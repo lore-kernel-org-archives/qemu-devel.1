@@ -2,62 +2,66 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34B9EC43218
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 19:29:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80902C43218
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 19:50:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F59520820
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 19:29:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F59520820
+	by mail.kernel.org (Postfix) with ESMTPS id 585872082E
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 19:50:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 585872082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49212 helo=lists.gnu.org)
+Received: from localhost ([::1]:49298 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haPz7-00015M-Ml
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 15:29:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55336)
+	id 1haQJX-0008TU-3K
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 15:50:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59600)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <msnitzer@redhat.com>) id 1haPyd-0000fa-EV
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 15:29:08 -0400
+ (envelope-from <wainersm@redhat.com>) id 1haQGO-0006z0-Nm
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 15:47:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <msnitzer@redhat.com>) id 1haPyb-0006Xa-B1
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 15:29:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48026)
+ (envelope-from <wainersm@redhat.com>) id 1haQGN-0001kf-Pj
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 15:47:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37123)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <msnitzer@redhat.com>) id 1haPyZ-0006QR-7X
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 15:29:03 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1haQGN-0001g3-Ix
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 15:47:27 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D9FFB120D7;
- Mon, 10 Jun 2019 19:28:23 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A734160C47;
- Mon, 10 Jun 2019 19:28:04 +0000 (UTC)
-Date: Mon, 10 Jun 2019 15:28:03 -0400
-From: Mike Snitzer <snitzer@redhat.com>
-To: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <20190610192803.GA29002@redhat.com>
-References: <20190610090730.8589-1-pagupta@redhat.com>
- <20190610090730.8589-5-pagupta@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 2582E223876;
+ Mon, 10 Jun 2019 19:47:14 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-123-147.rdu2.redhat.com
+ [10.10.123.147])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3509E5C207;
+ Mon, 10 Jun 2019 19:47:02 +0000 (UTC)
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+References: <20190607152223.9467-1-crosa@redhat.com>
+ <20190607152223.9467-2-crosa@redhat.com>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <9d94be88-3093-be44-1d0e-18372d686594@redhat.com>
+Date: Mon, 10 Jun 2019 16:46:56 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.5.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190610090730.8589-5-pagupta@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20190607152223.9467-2-crosa@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Mon, 10 Jun 2019 19:28:48 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.39]); Mon, 10 Jun 2019 19:47:19 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v11 4/7] dm: enable synchronous dax
+Subject: Re: [Qemu-devel] [PATCH 1/8] Travis: print acceptance tests logs in
+ case of job failure
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,94 +73,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, jack@suse.cz, kvm@vger.kernel.org, mst@redhat.com,
- jasowang@redhat.com, david@fromorbit.com, qemu-devel@nongnu.org,
- virtualization@lists.linux-foundation.org, dm-devel@redhat.com,
- adilger.kernel@dilger.ca, zwisler@kernel.org, aarcange@redhat.com,
- dave.jiang@intel.com, jstaron@google.com, linux-nvdimm@lists.01.org,
- vishal.l.verma@intel.com, david@redhat.com, willy@infradead.org,
- hch@infradead.org, linux-acpi@vger.kernel.org, jmoyer@redhat.com,
- linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
- rdunlap@infradead.org, riel@surriel.com, yuval.shaia@oracle.com,
- stefanha@redhat.com, pbonzini@redhat.com, dan.j.williams@intel.com,
- lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com, tytso@mit.edu,
- xiaoguangrong.eric@gmail.com, darrick.wong@oracle.com, rjw@rjwysocki.net,
- linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, imammedo@redhat.com
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 10 2019 at  5:07am -0400,
-Pankaj Gupta <pagupta@redhat.com> wrote:
 
->  This patch sets dax device 'DAXDEV_SYNC' flag if all the target
->  devices of device mapper support synchrononous DAX. If device
->  mapper consists of both synchronous and asynchronous dax devices,
->  we don't set 'DAXDEV_SYNC' flag.
-> 
-> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+On 06/07/2019 12:22 PM, Cleber Rosa wrote:
+> Because Travis doesn't allow us to keep files produced during tests
+> (such as log files), let's print the complete job log to the "console"
+> in case of job failures.
+>
+> This is a debugging aid, and given that there's been some timeouts
+> happening on some tests, we absolutely needs the logs to have a proper
+> action.
+>
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
 > ---
->  drivers/md/dm-table.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
-> 
-> diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-> index 350cf0451456..c5160d846fe6 100644
-> --- a/drivers/md/dm-table.c
-> +++ b/drivers/md/dm-table.c
-> @@ -890,10 +890,17 @@ static int device_supports_dax(struct dm_target *ti, struct dm_dev *dev,
->  			start, len);
->  }
->  
-> +static int device_synchronous(struct dm_target *ti, struct dm_dev *dev,
-> +				       sector_t start, sector_t len, void *data)
-> +{
-> +	return dax_synchronous(dev->dax_dev);
-> +}
-> +
->  bool dm_table_supports_dax(struct dm_table *t, int blocksize)
->  {
->  	struct dm_target *ti;
->  	unsigned i;
-> +	bool dax_sync = true;
->  
->  	/* Ensure that all targets support DAX. */
->  	for (i = 0; i < dm_table_get_num_targets(t); i++) {
-> @@ -906,7 +913,14 @@ bool dm_table_supports_dax(struct dm_table *t, int blocksize)
->  		    !ti->type->iterate_devices(ti, device_supports_dax,
->  			    &blocksize))
->  			return false;
-> +
-> +		/* Check devices support synchronous DAX */
-> +		if (dax_sync &&
-> +		    !ti->type->iterate_devices(ti, device_synchronous, NULL))
-> +			dax_sync = false;
->  	}
-> +	if (dax_sync)
-> +		set_dax_synchronous(t->md->dax_dev);
->  
->  	return true;
->  }
-> -- 
-> 2.20.1
-> 
+>   .travis.yml | 2 ++
+>   1 file changed, 2 insertions(+)
+>
+> diff --git a/.travis.yml b/.travis.yml
+> index b053a836a3..9f8e73f276 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
 
-dm_table_supports_dax() is called multiple times (from
-dm_table_set_restrictions and dm_table_determine_type).  It is strange
-to have a getter have a side-effect of being a setter too.  Overloading
-like this could get you in trouble in the future.
+It's handy. Unfortunately you cannot archive the log files in Travis, 
+otherwise that would be a nice option.
 
-Are you certain this is what you want?
+Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
 
-Or would it be better to refactor dm_table_supports_dax() to take an
-iterate_devices_fn arg and have callers pass the appropriate function?
-Then have dm_table_set_restrictions() caller do:
+> @@ -226,6 +226,8 @@ matrix:
+>       - env:
+>           - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu"
+>           - TEST_CMD="make check-acceptance"
+> +      after_failure:
+> +        - cat tests/results/latest/job.log
+>         addons:
+>           apt:
+>             packages:
 
-     if (dm_table_supports_dax(t, device_synchronous, NULL))
-     	  set_dax_synchronous(t->md->dax_dev);
-
-(NULL arg implies dm_table_supports_dax() refactoring would take a int
-*data pointer rather than int type).
-
-Mike
 
