@@ -2,86 +2,91 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AE5DC4321A
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 21:44:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72A22C43218
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 22:14:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8DCC20859
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 21:44:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JlM00l1f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8DCC20859
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 46B412082E
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 22:14:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46B412082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49920 helo=lists.gnu.org)
+Received: from localhost ([::1]:50064 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haS5M-0004jR-AX
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 17:44:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34988)
+	id 1haSYs-0002uy-1D
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 18:14:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41672)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1haS30-0002tH-Rj
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 17:41:48 -0400
+ (envelope-from <eblake@redhat.com>) id 1haSXN-0001kG-IH
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 18:13:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1haS2z-00018k-Hq
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 17:41:46 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:39186)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1haS2z-00017o-9B
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 17:41:45 -0400
-Received: by mail-ot1-x342.google.com with SMTP id r21so9808349otq.6
- for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 14:41:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=xnoKZEGB81OF4PyAUGnsUuuLgt1J2NT0rdvxKDH6KRE=;
- b=JlM00l1fJphZmBA7BGYK4bdBDMUJG4vVqHREVAJDQKoB/IGoFtNJ0yA6MTBpFMjltg
- yzsq1bn4Olc9powwdq49SqW3KvFM1nbbsnvsNEjTG6mFLb8V6clflnYROCoeiV2toIED
- xY61zNxM7fJgqHVOTnB2jBWdqKxVhfKX7dsmem4oe3QbHQ21dv53+gltoAMQLDHqTJ7A
- AFo/usn4RiukNKzWrZ2DlK+luwautp4JdageSPwm9HwJo+BThxa760t8WXwuVoHgql5u
- CjEOJt4/ySWuwsI6fK72h3/3SiPidrQhvbWho1b8xpuD1v2smxqr14AoTcd7wG4ZOSJh
- kT/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=xnoKZEGB81OF4PyAUGnsUuuLgt1J2NT0rdvxKDH6KRE=;
- b=JKniPA6mqnMYcs8cHFdpIZvDmmqv8/cMVhw1kkFbnsaaBLK6SkVkmxWCjK3fQUcRxF
- d5OFbqpAxQ6cpTv2W+NPGl45ARB5N5a5znHMHRlv2OnyiDA/Os4c8sEXV9SRD8pGJM6g
- qFDpfXjEmJ4T2ctXlUT74z2+aNSdZO/wNN+ShDv68LYuLiwj29gJtyi/9dHJQUVAfXxF
- +n7vGVoPtCAozgrCzPxtZBkLZy2nrVtjeX6WCvj7CqKho5788oDBbiNGlnDxSiXAqlG4
- kfRCWvuPZm1k9z0tZfwUeFwOwBjvcN9yVK+sezVk7TEZ4LMiVcNl48X95OzjL585WVpe
- 9ixQ==
-X-Gm-Message-State: APjAAAXZQJWN0JerLzZ/GnzQOzDy8UXkBk1mBJAzoaUKTWgXazLUNOuN
- v+zEh5dKduTytxjWMm/Af4TlH0pFLcHDachW+ieOhcwz
-X-Google-Smtp-Source: APXvYqzbxgSSlJPcQ8ODymsZ9iqmh0Bjhht+5wG1xow1bNkhLT/9b6C4ra9vW8R8wHO5PjKdGpAP1N0745G/Z9BcIl8=
-X-Received: by 2002:a9d:6e8a:: with SMTP id a10mr13840230otr.295.1560202904439; 
- Mon, 10 Jun 2019 14:41:44 -0700 (PDT)
+ (envelope-from <eblake@redhat.com>) id 1haSRz-00057Q-4m
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 18:07:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47056)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1haSRy-00056V-SO
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 18:07:35 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id DDC5087633;
+ Mon, 10 Jun 2019 22:07:33 +0000 (UTC)
+Received: from [10.3.116.85] (ovpn-116-85.phx2.redhat.com [10.3.116.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 115255DA2E;
+ Mon, 10 Jun 2019 22:07:30 +0000 (UTC)
+To: Gary Dale <gary@extremeground.com>, Stefan Hajnoczi <stefanha@gmail.com>
+References: <abb7990e-0331-67a4-af92-05276366478c@extremeground.com>
+ <20190610121941.GI14257@stefanha-x1.localdomain>
+ <dc7a70ea-c94f-e975-df44-b0199da698e2@extremeground.com>
+ <ab3e81c2-f0ce-2ef5-bbe7-948a87463b59@extremeground.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <edf57b3a-660c-0964-2455-9461b9aa2711@redhat.com>
+Date: Mon, 10 Jun 2019 17:07:30 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Received: by 2002:a9d:20e4:0:0:0:0:0 with HTTP; Mon, 10 Jun 2019 14:41:43
- -0700 (PDT)
-Received: by 2002:a9d:20e4:0:0:0:0:0 with HTTP; Mon, 10 Jun 2019 14:41:43
- -0700 (PDT)
-In-Reply-To: <20190610152444.20859-2-peter.maydell@linaro.org>
-References: <20190610152444.20859-1-peter.maydell@linaro.org>
- <20190610152444.20859-2-peter.maydell@linaro.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 10 Jun 2019 23:41:43 +0200
-Message-ID: <CAL1e-=hSY4uWQ9QmebdzkkV4WTZ82JFSW2fRafHBtvdJv1tm5A@mail.gmail.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH 1/2] docs/specs/index.rst: Fix minor syntax
- issues
+In-Reply-To: <ab3e81c2-f0ce-2ef5-bbe7-948a87463b59@extremeground.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="K2gJayIcESzcEPVHUa0os4mXQveQZHVdm"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Mon, 10 Jun 2019 22:07:34 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] kvm / virsh snapshot management
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,60 +98,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, kvm@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Jun 10, 2019 5:25 PM, "Peter Maydell" <peter.maydell@linaro.org> wrote:
->
-> The docs/specs/index.rst has a couple of minor issues which
-> we didn't notice because we weren't building the manual:
->  * the ToC entry for the new PPC XIVE docs points to
->    a nonexistent file
->  * the initial comment needs to be marked by '..', not '.',
->    or it will appear in the output
->  * the title doesn't match the capitialization used by
->    the existing interop or devel manuals, and uses
->    'full-system emulation' rather than the 'system emulation'
->    that the interop manual title uses
->
-> Fix these minor issues before we start trying to build the manual.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--K2gJayIcESzcEPVHUa0os4mXQveQZHVdm
+Content-Type: multipart/mixed; boundary="6lITd0FOqQXdxW57qkKHEujFi00VZHlSQ";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Gary Dale <gary@extremeground.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, kvm@vger.kernel.org
+Message-ID: <edf57b3a-660c-0964-2455-9461b9aa2711@redhat.com>
+Subject: Re: [Qemu-devel] kvm / virsh snapshot management
+References: <abb7990e-0331-67a4-af92-05276366478c@extremeground.com>
+ <20190610121941.GI14257@stefanha-x1.localdomain>
+ <dc7a70ea-c94f-e975-df44-b0199da698e2@extremeground.com>
+ <ab3e81c2-f0ce-2ef5-bbe7-948a87463b59@extremeground.com>
+In-Reply-To: <ab3e81c2-f0ce-2ef5-bbe7-948a87463b59@extremeground.com>
 
-Acked-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+--6lITd0FOqQXdxW57qkKHEujFi00VZHlSQ
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
->  docs/specs/index.rst | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
->
-> diff --git a/docs/specs/index.rst b/docs/specs/index.rst
-> index 2e927519c2e..40adb97c5eb 100644
-> --- a/docs/specs/index.rst
-> +++ b/docs/specs/index.rst
-> @@ -1,8 +1,8 @@
-> -. This is the top level page for the 'specs' manual
-> +.. This is the top level page for the 'specs' manual
->
->
-> -QEMU full-system emulation guest hardware specifications
-> -========================================================
-> +QEMU System Emulation Guest Hardware Specifications
-> +===================================================
->
->
->  Contents:
-> @@ -10,4 +10,5 @@ Contents:
->  .. toctree::
->     :maxdepth: 2
->
-> -   xive
-> +   ppc-xive
-> +   ppc-spapr-xive
-> --
-> 2.20.1
->
->
+On 6/10/19 4:27 PM, Gary Dale wrote:
+
+>>
+> Trying this against a test VM, I ran into a roadblock. My command line
+> and the results are:
+>=20
+> # virsh blockcommit stretch "/home/secure/virtual/stretch.qcow2" --top
+> stretchS3 --delete --wait
+> error: unsupported flags (0x2) in function qemuDomainBlockCommit
+>=20
+> I get the same thing when the path to the qcow2 file isn't quoted.
+
+That's a libvirt limitation - the --delete flag is documented from the
+generic API standpoint, but not (yet) implemented for the qemu driver
+within libvirt. For now, you have to omit --delete from your virsh
+command line, and then manually 'rm' the unused external file after the
+fact.
+
+>=20
+> I noted in
+> https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/=
+6/html/virtualization_administration_guide/sub-sect-domain_commands-using=
+_blockcommit_to_shorten_a_backing_chain
+> that the options use a single "-".
+
+Sounds like a bug in that documentation.
+
+> However the results for that were:
+> # virsh blockcommit stretch /home/secure/virtual/stretch.qcow2 -top
+> stretchS3 -delete -wait
+> error: Scaled numeric value '-top' for <--bandwidth> option is malforme=
+d
+> or out of range
+>=20
+> which looks like virsh doesn't like the single dashes and is trying to
+> interpret them as positional options.
+>=20
+> I also did a
+>=20
+> # virsh domblklist stretch
+> Target=A0=A0=A0=A0 Source
+> ------------------------------------------------
+> vda=A0=A0=A0=A0=A0=A0=A0 /home/secure/virtual/stretch.qcow2
+> hda=A0=A0=A0=A0=A0=A0=A0 -
+>=20
+> and tried using vda instead of the full path in the blockcommit but got=
+
+> the same error.
+>=20
+> Any ideas on what I'm doing wrong?
+
+Do you know for sure whether you have internal or external snapshots?
+And at this point, your questions are starting to wander more into
+libvirt territory.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--6lITd0FOqQXdxW57qkKHEujFi00VZHlSQ--
+
+--K2gJayIcESzcEPVHUa0os4mXQveQZHVdm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz+1KIACgkQp6FrSiUn
+Q2obeggAjN1NyupIkTIcuJET++dftWIhs2P8uigcNCSFMV3ZewRuU+OT5qyoV621
+LihI/hOPVD8zqtifMxNQNiLE75B7JJKSccLPvtPAj5T1qK3qpAtuW6i1ANcHRpq1
+iTxQISn5E4jcVUpDHrfIfs7ABPuC2JzTIP7wOr+dL+3/6/aKoNSkjzJpkN05ttwO
+AFoxH/zOKWAjS13SpUYtkSJkc+x1BmVqV9TN0r7XPy1Lq0U64WO8UrsoG6HSFNG4
+E5/xO3ceQg5gpPt47PdEzmu5j1HBkFOYVbdkgP+DJ4NJ3YxC+E3iL8h8cDu50WEb
+lp2Wi5DmBLUF3GLDuwBGOqvIs/8e7A==
+=oRXe
+-----END PGP SIGNATURE-----
+
+--K2gJayIcESzcEPVHUa0os4mXQveQZHVdm--
+
