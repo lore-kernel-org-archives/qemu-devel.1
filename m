@@ -2,93 +2,102 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FECDC4321A
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 20:51:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 730E0C43218
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 20:55:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1F8B2082E
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 20:51:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kZBYUwEF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1F8B2082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 48BFF20820
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 20:55:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48BFF20820
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49630 helo=lists.gnu.org)
+Received: from localhost ([::1]:49664 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haRGI-00010m-V6
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 16:51:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50433)
+	id 1haRJn-0002O2-OF
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 16:55:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51863)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1haRFB-0000SH-Iv
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 16:50:19 -0400
+ (envelope-from <anoo@linux.ibm.com>) id 1haRIV-0001jH-BF
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 16:53:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1haRFA-0001zm-Ci
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 16:50:17 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:37902)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1haRF8-0001jl-CC
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 16:50:14 -0400
-Received: by mail-pg1-x541.google.com with SMTP id v11so5644753pgl.5
- for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 13:50:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=U8PfD+7I+jePEGpyqltvhMZ5gvA5IKXr+HPT1O4Ndg8=;
- b=kZBYUwEFlKaT9NigtuChF/6Mrl38Nf5q2QUpMgmanA2ccfDOcIcBa/+KtapeKVT5R3
- hfkHTck7MLUbBBmy6DMJZBDipO3rbFe0+/uRX7M0CtUvV+1xPMrxqxsA96XWclphI8Lw
- OZqMQ14de3Mk3fY3O0YB7XvE4VQ7NHWuaWZ3EWH3SPuzWpkSCnAs/2ZgZ/CIYLofQWit
- ez9aLJAnJ3Z8awsyck/OtPfdWO5rGA8UGRgHCEsecB7FXPwDW0XiUDgJ9Zq0vGkaxSYI
- MsmOJQllf2Ns5ng+SPTvsGTEcAEFU6F+FaevYJD1YVCDqlnxWX5o72MybZDZpMCdHsgs
- l2aQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=U8PfD+7I+jePEGpyqltvhMZ5gvA5IKXr+HPT1O4Ndg8=;
- b=b9onO36Jds859n3HrVGJHM7TV/ldf9RE0qFesxem8eMZmwJqAJF2GmwihIvoM8wNs6
- FhvnSCgPpNi9KM77/VNwa3WjiKc662b0HN0LcbnTrwbQWXAp/sCmKrHaOlptuvOQe11r
- PUrVPgyxyWBqPxGyqolsHEEvYWqHKsiZ1qQ+EHrGzm6IUUw/QVAPWTkJyJXGjz9AQmHq
- zzJgeRky/m1gnHfDo9t7r8y6iZoCGPfKUa+hk90O3WzO73wE/EIjkMGol6rxo7VPwVIu
- 0TJKiWgBIAJbnpY1GupxxT8C4H71LyWoghyHHa5iAgkKQ2AbCawmh5fiBa7dr2v51NTw
- lJRQ==
-X-Gm-Message-State: APjAAAXFtlRMO2V2I4xHjyB3YwVDQLAIKzBXK+/TNj4v4w4k/TAHhNL8
- tscVXaS7n5I8Q/KSHNfPUxk1FQ==
-X-Google-Smtp-Source: APXvYqw3Xu76dnMAp0jMZGkErDxmDN/1qX4TwCFq/kJk//ts+M4k9c/lI+FCjmG5+s/Nk66H4XebRg==
-X-Received: by 2002:a17:90a:7f93:: with SMTP id
- m19mr23796983pjl.73.1560199804764; 
- Mon, 10 Jun 2019 13:50:04 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
- by smtp.gmail.com with ESMTPSA id
- n21sm384409pjo.0.2019.06.10.13.50.03
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 10 Jun 2019 13:50:03 -0700 (PDT)
-To: Michael Rolnik <mrolnik@gmail.com>, qemu-devel@nongnu.org
-References: <20190606193012.37715-1-mrolnik@gmail.com>
- <20190606193012.37715-5-mrolnik@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <35b377ca-dbad-b932-5e33-c5ae63344800@linaro.org>
-Date: Mon, 10 Jun 2019 13:50:02 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <anoo@linux.ibm.com>) id 1haRIU-0004cL-2L
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 16:53:43 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41138)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <anoo@linux.ibm.com>) id 1haRIQ-0004VE-TE
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 16:53:40 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x5AKXhZQ050216
+ for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 16:53:34 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2t1x2kh9hh-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 16:53:33 -0400
+Received: from localhost
+ by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <anoo@linux.ibm.com>;
+ Mon, 10 Jun 2019 21:53:33 +0100
+Received: from b03cxnp07029.gho.boulder.ibm.com (9.17.130.16)
+ by e36.co.us.ibm.com (192.168.1.136) with IBM ESMTP SMTP Gateway: Authorized
+ Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Mon, 10 Jun 2019 21:53:29 +0100
+Received: from b03ledav003.gho.boulder.ibm.com
+ (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+ by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x5AKrS0324510748
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 10 Jun 2019 20:53:28 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4648C6A051;
+ Mon, 10 Jun 2019 20:53:28 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C69136A04D;
+ Mon, 10 Jun 2019 20:53:27 +0000 (GMT)
+Received: from habcap11p1.aus.stglabs.ibm.com (unknown [9.41.164.53])
+ by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Mon, 10 Jun 2019 20:53:27 +0000 (GMT)
+From: Adriana Kobylak <anoo@linux.ibm.com>
+To: clg@kaod.org, peter.maydell@linaro.org, andrew@aj.id.au, joel@jms.id.au,
+ qemu-arm@nongnu.org
+Date: Mon, 10 Jun 2019 15:53:31 -0500
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <cce364a3-548c-427f-addb-07e38f827e03@www.fastmail.com>
+References: <cce364a3-548c-427f-addb-07e38f827e03@www.fastmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190606193012.37715-5-mrolnik@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::541
-Subject: Re: [Qemu-devel] [PATCH v21 4/7] target/avr: Add instruction
- translation
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+x-cbid: 19061020-0020-0000-0000-00000EF79DEF
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011243; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000286; SDB=6.01216112; UDB=6.00639395; IPR=6.00997212; 
+ MB=3.00027255; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-10 20:53:31
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19061020-0021-0000-0000-00006631EEBB
+Message-Id: <1560200011-70806-1-git-send-email-anoo@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-06-10_09:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906100139
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+ mx0a-001b2d01.pphosted.com id x5AKXhZQ050216
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: [Qemu-devel] [PATCH qemu v2] aspeed: Add support for the swift-bmc
+ board
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,35 +109,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sarah Harris <S.E.Harris@kent.ac.uk>, rth@twiddle.net
+Cc: Adriana Kobylak <anoo@us.ibm.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/6/19 12:30 PM, Michael Rolnik wrote:
-> +        if ((ctx.cpc & (TARGET_PAGE_SIZE - 1)) == 0) {
-> +            break; /* page boundary */
-> +        }
+From: Adriana Kobylak <anoo@us.ibm.com>
 
-This test isn't right, because this ended the TB if the *first* instruction was
-located on the page boundary.  It also fails to allow for a 32-bit opcode to
-span 0xff - 0x101, since we did not see an instruction boundary at 0x100.
+The Swift board is an OpenPOWER system hosting POWER processors.
+Add support for their BMC including the I2C devices as found on HW.
 
-Since there is no MMU, we do not have to protect against permissions changes.
-All we have to worry about is QEMU's code that detects self-modifying code.
-This requires the code for each TranslationBlocks be contained within no more
-than two pages.  Therefore,
+Signed-off-by: Adriana Kobylak <anoo@us.ibm.com>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ hw/arm/aspeed.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
 
-    /* Do not allow the next insn to cross into a third code page.  */
-    if ((ctx.npc - pc_start) * 2 >= TARGET_PAGE_SIZE - 4) {
-        break;
-    }
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index 33070a6..7fd0e0c 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -73,6 +73,17 @@ struct AspeedBoardState {
+         SCU_AST2500_HW_STRAP_ACPI_ENABLE |                              =
+\
+         SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER))
+=20
++/* Swift hardware value: 0xF11AD206 */
++#define SWIFT_BMC_HW_STRAP1 (                                           =
+\
++        AST2500_HW_STRAP1_DEFAULTS |                                    =
+\
++        SCU_AST2500_HW_STRAP_SPI_AUTOFETCH_ENABLE |                     =
+\
++        SCU_AST2500_HW_STRAP_GPIO_STRAP_ENABLE |                        =
+\
++        SCU_AST2500_HW_STRAP_UART_DEBUG |                               =
+\
++        SCU_AST2500_HW_STRAP_DDR4_ENABLE |                              =
+\
++        SCU_H_PLL_BYPASS_EN |                                           =
+\
++        SCU_AST2500_HW_STRAP_ACPI_ENABLE |                              =
+\
++        SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER))
++
+ /* Witherspoon hardware value: 0xF10AD216 (but use romulus definition) *=
+/
+ #define WITHERSPOON_BMC_HW_STRAP1 ROMULUS_BMC_HW_STRAP1
+=20
+@@ -287,6 +298,35 @@ static void romulus_bmc_i2c_init(AspeedBoardState *b=
+mc)
+     i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11), "ds1338"=
+, 0x32);
+ }
+=20
++static void swift_bmc_i2c_init(AspeedBoardState *bmc)
++{
++    AspeedSoCState *soc =3D &bmc->soc;
++
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 3), "pca9552"=
+, 0x60);
++
++    /* The swift board expects a TMP275 but a TMP105 is compatible */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 7), "tmp105",=
+ 0x48);
++    /* The swift board expects a pca9551 but a pca9552 is compatible */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 7), "pca9552"=
+, 0x60);
++
++    /* The swift board expects an Epson RX8900 RTC but a ds1338 is compa=
+tible */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 8), "ds1338",=
+ 0x32);
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 8), "pca9552"=
+, 0x60);
++
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 9), "tmp423",=
+ 0x4c);
++    /* The swift board expects a pca9539 but a pca9552 is compatible */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 9), "pca9552"=
+, 0x74);
++
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 10), "tmp423"=
+, 0x4c);
++    /* The swift board expects a pca9539 but a pca9552 is compatible */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 10), "pca9552=
+",
++                     0x74);
++
++    /* The swift board expects a TMP275 but a TMP105 is compatible */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 12), "tmp105"=
+, 0x48);
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 12), "tmp105"=
+, 0x4a);
++}
++
+ static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
+ {
+     AspeedSoCState *soc =3D &bmc->soc;
+@@ -378,6 +418,16 @@ static const AspeedBoardConfig aspeed_boards[] =3D {
+         .i2c_init  =3D romulus_bmc_i2c_init,
+         .ram       =3D 512 * MiB,
+     }, {
++        .name      =3D MACHINE_TYPE_NAME("swift-bmc"),
++        .desc      =3D "OpenPOWER Swift BMC (ARM1176)",
++        .soc_name  =3D "ast2500-a1",
++        .hw_strap1 =3D SWIFT_BMC_HW_STRAP1,
++        .fmc_model =3D "mx66l1g45g",
++        .spi_model =3D "mx66l1g45g",
++        .num_cs    =3D 2,
++        .i2c_init  =3D swift_bmc_i2c_init,
++        .ram       =3D 512 * MiB,
++    }, {
+         .name      =3D MACHINE_TYPE_NAME("witherspoon-bmc"),
+         .desc      =3D "OpenPOWER Witherspoon BMC (ARM1176)",
+         .soc_name  =3D "ast2500-a1",
+--=20
+1.8.3.1
 
-is the better condition.  Subtracting 4 allows for the next instruction to be a
-32-bit opcode.  Limiting to TARGET_PAGE_SIZE allows pc_start to be located
-anywhere in the first code page without allowing npc to cross into a third code
-page.
-
-
-r~
 
