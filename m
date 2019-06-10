@@ -7,83 +7,79 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C20A2C28EBD
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:35:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D585C28EBD
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:36:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DAE02067C
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:35:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 175B92067C
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:36:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OWoa7WOB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DAE02067C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sbqrbA+X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 175B92067C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39836 helo=lists.gnu.org)
+Received: from localhost ([::1]:39838 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haAAA-0006FZ-M3
-	for qemu-devel@archiver.kernel.org; Sun, 09 Jun 2019 22:35:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53252)
+	id 1haAAL-0006e9-CY
+	for qemu-devel@archiver.kernel.org; Sun, 09 Jun 2019 22:36:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53308)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1ha9eD-0006qK-1I
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:02:59 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1ha9eH-0006tV-Ge
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:03:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ha9e9-0001qq-Rk
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:02:56 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:41536)
+ (envelope-from <richard.henderson@linaro.org>) id 1ha9eF-0001zY-J6
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:03:01 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:36882)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ha9e9-0001qB-Iz
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:02:53 -0400
-Received: by mail-pl1-x644.google.com with SMTP id s24so2979982plr.8
- for <qemu-devel@nongnu.org>; Sun, 09 Jun 2019 19:02:53 -0700 (PDT)
+ id 1ha9eD-0001v3-LE
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:02:57 -0400
+Received: by mail-pl1-x644.google.com with SMTP id bh12so2987924plb.4
+ for <qemu-devel@nongnu.org>; Sun, 09 Jun 2019 19:02:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Lg8ZYqzoVS5LU/Hk8CNPJL+47kESr7iXuKNlKmQ7dbA=;
- b=OWoa7WOB2Ey//TXrGrSK2pLq3I5s5D32Np8l8HBKQA9n63WlLfF8VRLbcdoBS8oPNy
- dGoNQ9D29Uuf9Kf7QafrEcKyXBBG9qDpWKb2Tc7CbQrpVvvbZ1qzqYWzO2pNxA/rVr/o
- ZzTCQL7EvPuE6qzrG6jBxm/pESdNJWbvNKB5Td0c7g7x4v76pM3Gz/eEuSZ+x8dKuXWA
- DBbUJfjlJ/U0ZMF4xLTkV2sYN4MfNg45unIlAWQBV3iyka742NNEPjHK3LTg9ocM/cP/
- jtTMo9mc1OV8EWNLGa4obxQq+0dAYbTm8B3HVz/KS1KkysR2h2xfkKd/P07KgN6ZXQtU
- 0Q0g==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=nwSqled/nvSwrZxfnns2Ie8Xa1WPbLk6Osef1/ENK6I=;
+ b=sbqrbA+X7C1HnFF0eEAzDpnLYEnAUJgqAUo0dP8fm0OHllqaAHIFpWtQippRcS0FsK
+ P/VxusZDv7MvOYwb5zMQTFNihOJkdRdsitS2KFl2jhKcLa0qizSTCJ0oL+Va1Ajagxg+
+ z2JNmOtLW4wuIgTszMGWjsYCGXvVjwNpXm+DQZtwGaBsqteN3AxSkDup91IbKc2ahFd+
+ 6Qn4T7BtF5CNe0yjbeoOkNMXeEzztmddDyyEHhb5/bnSHlHLFg0mQBfCCfjZAjAw5uHB
+ io8b6IxoJTu9rY++xEcb8ZvjRrhIrGAu/NOCCmVZw5JY5KuqcFR/FpYk2uuKafOpG0Kp
+ XgYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Lg8ZYqzoVS5LU/Hk8CNPJL+47kESr7iXuKNlKmQ7dbA=;
- b=I8I5C99z5PRMoU5+jRBq/LMVIxF3XlqHCx4/k53f2EIP3yKDbvupgXA4hUH/lTecoI
- CD8gdDmElWN1hBBJKwWcVZhYQ6n1qxDN+UkCcWD8RBKiCmqOb4Q+ZPJ/gqHHv+AzsYXD
- KZSjos/3cLhO65LQaQzyz3gR3ToH7ZiT9fFsOQ4uOBbDnjnbcjmX6BizmDhYN8EahCsA
- V48SL/LGctfjJFwPiXYFFXw3e9+JIQwX1OOiCs7GRWFXn9elMdtihjPXocB4oZSoxqcz
- 7d0HtFduRDJ5S4IMQ5c53L/sW4r5+/er8b6TGYL9MkqDjXUAvHvkM++bi/fDPy3mWhNN
- lv+Q==
-X-Gm-Message-State: APjAAAW9miV/Ee2qXZzdc8D2Sav421RMTD0LvRdJJbXLkMmMNjJTgBU2
- i6i2+4vrfrCD/iMpKrnNCtZG3SKtBh4=
-X-Google-Smtp-Source: APXvYqxeksFBQ+l3PgtbgNDW+jyj52i3Chf8agrSG8iI6lXVCZ9TBceV0Fwgi3tmddNESg6QaOTk6g==
-X-Received: by 2002:a17:902:b691:: with SMTP id
- c17mr45580186pls.107.1560132172014; 
- Sun, 09 Jun 2019 19:02:52 -0700 (PDT)
+ :references;
+ bh=nwSqled/nvSwrZxfnns2Ie8Xa1WPbLk6Osef1/ENK6I=;
+ b=R02q6mDLzFrAjLS+EhYigJdv/wig8ICCcmIEvtrqGP8CcuzcP2siAr9xc8O24XIkCF
+ Mb8TRYPU2DTgaNxRLDRvL2WfFOaJol8DParB1zl6hdSG6cTrBbgEHdc0wSZ/t8t/fuYB
+ SaPHJRrlE/Gqlzld2/InFnyWwhQv3B70p1k6SV03H4BL8jW4bojCbSMKeYzzLbHO7hO9
+ cqKuJkJZ8vD6UoIaXGCYBsIPRVi1XdO6v1AKehURj9s8LgoZNdAM03T1G3TIuUTvGBve
+ 4/JbwpaEFTz7tGRlEmSy4DFhdSPxzw4/ZLjcQDlMkaXA0ck6fHXwyEFkkk9fU2n3iY6q
+ 3GKA==
+X-Gm-Message-State: APjAAAUPZKPjAXZShSOBvZNmqMPQZRqwTVZ/UNNcGBYx23UDl8hQI4LK
+ T6ru6si7zaL2xyqabiUEdxqhLSLZN5k=
+X-Google-Smtp-Source: APXvYqynSZGm5VwxUlS6ukOhaQChFAmEv4V3w+CEGPoaZI+tf2uqhbJlxd0pRjFq3UxfV1JNxHkroA==
+X-Received: by 2002:a17:902:7c03:: with SMTP id
+ x3mr43380280pll.242.1560132176444; 
+ Sun, 09 Jun 2019 19:02:56 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
  [97.113.13.231])
- by smtp.gmail.com with ESMTPSA id l63sm9749013pfl.181.2019.06.09.19.02.51
+ by smtp.gmail.com with ESMTPSA id l63sm9749013pfl.181.2019.06.09.19.02.55
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 09 Jun 2019 19:02:51 -0700 (PDT)
+ Sun, 09 Jun 2019 19:02:55 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sun,  9 Jun 2019 19:02:05 -0700
-Message-Id: <20190610020218.9228-27-richard.henderson@linaro.org>
+Date: Sun,  9 Jun 2019 19:02:09 -0700
+Message-Id: <20190610020218.9228-31-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190610020218.9228-1-richard.henderson@linaro.org>
 References: <20190610020218.9228-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2607:f8b0:4864:20::644
-Subject: [Qemu-devel] [PULL 26/39] target/sparc: Use env_cpu, env_archcpu
+Subject: [Qemu-devel] [PULL 30/39] target/xtensa: Use env_cpu, env_archcpu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,361 +97,258 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Cleanup in the boilerplate that each target must define.
-Replace sparc_env_get_cpu with env_archcpu.  The combination
-CPU(sparc_env_get_cpu) should have used ENV_GET_CPU to begin;
+Replace xtensa_env_get_cpu with env_archcpu.  The combination
+CPU(xtensa_env_get_cpu) should have used ENV_GET_CPU to begin;
 use env_cpu now.
 
+Move cpu_get_tb_cpu_state below the include of "exec/cpu-all.h"
+so that the definition of env_cpu is available.
+
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/sparc/cpu.h          |  5 -----
- bsd-user/main.c             |  2 +-
- hw/sparc/leon3.c            |  4 ++--
- hw/sparc/sun4m.c            |  4 ++--
- hw/sparc64/sparc64.c        |  2 +-
- linux-user/sparc/cpu_loop.c |  2 +-
- target/sparc/fop_helper.c   |  2 +-
- target/sparc/helper.c       |  8 ++++----
- target/sparc/ldst_helper.c  | 33 +++++++++++++++------------------
- target/sparc/mmu_helper.c   | 10 +++++-----
- 10 files changed, 32 insertions(+), 40 deletions(-)
+ target/xtensa/cpu.h          | 17 ++++++-----------
+ hw/xtensa/pic_cpu.c          |  2 +-
+ linux-user/xtensa/cpu_loop.c |  2 +-
+ target/xtensa/dbg_helper.c   |  4 ++--
+ target/xtensa/exc_helper.c   |  9 ++++-----
+ target/xtensa/helper.c       |  2 +-
+ target/xtensa/mmu_helper.c   | 17 ++++++-----------
+ target/xtensa/xtensa-semi.c  |  2 +-
+ 8 files changed, 22 insertions(+), 33 deletions(-)
 
-diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-index e29421349b..adcd9e3000 100644
---- a/target/sparc/cpu.h
-+++ b/target/sparc/cpu.h
-@@ -532,11 +532,6 @@ struct SPARCCPU {
-     CPUSPARCState env;
+diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
+index 3de53cb5d0..97b7bae0fe 100644
+--- a/target/xtensa/cpu.h
++++ b/target/xtensa/cpu.h
+@@ -559,11 +559,6 @@ struct XtensaCPU {
+     CPUXtensaState env;
  };
  
--static inline SPARCCPU *sparc_env_get_cpu(CPUSPARCState *env)
+-static inline XtensaCPU *xtensa_env_get_cpu(const CPUXtensaState *env)
 -{
--    return container_of(env, SPARCCPU, env);
+-    return container_of(env, XtensaCPU, env);
 -}
 -
- #define ENV_OFFSET offsetof(SPARCCPU, env)
+ #define ENV_OFFSET offsetof(XtensaCPU, env)
  
- #ifndef CONFIG_USER_ONLY
-diff --git a/bsd-user/main.c b/bsd-user/main.c
-index bfdcae4269..f6f76f1a64 100644
---- a/bsd-user/main.c
-+++ b/bsd-user/main.c
-@@ -486,7 +486,7 @@ static void flush_windows(CPUSPARCState *env)
  
- void cpu_loop(CPUSPARCState *env)
+@@ -724,10 +719,15 @@ static inline int cpu_mmu_index(CPUXtensaState *env, bool ifetch)
+ #define XTENSA_CSBASE_LBEG_OFF_MASK 0x00ff0000
+ #define XTENSA_CSBASE_LBEG_OFF_SHIFT 16
+ 
++typedef CPUXtensaState CPUArchState;
++typedef XtensaCPU ArchCPU;
++
++#include "exec/cpu-all.h"
++
+ static inline void cpu_get_tb_cpu_state(CPUXtensaState *env, target_ulong *pc,
+         target_ulong *cs_base, uint32_t *flags)
  {
--    CPUState *cs = CPU(sparc_env_get_cpu(env));
+-    CPUState *cs = CPU(xtensa_env_get_cpu(env));
 +    CPUState *cs = env_cpu(env);
-     int trapnr, ret, syscall_nr;
-     //target_siginfo_t info;
  
-diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-index bdead85a93..19cedebd16 100644
---- a/hw/sparc/leon3.c
-+++ b/hw/sparc/leon3.c
-@@ -159,7 +159,7 @@ static void leon3_set_pil_in(void *opaque, uint32_t pil_in)
+     *pc = env->pc;
+     *cs_base = 0;
+@@ -797,9 +797,4 @@ static inline void cpu_get_tb_cpu_state(CPUXtensaState *env, target_ulong *pc,
+     }
+ }
  
-                 env->interrupt_index = TT_EXTINT | i;
-                 if (old_interrupt != env->interrupt_index) {
--                    cs = CPU(sparc_env_get_cpu(env));
-+                    cs = env_cpu(env);
-                     trace_leon3_set_irq(i);
-                     cpu_interrupt(cs, CPU_INTERRUPT_HARD);
-                 }
-@@ -167,7 +167,7 @@ static void leon3_set_pil_in(void *opaque, uint32_t pil_in)
-             }
-         }
-     } else if (!env->pil_in && (env->interrupt_index & ~15) == TT_EXTINT) {
--        cs = CPU(sparc_env_get_cpu(env));
-+        cs = env_cpu(env);
-         trace_leon3_reset_irq(env->interrupt_index & 15);
-         env->interrupt_index = 0;
-         cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index 5151a7202b..7e4f61fc3e 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -166,7 +166,7 @@ void cpu_check_irqs(CPUSPARCState *env)
+-typedef CPUXtensaState CPUArchState;
+-typedef XtensaCPU ArchCPU;
+-
+-#include "exec/cpu-all.h"
+-
+ #endif
+diff --git a/hw/xtensa/pic_cpu.c b/hw/xtensa/pic_cpu.c
+index a8939f5e58..df3acbb541 100644
+--- a/hw/xtensa/pic_cpu.c
++++ b/hw/xtensa/pic_cpu.c
+@@ -33,7 +33,7 @@
  
-                 env->interrupt_index = TT_EXTINT | i;
-                 if (old_interrupt != env->interrupt_index) {
--                    cs = CPU(sparc_env_get_cpu(env));
-+                    cs = env_cpu(env);
-                     trace_sun4m_cpu_interrupt(i);
-                     cpu_interrupt(cs, CPU_INTERRUPT_HARD);
-                 }
-@@ -174,7 +174,7 @@ void cpu_check_irqs(CPUSPARCState *env)
-             }
-         }
-     } else if (!env->pil_in && (env->interrupt_index & ~15) == TT_EXTINT) {
--        cs = CPU(sparc_env_get_cpu(env));
-+        cs = env_cpu(env);
-         trace_sun4m_cpu_reset_interrupt(env->interrupt_index & 15);
-         env->interrupt_index = 0;
-         cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
-diff --git a/hw/sparc64/sparc64.c b/hw/sparc64/sparc64.c
-index 408388945e..689801f37d 100644
---- a/hw/sparc64/sparc64.c
-+++ b/hw/sparc64/sparc64.c
-@@ -46,7 +46,7 @@ void cpu_check_irqs(CPUSPARCState *env)
-     if (env->ivec_status & 0x20) {
+ void check_interrupts(CPUXtensaState *env)
+ {
+-    CPUState *cs = CPU(xtensa_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     int minlevel = xtensa_get_cintlevel(env);
+     uint32_t int_set_enabled = env->sregs[INTSET] & env->sregs[INTENABLE];
+     int level;
+diff --git a/linux-user/xtensa/cpu_loop.c b/linux-user/xtensa/cpu_loop.c
+index bee78edb8a..64831c9199 100644
+--- a/linux-user/xtensa/cpu_loop.c
++++ b/linux-user/xtensa/cpu_loop.c
+@@ -123,7 +123,7 @@ static void xtensa_underflow12(CPUXtensaState *env)
+ 
+ void cpu_loop(CPUXtensaState *env)
+ {
+-    CPUState *cs = CPU(xtensa_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     target_siginfo_t info;
+     abi_ulong ret;
+     int trapnr;
+diff --git a/target/xtensa/dbg_helper.c b/target/xtensa/dbg_helper.c
+index cd8fbd653a..be1f81107b 100644
+--- a/target/xtensa/dbg_helper.c
++++ b/target/xtensa/dbg_helper.c
+@@ -71,7 +71,7 @@ void HELPER(wsr_ibreaka)(CPUXtensaState *env, uint32_t i, uint32_t v)
+ static void set_dbreak(CPUXtensaState *env, unsigned i, uint32_t dbreaka,
+         uint32_t dbreakc)
+ {
+-    CPUState *cs = CPU(xtensa_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     int flags = BP_CPU | BP_STOP_BEFORE_ACCESS;
+     uint32_t mask = dbreakc | ~DBREAKC_MASK;
+ 
+@@ -118,7 +118,7 @@ void HELPER(wsr_dbreakc)(CPUXtensaState *env, uint32_t i, uint32_t v)
+             set_dbreak(env, i, env->sregs[DBREAKA + i], v);
+         } else {
+             if (env->cpu_watchpoint[i]) {
+-                CPUState *cs = CPU(xtensa_env_get_cpu(env));
++                CPUState *cs = env_cpu(env);
+ 
+                 cpu_watchpoint_remove_by_ref(cs, env->cpu_watchpoint[i]);
+                 env->cpu_watchpoint[i] = NULL;
+diff --git a/target/xtensa/exc_helper.c b/target/xtensa/exc_helper.c
+index 4a1f7aef5d..601341d13a 100644
+--- a/target/xtensa/exc_helper.c
++++ b/target/xtensa/exc_helper.c
+@@ -34,7 +34,7 @@
+ 
+ void HELPER(exception)(CPUXtensaState *env, uint32_t excp)
+ {
+-    CPUState *cs = CPU(xtensa_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+ 
+     cs->exception_index = excp;
+     if (excp == EXCP_YIELD) {
+@@ -100,7 +100,7 @@ void HELPER(debug_exception)(CPUXtensaState *env, uint32_t pc, uint32_t cause)
+ 
+ void HELPER(waiti)(CPUXtensaState *env, uint32_t pc, uint32_t intlevel)
+ {
+-    CPUState *cpu;
++    CPUState *cpu = env_cpu(env);
+ 
+     env->pc = pc;
+     env->sregs[PS] = (env->sregs[PS] & ~PS_INTLEVEL) |
+@@ -111,11 +111,10 @@ void HELPER(waiti)(CPUXtensaState *env, uint32_t pc, uint32_t intlevel)
+     qemu_mutex_unlock_iothread();
+ 
+     if (env->pending_irq_level) {
+-        cpu_loop_exit(CPU(xtensa_env_get_cpu(env)));
++        cpu_loop_exit(cpu);
          return;
      }
--    cs = CPU(sparc_env_get_cpu(env));
-+    cs = env_cpu(env);
-     /* check if TM or SM in SOFTINT are set
-        setting these also causes interrupt 14 */
-     if (env->softint & (SOFTINT_TIMER | SOFTINT_STIMER)) {
-diff --git a/linux-user/sparc/cpu_loop.c b/linux-user/sparc/cpu_loop.c
-index 9e357229c0..d85359037c 100644
---- a/linux-user/sparc/cpu_loop.c
-+++ b/linux-user/sparc/cpu_loop.c
-@@ -145,7 +145,7 @@ static void flush_windows(CPUSPARCState *env)
  
- void cpu_loop (CPUSPARCState *env)
- {
--    CPUState *cs = CPU(sparc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     int trapnr;
-     abi_long ret;
-     target_siginfo_t info;
-diff --git a/target/sparc/fop_helper.c b/target/sparc/fop_helper.c
-index b6642fd1d7..9eb9b75718 100644
---- a/target/sparc/fop_helper.c
-+++ b/target/sparc/fop_helper.c
-@@ -53,7 +53,7 @@ static target_ulong do_check_ieee_exceptions(CPUSPARCState *env, uintptr_t ra)
-         }
- 
-         if ((fsr & FSR_CEXC_MASK) & ((fsr & FSR_TEM_MASK) >> 23)) {
--            CPUState *cs = CPU(sparc_env_get_cpu(env));
-+            CPUState *cs = env_cpu(env);
- 
-             /* Unmasked exception, generate a trap.  Note that while
-                the helper is marked as NO_WG, we can get away with
-diff --git a/target/sparc/helper.c b/target/sparc/helper.c
-index 46232788c8..1a52061fbf 100644
---- a/target/sparc/helper.c
-+++ b/target/sparc/helper.c
-@@ -26,7 +26,7 @@
- 
- void cpu_raise_exception_ra(CPUSPARCState *env, int tt, uintptr_t ra)
- {
--    CPUState *cs = CPU(sparc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
- 
-     cs->exception_index = tt;
-     cpu_loop_exit_restore(cs, ra);
-@@ -34,7 +34,7 @@ void cpu_raise_exception_ra(CPUSPARCState *env, int tt, uintptr_t ra)
- 
- void helper_raise_exception(CPUSPARCState *env, int tt)
- {
--    CPUState *cs = CPU(sparc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
- 
-     cs->exception_index = tt;
-     cpu_loop_exit(cs);
-@@ -42,7 +42,7 @@ void helper_raise_exception(CPUSPARCState *env, int tt)
- 
- void helper_debug(CPUSPARCState *env)
- {
--    CPUState *cs = CPU(sparc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
- 
-     cs->exception_index = EXCP_DEBUG;
-     cpu_loop_exit(cs);
-@@ -243,7 +243,7 @@ target_ulong helper_tsubcctv(CPUSPARCState *env, target_ulong src1,
- #ifndef TARGET_SPARC64
- void helper_power_down(CPUSPARCState *env)
- {
--    CPUState *cs = CPU(sparc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
- 
-     cs->halted = 1;
-     cs->exception_index = EXCP_HLT;
-diff --git a/target/sparc/ldst_helper.c b/target/sparc/ldst_helper.c
-index b4bf6faf41..7f56c100c6 100644
---- a/target/sparc/ldst_helper.c
-+++ b/target/sparc/ldst_helper.c
-@@ -122,13 +122,13 @@ static uint64_t ultrasparc_tag_target(uint64_t tag_access_register)
- 
- static void replace_tlb_entry(SparcTLBEntry *tlb,
-                               uint64_t tlb_tag, uint64_t tlb_tte,
--                              CPUSPARCState *env1)
-+                              CPUSPARCState *env)
- {
-     target_ulong mask, size, va, offset;
- 
-     /* flush page range if translation is valid */
-     if (TTE_IS_VALID(tlb->tte)) {
--        CPUState *cs = CPU(sparc_env_get_cpu(env1));
+-    cpu = CPU(xtensa_env_get_cpu(env));
+     cpu->halted = 1;
+     HELPER(exception)(env, EXCP_HLT);
+ }
+@@ -165,7 +164,7 @@ static void handle_interrupt(CPUXtensaState *env)
+         (env->config->level_mask[level] &
+          env->sregs[INTSET] &
+          env->sregs[INTENABLE])) {
+-        CPUState *cs = CPU(xtensa_env_get_cpu(env));
 +        CPUState *cs = env_cpu(env);
  
-         size = 8192ULL << 3 * TTE_PGSIZE(tlb->tte);
-         mask = 1ULL + ~size;
-@@ -499,7 +499,7 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
+         if (level > 1) {
+             env->sregs[EPC1 + level - 1] = env->pc;
+diff --git a/target/xtensa/helper.c b/target/xtensa/helper.c
+index f2d07e4a2f..376a61f339 100644
+--- a/target/xtensa/helper.c
++++ b/target/xtensa/helper.c
+@@ -324,7 +324,7 @@ void xtensa_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
+ 
+ void xtensa_runstall(CPUXtensaState *env, bool runstall)
  {
-     int size = 1 << (memop & MO_SIZE);
-     int sign = memop & MO_SIGN;
--    CPUState *cs = CPU(sparc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     uint64_t ret = 0;
- #if defined(DEBUG_MXCC) || defined(DEBUG_ASI)
-     uint32_t last_addr = addr;
-@@ -725,8 +725,7 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, uint64_t val,
-                    int asi, uint32_t memop)
+-    CPUState *cpu = CPU(xtensa_env_get_cpu(env));
++    CPUState *cpu = env_cpu(env);
+ 
+     env->runstall = runstall;
+     cpu->halted = runstall;
+diff --git a/target/xtensa/mmu_helper.c b/target/xtensa/mmu_helper.c
+index cab39f687a..f15bff306f 100644
+--- a/target/xtensa/mmu_helper.c
++++ b/target/xtensa/mmu_helper.c
+@@ -71,12 +71,10 @@ void HELPER(itlb_hit_test)(CPUXtensaState *env, uint32_t vaddr)
+ 
+ void HELPER(wsr_rasid)(CPUXtensaState *env, uint32_t v)
  {
-     int size = 1 << (memop & MO_SIZE);
--    SPARCCPU *cpu = sparc_env_get_cpu(env);
+-    XtensaCPU *cpu = xtensa_env_get_cpu(env);
+-
+     v = (v & 0xffffff00) | 0x1;
+     if (v != env->sregs[RASID]) {
+         env->sregs[RASID] = v;
+-        tlb_flush(CPU(cpu));
++        tlb_flush(env_cpu(env));
+     }
+ }
+ 
+@@ -276,8 +274,7 @@ static void xtensa_tlb_set_entry(CPUXtensaState *env, bool dtlb,
+                                  unsigned wi, unsigned ei,
+                                  uint32_t vpn, uint32_t pte)
+ {
+-    XtensaCPU *cpu = xtensa_env_get_cpu(env);
 -    CPUState *cs = CPU(cpu);
 +    CPUState *cs = env_cpu(env);
+     xtensa_tlb_entry *entry = xtensa_tlb_get_entry(env, dtlb, wi, ei);
  
-     do_check_align(env, addr, size - 1, GETPC());
-     switch (asi) {
-@@ -874,13 +873,13 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, uint64_t val,
-             DPRINTF_MMU("mmu flush level %d\n", mmulev);
-             switch (mmulev) {
-             case 0: /* flush page */
--                tlb_flush_page(CPU(cpu), addr & 0xfffff000);
-+                tlb_flush_page(cs, addr & 0xfffff000);
-                 break;
-             case 1: /* flush segment (256k) */
-             case 2: /* flush region (16M) */
-             case 3: /* flush context (4G) */
-             case 4: /* flush entire */
--                tlb_flush(CPU(cpu));
-+                tlb_flush(cs);
-                 break;
-             default:
-                 break;
-@@ -905,7 +904,7 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, uint64_t val,
-                    are invalid in normal mode.  */
-                 if ((oldreg ^ env->mmuregs[reg])
-                     & (MMU_NF | env->def.mmu_bm)) {
--                    tlb_flush(CPU(cpu));
-+                    tlb_flush(cs);
-                 }
-                 break;
-             case 1: /* Context Table Pointer Register */
-@@ -916,7 +915,7 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, uint64_t val,
-                 if (oldreg != env->mmuregs[reg]) {
-                     /* we flush when the MMU context changes because
-                        QEMU has no MMU context support */
--                    tlb_flush(CPU(cpu));
-+                    tlb_flush(cs);
-                 }
-                 break;
-             case 3: /* Synchronous Fault Status Register with Clear */
-@@ -1027,8 +1026,7 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, uint64_t val,
-     case ASI_USERTXT: /* User code access, XXX */
-     case ASI_KERNELTXT: /* Supervisor code access, XXX */
-     default:
--        cpu_unassigned_access(CPU(sparc_env_get_cpu(env)),
--                              addr, true, false, asi, size);
-+        cpu_unassigned_access(cs, addr, true, false, asi, size);
-         break;
+     if (xtensa_option_enabled(env->config, XTENSA_OPTION_MMU)) {
+@@ -503,7 +500,7 @@ void HELPER(itlb)(CPUXtensaState *env, uint32_t v, uint32_t dtlb)
+         uint32_t wi;
+         xtensa_tlb_entry *entry = get_tlb_entry(env, v, dtlb, &wi);
+         if (entry->variable && entry->asid) {
+-            tlb_flush_page(CPU(xtensa_env_get_cpu(env)), entry->vaddr);
++            tlb_flush_page(env_cpu(env), entry->vaddr);
+             entry->asid = 0;
+         }
+     }
+@@ -844,7 +841,7 @@ static int get_physical_addr_mmu(CPUXtensaState *env, bool update_tlb,
  
-     case ASI_USERDATA: /* User data access */
-@@ -1175,7 +1173,7 @@ uint64_t helper_ld_asi(CPUSPARCState *env, target_ulong addr,
+ static bool get_pte(CPUXtensaState *env, uint32_t vaddr, uint32_t *pte)
  {
-     int size = 1 << (memop & MO_SIZE);
-     int sign = memop & MO_SIGN;
--    CPUState *cs = CPU(sparc_env_get_cpu(env));
+-    CPUState *cs = CPU(xtensa_env_get_cpu(env));
 +    CPUState *cs = env_cpu(env);
-     uint64_t ret = 0;
- #if defined(DEBUG_ASI)
-     target_ulong last_addr = addr;
-@@ -1481,8 +1479,7 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, target_ulong val,
-                    int asi, uint32_t memop)
+     uint32_t paddr;
+     uint32_t page_size;
+     unsigned access;
+@@ -924,13 +921,11 @@ static int xtensa_mpu_lookup(const xtensa_mpu_entry *entry, unsigned n,
+ 
+ void HELPER(wsr_mpuenb)(CPUXtensaState *env, uint32_t v)
  {
-     int size = 1 << (memop & MO_SIZE);
--    SPARCCPU *cpu = sparc_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUState *cs = env_cpu(env);
+-    XtensaCPU *cpu = xtensa_env_get_cpu(env);
+-
+     v &= (2u << (env->config->n_mpu_fg_segments - 1)) - 1;
  
- #ifdef DEBUG_ASI
-     dump_asi("write", addr, asi, size, val);
-@@ -1686,13 +1683,13 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, target_ulong val,
-                 env->dmmu.mmu_primary_context = val;
-                 /* can be optimized to only flush MMU_USER_IDX
-                    and MMU_KERNEL_IDX entries */
--                tlb_flush(CPU(cpu));
-+                tlb_flush(cs);
-                 break;
-             case 2: /* Secondary context */
-                 env->dmmu.mmu_secondary_context = val;
-                 /* can be optimized to only flush MMU_USER_SECONDARY_IDX
-                    and MMU_KERNEL_SECONDARY_IDX entries */
--                tlb_flush(CPU(cpu));
-+                tlb_flush(cs);
-                 break;
-             case 5: /* TSB access */
-                 DPRINTF_MMU("dmmu TSB write: 0x%016" PRIx64 " -> 0x%016"
-@@ -1768,13 +1765,13 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, target_ulong val,
-           case 1:
-               env->dmmu.mmu_primary_context = val;
-               env->immu.mmu_primary_context = val;
--              tlb_flush_by_mmuidx(CPU(cpu),
-+              tlb_flush_by_mmuidx(cs,
-                                   (1 << MMU_USER_IDX) | (1 << MMU_KERNEL_IDX));
-               break;
-           case 2:
-               env->dmmu.mmu_secondary_context = val;
-               env->immu.mmu_secondary_context = val;
--              tlb_flush_by_mmuidx(CPU(cpu),
-+              tlb_flush_by_mmuidx(cs,
-                                   (1 << MMU_USER_SECONDARY_IDX) |
-                                   (1 << MMU_KERNEL_SECONDARY_IDX));
-               break;
-diff --git a/target/sparc/mmu_helper.c b/target/sparc/mmu_helper.c
-index facc0c60e9..cbd1e91179 100644
---- a/target/sparc/mmu_helper.c
-+++ b/target/sparc/mmu_helper.c
-@@ -97,7 +97,7 @@ static int get_physical_address(CPUSPARCState *env, hwaddr *physical,
-     uint32_t pde;
-     int error_code = 0, is_dirty, is_user;
-     unsigned long page_offset;
--    CPUState *cs = CPU(sparc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
+     if (v != env->sregs[MPUENB]) {
+         env->sregs[MPUENB] = v;
+-        tlb_flush(CPU(cpu));
++        tlb_flush(env_cpu(env));
+     }
+ }
  
-     is_user = mmu_idx == MMU_USER_IDX;
+@@ -942,7 +937,7 @@ void HELPER(wptlb)(CPUXtensaState *env, uint32_t p, uint32_t v)
+         env->mpu_fg[segment].vaddr = v & -env->config->mpu_align;
+         env->mpu_fg[segment].attr = p & XTENSA_MPU_ATTR_MASK;
+         env->sregs[MPUENB] = deposit32(env->sregs[MPUENB], segment, 1, v);
+-        tlb_flush(CPU(xtensa_env_get_cpu(env)));
++        tlb_flush(env_cpu(env));
+     }
+ }
  
-@@ -268,7 +268,7 @@ bool sparc_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+diff --git a/target/xtensa/xtensa-semi.c b/target/xtensa/xtensa-semi.c
+index 38efa3485a..8862985e56 100644
+--- a/target/xtensa/xtensa-semi.c
++++ b/target/xtensa/xtensa-semi.c
+@@ -197,7 +197,7 @@ void xtensa_sim_open_console(Chardev *chr)
  
- target_ulong mmu_probe(CPUSPARCState *env, target_ulong address, int mmulev)
+ void HELPER(simcall)(CPUXtensaState *env)
  {
--    CPUState *cs = CPU(sparc_env_get_cpu(env));
+-    CPUState *cs = CPU(xtensa_env_get_cpu(env));
 +    CPUState *cs = env_cpu(env);
-     hwaddr pde_ptr;
-     uint32_t pde;
+     uint32_t *regs = env->regs;
  
-@@ -335,7 +335,7 @@ target_ulong mmu_probe(CPUSPARCState *env, target_ulong address, int mmulev)
- 
- void dump_mmu(CPUSPARCState *env)
- {
--    CPUState *cs = CPU(sparc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     target_ulong va, va1, va2;
-     unsigned int n, m, o;
-     hwaddr pde_ptr, pa;
-@@ -494,7 +494,7 @@ static int get_physical_address_data(CPUSPARCState *env,
-                                      hwaddr *physical, int *prot,
-                                      target_ulong address, int rw, int mmu_idx)
- {
--    CPUState *cs = CPU(sparc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     unsigned int i;
-     uint64_t context;
-     uint64_t sfsr = 0;
-@@ -612,7 +612,7 @@ static int get_physical_address_code(CPUSPARCState *env,
-                                      hwaddr *physical, int *prot,
-                                      target_ulong address, int mmu_idx)
- {
--    CPUState *cs = CPU(sparc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     unsigned int i;
-     uint64_t context;
-     bool is_user = false;
+     switch (regs[2]) {
 -- 
 2.17.1
 
