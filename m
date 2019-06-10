@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5B07C31E40
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 14:43:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94177C31E40
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 14:44:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB3912085A
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 14:43:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB3912085A
+	by mail.kernel.org (Postfix) with ESMTPS id 6C6D320862
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 14:44:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C6D320862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47292 helo=lists.gnu.org)
+Received: from localhost ([::1]:47324 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haLWc-0002nh-Of
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 10:43:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34864)
+	id 1haLWp-0003BR-KZ
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 10:44:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35550)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1haLRO-0005ow-Ch
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 10:38:31 -0400
+ (envelope-from <eblake@redhat.com>) id 1haLTB-0007R5-QK
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 10:40:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1haLGt-0005d4-98
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 10:27:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59572)
+ (envelope-from <eblake@redhat.com>) id 1haLTA-0006Yb-O4
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 10:40:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59778)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1haLGt-0005cQ-0Q
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 10:27:39 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1haLTA-0006Xf-FT
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 10:40:20 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DB2D2C05681F;
- Mon, 10 Jun 2019 14:27:24 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 303BC30C1AE8
+ for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 14:40:17 +0000 (UTC)
 Received: from [10.3.116.85] (ovpn-116-85.phx2.redhat.com [10.3.116.85])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5B28E60BF3;
- Mon, 10 Jun 2019 14:27:23 +0000 (UTC)
-To: Wei Yang <richardw.yang@linux.intel.com>,
- Juan Quintela <quintela@redhat.com>
-References: <20190515121544.4597-1-quintela@redhat.com>
- <20190520063525.GA6718@richard>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A8F3E5F9B7;
+ Mon, 10 Jun 2019 14:40:15 +0000 (UTC)
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20190607221414.15962-1-eblake@redhat.com>
+ <20190610090811.GC7809@redhat.com>
+ <fd11c04f-c02a-8565-9f3b-e7ff83262725@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -71,21 +71,21 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <8591b552-6dc5-d466-54b7-881acd75db8d@redhat.com>
-Date: Mon, 10 Jun 2019 09:27:22 -0500
+Message-ID: <08d5564a-0b6d-f9c6-dd30-5c2465c0f74b@redhat.com>
+Date: Mon, 10 Jun 2019 09:40:14 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190520063525.GA6718@richard>
+In-Reply-To: <fd11c04f-c02a-8565-9f3b-e7ff83262725@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="qArHv2XjQ7HHo77QrJ5kjZrP7MYdhgL0G"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+ boundary="mnfzfzWAe6aWJn67bVY1PNg0wBH8gUQDf"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Mon, 10 Jun 2019 14:27:24 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Mon, 10 Jun 2019 14:40:17 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 0/8] WIP: Multifd compression support
+Subject: Re: [Qemu-devel] [PATCH] RFC: qio: Improve corking of TLS sessions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,62 +97,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qArHv2XjQ7HHo77QrJ5kjZrP7MYdhgL0G
-Content-Type: multipart/mixed; boundary="bsYhw0D0crVqycXsDvAaOoyB4DPA8DyWn";
+--mnfzfzWAe6aWJn67bVY1PNg0wBH8gUQDf
+Content-Type: multipart/mixed; boundary="94fmw07k9yrchn5GFO4dDRCvKY5IWRWHH";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
-To: Wei Yang <richardw.yang@linux.intel.com>,
- Juan Quintela <quintela@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <8591b552-6dc5-d466-54b7-881acd75db8d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/8] WIP: Multifd compression support
-References: <20190515121544.4597-1-quintela@redhat.com>
- <20190520063525.GA6718@richard>
-In-Reply-To: <20190520063525.GA6718@richard>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
+Message-ID: <08d5564a-0b6d-f9c6-dd30-5c2465c0f74b@redhat.com>
+Subject: Re: [PATCH] RFC: qio: Improve corking of TLS sessions
+References: <20190607221414.15962-1-eblake@redhat.com>
+ <20190610090811.GC7809@redhat.com>
+ <fd11c04f-c02a-8565-9f3b-e7ff83262725@redhat.com>
+In-Reply-To: <fd11c04f-c02a-8565-9f3b-e7ff83262725@redhat.com>
 
---bsYhw0D0crVqycXsDvAaOoyB4DPA8DyWn
+--94fmw07k9yrchn5GFO4dDRCvKY5IWRWHH
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 5/20/19 1:35 AM, Wei Yang wrote:
-> On Wed, May 15, 2019 at 02:15:36PM +0200, Juan Quintela wrote:
->> v3:
->> - improve the code
->> - address David and Markus comments
->> - make compression code into methods
->>  so we can add any other method ading just three functions
->>
->> Please review, as far as I know everything is ok now.
->>
->> Todo: Add zstd support
->=20
-> Confusion here. It is zstd or sztd?
->=20
-> BTW, I am not sure what it is :-)
->=20
->>
->> v2:
->> - improve the code left and right
->> - Split better the zlib code
->> - rename everything to v4.1
->> - Add tests for multifd-compress zlib
->> - Parameter is now an enum (soon will see sztd)
->                                            ^^^
+On 6/10/19 9:02 AM, Eric Blake wrote:
 
-zstd is the name of the new compression algorithm.
+>=20
+> send(MSG_MORE)
+> send()
+>=20
+> is ideal; under the hood, we can translate it to:
+>=20
+> send(MSG_MORE)
+>   gnutls_record_cork()
+>   gnutls_record_send()
+> send()
+>   if (size > threshold) {
+>     gnutls_record_uncork()
+>     gnutls_record_send()
+>   } else {
+>     gnutls_record_send()
+>     gnutls_record_uncork()
+>   }
+>=20
+> So we really need a way to plumb a MSG_MORE flag for senders to use,
+> when they KNOW they will be sending back-to-back pieces and where the
+> first piece is short, but it is not yet obvious whether the second piec=
+e
+> is short or long.
+
+This is what I meant to say,
+
+>=20
+> MSG_MORE was lon the next message to go through the stack, if the
+> previous message next paccork for
+
+this was an editing accident on incomplete thoughts.  But I wanted to add=
+:
+
+Setting up the ability to pass MGS_MORE through the qio stack will
+require either an update to ALL callers of qio_write to pass a flags
+argument (usually 0), or to add a set of new entry points to qio for the
+few callers that want to pass a non-zero flags argument (for now, nbd
+and sheepdog).
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -160,24 +168,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---bsYhw0D0crVqycXsDvAaOoyB4DPA8DyWn--
+--94fmw07k9yrchn5GFO4dDRCvKY5IWRWHH--
 
---qArHv2XjQ7HHo77QrJ5kjZrP7MYdhgL0G
+--mnfzfzWAe6aWJn67bVY1PNg0wBH8gUQDf
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz+aMoACgkQp6FrSiUn
-Q2oPgwf8DlFmMh8bCmPPIEMV2cNBMCCTAmCN3sWlz9UzLIOhmLxeNfdoTgnhGdQf
-oIYvX5k5oNguqC4ewISmFDipdYrXS7ZGFAXiDJ1IbaxSWOuyGsIQkl+KXXCboxEo
-i2GlyulC3y5S7mZzjYVFoUkWC7sRicogpoeOXTNpK1Km381I6zWPuLgvynEi/9db
-Y5AfINWA1PfvoWsGK5T2OYXzOI5XyWlBwGO1hMBSeCnPGz/ZEInijubQGGA/84GE
-Cc344RShsD1xzYZZUDakR46lh+PeGEe0qkLQvBoynhFnOigR+eQD9O0HEC4R+vq4
-chdk+PLy+2ovv/zSTtx4pc9073JjMg==
-=aQDi
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz+a84ACgkQp6FrSiUn
+Q2pynggAmclXkI+fm/7B56qvfYNJoljtkgNgatUfc9vwaauFaU5CPNM6KNdfRDc6
+V7f/gTlSxOcytLQwoXYnIIOANJYvD47vcEaP2Cej4/C267epzaEIBv/oxuiSdHzS
+5MbDR0rhlG16Wk2xVUw8eCTbWRugVyeQUTSNxShalPhYcBKfyw0W7uaeVmAOHdgn
+kRyWTglgT7JatLM9R4FytnIjvh8nii14ODdzhJHPPLebwfNSQd73/asJMwT04XJE
+LA1otLpg579t8BQAPw5wOozPGAyrV8lb1WsPMMwZB23iErF36CzwiFLgL/RZxh5r
+Ef3Akw23mOvm8xMq/+goYJ/qk1hN1g==
+=CHUA
 -----END PGP SIGNATURE-----
 
---qArHv2XjQ7HHo77QrJ5kjZrP7MYdhgL0G--
+--mnfzfzWAe6aWJn67bVY1PNg0wBH8gUQDf--
 
