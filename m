@@ -2,109 +2,56 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEE0FC28CC7
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 13:34:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEA48C28CC7
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 13:38:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 456402085A
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 13:34:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="DhEeB+bE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 456402085A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9292E20859
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 13:38:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9292E20859
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46480 helo=lists.gnu.org)
+Received: from localhost ([::1]:46566 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haKR3-0006QO-VY
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 09:34:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45802)
+	id 1haKV2-0000mp-Lw
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 09:38:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47396)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vsementsov@virtuozzo.com>) id 1haKMx-0004jS-Ou
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 09:29:52 -0400
+ (envelope-from <lizhengui@huawei.com>) id 1haKSj-0007TR-46
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 09:35:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1haKMw-0005D5-Ke
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 09:29:51 -0400
-Received: from mail-eopbgr10112.outbound.protection.outlook.com
- ([40.107.1.112]:9305 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1haKMt-00059g-Gg; Mon, 10 Jun 2019 09:29:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4zgDWOH88VYO+qA8xEnxCCv+TbSTqmKq4xUr9yhHx/A=;
- b=DhEeB+bEcax82rlRcFuDhnElruHMB7zq+fP1XbwFk64BrEJhAhPqiwy7HYrOLO9Twt07Ab5whS7AjMbI9e2IGJwsxAV1aDPNu1pz6tptKP0L43KiwJN/Xt3WX3BHTvbCTou+Wnbo0kM7SRL070P6V65YqZxkG9Czca/TQYRwSrA=
-Received: from AM0PR08MB3572.eurprd08.prod.outlook.com (20.177.110.153) by
- AM0PR08MB3811.eurprd08.prod.outlook.com (20.178.82.13) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1965.15; Mon, 10 Jun 2019 13:29:32 +0000
-Received: from AM0PR08MB3572.eurprd08.prod.outlook.com
- ([fe80::d064:530:c7:ad76]) by AM0PR08MB3572.eurprd08.prod.outlook.com
- ([fe80::d064:530:c7:ad76%6]) with mapi id 15.20.1965.017; Mon, 10 Jun 2019
- 13:29:32 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Thread-Topic: [PATCH v6 6/7] block/nbd-client: nbd reconnect
-Thread-Index: AQHU8IvOU96perqu+EiRV82H4T/8KaaP3geAgAWGEYD//9vfgA==
-Date: Mon, 10 Jun 2019 13:29:31 +0000
-Message-ID: <46bd12f6-8df7-ed2d-b85a-cd621c146e27@virtuozzo.com>
-References: <20190411172709.205032-1-vsementsov@virtuozzo.com>
- <20190411172709.205032-7-vsementsov@virtuozzo.com>
- <0b64cff5-33fa-0945-504c-b1bdd004c42a@redhat.com>
- <76780fdb-4c00-a8bd-4323-15bdd403fbaf@virtuozzo.com>
-In-Reply-To: <76780fdb-4c00-a8bd-4323-15bdd403fbaf@virtuozzo.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0301CA0019.eurprd03.prod.outlook.com
- (2603:10a6:3:76::29) To AM0PR08MB3572.eurprd08.prod.outlook.com
- (2603:10a6:208:e1::25)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190610162929673
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 7f8bf12f-296c-4974-c2ce-08d6eda7abcc
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:AM0PR08MB3811; 
-x-ms-traffictypediagnostic: AM0PR08MB3811:
-x-microsoft-antispam-prvs: <AM0PR08MB3811CD4E4CFC3F3DFB892406C1130@AM0PR08MB3811.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6430;
-x-forefront-prvs: 0064B3273C
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(979002)(366004)(39840400004)(396003)(376002)(346002)(136003)(189003)(199004)(66476007)(66446008)(66946007)(66556008)(316002)(6116002)(36756003)(71200400001)(71190400001)(31686004)(2501003)(64756008)(14454004)(25786009)(3846002)(5024004)(6486002)(256004)(4326008)(186003)(73956011)(478600001)(486006)(31696002)(229853002)(476003)(68736007)(305945005)(7736002)(6512007)(6246003)(99286004)(8936002)(5660300002)(8676002)(53936002)(11346002)(102836004)(446003)(66066001)(81156014)(81166006)(386003)(2906002)(86362001)(110136005)(6436002)(54906003)(6506007)(2616005)(52116002)(107886003)(76176011)(2201001)(26005)(969003)(989001)(999001)(1009001)(1019001);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB3811;
- H:AM0PR08MB3572.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: UWDnobT9c50cUcwDfAERAchezkOjdh4A698MCYrQdbWiSNx1GK7igJzHfW7dCipD7OZmP4y/fb0q26z1oA9SvkvqmnA6a/Z7qJAnwEE7t5G7iH/bntL6GOiHMaq8HdP1pxngOOVplU8WyzHg8N53tJfo/gg1gVb2vOdXPPnVYZEQ/GTP5XQEN8CIgicmomiMvgSk1zcA1IQTEFH68/rE5fCuRpnvk7Dhi5t4tlr9uHfy1mss4GTDqtRd9j1JbnPWiFaV7PTOEKhPGkXT+HOmj/fzIGk8uIjlPU6bzSkjxRfc5Ld/zQLzLhSsGXF3XOSwlGWfqVeDAADElkOZMeL3qbxcbUHsn1mn3qHygDDSeaiRdd74CR1NrVbo85+leO4+Ezt6wW07+GB9PeXFxCcGQIDR+SU7wACNeXOTenmgqeI=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <370BD7BC426D7B4B8DF8693CA5645D52@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <lizhengui@huawei.com>) id 1haKSh-0000QF-Lm
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 09:35:49 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2174 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lizhengui@huawei.com>)
+ id 1haKSL-00008R-Bh; Mon, 10 Jun 2019 09:35:30 -0400
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 7358E5FE7A8A56D645A7;
+ Mon, 10 Jun 2019 21:35:14 +0800 (CST)
+Received: from HGHY1l002846723.china.huawei.com (10.177.251.193) by
+ DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
+ 14.3.439.0; Mon, 10 Jun 2019 21:35:07 +0800
+From: Zhengui li <lizhengui@huawei.com>
+To: <pbonzini@redhat.com>, <stefanha@redhat.com>, <mreitz@redhat.com>,
+ <kwolf@redhat.com>
+Date: Mon, 10 Jun 2019 21:34:44 +0800
+Message-ID: <1560173684-6264-1-git-send-email-lizhengui@huawei.com>
+X-Mailer: git-send-email 2.7.2.windows.1
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7f8bf12f-296c-4974-c2ce-08d6eda7abcc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jun 2019 13:29:31.9477 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vsementsov@virtuozzo.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3811
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.1.112
-Subject: Re: [Qemu-devel] [PATCH v6 6/7] block/nbd-client: nbd reconnect
+Content-Type: text/plain
+X-Originating-IP: [10.177.251.193]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 45.249.212.190
+Subject: [Qemu-devel] [PATCH] file-posix: unlock qemu_global_mutex before
+ pread when attach disk
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,62 +63,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: lizhengui@huawei.com, qemu-block@nongnu.org, eric.fangyi@huawei.com,
+ qemu-devel@nongnu.org, jiangyiwen@huawei.com, wangjie88@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MTAuMDYuMjAxOSAxNTozOCwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
-MDcuMDYuMjAxOSA2OjE3LCBFcmljIEJsYWtlIHdyb3RlOg0KPj4+ICt0eXBlZGVmIHN0cnVjdCBO
-QkRDb25uZWN0aW9uIHsNCj4+PiArwqDCoMKgIEJsb2NrRHJpdmVyU3RhdGUgKmJzOw0KPj4+ICvC
-oMKgwqAgU29ja2V0QWRkcmVzcyAqc2FkZHI7DQo+Pj4gK8KgwqDCoCBjb25zdCBjaGFyICpleHBv
-cnQ7DQo+Pj4gK8KgwqDCoCBRQ3J5cHRvVExTQ3JlZHMgKnRsc2NyZWRzOw0KPj4+ICvCoMKgwqAg
-Y29uc3QgY2hhciAqaG9zdG5hbWU7DQo+Pj4gK8KgwqDCoCBjb25zdCBjaGFyICp4X2RpcnR5X2Jp
-dG1hcDsNCj4+PiArfSBOQkRDb25uZWN0aW9uOw0KPj4gQ2FuIHdlIHB1dCB0aGlzIHR5cGUgaW4g
-YSBoZWFkZXIsIGFuZCB1c2UgaXQgaW5zdGVhZCBvZiBwYXNzaW5nIGxvdHMgb2YNCj4+IGluZGl2
-aWR1YWwgcGFyYW1ldGVycyB0byBuYmRfY2xpZW50X2Nvbm5lY3QoKT/CoCBQcm9iYWJseSBhcyBh
-IHNlcGFyYXRlDQo+PiBwcmUtcmVxdWlzaXRlIGNsZWFudXAgcGF0Y2guDQo+Pg0KPiANCj4gDQo+
-IEhtbSwgYW5kIHRoZW4sIGluY2x1ZGUgaXQgaW50byBCRFJWTkJEU3RhdGU/IEkgZG9uJ3QgcmVt
-ZW1iZXIgd2h5IGRpZG4ndCBkbw0KPiBpdCwgYW5kIG5vdyBJIGRvbid0IHNlZSBhbnkgcmVhc29u
-IGZvciBpdC4gV2Ugc3RvcmUgdGhpcyBpbmZvcm1hdGlvbiBhbnl3YXkNCj4gZm9yIHRoZSB3aG9s
-ZSBsaWZlIG9mIHRoZSBkcml2ZXIuLg0KPiANCj4gU28sIGlmIEknbSBnb2luZyB0byByZWZhY3Rv
-ciBpdCwgSSBoYXZlIGEgcXVlc3Rpb246IGlzIHRoZXJlIGEgcmVhc29uIGZvcg0KPiBsYXllcmVk
-IEJEUlZOQkRTdGF0ZToNCj4gDQo+IHR5cGVkZWYgc3RydWN0IEJEUlZOQkRTdGF0ZSB7DQo+ICDC
-oMKgwqAgTkJEQ2xpZW50U2Vzc2lvbiBjbGllbnQ7DQo+IA0KPiAgwqDCoMKgIC8qIEZvciBuYmRf
-cmVmcmVzaF9maWxlbmFtZSgpICovDQo+ICDCoMKgwqAgU29ja2V0QWRkcmVzcyAqc2FkZHI7DQo+
-ICDCoMKgwqAgY2hhciAqZXhwb3J0LCAqdGxzY3JlZHNpZDsNCj4gfSBCRFJWTkJEU3RhdGU7DQo+
-IA0KPiBhbmQgdXNlIG5iZF9nZXRfY2xpZW50X3Nlc3Npb24gZXZlcnl3aGVyZSBpbnN0ZWFkIG9m
-IHNpbXBsZSBjb252ZXJ0aW5nIHZvaWQgKm9wYXF1ZQ0KPiB0byBTdGF0ZSBwb2ludGVyIGxpa2Ug
-aW4gcWNvdzIgZm9yIGV4YW1wbGU/DQo+IA0KPiBUaGUgb25seSByZWFzb24gSSBjYW4gaW1hZ2lu
-ZSBpcyBub3QgdG8gc2hhcmUgdGhlIHdob2xlIEJEUlZOQkRTdGF0ZSwgYW5kIGtlZXANCj4gdGhp
-bmdzIHdlIGFyZSB1c2luZyBvbmx5IGluIG5iZC5jIHRvIGJlIGF2YWlsYWJsZSBvbmx5IGluIG5i
-ZC5jLi4gQnV0IEkndmUgcHV0DQo+IHNhZGRyIGFuZCBleHBvcnQgdG8gTkJEQ29ubmVjdGlvbiB0
-byBiZSB1c2VkIGluIG5iZC1jbGllbnQuYyBhbnl3YXkuIFNvLCBJIHRoaW5rDQo+IGl0J3MgYSBn
-b29kIG1vbWVudCB0byBmbGF0dGVuIGFuZCBzaGFyZSBCRFJWTkJEU3RhdGUgYW5kIGRyb3AgbmJk
-X2dldF9jbGllbnRfc2Vzc2lvbi4NCj4gDQoNCkFuZCBpZiB3ZSBhcmUgaGVyZSwgd2hhdCBpcyBl
-eGFjdCBwdXJwb3NlIG9mIHNwbGl0dGluZyAgbmJkLWNsaWVudC5jIGZyb20gbmJkLmM/DQoNCkkg
-c2VlLCBpdCB3YXMgbG9uZyBhZ286DQoNCmNvbW1pdCAyMzAyYzFjYWZiMTNkZjIzOTM4YjA5OGQ5
-YzY1OTVkZTUyZWMyNTc3DQpBdXRob3I6IE1hcmMtQW5kcsOpIEx1cmVhdSA8bWFyY2FuZHJlLmx1
-cmVhdUByZWRoYXQuY29tPg0KRGF0ZTogICBTdW4gRGVjIDEgMjI6MjM6NDEgMjAxMyArMDEwMA0K
-DQogICAgIFNwbGl0IG5iZCBibG9jayBjbGllbnQgY29kZQ0KDQoNCkJ1dCBzdGlsbCwgaXQgZG9l
-c24ndCBleHBsYWluLi4NCg0KQW5kIGFsbCB0aGlzIGxlYWRzIHRvIG5vb3Agd3JhcHBlcnMgbGlr
-ZSB0aGlzDQoNCnN0YXRpYyBpbnQgbmJkX2NvX2ZsdXNoKEJsb2NrRHJpdmVyU3RhdGUgKmJzKQ0K
-ew0KICAgICByZXR1cm4gbmJkX2NsaWVudF9jb19mbHVzaChicyk7DQp9DQoNCnN0YXRpYyB2b2lk
-IG5iZF9kZXRhY2hfYWlvX2NvbnRleHQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQp7DQogICAgIG5i
-ZF9jbGllbnRfZGV0YWNoX2Fpb19jb250ZXh0KGJzKTsNCn0NCg0Kc3RhdGljIHZvaWQgbmJkX2F0
-dGFjaF9haW9fY29udGV4dChCbG9ja0RyaXZlclN0YXRlICpicywNCiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIEFpb0NvbnRleHQgKm5ld19jb250ZXh0KQ0Kew0KICAgICBuYmRf
-Y2xpZW50X2F0dGFjaF9haW9fY29udGV4dChicywgbmV3X2NvbnRleHQpOw0KfQ0KDQoNCm9yIG5l
-ZWQgb2YgZGVmaW5pbmcgZHJpdmVyIGNhbGxiYWNrcyBpbiBoZWFkZXIgZmlsZSwgaW5zdGVhZCBv
-ZiBrZWVwaW5nIHRoZW0gdG9nZXRoZXINCndpdGggZHJpdmVyIHN0cnVjdCBkZWZpbml0aW9uIGFu
-ZCBzdGF0aWMgKGxpa2Ugb3RoZXIgYmxvY2sgZHJpdmVycykuLi4NCg0KDQpBbmQgbmFtZXMgb2Yg
-dGhlc2UgdHdvIGZpbGVzIGFsd2F5cyBjb25mdXNlZCBtZS4uIG5iZC5jIGlzIG5iZCBjbGllbnQg
-YmxvY2sgZHJpdmVyLCBhbmQNCmRyaXZlciBpcyBkZWZpbmVkIGhlcmUuLiBCdXQgd2UgaGF2ZSBu
-YmQtY2xpZW50LmMgd2hpY2ggZGVmaW5lcyBuYmQgY2xpZW50IGRyaXZlciB0b28uDQpBbmQgd2Ug
-YWxzbyBoYXZlIG5iZC9jbGllbnQuYyAoT0ssIHRoaXMgc3BsaXQgSSB1bmRlcnN0YW5kIG9mIGNv
-dXJzZSwgYnV0IGl0IGluY3JlYXNlcw0KY29uZnVzaW9uIGFueXdheSkuDQoNCi0tIA0KQmVzdCBy
-ZWdhcmRzLA0KVmxhZGltaXINCg==
+virtual machine cpu soft lockup when attach a disk to the vm in the case
+that backend storage network has a large delay or IO pressure is too large.
+
+The bt of qemu main thread:
+#0 0x0000ffff9d78402c in pread64 () from /lib64/libpthread.so.0
+#1 0x0000aaaace3357d8 in pread64 (__offset=0, __nbytes=4096, __buf=0xaaaad47a5200, __fd=202) at /usr/include/bits/unistd.h:99
+#2 raw_is_io_aligned (fd=fd@entry=202, buf=buf@entry=0xaaaad47a5200, len=len@entry=4096) at block/raw_posix.c:294
+#3 0x0000aaaace33597c in raw_probe_alignment (bs=bs@entry=0xaaaad32ea920, fd=202, errp=errp@entry=0xfffffef7a330) at block/raw_posix.c:349
+#4 0x0000aaaace335a48 in raw_refresh_limits (bs=0xaaaad32ea920, errp=0xfffffef7a330) at block/raw_posix.c:811
+#5 0x0000aaaace3404b0 in bdrv_refresh_limits (bs=0xaaaad32ea920, errp=0xfffffef7a330, errp@entry=0xfffffef7a360) at block/io.c:122
+#6 0x0000aaaace340504 in bdrv_refresh_limits (bs=bs@entry=0xaaaad09ce800, errp=errp@entry=0xfffffef7a3b0) at block/io.c:97
+#7 0x0000aaaace2eb9f0 in bdrv_open_common (bs=bs@entry=0xaaaad09ce800, file=file@entry=0xaaaad0e89800, options=<optimized out>, errp=errp@entry=0xfffffef7a450)
+at block.c:1194
+#8 0x0000aaaace2eedec in bdrv_open_inherit (filename=<optimized out>, filename@entry=0xaaaad25f92d0 "/dev/mapper/36384c4f100630193359db7a80000011d",
+reference=reference@entry=0x0, options=<optimized out>, options@entry=0xaaaad3d0f4b0, flags=<optimized out>, flags@entry=128, parent=parent@entry=0x0,
+child_role=child_role@entry=0x0, errp=errp@entry=0xfffffef7a710) at block.c:1895
+#9 0x0000aaaace2ef510 in bdrv_open (filename=filename@entry=0xaaaad25f92d0 "/dev/mapper/36384c4f100630193359db7a80000011d", reference=reference@entry=0x0,
+options=options@entry=0xaaaad3d0f4b0, flags=flags@entry=128, errp=errp@entry=0xfffffef7a710) at block.c:1979
+#10 0x0000aaaace331ef0 in blk_new_open (filename=filename@entry=0xaaaad25f92d0 "/dev/mapper/36384c4f100630193359db7a80000011d", reference=reference@entry=0x0,
+options=options@entry=0xaaaad3d0f4b0, flags=128, errp=errp@entry=0xfffffef7a710) at block/block_backend.c:213
+#11 0x0000aaaace0da1f4 in blockdev_init (file=file@entry=0xaaaad25f92d0 "/dev/mapper/36384c4f100630193359db7a80000011d", bs_opts=bs_opts@entry=0xaaaad3d0f4b0,
+errp=errp@entry=0xfffffef7a710) at blockdev.c:603
+#12 0x0000aaaace0dc478 in drive_new (all_opts=all_opts@entry=0xaaaad4dc31d0, block_default_type=<optimized out>) at blockdev.c:1116
+#13 0x0000aaaace0e3ee0 in add_init_drive (
+optstr=optstr@entry=0xaaaad0872ec0 "file=/dev/mapper/36384c4f100630193359db7a80000011d,format=raw,if=none,id=drive-scsi0-0-0-3,cache=none,aio=native")
+at device_hotplug.c:46
+#14 0x0000aaaace0e3f78 in hmp_drive_add (mon=0xfffffef7a810, qdict=0xaaaad0c8f000) at device_hotplug.c:67
+#15 0x0000aaaacdf7d688 in handle_hmp_command (mon=0xfffffef7a810, cmdline=<optimized out>) at /usr/src/debug/qemu-kvm-2.8.1/monitor.c:3199
+#16 0x0000aaaacdf7d778 in qmp_human_monitor_command (
+command_line=0xaaaacfc8e3c0 "drive_add dummy file=/dev/mapper/36384c4f100630193359db7a80000011d,format=raw,if=none,id=drive-scsi0-0-0-3,cache=none,aio=native",
+has_cpu_index=false, cpu_index=0, errp=errp@entry=0xfffffef7a968) at /usr/src/debug/qemu-kvm-2.8.1/monitor.c:660
+#17 0x0000aaaace0fdb30 in qmp_marshal_human_monitor_command (args=<optimized out>, ret=0xfffffef7a9e0, errp=0xfffffef7a9d8) at qmp-marshal.c:2223
+#18 0x0000aaaace3b6ad0 in do_qmp_dispatch (request=<optimized out>, errp=0xfffffef7aa20, errp@entry=0xfffffef7aa40) at qapi/qmp_dispatch.c:115
+#19 0x0000aaaace3b6d58 in qmp_dispatch (request=<optimized out>) at qapi/qmp_dispatch.c:142
+#20 0x0000aaaacdf79398 in handle_qmp_command (parser=<optimized out>, tokens=<optimized out>) at /usr/src/debug/qemu-kvm-2.8.1/monitor.c:4010
+#21 0x0000aaaace3bd6c0 in json_message_process_token (lexer=0xaaaacf834c80, input=<optimized out>, type=JSON_RCURLY, x=214, y=274) at qobject/json_streamer.c:105
+#22 0x0000aaaace3f3d4c in json_lexer_feed_char (lexer=lexer@entry=0xaaaacf834c80, ch=<optimized out>, flush=flush@entry=false) at qobject/json_lexer.c:319
+#23 0x0000aaaace3f3e6c in json_lexer_feed (lexer=0xaaaacf834c80, buffer=<optimized out>, size=<optimized out>) at qobject/json_lexer.c:369
+#24 0x0000aaaacdf77c64 in monitor_qmp_read (opaque=<optimized out>, buf=<optimized out>, size=<optimized out>) at /usr/src/debug/qemu-kvm-2.8.1/monitor.c:4040
+#25 0x0000aaaace0eab18 in tcp_chr_read (chan=<optimized out>, cond=<optimized out>, opaque=0xaaaacf90b280) at qemu_char.c:3260
+#26 0x0000ffff9dadf200 in g_main_context_dispatch () from /lib64/libglib-2.0.so.0
+#27 0x0000aaaace3c4a00 in glib_pollfds_poll () at util/main_loop.c:230
+--Type <RET> for more, q to quit, c to continue without paging--
+#28 0x0000aaaace3c4a88 in os_host_main_loop_wait (timeout=<optimized out>) at util/main_loop.c:278
+#29 0x0000aaaace3c4bf0 in main_loop_wait (nonblocking=<optimized out>) at util/main_loop.c:534
+#30 0x0000aaaace0f5d08 in main_loop () at vl.c:2120
+#31 0x0000aaaacdf3a770 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:5017
+
+when do qmp sush as drive_add,  qemu main thread locks the qemu_global_mutex  and do pread in raw_probe_alignmen. Pread
+is a synchronous operation. If backend storage network has a large delay or IO pressure is too large,  the pread operation will not return for a long time, which
+make vcpu thread can't acquire qemu_global_mutex for a long time and make the vcpu thread unable to be scheduled for a long time.  So virtual machine cpu soft lockup happened.
+
+qemu main thread should not hold qemu_global_mutex for a long time when do qmp that involving IO synchronous operation sush pread , ioctl, etc.
+So this patch unlock qemu_global_mutex before IO synchronous operation sush pread.
+---
+ block/file-posix.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 1cf4ee4..192c779 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -297,7 +297,9 @@ static int probe_physical_blocksize(int fd, unsigned int *blk_size)
+  */
+ static bool raw_is_io_aligned(int fd, void *buf, size_t len)
+ {
++    qemu_mutex_unlock_iothread();
+     ssize_t ret = pread(fd, buf, len, 0);
++    qemu_mutex_lock_iothread();
+ 
+     if (ret >= 0) {
+         return true;
+-- 
+2.7.2.windows.1
+
+
 
