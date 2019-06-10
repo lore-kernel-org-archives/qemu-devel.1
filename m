@@ -2,64 +2,64 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C885CC31E40
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 16:58:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA313C31E40
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 17:17:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E46220859
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 16:58:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E46220859
+	by mail.kernel.org (Postfix) with ESMTPS id 7CE62207E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 17:17:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CE62207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48428 helo=lists.gnu.org)
+Received: from localhost ([::1]:48488 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haNdB-0005cd-RN
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 12:58:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47824)
+	id 1haNvX-0001ZX-2t
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 13:17:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51363)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1haNcU-0004yG-5X
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 12:58:07 -0400
+ (envelope-from <berrange@redhat.com>) id 1haNrz-0008Pg-72
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 13:14:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1haNcT-00065g-6C
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 12:58:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51920)
+ (envelope-from <berrange@redhat.com>) id 1haNqP-0008WU-VO
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 13:12:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44492)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1haNcT-00065I-0v
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 12:58:05 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1haNqP-0008Ub-Pc
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 13:12:29 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E4F52368A5;
- Mon, 10 Jun 2019 16:57:55 +0000 (UTC)
-Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4DF4F1001B30;
- Mon, 10 Jun 2019 16:57:55 +0000 (UTC)
-Date: Mon, 10 Jun 2019 13:57:53 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 5573030BC572;
+ Mon, 10 Jun 2019 17:12:18 +0000 (UTC)
+Received: from redhat.com (ovpn-112-50.ams2.redhat.com [10.36.112.50])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6259C5B681;
+ Mon, 10 Jun 2019 17:12:16 +0000 (UTC)
+Date: Mon, 10 Jun 2019 18:12:13 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <20190610165753.GA5927@habkost.net>
+Message-ID: <20190610171213.GK7809@redhat.com>
 References: <20190607211544.7964-1-ehabkost@redhat.com>
  <CAFEAcA-wCqppsi+gcrTqGjR3bSDOHs5btKKE8oHYxbAUDtu7Fw@mail.gmail.com>
  <20190610131105.GJ22416@habkost.net>
  <CAFEAcA_fBBN_854PznqJUniks0uemEite8Hxcw6cwTbUSr+aVg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <CAFEAcA_fBBN_854PznqJUniks0uemEite8Hxcw6cwTbUSr+aVg@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Mon, 10 Jun 2019 16:58:04 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.49]); Mon, 10 Jun 2019 17:12:26 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] Ubuntu Trusty as supported build platform (was Re:
- [PULL 0/8] Python queue, 2019-06-07)
+Subject: Re: [Qemu-devel] [PULL 0/8] Python queue, 2019-06-07
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,7 +71,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -99,10 +101,27 @@ On Mon, Jun 10, 2019 at 02:21:57PM +0100, Peter Maydell wrote:
 > machines I tend to feel we may be being a bit over-hasty in
 > deprecating things.
 
-I understand this as a request to make Trusty a supported build
-platform.  Can we please update the documentation to reflect
-that, then?
+There's been two new LTS releases of Ubuntu since then
+with Xenial and Bionic, so IMHO, it is pretty reasonable
+to want to drop Trusty rather than continuing to spend time
+on software versions from 2014 and before. Both our Travis
+and Docker setups use Xenial as minimum and the number of
+our developers stuck using Trusty is likely negligible.
 
+What gap is your gcc compile farm filling & can we find an
+alternate way to address that gap that's viable ?
+
+Does the gcc compile farm include Docker to let us run the
+build in a container from the compile farm. Or can we use
+a Docker container on a modern x86_64 host to test the same
+thing. We have docker containers for all Linux OS we need
+to target, and docker containers for non-x86_64 arches that
+cross compile.
+
+Regards,
+Daniel
 -- 
-Eduardo
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
