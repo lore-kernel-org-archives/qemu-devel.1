@@ -2,61 +2,79 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42156C31E40
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 14:53:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07690C31E41
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 14:57:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18DB920859
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 14:53:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18DB920859
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id C6BE920859
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 14:57:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F9aB3IOZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6BE920859
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47466 helo=lists.gnu.org)
+Received: from localhost ([::1]:47482 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haLfV-0006ZE-AW
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 10:53:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38986)
+	id 1haLjx-0007xd-2B
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 10:57:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40742)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <lizhengui@huawei.com>) id 1haLel-00060j-KA
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 10:52:20 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1haLjS-0007XM-Te
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 10:57:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lizhengui@huawei.com>) id 1haLek-0008Uk-MC
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 10:52:19 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2175 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lizhengui@huawei.com>)
- id 1haLeg-0008GV-P1; Mon, 10 Jun 2019 10:52:16 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 159D2C83EF5CEDAA36E9;
- Mon, 10 Jun 2019 22:52:03 +0800 (CST)
-Received: from [127.0.0.1] (10.177.251.193) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.439.0;
- Mon, 10 Jun 2019 22:51:56 +0800
-To: Paolo Bonzini <pbonzini@redhat.com>, <stefanha@redhat.com>,
- <mreitz@redhat.com>, <kwolf@redhat.com>
-References: <1560173684-6264-1-git-send-email-lizhengui@huawei.com>
- <1a218c83-7167-68c4-798f-2870f2f98475@redhat.com>
-From: l00284672 <lizhengui@huawei.com>
-Message-ID: <49e6310d-1c1c-2379-47e6-7239e0058e78@huawei.com>
-Date: Mon, 10 Jun 2019 22:51:42 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.4.0
+ (envelope-from <peter.maydell@linaro.org>) id 1haLjR-0003Us-L3
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 10:57:10 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:45761)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1haLjR-0003UW-CU
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 10:57:09 -0400
+Received: by mail-ot1-x343.google.com with SMTP id n2so8539093otl.12
+ for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 07:57:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=d+sFl7/oeS84K3Kn4cdiA4k3TUnX0QDKCjpV6d6I0WI=;
+ b=F9aB3IOZVqySmN+1IL21jfEmVO98x++2xA2zZwuAFcggg3LltGLRtrwYlEKeTFUVAG
+ /blLhKVA0SYpQG2lapKszY22oG7XFe8IXByjGq9rTzOl3PQYwqEG8uVZ/Z8yuCDhAoH/
+ aEshfC1ePhJcqspAljURdcqYeM0neFAhiOm5+TyOlHkghtxJPj4J+R+wR13uH8wG8ptS
+ UMCgrgQanOe0/T2QnI69P7BuQx49kxn6ZI57LiDcn7mlRPYyxdz/osYRljy8mbg/htGT
+ i3QKZFoA7OptuA3VPS3a+cysQ/3s6Oal6VV/TQH29JA8cFo9iAj+ppn9fXaOauEta8w2
+ S8VA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=d+sFl7/oeS84K3Kn4cdiA4k3TUnX0QDKCjpV6d6I0WI=;
+ b=Fkw4lhsTEb9twGfFpZ1qbCfdF6LiYTthImenzzOwAPU6jeD/QRMBTQs1Pc8slaarcH
+ 8lvTTT5rYztdzen8Y5J9Qru2WtrJ/hJBlJRO2ngSxZYClYhA6WKnMKRXsoaGK9/SbQDs
+ jhaK+roK3NLn5YuWFTuqFb4kz4eedtVbXEYwlXqkFIqa1OoTjEBkb/ZqCwpCmQf/LCeg
+ 0MgWZw+hZjIaPZhQ9zP5KPwWp/Tfrr7KeBTQBigtNC6eKDx1a39IANn1o9lp4pR0Ycmy
+ NSYGZAG2PNkBtFNAKP+ORg+q+eyMnJ9OWwcoXKjsbQlXd86XID7KGzNSfhf1SnaDKqRU
+ Nx8Q==
+X-Gm-Message-State: APjAAAUjur5yK4jsBNXUr/wb03X5vakw5UYtFZRdcHW7SVKumR4ctDVb
+ Mzg6xfqrgy10NtRKVTZtgTkTCaAELMGaKT1rwCJZrR4Cje4=
+X-Google-Smtp-Source: APXvYqyRDMS9j5v1uH7FIo9gkmga+Ua3wdO37e0J0jTiJTZapaRQzReQLEBtD6QHjc8SphPRnhoE8LYaXXy6NZnvNL4=
+X-Received: by 2002:a9d:630a:: with SMTP id q10mr9166611otk.91.1560178628192; 
+ Mon, 10 Jun 2019 07:57:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1a218c83-7167-68c4-798f-2870f2f98475@redhat.com>
-Content-Type: multipart/mixed; boundary="------------99187FACADB90121DC25F9F6"
-Content-Language: en-US
-X-Originating-IP: [10.177.251.193]
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.190
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] file-posix: unlock
- qemu_global_mutex before pread when attach disk
+References: <20190610134545.3743-1-peter.maydell@linaro.org>
+In-Reply-To: <20190610134545.3743-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 10 Jun 2019 15:56:57 +0100
+Message-ID: <CAFEAcA911arQ6QtyD=-LCBtoQO30tkADiGV0fV8Zwn8+wd_GRw@mail.gmail.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH] qemu-ga: Convert invocation documentation
+ to rST
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,61 +86,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jiangyiwen@huawei.com, wangjie88@huawei.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, eric.fangyi@huawei.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---------------99187FACADB90121DC25F9F6
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: quoted-printable
-
-The pread will hang in attaching disk just when backend storage network=20
-disconnection .
-
-I think the locking range of qemu_global_mutex is too large when do qmp=20
-operation. what
-
-does the qemu_global_mutex=C2=A0 really protect?=C2=A0 what is the risk o=
-f=20
-unlocking qemu_global_mutex
-
-in qmp?
-
-
-On 2019/6/10 21:51, Paolo Bonzini wrote:
-> On 10/06/19 15:34, Zhengui li wrote:
->> when do qmp sush as drive_add,  qemu main thread locks the
->> qemu_global_mutex  and do pread in raw_probe_alignmen. Pread is a
->> synchronous operation. If backend storage network has a large delay
->> or IO pressure is too large,  the pread operation will not return for
->> a long time, which make vcpu thread can't acquire qemu_global_mutex
->> for a long time and make the vcpu thread unable to be scheduled for a
->> long time.  So virtual machine cpu soft lockup happened.
->>
->> qemu main thread should not hold qemu_global_mutex for a long time
->> when do qmp that involving IO synchronous operation sush pread ,
->> ioctl, etc. So this patch unlock qemu_global_mutex before IO
->> synchronous operation sush pread.
-> These preads are for 512-4096 bytes, can they really last much longer
-> than the "open" that precedes them?  If pread of 4K can trigger a soft
-> lockup, things are really screwed up---and it's hard to be sure that al=
-l
-> callers of raw_probe_alignment are okay with releasing the global mutex=
-.
+On Mon, 10 Jun 2019 at 14:45, Peter Maydell <peter.maydell@linaro.org> wrote:
 >
-> Paolo
+> The qemu-ga documentation is currently in qemu-ga.texi in
+> Texinfo format, which we present to the user as:
+>  * a qemu-ga manpage
+>  * a section of the main qemu-doc HTML documentation
 >
-> .
+> Convert the documentation to rST format, and present it to
+> the user as:
+>  * a qemu-ga manpage
+>  * part of the interop/ Sphinx manual
 >
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> This is part of my general proposals about how we should
+> transition away from texinfo to sphinx (written up at
+> https://wiki.qemu.org/Features/Documentation). It's the
+> first part of step 3 (convert standalone manpages), so it's
+> interesting as a demonstration of Sphinx generating manpages
+> as well as HTML. The format of the output manpage is broadly
+> the same, though there are a few minor differences because
+> rST doesn't support quite the same kinds of output. (It also
+> fixes a bug where the current manpage renders some text intended
+> to be in bold as literally "B<unix-listen>".)
+>
+> Having the infrastructure for creating a simple manpage via
+> Sphinx should be a useful assist for the work in step 1 of the
+> transition plan that involves conversion of the auto-generated
+> qemu-ga-ref and qemu-qmp-ref (which need to produce manpages).
+>
+> The non-manpage HTML version of the doc moves from qemu-doc.html
+> into docs/interop/ (its final location in the new 5-manual setup).
+>
+>  Makefile                 |  13 ++--
+>  MAINTAINERS              |   2 +-
+>  docs/conf.py             |  18 ++---
+>  docs/interop/conf.py     |   7 ++
+>  docs/interop/index.rst   |   1 +
+>  docs/interop/qemu-ga.rst | 133 +++++++++++++++++++++++++++++++++++++
+>  qemu-doc.texi            |   5 --
+>  qemu-ga.texi             | 137 ---------------------------------------
+>  8 files changed, 161 insertions(+), 155 deletions(-)
+>  create mode 100644 docs/interop/qemu-ga.rst
+>  delete mode 100644 qemu-ga.texi
 
+I just realised that I forgot to update the Makefile 'install-manual'
+macro to filter out the generated docs/interop/qemu-ga.8 file,
+so at the moment 'make install' will put a copy into
+/usr/local/share/doc/qemu/interop/ as well as into
+/usr/local/share/man/man8/. I'll fix that in v2.
 
---------------99187FACADB90121DC25F9F6
-Content-Type: text/x-vcard; name="lizhengui.vcf"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="lizhengui.vcf"
-
-bnVsbA==
---------------99187FACADB90121DC25F9F6--
+thanks
+-- PMM
 
