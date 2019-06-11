@@ -2,60 +2,107 @@ Return-Path: <SRS0=mXWu=UK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C593C43218
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 08:28:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91A3FC43218
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 08:45:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34AD4212F5
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 08:28:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34AD4212F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6DD2521721
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 08:45:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DD2521721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52818 helo=lists.gnu.org)
+Received: from localhost ([::1]:52874 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hac8v-0001Fz-FC
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 04:28:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50491)
+	id 1hacPR-0005aC-HH
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 04:45:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53857)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richardw.yang@linux.intel.com>) id 1hac6i-0007fY-Oy
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 04:26:17 -0400
+ (envelope-from <lvivier@redhat.com>) id 1hacNU-0004G4-2a
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 04:43:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1hac6h-0004xa-GN
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 04:26:16 -0400
-Received: from mga18.intel.com ([134.134.136.126]:57800)
+ (envelope-from <lvivier@redhat.com>) id 1hacN2-0000iX-H4
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 04:43:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56684)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1hac6h-0004ws-34
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 04:26:15 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 11 Jun 2019 01:26:14 -0700
-X-ExtLoop1: 1
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by fmsmga005.fm.intel.com with ESMTP; 11 Jun 2019 01:26:12 -0700
-Date: Tue, 11 Jun 2019 16:25:48 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190611082548.GB11125@richard>
-References: <20190401061457.9393-1-richardw.yang@linux.intel.com>
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hacMe-0000Oq-Ta
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 04:43:08 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9617830833B4;
+ Tue, 11 Jun 2019 08:42:36 +0000 (UTC)
+Received: from [10.36.117.111] (ovpn-117-111.ams2.redhat.com [10.36.117.111])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6622E19C70;
+ Tue, 11 Jun 2019 08:42:31 +0000 (UTC)
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20190529143106.11789-1-lvivier@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <c0e7e3e5-2670-da5d-8b8a-128568f401e6@redhat.com>
+Date: Tue, 11 Jun 2019 10:42:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190401061457.9393-1-richardw.yang@linux.intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.126
-Subject: Re: [Qemu-devel] [PATCH] migration: cleanup check on ops in
- savevm.handlers iteration
+In-Reply-To: <20190529143106.11789-1-lvivier@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.44]); Tue, 11 Jun 2019 08:42:41 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v7 0/4] rng-builtin: add an RNG backend
+ that uses qemu_guest_getrandom()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,129 +114,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
+Cc: =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Amit Shah <amit@kernel.org>, Markus Armbruster <armbru@redhat.com>,
+ Kashyap Chamarthy <kchamart@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "Richard W . M . Jones" <rjones@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Apr 01, 2019 at 02:14:57PM +0800, Wei Yang wrote:
->During migration, there are several places to iterate on
->savevm.handlers. And on each iteration, we need to check its ops and
->related callbacks before invoke it.
->
->Generally, ops is the first element to check, and it is only necessary
->to check it once.
->
->This patch clean all the related part in savevm.c to check ops only once
->in those iterations.
->
->Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Michael,
 
-Hi, David
+Could you pick this series in the next virtio pull request?
 
-Are you willing to pick up this one?
+If you disagree with some of my patches, could you take at least the
+first one (from Kashyap)?
 
->---
-> migration/savevm.c | 35 ++++++++++++++---------------------
-> 1 file changed, 14 insertions(+), 21 deletions(-)
->
->diff --git a/migration/savevm.c b/migration/savevm.c
->index 5f0ca7fac2..92af2471cd 100644
->--- a/migration/savevm.c
->+++ b/migration/savevm.c
->@@ -1096,10 +1096,9 @@ void qemu_savevm_state_setup(QEMUFile *f)
->         if (!se->ops || !se->ops->save_setup) {
->             continue;
->         }
->-        if (se->ops && se->ops->is_active) {
->-            if (!se->ops->is_active(se->opaque)) {
->+        if (se->ops->is_active &&
->+            !se->ops->is_active(se->opaque)) {
->                 continue;
->-            }
->         }
->         save_section_header(f, se, QEMU_VM_SECTION_START);
-> 
->@@ -1127,10 +1126,9 @@ int qemu_savevm_state_resume_prepare(MigrationState *s)
->         if (!se->ops || !se->ops->resume_prepare) {
->             continue;
->         }
->-        if (se->ops && se->ops->is_active) {
->-            if (!se->ops->is_active(se->opaque)) {
->+        if (se->ops->is_active &&
->+            !se->ops->is_active(se->opaque)) {
->                 continue;
->-            }
->         }
->         ret = se->ops->resume_prepare(s, se->opaque);
->         if (ret < 0) {
->@@ -1223,10 +1221,9 @@ void qemu_savevm_state_complete_postcopy(QEMUFile *f)
->         if (!se->ops || !se->ops->save_live_complete_postcopy) {
->             continue;
->         }
->-        if (se->ops && se->ops->is_active) {
->-            if (!se->ops->is_active(se->opaque)) {
->+        if (se->ops->is_active &&
->+            !se->ops->is_active(se->opaque)) {
->                 continue;
->-            }
->         }
->         trace_savevm_section_start(se->idstr, se->section_id);
->         /* Section type */
->@@ -1265,18 +1262,16 @@ int qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only,
->     cpu_synchronize_all_states();
-> 
->     QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
->-        if (!se->ops ||
->+        if (!se->ops || !se->ops->save_live_complete_precopy ||
->             (in_postcopy && se->ops->has_postcopy &&
->              se->ops->has_postcopy(se->opaque)) ||
->-            (in_postcopy && !iterable_only) ||
->-            !se->ops->save_live_complete_precopy) {
->+            (in_postcopy && !iterable_only)) {
->             continue;
->         }
-> 
->-        if (se->ops && se->ops->is_active) {
->-            if (!se->ops->is_active(se->opaque)) {
->+        if (se->ops->is_active &&
->+            !se->ops->is_active(se->opaque)) {
->                 continue;
->-            }
->         }
->         trace_savevm_section_start(se->idstr, se->section_id);
-> 
->@@ -1377,10 +1372,9 @@ void qemu_savevm_state_pending(QEMUFile *f, uint64_t threshold_size,
->         if (!se->ops || !se->ops->save_live_pending) {
->             continue;
->         }
->-        if (se->ops && se->ops->is_active) {
->-            if (!se->ops->is_active(se->opaque)) {
->+        if (se->ops->is_active &&
->+            !se->ops->is_active(se->opaque)) {
->                 continue;
->-            }
->         }
->         se->ops->save_live_pending(f, se->opaque, threshold_size,
->                                    res_precopy_only, res_compatible,
->@@ -2276,10 +2270,9 @@ static int qemu_loadvm_state_setup(QEMUFile *f)
->         if (!se->ops || !se->ops->load_setup) {
->             continue;
->         }
->-        if (se->ops && se->ops->is_active) {
->-            if (!se->ops->is_active(se->opaque)) {
->+        if (se->ops->is_active &&
->+            !se->ops->is_active(se->opaque)) {
->                 continue;
->-            }
->         }
-> 
->         ret = se->ops->load_setup(f, se->opaque);
->-- 
->2.19.1
+Thanks,
+Laurent
 
--- 
-Wei Yang
-Help you, Help me
+On 29/05/2019 16:31, Laurent Vivier wrote:
+> Add a new RNG backend using QEMU builtin getrandom function.
+> 
+> v7: rebase on master
+>     Make rng-builtin asynchronous with QEMUBH (removed existing R-b)
+> 
+> v6: remove "sysemu/rng-random.h" from virtio-rng.c
+>     rebase on qemu_getrandom v8
+> 
+> v5: PATCH 1 s/linux/Linux/
+>     remove superfluous includes from rng-builtin.c
+>     don't update rng-random documentation
+>     add a patch from Markus to keep the default backend out of VirtIORNGConf
+>     move TYPE_RNG_BUILTIN to sysemu/rng.h and remove sysemu/rng-builtin.h
+> 
+> v4: update PATCH 1 commit message
+> 
+> v3: Include Kashyap's patch in the series
+>     Add a patch to change virtio-rng default backend to rng-builtin
+> 
+> v2: Update qemu-options.hx
+>     describe the new backend and specify virtio-rng uses the
+>     rng-random by default
+> 
+> Kashyap Chamarthy (1):
+>   VirtIO-RNG: Update default entropy source to `/dev/urandom`
+> 
+> Laurent Vivier (2):
+>   rng-builtin: add an RNG backend that uses qemu_guest_getrandom()
+>   virtio-rng: change default backend to rng-builtin
+> 
+> Markus Armbruster (1):
+>   virtio-rng: Keep the default backend out of VirtIORNGConf
+> 
+>  backends/Makefile.objs         |  2 +-
+>  backends/rng-builtin.c         | 77 ++++++++++++++++++++++++++++++++++
+>  backends/rng-random.c          |  2 +-
+>  hw/virtio/virtio-rng.c         | 19 ++++-----
+>  include/hw/virtio/virtio-rng.h |  2 -
+>  include/sysemu/rng.h           |  2 +
+>  qemu-options.hx                |  9 +++-
+>  7 files changed, 97 insertions(+), 16 deletions(-)
+>  create mode 100644 backends/rng-builtin.c
+> 
+
 
