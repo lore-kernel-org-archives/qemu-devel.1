@@ -2,58 +2,141 @@ Return-Path: <SRS0=mXWu=UK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E90F7C4321A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 17:40:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F2DBC4321A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 17:42:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C463521734
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 17:40:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C463521734
+	by mail.kernel.org (Postfix) with ESMTPS id 1BC102063F
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 17:42:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BC102063F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33406 helo=lists.gnu.org)
+Received: from localhost ([::1]:33408 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hakl9-0001Ug-1C
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 13:40:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33925)
+	id 1hakn2-0001u7-7L
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 13:42:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35943)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <lvivier@redhat.com>) id 1hakcr-00045p-3J
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 13:32:05 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hakhc-0007op-2m
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 13:36:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1hakS5-0001g5-LX
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 13:20:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43870)
+ (envelope-from <jsnow@redhat.com>) id 1hakhZ-0006CF-WB
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 13:36:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:61746)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hakS0-0001Yg-4w
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 13:20:51 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1hakhX-0005yZ-JR
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 13:36:53 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9D5FB81F01;
- Tue, 11 Jun 2019 17:20:37 +0000 (UTC)
-Received: from thinkpad.redhat.com (ovpn-117-111.ams2.redhat.com
- [10.36.117.111])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C626D2B3DC;
- Tue, 11 Jun 2019 17:20:33 +0000 (UTC)
-From: Laurent Vivier <lvivier@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 11 Jun 2019 19:20:32 +0200
-Message-Id: <20190611172032.19143-1-lvivier@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 90FE1308624C;
+ Tue, 11 Jun 2019 17:36:24 +0000 (UTC)
+Received: from [10.10.123.63] (ovpn-123-63.rdu2.redhat.com [10.10.123.63])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 632E379406;
+ Tue, 11 Jun 2019 17:36:23 +0000 (UTC)
+To: Markus Armbruster <armbru@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <CAFEAcA_-DptTwe7dkbZ171HJ+DtXCAOKt08pja=4-QbQKJSEvQ@mail.gmail.com>
+ <CAFEAcA9MOWkMGAyV_efH+FRBErJgM_9gwX+kutqSzH_0ou58Dg@mail.gmail.com>
+ <877e9stw9p.fsf@dusky.pond.sub.org>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <19821e20-b7a1-e3ea-364b-251e256e913c@redhat.com>
+Date: Tue, 11 Jun 2019 13:36:21 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <877e9stw9p.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Tue, 11 Jun 2019 17:20:37 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.49]); Tue, 11 Jun 2019 17:36:24 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC] virtio-rng: add a watchdog
+Subject: Re: [Qemu-devel] Sketch of a transition of QEMU docs to Sphinx
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,157 +148,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Amit Shah <amit@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The virtio-rng linux driver can be stuck in virtio_read() on a
-wait_for_completion_killable() call if the virtio-rng device in QEMU
-doesn't provide data.
 
-It's a problem, because virtio_read() is called from rng_get_data() with
-reading_mutex() held.  The same mutex is taken by add_early_randomness()
-and hwrng_fillfn() and this brings to a hang during the boot sequence if
-the virtio-rng driver is builtin.
-Moreover, another lock is taken (rng_mutex) when the hwrng driver
-wants to switch the RNG device or the user tries to unplug the virtio-rng
-PCI card, and this can hang too because the virtio-rng driver is only abl=
-e
-to release the card if the virtio-rng device sends back the virtqueue ele=
-ment.
 
-  # echo -n virtio_rng.1 > /sys/class/misc/hw_random/rng_current
-  [  240.165234] INFO: task kworker/u2:1:34 blocked for more than 120 sec=
-onds.
-  [  240.165961] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disab=
-les this message.
-  [  240.166708] kworker/u2:1    D ffffffffb86b85a8     0    34      2 0x=
-00000000
-  [  240.166714] Workqueue: kacpi_hotplug acpi_hotplug_work_fn
-  [  240.166716]  ffffa0e8f3c0b890 0000000000000046 ffffa0e8f3c00000 ffff=
-a0e8f3c0bfd8
-  [  240.166717]  ffffa0e8f3c0bfd8 ffffa0e8f3c0bfd8 ffffa0e8f3c00000 ffff=
-ffffb86b85a0
-  [  240.166719]  ffffffffb86b85a4 ffffa0e8f3c00000 00000000ffffffff ffff=
-ffffb86b85a8
-  [  240.166720] Call Trace:
-  [  240.166725]  [<ffffffffb82a61c9>] schedule_preempt_disabled+0x29/0x7=
-0
-  [  240.166727]  [<ffffffffb82a40f7>] __mutex_lock_slowpath+0xc7/0x1d0
-  [  240.166728]  [<ffffffffb82a350f>] mutex_lock+0x1f/0x2f
-  [  240.166730]  [<ffffffffb8022b52>] hwrng_register+0x32/0x1d0
-  [  240.166733]  [<ffffffffc07fa149>] virtrng_scan+0x19/0x30 [virtio_rng=
-]
-  [  240.166744]  [<ffffffffc03108db>] virtio_dev_probe+0x1eb/0x290 [virt=
-io]
-  [  240.166746]  [<ffffffffb803d6e5>] driver_probe_device+0x145/0x3c0
-  ...
+On 6/11/19 3:29 AM, Markus Armbruster wrote:
+> Peter Maydell <peter.maydell@linaro.org> writes:
+> 
+>> On Tue, 21 May 2019 at 19:56, Peter Maydell <peter.maydell@linaro.org> wrote:
+>>>
+>>> Currently we have a vague plan that we should migrate our
+>>> documentation away from Texinfo to using Sphinx, plus some isolated
+>>> bits of documentation already in .rst format. This email is an attempt
+>>> to sketch out a transition plan for getting us from where we are today
+>>> to where (I think) we want to be.
+>>
+>> Since nobody seemed to disagree particularly with this sketch,
+> 
+> I don't think rST is an improvement over Texinfo.  As Paolo said, it's
+> the Perl of ASCII-based markups.  But I (reluctantly) agree with Paolo
+> that our current mix of Texinfo, rST, Markdown, and ad hoc markup is
+> worse than consistent use of one markup system, even if it's an
+> ill-conceived one like rST.
+> 
+> March of progress, I guess.
+> 
+> [...]
+> 
 
-In some case, the QEMU RNG backend is not able to provide data, and
-the virtio-rng device is not aware of that:
-- with rng-random using /dev/random and no entropy is available,
-- with rng-egd started with a socket in "server,nowait" mode and
-  no daemon connected,
-- with rng-egd and an egd daemon that is not providing enough data,
-- ...
+I will say that at a minimum I enjoy the combination of sphinx and rST
+because at least we can error out on warnings and check that the cross
+references are valid.
 
-To release the locks regularly, this patch adds a watchdog in QEMU
-virtio-rng device that sends back to the guest the virtqueue buffer
-with a 0 byte payload. This case is expected and correctly managed by
-the hwrng core.
+Markdown is a hot mess of a non-spec that is subtly different for just
+about every implementation, and we procedurally check none of ours.
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
- hw/virtio/virtio-rng.c         | 23 +++++++++++++++++++++++
- include/hw/virtio/virtio-rng.h |  1 +
- 2 files changed, 24 insertions(+)
+At least rST is one thing, I guess. And that it's extensible via sphinx
+is nice.
 
-diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
-index 30493a258622..173ecd370c0e 100644
---- a/hw/virtio/virtio-rng.c
-+++ b/hw/virtio/virtio-rng.c
-@@ -19,6 +19,8 @@
- #include "qom/object_interfaces.h"
- #include "trace.h"
-=20
-+#define VIRTIO_RNG_WATCHDOG_MS 500
-+
- static bool is_guest_ready(VirtIORNG *vrng)
- {
-     VirtIODevice *vdev =3D VIRTIO_DEVICE(vrng);
-@@ -38,6 +40,21 @@ static size_t get_request_size(VirtQueue *vq, unsigned=
- quota)
-     return in;
- }
-=20
-+static void watchdog(void *opaque)
-+{
-+    VirtIORNG *vrng =3D opaque;
-+    VirtIODevice *vdev =3D VIRTIO_DEVICE(vrng);
-+    VirtQueueElement *elem;
-+
-+    /* wake up driver */
-+    elem =3D virtqueue_pop(vrng->vq, sizeof(VirtQueueElement));
-+    if (!elem) {
-+        return;
-+    }
-+    virtqueue_push(vrng->vq, elem, 0);
-+    virtio_notify(vdev, vrng->vq);
-+}
-+
- static void virtio_rng_process(VirtIORNG *vrng);
-=20
- /* Send data from a char device over to the guest */
-@@ -98,6 +115,9 @@ static void virtio_rng_process(VirtIORNG *vrng)
-         return;
-     }
-=20
-+    timer_mod(vrng->watchdog_timer,
-+              qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + VIRTIO_RNG_WATCHDO=
-G_MS);
-+
-     if (vrng->activate_timer) {
-         timer_mod(vrng->rate_limit_timer,
-                   qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + vrng->conf.per=
-iod_ms);
-@@ -222,6 +242,7 @@ static void virtio_rng_device_realize(DeviceState *de=
-v, Error **errp)
-=20
-     vrng->vq =3D virtio_add_queue(vdev, 8, handle_input);
-     vrng->quota_remaining =3D vrng->conf.max_bytes;
-+    vrng->watchdog_timer =3D timer_new_ms(QEMU_CLOCK_VIRTUAL, watchdog, =
-vrng);
-     vrng->rate_limit_timer =3D timer_new_ms(QEMU_CLOCK_VIRTUAL,
-                                                check_rate_limit, vrng);
-     vrng->activate_timer =3D true;
-@@ -236,6 +257,8 @@ static void virtio_rng_device_unrealize(DeviceState *=
-dev, Error **errp)
-     VirtIORNG *vrng =3D VIRTIO_RNG(dev);
-=20
-     qemu_del_vm_change_state_handler(vrng->vmstate);
-+    timer_del(vrng->watchdog_timer);
-+    timer_free(vrng->watchdog_timer);
-     timer_del(vrng->rate_limit_timer);
-     timer_free(vrng->rate_limit_timer);
-     virtio_cleanup(vdev);
-diff --git a/include/hw/virtio/virtio-rng.h b/include/hw/virtio/virtio-rn=
-g.h
-index 922dce7caccf..05d6b0e7d881 100644
---- a/include/hw/virtio/virtio-rng.h
-+++ b/include/hw/virtio/virtio-rng.h
-@@ -42,6 +42,7 @@ typedef struct VirtIORNG {
-     /* We purposefully don't migrate this state.  The quota will reset o=
-n the
-      * destination as a result.  Rate limiting is host state, not guest =
-state.
-      */
-+    QEMUTimer *watchdog_timer;
-     QEMUTimer *rate_limit_timer;
-     int64_t quota_remaining;
-     bool activate_timer;
---=20
-2.21.0
-
+--js
 
