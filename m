@@ -2,66 +2,89 @@ Return-Path: <SRS0=mXWu=UK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EE28C4321A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 14:30:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCCB3C4321B
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 14:32:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00905206BB
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 14:30:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00905206BB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8E4F920896
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 14:32:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZetTy6Hg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E4F920896
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59558 helo=lists.gnu.org)
+Received: from localhost ([::1]:59572 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hahmz-0001l6-9F
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 10:30:17 -0400
+	id 1hahpS-0003Jy-Ps
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 10:32:50 -0400
 Received: from eggs.gnu.org ([2001:470:142:3::10]:38301)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hahfs-0003xi-K8
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:22:58 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hahff-0003xi-Qo
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:22:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hahax-0005pj-EN
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:17:53 -0400
-Resent-Date: Tue, 11 Jun 2019 10:17:52 -0400
-Resent-Message-Id: <E1hahax-0005pj-EN@eggs.gnu.org>
-Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21945)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hahax-0005on-04
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:17:51 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1560262619; cv=none; d=zoho.com; s=zohoarc; 
- b=UGfpPKF/IWExOqwZJDGlGV8zdv+L1F6C37jlwZJJkJgqbujAiNpLIknCJzfrGr1l0YDagasw5cVTsB1sDSns6bMzTKzQR90N7ZVisP+0FlNFkV935XrWVjNd5HhdTBsFn7LPw2cZMMrT48dNlUB2rEPFaLd2LdeXKqlH721OnV0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1560262619;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=9Ld9cMK23pGZjVjCnUCKAs8rA8BdH5T8URkn6+phbqM=; 
- b=TAMY+3JVI0FlFmMmYJxjIVNiR2BeiIRGjsPhguiU/fSKfxC7y9jA2vAFpLXqLogaBit+pCuYKhexrp2vrOvlSFY2wYAWe/OyP6CJ4iBfWMnDitMKXAHMzSxRqCw7kYNqjGkSsjM7Uddpd+hUaDpqhG9u0Ayy/WDHEhHFXfL4mEs=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1560262617996605.0092699930582;
- Tue, 11 Jun 2019 07:16:57 -0700 (PDT)
-In-Reply-To: <20190611113731.16940-1-philmd@redhat.com>
-Message-ID: <156026261691.32260.5523393371246325860@ce79690b2cb9>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hahbz-0006Wn-KC
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:18:56 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:40490)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1hahbz-0006S8-CN
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:18:55 -0400
+Received: by mail-oi1-x243.google.com with SMTP id w196so9067147oie.7
+ for <qemu-devel@nongnu.org>; Tue, 11 Jun 2019 07:18:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=ROx3rIg+A7AiZ012ArdEhajj/bigiTMMqDBWharZ6+k=;
+ b=ZetTy6HghfpIychrUFA/yfrQPqZMWb865jJDznd1IyjRyABG2uCgzl/07qf6V3H7V2
+ cgneYUDvan0469FHSOGsfCI2O8jK+uHxZWOD6amPNOJ3e9M2vgw0zBnpI8Yf+KJvtTmE
+ g+LmBduQ+Is7c9s/j9Zfmtxkwn2RhbqgABP0nv/Vtfg5FcABr8HSTAbt0qxVKAm14+K7
+ k7FQCPV+BjPjOJlYeHg4ERretcrVmOs4dVjQKxC+PIc19fWnuzYksRKI8mBghkAJE/3H
+ rsaM3ahfPZNPucZ0DpQ0D9fb4WS4OgUzoMElX/XyI1Zr81iBAQ2w4MYDNdbfDKQ5Azr7
+ i9Xg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=ROx3rIg+A7AiZ012ArdEhajj/bigiTMMqDBWharZ6+k=;
+ b=cujgL6BSO3/4kIQ5N5wY7MwOhVafZeQm3y7WMZKI3Io2W39Chg1a0OgfunuwEKpgsh
+ veCrhJKWvpuRmnFhnzHruXaE98qSSz3EcqDB2xRPfIke1rLwMckbHlCq4HcoACEo9+0s
+ JG+Iv1HNwiEOHMqh95uQpq0JP0tqtgLXWBU8xzX3x5jNOQ1bSiBTchg7Gr3EgGzu4HAQ
+ IvtsCB1sY9R2Tx0WhnIFvtySyeCvU5Lkk0UcQQhBoGGC+zzNRrn2yCwazIRixnK44Cl6
+ dGMfAZQ3vweP1zmSrSHVjcjSnFoU/mPyl/gR4C/bBPmrG1IsNZVTqUwhoscwOCvvZ9tV
+ 8G0A==
+X-Gm-Message-State: APjAAAVoRhta6Qx/MESZ38Bb62lJtoNSdXaJauCU0gb+QV5qWyqN+tKu
+ b3qdLS7zQhQNnN0W0vXvkUqCVXxHJcQWoVY+ZtY=
+X-Google-Smtp-Source: APXvYqz0zeiNkTrjqxFe0a1FSrMHjVKR4ODauwLjPUyO96nIkpdxzKVWFblITFiXOUxboSNc4uDjm5U1YE1auwPG/Zo=
+X-Received: by 2002:aca:c2c3:: with SMTP id s186mr14768841oif.79.1560262733025; 
+ Tue, 11 Jun 2019 07:18:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: philmd@redhat.com
-Date: Tue, 11 Jun 2019 07:16:57 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.59
-Subject: Re: [Qemu-devel] [PATCH v19 00/21] Add RX archtecture support
+Received: by 2002:a9d:20e4:0:0:0:0:0 with HTTP; Tue, 11 Jun 2019 07:18:52
+ -0700 (PDT)
+Received: by 2002:a9d:20e4:0:0:0:0:0 with HTTP; Tue, 11 Jun 2019 07:18:52
+ -0700 (PDT)
+In-Reply-To: <CAFEAcA_TAQvXbjP1h9SS6TiCxwwDf5oAUDAWDn0FRX3G0PBzaA@mail.gmail.com>
+References: <20190610152444.20859-1-peter.maydell@linaro.org>
+ <20190610152444.20859-2-peter.maydell@linaro.org>
+ <CAL1e-=hSY4uWQ9QmebdzkkV4WTZ82JFSW2fRafHBtvdJv1tm5A@mail.gmail.com>
+ <CAFEAcA_TAQvXbjP1h9SS6TiCxwwDf5oAUDAWDn0FRX3G0PBzaA@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 11 Jun 2019 16:18:52 +0200
+Message-ID: <CAL1e-=jKcPK1ig3eHtRfTA0PDV0Z2Y1gXP6YhJ7jdbSA06B=fw@mail.gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH 1/2] docs/specs/index.rst: Fix minor syntax
+ issues
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,36 +96,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, richard.henderson@linaro.org, qemu-devel@nongnu.org,
- ysato@users.sourceforge.jp, philmd@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, John Snow <jsnow@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYxMTExMzczMS4xNjk0
-MC0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCBidWlsZCB0
-ZXN0IG9uIHMzOTB4IGhvc3QuIFBsZWFzZSBmaW5kIHRoZSBkZXRhaWxzIGJlbG93LgoKPT09IFRF
-U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAojIFRlc3Rpbmcgc2NyaXB0IHdpbGwgYmUg
-aW52b2tlZCB1bmRlciB0aGUgZ2l0IGNoZWNrb3V0IHdpdGgKIyBIRUFEIHBvaW50aW5nIHRvIGEg
-Y29tbWl0IHRoYXQgaGFzIHRoZSBwYXRjaGVzIGFwcGxpZWQgb24gdG9wIG9mICJiYXNlIgojIGJy
-YW5jaApzZXQgLWUKQ0M9JEhPTUUvYmluL2NjCklOU1RBTEw9JFBXRC9pbnN0YWxsCkJVSUxEPSRQ
-V0QvYnVpbGQKbWtkaXIgLXAgJEJVSUxEICRJTlNUQUxMClNSQz0kUFdECmNkICRCVUlMRAokU1JD
-L2NvbmZpZ3VyZSAtLWNjPSRDQyAtLXByZWZpeD0kSU5TVEFMTAptYWtlIC1qNAojIFhYWDogd2Ug
-bmVlZCByZWxpYWJsZSBjbGVhbiB1cAojIG1ha2UgY2hlY2sgLWo0IFY9MQptYWtlIGluc3RhbGwK
-CmVjaG8KZWNobyAiPT09IEVOViA9PT0iCmVudgoKZWNobwplY2hvICI9PT0gUEFDS0FHRVMgPT09
-IgpycG0gLXFhCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgcHBjNjQtc29mdG1t
-dS9hY2NlbC90Y2cvdGNnLXJ1bnRpbWUtZ3ZlYy5vCkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdmFy
-L3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtbDR2OWJvd2Yvc3JjL3RhcmdldC9yeC9jcHUuaDozMSwK
-ICAgICAgICAgICAgICAgICBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1sNHY5Ym93
-Zi9zcmMvZXhlYy5jOjIzOgovdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtbDR2OWJvd2Yvc3Jj
-L2luY2x1ZGUvZXhlYy9jcHUtZGVmcy5oOjM4OjEwOiBmYXRhbCBlcnJvcjogY3B1LXBhcmFtLmg6
-IE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkKICAgMzggfCAjaW5jbHVkZSAiY3B1LXBhcmFtLmgi
-CiAgICAgIHwgICAgICAgICAgXn5+fn5+fn5+fn5+fgpjb21waWxhdGlvbiB0ZXJtaW5hdGVkLgoK
-ClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAx
-OTA2MTExMTM3MzEuMTY5NDAtMS1waGlsbWRAcmVkaGF0LmNvbS90ZXN0aW5nLnMzOTB4Lz90eXBl
-PW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEByZWRoYXQuY29t
+On Jun 11, 2019 11:51 AM, "Peter Maydell" <peter.maydell@linaro.org> wrote:
+>
+> On Mon, 10 Jun 2019 at 22:41, Aleksandar Markovic
+> <aleksandar.m.mail@gmail.com> wrote:
+> >
+> >
+> > On Jun 10, 2019 5:25 PM, "Peter Maydell" <peter.maydell@linaro.org>
+wrote:
+> > >
+> > > The docs/specs/index.rst has a couple of minor issues which
+> > > we didn't notice because we weren't building the manual:
+> > >  * the ToC entry for the new PPC XIVE docs points to
+> > >    a nonexistent file
+> > >  * the initial comment needs to be marked by '..', not '.',
+> > >    or it will appear in the output
+> > >  * the title doesn't match the capitialization used by
+> > >    the existing interop or devel manuals, and uses
+> > >    'full-system emulation' rather than the 'system emulation'
+> > >    that the interop manual title uses
+> > >
+> > > Fix these minor issues before we start trying to build the manual.
+> > >
+> > > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> > > ---
+> >
+> > Acked-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+>
+> Hi Aleksandar; I'm just wondering what you were meaning
+> with this acked-by tag. Generally acked-by means  (to me,
+> and I think usually with qemu) "this patch touches an
+> area that I maintain, I haven't reviewed it but I'm OK with
+> it". But this series isn't mips-related, so maybe you
+> meant reviewed-by instead ?
+>
+> (Acked-by is a bit of an odd tag because it's less
+> clear what it means than reviewed-by or signed-off-by,
+> so it's not very surprising if you've picked up a
+> different opinion on what it's for.)
+>
 
+Hello, Peter.
 
+My intented meaning (of my Acked-by) is:
+
+=E2=80=9CI agree that this patch is valuable in general, I took a look at t=
+he code
+changes and they look good to me implementation-wise, but I am not a
+reviewer nor an expert in rst and related areas, so I am not comfortable
+=E2=80=9Creviewing-it-by=E2=80=9D - however as a potential user/writer of r=
+st files, I want
+to acknowledge the significance and the rightness of the patch by
+=E2=80=9Cacking-it-by=E2=80=9D.=E2=80=9D
+
+I am not sure how it fits in other definitions, but I am comfortable with
+your changing my =E2=80=9CAcked-by=E2=80=9D to =E2=80=9CReviewed-by=E2=80=
+=9D, leaving it as is, or changing
+it to nothing- whatever you deem being suitable.
+
+The same applies to the other patch of this series, of course.
+
+Yours,
+Aleksandar
+
+> thanks
+> -- PMM
