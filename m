@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D57D0C4321A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 12:08:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D4F0C43218
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 12:09:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A90C9206E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 12:08:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A90C9206E0
+	by mail.kernel.org (Postfix) with ESMTPS id 341D52089E
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 12:09:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 341D52089E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56842 helo=lists.gnu.org)
+Received: from localhost ([::1]:56854 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hafZL-00076f-T8
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 08:08:03 -0400
+	id 1hafap-0008Q3-Ey
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 08:09:35 -0400
 Received: from eggs.gnu.org ([2001:470:142:3::10]:52412)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hafAj-00070q-5j
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:42:39 -0400
+ (envelope-from <philmd@redhat.com>) id 1hafAa-00070q-4g
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:42:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1haf6H-00005d-9W
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:38:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59404)
+ (envelope-from <philmd@redhat.com>) id 1haf6L-0000Aw-FV
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:38:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59868)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1haf6F-0008Mq-8B
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:38:01 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1haf6J-00006f-D0
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:38:05 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BDB343092645;
- Tue, 11 Jun 2019 11:37:56 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 90E5A7FDF9;
+ Tue, 11 Jun 2019 11:38:01 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.205.167])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DB0AA60BF1;
- Tue, 11 Jun 2019 11:37:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 35A2660BF1;
+ Tue, 11 Jun 2019 11:37:57 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org,
 	Igor Mammedov <imammedo@redhat.com>
-Date: Tue, 11 Jun 2019 13:37:15 +0200
-Message-Id: <20190611113731.16940-6-philmd@redhat.com>
+Date: Tue, 11 Jun 2019 13:37:16 +0200
+Message-Id: <20190611113731.16940-7-philmd@redhat.com>
 In-Reply-To: <20190611113731.16940-1-philmd@redhat.com>
 References: <20190611113731.16940-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Tue, 11 Jun 2019 11:37:56 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Tue, 11 Jun 2019 11:38:01 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v19 05/21] target/rx: Disassemble rx_index_addr
- into a string
+Subject: [Qemu-devel] [PATCH v19 06/21] target/rx: Replace operand with
+ prt_ldmi in disassembler
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,276 +78,301 @@ Sender: "Qemu-devel"
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-We were eliding all zero indexes.  It is only ld=3D=3D0 that does
-not have an index in the instruction.  This also allows us to
-avoid breaking the final print into multiple pieces.
+This has consistency with prt_ri().  It loads all data before
+beginning output.  It uses exactly one call to prt() to emit
+the full instruction.
 
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Message-Id: <20190607091116.49044-19-ysato@users.sourceforge.jp>
+Message-Id: <20190607091116.49044-20-ysato@users.sourceforge.jp>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/rx/disas.c | 154 +++++++++++++++++-----------------------------
- 1 file changed, 55 insertions(+), 99 deletions(-)
+ target/rx/disas.c | 77 +++++++++++++++++------------------------------
+ 1 file changed, 27 insertions(+), 50 deletions(-)
 
 diff --git a/target/rx/disas.c b/target/rx/disas.c
-index 8cada4825d..64342537ee 100644
+index 64342537ee..515b365528 100644
 --- a/target/rx/disas.c
 +++ b/target/rx/disas.c
-@@ -107,49 +107,42 @@ static const char psw[] =3D {
-     'i', 'u', 0, 0, 0, 0, 0, 0,
- };
-=20
--static uint32_t rx_index_addr(int ld, int size, DisasContext *ctx)
-+static void rx_index_addr(DisasContext *ctx, char out[8], int ld, int mi=
-)
- {
--    bfd_byte buf[2];
-+    uint32_t addr =3D ctx->addr;
-+    uint8_t buf[2];
-+    uint16_t dsp;
-+
-     switch (ld) {
-     case 0:
--        return 0;
-+        /* No index; return empty string.  */
-+        out[0] =3D '\0';
-+        return;
-     case 1:
--        ctx->dis->read_memory_func(ctx->addr, buf, 1, ctx->dis);
-         ctx->addr +=3D 1;
--        return ((uint8_t)buf[0]) << size;
-+        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
-+        dsp =3D buf[0];
-+        break;
-     case 2:
--        ctx->dis->read_memory_func(ctx->addr, buf, 2, ctx->dis);
-         ctx->addr +=3D 2;
--        return lduw_le_p(buf) << size;
-+        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
-+        dsp =3D lduw_le_p(buf);
-+        break;
-+    default:
-+        g_assert_not_reached();
-     }
--    g_assert_not_reached();
-+
-+    sprintf(out, "%u", dsp << (mi < 3 ? mi : 4 - mi));
+@@ -135,18 +135,18 @@ static void rx_index_addr(DisasContext *ctx, char o=
+ut[8], int ld, int mi)
+     sprintf(out, "%u", dsp << (mi < 3 ? mi : 4 - mi));
  }
 =20
- static void operand(DisasContext *ctx, int ld, int mi, int rs, int rd)
+-static void operand(DisasContext *ctx, int ld, int mi, int rs, int rd)
++static void prt_ldmi(DisasContext *ctx, const char *insn,
++                     int ld, int mi, int rs, int rd)
  {
--    int dsp;
      static const char sizes[][4] =3D {".b", ".w", ".l", ".uw", ".ub"};
-+    char dsp[8];
-+
+     char dsp[8];
+=20
      if (ld < 3) {
--        switch (mi) {
--        case 4:
--            /* dsp[rs].ub */
--            dsp =3D rx_index_addr(ld, RX_MEMORY_BYTE, ctx);
--            break;
--        case 3:
--            /* dsp[rs].uw */
--            dsp =3D rx_index_addr(ld, RX_MEMORY_WORD, ctx);
--            break;
--        default:
--            /* dsp[rs].b */
--            /* dsp[rs].w */
--            /* dsp[rs].l */
--            dsp =3D rx_index_addr(ld, mi, ctx);
--            break;
--        }
--        if (dsp > 0) {
--            prt("%d", dsp);
--        }
--        prt("[r%d]%s", rs, sizes[mi]);
-+        rx_index_addr(ctx, dsp, ld, mi);
-+        prt("%s[r%d]%s", dsp, rs, sizes[mi]);
+         rx_index_addr(ctx, dsp, ld, mi);
+-        prt("%s[r%d]%s", dsp, rs, sizes[mi]);
++        prt("%s\t%s[r%d]%s, r%d", insn, dsp, rs, sizes[mi], rd);
      } else {
-         prt("r%d", rs);
+-        prt("r%d", rs);
++        prt("%s\tr%d, r%d", insn, rs, rd);
      }
-@@ -235,7 +228,7 @@ static bool trans_MOV_ra(DisasContext *ctx, arg_MOV_r=
-a *a)
- /* mov.[bwl] rs,rd */
- static bool trans_MOV_mm(DisasContext *ctx, arg_MOV_mm *a)
- {
--    int dsp;
-+    char dspd[8], dsps[8];
-=20
-     prt("mov.%c\t", size[a->sz]);
-     if (a->lds =3D=3D 3 && a->ldd =3D=3D 3) {
-@@ -244,29 +237,15 @@ static bool trans_MOV_mm(DisasContext *ctx, arg_MOV=
-_mm *a)
-         return true;
-     }
-     if (a->lds =3D=3D 3) {
--        prt("r%d, ", a->rd);
--        dsp =3D rx_index_addr(a->ldd, a->sz, ctx);
--        if (dsp > 0) {
--            prt("%d", dsp);
--        }
--        prt("[r%d]", a->rs);
-+        rx_index_addr(ctx, dspd, a->ldd, a->sz);
-+        prt("r%d, %s[r%d]", a->rs, dspd, a->rd);
-     } else if (a->ldd =3D=3D 3) {
--        dsp =3D rx_index_addr(a->lds, a->sz, ctx);
--        if (dsp > 0) {
--            prt("%d", dsp);
--        }
--        prt("[r%d], r%d", a->rs, a->rd);
-+        rx_index_addr(ctx, dsps, a->lds, a->sz);
-+        prt("%s[r%d], r%d", dsps, a->rs, a->rd);
-     } else {
--        dsp =3D rx_index_addr(a->lds, a->sz, ctx);
--        if (dsp > 0) {
--            prt("%d", dsp);
--        }
--        prt("[r%d], ", a->rs);
--        dsp =3D rx_index_addr(a->ldd, a->sz, ctx);
--        if (dsp > 0) {
--            prt("%d", dsp);
--        }
--        prt("[r%d]", a->rd);
-+        rx_index_addr(ctx, dsps, a->lds, a->sz);
-+        rx_index_addr(ctx, dspd, a->ldd, a->sz);
-+        prt("%s[r%d], %s[r%d]", dsps, a->rs, dspd, a->rd);
-     }
-     return true;
+-    prt(", r%d", rd);
  }
-@@ -357,12 +336,10 @@ static bool trans_PUSH_r(DisasContext *ctx, arg_PUS=
-H_r *a)
- /* push dsp[rs] */
- static bool trans_PUSH_m(DisasContext *ctx, arg_PUSH_m *a)
+=20
+ static void prt_ir(DisasContext *ctx, const char *insn, int imm, int rd)
+@@ -416,8 +416,7 @@ static bool trans_AND_ir(DisasContext *ctx, arg_AND_i=
+r *a)
+ /* and rs,rd */
+ static bool trans_AND_mr(DisasContext *ctx, arg_AND_mr *a)
  {
--    prt("push\t");
--    int dsp =3D rx_index_addr(a->ld, a->sz, ctx);
--    if (dsp > 0) {
--        prt("%d", dsp);
--    }
--    prt("[r%d]", a->rs);
-+    char dsp[8];
-+
-+    rx_index_addr(ctx, dsp, a->ld, a->sz);
-+    prt("push\t%s[r%d]", dsp, a->rs);
+-    prt("and\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "and", a->ld, a->mi, a->rs, a->rd);
      return true;
  }
 =20
-@@ -389,17 +366,13 @@ static bool trans_XCHG_rr(DisasContext *ctx, arg_XC=
-HG_rr *a)
- /* xchg dsp[rs].<mi>,rd */
- static bool trans_XCHG_mr(DisasContext *ctx, arg_XCHG_mr *a)
+@@ -440,8 +439,7 @@ static bool trans_OR_ir(DisasContext *ctx, arg_OR_ir =
+*a)
+ /* or rs,rd */
+ static bool trans_OR_mr(DisasContext *ctx, arg_OR_mr *a)
  {
--    int dsp;
-     static const char msize[][4] =3D {
-         "b", "w", "l", "ub", "uw",
-     };
-+    char dsp[8];
-=20
--    prt("xchg\t");
--    dsp =3D rx_index_addr(a->ld, a->mi, ctx);
--    if (dsp > 0) {
--        prt("%d", dsp);
--    }
--    prt("[r%d].%s, r%d", a->rs, msize[a->mi], a->rd);
-+    rx_index_addr(ctx, dsp, a->ld, a->mi);
-+    prt("xchg\t%s[r%d].%s, r%d", dsp, a->rs, msize[a->mi], a->rd);
+-    prt("or\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "or", a->ld, a->mi, a->rs, a->rd);
      return true;
  }
 =20
-@@ -552,13 +525,10 @@ static bool trans_ADC_rr(DisasContext *ctx, arg_ADC=
-_rr *a)
- /* adc dsp[rs], rd */
- static bool trans_ADC_mr(DisasContext *ctx, arg_ADC_mr *a)
+@@ -463,8 +461,7 @@ static bool trans_XOR_ir(DisasContext *ctx, arg_XOR_i=
+r *a)
+ /* xor rs,rd */
+ static bool trans_XOR_mr(DisasContext *ctx, arg_XOR_mr *a)
  {
--    int dsp;
--    prt("adc\t");
--    dsp =3D rx_index_addr(a->ld, 2, ctx);
--    if (dsp > 0) {
--        prt("%d", dsp);
--    }
--    prt("[r%d], r%d", a->rs, a->rd);
-+    char dsp[8];
-+
-+    rx_index_addr(ctx, dsp, a->ld, 2);
-+    prt("adc\t%s[r%d], r%d", dsp, a->rs, a->rd);
+-    prt("xor\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "xor", a->ld, a->mi, a->rs, a->rd);
      return true;
  }
 =20
-@@ -1217,25 +1187,17 @@ static bool trans_ITOF(DisasContext *ctx, arg_ITO=
-F *a)
-=20
- #define BOP_IM(name, reg)                                       \
-     do {                                                        \
--        int dsp;                                                \
--        prt("b%s\t#%d, ", #name, a->imm);                       \
--        dsp =3D rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);        \
--        if (dsp > 0) {                                          \
--            prt("%d", dsp);                                     \
--        }                                                       \
--        prt("[r%d]", reg);                                      \
-+        char dsp[8];                                            \
-+        rx_index_addr(ctx, dsp, a->ld, RX_MEMORY_BYTE);         \
-+        prt("b%s\t#%d, %s[r%d]", #name, a->imm, dsp, reg);      \
-         return true;                                            \
-     } while (0)
-=20
- #define BOP_RM(name)                                            \
-     do {                                                        \
--        int dsp;                                                \
--        prt("b%s\tr%d, ", #name, a->rd);                        \
--        dsp =3D rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);        \
--        if (dsp > 0) {                                          \
--            prt("%d", dsp);                                     \
--        }                                                       \
--        prt("[r%d]", a->rs);                                    \
-+        char dsp[8];                                            \
-+        rx_index_addr(ctx, dsp, a->ld, RX_MEMORY_BYTE);         \
-+        prt("b%s\tr%d, %s[r%d]", #name, a->rd, dsp, a->rs);     \
-         return true;                                            \
-     } while (0)
-=20
-@@ -1346,12 +1308,10 @@ static bool trans_BNOT_ir(DisasContext *ctx, arg_=
-BNOT_ir *a)
- /* bmcond #imm, dsp[rd] */
- static bool trans_BMCnd_im(DisasContext *ctx, arg_BMCnd_im *a)
+@@ -479,8 +476,7 @@ static bool trans_TST_ir(DisasContext *ctx, arg_TST_i=
+r *a)
+ /* tst rs, rd */
+ static bool trans_TST_mr(DisasContext *ctx, arg_TST_mr *a)
  {
--    int dsp =3D rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);
--    prt("bm%s\t#%d, ", cond[a->cd], a->imm);
--    if (dsp > 0) {
--        prt("%d", dsp);
--    }
--    prt("[%d]", a->rd);
-+    char dsp[8];
-+
-+    rx_index_addr(ctx, dsp, a->ld, RX_MEMORY_BYTE);
-+    prt("bm%s\t#%d, %s[r%d]", cond[a->cd], a->imm, dsp, a->rd);
+-    prt("tst\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "tst", a->ld, a->mi, a->rs, a->rd);
      return true;
  }
 =20
-@@ -1443,16 +1403,12 @@ static bool trans_WAIT(DisasContext *ctx, arg_WAI=
-T *a)
- /* sccnd.[bwl] dsp:[rd] */
- static bool trans_SCCnd(DisasContext *ctx, arg_SCCnd *a)
+@@ -548,8 +544,7 @@ static bool trans_ADD_irr(DisasContext *ctx, arg_ADD_=
+irr *a)
+ /* add dsp[rs], rd */
+ static bool trans_ADD_mr(DisasContext *ctx, arg_ADD_mr *a)
  {
--    int dsp;
--    prt("sc%s.%c\t", cond[a->cd], size[a->sz]);
-     if (a->ld < 3) {
--        dsp =3D rx_index_addr(a->sz, a->ld, ctx);
--        if (dsp > 0) {
--            prt("%d", dsp);
--        }
--        prt("[r%d]", a->rd);
-+        char dsp[8];
-+        rx_index_addr(ctx, dsp, a->sz, a->ld);
-+        prt("sc%s.%c\t%s[r%d]", cond[a->cd], size[a->sz], dsp, a->rd);
-     } else {
--        prt("r%d", a->rd);
-+        prt("sc%s.%c\tr%d", cond[a->cd], size[a->sz], a->rd);
-     }
+-    prt("add\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "add", a->ld, a->mi, a->rs, a->rd);
      return true;
  }
+=20
+@@ -573,8 +568,7 @@ static bool trans_CMP_ir(DisasContext *ctx, arg_CMP_i=
+r *a)
+ /* cmp dsp[rs], rs2 */
+ static bool trans_CMP_mr(DisasContext *ctx, arg_CMP_mr *a)
+ {
+-    prt("cmp\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "cmp", a->ld, a->mi, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -589,8 +583,7 @@ static bool trans_SUB_ir(DisasContext *ctx, arg_SUB_i=
+r *a)
+ /* sub dsp[rs], rd */
+ static bool trans_SUB_mr(DisasContext *ctx, arg_SUB_mr *a)
+ {
+-    prt("sub\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "sub", a->ld, a->mi, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -611,8 +604,7 @@ static bool trans_SBB_rr(DisasContext *ctx, arg_SBB_r=
+r *a)
+ /* sbb dsp[rs], rd */
+ static bool trans_SBB_mr(DisasContext *ctx, arg_SBB_mr *a)
+ {
+-    prt("sbb\t");
+-    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    prt_ldmi(ctx, "sbb", a->ld, RX_IM_LONG, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -640,8 +632,7 @@ static bool trans_MAX_ir(DisasContext *ctx, arg_MAX_i=
+r *a)
+ /* max dsp[rs], rd */
+ static bool trans_MAX_mr(DisasContext *ctx, arg_MAX_mr *a)
+ {
+-    prt("max\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "max", a->ld, a->mi, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -656,8 +647,7 @@ static bool trans_MIN_ir(DisasContext *ctx, arg_MIN_i=
+r *a)
+ /* min dsp[rs], rd */
+ static bool trans_MIN_mr(DisasContext *ctx, arg_MIN_mr *a)
+ {
+-    prt("max\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "min", a->ld, a->mi, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -673,8 +663,7 @@ static bool trans_MUL_ir(DisasContext *ctx, arg_MUL_i=
+r *a)
+ /* mul dsp[rs], rd */
+ static bool trans_MUL_mr(DisasContext *ctx, arg_MUL_mr *a)
+ {
+-    prt("mul\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "mul", a->ld, a->mi, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -696,8 +685,7 @@ static bool trans_EMUL_ir(DisasContext *ctx, arg_EMUL=
+_ir *a)
+ /* emul dsp[rs], rd */
+ static bool trans_EMUL_mr(DisasContext *ctx, arg_EMUL_mr *a)
+ {
+-    prt("emul\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "emul", a->ld, a->mi, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -712,8 +700,7 @@ static bool trans_EMULU_ir(DisasContext *ctx, arg_EMU=
+LU_ir *a)
+ /* emulu dsp[rs], rd */
+ static bool trans_EMULU_mr(DisasContext *ctx, arg_EMULU_mr *a)
+ {
+-    prt("emulu\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "emulu", a->ld, a->mi, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -728,8 +715,7 @@ static bool trans_DIV_ir(DisasContext *ctx, arg_DIV_i=
+r *a)
+ /* div dsp[rs], rd */
+ static bool trans_DIV_mr(DisasContext *ctx, arg_DIV_mr *a)
+ {
+-    prt("div\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "div", a->ld, a->mi, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -744,8 +730,7 @@ static bool trans_DIVU_ir(DisasContext *ctx, arg_DIVU=
+_ir *a)
+ /* divu dsp[rs], rd */
+ static bool trans_DIVU_mr(DisasContext *ctx, arg_DIVU_mr *a)
+ {
+-    prt("divu\t");
+-    operand(ctx, a->ld, a->mi, a->rs, a->rd);
++    prt_ldmi(ctx, "divu", a->ld, a->mi, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -1089,8 +1074,7 @@ static bool trans_FADD_ir(DisasContext *ctx, arg_FA=
+DD_ir *a)
+ /* fadd rs, rd */
+ static bool trans_FADD_mr(DisasContext *ctx, arg_FADD_mr *a)
+ {
+-    prt("fadd\t");
+-    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    prt_ldmi(ctx, "fadd", a->ld, RX_IM_LONG, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -1105,8 +1089,7 @@ static bool trans_FCMP_ir(DisasContext *ctx, arg_FC=
+MP_ir *a)
+ /* fcmp rs, rd */
+ static bool trans_FCMP_mr(DisasContext *ctx, arg_FCMP_mr *a)
+ {
+-    prt("fcmp\t");
+-    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    prt_ldmi(ctx, "fcmp", a->ld, RX_IM_LONG, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -1121,8 +1104,7 @@ static bool trans_FSUB_ir(DisasContext *ctx, arg_FS=
+UB_ir *a)
+ /* fsub rs, rd */
+ static bool trans_FSUB_mr(DisasContext *ctx, arg_FSUB_mr *a)
+ {
+-    prt("fsub\t");
+-    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    prt_ldmi(ctx, "fsub", a->ld, RX_IM_LONG, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -1130,8 +1112,7 @@ static bool trans_FSUB_mr(DisasContext *ctx, arg_FS=
+UB_mr *a)
+ /* ftoi rs, rd */
+ static bool trans_FTOI(DisasContext *ctx, arg_FTOI *a)
+ {
+-    prt("ftoi\t");
+-    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    prt_ldmi(ctx, "ftoi", a->ld, RX_IM_LONG, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -1146,8 +1127,7 @@ static bool trans_FMUL_ir(DisasContext *ctx, arg_FM=
+UL_ir *a)
+ /* fmul rs, rd */
+ static bool trans_FMUL_mr(DisasContext *ctx, arg_FMUL_mr *a)
+ {
+-    prt("fmul\t");
+-    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    prt_ldmi(ctx, "fmul", a->ld, RX_IM_LONG, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -1162,8 +1142,7 @@ static bool trans_FDIV_ir(DisasContext *ctx, arg_FD=
+IV_ir *a)
+ /* fdiv rs, rd */
+ static bool trans_FDIV_mr(DisasContext *ctx, arg_FDIV_mr *a)
+ {
+-    prt("fdiv\t");
+-    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    prt_ldmi(ctx, "fdiv", a->ld, RX_IM_LONG, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -1171,8 +1150,7 @@ static bool trans_FDIV_mr(DisasContext *ctx, arg_FD=
+IV_mr *a)
+ /* round rs, rd */
+ static bool trans_ROUND(DisasContext *ctx, arg_ROUND *a)
+ {
+-    prt("round\t");
+-    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    prt_ldmi(ctx, "round", a->ld, RX_IM_LONG, a->rs, a->rd);
+     return true;
+ }
+=20
+@@ -1180,8 +1158,7 @@ static bool trans_ROUND(DisasContext *ctx, arg_ROUN=
+D *a)
+ /* itof dsp[rs], rd */
+ static bool trans_ITOF(DisasContext *ctx, arg_ITOF *a)
+ {
+-    prt("itof\t");
+-    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
++    prt_ldmi(ctx, "itof", a->ld, RX_IM_LONG, a->rs, a->rd);
+     return true;
+ }
+=20
 --=20
 2.20.1
 
