@@ -2,87 +2,64 @@ Return-Path: <SRS0=mXWu=UK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,T_HK_NAME_DR,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10ED7C43218
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 10:37:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DF74C43218
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 10:38:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBA3F2080A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 10:37:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBA3F2080A
+	by mail.kernel.org (Postfix) with ESMTPS id 448FF2080A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 10:38:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 448FF2080A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56080 helo=lists.gnu.org)
+Received: from localhost ([::1]:56106 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hae9f-0002P3-6V
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 06:37:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33322)
+	id 1haeB1-0003SI-Gp
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 06:38:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34921)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hae42-000638-VZ
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 06:31:40 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hae9a-0002Sj-8W
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 06:37:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hae3t-0004DI-9x
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 06:31:33 -0400
-Received: from mail-wm1-f41.google.com ([209.85.128.41]:39521)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hae3s-0004AO-VD
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 06:31:29 -0400
-Received: by mail-wm1-f41.google.com with SMTP id z23so2302390wma.4
- for <qemu-devel@nongnu.org>; Tue, 11 Jun 2019 03:31:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=WGRwtWGs/Ap/mGmuC9rPS4alww4VNmlPEVJhVpgZlnE=;
- b=nrc2rc0oJFaowFgV6bn6SdLZRGmK4584yZXzJWl88KWgKEyzdbM6b9b16pYDC/oTkr
- zDmxEOhtDGErsoDvWPX9/VKVaoMFjXdQ/edP75SMSSBZT4KCrPHdISk0r62qZEnSHuGz
- UENbjOgeC87eD70pJvTCOjcaStcGFb91a/7wyf7oxe5WxXGpYweNZL9T1jMfpyS3NtAW
- t6gVkxbE3qu/FUtQm72mqldqRGzDtkNcGrxLJcTTwhtaUJY7SJbnT4afCNLqSD7elxpb
- AD6XROFMdo2uQUWGGnNALNwnglldSDWDMk6vKMmW25BVjyCcxxHxaoWEUOMYr8ClpzT+
- N1pw==
-X-Gm-Message-State: APjAAAXch8rbaQDmVMuk7eOc6O5PljhcFJYWCXBOSN95PdjGcW0H4f4x
- 3/VvZvlwPSV7Q3+6zmOEUL4ONA==
-X-Google-Smtp-Source: APXvYqy2ENyhl3BDgy3MWsQfBBztTpH0O1UVb3lBG8iwK50NffPyPiyyqrNezmO9CFeBw+fDUuCfJQ==
-X-Received: by 2002:a1c:a6d3:: with SMTP id p202mr18093427wme.26.1560249086212; 
- Tue, 11 Jun 2019 03:31:26 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:8cc3:8abd:4519:2cd6?
- ([2001:b07:6468:f312:8cc3:8abd:4519:2cd6])
- by smtp.gmail.com with ESMTPSA id z5sm1855091wma.36.2019.06.11.03.31.25
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Tue, 11 Jun 2019 03:31:25 -0700 (PDT)
-To: Markus Armbruster <armbru@redhat.com>
-References: <5cf62de9.1c69fb81.66fc.8f4fSMTPIN_ADDED_BROKEN@mx.google.com>
- <1e9e4edd-f4ad-d8d6-95a2-e0aeab89510d@redhat.com>
- <5cf7b6e6.1c69fb81.1cdca.e260SMTPIN_ADDED_BROKEN@mx.google.com>
- <ec5033a4-5c68-91b7-ca9e-a1f38c990221@redhat.com>
- <003b01d51f72$5e6f4160$1b4dc420$@Fursova@ispras.ru>
- <67806828-f666-0c9c-00fc-b520f15013d9@suse.de>
- <e4fe4dc0-f3c4-a051-d39d-afd7bfdc680d@redhat.com>
- <98826c5f-4a74-5364-2aef-28a10db12c20@suse.de>
- <39250506-f38f-c440-5728-7b970d32ab41@redhat.com>
- <79b821a4-7cc0-2461-7ca4-d71c3e5ee4ef@suse.de>
- <c49abf01-c209-b206-edee-507c31269011@redhat.com>
- <87o934sdot.fsf@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8d391b41-bf6d-b83b-7b22-25fefa18c518@redhat.com>
-Date: Tue, 11 Jun 2019 12:31:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ (envelope-from <dgilbert@redhat.com>) id 1hae9Z-0001cz-6V
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 06:37:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59816)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hae9Z-0001MU-0b
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 06:37:21 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8B1703082A98
+ for <qemu-devel@nongnu.org>; Tue, 11 Jun 2019 10:36:57 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.33])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4562460BEE;
+ Tue, 11 Jun 2019 10:36:53 +0000 (UTC)
+Date: Tue, 11 Jun 2019 11:36:50 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Message-ID: <20190611103650.GE2777@work-vm>
+References: <20190610184402.7090-1-dgilbert@redhat.com>
+ <20190610184402.7090-2-dgilbert@redhat.com>
+ <272867fd-1a3a-3cc2-9774-0feb694cd773@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87o934sdot.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <272867fd-1a3a-3cc2-9774-0feb694cd773@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Tue, 11 Jun 2019 10:36:57 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.41
-Subject: Re: [Qemu-devel] qgraph
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] net/announce: Allow optional list
+ of interfaces
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,28 +71,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Natalia Fursova <Natalia.Fursova@ispras.ru>,
- =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>,
- =?UTF-8?B?J9Cf0LDRiNCwJw==?= <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: jasowang@redhat.com, qemu-devel@nongnu.org, laine@redhat.com,
+ armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/06/19 10:56, Markus Armbruster wrote:
-> Yes, this is how introspection (both QMP and QOM) is commonly used.
-> Just keep in mind one difference: QMP is static, QOM is dynamic.
+* Eric Blake (eblake@redhat.com) wrote:
+> On 6/10/19 1:43 PM, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > Allow the caller to restrict the set of interfaces that announces are
+> > sent on.  The default is still to send on all interfaces.
+> > 
+> > e.g.
+> > 
+> >   { "execute": "announce-self", "arguments": { "initial": 50, "max": 550, "rounds": 5, "step": 50, "interfaces": ["vn2","vn1"] } }
+> > 
+> > This doesn't affect the behaviour of migraiton announcments.
+> > 
+> > Note: There's still only one timer for the qmp command, so that
+> > performing an 'announce-self' on one list of interfaces followed
+> > by another 'announce-self' on another list will stop the announces
+> > on the existing set.
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
 > 
-> QMP being static means it's defined at compile time.  So is the value of
-> query-qmp-schema.  Same QEMU build, same value.  This permits caching.
+> > +++ b/qapi/net.json
+> > @@ -699,6 +699,9 @@
+> >  #
+> >  # @step: Delay increase (in ms) after each self-announcement attempt
+> >  #
+> > +# @interfaces: An optional list of interface names, which restrict the
 > 
-> QOM being dynamic means to introspect an object's properties, you have
-> to create it.  Worse, an object's properties may (in theory) change at
-> any time.  *Properties*, not just property *values*.  In practice, I'd
-> expect properties to change only at realize time.
+> restricts
 
-Right, and we should move more towards class-based properties so that
-the dynamic nature of QOM is only used for the bare minimum needed (e.g.
-memory regions).
+Done
 
-Paolo
+> > +#        announcment to the listed interfaces. (Since 4.1)
+> 
+> announcement
+
+Done
+
+> > +#
+> >  # Since: 4.0
+> >  ##
+> >  
+> > @@ -706,7 +709,8 @@
+> >    'data': { 'initial': 'int',
+> >              'max': 'int',
+> >              'rounds': 'int',
+> > -            'step': 'int' } }
+> > +            'step': 'int',
+> > +            '*interfaces': ['str'] } }
+> >  
+> >  ##
+> >  # @announce-self:
+> > @@ -718,9 +722,10 @@
+> >  #
+> >  # Example:
+> >  #
+> > -# -> { "execute": "announce-self"
+> > +# -> { "execute": "announce-self",
+> 
+> Embarrassing that we didn't notice that one earlier.
+
+The way to avoid it I guess would be to parse the example code.
+
+> >  #      "arguments": {
+> > -#          "initial": 50, "max": 550, "rounds": 10, "step": 50 } }
+> > +#          "initial": 50, "max": 550, "rounds": 10, "step": 50,
+> > +#          "interfaces": ["vn2","vn3"] } }
+> 
+> Worth a space after the comma? Not required, but I think it looks nicer.
+
+Added
+
+> As I only focused on doc issues, I'll leave the full review to others.
+
+Thanks,
+
+Dave
+
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3226
+> Virtualization:  qemu.org | libvirt.org
+> 
+
+
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
