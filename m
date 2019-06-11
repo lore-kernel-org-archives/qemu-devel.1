@@ -2,66 +2,62 @@ Return-Path: <SRS0=mXWu=UK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25743C4321A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 13:25:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15511C43218
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 13:26:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B05732089E
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 13:25:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B05732089E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id DEC992089E
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 13:26:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEC992089E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58832 helo=lists.gnu.org)
+Received: from localhost ([::1]:58844 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hagmc-0002mx-El
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 09:25:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50812)
+	id 1hagnF-0003k6-5D
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 09:26:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50981)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1haghg-0000J2-TB
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 09:20:48 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hagiE-0000fk-2t
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 09:21:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1haghV-0005hP-G5
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 09:20:35 -0400
-Resent-Date: Tue, 11 Jun 2019 09:20:34 -0400
-Resent-Message-Id: <E1haghV-0005hP-G5@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21515)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1haghT-0005Mc-2d
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 09:20:32 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1560259164; cv=none; d=zoho.com; s=zohoarc; 
- b=dlGOSdL6lYynmPBwfHsFqIBVkNUJt8PKPANeYG6XTozzlmhZdnWDDJf/ff/MYa182Fl9YA7PLBV4A+PeQX7D0YEnczf6qEq7d6ctwO0lZf48mYt6n0M6toxPFcQTf50/Ho8UNvl3LQzWDrvs7RD4gk4kJbr2FpCQAcj0oq+jCY8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1560259164;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=KxhuGzm0GvGSiqOw0t1BhFOiXI9ogL/drr3vJfP4hBI=; 
- b=B+GyUbmxI4hnglV72EyRmJ4oeTPbxL/j+iizl5FokLKEi5CWCU6epdpyRHDVJJcg1PTHa8K3dp1V6kjcsj9Uek7GMuvRJvecVaMkpi5rmAjmrd1vYDAL12kUomAssp+1qEcPiWkc6Rm3snMOvpDteLILOehRoDZsfbsDRU8Vu7s=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1560259162210304.1250441084726;
- Tue, 11 Jun 2019 06:19:22 -0700 (PDT)
-In-Reply-To: <20190611113731.16940-1-philmd@redhat.com>
-Message-ID: <156025916106.32260.7604766616678035688@ce79690b2cb9>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: philmd@redhat.com
-Date: Tue, 11 Jun 2019 06:19:22 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH v19 00/21] Add RX archtecture support
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hagi7-0006zJ-NE
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 09:21:15 -0400
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:55931)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hagi5-0006lv-GJ
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 09:21:11 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
+ [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+ by mail03.asahi-net.or.jp (Postfix) with ESMTPA id F360F492D9;
+ Tue, 11 Jun 2019 22:21:03 +0900 (JST)
+Received: from yo-satoh-debian.ysato.ml (v096063.dynamic.ppp.asahi-net.or.jp
+ [124.155.96.63])
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 2B2CB240085;
+ Tue, 11 Jun 2019 22:21:01 +0900 (JST)
+Date: Tue, 11 Jun 2019 22:21:00 +0900
+Message-ID: <87muiop8ar.wl-ysato@users.sourceforge.jp>
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+In-Reply-To: <20190611113731.16940-17-philmd@redhat.com>
+References: <20190611113731.16940-1-philmd@redhat.com>
+ <20190611113731.16940-17-philmd@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?ISO-8859-4?Q?Goj=F2?=) APEL/10.8 EasyPG/1.0.0 Emacs/25.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 202.224.55.15
+Subject: Re: [Qemu-devel] [PATCH v19 16/21] hw/rx: Restrict the RX62N
+ microcontroller to the RX62N CPU core
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,35 +69,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, richard.henderson@linaro.org, qemu-devel@nongnu.org,
- ysato@users.sourceforge.jp, philmd@redhat.com
+Cc: Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYxMTExMzczMS4xNjk0
-MC0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCBidWlsZCB0
-ZXN0IG9uIHMzOTB4IGhvc3QuIFBsZWFzZSBmaW5kIHRoZSBkZXRhaWxzIGJlbG93LgoKPT09IFRF
-U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAojIFRlc3Rpbmcgc2NyaXB0IHdpbGwgYmUg
-aW52b2tlZCB1bmRlciB0aGUgZ2l0IGNoZWNrb3V0IHdpdGgKIyBIRUFEIHBvaW50aW5nIHRvIGEg
-Y29tbWl0IHRoYXQgaGFzIHRoZSBwYXRjaGVzIGFwcGxpZWQgb24gdG9wIG9mICJiYXNlIgojIGJy
-YW5jaApzZXQgLWUKQ0M9JEhPTUUvYmluL2NjCklOU1RBTEw9JFBXRC9pbnN0YWxsCkJVSUxEPSRQ
-V0QvYnVpbGQKbWtkaXIgLXAgJEJVSUxEICRJTlNUQUxMClNSQz0kUFdECmNkICRCVUlMRAokU1JD
-L2NvbmZpZ3VyZSAtLWNjPSRDQyAtLXByZWZpeD0kSU5TVEFMTAptYWtlIC1qNAojIFhYWDogd2Ug
-bmVlZCByZWxpYWJsZSBjbGVhbiB1cAojIG1ha2UgY2hlY2sgLWo0IFY9MQptYWtlIGluc3RhbGwK
-CmVjaG8KZWNobyAiPT09IEVOViA9PT0iCmVudgoKZWNobwplY2hvICI9PT0gUEFDS0FHRVMgPT09
-IgpycG0gLXFhCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgcngtc29mdG1tdS9l
-eGVjLm8KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1x
-a3hybGR0Yi9zcmMvdGFyZ2V0L3J4L2NwdS5oOjMxLAogICAgICAgICAgICAgICAgIGZyb20gL3Zh
-ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXFreHJsZHRiL3NyYy9leGVjLmM6MjM6Ci92YXIvdG1w
-L3BhdGNoZXctdGVzdGVyLXRtcC1xa3hybGR0Yi9zcmMvaW5jbHVkZS9leGVjL2NwdS1kZWZzLmg6
-Mzg6MTA6IGZhdGFsIGVycm9yOiBjcHUtcGFyYW0uaDogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9y
-eQogICAzOCB8ICNpbmNsdWRlICJjcHUtcGFyYW0uaCIKICAgICAgfCAgICAgICAgICBefn5+fn5+
-fn5+fn5+CmNvbXBpbGF0aW9uIHRlcm1pbmF0ZWQuCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJs
-ZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDYxMTExMzczMS4xNjk0MC0xLXBoaWxt
-ZEByZWRoYXQuY29tL3Rlc3RpbmcuczM5MHgvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVy
-YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxl
-YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Tue, 11 Jun 2019 20:37:26 +0900,
+Philippe Mathieu-Daud=E9 wrote:
+>=20
+> While the VIRT machine can use different microcontrollers,
+> the RX62N microcontroller is tied to the RX62N CPU core.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
+Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+
+> ---
+>  hw/rx/rx-virt.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>=20
+> diff --git a/hw/rx/rx-virt.c b/hw/rx/rx-virt.c
+> index ed0a3a1da0..797a090173 100644
+> --- a/hw/rx/rx-virt.c
+> +++ b/hw/rx/rx-virt.c
+> @@ -17,6 +17,7 @@
+>   */
+> =20
+>  #include "qemu/osdep.h"
+> +#include "qemu/error-report.h"
+>  #include "qapi/error.h"
+>  #include "qemu-common.h"
+>  #include "cpu.h"
+> @@ -34,6 +35,7 @@
+> =20
+>  static void rxvirt_init(MachineState *machine)
+>  {
+> +    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+>      RX62NState *s =3D g_new(RX62NState, 1);
+>      MemoryRegion *sysmem =3D get_system_memory();
+>      MemoryRegion *sdram =3D g_new(MemoryRegion, 1);
+> @@ -42,6 +44,12 @@ static void rxvirt_init(MachineState *machine)
+>      void *dtb =3D NULL;
+>      int dtb_size;
+> =20
+> +    if (strcmp(machine->cpu_type, mc->default_cpu_type) !=3D 0) {
+> +        error_report("This board can only be used with CPU %s",
+> +                     mc->default_cpu_type);
+> +        exit(1);
+> +    }
+> +
+>      /* Allocate memory space */
+>      memory_region_init_ram(sdram, NULL, "sdram", 16 * MiB,
+>                             &error_fatal);
+> --=20
+> 2.20.1
+>=20
+
+--=20
+Yosinori Sato
 
