@@ -2,89 +2,87 @@ Return-Path: <SRS0=mXWu=UK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29440C43218
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 04:05:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 282ECC4321A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 06:02:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9F052089E
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 04:05:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E1AD020679
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 06:02:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=extremeground.com header.i=@extremeground.com header.b="3N+YWKFm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9F052089E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=extremeground.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YDlk75J6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1AD020679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51700 helo=lists.gnu.org)
+Received: from localhost ([::1]:51982 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haY2S-0002v5-VX
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 00:05:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50185)
+	id 1haZrL-0001FB-L8
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 02:02:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46289)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <gary@extremeground.com>) id 1haY0P-0002Gs-5p
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 00:03:30 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1haZpt-0000fy-Jh
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 02:00:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gary@extremeground.com>) id 1haXlQ-0002Z3-MO
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 23:48:01 -0400
-Received: from ahs5.r4l.com ([158.69.52.156]:52455)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gary@extremeground.com>)
- id 1haXlQ-0002Vc-G0
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 23:48:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=extremeground.com; s=default; h=Content-Transfer-Encoding:Content-Type:
- In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
- :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
- Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
- List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
- bh=+JFdWZBnN5PWuryjHsJDVe7jHlQzglUpTXz1gm5bBPU=; b=3N+YWKFmdFvgjkFAgDZ+B13paK
- 0Pb399XjS1jRU+ZMRQPQ5NTM618JteFKv+c1vfR31uwgR1kAO4cTblmJZBjNsMHB0jwnWpIRc+80M
- YrVr68Zl/RPFQRrYFB0vrH+ewLztX0zfnUxW9DfLTg/Glhzq5mWw96YRmUrgFTzVD4yeNzo3bJt+3
- +p4/v2r6M7kJ/9sWSoeDGn8ol5xWNtNm/j11Z+JYD8DgCXMkifArCU/YjaVloSYY/a9NUAMDZTIwi
- m/XF3v5z3GtAoHquyBYNn41bBMa6wEcqPSV3nWTLSTawF5aJnwvJ23F1twdPSpAjHpvaPt+l1H4Ka
- 0GVMAfSQ==;
-Received: from cpeac202ed5e073-cmac202ed5e070.cpe.net.cable.rogers.com
- ([99.237.87.227]:38962 helo=[192.168.1.20])
- by ahs5.r4l.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
- (Exim 4.92) (envelope-from <gary@extremeground.com>)
- id 1haXlJ-0002BO-EU; Mon, 10 Jun 2019 23:47:53 -0400
-To: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-References: <abb7990e-0331-67a4-af92-05276366478c@extremeground.com>
- <20190610121941.GI14257@stefanha-x1.localdomain>
- <dc7a70ea-c94f-e975-df44-b0199da698e2@extremeground.com>
- <ab3e81c2-f0ce-2ef5-bbe7-948a87463b59@extremeground.com>
- <edf57b3a-660c-0964-2455-9461b9aa2711@redhat.com>
- <33b31422-1198-783a-cb15-8687a3f30199@extremeground.com>
- <0cd5c326-4d69-92fd-406d-d9fb8b08ccfc@redhat.com>
-From: Gary Dale <gary@extremeground.com>
-Message-ID: <04663a04-8009-f2c5-bad0-a2a42d6f0549@extremeground.com>
-Date: Mon, 10 Jun 2019 23:47:52 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1haZpr-0000zG-Qz
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 02:00:45 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:46822)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1haZpq-0000xq-1N
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 02:00:43 -0400
+Received: by mail-ot1-x342.google.com with SMTP id z23so10680074ote.13
+ for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 23:00:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=7n5/pm5NiHx4lZCC/Bp5PBB6WHBwDaF4uy/GdH+nUNo=;
+ b=YDlk75J6pWr5aqGReGWs9Fv1CrtwT9pR9BzI1bzJT8xqi7iu71NDQIRdoia0b1hQqk
+ R9gy3vA8ltaibz03nnDq1bszDwPAxFbcVwFcyTPnxPJ4X9MonCQl0LyFwYoarXaWJFCK
+ BuGmBVllJM0q3WDTzxqHactXs7XCzjlYYKxz2+mKgbUOt0mZ/PsY7qpFlsWfVoQseiGK
+ ErzlDoeQwiqcVk05E8B/exVn+i/Z5CdIJzSOYL+XNsQpEfuHC8nKOwDmPkkG4vZ2rcLG
+ 46mE+f9LSH85m+sxi5yMVBs3g1SniPbGiTBhhwXDnw6r9AuroIj4YSPhoGvT3j3bHdfM
+ VMAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=7n5/pm5NiHx4lZCC/Bp5PBB6WHBwDaF4uy/GdH+nUNo=;
+ b=sdSNBFRXyK9TFYPpALbWKZHIIY/ZqiXKd2Hx45ytBd7T9TTdsoV3uwmPugtnVph9dP
+ 1gJi+1fMGft6Pis1zDZirNQSjouEALu5LJ/2cTWFwFJ0zX/m+Yn1V06568RSLgdQUXsn
+ k2YnE/MCrEfJvYvcvjboeqP/xQU1jHap84GTETZJHdygbclx7VZhvLUFeq0/CrkFBBP5
+ 5i4W10Nk/2UbFZAUsHapCRTLMNZvHHP6oIyf1LtbFm+Z0lEwHuDHZ8xBB/BICNLk2BOm
+ QHEOyTcz5wIk0RDiWCpAhCXYfctRrpm+weJQUjQeVlVYNBPZHXunA+Sn6FGJ8Eyg3XZc
+ +qMA==
+X-Gm-Message-State: APjAAAVbUxCmV6WpOi6JHUfQ+3ymR5Pqbo6JCP9JUh9GPN6e+6kB62Ba
+ cG0n0OTdZf03d5aYc1VfCpW/DIfYCh4qiTUDrAw=
+X-Google-Smtp-Source: APXvYqwtWTEUsuOqTnutz83TdvwsGWtTbf9BZCR/siGDdyASWUO3+ACceHva2AbXkAHAtcMvscgv9lgKYjRQ6yf7HO8=
+X-Received: by 2002:a9d:5cc1:: with SMTP id r1mr1479121oti.341.1560232840477; 
+ Mon, 10 Jun 2019 23:00:40 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <0cd5c326-4d69-92fd-406d-d9fb8b08ccfc@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-CA
-X-AntiAbuse: This header was added to track abuse,
- please include it with any abuse report
-X-AntiAbuse: Primary Hostname - ahs5.r4l.com
-X-AntiAbuse: Original Domain - nongnu.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - extremeground.com
-X-Get-Message-Sender-Via: ahs5.r4l.com: authenticated_id:
- gary@extremeground.com
-X-Authenticated-Sender: ahs5.r4l.com: gary@extremeground.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 158.69.52.156
-Subject: Re: [Qemu-devel] kvm / virsh snapshot management
+Received: by 2002:a9d:20e4:0:0:0:0:0 with HTTP; Mon, 10 Jun 2019 23:00:39
+ -0700 (PDT)
+Received: by 2002:a9d:20e4:0:0:0:0:0 with HTTP; Mon, 10 Jun 2019 23:00:39
+ -0700 (PDT)
+In-Reply-To: <20190610232059.GA30549@localhost.localdomain>
+References: <1560196150-30436-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <20190610232059.GA30549@localhost.localdomain>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 11 Jun 2019 08:00:39 +0200
+Message-ID: <CAL1e-=ixiJhZBix-trQNJAG-X=ujp+35aOa9fYmhzXRwLwYYLA@mail.gmail.com>
+To: Cleber Rosa <crosa@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH] tests/acceptance: Improve failure
+ reporting in linux_ssh_mips_malta.py
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,58 +94,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, kvm@vger.kernel.org
+Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, f4bug@amsat.org,
+ qemu-devel@nongnu.org, amarkovic@wavecomp.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2019-06-10 8:10 p.m., Eric Blake wrote:
-> On 6/10/19 6:00 PM, Gary Dale wrote:
+On Jun 11, 2019 1:24 AM, "Cleber Rosa" <crosa@redhat.com> wrote:
 >
->>>> Any ideas on what I'm doing wrong?
->>> Do you know for sure whether you have internal or external snapshots?
->>> And at this point, your questions are starting to wander more into
->>> libvirt territory.
->>>
->> Yes. I'm using internal snapshots. From your other e-mail, I gather that
->> the (only) benefit to blockcommit with internal snapshots would be to
->> reduce the size of the various tables recording changed blocks. Without
->> a blockcommit, the L1 tables get progressively larger over time since
->> they record all changes to the base file. Eventually the snapshots could
->> become larger than the base image if I don't do a blockcommit.
-> Not quite. Blockcommit requires external images. It says to take this
-> image chain:
+> On Mon, Jun 10, 2019 at 09:49:10PM +0200, Aleksandar Markovic wrote:
+> > From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> >
+> > Rather than optputing a cryptic message:
+> >
+> > FAIL: True not found in [False],
+> >
+> > the following will be reported too, if the command output does not meet
+> > specified expectations:
+> >
+> > 'lspci -d 11ab:4620' output doesn't contain the word 'GT-64120'
+> >
+> > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> > ---
+> >  tests/acceptance/linux_ssh_mips_malta.py | 21 ++++++++++++++-------
+> >  1 file changed, 14 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/tests/acceptance/linux_ssh_mips_malta.py
+b/tests/acceptance/linux_ssh_mips_malta.py
+> > index aafb0c3..cbf1b34 100644
+> > --- a/tests/acceptance/linux_ssh_mips_malta.py
+> > +++ b/tests/acceptance/linux_ssh_mips_malta.py
+> > @@ -147,20 +147,27 @@ class LinuxSSH(Test):
+> >
+> >      def run_common_commands(self):
+> >          stdout, stderr =3D self.ssh_command('lspci -d 11ab:4620')
+> > -        self.assertIn(True, ["GT-64120" in line for line in stdout])
+> > +        self.assertIn(True, ["GT-64120a" in line for line in stdout],
 >
-> base <- active
+> Looks like there's an extra, unintended, "a" in the expected output, that
+is,
+> s/GT-64120a/GT-64120/.
 >
-> and change it into this shorter chain:
+> > +                      "'lspci -d 11ab:4620' output doesn't contain "
+> > +                      "the word 'GT-64120'")
+> >
+> >          stdout, stderr =3D self.ssh_command('cat
+/sys/bus/i2c/devices/i2c-0/name')
+> > -        self.assertIn(True, ["SMBus PIIX4 adapter" in line
+> > -                             for line in stdout])
+> > +        self.assertIn(True, ["SMBus PIIX4 adaptera" in line
 >
-> base
+> Here too (s/adaptera/adapter/).
 >
-> by moving the cluster from active into base.  There is no such thing as
-> blockcommit on internal snapshots, because you don't have any backing
-> file to push into.
+> > +                             for line in stdout],
+> > +                      "cat /sys/bus/i2c/devices/i2c-0/name' doesn't
+contain "
+> > +                      "the words 'SMBus PIIX4 adapter'")
+> >
+> >          stdout, stderr =3D self.ssh_command('cat /proc/mtd')
+> > -        self.assertIn(True, ["YAMON" in line
+> > -                             for line in stdout])
+> > +        self.assertIn(True, ["YAMONa" in line
 >
-> With internal snapshots, the longer an L1 table is active, the more
-> clusters you have to change compared to what was the case before the
-> snapshot was created - every time you change an existing cluster, the
-> refcount on the old cluster decreases and the change gets written into a
-> new cluster with refcount 1.  Yes, you can reach the point where there
-> are more clusters with refcount 1 associated with your current L1 table
-> than there are clusters with refcount > 1 that are shared with one or
-> more previous internal snapshots. But they are not recording a change to
-> the base file, rather, they are recording the current state of the file
-> where an internal snapshot says to not forget the old state of the file.
->   And yes, a qcow2 file with internal snapshots can require more disk
-> space than the amount of space exposed to the guest.  But that's true
-> too with external snapshots (the sum of the space required by all images
-> in the chain may be larger than the space visible to the guest).
+> Also here (s/YAMONa/YAMONa/).
+>
+> > +                             for line in stdout],
+> > +                      "'cat /proc/mtd' doesn't contain the word
+'YAMON'")
+> >
+> >          # Empty 'Board Config'
+> >          stdout, stderr =3D self.ssh_command('md5sum /dev/mtd2ro')
+> > -        self.assertIn(True, ["0dfbe8aa4c20b52e1b8bf3cb6cbdf193" in lin=
+e
+> > -                             for line in stdout])
+> > +        self.assertIn(True, ["0dfbe8aa4c20b52e1b8bf3cb6cbdf193a" in
+line
+> > +                             for line in stdout],
+>
+> And finnaly in the hash
+(s/0dfbe8aa4c20b52e1b8bf3cb6cbdf193a/0dfbe8aa4c20b52e1b8bf3cb6cbdf193/).
+>
+> > +                      "'md5sum /dev/mtd2ro' doesn't contain "
+> > +                      "the word '0dfbe8aa4c20b52e1b8bf3cb6cbdf193'")
+> >
+> >      def do_test_mips_malta(self, endianess, kernel_path, uname_m):
+> >          self.boot_debian_wheezy_image_and_ssh_login(endianess,
+kernel_path)
+> > --
+> > 2.7.4
+> >
+> >
+>
+> With those changes, the tests pass for me.  I'd recommend though:
+>
+> 1) Not related to your patch, but it's good practice to name unused
+>    variables "_", that is:
+>
+>    stdout, _ =3D self.ssh_command('lspci -d 11ab:4620')
+>
+> 2) Avoid repeating the expected content (which lead to the trailing
+>    "a"s in this patch).  Something like:
+>
+>    cmd =3D 'lspci -d 11ab:4620'
+>    stdout, _ =3D self.ssh_command(cmd)
+>    exp =3D "GT-64120"
+>    self.assertIn(True, [exp in line for line in stdout],
+>                  '"%s" output does not contain "%s"' % (cmd, exp))
+>
+> 3) Optionally, create an utility function that would make the check
+>    more obvious and avoid looping through all lines of the output
+>    (and creating a list, which a list comprehension will do).  Example:
+>
+>    def ssh_command_output_contains(self, cmd, exp):
+>        stdout, _ =3D self.ssh_command(cmd)
+>        for line in stdout:
+>            if exp in line:
+>                break
+>        else:
+>            self.fail('"%s" output does not contain "%s"' % (cmd, exp))
+>
+>     def run_common_commands(self):
+>         self.ssh_command_output_contains('lspci -d 11ab:4620', 'GT-64120'=
+)
+>         self.ssh_command_output_contains('cat
+/sys/bus/i2c/devices/i2c-0/name',
+>                                          'SMBus PIIX4 adapter')
+>         self.ssh_command_output_contains('cat /proc/mtd', 'YAMON')
+>         # Empty 'Board Config'
+>         self.ssh_command_output_contains('md5sum /dev/mtd2ro',
+>
+ '0dfbe8aa4c20b52e1b8bf3cb6cbdf193')
+>
 
+Thank you for your review, Cleber! I am almost certain that in v2 (that I
+am going to send soon), I will adopt the approach from point =E2=80=9C3=E2=
+=80=9D of your
+mail.
 
-OK. I think I'm getting it now. Thanks for your help. I just wish there 
-was some consistent documentation that explained all this. The Red Hat 
-stuff seems to assume that you understand it only applies to external 
-snapshots and the virsh man page seems to do the same.
+Yours,
+Aleksandar
 
-
+> Cheers,
+> - Cleber.
+>
