@@ -2,66 +2,66 @@ Return-Path: <SRS0=mXWu=UK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2E44C4321A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 14:19:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42F59C43218
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 14:26:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8F35205ED
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 14:19:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8F35205ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 17852206BB
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 14:26:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17852206BB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59440 helo=lists.gnu.org)
+Received: from localhost ([::1]:59526 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hahcC-0003Ee-1l
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 10:19:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59427)
+	id 1hahj5-0006CQ-7u
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 10:26:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38291)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <wangjie88@huawei.com>) id 1hahC1-0006Rn-MU
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 09:52:06 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hahff-0003xg-Q1
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:22:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wangjie88@huawei.com>) id 1hahC0-0005ei-FB
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 09:52:05 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2243 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wangjie88@huawei.com>)
- id 1hahBx-0005aJ-EB; Tue, 11 Jun 2019 09:52:01 -0400
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id E7170A5923EF54C2F7A6;
- Tue, 11 Jun 2019 21:51:52 +0800 (CST)
-Received: from [10.133.211.192] (10.133.211.192) by smtp.huawei.com
- (10.3.19.213) with Microsoft SMTP Server (TLS) id 14.3.439.0; Tue, 11 Jun
- 2019 21:51:43 +0800
-To: Paolo Bonzini <pbonzini@redhat.com>, Michal Privoznik
- <mprivozn@redhat.com>, <qemu-devel@nongnu.org>, <qemu-block@nongnu.org>
-References: <1559048796-57016-1-git-send-email-wangjie88@huawei.com>
- <cac8ed16-7846-ca22-2463-c3c738066d61@redhat.com>
- <f165741a-2ffd-62fd-b121-49bf1a3597f1@redhat.com>
- <ca74a7bf-dd68-d4c3-2c25-8e43db52678c@redhat.com>
- <f9b6dd9e-3e58-add9-c5ab-da1a883a0a4b@redhat.com>
- <b8a358ee-eb1f-14ca-b406-295ef668bb55@redhat.com>
-From: "wangjie (P)" <wangjie88@huawei.com>
-Message-ID: <4955ec04-1884-3a68-975f-8d72487c253c@huawei.com>
-Date: Tue, 11 Jun 2019 21:51:42 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.0
+ (envelope-from <no-reply@patchew.org>) id 1hahc7-0006eL-Sq
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:19:05 -0400
+Resent-Date: Tue, 11 Jun 2019 10:19:05 -0400
+Resent-Message-Id: <E1hahc7-0006eL-Sq@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21827)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hahc6-0006dA-WB; Tue, 11 Jun 2019 10:19:03 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1560262706; cv=none; d=zoho.com; s=zohoarc; 
+ b=hi1oFDHThDgRG3V5bd6Dm1QkYnh9muLyPHR10rVj2Z4PUbi3NlxaPDvLR9sEokl/Cg5dW2UWBDkU8UufceQezO+L/JoRg28YkakJpIVfbp+toIdH3SakJx77Kjm8PdCR01wUMSyMIyW0eeyAP0lAHXJ0KqF4gWbYXZvlAzlunC8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1560262706;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=Nx/nw1Y0yvhQycjNdq27r0Olr8h48o4wkl/2cXDnwgU=; 
+ b=libq4Kdli7FZtVCyqEdhj/RWyFeDXLjAHC8066HsiyldK70EaXMEjpw2jx44ZGSaZc0+lnqIANyb1mS79p4Yz/B+n2sJdhckmv1lAzZgmOls7YUfnQyP+4d4fwqAxs7n+/lCD3BkCVVigMrjAt6Pt6h9ocHe+8xj+/5Y3ctccn0=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1560262705139210.8631609951774;
+ Tue, 11 Jun 2019 07:18:25 -0700 (PDT)
+In-Reply-To: <20190611134043.9524-1-kwolf@redhat.com>
+Message-ID: <156026270395.32260.10662006474527917002@ce79690b2cb9>
 MIME-Version: 1.0
-In-Reply-To: <b8a358ee-eb1f-14ca-b406-295ef668bb55@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-X-Originating-IP: [10.133.211.192]
-X-CFilter-Loop: Reflected
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: kwolf@redhat.com
+Date: Tue, 11 Jun 2019 07:18:25 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.191
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] pr-manager-helper: fix pr
- process been killed when reconectting
+X-Received-From: 135.84.80.218
+Subject: Re: [Qemu-devel] [PATCH v2 00/11] monitor: Split monitor.c in
+ core/HMP/QMP/misc
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,81 +73,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: eric.fangyi@huawei.com
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, berrange@redhat.com, qemu-block@nongnu.org,
+ armbru@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi=EF=BC=8C Paolo and Michal=EF=BC=9A
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYxMTEzNDA0My45NTI0
+LTEta3dvbGZAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
+bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
+bWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwMC8xMV0gbW9uaXRvcjog
+U3BsaXQgbW9uaXRvci5jIGluIGNvcmUvSE1QL1FNUC9taXNjClR5cGU6IHNlcmllcwpNZXNzYWdl
+LWlkOiAyMDE5MDYxMTEzNDA0My45NTI0LTEta3dvbGZAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NS
+SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwg
+fHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29y
+aXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4K
+PT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXct
+cHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxOTA2MTEx
+MzQwNDMuOTUyNC0xLWt3b2xmQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MDYxMTEzNDA0My45
+NTI0LTEta3dvbGZAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjRk
+YjMzMWM1MTkgbW9uaXRvcjogU3BsaXQgb3V0IG1vbml0b3IvbW9uaXRvci5jCjg5OWEyMWYwMzUg
+bW9uaXRvcjogU3BsaXQgb3V0IG1vbml0b3IvaG1wLmMKNTA0MTZkNGFlYiBtb25pdG9yOiBTcGxp
+dCBvdXQgbW9uaXRvci9xbXAuYwozMWQxZmU4ZTQyIG1vbml0b3I6IENyZWF0ZSBtb25pdG9yX2lu
+dC5oIHdpdGggY29tbW9uIGRlZmluaXRpb25zCjJjMWFjNGVjYmYgbW9uaXRvcjogTW92ZSB7aG1w
+LCBxbXB9LmMgdG8gbW9uaXRvci97aG1wLCBxbXB9LWNtZHMuYwozN2Y4YzI4ZWNhIE1vdmUgbW9u
+aXRvci5jIHRvIG1vbml0b3IvbWlzYy5jCjAwNjc0ZWQxYzkgbW9uaXRvcjogTW92ZSBjbWRfdGFi
+bGUgdG8gTW9uaXRvckhNUAo4YTQ2YmM4Yzg1IG1vbml0b3I6IENyZWF0ZSBNb25pdG9ySE1QIHdp
+dGggcmVhZGxpbmUgc3RhdGUKYWY2ZTJhYWQ5NSBtb25pdG9yOiBNYWtlIE1vbml0b3JRTVAgYSBj
+aGlsZCBjbGFzcyBvZiBNb25pdG9yCmM0ODE4MWU1YWIgbW9uaXRvcjogU3BsaXQgbW9uaXRvcl9p
+bml0IGluIEhNUCBhbmQgUU1QIGZ1bmN0aW9uCjgyZWIxODE0N2YgbW9uaXRvcjogUmVtb3ZlIHVu
+dXNlZCBwYXNzd29yZCBwcm9tcHRpbmcgZmllbGRzCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzEx
+IENoZWNraW5nIGNvbW1pdCA4MmViMTgxNDdmZGYgKG1vbml0b3I6IFJlbW92ZSB1bnVzZWQgcGFz
+c3dvcmQgcHJvbXB0aW5nIGZpZWxkcykKMi8xMSBDaGVja2luZyBjb21taXQgYzQ4MTgxZTVhYjI0
+IChtb25pdG9yOiBTcGxpdCBtb25pdG9yX2luaXQgaW4gSE1QIGFuZCBRTVAgZnVuY3Rpb24pCjMv
+MTEgQ2hlY2tpbmcgY29tbWl0IGFmNmUyYWFkOTU3YyAobW9uaXRvcjogTWFrZSBNb25pdG9yUU1Q
+IGEgY2hpbGQgY2xhc3Mgb2YgTW9uaXRvcikKNC8xMSBDaGVja2luZyBjb21taXQgOGE0NmJjOGM4
+NTllIChtb25pdG9yOiBDcmVhdGUgTW9uaXRvckhNUCB3aXRoIHJlYWRsaW5lIHN0YXRlKQo1LzEx
+IENoZWNraW5nIGNvbW1pdCAwMDY3NGVkMWM5YzcgKG1vbml0b3I6IE1vdmUgY21kX3RhYmxlIHRv
+IE1vbml0b3JITVApCjYvMTEgQ2hlY2tpbmcgY29tbWl0IDM3ZjhjMjhlY2E2ZiAoTW92ZSBtb25p
+dG9yLmMgdG8gbW9uaXRvci9taXNjLmMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVk
+IGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzc4OiAKbmV3IGZpbGUg
+bW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNzggbGluZXMgY2hlY2tl
+ZAoKUGF0Y2ggNi8xMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
+b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
+aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo3LzExIENoZWNraW5nIGNv
+bW1pdCAyYzFhYzRlY2JmZDUgKG1vbml0b3I6IE1vdmUge2htcCwgcW1wfS5jIHRvIG1vbml0b3Iv
+e2htcCwgcW1wfS1jbWRzLmMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUo
+cyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzEwMjogCnJlbmFtZSBmcm9tIGht
+cC5jCgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDczIGxpbmVzIGNoZWNrZWQKClBhdGNo
+IDcvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOC8xMSBDaGVja2luZyBjb21taXQgMzFk
+MWZlOGU0MjA4IChtb25pdG9yOiBDcmVhdGUgbW9uaXRvcl9pbnQuaCB3aXRoIGNvbW1vbiBkZWZp
+bml0aW9ucykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBN
+QUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTcxOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRv
+dGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjkwIGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvMTEg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOS8xMSBDaGVja2luZyBjb21taXQgNTA0MTZkNGFl
+YmM1IChtb25pdG9yOiBTcGxpdCBvdXQgbW9uaXRvci9xbXAuYykKRVJST1I6IHJldHVybiBpcyBu
+b3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojNTg1OiBGSUxFOiBt
+b25pdG9yL21vbml0b3JfaW50Lmg6MTU0OgorICAgIHJldHVybiAobW9uLT5mbGFncyAmIE1PTklU
+T1JfVVNFX0NPTlRST0wpOwoKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShz
+KSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNjA5OiAKbmV3IGZpbGUgbW9kZSAx
+MDA2NDQKCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgOTY2IGxpbmVzIGNoZWNrZWQKClBh
+dGNoIDkvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjEwLzExIENoZWNraW5nIGNvbW1p
+dCA4OTlhMjFmMDM1OGUgKG1vbml0b3I6IFNwbGl0IG91dCBtb25pdG9yL2htcC5jKQpXQVJOSU5H
+OiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQg
+dXBkYXRpbmc/CiM0MTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogY29uc2lkZXIgdXNp
+bmcgcWVtdV9zdHJ0b3VsbCBpbiBwcmVmZXJlbmNlIHRvIHN0cnRvdWxsCiM0MDk6IEZJTEU6IG1v
+bml0b3IvaG1wLmM6MzY0OgorICAgICAgICBuID0gc3RydG91bGwocGNoLCAmcCwgMCk7CgpXQVJO
+SU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQoj
+MTI5MTogRklMRTogbW9uaXRvci9obXAuYzoxMjQ2OgorICAgIC8qIGlmIHRoZSBsaW5lIGVuZHMg
+d2l0aCBhIHNwYWNlLCBpdCBtZWFucyB3ZSB3YW50IHRvIGNvbXBsZXRlIHRoZQoKV0FSTklORzog
+QmxvY2sgY29tbWVudHMgdXNlIGEgdHJhaWxpbmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiMxMjky
+OiBGSUxFOiBtb25pdG9yL2htcC5jOjEyNDc6CisgICAgICogbmV4dCBhcmcgKi8KCnRvdGFsOiAx
+IGVycm9ycywgMyB3YXJuaW5ncywgMjg3OCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMC8xMSBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTEvMTEgQ2hlY2tpbmcgY29tbWl0IDRkYjMzMWM1MTky
+ZCAobW9uaXRvcjogU3BsaXQgb3V0IG1vbml0b3IvbW9uaXRvci5jKQpXQVJOSU5HOiBhZGRlZCwg
+bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
+CiM3MDY6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNl
+IGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzEzMTM6IEZJTEU6IG1vbml0b3IvbW9u
+aXRvci5jOjYwMzoKKyAgICAgICAgeyAvKiBlbmQgb2YgbGlzdCAqLyB9Cgp0b3RhbDogMCBlcnJv
+cnMsIDIgd2FybmluZ3MsIDEyNzMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTEvMTEgaGFzIHN0eWxl
+IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
+c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
+SCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
+IHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNo
+ZXcub3JnL2xvZ3MvMjAxOTA2MTExMzQwNDMuOTUyNC0xLWt3b2xmQHJlZGhhdC5jb20vdGVzdGlu
+Zy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
+YWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
+ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
-Base on my patch, I found another problem is that=EF=BC=9A
-
- =C2=A0=C2=A0=C2=A0 qemu: report DISCONNECTED
-
- =C2=A0=C2=A0=C2=A0 libvirt: start pr-helper #1, but it will takes a whil=
-e to complete=20
-this action
-
- =C2=A0=C2=A0=C2=A0 qemu: reconnect to start pr-helper #1 immediately and=
- failed, so=20
-report DISCONNECTED
-
- =C2=A0=C2=A0=C2=A0 libvirt: begin to call qemuProcessStartManagedPRDaemo=
-n to start=20
-pr-helper #2, but virPidFileAcquirePath failed, so close fd and unlink=20
-pidfile by mistake
-
-
-based on the above problem, I thought out two ways to fix this problem:
-
-1. qemu: when call pr_manager_helper_write failed, sleep one second to=20
-make sure libvirt had started pr-helper before call=20
-pr_manager_helper_initialize.
-
-2. libvirt: if virFileLock failed in virPidFileAcquirePath, not to close=20
-fd and unlink pidfile, because pr-helper #1 is using the pidfile.
-
-what kind of the two above solutions is better? please give me some=20
-advice, thanks.
-
-
-On 2019/5/30 18:59, Paolo Bonzini wrote:
-> On 30/05/19 12:08, Michal Privoznik wrote:
->>>> 1) Try to acquire (lock) pidfile
->>>> 2) unlink(socket)
->>>> 3) spawn pr-helper process (this yields child's PID)
->>>> 4) wait some time until socket is created
->>>> 5) some follow up work (move child's PID into same cgroup as qemu's =
-main
->>>> thread, relabel the socket so that qemu can access it)
->>> Note that qemu-pr-helper supports the systemd socket activation
->>> protocol.=C2=A0 Would it help if libvirt used it?
->> Thing is, libvirt creates a mount namespace for domains (one namespace
->> for one domain). In this namespace a dummy /dev is mounted and only
->> nodes that qemu is configured to have are created. For instance, you
->> won't see /dev/sda there unless your domain has it as a disk. Then,
->> libvirt moves pr-helper process into the same cgroups as the qemu's ma=
-in
->> thread. This is all done so that pr-helper has the same view of the
->> system as qemu. I don't think that he same result can be achieved usin=
-g
->> socket activation.
-> Why?  The only difference with "normal" behavior and socket activation
-> is who creates the socket and calls listen() on it.  Everything else is
-> entirely the same.
->
->> Also, libvirt spawns one pr-helper per domain (so that the socket can =
-be
->> private and share seclabel with qemu process it's attached to).
-> Yes, that is why I thought the socket could be moved in advance to the
-> right security label, prior to exec.  Also, perhaps could the child mov=
-e
-> itself to the right cgroup before dropping privileges.  This would
-> remove the window between 3 and 5, by moving all the work *before*
-> qemu-pr-helper is exec-ed.
->
-> Paolo
->
-> .
->
 
