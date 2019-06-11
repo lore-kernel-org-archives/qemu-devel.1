@@ -2,76 +2,65 @@ Return-Path: <SRS0=mXWu=UK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AB9DC4321A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 12:36:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85549C4321A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 12:37:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EE3A20673
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 12:36:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EE3A20673
+	by mail.kernel.org (Postfix) with ESMTPS id 5278F20896
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 12:37:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5278F20896
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57676 helo=lists.gnu.org)
+Received: from localhost ([::1]:57762 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hag0v-0000cx-9H
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 08:36:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52743)
+	id 1hag2E-0002th-FD
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 08:37:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52386)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hafAo-0007Ph-RD
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:42:46 -0400
+ (envelope-from <cohuck@redhat.com>) id 1hafAu-0006yr-GG
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:42:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1haf5u-00085L-7l
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:37:39 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:50323)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1haf5u-00084T-1W
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:37:38 -0400
-Received: by mail-wm1-f65.google.com with SMTP id c66so2578719wmf.0
- for <qemu-devel@nongnu.org>; Tue, 11 Jun 2019 04:37:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=t4hQ37YoEXlmC6jGUgEKBihosiktPvjtKJFuqH1c+c8=;
- b=oABEt7UElfGFdxdr95+NTtsOc6QgSaK1kOqsyhjRGPzomPemJytEC/hqanmqBoD3Fp
- 9x9N9dF6NONxC10H744BDDpqwTrI5FB0HgsINEkQF+LpGyvbQpUxjT86c3YPfQS/SavV
- wHah4kJRtjqOneCOiAUsgwymenRMNKQ1KLsJxzqZ/ud5rIKjDxR97myDg/bwGT+4w3Y9
- OrP/ZUscJ0VFWO4Bwe2xfuqo5DkBTP+wLKXJjl/8snP2evaq1Q/IAppqVTJZSTLUO61A
- pIkWydmG6Ty/DixZyi24FqLWrc1W3D9VKfAWtHue4qWcT0kBYfkOnzsbIogoQMRsmzBK
- er5g==
-X-Gm-Message-State: APjAAAX28rzl+O/zO7xVLUhj5gPZnnoQS0WV+ioFT2kDFhBUlAuvaTPA
- l4QI4eT9khqdiYk234Ih4rkFrVDLXrhuyw==
-X-Google-Smtp-Source: APXvYqzUGr2t/z/h3XjeMv75Q6OvjjPaM/9SyPRAvYroMLgCsERlMfMpfjRWqngcuZdmJKMituY8Rw==
-X-Received: by 2002:a7b:c751:: with SMTP id w17mr18418539wmk.127.1560253056551; 
- Tue, 11 Jun 2019 04:37:36 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:8cc3:8abd:4519:2cd6?
- ([2001:b07:6468:f312:8cc3:8abd:4519:2cd6])
- by smtp.gmail.com with ESMTPSA id t140sm167523wmt.0.2019.06.11.04.37.35
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Tue, 11 Jun 2019 04:37:35 -0700 (PDT)
-To: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-References: <20190607073429.3436-1-kraxel@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f69e038a-86e0-a01e-da31-8b608a733eb5@redhat.com>
-Date: Tue, 11 Jun 2019 13:37:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ (envelope-from <cohuck@redhat.com>) id 1haf5k-0007xG-Sg
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:37:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59342)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>)
+ id 1haf5k-0007pr-JN; Tue, 11 Jun 2019 07:37:28 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 630247FDFE;
+ Tue, 11 Jun 2019 11:37:21 +0000 (UTC)
+Received: from gondolin (ovpn-204-147.brq.redhat.com [10.40.204.147])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E67CE5DD63;
+ Tue, 11 Jun 2019 11:37:19 +0000 (UTC)
+Date: Tue, 11 Jun 2019 13:37:16 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Farhan Ali <alifm@linux.ibm.com>
+Message-ID: <20190611133716.427269b5.cohuck@redhat.com>
+In-Reply-To: <e8d6deb4-2e9a-188a-7171-ff9b85d625b3@linux.ibm.com>
+References: <20190607145353.2052-1-cohuck@redhat.com>
+ <77395432-9619-1fee-4aeb-5685b8aa9be3@linux.ibm.com>
+ <20190607170907.1d682513.cohuck@redhat.com>
+ <e8d6deb4-2e9a-188a-7171-ff9b85d625b3@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20190607073429.3436-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Tue, 11 Jun 2019 11:37:21 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PATCH v2] q35: fix mmconfig and PCI0._CRS
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v5] vfio-ccw: support async command
+ subregion
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,161 +72,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?B?TMOhc3psw7Mgw4lyc2Vr?= <lersek@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>,
+ qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/06/19 09:34, Gerd Hoffmann wrote:
-> This patch changes the handling of the mmconfig area.  Thanks to the
-> pci(e) expander devices we already have the logic to exclude address
-> ranges from PCI0._CRS.  We can simply add the mmconfig address range
-> to the list get it excluded as well.
-> 
-> With that in place we can go with a fixed pci hole which covers the
-> whole area from the end of (low) ram to the ioapic.
-> 
-> This will make the whole logic alot less fragile.  No matter where the
-> firmware places the mmconfig xbar, things should work correctly.  The
-> guest also gets a bit more PCI address space (seabios boot):
-> 
->     # cat /proc/iomem
->     [ ... ]
->     7ffdd000-7fffffff : reserved
->     80000000-afffffff : PCI Bus 0000:00            <<-- this is new
->     b0000000-bfffffff : PCI MMCONFIG 0000 [bus 00-ff]
->       b0000000-bfffffff : reserved
->     c0000000-febfffff : PCI Bus 0000:00
->       f8000000-fbffffff : 0000:00:01.0
->     [ ... ]
-> 
-> So this is a guest visible change.
-> 
-> Cc: László Érsek <lersek@redhat.com>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->  tests/bios-tables-test-allowed-diff.h |  8 +++++++
->  hw/i386/acpi-build.c                  | 14 ++++++++++++
->  hw/pci-host/q35.c                     | 31 +++++++--------------------
->  3 files changed, 30 insertions(+), 23 deletions(-)
-> 
-> diff --git a/tests/bios-tables-test-allowed-diff.h b/tests/bios-tables-test-allowed-diff.h
-> index dfb8523c8bf4..3bbd22c62a3b 100644
-> --- a/tests/bios-tables-test-allowed-diff.h
-> +++ b/tests/bios-tables-test-allowed-diff.h
-> @@ -1 +1,9 @@
->  /* List of comma-separated changed AML files to ignore */
-> +"tests/data/acpi/q35/DSDT",
-> +"tests/data/acpi/q35/DSDT.bridge",
-> +"tests/data/acpi/q35/DSDT.mmio64",
-> +"tests/data/acpi/q35/DSDT.ipmibt",
-> +"tests/data/acpi/q35/DSDT.cphp",
-> +"tests/data/acpi/q35/DSDT.memhp",
-> +"tests/data/acpi/q35/DSDT.numamem",
-> +"tests/data/acpi/q35/DSDT.dimmpxm",
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 85dc1640bc67..8e4f26977619 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -122,6 +122,8 @@ typedef struct FwCfgTPMConfig {
->      uint8_t tpmppi_version;
->  } QEMU_PACKED FwCfgTPMConfig;
->  
-> +static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg);
-> +
->  static void init_common_fadt_data(Object *o, AcpiFadtData *data)
->  {
->      uint32_t io = object_property_get_uint(o, ACPI_PM_PROP_PM_IO_BASE, NULL);
-> @@ -1807,6 +1809,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->      CrsRangeSet crs_range_set;
->      PCMachineState *pcms = PC_MACHINE(machine);
->      PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(machine);
-> +    AcpiMcfgInfo mcfg;
->      uint32_t nr_mem = machine->ram_slots;
->      int root_bus_limit = 0xFF;
->      PCIBus *bus = NULL;
-> @@ -1921,6 +1924,17 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->          }
->      }
->  
-> +    /*
-> +     * At this point crs_range_set has all the ranges used by pci
-> +     * busses *other* than PCI0.  These ranges will be excluded from
-> +     * the PCI0._CRS.  Add mmconfig to the set so it will be excluded
-> +     * too.
-> +     */
-> +    if (acpi_get_mcfg(&mcfg)) {
-> +        crs_range_insert(crs_range_set.mem_ranges,
-> +                         mcfg.base, mcfg.base + mcfg.size - 1);
-> +    }
-> +
->      scope = aml_scope("\\_SB.PCI0");
->      /* build PCI0._CRS */
->      crs = aml_resource_template();
-> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
-> index 960939f5ed3e..72093320befe 100644
-> --- a/hw/pci-host/q35.c
-> +++ b/hw/pci-host/q35.c
-> @@ -258,15 +258,6 @@ static void q35_host_initfn(Object *obj)
->      object_property_add_link(obj, MCH_HOST_PROP_IO_MEM, TYPE_MEMORY_REGION,
->                               (Object **) &s->mch.address_space_io,
->                               qdev_prop_allow_set_link_before_realize, 0, NULL);
-> -
-> -    /* Leave enough space for the biggest MCFG BAR */
-> -    /* TODO: this matches current bios behaviour, but
-> -     * it's not a power of two, which means an MTRR
-> -     * can't cover it exactly.
-> -     */
-> -    range_set_bounds(&s->mch.pci_hole,
-> -            MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT + MCH_HOST_BRIDGE_PCIEXBAR_MAX,
-> -            IO_APIC_DEFAULT_ADDRESS - 1);
->  }
->  
->  static const TypeInfo q35_host_info = {
-> @@ -338,20 +329,6 @@ static void mch_update_pciexbar(MCHPCIState *mch)
->      }
->      addr = pciexbar & addr_mask;
->      pcie_host_mmcfg_update(pehb, enable, addr, length);
-> -    /* Leave enough space for the MCFG BAR */
-> -    /*
-> -     * TODO: this matches current bios behaviour, but it's not a power of two,
-> -     * which means an MTRR can't cover it exactly.
-> -     */
-> -    if (enable) {
-> -        range_set_bounds(&mch->pci_hole,
-> -                         addr + length,
-> -                         IO_APIC_DEFAULT_ADDRESS - 1);
-> -    } else {
-> -        range_set_bounds(&mch->pci_hole,
-> -                         MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT,
-> -                         IO_APIC_DEFAULT_ADDRESS - 1);
-> -    }
->  }
->  
->  /* PAM */
-> @@ -484,6 +461,14 @@ static void mch_update(MCHPCIState *mch)
->      mch_update_pam(mch);
->      mch_update_smram(mch);
->      mch_update_ext_tseg_mbytes(mch);
-> +
-> +    /*
-> +     * pci hole goes from end-of-low-ram to io-apic.
-> +     * mmconfig will be excluded by the dsdt builder.
-> +     */
-> +    range_set_bounds(&mch->pci_hole,
-> +                     mch->below_4g_mem_size,
-> +                     IO_APIC_DEFAULT_ADDRESS - 1);
->  }
->  
->  static int mch_post_load(void *opaque, int version_id)
-> 
+On Fri, 7 Jun 2019 11:19:09 -0400
+Farhan Ali <alifm@linux.ibm.com> wrote:
 
-Queued, thanks.
+> On 06/07/2019 11:09 AM, Cornelia Huck wrote:
+> > On Fri, 7 Jun 2019 11:02:36 -0400
+> > Farhan Ali <alifm@linux.ibm.com> wrote:
+> >   
+> >> On 06/07/2019 10:53 AM, Cornelia Huck wrote:  
 
-Paolo
+> >>> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> >>> index ad310b9f94bc..b92395f165e6 100644
+> >>> --- a/hw/s390x/css.c
+> >>> +++ b/hw/s390x/css.c
+> >>> @@ -22,6 +22,7 @@
+> >>>    #include "trace.h"
+> >>>    #include "hw/s390x/s390_flic.h"
+> >>>    #include "hw/s390x/s390-virtio-ccw.h"
+> >>> +#include "hw/s390x/s390-ccw.h"
+> >>>    
+> >>>    typedef struct CrwContainer {
+> >>>        CRW crw;
+> >>> @@ -1205,6 +1206,26 @@ static void sch_handle_start_func_virtual(SubchDev *sch)
+> >>>    
+> >>>    }
+> >>>    
+> >>> +static void sch_handle_halt_func_passthrough(SubchDev *sch)
+> >>> +{
+> >>> +    int ret;
+> >>> +
+> >>> +    ret = s390_ccw_halt(sch);
+> >>> +    if (ret == -ENOSYS) {
+> >>> +        sch_handle_halt_func(sch);
+> >>> +    }
+> >>> +}
+> >>> +
+> >>> +static void sch_handle_clear_func_passthrough(SubchDev *sch)
+> >>> +{
+> >>> +    int ret;
+> >>> +
+> >>> +    ret = s390_ccw_clear(sch);
+> >>> +    if (ret == -ENOSYS) {
+> >>> +        sch_handle_clear_func(sch);
+> >>> +    }
+> >>> +}
+> >>> +  
+> >>
+> >> do we need an extra s390_ccw_clear/halt functions? can't we just call
+> >> cdc->clear/halt in the passthrough functions?  
+> > 
+> > I mostly added them for symmetry reasons... we still need to check for
+> > presence of the callback in any case, though.
+> > 
+> > (vfio is not always built, e.g. on windows or os x.)  
+> 
+> 
+> right, but if we are calling do_subchannel_work_passthrough, then we 
+> know for sure we are building the S390CCWDevice which is the vfio 
+> device, no?
+> 
+> So we could just add checks for callbacks in 
+> sch_handle_clear/halt_func_passthrough, no?
+> 
+> I would even like to get rid of the s390_ccw_cmd_request if we can, but 
+> that is out of scope for this patch. :)
+
+Ok, I just walked through various source files (some of which are a bit
+confusingly named) again and now I understand again why it was done
+that way in the first place.
+
+- hw/s390x/s390-ccw.c provides some interfaces for pass-through ccw
+  devices. It is built unconditionally, and its interfaces are called
+  unconditionally from the css code.
+  It also provides a device class where code can hook up callbacks.
+- hw/vfio/ccw.c (which is not built for !KVM) actually hooks up
+  callbacks in that device class.
+
+So, s390-ccw.c (not to be confused with ccw-device.c...) provides a
+layer that makes it possible to call things unconditionally, regardless
+whether we have vfio-ccw available or not. Not that the code ends up
+being called without vfio-ccw support; but the class indirection
+enables the code to be built.
+
+There's possibly a way to make this work without the class indirection
+as well, but I think we'd end up doing code juggling before ending up
+with something that's not really nicer than the code we have now.
+Therefore, I'd prefer to keep the class handling and hook up the
+halt/clear callbacks there as well.
 
