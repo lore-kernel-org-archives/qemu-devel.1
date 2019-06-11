@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43231C4321A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 11:05:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1AF8C4321A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 11:06:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0ABC120673
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 11:05:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C260720820
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 11:06:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="j5WAFGK3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ABC120673
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="D4+2M2+F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C260720820
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56248 helo=lists.gnu.org)
+Received: from localhost ([::1]:56256 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haeaJ-000880-7d
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 07:04:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39328)
+	id 1haebm-0001H1-39
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 07:06:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38987)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1haeQ3-0007Mo-Mm
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 06:54:28 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1haePp-0007A4-BU
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 06:54:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1haePy-0007XY-13
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 06:54:23 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51682)
+ (envelope-from <peter.maydell@linaro.org>) id 1haePl-0007IK-2x
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 06:54:07 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36473)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1haePx-0007Un-LD
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 06:54:17 -0400
-Received: by mail-wm1-x341.google.com with SMTP id 207so2438343wma.1
- for <qemu-devel@nongnu.org>; Tue, 11 Jun 2019 03:54:15 -0700 (PDT)
+ id 1haePi-0007EU-Ul
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 06:54:03 -0400
+Received: by mail-wm1-x342.google.com with SMTP id u8so2398905wmm.1
+ for <qemu-devel@nongnu.org>; Tue, 11 Jun 2019 03:54:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=CMrwrOJ95kW4T6/b8G/qtF8+mC0+yLfbGLY5ikylyb4=;
- b=j5WAFGK3YwuUVLpCXXs+wSIwwcaCGhtbd+umCM6gl/H5cR+dllX9OTNvTbHPyCUt09
- ZZbkd95C15o8hMp5JAxw8VQu99/KQuDwbSR9GBjKMruDwlLD318v0GmTeFcaiKYXGYtF
- tF6wgURuRvF5v4DkR/j6syJCIIekMjG9xTyL7mDHEDPjSxjcuR/6/UJhuYNciSbjE9hL
- cu0tAPmy5SklILvJWbySLEYXBZrX7bJr53DAvdFp+WnpKwo8A+H38mSOI0B3mWBQK82Q
- Stj00goUwio0MSSyc4ZDfg9oMbtAsdDMeQ3Tb3IfHxJojNnQhI2NmKyq/MLKDkaV9l7G
- pn9g==
+ bh=SZbakxW0g38DCAAdbQ5o6o6UWVsvUIKVBk4A8V5fIVY=;
+ b=D4+2M2+FrohjPjlO6FclDGgkQtD129vVisIuNtgtJIMypwavc6CYeDXe6xmoYb87t0
+ pdRsYQ524L7kGJBeiGcQ1Qx84IekbIcJlWANHrxWt9fH/piSyl9dWZBMmz/HtZsH63pd
+ OHsVwG2u8Pd2c7FMa1j/+YrDPm/3T/XotFpNNC5ZDlkGWh8CYizNC2t+7d8DWFSla8a5
+ 6712Kx4bOAVYLJ2eRaoMobV3u88eo08phU2uHOLx6GNK74pUbSaxFT0K9JUKYbVp+Y2c
+ vU/cyn7LBQ7f/XWIxxGHV6DEkSd30RBDqbTS6B3XExxcMW6ZWQxkS/9RmssgJv7e5SUV
+ C58A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=CMrwrOJ95kW4T6/b8G/qtF8+mC0+yLfbGLY5ikylyb4=;
- b=gjc6ssZ9nHcY4Lc4/rxA4D1kWi/9jWlZoGCsw+CrdAUdWk6qf9gR8xcYucEylkltf0
- imAcGQhWKv9cOmsdDGW1cJOUprJr7+aPjQE5Jl4r0cYULYpL1+zt8bk7MdC6a/+xMYIe
- IlVrLz/l6mCHF8NREb54qcBFe6x9Zmb608lfO6VEHcwQxv8dvAOkpp/nX1iZYF6IlJvA
- BYHXI4y507O379/hSxvoOdcuZJrhbkzPuNwD2Fo5Pg7ZdPT5/m8lZlXOoKBGcbpoe6Dg
- KFXCrvKURxYxKkFVkC5gFzvi/y6i4kbNuK0ui1yDX6swSaJiMJeG9iJi9DFa6g6z7PUc
- nO3A==
-X-Gm-Message-State: APjAAAVUu2exagX26eqCLGBPbKVOnpOHKvMnA8Pcr8K+R3VgAL2xGakG
- ps6NIYWPlITxDOcZpeE2IEEy5A==
-X-Google-Smtp-Source: APXvYqy+GD0a4Na80BB6FZyHymlK6Bnj1lX41VMDlW5nxYuYbkUEcOiVlpE08qM6vax1irG3NPExkw==
-X-Received: by 2002:a1c:a983:: with SMTP id s125mr16394297wme.18.1560250454758; 
- Tue, 11 Jun 2019 03:54:14 -0700 (PDT)
+ bh=SZbakxW0g38DCAAdbQ5o6o6UWVsvUIKVBk4A8V5fIVY=;
+ b=Zej9Q3sv7votiKSlSO7pI4kbW5yyN6uhcl6LK+cn0L4Wyt++V8F5lOa2gCwNBqvPch
+ Xwjdfjeyp1laNptblZFYduQUh2cZSlAQT99dUawynD8d1hUzW+sbwe+BZDf8+zuAvw7J
+ zyv/ZbAwnEe8iTsgKj2pOQVlQimLHCqKmEKK8A6yd/vwsaeQoZ2mAH9NSDluWEqQ+ZuP
+ 72dVCGjDrhMoAWcnqdyUhOw+G/bGd068pZV67Iw6Zbl0k/11KcCLg9x16RI0Lhxymmmg
+ qY1BpDRoo+oVWvuBLUA1yGKer8gyeW8vv0bBvHkYgtlOjWGinfsGhkTiDZ0mSREN0QyK
+ jOTg==
+X-Gm-Message-State: APjAAAX/bUXYZ15sMYyk7GVS62UYyDsUdSj2Zp8HaO2RNwKX2t3/2lSo
+ tqUdwiQ91N7e1Chy7I1KRp/tY9my5jd7UQ==
+X-Google-Smtp-Source: APXvYqwU6S2yHLaWRLmdzXPTpAa4OezYUKpQkHe6NozDe3UTeyu8nqD7H8B9BrnHwqfCE4U8Xez1Wg==
+X-Received: by 2002:a1c:80c1:: with SMTP id b184mr15846499wmd.24.1560250440383; 
+ Tue, 11 Jun 2019 03:54:00 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id e17sm10785945wrt.95.2019.06.11.03.54.13
+ by smtp.gmail.com with ESMTPSA id e17sm10785945wrt.95.2019.06.11.03.53.59
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 11 Jun 2019 03:54:13 -0700 (PDT)
+ Tue, 11 Jun 2019 03:53:59 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Tue, 11 Jun 2019 11:53:28 +0100
-Message-Id: <20190611105351.9871-20-peter.maydell@linaro.org>
+Date: Tue, 11 Jun 2019 11:53:16 +0100
+Message-Id: <20190611105351.9871-8-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190611105351.9871-1-peter.maydell@linaro.org>
 References: <20190611105351.9871-1-peter.maydell@linaro.org>
@@ -80,9 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: [Qemu-devel] [PATCH v2 19/42] target/arm: Convert VFP VMLS to
- decodetree
+X-Received-From: 2a00:1450:4864:20::342
+Subject: [Qemu-devel] [PATCH v2 07/42] target/arm: Convert VMINNM,
+ VMAXNM to decodetree
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,101 +99,106 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the VFP VMLS instruction to decodetree.
+Convert the VMINNM and VMAXNM instructions to decodetree.
+As with VSEL, we leave the trans_VMINMAXNM() function
+in translate.c for the moment.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-vfp.inc.c | 38 ++++++++++++++++++++++++++++++++++
- target/arm/translate.c         |  8 +------
- target/arm/vfp.decode          |  5 +++++
- 3 files changed, 44 insertions(+), 7 deletions(-)
+ target/arm/translate.c       | 41 ++++++++++++++++++++++++------------
+ target/arm/vfp-uncond.decode |  5 +++++
+ 2 files changed, 33 insertions(+), 13 deletions(-)
 
-diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
-index 4f922dc8405..00f64401dda 100644
---- a/target/arm/translate-vfp.inc.c
-+++ b/target/arm/translate-vfp.inc.c
-@@ -1303,3 +1303,41 @@ static bool trans_VMLA_dp(DisasContext *s, arg_VMLA_sp *a)
- {
-     return do_vfp_3op_dp(s, gen_VMLA_dp, a->vd, a->vn, a->vm, true);
- }
-+
-+static void gen_VMLS_sp(TCGv_i32 vd, TCGv_i32 vn, TCGv_i32 vm, TCGv_ptr fpst)
-+{
-+    /*
-+     * VMLS: vd = vd + -(vn * vm)
-+     * Note that order of inputs to the add matters for NaNs.
-+     */
-+    TCGv_i32 tmp = tcg_temp_new_i32();
-+
-+    gen_helper_vfp_muls(tmp, vn, vm, fpst);
-+    gen_helper_vfp_negs(tmp, tmp);
-+    gen_helper_vfp_adds(vd, vd, tmp, fpst);
-+    tcg_temp_free_i32(tmp);
-+}
-+
-+static bool trans_VMLS_sp(DisasContext *s, arg_VMLS_sp *a)
-+{
-+    return do_vfp_3op_sp(s, gen_VMLS_sp, a->vd, a->vn, a->vm, true);
-+}
-+
-+static void gen_VMLS_dp(TCGv_i64 vd, TCGv_i64 vn, TCGv_i64 vm, TCGv_ptr fpst)
-+{
-+    /*
-+     * VMLS: vd = vd + -(vn * vm)
-+     * Note that order of inputs to the add matters for NaNs.
-+     */
-+    TCGv_i64 tmp = tcg_temp_new_i64();
-+
-+    gen_helper_vfp_muld(tmp, vn, vm, fpst);
-+    gen_helper_vfp_negd(tmp, tmp);
-+    gen_helper_vfp_addd(vd, vd, tmp, fpst);
-+    tcg_temp_free_i64(tmp);
-+}
-+
-+static bool trans_VMLS_dp(DisasContext *s, arg_VMLS_sp *a)
-+{
-+    return do_vfp_3op_dp(s, gen_VMLS_dp, a->vd, a->vn, a->vm, true);
-+}
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 4e40a8562c4..bddc0d20447 100644
+index 6ee60303eeb..53badde1f52 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -3134,7 +3134,7 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-             rn = VFP_SREG_N(insn);
+@@ -3202,11 +3202,31 @@ static bool trans_VSEL(DisasContext *s, arg_VSEL *a)
+     return true;
+ }
  
-             switch (op) {
--            case 0:
-+            case 0 ... 1:
-                 /* Already handled by decodetree */
-                 return 1;
-             default:
-@@ -3320,12 +3320,6 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-             for (;;) {
-                 /* Perform the calculation.  */
-                 switch (op) {
--                case 1: /* VMLS: fd + -(fn * fm) */
--                    gen_vfp_mul(dp);
--                    gen_vfp_F1_neg(dp);
--                    gen_mov_F0_vreg(dp, rd);
--                    gen_vfp_add(dp);
--                    break;
-                 case 2: /* VNMLS: -fd + (fn * fm) */
-                     /* Note that it isn't valid to replace (-A + B) with (B - A)
-                      * or similar plausible looking simplifications
-diff --git a/target/arm/vfp.decode b/target/arm/vfp.decode
-index 9530e17ae02..7bcf2260eec 100644
---- a/target/arm/vfp.decode
-+++ b/target/arm/vfp.decode
-@@ -102,3 +102,8 @@ VMLA_sp      ---- 1110 0.00 .... .... 1010 .0.0 .... \
-              vm=%vm_sp vn=%vn_sp vd=%vd_sp
- VMLA_dp      ---- 1110 0.00 .... .... 1011 .0.0 .... \
-              vm=%vm_dp vn=%vn_dp vd=%vd_dp
+-static int handle_vminmaxnm(uint32_t insn, uint32_t rd, uint32_t rn,
+-                            uint32_t rm, uint32_t dp)
++static bool trans_VMINMAXNM(DisasContext *s, arg_VMINMAXNM *a)
+ {
+-    uint32_t vmin = extract32(insn, 6, 1);
+-    TCGv_ptr fpst = get_fpstatus_ptr(0);
++    uint32_t rd, rn, rm;
++    bool dp = a->dp;
++    bool vmin = a->op;
++    TCGv_ptr fpst;
 +
-+VMLS_sp      ---- 1110 0.00 .... .... 1010 .1.0 .... \
-+             vm=%vm_sp vn=%vn_sp vd=%vd_sp
-+VMLS_dp      ---- 1110 0.00 .... .... 1011 .1.0 .... \
-+             vm=%vm_dp vn=%vn_dp vd=%vd_dp
++    if (!dc_isar_feature(aa32_vminmaxnm, s)) {
++        return false;
++    }
++
++    /* UNDEF accesses to D16-D31 if they don't exist */
++    if (dp && !dc_isar_feature(aa32_fp_d32, s) &&
++        ((a->vm | a->vn | a->vd) & 0x10)) {
++        return false;
++    }
++    rd = a->vd;
++    rn = a->vn;
++    rm = a->vm;
++
++    if (!vfp_access_check(s)) {
++        return true;
++    }
++
++    fpst = get_fpstatus_ptr(0);
+ 
+     if (dp) {
+         TCGv_i64 frn, frm, dest;
+@@ -3247,7 +3267,7 @@ static int handle_vminmaxnm(uint32_t insn, uint32_t rd, uint32_t rn,
+     }
+ 
+     tcg_temp_free_ptr(fpst);
+-    return 0;
++    return true;
+ }
+ 
+ static int handle_vrint(uint32_t insn, uint32_t rd, uint32_t rm, uint32_t dp,
+@@ -3359,23 +3379,18 @@ static const uint8_t fp_decode_rm[] = {
+ 
+ static int disas_vfp_misc_insn(DisasContext *s, uint32_t insn)
+ {
+-    uint32_t rd, rn, rm, dp = extract32(insn, 8, 1);
++    uint32_t rd, rm, dp = extract32(insn, 8, 1);
+ 
+     if (dp) {
+         VFP_DREG_D(rd, insn);
+-        VFP_DREG_N(rn, insn);
+         VFP_DREG_M(rm, insn);
+     } else {
+         rd = VFP_SREG_D(insn);
+-        rn = VFP_SREG_N(insn);
+         rm = VFP_SREG_M(insn);
+     }
+ 
+-    if ((insn & 0x0fb00e10) == 0x0e800a00 &&
+-        dc_isar_feature(aa32_vminmaxnm, s)) {
+-        return handle_vminmaxnm(insn, rd, rn, rm, dp);
+-    } else if ((insn & 0x0fbc0ed0) == 0x0eb80a40 &&
+-               dc_isar_feature(aa32_vrint, s)) {
++    if ((insn & 0x0fbc0ed0) == 0x0eb80a40 &&
++        dc_isar_feature(aa32_vrint, s)) {
+         /* VRINTA, VRINTN, VRINTP, VRINTM */
+         int rounding = fp_decode_rm[extract32(insn, 16, 2)];
+         return handle_vrint(insn, rd, rm, dp, rounding);
+diff --git a/target/arm/vfp-uncond.decode b/target/arm/vfp-uncond.decode
+index b7f7c27fe86..8ab201fa058 100644
+--- a/target/arm/vfp-uncond.decode
++++ b/target/arm/vfp-uncond.decode
+@@ -45,3 +45,8 @@ VSEL        1111 1110 0. cc:2 .... .... 1010 .0.0 .... \
+             vm=%vm_sp vn=%vn_sp vd=%vd_sp dp=0
+ VSEL        1111 1110 0. cc:2 .... .... 1011 .0.0 .... \
+             vm=%vm_dp vn=%vn_dp vd=%vd_dp dp=1
++
++VMINMAXNM   1111 1110 1.00 .... .... 1010 . op:1 .0 .... \
++            vm=%vm_sp vn=%vn_sp vd=%vd_sp dp=0
++VMINMAXNM   1111 1110 1.00 .... .... 1011 . op:1 .0 .... \
++            vm=%vm_dp vn=%vn_dp vd=%vd_dp dp=1
 -- 
 2.20.1
 
