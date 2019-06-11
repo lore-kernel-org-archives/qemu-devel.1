@@ -2,62 +2,64 @@ Return-Path: <SRS0=mXWu=UK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A87D7C06508
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 16:59:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B39D7C4321A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 17:02:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 849C92086A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 16:59:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 849C92086A
+	by mail.kernel.org (Postfix) with ESMTPS id 4157820896
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 17:02:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4157820896
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33016 helo=lists.gnu.org)
+Received: from localhost ([::1]:33072 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hak6y-0002Ci-QG
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 12:59:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52112)
+	id 1hakAT-0005bv-Nv
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 13:02:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51790)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pagupta@redhat.com>) id 1hak31-0007gN-OJ
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 12:55:01 -0400
+ (envelope-from <quintela@redhat.com>) id 1hak2n-0007Kl-1U
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 12:54:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pagupta@redhat.com>) id 1hajrQ-0002s4-Le
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 12:43:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48040)
+ (envelope-from <quintela@redhat.com>) id 1hajvc-00065v-Dp
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 12:47:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47792)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hajrQ-0002rZ-GZ
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 12:43:00 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hajvc-0005vB-6e
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 12:47:20 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8109A30F1BA4;
- Tue, 11 Jun 2019 16:42:54 +0000 (UTC)
-Received: from dhcp201-121.englab.pnq.redhat.com (ovpn-116-60.sin2.redhat.com
- [10.67.116.60])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1255461F21;
- Tue, 11 Jun 2019 16:42:18 +0000 (UTC)
-From: Pankaj Gupta <pagupta@redhat.com>
-To: dm-devel@redhat.com, linux-nvdimm@lists.01.org,
- linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
- kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-acpi@vger.kernel.org, qemu-devel@nongnu.org,
- linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org
-Date: Tue, 11 Jun 2019 22:08:01 +0530
-Message-Id: <20190611163802.25352-7-pagupta@redhat.com>
-In-Reply-To: <20190611163802.25352-1-pagupta@redhat.com>
-References: <20190611163802.25352-1-pagupta@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+ by mx1.redhat.com (Postfix) with ESMTPS id 2D5CD6378
+ for <qemu-devel@nongnu.org>; Tue, 11 Jun 2019 16:46:56 +0000 (UTC)
+Received: from redhat.com (ovpn-117-129.ams2.redhat.com [10.36.117.129])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A09A05DA99;
+ Tue, 11 Jun 2019 16:46:53 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+In-Reply-To: <20190529164819.GL2882@work-vm> (David Alan Gilbert's message of
+ "Wed, 29 May 2019 17:48:20 +0100")
+References: <20190515121544.4597-1-quintela@redhat.com>
+ <20190515121544.4597-8-quintela@redhat.com>
+ <20190529164819.GL2882@work-vm>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+Date: Tue, 11 Jun 2019 18:46:51 +0200
+Message-ID: <87y328nk78.fsf@trasno.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Tue, 11 Jun 2019 16:42:54 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.38]); Tue, 11 Jun 2019 16:46:56 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v12 6/7] ext4: disable map_sync for async flush
+Subject: Re: [Qemu-devel] [PATCH v3 7/8] multifd: Add zlib compression
+ support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,58 +71,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pagupta@redhat.com, rdunlap@infradead.org, jack@suse.cz, snitzer@redhat.com,
- mst@redhat.com, jasowang@redhat.com, david@fromorbit.com,
- lcapitulino@redhat.com, adilger.kernel@dilger.ca, zwisler@kernel.org,
- aarcange@redhat.com, dave.jiang@intel.com, jstaron@google.com,
- darrick.wong@oracle.com, vishal.l.verma@intel.com, david@redhat.com,
- willy@infradead.org, hch@infradead.org, jmoyer@redhat.com, nilal@redhat.com,
- lenb@kernel.org, kilobyte@angband.pl, riel@surriel.com, yuval.shaia@oracle.com,
- stefanha@redhat.com, pbonzini@redhat.com, dan.j.williams@intel.com,
- kwolf@redhat.com, tytso@mit.edu, xiaoguangrong.eric@gmail.com,
- cohuck@redhat.com, rjw@rjwysocki.net, imammedo@redhat.com
+Reply-To: quintela@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Dont support 'MAP_SYNC' with non-DAX files and DAX files
-with asynchronous dax_device. Virtio pmem provides
-asynchronous host page cache flush mechanism. We don't
-support 'MAP_SYNC' with virtio pmem and ext4.
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  hw/core/qdev-properties.c |  2 +-
+>>  migration/migration.c     |  9 ++++++++
+>>  migration/migration.h     |  1 +
+>>  migration/ram.c           | 47 +++++++++++++++++++++++++++++++++++++++
+>>  qapi/migration.json       |  2 +-
+>>  tests/migration-test.c    |  6 +++++
+>>  6 files changed, 65 insertions(+), 2 deletions(-)
+>> 
 
-Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
----
- fs/ext4/file.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+>>  /* This value needs to be a multiple of qemu_target_page_size() */
+>>  #define MULTIFD_PACKET_SIZE (512 * 1024)
+>> @@ -663,6 +664,12 @@ typedef struct {
+>>      uint64_t num_pages;
+>>      /* syncs main thread and channels */
+>>      QemuSemaphore sem_sync;
+>> +    /* stream for compression */
+>> +    z_stream zs;
+>> +    /* compressed buffer */
+>> +    uint8_t *zbuff;
+>> +    /* size of compressed buffer */
+>> +    uint32_t zbuff_len;
+>
+> Does this set need to be in a union or something so that you select
+> them for different compression types?
 
-diff --git a/fs/ext4/file.c b/fs/ext4/file.c
-index 98ec11f69cd4..dee549339e13 100644
---- a/fs/ext4/file.c
-+++ b/fs/ext4/file.c
-@@ -360,15 +360,17 @@ static const struct vm_operations_struct ext4_file_vm_ops = {
- static int ext4_file_mmap(struct file *file, struct vm_area_struct *vma)
- {
- 	struct inode *inode = file->f_mapping->host;
-+	struct ext4_sb_info *sbi = EXT4_SB(inode->i_sb);
-+	struct dax_device *dax_dev = sbi->s_daxdev;
- 
--	if (unlikely(ext4_forced_shutdown(EXT4_SB(inode->i_sb))))
-+	if (unlikely(ext4_forced_shutdown(sbi)))
- 		return -EIO;
- 
- 	/*
--	 * We don't support synchronous mappings for non-DAX files. At least
--	 * until someone comes with a sensible use case.
-+	 * We don't support synchronous mappings for non-DAX files and
-+	 * for DAX files if underneath dax_device is not synchronous.
- 	 */
--	if (!IS_DAX(file_inode(file)) && (vma->vm_flags & VM_SYNC))
-+	if (!daxdev_mapping_supported(vma, dax_dev))
- 		return -EOPNOTSUPP;
- 
- 	file_accessed(file);
--- 
-2.20.1
+Yeap.  Done.
 
+>
+>>  }  MultiFDSendParams;
+>>  
+>>  typedef struct {
+>> @@ -698,6 +705,12 @@ typedef struct {
+>>      uint64_t num_pages;
+>>      /* syncs main thread and channels */
+>>      QemuSemaphore sem_sync;
+>> +    /* stream for compression */
+>
+> de-compression?
+
+Changed.  I think that "compression methods" mean both, but who I am to
+discuss with a native speaker O:-)
+
+>>          socket_send_channel_create(multifd_new_send_channel_async, p);
+>> +        zs->zalloc = Z_NULL;
+>> +        zs->zfree = Z_NULL;
+>> +        zs->opaque = Z_NULL;
+>> +        if (deflateInit(zs, migrate_compress_level()) != Z_OK) {
+>> +            printf("deflate init failed\n");
+>> +            return -1;
+>> +        }
+>> +        /* We will never have more than page_count pages */
+>> +        p->zbuff_len = page_count * qemu_target_page_size();
+>> +        p->zbuff_len *= 2;
+>
+> Should the ops gain a 'save_init' and 'load_init' so that you can
+> only do this lot if the compression is enabled?
+
+send_setup()/send_cleanup()
+recv_setup()/recv_cleanup()
+
+I have tried to be consistent ....
+
+>
+>> +        p->zbuff = g_malloc0(p->zbuff_len);
+>
+> I'd prefer g_try_malloc and do failure given it's not a tiny buffer.
+
+I can change, no problem there.
+Changing prototypes to get an Error *.
+
+
+Thanks, Juan.
 
