@@ -2,68 +2,61 @@ Return-Path: <SRS0=mXWu=UK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E75DFC4321A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 08:56:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A239C4321A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 08:57:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF21820657
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 08:56:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF21820657
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E739320657
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 08:57:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E739320657
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52996 helo=lists.gnu.org)
+Received: from localhost ([::1]:53048 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hacZt-0007Gb-SX
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 04:56:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56551)
+	id 1hacaZ-0008KV-7V
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 04:57:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56549)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hacUz-0002px-7t
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hacUz-0002pw-7Z
  for qemu-devel@nongnu.org; Tue, 11 Jun 2019 04:51:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hacUw-0005T9-H6
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hacUw-0005Sr-AU
  for qemu-devel@nongnu.org; Tue, 11 Jun 2019 04:51:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37448)
+Received: from mga01.intel.com ([192.55.52.88]:31704)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hacUk-0004ZK-SX; Tue, 11 Jun 2019 04:51:08 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0C1CD3086203;
- Tue, 11 Jun 2019 08:49:55 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-156.ams2.redhat.com
- [10.36.117.156])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 791301001B03;
- Tue, 11 Jun 2019 08:49:48 +0000 (UTC)
-Date: Tue, 11 Jun 2019 10:49:41 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: l00284672 <lizhengui@huawei.com>
-Message-ID: <20190611084941.GB8112@localhost.localdomain>
-References: <1560173684-6264-1-git-send-email-lizhengui@huawei.com>
- <1a218c83-7167-68c4-798f-2870f2f98475@redhat.com>
- <49e6310d-1c1c-2379-47e6-7239e0058e78@huawei.com>
- <487a3a9d-92b3-bed4-4082-5701cd4bd08d@redhat.com>
- <98826c00-3dae-3972-c68a-f86f544c2093@huawei.com>
+ (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+ id 1hacUu-0005MU-I3
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 04:51:18 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+ by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 11 Jun 2019 01:51:07 -0700
+X-ExtLoop1: 1
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+ by orsmga002.jf.intel.com with ESMTP; 11 Jun 2019 01:51:05 -0700
+Date: Tue, 11 Jun 2019 16:50:41 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: Juan Quintela <quintela@redhat.com>
+Message-ID: <20190611085040.GA28950@richard>
+References: <20190402003106.17614-1-richardw.yang@linux.intel.com>
+ <20190611082520.GA11125@richard> <87zhmottba.fsf@trasno.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <98826c00-3dae-3972-c68a-f86f544c2093@huawei.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Tue, 11 Jun 2019 08:49:55 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] file-posix: unlock
- qemu_global_mutex before pread when attach disk
+In-Reply-To: <87zhmottba.fsf@trasno.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.88
+Subject: Re: [Qemu-devel] [PATCH] migration: remove unused field bytes_xfer
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,33 +68,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, eric.fangyi@huawei.com, armbru@redhat.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, jiangyiwen@huawei.com,
- stefanha@redhat.com, wangjie88@huawei.com, Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: Wei Yang <richardw.yang@linux.intel.com>, dgilbert@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 11.06.2019 um 04:53 hat l00284672 geschrieben:
-> -- Would the "open" hang as well in that case?
->    The "open" doesn't hang in that case.
->=20
-> Do you have any better solutions to solve this problem in the case?
+On Tue, Jun 11, 2019 at 10:33:29AM +0200, Juan Quintela wrote:
+>Wei Yang <richardw.yang@linux.intel.com> wrote:
+>> On Tue, Apr 02, 2019 at 08:31:06AM +0800, Wei Yang wrote:
+>>>MigrationState->bytes_xfer is only set to 0 in migrate_init().
+>>>
+>>>Remove this unnecessary field.
+>>>
+>>>Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>>
+>> Hi, David
+>
+>Hi
+>
+>I am on duty this week, will get it.
 
-Yes, but unfortunately it's a lot harder.
+Thanks :-)
 
-This is roughly what you'd have to do:
+>
+>>
+>> Are you willing to pick up this one?
+>>
+>>>---
+>>> migration/migration.c | 1 -
+>>> migration/migration.h | 1 -
+>>> 2 files changed, 2 deletions(-)
+>>>
+>>>diff --git a/migration/migration.c b/migration/migration.c
+>>>index dea7078bf4..c929cf8d0f 100644
+>>>--- a/migration/migration.c
+>>>+++ b/migration/migration.c
+>>>@@ -1681,7 +1681,6 @@ void migrate_init(MigrationState *s)
+>>>      * parameters/capabilities that the user set, and
+>>>      * locks.
+>>>      */
+>>>-    s->bytes_xfer = 0;
+>>>     s->cleanup_bh = 0;
+>>>     s->to_dst_file = NULL;
+>>>     s->rp_state.from_dst_file = NULL;
+>>>diff --git a/migration/migration.h b/migration/migration.h
+>>>index 852eb3c4e9..b9efbe9168 100644
+>>>--- a/migration/migration.h
+>>>+++ b/migration/migration.h
+>>>@@ -116,7 +116,6 @@ struct MigrationState
+>>>     DeviceState parent_obj;
+>>> 
+>>>     /*< public >*/
+>>>-    size_t bytes_xfer;
+>>>     QemuThread thread;
+>>>     QEMUBH *cleanup_bh;
+>>>     QEMUFile *to_dst_file;
+>>>-- 
+>>>2.19.1
 
-1. Make QMP command handlers async (patches from Marc-Andr=E9 are on the
-   list)
-2. Stop using HMP drive_add and instead switch to QMP blockdev-add
-3. Move the blockdev-add code into a coroutine
-4. Make .bdrv_open a coroutine_fn
-5. Move the pread() in file-posix to the thread pool and let the
-   coroutine yield while the request is running
-
-Only with all of these pieces in place we'll be able to release the
-global mutex while we're waiting for the pread() to complete.
-
-Kevin
+-- 
+Wei Yang
+Help you, Help me
 
