@@ -2,92 +2,85 @@ Return-Path: <SRS0=mXWu=UK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 212B4C43218
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 14:48:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F0B9C4321A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 15:05:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E20462054F
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 14:48:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C2B15208E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 15:05:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Tqj4ZA9Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E20462054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZYMOEX4z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2B15208E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59830 helo=lists.gnu.org)
+Received: from localhost ([::1]:59970 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hai4B-0005DS-66
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 10:48:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43426)
+	id 1haiLK-0002mo-JN
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 11:05:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48214)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hahwI-00080X-Fd
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:39:55 -0400
+ (envelope-from <rfried.dev@gmail.com>) id 1haiFa-0007g5-0r
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:59:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hahwH-0001mN-3l
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:39:54 -0400
-Received: from mail-pg1-x529.google.com ([2607:f8b0:4864:20::529]:37898)
+ (envelope-from <rfried.dev@gmail.com>) id 1haiC9-0001zR-N4
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:56:18 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40779)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hahwG-0001lL-RV
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:39:53 -0400
-Received: by mail-pg1-x529.google.com with SMTP id v11so7087159pgl.5
- for <qemu-devel@nongnu.org>; Tue, 11 Jun 2019 07:39:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=6+NSggAW1jVndYD5uuYezxOAeEX1TiyYYrXZXZBN1Q4=;
- b=Tqj4ZA9ZyRsYcne91rdsX86iN2/PUxXYVYKf3Hl1LaKsNMpOAX/OsoJbfHqNZr9uZy
- VP8gPqf90ZnogAuc36gsKTbMKBMzW97G+TqBnFyns8Gqv5U87OPHrMNHkTlqOg7JQYZZ
- XJlF+D2CkD8/fRq2wfw/LCUiDd9TQajX8AUpLcFqbB7UUfaeU00Vuhxo3087jlhGUY7A
- fhtp/bpS1HmoUTQb1wAWrvEUfUAR0c6zAdSqBlTsE8mvr8dMMkCv9XHwzEtIOo3KmbJa
- zdciHWpYCPrQeTQQamZ3EuMoDwPCV8G1Z6mqIteuV9KibLroQmxupJiLxyfBS/DB1+zS
- Xmcg==
+ (Exim 4.71) (envelope-from <rfried.dev@gmail.com>)
+ id 1haiC9-0001z7-HA; Tue, 11 Jun 2019 10:56:17 -0400
+Received: by mail-wr1-x444.google.com with SMTP id p11so13401719wre.7;
+ Tue, 11 Jun 2019 07:56:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=b8QxGLK6EVt7cbCYgVtj1jSDrG4K14o9KcZtEODesBA=;
+ b=ZYMOEX4zTFZPD17SXfo4vTcVyh779cTHfYlRemdj9zF0aEhXQrf7s6EmncsEiiY9hI
+ PV7v3hCLwNP0JZnFc8alVDW2Cd/6stlfUVpIdlbMdk1OCyqaMcZDOqpnEunz5JU2FY7l
+ k+rkHMt7MzSI9qan3mIDDLUj6cmu0T8CjtsN84HMTjm9h/iSi8AhAhWEWu7rH/jcaA1e
+ 3FZ0pZ749M4s9BKySPW93ctUbMa9SbBgwF98/p2ZJw9mXkesOzTpxwwX4uhLlVj500ra
+ 6P62p9Xsc5wDL0HeTYclYZCeWVClMYFLyfZwJfCtGNbt54mAo8VLFDTZATm6xN5+eSYC
+ ncsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=6+NSggAW1jVndYD5uuYezxOAeEX1TiyYYrXZXZBN1Q4=;
- b=blIUN007jtMJ38WKCPg37EZRF9BzTUug02eIA0Vj+6hVtldmH2Utig112TXDmneBfU
- oVP79NW1t3oRJddkWMyq5U/yrnoD2rj1qizgJW6hJG4PcFtd87Ejydmp4m2c+/Six8vJ
- JzuMYkdtj/KevckPHJIAuO1hfgMQ7ffc1F/zzX2K8tEbHpEiRlcaIfAOqbh7ST+uq431
- caUFgDf7cUZ8OomnAxki37+Lo3CqVPiag3tb9LSrAYPEPhDn9QnYUSAX9U/5XrfMBPlL
- hgO2vXHKewRMxODzPMRW/b7ccEo+q6j3JnRc3PpAJDfzqYmt0qEBcP6ipnBKgcgULSjU
- pfrA==
-X-Gm-Message-State: APjAAAVT79I2Mw12srJnv9qKqm25DgAZBeYER5UPVSU1B7nvFT6wb7lb
- hpZw7Zt9GzMl9tmdwNh3Sf5MZA==
-X-Google-Smtp-Source: APXvYqyf6M+b0vPY1ybMbVSYDvojTBZWbpFRZGvINLzw0IUk6RccQXDWY+D+trKxiQEomrDJhHC+6w==
-X-Received: by 2002:a63:b547:: with SMTP id u7mr21118180pgo.322.1560263991153; 
- Tue, 11 Jun 2019 07:39:51 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
- by smtp.gmail.com with ESMTPSA id
- 16sm13910243pfo.65.2019.06.11.07.39.50
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 11 Jun 2019 07:39:50 -0700 (PDT)
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190610014249.7346-1-richard.henderson@linaro.org>
- <dc37189b-d810-25c3-b19a-486f1a3d5abd@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <3a74f1fc-4912-3507-b68a-ee6e782bf4a9@linaro.org>
-Date: Tue, 11 Jun 2019 07:39:48 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ bh=b8QxGLK6EVt7cbCYgVtj1jSDrG4K14o9KcZtEODesBA=;
+ b=sEMkUTR8eYp+mnOx96bAeHFPcLaq2Ty+n+YNCKlLufMH4ylxDh5VFF4qpsuZPzHiP3
+ e8eCsDz/u9ecElYL9bV9HPM7cFjAFEefEQ3aKt7Nok3e2Tut7qY+XNOzeursJVnXj15n
+ e8D4hBQ7s+Gp80LywdKN76NKSCe78PQI+5W400UtzCL9yTGz/sqtmF9RddZqlf8ncgYu
+ WJHQfc85gElhQjRNVeKFORzBYU+n542HcO/80lMwssuctoqSucH8m1aZccEeLAq/yexR
+ KwTxNiwJK/rmE74NtWt4cFXVmRukqsPl7F6CHuCyN/6xa7aSmmCsBQuc2kz7eQHOUTph
+ eV5g==
+X-Gm-Message-State: APjAAAXbP/BYCOg5vxRPlDstbytGLR/vsv5U9RM9iOkdG/ojdytSXam3
+ gejxBKG13xEypdTu9k82H7h68N2tzTg=
+X-Google-Smtp-Source: APXvYqxd+yONIAO8l3krTtlBPd4Qy0u1tMLozFUfpu5L1DfNBHrw8uaXTWqeomKbodFeNp8kFJeEEg==
+X-Received: by 2002:a5d:6190:: with SMTP id j16mr1300461wru.49.1560264976135; 
+ Tue, 11 Jun 2019 07:56:16 -0700 (PDT)
+Received: from localhost.localdomain ([141.226.31.91])
+ by smtp.gmail.com with ESMTPSA id v3sm1806137wmh.31.2019.06.11.07.56.14
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 11 Jun 2019 07:56:15 -0700 (PDT)
+From: Ramon Fried <rfried.dev@gmail.com>
+To: qemu-devel@nongnu.org,
+	qemu-trivial@nongnu.org
+Date: Tue, 11 Jun 2019 17:55:56 +0300
+Message-Id: <20190611145556.12940-1-rfried.dev@gmail.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <dc37189b-d810-25c3-b19a-486f1a3d5abd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::529
-Subject: Re: [Qemu-devel] [PATCH] tests/tcg/s390x: Fix alignment of csst
- parameter list
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PATCH v2] net: cadence_gem: fix compilation error
+ when debug is on
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,21 +92,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ "open list:Xilinx Zynq" <qemu-arm@nongnu.org>,
+ Ramon Fried <rfried.dev@gmail.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/11/19 6:06 AM, David Hildenbrand wrote:
-> Queuing it to
-> 
-> https://github.com/davidhildenbrand/qemu.git s390-tcg-next
-> 
-> for now. Let me know if you want to send this via a different PULL
-> request yourself.
+defining CADENCE_GEM_ERR_DEBUG causes compilation
+errors, fix that.
 
-No, that's perfect, thanks.
+Signed-off-by: Ramon Fried <rfried.dev@gmail.com>
+---
+v2: change %lx to HWADDR_PRIx and %lx to %zdx
 
+ hw/net/cadence_gem.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-r~
+diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
+index 7f63411430..e9b1b1e2eb 100644
+--- a/hw/net/cadence_gem.c
++++ b/hw/net/cadence_gem.c
+@@ -982,8 +982,8 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
+             return -1;
+         }
+ 
+-        DB_PRINT("copy %d bytes to 0x%x\n", MIN(bytes_to_copy, rxbufsize),
+-                rx_desc_get_buffer(s->rx_desc[q]));
++        DB_PRINT("copy %d bytes to 0x%" HWADDR_PRIx "\n", MIN(bytes_to_copy, rxbufsize),
++                rx_desc_get_buffer(s, s->rx_desc[q]));
+ 
+         /* Copy packet data to emulated DMA buffer */
+         address_space_write(&s->dma_as, rx_desc_get_buffer(s, s->rx_desc[q]) +
+@@ -1156,7 +1156,7 @@ static void gem_transmit(CadenceGEMState *s)
+             if (tx_desc_get_length(desc) > sizeof(tx_packet) -
+                                                (p - tx_packet)) {
+                 DB_PRINT("TX descriptor @ 0x%x too large: size 0x%x space " \
+-                         "0x%x\n", (unsigned)packet_desc_addr,
++                         "0x%zdx\n", (unsigned)packet_desc_addr,
+                          (unsigned)tx_desc_get_length(desc),
+                          sizeof(tx_packet) - (p - tx_packet));
+                 break;
+-- 
+2.21.0
+
 
