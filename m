@@ -2,70 +2,61 @@ Return-Path: <SRS0=mXWu=UK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEBA2C43218
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 13:14:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A997EC4321A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 13:17:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B629B20673
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 13:14:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B629B20673
+	by mail.kernel.org (Postfix) with ESMTPS id 6A9F820673
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 13:17:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A9F820673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58678 helo=lists.gnu.org)
+Received: from localhost ([::1]:58748 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hagbT-0004Es-0f
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 09:14:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48781)
+	id 1hageL-0006vG-Nh
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 09:17:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48912)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pagupta@redhat.com>) id 1hagZD-0002zL-2X
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 09:12:00 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hagZu-0003Di-Ln
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 09:12:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pagupta@redhat.com>) id 1hagZB-0000al-HW
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 09:11:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49630)
+ (envelope-from <imammedo@redhat.com>) id 1hagZr-0000lG-5F
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 09:12:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54674)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hagZB-0000Vp-8r
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 09:11:57 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hagZj-0000dS-Ep
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 09:12:33 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 875513082E6A;
- Tue, 11 Jun 2019 13:11:19 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
- (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 374A45D704;
- Tue, 11 Jun 2019 13:11:08 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com
- (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
- by colo-mx.corp.redhat.com (Postfix) with ESMTP id 4A3B74EBC9;
- Tue, 11 Jun 2019 13:10:59 +0000 (UTC)
-Date: Tue, 11 Jun 2019 09:10:58 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-To: Mike Snitzer <snitzer@redhat.com>
-Message-ID: <1206355816.34396746.1560258658768.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20190610192803.GA29002@redhat.com>
-References: <20190610090730.8589-1-pagupta@redhat.com>
- <20190610090730.8589-5-pagupta@redhat.com>
- <20190610192803.GA29002@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 750CCC004F44;
+ Tue, 11 Jun 2019 13:12:08 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2E63526FAD;
+ Tue, 11 Jun 2019 13:12:04 +0000 (UTC)
+Date: Tue, 11 Jun 2019 15:12:00 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Message-ID: <20190611151200.57a289f7@redhat.com>
+In-Reply-To: <20190611113731.16940-4-philmd@redhat.com>
+References: <20190611113731.16940-1-philmd@redhat.com>
+ <20190611113731.16940-4-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.116.33, 10.4.195.27]
-Thread-Topic: enable synchronous dax
-Thread-Index: 9TyGIIOSkuHn9exFInDwoSOU8/oLjA==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Tue, 11 Jun 2019 13:11:34 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Tue, 11 Jun 2019 13:12:08 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v11 4/7] dm: enable synchronous dax
+Subject: Re: [Qemu-devel] [PATCH v19 03/21] target/rx: CPU definition
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,170 +68,642 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: rdunlap@infradead.org, jack@suse.cz, kvm@vger.kernel.org, mst@redhat.com,
- jasowang@redhat.com, david@fromorbit.com, qemu-devel@nongnu.org,
- virtualization@lists.linux-foundation.org, dm-devel@redhat.com,
- adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org,
- aarcange@redhat.com, dave jiang <dave.jiang@intel.com>, jstaron@google.com,
- linux-nvdimm@lists.01.org, vishal l verma <vishal.l.verma@intel.com>,
- david@redhat.com, willy@infradead.org, hch@infradead.org,
- linux-acpi@vger.kernel.org, jmoyer@redhat.com, linux-ext4@vger.kernel.org,
- lenb@kernel.org, kilobyte@angband.pl, riel@surriel.com,
- yuval shaia <yuval.shaia@oracle.com>, stefanha@redhat.com, imammedo@redhat.com,
- dan j williams <dan.j.williams@intel.com>, lcapitulino@redhat.com,
- kwolf@redhat.com, nilal@redhat.com, tytso@mit.edu,
- xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, cohuck@redhat.com,
- rjw@rjwysocki.net, linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, pbonzini@redhat.com,
- darrick wong <darrick.wong@oracle.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Mike,
+On Tue, 11 Jun 2019 13:37:13 +0200
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
-Thanks for the review Please find my reply inline.
+> From: Yoshinori Sato <ysato@users.sourceforge.jp>
+>=20
+> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Message-Id: <20190607091116.49044-4-ysato@users.sourceforge.jp>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> [PMD: Use newer QOM style, split cpu-qom.h, restrict access to
+>  extable array, use rx_cpu_tlb_fill() extracted from patch of
+>  Yoshinori Sato 'Convert to CPUClass::tlb_fill']
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  target/rx/cpu-qom.h |  42 ++++++++
+>  target/rx/cpu.c     | 252 ++++++++++++++++++++++++++++++++++++++++++++
+>  target/rx/cpu.h     | 201 +++++++++++++++++++++++++++++++++++
+>  target/rx/gdbstub.c | 112 ++++++++++++++++++++
+>  target/rx/monitor.c |  38 +++++++
+>  5 files changed, 645 insertions(+)
+>  create mode 100644 target/rx/cpu-qom.h
+>  create mode 100644 target/rx/cpu.c
+>  create mode 100644 target/rx/cpu.h
+>  create mode 100644 target/rx/gdbstub.c
+>  create mode 100644 target/rx/monitor.c
+>=20
+> diff --git a/target/rx/cpu-qom.h b/target/rx/cpu-qom.h
+> new file mode 100644
+> index 0000000000..4ae3b38b3e
+> --- /dev/null
+> +++ b/target/rx/cpu-qom.h
+> @@ -0,0 +1,42 @@
+> +#ifndef QEMU_SUPERH_CPU_QOM_H
+> +#define QEMU_SUPERH_CPU_QOM_H
+> +
+> +#include "qom/cpu.h"
+> +/*
+> + * RX CPU
+> + *
+> + * Copyright (c) 2019 Yoshinori Sato
+> + * SPDX-License-Identifier: LGPL-2.0+
+> + */
+> +
+> +#define TYPE_RX_CPU "rx-cpu"
+> +
+> +#define TYPE_RX62N_CPU RX_CPU_TYPE_NAME("rx62n")
+> +
+> +#define RXCPU_CLASS(klass) \
+> +    OBJECT_CLASS_CHECK(RXCPUClass, (klass), TYPE_RX_CPU)
+> +#define RXCPU(obj) \
+> +    OBJECT_CHECK(RXCPU, (obj), TYPE_RX_CPU)
+> +#define RXCPU_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(RXCPUClass, (obj), TYPE_RX_CPU)
+> +
+> +/*
+> + * RXCPUClass:
+> + * @parent_realize: The parent class' realize handler.
+> + * @parent_reset: The parent class' reset handler.
+> + *
+> + * A RX CPU model.
+> + */
+> +typedef struct RXCPUClass {
+> +    /*< private >*/
+> +    CPUClass parent_class;
+> +    /*< public >*/
+> +
+> +    DeviceRealize parent_realize;
+> +    void (*parent_reset)(CPUState *cpu);
+> +
+> +} RXCPUClass;
+> +
+> +#define CPUArchState struct CPURXState
+> +
+> +#endif
+> diff --git a/target/rx/cpu.c b/target/rx/cpu.c
+> new file mode 100644
+> index 0000000000..4147c5c939
+> --- /dev/null
+> +++ b/target/rx/cpu.c
+> @@ -0,0 +1,252 @@
+> +/*
+> + * QEMU RX CPU
+> + *
+> + * Copyright (c) 2019 Yoshinori Sato
+> + *
+> + * This program is free software; you can redistribute it and/or modify =
+it
+> + * under the terms and conditions of the GNU General Public License,
+> + * version 2 or later, as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
+ for
+> + * more details.
+> + *
+> + * You should have received a copy of the GNU General Public License alo=
+ng with
+> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/qemu-print.h"
+> +#include "qapi/error.h"
+> +#include "cpu.h"
+> +#include "qemu-common.h"
+> +#include "migration/vmstate.h"
+> +#include "exec/exec-all.h"
+> +#include "hw/loader.h"
+> +#include "fpu/softfloat.h"
+> +
+> +static void rx_cpu_set_pc(CPUState *cs, vaddr value)
+> +{
+> +    RXCPU *cpu =3D RXCPU(cs);
+> +
+> +    cpu->env.pc =3D value;
+> +}
+> +
+> +static void rx_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *t=
+b)
+> +{
+> +    RXCPU *cpu =3D RXCPU(cs);
+> +
+> +    cpu->env.pc =3D tb->pc;
+> +}
+> +
+> +static bool rx_cpu_has_work(CPUState *cs)
+> +{
+> +    return cs->interrupt_request &
+> +        (CPU_INTERRUPT_HARD | CPU_INTERRUPT_FIR);
+> +}
+> +
+> +static void rx_cpu_reset(CPUState *s)
+> +{
+> +    RXCPU *cpu =3D RXCPU(s);
+> +    RXCPUClass *rcc =3D RXCPU_GET_CLASS(cpu);
+> +    CPURXState *env =3D &cpu->env;
+> +    uint32_t *resetvec;
+> +
+> +    rcc->parent_reset(s);
+> +
+> +    memset(env, 0, offsetof(CPURXState, end_reset_fields));
+> +
+> +    resetvec =3D rom_ptr(0xfffffffc, 4);
+> +    if (resetvec) {
+> +        /* In the case of kernel, it is ignored because it is not set. */
+> +        env->pc =3D ldl_p(resetvec);
+> +    }
+> +    rx_cpu_unpack_psw(env, 0, 1);
+> +    env->regs[0] =3D env->isp =3D env->usp =3D 0;
+> +    env->fpsw =3D 0;
+> +    set_flush_to_zero(1, &env->fp_status);
+> +    set_flush_inputs_to_zero(1, &env->fp_status);
+> +}
+> +
+> +static void rx_cpu_list_entry(gpointer data, gpointer user_data)
+> +{
+> +    const char *typename =3D object_class_get_name(OBJECT_CLASS(data));
+> +    int len =3D strlen(typename) - strlen(RX_CPU_TYPE_SUFFIX);
+you'd probably need to fix this up to account for comment below.
 
-> 
-> dm_table_supports_dax() is called multiple times (from
-> dm_table_set_restrictions and dm_table_determine_type).  It is strange
-> to have a getter have a side-effect of being a setter too.  Overloading
-> like this could get you in trouble in the future.
-> 
-> Are you certain this is what you want?
+> +
+> +    qemu_printf("%.*s\n", len, typename);
+> +}
+> +
+> +void rx_cpu_list(void)
+> +{
+> +    GSList *list;
+> +    list =3D object_class_get_list_sorted(TYPE_RX_CPU, false);
+> +    g_slist_foreach(list, rx_cpu_list_entry, NULL);
+> +    g_slist_free(list);
+> +}
+> +
+> +static ObjectClass *rx_cpu_class_by_name(const char *cpu_model)
+> +{
+> +    ObjectClass *oc;
+> +    char *typename;
+> +
+> +    oc =3D object_class_by_name(cpu_model);
+> +    if (oc !=3D NULL && object_class_dynamic_cast(oc, TYPE_RX_CPU) !=3D =
+NULL &&
+> +        !object_class_is_abstract(oc)) {
+> +        return oc;
+> +    }
+Leave only this part and drop the rest, so that it would be consistent
+with other interfaces (hmp/qmp/-device) which use pure type names.
+The less invariants we support the better.
 
-I agree with you.
+It's true that pr-existing cpu types support various ways to name CPUs
+but that's mostly due to us keeping compatibility for what used to work
+and definitely not from desire to support that madness.
 
-> 
-> Or would it be better to refactor dm_table_supports_dax() to take an
-> iterate_devices_fn arg and have callers pass the appropriate function?
-> Then have dm_table_set_restrictions() caller do:
-> 
->      if (dm_table_supports_dax(t, device_synchronous, NULL))
->                set_dax_synchronous(t->md->dax_dev);
-> 
-> (NULL arg implies dm_table_supports_dax() refactoring would take a int
-> *data pointer rather than int type).
-> 
-> Mike
-> 
+> +    typename =3D g_strdup_printf(RX_CPU_TYPE_NAME("%s"), cpu_model);
+> +    oc =3D object_class_by_name(typename);
+> +    if (oc !=3D NULL && object_class_is_abstract(oc)) {
+> +        oc =3D NULL;
+> +    }
+> +    g_free(typename);
+> +
+> +    if (!oc) {
+> +        /* default to rx62n */
+> +        oc =3D object_class_by_name(TYPE_RX62N_CPU);
+> +    }
+pls don't do fallbacks on nonsense user input, it's much better to return N=
+ULL
+here and make user fix error in his CLI.
 
-I am sending below patch as per your suggestion. Does it look
-near to what you have in mind?
+> +
+> +    return oc;
+> +}
 
-Thank you,
-Pankaj
+PS:
+ it's fine to reply with v20 here is it doesn't break the rest of the serie=
+s.
 
-===============
+[...]
 
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index 350cf0451456..8d89acc8b8c2 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -881,7 +881,7 @@ void dm_table_set_type(struct dm_table *t, enum dm_queue_mode type)
- EXPORT_SYMBOL_GPL(dm_table_set_type);
+> +void rx_load_image(RXCPU *cpu, const char *filename,
+> +                   uint32_t start, uint32_t size)
+> +{
+> +    static uint32_t extable[32];
+> +    long kernel_size;
+> +    int i;
+> +
+> +    kernel_size =3D load_image_targphys(filename, start, size);
+> +    if (kernel_size < 0) {
+> +        fprintf(stderr, "qemu: could not load kernel '%s'\n", filename);
+> +        exit(1);
+> +    }
+> +    cpu->env.pc =3D start;
+> +
+> +    /* setup exception trap trampoline */
+> +    /* linux kernel only works little-endian mode */
+> +    for (i =3D 0; i < ARRAY_SIZE(extable); i++) {
+> +        extable[i] =3D cpu_to_le32(0x10 + i * 4);
+> +    }
+> +    rom_add_blob_fixed("extable", extable, sizeof(extable), 0xffffff80);
+> +}
+well, it doesn't look like code that belongs to cpu.c,
+typically it is done from board specific code.
 
- /* validate the dax capability of the target device span */
--static int device_supports_dax(struct dm_target *ti, struct dm_dev *dev,
-+int device_supports_dax(struct dm_target *ti, struct dm_dev *dev,
-                                       sector_t start, sector_t len, void *data)
- {
-        int blocksize = *(int *) data;
-@@ -890,7 +890,15 @@ static int device_supports_dax(struct dm_target *ti, struct dm_dev *dev,
-                        start, len);
- }
+> diff --git a/target/rx/cpu.h b/target/rx/cpu.h
+> new file mode 100644
+> index 0000000000..3e5f371f51
+> --- /dev/null
+> +++ b/target/rx/cpu.h
+> @@ -0,0 +1,201 @@
+> +/*
+> + *  RX emulation definition
+> + *
+> + *  Copyright (c) 2019 Yoshinori Sato
+> + *
+> + * This program is free software; you can redistribute it and/or modify =
+it
+> + * under the terms and conditions of the GNU General Public License,
+> + * version 2 or later, as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
+ for
+> + * more details.
+> + *
+> + * You should have received a copy of the GNU General Public License alo=
+ng with
+> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#ifndef RX_CPU_H
+> +#define RX_CPU_H
+> +
+> +#include "qemu/bitops.h"
+> +#include "qemu-common.h"
+> +#include "hw/registerfields.h"
+> +#include "cpu-qom.h"
+> +#include "qom/cpu.h"
+> +
+> +#define TARGET_LONG_BITS 32
+> +#define TARGET_PAGE_BITS 12
+> +
+> +#include "exec/cpu-defs.h"
+> +
+> +#define TARGET_PHYS_ADDR_SPACE_BITS 32
+> +#define TARGET_VIRT_ADDR_SPACE_BITS 32
+> +
+> +/* PSW define */
+> +REG32(PSW, 0)
+> +FIELD(PSW, C, 0, 1)
+> +FIELD(PSW, Z, 1, 1)
+> +FIELD(PSW, S, 2, 1)
+> +FIELD(PSW, O, 3, 1)
+> +FIELD(PSW, I, 16, 1)
+> +FIELD(PSW, U, 17, 1)
+> +FIELD(PSW, PM, 20, 1)
+> +FIELD(PSW, IPL, 24, 4)
+> +
+> +/* FPSW define */
+> +REG32(FPSW, 0)
+> +FIELD(FPSW, RM, 0, 2)
+> +FIELD(FPSW, CV, 2, 1)
+> +FIELD(FPSW, CO, 3, 1)
+> +FIELD(FPSW, CZ, 4, 1)
+> +FIELD(FPSW, CU, 5, 1)
+> +FIELD(FPSW, CX, 6, 1)
+> +FIELD(FPSW, CE, 7, 1)
+> +FIELD(FPSW, CAUSE, 2, 6)
+> +FIELD(FPSW, DN, 8, 1)
+> +FIELD(FPSW, EV, 10, 1)
+> +FIELD(FPSW, EO, 11, 1)
+> +FIELD(FPSW, EZ, 12, 1)
+> +FIELD(FPSW, EU, 13, 1)
+> +FIELD(FPSW, EX, 14, 1)
+> +FIELD(FPSW, ENABLE, 10, 5)
+> +FIELD(FPSW, FV, 26, 1)
+> +FIELD(FPSW, FO, 27, 1)
+> +FIELD(FPSW, FZ, 28, 1)
+> +FIELD(FPSW, FU, 29, 1)
+> +FIELD(FPSW, FX, 30, 1)
+> +FIELD(FPSW, FLAGS, 26, 4)
+> +FIELD(FPSW, FS, 31, 1)
+> +
+> +#define NB_MMU_MODES 1
+> +#define MMU_MODE0_SUFFIX _all
+> +
+> +enum {
+> +    NUM_REGS =3D 16,
+> +};
+> +
+> +typedef struct CPURXState {
+> +    /* CPU registers */
+> +    uint32_t regs[NUM_REGS];    /* general registers */
+> +    uint32_t psw_o;             /* O bit of status register */
+> +    uint32_t psw_s;             /* S bit of status register */
+> +    uint32_t psw_z;             /* Z bit of status register */
+> +    uint32_t psw_c;             /* C bit of status register */
+> +    uint32_t psw_u;
+> +    uint32_t psw_i;
+> +    uint32_t psw_pm;
+> +    uint32_t psw_ipl;
+> +    uint32_t bpsw;              /* backup status */
+> +    uint32_t bpc;               /* backup pc */
+> +    uint32_t isp;               /* global base register */
+> +    uint32_t usp;               /* vector base register */
+> +    uint32_t pc;                /* program counter */
+> +    uint32_t intb;              /* interrupt vector */
+> +    uint32_t fintv;
+> +    uint32_t fpsw;
+> +    uint64_t acc;
+> +
+> +    /* Fields up to this point are cleared by a CPU reset */
+> +    struct {} end_reset_fields;
+> +
+> +    /* Internal use */
+> +    uint32_t in_sleep;
+> +    uint32_t req_irq;           /* Requested interrupt no (hard) */
+> +    uint32_t req_ipl;           /* Requested interrupt level */
+> +    uint32_t ack_irq;           /* execute irq */
+> +    uint32_t ack_ipl;           /* execute ipl */
+> +    float_status fp_status;
+> +    qemu_irq ack;               /* Interrupt acknowledge */
+> +
+> +    CPU_COMMON
+> +} CPURXState;
+> +
+> +/*
+> + * RXCPU:
+> + * @env: #CPURXState
+> + *
+> + * A RX CPU
+> + */
+> +struct RXCPU {
+> +    /*< private >*/
+> +    CPUState parent_obj;
+> +    /*< public >*/
+> +
+> +    CPURXState env;
+> +};
+> +
+> +typedef struct RXCPU RXCPU;
+> +typedef RXCPU ArchCPU;
+> +
+> +static inline RXCPU *rx_env_get_cpu(CPURXState *env)
+> +{
+> +    return container_of(env, RXCPU, env);
+> +}
+> +
+> +#define ENV_GET_CPU(e) CPU(rx_env_get_cpu(e))
+> +
+> +#define ENV_OFFSET offsetof(RXCPU, env)
+> +
+> +#define RX_CPU_TYPE_SUFFIX "-" TYPE_RX_CPU
+> +#define RX_CPU_TYPE_NAME(model) model RX_CPU_TYPE_SUFFIX
+> +#define CPU_RESOLVING_TYPE TYPE_RX_CPU
+> +
+> +extern const char rx_crname[][6];
+> +
+> +void rx_cpu_do_interrupt(CPUState *cpu);
+> +bool rx_cpu_exec_interrupt(CPUState *cpu, int int_req);
+> +void rx_cpu_dump_state(CPUState *cpu, FILE *f, int flags);
+> +int rx_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
+> +int rx_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+> +hwaddr rx_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+> +
+> +void rx_translate_init(void);
+> +int cpu_rx_signal_handler(int host_signum, void *pinfo,
+> +                           void *puc);
+> +
+> +void rx_cpu_list(void);
+> +void rx_load_image(RXCPU *cpu, const char *filename,
+> +                   uint32_t start, uint32_t size);
+> +void rx_cpu_unpack_psw(CPURXState *env, uint32_t psw, int rte);
+> +
+> +#define cpu_signal_handler cpu_rx_signal_handler
+> +#define cpu_list rx_cpu_list
+> +
+> +#include "exec/cpu-all.h"
+> +
+> +#define CPU_INTERRUPT_SOFT CPU_INTERRUPT_TGT_INT_0
+> +#define CPU_INTERRUPT_FIR  CPU_INTERRUPT_TGT_INT_1
+> +
+> +#define RX_CPU_IRQ 0
+> +#define RX_CPU_FIR 1
+> +
+> +static inline void cpu_get_tb_cpu_state(CPURXState *env, target_ulong *p=
+c,
+> +                                        target_ulong *cs_base, uint32_t =
+*flags)
+> +{
+> +    *pc =3D env->pc;
+> +    *cs_base =3D 0;
+> +    *flags =3D FIELD_DP32(0, PSW, PM, env->psw_pm);
+> +}
+> +
+> +static inline int cpu_mmu_index(CPURXState *env, bool ifetch)
+> +{
+> +    return 0;
+> +}
+> +
+> +static inline uint32_t rx_cpu_pack_psw(CPURXState *env)
+> +{
+> +    uint32_t psw =3D 0;
+> +    psw =3D FIELD_DP32(psw, PSW, IPL, env->psw_ipl);
+> +    psw =3D FIELD_DP32(psw, PSW, PM,  env->psw_pm);
+> +    psw =3D FIELD_DP32(psw, PSW, U,   env->psw_u);
+> +    psw =3D FIELD_DP32(psw, PSW, I,   env->psw_i);
+> +    psw =3D FIELD_DP32(psw, PSW, O,   env->psw_o >> 31);
+> +    psw =3D FIELD_DP32(psw, PSW, S,   env->psw_s >> 31);
+> +    psw =3D FIELD_DP32(psw, PSW, Z,   env->psw_z =3D=3D 0);
+> +    psw =3D FIELD_DP32(psw, PSW, C,   env->psw_c);
+> +    return psw;
+> +}
+> +
+> +#endif /* RX_CPU_H */
+> diff --git a/target/rx/gdbstub.c b/target/rx/gdbstub.c
+> new file mode 100644
+> index 0000000000..d76ca52e82
+> --- /dev/null
+> +++ b/target/rx/gdbstub.c
+> @@ -0,0 +1,112 @@
+> +/*
+> + * RX gdb server stub
+> + *
+> + * Copyright (c) 2019 Yoshinori Sato
+> + *
+> + * This program is free software; you can redistribute it and/or modify =
+it
+> + * under the terms and conditions of the GNU General Public License,
+> + * version 2 or later, as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
+ for
+> + * more details.
+> + *
+> + * You should have received a copy of the GNU General Public License alo=
+ng with
+> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +#include "cpu.h"
+> +#include "exec/gdbstub.h"
+> +
+> +int rx_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
+> +{
+> +    RXCPU *cpu =3D RXCPU(cs);
+> +    CPURXState *env =3D &cpu->env;
+> +
+> +    switch (n) {
+> +    case 0 ... 15:
+> +        return gdb_get_regl(mem_buf, env->regs[n]);
+> +    case 16:
+> +        return gdb_get_regl(mem_buf, (env->psw_u) ? env->regs[0] : env->=
+usp);
+> +    case 17:
+> +        return gdb_get_regl(mem_buf, (!env->psw_u) ? env->regs[0] : env-=
+>isp);
+> +    case 18:
+> +        return gdb_get_regl(mem_buf, rx_cpu_pack_psw(env));
+> +    case 19:
+> +        return gdb_get_regl(mem_buf, env->pc);
+> +    case 20:
+> +        return gdb_get_regl(mem_buf, env->intb);
+> +    case 21:
+> +        return gdb_get_regl(mem_buf, env->bpsw);
+> +    case 22:
+> +        return gdb_get_regl(mem_buf, env->bpc);
+> +    case 23:
+> +        return gdb_get_regl(mem_buf, env->fintv);
+> +    case 24:
+> +        return gdb_get_regl(mem_buf, env->fpsw);
+> +    case 25:
+> +        return 0;
+> +    }
+> +    return 0;
+> +}
+> +
+> +int rx_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+> +{
+> +    RXCPU *cpu =3D RXCPU(cs);
+> +    CPURXState *env =3D &cpu->env;
+> +    uint32_t psw;
+> +    switch (n) {
+> +    case 0 ... 15:
+> +        env->regs[n] =3D ldl_p(mem_buf);
+> +        if (n =3D=3D 0) {
+> +            if (env->psw_u) {
+> +                env->usp =3D env->regs[0];
+> +            } else {
+> +                env->isp =3D env->regs[0];
+> +            }
+> +        }
+> +        break;
+> +    case 16:
+> +        env->usp =3D ldl_p(mem_buf);
+> +        if (env->psw_u) {
+> +            env->regs[0] =3D ldl_p(mem_buf);
+> +        }
+> +        break;
+> +    case 17:
+> +        env->isp =3D ldl_p(mem_buf);
+> +        if (!env->psw_u) {
+> +            env->regs[0] =3D ldl_p(mem_buf);
+> +        }
+> +        break;
+> +    case 18:
+> +        psw =3D ldl_p(mem_buf);
+> +        rx_cpu_unpack_psw(env, psw, 1);
+> +        break;
+> +    case 19:
+> +        env->pc =3D ldl_p(mem_buf);
+> +        break;
+> +    case 20:
+> +        env->intb =3D ldl_p(mem_buf);
+> +        break;
+> +    case 21:
+> +        env->bpsw =3D ldl_p(mem_buf);
+> +        break;
+> +    case 22:
+> +        env->bpc =3D ldl_p(mem_buf);
+> +        break;
+> +    case 23:
+> +        env->fintv =3D ldl_p(mem_buf);
+> +        break;
+> +    case 24:
+> +        env->fpsw =3D ldl_p(mem_buf);
+> +        break;
+> +    case 25:
+> +        return 8;
+> +    default:
+> +        return 0;
+> +    }
+> +
+> +    return 4;
+> +}
+> diff --git a/target/rx/monitor.c b/target/rx/monitor.c
+> new file mode 100644
+> index 0000000000..5d7a1e58b5
+> --- /dev/null
+> +++ b/target/rx/monitor.c
+> @@ -0,0 +1,38 @@
+> +/*
+> + * QEMU monitor
+> + *
+> + * Copyright (c) 2003-2004 Fabrice Bellard
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
+> + * of this software and associated documentation files (the "Software"),=
+ to deal
+> + * in the Software without restriction, including without limitation the=
+ rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be includ=
+ed in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+> + * THE SOFTWARE.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "cpu.h"
+> +#include "monitor/monitor.h"
+> +#include "monitor/hmp-target.h"
+> +#include "hmp.h"
+> +
+> +void hmp_info_tlb(Monitor *mon, const QDict *qdict)
+> +{
+> +    CPUArchState *env =3D mon_get_cpu_env();
+> +
+> +    if (!env) {
+> +        monitor_printf(mon, "No CPU available\n");
+> +        return;
+> +    }
+> +}
 
--bool dm_table_supports_dax(struct dm_table *t, int blocksize)
-+/* Check devices support synchronous DAX */
-+static int device_synchronous(struct dm_target *ti, struct dm_dev *dev,
-+                                      sector_t start, sector_t len, void *data)
-+{
-+       return dax_synchronous(dev->dax_dev);
-+}
-+
-+bool dm_table_supports_dax(struct dm_table *t,
-+                         iterate_devices_callout_fn iterate_fn, int *blocksize)
- {
-        struct dm_target *ti;
-        unsigned i;
-@@ -903,8 +911,7 @@ bool dm_table_supports_dax(struct dm_table *t, int blocksize)
-                        return false;
-
-                if (!ti->type->iterate_devices ||
--                   !ti->type->iterate_devices(ti, device_supports_dax,
--                           &blocksize))
-+                       !ti->type->iterate_devices(ti, iterate_fn, blocksize))
-                        return false;
-        }
-
-@@ -940,6 +947,7 @@ static int dm_table_determine_type(struct dm_table *t)
-        struct dm_target *tgt;
-        struct list_head *devices = dm_table_get_devices(t);
-        enum dm_queue_mode live_md_type = dm_get_md_type(t->md);
-+       int page_size = PAGE_SIZE;
-
-        if (t->type != DM_TYPE_NONE) {
-                /* target already set the table's type */
-@@ -984,7 +992,7 @@ static int dm_table_determine_type(struct dm_table *t)
- verify_bio_based:
-                /* We must use this table as bio-based */
-                t->type = DM_TYPE_BIO_BASED;
--               if (dm_table_supports_dax(t, PAGE_SIZE) ||
-+               if (dm_table_supports_dax(t, device_supports_dax, &page_size) ||
-                    (list_empty(devices) && live_md_type == DM_TYPE_DAX_BIO_BASED)) {
-                        t->type = DM_TYPE_DAX_BIO_BASED;
-                } else {
-@@ -1883,6 +1891,7 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
-                               struct queue_limits *limits)
- {
-        bool wc = false, fua = false;
-+       int page_size = PAGE_SIZE;
-
-        /*
-         * Copy table's limits to the DM device's request_queue
-@@ -1910,8 +1919,13 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
-        }
-        blk_queue_write_cache(q, wc, fua);
-
--       if (dm_table_supports_dax(t, PAGE_SIZE))
-+       if (dm_table_supports_dax(t, device_supports_dax, &page_size)) {
-+
-                blk_queue_flag_set(QUEUE_FLAG_DAX, q);
-+               if (dm_table_supports_dax(t, device_synchronous, NULL))
-+                       set_dax_synchronous(t->md->dax_dev);
-+       }
-        else
-                blk_queue_flag_clear(QUEUE_FLAG_DAX, q);
-
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index b1caa7188209..b92c42a72ad4 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1119,7 +1119,7 @@ static bool dm_dax_supported(struct dax_device *dax_dev, struct block_device *bd
-        if (!map)
-                return false;
-
--       ret = dm_table_supports_dax(map, blocksize);
-+       ret = dm_table_supports_dax(map, device_supports_dax, &blocksize);
-
-        dm_put_live_table(md, srcu_idx);
-
-diff --git a/drivers/md/dm.h b/drivers/md/dm.h
-index 17e3db54404c..0475673337f3 100644
---- a/drivers/md/dm.h
-+++ b/drivers/md/dm.h
-@@ -72,7 +72,10 @@ bool dm_table_bio_based(struct dm_table *t);
- bool dm_table_request_based(struct dm_table *t);
- void dm_table_free_md_mempools(struct dm_table *t);
- struct dm_md_mempools *dm_table_get_md_mempools(struct dm_table *t);
--bool dm_table_supports_dax(struct dm_table *t, int blocksize);
-+bool dm_table_supports_dax(struct dm_table *t, iterate_devices_callout_fn fn,
-+                          int *blocksize);
-+int device_supports_dax(struct dm_target *ti, struct dm_dev *dev,
-+                          sector_t start, sector_t len, void *data);
-
- void dm_lock_md_type(struct mapped_device *md);
- void dm_unlock_md_type(struct mapped_device *md);
---
-2.20.1
 
