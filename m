@@ -2,63 +2,112 @@ Return-Path: <SRS0=mXWu=UK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	T_HK_NAME_DR,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6E38C4321A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 16:33:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58BA2C4321A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 16:37:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EF1E2086D
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 16:33:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EF1E2086D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DA8AA20645
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 16:37:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="loNNSPg7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA8AA20645
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60872 helo=lists.gnu.org)
+Received: from localhost ([::1]:60878 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hajic-0000O1-G3
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 12:33:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41687)
+	id 1hajlc-0002t0-Ru
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 12:37:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39143)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hajLn-0008Vb-VB
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 12:10:21 -0400
+ (envelope-from <jag.raman@oracle.com>) id 1hajBS-0001qA-9A
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 11:59:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hajLm-0007NA-0M
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 12:10:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58248)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>)
- id 1hajLh-0007FI-RK; Tue, 11 Jun 2019 12:10:14 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0C7153092675;
- Tue, 11 Jun 2019 16:10:08 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.33])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A8EF860BF1;
- Tue, 11 Jun 2019 16:10:00 +0000 (UTC)
-Date: Tue, 11 Jun 2019 17:09:58 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190611160957.GG2777@work-vm>
-References: <20190611134043.9524-1-kwolf@redhat.com>
- <20190611134043.9524-8-kwolf@redhat.com>
+ (envelope-from <jag.raman@oracle.com>) id 1hajBP-00007D-RF
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 11:59:37 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:44368)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
+ id 1hajBO-00005a-OC
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 11:59:35 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+ by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5BFs8m5163239;
+ Tue, 11 Jun 2019 15:59:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=YoogmoUyaoB/UsJ0FEvsHUW2wCpbM4vtCoDMagyVq94=;
+ b=loNNSPg7ZevxsvmlV2Ej0OwJxr8rH25Egz2i+bmiTuHUIqm47seJrqfRKgKRnGJl4AUi
+ Q7RZMGn8nmjIsjPbS6wMN1g3tkQLKRddkNgBccqckrFLp53m6y1fMNjGchYqT8J7xgVH
+ 15RDuB+qkzZQH9iUx77QRkaVU6zVtxnr0rdtDWOBm1vPHIKiAIrj4vcMp6CxLXBztqAL
+ YEg1d8qRdQNvg8IAmEQ35fCWQmKX8HRB5c+wwb1ZPW+map8C8X0k8UJxk2Q/N3UTLlFg
+ 9GfYcr0VxfKikgBl07CpmNhIy+7vdqctCbH+9UcWSv2vNBDj4mCNTUr6CwRfv5HeqlWV jA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by aserp2130.oracle.com with ESMTP id 2t02hepanu-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 11 Jun 2019 15:59:26 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5BFw9mq179125;
+ Tue, 11 Jun 2019 15:59:26 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3020.oracle.com with ESMTP id 2t0p9rcg2h-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 11 Jun 2019 15:59:25 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5BFxPdb010460;
+ Tue, 11 Jun 2019 15:59:25 GMT
+Received: from [10.11.108.55] (/10.11.108.55)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Tue, 11 Jun 2019 08:59:24 -0700
+To: Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>, quintela@redhat.com
+References: <BDEBF2EE-DE0F-46CF-B60E-536B3DA9BF77@oracle.com>
+ <20190308095036.GC12318@stefanha-x1.localdomain>
+ <20190326080822.GC21018@stefanha-x1.localdomain>
+ <e5395abf-6b41-46c8-f5af-3210077dfdd5@oracle.com>
+ <CAAdtpL4ztcpf-CTx0fc5T_+VQ+8upHa2pEMoiZPcmBXOO6L3Og@mail.gmail.com>
+ <c945c950-f6f1-7e2a-a6c4-399c9b728288@oracle.com>
+ <20190425154421.GG17806@stefanha-x1.localdomain>
+ <fe4b0b42-523d-5877-173c-3e878abd4e32@oracle.com>
+ <20190523111130.GF26632@stefanha-x1.localdomain>
+ <20190528151820.GA4545@heatpipe>
+ <20190530205434.GB2694@flaka.hsd1.ca.comcast.net>
+From: Jag Raman <jag.raman@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <371e9f92-0441-9a11-c568-6536c2c2b467@oracle.com>
+Date: Tue, 11 Jun 2019 11:59:23 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190611134043.9524-8-kwolf@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Tue, 11 Jun 2019 16:10:10 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 07/11] monitor: Move {hmp,
- qmp}.c to monitor/{hmp, qmp}-cmds.c
+In-Reply-To: <20190530205434.GB2694@flaka.hsd1.ca.comcast.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9284
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906110103
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9284
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906110103
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 141.146.126.79
+Subject: Re: [Qemu-devel] [multiprocess RFC PATCH 36/37] multi-process: add
+ the concept description to docs/devel/qemu-multiprocess
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,149 +119,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- armbru@redhat.com
+Cc: John G Johnson <john.g.johnson@oracle.com>, sstabellini@kernel.org,
+ konrad.wilk@oracle.com, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-devel@nongnu.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ ross.lagerwall@citrix.com, liran.alon@oracle.com,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kanth.ghatraju@oracle.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Kevin Wolf (kwolf@redhat.com) wrote:
-> Now that we have a monitor/ subdirectory, let's move hmp.c and qmp.c
-> from the root directory there. As they contain implementations of
-> monitor commands, rename them to {hmp,qmp}-cmds.c, so that {hmp,qmp}.c
-> are free for the HMP and QMP infrastructure.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-> ---
->  docs/devel/writing-qmp-commands.txt | 9 +++++----
->  hmp.c => monitor/hmp-cmds.c         | 2 +-
->  qmp.c => monitor/qmp-cmds.c         | 2 +-
->  MAINTAINERS                         | 5 +++--
->  Makefile.objs                       | 2 +-
->  monitor/Makefile.objs               | 1 +
->  6 files changed, 12 insertions(+), 9 deletions(-)
->  rename hmp.c => monitor/hmp-cmds.c (99%)
->  rename qmp.c => monitor/qmp-cmds.c (99%)
+On 5/30/2019 4:54 PM, Elena Ufimtseva wrote:
+> On Tue, May 28, 2019 at 08:18:20AM -0700, Elena Ufimtseva wrote:
+>> On Thu, May 23, 2019 at 12:11:30PM +0100, Stefan Hajnoczi wrote:
+>>> Hi Jag and Elena,
+>>> Do you think a call would help to move discussion along more quickly?
+>>>
+>>
+>> Hi Stefan,
+>>
+>> We would like to join this call.
+>> And thank you inviting us!
+>>
+>> Elena
+>>> We could use the next KVM Community Call on June 4th to discuss
+>>> remaining concerns and the next steps:
+>>> https://calendar.google.com/calendar/embed?src=dG9iMXRqcXAzN3Y4ZXZwNzRoMHE4a3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
+>>>
+>>> I also hope to include other core QEMU developers.  As you know, I'm
+>>> skeptical, but it could be just me and I don't want to block you
+>>> unnecessarily if others are more enthusiastic about this approach.
+>>>
 > 
-> diff --git a/docs/devel/writing-qmp-commands.txt b/docs/devel/writing-qmp-commands.txt
-> index cc6ecd6d5d..46a6c48683 100644
-> --- a/docs/devel/writing-qmp-commands.txt
-> +++ b/docs/devel/writing-qmp-commands.txt
-> @@ -20,7 +20,7 @@ new QMP command.
->  
->  2. Write the QMP command itself, which is a regular C function. Preferably,
->     the command should be exported by some QEMU subsystem. But it can also be
-> -   added to the qmp.c file
-> +   added to the monitor/qmp-cmds.c file
->  
->  3. At this point the command can be tested under the QMP protocol
->  
-> @@ -101,7 +101,8 @@ protocol data.
->  
->  The next step is to write the "hello-world" implementation. As explained
->  earlier, it's preferable for commands to live in QEMU subsystems. But
-> -"hello-world" doesn't pertain to any, so we put its implementation in qmp.c:
-> +"hello-world" doesn't pertain to any, so we put its implementation in
-> +monitor/qmp-cmds.c:
->  
->  void qmp_hello_world(Error **errp)
->  {
-> @@ -146,7 +147,7 @@ for mandatory arguments). Finally, 'str' is the argument's type, which
->  stands for "string". The QAPI also supports integers, booleans, enumerations
->  and user defined types.
->  
-> -Now, let's update our C implementation in qmp.c:
-> +Now, let's update our C implementation in monitor/qmp-cmds.c:
->  
->  void qmp_hello_world(bool has_message, const char *message, Error **errp)
->  {
-> @@ -267,7 +268,7 @@ monitor (HMP).
->  
->  With the introduction of the QAPI, HMP commands make QMP calls. Most of the
->  time HMP commands are simple wrappers. All HMP commands implementation exist in
-> -the hmp.c file.
-> +the monitor/hmp-cmds.c file.
->  
->  Here's the implementation of the "hello-world" HMP command:
->  
-> diff --git a/hmp.c b/monitor/hmp-cmds.c
-> similarity index 99%
-> rename from hmp.c
-> rename to monitor/hmp-cmds.c
-> index 99414cd39c..712737cd18 100644
-> --- a/hmp.c
-> +++ b/monitor/hmp-cmds.c
-> @@ -1,5 +1,5 @@
->  /*
-> - * Human Monitor Interface
-> + * Human Monitor Interface commands
->   *
->   * Copyright IBM, Corp. 2011
->   *
-> diff --git a/qmp.c b/monitor/qmp-cmds.c
-> similarity index 99%
-> rename from qmp.c
-> rename to monitor/qmp-cmds.c
-> index fa1b3c1577..65520222ca 100644
-> --- a/qmp.c
-> +++ b/monitor/qmp-cmds.c
-> @@ -1,5 +1,5 @@
->  /*
-> - * QEMU Management Protocol
-> + * QEMU Management Protocol commands
->   *
->   * Copyright IBM, Corp. 2011
->   *
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 10c082314c..8789c82e5c 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1925,7 +1925,8 @@ Human Monitor (HMP)
->  M: Dr. David Alan Gilbert <dgilbert@redhat.com>
->  S: Maintained
->  F: monitor/misc.c
-> -F: hmp.[ch]
-> +F: monitor/hmp*
-> +F: hmp.h
->  F: hmp-commands*.hx
->  F: include/monitor/hmp-target.h
->  F: tests/test-hmp.c
-> @@ -2045,7 +2046,7 @@ F: tests/check-qom-proplist.c
->  QMP
->  M: Markus Armbruster <armbru@redhat.com>
->  S: Supported
-> -F: qmp.c
-> +F: monitor/qmp*
->  F: monitor/misc.c
->  F: docs/devel/*qmp-*
->  F: docs/interop/*qmp-*
-> diff --git a/Makefile.objs b/Makefile.objs
-> index dd39a70b48..9495fcbc7e 100644
-> --- a/Makefile.objs
-> +++ b/Makefile.objs
-> @@ -83,8 +83,8 @@ common-obj-$(CONFIG_FDT) += device_tree.o
->  ######################################################################
->  # qapi
->  
-> -common-obj-y += qmp.o hmp.o
->  common-obj-y += qapi/
-> +common-obj-y += monitor/
->  endif
->  
->  #######################################################################
-> diff --git a/monitor/Makefile.objs b/monitor/Makefile.objs
-> index e783b0616b..a7170af6e1 100644
-> --- a/monitor/Makefile.objs
-> +++ b/monitor/Makefile.objs
-> @@ -1 +1,2 @@
->  obj-y += misc.o
-> +common-obj-y += qmp-cmds.o hmp-cmds.o
-> -- 
-> 2.20.1
+> Hi Stefan
 > 
+> A few questions we have are about the call.
+> What is the format of the call usually? Should we provide some kind of the project outline for 5 minutes?
+> We are planning to address some of the concerns you have voiced in regards to amount of changes, usability,
+> security and performance. I assume there will be other questions as well. Is there any time limit per topic?
+> 
+> And would you mind sharing the call details with us?
+> 
+> Thanks!
+> Elena
+>>
+>>
+>>> Stefan
+
+Hi Stefan,
+
+We would like to add multi-process QEMU to the agenda for any of the
+upcoming KVM community calls. Do you know how we could go about doing
+this?
+
+Could you kindly share the contact details of the organizer for this
+meeting?
+
+Thank you very much!
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Jag
+
+>>
+>>
 
