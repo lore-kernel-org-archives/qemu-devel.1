@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FABBC4321A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 13:11:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D85EC4321A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 13:14:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06E3E20673
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 13:11:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06E3E20673
+	by mail.kernel.org (Postfix) with ESMTPS id 1309120673
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 13:14:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1309120673
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernelpath.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58648 helo=lists.gnu.org)
+Received: from localhost ([::1]:58676 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hagYk-0002SE-5b
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 09:11:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52805)
+	id 1hagbL-0003ub-Ce
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 09:14:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55868)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hafB3-0007aS-Jh
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:43:02 -0400
+ (envelope-from <bounces@canonical.com>) id 1hafIZ-0006LX-TT
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:50:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1haf43-0006eM-IU
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:35:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44372)
+ (envelope-from <bounces@canonical.com>) id 1hafIY-0001WD-1O
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:50:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46804)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1haf41-0006aU-M0
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:35:41 -0400
+ id 1hafIX-0001UJ-RF
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:50:41 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1haf3v-0000d7-Ad
- for <qemu-devel@nongnu.org>; Tue, 11 Jun 2019 11:35:35 +0000
+ id 1hafIV-0002AV-JF
+ for <qemu-devel@nongnu.org>; Tue, 11 Jun 2019 11:50:39 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 4F5302E80CC
- for <qemu-devel@nongnu.org>; Tue, 11 Jun 2019 11:35:35 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 603BA2E80CF
+ for <qemu-devel@nongnu.org>; Tue, 11 Jun 2019 11:50:39 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 11 Jun 2019 11:27:31 -0000
+Date: Tue, 11 Jun 2019 11:41:18 -0000
 From: Rafael David Tinoco <rafaeldtinoco@kernelpath.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -51,7 +51,7 @@ X-Launchpad-Bug: product=intel; status=New; importance=Undecided; assignee=None;
 X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
  assignee=None; 
 X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Fix Released; importance=Undecided; assignee=None; 
+ status=Confirmed; importance=Wishlist; assignee=rafaeldtinoco@kernelpath.com; 
 X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
  component=main; status=Confirmed; importance=Wishlist;
  assignee=None; 
@@ -59,7 +59,7 @@ X-Launchpad-Bug: distribution=ubuntu; distroseries=cosmic; sourcepackage=qemu;
  component=main; status=Confirmed; importance=Wishlist;
  assignee=None; 
 X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=qemu; 
- component=main; status=Fix Released; importance=Undecided;
+ component=main; status=Confirmed; importance=Wishlist;
  assignee=None; 
 X-Launchpad-Bug-Tags: intel-virt-19.10 qemu-19.10
 X-Launchpad-Bug-Information-Type: Public
@@ -69,13 +69,13 @@ X-Launchpad-Bug-Commenters: paelzer quanxian-wang rafaeldtinoco sbeattie
 X-Launchpad-Bug-Reporter: quanxian (quanxian-wang)
 X-Launchpad-Bug-Modifier: Rafael David Tinoco (rafaeldtinoco)
 References: <155909595152.12810.1489513977238974514.malonedeb@soybean.canonical.com>
-Message-Id: <156025245144.16242.9131562055331336614.malone@soybean.canonical.com>
+Message-Id: <156025328006.23831.8398367393569661057.launchpad@chaenomeles.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18978";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 971f4f625b47c5570ab4f589015f07df1dfc4c9a
+X-Launchpad-Hash: 63f448257b529d379fee1983aaf541ad2f7205d0
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-Mailman-Approved-At: Tue, 11 Jun 2019 09:09:52 -0400
@@ -95,17 +95,20 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This effort, if done, would be done together with:
+** Changed in: qemu (Ubuntu Disco)
+       Status: Fix Released =3D> Confirmed
 
-https://bugs.launchpad.net/intel/+bug/1828495
+** Changed in: qemu (Ubuntu Disco)
+   Importance: Undecided =3D> Wishlist
 
-Please read comments:
+** Changed in: qemu (Ubuntu)
+       Status: Fix Released =3D> Confirmed
 
-https://bugs.launchpad.net/intel/+bug/1828495/comments/8
+** Changed in: qemu (Ubuntu)
+   Importance: Undecided =3D> Wishlist
 
-and
-
-https://bugs.launchpad.net/intel/+bug/1828495/comments/10
+** Changed in: qemu (Ubuntu)
+     Assignee: (unassigned) =3D> Rafael David Tinoco (rafaeldtinoco)
 
 -- =
 
@@ -121,13 +124,13 @@ Status in intel:
 Status in QEMU:
   Fix Released
 Status in qemu package in Ubuntu:
-  Fix Released
+  Confirmed
 Status in qemu source package in Bionic:
   Confirmed
 Status in qemu source package in Cosmic:
   Confirmed
 Status in qemu source package in Disco:
-  Fix Released
+  Confirmed
 
 Bug description:
   Description:
