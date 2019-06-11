@@ -2,66 +2,63 @@ Return-Path: <SRS0=mXWu=UK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60D6DC4321A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 15:31:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F52EC4321A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 15:31:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EF162080A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 15:31:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EF162080A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1258B2080A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 15:31:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1258B2080A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60270 helo=lists.gnu.org)
+Received: from localhost ([::1]:60278 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haik4-0006Xi-7i
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 11:31:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57144)
+	id 1haikf-00076h-62
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 11:31:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57309)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1haidg-0004XW-9G
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 11:24:46 -0400
+ (envelope-from <armbru@redhat.com>) id 1haidq-0004bK-I6
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 11:24:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1haide-0006Ad-4U
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 11:24:44 -0400
-Resent-Date: Tue, 11 Jun 2019 11:24:43 -0400
-Resent-Message-Id: <E1haide-0006Ad-4U@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21893)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1haidb-00065s-W2; Tue, 11 Jun 2019 11:24:41 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1560266650; cv=none; d=zoho.com; s=zohoarc; 
- b=AFxSi5p9SXZuiTFva0tNsYWbdqjNigYXlp2xckHnwJTQJTUTwr0FDy13xVCKDahP1/bDvQuy+Fu/Oexs/xM6cJdrHrZAQNXwlI2u4Tf0e0Rj1P1c0n4Ddjjb7B3bajXG37SHvxS8dUqFv97fwh+h+Z8XqtgnVQs7V1THdfMKpq0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1560266650;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=GEPiRZl3fR6bGAYzZbzlSsTgUjfqC+YCSYcHghhdrtc=; 
- b=B29aTi0ImWO/BZJVx/OsJuSh05TRVlkAnMPbn7KqrSFHUPzTXJBFdQEJAogFAGXa4HDs0v/qXQGSDhQLf17z1RAjszEZXMymROtOf7zKNB9ivtMk1+XTJamQJraiDrYg3hftKkDc9FgdsiSQRqnzcCpSPbfSNtOFl4CLRHUPXL0=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 156026664988537.12429407237528;
- Tue, 11 Jun 2019 08:24:09 -0700 (PDT)
-In-Reply-To: <20190611134043.9524-1-kwolf@redhat.com>
-Message-ID: <156026664874.32260.12368704578781915016@ce79690b2cb9>
+ (envelope-from <armbru@redhat.com>) id 1haido-0006KO-2L
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 11:24:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50184)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1haidn-0006Ig-PL
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 11:24:51 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8F20C5D619;
+ Tue, 11 Jun 2019 15:24:50 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
+ [10.36.116.148])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 37D1760A35;
+ Tue, 11 Jun 2019 15:24:50 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id B9A3F1138661; Tue, 11 Jun 2019 17:24:48 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 11 Jun 2019 17:24:38 +0200
+Message-Id: <20190611152448.29436-3-armbru@redhat.com>
+In-Reply-To: <20190611152448.29436-1-armbru@redhat.com>
+References: <20190611152448.29436-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: kwolf@redhat.com
-Date: Tue, 11 Jun 2019 08:24:09 -0700 (PDT)
-X-ZohoMailClient: External
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.39]); Tue, 11 Jun 2019 15:24:50 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.218
-Subject: Re: [Qemu-devel] [PATCH v2 00/11] monitor: Split monitor.c in
- core/HMP/QMP/misc
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 02/12] qemu-common: Move qemu_isalnum() etc. to
+ qemu/ctype.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,101 +70,374 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, berrange@redhat.com, qemu-block@nongnu.org,
- armbru@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYxMTEzNDA0My45NTI0
-LTEta3dvbGZAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
-bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
-bWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTA2MTExMzQwNDMuOTUyNC0xLWt3b2xmQHJlZGhhdC5j
-b20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwMC8xMV0gbW9uaXRvcjogU3BsaXQg
-bW9uaXRvci5jIGluIGNvcmUvSE1QL1FNUC9taXNjClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NS
-SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwg
-fHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29y
-aXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4K
-PT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXct
-cHJvamVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAxOTA2MTExMzQwNDMu
-OTUyNC0xLWt3b2xmQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MDYxMTEzNDA0My45NTI0LTEt
-a3dvbGZAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmEzOGIxMWYg
-bW9uaXRvcjogU3BsaXQgb3V0IG1vbml0b3IvbW9uaXRvci5jCjJlM2Q3NDMgbW9uaXRvcjogU3Bs
-aXQgb3V0IG1vbml0b3IvaG1wLmMKZWM4MzdjMCBtb25pdG9yOiBTcGxpdCBvdXQgbW9uaXRvci9x
-bXAuYwo3NzY4ZjkzIG1vbml0b3I6IENyZWF0ZSBtb25pdG9yX2ludC5oIHdpdGggY29tbW9uIGRl
-ZmluaXRpb25zCjIxMmRhYjYgbW9uaXRvcjogTW92ZSB7aG1wLCBxbXB9LmMgdG8gbW9uaXRvci97
-aG1wLCBxbXB9LWNtZHMuYwpmOTFjYWJmIE1vdmUgbW9uaXRvci5jIHRvIG1vbml0b3IvbWlzYy5j
-CjI5Y2Y1NjEgbW9uaXRvcjogTW92ZSBjbWRfdGFibGUgdG8gTW9uaXRvckhNUApiZGMxOTcyIG1v
-bml0b3I6IENyZWF0ZSBNb25pdG9ySE1QIHdpdGggcmVhZGxpbmUgc3RhdGUKYjliNGY5NCBtb25p
-dG9yOiBNYWtlIE1vbml0b3JRTVAgYSBjaGlsZCBjbGFzcyBvZiBNb25pdG9yCjk2ZTg0MDYgbW9u
-aXRvcjogU3BsaXQgbW9uaXRvcl9pbml0IGluIEhNUCBhbmQgUU1QIGZ1bmN0aW9uCjU2ZWY0YmMg
-bW9uaXRvcjogUmVtb3ZlIHVudXNlZCBwYXNzd29yZCBwcm9tcHRpbmcgZmllbGRzCgo9PT0gT1VU
-UFVUIEJFR0lOID09PQoxLzExIENoZWNraW5nIGNvbW1pdCA1NmVmNGJjNjI1ZGUgKG1vbml0b3I6
-IFJlbW92ZSB1bnVzZWQgcGFzc3dvcmQgcHJvbXB0aW5nIGZpZWxkcykKMi8xMSBDaGVja2luZyBj
-b21taXQgOTZlODQwNjRkYmZiIChtb25pdG9yOiBTcGxpdCBtb25pdG9yX2luaXQgaW4gSE1QIGFu
-ZCBRTVAgZnVuY3Rpb24pCjMvMTEgQ2hlY2tpbmcgY29tbWl0IGI5YjRmOTRmZmYzZiAobW9uaXRv
-cjogTWFrZSBNb25pdG9yUU1QIGEgY2hpbGQgY2xhc3Mgb2YgTW9uaXRvcikKNC8xMSBDaGVja2lu
-ZyBjb21taXQgYmRjMTk3MmQ3ZjFjIChtb25pdG9yOiBDcmVhdGUgTW9uaXRvckhNUCB3aXRoIHJl
-YWRsaW5lIHN0YXRlKQo1LzExIENoZWNraW5nIGNvbW1pdCAyOWNmNTYxMjNkNjggKG1vbml0b3I6
-IE1vdmUgY21kX3RhYmxlIHRvIE1vbml0b3JITVApCjYvMTEgQ2hlY2tpbmcgY29tbWl0IGY5MWNh
-YmZhM2FjMiAoTW92ZSBtb25pdG9yLmMgdG8gbW9uaXRvci9taXNjLmMpCldBUk5JTkc6IGFkZGVk
-LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
-Zz8KIzc4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5n
-cywgNzggbGluZXMgY2hlY2tlZAoKUGF0Y2ggNi8xMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-Lgo3LzExIENoZWNraW5nIGNvbW1pdCAyMTJkYWI2M2VhODAgKG1vbml0b3I6IE1vdmUge2htcCwg
-cW1wfS5jIHRvIG1vbml0b3Ive2htcCwgcW1wfS1jbWRzLmMpCldBUk5JTkc6IGFkZGVkLCBtb3Zl
-ZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzEw
-MjogCnJlbmFtZSBmcm9tIGhtcC5jCgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDczIGxp
-bmVzIGNoZWNrZWQKClBhdGNoIDcvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOC8xMSBD
-aGVja2luZyBjb21taXQgNzc2OGY5M2FiNjhkIChtb25pdG9yOiBDcmVhdGUgbW9uaXRvcl9pbnQu
-aCB3aXRoIGNvbW1vbiBkZWZpbml0aW9ucykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0
-ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTcxOiAKbmV3IGZp
-bGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjkwIGxpbmVzIGNo
-ZWNrZWQKClBhdGNoIDgvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOS8xMSBDaGVja2lu
-ZyBjb21taXQgZWM4MzdjMDU5NjY0IChtb25pdG9yOiBTcGxpdCBvdXQgbW9uaXRvci9xbXAuYykK
-RVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1
-aXJlZAojNTg2OiBGSUxFOiBtb25pdG9yL21vbml0b3JfaW50Lmg6MTU0OgorICAgIHJldHVybiAo
-bW9uLT5mbGFncyAmIE1PTklUT1JfVVNFX0NPTlRST0wpOwoKV0FSTklORzogYWRkZWQsIG1vdmVk
-IG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNjEw
-OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgOTY3
-IGxpbmVzIGNoZWNrZWQKClBhdGNoIDkvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjEw
-LzExIENoZWNraW5nIGNvbW1pdCAyZTNkNzQzMmZmZDMgKG1vbml0b3I6IFNwbGl0IG91dCBtb25p
-dG9yL2htcC5jKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2Vz
-IE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0MTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpF
-UlJPUjogY29uc2lkZXIgdXNpbmcgcWVtdV9zdHJ0b3VsbCBpbiBwcmVmZXJlbmNlIHRvIHN0cnRv
-dWxsCiM0MDk6IEZJTEU6IG1vbml0b3IvaG1wLmM6MzY0OgorICAgICAgICBuID0gc3RydG91bGwo
-cGNoLCAmcCwgMCk7CgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9u
-IGEgc2VwYXJhdGUgbGluZQojMTI5MTogRklMRTogbW9uaXRvci9obXAuYzoxMjQ2OgorICAgIC8q
-IGlmIHRoZSBsaW5lIGVuZHMgd2l0aCBhIHNwYWNlLCBpdCBtZWFucyB3ZSB3YW50IHRvIGNvbXBs
-ZXRlIHRoZQoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgdHJhaWxpbmcgKi8gb24gYSBz
-ZXBhcmF0ZSBsaW5lCiMxMjkyOiBGSUxFOiBtb25pdG9yL2htcC5jOjEyNDc6CisgICAgICogbmV4
-dCBhcmcgKi8KCnRvdGFsOiAxIGVycm9ycywgMyB3YXJuaW5ncywgMjg3OCBsaW5lcyBjaGVja2Vk
-CgpQYXRjaCAxMC8xMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTEvMTEgQ2hlY2tpbmcg
-Y29tbWl0IGEzOGIxMWY2MTdjNCAobW9uaXRvcjogU3BsaXQgb3V0IG1vbml0b3IvbW9uaXRvci5j
-KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlO
-RVJTIG5lZWQgdXBkYXRpbmc/CiM3MDY6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKV0FSTklORzog
-QmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzEzMTM6
-IEZJTEU6IG1vbml0b3IvbW9uaXRvci5jOjYwMzoKKyAgICAgICAgeyAvKiBlbmQgb2YgbGlzdCAq
-LyB9Cgp0b3RhbDogMCBlcnJvcnMsIDIgd2FybmluZ3MsIDEyNzMgbGluZXMgY2hlY2tlZAoKUGF0
-Y2ggMTEvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpU
-ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFi
-bGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA2MTExMzQwNDMuOTUyNC0xLWt3b2xm
-QHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10u
-ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20190523143508.25387-3-armbru@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ block/ssh.c                |  1 +
+ block/vvfat.c              |  1 +
+ gdbstub.c                  |  2 ++
+ hw/core/bus.c              |  2 +-
+ hw/core/qdev-properties.c  |  1 +
+ hw/s390x/s390-virtio-ccw.c |  1 +
+ hw/scsi/scsi-generic.c     |  2 +-
+ include/qemu-common.h      | 16 ----------------
+ include/qemu/ctype.h       | 27 +++++++++++++++++++++++++++
+ monitor.c                  |  1 +
+ net/net.c                  |  1 +
+ net/tap-solaris.c          |  1 +
+ qapi/qapi-util.c           |  2 +-
+ qobject/json-parser.c      |  2 +-
+ target/ppc/monitor.c       |  2 ++
+ target/riscv/cpu.c         |  1 +
+ tests/libqtest.c           |  1 +
+ tests/vhost-user-bridge.c  |  2 +-
+ ui/keymaps.c               |  1 +
+ util/cutils.c              |  3 ++-
+ util/id.c                  |  2 +-
+ util/readline.c            |  2 +-
+ 22 files changed, 50 insertions(+), 24 deletions(-)
+ create mode 100644 include/qemu/ctype.h
+
+diff --git a/block/ssh.c b/block/ssh.c
+index 12fd4f39e8..584c302fe6 100644
+--- a/block/ssh.c
++++ b/block/ssh.c
+@@ -32,6 +32,7 @@
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+ #include "qemu/option.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+ #include "qemu/sockets.h"
+ #include "qemu/uri.h"
+diff --git a/block/vvfat.c b/block/vvfat.c
+index 253cc716dd..f6c28805dd 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -34,6 +34,7 @@
+ #include "migration/blocker.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qstring.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+ #include "qemu/error-report.h"
+=20
+diff --git a/gdbstub.c b/gdbstub.c
+index 462f89edfe..9159d7d153 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -16,9 +16,11 @@
+  * You should have received a copy of the GNU Lesser General Public
+  * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+  */
++
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+ #include "trace-root.h"
+ #ifdef CONFIG_USER_ONLY
+diff --git a/hw/core/bus.c b/hw/core/bus.c
+index e09843f6ab..60c4720379 100644
+--- a/hw/core/bus.c
++++ b/hw/core/bus.c
+@@ -18,7 +18,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
++#include "qemu/ctype.h"
+ #include "hw/qdev.h"
+ #include "qapi/error.h"
+=20
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 5da1439a8b..81c97f48a7 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -4,6 +4,7 @@
+ #include "qapi/error.h"
+ #include "hw/pci/pci.h"
+ #include "qapi/qmp/qerror.h"
++#include "qemu/ctype.h"
+ #include "qemu/error-report.h"
+ #include "hw/block/block.h"
+ #include "net/hub.h"
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 4d643686cb..87b2039f1b 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -23,6 +23,7 @@
+ #include "hw/s390x/css.h"
+ #include "virtio-ccw.h"
+ #include "qemu/config-file.h"
++#include "qemu/ctype.h"
+ #include "qemu/error-report.h"
+ #include "qemu/option.h"
+ #include "s390-pci-bus.h"
+diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
+index d82b462be4..e8a8706a4f 100644
+--- a/hw/scsi/scsi-generic.c
++++ b/hw/scsi/scsi-generic.c
+@@ -13,7 +13,7 @@
+=20
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
++#include "qemu/ctype.h"
+ #include "qemu/error-report.h"
+ #include "hw/scsi/scsi.h"
+ #include "hw/scsi/emulation.h"
+diff --git a/include/qemu-common.h b/include/qemu-common.h
+index d7f4a4e7eb..9b01f6e7cb 100644
+--- a/include/qemu-common.h
++++ b/include/qemu-common.h
+@@ -31,22 +31,6 @@ int qemu_main(int argc, char **argv, char **envp);
+ void qemu_get_timedate(struct tm *tm, int offset);
+ int qemu_timedate_diff(struct tm *tm);
+=20
+-#define qemu_isalnum(c)		isalnum((unsigned char)(c))
+-#define qemu_isalpha(c)		isalpha((unsigned char)(c))
+-#define qemu_iscntrl(c)		iscntrl((unsigned char)(c))
+-#define qemu_isdigit(c)		isdigit((unsigned char)(c))
+-#define qemu_isgraph(c)		isgraph((unsigned char)(c))
+-#define qemu_islower(c)		islower((unsigned char)(c))
+-#define qemu_isprint(c)		isprint((unsigned char)(c))
+-#define qemu_ispunct(c)		ispunct((unsigned char)(c))
+-#define qemu_isspace(c)		isspace((unsigned char)(c))
+-#define qemu_isupper(c)		isupper((unsigned char)(c))
+-#define qemu_isxdigit(c)	isxdigit((unsigned char)(c))
+-#define qemu_tolower(c)		tolower((unsigned char)(c))
+-#define qemu_toupper(c)		toupper((unsigned char)(c))
+-#define qemu_isascii(c)		isascii((unsigned char)(c))
+-#define qemu_toascii(c)		toascii((unsigned char)(c))
+-
+ void *qemu_oom_check(void *ptr);
+=20
+ ssize_t qemu_write_full(int fd, const void *buf, size_t count)
+diff --git a/include/qemu/ctype.h b/include/qemu/ctype.h
+new file mode 100644
+index 0000000000..3691f0984d
+--- /dev/null
++++ b/include/qemu/ctype.h
+@@ -0,0 +1,27 @@
++/*
++ * QEMU TCG support
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef QEMU_CTYPE_H
++#define QEMU_CTYPE_H
++
++#define qemu_isalnum(c)         isalnum((unsigned char)(c))
++#define qemu_isalpha(c)         isalpha((unsigned char)(c))
++#define qemu_iscntrl(c)         iscntrl((unsigned char)(c))
++#define qemu_isdigit(c)         isdigit((unsigned char)(c))
++#define qemu_isgraph(c)         isgraph((unsigned char)(c))
++#define qemu_islower(c)         islower((unsigned char)(c))
++#define qemu_isprint(c)         isprint((unsigned char)(c))
++#define qemu_ispunct(c)         ispunct((unsigned char)(c))
++#define qemu_isspace(c)         isspace((unsigned char)(c))
++#define qemu_isupper(c)         isupper((unsigned char)(c))
++#define qemu_isxdigit(c)        isxdigit((unsigned char)(c))
++#define qemu_tolower(c)         tolower((unsigned char)(c))
++#define qemu_toupper(c)         toupper((unsigned char)(c))
++#define qemu_isascii(c)         isascii((unsigned char)(c))
++#define qemu_toascii(c)         toascii((unsigned char)(c))
++
++#endif
+diff --git a/monitor.c b/monitor.c
+index 3650ceb574..5c5cbe254a 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -42,6 +42,7 @@
+ #include "sysemu/numa.h"
+ #include "monitor/monitor.h"
+ #include "qemu/config-file.h"
++#include "qemu/ctype.h"
+ #include "qemu/readline.h"
+ #include "ui/console.h"
+ #include "ui/input.h"
+diff --git a/net/net.c b/net/net.c
+index 2cf5e76469..3e65c93920 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -41,6 +41,7 @@
+ #include "qemu/sockets.h"
+ #include "qemu/cutils.h"
+ #include "qemu/config-file.h"
++#include "qemu/ctype.h"
+ #include "hw/qdev.h"
+ #include "qemu/iov.h"
+ #include "qemu/main-loop.h"
+diff --git a/net/tap-solaris.c b/net/tap-solaris.c
+index a2a92356c1..0e3f3e0a9b 100644
+--- a/net/tap-solaris.c
++++ b/net/tap-solaris.c
+@@ -26,6 +26,7 @@
+ #include "qapi/error.h"
+ #include "tap_int.h"
+ #include "sysemu/sysemu.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+=20
+ #include <sys/ethernet.h>
+diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
+index e9b266bb70..29a6c98b53 100644
+--- a/qapi/qapi-util.c
++++ b/qapi/qapi-util.c
+@@ -12,7 +12,7 @@
+=20
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
++#include "qemu/ctype.h"
+=20
+ const char *qapi_enum_lookup(const QEnumLookup *lookup, int val)
+ {
+diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+index d8eb210c0c..7d23e12e33 100644
+--- a/qobject/json-parser.c
++++ b/qobject/json-parser.c
+@@ -12,10 +12,10 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+ #include "qemu/unicode.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
+ #include "qapi/qmp/qbool.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qlist.h"
+diff --git a/target/ppc/monitor.c b/target/ppc/monitor.c
+index ee9d6e81d2..7f8360d903 100644
+--- a/target/ppc/monitor.c
++++ b/target/ppc/monitor.c
+@@ -21,9 +21,11 @@
+  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+  * THE SOFTWARE.
+  */
++
+ #include "qemu/osdep.h"
+ #include "cpu.h"
+ #include "monitor/monitor.h"
++#include "qemu/ctype.h"
+ #include "monitor/hmp-target.h"
+ #include "hmp.h"
+=20
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 86fd8693a8..6f2b644220 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -19,6 +19,7 @@
+=20
+ #include "qemu/osdep.h"
+ #include "qemu/qemu-print.h"
++#include "qemu/ctype.h"
+ #include "qemu/log.h"
+ #include "cpu.h"
+ #include "exec/exec-all.h"
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index 9b9b5f37fc..3c5c3f49d8 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -22,6 +22,7 @@
+=20
+ #include "libqtest.h"
+ #include "qemu-common.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp/json-parser.h"
+diff --git a/tests/vhost-user-bridge.c b/tests/vhost-user-bridge.c
+index 5b771de7a3..0bb03af0e5 100644
+--- a/tests/vhost-user-bridge.c
++++ b/tests/vhost-user-bridge.c
+@@ -30,8 +30,8 @@
+ #define _FILE_OFFSET_BITS 64
+=20
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/atomic.h"
++#include "qemu/ctype.h"
+ #include "qemu/iov.h"
+ #include "standard-headers/linux/virtio_net.h"
+ #include "contrib/libvhost-user/libvhost-user.h"
+diff --git a/ui/keymaps.c b/ui/keymaps.c
+index 544b55c27b..38fd22ed2b 100644
+--- a/ui/keymaps.c
++++ b/ui/keymaps.c
+@@ -26,6 +26,7 @@
+ #include "keymaps.h"
+ #include "sysemu/sysemu.h"
+ #include "trace.h"
++#include "qemu/ctype.h"
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "ui/input.h"
+diff --git a/util/cutils.c b/util/cutils.c
+index 9aacc422ca..53e4af59f8 100644
+--- a/util/cutils.c
++++ b/util/cutils.c
+@@ -21,14 +21,15 @@
+  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+  * THE SOFTWARE.
+  */
++
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/host-utils.h"
+ #include <math.h>
+=20
+ #include "qemu/sockets.h"
+ #include "qemu/iov.h"
+ #include "net/net.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+ #include "qemu/error-report.h"
+=20
+diff --git a/util/id.c b/util/id.c
+index 6141352955..af1c5f1b81 100644
+--- a/util/id.c
++++ b/util/id.c
+@@ -11,7 +11,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
++#include "qemu/ctype.h"
+ #include "qemu/id.h"
+=20
+ bool id_wellformed(const char *id)
+diff --git a/util/readline.c b/util/readline.c
+index a7672b51c1..e534460da6 100644
+--- a/util/readline.c
++++ b/util/readline.c
+@@ -23,8 +23,8 @@
+  */
+=20
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/readline.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+=20
+ #define IS_NORM 0
+--=20
+2.21.0
 
 
