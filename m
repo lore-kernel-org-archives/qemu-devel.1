@@ -2,66 +2,79 @@ Return-Path: <SRS0=mXWu=UK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B57BCC4321A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 16:38:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DB3DC06510
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 16:39:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E4C52086A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 16:38:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E4C52086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3EA7F2086A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 16:39:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MQ3l11xC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EA7F2086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60908 helo=lists.gnu.org)
+Received: from localhost ([::1]:60914 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hajnM-0004xT-I4
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 12:38:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42218)
+	id 1hajnd-0005a7-CZ
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 12:39:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36973)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laine@redhat.com>) id 1hajNm-0001bf-MJ
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 12:12:25 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1haj33-0004rx-Or
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 11:51:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laine@redhat.com>) id 1hajNj-0000Io-HO
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 12:12:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53684)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <laine@redhat.com>) id 1hajNj-0000Hm-75
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 12:12:19 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7474A307CDE7
- for <qemu-devel@nongnu.org>; Tue, 11 Jun 2019 16:12:13 +0000 (UTC)
-Received: from vhost2.laine.org (ovpn-116-157.phx2.redhat.com [10.3.116.157])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C5ACE600CD;
- Tue, 11 Jun 2019 16:12:05 +0000 (UTC)
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20190517125820.2885-1-jfreimann@redhat.com>
- <646d0bf1-2fbb-1adb-d5d3-3ef3944376b5@redhat.com>
- <20190611115009-mutt-send-email-mst@kernel.org>
-From: Laine Stump <laine@redhat.com>
-Message-ID: <2f287667-405d-deac-b0af-1048ec33db1f@redhat.com>
-Date: Tue, 11 Jun 2019 12:12:04 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ (envelope-from <peter.maydell@linaro.org>) id 1haj2u-0001I3-2M
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 11:50:52 -0400
+Received: from mail-oi1-x232.google.com ([2607:f8b0:4864:20::232]:38393)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1haj2t-0001GY-LB
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 11:50:47 -0400
+Received: by mail-oi1-x232.google.com with SMTP id v186so9323599oie.5
+ for <qemu-devel@nongnu.org>; Tue, 11 Jun 2019 08:50:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=RaLj/zpp5phPfmHdEBF3TWQov7i352Xv6cujubNO7Vg=;
+ b=MQ3l11xChVej/X0B2fYnMxczF5P83Z3sGZH43YnyANlJeJyMjI9O82CaHFydEZik2E
+ 4BkfQLRUSwHfnSNAMc2+5bxtBQROjBMDJS2/s/GmdHPh5y9OGIM53kfpYHnR2d+DiYgC
+ 6Xmkvk+oDYK+j2RIxjScNHboO4ZPTtwW71GKUCy8gK+4bjXneOep/yIPOl3+1sQjTt2P
+ o3gui5kmfZijtu2HCYN+sraVFnUCaAmeVfpa+Xpj6jJO8gNcHzy4zrbthNOlpHIPPcSD
+ ir3B/AU9wheMegskFfy7GvhF8O7CEKRnikLkb8qVcBiR5Ti4IDS22IYNSBF2Y6HR3wc0
+ 2csw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=RaLj/zpp5phPfmHdEBF3TWQov7i352Xv6cujubNO7Vg=;
+ b=AAtInrgkQ4wRtu5jEYIKc+Tg0USsQi6G2zL6gWjoigmIOjkhyzuPdzpg1BXV3CAWZI
+ P1QhSIfzCq9NOf4d8gT5KljNMIuuVkcyMkbAVeM6NBwAXAyN6JXoUehIZKNAoFMAv4xP
+ avH+ygalkZ8YVgKbzHmeltlKn6NTCxIOeU41VS8F8aqc+qN3W3ndSq4s8OsoIkeBhRB8
+ d5zDm/b4sZ9p+GrhzNYSYWQuRLqa7gKQYtaFTd15G1JSnS/efqlXP4XbB+3Y38voYxpF
+ OiKRDE4DiCPesWryTfmDYJ1QVz+moAqpORlY0PLAF7/BqQEVgUH2+1X4OugVLTlLECa7
+ Q3KA==
+X-Gm-Message-State: APjAAAVrq2KB8kSMateDW4NAWrvUesclNeIVKLffvaKDOWAN6z1DJ/2A
+ F69peKKCGhp3ol6uniYrzp6ypspcsNrSkQeOn09iHA==
+X-Google-Smtp-Source: APXvYqxvEk5+OlERuitcGNSrnv6eVJmaJ0+CURQ9ncx/QgPc+MvidSw9tzC+mQkGwuNs2YZ0nTPzCAXeAz4qxW0QQlA=
+X-Received: by 2002:aca:ac48:: with SMTP id v69mr15304171oie.48.1560268246026; 
+ Tue, 11 Jun 2019 08:50:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190611115009-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Tue, 11 Jun 2019 16:12:13 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/4] add failover feature for assigned
- network devices
+References: <20190607211544.7964-1-ehabkost@redhat.com>
+ <CAFEAcA-wCqppsi+gcrTqGjR3bSDOHs5btKKE8oHYxbAUDtu7Fw@mail.gmail.com>
+In-Reply-To: <CAFEAcA-wCqppsi+gcrTqGjR3bSDOHs5btKKE8oHYxbAUDtu7Fw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 11 Jun 2019 16:50:34 +0100
+Message-ID: <CAFEAcA9ZeB1knLYYQLJG0d5McG2vo6w8P9+vOBWgtSVgPEG0jA@mail.gmail.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::232
+Subject: Re: [Qemu-devel] [PULL 0/8] Python queue, 2019-06-07
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,198 +86,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
- aadam@redhat.com, qemu-devel@nongnu.org, Jens Freimann <jfreimann@redhat.com>,
- ailan@redhat.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/11/19 11:51 AM, Michael S. Tsirkin wrote:
-> On Tue, Jun 11, 2019 at 11:42:54AM -0400, Laine Stump wrote:
->> On 5/17/19 8:58 AM, Jens Freimann wrote:
->>> This is another attempt at implementing the host side of the
->>> net_failover concept
->>> (https://www.kernel.org/doc/html/latest/networking/net_failover.html)
->>>
->>> Changes since last RFC:
->>> - work around circular dependency of commandline options. Just add
->>>     failover=on to the virtio-net standby options and reference it from
->>>     primary (vfio-pci) device with standby=<id>
->>> - add patch 3/4 to allow migration of vfio-pci device when it is part of a
->>>     failover pair, still disallow for all other devices
->>> - add patch 4/4 to allow unplug of device during migrationm, make an
->>>     exception for failover primary devices. I'd like feedback on how to
->>>     solve this more elegant. I added a boolean to DeviceState, have it
->>>     default to false for all devices except for primary devices.
->>> - not tested yet with surprise removal
->>> - I don't expect this to go in as it is, still needs more testing but
->>>     I'd like to get feedback on above mentioned changes.
->>>
->>> The general idea is that we have a pair of devices, a vfio-pci and a
->>> emulated device. Before migration the vfio device is unplugged and data
->>> flows to the emulated device, on the target side another vfio-pci device
->>> is plugged in to take over the data-path. In the guest the net_failover
->>> module will pair net devices with the same MAC address.
->>>
->>> * In the first patch the infrastructure for hiding the device is added
->>>     for the qbus and qdev APIs.
->>>
->>> * In the second patch the virtio-net uses the API to defer adding the vfio
->>>     device until the VIRTIO_NET_F_STANDBY feature is acked.
->>>
->>> Previous discussion:
->>>     RFC v1 https://patchwork.ozlabs.org/cover/989098/
->>>     RFC v2 https://www.mail-archive.com/qemu-devel@nongnu.org/msg606906.html
->>>
->>> To summarize concerns/feedback from previous discussion:
->>> 1.- guest OS can reject or worse _delay_ unplug by any amount of time.
->>>     Migration might get stuck for unpredictable time with unclear reason.
->>>     This approach combines two tricky things, hot/unplug and migration.
->>>     -> We can surprise-remove the PCI device and in QEMU we can do all
->>>        necessary rollbacks transparent to management software. Will it be
->>>        easy, probably not.
->>> 2. PCI devices are a precious ressource. The primary device should never
->>>     be added to QEMU if it won't be used by guest instead of hiding it in
->>>     QEMU.
->>>     -> We only hotplug the device when the standby feature bit was
->>>        negotiated. We save the device cmdline options until we need it for
->>>        qdev_device_add()
->>>        Hiding a device can be a useful concept to model. For example a
->>>        pci device in a powered-off slot could be marked as hidden until the slot is
->>>        powered on (mst).
->>> 3. Management layer software should handle this. Open Stack already has
->>>     components/code to handle unplug/replug VFIO devices and metadata to
->>>     provide to the guest for detecting which devices should be paired.
->>>     -> An approach that includes all software from firmware to
->>>        higher-level management software wasn't tried in the last years. This is
->>>        an attempt to keep it simple and contained in QEMU as much as possible.
->>> 4. Hotplugging a device and then making it part of a failover setup is
->>>      not possible
->>>     -> addressed by extending qdev hotplug functions to check for hidden
->>>        attribute, so e.g. device_add can be used to plug a device.
->>>
->>>
->>> I have tested this with a mlx5 NIC and was able to migrate the VM with
->>> above mentioned workarounds for open problems.
->>>
->>> Command line example:
->>>
->>> qemu-system-x86_64 -enable-kvm -m 3072 -smp 3 \
->>>           -machine q35,kernel-irqchip=split -cpu host   \
->>>           -k fr   \
->>>           -serial stdio   \
->>>           -net none \
->>>           -qmp unix:/tmp/qmp.socket,server,nowait \
->>>           -monitor telnet:127.0.0.1:5555,server,nowait \
->>>           -device pcie-root-port,id=root0,multifunction=on,chassis=0,addr=0xa \
->>>           -device pcie-root-port,id=root1,bus=pcie.0,chassis=1 \
->>>           -device pcie-root-port,id=root2,bus=pcie.0,chassis=2 \
->>>           -netdev tap,script=/root/bin/bridge.sh,downscript=no,id=hostnet1,vhost=on \
->>>           -device virtio-net-pci,netdev=hostnet1,id=net1,mac=52:54:00:6f:55:cc,bus=root2,failover=on \
->>>           /root/rhel-guest-image-8.0-1781.x86_64.qcow2
->>>
->>> Then the primary device can be hotplugged via
->>>    (qemu) device_add vfio-pci,host=5e:00.2,id=hostdev0,bus=root1,standby=net1
->>
->>
->> I guess this is the commandline on the migration destination, and as far as
->> I understand from this example, on the destination we (meaning libvirt or
->> higher level management application) must *not* include the assigned device
->> on the qemu commandline, but must instead hotplug the device later after the
->> guest CPUs have been restarted on the destination.
->>
->> So if I'm understanding correctly, the idea is that on the migration source,
->> the device may have been hotplugged, or may have been included when qemu was
->> originally started. Then qemu automatically handles the unplug of the device
->> on the source, but it seems qemu does nothing on the destination, leaving
->> that up to libvirt or a higher layer to implement.
-> 
-> Good point. I don't see why it would not work just as well
-> with device present straight away.
+On Mon, 10 Jun 2019 at 13:58, Peter Maydell <peter.maydell@linaro.org> wrote:
+> Hi. This fails to build on one of my buildtest machines:
+>
+> ERROR: Cannot use 'python3', Python 2 >= 2.7 or Python 3 >= 3.5 is required.
+>        Use --python=/path/to/python to specify a supported Python.
+>
+> The machine has python 2.7.6 and 3.4.3. (It's an Ubuntu trusty
+> box; it's one of the gcc compile farm machines so upgrades to its
+> OS are not really under my control.)
 
-Will the guest get properly notified about the device if it had been 
-unplugged (from the guest POV) prior to the migration (so the last thing 
-the guest knows is that there is no device), but is suddenly/magically 
-back in place from the instant the CPUs start on the destination? 
-Doesn't there need to be some sort of notification sent from qemu to the 
-guest OS to let it know that a "new" device has been plugged in? (I've 
-always assumed this was the case, but it's really just guessing on my 
-part :-)
+Rereading this, I realise that either the check or the error
+message is wrong here. The machine has 2.7.6, which satisfies
+"python 2 >= 2.7", so we should be OK to build. The bug
+seems to be that we say "prefer python3 over plain python
+on python2" early, but don't revisit that decision if the
+python3 we found isn't actually good enough for us.
 
-It will certainly make things simpler if the device can be present in 
-the qemu commandline. If that's the case, then I *think* only item (2) 
-below will need solving.
+(I am also setting up to do builds on a different aarch64 box
+which has a newer python3.)
 
-> 
-> Did I miss something?
-> 
-> I think Jens was just testing local machine migration
-> and of course you can only assign a device to 1 VM at a time.
-
-
-That's useful and convenient for a smoke test, but doesn't account for 
-the (almost 100%) possibility of having a different device address 
-(maybe even a different model of device) on source and destination, or 
-for the need to unbind/rebind vfio-pci and the host net driver.
-
-
-> 
->> Then in order for this to work, libvirt (or OpenStack or oVirt or whoever)
->> needs to understand that the device in the libvirt config (it will still be
->> in the libvirt config, since from libvirt's POV it hasn't been unplugged):
->>
->> 1) shouldn't be included in the qemu commandline on the destination,
->>
->> 2) will almost surely need to be replaced with a different device on the
->> destination (since it's almost certain that the destination won't have an
->> available device at the same PCI address)
->>
->> 3) will probably need to be unbinded from the VF net driver (does this need
->> to happen before migration is finished? If we want to lower the probability
->> of a failure after we're already committed to the migration, then I think we
->> must, but libvirt isn't set up for that in any way).
->>
->> 4) will need to be hotplugged after the migration has finished *and* after
->> the guest CPUs have been restarted on the destination.
->>
->>
->> While it will be possible to assure that there is a destination device, and
->> to replace the old device with new in the config (and maybe, either with
->> some major reworking of device assignment code, or offloading the
->> responsibility to the management application(s), possible to re-bind the
->> device to the vfio-pci driver), prior to marking the migration as
->> "successful" (thus committing to running it on the destination), we can't
->> say as much for actually assigning the device. So if the assignment fails,
->> then what happens?
->>
->>
->> So a few issues I see that will need to be solved by [someone] (apparently
->> either libvirt or management):
->>
->> a) there isn't anything in libvirt's XML grammar that allows us to signify a
->> device that is "present in the config but shouldn't be included in the
->> commandline"
->>
->> b) someone will need to replace the device from the source with an
->> equivalent device on the destination in the libvirt XML. There are other
->> cases of management modifying the XML during migration (I think), but this
->> does point out that putting the "auto-unplug code into qemu isn't turning
->> this into a trivial
->>
->> c) there is nothing in libvirt's migration logic that can cause a device to
->> be re-binded to vfio-pci prior to completion of a migration. Unless this is
->> added to libvirt (or the re-bind operation is passed off to the management
->> application), we will need to live with the possibility that hotplugging the
->> device will fail due to failed re-bind *after* we've committed to the
->> migration.
->>
->> d) once the guest CPUs are restarted on the destination, [someone] (libvirt
->> or management) needs to hotplug the new device on the destination. (I'm
->> guessing that a hotplug can only be done while the guest CPUs are running;
->> correct me if this is wrong!)
->>
->> This sounds like a lot of complexity for something that was supposed to be
->> handled completely/transparently by qemu :-P.
-
+thanks
+-- PMM
 
