@@ -6,48 +6,47 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 720EAC0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 18:08:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1152DC4321A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 18:11:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5490020874
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 18:08:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5490020874
+	by mail.kernel.org (Postfix) with ESMTPS id E3EA120896
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 18:11:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3EA120896
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33572 helo=lists.gnu.org)
+Received: from localhost ([::1]:33598 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1halCQ-0002nE-JQ
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 14:08:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42326)
+	id 1halF8-00058B-44
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 14:11:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42282)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hal6M-0006A4-Jz
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 14:02:32 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hal6K-0005V9-JW
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hal6K-00067r-Ln
  for qemu-devel@nongnu.org; Tue, 11 Jun 2019 14:02:30 -0400
-Received: from relay.sw.ru ([185.231.240.75]:34290)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hal6G-0005QY-Pv
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 14:02:26 -0400
+Received: from relay.sw.ru ([185.231.240.75]:34300)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1hal6E-0005Ir-DX; Tue, 11 Jun 2019 14:02:24 -0400
+ id 1hal6C-0005Is-Bn; Tue, 11 Jun 2019 14:02:20 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1hal66-0002AB-M3; Tue, 11 Jun 2019 21:02:14 +0300
+ id 1hal66-0002AB-9d; Tue, 11 Jun 2019 21:02:14 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Date: Tue, 11 Jun 2019 21:02:09 +0300
-Message-Id: <1560276131-683243-6-git-send-email-andrey.shinkevich@virtuozzo.com>
+Date: Tue, 11 Jun 2019 21:02:08 +0300
+Message-Id: <1560276131-683243-5-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1560276131-683243-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1560276131-683243-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v2 5/7] iotests: extend sleeping time under
- Valgrind
+Subject: [Qemu-devel] [PATCH v2 4/7] iotests: extended timeout under Valgrind
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,31 +65,73 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-To synchronize the time when QEMU is running longer under the Valgrind,
-increase the sleeping time int the test 247.
+As the iotests run longer under the Valgrind, the QEMU_COMM_TIMEOUT is
+to be increased in the test cases 028, 183 and 192 when running under
+the Valgrind.
 
+Suggested-by: Roman Kagan <rkagan@virtuozzo.com>
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- tests/qemu-iotests/247 | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/028 | 6 +++++-
+ tests/qemu-iotests/183 | 9 ++++++++-
+ tests/qemu-iotests/192 | 6 +++++-
+ 3 files changed, 18 insertions(+), 3 deletions(-)
 
-diff --git a/tests/qemu-iotests/247 b/tests/qemu-iotests/247
-index 546a794..1036a17 100755
---- a/tests/qemu-iotests/247
-+++ b/tests/qemu-iotests/247
-@@ -57,7 +57,11 @@ TEST_IMG="$TEST_IMG.4" _make_test_img $size
- {"execute":"block-commit",
-  "arguments":{"device":"format-4", "top-node": "format-2", "base-node":"format-0", "job-id":"job0"}}
- EOF
--sleep 1
+diff --git a/tests/qemu-iotests/028 b/tests/qemu-iotests/028
+index 01f4959..2fd4405 100755
+--- a/tests/qemu-iotests/028
++++ b/tests/qemu-iotests/028
+@@ -110,7 +110,11 @@ echo
+ qemu_comm_method="monitor"
+ _launch_qemu -drive file="${TEST_IMG}",cache=${CACHEMODE},id=disk
+ h=$QEMU_HANDLE
+-QEMU_COMM_TIMEOUT=1
 +if [ "${VALGRIND_QEMU}" == "y" ]; then
-+    sleep 5
++    QEMU_COMM_TIMEOUT=4
 +else
-+    sleep 1
++    QEMU_COMM_TIMEOUT=1
 +fi
- echo '{"execute":"quit"}'
- ) | $QEMU -qmp stdio -nographic -nodefaults \
-     -blockdev file,node-name=file-0,filename=$TEST_IMG.0,auto-read-only=on \
+ 
+ # Silence output since it contains the disk image path and QEMU's readline
+ # character echoing makes it very hard to filter the output. Plus, there
+diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
+index fbe5a99..71feab8 100755
+--- a/tests/qemu-iotests/183
++++ b/tests/qemu-iotests/183
+@@ -94,8 +94,15 @@ if echo "$reply" | grep "compiled without old-style" > /dev/null; then
+     _notrun "migrate -b support not compiled in"
+ fi
+ 
+-QEMU_COMM_TIMEOUT=0.1 qemu_cmd_repeat=50 silent=yes \
++timeout_comm=$QEMU_COMM_TIMEOUT
++if [ "${VALGRIND_QEMU}" == "y" ]; then
++    QEMU_COMM_TIMEOUT=1
++else
++    QEMU_COMM_TIMEOUT=0.1
++fi
++qemu_cmd_repeat=50 silent=yes \
+     _send_qemu_cmd $src "{ 'execute': 'query-migrate' }" '"status": "completed"'
++QEMU_COMM_TIMEOUT=$timeout_comm
+ _send_qemu_cmd $src "{ 'execute': 'query-status' }" "return"
+ 
+ echo
+diff --git a/tests/qemu-iotests/192 b/tests/qemu-iotests/192
+index 6193257..11ea037 100755
+--- a/tests/qemu-iotests/192
++++ b/tests/qemu-iotests/192
+@@ -60,7 +60,11 @@ fi
+ qemu_comm_method="monitor"
+ _launch_qemu -drive $DRIVE_ARG -incoming defer
+ h=$QEMU_HANDLE
+-QEMU_COMM_TIMEOUT=1
++if [ "${VALGRIND_QEMU}" == "y" ]; then
++    QEMU_COMM_TIMEOUT=4
++else
++    QEMU_COMM_TIMEOUT=1
++fi
+ 
+ _send_qemu_cmd $h "nbd_server_start unix:$TEST_DIR/nbd" "(qemu)"
+ _send_qemu_cmd $h "nbd_server_add -w drive0" "(qemu)"
 -- 
 1.8.3.1
 
