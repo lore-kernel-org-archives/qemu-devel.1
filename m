@@ -2,81 +2,64 @@ Return-Path: <SRS0=mXWu=UK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12E5EC4321A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 16:52:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FFBBC4321A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 16:57:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D39442086A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 16:52:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="alkn+XGa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D39442086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7C1242086A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 16:57:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C1242086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32928 helo=lists.gnu.org)
+Received: from localhost ([::1]:32995 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hak0z-0006kL-VV
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 12:52:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41175)
+	id 1hak5s-0001P7-L5
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 12:57:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51655)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hajJn-0006tP-Hu
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 12:08:17 -0400
+ (envelope-from <quintela@redhat.com>) id 1hak2F-0007K7-Lj
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 12:54:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hajJj-0005l3-DK
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 12:08:13 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:46318)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hajJh-0005hL-El
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 12:08:10 -0400
-Received: by mail-ot1-x343.google.com with SMTP id z23so12400324ote.13
- for <qemu-devel@nongnu.org>; Tue, 11 Jun 2019 09:08:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=JR9ZUNk9cSB5ZOSnmOXD6oGGd/boRFK2MnJ/XPOY0Hc=;
- b=alkn+XGaLBAL3V0l2ldlZsrnjhZ+iscwqfKm4Vh9zdKl1RbPqMLM5WsUd1QxGnURQn
- lGVydvjOL/dmSbGtDd5XLxMuOUODCETCWDx0zMBcAF7Vz+RG8cKGBUyA1JKdfRd8cHkm
- Fuf3it+3bcdCVWrDxo9+xYIgvgvkqXftUiy0PUrgiDp+VmvmxUNwvd+tymDmb/il/fF+
- aQ+VDIualH5pMIi9pPg7ItZcJ5xiZyhr6ZkjSZ345C+kNQ/oTZUwNkSx3IdcVB76/kow
- jUCYuf8BglJuLJ4RmKJLrLq4XjslbVQysvV4vQi8G4l7jL8Qzpm4Yli5Tzdft6YBRgNe
- hMcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=JR9ZUNk9cSB5ZOSnmOXD6oGGd/boRFK2MnJ/XPOY0Hc=;
- b=h7P7r6ZhLBnQyLRb4gFFyi+NZYgukzKHVsvBwVMEPIVb0L1FT8ybBUdTaLcHy++C53
- iCDGTfuExr9NhZBi3N5tiFzuB+prCgCThiMHM5sG5dFruCmYpuBhA4HwNuf65XdK9YPv
- y/U4uBoIxCYkBrj/zU6tW0xBzdd5lY/+3/fKmzelfdUWwyO6NusbBGHq7lzXwn9N6nUR
- dVu+6dOt8DCgYk4EUCHlZNclGADlRYHTRIlU3jN3c7xcFI0u1gL2OU4Qa7IZzGMHDafj
- Kd5CiXWYNUoCr6wBQczjjOJctzfvZttUaUujyu4ava+WrzuyWL431jwH/xlYjUwDSqCi
- QPpQ==
-X-Gm-Message-State: APjAAAUndBw4iZedP8ix81qNI6QZklFx6qgqNfpVDdsDHhJVMUdKh98o
- owBdSfmNzFbKCdUqJG7B6dCyq+y0Q0YpGFlnqGT8qg==
-X-Google-Smtp-Source: APXvYqzqXncvZCbkyMz9ft8F0KiMwreIBcKkNltlUjRrobyo39Meaa/kmjNea6VwNoWR33gMWl/k/uWngm2qGqXls1M=
-X-Received: by 2002:a9d:630a:: with SMTP id q10mr98913otk.91.1560269286219;
- Tue, 11 Jun 2019 09:08:06 -0700 (PDT)
+ (envelope-from <quintela@redhat.com>) id 1hajzB-0001qW-4g
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 12:51:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44800)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hajz8-0001Zi-2S
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 12:51:00 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A48EDC18B2EE;
+ Tue, 11 Jun 2019 16:50:34 +0000 (UTC)
+Received: from redhat.com (ovpn-117-129.ams2.redhat.com [10.36.117.129])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 257E95DA99;
+ Tue, 11 Jun 2019 16:50:33 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+In-Reply-To: <20190521030745.GA24543@richard> (Wei Yang's message of "Tue, 21
+ May 2019 11:07:45 +0800")
+References: <20190515121544.4597-1-quintela@redhat.com>
+ <20190515121544.4597-8-quintela@redhat.com>
+ <20190521030745.GA24543@richard>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+Date: Tue, 11 Jun 2019 18:50:31 +0200
+Message-ID: <87o934nk14.fsf@trasno.org>
 MIME-Version: 1.0
-References: <20190607211544.7964-1-ehabkost@redhat.com>
- <CAFEAcA-wCqppsi+gcrTqGjR3bSDOHs5btKKE8oHYxbAUDtu7Fw@mail.gmail.com>
- <CAFEAcA9ZeB1knLYYQLJG0d5McG2vo6w8P9+vOBWgtSVgPEG0jA@mail.gmail.com>
- <20190611160329.GH5927@habkost.net>
-In-Reply-To: <20190611160329.GH5927@habkost.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 11 Jun 2019 17:07:55 +0100
-Message-ID: <CAFEAcA-cv8vPT=7YraioJvW7-WnvGy9YoJXOc_E+UEWUehE+Bg@mail.gmail.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Subject: Re: [Qemu-devel] [PULL 0/8] Python queue, 2019-06-07
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Tue, 11 Jun 2019 16:50:34 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 7/8] multifd: Add zlib compression
+ support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,41 +71,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>
+Reply-To: quintela@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 11 Jun 2019 at 17:03, Eduardo Habkost <ehabkost@redhat.com> wrote:
->
-> On Tue, Jun 11, 2019 at 04:50:34PM +0100, Peter Maydell wrote:
-> > On Mon, 10 Jun 2019 at 13:58, Peter Maydell <peter.maydell@linaro.org> wrote:
-> > > Hi. This fails to build on one of my buildtest machines:
-> > >
-> > > ERROR: Cannot use 'python3', Python 2 >= 2.7 or Python 3 >= 3.5 is required.
-> > >        Use --python=/path/to/python to specify a supported Python.
-> > >
-> > > The machine has python 2.7.6 and 3.4.3. (It's an Ubuntu trusty
-> > > box; it's one of the gcc compile farm machines so upgrades to its
-> > > OS are not really under my control.)
-> >
-> > Rereading this, I realise that either the check or the error
-> > message is wrong here. The machine has 2.7.6, which satisfies
-> > "python 2 >= 2.7", so we should be OK to build. The bug
-> > seems to be that we say "prefer python3 over plain python
-> > on python2" early, but don't revisit that decision if the
-> > python3 we found isn't actually good enough for us.
->
-> Right.  The error message is technically correct, but misleading.
-> python3 is too old, but python2 would work.
->
-> We can make configure not use python3 by default if it's too old,
-> and fall back to python2 in this case.
+Wei Yang <richardw.yang@linux.intel.com> wrote:
+> On Wed, May 15, 2019 at 02:15:43PM +0200, Juan Quintela wrote:
 
-Sounds good. Since I have now managed to get my alternate
-aarch64 box set up, how about I apply this pullreq and you
-send a followup patch which does the fallback to python/python2 ?
+>> 
+>> #define MULTIFD_FLAG_SYNC (1 << 0)
+>>+#define MULTIFD_FLAG_ZLIB (1 << 1)
+>> 
+>
+> If no one use this in this patch, prefer to put it where it will be used.
 
-thanks
--- PMM
+Oops, you are right, I have to use it.
+
+>>@@ -1253,6 +1270,17 @@ int multifd_save_setup(void)
+>>         p->packet = g_malloc0(p->packet_len);
+>>         p->name = g_strdup_printf("multifdsend_%d", i);
+>>         socket_send_channel_create(multifd_new_send_channel_async, p);
+>>+        zs->zalloc = Z_NULL;
+>>+        zs->zfree = Z_NULL;
+>>+        zs->opaque = Z_NULL;
+>
+> Since zlib is not default option, is it better to setup these when zlib is
+> set?
+
+Moved to an opaque void *data pointer, thanks.
+
+>>+        if (deflateInit(zs, migrate_compress_level()) != Z_OK) {
+>>+            printf("deflate init failed\n");
+>>+            return -1;
+>>+        }
+>>+        /* We will never have more than page_count pages */
+>>+        p->zbuff_len = page_count * qemu_target_page_size();
+>>+        p->zbuff_len *= 2;
+>>+        p->zbuff = g_malloc0(p->zbuff_len);
+>>     }
+>>     return 0;
+>> }
+>>@@ -1322,6 +1350,9 @@ int multifd_load_cleanup(Error **errp)
+>>         p->packet_len = 0;
+>>         g_free(p->packet);
+>>         p->packet = NULL;
+>>+        inflateEnd(&p->zs);
+>>+        g_free(p->zbuff);
+>>+        p->zbuff = NULL;
+>>     }
+>>     qemu_sem_destroy(&multifd_recv_state->sem_sync);
+>>     g_free(multifd_recv_state->params);
+>>@@ -1440,6 +1471,7 @@ int multifd_load_setup(void)
+>> 
+>>     for (i = 0; i < thread_count; i++) {
+>>         MultiFDRecvParams *p = &multifd_recv_state->params[i];
+>>+        z_stream *zs = &p->zs;
+>> 
+>>         qemu_mutex_init(&p->mutex);
+>>         qemu_sem_init(&p->sem_sync, 0);
+>>@@ -1449,6 +1481,21 @@ int multifd_load_setup(void)
+>>                       + sizeof(ram_addr_t) * page_count;
+>>         p->packet = g_malloc0(p->packet_len);
+>>         p->name = g_strdup_printf("multifdrecv_%d", i);
+>>+
+>>+        zs->zalloc = Z_NULL;
+>>+        zs->zfree = Z_NULL;
+>>+        zs->opaque = Z_NULL;
+>>+        zs->avail_in = 0;
+>>+        zs->next_in = Z_NULL;
+>>+        if (inflateInit(zs) != Z_OK) {
+>>+            printf("inflate init failed\n");
+>>+            return -1;
+>>+        }
+>>+        /* We will never have more than page_count pages */
+>>+        p->zbuff_len = page_count * qemu_target_page_size();
+>>+        /* We know compression "could" use more space */
+>>+        p->zbuff_len *= 2;
+>>+        p->zbuff = g_malloc0(p->zbuff_len);
+>>     }
+>>     return 0;
+>> }
+>>diff --git a/qapi/migration.json b/qapi/migration.json
+>>index 8ec1944b7a..e6c27fae06 100644
+>>--- a/qapi/migration.json
+>>+++ b/qapi/migration.json
+>>@@ -493,7 +493,7 @@
+>> #
+>> ##
+>> { 'enum': 'MultifdCompress',
+>>-  'data': [ 'none' ] }
+>>+  'data': [ 'none', 'zlib' ] }
+>> 
+>> ##
+>> # @MigrationParameter:
+>>diff --git a/tests/migration-test.c b/tests/migration-test.c
+>>index 8a1ccc2516..2dd4d4c5b4 100644
+>>--- a/tests/migration-test.c
+>>+++ b/tests/migration-test.c
+>>@@ -1119,6 +1119,11 @@ static void test_multifd_tcp_none(void)
+>>     test_multifd_tcp("none");
+>> }
+>> 
+>>+static void test_multifd_tcp_zlib(void)
+>>+{
+>>+    test_multifd_tcp("zlib");
+>>+}
+>>+
+>> int main(int argc, char **argv)
+>> {
+>>     char template[] = "/tmp/migration-test-XXXXXX";
+>>@@ -1174,6 +1179,7 @@ int main(int argc, char **argv)
+>>     /* qtest_add_func("/migration/ignore_shared", test_ignore_shared); */
+>>     qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
+>>     qtest_add_func("/migration/multifd/tcp/none", test_multifd_tcp_none);
+>>+    qtest_add_func("/migration/multifd/tcp/zlib", test_multifd_tcp_zlib);
+>
+> Actually zlib is not enabled at this moment, the test here may not touch the
+> real functionality.
+
+It is, see what the
+
+   test_multifd_tcp("zlib");
+
+line does for:
+
+
+>>     test_multifd_tcp("none");
+>> }
+>> 
+>>+static void test_multifd_tcp_zlib(void)
+>>+{
+>>+    test_multifd_tcp("zlib");
+>>+}
+>>+
+>> int main(int argc, char **argv)
+>> {
+>>     char template[] = "/tmp/migration-test-XXXXXX";
+>>@@ -1174,6 +1179,7 @@ int main(int argc, char **argv)
+>>     /* qtest_add_func("/migration/ignore_shared", test_ignore_shared); */
+>>     qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
+>>     qtest_add_func("/migration/multifd/tcp/none", test_multifd_tcp_none);
+>>+    qtest_add_func("/migration/multifd/tcp/zlib", test_multifd_tcp_zlib);
+>
+> Actually zlib is not enabled at this moment, the test here may not touch the
+> real functionality.
+
+It is, see what the
+
+   test_multifd_tcp("zlib");
+
+line does for:
+
+static void test_multifd_tcp(const char *method)
+{
+    ....
+    migrate_set_parameter_str(from, "multifd-compress", method);
+    migrate_set_parameter_str(to, "multifd-compress", method);
+
+    ...
+}
+
+Thanks, Juan.
 
