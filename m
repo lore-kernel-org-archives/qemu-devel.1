@@ -2,84 +2,87 @@ Return-Path: <SRS0=mXWu=UK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 428B9C43218
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 10:57:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D5A7C43218
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 10:59:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAF7720673
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 10:57:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4733B20673
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 10:59:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d8Pj1LLR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAF7720673
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mZlyf08o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4733B20673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56184 helo=lists.gnu.org)
+Received: from localhost ([::1]:56202 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haeSz-0001X8-GV
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 06:57:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38791)
+	id 1haeUV-0003cx-J0
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 06:58:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38862)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1haePd-0006y8-3Q
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 06:53:59 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1haePg-00073d-U7
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 06:54:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1haePb-00079R-Bn
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 06:53:57 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:35552)
+ (envelope-from <peter.maydell@linaro.org>) id 1haePd-0007Bj-SM
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 06:54:00 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45344)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1haePb-00078D-1x
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 06:53:55 -0400
-Received: by mail-wm1-x343.google.com with SMTP id c6so2403279wml.0
- for <qemu-devel@nongnu.org>; Tue, 11 Jun 2019 03:53:54 -0700 (PDT)
+ id 1haePd-0007Ai-Hv
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 06:53:57 -0400
+Received: by mail-wr1-x442.google.com with SMTP id f9so12455986wre.12
+ for <qemu-devel@nongnu.org>; Tue, 11 Jun 2019 03:53:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=PioQAPu2dEtIJL/ymm8J+Jkq+mHbob2CLgKq2GbqE/E=;
- b=d8Pj1LLRQb1Z58H806WBFbmhQ1DXYQu4dYp3dNzPjJ6msUGNM89gh7381zUrp6kpV4
- PWGq/mGzX/4mKAFCI0sW95BRr6w21KoAPwlymAFS2vholBo8poyOMdx7E1f8Ft82eC23
- R7ClFkk7CDABdcVGQbiByUhT7yfD3vFR0B5dXEGLjHoT2TyX2lftcsjlVRf6/7PwL9KY
- LTzMjy0MVZlACf+mPCxs2qyLZMbzuXqSMsGoPR6k5XSbaAFy3Q2g5tB2EBf3opCAnLYV
- cBSKoKZcLIuSB7Z5MLMasxoIsRIQ0FNNfRqP3GD//d44AodniPipPXKk9FAHa/Kb0BGn
- zosw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=7jqHN827NhY1D5N0LjiHG3QJ6+mHqX+62R3ls5gE3QI=;
+ b=mZlyf08oNQFnE4X7k9kHqzZbDAXgJBcq1qjVUQJa0hLeFg38PRNpGwr1SNQjpZ6WtP
+ c3w6oT7K1gsp7wdTo3oMRIpGgjgDpEFZqnD1BBpSnNNWWF+Byq5q7L0iDqHoqSNcbbIZ
+ p6vLDF8BIt1yQVEv7kuOiY3PJojl2Ud1OoswJuK87ZBF/0s5S7gL6rMI3nJA6HT21/py
+ DjXRQm7idrfExBiOx9nb7UmW0YS0QTuMXtDB8unxftTAiY1PqJr4l3ht4j97mqQV07xI
+ de4paIZflBa9Mv/quvlUaPf4psv+sVsdxJxjmZDt3OiGVbIqyjMvg8TVNp8esCZLjkkA
+ oI6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=PioQAPu2dEtIJL/ymm8J+Jkq+mHbob2CLgKq2GbqE/E=;
- b=FAqqwdzErzZlGgT8cjtSTs7+RynbMv3g8aliCpwec4JLs/d9GIHCTKrrO9pnCFiIuf
- bzNPeXJr5IV5nFoDJVgDECfx8yNhGU0vCkFwwfyw0+DgGugwI2KoEu1em5kGWT6a5bto
- mcYzrPLBWjx10gv0sAsMq8z7133LM+ukKWZY6OPEP15GDtnSt0mglrIEBJ2npoLoMguz
- +KjiDS29zMu1NSF+oqTCOCg8KR+o7O9cN82d3SBjFbngA4mXny8/Lebeej1MovcBqNG1
- bMItWLpnlkhc8BuO95ZSFyLhAp3/ICoxFGcK1SycHTVEHfvxu3eS4LeOFCF8/B4qOeE1
- H2UA==
-X-Gm-Message-State: APjAAAUyM9qg5W9VcGVNEhrbycd5vlihAc9zhYttr4rJqA3qoe3WziBj
- 1YwmRUoPibTvWpOL/S1DSiGqnw==
-X-Google-Smtp-Source: APXvYqxtvyVjTv57i1bVuvabA+IcuVcbBkYTxDJo1Yx5JQFOmvofukVjFFFW9oA8OQSoiQxMzw5+2g==
-X-Received: by 2002:a7b:ce01:: with SMTP id m1mr17044368wmc.1.1560250433350;
- Tue, 11 Jun 2019 03:53:53 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=7jqHN827NhY1D5N0LjiHG3QJ6+mHqX+62R3ls5gE3QI=;
+ b=rV/w4IJI/bQXpwt5r1aNMYdTzmXB8wO1JfnoRTsQvsJSLIu11rT0OsKO1pMwreYPU7
+ FLTCtSpoLPmEgmzy/nLp6pyiiyrvurcp86RYlNrVTVyioRwHSZefBncV0BtIPmHcf84J
+ 7E4XoCLnfNX5VJ++8cLoikeAWxw4eviQBxRIUYIZZykz8nu9y1qZnS0i2GEbcpU6+n/d
+ PNBBzaGUxIbOPtX0TZbZghl6P5n3R19wwbublM1cpZJnct6D3NaqPLZuMGblrEzN4CU9
+ tfoyMJ2eIEWA/YmJKRjRQUBEXHoZIlYh+9eqqpulJzCLT7whxO8Do2V2V5+jX6CFdsrF
+ wXlg==
+X-Gm-Message-State: APjAAAVJ7g+mf1MvG2OkJfTtMfaZcBuNkUhvkH2vLy7VFSElRCVlCPwT
+ aieoXgq0btgg1dTw0ONxtuhuYyOAoEkYmA==
+X-Google-Smtp-Source: APXvYqwS3bEXtwC2stL/JpXGCE8boMowC8iFTXY4SXXaXK2REEWU8a2yvSt56CDL3XnBbcF0VUSVeg==
+X-Received: by 2002:adf:d847:: with SMTP id k7mr19449277wrl.144.1560250436525; 
+ Tue, 11 Jun 2019 03:53:56 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id e17sm10785945wrt.95.2019.06.11.03.53.52
+ by smtp.gmail.com with ESMTPSA id e17sm10785945wrt.95.2019.06.11.03.53.55
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 11 Jun 2019 03:53:52 -0700 (PDT)
+ Tue, 11 Jun 2019 03:53:56 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Tue, 11 Jun 2019 11:53:09 +0100
-Message-Id: <20190611105351.9871-1-peter.maydell@linaro.org>
+Date: Tue, 11 Jun 2019 11:53:12 +0100
+Message-Id: <20190611105351.9871-4-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190611105351.9871-1-peter.maydell@linaro.org>
+References: <20190611105351.9871-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [PATCH v2 00/42] target/arm: Convert VFP decoder to
- decodetree
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PATCH v2 03/42] target/arm: Factor out VFP access
+ checking code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,137 +99,263 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patchset converts the Arm VFP instructions to use decodetree
-instead of the current hand-written decode.
+Factor out the VFP access checking code so that we can use it in the
+leaf functions of the decodetree decoder.
 
-v2 has only very minor changes since v1:
- * patch 33 (VFP comparisons): added missing TCG frees
- * patch 39 (VJCVT): add back missing jscvt feature check
+We call the function full_vfp_access_check() so we can keep
+the more natural vfp_access_check() for a version which doesn't
+have the 'ignore_vfp_enabled' flag -- that way almost all VFP
+insns will be able to use vfp_access_check(s) and only the
+special-register access function will have to use
+full_vfp_access_check(s, ignore_vfp_enabled).
 
-Patch 39 is the only one still in need of review.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/translate-vfp.inc.c | 100 ++++++++++++++++++++++++++++++++
+ target/arm/translate.c         | 101 +++++----------------------------
+ 2 files changed, 113 insertions(+), 88 deletions(-)
 
-
-
-Rest of the cover letter from v1 below, for further context:
-
-We gain:
- * a more maintainable decoder which doesn't live in one big function
- * correct prioritization of UNDEF exceptions against "VFP disabled"
-   exceptions and "M-profile lazy FP stacking" activity
- * significant reduction in the use of the "cpu_F0[sd]" and "cpu_F1[sd]"
-   TCG globals. These are a relic of a much older translator and
-   eventually we should try to get rid of them entirely
- * more accurate decode, UNDEFing some things we were incorrectly lax on
- * a fixed bug for VFP short-vector mixed vector/scalar VMLA/VMLS/VNMLA/VNMLS
-   insns: we were incorrectly corrupting the scalar input operand
-   in the process of performing the multiply-accumulate, so every
-   element after the first was miscalculated
- * a fixed bug in the calculation of the next register number to use
-   when VFP short-vector operations wrapped around the vector bank
- * decode which checks ID registers for "do we have D16-D31" rather
-   than using "is this VFPv3" -- this means that Cortex-M4, -M33 and -R5F
-   all now correctly give the guest only 16 Dregs rather than 31.
-   (Note that the old decoder hides this UNDEF handling inside the
-   VFP_DREG macros...)
- * the fused multiply-add insns now correctly UNDEF for attempts to
-   use them as short-vector operations
- * short-vector functionality is only implemented if the ID registers
-   say it should be (which in practice means "only Cortex-A8 or earlier");
-   we continue to provide it in -cpu max for compatibility
- * VRINTR, VRINTZ and VRINTX are only provided in v8A and above
- * VFP related translation code split out into its own source file
- * the "is this special register present and accessible" check is
-   now consistent between read and write
-
-There is definitely scope for further cleanup:
- * the translate-vfp.inc.c could be further isolated into its
-   own standalone .c file rather than being #included into translate.c
- * cpu_F0* are still used in parts of the Neon decode (and the
-   iwmmxt code, alas)
- * I noticed some places doing a load-and-shift or load-modify-store
-   sequence to update byte or halfword parts of float registers;
-   these could be rewritten to do direct byte or halfword loads/stores
- * we could remove the remaining uses of tcg_gen_ld/st_f32()
-   (in the Neon decode)
-but at 42 patches this is already a pretty hefty patchset, so
-I have deferred those to attack later once this has got in.
-
-On the downside, there are more lines of code here, but some of
-them we'll get back when we finish some of the cleanups noted
-above, some are just copyright-and-license boilerplate, and I
-think the rest are well invested in easier to modify code...
-
-Patch 1 is Richard's recent decodetree script bugfix, which
-is needed for the VFP decode to behave correctly.
-
-Tested with RISU, a mixture of comparison against real Cortex-A7
-and Cortex-A8 and against the old version of QEMU, plus some
-smoke-testing of aarch32 system emulation.
-
-thanks
--- PMM
-
-
-Peter Maydell (41):
-  target/arm: Add stubs for AArch32 VFP decodetree
-  target/arm: Factor out VFP access checking code
-  target/arm: Fix Cortex-R5F MVFR values
-  target/arm: Explicitly enable VFP short-vectors for aarch32 -cpu max
-  target/arm: Convert the VSEL instructions to decodetree
-  target/arm: Convert VMINNM, VMAXNM to decodetree
-  target/arm: Convert VRINTA/VRINTN/VRINTP/VRINTM to decodetree
-  target/arm: Convert VCVTA/VCVTN/VCVTP/VCVTM to decodetree
-  target/arm: Move the VFP trans_* functions to translate-vfp.inc.c
-  target/arm: Add helpers for VFP register loads and stores
-  target/arm: Convert "double-precision" register moves to decodetree
-  target/arm: Convert "single-precision" register moves to decodetree
-  target/arm: Convert VFP two-register transfer insns to decodetree
-  target/arm: Convert VFP VLDR and VSTR to decodetree
-  target/arm: Convert the VFP load/store multiple insns to decodetree
-  target/arm: Remove VLDR/VSTR/VLDM/VSTM use of cpu_F0s and cpu_F0d
-  target/arm: Convert VFP VMLA to decodetree
-  target/arm: Convert VFP VMLS to decodetree
-  target/arm: Convert VFP VNMLS to decodetree
-  target/arm: Convert VFP VNMLA to decodetree
-  target/arm: Convert VMUL to decodetree
-  target/arm: Convert VNMUL to decodetree
-  target/arm: Convert VADD to decodetree
-  target/arm: Convert VSUB to decodetree
-  target/arm: Convert VDIV to decodetree
-  target/arm: Convert VFP fused multiply-add insns to decodetree
-  target/arm: Convert VMOV (imm) to decodetree
-  target/arm: Convert VABS to decodetree
-  target/arm: Convert VNEG to decodetree
-  target/arm: Convert VSQRT to decodetree
-  target/arm: Convert VMOV (register) to decodetree
-  target/arm: Convert VFP comparison insns to decodetree
-  target/arm: Convert the VCVT-from-f16 insns to decodetree
-  target/arm: Convert the VCVT-to-f16 insns to decodetree
-  target/arm: Convert VFP round insns to decodetree
-  target/arm: Convert double-single precision conversion insns to
-    decodetree
-  target/arm: Convert integer-to-float insns to decodetree
-  target/arm: Convert VJCVT to decodetree
-  target/arm: Convert VCVT fp/fixed-point conversion insns to decodetree
-  target/arm: Convert float-to-integer VCVT insns to decodetree
-  target/arm: Fix short-vector increment behaviour
-
-Richard Henderson (1):
-  decodetree: Fix comparison of Field
-
- target/arm/Makefile.objs       |   13 +
- target/arm/cpu.h               |   11 +
- target/arm/cpu.c               |    6 +
- target/arm/translate-vfp.inc.c | 2672 ++++++++++++++++++++++++++++++++
- target/arm/translate.c         | 1503 +-----------------
- scripts/decodetree.py          |    2 +-
- target/arm/vfp-uncond.decode   |   63 +
- target/arm/vfp.decode          |  242 +++
- 8 files changed, 3036 insertions(+), 1476 deletions(-)
- create mode 100644 target/arm/translate-vfp.inc.c
- create mode 100644 target/arm/vfp-uncond.decode
- create mode 100644 target/arm/vfp.decode
-
+diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
+index 3447b3e6466..cf3d7febaa7 100644
+--- a/target/arm/translate-vfp.inc.c
++++ b/target/arm/translate-vfp.inc.c
+@@ -29,3 +29,103 @@
+ /* Include the generated VFP decoder */
+ #include "decode-vfp.inc.c"
+ #include "decode-vfp-uncond.inc.c"
++
++/*
++ * Check that VFP access is enabled. If it is, do the necessary
++ * M-profile lazy-FP handling and then return true.
++ * If not, emit code to generate an appropriate exception and
++ * return false.
++ * The ignore_vfp_enabled argument specifies that we should ignore
++ * whether VFP is enabled via FPEXC[EN]: this should be true for FMXR/FMRX
++ * accesses to FPSID, FPEXC, MVFR0, MVFR1, MVFR2, and false for all other insns.
++ */
++static bool full_vfp_access_check(DisasContext *s, bool ignore_vfp_enabled)
++{
++    if (s->fp_excp_el) {
++        if (arm_dc_feature(s, ARM_FEATURE_M)) {
++            gen_exception_insn(s, 4, EXCP_NOCP, syn_uncategorized(),
++                               s->fp_excp_el);
++        } else {
++            gen_exception_insn(s, 4, EXCP_UDEF,
++                               syn_fp_access_trap(1, 0xe, false),
++                               s->fp_excp_el);
++        }
++        return false;
++    }
++
++    if (!s->vfp_enabled && !ignore_vfp_enabled) {
++        assert(!arm_dc_feature(s, ARM_FEATURE_M));
++        gen_exception_insn(s, 4, EXCP_UDEF, syn_uncategorized(),
++                           default_exception_el(s));
++        return false;
++    }
++
++    if (arm_dc_feature(s, ARM_FEATURE_M)) {
++        /* Handle M-profile lazy FP state mechanics */
++
++        /* Trigger lazy-state preservation if necessary */
++        if (s->v7m_lspact) {
++            /*
++             * Lazy state saving affects external memory and also the NVIC,
++             * so we must mark it as an IO operation for icount.
++             */
++            if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
++                gen_io_start();
++            }
++            gen_helper_v7m_preserve_fp_state(cpu_env);
++            if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
++                gen_io_end();
++            }
++            /*
++             * If the preserve_fp_state helper doesn't throw an exception
++             * then it will clear LSPACT; we don't need to repeat this for
++             * any further FP insns in this TB.
++             */
++            s->v7m_lspact = false;
++        }
++
++        /* Update ownership of FP context: set FPCCR.S to match current state */
++        if (s->v8m_fpccr_s_wrong) {
++            TCGv_i32 tmp;
++
++            tmp = load_cpu_field(v7m.fpccr[M_REG_S]);
++            if (s->v8m_secure) {
++                tcg_gen_ori_i32(tmp, tmp, R_V7M_FPCCR_S_MASK);
++            } else {
++                tcg_gen_andi_i32(tmp, tmp, ~R_V7M_FPCCR_S_MASK);
++            }
++            store_cpu_field(tmp, v7m.fpccr[M_REG_S]);
++            /* Don't need to do this for any further FP insns in this TB */
++            s->v8m_fpccr_s_wrong = false;
++        }
++
++        if (s->v7m_new_fp_ctxt_needed) {
++            /*
++             * Create new FP context by updating CONTROL.FPCA, CONTROL.SFPA
++             * and the FPSCR.
++             */
++            TCGv_i32 control, fpscr;
++            uint32_t bits = R_V7M_CONTROL_FPCA_MASK;
++
++            fpscr = load_cpu_field(v7m.fpdscr[s->v8m_secure]);
++            gen_helper_vfp_set_fpscr(cpu_env, fpscr);
++            tcg_temp_free_i32(fpscr);
++            /*
++             * We don't need to arrange to end the TB, because the only
++             * parts of FPSCR which we cache in the TB flags are the VECLEN
++             * and VECSTRIDE, and those don't exist for M-profile.
++             */
++
++            if (s->v8m_secure) {
++                bits |= R_V7M_CONTROL_SFPA_MASK;
++            }
++            control = load_cpu_field(v7m.control[M_REG_S]);
++            tcg_gen_ori_i32(control, control, bits);
++            store_cpu_field(control, v7m.control[M_REG_S]);
++            /* Don't need to do this for any further FP insns in this TB */
++            s->v7m_new_fp_ctxt_needed = false;
++        }
++    }
++
++    return true;
++}
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index c75d94952de..4ba3f1287ee 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -3373,8 +3373,10 @@ static int disas_vfp_misc_insn(DisasContext *s, uint32_t insn)
+     return 1;
+ }
+ 
+-/* Disassemble a VFP instruction.  Returns nonzero if an error occurred
+-   (ie. an undefined instruction).  */
++/*
++ * Disassemble a VFP instruction.  Returns nonzero if an error occurred
++ * (ie. an undefined instruction).
++ */
+ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+ {
+     uint32_t rd, rn, rm, op, i, n, offset, delta_d, delta_m, bank_mask;
+@@ -3382,6 +3384,7 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+     TCGv_i32 addr;
+     TCGv_i32 tmp;
+     TCGv_i32 tmp2;
++    bool ignore_vfp_enabled = false;
+ 
+     if (!arm_dc_feature(s, ARM_FEATURE_VFP)) {
+         return 1;
+@@ -3403,98 +3406,20 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+         }
+     }
+ 
+-    /* FIXME: this access check should not take precedence over UNDEF
++    /*
++     * FIXME: this access check should not take precedence over UNDEF
+      * for invalid encodings; we will generate incorrect syndrome information
+      * for attempts to execute invalid vfp/neon encodings with FP disabled.
+      */
+-    if (s->fp_excp_el) {
+-        if (arm_dc_feature(s, ARM_FEATURE_M)) {
+-            gen_exception_insn(s, 4, EXCP_NOCP, syn_uncategorized(),
+-                               s->fp_excp_el);
+-        } else {
+-            gen_exception_insn(s, 4, EXCP_UDEF,
+-                               syn_fp_access_trap(1, 0xe, false),
+-                               s->fp_excp_el);
+-        }
+-        return 0;
+-    }
+-
+-    if (!s->vfp_enabled) {
+-        /* VFP disabled.  Only allow fmxr/fmrx to/from some control regs.  */
+-        if ((insn & 0x0fe00fff) != 0x0ee00a10)
+-            return 1;
++    if ((insn & 0x0fe00fff) == 0x0ee00a10) {
+         rn = (insn >> 16) & 0xf;
+-        if (rn != ARM_VFP_FPSID && rn != ARM_VFP_FPEXC && rn != ARM_VFP_MVFR2
+-            && rn != ARM_VFP_MVFR1 && rn != ARM_VFP_MVFR0) {
+-            return 1;
++        if (rn == ARM_VFP_FPSID || rn == ARM_VFP_FPEXC || rn == ARM_VFP_MVFR2
++            || rn == ARM_VFP_MVFR1 || rn == ARM_VFP_MVFR0) {
++            ignore_vfp_enabled = true;
+         }
+     }
+-
+-    if (arm_dc_feature(s, ARM_FEATURE_M)) {
+-        /* Handle M-profile lazy FP state mechanics */
+-
+-        /* Trigger lazy-state preservation if necessary */
+-        if (s->v7m_lspact) {
+-            /*
+-             * Lazy state saving affects external memory and also the NVIC,
+-             * so we must mark it as an IO operation for icount.
+-             */
+-            if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
+-                gen_io_start();
+-            }
+-            gen_helper_v7m_preserve_fp_state(cpu_env);
+-            if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
+-                gen_io_end();
+-            }
+-            /*
+-             * If the preserve_fp_state helper doesn't throw an exception
+-             * then it will clear LSPACT; we don't need to repeat this for
+-             * any further FP insns in this TB.
+-             */
+-            s->v7m_lspact = false;
+-        }
+-
+-        /* Update ownership of FP context: set FPCCR.S to match current state */
+-        if (s->v8m_fpccr_s_wrong) {
+-            TCGv_i32 tmp;
+-
+-            tmp = load_cpu_field(v7m.fpccr[M_REG_S]);
+-            if (s->v8m_secure) {
+-                tcg_gen_ori_i32(tmp, tmp, R_V7M_FPCCR_S_MASK);
+-            } else {
+-                tcg_gen_andi_i32(tmp, tmp, ~R_V7M_FPCCR_S_MASK);
+-            }
+-            store_cpu_field(tmp, v7m.fpccr[M_REG_S]);
+-            /* Don't need to do this for any further FP insns in this TB */
+-            s->v8m_fpccr_s_wrong = false;
+-        }
+-
+-        if (s->v7m_new_fp_ctxt_needed) {
+-            /*
+-             * Create new FP context by updating CONTROL.FPCA, CONTROL.SFPA
+-             * and the FPSCR.
+-             */
+-            TCGv_i32 control, fpscr;
+-            uint32_t bits = R_V7M_CONTROL_FPCA_MASK;
+-
+-            fpscr = load_cpu_field(v7m.fpdscr[s->v8m_secure]);
+-            gen_helper_vfp_set_fpscr(cpu_env, fpscr);
+-            tcg_temp_free_i32(fpscr);
+-            /*
+-             * We don't need to arrange to end the TB, because the only
+-             * parts of FPSCR which we cache in the TB flags are the VECLEN
+-             * and VECSTRIDE, and those don't exist for M-profile.
+-             */
+-
+-            if (s->v8m_secure) {
+-                bits |= R_V7M_CONTROL_SFPA_MASK;
+-            }
+-            control = load_cpu_field(v7m.control[M_REG_S]);
+-            tcg_gen_ori_i32(control, control, bits);
+-            store_cpu_field(control, v7m.control[M_REG_S]);
+-            /* Don't need to do this for any further FP insns in this TB */
+-            s->v7m_new_fp_ctxt_needed = false;
+-        }
++    if (!full_vfp_access_check(s, ignore_vfp_enabled)) {
++        return 0;
+     }
+ 
+     if (extract32(insn, 28, 4) == 0xf) {
 -- 
 2.20.1
 
