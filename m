@@ -2,77 +2,83 @@ Return-Path: <SRS0=mXWu=UK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0475CC43218
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 12:38:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37FF0C4321A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 12:41:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C54EA20896
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 12:38:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E48FD20896
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 12:41:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=euphon.net header.i=fam@euphon.net header.b="LJMSRRgt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C54EA20896
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=euphon.net
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KHzbqU+R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E48FD20896
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57780 helo=lists.gnu.org)
+Received: from localhost ([::1]:57802 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hag2y-0003rP-50
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 08:38:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52684)
+	id 1hag5X-00068D-2t
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 08:41:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52421)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <fam@euphon.net>) id 1hafB1-0007N4-Bn
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:42:57 -0400
+ (envelope-from <rfried.dev@gmail.com>) id 1hafBw-00071Q-2t
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:43:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fam@euphon.net>) id 1haf5H-0007Uy-Hc
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:37:01 -0400
-Received: from sender2-op-o12.zoho.com.cn ([163.53.93.243]:17730
- helo=sender1.zoho.com.cn)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <fam@euphon.net>)
- id 1haf5H-0007P6-6Z; Tue, 11 Jun 2019 07:36:59 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1560252896; cv=none; d=zoho.com.cn; s=zohoarc; 
- b=dxJSID7knp9U3eBWYQH17q954kEGkmICJjXbGBZ4TYgmMAria4hCqWykKKFKykIPacYqOgNUyTtJ15JnhRRfjjxujuyit6OyGhTuCdk2nnIUciloNH9MvxF8lEj0Afhg+4ycIaXpEf/GFnHYIKwvzw26zIcsVCWIRpjwpnjSl9Q=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com.cn;
- s=zohoarc; t=1560252896;
- h=Content-Type:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To:ARC-Authentication-Results;
- bh=x7XCjUnc7dQw9dAYIhA37DqnVnAWh9N0bJfkGXFsKiA=; 
- b=R3QhdYgBrTexxxfJeHsYBJNWg3ow2xMMGTXbzYx3WJbVOaiDL+hQziWR/M8ayiyPYv2g6Rqby1Y9YQkEtYiQ0E8ObdH4PEsPXZZubY3wfsJMm1NJyvoKDmO+sf0FqjPbIBDPGbaAf5MNiInnTE1AmWNzmJvcZGBLlA8It3HBX5s=
-ARC-Authentication-Results: i=1; mx.zoho.com.cn;
- dkim=pass  header.i=euphon.net;
- spf=pass  smtp.mailfrom=fam@euphon.net;
- dmarc=pass header.from=<fam@euphon.net> header.from=<fam@euphon.net>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1560252896; 
- s=zoho; d=euphon.net; i=fam@euphon.net;
- h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:In-Reply-To;
- l=3627; bh=x7XCjUnc7dQw9dAYIhA37DqnVnAWh9N0bJfkGXFsKiA=;
- b=LJMSRRgtjx17bh0AiJam1Ab993/RqGucGbE5TJf5gmMcogn6llLQglzVuvxA+c1D
- 4RgTJgO3zl7PBixonnNARVyJWIfTcmHYP4nOWHV3WGHxC5n6f3ghvcihK6kiWNDQZGE
- daaBDkJ2YBzeEcfiKjEZJfzPNJvAKDjKywxVekao=
-Received: from localhost (120.52.147.40 [120.52.147.40]) by mx.zoho.com.cn
- with SMTPS id 1560252894071543.9879006207103;
- Tue, 11 Jun 2019 19:34:54 +0800 (CST)
-Date: Tue, 11 Jun 2019 19:34:52 +0800
-From: Fam Zheng <fam@euphon.net>
-To: Aarushi Mehta <mehta.aaru20@gmail.com>
-Message-ID: <20190611113452.v6frbexgoyfjzjh7@debian>
-References: <20190610134905.22294-1-mehta.aaru20@gmail.com>
- <20190610134905.22294-10-mehta.aaru20@gmail.com>
+ (envelope-from <rfried.dev@gmail.com>) id 1haewu-00015V-Od
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:28:23 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54611)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <rfried.dev@gmail.com>)
+ id 1haewu-00014N-Ds; Tue, 11 Jun 2019 07:28:20 -0400
+Received: by mail-wm1-x344.google.com with SMTP id g135so2531598wme.4;
+ Tue, 11 Jun 2019 04:28:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=hqXHWwI+6YLDY2XPkJyKYaUQ0K7IV5tHdMlx1gZ34CE=;
+ b=KHzbqU+RBnzQPi6PE8my31XDM7I8tIJQBemibSIqblOb7XDr+6DOUetrc5L36tbyW6
+ 8klmUoylaFObVaPCwsMHtZYXWOxeKXIEsTELmmcBkWbNwdKFM4qpBmQN7wsXU//ByAZE
+ UgU9rPk4iiGqn1Yqjlez+wPyx6cGv2nW5Nd3m9P+IGOhLzlx9opkQMP6hiCFNefdXqgs
+ mjovm9C17WtRyTTal1zWCH7slDKSjzfQnWAY991q7ndVtSlf00ns+ItzClcQf8H2OVWk
+ RSczX1WswMlOvjLDfblSYdB4++fwyWnLNDgmid4ZfjtH/DxKMUVen+PKq6rpNyHdmjKh
+ 3wZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=hqXHWwI+6YLDY2XPkJyKYaUQ0K7IV5tHdMlx1gZ34CE=;
+ b=KcWS/Hvj8952bn9V9SJe+bwHsJX9Kr2NziUVTV/ulKoUTE1tYv8UmJ8ika7yLmoSHS
+ G2eUjT1SUB7rs4LD5Fpj0xJTGmJ9NfHdIMshV7qJJNekABIjInpO6xTQee7US32WembQ
+ PKuFtmZJmjdkFkUCEg1sGr9d+5JoqR1LiAFps8FzpBoi6jZ73U8Komu5wznhqbs+o9ch
+ awmnldqctqdsifSAtX4B389EnRnwHTFm+8fBx5nRZW40kUbChdveoIsAXFF9sA9u+4zP
+ bIVCYwjLo3qSVgOP2N0gWICqGSxbmMXs+JkXkW/BpEg9QQyNrAyezjoTK7FuES3+wQ3P
+ PirA==
+X-Gm-Message-State: APjAAAViWvw2cvnUUwQ/r8aBToNLul3XSIVqsm5a0PHU0JLyNpeHDSs9
+ nemjFcin95UCwK6qlOhnieQGm42QGxCHQp8KQxE=
+X-Google-Smtp-Source: APXvYqxq3qBEh1XBrEoEdjx7lBPjQRngnVvws0JBaghk9Wk7e9ZKCFB1EyFRnmqIz6WMNnQHqBqrtgKPhhZP6oyn+EU=
+X-Received: by 2002:a1c:b782:: with SMTP id h124mr17358696wmf.20.1560252498265; 
+ Tue, 11 Jun 2019 04:28:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190610134905.22294-10-mehta.aaru20@gmail.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
-X-ZohoCNMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 163.53.93.243
-Subject: Re: [Qemu-devel] [PATCH v5 09/12] block: add trace events for
- io_uring
+References: <20190609100837.17586-1-rfried.dev@gmail.com>
+ <04cd3c78-9d8e-8958-1cdf-f65ab7d91dc7@redhat.com>
+In-Reply-To: <04cd3c78-9d8e-8958-1cdf-f65ab7d91dc7@redhat.com>
+From: Ramon Fried <rfried.dev@gmail.com>
+Date: Tue, 11 Jun 2019 14:28:07 +0300
+Message-ID: <CAGi-RUJEwpyzFg3qe18CuR+aO1NXX3O8sUBxKyP1ooncFpcOrA@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH] net: cadence_gem: fix compilation error
+ when debug is on
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,118 +90,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Sergio Lopez <slp@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- saket.sinha89@gmail.com, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- Julia Suvorova <jusual@mail.ru>, Markus Armbruster <armbru@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
+ "open list:Xilinx Zynq" <qemu-arm@nongnu.org>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 06/10 19:19, Aarushi Mehta wrote:
-> Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
-> ---
->  block/io_uring.c   | 14 ++++++++++++--
->  block/trace-events |  8 ++++++++
->  2 files changed, 20 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/io_uring.c b/block/io_uring.c
-> index f327c7ef96..47e027364a 100644
-> --- a/block/io_uring.c
-> +++ b/block/io_uring.c
-> @@ -17,6 +17,7 @@
->  #include "block/raw-aio.h"
->  #include "qemu/coroutine.h"
->  #include "qapi/error.h"
-> +#include "trace.h"
->  
->  #define MAX_EVENTS 128
->  
-> @@ -191,12 +192,15 @@ static int ioq_submit(LuringState *s)
->  
->  void luring_io_plug(BlockDriverState *bs, LuringState *s)
->  {
-> +    trace_luring_io_plug();
->      s->io_q.plugged++;
->  }
->  
->  void luring_io_unplug(BlockDriverState *bs, LuringState *s)
->  {
->      assert(s->io_q.plugged);
-> +    trace_luring_io_unplug(s->io_q.blocked, s->io_q.plugged,
-> +                                 s->io_q.in_queue, s->io_q.in_flight);
->      if (--s->io_q.plugged == 0 &&
->          !s->io_q.blocked && s->io_q.in_queue > 0) {
->          ioq_submit(s);
-> @@ -217,6 +221,7 @@ void luring_io_unplug(BlockDriverState *bs, LuringState *s)
->  static int luring_do_submit(int fd, LuringAIOCB *luringcb, LuringState *s,
->                              uint64_t offset, int type)
->  {
-> +    int ret;
->      struct io_uring_sqe *sqes = io_uring_get_sqe(&s->ring);
->      if (!sqes) {
->          sqes = &luringcb->sqeq;
-> @@ -242,11 +247,14 @@ static int luring_do_submit(int fd, LuringAIOCB *luringcb, LuringState *s,
->      }
->      io_uring_sqe_set_data(sqes, luringcb);
->      s->io_q.in_queue++;
-> -
-> +    trace_luring_do_submit(s->io_q.blocked, s->io_q.plugged,
-> +                           s->io_q.in_queue, s->io_q.in_flight);
->      if (!s->io_q.blocked &&
->          (!s->io_q.plugged ||
->           s->io_q.in_flight + s->io_q.in_queue >= MAX_EVENTS)) {
-> -        return ioq_submit(s);
-> +        ret = ioq_submit(s);
-> +        trace_luring_do_submit_done(ret);
-> +        return ret;
->      }
->      return 0;
->  }
-> @@ -294,6 +302,7 @@ LuringState *luring_init(Error **errp)
->      int rc;
->      LuringState *s;
->      s = g_malloc0(sizeof(*s));
-> +    trace_luring_init_state((void *)s, sizeof(*s));
+On Tue, Jun 11, 2019 at 11:34 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat=
+.com>
+wrote:
 
-The pointer type cast is unnecessary.
+> Hi Ramon,
+>
+> On 6/9/19 12:08 PM, Ramon Fried wrote:
+> > defining CADENCE_GEM_ERR_DEBUG causes compilation
+> > errors, fix that.
+> >
+> > Signed-off-by: Ramon Fried <rfried.dev@gmail.com>
+> > ---
+> >  hw/net/cadence_gem.c | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
+> > index 7f63411430..5cc5a71524 100644
+> > --- a/hw/net/cadence_gem.c
+> > +++ b/hw/net/cadence_gem.c
+> > @@ -982,8 +982,8 @@ static ssize_t gem_receive(NetClientState *nc, cons=
+t
+> uint8_t *buf, size_t size)
+> >              return -1;
+> >          }
+> >
+> > -        DB_PRINT("copy %d bytes to 0x%x\n", MIN(bytes_to_copy,
+> rxbufsize),
+> > -                rx_desc_get_buffer(s->rx_desc[q]));
+> > +        DB_PRINT("copy %d bytes to 0x%lx\n", MIN(bytes_to_copy,
+> rxbufsize),
+> > +                rx_desc_get_buffer(s, s->rx_desc[q]));
+>
+> Your patch fails on 32-bit hosts:
+>
+> ./hw/net/cadence_gem.c:987:18: error: format '%lx' expects argument of
+> type 'long unsigned int', but argument 4 has type 'uint64_t {aka long
+> long unsigned int}' [-Werror=3Dformat=3D]
+>          DB_PRINT("copy %d bytes to 0x%lx\n", MIN(bytes_to_copy,
+> rxbufsize),
+>                   ^
+> ./hw/net/cadence_gem.c:39:24: note: in definition of macro 'DB_PRINT'
+>      fprintf(stderr, ## __VA_ARGS__); \
+>                         ^
+> ./hw/net/cadence_gem.c: In function 'gem_transmit':
+> ./hw/net/cadence_gem.c:1160:26: error: format '%lx' expects argument of
+> type 'long unsigned int', but argument 5 has type 'unsigned int'
+> [-Werror=3Dformat=3D]
+>                  DB_PRINT("TX descriptor @ 0x%x too large: size 0x%x
+> space " \
+>                           ^
+> ./hw/net/cadence_gem.c:39:24: note: in definition of macro 'DB_PRINT'
+>      fprintf(stderr, ## __VA_ARGS__); \
+>                         ^
+> cc1: all warnings being treated as errors
+>
+> QEMU provides "HWADDR_PRIx" format for addresses, see for example few
+> lines earlier:
+>
+>     DB_PRINT("read descriptor 0x%" HWADDR_PRIx "\n", packet_desc_addr);
+>
+>
+> >
+> >          /* Copy packet data to emulated DMA buffer */
+> >          address_space_write(&s->dma_as, rx_desc_get_buffer(s,
+> s->rx_desc[q]) +
+> > @@ -1156,7 +1156,7 @@ static void gem_transmit(CadenceGEMState *s)
+> >              if (tx_desc_get_length(desc) > sizeof(tx_packet) -
+> >                                                 (p - tx_packet)) {
+> >                  DB_PRINT("TX descriptor @ 0x%x too large: size 0x%x
+> space " \
+> > -                         "0x%x\n", (unsigned)packet_desc_addr,
+> > +                         "0x%lx\n", (unsigned)packet_desc_addr,
+>
+> Here the correct format seems to be "%zd" (difference of sizeof).
+>
+> >                           (unsigned)tx_desc_get_length(desc),
+> >                           sizeof(tx_packet) - (p - tx_packet));
+> >                  break;
+> >
+>
+> Nowadays QEMU prefers to move from the old DB_PRINT() macros to the
+> trace events API, see for example this commit:
+>
+>
+> https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dda1804d17a9ed7f060c=
+072fbc4889db5fbc9c7d2;hp=3Da4f667b6714916683408b983cfe0a615a725775f
+>
+> The first line you changed would be replaced by a trace event, while the
+> second could be replaced by a qemu_log_mask() call (it is an error
+> condition).
+>
+> Also I suggest to include "QEMU Trivial <qemu-trivial@nongnu.org>" in
+> the list of recipients, so your patch might get reviewed/merged quicker.
+>
+> Regards,
+>
+> Phil.
+>
 
->      struct io_uring *ring = &s->ring;
->      rc =  io_uring_queue_init(MAX_EVENTS, ring, 0);
->      if (rc < 0) {
-> @@ -311,4 +320,5 @@ void luring_cleanup(LuringState *s)
->  {
->      io_uring_queue_exit(&s->ring);
->      g_free(s);
-> +    trace_luring_cleanup_state();
-
-Pass @s?
-
->  }
-> diff --git a/block/trace-events b/block/trace-events
-> index eab51497fc..c4564dcd96 100644
-> --- a/block/trace-events
-> +++ b/block/trace-events
-> @@ -60,6 +60,14 @@ qmp_block_stream(void *bs, void *job) "bs %p job %p"
->  file_paio_submit(void *acb, void *opaque, int64_t offset, int count, int type) "acb %p opaque %p offset %"PRId64" count %d type %d"
->  file_copy_file_range(void *bs, int src, int64_t src_off, int dst, int64_t dst_off, int64_t bytes, int flags, int64_t ret) "bs %p src_fd %d offset %"PRIu64" dst_fd %d offset %"PRIu64" bytes %"PRIu64" flags %d ret %"PRId64
->  
-> +#io_uring.c
-> +luring_init_state(void *s, size_t size) "s %p size %zu"
-> +luring_cleanup_state(void) "s freed"
-> +disable luring_io_plug(void) "plug"
-> +disable luring_io_unplug(int blocked, int plugged, int queued, int inflight) "blocked %d plugged %d queued %d inflight %d"
-> +disable luring_do_submit(int blocked, int plugged, int queued, int inflight) "blocked %d plugged %d queued %d inflight %d"
-> +disable luring_do_submit_done(int ret) "submitted to kernel %d"
-> +
->  # qcow2.c
->  qcow2_writev_start_req(void *co, int64_t offset, int bytes) "co %p offset 0x%" PRIx64 " bytes %d"
->  qcow2_writev_done_req(void *co, int ret) "co %p ret %d"
-> -- 
-> 2.17.1
-> 
-
-Fam
-
-
+Hi Phil,
+Thanks for the review, I'll send v2 soon.
