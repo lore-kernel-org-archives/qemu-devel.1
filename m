@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 233CFC43218
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 11:50:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F861C4321A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 11:50:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D82D320673
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 11:50:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D82D320673
+	by mail.kernel.org (Postfix) with ESMTPS id 6773F20673
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 11:50:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6773F20673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56658 helo=lists.gnu.org)
+Received: from localhost ([::1]:56660 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hafIW-0005P0-65
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 07:50:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52386)
+	id 1hafId-0005Zx-I2
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 07:50:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52421)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hafA4-0006yr-Uk
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:42:00 -0400
+ (envelope-from <philmd@redhat.com>) id 1hafA2-00071Q-2m
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:41:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1haf6x-0000yb-E1
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:38:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44166)
+ (envelope-from <philmd@redhat.com>) id 1haf7J-0001TC-LC
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:39:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56514)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1haf6x-0000hc-0w
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:38:43 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1haf7H-00014t-Ll
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 07:39:05 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 07C12B2DCE;
- Tue, 11 Jun 2019 11:38:24 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id C34E83082B6B;
+ Tue, 11 Jun 2019 11:38:48 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.205.167])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DE3D960BF1;
- Tue, 11 Jun 2019 11:38:16 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id ECAC860BF1;
+ Tue, 11 Jun 2019 11:38:46 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org,
 	Igor Mammedov <imammedo@redhat.com>
-Date: Tue, 11 Jun 2019 13:37:23 +0200
-Message-Id: <20190611113731.16940-14-philmd@redhat.com>
+Date: Tue, 11 Jun 2019 13:37:31 +0200
+Message-Id: <20190611113731.16940-22-philmd@redhat.com>
 In-Reply-To: <20190611113731.16940-1-philmd@redhat.com>
 References: <20190611113731.16940-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Tue, 11 Jun 2019 11:38:24 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Tue, 11 Jun 2019 11:38:48 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v19 13/21] hw/char: RX62N serial communication
- interface (SCI)
+Subject: [Qemu-devel] [PATCH v19 21/21] BootLinuxConsoleTest: Test the
+ RX-Virt machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,466 +69,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yoshinori Sato <ysato@users.sourceforge.jp>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
+Add two tests for the rx-virt machine, based on the recommended test
+setup from Yoshinori Sato:
+https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03586.html
 
-This module supported only non FIFO type.
-Hardware manual.
-https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh0033=
-ej0140_rx62n.pdf
+- U-Boot prompt
+- Linux kernel with Sash shell
 
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190607091116.49044-8-ysato@users.sourceforge.jp>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+These are very quick tests:
+
+  $ avocado run -t arch:rx tests/acceptance/boot_linux_console.py
+  JOB ID     : 84a6ef01c0b87975ecbfcb31a920afd735753ace
+  JOB LOG    : /home/phil/avocado/job-results/job-2019-05-24T05.02-84a6ef=
+0/job.log
+   (1/2) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_rx_=
+uboot: PASS (0.11 s)
+   (2/2) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_rx_=
+linux: PASS (0.45 s)
+  RESULTS    : PASS 2 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 =
+| CANCEL 0
+
+Tests can also be run with:
+
+  $ avocado --show=3Dconsole run -t arch:rx tests/acceptance/boot_linux_c=
+onsole.py
+  console: U-Boot 2016.05-rc3-23705-ga1ef3c71cb-dirty (Feb 05 2019 - 21:5=
+6:06 +0900)
+  console: Linux version 4.19.0+ (yo-satoh@yo-satoh-debian) (gcc version =
+9.0.0 20181105 (experimental) (GCC)) #137 Wed Feb 20 23:20:02 JST 2019
+  console: Built 1 zonelists, mobility grouping on.  Total pages: 8128
+  ...
+  console: SuperH (H)SCI(F) driver initialized
+  console: 88240.serial: ttySC0 at MMIO 0x88240 (irq =3D 215, base_baud =3D=
+ 0) is a sci
+  console: console [ttySC0] enabled
+  console: 88248.serial: ttySC1 at MMIO 0x88248 (irq =3D 219, base_baud =3D=
+ 0) is a sci
+
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/char/Kconfig               |   3 +
- hw/char/Makefile.objs         |   1 +
- hw/char/renesas_sci.c         | 340 ++++++++++++++++++++++++++++++++++
- include/hw/char/renesas_sci.h |  45 +++++
- 4 files changed, 389 insertions(+)
- create mode 100644 hw/char/renesas_sci.c
- create mode 100644 include/hw/char/renesas_sci.h
+Based-on: 20190517045136.3509-1-richard.henderson@linaro.org
+"RX architecture support"
+---
+ tests/acceptance/boot_linux_console.py | 51 ++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
-diff --git a/hw/char/Kconfig b/hw/char/Kconfig
-index 40e7a8b8bb..874627520c 100644
---- a/hw/char/Kconfig
-+++ b/hw/char/Kconfig
-@@ -46,3 +46,6 @@ config SCLPCONSOLE
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
+ot_linux_console.py
+index d5c500ea30..f68aab1df8 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -45,6 +45,11 @@ class BootLinuxConsole(Test):
+                 fail =3D 'Failure message found in console: %s' % failur=
+e_message
+                 self.fail(fail)
 =20
- config TERMINAL3270
-     bool
++    def exec_command_and_wait_for_pattern(self, command, success_message=
+):
++        command +=3D '\n'
++        self.vm.console_socket.sendall(command.encode())
++        self.wait_for_console_pattern(success_message)
 +
-+config RENESAS_SCI
-+    bool
-diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
-index 02d8a66925..4472d563b5 100644
---- a/hw/char/Makefile.objs
-+++ b/hw/char/Makefile.objs
-@@ -21,6 +21,7 @@ obj-$(CONFIG_PSERIES) +=3D spapr_vty.o
- obj-$(CONFIG_DIGIC) +=3D digic-uart.o
- obj-$(CONFIG_STM32F2XX_USART) +=3D stm32f2xx_usart.o
- obj-$(CONFIG_RASPI) +=3D bcm2835_aux.o
-+obj-$(CONFIG_RENESAS_SCI) +=3D renesas_sci.o
-=20
- common-obj-$(CONFIG_CMSDK_APB_UART) +=3D cmsdk-apb-uart.o
- common-obj-$(CONFIG_ETRAXFS) +=3D etraxfs_ser.o
-diff --git a/hw/char/renesas_sci.c b/hw/char/renesas_sci.c
-new file mode 100644
-index 0000000000..6298cbf43a
---- /dev/null
-+++ b/hw/char/renesas_sci.c
-@@ -0,0 +1,340 @@
-+/*
-+ * Renesas Serial Communication Interface
-+ *
-+ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
-+ * (Rev.1.40 R01UH0033EJ0140)
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
+     def extract_from_deb(self, deb, path):
+         """
+         Extracts a file from a deb package into the test workdir
+@@ -217,3 +222,49 @@ class BootLinuxConsole(Test):
+         self.vm.launch()
+         console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
+ine
+         self.wait_for_console_pattern(console_pattern)
 +
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "qapi/error.h"
-+#include "qemu-common.h"
-+#include "cpu.h"
-+#include "hw/hw.h"
-+#include "hw/sysbus.h"
-+#include "hw/registerfields.h"
-+#include "hw/char/renesas_sci.h"
-+#include "qemu/error-report.h"
++    def test_rx_uboot(self):
++        """
++        :avocado: tags=3Darch:rx
++        :avocado: tags=3Dmachine:rx-virt
++        :avocado: tags=3Dendian:little
++        """
++        uboot_url =3D ('https://acc.dl.osdn.jp/users/23/23888/u-boot.bin=
+.gz')
++        uboot_hash =3D '9b78dbd43b40b2526848c0b1ce9de02c24f4dcdb'
++        uboot_path =3D self.fetch_asset(uboot_url, asset_hash=3Duboot_ha=
+sh)
++        uboot_path =3D archive.uncompress(uboot_path, self.workdir)
 +
-+/* SCI register map */
-+REG8(SMR, 0)
-+  FIELD(SMR, CKS,  0, 2)
-+  FIELD(SMR, MP,   2, 1)
-+  FIELD(SMR, STOP, 3, 1)
-+  FIELD(SMR, PM,   4, 1)
-+  FIELD(SMR, PE,   5, 1)
-+  FIELD(SMR, CHR,  6, 1)
-+  FIELD(SMR, CM,   7, 1)
-+REG8(BRR, 1)
-+REG8(SCR, 2)
-+  FIELD(SCR, CKE, 0, 2)
-+  FIELD(SCR, TEIE, 2, 1)
-+  FIELD(SCR, MPIE, 3, 1)
-+  FIELD(SCR, RE,   4, 1)
-+  FIELD(SCR, TE,   5, 1)
-+  FIELD(SCR, RIE,  6, 1)
-+  FIELD(SCR, TIE,  7, 1)
-+REG8(TDR, 3)
-+REG8(SSR, 4)
-+  FIELD(SSR, MPBT, 0, 1)
-+  FIELD(SSR, MPB,  1, 1)
-+  FIELD(SSR, TEND, 2, 1)
-+  FIELD(SSR, ERR, 3, 3)
-+    FIELD(SSR, PER,  3, 1)
-+    FIELD(SSR, FER,  4, 1)
-+    FIELD(SSR, ORER, 5, 1)
-+  FIELD(SSR, RDRF, 6, 1)
-+  FIELD(SSR, TDRE, 7, 1)
-+REG8(RDR, 5)
-+REG8(SCMR, 6)
-+  FIELD(SCMR, SMIF, 0, 1)
-+  FIELD(SCMR, SINV, 2, 1)
-+  FIELD(SCMR, SDIR, 3, 1)
-+  FIELD(SCMR, BCP2, 7, 1)
-+REG8(SEMR, 7)
-+  FIELD(SEMR, ACS0, 0, 1)
-+  FIELD(SEMR, ABCS, 4, 1)
++        self.vm.set_machine('rx-virt')
++        self.vm.set_console()
++        self.vm.add_args('-bios', uboot_path,
++                         '-no-reboot')
++        self.vm.launch()
++        uboot_version =3D 'U-Boot 2016.05-rc3-23705-ga1ef3c71cb-dirty'
++        self.wait_for_console_pattern(uboot_version)
++        gcc_version =3D 'rx-unknown-linux-gcc (GCC) 9.0.0 20181105 (expe=
+rimental)'
++        # FIXME limit baudrate on chardev, else we type too fast
++        #self.exec_command_and_wait_for_pattern('version', gcc_version)
 +
-+static int can_receive(void *opaque)
-+{
-+    RSCIState *sci =3D RSCI(opaque);
-+    if (sci->rx_next > qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)) {
-+        return 0;
-+    } else {
-+        return FIELD_EX8(sci->scr, SCR, RE);
-+    }
-+}
++    def test_rx_linux(self):
++        """
++        :avocado: tags=3Darch:rx
++        :avocado: tags=3Dmachine:rx-virt
++        :avocado: tags=3Dendian:little
++        """
++        dtb_url =3D ('https://acc.dl.osdn.jp/users/23/23887/rx-qemu.dtb'=
+)
++        dtb_hash =3D '7b4e4e2c71905da44e86ce47adee2210b026ac18'
++        dtb_path =3D self.fetch_asset(dtb_url, asset_hash=3Ddtb_hash)
++        kernel_url =3D ('http://acc.dl.osdn.jp/users/23/23845/zImage')
++        kernel_hash =3D '39a81067f8d72faad90866ddfefa19165d68fc99'
++        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
+_hash)
 +
-+static void receive(void *opaque, const uint8_t *buf, int size)
-+{
-+    RSCIState *sci =3D RSCI(opaque);
-+    sci->rx_next =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime=
-;
-+    if (FIELD_EX8(sci->ssr, SSR, RDRF) || size > 1) {
-+        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, ORER, 1);
-+        if (FIELD_EX8(sci->scr, SCR, RIE)) {
-+            qemu_set_irq(sci->irq[ERI], 1);
-+        }
-+    } else {
-+        sci->rdr =3D buf[0];
-+        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, RDRF, 1);
-+        if (FIELD_EX8(sci->scr, SCR, RIE)) {
-+            qemu_irq_pulse(sci->irq[RXI]);
-+        }
-+    }
-+}
-+
-+static void send_byte(RSCIState *sci)
-+{
-+    if (qemu_chr_fe_backend_connected(&sci->chr)) {
-+        qemu_chr_fe_write_all(&sci->chr, &sci->tdr, 1);
-+    }
-+    timer_mod(sci->timer,
-+              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime);
-+    sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TEND, 0);
-+    sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TDRE, 1);
-+    qemu_set_irq(sci->irq[TEI], 0);
-+    if (FIELD_EX8(sci->scr, SCR, TIE)) {
-+        qemu_irq_pulse(sci->irq[TXI]);
-+    }
-+}
-+
-+static void txend(void *opaque)
-+{
-+    RSCIState *sci =3D RSCI(opaque);
-+    if (!FIELD_EX8(sci->ssr, SSR, TDRE)) {
-+        send_byte(sci);
-+    } else {
-+        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TEND, 1);
-+        if (FIELD_EX8(sci->scr, SCR, TEIE)) {
-+            qemu_set_irq(sci->irq[TEI], 1);
-+        }
-+    }
-+}
-+
-+static void update_trtime(RSCIState *sci)
-+{
-+    /* char per bits */
-+    sci->trtime =3D 8 - FIELD_EX8(sci->smr, SMR, CHR);
-+    sci->trtime +=3D FIELD_EX8(sci->smr, SMR, PE);
-+    sci->trtime +=3D FIELD_EX8(sci->smr, SMR, STOP) + 1;
-+    /* x bit transmit time (32 * divrate * brr) / base freq */
-+    sci->trtime *=3D 32 * sci->brr;
-+    sci->trtime *=3D 1 << (2 * FIELD_EX8(sci->smr, SMR, CKS));
-+    sci->trtime *=3D NANOSECONDS_PER_SECOND;
-+    sci->trtime /=3D sci->input_freq;
-+}
-+
-+#define IS_TR_ENABLED(scr) \
-+    (FIELD_EX8(scr, SCR, TE) || FIELD_EX8(scr, SCR, RE))
-+
-+static void sci_write(void *opaque, hwaddr addr, uint64_t val, unsigned =
-size)
-+{
-+    hwaddr offset =3D addr & 0x07;
-+    RSCIState *sci =3D RSCI(opaque);
-+
-+    switch (offset) {
-+    case A_SMR:
-+        if (!IS_TR_ENABLED(sci->scr)) {
-+            sci->smr =3D val;
-+            update_trtime(sci);
-+        }
-+        break;
-+    case A_BRR:
-+        if (!IS_TR_ENABLED(sci->scr)) {
-+            sci->brr =3D val;
-+            update_trtime(sci);
-+        }
-+        break;
-+    case A_SCR:
-+        sci->scr =3D val;
-+        if (FIELD_EX8(sci->scr, SCR, TE)) {
-+            sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TDRE, 1);
-+            sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TEND, 1);
-+            if (FIELD_EX8(sci->scr, SCR, TIE)) {
-+                qemu_irq_pulse(sci->irq[TXI]);
-+            }
-+        }
-+        if (!FIELD_EX8(sci->scr, SCR, TEIE)) {
-+            qemu_set_irq(sci->irq[TEI], 0);
-+        }
-+        if (!FIELD_EX8(sci->scr, SCR, RIE)) {
-+            qemu_set_irq(sci->irq[ERI], 0);
-+        }
-+        break;
-+    case A_TDR:
-+        sci->tdr =3D val;
-+        if (FIELD_EX8(sci->ssr, SSR, TEND)) {
-+            send_byte(sci);
-+        } else {
-+            sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TDRE, 0);
-+        }
-+        break;
-+    case A_SSR:
-+        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, MPBT,
-+                             FIELD_EX8(val, SSR, MPBT));
-+        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, ERR,
-+                             FIELD_EX8(val, SSR, ERR) & 0x07);
-+        if (FIELD_EX8(sci->read_ssr, SSR, ERR) &&
-+            FIELD_EX8(sci->ssr, SSR, ERR) =3D=3D 0) {
-+            qemu_set_irq(sci->irq[ERI], 0);
-+        }
-+        break;
-+    case A_RDR:
-+        qemu_log_mask(LOG_GUEST_ERROR, "reneas_sci: RDR is read only.\n"=
-);
-+        break;
-+    case A_SCMR:
-+        sci->scmr =3D val; break;
-+    case A_SEMR: /* SEMR */
-+        sci->semr =3D val; break;
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX
-+                      " not implemented\n", offset);
-+    }
-+}
-+
-+static uint64_t sci_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    hwaddr offset =3D addr & 0x07;
-+    RSCIState *sci =3D RSCI(opaque);
-+
-+    switch (offset) {
-+    case A_SMR:
-+        return sci->smr;
-+    case A_BRR:
-+        return sci->brr;
-+    case A_SCR:
-+        return sci->scr;
-+    case A_TDR:
-+        return sci->tdr;
-+    case A_SSR:
-+        sci->read_ssr =3D sci->ssr;
-+        return sci->ssr;
-+    case A_RDR:
-+        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, RDRF, 0);
-+        return sci->rdr;
-+    case A_SCMR:
-+        return sci->scmr;
-+    case A_SEMR:
-+        return sci->semr;
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX
-+                      " not implemented.\n", offset);
-+    }
-+    return UINT64_MAX;
-+}
-+
-+static const MemoryRegionOps sci_ops =3D {
-+    .write =3D sci_write,
-+    .read  =3D sci_read,
-+    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+    .impl =3D {
-+        .max_access_size =3D 1,
-+    },
-+};
-+
-+static void rsci_reset(DeviceState *dev)
-+{
-+    RSCIState *sci =3D RSCI(dev);
-+    sci->smr =3D sci->scr =3D 0x00;
-+    sci->brr =3D 0xff;
-+    sci->tdr =3D 0xff;
-+    sci->rdr =3D 0x00;
-+    sci->ssr =3D 0x84;
-+    sci->scmr =3D 0x00;
-+    sci->semr =3D 0x00;
-+    sci->rx_next =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+}
-+
-+static void sci_event(void *opaque, int event)
-+{
-+    RSCIState *sci =3D RSCI(opaque);
-+    if (event =3D=3D CHR_EVENT_BREAK) {
-+        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, FER, 1);
-+        if (FIELD_EX8(sci->scr, SCR, RIE)) {
-+            qemu_set_irq(sci->irq[ERI], 1);
-+        }
-+    }
-+}
-+
-+static void rsci_realize(DeviceState *dev, Error **errp)
-+{
-+    RSCIState *sci =3D RSCI(dev);
-+
-+    if (sci->input_freq =3D=3D 0) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_sci: input-freq property must be set.");
-+        return;
-+    }
-+    qemu_chr_fe_set_handlers(&sci->chr, can_receive, receive,
-+                             sci_event, NULL, sci, NULL, true);
-+}
-+
-+static void rsci_init(Object *obj)
-+{
-+    SysBusDevice *d =3D SYS_BUS_DEVICE(obj);
-+    RSCIState *sci =3D RSCI(obj);
-+    int i;
-+
-+    memory_region_init_io(&sci->memory, OBJECT(sci), &sci_ops,
-+                          sci, "renesas-sci", 0x8);
-+    sysbus_init_mmio(d, &sci->memory);
-+
-+    for (i =3D 0; i < SCI_NR_IRQ; i++) {
-+        sysbus_init_irq(d, &sci->irq[i]);
-+    }
-+    sci->timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, txend, sci);
-+}
-+
-+static const VMStateDescription vmstate_rcmt =3D {
-+    .name =3D "renesas-sci",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static Property rsci_properties[] =3D {
-+    DEFINE_PROP_UINT64("input-freq", RSCIState, input_freq, 0),
-+    DEFINE_PROP_CHR("chardev", RSCIState, chr),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void rsci_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+
-+    dc->realize =3D rsci_realize;
-+    dc->props =3D rsci_properties;
-+    dc->vmsd =3D &vmstate_rcmt;
-+    dc->reset =3D rsci_reset;
-+}
-+
-+static const TypeInfo rsci_info =3D {
-+    .name       =3D TYPE_RENESAS_SCI,
-+    .parent     =3D TYPE_SYS_BUS_DEVICE,
-+    .instance_size =3D sizeof(RSCIState),
-+    .instance_init =3D rsci_init,
-+    .class_init =3D rsci_class_init,
-+};
-+
-+static void rsci_register_types(void)
-+{
-+    type_register_static(&rsci_info);
-+}
-+
-+type_init(rsci_register_types)
-diff --git a/include/hw/char/renesas_sci.h b/include/hw/char/renesas_sci.=
-h
-new file mode 100644
-index 0000000000..50d1336944
---- /dev/null
-+++ b/include/hw/char/renesas_sci.h
-@@ -0,0 +1,45 @@
-+/*
-+ * Renesas Serial Communication Interface
-+ *
-+ * Copyright (c) 2018 Yoshinori Sato
-+ *
-+ * This code is licensed under the GPL version 2 or later.
-+ *
-+ */
-+
-+#include "chardev/char-fe.h"
-+#include "qemu/timer.h"
-+#include "hw/sysbus.h"
-+
-+#define TYPE_RENESAS_SCI "renesas-sci"
-+#define RSCI(obj) OBJECT_CHECK(RSCIState, (obj), TYPE_RENESAS_SCI)
-+
-+enum {
-+    ERI =3D 0,
-+    RXI =3D 1,
-+    TXI =3D 2,
-+    TEI =3D 3,
-+    SCI_NR_IRQ =3D 4,
-+};
-+
-+typedef struct {
-+    SysBusDevice parent_obj;
-+    MemoryRegion memory;
-+
-+    uint8_t smr;
-+    uint8_t brr;
-+    uint8_t scr;
-+    uint8_t tdr;
-+    uint8_t ssr;
-+    uint8_t rdr;
-+    uint8_t scmr;
-+    uint8_t semr;
-+
-+    uint8_t read_ssr;
-+    int64_t trtime;
-+    int64_t rx_next;
-+    QEMUTimer *timer;
-+    CharBackend chr;
-+    uint64_t input_freq;
-+    qemu_irq irq[SCI_NR_IRQ];
-+} RSCIState;
++        self.vm.set_machine('rx-virt')
++        self.vm.set_console()
++        kernel_command_line =3D self.KERNEL_COMMON_COMMAND_LINE + 'early=
+con'
++        self.vm.add_args('-kernel', kernel_path,
++                         '-dtb', dtb_path,
++                         '-no-reboot')
++        self.vm.launch()
++        self.wait_for_console_pattern('Sash command shell (version 1.1.1=
+)')
++        self.exec_command_and_wait_for_pattern('printenv',
++                                               'TERM=3Dlinux')
 --=20
 2.20.1
 
