@@ -2,68 +2,89 @@ Return-Path: <SRS0=mXWu=UK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8EA5C43218
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 02:58:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29440C43218
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 04:05:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A277C20820
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 02:58:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E9F052089E
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 04:05:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="jeo4JzMG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A277C20820
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=extremeground.com header.i=@extremeground.com header.b="3N+YWKFm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9F052089E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=extremeground.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51542 helo=lists.gnu.org)
+Received: from localhost ([::1]:51700 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haWze-00079O-RJ
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 22:58:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38728)
+	id 1haY2S-0002v5-VX
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 00:05:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50185)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1haWxE-0004VW-6T
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 22:56:09 -0400
+ (envelope-from <gary@extremeground.com>) id 1haY0P-0002Gs-5p
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 00:03:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1haWlZ-00076a-Ml
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 22:44:07 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:50649 helo=ozlabs.org)
+ (envelope-from <gary@extremeground.com>) id 1haXlQ-0002Z3-MO
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 23:48:01 -0400
+Received: from ahs5.r4l.com ([158.69.52.156]:52455)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1haWlW-0006sb-TP; Mon, 10 Jun 2019 22:44:05 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 45NDpK6n4lz9sNT; Tue, 11 Jun 2019 12:43:37 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1560221017;
- bh=5MWNcbdX4c47c3P89F8k+Le5Llb1WY17pgZ6bWfs/qI=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=jeo4JzMGzGR/kfnG4hEAeRLMeDz7Ndl9WDA/hbNuNwKrDOloO79zORthmWs6ZPNHk
- 5gR1UyDFD8DVzjzFh1wn3zQVnYlMdsxBCxUMTj7jE1gWB6uVV+BYskpfeIJXOf7JfR
- F3S0TQZCDTGtC/KIhln2VpOsQTrgTFAtl7qwhngI=
-Date: Tue, 11 Jun 2019 12:43:24 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <20190611024324.GB3998@umbus.fritz.box>
-References: <20190529065017.15149-1-david@gibson.dropbear.id.au>
- <20190529065017.15149-24-david@gibson.dropbear.id.au>
- <31966f5b-d46c-4b86-6852-c949d9f72497@redhat.com>
- <9218989c-c92d-6e7b-71a9-08d511c3a0b3@redhat.com>
- <32a8e668-80f5-1429-58f4-8935c973dd2b@linaro.org>
+ (Exim 4.71) (envelope-from <gary@extremeground.com>)
+ id 1haXlQ-0002Vc-G0
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 23:48:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=extremeground.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+ In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+ :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+ Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+ List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+ bh=+JFdWZBnN5PWuryjHsJDVe7jHlQzglUpTXz1gm5bBPU=; b=3N+YWKFmdFvgjkFAgDZ+B13paK
+ 0Pb399XjS1jRU+ZMRQPQ5NTM618JteFKv+c1vfR31uwgR1kAO4cTblmJZBjNsMHB0jwnWpIRc+80M
+ YrVr68Zl/RPFQRrYFB0vrH+ewLztX0zfnUxW9DfLTg/Glhzq5mWw96YRmUrgFTzVD4yeNzo3bJt+3
+ +p4/v2r6M7kJ/9sWSoeDGn8ol5xWNtNm/j11Z+JYD8DgCXMkifArCU/YjaVloSYY/a9NUAMDZTIwi
+ m/XF3v5z3GtAoHquyBYNn41bBMa6wEcqPSV3nWTLSTawF5aJnwvJ23F1twdPSpAjHpvaPt+l1H4Ka
+ 0GVMAfSQ==;
+Received: from cpeac202ed5e073-cmac202ed5e070.cpe.net.cable.rogers.com
+ ([99.237.87.227]:38962 helo=[192.168.1.20])
+ by ahs5.r4l.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+ (Exim 4.92) (envelope-from <gary@extremeground.com>)
+ id 1haXlJ-0002BO-EU; Mon, 10 Jun 2019 23:47:53 -0400
+To: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+References: <abb7990e-0331-67a4-af92-05276366478c@extremeground.com>
+ <20190610121941.GI14257@stefanha-x1.localdomain>
+ <dc7a70ea-c94f-e975-df44-b0199da698e2@extremeground.com>
+ <ab3e81c2-f0ce-2ef5-bbe7-948a87463b59@extremeground.com>
+ <edf57b3a-660c-0964-2455-9461b9aa2711@redhat.com>
+ <33b31422-1198-783a-cb15-8687a3f30199@extremeground.com>
+ <0cd5c326-4d69-92fd-406d-d9fb8b08ccfc@redhat.com>
+From: Gary Dale <gary@extremeground.com>
+Message-ID: <04663a04-8009-f2c5-bad0-a2a42d6f0549@extremeground.com>
+Date: Mon, 10 Jun 2019 23:47:52 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="wzJLGUyc3ArbnUjN"
-Content-Disposition: inline
-In-Reply-To: <32a8e668-80f5-1429-58f4-8935c973dd2b@linaro.org>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [PULL 23/44] target/ppc: Use vector variable
- shifts for VSL, VSR, VSRA
+In-Reply-To: <0cd5c326-4d69-92fd-406d-d9fb8b08ccfc@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-CA
+X-AntiAbuse: This header was added to track abuse,
+ please include it with any abuse report
+X-AntiAbuse: Primary Hostname - ahs5.r4l.com
+X-AntiAbuse: Original Domain - nongnu.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - extremeground.com
+X-Get-Message-Sender-Via: ahs5.r4l.com: authenticated_id:
+ gary@extremeground.com
+X-Authenticated-Sender: ahs5.r4l.com: gary@extremeground.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 158.69.52.156
+Subject: Re: [Qemu-devel] kvm / virsh snapshot management
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,130 +96,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, peter.maydell@linaro.org,
- qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
- rth@twiddle.net
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, kvm@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 2019-06-10 8:10 p.m., Eric Blake wrote:
+> On 6/10/19 6:00 PM, Gary Dale wrote:
+>
+>>>> Any ideas on what I'm doing wrong?
+>>> Do you know for sure whether you have internal or external snapshots?
+>>> And at this point, your questions are starting to wander more into
+>>> libvirt territory.
+>>>
+>> Yes. I'm using internal snapshots. From your other e-mail, I gather that
+>> the (only) benefit to blockcommit with internal snapshots would be to
+>> reduce the size of the various tables recording changed blocks. Without
+>> a blockcommit, the L1 tables get progressively larger over time since
+>> they record all changes to the base file. Eventually the snapshots could
+>> become larger than the base image if I don't do a blockcommit.
+> Not quite. Blockcommit requires external images. It says to take this
+> image chain:
+>
+> base <- active
+>
+> and change it into this shorter chain:
+>
+> base
+>
+> by moving the cluster from active into base.  There is no such thing as
+> blockcommit on internal snapshots, because you don't have any backing
+> file to push into.
+>
+> With internal snapshots, the longer an L1 table is active, the more
+> clusters you have to change compared to what was the case before the
+> snapshot was created - every time you change an existing cluster, the
+> refcount on the old cluster decreases and the change gets written into a
+> new cluster with refcount 1.  Yes, you can reach the point where there
+> are more clusters with refcount 1 associated with your current L1 table
+> than there are clusters with refcount > 1 that are shared with one or
+> more previous internal snapshots. But they are not recording a change to
+> the base file, rather, they are recording the current state of the file
+> where an internal snapshot says to not forget the old state of the file.
+>   And yes, a qcow2 file with internal snapshots can require more disk
+> space than the amount of space exposed to the guest.  But that's true
+> too with external snapshots (the sum of the space required by all images
+> in the chain may be larger than the space visible to the guest).
 
---wzJLGUyc3ArbnUjN
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 07, 2019 at 09:28:49AM -0500, Richard Henderson wrote:
-> On 6/7/19 9:09 AM, Laurent Vivier wrote:
-> > On 07/06/2019 11:29, Laurent Vivier wrote:
-> >> On 29/05/2019 08:49, David Gibson wrote:
-> >>> From: Richard Henderson <richard.henderson@linaro.org>
-> >>>
-> >>> The gvec expanders take care of masking the shift amount
-> >>> against the element width.
-> >>>
-> >>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> >>> Message-Id: <20190518191430.21686-2-richard.henderson@linaro.org>
-> >>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> >>> ---
-> >>>  target/ppc/helper.h                 | 12 ----------
-> >>>  target/ppc/int_helper.c             | 37 ---------------------------=
---
-> >>>  target/ppc/translate/vmx-impl.inc.c | 24 +++++++++----------
-> >>>  3 files changed, 12 insertions(+), 61 deletions(-)
-> >>
-> >> This patch introduces a regressions
-> >>  with Fedora 29 guest:
-> >>
-> >> - during kernel boot:
-> >>
-> >> [   40.397876] crypto_register_alg 'aes' =3D 0
-> >> [   40.577517] crypto_register_alg 'cbc(aes)' =3D 0
-> >> [   40.743576] crypto_register_alg 'ctr(aes)' =3D 0
-> >> [   41.061379] alg: skcipher: Test 1 failed (invalid result) on encryp=
-tion for p8_aes_xts
-> >> [   41.062054] 00000000: 91 7c f6 9e bd 68 b2 ec 9b 9f e9 a3 ea dd a6 =
-92
-> >> [   41.062163] 00000010: 98 10 35 57 5e dc 36 1e 9a f7 bc ba 39 f2 5c =
-eb
-> >> [   41.062834] crypto_register_alg 'xts(aes)' =3D 0
-> >> [   41.077358] alg: hash: Test 2 failed for p8_ghash
-> >> [   41.077553] 00000000: 5f 89 ab f7 20 57 20 57 20 57 20 57 20 57 20 =
-57
-> >>
-> >> - with libssl:
-> >>
-> >> # curl -o /dev/null https://www.google.com
-> >>   % Total    % Received % Xferd  Average Speed   Time    Time     Time=
-  Current
-> >>                                  Dload  Upload   Total   Spent    Left=
-  Speed
-> >>   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:=
---     0
-> >> curl: (35) error:1408F119:SSL routines:ssl3_get_record:decryption fail=
-ed or bad record mac
-> >>
-> >> [before, this one fails with:
-> >> curl: (35) error:04091068:rsa routines:int_rsa_verify:bad signature ]
-> >>
-> >> If I revert this patch on top of 0d74f3b427 + "target/ppc: Fix lxvw4x,=
- lxvh8x and lxvb16x", all works fine.
-> >>
-> >> Thanks,
-> >> Laurent
-> >>
-> >=20
-> > This seems to fix the problem:
-> >=20
-> > diff --git a/accel/tcg/tcg-runtime-gvec.c b/accel/tcg/tcg-runtime-gvec.c
-> > index 3b6052fe97..6f0709b307 100644
-> > --- a/accel/tcg/tcg-runtime-gvec.c
-> > +++ b/accel/tcg/tcg-runtime-gvec.c
-> > @@ -874,7 +874,7 @@ void HELPER(gvec_sar8v)(void *d, void *a, void *b,
-> > uint32_t desc)
-> >      intptr_t oprsz =3D simd_oprsz(desc);
-> >      intptr_t i;
-> >=20
-> > -    for (i =3D 0; i < oprsz; i +=3D sizeof(vec8)) {
-> > +    for (i =3D 0; i < oprsz; i +=3D sizeof(uint8_t)) {
-> >          uint8_t sh =3D *(uint8_t *)(b + i) & 7;
-> >          *(int8_t *)(d + i) =3D *(int8_t *)(a + i) >> sh;
-> >      }
->=20
-> Grr.  I really really need to come up with a solution for testing that al=
-lows
-> me to test paths that the host cpu would not ordinarily take.  This bug is
-> hidden on a host with AVX2.
->=20
-> Thanks for the digging.
+OK. I think I'm getting it now. Thanks for your help. I just wish there 
+was some consistent documentation that explained all this. The Red Hat 
+stuff seems to assume that you understand it only applies to external 
+snapshots and the virsh man page seems to do the same.
 
-Can one of you send this fix formally with a S-o-b and so forth?
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---wzJLGUyc3ArbnUjN
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlz/FUwACgkQbDjKyiDZ
-s5JW9A/+PKC5rlZY8E5E/xIUry6mRvH0JxAKnmIgS5isjR+YqBSrZmeN6UcAJOyK
-cZQUHyTECxshnzrnk4wj5Qeu4ovF+bqUsuO1cBxjFBesJeA5Qj3zIP79LYCRi+Nk
-6z68S9cudKofyvyIl4EV+C5u8i3upSea7d3/A8XjkVansPv1htpcJLD1IKISacjv
-gIGeg0cGCG0/6KbyyCdA2if+jgBdxB+C1q454g57cO84Zhq2/UQapOwDh0+RO7nL
-9TT9I3B/Cu8aG426YW2MGCu0MPqR0metgfBiC8kPKysRsN8xeZu5syfFa0Uge5no
-G2vheBZgmDNZ4neS3lKzchdDLTqP1JFXqHK6tx0p+h5xNX6GhIpPW0ks9HSdGg3c
-3P3lcHKy9c1E6MSaCYRvjPOTzO5uAVhRve8WAC2TkxiGBYhmkwLzTJQix+m5uoLU
-mht5eYw1+2Uvl34xZ6VFGPC5t/BrxJumpRtqUT5YM6i2KSLMV8CwTsw+6jJvoe5w
-UX2k1LPDN+AnvW/UYDa4pQocyCBibtks+U7XcVUCWe6V05XaoVDvllB1zLqdSH1i
-scMamqRp0g/NDS+Jv8ejB5o3AuKSMcJXPJCCacwnA/RwmvZ3ylHFuD7Knr6doT/K
-YDQiEMdG8lgqibJJ5r6bP2eVmll+aZC2ypm7KOmpoaP04fEB/Q0=
-=Hlvw
------END PGP SIGNATURE-----
-
---wzJLGUyc3ArbnUjN--
 
