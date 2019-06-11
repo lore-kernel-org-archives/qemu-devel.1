@@ -2,88 +2,92 @@ Return-Path: <SRS0=mXWu=UK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 844C5C43218
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 14:45:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 212B4C43218
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 14:48:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40C192054F
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 14:45:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E20462054F
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 14:48:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UqguzFvc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40C192054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Tqj4ZA9Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E20462054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59816 helo=lists.gnu.org)
+Received: from localhost ([::1]:59830 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hai28-0003jD-W4
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 10:45:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41314)
+	id 1hai4B-0005DS-66
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 10:48:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43426)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hahp7-00039h-FC
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:32:31 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hahwI-00080X-Fd
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:39:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hahp5-0004sj-9H
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:32:29 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:38505)
+ (envelope-from <richard.henderson@linaro.org>) id 1hahwH-0001mN-3l
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:39:54 -0400
+Received: from mail-pg1-x529.google.com ([2607:f8b0:4864:20::529]:37898)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1hahp3-0004oD-VK
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:32:26 -0400
-Received: by mail-ot1-x343.google.com with SMTP id d17so12075532oth.5
- for <qemu-devel@nongnu.org>; Tue, 11 Jun 2019 07:32:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=UlL5IyrygXOxk0kK9k8R7NDCDe9aBG9SJ+YHveIeAUs=;
- b=UqguzFvcRNhYlfRhFgB4ulNQ7PVhnJ7yTX3aKxZdyhHA3Ne7HlVgXV6pw+pxtpCB2a
- LQbvS0/yvHNmI3kRi4KYAPOAoByFnwV+Orp0oq+TrHjlAd9B+Tw9W6gPewn42K0Bs7zX
- dgeu4+p6hV4WWBd8EJnzHhNGMyOeZyl80bsmP15R+K+RaETSyjs+ShEeqUOJt3FYaV+9
- OJ98QZGh0R0tdD11cQsKcK3WkR10ZbO+LgJGFuvhqVMkzyluTo6XjGDycFdLpqIVVCsL
- nEYfcU1v+YnOpqelM4rc6AXHDN9i7OXmal7Toj50XurGD+A5d4RfNPj0h6VbdxvHudrY
- RSYQ==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hahwG-0001lL-RV
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:39:53 -0400
+Received: by mail-pg1-x529.google.com with SMTP id v11so7087159pgl.5
+ for <qemu-devel@nongnu.org>; Tue, 11 Jun 2019 07:39:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=6+NSggAW1jVndYD5uuYezxOAeEX1TiyYYrXZXZBN1Q4=;
+ b=Tqj4ZA9ZyRsYcne91rdsX86iN2/PUxXYVYKf3Hl1LaKsNMpOAX/OsoJbfHqNZr9uZy
+ VP8gPqf90ZnogAuc36gsKTbMKBMzW97G+TqBnFyns8Gqv5U87OPHrMNHkTlqOg7JQYZZ
+ XJlF+D2CkD8/fRq2wfw/LCUiDd9TQajX8AUpLcFqbB7UUfaeU00Vuhxo3087jlhGUY7A
+ fhtp/bpS1HmoUTQb1wAWrvEUfUAR0c6zAdSqBlTsE8mvr8dMMkCv9XHwzEtIOo3KmbJa
+ zdciHWpYCPrQeTQQamZ3EuMoDwPCV8G1Z6mqIteuV9KibLroQmxupJiLxyfBS/DB1+zS
+ Xmcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=UlL5IyrygXOxk0kK9k8R7NDCDe9aBG9SJ+YHveIeAUs=;
- b=eybamjOnTq6WxtBNs4mmE6GSYe1s8Pv8tYtaGfswQP+tKIaTJRcQcGpo5Dz+NL3IAV
- 6C+w+CgvQlYqfNYY6c2CQTszjanphb2Prakce87/JQzT+JlAqAFtIzSn+9xbwJe0UYrE
- /jviGGNMUA9auw4ifZRgiimHSy+m8clVDBLjk8BJhVEElnhP5vKdGpp9/hMowq8nT2Vc
- MZII8bYoHZlLkH0MTMsMPqrgzNIK+HF5XrdgtkYkZmFeuhdP+6HDK63NKaLAnZ/Umzvm
- A3sLZKiokptA/PoKl7JAL5+qGt/qugrWlQYjpCxKsvsq65rPufd3bng+vmxKQwsVEJXH
- dbpg==
-X-Gm-Message-State: APjAAAWQj7U2uLDmSsQ7xumUn/6e6a7/SR45Z3w1xusnR5jY0N/o9QJJ
- KySovksh3kUozZhZA3l5d8t/QSp4mQvCy1ZTOuI=
-X-Google-Smtp-Source: APXvYqwcm60hQB3bmDyQixBQsDd5fnC9eFKAMZRZ8aj2D69x2HhwqCQtUksrO4hJNaqDGfx+06PAp/8fC0L1Gv166Rc=
-X-Received: by 2002:a9d:6e8a:: with SMTP id a10mr16757743otr.295.1560263539000; 
- Tue, 11 Jun 2019 07:32:19 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=6+NSggAW1jVndYD5uuYezxOAeEX1TiyYYrXZXZBN1Q4=;
+ b=blIUN007jtMJ38WKCPg37EZRF9BzTUug02eIA0Vj+6hVtldmH2Utig112TXDmneBfU
+ oVP79NW1t3oRJddkWMyq5U/yrnoD2rj1qizgJW6hJG4PcFtd87Ejydmp4m2c+/Six8vJ
+ JzuMYkdtj/KevckPHJIAuO1hfgMQ7ffc1F/zzX2K8tEbHpEiRlcaIfAOqbh7ST+uq431
+ caUFgDf7cUZ8OomnAxki37+Lo3CqVPiag3tb9LSrAYPEPhDn9QnYUSAX9U/5XrfMBPlL
+ hgO2vXHKewRMxODzPMRW/b7ccEo+q6j3JnRc3PpAJDfzqYmt0qEBcP6ipnBKgcgULSjU
+ pfrA==
+X-Gm-Message-State: APjAAAVT79I2Mw12srJnv9qKqm25DgAZBeYER5UPVSU1B7nvFT6wb7lb
+ hpZw7Zt9GzMl9tmdwNh3Sf5MZA==
+X-Google-Smtp-Source: APXvYqyf6M+b0vPY1ybMbVSYDvojTBZWbpFRZGvINLzw0IUk6RccQXDWY+D+trKxiQEomrDJhHC+6w==
+X-Received: by 2002:a63:b547:: with SMTP id u7mr21118180pgo.322.1560263991153; 
+ Tue, 11 Jun 2019 07:39:51 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
+ by smtp.gmail.com with ESMTPSA id
+ 16sm13910243pfo.65.2019.06.11.07.39.50
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 11 Jun 2019 07:39:50 -0700 (PDT)
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20190610014249.7346-1-richard.henderson@linaro.org>
+ <dc37189b-d810-25c3-b19a-486f1a3d5abd@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <3a74f1fc-4912-3507-b68a-ee6e782bf4a9@linaro.org>
+Date: Tue, 11 Jun 2019 07:39:48 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Received: by 2002:a9d:20e4:0:0:0:0:0 with HTTP; Tue, 11 Jun 2019 07:32:18
- -0700 (PDT)
-Received: by 2002:a9d:20e4:0:0:0:0:0 with HTTP; Tue, 11 Jun 2019 07:32:18
- -0700 (PDT)
-In-Reply-To: <CAL1e-=ixiJhZBix-trQNJAG-X=ujp+35aOa9fYmhzXRwLwYYLA@mail.gmail.com>
-References: <1560196150-30436-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <20190610232059.GA30549@localhost.localdomain>
- <CAL1e-=ixiJhZBix-trQNJAG-X=ujp+35aOa9fYmhzXRwLwYYLA@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 11 Jun 2019 16:32:18 +0200
-Message-ID: <CAL1e-=jT-wYCuVc7hWa27v=2skrVC5XeraLyddjaDvEebZnnHA@mail.gmail.com>
-To: Cleber Rosa <crosa@redhat.com>
+In-Reply-To: <dc37189b-d810-25c3-b19a-486f1a3d5abd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH] tests/acceptance: Improve failure
- reporting in linux_ssh_mips_malta.py
+X-Received-From: 2607:f8b0:4864:20::529
+Subject: Re: [Qemu-devel] [PATCH] tests/tcg/s390x: Fix alignment of csst
+ parameter list
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,160 +99,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, f4bug@amsat.org,
- qemu-devel@nongnu.org, amarkovic@wavecomp.com, ehabkost@redhat.com
+Cc: cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Jun 11, 2019 8:00 AM, "Aleksandar Markovic" <aleksandar.m.mail@gmail.com=
->
-wrote:
->
->
-> On Jun 11, 2019 1:24 AM, "Cleber Rosa" <crosa@redhat.com> wrote:
-> >
-> > On Mon, Jun 10, 2019 at 09:49:10PM +0200, Aleksandar Markovic wrote:
-> > > From: Aleksandar Markovic <amarkovic@wavecomp.com>
-> > >
-> > > Rather than optputing a cryptic message:
-> > >
-> > > FAIL: True not found in [False],
-> > >
-> > > the following will be reported too, if the command output does not
-meet
-> > > specified expectations:
-> > >
-> > > 'lspci -d 11ab:4620' output doesn't contain the word 'GT-64120'
-> > >
-> > > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> > > ---
-> > >  tests/acceptance/linux_ssh_mips_malta.py | 21 ++++++++++++++-------
-> > >  1 file changed, 14 insertions(+), 7 deletions(-)
-> > >
-> > > diff --git a/tests/acceptance/linux_ssh_mips_malta.py
-b/tests/acceptance/linux_ssh_mips_malta.py
-> > > index aafb0c3..cbf1b34 100644
-> > > --- a/tests/acceptance/linux_ssh_mips_malta.py
-> > > +++ b/tests/acceptance/linux_ssh_mips_malta.py
-> > > @@ -147,20 +147,27 @@ class LinuxSSH(Test):
-> > >
-> > >      def run_common_commands(self):
-> > >          stdout, stderr =3D self.ssh_command('lspci -d 11ab:4620')
-> > > -        self.assertIn(True, ["GT-64120" in line for line in stdout])
-> > > +        self.assertIn(True, ["GT-64120a" in line for line in stdout]=
-,
-> >
-> > Looks like there's an extra, unintended, "a" in the expected output,
-that is,
-> > s/GT-64120a/GT-64120/.
-> >
-> > > +                      "'lspci -d 11ab:4620' output doesn't contain "
-> > > +                      "the word 'GT-64120'")
-> > >
-> > >          stdout, stderr =3D self.ssh_command('cat
-/sys/bus/i2c/devices/i2c-0/name')
-> > > -        self.assertIn(True, ["SMBus PIIX4 adapter" in line
-> > > -                             for line in stdout])
-> > > +        self.assertIn(True, ["SMBus PIIX4 adaptera" in line
-> >
-> > Here too (s/adaptera/adapter/).
-> >
-> > > +                             for line in stdout],
-> > > +                      "cat /sys/bus/i2c/devices/i2c-0/name' doesn't
-contain "
-> > > +                      "the words 'SMBus PIIX4 adapter'")
-> > >
-> > >          stdout, stderr =3D self.ssh_command('cat /proc/mtd')
-> > > -        self.assertIn(True, ["YAMON" in line
-> > > -                             for line in stdout])
-> > > +        self.assertIn(True, ["YAMONa" in line
-> >
-> > Also here (s/YAMONa/YAMONa/).
-> >
-> > > +                             for line in stdout],
-> > > +                      "'cat /proc/mtd' doesn't contain the word
-'YAMON'")
-> > >
-> > >          # Empty 'Board Config'
-> > >          stdout, stderr =3D self.ssh_command('md5sum /dev/mtd2ro')
-> > > -        self.assertIn(True, ["0dfbe8aa4c20b52e1b8bf3cb6cbdf193" in
-line
-> > > -                             for line in stdout])
-> > > +        self.assertIn(True, ["0dfbe8aa4c20b52e1b8bf3cb6cbdf193a" in
-line
-> > > +                             for line in stdout],
-> >
-> > And finnaly in the hash
-(s/0dfbe8aa4c20b52e1b8bf3cb6cbdf193a/0dfbe8aa4c20b52e1b8bf3cb6cbdf193/).
-> >
-> > > +                      "'md5sum /dev/mtd2ro' doesn't contain "
-> > > +                      "the word '0dfbe8aa4c20b52e1b8bf3cb6cbdf193'")
-> > >
-> > >      def do_test_mips_malta(self, endianess, kernel_path, uname_m):
-> > >          self.boot_debian_wheezy_image_and_ssh_login(endianess,
-kernel_path)
-> > > --
-> > > 2.7.4
-> > >
-> > >
-> >
-> > With those changes, the tests pass for me.  I'd recommend though:
-> >
-> > 1) Not related to your patch, but it's good practice to name unused
-> >    variables "_", that is:
-> >
-> >    stdout, _ =3D self.ssh_command('lspci -d 11ab:4620')
-> >
-> > 2) Avoid repeating the expected content (which lead to the trailing
-> >    "a"s in this patch).  Something like:
-> >
-> >    cmd =3D 'lspci -d 11ab:4620'
-> >    stdout, _ =3D self.ssh_command(cmd)
-> >    exp =3D "GT-64120"
-> >    self.assertIn(True, [exp in line for line in stdout],
-> >                  '"%s" output does not contain "%s"' % (cmd, exp))
-> >
-> > 3) Optionally, create an utility function that would make the check
-> >    more obvious and avoid looping through all lines of the output
-> >    (and creating a list, which a list comprehension will do).  Example:
-> >
-> >    def ssh_command_output_contains(self, cmd, exp):
-> >        stdout, _ =3D self.ssh_command(cmd)
-> >        for line in stdout:
-> >            if exp in line:
-> >                break
-> >        else:
-> >            self.fail('"%s" output does not contain "%s"' % (cmd, exp))
-> >
-> >     def run_common_commands(self):
-> >         self.ssh_command_output_contains('lspci -d 11ab:4620',
-'GT-64120')
-> >         self.ssh_command_output_contains('cat
-/sys/bus/i2c/devices/i2c-0/name',
-> >                                          'SMBus PIIX4 adapter')
-> >         self.ssh_command_output_contains('cat /proc/mtd', 'YAMON')
-> >         # Empty 'Board Config'
-> >         self.ssh_command_output_contains('md5sum /dev/mtd2ro',
-> >
- '0dfbe8aa4c20b52e1b8bf3cb6cbdf193')
-> >
->
-> Thank you for your review, Cleber! I am almost certain that in v2 (that I
-am going to send soon), I will adopt the approach from point =E2=80=9C3=E2=
-=80=9D of your
-mail.
->
-> Yours,
-> Aleksandar
->
-> > Cheers,
-> > - Cleber.
-> >
+On 6/11/19 6:06 AM, David Hildenbrand wrote:
+> Queuing it to
+> 
+> https://github.com/davidhildenbrand/qemu.git s390-tcg-next
+> 
+> for now. Let me know if you want to send this via a different PULL
+> request yourself.
 
-Trailing =E2=80=9Ca=E2=80=9Ds are just leftover of my testing the script (f=
-orcing it to
-report failures), and it is good that you spotted them, but they will
-disappear in v2.
+No, that's perfect, thanks.
 
-Thanks, Aleksandar
+
+r~
+
