@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	T_HK_NAME_DR,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE720C4321A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 17:56:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0A57C4321A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 18:02:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA9AC2086D
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 17:56:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA9AC2086D
+	by mail.kernel.org (Postfix) with ESMTPS id BD3C820896
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 18:02:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD3C820896
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33490 helo=lists.gnu.org)
+Received: from localhost ([::1]:33526 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hal0G-0001r6-EK
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 13:56:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38946)
+	id 1hal5y-0005gy-OD
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 14:02:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41362)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hakub-0006AG-Ev
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 13:50:23 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hal3f-0004tm-C8
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 13:59:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hakuY-0005Yo-J1
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 13:50:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41512)
+ (envelope-from <dgilbert@redhat.com>) id 1hal3b-0003RU-Un
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 13:59:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41390)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hakuY-0005P8-Ah
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 13:50:18 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hal3b-0003QE-LF
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 13:59:39 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2712130BBE84;
- Tue, 11 Jun 2019 17:49:59 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1F9CDC04BD4A;
+ Tue, 11 Jun 2019 17:59:31 +0000 (UTC)
 Received: from work-vm (unknown [10.36.118.33])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3122A5DEF9;
- Tue, 11 Jun 2019 17:49:56 +0000 (UTC)
-Date: Tue, 11 Jun 2019 18:49:54 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0820E19C70;
+ Tue, 11 Jun 2019 17:59:28 +0000 (UTC)
+Date: Tue, 11 Jun 2019 18:59:26 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 To: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190611174954.GI2777@work-vm>
+Message-ID: <20190611175926.GJ2777@work-vm>
 References: <20190610030852.16039-1-richardw.yang@linux.intel.com>
- <20190610030852.16039-2-richardw.yang@linux.intel.com>
+ <20190610030852.16039-3-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190610030852.16039-2-richardw.yang@linux.intel.com>
+In-Reply-To: <20190610030852.16039-3-richardw.yang@linux.intel.com>
 User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Tue, 11 Jun 2019 17:49:59 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Tue, 11 Jun 2019 17:59:36 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] cutils: remove one unnecessary pointer
- operation
+Subject: Re: [Qemu-devel] [PATCH 2/2] migration/xbzrle: make
+ xbzrle_encode_buffer little easier to read
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,58 +76,217 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 * Wei Yang (richardw.yang@linux.intel.com) wrote:
-> Since we will not operate on the next address pointed by out, it is not
-> necessary to do addition on it.
+> The encoding process could be described below:
 > 
-> After removing the operation, the function size reduced 16/18 bytes.
-
-For me with a -O3 it didn't make any difference - the compiler was
-already smart enough to spot it, but it is correct.
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
+>     for [content]
+>         get length of a run
+>         encode this run
+> 
+> By refactoring the code with this logic, it maybe a little easier to
+> understand.
+> 
 > Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 > ---
->  util/cutils.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  migration/xbzrle.c | 153 +++++++++++++++++++++------------------------
+>  1 file changed, 73 insertions(+), 80 deletions(-)
 > 
-> diff --git a/util/cutils.c b/util/cutils.c
-> index 9aacc422ca..1933a68da5 100644
-> --- a/util/cutils.c
-> +++ b/util/cutils.c
-> @@ -754,11 +754,11 @@ int uleb128_encode_small(uint8_t *out, uint32_t n)
+> diff --git a/migration/xbzrle.c b/migration/xbzrle.c
+> index 1ba482ded9..25c69708ec 100644
+> --- a/migration/xbzrle.c
+> +++ b/migration/xbzrle.c
+> @@ -14,6 +14,59 @@
+>  #include "qemu/cutils.h"
+>  #include "xbzrle.h"
+>  
+> +static int next_run(uint8_t *old_buf, uint8_t *new_buf, int off, int slen,
+> +                    bool zrun)
+> +{
+> +    uint32_t len = 0;
+> +    long res;
+> +
+> +    res = (slen - off) % sizeof(long);
+> +
+> +    /* first unaligned bytes */
+> +    while (res) {
+> +        uint8_t xor = old_buf[off + len] ^ new_buf[off + len];
+> +
+> +        if (!(zrun ^ !!xor)) {
+> +            break;
+> +        }
+> +        len++;
+> +        res--;
+> +    }
+> +
+> +    if (res) {
+> +        return len;
+> +    }
+> +
+> +    /* word at a time for speed, use of 32-bit long okay */
+> +    while (off + len < slen) {
+> +        /* truncation to 32-bit long okay */
+> +        unsigned long mask = (unsigned long)0x0101010101010101ULL;
+> +        long xor = (*(long *)(old_buf + off + len)) ^
+> +                   (*(long *)(new_buf + off + len));
+> +
+> +        if (zrun && !(zrun ^ !!xor)) {
+
+Are lines like this really making it easier to read?
+
+Juan: Opinion?
+
+Dave
+
+> +            break;
+> +        } else if (!zrun && ((xor - mask) & ~xor & (mask << 7))) {
+
+
+> +            break;
+> +        }
+> +
+> +        len += sizeof(long);
+> +    }
+> +
+> +    /* go over the rest */
+> +    while (off + len < slen) {
+> +        uint8_t xor = old_buf[off + len] ^ new_buf[off + len];
+> +
+> +        if (!(zrun ^ !!xor)) {
+> +            break;
+> +        }
+> +
+> +        len++;
+> +    }
+> +
+> +    return len;
+> +}
+> +
+>  /*
+>    page = zrun nzrun
+>         | zrun nzrun page
+> @@ -27,103 +80,43 @@
+>  int xbzrle_encode_buffer(uint8_t *old_buf, uint8_t *new_buf, int slen,
+>                           uint8_t *dst, int dlen)
 >  {
->      g_assert(n <= 0x3fff);
->      if (n < 0x80) {
-> -        *out++ = n;
-> +        *out = n;
->          return 1;
->      } else {
->          *out++ = (n & 0x7f) | 0x80;
-> -        *out++ = n >> 7;
-> +        *out = n >> 7;
->          return 2;
->      }
->  }
-> @@ -766,7 +766,7 @@ int uleb128_encode_small(uint8_t *out, uint32_t n)
->  int uleb128_decode_small(const uint8_t *in, uint32_t *n)
->  {
->      if (!(*in & 0x80)) {
-> -        *n = *in++;
-> +        *n = *in;
->          return 1;
->      } else {
->          *n = *in++ & 0x7f;
-> @@ -774,7 +774,7 @@ int uleb128_decode_small(const uint8_t *in, uint32_t *n)
->          if (*in & 0x80) {
+> -    uint32_t zrun_len = 0, nzrun_len = 0;
+> -    int d = 0, i = 0;
+> -    long res;
+> -    uint8_t *nzrun_start = NULL;
+> +    bool zrun = true;
+> +    int len, src_off = 0, dst_off = 0;
+>  
+>      g_assert(!(((uintptr_t)old_buf | (uintptr_t)new_buf | slen) %
+>                 sizeof(long)));
+>  
+> -    while (i < slen) {
+> +    for (; src_off < slen; src_off += len, zrun = !zrun) {
+>          /* overflow */
+> -        if (d + 2 > dlen) {
+> +        if (dst_off + 2 > dlen) {
 >              return -1;
 >          }
-> -        *n |= *in++ << 7;
-> +        *n |= *in << 7;
->          return 2;
+>  
+> -        /* not aligned to sizeof(long) */
+> -        res = (slen - i) % sizeof(long);
+> -        while (res && old_buf[i] == new_buf[i]) {
+> -            zrun_len++;
+> -            i++;
+> -            res--;
+> -        }
+> +        len = next_run(old_buf, new_buf, src_off, slen, zrun);
+>  
+> -        /* word at a time for speed */
+> -        if (!res) {
+> -            while (i < slen &&
+> -                   (*(long *)(old_buf + i)) == (*(long *)(new_buf + i))) {
+> -                i += sizeof(long);
+> -                zrun_len += sizeof(long);
+> +        if (zrun) {
+> +            /* buffer unchanged */
+> +            if (len == slen) {
+> +                return 0;
+>              }
+> -
+> -            /* go over the rest */
+> -            while (i < slen && old_buf[i] == new_buf[i]) {
+> -                zrun_len++;
+> -                i++;
+> +            /* skip last zero run */
+> +            if (src_off + len == slen) {
+> +                return dst_off;
+>              }
+>          }
+>  
+> -        /* buffer unchanged */
+> -        if (zrun_len == slen) {
+> -            return 0;
+> -        }
+> -
+> -        /* skip last zero run */
+> -        if (i == slen) {
+> -            return d;
+> -        }
+> -
+> -        d += uleb128_encode_small(dst + d, zrun_len);
+> -
+> -        zrun_len = 0;
+> -        nzrun_start = new_buf + i;
+> -
+> -        /* overflow */
+> -        if (d + 2 > dlen) {
+> -            return -1;
+> -        }
+> -        /* not aligned to sizeof(long) */
+> -        res = (slen - i) % sizeof(long);
+> -        while (res && old_buf[i] != new_buf[i]) {
+> -            i++;
+> -            nzrun_len++;
+> -            res--;
+> -        }
+> -
+> -        /* word at a time for speed, use of 32-bit long okay */
+> -        if (!res) {
+> -            /* truncation to 32-bit long okay */
+> -            unsigned long mask = (unsigned long)0x0101010101010101ULL;
+> -            while (i < slen) {
+> -                unsigned long xor;
+> -                xor = *(unsigned long *)(old_buf + i)
+> -                    ^ *(unsigned long *)(new_buf + i);
+> -                if ((xor - mask) & ~xor & (mask << 7)) {
+> -                    /* found the end of an nzrun within the current long */
+> -                    while (old_buf[i] != new_buf[i]) {
+> -                        nzrun_len++;
+> -                        i++;
+> -                    }
+> -                    break;
+> -                } else {
+> -                    i += sizeof(long);
+> -                    nzrun_len += sizeof(long);
+> -                }
+> +        dst_off += uleb128_encode_small(dst + dst_off, len);
+> +        if (!zrun) {
+> +            /* overflow */
+> +            if (dst_off + len > dlen) {
+> +                return -1;
+>              }
+> +            memcpy(dst + dst_off, new_buf + src_off, len);
+> +            dst_off += len;
+>          }
+> -
+> -        d += uleb128_encode_small(dst + d, nzrun_len);
+> -        /* overflow */
+> -        if (d + nzrun_len > dlen) {
+> -            return -1;
+> -        }
+> -        memcpy(dst + d, nzrun_start, nzrun_len);
+> -        d += nzrun_len;
+> -        nzrun_len = 0;
 >      }
+>  
+> -    return d;
+> +    return dst_off;
 >  }
+>  
+>  int xbzrle_decode_buffer(uint8_t *src, int slen, uint8_t *dst, int dlen)
 > -- 
 > 2.19.1
 > 
