@@ -2,85 +2,86 @@ Return-Path: <SRS0=mXWu=UK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F0B9C4321A
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B1DFC43218
 	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 15:05:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2B15208E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 15:05:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZYMOEX4z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2B15208E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9E54D2080A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Jun 2019 15:05:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E54D2080A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59970 helo=lists.gnu.org)
+Received: from localhost ([::1]:59968 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haiLK-0002mo-JN
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 11:05:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48214)
+	id 1haiLJ-0002l8-PQ
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 11:05:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49120)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <rfried.dev@gmail.com>) id 1haiFa-0007g5-0r
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:59:51 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1haiHI-0008NW-GG
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 11:01:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rfried.dev@gmail.com>) id 1haiC9-0001zR-N4
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:56:18 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40779)
+ (envelope-from <pbonzini@redhat.com>) id 1hai2U-000612-Ah
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:46:19 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:37179)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <rfried.dev@gmail.com>)
- id 1haiC9-0001z7-HA; Tue, 11 Jun 2019 10:56:17 -0400
-Received: by mail-wr1-x444.google.com with SMTP id p11so13401719wre.7;
- Tue, 11 Jun 2019 07:56:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=b8QxGLK6EVt7cbCYgVtj1jSDrG4K14o9KcZtEODesBA=;
- b=ZYMOEX4zTFZPD17SXfo4vTcVyh779cTHfYlRemdj9zF0aEhXQrf7s6EmncsEiiY9hI
- PV7v3hCLwNP0JZnFc8alVDW2Cd/6stlfUVpIdlbMdk1OCyqaMcZDOqpnEunz5JU2FY7l
- k+rkHMt7MzSI9qan3mIDDLUj6cmu0T8CjtsN84HMTjm9h/iSi8AhAhWEWu7rH/jcaA1e
- 3FZ0pZ749M4s9BKySPW93ctUbMa9SbBgwF98/p2ZJw9mXkesOzTpxwwX4uhLlVj500ra
- 6P62p9Xsc5wDL0HeTYclYZCeWVClMYFLyfZwJfCtGNbt54mAo8VLFDTZATm6xN5+eSYC
- ncsg==
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hai2U-000602-2i
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 10:46:18 -0400
+Received: by mail-wm1-f65.google.com with SMTP id 22so3247641wmg.2
+ for <qemu-devel@nongnu.org>; Tue, 11 Jun 2019 07:46:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=b8QxGLK6EVt7cbCYgVtj1jSDrG4K14o9KcZtEODesBA=;
- b=sEMkUTR8eYp+mnOx96bAeHFPcLaq2Ty+n+YNCKlLufMH4ylxDh5VFF4qpsuZPzHiP3
- e8eCsDz/u9ecElYL9bV9HPM7cFjAFEefEQ3aKt7Nok3e2Tut7qY+XNOzeursJVnXj15n
- e8D4hBQ7s+Gp80LywdKN76NKSCe78PQI+5W400UtzCL9yTGz/sqtmF9RddZqlf8ncgYu
- WJHQfc85gElhQjRNVeKFORzBYU+n542HcO/80lMwssuctoqSucH8m1aZccEeLAq/yexR
- KwTxNiwJK/rmE74NtWt4cFXVmRukqsPl7F6CHuCyN/6xa7aSmmCsBQuc2kz7eQHOUTph
- eV5g==
-X-Gm-Message-State: APjAAAXbP/BYCOg5vxRPlDstbytGLR/vsv5U9RM9iOkdG/ojdytSXam3
- gejxBKG13xEypdTu9k82H7h68N2tzTg=
-X-Google-Smtp-Source: APXvYqxd+yONIAO8l3krTtlBPd4Qy0u1tMLozFUfpu5L1DfNBHrw8uaXTWqeomKbodFeNp8kFJeEEg==
-X-Received: by 2002:a5d:6190:: with SMTP id j16mr1300461wru.49.1560264976135; 
- Tue, 11 Jun 2019 07:56:16 -0700 (PDT)
-Received: from localhost.localdomain ([141.226.31.91])
- by smtp.gmail.com with ESMTPSA id v3sm1806137wmh.31.2019.06.11.07.56.14
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 11 Jun 2019 07:56:15 -0700 (PDT)
-From: Ramon Fried <rfried.dev@gmail.com>
-To: qemu-devel@nongnu.org,
-	qemu-trivial@nongnu.org
-Date: Tue, 11 Jun 2019 17:55:56 +0300
-Message-Id: <20190611145556.12940-1-rfried.dev@gmail.com>
-X-Mailer: git-send-email 2.21.0
+ bh=u0pKX1Gpuq1szK531lu6VU6STfr7eTVlQOsvTQVcSwA=;
+ b=mHfClt5PTvQVDC7SStP4w9IPF8AL74wHptQhC6pGAEEPXAnpI400cW+df6EIeW/Np1
+ 8y9Vp92FOz9iG7waaBBSAL44eH91PlD9udC9tONkOXKE+Dn/Z1kWFjwdxbz4gVtD+Bj/
+ uhO5Man6nj5xFOujWYIJGWfzgibZXRkVDOv97W8ghdH2gUSVxtT99sPZcqjHRDeOuRq0
+ b6n5dJzpHKnjVk2Pv/Z+0wGyQHu/kxTuDCiW5EloQn4a4vUVRjQhwnQtCpBnHM1wX5PO
+ 6F9tvHKYOsVQnN6rDKRypZCx7qrJkdVFpz2sbuKTY+7dP7TvBRR4XPRa33Q8FGY55bFm
+ Hcow==
+X-Gm-Message-State: APjAAAXNhdw7IS9N47Aoz9iwB63QoPDtiSn97epY7RVEzpw2uCfuSHWt
+ sMR5k9wJD5K+ZpXdg5oYBRimWw==
+X-Google-Smtp-Source: APXvYqyKHNzhon+NcT5y0BfDPPBRu2lxHZ/KtNuLRlvOqmu4hwVzqRNBfM/Anw4v5TJtweMX6iIKNA==
+X-Received: by 2002:a1c:208c:: with SMTP id
+ g134mr18290611wmg.112.1560264376712; 
+ Tue, 11 Jun 2019 07:46:16 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:49d3:a711:c5a3:8ebf?
+ ([2001:b07:6468:f312:49d3:a711:c5a3:8ebf])
+ by smtp.gmail.com with ESMTPSA id f10sm23198827wrg.24.2019.06.11.07.46.11
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Tue, 11 Jun 2019 07:46:16 -0700 (PDT)
+To: "wangjie (P)" <wangjie88@huawei.com>,
+ Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
+References: <1559048796-57016-1-git-send-email-wangjie88@huawei.com>
+ <cac8ed16-7846-ca22-2463-c3c738066d61@redhat.com>
+ <f165741a-2ffd-62fd-b121-49bf1a3597f1@redhat.com>
+ <ca74a7bf-dd68-d4c3-2c25-8e43db52678c@redhat.com>
+ <f9b6dd9e-3e58-add9-c5ab-da1a883a0a4b@redhat.com>
+ <b8a358ee-eb1f-14ca-b406-295ef668bb55@redhat.com>
+ <4955ec04-1884-3a68-975f-8d72487c253c@huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fefb9893-fc15-bf1b-ed3c-e37c9dd66c65@redhat.com>
+Date: Tue, 11 Jun 2019 16:46:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <4955ec04-1884-3a68-975f-8d72487c253c@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH v2] net: cadence_gem: fix compilation error
- when debug is on
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] pr-manager-helper: fix pr
+ process been killed when reconectting
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,50 +93,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- "open list:Xilinx Zynq" <qemu-arm@nongnu.org>,
- Ramon Fried <rfried.dev@gmail.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: eric.fangyi@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-defining CADENCE_GEM_ERR_DEBUG causes compilation
-errors, fix that.
+On 11/06/19 15:51, wangjie (P) wrote:
+> Hi， Paolo and Michal：
+> 
+> Base on my patch, I found another problem is that：
+> 
+>     qemu: report DISCONNECTED
+> 
+>     libvirt: start pr-helper #1, but it will takes a while to complete
+> this action
+> 
+>     qemu: reconnect to start pr-helper #1 immediately and failed, so
+> report DISCONNECTED
+> 
+>     libvirt: begin to call qemuProcessStartManagedPRDaemon to start
+> pr-helper #2, but virPidFileAcquirePath failed, so close fd and unlink
+> pidfile by mistake
+> 
+> 
+> based on the above problem, I thought out two ways to fix this problem:
+> 
+> 1. qemu: when call pr_manager_helper_write failed, sleep one second to
+> make sure libvirt had started pr-helper before call
+> pr_manager_helper_initialize.
+> 
+> 2. libvirt: if virFileLock failed in virPidFileAcquirePath, not to close
+> fd and unlink pidfile, because pr-helper #1 is using the pidfile.
 
-Signed-off-by: Ramon Fried <rfried.dev@gmail.com>
----
-v2: change %lx to HWADDR_PRIx and %lx to %zdx
+I think this could also be fixed by using the socket activation protocol
+in libvirt, because QEMU will be able to connect.  libvirt will have to
+discard events from QMP right after it calls listen() on the socket.
 
- hw/net/cadence_gem.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-index 7f63411430..e9b1b1e2eb 100644
---- a/hw/net/cadence_gem.c
-+++ b/hw/net/cadence_gem.c
-@@ -982,8 +982,8 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
-             return -1;
-         }
- 
--        DB_PRINT("copy %d bytes to 0x%x\n", MIN(bytes_to_copy, rxbufsize),
--                rx_desc_get_buffer(s->rx_desc[q]));
-+        DB_PRINT("copy %d bytes to 0x%" HWADDR_PRIx "\n", MIN(bytes_to_copy, rxbufsize),
-+                rx_desc_get_buffer(s, s->rx_desc[q]));
- 
-         /* Copy packet data to emulated DMA buffer */
-         address_space_write(&s->dma_as, rx_desc_get_buffer(s, s->rx_desc[q]) +
-@@ -1156,7 +1156,7 @@ static void gem_transmit(CadenceGEMState *s)
-             if (tx_desc_get_length(desc) > sizeof(tx_packet) -
-                                                (p - tx_packet)) {
-                 DB_PRINT("TX descriptor @ 0x%x too large: size 0x%x space " \
--                         "0x%x\n", (unsigned)packet_desc_addr,
-+                         "0x%zdx\n", (unsigned)packet_desc_addr,
-                          (unsigned)tx_desc_get_length(desc),
-                          sizeof(tx_packet) - (p - tx_packet));
-                 break;
--- 
-2.21.0
-
+Paolo
 
