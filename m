@@ -2,95 +2,75 @@ Return-Path: <SRS0=XH1q=UL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27287C31E46
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 13:36:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5642C31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 13:43:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF1D820866
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 13:36:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF1D820866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9EF6F208CA
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 13:43:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EF6F208CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60532 helo=lists.gnu.org)
+Received: from localhost ([::1]:60588 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hb3QT-0001bB-7k
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 09:36:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38733)
+	id 1hb3XX-0004Lw-Qt
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 09:43:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56999)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <farosas@linux.ibm.com>) id 1hb3Op-0008Vn-3o
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 09:34:49 -0400
+ (envelope-from <bounces@canonical.com>) id 1hasdx-0000pu-Ov
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 22:05:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <farosas@linux.ibm.com>) id 1hb3On-0002Jx-FZ
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 09:34:46 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60870)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
- id 1hb3On-0002Ij-4o; Wed, 12 Jun 2019 09:34:45 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x5CDIMC5072725; Wed, 12 Jun 2019 09:34:32 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
- [169.63.214.131])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2t2yr47p40-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 12 Jun 2019 09:34:31 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x5C9LJ0r032295;
- Wed, 12 Jun 2019 09:39:15 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
- [9.57.198.26]) by ppma01dal.us.ibm.com with ESMTP id 2t1x6sq7y9-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 12 Jun 2019 09:39:15 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
- [9.57.199.110])
- by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x5CDYJiv24773094
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 12 Jun 2019 13:34:19 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8B332AE064;
- Wed, 12 Jun 2019 13:34:19 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 42E04AE063;
- Wed, 12 Jun 2019 13:34:19 +0000 (GMT)
-Received: from localhost (unknown [9.86.26.88])
- by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTPS;
- Wed, 12 Jun 2019 13:34:19 +0000 (GMT)
-From: Fabiano Rosas <farosas@linux.ibm.com>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-In-Reply-To: <c5e92072-eb8d-7af5-3eef-fac256f29c98@ozlabs.ru>
-References: <20190228225759.21328-1-farosas@linux.ibm.com>
- <20190228225759.21328-6-farosas@linux.ibm.com>
- <b8a30b89-8c19-821e-e3a3-f1b71a088d9d@ozlabs.ru>
- <87ef73rl39.fsf@linux.ibm.com>
- <eadc5e30-5094-9b76-7268-cfb633ac40bd@ozlabs.ru>
- <c5e92072-eb8d-7af5-3eef-fac256f29c98@ozlabs.ru>
-Date: Wed, 12 Jun 2019 10:34:17 -0300
-Message-ID: <877e9r3p2e.fsf@linux.ibm.com>
+ (envelope-from <bounces@canonical.com>) id 1hasdw-0002Vf-6R
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 22:05:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37832)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hasdv-0002Uv-Ch
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 22:05:39 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hasds-00011H-TP
+ for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 02:05:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id D253C2E80C7
+ for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 02:05:36 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-06-12_07:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=4 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906120092
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: Re: [Qemu-devel] [RFC PATCH v4 5/5] target/ppc: support single
- stepping with KVM HV
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 12 Jun 2019 01:59:54 -0000
+From: DDoSolitary <DDoSolitary@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: ppc
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ddosolitary
+X-Launchpad-Bug-Reporter: DDoSolitary (ddosolitary)
+X-Launchpad-Bug-Modifier: DDoSolitary (ddosolitary)
+References: <155137392124.31316.11495671074765014993.malonedeb@wampee.canonical.com>
+Message-Id: <156030479552.16323.6827018214929857588.launchpad@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18978";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 490a9306e6459acfbbf86278d451f34610b713a0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+X-Mailman-Approved-At: Wed, 12 Jun 2019 09:42:35 -0400
+Subject: [Qemu-devel] [Bug 1818122] Re: QEMU 3.1 makes libxslt to crash on
+ ppc64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -99,88 +79,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Reply-To: Bug 1818122 <1818122@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Alexey Kardashevskiy <aik@ozlabs.ru> writes:
+** Tags added: ppc
 
-> Are you reposting this any time soon?
+-- =
 
-I have sent a v2 to the kernel side of it:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1818122
 
-https://lore.kernel.org/kvm/20190529222219.27994-1-farosas@linux.ibm.com/
+Title:
+  QEMU 3.1 makes libxslt to crash on ppc64
 
-I'm depending on what we decide to do there. The core of this patchset
-will not change, just the mechanism by which the feature is selected
-(patch 2, kvm-all: Introduce kvm_set_singlestep).
+Status in QEMU:
+  New
 
-> In meanwhile I hit a problem when I cannot step over the "stdu" instruction.
->
-> I basically put this:
-> stdu    r1,-368(r1)
->
-> and "ni" in gdb does not stop on the next instruction which is quite
-> confusing. Ideas?
+Bug description:
+  Host: clean Ubuntu Disco with QEMU 3.1
 
-Perhaps the next instruction is one that is not traced? See the programming
-note at the end of section 6.5.15 in Book III.
+  Guest: Alpine Linux edge with xmlto
 
-Or maybe the step got preempted? You should see GDB messages indicating
-changing threads right before or after the stdu. However that would only
-happen with more than one VCPU and if 'show scheduler-locking' in GDB is
-'off'. And even then, that should not cause any issues, but it is a more
-complex scenario so there could be a bug in the code.
+  Steps to set up guest:
+  curl -O http://dl-cdn.alpinelinux.org/alpine/edge/releases/ppc64le/netboo=
+t/vmlinuz-vanilla
+  curl -O http://dl-cdn.alpinelinux.org/alpine/edge/releases/ppc64le/netboo=
+t/initramfs-vanilla
+  qemu-system-ppc64 -m 1G -kernel vmlinuz-vanilla -initrd initramfs-vanilla=
+ -append "console=3Dhvc0 ip=3Ddhcp alpine_repo=3Dhttp://dl-cdn.alpinelinux.=
+org/alpine/edge/main/ modloop=3Dhttp://dl-cdn.alpinelinux.org/alpine/edge/r=
+eleases/ppc64le/netboot/modloop-vanilla" -device virtio-rng-pci -nographic
+  This brings up an VM with an in-memory Alpine Linux.
 
-> On 20/03/2019 12:42, Alexey Kardashevskiy wrote:
->> 
->> 
->> On 20/03/2019 01:32, Fabiano Rosas wrote:
->>> Alexey Kardashevskiy <aik@ozlabs.ru> writes:
->>>
->>>> Looks good to me, does not break what already works. However I cannot
->>>> debug SLOF real mode and I am not sure why.
->>>>
->>>> (gdb) set endian big
->>>>
->>>> The target is assumed to be big endian
->>>> (gdb) b *0x3f00
->>>>
->>>> Breakpoint 2 at 0x3f00
->>>
->>> I think I'm missing the point here. Why 0x3f00?
->> 
->> Because I am stupid and did not realize that 0x3f00 is a relative offset
->> and 0x4000 is the correct address which works.
->> 
->> 
->> Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->> 
->> 
->>>
->>> (qemu) info roms
->>> addr=0000000000000000 size=0x0e22b8 mem=ram name="...qemu/slof.bin"                               
->>> addr=0000000000400000 size=0x17976d0 mem=ram name="...vmlinux"
->>>
->>>
->>> $ objdump -d board-qemu/llfw/stage1.elf | grep "_start>"
->>> 0000000000000100 <__start>:
->>>      100:       48 00 3f 00     b       4000 <_start>
->>> 0000000000004000 <_start>:
->>>
->>>
->>> Thread 1 hit Breakpoint 3, _start () at startup.S:82
->>> (gdb) p/x $pc
->>> $1 = 0x4000
->>> (gdb) si
->>> (gdb) p/x $pc
->>> $3 = 0x4004
->>> (gdb) c
->>> Thread 1 hit Breakpoint 4, early_c_entry (start_addr=49056, fdt_addr=49024) at stage2.c:202
->>> (gdb) p/x $pc
->>> $4 = 0x4d18
->>>
->> 
+  Steps to reproduce:
+  Login as root and execute the following commands.
+  apk add xmlto
+  ntpd -nqp time.google.com // For TLS OCSP
+  wget https://ddosolitary.org/manpage-base.xsl
+  wget https://ddosolitary.org/shadowsocks-libev.xml
+  xmlto -m manpage-base.xsl man shadowsocks-libev.xml
+  The downloaded files are from this project: https://github.com/shadowsock=
+s/shadowsocks-libev The former is directly taken from the "doc" directory a=
+nd the latter is an intermediate build output generated by asciidoc from do=
+c/shadowsocks-libev.asciidoc
+
+  Expected behavior: The command silently succeeds producing
+  shadowsocks-libev.8
+
+  Actual behavior: =
+
+  runtime error: file file:///usr/share/xml/docbook/xsl-stylesheets-1.79.1/=
+manpages/tbl.xsl line 450 element text
+  xsltApplySequenceConstructor: A potential infinite template recursion was=
+ detected.
+  You can adjust xsltMaxDepth (--maxdepth) in order to raise the maximum nu=
+mber of nested template calls and variables/params (currently set to 3000).
+  Templates:
+  #0 name process.colspan
+  #1 name process.colspan
+  #2 name process.colspan
+  #3 name process.colspan
+  #4 name process.colspan
+  #5 name process.colspan
+  #6 name process.colspan
+  #7 name process.colspan
+  #8 name process.colspan
+  #9 name process.colspan
+  #10 name process.colspan
+  #11 name process.colspan
+  #12 name process.colspan
+  #13 name process.colspan
+  #14 name process.colspan
+  Variables:
+  #0
+  type
+  colspan
+  #1
+  colspan
+  #2
+  type
+  colspan
+  #3
+  colspan
+  #4
+  type
+  colspan
+  #5
+  colspan
+  #6
+  type
+  colspan
+  #7
+  colspan
+  #8
+  type
+  colspan
+  #9
+  colspan
+  #10
+  type
+  colspan
+  #11
+  colspan
+  #12
+  type
+  colspan
+  #13
+  colspan
+  #14
+  type
+  colspan
+  error: file /root/shadowsocks-libev.xml
+  xsltRunStylesheet : run failed
+
+  Note:
+  I tried increasing --maxdepth as suggested in the error output but that w=
+ill result in a segfault.
+  This error doesn't occur with an older QEMU (I tested QEMU 2.12 on Ubuntu=
+ Cosmic) or different architectures on QEMU 3.1 (I tested x86, x86_64, arm,=
+ aarch64, s390x). Also it didn't help to use an older Alpine Linux (I teste=
+d v3.8). So I think it is caused by a bug in QEMU rather than the distro/pa=
+ckage.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1818122/+subscriptions
 
