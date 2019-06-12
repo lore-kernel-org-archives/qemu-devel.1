@@ -7,91 +7,91 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 260FBC31E46
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 09:46:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B889C31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 09:50:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA7F5207E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 09:46:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E1300207E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 09:50:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="zcIgjHa7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA7F5207E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="cMg+1qMs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1300207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58162 helo=lists.gnu.org)
+Received: from localhost ([::1]:58192 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hazqK-0007sd-4j
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 05:46:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44153)
+	id 1haztS-0002fR-TD
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 05:50:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44109)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <shmuel.eiderman@oracle.com>) id 1hazmv-0005Bh-Ov
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 05:43:27 -0400
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hazmr-00051P-79
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 05:43:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shmuel.eiderman@oracle.com>) id 1hazmu-0000pK-Dh
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 05:43:25 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:48090)
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hazmp-0000nP-US
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 05:43:21 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:42524)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
- id 1hazmr-0000no-De; Wed, 12 Jun 2019 05:43:21 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5C9Y5pE185455;
- Wed, 12 Jun 2019 09:43:19 GMT
+ id 1hazmm-0000kR-Vx; Wed, 12 Jun 2019 05:43:17 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5C9YCr0193645;
+ Wed, 12 Jun 2019 09:43:15 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
- bh=LGrComxyqN1TLgk8Bo9iKZ5zTEqxz7KVof3cokKzZBY=;
- b=zcIgjHa7ak8wZLBQaEEvg1t0gOV4iL7/QtYNT5PdxQAaJJ6tZU3KjviblcTjw283x1Zj
- ftSK6CvPUP13HMugaf3NrOd0asJh9OXjZzC/v9oEfqpQN7JxwRIOuuJkuHWXeUAw35EC
- ZqtZ/yAlq20enWvEnvFr7d2+9tLdJvmqeCRMAn/7APaGV5fyxIhXUT8GZlZrgch2BhOu
- hooohHe2URHYCVUnCOZCkF+TSwGvEVOWh1VtfVr2U64qdgPvyV5g8h0RpafuyrWYTjOq
- AwlY5anKe+bCCAwCTD589uAVCWZWrghWDHQtJ3WNn8wpc+eYsnG+wDgOEZQe/DDscrP+ Hw== 
+ bh=VuvUHYBiIoed7M4Qt45n2olUqtuKHAeuaxDDCAKVfqc=;
+ b=cMg+1qMszT1ezlOCHUiBMHPzpG+g0Ybi9S+r7GoE7V3GQ6mWVtrmW7pqTR1ie7+8bpKb
+ X3KmLNMk3omRJF6A4KFdjSm0VsGjbebJNlD3qWim++cWEIGsU+Egk04fegt0tRYItDpB
+ zo1wtzw3FJXeVjJ45sDbN4jMtgNLomooOYdjwteKY4+m0dk7yL9UBE2zYVhwLsxNrKO4
+ HCJIttI4CUVCIx55td1Yja+QJhXL23yaatfIeolM1g4/4pCI5OTJ0EM2/NZCvlE0QsCE
+ zq4yK6cOzthBGPK+jPZNA7HOhAi2HEfruT7k1tuNkjUjPZm0aJIWqbqSWdWYeFx+zsxe Gw== 
 Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2130.oracle.com with ESMTP id 2t04ettc1x-1
+ by userp2120.oracle.com with ESMTP id 2t05nqt88w-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 12 Jun 2019 09:43:19 +0000
+ Wed, 12 Jun 2019 09:43:14 +0000
 Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5C9gRNi116414;
- Wed, 12 Jun 2019 09:43:19 GMT
+ by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5C9gTNG116553;
+ Wed, 12 Jun 2019 09:43:14 GMT
 Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3020.oracle.com with ESMTP id 2t0p9rsgps-1
+ by aserp3020.oracle.com with ESMTP id 2t0p9rsgp4-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 12 Jun 2019 09:43:18 +0000
+ Wed, 12 Jun 2019 09:43:13 +0000
 Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5C9hHdb028834;
- Wed, 12 Jun 2019 09:43:17 GMT
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5C9hC8I028727;
+ Wed, 12 Jun 2019 09:43:12 GMT
 Received: from nexus.ravello.local (/213.57.127.2)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 12 Jun 2019 02:43:17 -0700
+ with ESMTP ; Wed, 12 Jun 2019 02:43:12 -0700
 From: Sam Eiderman <shmuel.eiderman@oracle.com>
 To: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
  mreitz@redhat.com, seabios@seabios.org, kraxel@redhat.com,
  kevin@koconnor.net
-Date: Wed, 12 Jun 2019 12:42:34 +0300
-Message-Id: <20190612094237.47462-6-shmuel.eiderman@oracle.com>
+Date: Wed, 12 Jun 2019 12:42:32 +0300
+Message-Id: <20190612094237.47462-4-shmuel.eiderman@oracle.com>
 X-Mailer: git-send-email 2.13.3
 In-Reply-To: <20190612094237.47462-1-shmuel.eiderman@oracle.com>
 References: <20190612094237.47462-1-shmuel.eiderman@oracle.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9285
  signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2
  malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=886
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.0.1-1810050000 definitions=main-1906120067
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9285
  signatures=668687
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
  priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=930 adultscore=0
+ suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
  definitions=main-1906120066
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.86
-Subject: [Qemu-devel] [QEMU] [PATCH 5/8] bootdevice: Gather LCHS from all
- relevant devices
+X-Received-From: 156.151.31.85
+Subject: [Qemu-devel] [QEMU] [PATCH 3/8] bootdevice: Add interface to gather
+ LCHS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,116 +109,94 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Relevant devices are:
-    * ide-hd (and ide-cd, ide-drive)
-    * scsi-hd (and scsi-cd, scsi-disk, scsi-block)
-    * virtio-blk-pci
-
-We do not call del_boot_device_lchs() for ide-* since we don't need to -
-IDE block devices do not support unplugging.
+Add an interface to provide direct logical CHS values for boot devices.
+We will use this interface in the next commits.
 
 Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
 Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
 Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
 ---
- hw/block/virtio-blk.c |  6 ++++++
- hw/ide/qdev.c         |  5 +++++
- hw/scsi/scsi-disk.c   | 14 ++++++++++++++
- 3 files changed, 25 insertions(+)
+ bootdevice.c            | 55 +++++++++++++++++++++++++++++++++++++++++++++++++
+ include/sysemu/sysemu.h |  3 +++
+ 2 files changed, 58 insertions(+)
 
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 06e57a4d39..787bbd768a 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -1182,6 +1182,11 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
-     blk_set_guest_block_size(s->blk, s->conf.conf.logical_block_size);
- 
-     blk_iostatus_enable(s->blk);
-+
-+    add_boot_device_lchs(dev, "/disk@0,0",
-+                         (&conf->conf)->lcyls,
-+                         (&conf->conf)->lheads,
-+                         (&conf->conf)->lsecs);
+diff --git a/bootdevice.c b/bootdevice.c
+index 1d225202f9..bc5e1c2de4 100644
+--- a/bootdevice.c
++++ b/bootdevice.c
+@@ -343,3 +343,58 @@ void device_add_bootindex_property(Object *obj, int32_t *bootindex,
+     /* initialize devices' bootindex property to -1 */
+     object_property_set_int(obj, -1, name, NULL);
  }
- 
- static void virtio_blk_device_unrealize(DeviceState *dev, Error **errp)
-@@ -1189,6 +1194,7 @@ static void virtio_blk_device_unrealize(DeviceState *dev, Error **errp)
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VirtIOBlock *s = VIRTIO_BLK(dev);
- 
-+    del_boot_device_lchs(dev, "/disk@0,0");
-     virtio_blk_data_plane_destroy(s->dataplane);
-     s->dataplane = NULL;
-     qemu_del_vm_change_state_handler(s->change);
-diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
-index 9cae3205df..07f429d5e3 100644
---- a/hw/ide/qdev.c
-+++ b/hw/ide/qdev.c
-@@ -215,6 +215,11 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
- 
-     add_boot_device_path(dev->conf.bootindex, &dev->qdev,
-                          dev->unit ? "/disk@1" : "/disk@0");
 +
-+    add_boot_device_lchs(&dev->qdev, dev->unit ? "/disk@1" : "/disk@0",
-+                         (&dev->conf)->lcyls,
-+                         (&dev->conf)->lheads,
-+                         (&dev->conf)->lsecs);
- }
- 
- static void ide_dev_get_bootindex(Object *obj, Visitor *v, const char *name,
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 7b89ac798b..3451aefdea 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -2390,6 +2390,16 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
-     blk_set_guest_block_size(s->qdev.conf.blk, s->qdev.blocksize);
- 
-     blk_iostatus_enable(s->qdev.conf.blk);
++typedef struct FWLCHSEntry FWLCHSEntry;
 +
-+    add_boot_device_lchs(&dev->qdev, NULL,
-+                         (&dev->conf)->lcyls,
-+                         (&dev->conf)->lheads,
-+                         (&dev->conf)->lsecs);
++struct FWLCHSEntry {
++    QTAILQ_ENTRY(FWLCHSEntry) link;
++    DeviceState *dev;
++    char *suffix;
++    uint32_t lcyls;
++    uint32_t lheads;
++    uint32_t lsecs;
++};
++
++static QTAILQ_HEAD(, FWLCHSEntry) fw_lchs =
++    QTAILQ_HEAD_INITIALIZER(fw_lchs);
++
++void add_boot_device_lchs(DeviceState *dev, const char *suffix,
++                          uint32_t lcyls, uint32_t lheads, uint32_t lsecs)
++{
++    FWLCHSEntry *node;
++
++    if (!lcyls && !lheads && !lsecs) {
++        return;
++    }
++
++    assert(dev != NULL || suffix != NULL);
++
++    node = g_malloc0(sizeof(FWLCHSEntry));
++    node->suffix = g_strdup(suffix);
++    node->dev = dev;
++    node->lcyls = lcyls;
++    node->lheads = lheads;
++    node->lsecs = lsecs;
++
++    QTAILQ_INSERT_TAIL(&fw_lchs, node, link);
 +}
 +
-+static void scsi_unrealize(SCSIDevice *dev, Error **errp)
++void del_boot_device_lchs(DeviceState *dev, const char *suffix)
 +{
-+    del_boot_device_lchs(&dev->qdev, NULL);
- }
++    FWLCHSEntry *i;
++
++    if (dev == NULL) {
++        return;
++    }
++
++    QTAILQ_FOREACH(i, &fw_lchs, link) {
++        if ((!suffix || !g_strcmp0(i->suffix, suffix)) &&
++             i->dev == dev) {
++            QTAILQ_REMOVE(&fw_lchs, i, link);
++            g_free(i->suffix);
++            g_free(i);
++
++            break;
++        }
++    }
++}
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 61579ae71e..173dfbb539 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -171,6 +171,9 @@ void device_add_bootindex_property(Object *obj, int32_t *bootindex,
+                                    DeviceState *dev, Error **errp);
+ void restore_boot_order(void *opaque);
+ void validate_bootdevices(const char *devices, Error **errp);
++void add_boot_device_lchs(DeviceState *dev, const char *suffix,
++                          uint32_t lcyls, uint32_t lheads, uint32_t lsecs);
++void del_boot_device_lchs(DeviceState *dev, const char *suffix);
  
- static void scsi_hd_realize(SCSIDevice *dev, Error **errp)
-@@ -2988,6 +2998,7 @@ static void scsi_hd_class_initfn(ObjectClass *klass, void *data)
-     SCSIDeviceClass *sc = SCSI_DEVICE_CLASS(klass);
- 
-     sc->realize      = scsi_hd_realize;
-+    sc->unrealize    = scsi_unrealize;
-     sc->alloc_req    = scsi_new_request;
-     sc->unit_attention_reported = scsi_disk_unit_attention_reported;
-     dc->desc = "virtual SCSI disk";
-@@ -3019,6 +3030,7 @@ static void scsi_cd_class_initfn(ObjectClass *klass, void *data)
-     SCSIDeviceClass *sc = SCSI_DEVICE_CLASS(klass);
- 
-     sc->realize      = scsi_cd_realize;
-+    sc->unrealize    = scsi_unrealize;
-     sc->alloc_req    = scsi_new_request;
-     sc->unit_attention_reported = scsi_disk_unit_attention_reported;
-     dc->desc = "virtual SCSI CD-ROM";
-@@ -3054,6 +3066,7 @@ static void scsi_block_class_initfn(ObjectClass *klass, void *data)
-     SCSIDiskClass *sdc = SCSI_DISK_BASE_CLASS(klass);
- 
-     sc->realize      = scsi_block_realize;
-+    sc->unrealize    = scsi_unrealize;
-     sc->alloc_req    = scsi_block_new_request;
-     sc->parse_cdb    = scsi_block_parse_cdb;
-     sdc->dma_readv   = scsi_block_dma_readv;
-@@ -3095,6 +3108,7 @@ static void scsi_disk_class_initfn(ObjectClass *klass, void *data)
-     SCSIDeviceClass *sc = SCSI_DEVICE_CLASS(klass);
- 
-     sc->realize      = scsi_disk_realize;
-+    sc->unrealize    = scsi_unrealize;
-     sc->alloc_req    = scsi_new_request;
-     sc->unit_attention_reported = scsi_disk_unit_attention_reported;
-     dc->fw_name = "disk";
+ /* handler to set the boot_device order for a specific type of MachineClass */
+ typedef void QEMUBootSetHandler(void *opaque, const char *boot_order,
 -- 
 2.13.3
 
