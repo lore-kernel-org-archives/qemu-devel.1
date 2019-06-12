@@ -2,119 +2,82 @@ Return-Path: <SRS0=XH1q=UL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.4 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB9F8C31E46
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 16:37:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D19FC31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 16:43:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B96FA215EA
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 16:37:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4DBA5208C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 16:43:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t4v8BtN+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B96FA215EA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lAXwixuD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DBA5208C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33738 helo=lists.gnu.org)
+Received: from localhost ([::1]:33764 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hb6Fc-00042N-0t
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 12:37:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53938)
+	id 1hb6LR-0008AW-7r
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 12:43:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55188)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <rth7680@gmail.com>) id 1hb6EQ-00035S-UJ
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:36:15 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hb6K4-0006zV-2b
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:42:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rth7680@gmail.com>) id 1hb6EP-0000gT-R6
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:36:14 -0400
-Received: from mail-pf1-x42a.google.com ([2607:f8b0:4864:20::42a]:34221)
+ (envelope-from <alex.bennee@linaro.org>) id 1hb6K2-00048o-8T
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:42:04 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33011)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <rth7680@gmail.com>)
- id 1hb6EN-0000dX-DJ; Wed, 12 Jun 2019 12:36:11 -0400
-Received: by mail-pf1-x42a.google.com with SMTP id c85so9993982pfc.1;
- Wed, 12 Jun 2019 09:36:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:openpgp:autocrypt:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=4YAKgmm3uxfG6qjAg/EB3AViBdlelytDdopfZVhqhug=;
- b=t4v8BtN+R/KXjMmatS7BuuM2K1xqP+K/LhKOUlpvW1y8Wt89yVH28tDdC0ieAjW7mg
- idQH6IHlLgt0BknBPJpyV0nTJx6LvHbJlW5oGqm7I/PqSAPcfqOpUTZVH6+kmD/LKWiE
- bcIZL6BsAfB3uZ7yRKvbAWjBwqyLs89a3i0MJiunQKubxJWq40Inu6DrjfVR82ZPDktv
- GLpsFsPPmDLvTt2LdDnwmZIfLGhYZbXIKmczaMYmsNBmZFXK0VP4qoNS6WgHZg9nNCfy
- hOhkiPi+pqQmbODN/OLNp9I+aC6ZO6cVL5itYxK4Q6SJ9BuHrhmzxSBTsb6w6RUK9tOT
- K0QQ==
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hb6K1-00045c-U6
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:42:02 -0400
+Received: by mail-wr1-x444.google.com with SMTP id n9so17704656wru.0
+ for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 09:42:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=dRbmtXM9cpyVTd8ejdSwNx7Aep6niyPDXG8YhtL4dEM=;
+ b=lAXwixuDXaAijvAZyaXZ9sOKDbyObzw67+9gyqnUrCLLoM8tsEo+UBoTeMZTj9BNL5
+ xRKmkmHr9jbPJppjnab+kCI2KQGG3rL7A0fNcRbWptiTLbAfcFpY3KAr9awL6+8INEwu
+ nmND/1evFuueAmLbrFr81KGA3ROSbIt++Zdo9eR+IEqPAjKOlbQhMjhrY6reysBgMaVR
+ kem2MTXIr8DsNmpWr9KarbFAZ2+HPU/YnFh0rxQ5CzCLwTf3S43r7CYSgBTJXRYBtPwD
+ GQdt0mOtdpOAWfnumd5Ovcp977MsNFW4uaJXrWjBU7JthVdR+UgUtcb/NSshXIjmYFKK
+ DAfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:openpgp
- :autocrypt:message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=4YAKgmm3uxfG6qjAg/EB3AViBdlelytDdopfZVhqhug=;
- b=N+2fy4FBgH/qdpNC2x6E7Mo85+p0johOEViE82BjDkU+mJpkGcZ8O60t0jw5aDRwyw
- lcudNV+sbz2DcZbybgj+O/5MhMiI0Io80COYOinbxAXpES46cS7zcuHdIl/0aNemer7c
- bd3cn4DNSnnDufb3YAYNw34ieygzZuBHeepgckTs5d9/1BoiHRenr+WBkhx9ljDQVkF5
- lTHdCQUUJJDX5CxRi5/7V4J8gQZbY3BZ868F2M7ccYk+NG2fojNzSqfxdDE66MqVy/X1
- plQQvem5NP3hPfZn3Iq/Qi74x9ohw/ticOmAajsyRGRidZ72Ch1plR8H2MaAqPkoKdgH
- fgFA==
-X-Gm-Message-State: APjAAAXa4aPZV1joaOATR5RvQzBWqFcy/Al36O+/10Mgns9+feQBzMl3
- pHvR2qE5P3GYBZ+84atrsvx9Z/5U
-X-Google-Smtp-Source: APXvYqzN7XKqJZOKGcwnD7e/SipsO4XciwqbymYUNazoBbKHwenkTeHZOLsdfmT8sGIQhn77WrvVQw==
-X-Received: by 2002:a63:c508:: with SMTP id f8mr26328076pgd.48.1560357369773; 
- Wed, 12 Jun 2019 09:36:09 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
- by smtp.googlemail.com with ESMTPSA id
- n184sm90591pfn.21.2019.06.12.09.36.08
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 12 Jun 2019 09:36:09 -0700 (PDT)
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20190602110903.3431-1-mark.cave-ayland@ilande.co.uk>
- <20190602110903.3431-5-mark.cave-ayland@ilande.co.uk>
- <20190612015224.GG3998@umbus.fritz.box>
- <53c86ca8-332c-e073-0e78-2a684cd05161@twiddle.net>
- <20190612051604.GI3998@umbus.fritz.box>
-From: Richard Henderson <rth@twiddle.net>
-Openpgp: preference=signencrypt
-Autocrypt: addr=rth@twiddle.net; prefer-encrypt=mutual; keydata=
- mQENBFGuLC8BCADcAoWcnW9lTsDMzbO3MBU+KbiGaj5JPatEUscRDkQYM2fyNjJp2tIWDK5a
- n4yngeXB3eX61WbYR3QraRK8mlYLGxyAdHMEQfPipbqf3TmN043fssT2bc82ApJcs1zvLYgI
- rhMht7Dck7A0wNC1jo+ZjVVFig5gDTN7gOzaAdBtV8tVNUddwkLzzaGpfihhSD6U46NdqKOG
- Wlnn6TrkMy0QGdQ5NaXHkRlUjnnUTSW/nKfoxD+EI+A9V4sYOd8mc/TL4aJh/i/AiU57eLbo
- n17uQI6/VTWDUWl8USiz4x9c8vmqlywLx00tAFxxoRWqk4KVJlj+Sh0up/D/sJ+vPpgBABEB
- AAG0I1JpY2hhcmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5uZXQ+iQFBBBMBAgArAhsDBgsJ
- CAcDAgYVCAIJCgsEFgIDAQIeAQIXgAUJC7UHogUCWaDNVgIZAQAKCRCtEnDMTdAnm9N5CADO
- cB8F/SudJ72IupxQf40hbJdBK176+gb3sHMsixyLtrU59lee+lIM1OZmlNjsnCYmiSnbA5ks
- Q7p0HfO7DgdmfLzcK6xsHZukqSZy5LByw348Y913ZyjOrJZFdPP7kDg1MnqRqH4+3ZdzxV4y
- eYBWFU9GYMIF06JbUubossOOO4ArNVZbnIPu8Vn2tDZVVqsCBqkoCSBMj519xrvyOu5z4mHS
- LkCglXmVDOXMbqLuNAC3rfNXSnyM4hYkLUyfALJlAAy1Ro+jUqYhu7XUFV/MiwRuFMh5GbtY
- Urkx7tqsWQXLT3GeDk/LqvpWJQwk4cHHckYjRih+70CHIenm81PVuQENBFGuLC8BCACyEx3x
- 94HIkTX0CHu2sA0w75+h9wuoA8ggJ7+S4ri0y2YsijWad5TTt6z6MMiqxk9kSA5bppaj4HXh
- 86hBF/dWCtMpNr3Rb8FNOKyeA/qkYHVD6HiAiw9c6D8Dr9hWmOk3/HSmGrNURxeUFOckDXsv
- I+yGGKBNshj59j7QZr7ZiuIi2rWlBL8dFN/OWa/o3x7HKsE4k6K8ngwvCKP/QbDLwLLBOWH+
- VEUtpyeyxTr3OJ47ECTxdYvXoAV2iJaKr+6doVQiiR5eVFiMYrUPUECJeolOCwqc/JlWE18L
- +PCAFaW1H+/mpPVfSpN4wnkJ5cQiQVB41IaCM4p20iRzx7ZJABEBAAGJASUEGAECAA8CGwwF
- AlmgzYEFCQu1CEoACgkQrRJwzE3QJ5s7rggAwABzDAGrZ6uWsMxg5PeiiAYPy6LBnCBJSpB5
- Tfy5jH8QTmLfXW+u4Ib4sWXG7PYNR7sIrtqUHjRqXLVXrSnBX9ASGcYw/Xil45khW6LsRpO1
- prHv9gkwQfa6fTiWXVfSfm2Nant6u02q+MaYtQpCVTiz/9ki4FfftUwUHFLU0MhIQogjd11y
- /E08RJsqBwaHQdt14PwU1HphDOzSkhOXRXQLSd3ysyeGUXvL+gqQoXl5XYdvk8IId4PoJRo4
- jcyJ4VbnldvXh5gdGhFA/f9JgkLk9tPW+C3wNtNWyRUq8azR9hF2fg2HJUf4IXQlIu8OOgh1
- VcROBqvtH3ecaIL9iw==
-Message-ID: <380e5888-ad0d-c8aa-3ed5-ac542467fc09@twiddle.net>
-Date: Wed, 12 Jun 2019 08:58:26 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=dRbmtXM9cpyVTd8ejdSwNx7Aep6niyPDXG8YhtL4dEM=;
+ b=Yg6G1gbrTF2hYJsMf3vZjjM8ejLlYiHBY2Ki/rOvnnhEHp5HWCkm4gSowp2H0RShDw
+ evpJlEXxUzHQK/I8d1Ucrv68kVVHCiwgHuGh/OjTZJ/+z1U9+O1bKs81a0HScZVOrEXK
+ tfiEKBH3Zen9xRfmSiS7E0Zn/ISVLwxnoXPiaJ38+ihVMOhdZXpsB2eZ409cFVGXVNw5
+ ohQRLye27MdJYsl16acb+gwNu3p90z9UK9tc2flxUhmsF+OyQGbNHROMDTYbu6uFAru/
+ v6GANXvGmyFsd5XprtrH3UTaGP9J9zuKl6709OIV276vMvKe0mSDABhknt7ZZybBECnm
+ AzoQ==
+X-Gm-Message-State: APjAAAWPAs7m3W4l2DeY9igAdc5f1EfOJJ07Mt4kvjTDt+b7SQI1cGHv
+ Da/EBJpNauVP2q1j8/qLHFNl4xsFj203mVGk801F4Q==
+X-Google-Smtp-Source: APXvYqxEv0QbfaZFXtLnJ6tTdpV0Q5EShFHMiH3PM4DOi067BK34z8sB/1TlLIGtow45nW8VkC5d7qcdnKulFSeBrYc=
+X-Received: by 2002:a5d:4e83:: with SMTP id e3mr22148593wru.263.1560357719452; 
+ Wed, 12 Jun 2019 09:41:59 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190612051604.GI3998@umbus.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190612111949.25117-1-alex.bennee@linaro.org>
+ <CAFEAcA9cKcTpyU_SpzVH91JnQfU2g14bNuk_oWkObbbYYxdXQw@mail.gmail.com>
+In-Reply-To: <CAFEAcA9cKcTpyU_SpzVH91JnQfU2g14bNuk_oWkObbbYYxdXQw@mail.gmail.com>
+From: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Date: Wed, 12 Jun 2019 17:41:47 +0100
+Message-ID: <CAHDbmO0+DV0EP=xrHfXa8SUFC5TWWZvwPOE_D0ZpT8c0SPnoNw@mail.gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::42a
-Subject: Re: [Qemu-devel] [PATCH v2 04/15] target/ppc: introduce separate
- VSX_CMP macro for xvcmp* instructions
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] [PULL v2 00/52] testing, gdbstub and cputlb fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,18 +89,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, gkurz@kaod.org,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/11/19 10:16 PM, David Gibson wrote:
-> Fair enough.  Richard, I was kind of hoping for an A-b or R-b on the
-> series from you, but didn't see one..?
+It looks like it's still trying to use the system QEMU (which is
+broken for this in hackbox) to launch. Is there a built
+qemu-system-x86_64 in your build directory?
 
-It's still on my queue.  I hope to get to it soon.
+On Wed, 12 Jun 2019 at 16:57, Peter Maydell <peter.maydell@linaro.org> wrot=
+e:
+>
+> On Wed, 12 Jun 2019 at 12:19, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+> >
+> > The following changes since commit 219dca61ebf41625831d4f96a720852baf44=
+b762:
+> >
+> >   Merge remote-tracking branch 'remotes/ehabkost/tags/x86-next-pull-req=
+uest' into staging (2019-06-11 16:02:07 +0100)
+> >
+> > are available in the Git repository at:
+> >
+> >   https://github.com/stsquad/qemu.git tags/pull-testing-gdbstub-cputlb-=
+120619-2
+> >
+> > for you to fetch changes up to dfffdccbf6984ad7042b3123cba9e29c4f3c9a2b=
+:
+> >
+> >   gdbstub: Implement qemu physical memory mode (2019-06-12 11:23:08 +01=
+00)
+> >
+> > ----------------------------------------------------------------
+> > Various fixes and updates:
+> >
+> >   - editor config tweak for shell scripts
+> >   - iotest updates (still not default for make check)
+> >   - various docker updates
+> >   - gcc/ubsan updates for travis
+> >   - clean-ups for tests/vm including autoinstall (-netbsd)
+> >   - semihosting fix for Coverity
+> >   - fixes for cputlb in 64-on-32 cases
+> >   - gdbstub re-factor + maintainership update
+>
+> OpenBSD:
+>
+> make: Entering directory '/home/peter.maydell/qemu-openbsd/build'
+> python3 -B /home/peter.maydell/qemu-openbsd/tests/vm/openbsd  --debug
+> --build-dir /home/peter.maydell/qemu-openbsd/build --image
+> "/home/peter.maydell/.cache/qemu-vm/images/openbsd.img" --force
+> --build-image /home/peter.maydell/.cache/qemu-vm/images/openbsd.img
+> Formatting '/home/peter.maydell/.cache/qemu-vm/images/openbsd.img.tmp',
+> fmt=3Dqcow2 size=3D21474836480 cluster_size=3D65536 lazy_refcounts=3Doff
+> refcount_bits=3D16
+> ### Downloading install iso ...
+> ### Preparing iso and disk image ...
+> ### Booting installer ...
+> DEBUG:root:QEMU args: -nodefaults -m 4G -cpu max -netdev
+> user,id=3Dvnet,hostfwd=3D:127.0.0.1:0-:22 -device
+> virtio-net-pci,netdev=3Dvnet -vnc 127.0.0.1:0,to=3D20 -smp 18 -enable-kvm
+> -device VGA -drive
+> file=3D/home/peter.maydell/.cache/qemu-vm/images/openbsd.img.tmp,if=3Dnon=
+e,id=3Ddrive0,cache=3Dwriteback
+> -device virtio-blk,drive=3Ddrive0,bootindex=3D0 -machine graphics=3Doff
+> -cdrom /home/peter.maydell/.cache/qemu-vm/images/openbsd.img.install.iso
+> DEBUG:qemu:VM launch command: 'qemu-system-x86_64 -chardev
+> socket,id=3Dmon,path=3D/var/tmp/tmpnelhp5du/qemu-20711-monitor.sock -mon
+> chardev=3Dmon,mode=3Dcontrol -display none -vga none -machine pc -chardev
+> socket,id=3Dconsole,path=3D/var/tmp/tmpnelhp5du/qemu-20711-console.sock,s=
+erver,nowait
+> -serial chardev:console -nodefaults -m 4G -cpu max -netdev
+> user,id=3Dvnet,hostfwd=3D:127.0.0.1:0-:22 -device
+> virtio-net-pci,netdev=3Dvnet -vnc 127.0.0.1:0,to=3D20 -smp 18 -enable-kvm
+> -device VGA -drive
+> file=3D/home/peter.maydell/.cache/qemu-vm/images/openbsd.img.tmp,if=3Dnon=
+e,id=3Ddrive0,cache=3Dwriteback
+> -device virtio-blk,drive=3Ddrive0,bootindex=3D0 -machine graphics=3Doff
+> -cdrom /home/peter.maydell/.cache/qemu-vm/images/openbsd.img.install.iso'
+> DEBUG:QMP:>>> {'execute': 'qmp_capabilities'}
+> DEBUG:QMP:<<< {'return': {}}
+> DEBUG:QMP:>>> {'execute': 'human-monitor-command', 'arguments':
+> {'command-line': 'info usernet'}}
+> DEBUG:QMP:<<< {'return': 'VLAN -1 (vnet):\r\n  Protocol[State]    FD
+> Source Address  Port   Dest. Address  Port RecvQ SendQ\r\n
+> TCP[HOST_FORWARD]  13       127.0.0.1 46357       10.0.2.15    22
+> 0     0\r\n'}
+> console: *** read timeout ***
+> console: waiting for: 'boot>'
+> console: line buffer:
+>
+>
+> Failed to prepare guest environment
+> Traceback (most recent call last):
+>   File "/home/peter.maydell/qemu-openbsd/tests/vm/basevm.py", line 370, i=
+n main
+>     return vm.build_image(args.image)
+>   File "/home/peter.maydell/qemu-openbsd/tests/vm/openbsd", line 85,
+> in build_image
+>     self.console_wait_send("boot>", "set tty com0\n")
+>   File "/home/peter.maydell/qemu-openbsd/tests/vm/basevm.py", line
+> 267, in console_wait_send
+>     self.console_wait(wait)
+>   File "/home/peter.maydell/qemu-openbsd/tests/vm/basevm.py", line
+> 229, in console_wait
+>     chars =3D vm.console_socket.recv(1024)
+> socket.timeout: timed out
+> DEBUG:QMP:>>> {'execute': 'quit'}
+> DEBUG:QMP:<<< {'return': {}}
+> /home/peter.maydell/qemu-openbsd/tests/vm/Makefile.include:47: recipe
+> for target '/home/peter.maydell/.cache/qemu-vm/images/openbsd.img'
+> failed
+> make: *** [/home/peter.maydell/.cache/qemu-vm/images/openbsd.img] Error 2
+> make: Leaving directory '/home/peter.maydell/qemu-openbsd/build'
+>
+>
+> FreeBSD:
+>
+> make: Entering directory '/home/peter.maydell/qemu-freebsd/build'
+> python3 -B /home/peter.maydell/qemu-freebsd/tests/vm/freebsd  --debug
+> --build-dir /home/peter.maydell/qemu-freebsd/build --image
+> "/home/peter.maydell/.cache/qemu-vm/images/freebsd.img" --force
+> --build-image /home/peter.maydell/.cache/qemu-vm/images/freebsd.img
+> /home/peter.maydell/.cache/qemu-vm/images/freebsd.img.install.iso.xz:
+> 595.0 MiB / 851.1 MiB =3D 0.699, 78 MiB/s, 0:10
+> Formatting '/home/peter.maydell/.cache/qemu-vm/images/freebsd.img.tmp',
+> fmt=3Dqcow2 size=3D21474836480 cluster_size=3D65536 lazy_refcounts=3Doff
+> refcount_bits=3D16
+> ### Downloading install iso ...
+> ### Preparing iso and disk image ...
+> ### Booting installer ...
+> DEBUG:root:QEMU args: -nodefaults -m 4G -cpu max -netdev
+> user,id=3Dvnet,hostfwd=3D:127.0.0.1:0-:22 -device
+> virtio-net-pci,netdev=3Dvnet -vnc 127.0.0.1:0,to=3D20 -smp 18 -enable-kvm
+> -device VGA -drive
+> file=3D/home/peter.maydell/.cache/qemu-vm/images/freebsd.img.tmp,if=3Dnon=
+e,id=3Ddrive0,cache=3Dwriteback
+> -device virtio-blk,drive=3Ddrive0,bootindex=3D0 -machine graphics=3Doff
+> -cdrom /home/peter.maydell/.cache/qemu-vm/images/freebsd.img.install.iso
+> DEBUG:qemu:VM launch command: 'qemu-system-x86_64 -chardev
+> socket,id=3Dmon,path=3D/var/tmp/tmpxwprc886/qemu-20701-monitor.sock -mon
+> chardev=3Dmon,mode=3Dcontrol -display none -vga none -machine pc -chardev
+> socket,id=3Dconsole,path=3D/var/tmp/tmpxwprc886/qemu-20701-console.sock,s=
+erver,nowait
+> -serial chardev:console -nodefaults -m 4G -cpu max -netdev
+> user,id=3Dvnet,hostfwd=3D:127.0.0.1:0-:22 -device
+> virtio-net-pci,netdev=3Dvnet -vnc 127.0.0.1:0,to=3D20 -smp 18 -enable-kvm
+> -device VGA -drive
+> file=3D/home/peter.maydell/.cache/qemu-vm/images/freebsd.img.tmp,if=3Dnon=
+e,id=3Ddrive0,cache=3Dwriteback
+> -device virtio-blk,drive=3Ddrive0,bootindex=3D0 -machine graphics=3Doff
+> -cdrom /home/peter.maydell/.cache/qemu-vm/images/freebsd.img.install.iso'
+> DEBUG:QMP:>>> {'execute': 'qmp_capabilities'}
+> DEBUG:QMP:<<< {'return': {}}
+> DEBUG:QMP:>>> {'execute': 'human-monitor-command', 'arguments':
+> {'command-line': 'info usernet'}}
+> DEBUG:QMP:<<< {'return': 'VLAN -1 (vnet):\r\n  Protocol[State]    FD
+> Source Address  Port   Dest. Address  Port RecvQ SendQ\r\n
+> TCP[HOST_FORWARD]  13       127.0.0.1 39777       10.0.2.15    22
+> 0     0\r\n'}
+> console: *** read timeout ***
+> console: waiting for: 'Autoboot'
+> console: line buffer:
+>
+>
+> Failed to prepare guest environment
+> Traceback (most recent call last):
+>   File "/home/peter.maydell/qemu-freebsd/tests/vm/basevm.py", line 370, i=
+n main
+>     return vm.build_image(args.image)
+>   File "/home/peter.maydell/qemu-freebsd/tests/vm/freebsd", line 94,
+> in build_image
+>     self.console_boot_serial()
+>   File "/home/peter.maydell/qemu-freebsd/tests/vm/freebsd", line 71,
+> in console_boot_serial
+>     self.console_wait_send("Autoboot", "3")
+>   File "/home/peter.maydell/qemu-freebsd/tests/vm/basevm.py", line
+> 267, in console_wait_send
+>     self.console_wait(wait)
+>   File "/home/peter.maydell/qemu-freebsd/tests/vm/basevm.py", line
+> 229, in console_wait
+>     chars =3D vm.console_socket.recv(1024)
+> socket.timeout: timed out
+> DEBUG:QMP:>>> {'execute': 'quit'}
+> DEBUG:QMP:<<< {'timestamp': {'seconds': 1560354157, 'microseconds':
+> 358016}, 'event': 'NIC_RX_FILTER_CHANGED', 'data': {'path':
+> '/machine/peripheral-anon/device[0]/virtio-backend'}}
+> DEBUG:QMP:<<< {'return': {}}
+> /home/peter.maydell/qemu-freebsd/tests/vm/Makefile.include:47: recipe
+> for target '/home/peter.maydell/.cache/qemu-vm/images/freebsd.img'
+> failed
+> make: *** [/home/peter.maydell/.cache/qemu-vm/images/freebsd.img] Error 2
+> make: Leaving directory '/home/peter.maydell/qemu-freebsd/build'
+>
+> thanks
+> -- PMM
 
 
-r~
+
+--=20
+Alex Benn=C3=A9e
+KVM/QEMU Hacker for Linaro
 
