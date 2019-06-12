@@ -2,59 +2,75 @@ Return-Path: <SRS0=XH1q=UL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69EE7C31E46
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 16:09:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E009C31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 16:15:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40B742064A
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 16:09:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40B742064A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 563332064A
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 16:15:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 563332064A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33604 helo=lists.gnu.org)
+Received: from localhost ([::1]:33630 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hb5ov-0000Cn-6j
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 12:09:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47104)
+	id 1hb5uc-0002q6-SS
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 12:15:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49180)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <clg@kaod.org>) id 1hb5k6-0004JX-Ok
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:05:01 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1hb5st-0002Bz-L9
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:14:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1hb5k3-0001EF-HK
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:04:54 -0400
-Received: from 4.mo1.mail-out.ovh.net ([46.105.76.26]:58149)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hb5k1-00018l-Ki
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:04:51 -0400
-Received: from player799.ha.ovh.net (unknown [10.109.143.3])
- by mo1.mail-out.ovh.net (Postfix) with ESMTP id 9B1C417E6BF
- for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 18:04:43 +0200 (CEST)
-Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
- (Authenticated sender: clg@kaod.org)
- by player799.ha.ovh.net (Postfix) with ESMTPSA id 6CCE96BF3B42;
- Wed, 12 Jun 2019 16:04:35 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 12 Jun 2019 18:04:25 +0200
-Message-Id: <20190612160425.27670-1-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1hb5sr-0007Ln-5e
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:13:59 -0400
+Received: from mail-yb1-f172.google.com ([209.85.219.172]:40177)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1hb5sq-0007LH-WE
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:13:57 -0400
+Received: by mail-yb1-f172.google.com with SMTP id g62so6590010ybg.7
+ for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 09:13:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=EuyZTiY+BQonV6Eb0GVxJ4rB0f1VVeLxLME+kj3rHAU=;
+ b=VqCiwhmv6v6dExkQFAny8+rZ58ewypVEmVLcgLkh6txe6Acccf5pqaN/wFuLXlkf7Q
+ j8AGdRkeWkFkiEOtUpo5w6rET+8yWXWSGdl9nz0gDKcAR/kfXfKNfwgbLN3Mb/iP0Xa3
+ PD+mANJCvZ2z9OGdELu2NwKrIo7+1ztiNKKwaiH8zLgfByCQq7Ip/CHqf9EZ8VEGbTli
+ Y15ZPqRAk/8UqPRIqDKJA1rre99fda7gX8nAkHnz/rp+qMBeYyNqqg/+twDWTdbjL0xL
+ A4ShXLtF9MCSaE3MopfF4/LAvYqa+83iDG26kSBp3bv9z6Ex/hsIr1skXDCqduSYqojG
+ iWdQ==
+X-Gm-Message-State: APjAAAVYVUQo6s6zHVp0fUnLnJSyXXRcn8c2pFh+ESMVtgOCjles6d8I
+ KVoV5pGK7b49VXN6q0pSxuQi2SPWSWsfixevIdo=
+X-Google-Smtp-Source: APXvYqy0t7ABwbSvRg1Zfqp2h7HvZce7rLykFpUXzTG48EftP3lbHA4ELk+SRVAOc9Bd8F3FkU4BQORqjxveSW7CRgE=
+X-Received: by 2002:a5b:706:: with SMTP id g6mr39448599ybq.316.1560356036047; 
+ Wed, 12 Jun 2019 09:13:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 2493586819962735590
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudehjedguddttdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-Content-Transfer-Encoding: quoted-printable
+References: <20190612111949.25117-1-alex.bennee@linaro.org>
+ <CAFEAcA9cKcTpyU_SpzVH91JnQfU2g14bNuk_oWkObbbYYxdXQw@mail.gmail.com>
+In-Reply-To: <CAFEAcA9cKcTpyU_SpzVH91JnQfU2g14bNuk_oWkObbbYYxdXQw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Wed, 12 Jun 2019 18:13:42 +0200
+Message-ID: <CAAdtpL4n-DkVhe35yeTVdT7a_XXbUnqaETY_dz_cBtswYcb7CA@mail.gmail.com>
+To: Cleber Rosa <crosa@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>, 
+ Eduardo Habkost <ehabkost@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.76.26
-Subject: [Qemu-devel] [PATCH] docs: updates on the POWER9 XIVE interrupt
- controller documentation
+ [fuzzy]
+X-Received-From: 209.85.219.172
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PULL v2 00/52] testing, gdbstub and cputlb fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,216 +82,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
- Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This includes various small updates and a better description of the
-chosen interrupt mode resulting from the combination of the 'ic-mode'
-machine option, the 'kernel_irqchip' option, guest support and KVM
-support.
+Le mer. 12 juin 2019 18:04, Peter Maydell <peter.maydell@linaro.org> a
+=C3=A9crit :
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
+> On Wed, 12 Jun 2019 at 12:19, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+> >
+> > The following changes since commit
+> 219dca61ebf41625831d4f96a720852baf44b762:
+> >
+> >   Merge remote-tracking branch
+> 'remotes/ehabkost/tags/x86-next-pull-request' into staging (2019-06-11
+> 16:02:07 +0100)
+> >
+> > are available in the Git repository at:
+> >
+> >   https://github.com/stsquad/qemu.git
+> tags/pull-testing-gdbstub-cputlb-120619-2
+> >
+> > for you to fetch changes up to dfffdccbf6984ad7042b3123cba9e29c4f3c9a2b=
+:
+> >
+> >   gdbstub: Implement qemu physical memory mode (2019-06-12 11:23:08
+> +0100)
+> >
+> > ----------------------------------------------------------------
+> > Various fixes and updates:
+> >
+> >   - editor config tweak for shell scripts
+> >   - iotest updates (still not default for make check)
+> >   - various docker updates
+> >   - gcc/ubsan updates for travis
+> >   - clean-ups for tests/vm including autoinstall (-netbsd)
+> >   - semihosting fix for Coverity
+> >   - fixes for cputlb in 64-on-32 cases
+> >   - gdbstub re-factor + maintainership update
+>
+> OpenBSD:
+>
+> make: Entering directory '/home/peter.maydell/qemu-openbsd/build'
+> python3 -B /home/peter.maydell/qemu-openbsd/tests/vm/openbsd  --debug
+> --build-dir /home/peter.maydell/qemu-openbsd/build --image
+> "/home/peter.maydell/.cache/qemu-vm/images/openbsd.img" --force
+> --build-image /home/peter.maydell/.cache/qemu-vm/images/openbsd.img
+> Formatting '/home/peter.maydell/.cache/qemu-vm/images/openbsd.img.tmp',
+> fmt=3Dqcow2 size=3D21474836480 cluster_size=3D65536 lazy_refcounts=3Doff
+> refcount_bits=3D16
+> ### Downloading install iso ...
+> ### Preparing iso and disk image ...
+> ### Booting installer ...
+> DEBUG:root:QEMU args: -nodefaults -m 4G -cpu max -netdev
+> user,id=3Dvnet,hostfwd=3D:127.0.0.1:0-:22 -device
+> virtio-net-pci,netdev=3Dvnet -vnc 127.0.0.1:0,to=3D20 -smp 18 -enable-kvm
+> -device VGA -drive
+>
+> file=3D/home/peter.maydell/.cache/qemu-vm/images/openbsd.img.tmp,if=3Dnon=
+e,id=3Ddrive0,cache=3Dwriteback
+> -device virtio-blk,drive=3Ddrive0,bootindex=3D0 -machine graphics=3Doff
+> -cdrom /home/peter.maydell/.cache/qemu-vm/images/openbsd.img.install.iso
+> DEBUG:qemu:VM launch command: 'qemu-system-x86_64 -chardev
+> socket,id=3Dmon,path=3D/var/tmp/tmpnelhp5du/qemu-20711-monitor.sock -mon
+> chardev=3Dmon,mode=3Dcontrol -display none -vga none -machine pc -chardev
+>
+> socket,id=3Dconsole,path=3D/var/tmp/tmpnelhp5du/qemu-20711-console.sock,s=
+erver,nowait
+> -serial chardev:console -nodefaults -m 4G -cpu max -netdev
+> user,id=3Dvnet,hostfwd=3D:127.0.0.1:0-:22 -device
+> virtio-net-pci,netdev=3Dvnet -vnc 127.0.0.1:0,to=3D20 -smp 18 -enable-kvm
+> -device VGA -drive
+>
+> file=3D/home/peter.maydell/.cache/qemu-vm/images/openbsd.img.tmp,if=3Dnon=
+e,id=3Ddrive0,cache=3Dwriteback
+> -device virtio-blk,drive=3Ddrive0,bootindex=3D0 -machine graphics=3Doff
+> -cdrom /home/peter.maydell/.cache/qemu-vm/images/openbsd.img.install.iso'
+> DEBUG:QMP:>>> {'execute': 'qmp_capabilities'}
+> DEBUG:QMP:<<< {'return': {}}
+> DEBUG:QMP:>>> {'execute': 'human-monitor-command', 'arguments':
+> {'command-line': 'info usernet'}}
+> DEBUG:QMP:<<< {'return': 'VLAN -1 (vnet):\r\n  Protocol[State]    FD
+> Source Address  Port   Dest. Address  Port RecvQ SendQ\r\n
+> TCP[HOST_FORWARD]  13       127.0.0.1 46357       10.0.2.15    22
+> 0     0\r\n'}
+> console: *** read timeout ***
+> console: waiting for: 'boot>'
+> console: line buffer:
+>
+>
+> Failed to prepare guest environment
+> Traceback (most recent call last):
+>   File "/home/peter.maydell/qemu-openbsd/tests/vm/basevm.py", line 370, i=
+n
+> main
+>     return vm.build_image(args.image)
+>   File "/home/peter.maydell/qemu-openbsd/tests/vm/openbsd", line 85,
+> in build_image
+>     self.console_wait_send("boot>", "set tty com0\n")
+>   File "/home/peter.maydell/qemu-openbsd/tests/vm/basevm.py", line
+> 267, in console_wait_send
+>     self.console_wait(wait)
+>   File "/home/peter.maydell/qemu-openbsd/tests/vm/basevm.py", line
+> 229, in console_wait
+>     chars =3D vm.console_socket.recv(1024)
+> socket.timeout: timed out
+> DEBUG:QMP:>>> {'execute': 'quit'}
+> DEBUG:QMP:<<< {'return': {}}
+> /home/peter.maydell/qemu-openbsd/tests/vm/Makefile.include:47: recipe
+> for target '/home/peter.maydell/.cache/qemu-vm/images/openbsd.img'
+> failed
+> make: *** [/home/peter.maydell/.cache/qemu-vm/images/openbsd.img] Error 2
+> make: Leaving directory '/home/peter.maydell/qemu-openbsd/build'
+>
+>
+> FreeBSD:
+>
+> make: Entering directory '/home/peter.maydell/qemu-freebsd/build'
+> python3 -B /home/peter.maydell/qemu-freebsd/tests/vm/freebsd  --debug
+> --build-dir /home/peter.maydell/qemu-freebsd/build --image
+> "/home/peter.maydell/.cache/qemu-vm/images/freebsd.img" --force
+> --build-image /home/peter.maydell/.cache/qemu-vm/images/freebsd.img
+> /home/peter.maydell/.cache/qemu-vm/images/freebsd.img.install.iso.xz:
+> 595.0 MiB / 851.1 MiB =3D 0.699, 78 MiB/s, 0:10
+> Formatting '/home/peter.maydell/.cache/qemu-vm/images/freebsd.img.tmp',
+> fmt=3Dqcow2 size=3D21474836480 cluster_size=3D65536 lazy_refcounts=3Doff
+> refcount_bits=3D16
+> ### Downloading install iso ...
+> ### Preparing iso and disk image ...
+> ### Booting installer ...
+> DEBUG:root:QEMU args: -nodefaults -m 4G -cpu max -netdev
+> user,id=3Dvnet,hostfwd=3D:127.0.0.1:0-:22 -device
+> virtio-net-pci,netdev=3Dvnet -vnc 127.0.0.1:0,to=3D20 -smp 18 -enable-kvm
+> -device VGA -drive
+>
+> file=3D/home/peter.maydell/.cache/qemu-vm/images/freebsd.img.tmp,if=3Dnon=
+e,id=3Ddrive0,cache=3Dwriteback
+> -device virtio-blk,drive=3Ddrive0,bootindex=3D0 -machine graphics=3Doff
+> -cdrom /home/peter.maydell/.cache/qemu-vm/images/freebsd.img.install.iso
+> DEBUG:qemu:VM launch command: 'qemu-system-x86_64 -chardev
+> socket,id=3Dmon,path=3D/var/tmp/tmpxwprc886/qemu-20701-monitor.sock -mon
+> chardev=3Dmon,mode=3Dcontrol -display none -vga none -machine pc -chardev
+>
+> socket,id=3Dconsole,path=3D/var/tmp/tmpxwprc886/qemu-20701-console.sock,s=
+erver,nowait
+> -serial chardev:console -nodefaults -m 4G -cpu max -netdev
+> user,id=3Dvnet,hostfwd=3D:127.0.0.1:0-:22 -device
+> virtio-net-pci,netdev=3Dvnet -vnc 127.0.0.1:0,to=3D20 -smp 18 -enable-kvm
+> -device VGA -drive
+>
+> file=3D/home/peter.maydell/.cache/qemu-vm/images/freebsd.img.tmp,if=3Dnon=
+e,id=3Ddrive0,cache=3Dwriteback
+> -device virtio-blk,drive=3Ddrive0,bootindex=3D0 -machine graphics=3Doff
+> -cdrom /home/peter.maydell/.cache/qemu-vm/images/freebsd.img.install.iso'
+> DEBUG:QMP:>>> {'execute': 'qmp_capabilities'}
+> DEBUG:QMP:<<< {'return': {}}
+> DEBUG:QMP:>>> {'execute': 'human-monitor-command', 'arguments':
+> {'command-line': 'info usernet'}}
+> DEBUG:QMP:<<< {'return': 'VLAN -1 (vnet):\r\n  Protocol[State]    FD
+> Source Address  Port   Dest. Address  Port RecvQ SendQ\r\n
+> TCP[HOST_FORWARD]  13       127.0.0.1 39777       10.0.2.15    22
+> 0     0\r\n'}
+> console: *** read timeout ***
+> console: waiting for: 'Autoboot'
+> console: line buffer:
+>
+>
+> Failed to prepare guest environment
+> Traceback (most recent call last):
+>   File "/home/peter.maydell/qemu-freebsd/tests/vm/basevm.py", line 370, i=
+n
+> main
+>     return vm.build_image(args.image)
+>   File "/home/peter.maydell/qemu-freebsd/tests/vm/freebsd", line 94,
+> in build_image
+>     self.console_boot_serial()
+>   File "/home/peter.maydell/qemu-freebsd/tests/vm/freebsd", line 71,
+> in console_boot_serial
+>     self.console_wait_send("Autoboot", "3")
+>   File "/home/peter.maydell/qemu-freebsd/tests/vm/basevm.py", line
+> 267, in console_wait_send
+>     self.console_wait(wait)
+>   File "/home/peter.maydell/qemu-freebsd/tests/vm/basevm.py", line
+> 229, in console_wait
+>     chars =3D vm.console_socket.recv(1024)
+> socket.timeout: timed out
+> DEBUG:QMP:>>> {'execute': 'quit'}
+> DEBUG:QMP:<<< {'timestamp': {'seconds': 1560354157, 'microseconds':
+> 358016}, 'event': 'NIC_RX_FILTER_CHANGED', 'data': {'path':
+> '/machine/peripheral-anon/device[0]/virtio-backend'}}
+> DEBUG:QMP:<<< {'return': {}}
+> /home/peter.maydell/qemu-freebsd/tests/vm/Makefile.include:47: recipe
+> for target '/home/peter.maydell/.cache/qemu-vm/images/freebsd.img'
+> failed
+> make: *** [/home/peter.maydell/.cache/qemu-vm/images/freebsd.img] Error 2
+> make: Leaving directory '/home/peter.maydell/qemu-freebsd/build'
+>
 
- David, please check the tables below. Thanks
+3 errors seems the same Python socket char dropped/missed issue we are
+trying to figure out with Cleber.
 
- docs/specs/ppc-spapr-xive.rst | 112 ++++++++++++++++++++++++++++++++--
- docs/specs/ppc-xive.rst       |   9 +--
- 2 files changed, 111 insertions(+), 10 deletions(-)
-
-diff --git a/docs/specs/ppc-spapr-xive.rst b/docs/specs/ppc-spapr-xive.rs=
-t
-index 539ce7ca4e90..7a64c9d04951 100644
---- a/docs/specs/ppc-spapr-xive.rst
-+++ b/docs/specs/ppc-spapr-xive.rst
-@@ -34,19 +34,118 @@ CAS Negotiation
- ---------------
-=20
- QEMU advertises the supported interrupt modes in the device tree
--property "ibm,arch-vec-5-platform-support" in byte 23 and the OS
--Selection for XIVE is indicated in the "ibm,architecture-vec-5"
-+property ``ibm,arch-vec-5-platform-support`` in byte 23 and the OS
-+Selection for XIVE is indicated in the ``ibm,architecture-vec-5``
- property byte 23.
-=20
- The interrupt modes supported by the machine depend on the CPU type
- (POWER9 is required for XIVE) but also on the machine property
- ``ic-mode`` which can be set on the command line. It can take the
--following values: ``xics``, ``xive``, ``dual`` and currently ``xics``
--is the default but it may change in the future.
-+following values: ``xics``, ``xive``, and ``dual`` which is the
-+default mode. ``dual`` means that both modes XICS **and** XIVE are
-+supported and if the guest OS supports XIVE, this mode will be
-+selected.
-=20
- The choosen interrupt mode is activated after a reconfiguration done
- in a machine reset.
-=20
-+KVM negotiation
-+---------------
-+
-+When the guest starts under KVM, the capabilities of the host kernel
-+and QEMU are also negotiated. Depending on the version of the host
-+kernel, KVM will advertise the XIVE capability to QEMU or not.
-+
-+Nevertheless, the available interrupt modes in the machine should not
-+depend on the XIVE KVM capability of the host. On older kernels
-+without XIVE KVM support, QEMU will use the emulated XIVE device as a
-+fallback and on newer kernels (>=3D5.2), the KVM XIVE device.
-+
-+As a final refinement, the user can also switch the use of the KVM
-+device with the machine option ``kernel_irqchip``.
-+
-+
-+XIVE support in KVM
-+~~~~~~~~~~~~~~~~~~~
-+
-+For guest OSes supporting XIVE, the resulting interrupt modes on host
-+kernels with XIVE KVM support are the following:
-+
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+ic-mode                            kernel_irqchip
-+--------------  ----------------------------------------------
-+/               allowed        off            on
-+                (default)
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+dual (default)  XIVE KVM       XIVE emul.     XIVE KVM
-+xive            XIVE KVM       XIVE emul.     XIVE KVM
-+xics            XICS KVM       XICS emul.     XICS KVM
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+For legacy guest OSes without XIVE support, the resulting interrupt
-+modes are the following:
-+
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+ic-mode                            kernel_irqchip
-+--------------  ----------------------------------------------
-+/               allowed        off            on
-+                (default)
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+dual (default)  XICS KVM       XICS emul.     XICS KVM
-+xive            QEMU error(3)  QEMU error(3)  QEMU error(3)
-+xics            XICS KVM       XICS emul.     XICS KVM
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+(3) QEMU fails at CAS with ``Guest requested unavailable interrupt
-+    mode (XICS), either don't set the ic-mode machine property or try
-+    ic-mode=3Dxics or ic-mode=3Ddual``
-+
-+
-+No XIVE support in KVM
-+~~~~~~~~~~~~~~~~~~~~~~
-+
-+For guest OSes supporting XIVE, the resulting interrupt modes on host
-+kernels without XIVE KVM support are the following:
-+
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+ic-mode                            kernel_irqchip
-+--------------  ----------------------------------------------
-+/               allowed        off            on
-+                (default)
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+dual (default)  XIVE emul.(1)  XIVE emul.     QEMU error (2)
-+xive            XIVE emul.(1)  XIVE emul.     QEMU error (2)
-+xics            XICS KVM       XICS emul.     XICS KVM
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+
-+(1) QEMU warns with ``warning: kernel_irqchip requested but unavailable:
-+    IRQ_XIVE capability must be present for KVM``
-+(2) QEMU fails with ``kernel_irqchip requested but unavailable:
-+    IRQ_XIVE capability must be present for KVM``
-+
-+
-+For legacy guest OSes without XIVE support, the resulting interrupt
-+modes are the following:
-+
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+ic-mode                            kernel_irqchip
-+--------------  ----------------------------------------------
-+/               allowed        off            on
-+                (default)
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+dual (default)  QEMU error(4)  XICS emul.     QEMU error(4)
-+xive            QEMU error(3)  QEMU error(3)  QEMU error(3)
-+xics            XICS KVM       XICS emul.     XICS KVM
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+(3) QEMU fails at CAS with ``Guest requested unavailable interrupt
-+    mode (XICS), either don't set the ic-mode machine property or try
-+    ic-mode=3Dxics or ic-mode=3Ddual``
-+(4) QEMU/KVM incompatibility due to device destruction in reset. This
-+    needs to be addressed more cleanly with an error.
-+
-+
- XIVE Device tree properties
- ---------------------------
-=20
-@@ -92,10 +191,11 @@ for both interrupt mode. The different ranges are de=
-fined as follow :
- - ``0x0000 .. 0x0FFF`` 4K CPU IPIs (only used under XIVE)
- - ``0x1000 .. 0x1000`` 1 EPOW
- - ``0x1001 .. 0x1001`` 1 HOTPLUG
-+- ``0x1002 .. 0x10FF`` unused
- - ``0x1100 .. 0x11FF`` 256 VIO devices
--- ``0x1200 .. 0x127F`` 32 PHBs devices
-+- ``0x1200 .. 0x127F`` 32x4 LSIs for PHB devices
- - ``0x1280 .. 0x12FF`` unused
--- ``0x1300 .. 0x1FFF`` PHB MSIs
-+- ``0x1300 .. 0x1FFF`` PHB MSIs (dynamically allocated)
-=20
- Monitoring XIVE
- ---------------
-diff --git a/docs/specs/ppc-xive.rst b/docs/specs/ppc-xive.rst
-index b997dc062910..148d57eb6ab2 100644
---- a/docs/specs/ppc-xive.rst
-+++ b/docs/specs/ppc-xive.rst
-@@ -20,10 +20,11 @@ The XIVE IC is composed of three sub-engines, each ta=
-king care of a
- processing layer of external interrupts:
-=20
- - Interrupt Virtualization Source Engine (IVSE), or Source Controller
--  (SC). These are found in PCI PHBs, in the PSI host bridge
--  controller, but also inside the main controller for the core IPIs
--  and other sub-chips (NX, CAP, NPU) of the chip/processor. They are
--  configured to feed the IVRE with events.
-+  (SC). These are found in PCI PHBs, in the Processor Service
-+  Interface (PSI) host bridge Controller, but also inside the main
-+  controller for the core IPIs and other sub-chips (NX, CAP, NPU) of
-+  the chip/processor. They are configured to feed the IVRE with
-+  events.
- - Interrupt Virtualization Routing Engine (IVRE) or Virtualization
-   Controller (VC). It handles event coalescing and perform interrupt
-   routing by matching an event source number with an Event
---=20
-2.21.0
-
-
+>
