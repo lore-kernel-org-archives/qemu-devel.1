@@ -6,56 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BCE5C31E46
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 10:55:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5CA9C31E47
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 10:55:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 749EE2080A
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 10:55:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 749EE2080A
+	by mail.kernel.org (Postfix) with ESMTPS id B16332080A
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 10:55:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B16332080A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58740 helo=lists.gnu.org)
+Received: from localhost ([::1]:58742 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hb0uB-0000rT-OE
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 06:54:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58702)
+	id 1hb0uC-0000tm-W0
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 06:55:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58827)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <quintela@redhat.com>) id 1hb0o0-0003I5-78
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 06:48:37 -0400
+ (envelope-from <quintela@redhat.com>) id 1hb0oD-0003YE-Kv
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 06:48:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1hb0ny-0002pL-9H
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 06:48:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45344)
+ (envelope-from <quintela@redhat.com>) id 1hb0oA-0002th-Vh
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 06:48:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34296)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hb0nx-0002jX-W2
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 06:48:34 -0400
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hb0oA-0002tQ-Lb
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 06:48:46 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C6CBAC05B1CD;
- Wed, 12 Jun 2019 10:48:17 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id F12F73082141;
+ Wed, 12 Jun 2019 10:48:45 +0000 (UTC)
 Received: from localhost.localdomain (ovpn-116-241.ams2.redhat.com
  [10.36.116.241])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 53F6127C39;
- Wed, 12 Jun 2019 10:48:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B907B46;
+ Wed, 12 Jun 2019 10:48:43 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 12 Jun 2019 12:48:01 +0200
-Message-Id: <20190612104808.6398-2-quintela@redhat.com>
+Date: Wed, 12 Jun 2019 12:48:08 +0200
+Message-Id: <20190612104808.6398-9-quintela@redhat.com>
 In-Reply-To: <20190612104808.6398-1-quintela@redhat.com>
 References: <20190612104808.6398-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Wed, 12 Jun 2019 10:48:20 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.42]); Wed, 12 Jun 2019 10:48:46 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 1/8] migration: fix multifd_recv event typo
+Subject: [Qemu-devel] [PULL 8/8] migratioin/ram.c: reset complete_round when
+ we gets a queued page
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,34 +77,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It uses num in multifd_send().  Make it coherent.
+From: Wei Yang <richardw.yang@linux.intel.com>
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
+In case we gets a queued page, the order of block is interrupted. We may
+not rely on the complete_round flag to say we have already searched the
+whole blocks on the list.
+
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Message-Id: <20190605010828.6969-1-richardw.yang@linux.intel.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/trace-events | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ migration/ram.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/migration/trace-events b/migration/trace-events
-index de2e136e57..cd50a1e659 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -80,7 +80,7 @@ get_queued_page_not_dirty(const char *block_name, uint6=
-4_t tmp_offset, unsigned
- migration_bitmap_sync_start(void) ""
- migration_bitmap_sync_end(uint64_t dirty_pages) "dirty_pages %" PRIu64
- migration_throttle(void) ""
--multifd_recv(uint8_t id, uint64_t packet_num, uint32_t used, uint32_t fl=
-ags, uint32_t next_packet_size) "channel %d packet number %" PRIu64 " pag=
-es %d flags 0x%x next packet size %d"
-+multifd_recv(uint8_t id, uint64_t packet_num, uint32_t used, uint32_t fl=
-ags, uint32_t next_packet_size) "channel %d packet_num %" PRIu64 " pages =
-%d flags 0x%x next packet size %d"
- multifd_recv_sync_main(long packet_num) "packet num %ld"
- multifd_recv_sync_main_signal(uint8_t id) "channel %d"
- multifd_recv_sync_main_wait(uint8_t id) "channel %d"
+diff --git a/migration/ram.c b/migration/ram.c
+index 96c84f770a..89eec7ee9d 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -2286,6 +2286,12 @@ static bool get_queued_page(RAMState *rs, PageSear=
+chStatus *pss)
+          */
+         pss->block =3D block;
+         pss->page =3D offset >> TARGET_PAGE_BITS;
++
++        /*
++         * This unqueued page would break the "one round" check, even is
++         * really rare.
++         */
++        pss->complete_round =3D false;
+     }
+=20
+     return !!block;
 --=20
 2.21.0
 
