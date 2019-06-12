@@ -6,58 +6,59 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 709BDC31E46
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 17:07:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A02ECC31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 17:09:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C58E215EA
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 17:07:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C58E215EA
+	by mail.kernel.org (Postfix) with ESMTPS id 7C02B21019
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 17:09:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C02B21019
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33928 helo=lists.gnu.org)
+Received: from localhost ([::1]:33952 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hb6ij-0001Bk-Gu
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 13:07:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57978)
+	id 1hb6k9-0002oO-QR
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 13:09:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57863)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hb6Ug-0007UQ-4m
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:53:09 -0400
+ (envelope-from <armbru@redhat.com>) id 1hb6UM-0007Qs-AV
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:52:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hb6Uc-0006YW-0I
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:53:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34664)
+ (envelope-from <armbru@redhat.com>) id 1hb6UI-0006FS-QU
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:52:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57976)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hb6Ub-0006Fk-MP
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:52:57 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hb6UG-0006Ab-6J
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:52:36 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D11D9C002965
- for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 16:52:33 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id D52A330001DA
+ for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 16:52:32 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
  [10.36.116.148])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7DD395C298;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E90851C60;
  Wed, 12 Jun 2019 16:52:32 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id A716311385D5; Wed, 12 Jun 2019 18:52:29 +0200 (CEST)
+ id AA6BE11384AA; Wed, 12 Jun 2019 18:52:29 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 12 Jun 2019 18:52:23 +0200
-Message-Id: <20190612165229.26976-6-armbru@redhat.com>
+Date: Wed, 12 Jun 2019 18:52:24 +0200
+Message-Id: <20190612165229.26976-7-armbru@redhat.com>
 In-Reply-To: <20190612165229.26976-1-armbru@redhat.com>
 References: <20190612165229.26976-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Wed, 12 Jun 2019 16:52:33 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Wed, 12 Jun 2019 16:52:32 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 05/11] qapi: Add feature flags to struct types
+Subject: [Qemu-devel] [PULL 06/11] tests/qapi-schema: Test for good feature
+ lists in structs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,451 +77,159 @@ Sender: "Qemu-devel"
 
 From: Kevin Wolf <kwolf@redhat.com>
 
-Sometimes, the behaviour of QEMU changes without a change in the QMP
-syntax (usually by allowing values or operations that previously
-resulted in an error). QMP clients may still need to know whether
-they can rely on the changed behavior.
-
-Let's add feature flags to the QAPI schema language, so that we can make
-such changes visible with schema introspection.
-
-An example for a schema definition using feature flags looks like this:
-
-    { 'struct': 'TestType',
-      'data': { 'number': 'int' },
-      'features': [ 'allow-negative-numbers' ] }
-
-Introspection information then looks like this:
-
-    { "name": "TestType", "meta-type": "object",
-      "members": [
-          { "name": "number", "type": "int" } ],
-      "features": [ "allow-negative-numbers" ] }
-
-This patch implements feature flags only for struct types. We'll
-implement them more widely as needed.
-
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Message-Id: <20190606153803.5278-2-armbru@redhat.com>
+Message-Id: <20190606153803.5278-3-armbru@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- docs/devel/qapi-code-gen.txt           | 38 +++++++++++++++
- qapi/introspect.json                   |  6 ++-
- scripts/qapi/common.py                 | 66 ++++++++++++++++++++++----
- scripts/qapi/doc.py                    |  3 +-
- scripts/qapi/introspect.py             |  6 ++-
- scripts/qapi/types.py                  |  3 +-
- scripts/qapi/visit.py                  |  3 +-
- tests/qapi-schema/double-type.err      |  2 +-
- tests/qapi-schema/test-qapi.py         |  3 +-
- tests/qapi-schema/unknown-expr-key.err |  2 +-
- 10 files changed, 114 insertions(+), 18 deletions(-)
+ tests/qapi-schema/qapi-schema-test.json | 39 ++++++++++++++++++++++
+ tests/qapi-schema/qapi-schema-test.out  | 43 +++++++++++++++++++++++++
+ tests/qapi-schema/test-qapi.py          |  4 +++
+ tests/test-qmp-cmds.c                   |  8 +++++
+ 4 files changed, 94 insertions(+)
 
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index b517b0cfbf..e8ec8ac1de 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -719,6 +719,34 @@ any non-empty complex type (struct, union, or altern=
-ate), and a
- pointer to that QAPI type is passed as a single argument.
-=20
-=20
-+=3D=3D=3D Features =3D=3D=3D
+diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
+qapi-schema-test.json
+index 0952c68734..c6d59acc3e 100644
+--- a/tests/qapi-schema/qapi-schema-test.json
++++ b/tests/qapi-schema/qapi-schema-test.json
+@@ -242,3 +242,42 @@
+   { 'foo': 'TestIfStruct',
+     'bar': { 'type': ['TestIfEnum'], 'if': 'defined(TEST_IF_EVT_BAR)' } =
+},
+   'if': 'defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)' }
 +
-+Sometimes, the behaviour of QEMU changes compatibly, but without a
-+change in the QMP syntax (usually by allowing values or operations that
-+previously resulted in an error). QMP clients may still need to know
-+whether the extension is available.
++# test 'features' for structs
 +
-+For this purpose, a list of features can be specified for a struct type.
-+This is exposed to the client as a list of string, where each string
-+signals that this build of QEMU shows a certain behaviour.
++{ 'struct': 'FeatureStruct0',
++  'data': { 'foo': 'int' },
++  'features': [] }
++{ 'struct': 'FeatureStruct1',
++  'data': { 'foo': 'int' },
++  'features': [ 'feature1' ] }
++{ 'struct': 'FeatureStruct2',
++  'data': { 'foo': 'int' },
++  'features': [ { 'name': 'feature1' } ] }
++{ 'struct': 'FeatureStruct3',
++  'data': { 'foo': 'int' },
++  'features': [ 'feature1', 'feature2' ] }
++{ 'struct': 'FeatureStruct4',
++  'data': { 'namespace-test': 'int' },
++  'features': [ 'namespace-test', 'int', 'name', 'if' ] }
 +
-+In the schema, features can be specified as simple strings, for example:
-+
-+{ 'struct': 'TestType',
-+  'data': { 'number': 'int' },
-+  'features': [ 'allow-negative-numbers' ] }
-+
-+Another option is to specify features as dictionaries, where the key
-+'name' specifies the feature string to be exposed to clients:
-+
-+{ 'struct': 'TestType',
-+  'data': { 'number': 'int' },
-+  'features': [ { 'name': 'allow-negative-numbers' } ] }
-+
-+This expanded form is necessary if you want to make the feature
-+conditional (see below in "Configuring the schema").
-+
-+
- =3D=3D=3D Downstream extensions =3D=3D=3D
-=20
- QAPI schema names that are externally visible, say in the Client JSON
-@@ -771,6 +799,16 @@ Example: a conditional 'bar' enum member.
-   [ 'foo',
-     { 'name' : 'bar', 'if': 'defined(IFCOND)' } ] }
-=20
-+Similarly, features can be specified as a dictionary with a 'name' and
-+an 'if' key.
-+
-+Example: a conditional 'allow-negative-numbers' feature
-+
-+{ 'struct': 'TestType',
-+  'data': { 'number': 'int' },
-+  'features': [ { 'name': 'allow-negative-numbers',
-+                  'if' 'defined(IFCOND)' } ] }
-+
- Please note that you are responsible to ensure that the C code will
- compile with an arbitrary combination of conditions, since the
- generators are unable to check it at this point.
-diff --git a/qapi/introspect.json b/qapi/introspect.json
-index 3d22166b2b..1843c1cb17 100644
---- a/qapi/introspect.json
-+++ b/qapi/introspect.json
-@@ -174,6 +174,9 @@
- #            and may even differ from the order of the values of the
- #            enum type of the @tag.
- #
-+# @features: names of features associated with the type, in no particula=
-r
-+#            order. (since: 4.1)
-+#
- # Values of this type are JSON object on the wire.
- #
- # Since: 2.5
-@@ -181,7 +184,8 @@
- { 'struct': 'SchemaInfoObject',
-   'data': { 'members': [ 'SchemaInfoObjectMember' ],
-             '*tag': 'str',
--            '*variants': [ 'SchemaInfoObjectVariant' ] } }
-+            '*variants': [ 'SchemaInfoObjectVariant' ],
-+            '*features': [ 'str' ] } }
-=20
- ##
- # @SchemaInfoObjectMember:
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index f07869ec73..9e4b6c00b5 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -886,12 +886,26 @@ def check_enum(expr, info):
- def check_struct(expr, info):
-     name =3D expr['struct']
-     members =3D expr['data']
-+    features =3D expr.get('features')
-=20
-     check_type(info, "'data' for struct '%s'" % name, members,
-                allow_dict=3DTrue, allow_optional=3DTrue)
-     check_type(info, "'base' for struct '%s'" % name, expr.get('base'),
-                allow_metas=3D['struct'])
-=20
-+    if features:
-+        if not isinstance(features, list):
-+            raise QAPISemError(info,
-+                               "Struct '%s' requires an array for 'featu=
-res'" %
-+                               name)
-+        for f in features:
-+            assert isinstance(f, dict)
-+            check_known_keys(info, "feature of struct %s" % name, f,
-+                             ['name'], ['if'])
-+
-+            check_if(f, info)
-+            check_name(info, "Feature of struct %s" % name, f['name'])
-+
-=20
- def check_known_keys(info, source, keys, required, optional):
-=20
-@@ -948,6 +962,12 @@ def normalize_members(members):
-             members[key] =3D {'type': arg}
-=20
-=20
-+def normalize_features(features):
-+    if isinstance(features, list):
-+        features[:] =3D [f if isinstance(f, dict) else {'name': f}
-+                       for f in features]
-+
-+
- def check_exprs(exprs):
-     global all_names
-=20
-@@ -986,8 +1006,10 @@ def check_exprs(exprs):
-             normalize_members(expr['data'])
-         elif 'struct' in expr:
-             meta =3D 'struct'
--            check_keys(expr_elem, 'struct', ['data'], ['base', 'if'])
-+            check_keys(expr_elem, 'struct', ['data'],
-+                       ['base', 'if', 'features'])
-             normalize_members(expr['data'])
-+            normalize_features(expr.get('features'))
-             struct_types[expr[meta]] =3D expr
-         elif 'command' in expr:
-             meta =3D 'command'
-@@ -1126,10 +1148,12 @@ class QAPISchemaVisitor(object):
-     def visit_array_type(self, name, info, ifcond, element_type):
-         pass
-=20
--    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts):
-+    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts,
-+                          features):
-         pass
-=20
--    def visit_object_type_flat(self, name, info, ifcond, members, varian=
-ts):
-+    def visit_object_type_flat(self, name, info, ifcond, members, varian=
-ts,
-+                               features):
-         pass
-=20
-     def visit_alternate_type(self, name, info, ifcond, variants):
-@@ -1290,7 +1314,7 @@ class QAPISchemaArrayType(QAPISchemaType):
-=20
- class QAPISchemaObjectType(QAPISchemaType):
-     def __init__(self, name, info, doc, ifcond,
--                 base, local_members, variants):
-+                 base, local_members, variants, features):
-         # struct has local_members, optional base, and no variants
-         # flat union has base, variants, and no local_members
-         # simple union has local_members, variants, and no base
-@@ -1302,11 +1326,15 @@ class QAPISchemaObjectType(QAPISchemaType):
-         if variants is not None:
-             assert isinstance(variants, QAPISchemaObjectTypeVariants)
-             variants.set_owner(name)
-+        for f in features:
-+            assert isinstance(f, QAPISchemaFeature)
-+            f.set_owner(name)
-         self._base_name =3D base
-         self.base =3D None
-         self.local_members =3D local_members
-         self.variants =3D variants
-         self.members =3D None
-+        self.features =3D features
-=20
-     def check(self, schema):
-         QAPISchemaType.check(self, schema)
-@@ -1332,6 +1360,12 @@ class QAPISchemaObjectType(QAPISchemaType):
-             self.variants.check(schema, seen)
-             assert self.variants.tag_member in self.members
-             self.variants.check_clash(self.info, seen)
-+
-+        # Features are in a name space separate from members
-+        seen =3D {}
-+        for f in self.features:
-+            f.check_clash(self.info, seen)
-+
-         if self.doc:
-             self.doc.check()
-=20
-@@ -1368,12 +1402,15 @@ class QAPISchemaObjectType(QAPISchemaType):
-=20
-     def visit(self, visitor):
-         visitor.visit_object_type(self.name, self.info, self.ifcond,
--                                  self.base, self.local_members, self.va=
-riants)
-+                                  self.base, self.local_members, self.va=
-riants,
-+                                  self.features)
-         visitor.visit_object_type_flat(self.name, self.info, self.ifcond=
-,
--                                       self.members, self.variants)
-+                                       self.members, self.variants,
-+                                       self.features)
-=20
-=20
- class QAPISchemaMember(object):
-+    """ Represents object members, enum members and features """
-     role =3D 'member'
-=20
-     def __init__(self, name, ifcond=3DNone):
-@@ -1419,6 +1456,10 @@ class QAPISchemaMember(object):
-         return "'%s' %s" % (self.name, self._pretty_owner())
-=20
-=20
-+class QAPISchemaFeature(QAPISchemaMember):
-+    role =3D 'feature'
-+
-+
- class QAPISchemaObjectTypeMember(QAPISchemaMember):
-     def __init__(self, name, typ, optional, ifcond=3DNone):
-         QAPISchemaMember.__init__(self, name, ifcond)
-@@ -1675,7 +1716,7 @@ class QAPISchema(object):
-                   ('null',   'null',    'QNull' + pointer_suffix)]:
-             self._def_builtin_type(*t)
-         self.the_empty_object_type =3D QAPISchemaObjectType(
--            'q_empty', None, None, None, None, [], None)
-+            'q_empty', None, None, None, None, [], None, [])
-         self._def_entity(self.the_empty_object_type)
-=20
-         qtypes =3D ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist'=
-,
-@@ -1685,6 +1726,9 @@ class QAPISchema(object):
-         self._def_entity(QAPISchemaEnumType('QType', None, None, None,
-                                             qtype_values, 'QTYPE'))
-=20
-+    def _make_features(self, features):
-+        return [QAPISchemaFeature(f['name'], f.get('if')) for f in featu=
-res]
-+
-     def _make_enum_members(self, values):
-         return [QAPISchemaMember(v['name'], v.get('if')) for v in values=
-]
-=20
-@@ -1721,7 +1765,7 @@ class QAPISchema(object):
-             assert ifcond =3D=3D typ._ifcond # pylint: disable=3Dprotect=
-ed-access
-         else:
-             self._def_entity(QAPISchemaObjectType(name, info, doc, ifcon=
-d,
--                                                  None, members, None))
-+                                                  None, members, None, [=
-]))
-         return name
-=20
-     def _def_enum_type(self, expr, info, doc):
-@@ -1752,9 +1796,11 @@ class QAPISchema(object):
-         base =3D expr.get('base')
-         data =3D expr['data']
-         ifcond =3D expr.get('if')
-+        features =3D expr.get('features', [])
-         self._def_entity(QAPISchemaObjectType(name, info, doc, ifcond, b=
-ase,
-                                               self._make_members(data, i=
-nfo),
--                                              None))
-+                                              None,
-+                                              self._make_features(featur=
-es)))
-=20
-     def _make_variant(self, case, typ, ifcond):
-         return QAPISchemaObjectTypeVariant(case, typ, ifcond)
-@@ -1795,7 +1841,7 @@ class QAPISchema(object):
-             QAPISchemaObjectType(name, info, doc, ifcond, base, members,
-                                  QAPISchemaObjectTypeVariants(tag_name,
-                                                               tag_member=
-,
--                                                              variants))=
-)
-+                                                              variants),=
- []))
-=20
-     def _def_alternate_type(self, expr, info, doc):
-         name =3D expr['alternate']
-diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
-index 5c8c136899..433e9fcbfb 100755
---- a/scripts/qapi/doc.py
-+++ b/scripts/qapi/doc.py
-@@ -220,7 +220,8 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
-isitor):
-                                body=3Dtexi_entity(doc, 'Values', ifcond,
-                                                 member_func=3Dtexi_enum_=
-value)))
-=20
--    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts):
-+    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts,
-+                          features):
-         doc =3D self.cur_doc
-         if base and base.is_implicit():
-             base =3D None
-diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-index f7f2ca07e4..f62cf0a2e1 100644
---- a/scripts/qapi/introspect.py
-+++ b/scripts/qapi/introspect.py
-@@ -188,11 +188,15 @@ const QLitObject %(c_name)s =3D %(c_string)s;
-         self._gen_qlit('[' + element + ']', 'array', {'element-type': el=
-ement},
-                        ifcond)
-=20
--    def visit_object_type_flat(self, name, info, ifcond, members, varian=
-ts):
-+    def visit_object_type_flat(self, name, info, ifcond, members, varian=
-ts,
-+                               features):
-         obj =3D {'members': [self._gen_member(m) for m in members]}
-         if variants:
-             obj.update(self._gen_variants(variants.tag_member.name,
-                                           variants.variants))
-+        if features:
-+            obj['features'] =3D [(f.name, {'if': f.ifcond}) for f in fea=
-tures]
-+
-         self._gen_qlit(name, 'object', obj, ifcond)
-=20
-     def visit_alternate_type(self, name, info, ifcond, variants):
-diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
-index 2bd6fcd44f..3edd9374aa 100644
---- a/scripts/qapi/types.py
-+++ b/scripts/qapi/types.py
-@@ -227,7 +227,8 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVisi=
-tor):
-             self._genh.add(gen_array(name, element_type))
-             self._gen_type_cleanup(name)
-=20
--    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts):
-+    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts,
-+                          features):
-         # Nothing to do for the special empty builtin
-         if name =3D=3D 'q_empty':
-             return
-diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
-index fd356151d2..484ebb66ad 100644
---- a/scripts/qapi/visit.py
-+++ b/scripts/qapi/visit.py
-@@ -324,7 +324,8 @@ class QAPISchemaGenVisitVisitor(QAPISchemaModularCVis=
-itor):
-             self._genh.add(gen_visit_decl(name))
-             self._genc.add(gen_visit_list(name, element_type))
-=20
--    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts):
-+    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts,
-+                          features):
-         # Nothing to do for the special empty builtin
-         if name =3D=3D 'q_empty':
-             return
-diff --git a/tests/qapi-schema/double-type.err b/tests/qapi-schema/double=
--type.err
-index 799193dba1..69457173a7 100644
---- a/tests/qapi-schema/double-type.err
-+++ b/tests/qapi-schema/double-type.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/double-type.json:2: Unknown key 'command' in struct 'b=
-ar'
--Valid keys are 'base', 'data', 'if', 'struct'.
-+Valid keys are 'base', 'data', 'features', 'if', 'struct'.
++{ 'struct': 'CondFeatureStruct1',
++  'data': { 'foo': 'int' },
++  'features': [ { 'name': 'feature1', 'if': 'defined(TEST_IF_FEATURE_1)'=
+} ] }
++{ 'struct': 'CondFeatureStruct2',
++  'data': { 'foo': 'int' },
++  'features': [ { 'name': 'feature1', 'if': 'defined(TEST_IF_FEATURE_1)'=
+},
++                { 'name': 'feature2', 'if': 'defined(TEST_IF_FEATURE_2)'=
+} ] }
++{ 'struct': 'CondFeatureStruct3',
++  'data': { 'foo': 'int' },
++  'features': [ { 'name': 'feature1', 'if': [ 'defined(TEST_IF_COND_1)',
++                                              'defined(TEST_IF_COND_2)']=
+ } ] }
++{ 'command': 'test-features',
++  'data': { 'fs0': 'FeatureStruct0',
++            'fs1': 'FeatureStruct1',
++            'fs2': 'FeatureStruct2',
++            'fs3': 'FeatureStruct3',
++            'fs4': 'FeatureStruct4',
++            'cfs1': 'CondFeatureStruct1',
++            'cfs2': 'CondFeatureStruct2',
++            'cfs3': 'CondFeatureStruct3' } }
+diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
+api-schema-test.out
+index 77fb1e1aa9..85d510bc00 100644
+--- a/tests/qapi-schema/qapi-schema-test.out
++++ b/tests/qapi-schema/qapi-schema-test.out
+@@ -354,3 +354,46 @@ object q_obj_TestIfEvent-arg
+ event TestIfEvent q_obj_TestIfEvent-arg
+    boxed=3DFalse
+     if ['defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)']
++object FeatureStruct0
++    member foo: int optional=3DFalse
++object FeatureStruct1
++    member foo: int optional=3DFalse
++    feature feature1
++object FeatureStruct2
++    member foo: int optional=3DFalse
++    feature feature1
++object FeatureStruct3
++    member foo: int optional=3DFalse
++    feature feature1
++    feature feature2
++object FeatureStruct4
++    member namespace-test: int optional=3DFalse
++    feature namespace-test
++    feature int
++    feature name
++    feature if
++object CondFeatureStruct1
++    member foo: int optional=3DFalse
++    feature feature1
++        if ['defined(TEST_IF_FEATURE_1)']
++object CondFeatureStruct2
++    member foo: int optional=3DFalse
++    feature feature1
++        if ['defined(TEST_IF_FEATURE_1)']
++    feature feature2
++        if ['defined(TEST_IF_FEATURE_2)']
++object CondFeatureStruct3
++    member foo: int optional=3DFalse
++    feature feature1
++        if ['defined(TEST_IF_COND_1)', 'defined(TEST_IF_COND_2)']
++object q_obj_test-features-arg
++    member fs0: FeatureStruct0 optional=3DFalse
++    member fs1: FeatureStruct1 optional=3DFalse
++    member fs2: FeatureStruct2 optional=3DFalse
++    member fs3: FeatureStruct3 optional=3DFalse
++    member fs4: FeatureStruct4 optional=3DFalse
++    member cfs1: CondFeatureStruct1 optional=3DFalse
++    member cfs2: CondFeatureStruct2 optional=3DFalse
++    member cfs3: CondFeatureStruct3 optional=3DFalse
++command test-features q_obj_test-features-arg -> None
++   gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfi=
+g=3DFalse
 diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
 .py
-index d21fca01fc..f2d6815c86 100644
+index f2d6815c86..b0f770b9bd 100644
 --- a/tests/qapi-schema/test-qapi.py
 +++ b/tests/qapi-schema/test-qapi.py
-@@ -38,7 +38,8 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-         print('array %s %s' % (name, element_type.name))
+@@ -49,6 +49,10 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+             self._print_if(m.ifcond, 8)
+         self._print_variants(variants)
          self._print_if(ifcond)
++        if features:
++            for f in features:
++                print('    feature %s' % f.name)
++                self._print_if(f.ifcond, 8)
 =20
--    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts):
-+    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts,
-+                          features):
-         print('object %s' % name)
-         if base:
-             print('    base %s' % base.name)
-diff --git a/tests/qapi-schema/unknown-expr-key.err b/tests/qapi-schema/u=
-nknown-expr-key.err
-index 6ff8bb99c5..4340eaf894 100644
---- a/tests/qapi-schema/unknown-expr-key.err
-+++ b/tests/qapi-schema/unknown-expr-key.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/unknown-expr-key.json:2: Unknown keys 'bogus', 'phony'=
- in struct 'bar'
--Valid keys are 'base', 'data', 'if', 'struct'.
-+Valid keys are 'base', 'data', 'features', 'if', 'struct'.
+     def visit_alternate_type(self, name, info, ifcond, variants):
+         print('alternate %s' % name)
+diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
+index f0b95dcbc3..ab389f42da 100644
+--- a/tests/test-qmp-cmds.c
++++ b/tests/test-qmp-cmds.c
+@@ -43,6 +43,14 @@ void qmp_user_def_cmd1(UserDefOne * ud1, Error **errp)
+ {
+ }
+=20
++void qmp_test_features(FeatureStruct0 *fs0, FeatureStruct1 *fs1,
++                       FeatureStruct2 *fs2, FeatureStruct3 *fs3,
++                       FeatureStruct4 *fs4, CondFeatureStruct1 *cfs1,
++                       CondFeatureStruct2 *cfs2, CondFeatureStruct3 *cfs=
+3,
++                       Error **errp)
++{
++}
++
+ UserDefTwo *qmp_user_def_cmd2(UserDefOne *ud1a,
+                               bool has_udb1, UserDefOne *ud1b,
+                               Error **errp)
 --=20
 2.21.0
 
