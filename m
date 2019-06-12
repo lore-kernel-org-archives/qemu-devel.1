@@ -4,60 +4,74 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B158C31E46
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 12:56:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72C25C31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 12:57:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DAF420866
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 12:56:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DAF420866
+	by mail.kernel.org (Postfix) with ESMTPS id 4B4A020866
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 12:57:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B4A020866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60048 helo=lists.gnu.org)
+Received: from localhost ([::1]:60050 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hb2oC-0007Sk-FP
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 08:56:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55177)
+	id 1hb2oJ-0007ir-Ia
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 08:57:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51889)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pagupta@redhat.com>) id 1hb2gR-0001wI-Tt
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 08:48:57 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hb2Qp-0001gK-Eu
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 08:32:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pagupta@redhat.com>) id 1hb2gM-0005wH-Vl
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 08:48:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47604)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hb2gK-0005kh-7g
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 08:48:50 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5037E31628E7;
- Wed, 12 Jun 2019 12:48:28 +0000 (UTC)
-Received: from dhcp201-121.englab.pnq.redhat.com (ovpn-116-228.sin2.redhat.com
- [10.67.116.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 99A5E60BF1;
- Wed, 12 Jun 2019 12:47:54 +0000 (UTC)
-From: Pankaj Gupta <pagupta@redhat.com>
-To: dm-devel@redhat.com, linux-nvdimm@lists.01.org,
- linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
- kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-acpi@vger.kernel.org, qemu-devel@nongnu.org,
- linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org
-Date: Wed, 12 Jun 2019 18:15:24 +0530
-Message-Id: <20190612124527.3763-5-pagupta@redhat.com>
-In-Reply-To: <20190612124527.3763-1-pagupta@redhat.com>
-References: <20190612124527.3763-1-pagupta@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Wed, 12 Jun 2019 12:48:35 +0000 (UTC)
+ (envelope-from <pbonzini@redhat.com>) id 1hb2Ql-000227-4m
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 08:32:45 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:39702)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hb2Qh-0001vo-Hy
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 08:32:43 -0400
+Received: by mail-wm1-f68.google.com with SMTP id z23so6339577wma.4
+ for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 05:32:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Mqp3msBOCufH0pE24Yxy/kWNBy0vvGDj87ptUcKLmC4=;
+ b=KNY2K3eiOT4LPmAr3et2QiduRV8sjaGAPVCSdUbi1o94AlKDGYb6AQxJni0VtFm7UO
+ 4cA1fLFswXKSBV100CBVeuqX2SOYT8Jli68s8qDy14Hjx4NCxJ6WM7ILv0P8GTdQsPUo
+ fy8G/YNYZQEWLG50m6LAbR1Bo2uYPIVlqWblCR3e4WbupqKbVTildQU9DF5lBdX+N+Jr
+ b3Rr86b8Bs7I8nDeUNZPMC8N74y5WpqP4KKmUUINw+eJ0eL6p+y2dBOMNAQA0TynGKKN
+ EDsDQcVB9nN3aVNZZw9evQBaOd9AnWS2H/IAmIITS7HxarkwcjrbXjE4bXR8dDhVFh6m
+ bVsg==
+X-Gm-Message-State: APjAAAVdTPy7w2ATb+T4ZOP15GtNasGxClgdnsZ+8RmhXiiDRwWF6mEU
+ OvRgRzXZ2flXQw4QIdyj9ODexg==
+X-Google-Smtp-Source: APXvYqyjXO02hhBnKwb9cfaC6jXDITSB7HfLoerYZhm3n49ukOi52afqJa1wlUCtOgxRO++y8X8QKQ==
+X-Received: by 2002:a1c:e341:: with SMTP id a62mr21818469wmh.165.1560342757948; 
+ Wed, 12 Jun 2019 05:32:37 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d43d:6da3:9364:a775?
+ ([2001:b07:6468:f312:d43d:6da3:9364:a775])
+ by smtp.gmail.com with ESMTPSA id l190sm5935869wml.16.2019.06.12.05.32.36
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 12 Jun 2019 05:32:37 -0700 (PDT)
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+References: <20190612120421.20336-1-stefanha@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <298bea90-7b26-6a07-3f3f-65dacaba9fe5@redhat.com>
+Date: Wed, 12 Jun 2019 14:32:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190612120421.20336-1-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v13 4/7] dm: enable synchronous dax
+ [fuzzy]
+X-Received-From: 209.85.128.68
+Subject: Re: [Qemu-devel] [PATCH v4] virtio-scsi: restart DMA after iothread
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,145 +83,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pagupta@redhat.com, rdunlap@infradead.org, jack@suse.cz, snitzer@redhat.com,
- mst@redhat.com, jasowang@redhat.com, david@fromorbit.com,
- lcapitulino@redhat.com, adilger.kernel@dilger.ca, zwisler@kernel.org,
- aarcange@redhat.com, dave.jiang@intel.com, jstaron@google.com,
- darrick.wong@oracle.com, vishal.l.verma@intel.com, david@redhat.com,
- willy@infradead.org, hch@infradead.org, jmoyer@redhat.com, nilal@redhat.com,
- lenb@kernel.org, kilobyte@angband.pl, riel@surriel.com, yuval.shaia@oracle.com,
- stefanha@redhat.com, pbonzini@redhat.com, dan.j.williams@intel.com,
- kwolf@redhat.com, tytso@mit.edu, xiaoguangrong.eric@gmail.com,
- cohuck@redhat.com, rjw@rjwysocki.net, imammedo@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch sets dax device 'DAXDEV_SYNC' flag if all the target
-devices of device mapper support synchrononous DAX. If device
-mapper consists of both synchronous and asynchronous dax devices,
-we don't set 'DAXDEV_SYNC' flag.
+On 12/06/19 14:04, Stefan Hajnoczi wrote:
+> When the 'cont' command resumes guest execution the vm change state
+> handlers are invoked.  Unfortunately there is no explicit ordering
+> between vm change state handlers.  When two layers of code both use vm
+> change state handlers, we don't control which handler runs first.
+> 
+> virtio-scsi with iothreads hits a deadlock when a failed SCSI command is
+> restarted and completes before the iothread is re-initialized.
+> 
+> This patch introduces priorities for VM change state handlers so the
+> IOThread is guaranteed to be initialized before DMA requests are
+> restarted.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+> v4:
+> Paolo and Michael were interested in a priorities system.  Kevin wasn't
+> convinced.  Here is a patch implementing the priorities approach so you
+> can decide whether you prefer this or not.
 
-'dm_table_supports_dax' is refactored to pass 'iterate_devices_fn'
-as argument so that the callers can pass the appropriate functions.
+I like this better than the others, but I do agree with Kevin that the
+names aren't great and PRIO_IOTHREAD has nothing to do with iothreads
+really.
 
-Suggested-by: Mike Snitzer <snitzer@redhat.com>
-Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-Reviewed-by: Mike Snitzer <snitzer@redhat.com>
----
- drivers/md/dm-table.c | 24 ++++++++++++++++++------
- drivers/md/dm.c       |  2 +-
- drivers/md/dm.h       |  5 ++++-
- 3 files changed, 23 insertions(+), 8 deletions(-)
+Maybe the priority should be simply the "depth" of the device's bus, so
+2 for scsi because we know it always has a controller between the device
+and the machine and 1 for everything else.  Maybe who knows, in the
+future the vmstate_change handler could be moved in DeviceClass and
+propagated across buses[1]
 
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index 350cf0451456..81c55304c4fa 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -881,7 +881,7 @@ void dm_table_set_type(struct dm_table *t, enum dm_queue_mode type)
- EXPORT_SYMBOL_GPL(dm_table_set_type);
- 
- /* validate the dax capability of the target device span */
--static int device_supports_dax(struct dm_target *ti, struct dm_dev *dev,
-+int device_supports_dax(struct dm_target *ti, struct dm_dev *dev,
- 				       sector_t start, sector_t len, void *data)
- {
- 	int blocksize = *(int *) data;
-@@ -890,7 +890,15 @@ static int device_supports_dax(struct dm_target *ti, struct dm_dev *dev,
- 			start, len);
- }
- 
--bool dm_table_supports_dax(struct dm_table *t, int blocksize)
-+/* Check devices support synchronous DAX */
-+static int device_synchronous(struct dm_target *ti, struct dm_dev *dev,
-+				       sector_t start, sector_t len, void *data)
-+{
-+	return dax_synchronous(dev->dax_dev);
-+}
-+
-+bool dm_table_supports_dax(struct dm_table *t,
-+			  iterate_devices_callout_fn iterate_fn, int *blocksize)
- {
- 	struct dm_target *ti;
- 	unsigned i;
-@@ -903,8 +911,7 @@ bool dm_table_supports_dax(struct dm_table *t, int blocksize)
- 			return false;
- 
- 		if (!ti->type->iterate_devices ||
--		    !ti->type->iterate_devices(ti, device_supports_dax,
--			    &blocksize))
-+			!ti->type->iterate_devices(ti, iterate_fn, blocksize))
- 			return false;
- 	}
- 
-@@ -940,6 +947,7 @@ static int dm_table_determine_type(struct dm_table *t)
- 	struct dm_target *tgt;
- 	struct list_head *devices = dm_table_get_devices(t);
- 	enum dm_queue_mode live_md_type = dm_get_md_type(t->md);
-+	int page_size = PAGE_SIZE;
- 
- 	if (t->type != DM_TYPE_NONE) {
- 		/* target already set the table's type */
-@@ -984,7 +992,7 @@ static int dm_table_determine_type(struct dm_table *t)
- verify_bio_based:
- 		/* We must use this table as bio-based */
- 		t->type = DM_TYPE_BIO_BASED;
--		if (dm_table_supports_dax(t, PAGE_SIZE) ||
-+		if (dm_table_supports_dax(t, device_supports_dax, &page_size) ||
- 		    (list_empty(devices) && live_md_type == DM_TYPE_DAX_BIO_BASED)) {
- 			t->type = DM_TYPE_DAX_BIO_BASED;
- 		} else {
-@@ -1883,6 +1891,7 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
- 			       struct queue_limits *limits)
- {
- 	bool wc = false, fua = false;
-+	int page_size = PAGE_SIZE;
- 
- 	/*
- 	 * Copy table's limits to the DM device's request_queue
-@@ -1910,8 +1919,11 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
- 	}
- 	blk_queue_write_cache(q, wc, fua);
- 
--	if (dm_table_supports_dax(t, PAGE_SIZE))
-+	if (dm_table_supports_dax(t, device_supports_dax, &page_size)) {
- 		blk_queue_flag_set(QUEUE_FLAG_DAX, q);
-+		if (dm_table_supports_dax(t, device_synchronous, NULL))
-+			set_dax_synchronous(t->md->dax_dev);
-+	}
- 	else
- 		blk_queue_flag_clear(QUEUE_FLAG_DAX, q);
- 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index b1caa7188209..b92c42a72ad4 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1119,7 +1119,7 @@ static bool dm_dax_supported(struct dax_device *dax_dev, struct block_device *bd
- 	if (!map)
- 		return false;
- 
--	ret = dm_table_supports_dax(map, blocksize);
-+	ret = dm_table_supports_dax(map, device_supports_dax, &blocksize);
- 
- 	dm_put_live_table(md, srcu_idx);
- 
-diff --git a/drivers/md/dm.h b/drivers/md/dm.h
-index 17e3db54404c..0475673337f3 100644
---- a/drivers/md/dm.h
-+++ b/drivers/md/dm.h
-@@ -72,7 +72,10 @@ bool dm_table_bio_based(struct dm_table *t);
- bool dm_table_request_based(struct dm_table *t);
- void dm_table_free_md_mempools(struct dm_table *t);
- struct dm_md_mempools *dm_table_get_md_mempools(struct dm_table *t);
--bool dm_table_supports_dax(struct dm_table *t, int blocksize);
-+bool dm_table_supports_dax(struct dm_table *t, iterate_devices_callout_fn fn,
-+			   int *blocksize);
-+int device_supports_dax(struct dm_target *ti, struct dm_dev *dev,
-+			   sector_t start, sector_t len, void *data);
- 
- void dm_lock_md_type(struct mapped_device *md);
- void dm_unlock_md_type(struct mapped_device *md);
--- 
-2.20.1
+So I vote for this patch but with VM_CHANGE_STATE_HANDLER_PRIO_IOTHREAD
+renamed to VM_CHANGE_STATE_HANDLER_PRIO_DEVICE and
+VM_CHANGE_STATE_HANDLER_PRIO_DEVICE renamed to
+VM_CHANGE_STATE_HANDLER_PRIO_DISK (which is consistent with the naming
+of scsi-disk, though not with ide-drive...).
+
+Paolo
+
+[1] With care, because currently the initialization order for stop is
+virtio-device -> virtio-pci -> scsi-bus (and the opposite for start).  I
+am not sure that the order for virtio-pci and virtio-device could be
+exchanged, as would be the case if you followed the bus order
+pci->virtio->scsi.
+
+> The customer has now confirmed that the deadlock is fixed.  I have
+> changed the Subject line from RFC to PATCH.
+> 
+>  include/sysemu/sysemu.h | 10 ++++++++++
+>  hw/scsi/scsi-bus.c      |  6 ++++--
+>  hw/virtio/virtio.c      |  6 ++++--
+>  vl.c                    | 44 +++++++++++++++++++++++++++++++----------
+>  4 files changed, 52 insertions(+), 14 deletions(-)
+> 
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index 61579ae71e..1a4db092c7 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -27,8 +27,18 @@ bool runstate_store(char *str, size_t size);
+>  typedef struct vm_change_state_entry VMChangeStateEntry;
+>  typedef void VMChangeStateHandler(void *opaque, int running, RunState state);
+>  
+> +enum {
+> +    /* Low priorities run first when the VM starts */
+> +    VM_CHANGE_STATE_HANDLER_PRIO_UNDEFINED = 0,
+> +    VM_CHANGE_STATE_HANDLER_PRIO_IOTHREAD = 100,
+> +    VM_CHANGE_STATE_HANDLER_PRIO_DEVICE = 200,
+> +    /* High priorities run first when the VM stops */
+> +};
+> +
+>  VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandler *cb,
+>                                                       void *opaque);
+> +VMChangeStateEntry *qemu_add_vm_change_state_handler_prio(
+> +        VMChangeStateHandler *cb, void *opaque, int priority);
+>  void qemu_del_vm_change_state_handler(VMChangeStateEntry *e);
+>  void vm_state_notify(int running, RunState state);
+>  
+> diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+> index c480553083..eda5b9a19e 100644
+> --- a/hw/scsi/scsi-bus.c
+> +++ b/hw/scsi/scsi-bus.c
+> @@ -206,8 +206,10 @@ static void scsi_qdev_realize(DeviceState *qdev, Error **errp)
+>          error_propagate(errp, local_err);
+>          return;
+>      }
+> -    dev->vmsentry = qemu_add_vm_change_state_handler(scsi_dma_restart_cb,
+> -                                                     dev);
+> +    dev->vmsentry = qemu_add_vm_change_state_handler_prio(
+> +            scsi_dma_restart_cb,
+> +            dev,
+> +            VM_CHANGE_STATE_HANDLER_PRIO_DEVICE);
+>  }
+>  
+>  static void scsi_qdev_unrealize(DeviceState *qdev, Error **errp)
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index 07f4a64b48..9256af587a 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -2354,8 +2354,10 @@ void virtio_init(VirtIODevice *vdev, const char *name,
+>      } else {
+>          vdev->config = NULL;
+>      }
+> -    vdev->vmstate = qemu_add_vm_change_state_handler(virtio_vmstate_change,
+> -                                                     vdev);
+> +    vdev->vmstate = qemu_add_vm_change_state_handler_prio(
+> +            virtio_vmstate_change,
+> +            vdev,
+> +            VM_CHANGE_STATE_HANDLER_PRIO_IOTHREAD);
+>      vdev->device_endian = virtio_default_endian();
+>      vdev->use_guest_notifier_mask = true;
+>  }
+> diff --git a/vl.c b/vl.c
+> index cd1fbc4cdc..26c82063d2 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -1469,27 +1469,45 @@ static int machine_help_func(QemuOpts *opts, MachineState *machine)
+>  struct vm_change_state_entry {
+>      VMChangeStateHandler *cb;
+>      void *opaque;
+> -    QLIST_ENTRY (vm_change_state_entry) entries;
+> +    QTAILQ_ENTRY (vm_change_state_entry) entries;
+> +    int priority;
+>  };
+>  
+> -static QLIST_HEAD(, vm_change_state_entry) vm_change_state_head;
+> +static QTAILQ_HEAD(, vm_change_state_entry) vm_change_state_head;
+>  
+> -VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandler *cb,
+> -                                                     void *opaque)
+> +VMChangeStateEntry *qemu_add_vm_change_state_handler_prio(
+> +        VMChangeStateHandler *cb, void *opaque, int priority)
+>  {
+>      VMChangeStateEntry *e;
+> +    VMChangeStateEntry *other;
+>  
+>      e = g_malloc0(sizeof (*e));
+> -
+>      e->cb = cb;
+>      e->opaque = opaque;
+> -    QLIST_INSERT_HEAD(&vm_change_state_head, e, entries);
+> +    e->priority = priority;
+> +
+> +    /* Keep list sorted in ascending priority order */
+> +    QTAILQ_FOREACH(other, &vm_change_state_head, entries) {
+> +        if (priority < other->priority) {
+> +            QTAILQ_INSERT_BEFORE(other, e, entries);
+> +            return e;
+> +        }
+> +    }
+> +
+> +    QTAILQ_INSERT_TAIL(&vm_change_state_head, e, entries);
+>      return e;
+>  }
+>  
+> +VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandler *cb,
+> +                                                     void *opaque)
+> +{
+> +    return qemu_add_vm_change_state_handler_prio(cb, opaque,
+> +            VM_CHANGE_STATE_HANDLER_PRIO_UNDEFINED);
+> +}
+> +
+>  void qemu_del_vm_change_state_handler(VMChangeStateEntry *e)
+>  {
+> -    QLIST_REMOVE (e, entries);
+> +    QTAILQ_REMOVE (&vm_change_state_head, e, entries);
+>      g_free (e);
+>  }
+>  
+> @@ -1499,8 +1517,14 @@ void vm_state_notify(int running, RunState state)
+>  
+>      trace_vm_state_notify(running, state, RunState_str(state));
+>  
+> -    QLIST_FOREACH_SAFE(e, &vm_change_state_head, entries, next) {
+> -        e->cb(e->opaque, running, state);
+> +    if (running) {
+> +        QTAILQ_FOREACH_SAFE(e, &vm_change_state_head, entries, next) {
+> +            e->cb(e->opaque, running, state);
+> +        }
+> +    } else {
+> +        QTAILQ_FOREACH_REVERSE_SAFE(e, &vm_change_state_head, entries, next) {
+> +            e->cb(e->opaque, running, state);
+> +        }
+>      }
+>  }
+>  
+> @@ -3009,7 +3033,7 @@ int main(int argc, char **argv, char **envp)
+>          exit(1);
+>      }
+>  
+> -    QLIST_INIT (&vm_change_state_head);
+> +    QTAILQ_INIT (&vm_change_state_head);
+>      os_setup_early_signal_handling();
+>  
+>      cpu_option = NULL;
+> 
 
 
