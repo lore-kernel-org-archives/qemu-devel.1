@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 257F0C31E46
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 05:52:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53BC6C31E47
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 05:52:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4A2820866
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 05:52:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2957B20866
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 05:52:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="YqhUbCMZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4A2820866
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="MIhTdr6R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2957B20866
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56810 helo=lists.gnu.org)
+Received: from localhost ([::1]:56812 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hawB0-0006hz-Vy
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 01:52:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58386)
+	id 1hawB3-0006lb-8Q
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 01:52:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58391)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1haw8i-0004OP-TR
+ (envelope-from <dgibson@ozlabs.org>) id 1haw8j-0004Od-36
  for qemu-devel@nongnu.org; Wed, 12 Jun 2019 01:49:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1haw8h-00070d-HJ
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 01:49:40 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:36969 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1haw8h-00070l-Pn
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 01:49:41 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:34047)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1haw8g-0006zh-MQ; Wed, 12 Jun 2019 01:49:39 -0400
+ id 1haw8g-0006zf-MK; Wed, 12 Jun 2019 01:49:39 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 45NwtQ626Nz9sDB; Wed, 12 Jun 2019 15:49:34 +1000 (AEST)
+ id 45NwtQ4zKFz9sBr; Wed, 12 Jun 2019 15:49:34 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1560318574;
- bh=vsL1MTcIqQtzX5J9XA5ybbRM13gWkkMbqPYJHP8GFT8=;
+ bh=68ja9D+gsAavD+uwI2kDBEzDvhTjjHe39m37M5/3DuU=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=YqhUbCMZHahPs5YVI05TxaJhglxTkClsJ4hYf45s1tEYhMu87B0z2s57fxtww0vbX
- SfRqNwvfj+IrzY3b7rfzayjLQd94TMlFmrzxxmrnUOv2AzNVkVL+3vig0SYamQBqjx
- Y2Mf4VhVrApEZj+Au7gVWP+HL60DLypChYQ30iuY=
+ b=MIhTdr6RdAUeIM0HSVZ9yoWdrD3eMUQyOcfZ/ckJmvzcbwUzgb9/6wxqw95vYJOQV
+ E7XQR9Juv3M4aI4uzlbE9zsKTTT2wNVrVbtjg8yNV01awBpZorOWuju8kensrTl6Ph
+ j1Vz/OyGucNg1w6lleAGUyUxVphbsipCWGglodMg=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Wed, 12 Jun 2019 15:49:19 +1000
-Message-Id: <20190612054929.21136-4-david@gibson.dropbear.id.au>
+Date: Wed, 12 Jun 2019 15:49:18 +1000
+Message-Id: <20190612054929.21136-3-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190612054929.21136-1-david@gibson.dropbear.id.au>
 References: <20190612054929.21136-1-david@gibson.dropbear.id.au>
@@ -56,8 +56,7 @@ Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 03/13] spapr: Clean up device node name
- generation for PCI devices
+Subject: [Qemu-devel] [PULL 02/13] target/ppc: Fix lxvw4x, lxvh8x and lxvb16x
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,117 +68,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, "Michael S . Tsirkin" <mst@redhat.com>, aik@ozlabs.ru,
- qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: lvivier@redhat.com, aik@ozlabs.ru,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
+ Anton Blanchard <anton@ozlabs.org>, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-spapr_populate_pci_child_dt() adds a 'name' property to the device tree
-node for PCI devices.  This is never necessary for a flattened device tre=
-e,
-it is implicit in the name added when the node is constructed.  In fact
-anything we do add to a 'name' property will be overwritten with somethin=
-g
-derived from the structural name in the guest firmware (but in fact it is
-exactly the same bytes).
+From: Anton Blanchard <anton@ozlabs.org>
 
-So, remove that.  In addition, pci_get_node_name() is very simple, so fol=
-d
-it into its (also simple) sole caller spapr_create_pci_child_dt().
+During the conversion these instructions were incorrectly treated as
+stores. We need to use set_cpu_vsr* and not get_cpu_vsr*.
 
-While we're there rename pci_find_device_name() to the shorter and more
-accurate dt_name_from_class().
-
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Fixes: 8b3b2d75c7c0 ("introduce get_cpu_vsr{l,h}() and set_cpu_vsr{l,h}()=
+ helpers for VSR register access")
+Signed-off-by: Anton Blanchard <anton@ozlabs.org>
+Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Tested-by: Greg Kurz <groug@kaod.org>
 Reviewed-by: Greg Kurz <groug@kaod.org>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Message-Id: <20190524065345.25591-1-mark.cave-ayland@ilande.co.uk>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_pci.c | 41 ++++++++++++++++-------------------------
- 1 file changed, 16 insertions(+), 25 deletions(-)
+ target/ppc/translate/vsx-impl.inc.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 483639b107..e8173d3246 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1173,8 +1173,8 @@ static const PCIClass pci_classes[] =3D {
-     { "data-processing-controller", spc_subclass },
- };
-=20
--static const char *pci_find_device_name(uint8_t class, uint8_t subclass,
--                                        uint8_t iface)
-+static const char *dt_name_from_class(uint8_t class, uint8_t subclass,
-+                                      uint8_t iface)
- {
-     const PCIClass *pclass;
-     const PCISubClass *psubclass;
-@@ -1216,23 +1216,6 @@ static const char *pci_find_device_name(uint8_t cl=
-ass, uint8_t subclass,
-     return name;
- }
-=20
--static gchar *pci_get_node_name(PCIDevice *dev)
--{
--    int slot =3D PCI_SLOT(dev->devfn);
--    int func =3D PCI_FUNC(dev->devfn);
--    uint32_t ccode =3D pci_default_read_config(dev, PCI_CLASS_PROG, 3);
--    const char *name;
--
--    name =3D pci_find_device_name((ccode >> 16) & 0xff, (ccode >> 8) & 0=
-xff,
--                                ccode & 0xff);
--
--    if (func !=3D 0) {
--        return g_strdup_printf("%s@%x,%x", name, slot, func);
--    } else {
--        return g_strdup_printf("%s@%x", name, slot);
--    }
--}
--
- static uint32_t spapr_phb_get_pci_drc_index(SpaprPhbState *phb,
-                                             PCIDevice *pdev);
-=20
-@@ -1300,11 +1283,6 @@ static void spapr_populate_pci_child_dt(PCIDevice =
-*dev, void *fdt, int offset,
-         _FDT(fdt_setprop(fdt, offset, "udf-supported", NULL, 0));
+diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/v=
+sx-impl.inc.c
+index 199d22da97..cdb44b8b70 100644
+--- a/target/ppc/translate/vsx-impl.inc.c
++++ b/target/ppc/translate/vsx-impl.inc.c
+@@ -102,8 +102,7 @@ static void gen_lxvw4x(DisasContext *ctx)
      }
-=20
--    _FDT(fdt_setprop_string(fdt, offset, "name",
--                            pci_find_device_name((ccode >> 16) & 0xff,
--                                                 (ccode >> 8) & 0xff,
--                                                 ccode & 0xff)));
--
-     buf =3D spapr_phb_get_loc_code(sphb, dev);
-     _FDT(fdt_setprop_string(fdt, offset, "ibm,loc-code", buf));
-     g_free(buf);
-@@ -1348,10 +1326,23 @@ static int spapr_create_pci_child_dt(SpaprPhbStat=
-e *phb, PCIDevice *dev,
-                                      void *fdt, int node_offset)
- {
-     int offset;
-+    const gchar *basename;
-     gchar *nodename;
-+    int slot =3D PCI_SLOT(dev->devfn);
-+    int func =3D PCI_FUNC(dev->devfn);
-+    uint32_t ccode =3D pci_default_read_config(dev, PCI_CLASS_PROG, 3);
+     xth =3D tcg_temp_new_i64();
+     xtl =3D tcg_temp_new_i64();
+-    get_cpu_vsrh(xth, xT(ctx->opcode));
+-    get_cpu_vsrl(xtl, xT(ctx->opcode));
 +
-+    basename =3D dt_name_from_class((ccode >> 16) & 0xff, (ccode >> 8) &=
- 0xff,
-+                                  ccode & 0xff);
-+
-+    if (func !=3D 0) {
-+        nodename =3D g_strdup_printf("%s@%x,%x", basename, slot, func);
-+    } else {
-+        nodename =3D g_strdup_printf("%s@%x", basename, slot);
-+    }
+     gen_set_access_type(ctx, ACCESS_INT);
+     EA =3D tcg_temp_new();
 =20
--    nodename =3D pci_get_node_name(dev);
-     _FDT(offset =3D fdt_add_subnode(fdt, node_offset, nodename));
-+
-     g_free(nodename);
+@@ -126,6 +125,8 @@ static void gen_lxvw4x(DisasContext *ctx)
+         tcg_gen_addi_tl(EA, EA, 8);
+         tcg_gen_qemu_ld_i64(xtl, EA, ctx->mem_idx, MO_BEQ);
+     }
++    set_cpu_vsrh(xT(ctx->opcode), xth);
++    set_cpu_vsrl(xT(ctx->opcode), xtl);
+     tcg_temp_free(EA);
+     tcg_temp_free_i64(xth);
+     tcg_temp_free_i64(xtl);
+@@ -185,8 +186,6 @@ static void gen_lxvh8x(DisasContext *ctx)
+     }
+     xth =3D tcg_temp_new_i64();
+     xtl =3D tcg_temp_new_i64();
+-    get_cpu_vsrh(xth, xT(ctx->opcode));
+-    get_cpu_vsrl(xtl, xT(ctx->opcode));
+     gen_set_access_type(ctx, ACCESS_INT);
 =20
-     spapr_populate_pci_child_dt(dev, fdt, offset, phb);
+     EA =3D tcg_temp_new();
+@@ -197,6 +196,8 @@ static void gen_lxvh8x(DisasContext *ctx)
+     if (ctx->le_mode) {
+         gen_bswap16x8(xth, xtl, xth, xtl);
+     }
++    set_cpu_vsrh(xT(ctx->opcode), xth);
++    set_cpu_vsrl(xT(ctx->opcode), xtl);
+     tcg_temp_free(EA);
+     tcg_temp_free_i64(xth);
+     tcg_temp_free_i64(xtl);
+@@ -214,14 +215,14 @@ static void gen_lxvb16x(DisasContext *ctx)
+     }
+     xth =3D tcg_temp_new_i64();
+     xtl =3D tcg_temp_new_i64();
+-    get_cpu_vsrh(xth, xT(ctx->opcode));
+-    get_cpu_vsrl(xtl, xT(ctx->opcode));
+     gen_set_access_type(ctx, ACCESS_INT);
+     EA =3D tcg_temp_new();
+     gen_addr_reg_index(ctx, EA);
+     tcg_gen_qemu_ld_i64(xth, EA, ctx->mem_idx, MO_BEQ);
+     tcg_gen_addi_tl(EA, EA, 8);
+     tcg_gen_qemu_ld_i64(xtl, EA, ctx->mem_idx, MO_BEQ);
++    set_cpu_vsrh(xT(ctx->opcode), xth);
++    set_cpu_vsrl(xT(ctx->opcode), xtl);
+     tcg_temp_free(EA);
+     tcg_temp_free_i64(xth);
+     tcg_temp_free_i64(xtl);
 --=20
 2.21.0
 
