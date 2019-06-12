@@ -2,63 +2,95 @@ Return-Path: <SRS0=XH1q=UL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB8C7C31E46
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 09:39:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00992C31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 09:46:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 94EBA207E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 09:39:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94EBA207E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C1B9320866
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 09:46:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="oLcqa9oT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1B9320866
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58114 helo=lists.gnu.org)
+Received: from localhost ([::1]:58150 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haziy-0003fv-Ny
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 05:39:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43159)
+	id 1hazpv-0007E5-Rv
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 05:46:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44055)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <cohuck@redhat.com>) id 1hazi5-00038A-BV
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 05:38:26 -0400
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hazmm-0004t1-0A
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 05:43:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1hazi4-00078m-9l
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 05:38:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46506)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>)
- id 1hazi4-000789-1a; Wed, 12 Jun 2019 05:38:24 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 18777883D7;
- Wed, 12 Jun 2019 09:38:19 +0000 (UTC)
-Received: from gondolin (ovpn-116-169.ams2.redhat.com [10.36.116.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 940695D9C9;
- Wed, 12 Jun 2019 09:38:13 +0000 (UTC)
-Date: Wed, 12 Jun 2019 11:38:08 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Farhan Ali <alifm@linux.ibm.com>
-Message-ID: <20190612113808.06fec7d7.cohuck@redhat.com>
-In-Reply-To: <e07bf42d-2b8a-382c-85c8-520985ddfe8a@linux.ibm.com>
-References: <20190607145353.2052-1-cohuck@redhat.com>
- <e07bf42d-2b8a-382c-85c8-520985ddfe8a@linux.ibm.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Wed, 12 Jun 2019 09:38:23 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v5] vfio-ccw: support async command
- subregion
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hazmk-0000jq-LF
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 05:43:15 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:39202)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
+ id 1hazmh-0000iF-SN; Wed, 12 Jun 2019 05:43:12 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+ by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5C9XcNH007409;
+ Wed, 12 Jun 2019 09:43:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
+ bh=IF99orgPl5PZbXP/iOJCxdKOiazKw347UHLBH9LWKbA=;
+ b=oLcqa9oTDBacS85yX/RMqqWRUHYs4dsocJzIqF6w7GQtRyNyBmWSUfAH/myqS4K6gS0g
+ aZCd2Qul9HCSIDUrI9XVuHDBQLUSrotV1kNEXJ/R/SKfhPGnKa8sZUzuxuxxAUZPNpNN
+ /nfB4GItQKiKg5QTsMFClTN77Et7ZvZY255cZCS9+AXx372BfEVG21NJ06UNQlu2Cv6n
+ hCCM4rOOxHvXn/GifEuunHMBtDjdg0A6F0i/VxUems9NeH+1Gf5tkhy94IOjhJW96W1M
+ hZUVzeMIHemtBDmBEBeer5z2NsiCChp0yE/Vw2FHQXBh5cATN3hleE9uoSlBMIdKjAMd PQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by aserp2130.oracle.com with ESMTP id 2t02hetf52-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 12 Jun 2019 09:43:08 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5C9gufU064402;
+ Wed, 12 Jun 2019 09:43:08 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by aserp3030.oracle.com with ESMTP id 2t04hyuasr-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 12 Jun 2019 09:43:08 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5C9h7CM003336;
+ Wed, 12 Jun 2019 09:43:07 GMT
+Received: from nexus.ravello.local (/213.57.127.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Wed, 12 Jun 2019 02:43:07 -0700
+From: Sam Eiderman <shmuel.eiderman@oracle.com>
+To: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ mreitz@redhat.com, seabios@seabios.org, kraxel@redhat.com,
+ kevin@koconnor.net
+Date: Wed, 12 Jun 2019 12:42:30 +0300
+Message-Id: <20190612094237.47462-2-shmuel.eiderman@oracle.com>
+X-Mailer: git-send-email 2.13.3
+In-Reply-To: <20190612094237.47462-1-shmuel.eiderman@oracle.com>
+References: <20190612094237.47462-1-shmuel.eiderman@oracle.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9285
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906120067
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9285
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906120066
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 141.146.126.79
+Subject: [Qemu-devel] [QEMU] [PATCH 1/8] block: Refactor macros - fix tabbing
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,92 +102,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>,
- qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: liran.alon@oracle.com, shmuel.eiderman@oracle.com, karl.heubaum@oracle.com,
+ arbel.moshe@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 11 Jun 2019 15:33:59 -0400
-Farhan Ali <alifm@linux.ibm.com> wrote:
+Fixing tabbing in block related macros.
 
-> On 06/07/2019 10:53 AM, Cornelia Huck wrote:
-> > A vfio-ccw device may provide an async command subregion for
-> > issuing halt/clear subchannel requests. If it is present, use
-> > it for sending halt/clear request to the device; if not, fall
-> > back to emulation (as done today).
-> > 
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > ---
-> > 
-> > v4->v5:
-> > - It seems we need to take the indirection via the class for the
-> >    callbacks after all :(
-> > - Dropped Eric's R-b: for that reason
-> > 
-> > ---
-> >   hw/s390x/css.c              |  27 +++++++--
-> >   hw/s390x/s390-ccw.c         |  20 +++++++
-> >   hw/vfio/ccw.c               | 112 +++++++++++++++++++++++++++++++++++-
-> >   include/hw/s390x/css.h      |   3 +
-> >   include/hw/s390x/s390-ccw.h |   2 +
-> >   5 files changed, 158 insertions(+), 6 deletions(-)
-> > 
+Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
+Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
+---
+ hw/ide/qdev.c            |  2 +-
+ include/hw/block/block.h | 16 ++++++++--------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
-> > @@ -309,11 +400,26 @@ static void vfio_ccw_get_region(VFIOCCWDevice *vcdev, Error **errp)
-> >       vcdev->io_region_offset = info->offset;
-> >       vcdev->io_region = g_malloc0(info->size);
-> >   
-> > +    /* check for the optional async command region */
-> > +    ret = vfio_get_dev_region_info(vdev, VFIO_REGION_TYPE_CCW,
-> > +                                   VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD, &info);
-> > +    if (!ret) {
-> > +        vcdev->async_cmd_region_size = info->size;
-> > +        if (sizeof(*vcdev->async_cmd_region) != vcdev->async_cmd_region_size) {
-> > +            error_setg(errp, "vfio: Unexpected size of the async cmd region");
-> > +            g_free(info);
-> > +            return;
-> > +        }
-> > +        vcdev->async_cmd_region_offset = info->offset;
-> > +        vcdev->async_cmd_region = g_malloc0(info->size);
-> > +    }
-> > +
-> >       g_free(info);
-> >   }
-> >   
-> >   static void vfio_ccw_put_region(VFIOCCWDevice *vcdev)
-> >   {
-> > +    g_free(vcdev->async_cmd_region);
-> >       g_free(vcdev->io_region);
-> >   }  
-> 
-> I think we can have a memory leak given how the code is currently 
-> structured and how we call vfio_ccw_get_region.
-> 
-> vfio_ccw_get_region is called in vfio_ccw_realize. So if we return an 
-> error from vfio_ccw_get_region, we would jump to out_region_err in 
-> vfio_ccw_realize which would call vfio_ccw_put_device.
-> 
-> Now we can also return an error from vfio_ccw_get_region for the async 
-> region, and so we might never end up freeing the io_region for which we 
-> allocated memory successfully.
-> 
-> I think we would also need to change vfio_ccw_realize, no?
+diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+index 360cd20bd8..9cae3205df 100644
+--- a/hw/ide/qdev.c
++++ b/hw/ide/qdev.c
+@@ -285,7 +285,7 @@ static void ide_drive_realize(IDEDevice *dev, Error **errp)
+     DEFINE_BLOCK_PROPERTIES(IDEDrive, dev.conf),        \
+     DEFINE_BLOCK_ERROR_PROPERTIES(IDEDrive, dev.conf),  \
+     DEFINE_PROP_STRING("ver",  IDEDrive, dev.version),  \
+-    DEFINE_PROP_UINT64("wwn",  IDEDrive, dev.wwn, 0),    \
++    DEFINE_PROP_UINT64("wwn",  IDEDrive, dev.wwn, 0),   \
+     DEFINE_PROP_STRING("serial",  IDEDrive, dev.serial),\
+     DEFINE_PROP_STRING("model", IDEDrive, dev.model)
+ 
+diff --git a/include/hw/block/block.h b/include/hw/block/block.h
+index 607539057a..fd55a30bca 100644
+--- a/include/hw/block/block.h
++++ b/include/hw/block/block.h
+@@ -50,21 +50,21 @@ static inline unsigned int get_physical_block_exp(BlockConf *conf)
+                           _conf.logical_block_size),                    \
+     DEFINE_PROP_BLOCKSIZE("physical_block_size", _state,                \
+                           _conf.physical_block_size),                   \
+-    DEFINE_PROP_UINT16("min_io_size", _state, _conf.min_io_size, 0),  \
++    DEFINE_PROP_UINT16("min_io_size", _state, _conf.min_io_size, 0),    \
+     DEFINE_PROP_UINT32("opt_io_size", _state, _conf.opt_io_size, 0),    \
+-    DEFINE_PROP_UINT32("discard_granularity", _state, \
+-                       _conf.discard_granularity, -1), \
+-    DEFINE_PROP_ON_OFF_AUTO("write-cache", _state, _conf.wce, \
+-                            ON_OFF_AUTO_AUTO), \
++    DEFINE_PROP_UINT32("discard_granularity", _state,                   \
++                       _conf.discard_granularity, -1),                  \
++    DEFINE_PROP_ON_OFF_AUTO("write-cache", _state, _conf.wce,           \
++                            ON_OFF_AUTO_AUTO),                          \
+     DEFINE_PROP_BOOL("share-rw", _state, _conf.share_rw, false)
+ 
+ #define DEFINE_BLOCK_PROPERTIES(_state, _conf)                          \
+     DEFINE_PROP_DRIVE("drive", _state, _conf.blk),                      \
+     DEFINE_BLOCK_PROPERTIES_BASE(_state, _conf)
+ 
+-#define DEFINE_BLOCK_CHS_PROPERTIES(_state, _conf)      \
+-    DEFINE_PROP_UINT32("cyls", _state, _conf.cyls, 0),  \
+-    DEFINE_PROP_UINT32("heads", _state, _conf.heads, 0), \
++#define DEFINE_BLOCK_CHS_PROPERTIES(_state, _conf)                      \
++    DEFINE_PROP_UINT32("cyls", _state, _conf.cyls, 0),                  \
++    DEFINE_PROP_UINT32("heads", _state, _conf.heads, 0),                \
+     DEFINE_PROP_UINT32("secs", _state, _conf.secs, 0)
+ 
+ #define DEFINE_BLOCK_ERROR_PROPERTIES(_state, _conf)                    \
+-- 
+2.13.3
 
-Indeed, you're right. I have the following change on top:
-
-diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-index c9d1c76b4d04..d21ac24f743c 100644
---- a/hw/vfio/ccw.c
-+++ b/hw/vfio/ccw.c
-@@ -407,6 +407,7 @@ static void vfio_ccw_get_region(VFIOCCWDevice *vcdev, Error **errp)
-         vcdev->async_cmd_region_size = info->size;
-         if (sizeof(*vcdev->async_cmd_region) != vcdev->async_cmd_region_size) {
-             error_setg(errp, "vfio: Unexpected size of the async cmd region");
-+            g_free(vcdev->io_region);
-             g_free(info);
-             return;
-         }
-
-Anything else before I respin?
 
