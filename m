@@ -2,62 +2,80 @@ Return-Path: <SRS0=XH1q=UL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	T_HK_NAME_DR,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0D17C31E46
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 09:03:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4CCEC31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 09:08:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3CF820866
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 09:03:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3CF820866
+	by mail.kernel.org (Postfix) with ESMTPS id 3D0162063F
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 09:08:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D0162063F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57722 helo=lists.gnu.org)
+Received: from localhost ([::1]:57752 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hazAL-0008I3-Mh
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 05:03:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39037)
+	id 1hazFI-0001VI-Tu
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 05:08:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39627)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1haz6Q-000688-V5
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 04:59:32 -0400
+ (envelope-from <philmd@redhat.com>) id 1haz72-0006NE-N7
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 05:00:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1haz5h-00051R-5h
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 04:58:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44232)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1haz5d-0004zq-JP
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 04:58:43 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CCFE331628E1;
- Wed, 12 Jun 2019 08:58:39 +0000 (UTC)
-Received: from work-vm (ovpn-117-119.ams2.redhat.com [10.36.117.119])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A0B1426FC1;
- Wed, 12 Jun 2019 08:58:38 +0000 (UTC)
-Date: Wed, 12 Jun 2019 09:58:36 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190612085834.GA2691@work-vm>
-References: <20190611205420.20286-1-ehabkost@redhat.com>
+ (envelope-from <philmd@redhat.com>) id 1haz70-0006K2-SH
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 05:00:08 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:35728)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1haz70-00065z-M5
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 05:00:06 -0400
+Received: by mail-wr1-f65.google.com with SMTP id m3so16017300wrv.2
+ for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 01:59:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=zgUbtKkYU09l3Z343qmbN5oUGjT+4e9ZBZHffQ9lbCw=;
+ b=DY2MaN4xDxzeIMw3tTfBM3mYsqUglwIkN5pA+1FloSv2Ak+8ELTi9LV3Hqce7W8nLT
+ VXLcpK4Qn5FJ8GAIuVXgogHxRotEShylWtMKxubg7CPW9twGda9ahWiBnRZfjkbJ4ZQ5
+ rjj+DwaV3cGjbK8TqKogmmEBhGKM9Ylx94T3Zx9p76WkaYlDJTSFJo+fMRzLqQxWXqoi
+ GiiQ8YR7I5e/wtnf7KB8jn4i89mXBw46kU8dSPuSm4Bow8J0DTbbmHxmF9Z7b7nto6r0
+ 7lOjpI9LI1y/RKd6mCIVKC/gP1578MNlWCsmAQ/0T7Z+Xtrae0HqffcL+eHQMht6VXqt
+ vYuQ==
+X-Gm-Message-State: APjAAAW8sxpVO0ay4L768u3pEty18Og5/lbfYh9+Ls8deET5idtM0ifL
+ 97T/zZbFKkB6AEmp/O8vMvmgKw==
+X-Google-Smtp-Source: APXvYqzzsWL7OwpTO+oBc2iaBU6YTQshWprpg7uec4UcsBtCY4A0XlHOEuoWt8AU3hwzrLpxTPRBQw==
+X-Received: by 2002:a5d:69ce:: with SMTP id s14mr5909075wrw.135.1560329988417; 
+ Wed, 12 Jun 2019 01:59:48 -0700 (PDT)
+Received: from ?IPv6:2a01:e35:2eec:b420:bca5:71b1:6738:c7ee?
+ ([2a01:e35:2eec:b420:bca5:71b1:6738:c7ee])
+ by smtp.gmail.com with ESMTPSA id a81sm7400399wmh.3.2019.06.12.01.59.47
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 12 Jun 2019 01:59:47 -0700 (PDT)
+To: Ramon Fried <rfried.dev@gmail.com>, qemu-devel@nongnu.org,
+ qemu-trivial@nongnu.org
+References: <20190611145556.12940-1-rfried.dev@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <eba0a139-d9c6-4e4c-b6cf-5013da84c908@redhat.com>
+Date: Wed, 12 Jun 2019 10:59:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190611205420.20286-1-ehabkost@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Wed, 12 Jun 2019 08:58:39 +0000 (UTC)
+In-Reply-To: <20190611145556.12940-1-rfried.dev@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] i386: Don't print warning if phys-bits was
- set automatically
+ [fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH v2] net: cadence_gem: fix compilation error
+ when debug is on
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,78 +87,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, xuelian.guo@intel.com,
- qemu-devel@nongnu.org, Robert Hoo <robert.hu@linux.intel.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ "open list:Xilinx Zynq" <qemu-arm@nongnu.org>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Eduardo Habkost (ehabkost@redhat.com) wrote:
-> If cpu->host_phys_bits_limit is set, QEMU will make
-> cpu->phys_bits be lower than host_phys_bits on some cases.  This
-> triggers a warning that was supposed to be printed only if
-> phys-bits was explicitly set in the command-line.
+On 6/11/19 4:55 PM, Ramon Fried wrote:
+> defining CADENCE_GEM_ERR_DEBUG causes compilation
+> errors, fix that.
 > 
-> Reorder the code so the value of cpu->phys_bits is validated
-> before the cpu->host_phys_bits handling.  This will avoid
-> unexpected warnings when cpu->host_phys_bits_limit is set.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-
-I think that's OK; note I think that means you can trigger an erroneous
-warning in the case where the user does something odd like:
-
- phys_bits=50,host_phys_bits=true
-
-so you print the warning and *then* set phys_bits = host_phys_bits.
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-
+> Signed-off-by: Ramon Fried <rfried.dev@gmail.com>
 > ---
->  target/i386/cpu.c | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
+> v2: change %lx to HWADDR_PRIx and %lx to %zdx
 > 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 7e5b545005..1327e4901a 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -5269,15 +5269,6 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
->              uint32_t host_phys_bits = x86_host_phys_bits();
->              static bool warned;
->  
-> -            if (cpu->host_phys_bits) {
-> -                /* The user asked for us to use the host physical bits */
-> -                cpu->phys_bits = host_phys_bits;
-> -                if (cpu->host_phys_bits_limit &&
-> -                    cpu->phys_bits > cpu->host_phys_bits_limit) {
-> -                    cpu->phys_bits = cpu->host_phys_bits_limit;
-> -                }
-> -            }
-> -
->              /* Print a warning if the user set it to a value that's not the
->               * host value.
->               */
-> @@ -5289,6 +5280,15 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
->                  warned = true;
->              }
->  
-> +            if (cpu->host_phys_bits) {
-> +                /* The user asked for us to use the host physical bits */
-> +                cpu->phys_bits = host_phys_bits;
-> +                if (cpu->host_phys_bits_limit &&
-> +                    cpu->phys_bits > cpu->host_phys_bits_limit) {
-> +                    cpu->phys_bits = cpu->host_phys_bits_limit;
-> +                }
-> +            }
-> +
->              if (cpu->phys_bits &&
->                  (cpu->phys_bits > TARGET_PHYS_ADDR_SPACE_BITS ||
->                  cpu->phys_bits < 32)) {
-> -- 
-> 2.18.0.rc1.1.g3f1ff2140
+>  hw/net/cadence_gem.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
+> index 7f63411430..e9b1b1e2eb 100644
+> --- a/hw/net/cadence_gem.c
+> +++ b/hw/net/cadence_gem.c
+> @@ -982,8 +982,8 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
+>              return -1;
+>          }
+>  
+> -        DB_PRINT("copy %d bytes to 0x%x\n", MIN(bytes_to_copy, rxbufsize),
+> -                rx_desc_get_buffer(s->rx_desc[q]));
+> +        DB_PRINT("copy %d bytes to 0x%" HWADDR_PRIx "\n", MIN(bytes_to_copy, rxbufsize),
+> +                rx_desc_get_buffer(s, s->rx_desc[q]));
+>  
+>          /* Copy packet data to emulated DMA buffer */
+>          address_space_write(&s->dma_as, rx_desc_get_buffer(s, s->rx_desc[q]) +
+> @@ -1156,7 +1156,7 @@ static void gem_transmit(CadenceGEMState *s)
+>              if (tx_desc_get_length(desc) > sizeof(tx_packet) -
+>                                                 (p - tx_packet)) {
+>                  DB_PRINT("TX descriptor @ 0x%x too large: size 0x%x space " \
+> -                         "0x%x\n", (unsigned)packet_desc_addr,
+> +                         "0x%zdx\n", (unsigned)packet_desc_addr,
+
+The format is either "zd" or "zx". I misunderstood how you want to print
+it, if you want hexadecimal, it should be "zx" then.
+
+>                           (unsigned)tx_desc_get_length(desc),
+>                           sizeof(tx_packet) - (p - tx_packet));
+>                  break;
+> 
 
