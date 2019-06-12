@@ -6,78 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 848B9C31E46
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 22:58:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 158DBC31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 22:58:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D93820896
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 22:58:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D93820896
+	by mail.kernel.org (Postfix) with ESMTPS id DF72020896
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 22:58:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF72020896
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35798 helo=lists.gnu.org)
+Received: from localhost ([::1]:35800 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbCCE-0004SN-Ke
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 18:58:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51830)
+	id 1hbCCZ-00056s-64
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 18:58:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46282)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hbBod-0003py-3r
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 18:34:01 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hbBT4-0000Cl-V5
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 18:11:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hbBob-0002FE-U4
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 18:33:59 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:35577)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hbBob-0001zK-N0
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 18:33:57 -0400
-Received: by mail-wm1-f67.google.com with SMTP id c6so8116652wml.0
- for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 15:33:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=QfJC6QDlrpiTTjJGcCfP6jz904i+9FIkxt5558dM2uI=;
- b=s+44FzSRTs3dj5OCicuruqZNzE95ufHNAnVW0TCNy9sJRxno0R8/SppAZwEHpHnBwg
- kW+FvIgfobJh+BmTvBKEwqUUk1eKkMQEn4TFgtcxP4AoqGu1un6LJv3sPK0NglmOZuGV
- ug93bSyM+iFad1Ixhp3XWZSLAqSlEg0vgpa3Pb0ClpQWg64tEQkVrG1wksex08zMyhWC
- CFzRs5++8EY78mUaSp7lsuowi8NuDA5xL6TPNAWfgRROkTM42p9OYbqpV2Q0/otQ6Evb
- x8umbRrB4AyqbkqIgzLKfkd4ZfyCkCopc2lh6vzvYKysg5fbsbXUBuRyAI8vz91zR/jb
- 53Mw==
-X-Gm-Message-State: APjAAAWpuLUsNaOHJgfDxgJ1X9x66X0mv8rtoFriA3Xuk0NB0jd3ZYdI
- zediGx82XMWqC55A1ztZzQoAcg==
-X-Google-Smtp-Source: APXvYqwXvxXmS94aOYr4tXrCLHwcp1M7EbOaVorNmeZBez5M7HVcDZL5+XDz7hdj03Fbd89gZSLoyg==
-X-Received: by 2002:a1c:968c:: with SMTP id y134mr896883wmd.122.1560378829704; 
- Wed, 12 Jun 2019 15:33:49 -0700 (PDT)
-Received: from [192.168.1.103] (183.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.183])
- by smtp.gmail.com with ESMTPSA id u23sm851194wmj.33.2019.06.12.15.33.48
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 12 Jun 2019 15:33:49 -0700 (PDT)
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20190611171456.23444-1-ehabkost@redhat.com>
- <20190611171456.23444-7-ehabkost@redhat.com>
- <d107483c-eba8-f6fc-8e3a-ad0a86472d07@redhat.com>
- <20190612205242.GQ5927@habkost.net>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <1d745328-0fbf-2e05-d066-f721d65be4c4@redhat.com>
-Date: Thu, 13 Jun 2019 00:33:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ (envelope-from <mreitz@redhat.com>) id 1hbBT2-0008Ih-RE
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 18:11:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34806)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hbBSx-0008E4-5K; Wed, 12 Jun 2019 18:11:35 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 22DDEA3B6F;
+ Wed, 12 Jun 2019 22:11:32 +0000 (UTC)
+Received: from localhost (unknown [10.40.205.72])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A37B75DEDF;
+ Wed, 12 Jun 2019 22:11:31 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Date: Thu, 13 Jun 2019 00:09:55 +0200
+Message-Id: <20190612221004.2317-34-mreitz@redhat.com>
+In-Reply-To: <20190612221004.2317-1-mreitz@redhat.com>
+References: <20190612221004.2317-1-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190612205242.GQ5927@habkost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Wed, 12 Jun 2019 22:11:32 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [PULL 6/6] travis: Make check-acceptance job more
- verbose
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v5 33/42] blockdev: Fix active commit choice
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,51 +66,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-devel@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/12/19 10:52 PM, Eduardo Habkost wrote:
-> On Wed, Jun 12, 2019 at 10:49:18PM +0200, Philippe Mathieu-Daudé wrote:
->> On 6/11/19 7:14 PM, Eduardo Habkost wrote:
->>> It will help us debug issues when tests fail.
->>>
->>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
->>> ---
->>>  .travis.yml | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/.travis.yml b/.travis.yml
->>> index b053a836a3..a08a7b7278 100644
->>> --- a/.travis.yml
->>> +++ b/.travis.yml
->>> @@ -225,7 +225,7 @@ matrix:
->>>      # Acceptance (Functional) tests
->>>      - env:
->>>          - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu"
->>> -        - TEST_CMD="make check-acceptance"
->>> +        - TEST_CMD="make AVOCADO_SHOW=test check-acceptance"
->>>        addons:
->>>          apt:
->>>            packages:
->>>
->>
->> Cleber, can you help figuring what's wrong here?
->>
->> https://travis-ci.org/qemu/qemu/jobs/544805900
->>
->> The tests seems successfull, is it possible the verbose logging returns
->> error to the shell even if the test succeed?
-> 
-> That's exactly what this patch does.  On my next pull request I
-> will replace this with Cleber's patch that dumps the error log
-> only if tests failed.
+We have to perform an active commit whenever the top node has a parent
+that has taken the WRITE permission on it.
 
-Ah OK, this is annoying because now all Travis builds are marked as
-failed. Maybe Peter can apply your patch directly to master as a build fix?
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ blockdev.c | 24 +++++++++++++++++++++---
+ 1 file changed, 21 insertions(+), 3 deletions(-)
+
+diff --git a/blockdev.c b/blockdev.c
+index a464cabf9e..5370f3b738 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3294,6 +3294,7 @@ void qmp_block_commit(bool has_job_id, const char *=
+job_id, const char *device,
+      */
+     BlockdevOnError on_error =3D BLOCKDEV_ON_ERROR_REPORT;
+     int job_flags =3D JOB_DEFAULT;
++    uint64_t top_perm, top_shared;
+=20
+     if (!has_speed) {
+         speed =3D 0;
+@@ -3406,14 +3407,31 @@ void qmp_block_commit(bool has_job_id, const char=
+ *job_id, const char *device,
+         goto out;
+     }
+=20
+-    if (top_bs =3D=3D bs) {
++    /*
++     * Active commit is required if and only if someone has taken a
++     * WRITE permission on the top node.  Historically, we have always
++     * used active commit for top nodes, so continue that practice.
++     * (Active commit is never really wrong.)
++     */
++    bdrv_get_cumulative_perm(top_bs, &top_perm, &top_shared);
++    if (top_perm & BLK_PERM_WRITE ||
++        bdrv_skip_rw_filters(top_bs) =3D=3D bdrv_skip_rw_filters(bs))
++    {
+         if (has_backing_file) {
+             error_setg(errp, "'backing-file' specified,"
+                              " but 'top' is the active layer");
+             goto out;
+         }
+-        commit_active_start(has_job_id ? job_id : NULL, bs, base_bs,
+-                            job_flags, speed, on_error,
++        if (!has_job_id) {
++            /*
++             * Emulate here what block_job_create() does, because it
++             * is possible that @bs !=3D @top_bs (the block job should
++             * be named after @bs, even if @top_bs is the actual
++             * source)
++             */
++            job_id =3D bdrv_get_device_name(bs);
++        }
++        commit_active_start(job_id, top_bs, base_bs, job_flags, speed, o=
+n_error,
+                             filter_node_name, NULL, NULL, false, &local_=
+err);
+     } else {
+         BlockDriverState *overlay_bs =3D bdrv_find_overlay(bs, top_bs);
+--=20
+2.21.0
+
 
