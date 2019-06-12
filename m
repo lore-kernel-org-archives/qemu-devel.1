@@ -2,61 +2,70 @@ Return-Path: <SRS0=XH1q=UL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D42DCC31E44
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 02:14:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1836AC31E44
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 02:24:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1ECF20866
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 02:14:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1ECF20866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id D84BE206E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 02:24:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D84BE206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56338 helo=lists.gnu.org)
+Received: from localhost ([::1]:56362 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hasmi-0006Ng-Uv
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 22:14:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58587)
+	id 1hasvz-0000sH-QI
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 22:24:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60521)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tiwei.bie@intel.com>) id 1haslF-0004zd-3u
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 22:13:14 -0400
+ (envelope-from <pagupta@redhat.com>) id 1hasuz-0000P7-Aw
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 22:23:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tiwei.bie@intel.com>) id 1haslD-00061F-TF
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 22:13:13 -0400
-Received: from mga11.intel.com ([192.55.52.93]:29033)
+ (envelope-from <pagupta@redhat.com>) id 1hasuy-0001wa-CT
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 22:23:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42882)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tiwei.bie@intel.com>)
- id 1haslD-00060k-Ix; Tue, 11 Jun 2019 22:13:11 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
- by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 11 Jun 2019 19:13:10 -0700
-X-ExtLoop1: 1
-Received: from npg-dpdk-virtio-tbie-2.sh.intel.com (HELO ___) ([10.67.104.151])
- by orsmga003.jf.intel.com with ESMTP; 11 Jun 2019 19:13:08 -0700
-Date: Wed, 12 Jun 2019 10:11:57 +0800
-From: Tiwei Bie <tiwei.bie@intel.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190612021157.GA23850@___>
-References: <20190611065137.16329-1-tiwei.bie@intel.com>
- <20190611085441-mutt-send-email-mst@kernel.org>
+ (Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hasuw-0001uQ-Np
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 22:23:16 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 63D5C3082E03;
+ Wed, 12 Jun 2019 02:23:12 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+ (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 32A02648BF;
+ Wed, 12 Jun 2019 02:23:11 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com
+ (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+ by colo-mx.corp.redhat.com (Postfix) with ESMTP id 2391624B25;
+ Wed, 12 Jun 2019 02:23:10 +0000 (UTC)
+Date: Tue, 11 Jun 2019 22:23:09 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+To: Mike Snitzer <snitzer@redhat.com>
+Message-ID: <332155967.34508010.1560306189624.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20190611171416.GA1248@redhat.com>
+References: <20190611163802.25352-1-pagupta@redhat.com>
+ <20190611163802.25352-5-pagupta@redhat.com>
+ <20190611171416.GA1248@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190611085441-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.93
-Subject: Re: [Qemu-devel] [RFC] vhost-user: don't ignore CTRL_VLAN feature
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.116.70, 10.4.195.27]
+Thread-Topic: enable synchronous dax
+Thread-Index: 7O59Nmg+n8QzGpvkvBkkxWqWG8w3fA==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Wed, 12 Jun 2019 02:23:12 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v12 4/7] dm: enable synchronous dax
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,70 +77,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jasowang@redhat.com, qemu-devel@nongnu.org, qemu-stable@nongnu.org
+Cc: rdunlap@infradead.org, jack@suse.cz, kvm@vger.kernel.org, mst@redhat.com,
+ jasowang@redhat.com, david@fromorbit.com, qemu-devel@nongnu.org,
+ virtualization@lists.linux-foundation.org, dm-devel@redhat.com,
+ adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org,
+ aarcange@redhat.com, dave jiang <dave.jiang@intel.com>, jstaron@google.com,
+ linux-nvdimm@lists.01.org, vishal l verma <vishal.l.verma@intel.com>,
+ david@redhat.com, willy@infradead.org, hch@infradead.org,
+ linux-acpi@vger.kernel.org, jmoyer@redhat.com, linux-ext4@vger.kernel.org,
+ lenb@kernel.org, kilobyte@angband.pl, riel@surriel.com,
+ yuval shaia <yuval.shaia@oracle.com>, stefanha@redhat.com, imammedo@redhat.com,
+ dan j williams <dan.j.williams@intel.com>, lcapitulino@redhat.com,
+ kwolf@redhat.com, nilal@redhat.com, tytso@mit.edu,
+ xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, cohuck@redhat.com,
+ rjw@rjwysocki.net, linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, pbonzini@redhat.com,
+ darrick wong <darrick.wong@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 11, 2019 at 10:10:14AM -0400, Michael S. Tsirkin wrote:
-> On Tue, Jun 11, 2019 at 02:51:37PM +0800, Tiwei Bie wrote:
-> > The VIRTIO_NET_F_CTRL_VLAN feature requires the support of
-> > vhost-user backend. But it will be advertised to guest driver
-> > as long as it's enabled by users in QEMU, while it's not
-> > supported by vhost-user backend. This patch fixes this issue.
-> 
-> Fixes by making guest refuse to send vlan tags?
 
-Fixes by not advertising this feature bit to guest driver
-when it's not supported, and guest won't expect the device
-to do vlan filtering then.
-
-> I agree it seems cleaner, but which guests does this actually help?
+> On Tue, Jun 11 2019 at 12:37pm -0400,
+> Pankaj Gupta <pagupta@redhat.com> wrote:
 > 
-> > Fixes: 72018d1e1917 ("vhost-user: ignore qemu-only features")
-> > Cc: qemu-stable@nongnu.org
+> > This patch sets dax device 'DAXDEV_SYNC' flag if all the target
+> > devices of device mapper support synchrononous DAX. If device
+> > mapper consists of both synchronous and asynchronous dax devices,
+> > we don't set 'DAXDEV_SYNC' flag.
 > > 
-> > Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
-> 
-> A change like that will break migration compatibility, will it not?
-
-Yeah, that's a problem...
-
-> Maybe we need to tie it to a machine version somehow...
-> 
-> 
-> > ---
-> > It's not clear in the spec that, whether vlan filtering is
-> > also best-effort:
-> > https://github.com/oasis-tcs/virtio-spec/blob/37057052e7/content.tex#L3372
-> 
-> So what breaks if we declare it best effort for now?
-> And does it really help if we report that vlan filtering
-> is not supported to guests?
-
-If it's best effort, then it won't violate the spec to
-advertise this feature when it's not supported in backends.
-
-
-> 
-> 
-> 
-> >  hw/net/vhost_net.c | 2 ++
-> >  1 file changed, 2 insertions(+)
+> > 'dm_table_supports_dax' is refactored to pass 'iterate_devices_fn'
+> > as argument so that the callers can pass the appropriate functions.
 > > 
-> > diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-> > index a6b719035c..1444fc9230 100644
-> > --- a/hw/net/vhost_net.c
-> > +++ b/hw/net/vhost_net.c
-> > @@ -75,6 +75,8 @@ static const int user_feature_bits[] = {
-> >      VIRTIO_NET_F_MTU,
-> >      VIRTIO_F_IOMMU_PLATFORM,
-> >  
-> > +    VIRTIO_NET_F_CTRL_VLAN,
-> > +
-> >      /* This bit implies RARP isn't sent by QEMU out of band */
-> >      VIRTIO_NET_F_GUEST_ANNOUNCE,
-> >  
-> > -- 
-> > 2.17.1
+> > Suggested-by: Mike Snitzer <snitzer@redhat.com>
+> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> 
+> Thanks, and for the benefit of others, passing function pointers like
+> this is perfectly fine IMHO because this code is _not_ in the fast
+> path.  These methods are only for device creation.
+> 
+> Reviewed-by: Mike Snitzer <snitzer@redhat.com>
+
+Thank you, Mike
+
+Best regards,
+Pankaj
+
+> 
+> 
 
