@@ -2,76 +2,57 @@ Return-Path: <SRS0=XH1q=UL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1216C31E47
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 11:53:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C1E0C31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 12:13:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C15BC20896
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 11:53:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b="RkojnDNs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C15BC20896
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
+	by mail.kernel.org (Postfix) with ESMTPS id 7550C208C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 12:13:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7550C208C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59268 helo=lists.gnu.org)
+Received: from localhost ([::1]:59752 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hb1ot-0006PF-0Z
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 07:53:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43891)
+	id 1hb28U-0003rY-Bm
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 08:13:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46745)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kbastian@mail.uni-paderborn.de>) id 1hb1o2-00060L-S8
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 07:52:43 -0400
+ (envelope-from <stefanha@redhat.com>) id 1hb24U-0001RY-66
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 08:09:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kbastian@mail.uni-paderborn.de>) id 1hb1o1-0005Vp-SH
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 07:52:42 -0400
-Received: from nylar.uni-paderborn.de ([131.234.189.18]:56882)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
- id 1hb1o1-0005Uj-5v
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 07:52:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=mail.uni-paderborn.de; s=20170601; h=Content-Transfer-Encoding:Content-Type
- :In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:
- Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
- Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
- List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
- bh=Fvyks6l203BtIWer/hofmPjurNQEhJPQ6YPPjQ5sMls=; b=RkojnDNsBpDQdMF7g59xXHTmqK
- cgXMeUKwjajYDKMy92uIOL69m/LOjpNpoPCDiK3k7H1zfhsBhNYQ3coknqJl4F7DQ5SOvv34wNICz
- ucvKuTWdVLK6n22Jjlj0liLvjO5ZUyXOxEApTksrabskG2oqMkqKh/OzqdwMGaZG1WyQ=;
-To: "Brenken, David (EFS-GH2)" <david.brenken@efs-auto.de>,
- Richard Henderson <richard.henderson@linaro.org>,
- David Brenken <david.brenken@efs-auto.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20190605061126.10244-1-david.brenken@efs-auto.org>
- <20190605061126.10244-4-david.brenken@efs-auto.org>
- <ffb4ba2c-318e-6b08-c206-a90b000074d2@mail.uni-paderborn.de>
- <34F764F04E859040BBA6C4FF41AB17D93B2DA4@AUDIINSX0410.audi.vwg>
- <8e4f29db-fb2d-4053-2483-a2d92466ce35@linaro.org>
- <34F764F04E859040BBA6C4FF41AB17D93B4A3D@AUDIINSX0410.audi.vwg>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <1dc1af82-88cf-5840-dfad-ff0a75e3dcec@mail.uni-paderborn.de>
-Date: Wed, 12 Jun 2019 13:52:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <stefanha@redhat.com>) id 1hb202-0007Ff-EU
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 08:05:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54598)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hb200-00070u-El
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 08:05:06 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 31DBA3162919;
+ Wed, 12 Jun 2019 12:04:28 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 35401614C4;
+ Wed, 12 Jun 2019 12:04:21 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 12 Jun 2019 13:04:21 +0100
+Message-Id: <20190612120421.20336-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <34F764F04E859040BBA6C4FF41AB17D93B4A3D@AUDIINSX0410.audi.vwg>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US-large
-X-IMT-Spam-Score: 0.0 ()
-X-PMX-Version: 6.4.6.2792898, Antispam-Engine: 2.7.2.2107409,
- Antispam-Data: 2019.6.12.114216, AntiVirus-Engine: 5.63.0,
- AntiVirus-Data: 2019.6.4.5630002
-X-IMT-Authenticated-Sender: kbastian@UNI-PADERBORN.DE
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Wed, 12 Jun 2019 12:04:32 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 131.234.189.18
-Subject: Re: [Qemu-devel] [PATCH 3/5] tricore: fix RRPW_INSERT instruction
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v4] virtio-scsi: restart DMA after iothread
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,31 +64,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Biermanski, Lars \(EFS-GH3\)" <lars.biermanski@efs-auto.de>, "Rasche,
- Robert \(EFS-GH2\)" <robert.rasche@efs-auto.de>, "Hofstetter,
- Georg \(EFS-GH2\)" <Georg.Hofstetter@efs-auto.de>, "Konopik,
- Andreas \(EFS-GH2\)" <andreas.konopik@efs-auto.de>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi David,
+When the 'cont' command resumes guest execution the vm change state
+handlers are invoked.  Unfortunately there is no explicit ordering
+between vm change state handlers.  When two layers of code both use vm
+change state handlers, we don't control which handler runs first.
 
-On 6/12/19 7:48 AM, Brenken, David (EFS-GH2) wrote:
-> Thank you for your hint.
-> Would anyone mind, if keep my insert implementation anyway?
-> If I compare the pseudo code of the instruction manual to the insert implementation it looks nearly the same whereas it seems kind of difficult to directly map the pseudo code of the instruction manual to the general deposit instruction.
+virtio-scsi with iothreads hits a deadlock when a failed SCSI command is
+restarted and completes before the iothread is re-initialized.
 
-I think deposit is better, as tcg can emit the native deposit 
-instruction of the host processor (which it does for x86). gen_insert() 
-on the other hand needs 8 tcg ops.
+This patch introduces priorities for VM change state handlers so the
+IOThread is guaranteed to be initialized before DMA requests are
+restarted.
 
-Regarding the pseudo code, take a look at tcg/README. You'll see that 
-the semantics of insert and deposit are the same. Thus, I think Richards 
-fix is better.
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+v4:
+Paolo and Michael were interested in a priorities system.  Kevin wasn't
+convinced.  Here is a patch implementing the priorities approach so you
+can decide whether you prefer this or not.
 
-Cheers,
+The customer has now confirmed that the deadlock is fixed.  I have
+changed the Subject line from RFC to PATCH.
 
-Bastian
+ include/sysemu/sysemu.h | 10 ++++++++++
+ hw/scsi/scsi-bus.c      |  6 ++++--
+ hw/virtio/virtio.c      |  6 ++++--
+ vl.c                    | 44 +++++++++++++++++++++++++++++++----------
+ 4 files changed, 52 insertions(+), 14 deletions(-)
+
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 61579ae71e..1a4db092c7 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -27,8 +27,18 @@ bool runstate_store(char *str, size_t size);
+ typedef struct vm_change_state_entry VMChangeStateEntry;
+ typedef void VMChangeStateHandler(void *opaque, int running, RunState st=
+ate);
+=20
++enum {
++    /* Low priorities run first when the VM starts */
++    VM_CHANGE_STATE_HANDLER_PRIO_UNDEFINED =3D 0,
++    VM_CHANGE_STATE_HANDLER_PRIO_IOTHREAD =3D 100,
++    VM_CHANGE_STATE_HANDLER_PRIO_DEVICE =3D 200,
++    /* High priorities run first when the VM stops */
++};
++
+ VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandle=
+r *cb,
+                                                      void *opaque);
++VMChangeStateEntry *qemu_add_vm_change_state_handler_prio(
++        VMChangeStateHandler *cb, void *opaque, int priority);
+ void qemu_del_vm_change_state_handler(VMChangeStateEntry *e);
+ void vm_state_notify(int running, RunState state);
+=20
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index c480553083..eda5b9a19e 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -206,8 +206,10 @@ static void scsi_qdev_realize(DeviceState *qdev, Err=
+or **errp)
+         error_propagate(errp, local_err);
+         return;
+     }
+-    dev->vmsentry =3D qemu_add_vm_change_state_handler(scsi_dma_restart_=
+cb,
+-                                                     dev);
++    dev->vmsentry =3D qemu_add_vm_change_state_handler_prio(
++            scsi_dma_restart_cb,
++            dev,
++            VM_CHANGE_STATE_HANDLER_PRIO_DEVICE);
+ }
+=20
+ static void scsi_qdev_unrealize(DeviceState *qdev, Error **errp)
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 07f4a64b48..9256af587a 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -2354,8 +2354,10 @@ void virtio_init(VirtIODevice *vdev, const char *n=
+ame,
+     } else {
+         vdev->config =3D NULL;
+     }
+-    vdev->vmstate =3D qemu_add_vm_change_state_handler(virtio_vmstate_ch=
+ange,
+-                                                     vdev);
++    vdev->vmstate =3D qemu_add_vm_change_state_handler_prio(
++            virtio_vmstate_change,
++            vdev,
++            VM_CHANGE_STATE_HANDLER_PRIO_IOTHREAD);
+     vdev->device_endian =3D virtio_default_endian();
+     vdev->use_guest_notifier_mask =3D true;
+ }
+diff --git a/vl.c b/vl.c
+index cd1fbc4cdc..26c82063d2 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1469,27 +1469,45 @@ static int machine_help_func(QemuOpts *opts, Mach=
+ineState *machine)
+ struct vm_change_state_entry {
+     VMChangeStateHandler *cb;
+     void *opaque;
+-    QLIST_ENTRY (vm_change_state_entry) entries;
++    QTAILQ_ENTRY (vm_change_state_entry) entries;
++    int priority;
+ };
+=20
+-static QLIST_HEAD(, vm_change_state_entry) vm_change_state_head;
++static QTAILQ_HEAD(, vm_change_state_entry) vm_change_state_head;
+=20
+-VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandle=
+r *cb,
+-                                                     void *opaque)
++VMChangeStateEntry *qemu_add_vm_change_state_handler_prio(
++        VMChangeStateHandler *cb, void *opaque, int priority)
+ {
+     VMChangeStateEntry *e;
++    VMChangeStateEntry *other;
+=20
+     e =3D g_malloc0(sizeof (*e));
+-
+     e->cb =3D cb;
+     e->opaque =3D opaque;
+-    QLIST_INSERT_HEAD(&vm_change_state_head, e, entries);
++    e->priority =3D priority;
++
++    /* Keep list sorted in ascending priority order */
++    QTAILQ_FOREACH(other, &vm_change_state_head, entries) {
++        if (priority < other->priority) {
++            QTAILQ_INSERT_BEFORE(other, e, entries);
++            return e;
++        }
++    }
++
++    QTAILQ_INSERT_TAIL(&vm_change_state_head, e, entries);
+     return e;
+ }
+=20
++VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandle=
+r *cb,
++                                                     void *opaque)
++{
++    return qemu_add_vm_change_state_handler_prio(cb, opaque,
++            VM_CHANGE_STATE_HANDLER_PRIO_UNDEFINED);
++}
++
+ void qemu_del_vm_change_state_handler(VMChangeStateEntry *e)
+ {
+-    QLIST_REMOVE (e, entries);
++    QTAILQ_REMOVE (&vm_change_state_head, e, entries);
+     g_free (e);
+ }
+=20
+@@ -1499,8 +1517,14 @@ void vm_state_notify(int running, RunState state)
+=20
+     trace_vm_state_notify(running, state, RunState_str(state));
+=20
+-    QLIST_FOREACH_SAFE(e, &vm_change_state_head, entries, next) {
+-        e->cb(e->opaque, running, state);
++    if (running) {
++        QTAILQ_FOREACH_SAFE(e, &vm_change_state_head, entries, next) {
++            e->cb(e->opaque, running, state);
++        }
++    } else {
++        QTAILQ_FOREACH_REVERSE_SAFE(e, &vm_change_state_head, entries, n=
+ext) {
++            e->cb(e->opaque, running, state);
++        }
+     }
+ }
+=20
+@@ -3009,7 +3033,7 @@ int main(int argc, char **argv, char **envp)
+         exit(1);
+     }
+=20
+-    QLIST_INIT (&vm_change_state_head);
++    QTAILQ_INIT (&vm_change_state_head);
+     os_setup_early_signal_handling();
+=20
+     cpu_option =3D NULL;
+--=20
+2.21.0
 
 
