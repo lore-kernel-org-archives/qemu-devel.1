@@ -2,71 +2,73 @@ Return-Path: <SRS0=XH1q=UL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F04B0C31E47
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 14:12:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4B50C31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 14:16:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC91420866
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 14:12:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC91420866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9ECA520866
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 14:16:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9ECA520866
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60770 helo=lists.gnu.org)
+Received: from localhost ([::1]:60826 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hb3zk-0008Lo-4T
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 10:12:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45664)
+	id 1hb43C-0002kS-Om
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 10:16:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44205)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hb3w0-00060k-6o
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 10:09:05 -0400
+ (envelope-from <bounces@canonical.com>) id 1hb3pE-0002fx-Dc
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 10:02:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hb3vy-0001BX-Oo
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 10:09:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56070)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>)
- id 1hb3vv-00017d-DJ; Wed, 12 Jun 2019 10:08:59 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5423C59473;
- Wed, 12 Jun 2019 14:08:58 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
- [10.36.116.148])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 798631001B0D;
- Wed, 12 Jun 2019 14:08:54 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0BB2B1138648; Wed, 12 Jun 2019 16:08:53 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20190611134043.9524-1-kwolf@redhat.com>
- <20190611134043.9524-5-kwolf@redhat.com>
- <877e9r41fu.fsf@dusky.pond.sub.org>
- <20190612100327.GA9699@localhost.localdomain>
-Date: Wed, 12 Jun 2019 16:08:53 +0200
-In-Reply-To: <20190612100327.GA9699@localhost.localdomain> (Kevin Wolf's
- message of "Wed, 12 Jun 2019 12:03:27 +0200")
-Message-ID: <87wohqx5e2.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <bounces@canonical.com>) id 1hb3pA-0005FK-1g
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 10:02:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40294)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hb3p6-0005CV-Kd
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 10:01:58 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hb3ox-0003FR-JY
+ for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 14:01:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 3119E2E80D1
+ for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 14:01:47 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Wed, 12 Jun 2019 14:08:58 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 12 Jun 2019 13:46:13 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: ppc
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ddosolitary pmaydell
+X-Launchpad-Bug-Reporter: DDoSolitary (ddosolitary)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <155137392124.31316.11495671074765014993.malonedeb@wampee.canonical.com>
+Message-Id: <156034717312.30867.1168495929007980486.malone@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18978";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 99c769ccb55deb2f40db994c7f47ea7c87fc2b9b
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 04/11] monitor: Create MonitorHMP with
- readline state
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1818122] Re: QEMU 3.1 makes libxslt to crash on
+ ppc64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,157 +77,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, berrange@redhat.com, qemu-devel@nongnu.org,
- Peter Xu <peterx@redhat.com>, dgilbert@redhat.com
+Reply-To: Bug 1818122 <1818122@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin Wolf <kwolf@redhat.com> writes:
+Could you try with QEMU 4.0, please? There was a bug/incompatibility
+between earlier QEMU and the Alpine Linux libc which we fixed in 4.0,
+and so this might be that bug (or some other bug we've already fixed).
 
-> Am 12.06.2019 um 11:07 hat Markus Armbruster geschrieben:
->> Cc: Peter for a monitor I/O thread question.
->> 
->> Kevin Wolf <kwolf@redhat.com> writes:
->> 
->> > The ReadLineState in Monitor is only used for HMP monitors. Create
->> > MonitorHMP and move it there.
->> >
->> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->
->> > @@ -218,6 +210,17 @@ struct Monitor {
->> >      int mux_out;
->> >  };
->> >  
->> > +struct MonitorHMP {
->> > +    Monitor common;
->> > +    /*
->> > +     * State used only in the thread "owning" the monitor.
->> > +     * If @use_io_thread, this is @mon_iothread.
->> > +     * Else, it's the main thread.
->> > +     * These members can be safely accessed without locks.
->> > +     */
->> > +    ReadLineState *rs;
->> > +};
->> > +
->> 
->> Hmm.
->> 
->> The monitor I/O thread code makes an effort not to restrict I/O thread
->> use to QMP, even though we only use it there.  Whether the code would
->> actually work for HMP as well we don't know.
->> 
->> Readline was similar until your PATCH 02: the code made an effort not to
->> restrict it to HMP, even though we only use it there.  Whether the code
->> would actually work for QMP as well we don't know.
->> 
->> Should we stop pretending and hard-code "I/O thread only for QMP"?
->> 
->> If yes, the comment above gets simplified by the patch that hard-codes
->> "I/O thread only for QMP".
->> 
->> If no, we should perhaps point out that we currently don't use an I/O
->> thread with HMP.  The comment above seems like a good place for that.
->> 
->> Perhaps restricting readline to HMP should be a separate patch before
->> PATCH 02.
->
-> Yes, possibly iothreads could be restricted to QMP. It doesn't help me
-> in splitting the monitor in any way, though, so I don't see it within
-> the scope of this series.
+-- =
 
-That's okay.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1818122
 
-Would you mind pointing out we don't actually use an I/O thread with HMP
-in the comment?
+Title:
+  QEMU 3.1 makes libxslt to crash on ppc64
 
-> Keeping readline around for QMP, on the other hand, would probably have
-> been harder than making the restriction.
->
-> As for splitting patch 2, I don't think that reorganising a patch that
-> already does its job and already received review is the most productive
-> thing we could do, but if you insist on a separate patch, I can do that.
+Status in QEMU:
+  New
 
-No, I don't insist.
+Bug description:
+  Host: clean Ubuntu Disco with QEMU 3.1
 
->> > @@ -748,12 +754,13 @@ char *qmp_human_monitor_command(const char *command_line, bool has_cpu_index,
->> >                                  int64_t cpu_index, Error **errp)
->> >  {
->> >      char *output = NULL;
->> > -    Monitor *old_mon, hmp;
->> > +    Monitor *old_mon;
->> > +    MonitorHMP hmp = {};
->> 
->> Any particular reason for adding the initializer?
->
-> Yes:
->
->> >  
->> > -    monitor_data_init(&hmp, 0, true, false);
->> > +    monitor_data_init(&hmp.common, 0, true, false);
->
-> monitor_data_init() does a memset(), but only on hmp.common, so the
-> fields outside of hmp.common would remain uniniitialised. Specifically,
-> hmp.rs wouldn't be initialised to NULL and attempting to free it in the
-> end would crash.
+  Guest: Alpine Linux edge with xmlto
 
-I see.
+  Steps to set up guest:
+  curl -O http://dl-cdn.alpinelinux.org/alpine/edge/releases/ppc64le/netboo=
+t/vmlinuz-vanilla
+  curl -O http://dl-cdn.alpinelinux.org/alpine/edge/releases/ppc64le/netboo=
+t/initramfs-vanilla
+  qemu-system-ppc64 -m 1G -kernel vmlinuz-vanilla -initrd initramfs-vanilla=
+ -append "console=3Dhvc0 ip=3Ddhcp alpine_repo=3Dhttp://dl-cdn.alpinelinux.=
+org/alpine/edge/main/ modloop=3Dhttp://dl-cdn.alpinelinux.org/alpine/edge/r=
+eleases/ppc64le/netboot/modloop-vanilla" -device virtio-rng-pci -nographic
+  This brings up an VM with an in-memory Alpine Linux.
 
-Drop the superfluous memset() in monitor_data_init() then.
+  Steps to reproduce:
+  Login as root and execute the following commands.
+  apk add xmlto
+  ntpd -nqp time.google.com // For TLS OCSP
+  wget https://ddosolitary.org/manpage-base.xsl
+  wget https://ddosolitary.org/shadowsocks-libev.xml
+  xmlto -m manpage-base.xsl man shadowsocks-libev.xml
+  The downloaded files are from this project: https://github.com/shadowsock=
+s/shadowsocks-libev The former is directly taken from the "doc" directory a=
+nd the latter is an intermediate build output generated by asciidoc from do=
+c/shadowsocks-libev.asciidoc
 
->> >      old_mon = cur_mon;
->> > -    cur_mon = &hmp;
->> > +    cur_mon = &hmp.common;
->> >  
->> >      if (has_cpu_index) {
->> >          int ret = monitor_set_cpu(cpu_index);
->
->> > @@ -1341,16 +1348,19 @@ static void hmp_info_sync_profile(Monitor *mon, const QDict *qdict)
->> >  
->> >  static void hmp_info_history(Monitor *mon, const QDict *qdict)
->> >  {
->> > +    MonitorHMP *hmp_mon = container_of(mon, MonitorHMP, common);
->> 
->> Unchecked conversion.  Tolerable, I think, since HMP command handlers
->> generally don't get invoked manually, unlike QMP command handlers.
->
-> I would like to see all HMP command handlers take MonitorHMP* instead of
-> Monitor*, but that would be a big ugly patch touching everything that
-> isn't really needed for the goal of this series, so I didn't include it.
+  Expected behavior: The command silently succeeds producing
+  shadowsocks-libev.8
 
-I consider the MonitorHMP job incomplete without it.  But it's Dave's
-turf.
+  Actual behavior: =
 
-> If you consider it valuable to get rid of this container_of(), that's
-> probably the follow-up you could do.
+  runtime error: file file:///usr/share/xml/docbook/xsl-stylesheets-1.79.1/=
+manpages/tbl.xsl line 450 element text
+  xsltApplySequenceConstructor: A potential infinite template recursion was=
+ detected.
+  You can adjust xsltMaxDepth (--maxdepth) in order to raise the maximum nu=
+mber of nested template calls and variables/params (currently set to 3000).
+  Templates:
+  #0 name process.colspan
+  #1 name process.colspan
+  #2 name process.colspan
+  #3 name process.colspan
+  #4 name process.colspan
+  #5 name process.colspan
+  #6 name process.colspan
+  #7 name process.colspan
+  #8 name process.colspan
+  #9 name process.colspan
+  #10 name process.colspan
+  #11 name process.colspan
+  #12 name process.colspan
+  #13 name process.colspan
+  #14 name process.colspan
+  Variables:
+  #0
+  type
+  colspan
+  #1
+  colspan
+  #2
+  type
+  colspan
+  #3
+  colspan
+  #4
+  type
+  colspan
+  #5
+  colspan
+  #6
+  type
+  colspan
+  #7
+  colspan
+  #8
+  type
+  colspan
+  #9
+  colspan
+  #10
+  type
+  colspan
+  #11
+  colspan
+  #12
+  type
+  colspan
+  #13
+  colspan
+  #14
+  type
+  colspan
+  error: file /root/shadowsocks-libev.xml
+  xsltRunStylesheet : run failed
 
-My recent qemu-common.h pull request temporarily cooled my enthusiasm
-for big, ugly patches touching everything...
+  Note:
+  I tried increasing --maxdepth as suggested in the error output but that w=
+ill result in a segfault.
+  This error doesn't occur with an older QEMU (I tested QEMU 2.12 on Ubuntu=
+ Cosmic) or different architectures on QEMU 3.1 (I tested x86, x86_64, arm,=
+ aarch64, s390x). Also it didn't help to use an older Alpine Linux (I teste=
+d v3.8). So I think it is caused by a bug in QEMU rather than the distro/pa=
+ckage.
 
->> > @@ -4460,6 +4474,7 @@ static void monitor_qmp_event(void *opaque, int event)
->> >  static void monitor_event(void *opaque, int event)
->> >  {
->> >      Monitor *mon = opaque;
->> > +    MonitorHMP *hmp_mon = container_of(cur_mon, MonitorHMP, common);
->> 
->> Any particular reason for changing from @opaque to @cur_mon?
->
-> Probably a copy & paste error, thanks for catching it! I'll fix it.
->
->> > @@ -4662,11 +4679,11 @@ static void monitor_init_qmp(Chardev *chr, int flags)
->> >  
->> >  static void monitor_init_hmp(Chardev *chr, int flags)
->> >  {
->> > -    Monitor *mon = g_malloc(sizeof(*mon));
->> > +    MonitorHMP *mon = g_malloc0(sizeof(*mon));
->> 
->> Any particular reason for changing to g_malloc0()?
->> 
->> You hid the same change for monitor_init_qmp() in PATCH 03, where I
->> missed it until now.
->
-> As above, initialising the fields outside mon->common.
->
-> Kevin
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1818122/+subscriptions
 
