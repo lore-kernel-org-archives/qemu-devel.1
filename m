@@ -2,82 +2,63 @@ Return-Path: <SRS0=XH1q=UL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5669C31E46
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 17:00:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBF14C31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 17:00:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 518AB215EA
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 17:00:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K12kRcUw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 518AB215EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id A8627215EA
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 17:00:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8627215EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33878 helo=lists.gnu.org)
+Received: from localhost ([::1]:33876 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hb6c5-0005N0-QG
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 13:00:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57238)
+	id 1hb6cD-0005Mi-A5
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 13:00:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57929)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ryanpboyce12@gmail.com>) id 1hb6S3-0004S5-1n
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:50:20 -0400
+ (envelope-from <armbru@redhat.com>) id 1hb6Ue-0007TU-1W
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:53:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ryanpboyce12@gmail.com>) id 1hb6S1-0004de-ND
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:50:18 -0400
-Received: from mail-qk1-x729.google.com ([2607:f8b0:4864:20::729]:34589)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <ryanpboyce12@gmail.com>)
- id 1hb6S1-0004c5-Hy
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:50:17 -0400
-Received: by mail-qk1-x729.google.com with SMTP id t8so7101218qkt.1
- for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 09:50:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=xqIVbIzYsqovppDRqXJiYVwSyt0hLDqAMfuJFn9u9nE=;
- b=K12kRcUwVjilN49bER95HfBMYKfS3MpzNZqB+F8ZjwUJdsC3RJT+XKD0Xecpfk4LTR
- /q+fEgIW8cRp568PZqFJvq0gITrTIXAKsgNIEmQSOQ6HL11PzeuKhxwZEOUmy2ByVxiP
- oMoAzEAtMI07gF+7Y/yHWpzgtBa0QbvTnNcxWwjaG53lfVCSpKWCNdQXr1JnP7D/Ms3x
- AuJnFSUSdXx3ss54LVTCR0tmGO8ri+beb27Q07vDhLIsy39pHN4mlNiBjOD+9FtI2nWw
- Rw0tRFN8hxL7zrCeSiVRdxUTM/NsDXmuP0PCGLGf4SUVeUuorhpGH3jmKlIqPJMye/1V
- W6JQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=xqIVbIzYsqovppDRqXJiYVwSyt0hLDqAMfuJFn9u9nE=;
- b=W9FJyTvn4L+NFHwa3ghffEEeokP+Z4rjDmz/gY8Hc9deUrTNzjK5tJpE086mWNlPBO
- e8wbFk1aRIY+ejFX1YiTlsysuk+j1qYX9UbPvlx4qWP99rQ3ljV1c5Ld8WIr3ncDbrL6
- MxuzC1xeZANeaP9WKvprbz6CAwJorRBLlOPQvWSVvvmH/LfSmJxrx0RiB516sNMFxfuz
- aIY+9ktTyt7DrpbBV52V0WyZZDOU4iQ2Ht8E44dQNKrhQ0+tGyObe8eD4kenb9B0z16k
- cc2ogsH//dJUh0CKel+5wSlGTI+XcrrUwxrwMBNJtGvMUj/AdQNed2gq57zUsEI7zfSv
- c4+Q==
-X-Gm-Message-State: APjAAAVTyZVkCerOPv8EFG5M5NbyVvuJtvJSuQ5Pt872u3pF+U+444tk
- nq/xUdtHe/KaYAboMVfS3RQ2h44pKGtmohL466s=
-X-Google-Smtp-Source: APXvYqwgTcN/+ZX3xizAR6HE5kkm9l1mcgwq6YvQM4Wwzfb2C34zXwh0W8A59okjwXPSTLaegyez00QcTdAc4J4wFPk=
-X-Received: by 2002:ae9:e30d:: with SMTP id v13mr47399925qkf.148.1560358216856; 
- Wed, 12 Jun 2019 09:50:16 -0700 (PDT)
+ (envelope-from <armbru@redhat.com>) id 1hb6Ub-0006YI-TH
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:52:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35098)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hb6UW-0006Fq-MJ
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:52:55 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id DFA6330872C2
+ for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 16:52:33 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
+ [10.36.116.148])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7ED9F600CC;
+ Wed, 12 Jun 2019 16:52:32 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id B030711384DA; Wed, 12 Jun 2019 18:52:29 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 12 Jun 2019 18:52:25 +0200
+Message-Id: <20190612165229.26976-8-armbru@redhat.com>
+In-Reply-To: <20190612165229.26976-1-armbru@redhat.com>
+References: <20190612165229.26976-1-armbru@redhat.com>
 MIME-Version: 1.0
-References: <CAOJt3afDmLtb1328ZWRvbO=SYgqtGZYX-aApTMoDPffiErygGg@mail.gmail.com>
- <CAHDbmO2cxxAv2Fqotfw8S8DBh7J+9oa67N8K_Ps_25vRbtpe3Q@mail.gmail.com>
-In-Reply-To: <CAHDbmO2cxxAv2Fqotfw8S8DBh7J+9oa67N8K_Ps_25vRbtpe3Q@mail.gmail.com>
-From: Ryan Boyce <ryanpboyce12@gmail.com>
-Date: Wed, 12 Jun 2019 12:50:05 -0400
-Message-ID: <CAOJt3ad2HbohoBRv8Ey9fknBRGeiN1SJ7wAk9gX+Vpf4pig_KA@mail.gmail.com>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::729
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Wed, 12 Jun 2019 16:52:33 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] qemu processes
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 07/11] tests/qapi-schema: Error case tests for
+ features in structs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,54 +70,274 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thank you my friend!
+From: Kevin Wolf <kwolf@redhat.com>
 
-On Wed, Jun 12, 2019 at 12:48 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> =
-wrote:
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Message-Id: <20190606153803.5278-4-armbru@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ tests/Makefile.include                         | 6 ++++++
+ tests/qapi-schema/features-bad-type.err        | 1 +
+ tests/qapi-schema/features-bad-type.exit       | 1 +
+ tests/qapi-schema/features-bad-type.json       | 3 +++
+ tests/qapi-schema/features-bad-type.out        | 0
+ tests/qapi-schema/features-duplicate-name.err  | 1 +
+ tests/qapi-schema/features-duplicate-name.exit | 1 +
+ tests/qapi-schema/features-duplicate-name.json | 3 +++
+ tests/qapi-schema/features-duplicate-name.out  | 0
+ tests/qapi-schema/features-missing-name.err    | 1 +
+ tests/qapi-schema/features-missing-name.exit   | 1 +
+ tests/qapi-schema/features-missing-name.json   | 3 +++
+ tests/qapi-schema/features-missing-name.out    | 0
+ tests/qapi-schema/features-name-bad-type.err   | 1 +
+ tests/qapi-schema/features-name-bad-type.exit  | 1 +
+ tests/qapi-schema/features-name-bad-type.json  | 3 +++
+ tests/qapi-schema/features-name-bad-type.out   | 0
+ tests/qapi-schema/features-no-list.err         | 1 +
+ tests/qapi-schema/features-no-list.exit        | 1 +
+ tests/qapi-schema/features-no-list.json        | 3 +++
+ tests/qapi-schema/features-no-list.out         | 0
+ tests/qapi-schema/features-unknown-key.err     | 2 ++
+ tests/qapi-schema/features-unknown-key.exit    | 1 +
+ tests/qapi-schema/features-unknown-key.json    | 3 +++
+ tests/qapi-schema/features-unknown-key.out     | 0
+ 25 files changed, 37 insertions(+)
+ create mode 100644 tests/qapi-schema/features-bad-type.err
+ create mode 100644 tests/qapi-schema/features-bad-type.exit
+ create mode 100644 tests/qapi-schema/features-bad-type.json
+ create mode 100644 tests/qapi-schema/features-bad-type.out
+ create mode 100644 tests/qapi-schema/features-duplicate-name.err
+ create mode 100644 tests/qapi-schema/features-duplicate-name.exit
+ create mode 100644 tests/qapi-schema/features-duplicate-name.json
+ create mode 100644 tests/qapi-schema/features-duplicate-name.out
+ create mode 100644 tests/qapi-schema/features-missing-name.err
+ create mode 100644 tests/qapi-schema/features-missing-name.exit
+ create mode 100644 tests/qapi-schema/features-missing-name.json
+ create mode 100644 tests/qapi-schema/features-missing-name.out
+ create mode 100644 tests/qapi-schema/features-name-bad-type.err
+ create mode 100644 tests/qapi-schema/features-name-bad-type.exit
+ create mode 100644 tests/qapi-schema/features-name-bad-type.json
+ create mode 100644 tests/qapi-schema/features-name-bad-type.out
+ create mode 100644 tests/qapi-schema/features-no-list.err
+ create mode 100644 tests/qapi-schema/features-no-list.exit
+ create mode 100644 tests/qapi-schema/features-no-list.json
+ create mode 100644 tests/qapi-schema/features-no-list.out
+ create mode 100644 tests/qapi-schema/features-unknown-key.err
+ create mode 100644 tests/qapi-schema/features-unknown-key.exit
+ create mode 100644 tests/qapi-schema/features-unknown-key.json
+ create mode 100644 tests/qapi-schema/features-unknown-key.out
 
-> You've actually contacted the development list but I can answer the
-> question.
->
-> QEMU is multi-threaded so there will be a thread per KVM based vCPU
-> (and also for TCG based vCPUs where MTTCG is enabled). There will also
-> be a number of additional threads created including at least one for
-> the main monitor thread and potentially additional threads for
-> servicing IO requests. So expect to see $SMP + 1 + n threads for each
-> QEMU instance.
->
-> On Wed, 12 Jun 2019 at 16:32, Ryan Boyce <ryanpboyce12@gmail.com> wrote:
-> >
-> > Hi Stefan,
-> >
-> > I am a big fan of your blog! In relation to your blog post,
-> >
-> http://blog.vmsplice.net/2011/03/qemu-internals-big-picture-overview.html=
-,
-> > I have a question I am really hoping you can answer:
-> >
-> > When I start a VM, I see that the qemu-kvm processes start and run as
-> > "qemu-kvm..... -name "something1"...."
-> > My issue, though, is I see multiple processes running as "qemu-kvm.....
-> > -name "something1"...." and each of these processes has memory/cpu/disk
-> > mapped to it.
-> > Does qemu-kvm run VMs on a one-to-one VM-to-host process basis? Or does
-> > each virtual cpu on the guest get its own process on the host?
-> > For example, If I have a VM that has 4 virtual cpus, will I see 4
-> processes
-> > (PIDs) on the host or should I see just see one for the VM itself.
-> >
-> > Any help you can give would be GREATLY appreciated. Thank you!
-> >
-> > Ryan
->
->
->
-> --
-> Alex Benn=C3=A9e
-> KVM/QEMU Hacker for Linaro
->
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 0cd5f465b7..db750dd6d0 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -378,6 +378,12 @@ qapi-schema +=3D event-boxed-empty.json
+ qapi-schema +=3D event-case.json
+ qapi-schema +=3D event-member-invalid-dict.json
+ qapi-schema +=3D event-nest-struct.json
++qapi-schema +=3D features-bad-type.json
++qapi-schema +=3D features-duplicate-name.json
++qapi-schema +=3D features-missing-name.json
++qapi-schema +=3D features-name-bad-type.json
++qapi-schema +=3D features-no-list.json
++qapi-schema +=3D features-unknown-key.json
+ qapi-schema +=3D flat-union-array-branch.json
+ qapi-schema +=3D flat-union-bad-base.json
+ qapi-schema +=3D flat-union-bad-discriminator.json
+diff --git a/tests/qapi-schema/features-bad-type.err b/tests/qapi-schema/=
+features-bad-type.err
+new file mode 100644
+index 0000000000..5fb95c2f90
+--- /dev/null
++++ b/tests/qapi-schema/features-bad-type.err
+@@ -0,0 +1 @@
++tests/qapi-schema/features-bad-type.json:1: Feature of struct FeatureStr=
+uct0 requires a string name
+diff --git a/tests/qapi-schema/features-bad-type.exit b/tests/qapi-schema=
+/features-bad-type.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/features-bad-type.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/features-bad-type.json b/tests/qapi-schema=
+/features-bad-type.json
+new file mode 100644
+index 0000000000..57db5540e7
+--- /dev/null
++++ b/tests/qapi-schema/features-bad-type.json
+@@ -0,0 +1,3 @@
++{ 'struct': 'FeatureStruct0',
++  'data': { 'foo': 'int' },
++  'features': [ [ 'a feature cannot be an array' ] ] }
+diff --git a/tests/qapi-schema/features-bad-type.out b/tests/qapi-schema/=
+features-bad-type.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/features-duplicate-name.err b/tests/qapi-s=
+chema/features-duplicate-name.err
+new file mode 100644
+index 0000000000..c0a4cccae6
+--- /dev/null
++++ b/tests/qapi-schema/features-duplicate-name.err
+@@ -0,0 +1 @@
++tests/qapi-schema/features-duplicate-name.json:1: 'foo' (feature of Feat=
+ureStruct0) collides with 'foo' (feature of FeatureStruct0)
+diff --git a/tests/qapi-schema/features-duplicate-name.exit b/tests/qapi-=
+schema/features-duplicate-name.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/features-duplicate-name.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/features-duplicate-name.json b/tests/qapi-=
+schema/features-duplicate-name.json
+new file mode 100644
+index 0000000000..29358e6220
+--- /dev/null
++++ b/tests/qapi-schema/features-duplicate-name.json
+@@ -0,0 +1,3 @@
++{ 'struct': 'FeatureStruct0',
++  'data': { 'foo': 'int' },
++  'features': [ 'foo', 'bar', 'foo' ] }
+diff --git a/tests/qapi-schema/features-duplicate-name.out b/tests/qapi-s=
+chema/features-duplicate-name.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/features-missing-name.err b/tests/qapi-sch=
+ema/features-missing-name.err
+new file mode 100644
+index 0000000000..4f1d2715aa
+--- /dev/null
++++ b/tests/qapi-schema/features-missing-name.err
+@@ -0,0 +1 @@
++tests/qapi-schema/features-missing-name.json:1: Key 'name' is missing fr=
+om feature of struct FeatureStruct0
+diff --git a/tests/qapi-schema/features-missing-name.exit b/tests/qapi-sc=
+hema/features-missing-name.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/features-missing-name.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/features-missing-name.json b/tests/qapi-sc=
+hema/features-missing-name.json
+new file mode 100644
+index 0000000000..2314f97c00
+--- /dev/null
++++ b/tests/qapi-schema/features-missing-name.json
+@@ -0,0 +1,3 @@
++{ 'struct': 'FeatureStruct0',
++  'data': { 'foo': 'int' },
++  'features': [ { 'if': 'defined(NAMELESS_FEATURES)' } ] }
+diff --git a/tests/qapi-schema/features-missing-name.out b/tests/qapi-sch=
+ema/features-missing-name.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/features-name-bad-type.err b/tests/qapi-sc=
+hema/features-name-bad-type.err
+new file mode 100644
+index 0000000000..8a3eecb972
+--- /dev/null
++++ b/tests/qapi-schema/features-name-bad-type.err
+@@ -0,0 +1 @@
++tests/qapi-schema/features-name-bad-type.json:1: Feature of struct Featu=
+reStruct0 requires a string name
+diff --git a/tests/qapi-schema/features-name-bad-type.exit b/tests/qapi-s=
+chema/features-name-bad-type.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/features-name-bad-type.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/features-name-bad-type.json b/tests/qapi-s=
+chema/features-name-bad-type.json
+new file mode 100644
+index 0000000000..b07139978a
+--- /dev/null
++++ b/tests/qapi-schema/features-name-bad-type.json
+@@ -0,0 +1,3 @@
++{ 'struct': 'FeatureStruct0',
++  'data': { 'foo': 'int' },
++  'features': [ { 'name': { 'feature-type': 'object' } } ] }
+diff --git a/tests/qapi-schema/features-name-bad-type.out b/tests/qapi-sc=
+hema/features-name-bad-type.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/features-no-list.err b/tests/qapi-schema/f=
+eatures-no-list.err
+new file mode 100644
+index 0000000000..61ed68612b
+--- /dev/null
++++ b/tests/qapi-schema/features-no-list.err
+@@ -0,0 +1 @@
++tests/qapi-schema/features-no-list.json:1: Struct 'FeatureStruct0' requi=
+res an array for 'features'
+diff --git a/tests/qapi-schema/features-no-list.exit b/tests/qapi-schema/=
+features-no-list.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/features-no-list.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/features-no-list.json b/tests/qapi-schema/=
+features-no-list.json
+new file mode 100644
+index 0000000000..9484fd94fc
+--- /dev/null
++++ b/tests/qapi-schema/features-no-list.json
+@@ -0,0 +1,3 @@
++{ 'struct': 'FeatureStruct0',
++  'data': { 'foo': 'int' },
++  'features': 'bar' }
+diff --git a/tests/qapi-schema/features-no-list.out b/tests/qapi-schema/f=
+eatures-no-list.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/features-unknown-key.err b/tests/qapi-sche=
+ma/features-unknown-key.err
+new file mode 100644
+index 0000000000..a1d693030d
+--- /dev/null
++++ b/tests/qapi-schema/features-unknown-key.err
+@@ -0,0 +1,2 @@
++tests/qapi-schema/features-unknown-key.json:1: Unknown key 'colour' in f=
+eature of struct FeatureStruct0
++Valid keys are 'if', 'name'.
+diff --git a/tests/qapi-schema/features-unknown-key.exit b/tests/qapi-sch=
+ema/features-unknown-key.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/features-unknown-key.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/features-unknown-key.json b/tests/qapi-sch=
+ema/features-unknown-key.json
+new file mode 100644
+index 0000000000..134df3b503
+--- /dev/null
++++ b/tests/qapi-schema/features-unknown-key.json
+@@ -0,0 +1,3 @@
++{ 'struct': 'FeatureStruct0',
++  'data': { 'foo': 'int' },
++  'features': [ { 'name': 'bar', 'colour': 'red' } ] }
+diff --git a/tests/qapi-schema/features-unknown-key.out b/tests/qapi-sche=
+ma/features-unknown-key.out
+new file mode 100644
+index 0000000000..e69de29bb2
+--=20
+2.21.0
+
+
