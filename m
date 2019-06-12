@@ -2,57 +2,171 @@ Return-Path: <SRS0=XH1q=UL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79015C31E46
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 23:13:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36323C31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 23:29:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 528F0208C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 23:13:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 528F0208C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E0AD520B7C
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 23:28:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="le/sX0Kz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0AD520B7C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35962 helo=lists.gnu.org)
+Received: from localhost ([::1]:36062 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbCR6-0000Gj-Gm
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 19:13:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52513)
+	id 1hbCfq-0003z7-Rn
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 19:28:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35404)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hbBrv-0005pI-4W
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 18:37:24 -0400
+ (envelope-from <aik@ozlabs.ru>) id 1hbCeZ-0002xh-Ci
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 19:27:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hbBrt-0005xF-IV
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 18:37:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52366)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hbBrq-0005n5-JO; Wed, 12 Jun 2019 18:37:18 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 000F1307D869;
- Wed, 12 Jun 2019 22:37:03 +0000 (UTC)
-Received: from localhost (unknown [10.40.205.72])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 861645ED2B;
- Wed, 12 Jun 2019 22:37:03 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Thu, 13 Jun 2019 00:37:01 +0200
-Message-Id: <20190612223701.31456-1-mreitz@redhat.com>
+ (envelope-from <aik@ozlabs.ru>) id 1hbCe6-0000Ln-6K
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 19:27:11 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:34000)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1hbCe5-0000Kr-Kq
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 19:27:10 -0400
+Received: by mail-pl1-x644.google.com with SMTP id i2so7256724plt.1
+ for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 16:27:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+ h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=J0KYGZXZ26NqXhxLesmwOll1ZMGGZoHYrYFQLJ4y0jY=;
+ b=le/sX0KzpWxak0k7EAAFo71/taONcDZkEd3YpKWJZ4/GqkRgSMx4OHz5fOQ+5BmVOF
+ sG4TMC0H5W2t+5An4ldKgCZtxwwHvwOEzEncgRc2HgsGL6oViWDscQXIS1Z/rMi8GXkA
+ 1d08nrG0umUKGArI4IOh6s1trbJ75cEsTajnZOJ3G1vvon4mhWK1BfV+Bhl3ymWRvxq7
+ 85NeN58QNO43ERtEL2TAPEY+seBSvKEo9PmQ1HQ2vGkP069sGfke7J5B9NFpGISTwtzM
+ 1uSKxB5EVJJa/xUsDqyYKSRDCiwvRWupAbmHtlTRNRFZ5ngIrLaEMTW9gXcd+lOS0YJR
+ k4Eg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=J0KYGZXZ26NqXhxLesmwOll1ZMGGZoHYrYFQLJ4y0jY=;
+ b=r3YAtba2jglxDMF9d3eV30Xv3FAQLhRj5kDlvXdbJGFb+GN8bKrkguyE5n1uYx1pPN
+ E2722UP7nqgQmJf7Qf8BPZD9n8dG+g3yBba8HTbBLZmFdGr92BJj/yJe8vpoI5WTOKhy
+ xNqW5X+BBR1+4a6zE4O4GVnLTpfiIDQ8sBVwKbRyOUwhFkxWWWUKKZPnsz9JfKGn5nWi
+ Q6g73OjTRDbWOAbxVDo3vkpM383gIOjMWnWfxWepjNhkjRT1EwJ0tyqX2c25VR0JzWZ+
+ JWIY7QY6PKBo2928W4aSxfuUH5Wf6Pjx8wOym59JQRXTGjZ8VvwW7r84+irbIWB+NlWZ
+ gYKg==
+X-Gm-Message-State: APjAAAU68D0Xy4Ma+sNaXclGo5Clf6KTnj5/Ju7n8yWAB4S66ErUuXCG
+ HTvKGd97INsFq7786ltfElgVlQ==
+X-Google-Smtp-Source: APXvYqwZhnFk0R3I9EUi2w2oOGrIrNbu+9tUW63YxLbNnkDB8P29c2B9mQa1aotHsb3rc5QqQPP4mA==
+X-Received: by 2002:a17:902:a405:: with SMTP id
+ p5mr13566748plq.51.1560382028314; 
+ Wed, 12 Jun 2019 16:27:08 -0700 (PDT)
+Received: from [10.61.2.175] ([122.99.82.10])
+ by smtp.gmail.com with ESMTPSA id h2sm500011pgs.17.2019.06.12.16.27.05
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 12 Jun 2019 16:27:07 -0700 (PDT)
+To: Fabiano Rosas <farosas@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20190228225759.21328-1-farosas@linux.ibm.com>
+ <20190228225759.21328-6-farosas@linux.ibm.com>
+ <b8a30b89-8c19-821e-e3a3-f1b71a088d9d@ozlabs.ru>
+ <87ef73rl39.fsf@linux.ibm.com>
+ <eadc5e30-5094-9b76-7268-cfb633ac40bd@ozlabs.ru>
+ <c5e92072-eb8d-7af5-3eef-fac256f29c98@ozlabs.ru>
+ <877e9r3p2e.fsf@linux.ibm.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Openpgp: preference=signencrypt
+Autocrypt: addr=aik@ozlabs.ru; keydata=
+ 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
+Message-ID: <31dba2e5-7e8b-d006-d403-8c58c3c8a464@ozlabs.ru>
+Date: Thu, 13 Jun 2019 09:27:02 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Wed, 12 Jun 2019 22:37:04 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] iotests: Fix 129
+In-Reply-To: <877e9r3p2e.fsf@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::644
+Subject: Re: [Qemu-devel] [RFC PATCH v4 5/5] target/ppc: support single
+ stepping with KVM HV
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,104 +178,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Throttling on the BB have not affected block jobs in a while, so 129
-is prone to break (at least on tmpfs with high system load).  We can
-fix the problem by running the job from a throttle node.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
-Depends on "[PATCH v5 00/42] block: Deal with filters".
 
-Based-on: <20190612221004.2317-1-mreitz@redhat.com>
+On 12/06/2019 23:34, Fabiano Rosas wrote:
+> Alexey Kardashevskiy <aik@ozlabs.ru> writes:
+> 
+>> Are you reposting this any time soon?
+> 
+> I have sent a v2 to the kernel side of it:
+> 
+> https://lore.kernel.org/kvm/20190529222219.27994-1-farosas@linux.ibm.com/
+> 
+> I'm depending on what we decide to do there. The core of this patchset
+> will not change, just the mechanism by which the feature is selected
+> (patch 2, kvm-all: Introduce kvm_set_singlestep).
+> 
+>> In meanwhile I hit a problem when I cannot step over the "stdu" instruction.
+>>
+>> I basically put this:
+>> stdu    r1,-368(r1)
+>>
+>> and "ni" in gdb does not stop on the next instruction which is quite
+>> confusing. Ideas?
+> 
+> Perhaps the next instruction is one that is not traced? See the programming
+> note at the end of section 6.5.15 in Book III.
 
-Yes, I know, that is a long dependency chain.  For now, I just want to
-show that this patch exists.
----
- tests/qemu-iotests/129 | 33 +++++++++------------------------
- 1 file changed, 9 insertions(+), 24 deletions(-)
+No, it is not it, it is more subtle. The problem piece was originally this:
 
-diff --git a/tests/qemu-iotests/129 b/tests/qemu-iotests/129
-index 9e87e1c8d9..c729e2bde5 100755
---- a/tests/qemu-iotests/129
-+++ b/tests/qemu-iotests/129
-@@ -31,52 +31,37 @@ class TestStopWithBlockJob(iotests.QMPTestCase):
-         iotests.qemu_img('create', '-f', iotests.imgfmt, self.base_img, =
-"1G")
-         iotests.qemu_img('create', '-f', iotests.imgfmt, self.test_img, =
-"-b", self.base_img)
-         iotests.qemu_io('-f', iotests.imgfmt, '-c', 'write -P0x5d 1M 128=
-M', self.test_img)
--        self.vm =3D iotests.VM().add_drive(self.test_img)
-+        self.vm =3D iotests.VM()
-+        self.vm.add_object('throttle-group,id=3Dtg0,x-bps-total=3D1024')
-+        self.vm.add_drive(None, 'driver=3Dthrottle,throttle-group=3Dtg0,=
-file.driver=3D%s,file.file.filename=3D%s' % (iotests.imgfmt, self.test_im=
-g))
-         self.vm.launch()
-=20
-     def tearDown(self):
--        params =3D {"device": "drive0",
--                  "bps": 0,
--                  "bps_rd": 0,
--                  "bps_wr": 0,
--                  "iops": 0,
--                  "iops_rd": 0,
--                  "iops_wr": 0,
--                 }
--        result =3D self.vm.qmp("block_set_io_throttle", conv_keys=3DFals=
-e,
--                             **params)
-         self.vm.shutdown()
-=20
-     def do_test_stop(self, cmd, **args):
-         """Test 'stop' while block job is running on a throttled drive.
-         The 'stop' command shouldn't drain the job"""
--        params =3D {"device": "drive0",
--                  "bps": 1024,
--                  "bps_rd": 0,
--                  "bps_wr": 0,
--                  "iops": 0,
--                  "iops_rd": 0,
--                  "iops_wr": 0,
--                 }
--        result =3D self.vm.qmp("block_set_io_throttle", conv_keys=3DFals=
-e,
--                             **params)
--        self.assert_qmp(result, 'return', {})
-         result =3D self.vm.qmp(cmd, **args)
-         self.assert_qmp(result, 'return', {})
-+
-         result =3D self.vm.qmp("stop")
-         self.assert_qmp(result, 'return', {})
-         result =3D self.vm.qmp("query-block-jobs")
-+
-         self.assert_qmp(result, 'return[0]/busy', True)
-         self.assert_qmp(result, 'return[0]/ready', False)
-=20
-+        self.vm.qmp("block-job-cancel", device=3D"drive0", force=3DTrue)
-+
-     def test_drive_mirror(self):
-         self.do_test_stop("drive-mirror", device=3D"drive0",
--                          target=3Dself.target_img,
-+                          target=3Dself.target_img, format=3Diotests.img=
-fmt,
-                           sync=3D"full")
-=20
-     def test_drive_backup(self):
-         self.do_test_stop("drive-backup", device=3D"drive0",
--                          target=3Dself.target_img,
-+                          target=3Dself.target_img, format=3Diotests.img=
-fmt,
-                           sync=3D"full")
-=20
-     def test_block_commit(self):
---=20
-2.21.0
+c0000000010f16b4:       f0 ff c1 fb     std     r30,-16(r1)
+c0000000010f16b8:       f8 ff e1 fb     std     r31,-8(r1)
+c0000000010f16bc:       91 fe 21 f8     stdu    r1,-368(r1)
+c0000000010f16c0:       39 00 22 3d     addis   r9,r2,57
+c0000000010f16c4:       18 97 49 39     addi    r10,r9,-26856
+c0000000010f16c8:       08 00 22 3d     addis   r9,r2,8
+c0000000010f16cc:       00 78 29 39     addi    r9,r9,30720
 
+It is Linux'es prom_init().
+
+
+> Or maybe the step got preempted? You should see GDB messages indicating
+> changing threads right before or after the stdu. However that would only
+> happen with more than one VCPU and if 'show scheduler-locking' in GDB is
+> 'off'. And even then, that should not cause any issues, but it is a more
+> complex scenario so there could be a bug in the code.
+
+It is TCG, a single CPU with a single thread and no matter where I put
+this "stdu    r1,-368(r1)" - GDB does not stop on the next one and just
+runs.
+
+In the example above:
+1. "b *0x10f16bc" makes GDB stop there, "ni" continues without stopping
+on at 0x10f16c0.
+2. "b *0x10f16bc" and "b *0x10f16c0" make GDB stop at 0x10f16bc and "ni"
+steps to 0x10f16c0 but it is rather because it is a breakpoint and not
+the next instruction.
+3. "b *0x10f16bc" and "b *0x10f16c4" make GDB stop at 0x10f16bc and "ni"
+stops GDB at 0x10f16bc but again it is a breakpoint.
+
+In 2 and 3 it is possible to continue step debugging till the next "stdu".
+
+
+> 
+>> On 20/03/2019 12:42, Alexey Kardashevskiy wrote:
+>>>
+>>>
+>>> On 20/03/2019 01:32, Fabiano Rosas wrote:
+>>>> Alexey Kardashevskiy <aik@ozlabs.ru> writes:
+>>>>
+>>>>> Looks good to me, does not break what already works. However I cannot
+>>>>> debug SLOF real mode and I am not sure why.
+>>>>>
+>>>>> (gdb) set endian big
+>>>>>
+>>>>> The target is assumed to be big endian
+>>>>> (gdb) b *0x3f00
+>>>>>
+>>>>> Breakpoint 2 at 0x3f00
+>>>>
+>>>> I think I'm missing the point here. Why 0x3f00?
+>>>
+>>> Because I am stupid and did not realize that 0x3f00 is a relative offset
+>>> and 0x4000 is the correct address which works.
+>>>
+>>>
+>>> Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>>
+>>>
+>>>>
+>>>> (qemu) info roms
+>>>> addr=0000000000000000 size=0x0e22b8 mem=ram name="...qemu/slof.bin"                               
+>>>> addr=0000000000400000 size=0x17976d0 mem=ram name="...vmlinux"
+>>>>
+>>>>
+>>>> $ objdump -d board-qemu/llfw/stage1.elf | grep "_start>"
+>>>> 0000000000000100 <__start>:
+>>>>      100:       48 00 3f 00     b       4000 <_start>
+>>>> 0000000000004000 <_start>:
+>>>>
+>>>>
+>>>> Thread 1 hit Breakpoint 3, _start () at startup.S:82
+>>>> (gdb) p/x $pc
+>>>> $1 = 0x4000
+>>>> (gdb) si
+>>>> (gdb) p/x $pc
+>>>> $3 = 0x4004
+>>>> (gdb) c
+>>>> Thread 1 hit Breakpoint 4, early_c_entry (start_addr=49056, fdt_addr=49024) at stage2.c:202
+>>>> (gdb) p/x $pc
+>>>> $4 = 0x4d18
+>>>>
+>>>
+
+-- 
+Alexey
 
