@@ -6,58 +6,64 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB7F2C31E48
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 14:31:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39744C31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 14:33:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9300A2082C
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 14:31:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9300A2082C
+	by mail.kernel.org (Postfix) with ESMTPS id 12E042082C
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 14:33:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12E042082C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60910 helo=lists.gnu.org)
+Received: from localhost ([::1]:60918 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hb4HP-0007Gy-PO
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 10:31:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49136)
+	id 1hb4Ji-0008LH-8v
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 10:33:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49261)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <cohuck@redhat.com>) id 1hb4DN-0005B9-0v
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 10:27:02 -0400
+ (envelope-from <armbru@redhat.com>) id 1hb4DW-0005RL-3R
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 10:27:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1hb47x-00054z-0L
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 10:21:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:31741)
+ (envelope-from <armbru@redhat.com>) id 1hb459-0001e0-18
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 10:18:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:16141)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1hb47w-0004do-QH
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 10:21:24 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>)
+ id 1hb451-0001TZ-J2; Wed, 12 Jun 2019 10:18:25 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1648030C3195;
- Wed, 12 Jun 2019 14:20:56 +0000 (UTC)
-Received: from gondolin (ovpn-116-169.ams2.redhat.com [10.36.116.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D885A79581;
- Wed, 12 Jun 2019 14:20:14 +0000 (UTC)
-Date: Wed, 12 Jun 2019 16:20:12 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <20190612162012.06b4af7f.cohuck@redhat.com>
-In-Reply-To: <20190612124527.3763-3-pagupta@redhat.com>
-References: <20190612124527.3763-1-pagupta@redhat.com>
- <20190612124527.3763-3-pagupta@redhat.com>
-Organization: Red Hat GmbH
+ by mx1.redhat.com (Postfix) with ESMTPS id A792830872D7;
+ Wed, 12 Jun 2019 14:18:10 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
+ [10.36.116.148])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 848305C644;
+ Wed, 12 Jun 2019 14:18:09 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 174AF1138648; Wed, 12 Jun 2019 16:18:08 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20190611134043.9524-1-kwolf@redhat.com>
+ <20190611134043.9524-4-kwolf@redhat.com>
+ <875zpb5j4b.fsf@dusky.pond.sub.org>
+ <20190612112807.GB9699@localhost.localdomain>
+Date: Wed, 12 Jun 2019 16:18:08 +0200
+In-Reply-To: <20190612112807.GB9699@localhost.localdomain> (Kevin Wolf's
+ message of "Wed, 12 Jun 2019 13:28:07 +0200")
+Message-ID: <87tvcux4yn.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Wed, 12 Jun 2019 14:21:04 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Wed, 12 Jun 2019 14:18:15 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v13 2/7] virtio-pmem: Add virtio pmem driver
+Subject: Re: [Qemu-devel] [PATCH v2 03/11] monitor: Make MonitorQMP a child
+ class of Monitor
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,60 +75,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: rdunlap@infradead.org, jack@suse.cz, kvm@vger.kernel.org, mst@redhat.com,
- jasowang@redhat.com, david@fromorbit.com, qemu-devel@nongnu.org,
- virtualization@lists.linux-foundation.org, dm-devel@redhat.com,
- adilger.kernel@dilger.ca, zwisler@kernel.org, aarcange@redhat.com,
- dave.jiang@intel.com, jstaron@google.com, linux-nvdimm@lists.01.org,
- vishal.l.verma@intel.com, david@redhat.com, willy@infradead.org,
- hch@infradead.org, linux-acpi@vger.kernel.org, jmoyer@redhat.com,
- linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
- riel@surriel.com, yuval.shaia@oracle.com, stefanha@redhat.com,
- pbonzini@redhat.com, dan.j.williams@intel.com, lcapitulino@redhat.com,
- kwolf@redhat.com, nilal@redhat.com, tytso@mit.edu,
- xiaoguangrong.eric@gmail.com, snitzer@redhat.com, darrick.wong@oracle.com,
- rjw@rjwysocki.net, linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, imammedo@redhat.com
+Cc: berrange@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 12 Jun 2019 18:15:22 +0530
-Pankaj Gupta <pagupta@redhat.com> wrote:
+Kevin Wolf <kwolf@redhat.com> writes:
 
-> This patch adds virtio-pmem driver for KVM guest.
-> 
-> Guest reads the persistent memory range information from
-> Qemu over VIRTIO and registers it on nvdimm_bus. It also
-> creates a nd_region object with the persistent memory
-> range information so that existing 'nvdimm/pmem' driver
-> can reserve this into system memory map. This way
-> 'virtio-pmem' driver uses existing functionality of pmem
-> driver to register persistent memory compatible for DAX
-> capable filesystems.
-> 
-> This also provides function to perform guest flush over
-> VIRTIO from 'pmem' driver when userspace performs flush
-> on DAX memory range.
-> 
-> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> Acked-by: Jakub Staron <jstaron@google.com>
-> Tested-by: Jakub Staron <jstaron@google.com>
-> ---
->  drivers/nvdimm/Makefile          |   1 +
->  drivers/nvdimm/nd_virtio.c       | 125 +++++++++++++++++++++++++++++++
->  drivers/nvdimm/virtio_pmem.c     | 122 ++++++++++++++++++++++++++++++
->  drivers/nvdimm/virtio_pmem.h     |  55 ++++++++++++++
->  drivers/virtio/Kconfig           |  11 +++
->  include/uapi/linux/virtio_ids.h  |   1 +
->  include/uapi/linux/virtio_pmem.h |  35 +++++++++
->  7 files changed, 350 insertions(+)
->  create mode 100644 drivers/nvdimm/nd_virtio.c
->  create mode 100644 drivers/nvdimm/virtio_pmem.c
->  create mode 100644 drivers/nvdimm/virtio_pmem.h
->  create mode 100644 include/uapi/linux/virtio_pmem.h
+> Am 12.06.2019 um 09:59 hat Markus Armbruster geschrieben:
+>> Kevin Wolf <kwolf@redhat.com> writes:
+>> 
+>> > Currently, struct Monitor mixes state that is only relevant for HMP,
+>> > state that is only relevant for QMP, and some actually shared state.
+>> > In particular, a MonitorQMP field is present in the state of any
+>> > monitor, even if it's not a QMP monitor and therefore doesn't use the
+>> > state.
+>> >
+>> > As a first step towards a clean separation between QMP and HMP, let
+>> > MonitorQMP extend Monitor and create a MonitorQMP object only when the
+>> > monitor is actually a QMP monitor.
+>> >
+>> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> 
+>> This is a bit harder to review than necessary, because it mixes the
+>> largely mechanical "replace QMP member by child class" with the
+>> necessary prerequisite "clean up to access QMP stuff only when the
+>> monitor is actually a QMP monitor".  I'm going to post a split.
+>> 
+>> Effectively preexisting: we go from Monitor * to MonitorQMP * without
+>> checking in several places.  I'll throw in assertions.
+>
+> Since I don't think doing both in one patch makes review a lot harder
+> (and in fact think your patch 2.5 is harder to review for completeness
+> that the combined patch)
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+I disagree with the parenthesis.  The completeness argument is really
+simple: each occurence of member qmp is either guarded by a "is a QMP
+monitor" conditional, or an "is a QMP monitor" assertion, or in a
+callback that takes a QMP monitor converted to void * (I didn't bother
+asserting anything there).
+
+>                          and since both Dave and you already reviewed
+> the patch in its current form
+
+Actually, I didn't review the patch "in its current form", because I
+found that more bothersome than splitting it up and reviewing the parts.
+
+By effectively squashing together the parts, you have of course every
+right to claim the resulting code passed my review.  That's not quite
+the same as claiming my R-by for the *patch*.
+
+>                                   I don't want to invalidate that
+> review, I'm going to keep it as a single patch and just squash in the
+> additional assertions where container_of() is used. The resulting code
+> is the same anyway.
+
+Having the commit message explain that the patch mixes mechanical change
+for the "replace QMP member by child class" data reorganization with its
+prerequisite cleanup "access QMP stuff only when the monitor is actually
+a QMP monitor" might suffice to make me acquiesce to the squashed patch.
 
