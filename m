@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D69A1C31E46
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 22:21:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1860DC31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 22:22:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A669020896
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 22:21:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A669020896
+	by mail.kernel.org (Postfix) with ESMTPS id E48B7208C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 22:22:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E48B7208C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35438 helo=lists.gnu.org)
+Received: from localhost ([::1]:35454 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbBcj-00061K-OW
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 18:21:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45156)
+	id 1hbBdI-0007Bm-5w
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 18:22:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45496)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hbBRg-00075u-94
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 18:10:17 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hbBS4-0007Tn-S1
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 18:10:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hbBRf-0007I6-7h
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 18:10:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32802)
+ (envelope-from <mreitz@redhat.com>) id 1hbBS3-0007el-Hj
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 18:10:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43036)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hbBRc-0007Fv-Vs; Wed, 12 Jun 2019 18:10:13 -0400
+ id 1hbBS0-0007aC-AL; Wed, 12 Jun 2019 18:10:36 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 362A13003A4D;
- Wed, 12 Jun 2019 22:10:12 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2FAD52F8BE8;
+ Wed, 12 Jun 2019 22:10:35 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.72])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B94247E672;
- Wed, 12 Jun 2019 22:10:11 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B19EE1710F;
+ Wed, 12 Jun 2019 22:10:34 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Thu, 13 Jun 2019 00:09:24 +0200
-Message-Id: <20190612221004.2317-3-mreitz@redhat.com>
+Date: Thu, 13 Jun 2019 00:09:33 +0200
+Message-Id: <20190612221004.2317-12-mreitz@redhat.com>
 In-Reply-To: <20190612221004.2317-1-mreitz@redhat.com>
 References: <20190612221004.2317-1-mreitz@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Wed, 12 Jun 2019 22:10:12 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.38]); Wed, 12 Jun 2019 22:10:35 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v5 02/42] copy-on-read: Support compressed
- writes
+Subject: [Qemu-devel] [PATCH v5 11/42] block: Add
+ bdrv_supports_compressed_writes()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,41 +74,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Filters cannot compress data themselves but they have to implement
+.bdrv_co_pwritev_compressed() still (or they cannot forward compressed
+writes).  Therefore, checking whether
+bs->drv->bdrv_co_pwritev_compressed is non-NULL is not sufficient to
+know whether the node can actually handle compressed writes.  This
+function looks down the filter chain to see whether there is a
+non-filter that can actually convert the compressed writes into
+compressed data (and thus normal writes).
+
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/copy-on-read.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ include/block/block.h |  1 +
+ block.c               | 22 ++++++++++++++++++++++
+ 2 files changed, 23 insertions(+)
 
-diff --git a/block/copy-on-read.c b/block/copy-on-read.c
-index 53972b1da3..88e1c1f538 100644
---- a/block/copy-on-read.c
-+++ b/block/copy-on-read.c
-@@ -114,6 +114,16 @@ static int coroutine_fn cor_co_pdiscard(BlockDriverS=
-tate *bs,
+diff --git a/include/block/block.h b/include/block/block.h
+index 687c03b275..7835c5b370 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -487,6 +487,7 @@ void bdrv_next_cleanup(BdrvNextIterator *it);
+=20
+ BlockDriverState *bdrv_next_monitor_owned(BlockDriverState *bs);
+ bool bdrv_is_encrypted(BlockDriverState *bs);
++bool bdrv_supports_compressed_writes(BlockDriverState *bs);
+ void bdrv_iterate_format(void (*it)(void *opaque, const char *name),
+                          void *opaque, bool read_only);
+ const char *bdrv_get_node_name(const BlockDriverState *bs);
+diff --git a/block.c b/block.c
+index 567a0f82c8..97774b7b06 100644
+--- a/block.c
++++ b/block.c
+@@ -4584,6 +4584,28 @@ bool bdrv_is_encrypted(BlockDriverState *bs)
+     return false;
  }
 =20
-=20
-+static int coroutine_fn cor_co_pwritev_compressed(BlockDriverState *bs,
-+                                                  uint64_t offset,
-+                                                  uint64_t bytes,
-+                                                  QEMUIOVector *qiov)
++/**
++ * Return whether the given node supports compressed writes.
++ */
++bool bdrv_supports_compressed_writes(BlockDriverState *bs)
 +{
-+    return bdrv_co_pwritev(bs->file, offset, bytes, qiov,
-+                           BDRV_REQ_WRITE_COMPRESSED);
++    BlockDriverState *filtered =3D bdrv_filtered_rw_bs(bs);
++
++    if (!bs->drv || !bs->drv->bdrv_co_pwritev_compressed) {
++        return false;
++    }
++
++    if (filtered) {
++        /*
++         * Filters can only forward compressed writes, so we have to
++         * check the child.
++         */
++        return bdrv_supports_compressed_writes(filtered);
++    }
++
++    return true;
 +}
 +
-+
- static void cor_eject(BlockDriverState *bs, bool eject_flag)
+ const char *bdrv_get_format_name(BlockDriverState *bs)
  {
-     bdrv_eject(bs->file->bs, eject_flag);
-@@ -146,6 +156,7 @@ static BlockDriver bdrv_copy_on_read =3D {
-     .bdrv_co_pwritev                    =3D cor_co_pwritev,
-     .bdrv_co_pwrite_zeroes              =3D cor_co_pwrite_zeroes,
-     .bdrv_co_pdiscard                   =3D cor_co_pdiscard,
-+    .bdrv_co_pwritev_compressed         =3D cor_co_pwritev_compressed,
-=20
-     .bdrv_eject                         =3D cor_eject,
-     .bdrv_lock_medium                   =3D cor_lock_medium,
+     return bs->drv ? bs->drv->format_name : NULL;
 --=20
 2.21.0
 
