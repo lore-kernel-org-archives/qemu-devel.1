@@ -2,96 +2,67 @@ Return-Path: <SRS0=XH1q=UL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 009DBC31E46
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 16:26:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE65AC31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 16:33:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C123921019
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 16:26:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XF7PwyRJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C123921019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8B0E821019
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 16:33:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B0E821019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33680 helo=lists.gnu.org)
+Received: from localhost ([::1]:33714 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hb65R-0007Xg-Tz
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 12:26:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51437)
+	id 1hb6Be-0001i8-Vy
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 12:33:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53123)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@gmail.com>) id 1hb630-0006KD-0U
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:24:28 -0400
+ (envelope-from <armbru@redhat.com>) id 1hb6A3-0000qQ-N9
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:31:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hb62y-0007lJ-SH
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:24:25 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52997)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hb62y-0007kK-IC
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:24:24 -0400
-Received: by mail-wm1-x341.google.com with SMTP id s3so7216363wms.2
- for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 09:24:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=N+/yIdfU02JHHyPZEYVbXfmmoWd7uhT5Rpe82TIP/Es=;
- b=XF7PwyRJYDAHEyKwMho5COsM4VYd2ZlrDSNFh6nFMkRDe12KmcFPURj2EktTaXq8u1
- 8qfMjMRz4m7J2pp6MvzcEiIEqfiA3DYdNaF1LxcwbgAbrcXXKPav3HtiL5DxePpamo3A
- Ue0gsRsFb+QV4sPM/WXNRbLUD/dkojR+cxxpUAc8PYyQQ2sxjbXRDjjHQcDdVY5HEB/4
- 8BUl+WcPAzgHlByAe2a/xQp64tnjP6mU5xJgs0RPWzUpwT8SRqmJmCCbyOIMfnhqjw1Z
- Ri9Av1cEGGm91+K9GdKV4ZmPB+wuoQA7A01aBvOcO1DFS9jS/m/L8F18gbJEs3beYbiK
- m9tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=N+/yIdfU02JHHyPZEYVbXfmmoWd7uhT5Rpe82TIP/Es=;
- b=TzarZtPw76soyyQ44FPBb2Hu0xiXreIWlo886Biz843O9BN3cogflTNeP2U4O7meRn
- MNdSRa0eQ2oI/VcQbVFdkAZJrypxJhlNSmHiZE4xqJvE8oZjQ9GBKlhd8mkqjR8YNQ5E
- yVt8d/VHqO9Nin62Fq8SdsqHe5hPr2xRjg78mP0JUwlg9wurzMd2cZtSG6K6Tls2peb6
- 6u1ljgNg39gLKXnLk5bBGo7f9+gfL4shlHJwlVeh0iy7TAB8DutJ04slWOBIOv86eHaz
- LVIwydTnAow28DBgFCebDXhDWwABo9YcWu6d3raki+K7nMKHkLtCBQpUf2zaGm15ulwx
- q8tg==
-X-Gm-Message-State: APjAAAWDV4zL5DwN+tvL6GV9lrHrQAd8u7YM/po24/gx/S126hqfAC78
- 1GdOrgP7Ki81knJgSJuMAzI=
-X-Google-Smtp-Source: APXvYqya62wGD+mOzp5kh5kwe6Qplx76aJtZOgibpw6P8eOkPoxkJxrfwL1W3qB5w73HgGdVmBfWiw==
-X-Received: by 2002:a1c:345:: with SMTP id 66mr74619wmd.8.1560356663078;
- Wed, 12 Jun 2019 09:24:23 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id 128sm256779wme.12.2019.06.12.09.24.21
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 12 Jun 2019 09:24:21 -0700 (PDT)
-Date: Wed, 12 Jun 2019 17:24:13 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-Message-ID: <20190612162413.GB1620@stefanha-x1.localdomain>
-References: <20190308095036.GC12318@stefanha-x1.localdomain>
- <20190326080822.GC21018@stefanha-x1.localdomain>
- <e5395abf-6b41-46c8-f5af-3210077dfdd5@oracle.com>
- <CAAdtpL4ztcpf-CTx0fc5T_+VQ+8upHa2pEMoiZPcmBXOO6L3Og@mail.gmail.com>
- <c945c950-f6f1-7e2a-a6c4-399c9b728288@oracle.com>
- <20190425154421.GG17806@stefanha-x1.localdomain>
- <fe4b0b42-523d-5877-173c-3e878abd4e32@oracle.com>
- <20190523111130.GF26632@stefanha-x1.localdomain>
- <20190528151820.GA4545@heatpipe>
- <20190530205434.GB2694@flaka.hsd1.ca.comcast.net>
+ (envelope-from <armbru@redhat.com>) id 1hb6A2-0006Az-NM
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 12:31:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60664)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>)
+ id 1hb6A0-00067X-Cr; Wed, 12 Jun 2019 12:31:40 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9947330C252E;
+ Wed, 12 Jun 2019 16:31:28 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
+ [10.36.116.148])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 66297608A6;
+ Wed, 12 Jun 2019 16:31:27 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 0E87E1138648; Wed, 12 Jun 2019 18:31:26 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+References: <20190606153803.5278-1-armbru@redhat.com>
+ <20190606153803.5278-7-armbru@redhat.com>
+ <2d2f4567-1b35-6586-e195-a89b398e676c@redhat.com>
+Date: Wed, 12 Jun 2019 18:31:26 +0200
+In-Reply-To: <2d2f4567-1b35-6586-e195-a89b398e676c@redhat.com> (Eric Blake's
+ message of "Thu, 6 Jun 2019 10:54:16 -0500")
+Message-ID: <877e9qwysh.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="l76fUT7nc3MelDdI"
-Content-Disposition: inline
-In-Reply-To: <20190530205434.GB2694@flaka.hsd1.ca.comcast.net>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: Re: [Qemu-devel] [multiprocess RFC PATCH 36/37] multi-process: add
- the concept description to docs/devel/qemu-multiprocess
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Wed, 12 Jun 2019 16:31:38 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 6/7] file-posix: Add dynamic-auto-read-only
+ QAPI feature
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,95 +74,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John G Johnson <john.g.johnson@oracle.com>, sstabellini@kernel.org,
- Jag Raman <jag.raman@oracle.com>, konrad.wilk@oracle.com,
- Peter Maydell <peter.maydell@linaro.org>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org, ross.lagerwall@citrix.com, liran.alon@oracle.com,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- kanth.ghatraju@oracle.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Eric Blake <eblake@redhat.com> writes:
 
---l76fUT7nc3MelDdI
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 6/6/19 10:38 AM, Markus Armbruster wrote:
+>> From: Kevin Wolf <kwolf@redhat.com>
+>> 
+>> In commit 23dece19da4 ('file-posix: Make auto-read-only dynamic') ,
+>> auto-read-only=on changed its behaviour in file-posix for the 4.0
+>> release. This change cannot be detected through the usual mechanisms
+>> like schema introspection. Add a new feature flag to the schema to
+>> allow libvirt to detect the presence of the new behaviour.
+>> 
+>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>> ---
+>>  qapi/block-core.json | 13 ++++++++++++-
+>>  1 file changed, 12 insertions(+), 1 deletion(-)
+>> 
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index 1defcde048..f5e1ee91f9 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -2859,6 +2859,15 @@
+>>  #                         file is large, do not use in production.
+>>  #                         (default: off) (since: 3.0)
+>>  #
+>> +# Features:
+>> +# @dynamic-auto-read-only: If present, enabled auto-read-only means that the
+>> +#                          driver will open the image read-only at first,
+>> +#                          dynamically reopen the image file read-write when
+>> +#                          the first writer is attached to the node and reopen
+>> +#                          read-only when the last writer is detached. This
+>> +#                          allows to give QEMU write permissions only on demand
+>
+> s/allows to give/allows giving/
 
-On Thu, May 30, 2019 at 01:54:35PM -0700, Elena Ufimtseva wrote:
-> On Tue, May 28, 2019 at 08:18:20AM -0700, Elena Ufimtseva wrote:
-> > On Thu, May 23, 2019 at 12:11:30PM +0100, Stefan Hajnoczi wrote:
-> > > Hi Jag and Elena,
-> > > Do you think a call would help to move discussion along more quickly?
-> > >
-> >=20
-> > Hi Stefan,
-> >=20
-> > We would like to join this call.
-> > And thank you inviting us!
-> >=20
-> > Elena
-> > > We could use the next KVM Community Call on June 4th to discuss
-> > > remaining concerns and the next steps:
-> > > https://calendar.google.com/calendar/embed?src=3DdG9iMXRqcXAzN3Y4ZXZw=
-NzRoMHE4a3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
-> > >
-> > > I also hope to include other core QEMU developers.  As you know, I'm
-> > > skeptical, but it could be just me and I don't want to block you
-> > > unnecessarily if others are more enthusiastic about this approach.
-> > >
->=20
-> Hi Stefan
->=20
-> A few questions we have are about the call.
-> What is the format of the call usually? Should we provide some kind of th=
-e project outline for 5 minutes?
-> We are planning to address some of the concerns you have voiced in regard=
-s to amount of changes, usability,
-> security and performance. I assume there will be other questions as well.=
- Is there any time limit per topic?
->=20
-> And would you mind sharing the call details with us?
+Fixing, thanks!
 
-Hi Elena and Jag,
-Sorry, I was away on sick leave.  The KVM Community Call is informal.
-The goal is to get people together in a teleconference where we can
-discuss topics much more quickly than on the mailing list.  This can
-help make progress in areas where the mailing list discussion seems to
-be making slow progress.
-
-I would suggest starting with a status update the describes your
-current approach (without assuming the audience has familiarity).  Then
-you could touch on any issues where you'd like input from the community
-and you could take questions.
-
-Our goal should be to get a consensus on whether disaggregated QEMU can
-be merged or not.
-
-Here are the calendar details (Tuesday, June 18th at 8:00 UTC):
-https://calendar.google.com/calendar/ical/tob1tjqp37v8evp74h0q8kpjqs%40grou=
-p.calendar.google.com/public/basic.ics
-
-Is this time okay for you?
-
-Stefan
-
---l76fUT7nc3MelDdI
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0BJy0ACgkQnKSrs4Gr
-c8j+4Af/adGqjEFMi3fSSczfv0dvywDPVkPkmVpCCz3THIsSYTLGQP3ywJ0bpNn3
-zc0cNu4iNa3cTOZBvpRNe68/mFEfeIEoAUBoQ6lNwQe79g/yLahsVks0a7GzRexw
-kOvZuIkLN8/1xtjV1HpilAuDNL6TjXK3K8zro8imLe/RDhXv+uBUFTv/iguQO5IK
-y33FJg7A6VBVMGZuoDNFpzwJ3JJQLJIy+MzbnuFU/RNcAQM1pS0H944hZWav/6A2
-GR2JOh/YqLiVTpicuNTsZAnTsfwO96Q0qoGMoyDu6h7Paj6Bet0hOvAlZEYI7uvn
-mqtWgE+uheIQ1oYWJXpayHAnR6MxMQ==
-=QhLX
------END PGP SIGNATURE-----
-
---l76fUT7nc3MelDdI--
+>> +#                          when an operation actually needs write access.
+>> +#
+>>  # Since: 2.9
+>>  ##
+>>  { 'struct': 'BlockdevOptionsFile',
+>> @@ -2868,7 +2877,9 @@
+>>              '*aio': 'BlockdevAioOptions',
+>>  	    '*drop-cache': {'type': 'bool',
+>>  	                    'if': 'defined(CONFIG_LINUX)'},
+>> -            '*x-check-cache-dropped': 'bool' } }
+>> +            '*x-check-cache-dropped': 'bool' },
+>> +  'features': [ { 'name': 'dynamic-auto-read-only',
+>> +                  'if': 'defined(CONFIG_POSIX)' } ] }
+>>  
+>>  ##
+>>  # @BlockdevOptionsNull:
+>> 
 
