@@ -2,171 +2,82 @@ Return-Path: <SRS0=XH1q=UL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_SBL,URIBL_SBL_A autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36323C31E46
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 23:29:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE50CC31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 23:29:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0AD520B7C
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 23:28:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="le/sX0Kz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0AD520B7C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	by mail.kernel.org (Postfix) with ESMTPS id A69CB20B7C
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 23:29:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A69CB20B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36062 helo=lists.gnu.org)
+Received: from localhost ([::1]:36072 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbCfq-0003z7-Rn
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 19:28:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35404)
+	id 1hbCgj-0004qF-Te
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 19:29:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35495)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aik@ozlabs.ru>) id 1hbCeZ-0002xh-Ci
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 19:27:40 -0400
+ (envelope-from <philmd@redhat.com>) id 1hbCfH-00032N-G8
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 19:28:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1hbCe6-0000Ln-6K
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 19:27:11 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:34000)
+ (envelope-from <philmd@redhat.com>) id 1hbCQA-0007Cp-Jy
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 19:12:48 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:33376)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1hbCe5-0000Kr-Kq
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 19:27:10 -0400
-Received: by mail-pl1-x644.google.com with SMTP id i2so7256724plt.1
- for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 16:27:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
- h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=J0KYGZXZ26NqXhxLesmwOll1ZMGGZoHYrYFQLJ4y0jY=;
- b=le/sX0KzpWxak0k7EAAFo71/taONcDZkEd3YpKWJZ4/GqkRgSMx4OHz5fOQ+5BmVOF
- sG4TMC0H5W2t+5An4ldKgCZtxwwHvwOEzEncgRc2HgsGL6oViWDscQXIS1Z/rMi8GXkA
- 1d08nrG0umUKGArI4IOh6s1trbJ75cEsTajnZOJ3G1vvon4mhWK1BfV+Bhl3ymWRvxq7
- 85NeN58QNO43ERtEL2TAPEY+seBSvKEo9PmQ1HQ2vGkP069sGfke7J5B9NFpGISTwtzM
- 1uSKxB5EVJJa/xUsDqyYKSRDCiwvRWupAbmHtlTRNRFZ5ngIrLaEMTW9gXcd+lOS0YJR
- k4Eg==
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hbCQ9-0007Bb-ST
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 19:12:46 -0400
+Received: by mail-wr1-f67.google.com with SMTP id n9so18692664wru.0
+ for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 16:12:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=J0KYGZXZ26NqXhxLesmwOll1ZMGGZoHYrYFQLJ4y0jY=;
- b=r3YAtba2jglxDMF9d3eV30Xv3FAQLhRj5kDlvXdbJGFb+GN8bKrkguyE5n1uYx1pPN
- E2722UP7nqgQmJf7Qf8BPZD9n8dG+g3yBba8HTbBLZmFdGr92BJj/yJe8vpoI5WTOKhy
- xNqW5X+BBR1+4a6zE4O4GVnLTpfiIDQ8sBVwKbRyOUwhFkxWWWUKKZPnsz9JfKGn5nWi
- Q6g73OjTRDbWOAbxVDo3vkpM383gIOjMWnWfxWepjNhkjRT1EwJ0tyqX2c25VR0JzWZ+
- JWIY7QY6PKBo2928W4aSxfuUH5Wf6Pjx8wOym59JQRXTGjZ8VvwW7r84+irbIWB+NlWZ
- gYKg==
-X-Gm-Message-State: APjAAAU68D0Xy4Ma+sNaXclGo5Clf6KTnj5/Ju7n8yWAB4S66ErUuXCG
- HTvKGd97INsFq7786ltfElgVlQ==
-X-Google-Smtp-Source: APXvYqwZhnFk0R3I9EUi2w2oOGrIrNbu+9tUW63YxLbNnkDB8P29c2B9mQa1aotHsb3rc5QqQPP4mA==
-X-Received: by 2002:a17:902:a405:: with SMTP id
- p5mr13566748plq.51.1560382028314; 
- Wed, 12 Jun 2019 16:27:08 -0700 (PDT)
-Received: from [10.61.2.175] ([122.99.82.10])
- by smtp.gmail.com with ESMTPSA id h2sm500011pgs.17.2019.06.12.16.27.05
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 12 Jun 2019 16:27:07 -0700 (PDT)
-To: Fabiano Rosas <farosas@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20190228225759.21328-1-farosas@linux.ibm.com>
- <20190228225759.21328-6-farosas@linux.ibm.com>
- <b8a30b89-8c19-821e-e3a3-f1b71a088d9d@ozlabs.ru>
- <87ef73rl39.fsf@linux.ibm.com>
- <eadc5e30-5094-9b76-7268-cfb633ac40bd@ozlabs.ru>
- <c5e92072-eb8d-7af5-3eef-fac256f29c98@ozlabs.ru>
- <877e9r3p2e.fsf@linux.ibm.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Openpgp: preference=signencrypt
-Autocrypt: addr=aik@ozlabs.ru; keydata=
- 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
-Message-ID: <31dba2e5-7e8b-d006-d403-8c58c3c8a464@ozlabs.ru>
-Date: Thu, 13 Jun 2019 09:27:02 +1000
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=yDCf1hSVOF9p2tJXezR4cDgv4ZT+yucbJDDuthzBX7s=;
+ b=DAO7GtSaSLUJEgPkvTwpmTnLC7HROpUoNnoTtsAULQKawzINhkbs9m3M5Yuvocoiwu
+ uzXA/bfKruAiR5bcnqn3kniCVuIsTSg+x/1xPbm81SkxIk81eHMbjmnPMikurAlbKFuE
+ 3kGjJttwLtNDUIyiW0p7Eq/9x7Fp/Y5JKCbOO+TbGO76BcSb7B65qxR1xM3x055BEFDf
+ MwpzVrNDl5Ok8NTFuebeZOMxy70/ox48FkHFxwnOmLY/aD6iqW4ggCBFa/eut+WYkHBs
+ p2oCmNmrU2dBkmuVA97F/f647OtpHF2bszAZtXCv1bBEg1V2hEkpFTI+FjjosysJdaOb
+ SwSA==
+X-Gm-Message-State: APjAAAV4oFIY3X34xmzZIGkSwunPx9HZmE3Z36vd5WZhM1URJhSiqucv
+ gw9EMPkjDRqP27GGX9Rh74ETnQ==
+X-Google-Smtp-Source: APXvYqzqewZojKt4lSIUsXKhnRyKFNLDM0ojiF6kV1k8JCRZ//P4DERRAM1l7NdizGps10dAjfGNLQ==
+X-Received: by 2002:adf:e446:: with SMTP id t6mr43880055wrm.115.1560381164162; 
+ Wed, 12 Jun 2019 16:12:44 -0700 (PDT)
+Received: from [192.168.1.103] (183.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.183])
+ by smtp.gmail.com with ESMTPSA id j16sm1887267wre.94.2019.06.12.16.12.43
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 12 Jun 2019 16:12:43 -0700 (PDT)
+To: Cleber Rosa <crosa@redhat.com>
+References: <20190611171456.23444-1-ehabkost@redhat.com>
+ <20190611171456.23444-7-ehabkost@redhat.com>
+ <d107483c-eba8-f6fc-8e3a-ad0a86472d07@redhat.com>
+ <20190612224736.GA9536@localhost.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <f9bf67d5-4b77-d952-148e-74066b49088a@redhat.com>
+Date: Thu, 13 Jun 2019 01:12:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <877e9r3p2e.fsf@linux.ibm.com>
+In-Reply-To: <20190612224736.GA9536@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::644
-Subject: Re: [Qemu-devel] [RFC PATCH v4 5/5] target/ppc: support single
- stepping with KVM HV
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PULL 6/6] travis: Make check-acceptance job more
+ verbose
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -178,124 +89,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-devel@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 12/06/2019 23:34, Fabiano Rosas wrote:
-> Alexey Kardashevskiy <aik@ozlabs.ru> writes:
-> 
->> Are you reposting this any time soon?
-> 
-> I have sent a v2 to the kernel side of it:
-> 
-> https://lore.kernel.org/kvm/20190529222219.27994-1-farosas@linux.ibm.com/
-> 
-> I'm depending on what we decide to do there. The core of this patchset
-> will not change, just the mechanism by which the feature is selected
-> (patch 2, kvm-all: Introduce kvm_set_singlestep).
-> 
->> In meanwhile I hit a problem when I cannot step over the "stdu" instruction.
+On 6/13/19 12:47 AM, Cleber Rosa wrote:
+> On Wed, Jun 12, 2019 at 10:49:18PM +0200, Philippe Mathieu-Daudé wrote:
+>> On 6/11/19 7:14 PM, Eduardo Habkost wrote:
+>>> It will help us debug issues when tests fail.
+>>>
+>>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>>> ---
+>>>  .travis.yml | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/.travis.yml b/.travis.yml
+>>> index b053a836a3..a08a7b7278 100644
+>>> --- a/.travis.yml
+>>> +++ b/.travis.yml
+>>> @@ -225,7 +225,7 @@ matrix:
+>>>      # Acceptance (Functional) tests
+>>>      - env:
+>>>          - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu"
+>>> -        - TEST_CMD="make check-acceptance"
+>>> +        - TEST_CMD="make AVOCADO_SHOW=test check-acceptance"
+>>>        addons:
+>>>          apt:
+>>>            packages:
+>>>
 >>
->> I basically put this:
->> stdu    r1,-368(r1)
+>> Cleber, can you help figuring what's wrong here?
 >>
->> and "ni" in gdb does not stop on the next instruction which is quite
->> confusing. Ideas?
+>> https://travis-ci.org/qemu/qemu/jobs/544805900
+>>
+>> The tests seems successfull, is it possible the verbose logging returns
+>> error to the shell even if the test succeed?
+>>
 > 
-> Perhaps the next instruction is one that is not traced? See the programming
-> note at the end of section 6.5.15 in Book III.
+> There's some confusion here... To the best of my knowledge this failure is
+> not associated with Eduardo's change of the of the AVOCADO_SHOW variable.
+> This seems to be we hitting this:
+> 
+>   https://bugs.launchpad.net/qemu/+bug/1829779
+> 
+> Which was also discussed in other threads, such as:
+> 
+>   https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg01254.html
 
-No, it is not it, it is more subtle. The problem piece was originally this:
+Oh you are right, thanks for clearing this (and working on a fix!).
 
-c0000000010f16b4:       f0 ff c1 fb     std     r30,-16(r1)
-c0000000010f16b8:       f8 ff e1 fb     std     r31,-8(r1)
-c0000000010f16bc:       91 fe 21 f8     stdu    r1,-368(r1)
-c0000000010f16c0:       39 00 22 3d     addis   r9,r2,57
-c0000000010f16c4:       18 97 49 39     addi    r10,r9,-26856
-c0000000010f16c8:       08 00 22 3d     addis   r9,r2,8
-c0000000010f16cc:       00 78 29 39     addi    r9,r9,30720
+Regards,
 
-It is Linux'es prom_init().
-
-
-> Or maybe the step got preempted? You should see GDB messages indicating
-> changing threads right before or after the stdu. However that would only
-> happen with more than one VCPU and if 'show scheduler-locking' in GDB is
-> 'off'. And even then, that should not cause any issues, but it is a more
-> complex scenario so there could be a bug in the code.
-
-It is TCG, a single CPU with a single thread and no matter where I put
-this "stdu    r1,-368(r1)" - GDB does not stop on the next one and just
-runs.
-
-In the example above:
-1. "b *0x10f16bc" makes GDB stop there, "ni" continues without stopping
-on at 0x10f16c0.
-2. "b *0x10f16bc" and "b *0x10f16c0" make GDB stop at 0x10f16bc and "ni"
-steps to 0x10f16c0 but it is rather because it is a breakpoint and not
-the next instruction.
-3. "b *0x10f16bc" and "b *0x10f16c4" make GDB stop at 0x10f16bc and "ni"
-stops GDB at 0x10f16bc but again it is a breakpoint.
-
-In 2 and 3 it is possible to continue step debugging till the next "stdu".
-
+Phil.
 
 > 
->> On 20/03/2019 12:42, Alexey Kardashevskiy wrote:
->>>
->>>
->>> On 20/03/2019 01:32, Fabiano Rosas wrote:
->>>> Alexey Kardashevskiy <aik@ozlabs.ru> writes:
->>>>
->>>>> Looks good to me, does not break what already works. However I cannot
->>>>> debug SLOF real mode and I am not sure why.
->>>>>
->>>>> (gdb) set endian big
->>>>>
->>>>> The target is assumed to be big endian
->>>>> (gdb) b *0x3f00
->>>>>
->>>>> Breakpoint 2 at 0x3f00
->>>>
->>>> I think I'm missing the point here. Why 0x3f00?
->>>
->>> Because I am stupid and did not realize that 0x3f00 is a relative offset
->>> and 0x4000 is the correct address which works.
->>>
->>>
->>> Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->>>
->>>
->>>>
->>>> (qemu) info roms
->>>> addr=0000000000000000 size=0x0e22b8 mem=ram name="...qemu/slof.bin"                               
->>>> addr=0000000000400000 size=0x17976d0 mem=ram name="...vmlinux"
->>>>
->>>>
->>>> $ objdump -d board-qemu/llfw/stage1.elf | grep "_start>"
->>>> 0000000000000100 <__start>:
->>>>      100:       48 00 3f 00     b       4000 <_start>
->>>> 0000000000004000 <_start>:
->>>>
->>>>
->>>> Thread 1 hit Breakpoint 3, _start () at startup.S:82
->>>> (gdb) p/x $pc
->>>> $1 = 0x4000
->>>> (gdb) si
->>>> (gdb) p/x $pc
->>>> $3 = 0x4004
->>>> (gdb) c
->>>> Thread 1 hit Breakpoint 4, early_c_entry (start_addr=49056, fdt_addr=49024) at stage2.c:202
->>>> (gdb) p/x $pc
->>>> $4 = 0x4d18
->>>>
->>>
-
--- 
-Alexey
+> We have identified two ways to work around this, and about two days
+> ago Eduardo and myself settled on one of them.  I'll send a patch in
+> a few.
+> 
+>> INIT
+>> 05-/home/travis/build/qemu/qemu/tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_aarch64_virt
+>> PARAMS (key=timeout, path=*, default=90) => 90
+>> Test metadata:
+>>   filename:
+>> /home/travis/build/qemu/qemu/tests/acceptance/boot_linux_console.py
+>>   teststmpdir: /tmp/avocado_6tk1s4nz
+>>   workdir:
+>> /tmp/avocado_ifg2df04/avocado_job_zqdrt4ht/05-_home_travis_build_qemu_qemu_tests_acceptance_boot_linux_console.py_BootLinuxConsole.test_aarch64_virt
+>> START
+>> 05-/home/travis/build/qemu/qemu/tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_aarch64_virt
+>> DATA (filename=output.expected) => NOT FOUND (data sources: variant,
+>> test, file)
+>> PARAMS (key=arch, path=*, default=aarch64) => 'aarch64'
+>> PARAMS (key=qemu_bin, path=*,
+>> default=aarch64-softmmu/qemu-system-aarch64) =>
+>> 'aarch64-softmmu/qemu-system-aarch64'
+>> Fetching
+>> https://download.fedoraproject.org/pub/fedora/linux/releases/29/Everything/aarch64/os/images/pxeboot/vmlinuz
+>> ->
+>> /home/travis/avocado/data/cache/by_location/e959d0e1dd72e77653e218e666198db1f3d0c213/vmlinuz.g3ehffso
+>> Retrieved URL
+>> "https://download.fedoraproject.org/pub/fedora/linux/releases/29/Everything/aarch64/os/images/pxeboot/vmlinuz":
+>> content-length 8623423, date: "Wed, 12 Jun 2019 18:54:21 GMT",
+>> last-modified: "Sun, 21 Oct 2018 00:43:09 GMT"
+>> VM launch command: 'aarch64-softmmu/qemu-system-aarch64 -chardev
+>> socket,id=mon,path=/var/tmp/tmptpv0noew/qemu-6334-monitor.sock -mon
+>> chardev=mon,mode=control -display none -vga none -machine virt -chardev
+>> socket,id=console,path=/var/tmp/tmptpv0noew/qemu-6334-console.sock,server,nowait
+>> -serial chardev:console -cpu cortex-a53 -kernel
+>> /home/travis/avocado/data/cache/by_location/e959d0e1dd72e77653e218e666198db1f3d0c213/vmlinuz
+>> -append printk.time=0 console=ttyAMA0'
+>>>>> {'execute': 'qmp_capabilities'}
+>> <<< {'return': {}}
+>> Booting Linux on physical CPU 0x0000000000 [0x410fd034]
+>> Linux version 4.18.16-300.fc29.aarch64
+>> (mockbuild@buildvm-aarch64-02.arm.fedoraproject.org) (gcc version 8.2.1
+>> 20180801 (Red Hat 8.2.1-2) (GCC)) #1 SMP Sat Oct 20 23:12:22 UTC 2018
+>> Machine model: linux,dummy-virt
+>> efi: Getting EFI parameters from FDT:
+>> efi: UEFI not found.
+>> cma: Failed to reserve 64 MiB
+>> NUMA: No NUMA configuration found
+>> NUMA: Faking a node at [mem 0x0000000000000000-0x0000000047ffffff]
+>> NUMA: NODE_DATA [mem 0x47f9c780-0x47fa9fff]
+>> Zone ranges:
+>> DMA32    [mem 0x0000000040000000-0x0000000047ffffff]
+>> Normal   empty
+>> Movable zone start for each node
+>> Early memory node ranges
+>> node   0: [mem 0x0000000040000000-0x0000000047ffffff]
+>> Initmem setup node 0 [mem 0x0000000040000000-0x0000000047ffffff]
+>> psci: probing for conduit method from DT.
+>> psci: PSCIv0.2 detected in firmware.
+>> psci: Using standard PSCI v0.2 function IDs
+>> psci: Trusted OS migration not required
+>> percpu: Embedded 23 pages/cpu @(____ptrval____) s53528 r8192 d32488 u94208
+>> Detected VIPT I-cache on CPU0
+>> CPU features: enabling workaround for ARM erratum 843419
+>> CPU features: detected: Kernel page table isolation (KPTI)
+>> Built 1 zonelists, mobility grouping on.  Total pages: 32256
+>> Policy zone: DMA32
+>> Kernel command line: printk.time=0 console=ttyAMA0
+>>>>> {'execute': 'quit'}
+> 
+> Notice how QEMU gets stuck here.
+> 
+> - Cleber.
+> 
+>> qemu received signal 9: aarch64-softmmu/qemu-system-aarch64 -chardev
+>> socket,id=mon,path=/var/tmp/tmptpv0noew/qemu-6334-monitor.sock -mon
+>> chardev=mon,mode=control -display none -vga none -machine virt -chardev
+>> socket,id=console,path=/var/tmp/tmptpv0noew/qemu-6334-console.sock,server,nowait
+>> -serial chardev:console -cpu cortex-a53 -kernel
+>> /home/travis/avocado/data/cache/by_location/e959d0e1dd72e77653e218e666198db1f3d0c213/vmlinuz
+>> -append printk.time=0 console=ttyAMA0
+>> DATA (filename=output.expected) => NOT FOUND (data sources: variant,
+>> test, file)
+>> DATA (filename=stdout.expected) => NOT FOUND (data sources: variant,
+>> test, file)
+>> DATA (filename=stderr.expected) => NOT FOUND (data sources: variant,
+>> test, file)
+>> Not logging /var/log/syslog (lack of permissions)
+>> PASS
+>> 05-/home/travis/build/qemu/qemu/tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_aarch64_virt
+>> Runner error occurred: Timeout reached
+[...]
 
