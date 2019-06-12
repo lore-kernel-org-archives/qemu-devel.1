@@ -2,70 +2,118 @@ Return-Path: <SRS0=XH1q=UL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69FA0C31E46
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 03:36:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D4C9C31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 04:26:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32E5320866
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 03:36:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32E5320866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E32D120874
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 04:26:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SpwEyxNu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E32D120874
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56492 helo=lists.gnu.org)
+Received: from localhost ([::1]:56584 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hau3g-0007DF-4R
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 23:36:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41392)
+	id 1hauqV-0008Fn-M6
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 00:26:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46794)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pagupta@redhat.com>) id 1hau2u-0006nM-RG
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 23:35:35 -0400
+ (envelope-from <rth7680@gmail.com>) id 1hauoK-0007B6-94
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 00:24:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pagupta@redhat.com>) id 1hau2o-0006nN-Us
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 23:35:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60030)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hau2m-0006ly-Tg
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 23:35:26 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7F4D5300B916;
- Wed, 12 Jun 2019 03:34:57 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
- (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9E8D87E57B;
- Wed, 12 Jun 2019 03:34:55 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com
- (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
- by colo-mx.corp.redhat.com (Postfix) with ESMTP id 768FC1806B18;
- Wed, 12 Jun 2019 03:34:50 +0000 (UTC)
-Date: Tue, 11 Jun 2019 23:34:50 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <1003601865.34513553.1560310490030.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20190611190209.0b25033e.cohuck@redhat.com>
-References: <20190611163802.25352-1-pagupta@redhat.com>
- <20190611163802.25352-3-pagupta@redhat.com>
- <20190611190209.0b25033e.cohuck@redhat.com>
+ (envelope-from <rth7680@gmail.com>) id 1haumE-0006cA-HQ
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 00:22:23 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:39888)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <rth7680@gmail.com>)
+ id 1haumD-0006bC-6l; Wed, 12 Jun 2019 00:22:21 -0400
+Received: by mail-pf1-x444.google.com with SMTP id j2so8814630pfe.6;
+ Tue, 11 Jun 2019 21:22:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:openpgp:autocrypt:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=jRyOzvRcVS4d5PkRMA/txJ2qLGg7SMlEd20E7BdieUY=;
+ b=SpwEyxNuwpVTL4YYzuOPPqKiberBj18dCYd3kVd1+fgw9pU/Y2Wea84/pfJlFHHc4G
+ TCPCcTnFqdAOOMG2xAzsgJzvEdmaMvSPuhEaHTSv7NlC7n2OmaDGgqIBi0x8dncGrcxE
+ 7LTAPyeHLNx1Jj6cR7+gj405iK2jG+9CO88dZ084ZtAv0CmWCK9/yjUy5RObebUfVk2s
+ xUFtC3ldFvVXjdU9iuolCEVqkorg1Hff4QyFJiX4uOdOBvdp5fLH2TBGOCslU8SE3Jv8
+ AwG56ePRN+DEf7vJrqx0A2BbnCfWfJNLVpT1pzNVkk7zujcryA0WXVWA7jt+ivC92NXy
+ IiXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:openpgp
+ :autocrypt:message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=jRyOzvRcVS4d5PkRMA/txJ2qLGg7SMlEd20E7BdieUY=;
+ b=to0VDo7fX3N5MZqF7Yl4rjFhnEHIQgRpt8utyQ8TDs3/38wdOft0YeCS1JGFZJJtMN
+ BuABvTuLx+g9Hjrrq5leFLN9xZxWDJk8YoA1e6U1z2+YUAjkQ3EsKXy6iITUcIxu4JSQ
+ 9JEp5Kv7EQRZBvgtvrit+gUdK400mnzgYGydTLfFj/M8YsfZS4Y05kPXtUXku5E9ecIb
+ JwlrNxJPExXXroAwXsnYzWQSxV3C7HKZKi6YiKP/Mn7ryQ59hsfiH+CCwhpFDqVpEp0y
+ +8/WeFp+0VSDSmUuPxuZTHMexxuMIMbZ4qI3Ymp8RaG/tW3979ZNAUtvgqgKil3rsGcS
+ dQpA==
+X-Gm-Message-State: APjAAAV2gdNYPkAPOE5c5XAr3Soa3/AfO/trrYR0VxtbdfL8ob85WbZ1
+ J2342zXrJP6hqWvieF+IdY3rqwUT
+X-Google-Smtp-Source: APXvYqxaeFND4WMBS1MatmAuNL6Uqs2/mjQ1w/wunBJ2t3p0/YSXEcI6oDaSO6dKbOqvVMZaXNnTrw==
+X-Received: by 2002:a63:441c:: with SMTP id r28mr23413747pga.255.1560313339248; 
+ Tue, 11 Jun 2019 21:22:19 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
+ by smtp.googlemail.com with ESMTPSA id
+ k22sm15674884pfk.178.2019.06.11.21.22.17
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 11 Jun 2019 21:22:17 -0700 (PDT)
+To: David Gibson <david@gibson.dropbear.id.au>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+References: <20190602110903.3431-1-mark.cave-ayland@ilande.co.uk>
+ <20190602110903.3431-5-mark.cave-ayland@ilande.co.uk>
+ <20190612015224.GG3998@umbus.fritz.box>
+From: Richard Henderson <rth@twiddle.net>
+Openpgp: preference=signencrypt
+Autocrypt: addr=rth@twiddle.net; prefer-encrypt=mutual; keydata=
+ mQENBFGuLC8BCADcAoWcnW9lTsDMzbO3MBU+KbiGaj5JPatEUscRDkQYM2fyNjJp2tIWDK5a
+ n4yngeXB3eX61WbYR3QraRK8mlYLGxyAdHMEQfPipbqf3TmN043fssT2bc82ApJcs1zvLYgI
+ rhMht7Dck7A0wNC1jo+ZjVVFig5gDTN7gOzaAdBtV8tVNUddwkLzzaGpfihhSD6U46NdqKOG
+ Wlnn6TrkMy0QGdQ5NaXHkRlUjnnUTSW/nKfoxD+EI+A9V4sYOd8mc/TL4aJh/i/AiU57eLbo
+ n17uQI6/VTWDUWl8USiz4x9c8vmqlywLx00tAFxxoRWqk4KVJlj+Sh0up/D/sJ+vPpgBABEB
+ AAG0I1JpY2hhcmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5uZXQ+iQFBBBMBAgArAhsDBgsJ
+ CAcDAgYVCAIJCgsEFgIDAQIeAQIXgAUJC7UHogUCWaDNVgIZAQAKCRCtEnDMTdAnm9N5CADO
+ cB8F/SudJ72IupxQf40hbJdBK176+gb3sHMsixyLtrU59lee+lIM1OZmlNjsnCYmiSnbA5ks
+ Q7p0HfO7DgdmfLzcK6xsHZukqSZy5LByw348Y913ZyjOrJZFdPP7kDg1MnqRqH4+3ZdzxV4y
+ eYBWFU9GYMIF06JbUubossOOO4ArNVZbnIPu8Vn2tDZVVqsCBqkoCSBMj519xrvyOu5z4mHS
+ LkCglXmVDOXMbqLuNAC3rfNXSnyM4hYkLUyfALJlAAy1Ro+jUqYhu7XUFV/MiwRuFMh5GbtY
+ Urkx7tqsWQXLT3GeDk/LqvpWJQwk4cHHckYjRih+70CHIenm81PVuQENBFGuLC8BCACyEx3x
+ 94HIkTX0CHu2sA0w75+h9wuoA8ggJ7+S4ri0y2YsijWad5TTt6z6MMiqxk9kSA5bppaj4HXh
+ 86hBF/dWCtMpNr3Rb8FNOKyeA/qkYHVD6HiAiw9c6D8Dr9hWmOk3/HSmGrNURxeUFOckDXsv
+ I+yGGKBNshj59j7QZr7ZiuIi2rWlBL8dFN/OWa/o3x7HKsE4k6K8ngwvCKP/QbDLwLLBOWH+
+ VEUtpyeyxTr3OJ47ECTxdYvXoAV2iJaKr+6doVQiiR5eVFiMYrUPUECJeolOCwqc/JlWE18L
+ +PCAFaW1H+/mpPVfSpN4wnkJ5cQiQVB41IaCM4p20iRzx7ZJABEBAAGJASUEGAECAA8CGwwF
+ AlmgzYEFCQu1CEoACgkQrRJwzE3QJ5s7rggAwABzDAGrZ6uWsMxg5PeiiAYPy6LBnCBJSpB5
+ Tfy5jH8QTmLfXW+u4Ib4sWXG7PYNR7sIrtqUHjRqXLVXrSnBX9ASGcYw/Xil45khW6LsRpO1
+ prHv9gkwQfa6fTiWXVfSfm2Nant6u02q+MaYtQpCVTiz/9ki4FfftUwUHFLU0MhIQogjd11y
+ /E08RJsqBwaHQdt14PwU1HphDOzSkhOXRXQLSd3ysyeGUXvL+gqQoXl5XYdvk8IId4PoJRo4
+ jcyJ4VbnldvXh5gdGhFA/f9JgkLk9tPW+C3wNtNWyRUq8azR9hF2fg2HJUf4IXQlIu8OOgh1
+ VcROBqvtH3ecaIL9iw==
+Message-ID: <53c86ca8-332c-e073-0e78-2a684cd05161@twiddle.net>
+Date: Tue, 11 Jun 2019 21:22:15 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
+In-Reply-To: <20190612015224.GG3998@umbus.fritz.box>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.116.70, 10.4.195.19]
-Thread-Topic: virtio-pmem: Add virtio pmem driver
-Thread-Index: xouy0wKH9tDSBlfe8WrSfeKKI3BR8Q==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Wed, 12 Jun 2019 03:35:14 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v12 2/7] virtio-pmem: Add virtio pmem driver
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH v2 04/15] target/ppc: introduce separate
+ VSX_CMP macro for xvcmp* instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,338 +125,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: rdunlap@infradead.org, jack@suse.cz, kvm@vger.kernel.org, mst@redhat.com,
- jasowang@redhat.com, david@fromorbit.com, qemu-devel@nongnu.org,
- virtualization@lists.linux-foundation.org, dm-devel@redhat.com,
- adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org,
- aarcange@redhat.com, dave jiang <dave.jiang@intel.com>, jstaron@google.com,
- linux-nvdimm@lists.01.org, vishal l verma <vishal.l.verma@intel.com>,
- david@redhat.com, willy@infradead.org, hch@infradead.org,
- linux-acpi@vger.kernel.org, jmoyer@redhat.com, linux-ext4@vger.kernel.org,
- lenb@kernel.org, kilobyte@angband.pl, riel@surriel.com,
- yuval shaia <yuval.shaia@oracle.com>, stefanha@redhat.com, pbonzini@redhat.com,
- dan j williams <dan.j.williams@intel.com>, lcapitulino@redhat.com,
- kwolf@redhat.com, nilal@redhat.com, tytso@mit.edu,
- xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, snitzer@redhat.com,
- darrick wong <darrick.wong@oracle.com>, rjw@rjwysocki.net,
- linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, imammedo@redhat.com
+Cc: gkurz@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Hi Cornelia,
-
-> On Tue, 11 Jun 2019 22:07:57 +0530
-> Pankaj Gupta <pagupta@redhat.com> wrote:
+On 6/11/19 6:52 PM, David Gibson wrote:
+> On Sun, Jun 02, 2019 at 12:08:52PM +0100, Mark Cave-Ayland wrote:
+>> Rather than perform the VSR register decoding within the helper itself,
+>> introduce a new VSX_CMP macro which performs the decode based upon xT, xA
+>> and xB at translation time.
+>>
+>> Subsequent commits will make the same changes for other instructions however
+>> the xvcmp* instructions are different in that they return a set of flags to be
+>> optionally written back to the crf[6] register. Move this logic from the
+>> helper function to the generator function, along with the
+>> float_status update.
 > 
-> > This patch adds virtio-pmem driver for KVM guest.
-> > 
-> > Guest reads the persistent memory range information from
-> > Qemu over VIRTIO and registers it on nvdimm_bus. It also
-> > creates a nd_region object with the persistent memory
-> > range information so that existing 'nvdimm/pmem' driver
-> > can reserve this into system memory map. This way
-> > 'virtio-pmem' driver uses existing functionality of pmem
-> > driver to register persistent memory compatible for DAX
-> > capable filesystems.
-> > 
-> > This also provides function to perform guest flush over
-> > VIRTIO from 'pmem' driver when userspace performs flush
-> > on DAX memory range.
-> > 
-> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> > Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
-> > Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> > Acked-by: Jakub Staron <jstaron@google.com>
-> > Tested-by: Jakub Staron <jstaron@google.com>
-> > ---
-> >  drivers/nvdimm/Makefile          |   1 +
-> >  drivers/nvdimm/nd_virtio.c       | 124 +++++++++++++++++++++++++++++++
-> >  drivers/nvdimm/virtio_pmem.c     | 122 ++++++++++++++++++++++++++++++
-> >  drivers/nvdimm/virtio_pmem.h     |  55 ++++++++++++++
-> >  drivers/virtio/Kconfig           |  11 +++
-> >  include/uapi/linux/virtio_ids.h  |   1 +
-> >  include/uapi/linux/virtio_pmem.h |  35 +++++++++
-> >  7 files changed, 349 insertions(+)
-> >  create mode 100644 drivers/nvdimm/nd_virtio.c
-> >  create mode 100644 drivers/nvdimm/virtio_pmem.c
-> >  create mode 100644 drivers/nvdimm/virtio_pmem.h
-> >  create mode 100644 include/uapi/linux/virtio_pmem.h
-> 
-> Sorry about being late to the party; this one has been sitting in my
-> 'to review' queue for far too long :(
-> 
-> (...)
-> 
-> > diff --git a/drivers/nvdimm/nd_virtio.c b/drivers/nvdimm/nd_virtio.c
-> > new file mode 100644
-> > index 000000000000..efc535723517
-> > --- /dev/null
-> > +++ b/drivers/nvdimm/nd_virtio.c
-> > @@ -0,0 +1,124 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * virtio_pmem.c: Virtio pmem Driver
-> > + *
-> > + * Discovers persistent memory range information
-> > + * from host and provides a virtio based flushing
-> > + * interface.
-> > + */
-> > +#include "virtio_pmem.h"
-> > +#include "nd.h"
-> > +
-> > + /* The interrupt handler */
-> > +void host_ack(struct virtqueue *vq)
-> > +{
-> > +	struct virtio_pmem *vpmem = vq->vdev->priv;
-> > +	struct virtio_pmem_request *req_data, *req_buf;
-> > +	unsigned long flags;
-> > +	unsigned int len;
-> > +
-> > +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> > +	while ((req_data = virtqueue_get_buf(vq, &len)) != NULL) {
-> > +		req_data->done = true;
-> > +		wake_up(&req_data->host_acked);
-> > +
-> > +		if (!list_empty(&vpmem->req_list)) {
-> > +			req_buf = list_first_entry(&vpmem->req_list,
-> > +					struct virtio_pmem_request, list);
-> > +			req_buf->wq_buf_avail = true;
-> > +			wake_up(&req_buf->wq_buf);
-> > +			list_del(&req_buf->list);
-> > +		}
-> > +	}
-> > +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> > +}
-> > +EXPORT_SYMBOL_GPL(host_ack);
-> 
-> Nit: 'host_ack' looks a bit generic for an exported function... would
-> 'virtio_pmem_host_ack' maybe be better?
+> What's the advantage of this.  Since we still have a helper, don't we
+> suffer the cost of the helper call *plus* the now-generated
+> instructions?
 
-Yes, this looks better. Changed.
+Not as such.
 
-> 
-> > +
-> > + /* The request submission function */
-> > +int virtio_pmem_flush(struct nd_region *nd_region)
-> 
-> I don't see an EXPORT_SYMBOL_GPL() for this function... should it get
-> one, or should it be made static?
+The generated instructions are all of the form
 
-Made static. Leftover from last refactor of 'asyc_pmem_flush'.
+	lea	offset+x*16(env), reg
 
-> 
-> > +{
-> > +	struct virtio_device *vdev = nd_region->provider_data;
-> > +	struct virtio_pmem *vpmem  = vdev->priv;
-> > +	struct virtio_pmem_request *req_data;
-> > +	struct scatterlist *sgs[2], sg, ret;
-> > +	unsigned long flags;
-> > +	int err, err1;
-> > +
-> > +	might_sleep();
-> > +	req_data = kmalloc(sizeof(*req_data), GFP_KERNEL);
-> > +	if (!req_data)
-> > +		return -ENOMEM;
-> > +
-> > +	req_data->done = false;
-> > +	init_waitqueue_head(&req_data->host_acked);
-> > +	init_waitqueue_head(&req_data->wq_buf);
-> > +	INIT_LIST_HEAD(&req_data->list);
-> > +	req_data->req.type = cpu_to_virtio32(vdev, VIRTIO_PMEM_REQ_TYPE_FLUSH);
-> > +	sg_init_one(&sg, &req_data->req, sizeof(req_data->req));
-> > +	sgs[0] = &sg;
-> > +	sg_init_one(&ret, &req_data->resp.ret, sizeof(req_data->resp));
-> > +	sgs[1] = &ret;
-> > +
-> > +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> > +	 /*
-> > +	  * If virtqueue_add_sgs returns -ENOSPC then req_vq virtual
-> > +	  * queue does not have free descriptor. We add the request
-> > +	  * to req_list and wait for host_ack to wake us up when free
-> > +	  * slots are available.
-> > +	  */
-> > +	while ((err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req_data,
-> > +					GFP_ATOMIC)) == -ENOSPC) {
-> > +
-> > +		dev_err(&vdev->dev, "failed to send command to virtio pmem device, no
-> > free slots in the virtqueue\n");
-> 
-> Hm... by the comment above I would have thought that this is not really
-> an error, but rather a temporary condition? Maybe downgrade this to
-> dev_info()?
+which is cheaper than
 
-o.k.
+	mov	$x, reg
 
-> 
-> > +		req_data->wq_buf_avail = false;
-> > +		list_add_tail(&req_data->list, &vpmem->req_list);
-> > +		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> > +
-> > +		/* A host response results in "host_ack" getting called */
-> > +		wait_event(req_data->wq_buf, req_data->wq_buf_avail);
-> > +		spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> > +	}
-> > +	err1 = virtqueue_kick(vpmem->req_vq);
-> > +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> > +	/*
-> > +	 * virtqueue_add_sgs failed with error different than -ENOSPC, we can't
-> > +	 * do anything about that.
-> > +	 */
-> 
-> Does it make sense to kick if you couldn't add at all?
+and then
 
-When we could not add because of -ENOSPC we are waiting and when buffer is added
-then only we do a kick. For any other error which might be a rare occurrence, I think
-kick is harmless here and keeps the code clean?
+	shl	$4, reg
+	lea	offset(env, reg), reg
 
-> 
-> > +	if (err || !err1) {
-> > +		dev_info(&vdev->dev, "failed to send command to virtio pmem device\n");
-> 
-> If this is dev_info, I think the error above really should be dev_info
-> as well (and maybe also log the error value)?
+within the helper.
 
-o.k. 
 
-> 
-> > +		err = -EIO;
-> > +	} else {
-> > +		/* A host repsonse results in "host_ack" getting called */
-> > +		wait_event(req_data->host_acked, req_data->done);
-> > +		err = virtio32_to_cpu(vdev, req_data->resp.ret);
-> > +	}
-> > +
-> > +	kfree(req_data);
-> > +	return err;
-> > +};
-> > +
-> > +/* The asynchronous flush callback function */
-> > +int async_pmem_flush(struct nd_region *nd_region, struct bio *bio)
-> > +{
-> > +	/* Create child bio for asynchronous flush and chain with
-> > +	 * parent bio. Otherwise directly call nd_region flush.
-> > +	 */
-> 
-> Nit: The comment should start with an otherwise empty /* line.
-
-yes.
-
-> 
-> > +	if (bio && bio->bi_iter.bi_sector != -1) {
-> > +		struct bio *child = bio_alloc(GFP_ATOMIC, 0);
-> > +
-> > +		if (!child)
-> > +			return -ENOMEM;
-> > +		bio_copy_dev(child, bio);
-> > +		child->bi_opf = REQ_PREFLUSH;
-> > +		child->bi_iter.bi_sector = -1;
-> > +		bio_chain(child, bio);
-> > +		submit_bio(child);
-> > +		return 0;
-> > +	}
-> > +	if (virtio_pmem_flush(nd_region))
-> > +		return -EIO;
-> > +
-> > +	return 0;
-> > +};
-> > +EXPORT_SYMBOL_GPL(async_pmem_flush);
-> > +MODULE_LICENSE("GPL");
-> 
-> (...)
-> 
-> I have only some more minor comments; on the whole, this looks good to
-> me.
-
-Sure, Thank you. Attaching below on top changes on current patch2 based on
-your suggestions. Let me know if these are okay and then will send official
-v13 to for upstream merging.
-
-Thanks,
-Pankaj
-
-===============
-
-diff --git a/drivers/nvdimm/nd_virtio.c b/drivers/nvdimm/nd_virtio.c
-index efc535723517..5b8d2367da0b 100644
---- a/drivers/nvdimm/nd_virtio.c
-+++ b/drivers/nvdimm/nd_virtio.c
-@@ -10,7 +10,7 @@
- #include "nd.h"
- 
-  /* The interrupt handler */
--void host_ack(struct virtqueue *vq)
-+void virtio_pmem_host_ack(struct virtqueue *vq)
- {
-        struct virtio_pmem *vpmem = vq->vdev->priv;
-        struct virtio_pmem_request *req_data, *req_buf;
-@@ -32,10 +32,10 @@ void host_ack(struct virtqueue *vq)
-        }
-        spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
- }
--EXPORT_SYMBOL_GPL(host_ack);
-+EXPORT_SYMBOL_GPL(virtio_pmem_host_ack);
- 
-  /* The request submission function */
--int virtio_pmem_flush(struct nd_region *nd_region)
-+static int virtio_pmem_flush(struct nd_region *nd_region)
- {
-        struct virtio_device *vdev = nd_region->provider_data;
-        struct virtio_pmem *vpmem  = vdev->priv;
-@@ -69,7 +69,7 @@ int virtio_pmem_flush(struct nd_region *nd_region)
-        while ((err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req_data,
-                                        GFP_ATOMIC)) == -ENOSPC) {
- 
--               dev_err(&vdev->dev, "failed to send command to virtio pmem device, no free slots in the virtqueue\n");
-+               dev_info(&vdev->dev, "failed to send command to virtio pmem device, no free slots in the virtqueue\n");
-                req_data->wq_buf_avail = false;
-                list_add_tail(&req_data->list, &vpmem->req_list);
-                spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-@@ -90,7 +90,8 @@ int virtio_pmem_flush(struct nd_region *nd_region)
-        } else {
-                /* A host repsonse results in "host_ack" getting called */
-                wait_event(req_data->host_acked, req_data->done);
--               err = virtio32_to_cpu(vdev, req_data->resp.ret);
-+               if ((err = virtio32_to_cpu(vdev, req_data->resp.ret)))
-+                       err = -EIO;
-        }
- 
-        kfree(req_data);
-@@ -100,7 +101,8 @@ int virtio_pmem_flush(struct nd_region *nd_region)
- /* The asynchronous flush callback function */
- int async_pmem_flush(struct nd_region *nd_region, struct bio *bio)
- {
--       /* Create child bio for asynchronous flush and chain with
-+       /*
-+        * Create child bio for asynchronous flush and chain with
-         * parent bio. Otherwise directly call nd_region flush.
-         */
-        if (bio && bio->bi_iter.bi_sector != -1) {
-diff --git a/drivers/nvdimm/virtio_pmem.c b/drivers/nvdimm/virtio_pmem.c
-index b60ebd8cd2fd..5e3d07b47e0c 100644
---- a/drivers/nvdimm/virtio_pmem.c
-+++ b/drivers/nvdimm/virtio_pmem.c
-@@ -19,7 +19,7 @@ static int init_vq(struct virtio_pmem *vpmem)
- {
-        /* single vq */
-        vpmem->req_vq = virtio_find_single_vq(vpmem->vdev,
--                                               host_ack, "flush_queue");
-+                                       virtio_pmem_host_ack, "flush_queue");
-        if (IS_ERR(vpmem->req_vq))
-                return PTR_ERR(vpmem->req_vq);
- 
-diff --git a/drivers/nvdimm/virtio_pmem.h b/drivers/nvdimm/virtio_pmem.h
-index 6e47521be158..998efbc7660c 100644
---- a/drivers/nvdimm/virtio_pmem.h
-+++ b/drivers/nvdimm/virtio_pmem.h
-@@ -50,6 +50,6 @@ struct virtio_pmem {
-        uint64_t size;
- };
- 
--void host_ack(struct virtqueue *vq);
-+void virtio_pmem_host_ack(struct virtqueue *vq);
- int async_pmem_flush(struct nd_region *nd_region, struct bio *bio);
- #endif
+r~
 
