@@ -6,75 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF0EAC31E46
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 13:29:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6CAFC31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 13:30:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6DB820866
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 13:29:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6DB820866
+	by mail.kernel.org (Postfix) with ESMTPS id 60DB120866
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 13:30:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60DB120866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60464 helo=lists.gnu.org)
+Received: from localhost ([::1]:60466 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hb3K4-0005e2-T0
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 09:29:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37050)
+	id 1hb3Kw-0005qx-DZ
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 09:30:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36551)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hb3IJ-0004XX-Lr
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 09:28:09 -0400
+ (envelope-from <david@redhat.com>) id 1hb3GW-0002Kv-Np
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 09:26:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hb3ID-0005G3-9Q
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 09:28:03 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:52469)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hb3IC-0005Es-QS
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 09:27:57 -0400
-Received: by mail-wm1-f68.google.com with SMTP id s3so6600419wms.2
- for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 06:27:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=tLx/TYo1KJCRfD9wsRuveCpM/9BityOCphrjqWwEkOU=;
- b=P8pqUjkjCC6zfsNmvngHAuTBbVVbaYjXpN7O+Y4EeOj4uaCE49SCZjrC+NILt6/9Zr
- 7j5CJskHq/FlDnJNwY0WnsIH54OFJvpi9ztg87xwTEGgmQ0md1S4oceVD395a9XLt9fD
- NJ0p+QNfOYDhRHaJLEpxiia8m/fMcsCKvYdhlzd/+nGpBiqMNdhRIzVXLPPvNZtT1UOJ
- A+mFhxdq+9DIrQ/ubje71aTGUr0hhDasQFNa6RZbSH7o1706gt38rjP81FC4MK0ZO/H5
- 6Hx/TEkdxfHOvSUWbuwP223bDuLoRIXQOJwSiuU6iYoF5QjA4ZLYyLLVZC/CshwhAwlL
- zImg==
-X-Gm-Message-State: APjAAAXZyxIady1zhdfr6HZCETm7OBSKQfk+Oh68Y6tJnc56EliV7TWX
- x1wCOvL92s+DMws+0haN0fGl4w==
-X-Google-Smtp-Source: APXvYqyuJ2tPf25XI1UMtYfu5+H5T6pBiwJb8EJw+RzUBXQ2JJsWvYyYn+14teSyO0EcHbBOG0lHwg==
-X-Received: by 2002:a7b:cd04:: with SMTP id f4mr23688482wmj.64.1560346075089; 
- Wed, 12 Jun 2019 06:27:55 -0700 (PDT)
-Received: from ?IPv6:2a01:e35:2eec:b420:bca5:71b1:6738:c7ee?
- ([2a01:e35:2eec:b420:bca5:71b1:6738:c7ee])
- by smtp.gmail.com with ESMTPSA id c2sm18061558wrf.75.2019.06.12.06.27.53
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 12 Jun 2019 06:27:54 -0700 (PDT)
-To: Pino Toscano <ptoscano@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-References: <20190605213654.9785-1-ptoscano@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <a8797829-a5c6-24a3-647f-14872bc2f951@redhat.com>
-Date: Wed, 12 Jun 2019 15:27:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ (envelope-from <david@redhat.com>) id 1hb3GH-00044Q-3U
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 09:26:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48754)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1hb3GG-00043q-LT; Wed, 12 Jun 2019 09:25:57 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B0854308622B;
+ Wed, 12 Jun 2019 13:25:40 +0000 (UTC)
+Received: from t460s.redhat.com (ovpn-116-159.ams2.redhat.com [10.36.116.159])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 48C711001B0A;
+ Wed, 12 Jun 2019 13:25:36 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 12 Jun 2019 15:25:25 +0200
+Message-Id: <20190612132526.8905-2-david@redhat.com>
+In-Reply-To: <20190612132526.8905-1-david@redhat.com>
+References: <20190612132526.8905-1-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190605213654.9785-1-ptoscano@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Wed, 12 Jun 2019 13:25:50 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PATCH v6] ssh: switch from libssh2 to libssh
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v1 1/2] s390x/cpumodel: Rework CPU feature
+ definition
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,1528 +67,1581 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>,
- Stefan Weil <sw@weilnetz.de>, rjones@redhat.com, mreitz@redhat.com,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc'ing Alex (Docker, Travis) and Stefan (MinGW)
+Let's define features at a single spot and make it less error prone to
+define new features.
 
-On 6/5/19 11:36 PM, Pino Toscano wrote:
-> Rewrite the implementation of the ssh block driver to use libssh instead
-> of libssh2.  The libssh library has various advantages over libssh2:
-> - easier API for authentication (for example for using ssh-agent)
-> - easier API for known_hosts handling
-> - supports newer types of keys in known_hosts
-> 
-> Use APIs/features available in libssh 0.8 conditionally, to support
-> older versions (which are not recommended though).
-> 
-> Signed-off-by: Pino Toscano <ptoscano@redhat.com>
-> ---
-> 
-> Changes from v5:
-> - adapt to newer tracing APIs
-> - disable ssh compression (mimic what libssh2 does by default)
-> - use build time checks for libssh 0.8, and use newer APIs directly
-> 
-> Changes from v4:
-> - fix wrong usages of error_setg/session_error_setg/sftp_error_setg
-> - fix few return code checks
-> - remove now-unused parameters in few internal functions
-> - allow authentication with "none" method
-> - switch to unsigned int for the port number
-> - enable TCP_NODELAY on the socket
-> - fix one reference error message in iotest 207
-> 
-> Changes from v3:
-> - fix socket cleanup in connect_to_ssh()
-> - add comments about the socket cleanup
-> - improve the error reporting (closer to what was with libssh2)
-> - improve EOF detection on sftp_read()
-> 
-> Changes from v2:
-> - used again an own fd
-> - fixed co_yield() implementation
-> 
-> Changes from v1:
-> - fixed jumbo packets writing
-> - fixed missing 'err' assignment
-> - fixed commit message
-> 
->  block/Makefile.objs        |   6 +-
->  block/ssh.c                | 610 +++++++++++++++++++------------------
->  block/trace-events         |  14 +-
->  configure                  |  62 ++--
->  tests/qemu-iotests/207.out |   2 +-
->  5 files changed, 351 insertions(+), 343 deletions(-)
-> 
-> diff --git a/block/Makefile.objs b/block/Makefile.objs
-> index ae11605c9f..bf01429dd5 100644
-> --- a/block/Makefile.objs
-> +++ b/block/Makefile.objs
-> @@ -31,7 +31,7 @@ block-obj-$(CONFIG_CURL) += curl.o
->  block-obj-$(CONFIG_RBD) += rbd.o
->  block-obj-$(CONFIG_GLUSTERFS) += gluster.o
->  block-obj-$(CONFIG_VXHS) += vxhs.o
-> -block-obj-$(CONFIG_LIBSSH2) += ssh.o
-> +block-obj-$(CONFIG_LIBSSH) += ssh.o
->  block-obj-y += accounting.o dirty-bitmap.o
->  block-obj-y += write-threshold.o
->  block-obj-y += backup.o
-> @@ -52,8 +52,8 @@ rbd.o-libs         := $(RBD_LIBS)
->  gluster.o-cflags   := $(GLUSTERFS_CFLAGS)
->  gluster.o-libs     := $(GLUSTERFS_LIBS)
->  vxhs.o-libs        := $(VXHS_LIBS)
-> -ssh.o-cflags       := $(LIBSSH2_CFLAGS)
-> -ssh.o-libs         := $(LIBSSH2_LIBS)
-> +ssh.o-cflags       := $(LIBSSH_CFLAGS)
-> +ssh.o-libs         := $(LIBSSH_LIBS)
->  block-obj-dmg-bz2-$(CONFIG_BZIP2) += dmg-bz2.o
->  block-obj-$(if $(CONFIG_DMG),m,n) += $(block-obj-dmg-bz2-y)
->  dmg-bz2.o-libs     := $(BZIP2_LIBS)
-> diff --git a/block/ssh.c b/block/ssh.c
-> index 12fd4f39e8..ce2363a471 100644
-> --- a/block/ssh.c
-> +++ b/block/ssh.c
-> @@ -24,8 +24,8 @@
->  
->  #include "qemu/osdep.h"
->  
-> -#include <libssh2.h>
-> -#include <libssh2_sftp.h>
-> +#include <libssh/libssh.h>
-> +#include <libssh/sftp.h>
->  
->  #include "block/block_int.h"
->  #include "block/qdict.h"
-> @@ -43,14 +43,13 @@
->  #include "qapi/qobject-output-visitor.h"
->  #include "trace.h"
->  
-> -/*
-> - * TRACE_LIBSSH2=<bitmask> enables tracing in libssh2 itself.  Note
-> - * that this requires that libssh2 was specially compiled with the
-> - * `./configure --enable-debug' option, so most likely you will have
-> - * to compile it yourself.  The meaning of <bitmask> is described
-> - * here: http://www.libssh2.org/libssh2_trace.html
-> +/* TRACE_LIBSSH=<level> enables tracing in libssh itself.
-> + * The meaning of <level> is described here:
-> + * http://api.libssh.org/master/group__libssh__log.html
->   */
-> -#define TRACE_LIBSSH2 0 /* or try: LIBSSH2_TRACE_SFTP */
-> +#define TRACE_LIBSSH  0 /* see: SSH_LOG_* */
-> +
-> +#define HAVE_LIBSSH_0_8 (LIBSSH_VERSION_INT >= SSH_VERSION_INT(0, 8, 0))
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/cpu_features.c         | 352 +-------------------------
+ target/s390x/cpu_features_def.h     | 352 +-------------------------
+ target/s390x/cpu_features_def.inc.h | 369 ++++++++++++++++++++++++++++
+ 3 files changed, 386 insertions(+), 687 deletions(-)
+ create mode 100644 target/s390x/cpu_features_def.inc.h
 
-As I noticed with ssh_get_publickey() and reading
-https://www.redhat.com/archives/libvir-list/2018-May/msg00597.html, I'm
-not convinced this definition is accurate. Used in [1].
-
->  
->  typedef struct BDRVSSHState {
->      /* Coroutine. */
-> @@ -58,18 +57,14 @@ typedef struct BDRVSSHState {
->  
->      /* SSH connection. */
->      int sock;                         /* socket */
-> -    LIBSSH2_SESSION *session;         /* ssh session */
-> -    LIBSSH2_SFTP *sftp;               /* sftp session */
-> -    LIBSSH2_SFTP_HANDLE *sftp_handle; /* sftp remote file handle */
-> +    ssh_session session;              /* ssh session */
-> +    sftp_session sftp;                /* sftp session */
-> +    sftp_file sftp_handle;            /* sftp remote file handle */
->  
-> -    /* See ssh_seek() function below. */
-> -    int64_t offset;
-> -    bool offset_op_read;
-> -
-> -    /* File attributes at open.  We try to keep the .filesize field
-> +    /* File attributes at open.  We try to keep the .size field
->       * updated if it changes (eg by writing at the end of the file).
->       */
-> -    LIBSSH2_SFTP_ATTRIBUTES attrs;
-> +    sftp_attributes attrs;
->  
->      InetSocketAddress *inet;
->  
-> @@ -89,7 +84,6 @@ static void ssh_state_init(BDRVSSHState *s)
->  {
->      memset(s, 0, sizeof *s);
->      s->sock = -1;
-> -    s->offset = -1;
->      qemu_co_mutex_init(&s->lock);
->  }
->  
-> @@ -97,21 +91,20 @@ static void ssh_state_free(BDRVSSHState *s)
->  {
->      g_free(s->user);
->  
-> +    if (s->attrs) {
-> +        sftp_attributes_free(s->attrs);
-> +    }
->      if (s->sftp_handle) {
-> -        libssh2_sftp_close(s->sftp_handle);
-> +        sftp_close(s->sftp_handle);
->      }
->      if (s->sftp) {
-> -        libssh2_sftp_shutdown(s->sftp);
-> +        sftp_free(s->sftp);
->      }
->      if (s->session) {
-> -        libssh2_session_disconnect(s->session,
-> -                                   "from qemu ssh client: "
-> -                                   "user closed the connection");
-> -        libssh2_session_free(s->session);
-> -    }
-> -    if (s->sock >= 0) {
-> -        close(s->sock);
-> +        ssh_disconnect(s->session);
-> +        ssh_free(s->session);
-
-Maybe:
-
-           ssh_free(s->session); /* This frees s->sock */
-
->      }
-> +    /* s->sock is owned by the ssh_session, which frees it. */
-
-And drop this comment.
-
->  }
->  
->  static void GCC_FMT_ATTR(3, 4)
-> @@ -125,13 +118,13 @@ session_error_setg(Error **errp, BDRVSSHState *s, const char *fs, ...)
->      va_end(args);
->  
->      if (s->session) {
-> -        char *ssh_err;
-> +        const char *ssh_err;
->          int ssh_err_code;
-
-You can drop these,
-
->  
-> -        /* This is not an errno.  See <libssh2.h>. */
-> -        ssh_err_code = libssh2_session_last_error(s->session,
-> -                                                  &ssh_err, NULL, 0);
-> -        error_setg(errp, "%s: %s (libssh2 error code: %d)",
-> +        /* This is not an errno.  See <libssh/libssh.h>. */
-> +        ssh_err = ssh_get_error(s->session);
-> +        ssh_err_code = ssh_get_error_code(s->session);
-> +        error_setg(errp, "%s: %s (libssh error code: %d)",
-
-using directly as arguments here. However this might be easier for the
-libssh2/libssh switch to do as you did, and clean this later.
-
->                     msg, ssh_err, ssh_err_code);
->      } else {
->          error_setg(errp, "%s", msg);
-> @@ -150,18 +143,18 @@ sftp_error_setg(Error **errp, BDRVSSHState *s, const char *fs, ...)
->      va_end(args);
->  
->      if (s->sftp) {
-> -        char *ssh_err;
-> +        const char *ssh_err;
->          int ssh_err_code;
-> -        unsigned long sftp_err_code;
-> +        int sftp_err_code;
->  
-> -        /* This is not an errno.  See <libssh2.h>. */
-> -        ssh_err_code = libssh2_session_last_error(s->session,
-> -                                                  &ssh_err, NULL, 0);
-> -        /* See <libssh2_sftp.h>. */
-> -        sftp_err_code = libssh2_sftp_last_error((s)->sftp);
-> +        /* This is not an errno.  See <libssh/libssh.h>. */
-> +        ssh_err = ssh_get_error(s->session);
-> +        ssh_err_code = ssh_get_error_code(s->session);
-> +        /* See <libssh/sftp.h>. */
-> +        sftp_err_code = sftp_get_error(s->sftp);
->  
->          error_setg(errp,
-> -                   "%s: %s (libssh2 error code: %d, sftp error code: %lu)",
-> +                   "%s: %s (libssh error code: %d, sftp error code: %d)",
->                     msg, ssh_err, ssh_err_code, sftp_err_code);
-
-Ditto, etc.
-
->      } else {
->          error_setg(errp, "%s", msg);
-> @@ -171,15 +164,15 @@ sftp_error_setg(Error **errp, BDRVSSHState *s, const char *fs, ...)
->  
->  static void sftp_error_trace(BDRVSSHState *s, const char *op)
->  {
-> -    char *ssh_err;
-> +    const char *ssh_err;
->      int ssh_err_code;
-> -    unsigned long sftp_err_code;
-> +    int sftp_err_code;
->  
-> -    /* This is not an errno.  See <libssh2.h>. */
-> -    ssh_err_code = libssh2_session_last_error(s->session,
-> -                                              &ssh_err, NULL, 0);
-> -    /* See <libssh2_sftp.h>. */
-> -    sftp_err_code = libssh2_sftp_last_error((s)->sftp);
-> +    /* This is not an errno.  See <libssh/libssh.h>. */
-> +    ssh_err = ssh_get_error(s->session);
-> +    ssh_err_code = ssh_get_error_code(s->session);
-> +    /* See <libssh/sftp.h>. */
-> +    sftp_err_code = sftp_get_error(s->sftp);
->  
->      trace_sftp_error(op, ssh_err, ssh_err_code, sftp_err_code);
->  }
-> @@ -280,82 +273,89 @@ static void ssh_parse_filename(const char *filename, QDict *options,
->      parse_uri(filename, options, errp);
->  }
->  
-> -static int check_host_key_knownhosts(BDRVSSHState *s,
-> -                                     const char *host, int port, Error **errp)
-> +static int check_host_key_knownhosts(BDRVSSHState *s, Error **errp)
->  {
-> -    const char *home;
-> -    char *knh_file = NULL;
-> -    LIBSSH2_KNOWNHOSTS *knh = NULL;
-> -    struct libssh2_knownhost *found;
-> -    int ret, r;
-> -    const char *hostkey;
-> -    size_t len;
-> -    int type;
-> +    int ret;
-> +#if HAVE_LIBSSH_0_8
-
-[1] See previous comment about HAVE_LIBSSH_0_8.
-
-> +    enum ssh_known_hosts_e state;
->  
-> -    hostkey = libssh2_session_hostkey(s->session, &len, &type);
-> -    if (!hostkey) {
-> +    state = ssh_session_is_known_server(s->session);
-> +    trace_ssh_server_status(state);
-> +
-> +    switch (state) {
-> +    case SSH_KNOWN_HOSTS_OK:
-> +        /* OK */
-> +        trace_ssh_check_host_key_knownhosts();
-> +        break;
-> +    case SSH_KNOWN_HOSTS_CHANGED:
->          ret = -EINVAL;
-> -        session_error_setg(errp, s, "failed to read remote host key");
-> +        error_setg(errp, "host key does not match the one in known_hosts");
->          goto out;
-> -    }
-> -
-> -    knh = libssh2_knownhost_init(s->session);
-> -    if (!knh) {
-> +    case SSH_KNOWN_HOSTS_OTHER:
->          ret = -EINVAL;
-> -        session_error_setg(errp, s,
-> -                           "failed to initialize known hosts support");
-> +        error_setg(errp,
-> +                   "host key for this server not found, another type exists");
-> +        goto out;
-> +    case SSH_KNOWN_HOSTS_UNKNOWN:
-> +        ret = -ENOENT;
-> +        error_setg(errp, "no host key was found in known_hosts");
-> +        goto out;
-> +    case SSH_KNOWN_HOSTS_NOT_FOUND:
-> +        ret = -EINVAL;
-> +        error_setg(errp, "known_hosts file not found");
-> +        goto out;
-> +    case SSH_KNOWN_HOSTS_ERROR:
-> +        ret = -EINVAL;
-> +        error_setg(errp, "error while checking the host");
-> +        goto out;
-> +    default:
-
-I'd rather not use a default case, so if libssh get more
-ssh_known_hosts_e, we get a build failure and add the new cases.
-
-> +        ret = -EINVAL;
-> +        error_setg(errp, "error while checking for known server");
->          goto out;
->      }
-> +#else /* !HAVE_LIBSSH_0_8 */
-> +    int state;
->  
-> -    home = getenv("HOME");
-> -    if (home) {
-> -        knh_file = g_strdup_printf("%s/.ssh/known_hosts", home);
-> -    } else {
-> -        knh_file = g_strdup_printf("/root/.ssh/known_hosts");
-> -    }
-> -
-> -    /* Read all known hosts from OpenSSH-style known_hosts file. */
-> -    libssh2_knownhost_readfile(knh, knh_file, LIBSSH2_KNOWNHOST_FILE_OPENSSH);
-> +    state = ssh_is_server_known(s->session);
-> +    trace_ssh_server_status(state);
->  
-> -    r = libssh2_knownhost_checkp(knh, host, port, hostkey, len,
-> -                                 LIBSSH2_KNOWNHOST_TYPE_PLAIN|
-> -                                 LIBSSH2_KNOWNHOST_KEYENC_RAW,
-> -                                 &found);
-> -    switch (r) {
-> -    case LIBSSH2_KNOWNHOST_CHECK_MATCH:
-> +    switch (state) {
-> +    case SSH_SERVER_KNOWN_OK:
->          /* OK */
-> -        trace_ssh_check_host_key_knownhosts(found->key);
-> +        trace_ssh_check_host_key_knownhosts();
->          break;
-> -    case LIBSSH2_KNOWNHOST_CHECK_MISMATCH:
-> +    case SSH_SERVER_KNOWN_CHANGED:
-> +        ret = -EINVAL;
-> +        error_setg(errp, "host key does not match the one in known_hosts");
-> +        goto out;
-> +    case SSH_SERVER_FOUND_OTHER:
->          ret = -EINVAL;
-> -        session_error_setg(errp, s,
-> -                      "host key does not match the one in known_hosts"
-> -                      " (found key %s)", found->key);
-> +        error_setg(errp,
-> +                   "host key for this server not found, another type exists");
-> +        goto out;
-> +    case SSH_SERVER_FILE_NOT_FOUND:
-> +        ret = -ENOENT;
-> +        error_setg(errp, "known_hosts file not found");
->          goto out;
-> -    case LIBSSH2_KNOWNHOST_CHECK_NOTFOUND:
-> +    case SSH_SERVER_NOT_KNOWN:
->          ret = -EINVAL;
-> -        session_error_setg(errp, s, "no host key was found in known_hosts");
-> +        error_setg(errp, "no host key was found in known_hosts");
->          goto out;
-> -    case LIBSSH2_KNOWNHOST_CHECK_FAILURE:
-> +    case SSH_SERVER_ERROR:
->          ret = -EINVAL;
-> -        session_error_setg(errp, s,
-> -                      "failure matching the host key with known_hosts");
-> +        error_setg(errp, "server error");
->          goto out;
->      default:
->          ret = -EINVAL;
-> -        session_error_setg(errp, s, "unknown error matching the host key"
-> -                      " with known_hosts (%d)", r);
-> +        error_setg(errp, "error while checking for known server");
->          goto out;
-
-Here the default is dead code, I'd remove it too.
-
->      }
-> +#endif /* !HAVE_LIBSSH_0_8 */
->  
->      /* known_hosts checking successful. */
->      ret = 0;
->  
->   out:
-> -    if (knh != NULL) {
-> -        libssh2_knownhost_free(knh);
-> -    }
-> -    g_free(knh_file);
->      return ret;
->  }
->  
-> @@ -399,18 +399,34 @@ static int compare_fingerprint(const unsigned char *fingerprint, size_t len,
->  
->  static int
->  check_host_key_hash(BDRVSSHState *s, const char *hash,
-> -                    int hash_type, size_t fingerprint_len, Error **errp)
-> +                    enum ssh_publickey_hash_type type, Error **errp)
->  {
-> -    const char *fingerprint;
-> +    int r;
-> +    ssh_key pubkey;
-> +    unsigned char *server_hash;
-> +    size_t server_hash_len;
->  
-> -    fingerprint = libssh2_hostkey_hash(s->session, hash_type);
-> -    if (!fingerprint) {
-> +#if HAVE_LIBSSH_0_8
-> +    r = ssh_get_server_publickey(s->session, &pubkey);
-> +#else
-> +    r = ssh_get_publickey(s->session, &pubkey);
-> +#endif
-> +    if (r != SSH_OK) {
->          session_error_setg(errp, s, "failed to read remote host key");
->          return -EINVAL;
->      }
->  
-> -    if(compare_fingerprint((unsigned char *) fingerprint, fingerprint_len,
-> -                           hash) != 0) {
-> +    r = ssh_get_publickey_hash(pubkey, type, &server_hash, &server_hash_len);
-> +    ssh_key_free(pubkey);
-> +    if (r != 0) {
-> +        session_error_setg(errp, s,
-> +                           "failed reading the hash of the server SSH key");
-> +        return -EINVAL;
-> +    }
-> +
-> +    r = compare_fingerprint(server_hash, server_hash_len, hash);
-> +    ssh_clean_pubkey_hash(&server_hash);
-> +    if (r != 0) {
->          error_setg(errp, "remote host key does not match host_key_check '%s'",
->                     hash);
->          return -EPERM;
-> @@ -419,8 +435,7 @@ check_host_key_hash(BDRVSSHState *s, const char *hash,
->      return 0;
->  }
->  
-> -static int check_host_key(BDRVSSHState *s, const char *host, int port,
-> -                          SshHostKeyCheck *hkc, Error **errp)
-> +static int check_host_key(BDRVSSHState *s, SshHostKeyCheck *hkc, Error **errp)
->  {
->      SshHostKeyCheckMode mode;
->  
-> @@ -436,15 +451,15 @@ static int check_host_key(BDRVSSHState *s, const char *host, int port,
->      case SSH_HOST_KEY_CHECK_MODE_HASH:
->          if (hkc->u.hash.type == SSH_HOST_KEY_CHECK_HASH_TYPE_MD5) {
->              return check_host_key_hash(s, hkc->u.hash.hash,
-> -                                       LIBSSH2_HOSTKEY_HASH_MD5, 16, errp);
-> +                                       SSH_PUBLICKEY_HASH_MD5, errp);
->          } else if (hkc->u.hash.type == SSH_HOST_KEY_CHECK_HASH_TYPE_SHA1) {
->              return check_host_key_hash(s, hkc->u.hash.hash,
-> -                                       LIBSSH2_HOSTKEY_HASH_SHA1, 20, errp);
-> +                                       SSH_PUBLICKEY_HASH_SHA1, errp);
->          }
->          g_assert_not_reached();
-
-At least Fedora 29 uses SSH_PUBLICKEY_HASH_SHA256.
-
->          break;
->      case SSH_HOST_KEY_CHECK_MODE_KNOWN_HOSTS:
-> -        return check_host_key_knownhosts(s, host, port, errp);
-> +        return check_host_key_knownhosts(s, errp);
->      default:
->          g_assert_not_reached();
->      }
-> @@ -452,60 +467,42 @@ static int check_host_key(BDRVSSHState *s, const char *host, int port,
->      return -EINVAL;
->  }
->  
-> -static int authenticate(BDRVSSHState *s, const char *user, Error **errp)
-> +static int authenticate(BDRVSSHState *s, Error **errp)
->  {
->      int r, ret;
-> -    const char *userauthlist;
-> -    LIBSSH2_AGENT *agent = NULL;
-> -    struct libssh2_agent_publickey *identity;
-> -    struct libssh2_agent_publickey *prev_identity = NULL;
-> +    int method;
->  
-> -    userauthlist = libssh2_userauth_list(s->session, user, strlen(user));
-> -    if (strstr(userauthlist, "publickey") == NULL) {
-> +    /* Try to authenticate with the "none" method. */
-> +    r = ssh_userauth_none(s->session, NULL);
-> +    if (r == SSH_AUTH_ERROR) {
->          ret = -EPERM;
-> -        error_setg(errp,
-> -                "remote server does not support \"publickey\" authentication");
-> +        session_error_setg(errp, s, "failed to authenticate using none "
-> +                                    "authentication");
->          goto out;
-> -    }
-> -
-> -    /* Connect to ssh-agent and try each identity in turn. */
-> -    agent = libssh2_agent_init(s->session);
-> -    if (!agent) {
-> -        ret = -EINVAL;
-> -        session_error_setg(errp, s, "failed to initialize ssh-agent support");
-> -        goto out;
-> -    }
-> -    if (libssh2_agent_connect(agent)) {
-> -        ret = -ECONNREFUSED;
-> -        session_error_setg(errp, s, "failed to connect to ssh-agent");
-> -        goto out;
-> -    }
-> -    if (libssh2_agent_list_identities(agent)) {
-> -        ret = -EINVAL;
-> -        session_error_setg(errp, s,
-> -                           "failed requesting identities from ssh-agent");
-> +    } else if (r == SSH_AUTH_SUCCESS) {
-> +        /* Authenticated! */
-> +        ret = 0;
->          goto out;
->      }
->  
-> -    for(;;) {
-> -        r = libssh2_agent_get_identity(agent, &identity, prev_identity);
-> -        if (r == 1) {           /* end of list */
-> -            break;
-> -        }
-> -        if (r < 0) {
-> +    method = ssh_userauth_list(s->session, NULL);
-> +    trace_ssh_auth_methods(method);
-> +
-> +    /* Try to authenticate with publickey, using the ssh-agent
-> +     * if available.
-> +     */
-> +    if (method & SSH_AUTH_METHOD_PUBLICKEY) {
-> +        r = ssh_userauth_publickey_auto(s->session, NULL, NULL);
-> +        if (r == SSH_AUTH_ERROR) {
->              ret = -EINVAL;
-> -            session_error_setg(errp, s,
-> -                               "failed to obtain identity from ssh-agent");
-> +            session_error_setg(errp, s, "failed to authenticate using "
-> +                                        "publickey authentication");
->              goto out;
-> -        }
-> -        r = libssh2_agent_userauth(agent, user, identity);
-> -        if (r == 0) {
-> +        } else if (r == SSH_AUTH_SUCCESS) {
->              /* Authenticated! */
->              ret = 0;
->              goto out;
->          }
-> -        /* Failed to authenticate with this identity, try the next one. */
-> -        prev_identity = identity;
->      }
->  
->      ret = -EPERM;
-> @@ -513,13 +510,6 @@ static int authenticate(BDRVSSHState *s, const char *user, Error **errp)
->                 "and the identities held by your ssh-agent");
->  
->   out:
-> -    if (agent != NULL) {
-> -        /* Note: libssh2 implementation implicitly calls
-> -         * libssh2_agent_disconnect if necessary.
-> -         */
-> -        libssh2_agent_free(agent);
-> -    }
-> -
->      return ret;
->  }
->  
-> @@ -638,7 +628,8 @@ static int connect_to_ssh(BDRVSSHState *s, BlockdevOptionsSsh *opts,
->                            int ssh_flags, int creat_mode, Error **errp)
->  {
->      int r, ret;
-> -    long port = 0;
-> +    unsigned int port = 0;
-> +    int new_sock = -1;
->  
->      if (opts->has_user) {
->          s->user = g_strdup(opts->user);
-> @@ -655,71 +646,145 @@ static int connect_to_ssh(BDRVSSHState *s, BlockdevOptionsSsh *opts,
->      s->inet = opts->server;
->      opts->server = NULL;
->  
-> -    if (qemu_strtol(s->inet->port, NULL, 10, &port) < 0) {
-> +    if (qemu_strtoui(s->inet->port, NULL, 10, &port) < 0) {
->          error_setg(errp, "Use only numeric port value");
->          ret = -EINVAL;
->          goto err;
->      }
->  
->      /* Open the socket and connect. */
-> -    s->sock = inet_connect_saddr(s->inet, errp);
-> -    if (s->sock < 0) {
-> +    new_sock = inet_connect_saddr(s->inet, errp);
-> +    if (new_sock < 0) {
->          ret = -EIO;
->          goto err;
->      }
->  
-> +    /* Try to disable the Nagle algorithm on TCP sockets to reduce latency,
-> +     * but do not fail if it cannot be disabled.
-> +     */
-> +    r = socket_set_nodelay(new_sock);
-> +    if (r < 0) {
-> +        warn_report("setting NODELAY for the ssh server %s failed: %m",
-> +                    s->inet->host);
-> +    }
-> +
->      /* Create SSH session. */
-> -    s->session = libssh2_session_init();
-> +    s->session = ssh_new();
->      if (!s->session) {
->          ret = -EINVAL;
-> -        session_error_setg(errp, s, "failed to initialize libssh2 session");
-> +        session_error_setg(errp, s, "failed to initialize libssh session");
->          goto err;
->      }
->  
-> -#if TRACE_LIBSSH2 != 0
-> -    libssh2_trace(s->session, TRACE_LIBSSH2);
-> -#endif
-> +    /* Make sure we are in blocking mode during the connection and
-> +     * authentication phases.
-> +     */
-> +    ssh_set_blocking(s->session, 1);
->  
-> -    r = libssh2_session_handshake(s->session, s->sock);
-> -    if (r != 0) {
-> +    r = ssh_options_set(s->session, SSH_OPTIONS_USER, s->user);
-> +    if (r < 0) {
-> +        ret = -EINVAL;
-> +        session_error_setg(errp, s,
-> +                           "failed to set the user in the libssh session");
-> +        goto err;
-> +    }
-> +
-> +    r = ssh_options_set(s->session, SSH_OPTIONS_HOST, s->inet->host);
-> +    if (r < 0) {
-> +        ret = -EINVAL;
-> +        session_error_setg(errp, s,
-> +                           "failed to set the host in the libssh session");
-> +        goto err;
-> +    }
-> +
-> +    if (port > 0) {
-> +        r = ssh_options_set(s->session, SSH_OPTIONS_PORT, &port);
-> +        if (r < 0) {
-> +            ret = -EINVAL;
-> +            session_error_setg(errp, s,
-> +                               "failed to set the port in the libssh session");
-> +            goto err;
-> +        }
-> +    }
-> +
-> +    r = ssh_options_set(s->session, SSH_OPTIONS_COMPRESSION, "none");
-> +    if (r < 0) {
-> +        ret = -EINVAL;
-> +        session_error_setg(errp, s,
-> +                           "failed to disable the compression in the libssh "
-> +                           "session");
-> +        goto err;
-> +    }
-> +
-> +    /* Read ~/.ssh/config. */
-> +    r = ssh_options_parse_config(s->session, NULL);
-> +    if (r < 0) {
-> +        ret = -EINVAL;
-> +        session_error_setg(errp, s, "failed to parse ~/.ssh/config");
-> +        goto err;
-> +    }
-> +
-> +    r = ssh_options_set(s->session, SSH_OPTIONS_FD, &new_sock);
-> +    if (r < 0) {
-> +        ret = -EINVAL;
-> +        session_error_setg(errp, s,
-> +                           "failed to set the socket in the libssh session");
-> +        goto err;
-> +    }
-> +    /* libssh took ownership of the socket. */
-> +    s->sock = new_sock;
-> +    new_sock = -1;
-> +
-> +    /* Connect. */
-> +    r = ssh_connect(s->session);
-> +    if (r != SSH_OK) {
->          ret = -EINVAL;
->          session_error_setg(errp, s, "failed to establish SSH session");
->          goto err;
->      }
->  
->      /* Check the remote host's key against known_hosts. */
-> -    ret = check_host_key(s, s->inet->host, port, opts->host_key_check, errp);
-> +    ret = check_host_key(s, opts->host_key_check, errp);
->      if (ret < 0) {
->          goto err;
->      }
->  
->      /* Authenticate. */
-> -    ret = authenticate(s, s->user, errp);
-> +    ret = authenticate(s, errp);
->      if (ret < 0) {
->          goto err;
->      }
->  
->      /* Start SFTP. */
-> -    s->sftp = libssh2_sftp_init(s->session);
-> +    s->sftp = sftp_new(s->session);
->      if (!s->sftp) {
-> -        session_error_setg(errp, s, "failed to initialize sftp handle");
-> +        session_error_setg(errp, s, "failed to create sftp handle");
-> +        ret = -EINVAL;
-> +        goto err;
-> +    }
-> +
-> +    r = sftp_init(s->sftp);
-> +    if (r < 0) {
-> +        sftp_error_setg(errp, s, "failed to initialize sftp handle");
->          ret = -EINVAL;
->          goto err;
->      }
->  
->      /* Open the remote file. */
->      trace_ssh_connect_to_ssh(opts->path, ssh_flags, creat_mode);
-> -    s->sftp_handle = libssh2_sftp_open(s->sftp, opts->path, ssh_flags,
-> -                                       creat_mode);
-> +    s->sftp_handle = sftp_open(s->sftp, opts->path, ssh_flags, creat_mode);
->      if (!s->sftp_handle) {
-> -        session_error_setg(errp, s, "failed to open remote file '%s'",
-> -                           opts->path);
-> +        sftp_error_setg(errp, s, "failed to open remote file '%s'",
-> +                        opts->path);
->          ret = -EINVAL;
->          goto err;
->      }
->  
-> -    r = libssh2_sftp_fstat(s->sftp_handle, &s->attrs);
-> -    if (r < 0) {
-> +    /* Make sure the SFTP file is handled in blocking mode. */
-> +    sftp_file_set_blocking(s->sftp_handle);
-> +
-> +    s->attrs = sftp_fstat(s->sftp_handle);
-> +    if (!s->attrs) {
->          sftp_error_setg(errp, s, "failed to read file attributes");
->          return -EINVAL;
->      }
-> @@ -727,21 +792,26 @@ static int connect_to_ssh(BDRVSSHState *s, BlockdevOptionsSsh *opts,
->      return 0;
->  
->   err:
-> +    if (s->attrs) {
-> +        sftp_attributes_free(s->attrs);
-> +    }
-> +    s->attrs = NULL;
->      if (s->sftp_handle) {
-> -        libssh2_sftp_close(s->sftp_handle);
-> +        sftp_close(s->sftp_handle);
->      }
->      s->sftp_handle = NULL;
->      if (s->sftp) {
-> -        libssh2_sftp_shutdown(s->sftp);
-> +        sftp_free(s->sftp);
->      }
->      s->sftp = NULL;
->      if (s->session) {
-> -        libssh2_session_disconnect(s->session,
-> -                                   "from qemu ssh client: "
-> -                                   "error opening connection");
-> -        libssh2_session_free(s->session);
-> +        ssh_disconnect(s->session);
-> +        ssh_free(s->session);
->      }
->      s->session = NULL;
-> +    if (new_sock >= 0) {
-> +        close(new_sock);
-> +    }
->  
->      return ret;
->  }
-> @@ -756,9 +826,11 @@ static int ssh_file_open(BlockDriverState *bs, QDict *options, int bdrv_flags,
->  
->      ssh_state_init(s);
->  
-> -    ssh_flags = LIBSSH2_FXF_READ;
-> +    ssh_flags = 0;
->      if (bdrv_flags & BDRV_O_RDWR) {
-> -        ssh_flags |= LIBSSH2_FXF_WRITE;
-> +        ssh_flags |= O_RDWR;
-> +    } else {
-> +        ssh_flags |= O_RDONLY;
->      }
->  
->      opts = ssh_parse_options(options, errp);
-> @@ -773,16 +845,13 @@ static int ssh_file_open(BlockDriverState *bs, QDict *options, int bdrv_flags,
->      }
->  
->      /* Go non-blocking. */
-> -    libssh2_session_set_blocking(s->session, 0);
-> +    ssh_set_blocking(s->session, 0);
->  
->      qapi_free_BlockdevOptionsSsh(opts);
->  
->      return 0;
->  
->   err:
-> -    if (s->sock >= 0) {
-> -        close(s->sock);
-> -    }
->      s->sock = -1;
->  
->      qapi_free_BlockdevOptionsSsh(opts);
-> @@ -795,25 +864,25 @@ static int ssh_grow_file(BDRVSSHState *s, int64_t offset, Error **errp)
->  {
->      ssize_t ret;
->      char c[1] = { '\0' };
-> -    int was_blocking = libssh2_session_get_blocking(s->session);
-> +    int was_blocking = ssh_is_blocking(s->session);
->  
->      /* offset must be strictly greater than the current size so we do
->       * not overwrite anything */
-> -    assert(offset > 0 && offset > s->attrs.filesize);
-> +    assert(offset > 0 && offset > s->attrs->size);
->  
-> -    libssh2_session_set_blocking(s->session, 1);
-> +    ssh_set_blocking(s->session, 1);
->  
-> -    libssh2_sftp_seek64(s->sftp_handle, offset - 1);
-> -    ret = libssh2_sftp_write(s->sftp_handle, c, 1);
-> +    sftp_seek64(s->sftp_handle, offset - 1);
-> +    ret = sftp_write(s->sftp_handle, c, 1);
->  
-> -    libssh2_session_set_blocking(s->session, was_blocking);
-> +    ssh_set_blocking(s->session, was_blocking);
->  
->      if (ret < 0) {
->          sftp_error_setg(errp, s, "Failed to grow file");
->          return -EIO;
->      }
->  
-> -    s->attrs.filesize = offset;
-> +    s->attrs->size = offset;
->      return 0;
->  }
->  
-> @@ -841,8 +910,7 @@ static int ssh_co_create(BlockdevCreateOptions *options, Error **errp)
->      ssh_state_init(&s);
->  
->      ret = connect_to_ssh(&s, opts->location,
-> -                         LIBSSH2_FXF_READ|LIBSSH2_FXF_WRITE|
-> -                         LIBSSH2_FXF_CREAT|LIBSSH2_FXF_TRUNC,
-> +                         O_RDWR | O_CREAT | O_TRUNC,
->                           0644, errp);
->      if (ret < 0) {
->          goto fail;
-> @@ -911,10 +979,8 @@ static int ssh_has_zero_init(BlockDriverState *bs)
->      /* Assume false, unless we can positively prove it's true. */
->      int has_zero_init = 0;
->  
-> -    if (s->attrs.flags & LIBSSH2_SFTP_ATTR_PERMISSIONS) {
-> -        if (s->attrs.permissions & LIBSSH2_SFTP_S_IFREG) {
-> -            has_zero_init = 1;
-> -        }
-> +    if (s->attrs->type == SSH_FILEXFER_TYPE_REGULAR) {
-> +        has_zero_init = 1;
->      }
->  
->      return has_zero_init;
-> @@ -951,12 +1017,12 @@ static coroutine_fn void co_yield(BDRVSSHState *s, BlockDriverState *bs)
->          .co = qemu_coroutine_self()
->      };
->  
-> -    r = libssh2_session_block_directions(s->session);
-> +    r = ssh_get_poll_flags(s->session);
->  
-> -    if (r & LIBSSH2_SESSION_BLOCK_INBOUND) {
-> +    if (r & SSH_READ_PENDING) {
->          rd_handler = restart_coroutine;
->      }
-> -    if (r & LIBSSH2_SESSION_BLOCK_OUTBOUND) {
-> +    if (r & SSH_WRITE_PENDING) {
->          wr_handler = restart_coroutine;
->      }
->  
-> @@ -968,33 +1034,6 @@ static coroutine_fn void co_yield(BDRVSSHState *s, BlockDriverState *bs)
->      trace_ssh_co_yield_back(s->sock);
->  }
->  
-> -/* SFTP has a function `libssh2_sftp_seek64' which seeks to a position
-> - * in the remote file.  Notice that it just updates a field in the
-> - * sftp_handle structure, so there is no network traffic and it cannot
-> - * fail.
-> - *
-> - * However, `libssh2_sftp_seek64' does have a catastrophic effect on
-> - * performance since it causes the handle to throw away all in-flight
-> - * reads and buffered readahead data.  Therefore this function tries
-> - * to be intelligent about when to call the underlying libssh2 function.
-> - */
-> -#define SSH_SEEK_WRITE 0
-> -#define SSH_SEEK_READ  1
-> -#define SSH_SEEK_FORCE 2
-> -
-> -static void ssh_seek(BDRVSSHState *s, int64_t offset, int flags)
-> -{
-> -    bool op_read = (flags & SSH_SEEK_READ) != 0;
-> -    bool force = (flags & SSH_SEEK_FORCE) != 0;
-> -
-> -    if (force || op_read != s->offset_op_read || offset != s->offset) {
-> -        trace_ssh_seek(offset);
-> -        libssh2_sftp_seek64(s->sftp_handle, offset);
-> -        s->offset = offset;
-> -        s->offset_op_read = op_read;
-> -    }
-> -}
-> -
->  static coroutine_fn int ssh_read(BDRVSSHState *s, BlockDriverState *bs,
->                                   int64_t offset, size_t size,
->                                   QEMUIOVector *qiov)
-> @@ -1006,7 +1045,8 @@ static coroutine_fn int ssh_read(BDRVSSHState *s, BlockDriverState *bs,
->  
->      trace_ssh_read(offset, size);
->  
-> -    ssh_seek(s, offset, SSH_SEEK_READ);
-> +    trace_ssh_seek(offset);
-> +    sftp_seek64(s->sftp_handle, offset);
->  
->      /* This keeps track of the current iovec element ('i'), where we
->       * will write to next ('buf'), and the end of the current iovec
-> @@ -1016,35 +1056,33 @@ static coroutine_fn int ssh_read(BDRVSSHState *s, BlockDriverState *bs,
->      buf = i->iov_base;
->      end_of_vec = i->iov_base + i->iov_len;
->  
-> -    /* libssh2 has a hard-coded limit of 2000 bytes per request,
-> -     * although it will also do readahead behind our backs.  Therefore
-> -     * we may have to do repeated reads here until we have read 'size'
-> -     * bytes.
-> -     */
->      for (got = 0; got < size; ) {
->      again:
-
-I'd use:
-
-    const ptrdiff_t request_read_size = MIN(end_of_vec - buf, 16 * KiB);
-
-> -        trace_ssh_read_buf(buf, end_of_vec - buf);
-> -        r = libssh2_sftp_read(s->sftp_handle, buf, end_of_vec - buf);
-> -        trace_ssh_read_return(r);
-> +        trace_ssh_read_buf(buf, end_of_vec - buf, MIN(end_of_vec - buf, 16384));
-
-and use 'request_read_size' here,
-
-> +        /* The size of SFTP packets is limited to 32K bytes, so limit
-> +         * the amount of data requested to 16K, as libssh currently
-> +         * does not handle multiple requests on its own:
-> +         * https://red.libssh.org/issues/58
-> +         */
-> +        r = sftp_read(s->sftp_handle, buf, MIN(end_of_vec - buf, 16384));
-
-and here.
-
-> +        trace_ssh_read_return(r, sftp_get_error(s->sftp));
->  
-> -        if (r == LIBSSH2_ERROR_EAGAIN || r == LIBSSH2_ERROR_TIMEOUT) {
-> +        if (r == SSH_AGAIN) {
->              co_yield(s, bs);
->              goto again;
->          }
-> -        if (r < 0) {
-> -            sftp_error_trace(s, "read");
-> -            s->offset = -1;
-> -            return -EIO;
-> -        }
-> -        if (r == 0) {
-> +        if (r == SSH_EOF || (r == 0 && sftp_get_error(s->sftp) == SSH_FX_EOF)) {
->              /* EOF: Short read so pad the buffer with zeroes and return it. */
->              qemu_iovec_memset(qiov, got, 0, size - got);
->              return 0;
->          }
-> +        if (r <= 0) {
-> +            sftp_error_trace(s, "read");
-> +            return -EIO;
-> +        }
->  
->          got += r;
->          buf += r;
-> -        s->offset += r;
->          if (buf >= end_of_vec && got < size) {
->              i++;
->              buf = i->iov_base;
-> @@ -1081,7 +1119,8 @@ static int ssh_write(BDRVSSHState *s, BlockDriverState *bs,
->  
->      trace_ssh_write(offset, size);
->  
-> -    ssh_seek(s, offset, SSH_SEEK_WRITE);
-> +    trace_ssh_seek(offset);
-> +    sftp_seek64(s->sftp_handle, offset);
->  
->      /* This keeps track of the current iovec element ('i'), where we
->       * will read from next ('buf'), and the end of the current iovec
-> @@ -1093,45 +1132,34 @@ static int ssh_write(BDRVSSHState *s, BlockDriverState *bs,
->  
->      for (written = 0; written < size; ) {
->      again:
-
-Ditto 'request_write_size = MIN(..., 128 * KiB)'.
-
-> -        trace_ssh_write_buf(buf, end_of_vec - buf);
-> -        r = libssh2_sftp_write(s->sftp_handle, buf, end_of_vec - buf);
-> -        trace_ssh_write_return(r);
-> +        trace_ssh_write_buf(buf, end_of_vec - buf, MIN(end_of_vec - buf, 131072));
-> +        /* Avoid too large data packets, as libssh currently does not
-> +         * handle multiple requests on its own:
-> +         * https://red.libssh.org/issues/58
-> +         */
-> +        r = sftp_write(s->sftp_handle, buf, MIN(end_of_vec - buf, 131072));
-> +        trace_ssh_write_return(r, sftp_get_error(s->sftp));
->  
-> -        if (r == LIBSSH2_ERROR_EAGAIN || r == LIBSSH2_ERROR_TIMEOUT) {
-> +        if (r == SSH_AGAIN) {
->              co_yield(s, bs);
->              goto again;
->          }
->          if (r < 0) {
->              sftp_error_trace(s, "write");
-> -            s->offset = -1;
->              return -EIO;
->          }
-> -        /* The libssh2 API is very unclear about this.  A comment in
-> -         * the code says "nothing was acked, and no EAGAIN was
-> -         * received!" which apparently means that no data got sent
-> -         * out, and the underlying channel didn't return any EAGAIN
-> -         * indication.  I think this is a bug in either libssh2 or
-> -         * OpenSSH (server-side).  In any case, forcing a seek (to
-> -         * discard libssh2 internal buffers), and then trying again
-> -         * works for me.
-> -         */
-> -        if (r == 0) {
-> -            ssh_seek(s, offset + written, SSH_SEEK_WRITE|SSH_SEEK_FORCE);
-> -            co_yield(s, bs);
-> -            goto again;
-> -        }
->  
->          written += r;
->          buf += r;
-> -        s->offset += r;
->          if (buf >= end_of_vec && written < size) {
->              i++;
->              buf = i->iov_base;
->              end_of_vec = i->iov_base + i->iov_len;
->          }
->  
-> -        if (offset + written > s->attrs.filesize)
-> -            s->attrs.filesize = offset + written;
-> +        if (offset + written > s->attrs->size) {
-> +            s->attrs->size = offset + written;
-> +        }
->      }
->  
->      return 0;
-> @@ -1166,24 +1194,24 @@ static void unsafe_flush_warning(BDRVSSHState *s, const char *what)
->      }
->  }
->  
-> -#ifdef HAS_LIBSSH2_SFTP_FSYNC
-> +#if HAVE_LIBSSH_0_8
->  
->  static coroutine_fn int ssh_flush(BDRVSSHState *s, BlockDriverState *bs)
->  {
->      int r;
->  
->      trace_ssh_flush();
-> +
-> +    if (!sftp_extension_supported(s->sftp, "fsync@openssh.com", "1")) {
-> +        unsafe_flush_warning(s, "OpenSSH >= 6.3");
-> +        return 0;
-> +    }
->   again:
-> -    r = libssh2_sftp_fsync(s->sftp_handle);
-> -    if (r == LIBSSH2_ERROR_EAGAIN || r == LIBSSH2_ERROR_TIMEOUT) {
-> +    r = sftp_fsync(s->sftp_handle);
-> +    if (r == SSH_AGAIN) {
->          co_yield(s, bs);
->          goto again;
->      }
-> -    if (r == LIBSSH2_ERROR_SFTP_PROTOCOL &&
-> -        libssh2_sftp_last_error(s->sftp) == LIBSSH2_FX_OP_UNSUPPORTED) {
-> -        unsafe_flush_warning(s, "OpenSSH >= 6.3");
-> -        return 0;
-> -    }
->      if (r < 0) {
->          sftp_error_trace(s, "fsync");
->          return -EIO;
-> @@ -1204,25 +1232,25 @@ static coroutine_fn int ssh_co_flush(BlockDriverState *bs)
->      return ret;
->  }
->  
-> -#else /* !HAS_LIBSSH2_SFTP_FSYNC */
-> +#else /* !HAVE_LIBSSH_0_8 */
->  
->  static coroutine_fn int ssh_co_flush(BlockDriverState *bs)
->  {
->      BDRVSSHState *s = bs->opaque;
->  
-> -    unsafe_flush_warning(s, "libssh2 >= 1.4.4");
-> +    unsafe_flush_warning(s, "libssh >= 0.8.0");
->      return 0;
->  }
->  
-> -#endif /* !HAS_LIBSSH2_SFTP_FSYNC */
-> +#endif /* !HAVE_LIBSSH_0_8 */
->  
->  static int64_t ssh_getlength(BlockDriverState *bs)
->  {
->      BDRVSSHState *s = bs->opaque;
->      int64_t length;
->  
-> -    /* Note we cannot make a libssh2 call here. */
-> -    length = (int64_t) s->attrs.filesize;
-> +    /* Note we cannot make a libssh call here. */
-> +    length = (int64_t) s->attrs->size;
->      trace_ssh_getlength(length);
->  
->      return length;
-> @@ -1239,12 +1267,12 @@ static int coroutine_fn ssh_co_truncate(BlockDriverState *bs, int64_t offset,
->          return -ENOTSUP;
->      }
->  
-> -    if (offset < s->attrs.filesize) {
-> +    if (offset < s->attrs->size) {
->          error_setg(errp, "ssh driver does not support shrinking files");
->          return -ENOTSUP;
->      }
->  
-> -    if (offset == s->attrs.filesize) {
-> +    if (offset == s->attrs->size) {
->          return 0;
->      }
->  
-> @@ -1339,12 +1367,16 @@ static void bdrv_ssh_init(void)
->  {
->      int r;
->  
-> -    r = libssh2_init(0);
-> +    r = ssh_init();
->      if (r != 0) {
-> -        fprintf(stderr, "libssh2 initialization failed, %d\n", r);
-> +        fprintf(stderr, "libssh initialization failed, %d\n", r);
->          exit(EXIT_FAILURE);
->      }
->  
-> +#if TRACE_LIBSSH != 0
-> +    ssh_set_log_level(TRACE_LIBSSH);
-> +#endif
-> +
->      bdrv_register(&bdrv_ssh);
->  }
->  
-> diff --git a/block/trace-events b/block/trace-events
-> index eab51497fc..0d2126e840 100644
-> --- a/block/trace-events
-> +++ b/block/trace-events
-> @@ -169,19 +169,21 @@ nbd_co_request_fail(uint64_t from, uint32_t len, uint64_t handle, uint16_t flags
->  # ssh.c
->  ssh_restart_coroutine(void *co) "co=%p"
->  ssh_flush(void) "fsync"
-> -ssh_check_host_key_knownhosts(const char *key) "host key OK: %s"
-> +ssh_check_host_key_knownhosts(void) "host key OK"
->  ssh_connect_to_ssh(char *path, int flags, int mode) "opening file %s flags=0x%x creat_mode=0%o"
->  ssh_co_yield(int sock, void *rd_handler, void *wr_handler) "s->sock=%d rd_handler=%p wr_handler=%p"
->  ssh_co_yield_back(int sock) "s->sock=%d - back"
->  ssh_getlength(int64_t length) "length=%" PRIi64
->  ssh_co_create_opts(uint64_t size) "total_size=%" PRIu64
->  ssh_read(int64_t offset, size_t size) "offset=%" PRIi64 " size=%zu"
-> -ssh_read_buf(void *buf, size_t size) "sftp_read buf=%p size=%zu"
-> -ssh_read_return(ssize_t ret) "sftp_read returned %zd"
-> +ssh_read_buf(void *buf, size_t size, size_t actual_size) "sftp_read buf=%p size=%zu (actual size=%zu)"
-> +ssh_read_return(ssize_t ret, int sftp_err) "sftp_read returned %zd (sftp error=%d)"
->  ssh_write(int64_t offset, size_t size) "offset=%" PRIi64 " size=%zu"
-> -ssh_write_buf(void *buf, size_t size) "sftp_write buf=%p size=%zu"
-> -ssh_write_return(ssize_t ret) "sftp_write returned %zd"
-> +ssh_write_buf(void *buf, size_t size, size_t actual_size) "sftp_write buf=%p size=%zu (actual size=%zu)"
-> +ssh_write_return(ssize_t ret, int sftp_err) "sftp_write returned %zd (sftp error=%d)"
->  ssh_seek(int64_t offset) "seeking to offset=%" PRIi64
-> +ssh_auth_methods(int methods) "auth methods=%x"
-
-Please use 0x prefix.
-
-> +ssh_server_status(int status) "server status=%d"
->  
->  # curl.c
->  curl_timer_cb(long timeout_ms) "timer callback timeout_ms %ld"
-> @@ -214,4 +216,4 @@ sheepdog_snapshot_create(const char *sn_name, const char *id) "%s %s"
->  sheepdog_snapshot_create_inode(const char *name, uint32_t snap, uint32_t vdi) "s->inode: name %s snap_id 0x%" PRIx32 " vdi 0x%" PRIx32
->  
->  # ssh.c
-> -sftp_error(const char *op, const char *ssh_err, int ssh_err_code, unsigned long sftp_err_code) "%s failed: %s (libssh2 error code: %d, sftp error code: %lu)"
-> +sftp_error(const char *op, const char *ssh_err, int ssh_err_code, int sftp_err_code) "%s failed: %s (libssh error code: %d, sftp error code: %d)"
-> diff --git a/configure b/configure
-> index b091b82cb3..bfdd70c40a 100755
-> --- a/configure
-> +++ b/configure
-> @@ -472,7 +472,7 @@ auth_pam=""
->  vte=""
->  virglrenderer=""
->  tpm=""
-> -libssh2=""
-> +libssh=""
->  live_block_migration="yes"
->  numa=""
->  tcmalloc="no"
-> @@ -1439,9 +1439,9 @@ for opt do
->    ;;
->    --enable-tpm) tpm="yes"
->    ;;
-> -  --disable-libssh2) libssh2="no"
-> +  --disable-libssh) libssh="no"
->    ;;
-> -  --enable-libssh2) libssh2="yes"
-> +  --enable-libssh) libssh="yes"
->    ;;
->    --disable-live-block-migration) live_block_migration="no"
->    ;;
-> @@ -1810,7 +1810,7 @@ disabled with --disable-FEATURE, default is enabled if available:
->    coroutine-pool  coroutine freelist (better performance)
->    glusterfs       GlusterFS backend
->    tpm             TPM support
-> -  libssh2         ssh block device support
-> +  libssh          ssh block device support
->    numa            libnuma support
->    libxml2         for Parallels image format
->    tcmalloc        tcmalloc support
-> @@ -3914,43 +3914,17 @@ EOF
->  fi
->  
->  ##########################################
-> -# libssh2 probe
-> -min_libssh2_version=1.2.8
-> -if test "$libssh2" != "no" ; then
-> -  if $pkg_config --atleast-version=$min_libssh2_version libssh2; then
-> -    libssh2_cflags=$($pkg_config libssh2 --cflags)
-> -    libssh2_libs=$($pkg_config libssh2 --libs)
-> -    libssh2=yes
-> +# libssh probe
-> +if test "$libssh" != "no" ; then
-> +  if $pkg_config --exists libssh; then
-> +    libssh_cflags=$($pkg_config libssh --cflags)
-> +    libssh_libs=$($pkg_config libssh --libs)
-> +    libssh=yes
->    else
-> -    if test "$libssh2" = "yes" ; then
-> -      error_exit "libssh2 >= $min_libssh2_version required for --enable-libssh2"
-> +    if test "$libssh" = "yes" ; then
-> +      error_exit "libssh required for --enable-libssh"
->      fi
-> -    libssh2=no
-> -  fi
-> -fi
-> -
-> -##########################################
-> -# libssh2_sftp_fsync probe
-> -
-> -if test "$libssh2" = "yes"; then
-> -  cat > $TMPC <<EOF
-> -#include <stdio.h>
-> -#include <libssh2.h>
-> -#include <libssh2_sftp.h>
-> -int main(void) {
-> -    LIBSSH2_SESSION *session;
-> -    LIBSSH2_SFTP *sftp;
-> -    LIBSSH2_SFTP_HANDLE *sftp_handle;
-> -    session = libssh2_session_init ();
-> -    sftp = libssh2_sftp_init (session);
-> -    sftp_handle = libssh2_sftp_open (sftp, "/", 0, 0);
-> -    libssh2_sftp_fsync (sftp_handle);
-> -    return 0;
-> -}
-> -EOF
-> -  # libssh2_cflags/libssh2_libs defined in previous test.
-> -  if compile_prog "$libssh2_cflags" "$libssh2_libs" ; then
-> -    QEMU_CFLAGS="-DHAS_LIBSSH2_SFTP_FSYNC $QEMU_CFLAGS"
-> +    libssh=no
->    fi
->  fi
->  
-> @@ -6451,7 +6425,7 @@ echo "GlusterFS support $glusterfs"
->  echo "gcov              $gcov_tool"
->  echo "gcov enabled      $gcov"
->  echo "TPM support       $tpm"
-> -echo "libssh2 support   $libssh2"
-> +echo "libssh support    $libssh"
->  echo "QOM debugging     $qom_cast_debug"
->  echo "Live block migration $live_block_migration"
->  echo "lzo support       $lzo"
-> @@ -7144,10 +7118,10 @@ if test "$glusterfs_iocb_has_stat" = "yes" ; then
->    echo "CONFIG_GLUSTERFS_IOCB_HAS_STAT=y" >> $config_host_mak
->  fi
->  
-> -if test "$libssh2" = "yes" ; then
-> -  echo "CONFIG_LIBSSH2=m" >> $config_host_mak
-> -  echo "LIBSSH2_CFLAGS=$libssh2_cflags" >> $config_host_mak
-> -  echo "LIBSSH2_LIBS=$libssh2_libs" >> $config_host_mak
-> +if test "$libssh" = "yes" ; then
-> +  echo "CONFIG_LIBSSH=m" >> $config_host_mak
-> +  echo "LIBSSH_CFLAGS=$libssh_cflags" >> $config_host_mak
-> +  echo "LIBSSH_LIBS=$libssh_libs" >> $config_host_mak
->  fi
->  
->  if test "$live_block_migration" = "yes" ; then
-> diff --git a/tests/qemu-iotests/207.out b/tests/qemu-iotests/207.out
-> index ec9823793a..1239d9d648 100644
-> --- a/tests/qemu-iotests/207.out
-> +++ b/tests/qemu-iotests/207.out
-> @@ -68,7 +68,7 @@ virtual size: 4 MiB (4194304 bytes)
->  
->  {"execute": "blockdev-create", "arguments": {"job-id": "job0", "options": {"driver": "ssh", "location": {"host-key-check": {"mode": "none"}, "path": "/this/is/not/an/existing/path", "server": {"host": "127.0.0.1", "port": "22"}}, "size": 4194304}}}
->  {"return": {}}
-> -Job failed: failed to open remote file '/this/is/not/an/existing/path': Failed opening remote file (libssh2 error code: -31)
-> +Job failed: failed to open remote file '/this/is/not/an/existing/path': SFTP server: No such file (libssh error code: 1, sftp error code: 2)
->  {"execute": "job-dismiss", "arguments": {"id": "job0"}}
->  {"return": {}}
->  
-> 
-
-Pino, this is the list of changes I did, as I commented on IRC:
-
-1/ Build on Ubuntu:
-
-./block/ssh.c:417:10: note: each undeclared identifier is reported only
-once for each function it appears in
-./block/ssh.c: In function 'check_host_key_hash':
-./block/ssh.c:440:5: error: 'ssh_get_publickey' is deprecated
-[-Werror=deprecated-declarations]
-     r = ssh_get_publickey(s->session, &pubkey);
-     ^
-In file included from ./block/ssh.c:27:0:
-/usr/include/libssh/libssh.h:489:31: note: declared here
- SSH_DEPRECATED LIBSSH_API int ssh_get_publickey(ssh_session session,
-ssh_key *key);
-                               ^~~~~~~~~~~~~~~~~
-cc1: all warnings being treated as errors
-
--- >8 --diff --git a/block/ssh.c b/block/ssh.c
-index e62f9ee3b5..cb6fe0b17d 100644
---- a/block/ssh.c
-+++ b/block/ssh.c
-@@ -408,7 +408,7 @@ check_host_key_hash(BDRVSSHState *s, const char *hash,
-     unsigned char *server_hash;
-     size_t server_hash_len;
-
--#if HAVE_LIBSSH_0_8
-+#ifdef HAVE_SSH_GET_SERVER_PUBLICKEY
-     r = ssh_get_server_publickey(s->session, &pubkey);
- #else
-     r = ssh_get_publickey(s->session, &pubkey);
-diff --git a/configure b/configure
-index bfdd70c40a..93547b4958 100755
---- a/configure
-+++ b/configure
-@@ -3928,6 +3928,18 @@ if test "$libssh" != "no" ; then
-   fi
- fi
-
-+# check for ssh_get_server_publickey
-+if test "$libssh" = "yes" ; then
-+  cat > $TMPC << EOF
-+#include <libssh/libssh.h>
-+int main(void) { return ssh_get_server_publickey(NULL, NULL);}
-+EOF
-+  if compile_prog "$libssh_cflags" "$libssh_libs"; then
-+    libssh_cflags="-DHAVE_SSH_GET_SERVER_PUBLICKEY $libssh_cflags"
-+  fi
-+fi
+diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+index f64f581c86..9f817e3cfa 100644
+--- a/target/s390x/cpu_features.c
++++ b/target/s390x/cpu_features.c
+@@ -2,8 +2,9 @@
+  * CPU features/facilities for s390x
+  *
+  * Copyright IBM Corp. 2016, 2018
++ * Copyright Red Hat, Inc. 2019
+  *
+- * Author(s): David Hildenbrand <dahi@linux.vnet.ibm.com>
++ * Author(s): David Hildenbrand <david@redhat.com>
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2 or (a=
+t
+  * your option) any later version. See the COPYING file in the top-level
+@@ -14,346 +15,17 @@
+ #include "qemu/module.h"
+ #include "cpu_features.h"
+=20
+-#define FEAT_INIT(_name, _type, _bit, _desc) \
+-    {                                                \
+-        .name =3D _name,                               \
+-        .type =3D _type,                               \
+-        .bit =3D _bit,                                 \
+-        .desc =3D _desc,                               \
+-    }
+-
+-/* S390FeatDef.bit is not applicable as there is no feature block. */
+-#define FEAT_INIT_MISC(_name, _desc)                 \
+-            FEAT_INIT(_name, S390_FEAT_TYPE_MISC, 0, _desc)
+-
+-/* indexed by feature number for easy lookup */
+-static const S390FeatDef s390_features[] =3D {
+-    FEAT_INIT("esan3", S390_FEAT_TYPE_STFL, 0, "Instructions marked as n=
+3"),
+-    FEAT_INIT("zarch", S390_FEAT_TYPE_STFL, 1, "z/Architecture architect=
+ural mode"),
+-    FEAT_INIT("dateh", S390_FEAT_TYPE_STFL, 3, "DAT-enhancement facility=
+"),
+-    FEAT_INIT("idtes", S390_FEAT_TYPE_STFL, 4, "IDTE selective TLB segme=
+nt-table clearing"),
+-    FEAT_INIT("idter", S390_FEAT_TYPE_STFL, 5, "IDTE selective TLB regio=
+n-table clearing"),
+-    FEAT_INIT("asnlxr", S390_FEAT_TYPE_STFL, 6, "ASN-and-LX reuse facili=
+ty"),
+-    FEAT_INIT("stfle", S390_FEAT_TYPE_STFL, 7, "Store-facility-list-exte=
+nded facility"),
+-    FEAT_INIT("edat", S390_FEAT_TYPE_STFL, 8, "Enhanced-DAT facility"),
+-    FEAT_INIT("srs", S390_FEAT_TYPE_STFL, 9, "Sense-running-status facil=
+ity"),
+-    FEAT_INIT("csske", S390_FEAT_TYPE_STFL, 10, "Conditional-SSKE facili=
+ty"),
+-    FEAT_INIT("ctop", S390_FEAT_TYPE_STFL, 11, "Configuration-topology f=
+acility"),
+-    FEAT_INIT("apqci", S390_FEAT_TYPE_STFL, 12, "Query AP Configuration =
+Information facility"),
+-    FEAT_INIT("ipter", S390_FEAT_TYPE_STFL, 13, "IPTE-range facility"),
+-    FEAT_INIT("nonqks", S390_FEAT_TYPE_STFL, 14, "Nonquiescing key-setti=
+ng facility"),
+-    FEAT_INIT("apft", S390_FEAT_TYPE_STFL, 15, "AP Facilities Test facil=
+ity"),
+-    FEAT_INIT("etf2", S390_FEAT_TYPE_STFL, 16, "Extended-translation fac=
+ility 2"),
+-    FEAT_INIT("msa-base", S390_FEAT_TYPE_STFL, 17, "Message-security-ass=
+ist facility (excluding subfunctions)"),
+-    FEAT_INIT("ldisp", S390_FEAT_TYPE_STFL, 18, "Long-displacement facil=
+ity"),
+-    FEAT_INIT("ldisphp", S390_FEAT_TYPE_STFL, 19, "Long-displacement fac=
+ility has high performance"),
+-    FEAT_INIT("hfpm", S390_FEAT_TYPE_STFL, 20, "HFP-multiply-add/subtrac=
+t facility"),
+-    FEAT_INIT("eimm", S390_FEAT_TYPE_STFL, 21, "Extended-immediate facil=
+ity"),
+-    FEAT_INIT("etf3", S390_FEAT_TYPE_STFL, 22, "Extended-translation fac=
+ility 3"),
+-    FEAT_INIT("hfpue", S390_FEAT_TYPE_STFL, 23, "HFP-unnormalized-extens=
+ion facility"),
+-    FEAT_INIT("etf2eh", S390_FEAT_TYPE_STFL, 24, "ETF2-enhancement facil=
+ity"),
+-    FEAT_INIT("stckf", S390_FEAT_TYPE_STFL, 25, "Store-clock-fast facili=
+ty"),
+-    FEAT_INIT("parseh", S390_FEAT_TYPE_STFL, 26, "Parsing-enhancement fa=
+cility"),
+-    FEAT_INIT("mvcos", S390_FEAT_TYPE_STFL, 27, "Move-with-optional-spec=
+ification facility"),
+-    FEAT_INIT("tods-base", S390_FEAT_TYPE_STFL, 28, "TOD-clock-steering =
+facility (excluding subfunctions)"),
+-    FEAT_INIT("etf3eh", S390_FEAT_TYPE_STFL, 30, "ETF3-enhancement facil=
+ity"),
+-    FEAT_INIT("ectg", S390_FEAT_TYPE_STFL, 31, "Extract-CPU-time facilit=
+y"),
+-    FEAT_INIT("csst", S390_FEAT_TYPE_STFL, 32, "Compare-and-swap-and-sto=
+re facility"),
+-    FEAT_INIT("csst2", S390_FEAT_TYPE_STFL, 33, "Compare-and-swap-and-st=
+ore facility 2"),
+-    FEAT_INIT("ginste", S390_FEAT_TYPE_STFL, 34, "General-instructions-e=
+xtension facility"),
+-    FEAT_INIT("exrl", S390_FEAT_TYPE_STFL, 35, "Execute-extensions facil=
+ity"),
+-    FEAT_INIT("emon", S390_FEAT_TYPE_STFL, 36, "Enhanced-monitor facilit=
+y"),
+-    FEAT_INIT("fpe", S390_FEAT_TYPE_STFL, 37, "Floating-point extension =
+facility"),
+-    FEAT_INIT("opc", S390_FEAT_TYPE_STFL, 38, "Order Preserving Compress=
+ion facility"),
+-    FEAT_INIT("sprogp", S390_FEAT_TYPE_STFL, 40, "Set-program-parameters=
+ facility"),
+-    FEAT_INIT("fpseh", S390_FEAT_TYPE_STFL, 41, "Floating-point-support-=
+enhancement facilities"),
+-    FEAT_INIT("dfp", S390_FEAT_TYPE_STFL, 42, "DFP (decimal-floating-poi=
+nt) facility"),
+-    FEAT_INIT("dfphp", S390_FEAT_TYPE_STFL, 43, "DFP (decimal-floating-p=
+oint) facility has high performance"),
+-    FEAT_INIT("pfpo", S390_FEAT_TYPE_STFL, 44, "PFPO instruction"),
+-    FEAT_INIT("stfle45", S390_FEAT_TYPE_STFL, 45, "Various facilities in=
+troduced with z196"),
+-    FEAT_INIT("cmpsceh", S390_FEAT_TYPE_STFL, 47, "CMPSC-enhancement fac=
+ility"),
+-    FEAT_INIT("dfpzc", S390_FEAT_TYPE_STFL, 48, "Decimal-floating-point =
+zoned-conversion facility"),
+-    FEAT_INIT("stfle49", S390_FEAT_TYPE_STFL, 49, "Various facilities in=
+troduced with zEC12"),
+-    FEAT_INIT("cte", S390_FEAT_TYPE_STFL, 50, "Constrained transactional=
+-execution facility"),
+-    FEAT_INIT("ltlbc", S390_FEAT_TYPE_STFL, 51, "Local-TLB-clearing faci=
+lity"),
+-    FEAT_INIT("iacc2", S390_FEAT_TYPE_STFL, 52, "Interlocked-access faci=
+lity 2"),
+-    FEAT_INIT("stfle53", S390_FEAT_TYPE_STFL, 53, "Various facilities in=
+troduced with z13"),
+-    FEAT_INIT("eec", S390_FEAT_TYPE_STFL, 54, "Entropy encoding compress=
+ion facility"),
+-    FEAT_INIT("msa5-base", S390_FEAT_TYPE_STFL, 57, "Message-security-as=
+sist-extension-5 facility (excluding subfunctions)"),
+-    FEAT_INIT("minste2", S390_FEAT_TYPE_STFL, 58, "Miscellaneous-instruc=
+tion-extensions facility 2"),
+-    FEAT_INIT("sema", S390_FEAT_TYPE_STFL, 59, "Semaphore-assist facilit=
+y"),
+-    FEAT_INIT("tsi", S390_FEAT_TYPE_STFL, 60, "Time-slice Instrumentatio=
+n facility"),
+-    FEAT_INIT("minste3", S390_FEAT_TYPE_STFL, 61, "Miscellaneous-Instruc=
+tion-Extensions Facility 3"),
+-    FEAT_INIT("ri", S390_FEAT_TYPE_STFL, 64, "CPU runtime-instrumentatio=
+n facility"),
+-    FEAT_INIT("zpci", S390_FEAT_TYPE_STFL, 69, "z/PCI facility"),
+-    FEAT_INIT("aen", S390_FEAT_TYPE_STFL, 71, "General-purpose-adapter-e=
+vent-notification facility"),
+-    FEAT_INIT("ais", S390_FEAT_TYPE_STFL, 72, "General-purpose-adapter-i=
+nterruption-suppression facility"),
+-    FEAT_INIT("te", S390_FEAT_TYPE_STFL, 73, "Transactional-execution fa=
+cility"),
+-    FEAT_INIT("sthyi", S390_FEAT_TYPE_STFL, 74, "Store-hypervisor-inform=
+ation facility"),
+-    FEAT_INIT("aefsi", S390_FEAT_TYPE_STFL, 75, "Access-exception-fetch/=
+store-indication facility"),
+-    FEAT_INIT("msa3-base", S390_FEAT_TYPE_STFL, 76, "Message-security-as=
+sist-extension-3 facility (excluding subfunctions)"),
+-    FEAT_INIT("msa4-base", S390_FEAT_TYPE_STFL, 77, "Message-security-as=
+sist-extension-4 facility (excluding subfunctions)"),
+-    FEAT_INIT("edat2", S390_FEAT_TYPE_STFL, 78, "Enhanced-DAT facility 2=
+"),
+-    FEAT_INIT("dfppc", S390_FEAT_TYPE_STFL, 80, "Decimal-floating-point =
+packed-conversion facility"),
+-    FEAT_INIT("ppa15", S390_FEAT_TYPE_STFL, 81, "PPA15 is installed"),
+-    FEAT_INIT("bpb", S390_FEAT_TYPE_STFL, 82, "Branch prediction blockin=
+g"),
+-    FEAT_INIT("vx", S390_FEAT_TYPE_STFL, 129, "Vector facility"),
+-    FEAT_INIT("iep", S390_FEAT_TYPE_STFL, 130, "Instruction-execution-pr=
+otection facility"),
+-    FEAT_INIT("sea_esop2", S390_FEAT_TYPE_STFL, 131, "Side-effect-access=
+ facility and Enhanced-suppression-on-protection facility 2"),
+-    FEAT_INIT("gs", S390_FEAT_TYPE_STFL, 133, "Guarded-storage facility"=
+),
+-    FEAT_INIT("vxpd", S390_FEAT_TYPE_STFL, 134, "Vector packed decimal f=
+acility"),
+-    FEAT_INIT("vxeh", S390_FEAT_TYPE_STFL, 135, "Vector enhancements fac=
+ility"),
+-    FEAT_INIT("mepoch", S390_FEAT_TYPE_STFL, 139, "Multiple-epoch facili=
+ty"),
+-    FEAT_INIT("tpei", S390_FEAT_TYPE_STFL, 144, "Test-pending-external-i=
+nterruption facility"),
+-    FEAT_INIT("irbm", S390_FEAT_TYPE_STFL, 145, "Insert-reference-bits-m=
+ultiple facility"),
+-    FEAT_INIT("msa8-base", S390_FEAT_TYPE_STFL, 146, "Message-security-a=
+ssist-extension-8 facility (excluding subfunctions)"),
+-    FEAT_INIT("cmmnt", S390_FEAT_TYPE_STFL, 147, "CMM: ESSA-enhancement =
+(no translate) facility"),
+-    FEAT_INIT("vxeh2", S390_FEAT_TYPE_STFL, 148, "Vector Enhancements fa=
+cility 2"),
+-    FEAT_INIT("esort-base", S390_FEAT_TYPE_STFL, 150, "Enhanced-sort fac=
+ility (excluding subfunctions)"),
+-    FEAT_INIT("deflate-base", S390_FEAT_TYPE_STFL, 151, "Deflate-convers=
+ion facility (excluding subfunctions)"),
+-    FEAT_INIT("vxbeh", S390_FEAT_TYPE_STFL, 152, "Vector BCD enhancement=
+s facility 1"),
+-    FEAT_INIT("msa9-base", S390_FEAT_TYPE_STFL, 155, "Message-security-a=
+ssist-extension-9 facility (excluding subfunctions)"),
+-    FEAT_INIT("etoken", S390_FEAT_TYPE_STFL, 156, "Etoken facility"),
+-
+-    /* SCLP SCCB Byte 80 - 98  (bit numbers relative to byte-80) */
+-    FEAT_INIT("gsls", S390_FEAT_TYPE_SCLP_CONF_CHAR, 40, "SIE: Guest-sto=
+rage-limit-suppression facility"),
+-    FEAT_INIT("esop", S390_FEAT_TYPE_SCLP_CONF_CHAR, 46, "Enhanced-suppr=
+ession-on-protection facility"),
+-    FEAT_INIT("hpma2", S390_FEAT_TYPE_SCLP_CONF_CHAR, 90, "Host page man=
+agement assist 2 Facility"), /* 91-2 */
+-    FEAT_INIT("kss", S390_FEAT_TYPE_SCLP_CONF_CHAR, 151, "SIE: Keyless-s=
+ubset facility"),  /* 98-7 */
+-
+-    /* SCLP SCCB Byte 116 - 119 (bit numbers relative to byte-116) */
+-    FEAT_INIT("64bscao", S390_FEAT_TYPE_SCLP_CONF_CHAR_EXT, 0, "SIE: 64-=
+bit-SCAO facility"),
+-    FEAT_INIT("cmma", S390_FEAT_TYPE_SCLP_CONF_CHAR_EXT, 1, "SIE: Collab=
+orative-memory-management assist"),
+-    FEAT_INIT("pfmfi", S390_FEAT_TYPE_SCLP_CONF_CHAR_EXT, 9, "SIE: PFMF =
+interpretation facility"),
+-    FEAT_INIT("ibs", S390_FEAT_TYPE_SCLP_CONF_CHAR_EXT, 10, "SIE: Interl=
+ock-and-broadcast-suppression facility"),
+-
+-    FEAT_INIT("sief2", S390_FEAT_TYPE_SCLP_CPU, 4, "SIE: interception fo=
+rmat 2 (Virtual SIE)"),
+-    FEAT_INIT("skey", S390_FEAT_TYPE_SCLP_CPU, 5, "SIE: Storage-key faci=
+lity"),
+-    FEAT_INIT("gpereh", S390_FEAT_TYPE_SCLP_CPU, 10, "SIE: Guest-PER enh=
+ancement facility"),
+-    FEAT_INIT("siif", S390_FEAT_TYPE_SCLP_CPU, 11, "SIE: Shared IPTE-int=
+erlock facility"),
+-    FEAT_INIT("sigpif", S390_FEAT_TYPE_SCLP_CPU, 12, "SIE: SIGP interpre=
+tation facility"),
+-    FEAT_INIT("ib", S390_FEAT_TYPE_SCLP_CPU, 42, "SIE: Intervention bypa=
+ss facility"),
+-    FEAT_INIT("cei", S390_FEAT_TYPE_SCLP_CPU, 43, "SIE: Conditional-exte=
+rnal-interception facility"),
+-
+-    FEAT_INIT_MISC("dateh2", "DAT-enhancement facility 2"),
+-    FEAT_INIT_MISC("cmm", "Collaborative-memory-management facility"),
+-    FEAT_INIT_MISC("ap", "AP instructions installed"),
+-
+-    FEAT_INIT("plo-cl", S390_FEAT_TYPE_PLO, 0, "PLO Compare and load (32=
+ bit in general registers)"),
+-    FEAT_INIT("plo-clg", S390_FEAT_TYPE_PLO, 1, "PLO Compare and load (6=
+4 bit in parameter list)"),
+-    FEAT_INIT("plo-clgr", S390_FEAT_TYPE_PLO, 2, "PLO Compare and load (=
+32 bit in general registers)"),
+-    FEAT_INIT("plo-clx", S390_FEAT_TYPE_PLO, 3, "PLO Compare and load (1=
+28 bit in parameter list)"),
+-    FEAT_INIT("plo-cs", S390_FEAT_TYPE_PLO, 4, "PLO Compare and swap (32=
+ bit in general registers)"),
+-    FEAT_INIT("plo-csg", S390_FEAT_TYPE_PLO, 5, "PLO Compare and swap (6=
+4 bit in parameter list)"),
+-    FEAT_INIT("plo-csgr", S390_FEAT_TYPE_PLO, 6, "PLO Compare and swap (=
+32 bit in general registers)"),
+-    FEAT_INIT("plo-csx", S390_FEAT_TYPE_PLO, 7, "PLO Compare and swap (1=
+28 bit in parameter list)"),
+-    FEAT_INIT("plo-dcs", S390_FEAT_TYPE_PLO, 8, "PLO Double compare and =
+swap (32 bit in general registers)"),
+-    FEAT_INIT("plo-dcsg", S390_FEAT_TYPE_PLO, 9, "PLO Double compare and=
+ swap (64 bit in parameter list)"),
+-    FEAT_INIT("plo-dcsgr", S390_FEAT_TYPE_PLO, 10, "PLO Double compare a=
+nd swap (32 bit in general registers)"),
+-    FEAT_INIT("plo-dcsx", S390_FEAT_TYPE_PLO, 11, "PLO Double compare an=
+d swap (128 bit in parameter list)"),
+-    FEAT_INIT("plo-csst", S390_FEAT_TYPE_PLO, 12, "PLO Compare and swap =
+and store (32 bit in general registers)"),
+-    FEAT_INIT("plo-csstg", S390_FEAT_TYPE_PLO, 13, "PLO Compare and swap=
+ and store (64 bit in parameter list)"),
+-    FEAT_INIT("plo-csstgr", S390_FEAT_TYPE_PLO, 14, "PLO Compare and swa=
+p and store (32 bit in general registers)"),
+-    FEAT_INIT("plo-csstx", S390_FEAT_TYPE_PLO, 15, "PLO Compare and swap=
+ and store (128 bit in parameter list)"),
+-    FEAT_INIT("plo-csdst", S390_FEAT_TYPE_PLO, 16, "PLO Compare and swap=
+ and double store (32 bit in general registers)"),
+-    FEAT_INIT("plo-csdstg", S390_FEAT_TYPE_PLO, 17, "PLO Compare and swa=
+p and double store (64 bit in parameter list)"),
+-    FEAT_INIT("plo-csdstgr", S390_FEAT_TYPE_PLO, 18, "PLO Compare and sw=
+ap and double store (32 bit in general registers)"),
+-    FEAT_INIT("plo-csdstx", S390_FEAT_TYPE_PLO, 19, "PLO Compare and swa=
+p and double store (128 bit in parameter list)"),
+-    FEAT_INIT("plo-cstst", S390_FEAT_TYPE_PLO, 20, "PLO Compare and swap=
+ and triple store (32 bit in general registers)"),
+-    FEAT_INIT("plo-cststg", S390_FEAT_TYPE_PLO, 21, "PLO Compare and swa=
+p and triple store (64 bit in parameter list)"),
+-    FEAT_INIT("plo-cststgr", S390_FEAT_TYPE_PLO, 22, "PLO Compare and sw=
+ap and triple store (32 bit in general registers)"),
+-    FEAT_INIT("plo-cststx", S390_FEAT_TYPE_PLO, 23, "PLO Compare and swa=
+p and triple store (128 bit in parameter list)"),
+-
+-    FEAT_INIT("ptff-qto", S390_FEAT_TYPE_PTFF, 1, "PTFF Query TOD Offset=
+"),
+-    FEAT_INIT("ptff-qsi", S390_FEAT_TYPE_PTFF, 2, "PTFF Query Steering I=
+nformation"),
+-    FEAT_INIT("ptff-qpc", S390_FEAT_TYPE_PTFF, 3, "PTFF Query Physical C=
+lock"),
+-    FEAT_INIT("ptff-qui", S390_FEAT_TYPE_PTFF, 4, "PTFF Query UTC Inform=
+ation"),
+-    FEAT_INIT("ptff-qtou", S390_FEAT_TYPE_PTFF, 5, "PTFF Query TOD Offse=
+t User"),
+-    FEAT_INIT("ptff-qsie", S390_FEAT_TYPE_PTFF, 10, "PTFF Query Steering=
+ Information Extended"),
+-    FEAT_INIT("ptff-qtoue", S390_FEAT_TYPE_PTFF, 13, "PTFF Query TOD Off=
+set User Extended"),
+-    FEAT_INIT("ptff-sto", S390_FEAT_TYPE_PTFF, 65, "PTFF Set TOD Offset"=
+),
+-    FEAT_INIT("ptff-stou", S390_FEAT_TYPE_PTFF, 69, "PTFF Set TOD Offset=
+ User"),
+-    FEAT_INIT("ptff-stoe", S390_FEAT_TYPE_PTFF, 73, "PTFF Set TOD Offset=
+ Extended"),
+-    FEAT_INIT("ptff-stoue", S390_FEAT_TYPE_PTFF, 77, "PTFF Set TOD Offse=
+t User Extended"),
+-
+-    FEAT_INIT("kmac-dea", S390_FEAT_TYPE_KMAC, 1, "KMAC DEA"),
+-    FEAT_INIT("kmac-tdea-128", S390_FEAT_TYPE_KMAC, 2, "KMAC TDEA-128"),
+-    FEAT_INIT("kmac-tdea-192", S390_FEAT_TYPE_KMAC, 3, "KMAC TDEA-192"),
+-    FEAT_INIT("kmac-edea", S390_FEAT_TYPE_KMAC, 9, "KMAC Encrypted-DEA")=
+,
+-    FEAT_INIT("kmac-etdea-128", S390_FEAT_TYPE_KMAC, 10, "KMAC Encrypted=
+-TDEA-128"),
+-    FEAT_INIT("kmac-etdea-192", S390_FEAT_TYPE_KMAC, 11, "KMAC Encrypted=
+-TDEA-192"),
+-    FEAT_INIT("kmac-aes-128", S390_FEAT_TYPE_KMAC, 18, "KMAC AES-128"),
+-    FEAT_INIT("kmac-aes-192", S390_FEAT_TYPE_KMAC, 19, "KMAC AES-192"),
+-    FEAT_INIT("kmac-aes-256", S390_FEAT_TYPE_KMAC, 20, "KMAC AES-256"),
+-    FEAT_INIT("kmac-eaes-128", S390_FEAT_TYPE_KMAC, 26, "KMAC Encrypted-=
+AES-128"),
+-    FEAT_INIT("kmac-eaes-192", S390_FEAT_TYPE_KMAC, 27, "KMAC Encrypted-=
+AES-192"),
+-    FEAT_INIT("kmac-eaes-256", S390_FEAT_TYPE_KMAC, 28, "KMAC Encrypted-=
+AES-256"),
+-
+-    FEAT_INIT("kmc-dea", S390_FEAT_TYPE_KMC, 1, "KMC DEA"),
+-    FEAT_INIT("kmc-tdea-128", S390_FEAT_TYPE_KMC, 2, "KMC TDEA-128"),
+-    FEAT_INIT("kmc-tdea-192", S390_FEAT_TYPE_KMC, 3, "KMC TDEA-192"),
+-    FEAT_INIT("kmc-edea", S390_FEAT_TYPE_KMC, 9, "KMC Encrypted-DEA"),
+-    FEAT_INIT("kmc-etdea-128", S390_FEAT_TYPE_KMC, 10, "KMC Encrypted-TD=
+EA-128"),
+-    FEAT_INIT("kmc-etdea-192", S390_FEAT_TYPE_KMC, 11, "KMC Encrypted-TD=
+EA-192"),
+-    FEAT_INIT("kmc-aes-128", S390_FEAT_TYPE_KMC, 18, "KMC AES-128"),
+-    FEAT_INIT("kmc-aes-192", S390_FEAT_TYPE_KMC, 19, "KMC AES-192"),
+-    FEAT_INIT("kmc-aes-256", S390_FEAT_TYPE_KMC, 20, "KMC AES-256"),
+-    FEAT_INIT("kmc-eaes-128", S390_FEAT_TYPE_KMC, 26, "KMC Encrypted-AES=
+-128"),
+-    FEAT_INIT("kmc-eaes-192", S390_FEAT_TYPE_KMC, 27, "KMC Encrypted-AES=
+-192"),
+-    FEAT_INIT("kmc-eaes-256", S390_FEAT_TYPE_KMC, 28, "KMC Encrypted-AES=
+-256"),
+-    FEAT_INIT("kmc-prng", S390_FEAT_TYPE_KMC, 67, "KMC PRNG"),
+-
+-    FEAT_INIT("km-dea", S390_FEAT_TYPE_KM, 1, "KM DEA"),
+-    FEAT_INIT("km-tdea-128", S390_FEAT_TYPE_KM, 2, "KM TDEA-128"),
+-    FEAT_INIT("km-tdea-192", S390_FEAT_TYPE_KM, 3, "KM TDEA-192"),
+-    FEAT_INIT("km-edea", S390_FEAT_TYPE_KM, 9, "KM Encrypted-DEA"),
+-    FEAT_INIT("km-etdea-128", S390_FEAT_TYPE_KM, 10, "KM Encrypted-TDEA-=
+128"),
+-    FEAT_INIT("km-etdea-192", S390_FEAT_TYPE_KM, 11, "KM Encrypted-TDEA-=
+192"),
+-    FEAT_INIT("km-aes-128", S390_FEAT_TYPE_KM, 18, "KM AES-128"),
+-    FEAT_INIT("km-aes-192", S390_FEAT_TYPE_KM, 19, "KM AES-192"),
+-    FEAT_INIT("km-aes-256", S390_FEAT_TYPE_KM, 20, "KM AES-256"),
+-    FEAT_INIT("km-eaes-128", S390_FEAT_TYPE_KM, 26, "KM Encrypted-AES-12=
+8"),
+-    FEAT_INIT("km-eaes-192", S390_FEAT_TYPE_KM, 27, "KM Encrypted-AES-19=
+2"),
+-    FEAT_INIT("km-eaes-256", S390_FEAT_TYPE_KM, 28, "KM Encrypted-AES-25=
+6"),
+-    FEAT_INIT("km-xts-aes-128", S390_FEAT_TYPE_KM, 50, "KM XTS-AES-128")=
+,
+-    FEAT_INIT("km-xts-aes-256", S390_FEAT_TYPE_KM, 52, "KM XTS-AES-256")=
+,
+-    FEAT_INIT("km-xts-eaes-128", S390_FEAT_TYPE_KM, 58, "KM XTS-Encrypte=
+d-AES-128"),
+-    FEAT_INIT("km-xts-eaes-256", S390_FEAT_TYPE_KM, 60, "KM XTS-Encrypte=
+d-AES-256"),
+-
+-    FEAT_INIT("kimd-sha-1", S390_FEAT_TYPE_KIMD, 1, "KIMD SHA-1"),
+-    FEAT_INIT("kimd-sha-256", S390_FEAT_TYPE_KIMD, 2, "KIMD SHA-256"),
+-    FEAT_INIT("kimd-sha-512", S390_FEAT_TYPE_KIMD, 3, "KIMD SHA-512"),
+-    FEAT_INIT("kimd-sha3-224", S390_FEAT_TYPE_KIMD, 32, "KIMD SHA3-224")=
+,
+-    FEAT_INIT("kimd-sha3-256", S390_FEAT_TYPE_KIMD, 33, "KIMD SHA3-256")=
+,
+-    FEAT_INIT("kimd-sha3-384", S390_FEAT_TYPE_KIMD, 34, "KIMD SHA3-384")=
+,
+-    FEAT_INIT("kimd-sha3-512", S390_FEAT_TYPE_KIMD, 35, "KIMD SHA3-512")=
+,
+-    FEAT_INIT("kimd-shake-128", S390_FEAT_TYPE_KIMD, 36, "KIMD SHAKE-128=
+"),
+-    FEAT_INIT("kimd-shake-256", S390_FEAT_TYPE_KIMD, 37, "KIMD SHAKE-256=
+"),
+-    FEAT_INIT("kimd-ghash", S390_FEAT_TYPE_KIMD, 65, "KIMD GHASH"),
+-
+-    FEAT_INIT("klmd-sha-1", S390_FEAT_TYPE_KLMD, 1, "KLMD SHA-1"),
+-    FEAT_INIT("klmd-sha-256", S390_FEAT_TYPE_KLMD, 2, "KLMD SHA-256"),
+-    FEAT_INIT("klmd-sha-512", S390_FEAT_TYPE_KLMD, 3, "KLMD SHA-512"),
+-    FEAT_INIT("klmd-sha3-224", S390_FEAT_TYPE_KLMD, 32, "KLMD SHA3-224")=
+,
+-    FEAT_INIT("klmd-sha3-256", S390_FEAT_TYPE_KLMD, 33, "KLMD SHA3-256")=
+,
+-    FEAT_INIT("klmd-sha3-384", S390_FEAT_TYPE_KLMD, 34, "KLMD SHA3-384")=
+,
+-    FEAT_INIT("klmd-sha3-512", S390_FEAT_TYPE_KLMD, 35, "KLMD SHA3-512")=
+,
+-    FEAT_INIT("klmd-shake-128", S390_FEAT_TYPE_KLMD, 36, "KLMD SHAKE-128=
+"),
+-    FEAT_INIT("klmd-shake-256", S390_FEAT_TYPE_KLMD, 37, "KLMD SHAKE-256=
+"),
+-
+-    FEAT_INIT("pckmo-edea", S390_FEAT_TYPE_PCKMO, 1, "PCKMO Encrypted-DE=
+A-Key"),
+-    FEAT_INIT("pckmo-etdea-128", S390_FEAT_TYPE_PCKMO, 2, "PCKMO Encrypt=
+ed-TDEA-128-Key"),
+-    FEAT_INIT("pckmo-etdea-192", S390_FEAT_TYPE_PCKMO, 3, "PCKMO Encrypt=
+ed-TDEA-192-Key"),
+-    FEAT_INIT("pckmo-aes-128", S390_FEAT_TYPE_PCKMO, 18, "PCKMO Encrypte=
+d-AES-128-Key"),
+-    FEAT_INIT("pckmo-aes-192", S390_FEAT_TYPE_PCKMO, 19, "PCKMO Encrypte=
+d-AES-192-Key"),
+-    FEAT_INIT("pckmo-aes-256", S390_FEAT_TYPE_PCKMO, 20, "PCKMO Encrypte=
+d-AES-256-Key"),
+-    FEAT_INIT("pckmo-ecc-p256", S390_FEAT_TYPE_PCKMO, 32, "PCKMO Encrypt=
+-ECC-P256-Key"),
+-    FEAT_INIT("pckmo-ecc-p384", S390_FEAT_TYPE_PCKMO, 33, "PCKMO Encrypt=
+-ECC-P384-Key"),
+-    FEAT_INIT("pckmo-ecc-p521", S390_FEAT_TYPE_PCKMO, 34, "PCKMO Encrypt=
+-ECC-P521-Key"),
+-    FEAT_INIT("pckmo-ecc-ed25519", S390_FEAT_TYPE_PCKMO, 40 , "PCKMO Enc=
+rypt-ECC-Ed25519-Key"),
+-    FEAT_INIT("pckmo-ecc-ed448", S390_FEAT_TYPE_PCKMO, 41 , "PCKMO Encry=
+pt-ECC-Ed448-Key"),
+-
+-    FEAT_INIT("kmctr-dea", S390_FEAT_TYPE_KMCTR, 1, "KMCTR DEA"),
+-    FEAT_INIT("kmctr-tdea-128", S390_FEAT_TYPE_KMCTR, 2, "KMCTR TDEA-128=
+"),
+-    FEAT_INIT("kmctr-tdea-192", S390_FEAT_TYPE_KMCTR, 3, "KMCTR TDEA-192=
+"),
+-    FEAT_INIT("kmctr-edea", S390_FEAT_TYPE_KMCTR, 9, "KMCTR Encrypted-DE=
+A"),
+-    FEAT_INIT("kmctr-etdea-128", S390_FEAT_TYPE_KMCTR, 10, "KMCTR Encryp=
+ted-TDEA-128"),
+-    FEAT_INIT("kmctr-etdea-192", S390_FEAT_TYPE_KMCTR, 11, "KMCTR Encryp=
+ted-TDEA-192"),
+-    FEAT_INIT("kmctr-aes-128", S390_FEAT_TYPE_KMCTR, 18, "KMCTR AES-128"=
+),
+-    FEAT_INIT("kmctr-aes-192", S390_FEAT_TYPE_KMCTR, 19, "KMCTR AES-192"=
+),
+-    FEAT_INIT("kmctr-aes-256", S390_FEAT_TYPE_KMCTR, 20, "KMCTR AES-256"=
+),
+-    FEAT_INIT("kmctr-eaes-128", S390_FEAT_TYPE_KMCTR, 26, "KMCTR Encrypt=
+ed-AES-128"),
+-    FEAT_INIT("kmctr-eaes-192", S390_FEAT_TYPE_KMCTR, 27, "KMCTR Encrypt=
+ed-AES-192"),
+-    FEAT_INIT("kmctr-eaes-256", S390_FEAT_TYPE_KMCTR, 28, "KMCTR Encrypt=
+ed-AES-256"),
+-
+-    FEAT_INIT("kmf-dea", S390_FEAT_TYPE_KMF, 1, "KMF DEA"),
+-    FEAT_INIT("kmf-tdea-128", S390_FEAT_TYPE_KMF, 2, "KMF TDEA-128"),
+-    FEAT_INIT("kmf-tdea-192", S390_FEAT_TYPE_KMF, 3, "KMF TDEA-192"),
+-    FEAT_INIT("kmf-edea", S390_FEAT_TYPE_KMF, 9, "KMF Encrypted-DEA"),
+-    FEAT_INIT("kmf-etdea-128", S390_FEAT_TYPE_KMF, 10, "KMF Encrypted-TD=
+EA-128"),
+-    FEAT_INIT("kmf-etdea-192", S390_FEAT_TYPE_KMF, 11, "KMF Encrypted-TD=
+EA-192"),
+-    FEAT_INIT("kmf-aes-128", S390_FEAT_TYPE_KMF, 18, "KMF AES-128"),
+-    FEAT_INIT("kmf-aes-192", S390_FEAT_TYPE_KMF, 19, "KMF AES-192"),
+-    FEAT_INIT("kmf-aes-256", S390_FEAT_TYPE_KMF, 20, "KMF AES-256"),
+-    FEAT_INIT("kmf-eaes-128", S390_FEAT_TYPE_KMF, 26, "KMF Encrypted-AES=
+-128"),
+-    FEAT_INIT("kmf-eaes-192", S390_FEAT_TYPE_KMF, 27, "KMF Encrypted-AES=
+-192"),
+-    FEAT_INIT("kmf-eaes-256", S390_FEAT_TYPE_KMF, 28, "KMF Encrypted-AES=
+-256"),
+-
+-    FEAT_INIT("kmo-dea", S390_FEAT_TYPE_KMO, 1, "KMO DEA"),
+-    FEAT_INIT("kmo-tdea-128", S390_FEAT_TYPE_KMO, 2, "KMO TDEA-128"),
+-    FEAT_INIT("kmo-tdea-192", S390_FEAT_TYPE_KMO, 3, "KMO TDEA-192"),
+-    FEAT_INIT("kmo-edea", S390_FEAT_TYPE_KMO, 9, "KMO Encrypted-DEA"),
+-    FEAT_INIT("kmo-etdea-128", S390_FEAT_TYPE_KMO, 10, "KMO Encrypted-TD=
+EA-128"),
+-    FEAT_INIT("kmo-etdea-192", S390_FEAT_TYPE_KMO, 11, "KMO Encrypted-TD=
+EA-192"),
+-    FEAT_INIT("kmo-aes-128", S390_FEAT_TYPE_KMO, 18, "KMO AES-128"),
+-    FEAT_INIT("kmo-aes-192", S390_FEAT_TYPE_KMO, 19, "KMO AES-192"),
+-    FEAT_INIT("kmo-aes-256", S390_FEAT_TYPE_KMO, 20, "KMO AES-256"),
+-    FEAT_INIT("kmo-eaes-128", S390_FEAT_TYPE_KMO, 26, "KMO Encrypted-AES=
+-128"),
+-    FEAT_INIT("kmo-eaes-192", S390_FEAT_TYPE_KMO, 27, "KMO Encrypted-AES=
+-192"),
+-    FEAT_INIT("kmo-eaes-256", S390_FEAT_TYPE_KMO, 28, "KMO Encrypted-AES=
+-256"),
+-
+-    FEAT_INIT("pcc-cmac-dea", S390_FEAT_TYPE_PCC, 1, "PCC Compute-Last-B=
+lock-CMAC-Using-DEA"),
+-    FEAT_INIT("pcc-cmac-tdea-128", S390_FEAT_TYPE_PCC, 2, "PCC Compute-L=
+ast-Block-CMAC-Using-TDEA-128"),
+-    FEAT_INIT("pcc-cmac-tdea-192", S390_FEAT_TYPE_PCC, 3, "PCC Compute-L=
+ast-Block-CMAC-Using-TDEA-192"),
+-    FEAT_INIT("pcc-cmac-edea", S390_FEAT_TYPE_PCC, 9, "PCC Compute-Last-=
+Block-CMAC-Using-Encrypted-DEA"),
+-    FEAT_INIT("pcc-cmac-etdea-128", S390_FEAT_TYPE_PCC, 10, "PCC Compute=
+-Last-Block-CMAC-Using-Encrypted-TDEA-128"),
+-    FEAT_INIT("pcc-cmac-etdea-192", S390_FEAT_TYPE_PCC, 11, "PCC Compute=
+-Last-Block-CMAC-Using-EncryptedTDEA-192"),
+-    FEAT_INIT("pcc-cmac-aes-128", S390_FEAT_TYPE_PCC, 18, "PCC Compute-L=
+ast-Block-CMAC-Using-AES-128"),
+-    FEAT_INIT("pcc-cmac-aes-192", S390_FEAT_TYPE_PCC, 19, "PCC Compute-L=
+ast-Block-CMAC-Using-AES-192"),
+-    FEAT_INIT("pcc-cmac-eaes-256", S390_FEAT_TYPE_PCC, 20, "PCC Compute-=
+Last-Block-CMAC-Using-AES-256"),
+-    FEAT_INIT("pcc-cmac-eaes-128", S390_FEAT_TYPE_PCC, 26, "PCC Compute-=
+Last-Block-CMAC-Using-Encrypted-AES-128"),
+-    FEAT_INIT("pcc-cmac-eaes-192", S390_FEAT_TYPE_PCC, 27, "PCC Compute-=
+Last-Block-CMAC-Using-Encrypted-AES-192"),
+-    FEAT_INIT("pcc-cmac-eaes-256", S390_FEAT_TYPE_PCC, 28, "PCC Compute-=
+Last-Block-CMAC-Using-Encrypted-AES-256"),
+-    FEAT_INIT("pcc-xts-aes-128", S390_FEAT_TYPE_PCC, 50, "PCC Compute-XT=
+S-Parameter-Using-AES-128"),
+-    FEAT_INIT("pcc-xts-aes-256", S390_FEAT_TYPE_PCC, 52, "PCC Compute-XT=
+S-Parameter-Using-AES-256"),
+-    FEAT_INIT("pcc-xts-eaes-128", S390_FEAT_TYPE_PCC, 58, "PCC Compute-X=
+TS-Parameter-Using-Encrypted-AES-128"),
+-    FEAT_INIT("pcc-xts-eaes-256", S390_FEAT_TYPE_PCC, 60, "PCC Compute-X=
+TS-Parameter-Using-Encrypted-AES-256"),
+-    FEAT_INIT("pcc-scalar-mult-p256", S390_FEAT_TYPE_PCC, 64, "PCC Scala=
+r-Multiply-P256"),
+-    FEAT_INIT("pcc-scalar-mult-p384", S390_FEAT_TYPE_PCC, 65, "PCC Scala=
+r-Multiply-P384"),
+-    FEAT_INIT("pcc-scalar-mult-p521", S390_FEAT_TYPE_PCC, 66, "PCC Scala=
+r-Multiply-P521"),
+-    FEAT_INIT("pcc-scalar-mult-ed25519", S390_FEAT_TYPE_PCC, 72, "PCC Sc=
+alar-Multiply-Ed25519"),
+-    FEAT_INIT("pcc-scalar-mult-ed448", S390_FEAT_TYPE_PCC, 73, "PCC Scal=
+ar-Multiply-Ed448"),
+-    FEAT_INIT("pcc-scalar-mult-x25519", S390_FEAT_TYPE_PCC, 80, "PCC Sca=
+lar-Multiply-X25519"),
+-    FEAT_INIT("pcc-scalar-mult-x448", S390_FEAT_TYPE_PCC, 81, "PCC Scala=
+r-Multiply-X448"),
+-
+-    FEAT_INIT("ppno-sha-512-drng", S390_FEAT_TYPE_PPNO, 3, "PPNO SHA-512=
+-DRNG"),
+-    FEAT_INIT("prno-trng-qrtcr", S390_FEAT_TYPE_PPNO, 112, "PRNO TRNG-Qu=
+ery-Raw-to-Conditioned-Ratio"),
+-    FEAT_INIT("prno-trng", S390_FEAT_TYPE_PPNO, 114, "PRNO TRNG"),
+-
+-    FEAT_INIT("kma-gcm-aes-128", S390_FEAT_TYPE_KMA, 18, "KMA GCM-AES-12=
+8"),
+-    FEAT_INIT("kma-gcm-aes-192", S390_FEAT_TYPE_KMA, 19, "KMA GCM-AES-19=
+2"),
+-    FEAT_INIT("kma-gcm-aes-256", S390_FEAT_TYPE_KMA, 20, "KMA GCM-AES-25=
+6"),
+-    FEAT_INIT("kma-gcm-eaes-128", S390_FEAT_TYPE_KMA, 26, "KMA GCM-Encry=
+pted-AES-128"),
+-    FEAT_INIT("kma-gcm-eaes-192", S390_FEAT_TYPE_KMA, 27, "KMA GCM-Encry=
+pted-AES-192"),
+-    FEAT_INIT("kma-gcm-eaes-256", S390_FEAT_TYPE_KMA, 28, "KMA GCM-Encry=
+pted-AES-256"),
+-
+-    FEAT_INIT("kdsa-ecdsa-verify-p256", S390_FEAT_TYPE_KDSA, 1, "KDSA EC=
+DSA-Verify-P256"),
+-    FEAT_INIT("kdsa-ecdsa-verify-p384", S390_FEAT_TYPE_KDSA, 2, "KDSA EC=
+DSA-Verify-P384"),
+-    FEAT_INIT("kdsa-ecdsa-verify-p521", S390_FEAT_TYPE_KDSA, 3, "KDSA EC=
+DSA-Verify-P521"),
+-    FEAT_INIT("kdsa-ecdsa-sign-p256", S390_FEAT_TYPE_KDSA, 9, "KDSA ECDS=
+A-Sign-P256"),
+-    FEAT_INIT("kdsa-ecdsa-sign-p384", S390_FEAT_TYPE_KDSA, 10, "KDSA ECD=
+SA-Sign-P384"),
+-    FEAT_INIT("kdsa-ecdsa-sign-p521", S390_FEAT_TYPE_KDSA, 11, "KDSA ECD=
+SA-Sign-P521"),
+-    FEAT_INIT("kdsa-eecdsa-sign-p256", S390_FEAT_TYPE_KDSA, 17, "KDSA En=
+crypted-ECDSA-Sign-P256"),
+-    FEAT_INIT("kdsa-eecdsa-sign-p384", S390_FEAT_TYPE_KDSA, 18, "KDSA En=
+crypted-ECDSA-Sign-P384"),
+-    FEAT_INIT("kdsa-eecdsa-sign-p521", S390_FEAT_TYPE_KDSA, 19, "KDSA En=
+crypted-ECDSA-Sign-P521"),
+-    FEAT_INIT("kdsa-eddsa-verify-ed25519", S390_FEAT_TYPE_KDSA, 32, "KDS=
+A EdDSA-Verify-Ed25519"),
+-    FEAT_INIT("kdsa-eddsa-verify-ed448", S390_FEAT_TYPE_KDSA, 36, "KDSA =
+EdDSA-Verify-Ed448"),
+-    FEAT_INIT("kdsa-eddsa-sign-ed25519", S390_FEAT_TYPE_KDSA, 40, "KDSA =
+EdDSA-Sign-Ed25519"),
+-    FEAT_INIT("kdsa-eddsa-sign-ed448", S390_FEAT_TYPE_KDSA, 44, "KDSA Ed=
+DSA-Sign-Ed448"),
+-    FEAT_INIT("kdsa-eeddsa-sign-ed25519", S390_FEAT_TYPE_KDSA, 48, "KDSA=
+ Encrypted-EdDSA-Sign-Ed25519"),
+-    FEAT_INIT("kdsa-eeddsa-sign-ed448", S390_FEAT_TYPE_KDSA, 52, "KDSA E=
+ncrypted-EdDSA-Sign-Ed448"),
+-
+-    FEAT_INIT("sortl-sflr", S390_FEAT_TYPE_SORTL, 1, "SORTL SFLR"),
+-    FEAT_INIT("sortl-svlr", S390_FEAT_TYPE_SORTL, 2, "SORTL SVLR"),
+-    FEAT_INIT("sortl-32", S390_FEAT_TYPE_SORTL, 130, "SORTL 32 input lis=
+ts"),
+-    FEAT_INIT("sortl-128", S390_FEAT_TYPE_SORTL, 132, "SORTL 128 input l=
+ists"),
+-    FEAT_INIT("sortl-f0", S390_FEAT_TYPE_SORTL, 192, "SORTL format 0 par=
+ameter-block"),
+-
+-    FEAT_INIT("dfltcc-gdht", S390_FEAT_TYPE_DFLTCC, 1, "DFLTCC GDHT"),
+-    FEAT_INIT("dfltcc-cmpr", S390_FEAT_TYPE_DFLTCC, 2, "DFLTCC CMPR"),
+-    FEAT_INIT("dfltcc-xpnd", S390_FEAT_TYPE_DFLTCC, 4, "DFLTCC XPND"),
+-    FEAT_INIT("dfltcc-f0", S390_FEAT_TYPE_DFLTCC, 192, "DFLTCC format 0 =
+parameter-block"),
++#define DEF_FEAT(_FEAT, _NAME, _TYPE, _BIT, _DESC) \
++    [S390_FEAT_##_FEAT] =3D {                        \
++        .name =3D _NAME,                             \
++        .type =3D S390_FEAT_TYPE_##_TYPE,            \
++        .bit =3D _BIT,                               \
++        .desc =3D _DESC,                             \
++    },
++static const S390FeatDef s390_features[S390_FEAT_MAX] =3D {
++    #include "cpu_features_def.inc.h"
+ };
++#undef DEF_FEAT
+=20
+ const S390FeatDef *s390_feat_def(S390Feat feat)
+ {
+diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_=
+def.h
+index 292b17b35d..412d356feb 100644
+--- a/target/s390x/cpu_features_def.h
++++ b/target/s390x/cpu_features_def.h
+@@ -2,9 +2,10 @@
+  * CPU features/facilities for s390
+  *
+  * Copyright IBM Corp. 2016, 2018
++ * Copyright Red Hat, Inc. 2019
+  *
+  * Author(s): Michael Mueller <mimu@linux.vnet.ibm.com>
+- *            David Hildenbrand <dahi@linux.vnet.ibm.com>
++ *            David Hildenbrand <david@redhat.com>
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2 or (a=
+t
+  * your option) any later version. See the COPYING file in the top-level
+@@ -14,354 +15,11 @@
+ #ifndef TARGET_S390X_CPU_FEATURES_DEF_H
+ #define TARGET_S390X_CPU_FEATURES_DEF_H
+=20
++#define DEF_FEAT(_FEAT, ...) S390_FEAT_##_FEAT,
+ typedef enum {
+-    /* Stfle */
+-    S390_FEAT_ESAN3 =3D 0,
+-    S390_FEAT_ZARCH,
+-    S390_FEAT_DAT_ENH,
+-    S390_FEAT_IDTE_SEGMENT,
+-    S390_FEAT_IDTE_REGION,
+-    S390_FEAT_ASN_LX_REUSE,
+-    S390_FEAT_STFLE,
+-    S390_FEAT_EDAT,
+-    S390_FEAT_SENSE_RUNNING_STATUS,
+-    S390_FEAT_CONDITIONAL_SSKE,
+-    S390_FEAT_CONFIGURATION_TOPOLOGY,
+-    S390_FEAT_AP_QUERY_CONFIG_INFO,
+-    S390_FEAT_IPTE_RANGE,
+-    S390_FEAT_NONQ_KEY_SETTING,
+-    S390_FEAT_AP_FACILITIES_TEST,
+-    S390_FEAT_EXTENDED_TRANSLATION_2,
+-    S390_FEAT_MSA,
+-    S390_FEAT_LONG_DISPLACEMENT,
+-    S390_FEAT_LONG_DISPLACEMENT_FAST,
+-    S390_FEAT_HFP_MADDSUB,
+-    S390_FEAT_EXTENDED_IMMEDIATE,
+-    S390_FEAT_EXTENDED_TRANSLATION_3,
+-    S390_FEAT_HFP_UNNORMALIZED_EXT,
+-    S390_FEAT_ETF2_ENH,
+-    S390_FEAT_STORE_CLOCK_FAST,
+-    S390_FEAT_PARSING_ENH,
+-    S390_FEAT_MOVE_WITH_OPTIONAL_SPEC,
+-    S390_FEAT_TOD_CLOCK_STEERING,
+-    S390_FEAT_ETF3_ENH,
+-    S390_FEAT_EXTRACT_CPU_TIME,
+-    S390_FEAT_COMPARE_AND_SWAP_AND_STORE,
+-    S390_FEAT_COMPARE_AND_SWAP_AND_STORE_2,
+-    S390_FEAT_GENERAL_INSTRUCTIONS_EXT,
+-    S390_FEAT_EXECUTE_EXT,
+-    S390_FEAT_ENHANCED_MONITOR,
+-    S390_FEAT_FLOATING_POINT_EXT,
+-    S390_FEAT_ORDER_PRESERVING_COMPRESSION,
+-    S390_FEAT_SET_PROGRAM_PARAMETERS,
+-    S390_FEAT_FLOATING_POINT_SUPPPORT_ENH,
+-    S390_FEAT_DFP,
+-    S390_FEAT_DFP_FAST,
+-    S390_FEAT_PFPO,
+-    S390_FEAT_STFLE_45,
+-    S390_FEAT_CMPSC_ENH,
+-    S390_FEAT_DFP_ZONED_CONVERSION,
+-    S390_FEAT_STFLE_49,
+-    S390_FEAT_CONSTRAINT_TRANSACTIONAL_EXE,
+-    S390_FEAT_LOCAL_TLB_CLEARING,
+-    S390_FEAT_INTERLOCKED_ACCESS_2,
+-    S390_FEAT_STFLE_53,
+-    S390_FEAT_ENTROPY_ENC_COMP,
+-    S390_FEAT_MSA_EXT_5,
+-    S390_FEAT_MISC_INSTRUCTION_EXT,
+-    S390_FEAT_SEMAPHORE_ASSIST,
+-    S390_FEAT_TIME_SLICE_INSTRUMENTATION,
+-    S390_FEAT_MISC_INSTRUCTION_EXT3,
+-    S390_FEAT_RUNTIME_INSTRUMENTATION,
+-    S390_FEAT_ZPCI,
+-    S390_FEAT_ADAPTER_EVENT_NOTIFICATION,
+-    S390_FEAT_ADAPTER_INT_SUPPRESSION,
+-    S390_FEAT_TRANSACTIONAL_EXE,
+-    S390_FEAT_STORE_HYPERVISOR_INFO,
+-    S390_FEAT_ACCESS_EXCEPTION_FS_INDICATION,
+-    S390_FEAT_MSA_EXT_3,
+-    S390_FEAT_MSA_EXT_4,
+-    S390_FEAT_EDAT_2,
+-    S390_FEAT_DFP_PACKED_CONVERSION,
+-    S390_FEAT_PPA15,
+-    S390_FEAT_BPB,
+-    S390_FEAT_VECTOR,
+-    S390_FEAT_INSTRUCTION_EXEC_PROT,
+-    S390_FEAT_SIDE_EFFECT_ACCESS_ESOP2,
+-    S390_FEAT_GUARDED_STORAGE,
+-    S390_FEAT_VECTOR_PACKED_DECIMAL,
+-    S390_FEAT_VECTOR_ENH,
+-    S390_FEAT_MULTIPLE_EPOCH,
+-    S390_FEAT_TEST_PENDING_EXT_INTERRUPTION,
+-    S390_FEAT_INSERT_REFERENCE_BITS_MULT,
+-    S390_FEAT_MSA_EXT_8,
+-    S390_FEAT_CMM_NT,
+-    S390_FEAT_VECTOR_ENH2,
+-    S390_FEAT_ESORT_BASE,
+-    S390_FEAT_DEFLATE_BASE,
+-    S390_FEAT_VECTOR_BCD_ENH,
+-    S390_FEAT_MSA_EXT_9,
+-    S390_FEAT_ETOKEN,
+-
+-    /* Sclp Conf Char */
+-    S390_FEAT_SIE_GSLS,
+-    S390_FEAT_ESOP,
+-    S390_FEAT_HPMA2,
+-    S390_FEAT_SIE_KSS,
+-
+-    /* Sclp Conf Char Ext */
+-    S390_FEAT_SIE_64BSCAO,
+-    S390_FEAT_SIE_CMMA,
+-    S390_FEAT_SIE_PFMFI,
+-    S390_FEAT_SIE_IBS,
+-
+-    /* Sclp Cpu */
+-    S390_FEAT_SIE_F2,
+-    S390_FEAT_SIE_SKEY,
+-    S390_FEAT_SIE_GPERE,
+-    S390_FEAT_SIE_SIIF,
+-    S390_FEAT_SIE_SIGPIF,
+-    S390_FEAT_SIE_IB,
+-    S390_FEAT_SIE_CEI,
+-
+-    /* Misc */
+-    S390_FEAT_DAT_ENH_2,
+-    S390_FEAT_CMM,
+-    S390_FEAT_AP,
+-
+-    /* PLO */
+-    S390_FEAT_PLO_CL,
+-    S390_FEAT_PLO_CLG,
+-    S390_FEAT_PLO_CLGR,
+-    S390_FEAT_PLO_CLX,
+-    S390_FEAT_PLO_CS,
+-    S390_FEAT_PLO_CSG,
+-    S390_FEAT_PLO_CSGR,
+-    S390_FEAT_PLO_CSX,
+-    S390_FEAT_PLO_DCS,
+-    S390_FEAT_PLO_DCSG,
+-    S390_FEAT_PLO_DCSGR,
+-    S390_FEAT_PLO_DCSX,
+-    S390_FEAT_PLO_CSST,
+-    S390_FEAT_PLO_CSSTG,
+-    S390_FEAT_PLO_CSSTGR,
+-    S390_FEAT_PLO_CSSTX,
+-    S390_FEAT_PLO_CSDST,
+-    S390_FEAT_PLO_CSDSTG,
+-    S390_FEAT_PLO_CSDSTGR,
+-    S390_FEAT_PLO_CSDSTX,
+-    S390_FEAT_PLO_CSTST,
+-    S390_FEAT_PLO_CSTSTG,
+-    S390_FEAT_PLO_CSTSTGR,
+-    S390_FEAT_PLO_CSTSTX,
+-
+-    /* PTFF */
+-    S390_FEAT_PTFF_QTO,
+-    S390_FEAT_PTFF_QSI,
+-    S390_FEAT_PTFF_QPT,
+-    S390_FEAT_PTFF_QUI,
+-    S390_FEAT_PTFF_QTOU,
+-    S390_FEAT_PTFF_QSIE,
+-    S390_FEAT_PTFF_QTOUE,
+-    S390_FEAT_PTFF_STO,
+-    S390_FEAT_PTFF_STOU,
+-    S390_FEAT_PTFF_STOE,
+-    S390_FEAT_PTFF_STOUE,
+-
+-    /* KMAC */
+-    S390_FEAT_KMAC_DEA,
+-    S390_FEAT_KMAC_TDEA_128,
+-    S390_FEAT_KMAC_TDEA_192,
+-    S390_FEAT_KMAC_EDEA,
+-    S390_FEAT_KMAC_ETDEA_128,
+-    S390_FEAT_KMAC_ETDEA_192,
+-    S390_FEAT_KMAC_AES_128,
+-    S390_FEAT_KMAC_AES_192,
+-    S390_FEAT_KMAC_AES_256,
+-    S390_FEAT_KMAC_EAES_128,
+-    S390_FEAT_KMAC_EAES_192,
+-    S390_FEAT_KMAC_EAES_256,
+-
+-    /* KMC */
+-    S390_FEAT_KMC_DEA,
+-    S390_FEAT_KMC_TDEA_128,
+-    S390_FEAT_KMC_TDEA_192,
+-    S390_FEAT_KMC_EDEA,
+-    S390_FEAT_KMC_ETDEA_128,
+-    S390_FEAT_KMC_ETDEA_192,
+-    S390_FEAT_KMC_AES_128,
+-    S390_FEAT_KMC_AES_192,
+-    S390_FEAT_KMC_AES_256,
+-    S390_FEAT_KMC_EAES_128,
+-    S390_FEAT_KMC_EAES_192,
+-    S390_FEAT_KMC_EAES_256,
+-    S390_FEAT_KMC_PRNG,
+-
+-    /* KM */
+-    S390_FEAT_KM_DEA,
+-    S390_FEAT_KM_TDEA_128,
+-    S390_FEAT_KM_TDEA_192,
+-    S390_FEAT_KM_EDEA,
+-    S390_FEAT_KM_ETDEA_128,
+-    S390_FEAT_KM_ETDEA_192,
+-    S390_FEAT_KM_AES_128,
+-    S390_FEAT_KM_AES_192,
+-    S390_FEAT_KM_AES_256,
+-    S390_FEAT_KM_EAES_128,
+-    S390_FEAT_KM_EAES_192,
+-    S390_FEAT_KM_EAES_256,
+-    S390_FEAT_KM_XTS_AES_128,
+-    S390_FEAT_KM_XTS_AES_256,
+-    S390_FEAT_KM_XTS_EAES_128,
+-    S390_FEAT_KM_XTS_EAES_256,
+-
+-    /* KIMD */
+-    S390_FEAT_KIMD_SHA_1,
+-    S390_FEAT_KIMD_SHA_256,
+-    S390_FEAT_KIMD_SHA_512,
+-    S390_FEAT_KIMD_SHA3_224,
+-    S390_FEAT_KIMD_SHA3_256,
+-    S390_FEAT_KIMD_SHA3_384,
+-    S390_FEAT_KIMD_SHA3_512,
+-    S390_FEAT_KIMD_SHAKE_128,
+-    S390_FEAT_KIMD_SHAKE_256,
+-    S390_FEAT_KIMD_GHASH,
+-
+-    /* KLMD */
+-    S390_FEAT_KLMD_SHA_1,
+-    S390_FEAT_KLMD_SHA_256,
+-    S390_FEAT_KLMD_SHA_512,
+-    S390_FEAT_KLMD_SHA3_224,
+-    S390_FEAT_KLMD_SHA3_256,
+-    S390_FEAT_KLMD_SHA3_384,
+-    S390_FEAT_KLMD_SHA3_512,
+-    S390_FEAT_KLMD_SHAKE_128,
+-    S390_FEAT_KLMD_SHAKE_256,
+-
+-    /* PCKMO */
+-    S390_FEAT_PCKMO_EDEA,
+-    S390_FEAT_PCKMO_ETDEA_128,
+-    S390_FEAT_PCKMO_ETDEA_256,
+-    S390_FEAT_PCKMO_AES_128,
+-    S390_FEAT_PCKMO_AES_192,
+-    S390_FEAT_PCKMO_AES_256,
+-    S390_FEAT_PCKMO_ECC_P256,
+-    S390_FEAT_PCKMO_ECC_P384,
+-    S390_FEAT_PCKMO_ECC_P521,
+-    S390_FEAT_PCKMO_ECC_ED25519,
+-    S390_FEAT_PCKMO_ECC_ED448,
+-
+-    /* KMCTR */
+-    S390_FEAT_KMCTR_DEA,
+-    S390_FEAT_KMCTR_TDEA_128,
+-    S390_FEAT_KMCTR_TDEA_192,
+-    S390_FEAT_KMCTR_EDEA,
+-    S390_FEAT_KMCTR_ETDEA_128,
+-    S390_FEAT_KMCTR_ETDEA_192,
+-    S390_FEAT_KMCTR_AES_128,
+-    S390_FEAT_KMCTR_AES_192,
+-    S390_FEAT_KMCTR_AES_256,
+-    S390_FEAT_KMCTR_EAES_128,
+-    S390_FEAT_KMCTR_EAES_192,
+-    S390_FEAT_KMCTR_EAES_256,
+-
+-    /* KMF */
+-    S390_FEAT_KMF_DEA,
+-    S390_FEAT_KMF_TDEA_128,
+-    S390_FEAT_KMF_TDEA_192,
+-    S390_FEAT_KMF_EDEA,
+-    S390_FEAT_KMF_ETDEA_128,
+-    S390_FEAT_KMF_ETDEA_192,
+-    S390_FEAT_KMF_AES_128,
+-    S390_FEAT_KMF_AES_192,
+-    S390_FEAT_KMF_AES_256,
+-    S390_FEAT_KMF_EAES_128,
+-    S390_FEAT_KMF_EAES_192,
+-    S390_FEAT_KMF_EAES_256,
+-
+-    /* KMO */
+-    S390_FEAT_KMO_DEA,
+-    S390_FEAT_KMO_TDEA_128,
+-    S390_FEAT_KMO_TDEA_192,
+-    S390_FEAT_KMO_EDEA,
+-    S390_FEAT_KMO_ETDEA_128,
+-    S390_FEAT_KMO_ETDEA_192,
+-    S390_FEAT_KMO_AES_128,
+-    S390_FEAT_KMO_AES_192,
+-    S390_FEAT_KMO_AES_256,
+-    S390_FEAT_KMO_EAES_128,
+-    S390_FEAT_KMO_EAES_192,
+-    S390_FEAT_KMO_EAES_256,
+-
+-    /* PCC */
+-    S390_FEAT_PCC_CMAC_DEA,
+-    S390_FEAT_PCC_CMAC_TDEA_128,
+-    S390_FEAT_PCC_CMAC_TDEA_192,
+-    S390_FEAT_PCC_CMAC_ETDEA_128,
+-    S390_FEAT_PCC_CMAC_ETDEA_192,
+-    S390_FEAT_PCC_CMAC_TDEA,
+-    S390_FEAT_PCC_CMAC_AES_128,
+-    S390_FEAT_PCC_CMAC_AES_192,
+-    S390_FEAT_PCC_CMAC_AES_256,
+-    S390_FEAT_PCC_CMAC_EAES_128,
+-    S390_FEAT_PCC_CMAC_EAES_192,
+-    S390_FEAT_PCC_CMAC_EAES_256,
+-    S390_FEAT_PCC_XTS_AES_128,
+-    S390_FEAT_PCC_XTS_AES_256,
+-    S390_FEAT_PCC_XTS_EAES_128,
+-    S390_FEAT_PCC_XTS_EAES_256,
+-    S390_FEAT_PCC_SCALAR_MULT_P256,
+-    S390_FEAT_PCC_SCALAR_MULT_P384,
+-    S390_FEAT_PCC_SCALAR_MULT_P512,
+-    S390_FEAT_PCC_SCALAR_MULT_ED25519,
+-    S390_FEAT_PCC_SCALAR_MULT_ED448,
+-    S390_FEAT_PCC_SCALAR_MULT_X25519,
+-    S390_FEAT_PCC_SCALAR_MULT_X448,
+-
+-    /* PPNO/PRNO */
+-    S390_FEAT_PPNO_SHA_512_DRNG,
+-    S390_FEAT_PRNO_TRNG_QRTCR,
+-    S390_FEAT_PRNO_TRNG,
+-
+-    /* KMA */
+-    S390_FEAT_KMA_GCM_AES_128,
+-    S390_FEAT_KMA_GCM_AES_192,
+-    S390_FEAT_KMA_GCM_AES_256 ,
+-    S390_FEAT_KMA_GCM_EAES_128,
+-    S390_FEAT_KMA_GCM_EAES_192,
+-    S390_FEAT_KMA_GCM_EAES_256,
+-
+-    /* KDSA */
+-    S390_FEAT_ECDSA_VERIFY_P256,
+-    S390_FEAT_ECDSA_VERIFY_P384,
+-    S390_FEAT_ECDSA_VERIFY_P512,
+-    S390_FEAT_ECDSA_SIGN_P256,
+-    S390_FEAT_ECDSA_SIGN_P384,
+-    S390_FEAT_ECDSA_SIGN_P512,
+-    S390_FEAT_EECDSA_SIGN_P256,
+-    S390_FEAT_EECDSA_SIGN_P384,
+-    S390_FEAT_EECDSA_SIGN_P512,
+-    S390_FEAT_EDDSA_VERIFY_ED25519,
+-    S390_FEAT_EDDSA_VERIFY_ED448,
+-    S390_FEAT_EDDSA_SIGN_ED25519,
+-    S390_FEAT_EDDSA_SIGN_ED448,
+-    S390_FEAT_EEDDSA_SIGN_ED25519,
+-    S390_FEAT_EEDDSA_SIGN_ED448,
+-
+-    /* SORTL */
+-    S390_FEAT_SORTL_SFLR,
+-    S390_FEAT_SORTL_SVLR,
+-    S390_FEAT_SORTL_32,
+-    S390_FEAT_SORTL_128,
+-    S390_FEAT_SORTL_F0,
+-
+-    /* DEFLATE */
+-    S390_FEAT_DEFLATE_GHDT,
+-    S390_FEAT_DEFLATE_CMPR,
+-    S390_FEAT_DEFLATE_XPND,
+-    S390_FEAT_DEFLATE_F0,
+-
++    #include "cpu_features_def.inc.h"
+     S390_FEAT_MAX,
+ } S390Feat;
++#undef DEF_FEAT
+=20
+ #endif /* TARGET_S390X_CPU_FEATURES_DEF_H */
+diff --git a/target/s390x/cpu_features_def.inc.h b/target/s390x/cpu_featu=
+res_def.inc.h
+new file mode 100644
+index 0000000000..5dffff65fa
+--- /dev/null
++++ b/target/s390x/cpu_features_def.inc.h
+@@ -0,0 +1,369 @@
++/*
++ * RAW s390x CPU feature definitions:
++ *
++ * DEF_FEAT(_FEAT, _NAME, _TYPE, _BIT, _DESC):
++ * - _FEAT: Feature (enum) name used internally (S390_FEAT_##_FEAT)
++ * - _NAME: Feature name exposed to the user.
++ * - _TYPE: Feature type (S390_FEAT_TYPE_##_TYPE).
++ * - _BIT: Feature bit number within feature type block (unused for MISC=
+).
++ * - _DESC: Feature description, exposed to the user.
++ *
++ * Copyright IBM Corp. 2016, 2018
++ * Copyright Red Hat, Inc. 2019
++ *
++ * Author(s): Michael Mueller <mimu@linux.vnet.ibm.com>
++ *            David Hildenbrand <david@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or (a=
+t
++ * your option) any later version. See the COPYING file in the top-level
++ * directory.
++ */
 +
++/* Features exposed via the STFL(E) instruction. */
++DEF_FEAT(ESAN3, "esan3", STFL, 0, "Instructions marked as n3")
++DEF_FEAT(ZARCH, "zarch", STFL, 1, "z/Architecture architectural mode")
++DEF_FEAT(DAT_ENH, "dateh", STFL, 3, "DAT-enhancement facility")
++DEF_FEAT(IDTE_SEGMENT, "idtes", STFL, 4, "IDTE selective TLB segment-tab=
+le clearing")
++DEF_FEAT(IDTE_REGION, "idter", STFL, 5, "IDTE selective TLB region-table=
+ clearing")
++DEF_FEAT(ASN_LX_REUSE, "asnlxr", STFL, 6, "ASN-and-LX reuse facility")
++DEF_FEAT(STFLE, "stfle", STFL, 7, "Store-facility-list-extended facility=
+")
++DEF_FEAT(EDAT, "edat", STFL, 8, "Enhanced-DAT facility")
++DEF_FEAT(SENSE_RUNNING_STATUS, "srs", STFL, 9, "Sense-running-status fac=
+ility")
++DEF_FEAT(CONDITIONAL_SSKE, "csske", STFL, 10, "Conditional-SSKE facility=
+")
++DEF_FEAT(CONFIGURATION_TOPOLOGY, "ctop", STFL, 11, "Configuration-topolo=
+gy facility")
++DEF_FEAT(AP_QUERY_CONFIG_INFO, "apqci", STFL, 12, "Query AP Configuratio=
+n Information facility")
++DEF_FEAT(IPTE_RANGE, "ipter", STFL, 13, "IPTE-range facility")
++DEF_FEAT(NONQ_KEY_SETTING, "nonqks", STFL, 14, "Nonquiescing key-setting=
+ facility")
++DEF_FEAT(AP_FACILITIES_TEST, "apft", STFL, 15, "AP Facilities Test facil=
+ity")
++DEF_FEAT(EXTENDED_TRANSLATION_2, "etf2", STFL, 16, "Extended-translation=
+ facility 2")
++DEF_FEAT(MSA, "msa-base", STFL, 17, "Message-security-assist facility (e=
+xcluding subfunctions)")
++DEF_FEAT(LONG_DISPLACEMENT, "ldisp", STFL, 18, "Long-displacement facili=
+ty")
++DEF_FEAT(LONG_DISPLACEMENT_FAST, "ldisphp", STFL, 19, "Long-displacement=
+ facility has high performance")
++DEF_FEAT(HFP_MADDSUB, "hfpm", STFL, 20, "HFP-multiply-add/subtract facil=
+ity")
++DEF_FEAT(EXTENDED_IMMEDIATE, "eimm", STFL, 21, "Extended-immediate facil=
+ity")
++DEF_FEAT(EXTENDED_TRANSLATION_3, "etf3", STFL, 22, "Extended-translation=
+ facility 3")
++DEF_FEAT(HFP_UNNORMALIZED_EXT, "hfpue", STFL, 23, "HFP-unnormalized-exte=
+nsion facility")
++DEF_FEAT(ETF2_ENH, "etf2eh", STFL, 24, "ETF2-enhancement facility")
++DEF_FEAT(STORE_CLOCK_FAST, "stckf", STFL, 25, "Store-clock-fast facility=
+")
++DEF_FEAT(PARSING_ENH, "parseh", STFL, 26, "Parsing-enhancement facility"=
+)
++DEF_FEAT(MOVE_WITH_OPTIONAL_SPEC, "mvcos", STFL, 27, "Move-with-optional=
+-specification facility")
++DEF_FEAT(TOD_CLOCK_STEERING, "tods-base", STFL, 28, "TOD-clock-steering =
+facility (excluding subfunctions)")
++DEF_FEAT(ETF3_ENH, "etf3eh", STFL, 30, "ETF3-enhancement facility")
++DEF_FEAT(EXTRACT_CPU_TIME, "ectg", STFL, 31, "Extract-CPU-time facility"=
+)
++DEF_FEAT(COMPARE_AND_SWAP_AND_STORE, "csst", STFL, 32, "Compare-and-swap=
+-and-store facility")
++DEF_FEAT(COMPARE_AND_SWAP_AND_STORE_2, "csst2", STFL, 33, "Compare-and-s=
+wap-and-store facility 2")
++DEF_FEAT(GENERAL_INSTRUCTIONS_EXT, "ginste", STFL, 34, "General-instruct=
+ions-extension facility")
++DEF_FEAT(EXECUTE_EXT, "exrl", STFL, 35, "Execute-extensions facility")
++DEF_FEAT(ENHANCED_MONITOR, "emon", STFL, 36, "Enhanced-monitor facility"=
+)
++DEF_FEAT(FLOATING_POINT_EXT, "fpe", STFL, 37, "Floating-point extension =
+facility")
++DEF_FEAT(ORDER_PRESERVING_COMPRESSION, "opc", STFL, 38, "Order Preservin=
+g Compression facility")
++DEF_FEAT(SET_PROGRAM_PARAMETERS, "sprogp", STFL, 40, "Set-program-parame=
+ters facility")
++DEF_FEAT(FLOATING_POINT_SUPPPORT_ENH, "fpseh", STFL, 41, "Floating-point=
+-support-enhancement facilities")
++DEF_FEAT(DFP, "dfp", STFL, 42, "DFP (decimal-floating-point) facility")
++DEF_FEAT(DFP_FAST, "dfphp", STFL, 43, "DFP (decimal-floating-point) faci=
+lity has high performance")
++DEF_FEAT(PFPO, "pfpo", STFL, 44, "PFPO instruction")
++DEF_FEAT(STFLE_45, "stfle45", STFL, 45, "Various facilities introduced w=
+ith z196")
++DEF_FEAT(CMPSC_ENH, "cmpsceh", STFL, 47, "CMPSC-enhancement facility")
++DEF_FEAT(DFP_ZONED_CONVERSION, "dfpzc", STFL, 48, "Decimal-floating-poin=
+t zoned-conversion facility")
++DEF_FEAT(STFLE_49, "stfle49", STFL, 49, "Various facilities introduced w=
+ith zEC12")
++DEF_FEAT(CONSTRAINT_TRANSACTIONAL_EXE, "cte", STFL, 50, "Constrained tra=
+nsactional-execution facility")
++DEF_FEAT(LOCAL_TLB_CLEARING, "ltlbc", STFL, 51, "Local-TLB-clearing faci=
+lity")
++DEF_FEAT(INTERLOCKED_ACCESS_2, "iacc2", STFL, 52, "Interlocked-access fa=
+cility 2")
++DEF_FEAT(STFLE_53, "stfle53", STFL, 53, "Various facilities introduced w=
+ith z13")
++DEF_FEAT(ENTROPY_ENC_COMP, "eec", STFL, 54, "Entropy encoding compressio=
+n facility")
++DEF_FEAT(MSA_EXT_5, "msa5-base", STFL, 57, "Message-security-assist-exte=
+nsion-5 facility (excluding subfunctions)")
++DEF_FEAT(MISC_INSTRUCTION_EXT, "minste2", STFL, 58, "Miscellaneous-instr=
+uction-extensions facility 2")
++DEF_FEAT(SEMAPHORE_ASSIST, "sema", STFL, 59, "Semaphore-assist facility"=
+)
++DEF_FEAT(TIME_SLICE_INSTRUMENTATION, "tsi", STFL, 60, "Time-slice Instru=
+mentation facility")
++DEF_FEAT(MISC_INSTRUCTION_EXT3, "minste3", STFL, 61, "Miscellaneous-Inst=
+ruction-Extensions Facility 3")
++DEF_FEAT(RUNTIME_INSTRUMENTATION, "ri", STFL, 64, "CPU runtime-instrumen=
+tation facility")
++DEF_FEAT(ZPCI, "zpci", STFL, 69, "z/PCI facility")
++DEF_FEAT(ADAPTER_EVENT_NOTIFICATION, "aen", STFL, 71, "General-purpose-a=
+dapter-event-notification facility")
++DEF_FEAT(ADAPTER_INT_SUPPRESSION, "ais", STFL, 72, "General-purpose-adap=
+ter-interruption-suppression facility")
++DEF_FEAT(TRANSACTIONAL_EXE, "te", STFL, 73, "Transactional-execution fac=
+ility")
++DEF_FEAT(STORE_HYPERVISOR_INFO, "sthyi", STFL, 74, "Store-hypervisor-inf=
+ormation facility")
++DEF_FEAT(ACCESS_EXCEPTION_FS_INDICATION, "aefsi", STFL, 75, "Access-exce=
+ption-fetch/store-indication facility")
++DEF_FEAT(MSA_EXT_3, "msa3-base", STFL, 76, "Message-security-assist-exte=
+nsion-3 facility (excluding subfunctions)")
++DEF_FEAT(MSA_EXT_4, "msa4-base", STFL, 77, "Message-security-assist-exte=
+nsion-4 facility (excluding subfunctions)")
++DEF_FEAT(EDAT_2, "edat2", STFL, 78, "Enhanced-DAT facility 2")
++DEF_FEAT(DFP_PACKED_CONVERSION, "dfppc", STFL, 80, "Decimal-floating-poi=
+nt packed-conversion facility")
++DEF_FEAT(PPA15, "ppa15", STFL, 81, "PPA15 is installed")
++DEF_FEAT(BPB, "bpb", STFL, 82, "Branch prediction blocking")
++DEF_FEAT(VECTOR, "vx", STFL, 129, "Vector facility")
++DEF_FEAT(INSTRUCTION_EXEC_PROT, "iep", STFL, 130, "Instruction-execution=
+-protection facility")
++DEF_FEAT(SIDE_EFFECT_ACCESS_ESOP2, "sea_esop2", STFL, 131, "Side-effect-=
+access facility and Enhanced-suppression-on-protection facility 2")
++DEF_FEAT(GUARDED_STORAGE, "gs", STFL, 133, "Guarded-storage facility")
++DEF_FEAT(VECTOR_PACKED_DECIMAL, "vxpd", STFL, 134, "Vector packed decima=
+l facility")
++DEF_FEAT(VECTOR_ENH, "vxeh", STFL, 135, "Vector enhancements facility")
++DEF_FEAT(MULTIPLE_EPOCH, "mepoch", STFL, 139, "Multiple-epoch facility")
++DEF_FEAT(TEST_PENDING_EXT_INTERRUPTION, "tpei", STFL, 144, "Test-pending=
+-external-interruption facility")
++DEF_FEAT(INSERT_REFERENCE_BITS_MULT, "irbm", STFL, 145, "Insert-referenc=
+e-bits-multiple facility")
++DEF_FEAT(MSA_EXT_8, "msa8-base", STFL, 146, "Message-security-assist-ext=
+ension-8 facility (excluding subfunctions)")
++DEF_FEAT(CMM_NT, "cmmnt", STFL, 147, "CMM: ESSA-enhancement (no translat=
+e) facility")
++DEF_FEAT(VECTOR_ENH2, "vxeh2", STFL, 148, "Vector Enhancements facility =
+2")
++DEF_FEAT(ESORT_BASE, "esort-base", STFL, 150, "Enhanced-sort facility (e=
+xcluding subfunctions)")
++DEF_FEAT(DEFLATE_BASE, "deflate-base", STFL, 151, "Deflate-conversion fa=
+cility (excluding subfunctions)")
++DEF_FEAT(VECTOR_BCD_ENH, "vxbeh", STFL, 152, "Vector BCD enhancements fa=
+cility 1")
++DEF_FEAT(MSA_EXT_9, "msa9-base", STFL, 155, "Message-security-assist-ext=
+ension-9 facility (excluding subfunctions)")
++DEF_FEAT(ETOKEN, "etoken", STFL, 156, "Etoken facility")
 +
- ##########################################
- # linux-aio probe---
++/* Features exposed via SCLP SCCB Byte 80 - 98  (bit numbers relative to=
+ byte-80) */
++DEF_FEAT(SIE_GSLS, "gsls", SCLP_CONF_CHAR, 40, "SIE: Guest-storage-limit=
+-suppression facility")
++DEF_FEAT(ESOP, "esop", SCLP_CONF_CHAR, 46, "Enhanced-suppression-on-prot=
+ection facility")
++DEF_FEAT(HPMA2, "hpma2", SCLP_CONF_CHAR, 90, "Host page management assis=
+t 2 Facility") /* 91-2 */
++DEF_FEAT(SIE_KSS, "kss", SCLP_CONF_CHAR, 151, "SIE: Keyless-subset facil=
+ity")  /* 98-7 */
++
++/* Features exposed via SCLP SCCB Byte 116 - 119 (bit numbers relative t=
+o byte-116) */
++DEF_FEAT(SIE_64BSCAO, "64bscao", SCLP_CONF_CHAR_EXT, 0, "SIE: 64-bit-SCA=
+O facility")
++DEF_FEAT(SIE_CMMA, "cmma", SCLP_CONF_CHAR_EXT, 1, "SIE: Collaborative-me=
+mory-management assist")
++DEF_FEAT(SIE_PFMFI, "pfmfi", SCLP_CONF_CHAR_EXT, 9, "SIE: PFMF interpret=
+ation facility")
++DEF_FEAT(SIE_IBS, "ibs", SCLP_CONF_CHAR_EXT, 10, "SIE: Interlock-and-bro=
+adcast-suppression facility")
++
++/* Features exposed via SCLP CPU info. */
++DEF_FEAT(SIE_F2, "sief2", SCLP_CPU, 4, "SIE: interception format 2 (Virt=
+ual SIE)")
++DEF_FEAT(SIE_SKEY, "skey", SCLP_CPU, 5, "SIE: Storage-key facility")
++DEF_FEAT(SIE_GPERE, "gpereh", SCLP_CPU, 10, "SIE: Guest-PER enhancement =
+facility")
++DEF_FEAT(SIE_SIIF, "siif", SCLP_CPU, 11, "SIE: Shared IPTE-interlock fac=
+ility")
++DEF_FEAT(SIE_SIGPIF, "sigpif", SCLP_CPU, 12, "SIE: SIGP interpretation f=
+acility")
++DEF_FEAT(SIE_IB, "ib", SCLP_CPU, 42, "SIE: Intervention bypass facility"=
+)
++DEF_FEAT(SIE_CEI, "cei", SCLP_CPU, 43, "SIE: Conditional-external-interc=
+eption facility")
++
++/*
++ * Features exposed via no feature bit (but e.g., instruction sensing)
++ * -> the feature bit number is irrelavant
++ */
++DEF_FEAT(DAT_ENH_2, "dateh2", MISC, 0, "DAT-enhancement facility 2")
++DEF_FEAT(CMM, "cmm", MISC, 0, "Collaborative-memory-management facility"=
+)
++DEF_FEAT(AP, "ap", MISC, 0, "AP instructions installed")
++
++/* Features exposed via the PLO instruction. */
++DEF_FEAT(PLO_CL, "plo-cl", PLO, 0, "PLO Compare and load (32 bit in gene=
+ral registers)")
++DEF_FEAT(PLO_CLG, "plo-clg", PLO, 1, "PLO Compare and load (64 bit in pa=
+rameter list)")
++DEF_FEAT(PLO_CLGR, "plo-clgr", PLO, 2, "PLO Compare and load (32 bit in =
+general registers)")
++DEF_FEAT(PLO_CLX, "plo-clx", PLO, 3, "PLO Compare and load (128 bit in p=
+arameter list)")
++DEF_FEAT(PLO_CS, "plo-cs", PLO, 4, "PLO Compare and swap (32 bit in gene=
+ral registers)")
++DEF_FEAT(PLO_CSG, "plo-csg", PLO, 5, "PLO Compare and swap (64 bit in pa=
+rameter list)")
++DEF_FEAT(PLO_CSGR, "plo-csgr", PLO, 6, "PLO Compare and swap (32 bit in =
+general registers)")
++DEF_FEAT(PLO_CSX, "plo-csx", PLO, 7, "PLO Compare and swap (128 bit in p=
+arameter list)")
++DEF_FEAT(PLO_DCS, "plo-dcs", PLO, 8, "PLO Double compare and swap (32 bi=
+t in general registers)")
++DEF_FEAT(PLO_DCSG, "plo-dcsg", PLO, 9, "PLO Double compare and swap (64 =
+bit in parameter list)")
++DEF_FEAT(PLO_DCSGR, "plo-dcsgr", PLO, 10, "PLO Double compare and swap (=
+32 bit in general registers)")
++DEF_FEAT(PLO_DCSX, "plo-dcsx", PLO, 11, "PLO Double compare and swap (12=
+8 bit in parameter list)")
++DEF_FEAT(PLO_CSST, "plo-csst", PLO, 12, "PLO Compare and swap and store =
+(32 bit in general registers)")
++DEF_FEAT(PLO_CSSTG, "plo-csstg", PLO, 13, "PLO Compare and swap and stor=
+e (64 bit in parameter list)")
++DEF_FEAT(PLO_CSSTGR, "plo-csstgr", PLO, 14, "PLO Compare and swap and st=
+ore (32 bit in general registers)")
++DEF_FEAT(PLO_CSSTX, "plo-csstx", PLO, 15, "PLO Compare and swap and stor=
+e (128 bit in parameter list)")
++DEF_FEAT(PLO_CSDST, "plo-csdst", PLO, 16, "PLO Compare and swap and doub=
+le store (32 bit in general registers)")
++DEF_FEAT(PLO_CSDSTG, "plo-csdstg", PLO, 17, "PLO Compare and swap and do=
+uble store (64 bit in parameter list)")
++DEF_FEAT(PLO_CSDSTGR, "plo-csdstgr", PLO, 18, "PLO Compare and swap and =
+double store (32 bit in general registers)")
++DEF_FEAT(PLO_CSDSTX, "plo-csdstx", PLO, 19, "PLO Compare and swap and do=
+uble store (128 bit in parameter list)")
++DEF_FEAT(PLO_CSTST, "plo-cstst", PLO, 20, "PLO Compare and swap and trip=
+le store (32 bit in general registers)")
++DEF_FEAT(PLO_CSTSTG, "plo-cststg", PLO, 21, "PLO Compare and swap and tr=
+iple store (64 bit in parameter list)")
++DEF_FEAT(PLO_CSTSTGR, "plo-cststgr", PLO, 22, "PLO Compare and swap and =
+triple store (32 bit in general registers)")
++DEF_FEAT(PLO_CSTSTX, "plo-cststx", PLO, 23, "PLO Compare and swap and tr=
+iple store (128 bit in parameter list)")
++
++/* Features exposed via the PTFF instruction. */
++DEF_FEAT(PTFF_QTO, "ptff-qto", PTFF, 1, "PTFF Query TOD Offset")
++DEF_FEAT(PTFF_QSI, "ptff-qsi", PTFF, 2, "PTFF Query Steering Information=
+")
++DEF_FEAT(PTFF_QPT, "ptff-qpc", PTFF, 3, "PTFF Query Physical Clock")
++DEF_FEAT(PTFF_QUI, "ptff-qui", PTFF, 4, "PTFF Query UTC Information")
++DEF_FEAT(PTFF_QTOU, "ptff-qtou", PTFF, 5, "PTFF Query TOD Offset User")
++DEF_FEAT(PTFF_QSIE, "ptff-qsie", PTFF, 10, "PTFF Query Steering Informat=
+ion Extended")
++DEF_FEAT(PTFF_QTOUE, "ptff-qtoue", PTFF, 13, "PTFF Query TOD Offset User=
+ Extended")
++DEF_FEAT(PTFF_STO, "ptff-sto", PTFF, 65, "PTFF Set TOD Offset")
++DEF_FEAT(PTFF_STOU, "ptff-stou", PTFF, 69, "PTFF Set TOD Offset User")
++DEF_FEAT(PTFF_STOE, "ptff-stoe", PTFF, 73, "PTFF Set TOD Offset Extended=
+")
++DEF_FEAT(PTFF_STOUE, "ptff-stoue", PTFF, 77, "PTFF Set TOD Offset User E=
+xtended")
++
++/* Features exposed via the KMAC instruction. */
++DEF_FEAT(KMAC_DEA, "kmac-dea", KMAC, 1, "KMAC DEA")
++DEF_FEAT(KMAC_TDEA_128, "kmac-tdea-128", KMAC, 2, "KMAC TDEA-128")
++DEF_FEAT(KMAC_TDEA_192, "kmac-tdea-192", KMAC, 3, "KMAC TDEA-192")
++DEF_FEAT(KMAC_EDEA, "kmac-edea", KMAC, 9, "KMAC Encrypted-DEA")
++DEF_FEAT(KMAC_ETDEA_128, "kmac-etdea-128", KMAC, 10, "KMAC Encrypted-TDE=
+A-128")
++DEF_FEAT(KMAC_ETDEA_192, "kmac-etdea-192", KMAC, 11, "KMAC Encrypted-TDE=
+A-192")
++DEF_FEAT(KMAC_AES_128, "kmac-aes-128", KMAC, 18, "KMAC AES-128")
++DEF_FEAT(KMAC_AES_192, "kmac-aes-192", KMAC, 19, "KMAC AES-192")
++DEF_FEAT(KMAC_AES_256, "kmac-aes-256", KMAC, 20, "KMAC AES-256")
++DEF_FEAT(KMAC_EAES_128, "kmac-eaes-128", KMAC, 26, "KMAC Encrypted-AES-1=
+28")
++DEF_FEAT(KMAC_EAES_192, "kmac-eaes-192", KMAC, 27, "KMAC Encrypted-AES-1=
+92")
++DEF_FEAT(KMAC_EAES_256, "kmac-eaes-256", KMAC, 28, "KMAC Encrypted-AES-2=
+56")
++
++/* Features exposed via the KMC instruction. */
++DEF_FEAT(KMC_DEA, "kmc-dea", KMC, 1, "KMC DEA")
++DEF_FEAT(KMC_TDEA_128, "kmc-tdea-128", KMC, 2, "KMC TDEA-128")
++DEF_FEAT(KMC_TDEA_192, "kmc-tdea-192", KMC, 3, "KMC TDEA-192")
++DEF_FEAT(KMC_EDEA, "kmc-edea", KMC, 9, "KMC Encrypted-DEA")
++DEF_FEAT(KMC_ETDEA_128, "kmc-etdea-128", KMC, 10, "KMC Encrypted-TDEA-12=
+8")
++DEF_FEAT(KMC_ETDEA_192, "kmc-etdea-192", KMC, 11, "KMC Encrypted-TDEA-19=
+2")
++DEF_FEAT(KMC_AES_128, "kmc-aes-128", KMC, 18, "KMC AES-128")
++DEF_FEAT(KMC_AES_192, "kmc-aes-192", KMC, 19, "KMC AES-192")
++DEF_FEAT(KMC_AES_256, "kmc-aes-256", KMC, 20, "KMC AES-256")
++DEF_FEAT(KMC_EAES_128, "kmc-eaes-128", KMC, 26, "KMC Encrypted-AES-128")
++DEF_FEAT(KMC_EAES_192, "kmc-eaes-192", KMC, 27, "KMC Encrypted-AES-192")
++DEF_FEAT(KMC_EAES_256, "kmc-eaes-256", KMC, 28, "KMC Encrypted-AES-256")
++DEF_FEAT(KMC_PRNG, "kmc-prng", KMC, 67, "KMC PRNG")
++
++/* Features exposed via the KM instruction. */
++DEF_FEAT(KM_DEA, "km-dea", KM, 1, "KM DEA")
++DEF_FEAT(KM_TDEA_128, "km-tdea-128", KM, 2, "KM TDEA-128")
++DEF_FEAT(KM_TDEA_192, "km-tdea-192", KM, 3, "KM TDEA-192")
++DEF_FEAT(KM_EDEA, "km-edea", KM, 9, "KM Encrypted-DEA")
++DEF_FEAT(KM_ETDEA_128, "km-etdea-128", KM, 10, "KM Encrypted-TDEA-128")
++DEF_FEAT(KM_ETDEA_192, "km-etdea-192", KM, 11, "KM Encrypted-TDEA-192")
++DEF_FEAT(KM_AES_128, "km-aes-128", KM, 18, "KM AES-128")
++DEF_FEAT(KM_AES_192, "km-aes-192", KM, 19, "KM AES-192")
++DEF_FEAT(KM_AES_256, "km-aes-256", KM, 20, "KM AES-256")
++DEF_FEAT(KM_EAES_128, "km-eaes-128", KM, 26, "KM Encrypted-AES-128")
++DEF_FEAT(KM_EAES_192, "km-eaes-192", KM, 27, "KM Encrypted-AES-192")
++DEF_FEAT(KM_EAES_256, "km-eaes-256", KM, 28, "KM Encrypted-AES-256")
++DEF_FEAT(KM_XTS_AES_128, "km-xts-aes-128", KM, 50, "KM XTS-AES-128")
++DEF_FEAT(KM_XTS_AES_256, "km-xts-aes-256", KM, 52, "KM XTS-AES-256")
++DEF_FEAT(KM_XTS_EAES_128, "km-xts-eaes-128", KM, 58, "KM XTS-Encrypted-A=
+ES-128")
++DEF_FEAT(KM_XTS_EAES_256, "km-xts-eaes-256", KM, 60, "KM XTS-Encrypted-A=
+ES-256")
++
++/* Features exposed via the KIMD instruction. */
++DEF_FEAT(KIMD_SHA_1, "kimd-sha-1", KIMD, 1, "KIMD SHA-1")
++DEF_FEAT(KIMD_SHA_256, "kimd-sha-256", KIMD, 2, "KIMD SHA-256")
++DEF_FEAT(KIMD_SHA_512, "kimd-sha-512", KIMD, 3, "KIMD SHA-512")
++DEF_FEAT(KIMD_SHA3_224, "kimd-sha3-224", KIMD, 32, "KIMD SHA3-224")
++DEF_FEAT(KIMD_SHA3_256, "kimd-sha3-256", KIMD, 33, "KIMD SHA3-256")
++DEF_FEAT(KIMD_SHA3_384, "kimd-sha3-384", KIMD, 34, "KIMD SHA3-384")
++DEF_FEAT(KIMD_SHA3_512, "kimd-sha3-512", KIMD, 35, "KIMD SHA3-512")
++DEF_FEAT(KIMD_SHAKE_128, "kimd-shake-128", KIMD, 36, "KIMD SHAKE-128")
++DEF_FEAT(KIMD_SHAKE_256, "kimd-shake-256", KIMD, 37, "KIMD SHAKE-256")
++DEF_FEAT(KIMD_GHASH, "kimd-ghash", KIMD, 65, "KIMD GHASH")
++
++/* Features exposed via the KLMD instruction. */
++DEF_FEAT(KLMD_SHA_1, "klmd-sha-1", KLMD, 1, "KLMD SHA-1")
++DEF_FEAT(KLMD_SHA_256, "klmd-sha-256", KLMD, 2, "KLMD SHA-256")
++DEF_FEAT(KLMD_SHA_512, "klmd-sha-512", KLMD, 3, "KLMD SHA-512")
++DEF_FEAT(KLMD_SHA3_224, "klmd-sha3-224", KLMD, 32, "KLMD SHA3-224")
++DEF_FEAT(KLMD_SHA3_256, "klmd-sha3-256", KLMD, 33, "KLMD SHA3-256")
++DEF_FEAT(KLMD_SHA3_384, "klmd-sha3-384", KLMD, 34, "KLMD SHA3-384")
++DEF_FEAT(KLMD_SHA3_512, "klmd-sha3-512", KLMD, 35, "KLMD SHA3-512")
++DEF_FEAT(KLMD_SHAKE_128, "klmd-shake-128", KLMD, 36, "KLMD SHAKE-128")
++DEF_FEAT(KLMD_SHAKE_256, "klmd-shake-256", KLMD, 37, "KLMD SHAKE-256")
++
++/* Features exposed via the PCKMO instruction. */
++DEF_FEAT(PCKMO_EDEA, "pckmo-edea", PCKMO, 1, "PCKMO Encrypted-DEA-Key")
++DEF_FEAT(PCKMO_ETDEA_128, "pckmo-etdea-128", PCKMO, 2, "PCKMO Encrypted-=
+TDEA-128-Key")
++DEF_FEAT(PCKMO_ETDEA_256, "pckmo-etdea-192", PCKMO, 3, "PCKMO Encrypted-=
+TDEA-192-Key")
++DEF_FEAT(PCKMO_AES_128, "pckmo-aes-128", PCKMO, 18, "PCKMO Encrypted-AES=
+-128-Key")
++DEF_FEAT(PCKMO_AES_192, "pckmo-aes-192", PCKMO, 19, "PCKMO Encrypted-AES=
+-192-Key")
++DEF_FEAT(PCKMO_AES_256, "pckmo-aes-256", PCKMO, 20, "PCKMO Encrypted-AES=
+-256-Key")
++DEF_FEAT(PCKMO_ECC_P256, "pckmo-ecc-p256", PCKMO, 32, "PCKMO Encrypt-ECC=
+-P256-Key")
++DEF_FEAT(PCKMO_ECC_P384, "pckmo-ecc-p384", PCKMO, 33, "PCKMO Encrypt-ECC=
+-P384-Key")
++DEF_FEAT(PCKMO_ECC_P521, "pckmo-ecc-p521", PCKMO, 34, "PCKMO Encrypt-ECC=
+-P521-Key")
++DEF_FEAT(PCKMO_ECC_ED25519, "pckmo-ecc-ed25519", PCKMO, 40 , "PCKMO Encr=
+ypt-ECC-Ed25519-Key")
++DEF_FEAT(PCKMO_ECC_ED448, "pckmo-ecc-ed448", PCKMO, 41 , "PCKMO Encrypt-=
+ECC-Ed448-Key")
++
++/* Features exposed via the KMCTR instruction. */
++DEF_FEAT(KMCTR_DEA, "kmctr-dea", KMCTR, 1, "KMCTR DEA")
++DEF_FEAT(KMCTR_TDEA_128, "kmctr-tdea-128", KMCTR, 2, "KMCTR TDEA-128")
++DEF_FEAT(KMCTR_TDEA_192, "kmctr-tdea-192", KMCTR, 3, "KMCTR TDEA-192")
++DEF_FEAT(KMCTR_EDEA, "kmctr-edea", KMCTR, 9, "KMCTR Encrypted-DEA")
++DEF_FEAT(KMCTR_ETDEA_128, "kmctr-etdea-128", KMCTR, 10, "KMCTR Encrypted=
+-TDEA-128")
++DEF_FEAT(KMCTR_ETDEA_192, "kmctr-etdea-192", KMCTR, 11, "KMCTR Encrypted=
+-TDEA-192")
++DEF_FEAT(KMCTR_AES_128, "kmctr-aes-128", KMCTR, 18, "KMCTR AES-128")
++DEF_FEAT(KMCTR_AES_192, "kmctr-aes-192", KMCTR, 19, "KMCTR AES-192")
++DEF_FEAT(KMCTR_AES_256, "kmctr-aes-256", KMCTR, 20, "KMCTR AES-256")
++DEF_FEAT(KMCTR_EAES_128, "kmctr-eaes-128", KMCTR, 26, "KMCTR Encrypted-A=
+ES-128")
++DEF_FEAT(KMCTR_EAES_192, "kmctr-eaes-192", KMCTR, 27, "KMCTR Encrypted-A=
+ES-192")
++DEF_FEAT(KMCTR_EAES_256, "kmctr-eaes-256", KMCTR, 28, "KMCTR Encrypted-A=
+ES-256")
++
++/* Features exposed via the KMF instruction. */
++DEF_FEAT(KMF_DEA, "kmf-dea", KMF, 1, "KMF DEA")
++DEF_FEAT(KMF_TDEA_128, "kmf-tdea-128", KMF, 2, "KMF TDEA-128")
++DEF_FEAT(KMF_TDEA_192, "kmf-tdea-192", KMF, 3, "KMF TDEA-192")
++DEF_FEAT(KMF_EDEA, "kmf-edea", KMF, 9, "KMF Encrypted-DEA")
++DEF_FEAT(KMF_ETDEA_128, "kmf-etdea-128", KMF, 10, "KMF Encrypted-TDEA-12=
+8")
++DEF_FEAT(KMF_ETDEA_192, "kmf-etdea-192", KMF, 11, "KMF Encrypted-TDEA-19=
+2")
++DEF_FEAT(KMF_AES_128, "kmf-aes-128", KMF, 18, "KMF AES-128")
++DEF_FEAT(KMF_AES_192, "kmf-aes-192", KMF, 19, "KMF AES-192")
++DEF_FEAT(KMF_AES_256, "kmf-aes-256", KMF, 20, "KMF AES-256")
++DEF_FEAT(KMF_EAES_128, "kmf-eaes-128", KMF, 26, "KMF Encrypted-AES-128")
++DEF_FEAT(KMF_EAES_192, "kmf-eaes-192", KMF, 27, "KMF Encrypted-AES-192")
++DEF_FEAT(KMF_EAES_256, "kmf-eaes-256", KMF, 28, "KMF Encrypted-AES-256")
++
++/* Features exposed via the KMO instruction. */
++DEF_FEAT(KMO_DEA, "kmo-dea", KMO, 1, "KMO DEA")
++DEF_FEAT(KMO_TDEA_128, "kmo-tdea-128", KMO, 2, "KMO TDEA-128")
++DEF_FEAT(KMO_TDEA_192, "kmo-tdea-192", KMO, 3, "KMO TDEA-192")
++DEF_FEAT(KMO_EDEA, "kmo-edea", KMO, 9, "KMO Encrypted-DEA")
++DEF_FEAT(KMO_ETDEA_128, "kmo-etdea-128", KMO, 10, "KMO Encrypted-TDEA-12=
+8")
++DEF_FEAT(KMO_ETDEA_192, "kmo-etdea-192", KMO, 11, "KMO Encrypted-TDEA-19=
+2")
++DEF_FEAT(KMO_AES_128, "kmo-aes-128", KMO, 18, "KMO AES-128")
++DEF_FEAT(KMO_AES_192, "kmo-aes-192", KMO, 19, "KMO AES-192")
++DEF_FEAT(KMO_AES_256, "kmo-aes-256", KMO, 20, "KMO AES-256")
++DEF_FEAT(KMO_EAES_128, "kmo-eaes-128", KMO, 26, "KMO Encrypted-AES-128")
++DEF_FEAT(KMO_EAES_192, "kmo-eaes-192", KMO, 27, "KMO Encrypted-AES-192")
++DEF_FEAT(KMO_EAES_256, "kmo-eaes-256", KMO, 28, "KMO Encrypted-AES-256")
++
++/* Features exposed via the PCC instruction. */
++DEF_FEAT(PCC_CMAC_DEA, "pcc-cmac-dea", PCC, 1, "PCC Compute-Last-Block-C=
+MAC-Using-DEA")
++DEF_FEAT(PCC_CMAC_TDEA_128, "pcc-cmac-tdea-128", PCC, 2, "PCC Compute-La=
+st-Block-CMAC-Using-TDEA-128")
++DEF_FEAT(PCC_CMAC_TDEA_192, "pcc-cmac-tdea-192", PCC, 3, "PCC Compute-La=
+st-Block-CMAC-Using-TDEA-192")
++DEF_FEAT(PCC_CMAC_ETDEA_128, "pcc-cmac-edea", PCC, 9, "PCC Compute-Last-=
+Block-CMAC-Using-Encrypted-DEA")
++DEF_FEAT(PCC_CMAC_ETDEA_192, "pcc-cmac-etdea-128", PCC, 10, "PCC Compute=
+-Last-Block-CMAC-Using-Encrypted-TDEA-128")
++DEF_FEAT(PCC_CMAC_TDEA, "pcc-cmac-etdea-192", PCC, 11, "PCC Compute-Last=
+-Block-CMAC-Using-EncryptedTDEA-192")
++DEF_FEAT(PCC_CMAC_AES_128, "pcc-cmac-aes-128", PCC, 18, "PCC Compute-Las=
+t-Block-CMAC-Using-AES-128")
++DEF_FEAT(PCC_CMAC_AES_192, "pcc-cmac-aes-192", PCC, 19, "PCC Compute-Las=
+t-Block-CMAC-Using-AES-192")
++DEF_FEAT(PCC_CMAC_AES_256, "pcc-cmac-eaes-256", PCC, 20, "PCC Compute-La=
+st-Block-CMAC-Using-AES-256")
++DEF_FEAT(PCC_CMAC_EAES_128, "pcc-cmac-eaes-128", PCC, 26, "PCC Compute-L=
+ast-Block-CMAC-Using-Encrypted-AES-128")
++DEF_FEAT(PCC_CMAC_EAES_192, "pcc-cmac-eaes-192", PCC, 27, "PCC Compute-L=
+ast-Block-CMAC-Using-Encrypted-AES-192")
++DEF_FEAT(PCC_CMAC_EAES_256, "pcc-cmac-eaes-256", PCC, 28, "PCC Compute-L=
+ast-Block-CMAC-Using-Encrypted-AES-256")
++DEF_FEAT(PCC_XTS_AES_128, "pcc-xts-aes-128", PCC, 50, "PCC Compute-XTS-P=
+arameter-Using-AES-128")
++DEF_FEAT(PCC_XTS_AES_256, "pcc-xts-aes-256", PCC, 52, "PCC Compute-XTS-P=
+arameter-Using-AES-256")
++DEF_FEAT(PCC_XTS_EAES_128, "pcc-xts-eaes-128", PCC, 58, "PCC Compute-XTS=
+-Parameter-Using-Encrypted-AES-128")
++DEF_FEAT(PCC_XTS_EAES_256, "pcc-xts-eaes-256", PCC, 60, "PCC Compute-XTS=
+-Parameter-Using-Encrypted-AES-256")
++DEF_FEAT(PCC_SCALAR_MULT_P256, "pcc-scalar-mult-p256", PCC, 64, "PCC Sca=
+lar-Multiply-P256")
++DEF_FEAT(PCC_SCALAR_MULT_P384, "pcc-scalar-mult-p384", PCC, 65, "PCC Sca=
+lar-Multiply-P384")
++DEF_FEAT(PCC_SCALAR_MULT_P512, "pcc-scalar-mult-p521", PCC, 66, "PCC Sca=
+lar-Multiply-P521")
++DEF_FEAT(PCC_SCALAR_MULT_ED25519, "pcc-scalar-mult-ed25519", PCC, 72, "P=
+CC Scalar-Multiply-Ed25519")
++DEF_FEAT(PCC_SCALAR_MULT_ED448, "pcc-scalar-mult-ed448", PCC, 73, "PCC S=
+calar-Multiply-Ed448")
++DEF_FEAT(PCC_SCALAR_MULT_X25519, "pcc-scalar-mult-x25519", PCC, 80, "PCC=
+ Scalar-Multiply-X25519")
++DEF_FEAT(PCC_SCALAR_MULT_X448, "pcc-scalar-mult-x448", PCC, 81, "PCC Sca=
+lar-Multiply-X448")
++
++/* Features exposed via the PPNO/PRNO instruction. */
++DEF_FEAT(PPNO_SHA_512_DRNG, "ppno-sha-512-drng", PPNO, 3, "PPNO SHA-512-=
+DRNG")
++DEF_FEAT(PRNO_TRNG_QRTCR, "prno-trng-qrtcr", PPNO, 112, "PRNO TRNG-Query=
+-Raw-to-Conditioned-Ratio")
++DEF_FEAT(PRNO_TRNG, "prno-trng", PPNO, 114, "PRNO TRNG")
++
++/* Features exposed via the KMA instruction. */
++DEF_FEAT(KMA_GCM_AES_128, "kma-gcm-aes-128", KMA, 18, "KMA GCM-AES-128")
++DEF_FEAT(KMA_GCM_AES_192, "kma-gcm-aes-192", KMA, 19, "KMA GCM-AES-192")
++DEF_FEAT(KMA_GCM_AES_256, "kma-gcm-aes-256", KMA, 20, "KMA GCM-AES-256")
++DEF_FEAT(KMA_GCM_EAES_128, "kma-gcm-eaes-128", KMA, 26, "KMA GCM-Encrypt=
+ed-AES-128")
++DEF_FEAT(KMA_GCM_EAES_192, "kma-gcm-eaes-192", KMA, 27, "KMA GCM-Encrypt=
+ed-AES-192")
++DEF_FEAT(KMA_GCM_EAES_256, "kma-gcm-eaes-256", KMA, 28, "KMA GCM-Encrypt=
+ed-AES-256")
++
++/* Features exposed via the KDSA instruction. */
++DEF_FEAT(ECDSA_VERIFY_P256, "kdsa-ecdsa-verify-p256", KDSA, 1, "KDSA ECD=
+SA-Verify-P256")
++DEF_FEAT(ECDSA_VERIFY_P384, "kdsa-ecdsa-verify-p384", KDSA, 2, "KDSA ECD=
+SA-Verify-P384")
++DEF_FEAT(ECDSA_VERIFY_P512, "kdsa-ecdsa-verify-p521", KDSA, 3, "KDSA ECD=
+SA-Verify-P521")
++DEF_FEAT(ECDSA_SIGN_P256, "kdsa-ecdsa-sign-p256", KDSA, 9, "KDSA ECDSA-S=
+ign-P256")
++DEF_FEAT(ECDSA_SIGN_P384, "kdsa-ecdsa-sign-p384", KDSA, 10, "KDSA ECDSA-=
+Sign-P384")
++DEF_FEAT(ECDSA_SIGN_P512, "kdsa-ecdsa-sign-p521", KDSA, 11, "KDSA ECDSA-=
+Sign-P521")
++DEF_FEAT(EECDSA_SIGN_P256, "kdsa-eecdsa-sign-p256", KDSA, 17, "KDSA Encr=
+ypted-ECDSA-Sign-P256")
++DEF_FEAT(EECDSA_SIGN_P384, "kdsa-eecdsa-sign-p384", KDSA, 18, "KDSA Encr=
+ypted-ECDSA-Sign-P384")
++DEF_FEAT(EECDSA_SIGN_P512, "kdsa-eecdsa-sign-p521", KDSA, 19, "KDSA Encr=
+ypted-ECDSA-Sign-P521")
++DEF_FEAT(EDDSA_VERIFY_ED25519, "kdsa-eddsa-verify-ed25519", KDSA, 32, "K=
+DSA EdDSA-Verify-Ed25519")
++DEF_FEAT(EDDSA_VERIFY_ED448, "kdsa-eddsa-verify-ed448", KDSA, 36, "KDSA =
+EdDSA-Verify-Ed448")
++DEF_FEAT(EDDSA_SIGN_ED25519, "kdsa-eddsa-sign-ed25519", KDSA, 40, "KDSA =
+EdDSA-Sign-Ed25519")
++DEF_FEAT(EDDSA_SIGN_ED448, "kdsa-eddsa-sign-ed448", KDSA, 44, "KDSA EdDS=
+A-Sign-Ed448")
++DEF_FEAT(EEDDSA_SIGN_ED25519, "kdsa-eeddsa-sign-ed25519", KDSA, 48, "KDS=
+A Encrypted-EdDSA-Sign-Ed25519")
++DEF_FEAT(EEDDSA_SIGN_ED448, "kdsa-eeddsa-sign-ed448", KDSA, 52, "KDSA En=
+crypted-EdDSA-Sign-Ed448")
++
++/* Features exposed via the SORTL instruction. */
++DEF_FEAT(SORTL_SFLR, "sortl-sflr", SORTL, 1, "SORTL SFLR")
++DEF_FEAT(SORTL_SVLR, "sortl-svlr", SORTL, 2, "SORTL SVLR")
++DEF_FEAT(SORTL_32, "sortl-32", SORTL, 130, "SORTL 32 input lists")
++DEF_FEAT(SORTL_128, "sortl-128", SORTL, 132, "SORTL 128 input lists")
++DEF_FEAT(SORTL_F0, "sortl-f0", SORTL, 192, "SORTL format 0 parameter-blo=
+ck")
++
++/* Features exposed via the DEFLATE instruction. */
++DEF_FEAT(DEFLATE_GHDT, "dfltcc-gdht", DFLTCC, 1, "DFLTCC GDHT")
++DEF_FEAT(DEFLATE_CMPR, "dfltcc-cmpr", DFLTCC, 2, "DFLTCC CMPR")
++DEF_FEAT(DEFLATE_XPND, "dfltcc-xpnd", DFLTCC, 4, "DFLTCC XPND")
++DEF_FEAT(DEFLATE_F0, "dfltcc-f0", DFLTCC, 192, "DFLTCC format 0 paramete=
+r-block")
+--=20
+2.21.0
 
-See https://www.redhat.com/archives/libvir-list/2018-May/msg00597.html
-
-2/ Checkpatch (you already fixed the style issues)
-
--- >8 --
-diff --git a/block/trace-events b/block/trace-events
-index 0d2126e840..cb91787bd9 100644
-@@ -182,7 +182,7 @@ ssh_write(int64_t offset, size_t size) "offset=%"
-PRIi64 " size=%zu"
- ssh_write_buf(void *buf, size_t size, size_t actual_size) "sftp_write
-buf=%p size=%zu (actual size=%zu)"
- ssh_write_return(ssize_t ret, int sftp_err) "sftp_write returned %zd
-(sftp error=%d)"
- ssh_seek(int64_t offset) "seeking to offset=%" PRIi64
--ssh_auth_methods(int methods) "auth methods=%x"
-+ssh_auth_methods(int methods) "auth methods=0x%04x"
- ssh_server_status(int status) "server status=%d"
----
-
-3/ Travis
-
--- >8 --
-diff --git a/.travis.yml b/.travis.yml
-index b053a836a3..a2dac8b7c9 100644
-@@ -31,7 +31,7 @@ addons:
-       - libseccomp-dev
-       - libspice-protocol-dev
-       - libspice-server-dev
--      - libssh2-1-dev
-+      - libssh-dev
-       - liburcu-dev
-       - libusb-1.0-0-dev
-       - libvte-2.91-dev
-@@ -261,7 +261,7 @@ matrix:
-             - libseccomp-dev
-             - libspice-protocol-dev
-             - libspice-server-dev
--            - libssh2-1-dev
-+            - libssh-dev
-             - liburcu-dev
-             - libusb-1.0-0-dev
-             - libvte-2.91-dev
----
-
-4/ Docker
-
--- >8 --
-diff --git a/tests/docker/dockerfiles/fedora.docker
-b/tests/docker/dockerfiles/fedora.docker
-index afbba29ada..8893c1b957 100644
-@@ -35,7 +35,7 @@ ENV PACKAGES \
-     libpng-devel \
-     librbd-devel \
-     libseccomp-devel \
--    libssh2-devel \
-+    libssh-devel \
-     libubsan \
-     libusbx-devel \
-     libxml2-devel \
-@@ -50,7 +50,6 @@ ENV PACKAGES \
-     mingw32-gtk3 \
-     mingw32-libjpeg-turbo \
-     mingw32-libpng \
--    mingw32-libssh2 \
-     mingw32-libtasn1 \
-     mingw32-nettle \
-     mingw32-pixman \
-@@ -64,7 +63,6 @@ ENV PACKAGES \
-     mingw64-gtk3 \
-     mingw64-libjpeg-turbo \
-     mingw64-libpng \
--    mingw64-libssh2 \
-     mingw64-libtasn1 \
-     mingw64-nettle \
-     mingw64-pixman \
-diff --git a/tests/docker/dockerfiles/ubuntu.docker
-b/tests/docker/dockerfiles/ubuntu.docker
-index 36e2b17de5..1bbb7f9598 100644
-@@ -44,7 +44,7 @@ ENV PACKAGES flex bison \
-     libsnappy-dev \
-     libspice-protocol-dev \
-     libspice-server-dev \
--    libssh2-1-dev \
-+    libssh-dev \
-     libusb-1.0-0-dev \
-     libusbredirhost-dev \
-     libvdeplug-dev \
-diff --git a/tests/docker/dockerfiles/ubuntu1804.docker
-b/tests/docker/dockerfiles/ubuntu1804.docker
-index 2e2900150b..9d80b11500 100644
-@@ -40,7 +40,7 @@ ENV PACKAGES flex bison \
-     libsnappy-dev \
-     libspice-protocol-dev \
-     libspice-server-dev \
--    libssh2-1-dev \
-+    libssh-dev \
-     libusb-1.0-0-dev \
-     libusbredirhost-dev \
----
-
-Note, libssh is not available on MinGW.
-
-5/ Documentation
-
--- >8 --
-diff --git a/docs/qemu-block-drivers.texi b/docs/qemu-block-drivers.texi
-index da06a9bc83..91ab0eceae 100644
-@@ -782,7 +782,7 @@ print a warning when @code{fsync} is not supported:
-
- warning: ssh server @code{ssh.example.com:22} does not support fsync
-
--With sufficiently new versions of libssh2 and OpenSSH, @code{fsync} is
-+With sufficiently new versions of libssh and OpenSSH, @code{fsync} is
- supported.
-
----
-
-Overall looks OK.
-
-Since iotest #207 is quick, it would be nice to have it in our CI.
-
-I guess a Docker Compose setup should work, I'll see what I can do.
-
-Regards,
-
-Phil.
 
