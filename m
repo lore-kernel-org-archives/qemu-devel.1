@@ -2,72 +2,61 @@ Return-Path: <SRS0=XH1q=UL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C584C31E46
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 10:50:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C101C31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 10:51:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2005F2082C
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 10:50:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=me.com header.i=@me.com header.b="ihcluXrj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2005F2082C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id 19D962082C
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 10:51:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19D962082C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58702 helo=lists.gnu.org)
+Received: from localhost ([::1]:58704 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hb0q7-0004Hm-47
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 06:50:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58454)
+	id 1hb0ql-0005Eo-D3
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 06:51:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58691)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tgfbeta@me.com>) id 1hb0nO-0002to-ON
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 06:47:59 -0400
+ (envelope-from <quintela@redhat.com>) id 1hb0nz-0003Hc-Rh
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 06:48:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tgfbeta@me.com>) id 1hb0nN-0002SW-M1
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 06:47:58 -0400
-Received: from pv50p00im-ztdg10011301.me.com ([17.58.6.40]:36315)
+ (envelope-from <quintela@redhat.com>) id 1hb0ny-0002pD-5v
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 06:48:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49260)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tgfbeta@me.com>) id 1hb0nN-0002Qb-Fz
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 06:47:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=me.com; s=04042017;
- t=1560336473; bh=GCeCm8uQLWsGH/B+sA1wnoOgD7Gg/RvGEeF7f+1x67g=;
- h=Content-Type:Mime-Version:Subject:From:Date:Message-Id:To;
- b=ihcluXrjjb1ApP5zHjE9pUclyXFNENzUY3ldEwF8bsekuuKTw2v0Hr+BqBrPQcbY4
- I4fHRinioj8kck7Ia8leKAlv3ZTqDzjmzPkLRUL361+vztU8ZT9EqqPsMbHpa7JMAv
- h0IcX4TnWBymKSnJFfUtdF/818H7reoIUcnfTKj05LHDTZXaljSU7k7WuScQ9UEtJD
- XaGOXNRdW6lp53zABdYHOITj5XkqW4y2JRaQAUjL6eQ824oNIy77CiVv0lNnAIWsUp
- 4JM2p5vq7lCMCKae5AWntQBK+VsXNI0YxQ+FWQC3W6vSNmkVZnXi1iaa119waqtJUd
- fdmuPuiNehMMQ==
-Received: from [172.18.2.102] (unknown [36.106.167.139])
- by pv50p00im-ztdg10011301.me.com (Postfix) with ESMTPSA id 3ECC1640336;
- Wed, 12 Jun 2019 10:47:52 +0000 (UTC)
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-In-Reply-To: <CAFEAcA_=A3w490ey9_EyO7gJ1PRjs4L+aRtNPGzx-L7XyGVmZg@mail.gmail.com>
-Date: Wed, 12 Jun 2019 18:47:49 +0800
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hb0nx-0002nm-TI
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 06:48:34 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B01C18830B;
+ Wed, 12 Jun 2019 10:48:29 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-241.ams2.redhat.com
+ [10.36.116.241])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5B8032719B;
+ Wed, 12 Jun 2019 10:48:26 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 12 Jun 2019 12:48:04 +0200
+Message-Id: <20190612104808.6398-5-quintela@redhat.com>
+In-Reply-To: <20190612104808.6398-1-quintela@redhat.com>
+References: <20190612104808.6398-1-quintela@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.28]); Wed, 12 Jun 2019 10:48:29 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <A97EF5AC-945D-4698-B328-BDE53097934B@me.com>
-References: <B3540B0C-9A71-4733-8109-11B0DC7A17D2@me.com>
- <CAFEAcA_=A3w490ey9_EyO7gJ1PRjs4L+aRtNPGzx-L7XyGVmZg@mail.gmail.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-X-Mailer: Apple Mail (2.3445.104.11)
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-06-12_06:, , signatures=0
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 clxscore=1015 mlxscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1812120000 definitions=main-1906120075
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 17.58.6.40
-Subject: Re: [Qemu-devel] [PATCH 0/2] ui/cocoa: Fix input device issues on
- Mojave
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 4/8] migration/multifd: call
+ multifd_send_sync_main when sending RAM_SAVE_FLAG_EOS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,36 +68,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-From: Chen Zhang via Qemu-devel <qemu-devel@nongnu.org>
-Reply-To: Chen Zhang <tgfbeta@me.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Wei Yang <richardw.yang@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thank you and best regards.
+From: Wei Yang <richardw.yang@linux.intel.com>
 
-> On Jun 12, 2019, at 6:39 PM, Peter Maydell <peter.maydell@linaro.org> =
-wrote:
->=20
-> On Tue, 4 Jun 2019 at 10:34, Chen Zhang <tgfbeta@me.com> wrote:
->>=20
->> The following patches fixed issues of absolute and relative input =
-devices
->> on macOS Mojave.
->>=20
->> Chen Zhang (2):
->>  ui/cocoa: Fix absolute input device grabbing issue on Mojave
->>  ui/cocoa: Fix mouse grabbing in fullscreen mode for relative input
->>    device
->>=20
->> ui/cocoa.m | 50 +++++++++++++++++++++++++++++++++++++++++++++++---
->> 1 file changed, 47 insertions(+), 3 deletions(-)
->=20
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> I'll apply these to master some time this week.
->=20
-> thanks
-> -- PMM
+On receiving RAM_SAVE_FLAG_EOS, multifd_recv_sync_main() is called to
+synchronize receive threads. Current synchronization mechanism is to wait
+for each channel's sem_sync semaphore. This semaphore is triggered by a
+packet with MULTIFD_FLAG_SYNC flag. While in current implementation, we
+don't do multifd_send_sync_main() to send such packet when
+blk_mig_bulk_active() is true.
+
+This will leads to the receive threads won't notify
+multifd_recv_sync_main() by sem_sync. And multifd_recv_sync_main() will
+always wait there.
+
+[Note]: normal migration test works, while didn't test the
+blk_mig_bulk_active() case. Since not sure how to produce this
+situation.
+
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Message-Id: <20190612014337.11255-1-richardw.yang@linux.intel.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ migration/ram.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/migration/ram.c b/migration/ram.c
+index 908517fc2b..74c9306c78 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -3466,8 +3466,8 @@ static int ram_save_iterate(QEMUFile *f, void *opaq=
+ue)
+      */
+     ram_control_after_iterate(f, RAM_CONTROL_ROUND);
+=20
+-    multifd_send_sync_main();
+ out:
++    multifd_send_sync_main();
+     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
+     qemu_fflush(f);
+     ram_counters.transferred +=3D 8;
+--=20
+2.21.0
 
 
