@@ -2,90 +2,100 @@ Return-Path: <SRS0=XH1q=UL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17726C31E46
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 09:14:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68F2FC31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 09:26:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D888E2063F
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 09:14:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YokWIRe3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D888E2063F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 41231207E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 09:26:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41231207E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57850 helo=lists.gnu.org)
+Received: from localhost ([::1]:57952 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hazKu-0006TR-1E
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 05:14:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37527)
+	id 1hazWH-0002xH-VH
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 05:26:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39116)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hazJ3-00059H-9X
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 05:12:34 -0400
+ (envelope-from <aravinda@linux.vnet.ibm.com>) id 1hazRI-00019Q-IR
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 05:21:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hazJ1-0004Sp-Le
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 05:12:33 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:44188)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1hazJ1-0004S9-EG
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 05:12:31 -0400
-Received: by mail-ot1-x344.google.com with SMTP id b7so14684539otl.11
- for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 02:12:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=cRwMbRuAdQsvxb5M1evV/Mg13HwO504YDuXD/MXWqi4=;
- b=YokWIRe35bkMqlOFHfpP3iX4+VcMyieqWgAsjURYmAbM7MdnwlZxZd6T4rNloDW8HI
- 5douVp2J4hsLrOdRVCIcGu3daQzarvynqIlwxSQhb8ADNpQcA1SvqBROBi0PejnZ7SQD
- HoZIeCZOgf7IZHsWhJ8bok/KkAfEKcW1Sjm/srdqooxw6HAr6qsHvY1YSSDCUSBl/rF4
- UHO/ghfPgStQrG3UgDNvcosNYKx0Hy3BP5GXzn4Hff+d5e+xrT84QvLw2e9WIXkLk5WT
- e3+mCqdHeiD6KOL+BKpYny4f/7hwMrlmALhpjFh+GSAUk4IHtpycJAiUY4CZUFxSVHnp
- B9aA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=cRwMbRuAdQsvxb5M1evV/Mg13HwO504YDuXD/MXWqi4=;
- b=ZYEE7s6+n0xgRqjnUF7sY/MhPBWD4PETiRd7m2COhzDX1k4wZE6KWDarqQzDHgvkg/
- bwk82fSt/kz/imNIXk7ZFq2KNYEQ8cTHdIudX9Ct85wFbY4QojyyiIVS2S5/WU/yuEsW
- 2YwssyJbJBT9pdjK30lLAmWZ69SZNqQwIZCoD0A/VthmPzIqawc3XHM69mVpNoe9n8Ia
- NyWCDdRBwrffxcHazGva25N9+dsBj7w5NjSZnyIX2w8Ys8AgKNf9JKH4h3UFWZy//gOo
- a8GS1PRvQqBTXdlUrgdrfTL3Hj4a7a4FH22SXf7O4R7r9CX3/RkHMNTWNtOB4BQWLGen
- diag==
-X-Gm-Message-State: APjAAAVwpQFaJvP6J9Mo2jDiIKDmhIT2Ty2vtkmrMJe/3rC8W4vPFDK7
- R4T3TdJK9k0o3jir/PWjvvRIeokLiHWiUsgjmyE=
-X-Google-Smtp-Source: APXvYqxoGmkL4rb6SmshKgEcakiySHRsRM0otzVnJlT+EE2PJslFvbCmrQw/aURMHotm+WgG5nPSxeJAat3/lS6O9yI=
-X-Received: by 2002:a9d:6e8a:: with SMTP id a10mr20308728otr.295.1560330749662; 
- Wed, 12 Jun 2019 02:12:29 -0700 (PDT)
+ (envelope-from <aravinda@linux.vnet.ibm.com>) id 1hazRH-0007di-Hj
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 05:21:04 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52569
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
+ id 1hazRH-0007YO-Cg
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 05:21:03 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x5C9DhU7068995
+ for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 05:20:55 -0400
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2t2w9nuu37-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 05:20:55 -0400
+Received: from localhost
+ by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
+ Wed, 12 Jun 2019 10:20:54 +0100
+Received: from b03cxnp08025.gho.boulder.ibm.com (9.17.130.17)
+ by e31.co.us.ibm.com (192.168.1.131) with IBM ESMTP SMTP Gateway: Authorized
+ Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 12 Jun 2019 10:20:51 +0100
+Received: from b03ledav006.gho.boulder.ibm.com
+ (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+ by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x5C9KoF526345772
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 12 Jun 2019 09:20:50 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A3B3AC6057;
+ Wed, 12 Jun 2019 09:20:50 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8228CC6055;
+ Wed, 12 Jun 2019 09:20:48 +0000 (GMT)
+Received: from [127.0.1.1] (unknown [9.124.31.35])
+ by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Wed, 12 Jun 2019 09:20:48 +0000 (GMT)
+From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+To: aik@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ david@gibson.dropbear.id.au
+Date: Wed, 12 Jun 2019 14:50:47 +0530
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
-Received: by 2002:a9d:20e4:0:0:0:0:0 with HTTP; Wed, 12 Jun 2019 02:12:29
- -0700 (PDT)
-Received: by 2002:a9d:20e4:0:0:0:0:0 with HTTP; Wed, 12 Jun 2019 02:12:29
- -0700 (PDT)
-In-Reply-To: <CAL1e-=jKcPK1ig3eHtRfTA0PDV0Z2Y1gXP6YhJ7jdbSA06B=fw@mail.gmail.com>
-References: <20190610152444.20859-1-peter.maydell@linaro.org>
- <20190610152444.20859-2-peter.maydell@linaro.org>
- <CAL1e-=hSY4uWQ9QmebdzkkV4WTZ82JFSW2fRafHBtvdJv1tm5A@mail.gmail.com>
- <CAFEAcA_TAQvXbjP1h9SS6TiCxwwDf5oAUDAWDn0FRX3G0PBzaA@mail.gmail.com>
- <CAL1e-=jKcPK1ig3eHtRfTA0PDV0Z2Y1gXP6YhJ7jdbSA06B=fw@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Wed, 12 Jun 2019 11:12:29 +0200
-Message-ID: <CAL1e-=guBWdaYzG5q_g9eB3tn68hnT+r1WnQR5qzNfF2KnhR5w@mail.gmail.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH 1/2] docs/specs/index.rst: Fix minor syntax
- issues
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19061209-8235-0000-0000-00000EA6D0D4
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011250; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000286; SDB=6.01216839; UDB=6.00639831; IPR=6.00997939; 
+ MB=3.00027275; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-12 09:20:53
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19061209-8236-0000-0000-000045FD0C96
+Message-Id: <156033104292.26635.15759339817253067370.stgit@aravinda>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-06-12_05:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=512 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906120064
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: [Qemu-devel] [PATCH v10 0/6] target-ppc/spapr: Add FWNMI support in
+ QEMU for PowerKVM guests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,97 +107,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>, John Snow <jsnow@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: paulus@ozlabs.org, aravinda@linux.vnet.ibm.com, groug@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Jun 11, 2019 4:18 PM, "Aleksandar Markovic" <aleksandar.m.mail@gmail.com=
->
-wrote:
->
->
-> On Jun 11, 2019 11:51 AM, "Peter Maydell" <peter.maydell@linaro.org>
-wrote:
-> >
-> > On Mon, 10 Jun 2019 at 22:41, Aleksandar Markovic
-> > <aleksandar.m.mail@gmail.com> wrote:
-> > >
-> > >
-> > > On Jun 10, 2019 5:25 PM, "Peter Maydell" <peter.maydell@linaro.org>
-wrote:
-> > > >
-> > > > The docs/specs/index.rst has a couple of minor issues which
-> > > > we didn't notice because we weren't building the manual:
-> > > >  * the ToC entry for the new PPC XIVE docs points to
-> > > >    a nonexistent file
-> > > >  * the initial comment needs to be marked by '..', not '.',
-> > > >    or it will appear in the output
-> > > >  * the title doesn't match the capitialization used by
-> > > >    the existing interop or devel manuals, and uses
-> > > >    'full-system emulation' rather than the 'system emulation'
-> > > >    that the interop manual title uses
-> > > >
-> > > > Fix these minor issues before we start trying to build the manual.
-> > > >
-> > > > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> > > > ---
-> > >
-> > > Acked-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> >
-> > Hi Aleksandar; I'm just wondering what you were meaning
-> > with this acked-by tag. Generally acked-by means  (to me,
-> > and I think usually with qemu) "this patch touches an
-> > area that I maintain, I haven't reviewed it but I'm OK with
-> > it". But this series isn't mips-related, so maybe you
-> > meant reviewed-by instead ?
-> >
-> > (Acked-by is a bit of an odd tag because it's less
-> > clear what it means than reviewed-by or signed-off-by,
-> > so it's not very surprising if you've picked up a
-> > different opinion on what it's for.)
-> >
->
-> Hello, Peter.
->
-> My intented meaning (of my Acked-by) is:
->
-> =E2=80=9CI agree that this patch is valuable in general, I took a look at=
- the
-code changes and they look good to me implementation-wise, but I am not a
-reviewer nor an expert in rst and related areas, so I am not comfortable
-=E2=80=9Creviewing-it-by=E2=80=9D - however as a potential user/writer of r=
-st files, I want
-to acknowledge the significance and the rightness of the patch by
-=E2=80=9Cacking-it-by=E2=80=9D.=E2=80=9D
->
-> I am not sure how it fits in other definitions, but I am comfortable with
-your changing my =E2=80=9CAcked-by=E2=80=9D to =E2=80=9CReviewed-by=E2=80=
-=9D, leaving it as is, or changing
-it to nothing- whatever you deem being suitable.
->
-> The same applies to the other patch of this series, of course.
->
-> Yours,
-> Aleksandar
->
-> > thanks
-> > -- PMM
+This patch set adds support for FWNMI in PowerKVM guests.
 
-Peter, hi again.
+System errors such as SLB multihit and memory errors
+that cannot be corrected by hardware is passed on to
+the kernel for handling by raising machine check
+exception (an NMI). Upon such machine check exceptions,
+if the address in error belongs to guest then KVM
+invokes guests' 0x200 interrupt vector if the guest
+is not FWNMI capable. For FWNMI capable guest
+KVM passes the control to QEMU by exiting the guest.
 
-While the content of this patch seems definitely unrelated to mips, we in
-mips are very interested in QEMU documention framework extended and
-improved, since we plan (in a mid-term) a major overhaul of both external
-and internal mips-related QEMU documentation.
+This patch series adds functionality to QEMU to pass
+on such machine check exceptions to the FWNMI capable
+guest kernel by building an error log and invoking
+the guest registered machine check handling routine.
 
-That is why I am closely observing activities in that area, and most
-probably the missing context that left you wandering why I participate in
-the discussions on these patches at all. Hopefully this explanations
-removes some of your dilemmas.
+The KVM changes are now part of the upstream kernel
+(commit e20bbd3d). This series contain QEMU changes.
 
-Best regards,
-Aleksandar
+Change Log v10:
+  - Reshuffled the patch sequence + minor fixes
+
+Change Log v9:
+  - Fixed kvm cap and spapr cap issues
+
+Change Log v8:
+  - Added functionality to check FWNMI capability during
+    VM migration
+---
+
+Aravinda Prasad (6):
+      Wrapper function to wait on condition for the main loop mutex
+      ppc: spapr: Introduce FWNMI capability
+      target/ppc: Handle NMI guest exit
+      target/ppc: Build rtas error log upon an MCE
+      migration: Include migration support for machine check handling
+      ppc: spapr: Handle "ibm,nmi-register" and "ibm,nmi-interlock" RTAS calls
+
+
+ cpus.c                   |    5 +
+ hw/ppc/spapr.c           |   53 +++++++++
+ hw/ppc/spapr_caps.c      |   26 ++++
+ hw/ppc/spapr_events.c    |  273 ++++++++++++++++++++++++++++++++++++++++++++++
+ hw/ppc/spapr_rtas.c      |   89 +++++++++++++++
+ include/hw/ppc/spapr.h   |   25 ++++
+ include/qemu/main-loop.h |    8 +
+ target/ppc/kvm.c         |   35 ++++++
+ target/ppc/kvm_ppc.h     |   14 ++
+ target/ppc/trace-events  |    1 
+ 10 files changed, 527 insertions(+), 2 deletions(-)
+
+--
+Aravinda Prasad
+
+
