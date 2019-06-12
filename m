@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BE27C46477
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 08:52:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A218C31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 08:55:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE0D82086A
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 08:52:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE0D82086A
+	by mail.kernel.org (Postfix) with ESMTPS id 51FA720866
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 08:55:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51FA720866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57658 helo=lists.gnu.org)
+Received: from localhost ([::1]:57682 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hayzx-0000xu-65
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 04:52:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57848)
+	id 1haz2i-0003oI-G4
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 04:55:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57751)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <like.xu@linux.intel.com>) id 1hayrw-0003Ht-7C
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 04:44:33 -0400
+ (envelope-from <like.xu@linux.intel.com>) id 1hayro-00038U-1i
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 04:44:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <like.xu@linux.intel.com>) id 1hayru-0006Lr-Sd
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 04:44:32 -0400
-Received: from mga11.intel.com ([192.55.52.93]:10702)
+ (envelope-from <like.xu@linux.intel.com>) id 1hayri-0006Dy-IR
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 04:44:23 -0400
+Received: from mga09.intel.com ([134.134.136.24]:33312)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <like.xu@linux.intel.com>)
- id 1hayru-0005vD-JD
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 04:44:30 -0400
+ id 1hayr5-00061H-KN
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 04:44:18 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
- by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 12 Jun 2019 01:43:28 -0700
+ by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 12 Jun 2019 01:43:37 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,363,1557212400"; d="scan'208";a="184175072"
+X-IronPort-AV: E=Sophos;i="5.63,363,1557212400"; d="scan'208";a="184175095"
 Received: from likexu-e5-2699-v4.sh.intel.com ([10.239.48.178])
- by fmsmga002.fm.intel.com with ESMTP; 12 Jun 2019 01:43:27 -0700
+ by fmsmga002.fm.intel.com with ESMTP; 12 Jun 2019 01:43:35 -0700
 From: Like Xu <like.xu@linux.intel.com>
 To: qemu-devel@nongnu.org,
 	Eduardo Habkost <ehabkost@redhat.com>
-Date: Wed, 12 Jun 2019 16:40:56 +0800
-Message-Id: <20190612084104.34984-2-like.xu@linux.intel.com>
+Date: Wed, 12 Jun 2019 16:41:04 +0800
+Message-Id: <20190612084104.34984-10-like.xu@linux.intel.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190612084104.34984-1-like.xu@linux.intel.com>
 References: <20190612084104.34984-1-like.xu@linux.intel.com>
@@ -54,9 +54,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.93
-Subject: [Qemu-devel] [PATCH v3 1/9] i386: Add die-level cpu topology to
- x86CPU on PCMachine
+X-Received-From: 134.134.136.24
+Subject: [Qemu-devel]  [PATCH v3 9/9] vl.c: Add -smp,
+ dies=* command line support and update doc
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,99 +74,157 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The die-level as the first PC-specific cpu topology is added to the leagcy
-cpu topology model, which has one die per package implicitly and only the
-numbers of sockets/cores/threads are configurable.
+For PC target, users could configure the number of dies per one package
+via command line with this patch, such as "-smp dies=2,cores=4".
 
-In the new model with die-level support, the total number of logical
-processors (including offline) on board will be calculated as:
-
-     #cpus = #sockets * #dies * #cores * #threads
-
-and considering compatibility, the default value for #dies would be
-initialized to one in x86_cpu_initfn() and pc_machine_initfn().
+The parsing rules of new cpu-topology model obey the same restrictions/logic
+as the legacy socket/core/thread model especially on missing values computing.
 
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
 ---
- hw/i386/pc.c         | 9 +++++++--
- include/hw/i386/pc.h | 2 ++
- target/i386/cpu.c    | 1 +
- target/i386/cpu.h    | 2 ++
- 4 files changed, 12 insertions(+), 2 deletions(-)
+ hw/i386/pc.c    | 32 ++++++++++++++++++--------------
+ qemu-options.hx | 17 +++++++++--------
+ vl.c            |  3 +++
+ 3 files changed, 30 insertions(+), 22 deletions(-)
 
 diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 12c1e08b85..9e9a42f007 100644
+index 63b44bd2bd..8a5da4f0c1 100644
 --- a/hw/i386/pc.c
 +++ b/hw/i386/pc.c
-@@ -2308,9 +2308,13 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
-         return;
+@@ -1543,10 +1543,13 @@ static void pc_new_cpu(PCMachineState *pcms, int64_t apic_id, Error **errp)
+ 
+ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
+ {
+-    /* copy it from legacy smp_parse() in vl.c */
++    PCMachineState *pcms = (PCMachineState *)
++        object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE);
++
+     if (opts) {
+         unsigned cpus    = qemu_opt_get_number(opts, "cpus", 0);
+         unsigned sockets = qemu_opt_get_number(opts, "sockets", 0);
++        unsigned dies = qemu_opt_get_number(opts, "dies", 1);
+         unsigned cores   = qemu_opt_get_number(opts, "cores", 0);
+         unsigned threads = qemu_opt_get_number(opts, "threads", 0);
+ 
+@@ -1556,24 +1559,24 @@ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
+             threads = threads > 0 ? threads : 1;
+             if (cpus == 0) {
+                 sockets = sockets > 0 ? sockets : 1;
+-                cpus = cores * threads * sockets;
++                cpus = cores * threads * dies * sockets;
+             } else {
+                 ms->smp.max_cpus =
+                         qemu_opt_get_number(opts, "maxcpus", cpus);
+-                sockets = ms->smp.max_cpus / (cores * threads);
++                sockets = ms->smp.max_cpus / (cores * threads * dies);
+             }
+         } else if (cores == 0) {
+             threads = threads > 0 ? threads : 1;
+-            cores = cpus / (sockets * threads);
++            cores = cpus / (sockets * dies * threads);
+             cores = cores > 0 ? cores : 1;
+         } else if (threads == 0) {
+-            threads = cpus / (cores * sockets);
++            threads = cpus / (cores * dies * sockets);
+             threads = threads > 0 ? threads : 1;
+-        } else if (sockets * cores * threads < cpus) {
++        } else if (sockets * dies * cores * threads < cpus) {
+             error_report("cpu topology: "
+-                         "sockets (%u) * cores (%u) * threads (%u) < "
++                         "sockets (%u) * dies (%u) * cores (%u) * threads (%u) < "
+                          "smp_cpus (%u)",
+-                         sockets, cores, threads, cpus);
++                         sockets, dies, cores, threads, cpus);
+             exit(1);
+         }
+ 
+@@ -1585,26 +1588,27 @@ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
+             exit(1);
+         }
+ 
+-        if (sockets * cores * threads > ms->smp.max_cpus) {
++        if (sockets * dies * cores * threads > ms->smp.max_cpus) {
+             error_report("cpu topology: "
+-                         "sockets (%u) * cores (%u) * threads (%u) > "
++                         "sockets (%u) * dies (%u) * cores (%u) * threads (%u) > "
+                          "maxcpus (%u)",
+-                         sockets, cores, threads,
++                         sockets, dies, cores, threads,
+                          ms->smp.max_cpus);
+             exit(1);
+         }
+ 
+-        if (sockets * cores * threads != ms->smp.max_cpus) {
++        if (sockets * dies * cores * threads != ms->smp.max_cpus) {
+             warn_report("Invalid CPU topology deprecated: "
+-                        "sockets (%u) * cores (%u) * threads (%u) "
++                        "sockets (%u) * dies (%u) * cores (%u) * threads (%u) "
+                         "!= maxcpus (%u)",
+-                        sockets, cores, threads,
++                        sockets, dies, cores, threads,
+                         ms->smp.max_cpus);
+         }
+ 
+         ms->smp.cpus = cpus;
+         ms->smp.cores = cores;
+         ms->smp.threads = threads;
++        pcms->smp_dies = dies;
      }
  
--    /* if APIC ID is not set, set it based on socket/core/thread properties */
-+    /*
-+     * If APIC ID is not set,
-+     * set it based on socket/die/core/thread properties.
-+     */
-     if (cpu->apic_id == UNASSIGNED_APIC_ID) {
--        int max_socket = (ms->smp.max_cpus - 1) / smp_threads / smp_cores;
-+        int max_socket = (ms->smp.max_cpus - 1) /
-+                                smp_threads / smp_cores / pcms->smp_dies;
+     if (ms->smp.cpus > 1) {
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 0d8beb4afd..a5b314a448 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -138,25 +138,26 @@ no incompatible TCG features have been enabled (e.g. icount/replay).
+ ETEXI
  
-         if (cpu->socket_id < 0) {
-             error_setg(errp, "CPU socket-id is not set");
-@@ -2620,6 +2624,7 @@ static void pc_machine_initfn(Object *obj)
-     pcms->smbus_enabled = true;
-     pcms->sata_enabled = true;
-     pcms->pit_enabled = true;
-+    pcms->smp_dies = 1;
+ DEF("smp", HAS_ARG, QEMU_OPTION_smp,
+-    "-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,sockets=sockets]\n"
++    "-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,dies=dies][,sockets=sockets]\n"
+     "                set the number of CPUs to 'n' [default=1]\n"
+     "                maxcpus= maximum number of total cpus, including\n"
+     "                offline CPUs for hotplug, etc\n"
+-    "                cores= number of CPU cores on one socket\n"
++    "                cores= number of CPU cores on one socket (for PC, it's on one die)\n"
+     "                threads= number of threads on one CPU core\n"
++    "                dies= number of CPU dies on one socket (for PC only)\n"
+     "                sockets= number of discrete sockets in the system\n",
+         QEMU_ARCH_ALL)
+ STEXI
+-@item -smp [cpus=]@var{n}[,cores=@var{cores}][,threads=@var{threads}][,sockets=@var{sockets}][,maxcpus=@var{maxcpus}]
++@item -smp [cpus=]@var{n}[,cores=@var{cores}][,threads=@var{threads}][,dies=dies][,sockets=@var{sockets}][,maxcpus=@var{maxcpus}]
+ @findex -smp
+ Simulate an SMP system with @var{n} CPUs. On the PC target, up to 255
+ CPUs are supported. On Sparc32 target, Linux limits the number of usable CPUs
+ to 4.
+-For the PC target, the number of @var{cores} per socket, the number
+-of @var{threads} per cores and the total number of @var{sockets} can be
+-specified. Missing values will be computed. If any on the three values is
+-given, the total number of CPUs @var{n} can be omitted. @var{maxcpus}
+-specifies the maximum number of hotpluggable CPUs.
++For the PC target, the number of @var{cores} per die, the number of @var{threads}
++per cores, the number of @var{dies} per packages and the total number of
++@var{sockets} can be specified. Missing values will be computed.
++If any on the three values is given, the total number of CPUs @var{n} can be omitted.
++@var{maxcpus} specifies the maximum number of hotpluggable CPUs.
+ ETEXI
  
-     pc_system_flash_create(pcms);
- }
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index b260262640..fae9217e34 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -24,6 +24,7 @@
-  * PCMachineState:
-  * @acpi_dev: link to ACPI PM device that performs ACPI hotplug handling
-  * @boot_cpus: number of present VCPUs
-+ * @smp_dies: number of dies per one package
-  */
- struct PCMachineState {
-     /*< private >*/
-@@ -59,6 +60,7 @@ struct PCMachineState {
-     bool apic_xrupt_override;
-     unsigned apic_id_limit;
-     uint16_t boot_cpus;
-+    unsigned smp_dies;
- 
-     /* NUMA information: */
-     uint64_t numa_nodes;
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 23119699de..a16be205fe 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -5619,6 +5619,7 @@ static void x86_cpu_initfn(Object *obj)
-     CPUX86State *env = &cpu->env;
-     FeatureWord w;
- 
-+    env->nr_dies = 1;
-     cpu_set_cpustate_pointers(cpu);
- 
-     object_property_add(obj, "family", "int",
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index edad6e1efb..5daa2eeafa 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1349,6 +1349,8 @@ typedef struct CPUX86State {
-     uint64_t xss;
- 
-     TPRAccess tpr_access_type;
-+
-+    unsigned nr_dies;
- } CPUX86State;
- 
- struct kvm_msrs;
+ DEF("numa", HAS_ARG, QEMU_OPTION_numa,
+diff --git a/vl.c b/vl.c
+index 53ea9b6d6f..c6d1339442 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1231,6 +1231,9 @@ static QemuOptsList qemu_smp_opts = {
+         }, {
+             .name = "sockets",
+             .type = QEMU_OPT_NUMBER,
++        }, {
++            .name = "dies",
++            .type = QEMU_OPT_NUMBER,
+         }, {
+             .name = "cores",
+             .type = QEMU_OPT_NUMBER,
 -- 
 2.21.0
 
