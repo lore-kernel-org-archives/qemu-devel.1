@@ -2,60 +2,60 @@ Return-Path: <SRS0=XH1q=UL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51528C31E46
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 05:52:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80393C31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 05:53:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 214EA20874
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 05:52:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 48E4F20874
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 05:53:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ezP/FgFM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 214EA20874
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="PGJjatN6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48E4F20874
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56814 helo=lists.gnu.org)
+Received: from localhost ([::1]:56816 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hawBN-00078K-CK
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 01:52:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58473)
+	id 1hawBy-000859-Lw
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 01:53:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58392)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1haw8m-0004Ur-8f
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 01:49:46 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1haw8j-0004Of-3f
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 01:49:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1haw8k-00072W-En
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 01:49:44 -0400
-Received: from ozlabs.org ([203.11.71.1]:33539)
+ (envelope-from <dgibson@ozlabs.org>) id 1haw8h-00070m-Pi
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 01:49:41 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:46941)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1haw8k-00070u-26; Wed, 12 Jun 2019 01:49:42 -0400
+ id 1haw8g-0006zb-Jr; Wed, 12 Jun 2019 01:49:39 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 45NwtR1Hlnz9sNT; Wed, 12 Jun 2019 15:49:35 +1000 (AEST)
+ id 45NwtQ3PFXz9s9y; Wed, 12 Jun 2019 15:49:34 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1560318575;
- bh=KS3YuiEIOq/GZnRXvIWmLklhlLsIdYGPylfsoDmpdvo=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=ezP/FgFM07clANxNp9kcWY167jth5oTPP+Qu+oyqCDhoE520KweugtXUgMFp05lRv
- 1P9BYCayylNXCxwgev9gFFbak8Lzn57ZT6NUtUy5n662Sdy+eUdY2GKhgUYqSFwC2e
- 6HehvV/SM68lFBU1dia0HzWV9EBYgdmqnDQUjoeg=
+ d=gibson.dropbear.id.au; s=201602; t=1560318574;
+ bh=afZGPOcXXj2+YdmyHT27j2KUWyG32JKL2p+Rx7eidK8=;
+ h=From:To:Cc:Subject:Date:From;
+ b=PGJjatN6eXBO2HKVQXFeTNmmrgIisNceCm8irNNwiu1f1AqbZp1em1xk9l3ed0Phe
+ Vhukxs7G2z2SvHGh2mw3TvYrdwYPqswwg6DA57B6qSyHjZ6cqGImjBWPIKf2iGFavB
+ k2J3rcYy6O3oWj25moDv7USqWFUjCIvYWuKYNl94=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Wed, 12 Jun 2019 15:49:27 +1000
-Message-Id: <20190612054929.21136-12-david@gibson.dropbear.id.au>
+Date: Wed, 12 Jun 2019 15:49:16 +1000
+Message-Id: <20190612054929.21136-1-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190612054929.21136-1-david@gibson.dropbear.id.au>
-References: <20190612054929.21136-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: [Qemu-devel] [PULL 11/13] target/ppc: Use tcg_gen_gvec_bitsel
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: [Qemu-devel] [PULL 00/13] ppc-for-4.1 queue 20190612
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,74 +67,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, aik@ozlabs.ru,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+The following changes since commit 219dca61ebf41625831d4f96a720852baf44b7=
+62:
 
-Replace the target-specific implementation of XXSEL.
+  Merge remote-tracking branch 'remotes/ehabkost/tags/x86-next-pull-reque=
+st' into staging (2019-06-11 16:02:07 +0100)
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20190603164927.8336-1-richard.henderson@linaro.org>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- target/ppc/translate/vsx-impl.inc.c | 24 ++----------------------
- 1 file changed, 2 insertions(+), 22 deletions(-)
+are available in the Git repository at:
 
-diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/v=
-sx-impl.inc.c
-index cdb44b8b70..e9b7562f84 100644
---- a/target/ppc/translate/vsx-impl.inc.c
-+++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -1339,28 +1339,8 @@ static void glue(gen_, name)(DisasContext *ctx)   =
-          \
- VSX_XXMRG(xxmrghw, 1)
- VSX_XXMRG(xxmrglw, 0)
-=20
--static void xxsel_i64(TCGv_i64 t, TCGv_i64 a, TCGv_i64 b, TCGv_i64 c)
--{
--    tcg_gen_and_i64(b, b, c);
--    tcg_gen_andc_i64(a, a, c);
--    tcg_gen_or_i64(t, a, b);
--}
--
--static void xxsel_vec(unsigned vece, TCGv_vec t, TCGv_vec a,
--                      TCGv_vec b, TCGv_vec c)
--{
--    tcg_gen_and_vec(vece, b, b, c);
--    tcg_gen_andc_vec(vece, a, a, c);
--    tcg_gen_or_vec(vece, t, a, b);
--}
--
- static void gen_xxsel(DisasContext *ctx)
- {
--    static const GVecGen4 g =3D {
--        .fni8 =3D xxsel_i64,
--        .fniv =3D xxsel_vec,
--        .vece =3D MO_64,
--    };
-     int rt =3D xT(ctx->opcode);
-     int ra =3D xA(ctx->opcode);
-     int rb =3D xB(ctx->opcode);
-@@ -1370,8 +1350,8 @@ static void gen_xxsel(DisasContext *ctx)
-         gen_exception(ctx, POWERPC_EXCP_VSXU);
-         return;
-     }
--    tcg_gen_gvec_4(vsr_full_offset(rt), vsr_full_offset(ra),
--                   vsr_full_offset(rb), vsr_full_offset(rc), 16, 16, &g)=
-;
-+    tcg_gen_gvec_bitsel(MO_64, vsr_full_offset(rt), vsr_full_offset(rc),
-+                        vsr_full_offset(rb), vsr_full_offset(ra), 16, 16=
-);
- }
-=20
- static void gen_xxspltw(DisasContext *ctx)
---=20
-2.21.0
+  git://github.com/dgibson/qemu.git tags/ppc-for-4.1-20190612
 
+for you to fetch changes up to 4aca9786542e427d4337503566efdf09f2cb87cd:
+
+  ppc/xive: Make XIVE generate the proper interrupt types (2019-06-12 10:=
+41:50 +1000)
+
+----------------------------------------------------------------
+ppc patch queue 2019-06-12
+
+Next pull request against qemu-4.1.  The big thing here is adding
+support for hot plug of P2P bridges, and PCI devices under P2P bridges
+on the "pseries" machine (which doesn't use SHPC).  Other than that
+there's just a handful of fixes and small enhancements.
+
+----------------------------------------------------------------
+Anton Blanchard (1):
+      target/ppc: Fix lxvw4x, lxvh8x and lxvb16x
+
+Benjamin Herrenschmidt (1):
+      ppc/xive: Make XIVE generate the proper interrupt types
+
+C=C3=A9dric Le Goater (1):
+      ppc/pnv: activate the "dumpdtb" option on the powernv machine
+
+David Gibson (8):
+      spapr: Clean up device node name generation for PCI devices
+      spapr: Clean up device tree construction for PCI devices
+      spapr: Clean up dt creation for PCI buses
+      spapr: Clean up spapr_drc_populate_dt()
+      spapr: Clean up DRC index construction
+      spapr: Don't use bus number for building DRC ids
+      spapr: Direct all PCI hotplug to host bridge, rather than P2P bridg=
+e
+      spapr: Allow hot plug/unplug of PCI bridges and devices under PCI b=
+ridges
+
+Greg Kurz (1):
+      spapr_pci: Improve error message
+
+Richard Henderson (1):
+      target/ppc: Use tcg_gen_gvec_bitsel
+
+ hw/intc/xive.c                      |  22 +-
+ hw/ppc/pnv.c                        |   2 +
+ hw/ppc/spapr.c                      |  25 +-
+ hw/ppc/spapr_drc.c                  |  13 +-
+ hw/ppc/spapr_pci.c                  | 497 ++++++++++++++++++++++--------=
+------
+ include/hw/pci-host/spapr.h         |   4 +-
+ include/hw/ppc/spapr_drc.h          |   3 +-
+ include/hw/ppc/xive.h               |   3 +-
+ target/ppc/translate/vsx-impl.inc.c |  37 +--
+ 9 files changed, 368 insertions(+), 238 deletions(-)
 
