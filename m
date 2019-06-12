@@ -2,72 +2,81 @@ Return-Path: <SRS0=XH1q=UL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FD57C31E44
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 01:54:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68B16C31E44
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 01:54:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 083C62054F
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 01:54:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 083C62054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 15CD320883
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 01:54:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="CajKx7Wp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15CD320883
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56192 helo=lists.gnu.org)
+Received: from localhost ([::1]:56194 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hasT1-00016y-BJ
-	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 21:54:23 -0400
+	id 1hasT5-0001Cl-Bo
+	for qemu-devel@archiver.kernel.org; Tue, 11 Jun 2019 21:54:27 -0400
 Received: from eggs.gnu.org ([2001:470:142:3::10]:54098)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hasOQ-0004YM-IC
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 21:49:39 -0400
+ (envelope-from <joel.stan@gmail.com>) id 1hasOM-0004YM-El
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 21:49:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hasBC-00012s-Lj
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 21:36:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59954)
+ (envelope-from <joel.stan@gmail.com>) id 1hasBx-0001CF-RJ
+ for qemu-devel@nongnu.org; Tue, 11 Jun 2019 21:36:46 -0400
+Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:38129)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hasBA-0000xs-3v
- for qemu-devel@nongnu.org; Tue, 11 Jun 2019 21:35:56 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hasAl-0006hz-Ef
- for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 01:35:31 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 69CD32E806F
- for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 01:35:31 +0000 (UTC)
+ (Exim 4.71) (envelope-from <joel.stan@gmail.com>)
+ id 1hasBw-0001Bu-EH; Tue, 11 Jun 2019 21:36:44 -0400
+Received: by mail-qt1-x841.google.com with SMTP id n11so14836941qtl.5;
+ Tue, 11 Jun 2019 18:36:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=eTIfW7HynanhXXC8daMSeYJoRYU/p94Cc8htj9sUXcA=;
+ b=CajKx7Wp13Uf0qBRefqjXXXF7SD3N6CcZqyNG57OhGqVopDyyOZWMjX3EjL/pygwwH
+ uETkG/us7RDjKNHvyEZB8xGLdP5rSOahpvORugacDJDdRH6YfRqoIiNwitfM1ylBs/cc
+ M3vtNGVCGZk+6v1v08/UCz0HLAsSScqu8S95M=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=eTIfW7HynanhXXC8daMSeYJoRYU/p94Cc8htj9sUXcA=;
+ b=GKnOFPmdrkrgedxKj5t9mIQInfj1Kv+qfqzAZ1GGOnMYMi8igYpoPDbLUf5xuwIMZZ
+ pUK5rXxVBrBI6GW4F/uz2sB8O9HDw6UqsX9ARe5teFCOtFLYLxI87MHkROBoQU/7saup
+ RsNpjYuqZPRCySdDn33E6oc3yc46nww/3OXUkclH/5ZDsyDK2S9s3PVoRBxroJqsXUAP
+ 8N+HXUku9DWe6RYteLCupks2qG29QSdiU2Reg9I9FO/VsQe6lp34JIAhRRmd12ocMk3t
+ aRROI1kFWQQNiCMdQ5dUVtqyK/uq4dBx11UGyWWj2wMsvybsnAcOhyIk3YxxEu64w8QN
+ w2aA==
+X-Gm-Message-State: APjAAAV/AYRIRQIr1beO8HLdGYKczNCYQpCslmEvlCJfi/vRQ0Gya8mT
+ swGXAUMRDZd7uxsDtKx6f5LARuyDCEaoFemeh84P5/Pk
+X-Google-Smtp-Source: APXvYqwwC27FMONOVlz9488myVgoRdWMJf38g4xfnR4X51Ra/wxqJ5qGYePa7IUcsIqabckLHnksB6XGaFwkkSIXT7A=
+X-Received: by 2002:ac8:264a:: with SMTP id v10mr35694473qtv.255.1560303403519; 
+ Tue, 11 Jun 2019 18:36:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20190525151241.5017-1-clg@kaod.org>
+ <20190525151241.5017-16-clg@kaod.org>
+In-Reply-To: <20190525151241.5017-16-clg@kaod.org>
+From: Joel Stanley <joel@jms.id.au>
+Date: Wed, 12 Jun 2019 01:36:32 +0000
+Message-ID: <CACPK8Xfgk6+3vEy=_81X1GUep_8w-uFyE8AnzdpgUTKNVFyxnw@mail.gmail.com>
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Jun 2019 01:22:33 -0000
-From: "Sonicadvance1@gmail.com" <Sonicadvance1@gmail.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: sonicadvance1
-X-Launchpad-Bug-Reporter: Sonicadvance1@gmail.com (sonicadvance1)
-X-Launchpad-Bug-Modifier: Sonicadvance1@gmail.com (sonicadvance1)
-Message-Id: <156030255368.16736.8122800429162874738.malonedeb@soybean.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18978";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: dc09e5ce6f04e5738d885028a740702c4b04edfd
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1832422] [NEW] SSE CMP ops with 8bit immediate
- throw sigill with oversized byte
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::841
+Subject: Re: [Qemu-devel] [PATCH 15/19] aspeed: add a RAM memory region
+ container
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,58 +85,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1832422 <1832422@bugs.launchpad.net>
+Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On Sat, 25 May 2019 at 15:14, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>
+> The RAM memory region is defined after the SoC is realized when the
+> SDMC controller has cheched that the defined RAM size for the machine
 
-The SSE comparison ops that use an 8bit immediate as a comparison type
-selector throws a sigill when the immediate is oversized.
+checked
 
-Test op that I found this on is here `66 0f c2 c0 d1          cmppd  xmm0,x=
-mm0,0xd1`
-According to the x86-64 documentation only bits [2:0] are used for these op=
-s (and [4:0] for the AVX variant)
-Currently qemu just checks if the value is >=3D8 and will throw a sigill in=
- that case. It instead needs to mask.
+> is correct. This is problematic for controller models requiring a link
+> on the RAM region, for DMA support in the SMC controller for instance.
+>
+> Introduce a container memory region for the RAM that we can link into
+> the controllers early, before the SoC is realized. It will be
+> populated with the RAM region after the checks have be done.
+>
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-I have a small patch that fixes the issue for the SSE variant.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Patch added: "Fixes the bug"
-   https://bugs.launchpad.net/bugs/1832422/+attachment/5270247/+files/compa=
-re_ops.diff
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1832422
-
-Title:
-  SSE CMP ops with 8bit immediate throw sigill with oversized byte
-
-Status in QEMU:
-  New
-
-Bug description:
-  The SSE comparison ops that use an 8bit immediate as a comparison type
-  selector throws a sigill when the immediate is oversized.
-
-  Test op that I found this on is here `66 0f c2 c0 d1          cmppd  xmm0=
-,xmm0,0xd1`
-  According to the x86-64 documentation only bits [2:0] are used for these =
-ops (and [4:0] for the AVX variant)
-  Currently qemu just checks if the value is >=3D8 and will throw a sigill =
-in that case. It instead needs to mask.
-
-  I have a small patch that fixes the issue for the SSE variant.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1832422/+subscriptions
+Reviewed-by: Joel Stanley <joel@jms.id.au>
 
