@@ -2,81 +2,66 @@ Return-Path: <SRS0=XH1q=UL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71A95C31E46
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 14:09:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE506C31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 14:12:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6B0E20866
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 14:09:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LlCEHlDE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6B0E20866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8882E20866
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 14:12:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8882E20866
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60742 helo=lists.gnu.org)
+Received: from localhost ([::1]:60764 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hb3w6-0005iX-Qy
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 10:09:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42176)
+	id 1hb3zE-0007qY-Jn
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 10:12:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45261)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hb3iS-0006YT-35
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 09:55:08 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hb3uV-0005Nk-AZ
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 10:07:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hb3XQ-00011j-5u
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 09:43:41 -0400
-Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:40062)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hb3XP-00010x-PG
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 09:43:40 -0400
-Received: by mail-oi1-x235.google.com with SMTP id w196so11702577oie.7
- for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 06:43:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=4o0L3z2wH+Ou8v+gUGiBLKcFXNl6G+vFe+39clMs+oU=;
- b=LlCEHlDEF370/Q02E/N+Lh5O1q3UlY4StEItY2UZkKuYMS2fAXXbw7GvJbB1OdGqIT
- juTbNu8xSid3CgJvi9/Gl0nI5lTCzhnAvjllGP4W8eWj0gAF7829K1N2b0wtCepgqUwV
- SCEJjAzF4eV7Js/bD0cdghAFiKR4aq79iXbnuobhw5dyqz8LZmciPZg9hRH7jy29UZRX
- qSGFJwu+y+LwZzzwWHfpas2JjEdbTpC7kTJ+cImoVut8iqPdzk/SNlwGUGpbos4A7Swc
- mE7LGDvZi4ZAnGVHiypYBb8dy02PeAsjSr6NGvD5of3hTY4ZkfLOb2bi3Ow0GgH+Cd+e
- bLEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=4o0L3z2wH+Ou8v+gUGiBLKcFXNl6G+vFe+39clMs+oU=;
- b=cfgXZ9i9fJbXmzGkWF8V2OVs7zNeH2x6h/Uk857wkERNFG5WAyej0oBxjXAQnP14+G
- /T0zzuLtub36GKWuyHz/B9jVTUOZrZcLrZQbzU7xQchT/wFKVsyanax6JIVsVFBq8roh
- mFyPTtywGwi2iOKp1/OHM+i6ui3j/cOkzT2juRl0hFCPdkaG3+lb1uEVKTAx8qad4VLJ
- u+GK/hTemNMp+IgRa5mkItA1W12bYPwkL8Vj5XvywaxuvyVMHZtwGcb6ZTYiGt2xdiJ8
- rkVE6fnnNEYkhSNdtr13m7rVc+7WJKICkUPakP2e8XOudUX+iemmxOE+fOuR4r61DtOL
- fqXQ==
-X-Gm-Message-State: APjAAAXFR2ECHZmJckW0cWvxTdZVIuaEpeXvUKEMcgKP7zkaW2g1Qv3O
- kkuMUWbjKB27LCEGFWch2w39nA1RQ6MzxobHHIDK/A==
-X-Google-Smtp-Source: APXvYqwtGvs7ZwR9U2oy4YTzF8tmwj9cSxTYvtoE01u846XBIE5vfmq3pd0qn7cOBdp955hDbb11H30TdZlfWmerq3g=
-X-Received: by 2002:a05:6808:8f1:: with SMTP id
- d17mr19412112oic.170.1560347018688; 
- Wed, 12 Jun 2019 06:43:38 -0700 (PDT)
+ (envelope-from <no-reply@patchew.org>) id 1hb3uR-0007wR-OH
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 10:07:30 -0400
+Resent-Date: Wed, 12 Jun 2019 10:07:28 -0400
+Resent-Message-Id: <E1hb3uR-0007wR-OH@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21501)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hb3uO-0007sN-Vb
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 10:07:26 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1560348378; cv=none; d=zoho.com; s=zohoarc; 
+ b=MbFy9QNBjlOGYgC7bvSu15ubAA4aE2AhT9fLgcf50nvl9AhMeMoebfCeGM+nWpQHBkyi57CY3s/wxwTO46eKP5u6JrWgL1vV4GswrDMmeXRSyvS3/w0zhpg42ACyI6MuDp+/aSJk5TI0JTeoM9U7R+/oqVbm6z/X652LtmsbkKg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1560348378;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=KHWeLwDY9DOzzMln0Gvm3zjxUOH+dCdwxd+0wsJCrhE=; 
+ b=mLujrpSUDDbfmi2RJ4mhBAdFvwEJto2vklCFOz9bPbpa4FGqb8WbD/qdDMhlq7dUApREuj0rNWt+GG79CxL24+1A9XBhszsrZs8joS3W9cB+jUZYKT7mqHHuYnwFKPgscJYxPjXIgoKUHeO3SxUFiCQc+uJ8h25VOsqtO2mnF4g=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1560348376243614.669213973121;
+ Wed, 12 Jun 2019 07:06:16 -0700 (PDT)
+In-Reply-To: <20190612120421.20336-1-stefanha@redhat.com>
+Message-ID: <156034837501.31589.6169189435622024069@ce79690b2cb9>
 MIME-Version: 1.0
-References: <20190612112747.16374-1-armbru@redhat.com>
-In-Reply-To: <20190612112747.16374-1-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 12 Jun 2019 14:43:27 +0100
-Message-ID: <CAFEAcA-kZzAkthuQZjRV0eajXRpQTsu33yw4adWt4Zp8tQ=wwg@mail.gmail.com>
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::235
-Subject: Re: [Qemu-devel] [PULL v3 00/12] Miscellaneous patches for
- 2019-06-11
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: stefanha@redhat.com
+Date: Wed, 12 Jun 2019 07:06:16 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH v4] virtio-scsi: restart DMA after iothread
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,33 +73,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, fam@euphon.net, mst@redhat.com, qemu-devel@nongnu.org,
+ stefanha@redhat.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 12 Jun 2019 at 12:36, Markus Armbruster <armbru@redhat.com> wrote:
->
-> The following changes since commit a578cdfbdd8f9beff5ced52b7826ddb1669abbbf:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20190610' into staging (2019-06-10 16:09:19 +0100)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-misc-2019-06-11-v3
->
-> for you to fetch changes up to 84995ea21935403cc9d57b6cb7dddcac5fa02c1c:
->
->   MAINTAINERS: Polish headline decorations (2019-06-12 13:20:21 +0200)
->
-> ----------------------------------------------------------------
-> Miscellaneous patches for 2019-06-11
->
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYxMjEyMDQyMS4yMDMz
+Ni0xLXN0ZWZhbmhhQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
+ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
+bmZvcm1hdGlvbjoKClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjRdIHZpcnRpby1zY3Np
+OiByZXN0YXJ0IERNQSBhZnRlciBpb3RocmVhZApUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAx
+OTA2MTIxMjA0MjEuMjAzMzYtMS1zdGVmYW5oYUByZWRoYXQuY29tCgo9PT0gVEVTVCBTQ1JJUFQg
+QkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBl
+eGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGht
+IGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0g
+VEVTVCBTQ1JJUFQgRU5EID09PQoKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9q
+ZWN0L3FlbXUKICAgMjE5ZGNhNjFlYi4uNTljNThmOTZiMiAgbWFzdGVyICAgICAtPiBtYXN0ZXIK
+RnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWdd
+ICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDYxMjEyMDQyMS4yMDMzNi0xLXN0ZWZhbmhhQHJl
+ZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MDYxMjEyMDQyMS4yMDMzNi0xLXN0ZWZhbmhhQHJlZGhh
+dC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkMWQ0OTA3MWZmIHZpcnRpby1z
+Y3NpOiByZXN0YXJ0IERNQSBhZnRlciBpb3RocmVhZAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KRVJS
+T1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVu
+dGhlc2lzICcoJwojODg6IEZJTEU6IHZsLmM6MTQ3MjoKKyAgICBRVEFJTFFfRU5UUlkgKHZtX2No
+YW5nZV9zdGF0ZV9lbnRyeSkgZW50cmllczsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdl
+ZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzEwMTogRklMRTogdmwu
+YzoxNDg0OgorICAgIGUgPSBnX21hbGxvYzAoc2l6ZW9mICgqZSkpOwoKRVJST1I6IHNwYWNlIHBy
+b2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwoj
+MTM2OiBGSUxFOiB2bC5jOjE1MTA6CisgICAgUVRBSUxRX1JFTU9WRSAoJnZtX2NoYW5nZV9zdGF0
+ZV9oZWFkLCBlLCBlbnRyaWVzKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVu
+Y3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzE2MjogRklMRTogdmwuYzozMDM2
+OgorICAgIFFUQUlMUV9JTklUICgmdm1fY2hhbmdlX3N0YXRlX2hlYWQpOwoKdG90YWw6IDQgZXJy
+b3JzLCAwIHdhcm5pbmdzLCAxMjIgbGluZXMgY2hlY2tlZAoKQ29tbWl0IGQxZDQ5MDcxZmY2ZSAo
+dmlydGlvLXNjc2k6IHJlc3RhcnQgRE1BIGFmdGVyIGlvdGhyZWFkKSBoYXMgc3R5bGUgcHJvYmxl
+bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
+dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBj
+b2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcv
+bG9ncy8yMDE5MDYxMjEyMDQyMS4yMDMzNi0xLXN0ZWZhbmhhQHJlZGhhdC5jb20vdGVzdGluZy5j
+aGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
+eSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
+ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
-
--- PMM
 
