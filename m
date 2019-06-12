@@ -2,96 +2,93 @@ Return-Path: <SRS0=XH1q=UL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDBC2C31E47
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 09:53:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB01BC31E46
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 09:55:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C153320896
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 09:53:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE918208C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Jun 2019 09:55:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="A6Q+6fVd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C153320896
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Rea+ie0q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE918208C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58214 helo=lists.gnu.org)
+Received: from localhost ([::1]:58242 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hazwV-0005KI-Tq
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 05:53:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44198)
+	id 1hazyH-0007L6-0E
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 05:55:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45468)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <shmuel.eiderman@oracle.com>) id 1hazmz-0005N6-2O
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 05:43:30 -0400
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hazrf-0001co-BH
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 05:48:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shmuel.eiderman@oracle.com>) id 1hazmx-0000rA-Pd
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 05:43:28 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:39402)
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hazrd-0002r4-2p
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 05:48:19 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:39203)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
- id 1hazmu-0000pE-TG; Wed, 12 Jun 2019 05:43:25 -0400
+ id 1hazmh-0000iE-SP; Wed, 12 Jun 2019 05:43:12 -0400
 Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
- by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5C9YhgH008054;
- Wed, 12 Jun 2019 09:43:23 GMT
+ by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5C9XjHZ007455;
+ Wed, 12 Jun 2019 09:43:08 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
- bh=iHOxrB7sQtoFEk7ueVdptFxfU4bhLQrvkAX6+XMXujI=;
- b=A6Q+6fVdtShRCAmwVQ/VQuwn+mOTNTBY4I27IcxDy38a003iySo788RtQm5Vv8/zcFpA
- bkt8jNOHyXKmCGIdC767+VjIq6LgQwgRdMe196CYkN2i+xGKGfDjz/UCi0K1fltjzgal
- /DXsIFo16PowNicR5fFGVpptjRhqvojVS5KXXecvXzAMsMPhUFe4awvGS4mvDt39tRHu
- aeKUvjujCAlgR+0O32P7apbQBvHDrnYYqmWdDhTuY4KjS02M3qAvCP48jTdVJd5mA6G5
- udhBzQP21M7NPUOfktXXoMWeQmHOgBH66QpfcQ0FY2xgjh92RhmXGL+pA/F4nV5N2uZo 1A== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by aserp2130.oracle.com with ESMTP id 2t02hetf68-1
+ subject : date : message-id; s=corp-2018-07-02;
+ bh=B95NFMN89TpkRhbo2thttGiMmUdmAK0h/7Qmqt0zUJw=;
+ b=Rea+ie0q9xL57Lk0qrrVqe/+5wWWi/+9EIZS2RzYh41BczNWMeG2gLm7fCKbeg1pcfVK
+ qcCi/6RNGPfIMjCrLZMUpGqflqlIzDUiYBbocvCZIF4t9QvFTptpzvdtW2rePrN7G4c2
+ K3vagyznqImgrfRAT+SlxIcEAajoRwtXst8S7ozs+hHbKBXOshBmj+W0YMyenTTP7SWQ
+ zFC3Ds53Q/yvow5+bUuKk2jHrdNF0VQ70VWCxaVL5c3ic0t51kkuObJbf7TjZ5oBy2CD
+ 6jCE+1nXIXYUR9mWzBVonPkIlq1hJ9ahFnqOU1j2JP0I7y/pxUNsJLfBQUxuEA9maTT+ cA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by aserp2130.oracle.com with ESMTP id 2t02hetf4y-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 12 Jun 2019 09:43:22 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5C9gtNc194477;
- Wed, 12 Jun 2019 09:43:22 GMT
+ Wed, 12 Jun 2019 09:43:08 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5C9gufT064402;
+ Wed, 12 Jun 2019 09:43:07 GMT
 Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by userp3020.oracle.com with ESMTP id 2t1jphxa7t-1
+ by aserp3030.oracle.com with ESMTP id 2t04hyuas8-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 12 Jun 2019 09:43:21 +0000
+ Wed, 12 Jun 2019 09:43:07 +0000
 Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5C9hL11028845;
- Wed, 12 Jun 2019 09:43:21 GMT
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5C9h5GP028670;
+ Wed, 12 Jun 2019 09:43:06 GMT
 Received: from nexus.ravello.local (/213.57.127.2)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 12 Jun 2019 02:43:20 -0700
+ with ESMTP ; Wed, 12 Jun 2019 02:43:04 -0700
 From: Sam Eiderman <shmuel.eiderman@oracle.com>
 To: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
  mreitz@redhat.com, seabios@seabios.org, kraxel@redhat.com,
  kevin@koconnor.net
-Date: Wed, 12 Jun 2019 12:42:35 +0300
-Message-Id: <20190612094237.47462-7-shmuel.eiderman@oracle.com>
+Date: Wed, 12 Jun 2019 12:42:29 +0300
+Message-Id: <20190612094237.47462-1-shmuel.eiderman@oracle.com>
 X-Mailer: git-send-email 2.13.3
-In-Reply-To: <20190612094237.47462-1-shmuel.eiderman@oracle.com>
-References: <20190612094237.47462-1-shmuel.eiderman@oracle.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9285
  signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
  malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=702
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.0.1-1810050000 definitions=main-1906120067
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9285
  signatures=668687
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
  priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=742 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
  definitions=main-1906120066
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
 X-Received-From: 141.146.126.79
-Subject: [Qemu-devel] [QEMU] [PATCH 6/8] bootdevice: Refactor
- get_boot_devices_list
+Subject: [Qemu-devel] [QEMU] [PATCH 0/8] Add Qemu to SeaBIOS LCHS interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,100 +106,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move device name construction to a separate function.
+Non-standard logical geometries break under QEMU.
 
-We will reuse this function in the following commit to pass logical CHS
-parameters through fw_cfg much like we currently pass bootindex.
+A virtual disk which contains an operating system which depends on
+logical geometries (consistent values being reported from BIOS INT13
+AH=08) will most likely break under QEMU/SeaBIOS if it has non-standard
+logical geometries - for example 56 SPT (sectors per track).
+No matter what QEMU will guess - SeaBIOS, for large enough disks - will
+use LBA translation, which will report 63 SPT instead.
 
-Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
-Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
----
- bootdevice.c | 61 +++++++++++++++++++++++++++++++++---------------------------
- 1 file changed, 34 insertions(+), 27 deletions(-)
+In addition we can not enforce SeaBIOS to rely on phyiscal geometries at
+all. A virtio-blk-pci virtual disk with 255 phyiscal heads can not
+report more than 16 physical heads when moved to an IDE controller, the
+ATA spec allows a maximum of 16 heads - this is an artifact of
+virtualization.
 
-diff --git a/bootdevice.c b/bootdevice.c
-index bc5e1c2de4..2b12fb85a4 100644
---- a/bootdevice.c
-+++ b/bootdevice.c
-@@ -202,6 +202,39 @@ DeviceState *get_boot_device(uint32_t position)
-     return res;
- }
- 
-+static char *get_boot_device_path(DeviceState *dev, bool ignore_suffixes,
-+                                  char *suffix)
-+{
-+    char *devpath = NULL, *s = NULL, *d, *bootpath;
-+
-+    if (dev) {
-+        devpath = qdev_get_fw_dev_path(dev);
-+        assert(devpath);
-+    }
-+
-+    if (!ignore_suffixes) {
-+        if (dev) {
-+            d = qdev_get_own_fw_dev_path_from_handler(dev->parent_bus, dev);
-+            if (d) {
-+                assert(!suffix);
-+                s = d;
-+            } else {
-+                s = g_strdup(suffix);
-+            }
-+        } else {
-+            s = g_strdup(suffix);
-+        }
-+    }
-+
-+    bootpath = g_strdup_printf("%s%s",
-+                               devpath ? devpath : "",
-+                               s ? s : "");
-+    g_free(devpath);
-+    g_free(s);
-+
-+    return bootpath;
-+}
-+
- /*
-  * This function returns null terminated string that consist of new line
-  * separated device paths.
-@@ -218,36 +251,10 @@ char *get_boot_devices_list(size_t *size)
-     bool ignore_suffixes = mc->ignore_boot_device_suffixes;
- 
-     QTAILQ_FOREACH(i, &fw_boot_order, link) {
--        char *devpath = NULL,  *suffix = NULL;
-         char *bootpath;
--        char *d;
-         size_t len;
- 
--        if (i->dev) {
--            devpath = qdev_get_fw_dev_path(i->dev);
--            assert(devpath);
--        }
--
--        if (!ignore_suffixes) {
--            if (i->dev) {
--                d = qdev_get_own_fw_dev_path_from_handler(i->dev->parent_bus,
--                                                          i->dev);
--                if (d) {
--                    assert(!i->suffix);
--                    suffix = d;
--                } else {
--                    suffix = g_strdup(i->suffix);
--                }
--            } else {
--                suffix = g_strdup(i->suffix);
--            }
--        }
--
--        bootpath = g_strdup_printf("%s%s",
--                                   devpath ? devpath : "",
--                                   suffix ? suffix : "");
--        g_free(devpath);
--        g_free(suffix);
-+        bootpath = get_boot_device_path(i->dev, ignore_suffixes, i->suffix);
- 
-         if (total) {
-             list[total-1] = '\n';
+By supplying the logical geometies directly we are able to support such
+"exotic" disks.
+
+We will use fw_cfg to do just that.
+
+Sam Eiderman (8):
+  block: Refactor macros - fix tabbing
+  block: Support providing LCHS from user
+  bootdevice: Add interface to gather LCHS
+  scsi: Propagate unrealize() callback to scsi-hd
+  bootdevice: Gather LCHS from all relevant devices
+  bootdevice: Refactor get_boot_devices_list
+  bootdevice: FW_CFG interface for LCHS values
+  hd-geo-test: Add tests for lchs override
+
+ bootdevice.c             | 158 ++++++++++---
+ hw/block/virtio-blk.c    |   6 +
+ hw/ide/qdev.c            |   7 +-
+ hw/nvram/fw_cfg.c        |  14 +-
+ hw/scsi/scsi-bus.c       |  15 ++
+ hw/scsi/scsi-disk.c      |  14 ++
+ include/hw/block/block.h |  22 +-
+ include/hw/scsi/scsi.h   |   1 +
+ include/sysemu/sysemu.h  |   4 +
+ tests/Makefile.include   |   2 +-
+ tests/hd-geo-test.c      | 565 +++++++++++++++++++++++++++++++++++++++++++++++
+ 11 files changed, 767 insertions(+), 41 deletions(-)
+
 -- 
 2.13.3
 
