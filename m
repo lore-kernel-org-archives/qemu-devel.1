@@ -2,73 +2,67 @@ Return-Path: <SRS0=rgCY=UM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DATE_IN_PAST_03_06,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FD86C31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 03:36:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79767C31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 03:43:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7171620866
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 03:36:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7171620866
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 3FF6F20B7C
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 03:43:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="iWrv9F/g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FF6F20B7C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36748 helo=lists.gnu.org)
+Received: from localhost ([::1]:36766 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbGXe-0003q3-MT
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 23:36:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56325)
+	id 1hbGeL-0006cj-Pa
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 23:43:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57553)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hbGWR-0002mV-Hc
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 23:35:32 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hbGc4-000551-Ud
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 23:41:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hbGWQ-0002jV-7S
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 23:35:31 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57002)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hbGWQ-0002iC-28
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 23:35:30 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hbGWN-0006J1-Cr
- for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 03:35:27 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 4AE632E80CB
- for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 03:35:27 +0000 (UTC)
+ (envelope-from <dgibson@ozlabs.org>) id 1hbGc2-0006mA-3M
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 23:41:20 -0400
+Received: from ozlabs.org ([203.11.71.1]:37391)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1hbGbz-0006hZ-66; Wed, 12 Jun 2019 23:41:17 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 45PTzp4RbTz9sNR; Thu, 13 Jun 2019 13:41:10 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1560397270;
+ bh=oLAaE9ujw9vK0P8Z+0lVNW+gxyP5umaXW0Pms6g9Bl0=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=iWrv9F/gYxUhG9K/tMgUMOTmdGl9lVL0Wr1i0E3AItrhvOEOuYDNd5IcigKx4Hggq
+ dQxa3YH3/vgxigF1TuEkVUCtPu5LGQ8x+kCX49k6M0y7x6eQf1DKDh3W8YxWN9YT0z
+ 3HuIN3Z4jfDGH2Td3WKmQbKhTSUKqalCSZICWkNs=
+Date: Thu, 13 Jun 2019 10:04:34 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Message-ID: <20190613000434.GB18900@umbus.fritz.box>
+References: <20190612174345.9799-1-clg@kaod.org>
+ <5749e4b4-cca7-e6a0-4951-431a9493581f@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 13 Jun 2019 03:29:50 -0000
-From: tsiros <1774853@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: alexaltea masonleeback tsiros
-X-Launchpad-Bug-Reporter: tsiros (tsiros)
-X-Launchpad-Bug-Modifier: tsiros (tsiros)
-References: <152802310962.26200.2575137842813128178.malonedeb@wampee.canonical.com>
- <156038485941.16569.13243320428077514633.malone@soybean.canonical.com>
-Message-Id: <CAMm8ofSLYu35ZpLHV2P6FuPCdP0KgjBQwK2mYSvvd2vcDWzD9A@mail.gmail.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18978";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 2fa0ecf4fa7f6ebfe7740436d5b76efea2a9af40
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="dc+cDN39EJAMEtIO"
+Content-Disposition: inline
+In-Reply-To: <5749e4b4-cca7-e6a0-4951-431a9493581f@kaod.org>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: Re: [Qemu-devel] [Bug 1774853] Re: claims temp file is used by
- another process
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [PATCH 0/2] ppc/pnc: fix XSCOM MMIO base address
+ for P9 machines with multiple chips
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,73 +71,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1774853 <1774853@bugs.launchpad.net>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I can't remember at all!
 
-i am sorry i know how frustrating this is
+--dc+cDN39EJAMEtIO
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-i don't remember even if i fixed it or if i gave up
+On Wed, Jun 12, 2019 at 07:47:20PM +0200, C=E9dric Le Goater wrote:
+> On 12/06/2019 19:43, C=E9dric Le Goater wrote:
+> > Hello,
+> >=20
+> > The base address of the MMIO window of the XSCOM bus is incorrect on
+> > P9 machines with multiple chips. Provide a fix for that to prepare
+> > ground for future PowerNV chips.
+>=20
+> David,
+>=20
+> I just noticed the 'pnc' in the title. If you were to merge, can you=20
+> fix it ?
 
-On Thu, Jun 13, 2019, 03:20 Alexandro Sanchez Bach <
-1774853@bugs.launchpad.net> wrote:
+Done.
 
-> @tsiros, can you explain why this isn't an issue for you anymore? This
-> is precisely what happens to me, specifically when I create drives as
-> `file=3Dfat:rw:path/to/dir`. When I type `fat:path/to/dir`, everything
-> works fine, though I get some warnings. Was this fixed in newer versions
-> or did you simply realized some issue on your side? Thanks.
->
-> --
-> You received this bug notification because you are subscribed to the bug
-> report.
-> https://bugs.launchpad.net/bugs/1774853
->
-> Title:
->   claims temp file is used by another process
->
-> Status in QEMU:
->   New
->
-> Bug description:
->   QEMU emulator version 2.12.50 (v2.12.0-12378-g99a34dc4d2-dirty)
->
->   "c:\Program Files\qemu\qemu-system-x86_64.exe" -net none -parallel none
-> -bios OVMF.fd -L . -hda fat:rw:image
->   vvfat image chs 1024,16,63
->   c:\Program Files\qemu\qemu-system-x86_64.exe: -hda fat:rw:image: Could
-> not open 'C:\Users\tsiros\AppData\Local\Temp\qem5B92.tmp': The process
-> cannot access the file because it is being used by another process.
->
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1774853/+subscriptions
->
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
--- =
+--dc+cDN39EJAMEtIO
+Content-Type: application/pgp-signature; name="signature.asc"
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1774853
+-----BEGIN PGP SIGNATURE-----
 
-Title:
-  claims temp file is used by another process
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0BkxIACgkQbDjKyiDZ
+s5J/sw/9Hws+fw0y0147VpaA/N+GZ7bsr4wAZSH427CebAZQWx0cCCT7O9+noIxf
+bCUZkIvXi8opQ/F4Pe0viDKSOKcPulXwFJ6QPpX07jGB/xbhYILyOZc3NVyYhKv2
+mbvZpOgu4tTirF+mKlc0agmGwY7odNziusqMgUB8EQJgizALbLXVuLG9lNNj3B5t
+SE8XgxnZdSa6lbqqk6SfSwKTcjN4zyr3twC7av6dCd8xV9YQWnl1PvWUfRmz+mn5
+iyQOMMPi5ItiLLdScjJWdd5JxPGci5BO3TzisPGfuJo49AYrzDTB+AUMD2tS0/d+
++zjYo4a+Lzvw1fmhpLmuYiruv4lysYl3NJh3xngqNF0+Nqiq2hx490r0eMAbUAuj
+o9F5RfPHRIBax6GeU/L2yD0Qbq2+xWYHXbKhqw+c5szrax3ZpfAUp141IBt6bJvh
+d0OUi0QhFDJdjg1IHJ5xBcAmGdXtu5tJMu4N0KNRB98J5g/j9c/ebAsmF+8yFUPU
+OE4s+Cpo5cVXcgHxss4FXIWfpvRmtcEQL/TTt9P2OgTrh24VlKOwjTC2BxLmecn2
+te5vhPNiTHr2A7WJMm9gxwte1GqiUJ5RZ+OFJaAD4yVo3pRIElD5a+ZVidrJE91o
+/WFhCpV0N/gbIipUkbWLfFkw8c8m7mobDv16nd8jJO7g5P5Qi8c=
+=EZeL
+-----END PGP SIGNATURE-----
 
-Status in QEMU:
-  New
-
-Bug description:
-  QEMU emulator version 2.12.50 (v2.12.0-12378-g99a34dc4d2-dirty)
-
-  "c:\Program Files\qemu\qemu-system-x86_64.exe" -net none -parallel none -=
-bios OVMF.fd -L . -hda fat:rw:image
-  vvfat image chs 1024,16,63
-  c:\Program Files\qemu\qemu-system-x86_64.exe: -hda fat:rw:image: Could no=
-t open 'C:\Users\tsiros\AppData\Local\Temp\qem5B92.tmp': The process cannot=
- access the file because it is being used by another process.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1774853/+subscriptions
+--dc+cDN39EJAMEtIO--
 
