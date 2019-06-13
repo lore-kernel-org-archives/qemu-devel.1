@@ -2,91 +2,92 @@ Return-Path: <SRS0=rgCY=UM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9654EC31E49
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 14:59:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6AB4C31E4B
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 15:07:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6831F207E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 14:59:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v31NJkhZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6831F207E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 823952175B
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 15:07:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 823952175B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40656 helo=lists.gnu.org)
+Received: from localhost ([::1]:40728 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbRCJ-0003Dc-KS
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 10:59:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52158)
+	id 1hbRKH-00006A-AU
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 11:07:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37611)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hbPoX-000633-PD
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 09:30:54 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hbQa2-0004kx-MI
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 10:19:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hbPoR-0007W2-L4
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 09:30:49 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45926)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hbPoR-0007Uq-Ba
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 09:30:43 -0400
-Received: by mail-wr1-x443.google.com with SMTP id f9so20769621wre.12
- for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 06:30:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=CAQkI/KYT7c6DwMNv9emGR+PJjl1WDR1C4uGFY3y73M=;
- b=v31NJkhZOnZxQNZXRPStLU/t3uyU+1DIJMbH3xQ1I90gfA70o4Ehw/bwX1QY2QmE8r
- exoWXjeTj0DwdQmENDrps5YpvMmUOJVzKAjHvXty4aeTU17+pnRCEOjajTYA7s/0Uz7r
- WuhMY2wPbO/jUBeM29FAXnBPAdiBvMQ2QjBYh6A06BXLDVJ1nfTgCwtAt4ERprmqUkFU
- bpyFdBaLoNSdNFDs/sAxQZTgG6bkM3UgzF3XNZ+kKgvtFuNGW0Q3gwwwI6NPk744iBSe
- yb67Q+SiUPGecQCQ6W5UhVv/i+fkHw4AI6nxc0oocy4s8NqfQtZI4wWj6HSoLDi1eaBe
- Kwcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=CAQkI/KYT7c6DwMNv9emGR+PJjl1WDR1C4uGFY3y73M=;
- b=dx5upkokE3+ujZAAW93aIkCIoahnQUYg6+U0KQJYs5Sg77uOb5LVm6q1LvvSWeuZcc
- I1xXenMMufx7EQrhZVnX+XD65eqCO5vFiTi5FH7eG/EH37X4hRQ4EvF8k5kgN3Jt74oO
- 5PRKVUDUyCnNCiA5vuyo/7dJYDKkNgX0a9DDbBL+RjLUR+7n/gpmm0bk3r5D/P4bbszO
- YFWFFikgy3h60cwqNZ2FcfZ9kcy+LUF197Ks1DHDsRNkvQXC1ngKB1Rs1wdrUM4j4J21
- YHmdOoNVG+3iEgu6MDJjOiSP6eOiEZR9V0CHUohRoKKLg62U6ti4W3rJSqDT3S3WJsER
- WfLA==
-X-Gm-Message-State: APjAAAU3VvORIHloXQMa+zwU8gbqrYHMqOaXtjdF0cv+QNT7AEShbzcp
- QTPkyxn1EKFGUM43nZLO0k7vMqbA6pQ=
-X-Google-Smtp-Source: APXvYqyAxrZGP6wSjJIudKesezgSvuG2kOVAbo2a1F1Kc4T83rg8nozzL2lFY3T1jtPXKTDBXyIRpQ==
-X-Received: by 2002:a5d:6b03:: with SMTP id v3mr39664000wrw.309.1560432641874; 
- Thu, 13 Jun 2019 06:30:41 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id q21sm4068078wmq.13.2019.06.13.06.30.41
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 13 Jun 2019 06:30:41 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D90C61FF87;
- Thu, 13 Jun 2019 14:30:40 +0100 (BST)
-References: <20190517174046.11146-1-peter.maydell@linaro.org>
- <20190517174046.11146-2-peter.maydell@linaro.org>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-arm@nongnu.org
-In-reply-to: <20190517174046.11146-2-peter.maydell@linaro.org>
-Date: Thu, 13 Jun 2019 14:30:40 +0100
-Message-ID: <87a7elehof.fsf@zen.linaroharston>
+ (envelope-from <mreitz@redhat.com>) id 1hbQa1-0005ml-IZ
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 10:19:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54452)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hbQZy-0005jY-Tx; Thu, 13 Jun 2019 10:19:51 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id F05E330BC56C;
+ Thu, 13 Jun 2019 14:19:41 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.187])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C4627600C0;
+ Thu, 13 Jun 2019 14:19:40 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190612221004.2317-1-mreitz@redhat.com>
+ <20190612221004.2317-12-mreitz@redhat.com>
+ <7a0fe60a-0d16-5420-0c6a-65cfe01bc933@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <187cae6d-c9f1-7adb-aca9-5d0ba977de43@redhat.com>
+Date: Thu, 13 Jun 2019 16:19:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/4] target/arm: Allow VFP and
- Neon to be disabled via a CPU property
+In-Reply-To: <7a0fe60a-0d16-5420-0c6a-65cfe01bc933@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="6vcGHSR6dj1chBEr0lp1MOYpIYATotnBx"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Thu, 13 Jun 2019 14:19:42 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v5 11/42] block: Add
+ bdrv_supports_compressed_writes()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,245 +99,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--6vcGHSR6dj1chBEr0lp1MOYpIYATotnBx
+Content-Type: multipart/mixed; boundary="2qFuF8NjhXuyUUZY4x3xIlgjJzSR7qwzl";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <187cae6d-c9f1-7adb-aca9-5d0ba977de43@redhat.com>
+Subject: Re: [PATCH v5 11/42] block: Add bdrv_supports_compressed_writes()
+References: <20190612221004.2317-1-mreitz@redhat.com>
+ <20190612221004.2317-12-mreitz@redhat.com>
+ <7a0fe60a-0d16-5420-0c6a-65cfe01bc933@virtuozzo.com>
+In-Reply-To: <7a0fe60a-0d16-5420-0c6a-65cfe01bc933@virtuozzo.com>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+--2qFuF8NjhXuyUUZY4x3xIlgjJzSR7qwzl
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> Allow VFP and neon to be disabled via a CPU property. As with
-> the "pmu" property, we only allow these features to be removed
-> from CPUs which have it by default, not added to CPUs which
-> don't have it.
->
-> The primary motivation here is to be able to optionally
-> create Cortex-M33 CPUs with no FPU, but we provide switches
-> for both VFP and Neon because the two interact:
->  * AArch64 can't have one without the other
->  * Some ID register fields only change if both are disabled
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On 13.06.19 15:29, Vladimir Sementsov-Ogievskiy wrote:
+> 13.06.2019 1:09, Max Reitz wrote:
+>> Filters cannot compress data themselves but they have to implement
+>> .bdrv_co_pwritev_compressed() still (or they cannot forward compressed=
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> writes).  Therefore, checking whether
+>> bs->drv->bdrv_co_pwritev_compressed is non-NULL is not sufficient to
+>> know whether the node can actually handle compressed writes.  This
+>> function looks down the filter chain to see whether there is a
+>> non-filter that can actually convert the compressed writes into
+>> compressed data (and thus normal writes).
+>=20
+> Why not to use this function in (as I remember only 2-3 cases) when
+> we check for bs->drv->bdrv_co_pwritev_compressed? It would be a complet=
+e fix
+> for described problem.
 
-> ---
->  target/arm/cpu.h |   4 ++
->  target/arm/cpu.c | 150 +++++++++++++++++++++++++++++++++++++++++++++--
->  2 files changed, 148 insertions(+), 6 deletions(-)
->
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 733b840a712..778fb293e7c 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -797,6 +797,10 @@ struct ARMCPU {
->      bool has_el3;
->      /* CPU has PMU (Performance Monitor Unit) */
->      bool has_pmu;
-> +    /* CPU has VFP */
-> +    bool has_vfp;
-> +    /* CPU has Neon */
-> +    bool has_neon;
->
->      /* CPU has memory protection unit */
->      bool has_mpu;
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 8eee1d8c59a..406fd360a2a 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -763,6 +763,12 @@ static Property arm_cpu_cfgend_property =3D
->  static Property arm_cpu_has_pmu_property =3D
->              DEFINE_PROP_BOOL("pmu", ARMCPU, has_pmu, true);
->
-> +static Property arm_cpu_has_vfp_property =3D
-> +            DEFINE_PROP_BOOL("vfp", ARMCPU, has_vfp, true);
-> +
-> +static Property arm_cpu_has_neon_property =3D
-> +            DEFINE_PROP_BOOL("neon", ARMCPU, has_neon, true);
-> +
->  static Property arm_cpu_has_mpu_property =3D
->              DEFINE_PROP_BOOL("has-mpu", ARMCPU, has_mpu, true);
->
-> @@ -803,6 +809,13 @@ void arm_cpu_post_init(Object *obj)
->      if (arm_feature(&cpu->env, ARM_FEATURE_M)) {
->          set_feature(&cpu->env, ARM_FEATURE_PMSA);
->      }
-> +    /* Similarly for the VFP feature bits */
-> +    if (arm_feature(&cpu->env, ARM_FEATURE_VFP4)) {
-> +        set_feature(&cpu->env, ARM_FEATURE_VFP3);
-> +    }
-> +    if (arm_feature(&cpu->env, ARM_FEATURE_VFP3)) {
-> +        set_feature(&cpu->env, ARM_FEATURE_VFP);
-> +    }
->
->      if (arm_feature(&cpu->env, ARM_FEATURE_CBAR) ||
->          arm_feature(&cpu->env, ARM_FEATURE_CBAR_RO)) {
-> @@ -847,6 +860,27 @@ void arm_cpu_post_init(Object *obj)
->                                   &error_abort);
->      }
->
-> +    /*
-> +     * Allow user to turn off VFP and Neon support, but only for TCG --
-> +     * KVM does not currently allow us to lie to the guest about its
-> +     * ID/feature registers, so the guest always sees what the host has.
-> +     */
-> +    if (arm_feature(&cpu->env, ARM_FEATURE_VFP)) {
-> +        cpu->has_vfp =3D true;
-> +        if (!kvm_enabled()) {
-> +            qdev_property_add_static(DEVICE(obj), &arm_cpu_has_vfp_prope=
-rty,
-> +                                     &error_abort);
-> +        }
-> +    }
-> +
-> +    if (arm_feature(&cpu->env, ARM_FEATURE_NEON)) {
-> +        cpu->has_neon =3D true;
-> +        if (!kvm_enabled()) {
-> +            qdev_property_add_static(DEVICE(obj), &arm_cpu_has_neon_prop=
-erty,
-> +                                     &error_abort);
-> +        }
-> +    }
-> +
->      if (arm_feature(&cpu->env, ARM_FEATURE_PMSA)) {
->          qdev_property_add_static(DEVICE(obj), &arm_cpu_has_mpu_property,
->                                   &error_abort);
-> @@ -956,6 +990,116 @@ static void arm_cpu_realizefn(DeviceState *dev, Err=
-or **errp)
->          return;
->      }
->
-> +    if (arm_feature(env, ARM_FEATURE_AARCH64) &&
-> +        cpu->has_vfp !=3D cpu->has_neon) {
-> +        /*
-> +         * This is an architectural requirement for AArch64; AArch32 is
-> +         * more flexible and permits VFP-no-Neon and Neon-no-VFP.
-> +         */
-> +        error_setg(errp,
-> +                   "AArch64 CPUs must have both VFP and Neon or neither"=
-);
-> +        return;
-> +    }
-> +
-> +    if (!cpu->has_vfp) {
-> +        uint64_t t;
-> +        uint32_t u;
-> +
-> +        unset_feature(env, ARM_FEATURE_VFP);
-> +        unset_feature(env, ARM_FEATURE_VFP3);
-> +        unset_feature(env, ARM_FEATURE_VFP4);
-> +
-> +        t =3D cpu->isar.id_aa64isar1;
-> +        t =3D FIELD_DP64(t, ID_AA64ISAR1, JSCVT, 0);
-> +        cpu->isar.id_aa64isar1 =3D t;
-> +
-> +        t =3D cpu->isar.id_aa64pfr0;
-> +        t =3D FIELD_DP64(t, ID_AA64PFR0, FP, 0xf);
-> +        cpu->isar.id_aa64pfr0 =3D t;
-> +
-> +        u =3D cpu->isar.id_isar6;
-> +        u =3D FIELD_DP32(u, ID_ISAR6, JSCVT, 0);
-> +        cpu->isar.id_isar6 =3D u;
-> +
-> +        u =3D cpu->isar.mvfr0;
-> +        u =3D FIELD_DP32(u, MVFR0, FPSP, 0);
-> +        u =3D FIELD_DP32(u, MVFR0, FPDP, 0);
-> +        u =3D FIELD_DP32(u, MVFR0, FPTRAP, 0);
-> +        u =3D FIELD_DP32(u, MVFR0, FPDIVIDE, 0);
-> +        u =3D FIELD_DP32(u, MVFR0, FPSQRT, 0);
-> +        u =3D FIELD_DP32(u, MVFR0, FPSHVEC, 0);
-> +        u =3D FIELD_DP32(u, MVFR0, FPROUND, 0);
-> +        cpu->isar.mvfr0 =3D u;
-> +
-> +        u =3D cpu->isar.mvfr1;
-> +        u =3D FIELD_DP32(u, MVFR1, FPFTZ, 0);
-> +        u =3D FIELD_DP32(u, MVFR1, FPDNAN, 0);
-> +        u =3D FIELD_DP32(u, MVFR1, FPHP, 0);
-> +        cpu->isar.mvfr1 =3D u;
-> +
-> +        u =3D cpu->isar.mvfr2;
-> +        u =3D FIELD_DP32(u, MVFR2, FPMISC, 0);
-> +        cpu->isar.mvfr2 =3D u;
-> +    }
-> +
-> +    if (!cpu->has_neon) {
-> +        uint64_t t;
-> +        uint32_t u;
-> +
-> +        unset_feature(env, ARM_FEATURE_NEON);
-> +
-> +        t =3D cpu->isar.id_aa64isar0;
-> +        t =3D FIELD_DP64(t, ID_AA64ISAR0, DP, 0);
-> +        cpu->isar.id_aa64isar0 =3D t;
-> +
-> +        t =3D cpu->isar.id_aa64isar1;
-> +        t =3D FIELD_DP64(t, ID_AA64ISAR1, FCMA, 0);
-> +        cpu->isar.id_aa64isar1 =3D t;
-> +
-> +        t =3D cpu->isar.id_aa64pfr0;
-> +        t =3D FIELD_DP64(t, ID_AA64PFR0, ADVSIMD, 0xf);
-> +        cpu->isar.id_aa64pfr0 =3D t;
-> +
-> +        u =3D cpu->isar.id_isar5;
-> +        u =3D FIELD_DP32(u, ID_ISAR5, RDM, 0);
-> +        u =3D FIELD_DP32(u, ID_ISAR5, VCMA, 0);
-> +        cpu->isar.id_isar5 =3D u;
-> +
-> +        u =3D cpu->isar.id_isar6;
-> +        u =3D FIELD_DP32(u, ID_ISAR6, DP, 0);
-> +        u =3D FIELD_DP32(u, ID_ISAR6, FHM, 0);
-> +        cpu->isar.id_isar6 =3D u;
-> +
-> +        u =3D cpu->isar.mvfr1;
-> +        u =3D FIELD_DP32(u, MVFR1, SIMDLS, 0);
-> +        u =3D FIELD_DP32(u, MVFR1, SIMDINT, 0);
-> +        u =3D FIELD_DP32(u, MVFR1, SIMDSP, 0);
-> +        u =3D FIELD_DP32(u, MVFR1, SIMDHP, 0);
-> +        u =3D FIELD_DP32(u, MVFR1, SIMDFMAC, 0);
-> +        cpu->isar.mvfr1 =3D u;
-> +
-> +        u =3D cpu->isar.mvfr2;
-> +        u =3D FIELD_DP32(u, MVFR2, SIMDMISC, 0);
-> +        cpu->isar.mvfr2 =3D u;
-> +    }
-> +
-> +    if (!cpu->has_neon && !cpu->has_vfp) {
-> +        uint64_t t;
-> +        uint32_t u;
-> +
-> +        t =3D cpu->isar.id_aa64isar0;
-> +        t =3D FIELD_DP64(t, ID_AA64ISAR0, FHM, 0);
-> +        cpu->isar.id_aa64isar0 =3D t;
-> +
-> +        t =3D cpu->isar.id_aa64isar1;
-> +        t =3D FIELD_DP64(t, ID_AA64ISAR1, FRINTTS, 0);
-> +        cpu->isar.id_aa64isar1 =3D t;
-> +
-> +        u =3D cpu->isar.mvfr0;
-> +        u =3D FIELD_DP32(u, MVFR0, SIMDREG, 0);
-> +        cpu->isar.mvfr0 =3D u;
-> +    }
-> +
->      /* Some features automatically imply others: */
->      if (arm_feature(env, ARM_FEATURE_V8)) {
->          if (arm_feature(env, ARM_FEATURE_M)) {
-> @@ -1016,12 +1160,6 @@ static void arm_cpu_realizefn(DeviceState *dev, Er=
-ror **errp)
->      if (arm_feature(env, ARM_FEATURE_V5)) {
->          set_feature(env, ARM_FEATURE_V4T);
->      }
-> -    if (arm_feature(env, ARM_FEATURE_VFP4)) {
-> -        set_feature(env, ARM_FEATURE_VFP3);
-> -    }
-> -    if (arm_feature(env, ARM_FEATURE_VFP3)) {
-> -        set_feature(env, ARM_FEATURE_VFP);
-> -    }
->      if (arm_feature(env, ARM_FEATURE_LPAE)) {
->          set_feature(env, ARM_FEATURE_V7MP);
->          set_feature(env, ARM_FEATURE_PXN);
+Well, bdrv_driver_pwritev_compressed() doesn=E2=80=99t really care, it wi=
+ll find
+out sooner or later anyway (while being passed down the chain).  This is
+only really important for the backup job, which will use this function
+as of patch 26.  (It isn=E2=80=99t important before 26, because using fil=
+ters
+with backup generally is a gamble before that patch.)
+
+> (hmm, ok, other new APIs are added separately too, for some reason they=
+ don't
+> confuse me and this confuses)
+>=20
+> On the other hand, (the second time I think about it during review), co=
+uld
+> we handle compression through flags completely?
+> We have supported_write_flags feature, which should be used for all the=
+se checks..
+> And may be, we may drop .bdrv_co_pwritev_compressed at all.
+
+We probably could, yes.  I just felt like this wasn=E2=80=99t the time to=
+ do it.
+O:-)
+
+> But if you want to keep it as is, it's OK too:
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+Thanks for reviewing!
+
+Max
 
 
---
-Alex Benn=C3=A9e
+--2qFuF8NjhXuyUUZY4x3xIlgjJzSR7qwzl--
+
+--6vcGHSR6dj1chBEr0lp1MOYpIYATotnBx
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0CW3sACgkQ9AfbAGHV
+z0CdAQf/d3CneSCTEjpC2G1vgsc8TCbejhSWKnbjjbEU5KF8wxesDKoj0xDbXA7Z
+d4CruHK4bbiMovDNLnQGJmxvRZhG9aOUJuvR6QmAGb+0b8Yu+OzgaFW0JxOyWerQ
+sgyEWtGCegsbvznNtCP79rvSNQ8TbMRl3F8gMH9Hz4dCd8XjdxzExLPNKZrsG210
+haJw53YGbLAmn+7IAC1s7h38g0Gv5mxN5WVs/3Y1ep9U+ondYJYckGa1JUWkVZUT
+Tm3o0OcUbsY5YE2Ukm07ZtZtfnuqNZd5NF5rfRt8rDauWFt+0O4ykt6OFcAsHQXL
+go/Ofto4wi2IqHRthkkIXi70fef25g==
+=8gWQ
+-----END PGP SIGNATURE-----
+
+--6vcGHSR6dj1chBEr0lp1MOYpIYATotnBx--
 
