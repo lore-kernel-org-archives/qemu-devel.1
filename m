@@ -2,89 +2,112 @@ Return-Path: <SRS0=rgCY=UM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F1E1C31E45
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 683C6C31E4A
 	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 19:52:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28F7020896
+	by mail.kernel.org (Postfix) with ESMTPS id 4631F2147A
 	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 19:52:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28F7020896
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4631F2147A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45266 helo=lists.gnu.org)
+Received: from localhost ([::1]:45268 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbVlg-0007yv-6F
+	id 1hbVlg-00080n-DI
 	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 15:52:16 -0400
 Received: from eggs.gnu.org ([2001:470:142:3::10]:53191)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hbViF-0005d4-Mv
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 15:48:45 -0400
+ (envelope-from <sw@weilnetz.de>) id 1hbViR-0005d4-GU
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 15:48:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hbVeC-0007o2-8Z
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 15:44:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38966)
+ (envelope-from <sw@weilnetz.de>) id 1hbVbr-0006dz-79
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 15:42:08 -0400
+Received: from mail.weilnetz.de ([37.120.169.71]:41586
+ helo=v2201612906741603.powersrv.de)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hbVeA-0007n3-Kn; Thu, 13 Jun 2019 15:44:30 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <sw@weilnetz.de>)
+ id 1hbVbp-0006cM-Si; Thu, 13 Jun 2019 15:42:06 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by v2201612906741603.powersrv.de (Postfix) with ESMTP id 68BA8DA3A20;
+ Thu, 13 Jun 2019 21:42:03 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
+Received: from v2201612906741603.powersrv.de ([127.0.0.1])
+ by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
+ port 10024)
+ with ESMTP id eecI2FH6XPrN; Thu, 13 Jun 2019 21:42:01 +0200 (CEST)
+Received: from [134.155.36.155] (edv32.bib.uni-mannheim.de [134.155.36.155])
+ (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+ key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 68DE73082E42;
- Thu, 13 Jun 2019 19:44:24 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.187])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3470D600C0;
- Thu, 13 Jun 2019 19:44:21 +0000 (UTC)
-To: qemu-block@nongnu.org
-References: <20190522170352.12020-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
+ by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id B9051DA2EC2;
+ Thu, 13 Jun 2019 21:41:59 +0200 (CEST)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Pino Toscano <ptoscano@redhat.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
+References: <20190605213654.9785-1-ptoscano@redhat.com>
+ <a8797829-a5c6-24a3-647f-14872bc2f951@redhat.com>
+From: Stefan Weil <sw@weilnetz.de>
 Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <1eeac24b-7456-f533-b77e-e97acbd4d67c@redhat.com>
-Date: Thu, 13 Jun 2019 21:44:19 +0200
+Autocrypt: addr=sw@weilnetz.de; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <c4376dbb-d755-f05f-fb93-ed212bf30bb0@weilnetz.de>
+Date: Thu, 13 Jun 2019 21:41:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190522170352.12020-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="QVnnVOVLQvDzYuTYnvCIgIihnhRVdNzHs"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Thu, 13 Jun 2019 19:44:29 +0000 (UTC)
+In-Reply-To: <a8797829-a5c6-24a3-647f-14872bc2f951@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: de-DE
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 0/8] block: Ignore loosening perm
- restrictions failures
+X-Received-From: 37.120.169.71
+Subject: Re: [Qemu-devel] [PATCH v6] ssh: switch from libssh2 to libssh
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,148 +119,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, rjones@redhat.com,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QVnnVOVLQvDzYuTYnvCIgIihnhRVdNzHs
-Content-Type: multipart/mixed; boundary="vnMFXvAZqXYBNc8UiHz7ZOxBqZzgjjPt7";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <1eeac24b-7456-f533-b77e-e97acbd4d67c@redhat.com>
-Subject: Re: [PATCH v3 0/8] block: Ignore loosening perm restrictions failures
-References: <20190522170352.12020-1-mreitz@redhat.com>
-In-Reply-To: <20190522170352.12020-1-mreitz@redhat.com>
+On 12.06.19 15:27, Philippe Mathieu-Daud=C3=A9 wrote:
+> Cc'ing Alex (Docker, Travis) and Stefan (MinGW)
+[...]
+> Note, libssh is not available on MinGW.
 
---vnMFXvAZqXYBNc8UiHz7ZOxBqZzgjjPt7
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Nor is it available for Mingw64:
 
-Ping
+https://cygwin.com/cgi-bin2/package-grep.cgi?grep=3Dmingw64-x86_64-libssh=
+&arch=3Dx86_64
 
-<bait>just the final three patches left to review</bait>
+That makes building for Windows more difficult because there is an
+additional dependency which must be built from source.
 
-
-On 22.05.19 19:03, Max Reitz wrote:
-> Hi,
->=20
-> This series is mainly a fix for
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1703793.  The problem
-> described there is that mirroring to a gluster volume, then switching
-> off the volume makes qemu crash.  There are two problems here:
->=20
-> (1) file-posix reopens the FD all the time because it thinks the FD it
->     has is RDONLY.  It actually isn=E2=80=99t after the first reopen, w=
-e just
->     forgot to change the internal flags.  That=E2=80=99s what patch 1 i=
-s for.
->=20
-> (2) Even then, when mirror completes, it drops its write permission on
->     the FD.  This requires a reopen, which will fail if the volume is
->     down.  Mirror doesn=E2=80=99t expect that.  Nobody ever expects tha=
-t
->     dropping permissions can fail, and rightfully so because that=E2=80=
-=99s what
->     I think we have generally agreed on.
->     Therefore, the block layer should hide this error.  This is what th=
-e
->     last two patches are for.
->=20
-> The penultimate patch adds two assertions: bdrv_replace_child() (for th=
-e
-> old BDS) and bdrv_inactivate_recurse() assume they only ever drop
-> assertions.  This is now substantiated by these new assertions.
-> It turns out that this assumption was just plain wrong.  Patches 3 to 5=
-
-> make it right.
->=20
->=20
-> v3:
-> - Received no reply to my =E2=80=9CHm, warnings break 'make check', so =
-maybe we
->   should just keep quiet if loosening restrictions fails?=E2=80=9D ques=
-tion, so
->   I assume silence means agreement.  Changed patch 7 accordingly.
->=20
-> - Added a test: The fact how make check kind-of-but-not-really broke
->   showed a nice reproducer: Launching qemu with some file, then deletin=
-g
->   that file, then quitting qemu.
->=20
-> - Rebase =E2=80=9Cconflict=E2=80=9D in patch 6: The forward declaration=
- of
->   bdrv_get_cumulative_perm() is already in qemu thanks to commit
->   481e0eeef4f.
->=20
->=20
-> git-backport-diff against v2:
->=20
-> Key:
-> [----] : patches are identical
-> [####] : number of functional differences between upstream/downstream p=
-atch
-> [down] : patch is downstream-only
-> The flags [FC] indicate (F)unctional and (C)ontextual differences, resp=
-ectively
->=20
-> 001/8:[----] [--] 'file-posix: Update open_flags in raw_set_perm()'
-> 002/8:[----] [--] 'block: Add bdrv_child_refresh_perms()'
-> 003/8:[----] [--] 'block/mirror: Fix child permissions'
-> 004/8:[----] [--] 'block/commit: Drop bdrv_child_try_set_perm()'
-> 005/8:[0018] [FC] 'block: Fix order in bdrv_replace_child()'
->        ^^^^ Again confuses my v2 patch with 8aecf1d1bd250a, should be:
->       [----] : patches are identical
-> 006/8:[0002] [FC] 'block: Add *tighten_restrictions to *check*_perm()'
-> 007/8:[0018] [FC] 'block: Ignore loosening perm restrictions failures'
-> 008/8:[down] 'iotests: Test failure to loosen restrictions'
->=20
->=20
-> Max Reitz (8):
->   file-posix: Update open_flags in raw_set_perm()
->   block: Add bdrv_child_refresh_perms()
->   block/mirror: Fix child permissions
->   block/commit: Drop bdrv_child_try_set_perm()
->   block: Fix order in bdrv_replace_child()
->   block: Add *tighten_restrictions to *check*_perm()
->   block: Ignore loosening perm restrictions failures
->   iotests: Test failure to loosen restrictions
->=20
->  include/block/block_int.h  |  15 ++++
->  block.c                    | 153 +++++++++++++++++++++++++++++++------=
-
->  block/commit.c             |   2 -
->  block/file-posix.c         |   4 +
->  block/mirror.c             |  32 +++++---
->  tests/qemu-iotests/182     |  21 +++++
->  tests/qemu-iotests/182.out |   6 ++
->  7 files changed, 198 insertions(+), 35 deletions(-)
->=20
-
-
-
---vnMFXvAZqXYBNc8UiHz7ZOxBqZzgjjPt7--
-
---QVnnVOVLQvDzYuTYnvCIgIihnhRVdNzHs
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0Cp5MACgkQ9AfbAGHV
-z0Drzgf/YSC4OyBwIMcPC3/tztaV6h+rPVhTvCLS+HGWAZmjEKNm+a5dd+WrESHp
-bVNHoD1s/5+esGQYwf9oGVJjrkaaKSxjygAnfl4Rx1FLdXNq5feukkd7cP8lvAH7
-8/BOAdl+R6dGlwP4WwGh4EBDeYs92ALAHMudUZT6XpGtjEsAgqIIhw0spjrjGao/
-PO0rqO7MW6b/JjtavwpMA191kV04SS6V9eALrl6PTVf/tNQ3yeJh7gXHeDpWsnTY
-DDTnDwW1KzfW0rVys25/YvYoY/aDAyRk2zh+CwSFYo9LNPUE8bILRoi1uVMO6tBX
-Y9tzox9S535SziXIO/fyos2HzBTPdQ==
-=rfM5
------END PGP SIGNATURE-----
-
---QVnnVOVLQvDzYuTYnvCIgIihnhRVdNzHs--
+Regards
+Stefan
 
