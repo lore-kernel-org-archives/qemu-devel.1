@@ -2,104 +2,93 @@ Return-Path: <SRS0=rgCY=UM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57AD1C31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 11:47:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A1C9C31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 11:48:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F86521743
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 11:47:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C858C21743
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 11:48:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="4Ug1hoyI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F86521743
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T22lVfdb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C858C21743
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38736 helo=lists.gnu.org)
+Received: from localhost ([::1]:38740 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbOCq-0007YL-29
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 07:47:48 -0400
+	id 1hbODw-0008U7-2j
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 07:48:56 -0400
 Received: from eggs.gnu.org ([2001:470:142:3::10]:50705)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <shmuel.eiderman@oracle.com>) id 1hbOBG-0006UL-FJ
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 07:46:11 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hbOC6-0006UL-TJ
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 07:47:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shmuel.eiderman@oracle.com>) id 1hbOBE-0006vw-Ui
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 07:46:10 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:47376)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
- id 1hbOBD-0006mP-1z; Thu, 13 Jun 2019 07:46:07 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5DBipLk053890;
- Thu, 13 Jun 2019 11:45:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : message-id :
- content-type : mime-version : subject : date : in-reply-to : cc : to :
- references; s=corp-2018-07-02;
- bh=db+34tNJ3CRMcKFSFoehrVjWduhUnKRLqjweyGF8v5M=;
- b=4Ug1hoyI16FNW8tCPL+bD3dopxl3TEe4rfB21ncqp+pNOBFBasfkEgaCQ0htdCb+5JKW
- opb6UAOm4SW1L4en0tvGyVkr+q4wiTXOCxX5ro8UXtLAoQfj+a6dLHw1PJ8m4bABOdVl
- Bbfj6dVlF2l+dhFcR8bI8O2n20S6aNgpFLWJojiN2E7eXdpj3ulLXiMdWD/dEQA31WSc
- yaz+aKqEFDwZfb3b6K4gSH7n2uPJnWyGyjg6L7rZTvK7/ygFbTqtY9qZeCjtIFWeq5xi
- UpOcjT/mFfBsUInCOIIqJfwRytpxRPyFpEmo/8oGLp/SU0wPPkV/2UhPIphoYcOKXPxb JQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2130.oracle.com with ESMTP id 2t04eu112u-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 13 Jun 2019 11:45:59 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5DBiSlP047848;
- Thu, 13 Jun 2019 11:45:58 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by aserp3020.oracle.com with ESMTP id 2t0p9sbun4-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 13 Jun 2019 11:45:58 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5DBjvu8026610;
- Thu, 13 Jun 2019 11:45:57 GMT
-Received: from [10.74.126.124] (/10.74.126.124)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 13 Jun 2019 04:45:57 -0700
-From: Sam Eiderman <shmuel.eiderman@oracle.com>
-Message-Id: <730C65DE-A9B4-4553-B6A0-7A3B81A1FA12@oracle.com>
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Date: Thu, 13 Jun 2019 14:45:51 +0300
-In-Reply-To: <20190613093850.5k7prawn6x4qt3fi@sirius.home.kraxel.org>
+ (envelope-from <alex.bennee@linaro.org>) id 1hbO0I-0006Pg-6t
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 07:34:51 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:56019)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hbO0H-0006Nr-Q0
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 07:34:50 -0400
+Received: by mail-wm1-x343.google.com with SMTP id a15so9802487wmj.5
+ for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 04:34:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=mqQpCAaIcqTJ64VRGmkbaqTjhAJu6yxpOGs2uWLfUWU=;
+ b=T22lVfdbfvtLwem06Id7k2N5z154cWMBRU+KHABE7OMnqrJAWiGeTEeGu7sh9dAxjq
+ ttK4ADyNri/goTQneFa4m/6QFYPVmvzb0wDOmmVTEJNu1uCTUfPSmUTLpDH4U75GDLZy
+ CFdyd0NZKOc6l9uIczOD/jdcu+rhB02MVLboRPvAljP82RfOrp9rZWzdNFw17PRT9BMr
+ IYES4MiuraOi7JYTx15gkQZoUGaa8Yn7T0h8zBxuKi/o8SeCW6EK1srFppXhIdhb28vI
+ 4797tQS3faT49Sqs4iqYq5q7R7N3mHGCypJohI6dnpRDsO7aj8Z0vyzdx2EPo0sHtWGS
+ Jv6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=mqQpCAaIcqTJ64VRGmkbaqTjhAJu6yxpOGs2uWLfUWU=;
+ b=SSmDvCONXAM9LJABgNXH4b7LArPdYpU5/SFImE6qr5NJ/BkVZY7qMaVq7MZZoBKkdX
+ VhV5e51kKtcy3ylj5NzZux3wg1wg8JqYx/LQkh1YCtwlmVmgLPz3/gAzDpkxOwP30Iqy
+ IJ56vqqvT+SyvhPvqoajLfQUDKKFqkT0rLMMdIr4eZ+OOhh3ioYxMk68keQoKxsPxA+7
+ qPO0uv/wrca5eEnAl/ZnEerbco6ZzXJdB2lfnlqSzcaHCJNqSJWM165qG2M1cmvJgrZv
+ NKtjnqrZGpQS0iJrWyIFN1xMvTH79syST3eNM0Z42ZQz5/XU+JkBJowd0aNcUEGmGqQH
+ qK1w==
+X-Gm-Message-State: APjAAAXbkCRgEPeBw/lrHzC/myrr4+nqALNbn9naP6l+ZMgS+MVKOSSn
+ LOdbZtgN2kocTMlFxDUT0pzV+Q==
+X-Google-Smtp-Source: APXvYqx+zg0rXfV+z4wjKBmgCoMgQQwND4lU1yqyVG/ddPkhyK0W60ka+pX0itnR1hXxCeQ/cYzb1Q==
+X-Received: by 2002:a1c:c255:: with SMTP id s82mr3627860wmf.6.1560425687972;
+ Thu, 13 Jun 2019 04:34:47 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id f2sm4396903wrq.48.2019.06.13.04.34.46
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 13 Jun 2019 04:34:46 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 84CB11FF87;
+ Thu, 13 Jun 2019 12:34:46 +0100 (BST)
+References: <20190520124716.30472-1-kraxel@redhat.com>
+ <878suo5ls0.fsf@zen.linaroharston> <87pnniemgo.fsf@zen.linaroharston>
+ <d32b4c47-4f46-474c-3c4d-54250a29960a@gmx.com>
+ <87muileshz.fsf@zen.linaroharston>
+ <20190613095249.hpwaoyfo6ndqr5ae@sirius.home.kraxel.org>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Gerd Hoffmann <kraxel@redhat.com>
-References: <20190612115939.23825-1-shmuel.eiderman@oracle.com>
- <20190612130650.xftda65kgnsefyvs@sirius.home.kraxel.org>
- <A3F8BD49-3C35-4A07-8DE2-85F7CC293DC9@oracle.com>
- <20190612191817.5bilt2abif2xvcbv@sirius.home.kraxel.org>
- <02844D7D-ED79-4744-A203-8E713DE7A717@oracle.com>
- <20190613093850.5k7prawn6x4qt3fi@sirius.home.kraxel.org>
-X-Mailer: Apple Mail (2.3445.104.11)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9286
- signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906130092
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9286
- signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906130092
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.86
-Content-Type: text/plain;
-	charset=utf-8
+In-reply-to: <20190613095249.hpwaoyfo6ndqr5ae@sirius.home.kraxel.org>
+Date: Thu, 13 Jun 2019 12:34:46 +0100
+Message-ID: <87lfy5en1l.fsf@zen.linaroharston>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [QEMU] [PATCH v2 0/8] Add Qemu to SeaBIOS LCHS
- interface
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH v3 00/14] tests/vm: serial console
+ autoinstall, misc fixes.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,142 +100,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, arbel.moshe@oracle.com,
- seabios@seabios.org, QEMU <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, Kevin O'Connor <kevin@koconnor.net>,
- liran.alon@oracle.com, Karl Heubaum <karl.heubaum@oracle.com>
+Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
+ qemu-devel@nongnu.org, Kamil Rytarowski <kamil@netbsd.org>,
+ Kamil Rytarowski <n54@gmx.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Brad Smith <brad@comstyle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+Gerd Hoffmann <kraxel@redhat.com> writes:
 
-> On 13 Jun 2019, at 12:38, Gerd Hoffmann <kraxel@redhat.com> wrote:
->=20
->  Hi,
->=20
->> Yes they are pretty rare.
->> Windows 2000 and Windows XP guests migrated from VMware to Qemu/KVM
->> would not boot due to incorrect disk geometries (some had 32/56 spt =
-instead of
->> 56. Also number of heads was not entirely correct)
->=20
-> Ok.
->=20
->>> Why?  Asking the user to deal with the mess is pretty lame if there =
-are
->>> better options.  And IMO doing this fully automatic in seabios is
->>> better.
->>=20
->> I=E2=80=99m not against an automatic approach, however I do think =
-that doing this
->> in SeaBIOS might break compatibility for already existing guests that =
-will
->> suddenly see different LCHS values. (Explanation below)
->=20
->>> I can't see how this can break guests.  It should either have no =
-effect
->>> (guests using LBA) or unbreak guests due to LCHS changing from =
-"wrong"
->>> to "correct=E2=80=9D.
->>=20
->> I=E2=80=99m not sure what do you mean by "unbreak guests=E2=80=9D if =
-you change an existing
->> guest that uses LCHS from 56 spt to LBA (63 spt) it will stop =
-booting.
->=20
-> Well, that LCHS change happens because you move the guest from vmware =
-to
-> qemu and seabios uses 63 spt no matter what if the disk is too big for
-> chs addressing.
->=20
-> When seabios is changed to look at the MBR to figure what the lchs of
-> the disk is that will make your guest boot.
-
-See below
-
->=20
->> Your guessing algorithm will have to guess 56, if it will fail =
-guessing 56 correctly,
->> the user can not perform any action beside downgrading SeaBIOS in =
-order to run
->> the guest.
->=20
-> Sure, if the guess is wrong then the guest will not boot.  That isn't
-> worse than the situation we have today where seabios will not even try
-> to figure what the lchs of the disk is.
->=20
-> And, no, downgrading seabios will not make your vmware guest with 56 =
-spt
-> boot.
-
-I=E2=80=99m not talking about the vmware case here.
-If you introduce MBR guessing into SeaBIOS and change its default =
-behaviour you
-risk making operating systems such as Windows XP / 2003 / 2000 created =
-on
-QEMU to not work anymore.
-
-Example:
-
-	Consider a Windows XP that works with the following geometries =
-on standard
-	QEMU/SeaBIOS today:
-=09
-	Disk is very large, therefore INT13 AH=3D02:
-
-		255 heads, 63 spt
-
-	Now you change SeaBIOS to guess from the MBR.
-	In some cases the MBR guess can be incorrect so now SeaBIOS will =
-guess:
-
-		255 heads, 62 spt
-
-	The guest no longer boots with these geometries and you broke =
-compatibility.
-=09
-Can there be a guest that will fail the MBR in such a way? Yes.
-Look at the following MBR partition table of a Windows XP guest in our =
-production
-environment:
-
-Disk size in sectors: 16777216
-
-Binary (only one partition 16 bytes): 80 01 01 00 07 fe ff ff 3f 00 00 =
-00 d5 ea ff 00
-Start: (0, 1, 1, 63)
-End: (1023, 254, 63, 16771859)
-
-As can be easily seen, any MBR guessing algorithm should guess:
-
-	255 heads (since a value of 254 appears), 63 spt (since a value =
-of 63 appears)
-
-Turns out that this image does not work with 255, 63 but actually =
-requires
-
-	16 heads, 63 spt
-
-to boot.
-
-So relying on MBR partitions alone is not always enough and sometimes =
-manual intervention
-is required.
-
-(VMware solves this by specifying 16 heads, 63 spt in the descriptor =
-file and overrides its
-default guessing algorithm which also fails here)
-
-(By the way this is not a VMware specific problem, the disk itself was =
-imported to VMware in
-a P2V scenario, so that probably explains why the ddb.geometry.bios* =
-values appear in the
-VMDK in the first place)
-
-
->=20
+>> > What version of NetBSD did you test? There was recently a short lived
+>> > regression in curses(3) that affected sysinst(8) (installer) in HEAD,
+>> > but it was fixed.
+>>
+>> The error for NetBSD was navigating the installer which was dumping a
+>> lot of q's in the stream (unicode bar characters?).
+>
+> Not unicode, but yes these are bars for boxes.
+>
+> The console trace you get printed to stdout with V=3D1 or DEBUG=3D1 has
+> terminal sequences and non-printable characters stripped off, so the
+> switch to the box drawing charset doesn't happen and you get those
+> q's instead.
+>
 > cheers,
->  Gerd
->=20
+>   Gerd
+>
+> PS: /me is busy installing ubuntu 18.04 guest to have a look ...
+
+Thanks.
+
+If you do a re-spin then could you consider including:
+
+  Subject: [PATCH] tests/vm: favour the locally built QEMU for bootstrapping
+  Date: Fri,  7 Jun 2019 19:53:37 +0100
+  Message-Id: <20190607185337.14524-1-alex.bennee@linaro.org>
+
+Also your scripts and python3 fixes are already merged.
+
+--
+Alex Benn=C3=A9e
 
