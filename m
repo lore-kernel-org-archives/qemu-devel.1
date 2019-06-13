@@ -6,56 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBF06C31E49
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 16:57:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7E92C31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 17:02:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C798420665
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 16:57:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C798420665
+	by mail.kernel.org (Postfix) with ESMTPS id 7D2F82063F
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 17:02:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D2F82063F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41882 helo=lists.gnu.org)
+Received: from localhost ([::1]:41964 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbT2x-0003j0-3m
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 12:57:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59985)
+	id 1hbT7N-0006gj-Ee
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 13:02:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60243)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hbRkt-0000WE-8G
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 11:35:12 -0400
+ (envelope-from <kwolf@redhat.com>) id 1hbRlT-00010q-Jv
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 11:35:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hbRkr-0003Tx-Eo
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 11:35:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56786)
+ (envelope-from <kwolf@redhat.com>) id 1hbRlR-0003z3-7c
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 11:35:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:12278)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hbRkk-0003F8-Df; Thu, 13 Jun 2019 11:35:04 -0400
+ id 1hbRlG-0003pF-06; Thu, 13 Jun 2019 11:35:34 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8DEFE6EB81;
- Thu, 13 Jun 2019 15:34:47 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6F991C047B7A;
+ Thu, 13 Jun 2019 15:35:26 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-116-246.ams2.redhat.com
  [10.36.116.246])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 137B260C44;
- Thu, 13 Jun 2019 15:34:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8183961980;
+ Thu, 13 Jun 2019 15:35:22 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 13 Jun 2019 17:33:57 +0200
-Message-Id: <20190613153405.24769-8-kwolf@redhat.com>
+Date: Thu, 13 Jun 2019 17:34:03 +0200
+Message-Id: <20190613153405.24769-14-kwolf@redhat.com>
 In-Reply-To: <20190613153405.24769-1-kwolf@redhat.com>
 References: <20190613153405.24769-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Thu, 13 Jun 2019 15:34:52 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Thu, 13 Jun 2019 15:35:32 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 07/15] Move monitor.c to monitor/misc.c
+Subject: [Qemu-devel] [PATCH v3 13/15] monitor: Split Monitor.flags into
+ separate bools
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,161 +74,183 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Create a new monitor/ subdirectory and move monitor.c there. As the plan
-is to move the monitor core into separate files, use the chance to
-rename it to misc.c.
+Monitor.flags contains three different flags: One to distinguish HMP
+from QMP; one specific to HMP (MONITOR_USE_READLINE) that is ignored
+with QMP; and another one specific to QMP (MONITOR_USE_PRETTY) that is
+ignored with HMP.
+
+Split the flags field into three bools and move them to the right
+subclass. Flags are still in use for the monitor_init() interface.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- docs/devel/writing-qmp-commands.txt |  2 +-
- monitor.c =3D> monitor/misc.c         |  2 +-
- MAINTAINERS                         |  4 ++--
- Makefile.objs                       |  1 +
- Makefile.target                     |  3 ++-
- monitor/Makefile.objs               |  1 +
- monitor/trace-events                | 11 +++++++++++
- trace-events                        | 10 ----------
- 8 files changed, 19 insertions(+), 15 deletions(-)
- rename monitor.c =3D> monitor/misc.c (99%)
- create mode 100644 monitor/Makefile.objs
- create mode 100644 monitor/trace-events
+ monitor/monitor-internal.h |  8 +++++---
+ monitor/hmp.c              |  6 +++---
+ monitor/misc.c             |  2 +-
+ monitor/monitor.c          | 14 +++++++++-----
+ monitor/qmp.c              |  7 ++++---
+ 5 files changed, 22 insertions(+), 15 deletions(-)
 
-diff --git a/docs/devel/writing-qmp-commands.txt b/docs/devel/writing-qmp=
--commands.txt
-index 9dfc62bf5a..cc6ecd6d5d 100644
---- a/docs/devel/writing-qmp-commands.txt
-+++ b/docs/devel/writing-qmp-commands.txt
-@@ -470,7 +470,7 @@ it's good practice to always check for errors.
+diff --git a/monitor/monitor-internal.h b/monitor/monitor-internal.h
+index 30679d522e..260725e51b 100644
+--- a/monitor/monitor-internal.h
++++ b/monitor/monitor-internal.h
+@@ -90,8 +90,8 @@ typedef struct HMPCommand {
+ struct Monitor {
+     CharBackend chr;
+     int reset_seen;
+-    int flags;
+     int suspend_cnt;            /* Needs to be accessed atomically */
++    bool is_qmp;
+     bool skip_flush;
+     bool use_io_thread;
 =20
- Another important detail is that HMP's "info" commands don't go into the
- hmp-commands.hx. Instead, they go into the info_cmds[] table, which is d=
-efined
--in the monitor.c file. The entry for the "info alarmclock" follows:
-+in the monitor/misc.c file. The entry for the "info alarmclock" follows:
+@@ -116,6 +116,7 @@ struct Monitor {
 =20
-     {
-         .name       =3D "alarmclock",
-diff --git a/monitor.c b/monitor/misc.c
-similarity index 99%
-rename from monitor.c
-rename to monitor/misc.c
-index 006c650761..e5db04265d 100644
---- a/monitor.c
+ struct MonitorHMP {
+     Monitor common;
++    bool use_readline;
+     /*
+      * State used only in the thread "owning" the monitor.
+      * If @use_io_thread, this is @mon_iothread. (This does not actually=
+ happen
+@@ -129,6 +130,7 @@ struct MonitorHMP {
+ typedef struct {
+     Monitor common;
+     JSONMessageParser parser;
++    bool pretty;
+     /*
+      * When a client connects, we're in capabilities negotiation mode.
+      * @commands is &qmp_cap_negotiation_commands then.  When command
+@@ -152,7 +154,7 @@ typedef struct {
+  */
+ static inline bool monitor_is_qmp(const Monitor *mon)
+ {
+-    return (mon->flags & MONITOR_USE_CONTROL);
++    return mon->is_qmp;
+ }
+=20
+ typedef QTAILQ_HEAD(MonitorList, Monitor) MonitorList;
+@@ -169,7 +171,7 @@ void monitor_init_qmp(Chardev *chr, int flags);
+ void monitor_init_hmp(Chardev *chr, int flags);
+=20
+ int monitor_puts(Monitor *mon, const char *str);
+-void monitor_data_init(Monitor *mon, int flags, bool skip_flush,
++void monitor_data_init(Monitor *mon, bool is_qmp, bool skip_flush,
+                        bool use_io_thread);
+ void monitor_data_destroy(Monitor *mon);
+ int monitor_can_read(void *opaque);
+diff --git a/monitor/hmp.c b/monitor/hmp.c
+index 3621b195ed..5ba8b6e8d5 100644
+--- a/monitor/hmp.c
++++ b/monitor/hmp.c
+@@ -1396,12 +1396,12 @@ static void monitor_readline_flush(void *opaque)
+ void monitor_init_hmp(Chardev *chr, int flags)
+ {
+     MonitorHMP *mon =3D g_malloc0(sizeof(*mon));
+-    bool use_readline =3D flags & MONITOR_USE_READLINE;
+=20
+-    monitor_data_init(&mon->common, flags, false, false);
++    monitor_data_init(&mon->common, false, false, false);
+     qemu_chr_fe_init(&mon->common.chr, chr, &error_abort);
+=20
+-    if (use_readline) {
++    mon->use_readline =3D flags & MONITOR_USE_READLINE;
++    if (mon->use_readline) {
+         mon->rs =3D readline_init(monitor_readline_printf,
+                                 monitor_readline_flush,
+                                 mon,
+diff --git a/monitor/misc.c b/monitor/misc.c
+index dddbddb21f..10c056394e 100644
+--- a/monitor/misc.c
 +++ b/monitor/misc.c
-@@ -64,7 +64,7 @@
- #include "qapi/qmp/json-parser.h"
- #include "qapi/qmp/qlist.h"
- #include "qom/object_interfaces.h"
--#include "trace-root.h"
-+#include "trace.h"
- #include "trace/control.h"
- #include "monitor/hmp-target.h"
- #ifdef CONFIG_TRACE_SIMPLE
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 588c8d947a..231964c1da 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1916,7 +1916,7 @@ F: qapi/run-state.json
- Human Monitor (HMP)
- M: Dr. David Alan Gilbert <dgilbert@redhat.com>
- S: Maintained
--F: monitor.c
-+F: monitor/misc.c
- F: hmp.[ch]
- F: hmp-commands*.hx
- F: include/monitor/hmp-target.h
-@@ -2038,7 +2038,7 @@ QMP
- M: Markus Armbruster <armbru@redhat.com>
- S: Supported
- F: qmp.c
--F: monitor.c
-+F: monitor/misc.c
- F: docs/devel/*qmp-*
- F: docs/interop/*qmp-*
- F: scripts/qmp/
-diff --git a/Makefile.objs b/Makefile.objs
-index c8337fa34b..dd39a70b48 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -130,6 +130,7 @@ trace-events-subdirs =3D
- trace-events-subdirs +=3D accel/kvm
- trace-events-subdirs +=3D accel/tcg
- trace-events-subdirs +=3D crypto
-+trace-events-subdirs +=3D monitor
- ifeq ($(CONFIG_USER_ONLY),y)
- trace-events-subdirs +=3D linux-user
- endif
-diff --git a/Makefile.target b/Makefile.target
-index ecd856e3a3..72c267f7dc 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -148,9 +148,10 @@ endif #CONFIG_BSD_USER
- #########################################################
- # System emulator target
- ifdef CONFIG_SOFTMMU
--obj-y +=3D arch_init.o cpus.o monitor.o gdbstub.o balloon.o ioport.o num=
-a.o
-+obj-y +=3D arch_init.o cpus.o gdbstub.o balloon.o ioport.o numa.o
- obj-y +=3D qtest.o
- obj-y +=3D hw/
-+obj-y +=3D monitor/
- obj-y +=3D qapi/
- obj-y +=3D memory.o
- obj-y +=3D memory_mapping.o
-diff --git a/monitor/Makefile.objs b/monitor/Makefile.objs
-new file mode 100644
-index 0000000000..e783b0616b
---- /dev/null
-+++ b/monitor/Makefile.objs
-@@ -0,0 +1 @@
-+obj-y +=3D misc.o
-diff --git a/monitor/trace-events b/monitor/trace-events
-new file mode 100644
-index 0000000000..abfdf20b14
---- /dev/null
-+++ b/monitor/trace-events
-@@ -0,0 +1,11 @@
-+# See docs/devel/tracing.txt for syntax documentation.
-+
-+# misc.c
-+monitor_protocol_event_handler(uint32_t event, void *qdict) "event=3D%d =
-data=3D%p"
-+monitor_protocol_event_emit(uint32_t event, void *data) "event=3D%d data=
-=3D%p"
-+monitor_protocol_event_queue(uint32_t event, void *qdict, uint64_t rate)=
- "event=3D%d data=3D%p rate=3D%" PRId64
-+handle_hmp_command(void *mon, const char *cmdline) "mon %p cmdline: %s"
-+handle_qmp_command(void *mon, const char *req) "mon %p req: %s"
-+monitor_suspend(void *ptr, int cnt) "mon %p: %d"
-+monitor_qmp_cmd_in_band(const char *id) "%s"
-+monitor_qmp_cmd_out_of_band(const char *id) "%s"
-diff --git a/trace-events b/trace-events
-index 844ee58dd9..aeea3c2bdb 100644
---- a/trace-events
-+++ b/trace-events
-@@ -41,16 +41,6 @@ system_wakeup_request(int reason) "reason=3D%d"
- qemu_system_shutdown_request(int reason) "reason=3D%d"
- qemu_system_powerdown_request(void) ""
+@@ -134,7 +134,7 @@ char *qmp_human_monitor_command(const char *command_l=
+ine, bool has_cpu_index,
+     Monitor *old_mon;
+     MonitorHMP hmp =3D {};
 =20
--# monitor.c
--monitor_protocol_event_handler(uint32_t event, void *qdict) "event=3D%d =
-data=3D%p"
--monitor_protocol_event_emit(uint32_t event, void *data) "event=3D%d data=
-=3D%p"
--monitor_protocol_event_queue(uint32_t event, void *qdict, uint64_t rate)=
- "event=3D%d data=3D%p rate=3D%" PRId64
--handle_hmp_command(void *mon, const char *cmdline) "mon %p cmdline: %s"
--handle_qmp_command(void *mon, const char *req) "mon %p req: %s"
--monitor_suspend(void *ptr, int cnt) "mon %p: %d"
--monitor_qmp_cmd_in_band(const char *id) "%s"
--monitor_qmp_cmd_out_of_band(const char *id) "%s"
--
- # dma-helpers.c
- dma_blk_io(void *dbs, void *bs, int64_t offset, bool to_dev) "dbs=3D%p b=
-s=3D%p offset=3D%" PRId64 " to_dev=3D%d"
- dma_aio_cancel(void *dbs) "dbs=3D%p"
+-    monitor_data_init(&hmp.common, 0, true, false);
++    monitor_data_init(&hmp.common, false, true, false);
+=20
+     old_mon =3D cur_mon;
+     cur_mon =3D &hmp.common;
+diff --git a/monitor/monitor.c b/monitor/monitor.c
+index 6802b8e491..7325e4362b 100644
+--- a/monitor/monitor.c
++++ b/monitor/monitor.c
+@@ -80,14 +80,18 @@ bool monitor_cur_is_qmp(void)
+  * Note: not all HMP monitors use readline, e.g., gdbserver has a
+  * non-interactive HMP monitor, so readline is not used there.
+  */
+-static inline bool monitor_uses_readline(const Monitor *mon)
++static inline bool monitor_uses_readline(const MonitorHMP *mon)
+ {
+-    return mon->flags & MONITOR_USE_READLINE;
++    return mon->use_readline;
+ }
+=20
+ static inline bool monitor_is_hmp_non_interactive(const Monitor *mon)
+ {
+-    return !monitor_is_qmp(mon) && !monitor_uses_readline(mon);
++    if (monitor_is_qmp(mon)) {
++        return false;
++    }
++
++    return !monitor_uses_readline(container_of(mon, MonitorHMP, common))=
+;
+ }
+=20
+ static void monitor_flush_locked(Monitor *mon);
+@@ -523,17 +527,17 @@ static void monitor_iothread_init(void)
+     mon_iothread =3D iothread_create("mon_iothread", &error_abort);
+ }
+=20
+-void monitor_data_init(Monitor *mon, int flags, bool skip_flush,
++void monitor_data_init(Monitor *mon, bool is_qmp, bool skip_flush,
+                        bool use_io_thread)
+ {
+     if (use_io_thread && !mon_iothread) {
+         monitor_iothread_init();
+     }
+     qemu_mutex_init(&mon->mon_lock);
++    mon->is_qmp =3D is_qmp;
+     mon->outbuf =3D qstring_new();
+     mon->skip_flush =3D skip_flush;
+     mon->use_io_thread =3D use_io_thread;
+-    mon->flags =3D flags;
+ }
+=20
+ void monitor_data_destroy(Monitor *mon)
+diff --git a/monitor/qmp.c b/monitor/qmp.c
+index 31fbcd59f7..3abc718ca3 100644
+--- a/monitor/qmp.c
++++ b/monitor/qmp.c
+@@ -86,8 +86,7 @@ void qmp_send_response(MonitorQMP *mon, const QDict *rs=
+p)
+     const QObject *data =3D QOBJECT(rsp);
+     QString *json;
+=20
+-    json =3D mon->common.flags & MONITOR_USE_PRETTY ?
+-           qobject_to_json_pretty(data) : qobject_to_json(data);
++    json =3D mon->pretty ? qobject_to_json_pretty(data) : qobject_to_jso=
+n(data);
+     assert(json !=3D NULL);
+=20
+     qstring_append_chr(json, '\n');
+@@ -372,9 +371,11 @@ void monitor_init_qmp(Chardev *chr, int flags)
+     assert(!(flags & MONITOR_USE_READLINE));
+=20
+     /* Note: we run QMP monitor in I/O thread when @chr supports that */
+-    monitor_data_init(&mon->common, flags, false,
++    monitor_data_init(&mon->common, true, false,
+                       qemu_chr_has_feature(chr, QEMU_CHAR_FEATURE_GCONTE=
+XT));
+=20
++    mon->pretty =3D flags & MONITOR_USE_PRETTY;
++
+     qemu_mutex_init(&mon->qmp_queue_lock);
+     mon->qmp_requests =3D g_queue_new();
+=20
 --=20
 2.20.1
 
