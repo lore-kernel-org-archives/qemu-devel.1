@@ -2,66 +2,87 @@ Return-Path: <SRS0=rgCY=UM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7C20C31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 19:09:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F73DC31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 19:13:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1C3A20896
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 19:09:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1C3A20896
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id D3E732054F
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 19:13:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fGMbgV2W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3E732054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44398 helo=lists.gnu.org)
+Received: from localhost ([::1]:44438 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbV6L-00042q-Ua
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 15:09:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56884)
+	id 1hbVA9-0007Ho-AU
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 15:13:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43989)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hbSwl-0005gW-4O
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:51:33 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hbV7o-0005Wv-CY
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 15:11:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hbSwj-0007N7-10
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:51:30 -0400
-Resent-Date: Thu, 13 Jun 2019 12:51:30 -0400
-Resent-Message-Id: <E1hbSwj-0007N7-10@eggs.gnu.org>
-Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21922)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hbSwi-0007HA-Lv
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:51:28 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1560444669; cv=none; d=zoho.com; s=zohoarc; 
- b=dA4O+16YllfVMIuvxHNB4mHoQFQl+Xu6mXdM0MzMDJZQjIiw8LaFymDmp3ykvQVrHJ+cwX4V6tLoGUm6ZQdaW0MvJAfmssgWNzC8Ngd2ZVihO9tOVItVQDGrzIWl7S0MseCJ+aV0ClFxlGJKGii1jY4WeAgXzJBweb+bnWMMOWY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1560444669;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=b3YLgs92b6dwJfjYu/G4jkAFUOzQhB4OYKwnHkOKkFc=; 
- b=ShOz07AEoOmosEKuD7OA/FZfMigbWmpQzWcDkt7Qu4eeODFaLFmoPfDTaaCcXXXBvXda+Y9hDbhsa40M3pybTdXFk75eByzz5ENnMghEKseskmCCclIcW9zmlOs/BV85fXbbu3SJaXz8BhyLHLUyybNgcdPj6SDG3/Pw1QsgMOI=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1560444668058478.90860374740316;
- Thu, 13 Jun 2019 09:51:08 -0700 (PDT)
-In-Reply-To: <20190613121433.5246-1-peter.maydell@linaro.org>
-Message-ID: <156044466722.5426.17023834607929355654@ce79690b2cb9>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hbV7i-0004t6-Ex
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 15:11:04 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39050)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1hbV7i-0004Ys-1m
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 15:10:58 -0400
+Received: by mail-ot1-x344.google.com with SMTP id r21so244628otq.6
+ for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 12:10:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=dHoUlv8DCkW+CTsCAOpGTAeCd7DEmn0QLagHKgdfuRo=;
+ b=fGMbgV2WLjos9cqrRmSOaqm9FRk9Kwxxb2yn5D5IYX7rOmNRXt7h0ImCnYz+qxN4Ts
+ 3d9zl51tBBQtBb+mtrOgJ4Xjz2sA/AH3/mV8KelZv3oDfkiI94mnllrMFm9T/T+Uf6iZ
+ EWI0RdgyjHfpbyk7sgqj8agUEeUlAWsCUMGnzukyGlCWrh9nT4A/Z213oYPYriyLSTo6
+ OqMYki9s4QCXvqLVpuSmYQLBc7qEtvu2gpLb0Hq2UOwOYKEcrmKHPPihW68fTPrTVdmi
+ YnwRiTtriQMy3B8SEv97+iwczSVH69QOIJK8cfGe+s8tGGs+VEs8L9UtFPIpADzinONO
+ oesQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=dHoUlv8DCkW+CTsCAOpGTAeCd7DEmn0QLagHKgdfuRo=;
+ b=eVFoHysoPUs70JLmPdaZ6edevrxpxdfsHEXDs509Z7JW98kwuTV4tAlrz2cCU/R8Gt
+ LabCQmyrMbfDoyiPmLwYK7MYwZAn2x8QNVrMc9zRy+DoGGov2yGHBnco/cNfqjSG1wKw
+ LaIuDY/zsmnsC+yn6lA1qD84XjZ61whNxKpXQpbeDasIWkOnbJMOq7jnGZ+1594qMQRl
+ 0IpAADkMGnGruZhD2s27MsXwjNw9Fi4Ec8zUy3BEz1VkDNSmSlOBl7tDe8+jX+mUFxAx
+ mnhE46ycwL5Lrfizms8eA8OcMf7ejdbLHiWav2/sv5JsIuBGi5nxSQWFVKGffQ1z4/3L
+ ezQw==
+X-Gm-Message-State: APjAAAXbhQzBylnPKJqivLZ4DQ+VdieA5b7gzcGAS1N3TGduFXRlM0w5
+ 1kdtVgR0qEOyKH7u/HH4cK1WmWwp7LzLeW1HlC0=
+X-Google-Smtp-Source: APXvYqzHQLdr5Lwf26oi8whPOqQYiVwwHdkOWIY9xdw/1fvdXZnX4LWq3zfRvqF+WE1WupJMSJBhZdvqtDJGgtmbrvc=
+X-Received: by 2002:a9d:6ad7:: with SMTP id m23mr37666314otq.306.1560453037072; 
+ Thu, 13 Jun 2019 12:10:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: peter.maydell@linaro.org
-Date: Thu, 13 Jun 2019 09:51:08 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.59
-Subject: Re: [Qemu-devel] [PULL 00/48] target-arm queue
+Received: by 2002:a9d:20e4:0:0:0:0:0 with HTTP; Thu, 13 Jun 2019 12:10:36
+ -0700 (PDT)
+Received: by 2002:a9d:20e4:0:0:0:0:0 with HTTP; Thu, 13 Jun 2019 12:10:36
+ -0700 (PDT)
+In-Reply-To: <20190519201953.20161-4-richard.henderson@linaro.org>
+References: <20190519201953.20161-1-richard.henderson@linaro.org>
+ <20190519201953.20161-4-richard.henderson@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Thu, 13 Jun 2019 21:10:36 +0200
+Message-ID: <CAL1e-=jU2ZnUooP2hBUW01_x030cJ2Ehd5N+zn9mgzQhr73DrQ@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH 03/13] linux-user: Introduce
+ cpu_clone_regs_parent
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,173 +94,365 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYxMzEyMTQzMy41MjQ2
-LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
-IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
-cmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMDAvNDhdIHRhcmdl
-dC1hcm0gcXVldWUKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwNjEzMTIxNDMzLjUyNDYt
-MS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEv
-YmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
-bmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4v
-c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBF
-TkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
-ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNGE0ZjQ3NiB0YXJnZXQvYXJtOiBGaXgg
-c2hvcnQtdmVjdG9yIGluY3JlbWVudCBiZWhhdmlvdXIKZjk3OTY5ZiB0YXJnZXQvYXJtOiBDb252
-ZXJ0IGZsb2F0LXRvLWludGVnZXIgVkNWVCBpbnNucyB0byBkZWNvZGV0cmVlCjA2NjkxYmQgdGFy
-Z2V0L2FybTogQ29udmVydCBWQ1ZUIGZwL2ZpeGVkLXBvaW50IGNvbnZlcnNpb24gaW5zbnMgdG8g
-ZGVjb2RldHJlZQo4ZWNjYmI3IHRhcmdldC9hcm06IENvbnZlcnQgVkpDVlQgdG8gZGVjb2RldHJl
-ZQpiMGRkNWVmIHRhcmdldC9hcm06IENvbnZlcnQgaW50ZWdlci10by1mbG9hdCBpbnNucyB0byBk
-ZWNvZGV0cmVlCmMwYjQzZDcgdGFyZ2V0L2FybTogQ29udmVydCBkb3VibGUtc2luZ2xlIHByZWNp
-c2lvbiBjb252ZXJzaW9uIGluc25zIHRvIGRlY29kZXRyZWUKYmRhZjlhNyB0YXJnZXQvYXJtOiBD
-b252ZXJ0IFZGUCByb3VuZCBpbnNucyB0byBkZWNvZGV0cmVlCjQ2MDZjYWMgdGFyZ2V0L2FybTog
-Q29udmVydCB0aGUgVkNWVC10by1mMTYgaW5zbnMgdG8gZGVjb2RldHJlZQpkYjQzNTkwIHRhcmdl
-dC9hcm06IENvbnZlcnQgdGhlIFZDVlQtZnJvbS1mMTYgaW5zbnMgdG8gZGVjb2RldHJlZQoxNTAx
-NGZhIHRhcmdldC9hcm06IENvbnZlcnQgVkZQIGNvbXBhcmlzb24gaW5zbnMgdG8gZGVjb2RldHJl
-ZQo3MmI4OTczIHRhcmdldC9hcm06IENvbnZlcnQgVk1PViAocmVnaXN0ZXIpIHRvIGRlY29kZXRy
-ZWUKNzM5ZjFhYiB0YXJnZXQvYXJtOiBDb252ZXJ0IFZTUVJUIHRvIGRlY29kZXRyZWUKNmE1NjAx
-OSB0YXJnZXQvYXJtOiBDb252ZXJ0IFZORUcgdG8gZGVjb2RldHJlZQozNzllMzkzIHRhcmdldC9h
-cm06IENvbnZlcnQgVkFCUyB0byBkZWNvZGV0cmVlCjc0ZmMzMDEgdGFyZ2V0L2FybTogQ29udmVy
-dCBWTU9WIChpbW0pIHRvIGRlY29kZXRyZWUKMWYxNzkzNyB0YXJnZXQvYXJtOiBDb252ZXJ0IFZG
-UCBmdXNlZCBtdWx0aXBseS1hZGQgaW5zbnMgdG8gZGVjb2RldHJlZQo3MDgyM2I3IHRhcmdldC9h
-cm06IENvbnZlcnQgVkRJViB0byBkZWNvZGV0cmVlCjY1MjA0MjIgdGFyZ2V0L2FybTogQ29udmVy
-dCBWU1VCIHRvIGRlY29kZXRyZWUKOTI2OWI1MWEgdGFyZ2V0L2FybTogQ29udmVydCBWQUREIHRv
-IGRlY29kZXRyZWUKYWNlZGVmNCB0YXJnZXQvYXJtOiBDb252ZXJ0IFZOTVVMIHRvIGRlY29kZXRy
-ZWUKY2Y4YjU2YSB0YXJnZXQvYXJtOiBDb252ZXJ0IFZNVUwgdG8gZGVjb2RldHJlZQpiN2E5ZTJi
-IHRhcmdldC9hcm06IENvbnZlcnQgVkZQIFZOTUxBIHRvIGRlY29kZXRyZWUKZjBmYzdmZCB0YXJn
-ZXQvYXJtOiBDb252ZXJ0IFZGUCBWTk1MUyB0byBkZWNvZGV0cmVlCmU0YTYyM2QgdGFyZ2V0L2Fy
-bTogQ29udmVydCBWRlAgVk1MUyB0byBkZWNvZGV0cmVlCmM1YjViYTggdGFyZ2V0L2FybTogQ29u
-dmVydCBWRlAgVk1MQSB0byBkZWNvZGV0cmVlCjBkYTU4ZmMgdGFyZ2V0L2FybTogUmVtb3ZlIFZM
-RFIvVlNUUi9WTERNL1ZTVE0gdXNlIG9mIGNwdV9GMHMgYW5kIGNwdV9GMGQKNGYxZDE0MSB0YXJn
-ZXQvYXJtOiBDb252ZXJ0IHRoZSBWRlAgbG9hZC9zdG9yZSBtdWx0aXBsZSBpbnNucyB0byBkZWNv
-ZGV0cmVlCmY0YjZiOTMgdGFyZ2V0L2FybTogQ29udmVydCBWRlAgVkxEUiBhbmQgVlNUUiB0byBk
-ZWNvZGV0cmVlCjc4ZTI4ZmQgdGFyZ2V0L2FybTogQ29udmVydCBWRlAgdHdvLXJlZ2lzdGVyIHRy
-YW5zZmVyIGluc25zIHRvIGRlY29kZXRyZWUKYmE0YTM3YSB0YXJnZXQvYXJtOiBDb252ZXJ0ICJz
-aW5nbGUtcHJlY2lzaW9uIiByZWdpc3RlciBtb3ZlcyB0byBkZWNvZGV0cmVlCmFlYWIyY2YgdGFy
-Z2V0L2FybTogQ29udmVydCAiZG91YmxlLXByZWNpc2lvbiIgcmVnaXN0ZXIgbW92ZXMgdG8gZGVj
-b2RldHJlZQo1M2I1MDkwIHRhcmdldC9hcm06IEFkZCBoZWxwZXJzIGZvciBWRlAgcmVnaXN0ZXIg
-bG9hZHMgYW5kIHN0b3JlcwphYjkyODdjIHRhcmdldC9hcm06IE1vdmUgdGhlIFZGUCB0cmFuc18q
-IGZ1bmN0aW9ucyB0byB0cmFuc2xhdGUtdmZwLmluYy5jCmUwNmQxNDYgdGFyZ2V0L2FybTogQ29u
-dmVydCBWQ1ZUQS9WQ1ZUTi9WQ1ZUUC9WQ1ZUTSB0byBkZWNvZGV0cmVlCmJkZWMyOWQgdGFyZ2V0
-L2FybTogQ29udmVydCBWUklOVEEvVlJJTlROL1ZSSU5UUC9WUklOVE0gdG8gZGVjb2RldHJlZQo3
-OTYyODIzIHRhcmdldC9hcm06IENvbnZlcnQgVk1JTk5NLCBWTUFYTk0gdG8gZGVjb2RldHJlZQoy
-ZTk3MDNhIHRhcmdldC9hcm06IENvbnZlcnQgdGhlIFZTRUwgaW5zdHJ1Y3Rpb25zIHRvIGRlY29k
-ZXRyZWUKZjcwMTk3NCB0YXJnZXQvYXJtOiBFeHBsaWNpdGx5IGVuYWJsZSBWRlAgc2hvcnQtdmVj
-dG9ycyBmb3IgYWFyY2gzMiAtY3B1IG1heAo0NWVhYWY3IHRhcmdldC9hcm06IEZpeCBDb3J0ZXgt
-UjVGIE1WRlIgdmFsdWVzCmVjNDJiN2UgdGFyZ2V0L2FybTogRmFjdG9yIG91dCBWRlAgYWNjZXNz
-IGNoZWNraW5nIGNvZGUKNzMzYWNkOCB0YXJnZXQvYXJtOiBBZGQgc3R1YnMgZm9yIEFBcmNoMzIg
-VkZQIGRlY29kZXRyZWUKYzIxMjZhNSBkZWNvZGV0cmVlOiBGaXggY29tcGFyaXNvbiBvZiBGaWVs
-ZAo2N2ZhZGEwIHRhcmdldC9hcm06IEZpeCBvdXRwdXQgb2YgUEF1dGggQXV0aAo4YTUyM2M3IGh3
-L2NvcmUvYnVzLmM6IE9ubHkgdGhlIG1haW4gc3lzdGVtIGJ1cyBjYW4gaGF2ZSBubyBwYXJlbnQK
-YzZmZWMyMSBody9hcm0vc21tdXYzOiBGaXggZGVjb2Rpbmcgb2YgSUQgcmVnaXN0ZXIgcmFuZ2UK
-ODIyYzQ2ZSB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgTlNBQ1IgZ2F0aW5nIG9mIGZsb2F0aW5nIHBv
-aW50CmVlMzUwZDQgdGFyZ2V0L2FybTogVXNlIHRjZ19nZW5fZ3ZlY19iaXRzZWwKZThiMWEyNiB0
-YXJnZXQvYXJtOiBWZWN0b3JpemUgVVNITCBhbmQgU1NITAoKPT09IE9VVFBVVCBCRUdJTiA9PT0K
-MS80OCBDaGVja2luZyBjb21taXQgZThiMWEyNjcyYzE4ICh0YXJnZXQvYXJtOiBWZWN0b3JpemUg
-VVNITCBhbmQgU1NITCkKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5l
-eHQgbGluZQojMTYzOiBGSUxFOiB0YXJnZXQvYXJtL3RyYW5zbGF0ZS5jOjUzNzc6CisgICAgICAg
-ICAgICBjYXNlIDI6IGdlbl91c2hsX2kzMih2YXIsIHZhciwgc2hpZnQpOyBicmVhazsKCkVSUk9S
-OiB0cmFpbGluZyBzdGF0ZW1lbnRzIHNob3VsZCBiZSBvbiBuZXh0IGxpbmUKIzE3MDogRklMRTog
-dGFyZ2V0L2FybS90cmFuc2xhdGUuYzo1MzgzOgorICAgICAgICAgICAgY2FzZSAyOiBnZW5fc3No
-bF9pMzIodmFyLCB2YXIsIHNoaWZ0KTsgYnJlYWs7Cgp0b3RhbDogMiBlcnJvcnMsIDAgd2Fybmlu
-Z3MsIDU3MCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxLzQ4IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
-YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
-ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
-UlMuCgoyLzQ4IENoZWNraW5nIGNvbW1pdCBlZTM1MGQ0ZmFmODQgKHRhcmdldC9hcm06IFVzZSB0
-Y2dfZ2VuX2d2ZWNfYml0c2VsKQozLzQ4IENoZWNraW5nIGNvbW1pdCA4MjJjNDZlZDQ4ZmEgKHRh
-cmdldC9hcm06IEltcGxlbWVudCBOU0FDUiBnYXRpbmcgb2YgZmxvYXRpbmcgcG9pbnQpCjQvNDgg
-Q2hlY2tpbmcgY29tbWl0IGM2ZmVjMjE3Yzk2OCAoaHcvYXJtL3NtbXV2MzogRml4IGRlY29kaW5n
-IG9mIElEIHJlZ2lzdGVyIHJhbmdlKQo1LzQ4IENoZWNraW5nIGNvbW1pdCA4YTUyM2M3ZWE5ZjEg
-KGh3L2NvcmUvYnVzLmM6IE9ubHkgdGhlIG1haW4gc3lzdGVtIGJ1cyBjYW4gaGF2ZSBubyBwYXJl
-bnQpCjYvNDggQ2hlY2tpbmcgY29tbWl0IDY3ZmFkYTA1MTNkYSAodGFyZ2V0L2FybTogRml4IG91
-dHB1dCBvZiBQQXV0aCBBdXRoKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxl
-KHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0OTogCm5ldyBmaWxlIG1vZGUg
-MTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDgwIGxpbmVzIGNoZWNrZWQKClBh
-dGNoIDYvNDggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNy80OCBDaGVja2luZyBjb21taXQg
-YzIxMjZhNTQxNTMyIChkZWNvZGV0cmVlOiBGaXggY29tcGFyaXNvbiBvZiBGaWVsZCkKOC80OCBD
-aGVja2luZyBjb21taXQgNzMzYWNkODMwMjg5ICh0YXJnZXQvYXJtOiBBZGQgc3R1YnMgZm9yIEFB
-cmNoMzIgVkZQIGRlY29kZXRyZWUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
-bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzUxOiAKbmV3IGZpbGUgbW9k
-ZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTM2IGxpbmVzIGNoZWNrZWQK
-ClBhdGNoIDgvNDggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOS80OCBDaGVja2luZyBjb21t
-aXQgZWM0MmI3ZTczNmE5ICh0YXJnZXQvYXJtOiBGYWN0b3Igb3V0IFZGUCBhY2Nlc3MgY2hlY2tp
-bmcgY29kZSkKMTAvNDggQ2hlY2tpbmcgY29tbWl0IDQ1ZWFhZjcyZGVmOCAodGFyZ2V0L2FybTog
-Rml4IENvcnRleC1SNUYgTVZGUiB2YWx1ZXMpCjExLzQ4IENoZWNraW5nIGNvbW1pdCBmNzAxOTc0
-ZTE2YTggKHRhcmdldC9hcm06IEV4cGxpY2l0bHkgZW5hYmxlIFZGUCBzaG9ydC12ZWN0b3JzIGZv
-ciBhYXJjaDMyIC1jcHUgbWF4KQoxMi80OCBDaGVja2luZyBjb21taXQgMmU5NzAzYTE3YzZkICh0
-YXJnZXQvYXJtOiBDb252ZXJ0IHRoZSBWU0VMIGluc3RydWN0aW9ucyB0byBkZWNvZGV0cmVlKQox
-My80OCBDaGVja2luZyBjb21taXQgNzk2MjgyM2E5ODM2ICh0YXJnZXQvYXJtOiBDb252ZXJ0IFZN
-SU5OTSwgVk1BWE5NIHRvIGRlY29kZXRyZWUpCjE0LzQ4IENoZWNraW5nIGNvbW1pdCBiZGVjMjlk
-MjJmZmYgKHRhcmdldC9hcm06IENvbnZlcnQgVlJJTlRBL1ZSSU5UTi9WUklOVFAvVlJJTlRNIHRv
-IGRlY29kZXRyZWUpCjE1LzQ4IENoZWNraW5nIGNvbW1pdCBlMDZkMTQ2ZGNlODkgKHRhcmdldC9h
-cm06IENvbnZlcnQgVkNWVEEvVkNWVE4vVkNWVFAvVkNWVE0gdG8gZGVjb2RldHJlZSkKMTYvNDgg
-Q2hlY2tpbmcgY29tbWl0IGFiOTI4N2NkNGNjNCAodGFyZ2V0L2FybTogTW92ZSB0aGUgVkZQIHRy
-YW5zXyogZnVuY3Rpb25zIHRvIHRyYW5zbGF0ZS12ZnAuaW5jLmMpCjE3LzQ4IENoZWNraW5nIGNv
-bW1pdCA1M2I1MDkwNTE4MzMgKHRhcmdldC9hcm06IEFkZCBoZWxwZXJzIGZvciBWRlAgcmVnaXN0
-ZXIgbG9hZHMgYW5kIHN0b3JlcykKMTgvNDggQ2hlY2tpbmcgY29tbWl0IGFlYWIyY2ZlMTMxNCAo
-dGFyZ2V0L2FybTogQ29udmVydCAiZG91YmxlLXByZWNpc2lvbiIgcmVnaXN0ZXIgbW92ZXMgdG8g
-ZGVjb2RldHJlZSkKMTkvNDggQ2hlY2tpbmcgY29tbWl0IGJhNGEzN2FmOTMyNyAodGFyZ2V0L2Fy
-bTogQ29udmVydCAic2luZ2xlLXByZWNpc2lvbiIgcmVnaXN0ZXIgbW92ZXMgdG8gZGVjb2RldHJl
-ZSkKMjAvNDggQ2hlY2tpbmcgY29tbWl0IDc4ZTI4ZmRhZTEwOCAodGFyZ2V0L2FybTogQ29udmVy
-dCBWRlAgdHdvLXJlZ2lzdGVyIHRyYW5zZmVyIGluc25zIHRvIGRlY29kZXRyZWUpCjIxLzQ4IENo
-ZWNraW5nIGNvbW1pdCBmNGI2YjkzM2E3ZDIgKHRhcmdldC9hcm06IENvbnZlcnQgVkZQIFZMRFIg
-YW5kIFZTVFIgdG8gZGVjb2RldHJlZSkKMjIvNDggQ2hlY2tpbmcgY29tbWl0IDRmMWQxNDE0Nzcz
-MCAodGFyZ2V0L2FybTogQ29udmVydCB0aGUgVkZQIGxvYWQvc3RvcmUgbXVsdGlwbGUgaW5zbnMg
-dG8gZGVjb2RldHJlZSkKMjMvNDggQ2hlY2tpbmcgY29tbWl0IDBkYTU4ZmNmOGJlZSAodGFyZ2V0
-L2FybTogUmVtb3ZlIFZMRFIvVlNUUi9WTERNL1ZTVE0gdXNlIG9mIGNwdV9GMHMgYW5kIGNwdV9G
-MGQpCjI0LzQ4IENoZWNraW5nIGNvbW1pdCBjNWI1YmE4YmQ5ZGYgKHRhcmdldC9hcm06IENvbnZl
-cnQgVkZQIFZNTEEgdG8gZGVjb2RldHJlZSkKMjUvNDggQ2hlY2tpbmcgY29tbWl0IGU0YTYyM2Rk
-N2FjOSAodGFyZ2V0L2FybTogQ29udmVydCBWRlAgVk1MUyB0byBkZWNvZGV0cmVlKQoyNi80OCBD
-aGVja2luZyBjb21taXQgZjBmYzdmZDhlZTAwICh0YXJnZXQvYXJtOiBDb252ZXJ0IFZGUCBWTk1M
-UyB0byBkZWNvZGV0cmVlKQoyNy80OCBDaGVja2luZyBjb21taXQgYjdhOWUyYmVhZDk1ICh0YXJn
-ZXQvYXJtOiBDb252ZXJ0IFZGUCBWTk1MQSB0byBkZWNvZGV0cmVlKQoyOC80OCBDaGVja2luZyBj
-b21taXQgY2Y4YjU2YTZkMTUwICh0YXJnZXQvYXJtOiBDb252ZXJ0IFZNVUwgdG8gZGVjb2RldHJl
-ZSkKMjkvNDggQ2hlY2tpbmcgY29tbWl0IGFjZWRlZjQ4YWQ4NSAodGFyZ2V0L2FybTogQ29udmVy
-dCBWTk1VTCB0byBkZWNvZGV0cmVlKQozMC80OCBDaGVja2luZyBjb21taXQgOTI2OWI1MWE0NDg2
-ICh0YXJnZXQvYXJtOiBDb252ZXJ0IFZBREQgdG8gZGVjb2RldHJlZSkKMzEvNDggQ2hlY2tpbmcg
-Y29tbWl0IDY1MjA0MjIyZWEwYiAodGFyZ2V0L2FybTogQ29udmVydCBWU1VCIHRvIGRlY29kZXRy
-ZWUpCjMyLzQ4IENoZWNraW5nIGNvbW1pdCA3MDgyM2I3OTY2YjYgKHRhcmdldC9hcm06IENvbnZl
-cnQgVkRJViB0byBkZWNvZGV0cmVlKQozMy80OCBDaGVja2luZyBjb21taXQgMWYxNzkzNzJjYjcz
-ICh0YXJnZXQvYXJtOiBDb252ZXJ0IFZGUCBmdXNlZCBtdWx0aXBseS1hZGQgaW5zbnMgdG8gZGVj
-b2RldHJlZSkKMzQvNDggQ2hlY2tpbmcgY29tbWl0IDc0ZmMzMDFiMDZhMiAodGFyZ2V0L2FybTog
-Q29udmVydCBWTU9WIChpbW0pIHRvIGRlY29kZXRyZWUpCjM1LzQ4IENoZWNraW5nIGNvbW1pdCAz
-NzllMzkzYWI0NjcgKHRhcmdldC9hcm06IENvbnZlcnQgVkFCUyB0byBkZWNvZGV0cmVlKQozNi80
-OCBDaGVja2luZyBjb21taXQgNmE1NjAxOTA5NTA1ICh0YXJnZXQvYXJtOiBDb252ZXJ0IFZORUcg
-dG8gZGVjb2RldHJlZSkKMzcvNDggQ2hlY2tpbmcgY29tbWl0IDczOWYxYWJlOTY4MiAodGFyZ2V0
-L2FybTogQ29udmVydCBWU1FSVCB0byBkZWNvZGV0cmVlKQozOC80OCBDaGVja2luZyBjb21taXQg
-NzJiODk3M2UyOTIyICh0YXJnZXQvYXJtOiBDb252ZXJ0IFZNT1YgKHJlZ2lzdGVyKSB0byBkZWNv
-ZGV0cmVlKQozOS80OCBDaGVja2luZyBjb21taXQgMTUwMTRmYTMwYzFkICh0YXJnZXQvYXJtOiBD
-b252ZXJ0IFZGUCBjb21wYXJpc29uIGluc25zIHRvIGRlY29kZXRyZWUpCjQwLzQ4IENoZWNraW5n
-IGNvbW1pdCBkYjQzNTkwYjcwMGMgKHRhcmdldC9hcm06IENvbnZlcnQgdGhlIFZDVlQtZnJvbS1m
-MTYgaW5zbnMgdG8gZGVjb2RldHJlZSkKNDEvNDggQ2hlY2tpbmcgY29tbWl0IDQ2MDZjYWNkZTNk
-NyAodGFyZ2V0L2FybTogQ29udmVydCB0aGUgVkNWVC10by1mMTYgaW5zbnMgdG8gZGVjb2RldHJl
-ZSkKNDIvNDggQ2hlY2tpbmcgY29tbWl0IGJkYWY5YTc1NDU1YSAodGFyZ2V0L2FybTogQ29udmVy
-dCBWRlAgcm91bmQgaW5zbnMgdG8gZGVjb2RldHJlZSkKNDMvNDggQ2hlY2tpbmcgY29tbWl0IGMw
-YjQzZDc2YmRkZCAodGFyZ2V0L2FybTogQ29udmVydCBkb3VibGUtc2luZ2xlIHByZWNpc2lvbiBj
-b252ZXJzaW9uIGluc25zIHRvIGRlY29kZXRyZWUpCjQ0LzQ4IENoZWNraW5nIGNvbW1pdCBiMGRk
-NWVmMGVmMDggKHRhcmdldC9hcm06IENvbnZlcnQgaW50ZWdlci10by1mbG9hdCBpbnNucyB0byBk
-ZWNvZGV0cmVlKQo0NS80OCBDaGVja2luZyBjb21taXQgOGVjY2JiNzljOGJmICh0YXJnZXQvYXJt
-OiBDb252ZXJ0IFZKQ1ZUIHRvIGRlY29kZXRyZWUpCjQ2LzQ4IENoZWNraW5nIGNvbW1pdCAwNjY5
-MWJkZjgzZTkgKHRhcmdldC9hcm06IENvbnZlcnQgVkNWVCBmcC9maXhlZC1wb2ludCBjb252ZXJz
-aW9uIGluc25zIHRvIGRlY29kZXRyZWUpCjQ3LzQ4IENoZWNraW5nIGNvbW1pdCBmOTc5NjlmYTVj
-OGMgKHRhcmdldC9hcm06IENvbnZlcnQgZmxvYXQtdG8taW50ZWdlciBWQ1ZUIGluc25zIHRvIGRl
-Y29kZXRyZWUpCjQ4LzQ4IENoZWNraW5nIGNvbW1pdCA0YTRmNDc2OTk2MjQgKHRhcmdldC9hcm06
-IEZpeCBzaG9ydC12ZWN0b3IgaW5jcmVtZW50IGJlaGF2aW91cikKPT09IE9VVFBVVCBFTkQgPT09
-CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFp
-bGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA2MTMxMjE0MzMuNTI0Ni0xLXBl
-dGVyLm1heWRlbGxAbGluYXJvLm9yZy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4K
-LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0
-Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
-ZGhhdC5jb20=
+On May 19, 2019 10:27 PM, "Richard Henderson" <richard.henderson@linaro.org>
+wrote:
+>
+> Add an empty inline function for each target, and invoke it
+> from the proper places.
+>
 
+Can we outline the meaning/purpose of the new function here?
 
+This commit message looks horrible.
+
+Regards,
+Aleksandar
+
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  linux-user/aarch64/target_cpu.h    | 4 ++++
+>  linux-user/alpha/target_cpu.h      | 4 ++++
+>  linux-user/arm/target_cpu.h        | 4 ++++
+>  linux-user/cris/target_cpu.h       | 4 ++++
+>  linux-user/hppa/target_cpu.h       | 4 ++++
+>  linux-user/i386/target_cpu.h       | 4 ++++
+>  linux-user/m68k/target_cpu.h       | 4 ++++
+>  linux-user/microblaze/target_cpu.h | 4 ++++
+>  linux-user/mips/target_cpu.h       | 4 ++++
+>  linux-user/nios2/target_cpu.h      | 4 ++++
+>  linux-user/openrisc/target_cpu.h   | 4 ++++
+>  linux-user/ppc/target_cpu.h        | 4 ++++
+>  linux-user/riscv/target_cpu.h      | 4 ++++
+>  linux-user/s390x/target_cpu.h      | 4 ++++
+>  linux-user/sh4/target_cpu.h        | 4 ++++
+>  linux-user/sparc/target_cpu.h      | 4 ++++
+>  linux-user/tilegx/target_cpu.h     | 4 ++++
+>  linux-user/xtensa/target_cpu.h     | 4 ++++
+>  linux-user/syscall.c               | 2 ++
+>  19 files changed, 74 insertions(+)
+>
+> diff --git a/linux-user/aarch64/target_cpu.h
+b/linux-user/aarch64/target_cpu.h
+> index abde35b104..0182bfca07 100644
+> --- a/linux-user/aarch64/target_cpu.h
+> +++ b/linux-user/aarch64/target_cpu.h
+> @@ -27,6 +27,10 @@ static inline void cpu_clone_regs_child(CPUARMState
+*env, target_ulong newsp)
+>      env->xregs[0] = 0;
+>  }
+>
+> +static inline void cpu_clone_regs_parent(CPUARMState *env)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUARMState *env, target_ulong newtls)
+>  {
+>      /* Note that AArch64 Linux keeps the TLS pointer in TPIDR; this is
+> diff --git a/linux-user/alpha/target_cpu.h b/linux-user/alpha/target_cpu.h
+> index dc02f2234c..140a459f73 100644
+> --- a/linux-user/alpha/target_cpu.h
+> +++ b/linux-user/alpha/target_cpu.h
+> @@ -28,6 +28,10 @@ static inline void cpu_clone_regs_child(CPUAlphaState
+*env, target_ulong newsp)
+>      env->ir[IR_A3] = 0;
+>  }
+>
+> +static inline void cpu_clone_regs_parent(CPUAlphaState *env)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUAlphaState *env, target_ulong newtls)
+>  {
+>      env->unique = newtls;
+> diff --git a/linux-user/arm/target_cpu.h b/linux-user/arm/target_cpu.h
+> index d35c997287..3e66d5b106 100644
+> --- a/linux-user/arm/target_cpu.h
+> +++ b/linux-user/arm/target_cpu.h
+> @@ -31,6 +31,10 @@ static inline void cpu_clone_regs_child(CPUARMState
+*env, target_ulong newsp)
+>      env->regs[0] = 0;
+>  }
+>
+> +static inline void cpu_clone_regs_parent(CPUARMState *env)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUARMState *env, target_ulong newtls)
+>  {
+>      if (access_secure_reg(env)) {
+> diff --git a/linux-user/cris/target_cpu.h b/linux-user/cris/target_cpu.h
+> index 9c847caaef..4da074b4fd 100644
+> --- a/linux-user/cris/target_cpu.h
+> +++ b/linux-user/cris/target_cpu.h
+> @@ -28,6 +28,10 @@ static inline void cpu_clone_regs_child(CPUCRISState
+*env, target_ulong newsp)
+>      env->regs[10] = 0;
+>  }
+>
+> +static inline void cpu_clone_regs_parent(CPUCRISState *env)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUCRISState *env, target_ulong newtls)
+>  {
+>      env->pregs[PR_PID] = (env->pregs[PR_PID] & 0xff) | newtls;
+> diff --git a/linux-user/hppa/target_cpu.h b/linux-user/hppa/target_cpu.h
+> index b98e5a1cfe..6b323297af 100644
+> --- a/linux-user/hppa/target_cpu.h
+> +++ b/linux-user/hppa/target_cpu.h
+> @@ -31,6 +31,10 @@ static inline void cpu_clone_regs_child(CPUHPPAState
+*env, target_ulong newsp)
+>      env->iaoq_b = env->gr[31] + 4;
+>  }
+>
+> +static inline void cpu_clone_regs_parent(CPUHPPAState *env)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUHPPAState *env, target_ulong newtls)
+>  {
+>      env->cr[27] = newtls;
+> diff --git a/linux-user/i386/target_cpu.h b/linux-user/i386/target_cpu.h
+> index e1c9e03490..6dbb856c52 100644
+> --- a/linux-user/i386/target_cpu.h
+> +++ b/linux-user/i386/target_cpu.h
+> @@ -28,6 +28,10 @@ static inline void cpu_clone_regs_child(CPUX86State
+*env, target_ulong newsp)
+>      env->regs[R_EAX] = 0;
+>  }
+>
+> +static inline void cpu_clone_regs_parent(CPUX86State *env)
+> +{
+> +}
+> +
+>  #if defined(TARGET_ABI32)
+>  abi_long do_set_thread_area(CPUX86State *env, abi_ulong ptr);
+>
+> diff --git a/linux-user/m68k/target_cpu.h b/linux-user/m68k/target_cpu.h
+> index 7637a98cab..f1a53cdee5 100644
+> --- a/linux-user/m68k/target_cpu.h
+> +++ b/linux-user/m68k/target_cpu.h
+> @@ -29,6 +29,10 @@ static inline void cpu_clone_regs_child(CPUM68KState
+*env, target_ulong newsp)
+>      env->dregs[0] = 0;
+>  }
+>
+> +static inline void cpu_clone_regs_parent(CPUM68KState *env)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUM68KState *env, target_ulong newtls)
+>  {
+>      CPUState *cs = CPU(m68k_env_get_cpu(env));
+> diff --git a/linux-user/microblaze/target_cpu.h
+b/linux-user/microblaze/target_cpu.h
+> index 526b80d54d..5e285e9211 100644
+> --- a/linux-user/microblaze/target_cpu.h
+> +++ b/linux-user/microblaze/target_cpu.h
+> @@ -27,6 +27,10 @@ static inline void cpu_clone_regs_child(CPUMBState
+*env, target_ulong newsp)
+>      env->regs[3] = 0;
+>  }
+>
+> +static inline void cpu_clone_regs_parent(CPUMBState *env)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUMBState *env, target_ulong newtls)
+>  {
+>      env->regs[21] = newtls;
+> diff --git a/linux-user/mips/target_cpu.h b/linux-user/mips/target_cpu.h
+> index c42660b047..d0e0b1bac0 100644
+> --- a/linux-user/mips/target_cpu.h
+> +++ b/linux-user/mips/target_cpu.h
+> @@ -28,6 +28,10 @@ static inline void cpu_clone_regs_child(CPUMIPSState
+*env, target_ulong newsp)
+>      env->active_tc.gpr[2] = 0;
+>  }
+>
+> +static inline void cpu_clone_regs_parent(CPUMIPSState *env)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUMIPSState *env, target_ulong newtls)
+>  {
+>      env->active_tc.CP0_UserLocal = newtls;
+> diff --git a/linux-user/nios2/target_cpu.h b/linux-user/nios2/target_cpu.h
+> index bec2ea79c4..01725ba004 100644
+> --- a/linux-user/nios2/target_cpu.h
+> +++ b/linux-user/nios2/target_cpu.h
+> @@ -28,6 +28,10 @@ static inline void cpu_clone_regs_child(CPUNios2State
+*env, target_ulong newsp)
+>      env->regs[R_RET0] = 0;
+>  }
+>
+> +static inline void cpu_clone_regs_parent(CPUNios2State *env)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUNios2State *env, target_ulong newtls)
+>  {
+>      /*
+> diff --git a/linux-user/openrisc/target_cpu.h
+b/linux-user/openrisc/target_cpu.h
+> index d163ba2e26..6586951c5b 100644
+> --- a/linux-user/openrisc/target_cpu.h
+> +++ b/linux-user/openrisc/target_cpu.h
+> @@ -29,6 +29,10 @@ static inline void
+cpu_clone_regs_child(CPUOpenRISCState *env,
+>      cpu_set_gpr(env, 11, 0);
+>  }
+>
+> +static inline void cpu_clone_regs_parent(CPUOpenRISCState *env)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUOpenRISCState *env, target_ulong
+newtls)
+>  {
+>      cpu_set_gpr(env, 10, newtls);
+> diff --git a/linux-user/ppc/target_cpu.h b/linux-user/ppc/target_cpu.h
+> index 34decf3876..00c9f5eb86 100644
+> --- a/linux-user/ppc/target_cpu.h
+> +++ b/linux-user/ppc/target_cpu.h
+> @@ -27,6 +27,10 @@ static inline void cpu_clone_regs_child(CPUPPCState
+*env, target_ulong newsp)
+>      env->gpr[3] = 0;
+>  }
+>
+> +static inline void cpu_clone_regs_parent(CPUPPCState *env)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUPPCState *env, target_ulong newtls)
+>  {
+>  #if defined(TARGET_PPC64)
+> diff --git a/linux-user/riscv/target_cpu.h b/linux-user/riscv/target_cpu.h
+> index d92153851c..4ef1b23b4f 100644
+> --- a/linux-user/riscv/target_cpu.h
+> +++ b/linux-user/riscv/target_cpu.h
+> @@ -10,6 +10,10 @@ static inline void cpu_clone_regs_child(CPURISCVState
+*env, target_ulong newsp)
+>      env->gpr[xA0] = 0;
+>  }
+>
+> +static inline void cpu_clone_regs_parent(CPURISCVState *env)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPURISCVState *env, target_ulong newtls)
+>  {
+>      env->gpr[xTP] = newtls;
+> diff --git a/linux-user/s390x/target_cpu.h b/linux-user/s390x/target_cpu.h
+> index e0baa98e75..18e290ece8 100644
+> --- a/linux-user/s390x/target_cpu.h
+> +++ b/linux-user/s390x/target_cpu.h
+> @@ -27,6 +27,10 @@ static inline void cpu_clone_regs_child(CPUS390XState
+*env, target_ulong newsp)
+>      env->regs[2] = 0;
+>  }
+>
+> +static inline void cpu_clone_regs_parent(CPUS390XState *env)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUS390XState *env, target_ulong newtls)
+>  {
+>      env->aregs[0] = newtls >> 32;
+> diff --git a/linux-user/sh4/target_cpu.h b/linux-user/sh4/target_cpu.h
+> index 854955aa5a..b0e4ab23a7 100644
+> --- a/linux-user/sh4/target_cpu.h
+> +++ b/linux-user/sh4/target_cpu.h
+> @@ -27,6 +27,10 @@ static inline void cpu_clone_regs_child(CPUSH4State
+*env, target_ulong newsp)
+>      env->gregs[0] = 0;
+>  }
+>
+> +static inline void cpu_clone_regs_parent(CPUSH4State *env)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUSH4State *env, target_ulong newtls)
+>  {
+>    env->gbr = newtls;
+> diff --git a/linux-user/sparc/target_cpu.h b/linux-user/sparc/target_cpu.h
+> index 8511fc3f6f..52c9d8c7db 100644
+> --- a/linux-user/sparc/target_cpu.h
+> +++ b/linux-user/sparc/target_cpu.h
+> @@ -36,6 +36,10 @@ static inline void cpu_clone_regs_child(CPUSPARCState
+*env, target_ulong newsp)
+>  #endif
+>  }
+>
+> +static inline void cpu_clone_regs_parent(CPUSPARCState *env)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUSPARCState *env, target_ulong newtls)
+>  {
+>      env->gregs[7] = newtls;
+> diff --git a/linux-user/tilegx/target_cpu.h
+b/linux-user/tilegx/target_cpu.h
+> index dfca8d9598..9577462821 100644
+> --- a/linux-user/tilegx/target_cpu.h
+> +++ b/linux-user/tilegx/target_cpu.h
+> @@ -27,6 +27,10 @@ static inline void cpu_clone_regs_child(CPUTLGState
+*env, target_ulong newsp)
+>      env->regs[TILEGX_R_RE] = 0;
+>  }
+>
+> +static inline void cpu_clone_regs_parent(CPUTLGState *env)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUTLGState *env, target_ulong newtls)
+>  {
+>      env->regs[TILEGX_R_TP] = newtls;
+> diff --git a/linux-user/xtensa/target_cpu.h
+b/linux-user/xtensa/target_cpu.h
+> index f436b160c4..42e66211cf 100644
+> --- a/linux-user/xtensa/target_cpu.h
+> +++ b/linux-user/xtensa/target_cpu.h
+> @@ -15,6 +15,10 @@ static inline void cpu_clone_regs_child(CPUXtensaState
+*env,
+>      env->regs[2] = 0;
+>  }
+>
+> +static inline void cpu_clone_regs_parent(CPUXtensaState *env)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUXtensaState *env, target_ulong newtls)
+>  {
+>      env->uregs[THREADPTR] = newtls;
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index b9127a9601..f960556bf8 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -5535,6 +5535,7 @@ static int do_fork(CPUArchState *env, unsigned int
+flags, abi_ulong newsp,
+>          new_env = cpu_copy(env);
+>          /* Init regs that differ from the parent.  */
+>          cpu_clone_regs_child(new_env, newsp);
+> +        cpu_clone_regs_parent(env);
+>          new_cpu = ENV_GET_CPU(new_env);
+>          new_cpu->opaque = ts;
+>          ts->bprm = parent_ts->bprm;
+> @@ -5630,6 +5631,7 @@ static int do_fork(CPUArchState *env, unsigned int
+flags, abi_ulong newsp,
+>              if (flags & CLONE_CHILD_CLEARTID)
+>                  ts->child_tidptr = child_tidptr;
+>          } else {
+> +            cpu_clone_regs_parent(env);
+>              fork_end(0);
+>          }
+>      }
+> --
+> 2.17.1
+>
+>
