@@ -2,105 +2,92 @@ Return-Path: <SRS0=rgCY=UM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 551A6C31E46
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 02:11:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89575C31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 03:27:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25B12215EA
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 02:11:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25B12215EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4038A20851
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 03:27:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nctB582b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4038A20851
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36566 helo=lists.gnu.org)
+Received: from localhost ([::1]:36704 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbFDM-0003wo-6t
-	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 22:11:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41761)
+	id 1hbGOR-0006Dz-ML
+	for qemu-devel@archiver.kernel.org; Wed, 12 Jun 2019 23:27:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54430)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <farosas@linux.ibm.com>) id 1hbFCY-0003Lb-1j
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 22:10:54 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hbGNy-0005pN-BZ
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 23:26:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <farosas@linux.ibm.com>) id 1hbF3T-0007oe-4t
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 22:01:33 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42030)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
- id 1hbF3H-0007jK-V3
- for qemu-devel@nongnu.org; Wed, 12 Jun 2019 22:01:24 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x5D1uYBC093436
- for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 22:01:15 -0400
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2t3a7tdw1d-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 22:01:15 -0400
-Received: from localhost
- by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <farosas@linux.ibm.com>;
- Thu, 13 Jun 2019 03:01:13 +0100
-Received: from b01cxnp22033.gho.pok.ibm.com (9.57.198.23)
- by e13.ny.us.ibm.com (146.89.104.200) with IBM ESMTP SMTP Gateway: Authorized
- Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 13 Jun 2019 03:01:09 +0100
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
- [9.57.199.110])
- by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x5D218ZH39256396
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 13 Jun 2019 02:01:08 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id AF072AE079;
- Thu, 13 Jun 2019 02:01:06 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 19159AE071;
- Thu, 13 Jun 2019 02:01:06 +0000 (GMT)
-Received: from localhost (unknown [9.80.198.141])
- by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTPS;
- Thu, 13 Jun 2019 02:01:04 +0000 (GMT)
-From: Fabiano Rosas <farosas@linux.ibm.com>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-In-Reply-To: <31dba2e5-7e8b-d006-d403-8c58c3c8a464@ozlabs.ru>
-References: <20190228225759.21328-1-farosas@linux.ibm.com>
- <20190228225759.21328-6-farosas@linux.ibm.com>
- <b8a30b89-8c19-821e-e3a3-f1b71a088d9d@ozlabs.ru>
- <87ef73rl39.fsf@linux.ibm.com>
- <eadc5e30-5094-9b76-7268-cfb633ac40bd@ozlabs.ru>
- <c5e92072-eb8d-7af5-3eef-fac256f29c98@ozlabs.ru>
- <877e9r3p2e.fsf@linux.ibm.com>
- <31dba2e5-7e8b-d006-d403-8c58c3c8a464@ozlabs.ru>
-Date: Wed, 12 Jun 2019 23:01:03 -0300
+ (envelope-from <richard.henderson@linaro.org>) id 1hbGNx-0003pN-BP
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 23:26:46 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:38538)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hbGNx-0003oa-31
+ for qemu-devel@nongnu.org; Wed, 12 Jun 2019 23:26:45 -0400
+Received: by mail-pg1-x543.google.com with SMTP id v11so10063859pgl.5
+ for <qemu-devel@nongnu.org>; Wed, 12 Jun 2019 20:26:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=kjS5qSsLEwd1D25sPupWyYSgQGfpTwaoBp+ORcl9HXI=;
+ b=nctB582bf9SOxbRev7N7J25JrGrm1mnLXIMT2oeXvhnipj4GkJu63QfJAqvi/YRwil
+ /bQjrzeDT8FgGIEHE4JKhwdaLBrPOaYJAZoOQUqSf5m2YNibyFGFIs9NDL6Ldqv1s7jD
+ 7Bay9n6ZbNLJoZI2pgFutbb+WnS6hYztTlocXGRoGd6A+g+igeJ7ETmFQJKdKk49rZU6
+ 1QIofOUL4JKwFCkny591TIWkgqxokFgqToh9aXtlgIBOXL9apsjpx5VY0iqJuIbEOG3T
+ 1EmrlSBN3uN15HIfYd4yrfaHzG0Kf+8E+9sNGioHTBj/KFzfQ6ECs3NVdcECGr8M+ec1
+ 2Y9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=kjS5qSsLEwd1D25sPupWyYSgQGfpTwaoBp+ORcl9HXI=;
+ b=DTFH0eOQAeb6gljwYM25sMrQ3zzWcsxtrqx8KcQMflDXsCbYzlp1KzRHoT34dhCLp2
+ xkkR2vbINh6lZ0SlrKT5wTPjTtwy5qYGJJRhK+SwXLXXJMJY6oe8lGueum+Xcvlpb0be
+ r/LMcyTag+/WY+J2xJxsQzNIL8p3a5tSlr1Cf+vrtyzMmh3NOU5pTJ89E7eZm6oesn5w
+ WgwDwMBHSchDVBmwfY0czpt2VeXoDDLFtiDZMGvqL/70ocDyDqJD+uXq4snWr1DijC4M
+ C89qIuQVHGU4r+2raw/I7QMjoE41ZkoA7F0PI/7Uj+nekoqZVlkHDhjkfPoKXQfa2w47
+ OmPQ==
+X-Gm-Message-State: APjAAAXho+m/MqWyg/mxt3pm87BxYZ3rDALOa3ySaWqJDzqDGGoOeeOa
+ khkSlidnAFXVMUUK5dLvyX9LVw==
+X-Google-Smtp-Source: APXvYqygVHP2Vs/MXmvPNZh5bRgDhXsXBi4AT7UKger88ruguAeHVzt8zSW3KHJQWVJh/0bP3IZNXg==
+X-Received: by 2002:a62:778d:: with SMTP id
+ s135mr18468852pfc.204.1560396403451; 
+ Wed, 12 Jun 2019 20:26:43 -0700 (PDT)
+Received: from [10.1.2.220] (50-247-96-158-static.hfc.comcastbusiness.net.
+ [50.247.96.158])
+ by smtp.gmail.com with ESMTPSA id g5sm720025pfm.54.2019.06.12.20.26.42
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 12 Jun 2019 20:26:42 -0700 (PDT)
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ atar4qemu@gmail.com, pbonzini@redhat.com
+References: <20190612203916.16875-1-mark.cave-ayland@ilande.co.uk>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <a638648c-4a1d-6508-fb42-b2fe2ec692f1@linaro.org>
+Date: Wed, 12 Jun 2019 20:26:40 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-x-cbid: 19061302-0064-0000-0000-000003ED90AC
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011252; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000286; SDB=6.01217164; UDB=6.00640031; IPR=6.00998272; 
- MB=3.00027289; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-13 02:01:11
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19061302-0065-0000-0000-00003DDF6711
-Message-Id: <874l4u4528.fsf@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-06-13_01:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=44 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=736 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906130014
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: Re: [Qemu-devel] [RFC PATCH v4 5/5] target/ppc: support single
- stepping with KVM HV
+In-Reply-To: <20190612203916.16875-1-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::543
+Subject: Re: [Qemu-devel] [PATCH] sun4m: set default display type to TCX
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,51 +99,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
- Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Alexey Kardashevskiy <aik@ozlabs.ru> writes:
+On 6/12/19 1:39 PM, Mark Cave-Ayland wrote:
+> Commit 6807874d55 "sun4m: obey -vga none" changed the sun4m machines so that
+> they could be started without a framebuffer installed, but as no default
+> display type was configured the machines would start in headless mode without
+> an explict -vga option.
+> 
+> Set the default display type for all sun4m machines to TCX so that they will
+> start with a framebuffer if one is not specifically requested.
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  hw/sparc/sun4m.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 
-> It is TCG, a single CPU with a single thread and no matter where I put
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Ok, but then none of this code gets executed because it is kvm-only:
 
-qemu/exec.c
-void cpu_single_step(CPUState *cpu, int enabled)
-{
-    if (cpu->singlestep_enabled != enabled) {
-        cpu->singlestep_enabled = enabled;
-        if (kvm_enabled()) {
-->           kvm_set_singlestep(cpu, enabled);
-        } else {
-            /* must flush all the translated code to avoid inconsistencies */
-            /* XXX: only flush what is necessary */
-            tb_flush(cpu);
-        }
-    }
-}
-
-> this "stdu    r1,-368(r1)" - GDB does not stop on the next one and just
-> runs.
->
-> In the example above:
-> 1. "b *0x10f16bc" makes GDB stop there, "ni" continues without stopping
-> on at 0x10f16c0.
-
-But this seems wrong anyway. Let me try to reproduce it and see what I
-can find.
-
-> 2. "b *0x10f16bc" and "b *0x10f16c0" make GDB stop at 0x10f16bc and "ni"
-> steps to 0x10f16c0 but it is rather because it is a breakpoint and not
-> the next instruction.
-> 3. "b *0x10f16bc" and "b *0x10f16c4" make GDB stop at 0x10f16bc and "ni"
-> stops GDB at 0x10f16bc but again it is a breakpoint.
->
-> In 2 and 3 it is possible to continue step debugging till the next "stdu".
->
-
+r~
 
