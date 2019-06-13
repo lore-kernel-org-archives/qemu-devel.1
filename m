@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68CEBC31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 12:30:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E0E7C31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 12:30:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36FDE21721
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 12:30:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF53A21721
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 12:30:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GqddfPVK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36FDE21721
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oYdT9Uiv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF53A21721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39398 helo=lists.gnu.org)
+Received: from localhost ([::1]:39400 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbOs7-0007B4-9b
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 08:30:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58811)
+	id 1hbOsQ-0007Do-Vq
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 08:30:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58769)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hbOcz-0007uF-RP
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:14:52 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hbOcx-0007tj-BD
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:14:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hbOcx-0003zF-Do
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:14:49 -0400
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:32989)
+ (envelope-from <peter.maydell@linaro.org>) id 1hbOcu-0003wx-B0
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:14:45 -0400
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:42885)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hbOcv-0003wG-63
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:14:45 -0400
-Received: by mail-wr1-x431.google.com with SMTP id n9so20572366wru.0
- for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 05:14:44 -0700 (PDT)
+ id 1hbOcr-0003tu-ED
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:14:41 -0400
+Received: by mail-wr1-x42c.google.com with SMTP id x17so5233198wrl.9
+ for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 05:14:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=A6zB6s48Mdps2LC1th7zZyg8f6vSOggdH9q3F9SoDps=;
- b=GqddfPVKPAImuE+nN8zpYvXcatzOSLgJqFUAadSshC0ahGORjGzEM1fSizt+Hp629B
- eoN/4Wu26fgJmYlJ8ZnngfduwZOp1EKPafuiJO5uc3GxHQLwc9P9bAwCf6Da2ntuXA9V
- 2KAkuj4ymP9ivFVJ3PE9aw8a/EwGJTYS1NxJfyhMjR+nKttessRpBZEYOza/byEb2W4A
- TMogiNOLHQftGc0c5H+djmRndyVhHOu2w0ZBwuT1LOoI+fP6LQb2oppPnPKAxHJJ4BM+
- DByE+Fa3b0cpnljXUbc5uJBjXZ0vA59z3881W06dFSW6aUWZ0vkMVgL5kT3MQ8CPoboK
- sxQA==
+ bh=ZUooYRNQgmkNG0e2yEBeTuMYF1MRR7xam1XkALvG320=;
+ b=oYdT9UivNs+OPvJezs7OUA8WLYiud+InyFfN2ZNe525ESXhsF6vWC8/S/qATRDZBMK
+ bmdvZASWVSiNvD44mWNvFtZ8lt4CctQ5cA67KYQvP7m/xHAOVNytBXnk/9bk4t+6dcEg
+ X9Vd1x1Eoz2+mg7MfoCtZfPdqbie+gYZkd3ddvsgZx3HJlCp7S07uVNkXPIWXXNX7+dg
+ fc8PmajTVs9u0E3iKKo4DA6vnbeP1w9x0KNqYwhihK/Hm6hZGu1VmhGTQskko/dgpoXy
+ 4htWSOJ0xArlcuMup7097n5MpUA9Hs2MSpyuQbGDpTEN6YuwfOPVktGMX0XHao0MI++C
+ RnxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=A6zB6s48Mdps2LC1th7zZyg8f6vSOggdH9q3F9SoDps=;
- b=WmKeiDbm9i7n/iUNM2F+fF8WLoASW8yB9Pn/rFq7viBTJDDD+s6BDSzrW1hZHB+fvJ
- dAvFICnqhyHfbLLNrDXQ1NDEL0ETkPhBD6cCCOzN3VGV/u8pjDbBE/YioboHTnizbTc9
- wdSHT5NUcnTP90CVSooyBbQxUPjvN9LbQMPGyAYRNtF1xU/87wx4MM89zpQSm3fB47se
- eJJo2Ar0hydtZRmmjTDUO7XJ1Vi2/B8xI0tt7nuoFnQOnxMAv9hXLVCIiTwbMLjjWAn7
- nkJgl15bf0jZFeof1zL5pxk8fBfnvaGxthT77ObQKDC2iU+cBO2oj8k8JGZXJhI0xR2y
- 142A==
-X-Gm-Message-State: APjAAAXD5WzUmFqmERYbZpZrozlkQyeVrYV29Rij6WQwwtRFQa848f15
- hhoS25zK1VO5Ry3cSmT2FTKgjoVe3x8pTw==
-X-Google-Smtp-Source: APXvYqzx1FkXL3gI2ZObyEj0/mA2HyEpmfL25QCK5KSSmms8GjAyajRqaIYUsAlsk1FEFrrFI508Eg==
-X-Received: by 2002:adf:9cd0:: with SMTP id h16mr42664147wre.211.1560428083050; 
- Thu, 13 Jun 2019 05:14:43 -0700 (PDT)
+ bh=ZUooYRNQgmkNG0e2yEBeTuMYF1MRR7xam1XkALvG320=;
+ b=JTXTq8UpSEk2z7INEAyZw0JnstnoS1pW5UJNyCLNdq8ju8xPNQqyK9C3DjIPDJb8ru
+ gJNaXPYNLShcs6vmzOKXEAFeIKaEYlh9Xr1GA7Dw1VJ3YrI/BD3mLvf3isgNUQWXiWtb
+ 0kq7lpNuilCl+Ah7zqHoCO0tvzAOmwz4sEoEQO46jhM8vj9E0acX7jFE8qgutJCDsz3Y
+ 3ULWrs4cZ5BQwPsHlxP1Jx3j3hdVNplXWaZkMxN26tOB3Gbgk4HJ3yoXLOAIGFlARtpm
+ mt2icdAf5nr2UYMv89afcB+NLxrA2WAJam6wc40dOv1D/MAu6hepMHWHCpX4JqRoNj6s
+ FdSg==
+X-Gm-Message-State: APjAAAV42yAuh0w9HvMKBV3JHEv3IaXMjLARfWIxRmGXGnXZr9e3/kGE
+ GqgA2/HeIbttLRrs/frSmKS4LuBsMaDOIg==
+X-Google-Smtp-Source: APXvYqzZjqmA9maAN/u+MG/EpB6yaTKpdoChcU5mxKN6vc9kD25id12ilfrfF35IXl3H1nMAZgiDfw==
+X-Received: by 2002:adf:e8c8:: with SMTP id k8mr31275776wrn.285.1560428080053; 
+ Thu, 13 Jun 2019 05:14:40 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id y6sm2010576wrp.12.2019.06.13.05.14.42
+ by smtp.gmail.com with ESMTPSA id y6sm2010576wrp.12.2019.06.13.05.14.39
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 13 Jun 2019 05:14:42 -0700 (PDT)
+ Thu, 13 Jun 2019 05:14:39 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu, 13 Jun 2019 13:13:52 +0100
-Message-Id: <20190613121433.5246-8-peter.maydell@linaro.org>
+Date: Thu, 13 Jun 2019 13:13:49 +0100
+Message-Id: <20190613121433.5246-5-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190613121433.5246-1-peter.maydell@linaro.org>
 References: <20190613121433.5246-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::431
-Subject: [Qemu-devel] [PULL 07/48] decodetree: Fix comparison of Field
+X-Received-From: 2a00:1450:4864:20::42c
+Subject: [Qemu-devel] [PULL 04/48] hw/arm/smmuv3: Fix decoding of ID
+ register range
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,34 +98,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+The SMMUv3 ID registers cover an area 0x30 bytes in size
+(12 registers, 4 bytes each). We were incorrectly decoding
+only the first 0x20 bytes.
 
-Typo comparing the sign of the field, twice, instead of also comparing
-the mask of the field (which itself encodes both position and length).
-
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190604154225.26992-1-richard.henderson@linaro.org
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Message-id: 20190524124829.2589-1-peter.maydell@linaro.org
 ---
- scripts/decodetree.py | 2 +-
+ hw/arm/smmuv3.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/decodetree.py b/scripts/decodetree.py
-index 81874e22cc7..d7a59d63ac3 100755
---- a/scripts/decodetree.py
-+++ b/scripts/decodetree.py
-@@ -184,7 +184,7 @@ class Field:
-         return '{0}(insn, {1}, {2})'.format(extr, self.pos, self.len)
- 
-     def __eq__(self, other):
--        return self.sign == other.sign and self.sign == other.sign
-+        return self.sign == other.sign and self.mask == other.mask
- 
-     def __ne__(self, other):
-         return not self.__eq__(other)
+diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+index fd8ec7860ee..e96d5beb9a8 100644
+--- a/hw/arm/smmuv3.c
++++ b/hw/arm/smmuv3.c
+@@ -1232,7 +1232,7 @@ static MemTxResult smmu_readl(SMMUv3State *s, hwaddr offset,
+                               uint64_t *data, MemTxAttrs attrs)
+ {
+     switch (offset) {
+-    case A_IDREGS ... A_IDREGS + 0x1f:
++    case A_IDREGS ... A_IDREGS + 0x2f:
+         *data = smmuv3_idreg(offset - A_IDREGS);
+         return MEMTX_OK;
+     case A_IDR0 ... A_IDR5:
 -- 
 2.20.1
 
