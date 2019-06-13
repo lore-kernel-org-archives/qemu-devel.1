@@ -2,91 +2,59 @@ Return-Path: <SRS0=rgCY=UM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E607C31E49
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 15:12:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06EAEC31E49
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 15:13:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D434B20449
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 15:12:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w8wCkuw2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D434B20449
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D5AC320449
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 15:13:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5AC320449
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40770 helo=lists.gnu.org)
+Received: from localhost ([::1]:40772 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbRPK-0005cZ-5J
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 11:12:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52566)
+	id 1hbRPq-0005vI-5S
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 11:13:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42121)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hbPqO-0007tL-A9
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 09:32:46 -0400
+ (envelope-from <philmd@redhat.com>) id 1hbQpR-0001MO-5R
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 10:35:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hbPqM-0000DS-AH
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 09:32:44 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40427)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hbPqK-0000BW-SO
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 09:32:42 -0400
-Received: by mail-wr1-x442.google.com with SMTP id p11so20830242wre.7
- for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 06:32:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=uvNzLERCNx/G/M6pBVrbtkepYOvYJQh+bp8Sukri6j8=;
- b=w8wCkuw2+RsPEFZKXPXq3eriwwEX0xUkvxgk4xPtrKMtsqCWrNvVEvX8Svfh3XjOQN
- UIzVZTPMS1lXymaEdeVNfZiNOGgjd+wsrKGsiTWdJZbrfW9cwblqS2Vpbe5trV/lOCS3
- FNNalx2K/ioNIP10AYUGGsPMISRh8C//lKgP9fwtIpEkmMh5zfBQbtJzH2Wfy17AJVCb
- nw65aBoXjsPJA303ROSLHaS/4K+RwZANzPHBwo4t4pc2E2Os+aXdUcUWcDEUh2XcGQ+a
- Aa1fx20ld2Dktzp1tCgWaFq/vuKJxgJZ5P0RSsJ82rKKza9EZenJbxcwxfs3SQRU1u73
- MYUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=uvNzLERCNx/G/M6pBVrbtkepYOvYJQh+bp8Sukri6j8=;
- b=b9Ez0+pF2+4XRtvEtXTnx7ewVKTQHepno1T4UtRxKi9i3gztct+Tdv3r9UqnG++NDI
- PgcmiTPRUZGTEV1PTHge05+8ByjBU6OCU0cRx0NaW+k8YLVINo+I1Gc6vDcWxhZDq9Ob
- A7KScwmMCravwYeLjVWfI2JWjdPjryhIsbEWpIhhsoQc2/qYxCJErCeE3mKNmndp9aql
- i6xrXKWt9FkA2s4I+nERwgf70wTF/GZc1Ab7igqjrN78GsoRyBrxoUQfnWL3VJ5Ft8Nl
- AnBePz1agxSYgdgZQ3Yvl46URgtcjd6T8eTFQ+wRGiEvFMdkCOH1fntq46PKaX56yRNy
- jxcA==
-X-Gm-Message-State: APjAAAXZdxoVLiw37A2r6U6/fhTRN2W8QHGiNiKoP9UZEMcXhap2OZTW
- wsE3F8BnTDfytxa0//dgYWO0wg==
-X-Google-Smtp-Source: APXvYqwxXRtPkJMxB3+pT5mFi6R2Rj8ijg5e1fPw6iyM/TKaPVxo5O4GbD9ipJInbssC3dXkyhybZw==
-X-Received: by 2002:adf:8183:: with SMTP id 3mr46146178wra.181.1560432759220; 
- Thu, 13 Jun 2019 06:32:39 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id g8sm1578578wme.20.2019.06.13.06.32.38
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 13 Jun 2019 06:32:38 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id DB2361FF87;
- Thu, 13 Jun 2019 14:32:37 +0100 (BST)
-References: <20190517174046.11146-1-peter.maydell@linaro.org>
- <20190517174046.11146-3-peter.maydell@linaro.org>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+ (envelope-from <philmd@redhat.com>) id 1hbQpP-0001H5-5G
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 10:35:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37952)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hbQpO-0000im-Qm
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 10:35:47 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D915730BC58B;
+ Thu, 13 Jun 2019 14:35:00 +0000 (UTC)
+Received: from x1w.redhat.com (unknown [10.40.205.141])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 393DD1001B2B;
+ Thu, 13 Jun 2019 14:34:48 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-In-reply-to: <20190517174046.11146-3-peter.maydell@linaro.org>
-Date: Thu, 13 Jun 2019 14:32:37 +0100
-Message-ID: <878su5ehl6.fsf@zen.linaroharston>
+Date: Thu, 13 Jun 2019 16:34:26 +0200
+Message-Id: <20190613143446.23937-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Thu, 13 Jun 2019 14:35:19 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: Re: [Qemu-devel] [PATCH 2/4] target/arm: Allow M-profile CPUs to
- disable the DSP extension via CPU property
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2 00/20] hw/i386/pc: Do not restrict the
+ fw_cfg functions to the PC machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,98 +66,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org
+Cc: Yang Zhong <yang.zhong@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>,
+ Rob Bradford <robert.bradford@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Samuel Ortiz <sameo@linux.intel.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi,
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+This is my take at salvaging some NEMU good work.
+Samuel worked in adding the fw_cfg device to the x86-virt NEMU machine.
+This series is inspired by NEMU's commit 3cb92d080835 [*] and adapted
+to upstream style. The result makes the upstream codebase more
+modularizable.
+There are very little logical changes, this is mostly a cleanup
+refactor.
 
-> Allow the DSP extension to be disabled via a CPU property for
-> M-profile CPUs. (A and R-profile CPUs don't have this extension
-> as a defined separate optional architecture extension, so
-> they don't need the property.)
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Since v1:
+- Addressed Li and MST comments
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+$ git backport-diff -u v1
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream pat=
+ch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
+tively
 
-> ---
->  target/arm/cpu.h |  2 ++
->  target/arm/cpu.c | 29 +++++++++++++++++++++++++++++
->  2 files changed, 31 insertions(+)
->
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 778fb293e7c..b1c7ab3ee94 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -801,6 +801,8 @@ struct ARMCPU {
->      bool has_vfp;
->      /* CPU has Neon */
->      bool has_neon;
-> +    /* CPU has M-profile DSP extension */
-> +    bool has_dsp;
->
->      /* CPU has memory protection unit */
->      bool has_mpu;
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 406fd360a2a..c43139ba897 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -769,6 +769,9 @@ static Property arm_cpu_has_vfp_property =3D
->  static Property arm_cpu_has_neon_property =3D
->              DEFINE_PROP_BOOL("neon", ARMCPU, has_neon, true);
->
-> +static Property arm_cpu_has_dsp_property =3D
-> +            DEFINE_PROP_BOOL("dsp", ARMCPU, has_dsp, true);
-> +
->  static Property arm_cpu_has_mpu_property =3D
->              DEFINE_PROP_BOOL("has-mpu", ARMCPU, has_mpu, true);
->
-> @@ -881,6 +884,12 @@ void arm_cpu_post_init(Object *obj)
->          }
->      }
->
-> +    if (arm_feature(&cpu->env, ARM_FEATURE_M) &&
-> +        arm_feature(&cpu->env, ARM_FEATURE_THUMB_DSP)) {
-> +        qdev_property_add_static(DEVICE(obj), &arm_cpu_has_dsp_property,
-> +                                 &error_abort);
-> +    }
-> +
->      if (arm_feature(&cpu->env, ARM_FEATURE_PMSA)) {
->          qdev_property_add_static(DEVICE(obj), &arm_cpu_has_mpu_property,
->                                   &error_abort);
-> @@ -1100,6 +1109,26 @@ static void arm_cpu_realizefn(DeviceState *dev, Er=
-ror **errp)
->          cpu->isar.mvfr0 =3D u;
->      }
->
-> +    if (arm_feature(env, ARM_FEATURE_M) && !cpu->has_dsp) {
-> +        uint32_t u;
-> +
-> +        unset_feature(env, ARM_FEATURE_THUMB_DSP);
-> +
-> +        u =3D cpu->isar.id_isar1;
-> +        u =3D FIELD_DP32(u, ID_ISAR1, EXTEND, 1);
-> +        cpu->isar.id_isar1 =3D u;
-> +
-> +        u =3D cpu->isar.id_isar2;
-> +        u =3D FIELD_DP32(u, ID_ISAR2, MULTU, 1);
-> +        u =3D FIELD_DP32(u, ID_ISAR2, MULTS, 1);
-> +        cpu->isar.id_isar2 =3D u;
-> +
-> +        u =3D cpu->isar.id_isar3;
-> +        u =3D FIELD_DP32(u, ID_ISAR3, SIMD, 1);
-> +        u =3D FIELD_DP32(u, ID_ISAR3, SATURATE, 0);
-> +        cpu->isar.id_isar3 =3D u;
-> +    }
-> +
->      /* Some features automatically imply others: */
->      if (arm_feature(env, ARM_FEATURE_V8)) {
->          if (arm_feature(env, ARM_FEATURE_M)) {
+001/20:[----] [-C] 'hw/i386/pc: Use unsigned type to index arrays'
+002/20:[----] [-C] 'hw/i386/pc: Use size_t type to hold/return a size of =
+array'
+003/20:[----] [--] 'hw/i386/pc: Let e820_add_entry() return a ssize_t typ=
+e'
+004/20:[0008] [FC] 'hw/i386/pc: Add the E820Type enum type'
+005/20:[----] [-C] 'hw/i386/pc: Add documentation to the e820_*() functio=
+ns'
+006/20:[----] [--] 'hw/i386/pc: Use e820_get_num_entries() to access e820=
+_entries'
+007/20:[0016] [FC] 'hw/i386/pc: Extract e820 memory layout code'
+008/20:[----] [--] 'hw/i386/pc: Use address_space_memory in place'
+009/20:[down] 'hw/i386/pc: Rename bochs_bios_init as more generic fw_cfg_=
+arch_create'
+010/20:[0009] [FC] 'hw/i386/pc: Pass the boot_cpus value by argument'
+011/20:[0010] [FC] 'hw/i386/pc: Pass the apic_id_limit value by argument'
+012/20:[0009] [FC] 'hw/i386/pc: Pass the CPUArchIdList array by argument'
+013/20:[0008] [FC] 'hw/i386/pc: Let fw_cfg_init() use the generic Machine=
+State'
+014/20:[----] [--] 'hw/i386/pc: Let pc_build_smbios() take a FWCfgState a=
+rgument'
+015/20:[----] [--] 'hw/i386/pc: Let pc_build_smbios() take a generic Mach=
+ineState argument'
+016/20:[----] [--] 'hw/i386/pc: Rename pc_build_smbios() as generic fw_cf=
+g_build_smbios()'
+017/20:[----] [--] 'hw/i386/pc: Let pc_build_feature_control() take a FWC=
+fgState argument'
+018/20:[----] [--] 'hw/i386/pc: Let pc_build_feature_control() take a Mac=
+hineState argument'
+019/20:[----] [--] 'hw/i386/pc: Rename pc_build_feature_control() as gene=
+ric fw_cfg_build_*'
+020/20:[0132] [FC] 'hw/i386/pc: Extract the x86 generic fw_cfg code'
+Do you want to view the diffs using meld? y/[n]:
 
+Regards,
 
---
-Alex Benn=C3=A9e
+Phil.
+
+[*] https://github.com/intel/nemu/commit/3cb92d080835ac8d47c8b713156338af=
+a33cff5c
+
+Philippe Mathieu-Daud=C3=A9 (20):
+  hw/i386/pc: Use unsigned type to index arrays
+  hw/i386/pc: Use size_t type to hold/return a size of array
+  hw/i386/pc: Let e820_add_entry() return a ssize_t type
+  hw/i386/pc: Add the E820Type enum type
+  hw/i386/pc: Add documentation to the e820_*() functions
+  hw/i386/pc: Use e820_get_num_entries() to access e820_entries
+  hw/i386/pc: Extract e820 memory layout code
+  hw/i386/pc: Use address_space_memory in place
+  hw/i386/pc: Rename bochs_bios_init as more generic fw_cfg_arch_create
+  hw/i386/pc: Pass the boot_cpus value by argument
+  hw/i386/pc: Pass the apic_id_limit value by argument
+  hw/i386/pc: Pass the CPUArchIdList array by argument
+  hw/i386/pc: Let fw_cfg_init() use the generic MachineState
+  hw/i386/pc: Let pc_build_smbios() take a FWCfgState argument
+  hw/i386/pc: Let pc_build_smbios() take a generic MachineState argument
+  hw/i386/pc: Rename pc_build_smbios() as generic fw_cfg_build_smbios()
+  hw/i386/pc: Let pc_build_feature_control() take a FWCfgState argument
+  hw/i386/pc: Let pc_build_feature_control() take a MachineState
+    argument
+  hw/i386/pc: Rename pc_build_feature_control() as generic
+    fw_cfg_build_*
+  hw/i386/pc: Extract the x86 generic fw_cfg code
+
+ hw/i386/Makefile.objs        |   2 +-
+ hw/i386/e820_memory_layout.c |  60 +++++++++++
+ hw/i386/e820_memory_layout.h |  76 +++++++++++++
+ hw/i386/fw_cfg.c             | 137 ++++++++++++++++++++++++
+ hw/i386/fw_cfg.h             |   8 ++
+ hw/i386/pc.c                 | 201 ++---------------------------------
+ include/hw/i386/pc.h         |  11 --
+ target/i386/kvm.c            |   1 +
+ 8 files changed, 291 insertions(+), 205 deletions(-)
+ create mode 100644 hw/i386/e820_memory_layout.c
+ create mode 100644 hw/i386/e820_memory_layout.h
+
+--=20
+2.20.1
+
 
