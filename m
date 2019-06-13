@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E3B6C31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 18:46:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22010C31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 18:49:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD5CA21473
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 18:46:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E1E3A21721
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 18:49:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JyIH9wNg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD5CA21473
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WUC/NR/r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1E3A21721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43764 helo=lists.gnu.org)
+Received: from localhost ([::1]:43784 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbUjf-0000E5-Sd
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 14:46:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53750)
+	id 1hbUn5-0002QB-4N
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 14:49:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53848)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hbSlH-000404-C3
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:39:44 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hbSlK-00049x-PM
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:39:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hbSlF-0003Jz-DE
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:39:39 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:34581)
+ (envelope-from <peter.maydell@linaro.org>) id 1hbSlG-0003OS-IX
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:39:42 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45093)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hbSlF-0002nU-3L
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:39:37 -0400
-Received: by mail-wm1-x343.google.com with SMTP id w9so7014363wmd.1
- for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 09:39:29 -0700 (PDT)
+ id 1hbSlG-0002Nk-0M
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:39:38 -0400
+Received: by mail-wr1-x441.google.com with SMTP id f9so21465419wre.12
+ for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 09:39:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=XGJE4iIoyDN2tN+sycnvDF5WRUBy3je+PRFryiYL8bY=;
- b=JyIH9wNgMCaCsjeNgXKXY6qO5YVaQsxfCRq0Ywi0BSCT4kPClEVph/yDc0l4vbePjD
- KBLFUSxRcJW3oFamFyvvs9LXbLghG4W2IvuEL4fesDZl/AW2mzUSZiooBcZH4O+eObdu
- 94HBQMEV3zPqzP2q3Az4MgXfnPi8VdX0L7oQ9kpQgMD59HbSgqFKCNkpLnguCy0xdFwo
- LqUGE+YMDNyy+2QCH89IhecqB+EyHiCUWzJ+ABMOVyXO3ORupTzqUYUdPZBRGMg0IPPr
- wYtqh0K2iDNob6wTQ7vU15nf5IlXpgFaTMLYZsahJHRqOozsAqRVrcBxXm2FYJ+ZftHU
- ftBQ==
+ bh=rimcTwT3jseYgOecETEoK3gV+MP4oaaAWnNA90CS1sc=;
+ b=WUC/NR/reoeIEelJq/6TVn2rSH/Q5u9ChWO0s5e5z2VaAs/2A6a5/RRqKidEVi6T8J
+ EeG6g1KJ3Ynlg5Cms0UYtrCGGGMty1ukQmn9FxJW6qv+RJ5vD1xcNLMPmdrHMYNjwloG
+ e9wO83nv4MVf45s3I6/kEt8WTSY1kCjuuYWRNtn1qjUlRujjhE3Vdk0AVRwiuDQqC9gU
+ kz8CWoLZdOY4Je9mwOORyOViqWL4xuGhLqoU5zXu2p51MJ84KWzY86jVieZJhliATfCx
+ ZdpKJaue3OMzZ1X0eHS+8UAD8La9ESQQKAP5HbYtIuKrosQrkCbWEsOl7qZGgLDroTg7
+ XeEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=XGJE4iIoyDN2tN+sycnvDF5WRUBy3je+PRFryiYL8bY=;
- b=WK2yeol/cWgIfwyRMdGhdNDMkQsDxftSrfvXozyWRNAKIXOzB6h8ktvPLuHOACtynk
- Tpd7DJ/QMsQOOmuTErU7pEeOsouJn1jZFOAO1K3ET8xcQix0Z5YOzwBg7DYu0IEZ8BVB
- I75IKPXHeUN3+SbgW1j/rpL7QYqUQks66MxDMfgtTSTz5Yv9XcJosxVVrBeRcQnpNZkG
- A2r+It3NhI2INeLjrIpmUIiOA84GQHKu5ZqrNa8Y6XczZT34W48QpjGpPt7fLUR6dKy1
- zrHRBtCJemUQdhNPKyi4L/Nn4wgGxWmVrAcYs849ufo0+vnmxSPFUoqwX3M+I2CN+r/H
- pLiw==
-X-Gm-Message-State: APjAAAU3z3RwVKN+/wksRcIunNdvgN8woweqbPl6UP3Zd13U8o1fHqOB
- VliF6/qaVxhWc4YCM8U1WKyo2A==
-X-Google-Smtp-Source: APXvYqzFqv5g4TK37epAS+rO3iVECjyRj5ICcyTxN7hSkrzDixkhiJTFTIEU0q0WZY9850KymmY1Ew==
-X-Received: by 2002:a1c:7d4e:: with SMTP id y75mr4518552wmc.169.1560443968944; 
- Thu, 13 Jun 2019 09:39:28 -0700 (PDT)
+ bh=rimcTwT3jseYgOecETEoK3gV+MP4oaaAWnNA90CS1sc=;
+ b=A+qcaLeNkRE6uXU0OPrxh49TtSrXkF69GndC9JA5qKI4V7Yt2lmEM+ySN9ZzAgy604
+ Ye00uEYfTdDK0MfzAZeqOQHUb1XkmPdBsji9Iw31bFnEMSd1Tnqk4yZdKxrJ5rvQbBZc
+ FtGcZY5ZAngNPVDIM83s+TJgzR47pj3N/XStTc0ew+6l0kbiJZS3tfl06EpReW3Px3wE
+ wfj5aXMkBAHCuR6JjR5BCK0cK/PaeGNCFlogVpkTlqW+W3KEPaTJ+T1sd3jvId+8sj5g
+ FQNTPYPhghP5mIpwWkYtoC5IgnKdkthENJ/6eOwVbl48smhSHiN2kOiDyyLZ1Wl/ZRkg
+ HmJQ==
+X-Gm-Message-State: APjAAAUUnoaCE515yOKfCWoMxoIjWyHuQHgjbwywbxlLjAIEiQ3H+EXK
+ xA/K4Ly8hxyoOUe/vdXyfLcg/g==
+X-Google-Smtp-Source: APXvYqxtdgJyxLVeVzRUIfr+SqBYq0C2qNduSAdG/izCG59yDPc2rp3Wkia+Bo0dYNKPbLshAZkIJg==
+X-Received: by 2002:adf:e9c3:: with SMTP id l3mr37413931wrn.148.1560443965631; 
+ Thu, 13 Jun 2019 09:39:25 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id f197sm358747wme.39.2019.06.13.09.39.27
+ by smtp.gmail.com with ESMTPSA id f197sm358747wme.39.2019.06.13.09.39.24
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 13 Jun 2019 09:39:28 -0700 (PDT)
+ Thu, 13 Jun 2019 09:39:25 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Thu, 13 Jun 2019 17:39:14 +0100
-Message-Id: <20190613163917.28589-10-peter.maydell@linaro.org>
+Date: Thu, 13 Jun 2019 17:39:11 +0100
+Message-Id: <20190613163917.28589-7-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190613163917.28589-1-peter.maydell@linaro.org>
 References: <20190613163917.28589-1-peter.maydell@linaro.org>
@@ -80,9 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [PATCH 09/12] target/arm: Stop using cpu_F0s in Neon
- VCVT fixed-point ops
+X-Received-From: 2a00:1450:4864:20::441
+Subject: [Qemu-devel] [PATCH 06/12] target/arm: Stop using cpu_F0s for
+ NEON_2RM_VCVT[ANPM][US]
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,109 +99,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Stop using cpu_F0s in the Neon VCVT fixed-point operations.
+Stop using cpu_F0s for the NEON_2RM_VCVT[ANPM][US] ops.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate.c | 62 +++++++++++++++++++-----------------------
- 1 file changed, 28 insertions(+), 34 deletions(-)
+ target/arm/translate.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 0fb94b777bf..d8b46130d42 100644
+index 243dbee8357..124045a9ef6 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -80,6 +80,8 @@ static const char * const regnames[] =
- /* Function prototypes for gen_ functions calling Neon helpers.  */
- typedef void NeonGenThreeOpEnvFn(TCGv_i32, TCGv_env, TCGv_i32,
-                                  TCGv_i32, TCGv_i32);
-+/* Function prototypes for gen_ functions for fix point conversions */
-+typedef void VFPGenFixPointFn(TCGv_i32, TCGv_i32, TCGv_i32, TCGv_ptr);
- 
- /* initialize TCG globals.  */
- void arm_translate_init(void)
-@@ -1374,27 +1376,6 @@ static TCGv_ptr get_fpstatus_ptr(int neon)
-     return statusptr;
+@@ -4181,8 +4181,7 @@ static int neon_2rm_is_float_op(int op)
+      * what we are asking here is "does the code for this case in
+      * the Neon for-each-pass loop use cpu_F0s?".
+      */
+-    return ((op >= NEON_2RM_VCVTAU && op <= NEON_2RM_VCVTMS) ||
+-            op >= NEON_2RM_VRECPE_F);
++    return op >= NEON_2RM_VRECPE_F;
  }
  
--#define VFP_GEN_FIX(name, round) \
--static inline void gen_vfp_##name(int dp, int shift, int neon) \
--{ \
--    TCGv_i32 tmp_shift = tcg_const_i32(shift); \
--    TCGv_ptr statusptr = get_fpstatus_ptr(neon); \
--    if (dp) { \
--        gen_helper_vfp_##name##d##round(cpu_F0d, cpu_F0d, tmp_shift, \
--                                        statusptr); \
--    } else { \
--        gen_helper_vfp_##name##s##round(cpu_F0s, cpu_F0s, tmp_shift, \
--                                        statusptr); \
--    } \
--    tcg_temp_free_i32(tmp_shift); \
--    tcg_temp_free_ptr(statusptr); \
--}
--VFP_GEN_FIX(tosl, _round_to_zero)
--VFP_GEN_FIX(toul, _round_to_zero)
--VFP_GEN_FIX(slto, )
--VFP_GEN_FIX(ulto, )
--#undef VFP_GEN_FIX
--
- static inline long vfp_reg_offset(bool dp, unsigned reg)
- {
-     if (dp) {
-@@ -5721,28 +5702,41 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                 }
-             } else if (op >= 14) {
-                 /* VCVT fixed-point.  */
-+                TCGv_ptr fpst;
-+                TCGv_i32 shiftv;
-+                VFPGenFixPointFn *fn;
-+
-                 if (!(insn & (1 << 21)) || (q && ((rd | rm) & 1))) {
-                     return 1;
-                 }
-+
-+                if (!(op & 1)) {
-+                    if (u) {
-+                        fn = gen_helper_vfp_ultos;
-+                    } else {
-+                        fn = gen_helper_vfp_sltos;
-+                    }
-+                } else {
-+                    if (u) {
-+                        fn = gen_helper_vfp_touls_round_to_zero;
-+                    } else {
-+                        fn = gen_helper_vfp_tosls_round_to_zero;
-+                    }
-+                }
-+
-                 /* We have already masked out the must-be-1 top bit of imm6,
-                  * hence this 32-shift where the ARM ARM has 64-imm6.
-                  */
-                 shift = 32 - shift;
-+                fpst = get_fpstatus_ptr(1);
-+                shiftv = tcg_const_i32(shift);
-                 for (pass = 0; pass < (q ? 4 : 2); pass++) {
--                    tcg_gen_ld_f32(cpu_F0s, cpu_env, neon_reg_offset(rm, pass));
--                    if (!(op & 1)) {
--                        if (u)
--                            gen_vfp_ulto(0, shift, 1);
--                        else
--                            gen_vfp_slto(0, shift, 1);
--                    } else {
--                        if (u)
--                            gen_vfp_toul(0, shift, 1);
--                        else
--                            gen_vfp_tosl(0, shift, 1);
--                    }
--                    tcg_gen_st_f32(cpu_F0s, cpu_env, neon_reg_offset(rd, pass));
-+                    TCGv_i32 tmpf = neon_load_reg(rm, pass);
-+                    fn(tmpf, tmpf, shiftv, fpst);
-+                    neon_store_reg(rd, pass, tmpf);
-                 }
-+                tcg_temp_free_ptr(fpst);
-+                tcg_temp_free_i32(shiftv);
-             } else {
-                 return 1;
-             }
+ static bool neon_2rm_is_v8_op(int op)
+@@ -6818,10 +6817,10 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                                                       cpu_env);
+ 
+                             if (is_signed) {
+-                                gen_helper_vfp_tosls(cpu_F0s, cpu_F0s,
++                                gen_helper_vfp_tosls(tmp, tmp,
+                                                      tcg_shift, fpst);
+                             } else {
+-                                gen_helper_vfp_touls(cpu_F0s, cpu_F0s,
++                                gen_helper_vfp_touls(tmp, tmp,
+                                                      tcg_shift, fpst);
+                             }
+ 
 -- 
 2.20.1
 
