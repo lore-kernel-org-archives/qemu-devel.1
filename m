@@ -2,91 +2,90 @@ Return-Path: <SRS0=rgCY=UM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B417C31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 15:09:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A034C31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 15:12:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F09DF20896
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 15:09:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cm/pRn7+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F09DF20896
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 05A2B20449
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 15:12:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05A2B20449
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40742 helo=lists.gnu.org)
+Received: from localhost ([::1]:40768 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbRLw-0001hV-9A
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 11:09:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52886)
+	id 1hbROx-0004qc-BG
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 11:12:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39833)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hbPrO-0000Gi-Cx
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 09:33:47 -0400
+ (envelope-from <eblake@redhat.com>) id 1hbQiP-0003py-KN
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 10:28:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hbPrL-0000uy-JO
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 09:33:45 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35248)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hbPrH-0000ry-Tw
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 09:33:41 -0400
-Received: by mail-wr1-x441.google.com with SMTP id m3so1838919wrv.2
- for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 06:33:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=vDycYkpBBaB/Jl0cqSCwG7VUAJgXuKuroLUoQLhjjZU=;
- b=cm/pRn7+jjCDudLpSezgO1TgY9/v9vEUuPurKAuNvfDv0KA5vwWJDPrtX6s2/1iPgZ
- B1DeECbHYiHX+EOuiMG6KWxbG07Q2rsaKOZi8pX311ciw8pTLpxbJ5LDs4SBcfgRuG+j
- RWglNfTE8BvsCTdr+4AS4WItgw/nO/0BRcCnbgDFNMLa/JuJVUuA+WsWIntTjjZpCzCq
- XNI2Dx53McYLvuCyLJc5h44vxpuqJBtXS8/K/ZtSPahfii/uxoxoUWc/A54UiAaj9Kvy
- lOeOcziKvW+EgB4/OC57DSiBKPBqqZtCPQXdXJ+7EVM1TJulZyYllZ6ZCmbbKz+Dw72L
- ZTng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=vDycYkpBBaB/Jl0cqSCwG7VUAJgXuKuroLUoQLhjjZU=;
- b=AynMsHpDhAjp0kouE2MzkaxKGyJ5ZnH86l7OSTipzldkEBMQxXb+8PpuqkAR1LPcZW
- b3c4yg/wE+qA+k1ng8KwqkUPX4FoizJk/Z3Gj0PhLI6B360Q1MjxV0hV2vrcsMUdmGuF
- CEE/cSP1lbhYO4kz9Gda7ev9ERPB3Wqxpx0J+C9rue+nSQlOFZH/69ZoSrsFWtPckLZ6
- DS5K+m1BRoo1LYWY2L75K1sQv/0k0y/2brC4WETsyn4IKzsImhyvmYtXQeGrWV8t11fk
- 7C2y/mB6h6NP9hFCGkFATCoj5Hl/tSh7/l+CEbG88FS/PfMDysX8hBwHynhaynbyvVNF
- SdkA==
-X-Gm-Message-State: APjAAAUebYPedHM1v0RZLIs/hFWC3/60E11e5iGY+DxbicCL5Hw4M8YK
- eAq5/7mnVkDFJp+84CdGAt4hjw==
-X-Google-Smtp-Source: APXvYqxbukC3wuoYLIcAFUFF7rtznwf5iOeYlSOH8C6ZtTJiTtZylUrTS/tmoa9gzf42d72JZ14PBw==
-X-Received: by 2002:adf:e8cb:: with SMTP id k11mr58471356wrn.244.1560432818296; 
- Thu, 13 Jun 2019 06:33:38 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id c65sm4387239wma.44.2019.06.13.06.33.37
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 13 Jun 2019 06:33:37 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 6299D1FF87;
- Thu, 13 Jun 2019 14:33:37 +0100 (BST)
-References: <20190517174046.11146-1-peter.maydell@linaro.org>
- <20190517174046.11146-4-peter.maydell@linaro.org>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-arm@nongnu.org
-In-reply-to: <20190517174046.11146-4-peter.maydell@linaro.org>
-Date: Thu, 13 Jun 2019 14:33:37 +0100
-Message-ID: <877e9pehji.fsf@zen.linaroharston>
+ (envelope-from <eblake@redhat.com>) id 1hbQiO-0004Ok-La
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 10:28:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42506)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1hbQiM-0004MJ-D9; Thu, 13 Jun 2019 10:28:30 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 606DC2EF195;
+ Thu, 13 Jun 2019 14:28:13 +0000 (UTC)
+Received: from [10.3.116.85] (ovpn-116-85.phx2.redhat.com [10.3.116.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 23E8E2B443;
+ Thu, 13 Jun 2019 14:28:08 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20190611102720.86114-1-vsementsov@virtuozzo.com>
+ <20190611102720.86114-2-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <ab8a1232-d609-d019-1aff-888eab403ce1@redhat.com>
+Date: Thu, 13 Jun 2019 09:28:07 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 3/4] hw/arm/armv7m: Forward
- "vfp" and "dsp" properties to CPU
+In-Reply-To: <20190611102720.86114-2-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="HQCstxFOiC4kRkakF7PSC6sqLfejyVqsY"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Thu, 13 Jun 2019 14:28:21 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 1/3] block/nbd-client: drop stale logout
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,89 +97,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--HQCstxFOiC4kRkakF7PSC6sqLfejyVqsY
+Content-Type: multipart/mixed; boundary="vJ2avaBwYwCZKOyAPCuiAxuRnY2uMSooq";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com
+Message-ID: <ab8a1232-d609-d019-1aff-888eab403ce1@redhat.com>
+Subject: Re: [PATCH 1/3] block/nbd-client: drop stale logout
+References: <20190611102720.86114-1-vsementsov@virtuozzo.com>
+ <20190611102720.86114-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20190611102720.86114-2-vsementsov@virtuozzo.com>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+--vJ2avaBwYwCZKOyAPCuiAxuRnY2uMSooq
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> Create "vfp" and "dsp" properties on the armv7m container object
-> which will be forwarded to its CPU object, so that SoCs can
-> configure whether the CPU has these features.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
+On 6/11/19 5:27 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Drop one on failure path (we have errp) and turn two others into trace
+> points.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  include/hw/arm/armv7m.h |  4 ++++
->  hw/arm/armv7m.c         | 18 ++++++++++++++++++
->  2 files changed, 22 insertions(+)
->
-> diff --git a/include/hw/arm/armv7m.h b/include/hw/arm/armv7m.h
-> index e96a98f8093..d2c74d3872a 100644
-> --- a/include/hw/arm/armv7m.h
-> +++ b/include/hw/arm/armv7m.h
-> @@ -43,6 +43,8 @@ typedef struct {
->   *   devices will be automatically layered on top of this view.)
->   * + Property "idau": IDAU interface (forwarded to CPU object)
->   * + Property "init-svtor": secure VTOR reset value (forwarded to CPU ob=
-ject)
-> + * + Property "vfp": enable VFP (forwarded to CPU object)
-> + * + Property "dsp": enable DSP (forwarded to CPU object)
->   * + Property "enable-bitband": expose bitbanded IO
->   */
->  typedef struct ARMv7MState {
-> @@ -66,6 +68,8 @@ typedef struct ARMv7MState {
->      uint32_t init_svtor;
->      bool enable_bitband;
->      bool start_powered_off;
-> +    bool vfp;
-> +    bool dsp;
->  } ARMv7MState;
->
->  #endif
-> diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-> index c4b2a9a1f5c..7caf9bd3364 100644
-> --- a/hw/arm/armv7m.c
-> +++ b/hw/arm/armv7m.c
-> @@ -190,6 +190,22 @@ static void armv7m_realize(DeviceState *dev, Error *=
-*errp)
->              return;
->          }
->      }
-> +    if (object_property_find(OBJECT(s->cpu), "vfp", NULL)) {
-> +        object_property_set_bool(OBJECT(s->cpu), s->vfp,
-> +                                 "vfp", &err);
-> +        if (err !=3D NULL) {
-> +            error_propagate(errp, err);
-> +            return;
-> +        }
-> +    }
-> +    if (object_property_find(OBJECT(s->cpu), "dsp", NULL)) {
-> +        object_property_set_bool(OBJECT(s->cpu), s->dsp,
-> +                                 "dsp", &err);
-> +        if (err !=3D NULL) {
-> +            error_propagate(errp, err);
-> +            return;
-> +        }
-> +    }
->
->      /*
->       * Tell the CPU where the NVIC is; it will fail realize if it doesn't
-> @@ -260,6 +276,8 @@ static Property armv7m_properties[] =3D {
->      DEFINE_PROP_BOOL("enable-bitband", ARMv7MState, enable_bitband, fals=
-e),
->      DEFINE_PROP_BOOL("start-powered-off", ARMv7MState, start_powered_off,
->                       false),
-> +    DEFINE_PROP_BOOL("vfp", ARMv7MState, vfp, true),
-> +    DEFINE_PROP_BOOL("dsp", ARMv7MState, dsp, true),
->      DEFINE_PROP_END_OF_LIST(),
->  };
+>  block/nbd-client.h | 9 ---------
+>  block/nbd-client.c | 6 +++---
+>  block/trace-events | 2 ++
+>  3 files changed, 5 insertions(+), 12 deletions(-)
+>=20
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
---
-Alex Benn=C3=A9e
+--vJ2avaBwYwCZKOyAPCuiAxuRnY2uMSooq--
+
+--HQCstxFOiC4kRkakF7PSC6sqLfejyVqsY
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0CXXcACgkQp6FrSiUn
+Q2oY6Qf9EHevRyLU89ezGuZu0ouFzhdmYY44U60z4VRzR6uj2RD1ycBwFYXCZNqE
+FJ2BFxU+eexYkb2jOnH0UD4Zj2J1xiIIEbNWe1r/eRG+11168uJ1UWizNp/5gs5P
+v7pF5+ovc/ZdvxiGLZfGiIY8V8xa997RMu/Q+k7SqSe3iqVvcP+QQjPejPgQuQzf
+pItk4Fy3rJxHRfCSRyJeaaVPobi/tbvzfUk5EHCc3S/hc973/Z9+ueAiuVC4frwA
+xO0tkT3jzqMh5kPDzi122CfKEKz3z/E+d8tGBUjA+D/dTKx0my1sIkR++B7zWW0I
+sYFeEPQntUsLYKqCW2dMKYeIN/I0kw==
+=2PDh
+-----END PGP SIGNATURE-----
+
+--HQCstxFOiC4kRkakF7PSC6sqLfejyVqsY--
 
