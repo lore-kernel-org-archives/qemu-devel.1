@@ -4,90 +4,90 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24550C31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 21:24:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02175C31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 21:25:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1ECF2133D
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 21:24:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BFC752133D
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 21:25:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VQyk9Asa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1ECF2133D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KOeVJ7IV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFC752133D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45678 helo=lists.gnu.org)
+Received: from localhost ([::1]:45682 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbXDH-000879-5L
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 17:24:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47209)
+	id 1hbXE5-0000Jq-UX
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 17:25:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47590)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hbXBL-0006Wg-16
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 17:22:52 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hbXBy-00074h-Vk
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 17:23:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hbXBJ-0005nV-LE
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 17:22:50 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:41907)
+ (envelope-from <richard.henderson@linaro.org>) id 1hbXBw-0006Kj-Rm
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 17:23:30 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:35646)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hbXBJ-0005fY-Dz
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 17:22:49 -0400
-Received: by mail-pg1-x542.google.com with SMTP id 83so217624pgg.8
- for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 14:22:34 -0700 (PDT)
+ id 1hbXBw-0006K0-Lv
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 17:23:28 -0400
+Received: by mail-pg1-x541.google.com with SMTP id s27so236724pgl.2
+ for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 14:23:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:references:from:openpgp:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=OAP/upUtegrxqAywk24FWAl1YAXKXMifpg7i+kWaL5A=;
- b=VQyk9AsakF59WpTEM2iNIS+Zxmyf2WxC2h0aBiG7+xbT+1l+lDn6QxYq9G1Lslm6Du
- ndAAdx1P8ks3Qudmve6nEU+ycKt4I1B5sVW3iGjwjIHmGPvXDnXFVn74qHTjL0HeXaqS
- yblHsyehFoxyws9nktNbUCfCwhFTMmbkNxR2ng7tOWqjNDV/gfJY8+1gdFN59m/5aL21
- +mvwQxAtknQ2fHv1DS2LzRzSFJc+M6D2nM0SDH09RTc3Uc7fdolhDMxPw5HECWW8oTey
- gIykI/LrsnfEkNhtBmkRYomZFtBI5fAMqkLReQYmThQlVhLMMTtY3ztMtkZb7U+Zmz4M
- 3j3g==
+ bh=+PhFHDqEdtLwS/tvs7fSztDQszEBBsq7OUkTnqZnXXQ=;
+ b=KOeVJ7IVKOEgGqvaz+NwIQIDpyXyXj6g4JTI9tktoE58AzY7OnVcj7guaZvk0Ny+TO
+ K1DYmdGxVQowgZFhiK+5P1y5xlc0Pscs5R0Y12Lq7wwvaaB9bUdvi9PG/VYKxnenOV5T
+ hp3RMEMcPqN+3BIRx99yWmPlJ4MRnvtcZ5WyIyO0venGCAuD/9/kXv3meBeBpKgsqQfb
+ XM0MHMXeZ+ZTrsS4eHWZu8UyN//w5RxlWL9cnjuEEmG1zG0+drDvLKbfCzT8i4zeMOv+
+ tk2WhQ4b9I4g7Hq4GsJ0ePRHwV3JoSp/MQTwFR8d2V6IQdZ5xvSDNOpA4iIdFOza1Hbm
+ 1w7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=OAP/upUtegrxqAywk24FWAl1YAXKXMifpg7i+kWaL5A=;
- b=EpqJBJFvMfHADd1n+6oPGM3km3hkzg1osaaY+Y/iYYvFpXSFfe6K52IqPuxyTzymVX
- 3ykDrlQc38dV5bLzSDgndIYIJtbSzKZ3TW0q3CwT48H3I2KzWl92wpXwYV4J9qFkI5WW
- 5GvZPZata627NAmEs4uNFxXsl9Ug22OCnu176MijjKA92trilHcaoWiDoSEPX0aqD7qg
- uSkhHlNadGMAPSLjjx8ArCfJX+M8qywFjGbvgu8CH6kZJ7H/LWMfTO2zIHIh1Mxlikeh
- bB1mmsKlfqIc/wmJ0rskiNbTkaFJDT6Y9rUjA8Mt7eirgqCHoiA5mAaVdkQ/ohi0xA0K
- Ut5A==
-X-Gm-Message-State: APjAAAV/zIetb/1FPAkd3cvU4xm6dtNpZrAA5TSRGm2vG4v31LNsZwOb
- xSwaDkHnxUqWucHIXPAQv0hwq5KRJB4=
-X-Google-Smtp-Source: APXvYqzuELeCOSSLbc0i6pHjCLL9vYsoh3sINQx8j9id5ZTaWDPLK2XXAoAbPxjbN7xzL7MBYhLtVQ==
-X-Received: by 2002:a63:161b:: with SMTP id w27mr32053658pgl.338.1560460952862; 
- Thu, 13 Jun 2019 14:22:32 -0700 (PDT)
+ bh=+PhFHDqEdtLwS/tvs7fSztDQszEBBsq7OUkTnqZnXXQ=;
+ b=mkdeuVauNNfyKfvB6gtvf3r88yeZUgkGFyz/tf6DVaIefvwrQ9WFL0QDwod4q9HEMj
+ 9htBXYV5DTgiDIrTk+3eJH/RGOEOjLo4jinRjqdgRV+FD5aJaOVPSRJXG3LjfT9VdO0E
+ 7/hZWd9ecvQBk0umB+gcr4cUUE0/WDWPRUh3RTKuogF5VbyE+q/IH1Z1E9Slo3w0mHwA
+ +nP7L2oJPb2CRZnWCiDkVi3r5ORk+dw+F8CfIWBs8Hlj8Qcay0bg/+03uFj1L668iH6h
+ GHiYgbfIlxLlhxgazlnSmQqXTQP8EFA7Ej3OQYeT1NhM8h305CNEguzJDs+C9l55MOHM
+ yDBw==
+X-Gm-Message-State: APjAAAVPAZDkkR5Bg1hn23NBsp8941p5J8fyXY4NGkWJbS++nzsOUGzc
+ LMyXNmCqFEmGS5wpY6O2yoCfifVdshM=
+X-Google-Smtp-Source: APXvYqz4/zcPpm3zfo6Nd6wkuEz33/0o5awGbnVtkuVJzvewciZxCdBSp/b2xSwpQ2HBFtx88uzH4g==
+X-Received: by 2002:a65:624f:: with SMTP id q15mr32315936pgv.436.1560461007244; 
+ Thu, 13 Jun 2019 14:23:27 -0700 (PDT)
 Received: from [10.10.150.239] ([149.199.65.200])
- by smtp.gmail.com with ESMTPSA id z32sm699239pgk.25.2019.06.13.14.22.31
+ by smtp.gmail.com with ESMTPSA id b128sm593016pfa.165.2019.06.13.14.23.26
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 13 Jun 2019 14:22:32 -0700 (PDT)
+ Thu, 13 Jun 2019 14:23:26 -0700 (PDT)
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
  qemu-devel@nongnu.org
 References: <20190613163917.28589-1-peter.maydell@linaro.org>
- <20190613163917.28589-2-peter.maydell@linaro.org>
+ <20190613163917.28589-3-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <774598e5-f859-5da2-0702-723ff0654931@linaro.org>
-Date: Thu, 13 Jun 2019 14:22:28 -0700
+Message-ID: <09f6f0a2-2964-fb95-d099-e3f06b14d824@linaro.org>
+Date: Thu, 13 Jun 2019 14:23:24 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190613163917.28589-2-peter.maydell@linaro.org>
+In-Reply-To: <20190613163917.28589-3-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
-Subject: Re: [Qemu-devel] [PATCH 01/12] target/arm: Move vfp_expand_imm() to
- translate.[ch]
+X-Received-From: 2607:f8b0:4864:20::541
+Subject: Re: [Qemu-devel] [PATCH 02/12] target/arm: Use vfp_expand_imm() for
+ AArch32 VFP VMOV_imm
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,17 +104,16 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 6/13/19 9:39 AM, Peter Maydell wrote:
-> We want to use vfp_expand_imm() in the AArch32 VFP decode;
-> move it from the a64-only header/source file to the
-> AArch32 one (which is always compiled even for AArch64).
+> The AArch32 VMOV (immediate) instruction uses the same VFP encoded
+> immediate format we already handle in vfp_expand_imm().  Use that
+> function rather than hand-decoding it.
 > 
+> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  target/arm/translate-a64.h     |  1 -
->  target/arm/translate.h         |  7 +++++++
->  target/arm/translate-a64.c     | 32 --------------------------------
->  target/arm/translate-vfp.inc.c | 33 +++++++++++++++++++++++++++++++++
->  4 files changed, 40 insertions(+), 33 deletions(-)
+>  target/arm/translate-vfp.inc.c | 28 ++++------------------------
+>  target/arm/vfp.decode          | 10 ++++++----
+>  2 files changed, 10 insertions(+), 28 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
