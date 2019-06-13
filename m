@@ -2,93 +2,61 @@ Return-Path: <SRS0=rgCY=UM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E4B7C31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 21:40:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E117BC31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 21:41:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E6EE208CA
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 21:40:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WF0fLdjO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E6EE208CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id B5F14208CA
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 21:41:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5F14208CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45850 helo=lists.gnu.org)
+Received: from localhost ([::1]:45852 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbXSi-0005Y7-5y
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 17:40:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49722)
+	id 1hbXTV-0006Ia-W2
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 17:41:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51510)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hbXHr-0004xC-FK
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 17:29:36 -0400
+ (envelope-from <alex.williamson@redhat.com>) id 1hbXMK-0000Gn-Od
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 17:34:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hbXHq-0000jn-Cg
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 17:29:35 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:38395)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hbXHq-0000jO-5x
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 17:29:34 -0400
-Received: by mail-pl1-x643.google.com with SMTP id f97so72920plb.5
- for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 14:29:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=xliFVyd+L1z4t/SGEf7l3fazrap3Sq4RK1AsGcXYU14=;
- b=WF0fLdjO/u4RlMUDYj4nwBGuLbz2JknqUCaCVGq3CmK4yLs9ulXXW19ifpFl2+hVke
- 2dmv9b8CgnfZxtemLv2U97byVKfklbh62Q3O5m498OVOW5eFmUE9fc6ogKwbYDj4MYFa
- B6vzvnd1dYkhuMr9jdw5Szs6RP0F9m/whgD4RgcvzAHFhPd+982cOGo5HeRenDrC5D9/
- 7hT/9FwY6Acr1fjvPJONQ39zW/q+Kn/y7vaujTUiFxYjHtOoZkKI2NLjoKw0EmDBT7y9
- G5XgzAyy8h8om7OHB6wryzRJ9Y8x5wX8ZyarfoGmj00Qv8ZHzyvDwPqXCHCQSB47Jfmx
- 2x8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=xliFVyd+L1z4t/SGEf7l3fazrap3Sq4RK1AsGcXYU14=;
- b=I1GaAXmVKUGciEWBiZr+xKAbmoib7XYHMPCY+x5JoIGc4NyPJTSD/Iaw8N78mW6wne
- NHm2dNbdYCy/aod/YqNgDAQ17JFBBQznJMPmddPV+34mAEtaI2swjBqspx6WF/8e0Pyj
- 4GwDV3n1Gz9CjuD40mhvOCEMDmxp0Zj/SI4bGuvwJQ8gWussNdHcowBMUNa4AyqJhgwe
- hqZdIJ+XMiSFlYp+xXJTOVRSFCUCfPULb0WwHr3fuYwSaeuCNfIFfuXx7/C5S52D3pkQ
- NnP6eErcKhJbtB7TFnywiRJTBaeIVJoqXTm7zVuhcouOPYR/yp/U+W7Autvy1P03OLX1
- EGjw==
-X-Gm-Message-State: APjAAAWqgvXnhrP8wjv6gPGxVM/VzfGknrsYsPUBf+pKvhgm1N5zKCZf
- i51QFdK6hIzvah9CTVcsYfnc3Ek0aK0=
-X-Google-Smtp-Source: APXvYqxMbtdUKOLMwc2OFHcA2ngCOtXMxqMb8+tbKCQHZ066OGFLDPH6Ahwnm1UxyrQIWHquWP+bfQ==
-X-Received: by 2002:a17:902:27a8:: with SMTP id
- d37mr90318116plb.150.1560461372860; 
- Thu, 13 Jun 2019 14:29:32 -0700 (PDT)
-Received: from [10.10.150.239] ([149.199.65.200])
- by smtp.gmail.com with ESMTPSA id b17sm658899pfb.18.2019.06.13.14.29.31
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 13 Jun 2019 14:29:32 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20190613163917.28589-1-peter.maydell@linaro.org>
- <20190613163917.28589-9-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <dae3bc40-576a-c592-3bd6-c30e2938ebd8@linaro.org>
-Date: Thu, 13 Jun 2019 14:29:30 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <alex.williamson@redhat.com>) id 1hbXMH-000323-OS
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 17:34:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46110)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1hbXMG-0002s9-Up
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 17:34:09 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5207013AAE
+ for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 21:33:40 +0000 (UTC)
+Received: from gimli.home (ovpn-116-190.phx2.redhat.com [10.3.116.190])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 211D15C257;
+ Thu, 13 Jun 2019 21:33:37 +0000 (UTC)
+From: Alex Williamson <alex.williamson@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 13 Jun 2019 15:33:37 -0600
+Message-ID: <156046151566.26543.17274661862206856605.stgit@gimli.home>
+User-Agent: StGit/0.19-dirty
 MIME-Version: 1.0
-In-Reply-To: <20190613163917.28589-9-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::643
-Subject: Re: [Qemu-devel] [PATCH 08/12] target/arm: Stop using cpu_F0s for
- Neon f32/s32 VCVT
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Thu, 13 Jun 2019 21:33:45 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 0/3] vfio updates 2019-06-13
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,19 +72,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/13/19 9:39 AM, Peter Maydell wrote:
-> Stop using cpu_F0s for the Neon f32/s32 VCVT operations.
-> Since this is the last user of cpu_F0s in the Neon 2rm-op
-> loop, we can remove the handling code for it too.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/translate.c | 82 ++++++++++++------------------------------
->  1 file changed, 22 insertions(+), 60 deletions(-)
+The following changes since commit 650a379d505bf558bcb41124bc6c951a76cbc113:
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20190613-1' into staging (2019-06-13 15:16:39 +0100)
 
+are available in the Git repository at:
 
-r~
+  git://github.com/awilliam/qemu-vfio.git tags/vfio-updates-20190613.0
 
+for you to fetch changes up to 201a733145751aa691e7e3b9c0f263f0c92db0c5:
+
+  vfio/common: Introduce vfio_set_irq_signaling helper (2019-06-13 09:57:37 -0600)
+
+----------------------------------------------------------------
+VFIO updates 2019-06-13
+
+ - Hide resizable BAR capability to prevent false guest resizing
+   (Alex Williamson)
+
+ - Allow relocation to fix bogus MSI-X hardware (Alex Williamson)
+
+ - Condense IRQ setup into a common helper (Eric Auger)
+
+----------------------------------------------------------------
+Alex Williamson (2):
+      vfio/pci: Hide Resizable BAR capability
+      vfio/pci: Allow MSI-X relocation to fixup bogus PBA
+
+Eric Auger (1):
+      vfio/common: Introduce vfio_set_irq_signaling helper
+
+ hw/vfio/common.c              |  78 +++++++++++++++
+ hw/vfio/pci.c                 | 220 ++++++++++--------------------------------
+ hw/vfio/platform.c            |  68 +++++--------
+ include/hw/vfio/vfio-common.h |   2 +
+ 4 files changed, 156 insertions(+), 212 deletions(-)
 
