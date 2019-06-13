@@ -2,102 +2,90 @@ Return-Path: <SRS0=rgCY=UM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAD4AC31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 18:14:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80C29C31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 18:18:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7BD12082C
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 18:14:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7BD12082C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 568E82084D
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 18:18:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 568E82084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43342 helo=lists.gnu.org)
+Received: from localhost ([::1]:43412 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbUFU-0002Q9-4U
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 14:14:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56983)
+	id 1hbUIV-0004l0-9Y
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 14:18:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50524)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1hbSxG-00068j-Fj
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:52:04 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hbSeO-0004AJ-FY
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:32:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1hbSxE-0001iJ-Jh
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:52:02 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35868)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1hbSxC-0001Rw-KW
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:52:00 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x5DGgTq2081384
- for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 12:51:53 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2t3rn6wa63-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 12:51:52 -0400
-Received: from localhost
- by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
- Thu, 13 Jun 2019 17:51:52 +0100
-Received: from b03cxnp07028.gho.boulder.ibm.com (9.17.130.15)
- by e33.co.us.ibm.com (192.168.1.133) with IBM ESMTP SMTP Gateway: Authorized
- Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 13 Jun 2019 17:51:48 +0100
-Received: from b03ledav005.gho.boulder.ibm.com
- (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
- by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x5DGplXd30671326
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 13 Jun 2019 16:51:47 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6CF67BE053;
- Thu, 13 Jun 2019 16:51:47 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2872EBE051;
- Thu, 13 Jun 2019 16:51:47 +0000 (GMT)
-Received: from localhost (unknown [9.80.81.20])
- by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
- Thu, 13 Jun 2019 16:51:46 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+ (envelope-from <mreitz@redhat.com>) id 1hbSTP-0003du-My
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:21:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59514)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hbSTJ-0003CN-4b; Thu, 13 Jun 2019 12:21:05 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 42A3230C1CD6;
+ Thu, 13 Jun 2019 16:21:04 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.187])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 77C7C1001B21;
+ Thu, 13 Jun 2019 16:20:59 +0000 (UTC)
+To: Stefan Hajnoczi <stefanha@gmail.com>
+References: <20190524172812.27308-1-mreitz@redhat.com>
+ <20190613161225.GB12986@stefanha-x1.localdomain>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <55f6ce93-b9c8-173c-8167-c649b4f661a6@redhat.com>
+Date: Thu, 13 Jun 2019 18:20:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-To: Peter Maydell <peter.maydell@linaro.org>
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <CAFEAcA97MUveG=si03B7_2WzDugtz7hR9x+YNQmU2xDiCF81eA@mail.gmail.com>
-References: <20190610134545.3743-1-peter.maydell@linaro.org>
- <156043918624.3418.2275764093147880770@sif>
- <CAFEAcA97MUveG=si03B7_2WzDugtz7hR9x+YNQmU2xDiCF81eA@mail.gmail.com>
-User-Agent: alot/0.7
-Date: Thu, 13 Jun 2019 11:51:41 -0500
-X-TM-AS-GCONF: 00
-x-cbid: 19061316-0036-0000-0000-00000ACB79BA
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011255; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000286; SDB=6.01217453; UDB=6.00640208; IPR=6.00998565; 
- MB=3.00027296; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-13 16:51:50
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19061316-0037-0000-0000-00004C36EF5B
-Message-Id: <156044470155.3418.5487761086434554857@sif>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-06-13_11:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906130122
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: Re: [Qemu-devel] [PATCH] qemu-ga: Convert invocation documentation
- to rST
+In-Reply-To: <20190613161225.GB12986@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="T5fZOJ9w9NmKyQEBOKsJNr3bxlnDGd3rE"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Thu, 13 Jun 2019 16:21:04 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] =?utf-8?q?=5BRFC_0/3=5D_block=3A_Inquire_images?=
+ =?utf-8?q?=E2=80=99_rotational_info?=
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,173 +97,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, Anton Nefedov <anton.nefedov@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Quoting Peter Maydell (2019-06-13 10:29:33)
-> On Thu, 13 Jun 2019 at 16:20, Michael Roth <mdroth@linux.vnet.ibm.com> wr=
-ote:
-> >
-> > Quoting Peter Maydell (2019-06-10 08:45:45)
-> > > The qemu-ga documentation is currently in qemu-ga.texi in
-> > > Texinfo format, which we present to the user as:
-> > >  * a qemu-ga manpage
-> > >  * a section of the main qemu-doc HTML documentation
-> > >
-> > > Convert the documentation to rST format, and present it to
-> > > the user as:
-> > >  * a qemu-ga manpage
-> > >  * part of the interop/ Sphinx manual
-> > >
-> > > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> =
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--T5fZOJ9w9NmKyQEBOKsJNr3bxlnDGd3rE
+Content-Type: multipart/mixed; boundary="DgyqvTLnC57mQnbXiq86R0DaQSVemHVx4";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <55f6ce93-b9c8-173c-8167-c649b4f661a6@redhat.com>
+Subject: =?UTF-8?Q?Re=3a_=5bQemu-devel=5d_=5bRFC_0/3=5d_block=3a_Inquire_ima?=
+ =?UTF-8?Q?ges=e2=80=99_rotational_info?=
+References: <20190524172812.27308-1-mreitz@redhat.com>
+ <20190613161225.GB12986@stefanha-x1.localdomain>
+In-Reply-To: <20190613161225.GB12986@stefanha-x1.localdomain>
 
-> > > +# Canned command to build manpages from a single manual
-> > > +build-manpages =3D $(call quiet-command,CONFDIR=3D"$(qemu_confdir)" =
-sphinx-build $(if $(V),,-q) -W -n -b man -D version=3D$(VERSION) -D release=
-=3D"$(FULL_VERSION)" -d .doctrees/$1 $(SRC_PATH)/docs/$1
-> $(MANUAL_BUILDDIR)/$1 ,"SPHINX","$(MANUAL_BUILDDIR)/$1")
-> =
+--DgyqvTLnC57mQnbXiq86R0DaQSVemHVx4
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> > > --- a/docs/conf.py
-> > > +++ b/docs/conf.py
-> > > @@ -115,6 +115,14 @@ todo_include_todos =3D False
-> > >  # with "option::" in the document being processed. Turn that off.
-> > >  suppress_warnings =3D ["ref.option"]
-> > >
-> > > +# The rst_epilog fragment is effectively included in every rST file.
-> > > +# We use it to define substitutions based on build config that
-> > > +# can then be used in the documentation. The fallback if the
-> > > +# environment variable is not set is for the benefit of readthedocs
-> > > +# style document building; our Makefile always sets the variable.
-> > > +confdir =3D os.getenv('CONFDIR', "/usr/local/etc")
-> > > +rst_epilog =3D ".. |CONFDIR| replace:: ``" + confdir + "``\n"
-> > > +
-> >
-> > When testing this I have the following in my qemu build directory (via
-> > ./configure --prefix=3D/home/mdroth/w/qemu-install2):
-> >
-> >   $ grep -r CONFDIR
-> >   config-host.h-timestamp:#define CONFIG_QEMU_CONFDIR "/home/mdroth/w/q=
-emu-install2/etc/qemu"
-> >   qemu-doc.txt:     user-provided config files on SYSCONFDIR.
-> >   config-host.h:#define CONFIG_QEMU_CONFDIR "/home/mdroth/w/qemu-instal=
-l2/etc/qemu"
-> >   docs/version.texi:@set CONFDIR /home/mdroth/w/qemu-install2/etc/qemu
-> >
-> > but the following input for the qemu-ga man page:
-> >
-> >   qemu-ga will read a system configuration file on startup (located at
-> >   |CONFDIR|\ ``/qemu-ga.conf`` by default),
-> >
-> > ends up as this in the generated man page:
-> >
-> >   qemu-ga will read a system configuration file on startup (located at =
-/usr/local/etc/qemu-ga.conf
-> >   by  default),
-> >
-> > is this expected, or are we unexpectedly falling back to the default
-> > value here?
-> =
+On 13.06.19 18:12, Stefan Hajnoczi wrote:
+> On Fri, May 24, 2019 at 07:28:09PM +0200, Max Reitz wrote:
+>> Hi,
+>>
+>> http://lists.nongnu.org/archive/html/qemu-block/2019-05/msg00569.html
+>> shows that optimizations affect HDDs and SSDs differently.  It would b=
+e
+>> nice if we could differentiate between the two and then choose to adju=
+st
+>> our behavior depending on whether a given image is stored on an HDD or=
 
-> No, if you're invoking Sphinx via the makefile then we should
-> be passing CONFDIR=3D"$(qemu_confdir)" to set the environment
-> variable when we invoke it. Can you try doing a build with V=3D1
-> to check the sphinx command line ?
-
-Here's the relevant output from make. The environment variable seems to
-be defined as expected but I guess sphinx-build isn't picking it up for
-some reason?
-
-( echo "@set VERSION 4.0.50" && echo "@set CONFDIR /home/mdroth/w/qemu-inst=
-all2/etc/qemu" )> docs/version.texi
-sh /home/mdroth/w/qemu4.git/scripts/hxtool -t < /home/mdroth/w/qemu4.git/qe=
-mu-options.hx > qemu-options.texi
-sh /home/mdroth/w/qemu4.git/scripts/hxtool -t < /home/mdroth/w/qemu4.git/hm=
-p-commands.hx > qemu-monitor.texi
-sh /home/mdroth/w/qemu4.git/scripts/hxtool -t < /home/mdroth/w/qemu4.git/qe=
-mu-img-cmds.hx > qemu-img-cmds.texi
-sh /home/mdroth/w/qemu4.git/scripts/hxtool -t < /home/mdroth/w/qemu4.git/hm=
-p-commands-info.hx > qemu-monitor-info.texi
-LC_ALL=3DC makeinfo --no-split --number-sections -I docs -I /home/mdroth/w/=
-qemu4.git -I . --no-headers --html /home/mdroth/w/qemu4.git/qemu-doc.texi -=
-o qemu-doc.html
-LC_ALL=3DC makeinfo --no-split --number-sections -I docs -I /home/mdroth/w/=
-qemu4.git -I . --no-headers --plaintext /home/mdroth/w/qemu4.git/qemu-doc.t=
-exi -o qemu-doc.txt
-perl -Ww -- /home/mdroth/w/qemu4.git/scripts/texi2pod.pl -I docs -I /home/m=
-droth/w/qemu4.git -I . -DVERSION=3D"4.0.50" -DCONFDIR=3D"/home/mdroth/w/qem=
-u-install2/etc/qemu" /home/mdroth/w/qemu4.git/qemu-doc.texi qemu.1.pod && p=
-od2man --utf8 --section=3D1 --center=3D" " --release=3D" " qemu.1.pod > qem=
-u.1
-perl -Ww -- /home/mdroth/w/qemu4.git/scripts/texi2pod.pl -I docs -I /home/m=
-droth/w/qemu4.git -I . -DVERSION=3D"4.0.50" -DCONFDIR=3D"/home/mdroth/w/qem=
-u-install2/etc/qemu" /home/mdroth/w/qemu4.git/qemu-img.texi qemu-img.1.pod =
-&& pod2man --utf8 --section=3D1 --center=3D" " --release=3D" " qemu-img.1.p=
-od > qemu-img.1
-perl -Ww -- /home/mdroth/w/qemu4.git/scripts/texi2pod.pl -I docs -I /home/m=
-droth/w/qemu4.git -I . -DVERSION=3D"4.0.50" -DCONFDIR=3D"/home/mdroth/w/qem=
-u-install2/etc/qemu" /home/mdroth/w/qemu4.git/qemu-nbd.texi qemu-nbd.8.pod =
-&& pod2man --utf8 --section=3D8 --center=3D" " --release=3D" " qemu-nbd.8.p=
-od > qemu-nbd.8
-CONFDIR=3D"/home/mdroth/w/qemu-install2/etc/qemu" sphinx-build  -W -n -b ma=
-n -D version=3D4.0.50 -D release=3D"4.0.50 (v4.0.0-1240-g90b8a170d2-dirty)"=
- -d .doctrees/interop /home/mdroth/w/qemu4.git/docs/interop docs/interop
-Running Sphinx v1.6.7
-loading pickled environment... done
-building [mo]: targets for 0 po files that are out of date
-building [man]: all manpages
-updating environment: [config changed] 7 added, 0 changed, 0 removed
-reading sources... [ 14%] bitmaps
-reading sources... [ 28%] index
-reading sources... [ 42%] live-block-operations
-reading sources... [ 57%] pr-helper
-reading sources... [ 71%] qemu-ga
-reading sources... [ 85%] vhost-user
-reading sources... [100%] vhost-user-gpu
-
-looking for now-outdated files... none found
-pickling environment... done
-checking consistency... done
-writing... qemu-ga.8 { }
-build succeeded.
-
-> =
-
-> I've just realized that I didn't also update the 'build-manual'
-> macro to add the CONFDIR setting. Perhaps Sphinx ran first with
-> the build-manual macro and has cached document contents created
-> with that incorrect invocation and then reused them in the manpage
-> creation? If so, this should be fixable by adding the CONFDIR=3D"$(qemu_c=
-onfdir)"
-> to the build-manual macro in the Makefile, and then deleting the .doctree=
-s/
-> directory from your build tree and rerunning make.
-
-Sorry looks like it was an issue on my end actually...I guess I had a left-=
-over
-.doctrees from an earlier build (with no --prefix). I generally rm -rf * wi=
-thin
-build directory instead of 'make clean', but that was still leaving around a
-stale .doctrees. Once I deleted that I could no longer reproduce (neither
-with/without the additional CONFDIR setting).
-
-> =
-
-> > Sphinx seems to do a better job of formatting "Key" and "Key type" into
-> > actual table columns in the generated man/html pages (rather than just
-> > separating them with whitespace), so I think we can drop the trailing '=
-=3D's
-> =
-
-> Sure; I'll change this in v2.
-> =
-
-> thanks
-> -- PMM
+>> not.
+>>
+>> Or maybe it isn=E2=80=99t so nice.  That=E2=80=99s one reason this is =
+an RFC.
 >=20
+> Seems useful.
+>=20
+> As long as this isn't exposed to the guest automatically (e.g. via SCSI=
+)
+> then it's fine since guest-visible values are not allowed to change
+> across live migration or storage migration.
 
+Urgh.  I wanted to do that in v1.  Then I guess I better won=E2=80=99t...=
+
+
+Max
+
+
+--DgyqvTLnC57mQnbXiq86R0DaQSVemHVx4--
+
+--T5fZOJ9w9NmKyQEBOKsJNr3bxlnDGd3rE
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0Cd+kACgkQ9AfbAGHV
+z0DtyQgAr5b79ZtM8PKH8kg6uJlmQbQhfVquQM9FoORD8P8tJsiZjS/UXpb0hep5
+edGYvrBL03ujYsVlmYU+O0KXFeUhMAERvxR82/mlhUOEiu9dxJNoZ6VNy5n/SUnQ
+ZF+PL7O1M9l2Qn9iCt5sCnIn5jw7X3h8PlYJDoXpc15JCTwlF85hwHOxbNMw22SM
+DlKzzprRlkA0XV6ltcnhzj/RxttfsR0VSydkacyTGutAyVKgWN5iIUzOPtUSdh3D
+ED5w2ZbPrzWldYPVPlZwutE/Z0Fsi5O0AKFcbICaQxZ0bEMq+bRcq7uyPpCokswf
+NZszF7We2BTHFJXibVyKWH3ppeSGvw==
+=EGVh
+-----END PGP SIGNATURE-----
+
+--T5fZOJ9w9NmKyQEBOKsJNr3bxlnDGd3rE--
 
