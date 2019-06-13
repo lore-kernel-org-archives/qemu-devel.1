@@ -2,66 +2,91 @@ Return-Path: <SRS0=rgCY=UM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FFFEC31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 14:58:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9654EC31E49
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 14:59:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 483C4207E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 14:58:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 483C4207E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6831F207E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 14:59:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v31NJkhZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6831F207E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40654 helo=lists.gnu.org)
+Received: from localhost ([::1]:40656 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbRBG-0002dJ-9U
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 10:58:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37339)
+	id 1hbRCJ-0003Dc-KS
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 10:59:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52158)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hbQZ4-0004CE-H2
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 10:18:56 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hbPoX-000633-PD
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 09:30:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hbQZ2-0004y6-E2
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 10:18:54 -0400
-Resent-Date: Thu, 13 Jun 2019 10:18:54 -0400
-Resent-Message-Id: <E1hbQZ2-0004y6-E2@eggs.gnu.org>
-Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21926)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hbQYv-0004ob-EZ
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 10:18:47 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1560435512; cv=none; d=zoho.com; s=zohoarc; 
- b=NBBzVvj0PurKvyPI3Zc+zZu4iNZKY9w+B3CjJ881E0EaX0LA/pMmoX96r0PSfPpj3uHdUif7GIXKKXRW0Az9Yh9RVTIng6szAXxAwjRdqr1D+SaBATiSu2nQXjJsl5Yd9jaRsiTSA+Gj+CNuOFtGxrOQKJ1bWU3koULuwuEIFpQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1560435512;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=2fm08z1oNhEIARh6JCHyltWRzx4XGaU/HtQGPm07DYU=; 
- b=CqVBZJReAAChx1DTw2ZHsD4QLWYGtg6VIrw/LmpmJGplehxoEepsy9MsxcfM+1ZaIzKA0YMOX36xusPYAXZ5DVgqdiPrv6XghGHTrkOhCjbejKkF7/OPd4S8o4fxU3ScH8dyXG2RPcSh16f0PRci2jP+9jgVDDroiDAvHRPd4Vc=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1560435510594329.21167639358225;
- Thu, 13 Jun 2019 07:18:30 -0700 (PDT)
-In-Reply-To: <20190613121433.5246-1-peter.maydell@linaro.org>
-Message-ID: <156043550978.5392.14222142178545888482@ce79690b2cb9>
+ (envelope-from <alex.bennee@linaro.org>) id 1hbPoR-0007W2-L4
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 09:30:49 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45926)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hbPoR-0007Uq-Ba
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 09:30:43 -0400
+Received: by mail-wr1-x443.google.com with SMTP id f9so20769621wre.12
+ for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 06:30:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=CAQkI/KYT7c6DwMNv9emGR+PJjl1WDR1C4uGFY3y73M=;
+ b=v31NJkhZOnZxQNZXRPStLU/t3uyU+1DIJMbH3xQ1I90gfA70o4Ehw/bwX1QY2QmE8r
+ exoWXjeTj0DwdQmENDrps5YpvMmUOJVzKAjHvXty4aeTU17+pnRCEOjajTYA7s/0Uz7r
+ WuhMY2wPbO/jUBeM29FAXnBPAdiBvMQ2QjBYh6A06BXLDVJ1nfTgCwtAt4ERprmqUkFU
+ bpyFdBaLoNSdNFDs/sAxQZTgG6bkM3UgzF3XNZ+kKgvtFuNGW0Q3gwwwI6NPk744iBSe
+ yb67Q+SiUPGecQCQ6W5UhVv/i+fkHw4AI6nxc0oocy4s8NqfQtZI4wWj6HSoLDi1eaBe
+ Kwcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=CAQkI/KYT7c6DwMNv9emGR+PJjl1WDR1C4uGFY3y73M=;
+ b=dx5upkokE3+ujZAAW93aIkCIoahnQUYg6+U0KQJYs5Sg77uOb5LVm6q1LvvSWeuZcc
+ I1xXenMMufx7EQrhZVnX+XD65eqCO5vFiTi5FH7eG/EH37X4hRQ4EvF8k5kgN3Jt74oO
+ 5PRKVUDUyCnNCiA5vuyo/7dJYDKkNgX0a9DDbBL+RjLUR+7n/gpmm0bk3r5D/P4bbszO
+ YFWFFikgy3h60cwqNZ2FcfZ9kcy+LUF197Ks1DHDsRNkvQXC1ngKB1Rs1wdrUM4j4J21
+ YHmdOoNVG+3iEgu6MDJjOiSP6eOiEZR9V0CHUohRoKKLg62U6ti4W3rJSqDT3S3WJsER
+ WfLA==
+X-Gm-Message-State: APjAAAU3VvORIHloXQMa+zwU8gbqrYHMqOaXtjdF0cv+QNT7AEShbzcp
+ QTPkyxn1EKFGUM43nZLO0k7vMqbA6pQ=
+X-Google-Smtp-Source: APXvYqyAxrZGP6wSjJIudKesezgSvuG2kOVAbo2a1F1Kc4T83rg8nozzL2lFY3T1jtPXKTDBXyIRpQ==
+X-Received: by 2002:a5d:6b03:: with SMTP id v3mr39664000wrw.309.1560432641874; 
+ Thu, 13 Jun 2019 06:30:41 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id q21sm4068078wmq.13.2019.06.13.06.30.41
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 13 Jun 2019 06:30:41 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id D90C61FF87;
+ Thu, 13 Jun 2019 14:30:40 +0100 (BST)
+References: <20190517174046.11146-1-peter.maydell@linaro.org>
+ <20190517174046.11146-2-peter.maydell@linaro.org>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-arm@nongnu.org
+In-reply-to: <20190517174046.11146-2-peter.maydell@linaro.org>
+Date: Thu, 13 Jun 2019 14:30:40 +0100
+Message-ID: <87a7elehof.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: peter.maydell@linaro.org
-Date: Thu, 13 Jun 2019 07:18:30 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.59
-Subject: Re: [Qemu-devel] [PULL 00/48] target-arm queue
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/4] target/arm: Allow VFP and
+ Neon to be disabled via a CPU property
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,179 +98,245 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
 Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYxMzEyMTQzMy41MjQ2
-LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
-IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
-cmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMDAvNDhdIHRhcmdl
-dC1hcm0gcXVldWUKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwNjEzMTIxNDMzLjUyNDYt
-MS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEv
-YmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
-bmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4v
-c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBF
-TkQgPT09CgpGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogICBm
-ZTE4OTExYWY3Li43ODVhNjAyZWFlICBtYXN0ZXIgICAgIC0+IG1hc3RlcgpGcm9tIGh0dHBzOi8v
-Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAg
-ICBwYXRjaGV3LzIwMTkwNjEzMTIxNDMzLjUyNDYtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcg
-LT4gcGF0Y2hldy8yMDE5MDYxMzEyMTQzMy41MjQ2LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3Jn
-ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKOTI2ZTYzMDc3NiB0YXJnZXQvYXJtOiBG
-aXggc2hvcnQtdmVjdG9yIGluY3JlbWVudCBiZWhhdmlvdXIKY2UyMjg1MzA3NyB0YXJnZXQvYXJt
-OiBDb252ZXJ0IGZsb2F0LXRvLWludGVnZXIgVkNWVCBpbnNucyB0byBkZWNvZGV0cmVlCmMzN2Nh
-MmYzYmYgdGFyZ2V0L2FybTogQ29udmVydCBWQ1ZUIGZwL2ZpeGVkLXBvaW50IGNvbnZlcnNpb24g
-aW5zbnMgdG8gZGVjb2RldHJlZQozYjVmMjM1MzQ2IHRhcmdldC9hcm06IENvbnZlcnQgVkpDVlQg
-dG8gZGVjb2RldHJlZQoxYmZmMWI0MmM1IHRhcmdldC9hcm06IENvbnZlcnQgaW50ZWdlci10by1m
-bG9hdCBpbnNucyB0byBkZWNvZGV0cmVlCjU1NTgwNjUzMmYgdGFyZ2V0L2FybTogQ29udmVydCBk
-b3VibGUtc2luZ2xlIHByZWNpc2lvbiBjb252ZXJzaW9uIGluc25zIHRvIGRlY29kZXRyZWUKMmNh
-YThlZmIxOCB0YXJnZXQvYXJtOiBDb252ZXJ0IFZGUCByb3VuZCBpbnNucyB0byBkZWNvZGV0cmVl
-CmYwYTVlNzQyMTEgdGFyZ2V0L2FybTogQ29udmVydCB0aGUgVkNWVC10by1mMTYgaW5zbnMgdG8g
-ZGVjb2RldHJlZQowYzI0MDg4NDQzIHRhcmdldC9hcm06IENvbnZlcnQgdGhlIFZDVlQtZnJvbS1m
-MTYgaW5zbnMgdG8gZGVjb2RldHJlZQoxMTdmNTcyNGQ2IHRhcmdldC9hcm06IENvbnZlcnQgVkZQ
-IGNvbXBhcmlzb24gaW5zbnMgdG8gZGVjb2RldHJlZQo5NWMwZDFhMjAzIHRhcmdldC9hcm06IENv
-bnZlcnQgVk1PViAocmVnaXN0ZXIpIHRvIGRlY29kZXRyZWUKODlhNThkMTIyZCB0YXJnZXQvYXJt
-OiBDb252ZXJ0IFZTUVJUIHRvIGRlY29kZXRyZWUKNmQ0NzA1YzkzMCB0YXJnZXQvYXJtOiBDb252
-ZXJ0IFZORUcgdG8gZGVjb2RldHJlZQpiODYxZDRmNmZhIHRhcmdldC9hcm06IENvbnZlcnQgVkFC
-UyB0byBkZWNvZGV0cmVlCjYyNzU4NDY5OWEgdGFyZ2V0L2FybTogQ29udmVydCBWTU9WIChpbW0p
-IHRvIGRlY29kZXRyZWUKM2I2YzJmZGI3MCB0YXJnZXQvYXJtOiBDb252ZXJ0IFZGUCBmdXNlZCBt
-dWx0aXBseS1hZGQgaW5zbnMgdG8gZGVjb2RldHJlZQplNmQxNGExMzg5IHRhcmdldC9hcm06IENv
-bnZlcnQgVkRJViB0byBkZWNvZGV0cmVlCjI0YzNhOGFhN2UgdGFyZ2V0L2FybTogQ29udmVydCBW
-U1VCIHRvIGRlY29kZXRyZWUKY2MxZWU4MjFiMSB0YXJnZXQvYXJtOiBDb252ZXJ0IFZBREQgdG8g
-ZGVjb2RldHJlZQo0NDE5ZTUxNWNhIHRhcmdldC9hcm06IENvbnZlcnQgVk5NVUwgdG8gZGVjb2Rl
-dHJlZQoxZjFiNGQ5OTVmIHRhcmdldC9hcm06IENvbnZlcnQgVk1VTCB0byBkZWNvZGV0cmVlCmE0
-MDA5Njk4NTIgdGFyZ2V0L2FybTogQ29udmVydCBWRlAgVk5NTEEgdG8gZGVjb2RldHJlZQpjNDgz
-ZjUzNGNkIHRhcmdldC9hcm06IENvbnZlcnQgVkZQIFZOTUxTIHRvIGRlY29kZXRyZWUKMjc5NGZk
-MDFhNiB0YXJnZXQvYXJtOiBDb252ZXJ0IFZGUCBWTUxTIHRvIGRlY29kZXRyZWUKZGJmOWM2NjNi
-ZSB0YXJnZXQvYXJtOiBDb252ZXJ0IFZGUCBWTUxBIHRvIGRlY29kZXRyZWUKMDIzNWUzYzMxOSB0
-YXJnZXQvYXJtOiBSZW1vdmUgVkxEUi9WU1RSL1ZMRE0vVlNUTSB1c2Ugb2YgY3B1X0YwcyBhbmQg
-Y3B1X0YwZAozOTM2MWRkNTY1IHRhcmdldC9hcm06IENvbnZlcnQgdGhlIFZGUCBsb2FkL3N0b3Jl
-IG11bHRpcGxlIGluc25zIHRvIGRlY29kZXRyZWUKZjI5YTMyZDBmZiB0YXJnZXQvYXJtOiBDb252
-ZXJ0IFZGUCBWTERSIGFuZCBWU1RSIHRvIGRlY29kZXRyZWUKZTAwNjhjZTk1MCB0YXJnZXQvYXJt
-OiBDb252ZXJ0IFZGUCB0d28tcmVnaXN0ZXIgdHJhbnNmZXIgaW5zbnMgdG8gZGVjb2RldHJlZQpl
-MzZmOGJjMGMxIHRhcmdldC9hcm06IENvbnZlcnQgInNpbmdsZS1wcmVjaXNpb24iIHJlZ2lzdGVy
-IG1vdmVzIHRvIGRlY29kZXRyZWUKODA2NGJmZTFkNSB0YXJnZXQvYXJtOiBDb252ZXJ0ICJkb3Vi
-bGUtcHJlY2lzaW9uIiByZWdpc3RlciBtb3ZlcyB0byBkZWNvZGV0cmVlCjUzMzQ1MjllNmQgdGFy
-Z2V0L2FybTogQWRkIGhlbHBlcnMgZm9yIFZGUCByZWdpc3RlciBsb2FkcyBhbmQgc3RvcmVzCjQx
-ZjY3ZDMwZGEgdGFyZ2V0L2FybTogTW92ZSB0aGUgVkZQIHRyYW5zXyogZnVuY3Rpb25zIHRvIHRy
-YW5zbGF0ZS12ZnAuaW5jLmMKNTJjMzQ3YWU3NyB0YXJnZXQvYXJtOiBDb252ZXJ0IFZDVlRBL1ZD
-VlROL1ZDVlRQL1ZDVlRNIHRvIGRlY29kZXRyZWUKMDNhNTljZDc0YiB0YXJnZXQvYXJtOiBDb252
-ZXJ0IFZSSU5UQS9WUklOVE4vVlJJTlRQL1ZSSU5UTSB0byBkZWNvZGV0cmVlCmNjYjRkN2I5NTQg
-dGFyZ2V0L2FybTogQ29udmVydCBWTUlOTk0sIFZNQVhOTSB0byBkZWNvZGV0cmVlCjZlZDk2M2Q2
-YjQgdGFyZ2V0L2FybTogQ29udmVydCB0aGUgVlNFTCBpbnN0cnVjdGlvbnMgdG8gZGVjb2RldHJl
-ZQozNzQ3NzQ2OGM1IHRhcmdldC9hcm06IEV4cGxpY2l0bHkgZW5hYmxlIFZGUCBzaG9ydC12ZWN0
-b3JzIGZvciBhYXJjaDMyIC1jcHUgbWF4CjMzNzlmODQ3NGQgdGFyZ2V0L2FybTogRml4IENvcnRl
-eC1SNUYgTVZGUiB2YWx1ZXMKM2M0YWJkNjhkZCB0YXJnZXQvYXJtOiBGYWN0b3Igb3V0IFZGUCBh
-Y2Nlc3MgY2hlY2tpbmcgY29kZQo1MDg2OWQ1MzJmIHRhcmdldC9hcm06IEFkZCBzdHVicyBmb3Ig
-QUFyY2gzMiBWRlAgZGVjb2RldHJlZQo3Yjc1ZTEyNTI4IGRlY29kZXRyZWU6IEZpeCBjb21wYXJp
-c29uIG9mIEZpZWxkCjBjMmIzYWY4MzggdGFyZ2V0L2FybTogRml4IG91dHB1dCBvZiBQQXV0aCBB
-dXRoCmY5NTBmZDA3ZTEgaHcvY29yZS9idXMuYzogT25seSB0aGUgbWFpbiBzeXN0ZW0gYnVzIGNh
-biBoYXZlIG5vIHBhcmVudAo2MGM3MTM2NTBhIGh3L2FybS9zbW11djM6IEZpeCBkZWNvZGluZyBv
-ZiBJRCByZWdpc3RlciByYW5nZQpiMDY2NmY5YmU4IHRhcmdldC9hcm06IEltcGxlbWVudCBOU0FD
-UiBnYXRpbmcgb2YgZmxvYXRpbmcgcG9pbnQKNTVlNjE0NWU0ZCB0YXJnZXQvYXJtOiBVc2UgdGNn
-X2dlbl9ndmVjX2JpdHNlbAo5NGI5ZDEwZmRhIHRhcmdldC9hcm06IFZlY3Rvcml6ZSBVU0hMIGFu
-ZCBTU0hMCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzQ4IENoZWNraW5nIGNvbW1pdCA5NGI5ZDEw
-ZmRhZmQgKHRhcmdldC9hcm06IFZlY3Rvcml6ZSBVU0hMIGFuZCBTU0hMKQpFUlJPUjogdHJhaWxp
-bmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24gbmV4dCBsaW5lCiMxNjM6IEZJTEU6IHRhcmdldC9h
-cm0vdHJhbnNsYXRlLmM6NTM3NzoKKyAgICAgICAgICAgIGNhc2UgMjogZ2VuX3VzaGxfaTMyKHZh
-ciwgdmFyLCBzaGlmdCk7IGJyZWFrOwoKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxk
-IGJlIG9uIG5leHQgbGluZQojMTcwOiBGSUxFOiB0YXJnZXQvYXJtL3RyYW5zbGF0ZS5jOjUzODM6
-CisgICAgICAgICAgICBjYXNlIDI6IGdlbl9zc2hsX2kzMih2YXIsIHZhciwgc2hpZnQpOyBicmVh
-azsKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgNTcwIGxpbmVzIGNoZWNrZWQKClBhdGNo
-IDEvNDggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjIvNDggQ2hlY2tpbmcgY29tbWl0IDU1
-ZTYxNDVlNGRhMyAodGFyZ2V0L2FybTogVXNlIHRjZ19nZW5fZ3ZlY19iaXRzZWwpCjMvNDggQ2hl
-Y2tpbmcgY29tbWl0IGIwNjY2ZjliZTg0MCAodGFyZ2V0L2FybTogSW1wbGVtZW50IE5TQUNSIGdh
-dGluZyBvZiBmbG9hdGluZyBwb2ludCkKNC80OCBDaGVja2luZyBjb21taXQgNjBjNzEzNjUwYTQ3
-IChody9hcm0vc21tdXYzOiBGaXggZGVjb2Rpbmcgb2YgSUQgcmVnaXN0ZXIgcmFuZ2UpCjUvNDgg
-Q2hlY2tpbmcgY29tbWl0IGY5NTBmZDA3ZTFhNiAoaHcvY29yZS9idXMuYzogT25seSB0aGUgbWFp
-biBzeXN0ZW0gYnVzIGNhbiBoYXZlIG5vIHBhcmVudCkKNi80OCBDaGVja2luZyBjb21taXQgMGMy
-YjNhZjgzODFlICh0YXJnZXQvYXJtOiBGaXggb3V0cHV0IG9mIFBBdXRoIEF1dGgpCldBUk5JTkc6
-IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1
-cGRhdGluZz8KIzQ5OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3
-YXJuaW5ncywgODAgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNi80OCBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgo3LzQ4IENoZWNraW5nIGNvbW1pdCA3Yjc1ZTEyNTI4YmEgKGRlY29kZXRyZWU6IEZp
-eCBjb21wYXJpc29uIG9mIEZpZWxkKQo4LzQ4IENoZWNraW5nIGNvbW1pdCA1MDg2OWQ1MzJmM2Yg
-KHRhcmdldC9hcm06IEFkZCBzdHVicyBmb3IgQUFyY2gzMiBWRlAgZGVjb2RldHJlZSkKV0FSTklO
-RzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVk
-IHVwZGF0aW5nPwojNTE6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAx
-IHdhcm5pbmdzLCAxMzYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC80OCBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgo5LzQ4IENoZWNraW5nIGNvbW1pdCAzYzRhYmQ2OGRkZDUgKHRhcmdldC9hcm06
-IEZhY3RvciBvdXQgVkZQIGFjY2VzcyBjaGVja2luZyBjb2RlKQoxMC80OCBDaGVja2luZyBjb21t
-aXQgMzM3OWY4NDc0ZDFiICh0YXJnZXQvYXJtOiBGaXggQ29ydGV4LVI1RiBNVkZSIHZhbHVlcykK
-MTEvNDggQ2hlY2tpbmcgY29tbWl0IDM3NDc3NDY4YzVkYiAodGFyZ2V0L2FybTogRXhwbGljaXRs
-eSBlbmFibGUgVkZQIHNob3J0LXZlY3RvcnMgZm9yIGFhcmNoMzIgLWNwdSBtYXgpCjEyLzQ4IENo
-ZWNraW5nIGNvbW1pdCA2ZWQ5NjNkNmI0YzkgKHRhcmdldC9hcm06IENvbnZlcnQgdGhlIFZTRUwg
-aW5zdHJ1Y3Rpb25zIHRvIGRlY29kZXRyZWUpCjEzLzQ4IENoZWNraW5nIGNvbW1pdCBjY2I0ZDdi
-OTU0ODMgKHRhcmdldC9hcm06IENvbnZlcnQgVk1JTk5NLCBWTUFYTk0gdG8gZGVjb2RldHJlZSkK
-MTQvNDggQ2hlY2tpbmcgY29tbWl0IDAzYTU5Y2Q3NGIxYyAodGFyZ2V0L2FybTogQ29udmVydCBW
-UklOVEEvVlJJTlROL1ZSSU5UUC9WUklOVE0gdG8gZGVjb2RldHJlZSkKMTUvNDggQ2hlY2tpbmcg
-Y29tbWl0IDUyYzM0N2FlNzdhYSAodGFyZ2V0L2FybTogQ29udmVydCBWQ1ZUQS9WQ1ZUTi9WQ1ZU
-UC9WQ1ZUTSB0byBkZWNvZGV0cmVlKQoxNi80OCBDaGVja2luZyBjb21taXQgNDFmNjdkMzBkYTE1
-ICh0YXJnZXQvYXJtOiBNb3ZlIHRoZSBWRlAgdHJhbnNfKiBmdW5jdGlvbnMgdG8gdHJhbnNsYXRl
-LXZmcC5pbmMuYykKMTcvNDggQ2hlY2tpbmcgY29tbWl0IDUzMzQ1MjllNmRhOCAodGFyZ2V0L2Fy
-bTogQWRkIGhlbHBlcnMgZm9yIFZGUCByZWdpc3RlciBsb2FkcyBhbmQgc3RvcmVzKQoxOC80OCBD
-aGVja2luZyBjb21taXQgODA2NGJmZTFkNWI2ICh0YXJnZXQvYXJtOiBDb252ZXJ0ICJkb3VibGUt
-cHJlY2lzaW9uIiByZWdpc3RlciBtb3ZlcyB0byBkZWNvZGV0cmVlKQoxOS80OCBDaGVja2luZyBj
-b21taXQgZTM2ZjhiYzBjMTNhICh0YXJnZXQvYXJtOiBDb252ZXJ0ICJzaW5nbGUtcHJlY2lzaW9u
-IiByZWdpc3RlciBtb3ZlcyB0byBkZWNvZGV0cmVlKQoyMC80OCBDaGVja2luZyBjb21taXQgZTAw
-NjhjZTk1MDFhICh0YXJnZXQvYXJtOiBDb252ZXJ0IFZGUCB0d28tcmVnaXN0ZXIgdHJhbnNmZXIg
-aW5zbnMgdG8gZGVjb2RldHJlZSkKMjEvNDggQ2hlY2tpbmcgY29tbWl0IGYyOWEzMmQwZmYzZiAo
-dGFyZ2V0L2FybTogQ29udmVydCBWRlAgVkxEUiBhbmQgVlNUUiB0byBkZWNvZGV0cmVlKQoyMi80
-OCBDaGVja2luZyBjb21taXQgMzkzNjFkZDU2NTNkICh0YXJnZXQvYXJtOiBDb252ZXJ0IHRoZSBW
-RlAgbG9hZC9zdG9yZSBtdWx0aXBsZSBpbnNucyB0byBkZWNvZGV0cmVlKQoyMy80OCBDaGVja2lu
-ZyBjb21taXQgMDIzNWUzYzMxOTNjICh0YXJnZXQvYXJtOiBSZW1vdmUgVkxEUi9WU1RSL1ZMRE0v
-VlNUTSB1c2Ugb2YgY3B1X0YwcyBhbmQgY3B1X0YwZCkKMjQvNDggQ2hlY2tpbmcgY29tbWl0IGRi
-ZjljNjYzYmU3NCAodGFyZ2V0L2FybTogQ29udmVydCBWRlAgVk1MQSB0byBkZWNvZGV0cmVlKQoy
-NS80OCBDaGVja2luZyBjb21taXQgMjc5NGZkMDFhNjhhICh0YXJnZXQvYXJtOiBDb252ZXJ0IFZG
-UCBWTUxTIHRvIGRlY29kZXRyZWUpCjI2LzQ4IENoZWNraW5nIGNvbW1pdCBjNDgzZjUzNGNkZDMg
-KHRhcmdldC9hcm06IENvbnZlcnQgVkZQIFZOTUxTIHRvIGRlY29kZXRyZWUpCjI3LzQ4IENoZWNr
-aW5nIGNvbW1pdCBhNDAwOTY5ODUyOGYgKHRhcmdldC9hcm06IENvbnZlcnQgVkZQIFZOTUxBIHRv
-IGRlY29kZXRyZWUpCjI4LzQ4IENoZWNraW5nIGNvbW1pdCAxZjFiNGQ5OTVmZjUgKHRhcmdldC9h
-cm06IENvbnZlcnQgVk1VTCB0byBkZWNvZGV0cmVlKQoyOS80OCBDaGVja2luZyBjb21taXQgNDQx
-OWU1MTVjYTkxICh0YXJnZXQvYXJtOiBDb252ZXJ0IFZOTVVMIHRvIGRlY29kZXRyZWUpCjMwLzQ4
-IENoZWNraW5nIGNvbW1pdCBjYzFlZTgyMWIxZTAgKHRhcmdldC9hcm06IENvbnZlcnQgVkFERCB0
-byBkZWNvZGV0cmVlKQozMS80OCBDaGVja2luZyBjb21taXQgMjRjM2E4YWE3ZTNmICh0YXJnZXQv
-YXJtOiBDb252ZXJ0IFZTVUIgdG8gZGVjb2RldHJlZSkKMzIvNDggQ2hlY2tpbmcgY29tbWl0IGU2
-ZDE0YTEzODlhZiAodGFyZ2V0L2FybTogQ29udmVydCBWRElWIHRvIGRlY29kZXRyZWUpCjMzLzQ4
-IENoZWNraW5nIGNvbW1pdCAzYjZjMmZkYjcwMjYgKHRhcmdldC9hcm06IENvbnZlcnQgVkZQIGZ1
-c2VkIG11bHRpcGx5LWFkZCBpbnNucyB0byBkZWNvZGV0cmVlKQozNC80OCBDaGVja2luZyBjb21t
-aXQgNjI3NTg0Njk5YTQ3ICh0YXJnZXQvYXJtOiBDb252ZXJ0IFZNT1YgKGltbSkgdG8gZGVjb2Rl
-dHJlZSkKMzUvNDggQ2hlY2tpbmcgY29tbWl0IGI4NjFkNGY2ZmE1MiAodGFyZ2V0L2FybTogQ29u
-dmVydCBWQUJTIHRvIGRlY29kZXRyZWUpCjM2LzQ4IENoZWNraW5nIGNvbW1pdCA2ZDQ3MDVjOTMw
-ZmMgKHRhcmdldC9hcm06IENvbnZlcnQgVk5FRyB0byBkZWNvZGV0cmVlKQozNy80OCBDaGVja2lu
-ZyBjb21taXQgODlhNThkMTIyZDY4ICh0YXJnZXQvYXJtOiBDb252ZXJ0IFZTUVJUIHRvIGRlY29k
-ZXRyZWUpCjM4LzQ4IENoZWNraW5nIGNvbW1pdCA5NWMwZDFhMjAzZDAgKHRhcmdldC9hcm06IENv
-bnZlcnQgVk1PViAocmVnaXN0ZXIpIHRvIGRlY29kZXRyZWUpCjM5LzQ4IENoZWNraW5nIGNvbW1p
-dCAxMTdmNTcyNGQ2M2UgKHRhcmdldC9hcm06IENvbnZlcnQgVkZQIGNvbXBhcmlzb24gaW5zbnMg
-dG8gZGVjb2RldHJlZSkKNDAvNDggQ2hlY2tpbmcgY29tbWl0IDBjMjQwODg0NDM4MCAodGFyZ2V0
-L2FybTogQ29udmVydCB0aGUgVkNWVC1mcm9tLWYxNiBpbnNucyB0byBkZWNvZGV0cmVlKQo0MS80
-OCBDaGVja2luZyBjb21taXQgZjBhNWU3NDIxMTI1ICh0YXJnZXQvYXJtOiBDb252ZXJ0IHRoZSBW
-Q1ZULXRvLWYxNiBpbnNucyB0byBkZWNvZGV0cmVlKQo0Mi80OCBDaGVja2luZyBjb21taXQgMmNh
-YThlZmIxODRkICh0YXJnZXQvYXJtOiBDb252ZXJ0IFZGUCByb3VuZCBpbnNucyB0byBkZWNvZGV0
-cmVlKQo0My80OCBDaGVja2luZyBjb21taXQgNTU1ODA2NTMyZjg4ICh0YXJnZXQvYXJtOiBDb252
-ZXJ0IGRvdWJsZS1zaW5nbGUgcHJlY2lzaW9uIGNvbnZlcnNpb24gaW5zbnMgdG8gZGVjb2RldHJl
-ZSkKNDQvNDggQ2hlY2tpbmcgY29tbWl0IDFiZmYxYjQyYzU1MiAodGFyZ2V0L2FybTogQ29udmVy
-dCBpbnRlZ2VyLXRvLWZsb2F0IGluc25zIHRvIGRlY29kZXRyZWUpCjQ1LzQ4IENoZWNraW5nIGNv
-bW1pdCAzYjVmMjM1MzQ2YjQgKHRhcmdldC9hcm06IENvbnZlcnQgVkpDVlQgdG8gZGVjb2RldHJl
-ZSkKNDYvNDggQ2hlY2tpbmcgY29tbWl0IGMzN2NhMmYzYmZiYyAodGFyZ2V0L2FybTogQ29udmVy
-dCBWQ1ZUIGZwL2ZpeGVkLXBvaW50IGNvbnZlcnNpb24gaW5zbnMgdG8gZGVjb2RldHJlZSkKNDcv
-NDggQ2hlY2tpbmcgY29tbWl0IGNlMjI4NTMwNzc4MCAodGFyZ2V0L2FybTogQ29udmVydCBmbG9h
-dC10by1pbnRlZ2VyIFZDVlQgaW5zbnMgdG8gZGVjb2RldHJlZSkKNDgvNDggQ2hlY2tpbmcgY29t
-bWl0IDkyNmU2MzA3NzZlZSAodGFyZ2V0L2FybTogRml4IHNob3J0LXZlY3RvciBpbmNyZW1lbnQg
-YmVoYXZpb3VyKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBj
-b2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcv
-bG9ncy8yMDE5MDYxMzEyMTQzMy41MjQ2LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnL3Rlc3Rp
-bmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
-IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> Allow VFP and neon to be disabled via a CPU property. As with
+> the "pmu" property, we only allow these features to be removed
+> from CPUs which have it by default, not added to CPUs which
+> don't have it.
+>
+> The primary motivation here is to be able to optionally
+> create Cortex-M33 CPUs with no FPU, but we provide switches
+> for both VFP and Neon because the two interact:
+>  * AArch64 can't have one without the other
+>  * Some ID register fields only change if both are disabled
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  target/arm/cpu.h |   4 ++
+>  target/arm/cpu.c | 150 +++++++++++++++++++++++++++++++++++++++++++++--
+>  2 files changed, 148 insertions(+), 6 deletions(-)
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 733b840a712..778fb293e7c 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -797,6 +797,10 @@ struct ARMCPU {
+>      bool has_el3;
+>      /* CPU has PMU (Performance Monitor Unit) */
+>      bool has_pmu;
+> +    /* CPU has VFP */
+> +    bool has_vfp;
+> +    /* CPU has Neon */
+> +    bool has_neon;
+>
+>      /* CPU has memory protection unit */
+>      bool has_mpu;
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 8eee1d8c59a..406fd360a2a 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -763,6 +763,12 @@ static Property arm_cpu_cfgend_property =3D
+>  static Property arm_cpu_has_pmu_property =3D
+>              DEFINE_PROP_BOOL("pmu", ARMCPU, has_pmu, true);
+>
+> +static Property arm_cpu_has_vfp_property =3D
+> +            DEFINE_PROP_BOOL("vfp", ARMCPU, has_vfp, true);
+> +
+> +static Property arm_cpu_has_neon_property =3D
+> +            DEFINE_PROP_BOOL("neon", ARMCPU, has_neon, true);
+> +
+>  static Property arm_cpu_has_mpu_property =3D
+>              DEFINE_PROP_BOOL("has-mpu", ARMCPU, has_mpu, true);
+>
+> @@ -803,6 +809,13 @@ void arm_cpu_post_init(Object *obj)
+>      if (arm_feature(&cpu->env, ARM_FEATURE_M)) {
+>          set_feature(&cpu->env, ARM_FEATURE_PMSA);
+>      }
+> +    /* Similarly for the VFP feature bits */
+> +    if (arm_feature(&cpu->env, ARM_FEATURE_VFP4)) {
+> +        set_feature(&cpu->env, ARM_FEATURE_VFP3);
+> +    }
+> +    if (arm_feature(&cpu->env, ARM_FEATURE_VFP3)) {
+> +        set_feature(&cpu->env, ARM_FEATURE_VFP);
+> +    }
+>
+>      if (arm_feature(&cpu->env, ARM_FEATURE_CBAR) ||
+>          arm_feature(&cpu->env, ARM_FEATURE_CBAR_RO)) {
+> @@ -847,6 +860,27 @@ void arm_cpu_post_init(Object *obj)
+>                                   &error_abort);
+>      }
+>
+> +    /*
+> +     * Allow user to turn off VFP and Neon support, but only for TCG --
+> +     * KVM does not currently allow us to lie to the guest about its
+> +     * ID/feature registers, so the guest always sees what the host has.
+> +     */
+> +    if (arm_feature(&cpu->env, ARM_FEATURE_VFP)) {
+> +        cpu->has_vfp =3D true;
+> +        if (!kvm_enabled()) {
+> +            qdev_property_add_static(DEVICE(obj), &arm_cpu_has_vfp_prope=
+rty,
+> +                                     &error_abort);
+> +        }
+> +    }
+> +
+> +    if (arm_feature(&cpu->env, ARM_FEATURE_NEON)) {
+> +        cpu->has_neon =3D true;
+> +        if (!kvm_enabled()) {
+> +            qdev_property_add_static(DEVICE(obj), &arm_cpu_has_neon_prop=
+erty,
+> +                                     &error_abort);
+> +        }
+> +    }
+> +
+>      if (arm_feature(&cpu->env, ARM_FEATURE_PMSA)) {
+>          qdev_property_add_static(DEVICE(obj), &arm_cpu_has_mpu_property,
+>                                   &error_abort);
+> @@ -956,6 +990,116 @@ static void arm_cpu_realizefn(DeviceState *dev, Err=
+or **errp)
+>          return;
+>      }
+>
+> +    if (arm_feature(env, ARM_FEATURE_AARCH64) &&
+> +        cpu->has_vfp !=3D cpu->has_neon) {
+> +        /*
+> +         * This is an architectural requirement for AArch64; AArch32 is
+> +         * more flexible and permits VFP-no-Neon and Neon-no-VFP.
+> +         */
+> +        error_setg(errp,
+> +                   "AArch64 CPUs must have both VFP and Neon or neither"=
+);
+> +        return;
+> +    }
+> +
+> +    if (!cpu->has_vfp) {
+> +        uint64_t t;
+> +        uint32_t u;
+> +
+> +        unset_feature(env, ARM_FEATURE_VFP);
+> +        unset_feature(env, ARM_FEATURE_VFP3);
+> +        unset_feature(env, ARM_FEATURE_VFP4);
+> +
+> +        t =3D cpu->isar.id_aa64isar1;
+> +        t =3D FIELD_DP64(t, ID_AA64ISAR1, JSCVT, 0);
+> +        cpu->isar.id_aa64isar1 =3D t;
+> +
+> +        t =3D cpu->isar.id_aa64pfr0;
+> +        t =3D FIELD_DP64(t, ID_AA64PFR0, FP, 0xf);
+> +        cpu->isar.id_aa64pfr0 =3D t;
+> +
+> +        u =3D cpu->isar.id_isar6;
+> +        u =3D FIELD_DP32(u, ID_ISAR6, JSCVT, 0);
+> +        cpu->isar.id_isar6 =3D u;
+> +
+> +        u =3D cpu->isar.mvfr0;
+> +        u =3D FIELD_DP32(u, MVFR0, FPSP, 0);
+> +        u =3D FIELD_DP32(u, MVFR0, FPDP, 0);
+> +        u =3D FIELD_DP32(u, MVFR0, FPTRAP, 0);
+> +        u =3D FIELD_DP32(u, MVFR0, FPDIVIDE, 0);
+> +        u =3D FIELD_DP32(u, MVFR0, FPSQRT, 0);
+> +        u =3D FIELD_DP32(u, MVFR0, FPSHVEC, 0);
+> +        u =3D FIELD_DP32(u, MVFR0, FPROUND, 0);
+> +        cpu->isar.mvfr0 =3D u;
+> +
+> +        u =3D cpu->isar.mvfr1;
+> +        u =3D FIELD_DP32(u, MVFR1, FPFTZ, 0);
+> +        u =3D FIELD_DP32(u, MVFR1, FPDNAN, 0);
+> +        u =3D FIELD_DP32(u, MVFR1, FPHP, 0);
+> +        cpu->isar.mvfr1 =3D u;
+> +
+> +        u =3D cpu->isar.mvfr2;
+> +        u =3D FIELD_DP32(u, MVFR2, FPMISC, 0);
+> +        cpu->isar.mvfr2 =3D u;
+> +    }
+> +
+> +    if (!cpu->has_neon) {
+> +        uint64_t t;
+> +        uint32_t u;
+> +
+> +        unset_feature(env, ARM_FEATURE_NEON);
+> +
+> +        t =3D cpu->isar.id_aa64isar0;
+> +        t =3D FIELD_DP64(t, ID_AA64ISAR0, DP, 0);
+> +        cpu->isar.id_aa64isar0 =3D t;
+> +
+> +        t =3D cpu->isar.id_aa64isar1;
+> +        t =3D FIELD_DP64(t, ID_AA64ISAR1, FCMA, 0);
+> +        cpu->isar.id_aa64isar1 =3D t;
+> +
+> +        t =3D cpu->isar.id_aa64pfr0;
+> +        t =3D FIELD_DP64(t, ID_AA64PFR0, ADVSIMD, 0xf);
+> +        cpu->isar.id_aa64pfr0 =3D t;
+> +
+> +        u =3D cpu->isar.id_isar5;
+> +        u =3D FIELD_DP32(u, ID_ISAR5, RDM, 0);
+> +        u =3D FIELD_DP32(u, ID_ISAR5, VCMA, 0);
+> +        cpu->isar.id_isar5 =3D u;
+> +
+> +        u =3D cpu->isar.id_isar6;
+> +        u =3D FIELD_DP32(u, ID_ISAR6, DP, 0);
+> +        u =3D FIELD_DP32(u, ID_ISAR6, FHM, 0);
+> +        cpu->isar.id_isar6 =3D u;
+> +
+> +        u =3D cpu->isar.mvfr1;
+> +        u =3D FIELD_DP32(u, MVFR1, SIMDLS, 0);
+> +        u =3D FIELD_DP32(u, MVFR1, SIMDINT, 0);
+> +        u =3D FIELD_DP32(u, MVFR1, SIMDSP, 0);
+> +        u =3D FIELD_DP32(u, MVFR1, SIMDHP, 0);
+> +        u =3D FIELD_DP32(u, MVFR1, SIMDFMAC, 0);
+> +        cpu->isar.mvfr1 =3D u;
+> +
+> +        u =3D cpu->isar.mvfr2;
+> +        u =3D FIELD_DP32(u, MVFR2, SIMDMISC, 0);
+> +        cpu->isar.mvfr2 =3D u;
+> +    }
+> +
+> +    if (!cpu->has_neon && !cpu->has_vfp) {
+> +        uint64_t t;
+> +        uint32_t u;
+> +
+> +        t =3D cpu->isar.id_aa64isar0;
+> +        t =3D FIELD_DP64(t, ID_AA64ISAR0, FHM, 0);
+> +        cpu->isar.id_aa64isar0 =3D t;
+> +
+> +        t =3D cpu->isar.id_aa64isar1;
+> +        t =3D FIELD_DP64(t, ID_AA64ISAR1, FRINTTS, 0);
+> +        cpu->isar.id_aa64isar1 =3D t;
+> +
+> +        u =3D cpu->isar.mvfr0;
+> +        u =3D FIELD_DP32(u, MVFR0, SIMDREG, 0);
+> +        cpu->isar.mvfr0 =3D u;
+> +    }
+> +
+>      /* Some features automatically imply others: */
+>      if (arm_feature(env, ARM_FEATURE_V8)) {
+>          if (arm_feature(env, ARM_FEATURE_M)) {
+> @@ -1016,12 +1160,6 @@ static void arm_cpu_realizefn(DeviceState *dev, Er=
+ror **errp)
+>      if (arm_feature(env, ARM_FEATURE_V5)) {
+>          set_feature(env, ARM_FEATURE_V4T);
+>      }
+> -    if (arm_feature(env, ARM_FEATURE_VFP4)) {
+> -        set_feature(env, ARM_FEATURE_VFP3);
+> -    }
+> -    if (arm_feature(env, ARM_FEATURE_VFP3)) {
+> -        set_feature(env, ARM_FEATURE_VFP);
+> -    }
+>      if (arm_feature(env, ARM_FEATURE_LPAE)) {
+>          set_feature(env, ARM_FEATURE_V7MP);
+>          set_feature(env, ARM_FEATURE_PXN);
+
+
+--
+Alex Benn=C3=A9e
 
