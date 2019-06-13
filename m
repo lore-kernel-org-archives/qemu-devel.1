@@ -7,73 +7,72 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92CE2C31E4A
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 12:42:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2BDBC31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 12:43:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56E8621773
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 12:42:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7FD5C2147A
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 12:43:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n8DqNydj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56E8621773
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YJkouCQa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FD5C2147A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39456 helo=lists.gnu.org)
+Received: from localhost ([::1]:39460 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbP3k-0007U4-Lp
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 08:42:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58966)
+	id 1hbP4b-0008PP-Qk
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 08:43:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58961)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hbOdH-0007xz-ID
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:15:10 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hbOdH-0007xu-Gl
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:15:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hbOdE-0004Hh-UH
+ (envelope-from <peter.maydell@linaro.org>) id 1hbOdE-0004HY-T6
  for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:15:07 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:32988)
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:34055)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hbOdA-00049C-41
+ id 1hbOdA-0004Ai-4D
  for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:15:02 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id n9so20573060wru.0
- for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 05:14:56 -0700 (PDT)
+Received: by mail-wm1-x32b.google.com with SMTP id w9so6495644wmd.1
+ for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 05:14:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=Wun7v8ziEJU7Y16HcNfdAppp3ATFiw3GSpGschvFs5g=;
- b=n8DqNydjY4dkxEp2lOwg3CURchNCowlqsViLoXYOqYa8yp0nS+CZFNUnw8o4NEAom3
- /DYQ6xG3Dlx3SeCp2RBWAhBNr5E7oTvL9eEemm9INH+0KlPqniVD4mTe8G/ZQu4MZ0yD
- o5llUhkhsUFmd+a6e8+lzyr+8oYc0m7kF107EmtKHyeq/sn+M3eiLdSpWULKLrEkpPa/
- AVXWbNs6N8oROtsOecmsOyn74nX7b8iq8OgEpP0FkjGg9YccEuJIy8xizFRbNv32n1zZ
- oXDtlZQOlPBIYmkNwwR+HN6741eGWxE3FgXC/7YfQIHBsvRttiO2a8pthsc5R3MnfuPm
- iA3w==
+ bh=4+VW3JoxXuJ1NoxNJ7ljWo6K8LodZM2jZoja5e7yMec=;
+ b=YJkouCQaIiZbZia6XQdveXD5o/cvCdlZKocXJQW4D6vfBwYf8rS3hMlgrzKyS9PfPo
+ Ksc5cN1wKGpBpP8bBMnMgagUrdBVUfsANwkNKE1KOH5y2wIUd8+wRiUey/Hl0ku91EDR
+ WhboPCAs9ABWfR7IYr3vx+KrUCYoiUh87Xr8jXhld0BrcbZbenxt+Q3NjGlJ9wrW7RhJ
+ 39TQhS1R9CmNfkZPvqFjGDXDaAbHjyBKuFZ5fZGVHvpQyU0MbNDEiz/FyV8WFzC7A8R3
+ HYlchRFxe3LJ9l3wHgp4Johcrqv51xs/vi5kifiVdR1AagKF1CeBlA+Wxmu4d/2OrFdf
+ SRIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Wun7v8ziEJU7Y16HcNfdAppp3ATFiw3GSpGschvFs5g=;
- b=P6hS6lDy0sah4sK1SFIhRQRKQMMxqU/5MVJX/D/PSKbE5neo/696x0clXlh0gLym7V
- NRIEYgfpof9rU8TiAZUr8WzFs0GufY4nvFivd91Tu9PdbxLihERY/hfptqSftw1H//os
- wLD+rCEIbUqRy3m9O7ROR+0FmcjmHkub8AXpGW2BC+T4IUDTBNMu0IWoxWNhwAWsix7R
- HxwRRomn9F25AFjkqF9DB3thMpPP8M23BnQHRV3tn3DiKnbAkp+EcetQxGJ6IVGEfXY/
- aN4my705RqgO44dxH8iNcmDPrTR9+fxRy0QEvHwJi4Pwmt7WBrlOSy3GT0euORo9b2iv
- yYZw==
-X-Gm-Message-State: APjAAAX+1ufexl3KXM4djy1o+7pkyBJ7gig3Vc7bKRYxeaHYvAtM3oAv
- aBVF5IdAFWSrLkc5quBa56mMq8P15PZERA==
-X-Google-Smtp-Source: APXvYqyXUzzPSIQCkB1dnLQ83s9uSh3+J8DD+ZpbdkwcOsZRQLrCRJWNA9iKcwuzBkl7EpXPkzwyQQ==
-X-Received: by 2002:a05:6000:104e:: with SMTP id
- c14mr8698133wrx.71.1560428095153; 
- Thu, 13 Jun 2019 05:14:55 -0700 (PDT)
+ bh=4+VW3JoxXuJ1NoxNJ7ljWo6K8LodZM2jZoja5e7yMec=;
+ b=m8gSbn682ituhcYCQVzKEOzQSm+5spYeBFxM08ayI+LwtHwrNHUxhJ8H5lSMDply5H
+ pq/N5FBzWXs1ecPa49N3oK71K9c4EjsbYY8lMJ+uazkjhM5TjKzVyQ5gtiIJ2RX0d4on
+ K0Jh+6Pn7/wVf0+pK9h/7gsAXPWj6ORj8DotN7WI0q5yjPLq4R4JgXbSA5pZc27NLy7S
+ Vb/ePh1iOzKGVB/meHgiNCnGhz6ft7gi6c54MFOR/0XC1WFlci0i1RCnpbLNPNWI2x0Z
+ pOu1PwANvH04q8vUYthFAuqInra5EU4FiujHHoyY0G4V/Zp+GWCIV7Z9htlBagfWFvpA
+ mZOQ==
+X-Gm-Message-State: APjAAAWDDfptyEnaQ9Oy3TyNkdxZI9AwznCg07lkeg8nyuXxhCEDftM5
+ af/YecrdPS/O8r1/brIZPMJhI8RE+qaR2w==
+X-Google-Smtp-Source: APXvYqzT304f7l8U5ITWIxDyZt3MlUPtrT0riKemngfrv4Zv7G3HUeCx677fn3P6/pma/9V5vLhH6g==
+X-Received: by 2002:a1c:4484:: with SMTP id r126mr3672362wma.27.1560428097741; 
+ Thu, 13 Jun 2019 05:14:57 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id y6sm2010576wrp.12.2019.06.13.05.14.54
+ by smtp.gmail.com with ESMTPSA id y6sm2010576wrp.12.2019.06.13.05.14.56
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 13 Jun 2019 05:14:54 -0700 (PDT)
+ Thu, 13 Jun 2019 05:14:56 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu, 13 Jun 2019 13:14:03 +0100
-Message-Id: <20190613121433.5246-19-peter.maydell@linaro.org>
+Date: Thu, 13 Jun 2019 13:14:05 +0100
+Message-Id: <20190613121433.5246-21-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190613121433.5246-1-peter.maydell@linaro.org>
 References: <20190613121433.5246-1-peter.maydell@linaro.org>
@@ -81,9 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42e
-Subject: [Qemu-devel] [PULL 18/48] target/arm: Convert "double-precision"
- register moves to decodetree
+X-Received-From: 2a00:1450:4864:20::32b
+Subject: [Qemu-devel] [PULL 20/48] target/arm: Convert VFP two-register
+ transfer insns to decodetree
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,323 +98,169 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the "double-precision" register moves to decodetree:
-this covers VMOV scalar-to-gpreg, VMOV gpreg-to-scalar and VDUP.
+Convert the VFP two-register transfer instructions to decodetree
+(in the v8 Arm ARM these are the "Advanced SIMD and floating-point
+64-bit move" encoding group).
 
-Note that the conversion process has tightened up a few of the
-UNDEF encoding checks: we now correctly forbid:
- * VMOV-to-gpr with U:opc1:opc2 == 10x00 or x0x10
- * VMOV-from-gpr with opc1:opc2 == 0x10
- * VDUP with B:E == 11
- * VDUP with Q == 1 and Vn<0> == 1
+Again, we expand out the sequences involving gen_vfp_msr() and
+gen_msr_vfp().
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-The accesses of elements < 32 bits could be improved by doing
-direct ld/st of the right size rather than 32-bit read-and-shift
-or read-modify-write, but we leave this for later cleanup,
-since this series is generally trying to stick to fixing
-the decode.
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-vfp.inc.c | 147 +++++++++++++++++++++++++++++++++
- target/arm/translate.c         |  83 +------------------
- target/arm/vfp.decode          |  36 ++++++++
- 3 files changed, 185 insertions(+), 81 deletions(-)
+ target/arm/translate-vfp.inc.c | 70 ++++++++++++++++++++++++++++++++++
+ target/arm/translate.c         | 46 +---------------------
+ target/arm/vfp.decode          |  5 +++
+ 3 files changed, 77 insertions(+), 44 deletions(-)
 
 diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
-index 24358f3d3eb..8b0899fa05c 100644
+index 74c10f9024b..5f081221b83 100644
 --- a/target/arm/translate-vfp.inc.c
 +++ b/target/arm/translate-vfp.inc.c
-@@ -475,3 +475,150 @@ static bool trans_VCVT(DisasContext *s, arg_VCVT *a)
+@@ -783,3 +783,73 @@ static bool trans_VMOV_single(DisasContext *s, arg_VMOV_single *a)
  
      return true;
  }
 +
-+static bool trans_VMOV_to_gp(DisasContext *s, arg_VMOV_to_gp *a)
++static bool trans_VMOV_64_sp(DisasContext *s, arg_VMOV_64_sp *a)
 +{
-+    /* VMOV scalar to general purpose register */
 +    TCGv_i32 tmp;
-+    int pass;
-+    uint32_t offset;
 +
-+    /* UNDEF accesses to D16-D31 if they don't exist */
-+    if (!dc_isar_feature(aa32_fp_d32, s) && (a->vn & 0x10)) {
-+        return false;
-+    }
-+
-+    offset = a->index << a->size;
-+    pass = extract32(offset, 2, 1);
-+    offset = extract32(offset, 0, 2) * 8;
-+
-+    if (a->size != 2 && !arm_dc_feature(s, ARM_FEATURE_NEON)) {
-+        return false;
-+    }
-+
++    /*
++     * VMOV between two general-purpose registers and two single precision
++     * floating point registers
++     */
 +    if (!vfp_access_check(s)) {
 +        return true;
 +    }
 +
-+    tmp = neon_load_reg(a->vn, pass);
-+    switch (a->size) {
-+    case 0:
-+        if (offset) {
-+            tcg_gen_shri_i32(tmp, tmp, offset);
-+        }
-+        if (a->u) {
-+            gen_uxtb(tmp);
-+        } else {
-+            gen_sxtb(tmp);
-+        }
-+        break;
-+    case 1:
-+        if (a->u) {
-+            if (offset) {
-+                tcg_gen_shri_i32(tmp, tmp, 16);
-+            } else {
-+                gen_uxth(tmp);
-+            }
-+        } else {
-+            if (offset) {
-+                tcg_gen_sari_i32(tmp, tmp, 16);
-+            } else {
-+                gen_sxth(tmp);
-+            }
-+        }
-+        break;
-+    case 2:
-+        break;
-+    }
-+    store_reg(s, a->rt, tmp);
-+
-+    return true;
-+}
-+
-+static bool trans_VMOV_from_gp(DisasContext *s, arg_VMOV_from_gp *a)
-+{
-+    /* VMOV general purpose register to scalar */
-+    TCGv_i32 tmp, tmp2;
-+    int pass;
-+    uint32_t offset;
-+
-+    /* UNDEF accesses to D16-D31 if they don't exist */
-+    if (!dc_isar_feature(aa32_fp_d32, s) && (a->vn & 0x10)) {
-+        return false;
-+    }
-+
-+    offset = a->index << a->size;
-+    pass = extract32(offset, 2, 1);
-+    offset = extract32(offset, 0, 2) * 8;
-+
-+    if (a->size != 2 && !arm_dc_feature(s, ARM_FEATURE_NEON)) {
-+        return false;
-+    }
-+
-+    if (!vfp_access_check(s)) {
-+        return true;
-+    }
-+
-+    tmp = load_reg(s, a->rt);
-+    switch (a->size) {
-+    case 0:
-+        tmp2 = neon_load_reg(a->vn, pass);
-+        tcg_gen_deposit_i32(tmp, tmp2, tmp, offset, 8);
-+        tcg_temp_free_i32(tmp2);
-+        break;
-+    case 1:
-+        tmp2 = neon_load_reg(a->vn, pass);
-+        tcg_gen_deposit_i32(tmp, tmp2, tmp, offset, 16);
-+        tcg_temp_free_i32(tmp2);
-+        break;
-+    case 2:
-+        break;
-+    }
-+    neon_store_reg(a->vn, pass, tmp);
-+
-+    return true;
-+}
-+
-+static bool trans_VDUP(DisasContext *s, arg_VDUP *a)
-+{
-+    /* VDUP (general purpose register) */
-+    TCGv_i32 tmp;
-+    int size, vec_size;
-+
-+    if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
-+        return false;
-+    }
-+
-+    /* UNDEF accesses to D16-D31 if they don't exist */
-+    if (!dc_isar_feature(aa32_fp_d32, s) && (a->vn & 0x10)) {
-+        return false;
-+    }
-+
-+    if (a->b && a->e) {
-+        return false;
-+    }
-+
-+    if (a->q && (a->vn & 1)) {
-+        return false;
-+    }
-+
-+    vec_size = a->q ? 16 : 8;
-+    if (a->b) {
-+        size = 0;
-+    } else if (a->e) {
-+        size = 1;
++    if (a->op) {
++        /* fpreg to gpreg */
++        tmp = tcg_temp_new_i32();
++        neon_load_reg32(tmp, a->vm);
++        store_reg(s, a->rt, tmp);
++        tmp = tcg_temp_new_i32();
++        neon_load_reg32(tmp, a->vm + 1);
++        store_reg(s, a->rt2, tmp);
 +    } else {
-+        size = 2;
++        /* gpreg to fpreg */
++        tmp = load_reg(s, a->rt);
++        neon_store_reg32(tmp, a->vm);
++        tmp = load_reg(s, a->rt2);
++        neon_store_reg32(tmp, a->vm + 1);
++    }
++
++    return true;
++}
++
++static bool trans_VMOV_64_dp(DisasContext *s, arg_VMOV_64_sp *a)
++{
++    TCGv_i32 tmp;
++
++    /*
++     * VMOV between two general-purpose registers and one double precision
++     * floating point register
++     */
++
++    /* UNDEF accesses to D16-D31 if they don't exist */
++    if (!dc_isar_feature(aa32_fp_d32, s) && (a->vm & 0x10)) {
++        return false;
 +    }
 +
 +    if (!vfp_access_check(s)) {
 +        return true;
 +    }
 +
-+    tmp = load_reg(s, a->rt);
-+    tcg_gen_gvec_dup_i32(size, neon_reg_offset(a->vn, 0),
-+                         vec_size, vec_size, tmp);
-+    tcg_temp_free_i32(tmp);
++    if (a->op) {
++        /* fpreg to gpreg */
++        tmp = tcg_temp_new_i32();
++        neon_load_reg32(tmp, a->vm * 2);
++        store_reg(s, a->rt, tmp);
++        tmp = tcg_temp_new_i32();
++        neon_load_reg32(tmp, a->vm * 2 + 1);
++        store_reg(s, a->rt2, tmp);
++    } else {
++        /* gpreg to fpreg */
++        tmp = load_reg(s, a->rt);
++        neon_store_reg32(tmp, a->vm * 2);
++        tcg_temp_free_i32(tmp);
++        tmp = load_reg(s, a->rt2);
++        neon_store_reg32(tmp, a->vm * 2 + 1);
++        tcg_temp_free_i32(tmp);
++    }
 +
 +    return true;
 +}
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index bebd03f9da8..7e0771cd165 100644
+index 3982c870314..eb217af579a 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -3151,87 +3151,8 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-             /* single register transfer */
-             rd = (insn >> 12) & 0xf;
-             if (dp) {
--                int size;
--                int pass;
+@@ -3703,50 +3703,8 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+     case 0xc:
+     case 0xd:
+         if ((insn & 0x03e00000) == 0x00400000) {
+-            /* two-register transfer */
+-            rn = (insn >> 16) & 0xf;
+-            rd = (insn >> 12) & 0xf;
+-            if (dp) {
+-                VFP_DREG_M(rm, insn);
+-            } else {
+-                rm = VFP_SREG_M(insn);
+-            }
 -
--                VFP_DREG_N(rn, insn);
--                if (insn & 0xf)
--                    return 1;
--                if (insn & 0x00c00060
--                    && !arm_dc_feature(s, ARM_FEATURE_NEON)) {
--                    return 1;
--                }
--
--                pass = (insn >> 21) & 1;
--                if (insn & (1 << 22)) {
--                    size = 0;
--                    offset = ((insn >> 5) & 3) * 8;
--                } else if (insn & (1 << 5)) {
--                    size = 1;
--                    offset = (insn & (1 << 6)) ? 16 : 0;
--                } else {
--                    size = 2;
--                    offset = 0;
--                }
--                if (insn & ARM_CP_RW_BIT) {
--                    /* vfp->arm */
--                    tmp = neon_load_reg(rn, pass);
--                    switch (size) {
--                    case 0:
--                        if (offset)
--                            tcg_gen_shri_i32(tmp, tmp, offset);
--                        if (insn & (1 << 23))
--                            gen_uxtb(tmp);
--                        else
--                            gen_sxtb(tmp);
--                        break;
--                    case 1:
--                        if (insn & (1 << 23)) {
--                            if (offset) {
--                                tcg_gen_shri_i32(tmp, tmp, 16);
--                            } else {
--                                gen_uxth(tmp);
--                            }
--                        } else {
--                            if (offset) {
--                                tcg_gen_sari_i32(tmp, tmp, 16);
--                            } else {
--                                gen_sxth(tmp);
--                            }
--                        }
--                        break;
--                    case 2:
--                        break;
--                    }
+-            if (insn & ARM_CP_RW_BIT) {
+-                /* vfp->arm */
+-                if (dp) {
+-                    gen_mov_F0_vreg(0, rm * 2);
+-                    tmp = gen_vfp_mrs();
 -                    store_reg(s, rd, tmp);
+-                    gen_mov_F0_vreg(0, rm * 2 + 1);
+-                    tmp = gen_vfp_mrs();
+-                    store_reg(s, rn, tmp);
 -                } else {
--                    /* arm->vfp */
--                    tmp = load_reg(s, rd);
--                    if (insn & (1 << 23)) {
--                        /* VDUP */
--                        int vec_size = pass ? 16 : 8;
--                        tcg_gen_gvec_dup_i32(size, neon_reg_offset(rn, 0),
--                                             vec_size, vec_size, tmp);
--                        tcg_temp_free_i32(tmp);
--                    } else {
--                        /* VMOV */
--                        switch (size) {
--                        case 0:
--                            tmp2 = neon_load_reg(rn, pass);
--                            tcg_gen_deposit_i32(tmp, tmp2, tmp, offset, 8);
--                            tcg_temp_free_i32(tmp2);
--                            break;
--                        case 1:
--                            tmp2 = neon_load_reg(rn, pass);
--                            tcg_gen_deposit_i32(tmp, tmp2, tmp, offset, 16);
--                            tcg_temp_free_i32(tmp2);
--                            break;
--                        case 2:
--                            break;
--                        }
--                        neon_store_reg(rn, pass, tmp);
--                    }
+-                    gen_mov_F0_vreg(0, rm);
+-                    tmp = gen_vfp_mrs();
+-                    store_reg(s, rd, tmp);
+-                    gen_mov_F0_vreg(0, rm + 1);
+-                    tmp = gen_vfp_mrs();
+-                    store_reg(s, rn, tmp);
 -                }
-+                /* already handled by decodetree */
-+                return 1;
-             } else { /* !dp */
-                 bool is_sysreg;
- 
+-            } else {
+-                /* arm->vfp */
+-                if (dp) {
+-                    tmp = load_reg(s, rd);
+-                    gen_vfp_msr(tmp);
+-                    gen_mov_vreg_F0(0, rm * 2);
+-                    tmp = load_reg(s, rn);
+-                    gen_vfp_msr(tmp);
+-                    gen_mov_vreg_F0(0, rm * 2 + 1);
+-                } else {
+-                    tmp = load_reg(s, rd);
+-                    gen_vfp_msr(tmp);
+-                    gen_mov_vreg_F0(0, rm);
+-                    tmp = load_reg(s, rn);
+-                    gen_vfp_msr(tmp);
+-                    gen_mov_vreg_F0(0, rm + 1);
+-                }
+-            }
++            /* Already handled by decodetree */
++            return 1;
+         } else {
+             /* Load/store */
+             rn = (insn >> 16) & 0xf;
 diff --git a/target/arm/vfp.decode b/target/arm/vfp.decode
-index 28ee664d8c3..8286bdc0729 100644
+index bb7de403df3..134f1c9ef58 100644
 --- a/target/arm/vfp.decode
 +++ b/target/arm/vfp.decode
-@@ -26,3 +26,39 @@
- #  1110 1110 .... .... .... 101. .... ....
- # (but those patterns might also cover some Neon instructions,
- # which do not live in this file.)
+@@ -66,3 +66,8 @@ VDUP         ---- 1110 1 b:1 q:1 0 .... rt:4 1011 . 0 e:1 1 0000 \
+ VMSR_VMRS    ---- 1110 111 l:1 reg:4 rt:4 1010 0001 0000
+ VMOV_single  ---- 1110 000 l:1 .... rt:4 1010 . 001 0000 \
+              vn=%vn_sp
 +
-+# VFP registers have an odd encoding with a four-bit field
-+# and a one-bit field which are assembled in different orders
-+# depending on whether the register is double or single precision.
-+# Each individual instruction function must do the checks for
-+# "double register selected but CPU does not have double support"
-+# and "double register number has bit 4 set but CPU does not
-+# support D16-D31" (which should UNDEF).
-+%vm_dp  5:1 0:4
-+%vm_sp  0:4 5:1
-+%vn_dp  7:1 16:4
-+%vn_sp  16:4 7:1
-+%vd_dp  22:1 12:4
-+%vd_sp  12:4 22:1
-+
-+%vmov_idx_b     21:1 5:2
-+%vmov_idx_h     21:1 6:1
-+
-+# VMOV scalar to general-purpose register; note that this does
-+# include some Neon cases.
-+VMOV_to_gp   ---- 1110 u:1 1.        1 .... rt:4 1011 ... 1 0000 \
-+             vn=%vn_dp size=0 index=%vmov_idx_b
-+VMOV_to_gp   ---- 1110 u:1 0.        1 .... rt:4 1011 ..1 1 0000 \
-+             vn=%vn_dp size=1 index=%vmov_idx_h
-+VMOV_to_gp   ---- 1110 0   0 index:1 1 .... rt:4 1011 .00 1 0000 \
-+             vn=%vn_dp size=2 u=0
-+
-+VMOV_from_gp ---- 1110 0 1.        0 .... rt:4 1011 ... 1 0000 \
-+             vn=%vn_dp size=0 index=%vmov_idx_b
-+VMOV_from_gp ---- 1110 0 0.        0 .... rt:4 1011 ..1 1 0000 \
-+             vn=%vn_dp size=1 index=%vmov_idx_h
-+VMOV_from_gp ---- 1110 0 0 index:1 0 .... rt:4 1011 .00 1 0000 \
-+             vn=%vn_dp size=2
-+
-+VDUP         ---- 1110 1 b:1 q:1 0 .... rt:4 1011 . 0 e:1 1 0000 \
-+             vn=%vn_dp
++VMOV_64_sp   ---- 1100 010 op:1 rt2:4 rt:4 1010 00.1 .... \
++             vm=%vm_sp
++VMOV_64_dp   ---- 1100 010 op:1 rt2:4 rt:4 1011 00.1 .... \
++             vm=%vm_dp
 -- 
 2.20.1
 
