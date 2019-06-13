@@ -6,90 +6,56 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D00ADC31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 18:10:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6178C31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 18:11:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF3972082C
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 18:10:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF3972082C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7C8012082C
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 18:11:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C8012082C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43314 helo=lists.gnu.org)
+Received: from localhost ([::1]:42266 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbUAr-0006fZ-05
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 14:10:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55605)
+	id 1hbTQ5-0000MM-V5
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 13:21:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35691)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <groug@kaod.org>) id 1hbSqY-0001Rz-Et
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:45:07 -0400
+ (envelope-from <eblake@redhat.com>) id 1hbRyN-0002qj-0u
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 11:49:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1hbSqX-0007FZ-48
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:45:06 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57174)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1hbSqW-0007AX-Ol
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:45:05 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x5DGgcRs101726
- for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 12:45:01 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2t3sdujhs3-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 12:45:00 -0400
-Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <groug@kaod.org>;
- Thu, 13 Jun 2019 17:44:58 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 13 Jun 2019 17:44:55 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x5DGisCq59310172
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 13 Jun 2019 16:44:54 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 99CF64203F;
- Thu, 13 Jun 2019 16:44:54 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 61ECE42041;
- Thu, 13 Jun 2019 16:44:54 +0000 (GMT)
-Received: from bahia.lab.toulouse-stg.fr.ibm.com (unknown [9.101.4.41])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 13 Jun 2019 16:44:54 +0000 (GMT)
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 13 Jun 2019 18:44:54 +0200
-In-Reply-To: <156044428869.125694.13827513253200184549.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-References: <156044428869.125694.13827513253200184549.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-User-Agent: StGit/unknown-version
+ (envelope-from <eblake@redhat.com>) id 1hbRy9-0006Xn-2o
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 11:48:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34176)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1hbRy5-0006UU-NN; Thu, 13 Jun 2019 11:48:49 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E1FC830860BD;
+ Thu, 13 Jun 2019 15:48:48 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-116-85.phx2.redhat.com [10.3.116.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 40AA75C6D6;
+ Thu, 13 Jun 2019 15:48:48 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 13 Jun 2019 10:48:34 -0500
+Message-Id: <20190613154837.21734-7-eblake@redhat.com>
+In-Reply-To: <20190613154837.21734-1-eblake@redhat.com>
+References: <20190613154837.21734-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19061316-4275-0000-0000-00000342132A
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19061316-4276-0000-0000-000038522E0C
-Message-Id: <156044429419.125694.507569071972451514.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-06-13_11:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906130122
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: [Qemu-devel] [PATCH 1/3] xics/spapr: Prevent RTAS/hypercalls
- emulation to be used by in-kernel XICS
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.44]); Thu, 13 Jun 2019 15:48:48 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 6/9] nbd/server: Nicer spelling of max
+ BLOCK_STATUS reply length
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,154 +67,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>, Greg Kurz <groug@kaod.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "open list:Network Block Dev..." <qemu-block@nongnu.org>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The XICS-related RTAS calls and hypercalls in QEMU are supposed to be
-called only when the KVM in-kernel XICS is in use.
+Commit 3d068aff (3.0) introduced NBD_MAX_BITMAP_EXTENTS as a limit on
+how large we would allow a reply to NBD_CMD_BLOCK_STATUS to grow when
+it is visiting a qemu:dirty-bitmap: context.  Later, commit fb7afc79
+(3.1) reused the constant to limit base:allocation context replies,
+although the name is now less appropriate in that situation.
 
-Add some explicit checks to detect that, print an error message and report
-an hardware error to the guest.
+Rename things, and improve the macro to use units.h for better
+legibility. Then reformat the comment to comply with checkpatch rules
+added in the meantime. No semantic change.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20190510151735.29687-1-eblake@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/intc/xics_spapr.c |   46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ nbd/server.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-index 5a1835e8b1ed..d470ab5f7a2a 100644
---- a/hw/intc/xics_spapr.c
-+++ b/hw/intc/xics_spapr.c
-@@ -41,11 +41,31 @@
-  * Guest interfaces
-  */
- 
-+static bool check_in_kernel_xics(const char *func)
-+{
-+    if (kvm_irqchip_in_kernel()) {
-+        error_report("pseries: %s must never be called for in-kernel XICS",
-+                     func);
-+        return true;
-+    }
-+
-+    return false;
-+}
-+
-+#define CHECK_IN_KERNEL_XICS_HCALL              \
-+    do {                                        \
-+        if (check_in_kernel_xics(__func__)) {   \
-+            return H_HARDWARE;                  \
-+        }                                       \
-+    } while (0)
-+
- static target_ulong h_cppr(PowerPCCPU *cpu, SpaprMachineState *spapr,
-                            target_ulong opcode, target_ulong *args)
+diff --git a/nbd/server.c b/nbd/server.c
+index aeca3893fe2b..10faedcfc55d 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -21,15 +21,18 @@
+ #include "qapi/error.h"
+ #include "trace.h"
+ #include "nbd-internal.h"
++#include "qemu/units.h"
+
+ #define NBD_META_ID_BASE_ALLOCATION 0
+ #define NBD_META_ID_DIRTY_BITMAP 1
+
+-/* NBD_MAX_BITMAP_EXTENTS: 1 mb of extents data. An empirical
++/*
++ * NBD_MAX_BLOCK_STATUS_EXTENTS: 1 MiB of extents data. An empirical
+  * constant. If an increase is needed, note that the NBD protocol
+  * recommends no larger than 32 mb, so that the client won't consider
+- * the reply as a denial of service attack. */
+-#define NBD_MAX_BITMAP_EXTENTS (0x100000 / 8)
++ * the reply as a denial of service attack.
++ */
++#define NBD_MAX_BLOCK_STATUS_EXTENTS (1 * MiB / 8)
+
+ static int system_errno_to_nbd_errno(int err)
  {
-     target_ulong cppr = args[0];
- 
-+    CHECK_IN_KERNEL_XICS_HCALL;
-+
-     icp_set_cppr(spapr_cpu_state(cpu)->icp, cppr);
-     return H_SUCCESS;
- }
-@@ -56,6 +76,8 @@ static target_ulong h_ipi(PowerPCCPU *cpu, SpaprMachineState *spapr,
-     target_ulong mfrr = args[1];
-     ICPState *icp = xics_icp_get(XICS_FABRIC(spapr), args[0]);
- 
-+    CHECK_IN_KERNEL_XICS_HCALL;
-+
-     if (!icp) {
-         return H_PARAMETER;
-     }
-@@ -69,6 +91,8 @@ static target_ulong h_xirr(PowerPCCPU *cpu, SpaprMachineState *spapr,
+@@ -1960,7 +1963,7 @@ static int nbd_co_send_block_status(NBDClient *clie=
+nt, uint64_t handle,
+                                     Error **errp)
  {
-     uint32_t xirr = icp_accept(spapr_cpu_state(cpu)->icp);
- 
-+    CHECK_IN_KERNEL_XICS_HCALL;
-+
-     args[0] = xirr;
-     return H_SUCCESS;
- }
-@@ -78,6 +102,8 @@ static target_ulong h_xirr_x(PowerPCCPU *cpu, SpaprMachineState *spapr,
+     int ret;
+-    unsigned int nb_extents =3D dont_fragment ? 1 : NBD_MAX_BITMAP_EXTEN=
+TS;
++    unsigned int nb_extents =3D dont_fragment ? 1 : NBD_MAX_BLOCK_STATUS=
+_EXTENTS;
+     NBDExtent *extents =3D g_new(NBDExtent, nb_extents);
+     uint64_t final_length =3D length;
+
+@@ -2045,7 +2048,7 @@ static int nbd_co_send_bitmap(NBDClient *client, ui=
+nt64_t handle,
+                               uint32_t context_id, Error **errp)
  {
-     uint32_t xirr = icp_accept(spapr_cpu_state(cpu)->icp);
- 
-+    CHECK_IN_KERNEL_XICS_HCALL;
-+
-     args[0] = xirr;
-     args[1] = cpu_get_host_ticks();
-     return H_SUCCESS;
-@@ -88,6 +114,8 @@ static target_ulong h_eoi(PowerPCCPU *cpu, SpaprMachineState *spapr,
- {
-     target_ulong xirr = args[0];
- 
-+    CHECK_IN_KERNEL_XICS_HCALL;
-+
-     icp_eoi(spapr_cpu_state(cpu)->icp, xirr);
-     return H_SUCCESS;
- }
-@@ -99,6 +127,8 @@ static target_ulong h_ipoll(PowerPCCPU *cpu, SpaprMachineState *spapr,
-     uint32_t mfrr;
-     uint32_t xirr;
- 
-+    CHECK_IN_KERNEL_XICS_HCALL;
-+
-     if (!icp) {
-         return H_PARAMETER;
-     }
-@@ -111,6 +141,14 @@ static target_ulong h_ipoll(PowerPCCPU *cpu, SpaprMachineState *spapr,
-     return H_SUCCESS;
- }
- 
-+#define CHECK_IN_KERNEL_XICS_RTAS(rets)                 \
-+    do {                                                \
-+        if (check_in_kernel_xics(__func__)) {           \
-+            rtas_st((rets), 0, RTAS_OUT_HW_ERROR);      \
-+            return;                                     \
-+        }                                               \
-+    } while (0)
-+
- static void rtas_set_xive(PowerPCCPU *cpu, SpaprMachineState *spapr,
-                           uint32_t token,
-                           uint32_t nargs, target_ulong args,
-@@ -119,6 +157,8 @@ static void rtas_set_xive(PowerPCCPU *cpu, SpaprMachineState *spapr,
-     ICSState *ics = spapr->ics;
-     uint32_t nr, srcno, server, priority;
- 
-+    CHECK_IN_KERNEL_XICS_RTAS(rets);
-+
-     if ((nargs != 3) || (nret != 1)) {
-         rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-         return;
-@@ -152,6 +192,8 @@ static void rtas_get_xive(PowerPCCPU *cpu, SpaprMachineState *spapr,
-     ICSState *ics = spapr->ics;
-     uint32_t nr, srcno;
- 
-+    CHECK_IN_KERNEL_XICS_RTAS(rets);
-+
-     if ((nargs != 1) || (nret != 3)) {
-         rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-         return;
-@@ -182,6 +224,8 @@ static void rtas_int_off(PowerPCCPU *cpu, SpaprMachineState *spapr,
-     ICSState *ics = spapr->ics;
-     uint32_t nr, srcno;
- 
-+    CHECK_IN_KERNEL_XICS_RTAS(rets);
-+
-     if ((nargs != 1) || (nret != 1)) {
-         rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-         return;
-@@ -213,6 +257,8 @@ static void rtas_int_on(PowerPCCPU *cpu, SpaprMachineState *spapr,
-     ICSState *ics = spapr->ics;
-     uint32_t nr, srcno;
- 
-+    CHECK_IN_KERNEL_XICS_RTAS(rets);
-+
-     if ((nargs != 1) || (nret != 1)) {
-         rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-         return;
+     int ret;
+-    unsigned int nb_extents =3D dont_fragment ? 1 : NBD_MAX_BITMAP_EXTEN=
+TS;
++    unsigned int nb_extents =3D dont_fragment ? 1 : NBD_MAX_BLOCK_STATUS=
+_EXTENTS;
+     NBDExtent *extents =3D g_new(NBDExtent, nb_extents);
+     uint64_t final_length =3D length;
+
+--=20
+2.20.1
 
 
