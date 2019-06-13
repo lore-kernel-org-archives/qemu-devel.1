@@ -6,89 +6,88 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88777C31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 21:32:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49EF4C31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 21:36:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 486DF21537
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 21:32:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0459A2133D
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 21:36:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BMKLnW4/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 486DF21537
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n392FVQD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0459A2133D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45738 helo=lists.gnu.org)
+Received: from localhost ([::1]:45796 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbXKJ-0006S9-HH
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 17:32:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48767)
+	id 1hbXOx-0001oV-MA
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 17:36:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50619)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hbXFM-0001k6-VP
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 17:27:01 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hbXJk-0006K2-UG
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 17:31:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hbXFM-0007v3-2O
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 17:27:00 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:41867)
+ (envelope-from <richard.henderson@linaro.org>) id 1hbXJh-0001rg-TL
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 17:31:31 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:42524)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hbXFL-0007ui-TQ
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 17:27:00 -0400
-Received: by mail-pf1-x441.google.com with SMTP id m30so48427pff.8
- for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 14:26:59 -0700 (PDT)
+ id 1hbXJh-0001rN-Mq
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 17:31:29 -0400
+Received: by mail-pf1-x441.google.com with SMTP id q10so51387pff.9
+ for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 14:31:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:references:from:openpgp:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=u/MeMwjBxlkKgVf/YPlRl5EN/MDgjaYvWIQ6rwKk89E=;
- b=BMKLnW4/4hCKscGNVnrN8eTIiAKlGTD8Jb7I1Gw3iGA4hQmaEYRgWGuQQ2g57I+Lq6
- CC8uk0ewyw56WD/meJJfCBvSJayCSBSS5l5Dc54noFXLfxwnbOGM75HQbgGeSIDwjAMf
- pyfSdza6JxICzf1cAFfVfjD0/QiLLsLYOtR9yiXvPM0TCqdqoBgaVCSny8Rt13m/ryeh
- d/1u/ihxASKRSmElKHsOKDrbTO0niB87bjf0HlmdEdKbkQTBpks60/Lv1S57tdEOd/vL
- iyT+aLGMxqLpdJxKGTgKUxvqB5JksIWXlTRS9Oo3Fe/AbVUF69I4OMFBq897sW+DDuV/
- VQ7g==
+ bh=Ca3pu0Ed3//IeabkA1dLGA2V9ofR5NB2wPhnVn1euhU=;
+ b=n392FVQD4R6g8PuCixFWef83AoPpHz8+UeroTdUf8+baihqgvXSoV8MVk50UeSVhCT
+ ckqQ57hoJI0kUJImpTi1wUf4UTG1JUlFTAagPBxz6HIRy7BtsYLtma8ld0oTBf8ySRL2
+ reg8jIs2VWH/kMePrAFWeaTWwJNYhBJ/Qd9cpQcdUN8/G67sQMDlXVbOn3dIZeIeceCd
+ aVmw1SSwyqNSJptY2VhuzGoeRMWKysMPer1min9UIEd/eLEarlOjycmTIh14g1wKnmbJ
+ c1tDTDUYprnITx6fA5Lf+XPleFV3S2eGCbJBpfDAnMVGY5ZOjaJnjywGgCcEvWDZoEcd
+ goNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=u/MeMwjBxlkKgVf/YPlRl5EN/MDgjaYvWIQ6rwKk89E=;
- b=GxeZE5o20hbqaQ1ucSSxMog+h/hu/ME5TCOsEZ5EPloFmig43+1/7ubiH3xMueGxCe
- U5d+mYGLI3jIK8yS09VZ1dAT3ApCpi5/+9rwDB9C5AvRT0hSUPbJFBEdvPD497dfc0mA
- ckjVLsbpC4aR+xfN8Cp2fR4XNrFv7vRg9aVnMpG33Ge0Tzh2YDV8dhab/bD4JHoMIrJt
- UWUlAOnmMo6Bb73auqKH4mLhEzVHKOVFO6RhGpJ0IzrSnobUK4N69o1QJm8qwN8Ca7mD
- BI3cploYJGo3ta7v5LXVq55PzNMqcAud1bT2ou9Dwmbf4yRoGhG35ahYCSvXIWyAazTv
- oRCg==
-X-Gm-Message-State: APjAAAW1IjlAYD0iXDe8NM17xlfcz9kUqy4EHkZ6FURQEJNaUOOPqMFl
- hfqzmYTef1q+zxgwOmkl851SG+uUZ9A=
-X-Google-Smtp-Source: APXvYqyrGrfBpE4s5qFefheqyN1VZ72cealzqOUgcq1voBkd9a3p91hV0S78XaCvByLMwR23MIjUhg==
-X-Received: by 2002:a17:90a:a00d:: with SMTP id
- q13mr7484491pjp.80.1560461218772; 
- Thu, 13 Jun 2019 14:26:58 -0700 (PDT)
+ bh=Ca3pu0Ed3//IeabkA1dLGA2V9ofR5NB2wPhnVn1euhU=;
+ b=EFNeaPntdhJnHURa5GAiiC+Ei3elgEKcrp1rptgQDyx5ATpBmcN+BUYTsdAvU4Rrg3
+ uXqY9hJ6ZDrwAdzuV7tb8IHl88i/Lrh6O1FEnGEC+o6UYfEphvgCHzE5n3K7t/+k0J2A
+ m/x1FIuSAuxJIKwQG+GrUaIJpGZPP0VXoeUwGsUhBRtk0jzOC7+FIGZsMhTKeJ1lGO9G
+ R+jNmLUivhMcL7ZxH9hPSxBBUUONHvaozcHAPLeku03hz8y98XsDZ3jokYiNxgaCIn9S
+ J0VVqf3CfpxLPbMMnegJDnVkEozdjnYDQsCHTOJldZr3ddoP8OHG234VKoTjZOUHC4OE
+ JU+w==
+X-Gm-Message-State: APjAAAWd7Bkus0/tcVFYf3pkCGyBaTmzsVUbKOnpwO67NxgxckgvPi9r
+ DNB9FEWV8g5wiI67FLhIfr1fnKDpxps=
+X-Google-Smtp-Source: APXvYqwWls+gYw7SKHkSbk9+ilKWppKiRuXYMbVFBO3LoWLKQRJ0nHkZhtco+LPED/53LdVqlYAwwg==
+X-Received: by 2002:a62:1c91:: with SMTP id c139mr87924136pfc.25.1560461488264; 
+ Thu, 13 Jun 2019 14:31:28 -0700 (PDT)
 Received: from [10.10.150.239] ([149.199.65.200])
- by smtp.gmail.com with ESMTPSA id k11sm562702pfi.168.2019.06.13.14.26.57
+ by smtp.gmail.com with ESMTPSA id n66sm612410pfn.52.2019.06.13.14.31.27
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 13 Jun 2019 14:26:57 -0700 (PDT)
+ Thu, 13 Jun 2019 14:31:27 -0700 (PDT)
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
  qemu-devel@nongnu.org
 References: <20190613163917.28589-1-peter.maydell@linaro.org>
- <20190613163917.28589-6-peter.maydell@linaro.org>
+ <20190613163917.28589-10-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <d2c4799f-9659-e818-ca96-6a4065f19ae0@linaro.org>
-Date: Thu, 13 Jun 2019 14:26:55 -0700
+Message-ID: <dad9bbe4-a445-3718-dfae-8e121126a5ce@linaro.org>
+Date: Thu, 13 Jun 2019 14:31:25 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190613163917.28589-6-peter.maydell@linaro.org>
+In-Reply-To: <20190613163917.28589-10-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2607:f8b0:4864:20::441
-Subject: Re: [Qemu-devel] [PATCH 05/12] target/arm: Stop using cpu_F0s for
- NEON_2RM_VRINT*
+Subject: Re: [Qemu-devel] [PATCH 09/12] target/arm: Stop using cpu_F0s in
+ Neon VCVT fixed-point ops
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,12 +104,12 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 6/13/19 9:39 AM, Peter Maydell wrote:
-> Switch NEON_2RM_VRINT* away from using cpu_F0s.
+> Stop using cpu_F0s in the Neon VCVT fixed-point operations.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  target/arm/translate.c | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
+>  target/arm/translate.c | 62 +++++++++++++++++++-----------------------
+>  1 file changed, 28 insertions(+), 34 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
