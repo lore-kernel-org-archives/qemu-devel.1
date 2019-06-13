@@ -2,91 +2,79 @@ Return-Path: <SRS0=rgCY=UM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77838C31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 14:19:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 112DDC31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 14:21:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44BE720B7C
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 14:19:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CC94420B7C
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 14:21:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MMd5Ozrm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44BE720B7C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ekvsw4Ei"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC94420B7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40300 helo=lists.gnu.org)
+Received: from localhost ([::1]:40302 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbQa4-00042j-HI
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 10:19:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41180)
+	id 1hbQb8-0004l9-3N
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 10:21:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52033)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hbP9C-0004KE-SQ
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:48:08 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hbPnz-0005lp-Mj
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 09:30:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hbP9B-00063N-7r
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:48:06 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41745)
+ (envelope-from <peter.maydell@linaro.org>) id 1hbPnu-00079Y-Mk
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 09:30:15 -0400
+Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:35499)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hbP99-00060N-BP
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:48:04 -0400
-Received: by mail-wr1-x441.google.com with SMTP id c2so20637674wrm.8
- for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 05:48:01 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hbPnu-00078C-HV
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 09:30:10 -0400
+Received: by mail-ot1-x333.google.com with SMTP id j19so18964886otq.2
+ for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 06:30:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=+sPrlQBSejOtMk2OomKgV+4pROv1OHc9FKMYuqyMSIc=;
- b=MMd5OzrmDExwkKSnC/kRtmChRXk4opDc1gaolSNRT+6lJYnEXBVGY/KDGAeJNN3czT
- QE9uT6P8pLhteAE7EY7qUec6sAeEI4UHGlOO9DvyLv2x8LAKgDt8eQTSnd8Uzwo2iY6/
- QbwVNoGtzk6FBTVD5pMtYyyIadUex6/BhqBkPVYDgc/LTBbDfVW+VSRX5AfW7BG+x8lg
- FlytxZ0P05uyF45DJlghzElKgQPwnSWj+u9P//53Q6IJ+tdbTmBZxO9BqfYBEvhUY4oW
- OQ17MEmqKetLBrW/bym/mewkKxQm5TXLogDoLZm8rtCTgaugH5r3y3hPdZv8W111x1Me
- zmuQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=72I0M+sAdg5Hz9N2FoCUAjzdNN5xrSrpkHbPvg4Wojw=;
+ b=ekvsw4EilV/myGwWcwh2118uvmzJo9+x15SzxwbhHh8Ax6bmSDDKW+Aygjb+JCPqTs
+ XADU2OAuQX7kMtkvke8LcwKBjeep4JGLkhd5syuA4v8zMVR223E/JS7QSLziDiQ4e1Uc
+ 9rEYE4fP0+t/61AjuiwvzJQns4s4h7gNBf1QcqKz4S/M1mDt64Az+Sl4A/RuW4Xhnrw3
+ +vrb5vg2e0K8j8SlHLzg4fyBJJ1vsK67g7F+1IElmgmHkgcTW6lfh0fIzECX2KPiY+mD
+ fglEWyugbh8H0AH+PF3XIIdM9wt10f9Iasqhg5f00+WEL9Dy7FXlK4xKh+rr5464ZGsd
+ 75HQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=+sPrlQBSejOtMk2OomKgV+4pROv1OHc9FKMYuqyMSIc=;
- b=XrDkKU+hP7EUJv8m4Hwkz9Nx2ZDS304BxNCwi8UXRlGy3U93OvKOHdQirNQwQN17Mu
- m9ubN2XlUZLjevtkpmGYtk4Es1hROT6JX+tKS7wtYfW4zLURFIPuskq7je7AfFGjw/yf
- nNiA6vz/DzBIpj5M6O8QUE1D5tLaqEyWYBQturCxPswY1ML6A+Gt5UQivBlqcJ29Mjlt
- RUkqeGhHP3qbXFNASEG7Gtjs0kTtbUPhYYM9bondhobDfumBgkhm3u/3LAdJTMvo2/HZ
- p9tA2T+kJdrA0zbXstx8yG7Qaaz2iO9Pgq92TCVblFTYBQtT7RKL2SME4QYPDWAU+Rom
- GKFw==
-X-Gm-Message-State: APjAAAXqg5sw04DY2UgKbwtT+ccy2528Unl91iTo4r2VYbt00ZXTyjNI
- 3L9FhCau3q0nzUc6d03PO4pzyA==
-X-Google-Smtp-Source: APXvYqw4MBn+9sUvyWO9diOYuK+aSzMS8iynObWujULU3C4yp9aQCm+0aawA2PMhBY5RoAw63fHp0A==
-X-Received: by 2002:a5d:53d2:: with SMTP id a18mr10049966wrw.98.1560430080879; 
- Thu, 13 Jun 2019 05:48:00 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id t140sm6040929wmt.0.2019.06.13.05.48.00
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 13 Jun 2019 05:48:00 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D14631FF87;
- Thu, 13 Jun 2019 13:47:59 +0100 (BST)
-References: <20190516144733.32399-1-peter.maydell@linaro.org>
- <20190516144733.32399-3-peter.maydell@linaro.org>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190516144733.32399-3-peter.maydell@linaro.org>
-Date: Thu, 13 Jun 2019 13:47:59 +0100
-Message-ID: <87imt9ejnk.fsf@zen.linaroharston>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=72I0M+sAdg5Hz9N2FoCUAjzdNN5xrSrpkHbPvg4Wojw=;
+ b=I4TWJzMQVLQg8uo7e7nagK/tIDUaH64Tr9nj/5zgieGnlLkhrVBuHw4xts3OYrzhBt
+ Cco03b6q1gVSJUjA7VlCGaaTct/GHsEjfcu88SYNnH5aGOLMe1qyquvrPgEmms0I2vRr
+ zKnU8BH8jB5nntUaCeeO3H4X8F4S3jwLZPVgRS7MONGQKoqBKqZkNZEE0fvilerqCY3M
+ 7R/Y7L2hbU32QgKg1sjGF2Pt6PJxyf9+vYu6T9qHUSBW2d9NaS9UI7afoFPrMD+u41W/
+ +XkWsLBdeWjAKLonZ7MqejZPAJE+g/TjQJekw1j0zl2yEewOgQNGvSk/ycbwTwTFrKrT
+ sMPQ==
+X-Gm-Message-State: APjAAAUgYEQ5zAbcOW97uxi7pkUD2PSfk0BbG7nQACdav+U87200HV4Z
+ BbtksWQmQhsFlnB8cDz/EDTUxh7X3fxyW+hA2mfl8A==
+X-Google-Smtp-Source: APXvYqwUY81b/AUScoNEn7t9h+qQtAfHyz6nlx9HNDBXF946GBQKzj2UiWiWzYvpRyCHmFoZm4vpIy5akQreAXnPh6Q=
+X-Received: by 2002:a9d:711e:: with SMTP id n30mr8566482otj.97.1560432608583; 
+ Thu, 13 Jun 2019 06:30:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <20190613073834.22001-1-kraxel@redhat.com>
+In-Reply-To: <20190613073834.22001-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 13 Jun 2019 14:29:57 +0100
+Message-ID: <CAFEAcA-r4nT+GpgyNHkaFmVov3WzZagp8+uV+brePPZgHtcpzQ@mail.gmail.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] hw/arm/boot: Diagnose layouts that
- put initrd or DTB off the end of RAM
+X-Received-From: 2607:f8b0:4864:20::333
+Subject: Re: [Qemu-devel] [PULL 0/2] Vga 20190613 patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,96 +86,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Rutland <mark.rutland@arm.com>, qemu-arm@nongnu.org,
- Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> We calculate the locations in memory where we want to put the
-> initrd and the DTB based on the size of the kernel, since they
-> come after it. Add some explicit checks that these aren't off the
-> end of RAM entirely.
+On Thu, 13 Jun 2019 at 08:40, Gerd Hoffmann <kraxel@redhat.com> wrote:
 >
-> (At the moment the way we calculate the initrd_start means that
-> it can't ever be off the end of RAM, but that will change with
-> the next commit.)
+> The following changes since commit a050901d4b40092dc356b59912c6df39e389c7b9:
 >
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  hw/arm/boot.c | 23 +++++++++++++++++++++++
->  1 file changed, 23 insertions(+)
+>   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-4.1-20190612' into staging (2019-06-12 14:43:47 +0100)
 >
-> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-> index 0bb9a7d5b5c..935be3b92a5 100644
-> --- a/hw/arm/boot.c
-> +++ b/hw/arm/boot.c
-> @@ -1055,11 +1055,25 @@ static void arm_setup_direct_kernel_boot(ARMCPU *=
-cpu,
->          error_report("could not load kernel '%s'", info->kernel_filename=
-);
->          exit(1);
->      }
-> +
-> +    if (kernel_size > info->ram_size) {
-> +        error_report("kernel '%s' is too large to fit in RAM "
-> +                     "(kernel size %d, RAM size %" PRId64 ")",
-> +                     info->kernel_filename, kernel_size, info->ram_size);
-> +        exit(1);
-> +    }
-> +
->      info->entry =3D entry;
->      if (is_linux) {
->          uint32_t fixupcontext[FIXUP_MAX];
+> are available in the Git repository at:
 >
->          if (info->initrd_filename) {
-> +
-> +            if (info->initrd_start >=3D ram_end) {
-> +                error_report("not enough space after kernel to load init=
-rd");
-> +                exit(1);
-> +            }
-> +
->              initrd_size =3D load_ramdisk_as(info->initrd_filename,
->                                            info->initrd_start,
->                                            ram_end - info->initrd_start, =
-as);
-> @@ -1075,6 +1089,11 @@ static void arm_setup_direct_kernel_boot(ARMCPU *c=
-pu,
->                               info->initrd_filename);
->                  exit(1);
->              }
-> +            if (info->initrd_start + initrd_size > info->ram_size) {
-> +                error_report("could not load initrd '%s': "
-> +                             "too big to fit into RAM after the kernel",
-> +                             info->initrd_filename);
-> +            }
->          } else {
->              initrd_size =3D 0;
->          }
-> @@ -1110,6 +1129,10 @@ static void arm_setup_direct_kernel_boot(ARMCPU *c=
-pu,
->              /* Place the DTB after the initrd in memory with alignment. =
-*/
->              info->dtb_start =3D QEMU_ALIGN_UP(info->initrd_start + initr=
-d_size,
->                                             align);
-> +            if (info->dtb_start >=3D ram_end) {
-> +                error_report("Not enough space for DTB after kernel/init=
-rd");
-> +                exit(1);
-> +            }
->              fixupcontext[FIXUP_ARGPTR_LO] =3D info->dtb_start;
->              fixupcontext[FIXUP_ARGPTR_HI] =3D info->dtb_start >> 32;
->          } else {
+>   git://git.kraxel.org/qemu tags/vga-20190613-pull-request
+>
+> for you to fetch changes up to 0a71966253c8b07586ebd6bee094a818e1e163b8:
+>
+>   edid: flip the default to enabled (2019-06-13 09:34:50 +0200)
+>
+> ----------------------------------------------------------------
+> edid: add xmax + ymax properties, enable by default.
+>
+> ----------------------------------------------------------------
 
 
---
-Alex Benn=C3=A9e
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
+
+-- PMM
 
