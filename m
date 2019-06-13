@@ -2,47 +2,67 @@ Return-Path: <SRS0=rgCY=UM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A64BC31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 05:11:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA52BC31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 05:47:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F131C20896
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 05:11:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F131C20896
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 9433D2084D
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 05:47:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9433D2084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36974 helo=lists.gnu.org)
+Received: from localhost ([::1]:37054 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbI1l-00015X-9v
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 01:11:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44690)
+	id 1hbIab-0001yz-7z
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 01:47:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55486)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aik@ozlabs.ru>) id 1hbI0X-0000Yk-Ud
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 01:10:47 -0400
+ (envelope-from <armbru@redhat.com>) id 1hbIYn-0000sb-F8
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 01:46:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1hbI0V-000345-Ml
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 01:10:41 -0400
-Received: from ozlabs.ru ([107.173.13.209]:37775)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1hbI0V-0002md-Df
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 01:10:39 -0400
-Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
- by ozlabs.ru (Postfix) with ESMTP id 15EFDAE80020;
- Thu, 13 Jun 2019 01:09:42 -0400 (EDT)
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-To: qemu-devel@nongnu.org
-Date: Thu, 13 Jun 2019 15:09:37 +1000
-Message-Id: <20190613050937.124903-1-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 107.173.13.209
-Subject: [Qemu-devel] [PATCH qemu] loader: Trace loaded images
+ (envelope-from <armbru@redhat.com>) id 1hbIXP-00005T-F4
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 01:44:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51654)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>)
+ id 1hbIXN-0008Vp-Hj; Thu, 13 Jun 2019 01:44:37 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A48B1C057E65;
+ Thu, 13 Jun 2019 05:44:36 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
+ [10.36.116.148])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4645980CB;
+ Thu, 13 Jun 2019 05:44:36 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id B81481138648; Thu, 13 Jun 2019 07:44:34 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20190611134043.9524-1-kwolf@redhat.com>
+ <20190611134043.9524-11-kwolf@redhat.com>
+ <87wohrx7r7.fsf@dusky.pond.sub.org>
+ <20190612153108.GF9699@localhost.localdomain>
+Date: Thu, 13 Jun 2019 07:44:34 +0200
+In-Reply-To: <20190612153108.GF9699@localhost.localdomain> (Kevin Wolf's
+ message of "Wed, 12 Jun 2019 17:31:08 +0200")
+Message-ID: <87tvcuqbst.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.32]); Thu, 13 Jun 2019 05:44:36 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 10/11] monitor: Split out monitor/hmp.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -54,77 +74,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: berrange@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adds a trace point which prints every loaded image. This includes
-bios/firmware/kernel/initradmdisk/pcirom.
+Kevin Wolf <kwolf@redhat.com> writes:
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
+> Am 12.06.2019 um 15:17 hat Markus Armbruster geschrieben:
+>> Kevin Wolf <kwolf@redhat.com> writes:
+>> 
+>> > Move HMP infrastructure from monitor/misc.c to monitor/hmp.c. This is
+>> > code that can be shared for all targets, so compile it only once.
+>> >
+>> > The amount of function and particularly extern variables in
+>> > monitor_int.h is probably a bit larger than it needs to be, but this way
+>> > no non-trivial code modifications are needed. The interfaces between HMP
+>> > and the monitor core can be cleaned up later.
+>> >
+>> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> > ---
+>> >  include/monitor/monitor.h |    1 +
+>> >  monitor/monitor_int.h     |   31 +
+>> >  monitor/hmp.c             | 1387 +++++++++++++++++++++++++++++++++++++
+>> >  monitor/misc.c            | 1338 +----------------------------------
+>> >  monitor/Makefile.objs     |    2 +-
+>> >  monitor/trace-events      |    4 +-
+>> >  6 files changed, 1429 insertions(+), 1334 deletions(-)
+>> >  create mode 100644 monitor/hmp.c
+>> >
+>> > diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
+>> > index 7bbab05320..8547529e49 100644
+>> > --- a/include/monitor/monitor.h
+>> > +++ b/include/monitor/monitor.h
+>> > @@ -22,6 +22,7 @@ bool monitor_cur_is_qmp(void);
+>> >  void monitor_init_globals(void);
+>> >  void monitor_init(Chardev *chr, int flags);
+>> >  void monitor_init_qmp(Chardev *chr, int flags);
+>> > +void monitor_init_hmp(Chardev *chr, int flags);
+>> >  void monitor_cleanup(void);
+>> >  
+>> >  int monitor_suspend(Monitor *mon);
+>> > diff --git a/monitor/monitor_int.h b/monitor/monitor_int.h
+>> > index 4aabee54e1..88eaed9c5c 100644
+>> > --- a/monitor/monitor_int.h
+>> > +++ b/monitor/monitor_int.h
+>> > @@ -27,6 +27,7 @@
+>> >  
+>> >  #include "qemu-common.h"
+>> >  #include "monitor/monitor.h"
+>> > +#include "qemu/cutils.h"
+>> >  
+>> >  #include "qapi/qmp/qdict.h"
+>> >  #include "qapi/qmp/json-parser.h"
+>> > @@ -154,6 +155,29 @@ static inline bool monitor_is_qmp(const Monitor *mon)
+>> >      return (mon->flags & MONITOR_USE_CONTROL);
+>> >  }
+>> >  
+>> > +/**
+>> > + * Is @name in the '|' separated list of names @list?
+>> > + */
+>> > +static inline int compare_cmd(const char *name, const char *list)
+>> > +{
+>> > +    const char *p, *pstart;
+>> > +    int len;
+>> > +    len = strlen(name);
+>> > +    p = list;
+>> > +    for (;;) {
+>> > +        pstart = p;
+>> > +        p = qemu_strchrnul(p, '|');
+>> > +        if ((p - pstart) == len && !memcmp(pstart, name, len)) {
+>> > +            return 1;
+>> > +        }
+>> > +        if (*p == '\0') {
+>> > +            break;
+>> > +        }
+>> > +        p++;
+>> > +    }
+>> > +    return 0;
+>> > +}
+>> > +
+>> 
+>> What's the justification for inline?
+>
+> It seemed small enough, but maybe it isn't (it has also grown by two
+> lines after fixing the coding style). I can leave it in misc.c and just
+> make it public.
 
-The example for a pseries guest:
+Yes, please.
 
-loader_write_rom slof.bin: @0x0 size=0xe22e0 ROM=0
-loader_write_rom phdr #0: /home/aik/t/vml4120le: @0x400000 size=0x13df000 ROM=0
-loader_write_rom /home/aik/t/le.cpio: @0x1ad0000 size=0x9463a00 ROM=0
+> I'd just need a more specific name than compare_cmd() to make it public.
 
-Sadly "spapr-rtas.bin" does not show up because it is loaded from
-the spapr machine reset handler rather than via rom_reset(), may be needs
-to be fixed.
+Arguably a good idea even for static inlines in an internal header :)
 
----
- Makefile.objs        | 1 +
- hw/core/loader.c     | 3 +++
- hw/core/trace-events | 2 ++
- 3 files changed, 6 insertions(+)
- create mode 100644 hw/core/trace-events
+>> >  typedef QTAILQ_HEAD(MonitorList, Monitor) MonitorList;
+>> >  extern IOThread *mon_iothread;
+>> >  extern QEMUBH *qmp_dispatcher_bh;
+>> > @@ -162,6 +186,8 @@ extern QemuMutex monitor_lock;
+>> >  extern MonitorList mon_list;
+>> >  extern int mon_refcount;
+>> >  
+>> > +extern mon_cmd_t mon_cmds[];
+>> > +
+>> 
+>> Any particular reason for not moving this one to hmp.c, along with
+>> info_cmds?  Question, not demand :)
+>
+> Yes, it's not part of the core infrastructure, but contains commands
+> specific to the system emulator. If a tool were to use HMP, it would
+> have to provide its own command tables.
+>
+> If we ever create a monitor/hmp-sysemu.c or something like it, this
+> would be a good place for the tables.
 
-diff --git a/Makefile.objs b/Makefile.objs
-index c8337fa34be8..036ca6752908 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -200,6 +200,7 @@ trace-events-subdirs += target/riscv
- trace-events-subdirs += target/s390x
- trace-events-subdirs += target/sparc
- trace-events-subdirs += util
-+trace-events-subdirs += hw/core
- 
- trace-events-files = $(SRC_PATH)/trace-events $(trace-events-subdirs:%=$(SRC_PATH)/%/trace-events)
- 
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index a097bbe30a74..7fe083af492f 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -44,6 +44,7 @@
- 
- #include "qemu/osdep.h"
- #include "qapi/error.h"
-+#include "trace.h"
- #include "hw/hw.h"
- #include "disas/disas.h"
- #include "monitor/monitor.h"
-@@ -1114,6 +1115,8 @@ static void rom_reset(void *unused)
-          * CPU definitely fetches its instructions from the just written data.
-          */
-         cpu_flush_icache_range(rom->addr, rom->datasize);
-+
-+        trace_loader_write_rom(rom->name, rom->addr, rom->datasize, rom->isrom);
-     }
- }
- 
-diff --git a/hw/core/trace-events b/hw/core/trace-events
-new file mode 100644
-index 000000000000..fe47a9c8cb1f
---- /dev/null
-+++ b/hw/core/trace-events
-@@ -0,0 +1,2 @@
-+# loader.c
-+loader_write_rom(const char *name, uint64_t gpa, uint64_t size, bool isrom) "%s: @0x%"PRIx64" size=0x%"PRIx64" ROM=%d"
--- 
-2.17.1
-
+I'm very much in favor of splitting up monitor/misc.c further.  It's
+okay to leave that for later, of course.
 
