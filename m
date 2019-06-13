@@ -2,61 +2,111 @@ Return-Path: <SRS0=rgCY=UM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54062C31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 16:06:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F236C31E4A
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 16:08:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C79A420679
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 16:06:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C79A420679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3085720679
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 16:08:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="InZOxQ6b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3085720679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41240 helo=lists.gnu.org)
+Received: from localhost ([::1]:41254 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbSEn-00085V-OB
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 12:06:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42871)
+	id 1hbSGo-000161-6B
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 12:08:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55637)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hbQpv-0001hm-Rt
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 10:36:22 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hbRXJ-0004mD-Tj
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 11:21:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hbQpi-0001cL-FC
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 10:36:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37776)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hbQph-0001ZA-QK
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 10:36:06 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0A63B30860C9;
- Thu, 13 Jun 2019 14:35:56 +0000 (UTC)
-Received: from x1w.redhat.com (unknown [10.40.205.141])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9BA9A1001B2A;
- Thu, 13 Jun 2019 14:35:49 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 13 Jun 2019 16:34:33 +0200
-Message-Id: <20190613143446.23937-8-philmd@redhat.com>
-In-Reply-To: <20190613143446.23937-1-philmd@redhat.com>
-References: <20190613143446.23937-1-philmd@redhat.com>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hbRXI-0005lP-TL
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 11:21:09 -0400
+Received: from mail-am5eur03on071d.outbound.protection.outlook.com
+ ([2a01:111:f400:fe08::71d]:15499
+ helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1hbRXB-0005fH-51; Thu, 13 Jun 2019 11:21:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HP6wFMhv4fXPyDyiXNQb2rab42BIxdJjmbpeZhNRFs4=;
+ b=InZOxQ6b0Azfnx2UYZAvaiWv47LcpDCfM2sCGOPRrLJG40XCsibdhRr0tKXGUFDmoHG//061luCnW+BvfS8D981IVeHux3C3etm34RZX8+8/p7YKR03ffonbPkSZCYWfZlfX/fUUfUQ0LT8rxOQpXt87OCCVblDadTHDhiOrWes=
+Received: from AM0PR08MB3572.eurprd08.prod.outlook.com (20.177.110.153) by
+ AM0PR08MB3075.eurprd08.prod.outlook.com (52.134.92.29) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1965.14; Thu, 13 Jun 2019 15:20:56 +0000
+Received: from AM0PR08MB3572.eurprd08.prod.outlook.com
+ ([fe80::d064:530:c7:ad76]) by AM0PR08MB3572.eurprd08.prod.outlook.com
+ ([fe80::d064:530:c7:ad76%6]) with mapi id 15.20.1987.012; Thu, 13 Jun 2019
+ 15:20:56 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Thread-Topic: [PATCH 3/3] block/nbd: merge NBDClientSession struct back to
+ BDRVNBDState
+Thread-Index: AQHVIEBH0xMITr3E4EW/fglja6E9zKaZtZIAgAABHAA=
+Date: Thu, 13 Jun 2019 15:20:56 +0000
+Message-ID: <35dcdb7a-8a3d-81eb-76e9-e8dff544f726@virtuozzo.com>
+References: <20190611102720.86114-1-vsementsov@virtuozzo.com>
+ <20190611102720.86114-4-vsementsov@virtuozzo.com>
+ <c03ff39b-5e8f-ed0a-d33c-2d2d4919cd33@redhat.com>
+In-Reply-To: <c03ff39b-5e8f-ed0a-d33c-2d2d4919cd33@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0301CA0001.eurprd03.prod.outlook.com
+ (2603:10a6:3:76::11) To AM0PR08MB3572.eurprd08.prod.outlook.com
+ (2603:10a6:208:e1::25)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190613182054105
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: c681d645-66cc-43ac-2061-08d6f012bb3d
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:AM0PR08MB3075; 
+x-ms-traffictypediagnostic: AM0PR08MB3075:
+x-microsoft-antispam-prvs: <AM0PR08MB3075BA80662D1D5C5754DC9EC1EF0@AM0PR08MB3075.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:3513;
+x-forefront-prvs: 0067A8BA2A
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(376002)(396003)(346002)(366004)(39850400004)(136003)(199004)(189003)(66066001)(6512007)(73956011)(11346002)(36756003)(3846002)(4744005)(2501003)(8676002)(6436002)(2201001)(66556008)(86362001)(5660300002)(71200400001)(6116002)(53936002)(66476007)(2616005)(66946007)(486006)(64756008)(446003)(229853002)(66446008)(186003)(31696002)(102836004)(31686004)(81166006)(8936002)(316002)(6246003)(71190400001)(76176011)(52116002)(256004)(6486002)(110136005)(26005)(2906002)(68736007)(14454004)(305945005)(7736002)(53546011)(476003)(81156014)(25786009)(4326008)(6506007)(54906003)(99286004)(478600001)(386003)(156123004);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB3075;
+ H:AM0PR08MB3572.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: AoVR654+iSikrI0JgT5Qe4bN2Yte/5ePmpNiVFtSyPtarkRqJIOafKjx59jinaLsEZQCSUHOYUkN3bKfR5LkrLdORaXhltctoDWxydKf5pyjMSwHOG4muQz/WsIbsZ5C1g9qnH6+c1geRvSWjojez99vLBW3PdwBWSyB5INWqsEY+Zw4+Y//MoClNfWpbCc8c7jEt6sQSnOWfCysFfD6wbcbYQP6CbrdUGdzuCnE/2me/68W8HgjvPpR/HJc0oK9niKe4Cy2k/wLS5C17IGfGIWJuVnuRFsbF/7eQC8PNKcBxt4ScrSm8dT7KiDMGKYUNjgxZUzpZpCeoCtFTWBTdORz6DJYCReQmD8z+mbQPThfjo73F7Y28uqiWU6a3REgkogPlrBKqcFhqhlc9p5j0PFOiv9mAzIp7xOylIDa+9Y=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <79370876C7780446A249BCABD9B1C3D1@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Thu, 13 Jun 2019 14:36:04 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 07/20] hw/i386/pc: Extract e820 memory
- layout code
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c681d645-66cc-43ac-2061-08d6f012bb3d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jun 2019 15:20:56.3405 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vsementsov@virtuozzo.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3075
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 2a01:111:f400:fe08::71d
+Subject: Re: [Qemu-devel] [PATCH 3/3] block/nbd: merge NBDClientSession
+ struct back to BDRVNBDState
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,363 +118,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yang Zhong <yang.zhong@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
- kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, Li Qiang <liq3ea@gmail.com>,
- Rob Bradford <robert.bradford@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Samuel Ortiz <sameo@linux.intel.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Suggested-by: Samuel Ortiz <sameo@linux.intel.com>
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/i386/Makefile.objs        |  2 +-
- hw/i386/e820_memory_layout.c | 60 ++++++++++++++++++++++++++++
- hw/i386/e820_memory_layout.h | 76 ++++++++++++++++++++++++++++++++++++
- hw/i386/pc.c                 | 62 +----------------------------
- include/hw/i386/pc.h         | 48 -----------------------
- target/i386/kvm.c            |  1 +
- 6 files changed, 139 insertions(+), 110 deletions(-)
- create mode 100644 hw/i386/e820_memory_layout.c
- create mode 100644 hw/i386/e820_memory_layout.h
-
-diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
-index 5d9c9efd5f..d3374e0831 100644
---- a/hw/i386/Makefile.objs
-+++ b/hw/i386/Makefile.objs
-@@ -1,5 +1,5 @@
- obj-$(CONFIG_KVM) +=3D kvm/
--obj-y +=3D multiboot.o
-+obj-y +=3D e820_memory_layout.o multiboot.o
- obj-y +=3D pc.o
- obj-$(CONFIG_I440FX) +=3D pc_piix.o
- obj-$(CONFIG_Q35) +=3D pc_q35.o
-diff --git a/hw/i386/e820_memory_layout.c b/hw/i386/e820_memory_layout.c
-new file mode 100644
-index 0000000000..240eafff02
---- /dev/null
-+++ b/hw/i386/e820_memory_layout.c
-@@ -0,0 +1,60 @@
-+/*
-+ * QEMU BIOS e820 routines
-+ *
-+ * Copyright (c) 2003-2004 Fabrice Bellard
-+ *
-+ * SPDX-License-Identifier: MIT
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/bswap.h"
-+#include "e820_memory_layout.h"
-+
-+static size_t e820_entries;
-+struct e820_table e820_reserve;
-+struct e820_entry *e820_table;
-+
-+ssize_t e820_add_entry(uint64_t address, uint64_t length, E820Type type)
-+{
-+    unsigned int index =3D le32_to_cpu(e820_reserve.count);
-+    struct e820_entry *entry;
-+
-+    if (type !=3D E820_RAM) {
-+        /* old FW_CFG_E820_TABLE entry -- reservations only */
-+        if (index >=3D E820_NR_ENTRIES) {
-+            return -EBUSY;
-+        }
-+        entry =3D &e820_reserve.entry[index++];
-+
-+        entry->address =3D cpu_to_le64(address);
-+        entry->length =3D cpu_to_le64(length);
-+        entry->type =3D cpu_to_le32(type);
-+
-+        e820_reserve.count =3D cpu_to_le32(index);
-+    }
-+
-+    /* new "etc/e820" file -- include ram too */
-+    e820_table =3D g_renew(struct e820_entry, e820_table, e820_entries +=
- 1);
-+    e820_table[e820_entries].address =3D cpu_to_le64(address);
-+    e820_table[e820_entries].length =3D cpu_to_le64(length);
-+    e820_table[e820_entries].type =3D cpu_to_le32(type);
-+    e820_entries++;
-+
-+    return e820_entries;
-+}
-+
-+size_t e820_get_num_entries(void)
-+{
-+    return e820_entries;
-+}
-+
-+bool e820_get_entry(unsigned int idx, E820Type type,
-+                    uint64_t *address, uint64_t *length)
-+{
-+    if (idx < e820_entries && e820_table[idx].type =3D=3D cpu_to_le32(ty=
-pe)) {
-+        *address =3D le64_to_cpu(e820_table[idx].address);
-+        *length =3D le64_to_cpu(e820_table[idx].length);
-+        return true;
-+    }
-+    return false;
-+}
-diff --git a/hw/i386/e820_memory_layout.h b/hw/i386/e820_memory_layout.h
-new file mode 100644
-index 0000000000..64e88e4772
---- /dev/null
-+++ b/hw/i386/e820_memory_layout.h
-@@ -0,0 +1,76 @@
-+/*
-+ * QEMU BIOS e820 routines
-+ *
-+ * Copyright (c) 2003-2004 Fabrice Bellard
-+ *
-+ * SPDX-License-Identifier: MIT
-+ */
-+
-+#ifndef HW_I386_E820_H
-+#define HW_I386_E820_H
-+
-+/**
-+ * E820Type: Type of the e820 address range.
-+ */
-+typedef enum {
-+    E820_RAM        =3D 1,
-+    E820_RESERVED   =3D 2,
-+    E820_ACPI       =3D 3,
-+    E820_NVS        =3D 4,
-+    E820_UNUSABLE   =3D 5
-+} E820Type;
-+
-+#define E820_NR_ENTRIES 16
-+
-+struct e820_entry {
-+    uint64_t address;
-+    uint64_t length;
-+    uint32_t type;
-+} QEMU_PACKED __attribute((__aligned__(4)));
-+
-+struct e820_table {
-+    uint32_t count;
-+    struct e820_entry entry[E820_NR_ENTRIES];
-+} QEMU_PACKED __attribute((__aligned__(4)));
-+
-+extern struct e820_table e820_reserve;
-+extern struct e820_entry *e820_table;
-+
-+/**
-+ * e820_add_entry: Add an #e820_entry to the @e820_table.
-+ *
-+ * Returns the number of entries of the e820_table on success,
-+ *         or a negative errno otherwise.
-+ *
-+ * @address: The base address of the structure which the BIOS is to fill=
- in.
-+ * @length: The length in bytes of the structure passed to the BIOS.
-+ * @type: The #E820Type of the address range.
-+ */
-+ssize_t e820_add_entry(uint64_t address, uint64_t length, E820Type type)=
-;
-+
-+/**
-+ * e820_get_num_entries: The number of entries of the @e820_table.
-+ *
-+ * Returns the number of entries of the e820_table.
-+ */
-+size_t e820_get_num_entries(void);
-+
-+/**
-+ * e820_get_entry: Get the address/length of an #e820_entry.
-+ *
-+ * If the #e820_entry stored at @index is of #E820Type @type, fills @add=
-ress
-+ * and @length with the #e820_entry values and return @true.
-+ * Return @false otherwise.
-+ *
-+ * @index: The index of the #e820_entry to get values.
-+ * @type: The @E820Type of the address range expected.
-+ * @address: Pointer to the base address of the #e820_entry structure to
-+ *           be filled.
-+ * @length: Pointer to the length (in bytes) of the #e820_entry structur=
-e
-+ *          to be filled.
-+ * @return: true if the entry was found, false otherwise.
-+ */
-+bool e820_get_entry(unsigned int index, E820Type type,
-+                    uint64_t *address, uint64_t *length);
-+
-+#endif
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index d9589eb771..c5c96a2e10 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -79,6 +79,7 @@
- #include "hw/i386/intel_iommu.h"
- #include "hw/net/ne2000-isa.h"
- #include "standard-headers/asm-x86/bootparam.h"
-+#include "e820_memory_layout.h"
-=20
- /* debug PC/ISA interrupts */
- //#define DEBUG_IRQ
-@@ -90,22 +91,6 @@
- #define DPRINTF(fmt, ...)
- #endif
-=20
--#define E820_NR_ENTRIES		16
--
--struct e820_entry {
--    uint64_t address;
--    uint64_t length;
--    uint32_t type;
--} QEMU_PACKED __attribute((__aligned__(4)));
--
--struct e820_table {
--    uint32_t count;
--    struct e820_entry entry[E820_NR_ENTRIES];
--} QEMU_PACKED __attribute((__aligned__(4)));
--
--static struct e820_table e820_reserve;
--static struct e820_entry *e820_table;
--static size_t e820_entries;
- struct hpet_fw_config hpet_cfg =3D {.count =3D UINT8_MAX};
-=20
- /* Physical Address of PVH entry point read from kernel ELF NOTE */
-@@ -872,51 +857,6 @@ static void handle_a20_line_change(void *opaque, int=
- irq, int level)
-     x86_cpu_set_a20(cpu, level);
- }
-=20
--ssize_t e820_add_entry(uint64_t address, uint64_t length, E820Type type)
--{
--    unsigned int index =3D le32_to_cpu(e820_reserve.count);
--    struct e820_entry *entry;
--
--    if (type !=3D E820_RAM) {
--        /* old FW_CFG_E820_TABLE entry -- reservations only */
--        if (index >=3D E820_NR_ENTRIES) {
--            return -EBUSY;
--        }
--        entry =3D &e820_reserve.entry[index++];
--
--        entry->address =3D cpu_to_le64(address);
--        entry->length =3D cpu_to_le64(length);
--        entry->type =3D cpu_to_le32(type);
--
--        e820_reserve.count =3D cpu_to_le32(index);
--    }
--
--    /* new "etc/e820" file -- include ram too */
--    e820_table =3D g_renew(struct e820_entry, e820_table, e820_entries +=
- 1);
--    e820_table[e820_entries].address =3D cpu_to_le64(address);
--    e820_table[e820_entries].length =3D cpu_to_le64(length);
--    e820_table[e820_entries].type =3D cpu_to_le32(type);
--    e820_entries++;
--
--    return e820_entries;
--}
--
--size_t e820_get_num_entries(void)
--{
--    return e820_entries;
--}
--
--bool e820_get_entry(unsigned int idx, E820Type type,
--                    uint64_t *address, uint64_t *length)
--{
--    if (idx < e820_entries && e820_table[idx].type =3D=3D cpu_to_le32(ty=
-pe)) {
--        *address =3D le64_to_cpu(e820_table[idx].address);
--        *length =3D le64_to_cpu(e820_table[idx].length);
--        return true;
--    }
--    return false;
--}
--
- /* Enables contiguous-apic-ID mode, for compatibility */
- static bool compat_apic_id_mode;
-=20
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index fc66b61ff8..7a88768e76 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -282,54 +282,6 @@ void pc_system_firmware_init(PCMachineState *pcms, M=
-emoryRegion *rom_memory);
- void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
-                        const CPUArchIdList *apic_ids, GArray *entry);
-=20
--/**
-- * E820Type: Type of the e820 address range.
-- */
--typedef enum {
--    E820_RAM        =3D 1,
--    E820_RESERVED   =3D 2,
--    E820_ACPI       =3D 3,
--    E820_NVS        =3D 4,
--    E820_UNUSABLE   =3D 5
--} E820Type;
--
--/**
-- * e820_add_entry: Add an #e820_entry to the @e820_table.
-- *
-- * Returns the number of entries of the e820_table on success,
-- *         or a negative errno otherwise.
-- *
-- * @address: The base address of the structure which the BIOS is to fill=
- in.
-- * @length: The length in bytes of the structure passed to the BIOS.
-- * @type: The #E820Type of the address range.
-- */
--ssize_t e820_add_entry(uint64_t address, uint64_t length, E820Type type)=
-;
--
--/**
-- * e820_get_num_entries: The number of entries of the @e820_table.
-- *
-- * Returns the number of entries of the e820_table.
-- */
--size_t e820_get_num_entries(void);
--
--/**
-- * e820_get_entry: Get the address/length of an #e820_entry.
-- *
-- * If the #e820_entry stored at @index is of #E820Type @type, fills @add=
-ress
-- * and @length with the #e820_entry values and return @true.
-- * Return @false otherwise.
-- *
-- * @index: The index of the #e820_entry to get values.
-- * @type: The @E820Type of the address range expected.
-- * @address: Pointer to the base address of the #e820_entry structure to
-- *           be filled.
-- * @length: Pointer to the length (in bytes) of the #e820_entry structur=
-e
-- *          to be filled.
-- * @return: true if the entry was found, false otherwise.
-- */
--bool e820_get_entry(unsigned int index, E820Type type,
--                    uint64_t *address, uint64_t *length);
--
- extern GlobalProperty pc_compat_4_0_1[];
- extern const size_t pc_compat_4_0_1_len;
-=20
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 6899061b4e..73964fc63c 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -38,6 +38,7 @@
- #include "hw/i386/apic-msidef.h"
- #include "hw/i386/intel_iommu.h"
- #include "hw/i386/x86-iommu.h"
-+#include "hw/i386/e820_memory_layout.h"
-=20
- #include "hw/pci/pci.h"
- #include "hw/pci/msi.h"
---=20
-2.20.1
-
+MTMuMDYuMjAxOSAxODoxNiwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gNi8xMS8xOSA1OjI3IEFN
+LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gTm8gcmVhc29uIHRvIGtl
+ZXAgaXQgc2VwYXJhdGUsIGl0IGRpZmZlcnMgZnJvbSBvdGhlcnMgYmxvY2sgZHJpdmVyDQo+PiBi
+ZWhhdmlvciBhbmQgdGhlcmVmb3IgY29uZnVzZXMuIEluc3RlYWQgb2YgZ2VuZXJpYw0KPiANCj4g
+cy90aGVyZWZvci90aGVyZWZvcmUvIChib3RoIHNwZWxsaW5ncyBhcmUgdmFsaWQsIGJ1dCB0aGUg
+Zm9ybWVyIGxvb2tzDQo+IGFyY2hhaWMpDQoNCkludGVyZXN0aW5nLCBmb3IgbWUgaXQgd2FzIGp1
+c3QgYSBtaXN0YWtlLg0KDQo+IA0KPj4gICAgJ3N0YXRlID0gKFN0YXRlKilicy0+b3BhcXVlJyB3
+ZSBoYXZlIHRvIHVzZSBzcGVjaWFsIGhlbHBlci4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBWbGFk
+aW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+PiAt
+LS0NCj4+ICAgYmxvY2svbmJkLmMgfCAxOTcgKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPj4gICAxIGZpbGUgY2hhbmdlZCwgOTQgaW5zZXJ0aW9u
+cygrKSwgMTAzIGRlbGV0aW9ucygtKQ0KPj4NCj4gDQo+IFJldmlld2VkLWJ5OiBFcmljIEJsYWtl
+IDxlYmxha2VAcmVkaGF0LmNvbT4NCj4gDQo+IEknbSBxdWV1aW5nIHRoaXMgc2VyaWVzIHRocm91
+Z2ggbXkgTkJEIHRyZWUuDQo+IA0KDQpUaGFua3MhISBJJ2xsIHJlYmFzZSByZWNvbm5lY3Qgc2Vy
+aWVzIG9uIHRoaXMuDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
 
