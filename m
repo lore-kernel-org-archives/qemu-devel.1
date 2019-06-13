@@ -2,47 +2,47 @@ Return-Path: <SRS0=rgCY=UM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBF24C31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 19:52:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2913C31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 19:56:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C49E82133D
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 19:52:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C49E82133D
+	by mail.kernel.org (Postfix) with ESMTPS id 883022133D
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 19:56:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 883022133D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45270 helo=lists.gnu.org)
+Received: from localhost ([::1]:45340 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbVlt-000067-Rz
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 15:52:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53419)
+	id 1hbVq8-0003ow-S1
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 15:56:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53191)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hbViY-0005lc-Mg
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 15:49:03 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hbVic-0005d4-QA
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 15:49:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hbVbM-0006Rm-BD
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 15:41:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50760)
+ (envelope-from <mreitz@redhat.com>) id 1hbVa3-0005q4-4S
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 15:40:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57338)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hbVbE-0006Og-Iu; Thu, 13 Jun 2019 15:41:30 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1hbVZz-0005nf-Mx; Thu, 13 Jun 2019 15:40:11 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 72C223082AC3;
- Thu, 13 Jun 2019 19:41:26 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 55E0730917AB;
+ Thu, 13 Jun 2019 19:40:10 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.187])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 25434176BA;
- Thu, 13 Jun 2019 19:41:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 786624E6BD;
+ Thu, 13 Jun 2019 19:40:09 +0000 (UTC)
 To: qemu-block@nongnu.org
-References: <20190603202236.1342-1-mreitz@redhat.com>
+References: <20190528195338.12376-1-mreitz@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -69,21 +69,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <382c9dae-c89e-983f-44c9-e7f1739a35b9@redhat.com>
-Date: Thu, 13 Jun 2019 21:41:23 +0200
+Message-ID: <35287596-6ebe-502a-d675-3a1c0538df49@redhat.com>
+Date: Thu, 13 Jun 2019 21:40:07 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190603202236.1342-1-mreitz@redhat.com>
+In-Reply-To: <20190528195338.12376-1-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="5hubOCqZhEvDqisq1CAqHXK9G3xX8DwFd"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+ boundary="6P49s4c8bFR0vWq5ufmJk6cVMDfiRVSd1"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Thu, 13 Jun 2019 19:41:26 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.41]); Thu, 13 Jun 2019 19:40:10 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] blockdev: Overlays are not snapshots
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: Fix options leakage in
+ img_rebase()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,75 +96,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5hubOCqZhEvDqisq1CAqHXK9G3xX8DwFd
-Content-Type: multipart/mixed; boundary="dY2cpM43JsXfbw3pgNYWO9ggvpgXxtF68";
+--6P49s4c8bFR0vWq5ufmJk6cVMDfiRVSd1
+Content-Type: multipart/mixed; boundary="Tommd3MW3vyJDQxG89sDx6HPnLRRzRPIP";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Message-ID: <382c9dae-c89e-983f-44c9-e7f1739a35b9@redhat.com>
-Subject: Re: [PATCH v2 0/2] blockdev: Overlays are not snapshots
-References: <20190603202236.1342-1-mreitz@redhat.com>
-In-Reply-To: <20190603202236.1342-1-mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <35287596-6ebe-502a-d675-3a1c0538df49@redhat.com>
+Subject: Re: [PATCH] qemu-img: Fix options leakage in img_rebase()
+References: <20190528195338.12376-1-mreitz@redhat.com>
+In-Reply-To: <20190528195338.12376-1-mreitz@redhat.com>
 
---dY2cpM43JsXfbw3pgNYWO9ggvpgXxtF68
+--Tommd3MW3vyJDQxG89sDx6HPnLRRzRPIP
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 03.06.19 22:22, Max Reitz wrote:
-> QEMU=E2=80=99s always been confused over what a snapshot is: Is it the =
-overlay?
-> Is it the backing image?
+On 28.05.19 21:53, Max Reitz wrote:
+> img_rebase() can leak a QDict in two occasions.  Fix it.
 >=20
-> Confusion is rarely a good thing.  I can=E2=80=99t think of any objecti=
-ve reason
-> why the overlay would be a snapshot.  A snapshot is something that does=
-
-> not change over time; the overlay does.
->=20
-> (I suppose historically the reason is that =E2=80=9CTaking an overlay=E2=
-=80=9D makes no
-> sense, so the operations are called =E2=80=9CTaking a snapshot=E2=80=9D=
-=2E  Somehow, this
-> meaning carried over to the new file that is created during that
-> operation; if =E2=80=9CCreating a snapshot=E2=80=9D creates a file, tha=
-t file must be
-> the snapshot, right?  Well, no, it isn=E2=80=99t.)
->=20
-> Let=E2=80=99s fix this as best as we can.  Better Nate than lever.
+> Coverity: CID 1401416
+> Fixes: d16699b64671466b42079c45b89127aeea1ca565
+> Fixes: 330c72957196e0ae382abcaa97ebf4eb9bc8574f
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  qemu-img.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
 Applied to my block branch.
 
 Max
 
 
---dY2cpM43JsXfbw3pgNYWO9ggvpgXxtF68--
+--Tommd3MW3vyJDQxG89sDx6HPnLRRzRPIP--
 
---5hubOCqZhEvDqisq1CAqHXK9G3xX8DwFd
+--6P49s4c8bFR0vWq5ufmJk6cVMDfiRVSd1
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0CpuMACgkQ9AfbAGHV
-z0CjNQf8CHb/eL5Ep2+paE6DmI3c5XSJ4XLNQKvzaVsBq25mcPYLJgvAONEhebE3
-Mw8H97TMQI+g/yvWyUj+gfg9gAKBysife/momVBxBGpzXY+4poTzrIf1ZR4H5Efu
-5JHJCw24dspYdlsZeMPwVteSEGohGAli2V6Rw++bdPDSaLMEuBC38op4A1MeK9XE
-zhYYXC5OFjpuAfcNtrso+br9XrcHoS426k1/D1Ui5ubbJxLkhlqsrDMqNBhj7OPt
-/Y9vAmMYJdCpZjFdnSsHObkkiEYMQC6+Db3A7VEfypVZVgrjlJ9WNqv8GkQXId9q
-0qVktzcW4YpAdnyrBjIa0duWKV6+Pg==
-=KSk8
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0CppcACgkQ9AfbAGHV
+z0A/BQgAgYlY6w18JccdZUncA9T2ZpXONVBuHRKw+JGFyQUgRSwdPdgNmA0gf3Rc
+oE80le3b75wzrI7c24MPjTIIWyivvkevr9SZk8yXyFrldUQ1CJKdualwOqbZ2Iwd
+9C11kMRkhKY8wGZQM3VgDPZfHHmavUx3Z7acdiWTebzfN2KnRNCmuXw4hNtAOzlG
+4mIz2THQLxRd4ww1L300MiOLffsz4XfQ05BzAc/owwCN7yScwhmXAHLYSFGyknJv
+IJT9mDmf4EkFgjGae9qgZ5ivFWmjhEjMw8CkGdHEMCR6x73GN2sS3fPNBLb5J+8F
+1z4kbbpuTQYU+qIKaF2y4J5Cy3r5MA==
+=RLG5
 -----END PGP SIGNATURE-----
 
---5hubOCqZhEvDqisq1CAqHXK9G3xX8DwFd--
+--6P49s4c8bFR0vWq5ufmJk6cVMDfiRVSd1--
 
