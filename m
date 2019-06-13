@@ -2,67 +2,86 @@ Return-Path: <SRS0=rgCY=UM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7EDDC31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 13:32:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97C75C31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 13:34:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B3522082C
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 13:32:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B3522082C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 56A9F2082C
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 13:34:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="csH9Zwa5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56A9F2082C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39730 helo=lists.gnu.org)
+Received: from localhost ([::1]:39754 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbPqY-0007N8-ML
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 09:32:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39793)
+	id 1hbPrj-00008Q-IL
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 09:34:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59736)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hbP5U-0001cv-Aa
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:44:17 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hbOdu-0008Tf-22
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:15:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hbP5S-0002eK-5D
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:44:16 -0400
-Resent-Date: Thu, 13 Jun 2019 08:44:15 -0400
-Resent-Message-Id: <E1hbP5S-0002eK-5D@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21815)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hbP5Q-0002Tn-FK
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:44:13 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1560423511; cv=none; d=zoho.com; s=zohoarc; 
- b=mdOdsTyfBvmiZZnoD8eTqeIzhcqzYjUYCKUBeOaT6Ku9dtLl4WFoRVonpnwnInQrP2d7gdGUTW//KAYicxL2IvkgC4bIsKN4CQRmO8XMAotoK/guFAJlRBlwaKzfKEhS42AFCw2KV/Y7Nm2mOwRpnwlOLxrjex9JWhwbb4n0Exc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1560423511;
- h=Content-Type:Content-Transfer-Encoding:Date:From:In-Reply-To:MIME-Version:Message-ID:Subject:To:ARC-Authentication-Results;
- bh=fYtUQt6EVLM5BwNuUIO3P9KsgyRiILwtsS7lNXQlecc=; 
- b=hD5qbdnXp+AGxth6L60hMRdS0wET9wCvPlOkKygd7D1gEKWI6bG54qVMbv2fdZlwlYFtT5pEXt2S/mjSbfv1is4+tjiaD3hA96+i7CHVPurGhI69jngVGPS3MzOLFtEDzvdJpdYQpJvXWhNRr6LgLkwKXQL1F2hl9Qd6Xje8/fg=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.1] (qemu2.osuosl.org [140.211.15.4]) by
- mx.zohomail.com with SMTPS id 1560423510782104.05994294518894;
- Thu, 13 Jun 2019 03:58:30 -0700 (PDT)
-In-Reply-To: <B3540B0C-9A71-4733-8109-11B0DC7A17D2@me.com>
-Message-ID: <156042336371.23.16736649545265972432@d271e9ad1cbd>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
+ (envelope-from <peter.maydell@linaro.org>) id 1hbOdh-0004ur-S8
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:15:43 -0400
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:44903)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hbOdc-0004iv-Dp
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:15:29 -0400
+Received: by mail-wr1-x42f.google.com with SMTP id r16so1385216wrl.11
+ for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 05:15:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=dlG/h4e/09Nwqt8ZUUNPJpFZPx9E3DXWrZDW3I5mo2w=;
+ b=csH9Zwa5FP+jekeVGIuXk6esmvwkb7NPhHCyy6TpP5TcfS5mIFRnAHLZGqOO5YPoGr
+ CyPO/Rtd3RGwN/a9QbxgX8w+EHReSxLaZ6J7wcWhJKk3ueuRJC2KSuaB99qnHjNXHXGv
+ 9rWHlohSW12bt0Y6QoGir2HCHP9Dk1ZgrPo5gQ1yvFjV1uFSEhFeY3bVDynq6Ch4K2tJ
+ XvRqsW1ZJR6wePcYhZeihTxID4JCCYY9mimCU7uXW9DxsIAaaXe6KjPMLr5XGjS9sq3A
+ tue4ESCnF3yoftZGBC/Q4EJKwu/3GRyfc7r2Qcz2hSKs5xxpwT1wOBdYiR7iJlLDo1ya
+ Okqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=dlG/h4e/09Nwqt8ZUUNPJpFZPx9E3DXWrZDW3I5mo2w=;
+ b=c+DZznvtUkSk/EqNeQod8dL/ylOtvfb56v5B28uDarFVG+rrW2s5ofRD6ZZJ3bjss+
+ N+pvMkXjChSvlnp/w8ADDiReo/3Bg2fWwa6puUOhcXhvLL3MRt031RlS4tGWpYUnHBVF
+ fPgOWxLM78Q4YdLC8dH5HVkvLQdF9h/IzjF7KNRKok0FCJ5lMifQsndGgfPfrl/nXAcP
+ dOYGRw5hK7tNtH+f9LWWwBTQ2Q6tQ6UJOPht0xCLx3Nk3WL9y1qj5NTmzoCKycotWqvw
+ pk4vvZIMNTtGrMUY5braebgkMGbDT7qPy08igWPA8k2GO8mQDS+EF2NWHfjey/lJhu8c
+ 3N9w==
+X-Gm-Message-State: APjAAAWdpIvwZCxTakdpF/n+gWFRBr9cCaR9vGxE5Oy/Ah9tAzHzUhU6
+ CiYfp2hcCPtQ3DxOI1bPPgS8lmxnQ53FrQ==
+X-Google-Smtp-Source: APXvYqzg0Ja3i0yfIjsrEeT3203wwLiGkHYdUdndF5JzYicNmCuNP7Ngq0JQwY0OGJA6KtuLEN2pRQ==
+X-Received: by 2002:adf:e8cb:: with SMTP id k11mr58142015wrn.244.1560428122859; 
+ Thu, 13 Jun 2019 05:15:22 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id y6sm2010576wrp.12.2019.06.13.05.15.22
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 13 Jun 2019 05:15:22 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu, 13 Jun 2019 03:58:30 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.218
-Subject: [Qemu-devel] A patch has been merged in QEMU: [PATCH 0/2] ui/cocoa:
- Fix input device issues on Mojave
+Date: Thu, 13 Jun 2019 13:14:30 +0100
+Message-Id: <20190613121433.5246-46-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190613121433.5246-1-peter.maydell@linaro.org>
+References: <20190613121433.5246-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42f
+Subject: [Qemu-devel] [PULL 45/48] target/arm: Convert VJCVT to decodetree
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,9 +97,102 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Q29uZ3JhdHVsYXRpb25zLCBbUWVtdS1kZXZlbF0gW1BBVENIIDAvMl0gdWkvY29jb2E6IEZpeCBp
-bnB1dCBkZXZpY2UgaXNzdWVzIG9uIE1vamF2ZSB3YXMgbWVyZ2VkIGJ5IHRoZSBRRU1VCm1haW50
-YWluZXJzLgoKaHR0cDovL25leHQucGF0Y2hldy5vcmcvUUVNVS9CMzU0MEIwQy05QTcxLTQ3MzMt
-ODEwOS0xMUIwREM3QTE3RDJAbWUuY29tLw==
+Convert the VJCVT instruction to decodetree.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/translate-vfp.inc.c | 28 ++++++++++++++++++++++++++++
+ target/arm/translate.c         | 12 +-----------
+ target/arm/vfp.decode          |  4 ++++
+ 3 files changed, 33 insertions(+), 11 deletions(-)
+
+diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
+index cc3f61d9c41..161f0fdd888 100644
+--- a/target/arm/translate-vfp.inc.c
++++ b/target/arm/translate-vfp.inc.c
+@@ -2426,3 +2426,31 @@ static bool trans_VCVT_int_dp(DisasContext *s, arg_VCVT_int_dp *a)
+     tcg_temp_free_ptr(fpst);
+     return true;
+ }
++
++static bool trans_VJCVT(DisasContext *s, arg_VJCVT *a)
++{
++    TCGv_i32 vd;
++    TCGv_i64 vm;
++
++    if (!dc_isar_feature(aa32_jscvt, s)) {
++        return false;
++    }
++
++    /* UNDEF accesses to D16-D31 if they don't exist. */
++    if (!dc_isar_feature(aa32_fp_d32, s) && (a->vm & 0x10)) {
++        return false;
++    }
++
++    if (!vfp_access_check(s)) {
++        return true;
++    }
++
++    vm = tcg_temp_new_i64();
++    vd = tcg_temp_new_i32();
++    neon_load_reg64(vm, a->vm);
++    gen_helper_vjcvt(vd, vm, cpu_env);
++    neon_store_reg32(vd, a->vd);
++    tcg_temp_free_i64(vm);
++    tcg_temp_free_i32(vd);
++    return true;
++}
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index da4d4e9d012..d5347c55ad4 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -3050,7 +3050,7 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+                 return 1;
+             case 15:
+                 switch (rn) {
+-                case 0 ... 17:
++                case 0 ... 19:
+                     /* Already handled by decodetree */
+                     return 1;
+                 default:
+@@ -3085,13 +3085,6 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+                     rm_is_dp = false;
+                     break;
+ 
+-                case 0x13: /* vjcvt */
+-                    if (!dp || !dc_isar_feature(aa32_jscvt, s)) {
+-                        return 1;
+-                    }
+-                    rd_is_dp = false;
+-                    break;
+-
+                 default:
+                     return 1;
+                 }
+@@ -3177,9 +3170,6 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+                 switch (op) {
+                 case 15: /* extension space */
+                     switch (rn) {
+-                    case 19: /* vjcvt */
+-                        gen_helper_vjcvt(cpu_F0s, cpu_F0d, cpu_env);
+-                        break;
+                     case 20: /* fshto */
+                         gen_vfp_shto(dp, 16 - rm, 0);
+                         break;
+diff --git a/target/arm/vfp.decode b/target/arm/vfp.decode
+index 6da9a7913da..1a7c9b533de 100644
+--- a/target/arm/vfp.decode
++++ b/target/arm/vfp.decode
+@@ -220,3 +220,7 @@ VCVT_int_sp  ---- 1110 1.11 1000 .... 1010 s:1 1.0 .... \
+              vd=%vd_sp vm=%vm_sp
+ VCVT_int_dp  ---- 1110 1.11 1000 .... 1011 s:1 1.0 .... \
+              vd=%vd_dp vm=%vm_sp
++
++# VJCVT is always dp to sp
++VJCVT        ---- 1110 1.11 1001 .... 1011 11.0 .... \
++             vd=%vd_sp vm=%vm_dp
+-- 
+2.20.1
 
 
