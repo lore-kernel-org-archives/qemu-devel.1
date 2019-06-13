@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22010C31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 18:49:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4F86C31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 18:51:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1E3A21721
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 18:49:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F9922147A
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 18:51:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WUC/NR/r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1E3A21721
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EB3n0tHS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F9922147A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43784 helo=lists.gnu.org)
+Received: from localhost ([::1]:43828 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbUn5-0002QB-4N
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 14:49:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53848)
+	id 1hbUov-0003sV-TJ
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 14:51:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53762)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hbSlK-00049x-PM
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:39:46 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hbSlI-00041N-0q
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:39:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hbSlG-0003OS-IX
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:39:42 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45093)
+ (envelope-from <peter.maydell@linaro.org>) id 1hbSlF-0003Jj-CM
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:39:39 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46487)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hbSlG-0002Nk-0M
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:39:38 -0400
-Received: by mail-wr1-x441.google.com with SMTP id f9so21465419wre.12
- for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 09:39:26 -0700 (PDT)
+ id 1hbSlF-0001u4-2s
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:39:37 -0400
+Received: by mail-wr1-x444.google.com with SMTP id n4so21458847wrw.13
+ for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 09:39:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=rimcTwT3jseYgOecETEoK3gV+MP4oaaAWnNA90CS1sc=;
- b=WUC/NR/reoeIEelJq/6TVn2rSH/Q5u9ChWO0s5e5z2VaAs/2A6a5/RRqKidEVi6T8J
- EeG6g1KJ3Ynlg5Cms0UYtrCGGGMty1ukQmn9FxJW6qv+RJ5vD1xcNLMPmdrHMYNjwloG
- e9wO83nv4MVf45s3I6/kEt8WTSY1kCjuuYWRNtn1qjUlRujjhE3Vdk0AVRwiuDQqC9gU
- kz8CWoLZdOY4Je9mwOORyOViqWL4xuGhLqoU5zXu2p51MJ84KWzY86jVieZJhliATfCx
- ZdpKJaue3OMzZ1X0eHS+8UAD8La9ESQQKAP5HbYtIuKrosQrkCbWEsOl7qZGgLDroTg7
- XeEQ==
+ bh=G+NyIHdm+2ansJRDNwYfzFl09GqHtSLyhidznXncrP4=;
+ b=EB3n0tHSeM8OdTtRCrXDwLIA7a5NtocaQAGVRmCKhr4M5z3CEraFBqaCqVh0TJGjte
+ AC4x7VSu8/IJBL3wNKnBxSGIneUx2OE9MvwEH5aonmgt973LWwPkjyJfFRv9FL/pNwUI
+ hHckFN02VP+lHIiZo+TOPNADPPji5waAfaNkW9QEhB/YkGIpB/4UlhSbGmFYqMGeTjeC
+ OXGhsihjUSnE5xuYrojaF5RozvXSKz8h7qi+uAWzqH/3Fyr/10fj5LymSdLlxW0d4ycN
+ /pBZYLx+7uEu68FlIIXPw3YAyFWKlJnOsA48mtxBZClRv9vrYWTwQJB8dZx2vdTHNTC5
+ nBKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=rimcTwT3jseYgOecETEoK3gV+MP4oaaAWnNA90CS1sc=;
- b=A+qcaLeNkRE6uXU0OPrxh49TtSrXkF69GndC9JA5qKI4V7Yt2lmEM+ySN9ZzAgy604
- Ye00uEYfTdDK0MfzAZeqOQHUb1XkmPdBsji9Iw31bFnEMSd1Tnqk4yZdKxrJ5rvQbBZc
- FtGcZY5ZAngNPVDIM83s+TJgzR47pj3N/XStTc0ew+6l0kbiJZS3tfl06EpReW3Px3wE
- wfj5aXMkBAHCuR6JjR5BCK0cK/PaeGNCFlogVpkTlqW+W3KEPaTJ+T1sd3jvId+8sj5g
- FQNTPYPhghP5mIpwWkYtoC5IgnKdkthENJ/6eOwVbl48smhSHiN2kOiDyyLZ1Wl/ZRkg
- HmJQ==
-X-Gm-Message-State: APjAAAUUnoaCE515yOKfCWoMxoIjWyHuQHgjbwywbxlLjAIEiQ3H+EXK
- xA/K4Ly8hxyoOUe/vdXyfLcg/g==
-X-Google-Smtp-Source: APXvYqxtdgJyxLVeVzRUIfr+SqBYq0C2qNduSAdG/izCG59yDPc2rp3Wkia+Bo0dYNKPbLshAZkIJg==
-X-Received: by 2002:adf:e9c3:: with SMTP id l3mr37413931wrn.148.1560443965631; 
- Thu, 13 Jun 2019 09:39:25 -0700 (PDT)
+ bh=G+NyIHdm+2ansJRDNwYfzFl09GqHtSLyhidznXncrP4=;
+ b=pV2X34/STUflasNRY4wcDZOlYkofzclNODavt+xIUbtZmo9cVN9EpSY3WDzlWD4Xtk
+ PghxZQCMJ/jJtaroU6dBqot0IvP2qYDi0ZeAa7vTbUzS5FgYmWAkjCXMqM6Ut8jXeN8U
+ bSnGxcN8OixSOOmfHPoup8D60fj5Y6eQp7IM2ZUUTY24B3GxmQO/N5B/EWc8BrLB2Ozg
+ uXFL9ukM+gWevmXYEy8cjNQNqSmxgiq0Ang2agxnG5juIYcC77s64rn6La0h944+cqbj
+ 0HyvWbNcCfI+PLzzaV9QoDEMU+0f2WRoyT+BKO74tj61aplm28bN3g47Q96HOsyvUX0y
+ yokQ==
+X-Gm-Message-State: APjAAAVq8mCrZWM0OMoVcb7LNf2rgoeax2nwRvkO7iVbkrBWgwQvh1am
+ E4Wagep3uWUXgi6FJRUAfemg3jU3CW4vNA==
+X-Google-Smtp-Source: APXvYqz+APxGqi0dqRcvvDJLihGu9IJ7ca5IV1mDcd1rugZMQIUQ7VZhDjPjDrVyWlOSooO2BVTzGA==
+X-Received: by 2002:a5d:6acd:: with SMTP id u13mr14515369wrw.154.1560443960508; 
+ Thu, 13 Jun 2019 09:39:20 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id f197sm358747wme.39.2019.06.13.09.39.24
+ by smtp.gmail.com with ESMTPSA id f197sm358747wme.39.2019.06.13.09.39.19
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 13 Jun 2019 09:39:25 -0700 (PDT)
+ Thu, 13 Jun 2019 09:39:19 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Thu, 13 Jun 2019 17:39:11 +0100
-Message-Id: <20190613163917.28589-7-peter.maydell@linaro.org>
+Date: Thu, 13 Jun 2019 17:39:06 +0100
+Message-Id: <20190613163917.28589-2-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190613163917.28589-1-peter.maydell@linaro.org>
 References: <20190613163917.28589-1-peter.maydell@linaro.org>
@@ -80,9 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: [Qemu-devel] [PATCH 06/12] target/arm: Stop using cpu_F0s for
- NEON_2RM_VCVT[ANPM][US]
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PATCH 01/12] target/arm: Move vfp_expand_imm() to
+ translate.[ch]
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,40 +99,135 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Stop using cpu_F0s for the NEON_2RM_VCVT[ANPM][US] ops.
+We want to use vfp_expand_imm() in the AArch32 VFP decode;
+move it from the a64-only header/source file to the
+AArch32 one (which is always compiled even for AArch64).
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ target/arm/translate-a64.h     |  1 -
+ target/arm/translate.h         |  7 +++++++
+ target/arm/translate-a64.c     | 32 --------------------------------
+ target/arm/translate-vfp.inc.c | 33 +++++++++++++++++++++++++++++++++
+ 4 files changed, 40 insertions(+), 33 deletions(-)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 243dbee8357..124045a9ef6 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -4181,8 +4181,7 @@ static int neon_2rm_is_float_op(int op)
-      * what we are asking here is "does the code for this case in
-      * the Neon for-each-pass loop use cpu_F0s?".
-      */
--    return ((op >= NEON_2RM_VCVTAU && op <= NEON_2RM_VCVTMS) ||
--            op >= NEON_2RM_VRECPE_F);
-+    return op >= NEON_2RM_VRECPE_F;
+diff --git a/target/arm/translate-a64.h b/target/arm/translate-a64.h
+index 9569bc5963d..9ab40872d85 100644
+--- a/target/arm/translate-a64.h
++++ b/target/arm/translate-a64.h
+@@ -39,7 +39,6 @@ void write_fp_dreg(DisasContext *s, int reg, TCGv_i64 v);
+ TCGv_ptr get_fpstatus_ptr(bool);
+ bool logic_imm_decode_wmask(uint64_t *result, unsigned int immn,
+                             unsigned int imms, unsigned int immr);
+-uint64_t vfp_expand_imm(int size, uint8_t imm8);
+ bool sve_access_check(DisasContext *s);
+ 
+ /* We should have at some point before trying to access an FP register
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index dc06dce7675..bc1617809da 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -237,6 +237,13 @@ static inline void gen_ss_advance(DisasContext *s)
+     }
  }
  
- static bool neon_2rm_is_v8_op(int op)
-@@ -6818,10 +6817,10 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                                                       cpu_env);
++/*
++ * Given a VFP floating point constant encoded into an 8 bit immediate in an
++ * instruction, expand it to the actual constant value of the specified
++ * size, as per the VFPExpandImm() pseudocode in the Arm ARM.
++ */
++uint64_t vfp_expand_imm(int size, uint8_t imm8);
++
+ /* Vector operations shared between ARM and AArch64.  */
+ extern const GVecGen3 mla_op[4];
+ extern const GVecGen3 mls_op[4];
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index ae739f65756..97f4164fbbc 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -6380,38 +6380,6 @@ static void disas_fp_3src(DisasContext *s, uint32_t insn)
+     }
+ }
  
-                             if (is_signed) {
--                                gen_helper_vfp_tosls(cpu_F0s, cpu_F0s,
-+                                gen_helper_vfp_tosls(tmp, tmp,
-                                                      tcg_shift, fpst);
-                             } else {
--                                gen_helper_vfp_touls(cpu_F0s, cpu_F0s,
-+                                gen_helper_vfp_touls(tmp, tmp,
-                                                      tcg_shift, fpst);
-                             }
+-/* The imm8 encodes the sign bit, enough bits to represent an exponent in
+- * the range 01....1xx to 10....0xx, and the most significant 4 bits of
+- * the mantissa; see VFPExpandImm() in the v8 ARM ARM.
+- */
+-uint64_t vfp_expand_imm(int size, uint8_t imm8)
+-{
+-    uint64_t imm;
+-
+-    switch (size) {
+-    case MO_64:
+-        imm = (extract32(imm8, 7, 1) ? 0x8000 : 0) |
+-            (extract32(imm8, 6, 1) ? 0x3fc0 : 0x4000) |
+-            extract32(imm8, 0, 6);
+-        imm <<= 48;
+-        break;
+-    case MO_32:
+-        imm = (extract32(imm8, 7, 1) ? 0x8000 : 0) |
+-            (extract32(imm8, 6, 1) ? 0x3e00 : 0x4000) |
+-            (extract32(imm8, 0, 6) << 3);
+-        imm <<= 16;
+-        break;
+-    case MO_16:
+-        imm = (extract32(imm8, 7, 1) ? 0x8000 : 0) |
+-            (extract32(imm8, 6, 1) ? 0x3000 : 0x4000) |
+-            (extract32(imm8, 0, 6) << 6);
+-        break;
+-    default:
+-        g_assert_not_reached();
+-    }
+-    return imm;
+-}
+-
+ /* Floating point immediate
+  *   31  30  29 28       24 23  22  21 20        13 12   10 9    5 4    0
+  * +---+---+---+-----------+------+---+------------+-------+------+------+
+diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
+index 709fc65374d..a66084f6e36 100644
+--- a/target/arm/translate-vfp.inc.c
++++ b/target/arm/translate-vfp.inc.c
+@@ -30,6 +30,39 @@
+ #include "decode-vfp.inc.c"
+ #include "decode-vfp-uncond.inc.c"
  
++/*
++ * The imm8 encodes the sign bit, enough bits to represent an exponent in
++ * the range 01....1xx to 10....0xx, and the most significant 4 bits of
++ * the mantissa; see VFPExpandImm() in the v8 ARM ARM.
++ */
++uint64_t vfp_expand_imm(int size, uint8_t imm8)
++{
++    uint64_t imm;
++
++    switch (size) {
++    case MO_64:
++        imm = (extract32(imm8, 7, 1) ? 0x8000 : 0) |
++            (extract32(imm8, 6, 1) ? 0x3fc0 : 0x4000) |
++            extract32(imm8, 0, 6);
++        imm <<= 48;
++        break;
++    case MO_32:
++        imm = (extract32(imm8, 7, 1) ? 0x8000 : 0) |
++            (extract32(imm8, 6, 1) ? 0x3e00 : 0x4000) |
++            (extract32(imm8, 0, 6) << 3);
++        imm <<= 16;
++        break;
++    case MO_16:
++        imm = (extract32(imm8, 7, 1) ? 0x8000 : 0) |
++            (extract32(imm8, 6, 1) ? 0x3000 : 0x4000) |
++            (extract32(imm8, 0, 6) << 6);
++        break;
++    default:
++        g_assert_not_reached();
++    }
++    return imm;
++}
++
+ /*
+  * Return the offset of a 16-bit half of the specified VFP single-precision
+  * register. If top is true, returns the top 16 bits; otherwise the bottom
 -- 
 2.20.1
 
