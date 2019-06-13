@@ -2,60 +2,61 @@ Return-Path: <SRS0=rgCY=UM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,T_HK_NAME_DR
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	T_HK_NAME_DR autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2569BC31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 10:07:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77D60C31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 10:08:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F31B420851
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 10:07:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F31B420851
+	by mail.kernel.org (Postfix) with ESMTPS id 4F0E82147A
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 10:08:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F0E82147A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38190 helo=lists.gnu.org)
+Received: from localhost ([::1]:38192 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbMdo-0002yN-TY
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 06:07:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56261)
+	id 1hbMeO-0003gJ-HV
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 06:08:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56312)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hbMW6-00079g-Pp
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 05:59:35 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hbMWG-0007MV-GH
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 05:59:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hbMW5-0005uV-Su
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 05:59:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49544)
+ (envelope-from <dgilbert@redhat.com>) id 1hbMWF-0005zn-91
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 05:59:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36416)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hbMW5-0005tz-MX
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 05:59:33 -0400
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hbMWE-0005z3-R4
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 05:59:43 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C7F19A3B6B
- for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 09:59:32 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 149056EB93
+ for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 09:59:42 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-117-220.ams2.redhat.com
  [10.36.117.220])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6372B541C8;
- Thu, 13 Jun 2019 09:59:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DF5D552FDE;
+ Thu, 13 Jun 2019 09:59:40 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, jasowang@redhat.com, eblake@redhat.com,
  armbru@redhat.com, laine@redhat.com
-Date: Thu, 13 Jun 2019 10:59:19 +0100
-Message-Id: <20190613095924.21908-1-dgilbert@redhat.com>
+Date: Thu, 13 Jun 2019 10:59:23 +0100
+Message-Id: <20190613095924.21908-5-dgilbert@redhat.com>
+In-Reply-To: <20190613095924.21908-1-dgilbert@redhat.com>
+References: <20190613095924.21908-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Thu, 13 Jun 2019 09:59:32 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.25]); Thu, 13 Jun 2019 09:59:42 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 0/5] network announce;
- interface selection & IDs
+Subject: [Qemu-devel] [PATCH v4 4/5] net/announce: Add HMP optional ID
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,37 +74,80 @@ Sender: "Qemu-devel"
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Laine asked for some extra features on the network announce support;
+Add the optional ID to the HMP command.
 
-The first allows the announce timer to announce on a subset of the
-interfaces.
+e.g.
+   # start an announce for a long time on eth1
+   migrate_set_parameter announce-rounds 1000
+   announce_self "eth1" e1
 
-The second allows there to be multiple timers, each with their own
-parameters (including the interface list).
+   # start an announce on eth2
+   announce_self "eth2" e2
+
+   # Change e1 to be announcing on eth1 and eth3
+   announce_self "eth1,eth3" e1
+
+   # Cancel e1
+   migrate_set_parameter announce-rounds 0
+   announce_self "" e1
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ hmp-commands.hx | 7 ++++---
+ hmp.c           | 3 +++
+ 2 files changed, 7 insertions(+), 3 deletions(-)
 
-v4
-  Minor typo fixes
-  Expanded the test to check we can stop a running announce
-
-Dr. David Alan Gilbert (5):
-  net/announce: Allow optional list of interfaces
-  net/announce: Add HMP optional interface list
-  net/announce: Add optional ID
-  net/announce: Add HMP optional ID
-  net/announce: Expand test for stopping self announce
-
- hmp-commands.hx         |  7 +++-
- hmp.c                   | 41 +++++++++++++++++++-
- hw/net/virtio-net.c     |  4 +-
- include/net/announce.h  |  8 +++-
- net/announce.c          | 83 ++++++++++++++++++++++++++++++++++-------
- net/trace-events        |  3 +-
- qapi/net.json           | 16 ++++++--
- tests/virtio-net-test.c | 57 ++++++++++++++++++++++++++--
- 8 files changed, 192 insertions(+), 27 deletions(-)
-
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 1b63372713..7ba8543cc3 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -955,8 +955,8 @@ ETEXI
+=20
+     {
+         .name       =3D "announce_self",
+-        .args_type  =3D "interfaces:s?",
+-        .params     =3D "[interfaces]",
++        .args_type  =3D "interfaces:s?,id:s?",
++        .params     =3D "[interfaces] [id]",
+         .help       =3D "Trigger GARP/RARP announcements",
+         .cmd        =3D hmp_announce_self,
+     },
+@@ -968,7 +968,8 @@ Trigger a round of GARP/RARP broadcasts; this is usef=
+ul for explicitly updating
+ network infrastructure after a reconfiguration or some forms of migratio=
+n.
+ The timings of the round are set by the migration announce parameters.
+ An optional comma separated @var{interfaces} list restricts the announce=
+ to the
+-named set of interfaces.
++named set of interfaces. An optional @var{id} can be used to start a sep=
+arate announce
++timer and to change the parameters of it later.
+ ETEXI
+=20
+     {
+diff --git a/hmp.c b/hmp.c
+index 52efb4a4fa..fd498ca0a8 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1669,12 +1669,15 @@ void hmp_info_snapshots(Monitor *mon, const QDict=
+ *qdict)
+ void hmp_announce_self(Monitor *mon, const QDict *qdict)
+ {
+     const char *interfaces_str =3D qdict_get_try_str(qdict, "interfaces"=
+);
++    const char *id =3D qdict_get_try_str(qdict, "id");
+     AnnounceParameters *params =3D QAPI_CLONE(AnnounceParameters,
+                                             migrate_announce_params());
+=20
+     qapi_free_strList(params->interfaces);
+     params->interfaces =3D strList_from_comma_list(interfaces_str);
+     params->has_interfaces =3D params->interfaces !=3D NULL;
++    params->id =3D g_strdup(id);
++    params->has_id =3D !!params->id;
+     qmp_announce_self(params, NULL);
+     qapi_free_AnnounceParameters(params);
+ }
 --=20
 2.21.0
 
