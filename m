@@ -6,58 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2059BC31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 07:11:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0731AC31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 07:40:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDFDD2084D
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 07:11:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDFDD2084D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id D58B320896
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 07:40:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D58B320896
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37360 helo=lists.gnu.org)
+Received: from localhost ([::1]:37480 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbJtA-0004tk-1S
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 03:11:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45481)
+	id 1hbKL4-0005QH-Qs
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 03:40:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52845)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <groug@kaod.org>) id 1hbJqD-0003rw-6I
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 03:08:10 -0400
+ (envelope-from <kraxel@redhat.com>) id 1hbKJn-00044C-2B
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 03:38:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1hbJqC-0001Tn-3H
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 03:08:09 -0400
-Received: from 15.mo6.mail-out.ovh.net ([188.165.39.161]:58133)
+ (envelope-from <kraxel@redhat.com>) id 1hbKJl-00064a-UR
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 03:38:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54810)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1hbJqA-0001EW-MZ
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 03:08:07 -0400
-Received: from player738.ha.ovh.net (unknown [10.109.160.93])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id 14C021D0DC7
- for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 09:07:44 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player738.ha.ovh.net (Postfix) with ESMTPSA id 41E936E632A8;
- Thu, 13 Jun 2019 07:07:39 +0000 (UTC)
-Date: Thu, 13 Jun 2019 09:07:38 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190613090738.116b7e1b@bahia.lan>
-In-Reply-To: <20190612235627.GE26378@umbus.fritz.box>
-References: <20190612230202.878-1-philmd@redhat.com>
- <20190612235627.GE26378@umbus.fritz.box>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- boundary="Sig_/6CHsLwRdDyyj3agTjLyET31"; protocol="application/pgp-signature"
-X-Ovh-Tracer-Id: 17744182535315888614
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudehkedgudduhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hbKJl-00063s-OR
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 03:38:41 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4B4C330001DD;
+ Thu, 13 Jun 2019 07:38:40 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-33.ams2.redhat.com
+ [10.36.116.33])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8A018600C0;
+ Thu, 13 Jun 2019 07:38:35 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 4C16017510; Thu, 13 Jun 2019 09:38:34 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 13 Jun 2019 09:38:33 +0200
+Message-Id: <20190613073834.22001-2-kraxel@redhat.com>
+In-Reply-To: <20190613073834.22001-1-kraxel@redhat.com>
+References: <20190613073834.22001-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Thu, 13 Jun 2019 07:38:40 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 188.165.39.161
-Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH] spapr_pci: Fix Null pointer
- dereferences in spapr_dt_pci_bus()
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 1/2] edid: add xmax + ymax properties
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,93 +67,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org,
- Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/6CHsLwRdDyyj3agTjLyET31
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Add new properties to allow setting the maximum display resolution.
+Resolutions larger than that will not be included in the mode list.
+In linux guests xrandr can be used to list modes.
 
-On Thu, 13 Jun 2019 09:56:27 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+Note: The existing xres and yres properties set the preferred display
+resolution, i.e. the mode should be first in the mode list and guests
+should use it by default.
 
-> On Thu, Jun 13, 2019 at 01:02:02AM +0200, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> > Commit 14e714900f6 refactored the call to spapr_dt_drc(),
-> > but used an incorrect object owner as argument.
-> >=20
-> > This fixes:
-> >=20
-> >   /hw/ppc/spapr_pci.c: 1367 in spapr_dt_pci_bus() =20
-> >   >>>     CID 1401933:  Null pointer dereferences  (FORWARD_NULL)
-> >   >>>     Dereferencing null pointer "bus". =20
-> >   1367         ret =3D spapr_dt_drc(fdt, offset, OBJECT(bus->parent_dev=
-),
-> >   1368                            SPAPR_DR_CONNECTOR_TYPE_PCI);
-> >=20
-> > Fixes: 14e714900f6
-> > Reported-by: Coverity (CID 1401933)
-> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =20
->=20
-> Nack.  The bus bridge is the correct owner in most cases here.  It
-> *used* to be that all the PCI DRCs were owned by the PHB, but that's
-> intentionally not the case with the changes to allow hotplug under P2P
-> bridges.
->=20
-> AFAICT, the bus parameter does have to be non-NULL from both callers,
-> so I think the correct fix is to remove the test on if (bus) earlier
-> in the function.
->=20
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-id: 20190607083429.31943-1-kraxel@redhat.com
+---
+ include/hw/display/edid.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-... and maybe make this obvious with an assert(bus) ?
+diff --git a/include/hw/display/edid.h b/include/hw/display/edid.h
+index bacf1708894b..7948bd2c40f8 100644
+--- a/include/hw/display/edid.h
++++ b/include/hw/display/edid.h
+@@ -22,6 +22,8 @@ void qemu_edid_region_io(MemoryRegion *region, Object *owner,
+ 
+ #define DEFINE_EDID_PROPERTIES(_state, _edid_info)              \
+     DEFINE_PROP_UINT32("xres", _state, _edid_info.prefx, 0),    \
+-    DEFINE_PROP_UINT32("yres", _state, _edid_info.prefy, 0)
++    DEFINE_PROP_UINT32("yres", _state, _edid_info.prefy, 0),    \
++    DEFINE_PROP_UINT32("xmax", _state, _edid_info.maxx, 0),     \
++    DEFINE_PROP_UINT32("ymax", _state, _edid_info.maxy, 0)
+ 
+ #endif /* EDID_H */
+-- 
+2.18.1
 
-> > ---
-> >  hw/ppc/spapr_pci.c | 3 +--
-> >  1 file changed, 1 insertion(+), 2 deletions(-)
-> >=20
-> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> > index 957ae88bbd..e0cd3f11f1 100644
-> > --- a/hw/ppc/spapr_pci.c
-> > +++ b/hw/ppc/spapr_pci.c
-> > @@ -1364,8 +1364,7 @@ static int spapr_dt_pci_bus(SpaprPhbState *sphb, =
-PCIBus *bus,
-> >          }
-> >      }
-> > =20
-> > -    ret =3D spapr_dt_drc(fdt, offset, OBJECT(bus->parent_dev),
-> > -                       SPAPR_DR_CONNECTOR_TYPE_PCI);
-> > +    ret =3D spapr_dt_drc(fdt, offset, OBJECT(sphb), SPAPR_DR_CONNECTOR=
-_TYPE_PCI);
-> >      if (ret) {
-> >          return ret;
-> >      } =20
->=20
-
-
---Sig_/6CHsLwRdDyyj3agTjLyET31
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl0B9joACgkQcdTV5YIv
-c9YBng/9EFPd45eFimA4SsSWJxxFCGo2abBXIM0vGdXReF5icyMQ+KXD2xkmSpvY
-0Bh2HNFFsvgXAS8aPqiUW0lEWx273ycy5wMPN3o8NLjltB8qsGoOchL9gCli1jiO
-7jr8D8fyTIsAaSAF2irzbgJwblcVmFGMJtLrA6oWcrGzUL0v+Itnp/bx4fzB93dp
-4PtMcD3iL0F7gHIi/73YQR4QrkWWwpBEOOwOlbL8KK2y/JpNDPbJ08LNCCz8fZr4
-qNookEYxIjatKPK/gp1BzEkQrHIt5BURG0ElaKktbxhAh5aYnvJQh9pUQ44uENav
-gXHCyxy2UDXcVheD6F9N1/pCU3jxrNVYh1UNzDfa7ao1fnHrfs/VGdWE5tyzYCqX
-yiUCabML+O59bNGT1cSAxXNncmIkdZMqmlFTJPHt57+vknV7Pn6P0eUNohZp+1By
-qYDXfSWOMYLpCL7p9MuTFsjvCk1muRPqiwkGmimy7I6hygYElzUA912Zvb+bCScE
-p2JOidVG6tEenXvXzLbDdS7LK8LTkCKa9aG54+hvCFHw4aCfYXQIUu4arkU4UKhy
-eGsEeafccfvR1YDOFtwk0VGzm/3L1XwAR3Dz1xcMBVdg7mZpJRibr4BFF5SnxvHY
-cD+7s0G5QoZl0pQdZ3YC31TQsN3HZykyjVT8f0nbjFBGQ+m6LqQ=
-=UbK2
------END PGP SIGNATURE-----
-
---Sig_/6CHsLwRdDyyj3agTjLyET31--
 
