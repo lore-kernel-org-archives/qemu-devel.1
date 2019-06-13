@@ -2,61 +2,80 @@ Return-Path: <SRS0=rgCY=UM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B06E7C31E49
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 16:41:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C92CC31E4A
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 16:46:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C22B20644
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 16:41:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C22B20644
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6CE7720673
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 16:46:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JjH0k34y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CE7720673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41620 helo=lists.gnu.org)
+Received: from localhost ([::1]:41732 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbSnD-0005tc-P9
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 12:41:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59856)
+	id 1hbSre-0001Bu-Ih
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 12:46:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58437)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hbRkm-0000MY-EP
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 11:35:07 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hbRff-0005uh-DK
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 11:29:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hbRkg-0003HK-N1
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 11:35:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52348)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hbRkU-00036Y-SZ; Thu, 13 Jun 2019 11:34:48 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3959430917AA;
- Thu, 13 Jun 2019 15:34:33 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-116-246.ams2.redhat.com
- [10.36.116.246])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 520EA60C44;
- Thu, 13 Jun 2019 15:34:26 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 13 Jun 2019 17:33:53 +0200
-Message-Id: <20190613153405.24769-4-kwolf@redhat.com>
-In-Reply-To: <20190613153405.24769-1-kwolf@redhat.com>
-References: <20190613153405.24769-1-kwolf@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1hbRfe-0007OM-2B
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 11:29:47 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:45394)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hbRfd-0007Ni-Iw
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 11:29:45 -0400
+Received: by mail-ot1-x344.google.com with SMTP id x21so8460640otq.12
+ for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 08:29:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=KEkgxCKWRabUyBza824z8Hgv2Pzr1xKHtI89+T+0aec=;
+ b=JjH0k34yc7VvL8f74qAog778MLjkcY9P5nIbtcu2yVVNTE0NBmlQho9O3DDv/BpqYI
+ XzNTaZdItmZ9mgNXe27UNQeUBPI5v5dXUItUH09h/O8zxFSu0aLoDqgXFq/B+slVNBxy
+ cUIjHLzkSaWt/aBYoiQ3xOM9xqJ5MTuVqD5ZzdzbJiJf5URH7rPZ7GiLKnBDpy5NYIl9
+ RzqGKMDM6K5fTzlzhy0muikcAhF5Tt18f+7b5Rw9vbQrJ1zqXGk/If5T97XRoKOzrA7u
+ G1MFV8Sg5kPRt9IVUfxwDRbqMA1bGfQPijYu1MFPzTMx85uIxd0zhcZ0Ofvu+ZJ0P9ld
+ kTzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=KEkgxCKWRabUyBza824z8Hgv2Pzr1xKHtI89+T+0aec=;
+ b=IN860NGoSl5xCBusxajXwUDvLzwErw5XXmt9aqCw1bjJn7yoeSbwmnfGzKT8vy2x1U
+ 5WMNQ6F5WZHdBigNExshE6uGOg/H27KvPdt7l1+qPRG7b0OfrPilSk/RnxMH9jeryzBa
+ wpbaNLD+IDNAxqeoHf0DgtoXrj/Sk8tivf9K28aXcHyAIOaFh/G9QattbmvU77lDhLXM
+ /dC35C32oIO957l3dioisEm5gb5FcXD1hfmzshRqbGmwCatzV+h4OWP0lgdo43xnf3WG
+ VU9NYkZKdI241tPq+mV4n2Kmd7IyICuH7OUqD2h8NY6IdIvIdtT0BstgnxvGO1tm503e
+ hEUg==
+X-Gm-Message-State: APjAAAVAnyqomqUtbsUQvIqc0QSvHWMSv4Fmqj9i0wHj/N3+JCRhf0aH
+ VrKIqr68VRDSOy9h1pEoUh9CFdb++P/4mEkE5XyzFA==
+X-Google-Smtp-Source: APXvYqw1WD4E2NVORujl1LaOYftgBiU0xcr64Xf9Do6AO/5AdiCjTiTtUiV3kpCvcSlpjqHutDUVNJ2w9Ok3hEgHuBk=
+X-Received: by 2002:a9d:6a0f:: with SMTP id g15mr2063255otn.135.1560439784520; 
+ Thu, 13 Jun 2019 08:29:44 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Thu, 13 Jun 2019 15:34:41 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 03/15] monitor: Make MonitorQMP a child
- class of Monitor
+References: <20190610134545.3743-1-peter.maydell@linaro.org>
+ <156043918624.3418.2275764093147880770@sif>
+In-Reply-To: <156043918624.3418.2275764093147880770@sif>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 13 Jun 2019 16:29:33 +0100
+Message-ID: <CAFEAcA97MUveG=si03B7_2WzDugtz7hR9x+YNQmU2xDiCF81eA@mail.gmail.com>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH] qemu-ga: Convert invocation documentation
+ to rST
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,592 +87,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, berrange@redhat.com, qemu-block@nongnu.org,
- armbru@redhat.com, dgilbert@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently, struct Monitor mixes state that is only relevant for HMP,
-state that is only relevant for QMP, and some actually shared state.
-In particular, a MonitorQMP field is present in the state of any
-monitor, even if it's not a QMP monitor and therefore doesn't use the
-state.
+On Thu, 13 Jun 2019 at 16:20, Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+>
+> Quoting Peter Maydell (2019-06-10 08:45:45)
+> > The qemu-ga documentation is currently in qemu-ga.texi in
+> > Texinfo format, which we present to the user as:
+> >  * a qemu-ga manpage
+> >  * a section of the main qemu-doc HTML documentation
+> >
+> > Convert the documentation to rST format, and present it to
+> > the user as:
+> >  * a qemu-ga manpage
+> >  * part of the interop/ Sphinx manual
+> >
+> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-As a first step towards a clean separation between QMP and HMP, let
-MonitorQMP extend Monitor and create a MonitorQMP object only when the
-monitor is actually a QMP monitor.
+> > +# Canned command to build manpages from a single manual
+> > +build-manpages = $(call quiet-command,CONFDIR="$(qemu_confdir)" sphinx-build $(if $(V),,-q) -W -n -b man -D version=$(VERSION) -D release="$(FULL_VERSION)" -d .doctrees/$1 $(SRC_PATH)/docs/$1
+$(MANUAL_BUILDDIR)/$1 ,"SPHINX","$(MANUAL_BUILDDIR)/$1")
 
-Some places accessed Monitor.qmp unconditionally, even for HMP monitors.
-They can't keep doing this now, so during the conversion, they are
-either changed to become conditional on monitor_is_qmp() or to assert()
-that they always get a QMP monitor.
+> > --- a/docs/conf.py
+> > +++ b/docs/conf.py
+> > @@ -115,6 +115,14 @@ todo_include_todos = False
+> >  # with "option::" in the document being processed. Turn that off.
+> >  suppress_warnings = ["ref.option"]
+> >
+> > +# The rst_epilog fragment is effectively included in every rST file.
+> > +# We use it to define substitutions based on build config that
+> > +# can then be used in the documentation. The fallback if the
+> > +# environment variable is not set is for the benefit of readthedocs
+> > +# style document building; our Makefile always sets the variable.
+> > +confdir = os.getenv('CONFDIR', "/usr/local/etc")
+> > +rst_epilog = ".. |CONFDIR| replace:: ``" + confdir + "``\n"
+> > +
+>
+> When testing this I have the following in my qemu build directory (via
+> ./configure --prefix=/home/mdroth/w/qemu-install2):
+>
+>   $ grep -r CONFDIR
+>   config-host.h-timestamp:#define CONFIG_QEMU_CONFDIR "/home/mdroth/w/qemu-install2/etc/qemu"
+>   qemu-doc.txt:     user-provided config files on SYSCONFDIR.
+>   config-host.h:#define CONFIG_QEMU_CONFDIR "/home/mdroth/w/qemu-install2/etc/qemu"
+>   docs/version.texi:@set CONFDIR /home/mdroth/w/qemu-install2/etc/qemu
+>
+> but the following input for the qemu-ga man page:
+>
+>   qemu-ga will read a system configuration file on startup (located at
+>   |CONFDIR|\ ``/qemu-ga.conf`` by default),
+>
+> ends up as this in the generated man page:
+>
+>   qemu-ga will read a system configuration file on startup (located at /usr/local/etc/qemu-ga.conf
+>   by  default),
+>
+> is this expected, or are we unexpectedly falling back to the default
+> value here?
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- monitor.c | 220 ++++++++++++++++++++++++++++++------------------------
- 1 file changed, 124 insertions(+), 96 deletions(-)
+No, if you're invoking Sphinx via the makefile then we should
+be passing CONFDIR="$(qemu_confdir)" to set the environment
+variable when we invoke it. Can you try doing a build with V=1
+to check the sphinx command line ?
 
-diff --git a/monitor.c b/monitor.c
-index a70c1283b1..855a147723 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -168,26 +168,6 @@ struct MonFdset {
-     QLIST_ENTRY(MonFdset) next;
- };
-=20
--typedef struct {
--    JSONMessageParser parser;
--    /*
--     * When a client connects, we're in capabilities negotiation mode.
--     * @commands is &qmp_cap_negotiation_commands then.  When command
--     * qmp_capabilities succeeds, we go into command mode, and
--     * @command becomes &qmp_commands.
--     */
--    QmpCommandList *commands;
--    bool capab_offered[QMP_CAPABILITY__MAX]; /* capabilities offered */
--    bool capab[QMP_CAPABILITY__MAX];         /* offered and accepted */
--    /*
--     * Protects qmp request/response queue.
--     * Take monitor_lock first when you need both.
--     */
--    QemuMutex qmp_queue_lock;
--    /* Input queue that holds all the parsed QMP requests */
--    GQueue *qmp_requests;
--} MonitorQMP;
--
- /*
-  * To prevent flooding clients, events can be throttled. The
-  * throttling is calculated globally, rather than per-Monitor
-@@ -220,7 +200,6 @@ struct Monitor {
-      */
-     ReadLineState *rs;
-=20
--    MonitorQMP qmp;
-     gchar *mon_cpu_path;
-     mon_cmd_t *cmd_table;
-     QTAILQ_ENTRY(Monitor) entry;
-@@ -241,6 +220,27 @@ struct Monitor {
-     int mux_out;
- };
-=20
-+typedef struct {
-+    Monitor common;
-+    JSONMessageParser parser;
-+    /*
-+     * When a client connects, we're in capabilities negotiation mode.
-+     * @commands is &qmp_cap_negotiation_commands then.  When command
-+     * qmp_capabilities succeeds, we go into command mode, and
-+     * @command becomes &qmp_commands.
-+     */
-+    QmpCommandList *commands;
-+    bool capab_offered[QMP_CAPABILITY__MAX]; /* capabilities offered */
-+    bool capab[QMP_CAPABILITY__MAX];         /* offered and accepted */
-+    /*
-+     * Protects qmp request/response queue.
-+     * Take monitor_lock first when you need both.
-+     */
-+    QemuMutex qmp_queue_lock;
-+    /* Input queue that holds all the parsed QMP requests */
-+    GQueue *qmp_requests;
-+} MonitorQMP;
-+
- /* Shared monitor I/O thread */
- IOThread *mon_iothread;
-=20
-@@ -249,7 +249,7 @@ QEMUBH *qmp_dispatcher_bh;
-=20
- struct QMPRequest {
-     /* Owner of the request */
--    Monitor *mon;
-+    MonitorQMP *mon;
-     /*
-      * Request object to be handled or Error to be reported
-      * (exactly one of them is non-null)
-@@ -357,18 +357,18 @@ static void qmp_request_free(QMPRequest *req)
- }
-=20
- /* Caller must hold mon->qmp.qmp_queue_lock */
--static void monitor_qmp_cleanup_req_queue_locked(Monitor *mon)
-+static void monitor_qmp_cleanup_req_queue_locked(MonitorQMP *mon)
- {
--    while (!g_queue_is_empty(mon->qmp.qmp_requests)) {
--        qmp_request_free(g_queue_pop_head(mon->qmp.qmp_requests));
-+    while (!g_queue_is_empty(mon->qmp_requests)) {
-+        qmp_request_free(g_queue_pop_head(mon->qmp_requests));
-     }
- }
-=20
--static void monitor_qmp_cleanup_queues(Monitor *mon)
-+static void monitor_qmp_cleanup_queues(MonitorQMP *mon)
- {
--    qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
-+    qemu_mutex_lock(&mon->qmp_queue_lock);
-     monitor_qmp_cleanup_req_queue_locked(mon);
--    qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
-+    qemu_mutex_unlock(&mon->qmp_queue_lock);
- }
-=20
-=20
-@@ -480,17 +480,17 @@ int monitor_printf(Monitor *mon, const char *fmt, .=
-..)
-     return ret;
- }
-=20
--static void qmp_send_response(Monitor *mon, const QDict *rsp)
-+static void qmp_send_response(MonitorQMP *mon, const QDict *rsp)
- {
-     const QObject *data =3D QOBJECT(rsp);
-     QString *json;
-=20
--    json =3D mon->flags & MONITOR_USE_PRETTY ? qobject_to_json_pretty(da=
-ta) :
--                                             qobject_to_json(data);
-+    json =3D mon->common.flags & MONITOR_USE_PRETTY ?
-+           qobject_to_json_pretty(data) : qobject_to_json(data);
-     assert(json !=3D NULL);
-=20
-     qstring_append_chr(json, '\n');
--    monitor_puts(mon, qstring_get_str(json));
-+    monitor_puts(&mon->common, qstring_get_str(json));
-=20
-     qobject_unref(json);
- }
-@@ -513,12 +513,17 @@ static MonitorQAPIEventConf monitor_qapi_event_conf=
-[QAPI_EVENT__MAX] =3D {
- static void monitor_qapi_event_emit(QAPIEvent event, QDict *qdict)
- {
-     Monitor *mon;
-+    MonitorQMP *qmp_mon;
-=20
-     trace_monitor_protocol_event_emit(event, qdict);
-     QTAILQ_FOREACH(mon, &mon_list, entry) {
--        if (monitor_is_qmp(mon)
--            && mon->qmp.commands !=3D &qmp_cap_negotiation_commands) {
--            qmp_send_response(mon, qdict);
-+        if (!monitor_is_qmp(mon)) {
-+            continue;
-+        }
-+
-+        qmp_mon =3D container_of(mon, MonitorQMP, common);
-+        if (qmp_mon->commands !=3D &qmp_cap_negotiation_commands) {
-+            qmp_send_response(qmp_mon, qdict);
-         }
-     }
- }
-@@ -712,29 +717,33 @@ static void monitor_data_init(Monitor *mon, int fla=
-gs, bool skip_flush,
-     }
-     memset(mon, 0, sizeof(Monitor));
-     qemu_mutex_init(&mon->mon_lock);
--    qemu_mutex_init(&mon->qmp.qmp_queue_lock);
-     mon->outbuf =3D qstring_new();
-     /* Use *mon_cmds by default. */
-     mon->cmd_table =3D mon_cmds;
-     mon->skip_flush =3D skip_flush;
-     mon->use_io_thread =3D use_io_thread;
--    mon->qmp.qmp_requests =3D g_queue_new();
-     mon->flags =3D flags;
- }
-=20
-+static void monitor_data_destroy_qmp(MonitorQMP *mon)
-+{
-+    json_message_parser_destroy(&mon->parser);
-+    qemu_mutex_destroy(&mon->qmp_queue_lock);
-+    monitor_qmp_cleanup_req_queue_locked(mon);
-+    g_queue_free(mon->qmp_requests);
-+}
-+
- static void monitor_data_destroy(Monitor *mon)
- {
-     g_free(mon->mon_cpu_path);
-     qemu_chr_fe_deinit(&mon->chr, false);
-     if (monitor_is_qmp(mon)) {
--        json_message_parser_destroy(&mon->qmp.parser);
-+        MonitorQMP *qmp_mon =3D container_of(mon, MonitorQMP, common);
-+        monitor_data_destroy_qmp(qmp_mon);
-     }
-     readline_free(mon->rs);
-     qobject_unref(mon->outbuf);
-     qemu_mutex_destroy(&mon->mon_lock);
--    qemu_mutex_destroy(&mon->qmp.qmp_queue_lock);
--    monitor_qmp_cleanup_req_queue_locked(mon);
--    g_queue_free(mon->qmp.qmp_requests);
- }
-=20
- char *qmp_human_monitor_command(const char *command_line, bool has_cpu_i=
-ndex,
-@@ -1087,8 +1096,12 @@ static void query_commands_cb(QmpCommand *cmd, voi=
-d *opaque)
- CommandInfoList *qmp_query_commands(Error **errp)
- {
-     CommandInfoList *list =3D NULL;
-+    MonitorQMP *mon;
-+
-+    assert(monitor_is_qmp(cur_mon));
-+    mon =3D container_of(cur_mon, MonitorQMP, common);
-=20
--    qmp_for_each_command(cur_mon->qmp.commands, query_commands_cb, &list=
-);
-+    qmp_for_each_command(mon->commands, query_commands_cb, &list);
-=20
-     return list;
- }
-@@ -1155,16 +1168,16 @@ static void monitor_init_qmp_commands(void)
-                          qmp_marshal_qmp_capabilities, QCO_ALLOW_PRECONF=
-IG);
- }
-=20
--static bool qmp_oob_enabled(Monitor *mon)
-+static bool qmp_oob_enabled(MonitorQMP *mon)
- {
--    return mon->qmp.capab[QMP_CAPABILITY_OOB];
-+    return mon->capab[QMP_CAPABILITY_OOB];
- }
-=20
--static void monitor_qmp_caps_reset(Monitor *mon)
-+static void monitor_qmp_caps_reset(MonitorQMP *mon)
- {
--    memset(mon->qmp.capab_offered, 0, sizeof(mon->qmp.capab_offered));
--    memset(mon->qmp.capab, 0, sizeof(mon->qmp.capab));
--    mon->qmp.capab_offered[QMP_CAPABILITY_OOB] =3D mon->use_io_thread;
-+    memset(mon->capab_offered, 0, sizeof(mon->capab_offered));
-+    memset(mon->capab, 0, sizeof(mon->capab));
-+    mon->capab_offered[QMP_CAPABILITY_OOB] =3D mon->common.use_io_thread=
-;
- }
-=20
- /*
-@@ -1172,7 +1185,7 @@ static void monitor_qmp_caps_reset(Monitor *mon)
-  * On success, set mon->qmp.capab[], and return true.
-  * On error, set @errp, and return false.
-  */
--static bool qmp_caps_accept(Monitor *mon, QMPCapabilityList *list,
-+static bool qmp_caps_accept(MonitorQMP *mon, QMPCapabilityList *list,
-                             Error **errp)
- {
-     GString *unavailable =3D NULL;
-@@ -1181,7 +1194,7 @@ static bool qmp_caps_accept(Monitor *mon, QMPCapabi=
-lityList *list,
-     memset(capab, 0, sizeof(capab));
-=20
-     for (; list; list =3D list->next) {
--        if (!mon->qmp.capab_offered[list->value]) {
-+        if (!mon->capab_offered[list->value]) {
-             if (!unavailable) {
-                 unavailable =3D g_string_new(QMPCapability_str(list->val=
-ue));
-             } else {
-@@ -1198,25 +1211,30 @@ static bool qmp_caps_accept(Monitor *mon, QMPCapa=
-bilityList *list,
-         return false;
-     }
-=20
--    memcpy(mon->qmp.capab, capab, sizeof(capab));
-+    memcpy(mon->capab, capab, sizeof(capab));
-     return true;
- }
-=20
- void qmp_qmp_capabilities(bool has_enable, QMPCapabilityList *enable,
-                           Error **errp)
- {
--    if (cur_mon->qmp.commands =3D=3D &qmp_commands) {
-+    MonitorQMP *mon;
-+
-+    assert(monitor_is_qmp(cur_mon));
-+    mon =3D container_of(cur_mon, MonitorQMP, common);
-+
-+    if (mon->commands =3D=3D &qmp_commands) {
-         error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
-                   "Capabilities negotiation is already complete, command=
- "
-                   "ignored");
-         return;
-     }
-=20
--    if (!qmp_caps_accept(cur_mon, enable, errp)) {
-+    if (!qmp_caps_accept(mon, enable, errp)) {
-         return;
-     }
-=20
--    cur_mon->qmp.commands =3D &qmp_commands;
-+    mon->commands =3D &qmp_commands;
- }
-=20
- /* Set the current CPU defined by the user. Callers must hold BQL. */
-@@ -4123,27 +4141,27 @@ static int monitor_can_read(void *opaque)
-  * Null @rsp can only happen for commands with QCO_NO_SUCCESS_RESP.
-  * Nothing is emitted then.
-  */
--static void monitor_qmp_respond(Monitor *mon, QDict *rsp)
-+static void monitor_qmp_respond(MonitorQMP *mon, QDict *rsp)
- {
-     if (rsp) {
-         qmp_send_response(mon, rsp);
-     }
- }
-=20
--static void monitor_qmp_dispatch(Monitor *mon, QObject *req)
-+static void monitor_qmp_dispatch(MonitorQMP *mon, QObject *req)
- {
-     Monitor *old_mon;
-     QDict *rsp;
-     QDict *error;
-=20
-     old_mon =3D cur_mon;
--    cur_mon =3D mon;
-+    cur_mon =3D &mon->common;
-=20
--    rsp =3D qmp_dispatch(mon->qmp.commands, req, qmp_oob_enabled(mon));
-+    rsp =3D qmp_dispatch(mon->commands, req, qmp_oob_enabled(mon));
-=20
-     cur_mon =3D old_mon;
-=20
--    if (mon->qmp.commands =3D=3D &qmp_cap_negotiation_commands) {
-+    if (mon->commands =3D=3D &qmp_cap_negotiation_commands) {
-         error =3D qdict_get_qdict(rsp, "error");
-         if (error
-             && !g_strcmp0(qdict_get_try_str(error, "class"),
-@@ -4168,24 +4186,30 @@ static void monitor_qmp_dispatch(Monitor *mon, QO=
-bject *req)
-  * monitor to the end of mon_list queue.
-  *
-  * Note: if the function returned with non-NULL, then the caller will
-- * be with mon->qmp.qmp_queue_lock held, and the caller is responsible
-+ * be with qmp_mon->qmp_queue_lock held, and the caller is responsible
-  * to release it.
-  */
- static QMPRequest *monitor_qmp_requests_pop_any_with_lock(void)
- {
-     QMPRequest *req_obj =3D NULL;
-     Monitor *mon;
-+    MonitorQMP *qmp_mon;
-=20
-     qemu_mutex_lock(&monitor_lock);
-=20
-     QTAILQ_FOREACH(mon, &mon_list, entry) {
--        qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
--        req_obj =3D g_queue_pop_head(mon->qmp.qmp_requests);
-+        if (!monitor_is_qmp(mon)) {
-+            continue;
-+        }
-+
-+        qmp_mon =3D container_of(mon, MonitorQMP, common);
-+        qemu_mutex_lock(&qmp_mon->qmp_queue_lock);
-+        req_obj =3D g_queue_pop_head(qmp_mon->qmp_requests);
-         if (req_obj) {
-             /* With the lock of corresponding queue held */
-             break;
-         }
--        qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
-+        qemu_mutex_unlock(&qmp_mon->qmp_queue_lock);
-     }
-=20
-     if (req_obj) {
-@@ -4207,7 +4231,7 @@ static void monitor_qmp_bh_dispatcher(void *data)
-     QMPRequest *req_obj =3D monitor_qmp_requests_pop_any_with_lock();
-     QDict *rsp;
-     bool need_resume;
--    Monitor *mon;
-+    MonitorQMP *mon;
-=20
-     if (!req_obj) {
-         return;
-@@ -4216,8 +4240,8 @@ static void monitor_qmp_bh_dispatcher(void *data)
-     mon =3D req_obj->mon;
-     /*  qmp_oob_enabled() might change after "qmp_capabilities" */
-     need_resume =3D !qmp_oob_enabled(mon) ||
--        mon->qmp.qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_MAX - 1;
--    qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
-+        mon->qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_MAX - 1;
-+    qemu_mutex_unlock(&mon->qmp_queue_lock);
-     if (req_obj->req) {
-         QDict *qdict =3D qobject_to(QDict, req_obj->req);
-         QObject *id =3D qdict ? qdict_get(qdict, "id") : NULL;
-@@ -4233,7 +4257,7 @@ static void monitor_qmp_bh_dispatcher(void *data)
-=20
-     if (need_resume) {
-         /* Pairs with the monitor_suspend() in handle_qmp_command() */
--        monitor_resume(mon);
-+        monitor_resume(&mon->common);
-     }
-     qmp_request_free(req_obj);
-=20
-@@ -4243,7 +4267,7 @@ static void monitor_qmp_bh_dispatcher(void *data)
-=20
- static void handle_qmp_command(void *opaque, QObject *req, Error *err)
- {
--    Monitor *mon =3D opaque;
-+    MonitorQMP *mon =3D opaque;
-     QObject *id =3D NULL;
-     QDict *qdict;
-     QMPRequest *req_obj;
-@@ -4275,7 +4299,7 @@ static void handle_qmp_command(void *opaque, QObjec=
-t *req, Error *err)
-     req_obj->err =3D err;
-=20
-     /* Protect qmp_requests and fetching its length. */
--    qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
-+    qemu_mutex_lock(&mon->qmp_queue_lock);
-=20
-     /*
-      * Suspend the monitor when we can't queue more requests after
-@@ -4284,8 +4308,8 @@ static void handle_qmp_command(void *opaque, QObjec=
-t *req, Error *err)
-      * command, for backward compatibility.
-      */
-     if (!qmp_oob_enabled(mon) ||
--        mon->qmp.qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_MAX - 1) =
-{
--        monitor_suspend(mon);
-+        mon->qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_MAX - 1) {
-+        monitor_suspend(&mon->common);
-     }
-=20
-     /*
-@@ -4293,9 +4317,9 @@ static void handle_qmp_command(void *opaque, QObjec=
-t *req, Error *err)
-      * handled in time order.  Ownership for req_obj, req,
-      * etc. will be delivered to the handler side.
-      */
--    assert(mon->qmp.qmp_requests->length < QMP_REQ_QUEUE_LEN_MAX);
--    g_queue_push_tail(mon->qmp.qmp_requests, req_obj);
--    qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
-+    assert(mon->qmp_requests->length < QMP_REQ_QUEUE_LEN_MAX);
-+    g_queue_push_tail(mon->qmp_requests, req_obj);
-+    qemu_mutex_unlock(&mon->qmp_queue_lock);
-=20
-     /* Kick the dispatcher routine */
-     qemu_bh_schedule(qmp_dispatcher_bh);
-@@ -4303,9 +4327,9 @@ static void handle_qmp_command(void *opaque, QObjec=
-t *req, Error *err)
-=20
- static void monitor_qmp_read(void *opaque, const uint8_t *buf, int size)
- {
--    Monitor *mon =3D opaque;
-+    MonitorQMP *mon =3D opaque;
-=20
--    json_message_parser_feed(&mon->qmp.parser, (const char *) buf, size)=
-;
-+    json_message_parser_feed(&mon->parser, (const char *) buf, size);
- }
-=20
- static void monitor_read(void *opaque, const uint8_t *buf, int size)
-@@ -4391,7 +4415,7 @@ void monitor_resume(Monitor *mon)
-     trace_monitor_suspend(mon, -1);
- }
-=20
--static QDict *qmp_greeting(Monitor *mon)
-+static QDict *qmp_greeting(MonitorQMP *mon)
- {
-     QList *cap_list =3D qlist_new();
-     QObject *ver =3D NULL;
-@@ -4400,7 +4424,7 @@ static QDict *qmp_greeting(Monitor *mon)
-     qmp_marshal_query_version(NULL, &ver, NULL);
-=20
-     for (cap =3D 0; cap < QMP_CAPABILITY__MAX; cap++) {
--        if (mon->qmp.capab_offered[cap]) {
-+        if (mon->capab_offered[cap]) {
-             qlist_append_str(cap_list, QMPCapability_str(cap));
-         }
-     }
-@@ -4413,11 +4437,11 @@ static QDict *qmp_greeting(Monitor *mon)
- static void monitor_qmp_event(void *opaque, int event)
- {
-     QDict *data;
--    Monitor *mon =3D opaque;
-+    MonitorQMP *mon =3D opaque;
-=20
-     switch (event) {
-     case CHR_EVENT_OPENED:
--        mon->qmp.commands =3D &qmp_cap_negotiation_commands;
-+        mon->commands =3D &qmp_cap_negotiation_commands;
-         monitor_qmp_caps_reset(mon);
-         data =3D qmp_greeting(mon);
-         qmp_send_response(mon, data);
-@@ -4432,8 +4456,8 @@ static void monitor_qmp_event(void *opaque, int eve=
-nt)
-          * is closed.
-          */
-         monitor_qmp_cleanup_queues(mon);
--        json_message_parser_destroy(&mon->qmp.parser);
--        json_message_parser_init(&mon->qmp.parser, handle_qmp_command,
-+        json_message_parser_destroy(&mon->parser);
-+        json_message_parser_init(&mon->parser, handle_qmp_command,
-                                  mon, NULL);
-         mon_refcount--;
-         monitor_fdsets_cleanup();
-@@ -4595,33 +4619,37 @@ static void monitor_list_append(Monitor *mon)
-=20
- static void monitor_qmp_setup_handlers_bh(void *opaque)
- {
--    Monitor *mon =3D opaque;
-+    MonitorQMP *mon =3D opaque;
-     GMainContext *context;
-=20
--    assert(mon->use_io_thread);
-+    assert(mon->common.use_io_thread);
-     context =3D iothread_get_g_main_context(mon_iothread);
-     assert(context);
--    qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_qmp_re=
-ad,
--                             monitor_qmp_event, NULL, mon, context, true=
-);
--    monitor_list_append(mon);
-+    qemu_chr_fe_set_handlers(&mon->common.chr, monitor_can_read,
-+                             monitor_qmp_read, monitor_qmp_event,
-+                             NULL, &mon->common, context, true);
-+    monitor_list_append(&mon->common);
- }
-=20
- static void monitor_init_qmp(Chardev *chr, int flags)
- {
--    Monitor *mon =3D g_malloc(sizeof(*mon));
-+    MonitorQMP *mon =3D g_malloc0(sizeof(*mon));
-=20
-     /* Only HMP supports readline */
-     assert(!(flags & MONITOR_USE_READLINE));
-=20
-     /* Note: we run QMP monitor in I/O thread when @chr supports that */
--    monitor_data_init(mon, flags, false,
-+    monitor_data_init(&mon->common, flags, false,
-                       qemu_chr_has_feature(chr, QEMU_CHAR_FEATURE_GCONTE=
-XT));
-=20
--    qemu_chr_fe_init(&mon->chr, chr, &error_abort);
--    qemu_chr_fe_set_echo(&mon->chr, true);
-+    qemu_mutex_init(&mon->qmp_queue_lock);
-+    mon->qmp_requests =3D g_queue_new();
-=20
--    json_message_parser_init(&mon->qmp.parser, handle_qmp_command, mon, =
-NULL);
--    if (mon->use_io_thread) {
-+    qemu_chr_fe_init(&mon->common.chr, chr, &error_abort);
-+    qemu_chr_fe_set_echo(&mon->common.chr, true);
-+
-+    json_message_parser_init(&mon->parser, handle_qmp_command, mon, NULL=
-);
-+    if (mon->common.use_io_thread) {
-         /*
-          * Make sure the old iowatch is gone.  It's possible when
-          * e.g. the chardev is in client mode, with wait=3Don.
-@@ -4636,10 +4664,10 @@ static void monitor_init_qmp(Chardev *chr, int fl=
-ags)
-                                 monitor_qmp_setup_handlers_bh, mon);
-         /* The bottom half will add @mon to @mon_list */
-     } else {
--        qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read,
-+        qemu_chr_fe_set_handlers(&mon->common.chr, monitor_can_read,
-                                  monitor_qmp_read, monitor_qmp_event,
--                                 NULL, mon, NULL, true);
--        monitor_list_append(mon);
-+                                 NULL, &mon->common, NULL, true);
-+        monitor_list_append(&mon->common);
-     }
- }
-=20
---=20
-2.20.1
+I've just realized that I didn't also update the 'build-manual'
+macro to add the CONFDIR setting. Perhaps Sphinx ran first with
+the build-manual macro and has cached document contents created
+with that incorrect invocation and then reused them in the manpage
+creation? If so, this should be fixable by adding the CONFDIR="$(qemu_confdir)"
+to the build-manual macro in the Makefile, and then deleting the .doctrees/
+directory from your build tree and rerunning make.
 
+> Sphinx seems to do a better job of formatting "Key" and "Key type" into
+> actual table columns in the generated man/html pages (rather than just
+> separating them with whitespace), so I think we can drop the trailing '='s
+
+Sure; I'll change this in v2.
+
+thanks
+-- PMM
 
