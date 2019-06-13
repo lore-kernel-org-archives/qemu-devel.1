@@ -2,90 +2,61 @@ Return-Path: <SRS0=rgCY=UM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FFB8C31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 16:34:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83A47C46477
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 16:34:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF75520449
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 16:34:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF75520449
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 5D92621721
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 16:34:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D92621721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41542 helo=lists.gnu.org)
+Received: from localhost ([::1]:41544 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbSg2-00063T-GZ
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 12:34:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54083)
+	id 1hbSgg-0006KH-Hx
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 12:34:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60379)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hbRSP-0000hW-PK
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 11:16:07 -0400
+ (envelope-from <kwolf@redhat.com>) id 1hbRlp-00013z-I7
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 11:36:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hbRSM-0000er-Vi
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 11:16:05 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:41838
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1hbRSM-0000Xq-Oi
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 11:16:02 -0400
-Received: from host81-158-188-206.range81-158.btcentralplus.com
- ([81.158.188.206] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1hbRPs-0007wg-Nd; Thu, 13 Jun 2019 16:13:29 +0100
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- atar4qemu@gmail.com
-References: <20190612203916.16875-1-mark.cave-ayland@ilande.co.uk>
- <d1feb628-7455-1ba1-a3e9-bac6b3c6f9f0@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <4ce0f01d-634f-3921-8fbb-89c987789c29@ilande.co.uk>
-Date: Thu, 13 Jun 2019 16:13:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <kwolf@redhat.com>) id 1hbRln-0004Fo-II
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 11:36:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45980)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1hbRlU-00041M-Df; Thu, 13 Jun 2019 11:35:49 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9D7362EF16E;
+ Thu, 13 Jun 2019 15:35:34 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-116-246.ams2.redhat.com
+ [10.36.116.246])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 16AAF60C7F;
+ Thu, 13 Jun 2019 15:35:30 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 13 Jun 2019 17:34:05 +0200
+Message-Id: <20190613153405.24769-16-kwolf@redhat.com>
+In-Reply-To: <20190613153405.24769-1-kwolf@redhat.com>
+References: <20190613153405.24769-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <d1feb628-7455-1ba1-a3e9-bac6b3c6f9f0@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 81.158.188.206
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Thu, 13 Jun 2019 15:35:42 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH] sun4m: set default display type to TCX
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v3 15/15] vl: Deprecate -mon pretty=... for HMP
+ monitors
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,30 +68,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, berrange@redhat.com, qemu-block@nongnu.org,
+ armbru@redhat.com, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/06/2019 12:53, Paolo Bonzini wrote:
+The -mon pretty=3Don|off switch of the -mon option applies only the QMP
+monitors. It used to be silently ignored for HMP. Deprecate this
+combination so that we can make it an error in future versions.
 
-> On 12/06/19 22:39, Mark Cave-Ayland wrote:
->> Commit 6807874d55 "sun4m: obey -vga none" changed the sun4m machines so that
->> they could be started without a framebuffer installed, but as no default
->> display type was configured the machines would start in headless mode without
->> an explict -vga option.
->>
->> Set the default display type for all sun4m machines to TCX so that they will
->> start with a framebuffer if one is not specifically requested.
->>
->> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> 
-> Oops, sorry.  Do you want me to queue it, or are you doing that?
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ vl.c                 | 10 +++++++++-
+ qemu-deprecated.texi |  6 ++++++
+ 2 files changed, 15 insertions(+), 1 deletion(-)
 
-I've got nothing queued for SPARC at the moment, so please go ahead if you've already
-got a queue pending for a pull request.
+diff --git a/vl.c b/vl.c
+index 32daa434eb..99a56b5556 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2317,6 +2317,10 @@ static int mon_init_func(void *opaque, QemuOpts *o=
+pts, Error **errp)
+         return -1;
+     }
+=20
++    if (!qmp && qemu_opt_get(opts, "pretty")) {
++        warn_report("'pretty' is deprecated for HMP monitors, it has no =
+effect "
++                    "and will be removed in future versions");
++    }
+     if (qemu_opt_get_bool(opts, "pretty", 0)) {
+         pretty =3D true;
+     }
+@@ -2362,7 +2366,11 @@ static void monitor_parse(const char *optarg, cons=
+t char *mode, bool pretty)
+     opts =3D qemu_opts_create(qemu_find_opts("mon"), label, 1, &error_fa=
+tal);
+     qemu_opt_set(opts, "mode", mode, &error_abort);
+     qemu_opt_set(opts, "chardev", label, &error_abort);
+-    qemu_opt_set_bool(opts, "pretty", pretty, &error_abort);
++    if (!strcmp(mode, "control")) {
++        qemu_opt_set_bool(opts, "pretty", pretty, &error_abort);
++    } else {
++        assert(pretty =3D=3D false);
++    }
+     monitor_device_index++;
+ }
+=20
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 50292d820b..df04f2840b 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -72,6 +72,12 @@ backend settings instead of environment variables.  To=
+ ease migration to
+ the new format, the ``-audiodev-help'' option can be used to convert
+ the current values of the environment variables to ``-audiodev'' options=
+.
+=20
++@subsection -mon ...,control=3Dreadline,pretty=3Don|off (since 4.1)
++
++The @code{pretty=3Don|off} switch has no effect for HMP monitors, but is
++silently ignored. Using the switch with HMP monitors will become an
++error in the future.
++
+ @subsection -realtime (since 4.1)
+=20
+ The @code{-realtime mlock=3Don|off} argument has been replaced by the
+--=20
+2.20.1
 
-
-ATB,
-
-Mark.
 
