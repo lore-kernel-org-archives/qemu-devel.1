@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C5F4C31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 12:36:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2460CC31E4A
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 12:36:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46DC32173C
+	by mail.kernel.org (Postfix) with ESMTPS id E84B421721
 	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 12:36:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="plQQM5AM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46DC32173C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mo6vMRnX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E84B421721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39426 helo=lists.gnu.org)
+Received: from localhost ([::1]:39430 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbOxe-0003Tx-IG
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 08:36:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58882)
+	id 1hbOxf-0003WO-0Z
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 08:36:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58775)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hbOd9-0007uw-Vf
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:15:02 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hbOcx-0007tk-HY
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:14:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hbOd6-00048w-1f
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:14:59 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:41389)
+ (envelope-from <peter.maydell@linaro.org>) id 1hbOcu-0003wy-B0
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:14:47 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39408)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hbOcz-0003xx-Rz
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:14:51 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id c2so20519541wrm.8
- for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 05:14:46 -0700 (PDT)
+ id 1hbOcr-0003tS-DB
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 08:14:41 -0400
+Received: by mail-wr1-x443.google.com with SMTP id x4so17872241wrt.6
+ for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 05:14:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=xm/iU+FgN2/ONIM2BO5fUGTM2YKGKHisYFdgV1PLSxQ=;
- b=plQQM5AMHPTB2i5WNwtYosR6gEn3bHIZ20VeQWe6OdZojn5NmaefqLb6JgfK9otf69
- 0hccDmcn/HRTIMKvnTojtwKdCgU3EvOIijBaC+Stc20ilIsH2aLue3jsXWQ9XGHlaVUN
- d81hmtWWCQdgYXJcrLoQp88hHKzJ3JQmp8DBlVR68jzlWEOBxApDPuZ98jw0kpvWLD1X
- 4+9U1ZGMz5xSbIFeou8IOBZ9k8BbYEYMsureBp8Qpdq5TMdYdPAA7Npe1cusy3k33bD7
- sHKA4P9XVnOSuthxVPQSbOtLTrW4LvUmSsE0j2AHbyungjDNKFBLDM6bx8pN+guSTHiR
- 4ByQ==
+ bh=FgrJRA7j7aTJ3DWKdfLXQg9RBsbyTXhKrH5Enhs39X4=;
+ b=mo6vMRnX3ZrwUK7W+GWxyPfZUPDHrhoAbLvdB199iH+Xt2Q+QkRNiGo9aZ1ifX/SQW
+ 3Nw/Yxb7lVSchyLOW7nI6RIhRE3RWy6rmOtdR3SDS6Uz7xUKOobBg+IhY/2ALLBoMSFy
+ 5vScqnSoOf9ndo639W6Yved1gARN5PANXXd73KrcanxIYOWajgS35AVZM6s1tVcKC+jk
+ B5nKS5PSBwE1TneM4TBaQwzxORX+3BE8Xl/xKqf0xVxicjbMIpAr8+J2LiLE9WJzVMoi
+ WtTe6xfKZKss6icO3EX8Mn2DvAWd0Ze9GFibtr/k4cR/AxCxLMRukO4IVBY5kAw9WDqY
+ P6mg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=xm/iU+FgN2/ONIM2BO5fUGTM2YKGKHisYFdgV1PLSxQ=;
- b=qLaZIn4T2K1Qez/8UZhiDYfLz5xGLdjPUfLU+VvPz84tAViaEPTtiuoOaJUZIcTMAS
- BppGyYBwhNEe4XT2D0VDo9rV5gjsOgvA2BodCkgDdZjSew8I6EMFDDehWZ3RFV7bqPbk
- GRRQtt756PkzygasGJmIXau8CX421HWPtolO2nX151Ct3OfIl3RY+VINof1DWMLUcGV4
- Oa6BEB3oXJBC42od0BkWppOhRwPNGCs7TXcaM1DPlu1l4eQQMlUqB6lpvXqAANZfvQiA
- HPMfaZ1dEAW0u1SnzYuPxUhU7yTaZG4EI85Tx18o41vy+hLXDoGI/oa9OJ5lB8bJoKjC
- R4Pg==
-X-Gm-Message-State: APjAAAXiYr3kdoWdtiaN6Z3DoZmXCuNzzSU1JiHqUz9PAl/7SiDK9nuH
- VN4ps6SeDaquuKS95aiPD0dBPyOHhmUwHA==
-X-Google-Smtp-Source: APXvYqx6eeIS5OQtfmH2QWrIZODZ++M85W3TrGkM+DIcsfhqA0SnYr1GaHsuhH4/++80xzpbO/yHGg==
-X-Received: by 2002:a5d:5186:: with SMTP id k6mr45556426wrv.30.1560428085052; 
- Thu, 13 Jun 2019 05:14:45 -0700 (PDT)
+ bh=FgrJRA7j7aTJ3DWKdfLXQg9RBsbyTXhKrH5Enhs39X4=;
+ b=oVy1e6Wmvftw9Ch8QulPJnV31CkehUezGEzydDUa2OUJlK/+kfGUxMbyJT8MBj6QZE
+ q82mATgehoFIZvBDb3cnA7XLeXW0KD0C3twbFUXDUErvqULZw0Pb/isRhUd85nF7InBM
+ m7el1vAyVbfRPXlioqAXOQVnL/KMYARE3XwcIkIXytnbc1dTR8oIJvL2OaF7x+pV9OmF
+ day+7pAF7CLemw9T5DXJ+OrxidRIYc4/8NcLo8lhgeLbFE81FrvIlG4hX//UZ5ctwJEB
+ CozsqLV6VNtXE3NUjM3MZ6sqmWmZIgPWvj6+qEBlkKFwzhTFIxj6DTYN/SCF5jBSNwyK
+ WUXg==
+X-Gm-Message-State: APjAAAX7TrvxiP10b0Uf6/Ay0RGJ/40WRM3ijCXv890wSoGuzct8Jucf
+ PgLaiNe8lW6Ug1j7Ym/s+Jmk+Al0UMlJ5g==
+X-Google-Smtp-Source: APXvYqxRAhKHKi4j9t8SYU/WfhWIHiM1CV1bo2uRQMCU/poPbqnKk/6djKPpl/KdLO2VwjZbX3Q6QQ==
+X-Received: by 2002:adf:e8d0:: with SMTP id k16mr46597951wrn.31.1560428079139; 
+ Thu, 13 Jun 2019 05:14:39 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id y6sm2010576wrp.12.2019.06.13.05.14.44
+ by smtp.gmail.com with ESMTPSA id y6sm2010576wrp.12.2019.06.13.05.14.37
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 13 Jun 2019 05:14:44 -0700 (PDT)
+ Thu, 13 Jun 2019 05:14:38 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu, 13 Jun 2019 13:13:54 +0100
-Message-Id: <20190613121433.5246-10-peter.maydell@linaro.org>
+Date: Thu, 13 Jun 2019 13:13:48 +0100
+Message-Id: <20190613121433.5246-4-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190613121433.5246-1-peter.maydell@linaro.org>
 References: <20190613121433.5246-1-peter.maydell@linaro.org>
@@ -80,9 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42e
-Subject: [Qemu-devel] [PULL 09/48] target/arm: Factor out VFP access
- checking code
+X-Received-From: 2a00:1450:4864:20::443
+Subject: [Qemu-devel] [PULL 03/48] target/arm: Implement NSACR gating of
+ floating point
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,263 +98,141 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Factor out the VFP access checking code so that we can use it in the
-leaf functions of the decodetree decoder.
+The NSACR register allows secure code to configure the FPU
+to be inaccessible to non-secure code. If the NSACR.CP10
+bit is set then:
+ * NS accesses to the FPU trap as UNDEF (ie to NS EL1 or EL2)
+ * CPACR.{CP10,CP11} behave as if RAZ/WI
+ * HCPTR.{TCP11,TCP10} behave as if RAO/WI
 
-We call the function full_vfp_access_check() so we can keep
-the more natural vfp_access_check() for a version which doesn't
-have the 'ignore_vfp_enabled' flag -- that way almost all VFP
-insns will be able to use vfp_access_check(s) and only the
-special-register access function will have to use
-full_vfp_access_check(s, ignore_vfp_enabled).
+Note that we do not implement the NSACR.NSASEDIS bit which
+gates only access to Advanced SIMD, in the same way that
+we don't implement the equivalent CPACR.ASEDIS and HCPTR.TASE.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20190510110357.18825-1-peter.maydell@linaro.org
 ---
- target/arm/translate-vfp.inc.c | 100 ++++++++++++++++++++++++++++++++
- target/arm/translate.c         | 101 +++++----------------------------
- 2 files changed, 113 insertions(+), 88 deletions(-)
+ target/arm/helper.c | 75 +++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 73 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
-index 3447b3e6466..cf3d7febaa7 100644
---- a/target/arm/translate-vfp.inc.c
-+++ b/target/arm/translate-vfp.inc.c
-@@ -29,3 +29,103 @@
- /* Include the generated VFP decoder */
- #include "decode-vfp.inc.c"
- #include "decode-vfp-uncond.inc.c"
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 188fb1950ef..df4276f5f6c 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -930,9 +930,36 @@ static void cpacr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+         }
+         value &= mask;
+     }
 +
-+/*
-+ * Check that VFP access is enabled. If it is, do the necessary
-+ * M-profile lazy-FP handling and then return true.
-+ * If not, emit code to generate an appropriate exception and
-+ * return false.
-+ * The ignore_vfp_enabled argument specifies that we should ignore
-+ * whether VFP is enabled via FPEXC[EN]: this should be true for FMXR/FMRX
-+ * accesses to FPSID, FPEXC, MVFR0, MVFR1, MVFR2, and false for all other insns.
-+ */
-+static bool full_vfp_access_check(DisasContext *s, bool ignore_vfp_enabled)
-+{
-+    if (s->fp_excp_el) {
-+        if (arm_dc_feature(s, ARM_FEATURE_M)) {
-+            gen_exception_insn(s, 4, EXCP_NOCP, syn_uncategorized(),
-+                               s->fp_excp_el);
-+        } else {
-+            gen_exception_insn(s, 4, EXCP_UDEF,
-+                               syn_fp_access_trap(1, 0xe, false),
-+                               s->fp_excp_el);
-+        }
-+        return false;
++    /*
++     * For A-profile AArch32 EL3 (but not M-profile secure mode), if NSACR.CP10
++     * is 0 then CPACR.{CP11,CP10} ignore writes and read as 0b00.
++     */
++    if (arm_feature(env, ARM_FEATURE_EL3) && !arm_el_is_aa64(env, 3) &&
++        !arm_is_secure(env) && !extract32(env->cp15.nsacr, 10, 1)) {
++        value &= ~(0xf << 20);
++        value |= env->cp15.cpacr_el1 & (0xf << 20);
 +    }
 +
-+    if (!s->vfp_enabled && !ignore_vfp_enabled) {
-+        assert(!arm_dc_feature(s, ARM_FEATURE_M));
-+        gen_exception_insn(s, 4, EXCP_UDEF, syn_uncategorized(),
-+                           default_exception_el(s));
-+        return false;
-+    }
-+
-+    if (arm_dc_feature(s, ARM_FEATURE_M)) {
-+        /* Handle M-profile lazy FP state mechanics */
-+
-+        /* Trigger lazy-state preservation if necessary */
-+        if (s->v7m_lspact) {
-+            /*
-+             * Lazy state saving affects external memory and also the NVIC,
-+             * so we must mark it as an IO operation for icount.
-+             */
-+            if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
-+                gen_io_start();
-+            }
-+            gen_helper_v7m_preserve_fp_state(cpu_env);
-+            if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
-+                gen_io_end();
-+            }
-+            /*
-+             * If the preserve_fp_state helper doesn't throw an exception
-+             * then it will clear LSPACT; we don't need to repeat this for
-+             * any further FP insns in this TB.
-+             */
-+            s->v7m_lspact = false;
-+        }
-+
-+        /* Update ownership of FP context: set FPCCR.S to match current state */
-+        if (s->v8m_fpccr_s_wrong) {
-+            TCGv_i32 tmp;
-+
-+            tmp = load_cpu_field(v7m.fpccr[M_REG_S]);
-+            if (s->v8m_secure) {
-+                tcg_gen_ori_i32(tmp, tmp, R_V7M_FPCCR_S_MASK);
-+            } else {
-+                tcg_gen_andi_i32(tmp, tmp, ~R_V7M_FPCCR_S_MASK);
-+            }
-+            store_cpu_field(tmp, v7m.fpccr[M_REG_S]);
-+            /* Don't need to do this for any further FP insns in this TB */
-+            s->v8m_fpccr_s_wrong = false;
-+        }
-+
-+        if (s->v7m_new_fp_ctxt_needed) {
-+            /*
-+             * Create new FP context by updating CONTROL.FPCA, CONTROL.SFPA
-+             * and the FPSCR.
-+             */
-+            TCGv_i32 control, fpscr;
-+            uint32_t bits = R_V7M_CONTROL_FPCA_MASK;
-+
-+            fpscr = load_cpu_field(v7m.fpdscr[s->v8m_secure]);
-+            gen_helper_vfp_set_fpscr(cpu_env, fpscr);
-+            tcg_temp_free_i32(fpscr);
-+            /*
-+             * We don't need to arrange to end the TB, because the only
-+             * parts of FPSCR which we cache in the TB flags are the VECLEN
-+             * and VECSTRIDE, and those don't exist for M-profile.
-+             */
-+
-+            if (s->v8m_secure) {
-+                bits |= R_V7M_CONTROL_SFPA_MASK;
-+            }
-+            control = load_cpu_field(v7m.control[M_REG_S]);
-+            tcg_gen_ori_i32(control, control, bits);
-+            store_cpu_field(control, v7m.control[M_REG_S]);
-+            /* Don't need to do this for any further FP insns in this TB */
-+            s->v7m_new_fp_ctxt_needed = false;
-+        }
-+    }
-+
-+    return true;
-+}
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index c97e6c8238c..f7720922c75 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -3373,8 +3373,10 @@ static int disas_vfp_misc_insn(DisasContext *s, uint32_t insn)
-     return 1;
+     env->cp15.cpacr_el1 = value;
  }
  
--/* Disassemble a VFP instruction.  Returns nonzero if an error occurred
--   (ie. an undefined instruction).  */
-+/*
-+ * Disassemble a VFP instruction.  Returns nonzero if an error occurred
-+ * (ie. an undefined instruction).
-+ */
- static int disas_vfp_insn(DisasContext *s, uint32_t insn)
- {
-     uint32_t rd, rn, rm, op, i, n, offset, delta_d, delta_m, bank_mask;
-@@ -3382,6 +3384,7 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-     TCGv_i32 addr;
-     TCGv_i32 tmp;
-     TCGv_i32 tmp2;
-+    bool ignore_vfp_enabled = false;
- 
-     if (!arm_dc_feature(s, ARM_FEATURE_VFP)) {
-         return 1;
-@@ -3403,98 +3406,20 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-         }
-     }
- 
--    /* FIXME: this access check should not take precedence over UNDEF
++static uint64_t cpacr_read(CPUARMState *env, const ARMCPRegInfo *ri)
++{
 +    /*
-+     * FIXME: this access check should not take precedence over UNDEF
-      * for invalid encodings; we will generate incorrect syndrome information
-      * for attempts to execute invalid vfp/neon encodings with FP disabled.
-      */
--    if (s->fp_excp_el) {
--        if (arm_dc_feature(s, ARM_FEATURE_M)) {
--            gen_exception_insn(s, 4, EXCP_NOCP, syn_uncategorized(),
--                               s->fp_excp_el);
--        } else {
--            gen_exception_insn(s, 4, EXCP_UDEF,
--                               syn_fp_access_trap(1, 0xe, false),
--                               s->fp_excp_el);
--        }
--        return 0;
--    }
--
--    if (!s->vfp_enabled) {
--        /* VFP disabled.  Only allow fmxr/fmrx to/from some control regs.  */
--        if ((insn & 0x0fe00fff) != 0x0ee00a10)
--            return 1;
-+    if ((insn & 0x0fe00fff) == 0x0ee00a10) {
-         rn = (insn >> 16) & 0xf;
--        if (rn != ARM_VFP_FPSID && rn != ARM_VFP_FPEXC && rn != ARM_VFP_MVFR2
--            && rn != ARM_VFP_MVFR1 && rn != ARM_VFP_MVFR0) {
--            return 1;
-+        if (rn == ARM_VFP_FPSID || rn == ARM_VFP_FPEXC || rn == ARM_VFP_MVFR2
-+            || rn == ARM_VFP_MVFR1 || rn == ARM_VFP_MVFR0) {
-+            ignore_vfp_enabled = true;
-         }
-     }
--
--    if (arm_dc_feature(s, ARM_FEATURE_M)) {
--        /* Handle M-profile lazy FP state mechanics */
--
--        /* Trigger lazy-state preservation if necessary */
--        if (s->v7m_lspact) {
--            /*
--             * Lazy state saving affects external memory and also the NVIC,
--             * so we must mark it as an IO operation for icount.
--             */
--            if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
--                gen_io_start();
--            }
--            gen_helper_v7m_preserve_fp_state(cpu_env);
--            if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
--                gen_io_end();
--            }
--            /*
--             * If the preserve_fp_state helper doesn't throw an exception
--             * then it will clear LSPACT; we don't need to repeat this for
--             * any further FP insns in this TB.
--             */
--            s->v7m_lspact = false;
--        }
--
--        /* Update ownership of FP context: set FPCCR.S to match current state */
--        if (s->v8m_fpccr_s_wrong) {
--            TCGv_i32 tmp;
--
--            tmp = load_cpu_field(v7m.fpccr[M_REG_S]);
--            if (s->v8m_secure) {
--                tcg_gen_ori_i32(tmp, tmp, R_V7M_FPCCR_S_MASK);
--            } else {
--                tcg_gen_andi_i32(tmp, tmp, ~R_V7M_FPCCR_S_MASK);
--            }
--            store_cpu_field(tmp, v7m.fpccr[M_REG_S]);
--            /* Don't need to do this for any further FP insns in this TB */
--            s->v8m_fpccr_s_wrong = false;
--        }
--
--        if (s->v7m_new_fp_ctxt_needed) {
--            /*
--             * Create new FP context by updating CONTROL.FPCA, CONTROL.SFPA
--             * and the FPSCR.
--             */
--            TCGv_i32 control, fpscr;
--            uint32_t bits = R_V7M_CONTROL_FPCA_MASK;
--
--            fpscr = load_cpu_field(v7m.fpdscr[s->v8m_secure]);
--            gen_helper_vfp_set_fpscr(cpu_env, fpscr);
--            tcg_temp_free_i32(fpscr);
--            /*
--             * We don't need to arrange to end the TB, because the only
--             * parts of FPSCR which we cache in the TB flags are the VECLEN
--             * and VECSTRIDE, and those don't exist for M-profile.
--             */
--
--            if (s->v8m_secure) {
--                bits |= R_V7M_CONTROL_SFPA_MASK;
--            }
--            control = load_cpu_field(v7m.control[M_REG_S]);
--            tcg_gen_ori_i32(control, control, bits);
--            store_cpu_field(control, v7m.control[M_REG_S]);
--            /* Don't need to do this for any further FP insns in this TB */
--            s->v7m_new_fp_ctxt_needed = false;
--        }
-+    if (!full_vfp_access_check(s, ignore_vfp_enabled)) {
-+        return 0;
++     * For A-profile AArch32 EL3 (but not M-profile secure mode), if NSACR.CP10
++     * is 0 then CPACR.{CP11,CP10} ignore writes and read as 0b00.
++     */
++    uint64_t value = env->cp15.cpacr_el1;
++
++    if (arm_feature(env, ARM_FEATURE_EL3) && !arm_el_is_aa64(env, 3) &&
++        !arm_is_secure(env) && !extract32(env->cp15.nsacr, 10, 1)) {
++        value &= ~(0xf << 20);
++    }
++    return value;
++}
++
++
+ static void cpacr_reset(CPUARMState *env, const ARMCPRegInfo *ri)
+ {
+     /* Call cpacr_write() so that we reset with the correct RAO bits set
+@@ -998,7 +1025,7 @@ static const ARMCPRegInfo v6_cp_reginfo[] = {
+     { .name = "CPACR", .state = ARM_CP_STATE_BOTH, .opc0 = 3,
+       .crn = 1, .crm = 0, .opc1 = 0, .opc2 = 2, .accessfn = cpacr_access,
+       .access = PL1_RW, .fieldoffset = offsetof(CPUARMState, cp15.cpacr_el1),
+-      .resetfn = cpacr_reset, .writefn = cpacr_write },
++      .resetfn = cpacr_reset, .writefn = cpacr_write, .readfn = cpacr_read },
+     REGINFO_SENTINEL
+ };
+ 
+@@ -4683,6 +4710,36 @@ uint64_t arm_hcr_el2_eff(CPUARMState *env)
+     return ret;
+ }
+ 
++static void cptr_el2_write(CPUARMState *env, const ARMCPRegInfo *ri,
++                           uint64_t value)
++{
++    /*
++     * For A-profile AArch32 EL3, if NSACR.CP10
++     * is 0 then HCPTR.{TCP11,TCP10} ignore writes and read as 1.
++     */
++    if (arm_feature(env, ARM_FEATURE_EL3) && !arm_el_is_aa64(env, 3) &&
++        !arm_is_secure(env) && !extract32(env->cp15.nsacr, 10, 1)) {
++        value &= ~(0x3 << 10);
++        value |= env->cp15.cptr_el[2] & (0x3 << 10);
++    }
++    env->cp15.cptr_el[2] = value;
++}
++
++static uint64_t cptr_el2_read(CPUARMState *env, const ARMCPRegInfo *ri)
++{
++    /*
++     * For A-profile AArch32 EL3, if NSACR.CP10
++     * is 0 then HCPTR.{TCP11,TCP10} ignore writes and read as 1.
++     */
++    uint64_t value = env->cp15.cptr_el[2];
++
++    if (arm_feature(env, ARM_FEATURE_EL3) && !arm_el_is_aa64(env, 3) &&
++        !arm_is_secure(env) && !extract32(env->cp15.nsacr, 10, 1)) {
++        value |= 0x3 << 10;
++    }
++    return value;
++}
++
+ static const ARMCPRegInfo el2_cp_reginfo[] = {
+     { .name = "HCR_EL2", .state = ARM_CP_STATE_AA64,
+       .type = ARM_CP_IO,
+@@ -4730,7 +4787,8 @@ static const ARMCPRegInfo el2_cp_reginfo[] = {
+     { .name = "CPTR_EL2", .state = ARM_CP_STATE_BOTH,
+       .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 1, .opc2 = 2,
+       .access = PL2_RW, .accessfn = cptr_access, .resetvalue = 0,
+-      .fieldoffset = offsetof(CPUARMState, cp15.cptr_el[2]) },
++      .fieldoffset = offsetof(CPUARMState, cp15.cptr_el[2]),
++      .readfn = cptr_el2_read, .writefn = cptr_el2_write },
+     { .name = "MAIR_EL2", .state = ARM_CP_STATE_BOTH,
+       .opc0 = 3, .opc1 = 4, .crn = 10, .crm = 2, .opc2 = 0,
+       .access = PL2_RW, .fieldoffset = offsetof(CPUARMState, cp15.mair_el[2]),
+@@ -13587,6 +13645,19 @@ int fp_exception_el(CPUARMState *env, int cur_el)
+         break;
      }
  
-     if (extract32(insn, 28, 4) == 0xf) {
++    /*
++     * The NSACR allows A-profile AArch32 EL3 and M-profile secure mode
++     * to control non-secure access to the FPU. It doesn't have any
++     * effect if EL3 is AArch64 or if EL3 doesn't exist at all.
++     */
++    if ((arm_feature(env, ARM_FEATURE_EL3) && !arm_el_is_aa64(env, 3) &&
++         cur_el <= 2 && !arm_is_secure_below_el3(env))) {
++        if (!extract32(env->cp15.nsacr, 10, 1)) {
++            /* FP insns act as UNDEF */
++            return cur_el == 2 ? 2 : 1;
++        }
++    }
++
+     /* For the CPTR registers we don't need to guard with an ARM_FEATURE
+      * check because zero bits in the registers mean "don't trap".
+      */
 -- 
 2.20.1
 
