@@ -2,109 +2,92 @@ Return-Path: <SRS0=rgCY=UM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A72D1C46477
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 15:31:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78568C31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 15:37:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 752CC21743
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 15:31:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="BiNH5SVI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 752CC21743
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 409192082C
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 15:37:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 409192082C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40954 helo=lists.gnu.org)
+Received: from localhost ([::1]:40982 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbRgs-0006TE-8I
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 11:31:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33097)
+	id 1hbRn2-0001J5-2e
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 11:37:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34196)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hbQJs-0003VP-O8
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 10:03:15 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hbQMk-0005FJ-I7
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 10:06:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hbQJq-0003AJ-Eu
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 10:03:12 -0400
-Received: from mail-eopbgr30100.outbound.protection.outlook.com
- ([40.107.3.100]:50256 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1hbQJc-0002oa-Ex; Thu, 13 Jun 2019 10:02:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1cTtnXzIWMM/UpVbNZXwWLVUivd9jNGBVdSHvwuDUH0=;
- b=BiNH5SVImzJG3E6xeA/08AHdsoLDrlpD13NWqXyXyqOt+IPqoEhaM0Ogs7l039buW4swMYXA2RDyjIamh3sqCjG79+Yu9ghvAzKNYkwQ8mozqZGXDKDaCKUetoG7m4BAA0KQimCphTmBq0WSey43POZCtkTNy56LiGzJvZFFeNE=
-Received: from AM0PR08MB3572.eurprd08.prod.outlook.com (20.177.110.153) by
- AM0PR08MB3874.eurprd08.prod.outlook.com (20.178.82.86) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1987.12; Thu, 13 Jun 2019 14:02:37 +0000
-Received: from AM0PR08MB3572.eurprd08.prod.outlook.com
- ([fe80::d064:530:c7:ad76]) by AM0PR08MB3572.eurprd08.prod.outlook.com
- ([fe80::d064:530:c7:ad76%6]) with mapi id 15.20.1987.012; Thu, 13 Jun 2019
- 14:02:37 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Thread-Topic: [PATCH v8 2/7] block: swap operation order in bdrv_append
-Thread-Index: AQHVFjXGgsNg+PSamkmDUXu0vGswvqaZsBkAgAAExwA=
-Date: Thu, 13 Jun 2019 14:02:37 +0000
-Message-ID: <b643ce3f-104a-37e6-e373-1cb0de2aaf19@virtuozzo.com>
-References: <20190529154654.95870-1-vsementsov@virtuozzo.com>
- <20190529154654.95870-3-vsementsov@virtuozzo.com>
- <dd3c1d3f-a92a-bbd7-a916-ba7b066ee5dc@redhat.com>
-In-Reply-To: <dd3c1d3f-a92a-bbd7-a916-ba7b066ee5dc@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1P190CA0030.EURP190.PROD.OUTLOOK.COM (2603:10a6:7:52::19)
- To AM0PR08MB3572.eurprd08.prod.outlook.com
- (2603:10a6:208:e1::25)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190613170234675
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 9b3db8d1-69b7-4cae-74e5-08d6f007ca2a
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:AM0PR08MB3874; 
-x-ms-traffictypediagnostic: AM0PR08MB3874:
-x-microsoft-antispam-prvs: <AM0PR08MB3874F120B4543DFADA5891B6C1EF0@AM0PR08MB3874.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4303;
-x-forefront-prvs: 0067A8BA2A
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(376002)(366004)(346002)(396003)(39850400004)(136003)(199004)(189003)(186003)(81156014)(6486002)(26005)(81166006)(6436002)(36756003)(66066001)(229853002)(8676002)(31686004)(486006)(316002)(76176011)(2201001)(102836004)(2906002)(478600001)(2501003)(25786009)(6116002)(6506007)(8936002)(386003)(53546011)(3846002)(14454004)(31696002)(68736007)(66946007)(14444005)(256004)(6512007)(53936002)(86362001)(66476007)(66556008)(64756008)(66446008)(110136005)(54906003)(73956011)(71190400001)(305945005)(99286004)(52116002)(71200400001)(7736002)(11346002)(6246003)(446003)(4326008)(476003)(5660300002)(2616005);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB3874;
- H:AM0PR08MB3572.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: IXjWS2/cOa/Hkb6NPiON/vD0BqlL+dRQPFJKrb87sBgQv+4dtvXiRlQ7cGqw+OoRjZg3q4fgNsaojJ4tB2NtbUKKRzkObA+r6QNYLem/BT5SMFKgcRjGW7mbpo4m+3Y0CTZX0CkcTvyFpx29SCSZu8uoSf2ENM5UQbvLd6LcYxtVOzfyVZsjdEzWUXjeopJ8ZD0vF22nZdyidauTxJ5pXxYx+ajQ7u3S0WoQ1TOP66Q7hbK7n+eCQ9F84aI7B5LnhcFU7b/PD/3q9AJJoIlw76qzyzeex//0sd3W+WsvNaOMlaXgiiEf9mnY8t9L7e/aM1VnjiqVpNaVqbJ5/f02Sy1t1boGMCVM3ESEL9oAnxyfzOIiWJEaJ6goTjCS/KWuFT0UTbdcKNe3yYajtRvIsue1Ioby/FUFfYtBdn+zNgg=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <1E705B93C5739A49848954B2EDE922D3@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <mreitz@redhat.com>) id 1hbQMd-0005TS-3l
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 10:06:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50678)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hbQMY-0005OO-84; Thu, 13 Jun 2019 10:05:58 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D31BDA3EC0;
+ Thu, 13 Jun 2019 14:05:47 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.187])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 82D901001B04;
+ Thu, 13 Jun 2019 14:05:45 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190612221004.2317-1-mreitz@redhat.com>
+ <20190612221004.2317-10-mreitz@redhat.com>
+ <d6074caa-ee1e-4dde-1977-83ab327e2771@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <e4832ffc-62bd-bbaa-a00b-71fedf4d52bc@redhat.com>
+Date: Thu, 13 Jun 2019 16:05:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9b3db8d1-69b7-4cae-74e5-08d6f007ca2a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jun 2019 14:02:37.1338 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vsementsov@virtuozzo.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3874
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.3.100
-Subject: Re: [Qemu-devel] [PATCH v8 2/7] block: swap operation order in
- bdrv_append
+In-Reply-To: <d6074caa-ee1e-4dde-1977-83ab327e2771@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="dYxqDe86c1rxAE4t13CMfDFDpX2d5cvRX"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Thu, 13 Jun 2019 14:05:49 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v5 09/42] block: Include filters when
+ freezing backing chain
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,67 +99,262 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- Denis Lunev <den@virtuozzo.com>, "stefanha@redhat.com" <stefanha@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MTMuMDYuMjAxOSAxNjo0NSwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAyOS4wNS4xOSAxNzo0Niwg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IGJzX3RvcCBwYXJlbnRzIG1h
-eSBjb25mbGljdCB3aXRoIGJzX25ldyBiYWNraW5nIGNoaWxkIHBlcm1pc3Npb25zLCBzbw0KPj4g
-bGV0J3MgZG8gYmRydl9yZXBsYWNlX25vZGUgZmlyc3QsIGl0IGNvdmVycyBtb3JlIHBvc3NpYmxl
-IGNhc2VzLg0KPj4NCj4+IEl0IGlzIG5lZWRlZCBmb3IgZnVydGhlciBpbXBsZW1lbnRhdGlvbiBv
-ZiBiYWNrdXAtdG9wIGZpbHRlciwgd2hpY2gNCj4+IGRvbid0IHdhbnQgdG8gc2hhcmUgd3JpdGUg
-cGVybWlzc2lvbiBvbiBpdHMgYmFja2luZyBjaGlsZC4NCj4+DQo+PiBTaWRlIGVmZmVjdCBpcyB0
-aGF0IHdlIG1heSBzZXQgYmFja2luZyBoZCB3aGVuIGRldmljZSBuYW1lIGlzIGFscmVhZHkNCj4+
-IGF2YWlsYWJsZSwgc28gMDg1IGlvdGVzdCBvdXRwdXQgaXMgY2hhbmdlZC4NCj4+DQo+PiBTaWdu
-ZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1
-b3p6by5jb20+DQo+PiAtLS0NCj4+ICAgYmxvY2suYyAgICAgICAgICAgICAgICAgICAgfCAxMSAr
-KysrKysrKy0tLQ0KPj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvMDg1Lm91dCB8ICAyICstDQo+PiAg
-IDIgZmlsZXMgY2hhbmdlZCwgOSBpbnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygtKQ0KPj4NCj4+
-IGRpZmYgLS1naXQgYS9ibG9jay5jIGIvYmxvY2suYw0KPj4gaW5kZXggZTZlOTc3MDcwNC4uNTcy
-MTZmNDExNSAxMDA2NDQNCj4+IC0tLSBhL2Jsb2NrLmMNCj4+ICsrKyBiL2Jsb2NrLmMNCj4+IEBA
-IC00MDg4LDIyICs0MDg4LDI3IEBAIHZvaWQgYmRydl9hcHBlbmQoQmxvY2tEcml2ZXJTdGF0ZSAq
-YnNfbmV3LCBCbG9ja0RyaXZlclN0YXRlICpic190b3AsDQo+PiAgIHsNCj4+ICAgICAgIEVycm9y
-ICpsb2NhbF9lcnIgPSBOVUxMOw0KPj4gICANCj4+IC0gICAgYmRydl9zZXRfYmFja2luZ19oZChi
-c19uZXcsIGJzX3RvcCwgJmxvY2FsX2Vycik7DQo+PiArICAgIGJkcnZfcmVmKGJzX3RvcCk7DQo+
-PiArDQo+PiArICAgIGJkcnZfcmVwbGFjZV9ub2RlKGJzX3RvcCwgYnNfbmV3LCAmbG9jYWxfZXJy
-KTsNCj4+ICAgICAgIGlmIChsb2NhbF9lcnIpIHsNCj4+ICAgICAgICAgICBlcnJvcl9wcm9wYWdh
-dGUoZXJycCwgbG9jYWxfZXJyKTsNCj4+ICsgICAgICAgIGVycm9yX3ByZXBlbmQoZXJycCwgIkZh
-aWxlZCB0byByZXBsYWNlIG5vZGU6ICIpOw0KPj4gICAgICAgICAgIGdvdG8gb3V0Ow0KPj4gICAg
-ICAgfQ0KPj4gICANCj4+IC0gICAgYmRydl9yZXBsYWNlX25vZGUoYnNfdG9wLCBic19uZXcsICZs
-b2NhbF9lcnIpOw0KPj4gKyAgICBiZHJ2X3NldF9iYWNraW5nX2hkKGJzX25ldywgYnNfdG9wLCAm
-bG9jYWxfZXJyKTsNCj4+ICAgICAgIGlmIChsb2NhbF9lcnIpIHsNCj4+ICsgICAgICAgIGJkcnZf
-cmVwbGFjZV9ub2RlKGJzX25ldywgYnNfdG9wLCAmZXJyb3JfYWJvcnQpOw0KPiANCj4gSG0uICBJ
-IHNlZSB0aGUgbmVlZCBmb3Igc3dpdGNoaW5nIHRoaXMgc3R1ZmYgYXJvdW5kLCBidXQgdGhpcw0K
-PiAmZXJyb3JfYWJvcnQgaXMgbXVjaCBtb3JlIGRpZmZpY3VsdCB0byB2ZXJpZnkgdGhhbiB0aGUg
-cHJldmlvdXMgb25lIGZvcg0KPiBiZHJ2X3NldF9iYWNraW5nX2hkKC4uLiwgTlVMTCwgLi4uKS4g
-IEkgdGhpbmsgaXQgYXQgbGVhc3Qgd2FycmFudHMgYQ0KPiBjb21tZW50IHdoeSB0aGUgb3JkZXIg
-aGFzIHRvIGJlIHRoaXMgd2F5ICh1c2luZyBnaXQgYmxhbWUgaGFzIHRoZQ0KPiBkaXNhZHZhbnRh
-Z2Ugb2YgZmFkaW5nIG92ZXIgdGltZSBhcyBvdGhlciBwZW9wbGUgbW9kaWZ5IGEgcGllY2Ugb2YN
-Cg0Kc28sIEkgYWx3YXlzIHVzZSBnaXQgbG9nIC1wIC0tIDxmaWxlcGF0aD4gaW5zdGVhZCwgYW5k
-IHNlYXJjaCB0aHJvdWdoIGl0KQ0KDQo+IGNvZGUpLCBhbmQgd2h5IHRoaXMgJmVycm9yX2Fib3J0
-IGlzIHNhZmUuDQoNCm9rLCB3aWxsIGFkZA0KDQo+IA0KPiBNYXgNCj4gDQo+PiAgICAgICAgICAg
-ZXJyb3JfcHJvcGFnYXRlKGVycnAsIGxvY2FsX2Vycik7DQo+PiAtICAgICAgICBiZHJ2X3NldF9i
-YWNraW5nX2hkKGJzX25ldywgTlVMTCwgJmVycm9yX2Fib3J0KTsNCj4+ICsgICAgICAgIGVycm9y
-X3ByZXBlbmQoZXJycCwgIkZhaWxlZCB0byBzZXQgYmFja2luZzogIik7DQo+PiAgICAgICAgICAg
-Z290byBvdXQ7DQo+PiAgICAgICB9DQo+PiAgIA0KPj4gICAgICAgLyogYnNfbmV3IGlzIG5vdyBy
-ZWZlcmVuY2VkIGJ5IGl0cyBuZXcgcGFyZW50cywgd2UgZG9uJ3QgbmVlZCB0aGUNCj4+ICAgICAg
-ICAqIGFkZGl0aW9uYWwgcmVmZXJlbmNlIGFueSBtb3JlLiAqLw0KPj4gICBvdXQ6DQo+PiArICAg
-IGJkcnZfdW5yZWYoYnNfdG9wKTsNCj4+ICAgICAgIGJkcnZfdW5yZWYoYnNfbmV3KTsNCj4+ICAg
-fQ0KPj4gICANCj4+IGRpZmYgLS1naXQgYS90ZXN0cy9xZW11LWlvdGVzdHMvMDg1Lm91dCBiL3Rl
-c3RzL3FlbXUtaW90ZXN0cy8wODUub3V0DQo+PiBpbmRleCA2ZWRmMTA3ZjU1Li5lNWEyNjQ1YmY1
-IDEwMDY0NA0KPj4gLS0tIGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzA4NS5vdXQNCj4+ICsrKyBiL3Rl
-c3RzL3FlbXUtaW90ZXN0cy8wODUub3V0DQo+PiBAQCAtNzQsNyArNzQsNyBAQCBGb3JtYXR0aW5n
-ICdURVNUX0RJUi90LklNR0ZNVCcsIGZtdD1JTUdGTVQgc2l6ZT0xMzQyMTc3MjggYmFja2luZ19m
-aWxlPVRFU1RfRElSLw0KPj4gICANCj4+ICAgPT09IEludmFsaWQgY29tbWFuZCAtIHNuYXBzaG90
-IG5vZGUgdXNlZCBhcyBiYWNraW5nIGhkID09PQ0KPj4gICANCj4+IC17ImVycm9yIjogeyJjbGFz
-cyI6ICJHZW5lcmljRXJyb3IiLCAiZGVzYyI6ICJOb2RlICdzbmFwXzExJyBpcyBidXN5OiBub2Rl
-IGlzIHVzZWQgYXMgYmFja2luZyBoZCBvZiAnc25hcF8xMicifX0NCj4+ICt7ImVycm9yIjogeyJj
-bGFzcyI6ICJHZW5lcmljRXJyb3IiLCAiZGVzYyI6ICJOb2RlICdzbmFwXzExJyBpcyBidXN5OiBu
-b2RlIGlzIHVzZWQgYXMgYmFja2luZyBoZCBvZiAndmlydGlvMCcifX0NCj4+ICAgDQo+PiAgID09
-PSBJbnZhbGlkIGNvbW1hbmQgLSBzbmFwc2hvdCBub2RlIGhhcyBhIGJhY2tpbmcgaW1hZ2UgPT09
-DQo+PiAgIA0KPj4NCj4gDQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--dYxqDe86c1rxAE4t13CMfDFDpX2d5cvRX
+Content-Type: multipart/mixed; boundary="CSWZjMUnXPnH9PuokQymOLNxc07oRPZNa";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <e4832ffc-62bd-bbaa-a00b-71fedf4d52bc@redhat.com>
+Subject: Re: [PATCH v5 09/42] block: Include filters when freezing backing
+ chain
+References: <20190612221004.2317-1-mreitz@redhat.com>
+ <20190612221004.2317-10-mreitz@redhat.com>
+ <d6074caa-ee1e-4dde-1977-83ab327e2771@virtuozzo.com>
+In-Reply-To: <d6074caa-ee1e-4dde-1977-83ab327e2771@virtuozzo.com>
+
+--CSWZjMUnXPnH9PuokQymOLNxc07oRPZNa
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 13.06.19 15:04, Vladimir Sementsov-Ogievskiy wrote:
+> 13.06.2019 1:09, Max Reitz wrote:
+>> In order to make filters work in backing chains, the associated
+>> functions must be able to deal with them and freeze all filter links, =
+be
+>> they COW or R/W filter links.
+>>
+>> While at it, add some comments that note which functions require their=
+
+>> caller to ensure that a given child link is not frozen, and how the
+>> callers do so.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>   block.c | 45 ++++++++++++++++++++++++++++++++-------------
+>>   1 file changed, 32 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/block.c b/block.c
+>> index 8438b0699e..45882a3470 100644
+>> --- a/block.c
+>> +++ b/block.c
+>> @@ -2214,12 +2214,15 @@ static void bdrv_replace_child_noperm(BdrvChil=
+d *child,
+>>    * If @new_bs is not NULL, bdrv_check_perm() must be called beforeha=
+nd, as this
+>>    * function uses bdrv_set_perm() to update the permissions according=
+ to the new
+>>    * reference that @new_bs gets.
+>> + *
+>> + * Callers must ensure that child->frozen is false.
+>>    */
+>>   static void bdrv_replace_child(BdrvChild *child, BlockDriverState *n=
+ew_bs)
+>>   {
+>>       BlockDriverState *old_bs =3D child->bs;
+>>       uint64_t perm, shared_perm;
+>>  =20
+>> +    /* Asserts that child->frozen =3D=3D false */
+>>       bdrv_replace_child_noperm(child, new_bs);
+>>  =20
+>>       if (old_bs) {
+>> @@ -2360,6 +2363,7 @@ static void bdrv_detach_child(BdrvChild *child)
+>>       g_free(child);
+>>   }
+>>  =20
+>> +/* Callers must ensure that child->frozen is false. */
+>=20
+> Is such a comment better than one-line extra assertion at start of the =
+function body?
+
+Well, there already is an assertion, it is in
+bdrv_replace_child_noperm().  I personally prefer to read comments than
+assertions.
+
+>>   void bdrv_root_unref_child(BdrvChild *child)
+>>   {
+>>       BlockDriverState *child_bs;
+>> @@ -2369,6 +2373,7 @@ void bdrv_root_unref_child(BdrvChild *child)
+>>       bdrv_unref(child_bs);
+>>   }
+>>  =20
+>> +/* Callers must ensure that child->frozen is false. */
+>>   void bdrv_unref_child(BlockDriverState *parent, BdrvChild *child)
+>>   {
+>>       if (child =3D=3D NULL) {
+>> @@ -2435,6 +2440,7 @@ void bdrv_set_backing_hd(BlockDriverState *bs, B=
+lockDriverState *backing_hd,
+>>       }
+>>  =20
+>>       if (bs->backing) {
+>> +        /* Cannot be frozen, we checked that above */
+>>           bdrv_unref_child(bs, bs->backing);
+>>       }
+>>  =20
+>> @@ -3908,6 +3914,7 @@ static void bdrv_close(BlockDriverState *bs)
+>>  =20
+>>       if (bs->drv) {
+>>           if (bs->drv->bdrv_close) {
+>> +            /* Must unfreeze all children, so bdrv_unref_child() work=
+s */
+>>               bs->drv->bdrv_close(bs);
+>>           }
+>>           bs->drv =3D NULL;
+>> @@ -4281,17 +4288,20 @@ BlockDriverState *bdrv_find_base(BlockDriverSt=
+ate *bs)
+>>    * Return true if at least one of the backing links between @bs and
+>>    * @base is frozen. @errp is set if that's the case.
+>>    * @base must be reachable from @bs, or NULL.
+>> + * (Filters are treated as normal elements of the backing chain.)
+>>    */
+>>   bool bdrv_is_backing_chain_frozen(BlockDriverState *bs, BlockDriverS=
+tate *base,
+>>                                     Error **errp)
+>>   {
+>>       BlockDriverState *i;
+>> +    BdrvChild *child;
+>>  =20
+>> -    for (i =3D bs; i !=3D base; i =3D backing_bs(i)) {
+>> -        if (i->backing && i->backing->frozen) {
+>> +    for (i =3D bs; i !=3D base; i =3D child_bs(child)) {
+>> +        child =3D bdrv_filtered_child(i);
+>> +
+>> +        if (child && child->frozen) {
+>>               error_setg(errp, "Cannot change '%s' link from '%s' to '=
+%s'",
+>> -                       i->backing->name, i->node_name,
+>> -                       backing_bs(i)->node_name);
+>> +                       child->name, i->node_name, child->bs->node_nam=
+e);
+>>               return true;
+>>           }
+>>       }
+>> @@ -4305,19 +4315,22 @@ bool bdrv_is_backing_chain_frozen(BlockDriverS=
+tate *bs, BlockDriverState *base,
+>>    * none of the links are modified.
+>>    * @base must be reachable from @bs, or NULL.
+>>    * Returns 0 on success. On failure returns < 0 and sets @errp.
+>> + * (Filters are treated as normal elements of the backing chain.)
+>>    */
+>>   int bdrv_freeze_backing_chain(BlockDriverState *bs, BlockDriverState=
+ *base,
+>>                                 Error **errp)
+>>   {
+>>       BlockDriverState *i;
+>> +    BdrvChild *child;
+>>  =20
+>>       if (bdrv_is_backing_chain_frozen(bs, base, errp)) {
+>>           return -EPERM;
+>>       }
+>>  =20
+>> -    for (i =3D bs; i !=3D base; i =3D backing_bs(i)) {
+>> -        if (i->backing) {
+>> -            i->backing->frozen =3D true;
+>> +    for (i =3D bs; i !=3D base; i =3D child_bs(child)) {
+>> +        child =3D bdrv_filtered_child(i);
+>> +        if (child) {
+>> +            child->frozen =3D true;
+>>           }
+>>       }
+>>  =20
+>> @@ -4328,15 +4341,18 @@ int bdrv_freeze_backing_chain(BlockDriverState=
+ *bs, BlockDriverState *base,
+>>    * Unfreeze all backing links between @bs and @base. The caller must=
+
+>>    * ensure that all links are frozen before using this function.
+>>    * @base must be reachable from @bs, or NULL.
+>> + * (Filters are treated as normal elements of the backing chain.)
+>>    */
+>>   void bdrv_unfreeze_backing_chain(BlockDriverState *bs, BlockDriverSt=
+ate *base)
+>>   {
+>>       BlockDriverState *i;
+>> +    BdrvChild *child;
+>>  =20
+>> -    for (i =3D bs; i !=3D base; i =3D backing_bs(i)) {
+>> -        if (i->backing) {
+>> -            assert(i->backing->frozen);
+>> -            i->backing->frozen =3D false;
+>> +    for (i =3D bs; i !=3D base; i =3D child_bs(child)) {
+>> +        child =3D bdrv_filtered_child(i);
+>> +        if (child) {
+>> +            assert(child->frozen);
+>> +            child->frozen =3D false;
+>>           }
+>>       }
+>>   }
+>> @@ -4438,8 +4454,11 @@ int bdrv_drop_intermediate(BlockDriverState *to=
+p, BlockDriverState *base,
+>>               }
+>>           }
+>>  =20
+>> -        /* Do the actual switch in the in-memory graph.
+>> -         * Completes bdrv_check_update_perm() transaction internally.=
+ */
+>> +        /*
+>> +         * Do the actual switch in the in-memory graph.
+>> +         * Completes bdrv_check_update_perm() transaction internally.=
+
+>> +         * c->frozen is false, we have checked that above.
+>> +         */
+>>           bdrv_ref(base);
+>>           bdrv_replace_child(c, base);
+>>           bdrv_unref(top);
+>>
+>=20
+> Hmm, OK, it's better than it was, so:
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>=20
+> But I have one thought: we check that frozen is false at some point, an=
+d then
+> do some logic around this child. Where is guarantee, that someone else =
+will not
+> set frozen=3Dtrue during some yield, for example? So, do we need a kind=
+ of child_mutex,
+> or something like this?
+
+The guarantee is that the caller does not do anything that could cause
+the child link to become frozen between checking whether it is and
+performing an operation that relies on it not being frozen.
+
+Freezing (currently) only happens when starting block jobs, which can
+only happen because of monitor commands.  Even in
+bdrv_drop_intermediate(), which has quite a bit of code between checking
+the frozen status and calling bdrv_replace_child(), I don=E2=80=99t see h=
+ow a
+new block job could sneak in.
+
+Max
+
+
+--CSWZjMUnXPnH9PuokQymOLNxc07oRPZNa--
+
+--dYxqDe86c1rxAE4t13CMfDFDpX2d5cvRX
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0CWDcACgkQ9AfbAGHV
+z0DO8QgAjMnPRWcW0hk3Jfibgw013Os9phBHpoAEcLZ7qkccfsCxHcspwESCbDG8
+iUBY73m37DuyNrm0eYWL9og5Zp9B+PCOWfe63Uf0qJ8ZOdcPH85+9LOBK85UDOoc
+3r4NjYCV4e/Tp5dTvCe1EX5VpbxdMx3UxfPOxKUJKVS1Kjf41OcRIRmxDq6xZ2jN
+KtjAA0S5oziCcp5gDKV8ZLWJSnTUp0CNhlgtjs6TnELXy6UkkC6JgFH9GYNzJ3A1
+JB3Zg6Zb1gfjvSSTdT7b2bJ9a0tOYyOCaUJvXwn4uySgvjneVSeNmsf4gpZLBSGB
+vjpzmRzVBTX3IIjowymX9z6kjR4I4w==
+=JIWn
+-----END PGP SIGNATURE-----
+
+--dYxqDe86c1rxAE4t13CMfDFDpX2d5cvRX--
 
