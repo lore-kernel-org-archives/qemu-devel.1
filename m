@@ -2,59 +2,90 @@ Return-Path: <SRS0=rgCY=UM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6D28C31E45
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 17:42:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C9ADC31E45
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 17:57:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A041C218B6
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 17:42:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A041C218B6
+	by mail.kernel.org (Postfix) with ESMTPS id 07F3020645
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Jun 2019 17:57:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07F3020645
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42385 helo=lists.gnu.org)
+Received: from localhost ([::1]:43146 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbTVa-0004fv-Tp
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 13:27:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35690)
+	id 1hbTym-0006Jj-NJ
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 13:57:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46245)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hbRyN-0002qi-0u
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 11:49:08 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hbSLG-00067T-VW
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:12:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hbRy9-0006Xv-3f
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 11:48:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41852)
+ (envelope-from <mreitz@redhat.com>) id 1hbSLE-0008Lp-Bp
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 12:12:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47356)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hbRy4-0006Ta-PQ; Thu, 13 Jun 2019 11:48:49 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hbSL4-0006cw-4C; Thu, 13 Jun 2019 12:12:35 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0C59489C33;
- Thu, 13 Jun 2019 15:48:48 +0000 (UTC)
-Received: from blue.redhat.com (ovpn-116-85.phx2.redhat.com [10.3.116.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 69ABF5C6D6;
- Thu, 13 Jun 2019 15:48:47 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 13 Jun 2019 10:48:33 -0500
-Message-Id: <20190613154837.21734-6-eblake@redhat.com>
-In-Reply-To: <20190613154837.21734-1-eblake@redhat.com>
-References: <20190613154837.21734-1-eblake@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 65C1A3091D73;
+ Thu, 13 Jun 2019 16:12:09 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.187])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 292335C29A;
+ Thu, 13 Jun 2019 16:12:07 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190612221004.2317-1-mreitz@redhat.com>
+ <4c6524b7-2feb-2b92-6929-54629ece1e29@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <25f94c28-0f03-f2dc-9a26-314af8d0937f@redhat.com>
+Date: Thu, 13 Jun 2019 18:12:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <4c6524b7-2feb-2b92-6929-54629ece1e29@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="F0sGjpUmDV4JYDZEXBJCt1l6gZmvpwWAi"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Thu, 13 Jun 2019 15:48:48 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.42]); Thu, 13 Jun 2019 16:12:09 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 5/9] iotests: Let 233 run concurrently
+Subject: Re: [Qemu-devel] [PATCH v5 00/42] block: Deal with filters
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,199 +98,141 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--F0sGjpUmDV4JYDZEXBJCt1l6gZmvpwWAi
+Content-Type: multipart/mixed; boundary="akisZMwe7H8xHkd8U3UKV2NwnzOfMQWi5";
+ protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <25f94c28-0f03-f2dc-9a26-314af8d0937f@redhat.com>
+Subject: Re: [PATCH v5 00/42] block: Deal with filters
+References: <20190612221004.2317-1-mreitz@redhat.com>
+ <4c6524b7-2feb-2b92-6929-54629ece1e29@virtuozzo.com>
+In-Reply-To: <4c6524b7-2feb-2b92-6929-54629ece1e29@virtuozzo.com>
 
-common.nbd's nbd_server_set_tcp_port() tries to find a free port, and
-then uses it for the whole test run.  However, this is racy because even
-if the port was free at the beginning, there is no guarantee it will
-continue to be available.  Therefore, 233 currently cannot reliably be
-run concurrently with other NBD TCP tests.
+--akisZMwe7H8xHkd8U3UKV2NwnzOfMQWi5
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-This patch addresses the problem by dropping nbd_server_set_tcp_port(),
-and instead finding a new port every time nbd_server_start_tcp_socket()
-is invoked.  For this, we run qemu-nbd with --fork and on error evaluate
-the output to see whether it contains "Address already in use".  If so,
-we try the next port.
+On 13.06.19 17:28, Vladimir Sementsov-Ogievskiy wrote:
+> 13.06.2019 1:09, Max Reitz wrote:
+>> Hi,
+>>
+>> When we introduced filters, we did it a bit casually.  Sure, we talked=
+ a
+>> lot about them before, but that was mostly discussion about where
+>> implicit filters should be added to the graph (note that we currently
+>> only have two implicit filters, those being mirror and commit).  But i=
+n
+>> the end, we really just designated some drivers filters (Quorum,
+>> blkdebug, etc.) and added some specifically (throttle, COR), without
+>> really looking through the block layer to see where issues might occur=
+=2E
+>>
+>> It turns out vast areas of the block layer just don=E2=80=99t know abo=
+ut filters
+>> and cannot really handle them.  Many cases will work in practice, in
+>> others, well, too bad, you cannot use some feature because some part
+>> deep inside the block layer looks at your filters and thinks they are
+>> format nodes.
+>>
+>> This is one reason why this series is needed.  Over time (since v1), a=
 
-On success, we still want to continually redirect the output from
-qemu-nbd to stderr.  To achieve both, we redirect qemu-nbd's stderr to a
-FIFO that we then open in bash.  If the parent process exits with status
-0 (which means that the server has started successfully), we launch a
-background cat process that copies the FIFO to stderr.  On failure, we
-read the whole content into a variable and then evaluate it.
-
-While at it, use --fork in nbd_server_start_unix_socket(), too.  Doing
-so allows us to drop nbd_server_wait_for_*_socket().
-
-Note that the reason common.nbd did not use --fork before is that
-qemu-nbd did not have --pid-file.
-
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20190508211820.17851-6-mreitz@redhat.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- tests/qemu-iotests/common.nbd | 100 +++++++++++++++-------------------
- tests/qemu-iotests/233        |   1 -
- 2 files changed, 45 insertions(+), 56 deletions(-)
-
-diff --git a/tests/qemu-iotests/common.nbd b/tests/qemu-iotests/common.nb=
+>> second reason has made its way in:
+>>
+>> bs->file is not necessarily the place where a node=E2=80=99s data is s=
+tored.
+>> qcow2 now has external data files, and currently there is no way for t=
+he
+>> general block layer to know that the data is not stored in bs->file.
+>> Right now, I do not think that has any real consequences (all function=
+s
+>> that need access to the actual data storage file should only do so as =
+a
+>> fallback if the driver does not provide some functionality, but qcow2
+>> should provide it all), but it still shows that we need some way to le=
+t
+>> the general block layer know about such data files.  (Also, I will nee=
 d
-index 25fc9ffaa46b..24b01b60aae1 100644
---- a/tests/qemu-iotests/common.nbd
-+++ b/tests/qemu-iotests/common.nbd
-@@ -22,6 +22,11 @@
- nbd_unix_socket=3D"${TEST_DIR}/qemu-nbd.sock"
- nbd_tcp_addr=3D"127.0.0.1"
- nbd_pid_file=3D"${TEST_DIR}/qemu-nbd.pid"
-+nbd_stderr_fifo=3D"${TEST_DIR}/qemu-nbd.fifo"
-+
-+# If bash version is >=3D 4.1, this will be overwritten by a dynamically
-+# assigned file descriptor value.
-+nbd_fifo_fd=3D10
+>> this for v1 of my =E2=80=9CInquire images=E2=80=99 rotational info=E2=80=
+=9D series.)
+>>
+>> I won=E2=80=99t go on and on about this series now, I think the patche=
+s pretty
+>> much speak for themselves now.  If the cover letter gets too long,
+>> nobody reads it anyway (see previous versions).
+>>
+>>
+>> *** This series depends on some others. ***
+>>
+>> Dependencies:
+>> - [PATCH 0/4] block: Keep track of parent quiescing
+>> - [PATCH 0/2] vl: Drain before (block) job cancel when quitting
+>> - [PATCH v2 0/2] blockdev: Overlays are not snapshots
+>>
+>> Based-on: <20190605161118.14544-1-mreitz@redhat.com>
+>> Based-on: <20190612220839.1374-1-mreitz@redhat.com>
+>> Based-on: <20190603202236.1342-1-mreitz@redhat.com>
+>=20
+> Could you please export a branch?
 
- nbd_server_stop()
- {
-@@ -33,77 +38,62 @@ nbd_server_stop()
-             kill "$NBD_PID"
-         fi
-     fi
--    rm -f "$nbd_unix_socket"
--}
--
--nbd_server_wait_for_unix_socket()
--{
--    pid=3D$1
--
--    for ((i =3D 0; i < 300; i++))
--    do
--        if [ -r "$nbd_unix_socket" ]; then
--            return
--        fi
--        kill -s 0 $pid 2>/dev/null
--        if test $? !=3D 0
--        then
--            echo "qemu-nbd unexpectedly quit"
--            exit 1
--        fi
--        sleep 0.1
--    done
--    echo "Failed in check of unix socket created by qemu-nbd"
--    exit 1
-+    rm -f "$nbd_unix_socket" "$nbd_stderr_fifo"
- }
+Sure:
 
- nbd_server_start_unix_socket()
- {
-     nbd_server_stop
--    $QEMU_NBD -v -t -k "$nbd_unix_socket" "$@" &
--    nbd_server_wait_for_unix_socket $!
-+    $QEMU_NBD -v -t -k "$nbd_unix_socket" --fork "$@"
- }
+https://git.xanclic.moe/XanClic/qemu child-access-functions-v5
+Or:
+https://github.com/XanClic/qemu child-access-functions-v5
 
--nbd_server_set_tcp_port()
-+nbd_server_start_tcp_socket()
- {
--    (ss --help) >/dev/null 2>&1 || _notrun "ss utility not found, skippi=
-ng test"
-+    nbd_server_stop
 
-+    mkfifo "$nbd_stderr_fifo"
-     for ((port =3D 10809; port <=3D 10909; port++))
-     do
--        if ! ss -tln | grep -sqE ":$port\b"; then
-+        # Redirect stderr to FIFO, so we can later decide whether we
-+        # want to read it or to redirect it to our stderr, depending
-+        # on whether the command fails or not
-+        $QEMU_NBD -v -t -b $nbd_tcp_addr -p $port --fork "$@" \
-+            2> "$nbd_stderr_fifo" &
-+
-+        # Taken from common.qemu
-+        if [[ "${BASH_VERSINFO[0]}" -ge "5" ||
-+            ("${BASH_VERSINFO[0]}" -ge "4" && "${BASH_VERSINFO[1]}" -ge =
-"1") ]]
-+        then
-+            exec {nbd_fifo_fd}<"$nbd_stderr_fifo"
-+        else
-+            let _nbd_fifo_fd++
-+            eval "exec ${_nbd_fifo_fd}<'$nbd_stderr_fifo'"
-+        fi
-+        wait $!
-+
-+        if test $? =3D=3D 0
-+        then
-+            # Success, redirect qemu-nbd's stderr to our stderr
-             nbd_tcp_port=3D$port
-+            (cat <&$nbd_fifo_fd >&2) &
-+            eval "exec $nbd_fifo_fd>&-"
-             return
-         fi
-+
-+        # Failure, read the output
-+        output=3D$(cat <&$nbd_fifo_fd)
-+        eval "exec $nbd_fifo_fd>&-"
-+
-+        if ! echo "$output" | grep -q "Address already in use"
-+        then
-+            # Unknown error, print it
-+            echo "$output" >&2
-+            rm -f "$nbd_stderr_fifo"
-+            exit 1
-+        fi
-     done
+(And the base branch is:
 
-     echo "Cannot find free TCP port for nbd in range 10809-10909"
-+    rm -f "$nbd_stderr_fifo"
-     exit 1
- }
--
--nbd_server_wait_for_tcp_socket()
--{
--    pid=3D$1
--
--    for ((i =3D 0; i < 300; i++))
--    do
--        if ss -tln | grep -sqE ":$nbd_tcp_port\b"; then
--            return
--        fi
--        kill -s 0 $pid 2>/dev/null
--        if test $? !=3D 0
--        then
--            echo "qemu-nbd unexpectedly quit"
--            exit 1
--        fi
--        sleep 0.1
--    done
--    echo "Failed in check of TCP socket created by qemu-nbd"
--    exit 1
--}
--
--nbd_server_start_tcp_socket()
--{
--    nbd_server_stop
--    $QEMU_NBD -v -t -b $nbd_tcp_addr -p $nbd_tcp_port "$@" &
--    nbd_server_wait_for_tcp_socket $!
--}
-diff --git a/tests/qemu-iotests/233 b/tests/qemu-iotests/233
-index 057cad204460..a5c17c39639d 100755
---- a/tests/qemu-iotests/233
-+++ b/tests/qemu-iotests/233
-@@ -49,7 +49,6 @@ _supported_proto file
- # If porting to non-Linux, consider using socat instead of ss in common.=
-nbd
- _require_command QEMU_NBD
+https://git.xanclic.moe/XanClic/qemu child-access-functions-base
+https://github.com/XanClic/qemu child-access-functions-base
+)
 
--nbd_server_set_tcp_port
- tls_x509_init
+>> v5:
+>> - Split the huge patches 2 and 3 from the previous version into many
+>>    smaller patches to maintain the potential reviewers=E2=80=99 sanity=
+ [Vladimir]
+>=20
+> Thank you! In spite of frightening amount of patches, reviewing became =
+a lot
+> simpler.
 
- echo
---=20
-2.20.1
+I had hoped making it exactly 42 patches would make it a bit more welcomi=
+ng.
 
+Again, thanks a lot for reviewing!
+
+Max
+
+
+--akisZMwe7H8xHkd8U3UKV2NwnzOfMQWi5--
+
+--F0sGjpUmDV4JYDZEXBJCt1l6gZmvpwWAi
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0CddYACgkQ9AfbAGHV
+z0BZ0gf+KIjoyUTV01nLvD5wquA6Jh4OVIuwSkN/XUFghDRt18BwbBCciXKDgTiX
+j4W8B6lL3kPvyouUFoTNRpT7ion96zfARuVWWBN4yBNNIXlTM3/DI1oERJY4zVxF
+Ypl6HJfKxuAFbsxEFueXI82hVUHQTyNk+ftRhDKvUC7fH8rSvjrANOM0FvjJO/jH
+OpNreil7QD48Kp7IxFcJbVfqfe/DBQwmow6jl+BHxyFgRnlVjf7xGqWAHGWf5CNr
+jqx3d3dsx8xGtKCsGKACtY1uGysXqaHbLTULmRbSzb41q4xh1LIn7Z5onXX+aDGT
+N3M2Y2R8ADY4np5ZBd13zELihlFcNQ==
+=2SSg
+-----END PGP SIGNATURE-----
+
+--F0sGjpUmDV4JYDZEXBJCt1l6gZmvpwWAi--
 
