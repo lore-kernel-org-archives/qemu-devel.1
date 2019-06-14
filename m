@@ -2,88 +2,61 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEA7BC31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 17:19:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BDD0C31E4B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 17:20:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD6372183E
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 17:19:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pxq5Zjpa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD6372183E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D9BE72183E
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 17:20:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9BE72183E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53712 helo=lists.gnu.org)
+Received: from localhost ([::1]:53714 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbprb-0005hU-VO
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 13:19:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56054)
+	id 1hbpsX-0006Lm-5k
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 13:20:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53943)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hbpkL-0000fh-8e
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:12:14 -0400
+ (envelope-from <clg@kaod.org>) id 1hbphH-0005sJ-7Y
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:09:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hbpkJ-00033x-UJ
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:12:13 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:32795)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hbpkJ-00032n-N7
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:12:11 -0400
-Received: by mail-wr1-x443.google.com with SMTP id n9so3339344wru.0
- for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 10:12:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=ZGytCy7dk/rtAnR0c8LWL1u/jXw6ywf1Xd8f/B0+XIs=;
- b=pxq5ZjpaQRToCSpwt1pPvpFRVNiQ/D2WAC20IMEsDa68lIbIrN10EdCAGtSUHvzw0E
- BrsvDTpj+l3hci0chuojJBL8/g7sVrs2Te8k0EjoDS2jo9AELtK9prZpz9yM1mwAf4SI
- VeijTvFGOH2HXejJGQBEzzn6hO4eleuDXd6X1gQ76auaK0mBDht1wWvlNNB08zKyxCoS
- s8VWmJax8aqMpLmZwj/tGAQAFLO+5AoFkomr5VneX0QCfVwxWXFCfSkNtZhWhBrFG5cn
- hQLpj/2WwACaD18/A0gJU7LI8naSZWC1So1W+s0Wge1B6McQBRbIkewb8PEJVm09J2Xi
- Oj1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=ZGytCy7dk/rtAnR0c8LWL1u/jXw6ywf1Xd8f/B0+XIs=;
- b=gsfSNunZnPZdv+hWACWZZRdOqkj8/7I+yHw2dJFks9hTzsdwD+n+5y5scTqwMIUzRl
- VJE0pitMeZDQyQXz+YnkLcd/mVDS8rWK9w1vZMpQlqreC1XsmViPOhh7SCQReuBHGe71
- GIl/W6N+U9WcjGMZDUhZFe3Q5GT2H7gBWlk1SpLWA5PHtdCKnXHqsQnngw5AtlfGKlW/
- p+WclwZd+xEcvoqhHid4lfmSBLncxgpbPlJ7Aj5zXNmUivSQnbBmFAXflQIOFaJ9Z/Ac
- o/1VRVDxYYHs80KDFImDgdMv+adFT9PbpfGra1yqlD+6aGh9U225SLT4FUai58ZTtXH8
- QSdg==
-X-Gm-Message-State: APjAAAXR2fQSXpiVabV6W2ADEvQcPGJiuyRNwqlD4GbFWPgy2Ynk16aS
- MRJXvUJLL9PQd685YAn9nMUtEw==
-X-Google-Smtp-Source: APXvYqwynb8NZtUK5NtDBM3eDufFX+apCyNMFDI1h4I/cTv5ZVlV8uSDif5HIwmqA2z660sT8kv5tA==
-X-Received: by 2002:a5d:4a8d:: with SMTP id o13mr31265800wrq.350.1560532330517; 
- Fri, 14 Jun 2019 10:12:10 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id d17sm5047352wrx.9.2019.06.14.10.12.04
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 14 Jun 2019 10:12:06 -0700 (PDT)
-Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id C11701FF8C;
- Fri, 14 Jun 2019 18:12:01 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Fri, 14 Jun 2019 18:11:24 +0100
-Message-Id: <20190614171200.21078-15-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190614171200.21078-1-alex.bennee@linaro.org>
-References: <20190614171200.21078-1-alex.bennee@linaro.org>
+ (envelope-from <clg@kaod.org>) id 1hbpYK-0007Sd-8J
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 12:59:49 -0400
+Received: from 1.mo69.mail-out.ovh.net ([178.33.251.173]:38721)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hbpYI-0007Qb-W8
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 12:59:47 -0400
+Received: from player692.ha.ovh.net (unknown [10.108.35.103])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id A3BC15C856
+ for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 18:59:44 +0200 (CEST)
+Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
+ (Authenticated sender: clg@kaod.org)
+ by player692.ha.ovh.net (Postfix) with ESMTPSA id B6B616DB37F1;
+ Fri, 14 Jun 2019 16:59:38 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Fri, 14 Jun 2019 18:59:20 +0200
+Message-Id: <20190614165920.12670-3-clg@kaod.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190614165920.12670-1-clg@kaod.org>
+References: <20190614165920.12670-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: [Qemu-devel] [PATCH  v3 14/50] tcg: add tcg_gen_st_ptr
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 15168123545457298406
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudeiuddguddtlecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 178.33.251.173
+Subject: [Qemu-devel] [PATCH 2/2] spapr/xive: simplify
+ spapr_irq_init_device() to remove the emulated init
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,37 +68,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Emilio G. Cota" <cota@braap.org>, Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
+ Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Emilio G. Cota" <cota@braap.org>
+The init_emu() handles are now empty. Remove them and rename
+spapr_irq_init_device() to spapr_irq_init_kvm().
 
-Will gain a user soon.
-
-Signed-off-by: Emilio G. Cota <cota@braap.org>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- tcg/tcg-op.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ include/hw/ppc/spapr_irq.h |  1 -
+ hw/ppc/spapr_irq.c         | 20 +++-----------------
+ 2 files changed, 3 insertions(+), 18 deletions(-)
 
-diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index e997346c97..edf12de1f3 100644
---- a/tcg/tcg-op.h
-+++ b/tcg/tcg-op.h
-@@ -1260,6 +1260,11 @@ static inline void tcg_gen_ld_ptr(TCGv_ptr r, TCGv_ptr a, intptr_t o)
-     glue(tcg_gen_ld_,PTR)((NAT)r, a, o);
+diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+index 14cab73c9c07..f965a58f8954 100644
+--- a/include/hw/ppc/spapr_irq.h
++++ b/include/hw/ppc/spapr_irq.h
+@@ -48,7 +48,6 @@ typedef struct SpaprIrq {
+     void (*reset)(SpaprMachineState *spapr, Error **errp);
+     void (*set_irq)(void *opaque, int srcno, int val);
+     const char *(*get_nodename)(SpaprMachineState *spapr);
+-    void (*init_emu)(SpaprMachineState *spapr, Error **errp);
+     void (*init_kvm)(SpaprMachineState *spapr, Error **errp);
+ } SpaprIrq;
+=20
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index 73e6f10da165..84b9b32fe40f 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -62,7 +62,7 @@ void spapr_irq_msi_reset(SpaprMachineState *spapr)
+     bitmap_clear(spapr->irq_map, 0, spapr->irq_map_nr);
  }
- 
-+static inline void tcg_gen_st_ptr(TCGv_ptr r, TCGv_ptr a, intptr_t o)
-+{
-+    glue(tcg_gen_st_, PTR)((NAT)r, a, o);
-+}
-+
- static inline void tcg_gen_discard_ptr(TCGv_ptr a)
+=20
+-static void spapr_irq_init_device(SpaprMachineState *spapr,
++static void spapr_irq_init_kvm(SpaprMachineState *spapr,
+                                   SpaprIrq *irq, Error **errp)
  {
-     glue(tcg_gen_discard_,PTR)((NAT)a);
--- 
-2.20.1
+     MachineState *machine =3D MACHINE(spapr);
+@@ -88,8 +88,6 @@ static void spapr_irq_init_device(SpaprMachineState *sp=
+apr,
+         error_prepend(&local_err, "kernel_irqchip allowed but unavailabl=
+e: ");
+         warn_report_err(local_err);
+     }
+-
+-    irq->init_emu(spapr, errp);
+ }
+=20
+ /*
+@@ -224,7 +222,7 @@ static void spapr_irq_reset_xics(SpaprMachineState *s=
+papr, Error **errp)
+ {
+     Error *local_err =3D NULL;
+=20
+-    spapr_irq_init_device(spapr, &spapr_irq_xics, &local_err);
++    spapr_irq_init_kvm(spapr, &spapr_irq_xics, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -236,10 +234,6 @@ static const char *spapr_irq_get_nodename_xics(Spapr=
+MachineState *spapr)
+     return XICS_NODENAME;
+ }
+=20
+-static void spapr_irq_init_emu_xics(SpaprMachineState *spapr, Error **er=
+rp)
+-{
+-}
+-
+ static void spapr_irq_init_kvm_xics(SpaprMachineState *spapr, Error **er=
+rp)
+ {
+     if (kvm_enabled()) {
+@@ -267,7 +261,6 @@ SpaprIrq spapr_irq_xics =3D {
+     .reset       =3D spapr_irq_reset_xics,
+     .set_irq     =3D spapr_irq_set_irq_xics,
+     .get_nodename =3D spapr_irq_get_nodename_xics,
+-    .init_emu    =3D spapr_irq_init_emu_xics,
+     .init_kvm    =3D spapr_irq_init_kvm_xics,
+ };
+=20
+@@ -385,7 +378,7 @@ static void spapr_irq_reset_xive(SpaprMachineState *s=
+papr, Error **errp)
+         spapr_xive_set_tctx_os_cam(spapr_cpu_state(cpu)->tctx);
+     }
+=20
+-    spapr_irq_init_device(spapr, &spapr_irq_xive, &local_err);
++    spapr_irq_init_kvm(spapr, &spapr_irq_xive, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -411,10 +404,6 @@ static const char *spapr_irq_get_nodename_xive(Spapr=
+MachineState *spapr)
+     return spapr->xive->nodename;
+ }
+=20
+-static void spapr_irq_init_emu_xive(SpaprMachineState *spapr, Error **er=
+rp)
+-{
+-}
+-
+ static void spapr_irq_init_kvm_xive(SpaprMachineState *spapr, Error **er=
+rp)
+ {
+     if (kvm_enabled()) {
+@@ -446,7 +435,6 @@ SpaprIrq spapr_irq_xive =3D {
+     .reset       =3D spapr_irq_reset_xive,
+     .set_irq     =3D spapr_irq_set_irq_xive,
+     .get_nodename =3D spapr_irq_get_nodename_xive,
+-    .init_emu    =3D spapr_irq_init_emu_xive,
+     .init_kvm    =3D spapr_irq_init_kvm_xive,
+ };
+=20
+@@ -624,7 +612,6 @@ SpaprIrq spapr_irq_dual =3D {
+     .reset       =3D spapr_irq_reset_dual,
+     .set_irq     =3D spapr_irq_set_irq_dual,
+     .get_nodename =3D spapr_irq_get_nodename_dual,
+-    .init_emu    =3D NULL, /* should not be used */
+     .init_kvm    =3D NULL, /* should not be used */
+ };
+=20
+@@ -840,6 +827,5 @@ SpaprIrq spapr_irq_xics_legacy =3D {
+     .reset       =3D spapr_irq_reset_xics,
+     .set_irq     =3D spapr_irq_set_irq_xics,
+     .get_nodename =3D spapr_irq_get_nodename_xics,
+-    .init_emu    =3D spapr_irq_init_emu_xics,
+     .init_kvm    =3D spapr_irq_init_kvm_xics,
+ };
+--=20
+2.21.0
 
 
