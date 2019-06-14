@@ -2,59 +2,66 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67375C31E44
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 06:43:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DFA8C31E44
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 06:47:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A34E20866
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 06:43:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A34E20866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
+	by mail.kernel.org (Postfix) with ESMTPS id C09AC20866
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 06:46:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C09AC20866
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48800 helo=lists.gnu.org)
+Received: from localhost ([::1]:48818 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbfva-0001qT-Dh
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 02:43:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56949)
+	id 1hbfzG-00041A-0y
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 02:46:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57186)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tao.peng@linux.alibaba.com>) id 1hbftm-0000pU-GL
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 02:41:20 -0400
+ (envelope-from <armbru@redhat.com>) id 1hbfvG-0001pk-Eb
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 02:42:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao.peng@linux.alibaba.com>) id 1hbftk-00008p-Iu
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 02:41:18 -0400
-Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:28013)
+ (envelope-from <armbru@redhat.com>) id 1hbfv7-0001Ay-F6
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 02:42:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43182)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao.peng@linux.alibaba.com>)
- id 1hbftj-00005H-1P
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 02:41:16 -0400
-X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R611e4; CH=green; DM=||false|;
- FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e07487; MF=tao.peng@linux.alibaba.com; NM=1;
- PH=DS; RN=6; SR=0; TI=SMTPD_---0TU86dQt_1560494465; 
-Received: from graymalkin.local(mailfrom:tao.peng@linux.alibaba.com
- fp:SMTPD_---0TU86dQt_1560494465) by smtp.aliyun-inc.com(127.0.0.1);
- Fri, 14 Jun 2019 14:41:06 +0800
-To: qemu-devel@nongnu.org
-References: <1560494113-1141-1-git-send-email-tao.peng@linux.alibaba.com>
-From: Peng Tao <tao.peng@linux.alibaba.com>
-Message-ID: <6fecc0bc-64f4-2d66-354b-4fe8082fa353@linux.alibaba.com>
-Date: Fri, 14 Jun 2019 14:41:05 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.6.1
+ (Exim 4.71) (envelope-from <armbru@redhat.com>)
+ id 1hbfqD-0004T5-6Z; Fri, 14 Jun 2019 02:37:37 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 68404308212A;
+ Fri, 14 Jun 2019 06:37:31 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
+ [10.36.116.148])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 38A5E5C257;
+ Fri, 14 Jun 2019 06:37:31 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id C3A9111386A6; Fri, 14 Jun 2019 08:37:29 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20190613153405.24769-1-kwolf@redhat.com>
+ <20190613153405.24769-10-kwolf@redhat.com>
+Date: Fri, 14 Jun 2019 08:37:29 +0200
+In-Reply-To: <20190613153405.24769-10-kwolf@redhat.com> (Kevin Wolf's message
+ of "Thu, 13 Jun 2019 17:33:59 +0200")
+Message-ID: <87h88shdue.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <1560494113-1141-1-git-send-email-tao.peng@linux.alibaba.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 47.88.44.36
-Subject: Re: [Qemu-devel] [PATCH] migration: allow private destination ram
- with x-ignore-shared
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Fri, 14 Jun 2019 06:37:31 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 09/15] monitor: Create
+ monitor-internal.h with common definitions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,48 +73,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yury Kotov <yury-kotov@yandex-team.ru>, Xu Wang <xu@hyper.sh>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jiangshan Lai <laijs@hyper.sh>,
- kata-dev@lists.katacontainers.io
+Cc: berrange@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Kevin Wolf <kwolf@redhat.com> writes:
 
+> Before we can split monitor/misc.c, we need to create a header file that
+> contains the common definitions that will be used by multiple source
+> files.
+>
+> For a start, add the type definitions for Monitor, MonitorHMP and
+> MonitorQMP and their dependencies. We'll add functions as needed when
+> splitting monitor/misc.c.
+>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  monitor/monitor-internal.h | 148 +++++++++++++++++++++++++++++++++++++
+>  monitor/misc.c             | 110 +--------------------------
+>  MAINTAINERS                |   2 +
+>  3 files changed, 151 insertions(+), 109 deletions(-)
+>  create mode 100644 monitor/monitor-internal.h
+>
+> diff --git a/monitor/monitor-internal.h b/monitor/monitor-internal.h
+> new file mode 100644
+> index 0000000000..17a632b0ad
+> --- /dev/null
+> +++ b/monitor/monitor-internal.h
+> @@ -0,0 +1,148 @@
+> +/*
+> + * QEMU monitor
+> + *
+> + * Copyright (c) 2003-2004 Fabrice Bellard
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#ifndef MONITOR_INT_H
+> +#define MONITOR_INT_H
 
-On 2019/6/14 14:35, Peng Tao wrote:
-> By removing the share ram check, qemu is able to migrate
-> to private destination ram when x-ignore-shared capability
-> is on. Then we can create multiple destination VMs based
-> on the same source VM.
-> 
-> This changes the x-ignore-shared migration capability to
-> work similar to Lai's original bypass-shared-memory
-> work(https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg00003.html)
-> which enables kata containers (https://katacontainers.io)
-> to implement the VM templating feature.
-> 
-> An example usage in kata containers(https://katacontainers.io):
-> 1. Start the source VM:
->     qemu-system-x86 -m 2G \
->       -object memory-backend-file,id=mem0,size=2G,share=on,mem-path=/tmpfs/template-memory \
->       -numa node,memdev=mem0
-> 2. Stop the template VM, set migration x-ignore-shared capability,
->     migrate "exec:cat>/tmpfs/state", quit it
-> 3. Start target VM:
->     qemu-system-x86 -m 2G \
->       -object memory-backend-file,id=mem0,size=2G,share=off,mem-path=/tmpfs/template-memory \
->       -numa node,memdev=mem0 \
->       -incoming defer
-> 4. connect to target VM qmp, set migration x-ignore-shared capability,
-> migrate_incoming "exec:cat /tmpfs/state"
-> 5. create more target VMs repeating 3 and 4
-> 
-FYI, corresponding kata pull request is posted at 
-https://github.com/kata-containers/runtime/pull/1799
+Rename to MONITOR_INTERNAL_H, so it again matches the file name.  Can
+touch up in my tree.
 
-Cheers,
-Tao
--- 
-Into something rich and strange.
+> +
+> +#include "monitor/monitor.h"
+> +#include "qapi/qmp/qdict.h"
+
+These too are superfluous.  I'm willing to tolerate monitor.h anyway,
+since anything including monitor-internal.h is almost certainly going to
+need monitor.h, too.
+
+> +#include "qapi/qmp/json-parser.h"
+> +#include "qapi/qmp/dispatch.h"
+> +#include "qapi/qapi-types-misc.h"
+> +
+> +#include "qemu/readline.h"
+> +#include "chardev/char-fe.h"
+> +#include "sysemu/iothread.h"
+
+Another superfluous one.
+
+Happy to drop these two #include in my tree.
+
+[...]
+
+With that:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
