@@ -2,84 +2,80 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0D61C31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 13:26:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A23EC31E4B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 13:28:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 819A82133D
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 13:26:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 259F220851
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 13:28:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L98TUzUV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 819A82133D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ym8h1rvM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 259F220851
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51502 helo=lists.gnu.org)
+Received: from localhost ([::1]:51512 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbmDi-0006Ba-HF
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 09:26:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39750)
+	id 1hbmFP-0007RX-EV
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 09:28:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41269)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mrolnik@gmail.com>) id 1hbm5a-0000ke-OI
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:17:56 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hbmAm-0004jy-QS
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:23:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1hbm5Z-00072B-8S
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:17:54 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55966)
+ (envelope-from <peter.maydell@linaro.org>) id 1hbmAl-0002ds-Ot
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:23:16 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:44599)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1hbm5Y-00070w-Vm
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:17:53 -0400
-Received: by mail-wm1-x343.google.com with SMTP id a15so2326434wmj.5
- for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 06:17:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=y8C9xUiQWgRmNgofcL1xvoEyCtrpUgRP/KveYn3UxVc=;
- b=L98TUzUVyZXRHujTSQd7KhpI+5ALEJiWGd0Pn17Vq7kTrPLn5kN29PVDlC34T+XKZ9
- tiKLFf3eKE54bzgH1v3paFH4miElMZGhD0A/UX6bbv5Dbsp9VvdEf9OBKgbQyOHNviBe
- kOXCYaQXDKF0tBicBlKJBJ9onID7BsX+XnSDHRotFYt/NOZ5WVt0fKmE76Gf8Om8TYEu
- PHqvNfw8SHQirjF2m7/wqBiHpYgDAmKSgoG6jHhdNhX/LXIXyMoTiHPi2DXPtyKVyAYp
- uEiPT1t5kIvpUw9z7BQT9CV2k0+qp8Hf7aYpLDcn/Inn95IqP3iMYORs404/N877hk/j
- GkgQ==
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hbmAl-0002bZ-H3
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:23:15 -0400
+Received: by mail-oi1-x243.google.com with SMTP id e189so1912968oib.11
+ for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 06:23:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=nJDunLpsvIlcVSIbOOPB2qcWugmuhPqWH2k8AZJxHOc=;
+ b=ym8h1rvMNTnGYKTOqQvXJv8HT+z/+OSfPBYXOApJ3PEaZbuorifK5/mEzqzBQULkFL
+ R8lcjZgBTsVioUQExfxbaxykRXZjaBu9/7noGID84ID66RfH2Fuq4dyLQDEthZKuQ68p
+ VEoumyFJW+dnAYkJ6E/CaF7/0r4UfHHlCeubUVLY4L7mtzpWYK/My3EB09CJzOJvodDi
+ IwK4LTsjdqMHzR9+tYcT61cuMMVDUswzE1r+8cG2gn3xqL3v8kw5Ucq1mV1oXur7a5JQ
+ O1lbAmftW0wuvAuY7TC+kD0FzyClPBf98YB1H2mkt2QGeoqWc1JsteYDa6wJIx5egmRp
+ toQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=y8C9xUiQWgRmNgofcL1xvoEyCtrpUgRP/KveYn3UxVc=;
- b=GhieaJttp7ri0sRX1pjT86hOKYiyx2rg4Go+d+/SiqEH9ytIAqgVM/wTeU3Z71oVYC
- rnFIuOswUGt7IlTAc0tRs/ft4bNrlj1UBQWhZ+cvM8VFlxzAeJMZmAHL7g7WPFPPPN6Q
- XGZtxJXEBrJEV8sVpZrFLMxyu9GlT7aBAJfkJ+pEJBqC1REoaBHF8v1O9CSld7+dubzf
- 0+nt4D0iuSpI4+dJmyJgpzh+w+D6yPy2kBcCWZXq9zpgyWlntkSDirx2s0kVySBbGYlE
- RsIp5q8UD0kKHqBlTtv3XIgMwIyBNdg2f0u7rZ80W+YOlmBHmGJC1LQ+fM5gacuKCXJe
- zCsQ==
-X-Gm-Message-State: APjAAAWKYhlu0kmVzyPf2HY8unXZIfd89kK3yUzyfbpqD9cVTusp2bIh
- 6a8YXkcbmSV5M72E0U00076ZSrEGfqZi3w==
-X-Google-Smtp-Source: APXvYqzmY7oipY4dmwVKE5XMtP1tYPQlUOv0VLswWcaPVW65vqJsslcUR4XLj4nAFnFxC1IQk4sLSQ==
-X-Received: by 2002:a7b:cb48:: with SMTP id v8mr7800059wmj.108.1560518270211; 
- Fri, 14 Jun 2019 06:17:50 -0700 (PDT)
-Received: from localhost.localdomain (bzq-79-181-22-16.red.bezeqint.net.
- [79.181.22.16])
- by smtp.gmail.com with ESMTPSA id s9sm2217336wmc.11.2019.06.14.06.17.48
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 14 Jun 2019 06:17:49 -0700 (PDT)
-From: Michael Rolnik <mrolnik@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 14 Jun 2019 16:17:24 +0300
-Message-Id: <20190614131724.33928-8-mrolnik@gmail.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20190614131724.33928-1-mrolnik@gmail.com>
-References: <20190614131724.33928-1-mrolnik@gmail.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=nJDunLpsvIlcVSIbOOPB2qcWugmuhPqWH2k8AZJxHOc=;
+ b=eIm7bPyMWCyroGP+/rZ9ok88wE+ZdOkD7Yqq6SVZVtVN87qCtQlnBDyfAoNxazrTE7
+ q3bbx3lJpOYaQhdebNMgf4HBh7ZlNY0kkt3Db9PBMV315PX4m4FF23UArZoCqpYNiDfx
+ v7sjJCyNS5xWDB1HwEZzfLnB1ou6wzqcpuzmuZwlJBdrmU/WYpjigroVRvxxMos3asME
+ QvSCIFxvqi0fju+zf1vXK6NMZcQ2eLybrJQ64J0jraOfJ5ENViWq5dKZLKBqfdItfoc7
+ xjrdum2Rh0pHN5seeiGmIMApegqTsHcg4kQp+14FKJSZ+cS90Z0IEQKtBk32T/jOG314
+ 4coQ==
+X-Gm-Message-State: APjAAAXWSN7Mh+hlmw3J+ba5njpl0ZP8jp0Jj0DcqVWCtoDODvlbj/qe
+ OJxQGnhlriteZ4o9uo/2e5ikWIvpWLZWOsqJ9Xj/nQ==
+X-Google-Smtp-Source: APXvYqyX7vKNCMt/VGUQXUI6lhg7qTHuuRLtRUpMsgqP66FserLHqRz9PWZSW/dwq3DRBNYuEKOvAHAIB5QVPm8zHf8=
+X-Received: by 2002:aca:845:: with SMTP id 66mr1840159oii.163.1560518593672;
+ Fri, 14 Jun 2019 06:23:13 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190611142821.3874-1-eric.auger@redhat.com>
+ <20190611142821.3874-2-eric.auger@redhat.com>
+In-Reply-To: <20190611142821.3874-2-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 14 Jun 2019 14:23:02 +0100
+Message-ID: <CAFEAcA8N_uaq9kbS2MWDtdy1wz-j33OVo4wQbFZxvc-2uyMd0A@mail.gmail.com>
+To: Eric Auger <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [PATCH v22 7/7] target/avr: Register AVR support with
- the rest of QEMU, the build system, and the MAINTAINERS file
+X-Received-From: 2607:f8b0:4864:20::243
+Subject: Re: [Qemu-devel] [PATCH 1/2] hw/arm/smmuv3: Remove spurious error
+ messages on IOVA invalidations
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,194 +87,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sarah Harris <S.E.Harris@kent.ac.uk>, richard.henderson@linaro.org,
- Michael Rolnik <mrolnik@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Peter Xu <peterx@redhat.com>, Eric Auger <eric.auger.pro@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sarah Harris <S.E.Harris@kent.ac.uk>
+On Tue, 11 Jun 2019 at 15:29, Eric Auger <eric.auger@redhat.com> wrote:
+>
+> An IOVA/ASID invalidation is notified to all IOMMU Memory Regions
+> through smmuv3_inv_notifiers_iova/smmuv3_notify_iova.
+>
+> When the notification occurs it is possible that some of the
+> PCIe devices associated to the notified regions do not have a
+> valid stream table entry. In that case we output a LOG_GUEST_ERROR
+> message.
+>
+> invalid sid=<SID> (L1STD span=0)
+> "smmuv3_notify_iova error decoding the configuration for iommu mr=<MR>
+>
+> This is unfortunate as the user gets the impression that there
+> are some translation decoding errors whereas there are not.
+>
+> This patch adds a new field in SMMUEventInfo that tells whether
+> the detction of an invalid STE msut lead to an error report.
+> invalid_ste_allowed is set before doing the invalidations and
+> kept unset on actual translation.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>
+> ---
+>
+> I also experimented to pass Error handles to all the subfunctions
+> and handle the Error at top level but that's intricate to sort
+> out the various kinds of errors, whether they need to be logged,
+> and if so if they match LOG_GUEST_ERRoR mask or unimplemented
+> mask. So I think just passing this boolean has a lesser impact on
+> the code base.
+> ---
+>  hw/arm/smmuv3-internal.h |  1 +
+>  hw/arm/smmuv3.c          | 11 +++++------
+>  2 files changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
+> index b160289cd1..d190181ef1 100644
+> --- a/hw/arm/smmuv3-internal.h
+> +++ b/hw/arm/smmuv3-internal.h
+> @@ -381,6 +381,7 @@ typedef struct SMMUEventInfo {
+>      uint32_t sid;
+>      bool recorded;
+>      bool record_trans_faults;
+> +    bool inval_ste_allowed;
+>      union {
+>          struct {
+>              uint32_t ssid;
+> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+> index fd8ec7860e..e2f07d2864 100644
+> --- a/hw/arm/smmuv3.c
+> +++ b/hw/arm/smmuv3.c
+> @@ -404,7 +404,7 @@ static int smmu_find_ste(SMMUv3State *s, uint32_t sid, STE *ste,
+>
+>          span = L1STD_SPAN(&l1std);
+>
+> -        if (!span) {
+> +        if (!span && !event->inval_ste_allowed) {
+>              /* l2ptr is not valid */
+>              qemu_log_mask(LOG_GUEST_ERROR,
+>                            "invalid sid=%d (L1STD span=0)\n", sid);
 
-Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
----
- MAINTAINERS                     |  6 ++++++
- arch_init.c                     |  2 ++
- configure                       |  7 +++++++
- default-configs/avr-softmmu.mak |  5 +++++
- include/disas/dis-asm.h         |  6 ++++++
- include/sysemu/arch_init.h      |  1 +
- qapi/common.json                |  3 ++-
- target/avr/Makefile.objs        | 33 +++++++++++++++++++++++++++++++++
- tests/machine-none-test.c       |  1 +
- 9 files changed, 63 insertions(+), 1 deletion(-)
- create mode 100644 default-configs/avr-softmmu.mak
- create mode 100644 target/avr/Makefile.objs
+Why is this specific qemu_log_mask() the only one we need
+to suppress ?
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index acbad134ec..d85c306a62 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -163,6 +163,12 @@ S: Maintained
- F: hw/arm/smmu*
- F: include/hw/arm/smmu*
- 
-+AVR TCG CPUs
-+M: Michael Rolnik <mrolnik@gmail.com>
-+S: Maintained
-+F: target/avr/
-+F: hw/avr/
-+
- CRIS TCG CPUs
- M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
- S: Maintained
-diff --git a/arch_init.c b/arch_init.c
-index 74b0708634..413ad7acfd 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -85,6 +85,8 @@ int graphic_depth = 32;
- #define QEMU_ARCH QEMU_ARCH_UNICORE32
- #elif defined(TARGET_XTENSA)
- #define QEMU_ARCH QEMU_ARCH_XTENSA
-+#elif defined(TARGET_AVR)
-+#define QEMU_ARCH QEMU_ARCH_AVR
- #endif
- 
- const uint32_t arch_type = QEMU_ARCH;
-diff --git a/configure b/configure
-index b091b82cb3..715050a743 100755
---- a/configure
-+++ b/configure
-@@ -7499,6 +7499,10 @@ case "$target_name" in
-     target_compiler=$cross_cc_aarch64
-     eval "target_compiler_cflags=\$cross_cc_cflags_${target_name}"
-   ;;
-+  avr)
-+	gdb_xml_files="avr-cpu.xml"
-+    target_compiler=$cross_cc_avr
-+  ;;
-   cris)
-     target_compiler=$cross_cc_cris
-   ;;
-@@ -7776,6 +7780,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
-       disas_config "ARM_A64"
-     fi
-   ;;
-+  avr)
-+    disas_config "AVR"
-+  ;;
-   cris)
-     disas_config "CRIS"
-   ;;
-diff --git a/default-configs/avr-softmmu.mak b/default-configs/avr-softmmu.mak
-new file mode 100644
-index 0000000000..d1e1c28118
---- /dev/null
-+++ b/default-configs/avr-softmmu.mak
-@@ -0,0 +1,5 @@
-+# Default configuration for avr-softmmu
-+
-+# Boards:
-+#
-+CONFIG_AVR_SAMPLE=y
-diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
-index e9c7dd8eb4..8bedce17ac 100644
---- a/include/disas/dis-asm.h
-+++ b/include/disas/dis-asm.h
-@@ -211,6 +211,12 @@ enum bfd_architecture
- #define bfd_mach_m32r          0  /* backwards compatibility */
-   bfd_arch_mn10200,    /* Matsushita MN10200 */
-   bfd_arch_mn10300,    /* Matsushita MN10300 */
-+  bfd_arch_avr,       /* Atmel AVR microcontrollers.  */
-+#define bfd_mach_avr1          1
-+#define bfd_mach_avr2          2
-+#define bfd_mach_avr3          3
-+#define bfd_mach_avr4          4
-+#define bfd_mach_avr5          5
-   bfd_arch_cris,       /* Axis CRIS */
- #define bfd_mach_cris_v0_v10   255
- #define bfd_mach_cris_v32      32
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-index 10cbafe970..aff57bfe61 100644
---- a/include/sysemu/arch_init.h
-+++ b/include/sysemu/arch_init.h
-@@ -25,6 +25,7 @@ enum {
-     QEMU_ARCH_NIOS2 = (1 << 17),
-     QEMU_ARCH_HPPA = (1 << 18),
-     QEMU_ARCH_RISCV = (1 << 19),
-+    QEMU_ARCH_AVR = (1 << 20),
- };
- 
- extern const uint32_t arch_type;
-diff --git a/qapi/common.json b/qapi/common.json
-index 99d313ef3b..53f5018b9c 100644
---- a/qapi/common.json
-+++ b/qapi/common.json
-@@ -183,11 +183,12 @@
- #        is true even for "qemu-system-x86_64".
- #
- # ppcemb: dropped in 3.1
-+# avr: since 4.1
- #
- # Since: 3.0
- ##
- { 'enum' : 'SysEmuTarget',
--  'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386', 'lm32',
-+  'data' : [ 'aarch64', 'alpha', 'arm', 'avr', 'cris', 'hppa', 'i386', 'lm32',
-              'm68k', 'microblaze', 'microblazeel', 'mips', 'mips64',
-              'mips64el', 'mipsel', 'moxie', 'nios2', 'or1k', 'ppc',
-              'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
-diff --git a/target/avr/Makefile.objs b/target/avr/Makefile.objs
-new file mode 100644
-index 0000000000..1034d87525
---- /dev/null
-+++ b/target/avr/Makefile.objs
-@@ -0,0 +1,33 @@
-+#
-+#  QEMU AVR CPU
-+#
-+#  Copyright (c) 2016 Michael Rolnik
-+#
-+#  This library is free software; you can redistribute it and/or
-+#  modify it under the terms of the GNU Lesser General Public
-+#  License as published by the Free Software Foundation; either
-+#  version 2.1 of the License, or (at your option) any later version.
-+#
-+#  This library is distributed in the hope that it will be useful,
-+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+#  Lesser General Public License for more details.
-+#
-+#  You should have received a copy of the GNU Lesser General Public
-+#  License along with this library; if not, see
-+#  <http://www.gnu.org/licenses/lgpl-2.1.html>
-+#
-+
-+DECODETREE = $(SRC_PATH)/scripts/decodetree.py
-+decode-y = $(SRC_PATH)/target/avr/insn.decode
-+
-+target/avr/decode_insn.inc.c: $(decode-y) $(DECODETREE)
-+	$(call quiet-command, \
-+	  $(PYTHON) $(DECODETREE) -o $@ --decode decode_insn --insnwidth 16 $<, \
-+	  "GEN", $(TARGET_DIR)$@)
-+
-+target/avr/translate.o: target/avr/decode_insn.inc.c
-+
-+obj-y += translate.o cpu.o helper.o
-+obj-y += gdbstub.o
-+obj-$(CONFIG_SOFTMMU) += machine.o
-diff --git a/tests/machine-none-test.c b/tests/machine-none-test.c
-index 4c6d470798..361927bb76 100644
---- a/tests/machine-none-test.c
-+++ b/tests/machine-none-test.c
-@@ -27,6 +27,7 @@ static struct arch2cpu cpus_map[] = {
-     /* tested targets list */
-     { "arm", "cortex-a15" },
-     { "aarch64", "cortex-a57" },
-+    { "avr", "avr6" },
-     { "x86_64", "qemu64,apic-id=0" },
-     { "i386", "qemu32,apic-id=0" },
-     { "alpha", "ev67" },
--- 
-2.18.0
-
+thanks
+-- PMM
 
