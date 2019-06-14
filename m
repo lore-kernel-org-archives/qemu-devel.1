@@ -7,85 +7,83 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 665C8C31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 17:42:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E324DC31E4B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 17:43:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E78F2217D6
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 17:42:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B43FE21841
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 17:43:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="b4QxVGNm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E78F2217D6
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o3sZ4Pnp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B43FE21841
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53840 helo=lists.gnu.org)
+Received: from localhost ([::1]:53850 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbqDu-0007iC-7E
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 13:42:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58617)
+	id 1hbqER-00007R-W6
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 13:43:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58595)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hbpqh-0005ay-JG
+ (envelope-from <alex.bennee@linaro.org>) id 1hbpqh-0005ap-3b
  for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:18:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hbpqe-00076y-82
+ (envelope-from <alex.bennee@linaro.org>) id 1hbpqe-00077D-Bx
  for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:18:46 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35169)
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39168)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hbpqd-0006gy-Rv
+ id 1hbpqd-0006b4-T2
  for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:18:44 -0400
-Received: by mail-wm1-x341.google.com with SMTP id c6so3074856wml.0
- for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 10:18:31 -0700 (PDT)
+Received: by mail-wr1-x441.google.com with SMTP id x4so3333234wrt.6
+ for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 10:18:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=z1GEGb1AT/jZhECwGmNfmmOk5GT9rSMPb0f35A3hv4U=;
- b=b4QxVGNm+6Fj7wKneuYl+McZEVsa+rbuAQzeqkJF2ZMJqsv++7W5AjPv4k6Gczt9rD
- 0uqDgDSNqVea7ndExQqYgTmbyXwCy9IemmBy7YayqB4cTnudMSItHo5yH8mwVz7tqcEu
- +XPjLmX6CjZaYIJCjTYQgshcaHR2TTwRiSIGNrzy6wkjRf3YHBGnAUirb6ZTM/jZlU2D
- U8vr+Xn63JuWl9s6/maMM6g0T5/aK4LLrnyrBfrEznxVRXOBOp4OeC5z4mQ+xi8qAf2k
- R0QoBLo6Ga3MxgCA6UhddHnjHv0cmCqGvRjJhlvQeBJe6pyt458a2GsxDyxRF5h0HwgH
- s8GA==
+ bh=IwZdpz8vUj//qW3TG8z9CwKHzzC4bqX+Vltp43bJ1yk=;
+ b=o3sZ4PnpU7FHbCcoy45V70DS9r+zSw5ECniTV+Evo0WkDiAXXUAan11CUevOdMEY8n
+ Nai+SerQO/wxlFsTX1Pr5YgRozUk4r9KbBlyEO3VNzQRFQszReDQ93r0H6fTkOzrtPGl
+ XBTDQIvJmwhuL4bPnmk5p3Ri8cPANLkvz1fFcCWZ0AApk4fvr6FwyhJ+N1Q4H5GpZvi1
+ HqWPCy1XJY+UiQ1BZ0h4Sb6XP82C7rrQ8VWioBrnY28FrFgVfQgvgd53nzGiFQVs8Kdy
+ MJVkRe+HRUOCN9NP6fz5/JO2muJQDyTbKBPs8fgVhTTND0cnKJYiqGt0Rhx/eXMeob0L
+ 6LrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=z1GEGb1AT/jZhECwGmNfmmOk5GT9rSMPb0f35A3hv4U=;
- b=B+IqBR2VByBUzcC4Co9lvTs4HHCx2r9p1TRFFEY/E45TdUX1LBoXjZfYSgMqoSqJha
- ceaLEIZZ0OtY3zvwpf++uo0/CD8djL+35HMdXXp3Srg8qVfadgYda9VwipOPMNvc8P+e
- VeTlMXUUeEsWPex+jpm0tKfvEOkJJweu4WQ2Lv1cEE3z5dpST2uSOX0KHeGccuiCEjKh
- T1p6kNcMvDY3hr+852wyDiZTk8iGCAColjSK5k6DCAKHQhERnjDsaz1UtJyxucUrLe1+
- 8viknWmiBsxMa45yyCRt0LkLhuKFf51gSsRN1G142cS3NHDSs2kXF4cU1LUiT59pkguO
- x0/g==
-X-Gm-Message-State: APjAAAUHhEWhiT9WnrFjLkSH7q6lEu9muSt3Pz5MQPwqHmJy3gImicDd
- O6eYy0AqcaDU/Kz7dlpXHf0k80TZRFo=
-X-Google-Smtp-Source: APXvYqzgZQ5Z+g+Ud4extfvydZF0eChZKD9acTtshsuYsoYM7sGlUrb4SZbJMRck2kNClA/gh8pxzg==
-X-Received: by 2002:a1c:452:: with SMTP id 79mr9021561wme.149.1560532710963;
- Fri, 14 Jun 2019 10:18:30 -0700 (PDT)
+ bh=IwZdpz8vUj//qW3TG8z9CwKHzzC4bqX+Vltp43bJ1yk=;
+ b=fMoMXNbzt/1Kkb+BP1A8dRv3yHHEMfbyNgjGflLOGGVBO6F6sABZOgj1opCutxp2M3
+ 5haXsz+dpvbgSveMoXf4jn5OsF3M0dOCqZMOYzbyQr7JKgRF40WqYhe4aLQccg2OkWY3
+ AL6J/7QiL28GUYv9CPbuvZMHReo6iDE+wgPBlc67isvRDYvFiWu/uV87i4v7CovOAa9q
+ gCF/lbzWpfwzAc33OGLBSWzqU0FRuNTD18eUDfJAQqr3utc4Qv9+c9IYZDsuK0FXJVuV
+ td0CUUAbvHT+jBCB7TK4btf+NajEEYa8E/Jnx3PeIEiuTp+mrOUa/TFtkMBYl5XyU7l0
+ 8hjg==
+X-Gm-Message-State: APjAAAXSHkAykLCe9J3qoiVtwXbYqs/Qqgs0Dd548HYOSN2cVh2Ostet
+ /P1TJ79jWNswSx8Kqu9RDgwJNw==
+X-Google-Smtp-Source: APXvYqz31UqvKCNHZO9xGIlxVAazLGxYSQHiG8W5YLcZ8elMnr2BWRfeaX9+8IOYzyTN3T7LSPGzig==
+X-Received: by 2002:a5d:4008:: with SMTP id n8mr6522617wrp.353.1560532707867; 
+ Fri, 14 Jun 2019 10:18:27 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id y133sm5786558wmg.5.2019.06.14.10.18.27
+ by smtp.gmail.com with ESMTPSA id q20sm6518030wra.36.2019.06.14.10.18.26
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 14 Jun 2019 10:18:29 -0700 (PDT)
+ Fri, 14 Jun 2019 10:18:26 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 6C74A1FF91;
- Fri, 14 Jun 2019 18:12:04 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 9594B1FFAB;
+ Fri, 14 Jun 2019 18:12:02 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 14 Jun 2019 18:11:54 +0100
-Message-Id: <20190614171200.21078-45-alex.bennee@linaro.org>
+Date: Fri, 14 Jun 2019 18:11:33 +0100
+Message-Id: <20190614171200.21078-24-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190614171200.21078-1-alex.bennee@linaro.org>
 References: <20190614171200.21078-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: [Qemu-devel] [PATCH v3 44/50] plugin: add qemu_plugin_insn_disas
- helper
+X-Received-From: 2a00:1450:4864:20::441
+Subject: [Qemu-devel] [PATCH  v3 23/50] cpu: hook plugin vcpu events
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,207 +95,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Emilio G. Cota" <cota@braap.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Give the plugins access to the QEMU dissasembler so they don't have to
-re-invent the wheel.
+From: "Emilio G. Cota" <cota@braap.org>
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- disas.c                      | 103 +++++++++++++++++++++++++++++++++++
- include/disas/disas.h        |   2 +
- include/qemu/qemu-plugin.h   |   9 +++
- plugins/api.c                |   7 +++
- plugins/qemu-plugins.symbols |   1 +
- 5 files changed, 122 insertions(+)
+ cpus.c    | 10 ++++++++++
+ exec.c    |  2 ++
+ qom/cpu.c |  2 ++
+ 3 files changed, 14 insertions(+)
 
-diff --git a/disas.c b/disas.c
-index 3e2bfa572b..d8b75f0b73 100644
---- a/disas.c
-+++ b/disas.c
-@@ -475,6 +475,109 @@ void target_disas(FILE *out, CPUState *cpu, target_ulong code,
-     }
- }
+diff --git a/cpus.c b/cpus.c
+index dde3b7b981..2f86af9a87 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -46,6 +46,7 @@
+ #include "exec/exec-all.h"
  
-+static GString plugin_disas_output;
-+
-+static int plugin_printf(FILE *stream, const char *fmt, ...)
-+{
-+    va_list va;
-+    GString *s = &plugin_disas_output;
-+    int initial_len = s->len;
-+
-+    va_start(va, fmt);
-+    g_string_append_printf(s, fmt, va);
-+    va_end(va);
-+
-+    return s->len - initial_len;
-+}
-+
-+static void plugin_print_address (bfd_vma addr, struct disassemble_info *info)
-+{
-+    /* does nothing */
-+}
-+
-+/* Disassemble a single instruction directly into plugin output */
-+static bool plugin_cap_disas_insn(disassemble_info *info, uint64_t pc, size_t size)
-+{
-+    uint8_t cap_buf[1024];
-+    csh handle;
-+    cs_insn *insn;
-+    size_t csize = 0;
-+    int count;
-+    GString *s = &plugin_disas_output;
-+
-+    if (cap_disas_start(info, &handle) != CS_ERR_OK) {
-+        return false;
-+    }
-+    insn = cap_insn;
-+
-+    size_t tsize = MIN(sizeof(cap_buf) - csize, size);
-+    const uint8_t *cbuf = cap_buf;
-+    target_read_memory(pc, cap_buf, tsize, info);
-+
-+    count = cs_disasm(handle, cbuf, size, 0, 1, &insn);
-+
-+    if (count) {
-+        g_string_printf(s, "%s %s", insn->mnemonic, insn->op_str);
-+    } else {
-+        g_string_printf(s, "cs_disasm failed");
-+    }
-+
-+    cs_close(&handle);
-+    return true;
-+}
-+
-+char * plugin_disas(CPUState *cpu, uint64_t addr, size_t size)
-+{
-+    CPUClass *cc = CPU_GET_CLASS(cpu);
-+    target_ulong pc;
-+    int count;
-+    CPUDebug s;
-+    GString *ds = g_string_set_size(&plugin_disas_output, 0);
-+
-+    g_assert(ds == &plugin_disas_output);
-+
-+    INIT_DISASSEMBLE_INFO(s.info, NULL, plugin_printf);
-+
-+    s.cpu = cpu;
-+    s.info.read_memory_func = target_read_memory;
-+    s.info.buffer_vma = addr;
-+    s.info.buffer_length = size;
-+    s.info.print_address_func = plugin_print_address;
-+    s.info.cap_arch = -1;
-+    s.info.cap_mode = 0;
-+    s.info.cap_insn_unit = 4;
-+    s.info.cap_insn_split = 4;
-+
-+#ifdef TARGET_WORDS_BIGENDIAN
-+    s.info.endian = BFD_ENDIAN_BIG;
-+#else
-+    s.info.endian = BFD_ENDIAN_LITTLE;
-+#endif
-+
-+    if (cc->disas_set_info) {
-+        cc->disas_set_info(cpu, &s.info);
-+    }
-+
-+    if (s.info.cap_arch >= 0 && plugin_cap_disas_insn(&s.info, addr, size)) {
-+        return g_strdup(ds->str);
-+    }
-+
-+    if (s.info.print_insn == NULL) {
-+        s.info.print_insn = print_insn_od_target;
-+    }
-+
-+    for (pc = addr; size > 0; pc += count, size -= count) {
-+        count = s.info.print_insn(pc, &s.info);
-+
-+        if (count < 0)
-+            break;
-+
-+        g_assert(size >= count);
-+    }
-+
-+    return g_strdup(ds->str);
-+}
-+
- /* Disassemble this for me please... (debugging). */
- void disas(FILE *out, void *code, unsigned long size)
+ #include "qemu/thread.h"
++#include "qemu/plugin.h"
+ #include "sysemu/cpus.h"
+ #include "sysemu/qtest.h"
+ #include "qemu/main-loop.h"
+@@ -1243,9 +1244,18 @@ static void qemu_tcg_rr_wait_io_event(void)
+ 
+ static void qemu_wait_io_event(CPUState *cpu)
  {
-diff --git a/include/disas/disas.h b/include/disas/disas.h
-index 15da511f49..119df9e9bd 100644
---- a/include/disas/disas.h
-+++ b/include/disas/disas.h
-@@ -13,6 +13,8 @@ void target_disas(FILE *out, CPUState *cpu, target_ulong code,
- void monitor_disas(Monitor *mon, CPUState *cpu,
-                    target_ulong pc, int nb_insn, int is_physical);
- 
-+char * plugin_disas(CPUState *cpu, uint64_t addr, size_t size);
++    bool slept = false;
 +
- /* Look up symbol for debugging purpose.  Returns "" if unknown. */
- const char *lookup_symbol(target_ulong orig_addr);
- #endif
-diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
-index 0db1ef9714..21f056d4ab 100644
---- a/include/qemu/qemu-plugin.h
-+++ b/include/qemu/qemu-plugin.h
-@@ -312,6 +312,15 @@ qemu_plugin_register_vcpu_syscall_ret_cb(qemu_plugin_id_t id,
-                                          qemu_plugin_vcpu_syscall_ret_cb_t cb);
+     while (cpu_thread_is_idle(cpu)) {
++        if (!slept) {
++            slept = true;
++            qemu_plugin_vcpu_idle_cb(cpu);
++        }
+         qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+     }
++    if (slept) {
++        qemu_plugin_vcpu_resume_cb(cpu);
++    }
  
+ #ifdef _WIN32
+     /* Eat dummy APC queued by qemu_cpu_kick_thread.  */
+diff --git a/exec.c b/exec.c
+index e7622d1956..4a29471c3d 100644
+--- a/exec.c
++++ b/exec.c
+@@ -974,6 +974,8 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
+     }
+     tlb_init(cpu);
  
-+/**
-+ * qemu_plugin_insn_disas() - return disassembly string for instruction
-+ * @insn: instruction reference
-+ *
-+ * Returns an allocated string containing the disassembly
-+ */
++    qemu_plugin_vcpu_init_hook(cpu);
 +
-+char * qemu_plugin_insn_disas(const struct qemu_plugin_insn *insn);
-+
- /**
-  * qemu_plugin_vcpu_for_each() - iterate over the existing vCPU
-  * @id: plugin ID
-diff --git a/plugins/api.c b/plugins/api.c
-index 1c3aa64702..c0a1e98e68 100644
---- a/plugins/api.c
-+++ b/plugins/api.c
-@@ -40,6 +40,7 @@
- #include "sysemu/sysemu.h"
- #include "tcg/tcg.h"
- #include "trace/mem-internal.h" /* mem_info macros */
-+#include "disas/disas.h"
- #include "plugin.h"
+ #ifndef CONFIG_USER_ONLY
+     if (qdev_get_vmsd(DEVICE(cpu)) == NULL) {
+         vmstate_register(NULL, cpu->cpu_index, &vmstate_cpu_common, cpu);
+diff --git a/qom/cpu.c b/qom/cpu.c
+index f376f782d8..90ebb214bb 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -33,6 +33,7 @@
+ #include "hw/boards.h"
+ #include "hw/qdev-properties.h"
+ #include "trace-root.h"
++#include "qemu/plugin.h"
  
- /* Uninstall and Reset handlers */
-@@ -218,6 +219,12 @@ void *qemu_plugin_insn_haddr(const struct qemu_plugin_insn *insn)
-     return insn->haddr;
+ CPUInterruptHandler cpu_interrupt_handler;
+ 
+@@ -354,6 +355,7 @@ static void cpu_common_unrealizefn(DeviceState *dev, Error **errp)
+     CPUState *cpu = CPU(dev);
+     /* NOTE: latest generic point before the cpu is fully unrealized */
+     trace_fini_vcpu(cpu);
++    qemu_plugin_vcpu_exit_hook(cpu);
+     cpu_exec_unrealizefn(cpu);
  }
  
-+char *qemu_plugin_insn_disas(const struct qemu_plugin_insn *insn)
-+{
-+    CPUState *cpu = current_cpu;
-+    return plugin_disas(cpu, insn->vaddr, insn->data->len);
-+}
-+
- /*
-  * The memory queries allow the plugin to query information about a
-  * memory access.
-diff --git a/plugins/qemu-plugins.symbols b/plugins/qemu-plugins.symbols
-index 38d47b7922..3fd51112b5 100644
---- a/plugins/qemu-plugins.symbols
-+++ b/plugins/qemu-plugins.symbols
-@@ -25,6 +25,7 @@
-   qemu_plugin_insn_size;
-   qemu_plugin_insn_vaddr;
-   qemu_plugin_insn_haddr;
-+  qemu_plugin_insn_disas;
-   qemu_plugin_mem_size_shift;
-   qemu_plugin_mem_is_sign_extended;
-   qemu_plugin_mem_is_big_endian;
 -- 
 2.20.1
 
