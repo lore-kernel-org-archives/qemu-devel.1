@@ -2,48 +2,64 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CED9FC31E45
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 01:54:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 879E1C31E45
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 01:55:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0E1320B7C
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 01:54:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0E1320B7C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 5295720B7C
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 01:55:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="HcYHUcAx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5295720B7C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46650 helo=lists.gnu.org)
+Received: from localhost ([::1]:46658 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbbPs-0007ip-W0
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 21:54:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57688)
+	id 1hbbQm-0000Hk-LW
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 21:55:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56940)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aik@ozlabs.ru>) id 1hbbOY-0006s8-G3
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 21:52:48 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hbbL1-0003Hq-Gx
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 21:49:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1hbbOW-0004xs-SA
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 21:52:46 -0400
-Received: from ozlabs.ru ([107.173.13.209]:44047)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1hbbOW-0004wS-KM
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 21:52:44 -0400
-Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
- by ozlabs.ru (Postfix) with ESMTP id AD6A8AE807F0;
- Thu, 13 Jun 2019 21:52:40 -0400 (EDT)
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-To: qemu-devel@nongnu.org
-Date: Fri, 14 Jun 2019 11:52:37 +1000
-Message-Id: <20190614015237.82463-1-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 107.173.13.209
-Subject: [Qemu-devel] [PATCH qemu v3] hmp: Print if memory section is
- registered with an accelerator
+ (envelope-from <dgibson@ozlabs.org>) id 1hbbKz-0003Pe-Pp
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 21:49:07 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:46495 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1hbbKz-0003LL-5L; Thu, 13 Jun 2019 21:49:05 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 45Q3Rt1MBrz9s3Z; Fri, 14 Jun 2019 11:48:58 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1560476938;
+ bh=zYhbK8b3FCeEeSqYLwx5NAgSQLGqOOObVPlUfPPBoto=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=HcYHUcAxp3qf6sNkfxmHHF40QVeypyiE/fUSWYe4gvWGYN2s134EdugC9clNXuqxI
+ 5kzw0vPue0nPQkYjub9t6t42i6TVatVtBzWfxekknmxR4nvTKrH5r9u8M5W+Jf+8rq
+ 7hG/n3KeA9FJMcIRUaO859PheGTwPmZj51VbKbCo=
+Date: Fri, 14 Jun 2019 11:38:27 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>
+Message-ID: <20190614013827.GB11158@umbus.fritz.box>
+References: <156044428869.125694.13827513253200184549.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+ <156044429963.125694.13710679451927268758.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="UHN/qo2QbUvPLonB"
+Content-Disposition: inline
+In-Reply-To: <156044429963.125694.13710679451927268758.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [PATCH 2/3] xics/spapr: Register RTAS/hypercalls
+ once at machine init
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -55,197 +71,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adds an accelerator name to the "into mtree -f" to tell the user if
-a particular memory section is registered with the accelerator;
-the primary user for this is KVM and such information is useful
-for debugging purposes.
 
-This adds a has_memory() callback to the accelerator class allowing any
-accelerator to have a label in that memory tree dump.
+--UHN/qo2QbUvPLonB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Since memory sections are passed to memory listeners and get registered
-in accelerators (rather than memory regions), this only prints new labels
-for flatviews attached to the system address space.
+On Thu, Jun 13, 2019 at 06:44:59PM +0200, Greg Kurz wrote:
+> QEMU may crash when running a spapr machine in 'dual' interrupt controller
+> mode on some older (but not that old, eg. ubuntu 18.04.2) KVMs with parti=
+al
+> XIVE support:
+>=20
+> qemu-system-ppc64: hw/ppc/spapr_rtas.c:411: spapr_rtas_register:
+>  Assertion `!name || !rtas_table[token].name' failed.
+>=20
+> XICS is controlled by the guest thanks to a set of RTAS calls. Depending
+> on whether KVM XICS is used or not, the RTAS calls are handled by KVM or
+> QEMU. In both cases, QEMU needs to expose the RTAS calls to the guest
+> through the "rtas" node of the device tree.
+>=20
+> The spapr_rtas_register() helper takes care of all of that: it adds the
+> RTAS call token to the "rtas" node and registers a QEMU callback to be
+> invoked when the guest issues the RTAS call. In the KVM XICS case, QEMU
+> registers a dummy callback that just prints an error since it isn't
+> supposed to be invoked, ever.
+>=20
+> Historically, the XICS controller was setup during machine init and
+> released during final teardown. This changed when the 'dual' interrupt
+> controller mode was added to the spapr machine: in this case we need
+> to tear the XICS down and set it up again during machine reset. The
+> crash happens because we indeed have an incompatibility with older
+> KVMs that forces QEMU to fallback on emulated XICS, which tries to
+> re-registers the same RTAS calls.
+>=20
+> This could be fixed by adding proper rollback that would unregister
+> RTAS calls on error. But since the emulated RTAS calls in QEMU can
+> now detect when they are mistakenly called while KVM XICS is in
+> use, it seems simpler to register them once and for all at machine
+> init. This fixes the crash and allows to remove some now useless
+> lines of code.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-An example:
- Root memory region: system
-  0000000000000000-0000002fffffffff (prio 0, ram): /objects/mem0 kvm
-  0000003000000000-0000005fffffffff (prio 0, ram): /objects/mem1 kvm
-  0000200000000020-000020000000003f (prio 1, i/o): virtio-pci
-  0000200080000000-000020008000003f (prio 0, i/o): capabilities
+Applied, thanks.
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
-Changes:
-v3:
-* added support for multiple ASes per accelerator (KVM can do 2 at least)
-as Paolo suggested
+> ---
+>  hw/intc/xics_kvm.c          |   19 -------------------
+>  hw/intc/xics_spapr.c        |    8 --------
+>  hw/ppc/spapr_irq.c          |    3 ++-
+>  include/hw/ppc/spapr.h      |    4 ----
+>  include/hw/ppc/xics.h       |    1 -
+>  include/hw/ppc/xics_spapr.h |    1 +
+>  6 files changed, 3 insertions(+), 33 deletions(-)
+>=20
+> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+> index 5ba5b775615e..5c4208f43008 100644
+> --- a/hw/intc/xics_kvm.c
+> +++ b/hw/intc/xics_kvm.c
+> @@ -331,15 +331,6 @@ void ics_kvm_set_irq(ICSState *ics, int srcno, int v=
+al)
+>      }
+>  }
+> =20
+> -static void rtas_dummy(PowerPCCPU *cpu, SpaprMachineState *spapr,
+> -                       uint32_t token,
+> -                       uint32_t nargs, target_ulong args,
+> -                       uint32_t nret, target_ulong rets)
+> -{
+> -    error_report("pseries: %s must never be called for in-kernel XICS",
+> -                 __func__);
+> -}
+> -
+>  int xics_kvm_init(SpaprMachineState *spapr, Error **errp)
+>  {
+>      int rc;
+> @@ -360,11 +351,6 @@ int xics_kvm_init(SpaprMachineState *spapr, Error **=
+errp)
+>          goto fail;
+>      }
+> =20
+> -    spapr_rtas_register(RTAS_IBM_SET_XIVE, "ibm,set-xive", rtas_dummy);
+> -    spapr_rtas_register(RTAS_IBM_GET_XIVE, "ibm,get-xive", rtas_dummy);
+> -    spapr_rtas_register(RTAS_IBM_INT_OFF, "ibm,int-off", rtas_dummy);
+> -    spapr_rtas_register(RTAS_IBM_INT_ON, "ibm,int-on", rtas_dummy);
+> -
+>      rc =3D kvmppc_define_rtas_kernel_token(RTAS_IBM_SET_XIVE, "ibm,set-x=
+ive");
+>      if (rc < 0) {
+>          error_setg(errp, "kvmppc_define_rtas_kernel_token: ibm,set-xive"=
+);
+> @@ -454,11 +440,6 @@ void xics_kvm_disconnect(SpaprMachineState *spapr, E=
+rror **errp)
+>      close(kernel_xics_fd);
+>      kernel_xics_fd =3D -1;
+> =20
+> -    spapr_rtas_unregister(RTAS_IBM_SET_XIVE);
+> -    spapr_rtas_unregister(RTAS_IBM_GET_XIVE);
+> -    spapr_rtas_unregister(RTAS_IBM_INT_OFF);
+> -    spapr_rtas_unregister(RTAS_IBM_INT_ON);
+> -
+>      kvmppc_define_rtas_kernel_token(0, "ibm,set-xive");
+>      kvmppc_define_rtas_kernel_token(0, "ibm,get-xive");
+>      kvmppc_define_rtas_kernel_token(0, "ibm,int-on");
+> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+> index d470ab5f7a2a..8d605b68a7a0 100644
+> --- a/hw/intc/xics_spapr.c
+> +++ b/hw/intc/xics_spapr.c
+> @@ -285,14 +285,6 @@ static void rtas_int_on(PowerPCCPU *cpu, SpaprMachin=
+eState *spapr,
+> =20
+>  void xics_spapr_init(SpaprMachineState *spapr)
+>  {
+> -    /* Emulated mode can only be initialized once. */
+> -    if (spapr->ics->init) {
+> -        return;
+> -    }
+> -
+> -    spapr->ics->init =3D true;
+> -
+> -    /* Registration of global state belongs into realize */
+>      spapr_rtas_register(RTAS_IBM_SET_XIVE, "ibm,set-xive", rtas_set_xive=
+);
+>      spapr_rtas_register(RTAS_IBM_GET_XIVE, "ibm,get-xive", rtas_get_xive=
+);
+>      spapr_rtas_register(RTAS_IBM_INT_OFF, "ibm,int-off", rtas_int_off);
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 3156daf09381..dfb99f35ea00 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -114,6 +114,8 @@ static void spapr_irq_init_xics(SpaprMachineState *sp=
+apr, int nr_irqs,
+>      }
+> =20
+>      spapr->ics =3D ICS_BASE(obj);
+> +
+> +    xics_spapr_init(spapr);
+>  }
+> =20
+>  #define ICS_IRQ_FREE(ics, srcno)   \
+> @@ -236,7 +238,6 @@ static const char *spapr_irq_get_nodename_xics(SpaprM=
+achineState *spapr)
+> =20
+>  static void spapr_irq_init_emu_xics(SpaprMachineState *spapr, Error **er=
+rp)
+>  {
+> -    xics_spapr_init(spapr);
+>  }
+> =20
+>  static void spapr_irq_init_kvm_xics(SpaprMachineState *spapr, Error **er=
+rp)
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 4f5becf1f3cc..60553d32c4fa 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -676,10 +676,6 @@ typedef void (*spapr_rtas_fn)(PowerPCCPU *cpu, Spapr=
+MachineState *sm,
+>                                uint32_t nargs, target_ulong args,
+>                                uint32_t nret, target_ulong rets);
+>  void spapr_rtas_register(int token, const char *name, spapr_rtas_fn fn);
+> -static inline void spapr_rtas_unregister(int token)
+> -{
+> -    spapr_rtas_register(token, NULL, NULL);
+> -}
+>  target_ulong spapr_rtas_call(PowerPCCPU *cpu, SpaprMachineState *sm,
+>                               uint32_t token, uint32_t nargs, target_ulon=
+g args,
+>                               uint32_t nret, target_ulong rets);
+> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> index d6f8e4c4c282..eb65ad7e43b7 100644
+> --- a/include/hw/ppc/xics.h
+> +++ b/include/hw/ppc/xics.h
+> @@ -119,7 +119,6 @@ struct ICSState {
+>      uint32_t offset;
+>      ICSIRQState *irqs;
+>      XICSFabric *xics;
+> -    bool init; /* sPAPR ICS device initialized */
+>  };
+> =20
+>  #define ICS_PROP_XICS "xics"
+> diff --git a/include/hw/ppc/xics_spapr.h b/include/hw/ppc/xics_spapr.h
+> index 2476b540edfa..6c1d9ee55945 100644
+> --- a/include/hw/ppc/xics_spapr.h
+> +++ b/include/hw/ppc/xics_spapr.h
+> @@ -36,5 +36,6 @@ void spapr_dt_xics(SpaprMachineState *spapr, uint32_t n=
+r_servers, void *fdt,
+>  int xics_kvm_init(SpaprMachineState *spapr, Error **errp);
+>  void xics_kvm_disconnect(SpaprMachineState *spapr, Error **errp);
+>  void xics_spapr_init(SpaprMachineState *spapr);
+> +void xics_spapr_connect(SpaprMachineState *spapr);
+> =20
+>  #endif /* XICS_SPAPR_H */
+>=20
 
-v2:
-* added an accelerator callback instead of hardcoding it to kvm only
----
- include/sysemu/accel.h |  3 +++
- accel/kvm/kvm-all.c    | 38 ++++++++++++++++++++++++++++++++++++++
- memory.c               | 22 ++++++++++++++++++++++
- 3 files changed, 63 insertions(+)
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
-index 81293cdb08f9..89ce57e404ca 100644
---- a/include/sysemu/accel.h
-+++ b/include/sysemu/accel.h
-@@ -25,6 +25,7 @@
- 
- #include "qom/object.h"
- #include "hw/qdev-properties.h"
-+#include "exec/hwaddr.h"
- 
- typedef struct AccelState {
-     /*< private >*/
-@@ -39,6 +40,8 @@ typedef struct AccelClass {
-     const char *name;
-     int (*init_machine)(MachineState *ms);
-     void (*setup_post)(MachineState *ms, AccelState *accel);
-+    bool (*has_memory)(MachineState *ms, AddressSpace *as,
-+                       hwaddr start_addr, hwaddr size);
-     bool *allowed;
-     /*
-      * Array of global properties that would be applied when specific
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index b0c4bed6e367..948b7e53df47 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -109,6 +109,13 @@ struct KVMState
-     /* memory encryption */
-     void *memcrypt_handle;
-     int (*memcrypt_encrypt_data)(void *handle, uint8_t *ptr, uint64_t len);
-+
-+    /* For "info mtree -f" to tell if an MR is registered in KVM */
-+    int nr_as;
-+    struct KVMAs {
-+        KVMMemoryListener *ml;
-+        AddressSpace *as;
-+    } *as;
- };
- 
- KVMState *kvm_state;
-@@ -940,6 +947,14 @@ void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
-     kml->listener.priority = 10;
- 
-     memory_listener_register(&kml->listener, as);
-+
-+    for (i = 0; i < s->nr_as; ++i) {
-+        if (!s->as[i].as) {
-+            s->as[i].as = as;
-+            s->as[i].ml = kml;
-+            break;
-+        }
-+    }
- }
- 
- static MemoryListener kvm_io_listener = {
-@@ -1590,6 +1605,12 @@ static int kvm_init(MachineState *ms)
-         s->nr_slots = 32;
-     }
- 
-+    s->nr_as = kvm_check_extension(s, KVM_CAP_MULTI_ADDRESS_SPACE);
-+    if (s->nr_as <= 1) {
-+        s->nr_as = 1;
-+    }
-+    s->as = g_new0(struct KVMAs, s->nr_as);
-+
-     kvm_type = qemu_opt_get(qemu_get_machine_opts(), "kvm-type");
-     if (mc->kvm_type) {
-         type = mc->kvm_type(ms, kvm_type);
-@@ -2591,11 +2612,28 @@ int kvm_get_one_reg(CPUState *cs, uint64_t id, void *target)
-     return r;
- }
- 
-+static bool kvm_accel_has_memory(MachineState *ms, AddressSpace *as,
-+                                 hwaddr start_addr, hwaddr size)
-+{
-+    KVMState *kvm = KVM_STATE(ms->accelerator);
-+    int i;
-+
-+    for (i = 0; i < kvm->nr_as; ++i) {
-+        if (kvm->as[i].as == as && kvm->as[i].ml) {
-+            return NULL != kvm_lookup_matching_slot(kvm->as[i].ml,
-+                                                    start_addr, size);
-+        }
-+    }
-+
-+    return false;
-+}
-+
- static void kvm_accel_class_init(ObjectClass *oc, void *data)
- {
-     AccelClass *ac = ACCEL_CLASS(oc);
-     ac->name = "KVM";
-     ac->init_machine = kvm_init;
-+    ac->has_memory = kvm_accel_has_memory;
-     ac->allowed = &kvm_allowed;
- }
- 
-diff --git a/memory.c b/memory.c
-index 0a089a73ae1a..61524156a1ce 100644
---- a/memory.c
-+++ b/memory.c
-@@ -30,7 +30,9 @@
- #include "sysemu/kvm.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/tcg.h"
-+#include "sysemu/accel.h"
- #include "hw/qdev-properties.h"
-+#include "hw/boards.h"
- #include "migration/vmstate.h"
- 
- //#define DEBUG_UNASSIGNED
-@@ -2939,6 +2941,8 @@ struct FlatViewInfo {
-     int counter;
-     bool dispatch_tree;
-     bool owner;
-+    AccelClass *ac;
-+    const char *ac_name;
- };
- 
- static void mtree_print_flatview(gpointer key, gpointer value,
-@@ -3001,6 +3005,17 @@ static void mtree_print_flatview(gpointer key, gpointer value,
-         if (fvi->owner) {
-             mtree_print_mr_owner(mr);
-         }
-+
-+        if (fvi->ac) {
-+            for (i = 0; i < fv_address_spaces->len; ++i) {
-+                as = g_array_index(fv_address_spaces, AddressSpace*, i);
-+                if (fvi->ac->has_memory(current_machine, as,
-+                                        int128_get64(range->addr.start),
-+                                        MR_SIZE(range->addr.size) + 1)) {
-+                    qemu_printf(" %s", fvi->ac_name);
-+                }
-+            }
-+        }
-         qemu_printf("\n");
-         range++;
-     }
-@@ -3041,6 +3056,13 @@ void mtree_info(bool flatview, bool dispatch_tree, bool owner)
-         };
-         GArray *fv_address_spaces;
-         GHashTable *views = g_hash_table_new(g_direct_hash, g_direct_equal);
-+        AccelClass *ac = ACCEL_GET_CLASS(current_machine->accelerator);
-+
-+        if (ac->has_memory) {
-+            fvi.ac = ac;
-+            fvi.ac_name = current_machine->accel ? current_machine->accel :
-+                object_class_get_name(OBJECT_CLASS(ac));
-+        }
- 
-         /* Gather all FVs in one table */
-         QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
--- 
-2.17.1
+--UHN/qo2QbUvPLonB
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0C+pMACgkQbDjKyiDZ
+s5Kpkw/+IMBaE0QG9ereZqp5y1VleNQrwQmZVofZjeBf6sMyzDcUP47FyZW0PiMc
+BY7gV91B3/ez2AsnrTwIkbyjsYeaL4JC2CPtwScwVL9UuJ8zeGwTMiwSGWrpp9pv
+eR/8IqhIv0zOwXugHQc1pYkqf2fBPzS8lxzd9C5+b45CAnhroWNY3nI+mDUQmK8g
+Zchfsaxq9gLqOGxmQV2ZCIS9YZQ2zIAciiZ7BDN/i3gIZxK7rxOGV5pOM3+oxYQS
++sfJ/qTrlCuLH9S51pO1v0TNW9ATGIxi6jIBYS/HdwlqJfaDKDAqWDktx+jbMsFt
+Y7yyGZLU36o1Zc1LFqhNMBUr0iejlEvnfuE9ugaG9xXKUFVL4cyQ3wW6WKR9ucCx
+V93usyAEZB1p9IupDMTP2r+YSLGGlUy97jAjz2trEPrDiWQbSl3adCBtTtoe3YbY
+okbnZE4AOITLQSlpAOZ+15lgtFIpOj3D+zmQ9GAnoOMgWIu++r/6AhvF2vhNr5yD
+8yzPd2N3i3SZu7CQFZjjZDu4LZKZEpSD8CLKmmXc2mdsl61dblZpYElTqX0gi5BV
+hehzu4zr+87RDlofNDWjPF3hRxt9f/Owz7bCC9UsjdOKhFTYQySyhRsPRRcARkOp
+ZdRzLxEq8/mXx/cBb26sPq2Rav//ZoSrGm2DXg6kHig4aRIPkDk=
+=pZnG
+-----END PGP SIGNATURE-----
+
+--UHN/qo2QbUvPLonB--
 
