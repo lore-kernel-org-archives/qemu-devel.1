@@ -2,92 +2,66 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22663C31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 16:23:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BA2CC31E4B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 16:27:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA8962173C
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 16:23:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA8962173C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1154E21841
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 16:27:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1154E21841
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53252 helo=lists.gnu.org)
+Received: from localhost ([::1]:53292 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hboym-0002qD-IN
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 12:23:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60414)
+	id 1hbp2q-0004wn-2B
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 12:27:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34528)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hboVs-0004eO-5W
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 11:53:13 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hboec-0002Dp-Oc
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 12:02:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hboVq-00016s-51
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 11:53:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52994)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hboVm-00013T-QI; Fri, 14 Jun 2019 11:53:07 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 790BB3086202;
- Fri, 14 Jun 2019 15:53:00 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.125])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4BEE32D26D;
- Fri, 14 Jun 2019 15:52:58 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190612221004.2317-1-mreitz@redhat.com>
- <20190612221004.2317-16-mreitz@redhat.com>
- <9e448427-1d53-c1a7-c51f-123acf6eccaf@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <3f7ec115-9014-e375-ac7a-4b1ea46873e6@redhat.com>
-Date: Fri, 14 Jun 2019 17:52:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <no-reply@patchew.org>) id 1hboeb-0000nX-2w
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 12:02:14 -0400
+Resent-Date: Fri, 14 Jun 2019 12:02:14 -0400
+Resent-Message-Id: <E1hboeb-0000nX-2w@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21434)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hboea-0000l5-QN
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 12:02:13 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1560528117; cv=none; d=zoho.com; s=zohoarc; 
+ b=GeBWEH5EBN5AuTso3VTHFgRiz9qNupcvsk34qiC+O8PWdV5HPYizUJeMQTkp2Jb8cbQfeM4WuquWu0xx0loY/pYMcECbrnTRD5emGwrZO6805YKJGcUtfWB7h2g1O4h0dlW0MMm+Dh7grW10jXsO83aX6JYNEYXeo2wJKe1duSg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1560528117;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=EkgdUK0YZ+a72KheBNp24F9xQdtwpNihfwpwhsrIYVo=; 
+ b=dT1cbHfdwRnF6riETBHPo/lRgjsPxBd4YNZ2MuaGfCWxpqNRFFJh+ejJiCWhPxUbxs3R9bUo/VNpOC1Kk85BS6rODK5/2SKA9P2uOOw28lE2FVtW0nWIRXCR7JA/iNCsxSBkAtlRVz4mZfczpdGtWS1vtS/ZgSGHPpWlLevUJBM=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1560528115021709.1258138890714;
+ Fri, 14 Jun 2019 09:01:55 -0700 (PDT)
+In-Reply-To: <20190614135332.12777-1-vandersonmr2@gmail.com>
+Message-ID: <156052811424.13573.5259552275497724156@ce79690b2cb9>
 MIME-Version: 1.0
-In-Reply-To: <9e448427-1d53-c1a7-c51f-123acf6eccaf@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="3clvIKI2ps1QoeDEkPoDRDmbcrhCqGfiR"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 14 Jun 2019 15:53:00 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: vandersonmr2@gmail.com
+Date: Fri, 14 Jun 2019 09:01:55 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v5 15/42] block: Re-evaluate backing file
- handling in reopen
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH 0/3] Collecting TB Execution Frequency
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,241 +73,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3clvIKI2ps1QoeDEkPoDRDmbcrhCqGfiR
-Content-Type: multipart/mixed; boundary="wBQLrt8jIJs66FoHkfMQ4cEG1exKMQ6JT";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <3f7ec115-9014-e375-ac7a-4b1ea46873e6@redhat.com>
-Subject: Re: [PATCH v5 15/42] block: Re-evaluate backing file handling in
- reopen
-References: <20190612221004.2317-1-mreitz@redhat.com>
- <20190612221004.2317-16-mreitz@redhat.com>
- <9e448427-1d53-c1a7-c51f-123acf6eccaf@virtuozzo.com>
-In-Reply-To: <9e448427-1d53-c1a7-c51f-123acf6eccaf@virtuozzo.com>
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYxNDEzNTMzMi4xMjc3
+Ny0xLXZhbmRlcnNvbm1yMkBnbWFpbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
+aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
+ZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC8zXSBDb2xsZWN0
+aW5nIFRCIEV4ZWN1dGlvbiBGcmVxdWVuY3kKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkw
+NjE0MTM1MzMyLjEyNzc3LTEtdmFuZGVyc29ubXIyQGdtYWlsLmNvbQoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwg
+ZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAt
+LWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRo
+bSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09
+IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3
+ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3Fl
+bXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8xNTU5MTI1NDg0NjMuMjAxOTAwNC4zNTE1
+ODMwMzA1Mjk5ODA5OTAyLnN0Z2l0QGJhaGlhLmxhbiAtPiBwYXRjaGV3LzE1NTkxMjU0ODQ2My4y
+MDE5MDA0LjM1MTU4MzAzMDUyOTk4MDk5MDIuc3RnaXRAYmFoaWEubGFuCiAtIFt0YWcgdXBkYXRl
+XSAgICAgIHBhdGNoZXcvMTU2MDUxNzc0Mjc2LjI0NDg5MC44NjYwMjc3MjgwMTQ1NDY2Mzk2LnN0
+Z2l0QGJhaGlhLmxhbiAtPiBwYXRjaGV3LzE1NjA1MTc3NDI3Ni4yNDQ4OTAuODY2MDI3NzI4MDE0
+NTQ2NjM5Ni5zdGdpdEBiYWhpYS5sYW4KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo2
+NTEyMzg3IEFkZGluZyBjb21tYW5kIGxpbmUgb3B0aW9uIHRvIGxpbnV4LXVzZXIuCmFmNTJlZmQg
+U2F2aW5nIGNvdW50ZXJzIGJldHdlZW4gdGJfZmx1c2ggZXZlbnRzLgo5MDZjOGVmIEFkZGluZyBh
+biBvcHRpb25hbCB0YiBleGVjdXRpb24gY291bnRlci4KCj09PSBPVVRQVVQgQkVHSU4gPT09CjEv
+MyBDaGVja2luZyBjb21taXQgOTA2YzhlZjkyYWFjIChBZGRpbmcgYW4gb3B0aW9uYWwgdGIgZXhl
+Y3V0aW9uIGNvdW50ZXIuKQpFUlJPUjogIihmb28qKSIgc2hvdWxkIGJlICIoZm9vICopIgojMjQ6
+IEZJTEU6IGFjY2VsL3RjZy90Y2ctcnVudGltZS5jOjE3MzoKKyAgICBUcmFuc2xhdGlvbkJsb2Nr
+KiB0YiA9IChUcmFuc2xhdGlvbkJsb2NrKikgcHRyOwoKRVJST1I6IGRvIG5vdCBpbml0aWFsaXNl
+IGdsb2JhbHMgdG8gMCBvciBOVUxMCiM4MzogRklMRTogbGludXgtdXNlci9tYWluLmM6NjE6Citi
+b29sIGVuYWJsZV9mcmVxX2NvdW50ID0gZmFsc2U7CgpFUlJPUjogZG8gbm90IGluaXRpYWxpc2Ug
+Z2xvYmFscyB0byAwIG9yIE5VTEwKIzk1OiBGSUxFOiB2bC5jOjE5MzoKK2Jvb2wgZW5hYmxlX2Zy
+ZXFfY291bnQgPSBmYWxzZTsKCnRvdGFsOiAzIGVycm9ycywgMCB3YXJuaW5ncywgNTYgbGluZXMg
+Y2hlY2tlZAoKUGF0Y2ggMS8zIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyLzMgQ2hlY2tp
+bmcgY29tbWl0IGFmNTJlZmQ3ODQyZCAoU2F2aW5nIGNvdW50ZXJzIGJldHdlZW4gdGJfZmx1c2gg
+ZXZlbnRzLikKRVJST1I6ICJmb28qIGJhciIgc2hvdWxkIGJlICJmb28gKmJhciIKIzIyOiBGSUxF
+OiBhY2NlbC90Y2cvdHJhbnNsYXRlLWFsbC5jOjExMjE6CitzdGF0aWMgYm9vbCBzdGF0aXN0aWNz
+X2NtcChjb25zdCB2b2lkKiBhcCwgY29uc3Qgdm9pZCAqYnApIHsKCkVSUk9SOiBvcGVuIGJyYWNl
+ICd7JyBmb2xsb3dpbmcgZnVuY3Rpb24gZGVjbGFyYXRpb25zIGdvIG9uIHRoZSBuZXh0IGxpbmUK
+IzIyOiBGSUxFOiBhY2NlbC90Y2cvdHJhbnNsYXRlLWFsbC5jOjExMjE6CitzdGF0aWMgYm9vbCBz
+dGF0aXN0aWNzX2NtcChjb25zdCB2b2lkKiBhcCwgY29uc3Qgdm9pZCAqYnApIHsKCkVSUk9SOiBs
+aW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzU6IEZJTEU6IGFjY2VsL3RjZy90cmFuc2xhdGUtYWxs
+LmM6MTE0NjoKKyAgICBxaHRfaW5pdCgmdGJfY3R4LnRiX3N0YXRpc3RpY3MsIHN0YXRpc3RpY3Nf
+Y21wLCBDT0RFX0dFTl9IVEFCTEVfU0laRSwgUUhUX01PREVfQVVUT19SRVNJWkUpOwoKRVJST1I6
+ICIoZm9vKikiIHNob3VsZCBiZSAiKGZvbyAqKSIKIzcwOiBGSUxFOiBhY2NlbC90Y2cvdHJhbnNs
+YXRlLWFsbC5jOjEyNjU6CisgICAgdWludDY0X3QgZXhlY19mcmVxID0gdGJfZ2V0X2FuZF9yZXNl
+dF9leGVjX2ZyZXEoKFRyYW5zbGF0aW9uQmxvY2sqKSBwKTsKCkVSUk9SOiAiKGZvbyopIiBzaG91
+bGQgYmUgIihmb28gKikiCiMxOTA6IEZJTEU6IGluY2x1ZGUvcW9tL2NwdS5oOjQ3NzoKK3VpbnQ2
+NF90IHRiX2dldF9hbmRfcmVzZXRfZXhlY19mcmVxKHN0cnVjdCBUcmFuc2xhdGlvbkJsb2NrKik7
+Cgp0b3RhbDogNSBlcnJvcnMsIDAgd2FybmluZ3MsIDE0NiBsaW5lcyBjaGVja2VkCgpQYXRjaCAy
+LzMgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
+cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
+ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjMvMyBDaGVja2luZyBjb21taXQgNjUxMjM4
+NzkzNDczIChBZGRpbmcgY29tbWFuZCBsaW5lIG9wdGlvbiB0byBsaW51eC11c2VyLikKRVJST1I6
+IGV4dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMgZmlsZXMKIzIyOiBGSUxFOiBsaW51eC11
+c2VyL2V4aXQuYzoyOToKK2V4dGVybiBib29sIGVuYWJsZV9mcmVxX2NvdW50OwoKdG90YWw6IDEg
+ZXJyb3JzLCAwIHdhcm5pbmdzLCAzMiBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzMgaGFzIHN0eWxl
+IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
+c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
+SCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
+ZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRj
+aGV3Lm9yZy9sb2dzLzIwMTkwNjE0MTM1MzMyLjEyNzc3LTEtdmFuZGVyc29ubXIyQGdtYWlsLmNv
+bS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBh
+dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
+bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
---wBQLrt8jIJs66FoHkfMQ4cEG1exKMQ6JT
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 14.06.19 15:42, Vladimir Sementsov-Ogievskiy wrote:
-> 13.06.2019 1:09, Max Reitz wrote:
->> Reopening a node's backing child needs a bit of special handling becau=
-se
->> the "backing" child has different defaults than all other children
->> (among other things).  Adding filter support here is a bit more
->> difficult than just using the child access functions.  In fact, we oft=
-en
->> have to directly use bs->backing because these functions are about the=
-
->> "backing" child (which may or may not be the COW backing file).
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>   block.c | 36 +++++++++++++++++++++++++++++-------
->>   1 file changed, 29 insertions(+), 7 deletions(-)
->>
->> diff --git a/block.c b/block.c
->> index 505b3e9a01..db2759c10d 100644
->> --- a/block.c
->> +++ b/block.c
->> @@ -3542,17 +3542,39 @@ static int bdrv_reopen_parse_backing(BDRVReope=
-nState *reopen_state,
->>           }
->>       }
->>  =20
->> +    /*
->> +     * Ensure that @bs can really handle backing files, because we ar=
-e
->> +     * about to give it one (or swap the existing one)
->> +     */
->> +    if (bs->drv->is_filter) {
->> +        /* Filters always have a file or a backing child */
->> +        if (!bs->backing) {
->> +            error_setg(errp, "'%s' is a %s filter node that does not =
-support a "
->> +                       "backing child", bs->node_name, bs->drv->forma=
-t_name);
->> +            return -EINVAL;
->> +        }
->> +    } else if (!bs->drv->supports_backing) {
->> +        error_setg(errp, "Driver '%s' of node '%s' does not support b=
-acking "
->> +                   "files", bs->drv->format_name, bs->node_name);
->> +        return -EINVAL;
->> +    }
->=20
-> hmm, shouldn't we have these checks for overlay_bs?
-
-I think this is correct here because this is the only node the user has
-control over, so this is the only one we can reasonably complain about.
-
-And I do think it is reasonable to complain about.
-
->> +
->>       /*
->>        * Find the "actual" backing file by skipping all links that poi=
-nt
->>        * to an implicit node, if any (e.g. a commit filter node).
->> +     * We cannot use any of the bdrv_skip_*() functions here because
->> +     * those return the first explicit node, while we are looking for=
-
->> +     * its overlay here.
->>        */
->>       overlay_bs =3D bs;
->> -    while (backing_bs(overlay_bs) && backing_bs(overlay_bs)->implicit=
-) {
->> -        overlay_bs =3D backing_bs(overlay_bs);
->> +    while (bdrv_filtered_bs(overlay_bs) &&
->> +           bdrv_filtered_bs(overlay_bs)->implicit)
->> +    {
->> +        overlay_bs =3D bdrv_filtered_bs(overlay_bs);
->>       }
->=20
-> here, overlay_bs may be some filter with file child ..
->=20
->>  =20
->>       /* If we want to replace the backing file we need some extra che=
-cks */
->> -    if (new_backing_bs !=3D backing_bs(overlay_bs)) {
->> +    if (new_backing_bs !=3D bdrv_filtered_bs(overlay_bs)) {
->>           /* Check for implicit nodes between bs and its backing file =
-*/
->>           if (bs !=3D overlay_bs) {
->>               error_setg(errp, "Cannot change backing link if '%s' has=
- "
->> @@ -3560,8 +3582,8 @@ static int bdrv_reopen_parse_backing(BDRVReopenS=
-tate *reopen_state,
->>               return -EPERM;
->>           }
->>           /* Check if the backing link that we want to replace is froz=
-en */
->> -        if (bdrv_is_backing_chain_frozen(overlay_bs, backing_bs(overl=
-ay_bs),
->> -                                         errp)) {
->> +        if (bdrv_is_backing_chain_frozen(overlay_bs,
->> +                                         child_bs(overlay_bs->backing=
-), errp)) {
->=20
-> .. and here we are doing wrong thing, as it don't have backing child
->=20
-> Aha, you use the fact that we now don't have implicit filters with file=
- child. Then, should
-> we add an assertion for this?
-
-No, that wasn=E2=80=99t my intention.  The real reason is that all of thi=
-s is a
-mess.
-
-Here is the full context:
-
->     overlay_bs =3D bs;
->     while (bdrv_filtered_bs(overlay_bs) &&
->            bdrv_filtered_bs(overlay_bs)->implicit)
->     {
->         overlay_bs =3D bdrv_filtered_bs(overlay_bs);
->     }
->=20
->     /* If we want to replace the backing file we need some extra checks=
- */
->     if (new_backing_bs !=3D bdrv_filtered_bs(overlay_bs)) {
->         /* Check for implicit nodes between bs and its backing file */
->         if (bs !=3D overlay_bs) {
->             error_setg(errp, "Cannot change backing link if '%s' has " =
-                                                                         =
-                                                                         =
-                   =20
->                        "an implicit backing file", bs->node_name);
->             return -EPERM;
->         }
->         /* Check if the backing link that we want to replace is frozen =
-*/
->         if (bdrv_is_backing_chain_frozen(overlay_bs,
->                                          child_bs(overlay_bs->backing),=
- errp)) {
->             return -EPERM;
->         }
-
-Note the =E2=80=9CCheck for implicit nodes=E2=80=9D thing.  If we get to =
-the frozen
-check, we have already confirmed that overlay_bs =3D=3D bs, so we then kn=
-ow
-that overlay_bs->backing works.
-
-I can add an additional comment to make that more clear.  It took myself
-quite a bit of digging to figure that out again...
-
-(The reason for the loop is that we want to be able to recognize when
-the user tries to not change the backing file.  In that case, we don=E2=80=
-=99t
-have to do anything, but because the user doesn=E2=80=99t know about impl=
-icit
-nodes, we have to skip them in order to check whether the user actually
-doesn=E2=80=99t want to change anything.)
-
-Max
-
->>               return -EPERM;
->>           }
->>           reopen_state->replace_backing_bs =3D true;
->> @@ -3712,7 +3734,7 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_=
-state, BlockReopenQueue *queue,
->>        * its metadata. Otherwise the 'backing' option can be omitted.
->>        */
->>       if (drv->supports_backing && reopen_state->backing_missing &&
->> -        (backing_bs(reopen_state->bs) || reopen_state->bs->backing_fi=
-le[0])) {
->> +        (reopen_state->bs->backing || reopen_state->bs->backing_file[=
-0])) {
->>           error_setg(errp, "backing is missing for '%s'",
->>                      reopen_state->bs->node_name);
->>           ret =3D -EINVAL;
->> @@ -3857,7 +3879,7 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_=
-state)
->>        * from bdrv_set_backing_hd()) has the new values.
->>        */
->>       if (reopen_state->replace_backing_bs) {
->> -        BlockDriverState *old_backing_bs =3D backing_bs(bs);
->> +        BlockDriverState *old_backing_bs =3D child_bs(bs->backing);
->>           assert(!old_backing_bs || !old_backing_bs->implicit);
->>           /* Abort the permission update on the backing bs we're detac=
-hing */
->>           if (old_backing_bs) {
->>
->=20
->=20
-
-
-
---wBQLrt8jIJs66FoHkfMQ4cEG1exKMQ6JT--
-
---3clvIKI2ps1QoeDEkPoDRDmbcrhCqGfiR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0DwtgACgkQ9AfbAGHV
-z0B3OAf8D+nE55Gqc0rXVrl9I/StNIMR9KGCxuAAKAzbgMVymjHdPZzvHpyBzI4+
-sDqKtCfsVP0slB9XuRScuq6d1Ti1j9Lajs6r41gvyYC/HYIETSNLNkt1yBa8hbO0
-bYElkaylfE6DzWZrvR8qBTPmrXejFSVvekRvkjSH3/HyFYSdjLNYoppL1ByxMJYY
-RT9Z8u3AlheB6efjpebPp2i2CY61BD4MX0z47UIcqEvlpmPKAUN9KB4nDiy8VCtv
-fHkbuFCGpm09fV1zsp5L6wcrJryWt3+z0dF9GbHWJcrVA1oNEwl0Ke/J3MY+82rM
-7b3m4LMdN0Ne2q2FG26kinxreFcgBQ==
-=bbHZ
------END PGP SIGNATURE-----
-
---3clvIKI2ps1QoeDEkPoDRDmbcrhCqGfiR--
 
