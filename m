@@ -2,85 +2,58 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCA09C31E44
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 09:48:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26FE4C31E44
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 09:49:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B37B2175B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 09:48:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hVsud2sK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B37B2175B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id F14E721721
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 09:49:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F14E721721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49672 helo=lists.gnu.org)
+Received: from localhost ([::1]:49674 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbiok-0005sq-2G
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 05:48:18 -0400
+	id 1hbiq2-0006pd-9Q
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 05:49:38 -0400
 Received: from eggs.gnu.org ([2001:470:142:3::10]:40783)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <elohimes@gmail.com>) id 1hbieK-0004oG-56
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 05:37:33 -0400
+ (envelope-from <cohuck@redhat.com>) id 1hbieo-0004oG-3C
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 05:38:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <elohimes@gmail.com>) id 1hbiZF-0000q9-RY
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 05:32:18 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:38858)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1hbiZF-0000pv-Md
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 05:32:17 -0400
-Received: by mail-pf1-x441.google.com with SMTP id a186so1098737pfa.5
- for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 02:32:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=XDE2icSbolLOa01WawYlTzTQ3MDApcSEwbj0XrcaTAM=;
- b=hVsud2sK/QSUbdHBBRmIvY5nK5Pam3KE4VfxjiBlZYAALULvpakZksta5eDLByRQA9
- bEvEGs4CgwjIlqb26WM3jgQakL2vKyllH2AlyAAiD3RzH9UaUhiMS9a/HxGqkzg4tcZM
- RjbvvzpHsbhITFpYQPf9uewQB7OYupwjcfS2BVaKh4dnMLcxmrnsfVT5B27CNY0cueTw
- dY7mIBrb6OURmBt//zJoLgtlR2tKicH8Jdi5Wy8XfyIADNMRJPBTZgGIhdZTtlbKUl2n
- QhK9WmENo1GIXCXwwL9dR2WJte/P6Vd3XoxZ7QC8AHRRB9qghKsliisxIRdro37ENKng
- 8tbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=XDE2icSbolLOa01WawYlTzTQ3MDApcSEwbj0XrcaTAM=;
- b=bTMlZunTYlnV5nsWWAORE0l42csCjdzxrJJJDDYCdQId36q1VChren9Sr1cX3TEOQ9
- lZ9tj8CKoq617+pWqyR3LwUJEu0JUh2qUJGyibn0FBDv3FOZ9rc+hDZYlll6T1Bu4KZk
- +aj4ADJf/MPLh8nfMvkkJ2iVX0kMk9lqGG4SSZvIKgCyCFWE2zGVbXuvMacl0UUATD6R
- TOYBhPgPthPg9tRamylLnFhEp1R8ZCcdlVB9/qUFhhj2ZRiJFGqp/ydwPNOvHfzGDpp6
- Om77Tjp7/1fbf9SiNbo3ba0bdVsUsIxBA3XE4SKxumgYDRBS2F+VUUALUvctgZsfwCXl
- gX/w==
-X-Gm-Message-State: APjAAAU/5Wes8r9zUPGqDk/0K95Uq8Hj5sD6kJ1Jt5X1tHI9tvFbJ7Tc
- L7rsLYuH2mAYlvxMXe5S/qc=
-X-Google-Smtp-Source: APXvYqx3D1bPiHSnIanbuiAHuzs4AsQDW/a5swnZaz8bNEqpaS9eOWEyW9ZnCXeaDTJwS+pwTHnLxw==
-X-Received: by 2002:a63:f959:: with SMTP id q25mr26668682pgk.357.1560504736820; 
- Fri, 14 Jun 2019 02:32:16 -0700 (PDT)
-Received: from localhost ([116.247.112.152])
- by smtp.gmail.com with ESMTPSA id o26sm2300980pgv.47.2019.06.14.02.32.16
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Fri, 14 Jun 2019 02:32:16 -0700 (PDT)
-From: elohimes@gmail.com
-X-Google-Original-From: xieyongji@baidu.com
-To: mst@redhat.com,
-	groug@kaod.org
-Date: Fri, 14 Jun 2019 17:31:21 +0800
-Message-Id: <20190614093121.5580-6-xieyongji@baidu.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190614093121.5580-1-xieyongji@baidu.com>
-References: <20190614093121.5580-1-xieyongji@baidu.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::441
-Subject: [Qemu-devel] [PATCH v3 5/5] virtio: Don't change "started" flag on
- virtio_vmstate_change()
+ (envelope-from <cohuck@redhat.com>) id 1hbiUO-000759-UA
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 05:27:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49598)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>)
+ id 1hbiUO-00073b-M8; Fri, 14 Jun 2019 05:27:16 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 99D22C049E23;
+ Fri, 14 Jun 2019 09:27:10 +0000 (UTC)
+Received: from localhost (dhcp-192-222.str.redhat.com [10.33.192.222])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 188A978370;
+ Fri, 14 Jun 2019 09:27:07 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Eric Farman <farman@linux.ibm.com>,
+	Farhan Ali <alifm@linux.ibm.com>
+Date: Fri, 14 Jun 2019 11:27:05 +0200
+Message-Id: <20190614092705.11025-1-cohuck@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Fri, 14 Jun 2019 09:27:12 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH] vfio-ccw: use vfio_set_irq_signaling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,41 +65,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Xie Yongji <xieyongji@baidu.com>,
- dgilbert@redhat.com, ehabkost@redhat.com
+Cc: Eric Auger <eric.auger@redhat.com>, qemu-s390x@nongnu.org,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Xie Yongji <xieyongji@baidu.com>
+Use the new helper.
 
-We will call virtio_set_status() on virtio_vmstate_change().
-The "started" flag should not be changed in this case. Otherwise,
-we may get an incorrect value when we set "started" flag but
-not set DRIVER_OK in source VM.
-
-Signed-off-by: Xie Yongji <xieyongji@baidu.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/virtio/virtio.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ hw/vfio/ccw.c | 68 +++++++++++----------------------------------------
+ 1 file changed, 14 insertions(+), 54 deletions(-)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index b4301f9e02..9af2e339af 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -1163,7 +1163,10 @@ int virtio_set_status(VirtIODevice *vdev, uint8_t val)
-         }
+diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+index 03a2becb3ec9..3dc08721a3db 100644
+--- a/hw/vfio/ccw.c
++++ b/hw/vfio/ccw.c
+@@ -197,10 +197,7 @@ read_err:
+ static void vfio_ccw_register_io_notifier(VFIOCCWDevice *vcdev, Error **=
+errp)
+ {
+     VFIODevice *vdev =3D &vcdev->vdev;
+-    struct vfio_irq_info *irq_info;
+-    struct vfio_irq_set *irq_set;
+-    size_t argsz;
+-    int32_t *pfd;
++    int fd;
+=20
+     if (vdev->num_irqs < VFIO_CCW_IO_IRQ_INDEX + 1) {
+         error_setg(errp, "vfio: unexpected number of io irqs %u",
+@@ -208,72 +205,35 @@ static void vfio_ccw_register_io_notifier(VFIOCCWDe=
+vice *vcdev, Error **errp)
+         return;
      }
- 
--    virtio_set_started(vdev, val & VIRTIO_CONFIG_S_DRIVER_OK);
-+    if ((vdev->status & VIRTIO_CONFIG_S_DRIVER_OK) !=
-+        (val & VIRTIO_CONFIG_S_DRIVER_OK)) {
-+        virtio_set_started(vdev, val & VIRTIO_CONFIG_S_DRIVER_OK);
-+    }
- 
-     if (k->set_status) {
-         k->set_status(vdev, val);
--- 
-2.17.1
+=20
+-    argsz =3D sizeof(*irq_info);
+-    irq_info =3D g_malloc0(argsz);
+-    irq_info->index =3D VFIO_CCW_IO_IRQ_INDEX;
+-    irq_info->argsz =3D argsz;
+-    if (ioctl(vdev->fd, VFIO_DEVICE_GET_IRQ_INFO,
+-              irq_info) < 0 || irq_info->count < 1) {
+-        error_setg_errno(errp, errno, "vfio: Error getting irq info");
+-        goto out_free_info;
+-    }
+-
+     if (event_notifier_init(&vcdev->io_notifier, 0)) {
+         error_setg_errno(errp, errno,
+                          "vfio: Unable to init event notifier for IO");
+-        goto out_free_info;
++        return;
+     }
+=20
+-    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
+-    irq_set =3D g_malloc0(argsz);
+-    irq_set->argsz =3D argsz;
+-    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD |
+-                     VFIO_IRQ_SET_ACTION_TRIGGER;
+-    irq_set->index =3D VFIO_CCW_IO_IRQ_INDEX;
+-    irq_set->start =3D 0;
+-    irq_set->count =3D 1;
+-    pfd =3D (int32_t *) &irq_set->data;
+-
+-    *pfd =3D event_notifier_get_fd(&vcdev->io_notifier);
+-    qemu_set_fd_handler(*pfd, vfio_ccw_io_notifier_handler, NULL, vcdev)=
+;
+-    if (ioctl(vdev->fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
+-        error_setg(errp, "vfio: Failed to set up io notification");
+-        qemu_set_fd_handler(*pfd, NULL, NULL, vcdev);
++    fd =3D event_notifier_get_fd(&vcdev->io_notifier);
++    qemu_set_fd_handler(fd, vfio_ccw_io_notifier_handler, NULL, vcdev);
++
++    if (vfio_set_irq_signaling(vdev, VFIO_CCW_IO_IRQ_INDEX, 0,
++                               VFIO_IRQ_SET_ACTION_TRIGGER, fd, errp)) {
++        qemu_set_fd_handler(fd, NULL, NULL, vcdev);
+         event_notifier_cleanup(&vcdev->io_notifier);
+     }
+-
+-    g_free(irq_set);
+-
+-out_free_info:
+-    g_free(irq_info);
+ }
+=20
+ static void vfio_ccw_unregister_io_notifier(VFIOCCWDevice *vcdev)
+ {
+-    struct vfio_irq_set *irq_set;
+-    size_t argsz;
+-    int32_t *pfd;
+-
+-    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
+-    irq_set =3D g_malloc0(argsz);
+-    irq_set->argsz =3D argsz;
+-    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD |
+-                     VFIO_IRQ_SET_ACTION_TRIGGER;
+-    irq_set->index =3D VFIO_CCW_IO_IRQ_INDEX;
+-    irq_set->start =3D 0;
+-    irq_set->count =3D 1;
+-    pfd =3D (int32_t *) &irq_set->data;
+-    *pfd =3D -1;
+-
+-    if (ioctl(vcdev->vdev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
+-        error_report("vfio: Failed to de-assign device io fd: %m");
++    Error *err =3D NULL;
++
++    vfio_set_irq_signaling(&vcdev->vdev, VFIO_CCW_IO_IRQ_INDEX, 0,
++                           VFIO_IRQ_SET_ACTION_TRIGGER, -1, &err);
++    if (err) {
++        error_reportf_err(err, VFIO_MSG_PREFIX, vcdev->vdev.name);
+     }
+=20
+     qemu_set_fd_handler(event_notifier_get_fd(&vcdev->io_notifier),
+                         NULL, NULL, vcdev);
+     event_notifier_cleanup(&vcdev->io_notifier);
+-
+-    g_free(irq_set);
+ }
+=20
+ static void vfio_ccw_get_region(VFIOCCWDevice *vcdev, Error **errp)
+--=20
+2.20.1
 
 
