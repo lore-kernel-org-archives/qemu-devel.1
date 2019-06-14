@@ -2,65 +2,58 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76EABC31E44
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 06:51:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 399FBC31E44
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 07:27:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C92C20866
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 06:51:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C92C20866
+	by mail.kernel.org (Postfix) with ESMTPS id 0FE132073F
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 07:27:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FE132073F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48836 helo=lists.gnu.org)
+Received: from localhost ([::1]:48990 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbg3A-0005wm-Ig
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 02:51:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58006)
+	id 1hbgcK-0000Zl-82
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 03:27:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39232)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hbfzV-0004LT-3H
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 02:47:26 -0400
+ (envelope-from <philmd@redhat.com>) id 1hbga7-000760-2S
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 03:25:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hbfzP-0004qF-Qr
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 02:47:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60918)
+ (envelope-from <philmd@redhat.com>) id 1hbga5-0004ib-U3
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 03:25:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53458)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>)
- id 1hbfzI-0004jw-51; Fri, 14 Jun 2019 02:47:00 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>)
+ id 1hbga2-0004dt-Px; Fri, 14 Jun 2019 03:24:58 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B0BF0882F2;
- Fri, 14 Jun 2019 06:46:58 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
- [10.36.116.148])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 43B7E5DD7A;
- Fri, 14 Jun 2019 06:46:58 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id CF3EE11386A6; Fri, 14 Jun 2019 08:46:56 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20190613153405.24769-1-kwolf@redhat.com>
- <20190613153405.24769-11-kwolf@redhat.com>
-Date: Fri, 14 Jun 2019 08:46:56 +0200
-In-Reply-To: <20190613153405.24769-11-kwolf@redhat.com> (Kevin Wolf's message
- of "Thu, 13 Jun 2019 17:34:00 +0200")
-Message-ID: <87d0jghden.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ by mx1.redhat.com (Postfix) with ESMTPS id B61043079B63;
+ Fri, 14 Jun 2019 07:24:44 +0000 (UTC)
+Received: from x1w.redhat.com (unknown [10.40.205.27])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7D3EE601AC;
+ Fri, 14 Jun 2019 07:24:35 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 14 Jun 2019 09:24:26 +0200
+Message-Id: <20190614072432.820-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Fri, 14 Jun 2019 06:46:58 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.41]); Fri, 14 Jun 2019 07:24:51 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 10/15] monitor: Split out monitor/qmp.c
+Subject: [Qemu-devel] [PATCH 0/6] configure: Try to fix --static linking
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,181 +65,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- dgilbert@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+ integration@gluster.org,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, =?UTF-8?q?Lo=C3=AFc=20Minier?= <loic.minier@linaro.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Michael Tokarev <mjt@tls.msk.ru>, Bharata B Rao <bharata@linux.ibm.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Niels de Vos <ndevos@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin Wolf <kwolf@redhat.com> writes:
+Hi,
 
-> Move QMP infrastructure from monitor/misc.c to monitor/qmp.c. This is
-> code that can be shared for all targets, so compile it only once.
->
-> The amount of function and particularly extern variables in
-> monitor_int.h is probably a bit larger than it needs to be, but this way
-> no non-trivial code modifications are needed. The interfaces between QMP
-> and the monitor core can be cleaned up later.
->
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  monitor/monitor-internal.h |  29 +++
->  monitor/misc.c             | 397 +-----------------------------------
->  monitor/qmp.c              | 405 +++++++++++++++++++++++++++++++++++++
->  Makefile.objs              |   1 +
->  monitor/Makefile.objs      |   1 +
->  monitor/trace-events       |   4 +-
->  6 files changed, 448 insertions(+), 389 deletions(-)
->  create mode 100644 monitor/qmp.c
->
-> diff --git a/monitor/monitor-internal.h b/monitor/monitor-internal.h
-> index 17a632b0ad..0a26f702dd 100644
-> --- a/monitor/monitor-internal.h
-> +++ b/monitor/monitor-internal.h
-> @@ -145,4 +145,33 @@ typedef struct {
->      GQueue *qmp_requests;
->  } MonitorQMP;
->  
-> +/**
-> + * Is @mon a QMP monitor?
-> + */
-> +static inline bool monitor_is_qmp(const Monitor *mon)
-> +{
-> +    return (mon->flags & MONITOR_USE_CONTROL);
+Apparently QEMU static linking is slowly bitroting. Obviously it
+depends the libraries an user has installed, anyway it seems there
+are not much testing done.
 
-checkpatch.pl complains:
+This series fixes few issues, enough to build QEMU on a Ubuntu
+aarch64 host, but not yet on a x86_64 host:
 
-    ERROR: return is not a function, parentheses are not required
+    LINK    x86_64-softmmu/qemu-system-x86_64
+  /usr/bin/ld: cannot find -lgtk-3
+  /usr/bin/ld: cannot find -latk-bridge-2.0
+  /usr/bin/ld: cannot find -latspi
+  /usr/bin/ld: cannot find -lsystemd
+  /usr/bin/ld: cannot find -lgdk-3
+  /usr/bin/ld: cannot find -lwayland-egl
+  /usr/bin/ld: cannot find -lmirclient
+  /usr/bin/ld: cannot find -lmircore
+  /usr/bin/ld: cannot find -lmircookie
+  /usr/bin/ld: cannot find -lepoxy
+  /usr/bin/ld: cannot find -latk-1.0
+  /usr/bin/ld: cannot find -lgdk_pixbuf-2.0
+  /usr/bin/ld: cannot find -lselinux
+  /usr/bin/ld: cannot find -lgtk-3
+  /usr/bin/ld: cannot find -latk-bridge-2.0
+  /usr/bin/ld: cannot find -latspi
+  /usr/bin/ld: cannot find -lsystemd
+  /usr/bin/ld: cannot find -lgdk-3
+  /usr/bin/ld: cannot find -lwayland-egl
+  /usr/bin/ld: cannot find -lmirclient
+  /usr/bin/ld: cannot find -lmircore
+  /usr/bin/ld: cannot find -lmircookie
+  /usr/bin/ld: cannot find -lepoxy
+  /usr/bin/ld: cannot find -latk-1.0
+  /usr/bin/ld: cannot find -lgdk_pixbuf-2.0
+  /usr/bin/ld: cannot find -lselinux
+  /usr/bin/ld: attempted static link of dynamic object `/usr/lib/x86_64-l=
+inux-gnu/libz.so'
+  collect2: error: ld returned 1 exit status
 
-Can touch up in my tree.
+Regards,
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Phil.
 
-Two reminders for myself below.
+Philippe Mathieu-Daud=C3=A9 (6):
+  configure: Only generate GLUSTERFS variables if glusterfs is usable
+  configure: Link test before auto-enabling glusterfs libraries
+  configure: Link test before auto-enabling the libusb library
+  configure: Link test before auto-enabling the libusbredir library
+  configure: Link test before auto-enabling the pulseaudio library
+  .travis.yml: Test static linking
 
-[...]
-> diff --git a/monitor/qmp.c b/monitor/qmp.c
-> new file mode 100644
-> index 0000000000..31fbcd59f7
-> --- /dev/null
-> +++ b/monitor/qmp.c
-> @@ -0,0 +1,405 @@
-> +/*
-> + * QEMU monitor
-> + *
-> + * Copyright (c) 2003-2004 Fabrice Bellard
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +
-> +#include "chardev/char-io.h"
-> +#include "monitor-internal.h"
-> +#include "qapi/error.h"
-> +#include "qapi/qapi-commands-misc.h"
-> +#include "qapi/qmp/qjson.h"
-> +#include "qapi/qmp/qstring.h"
-> +#include "qapi/qmp/qlist.h"
-> +#include "trace.h"
-> +
-> +struct QMPRequest {
-> +    /* Owner of the request */
-> +    MonitorQMP *mon;
-> +    /*
-> +     * Request object to be handled or Error to be reported
-> +     * (exactly one of them is non-null)
-> +     */
-> +    QObject *req;
-> +    Error *err;
-> +};
-> +typedef struct QMPRequest QMPRequest;
+ .travis.yml |   5 +++
+ configure   | 113 +++++++++++++++++++++++++++++++++++++++-------------
+ 2 files changed, 90 insertions(+), 28 deletions(-)
 
-Note to self: consider fusing these two in a follow-up patch.
+--=20
+2.20.1
 
-> +
-> +QmpCommandList qmp_commands, qmp_cap_negotiation_commands;
-> +
-> +static bool qmp_oob_enabled(MonitorQMP *mon)
-> +{
-> +    return mon->capab[QMP_CAPABILITY_OOB];
-> +}
-> +
-> +static void monitor_qmp_caps_reset(MonitorQMP *mon)
-> +{
-> +    memset(mon->capab_offered, 0, sizeof(mon->capab_offered));
-> +    memset(mon->capab, 0, sizeof(mon->capab));
-> +    mon->capab_offered[QMP_CAPABILITY_OOB] = mon->common.use_io_thread;
-> +}
-> +
-> +static void qmp_request_free(QMPRequest *req)
-> +{
-> +    qobject_unref(req->req);
-> +    error_free(req->err);
-> +    g_free(req);
-> +}
-> +
-> +/* Caller must hold mon->qmp.qmp_queue_lock */
-> +static void monitor_qmp_cleanup_req_queue_locked(MonitorQMP *mon)
-> +{
-> +    while (!g_queue_is_empty(mon->qmp_requests)) {
-> +        qmp_request_free(g_queue_pop_head(mon->qmp_requests));
-> +    }
-> +}
-> +
-> +static void monitor_qmp_cleanup_queues(MonitorQMP *mon)
-> +{
-> +    qemu_mutex_lock(&mon->qmp_queue_lock);
-> +    monitor_qmp_cleanup_req_queue_locked(mon);
-> +    qemu_mutex_unlock(&mon->qmp_queue_lock);
-> +}
-> +
-> +void qmp_send_response(MonitorQMP *mon, const QDict *rsp)
-> +{
-> +    const QObject *data = QOBJECT(rsp);
-> +    QString *json;
-> +
-> +    json = mon->common.flags & MONITOR_USE_PRETTY ?
-> +           qobject_to_json_pretty(data) : qobject_to_json(data);
-> +    assert(json != NULL);
-> +
-> +    qstring_append_chr(json, '\n');
-> +    monitor_puts(&mon->common, qstring_get_str(json));
-> +
-> +    qobject_unref(json);
-> +}
-> +
-> +/*
-> + * Emit QMP response @rsp with ID @id to @mon.
-> + * Null @rsp can only happen for commands with QCO_NO_SUCCESS_RESP.
-> + * Nothing is emitted then.
-> + */
-> +static void monitor_qmp_respond(MonitorQMP *mon, QDict *rsp)
-> +{
-> +    if (rsp) {
-> +        qmp_send_response(mon, rsp);
-> +    }
-> +}
-
-Note to self: of the two callers, only one can pass null @rsp.
-Eliminate this function.
-
-[...]
 
