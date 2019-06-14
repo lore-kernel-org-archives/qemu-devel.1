@@ -7,58 +7,61 @@ X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBF3CC31E45
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 01:51:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B56E9C31E49
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 01:51:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80703208CA
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 01:51:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8427F208CA
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 01:51:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Gq3osKjV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80703208CA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="VdApZ/3H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8427F208CA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46624 helo=lists.gnu.org)
+Received: from localhost ([::1]:46626 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbbN3-0004lJ-J6
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 21:51:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56909)
+	id 1hbbN5-0004qA-SB
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 21:51:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56938)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hbbKz-0003Hi-RT
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 21:49:07 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hbbL1-0003Hp-5X
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 21:49:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hbbKy-0003OL-KY
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 21:49:05 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:59759 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1hbbKz-0003Pj-QF
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 21:49:07 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:36263 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hbbKx-0003FY-5e; Thu, 13 Jun 2019 21:49:04 -0400
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1hbbKx-0003F3-2z
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 21:49:05 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 45Q3Rt0Wkyz9sBr; Fri, 14 Jun 2019 11:48:57 +1000 (AEST)
+ id 45Q3Rt3Vlwz9sDB; Fri, 14 Jun 2019 11:48:58 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1560476938;
- bh=2PblEQ6v+jEbOquTNZjJoEAKyfYbSuwoy9T43whjSoM=;
+ bh=pGNly4E5BqUrZ5zyFscDy9L92k//EyEyxp4jPEehBkg=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Gq3osKjVpYzYD04JDYrZPV+97dg2ukxSCaFw7z4OvqZHG0bMPyxTFVpJnjcQ20zqP
- xImO/L1yZQ39dk6C+XbpZtLZymnaOp3EIZOqnf76XyiH5RJCWQLiqCE+1DZWqDHfxm
- vLPXjuKMSLS8pZ0rjz72h0mW3hO/vyrc7WRG5EwA=
-Date: Fri, 14 Jun 2019 11:32:52 +1000
+ b=VdApZ/3HUrcnnwm8Mh2ypkEuSdU917WKlzdP4j27gTFcW7FQlSkJC9+uqgs80/KIP
+ ChLo1UXzqwAmsIQWvsi8Z8RpmUpATsg2zQ5qM4OZuRIllufSSnaq0Xm/dyr4WbIg2o
+ a6EcT7xUnOhlFEZUbCWtaC1kPcpuJHuiZbxYT1lk=
+Date: Fri, 14 Jun 2019 11:40:57 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190614013252.GA4021@umbus.fritz.box>
-References: <20190613213406.22053-1-philmd@redhat.com>
+Message-ID: <20190614014056.GD11158@umbus.fritz.box>
+References: <20190613060728.26955-1-david@gibson.dropbear.id.au>
+ <20190613060728.26955-3-david@gibson.dropbear.id.au>
+ <617a8179-7dcc-7c51-1239-6e4893090d43@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="X1bOJ3K7DJ5YkBrT"
+ protocol="application/pgp-signature"; boundary="rqzD5py0kzyFAOWN"
 Content-Disposition: inline
-In-Reply-To: <20190613213406.22053-1-philmd@redhat.com>
+In-Reply-To: <617a8179-7dcc-7c51-1239-6e4893090d43@redhat.com>
 User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [PATCH v2] spapr_pci: Fix potential NULL pointer
- dereference in spapr_dt_pci_bus()
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: Re: [Qemu-devel] [PATCH 2/3] tests/acceptance: Handle ppc64le host
+ arch correctly
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,73 +73,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
- Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- "Michael S . Tsirkin" <mst@redhat.com>
+Cc: arikalo@wavecomp.com, ehabkost@redhat.com, qemu-devel@nongnu.org,
+ aurelien@aurel32.net, crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---X1bOJ3K7DJ5YkBrT
+--rqzD5py0kzyFAOWN
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 13, 2019 at 11:34:06PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> Commit 14e714900f6 refactored the call to spapr_dt_drc(),
-> introducing a potential NULL pointer dereference while
-> accessing bus->parent_dev.
-> A trivial audit show 'bus' is not null in the two places
-> the static function spapr_dt_drc() is called.
+On Thu, Jun 13, 2019 at 11:01:19AM +0200, Philippe Mathieu-Daud=E9 wrote:
+> On 6/13/19 8:07 AM, David Gibson wrote:
+> > ppc64 and ppc64le are different archs from the host kernel point of view
+> > and are advertised as such in uname.  But these cover the same set of C=
+PUs,
+> > just in different endianness modes.  qemu-system-ppc64 handles both mod=
+es,
+> > so make sure we select the correct binary when running on ppc64le host
+> > architecture.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  tests/acceptance/avocado_qemu/__init__.py | 2 ++
+> >  1 file changed, 2 insertions(+)
+> >=20
+> > diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptan=
+ce/avocado_qemu/__init__.py
+> > index 2b236a1cf0..0ba9c536f4 100644
+> > --- a/tests/acceptance/avocado_qemu/__init__.py
+> > +++ b/tests/acceptance/avocado_qemu/__init__.py
+> > @@ -39,6 +39,8 @@ def pick_default_qemu_bin(arch=3DNone):
+> >      """
+> >      if arch is None:
+> >          arch =3D os.uname()[4]
+> > +        if arch =3D=3D 'ppc64le':
+> > +            arch =3D 'ppc64'
 >=20
-> Since the 'bus' parameter is not NULL in both callers, remove
-> remove the test on if (bus), and add an assert() to silent
-> static analyzers.
->=20
-> This fixes:
->=20
->   /hw/ppc/spapr_pci.c: 1367 in spapr_dt_pci_bus()
->   >>>     CID 1401933:  Null pointer dereferences  (FORWARD_NULL)
->   >>>     Dereferencing null pointer "bus".
->   1367         ret =3D spapr_dt_drc(fdt, offset, OBJECT(bus->parent_dev),
->   1368                            SPAPR_DR_CONNECTOR_TYPE_PCI);
->=20
-> Fixes: 14e714900f6
-> Reported-by: Coverity (CID 1401933)
-> Suggested-by: Greg Kurz <groug@kaod.org>
-> Suggested-by: David Gibson <david@gibson.dropbear.id.au>
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> I prefer the generic patch from Cleber:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg03418.html
+> (I guess remember another version with a json file)
 
-Applied, thanks.
+I hadn't seen that, that does indeed look better.
 
-> ---
->  hw/ppc/spapr_pci.c | 11 +++++------
->  1 file changed, 5 insertions(+), 6 deletions(-)
 >=20
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index 957ae88bbd..fbeb1c90ee 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -1356,12 +1356,11 @@ static int spapr_dt_pci_bus(SpaprPhbState *sphb, =
-PCIBus *bus,
->      _FDT(fdt_setprop_cell(fdt, offset, "#size-cells",
->                            RESOURCE_CELLS_SIZE));
-> =20
-> -    if (bus) {
-> -        pci_for_each_device_reverse(bus, pci_bus_num(bus),
-> -                                    spapr_dt_pci_device_cb, &cbinfo);
-> -        if (cbinfo.err) {
-> -            return cbinfo.err;
-> -        }
-> +    assert(bus);
-> +    pci_for_each_device_reverse(bus, pci_bus_num(bus),
-> +                                spapr_dt_pci_device_cb, &cbinfo);
-> +    if (cbinfo.err) {
-> +        return cbinfo.err;
->      }
-> =20
->      ret =3D spapr_dt_drc(fdt, offset, OBJECT(bus->parent_dev),
+> >      qemu_bin_relative_path =3D os.path.join("%s-softmmu" % arch,
+> >                                            "qemu-system-%s" % arch)
+> >      if is_readable_executable_file(qemu_bin_relative_path):
+> >=20
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -144,25 +131,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---X1bOJ3K7DJ5YkBrT
+--rqzD5py0kzyFAOWN
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0C+UIACgkQbDjKyiDZ
-s5IIAg/+Ki2gjg+f3jv79YlGGjotKry04tsfK6BZNcNxPXnfGyurn3fEaFPRXB08
-7XT63zV5u2gJhOEzuNNRTSWmGkKKHbIw6KhyoA03JMqtcsv8X2EQtlmEirpUh1Mt
-Q/9+8Z+6v/xRHovh951LbjhlGgAtzv62QEb/sDCeDAiqUF1Ifo9FYcbAr5IMjTSb
-fWl+JZ/GoTWlNIZ8OYt5LFkTuDDIRfw9P7AQNB0pgWmpb5endL1BJa7aY+S8fmio
-sxu6GA6fG1jQZWEmTxb8/KEP+1XN58+LE5cYa3B+/Vi5blR9d3k1Z3fRrZzdRCWZ
-qU8Xp6vQUrhDX0opgEBGQcEc/NOsvH64NmilUgYuE6/SvMZei2pbRInu+mHjvbma
-gd7VueGFQjsa5hb3Qz8JNRZE54mAQ3mEauj3J1x+pJeBqjhkHqHZaXvXXfy/Rnex
-GoOKWnDIh8+5rHVEzoZ7+N0bFwKRZC5SCjT7nh5zEz2NWycEfoVXLkArk4Prt8CK
-CItbX2VL2jOo15MW2eQf0T3wjdFVNI+pq0yYPfLgrahrvdxKce0JTwfHXYOE1Bav
-ExRhsHzaG/ZOMJjXE6i1ci6kBbEX7Dj1JVFy2vrSS57FTYwVKn27oSZMR9YTi93l
-ZPweSq05BqKbiLb/VlLj1BM6PjNO0SLvUF1Hxsnk5YIRTVJR2kc=
-=If0G
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0C+ygACgkQbDjKyiDZ
+s5JOJxAA4PN6GpnyfgDnFo1vjG1LeQZjRESrXMbos8GMw/Ipr6kZDlvoHe402wxz
+DjLh8hqWiRFWbOPvv+n5GD0S9DodmzUHuVl4Y0nfLXZPzKIlcdKc+SA3qIhv4KyQ
+nA6KnrpSV15N5c1gUSfysiG2UJfi1Tjd6aiayJqTbP53AtsB1G6udGt3oRc54O4J
+xFb413y0dPhksQXFa9tKu901qoWIv6gTwHKKVZflGWEJrSjXMJEycHtlZBr2EOeF
+KhbPbZtY2bJuwiYP4Ra5ke8OTkoBoAT3ae5vrC9I+ipNnvHAXCd0lRxf4OFNiVcU
+MVrFpDOfZxhaBOuUmj7MQTI1+pPQ4DsMKy7JxfLY9F+8IFu3v34S5spPsPp5VOBh
+7lKvKmK8zkKVMG3mZBjT4E1mA8+/2IOeESP6zhkdMKKSx7D5n+4mS1ZAmBMdIvWp
+OLx7YCMTXZ3IkQ8SznUGxYZfE5bZxjlcTRG6MOnrwjiRu4m+fQQFwth0m+u6o8dv
+Hi35II98RB8Aj3umkNpaLrMT/joJKSGjIeHF2fpuYHtoMTDP6wjDvKvmYHelwSA8
+BKAOfu7AUv62H0AIJ/Qqlb2Ilq+GsMMpeV/PZP2vT7aZ4kN/FKn24CpbF9JdUgnj
+qkWY95ALw8mrKz6eITrge7ZPzAvax6UBmg6n+j7zsaJy0l+KRXo=
+=6d3a
 -----END PGP SIGNATURE-----
 
---X1bOJ3K7DJ5YkBrT--
+--rqzD5py0kzyFAOWN--
 
