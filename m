@@ -2,66 +2,102 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DAB5C31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 14:58:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53BBCC31E4B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 15:06:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45A7221537
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 14:58:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45A7221537
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2B91220866
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 15:06:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B91220866
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52364 helo=lists.gnu.org)
+Received: from localhost ([::1]:52426 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbnfB-00083b-HQ
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 10:58:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59583)
+	id 1hbnmb-0004F7-US
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 11:06:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34168)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hbn5G-0003xJ-VC
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 10:21:40 -0400
+ (envelope-from <farman@linux.ibm.com>) id 1hbnER-0004Yz-A3
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 10:31:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hbn5F-0003A6-EJ
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 10:21:38 -0400
-Resent-Date: Fri, 14 Jun 2019 10:21:38 -0400
-Resent-Message-Id: <E1hbn5F-0003A6-EJ@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21411)
+ (envelope-from <farman@linux.ibm.com>) id 1hbnEN-00023P-Ou
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 10:31:07 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47094
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hbn5F-00035G-69
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 10:21:37 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1560522084; cv=none; d=zoho.com; s=zohoarc; 
- b=HP1v31zmtezs2hfPNhDgXx2Hqlbg3lsAIjPitRgoavQiGPXG/CP1CvO713tN7RLKRwarA+UiOZa0JS7J0b2GECArz7bLzRjuCFL4J7CFkdnxk/CfOkStHMG8UjIpntckL3D+IaVL7GNSKRR2vRb41i44xm3VnM2Yc2edaCBmY6Y=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1560522084;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=Z1OKYKAKf1TEojmYxXnHc+8DIYUk6nmGNrSDkgmsLa4=; 
- b=N6TGzlzxyw1sByeF6/BekwGqllGJPPRghgKSM5Y3cVsQd7eOAZSuzqri1NAn7jPiIFfku+OEC/tXQQ1x7bD4pgbAD5rrJQvbI2JHr3hL1y9zg5VVfxxGV038BalYMU5ZL7xjUrv7a/qBLFaHf0VpP6QmZMiRGvkofkwCSnF+qQg=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1560522081557851.0225427553772;
- Fri, 14 Jun 2019 07:21:21 -0700 (PDT)
-In-Reply-To: <20190614131724.33928-1-mrolnik@gmail.com>
-Message-ID: <156052208061.13573.1709468080912187030@ce79690b2cb9>
+ (Exim 4.71) (envelope-from <farman@linux.ibm.com>)
+ id 1hbnEN-0001tc-FS
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 10:31:03 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x5EEHQSo059180
+ for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 10:30:50 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2t4cggtqdc-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 10:30:49 -0400
+Received: from localhost
+ by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <farman@linux.ibm.com>;
+ Fri, 14 Jun 2019 15:30:48 +0100
+Received: from b01cxnp22034.gho.pok.ibm.com (9.57.198.24)
+ by e14.ny.us.ibm.com (146.89.104.201) with IBM ESMTP SMTP Gateway: Authorized
+ Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 14 Jun 2019 15:30:46 +0100
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
+ [9.57.199.110])
+ by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x5EEUjjO36503966
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 14 Jun 2019 14:30:45 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B0E99AE060;
+ Fri, 14 Jun 2019 14:30:45 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 70741AE068;
+ Fri, 14 Jun 2019 14:30:45 +0000 (GMT)
+Received: from [9.85.188.22] (unknown [9.85.188.22])
+ by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
+ Fri, 14 Jun 2019 14:30:45 +0000 (GMT)
+To: Cornelia Huck <cohuck@redhat.com>, Farhan Ali <alifm@linux.ibm.com>
+References: <20190614092705.11025-1-cohuck@redhat.com>
+From: Eric Farman <farman@linux.ibm.com>
+Date: Fri, 14 Jun 2019 10:30:45 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: mrolnik@gmail.com
-Date: Fri, 14 Jun 2019 07:21:21 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [PATCH v22 0/7] QEMU AVR 8 bit cores
+In-Reply-To: <20190614092705.11025-1-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19061414-0052-0000-0000-000003D11258
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011260; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000286; SDB=6.01217877; UDB=6.00640468; IPR=6.00998998; 
+ MB=3.00027308; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-14 14:30:48
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19061414-0053-0000-0000-000061538409
+Message-Id: <790578fe-9d90-bfa1-a540-f7f054d8293f@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-06-14_06:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=864 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906140122
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: Re: [Qemu-devel] [PATCH] vfio-ccw: use vfio_set_irq_signaling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,90 +109,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: mrolnik@gmail.com, richard.henderson@linaro.org, qemu-devel@nongnu.org
+Cc: Eric Auger <eric.auger@redhat.com>, qemu-s390x@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYxNDEzMTcyNC4zMzky
-OC0xLW1yb2xuaWtAZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyMiAwLzddIFFFTVUgQVZS
-IDggYml0IGNvcmVzClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDYxNDEzMTcyNC4zMzky
-OC0xLW1yb2xuaWtAZ21haWwuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
-YXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAt
-LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
-IFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3Njcmlw
-dHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0
-YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDYxNDEzMTcyNC4zMzkyOC0xLW1yb2xuaWtA
-Z21haWwuY29tIC0+IHBhdGNoZXcvMjAxOTA2MTQxMzE3MjQuMzM5MjgtMS1tcm9sbmlrQGdtYWls
-LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjkxMDVlMWMxODQgdGFyZ2V0L2F2
-cjogUmVnaXN0ZXIgQVZSIHN1cHBvcnQgd2l0aCB0aGUgcmVzdCBvZiBRRU1VLCB0aGUgYnVpbGQg
-c3lzdGVtLCBhbmQgdGhlIE1BSU5UQUlORVJTIGZpbGUKZDQxZDU5YzVjOCB0YXJnZXQvYXZyOiBB
-ZGQgZXhhbXBsZSBib2FyZCBjb25maWd1cmF0aW9uCjIzYmU0OTRjZmUgdGFyZ2V0L2F2cjogQWRk
-IGxpbWl0ZWQgc3VwcG9ydCBmb3IgVVNBUlQgYW5kIDE2IGJpdCB0aW1lciBwZXJpcGhlcmFscwow
-MTZmMTI0ZjYyIHRhcmdldC9hdnI6IEFkZCBpbnN0cnVjdGlvbiB0cmFuc2xhdGlvbgpjMzJkNWI3
-OTdmIHRhcmdldC9hdnI6IEFkZCBpbnN0cnVjdGlvbiBkZWNvZGluZwo1MGY1MTExN2IwIHRhcmdl
-dC9hdnI6IEFkZCBpbnN0cnVjdGlvbiBoZWxwZXJzCmNiM2ViMDViYzIgdGFyZ2V0L2F2cjogQWRk
-IG91dHdhcmQgZmFjaW5nIGludGVyZmFjZXMgYW5kIGNvcmUgQ1BVIGxvZ2ljCgo9PT0gT1VUUFVU
-IEJFR0lOID09PQoxLzcgQ2hlY2tpbmcgY29tbWl0IGNiM2ViMDViYzJiYiAodGFyZ2V0L2F2cjog
-QWRkIG91dHdhcmQgZmFjaW5nIGludGVyZmFjZXMgYW5kIGNvcmUgQ1BVIGxvZ2ljKQpXQVJOSU5H
-OiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQg
-dXBkYXRpbmc/CiMxNzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEg
-d2FybmluZ3MsIDExNzYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMS83IGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCjIvNyBDaGVja2luZyBjb21taXQgNTBmNTExMTdiMDIxICh0YXJnZXQvYXZyOiBB
-ZGQgaW5zdHJ1Y3Rpb24gaGVscGVycykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQg
-ZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTY6IApuZXcgZmlsZSBt
-b2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAzODMgbGluZXMgY2hlY2tl
-ZAoKUGF0Y2ggMi83IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjMvNyBDaGVja2luZyBjb21t
-aXQgYzMyZDViNzk3ZmNiICh0YXJnZXQvYXZyOiBBZGQgaW5zdHJ1Y3Rpb24gZGVjb2RpbmcpCldB
-Uk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMg
-bmVlZCB1cGRhdGluZz8KIzE1OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9y
-cywgMSB3YXJuaW5ncywgMTc1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvNyBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgo0LzcgQ2hlY2tpbmcgY29tbWl0IDAxNmYxMjRmNjJjOCAodGFyZ2V0L2F2
-cjogQWRkIGluc3RydWN0aW9uIHRyYW5zbGF0aW9uKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3Ig
-ZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNDogCm5l
-dyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzU2OiBG
-SUxFOiB0YXJnZXQvYXZyL3RyYW5zbGF0ZS5jOjM4OgorICogIFRoaXMgaXMgZm9yIGh0dHBzOi8v
-Z2l0aHViLmNvbS9zZWhhcnJpcy9xZW11LWF2ci10ZXN0cy90cmVlL21hc3Rlci9pbnN0cnVjdGlv
-bi10ZXN0cyB0ZXN0cwoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCAyODg2IGxpbmVzIGNo
-ZWNrZWQKClBhdGNoIDQvNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNS83IENoZWNraW5n
-IGNvbW1pdCAyM2JlNDk0Y2ZlMWIgKHRhcmdldC9hdnI6IEFkZCBsaW1pdGVkIHN1cHBvcnQgZm9y
-IFVTQVJUIGFuZCAxNiBiaXQgdGltZXIgcGVyaXBoZXJhbHMpCldBUk5JTkc6IGFkZGVkLCBtb3Zl
-ZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM3
-OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTEy
-NyBsaW5lcyBjaGVja2VkCgpQYXRjaCA1LzcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNi83
-IENoZWNraW5nIGNvbW1pdCBkNDFkNTljNWM4ODQgKHRhcmdldC9hdnI6IEFkZCBleGFtcGxlIGJv
-YXJkIGNvbmZpZ3VyYXRpb24pCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUo
-cyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzI2OiAKbmV3IGZpbGUgbW9kZSAx
-MDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjI5IGxpbmVzIGNoZWNrZWQKClBh
-dGNoIDYvNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo3LzcgQ2hlY2tpbmcgY29tbWl0IDkx
-MDVlMWMxODRiMyAodGFyZ2V0L2F2cjogUmVnaXN0ZXIgQVZSIHN1cHBvcnQgd2l0aCB0aGUgcmVz
-dCBvZiBRRU1VLCB0aGUgYnVpbGQgc3lzdGVtLCBhbmQgdGhlIE1BSU5UQUlORVJTIGZpbGUpCldB
-Uk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMg
-bmVlZCB1cGRhdGluZz8KIzY2OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9y
-cywgMSB3YXJuaW5ncywgMTE2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDcvNyBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0
-aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5v
-cmcvbG9ncy8yMDE5MDYxNDEzMTcyNC4zMzkyOC0xLW1yb2xuaWtAZ21haWwuY29tL3Rlc3Rpbmcu
-Y2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
-bHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
-ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+
+
+On 6/14/19 5:27 AM, Cornelia Huck wrote:
+> Use the new helper.
+> 
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  hw/vfio/ccw.c | 68 +++++++++++----------------------------------------
+>  1 file changed, 14 insertions(+), 54 deletions(-)
+> 
+> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+> index 03a2becb3ec9..3dc08721a3db 100644
+> --- a/hw/vfio/ccw.c
+> +++ b/hw/vfio/ccw.c
+> @@ -197,10 +197,7 @@ read_err:
+>  static void vfio_ccw_register_io_notifier(VFIOCCWDevice *vcdev, Error **errp)
+>  {
+>      VFIODevice *vdev = &vcdev->vdev;
+> -    struct vfio_irq_info *irq_info;
+> -    struct vfio_irq_set *irq_set;
+> -    size_t argsz;
+> -    int32_t *pfd;
+> +    int fd;
+>  
+>      if (vdev->num_irqs < VFIO_CCW_IO_IRQ_INDEX + 1) {
+>          error_setg(errp, "vfio: unexpected number of io irqs %u",
+> @@ -208,72 +205,35 @@ static void vfio_ccw_register_io_notifier(VFIOCCWDevice *vcdev, Error **errp)
+>          return;
+>      }
+>  
+> -    argsz = sizeof(*irq_info);
+> -    irq_info = g_malloc0(argsz);
+> -    irq_info->index = VFIO_CCW_IO_IRQ_INDEX;
+> -    irq_info->argsz = argsz;
+> -    if (ioctl(vdev->fd, VFIO_DEVICE_GET_IRQ_INFO,
+> -              irq_info) < 0 || irq_info->count < 1) {
+> -        error_setg_errno(errp, errno, "vfio: Error getting irq info");
+> -        goto out_free_info;
+> -    }
+> -
+
+Don't we still need this hunk?  (And the out_free_info label stuff that
+cleans it up.)  I don't see vfio_set_irq_signaling() covering it.
+
+>      if (event_notifier_init(&vcdev->io_notifier, 0)) {
+>          error_setg_errno(errp, errno,
+>                           "vfio: Unable to init event notifier for IO");
+> -        goto out_free_info;
+> +        return;
+>      }
+>  
+> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
+> -    irq_set = g_malloc0(argsz);
+> -    irq_set->argsz = argsz;
+> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
+> -    irq_set->index = VFIO_CCW_IO_IRQ_INDEX;
+> -    irq_set->start = 0;
+> -    irq_set->count = 1;
+> -    pfd = (int32_t *) &irq_set->data;
+> -
+> -    *pfd = event_notifier_get_fd(&vcdev->io_notifier);
+> -    qemu_set_fd_handler(*pfd, vfio_ccw_io_notifier_handler, NULL, vcdev);
+> -    if (ioctl(vdev->fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
+> -        error_setg(errp, "vfio: Failed to set up io notification");
+> -        qemu_set_fd_handler(*pfd, NULL, NULL, vcdev);
+> +    fd = event_notifier_get_fd(&vcdev->io_notifier);
+> +    qemu_set_fd_handler(fd, vfio_ccw_io_notifier_handler, NULL, vcdev);
+> +
+> +    if (vfio_set_irq_signaling(vdev, VFIO_CCW_IO_IRQ_INDEX, 0,
+> +                               VFIO_IRQ_SET_ACTION_TRIGGER, fd, errp)) {
+> +        qemu_set_fd_handler(fd, NULL, NULL, vcdev);
+
+This sure looks nice though.  :)
+
+>          event_notifier_cleanup(&vcdev->io_notifier);
+>      }
+> -
+> -    g_free(irq_set);
+> -
+> -out_free_info:
+> -    g_free(irq_info);
+>  }
+>  
+>  static void vfio_ccw_unregister_io_notifier(VFIOCCWDevice *vcdev)
+>  {
+> -    struct vfio_irq_set *irq_set;
+> -    size_t argsz;
+> -    int32_t *pfd;
+> -
+> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
+> -    irq_set = g_malloc0(argsz);
+> -    irq_set->argsz = argsz;
+> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
+> -    irq_set->index = VFIO_CCW_IO_IRQ_INDEX;
+> -    irq_set->start = 0;
+> -    irq_set->count = 1;
+> -    pfd = (int32_t *) &irq_set->data;
+> -    *pfd = -1;
+> -
+> -    if (ioctl(vcdev->vdev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
+> -        error_report("vfio: Failed to de-assign device io fd: %m");
+> +    Error *err = NULL;
+> +
+> +    vfio_set_irq_signaling(&vcdev->vdev, VFIO_CCW_IO_IRQ_INDEX, 0,
+> +                           VFIO_IRQ_SET_ACTION_TRIGGER, -1, &err);
+> +    if (err) {
+> +        error_reportf_err(err, VFIO_MSG_PREFIX, vcdev->vdev.name);
+>      }
+>  
+>      qemu_set_fd_handler(event_notifier_get_fd(&vcdev->io_notifier),
+>                          NULL, NULL, vcdev);
+>      event_notifier_cleanup(&vcdev->io_notifier);
+> -
+> -    g_free(irq_set);
+>  }
+>  
+>  static void vfio_ccw_get_region(VFIOCCWDevice *vcdev, Error **errp)
+> 
 
 
