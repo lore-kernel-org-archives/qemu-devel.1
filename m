@@ -2,71 +2,110 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD083C31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 12:12:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49E66C31E44
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 12:13:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A81CB21473
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 12:12:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A81CB21473
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 223CB208CA
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 12:13:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 223CB208CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50806 helo=lists.gnu.org)
+Received: from localhost ([::1]:50808 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbl4I-0004Pr-Kv
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 08:12:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51828)
+	id 1hbl57-000588-D5
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 08:13:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48067)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <palmer@dabbelt.com>) id 1hbl2L-0002YU-AI
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 08:10:31 -0400
+ (envelope-from <david@redhat.com>) id 1hbkn4-0001kn-BG
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 07:54:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1hbl2J-0003tm-Ip
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 08:10:29 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:56311)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hbl2J-0003gv-6d
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 08:10:27 -0400
-Received: by mail-wm1-f65.google.com with SMTP id a15so2089020wmj.5
- for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 05:10:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=HHmxPOXC/7BCycsETxDS9BYLXUGEb3sRUYUuk8X8HLk=;
- b=R26yM2oAtyT2bvZVKsIg1mji/iaR5WCaUMS+GxpcJid5/Dwp1LwvJhrN3bS5OJ++CT
- uQP+NAWq8hFXzPuhAetxzNTjRt1FckNjdRSRWmH1Iqhs5UOWrtGEt1yjcc0+iFiY0R2I
- c8oJu60C6RfA5xeyvlIYfH+QSw21IvQLdMo6g6Cp/DrNCq9r4QFaQ16UGFNHka56Mpbf
- QgLl0Xx8MEKVlYyW+6a2BE9pH5MbfI086kZE3p9a3POWB6x/VJDYu9umKdEEqUB2yFX/
- 902jAr8CQBqh1Ujs44spMFvsGsd/McYg4ruJ2jVgw3NiPHBMnb2h5VXjlSyQknSvk7C/
- Sd7w==
-X-Gm-Message-State: APjAAAUGvEe51V2mJaKU7Dhbtoqn4d5BIndCU7/YSI1OTkF4OullVftT
- em0I+/TQftKjsxRdRUK8Ze6B2g==
-X-Google-Smtp-Source: APXvYqzW/Brcm6Lo8qlf2hPmdiAbiy/SJaKDnrPS0BUy97rjS7rGcXAhPBAa5tTwUZiBNMXF9BX1xw==
-X-Received: by 2002:a1c:2d8b:: with SMTP id t133mr7744690wmt.57.1560514212594; 
- Fri, 14 Jun 2019 05:10:12 -0700 (PDT)
-Received: from localhost ([83.137.6.186])
- by smtp.gmail.com with ESMTPSA id p3sm4394672wrd.47.2019.06.14.05.10.09
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 14 Jun 2019 05:10:12 -0700 (PDT)
-Date: Fri, 14 Jun 2019 05:10:12 -0700 (PDT)
-X-Google-Original-Date: Fri, 14 Jun 2019 05:09:48 PDT (-0700)
-In-Reply-To: <CAFEAcA-01sahAvfLRoe3e9RfCcgmk4+Ubceufg9hhmwQAFpbRQ@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <mhng-1958cec5-7d9d-483b-bb14-72e53bbde47f@palmer-si-x1e>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ (envelope-from <david@redhat.com>) id 1hbkn3-0005zD-Cf
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 07:54:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54618)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1hbkn3-0005y1-3G; Fri, 14 Jun 2019 07:54:41 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id BDED881F07;
+ Fri, 14 Jun 2019 11:54:34 +0000 (UTC)
+Received: from [10.36.117.37] (ovpn-117-37.ams2.redhat.com [10.36.117.37])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2D6555DE4E;
+ Fri, 14 Jun 2019 11:54:32 +0000 (UTC)
+To: Cornelia Huck <cohuck@redhat.com>
+References: <20190612132526.8905-1-david@redhat.com>
+ <20190614134932.3df92945.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <b0260778-a514-445f-843c-24e24f3805ff@redhat.com>
+Date: Fri, 14 Jun 2019 13:54:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <20190614134932.3df92945.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Fri, 14 Jun 2019 11:54:34 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PULL 01/29] SiFive RISC-V GPIO Device
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v1 0/2] s390x/cpumodel: Rework CPU feature
+ definition
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,61 +117,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, chouteau@adacore.com
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 30 May 2019 03:57:12 PDT (-0700), Peter Maydell wrote:
-> On Sun, 26 May 2019 at 02:10, Palmer Dabbelt <palmer@sifive.com> wrote:
+On 14.06.19 13:49, Cornelia Huck wrote:
+> On Wed, 12 Jun 2019 15:25:24 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> Rework the feature initialization, making it harder to make mistakes.
+>> While at it, rename the enum names of the KDSA features.
 >>
->> From: Fabien Chouteau <chouteau@adacore.com>
+>> David Hildenbrand (2):
+>>   s390x/cpumodel: Rework CPU feature definition
+>>   s390x/cpumodel: Prepend KDSA features with "KDSA"
 >>
->> QEMU model of the GPIO device on the SiFive E300 series SOCs.
+>>  target/s390x/cpu_features.c         | 352 +-------------------------
+>>  target/s390x/cpu_features_def.h     | 352 +-------------------------
+>>  target/s390x/cpu_features_def.inc.h | 369 ++++++++++++++++++++++++++++
+>>  target/s390x/gen-features.c         |  30 +--
+>>  4 files changed, 401 insertions(+), 702 deletions(-)
+>>  create mode 100644 target/s390x/cpu_features_def.inc.h
 >>
->> The pins are not used by a board definition yet, however this
->> implementation can already be used to trigger GPIO interrupts from the
->> software by configuring a pin as both output and input.
->>
->> Signed-off-by: Fabien Chouteau <chouteau@adacore.com>
->> Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
->> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
->
-> Hi; this patch causes Coverity to complain about a memory
-> leak (CID 1401707):
->
->>  static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
->>  {
->>      const struct MemmapEntry *memmap = sifive_e_memmap;
->> +    Error *err = NULL;
->>
->>      SiFiveESoCState *s = RISCV_E_SOC(dev);
->>      MemoryRegion *sys_mem = get_system_memory();
->> @@ -184,8 +188,28 @@ static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
->>      sifive_mmio_emulate(sys_mem, "riscv.sifive.e.aon",
->>          memmap[SIFIVE_E_AON].base, memmap[SIFIVE_E_AON].size);
->>      sifive_prci_create(memmap[SIFIVE_E_PRCI].base);
->> -    sifive_mmio_emulate(sys_mem, "riscv.sifive.e.gpio0",
->> -        memmap[SIFIVE_E_GPIO0].base, memmap[SIFIVE_E_GPIO0].size);
->> +
->> +    /* GPIO */
->> +
->> +    object_property_set_bool(OBJECT(&s->gpio), true, "realized", &err);
->> +    if (err) {
->> +        error_propagate(errp, err);
->> +        return;
->> +    }
->
-> This function allocated xip_mem and mask_rom via g_new() but
-> then this error-exit doesn't free them.
->
-> The best way to fix this is to stop doing separate memory
-> allocations at all -- instead just have fields in the
-> SiFiveESoCState struct
->    MemoryRegion xip_mem;
->    Memory_Region mask_rom;
->
-> and pass &s->xip_mem etc where currently the code uses xip_mem.
+> 
+> Looks good to me. Do you want to take it via your tree?
+> 
 
-Sorry this took a while to fix, I've just sent a patch to fix the memory leak.
+Yep, will do. Thanks!
+
+-- 
+
+Thanks,
+
+David / dhildenb
 
