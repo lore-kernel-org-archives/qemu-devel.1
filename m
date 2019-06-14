@@ -2,67 +2,66 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0033C31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 19:46:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E652EC31E4B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 19:48:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C560217D6
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 19:46:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C560217D6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BD0BC217F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 19:48:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD0BC217F9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54816 helo=lists.gnu.org)
+Received: from localhost ([::1]:54828 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbs99-0005K5-G2
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 15:45:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46289)
+	id 1hbsBn-0007Ay-3k
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 15:48:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47311)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <lersek@redhat.com>) id 1hbs7R-0004VN-Q3
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 15:44:15 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hbsB1-0006lO-1G
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 15:47:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1hbs7Q-0007vy-8K
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 15:44:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50116)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hbs7O-0007sZ-Kw
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 15:44:12 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 396C430832CC
- for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 19:44:02 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-141.ams2.redhat.com
- [10.36.116.141])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 534C86108A;
- Fri, 14 Jun 2019 19:43:57 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-References: <20190606133110.13754-1-lersek@redhat.com>
- <611d1efd-3052-c98d-e88a-294d07c822ab@redhat.com>
- <50d3c5a3-9f7a-ab7d-7421-9608675f1bf0@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <75a60e82-11e8-5ad8-0c38-ad1b9741d2a6@redhat.com>
-Date: Fri, 14 Jun 2019 21:43:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ (envelope-from <no-reply@patchew.org>) id 1hbsAz-0002pa-EY
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 15:47:54 -0400
+Resent-Date: Fri, 14 Jun 2019 15:47:54 -0400
+Resent-Message-Id: <E1hbsAz-0002pa-EY@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21460)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hbsAz-0002o4-0w
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 15:47:53 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1560541668; cv=none; d=zoho.com; s=zohoarc; 
+ b=A77wn4luHBFt/d63FcujGXSFI82Ii5XliBt7VviJnCcGFmqwQgW3l7iYwGQr59Prc2DthCdkspV+AqkLSWp6JYPD0uvTO4Jvr9k1c8W8WbyX82kktO++DOzsJ4Tf7poqm+6KGqaPLElT9FweXCKilwO7PndhKOSGew42rnQqm6E=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1560541668;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=UOJBCfW5Snc+p9dNkAJUzYhluCS944BcWFbkOLjGyXw=; 
+ b=LP2ajslmo9/cVBQUWryg1M7liymMW9KLY9G6p8IDLsQiRi5wg6wP5ulfQPvbF4Af8n6YyU+y21zS6ETrcOE7Iepv+DxM1pSikyuBQM65+VkJ730I8FJS1NVf4J14vDyA4mTD92RsX2nMYYLk+TS8Qq/C8bO6HpDIouQ9Mr+kahw=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 156054166693236.67260611033964;
+ Fri, 14 Jun 2019 12:47:46 -0700 (PDT)
+In-Reply-To: <20190614171200.21078-1-alex.bennee@linaro.org>
+Message-ID: <156054166606.13573.5298444342662423519@ce79690b2cb9>
 MIME-Version: 1.0
-In-Reply-To: <50d3c5a3-9f7a-ab7d-7421-9608675f1bf0@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Fri, 14 Jun 2019 19:44:07 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: alex.bennee@linaro.org
+Date: Fri, 14 Jun 2019 12:47:46 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/6] update edk2 submodule & binaries to
- edk2-stable201905
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH  v3 00/50] tcg plugin support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,72 +73,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu devel list <qemu-devel@nongnu.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/13/19 19:41, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 6/13/19 5:12 PM, Laszlo Ersek wrote:
->> On 06/06/19 15:31, Laszlo Ersek wrote:
->>> Launchpad: https://bugs.launchpad.net/qemu/+bug/1831477
->>> Repo:      https://github.com/lersek/qemu.git
->>> Branch:    edk2-stable201905-lp-1831477
->>>
->>> edk2-stable201905 has been released today; let's update QEMU's
->>> submodule, and the binaries built thereof. This should be the edk2
->>> release that goes into QEMU 4.1.
->>>
->>> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>>
->>> Thanks
->>> Laszlo
->>>
->>> Laszlo Ersek (6):
->>>   roms/Makefile.edk2: define edk2-stable201905 network feature test
->>>     macros
->>>   roms/edk2: update submodule from edk2-stable201903 to
->>>     edk2-stable201905
->>>   roms/Makefile.edk2: remove edk2-stable201903 network feature test
->>>     macros
->>>   roms/Makefile.edk2: update input file list for
->>>     "pc-bios/edk2-licenses.txt"
->>>   pc-bios: refresh edk2 build artifacts for edk2-stable201905
->>>   pc-bios: update the README file with edk2-stable201905 information
->>>
->>>  pc-bios/README                         |  14 +-
->>>  pc-bios/edk2-aarch64-code.fd.bz2       | Bin 1177603 -> 1178070 byte=
-s
->>>  pc-bios/edk2-arm-code.fd.bz2           | Bin 1173662 -> 1172752 byte=
-s
->>>  pc-bios/edk2-i386-code.fd.bz2          | Bin 1688659 -> 1736199 byte=
-s
->>>  pc-bios/edk2-i386-secure-code.fd.bz2   | Bin 1881979 -> 1943949 byte=
-s
->>>  pc-bios/edk2-licenses.txt              | 752 ++++++++++++++++++--
->>>  pc-bios/edk2-x86_64-code.fd.bz2        | Bin 1669280 -> 1717094 byte=
-s
->>>  pc-bios/edk2-x86_64-secure-code.fd.bz2 | Bin 1901210 -> 1958037 byte=
-s
->>>  roms/Makefile.edk2                     |  22 +-
->>>  roms/edk2                              |   2 +-
->>>  10 files changed, 714 insertions(+), 76 deletions(-)
->>>
->>
->> Ping :)
->=20
-> Oops sorry ...
->=20
-> Series:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYxNDE3MTIwMC4yMTA3
+OC0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRo
+ZSBhc2FuIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0
+aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4g
+cHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
+CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUg
+bWFrZSBkb2NrZXItdGVzdC1kZWJ1Z0BmZWRvcmEgVEFSR0VUX0xJU1Q9eDg2XzY0LXNvZnRtbXUg
+Sj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAgICB4ODZfNjQt
+c29mdG1tdS9iYWxsb29uLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2lvcG9ydC5vCiAgQ0Mg
+ICAgICB4ODZfNjQtc29mdG1tdS9udW1hLm8KL3RtcC9xZW11LXRlc3Qvc3JjL2Rpc2FzLmM6NTAy
+OjU6IGVycm9yOiB1c2Ugb2YgdW5kZWNsYXJlZCBpZGVudGlmaWVyICdjc2gnCiAgICBjc2ggaGFu
+ZGxlOwogICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvZGlzYXMuYzo1MDM6NTogZXJyb3I6IHVzZSBv
+ZiB1bmRlY2xhcmVkIGlkZW50aWZpZXIgJ2NzX2luc24nCiAgICBjc19pbnNuICppbnNuOwogICAg
+XgovdG1wL3FlbXUtdGVzdC9zcmMvZGlzYXMuYzo1MDM6MTQ6IGVycm9yOiB1c2Ugb2YgdW5kZWNs
+YXJlZCBpZGVudGlmaWVyICdpbnNuJzsgZGlkIHlvdSBtZWFuICdpbmZvJz8KICAgIGNzX2luc24g
+Kmluc247CiAgICAgICAgICAgICBefn5+CiAgICAgICAgICAgICBpbmZvCi90bXAvcWVtdS10ZXN0
+L3NyYy9kaXNhcy5jOjQ5OTo1Mzogbm90ZTogJ2luZm8nIGRlY2xhcmVkIGhlcmUKc3RhdGljIGJv
+b2wgcGx1Z2luX2NhcF9kaXNhc19pbnNuKGRpc2Fzc2VtYmxlX2luZm8gKmluZm8sIHVpbnQ2NF90
+IHBjLCBzaXplX3Qgc2l6ZSkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL2Rpc2FzLmM6NTA4Ojk6IGVycm9yOiBp
+bXBsaWNpdCBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbiAnY2FwX2Rpc2FzX3N0YXJ0JyBpcyBpbnZh
+bGlkIGluIEM5OSBbLVdlcnJvciwtV2ltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uXQogICAg
+aWYgKGNhcF9kaXNhc19zdGFydChpbmZvLCAmaGFuZGxlKSAhPSBDU19FUlJfT0spIHsKICAgICAg
+ICBeCi90bXAvcWVtdS10ZXN0L3NyYy9kaXNhcy5jOjUwODo5OiBlcnJvcjogdGhpcyBmdW5jdGlv
+biBkZWNsYXJhdGlvbiBpcyBub3QgYSBwcm90b3R5cGUgWy1XZXJyb3IsLVdzdHJpY3QtcHJvdG90
+eXBlc10KL3RtcC9xZW11LXRlc3Qvc3JjL2Rpc2FzLmM6NTA4OjMyOiBlcnJvcjogdXNlIG9mIHVu
+ZGVjbGFyZWQgaWRlbnRpZmllciAnaGFuZGxlJwogICAgaWYgKGNhcF9kaXNhc19zdGFydChpbmZv
+LCAmaGFuZGxlKSAhPSBDU19FUlJfT0spIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IF4KL3RtcC9xZW11LXRlc3Qvc3JjL2Rpc2FzLmM6NTA4OjQzOiBlcnJvcjogdXNlIG9mIHVuZGVj
+bGFyZWQgaWRlbnRpZmllciAnQ1NfRVJSX09LJwogICAgaWYgKGNhcF9kaXNhc19zdGFydChpbmZv
+LCAmaGFuZGxlKSAhPSBDU19FUlJfT0spIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvZGlzYXMuYzo1MTE6NTogZXJyb3I6IHVz
+ZSBvZiB1bmRlY2xhcmVkIGlkZW50aWZpZXIgJ2luc24nCiAgICBpbnNuID0gY2FwX2luc247CiAg
+ICBeCi90bXAvcWVtdS10ZXN0L3NyYy9kaXNhcy5jOjUxMToxMjogZXJyb3I6IHVzZSBvZiB1bmRl
+Y2xhcmVkIGlkZW50aWZpZXIgJ2NhcF9pbnNuJwogICAgaW5zbiA9IGNhcF9pbnNuOwogICAgICAg
+ICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL2Rpc2FzLmM6NTE3OjEzOiBlcnJvcjogaW1wbGljaXQg
+ZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ2NzX2Rpc2FzbScgaXMgaW52YWxpZCBpbiBDOTkgWy1X
+ZXJyb3IsLVdpbXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJhdGlvbl0KICAgIGNvdW50ID0gY3NfZGlz
+YXNtKGhhbmRsZSwgY2J1Ziwgc2l6ZSwgMCwgMSwgJmluc24pOwogICAgICAgICAgICBeCi90bXAv
+cWVtdS10ZXN0L3NyYy9kaXNhcy5jOjUxNzoxMzogZXJyb3I6IHRoaXMgZnVuY3Rpb24gZGVjbGFy
+YXRpb24gaXMgbm90IGEgcHJvdG90eXBlIFstV2Vycm9yLC1Xc3RyaWN0LXByb3RvdHlwZXNdCi90
+bXAvcWVtdS10ZXN0L3NyYy9kaXNhcy5jOjUxNzoyMzogZXJyb3I6IHVzZSBvZiB1bmRlY2xhcmVk
+IGlkZW50aWZpZXIgJ2hhbmRsZScKICAgIGNvdW50ID0gY3NfZGlzYXNtKGhhbmRsZSwgY2J1Ziwg
+c2l6ZSwgMCwgMSwgJmluc24pOwogICAgICAgICAgICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVz
+dC9zcmMvZGlzYXMuYzo1MTc6NTA6IGVycm9yOiB1c2Ugb2YgdW5kZWNsYXJlZCBpZGVudGlmaWVy
+ICdpbnNuJwogICAgY291bnQgPSBjc19kaXNhc20oaGFuZGxlLCBjYnVmLCBzaXplLCAwLCAxLCAm
+aW5zbik7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBe
+Ci90bXAvcWVtdS10ZXN0L3NyYy9kaXNhcy5jOjUyMDozNzogZXJyb3I6IHVzZSBvZiB1bmRlY2xh
+cmVkIGlkZW50aWZpZXIgJ2luc24nCiAgICAgICAgZ19zdHJpbmdfcHJpbnRmKHMsICIlcyAlcyIs
+IGluc24tPm1uZW1vbmljLCBpbnNuLT5vcF9zdHIpOwogICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy9kaXNhcy5jOjUyMDo1MzogZXJyb3I6IHVz
+ZSBvZiB1bmRlY2xhcmVkIGlkZW50aWZpZXIgJ2luc24nCiAgICAgICAgZ19zdHJpbmdfcHJpbnRm
+KHMsICIlcyAlcyIsIGluc24tPm1uZW1vbmljLCBpbnNuLT5vcF9zdHIpOwogICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVzdC9z
+cmMvZGlzYXMuYzo1MjU6NTogZXJyb3I6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9u
+ICdjc19jbG9zZScgaXMgaW52YWxpZCBpbiBDOTkgWy1XZXJyb3IsLVdpbXBsaWNpdC1mdW5jdGlv
+bi1kZWNsYXJhdGlvbl0KICAgIGNzX2Nsb3NlKCZoYW5kbGUpOwogICAgXgovdG1wL3FlbXUtdGVz
+dC9zcmMvZGlzYXMuYzo1MjU6NTogZXJyb3I6IHRoaXMgZnVuY3Rpb24gZGVjbGFyYXRpb24gaXMg
+bm90IGEgcHJvdG90eXBlIFstV2Vycm9yLC1Xc3RyaWN0LXByb3RvdHlwZXNdCi90bXAvcWVtdS10
+ZXN0L3NyYy9kaXNhcy5jOjUyNToxNTogZXJyb3I6IHVzZSBvZiB1bmRlY2xhcmVkIGlkZW50aWZp
+ZXIgJ2hhbmRsZScKICAgIGNzX2Nsb3NlKCZoYW5kbGUpOwogICAgICAgICAgICAgIF4KMTggZXJy
+b3JzIGdlbmVyYXRlZC4KCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRj
+aGV3Lm9yZy9sb2dzLzIwMTkwNjE0MTcxMjAwLjIxMDc4LTEtYWxleC5iZW5uZWVAbGluYXJvLm9y
+Zy90ZXN0aW5nLmFzYW4vP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
+aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
+ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
-Thanks! I'll send a pull req soon.
-
-> (Definitively not a series you want to test on your laptop...)
-
-Can you please clarify? I did test the series on my laptop...
-
-Thanks,
-Laszlo
 
