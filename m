@@ -2,62 +2,90 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D94FC31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 18:39:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 512DBC31E4B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 18:39:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D025220673
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 18:39:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D025220673
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1781220673
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 18:39:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W6EqP8YJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1781220673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54172 helo=lists.gnu.org)
+Received: from localhost ([::1]:54178 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbr6M-0004td-07
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 14:39:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37376)
+	id 1hbr6W-0005IU-7h
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 14:39:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34063)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <groug@kaod.org>) id 1hbqD1-0007Oq-U2
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:41:55 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hbq0J-00076W-Q7
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:28:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1hbqCz-0005gx-T4
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:41:51 -0400
-Received: from 1.mo178.mail-out.ovh.net ([178.33.251.53]:37170)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1hbqCw-0005Tg-Bi
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:41:49 -0400
-Received: from player795.ha.ovh.net (unknown [10.108.42.184])
- by mo178.mail-out.ovh.net (Postfix) with ESMTP id 7A9FE6C747
- for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 19:41:33 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player795.ha.ovh.net (Postfix) with ESMTPSA id EBCAB6CBF181;
- Fri, 14 Jun 2019 17:41:28 +0000 (UTC)
-Date: Fri, 14 Jun 2019 19:41:28 +0200
-From: Greg Kurz <groug@kaod.org>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Message-ID: <20190614194128.48c1a2e7@bahia.lan>
-In-Reply-To: <20190614165920.12670-2-clg@kaod.org>
-References: <20190614165920.12670-1-clg@kaod.org>
- <20190614165920.12670-2-clg@kaod.org>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <alex.bennee@linaro.org>) id 1hbq0H-0003zf-J4
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:28:42 -0400
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:37322)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hbq0F-0003wu-Li
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:28:40 -0400
+Received: by mail-wm1-x331.google.com with SMTP id f17so575593wme.2
+ for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 10:28:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=7LkO/RwU961CsHjb/1835Cx9O+zFCubxVzSPwrwohBY=;
+ b=W6EqP8YJ+T9LS2axiftttPSXbxy78ZYzJJ8MKjFCDwGsLUHeGuD00S/IKsLeLBVP69
+ zN4lQloUzN0iJ7hr8bKOItDQelJc4aE9XL+ag8Kuki+qQzl3oqilwdnUoaVViskIolnM
+ vl4UfQ4UOmLecQSm9ZPwk1Ue2lIq9IzYbzn/mQODII8EENhknYA9Lb71O3ivo0C3wA//
+ Z2S0bV+o9cBvCMPgeCEdkKBwKDd5linBPIVdqOWrV19FY5+i+w7vV8hIIX/7EEFlw6dt
+ FGzGHrSFR5OM1B1FpU4Ahzt67ZREHcmJZcTf2pem1yMJg+9qN9rUb3dYCMmTMvF5yUz5
+ 8vAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=7LkO/RwU961CsHjb/1835Cx9O+zFCubxVzSPwrwohBY=;
+ b=eSXQt8SF8Zlaqb1O9LDUPbeXAaTHDHFcCuGDHQ2lVV4CpHGvEdFK68xl3ycKCkqo7M
+ 0IMfQO3sGQD1zirGZrG8pNebiMrdXL5WTNN50dcw68Xn4QgKXD6S40TTl3g/W1ek2boZ
+ QgXQbEoIYQem0WYHVxRSc5Y/oP4RlDZalk7VY7H2HBS/cOCmkkrHb3cJMR8uuf8Lc/fC
+ L1ijOcs5TMExRr0p6sUOYJbr+w6UpnHd9gBi5GTOK/8Zx4AuPRFFl2T4WMabdbhL+h2e
+ x3dj0TYF3gq5/C2DDX4B5nBGgdjQSiEz8LVQ/KsI9eq3e+EQJb0oTHO+WoPH+WSkNY/w
+ pW5g==
+X-Gm-Message-State: APjAAAWNrG3vxZ0YVl5fXvbXCw/6W6tuxztqtzly3zZNuPAjf+fBPl3S
+ Jhaifu1t4wJQyp1TodZ71+KXmg==
+X-Google-Smtp-Source: APXvYqwAjbuiS8A1DyMpf1MGsaDY4dHNCCPSRo1/xfeOfnoq/QYoURplMUi6TxMkTqAi92AsWAMPRg==
+X-Received: by 2002:a7b:c057:: with SMTP id u23mr8968631wmc.29.1560533318513; 
+ Fri, 14 Jun 2019 10:28:38 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id v204sm5834489wma.20.2019.06.14.10.28.32
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 14 Jun 2019 10:28:36 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id EB19D1FF9F;
+ Fri, 14 Jun 2019 18:12:01 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Fri, 14 Jun 2019 18:11:26 +0100
+Message-Id: <20190614171200.21078-17-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190614171200.21078-1-alex.bennee@linaro.org>
+References: <20190614171200.21078-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 15874062787113621899
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudeiuddguddukecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.251.53
-Subject: Re: [Qemu-devel] [PATCH 1/2] spapr/xive: rework the mapping the KVM
- memory regions
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::331
+Subject: [Qemu-devel] [PATCH v3 16/50] atomic_template: fix indentation in
+ GEN_ATOMIC_HELPER
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,234 +97,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Emilio G. Cota" <cota@braap.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 14 Jun 2019 18:59:19 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+From: "Emilio G. Cota" <cota@braap.org>
 
-> Today, the interrupt device is fully initialized at reset when the CAS
-> negotiation process has completed. Depending on the KVM capabilities,
-> the SpaprXive memory regions (ESB, TIMA) are initialized with a host
-> MMIO backend or a QEMU emulated backend. This results in a complex
-> initialization sequence partially done at realize and later at reset,
-> and some memory region leaks.
->=20
-> To simplify this sequence and to remove of the late initialization of
-> the emulated device which is required to be done only once, we
-> introduce new memory regions specific for KVM. These regions are
-> mapped as overlaps on top of the emulated device to make use of the
-> host MMIOs. Also provide proper cleanups of these regions when the
-> XIVE KVM device is destroyed to fix the leaks.
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+---
+ accel/tcg/atomic_template.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Nice !
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  include/hw/ppc/spapr_xive.h |  2 +-
->  include/hw/ppc/xive.h       |  1 +
->  hw/intc/spapr_xive.c        | 38 ++++++++++---------------------------
->  hw/intc/spapr_xive_kvm.c    | 21 +++++++++++---------
->  hw/ppc/spapr_irq.c          |  1 -
->  5 files changed, 24 insertions(+), 39 deletions(-)
->=20
-> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> index b26befcf6b56..719714426524 100644
-> --- a/include/hw/ppc/spapr_xive.h
-> +++ b/include/hw/ppc/spapr_xive.h
-> @@ -42,6 +42,7 @@ typedef struct SpaprXive {
->      /* KVM support */
->      int           fd;
->      void          *tm_mmap;
-> +    MemoryRegion  tm_mmio_kvm;
->      VMChangeStateEntry *change;
->  } SpaprXive;
-> =20
-> @@ -66,7 +67,6 @@ void spapr_xive_map_mmio(SpaprXive *xive);
-> =20
->  int spapr_xive_end_to_target(uint8_t end_blk, uint32_t end_idx,
->                               uint32_t *out_server, uint8_t *out_prio);
-> -void spapr_xive_init(SpaprXive *xive, Error **errp);
-> =20
->  /*
->   * KVM XIVE device helpers
-> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index a6ee7e831d8b..55c53c741776 100644
-> --- a/include/hw/ppc/xive.h
-> +++ b/include/hw/ppc/xive.h
-> @@ -197,6 +197,7 @@ typedef struct XiveSource {
-> =20
->      /* KVM support */
->      void            *esb_mmap;
-> +    MemoryRegion    esb_mmio_kvm;
-> =20
->      XiveNotifier    *xive;
->  } XiveSource;
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index 58c2e5d890bd..3ae311d9ff7f 100644
-> --- a/hw/intc/spapr_xive.c
-> +++ b/hw/intc/spapr_xive.c
-> @@ -194,13 +194,6 @@ void spapr_xive_pic_print_info(SpaprXive *xive, Moni=
-tor *mon)
->      }
->  }
-> =20
-> -void spapr_xive_map_mmio(SpaprXive *xive)
-> -{
-> -    sysbus_mmio_map(SYS_BUS_DEVICE(xive), 0, xive->vc_base);
-> -    sysbus_mmio_map(SYS_BUS_DEVICE(xive), 1, xive->end_base);
-> -    sysbus_mmio_map(SYS_BUS_DEVICE(xive), 2, xive->tm_base);
-> -}
-> -
->  void spapr_xive_mmio_set_enabled(SpaprXive *xive, bool enable)
->  {
->      memory_region_set_enabled(&xive->source.esb_mmio, enable);
-> @@ -305,6 +298,7 @@ static void spapr_xive_realize(DeviceState *dev, Erro=
-r **errp)
->          error_propagate(errp, local_err);
->          return;
->      }
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xsrc->esb_mmio);
-> =20
->      /*
->       * Initialize the END ESB source
-> @@ -318,6 +312,7 @@ static void spapr_xive_realize(DeviceState *dev, Erro=
-r **errp)
->          error_propagate(errp, local_err);
->          return;
->      }
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &end_xsrc->esb_mmio);
-> =20
->      /* Set the mapping address of the END ESB pages after the source ESB=
-s */
->      xive->end_base =3D xive->vc_base + (1ull << xsrc->esb_shift) * xsrc-=
->nr_irqs;
-> @@ -333,31 +328,18 @@ static void spapr_xive_realize(DeviceState *dev, Er=
-ror **errp)
-> =20
->      qemu_register_reset(spapr_xive_reset, dev);
-> =20
-> -    /* Define all XIVE MMIO regions on SysBus */
-> -    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xsrc->esb_mmio);
-> -    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &end_xsrc->esb_mmio);
-> -    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xive->tm_mmio);
-> -}
-> -
-> -void spapr_xive_init(SpaprXive *xive, Error **errp)
-> -{
-> -    XiveSource *xsrc =3D &xive->source;
-> -
-> -    /*
-> -     * The emulated XIVE device can only be initialized once. If the
-> -     * ESB memory region has been already mapped, it means we have been
-> -     * through there.
-> -     */
-> -    if (memory_region_is_mapped(&xsrc->esb_mmio)) {
-> -        return;
-> -    }
-> -
->      /* TIMA initialization */
->      memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_ops, xi=
-ve,
->                            "xive.tima", 4ull << TM_SHIFT);
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xive->tm_mmio);
-> =20
-> -    /* Map all regions */
-> -    spapr_xive_map_mmio(xive);
-> +    /*
-> +     * Map all regions. These will be enabled or disabled at reset and
-> +     * can also be overridden by KVM memory regions if active
-> +     */
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(xive), 0, xive->vc_base);
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(xive), 1, xive->end_base);
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(xive), 2, xive->tm_base);
->  }
-> =20
->  static int spapr_xive_get_eas(XiveRouter *xrtr, uint8_t eas_blk,
-> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-> index b48f135838f2..5559f8bce5ef 100644
-> --- a/hw/intc/spapr_xive_kvm.c
-> +++ b/hw/intc/spapr_xive_kvm.c
-> @@ -728,8 +728,10 @@ void kvmppc_xive_connect(SpaprXive *xive, Error **er=
-rp)
->          return;
->      }
-> =20
-> -    memory_region_init_ram_device_ptr(&xsrc->esb_mmio, OBJECT(xsrc),
-> +    memory_region_init_ram_device_ptr(&xsrc->esb_mmio_kvm, OBJECT(xsrc),
->                                        "xive.esb", esb_len, xsrc->esb_mma=
-p);
-> +    memory_region_add_subregion_overlap(&xsrc->esb_mmio, 0,
-> +                                        &xsrc->esb_mmio_kvm, 1);
-> =20
->      /*
->       * 2. END ESB pages (No KVM support yet)
-> @@ -744,8 +746,10 @@ void kvmppc_xive_connect(SpaprXive *xive, Error **er=
-rp)
->          error_propagate(errp, local_err);
->          return;
->      }
-> -    memory_region_init_ram_device_ptr(&xive->tm_mmio, OBJECT(xive),
-> +    memory_region_init_ram_device_ptr(&xive->tm_mmio_kvm, OBJECT(xive),
->                                        "xive.tima", tima_len, xive->tm_mm=
-ap);
-> +    memory_region_add_subregion_overlap(&xive->tm_mmio, 0,
-> +                                        &xive->tm_mmio_kvm, 1);
-> =20
->      xive->change =3D qemu_add_vm_change_state_handler(
->          kvmppc_xive_change_state_handler, xive);
-> @@ -771,9 +775,6 @@ void kvmppc_xive_connect(SpaprXive *xive, Error **err=
-p)
->      kvm_kernel_irqchip =3D true;
->      kvm_msi_via_irqfd_allowed =3D true;
->      kvm_gsi_direct_mapping =3D true;
-> -
-> -    /* Map all regions */
-> -    spapr_xive_map_mmio(xive);
->  }
-> =20
->  void kvmppc_xive_disconnect(SpaprXive *xive, Error **errp)
-> @@ -795,13 +796,15 @@ void kvmppc_xive_disconnect(SpaprXive *xive, Error =
-**errp)
->      xsrc =3D &xive->source;
->      esb_len =3D (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
-> =20
-> -    sysbus_mmio_unmap(SYS_BUS_DEVICE(xive), 0);
-> +    memory_region_del_subregion(&xsrc->esb_mmio, &xsrc->esb_mmio_kvm);
-> +    object_unparent(OBJECT(&xsrc->esb_mmio_kvm));
->      munmap(xsrc->esb_mmap, esb_len);
-> +    xsrc->esb_mmap =3D NULL;
-> =20
-> -    sysbus_mmio_unmap(SYS_BUS_DEVICE(xive), 1);
-> -
-> -    sysbus_mmio_unmap(SYS_BUS_DEVICE(xive), 2);
-> +    memory_region_del_subregion(&xive->tm_mmio, &xive->tm_mmio_kvm);
-> +    object_unparent(OBJECT(&xive->tm_mmio_kvm));
->      munmap(xive->tm_mmap, 4ull << TM_SHIFT);
-> +    xive->tm_mmap =3D NULL;
-> =20
->      /*
->       * When the KVM device fd is closed, the KVM device is destroyed
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index 75654fc67aba..73e6f10da165 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -413,7 +413,6 @@ static const char *spapr_irq_get_nodename_xive(SpaprM=
-achineState *spapr)
-> =20
->  static void spapr_irq_init_emu_xive(SpaprMachineState *spapr, Error **er=
-rp)
->  {
-> -    spapr_xive_init(spapr->xive, errp);
->  }
-> =20
->  static void spapr_irq_init_kvm_xive(SpaprMachineState *spapr, Error **er=
-rp)
+diff --git a/accel/tcg/atomic_template.h b/accel/tcg/atomic_template.h
+index 5aaf186253..df9c838817 100644
+--- a/accel/tcg/atomic_template.h
++++ b/accel/tcg/atomic_template.h
+@@ -284,7 +284,7 @@ ABI_TYPE ATOMIC_NAME(xchg)(CPUArchState *env, target_ulong addr,
+ 
+ #define GEN_ATOMIC_HELPER(X)                                        \
+ ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, target_ulong addr,       \
+-                 ABI_TYPE val EXTRA_ARGS)                           \
++                        ABI_TYPE val EXTRA_ARGS)                    \
+ {                                                                   \
+     ATOMIC_MMU_DECLS;                                               \
+     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;                           \
+-- 
+2.20.1
 
 
