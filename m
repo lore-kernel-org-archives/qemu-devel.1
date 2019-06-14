@@ -2,81 +2,70 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.7 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 947D7C31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 19:06:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DCBFC31E4B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 19:13:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E03921473
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 19:06:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NztWyKqE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E03921473
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 52F4F21773
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 19:13:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52F4F21773
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54430 helo=lists.gnu.org)
+Received: from localhost ([::1]:54502 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbrWn-0003MT-7i
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 15:06:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41007)
+	id 1hbreA-0007qR-CF
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 15:13:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55162)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hbqNj-0007GG-V9
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:52:57 -0400
+ (envelope-from <lersek@redhat.com>) id 1hbr0G-0001hH-QE
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 14:32:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hbqNi-0007Gj-QY
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:52:55 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:45229)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hbqNg-00072r-Su
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:52:53 -0400
-Received: by mail-ot1-x344.google.com with SMTP id x21so3405726otq.12
- for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 10:52:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=aXyj3HlAs6XieE1lzfqUgpGcYF+8UXTk6niz6BWcjJI=;
- b=NztWyKqEBb/Niuvpsf0BaEySXYaI/YXSSMoGNhhTkJH8kxyzobFZB+l7HgDGtAlyDH
- WfnP6veRuT/aiRUjPiEL77v0NyUnbddxqO9J6NjK+lajpn9ijUIl8A8ALcbyG37NvAGO
- yTJaSSqAkiooIZYO5YjtzK7EW/7pCjgiy9xat1KwfACbO4PpRK70ATuAsvTlwvQhoPWw
- NFjAPfSs2XV94CXgSPKMD716GSKrDlx7PlHOFYI5dHz/REaVny4nUtViSHamyfY5kpFK
- WPVdrX6pJyvbz4+T/4EQB7FjXS/ZfKcLycnE3SbGNsMc4KnjZ4fmW57VubSxF+UD7wV2
- eYig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=aXyj3HlAs6XieE1lzfqUgpGcYF+8UXTk6niz6BWcjJI=;
- b=jBbVlP1+Yns+bF8oSyurtYy4U8Z0SFrRMm0NdbjPY8l7mGcCFPp+BFkFzJrV1nH9hK
- qt/hZmf8teVh+afn+edTZcQ9+dK6wvonUfE4XrXBhRM9nimrcHMwEoFoBe+39zuYRh0c
- VJepSkHCAQXEcUSQ9oGpmKrVtFXnKb+3zZxT/snvjswyAa47vUWrIp6Nw+Za4CjajY5P
- 6NqPeaYw+js4vs0HZY3QuNIcU5jM2n9UCigHjAbc0Gp+UMTcC5ihB8DwfNvZsAAvjP/L
- 4dI9Goki0fns/U7KggvbjSKTiWLq4ZNjnqNn57j/4rp7gc6JX0vMDYyOMNcWSVtQGWKa
- NCAQ==
-X-Gm-Message-State: APjAAAXemBzmWNVJ6zL8kCT5UyzHVY4i1+wPix6WKViUo4UzbZkJyNqh
- SECYseVAjnnY5lV6Py7hBA9zpOILZ3IrlRvx5x72nLu3DxM=
-X-Google-Smtp-Source: APXvYqzPwNgMIZYuzUhv66XqzRXQQSdgI4W4YKU0gKHO7fNUVuDnKSu7QF+rqrmniQkEJ514zVWYjY0meeTTxDg6xII=
-X-Received: by 2002:a9d:d17:: with SMTP id 23mr47560156oti.221.1560534755345; 
- Fri, 14 Jun 2019 10:52:35 -0700 (PDT)
+ (envelope-from <lersek@redhat.com>) id 1hbr0E-0002CU-HY
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 14:32:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58886)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hbr0C-000260-Dt
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 14:32:42 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B9CC0309B159;
+ Fri, 14 Jun 2019 18:32:31 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-141.ams2.redhat.com
+ [10.36.116.141])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E859969A20;
+ Fri, 14 Jun 2019 18:32:28 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+References: <20190311003052.13778-1-philmd@redhat.com>
+ <20190311003052.13778-6-philmd@redhat.com>
+ <ecd8aaf1-f75e-abd0-48b1-e80a227f01c3@redhat.com>
+ <19958c32-2df9-cccf-3f05-c2fa0fe3dec2@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <ed5896ab-4bb5-3e60-fb04-e3f535f4caac@redhat.com>
+Date: Fri, 14 Jun 2019 20:32:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-References: <20190614104457.24703-1-peter.maydell@linaro.org>
- <20190614104457.24703-3-peter.maydell@linaro.org>
- <ab0b9cf8-98d2-1901-a8f7-259d6426f833@linaro.org>
-In-Reply-To: <ab0b9cf8-98d2-1901-a8f7-259d6426f833@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 14 Jun 2019 18:52:24 +0100
-Message-ID: <CAFEAcA8CkvThgBXrSJw=O4BWBBDi0yXcF1T8fgytB53AshExXQ@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH 2/2] target/arm: Only implement doubles if
- the FPU supports them
+In-Reply-To: <19958c32-2df9-cccf-3f05-c2fa0fe3dec2@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Fri, 14 Jun 2019 18:32:36 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 5/5] .travis.yml: Build and install EDK2
+ roms
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,51 +77,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?B?TWljaGFsIFByw612b3puw61r?= <mprivozn@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 14 Jun 2019 at 18:21, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 6/14/19 3:44 AM, Peter Maydell wrote:
-> > @@ -173,6 +173,11 @@ static bool trans_VSEL(DisasContext *s, arg_VSEL *a)
-> >          ((a->vm | a->vn | a->vd) & 0x10)) {
-> >          return false;
-> >      }
-> > +
-> > +    if (dp && !dc_isar_feature(aa32_fpdp, s)) {
-> > +        return false;
-> > +    }
->
-> Would it be cleaner to define something like
->
-> static bool vfp_dp_enabled(DisasContext *s, int regmask)
-> {
->     if (!dc_isar_feature(aa32_fpdp, s)) {
->         /* All double-precision disabled.  */
->         return false;
->     }
->     if (!dc_isar_feature(aa32_fp_d32, s) && (regmask & 0x10)) {
->         /* D16-D31 do not exist.  */
->         return false;
->     }
->     return true;
-> }
->
-> Then use
->
->     if (dp && !vfp_dp_enabled(s, a->vm | a->vn | a->vd))
->
-> ?
+On 06/13/19 18:59, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Laszlo,
+>=20
+> On 3/12/19 5:29 PM, Laszlo Ersek wrote:
+>> On 03/11/19 01:30, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> Add a job to build and install the EDK2 platform firmware binaries.
+>>>
+>>> This job is only triggered if the last commit matches the EDK2
+>>> name (case insensitive), or when tag are created (such releases
+>>> or release candidates).
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>> ---
+>>>  .travis.yml | 21 +++++++++++++++++++++
+>>>  1 file changed, 21 insertions(+)
+>>>
+>>> diff --git a/.travis.yml b/.travis.yml
+>>> index e942175dd3..628cc52c99 100644
+>>> --- a/.travis.yml
+>>> +++ b/.travis.yml
+>>> @@ -258,3 +258,24 @@ matrix:
+>>>      - env:
+>>>          - CONFIG=3D"--disable-system"
+>>>          - TEST_CMD=3D"make -j3 check-tcg V=3D1"
+>>> +
+>>> +
+>>> +    # EDK2 roms builds
+>>> +    - if: tag IS present OR commit_message =3D~ /(edk2|EDK2)/
+>>> +      env:
+>>> +        - CONFIG=3D"--disable-system --disable-user --prefix=3D$PWD/=
+dist"
+>>> +        - EDK2_BUILD_OPTIONS=3D"--quiet --silent"
+>>> +      script:
+>>> +        - git submodule update --init roms/edk2
+>>> +        - make -j3
+>>> +        - make -C roms efi -j2
+>>> +        - make install
+>>> +      addons:
+>>> +        apt:
+>>> +          packages:
+>>> +            - dos2unix
+>>> +            - gcc-aarch64-linux-gnu
+>>> +            - gcc-arm-linux-gnueabihf
+>>> +            - iasl
+>>> +            - nasm
+>>> +            - uuid-dev
+>>>
+>>
+>> Regardless of what problem we're trying to address with "--quiet
+>> --silent", those options are wrong. You certainly want detailed build
+>> logs for the case a CI job fails (at build time or at runtime).
+>=20
+> On Travis we get:
+>=20
+> The job exceeded the maximum log length, and has been terminated.
+> (https://travis-ci.org/philmd/qemu/jobs/545329905)
+>=20
+> So I moved to GitLab, but we still get:
+>=20
+> "Job's log exceeded limit of 4194304 bytes."
+> (https://gitlab.com/philmd/qemu/-/jobs/230772314)
+>=20
+> Regarding the options to pass to edk2-build.sh,
+>=20
+> $ build --help
+>   -j LOGFILE, --log=3DLOGFILE
+>                    Put log in specified file as well as on console.
+>   -s, --silent     Make use of silent mode of (n)make.
+>   -q, --quiet      Disable all messages except FATAL ERRORS.
+>   -v, --verbose    Turn on verbose output with informational messages
+>                    printed, including library instances selected, final
+>                    dependency expression, and warning messages, etc.
+>=20
+> '--log' duplicate the output, and I don't want to reduce the log
+> details, so I understand I should use:
+>=20
+>   ./edk2-build.sh [...] --log=3Dbuild.log >/dev/null || cat build.log
+>=20
+> Is that correct? But then I'd need to modify Makefile.edk2 to redirect
+> stdout.
 
-It would be less code, but I don't think the "are we using
-a register than doesn't exist" and the "do we have dp support"
-checks are really related, and splitting the "OR the register
-numbers together" from the "test the top bit" makes that
-part look rather less clear I think.
+Would it be possible to invoke the outermost make like this?
 
-thanks
--- PMM
+  make -C roms -j2 efi >make.roms.efi.log 2>&1 \
+  || ( tail -c 2M make.roms.efi.log; false )
+
+Thanks
+Laszlo
+
+>=20
+>> The reason why I only include DEBUG firmware builds in the edk2 bundli=
+ng
+>> series is similar -- RELEASE builds lack DEBUG messages and ASSERT()s,
+>> and as such they are 100% unsupportable in my book. Bugs in software a=
+re
+>> the norm, not the exception, so we should allow (even force) the user
+>> (and remote systems) to provide as much information as they can.
+>=20
+> Sure, we have the same book here ;)
+>=20
+> Regards,
+>=20
+> Phil.
+>=20
+
 
