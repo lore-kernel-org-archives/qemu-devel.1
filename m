@@ -2,72 +2,58 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CBF1C31E44
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 10:00:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85707C31E4C
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 10:11:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C59FA21773
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 10:00:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C59FA21773
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 61A8920665
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 10:11:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61A8920665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49764 helo=lists.gnu.org)
+Received: from localhost ([::1]:49834 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbj0q-0008Rt-Rz
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 06:00:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43370)
+	id 1hbjB6-0005Dz-5G
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 06:11:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48514)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <palmer@dabbelt.com>) id 1hbimr-0005vH-Jn
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 05:46:23 -0400
+ (envelope-from <philmd@redhat.com>) id 1hbj7S-0003ZF-2E
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 06:07:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1hbimp-0001Ka-Gq
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 05:46:21 -0400
-Received: from mail-yw1-f68.google.com ([209.85.161.68]:45133)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hbimn-0001IM-NQ
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 05:46:18 -0400
-Received: by mail-yw1-f68.google.com with SMTP id m16so812613ywh.12
- for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 02:46:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=cK4IHru9NjtoK1j7sPnIwHPmoDOk1U9/R6+MGUtxwxM=;
- b=f/tTjHfpmPH+Yka6PIuaqVEmEe0psAYwlsJSP8bw1kJaNYkZE7XDLNQgh+jVspT1x5
- /VKW3aZvpL3IKhD/PVtaQYBkfxxO2/jH21DcD6uCT026APxmMM9PC1m5tVq6l0kYss4E
- ALt5laHnfU9pf8GKa/EGTHR6C3tJiXX7Bf+A5f6gG4T55hj5cMLpdDKMxoHMy0bDKDrS
- GFLVB9lcBLm5PlfIQClk/QZ6GsAqlC1rjUim2OxgYfEHxecgSX3OrVqIQtgnWZG7EPi/
- Vz4h1k6Sfr3uvBfjyf/iIZNwLWPK9MKwlvmvEcnywEJLmwc8fetVCwMDKREo/1Qq43DH
- 7T6Q==
-X-Gm-Message-State: APjAAAWAEjZB+NzzfpKP97LqABjQxymofOb6efZ7U2x4CwZgdpG2bpYs
- PbJojsNCGFbRVqV+duajejc4mBkYlw5YKw==
-X-Google-Smtp-Source: APXvYqwSxlAaD/UdXNQxiqJIeb1XUQ3SEVwE8D0U2XrWpwLqMcImTpWEULlQXDxLPzTsXCJyVB1qxw==
-X-Received: by 2002:a81:3250:: with SMTP id y77mr37829602ywy.437.1560505575907; 
- Fri, 14 Jun 2019 02:46:15 -0700 (PDT)
-Received: from localhost ([83.137.6.186])
- by smtp.gmail.com with ESMTPSA id j127sm642757ywe.32.2019.06.14.02.46.14
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 14 Jun 2019 02:46:15 -0700 (PDT)
-Date: Fri, 14 Jun 2019 02:46:15 -0700 (PDT)
-X-Google-Original-Date: Fri, 14 Jun 2019 02:45:46 PDT (-0700)
-In-Reply-To: <cover.1558131003.git.alistair.francis@wdc.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: Alistair Francis <Alistair.Francis@wdc.com>
-Message-ID: <mhng-0be72427-39c4-40d8-b88d-d050ec1591bb@palmer-si-x1e>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ (envelope-from <philmd@redhat.com>) id 1hbj7Q-0008V2-Iz
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 06:07:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51700)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>)
+ id 1hbj7N-0008S5-Q8; Fri, 14 Jun 2019 06:07:33 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E80263084213;
+ Fri, 14 Jun 2019 10:07:31 +0000 (UTC)
+Received: from x1w.redhat.com (unknown [10.40.205.27])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 15FA21001B0F;
+ Fri, 14 Jun 2019 10:07:21 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 14 Jun 2019 12:07:09 +0200
+Message-Id: <20190614100718.14019-1-philmd@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Fri, 14 Jun 2019 10:07:32 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.161.68
-Subject: Re: [Qemu-devel] [PATCH v1 0/4] Miscellaneous patches from the
- RISC-V fork
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2 0/9] configure: Fix softmmu --static linking
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,33 +65,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org,
- qemu-devel@nongnu.org, alistair23@gmail.com
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Michael Tokarev <mjt@tls.msk.ru>, Bharata B Rao <bharata@linux.ibm.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Niels de Vos <ndevos@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 17 May 2019 15:10:56 PDT (-0700), Alistair Francis wrote:
-> This should be the last series bringing the patches from the RISC-V fork
-> into mainline QEMU.
->
-> Dayeol Lee (1):
->   target/riscv: Fix PMP range boundary address bug
->
-> Michael Clark (3):
->   disas/riscv: Disassemble reserved compressed encodings as illegal
->   disas/riscv: Fix `rdinstreth` constraint
->   target/riscv: Implement riscv_cpu_unassigned_access
->
->  disas/riscv.c             | 53 ++++++++++++++++++++++++++-------------
->  target/riscv/cpu.c        |  1 +
->  target/riscv/cpu.h        |  2 ++
->  target/riscv/cpu_helper.c | 16 ++++++++++++
->  target/riscv/pmp.c        |  2 +-
->  5 files changed, 55 insertions(+), 19 deletions(-)
+Hi,
 
-There's some minor issues with two of these, but since they're all independent
-I'm going to take the other two right now.
+Apparently QEMU static linking is slowly bitroting. Obviously it
+depends the libraries an user has installed, anyway it seems there
+are not much testing done.
 
-Thanks!
+This series fixes few issues, enough to build QEMU on a Ubuntu
+18.04 host.
+
+Peter commented on v1:
+
+  The main reason for supporting static linking is so we can build
+  the user-mode emulators. Almost always the problems with
+  static linking the softmmu binaries and the tools are
+  issues with the distro's packaging of the static libraries
+  (pkg-config files which specify things that don't work for
+  static is a common one).
+
+  So we could put in a lot of checking of "is what pkg-config
+  tells us broken". Or we could just say "we don't support static
+  linking for anything except the usermode binaries". We
+  should probably phase in deprecation of that because it's
+  possible somebody's using it seriously, but it seems like
+  a fairly weird thing to do to me.
+
+I share his view on this (restricting static linking to qemu-user)
+but since the work was already done when I read his comment, I still
+send the v2.
+
+Since v1:
+- pkg-config already use the '--static' argument, do not add it twice
+- Fixed x86_64 host builds (was missing GTK and OpenGL patches)
+- Added Niels R-b tag on the first patch
+- The Travis-CI job now succeeds:
+  https://travis-ci.org/philmd/qemu/jobs/545653697 (6 min 7 sec)
+
+Regards,
+
+Phil.
+
+Philippe Mathieu-Daud=C3=A9 (9):
+  configure: Only generate GLUSTERFS variables if glusterfs is usable
+  configure: Link test before auto-enabling GlusterFS libraries
+  configure: Link test before auto-enabling libusb library
+  configure: Link test before auto-enabling libusbredir library
+  configure: Link test before auto-enabling PulseAudio library
+  configure: Link test before auto-enabling OpenGL libraries
+  configure: Link test before auto-enabling GTK libraries
+  tests/docker: Kludge for missing libunistring.so symlink on Ubuntu
+    18.04
+  .travis.yml: Test softmmu static linking
+
+ .travis.yml                                |   5 +
+ configure                                  | 121 ++++++++++++++++-----
+ tests/docker/dockerfiles/ubuntu1804.docker |   4 +
+ 3 files changed, 100 insertions(+), 30 deletions(-)
+
+--=20
+2.20.1
+
 
