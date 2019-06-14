@@ -2,50 +2,90 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 846AFC31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 18:42:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74EFDC31E4B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 18:44:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F0C021848
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 18:42:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F0C021848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 433B9205F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 18:44:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iedGUINC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 433B9205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54214 helo=lists.gnu.org)
+Received: from localhost ([::1]:54234 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbrA1-0001Of-9C
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 14:42:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34972)
+	id 1hbrC3-0002vU-Hw
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 14:44:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34180)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hbq3I-0000cK-Hp
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:31:50 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hbq0Q-0007A0-QK
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:28:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hbq3G-0006b8-NW
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:31:48 -0400
-Received: from relay.sw.ru ([185.231.240.75]:56110)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1hbq3G-0006Y1-Fl
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:31:46 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1hbq3C-0007hu-4n; Fri, 14 Jun 2019 20:31:42 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1hbq0N-00049P-DM
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:28:49 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:56033)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hbq0M-0003up-7F
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:28:47 -0400
+Received: by mail-wm1-x342.google.com with SMTP id a15so3145584wmj.5
+ for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 10:28:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=M9pjVZf2vmVt0qPRpyohqMfwA1FkxEKe0Yjf3n3HoWM=;
+ b=iedGUINCZYuC4fwc28TFy3USZ4JCp6y8qiISt2ZYUhcAu43siybfwyBjoaWfjfTnDN
+ ifHXchm9hegUWABSf9k9xxjf86oFPJ7vNk4+23RZITagCkTLhfA9J0xbwWiJ/Vesa4lB
+ taWaj01xyxOFX/7w4JXJYrMzWxjmPn6TO6EksJAlhwHbRIggla4bhcUQwlJvEtOR/tl9
+ euxt8g2TwFD5YCeTvNjbukB0ocgmI+2O2aqP2xmDng1EFEbH1dgINFfbN9+hZmSb+RTh
+ RjCRhyZX3slbFfZFxXSb+u4iJRVV14anSpfTYwWp6Pq0AWLiJ8irDIWmnp+QjkD692pI
+ 2zxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=M9pjVZf2vmVt0qPRpyohqMfwA1FkxEKe0Yjf3n3HoWM=;
+ b=PeaJ+Xc12j1LH1mZgqohrGAjcHcoVHDrKsTVihuHwucsh0qM700HXAMJSgvJBWDLV1
+ Ifh2q97IDaswQqeNU7ApY1CZOIBm6kMEE7BzbyAQPFHm7Vicieg7Z2H8D155Ee/7dfie
+ wtSxijsmrsJJt18BBNQaYMdHcemeccSSgTaPhY1NPXEfhnSEkUJAUpRZOcsDVr9qWILx
+ k+XRJj42v7bw2Gjx3pm8y3T5wq7dj4WfOA0l5FF0lK7OgGZ+2FB35/wXkH3t5vs3O4Ec
+ +JS152pNF5HJhaGdNIpQP7hs2CMTNUGArG+Z3rTxxMjIXfupL3BskuABL/0LoBLSdo0v
+ 0i+A==
+X-Gm-Message-State: APjAAAWtHhtsFmLBrX2HG0Q67CVcVJFMzxC/gIsI/RhSROs7vdccM+nq
+ pVB6ZOR/r1+Fw6OzGyC/zjAuznTkYos=
+X-Google-Smtp-Source: APXvYqyelPlKrgmQBwFBI7WLeymq9VOP+8CbOBoe3Q/SvtGzaUaP9+x+Au2xgUtRg3fXhWc5inhlzQ==
+X-Received: by 2002:a05:600c:2243:: with SMTP id
+ a3mr8531302wmm.83.1560533316231; 
+ Fri, 14 Jun 2019 10:28:36 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id j123sm6629837wmb.32.2019.06.14.10.28.29
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 14 Jun 2019 10:28:30 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id BBD191FFAE;
+ Fri, 14 Jun 2019 18:12:02 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 14 Jun 2019 20:31:40 +0300
-Message-Id: <20190614173140.19159-1-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.18.0
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v3] qapi: Add InetSocketAddress member
- keep-alive
+Date: Fri, 14 Jun 2019 18:11:35 +0100
+Message-Id: <20190614171200.21078-26-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190614171200.21078-1-alex.bennee@linaro.org>
+References: <20190614171200.21078-1-alex.bennee@linaro.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
+Subject: [Qemu-devel] [PATCH  v3 25/50] translator: add translator_ld{ub, sw,
+ uw, l, q}
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -57,107 +97,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, berrange@redhat.com, armbru@redhat.com,
- kraxel@redhat.com, den@openvz.org
+Cc: "Emilio G. Cota" <cota@braap.org>,
+ Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It's needed to provide keepalive for nbd client to track server
-availability.
+From: "Emilio G. Cota" <cota@braap.org>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
+ include/exec/translator.h | 30 +++++++++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
 
-v3: [by Markus's comments]
-
-- Fix commit subject
-- Add comment to qapi and restrict server-side connections
-- Fix s/"keep-alive="/",keep-alive"/
-
-
- qapi/sockets.json   |  6 +++++-
- util/qemu-sockets.c | 28 ++++++++++++++++++++++++++++
- 2 files changed, 33 insertions(+), 1 deletion(-)
-
-diff --git a/qapi/sockets.json b/qapi/sockets.json
-index fc81d8d5e8..c44af481a1 100644
---- a/qapi/sockets.json
-+++ b/qapi/sockets.json
-@@ -53,6 +53,9 @@
- #
- # @ipv6: whether to accept IPv6 addresses, default try both IPv4 and IPv6
- #
-+# @keep-alive: enable keep-alive when connecting to this socket. Not supported
-+#              for server-side connections. (Since 4.1)
-+#
- # Since: 1.3
- ##
- { 'struct': 'InetSocketAddress',
-@@ -61,7 +64,8 @@
-     '*numeric':  'bool',
-     '*to': 'uint16',
-     '*ipv4': 'bool',
--    '*ipv6': 'bool' } }
-+    '*ipv6': 'bool',
-+    '*keep-alive': 'bool' } }
+diff --git a/include/exec/translator.h b/include/exec/translator.h
+index 180c51d509..33fa709ba6 100644
+--- a/include/exec/translator.h
++++ b/include/exec/translator.h
+@@ -19,7 +19,10 @@
+  */
  
- ##
- # @UnixSocketAddress:
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index 8850a280a8..813063761b 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -438,6 +438,12 @@ int inet_connect_saddr(InetSocketAddress *saddr, Error **errp)
-     struct addrinfo *res, *e;
-     int sock = -1;
  
-+    if (saddr->keep_alive) {
-+        error_setg(errp, "keep-alive options is not supported for server-side "
-+                   "connection");
-+        return -1;
++#include "qemu/bswap.h"
+ #include "exec/exec-all.h"
++#include "exec/cpu_ldst.h"
++#include "exec/plugin-gen.h"
+ #include "tcg/tcg.h"
+ 
+ 
+@@ -142,4 +145,29 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
+ 
+ void translator_loop_temp_check(DisasContextBase *db);
+ 
+-#endif /* EXEC__TRANSLATOR_H */
++#define GEN_TRANSLATOR_LD(fullname, name, type, swap_fn)                \
++    static inline type                                                  \
++    fullname ## _swap(CPUArchState *env, abi_ptr pc, bool do_swap)      \
++    {                                                                   \
++        type ret = cpu_ ## name ## _code(env, pc);                      \
++                                                                        \
++        if (do_swap) {                                                  \
++            ret = swap_fn(ret);                                         \
++        }                                                               \
++        plugin_insn_append(&ret, sizeof(ret));                          \
++        return ret;                                                     \
++    }                                                                   \
++                                                                        \
++    static inline type fullname(CPUArchState *env, abi_ptr pc)          \
++    {                                                                   \
++        return fullname ## _swap(env, pc, false);                       \
 +    }
 +
-     res = inet_parse_connect_saddr(saddr, errp);
-     if (!res) {
-         return -1;
-@@ -457,6 +463,19 @@ int inet_connect_saddr(InetSocketAddress *saddr, Error **errp)
-     }
- 
-     freeaddrinfo(res);
++GEN_TRANSLATOR_LD(translator_ldub, ldub, uint8_t, /* no swap needed */)
++GEN_TRANSLATOR_LD(translator_ldsw, ldsw, int16_t, bswap16)
++GEN_TRANSLATOR_LD(translator_lduw, lduw, uint16_t, bswap16)
++GEN_TRANSLATOR_LD(translator_ldl, ldl, uint32_t, bswap32)
++GEN_TRANSLATOR_LD(translator_ldq, ldq, uint64_t, bswap64)
++#undef GEN_TRANSLATOR_LD
 +
-+    if (saddr->keep_alive) {
-+        int val = 1;
-+        int ret = qemu_setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE,
-+                                  &val, sizeof(val));
-+
-+        if (ret < 0) {
-+            error_setg_errno(errp, errno, "Unable to set KEEPALIVE");
-+            close(sock);
-+            return -1;
-+        }
-+    }
-+
-     return sock;
- }
- 
-@@ -652,6 +671,15 @@ int inet_parse(InetSocketAddress *addr, const char *str, Error **errp)
-         }
-         addr->has_ipv6 = true;
-     }
-+    begin = strstr(optstr, ",keep-alive");
-+    if (begin) {
-+        if (inet_parse_flag("keep-alive", begin + strlen(",keep-alive"),
-+                            &addr->keep_alive, errp) < 0)
-+        {
-+            return -1;
-+        }
-+        addr->has_keep_alive = true;
-+    }
-     return 0;
- }
- 
++#endif  /* EXEC__TRANSLATOR_H */
 -- 
-2.18.0
+2.20.1
 
 
