@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-11.7 required=3.0
 	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DCBFC31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 19:13:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77692C31E4B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 19:16:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52F4F21773
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 19:13:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52F4F21773
+	by mail.kernel.org (Postfix) with ESMTPS id 4A75B21773
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 19:16:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A75B21773
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54502 helo=lists.gnu.org)
+Received: from localhost ([::1]:54546 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbreA-0007qR-CF
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 15:13:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55162)
+	id 1hbrgs-0002Fn-CQ
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 15:16:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55166)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <lersek@redhat.com>) id 1hbr0G-0001hH-QE
+ (envelope-from <lersek@redhat.com>) id 1hbr0G-0001hS-Sk
  for qemu-devel@nongnu.org; Fri, 14 Jun 2019 14:32:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1hbr0E-0002CU-HY
+ (envelope-from <lersek@redhat.com>) id 1hbr0E-0002CO-HT
  for qemu-devel@nongnu.org; Fri, 14 Jun 2019 14:32:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58886)
+Received: from mx1.redhat.com ([209.132.183.28]:50218)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hbr0C-000260-Dt
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hbr0C-00025N-BH
  for qemu-devel@nongnu.org; Fri, 14 Jun 2019 14:32:42 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B9CC0309B159;
- Fri, 14 Jun 2019 18:32:31 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7EAA9368E3;
+ Fri, 14 Jun 2019 18:32:26 +0000 (UTC)
 Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-141.ams2.redhat.com
  [10.36.116.141])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E859969A20;
- Fri, 14 Jun 2019 18:32:28 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 844405DD7A;
+ Fri, 14 Jun 2019 18:31:49 +0000 (UTC)
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 References: <20190311003052.13778-1-philmd@redhat.com>
@@ -50,17 +50,17 @@ References: <20190311003052.13778-1-philmd@redhat.com>
  <ecd8aaf1-f75e-abd0-48b1-e80a227f01c3@redhat.com>
  <19958c32-2df9-cccf-3f05-c2fa0fe3dec2@redhat.com>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <ed5896ab-4bb5-3e60-fb04-e3f535f4caac@redhat.com>
-Date: Fri, 14 Jun 2019 20:32:28 +0200
+Message-ID: <b8aad7bf-1dec-5c1d-1b76-d15b639e4953@redhat.com>
+Date: Fri, 14 Jun 2019 20:31:48 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
  Thunderbird/52.9.1
 MIME-Version: 1.0
 In-Reply-To: <19958c32-2df9-cccf-3f05-c2fa0fe3dec2@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Fri, 14 Jun 2019 18:32:36 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Fri, 14 Jun 2019 18:32:31 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
