@@ -2,63 +2,94 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	T_HK_NAME_DR,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49387C31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 12:57:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4A9EC31E4B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 13:00:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 089DC208CA
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 12:57:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 089DC208CA
+	by mail.kernel.org (Postfix) with ESMTPS id 8BD83208CA
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 13:00:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BD83208CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51308 helo=lists.gnu.org)
+Received: from localhost ([::1]:51318 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hblmD-0000ek-7i
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 08:57:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34804)
+	id 1hbloM-0001dd-NT
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 09:00:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35158)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hbllI-0008KL-SW
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 08:56:58 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hblmU-00015p-Jq
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 08:58:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hbllH-0003VB-75
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 08:56:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:1793)
+ (envelope-from <mreitz@redhat.com>) id 1hblmT-0004mg-13
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 08:58:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50980)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hbllG-0003Ua-Ub
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 08:56:55 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hblmP-00049a-FW; Fri, 14 Jun 2019 08:58:05 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 997A7356CA
- for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 12:56:53 +0000 (UTC)
-Received: from work-vm (ovpn-117-220.ams2.redhat.com [10.36.117.220])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 94D2166D3E;
- Fri, 14 Jun 2019 12:56:43 +0000 (UTC)
-Date: Fri, 14 Jun 2019 13:56:41 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Juan Quintela <quintela@redhat.com>
-Message-ID: <20190614125640.GE2785@work-vm>
-References: <20190612105323.7051-1-quintela@redhat.com>
- <20190612105323.7051-7-quintela@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id C4F0B30821C1;
+ Fri, 14 Jun 2019 12:57:47 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.125])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C1FA61987;
+ Fri, 14 Jun 2019 12:57:41 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190529154654.95870-1-vsementsov@virtuozzo.com>
+ <20190529154654.95870-5-vsementsov@virtuozzo.com>
+ <c31e0d6e-3754-8b22-ccee-84c772eca404@redhat.com>
+ <7b401fba-36dd-d80e-966a-15fdd72ac335@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <825995ac-488e-b25c-c551-526812046caf@redhat.com>
+Date: Fri, 14 Jun 2019 14:57:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190612105323.7051-7-quintela@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <7b401fba-36dd-d80e-966a-15fdd72ac335@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="p0TFcz2mcVlkoux3LS1TDmeVAp0agcS2M"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Fri, 14 Jun 2019 12:56:53 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Fri, 14 Jun 2019 12:57:47 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 6/6] migration: Add zlib compression
- multifd support
+Subject: Re: [Qemu-devel] [PATCH v8 4/7] block: introduce backup-top filter
+ driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,371 +101,296 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
+ Denis Lunev <den@virtuozzo.com>, "stefanha@redhat.com" <stefanha@redhat.com>,
+ "jsnow@redhat.com" <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  hw/core/qdev-properties.c |   2 +-
->  migration/ram.c           | 262 ++++++++++++++++++++++++++++++++++++++
->  qapi/migration.json       |   2 +-
->  tests/migration-test.c    |   6 +
->  4 files changed, 270 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> index ebeeb5c88d..e40aa806e2 100644
-> --- a/hw/core/qdev-properties.c
-> +++ b/hw/core/qdev-properties.c
-> @@ -651,7 +651,7 @@ const PropertyInfo qdev_prop_fdc_drive_type = {
->  const PropertyInfo qdev_prop_multifd_compress = {
->      .name = "MultifdCompress",
->      .description = "multifd_compress values, "
-> -                   "none",
-> +                   "none/zlib",
->      .enum_table = &MultifdCompress_lookup,
->      .get = get_enum,
->      .set = set_enum,
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 3b0002ddba..691ebd9108 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -583,6 +583,7 @@ exit:
->  #define MULTIFD_VERSION 1
->  
->  #define MULTIFD_FLAG_SYNC (1 << 0)
-> +#define MULTIFD_FLAG_ZLIB (1 << 1)
->  
->  /* This value needs to be a multiple of qemu_target_page_size() */
->  #define MULTIFD_PACKET_SIZE (512 * 1024)
-> @@ -625,6 +626,15 @@ typedef struct {
->      RAMBlock *block;
->  } MultiFDPages_t;
->  
-> +struct zlib_data {
-> +    /* stream for compression */
-> +    z_stream zs;
-> +    /* compressed buffer */
-> +    uint8_t *zbuff;
-> +    /* size of compressed buffer */
-> +    uint32_t zbuff_len;
-> +};
-> +
->  typedef struct {
->      /* this fields are not changed once the thread is created */
->      /* channel number */
-> @@ -841,8 +851,260 @@ static MultiFDMethods multifd_nocomp_ops = {
->      .recv_pages = nocomp_recv_pages
->  };
->  
-> +/* Multifd zlib compression */
-> +
-> +/**
-> + * zlib_send_setup: setup send side
-> + *
-> + * Setup each channel with zlib compression.
-> + *
-> + * Returns 0 for success or -1 for error
-> + *
-> + * @p: Params for the channel that we are using
-> + * @errp: pointer to an error
-> + */
-> +static int zlib_send_setup(MultiFDSendParams *p, Error **errp)
-> +{
-> +    uint32_t page_count = MULTIFD_PACKET_SIZE / qemu_target_page_size();
-> +    struct zlib_data *z = g_malloc0(sizeof(struct zlib_data));
-> +    z_stream *zs = &z->zs;
-> +
-> +    p->data = z;
-> +    zs->zalloc = Z_NULL;
-> +    zs->zfree = Z_NULL;
-> +    zs->opaque = Z_NULL;
-> +    if (deflateInit(zs, migrate_compress_level()) != Z_OK) {
-> +        error_setg(errp, "multifd %d: deflate init failed", p->id);
-> +        return -1;
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--p0TFcz2mcVlkoux3LS1TDmeVAp0agcS2M
+Content-Type: multipart/mixed; boundary="6YzhKQ7eOx4uiWbZkf7TjvS5GaFK5npwn";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "fam@euphon.net" <fam@euphon.net>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "jsnow@redhat.com" <jsnow@redhat.com>, "kwolf@redhat.com"
+ <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+ "eblake@redhat.com" <eblake@redhat.com>
+Message-ID: <825995ac-488e-b25c-c551-526812046caf@redhat.com>
+Subject: Re: [PATCH v8 4/7] block: introduce backup-top filter driver
+References: <20190529154654.95870-1-vsementsov@virtuozzo.com>
+ <20190529154654.95870-5-vsementsov@virtuozzo.com>
+ <c31e0d6e-3754-8b22-ccee-84c772eca404@redhat.com>
+ <7b401fba-36dd-d80e-966a-15fdd72ac335@virtuozzo.com>
+In-Reply-To: <7b401fba-36dd-d80e-966a-15fdd72ac335@virtuozzo.com>
 
-We're leaking 'z' here? Or does zlib_send_cleanup happy?
+--6YzhKQ7eOx4uiWbZkf7TjvS5GaFK5npwn
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Other than that I think we're OK.
+On 14.06.19 11:04, Vladimir Sementsov-Ogievskiy wrote:
+> 13.06.2019 18:57, Max Reitz wrote:
+>> On 29.05.19 17:46, Vladimir Sementsov-Ogievskiy wrote:
+>>> Backup-top filter does copy-before-write operation. It should be
+>>> inserted above active disk and has a target node for CBW, like the
+>>> following:
+>>>
+>>>      +-------+
+>>>      | Guest |
+>>>      +-------+
+>>>          |r,w
+>>>          v
+>>>      +------------+  target   +---------------+
+>>>      | backup_top |---------->| target(qcow2) |
+>>>      +------------+   CBW     +---------------+
+>>>          |
+>>> backing |r,w
+>>>          v
+>>>      +-------------+
+>>>      | Active disk |
+>>>      +-------------+
+>>>
+>>> The driver will be used in backup instead of write-notifiers.
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
+>
+>>> ---
+>>>   block/backup-top.h  |  64 +++++++++
+>>>   block/backup-top.c  | 322 +++++++++++++++++++++++++++++++++++++++++=
++++
+>>>   block/Makefile.objs |   2 +
+>>>   3 files changed, 388 insertions(+)
+>>>   create mode 100644 block/backup-top.h
+>>>   create mode 100644 block/backup-top.c
+>>>
+>>> diff --git a/block/backup-top.h b/block/backup-top.h
+>>> new file mode 100644
+>>> index 0000000000..788e18c358
+>>> --- /dev/null
+>>> +++ b/block/backup-top.h
 
-Dave
+[...]
 
-> +    }
-> +    /* We will never have more than page_count pages */
-> +    z->zbuff_len = page_count * qemu_target_page_size();
-> +    z->zbuff_len *= 2;
-> +    z->zbuff = g_try_malloc(z->zbuff_len);
-> +    if (!z->zbuff) {
-> +        error_setg(errp, "multifd %d: out of memory for zbuff", p->id);
-> +        return -1;
-> +    }
-> +    return 0;
-> +}
-> +
-> +/**
-> + * zlib_send_cleanup: cleanup send side
-> + *
-> + * Close the channel and return memory.
-> + *
-> + * @p: Params for the channel that we are using
-> + */
-> +static void zlib_send_cleanup(MultiFDSendParams *p)
-> +{
-> +    struct zlib_data *z = p->data;
-> +
-> +    deflateEnd(&z->zs);
-> +    g_free(z->zbuff);
-> +    z->zbuff = NULL;
-> +    g_free(p->data);
-> +    p->data = NULL;
-> +}
-> +
-> +/**
-> + * zlib_send_prepare: prepare date to be able to send
-> + *
-> + * Create a compressed buffer with all the pages that we are going to
-> + * send.
-> + *
-> + * Returns 0 for success or -1 for error
-> + *
-> + * @p: Params for the channel that we are using
-> + * @used: number of pages used
-> + */
-> +static int zlib_send_prepare(MultiFDSendParams *p, uint32_t used, Error **errp)
-> +{
-> +    struct iovec *iov = p->pages->iov;
-> +    struct zlib_data *z = p->data;
-> +    z_stream *zs = &z->zs;
-> +    uint32_t out_size = 0;
-> +    int ret;
-> +    uint32_t i;
-> +
-> +    for (i = 0; i < used; i++) {
-> +        uint32_t available = z->zbuff_len - out_size;
-> +        int flush = Z_NO_FLUSH;
-> +
-> +        if (i == used  - 1) {
-> +            flush = Z_SYNC_FLUSH;
-> +        }
-> +
-> +        zs->avail_in = iov[i].iov_len;
-> +        zs->next_in = iov[i].iov_base;
-> +
-> +        zs->avail_out = available;
-> +        zs->next_out = z->zbuff + out_size;
-> +
-> +        ret = deflate(zs, flush);
-> +        if (ret != Z_OK) {
-> +            error_setg(errp, "multifd %d: deflate returned %d instead of Z_OK",
-> +                       p->id, ret);
-> +            return -1;
-> +        }
-> +        out_size += available - zs->avail_out;
-> +    }
-> +    p->next_packet_size = out_size;
-> +    p->flags |= MULTIFD_FLAG_ZLIB;
-> +
-> +    return 0;
-> +}
-> +
-> +/**
-> + * zlib_send_write: do the actual write of the data
-> + *
-> + * Do the actual write of the comprresed buffer.
-> + *
-> + * Returns 0 for success or -1 for error
-> + *
-> + * @p: Params for the channel that we are using
-> + * @used: number of pages used
-> + * @errp: pointer to an error
-> + */
-> +static int zlib_send_write(MultiFDSendParams *p, uint32_t used, Error **errp)
-> +{
-> +    struct zlib_data *z = p->data;
-> +
-> +    return qio_channel_write_all(p->c, (void *)z->zbuff, p->next_packet_size,
-> +                                 errp);
-> +}
-> +
-> +/**
-> + * zlib_recv_setup: setup receive side
-> + *
-> + * Create the compressed channel and buffer.
-> + *
-> + * Returns 0 for success or -1 for error
-> + *
-> + * @p: Params for the channel that we are using
-> + * @errp: pointer to an error
-> + */
-> +static int zlib_recv_setup(MultiFDRecvParams *p, Error **errp)
-> +{
-> +    uint32_t page_count = MULTIFD_PACKET_SIZE / qemu_target_page_size();
-> +    struct zlib_data *z = g_malloc0(sizeof(struct zlib_data));
-> +    z_stream *zs = &z->zs;
-> +
-> +    p->data = z;
-> +    zs->zalloc = Z_NULL;
-> +    zs->zfree = Z_NULL;
-> +    zs->opaque = Z_NULL;
-> +    zs->avail_in = 0;
-> +    zs->next_in = Z_NULL;
-> +    if (inflateInit(zs) != Z_OK) {
-> +        error_setg(errp, "multifd %d: inflate init failed", p->id);
-> +        return -1;
-> +    }
-> +    /* We will never have more than page_count pages */
-> +    z->zbuff_len = page_count * qemu_target_page_size();
-> +    /* We know compression "could" use more space */
-> +    z->zbuff_len *= 2;
-> +    z->zbuff = g_try_malloc(z->zbuff_len);
-> +    if (!z->zbuff) {
-> +        error_setg(errp, "multifd %d: out of memory for zbuff", p->id);
-> +        return -1;
-> +    }
-> +    return 0;
-> +}
-> +
-> +/**
-> + * zlib_recv_cleanup: setup receive side
-> + *
-> + * For no compression this function does nothing.
-> + *
-> + * @p: Params for the channel that we are using
-> + */
-> +static void zlib_recv_cleanup(MultiFDRecvParams *p)
-> +{
-> +    struct zlib_data *z = p->data;
-> +
-> +    inflateEnd(&z->zs);
-> +    g_free(z->zbuff);
-> +    z->zbuff = NULL;
-> +    g_free(p->data);
-> +    p->data = NULL;
-> +}
-> +
-> +/**
-> + * zlib_recv_pages: read the data from the channel into actual pages
-> + *
-> + * Read the compressed buffer, and uncompress it into the actual
-> + * pages.
-> + *
-> + * Returns 0 for success or -1 for error
-> + *
-> + * @p: Params for the channel that we are using
-> + * @used: number of pages used
-> + * @errp: pointer to an error
-> + */
-> +static int zlib_recv_pages(MultiFDRecvParams *p, uint32_t used, Error **errp)
-> +{
-> +    uint32_t in_size = p->next_packet_size;
-> +    uint32_t out_size = 0;
-> +    uint32_t expected_size = used * qemu_target_page_size();
-> +    struct zlib_data *z = p->data;
-> +    z_stream *zs = &z->zs;
-> +    int ret;
-> +    int i;
-> +
-> +    if (p->flags != MULTIFD_FLAG_ZLIB) {
-> +        error_setg(errp, "multifd %d: flags received %x flags expected %x",
-> +                   p->id, MULTIFD_FLAG_ZLIB, p->flags);
-> +        return -1;
-> +    }
-> +    ret = qio_channel_read_all(p->c, (void *)z->zbuff, in_size, errp);
-> +
-> +    if (ret != 0) {
-> +        return ret;
-> +    }
-> +
-> +    zs->avail_in = in_size;
-> +    zs->next_in = z->zbuff;
-> +
-> +    for (i = 0; i < used; i++) {
-> +        struct iovec *iov = &p->pages->iov[i];
-> +        int flush = Z_NO_FLUSH;
-> +
-> +        if (i == used  - 1) {
-> +            flush = Z_SYNC_FLUSH;
-> +        }
-> +
-> +        zs->avail_out = iov->iov_len;
-> +        zs->next_out = iov->iov_base;
-> +
-> +        ret = inflate(zs, flush);
-> +        if (ret != Z_OK) {
-> +            error_setg(errp, "multifd %d: inflate returned %d instead of Z_OK",
-> +                       p->id, ret);
-> +            return ret;
-> +        }
-> +        out_size += iov->iov_len;
-> +    }
-> +    if (out_size != expected_size) {
-> +        error_setg(errp, "multifd %d: packet size received %d size expected %d",
-> +                   p->id, out_size, expected_size);
-> +        return -1;
-> +    }
-> +    return 0;
-> +}
-> +
-> +static MultiFDMethods multifd_zlib_ops = {
-> +    .send_setup = zlib_send_setup,
-> +    .send_cleanup = zlib_send_cleanup,
-> +    .send_prepare = zlib_send_prepare,
-> +    .send_write = zlib_send_write,
-> +    .recv_setup = zlib_recv_setup,
-> +    .recv_cleanup = zlib_recv_cleanup,
-> +    .recv_pages = zlib_recv_pages
-> +};
-> +
->  static MultiFDMethods *multifd_ops[MULTIFD_COMPRESS__MAX] = {
->      [MULTIFD_COMPRESS_NONE] = &multifd_nocomp_ops,
-> +    [MULTIFD_COMPRESS_ZLIB] = &multifd_zlib_ops,
->  };
->  
->  static int multifd_send_initial_packet(MultiFDSendParams *p, Error **errp)
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index 153527e120..085eba8f07 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -493,7 +493,7 @@
->  #
->  ##
->  { 'enum': 'MultifdCompress',
-> -  'data': [ 'none' ] }
-> +  'data': [ 'none', 'zlib' ] }
->  
->  ##
->  # @MigrationParameter:
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index e5b8125e1c..e6995ae4e7 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -1219,6 +1219,11 @@ static void test_multifd_tcp_none(void)
->      test_multifd_tcp("none");
->  }
->  
-> +static void test_multifd_tcp_zlib(void)
-> +{
-> +    test_multifd_tcp("zlib");
-> +}
-> +
->  int main(int argc, char **argv)
->  {
->      char template[] = "/tmp/migration-test-XXXXXX";
-> @@ -1275,6 +1280,7 @@ int main(int argc, char **argv)
->      qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
->      qtest_add_func("/migration/fd_proto", test_migrate_fd_proto);
->      qtest_add_func("/migration/multifd/tcp/none", test_multifd_tcp_none);
-> +    qtest_add_func("/migration/multifd/tcp/zlib", test_multifd_tcp_zlib);
->  
->      ret = g_test_run();
->  
-> -- 
-> 2.21.0
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>> +/*
+>>> + * bdrv_backup_top_append
+>>> + *
+>>> + * Append backup_top filter node above @source node. @target node wi=
+ll receive
+>>> + * the data backed up during CBE operations. New filter together wit=
+h @target
+>>> + * node are attached to @source aio context.
+>>> + *
+>>> + * The resulting filter node is implicit.
+>>
+>> Why?  It=E2=80=99s just as easy for the caller to just make it implici=
+t if it
+>> should be.  (And usually the caller should decide that.)
+>=20
+> Personally, I don't know what are the reasons for filters to bi implici=
+t or not,
+> I just made it like other job-filters.. I can move making-implicit to t=
+he caller
+> or drop it at all (if it will work).
+
+Nodes are implicit if they haven=E2=80=99t been added consciously by the =
+user.
+A node added by a block job can be non-implicit, too, as mirror shows;
+If the user specifies the filter-node-name option, they will know about
+the node, thus it is no longer implicit.
+
+If the user doesn=E2=80=99t know about the node (they didn=E2=80=99t give=
+ the
+filter-node-name option), the node is implicit.
+
+[...]
+
+>>> +static int coroutine_fn backup_top_co_flush(BlockDriverState *bs)
+>>> +{
+>>> +    if (!bs->backing) {
+>>> +        return 0;
+>>> +    }
+>>> +
+>>> +    return bdrv_co_flush(bs->backing->bs);
+>>
+>> Should we flush the target, too?
+>=20
+> Hm, you've asked it already, on previous version :)
+
+I wasn=E2=80=99t sure...
+
+> Backup don't do it,
+> so I just keep old behavior. And what is the reason to flush backup tar=
+get
+> on any guest flush?
+
+Hm, well, what=E2=80=99s the reason not to do it?
+Also, there are not only guest flushes.  bdrv_flush_all() exists, which
+is called when the guest is stopped.  So who is going to flush the
+target if not its parent?
+
+[...]
+
+>>> +
+>>> +    if (role =3D=3D &child_file) {
+>>> +        /*
+>>> +         * Target child
+>>> +         *
+>>> +         * Share write to target (child_file), to not interfere
+>>> +         * with guest writes to its disk which may be in target back=
+ing chain.
+>>> +         */
+>>> +        if (perm & BLK_PERM_WRITE) {
+>>> +            *nshared =3D *nshared | BLK_PERM_WRITE;
+>>
+>> Why not always share WRITE on the target?
+>=20
+> Hmm, it's a bad thing to share writes on target, so I'm trying to reduc=
+e number of
+> cases when we have share it.
+
+Is it?  First of all, this filter doesn=E2=80=99t care.  It doesn=E2=80=99=
+t even read
+from the target (related note: we probably don=E2=80=99t need CONSISTENT_=
+READ on
+the target).
+
+Second, there is generally going to be a parent on backup-top that has
+the WRITE permission taken.  So this does not really effectively reduce
+that number of cases.
+
+>>> +        }
+>>> +    } else {
+>>> +        /* Source child */
+>>> +        if (perm & BLK_PERM_WRITE) {
+>>
+>> Or WRITE_UNCHANGED, no?
+>=20
+> Why? We don't need doing CBW for unchanged write.
+
+But we will do it still, won=E2=80=99t we?
+
+(If an unchanging write comes in, this driver will handle it just like a
+normal write, will it not?)
+
+[...]
+
+>>> +
+>>> +BlockDriverState *bdrv_backup_top_append(BlockDriverState *source,
+>>> +                                         BlockDriverState *target,
+>>> +                                         HBitmap *copy_bitmap,
+>>> +                                         Error **errp)
+>>> +{
+
+[...]
+
+>>> +}
+>>
+>> I guess it would be nice if it users could blockdev-add a backup-top
+>> node to basically get a backup with sync=3Dnone.
+>>
+>> (The bdrv_open implementation should then create a new bitmap and
+>> initialize it to be fully set.)
+>>
+>> But maybe it wouldn=E2=80=99t be so nice and I just have feverish drea=
+ms.
+>=20
+> When series begun, I was trying to make exactly this - user-available f=
+ilter,
+> which may be used in separate, but you was against)
+
+Past me is stupid.
+
+> Maybe, not totally against, but I decided not to argue long, and instea=
+d make
+> filter implicit and drop public api (like mirror and commit filters), b=
+ut place it
+> in a separate file (no one will argue against putting large enough and =
+complete
+> new feature, represented by object into a separate file :). And this ac=
+tually
+> makes it easy to publish this filter at some moment. And now I think it=
+ was
+> good decision anyway, as we postponed arguing around API and around sha=
+red dirty
+> bitmaps.
+>=20
+> So publishing the filter is future step.
+
+OK, sure.
+
+>>> +void bdrv_backup_top_set_progress_callback(
+>>> +        BlockDriverState *bs, BackupTopProgressCallback progress_cb,=
+
+>>> +        void *progress_opaque)
+>>> +{
+>>> +    BDRVBackupTopState *s =3D bs->opaque;
+>>> +
+>>> +    s->progress_cb =3D progress_cb;
+>>> +    s->progress_opaque =3D progress_opaque;
+>>> +}
+>>> +
+>>> +void bdrv_backup_top_drop(BlockDriverState *bs)
+>>> +{
+>>> +    BDRVBackupTopState *s =3D bs->opaque;
+>>> +    AioContext *aio_context =3D bdrv_get_aio_context(bs);
+>>> +
+>>> +    aio_context_acquire(aio_context);
+>>> +
+>>> +    bdrv_drained_begin(bs);
+>>> +
+>>> +    bdrv_child_try_set_perm(bs->backing, 0, BLK_PERM_ALL, &error_abo=
+rt);
+>>
+>> Pre-existing in other jobs, but I think calling this function is
+>> dangerous.  (Which is why I remove it in my =E2=80=9Cblock: Ignore loo=
+sening
+>> perm restrictions failures=E2=80=9D series.)
+>=20
+> Hmm, good thing.. Should I rebase on it?
+
+It would help me at least.
+
+>>> +    bdrv_replace_node(bs, backing_bs(bs), &error_abort);
+>>> +    bdrv_set_backing_hd(bs, NULL, &error_abort);
+>>
+>> I think some of this function should be in a .bdrv_close()
+>> implementation, for example this bdrv_set_backing_hd() call.
+>=20
+> Why? We don't have .bdrv_open, so why to have .bdrv_close? I think, whe=
+n
+> we publish this filter most of _add() and _drop() will be refactored to=
+
+> open() and close(). Is there a real reason to implement .close() now?
+
+Not really if it isn=E2=80=99t a usable block driver yet, no.
+
+Max
+
+
+--6YzhKQ7eOx4uiWbZkf7TjvS5GaFK5npwn--
+
+--p0TFcz2mcVlkoux3LS1TDmeVAp0agcS2M
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0DmcMACgkQ9AfbAGHV
+z0CO7wgAmdbLvl0p47veut+L1N2gdzolKlOI/zekW7k34AUnWYW/dEhyYAPOVeyd
+Odtiop0GuRUWsb5HY2pv4laLOGteLNLsBxOkBvmaGJS8PRKce4foFTOjaUjHPMGy
+5njZf3Gw56xy1hLqqZ5kTUi3JoEEFHCzJFUZZm3VoL5/CU61fKjSyl/URtpq2KRg
+GsIvAbFVS2aq6WleVgd/h2W+OHbZO9Sws4uSKUTZ48cusN60ZPyu1CgEY9WkdI4u
+FGAl2mNzPkpGGq7a5Amrfj7fr9BBYnnTpyUjz0jkiYdTAZuLoq0MqIKvc2D+tjwf
+q3LbF/Osy7iFY5W5UUL0rJy1xzQ9EA==
+=1Hhu
+-----END PGP SIGNATURE-----
+
+--p0TFcz2mcVlkoux3LS1TDmeVAp0agcS2M--
 
