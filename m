@@ -2,59 +2,59 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A51BC31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 13:57:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67A06C31E4B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 14:01:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 227A021537
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 13:57:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 227A021537
+	by mail.kernel.org (Postfix) with ESMTPS id 3FE1A21537
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 14:01:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FE1A21537
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51780 helo=lists.gnu.org)
+Received: from localhost ([::1]:51806 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbmiH-0006si-EN
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 09:57:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46332)
+	id 1hbmle-0001ty-CJ
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 10:01:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46395)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hbmRh-0001dw-Go
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:40:47 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hbmRl-0001fJ-Tg
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:40:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hbmRg-0005sf-2o
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:40:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38272)
+ (envelope-from <mreitz@redhat.com>) id 1hbmRk-0005vN-0S
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:40:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:30136)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hbmRW-0005jg-Id; Fri, 14 Jun 2019 09:40:36 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1hbmRe-0005pm-8Q; Fri, 14 Jun 2019 09:40:44 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A43F259466;
- Fri, 14 Jun 2019 13:40:33 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5D79F59474;
+ Fri, 14 Jun 2019 13:40:41 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.125])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3BE5E5B68A;
- Fri, 14 Jun 2019 13:40:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EABF1601AC;
+ Fri, 14 Jun 2019 13:40:40 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Fri, 14 Jun 2019 15:40:05 +0200
-Message-Id: <20190614134021.32486-5-mreitz@redhat.com>
+Date: Fri, 14 Jun 2019 15:40:07 +0200
+Message-Id: <20190614134021.32486-7-mreitz@redhat.com>
 In-Reply-To: <20190614134021.32486-1-mreitz@redhat.com>
 References: <20190614134021.32486-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Fri, 14 Jun 2019 13:40:33 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.39]); Fri, 14 Jun 2019 13:40:41 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 04/20] iotests.py: rewrite run_job to be pickier
+Subject: [Qemu-devel] [PULL 06/20] event_match: always match on None value
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,80 +74,74 @@ Sender: "Qemu-devel"
 
 From: John Snow <jsnow@redhat.com>
 
-Don't pull events out of the queue that don't belong to us;
-be choosier so that we can use this method to drive jobs that
-were launched by transactions that may have more jobs.
+Before, event_match didn't always recurse if the event value was not a
+dictionary, and would instead check for equality immediately.
+
+By delaying equality checking to post-recursion, we can allow leaf
+values like "5" to match "None" and take advantage of the generic
+None-returns-True clause.
+
+This makes the matching a little more obviously consistent at the
+expense of being able to check for explicit None values, which is
+probably not that important given what this function is used for.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
-Message-id: 20190523170643.20794-5-jsnow@redhat.com
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20190528183857.26167-1-jsnow@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 48 +++++++++++++++++++++--------------
- 1 file changed, 29 insertions(+), 19 deletions(-)
+ python/qemu/__init__.py | 24 ++++++++++++++----------
+ 1 file changed, 14 insertions(+), 10 deletions(-)
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-index 6a3703e6ee..3ecef5bc90 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -543,27 +543,37 @@ class VM(qtest.QEMUQtestMachine):
-     # Returns None on success, and an error string on failure
-     def run_job(self, job, auto_finalize=3DTrue, auto_dismiss=3DFalse,
-                 pre_finalize=3DNone, wait=3D60.0):
-+        match_device =3D {'data': {'device': job}}
-+        match_id =3D {'data': {'id': job}}
-+        events =3D [
-+            ('BLOCK_JOB_COMPLETED', match_device),
-+            ('BLOCK_JOB_CANCELLED', match_device),
-+            ('BLOCK_JOB_ERROR', match_device),
-+            ('BLOCK_JOB_READY', match_device),
-+            ('BLOCK_JOB_PENDING', match_id),
-+            ('JOB_STATUS_CHANGE', match_id)
-+        ]
-         error =3D None
-         while True:
--            for ev in self.get_qmp_events_filtered(wait=3Dwait):
--                if ev['event'] =3D=3D 'JOB_STATUS_CHANGE':
--                    status =3D ev['data']['status']
--                    if status =3D=3D 'aborting':
--                        result =3D self.qmp('query-jobs')
--                        for j in result['return']:
--                            if j['id'] =3D=3D job:
--                                error =3D j['error']
--                                log('Job failed: %s' % (j['error']))
--                    elif status =3D=3D 'pending' and not auto_finalize:
--                        if pre_finalize:
--                            pre_finalize()
--                        self.qmp_log('job-finalize', id=3Djob)
--                    elif status =3D=3D 'concluded' and not auto_dismiss:
--                        self.qmp_log('job-dismiss', id=3Djob)
--                    elif status =3D=3D 'null':
--                        return error
--                else:
--                    log(ev)
-+            ev =3D filter_qmp_event(self.events_wait(events))
-+            if ev['event'] !=3D 'JOB_STATUS_CHANGE':
-+                log(ev)
-+                continue
-+            status =3D ev['data']['status']
-+            if status =3D=3D 'aborting':
-+                result =3D self.qmp('query-jobs')
-+                for j in result['return']:
-+                    if j['id'] =3D=3D job:
-+                        error =3D j['error']
-+                        log('Job failed: %s' % (j['error']))
-+            elif status =3D=3D 'pending' and not auto_finalize:
-+                if pre_finalize:
-+                    pre_finalize()
-+                self.qmp_log('job-finalize', id=3Djob)
-+            elif status =3D=3D 'concluded' and not auto_dismiss:
-+                self.qmp_log('job-dismiss', id=3Djob)
-+            elif status =3D=3D 'null':
-+                return error
+diff --git a/python/qemu/__init__.py b/python/qemu/__init__.py
+index 98ed8a2e28..dbaf8a5311 100644
+--- a/python/qemu/__init__.py
++++ b/python/qemu/__init__.py
+@@ -409,27 +409,31 @@ class QEMUMachine(object):
 =20
-     def node_info(self, node_name):
-         nodes =3D self.qmp('query-named-block-nodes')
+         The match criteria takes the form of a matching subdict. The eve=
+nt is
+         checked to be a superset of the subdict, recursively, with match=
+ing
+-        values whenever those values are not None.
++        values whenever the subdict values are not None.
++
++        This has a limitation that you cannot explicitly check for None =
+values.
+=20
+         Examples, with the subdict queries on the left:
+          - None matches any object.
+          - {"foo": None} matches {"foo": {"bar": 1}}
+-         - {"foo": {"baz": None}} does not match {"foo": {"bar": 1}}
+-         - {"foo": {"baz": 2}} matches {"foo": {"bar": 1, "baz": 2}}
++         - {"foo": None} matches {"foo": 5}
++         - {"foo": {"abc": None}} does not match {"foo": {"bar": 1}}
++         - {"foo": {"rab": 2}} matches {"foo": {"bar": 1, "rab": 2}}
+         """
+         if match is None:
+             return True
+=20
+-        for key in match:
+-            if key in event:
+-                if isinstance(event[key], dict):
++        try:
++            for key in match:
++                if key in event:
+                     if not QEMUMachine.event_match(event[key], match[key=
+]):
+                         return False
+-                elif event[key] !=3D match[key]:
++                else:
+                     return False
+-            else:
+-                return False
+-        return True
++            return True
++        except TypeError:
++            # either match or event wasn't iterable (not a dict)
++            return match =3D=3D event
+=20
+     def event_wait(self, name, timeout=3D60.0, match=3DNone):
+         """
 --=20
 2.21.0
 
