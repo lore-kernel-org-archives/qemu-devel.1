@@ -2,89 +2,60 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CE38C31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 14:13:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB422C31E4B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 14:15:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0CA421537
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 14:13:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="S+n5DY4F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0CA421537
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 91CDB21537
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 14:15:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91CDB21537
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51914 helo=lists.gnu.org)
+Received: from localhost ([::1]:51936 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbmxZ-0004Em-DV
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 10:13:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52098)
+	id 1hbmzX-0005zO-QM
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 10:15:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46669)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hbmib-0008E6-Ev
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:58:14 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hbmS1-0001uu-V4
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:41:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hbmia-0003Ad-CK
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:58:13 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37953)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hbmia-00038T-3E
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:58:12 -0400
-Received: by mail-wr1-x443.google.com with SMTP id d18so2662668wrs.5
- for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 06:58:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=Gm9TUL/89b34X+XFCL8WVV7OUJKrb7tXBVXQhUIyXl4=;
- b=S+n5DY4FLHxNJcr5tU67AZFWsdigOFsNqiDXN6UELgmeEZmdUsKZMQ0OSSq2/NKjMZ
- ZpJ/MhiT0LGoVexvktOZFidgKNPMPMkOL8GX8CFnavmorxkQZHjbi3+4k4yko7HxUO+4
- FkOOzovf8o8GApajvg86ARMm5PpYffuO9NOjnCMc8Qajp2+TJoa8rYW1nIF6VUyN2Fhw
- APdzYB3bZsc0h3VX1qsZwD6oLz3ChCS3aI2Es0Flea+7HNcNjWXWl75kJj5gDOAzzQ4J
- Dt1d5IV3YVWfc/y8VzKSSz6m1qqZi+TxP87rE+W8t0iKz+2W0vE2JDMlIGgNPwAI+40T
- 08Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=Gm9TUL/89b34X+XFCL8WVV7OUJKrb7tXBVXQhUIyXl4=;
- b=adSEXV+keKK2U/mH3UDP0NVcILebDEcSm25ddls9Cp55xgtBJCxm33pP5kzxXUMBF4
- L8fmIR0StibROro3SAq0vJKmHieFBknNJzNUEi/D/dIlEG/pmfgxpyhIW1YN72unm+km
- VZWyjVYEf6oUeQH+I7tJgyUroTOEPWuuTPQcDX1dBJvyKYndyAR+CImBrDv9cjlpkrIF
- O75Wc8BSS7VPtNzt4vv1K0wE6pJkUz5jsN7cbTPuh/F+20inHoByHtIFeCF5bE9CtZXJ
- DmiNbjMq3wfI4WFsCN3QOflPEGd5OAxSYjjh0WpMzdwfzN5VB6FWbmcugJAYoxqkEPC3
- +Wog==
-X-Gm-Message-State: APjAAAW749YnHfn5o94mxQaPJ6B4WFId1empIE1l9/avDMdqVvzegEQg
- 0R21V3Gd9wofTm3QbsdSc8hWvg==
-X-Google-Smtp-Source: APXvYqye4yXbWWjDC5CM3RYdmb6uZhxl+8XVQObrBV5UccCR9yuhP3klWbUqDjn9Fj+PuxTiUzTSdw==
-X-Received: by 2002:adf:f6cb:: with SMTP id y11mr18828559wrp.245.1560520690243; 
- Fri, 14 Jun 2019 06:58:10 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id v204sm5012941wma.20.2019.06.14.06.58.09
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 14 Jun 2019 06:58:09 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 428D81FF87;
- Fri, 14 Jun 2019 14:58:09 +0100 (BST)
-References: <20190614072432.820-1-philmd@redhat.com>
- <CAFEAcA9zEKePcOHK6WMqAitf282EWh5LUYRqZ3oAJ_W1wPsohw@mail.gmail.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-In-reply-to: <CAFEAcA9zEKePcOHK6WMqAitf282EWh5LUYRqZ3oAJ_W1wPsohw@mail.gmail.com>
-Date: Fri, 14 Jun 2019 14:58:09 +0100
-Message-ID: <8736kce0b2.fsf@zen.linaroharston>
+ (envelope-from <mreitz@redhat.com>) id 1hbmS0-00068P-RB
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:41:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34940)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hbmRu-00063T-ST; Fri, 14 Jun 2019 09:40:59 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 24CB0811A9;
+ Fri, 14 Jun 2019 13:40:53 +0000 (UTC)
+Received: from localhost (unknown [10.40.205.125])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AECA539C3;
+ Fri, 14 Jun 2019 13:40:52 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Date: Fri, 14 Jun 2019 15:40:12 +0200
+Message-Id: <20190614134021.32486-12-mreitz@redhat.com>
+In-Reply-To: <20190614134021.32486-1-mreitz@redhat.com>
+References: <20190614134021.32486-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Fri, 14 Jun 2019 13:40:53 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH 0/6] configure: Try to fix --static linking
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 11/20] qemu-img: Fix options leakage in
+ img_rebase()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,54 +67,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- integration@gluster.org,
- =?utf-8?Q?Daniel_P=2E?= =?utf-8?Q?_Berrang=C3=A9?= <berrange@redhat.com>,
- Qemu-block <qemu-block@nongnu.org>,
- =?utf-8?Q?Lo=C3=AFc?= Minier <loic.minier@linaro.org>,
- Michael Tokarev <mjt@tls.msk.ru>, QEMU Developers <qemu-devel@nongnu.org>,
- Bharata B Rao <bharata@linux.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Niels de Vos <ndevos@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+img_rebase() can leak a QDict in two occasions.  Fix it.
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Coverity: CID 1401416
+Fixes: d16699b64671466b42079c45b89127aeea1ca565
+Fixes: 330c72957196e0ae382abcaa97ebf4eb9bc8574f
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20190528195338.12376-1-mreitz@redhat.com
+Reviewed-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ qemu-img.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-> On Fri, 14 Jun 2019 at 08:27, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com> wrote:
->> Apparently QEMU static linking is slowly bitroting. Obviously it
->> depends the libraries an user has installed, anyway it seems there
->> are not much testing done.
->
-> The main reason for supporting static linking is so we can build
-> the user-mode emulators. Almost always the problems with
-> static linking the softmmu binaries and the tools are
-> issues with the distro's packaging of the static libraries
-> (pkg-config files which specify things that don't work for
-> static is a common one).
->
-> So we could put in a lot of checking of "is what pkg-config
-> tells us broken". Or we could just say "we don't support static
-> linking for anything except the usermode binaries". We
-> should probably phase in deprecation of that because it's
-> possible somebody's using it seriously, but it seems like
-> a fairly weird thing to do to me.
+diff --git a/qemu-img.c b/qemu-img.c
+index fd62e3ad5d..da14aea46a 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -3350,6 +3350,7 @@ static int img_rebase(int argc, char **argv)
+                                                              out_baseimg=
+,
+                                                              &local_err)=
+;
+             if (local_err) {
++                qobject_unref(options);
+                 error_reportf_err(local_err,
+                                   "Could not resolve backing filename: "=
+);
+                 ret =3D -1;
+@@ -3362,7 +3363,9 @@ static int img_rebase(int argc, char **argv)
+              */
+             prefix_chain_bs =3D bdrv_find_backing_image(bs, out_real_pat=
+h);
+             if (prefix_chain_bs) {
++                qobject_unref(options);
+                 g_free(out_real_path);
++
+                 blk_new_backing =3D blk_new(qemu_get_aio_context(),
+                                           BLK_PERM_CONSISTENT_READ,
+                                           BLK_PERM_ALL);
+--=20
+2.21.0
 
-It would be nice to have a --static-user config flag and deprecate the
---static flag. I don't think there is a decent use case for system
-emulation targets.
-
-The Gentoo ebuild currently jumps through hoops to build QEMU by doing
-the build twice, first for softmmu targets and then for user targets. I
-suspect all of that is mostly to handle the reasonable "static-user" use
-case which is what people really want*.
-
-*I'm guessing
-
---
-Alex Benn=C3=A9e
 
