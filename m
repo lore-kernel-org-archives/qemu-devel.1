@@ -2,66 +2,86 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36751C46477
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 08:31:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B9A0C31E44
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 08:36:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1291B2084E
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 08:31:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1291B2084E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 49F6821537
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 08:36:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r83/gL1N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49F6821537
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49272 helo=lists.gnu.org)
+Received: from localhost ([::1]:49286 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbhcZ-0003Mx-9v
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 04:31:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54923)
+	id 1hbhhJ-0005u6-9w
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 04:36:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55594)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hbhau-0002gS-Kw
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 04:29:57 -0400
+ (envelope-from <stefanha@gmail.com>) id 1hbheC-0003yo-Id
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 04:33:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hbhat-0001qR-M0
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 04:29:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34899)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>)
- id 1hbhar-0001n5-Eb; Fri, 14 Jun 2019 04:29:53 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7F9D13082E56;
- Fri, 14 Jun 2019 08:29:47 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
- [10.36.116.148])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 498927BE97;
- Fri, 14 Jun 2019 08:29:44 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id BADA811386A6; Fri, 14 Jun 2019 10:29:42 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20190613153405.24769-1-kwolf@redhat.com>
- <20190613153405.24769-13-kwolf@redhat.com>
-Date: Fri, 14 Jun 2019 10:29:42 +0200
-In-Reply-To: <20190613153405.24769-13-kwolf@redhat.com> (Kevin Wolf's message
- of "Thu, 13 Jun 2019 17:34:02 +0200")
-Message-ID: <87tvcsfu2x.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <stefanha@gmail.com>) id 1hbhe5-00045q-AE
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 04:33:16 -0400
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:40999)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hbhe3-00041F-Am
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 04:33:13 -0400
+Received: by mail-wr1-x435.google.com with SMTP id c2so1555267wrm.8
+ for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 01:33:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=oDMxe05X7s/kqUFoAgC/6Dc3dkWT1ZRzHu7q2t4kuas=;
+ b=r83/gL1NBmSJVvRImhUqXyJQDj6UvtaPeSo83WV8u1tZocsrZNW4XNHOmu8myRxa/I
+ azBhmTCM0dd6WndVM+z1vMEvZv9FTKV2Tkk0xBj7Ld+Anc91wmjk8j8CDTacOPjtbP3I
+ /N4Yph4whaigOTlQpWpS95yj66JKbu9ErMgOMacITDViZquTWlcQ3tmRviUJJlxvObff
+ /30+OxpsI/a/VN7qyQbYYeBcvILxEclN++1Pc8b2sEiZNwWSJ/1QPWM7r9+eiwERN2i/
+ eGEwtI+THxn0RpfJTspTTr+LB1x5CdcxcPHli4Z3IiNNt80WH0wTOAjNC/jZBTEMWab1
+ fP+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=oDMxe05X7s/kqUFoAgC/6Dc3dkWT1ZRzHu7q2t4kuas=;
+ b=psOwZlDZDqUhnoK1XfPYeAR53TDiQPP1qI7fCIlwfpUQTuHTdW7dRLmM+bl82LMGw9
+ 4XEKRjNvkRghJZ8Hm0e56xzL/X+M4w92V9ypOUnPKu38jsKsbGve044Ne7RTTe7fB5s4
+ ZPqzcPzkxEiGDpQsvyATZ3pk5+ww+DHzOqWqX3SnUFU4NltNmYMMLXbovms20HgOTSvF
+ v4HW1jMNVvAuyOCU+nWf0b+FqwlZ7jrHpYnwpInopgdN3K15XSJCIdbOb9cYCx300e97
+ bMg70xzEAqmpbousq3Aa0hNH5lVrutwjW+cjXODBZSZioEuNr6yr00KmvveF4TcjG3On
+ r3TQ==
+X-Gm-Message-State: APjAAAXNImJQ2MLJ7eOf6ujzQu5PTfZecdnjMdwT2QOMcKJKtZCuLrpp
+ jJqE1ZLtVdDZzBEKBn1c7CI=
+X-Google-Smtp-Source: APXvYqwDgWoU5XTLocWITBFN8WhRsoBo6L2bUS8rp5SBqapdAm+/S0UhHFgYpdbOULTi5aPijXxFbQ==
+X-Received: by 2002:a5d:400f:: with SMTP id n15mr123773wrp.312.1560501187880; 
+ Fri, 14 Jun 2019 01:33:07 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id u5sm2816460wmc.32.2019.06.14.01.33.06
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 14 Jun 2019 01:33:06 -0700 (PDT)
+Date: Fri, 14 Jun 2019 09:33:02 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Martin Ichilevici de Oliveira <martin.i.oliveira@gmail.com>
+Message-ID: <20190614083302.GA10957@stefanha-x1.localdomain>
+References: <20190603205826.2345-1-martin.i.oliveira@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Fri, 14 Jun 2019 08:29:52 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 12/15] monitor: Split out
- monitor/monitor.c
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="9amGYk9869ThD9tj"
+Content-Disposition: inline
+In-Reply-To: <20190603205826.2345-1-martin.i.oliveira@gmail.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::435
+Subject: Re: [Qemu-devel] [PATCH] [RFC] Add a eBPF-capable PCIe device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,64 +93,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- dgilbert@redhat.com
+Cc: javier@javigon.com, qemu-devel@nongnu.org,
+ Stephen Bates <sbates@raithlin.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin Wolf <kwolf@redhat.com> writes:
 
-> Move the monitor core infrastructure from monitor/misc.c to
-> monitor/monitor.c. This is code that can be shared for all targets, so
-> compile it only once.
->
-> What remains in monitor/misc.c after this patch is mostly monitor
-> command implementations (which could move to hmp-cmds.c or qmp-cmds.c
-> later) and code that requires a system emulator or is even
-> target-dependent (including HMP command completion code).
->
-> The amount of function and particularly extern variables in
-> monitor_int.h is probably a bit larger than it needs to be, but this way
-> no non-trivial code modifications are needed. The interfaces between all
-> monitor parts can be cleaned up later.
->
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-[...]
-> diff --git a/monitor/monitor.c b/monitor/monitor.c
-> new file mode 100644
-> index 0000000000..6802b8e491
-> --- /dev/null
-> +++ b/monitor/monitor.c
-> @@ -0,0 +1,637 @@
-[...]
-> +QemuOptsList qemu_mon_opts = {
-> +    .name = "mon",
-> +    .implied_opt_name = "chardev",
-> +    .head = QTAILQ_HEAD_INITIALIZER(qemu_mon_opts.head),
-> +    .desc = {
-> +        {
-> +            .name = "mode",
-> +            .type = QEMU_OPT_STRING,
-> +        },{
-> +            .name = "chardev",
-> +            .type = QEMU_OPT_STRING,
-> +        },{
-> +            .name = "pretty",
-> +            .type = QEMU_OPT_BOOL,
-> +        },
-> +        { /* end of list */ }
+--9amGYk9869ThD9tj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-checkpatch.pl gripes:
+On Mon, Jun 03, 2019 at 02:58:26PM -0600, Martin Ichilevici de Oliveira wrote:
 
-    WARNING: Block comments use a leading /* on a separate line
+Thanks for sharing!
 
-I agree with ignoring this one, because it's the way it looks
-everywhere.
+The bpf_ram accesses are unsafe.  The guest can modify bpf_ram while the
+device is accessing it.  This is likely to cause security problems.
 
-> +    },
-> +};
-[...]
+I think a model is required where the device copies in the program and
+additional data before processing.  This way the guest cannot modify it
+while the device is executing the program.
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Also, please validate inputs.  The guest is untrusted.  Offsets, sizes,
+etc cannot be trusted and must be bounds-checked.
+
+--9amGYk9869ThD9tj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0DW74ACgkQnKSrs4Gr
+c8h81AgAlr3HtIcyOYR8abYf3r+TWyT1wicHIiddWcdwzej9tDo5jD0QQieB2F0a
+EpW30dAB84M9VouR3e8+0T95tFqzd6bJEy6K30gUdw8HqeHY1zofinbpCLQrGU+P
+wghj3bXlM3hukITcv3g1qhRRbQR2uAwsdLZGL7ocwSEt3LuM55bp1oXo4j8JpszT
+RYZjkpWbdXo7tWRMcaHcifsFgn/7pmOD9ZpSLNC3Nk7GV4MpsCmGVX9p9CYwM2dR
+LurdNJ3I1ndm9MLdtp9bv4eq9469k0h31P5I/nq3vtiC1Ktq1ua4p9zsJVjC5KBj
+5AxLUGHTGWgW9X/mPfCgrJkU+SmCQw==
+=4VpL
+-----END PGP SIGNATURE-----
+
+--9amGYk9869ThD9tj--
 
