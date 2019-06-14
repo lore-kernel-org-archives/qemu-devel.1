@@ -2,64 +2,48 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C381C31E45
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 01:53:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CED9FC31E45
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 01:54:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06AA620B7C
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 01:53:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="bNxkA9RT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06AA620B7C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id A0E1320B7C
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 01:54:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0E1320B7C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46648 helo=lists.gnu.org)
+Received: from localhost ([::1]:46650 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbbPD-00073M-CQ
-	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 21:53:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56912)
+	id 1hbbPs-0007ip-W0
+	for qemu-devel@archiver.kernel.org; Thu, 13 Jun 2019 21:54:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57688)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hbbKz-0003Hj-UX
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 21:49:07 -0400
+ (envelope-from <aik@ozlabs.ru>) id 1hbbOY-0006s8-G3
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 21:52:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hbbKy-0003OC-Im
- for qemu-devel@nongnu.org; Thu, 13 Jun 2019 21:49:05 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:57351 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hbbKx-0003F1-Eu; Thu, 13 Jun 2019 21:49:04 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 45Q3Rt2F0zz9sND; Fri, 14 Jun 2019 11:48:58 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1560476938;
- bh=LwHnaeIH8uBSmV+oCImOoA2xeM9HHDqHPMim3dUvHAE=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=bNxkA9RTPR539q40P9PoMmpPDQA/z2cAHm9J0E0gdMVOr4myNKONDpuRQSRXWFYO0
- QEXkKQV2ZBCn2fuN3dBKYmSV1AFvWGGyszuHtoMFsN1PnYLzA0I0AnN7SekIYJQ3rm
- dPB3BvrwlXUyxHrCwGc+tw1n9is79MzQxhH9Ofcw=
-Date: Fri, 14 Jun 2019 11:40:00 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Message-ID: <20190614014000.GC11158@umbus.fritz.box>
-References: <156044428869.125694.13827513253200184549.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
- <156044430517.125694.6207865998817342638.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="sHrvAb52M6C8blB9"
-Content-Disposition: inline
-In-Reply-To: <156044430517.125694.6207865998817342638.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [PATCH 3/3] xics/spapr: Detect old KVM XICS on
- POWER9 hosts
+ (envelope-from <aik@ozlabs.ru>) id 1hbbOW-0004xs-SA
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 21:52:46 -0400
+Received: from ozlabs.ru ([107.173.13.209]:44047)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <aik@ozlabs.ru>) id 1hbbOW-0004wS-KM
+ for qemu-devel@nongnu.org; Thu, 13 Jun 2019 21:52:44 -0400
+Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
+ by ozlabs.ru (Postfix) with ESMTP id AD6A8AE807F0;
+ Thu, 13 Jun 2019 21:52:40 -0400 (EDT)
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+To: qemu-devel@nongnu.org
+Date: Fri, 14 Jun 2019 11:52:37 +1000
+Message-Id: <20190614015237.82463-1-aik@ozlabs.ru>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 107.173.13.209
+Subject: [Qemu-devel] [PATCH qemu v3] hmp: Print if memory section is
+ registered with an accelerator
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,167 +55,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
- qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This adds an accelerator name to the "into mtree -f" to tell the user if
+a particular memory section is registered with the accelerator;
+the primary user for this is KVM and such information is useful
+for debugging purposes.
 
---sHrvAb52M6C8blB9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This adds a has_memory() callback to the accelerator class allowing any
+accelerator to have a label in that memory tree dump.
 
-On Thu, Jun 13, 2019 at 06:45:05PM +0200, Greg Kurz wrote:
-> Older KVMs on POWER9 don't support destroying/recreating a KVM XICS
-> device, which is required by 'dual' interrupt controller mode. This
-> causes QEMU to emit a warning when the guest is rebooted and to fall
-> back on XICS emulation:
->=20
-> qemu-system-ppc64: warning: kernel_irqchip allowed but unavailable:
->  Error on KVM_CREATE_DEVICE for XICS: File exists
->=20
-> If kernel irqchip is required, QEMU will thus exit when the guest is
-> first rebooted. Failing QEMU this late may be a painful experience
-> for the user.
->=20
-> Detect that and exit at machine init instead.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+Since memory sections are passed to memory listeners and get registered
+in accelerators (rather than memory regions), this only prints new labels
+for flatviews attached to the system address space.
 
-Applied, thanks.
+An example:
+ Root memory region: system
+  0000000000000000-0000002fffffffff (prio 0, ram): /objects/mem0 kvm
+  0000003000000000-0000005fffffffff (prio 0, ram): /objects/mem1 kvm
+  0000200000000020-000020000000003f (prio 1, i/o): virtio-pci
+  0000200080000000-000020008000003f (prio 0, i/o): capabilities
 
-> ---
->  docs/specs/ppc-spapr-xive.rst |    4 ++--
->  hw/intc/xics_kvm.c            |   30 ++++++++++++++++++++++++++++++
->  hw/ppc/spapr_irq.c            |   13 +++++++++++++
->  include/hw/ppc/xics_spapr.h   |    1 +
->  4 files changed, 46 insertions(+), 2 deletions(-)
->=20
-> diff --git a/docs/specs/ppc-spapr-xive.rst b/docs/specs/ppc-spapr-xive.rst
-> index 7a64c9d04951..6159bc6eed62 100644
-> --- a/docs/specs/ppc-spapr-xive.rst
-> +++ b/docs/specs/ppc-spapr-xive.rst
-> @@ -142,8 +142,8 @@ xics            XICS KVM       XICS emul.     XICS KVM
->  (3) QEMU fails at CAS with ``Guest requested unavailable interrupt
->      mode (XICS), either don't set the ic-mode machine property or try
->      ic-mode=3Dxics or ic-mode=3Ddual``
-> -(4) QEMU/KVM incompatibility due to device destruction in reset. This
-> -    needs to be addressed more cleanly with an error.
-> +(4) QEMU/KVM incompatibility due to device destruction in reset. QEMU fa=
-ils
-> +    with ``KVM is too old to support ic-mode=3Ddual,kernel-irqchip=3Don``
-> =20
-> =20
->  XIVE Device tree properties
-> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-> index 5c4208f43008..c7f8f5edd257 100644
-> --- a/hw/intc/xics_kvm.c
-> +++ b/hw/intc/xics_kvm.c
-> @@ -452,3 +452,33 @@ void xics_kvm_disconnect(SpaprMachineState *spapr, E=
-rror **errp)
->      /* Clear the presenter from the VCPUs */
->      kvm_disable_icps();
->  }
-> +
-> +/*
-> + * This is a heuristic to detect older KVMs on POWER9 hosts that don't
-> + * support destruction of a KVM XICS device while the VM is running.
-> + * Required to start a spapr machine with ic-mode=3Ddual,kernel-irqchip=
-=3Don.
-> + */
-> +bool xics_kvm_has_broken_disconnect(SpaprMachineState *spapr)
-> +{
-> +    int rc;
-> +
-> +    rc =3D kvm_create_device(kvm_state, KVM_DEV_TYPE_XICS, false);
-> +    if (rc < 0) {
-> +        /*
-> +         * The error is ignored on purpose. The KVM XICS setup code
-> +         * will catch it again anyway. The goal here is to see if
-> +         * close() actually destroys the device or not.
-> +         */
-> +        return false;
-> +    }
-> +
-> +    close(rc);
-> +
-> +    rc =3D kvm_create_device(kvm_state, KVM_DEV_TYPE_XICS, false);
-> +    if (rc >=3D 0) {
-> +        close(rc);
-> +        return false;
-> +    }
-> +
-> +    return errno =3D=3D EEXIST;
-> +}
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index dfb99f35ea00..75654fc67aba 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -669,6 +669,19 @@ static void spapr_irq_check(SpaprMachineState *spapr=
-, Error **errp)
->              return;
->          }
->      }
-> +
-> +    /*
-> +     * On a POWER9 host, some older KVM XICS devices cannot be destroyed=
- and
-> +     * re-created. Detect that early to avoid QEMU to exit later when the
-> +     * guest reboots.
-> +     */
-> +    if (kvm_enabled() &&
-> +        spapr->irq =3D=3D &spapr_irq_dual &&
-> +        machine_kernel_irqchip_required(machine) &&
-> +        xics_kvm_has_broken_disconnect(spapr)) {
-> +        error_setg(errp, "KVM is too old to support ic-mode=3Ddual,kerne=
-l-irqchip=3Don");
-> +        return;
-> +    }
->  }
-> =20
->  /*
-> diff --git a/include/hw/ppc/xics_spapr.h b/include/hw/ppc/xics_spapr.h
-> index 6c1d9ee55945..d968f2499ca7 100644
-> --- a/include/hw/ppc/xics_spapr.h
-> +++ b/include/hw/ppc/xics_spapr.h
-> @@ -35,6 +35,7 @@ void spapr_dt_xics(SpaprMachineState *spapr, uint32_t n=
-r_servers, void *fdt,
->                     uint32_t phandle);
->  int xics_kvm_init(SpaprMachineState *spapr, Error **errp);
->  void xics_kvm_disconnect(SpaprMachineState *spapr, Error **errp);
-> +bool xics_kvm_has_broken_disconnect(SpaprMachineState *spapr);
->  void xics_spapr_init(SpaprMachineState *spapr);
->  void xics_spapr_connect(SpaprMachineState *spapr);
-> =20
->=20
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+Changes:
+v3:
+* added support for multiple ASes per accelerator (KVM can do 2 at least)
+as Paolo suggested
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+v2:
+* added an accelerator callback instead of hardcoding it to kvm only
+---
+ include/sysemu/accel.h |  3 +++
+ accel/kvm/kvm-all.c    | 38 ++++++++++++++++++++++++++++++++++++++
+ memory.c               | 22 ++++++++++++++++++++++
+ 3 files changed, 63 insertions(+)
 
---sHrvAb52M6C8blB9
-Content-Type: application/pgp-signature; name="signature.asc"
+diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
+index 81293cdb08f9..89ce57e404ca 100644
+--- a/include/sysemu/accel.h
++++ b/include/sysemu/accel.h
+@@ -25,6 +25,7 @@
+ 
+ #include "qom/object.h"
+ #include "hw/qdev-properties.h"
++#include "exec/hwaddr.h"
+ 
+ typedef struct AccelState {
+     /*< private >*/
+@@ -39,6 +40,8 @@ typedef struct AccelClass {
+     const char *name;
+     int (*init_machine)(MachineState *ms);
+     void (*setup_post)(MachineState *ms, AccelState *accel);
++    bool (*has_memory)(MachineState *ms, AddressSpace *as,
++                       hwaddr start_addr, hwaddr size);
+     bool *allowed;
+     /*
+      * Array of global properties that would be applied when specific
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index b0c4bed6e367..948b7e53df47 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -109,6 +109,13 @@ struct KVMState
+     /* memory encryption */
+     void *memcrypt_handle;
+     int (*memcrypt_encrypt_data)(void *handle, uint8_t *ptr, uint64_t len);
++
++    /* For "info mtree -f" to tell if an MR is registered in KVM */
++    int nr_as;
++    struct KVMAs {
++        KVMMemoryListener *ml;
++        AddressSpace *as;
++    } *as;
+ };
+ 
+ KVMState *kvm_state;
+@@ -940,6 +947,14 @@ void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
+     kml->listener.priority = 10;
+ 
+     memory_listener_register(&kml->listener, as);
++
++    for (i = 0; i < s->nr_as; ++i) {
++        if (!s->as[i].as) {
++            s->as[i].as = as;
++            s->as[i].ml = kml;
++            break;
++        }
++    }
+ }
+ 
+ static MemoryListener kvm_io_listener = {
+@@ -1590,6 +1605,12 @@ static int kvm_init(MachineState *ms)
+         s->nr_slots = 32;
+     }
+ 
++    s->nr_as = kvm_check_extension(s, KVM_CAP_MULTI_ADDRESS_SPACE);
++    if (s->nr_as <= 1) {
++        s->nr_as = 1;
++    }
++    s->as = g_new0(struct KVMAs, s->nr_as);
++
+     kvm_type = qemu_opt_get(qemu_get_machine_opts(), "kvm-type");
+     if (mc->kvm_type) {
+         type = mc->kvm_type(ms, kvm_type);
+@@ -2591,11 +2612,28 @@ int kvm_get_one_reg(CPUState *cs, uint64_t id, void *target)
+     return r;
+ }
+ 
++static bool kvm_accel_has_memory(MachineState *ms, AddressSpace *as,
++                                 hwaddr start_addr, hwaddr size)
++{
++    KVMState *kvm = KVM_STATE(ms->accelerator);
++    int i;
++
++    for (i = 0; i < kvm->nr_as; ++i) {
++        if (kvm->as[i].as == as && kvm->as[i].ml) {
++            return NULL != kvm_lookup_matching_slot(kvm->as[i].ml,
++                                                    start_addr, size);
++        }
++    }
++
++    return false;
++}
++
+ static void kvm_accel_class_init(ObjectClass *oc, void *data)
+ {
+     AccelClass *ac = ACCEL_CLASS(oc);
+     ac->name = "KVM";
+     ac->init_machine = kvm_init;
++    ac->has_memory = kvm_accel_has_memory;
+     ac->allowed = &kvm_allowed;
+ }
+ 
+diff --git a/memory.c b/memory.c
+index 0a089a73ae1a..61524156a1ce 100644
+--- a/memory.c
++++ b/memory.c
+@@ -30,7 +30,9 @@
+ #include "sysemu/kvm.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/tcg.h"
++#include "sysemu/accel.h"
+ #include "hw/qdev-properties.h"
++#include "hw/boards.h"
+ #include "migration/vmstate.h"
+ 
+ //#define DEBUG_UNASSIGNED
+@@ -2939,6 +2941,8 @@ struct FlatViewInfo {
+     int counter;
+     bool dispatch_tree;
+     bool owner;
++    AccelClass *ac;
++    const char *ac_name;
+ };
+ 
+ static void mtree_print_flatview(gpointer key, gpointer value,
+@@ -3001,6 +3005,17 @@ static void mtree_print_flatview(gpointer key, gpointer value,
+         if (fvi->owner) {
+             mtree_print_mr_owner(mr);
+         }
++
++        if (fvi->ac) {
++            for (i = 0; i < fv_address_spaces->len; ++i) {
++                as = g_array_index(fv_address_spaces, AddressSpace*, i);
++                if (fvi->ac->has_memory(current_machine, as,
++                                        int128_get64(range->addr.start),
++                                        MR_SIZE(range->addr.size) + 1)) {
++                    qemu_printf(" %s", fvi->ac_name);
++                }
++            }
++        }
+         qemu_printf("\n");
+         range++;
+     }
+@@ -3041,6 +3056,13 @@ void mtree_info(bool flatview, bool dispatch_tree, bool owner)
+         };
+         GArray *fv_address_spaces;
+         GHashTable *views = g_hash_table_new(g_direct_hash, g_direct_equal);
++        AccelClass *ac = ACCEL_GET_CLASS(current_machine->accelerator);
++
++        if (ac->has_memory) {
++            fvi.ac = ac;
++            fvi.ac_name = current_machine->accel ? current_machine->accel :
++                object_class_get_name(OBJECT_CLASS(ac));
++        }
+ 
+         /* Gather all FVs in one table */
+         QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
+-- 
+2.17.1
 
------BEGIN PGP SIGNATURE-----
-
-iQIyBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0C+vAACgkQbDjKyiDZ
-s5JxMQ/4/dr3ZM3h3p5AIhnM3lm8YS6/6h+wtDdtmjPnqErzlFi5vJk0OdoIb8pP
-sX7m9qUt9aJ7x+e8RUmKxH03i7wCcQ6WIC4OfAjBYjYcBR1LdqZcTdA7LIoFMauX
-jVMrpBWJFCFjtkLKFdE4vycnfBDQTwSrP437vp937oBOugzpvztAkmlhiUjzmrvq
-uIK3ab7x6l1V5nOzkM7wRy0lpWkn72W1Jieok8aVjvR9VjDqmtbpxNVRkhC9hSGp
-2cG7UbEvysc8Y4EBYQsUyBau2em4XPqT3s7b9oBWQKWjMslIeolFSwmdgYipqJja
-AYt48vijZY8nrNb8Anrkdz9VT6H05vV3B30GByrVeuCcFFZRNdGh8NMoRxDyaftd
-KGRZPXiLkkUmmJPKI2G3XXESAkBbc/lwgBkT+gMDOeV5VAfj5mzvG2uincfiwmux
-TTzjMZ+WDyOWH/KnHmUzgArgV4eL+auTTA0Um9Ww269rObAiCSbN1YEksUN8Nyx2
-K7I+bxHHt+62qh8glAi/fwU+jZ7KUtlbPyStbxL7OyFD1OsSy5imM1+aWa/TgVjk
-2d6sKtqAiaKDJe5/7Kr5D7YEFVTbLuQ26wj/HYLCKHgDZc5uEfU1s3e99cOhWqpu
-EfO4vAR9HXoWRcNOdUnLG3LchlLGVCgR+AhRgffF9f+YbbPi9A==
-=fWAj
------END PGP SIGNATURE-----
-
---sHrvAb52M6C8blB9--
 
