@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D470C31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 17:40:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19E15C31E4B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 17:40:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE5F7217D6
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 17:40:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF471217D6
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 17:40:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Kjen5fso"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE5F7217D6
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="thCBkPLZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF471217D6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53834 helo=lists.gnu.org)
+Received: from localhost ([::1]:53836 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbqBq-0005p9-3z
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 13:40:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55863)
+	id 1hbqC8-0005uV-2S
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 13:40:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58618)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hbpkC-0000NH-PP
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:12:06 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hbpqh-0005az-JX
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:18:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hbpkB-0002ut-Gc
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:12:04 -0400
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:39086)
+ (envelope-from <alex.bennee@linaro.org>) id 1hbpqd-00075s-WE
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:18:46 -0400
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:40809)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hbpkB-0002ti-64
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:12:03 -0400
-Received: by mail-wr1-x433.google.com with SMTP id x4so3315244wrt.6
- for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 10:12:02 -0700 (PDT)
+ id 1hbpqd-0006c2-Iu
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:18:43 -0400
+Received: by mail-wr1-x42e.google.com with SMTP id p11so3330376wre.7
+ for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 10:18:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Oj/0oPpqLDS/GX/KzCrsGX7DQFLG22FAaJqDHl23Ay4=;
- b=Kjen5fsoYTGAeB1k2EAmzlv51KrS5lr09BpoulPDbZXumh3IT85rtXJcMmXSPXjUHC
- cLqFUov2x2tdBdQ+xNYzyB+Qj2EQ9Rm5qR9FAQiZiC38X0LMqEROpWGh4pfVTEM0JzSF
- v85N/vLObTEcTo6J07vdvOTp6Ul90yBHSPvfIkwNJE5bHryoTbpIgxSevGd+bfI/1pZV
- GuNUry6nJdEL7AHc48r9g0HHKM1rzsPh8KnOqithZ2RcSaj/ZopYW5CUW65E/1v+R5oF
- izQ7BJKbtnvL2Nsp9zEkX1P9WJwbo/JA92AP6ZDY//BwPK9ePVeB9jLhX3YPKhfx6/Dj
- jJsA==
+ bh=Q0g+J0COJWGb6iPQMwKOFR9aEmXrXmgB9rcv6IsahSA=;
+ b=thCBkPLZn2OyMi7jzH1+rFIWqAmnnlae6qtM3JHYhegd4nIlQyqEfDh5QI0BsQYeHR
+ Xj2fqCdLZGdeTYkzEeN2F1pKjfoMdKctAe0A/Rggke/nxqXRu7XY3uFeh6C70v8ZQpl+
+ hVo+Sl1mUfSmN54kp3UYDnu8yhlLbCXX5crvoXVxwr9XhAheMc3+5lqUAAgKDX4iXvIM
+ S0JvspdCIQlRIjPzqhu0xkkqy+54ymFoPcvV27eKNi962xBQQqSnt8TjVPkuYfwgKZBJ
+ PtjH3b28PsZCIQKAEs+JBoPOdDd0+KyYwm+nOwrQiLERyfFak4k17+WNtNgp8DSY7HQC
+ f87g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Oj/0oPpqLDS/GX/KzCrsGX7DQFLG22FAaJqDHl23Ay4=;
- b=N5DjqSBAtrI2cfOjJEUyXKLCGZEUSlVYJ3qas+geM23QFMaRh+DGJhLENqqr9MJrn7
- i+b/7outAw+lenhc2R8rCOpUkGnoNJZh2O0/ORXAJIdotHeYl4LS481Mbl8jjqOfnk1/
- g5d/hzFvZyPXxk/JuNoF9l+Zq1m1/PikOBQYIU2tQmy4P2e9dMtMlRFMN2yT0PYsl0QA
- 8DRAx/2cZ2L89k9YihoSO3b2vE5rL5gIwmH0hJO18P++jnHACnD4zuoxIqevwE2CAE8N
- mkqfqwyijuvl+9Kdcng9Y7ZZ97jtI4sSWHzY4EQQElUMA/5w6IZoUVNLoAnBu5DhJf7T
- JNiw==
-X-Gm-Message-State: APjAAAVE1LY76cYmSVadTN87n1rCA12zRh+1S5tL6vrFwgg/8TtvzuAe
- 772q0W+nKL4fuHqV3s4zFlyQ6GcoV4c=
-X-Google-Smtp-Source: APXvYqyXYaUP5/nsn+/uIdwF80NhYG/ZQOeUsR5r60NGPeGsixupb6MBeBGtKw7kTlCdkACIMYAAEA==
-X-Received: by 2002:adf:de90:: with SMTP id w16mr33056671wrl.217.1560532321714; 
- Fri, 14 Jun 2019 10:12:01 -0700 (PDT)
+ bh=Q0g+J0COJWGb6iPQMwKOFR9aEmXrXmgB9rcv6IsahSA=;
+ b=sf9a1E0A2sae/FgeeAF1zDLggX8b4CnKpAIAxUuKDmowlCUaiXczAIaUZ3n4ECbanx
+ Jgh3PzmQhiKB5gxFEjX7pDsXhqRoqQK71BR36v3ViEIoU2XEbR3O95D+WHK2QMQmwkpi
+ aJgDlz/9DPtJMHVbySOB1CIMmJoXdterMhuoNOZjfxIrrbc2hT+TesSpW+NUc260VmFI
+ /TM397rx7m9F0pzZJvJDZKywNyyuQ0r+gtLyda3SRIFughZqfyNGYVdnvGX37QLY6mjU
+ AYF8Fm6CDxIGwiKxUne3xGdAtqM0qvW+itpLI2914Qu+97lY67a77PwQdYgcVTjo6RWY
+ Kajg==
+X-Gm-Message-State: APjAAAWmy9xFxsc9TC2KzjRN2hyDUb1cvoO0ssKTOKBJHqWGQT+DwzDI
+ lNxEy4Lf2DM69taUwZIwYh/8svsdWzY=
+X-Google-Smtp-Source: APXvYqzake6QIVTv4bpS0cBgTdnAxv3DGFGNBUmfdmaidi5Zq2a3/dMizsC1Nh4af4tY2LhsDdl1ew==
+X-Received: by 2002:adf:bac5:: with SMTP id w5mr51292878wrg.124.1560532708568; 
+ Fri, 14 Jun 2019 10:18:28 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id o8sm4715854wrj.71.2019.06.14.10.12.00
+ by smtp.gmail.com with ESMTPSA id v204sm5792081wma.20.2019.06.14.10.18.26
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 14 Jun 2019 10:12:00 -0700 (PDT)
+ Fri, 14 Jun 2019 10:18:26 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 854831FF8C;
- Fri, 14 Jun 2019 18:12:00 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 975771FFC5;
+ Fri, 14 Jun 2019 18:12:04 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 14 Jun 2019 18:11:11 +0100
-Message-Id: <20190614171200.21078-2-alex.bennee@linaro.org>
+Date: Fri, 14 Jun 2019 18:11:56 +0100
+Message-Id: <20190614171200.21078-47-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190614171200.21078-1-alex.bennee@linaro.org>
 References: <20190614171200.21078-1-alex.bennee@linaro.org>
@@ -83,9 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::433
-Subject: [Qemu-devel] [PATCH v3 01/50] trace: expand mem_info:size_shift to
- 3 bits
+X-Received-From: 2a00:1450:4864:20::42e
+Subject: [Qemu-devel] [PATCH v3 46/50] tests/plugin: add hotpages plugin to
+ breakdown memory access patterns
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,36 +97,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Emilio G. Cota" <cota@braap.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Emilio G. Cota" <cota@braap.org>
+This plugin gives a break down of access patterns grouped into pages.
 
-This will allow us to trace 16B-long memory accesses.
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- trace-events | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/plugin/Makefile   |   1 +
+ tests/plugin/hotpages.c | 152 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 153 insertions(+)
+ create mode 100644 tests/plugin/hotpages.c
 
-diff --git a/trace-events b/trace-events
-index 844ee58dd9..037169aab3 100644
---- a/trace-events
-+++ b/trace-events
-@@ -159,7 +159,7 @@ vcpu guest_cpu_reset(void)
- # Access information can be parsed as:
- #
- # struct mem_info {
--#     uint8_t size_shift : 2; /* interpreted as "1 << size_shift" bytes */
-+#     uint8_t size_shift : 3; /* interpreted as "1 << size_shift" bytes */
- #     bool    sign_extend: 1; /* sign-extended */
- #     uint8_t endianness : 1; /* 0: little, 1: big */
- #     bool    store      : 1; /* wheter it's a store operation */
+diff --git a/tests/plugin/Makefile b/tests/plugin/Makefile
+index 3656429d46..75467b6db8 100644
+--- a/tests/plugin/Makefile
++++ b/tests/plugin/Makefile
+@@ -12,6 +12,7 @@ NAMES += insn
+ NAMES += mem
+ NAMES += hotblocks
+ NAMES += howvec
++NAMES += hotpages
+ 
+ SONAMES := $(addsuffix .so,$(addprefix lib,$(NAMES)))
+ 
+diff --git a/tests/plugin/hotpages.c b/tests/plugin/hotpages.c
+new file mode 100644
+index 0000000000..ddeaad077b
+--- /dev/null
++++ b/tests/plugin/hotpages.c
+@@ -0,0 +1,152 @@
++/*
++ * Copyright (C) 2019, Alex Bennée <alex.bennee@linaro.org>
++ *
++ * Hot Pages - show which pages saw the most memory accesses.
++ *
++ * License: GNU GPL, version 2 or later.
++ *   See the COPYING file in the top-level directory.
++ */
++
++#include <inttypes.h>
++#include <assert.h>
++#include <stdlib.h>
++#include <inttypes.h>
++#include <string.h>
++#include <unistd.h>
++#include <stdio.h>
++#include <glib.h>
++
++#include <qemu-plugin.h>
++
++#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
++
++static bool do_inline;
++static uint64_t page_size;
++static uint64_t page_mask;
++static int stdout_fd;
++static int limit = 50;
++static enum qemu_plugin_mem_rw rw = QEMU_PLUGIN_MEM_RW;
++
++typedef struct {
++    uint64_t page_address;
++    int cpu_read;
++    int cpu_write;
++    uint64_t reads;
++    uint64_t writes;
++} PageCounters;
++
++static GMutex lock;
++static GHashTable *pages;
++
++static gint cmp_access_count(gconstpointer a, gconstpointer b)
++{
++    PageCounters *ea = (PageCounters *) a;
++    PageCounters *eb = (PageCounters *) b;
++    return (ea->reads + ea->writes) > (eb->reads + eb->writes) ? -1 : 1;
++}
++
++
++static void plugin_exit(qemu_plugin_id_t id, void *p)
++{
++    GString *report = g_string_new("Pages:\n");
++    int i;
++    GList *counts;
++
++    counts = g_hash_table_get_values(pages);
++    if (counts && g_list_next(counts)) {
++        GList *it;
++
++        g_string_append_printf(report,"Individual Instructions:\n");
++
++        it = g_list_sort(counts, cmp_access_count);
++
++        for (i = 0; i < limit && it->next; i++, it = it->next) {
++            PageCounters *rec = (PageCounters *) it->data;
++            g_string_append_printf(report, "Page: %"PRIx64" cpus:%#04x/%#04x %"PRId64"/%"PRId64"\n",
++                                   rec->page_address,
++                                   rec->cpu_read, rec->cpu_write,
++                                   rec->reads, rec->writes);
++        }
++        g_list_free(it);
++    }
++
++    dprintf(stdout_fd, "%s", report->str);
++    g_string_free(report, true);
++}
++
++static void plugin_init(void)
++{
++    page_mask = (page_size - 1);
++    pages = g_hash_table_new(NULL, g_direct_equal);
++}
++
++static void vcpu_haddr(unsigned int cpu_index, qemu_plugin_meminfo_t meminfo,
++                       uint64_t vaddr, void *haddr, void *udata)
++{
++    uint64_t page = (uint64_t) haddr & page_mask;
++    PageCounters *count;
++
++    g_mutex_lock(&lock);
++    count = (PageCounters *) g_hash_table_lookup(pages, GUINT_TO_POINTER(page));
++
++    if (!count) {
++        count = g_new0(PageCounters, 1);
++        count->page_address = page;
++        g_hash_table_insert(pages, GUINT_TO_POINTER(page), (gpointer) count);
++    }
++    if (qemu_plugin_mem_is_store(meminfo)) {
++        count->writes++;
++        count->cpu_write |= (1 << cpu_index);
++    } else {
++        count->reads++;
++        count->cpu_read |= (1 << cpu_index);
++    }
++
++    g_mutex_unlock(&lock);
++}
++
++static void vcpu_tb_trans(qemu_plugin_id_t id, unsigned int cpu_index,
++                          struct qemu_plugin_tb *tb)
++{
++    size_t n = qemu_plugin_tb_n_insns(tb);
++    size_t i;
++
++    for (i = 0; i < n; i++) {
++        struct qemu_plugin_insn *insn = qemu_plugin_tb_get_insn(tb, i);
++        qemu_plugin_register_vcpu_mem_haddr_cb(insn, vcpu_haddr,
++                                               QEMU_PLUGIN_CB_NO_REGS,
++                                               rw, NULL);
++    }
++}
++
++static GOptionEntry entries[] =
++{
++    { "pagesize", 'r', 0, G_OPTION_ARG_INT, &page_size, "Page Size", "N" },
++    { "inline", 'i', 0, G_OPTION_ARG_NONE, &do_inline, "Inline counters", NULL },
++    { NULL }
++};
++
++QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
++                                           char **argv)
++{
++    GOptionContext *context;
++    GError *error;
++
++    context = g_option_context_new ("- hot pages tool");
++    g_option_context_add_main_entries (context, entries, NULL);
++    if (!g_option_context_parse (context, &argc, &argv, &error))
++    {
++        dprintf(stdout_fd, "option parsing failed: %s\n", error->message);
++        return -1;
++    }
++
++    /* to be used when in the exit hook */
++    stdout_fd = dup(STDOUT_FILENO);
++    assert(stdout_fd);
++
++    plugin_init();
++
++    qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
++    qemu_plugin_register_atexit_cb(id, plugin_exit, NULL);
++    return 0;
++}
 -- 
 2.20.1
 
