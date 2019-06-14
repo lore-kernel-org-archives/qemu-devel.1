@@ -2,66 +2,58 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-2.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BA2CC31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 16:27:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F2A8C31E4B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 16:29:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1154E21841
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 16:27:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1154E21841
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 160F821841
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 16:29:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 160F821841
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53292 helo=lists.gnu.org)
+Received: from localhost ([::1]:53308 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbp2q-0004wn-2B
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 12:27:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34528)
+	id 1hbp4n-0006UX-Bg
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 12:29:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33892)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hboec-0002Dp-Oc
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 12:02:16 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1hbobn-0001Bf-1W
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 11:59:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hboeb-0000nX-2w
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 12:02:14 -0400
-Resent-Date: Fri, 14 Jun 2019 12:02:14 -0400
-Resent-Message-Id: <E1hboeb-0000nX-2w@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21434)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hboea-0000l5-QN
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 12:02:13 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1560528117; cv=none; d=zoho.com; s=zohoarc; 
- b=GeBWEH5EBN5AuTso3VTHFgRiz9qNupcvsk34qiC+O8PWdV5HPYizUJeMQTkp2Jb8cbQfeM4WuquWu0xx0loY/pYMcECbrnTRD5emGwrZO6805YKJGcUtfWB7h2g1O4h0dlW0MMm+Dh7grW10jXsO83aX6JYNEYXeo2wJKe1duSg=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1560528117;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=EkgdUK0YZ+a72KheBNp24F9xQdtwpNihfwpwhsrIYVo=; 
- b=dT1cbHfdwRnF6riETBHPo/lRgjsPxBd4YNZ2MuaGfCWxpqNRFFJh+ejJiCWhPxUbxs3R9bUo/VNpOC1Kk85BS6rODK5/2SKA9P2uOOw28lE2FVtW0nWIRXCR7JA/iNCsxSBkAtlRVz4mZfczpdGtWS1vtS/ZgSGHPpWlLevUJBM=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1560528115021709.1258138890714;
- Fri, 14 Jun 2019 09:01:55 -0700 (PDT)
-In-Reply-To: <20190614135332.12777-1-vandersonmr2@gmail.com>
-Message-ID: <156052811424.13573.5259552275497724156@ce79690b2cb9>
+ (envelope-from <tao3.xu@intel.com>) id 1hbobl-0005st-7O
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 11:59:18 -0400
+Received: from mga18.intel.com ([134.134.136.126]:2019)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hbobj-0005LS-NL
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 11:59:16 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+ by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 14 Jun 2019 08:59:02 -0700
+X-ExtLoop1: 1
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.104])
+ by orsmga008.jf.intel.com with ESMTP; 14 Jun 2019 08:59:00 -0700
+From: Tao Xu <tao3.xu@intel.com>
+To: imammedo@redhat.com,
+	eblake@redhat.com,
+	ehabkost@redhat.com
+Date: Fri, 14 Jun 2019 23:56:18 +0800
+Message-Id: <20190614155626.27932-1-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: vandersonmr2@gmail.com
-Date: Fri, 14 Jun 2019 09:01:55 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [PATCH 0/3] Collecting TB Execution Frequency
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.126
+Subject: [Qemu-devel] [PATCH v5 0/8] Build ACPI Heterogeneous Memory
+ Attribute Table (HMAT)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,74 +65,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org
+Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYxNDEzNTMzMi4xMjc3
-Ny0xLXZhbmRlcnNvbm1yMkBnbWFpbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
-aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
-ZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC8zXSBDb2xsZWN0
-aW5nIFRCIEV4ZWN1dGlvbiBGcmVxdWVuY3kKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkw
-NjE0MTM1MzMyLjEyNzc3LTEtdmFuZGVyc29ubXIyQGdtYWlsLmNvbQoKPT09IFRFU1QgU0NSSVBU
-IEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwg
-ZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAt
-LWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRo
-bSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09
-IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3
-ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3Fl
-bXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8xNTU5MTI1NDg0NjMuMjAxOTAwNC4zNTE1
-ODMwMzA1Mjk5ODA5OTAyLnN0Z2l0QGJhaGlhLmxhbiAtPiBwYXRjaGV3LzE1NTkxMjU0ODQ2My4y
-MDE5MDA0LjM1MTU4MzAzMDUyOTk4MDk5MDIuc3RnaXRAYmFoaWEubGFuCiAtIFt0YWcgdXBkYXRl
-XSAgICAgIHBhdGNoZXcvMTU2MDUxNzc0Mjc2LjI0NDg5MC44NjYwMjc3MjgwMTQ1NDY2Mzk2LnN0
-Z2l0QGJhaGlhLmxhbiAtPiBwYXRjaGV3LzE1NjA1MTc3NDI3Ni4yNDQ4OTAuODY2MDI3NzI4MDE0
-NTQ2NjM5Ni5zdGdpdEBiYWhpYS5sYW4KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo2
-NTEyMzg3IEFkZGluZyBjb21tYW5kIGxpbmUgb3B0aW9uIHRvIGxpbnV4LXVzZXIuCmFmNTJlZmQg
-U2F2aW5nIGNvdW50ZXJzIGJldHdlZW4gdGJfZmx1c2ggZXZlbnRzLgo5MDZjOGVmIEFkZGluZyBh
-biBvcHRpb25hbCB0YiBleGVjdXRpb24gY291bnRlci4KCj09PSBPVVRQVVQgQkVHSU4gPT09CjEv
-MyBDaGVja2luZyBjb21taXQgOTA2YzhlZjkyYWFjIChBZGRpbmcgYW4gb3B0aW9uYWwgdGIgZXhl
-Y3V0aW9uIGNvdW50ZXIuKQpFUlJPUjogIihmb28qKSIgc2hvdWxkIGJlICIoZm9vICopIgojMjQ6
-IEZJTEU6IGFjY2VsL3RjZy90Y2ctcnVudGltZS5jOjE3MzoKKyAgICBUcmFuc2xhdGlvbkJsb2Nr
-KiB0YiA9IChUcmFuc2xhdGlvbkJsb2NrKikgcHRyOwoKRVJST1I6IGRvIG5vdCBpbml0aWFsaXNl
-IGdsb2JhbHMgdG8gMCBvciBOVUxMCiM4MzogRklMRTogbGludXgtdXNlci9tYWluLmM6NjE6Citi
-b29sIGVuYWJsZV9mcmVxX2NvdW50ID0gZmFsc2U7CgpFUlJPUjogZG8gbm90IGluaXRpYWxpc2Ug
-Z2xvYmFscyB0byAwIG9yIE5VTEwKIzk1OiBGSUxFOiB2bC5jOjE5MzoKK2Jvb2wgZW5hYmxlX2Zy
-ZXFfY291bnQgPSBmYWxzZTsKCnRvdGFsOiAzIGVycm9ycywgMCB3YXJuaW5ncywgNTYgbGluZXMg
-Y2hlY2tlZAoKUGF0Y2ggMS8zIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyLzMgQ2hlY2tp
-bmcgY29tbWl0IGFmNTJlZmQ3ODQyZCAoU2F2aW5nIGNvdW50ZXJzIGJldHdlZW4gdGJfZmx1c2gg
-ZXZlbnRzLikKRVJST1I6ICJmb28qIGJhciIgc2hvdWxkIGJlICJmb28gKmJhciIKIzIyOiBGSUxF
-OiBhY2NlbC90Y2cvdHJhbnNsYXRlLWFsbC5jOjExMjE6CitzdGF0aWMgYm9vbCBzdGF0aXN0aWNz
-X2NtcChjb25zdCB2b2lkKiBhcCwgY29uc3Qgdm9pZCAqYnApIHsKCkVSUk9SOiBvcGVuIGJyYWNl
-ICd7JyBmb2xsb3dpbmcgZnVuY3Rpb24gZGVjbGFyYXRpb25zIGdvIG9uIHRoZSBuZXh0IGxpbmUK
-IzIyOiBGSUxFOiBhY2NlbC90Y2cvdHJhbnNsYXRlLWFsbC5jOjExMjE6CitzdGF0aWMgYm9vbCBz
-dGF0aXN0aWNzX2NtcChjb25zdCB2b2lkKiBhcCwgY29uc3Qgdm9pZCAqYnApIHsKCkVSUk9SOiBs
-aW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzU6IEZJTEU6IGFjY2VsL3RjZy90cmFuc2xhdGUtYWxs
-LmM6MTE0NjoKKyAgICBxaHRfaW5pdCgmdGJfY3R4LnRiX3N0YXRpc3RpY3MsIHN0YXRpc3RpY3Nf
-Y21wLCBDT0RFX0dFTl9IVEFCTEVfU0laRSwgUUhUX01PREVfQVVUT19SRVNJWkUpOwoKRVJST1I6
-ICIoZm9vKikiIHNob3VsZCBiZSAiKGZvbyAqKSIKIzcwOiBGSUxFOiBhY2NlbC90Y2cvdHJhbnNs
-YXRlLWFsbC5jOjEyNjU6CisgICAgdWludDY0X3QgZXhlY19mcmVxID0gdGJfZ2V0X2FuZF9yZXNl
-dF9leGVjX2ZyZXEoKFRyYW5zbGF0aW9uQmxvY2sqKSBwKTsKCkVSUk9SOiAiKGZvbyopIiBzaG91
-bGQgYmUgIihmb28gKikiCiMxOTA6IEZJTEU6IGluY2x1ZGUvcW9tL2NwdS5oOjQ3NzoKK3VpbnQ2
-NF90IHRiX2dldF9hbmRfcmVzZXRfZXhlY19mcmVxKHN0cnVjdCBUcmFuc2xhdGlvbkJsb2NrKik7
-Cgp0b3RhbDogNSBlcnJvcnMsIDAgd2FybmluZ3MsIDE0NiBsaW5lcyBjaGVja2VkCgpQYXRjaCAy
-LzMgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjMvMyBDaGVja2luZyBjb21taXQgNjUxMjM4
-NzkzNDczIChBZGRpbmcgY29tbWFuZCBsaW5lIG9wdGlvbiB0byBsaW51eC11c2VyLikKRVJST1I6
-IGV4dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMgZmlsZXMKIzIyOiBGSUxFOiBsaW51eC11
-c2VyL2V4aXQuYzoyOToKK2V4dGVybiBib29sIGVuYWJsZV9mcmVxX2NvdW50OwoKdG90YWw6IDEg
-ZXJyb3JzLCAwIHdhcm5pbmdzLCAzMiBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzMgaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
-ZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRj
-aGV3Lm9yZy9sb2dzLzIwMTkwNjE0MTM1MzMyLjEyNzc3LTEtdmFuZGVyc29ubXIyQGdtYWlsLmNv
-bS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBh
-dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
-bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+This series of patches will build Heterogeneous Memory Attribute Table (HMAT)
+according to the command line. The ACPI HMAT describes the memory attributes,
+such as memory side cache attributes and bandwidth and latency details,
+related to the System Physical Address (SPA) Memory Ranges.
+The software is expected to use this information as hint for optimization.
+
+The V4 patches link:
+https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01644.html
+
+Changelog:
+v5:
+    - spilt the 1-6/11 and 8/11 from patch v4 to build Memory Subsystem
+    Address Range Structure(s) and System Locality Latency and Bandwidth
+    Information Structure(s) firstly.
+    - add 1/8 of patch v5 to simplify arm_load_dtb() (Igor)
+    - drop the helper machine_num_numa_nodes() and use
+    machine->numa_state->num_nodes (and numa_state->nodes) directly (Igor)
+    - Add more descriptions from ACPI spec (Igor)
+    - Add the reason of using stub (Igor)
+    - Use GArray for NUMA memory ranges data (Igor)
+    - Separate hmat_build_lb() (Igor)
+    - Drop all global variables and use local variables instead (Igor)
+    - Add error message when base unit < 10
+    - Update the hmat-lb option example by using '-numa cpu'
+    and '-numa memdev' (Igor)
+
+v4:
+    - send the patch of "move numa global variables into MachineState"
+    together with HMAT patches.
+    https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg03662.html
+    - spilt the 1/8 of v3 patch into two patches, 4/11 introduces
+    build_mem_ranges() and 5/11 builds HMAT (Igor)
+    - use build_append_int_noprefix() to build parts of ACPI table in
+    all patches (Igor)
+    - Split 8/8 of patch v3 into two parts, 10/11 introduces NFIT
+    generalizations (build_acpi_aml_common), and use it in 11/11 to
+    simplify hmat_build_aml (Igor)
+    - use MachineState instead of PCMachineState to build HMAT more
+    generalic (Igor)
+    - move the 7/8 v3 patch into the former patches
+    - update the version tag from 4.0 to 4.1
+v3:
+    - rebase the fixing patch into the jingqi's patches (Eric)
+    - update the version tag from 3.10 to 4.0 (Eric)
+v2:
+  Per Igor and Eric's comments, fix some coding style and small issues:
+    - update the version number in qapi/misc.json
+    - including the expansion of the acronym HMAT in qapi/misc.json
+    - correct spell mistakes in qapi/misc.json and qemu-options.hx
+    - fix the comment syle in hw/i386/acpi-build.c
+    and hw/acpi/hmat.h
+   - remove some unnecessary head files in hw/acpi/hmat.c 
+   - use hardcoded numbers from spec to generate
+   Memory Subsystem Address Range Structure in hw/acpi/hmat.c
+   - drop the struct AcpiHmat and AcpiHmatSpaRange
+    in hw/acpi/hmat.h
+   - rewrite NFIT code to build _HMA method
+
+Liu Jingqi (3):
+  hmat acpi: Build Memory Subsystem Address Range Structure(s) in ACPI
+    HMAT
+  hmat acpi: Build System Locality Latency and Bandwidth Information
+    Structure(s) in ACPI HMAT
+  numa: Extend the command-line to provide memory latency and bandwidth
+    information
+
+Tao Xu (5):
+  hw/arm: simplify arm_load_dtb
+  numa: move numa global variable nb_numa_nodes into MachineState
+  numa: move numa global variable have_numa_distance into MachineState
+  numa: move numa global variable numa_info into MachineState
+  acpi: introduce AcpiDeviceIfClass.build_mem_ranges hook
+
+ exec.c                               |   5 +-
+ hw/acpi/Kconfig                      |   5 +
+ hw/acpi/Makefile.objs                |   1 +
+ hw/acpi/aml-build.c                  |   9 +-
+ hw/acpi/hmat.c                       | 252 +++++++++++++++++++++++++++
+ hw/acpi/hmat.h                       |  82 +++++++++
+ hw/acpi/piix4.c                      |   1 +
+ hw/arm/aspeed.c                      |   5 +-
+ hw/arm/boot.c                        |  20 ++-
+ hw/arm/collie.c                      |   8 +-
+ hw/arm/cubieboard.c                  |   5 +-
+ hw/arm/exynos4_boards.c              |   7 +-
+ hw/arm/highbank.c                    |   8 +-
+ hw/arm/imx25_pdk.c                   |   5 +-
+ hw/arm/integratorcp.c                |   8 +-
+ hw/arm/kzm.c                         |   5 +-
+ hw/arm/mainstone.c                   |   5 +-
+ hw/arm/mcimx6ul-evk.c                |   5 +-
+ hw/arm/mcimx7d-sabre.c               |   5 +-
+ hw/arm/musicpal.c                    |   8 +-
+ hw/arm/nseries.c                     |   5 +-
+ hw/arm/omap_sx1.c                    |   5 +-
+ hw/arm/palm.c                        |  10 +-
+ hw/arm/raspi.c                       |   6 +-
+ hw/arm/realview.c                    |   5 +-
+ hw/arm/sabrelite.c                   |   5 +-
+ hw/arm/spitz.c                       |   5 +-
+ hw/arm/tosa.c                        |   8 +-
+ hw/arm/versatilepb.c                 |   5 +-
+ hw/arm/vexpress.c                    |   5 +-
+ hw/arm/virt-acpi-build.c             |  17 +-
+ hw/arm/virt.c                        |  16 +-
+ hw/arm/xilinx_zynq.c                 |   8 +-
+ hw/arm/xlnx-versal-virt.c            |   7 +-
+ hw/arm/xlnx-zcu102.c                 |   5 +-
+ hw/arm/z2.c                          |   8 +-
+ hw/core/machine.c                    |  16 +-
+ hw/i386/acpi-build.c                 | 140 +++++++++------
+ hw/i386/pc.c                         |  11 +-
+ hw/isa/lpc_ich9.c                    |   1 +
+ hw/mem/pc-dimm.c                     |   2 +
+ hw/pci-bridge/pci_expander_bridge.c  |   2 +
+ hw/ppc/spapr.c                       |  23 ++-
+ hw/ppc/spapr_pci.c                   |   2 +
+ include/hw/acpi/acpi_dev_interface.h |   4 +
+ include/hw/acpi/aml-build.h          |   2 +-
+ include/hw/arm/boot.h                |   4 +-
+ include/hw/boards.h                  |   2 +
+ include/hw/i386/pc.h                 |   1 +
+ include/qemu/typedefs.h              |   1 +
+ include/sysemu/numa.h                |  37 +++-
+ include/sysemu/sysemu.h              |  24 +++
+ monitor.c                            |  11 +-
+ numa.c                               | 219 +++++++++++++++++++----
+ qapi/misc.json                       |  94 +++++++++-
+ qemu-options.hx                      |  45 ++++-
+ stubs/Makefile.objs                  |   1 +
+ stubs/pc_build_mem_ranges.c          |  14 ++
+ 58 files changed, 961 insertions(+), 264 deletions(-)
+ create mode 100644 hw/acpi/hmat.c
+ create mode 100644 hw/acpi/hmat.h
+ create mode 100644 stubs/pc_build_mem_ranges.c
+
+-- 
+2.20.1
 
 
