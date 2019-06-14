@@ -2,94 +2,109 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4A9EC31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 13:00:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BB83C31E4C
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 13:04:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BD83208CA
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 13:00:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BD83208CA
+	by mail.kernel.org (Postfix) with ESMTPS id 5339921473
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 13:04:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5339921473
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51318 helo=lists.gnu.org)
+Received: from localhost ([::1]:51382 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbloM-0001dd-NT
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 09:00:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35158)
+	id 1hbls8-0002zQ-Hz
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 09:04:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35643)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hblmU-00015p-Jq
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 08:58:12 -0400
+ (envelope-from <lvivier@redhat.com>) id 1hbloc-0002By-KW
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:00:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hblmT-0004mg-13
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 08:58:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50980)
+ (envelope-from <lvivier@redhat.com>) id 1hbloa-0006IP-St
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:00:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44096)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hblmP-00049a-FW; Fri, 14 Jun 2019 08:58:05 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hbloa-0006Fu-Kt
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:00:20 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C4F0B30821C1;
- Fri, 14 Jun 2019 12:57:47 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.125])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C1FA61987;
- Fri, 14 Jun 2019 12:57:41 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190529154654.95870-1-vsementsov@virtuozzo.com>
- <20190529154654.95870-5-vsementsov@virtuozzo.com>
- <c31e0d6e-3754-8b22-ccee-84c772eca404@redhat.com>
- <7b401fba-36dd-d80e-966a-15fdd72ac335@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 3F3E185A03;
+ Fri, 14 Jun 2019 13:00:10 +0000 (UTC)
+Received: from [10.36.117.111] (ovpn-117-111.ams2.redhat.com [10.36.117.111])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F185467270;
+ Fri, 14 Jun 2019 13:00:05 +0000 (UTC)
+To: Amit Shah <amit@infradead.org>, qemu-devel@nongnu.org
+References: <20190611172032.19143-1-lvivier@redhat.com>
+ <8c2d26799074a46fb5f2aaae7dc4e951ec8318a2.camel@infradead.org>
+ <3ecdbf3e-abb1-b74c-7751-9740b5a2e4fc@redhat.com>
+ <34b3714f71373982264915d351c3161937500b1a.camel@infradead.org>
+From: Laurent Vivier <lvivier@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <825995ac-488e-b25c-c551-526812046caf@redhat.com>
-Date: Fri, 14 Jun 2019 14:57:38 +0200
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <b2ad8de7-e4a6-8679-83af-1d1fbab6d19b@redhat.com>
+Date: Fri, 14 Jun 2019 15:00:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <7b401fba-36dd-d80e-966a-15fdd72ac335@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="p0TFcz2mcVlkoux3LS1TDmeVAp0agcS2M"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <34b3714f71373982264915d351c3161937500b1a.camel@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Fri, 14 Jun 2019 12:57:47 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Fri, 14 Jun 2019 13:00:10 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v8 4/7] block: introduce backup-top filter
- driver
+Subject: Re: [Qemu-devel] [RFC] virtio-rng: add a watchdog
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,296 +116,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- Denis Lunev <den@virtuozzo.com>, "stefanha@redhat.com" <stefanha@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Amit Shah <amit@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---p0TFcz2mcVlkoux3LS1TDmeVAp0agcS2M
-Content-Type: multipart/mixed; boundary="6YzhKQ7eOx4uiWbZkf7TjvS5GaFK5npwn";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "fam@euphon.net" <fam@euphon.net>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>, "kwolf@redhat.com"
- <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
- "eblake@redhat.com" <eblake@redhat.com>
-Message-ID: <825995ac-488e-b25c-c551-526812046caf@redhat.com>
-Subject: Re: [PATCH v8 4/7] block: introduce backup-top filter driver
-References: <20190529154654.95870-1-vsementsov@virtuozzo.com>
- <20190529154654.95870-5-vsementsov@virtuozzo.com>
- <c31e0d6e-3754-8b22-ccee-84c772eca404@redhat.com>
- <7b401fba-36dd-d80e-966a-15fdd72ac335@virtuozzo.com>
-In-Reply-To: <7b401fba-36dd-d80e-966a-15fdd72ac335@virtuozzo.com>
-
---6YzhKQ7eOx4uiWbZkf7TjvS5GaFK5npwn
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 14.06.19 11:04, Vladimir Sementsov-Ogievskiy wrote:
-> 13.06.2019 18:57, Max Reitz wrote:
->> On 29.05.19 17:46, Vladimir Sementsov-Ogievskiy wrote:
->>> Backup-top filter does copy-before-write operation. It should be
->>> inserted above active disk and has a target node for CBW, like the
->>> following:
+On 14/06/2019 09:49, Amit Shah wrote:
+> On Thu, 2019-06-13 at 10:53 +0200, Laurent Vivier wrote:
+>> On 12/06/2019 09:03, Amit Shah wrote:
+>>> On Tue, 2019-06-11 at 19:20 +0200, Laurent Vivier wrote:
+>>>> The virtio-rng linux driver can be stuck in virtio_read() on a
+>>>> wait_for_completion_killable() call if the virtio-rng device in
+>>>> QEMU
+>>>> doesn't provide data.
+>>>>
+>>>> It's a problem, because virtio_read() is called from
+>>>> rng_get_data()
+>>>> with
+>>>> reading_mutex() held.  The same mutex is taken by
+>>>> add_early_randomness()
+>>>> and hwrng_fillfn() and this brings to a hang during the boot
+>>>> sequence
+>>>> if
+>>>> the virtio-rng driver is builtin.
+>>>> Moreover, another lock is taken (rng_mutex) when the hwrng driver
+>>>> wants to switch the RNG device or the user tries to unplug the
+>>>> virtio-rng
+>>>> PCI card, and this can hang too because the virtio-rng driver is
+>>>> only
+>>>> able
+>>>> to release the card if the virtio-rng device sends back the
+>>>> virtqueue
+>>>> element.
+>>>>
+>>>>   # echo -n virtio_rng.1 > /sys/class/misc/hw_random/rng_current
+>>>>   [  240.165234] INFO: task kworker/u2:1:34 blocked for more than
+>>>> 120
+>>>> seconds.
+>>>>   [  240.165961] "echo 0 >
+>>>> /proc/sys/kernel/hung_task_timeout_secs"
+>>>> disables this message.
+>>>>   [  240.166708] kworker/u2:1    D
+>>>> ffffffffb86b85a8     0    34      2 0x00000000
+>>>>   [  240.166714] Workqueue: kacpi_hotplug acpi_hotplug_work_fn
+>>>>   [  240.166716]  ffffa0e8f3c0b890 0000000000000046
+>>>> ffffa0e8f3c00000
+>>>> ffffa0e8f3c0bfd8
+>>>>   [  240.166717]  ffffa0e8f3c0bfd8 ffffa0e8f3c0bfd8
+>>>> ffffa0e8f3c00000
+>>>> ffffffffb86b85a0
+>>>>   [  240.166719]  ffffffffb86b85a4 ffffa0e8f3c00000
+>>>> 00000000ffffffff
+>>>> ffffffffb86b85a8
+>>>>   [  240.166720] Call Trace:
+>>>>   [  240.166725]  [<ffffffffb82a61c9>]
+>>>> schedule_preempt_disabled+0x29/0x70
+>>>>   [  240.166727]  [<ffffffffb82a40f7>]
+>>>> __mutex_lock_slowpath+0xc7/0x1d0
+>>>>   [  240.166728]  [<ffffffffb82a350f>] mutex_lock+0x1f/0x2f
+>>>>   [  240.166730]  [<ffffffffb8022b52>] hwrng_register+0x32/0x1d0
+>>>>   [  240.166733]  [<ffffffffc07fa149>] virtrng_scan+0x19/0x30
+>>>> [virtio_rng]
+>>>>   [  240.166744]  [<ffffffffc03108db>]
+>>>> virtio_dev_probe+0x1eb/0x290
+>>>> [virtio]
+>>>>   [  240.166746]  [<ffffffffb803d6e5>]
+>>>> driver_probe_device+0x145/0x3c0
+>>>>   ...
+>>>>
+>>>> In some case, the QEMU RNG backend is not able to provide data,
+>>>> and
+>>>> the virtio-rng device is not aware of that:
+>>>> - with rng-random using /dev/random and no entropy is available,
+>>>> - with rng-egd started with a socket in "server,nowait" mode and
+>>>>   no daemon connected,
+>>>> - with rng-egd and an egd daemon that is not providing enough
+>>>> data,
+>>>> - ...
+>>>>
+>>>> To release the locks regularly, this patch adds a watchdog in
+>>>> QEMU
+>>>> virtio-rng device that sends back to the guest the virtqueue
+>>>> buffer
+>>>> with a 0 byte payload. This case is expected and correctly
+>>>> managed by
+>>>> the hwrng core.
 >>>
->>>      +-------+
->>>      | Guest |
->>>      +-------+
->>>          |r,w
->>>          v
->>>      +------------+  target   +---------------+
->>>      | backup_top |---------->| target(qcow2) |
->>>      +------------+   CBW     +---------------+
->>>          |
->>> backing |r,w
->>>          v
->>>      +-------------+
->>>      | Active disk |
->>>      +-------------+
->>>
->>> The driver will be used in backup instead of write-notifiers.
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
->
->>> ---
->>>   block/backup-top.h  |  64 +++++++++
->>>   block/backup-top.c  | 322 +++++++++++++++++++++++++++++++++++++++++=
-+++
->>>   block/Makefile.objs |   2 +
->>>   3 files changed, 388 insertions(+)
->>>   create mode 100644 block/backup-top.h
->>>   create mode 100644 block/backup-top.c
->>>
->>> diff --git a/block/backup-top.h b/block/backup-top.h
->>> new file mode 100644
->>> index 0000000000..788e18c358
->>> --- /dev/null
->>> +++ b/block/backup-top.h
-
-[...]
-
->>> +/*
->>> + * bdrv_backup_top_append
->>> + *
->>> + * Append backup_top filter node above @source node. @target node wi=
-ll receive
->>> + * the data backed up during CBE operations. New filter together wit=
-h @target
->>> + * node are attached to @source aio context.
->>> + *
->>> + * The resulting filter node is implicit.
+>>> I'm wondering if it makes more sense to rework the way the kernel
+>>> driver requests for seeding entropy during probe.
 >>
->> Why?  It=E2=80=99s just as easy for the caller to just make it implici=
-t if it
->> should be.  (And usually the caller should decide that.)
->=20
-> Personally, I don't know what are the reasons for filters to bi implici=
-t or not,
-> I just made it like other job-filters.. I can move making-implicit to t=
-he caller
-> or drop it at all (if it will work).
-
-Nodes are implicit if they haven=E2=80=99t been added consciously by the =
-user.
-A node added by a block job can be non-implicit, too, as mirror shows;
-If the user specifies the filter-node-name option, they will know about
-the node, thus it is no longer implicit.
-
-If the user doesn=E2=80=99t know about the node (they didn=E2=80=99t give=
- the
-filter-node-name option), the node is implicit.
-
-[...]
-
->>> +static int coroutine_fn backup_top_co_flush(BlockDriverState *bs)
->>> +{
->>> +    if (!bs->backing) {
->>> +        return 0;
->>> +    }
->>> +
->>> +    return bdrv_co_flush(bs->backing->bs);
+>> The kernel side was my first angle of attack.
+>> I tried first to not block in add_early_randomness():
 >>
->> Should we flush the target, too?
->=20
-> Hm, you've asked it already, on previous version :)
-
-I wasn=E2=80=99t sure...
-
-> Backup don't do it,
-> so I just keep old behavior. And what is the reason to flush backup tar=
-get
-> on any guest flush?
-
-Hm, well, what=E2=80=99s the reason not to do it?
-Also, there are not only guest flushes.  bdrv_flush_all() exists, which
-is called when the guest is stopped.  So who is going to flush the
-target if not its parent?
-
-[...]
-
->>> +
->>> +    if (role =3D=3D &child_file) {
->>> +        /*
->>> +         * Target child
->>> +         *
->>> +         * Share write to target (child_file), to not interfere
->>> +         * with guest writes to its disk which may be in target back=
-ing chain.
->>> +         */
->>> +        if (perm & BLK_PERM_WRITE) {
->>> +            *nshared =3D *nshared | BLK_PERM_WRITE;
+>>   "hwrng: core - don't block in add_early_randomness()"
+>>   https://patchwork.kernel.org/patch/10877571/
 >>
->> Why not always share WRITE on the target?
->=20
-> Hmm, it's a bad thing to share writes on target, so I'm trying to reduc=
-e number of
-> cases when we have share it.
+>> But I agree with the maintainer, the problem must be fixed at virtio-
+>> rng 
+>> level.
+> 
+> Yea.
+> 
+> How much of this is due to 'rng-egd was not set up properly; the
+> backend did not appear in time' -- ie a setup problem; vs a problem we
+> can expect to recur?
 
-Is it?  First of all, this filter doesn=E2=80=99t care.  It doesn=E2=80=99=
-t even read
-from the target (related note: we probably don=E2=80=99t need CONSISTENT_=
-READ on
-the target).
+I agree there is a configuration issue here, but not only.
 
-Second, there is generally going to be a parent on backup-top that has
-the WRITE permission taken.  So this does not really effectively reduce
-that number of cases.
+Imagine the egd daemon on host hangs, is it normal the guest hangs (in
+the kernel) too?
 
->>> +        }
->>> +    } else {
->>> +        /* Source child */
->>> +        if (perm & BLK_PERM_WRITE) {
+It can also happen with rng-random on a host with not enough entropy.
+Imagine several guests on the same host that require entropy and there
+is not enough entropy for all.
+
+> The current patch affects *all* requests from the guest.  The problem
+> being seen though is just during the driver probe.  Is the current
+
+Not only during the device probe. It happens also when we try to unplug
+the virtio-rng card or when we try to switch rng backend in the guest
+kernel.
+
+> patch doing much more than is required?  Say the device runs out of
+> randomness to provide after setup - the guest's read calls will just
+> block and remain killable.  It's the probe currently that is not
+> killable.
+
+I don't think to be killable is the solution of the problem: who will
+kill it? How to know we need to kill something?
+Is this normal to have to explicitly kill a process when we want to
+unplug a card?
+
+> Other options to explore are:
+> 
+> 1. Ensure setup is ready (ie the device's backend is set up before
+> plugging in the device), so that the device is ready to serve requests
+> as soon as it's plugged in
+
+A way I have explored is to not set ready the virtio-rng device in QEMU
+if the backend is not ready (this should prevent the driver to be
+started in the guest), but this only fixes a problem at startup. It
+doesn't fix the problem if the EGD daemon on host hangs later or if
+there is no enough entropy on the host (with EGD or /dev/random).
+
+> 2. Make the add_early_randomness optional for virtio-rng.  (This is a
+> big hammer, and working around bad setup problems.)
+
+I've been tempted to remove it, but I don't remove code I don't
+understand: why do we need the add_early_randomness() in first place?
+
+>>> The virtio_read call is killable, so it can take signals when
+>>> initiated
+>>> by userspace.  For the initial probe, specifying a timeout /
+>>> watchdog
+>>> in the driver is better.
 >>
->> Or WRITE_UNCHANGED, no?
->=20
-> Why? We don't need doing CBW for unchanged write.
+...
+>> But I have a problem doing the timeout / watchdog at driver level:
+>> once 
+>> the buffer is submitted to the virtqueue, how to cancel it? Is there
+>> a 
+>> way to ask the QEMU device to not process the element in the
+>> virtqueue 
+>> we have stopped to wait for because of the timeout (or for the
+>> signal: I 
+>> don't understand how it works in this case. How it is canceled?)?
+> 
+> Could be achieved via a control command?  But all that sounds quite> ugly (and also requires host+guest modification).
+> 
 
-But we will do it still, won=E2=80=99t we?
+Adding a control command changes the specification of the device, can
+we? We need to add a queue, I guess?
 
-(If an unchanging write comes in, this driver will handle it just like a
-normal write, will it not?)
+So I think there is also a problem with the "killable" approach.
 
-[...]
+Using a watchdog in the QEMU device allows to remove the killable option
+and to avoid to have a lost request in the queue, without changing the
+specs, as the kernel rng core is able to manage 0 length data payload.
 
->>> +
->>> +BlockDriverState *bdrv_backup_top_append(BlockDriverState *source,
->>> +                                         BlockDriverState *target,
->>> +                                         HBitmap *copy_bitmap,
->>> +                                         Error **errp)
->>> +{
-
-[...]
-
->>> +}
->>
->> I guess it would be nice if it users could blockdev-add a backup-top
->> node to basically get a backup with sync=3Dnone.
->>
->> (The bdrv_open implementation should then create a new bitmap and
->> initialize it to be fully set.)
->>
->> But maybe it wouldn=E2=80=99t be so nice and I just have feverish drea=
-ms.
->=20
-> When series begun, I was trying to make exactly this - user-available f=
-ilter,
-> which may be used in separate, but you was against)
-
-Past me is stupid.
-
-> Maybe, not totally against, but I decided not to argue long, and instea=
-d make
-> filter implicit and drop public api (like mirror and commit filters), b=
-ut place it
-> in a separate file (no one will argue against putting large enough and =
-complete
-> new feature, represented by object into a separate file :). And this ac=
-tually
-> makes it easy to publish this filter at some moment. And now I think it=
- was
-> good decision anyway, as we postponed arguing around API and around sha=
-red dirty
-> bitmaps.
->=20
-> So publishing the filter is future step.
-
-OK, sure.
-
->>> +void bdrv_backup_top_set_progress_callback(
->>> +        BlockDriverState *bs, BackupTopProgressCallback progress_cb,=
-
->>> +        void *progress_opaque)
->>> +{
->>> +    BDRVBackupTopState *s =3D bs->opaque;
->>> +
->>> +    s->progress_cb =3D progress_cb;
->>> +    s->progress_opaque =3D progress_opaque;
->>> +}
->>> +
->>> +void bdrv_backup_top_drop(BlockDriverState *bs)
->>> +{
->>> +    BDRVBackupTopState *s =3D bs->opaque;
->>> +    AioContext *aio_context =3D bdrv_get_aio_context(bs);
->>> +
->>> +    aio_context_acquire(aio_context);
->>> +
->>> +    bdrv_drained_begin(bs);
->>> +
->>> +    bdrv_child_try_set_perm(bs->backing, 0, BLK_PERM_ALL, &error_abo=
-rt);
->>
->> Pre-existing in other jobs, but I think calling this function is
->> dangerous.  (Which is why I remove it in my =E2=80=9Cblock: Ignore loo=
-sening
->> perm restrictions failures=E2=80=9D series.)
->=20
-> Hmm, good thing.. Should I rebase on it?
-
-It would help me at least.
-
->>> +    bdrv_replace_node(bs, backing_bs(bs), &error_abort);
->>> +    bdrv_set_backing_hd(bs, NULL, &error_abort);
->>
->> I think some of this function should be in a .bdrv_close()
->> implementation, for example this bdrv_set_backing_hd() call.
->=20
-> Why? We don't have .bdrv_open, so why to have .bdrv_close? I think, whe=
-n
-> we publish this filter most of _add() and _drop() will be refactored to=
-
-> open() and close(). Is there a real reason to implement .close() now?
-
-Not really if it isn=E2=80=99t a usable block driver yet, no.
-
-Max
-
-
---6YzhKQ7eOx4uiWbZkf7TjvS5GaFK5npwn--
-
---p0TFcz2mcVlkoux3LS1TDmeVAp0agcS2M
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0DmcMACgkQ9AfbAGHV
-z0CO7wgAmdbLvl0p47veut+L1N2gdzolKlOI/zekW7k34AUnWYW/dEhyYAPOVeyd
-Odtiop0GuRUWsb5HY2pv4laLOGteLNLsBxOkBvmaGJS8PRKce4foFTOjaUjHPMGy
-5njZf3Gw56xy1hLqqZ5kTUi3JoEEFHCzJFUZZm3VoL5/CU61fKjSyl/URtpq2KRg
-GsIvAbFVS2aq6WleVgd/h2W+OHbZO9Sws4uSKUTZ48cusN60ZPyu1CgEY9WkdI4u
-FGAl2mNzPkpGGq7a5Amrfj7fr9BBYnnTpyUjz0jkiYdTAZuLoq0MqIKvc2D+tjwf
-q3LbF/Osy7iFY5W5UUL0rJy1xzQ9EA==
-=1Hhu
------END PGP SIGNATURE-----
-
---p0TFcz2mcVlkoux3LS1TDmeVAp0agcS2M--
+Thanks,
+Laurent
 
