@@ -6,61 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AC03C31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 13:44:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28392C31E4C
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 13:44:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA41F2168B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 13:44:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA41F2168B
+	by mail.kernel.org (Postfix) with ESMTPS id F29A52168B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 13:44:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F29A52168B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51678 helo=lists.gnu.org)
+Received: from localhost ([::1]:51682 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbmVg-0003yq-6V
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 09:44:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46193)
+	id 1hbmVh-00042H-8r
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 09:44:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46393)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1hbmRU-0001Wo-7m
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:40:33 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hbmRl-0001fH-TF
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:40:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1hbmRS-0005hA-SP
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:40:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50742)
+ (envelope-from <mreitz@redhat.com>) id 1hbmRk-0005vW-1U
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:40:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49952)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1hbmRQ-0005aD-1V; Fri, 14 Jun 2019 09:40:28 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hbmRe-0005pq-7q; Fri, 14 Jun 2019 09:40:44 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0DD63316290D;
- Fri, 14 Jun 2019 13:40:22 +0000 (UTC)
-Received: from [10.36.116.67] (ovpn-116-67.ams2.redhat.com [10.36.116.67])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A732F1001B1A;
- Fri, 14 Jun 2019 13:40:17 +0000 (UTC)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190611142821.3874-1-eric.auger@redhat.com>
- <20190611142821.3874-3-eric.auger@redhat.com>
- <CAFEAcA_OYdL1TPN+OTdkZ0J2fx_4vFiXCs0fUVdGjkkMURCfZA@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <ef87a46b-06fc-a66d-37ca-4499afc76663@redhat.com>
-Date: Fri, 14 Jun 2019 15:40:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 5D750C058CBA;
+ Fri, 14 Jun 2019 13:40:31 +0000 (UTC)
+Received: from localhost (unknown [10.40.205.125])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E6BA6601AC;
+ Fri, 14 Jun 2019 13:40:30 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Date: Fri, 14 Jun 2019 15:40:04 +0200
+Message-Id: <20190614134021.32486-4-mreitz@redhat.com>
+In-Reply-To: <20190614134021.32486-1-mreitz@redhat.com>
+References: <20190614134021.32486-1-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_OYdL1TPN+OTdkZ0J2fx_4vFiXCs0fUVdGjkkMURCfZA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Fri, 14 Jun 2019 13:40:27 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Fri, 14 Jun 2019 13:40:36 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/2] hw/arm/smmuv3: Implement dummy replay
+Subject: [Qemu-devel] [PULL 03/20] QEMUMachine: add events_wait method
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,87 +66,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Peter Xu <peterx@redhat.com>, Eric Auger <eric.auger.pro@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
+From: John Snow <jsnow@redhat.com>
 
-On 6/14/19 3:26 PM, Peter Maydell wrote:
-> On Tue, 11 Jun 2019 at 15:29, Eric Auger <eric.auger@redhat.com> wrote:
->>
->> On ARM we currently do not support VFIO-PCI devices protected
->> by the IOMMU. Any attempt to run such use case results in this
->> kind of warning:
->>
->> "-device vfio-pci,host=0004:01:00.0,id=hostdev0,bus=pci.1,addr=0x0:
->> warning: SMMUv3 does not support notification on MAP: device vfio-pci
->> will not function properly".
->>
->> However this is just a warning and this should not prevent the
->> guest from booting in a reasonable amount of time. This does not
->> happen currently.
->>
->> This is due to the fact the VFIO vfio_listener_region_add() calls
->> memory_region_iommu_replay(). As the SMMUv3 IOMMUMemoryRegionClass
->> currently does not implement the replay() callback, the default
->> memory_region_iommu_replay() implementation is used. This latter
->> loops on the whole notifier's range (48b address space), translates
->> each page and call the notifier on the resulting entry. This totally
->> freezes the guest.
->>
->> The Intel IOMMU implements the replay() function which only
->> notifies valid page table entries.
->>
->> In the looming SMMUv3 nested stage VFIO integration, there will be
->> no need to replay() anything as there will not be any shadow page
->> tables: the stage 1 page tables are owned by the guest.
->>
->> So let's implement a void replay() which satisfies both cases.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  hw/arm/smmuv3.c | 6 ++++++
->>  1 file changed, 6 insertions(+)
->>
->> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
->> index e2f07d2864..1f578365ef 100644
->> --- a/hw/arm/smmuv3.c
->> +++ b/hw/arm/smmuv3.c
->> @@ -1489,6 +1489,11 @@ static void smmuv3_notify_flag_changed(IOMMUMemoryRegion *iommu,
->>      }
->>  }
->>
->> +static inline void
->> +smmuv3_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
->> +{
->> +}
-> 
-> This doesn't seem like a valid implementation of the replay
-> method to me. The API doc comment says
->      * The default implementation of memory_region_iommu_replay() is to
->      * call the IOMMU translate method for every page in the address space
->      * with flag == IOMMU_NONE and then call the notifier if translate
->      * returns a valid mapping. If this method is implemented then it
->      * overrides the default behaviour, and must provide the full semantics
->      * of memory_region_iommu_replay(), by calling @notifier for every
->      * translation present in the IOMMU.
-> 
-> This empty function is definitely not going to call the notifier
-> for every IOMMU translation...
-The situation is a bit odd. SMMUv3 is not integrated with VFIO so VFIO
-devices will not work anyway (we are not able to notify on MAP). There
-is a warning already reporting the issue. However the default
-implementation of memory_region_iommu_replay() prevents the guest from
-booting. So what would you advise?
+Instead of event_wait which looks for a single event, add an events_wait
+which can look for any number of events simultaneously. However, it
+will still only return one at a time, whichever happens first.
 
-Thanks
+Signed-off-by: John Snow <jsnow@redhat.com>
+Message-id: 20190523170643.20794-4-jsnow@redhat.com
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ python/qemu/__init__.py | 69 +++++++++++++++++++++++++++++------------
+ 1 file changed, 49 insertions(+), 20 deletions(-)
 
-Eric
-> 
-> thanks
-> -- PMM
-> 
+diff --git a/python/qemu/__init__.py b/python/qemu/__init__.py
+index 81d9657ec0..98ed8a2e28 100644
+--- a/python/qemu/__init__.py
++++ b/python/qemu/__init__.py
+@@ -402,42 +402,71 @@ class QEMUMachine(object):
+         self._qmp.clear_events()
+         return events
+=20
+-    def event_wait(self, name, timeout=3D60.0, match=3DNone):
++    @staticmethod
++    def event_match(event, match=3DNone):
+         """
+-        Wait for specified timeout on named event in QMP; optionally fil=
+ter
+-        results by match.
++        Check if an event matches optional match criteria.
+=20
+-        The 'match' is checked to be a recursive subset of the 'event'; =
+skips
+-        branch processing on match's value None
+-           {"foo": {"bar": 1}} matches {"foo": None}
+-           {"foo": {"bar": 1}} does not matches {"foo": {"baz": None}}
++        The match criteria takes the form of a matching subdict. The eve=
+nt is
++        checked to be a superset of the subdict, recursively, with match=
+ing
++        values whenever those values are not None.
++
++        Examples, with the subdict queries on the left:
++         - None matches any object.
++         - {"foo": None} matches {"foo": {"bar": 1}}
++         - {"foo": {"baz": None}} does not match {"foo": {"bar": 1}}
++         - {"foo": {"baz": 2}} matches {"foo": {"bar": 1, "baz": 2}}
+         """
+-        def event_match(event, match=3DNone):
+-            if match is None:
+-                return True
++        if match is None:
++            return True
+=20
+-            for key in match:
+-                if key in event:
+-                    if isinstance(event[key], dict):
+-                        if not event_match(event[key], match[key]):
+-                            return False
+-                    elif event[key] !=3D match[key]:
++        for key in match:
++            if key in event:
++                if isinstance(event[key], dict):
++                    if not QEMUMachine.event_match(event[key], match[key=
+]):
+                         return False
+-                else:
++                elif event[key] !=3D match[key]:
+                     return False
++            else:
++                return False
++        return True
+=20
+-            return True
++    def event_wait(self, name, timeout=3D60.0, match=3DNone):
++        """
++        event_wait waits for and returns a named event from QMP with a t=
+imeout.
++
++        name: The event to wait for.
++        timeout: QEMUMonitorProtocol.pull_event timeout parameter.
++        match: Optional match criteria. See event_match for details.
++        """
++        return self.events_wait([(name, match)], timeout)
++
++    def events_wait(self, events, timeout=3D60.0):
++        """
++        events_wait waits for and returns a named event from QMP with a =
+timeout.
++
++        events: a sequence of (name, match_criteria) tuples.
++                The match criteria are optional and may be None.
++                See event_match for details.
++        timeout: QEMUMonitorProtocol.pull_event timeout parameter.
++        """
++        def _match(event):
++            for name, match in events:
++                if (event['event'] =3D=3D name and
++                    self.event_match(event, match)):
++                    return True
++            return False
+=20
+         # Search cached events
+         for event in self._events:
+-            if (event['event'] =3D=3D name) and event_match(event, match=
+):
++            if _match(event):
+                 self._events.remove(event)
+                 return event
+=20
+         # Poll for new events
+         while True:
+             event =3D self._qmp.pull_event(wait=3Dtimeout)
+-            if (event['event'] =3D=3D name) and event_match(event, match=
+):
++            if _match(event):
+                 return event
+             self._events.append(event)
+=20
+--=20
+2.21.0
+
 
