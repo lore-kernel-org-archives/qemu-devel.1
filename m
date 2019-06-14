@@ -2,110 +2,89 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAE5CC31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 17:24:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE222C31E4B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 17:25:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 89256217F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 17:24:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D680217F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 17:25:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="YLWA0z4L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89256217F9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HaE+yRpn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D680217F9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53742 helo=lists.gnu.org)
+Received: from localhost ([::1]:53750 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbpvv-0002dA-R3
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 13:24:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53959)
+	id 1hbpwl-0003N6-PM
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 13:25:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56048)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hbphO-0005se-JK
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:09:13 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hbpkL-0000fC-1a
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:12:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hbpWr-000642-1U
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 12:58:18 -0400
-Received: from mail-eopbgr150120.outbound.protection.outlook.com
- ([40.107.15.120]:35406 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1hbpWq-00061f-R3; Fri, 14 Jun 2019 12:58:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e0OAkxfSh0LW63s9vzJb5xTXobySFyWQiuXtsTx/SAc=;
- b=YLWA0z4LRp+PCxeVPPN8+ZMtC2a/m64/KU8G2IsobSo4rXWPT7EmPK+MdHQFxzvGuwZe8KiqBMWtMDKg0spNdBOP4nfJRjJ8a4oAk1KAFpZpg80PLBN7wmdeZmfFLNvzubbdbMZVaxgsO5xXyt23oB1go2M5QSaEhNXGY/qY+4E=
-Received: from AM0PR08MB3572.eurprd08.prod.outlook.com (20.177.110.153) by
- AM0PR08MB3076.eurprd08.prod.outlook.com (52.134.93.25) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1987.13; Fri, 14 Jun 2019 16:58:14 +0000
-Received: from AM0PR08MB3572.eurprd08.prod.outlook.com
- ([fe80::d064:530:c7:ad76]) by AM0PR08MB3572.eurprd08.prod.outlook.com
- ([fe80::d064:530:c7:ad76%6]) with mapi id 15.20.1987.012; Fri, 14 Jun 2019
- 16:58:14 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Thread-Topic: [PATCH v5 23/42] blockdev: Use CAF in external_snapshot_prepare()
-Thread-Index: AQHVIWu9uMzK/TD2M0yxTGXrEn+VtaabgCGA///XNwCAAAqDAA==
-Date: Fri, 14 Jun 2019 16:58:13 +0000
-Message-ID: <50d7843c-5110-fb93-41a0-e45d8a9b43f6@virtuozzo.com>
-References: <20190612221004.2317-1-mreitz@redhat.com>
- <20190612221004.2317-24-mreitz@redhat.com>
- <112404e2-7172-865c-d888-6a5cddcc40ec@virtuozzo.com>
- <b875c83b-c3a8-3a2c-2e92-716f5dc4411a@redhat.com>
-In-Reply-To: <b875c83b-c3a8-3a2c-2e92-716f5dc4411a@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0901CA0046.eurprd09.prod.outlook.com
- (2603:10a6:3:45::14) To AM0PR08MB3572.eurprd08.prod.outlook.com
- (2603:10a6:208:e1::25)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190614195812005
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a99f87c3-3bc7-4335-f0d3-08d6f0e97d1f
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:AM0PR08MB3076; 
-x-ms-traffictypediagnostic: AM0PR08MB3076:
-x-microsoft-antispam-prvs: <AM0PR08MB3076CE9A4EADB67FFF52531EC1EE0@AM0PR08MB3076.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 0068C7E410
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(39850400004)(366004)(376002)(346002)(396003)(136003)(189003)(199004)(14454004)(110136005)(7736002)(99286004)(36756003)(54906003)(26005)(76176011)(52116002)(305945005)(478600001)(186003)(68736007)(316002)(53546011)(386003)(25786009)(31696002)(53936002)(2906002)(8936002)(8676002)(6506007)(86362001)(102836004)(81156014)(81166006)(6486002)(11346002)(6116002)(6512007)(256004)(14444005)(6436002)(71200400001)(71190400001)(476003)(3846002)(229853002)(2616005)(446003)(31686004)(486006)(6246003)(73956011)(66556008)(64756008)(5660300002)(66476007)(4326008)(66066001)(66946007)(2501003)(66446008);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB3076;
- H:AM0PR08MB3572.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: fwEW47kkt30mweMF49sCrRwM6gBxjwnVRhLI3Xi3KOy7qT0NSuQ3EvxKiCjHV8AU9Up3Jg9XuVu/hrbsP29fO1wCkNiS8u2xiEZkI1zJUsk6y5qrBvWDPPizmyJKrXgyeDsc0SSDwBVrGdsptXWfAOo6CByhfgRuhs+Etj1NPbu5A0TbW96Y5CLUzggova1di8Gl1Wk/OG9I8TU5e9e6QENFRHCYy/VbkWu9OZ49J4jiMIbFGyLMMYYDG7Bldi7ASCpnLIZumoUsrOV35NqINqjWwSKZB56rug7JR+SVLCJd8Cpcr6kYuVxygyOnx1kyMOpyABYhmLCwwMP3ouivsGx9HRkLttJtsoK2n0t0MsjqU24BPvE9LESa0AQha9t9gegYIhXmsRh3CTghiPhhBWj0fjaPwXCN3V82KlFSHsA=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <732C993499998840924566E19B06C661@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <alex.bennee@linaro.org>) id 1hbpkI-00032P-KC
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:12:12 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:33422)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hbpkI-00031I-Aq
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:12:10 -0400
+Received: by mail-wm1-x343.google.com with SMTP id h19so9330987wme.0
+ for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 10:12:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=+NsNu/fQ72HqiGPytLgCEAG9ztz6pLZ4BO4isDX3okI=;
+ b=HaE+yRpnAcYcrv/zOu0tsRujZo0VdTZdm0oYvicFr/KucEVxuO+sdL5x5ELipwLDat
+ QB5an6c6CgPzBmA5WgOi5WIBH13e1Pl4TLLbGhPfdw3n6URG9Fm457znyuJ6apqB4Tzn
+ baNH3jukTIbTO8mJATZtteIZn0mmTF1fh4nTiaLsZ/dAeseDipIB9XZCCDdPPmypE2Gz
+ hv7ZNdVmn+h8zDCBcF72r9vOlBqQnEANDbZ3mx5rjhYLJxmxmS7gzEtP+PQqZR7zsysC
+ CCKB78o2pSedK2N/wkWJ0PmEbXDU/VXSRcwEPse/WOMP1JDnf2XWHH7CkYJi75siaF3Q
+ r5lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=+NsNu/fQ72HqiGPytLgCEAG9ztz6pLZ4BO4isDX3okI=;
+ b=iw1qgPi9oMe3MVqBoZvy5wl4Fva6O4rprz5AfVk4si4Fti7CXrS9yEAjNN/9AGouU1
+ ex7xnH7jTLsbukJbWTpn0MaDXXwPt/Wk1bacmlqeM/n6TruXuoV2t2F/Ed42QVd40N6x
+ lN5C3B3wfQiBDSc6gHsv1cCIftqUxJWBkS/HrENEgEx5PUIu+sH4z6YNrO8EYJTzr+jh
+ dABEkQZIGvlMUeAIVfUl3yFxPDIY908zoYm+2Y9Pg+lUnHsjECqcNWGaP+fd5qoYUpF9
+ eDj8/7u9O5tqlBOQDQ7gtOUBQwnzVehOZTXeh6YaJzPzO0U5wmJ7oUkMNBn0nlHV97+K
+ 1H2w==
+X-Gm-Message-State: APjAAAUnK1KnvgGWKB+pm444w76b5EbBqIjJtPHTsKTqjNY0uYNY4djY
+ hgtFtUQrxwHW50tkI79zsec2+Q==
+X-Google-Smtp-Source: APXvYqx50s14IHdIB7zQexL3mBSrztav3kuTm2g4ETiJsaUXhQwNTWW7F24RPcivVwrfq0/NNDYJVw==
+X-Received: by 2002:a1c:f21a:: with SMTP id s26mr8512836wmc.163.1560532329097; 
+ Fri, 14 Jun 2019 10:12:09 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id m9sm4276670wrr.14.2019.06.14.10.12.02
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 14 Jun 2019 10:12:05 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 0BC9E1FF96;
+ Fri, 14 Jun 2019 18:12:01 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Fri, 14 Jun 2019 18:11:17 +0100
+Message-Id: <20190614171200.21078-8-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190614171200.21078-1-alex.bennee@linaro.org>
+References: <20190614171200.21078-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a99f87c3-3bc7-4335-f0d3-08d6f0e97d1f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jun 2019 16:58:13.9243 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vsementsov@virtuozzo.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3076
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.15.120
-Subject: Re: [Qemu-devel] [PATCH v5 23/42] blockdev: Use CAF in
- external_snapshot_prepare()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
+Subject: [Qemu-devel] [PATCH  v3 07/50] plugin: add user-facing API
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,42 +96,374 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "Emilio G. Cota" <cota@braap.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MTQuMDYuMjAxOSAxOToyMCwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAxNC4wNi4xOSAxNzo0Niwg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDEzLjA2LjIwMTkgMTowOSwg
-TWF4IFJlaXR6IHdyb3RlOg0KPj4+IFRoaXMgYWxsb3dzIHVzIHRvIGRpZmZlcmVudGlhdGUgYmV0
-d2VlbiBmaWx0ZXJzIGFuZCBub2RlcyB3aXRoIENPVw0KPj4+IGJhY2tpbmcgZmlsZXM6IEZpbHRl
-cnMgY2Fubm90IGJlIHVzZWQgYXMgb3ZlcmxheXMgYXQgYWxsIChmb3IgdGhpcw0KPj4+IGZ1bmN0
-aW9uKS4NCj4+Pg0KPj4+IFNpZ25lZC1vZmYtYnk6IE1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5j
-b20+DQo+Pg0KPj4gT3ZlcmxheSBjcmVhdGVkIGluIHNuYXBzaG90IG9wZXJhdGlvbiBhc3N1bWVk
-IHRvIGNvbnN1bWUgZm9sbG93aW5nIHdyaXRlcw0KPj4gYW5kIGl0J3MgZmlsdGVyZWQgY2hpbGQg
-YmVjb21lcyByZWFkb25seS4uIEFuZCBmaWx0ZXIgd29ya3MgaW4gY29tcGxldGVseSBhbm90aGVy
-DQo+PiB3YXkuDQo+Pg0KPj4gUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNr
-aXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+DQo+PiBbaG1tLCBJIHN0YXJ0IHRvIGxp
-a2UgdXNpbmcgImZpbHRlcmVkIGNoaWxkIiBjb2xsb2NhdGlvbiB3aGVuIEkgc2F5IGFib3V0IHRo
-aXMgdGhpbmcuDQo+PiAgICBkaWRuJ3QgeW91IHRoaW5rIGFib3V0IHJlbmFtaW5nIGJhY2tpbmcg
-Y2hhaW4gdG8gZmlsdGVyZWQgY2hhaW4/XQ0KPiANCj4gSG0uICBUaGVyZSBhcmUgYmFja2luZyBj
-aGFpbnMgYW5kIHRoZXJlIGFyZSBiYWNraW5nIGNoYWlucy4gIFRoZXJlIGFyZQ0KPiBxZW11LWlu
-dGVybmFsIGJhY2tpbmcgY2hhaW5zIHRoYXQgY29uc2lzdCBvZiBhIGhlYWx0aHkgbWl4IG9mIGZp
-bHRlcnMNCj4gYW5kIENPVyBvdmVybGF5cywgYW5kIHRoZW4gdGhlcmUgYXJlIHRoZSBtb3JlIGhp
-Z2gtbGV2ZWwgYmFja2luZyBjaGFpbnMNCj4gdGhlIHVzZXIgYWN0dWFsbHkgbWFuYWdlcywgd2hl
-cmUgb25seSB0aGUgb3ZlcmxheXMgYXJlIGltcG9ydGFudC4NCj4gDQo+IEkgdGhpbmsgaXQgd291
-bGQgbWFrZSBzZW5zZSB0byByZW5hbWUgdGhlIOKAnHFlbXUtaW50ZXJuYWwgYmFja2luZyBjaGFp
-bnMiDQo+IHRvIOKAnGZpbHRlciBjaGFpbnPigJ0gb3Igc29tZXRoaW5nLiAgQnV0IHRoYXQgbWFr
-ZXMgaXQgc291bmQgYSBiaXQgbGlrZSBpdA0KPiB3b3VsZCBvbmx5IG1lYW4gUi9XIGZpbHRlcnMu
-Li4gIE1heWJlIGp1c3Qg4oCcY2hhaW7igJ0/DQo+IA0KPiBBY3R1YWxseSwgdGhlIG9ubHkgZnVu
-Y3Rpb25zIEkgZmluZCBhcmUgaXNfYmFja2luZ19jaGFpbl9mcm96ZW4gJiBDbywNCj4gYW5kIHRo
-ZXkgY291bGQgc2ltcGx5IGJlY29tZSBpc19jaGFpbl9mcm96ZW4uICBJcyB0aGVyZSBhbnl0aGlu
-ZyBlbHNlPw0KDQpDaGFpbiBpcyB0b28gZ2VuZXJhbCwgbWF5IGJlLCBibG9ja2NoYWluPyA6KSkp
-DQoNCkFuZCB0byBiZSBzZXJpb3VzLCBvbmUgbW9yZSByZWFzb24gdG8gcmVuYW1lIGl0IGlzIHlv
-dXJzDQpiZHJ2X2JhY2tpbmdfY2hhaW5fbmV4dCB3aGljaCBpcyBhYm91dCB1c2VyLWJhY2tpbmct
-Y2hhaW4gYW5kIGRpZmZlcnMgZnJvbQ0KZnJvemVuLWNoYWluIHJlbGF0ZWQgZnVuY3Rpb25zLg0K
-DQpIb3dldmVyLCBJIGRvbid0IHRoaW5rIHRoYXQgdGhlc2Ugc2VyaWVzIGlzIGdvb2QgcGxhY2Ug
-Zm9yIHRoaXMgcmVuYW1pbmcsDQppdCdzIHJhdGhlciBiaWcgYWxyZWFkeS4NCg0KLS0gDQpCZXN0
-IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+From: "Emilio G. Cota" <cota@braap.org>
+
+Add the API first to ease review.
+
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+
+---
+v3
+  - merge in changes to plugin install/reset/uninstall
+  - split api file
+---
+ include/qemu/qemu-plugin.h | 339 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 339 insertions(+)
+ create mode 100644 include/qemu/qemu-plugin.h
+
+diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
+new file mode 100644
+index 0000000000..0db1ef9714
+--- /dev/null
++++ b/include/qemu/qemu-plugin.h
+@@ -0,0 +1,339 @@
++/*
++ * Copyright (C) 2017, Emilio G. Cota <cota@braap.org>
++ * Copyright (C) 2019, Linaro
++ *
++ * License: GNU GPL, version 2 or later.
++ *   See the COPYING file in the top-level directory.
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++#ifndef QEMU_PLUGIN_API_H
++#define QEMU_PLUGIN_API_H
++
++#include <inttypes.h>
++#include <stdbool.h>
++
++/*
++ * For best performance, build the plugin with -fvisibility=hidden so that
++ * QEMU_PLUGIN_LOCAL is implicit. Then, just mark qemu_plugin_install with
++ * QEMU_PLUGIN_EXPORT. For more info, see
++ *   https://gcc.gnu.org/wiki/Visibility
++ */
++#if defined _WIN32 || defined __CYGWIN__
++  #ifdef BUILDING_DLL
++    #define QEMU_PLUGIN_EXPORT __declspec(dllexport)
++  #else
++    #define QEMU_PLUGIN_EXPORT __declspec(dllimport)
++  #endif
++  #define QEMU_PLUGIN_LOCAL
++#else
++  #if __GNUC__ >= 4
++    #define QEMU_PLUGIN_EXPORT __attribute__((visibility("default")))
++    #define QEMU_PLUGIN_LOCAL  __attribute__((visibility("hidden")))
++  #else
++    #define QEMU_PLUGIN_EXPORT
++    #define QEMU_PLUGIN_LOCAL
++  #endif
++#endif
++
++typedef uint64_t qemu_plugin_id_t;
++
++/**
++ * qemu_plugin_install() - Install a plugin
++ * @id: this plugin's opaque ID
++ * @argc: number of arguments
++ * @argv: array of arguments (@argc elements)
++ *
++ * All plugins must export this symbol.
++ *
++ * Note: Calling qemu_plugin_uninstall() from this function is a bug. To raise
++ * an error during install, return !0.
++ *
++ * Note: @argv remains valid throughout the lifetime of the loaded plugin.
++ */
++QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
++                                           char **argv);
++
++/*
++ * Prototypes for the various callback styles we will be registering
++ * in the following functions.
++ */
++typedef void (*qemu_plugin_simple_cb_t)(qemu_plugin_id_t id);
++
++typedef void (*qemu_plugin_udata_cb_t)(qemu_plugin_id_t id, void *userdata);
++
++typedef void (*qemu_plugin_vcpu_simple_cb_t)(qemu_plugin_id_t id,
++                                             unsigned int vcpu_index);
++
++typedef void (*qemu_plugin_vcpu_udata_cb_t)(unsigned int vcpu_index,
++                                            void *userdata);
++
++/**
++ * qemu_plugin_uninstall() - Uninstall a plugin
++ * @id: this plugin's opaque ID
++ * @cb: callback to be called once the plugin has been removed
++ *
++ * Do NOT assume that the plugin has been uninstalled once this function
++ * returns. Plugins are uninstalled asynchronously, and therefore the given
++ * plugin receives callbacks until @cb is called.
++ *
++ * Note: Calling this function from qemu_plugin_install() is a bug.
++ */
++void qemu_plugin_uninstall(qemu_plugin_id_t id, qemu_plugin_simple_cb_t cb);
++
++/**
++ * qemu_plugin_reset() - Reset a plugin
++ * @id: this plugin's opaque ID
++ * @cb: callback to be called once the plugin has been reset
++ *
++ * Unregisters all callbacks for the plugin given by @id.
++ *
++ * Do NOT assume that the plugin has been reset once this function returns.
++ * Plugins are reset asynchronously, and therefore the given plugin receives
++ * callbacks until @cb is called.
++ */
++void qemu_plugin_reset(qemu_plugin_id_t id, qemu_plugin_simple_cb_t cb);
++
++/**
++ * qemu_plugin_register_vcpu_init_cb() - register a vCPU initialization callback
++ * @id: plugin ID
++ * @cb: callback function
++ *
++ * The @cb function is called every time a vCPU is initialized.
++ *
++ * See also: qemu_plugin_register_vcpu_exit_cb()
++ */
++void qemu_plugin_register_vcpu_init_cb(qemu_plugin_id_t id,
++                                       qemu_plugin_vcpu_simple_cb_t cb);
++
++/**
++ * qemu_plugin_register_vcpu_exit_cb() - register a vCPU exit callback
++ * @id: plugin ID
++ * @cb: callback function
++ *
++ * The @cb function is called every time a vCPU exits.
++ *
++ * See also: qemu_plugin_register_vcpu_init_cb()
++ */
++void qemu_plugin_register_vcpu_exit_cb(qemu_plugin_id_t id,
++                                       qemu_plugin_vcpu_simple_cb_t cb);
++
++/**
++ * qemu_plugin_register_vcpu_idle_cb() - register a vCPU idle callback
++ * @id: plugin ID
++ * @cb: callback function
++ *
++ * The @cb function is called every time a vCPU idles.
++ */
++void qemu_plugin_register_vcpu_idle_cb(qemu_plugin_id_t id,
++                                       qemu_plugin_vcpu_simple_cb_t cb);
++
++/**
++ * qemu_plugin_register_vcpu_resume_cb() - register a vCPU resume callback
++ * @id: plugin ID
++ * @cb: callback function
++ *
++ * The @cb function is called every time a vCPU resumes execution.
++ */
++void qemu_plugin_register_vcpu_resume_cb(qemu_plugin_id_t id,
++                                         qemu_plugin_vcpu_simple_cb_t cb);
++
++/*
++ * Opaque types that the plugin is given during the translation and
++ * instrumentation phase.
++ */
++struct qemu_plugin_tb;
++struct qemu_plugin_insn;
++
++enum qemu_plugin_cb_flags {
++    QEMU_PLUGIN_CB_NO_REGS, /* callback does not access the CPU's regs */
++    QEMU_PLUGIN_CB_R_REGS,  /* callback reads the CPU's regs */
++    QEMU_PLUGIN_CB_RW_REGS, /* callback reads and writes the CPU's regs */
++};
++
++enum qemu_plugin_mem_rw {
++    QEMU_PLUGIN_MEM_R = 1,
++    QEMU_PLUGIN_MEM_W,
++    QEMU_PLUGIN_MEM_RW,
++};
++
++/**
++ * qemu_plugin_register_vcpu_tb_trans_cb() - register a translate cb
++ * @id: plugin ID
++ * @cb: callback function
++ *
++ * The @cb function is called every time a translation occurs. The @cb
++ * function is passed an opaque qemu_plugin_type which is can query
++ * for additional information including the list of translated
++ * instructions. At this point the plugin can register further
++ * callbacks to be triggered when the block or individual instruction
++ * executes.
++ */
++typedef void (*qemu_plugin_vcpu_tb_trans_cb_t)(qemu_plugin_id_t id,
++                                               unsigned int vcpu_index,
++                                               struct qemu_plugin_tb *tb);
++
++void qemu_plugin_register_vcpu_tb_trans_cb(qemu_plugin_id_t id,
++                                           qemu_plugin_vcpu_tb_trans_cb_t cb);
++
++/**
++ * qemu_plugin_register_vcpu_tb_trans_exec_cb() - register execution callback
++ * @tb: the opaque qemu_plugin_tb handle for the translation
++ * @cb: callback function
++ * @flags: does the plugin read or write the CPU's registers?
++ * @userdata: any plugin data to pass to the @cb?
++ *
++ * The @cb function is called every time a translated unit executes.
++ */
++void qemu_plugin_register_vcpu_tb_exec_cb(struct qemu_plugin_tb *tb,
++                                          qemu_plugin_vcpu_udata_cb_t cb,
++                                          enum qemu_plugin_cb_flags flags,
++                                          void *userdata);
++
++enum qemu_plugin_op {
++    QEMU_PLUGIN_INLINE_ADD_U64,
++};
++
++/**
++ * qemu_plugin_register_vcpu_tb_trans_exec_inline() - execution inline op
++ * @tb: the opaque qemu_plugin_tb handle for the translation
++ * @op: the type of qemu_plugin_op (e.g. ADD_U64)
++ * @ptr: the target memory location for the op
++ * @imm: the op data (e.g. 1)
++ *
++ * Insert an inline op to every time a translated unit executes.
++ * Useful if you just want to increment a single counter somewhere in
++ * memory.
++ */
++void qemu_plugin_register_vcpu_tb_exec_inline(struct qemu_plugin_tb *tb,
++                                              enum qemu_plugin_op op,
++                                              void *ptr, uint64_t imm);
++
++/**
++ * qemu_plugin_register_vcpu_insn_exec_cb() - register insn execution cb
++ * @insn: the opaque qemu_plugin_insn handle for an instruction
++ * @cb: callback function
++ * @flags: does the plugin read or write the CPU's registers?
++ * @userdata: any plugin data to pass to the @cb?
++ *
++ * The @cb function is called every time an instruction is executed
++ */
++void qemu_plugin_register_vcpu_insn_exec_cb(struct qemu_plugin_insn *insn,
++                                            qemu_plugin_vcpu_udata_cb_t cb,
++                                            enum qemu_plugin_cb_flags flags,
++                                            void *userdata);
++
++/**
++ * qemu_plugin_register_vcpu_insn_exec_inline() - insn execution inline op
++ * @insn: the opaque qemu_plugin_insn handle for an instruction
++ * @cb: callback function
++ * @op: the type of qemu_plugin_op (e.g. ADD_U64)
++ * @ptr: the target memory location for the op
++ * @imm: the op data (e.g. 1)
++ *
++ * Insert an inline op to every time an instruction executes. Useful
++ * if you just want to increment a single counter somewhere in memory.
++ */
++void qemu_plugin_register_vcpu_insn_exec_inline(struct qemu_plugin_insn *insn,
++                                                enum qemu_plugin_op op,
++                                                void *ptr, uint64_t imm);
++
++/*
++ * Helpers to query information about the instructions in a block
++ */
++size_t qemu_plugin_tb_n_insns(const struct qemu_plugin_tb *tb);
++
++uint64_t qemu_plugin_tb_vaddr(const struct qemu_plugin_tb *tb);
++
++struct qemu_plugin_insn *
++qemu_plugin_tb_get_insn(const struct qemu_plugin_tb *tb, size_t idx);
++
++const void *qemu_plugin_insn_data(const struct qemu_plugin_insn *insn);
++
++size_t qemu_plugin_insn_size(const struct qemu_plugin_insn *insn);
++
++uint64_t qemu_plugin_insn_vaddr(const struct qemu_plugin_insn *insn);
++void *qemu_plugin_insn_haddr(const struct qemu_plugin_insn *insn);
++
++/*
++ * Memory Instrumentation
++ */
++typedef uint32_t qemu_plugin_meminfo_t;
++
++unsigned qemu_plugin_mem_size_shift(qemu_plugin_meminfo_t info);
++bool qemu_plugin_mem_is_sign_extended(qemu_plugin_meminfo_t info);
++bool qemu_plugin_mem_is_big_endian(qemu_plugin_meminfo_t info);
++bool qemu_plugin_mem_is_store(qemu_plugin_meminfo_t info);
++
++typedef void
++(*qemu_plugin_vcpu_mem_cb_t)(unsigned int vcpu_index,
++                             qemu_plugin_meminfo_t info, uint64_t vaddr,
++                             void *userdata);
++
++typedef void
++(*qemu_plugin_vcpu_mem_haddr_cb_t)(unsigned int vcpu_index,
++                                   qemu_plugin_meminfo_t info, uint64_t vaddr,
++                                   void *haddr, void *userdata);
++
++void qemu_plugin_register_vcpu_mem_cb(struct qemu_plugin_insn *insn,
++                                      qemu_plugin_vcpu_mem_cb_t cb,
++                                      enum qemu_plugin_cb_flags flags,
++                                      enum qemu_plugin_mem_rw rw,
++                                      void *userdata);
++
++void qemu_plugin_register_vcpu_mem_haddr_cb(struct qemu_plugin_insn *insn,
++                                            qemu_plugin_vcpu_mem_haddr_cb_t cb,
++                                            enum qemu_plugin_cb_flags flags,
++                                            enum qemu_plugin_mem_rw rw,
++                                            void *userdata);
++
++void qemu_plugin_register_vcpu_mem_inline(struct qemu_plugin_insn *insn,
++                                          enum qemu_plugin_mem_rw rw,
++                                          enum qemu_plugin_op op, void *ptr,
++                                          uint64_t imm);
++
++uint64_t qemu_plugin_ram_addr_from_host(void *haddr);
++
++typedef void
++(*qemu_plugin_vcpu_syscall_cb_t)(qemu_plugin_id_t id, unsigned int vcpu_index,
++                                 int64_t num, uint64_t a1, uint64_t a2,
++                                 uint64_t a3, uint64_t a4, uint64_t a5,
++                                 uint64_t a6, uint64_t a7, uint64_t a8);
++
++void qemu_plugin_register_vcpu_syscall_cb(qemu_plugin_id_t id,
++                                          qemu_plugin_vcpu_syscall_cb_t cb);
++
++typedef void
++(*qemu_plugin_vcpu_syscall_ret_cb_t)(qemu_plugin_id_t id, unsigned int vcpu_idx,
++                                     int64_t num, int64_t ret);
++
++void
++qemu_plugin_register_vcpu_syscall_ret_cb(qemu_plugin_id_t id,
++                                         qemu_plugin_vcpu_syscall_ret_cb_t cb);
++
++
++/**
++ * qemu_plugin_vcpu_for_each() - iterate over the existing vCPU
++ * @id: plugin ID
++ * @cb: callback function
++ *
++ * The @cb function is called once for each existing vCPU.
++ *
++ * See also: qemu_plugin_register_vcpu_init_cb()
++ */
++void qemu_plugin_vcpu_for_each(qemu_plugin_id_t id,
++                               qemu_plugin_vcpu_simple_cb_t cb);
++
++void qemu_plugin_register_flush_cb(qemu_plugin_id_t id,
++                                   qemu_plugin_simple_cb_t cb);
++
++void qemu_plugin_register_atexit_cb(qemu_plugin_id_t id,
++                                    qemu_plugin_udata_cb_t cb, void *userdata);
++
++/* returns -1 in user-mode */
++int qemu_plugin_n_vcpus(void);
++
++/* returns -1 in user-mode */
++int qemu_plugin_n_max_vcpus(void);
++
++#endif /* QEMU_PLUGIN_API_H */
+-- 
+2.20.1
+
 
