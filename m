@@ -6,57 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6BB4C31E44
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 07:31:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DACA2C31E44
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 07:32:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD4672073F
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 07:31:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD4672073F
+	by mail.kernel.org (Postfix) with ESMTPS id AC8872080A
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 07:32:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC8872080A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49032 helo=lists.gnu.org)
+Received: from localhost ([::1]:49034 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbgg1-0004WF-8m
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 03:31:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39554)
+	id 1hbghK-0005ri-0M
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 03:32:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39686)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hbgap-0008Fj-5F
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 03:25:54 -0400
+ (envelope-from <philmd@redhat.com>) id 1hbgb9-0008Li-AB
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 03:26:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hbgao-0005TG-1n
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 03:25:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42988)
+ (envelope-from <philmd@redhat.com>) id 1hbgb7-0005kh-9n
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 03:26:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57444)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hbgal-0005PV-0w; Fri, 14 Jun 2019 03:25:43 -0400
+ id 1hbgay-0005bR-4V; Fri, 14 Jun 2019 03:25:58 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 169375945D;
- Fri, 14 Jun 2019 07:25:42 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0C4D22F8BD7;
+ Fri, 14 Jun 2019 07:25:55 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.205.27])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 53BDB60637;
- Fri, 14 Jun 2019 07:25:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 997A060637;
+ Fri, 14 Jun 2019 07:25:42 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 14 Jun 2019 09:24:31 +0200
-Message-Id: <20190614072432.820-6-philmd@redhat.com>
+Date: Fri, 14 Jun 2019 09:24:32 +0200
+Message-Id: <20190614072432.820-7-philmd@redhat.com>
 In-Reply-To: <20190614072432.820-1-philmd@redhat.com>
 References: <20190614072432.820-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Fri, 14 Jun 2019 07:25:42 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.38]); Fri, 14 Jun 2019 07:25:55 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 5/6] configure: Link test before auto-enabling
- the pulseaudio library
+Subject: [Qemu-devel] [PATCH 6/6] .travis.yml: Test static linking
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,71 +80,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Similarly to commit a73e82ef912, test the library links correctly
-before considering it as usable.
-
-This fixes using ./configure --static on Ubuntu 18.04:
-
-  $ make subdir-aarch64-softmmu
-  [...]
-    LINK    aarch64-softmmu/qemu-system-aarch64
-  /usr/bin/ld: cannot find -lpulse
-  /usr/bin/ld: cannot find -lpulsecommon-11.1
-  collect2: error: ld returned 1 exit status
-  Makefile:204: recipe for target 'qemu-system-aarch64' failed
-  make[1]: *** [qemu-system-aarch64] Error 1
-
-  $ fgrep pulse config-host.mak
-  PULSE_LIBS=3D-L/usr/lib/aarch64-linux-gnu/pulseaudio -lpulse -lpulsecom=
-mon-11.1
-
-  $ lsb_release -cri
-  Distributor ID: Ubuntu
-  Release:        18.04
-  Codename:       bionic
-
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- configure | 23 +++++++++++++++++++----
- 1 file changed, 19 insertions(+), 4 deletions(-)
+This job currently fails:
 
-diff --git a/configure b/configure
-index 4eed33e1b1..4d015496ae 100755
---- a/configure
-+++ b/configure
-@@ -3408,10 +3408,25 @@ for drv in $audio_drv_list; do
+      LINK    lm32-softmmu/qemu-system-lm32
+    /usr/bin/ld: cannot find -lgtk-3
+    /usr/bin/ld: cannot find -latk-bridge-2.0
+    /usr/bin/ld: cannot find -latspi
+    /usr/bin/ld: cannot find -lsystemd
+    /usr/bin/ld: cannot find -lgdk-3
+    /usr/bin/ld: cannot find -lwayland-egl
+    /usr/bin/ld: cannot find -lmirclient
+    /usr/bin/ld: cannot find -lmircore
+    /usr/bin/ld: cannot find -lmircookie
+    /usr/bin/ld: cannot find -lepoxy
+    /usr/bin/ld: cannot find -latk-1.0
+    /usr/bin/ld: cannot find -lgdk_pixbuf-2.0
+    /usr/bin/ld: cannot find -lselinux
+    /usr/bin/ld: cannot find -lgtk-3
+    /usr/bin/ld: cannot find -latk-bridge-2.0
+    /usr/bin/ld: cannot find -latspi
+    /usr/bin/ld: cannot find -lsystemd
+    /usr/bin/ld: cannot find -lgdk-3
+    /usr/bin/ld: cannot find -lwayland-egl
+    /usr/bin/ld: cannot find -lmirclient
+    /usr/bin/ld: cannot find -lmircore
+    /usr/bin/ld: cannot find -lmircookie
+    /usr/bin/ld: cannot find -lepoxy
+    /usr/bin/ld: cannot find -latk-1.0
+    /usr/bin/ld: cannot find -lgdk_pixbuf-2.0
+    /usr/bin/ld: cannot find -lselinux
+    /usr/bin/ld: attempted static link of dynamic object `/usr/lib/x86_64=
+-linux-gnu/libz.so'
+    collect2: error: ld returned 1 exit status
+    Makefile:204: recipe for target 'qemu-system-lm32' failed
+    make[1]: *** [qemu-system-lm32] Error 1
+    Makefile:472: recipe for target 'subdir-lm32-softmmu' failed
+    make: *** [subdir-lm32-softmmu] Error 2
+---
+ .travis.yml | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/.travis.yml b/.travis.yml
+index 08502c0aa2..6962fff826 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -92,6 +92,11 @@ matrix:
+         - CONFIG=3D"--disable-user --target-list-exclude=3D${MAIN_SOFTMM=
+U_TARGETS}"
 =20
-     pa | try-pa)
-     if $pkg_config libpulse --exists; then
--        pulse_libs=3D$($pkg_config libpulse --libs)
--        audio_pt_int=3D"yes"
--        if test "$drv" =3D "try-pa"; then
--            audio_drv_list=3D$(echo "$audio_drv_list" | sed -e 's/try-pa=
-/pa/')
-+        pulse_cflags=3D$($pkg_config --cflags libpulse)
-+        if test "$static" =3D "yes"; then
-+            pulse_libs=3D$($pkg_config --libs --static libpulse)
-+        else
-+            pulse_libs=3D$($pkg_config --libs libpulse)
-+        fi
-+        # Packaging for the static libraries is not always correct.
-+        # At least ubuntu 18.04 ships only shared libraries.
-+        write_c_skeleton
-+        if ! compile_prog "$pulse_cflags" "$pulse_libs" ; then
-+            unset pulse_cflags pulse_libs
-+            if test "$drv" =3D "try-pa"; then
-+                audio_drv_list=3D$(echo "$audio_drv_list" | sed -e 's/tr=
-y-pa//')
-+            fi
-+        else
-+            audio_pt_int=3D"yes"
-+            if test "$drv" =3D "try-pa"; then
-+                audio_drv_list=3D$(echo "$audio_drv_list" | sed -e 's/tr=
-y-pa/pa/')
-+            fi
-         fi
-     else
-         if test "$drv" =3D "try-pa"; then
+=20
++    # Test static linking
++    - env:
++        - CONFIG=3D"--static --target-list=3Dlm32-softmmu"
++
++
+     # Just build tools and run minimal unit and softfloat checks
+     - env:
+         - BASE_CONFIG=3D"--enable-tools"
 --=20
 2.20.1
 
