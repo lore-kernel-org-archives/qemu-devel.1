@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6B31C31E44
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 10:15:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8399DC31E44
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 10:15:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8989C20665
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 10:15:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8989C20665
+	by mail.kernel.org (Postfix) with ESMTPS id 5C9F820665
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 10:15:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C9F820665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49866 helo=lists.gnu.org)
+Received: from localhost ([::1]:49868 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbjEZ-0000lb-MZ
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 06:14:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48679)
+	id 1hbjEg-0000y0-Lv
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 06:15:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48650)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hbj7q-0003lw-Ek
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 06:08:03 -0400
+ (envelope-from <philmd@redhat.com>) id 1hbj7l-0003kD-4n
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 06:07:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hbj7o-0000FH-KO
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 06:08:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34184)
+ (envelope-from <philmd@redhat.com>) id 1hbj7i-0000C9-Ig
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 06:07:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45726)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hbj7j-0000CI-7c; Fri, 14 Jun 2019 06:07:55 -0400
+ id 1hbj7c-00008r-Pp; Fri, 14 Jun 2019 06:07:49 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 74C24C01F278;
- Fri, 14 Jun 2019 10:07:54 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A36E030821F4;
+ Fri, 14 Jun 2019 10:07:44 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.205.27])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6B00C1001B0F;
- Fri, 14 Jun 2019 10:07:45 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 47AE21001B0F;
+ Fri, 14 Jun 2019 10:07:38 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 14 Jun 2019 12:07:12 +0200
-Message-Id: <20190614100718.14019-4-philmd@redhat.com>
+Date: Fri, 14 Jun 2019 12:07:11 +0200
+Message-Id: <20190614100718.14019-3-philmd@redhat.com>
 In-Reply-To: <20190614100718.14019-1-philmd@redhat.com>
 References: <20190614100718.14019-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Fri, 14 Jun 2019 10:07:54 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Fri, 14 Jun 2019 10:07:44 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 3/9] configure: Link test before
- auto-enabling libusb library
+Subject: [Qemu-devel] [PATCH v2 2/9] configure: Link test before
+ auto-enabling GlusterFS libraries
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,21 +81,24 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Similarly to commit a73e82ef912, test the library links correctly
-before considering it as usable.
+Similarly to commit a73e82ef912, test the libraries link correctly
+before considering them as usable.
 
 This fixes using ./configure --static on Ubuntu 18.04:
 
   $ make subdir-aarch64-softmmu
   [...]
     LINK    aarch64-softmmu/qemu-system-aarch64
-  /usr/bin/ld: cannot find -ludev
+  /usr/bin/ld: cannot find -lgfapi
+  /usr/bin/ld: cannot find -lglusterfs
+  /usr/bin/ld: cannot find -lgfrpc
+  /usr/bin/ld: cannot find -lgfxdr
   collect2: error: ld returned 1 exit status
   Makefile:204: recipe for target 'qemu-system-aarch64' failed
   make[1]: *** [qemu-system-aarch64] Error 1
 
-  $ fgrep udev config-host.mak
-  LIBUSB_LIBS=3D-lusb-1.0 -ludev -pthread
+  $ fgrep gf config-host.mak
+  GLUSTERFS_LIBS=3D-lacl -lgfapi -lglusterfs -lgfrpc -lgfxdr -luuid
 
   $ lsb_release -cri
   Distributor ID: Ubuntu
@@ -108,31 +111,30 @@ Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
  1 file changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/configure b/configure
-index fe0e2e1b75..2ebaa32746 100755
+index 13fd4a1166..fe0e2e1b75 100755
 --- a/configure
 +++ b/configure
-@@ -4894,9 +4894,19 @@ fi
- # check for libusb
- if test "$libusb" !=3D "no" ; then
-     if $pkg_config --atleast-version=3D1.0.13 libusb-1.0; then
--        libusb=3D"yes"
-         libusb_cflags=3D$($pkg_config --cflags libusb-1.0)
-         libusb_libs=3D$($pkg_config --libs libusb-1.0)
-+        # Packaging for the static libraries is not always correct.
-+        # At least ubuntu 18.04 ships only shared libraries.
-+        write_c_skeleton
-+        if ! compile_prog "$libusb_cflags" "$libusb_libs" ; then
-+            if test "$libusb" =3D "yes" ; then
-+              error_exit "libusb check failed."
-+            fi
-+            libusb=3D"no"
-+        else
-+            libusb=3D"yes"
+@@ -4179,9 +4179,19 @@ fi
+ # glusterfs probe
+ if test "$glusterfs" !=3D "no" ; then
+   if $pkg_config --atleast-version=3D3 glusterfs-api; then
+-    glusterfs=3D"yes"
+     glusterfs_cflags=3D$($pkg_config --cflags glusterfs-api)
+     glusterfs_libs=3D$($pkg_config --libs glusterfs-api)
++    # Packaging for the static libraries is not always correct.
++    # At least ubuntu 18.04 ships only shared libraries.
++    write_c_skeleton
++    if ! compile_prog "$glusterfs_cflags" "$glusterfs_libs" ; then
++        if test "$glusterfs" =3D "yes" ; then
++          error_exit "glusterfs check failed."
 +        fi
-     else
-         if test "$libusb" =3D "yes"; then
-             feature_not_found "libusb" "Install libusb devel >=3D 1.0.13=
-"
++        glusterfs=3D"no"
++    else
++        glusterfs=3D"yes"
++    fi
+     if $pkg_config --atleast-version=3D4 glusterfs-api; then
+       glusterfs_xlator_opt=3D"yes"
+     fi
 --=20
 2.20.1
 
