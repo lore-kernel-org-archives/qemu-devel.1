@@ -2,71 +2,88 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF2A6C31E44
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 04:49:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE4CBC31E44
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 05:23:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB17420851
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 04:49:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB17420851
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7552220851
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 05:23:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p13fkqLD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7552220851
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48310 helo=lists.gnu.org)
+Received: from localhost ([::1]:48464 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbe9c-0001vw-M2
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 00:49:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35963)
+	id 1hbegX-0000Wa-3c
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 01:23:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41486)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kraxel@redhat.com>) id 1hbe8l-0001Wx-Mv
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 00:48:40 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hbefg-00005h-LP
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 01:22:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1hbe8k-0006Cp-Nr
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 00:48:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48464)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>)
- id 1hbe3q-00021B-H9; Fri, 14 Jun 2019 00:43:34 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E8E1B8762F;
- Fri, 14 Jun 2019 04:43:13 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-33.ams2.redhat.com
- [10.36.116.33])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 557D219C67;
- Fri, 14 Jun 2019 04:43:11 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 5A7C311AA3; Fri, 14 Jun 2019 06:43:10 +0200 (CEST)
-Date: Fri, 14 Jun 2019 06:43:10 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Sam Eiderman <shmuel.eiderman@oracle.com>
-Message-ID: <20190614044310.wxnkwxagr23d5cbt@sirius.home.kraxel.org>
-References: <20190612115939.23825-1-shmuel.eiderman@oracle.com>
- <20190612130650.xftda65kgnsefyvs@sirius.home.kraxel.org>
- <A3F8BD49-3C35-4A07-8DE2-85F7CC293DC9@oracle.com>
- <20190612191817.5bilt2abif2xvcbv@sirius.home.kraxel.org>
- <02844D7D-ED79-4744-A203-8E713DE7A717@oracle.com>
- <20190613093850.5k7prawn6x4qt3fi@sirius.home.kraxel.org>
- <730C65DE-A9B4-4553-B6A0-7A3B81A1FA12@oracle.com>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hbeff-0007Wa-DW
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 01:22:40 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:34798)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1hbeff-0007WN-7v
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 01:22:39 -0400
+Received: by mail-oi1-x242.google.com with SMTP id j184so1090770oih.1
+ for <qemu-devel@nongnu.org>; Thu, 13 Jun 2019 22:22:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=UEM0DPq4VzLWOyLGqQ23BCNhq2v+l75aEg56200Rzfk=;
+ b=p13fkqLDm88qaGvEgJoZl4afhk1viMzbrrS8qe509pRykODIKDCKGAB7r9Zrn4iixO
+ iyCWAAMQE+f19pLWFBZgnLiBLz/elRTHUmZuFVf9D1gxwOAoW7XmpVBkoNpWCJeyLfDT
+ PmMO9chkvyFDcyeJswBgtvSYPrQWR1eP1YOlvOozBXnY8EQd0Hn8+bzKNAyWoWXe0RRK
+ 5s3SC27ij8JnGcOhUaAIg1w4yBdu/0eoV19iNmLd+/vP0Ry/bm3R9qJYoK5fH3xZVkvQ
+ /+x2fmgVgJ0vOX4VBlIT5k7vLmbahtNZ+CJPQsJg8CbRsO1tVH7i0NRG0C3IL9SAi0RE
+ 4mGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=UEM0DPq4VzLWOyLGqQ23BCNhq2v+l75aEg56200Rzfk=;
+ b=jRI3uqjoxnBjs7TAX4Af7EGc9VaQSJ5Zh3qWNbuC5wQx6E7nTk2YuXDoHUEFKvZHYC
+ atL0P1v2r7RIn05l0w4tw4cu3wB5c8AIvuBF/uSOUL95N3la6kXHD944s9Rtq6WInXYC
+ R3xPzWIVfEz8i3QBWdNFODpeHOtX3f+SYZYeEJAiKAj/UHTpP+W9hyVKTuCEx/DN1hhj
+ cEcXpTlHBHDGPlFIyD4kmgLSjYhaY1TaFJX5sx2RWajHfOMZcjDrHpelDLJH5IumztNE
+ XzGcTvGhEClX6PuZ9LesjLD5Fme8jbSOu9tb4R3zybWpEOgbJxUEi/pR7Y4QaCGzBZqw
+ qJtw==
+X-Gm-Message-State: APjAAAVItcGDF6DW3KWfAvan6A20hewD+maYIVnEM2T3Z1YRYCF8j8mx
+ cizas0iMJveynS0YBOWKeZSyb2ApcVYGKuLtkSw=
+X-Google-Smtp-Source: APXvYqxzlcSF0NpIpkH494ZWNyq4ucAyG2XpHjAw4y3bu4prDkUag7QPVC9irlWWClCXGvCtbQUrWyp+Do5B3ebDj4k=
+X-Received: by 2002:aca:c2c3:: with SMTP id s186mr668358oif.79.1560489758265; 
+ Thu, 13 Jun 2019 22:22:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <730C65DE-A9B4-4553-B6A0-7A3B81A1FA12@oracle.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Fri, 14 Jun 2019 04:43:27 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [QEMU] [PATCH v2 0/8] Add Qemu to SeaBIOS LCHS
- interface
+Received: by 2002:a9d:20e4:0:0:0:0:0 with HTTP; Thu, 13 Jun 2019 22:22:37
+ -0700 (PDT)
+Received: by 2002:a9d:20e4:0:0:0:0:0 with HTTP; Thu, 13 Jun 2019 22:22:37
+ -0700 (PDT)
+In-Reply-To: <20190613041619.32102-2-richard.henderson@linaro.org>
+References: <20190613041619.32102-1-richard.henderson@linaro.org>
+ <20190613041619.32102-2-richard.henderson@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Fri, 14 Jun 2019 07:22:37 +0200
+Message-ID: <CAL1e-=iHb5khAaQeV1za8SnW=9O8mP-xg=t2Eaw818Yc9zdPPw@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH 1/1] tcg: Fix typos in helper_gvec_sar{8, 32,
+ 64}v
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,47 +95,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, arbel.moshe@oracle.com,
- seabios@seabios.org, QEMU <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, Kevin O'Connor <kevin@koconnor.net>,
- liran.alon@oracle.com, Karl Heubaum <karl.heubaum@oracle.com>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hi,
+On Jun 13, 2019 6:16 AM, "Richard Henderson" <richard.henderson@linaro.org>
+wrote:
+>
+> The loop is written with scalars, not vectors.
+> Use the correct type when incrementing.
+>
+> Fixes: 5ee5c14cacd
+> Reported-by: Laurent Vivier <lvivier@redhat.com>
+> Tested-by: Laurent Vivier <lvivier@redhat.com>
+> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
 
-> Can there be a guest that will fail the MBR in such a way? Yes.
-> Look at the following MBR partition table of a Windows XP guest in our production
-> environment:
-> 
-> Disk size in sectors: 16777216
-> 
-> Binary (only one partition 16 bytes): 80 01 01 00 07 fe ff ff 3f 00 00 00 d5 ea ff 00
-> Start: (0, 1, 1, 63)
-> End: (1023, 254, 63, 16771859)
-> 
-> As can be easily seen, any MBR guessing algorithm should guess:
-> 
-> 	255 heads (since a value of 254 appears), 63 spt (since a value of 63 appears)
-> 
-> Turns out that this image does not work with 255, 63 but actually requires
-> 
-> 	16 heads, 63 spt
-> 
-> to boot.
-> 
-> So relying on MBR partitions alone is not always enough and sometimes manual intervention
-> is required.
+This is certainly not a case of =E2=80=9Ctypo=E2=80=9D (which would mean th=
+at you
+accidentally typed =E2=80=9Cvec8=E2=80=9D instead od =E2=80=9Cint8_t=E2=80=
+=9D). So, change the title to
+=E2=80=9Ctcg: Fix loop step in
+helper_gvec_sar{8, 32, 64}v=E2=80=9D or similar.
 
-Ok, given that seabios has no setup any manual configuration needs to be done via qemu.
-
-But why do we need a new interface for that?  IDE can pass the geometry
-to the guest.  virtio-blk has support too (VIRTIO_BLK_F_GEOMETRY).
-Likewise scsi (MODE_PAGE_HD_GEOMETRY).  So this should be doable without
-any qemu changes.
-
-cheers,
-  Gerd
-
-
+>  accel/tcg/tcg-runtime-gvec.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/accel/tcg/tcg-runtime-gvec.c b/accel/tcg/tcg-runtime-gvec.c
+> index 3b6052fe97..51cb29ca79 100644
+> --- a/accel/tcg/tcg-runtime-gvec.c
+> +++ b/accel/tcg/tcg-runtime-gvec.c
+> @@ -874,7 +874,7 @@ void HELPER(gvec_sar8v)(void *d, void *a, void *b,
+uint32_t desc)
+>      intptr_t oprsz =3D simd_oprsz(desc);
+>      intptr_t i;
+>
+> -    for (i =3D 0; i < oprsz; i +=3D sizeof(vec8)) {
+> +    for (i =3D 0; i < oprsz; i +=3D sizeof(int8_t)) {
+>          uint8_t sh =3D *(uint8_t *)(b + i) & 7;
+>          *(int8_t *)(d + i) =3D *(int8_t *)(a + i) >> sh;
+>      }
+> @@ -898,7 +898,7 @@ void HELPER(gvec_sar32v)(void *d, void *a, void *b,
+uint32_t desc)
+>      intptr_t oprsz =3D simd_oprsz(desc);
+>      intptr_t i;
+>
+> -    for (i =3D 0; i < oprsz; i +=3D sizeof(vec32)) {
+> +    for (i =3D 0; i < oprsz; i +=3D sizeof(int32_t)) {
+>          uint8_t sh =3D *(uint32_t *)(b + i) & 31;
+>          *(int32_t *)(d + i) =3D *(int32_t *)(a + i) >> sh;
+>      }
+> @@ -910,7 +910,7 @@ void HELPER(gvec_sar64v)(void *d, void *a, void *b,
+uint32_t desc)
+>      intptr_t oprsz =3D simd_oprsz(desc);
+>      intptr_t i;
+>
+> -    for (i =3D 0; i < oprsz; i +=3D sizeof(vec64)) {
+> +    for (i =3D 0; i < oprsz; i +=3D sizeof(int64_t)) {
+>          uint8_t sh =3D *(uint64_t *)(b + i) & 63;
+>          *(int64_t *)(d + i) =3D *(int64_t *)(a + i) >> sh;
+>      }
+> --
+> 2.17.1
+>
+>
