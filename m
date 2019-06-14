@@ -2,87 +2,59 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40325C31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 14:09:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27EE4C31E4C
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 14:09:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9F1D2177E
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 14:09:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ilfphwh7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9F1D2177E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 032B421537
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 14:09:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 032B421537
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51864 helo=lists.gnu.org)
+Received: from localhost ([::1]:51866 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbmtX-0007UQ-Ob
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 10:09:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50888)
+	id 1hbmtb-0007bk-9K
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 10:09:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46984)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vandersonmr2@gmail.com>) id 1hbmey-0003Dh-5X
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:54:29 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hbmSt-00027R-Mj
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:42:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vandersonmr2@gmail.com>) id 1hbmew-0007xm-LN
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:54:28 -0400
-Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:37539)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <vandersonmr2@gmail.com>)
- id 1hbmew-0007xI-HG
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:54:26 -0400
-Received: by mail-qk1-x741.google.com with SMTP id d15so1703457qkl.4
- for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 06:54:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=IkKggjJFmzSiJ4uZvBdZPk5OGuw0OM24o79Ww5vmA0s=;
- b=Ilfphwh7W0bSCbz3HEE5Ig/H+sPpb7x2Wg2TAKIKuPmF4xtXimH5yuMYHLi4u9cPF3
- ApIm3jpHXDxRUkizDFnpok/EVWoYmVAzpQaAu2zbxnt24KFHxfi9sHb5nC9cdGs3xfpN
- lstxiTcPG9wxI3WxrY5HXm671Sa50zGYySXvFhKQIBjz3YL/XDa5dTvFqUI+MsdGPnUU
- Lx4ithhhSznK/wT+VIOQ7T+45BKZESlWsw6x4/RfegBLA/64jW8A8Vqczhb2iF/fJ3wN
- Px1c1ICSYjSaE8Qgg/FGE+O0foCR6E+wNNG2mYLlj6Pp1r3mS/cSj/wMY/70AmWUSvw8
- GS/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=IkKggjJFmzSiJ4uZvBdZPk5OGuw0OM24o79Ww5vmA0s=;
- b=h9/qH8+2RAx55ClsMwZHeJuz/CFLxRgQZwvjBWTh7YTpJHkf7YCtDJF1welwOHO9e2
- pcAl0Gqh9T3U/dzgwoQ/xG2JPRlv8qcPOtD4wpUKM0gKv8FR1fMuRYVoRgyKaJuZaKIx
- ya+6IvJhvV1u6xYTZ8eqLoy1yX6HXr9N7RG2fTzUzl9GUHIv1iya1Hzt+1bR7LRKctSs
- 0JtXNhDdZRdqMErwOoip5giYKjYIB5iv3bjHdoY/0M24QSO70b+l1xx57jlXn0yBu6Ty
- HbElqWyIXk4IQPflxJtO5J9o7KHQUNCIIPYQtYGc7U2vHqNsYnk8VrnKjKFMmkhYSr0K
- yKNw==
-X-Gm-Message-State: APjAAAXkfA2AdWgVSc5mQhuF4H3dX48Zdrm6yXtctMkAhd0DlVngZVJZ
- VzjKYetcHdsOTZos7TbhOZiRreRvmWU=
-X-Google-Smtp-Source: APXvYqyIYknesP7N2pux79oTWlaO0jCG3TpBqLi3gVCa1uVDxHqx/XVmN8zDqjeDFR9whNADYAuOeg==
-X-Received: by 2002:a37:9c50:: with SMTP id f77mr76429450qke.6.1560520465756; 
- Fri, 14 Jun 2019 06:54:25 -0700 (PDT)
-Received: from localhost.localdomain ([2804:7f4:548c:f96b:4e5b:86ef:e7bc:c1a0])
- by smtp.googlemail.com with ESMTPSA id 77sm1747150qkd.59.2019.06.14.06.54.23
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 14 Jun 2019 06:54:25 -0700 (PDT)
-From: vandersonmr <vandersonmr2@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 14 Jun 2019 10:53:29 -0300
-Message-Id: <20190614135332.12777-2-vandersonmr2@gmail.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190614135332.12777-1-vandersonmr2@gmail.com>
-References: <20190614135332.12777-1-vandersonmr2@gmail.com>
+ (envelope-from <mreitz@redhat.com>) id 1hbmSr-0006dv-Lh
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 09:41:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40828)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hbmSU-0006GF-Bv; Fri, 14 Jun 2019 09:41:34 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6F7C8C04D318;
+ Fri, 14 Jun 2019 13:41:15 +0000 (UTC)
+Received: from localhost (unknown [10.40.205.125])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CC9145D9C3;
+ Fri, 14 Jun 2019 13:41:14 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Date: Fri, 14 Jun 2019 15:40:20 +0200
+Message-Id: <20190614134021.32486-20-mreitz@redhat.com>
+In-Reply-To: <20190614134021.32486-1-mreitz@redhat.com>
+References: <20190614134021.32486-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::741
-Subject: [Qemu-devel] [Qemu-Devel][PATCH 1/3] Adding an optional tb
- execution counter.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Fri, 14 Jun 2019 13:41:15 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 19/20] iotests: Test qemu-img convert --salvage
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,113 +66,285 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- vandersonmr <vandersonmr2@gmail.com>, Laurent Vivier <laurent@vivier.eu>,
- Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-An uint64_t counter was added in the TranslationBlock struct and
-it is incremented every time that the TB is executed.
+This test converts a simple image to another, but blkdebug injects
+block_status and read faults at some offsets.  The resulting image
+should be the same as the input image, except that sectors that could
+not be read have to be 0.
 
-Signed-off-by: vandersonmr <vandersonmr2@gmail.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20190507203508.18026-7-mreitz@redhat.com
+Tested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+[mreitz: Dropped superfluous printf from _filter_offsets, as suggested
+         by Vladimir; disable test for VDI and IMGOPTSSYNTAX]
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- accel/tcg/tcg-runtime.c   | 6 ++++++
- accel/tcg/tcg-runtime.h   | 2 ++
- include/exec/exec-all.h   | 1 +
- include/exec/gen-icount.h | 7 +++++++
- linux-user/main.c         | 1 +
- vl.c                      | 1 +
- 6 files changed, 18 insertions(+)
+ tests/qemu-iotests/251     | 170 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/251.out |  43 ++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 214 insertions(+)
+ create mode 100755 tests/qemu-iotests/251
+ create mode 100644 tests/qemu-iotests/251.out
 
-diff --git a/accel/tcg/tcg-runtime.c b/accel/tcg/tcg-runtime.c
-index 8a1e408e31..d1f4127d31 100644
---- a/accel/tcg/tcg-runtime.c
-+++ b/accel/tcg/tcg-runtime.c
-@@ -167,3 +167,9 @@ void HELPER(exit_atomic)(CPUArchState *env)
- {
-     cpu_loop_exit_atomic(env_cpu(env), GETPC());
- }
+diff --git a/tests/qemu-iotests/251 b/tests/qemu-iotests/251
+new file mode 100755
+index 0000000000..13f85de9cd
+--- /dev/null
++++ b/tests/qemu-iotests/251
+@@ -0,0 +1,170 @@
++#!/usr/bin/env bash
++#
++# Test qemu-img convert --salvage
++#
++# Copyright (C) 2019 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-+void HELPER(inc_exec_freq)(void *ptr)
++# creator
++owner=3Dmreitz@redhat.com
++
++seq=3D$(basename $0)
++echo "QA output created by $seq"
++
++status=3D1	# failure is the default!
++
++_cleanup()
 +{
-+    TranslationBlock* tb = (TranslationBlock*) ptr;
-+    atomic_inc(&tb->exec_freq);
++    _cleanup_test_img
 +}
-diff --git a/accel/tcg/tcg-runtime.h b/accel/tcg/tcg-runtime.h
-index 4fa61b49b4..bf0b75dbe8 100644
---- a/accel/tcg/tcg-runtime.h
-+++ b/accel/tcg/tcg-runtime.h
-@@ -28,6 +28,8 @@ DEF_HELPER_FLAGS_1(lookup_tb_ptr, TCG_CALL_NO_WG_SE, ptr, env)
- 
- DEF_HELPER_FLAGS_1(exit_atomic, TCG_CALL_NO_WG, noreturn, env)
- 
-+DEF_HELPER_FLAGS_1(inc_exec_freq, TCG_CALL_NO_RWG, void, ptr)
++trap "_cleanup; exit \$status" 0 1 2 3 15
 +
- #ifdef CONFIG_SOFTMMU
- 
- DEF_HELPER_FLAGS_5(atomic_cmpxchgb, TCG_CALL_NO_WG,
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 16034ee651..a80407622e 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -342,6 +342,7 @@ struct TranslationBlock {
-     uint32_t flags; /* flags defining in which context the code was generated */
-     uint16_t size;      /* size of target code for this block (1 <=
-                            size <= TARGET_PAGE_SIZE) */
-+    uint64_t exec_freq;
-     uint16_t icount;
-     uint32_t cflags;    /* compile flags */
- #define CF_COUNT_MASK  0x00007fff
-diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
-index f7669b6841..a540d12005 100644
---- a/include/exec/gen-icount.h
-+++ b/include/exec/gen-icount.h
-@@ -6,11 +6,18 @@
- /* Helpers for instruction counting code generation.  */
- 
- static TCGOp *icount_start_insn;
-+extern bool enable_freq_count;
- 
- static inline void gen_tb_start(TranslationBlock *tb)
- {
-     TCGv_i32 count, imm;
- 
-+    if (enable_freq_count) {
-+        TCGv_ptr tb_ptr = tcg_temp_new_ptr();
-+        tcg_gen_trunc_i64_ptr(tb_ptr, tcg_const_i64((int64_t) tb));
-+        gen_helper_inc_exec_freq(tb_ptr);
-+    }
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++. ./common.qemu
 +
-     tcg_ctx->exitreq_label = gen_new_label();
-     if (tb_cflags(tb) & CF_USE_ICOUNT) {
-         count = tcg_temp_local_new_i32();
-diff --git a/linux-user/main.c b/linux-user/main.c
-index a59ae9439d..1bf7155670 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -58,6 +58,7 @@ static const char *seed_optarg;
- unsigned long mmap_min_addr;
- unsigned long guest_base;
- int have_guest_base;
-+bool enable_freq_count = false;
- 
- /*
-  * When running 32-on-64 we should make sure we can fit all of the possible
-diff --git a/vl.c b/vl.c
-index 005468cbfb..cb6c0ad63d 100644
---- a/vl.c
-+++ b/vl.c
-@@ -190,6 +190,7 @@ bool boot_strict;
- uint8_t *boot_splash_filedata;
- int only_migratable; /* turn it off unless user states otherwise */
- bool wakeup_suspend_enabled;
-+bool enable_freq_count = false;
- 
- int icount_align_option;
- 
--- 
-2.22.0
++_supported_fmt generic
++_supported_proto file
++_supported_os Linux
++
++if [ "$IMGOPTSSYNTAX" =3D "true" ]; then
++    # We use json:{} filenames here, so we cannot work with additional o=
+ptions.
++    _unsupported_fmt $IMGFMT
++else
++    # With VDI, the output is ordered differently.  Just disable it.
++    _unsupported_fmt vdi
++fi
++
++
++TEST_IMG=3D"$TEST_IMG.orig" _make_test_img 64M
++
++$QEMU_IO -c 'write -P 42 0 64M' "$TEST_IMG.orig" | _filter_qemu_io
++
++
++sector_size=3D512
++
++# Offsets on which to fail block-status.  Keep in ascending order so
++# the indexing done by _filter_offsets will appear in ascending order
++# in the output as well.
++status_fail_offsets=3D"$((16 * 1024 * 1024 + 8192))
++                     $((33 * 1024 * 1024 + 512))"
++
++# Offsets on which to fail reads.  Keep in ascending order for the
++# same reason.
++# The second element is shared with $status_fail_offsets on purpose.
++# Starting with the third element, we test what happens when a
++# continuous range of sectors is inaccessible.
++read_fail_offsets=3D"$((32 * 1024 * 1024 - 65536))
++                   $((33 * 1024 * 1024 + 512))
++                   $(seq $((34 * 1024 * 1024)) $sector_size \
++                         $((34 * 1024 * 1024 + 4096 - $sector_size)))"
++
++
++# blkdebug must be above the format layer so it can intercept all
++# block-status events
++source_img=3D"json:{'driver': 'blkdebug',
++                  'image': {
++                      'driver': '$IMGFMT',
++                      'file': {
++                          'driver': 'file',
++                          'filename': '$TEST_IMG.orig'
++                      }
++                  },
++                  'inject-error': ["
++
++for ofs in $status_fail_offsets
++do
++    source_img+=3D"{ 'event': 'none',
++                   'iotype': 'block-status',
++                   'errno': 5,
++                   'sector': $((ofs / sector_size)) },"
++done
++
++for ofs in $read_fail_offsets
++do
++    source_img+=3D"{ 'event': 'none',
++                   'iotype': 'read',
++                   'errno': 5,
++                   'sector': $((ofs / sector_size)) },"
++done
++
++# Remove the trailing comma and terminate @inject-error and json:{}
++source_img=3D"${source_img%,} ] }"
++
++
++echo
++
++
++_filter_offsets() {
++    filters=3D
++
++    index=3D0
++    for ofs in $1
++    do
++        filters+=3D" -e s/$ofs/status_fail_offset_$index/"
++        index=3D$((index + 1))
++    done
++
++    index=3D0
++    for ofs in $2
++    do
++        filters+=3D" -e s/$ofs/read_fail_offset_$index/"
++        index=3D$((index + 1))
++    done
++
++    sed $filters
++}
++
++# While determining the number of allocated sectors in the input
++# image, we should see one block status warning per element of
++# $status_fail_offsets.
++#
++# Then, the image is read.  Since the block status is queried in
++# basically the same way, the same warnings as in the previous step
++# should reappear.  Interleaved with those we should see a read
++# warning per element of $read_fail_offsets.
++# Note that $read_fail_offsets and $status_fail_offsets share an
++# element (read_fail_offset_1 =3D=3D status_fail_offset_1), so
++# "status_fail_offset_1" in the output is the same as
++# "read_fail_offset_1".
++$QEMU_IMG convert --salvage "$source_img" "$TEST_IMG" 2>&1 \
++    | _filter_offsets "$status_fail_offsets" "$read_fail_offsets"
++
++echo
++
++# The offsets where the block status could not be determined should
++# have been treated as containing data and thus should be correct in
++# the output image.
++# The offsets where reading failed altogether should be 0.  Make them
++# 0 in the input image, too, so we can compare both images.
++for ofs in $read_fail_offsets
++do
++    $QEMU_IO -c "write -z $ofs $sector_size" "$TEST_IMG.orig" \
++        | _filter_qemu_io \
++        | _filter_offsets '' "$read_fail_offsets"
++done
++
++echo
++
++# These should be equal now.
++$QEMU_IMG compare "$TEST_IMG.orig" "$TEST_IMG"
++
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=3D0
+diff --git a/tests/qemu-iotests/251.out b/tests/qemu-iotests/251.out
+new file mode 100644
+index 0000000000..75b8796aad
+--- /dev/null
++++ b/tests/qemu-iotests/251.out
+@@ -0,0 +1,43 @@
++QA output created by 251
++Formatting 'TEST_DIR/t.IMGFMT.orig', fmt=3DIMGFMT size=3D67108864
++wrote 67108864/67108864 bytes at offset 0
++64 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++qemu-img: warning: error while reading block status at offset status_fai=
+l_offset_0: Input/output error
++qemu-img: warning: error while reading block status at offset status_fai=
+l_offset_1: Input/output error
++qemu-img: warning: error while reading block status at offset status_fai=
+l_offset_0: Input/output error
++qemu-img: warning: error while reading offset read_fail_offset_0: Input/=
+output error
++qemu-img: warning: error while reading block status at offset status_fai=
+l_offset_1: Input/output error
++qemu-img: warning: error while reading offset status_fail_offset_1: Inpu=
+t/output error
++qemu-img: warning: error while reading offset read_fail_offset_2: Input/=
+output error
++qemu-img: warning: error while reading offset read_fail_offset_3: Input/=
+output error
++qemu-img: warning: error while reading offset read_fail_offset_4: Input/=
+output error
++qemu-img: warning: error while reading offset read_fail_offset_5: Input/=
+output error
++qemu-img: warning: error while reading offset read_fail_offset_6: Input/=
+output error
++qemu-img: warning: error while reading offset read_fail_offset_7: Input/=
+output error
++qemu-img: warning: error while reading offset read_fail_offset_8: Input/=
+output error
++qemu-img: warning: error while reading offset read_fail_offset_9: Input/=
+output error
++
++wrote 512/512 bytes at offset read_fail_offset_0
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_1
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_2
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_3
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_4
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_5
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_6
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_7
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_8
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_9
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++Images are identical.
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 0842167b7b..b34c8e3c0c 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -263,6 +263,7 @@
+ 248 rw quick
+ 249 rw auto quick
+ 250 rw auto quick
++251 rw auto quick
+ 252 rw auto backing quick
+ 253 rw auto quick
+ 254 rw auto backing quick
+--=20
+2.21.0
 
 
