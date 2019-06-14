@@ -2,88 +2,67 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7648DC31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 19:00:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3700C31E4B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 19:01:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3246D2183E
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 19:00:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xQbO9Fxe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3246D2183E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id BD89021473
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 19:01:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD89021473
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54382 helo=lists.gnu.org)
+Received: from localhost ([::1]:54390 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbrRX-0000Ip-B2
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 15:00:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39288)
+	id 1hbrSB-0000lF-32
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 15:01:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36288)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hbqJb-0004XL-Ts
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:48:42 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hbq8H-0004I9-Pj
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:36:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hbqJZ-0003Xt-AQ
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:48:39 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:44100)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hbqJT-0003S0-Tn
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:48:35 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id r16so3386355wrl.11
- for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 10:48:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=VXpK415OMJJqmZ3w36Oxw/kJSG0YBc4gbksES0oJVX8=;
- b=xQbO9FxeBWXSzUk5RTFwKb4C9mLDDfH+MkxTaAut61ZmxEBhRrP4MCI7MJv/Mc1/Gn
- qDahXRiKHpL54Vs/w3jxE2qA0+zcBwnDqzI8XG230SO4A0383ULxQEb3d8KRzfgHlKQt
- jul3QLDY8fldQ0BqBLLcGcfY8dFUNPE3upEPnI04jEw8pNzEsgYJtDmi4NtTNQLgnAu7
- TjWrZ1OjMnDTyI1xnQyWOyf3iRItfBYgjkyqZw2gDTTLyv47uLSZANHBF+O4uR6xM8kb
- 1VrENiaA+nEi/OV64t4BO0pjb9TNn8kcHy2/yXzWNp2z0DoOBgE+Mr2kkh6t6xvJFRzD
- 2bIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=VXpK415OMJJqmZ3w36Oxw/kJSG0YBc4gbksES0oJVX8=;
- b=aBKQmP3ZqEPXrug/sfvmi/l7kCkraCyIxXq61aVDRWSG2YkXdBO16APip0D4GgOc/D
- m/XrNOI4u8f9mFTk0fT8INA5jhp/jHqjRe4uBCedE1qQVfg7tY1CNUnxhrgp0xZCUq+f
- 6U/f/qIuGEa2MlvEdcOuvaiyA498VT/FX0hquD4ZHNfiJ2UKR/PgwLyHGLDx3Y/M0s2v
- Pco+IqpiHspAow0ZO6lTHqNNR+rC2Y6T67DjWOYl30vYHx60I5DWlsfLif63KH0XRJVe
- /YMEbI1KPLFFvLGwyIf3xxK+Yt7gY1nRQrOt+yNvum5334mEWKFlOQhsUmU3yGczGrE7
- Qi7w==
-X-Gm-Message-State: APjAAAUy4RFLK+ViZoRLQ7qDYwefQVzbSj71X33VBJuVNv5Fp2Wf1SyW
- OVSijJ8t/cZljFCTg3yrpAy+eA==
-X-Google-Smtp-Source: APXvYqwzVELrPux0c6U0ZsBBsmjubvRsPsv4uWGLUMQpraPiD/TfJooSwaP7KGEeNylKrfDOYKwxRQ==
-X-Received: by 2002:a5d:4302:: with SMTP id h2mr36455054wrq.137.1560534509002; 
- Fri, 14 Jun 2019 10:48:29 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id h84sm5730516wmf.43.2019.06.14.10.48.27
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 14 Jun 2019 10:48:27 -0700 (PDT)
-Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 24B3E1FFC0;
- Fri, 14 Jun 2019 18:12:04 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Fri, 14 Jun 2019 18:11:51 +0100
-Message-Id: <20190614171200.21078-42-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190614171200.21078-1-alex.bennee@linaro.org>
-References: <20190614171200.21078-1-alex.bennee@linaro.org>
+ (envelope-from <no-reply@patchew.org>) id 1hbq8G-0002IY-Eu
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:36:57 -0400
+Resent-Date: Fri, 14 Jun 2019 13:36:57 -0400
+Resent-Message-Id: <E1hbq8G-0002IY-Eu@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21498)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hbq8E-0002Fs-UW
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:36:56 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1560533781; cv=none; d=zoho.com; s=zohoarc; 
+ b=hPrKOOTL99LGjlndpYmIOTqPz4cPuogcHJlWP8AZJ0VgmJEESjSZ03Gzl9prijJQ5AzmRxTrc2Wys8Q5NvCuXK5GJSPBWfEr6i9PK0QUF0mQo0d0lOjrViNHO0/vx7oOuj9P2peizKd18YY1WyKDsLBCAR28BYXW0dxnkvBiCAA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1560533781;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=3dUckawlxSAP2i6yGj1QtHCs7RxClqXRaW2o9fW3go8=; 
+ b=WMOV+ZYPpDPEkAXZFhsYeqzgvznHgWmhQKWJVT2FlSqt48n/7vmUDvPgHPWLsGGhqUqqOzd9XuJb7cNNfXTehaCVfRs0eU5bXcwSEVgQxjPNq+tVw5vKx5tnCDLuNMyYItrQXcUYPitBRcsM88atBAkBM3BT9QzWZnlEONpx6RI=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 156053378045031.617573639201396;
+ Fri, 14 Jun 2019 10:36:20 -0700 (PDT)
+In-Reply-To: <20190614161106.218854-1-cosmin@nutanix.com>
+Message-ID: <156053377936.13573.7399026906297846522@ce79690b2cb9>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42c
-Subject: [Qemu-devel] [PATCH  v3 41/50] tests/plugin: add sample plugins
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: cosmin@nutanix.com
+Date: Fri, 14 Jun 2019 10:36:20 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH] migration: Improve accuracy of vCPU
+ throttling with per-vCPU timers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,362 +74,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Emilio G. Cota" <cota@braap.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, cosmin@nutanix.com, qemu-devel@nongnu.org,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Emilio G. Cota" <cota@braap.org>
-
-Pass arguments with -plugin=libfoo.so,arg=bar,arg=baz
-
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- configure             |  4 +-
- tests/plugin/Makefile | 28 +++++++++++++
- tests/plugin/bb.c     | 66 ++++++++++++++++++++++++++++++
- tests/plugin/empty.c  | 30 ++++++++++++++
- tests/plugin/insn.c   | 63 +++++++++++++++++++++++++++++
- tests/plugin/mem.c    | 93 +++++++++++++++++++++++++++++++++++++++++++
- 6 files changed, 282 insertions(+), 2 deletions(-)
- create mode 100644 tests/plugin/Makefile
- create mode 100644 tests/plugin/bb.c
- create mode 100644 tests/plugin/empty.c
- create mode 100644 tests/plugin/insn.c
- create mode 100644 tests/plugin/mem.c
-
-diff --git a/configure b/configure
-index d3bf254191..2af8c436f2 100755
---- a/configure
-+++ b/configure
-@@ -7995,14 +7995,14 @@ fi
- # tests might fail. Prefer to keep the relevant files in their own
- # directory and symlink the directory instead.
- DIRS="tests tests/tcg tests/tcg/cris tests/tcg/lm32 tests/libqos tests/qapi-schema tests/tcg/xtensa tests/qemu-iotests tests/vm"
--DIRS="$DIRS tests/fp tests/qgraph"
-+DIRS="$DIRS tests/fp tests/qgraph tests/plugin"
- DIRS="$DIRS docs docs/interop fsdev scsi"
- DIRS="$DIRS pc-bios/optionrom pc-bios/spapr-rtas pc-bios/s390-ccw"
- DIRS="$DIRS roms/seabios roms/vgabios"
- LINKS="Makefile tests/tcg/Makefile"
- LINKS="$LINKS tests/tcg/cris/Makefile tests/tcg/cris/.gdbinit"
- LINKS="$LINKS tests/tcg/lm32/Makefile tests/tcg/xtensa/Makefile po/Makefile"
--LINKS="$LINKS tests/fp/Makefile"
-+LINKS="$LINKS tests/fp/Makefile tests/plugin/Makefile"
- LINKS="$LINKS pc-bios/optionrom/Makefile pc-bios/keymaps"
- LINKS="$LINKS pc-bios/spapr-rtas/Makefile"
- LINKS="$LINKS pc-bios/s390-ccw/Makefile"
-diff --git a/tests/plugin/Makefile b/tests/plugin/Makefile
-new file mode 100644
-index 0000000000..f9a3546ea3
---- /dev/null
-+++ b/tests/plugin/Makefile
-@@ -0,0 +1,28 @@
-+BUILD_DIR := $(CURDIR)/../..
-+
-+include $(BUILD_DIR)/config-host.mak
-+include $(SRC_PATH)/rules.mak
-+
-+$(call set-vpath, $(SRC_PATH)/tests/plugin)
-+
-+NAMES :=
-+NAMES += bb
-+NAMES += empty
-+NAMES += insn
-+NAMES += mem
-+
-+SONAMES := $(addsuffix .so,$(addprefix lib,$(NAMES)))
-+
-+QEMU_CFLAGS += -fPIC
-+QEMU_CFLAGS += -I$(SRC_PATH)/include/qemu
-+
-+all: $(SONAMES)
-+
-+lib%.so: %.o
-+	$(CC) -shared -Wl,-soname,$@ -o $@ $^ $(LDLIBS)
-+
-+clean:
-+	rm -f *.o *.so *.d
-+	rm -Rf .libs
-+
-+.PHONY: all clean
-diff --git a/tests/plugin/bb.c b/tests/plugin/bb.c
-new file mode 100644
-index 0000000000..bb868599a9
---- /dev/null
-+++ b/tests/plugin/bb.c
-@@ -0,0 +1,66 @@
-+/*
-+ * Copyright (C) 2018, Emilio G. Cota <cota@braap.org>
-+ *
-+ * License: GNU GPL, version 2 or later.
-+ *   See the COPYING file in the top-level directory.
-+ */
-+#include <inttypes.h>
-+#include <assert.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <unistd.h>
-+#include <stdio.h>
-+
-+#include <qemu-plugin.h>
-+
-+static uint64_t bb_count;
-+static uint64_t insn_count;
-+static int stdout_fd;
-+static bool do_inline;
-+
-+static void plugin_exit(qemu_plugin_id_t id, void *p)
-+{
-+    dprintf(stdout_fd, "bb's: %" PRIu64", insns: %" PRIu64 "\n",
-+            bb_count, insn_count);
-+}
-+
-+static void vcpu_tb_exec(unsigned int cpu_index, void *udata)
-+{
-+    unsigned long n_insns = (unsigned long)udata;
-+
-+    insn_count += n_insns;
-+    bb_count++;
-+}
-+
-+static void vcpu_tb_trans(qemu_plugin_id_t id, unsigned int cpu_index,
-+                          struct qemu_plugin_tb *tb)
-+{
-+    unsigned long n_insns = qemu_plugin_tb_n_insns(tb);
-+
-+    if (do_inline) {
-+        qemu_plugin_register_vcpu_tb_exec_inline(tb, QEMU_PLUGIN_INLINE_ADD_U64,
-+                                                 &bb_count, 1);
-+        qemu_plugin_register_vcpu_tb_exec_inline(tb, QEMU_PLUGIN_INLINE_ADD_U64,
-+                                                 &insn_count, n_insns);
-+    } else {
-+        qemu_plugin_register_vcpu_tb_exec_cb(tb, vcpu_tb_exec,
-+                                             QEMU_PLUGIN_CB_NO_REGS,
-+                                             (void *)n_insns);
-+    }
-+}
-+
-+QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
-+                                           char **argv)
-+{
-+    if (argc && strcmp(argv[0], "inline") == 0) {
-+        do_inline = true;
-+    }
-+
-+    /* to be used when in the exit hook */
-+    stdout_fd = dup(STDOUT_FILENO);
-+    assert(stdout_fd);
-+
-+    qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
-+    qemu_plugin_register_atexit_cb(id, plugin_exit, NULL);
-+    return 0;
-+}
-diff --git a/tests/plugin/empty.c b/tests/plugin/empty.c
-new file mode 100644
-index 0000000000..b2e30bddb2
---- /dev/null
-+++ b/tests/plugin/empty.c
-@@ -0,0 +1,30 @@
-+/*
-+ * Copyright (C) 2018, Emilio G. Cota <cota@braap.org>
-+ *
-+ * License: GNU GPL, version 2 or later.
-+ *   See the COPYING file in the top-level directory.
-+ */
-+#include <inttypes.h>
-+#include <assert.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <unistd.h>
-+#include <stdio.h>
-+
-+#include <qemu-plugin.h>
-+
-+/*
-+ * Empty TB translation callback.
-+ * This allows us to measure the overhead of injecting and then
-+ * removing empty instrumentation.
-+ */
-+static void vcpu_tb_trans(qemu_plugin_id_t id, unsigned int cpu_index,
-+                          struct qemu_plugin_tb *tb)
-+{ }
-+
-+QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
-+                                           char **argv)
-+{
-+    qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
-+    return 0;
-+}
-diff --git a/tests/plugin/insn.c b/tests/plugin/insn.c
-new file mode 100644
-index 0000000000..11afe0e8f1
---- /dev/null
-+++ b/tests/plugin/insn.c
-@@ -0,0 +1,63 @@
-+/*
-+ * Copyright (C) 2018, Emilio G. Cota <cota@braap.org>
-+ *
-+ * License: GNU GPL, version 2 or later.
-+ *   See the COPYING file in the top-level directory.
-+ */
-+#include <inttypes.h>
-+#include <assert.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <unistd.h>
-+#include <stdio.h>
-+
-+#include <qemu-plugin.h>
-+
-+static int stdout_fd;
-+static uint64_t insn_count;
-+static bool do_inline;
-+
-+static void vcpu_insn_exec_before(unsigned int cpu_index, void *udata)
-+{
-+    insn_count++;
-+}
-+
-+static void vcpu_tb_trans(qemu_plugin_id_t id, unsigned int cpu_index,
-+                          struct qemu_plugin_tb *tb)
-+{
-+    size_t n = qemu_plugin_tb_n_insns(tb);
-+    size_t i;
-+
-+    for (i = 0; i < n; i++) {
-+        struct qemu_plugin_insn *insn = qemu_plugin_tb_get_insn(tb, i);
-+
-+        if (do_inline) {
-+            qemu_plugin_register_vcpu_insn_exec_inline(
-+                insn, QEMU_PLUGIN_INLINE_ADD_U64, &insn_count, 1);
-+        } else {
-+            qemu_plugin_register_vcpu_insn_exec_cb(
-+                insn, vcpu_insn_exec_before, QEMU_PLUGIN_CB_NO_REGS, NULL);
-+        }
-+    }
-+}
-+
-+static void plugin_exit(qemu_plugin_id_t id, void *p)
-+{
-+    dprintf(stdout_fd, "insns: %" PRIu64 "\n", insn_count);
-+}
-+
-+QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
-+                                           char **argv)
-+{
-+    if (argc && !strcmp(argv[0], "inline")) {
-+        do_inline = true;
-+    }
-+
-+    /* to be used when in the exit hook */
-+    stdout_fd = dup(STDOUT_FILENO);
-+    assert(stdout_fd);
-+
-+    qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
-+    qemu_plugin_register_atexit_cb(id, plugin_exit, NULL);
-+    return 0;
-+}
-diff --git a/tests/plugin/mem.c b/tests/plugin/mem.c
-new file mode 100644
-index 0000000000..c13c672c91
---- /dev/null
-+++ b/tests/plugin/mem.c
-@@ -0,0 +1,93 @@
-+/*
-+ * Copyright (C) 2018, Emilio G. Cota <cota@braap.org>
-+ *
-+ * License: GNU GPL, version 2 or later.
-+ *   See the COPYING file in the top-level directory.
-+ */
-+#include <inttypes.h>
-+#include <assert.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <unistd.h>
-+#include <stdio.h>
-+
-+#include <qemu-plugin.h>
-+
-+static uint64_t mem_count;
-+static int stdout_fd;
-+static bool do_inline;
-+static bool do_haddr;
-+static enum qemu_plugin_mem_rw rw = QEMU_PLUGIN_MEM_RW;
-+
-+static void plugin_exit(qemu_plugin_id_t id, void *p)
-+{
-+    dprintf(stdout_fd, "accesses: %" PRIu64 "\n", mem_count);
-+}
-+
-+static void vcpu_mem(unsigned int cpu_index, qemu_plugin_meminfo_t meminfo,
-+                     uint64_t vaddr, void *udata)
-+{
-+    mem_count++;
-+}
-+
-+static void vcpu_haddr(unsigned int cpu_index, qemu_plugin_meminfo_t meminfo,
-+                       uint64_t vaddr, void *haddr, void *udata)
-+{
-+    mem_count++;
-+}
-+
-+static void vcpu_tb_trans(qemu_plugin_id_t id, unsigned int cpu_index,
-+                          struct qemu_plugin_tb *tb)
-+{
-+    size_t n = qemu_plugin_tb_n_insns(tb);
-+    size_t i;
-+
-+    for (i = 0; i < n; i++) {
-+        struct qemu_plugin_insn *insn = qemu_plugin_tb_get_insn(tb, i);
-+
-+        if (do_inline) {
-+            qemu_plugin_register_vcpu_mem_inline(insn, rw,
-+                                                 QEMU_PLUGIN_INLINE_ADD_U64,
-+                                                 &mem_count, 1);
-+        } else if (do_haddr) {
-+            qemu_plugin_register_vcpu_mem_haddr_cb(insn, vcpu_haddr,
-+                                                   QEMU_PLUGIN_CB_NO_REGS,
-+                                                   rw, NULL);
-+        } else {
-+            qemu_plugin_register_vcpu_mem_cb(insn, vcpu_mem,
-+                                             QEMU_PLUGIN_CB_NO_REGS,
-+                                             rw, NULL);
-+        }
-+    }
-+}
-+
-+QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
-+                                           char **argv)
-+{
-+    if (argc) {
-+        if (argc >= 3) {
-+            if (!strcmp(argv[2], "haddr")) {
-+                do_haddr = true;
-+            }
-+        }
-+        if (argc >= 2) {
-+            const char *str = argv[1];
-+
-+            if (!strcmp(str, "r")) {
-+                rw = QEMU_PLUGIN_MEM_R;
-+            } else if (!strcmp(str, "w")) {
-+                rw = QEMU_PLUGIN_MEM_W;
-+            }
-+        }
-+        if (!strcmp(argv[0], "inline")) {
-+            do_inline = true;
-+        }
-+    }
-+    /* plugin_exit might write to stdout after stdout has been closed */
-+    stdout_fd = dup(STDOUT_FILENO);
-+    assert(stdout_fd);
-+
-+    qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
-+    qemu_plugin_register_atexit_cb(id, plugin_exit, NULL);
-+    return 0;
-+}
--- 
-2.20.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYxNDE2MTEwNi4yMTg4
+NTQtMS1jb3NtaW5AbnV0YW5peC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
+ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
+bmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwNjE0MTYxMTA2LjIxODg1NC0xLWNvc21pbkBu
+dXRhbml4LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBtaWdyYXRpb246IEltcHJv
+dmUgYWNjdXJhY3kgb2YgdkNQVSB0aHJvdHRsaW5nIHdpdGggcGVyLXZDUFUgdGltZXJzClR5cGU6
+IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBh
+cnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
+bmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gu
+cGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCkZyb20gaHR0cHM6
+Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBh
+dGNoZXcvMjAxOTA2MTQxNjExMDYuMjE4ODU0LTEtY29zbWluQG51dGFuaXguY29tIC0+IHBhdGNo
+ZXcvMjAxOTA2MTQxNjExMDYuMjE4ODU0LTEtY29zbWluQG51dGFuaXguY29tClN3aXRjaGVkIHRv
+IGEgbmV3IGJyYW5jaCAndGVzdCcKNDQ5NzAzMiBtaWdyYXRpb246IEltcHJvdmUgYWNjdXJhY3kg
+b2YgdkNQVSB0aHJvdHRsaW5nIHdpdGggcGVyLXZDUFUgdGltZXJzCgo9PT0gT1VUUFVUIEJFR0lO
+ID09PQpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojOTE6IEZJTEU6IGNwdXMuYzo4MDU6Cisg
+ICAgJAoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnLycgKGN0eDpWeFYpCiMx
+MTM6IEZJTEU6IGNwdXMuYzo4MjQ6CisgICAgcGN0ID0gKGRvdWJsZSluZXdfdGhyb3R0bGVfcGN0
+LzEwMDsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2Vz
+IHJlcXVpcmVkIGFyb3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzExNzogRklMRTogY3B1cy5jOjgy
+ODoKKyAgICAgICAgICAgICAgICBDUFVfVEhST1RUTEVfVElNRVNMSUNFX05TIC8gKDEtcGN0KSk7
+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKV0FSTklO
+RzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzE0
+OTogRklMRTogaW5jbHVkZS9xb20vY3B1Lmg6NDQyOgorICAgIC8qIFVzZWQgdG8gY3ljbGljYWxs
+eSB0cmlnZ2VyIHZDUFUgdGhyb3R0bGluZyBkdXJpbmcgVk0gbWlncmF0aW9uCgp0b3RhbDogMyBl
+cnJvcnMsIDEgd2FybmluZ3MsIDg4IGxpbmVzIGNoZWNrZWQKCkNvbW1pdCA0NDk3MDMyYTdkNzkg
+KG1pZ3JhdGlvbjogSW1wcm92ZSBhY2N1cmFjeSBvZiB2Q1BVIHRocm90dGxpbmcgd2l0aCBwZXIt
+dkNQVSB0aW1lcnMpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09
+PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZh
+aWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwNjE0MTYxMTA2LjIxODg1NC0x
+LWNvc21pbkBudXRhbml4LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0t
+CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hl
+dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
+dC5jb20=
 
 
