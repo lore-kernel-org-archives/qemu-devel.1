@@ -2,60 +2,92 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E84D2C31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 16:19:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22663C31E4B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 16:23:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E6722183E
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 16:19:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E6722183E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id EA8962173C
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 16:23:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA8962173C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53128 helo=lists.gnu.org)
+Received: from localhost ([::1]:53252 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbouz-0007QL-Ev
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 12:19:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33968)
+	id 1hboym-0002qD-IN
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 12:23:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60414)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tao3.xu@intel.com>) id 1hbobq-0001Cw-9t
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 11:59:24 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hboVs-0004eO-5W
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 11:53:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1hbobn-0005vo-58
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 11:59:22 -0400
-Received: from mga18.intel.com ([134.134.136.126]:2024)
+ (envelope-from <mreitz@redhat.com>) id 1hboVq-00016s-51
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 11:53:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52994)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hbobm-0005Pa-Mg
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 11:59:19 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
- by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 14 Jun 2019 08:59:17 -0700
-X-ExtLoop1: 1
-Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.104])
- by orsmga008.jf.intel.com with ESMTP; 14 Jun 2019 08:59:15 -0700
-From: Tao Xu <tao3.xu@intel.com>
-To: imammedo@redhat.com,
-	eblake@redhat.com,
-	ehabkost@redhat.com
-Date: Fri, 14 Jun 2019 23:56:26 +0800
-Message-Id: <20190614155626.27932-9-tao3.xu@intel.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190614155626.27932-1-tao3.xu@intel.com>
-References: <20190614155626.27932-1-tao3.xu@intel.com>
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hboVm-00013T-QI; Fri, 14 Jun 2019 11:53:07 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 790BB3086202;
+ Fri, 14 Jun 2019 15:53:00 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.125])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4BEE32D26D;
+ Fri, 14 Jun 2019 15:52:58 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190612221004.2317-1-mreitz@redhat.com>
+ <20190612221004.2317-16-mreitz@redhat.com>
+ <9e448427-1d53-c1a7-c51f-123acf6eccaf@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <3f7ec115-9014-e375-ac7a-4b1ea46873e6@redhat.com>
+Date: Fri, 14 Jun 2019 17:52:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.126
-Subject: [Qemu-devel] [PATCH v5 8/8] numa: Extend the command-line to
- provide memory latency and bandwidth information
+In-Reply-To: <9e448427-1d53-c1a7-c51f-123acf6eccaf@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="3clvIKI2ps1QoeDEkPoDRDmbcrhCqGfiR"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Fri, 14 Jun 2019 15:53:00 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v5 15/42] block: Re-evaluate backing file
+ handling in reopen
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,390 +99,241 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liu Jingqi <jingqi.liu@intel.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--3clvIKI2ps1QoeDEkPoDRDmbcrhCqGfiR
+Content-Type: multipart/mixed; boundary="wBQLrt8jIJs66FoHkfMQ4cEG1exKMQ6JT";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <3f7ec115-9014-e375-ac7a-4b1ea46873e6@redhat.com>
+Subject: Re: [PATCH v5 15/42] block: Re-evaluate backing file handling in
+ reopen
+References: <20190612221004.2317-1-mreitz@redhat.com>
+ <20190612221004.2317-16-mreitz@redhat.com>
+ <9e448427-1d53-c1a7-c51f-123acf6eccaf@virtuozzo.com>
+In-Reply-To: <9e448427-1d53-c1a7-c51f-123acf6eccaf@virtuozzo.com>
 
-Add -numa hmat-lb option to provide System Locality Latency and
-Bandwidth Information. These memory attributes help to build
-System Locality Latency and Bandwidth Information Structure(s)
-in ACPI Heterogeneous Memory Attribute Table (HMAT).
+--wBQLrt8jIJs66FoHkfMQ4cEG1exKMQ6JT
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
----
+On 14.06.19 15:42, Vladimir Sementsov-Ogievskiy wrote:
+> 13.06.2019 1:09, Max Reitz wrote:
+>> Reopening a node's backing child needs a bit of special handling becau=
+se
+>> the "backing" child has different defaults than all other children
+>> (among other things).  Adding filter support here is a bit more
+>> difficult than just using the child access functions.  In fact, we oft=
+en
+>> have to directly use bs->backing because these functions are about the=
 
-Changes in v5 -> v4:
-    - Add error message when base unit < 10
-    - Add more descriptions about option hmat-lb (Igor)
-    - Fix some spell error
-    - Update the hmat-lb option example by using '-numa cpu'
-    and '-numa memdev' (Igor)
----
- numa.c          | 135 ++++++++++++++++++++++++++++++++++++++++++++++++
- qapi/misc.json  |  94 ++++++++++++++++++++++++++++++++-
- qemu-options.hx |  45 +++++++++++++++-
- 3 files changed, 271 insertions(+), 3 deletions(-)
+>> "backing" child (which may or may not be the COW backing file).
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>   block.c | 36 +++++++++++++++++++++++++++++-------
+>>   1 file changed, 29 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/block.c b/block.c
+>> index 505b3e9a01..db2759c10d 100644
+>> --- a/block.c
+>> +++ b/block.c
+>> @@ -3542,17 +3542,39 @@ static int bdrv_reopen_parse_backing(BDRVReope=
+nState *reopen_state,
+>>           }
+>>       }
+>>  =20
+>> +    /*
+>> +     * Ensure that @bs can really handle backing files, because we ar=
+e
+>> +     * about to give it one (or swap the existing one)
+>> +     */
+>> +    if (bs->drv->is_filter) {
+>> +        /* Filters always have a file or a backing child */
+>> +        if (!bs->backing) {
+>> +            error_setg(errp, "'%s' is a %s filter node that does not =
+support a "
+>> +                       "backing child", bs->node_name, bs->drv->forma=
+t_name);
+>> +            return -EINVAL;
+>> +        }
+>> +    } else if (!bs->drv->supports_backing) {
+>> +        error_setg(errp, "Driver '%s' of node '%s' does not support b=
+acking "
+>> +                   "files", bs->drv->format_name, bs->node_name);
+>> +        return -EINVAL;
+>> +    }
+>=20
+> hmm, shouldn't we have these checks for overlay_bs?
 
-diff --git a/numa.c b/numa.c
-index 5556d118c3..ca9d99743a 100644
---- a/numa.c
-+++ b/numa.c
-@@ -40,6 +40,7 @@
- #include "qemu/option.h"
- #include "qemu/config-file.h"
- #include "qemu/cutils.h"
-+#include "hw/acpi/hmat.h"
- 
- QemuOptsList qemu_numa_opts = {
-     .name = "numa",
-@@ -179,6 +180,134 @@ void parse_numa_distance(MachineState *ms, NumaDistOptions *dist, Error **errp)
-     ms->numa_state->have_numa_distance = true;
- }
- 
-+static void parse_numa_hmat_lb(MachineState *ms, NumaHmatLBOptions *node,
-+                               Error **errp)
-+{
-+    int nb_numa_nodes = ms->numa_state->num_nodes;
-+    NodeInfo *numa_info = ms->numa_state->nodes;
-+    HMAT_LB_Info *hmat_lb = NULL;
-+
-+    if (node->data_type <= HMATLB_DATA_TYPE_WRITE_LATENCY) {
-+        if (!node->has_latency) {
-+            error_setg(errp, "Missing 'latency' option.");
-+            return;
-+        }
-+        if (node->has_bandwidth) {
-+            error_setg(errp, "Invalid option 'bandwidth' since "
-+                       "the data type is latency.");
-+            return;
-+        }
-+        if (node->has_base_bw) {
-+            error_setg(errp, "Invalid option 'base_bw' since "
-+                       "the data type is latency.");
-+            return;
-+        }
-+    }
-+
-+    if (node->data_type >= HMATLB_DATA_TYPE_ACCESS_BANDWIDTH) {
-+        if (!node->has_bandwidth) {
-+            error_setg(errp, "Missing 'bandwidth' option.");
-+            return;
-+        }
-+        if (node->has_latency) {
-+            error_setg(errp, "Invalid option 'latency' since "
-+                       "the data type is bandwidth.");
-+            return;
-+        }
-+        if (node->has_base_lat) {
-+            error_setg(errp, "Invalid option 'base_lat' since "
-+                       "the data type is bandwidth.");
-+            return;
-+        }
-+    }
-+
-+    if (node->initiator >= nb_numa_nodes) {
-+        error_setg(errp, "Invalid initiator=%"
-+                   PRIu16 ", it should be less than %d.",
-+                   node->initiator, nb_numa_nodes);
-+        return;
-+    }
-+    if (!numa_info[node->initiator].is_initiator) {
-+        error_setg(errp, "Invalid initiator=%"
-+                   PRIu16 ", it isn't an initiator proximity domain.",
-+                   node->initiator);
-+        return;
-+    }
-+
-+    if (node->target >= nb_numa_nodes) {
-+        error_setg(errp, "Invalid target=%"
-+                   PRIu16 ", it should be less than %d.",
-+                   node->target, nb_numa_nodes);
-+        return;
-+    }
-+    if (!numa_info[node->target].is_target) {
-+        error_setg(errp, "Invalid target=%"
-+                   PRIu16 ", it isn't a target proximity domain.",
-+                   node->target);
-+        return;
-+    }
-+
-+    if (node->has_latency) {
-+        hmat_lb = ms->numa_state->hmat_lb[node->hierarchy][node->data_type];
-+
-+        if (!hmat_lb) {
-+            hmat_lb = g_malloc0(sizeof(*hmat_lb));
-+            ms->numa_state->hmat_lb[node->hierarchy][node->data_type] = hmat_lb;
-+        } else if (hmat_lb->latency[node->initiator][node->target]) {
-+            error_setg(errp, "Duplicate configuration of the latency for "
-+                       "initiator=%" PRIu16 " and target=%" PRIu16 ".",
-+                       node->initiator, node->target);
-+            return;
-+        }
-+
-+        /* Only the first time of setting the base unit is valid. */
-+        if ((hmat_lb->base_lat == 0) && (node->has_base_lat)) {
-+            if (node->base_lat >= 10) {
-+                hmat_lb->base_lat = node->base_lat;
-+            } else {
-+                error_setg(errp, "The minimum latency base unit is 10.");
-+                return;
-+            }
-+        }
-+
-+        hmat_lb->latency[node->initiator][node->target] = node->latency;
-+    }
-+
-+    if (node->has_bandwidth) {
-+        hmat_lb = ms->numa_state->hmat_lb[node->hierarchy][node->data_type];
-+
-+        if (!hmat_lb) {
-+            hmat_lb = g_malloc0(sizeof(*hmat_lb));
-+            ms->numa_state->hmat_lb[node->hierarchy][node->data_type] = hmat_lb;
-+        } else if (hmat_lb->bandwidth[node->initiator][node->target]) {
-+            error_setg(errp, "Duplicate configuration of the bandwidth for "
-+                       "initiator=%" PRIu16 " and target=%" PRIu16 ".",
-+                       node->initiator, node->target);
-+            return;
-+        }
-+
-+        /* Only the first time of setting the base unit is valid. */
-+        if (hmat_lb->base_bw == 0) {
-+            if (!node->has_base_bw) {
-+                error_setg(errp, "Missing 'base-bw' option");
-+                return;
-+            } else if (node->base_bw < 10) {
-+                error_setg(errp, "The minimum bandwidth base unit is 10.");
-+                return;
-+            } else {
-+                hmat_lb->base_bw = node->base_bw;
-+            }
-+        }
-+
-+        hmat_lb->bandwidth[node->initiator][node->target] = node->bandwidth;
-+    }
-+
-+    if (hmat_lb) {
-+        hmat_lb->hierarchy = node->hierarchy;
-+        hmat_lb->data_type = node->data_type;
-+    }
-+}
-+
- static
- void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
- {
-@@ -218,6 +347,12 @@ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
-         machine_set_cpu_numa_node(ms, qapi_NumaCpuOptions_base(&object->u.cpu),
-                                   &err);
-         break;
-+    case NUMA_OPTIONS_TYPE_HMAT_LB:
-+        parse_numa_hmat_lb(ms, &object->u.hmat_lb, &err);
-+        if (err) {
-+            goto end;
-+        }
-+        break;
-     default:
-         abort();
-     }
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 8b3ca4fdd3..a3fe411137 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -2539,10 +2539,12 @@
- #
- # @cpu: property based CPU(s) to node mapping (Since: 2.10)
- #
-+# @hmat-lb: memory latency and bandwidth information (Since: 4.1)
-+#
- # Since: 2.1
- ##
- { 'enum': 'NumaOptionsType',
--  'data': [ 'node', 'dist', 'cpu' ] }
-+  'data': [ 'node', 'dist', 'cpu', 'hmat-lb' ] }
- 
- ##
- # @NumaOptions:
-@@ -2557,7 +2559,8 @@
-   'data': {
-     'node': 'NumaNodeOptions',
-     'dist': 'NumaDistOptions',
--    'cpu': 'NumaCpuOptions' }}
-+    'cpu': 'NumaCpuOptions',
-+    'hmat-lb': 'NumaHmatLBOptions' }}
- 
- ##
- # @NumaNodeOptions:
-@@ -2620,6 +2623,93 @@
-    'base': 'CpuInstanceProperties',
-    'data' : {} }
- 
-+##
-+# @HmatLBMemoryHierarchy:
-+#
-+# The memory hierarchy in the System Locality Latency
-+# and Bandwidth Information Structure of HMAT (Heterogeneous
-+# Memory Attribute Table)
-+#
-+# @memory: the structure represents the memory performance
-+#
-+# @last-level: last level memory of memory side cached memory
-+#
-+# @first-level: first level memory of memory side cached memory
-+#
-+# @second-level: second level memory of memory side cached memory
-+#
-+# @third-level: third level memory of memory side cached memory
-+#
-+# Since: 4.1
-+##
-+{ 'enum': 'HmatLBMemoryHierarchy',
-+  'data': [ 'memory', 'last-level', 'first-level',
-+            'second-level', 'third-level' ] }
-+
-+##
-+# @HmatLBDataType:
-+#
-+# Data type in the System Locality Latency
-+# and Bandwidth Information Structure of HMAT (Heterogeneous
-+# Memory Attribute Table)
-+#
-+# @access-latency: access latency (nanoseconds)
-+#
-+# @read-latency: read latency (nanoseconds)
-+#
-+# @write-latency: write latency (nanoseconds)
-+#
-+# @access-bandwidth: access bandwidth (MB/s)
-+#
-+# @read-bandwidth: read bandwidth (MB/s)
-+#
-+# @write-bandwidth: write bandwidth (MB/s)
-+#
-+# Since: 4.1
-+##
-+{ 'enum': 'HmatLBDataType',
-+  'data': [ 'access-latency', 'read-latency', 'write-latency',
-+            'access-bandwidth', 'read-bandwidth', 'write-bandwidth' ] }
-+
-+##
-+# @NumaHmatLBOptions:
-+#
-+# Set the system locality latency and bandwidth information
-+# between Initiator and Target proximity Domains.
-+#
-+# @initiator: the Initiator Proximity Domain.
-+#
-+# @target: the Target Proximity Domain.
-+#
-+# @hierarchy: the Memory Hierarchy. Indicates the performance
-+#             of memory or side cache.
-+#
-+# @data-type: presents the type of data, access/read/write
-+#             latency or hit latency.
-+#
-+# @base-lat: the base unit for latency in nanoseconds.
-+#
-+# @base-bw: the base unit for bandwidth in megabytes per second(MB/s).
-+#
-+# @latency: the value of latency based on Base Unit from @initiator
-+#           to @target proximity domain.
-+#
-+# @bandwidth: the value of bandwidth based on Base Unit between
-+#             @initiator and @target proximity domain.
-+#
-+# Since: 4.1
-+##
-+{ 'struct': 'NumaHmatLBOptions',
-+    'data': {
-+    'initiator': 'uint16',
-+    'target': 'uint16',
-+    'hierarchy': 'HmatLBMemoryHierarchy',
-+    'data-type': 'HmatLBDataType',
-+    '*base-lat': 'uint64',
-+    '*base-bw': 'uint64',
-+    '*latency': 'uint16',
-+    '*bandwidth': 'uint16' }}
-+
- ##
- # @HostMemPolicy:
- #
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 0d8beb4afd..4179be516f 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -163,16 +163,19 @@ DEF("numa", HAS_ARG, QEMU_OPTION_numa,
-     "-numa node[,mem=size][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n"
-     "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n"
-     "-numa dist,src=source,dst=destination,val=distance\n"
--    "-numa cpu,node-id=node[,socket-id=x][,core-id=y][,thread-id=z]\n",
-+    "-numa cpu,node-id=node[,socket-id=x][,core-id=y][,thread-id=z]\n"
-+    "-numa hmat-lb,initiator=node,target=node,hierarchy=memory|last-level|first-level|second-level|third-level,data-type=access-latency|read-latency|write-latency[,base-lat=blat][,base-bw=bbw][,latency=lat][,bandwidth=bw]\n",
-     QEMU_ARCH_ALL)
- STEXI
- @item -numa node[,mem=@var{size}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}]
- @itemx -numa node[,memdev=@var{id}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}]
- @itemx -numa dist,src=@var{source},dst=@var{destination},val=@var{distance}
- @itemx -numa cpu,node-id=@var{node}[,socket-id=@var{x}][,core-id=@var{y}][,thread-id=@var{z}]
-+@itemx -numa hmat-lb,initiator=@var{node},target=@var{node},hierarchy=@var{str},data-type=@var{str}[,base-lat=@var{blat}][,base-bw=@var{bbw}][,latency=@var{lat}][,bandwidth=@var{bw}]
- @findex -numa
- Define a NUMA node and assign RAM and VCPUs to it.
- Set the NUMA distance from a source node to a destination node.
-+Set the ACPI Heterogeneous Memory Attributes for the given nodes.
- 
- Legacy VCPU assignment uses @samp{cpus} option where
- @var{firstcpu} and @var{lastcpu} are CPU indexes. Each
-@@ -230,6 +233,46 @@ specified resources, it just assigns existing resources to NUMA
- nodes. This means that one still has to use the @option{-m},
- @option{-smp} options to allocate RAM and VCPUs respectively.
- 
-+Use @samp{hmat-lb} to set System Locality Latency and Bandwidth Information
-+between initiator and target NUMA nodes in ACPI Heterogeneous Attribute Memory Table (HMAT).
-+Initiator NUMA node can create memory requests, usually including one or more processors.
-+Target NUMA node contains addressable memory.
-+[,base-lat=@var{blat}][,base-bw=@var{bbw}][,latency=@var{lat}][,bandwidth=@var{bw}]
-+
-+In @samp{hmat-lb} option, @var{node} are NUMA node IDs. @var{str} of 'hierarchy'
-+is the memory hierarchy of the target NUMA node: if @var{str} is 'memory', the structure
-+represents the memory performance; if @var{str} is 'last-level|first-level|second-level|third-level',
-+this structure represents aggregated performance of memory side caches for each domain.
-+@var{str} of 'data-type' is type of data represented by this structure instance:
-+if 'hierarchy' is 'memory', 'data-type' is 'access|read|write' latency(nanoseconds)
-+or 'access|read|write' bandwidth(MB/s) of the target memory; if 'hierarchy' is
-+'last-level|first-level|second-level|third-level', 'data-type' is 'access|read|write' hit latency(nanoseconds)
-+or 'access|read|write' hit bandwidth of the target memory side cache. @var{blat}
-+or @var{bbw} is Matrix Entry Values(latency or bandwidth) base unit used for normalizing
-+the matrix entry values(which store the latency or bandwidth values). Base unit
-+for latency in nanoseconds. Base unit for bandwidth in megabytes per second(MB/s).
-+Note: Due to the minimum matrix value entry value being 10, the base unit corresponds
-+to a value of 10. And @var{blat} or @var{bbw} should be an integer. @var{lat} or
-+@var{bw} is the latency/bandwidth value.
-+
-+For example, the following option assigns NUMA node 0 and 1. Node 0 has 2 cpus and
-+a ram, node 1 has only a ran. The processors in node 0 access memory in node
-+0 with access-latency 5 nanoseconds(base latency is 10), access-bandwidth 5 MB/s(base latency is 20);
-+The processors in NUMA node 0 access memory in NUMA node 1 with access-latency 10
-+nanoseconds(base latency is 10), access-bandwidth 10 MB/s(base latency is 20):
-+@example
-+-m 2G \
-+-object memory-backend-ram,size=1024M,policy=bind,host-nodes=0,id=ram-node0 -numa node,nodeid=0,memdev=ram-node0 \
-+-object memory-backend-ram,size=1024M,policy=bind,host-nodes=1,id=ram-node1 -numa node,nodeid=1,memdev=ram-node1 \
-+-smp 2 \
-+-numa cpu,node-id=0,socket-id=0 \
-+-numa cpu,node-id=0,socket-id=1 \
-+-numa hmat-lb,initiator=0,target=0,hierarchy=memory,data-type=access-latency,base-lat=10,latency=5 \
-+-numa hmat-lb,initiator=0,target=0,hierarchy=memory,data-type=access-bandwidth,base-bw=20,bandwidth=5 \
-+-numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-latency,base-lat=10,latency=10 \
-+-numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-bandwidth,base-bw=20,bandwidth=10 \
-+@end example
-+
- ETEXI
- 
- DEF("add-fd", HAS_ARG, QEMU_OPTION_add_fd,
--- 
-2.20.1
+I think this is correct here because this is the only node the user has
+control over, so this is the only one we can reasonably complain about.
 
+And I do think it is reasonable to complain about.
+
+>> +
+>>       /*
+>>        * Find the "actual" backing file by skipping all links that poi=
+nt
+>>        * to an implicit node, if any (e.g. a commit filter node).
+>> +     * We cannot use any of the bdrv_skip_*() functions here because
+>> +     * those return the first explicit node, while we are looking for=
+
+>> +     * its overlay here.
+>>        */
+>>       overlay_bs =3D bs;
+>> -    while (backing_bs(overlay_bs) && backing_bs(overlay_bs)->implicit=
+) {
+>> -        overlay_bs =3D backing_bs(overlay_bs);
+>> +    while (bdrv_filtered_bs(overlay_bs) &&
+>> +           bdrv_filtered_bs(overlay_bs)->implicit)
+>> +    {
+>> +        overlay_bs =3D bdrv_filtered_bs(overlay_bs);
+>>       }
+>=20
+> here, overlay_bs may be some filter with file child ..
+>=20
+>>  =20
+>>       /* If we want to replace the backing file we need some extra che=
+cks */
+>> -    if (new_backing_bs !=3D backing_bs(overlay_bs)) {
+>> +    if (new_backing_bs !=3D bdrv_filtered_bs(overlay_bs)) {
+>>           /* Check for implicit nodes between bs and its backing file =
+*/
+>>           if (bs !=3D overlay_bs) {
+>>               error_setg(errp, "Cannot change backing link if '%s' has=
+ "
+>> @@ -3560,8 +3582,8 @@ static int bdrv_reopen_parse_backing(BDRVReopenS=
+tate *reopen_state,
+>>               return -EPERM;
+>>           }
+>>           /* Check if the backing link that we want to replace is froz=
+en */
+>> -        if (bdrv_is_backing_chain_frozen(overlay_bs, backing_bs(overl=
+ay_bs),
+>> -                                         errp)) {
+>> +        if (bdrv_is_backing_chain_frozen(overlay_bs,
+>> +                                         child_bs(overlay_bs->backing=
+), errp)) {
+>=20
+> .. and here we are doing wrong thing, as it don't have backing child
+>=20
+> Aha, you use the fact that we now don't have implicit filters with file=
+ child. Then, should
+> we add an assertion for this?
+
+No, that wasn=E2=80=99t my intention.  The real reason is that all of thi=
+s is a
+mess.
+
+Here is the full context:
+
+>     overlay_bs =3D bs;
+>     while (bdrv_filtered_bs(overlay_bs) &&
+>            bdrv_filtered_bs(overlay_bs)->implicit)
+>     {
+>         overlay_bs =3D bdrv_filtered_bs(overlay_bs);
+>     }
+>=20
+>     /* If we want to replace the backing file we need some extra checks=
+ */
+>     if (new_backing_bs !=3D bdrv_filtered_bs(overlay_bs)) {
+>         /* Check for implicit nodes between bs and its backing file */
+>         if (bs !=3D overlay_bs) {
+>             error_setg(errp, "Cannot change backing link if '%s' has " =
+                                                                         =
+                                                                         =
+                   =20
+>                        "an implicit backing file", bs->node_name);
+>             return -EPERM;
+>         }
+>         /* Check if the backing link that we want to replace is frozen =
+*/
+>         if (bdrv_is_backing_chain_frozen(overlay_bs,
+>                                          child_bs(overlay_bs->backing),=
+ errp)) {
+>             return -EPERM;
+>         }
+
+Note the =E2=80=9CCheck for implicit nodes=E2=80=9D thing.  If we get to =
+the frozen
+check, we have already confirmed that overlay_bs =3D=3D bs, so we then kn=
+ow
+that overlay_bs->backing works.
+
+I can add an additional comment to make that more clear.  It took myself
+quite a bit of digging to figure that out again...
+
+(The reason for the loop is that we want to be able to recognize when
+the user tries to not change the backing file.  In that case, we don=E2=80=
+=99t
+have to do anything, but because the user doesn=E2=80=99t know about impl=
+icit
+nodes, we have to skip them in order to check whether the user actually
+doesn=E2=80=99t want to change anything.)
+
+Max
+
+>>               return -EPERM;
+>>           }
+>>           reopen_state->replace_backing_bs =3D true;
+>> @@ -3712,7 +3734,7 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_=
+state, BlockReopenQueue *queue,
+>>        * its metadata. Otherwise the 'backing' option can be omitted.
+>>        */
+>>       if (drv->supports_backing && reopen_state->backing_missing &&
+>> -        (backing_bs(reopen_state->bs) || reopen_state->bs->backing_fi=
+le[0])) {
+>> +        (reopen_state->bs->backing || reopen_state->bs->backing_file[=
+0])) {
+>>           error_setg(errp, "backing is missing for '%s'",
+>>                      reopen_state->bs->node_name);
+>>           ret =3D -EINVAL;
+>> @@ -3857,7 +3879,7 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_=
+state)
+>>        * from bdrv_set_backing_hd()) has the new values.
+>>        */
+>>       if (reopen_state->replace_backing_bs) {
+>> -        BlockDriverState *old_backing_bs =3D backing_bs(bs);
+>> +        BlockDriverState *old_backing_bs =3D child_bs(bs->backing);
+>>           assert(!old_backing_bs || !old_backing_bs->implicit);
+>>           /* Abort the permission update on the backing bs we're detac=
+hing */
+>>           if (old_backing_bs) {
+>>
+>=20
+>=20
+
+
+
+--wBQLrt8jIJs66FoHkfMQ4cEG1exKMQ6JT--
+
+--3clvIKI2ps1QoeDEkPoDRDmbcrhCqGfiR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0DwtgACgkQ9AfbAGHV
+z0B3OAf8D+nE55Gqc0rXVrl9I/StNIMR9KGCxuAAKAzbgMVymjHdPZzvHpyBzI4+
+sDqKtCfsVP0slB9XuRScuq6d1Ti1j9Lajs6r41gvyYC/HYIETSNLNkt1yBa8hbO0
+bYElkaylfE6DzWZrvR8qBTPmrXejFSVvekRvkjSH3/HyFYSdjLNYoppL1ByxMJYY
+RT9Z8u3AlheB6efjpebPp2i2CY61BD4MX0z47UIcqEvlpmPKAUN9KB4nDiy8VCtv
+fHkbuFCGpm09fV1zsp5L6wcrJryWt3+z0dF9GbHWJcrVA1oNEwl0Ke/J3MY+82rM
+7b3m4LMdN0Ne2q2FG26kinxreFcgBQ==
+=bbHZ
+-----END PGP SIGNATURE-----
+
+--3clvIKI2ps1QoeDEkPoDRDmbcrhCqGfiR--
 
