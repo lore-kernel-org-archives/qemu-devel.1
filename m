@@ -2,114 +2,83 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C546CC31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 12:46:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3761FC31E4B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 12:49:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9557D2133D
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 12:46:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9557D2133D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
+	by mail.kernel.org (Postfix) with ESMTPS id BAD302133D
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 12:49:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAD302133D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51222 helo=lists.gnu.org)
+Received: from localhost ([::1]:51248 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hblau-00032U-FK
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 08:46:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56798)
+	id 1hblde-00058q-Qx
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 08:49:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58229)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sw@weilnetz.de>) id 1hblKW-0000Pi-Kr
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 08:29:17 -0400
+ (envelope-from <philmd@redhat.com>) id 1hblQJ-0004BF-05
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 08:35:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sw@weilnetz.de>) id 1hblKV-0008KZ-H4
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 08:29:16 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:50298
- helo=v2201612906741603.powersrv.de)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sw@weilnetz.de>)
- id 1hblKT-0008HB-0F; Fri, 14 Jun 2019 08:29:13 -0400
-Received: from localhost (localhost [127.0.0.1])
- by v2201612906741603.powersrv.de (Postfix) with ESMTP id 402D0DB63D7;
- Fri, 14 Jun 2019 14:29:11 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
-Received: from v2201612906741603.powersrv.de ([127.0.0.1])
- by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
- port 10024)
- with ESMTP id ZRbxdebmc58F; Fri, 14 Jun 2019 14:29:03 +0200 (CEST)
-Received: from [134.155.36.155] (edv32.bib.uni-mannheim.de [134.155.36.155])
- (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
- key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
- (No client certificate requested)
- by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 2B78EDB636A;
- Fri, 14 Jun 2019 14:29:02 +0200 (CEST)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>
-References: <20190605213654.9785-1-ptoscano@redhat.com>
- <a8797829-a5c6-24a3-647f-14872bc2f951@redhat.com>
- <c4376dbb-d755-f05f-fb93-ed212bf30bb0@weilnetz.de>
- <20190614094252.GD6042@dhcp-200-226.str.redhat.com>
- <60460e9f-2254-7b76-3418-7c495aec3822@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=sw@weilnetz.de; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <97e6ec51-a9e6-cff8-3c56-9299450aad2f@weilnetz.de>
-Date: Fri, 14 Jun 2019 14:29:00 +0200
+ (envelope-from <philmd@redhat.com>) id 1hblQG-0004vN-VI
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 08:35:14 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:51437)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hblQE-0004tU-U1
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 08:35:12 -0400
+Received: by mail-wm1-f65.google.com with SMTP id 207so2199521wma.1
+ for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 05:35:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=fEaF4clYgZn2kJ7fan+D0LaG00CiaqS56mBWRFxX80o=;
+ b=Yc6EBIolmPp2mOGdhWr+SazP2pvLu8/bu8PStukAeDPyZLnolQrT1D7go9NYItzpSZ
+ Sj4CojnaPqHUtw1hL+OFDZU1qnsIqwAtsNBWWXhmIxu7GzB/JLtcICv8bxJsHGOPH8AE
+ uRQeT0ysHixNa042/oer3DlJy1617m04rLndQNIAcKbwma08QA2zuMI4vO2oY5tzHND2
+ KMXipGfZyQ2//IYRL+4mJSHmOE3GfbXLjWvaM/oOqbpVgFt+/gL3vCHTwjM8ku94goXp
+ tZNAlt7uECjlAjefomi9akUkd2J/vqRlfwRimoHSe7lcF2lpJnKIzDHn+l+92JJIzDGw
+ zLug==
+X-Gm-Message-State: APjAAAXp2YjDkAzS5nQ+xuocr1bfJmoyG7qxxrygQW11Us3EezeRsmhT
+ +vh6SfMlhk7iNhOpYtzSlN858w==
+X-Google-Smtp-Source: APXvYqzzX4wIjjU/WKDEBoyM4jttwVMGibTvdgcOWRj9XCW+kcFR8zp2OwkQevhx+9VmiR9T8Pj4yw==
+X-Received: by 2002:a1c:9d86:: with SMTP id g128mr8497166wme.51.1560515709509; 
+ Fri, 14 Jun 2019 05:35:09 -0700 (PDT)
+Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.183])
+ by smtp.gmail.com with ESMTPSA id t198sm3678080wmt.2.2019.06.14.05.35.08
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 14 Jun 2019 05:35:08 -0700 (PDT)
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20190525151241.5017-1-clg@kaod.org>
+ <20190525151241.5017-19-clg@kaod.org>
+ <f3b3948f-8d24-fb8c-0b65-8fe08019a077@redhat.com>
+ <b4401eaf-9898-8c3e-3beb-f550edb83228@kaod.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <1e2ae27f-d5e9-f2ca-ec35-2c536710a5ef@redhat.com>
+Date: Fri, 14 Jun 2019 14:35:08 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <60460e9f-2254-7b76-3418-7c495aec3822@redhat.com>
+In-Reply-To: <b4401eaf-9898-8c3e-3beb-f550edb83228@kaod.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: de-DE
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 37.120.169.71
-Subject: Re: [Qemu-devel] [PATCH v6] ssh: switch from libssh2 to libssh
+ [fuzzy]
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH 18/19] aspeed/smc: inject errors in DMA
+ checksum
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,33 +90,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, rjones@redhat.com, mreitz@redhat.com,
- Pino Toscano <ptoscano@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Andrew Jeffery <andrew@aj.id.au>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-arm@nongnu.org, qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 14.06.19 12:13, Philippe Mathieu-Daud=C3=A9 wrote:
-> I agree with Kevin. The only user of the 'ssh' block driver that I am
-> aware of is the virt-v2v tool:
->=20
-> http://libguestfs.org/virt-v2v.1.html#convert-from-esxi-hypervisor-over=
--ssh-to-local-libvirt
->=20
-> Stefan, do you think someone would use it on a Windows host?
+Cc'ing Markus & Marc-André
 
+On 6/14/19 2:02 PM, Cédric Le Goater wrote:
+> On 13/06/2019 16:31, Philippe Mathieu-Daudé wrote:
+>> Hi Cédric,
+>>
+>> On 5/25/19 5:12 PM, Cédric Le Goater wrote:
+>>> Emulate read errors in the DMA Checksum Register for high frequencies
+>>> and optimistic settings of the Read Timing Compensation Register. This
+>>> will help in tuning the SPI timing calibration algorithm.
+>>>
+>>> The values below are those to expect from the first flash device of
+>>> the FMC controller of a palmetto-bmc machine.
+>>>
+>>> Signed-off-by: Cédric Le Goater <clg@kaod.org>
+>>> ---
+>>>  hw/ssi/aspeed_smc.c | 29 +++++++++++++++++++++++++++++
+>>>  1 file changed, 29 insertions(+)
+>>>
+>>> diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+>>> index 406c30c60b3f..4c162912cf62 100644
+>>> --- a/hw/ssi/aspeed_smc.c
+>>> +++ b/hw/ssi/aspeed_smc.c
+>>> @@ -866,6 +866,30 @@ static void aspeed_smc_dma_calibration(AspeedSMCState *s)
+>>>      s->regs[s->r_ctrl0 + cs] |= CE_CTRL_CLOCK_FREQ(hclk_div);
+>>>  }
+>>>  
+>>
+>> Can you add a comment (like the patch description) here?
+> 
+> yes. done.
+>  
+>>> +static bool aspeed_smc_inject_read_failure(AspeedSMCState *s)
+>>> +{
+>>> +    uint8_t delay =
+>>> +        (s->regs[R_DMA_CTRL] >> DMA_CTRL_DELAY_SHIFT) & DMA_CTRL_DELAY_MASK;
+>>> +    uint8_t hclk_mask =
+>>> +        (s->regs[R_DMA_CTRL] >> DMA_CTRL_FREQ_SHIFT) & DMA_CTRL_FREQ_MASK;
+>>> +
+>>> +    /*
+>>> +     * Typical values of a palmetto-bmc machine.
+>>> +     */
+>>> +    switch (aspeed_smc_hclk_divisor(hclk_mask)) {
+>>> +    case 4 ... 16:
+>>> +        return false;
+>>> +    case 3: /* at least one HCLK cycle delay */
+>>> +        return (delay & 0x7) < 1;
+>>> +    case 2: /* at least two HCLK cycle delay */
+>>> +        return (delay & 0x7) < 2;
+>>> +    case 1: /* (> 100MHz) is above the max freq of the controller */
+>>> +        return true;
+>>> +    default:
+>>> +        g_assert_not_reached();
+>>> +    }
+>>> +}
+>>> +
+>>>  /*
+>>>   * Accumulate the result of the reads to provide a checksum that will
+>>>   * be used to validate the read timing settings.
+>>> @@ -903,6 +927,11 @@ static void aspeed_smc_dma_checksum(AspeedSMCState *s)
+>>>          s->regs[R_DMA_FLASH_ADDR] += 4;
+>>>          s->regs[R_DMA_LEN] -= 4;
+>>>      }
+>>> +
+>>> +    if (aspeed_smc_inject_read_failure(s)) {
+>>
+>> So this model real world where noise eventually triggers errors. Don't
+>> we want this to be enable by the user (or a QMP command)?
+> 
+> I can add a property at the device model level to trigger this behavior.
+> Such as :
+> 
+>    -global driver=aspeed.smc,property=timing,value=true
+> 
+> timing if defined would provide the maximum clock and delay settings.
 
-I simply don't know. Typically people contact me if something does not
-work. Rarely they send an e-mail to say what they do and that everything
-is fine.
+I was thinking of a simpler:
 
-If QEMU for Windows builds without libssl, I'll build binaries without
-it, add that information to the release notes and wait what happens.
+    -global driver=aspeed.smc,property=inject_failure,value=true
 
-So no objection from my side.
+Then
 
-Cheers
-Stefan
+    if (s->inject_failure && aspeed_smc_inject_read_failure(s)) {
+        s->regs[R_DMA_CHECKSUM] = 0xbadc0de;
+    }
+
+> 
+> Are there any other examples in QEMU ?
+
+I think most of them are hidden in the codebase...
+
+> 
+> Thanks,
+> 
+> C.
+> 
+>>
+>>> +        s->regs[R_DMA_CHECKSUM] = 0xbadc0de;
+>>> +    }
+>>> +
+>>>  }
+>>>  
+>>>  static void aspeed_smc_dma_rw(AspeedSMCState *s)
+>>>
+> 
 
