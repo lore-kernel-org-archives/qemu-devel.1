@@ -2,65 +2,81 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99D7CC31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 15:22:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3FCDC31E4B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 15:26:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D74F2133D
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 15:22:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D74F2133D
+	by mail.kernel.org (Postfix) with ESMTPS id A7DE32133D
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 15:26:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7DE32133D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52594 helo=lists.gnu.org)
+Received: from localhost ([::1]:52658 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbo1f-00078Q-67
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 11:21:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46357)
+	id 1hbo63-0003vJ-Q5
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 11:26:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49328)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1hbnmt-0005ur-JZ
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 11:06:47 -0400
+ (envelope-from <philmd@redhat.com>) id 1hbns7-0001h2-AO
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 11:12:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1hbnmq-0000vR-6K
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 11:06:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60136)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1hbnmp-0000m5-PN; Fri, 14 Jun 2019 11:06:40 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E60F73082E63;
- Fri, 14 Jun 2019 15:06:21 +0000 (UTC)
-Received: from [10.36.116.67] (ovpn-116-67.ams2.redhat.com [10.36.116.67])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 763E31948B;
- Fri, 14 Jun 2019 15:06:20 +0000 (UTC)
-To: Eric Farman <farman@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- Farhan Ali <alifm@linux.ibm.com>
-References: <20190614092705.11025-1-cohuck@redhat.com>
- <790578fe-9d90-bfa1-a540-f7f054d8293f@linux.ibm.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <5fd0fe9a-9f1e-15f1-b440-e3c505e6f3ea@redhat.com>
-Date: Fri, 14 Jun 2019 17:06:18 +0200
+ (envelope-from <philmd@redhat.com>) id 1hbns5-0005XX-RE
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 11:12:07 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:33459)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hbns5-0005Wv-JT
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 11:12:05 -0400
+Received: by mail-wr1-f68.google.com with SMTP id n9so2952145wru.0
+ for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 08:12:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=fU6fGwyVAjfQlO7fjnezZQptnNMKQPTRAbeFiuykzQs=;
+ b=SR49yd3/QMQsK5PQ1XfGRbG9TcIC+j0UF34rI95jZnG+Y02lwsfyKOWBkTQ6HboCk5
+ Krm39IOmV7anxV6YBeyydWnXAbmBdb2XYTsLoEkMQSNBk4tnnl93Gphgtw1nORo261O7
+ y4GOwRmGFKa/3UXZtZKBcKIKT8HJ1p9kzVXdOSkmZYzPhYQYzy5LpQJUb/NeOCDUivcS
+ 0xKupwJI6/HSKTyFOEFreVCnRy9m1XkP8RX39IoI0BHLfYfiAqGUKOWqy/PQzlUu+ZIN
+ o/lp4myzSmC7CyuOAg3atBhAbTkZuHLJKN7o8QTcyjOhZh4m1AkhQaraJvUlDmNdy02l
+ L4qg==
+X-Gm-Message-State: APjAAAUINz/KpOlznAJYRJHlAW+z+S8sNSaoRSU8WoLErg+lXOtNBNiB
+ ZoSUouq+EhDul3NFrQPi67hSrQ==
+X-Google-Smtp-Source: APXvYqwUUpAKr0oPoaxyUPt88NchjBspv25uZiny2nbxVyhfIlJOi9DydpPIVpAr1RbA98ayLSx4/w==
+X-Received: by 2002:a5d:6190:: with SMTP id j16mr4792067wru.49.1560525124636; 
+ Fri, 14 Jun 2019 08:12:04 -0700 (PDT)
+Received: from [192.168.1.103] (183.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.183])
+ by smtp.gmail.com with ESMTPSA id a3sm3138525wmb.35.2019.06.14.08.12.03
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 14 Jun 2019 08:12:04 -0700 (PDT)
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ ptoscano@redhat.com
+References: <156044303828.5426.699619794825925129@ce79690b2cb9>
+ <2376306b-9812-f4e2-883c-55bc818c16be@redhat.com>
+ <aee10f02-3ff8-222c-bfd4-833d595aa7e2@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <80eff352-8e1f-4451-0cdf-c8808dc033e8@redhat.com>
+Date: Fri, 14 Jun 2019 17:12:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <790578fe-9d90-bfa1-a540-f7f054d8293f@linux.ibm.com>
+In-Reply-To: <aee10f02-3ff8-222c-bfd4-833d595aa7e2@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Fri, 14 Jun 2019 15:06:22 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] vfio-ccw: use vfio_set_irq_signaling
+ [fuzzy]
+X-Received-From: 209.85.221.68
+Subject: Re: [Qemu-devel] [PATCH v9] ssh: switch from libssh2 to libssh
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,140 +88,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, fam@euphon.net, qemu-block@nongnu.org, sw@weilnetz.de,
+ rjones@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Eric,
-
-On 6/14/19 4:30 PM, Eric Farman wrote:
-> 
-> 
-> On 6/14/19 5:27 AM, Cornelia Huck wrote:
->> Use the new helper.
+On 6/13/19 8:18 PM, Paolo Bonzini wrote:
+> On 13/06/19 19:15, Philippe Mathieu-Daudé wrote:
 >>
->> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->> ---
->>  hw/vfio/ccw.c | 68 +++++++++++----------------------------------------
->>  1 file changed, 14 insertions(+), 54 deletions(-)
+>> On 6/13/19 6:24 PM, no-reply@patchew.org wrote:
+>>> === TEST SCRIPT BEGIN ===
+>>> #!/bin/bash
+>>> time make docker-test-debug@fedora TARGET_LIST=x86_64-softmmu J=14 NETWORK=1
+>>> === TEST SCRIPT END ===
 >>
->> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
->> index 03a2becb3ec9..3dc08721a3db 100644
->> --- a/hw/vfio/ccw.c
->> +++ b/hw/vfio/ccw.c
->> @@ -197,10 +197,7 @@ read_err:
->>  static void vfio_ccw_register_io_notifier(VFIOCCWDevice *vcdev, Error **errp)
->>  {
->>      VFIODevice *vdev = &vcdev->vdev;
->> -    struct vfio_irq_info *irq_info;
->> -    struct vfio_irq_set *irq_set;
->> -    size_t argsz;
->> -    int32_t *pfd;
->> +    int fd;
->>  
->>      if (vdev->num_irqs < VFIO_CCW_IO_IRQ_INDEX + 1) {
->>          error_setg(errp, "vfio: unexpected number of io irqs %u",
->> @@ -208,72 +205,35 @@ static void vfio_ccw_register_io_notifier(VFIOCCWDevice *vcdev, Error **errp)
->>          return;
->>      }
->>  
->> -    argsz = sizeof(*irq_info);
->> -    irq_info = g_malloc0(argsz);
->> -    irq_info->index = VFIO_CCW_IO_IRQ_INDEX;
->> -    irq_info->argsz = argsz;
->> -    if (ioctl(vdev->fd, VFIO_DEVICE_GET_IRQ_INFO,
->> -              irq_info) < 0 || irq_info->count < 1) {
->> -        error_setg_errno(errp, errno, "vfio: Error getting irq info");
->> -        goto out_free_info;
->> -    }
->> -
-> 
-> Don't we still need this hunk?  (And the out_free_info label stuff that
-> cleans it up.)  I don't see vfio_set_irq_signaling() covering it.
-
-Looks this IRQ index is always implemented and exposed by the driver,
-isn't it? In such a case it shouldn't be needed to test its presence?
-
-Thanks
-
-Eric
-> 
->>      if (event_notifier_init(&vcdev->io_notifier, 0)) {
->>          error_setg_errno(errp, errno,
->>                           "vfio: Unable to init event notifier for IO");
->> -        goto out_free_info;
->> +        return;
->>      }
->>  
->> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
->> -    irq_set = g_malloc0(argsz);
->> -    irq_set->argsz = argsz;
->> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
->> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
->> -    irq_set->index = VFIO_CCW_IO_IRQ_INDEX;
->> -    irq_set->start = 0;
->> -    irq_set->count = 1;
->> -    pfd = (int32_t *) &irq_set->data;
->> -
->> -    *pfd = event_notifier_get_fd(&vcdev->io_notifier);
->> -    qemu_set_fd_handler(*pfd, vfio_ccw_io_notifier_handler, NULL, vcdev);
->> -    if (ioctl(vdev->fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
->> -        error_setg(errp, "vfio: Failed to set up io notification");
->> -        qemu_set_fd_handler(*pfd, NULL, NULL, vcdev);
->> +    fd = event_notifier_get_fd(&vcdev->io_notifier);
->> +    qemu_set_fd_handler(fd, vfio_ccw_io_notifier_handler, NULL, vcdev);
->> +
->> +    if (vfio_set_irq_signaling(vdev, VFIO_CCW_IO_IRQ_INDEX, 0,
->> +                               VFIO_IRQ_SET_ACTION_TRIGGER, fd, errp)) {
->> +        qemu_set_fd_handler(fd, NULL, NULL, vcdev);
-> 
-> This sure looks nice though.  :)
-> 
->>          event_notifier_cleanup(&vcdev->io_notifier);
->>      }
->> -
->> -    g_free(irq_set);
->> -
->> -out_free_info:
->> -    g_free(irq_info);
->>  }
->>  
->>  static void vfio_ccw_unregister_io_notifier(VFIOCCWDevice *vcdev)
->>  {
->> -    struct vfio_irq_set *irq_set;
->> -    size_t argsz;
->> -    int32_t *pfd;
->> -
->> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
->> -    irq_set = g_malloc0(argsz);
->> -    irq_set->argsz = argsz;
->> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
->> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
->> -    irq_set->index = VFIO_CCW_IO_IRQ_INDEX;
->> -    irq_set->start = 0;
->> -    irq_set->count = 1;
->> -    pfd = (int32_t *) &irq_set->data;
->> -    *pfd = -1;
->> -
->> -    if (ioctl(vcdev->vdev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
->> -        error_report("vfio: Failed to de-assign device io fd: %m");
->> +    Error *err = NULL;
->> +
->> +    vfio_set_irq_signaling(&vcdev->vdev, VFIO_CCW_IO_IRQ_INDEX, 0,
->> +                           VFIO_IRQ_SET_ACTION_TRIGGER, -1, &err);
->> +    if (err) {
->> +        error_reportf_err(err, VFIO_MSG_PREFIX, vcdev->vdev.name);
->>      }
->>  
->>      qemu_set_fd_handler(event_notifier_get_fd(&vcdev->io_notifier),
->>                          NULL, NULL, vcdev);
->>      event_notifier_cleanup(&vcdev->io_notifier);
->> -
->> -    g_free(irq_set);
->>  }
->>  
->>  static void vfio_ccw_get_region(VFIOCCWDevice *vcdev, Error **errp)
+>>> The full log is available at
+>>> http://patchew.org/logs/20190613132000.2146-1-ptoscano@redhat.com/testing.asan/?type=message.
+>>
+>>
+>> === OUTPUT BEGIN ===
+>>   BUILD   fedora
+>> The command '/bin/sh -c dnf install -y $PACKAGES' returned a non-zero
+>> code: 1
+>> Traceback (most recent call last):
+>>   File "./tests/docker/docker.py", line 615, in <module>
+>>     sys.exit(main())
+>>   File "./tests/docker/docker.py", line 611, in main
+>>     return args.cmdobj.run(args, argv)
+>>   File "./tests/docker/docker.py", line 413, in run
+>>     extra_files_cksum=cksum)
+>>   File "./tests/docker/docker.py", line 280, in build_image
+>>     quiet=quiet)
+>>   File "./tests/docker/docker.py", line 207, in _do_check
+>>     return subprocess.check_call(self._command + cmd, **kwargs)
+>>   File "/usr/lib64/python2.7/subprocess.py", line 542, in check_call
+>>     raise CalledProcessError(retcode, cmd)
+>> subprocess.CalledProcessError: Command '['sudo', '-n', 'docker',
+>> 'build', '-t', 'qemu:fedora', '-f',
+>> '/tmp/docker_buildN2FMKc/tmpz_9Up_.docker', '/tmp/docker_buildN2FMKc']'
+>> returned non-zero exit status 1
+>> make: *** [docker-image-fedora] Error 1
+>>
+>> real	3m54.376s
+>>
+>> Not sure this is a network issue or something else, should we rebuild
+>> docker images with V=1 on patchew?
 >>
 > 
+> I restarted the job with V=1.
+
+Thanks!
+
+Patchew did not send update, which means no failure.
+Hopefully it updated the same url with the full log.
+Indeed the job is successful:
+
+
+real	30m39.367s
+user	0m8.061s
+sys	0m5.880s
+=== OUTPUT END ===
+
+Test command exited with code: 0
 
