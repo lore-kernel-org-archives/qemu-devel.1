@@ -2,64 +2,72 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	T_HK_NAME_DR,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAD9EC31E44
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 09:21:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02D24C31E44
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 09:21:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B107F208CA
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 09:21:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B107F208CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CF160208CA
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 09:21:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF160208CA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49546 helo=lists.gnu.org)
+Received: from localhost ([::1]:49550 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbiOo-0007i1-FZ
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 05:21:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37540)
+	id 1hbiP3-0007t2-4Y
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 05:21:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37747)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hbiLJ-0005G8-V7
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 05:18:14 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1hbiMP-0005gr-6z
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 05:19:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hbiLH-0001j2-QN
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 05:17:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43802)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>)
- id 1hbiLC-0001fm-S1; Fri, 14 Jun 2019 05:17:47 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C5A643082126;
- Fri, 14 Jun 2019 09:17:42 +0000 (UTC)
-Received: from work-vm (ovpn-117-220.ams2.redhat.com [10.36.117.220])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4E59D1001938;
- Fri, 14 Jun 2019 09:17:37 +0000 (UTC)
-Date: Fri, 14 Jun 2019 10:17:35 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Message-ID: <20190614091733.GA2785@work-vm>
-References: <20190613153405.24769-1-kwolf@redhat.com>
- <20190613153405.24769-12-kwolf@redhat.com>
- <87y324fud1.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87y324fud1.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 14 Jun 2019 09:17:42 +0000 (UTC)
+ (envelope-from <palmer@dabbelt.com>) id 1hbiMN-0002Wq-FM
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 05:19:01 -0400
+Received: from mail-yb1-f193.google.com ([209.85.219.193]:41978)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hbiMN-0002WL-AE
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 05:18:59 -0400
+Received: by mail-yb1-f193.google.com with SMTP id d2so795135ybh.8
+ for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 02:18:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=MKSedTkp3zp/P8418U7boPHVAMWNJ3vSIOJ9sfGhz5Y=;
+ b=DRQIVLhx835mIyqGGcZ0CuOhK72JrDbQuRE+uhCy/O0S+FrEn7kH/+EGpE1tXiSCgY
+ twOXvr+2kFYd8vNbGoSM9HJk1thkFgqb+0TRPcK/vgyDEEGclA9xy/2AU25/STkDPVuB
+ 0jg/MJuj9hRHUmDS3pBwWou+bZA/7iCtP5WmSD8GWAXO7ZMwcqXQc3R0HeTDNx3urPSB
+ oafiSHDMpQFBOcYyaSk8kx6g8HGMzJ3FlyoembOfH3WTgQS7WSldzbWhwSmP81zEq5aZ
+ ldGPmhpiTAb0Cw4A79FryZZ0GYebZ/mmy4QuwAH+A2ulHheX6ZpUTO6vMEz8ZeUUn6Iu
+ u7cg==
+X-Gm-Message-State: APjAAAXmXuj1aB7XiplkZciiG4Kf2AC2yU/FWb/CmSbgmRSboXZJvNds
+ 8tdYQEX30kmvzTNfK+PvML0eXCCNUwDeig==
+X-Google-Smtp-Source: APXvYqzKyum+4MrYgB/8cBiGlOeh9rNFVhcF3bdMP/Y4kcdxxVsnPAQb5Pwgapbmt+44TaehdrkfvA==
+X-Received: by 2002:a25:9d84:: with SMTP id v4mr44655139ybp.88.1560503937950; 
+ Fri, 14 Jun 2019 02:18:57 -0700 (PDT)
+Received: from localhost ([83.137.6.186])
+ by smtp.gmail.com with ESMTPSA id 205sm621229yws.46.2019.06.14.02.18.56
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 14 Jun 2019 02:18:57 -0700 (PDT)
+Date: Fri, 14 Jun 2019 02:18:57 -0700 (PDT)
+X-Google-Original-Date: Fri, 14 Jun 2019 02:18:48 PDT (-0700)
+In-Reply-To: <4e552352bb35b1f4b086e260be369464df7c490e.1558131003.git.alistair.francis@wdc.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>
+Message-ID: <mhng-96573692-b788-4185-85a6-435e87a7d7eb@palmer-si-x1e>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 11/15] monitor: Split out monitor/hmp.c
+ [fuzzy]
+X-Received-From: 209.85.219.193
+Subject: Re: [Qemu-devel] [PATCH v1 2/4] disas/riscv: Disassemble reserved
+ compressed encodings as illegal
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,434 +79,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, berrange@redhat.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> Kevin Wolf <kwolf@redhat.com> writes:
-> 
-> > Move HMP infrastructure from monitor/misc.c to monitor/hmp.c. This is
-> > code that can be shared for all targets, so compile it only once.
-> >
-> > The amount of function and particularly extern variables in
-> > monitor_int.h is probably a bit larger than it needs to be, but this way
-> > no non-trivial code modifications are needed. The interfaces between HMP
-> > and the monitor core can be cleaned up later.
-> >
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> [...]
-> > diff --git a/monitor/hmp.c b/monitor/hmp.c
-> > new file mode 100644
-> > index 0000000000..3621b195ed
-> > --- /dev/null
-> > +++ b/monitor/hmp.c
-> > @@ -0,0 +1,1415 @@
-> [...]
-> > +static int64_t expr_unary(Monitor *mon)
-> > +{
-> > +    int64_t n;
-> > +    char *p;
-> > +    int ret;
-> > +
-> > +    switch (*pch) {
-> > +    case '+':
-> > +        next();
-> > +        n = expr_unary(mon);
-> > +        break;
-> > +    case '-':
-> > +        next();
-> > +        n = -expr_unary(mon);
-> > +        break;
-> > +    case '~':
-> > +        next();
-> > +        n = ~expr_unary(mon);
-> > +        break;
-> > +    case '(':
-> > +        next();
-> > +        n = expr_sum(mon);
-> > +        if (*pch != ')') {
-> > +            expr_error(mon, "')' expected");
-> > +        }
-> > +        next();
-> > +        break;
-> > +    case '\'':
-> > +        pch++;
-> > +        if (*pch == '\0') {
-> > +            expr_error(mon, "character constant expected");
-> > +        }
-> > +        n = *pch;
-> > +        pch++;
-> > +        if (*pch != '\'') {
-> > +            expr_error(mon, "missing terminating \' character");
-> > +        }
-> > +        next();
-> > +        break;
-> > +    case '$':
-> > +        {
-> > +            char buf[128], *q;
-> > +            int64_t reg = 0;
-> > +
-> > +            pch++;
-> > +            q = buf;
-> > +            while ((*pch >= 'a' && *pch <= 'z') ||
-> > +                   (*pch >= 'A' && *pch <= 'Z') ||
-> > +                   (*pch >= '0' && *pch <= '9') ||
-> > +                   *pch == '_' || *pch == '.') {
-> > +                if ((q - buf) < sizeof(buf) - 1) {
-> > +                    *q++ = *pch;
-> > +                }
-> > +                pch++;
-> > +            }
-> > +            while (qemu_isspace(*pch)) {
-> > +                pch++;
-> > +            }
-> > +            *q = 0;
-> > +            ret = get_monitor_def(&reg, buf);
-> > +            if (ret < 0) {
-> > +                expr_error(mon, "unknown register");
-> > +            }
-> > +            n = reg;
-> > +        }
-> > +        break;
-> > +    case '\0':
-> > +        expr_error(mon, "unexpected end of expression");
-> > +        n = 0;
-> > +        break;
-> > +    default:
-> > +        errno = 0;
-> > +        n = strtoull(pch, &p, 0);
-> 
-> checkpatch.pl gripes:
-> 
->     ERROR: consider using qemu_strtoull in preference to strtoull
-> 
-> 
-> Let's add a TODO comment.  
-> 
-> > +        if (errno == ERANGE) {
-> > +            expr_error(mon, "number too large");
-> > +        }
-> > +        if (pch == p) {
-> > +            expr_error(mon, "invalid char '%c' in expression", *p);
-> > +        }
-> > +        pch = p;
-> > +        while (qemu_isspace(*pch)) {
-> > +            pch++;
-> > +        }
-> > +        break;
-> > +    }
-> > +    return n;
-> > +}
-> [...]
-> > +static void monitor_find_completion(void *opaque,
-> > +                                    const char *cmdline)
-> > +{
-> > +    MonitorHMP *mon = opaque;
-> > +    char *args[MAX_ARGS];
-> > +    int nb_args, len;
-> > +
-> > +    /* 1. parse the cmdline */
-> > +    if (parse_cmdline(cmdline, &nb_args, args) < 0) {
-> > +        return;
-> > +    }
-> > +
-> > +    /* if the line ends with a space, it means we want to complete the
-> > +     * next arg */
-> 
-> checkpatch.pl again:
-> 
->     WARNING: Block comments use a leading /* on a separate line
->     WARNING: Block comments use a trailing */ on a separate line
-> 
-> Can touch up in my tree.
+On Fri, 17 May 2019 15:11:01 PDT (-0700), Alistair Francis wrote:
+> From: Michael Clark <mjc@sifive.com>
+>
+> Due to the design of the disassembler, the immediate is not
+> known during decoding of the opcode; so to handle compressed
+> encodings with reserved immediate values (non-zero), we need
+> to add an additional check during decompression to match
+> reserved encodings with zero immediates and translate them
+> into the illegal instruction.
+>
+> The following compressed opcodes have reserved encodings with
+> zero immediates: c.addi4spn, c.addi, c.lui, c.addi16sp, c.srli,
+> c.srai, c.andi and c.slli
+>
+> Signed-off-by: Michael Clark <mjc@sifive.com>
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  disas/riscv.c | 51 ++++++++++++++++++++++++++++++++++-----------------
+>  1 file changed, 34 insertions(+), 17 deletions(-)
+>
+> diff --git a/disas/riscv.c b/disas/riscv.c
+> index 59a9b0437a..3ab4586f0a 100644
+> --- a/disas/riscv.c
+> +++ b/disas/riscv.c
+> @@ -504,14 +504,19 @@ typedef struct {
+>      const rvc_constraint *constraints;
+>  } rv_comp_data;
+>
+> +enum {
+> +    rvcd_imm_nz = 0x1
+> +};
+> +
+>  typedef struct {
+>      const char * const name;
+>      const rv_codec codec;
+>      const char * const format;
+>      const rv_comp_data *pseudo;
+> -    const int decomp_rv32;
+> -    const int decomp_rv64;
+> -    const int decomp_rv128;
+> +    const short decomp_rv32;
+> +    const short decomp_rv64;
+> +    const short decomp_rv128;
+> +    const short decomp_data;
+>  } rv_opcode_data;
+>
+>  /* register names */
+> @@ -1011,7 +1016,7 @@ const rv_opcode_data opcode_data[] = {
+>      { "fcvt.q.lu", rv_codec_r_m, rv_fmt_rm_frd_rs1, NULL, 0, 0, 0 },
+>      { "fmv.x.q", rv_codec_r, rv_fmt_rd_frs1, NULL, 0, 0, 0 },
+>      { "fmv.q.x", rv_codec_r, rv_fmt_frd_rs1, NULL, 0, 0, 0 },
+> -    { "c.addi4spn", rv_codec_ciw_4spn, rv_fmt_rd_rs1_imm, NULL, rv_op_addi, rv_op_addi, rv_op_addi },
+> +    { "c.addi4spn", rv_codec_ciw_4spn, rv_fmt_rd_rs1_imm, NULL, rv_op_addi, rv_op_addi, rv_op_addi, rvcd_imm_nz },
+>      { "c.fld", rv_codec_cl_ld, rv_fmt_frd_offset_rs1, NULL, rv_op_fld, rv_op_fld, 0 },
+>      { "c.lw", rv_codec_cl_lw, rv_fmt_rd_offset_rs1, NULL, rv_op_lw, rv_op_lw, rv_op_lw },
+>      { "c.flw", rv_codec_cl_lw, rv_fmt_frd_offset_rs1, NULL, rv_op_flw, 0, 0 },
+> @@ -1019,14 +1024,14 @@ const rv_opcode_data opcode_data[] = {
+>      { "c.sw", rv_codec_cs_sw, rv_fmt_rs2_offset_rs1, NULL, rv_op_sw, rv_op_sw, rv_op_sw },
+>      { "c.fsw", rv_codec_cs_sw, rv_fmt_frs2_offset_rs1, NULL, rv_op_fsw, 0, 0 },
+>      { "c.nop", rv_codec_ci_none, rv_fmt_none, NULL, rv_op_addi, rv_op_addi, rv_op_addi },
+> -    { "c.addi", rv_codec_ci, rv_fmt_rd_rs1_imm, NULL, rv_op_addi, rv_op_addi, rv_op_addi },
+> +    { "c.addi", rv_codec_ci, rv_fmt_rd_rs1_imm, NULL, rv_op_addi, rv_op_addi, rv_op_addi, rvcd_imm_nz },
+>      { "c.jal", rv_codec_cj_jal, rv_fmt_rd_offset, NULL, rv_op_jal, 0, 0 },
+>      { "c.li", rv_codec_ci_li, rv_fmt_rd_rs1_imm, NULL, rv_op_addi, rv_op_addi, rv_op_addi },
+> -    { "c.addi16sp", rv_codec_ci_16sp, rv_fmt_rd_rs1_imm, NULL, rv_op_addi, rv_op_addi, rv_op_addi },
+> -    { "c.lui", rv_codec_ci_lui, rv_fmt_rd_imm, NULL, rv_op_lui, rv_op_lui, rv_op_lui },
+> -    { "c.srli", rv_codec_cb_sh6, rv_fmt_rd_rs1_imm, NULL, rv_op_srli, rv_op_srli, rv_op_srli },
+> -    { "c.srai", rv_codec_cb_sh6, rv_fmt_rd_rs1_imm, NULL, rv_op_srai, rv_op_srai, rv_op_srai },
+> -    { "c.andi", rv_codec_cb_imm, rv_fmt_rd_rs1_imm, NULL, rv_op_andi, rv_op_andi, rv_op_andi },
+> +    { "c.addi16sp", rv_codec_ci_16sp, rv_fmt_rd_rs1_imm, NULL, rv_op_addi, rv_op_addi, rv_op_addi, rvcd_imm_nz },
+> +    { "c.lui", rv_codec_ci_lui, rv_fmt_rd_imm, NULL, rv_op_lui, rv_op_lui, rv_op_lui, rvcd_imm_nz },
+> +    { "c.srli", rv_codec_cb_sh6, rv_fmt_rd_rs1_imm, NULL, rv_op_srli, rv_op_srli, rv_op_srli, rvcd_imm_nz },
+> +    { "c.srai", rv_codec_cb_sh6, rv_fmt_rd_rs1_imm, NULL, rv_op_srai, rv_op_srai, rv_op_srai, rvcd_imm_nz },
+> +    { "c.andi", rv_codec_cb_imm, rv_fmt_rd_rs1_imm, NULL, rv_op_andi, rv_op_andi, rv_op_andi, rvcd_imm_nz },
 
-I wouldn't worry too much about fixing the existing problems here -
-let's get the reorg done through kwolf's patches and then it's easier
-to clean up later.
+Unless I'm missing something, c.andi can have a zero immediate.
 
-Dave
-
-> > +    len = strlen(cmdline);
-> > +    if (len > 0 && qemu_isspace(cmdline[len - 1])) {
-> > +        if (nb_args >= MAX_ARGS) {
-> > +            goto cleanup;
-> > +        }
-> > +        args[nb_args++] = g_strdup("");
-> > +    }
-> > +
-> > +    /* 2. auto complete according to args */
-> > +    monitor_find_completion_by_table(mon, hmp_cmds, args, nb_args);
-> > +
-> > +cleanup:
-> > +    free_cmdline_args(args, nb_args);
-> > +}
-> [...]
-> > diff --git a/monitor/misc.c b/monitor/misc.c
-> > index 368b8297d4..c8289959c0 100644
-> > --- a/monitor/misc.c
-> > +++ b/monitor/misc.c
-> [...]
-> > @@ -612,245 +580,27 @@ out:
-> >      return output;
-> >  }
-> >  
-> > -static int compare_cmd(const char *name, const char *list)
-> > +/**
-> > + * Is @name in the '|' separated list of names @list?
-> > + */
-> > +int hmp_compare_cmd(const char *name, const char *list)
-> >  {
-> >      const char *p, *pstart;
-> >      int len;
-> >      len = strlen(name);
-> >      p = list;
-> > -    for(;;) {
-> > +    for (;;) {
-> >          pstart = p;
-> >          p = qemu_strchrnul(p, '|');
-> > -        if ((p - pstart) == len && !memcmp(pstart, name, len))
-> > +        if ((p - pstart) == len && !memcmp(pstart, name, len)) {
-> >              return 1;
-> 
-> The diff gets confusing here.  The function remains unchanged.  Good.
-> 
-> > -        if (*p == '\0')
-> > -            break;
-> > -        p++;
-> > -    }
-> > -    return 0;
-> > -}
-> > -
-> > -static int get_str(char *buf, int buf_size, const char **pp)
-> > -{
-> > -    const char *p;
-> > -    char *q;
-> > -    int c;
-> > -
-> > -    q = buf;
-> > -    p = *pp;
-> > -    while (qemu_isspace(*p)) {
-> > -        p++;
-> > -    }
-> > -    if (*p == '\0') {
-> > -    fail:
-> > -        *q = '\0';
-> > -        *pp = p;
-> > -        return -1;
-> > -    }
-> > -    if (*p == '\"') {
-> > -        p++;
-> > -        while (*p != '\0' && *p != '\"') {
-> > -            if (*p == '\\') {
-> > -                p++;
-> > -                c = *p++;
-> > -                switch (c) {
-> > -                case 'n':
-> > -                    c = '\n';
-> > -                    break;
-> > -                case 'r':
-> > -                    c = '\r';
-> > -                    break;
-> > -                case '\\':
-> > -                case '\'':
-> > -                case '\"':
-> > -                    break;
-> > -                default:
-> > -                    printf("unsupported escape code: '\\%c'\n", c);
-> > -                    goto fail;
-> > -                }
-> > -                if ((q - buf) < buf_size - 1) {
-> > -                    *q++ = c;
-> > -                }
-> > -            } else {
-> > -                if ((q - buf) < buf_size - 1) {
-> > -                    *q++ = *p;
-> > -                }
-> > -                p++;
-> > -            }
-> > -        }
-> > -        if (*p != '\"') {
-> > -            printf("unterminated string\n");
-> > -            goto fail;
-> > -        }
-> > -        p++;
-> > -    } else {
-> > -        while (*p != '\0' && !qemu_isspace(*p)) {
-> > -            if ((q - buf) < buf_size - 1) {
-> > -                *q++ = *p;
-> > -            }
-> > -            p++;
-> > -        }
-> > -    }
-> > -    *q = '\0';
-> > -    *pp = p;
-> > -    return 0;
-> > -}
-> > -
-> > -#define MAX_ARGS 16
-> > -
-> > -static void free_cmdline_args(char **args, int nb_args)
-> > -{
-> > -    int i;
-> > -
-> > -    assert(nb_args <= MAX_ARGS);
-> > -
-> > -    for (i = 0; i < nb_args; i++) {
-> > -        g_free(args[i]);
-> > -    }
-> > -
-> > -}
-> > -
-> > -/*
-> > - * Parse the command line to get valid args.
-> > - * @cmdline: command line to be parsed.
-> > - * @pnb_args: location to store the number of args, must NOT be NULL.
-> > - * @args: location to store the args, which should be freed by caller, must
-> > - *        NOT be NULL.
-> > - *
-> > - * Returns 0 on success, negative on failure.
-> > - *
-> > - * NOTE: this parser is an approximate form of the real command parser. Number
-> > - *       of args have a limit of MAX_ARGS. If cmdline contains more, it will
-> > - *       return with failure.
-> > - */
-> > -static int parse_cmdline(const char *cmdline,
-> > -                         int *pnb_args, char **args)
-> > -{
-> > -    const char *p;
-> > -    int nb_args, ret;
-> > -    char buf[1024];
-> > -
-> > -    p = cmdline;
-> > -    nb_args = 0;
-> > -    for (;;) {
-> > -        while (qemu_isspace(*p)) {
-> > -            p++;
-> >          }
-> >          if (*p == '\0') {
-> >              break;
-> >          }
-> > -        if (nb_args >= MAX_ARGS) {
-> > -            goto fail;
-> > -        }
-> > -        ret = get_str(buf, sizeof(buf), &p);
-> > -        if (ret < 0) {
-> > -            goto fail;
-> > -        }
-> > -        args[nb_args] = g_strdup(buf);
-> > -        nb_args++;
-> > +        p++;
-> >      }
-> > -    *pnb_args = nb_args;
-> >      return 0;
-> > -
-> > - fail:
-> > -    free_cmdline_args(args, nb_args);
-> > -    return -1;
-> > -}
-> > -
-> > -/*
-> > - * Can command @cmd be executed in preconfig state?
-> > - */
-> > -static bool cmd_can_preconfig(const HMPCommand *cmd)
-> > -{
-> > -    if (!cmd->flags) {
-> > -        return false;
-> > -    }
-> > -
-> > -    return strchr(cmd->flags, 'p');
-> > -}
-> > -
-> > -static void help_cmd_dump_one(Monitor *mon,
-> > -                              const HMPCommand *cmd,
-> > -                              char **prefix_args,
-> > -                              int prefix_args_nb)
-> > -{
-> > -    int i;
-> > -
-> > -    if (runstate_check(RUN_STATE_PRECONFIG) && !cmd_can_preconfig(cmd)) {
-> > -        return;
-> > -    }
-> > -
-> > -    for (i = 0; i < prefix_args_nb; i++) {
-> > -        monitor_printf(mon, "%s ", prefix_args[i]);
-> > -    }
-> > -    monitor_printf(mon, "%s %s -- %s\n", cmd->name, cmd->params, cmd->help);
-> > -}
-> > -
-> > -/* @args[@arg_index] is the valid command need to find in @cmds */
-> > -static void help_cmd_dump(Monitor *mon, const HMPCommand *cmds,
-> > -                          char **args, int nb_args, int arg_index)
-> > -{
-> > -    const HMPCommand *cmd;
-> > -    size_t i;
-> > -
-> > -    /* No valid arg need to compare with, dump all in *cmds */
-> > -    if (arg_index >= nb_args) {
-> > -        for (cmd = cmds; cmd->name != NULL; cmd++) {
-> > -            help_cmd_dump_one(mon, cmd, args, arg_index);
-> > -        }
-> > -        return;
-> > -    }
-> > -
-> > -    /* Find one entry to dump */
-> > -    for (cmd = cmds; cmd->name != NULL; cmd++) {
-> > -        if (compare_cmd(args[arg_index], cmd->name) &&
-> > -            ((!runstate_check(RUN_STATE_PRECONFIG) ||
-> > -                cmd_can_preconfig(cmd)))) {
-> > -            if (cmd->sub_table) {
-> > -                /* continue with next arg */
-> > -                help_cmd_dump(mon, cmd->sub_table,
-> > -                              args, nb_args, arg_index + 1);
-> > -            } else {
-> > -                help_cmd_dump_one(mon, cmd, args, arg_index);
-> > -            }
-> > -            return;
-> > -        }
-> > -    }
-> > -
-> > -    /* Command not found */
-> > -    monitor_printf(mon, "unknown command: '");
-> > -    for (i = 0; i <= arg_index; i++) {
-> > -        monitor_printf(mon, "%s%s", args[i], i == arg_index ? "'\n" : " ");
-> > -    }
-> > -}
-> > -
-> > -static void help_cmd(Monitor *mon, const char *name)
-> > -{
-> > -    char *args[MAX_ARGS];
-> > -    int nb_args = 0;
-> > -
-> > -    /* 1. parse user input */
-> > -    if (name) {
-> > -        /* special case for log, directly dump and return */
-> > -        if (!strcmp(name, "log")) {
-> > -            const QEMULogItem *item;
-> > -            monitor_printf(mon, "Log items (comma separated):\n");
-> > -            monitor_printf(mon, "%-10s %s\n", "none", "remove all logs");
-> > -            for (item = qemu_log_items; item->mask != 0; item++) {
-> > -                monitor_printf(mon, "%-10s %s\n", item->name, item->help);
-> > -            }
-> > -            return;
-> > -        }
-> > -
-> > -        if (parse_cmdline(name, &nb_args, args) < 0) {
-> > -            return;
-> > -        }
-> > -    }
-> > -
-> > -    /* 2. dump the contents according to parsed args */
-> > -    help_cmd_dump(mon, hmp_cmds, args, nb_args, 0);
-> > -
-> > -    free_cmdline_args(args, nb_args);
-> >  }
-> [...]
-> 
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>      { "c.sub", rv_codec_cs, rv_fmt_rd_rs1_rs2, NULL, rv_op_sub, rv_op_sub, rv_op_sub },
+>      { "c.xor", rv_codec_cs, rv_fmt_rd_rs1_rs2, NULL, rv_op_xor, rv_op_xor, rv_op_xor },
+>      { "c.or", rv_codec_cs, rv_fmt_rd_rs1_rs2, NULL, rv_op_or, rv_op_or, rv_op_or },
+> @@ -1036,7 +1041,7 @@ const rv_opcode_data opcode_data[] = {
+>      { "c.j", rv_codec_cj, rv_fmt_rd_offset, NULL, rv_op_jal, rv_op_jal, rv_op_jal },
+>      { "c.beqz", rv_codec_cb, rv_fmt_rs1_rs2_offset, NULL, rv_op_beq, rv_op_beq, rv_op_beq },
+>      { "c.bnez", rv_codec_cb, rv_fmt_rs1_rs2_offset, NULL, rv_op_bne, rv_op_bne, rv_op_bne },
+> -    { "c.slli", rv_codec_ci_sh6, rv_fmt_rd_rs1_imm, NULL, rv_op_slli, rv_op_slli, rv_op_slli },
+> +    { "c.slli", rv_codec_ci_sh6, rv_fmt_rd_rs1_imm, NULL, rv_op_slli, rv_op_slli, rv_op_slli, rvcd_imm_nz },
+>      { "c.fldsp", rv_codec_ci_ldsp, rv_fmt_frd_offset_rs1, NULL, rv_op_fld, rv_op_fld, rv_op_fld },
+>      { "c.lwsp", rv_codec_ci_lwsp, rv_fmt_rd_offset_rs1, NULL, rv_op_lw, rv_op_lw, rv_op_lw },
+>      { "c.flwsp", rv_codec_ci_lwsp, rv_fmt_frd_offset_rs1, NULL, rv_op_flw, 0, 0 },
+> @@ -2795,8 +2800,12 @@ static void decode_inst_decompress_rv32(rv_decode *dec)
+>  {
+>      int decomp_op = opcode_data[dec->op].decomp_rv32;
+>      if (decomp_op != rv_op_illegal) {
+> -        dec->op = decomp_op;
+> -        dec->codec = opcode_data[decomp_op].codec;
+> +        if ((opcode_data[dec->op].decomp_data & rvcd_imm_nz) && dec->imm == 0) {
+> +            dec->op = rv_op_illegal;
+> +        } else {
+> +            dec->op = decomp_op;
+> +            dec->codec = opcode_data[decomp_op].codec;
+> +        }
+>      }
+>  }
+>
+> @@ -2804,8 +2813,12 @@ static void decode_inst_decompress_rv64(rv_decode *dec)
+>  {
+>      int decomp_op = opcode_data[dec->op].decomp_rv64;
+>      if (decomp_op != rv_op_illegal) {
+> -        dec->op = decomp_op;
+> -        dec->codec = opcode_data[decomp_op].codec;
+> +        if ((opcode_data[dec->op].decomp_data & rvcd_imm_nz) && dec->imm == 0) {
+> +            dec->op = rv_op_illegal;
+> +        } else {
+> +            dec->op = decomp_op;
+> +            dec->codec = opcode_data[decomp_op].codec;
+> +        }
+>      }
+>  }
+>
+> @@ -2813,8 +2826,12 @@ static void decode_inst_decompress_rv128(rv_decode *dec)
+>  {
+>      int decomp_op = opcode_data[dec->op].decomp_rv128;
+>      if (decomp_op != rv_op_illegal) {
+> -        dec->op = decomp_op;
+> -        dec->codec = opcode_data[decomp_op].codec;
+> +        if ((opcode_data[dec->op].decomp_data & rvcd_imm_nz) && dec->imm == 0) {
+> +            dec->op = rv_op_illegal;
+> +        } else {
+> +            dec->op = decomp_op;
+> +            dec->codec = opcode_data[decomp_op].codec;
+> +        }
+>      }
+>  }
 
