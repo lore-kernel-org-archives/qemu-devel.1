@@ -2,69 +2,87 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7640DC31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 18:46:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CA12C31E4B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 18:49:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50C47205F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 18:46:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50C47205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D149C2080A
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 18:49:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sb6Xu5Kp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D149C2080A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54250 helo=lists.gnu.org)
+Received: from localhost ([::1]:54270 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbrDv-0004Vz-Im
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 14:46:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35837)
+	id 1hbrGS-0006wL-Vc
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 14:49:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34208)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <lersek@redhat.com>) id 1hbq6h-0002qS-DQ
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:35:20 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hbq0T-0007A9-MY
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:28:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1hbq6g-0001Ga-4v
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:35:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38134)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hbq6f-0001BL-Qv
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:35:18 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 261188553F
- for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 17:35:10 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-141.ams2.redhat.com
- [10.36.116.141])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 30B9217DCE;
- Fri, 14 Jun 2019 17:35:07 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20190613175435.6575-1-philmd@redhat.com>
- <7c44bcb6-1c72-e327-9091-394e6abfb51e@redhat.com>
- <c02e3358-f195-51e7-171f-aab2b0314c72@redhat.com>
- <62fae3fa-ba9d-6c38-ac8f-0e453ef396f8@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <5ad8f71b-9266-8cab-f50d-37a992e67d91@redhat.com>
-Date: Fri, 14 Jun 2019 19:35:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ (envelope-from <alex.bennee@linaro.org>) id 1hbq0P-0004Ca-Dg
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:28:51 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33066)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hbq0N-0003wR-Bo
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:28:48 -0400
+Received: by mail-wr1-x444.google.com with SMTP id n9so3386221wru.0
+ for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 10:28:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=l+F+1JN97gKyw7kKNWTOxFjpETDNYB39JWHiUo3QTVA=;
+ b=sb6Xu5Kp41Z06TykOvhElWOnU/IGs1hZmd23GE+R+8eET7wGXVqS4I/T6oA76AIkSK
+ 0b+dxWBpr7NOJZ79VVLP8ambmypEN8uW6/WSDPdE3KPdvFTc0d5tT/fDQHljertzxPL0
+ mRK+wijtp353zjBR18hWt9fd8LGNTMKYl2pcD2/pjAaz2BXaH5NiyzuTIlwFNqw2EMtF
+ lbxQtxBSSfmALXKphpaA2mMbhjkv/WzmSc17qAu9J/HeqAqOsikpbRnGjRLcby40I/im
+ z61WDhl3HyReuCU2dWkOEgZG0bLlzs57RLA3Nv6GaAPSld32ffb0DwL8W2LjNz3/7i6R
+ FryA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=l+F+1JN97gKyw7kKNWTOxFjpETDNYB39JWHiUo3QTVA=;
+ b=E88vv6nLS++QKbsNovbk3LncZVEtMJjNzVOIkI/DplHTE3ZbzlwCOyAFtX334xUMOo
+ uqoHpiqnEpcs+TchclWX5+Zo/XRG4VC9YcndmB7DE5tZyVGhIXwgDkdsF5uMrTt2uMAj
+ 3Bdwd4qLshq3BPwk+Z63+SthJI4nUc7OBfMr3WG+SeRJ+gVoyA78doc7tPhLtYZkdT5p
+ 589BeVQiaempM/wsKd/2fBhzGbV3bzuD8+hHYFyIA+soOpmTNmggEauo1cdSb6M+oImy
+ k0CYOXMugtZm/AykM28cUPqWclpanzQL/7KP8mABFsUYoJ/+vMa1Letlp138FgxmlvXf
+ MVfA==
+X-Gm-Message-State: APjAAAW3nf5LBK3lsZp2yklzsXASlDKVCVhi0DpZXtz/gWS1p2ysPtg6
+ yUnt2hrXbzxyN4jQhIuhO1FbYw==
+X-Google-Smtp-Source: APXvYqzMLSK7+SkT+doycWqokAFfRgXvilXEqEabHPNK31DKuQzeai/z248Q1ZETdDcZvs/q+IljJA==
+X-Received: by 2002:a5d:6709:: with SMTP id o9mr52157881wru.301.1560533317777; 
+ Fri, 14 Jun 2019 10:28:37 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id s188sm4205143wmf.40.2019.06.14.10.28.30
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 14 Jun 2019 10:28:36 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id E50C71FFCB;
+ Fri, 14 Jun 2019 18:12:04 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Fri, 14 Jun 2019 18:12:00 +0100
+Message-Id: <20190614171200.21078-51-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190614171200.21078-1-alex.bennee@linaro.org>
+References: <20190614171200.21078-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <62fae3fa-ba9d-6c38-ac8f-0e453ef396f8@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Fri, 14 Jun 2019 17:35:10 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] roms/edk2-build.sh: Allow to run
- edk2-build.sh from command line
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PATCH  v3 50/50] TODO: API changes to make?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,105 +94,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/14/19 15:55, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 6/14/19 3:29 PM, Eric Blake wrote:
->> On 6/14/19 5:16 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->>> Cc'ing Eric :)
->>>
->>
->>>> When running this script out of 'make', we get:
->>>>
->>>>   $ cd roms
->>>>   $ ./edk2-build.sh aarch64 --arch=3DAARCH64 --platform=3DArmVirtPkg=
-/ArmVirtQemu.dsc > /dev/null
->>>>   ./edk2-build.sh: line 46: MAKEFLAGS: unbound variable
->>>>
->>>> Fix this by checking the variable is defined before using it,
->>>> else use a default value.
->>>>
->>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>>> ---
->>>>  roms/edk2-build.sh | 8 +++++++-
->>>>  1 file changed, 7 insertions(+), 1 deletion(-)
+---
+ include/qemu/qemu-plugin.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-(1) "allow to run" is not correct English, to my understanding. This
-form of "allow" requires an object. You could reformulate the subject
-line as "allow edk2-build.sh to be invoked from the command line".
+diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
+index 21f056d4ab..655640fe54 100644
+--- a/include/qemu/qemu-plugin.h
++++ b/include/qemu/qemu-plugin.h
+@@ -169,6 +169,7 @@ enum qemu_plugin_mem_rw {
+  * callbacks to be triggered when the block or individual instruction
+  * executes.
+  */
++/* ??? - should we expose vcpu_index here? */
+ typedef void (*qemu_plugin_vcpu_tb_trans_cb_t)(qemu_plugin_id_t id,
+                                                unsigned int vcpu_index,
+                                                struct qemu_plugin_tb *tb);
+-- 
+2.20.1
 
-
->>>> diff --git a/roms/edk2-build.sh b/roms/edk2-build.sh
->>>> index 4f46f8a6a2..5390228b4e 100755
->>>> --- a/roms/edk2-build.sh
->>>> +++ b/roms/edk2-build.sh
->>
->> This is running under /bin/bash (hmm - not '/bin/env bash' like other
->> scripts in qemu?), so...
->>
->>>> @@ -43,7 +43,13 @@ fi
->>>>  # any), for the edk2 "build" utility.
->>>>  source ../edk2-funcs.sh
->>>>  edk2_toolchain=3D$(qemu_edk2_get_toolchain "$emulation_target")
->>>> -edk2_thread_count=3D$(qemu_edk2_get_thread_count "$MAKEFLAGS")
->>>> +if [ -v MAKEFLAGS ]; then
->>
->> the non-portable bashism '[ -v' works. However, it's just as easy to
->=20
-> Ah, OK.
->=20
->> work around this problem portably for all POSIX shells without needing=
- 'if':
->>
->>>> +  edk2_thread_count=3D$(qemu_edk2_get_thread_count "$MAKEFLAGS")
->>>> +else
->>>> +  # We are not running within 'make', let the edk2 "build" utility =
-to fetch
->>>> +  # the logical CPU count with Python's multiprocessing.cpu_count()=
- method.
->>>> +  edk2_thread_count=3D0
->>>> +fi
-
-(2) "let" doesn't take the preposition "to". I'd suggest:
-
-  Let the edk2 "build" utility [] fetch ...
-
-
->>
->> edk2_thread_count=3D$(qemu_edk2_get_thread_count "${MAKEFLAGS:-0}")
-
-(3) The expression
-
-  edk2_thread_count=3D$(qemu_edk2_get_thread_count "${MAKEFLAGS:-0}")
-
-would pass the string "0" as $1 to the qemu_edk2_get_thread_count()
-function. That doesn't seem useful (please see the docs on said shell
-function).
-
-We could write
-
-  edk2_thread_count=3D$(qemu_edk2_get_thread_count "${MAKEFLAGS:-}")
-
-instead, to pass "". But that would cause qemu_edk2_get_thread_count()
-to print "1", which is not what we want here, AIUI.
-
-
-I think I prefer the approach with "[ -v". While it's nonportable,
-"edk2-build.sh" is already -- consciously -- so: it uses an array
-variable, for example.
-
-
-(4) Phil, did you regression-test this change with plain "make" (i.e.,
-no "-j" option)? The behavior shouldn't change for that case (i.e.
-qemu_edk2_get_thread_count() should be invoked, and it should print "1").
-
-
-With (1) and (2) fixed, and (4) confirmed:
-
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-
-Thanks
-Laszlo
 
