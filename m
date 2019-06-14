@@ -7,85 +7,83 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 512DBC31E4B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 18:39:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFF2DC31E4B
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 18:41:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1781220673
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 18:39:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 750BA20673
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 18:41:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W6EqP8YJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1781220673
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KIf3qLrd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 750BA20673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54178 helo=lists.gnu.org)
+Received: from localhost ([::1]:54202 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbr6W-0005IU-7h
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 14:39:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34063)
+	id 1hbr8g-0008I0-NC
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 14:41:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39289)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hbq0J-00076W-Q7
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:28:45 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hbqJb-0004XN-Tz
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:48:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hbq0H-0003zf-J4
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:28:42 -0400
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:37322)
+ (envelope-from <alex.bennee@linaro.org>) id 1hbqJZ-0003YI-Lb
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:48:39 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36555)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hbq0F-0003wu-Li
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:28:40 -0400
-Received: by mail-wm1-x331.google.com with SMTP id f17so575593wme.2
- for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 10:28:39 -0700 (PDT)
+ id 1hbqJX-0003SF-Lg
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 13:48:35 -0400
+Received: by mail-wr1-x444.google.com with SMTP id n4so3439356wrs.3
+ for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 10:48:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=7LkO/RwU961CsHjb/1835Cx9O+zFCubxVzSPwrwohBY=;
- b=W6EqP8YJ+T9LS2axiftttPSXbxy78ZYzJJ8MKjFCDwGsLUHeGuD00S/IKsLeLBVP69
- zN4lQloUzN0iJ7hr8bKOItDQelJc4aE9XL+ag8Kuki+qQzl3oqilwdnUoaVViskIolnM
- vl4UfQ4UOmLecQSm9ZPwk1Ue2lIq9IzYbzn/mQODII8EENhknYA9Lb71O3ivo0C3wA//
- Z2S0bV+o9cBvCMPgeCEdkKBwKDd5linBPIVdqOWrV19FY5+i+w7vV8hIIX/7EEFlw6dt
- FGzGHrSFR5OM1B1FpU4Ahzt67ZREHcmJZcTf2pem1yMJg+9qN9rUb3dYCMmTMvF5yUz5
- 8vAg==
+ bh=y/GuCM+htQJxVNj9wpaJsriigpxg4M/lN2SgW++LMIQ=;
+ b=KIf3qLrdzY/ShAkF8aEn6dNzEELD95uK7Z4JDC2i7SMHzuSLvNu5YNHJQ49bhW9Snb
+ 2S3h0qv6Oarp/pkE981+oH2t67GBS1qDhOQBkMRKS3Kfr/jO9vN2B86PhNt87nIEl+U8
+ srz45+qEY063XcJrIjsQSWilYFlyqcnxjQAjTKBst5z2wm+upUc/wIrpuHKt2HhKnWeN
+ uEAz6uuQm6f2+wR8dANFVPf/n7UELr87MbJ78H9lrzI1BTCA62dX8NUJ5Lps5IKiL972
+ 4XGT8sY5zJd4dMHAibwOB7TqhEdXF66wrFvMP8yJvt+CiWU6gIgjAHS0tZB0AP0P2ygg
+ ONSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=7LkO/RwU961CsHjb/1835Cx9O+zFCubxVzSPwrwohBY=;
- b=eSXQt8SF8Zlaqb1O9LDUPbeXAaTHDHFcCuGDHQ2lVV4CpHGvEdFK68xl3ycKCkqo7M
- 0IMfQO3sGQD1zirGZrG8pNebiMrdXL5WTNN50dcw68Xn4QgKXD6S40TTl3g/W1ek2boZ
- QgXQbEoIYQem0WYHVxRSc5Y/oP4RlDZalk7VY7H2HBS/cOCmkkrHb3cJMR8uuf8Lc/fC
- L1ijOcs5TMExRr0p6sUOYJbr+w6UpnHd9gBi5GTOK/8Zx4AuPRFFl2T4WMabdbhL+h2e
- x3dj0TYF3gq5/C2DDX4B5nBGgdjQSiEz8LVQ/KsI9eq3e+EQJb0oTHO+WoPH+WSkNY/w
- pW5g==
-X-Gm-Message-State: APjAAAWNrG3vxZ0YVl5fXvbXCw/6W6tuxztqtzly3zZNuPAjf+fBPl3S
- Jhaifu1t4wJQyp1TodZ71+KXmg==
-X-Google-Smtp-Source: APXvYqwAjbuiS8A1DyMpf1MGsaDY4dHNCCPSRo1/xfeOfnoq/QYoURplMUi6TxMkTqAi92AsWAMPRg==
-X-Received: by 2002:a7b:c057:: with SMTP id u23mr8968631wmc.29.1560533318513; 
- Fri, 14 Jun 2019 10:28:38 -0700 (PDT)
+ bh=y/GuCM+htQJxVNj9wpaJsriigpxg4M/lN2SgW++LMIQ=;
+ b=bEDBL5mj1vO6Jw+OJBuEUnBxuYbw6hOeS8mR3M9dsckTCWn2nG/Fhr1cmYEjqt8oqk
+ wCKp74DhhAoCvtfKs8ty0zwyLab9xJVMzX5wTrDkLkpUAkbgIyVcf2slBDBhr7ixqKeO
+ r5SkT5dBQeDDW3LbowXZZuPGLwOvYxBNRoZ0DPE/FiKFtqXEZ0dawTAPr++B0M29FPOj
+ uC6NptFJ+72KZBhWlwKklMCETI27RuXe/OXdIhlkxMBtzSs1lK9rMS/GsdGHFxcLz4Gt
+ L4BnmFxM/yfs4pwEoUeyYF3jHnDoiiJPzBXOjUUeKi5cliRu7dvvzEH5Q1dvhFgzY7Kz
+ DoXg==
+X-Gm-Message-State: APjAAAX7baljET1DRlA1FSHVwvKNIHIva9SLB1p5n9nTvqq/GMQeRmz0
+ q7IpsPBWXH34S3dXQ/Y4ofKHWQ==
+X-Google-Smtp-Source: APXvYqxVUf6JvHOanL8dF2IVjKwd1oGeV3pXYF+V2mgjUB/SYLQakIn++C4cuZoumvcJchN68wNaiQ==
+X-Received: by 2002:adf:f951:: with SMTP id q17mr37939614wrr.173.1560534509447; 
+ Fri, 14 Jun 2019 10:48:29 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id v204sm5834489wma.20.2019.06.14.10.28.32
+ by smtp.gmail.com with ESMTPSA id l12sm9601398wrb.81.2019.06.14.10.48.27
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 14 Jun 2019 10:28:36 -0700 (PDT)
+ Fri, 14 Jun 2019 10:48:27 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id EB19D1FF9F;
- Fri, 14 Jun 2019 18:12:01 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 807721FFAA;
+ Fri, 14 Jun 2019 18:12:02 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 14 Jun 2019 18:11:26 +0100
-Message-Id: <20190614171200.21078-17-alex.bennee@linaro.org>
+Date: Fri, 14 Jun 2019 18:11:32 +0100
+Message-Id: <20190614171200.21078-23-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190614171200.21078-1-alex.bennee@linaro.org>
 References: <20190614171200.21078-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::331
-Subject: [Qemu-devel] [PATCH v3 16/50] atomic_template: fix indentation in
- GEN_ATOMIC_HELPER
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PATCH  v3 22/50] *-user: plugin syscalls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,34 +95,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Emilio G. Cota" <cota@braap.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: Riku Voipio <riku.voipio@iki.fi>, "Emilio G. Cota" <cota@braap.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- accel/tcg/atomic_template.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ bsd-user/syscall.c   | 9 +++++++++
+ linux-user/syscall.c | 3 +++
+ 2 files changed, 12 insertions(+)
 
-diff --git a/accel/tcg/atomic_template.h b/accel/tcg/atomic_template.h
-index 5aaf186253..df9c838817 100644
---- a/accel/tcg/atomic_template.h
-+++ b/accel/tcg/atomic_template.h
-@@ -284,7 +284,7 @@ ABI_TYPE ATOMIC_NAME(xchg)(CPUArchState *env, target_ulong addr,
+diff --git a/bsd-user/syscall.c b/bsd-user/syscall.c
+index 84a983a9a1..50e47d217c 100644
+--- a/bsd-user/syscall.c
++++ b/bsd-user/syscall.c
+@@ -323,6 +323,8 @@ abi_long do_freebsd_syscall(void *cpu_env, int num, abi_long arg1,
+     gemu_log("freebsd syscall %d\n", num);
+ #endif
+     trace_guest_user_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
++    qemu_plugin_vcpu_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, arg6, arg7,
++                             arg8);
+     if(do_strace)
+         print_freebsd_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
  
- #define GEN_ATOMIC_HELPER(X)                                        \
- ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, target_ulong addr,       \
--                 ABI_TYPE val EXTRA_ARGS)                           \
-+                        ABI_TYPE val EXTRA_ARGS)                    \
- {                                                                   \
-     ATOMIC_MMU_DECLS;                                               \
-     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;                           \
+@@ -404,6 +406,7 @@ abi_long do_freebsd_syscall(void *cpu_env, int num, abi_long arg1,
+     if (do_strace)
+         print_freebsd_syscall_ret(num, ret);
+     trace_guest_user_syscall_ret(cpu, num, ret);
++    qemu_plugin_vcpu_syscall_ret(cpu, num, ret);
+     return ret;
+  efault:
+     ret = -TARGET_EFAULT;
+@@ -422,6 +425,8 @@ abi_long do_netbsd_syscall(void *cpu_env, int num, abi_long arg1,
+     gemu_log("netbsd syscall %d\n", num);
+ #endif
+     trace_guest_user_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, arg6, 0, 0);
++    qemu_plugin_vcpu_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, arg6, 0,
++                             0);
+     if(do_strace)
+         print_netbsd_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
+ 
+@@ -480,6 +485,7 @@ abi_long do_netbsd_syscall(void *cpu_env, int num, abi_long arg1,
+     if (do_strace)
+         print_netbsd_syscall_ret(num, ret);
+     trace_guest_user_syscall_ret(cpu, num, ret);
++    qemu_plugin_vcpu_syscall_ret(cpu, num, ret);
+     return ret;
+  efault:
+     ret = -TARGET_EFAULT;
+@@ -498,6 +504,8 @@ abi_long do_openbsd_syscall(void *cpu_env, int num, abi_long arg1,
+     gemu_log("openbsd syscall %d\n", num);
+ #endif
+     trace_guest_user_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, arg6, 0, 0);
++    qemu_plugin_vcpu_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, arg6, 0,
++                             0);
+     if(do_strace)
+         print_openbsd_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
+ 
+@@ -556,6 +564,7 @@ abi_long do_openbsd_syscall(void *cpu_env, int num, abi_long arg1,
+     if (do_strace)
+         print_openbsd_syscall_ret(num, ret);
+     trace_guest_user_syscall_ret(cpu, num, ret);
++    qemu_plugin_vcpu_syscall_ret(cpu, num, ret);
+     return ret;
+  efault:
+     ret = -TARGET_EFAULT;
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index b187c1281d..7f3cfdee84 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -11724,6 +11724,8 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+ 
+     trace_guest_user_syscall(cpu, num, arg1, arg2, arg3, arg4,
+                              arg5, arg6, arg7, arg8);
++    qemu_plugin_vcpu_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, arg6, arg7,
++                             arg8);
+ 
+     if (unlikely(do_strace)) {
+         print_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
+@@ -11736,5 +11738,6 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+     }
+ 
+     trace_guest_user_syscall_ret(cpu, num, ret);
++    qemu_plugin_vcpu_syscall_ret(cpu, num, ret);
+     return ret;
+ }
 -- 
 2.20.1
 
