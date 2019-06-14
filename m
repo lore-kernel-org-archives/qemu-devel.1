@@ -2,88 +2,80 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2F4AC31E44
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 08:38:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ACC2C31E44
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 08:41:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 708B12133D
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 08:38:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i85RF81Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 708B12133D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 02C3B2133D
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 08:41:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02C3B2133D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49304 helo=lists.gnu.org)
+Received: from localhost ([::1]:49314 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbhir-0007aN-NO
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 04:38:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56270)
+	id 1hbhmC-0000ff-5D
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 04:41:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57223)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@gmail.com>) id 1hbhh2-00065q-SZ
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 04:36:17 -0400
+ (envelope-from <philmd@redhat.com>) id 1hbhlJ-0000Ce-2h
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 04:40:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hbhgx-00068S-IS
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 04:36:13 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39322)
+ (envelope-from <philmd@redhat.com>) id 1hbhlG-0000By-VO
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 04:40:40 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:36639)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>)
- id 1hbhgx-00067I-Bs; Fri, 14 Jun 2019 04:36:11 -0400
-Received: by mail-wm1-x344.google.com with SMTP id z23so1392224wma.4;
- Fri, 14 Jun 2019 01:36:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=FtsMw6gULlhnWEqNSilawymZFzcFoOlY8Y32pKxwRro=;
- b=i85RF81QHE0GLgYy//g5gRXjpbcTD0qQHt9rVls97pztNR4g2g81hVLfZt6pLa3mTX
- iUm7EfLzUP9/kghT0GmsEYXzr8/D+NqNaAkB2jAmf+zZbXz8A2kYEIrrGBKhx8W73nli
- 5ORYR/dWo+NpwerfQZDsjfqhWtgpYfhK8n3BXtU1TeZT3WeytSd/SoHa715I5N6PreQj
- ojNlDHhyisJOI1AEIyyXgxphWkDrODmeUty/FuKjIrVUrswnnm+c+pC1wq0jhiGnanSa
- qDOVnkAo4AqJ88grdsytXscIczZBFDwCYJIT31BtdzNY0/IgYfPLthlUycOFVTKemXpA
- 6kUw==
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hbhlF-00008i-6i
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 04:40:37 -0400
+Received: by mail-wm1-f66.google.com with SMTP id u8so1424764wmm.1
+ for <qemu-devel@nongnu.org>; Fri, 14 Jun 2019 01:40:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=FtsMw6gULlhnWEqNSilawymZFzcFoOlY8Y32pKxwRro=;
- b=jDthlsd8bp57pxhiHofyeGhcO2Auo5lL+k94mCtZi9V2HooyCSSQXep+my40OWY9LH
- sjnC8uQpvh5OKgm6Kx+LAo5/Fm98OzQV76gXt25zk34E7VedRtdM9g+XZgT1Er0tr5Qz
- nm5U4thJoEN1ONqpByf2GsY4G0DiH+PS4vWjKs3h5sJZnWwo5Cgml/Z2Fa6dzu93yBZG
- v8JxgsdJiIhQa/qvJ5EOeXkRpN1qT8zHDj9QBoqdO/3GJipjA9qi3Gae9bskOardIctL
- 6DSIKszbvYg7AziDCkwJ2+FIg0hnagzBbhxg4GJpaqtElRngt/vqQNcO8DvDbiHeNq6d
- A8jg==
-X-Gm-Message-State: APjAAAWpzoJ4obDButI7z/L0jz9BlqXI+VQSF7neDh46DdBY7lKIxSOV
- s1gm3+cmGC83KSxeQuHLXdY=
-X-Google-Smtp-Source: APXvYqzZf565wq8+K0aO9G+2CRzEA8z7+x5B5wYcqX2kQxWuv5l3cwmGrmRCeLtSDEr6SY/RbUX9EQ==
-X-Received: by 2002:a05:600c:20c3:: with SMTP id
- y3mr7155410wmm.3.1560501369141; 
- Fri, 14 Jun 2019 01:36:09 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id y12sm2193773wrr.3.2019.06.14.01.36.08
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 14 Jun 2019 01:36:08 -0700 (PDT)
-Date: Fri, 14 Jun 2019 09:36:03 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <20190614083603.GB10957@stefanha-x1.localdomain>
-References: <20190605131221.29432-1-marcandre.lureau@redhat.com>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=pPtHLlx17NhBbzckWwC4+U9d9HbDHljwdwUWHxAH71s=;
+ b=U4X5zbAQAy1UYE9ydEwHjiYa02hOW0B4GVvubSnMTKKpMXoBtMpPig+7EJOMYs9bTh
+ Gwt8b54G/b9IMNM8CK0gBCM/IYDgohhmjBLFx6cfmUkWdv+ey+mrduwK0OpAJPTDwdWC
+ RCfdGBMgHrgGfk7e3fJRVQL0/Nn/qEYmclfmOEnilZVABT5WImDCBcZISA62efVGuoMY
+ nj819fNbAnmA3h1N1C3r2L6mqdfTTAbUszcwBJPhtdq0bIcbEgK/97hT7HMv8PfS9Gih
+ eg8X/AfI3F8LnJTq+D7uoHaFsFeoKijnM7ju/GJ9zPDdE1CPx1LJNnEFijJJgwlD7QW3
+ z8tA==
+X-Gm-Message-State: APjAAAV4oaAYmtcHLGJExR6bUKQG904N4WQmKPJJC+xhhpYUG2vvtr4A
+ 7LfscDvaQejy8R/mzT/G5QWqzA==
+X-Google-Smtp-Source: APXvYqzBONjS70/QanMpN3cS77+A9K3eD32h0w2CV7lkY9myFaxrfGUx25eMqki8sbVb62izw539iw==
+X-Received: by 2002:a1c:9a46:: with SMTP id c67mr4781845wme.11.1560501634804; 
+ Fri, 14 Jun 2019 01:40:34 -0700 (PDT)
+Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.183])
+ by smtp.gmail.com with ESMTPSA id l190sm2262424wml.16.2019.06.14.01.40.33
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 14 Jun 2019 01:40:34 -0700 (PDT)
+To: qemu-devel@nongnu.org
+References: <20190614072432.820-1-philmd@redhat.com>
+ <20190614072432.820-3-philmd@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <0855a9ee-631b-29e6-cafa-7b7d988cbf1b@redhat.com>
+Date: Fri, 14 Jun 2019 10:40:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="z6Eq5LdranGa6ru8"
-Content-Disposition: inline
-In-Reply-To: <20190605131221.29432-1-marcandre.lureau@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH] docs/vhost-user.json: some firmware.json
- copy leftovers
+In-Reply-To: <20190614072432.820-3-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.66
+Subject: Re: [Qemu-devel] [PATCH 2/6] configure: Link test before
+ auto-enabling glusterfs libraries
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,39 +87,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, mst@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+ integration@gluster.org,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, =?UTF-8?Q?Lo=c3=afc_Minier?= <loic.minier@linaro.org>,
+ Michael Tokarev <mjt@tls.msk.ru>, Bharata B Rao <bharata@linux.ibm.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Niels de Vos <ndevos@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---z6Eq5LdranGa6ru8
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Jun 05, 2019 at 03:12:21PM +0200, Marc-Andr=E9 Lureau wrote:
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+On 6/14/19 9:24 AM, Philippe Mathieu-Daudé wrote:
+> Similarly to commit a73e82ef912, test the libraries link correctly
+> before considering them as usable.
+> 
+> This fixes using ./configure --static on Ubuntu 18.04:
+> 
+>   $ make subdir-aarch64-softmmu
+>   [...]
+>     LINK    aarch64-softmmu/qemu-system-aarch64
+>   /usr/bin/ld: cannot find -lgfapi
+>   /usr/bin/ld: cannot find -lglusterfs
+>   /usr/bin/ld: cannot find -lgfrpc
+>   /usr/bin/ld: cannot find -lgfxdr
+>   collect2: error: ld returned 1 exit status
+>   Makefile:204: recipe for target 'qemu-system-aarch64' failed
+>   make[1]: *** [qemu-system-aarch64] Error 1
+> 
+>   $ fgrep gf config-host.mak
+>   GLUSTERFS_LIBS=-lacl -lgfapi -lglusterfs -lgfrpc -lgfxdr -luuid
+> 
+>   $ lsb_release -cri
+>   Distributor ID: Ubuntu
+>   Release:        18.04
+>   Codename:       bionic
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  docs/interop/vhost-user.json | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  configure | 18 ++++++++++++++++--
+>  1 file changed, 16 insertions(+), 2 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index 13fd4a1166..3428adb75b 100755
+> --- a/configure
+> +++ b/configure
+> @@ -4179,9 +4179,23 @@ fi
+>  # glusterfs probe
+>  if test "$glusterfs" != "no" ; then
+>    if $pkg_config --atleast-version=3 glusterfs-api; then
+> -    glusterfs="yes"
+>      glusterfs_cflags=$($pkg_config --cflags glusterfs-api)
+> -    glusterfs_libs=$($pkg_config --libs glusterfs-api)
+> +    if test "$static" = "yes"; then
+> +        glusterfs_libs=$($pkg_config --libs --static glusterfs-api)
+> +    else
+> +        glusterfs_libs=$($pkg_config --libs glusterfs-api)
+> +    fi
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+I just noticed in ./configure:
 
---z6Eq5LdranGa6ru8
-Content-Type: application/pgp-signature; name="signature.asc"
+  case "$opt" in
+  --static)
+    static="yes"
+    LDFLAGS="-static $LDFLAGS"
+    QEMU_PKG_CONFIG_FLAGS="--static $QEMU_PKG_CONFIG_FLAGS"
+  ;;
 
------BEGIN PGP SIGNATURE-----
+And
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0DXHMACgkQnKSrs4Gr
-c8i7xQf8CeyTI3u/TyRWKEcVGbn3cU0rOP8oOnVkScpoRe0bkmZevTpkmuy9kd44
-2k9AHgX1DDpla55m9AQk/ZQsZ95M3aY5WnUQlV1/D8wFrjEunv3okCl0Fd4bkQ5J
-72Qi6DrB/ZJ+OcnWJHJ4cW2zdDLmYhR/BmCN0EIPjivZIXcx0E1+JiZpg9VRJu5W
-v0vAnO4I4+Gqki/z06KWwdLtymlF3jgNoObbU04gI1h+qs4Se7cmh7sqcUSXegs+
-R7m0e0uouMGZypxwLinLOj8nUsijdW7vj9mwCOEzgIiJd0/EkXBDgTIAmUQ4APyC
-BlTi6FphKKZ2DjI/cxpkfW4rQ/eluQ==
-=oUDS
------END PGP SIGNATURE-----
+pkg_config_exe="${PKG_CONFIG-${cross_prefix}pkg-config}"
+query_pkg_config() {
+    "${pkg_config_exe}" ${QEMU_PKG_CONFIG_FLAGS} "$@"
+}
+pkg_config=query_pkg_config
 
---z6Eq5LdranGa6ru8--
+So I shouldn't need to test "$static" = "yes" and manually add --static.
+(same apply to other patches in this series).
+
+I'll see what's wrong...
+
+> +    # Packaging for the static libraries is not always correct.
+> +    # At least ubuntu 18.04 ships only shared libraries.
+> +    write_c_skeleton
+> +    if ! compile_prog "$glusterfs_cflags" "$glusterfs_libs" ; then
+> +        if test "$glusterfs" = "yes" ; then
+> +          error_exit "glusterfs check failed."
+> +        fi
+> +        glusterfs="no"
+> +    else
+> +        glusterfs="yes"
+> +    fi
+>      if $pkg_config --atleast-version=4 glusterfs-api; then
+>        glusterfs_xlator_opt="yes"
+>      fi
+> 
 
