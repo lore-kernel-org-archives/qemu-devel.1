@@ -2,61 +2,61 @@ Return-Path: <SRS0=2Sdx=UN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8399DC31E44
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 10:15:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0BA6C31E44
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 10:15:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C9F820665
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 10:15:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C9F820665
+	by mail.kernel.org (Postfix) with ESMTPS id A3ED120665
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Jun 2019 10:15:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3ED120665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49868 helo=lists.gnu.org)
+Received: from localhost ([::1]:49870 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hbjEg-0000y0-Lv
-	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 06:15:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48650)
+	id 1hbjFM-0001Px-RI
+	for qemu-devel@archiver.kernel.org; Fri, 14 Jun 2019 06:15:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48928)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hbj7l-0003kD-4n
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 06:07:58 -0400
+ (envelope-from <philmd@redhat.com>) id 1hbj8K-0004eR-2a
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 06:08:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hbj7i-0000C9-Ig
- for qemu-devel@nongnu.org; Fri, 14 Jun 2019 06:07:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45726)
+ (envelope-from <philmd@redhat.com>) id 1hbj8J-0000p4-11
+ for qemu-devel@nongnu.org; Fri, 14 Jun 2019 06:08:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48570)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hbj7c-00008r-Pp; Fri, 14 Jun 2019 06:07:49 -0400
+ id 1hbj8G-0000no-MF; Fri, 14 Jun 2019 06:08:28 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A36E030821F4;
- Fri, 14 Jun 2019 10:07:44 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id D2FD081DF1;
+ Fri, 14 Jun 2019 10:08:27 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.205.27])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 47AE21001B0F;
- Fri, 14 Jun 2019 10:07:38 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8ADD41001B0F;
+ Fri, 14 Jun 2019 10:08:22 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 14 Jun 2019 12:07:11 +0200
-Message-Id: <20190614100718.14019-3-philmd@redhat.com>
+Date: Fri, 14 Jun 2019 12:07:17 +0200
+Message-Id: <20190614100718.14019-9-philmd@redhat.com>
 In-Reply-To: <20190614100718.14019-1-philmd@redhat.com>
 References: <20190614100718.14019-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Fri, 14 Jun 2019 10:07:44 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.25]); Fri, 14 Jun 2019 10:08:27 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 2/9] configure: Link test before
- auto-enabling GlusterFS libraries
+Subject: [Qemu-devel] [PATCH v2 8/9] tests/docker: Kludge for missing
+ libunistring.so symlink on Ubuntu 18.04
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,60 +81,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Similarly to commit a73e82ef912, test the libraries link correctly
-before considering them as usable.
+When linking statically on Ubuntu 18.04 we get:
 
-This fixes using ./configure --static on Ubuntu 18.04:
-
-  $ make subdir-aarch64-softmmu
+  $ make subdir-x86_64-softmmu
   [...]
-    LINK    aarch64-softmmu/qemu-system-aarch64
-  /usr/bin/ld: cannot find -lgfapi
-  /usr/bin/ld: cannot find -lglusterfs
-  /usr/bin/ld: cannot find -lgfrpc
-  /usr/bin/ld: cannot find -lgfxdr
-  collect2: error: ld returned 1 exit status
-  Makefile:204: recipe for target 'qemu-system-aarch64' failed
-  make[1]: *** [qemu-system-aarch64] Error 1
+     LINK    x86_64-softmmu/qemu-system-x86_64
+  c++: error: /usr/lib/x86_64-linux-gnu/libunistring.so: No such file or =
+directory
 
-  $ fgrep gf config-host.mak
-  GLUSTERFS_LIBS=3D-lacl -lgfapi -lglusterfs -lgfrpc -lgfxdr -luuid
+This library is pulled in by GTK:
 
-  $ lsb_release -cri
-  Distributor ID: Ubuntu
-  Release:        18.04
-  Codename:       bionic
+  $ pkg-config --libs --static gtk+-3.0
+  -lgtk-3 -latk-bridge-2.0 -latspi -ldbus-1 -lpthread -lsystemd -lgdk-3 -=
+lgio-2.0 -lXinerama -lXi -lXrandr -lXcursor -lXcomposite -lXdamage -lXfix=
+es -lxkbcommon -lwayland-cursor -lwayland-egl -lwayland-client -lepoxy -l=
+dl -lpangocairo-1.0 -lpangoft2-1.0 -lharfbuzz -lm -lgraphite2 -lpango-1.0=
+ -lm -latk-1.0 -lcairo-gobject -lcairo -lz -lpixman-1 -lfontconfig -lexpa=
+t -lfreetype -lexpat -lfreetype -lpng16 -lm -lz -lm -lxcb-shm -lxcb-rende=
+r -lXrender -lXext -lX11 -lpthread -lxcb -lXau -lXdmcp -lgdk_pixbuf-2.0 -=
+lm -lpng16 -lm -lz -lm -lz -lgio-2.0 -lz -lresolv -lselinux -lmount -lgmo=
+dule-2.0 -pthread -ldl -lgobject-2.0 -lffi -lglib-2.0 -pthread -lpcre -pt=
+hread
+
+However, while the library is presentm, its symlink is missing:
+
+  $ ls -ld /usr/lib/x86_64-linux-gnu/libunistring.so
+  ls: cannot access '/usr/lib/x86_64-linux-gnu/libunistring.so': No such =
+file or directory
+
+  $ ls -ld /usr/lib/x86_64-linux-gnu/libunistring.so*
+  lrwxrwxrwx. 1 root root      21 Mar  3  2018 /usr/lib/x86_64-linux-gnu/=
+libunistring.so.2 -> libunistring.so.2.1.0
+  -rw-r--r--. 1 root root 1562664 Mar  3  2018 /usr/lib/x86_64-linux-gnu/=
+libunistring.so.2.1.0
+
+Fix the issue by creating the missing symlink manually.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- configure | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ tests/docker/dockerfiles/ubuntu1804.docker | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/configure b/configure
-index 13fd4a1166..fe0e2e1b75 100755
---- a/configure
-+++ b/configure
-@@ -4179,9 +4179,19 @@ fi
- # glusterfs probe
- if test "$glusterfs" !=3D "no" ; then
-   if $pkg_config --atleast-version=3D3 glusterfs-api; then
--    glusterfs=3D"yes"
-     glusterfs_cflags=3D$($pkg_config --cflags glusterfs-api)
-     glusterfs_libs=3D$($pkg_config --libs glusterfs-api)
-+    # Packaging for the static libraries is not always correct.
-+    # At least ubuntu 18.04 ships only shared libraries.
-+    write_c_skeleton
-+    if ! compile_prog "$glusterfs_cflags" "$glusterfs_libs" ; then
-+        if test "$glusterfs" =3D "yes" ; then
-+          error_exit "glusterfs check failed."
-+        fi
-+        glusterfs=3D"no"
-+    else
-+        glusterfs=3D"yes"
-+    fi
-     if $pkg_config --atleast-version=3D4 glusterfs-api; then
-       glusterfs_xlator_opt=3D"yes"
-     fi
+diff --git a/tests/docker/dockerfiles/ubuntu1804.docker b/tests/docker/do=
+ckerfiles/ubuntu1804.docker
+index 2e2900150b..7e45c52166 100644
+--- a/tests/docker/dockerfiles/ubuntu1804.docker
++++ b/tests/docker/dockerfiles/ubuntu1804.docker
+@@ -54,4 +54,8 @@ ENV PACKAGES flex bison \
+ RUN apt-get update && \
+     apt-get -y install $PACKAGES
+ RUN dpkg -l $PACKAGES | sort > /packages.txt
++# The libunistring2 package does not create a symlink to libunistring.so
++# Create it manually to fix:
++# error: /usr/lib/x86_64-linux-gnu/libunistring.so: No such file or dire=
+ctory
++RUN ln -s libunistring.so.2 /usr/lib/x86_64-linux-gnu/libunistring.so
+ ENV FEATURES clang pyyaml sdl2
 --=20
 2.20.1
 
