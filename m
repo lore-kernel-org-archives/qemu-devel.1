@@ -6,56 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FCC9C31E50
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Jun 2019 15:55:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38E3CC31E50
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Jun 2019 15:55:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53E3221473
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Jun 2019 15:55:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53E3221473
+	by mail.kernel.org (Postfix) with ESMTPS id 110FD21473
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Jun 2019 15:55:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 110FD21473
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32966 helo=lists.gnu.org)
+Received: from localhost ([::1]:32968 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcB1u-0005ph-IL
-	for qemu-devel@archiver.kernel.org; Sat, 15 Jun 2019 11:55:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35728)
+	id 1hcB1w-0005st-7D
+	for qemu-devel@archiver.kernel.org; Sat, 15 Jun 2019 11:55:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35801)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hcAqs-0003wU-3b
- for qemu-devel@nongnu.org; Sat, 15 Jun 2019 11:44:23 -0400
+ (envelope-from <philmd@redhat.com>) id 1hcAqw-00041n-QY
+ for qemu-devel@nongnu.org; Sat, 15 Jun 2019 11:44:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hcAqq-0000K3-K6
- for qemu-devel@nongnu.org; Sat, 15 Jun 2019 11:44:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35484)
+ (envelope-from <philmd@redhat.com>) id 1hcAqu-0000XS-PD
+ for qemu-devel@nongnu.org; Sat, 15 Jun 2019 11:44:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48338)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hcAqn-00009n-Nb; Sat, 15 Jun 2019 11:44:17 -0400
+ id 1hcAqr-0000KM-8L; Sat, 15 Jun 2019 11:44:21 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F2C9C3082E55;
- Sat, 15 Jun 2019 15:44:16 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 65DF381129;
+ Sat, 15 Jun 2019 15:44:20 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-41.brq.redhat.com [10.40.204.41])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8AAEB1001B05;
- Sat, 15 Jun 2019 15:44:13 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 266831001B05;
+ Sat, 15 Jun 2019 15:44:18 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Sat, 15 Jun 2019 17:43:38 +0200
-Message-Id: <20190615154352.26824-10-philmd@redhat.com>
+Date: Sat, 15 Jun 2019 17:43:40 +0200
+Message-Id: <20190615154352.26824-12-philmd@redhat.com>
 In-Reply-To: <20190615154352.26824-1-philmd@redhat.com>
 References: <20190615154352.26824-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Sat, 15 Jun 2019 15:44:17 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Sat, 15 Jun 2019 15:44:20 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 09/23] target/arm: Move code around
+Subject: [Qemu-devel] [PATCH v2 11/23] target/arm: Declare v7m_cpacr_pass()
+ publicly
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,78 +74,83 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-To ease the review of the next commit, move the
-write_v7m_exception() function around.
+In the next commit we will move exception handling routines to
+v7m_helper, so this function will be called from 2 different
+files. Declare it inlined in the "internals.h" header.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- target/arm/helper.c | 40 ++++++++++++++++++++--------------------
- 1 file changed, 20 insertions(+), 20 deletions(-)
+ target/arm/helper.c    | 19 -------------------
+ target/arm/internals.h | 21 +++++++++++++++++++++
+ 2 files changed, 21 insertions(+), 19 deletions(-)
 
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index a829086c6d..b4fd9b42d7 100644
+index cf76010ea1..5d05db84d3 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -7923,26 +7923,6 @@ void write_v7m_control_spsel(CPUARMState *env, boo=
-l new_spsel)
-     write_v7m_control_spsel_for_secstate(env, new_spsel, env->v7m.secure=
-);
+@@ -7611,25 +7611,6 @@ uint32_t arm_phys_excp_target_el(CPUState *cs, uin=
+t32_t excp_idx,
+     return target_el;
  }
 =20
--void write_v7m_exception(CPUARMState *env, uint32_t new_exc)
+-/*
+- * Return true if the v7M CPACR permits access to the FPU for the specif=
+ied
+- * security state and privilege level.
+- */
+-static bool v7m_cpacr_pass(CPUARMState *env, bool is_secure, bool is_pri=
+v)
 -{
--    /*
--     * Write a new value to v7m.exception, thus transitioning into or ou=
-t
--     * of Handler mode; this may result in a change of active stack poin=
-ter.
--     */
--    bool new_is_psp, old_is_psp =3D v7m_using_psp(env);
--    uint32_t tmp;
--
--    env->v7m.exception =3D new_exc;
--
--    new_is_psp =3D v7m_using_psp(env);
--
--    if (old_is_psp !=3D new_is_psp) {
--        tmp =3D env->v7m.other_sp;
--        env->v7m.other_sp =3D env->regs[13];
--        env->regs[13] =3D tmp;
+-    switch (extract32(env->v7m.cpacr[is_secure], 20, 2)) {
+-    case 0:
+-    case 2: /* UNPREDICTABLE: we treat like 0 */
+-        return false;
+-    case 1:
+-        return is_priv;
+-    case 3:
+-        return true;
+-    default:
+-        g_assert_not_reached();
 -    }
 -}
 -
- /* Switch M profile security state between NS and S */
- void switch_v7m_security_state(CPUARMState *env, bool new_secstate)
- {
-@@ -9247,6 +9227,26 @@ static bool do_v7m_function_return(ARMCPU *cpu)
-     return true;
+ /*
+  * What kind of stack write are we doing? This affects how exceptions
+  * generated during the stacking are treated.
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index 04711b317a..1d15af3f8b 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -891,6 +891,27 @@ static inline uint32_t v7m_sp_limit(CPUARMState *env=
+)
+     }
  }
 =20
-+void write_v7m_exception(CPUARMState *env, uint32_t new_exc)
++/**
++ * v7m_cpacr_pass:
++ * Return true if the v7M CPACR permits access to the FPU for the specif=
+ied
++ * security state and privilege level.
++ */
++static inline bool v7m_cpacr_pass(CPUARMState *env,
++                                  bool is_secure, bool is_priv)
 +{
-+    /*
-+     * Write a new value to v7m.exception, thus transitioning into or ou=
-t
-+     * of Handler mode; this may result in a change of active stack poin=
-ter.
-+     */
-+    bool new_is_psp, old_is_psp =3D v7m_using_psp(env);
-+    uint32_t tmp;
-+
-+    env->v7m.exception =3D new_exc;
-+
-+    new_is_psp =3D v7m_using_psp(env);
-+
-+    if (old_is_psp !=3D new_is_psp) {
-+        tmp =3D env->v7m.other_sp;
-+        env->v7m.other_sp =3D env->regs[13];
-+        env->regs[13] =3D tmp;
++    switch (extract32(env->v7m.cpacr[is_secure], 20, 2)) {
++    case 0:
++    case 2: /* UNPREDICTABLE: we treat like 0 */
++        return false;
++    case 1:
++        return is_priv;
++    case 3:
++        return true;
++    default:
++        g_assert_not_reached();
 +    }
 +}
 +
- void arm_log_exception(int idx)
- {
-     if (qemu_loglevel_mask(CPU_LOG_INT)) {
+ /**
+  * aarch32_mode_name(): Return name of the AArch32 CPU mode
+  * @psr: Program Status Register indicating CPU mode
 --=20
 2.20.1
 
