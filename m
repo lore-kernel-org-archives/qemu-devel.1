@@ -2,62 +2,62 @@ Return-Path: <SRS0=kfsH=UP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11ED4C31E50
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 18:54:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E36F0C46477
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 19:07:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD06320866
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 18:54:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD06320866
+	by mail.kernel.org (Postfix) with ESMTPS id C3B7520870
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 19:07:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3B7520870
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42164 helo=lists.gnu.org)
+Received: from localhost ([::1]:42260 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcaI5-00031L-SS
-	for qemu-devel@archiver.kernel.org; Sun, 16 Jun 2019 14:54:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60152)
+	id 1hcaVC-0006ir-KS
+	for qemu-devel@archiver.kernel.org; Sun, 16 Jun 2019 15:07:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35798)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1hcaDx-0001VA-G5
- for qemu-devel@nongnu.org; Sun, 16 Jun 2019 14:49:55 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hcaUP-0006HR-0J
+ for qemu-devel@nongnu.org; Sun, 16 Jun 2019 15:06:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1hcaDw-0008S4-Ei
- for qemu-devel@nongnu.org; Sun, 16 Jun 2019 14:49:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46124)
+ (envelope-from <imammedo@redhat.com>) id 1hcaUN-0006Yy-G8
+ for qemu-devel@nongnu.org; Sun, 16 Jun 2019 15:06:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55382)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hcaDw-0008Q2-6C
- for qemu-devel@nongnu.org; Sun, 16 Jun 2019 14:49:52 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hcaUM-0006Xe-Tz
+ for qemu-devel@nongnu.org; Sun, 16 Jun 2019 15:06:51 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 94976C057F88;
- Sun, 16 Jun 2019 18:49:50 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9444B3086218;
+ Sun, 16 Jun 2019 19:06:49 +0000 (UTC)
 Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6AA3490C50;
- Sun, 16 Jun 2019 18:49:47 +0000 (UTC)
-Date: Sun, 16 Jun 2019 20:49:42 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2CE10100034B;
+ Sun, 16 Jun 2019 19:06:46 +0000 (UTC)
+Date: Sun, 16 Jun 2019 21:06:41 +0200
 From: Igor Mammedov <imammedo@redhat.com>
 To: Yoshinori Sato <ysato@users.sourceforge.jp>
-Message-ID: <20190616204942.4131a648@redhat.com>
-In-Reply-To: <20190616142836.10614-18-ysato@users.sourceforge.jp>
+Message-ID: <20190616210641.347f276f@redhat.com>
+In-Reply-To: <20190616142836.10614-22-ysato@users.sourceforge.jp>
 References: <20190616142836.10614-1-ysato@users.sourceforge.jp>
- <20190616142836.10614-18-ysato@users.sourceforge.jp>
+ <20190616142836.10614-22-ysato@users.sourceforge.jp>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Sun, 16 Jun 2019 18:49:50 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.42]); Sun, 16 Jun 2019 19:06:49 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v20 17/24] target/rx: Move rx_load_image to
- rx-virt.
+Subject: Re: [Qemu-devel] [PATCH v20 21/24] hw/registerfields.h: Add 8bit
+ and 16bit register macros
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,87 +70,136 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, philmd@redhat.com
+ qemu-devel@nongnu.org,
+ Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 16 Jun 2019 23:28:29 +0900
+On Sun, 16 Jun 2019 23:28:33 +0900
 Yoshinori Sato <ysato@users.sourceforge.jp> wrote:
 
+> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>=20
+> Some RX peripheral using 8bit and 16bit registers.
+> Added 8bit and 16bit APIs.
+
+probably should go before 13/24 (i.e. before actual users start using it)
+
+this patch causes checkpatch errors but it uses macro magic style
+common to registerfields.h.
+we probably don't wish to fix existing code style at the moment.
+
 > Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Message-Id: <20190607091116.49044-11-ysato@users.sourceforge.jp>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  hw/rx/rx-virt.c | 22 ++++++++++++++++++++++
->  target/rx/cpu.c | 22 ----------------------
->  2 files changed, 22 insertions(+), 22 deletions(-)
-> 
-> diff --git a/hw/rx/rx-virt.c b/hw/rx/rx-virt.c
-> index ed0a3a1da0..4cfe2e3123 100644
-> --- a/hw/rx/rx-virt.c
-> +++ b/hw/rx/rx-virt.c
-> @@ -32,6 +32,28 @@
->  /* Same address of GDB integrated simulator */
->  #define SDRAM_BASE 0x01000000
->  
-> +static void rx_load_image(RXCPU *cpu, const char *filename,
-> +                          uint32_t start, uint32_t size)
-
-function shouldn't be added to target/rx/cpu.c at all,
-it should be introduced in 16/24 instead and this patch
-shouldn't exist.
-
-> +{
-> +    static uint32_t extable[32];
-> +    long kernel_size;
-> +    int i;
+>  include/hw/registerfields.h | 32 +++++++++++++++++++++++++++++++-
+>  1 file changed, 31 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/include/hw/registerfields.h b/include/hw/registerfields.h
+> index 2659a58737..a0bb0654d6 100644
+> --- a/include/hw/registerfields.h
+> +++ b/include/hw/registerfields.h
+> @@ -22,6 +22,14 @@
+>      enum { A_ ## reg =3D (addr) };                                      =
+    \
+>      enum { R_ ## reg =3D (addr) / 4 };
+> =20
+> +#define REG8(reg, addr)                                                 =
+ \
+> +    enum { A_ ## reg =3D (addr) };                                      =
+    \
+> +    enum { R_ ## reg =3D (addr) };
 > +
-> +    kernel_size = load_image_targphys(filename, start, size);
-> +    if (kernel_size < 0) {
-> +        fprintf(stderr, "qemu: could not load kernel '%s'\n", filename);
-> +        exit(1);
-> +    }
-> +    cpu->env.pc = start;
+> +#define REG16(reg, addr)                                                =
+  \
+> +    enum { A_ ## reg =3D (addr) };                                      =
+    \
+> +    enum { R_ ## reg =3D (addr) / 2 };
 > +
-> +    /* setup exception trap trampoline */
-> +    /* linux kernel only works little-endian mode */
-> +    for (i = 0; i < ARRAY_SIZE(extable); i++) {
-> +        extable[i] = cpu_to_le32(0x10 + i * 4);
-> +    }
-> +    rom_add_blob_fixed("extable", extable, sizeof(extable), 0xffffff80);
-> +}
-> +
->  static void rxvirt_init(MachineState *machine)
->  {
->      RX62NState *s = g_new(RX62NState, 1);
-> diff --git a/target/rx/cpu.c b/target/rx/cpu.c
-> index e3d76af55d..ea38639f47 100644
-> --- a/target/rx/cpu.c
-> +++ b/target/rx/cpu.c
-> @@ -215,25 +215,3 @@ static void rx_cpu_register_types(void)
->  }
->  
->  type_init(rx_cpu_register_types)
-> -
-> -void rx_load_image(RXCPU *cpu, const char *filename,
-> -                   uint32_t start, uint32_t size)
-> -{
-> -    static uint32_t extable[32];
-> -    long kernel_size;
-> -    int i;
-> -
-> -    kernel_size = load_image_targphys(filename, start, size);
-> -    if (kernel_size < 0) {
-> -        fprintf(stderr, "qemu: could not load kernel '%s'\n", filename);
-> -        exit(1);
-> -    }
-> -    cpu->env.pc = start;
-> -
-> -    /* setup exception trap trampoline */
-> -    /* linux kernel only works little-endian mode */
-> -    for (i = 0; i < ARRAY_SIZE(extable); i++) {
-> -        extable[i] = cpu_to_le32(0x10 + i * 4);
-> -    }
-> -    rom_add_blob_fixed("extable", extable, sizeof(extable), 0xffffff80);
-> -}
+>  /* Define SHIFT, LENGTH and MASK constants for a field within a register=
+ */
+> =20
+>  /* This macro will define R_FOO_BAR_MASK, R_FOO_BAR_SHIFT and R_FOO_BAR_=
+LENGTH
+> @@ -34,6 +42,12 @@
+>                                          MAKE_64BIT_MASK(shift, length)};
+> =20
+>  /* Extract a field from a register */
+> +#define FIELD_EX8(storage, reg, field)                                  =
+  \
+> +    extract8((storage), R_ ## reg ## _ ## field ## _SHIFT,              =
+  \
+> +              R_ ## reg ## _ ## field ## _LENGTH)
+> +#define FIELD_EX16(storage, reg, field)                                 =
+  \
+> +    extract16((storage), R_ ## reg ## _ ## field ## _SHIFT,             =
+  \
+> +              R_ ## reg ## _ ## field ## _LENGTH)
+>  #define FIELD_EX32(storage, reg, field)                                 =
+  \
+>      extract32((storage), R_ ## reg ## _ ## field ## _SHIFT,             =
+  \
+>                R_ ## reg ## _ ## field ## _LENGTH)
+> @@ -49,6 +63,22 @@
+>   * Assigning values larger then the target field will result in
+>   * compilation warnings.
+>   */
+> +#define FIELD_DP8(storage, reg, field, val) ({                          =
+  \
+> +    struct {                                                            =
+  \
+> +        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
+  \
+> +    } v =3D { .v =3D val };                                             =
+      \
+> +    uint8_t d;                                                          =
+  \
+> +    d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
+    \
+> +                  R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
+  \
+> +    d; })
+> +#define FIELD_DP16(storage, reg, field, val) ({                         =
+  \
+> +    struct {                                                            =
+  \
+> +        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
+  \
+> +    } v =3D { .v =3D val };                                             =
+      \
+> +    uint16_t d;                                                         =
+  \
+> +    d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
+    \
+> +                  R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
+  \
+> +    d; })
+>  #define FIELD_DP32(storage, reg, field, val) ({                         =
+  \
+>      struct {                                                            =
+  \
+>          unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
+  \
+> @@ -57,7 +87,7 @@
+>      d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
+    \
+>                    R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
+  \
+>      d; })
+> -#define FIELD_DP64(storage, reg, field, val) ({                         =
+  \
+> +#define FIELD_DP64(storage, reg, field, val) ({                         \
+>      struct {                                                            =
+  \
+>          unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
+  \
+>      } v =3D { .v =3D val };                                             =
+      \
 
 
