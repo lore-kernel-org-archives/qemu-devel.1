@@ -2,84 +2,78 @@ Return-Path: <SRS0=kfsH=UP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75617C31E49
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 11:43:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53C7EC31E49
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 12:05:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2461520652
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 11:43:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NHnpZLE/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2461520652
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1451620870
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 12:05:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1451620870
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38978 helo=lists.gnu.org)
+Received: from localhost ([::1]:39366 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcTZ5-0001WB-3U
-	for qemu-devel@archiver.kernel.org; Sun, 16 Jun 2019 07:43:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33339)
+	id 1hcTuN-0005xD-Rm
+	for qemu-devel@archiver.kernel.org; Sun, 16 Jun 2019 08:05:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36825)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <hongbo.zhang@linaro.org>) id 1hcTXz-00013t-Cz
- for qemu-devel@nongnu.org; Sun, 16 Jun 2019 07:42:11 -0400
+ (envelope-from <ybettan@redhat.com>) id 1hcTtK-0005Ue-IT
+ for qemu-devel@nongnu.org; Sun, 16 Jun 2019 08:04:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <hongbo.zhang@linaro.org>) id 1hcTXq-00013Y-Lg
- for qemu-devel@nongnu.org; Sun, 16 Jun 2019 07:42:03 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:44887)
+ (envelope-from <ybettan@redhat.com>) id 1hcTtH-0004Ik-J2
+ for qemu-devel@nongnu.org; Sun, 16 Jun 2019 08:04:10 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:40851)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
- id 1hcTXn-0000vY-Sm
- for qemu-devel@nongnu.org; Sun, 16 Jun 2019 07:41:57 -0400
-Received: by mail-io1-xd44.google.com with SMTP id s7so15223794iob.11
- for <qemu-devel@nongnu.org>; Sun, 16 Jun 2019 04:41:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=xzRoN3Hc4nbHvzh+ancbtXmvGerYtHMpr1hrImua3sU=;
- b=NHnpZLE/hhX0uULLxUgLGdzV/ese6dnYwenJwudqzu5T9LR3yIrIoBE0edt5c3+o6S
- Sokza6ogfwaG6KkXSnffkyW685TZ/rV1ZjBkhFZPsk8SYqFvoHPQtN/9aZTOHdjdyEx2
- esnttYjHVmulDDCbRjvMANNuYO9tKD7CO8AQh/+7h05aLoRsoKRPlr6t4tN5csCpkGkY
- ZcKGR85JbQnSds2bKHyyDNH2LumDJ5sSEvzwGrlo3HsviwUhTBYFT7iclBJpNHZkBMtB
- uNi+fmZ9B5ctn2JEQ9ewL8JmlTEb+MFixSmNbh3TEZ2jeAhS+GPBtbK9qxErStpUcOil
- DsmA==
+ (Exim 4.71) (envelope-from <ybettan@redhat.com>) id 1hcTtH-0004FI-Au
+ for qemu-devel@nongnu.org; Sun, 16 Jun 2019 08:04:07 -0400
+Received: by mail-wm1-f65.google.com with SMTP id v19so6292967wmj.5
+ for <qemu-devel@nongnu.org>; Sun, 16 Jun 2019 05:04:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=xzRoN3Hc4nbHvzh+ancbtXmvGerYtHMpr1hrImua3sU=;
- b=oz3CiXz4HXzBPtPNCO2tCpOYYJXqIeE1KDg+tzLd10TRk6xRcXZbDTtjrSLsAW3A8+
- IXw+k+vRJIsd54Mux55i5MncV+MEAQyZvZuyOYRXflgLgGjIHs87r1nF5Mc+sdxDad53
- w77/KvMsByYRigDZRrozeRto6EsfeLHxicJIYEgxXUbcte41twixXEeTJvihJOFWZgMC
- 7uxxcYK0sEkIh5afJ2LqgCVpAp18uMla0gIUkU/cWcX+snY4u6anS7bdiudsduY7WCRN
- ANOQ1SDwSI7xOq0c3FM+BrBqLdmNkWUXmgGKRu/o3b+Fx4yjMTZGKKgIry/o/lQlD5wv
- kemQ==
-X-Gm-Message-State: APjAAAUSDSG8B78vjk/+CCoT6E+/wqj2wvKmxoXjuLJCfUHnYHoleR2B
- ZaG+Jx3Pc99DBEcnkUOrtbnuFrys0uuEW0MbbPXXsw==
-X-Google-Smtp-Source: APXvYqzSaL77NCwlNEGmdJPbLXpAdu6vYa+YJXPUeGq0/ouHE+PvoUsoS52HT50k14WHEtt4EGJ3St8WxzCTzKT8d0Y=
-X-Received: by 2002:a02:7715:: with SMTP id g21mr30503750jac.24.1560685311112; 
- Sun, 16 Jun 2019 04:41:51 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-transfer-encoding
+ :content-language;
+ bh=y8QzB3LuLQCdvdIWSm4r/RN5vS0V3LP+3vtC3sRlbRQ=;
+ b=gIAMjBRJ9lLRZyO2WW9JXpRZkH/Vuyq/txCMKZqQOBWWYJAsVto1H/ADqsNNL5RP1f
+ sNgVxrbzc3cONKrybZpPc+yeSNFGnKm9SsQBqMV+b9mlknpgc4NRYadB5jOfp5APsxoE
+ KfD8kTiU+HfffEuMDU5CNDaJ43tdKIT+TRbPdrw+503RWpiv/Tsz0MtoDijjW1heNqpU
+ ixSuXeoFufKPDcHFrKe6+HIHh2PDuoRRb9G8YB3/+8aC2edp4R2tUdk4oozS+rChc8sf
+ HF5A1Dv3CvFbEAdVuYVPaob4hxJhzZaFtpb0nVigyq8kaJOb16kVva/0u1DMaBe56wfV
+ vhAw==
+X-Gm-Message-State: APjAAAVj/5KfOuUGx3kaLMnMw0uepD7OSpbw3ZcbxN2a3d13WiQm4KeJ
+ P27Meh3hIvMo3OMWnJwjUZsqdQ==
+X-Google-Smtp-Source: APXvYqznFGCFXQNJrnLcwhqnVXNCTEnQ5UovifeSuxHvhUwznRHx2567882XSJyTcb6ERgKKvleGOg==
+X-Received: by 2002:a1c:452:: with SMTP id 79mr15339343wme.149.1560686643973; 
+ Sun, 16 Jun 2019 05:04:03 -0700 (PDT)
+Received: from [10.201.132.176] (bzq-82-81-161-51.red.bezeqint.net.
+ [82.81.161.51])
+ by smtp.gmail.com with ESMTPSA id j18sm7546605wre.23.2019.06.16.05.04.02
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Sun, 16 Jun 2019 05:04:03 -0700 (PDT)
+To: Stefan Hajnoczi <stefanha@gmail.com>
+References: <20190428132631.37430-1-ybettan@redhat.com>
+ <20190515094344.GA29507@stefanha-x1.localdomain>
+From: Yoni Bettan <ybettan@redhat.com>
+Message-ID: <d314afe9-9cfd-cba5-6aaf-ff632efb6180@redhat.com>
+Date: Sun, 16 Jun 2019 15:04:01 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <1555560291-3415-1-git-send-email-hongbo.zhang@linaro.org>
- <1555560291-3415-3-git-send-email-hongbo.zhang@linaro.org>
- <ed731639-5ed1-5473-f078-e62f8fa98678@redhat.com>
-In-Reply-To: <ed731639-5ed1-5473-f078-e62f8fa98678@redhat.com>
-From: Hongbo Zhang <hongbo.zhang@linaro.org>
-Date: Sun, 16 Jun 2019 19:41:41 +0800
-Message-ID: <CAHmQWvAuQ9mwXA5uO3ShYyvP5ywOrck5kU4gPD_kGh5S39Va2w@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d44
-Subject: Re: [Qemu-devel] [PATCH v7 2/2] hw/arm: Add arm SBSA reference
- machine, devices part
+In-Reply-To: <20190515094344.GA29507@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH V1] Introducing virtio-example.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,644 +85,473 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
- Laszlo Ersek <lersek@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, ailan@redhat.com,
+ qemu-devel@nongnu.org, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 3 Jun 2019 at 18:54, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
-> wrote:
->
-> Hi Hongbo, Ard.
->
-> On 4/18/19 6:04 AM, Hongbo Zhang wrote:
-> > Following the previous patch, this patch adds peripheral devices to the
-> > newly introduced SBSA-ref machine.
-> >
-> > Signed-off-by: Hongbo Zhang <hongbo.zhang@linaro.org>
-> > ---
-> >  hw/arm/sbsa-ref.c | 451 ++++++++++++++++++++++++++++++++++++++++++++++=
-++++++++
-> >  1 file changed, 451 insertions(+)
-> >
-> > diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
-> > index 652ec13..3fb0027 100644
-> > --- a/hw/arm/sbsa-ref.c
-> > +++ b/hw/arm/sbsa-ref.c
-> > @@ -21,6 +21,7 @@
-> >  #include "qapi/error.h"
-> >  #include "qemu/error-report.h"
-> >  #include "qemu/units.h"
-> > +#include "sysemu/device_tree.h"
-> >  #include "sysemu/numa.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "exec/address-spaces.h"
-> > @@ -28,11 +29,28 @@
-> >  #include "kvm_arm.h"
-> >  #include "hw/arm/arm.h"
-> >  #include "hw/boards.h"
-> > +#include "hw/ide/internal.h"
-> > +#include "hw/ide/ahci_internal.h"
-> >  #include "hw/intc/arm_gicv3_common.h"
-> > +#include "hw/loader.h"
-> > +#include "hw/pci-host/gpex.h"
-> > +#include "hw/usb.h"
-> > +#include "net/net.h"
-> >
-> >  #define RAMLIMIT_GB 8192
-> >  #define RAMLIMIT_BYTES (RAMLIMIT_GB * GiB)
-> >
-> > +#define NUM_IRQS        256
-> > +#define NUM_SMMU_IRQS   4
-> > +#define NUM_SATA_PORTS  6
-> > +
-> > +#define VIRTUAL_PMU_IRQ        7
-> > +#define ARCH_GIC_MAINT_IRQ     9
-> > +#define ARCH_TIMER_VIRT_IRQ    11
-> > +#define ARCH_TIMER_S_EL1_IRQ   13
-> > +#define ARCH_TIMER_NS_EL1_IRQ  14
-> > +#define ARCH_TIMER_NS_EL2_IRQ  10
-> > +
-> >  enum {
-> >      SBSA_FLASH,
-> >      SBSA_MEM,
-> > @@ -115,6 +133,415 @@ static const int sbsa_ref_irqmap[] =3D {
-> >      [SBSA_EHCI] =3D 11,
-> >  };
-> >
-> > +/*
-> > + * Firmware on this machine only uses ACPI table to load OS, these lim=
-ited
-> > + * device tree nodes are just to let firmware know the info which vari=
-es from
-> > + * command line parameters, so it is not necessary to be fully compati=
-ble
-> > + * with the kernel CPU and NUMA binding rules.
-> > + */
-> > +static void create_fdt(SBSAMachineState *vms)
-> > +{
-> > +    void *fdt =3D create_device_tree(&vms->fdt_size);
-> > +    const MachineState *ms =3D MACHINE(vms);
-> > +    int cpu;
-> > +
-> > +    if (!fdt) {
-> > +        error_report("create_device_tree() failed");
-> > +        exit(1);
-> > +    }
-> > +
-> > +    vms->fdt =3D fdt;
-> > +
-> > +    qemu_fdt_setprop_string(fdt, "/", "compatible", "linux,sbsa-ref");
-> > +    qemu_fdt_setprop_cell(fdt, "/", "#address-cells", 0x2);
-> > +    qemu_fdt_setprop_cell(fdt, "/", "#size-cells", 0x2);
-> > +
-> > +    if (have_numa_distance) {
-> > +        int size =3D nb_numa_nodes * nb_numa_nodes * 3 * sizeof(uint32=
-_t);
-> > +        uint32_t *matrix =3D g_malloc0(size);
-> > +        int idx, i, j;
-> > +
-> > +        for (i =3D 0; i < nb_numa_nodes; i++) {
-> > +            for (j =3D 0; j < nb_numa_nodes; j++) {
-> > +                idx =3D (i * nb_numa_nodes + j) * 3;
-> > +                matrix[idx + 0] =3D cpu_to_be32(i);
-> > +                matrix[idx + 1] =3D cpu_to_be32(j);
-> > +                matrix[idx + 2] =3D cpu_to_be32(numa_info[i].distance[=
-j]);
-> > +            }
-> > +        }
-> > +
-> > +        qemu_fdt_add_subnode(fdt, "/distance-map");
-> > +        qemu_fdt_setprop(fdt, "/distance-map", "distance-matrix",
-> > +                         matrix, size);
-> > +        g_free(matrix);
-> > +    }
-> > +
-> > +    qemu_fdt_add_subnode(vms->fdt, "/cpus");
-> > +
-> > +    for (cpu =3D vms->smp_cpus - 1; cpu >=3D 0; cpu--) {
-> > +        char *nodename =3D g_strdup_printf("/cpus/cpu@%d", cpu);
-> > +        ARMCPU *armcpu =3D ARM_CPU(qemu_get_cpu(cpu));
-> > +        CPUState *cs =3D CPU(armcpu);
-> > +
-> > +        qemu_fdt_add_subnode(vms->fdt, nodename);
-> > +
-> > +        if (ms->possible_cpus->cpus[cs->cpu_index].props.has_node_id) =
-{
-> > +            qemu_fdt_setprop_cell(vms->fdt, nodename, "numa-node-id",
-> > +                ms->possible_cpus->cpus[cs->cpu_index].props.node_id);
-> > +        }
-> > +
-> > +        g_free(nodename);
-> > +    }
-> > +}
-> > +
-> > +static void create_one_flash(const char *name, hwaddr flashbase,
-> > +                             hwaddr flashsize, const char *file,
-> > +                             MemoryRegion *sysmem)
-> > +{
-> > +    /*
-> > +     * Create and map a single flash device. We use the same
-> > +     * parameters as the flash devices on the Versatile Express board.
-> > +     */
-> > +    DriveInfo *dinfo =3D drive_get_next(IF_PFLASH);
-> > +    DeviceState *dev =3D qdev_create(NULL, "cfi.pflash01");
->
-> Please use TYPE_PFLASH_CFI01 instead of "cfi.pflash01".
->
-> I wanted to ask "does it has to be CFI01?" because this device model is
-> in bad shape, but I guess I answered myself looking at the EDK2 platform
-> code:
->
-> - P30_CFI_ADDR_VENDOR_ID is not used
-> - NorFlashDxe::NorFlashReadCfiData() is not implemented
-> - All commands in NorFlashDxe uses:
->     SEND_NOR_COMMAND(..., P30_CMD_...)
->   which are specific to the Intel P30 Nor flash family (CFI01).
->
-> > +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-> > +    const uint64_t sectorlength =3D 256 * 1024;
-> > +
-> > +    if (dinfo) {
-> > +        qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(dinfo),
-> > +                            &error_abort);
-> > +    }
-> > +
-> > +    qdev_prop_set_uint32(dev, "num-blocks", flashsize / sectorlength);
-> > +    qdev_prop_set_uint64(dev, "sector-length", sectorlength);
-> > +    qdev_prop_set_uint8(dev, "width", 4);
-> > +    qdev_prop_set_uint8(dev, "device-width", 2);
-> > +    qdev_prop_set_bit(dev, "big-endian", false);
-> > +    qdev_prop_set_uint16(dev, "id0", 0x89);
-> > +    qdev_prop_set_uint16(dev, "id1", 0x18);
-> > +    qdev_prop_set_uint16(dev, "id2", 0x00);
-> > +    qdev_prop_set_uint16(dev, "id3", 0x00);
-> > +    qdev_prop_set_string(dev, "name", name);
-> > +    qdev_init_nofail(dev);
-> > +
-> > +    memory_region_add_subregion(sysmem, flashbase,
-> > +                                sysbus_mmio_get_region(SYS_BUS_DEVICE(=
-dev), 0));
-> > +
-> > +    if (file) {
-> > +        char *fn;
-> > +        int image_size;
-> > +
-> > +        if (drive_get(IF_PFLASH, 0, 0)) {
-> > +            error_report("The contents of the first flash device may b=
-e "
-> > +                         "specified with -bios or with -drive if=3Dpfl=
-ash... "
-> > +                         "but you cannot use both options at once");
-> > +            exit(1);
-> > +        }
-> > +        fn =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, file);
-> > +        if (!fn) {
-> > +            error_report("Could not find ROM image '%s'", file);
-> > +            exit(1);
-> > +        }
-> > +        image_size =3D load_image_mr(fn, sysbus_mmio_get_region(sbd, 0=
-));
-> > +        g_free(fn);
-> > +        if (image_size < 0) {
-> > +            error_report("Could not load ROM image '%s'", file);
-> > +            exit(1);
-> > +        }
-> > +    }
-> > +}
-> > +
-> > +static void create_flash(const SBSAMachineState *vms,
-> > +                         MemoryRegion *sysmem,
-> > +                         MemoryRegion *secure_sysmem)
-> > +{
-> > +    /*
-> > +     * Create one secure and nonsecure flash devices to fill SBSA_FLAS=
-H
-> > +     * space in the memmap, file passed via -bios goes in the first on=
-e.
-> > +     */
-> > +    hwaddr flashsize =3D vms->memmap[SBSA_FLASH].size / 2;
-> > +    hwaddr flashbase =3D vms->memmap[SBSA_FLASH].base;
-> > +
-> > +    create_one_flash("sbsa-ref.flash0", flashbase, flashsize,
-> > +                     bios_name, secure_sysmem);
-> > +    create_one_flash("sbsa-ref.flash1", flashbase + flashsize, flashsi=
-ze,
-> > +                     NULL, sysmem);
->
-> static const MemMapEntry base_memmap[] =3D {
->     /* Space up to 0x8000000 is reserved for a boot ROM */
->     [VIRT_FLASH] =3D              {          0, 0x08000000 },
->
-Hi Philippe,
-Thank you for the long comments.
-Some parts of this machine are based on the 'virt' machine, but I use
-this flash memory map:
-[SBSA_FLASH] =3D              {          0, 0x20000000 },
-that are 256M *2 flashes.
-Franky I didn't consider the product part number etc, just use the
-original design in 'virt' and change the size large enough as I think.
+Hi Stefan and thank you for your review.
 
-Peter, Ard, do we need more considerations here?
+I am sorry for my late response, I have updated the specification 
+according to your review (and Eduardo's review) and sent it to the 
+virtio-comment mailing list.
 
-> So you are creating 2 identical flashes of 128MiB/2 =3D 64 MiB each which
-> are the biggest flash you can have:
+On 5/15/19 12:43 PM, Stefan Hajnoczi wrote:
+> On Sun, Apr 28, 2019 at 04:26:31PM +0300, Yoni Bettan wrote:
+>> The main goal is to create an example to be used as template or
+>> guideline for contributors when they wish to create a new virtio
+>> device and to document "the right way" to do so.
+>>
+>> It consists of several parts:
+>>
+>>      1. The device specification
+>>          * it can be found in the device header
+>>          * it will hopefully be added to the official virtio specification
+>>
+>>      2. The device implementation for Qemu-KVM hypervisor
+>>          * this patch content
+>>
+>>      3. The device driver for linux
+>>          * it will hopefully be added to linux
+>>          * for now it can be found at https://github.com/ybettan/\
+>>                  QemuDeviceDrivers/blob/master/virtio/virtio_example_driver.c
+>>
+>>      4. A blog on virtio
+>>          * introducing the virtio concept
+>>          * gives some motivation for virtio-devices to be used
+>>          * bring extra documentation on "how to write":
+>>              - device specification
+>>              - device implementation
+>>              - device driver for linux
+>>          * it can be found at https://howtovms.wordpress.com
+>>
+>> Signed-off-by: Yoni Bettan <ybettan@redhat.com>
+>> ---
+> Existing VIRTIO devices provide plenty of examples of how to implement
+> device emulation and guest drivers.  This device is trivial and doesn't
+> address the interesting decisions that device designers face.  Its
+> usefulness is limited.  I don't think it should go into the spec, Linux,
+> or QEMU.
 >
-> "The P30 family provides density upgrades from 64-Mbit through
-> 512-Mbit." On Intel, the 512-Mib case is particular in that it is built
-> of 2x 256-Mib on the same die, with a virtual chip enable. It is simpler
-> to use a Micron or Numonyx model.
+> The following areas would be more helpful than an example device:
 >
-> I plan to use a whitelist of supported (and tested...) models, the one
-> you use seems the Micron JS28F512P30EF ('E' for 'Symetrically Blocked',
-> since the current model doesn't support bottom/top blocks layout), or in
-> short: 28F512P30E.
-> Ard, is that OK?
+>   * Expanding "Appendix B. Creating New Device Types" in the spec:
+>     https://docs.oasis-open.org/virtio/virtio/v1.1/cs01/virtio-v1.1-cs01.html#x1-444000B
 >
-> Checking EDK2 git history, the driver is part of ArmPlatformPkg,
-> imported in commit 1d5d0ae92d9541, based on 'Versatile Express'.
+>   * A code commentary of an existing device like virtio-net or
+>     virtio-scsi since they are non-trivial.  That would be a good fit for
+>     a series of blog posts.
 >
-> On the Versatile Express and the RealView Emulation Baseboard user
-> guides, I only find reference of "64MB of NOR flash" with no specific mod=
-el.
+>   * Improving the doc comments in Linux and QEMU.
 >
-> Peter, do you have physical access to tell me what flashes are used on
-> real hardware? I googled for Linux console boot log but the kernel
-> doesn't seem to care about detecting/mapping the flash.
+>> RFC -> V1:
+>>      
+>>      * Updated the commit message to be more informative about the full
+>>        working flow.
+>>
+>>      * Added the device specification to the device header.
+>>
+>>      * Removed the PCI-ID given for the device.
+>>        This was done by forcing the device to be in modern-only mode therefore
+>>        the PCI-ID is now generated automatically.
+>>      
+>>      * Made all requests consist of both input and output buffer instead
+>>        of separating them into 2 different requests.
+>>
+>>      * Made the device IO deal with integers instead of strings.
+>>        The user have read/write access to the device using sysfs,
+>>        therefore the driver's input are strings, in the RFC version
+>>        those strings where passed directly to the device and the integer
+>>        conversion was done inside the device, now the driver is handling those
+>>        conversions and the device is unaware of them.
+>>
+>>      * Added more documentation for the get_features() function.
+>>
+>>      * Simplified the error propagation in virtio_example_pci_realize()
+>>        function.
+>>
+>>      * Removed all code of previous previous patch from standard-headers.
+>>
+>>
+>>   hw/virtio/Makefile.objs            |   1 +
+>>   hw/virtio/virtio-example.c         | 110 +++++++++++++++++++++++++++++
+>>   hw/virtio/virtio-pci.c             |  47 ++++++++++++
+>>   hw/virtio/virtio-pci.h             |  14 ++++
+>>   include/hw/virtio/virtio-example.h |  92 ++++++++++++++++++++++++
+>>   5 files changed, 264 insertions(+)
+>>   create mode 100644 hw/virtio/virtio-example.c
+>>   create mode 100644 include/hw/virtio/virtio-example.h
+>>
+>> diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+>> index 1b2799cfd8..7a6fb2505c 100644
+>> --- a/hw/virtio/Makefile.objs
+>> +++ b/hw/virtio/Makefile.objs
+>> @@ -7,6 +7,7 @@ common-obj-$(CONFIG_VIRTIO_PCI) += virtio-pci.o
+>>   common-obj-$(CONFIG_VIRTIO_MMIO) += virtio-mmio.o
+>>   obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon.o
+>>   obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-crypto.o
+>> +obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-example.o
+> CRYPTO? :)
 >
-> QEMU added the flash to the Versatile board in commit 964c695a54ceda3a,
-> with the following description:
+>>   obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) += virtio-crypto-pci.o
+>>   
+>>   obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
+>> diff --git a/hw/virtio/virtio-example.c b/hw/virtio/virtio-example.c
+>> new file mode 100644
+>> index 0000000000..fd72f7c3a5
+>> --- /dev/null
+>> +++ b/hw/virtio/virtio-example.c
+>> @@ -0,0 +1,110 @@
+>> +/*
+>> + * A virtio device example.
+>> + *
+>> + * Copyright 2019 Red Hat, Inc.
+>> + * Copyright 2019 Yoni Bettan <ybettan@redhat.com>
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or
+>> + * (at your option) any later version.  See the COPYING file in the
+>> + * top-level directory.
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "qemu/iov.h"
+>> +#include "hw/virtio/virtio.h"
+>> +#include "hw/virtio/virtio-example.h"
+>> +
+>> +
+>> +/*
+>> + * this function is called when the driver 'kick' the virtqueue.
+>> + * since we can have more than 1 virtqueue we need the vq argument in order to
+>> + * know which one was kicked by the driver.
+>> + */
+>> +static void handle_input(VirtIODevice *vdev, VirtQueue *vq)
+>> +{
+>> +    VirtQueueElement *elem;
+>> +    int data;
+>> +
+>> +    /*
+>> +     * get the virtqueue element sent from the driver.
+>> +     * in_sg are the driver inputs (device outputs)
+>> +     * out_sg are the driver output (device input)
+>> +     */
+>> +    elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
+> virtqueue_pop() can fail.  The NULL return value must be handled.
 >
->     - add support for the 64MB NOR CFI01 flash available at
->     0x34000000 on the versatilepb board
+>> +
+>> +    /* read the driver output sg (device input sg) into a buffer */
+>> +    iov_to_buf(elem->out_sg, elem->out_num, 0, &data, sizeof(int));
+>> +
+>> +    /* process the data */
+>> +    data++;
+>> +
+>> +    /* write the result to the driver input sg (device output sg) */
+>> +    iov_from_buf(elem->in_sg, elem->in_num, 0, &data, sizeof(int));
+> This exposes uninitialized stack memory from QEMU to the guest when
+> elem->out_num = 0 or the buffer is smaller than sizeof(int).  This is a
+> security bug.
 >
-> http://infocenter.arm.com/help/index.jsp?topic=3D/com.arm.doc.dui0225d/BB=
-AJIHEC.html
+> To avoid it, handle iov_to_buf() failure with virtio_error() and return
+> early.  The device will be left in the "broken" state and further
+> operation will fail (e.g. virtqueue_pop() will fail until the next
+> device reset).
 >
-> However on this link I only see "SSMC Chip Select 1, normally NOR flash
-> (During boot remapping, this can be NOR flash, Disk-on-Chip, or static
-> expansion memory)". Again, nothing specific (which makes sense, why
-> restrict the users to a particuliar family, as long as the pinout matches=
-).
+>> +
+>> +    /* push back the result into the virtqueue */
+>> +    virtqueue_push(vq, elem, 1);
+> Why 1?  Normally this is the number of bytes transferred so it should be
+> sizeof(int).
 >
-> The Manufacturer/Device ID used in QEMU (0x0089, 0x0018) correspond to
-> the Micron 28F128J3D (128-Mbit, 128 symmetrical blocks of 128-KiB).
-> Neither the flash size (64 vs 16) nor the block size (256 vs 128) match.
+>> +
+>> +    /* interrupt the driver */
+>> +    virtio_notify(vdev, vq);
+>> +
+>> +    return;
+>> +}
+>> +
+>> +/*
+>> + * This function gets the host features as a parameter and add to it all the
+>> + * features supported by the device.
+>> + * This example-device has no currently defined feature bits but we still need
+>> + * this function because when a device is plugged this function is called to
+>> + * check the features offer by the device so it must exist and return the
+>> + * host features without any change.
+>> + */
+>> +static uint64_t
+>> +get_features(VirtIODevice *vdev, uint64_t features, Error **errp)
+>> +{
+>> +    return features;
+>> +}
+>> +
+>> +static void virtio_example_device_realize(DeviceState *dev, Error **errp)
+>> +{
+>> +    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+>> +    VirtIOEXAMPLE *vexmp = VIRTIO_EXAMPLE(dev);
+>> +
+>> +    /* common virtio device initialization */
+>> +    virtio_init(vdev, "virtio-example", VIRTIO_ID_EXAMPLE, 0);
+>> +
+>> +    /* this device suppot 1 virtqueue */
+>> +    vexmp->vq = virtio_add_queue(vdev, 1, handle_input);
+>> +}
+>> +
+>> +static void virtio_example_device_unrealize(DeviceState *dev, Error **errp)
+>> +{
+>> +    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+>> +
+>> +    /* common virtio device cleanup */
+>> +    virtio_cleanup(vdev);
+>> +}
+>> +
+>> +static void virtio_example_class_init(ObjectClass *klass, void *data)
+>> +{
+>> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>> +    VirtioDeviceClass *vdc = VIRTIO_DEVICE_CLASS(klass);
+>> +
+>> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+>> +    vdc->realize = virtio_example_device_realize;
+>> +    vdc->unrealize = virtio_example_device_unrealize;
+>> +    vdc->get_features = get_features;
+>> +}
+>> +
+>> +static const TypeInfo virtio_example_info = {
+>> +    .name = TYPE_VIRTIO_EXAMPLE,
+>> +    .parent = TYPE_VIRTIO_DEVICE,
+>> +    .instance_size = sizeof(VirtIOEXAMPLE),
+>> +    .class_init = virtio_example_class_init,
+>> +};
+>> +
+>> +static void virtio_register_types(void)
+>> +{
+>> +    type_register_static(&virtio_example_info);
+>> +}
+>> +
+>> +type_init(virtio_register_types)
+>> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+>> index 3a01fe90f0..36333168ad 100644
+>> --- a/hw/virtio/virtio-pci.c
+>> +++ b/hw/virtio/virtio-pci.c
+>> @@ -2521,6 +2521,52 @@ static const TypeInfo virtio_rng_pci_info = {
+>>       .class_init    = virtio_rng_pci_class_init,
+>>   };
+>>   
+>> +/* virtio-example-pci */
+>> +
+>> +static void virtio_example_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+>> +{
+>> +    VirtIOExamplePCI *vexmp = VIRTIO_EXAMPLE_PCI(vpci_dev);
+>> +    DeviceState *vdev = DEVICE(&vexmp->vdev);
+>> +
+>> +    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
+>> +    /*
+>> +     * force modern-only mode on the device, now a PCI-ID will be generated
+>> +     * automatically according to the VIRTIO-ID.
+>> +     */
+>> +    virtio_pci_force_virtio_1(vpci_dev);
+>> +    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
+>> +}
+>> +
+>> +static void virtio_example_pci_class_init(ObjectClass *klass, void *data)
+>> +{
+>> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>> +    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
+>> +    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
+>> +
+>> +    k->realize = virtio_example_pci_realize;
+>> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+>> +
+>> +    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
+>> +    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
+>> +    pcidev_k->class_id = PCI_CLASS_OTHERS;
+>> +}
+>> +
+>> +static void virtio_example_initfn(Object *obj)
+>> +{
+>> +    VirtIOExamplePCI *dev = VIRTIO_EXAMPLE_PCI(obj);
+>> +
+>> +    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
+>> +                                TYPE_VIRTIO_EXAMPLE);
+>> +}
+>> +
+>> +static const TypeInfo virtio_example_pci_info = {
+>> +    .name          = TYPE_VIRTIO_EXAMPLE_PCI,
+>> +    .parent        = TYPE_VIRTIO_PCI,
+>> +    .instance_size = sizeof(VirtIOExamplePCI),
+>> +    .instance_init = virtio_example_initfn,
+>> +    .class_init    = virtio_example_pci_class_init,
+>> +};
+>> +
+>>   /* virtio-input-pci */
+>>   
+>>   static Property virtio_input_pci_properties[] = {
+>> @@ -2693,6 +2739,7 @@ static const TypeInfo virtio_pci_bus_info = {
+>>   static void virtio_pci_register_types(void)
+>>   {
+>>       type_register_static(&virtio_rng_pci_info);
+>> +    type_register_static(&virtio_example_pci_info);
+>>       type_register_static(&virtio_input_pci_info);
+>>       type_register_static(&virtio_input_hid_pci_info);
+>>       type_register_static(&virtio_keyboard_pci_info);
+>> diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+>> index 813082b0d7..db3f5ec17d 100644
+>> --- a/hw/virtio/virtio-pci.h
+>> +++ b/hw/virtio/virtio-pci.h
+>> @@ -19,6 +19,7 @@
+>>   #include "hw/virtio/virtio-blk.h"
+>>   #include "hw/virtio/virtio-net.h"
+>>   #include "hw/virtio/virtio-rng.h"
+>> +#include "hw/virtio/virtio-example.h"
+>>   #include "hw/virtio/virtio-serial.h"
+>>   #include "hw/virtio/virtio-scsi.h"
+>>   #include "hw/virtio/virtio-balloon.h"
+>> @@ -51,6 +52,7 @@ typedef struct VHostSCSIPCI VHostSCSIPCI;
+>>   typedef struct VHostUserSCSIPCI VHostUserSCSIPCI;
+>>   typedef struct VHostUserBlkPCI VHostUserBlkPCI;
+>>   typedef struct VirtIORngPCI VirtIORngPCI;
+>> +typedef struct VirtIOExamplePCI VirtIOExamplePCI;
+>>   typedef struct VirtIOInputPCI VirtIOInputPCI;
+>>   typedef struct VirtIOInputHIDPCI VirtIOInputHIDPCI;
+>>   typedef struct VirtIOInputHostPCI VirtIOInputHostPCI;
+>> @@ -339,6 +341,18 @@ struct VirtIORngPCI {
+>>       VirtIORNG vdev;
+>>   };
+>>   
+>> +/*
+>> + * virtio-example-pci: This extends VirtioPCIProxy.
+>> + */
+>> +#define TYPE_VIRTIO_EXAMPLE_PCI "virtio-example-pci"
+>> +#define VIRTIO_EXAMPLE_PCI(obj) \
+>> +        OBJECT_CHECK(VirtIOExamplePCI, (obj), TYPE_VIRTIO_EXAMPLE_PCI)
+>> +
+>> +struct VirtIOExamplePCI {
+>> +    VirtIOPCIProxy parent_obj;
+>> +    VirtIOEXAMPLE vdev;
+>> +};
+>> +
+>>   /*
+>>    * virtio-input-pci: This extends VirtioPCIProxy.
+>>    */
+>> diff --git a/include/hw/virtio/virtio-example.h b/include/hw/virtio/virtio-example.h
+>> new file mode 100644
+>> index 0000000000..48397af4e1
+>> --- /dev/null
+>> +++ b/include/hw/virtio/virtio-example.h
+>> @@ -0,0 +1,92 @@
+>> +/*
+>> + * Virtio EXAMPLE Support
+>> + *
+>> + * Copyright Red Hat, Inc. 2019
+>> + * Copyright Yoni Bettan <ybettan@redhat.com>
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or
+>> + * (at your option) any later version.  See the COPYING file in the
+>> + * top-level directory.
+>> + */
+>> +
+>> +
+>> +/*
+>> + * ============================================================================
+>> + *                             Device specification
+>> + * ============================================================================
+>> + *
+>> + * 5.2 Example Device
+>> + *
+>> + * The virtio example device is a simple virtual block device. Read and write
+>> + * requests are placed in the queue, and serviced (probably out of order) by
+>> + * the device except where noted.
+> This was copy-pasted from virtio-blk and does not accurately describe
+> this example device.
 >
-> The safer fix here is to find a CFI01 flash of 256 sectors of 256-KiB
-> and update the Manufacturer/Device IDs in QEMU. Luckily this matches the
-> 28F512P30E cited previously :)
+>> + *
+>> + * 5.2.1 Device ID
+>> + *
+>> + * 21
+> A new ID is probably required.  See the latest ID requests on the virtio
+> mailing list.
 >
-> Regards,
+>> + *
+>> + * 5.2.2 Virtqueues
+>> + *
+>> + * 0 requestq
+>> + *
+>> + * 5.2.3 Feature bits
+>> + *
+>> + * None currently defined.
+>> + *
+>> + * 5.2.4 Device configuration layout
+>> + *
+>> + * None currently defined.
+>> + *
+>> + * 5.2.5 Device Initialization
+>> + *
+>> + * 1. The virtqueue is initialized.
+>> + *
+>> + * 5.2.6 Device Operation
+>> + *
+>> + * When the driver need computation, it places a request that consist of both
+>> + * input and output buffer into the queue.
+>> + * The first buffer is used as an input for the device and contain a single
+>> + * integer, represented by 4 or 8 bytes (depends on the architecture), and the
+>> + * second is given for the device to fill the result in it.
+> Modern VIRTIO devices have a well-defined ABI and do not contain
+> architecture-dependent data layout (with few exceptions).  An example
+> device should demonstrate this by using a little-endian 4-byte integer.
 >
-> Phil.
+>> + *
+>> + * The device is increasing this integer by 1, meaning the LSB will be
+>> + * increased by 1 and if needed the carry will be carried to the next byte.
+>> + *
+>> + * If the device get a number that is out of the range of an integer only the
+>> + * lower bytes that fit the size of an integer will represent the input and the
+>> + * upper bytes will be ignored.
+>> + * If the result is out of range then only the lower bytes will be written as
+>> + * result as well.
+>> + *
+>> + * 5.2.6.1 Driver Requirements: Device Operation
+>> + *
+>> + * The driver MUST place the 2 buffers in the same request in order to make a
+>> + * request atomically handled by the device, the first buffer contains the
+>> + * input and should be read-only and the second should be empty and write-only.
+> Please use the terminology from the specification:
+> s/buffer/element/
 >
-> > +}
-> > +
-> > +static void create_secure_ram(SBSAMachineState *vms,
-> > +                              MemoryRegion *secure_sysmem)
-> > +{
-> > +    MemoryRegion *secram =3D g_new(MemoryRegion, 1);
-> > +    hwaddr base =3D vms->memmap[SBSA_SECURE_MEM].base;
-> > +    hwaddr size =3D vms->memmap[SBSA_SECURE_MEM].size;
-> > +
-> > +    memory_region_init_ram(secram, NULL, "sbsa-ref.secure-ram", size,
-> > +                           &error_fatal);
-> > +    memory_region_add_subregion(secure_sysmem, base, secram);
-> > +}
-> > +
-> > +static void create_gic(SBSAMachineState *vms, qemu_irq *pic)
-> > +{
-> > +    DeviceState *gicdev;
-> > +    SysBusDevice *gicbusdev;
-> > +    const char *gictype;
-> > +    uint32_t redist0_capacity, redist0_count;
-> > +    int i;
-> > +
-> > +    gictype =3D gicv3_class_name();
-> > +
-> > +    gicdev =3D qdev_create(NULL, gictype);
-> > +    qdev_prop_set_uint32(gicdev, "revision", 3);
-> > +    qdev_prop_set_uint32(gicdev, "num-cpu", smp_cpus);
-> > +    /*
-> > +     * Note that the num-irq property counts both internal and externa=
-l
-> > +     * interrupts; there are always 32 of the former (mandated by GIC =
-spec).
-> > +     */
-> > +    qdev_prop_set_uint32(gicdev, "num-irq", NUM_IRQS + 32);
-> > +    qdev_prop_set_bit(gicdev, "has-security-extensions", true);
-> > +
-> > +    redist0_capacity =3D
-> > +                vms->memmap[SBSA_GIC_REDIST].size / GICV3_REDIST_SIZE;
-> > +    redist0_count =3D MIN(smp_cpus, redist0_capacity);
-> > +
-> > +    qdev_prop_set_uint32(gicdev, "len-redist-region-count", 1);
-> > +    qdev_prop_set_uint32(gicdev, "redist-region-count[0]", redist0_cou=
-nt);
-> > +
-> > +    qdev_init_nofail(gicdev);
-> > +    gicbusdev =3D SYS_BUS_DEVICE(gicdev);
-> > +    sysbus_mmio_map(gicbusdev, 0, vms->memmap[SBSA_GIC_DIST].base);
-> > +    sysbus_mmio_map(gicbusdev, 1, vms->memmap[SBSA_GIC_REDIST].base);
-> > +
-> > +    /*
-> > +     * Wire the outputs from each CPU's generic timer and the GICv3
-> > +     * maintenance interrupt signal to the appropriate GIC PPI inputs,
-> > +     * and the GIC's IRQ/FIQ/VIRQ/VFIQ interrupt outputs to the CPU's =
-inputs.
-> > +     */
-> > +    for (i =3D 0; i < smp_cpus; i++) {
-> > +        DeviceState *cpudev =3D DEVICE(qemu_get_cpu(i));
-> > +        int ppibase =3D NUM_IRQS + i * GIC_INTERNAL + GIC_NR_SGIS;
-> > +        int irq;
-> > +        /*
-> > +         * Mapping from the output timer irq lines from the CPU to the
-> > +         * GIC PPI inputs used for this board.
-> > +         */
-> > +        const int timer_irq[] =3D {
-> > +            [GTIMER_PHYS] =3D ARCH_TIMER_NS_EL1_IRQ,
-> > +            [GTIMER_VIRT] =3D ARCH_TIMER_VIRT_IRQ,
-> > +            [GTIMER_HYP]  =3D ARCH_TIMER_NS_EL2_IRQ,
-> > +            [GTIMER_SEC]  =3D ARCH_TIMER_S_EL1_IRQ,
-> > +        };
-> > +
-> > +        for (irq =3D 0; irq < ARRAY_SIZE(timer_irq); irq++) {
-> > +            qdev_connect_gpio_out(cpudev, irq,
-> > +                                  qdev_get_gpio_in(gicdev,
-> > +                                                   ppibase + timer_irq=
-[irq]));
-> > +        }
-> > +
-> > +        qdev_connect_gpio_out_named(cpudev, "gicv3-maintenance-interru=
-pt", 0,
-> > +                                    qdev_get_gpio_in(gicdev, ppibase
-> > +                                                     + ARCH_GIC_MAINT_=
-IRQ));
-> > +        qdev_connect_gpio_out_named(cpudev, "pmu-interrupt", 0,
-> > +                                    qdev_get_gpio_in(gicdev, ppibase
-> > +                                                     + VIRTUAL_PMU_IRQ=
-));
-> > +
-> > +        sysbus_connect_irq(gicbusdev, i, qdev_get_gpio_in(cpudev, ARM_=
-CPU_IRQ));
-> > +        sysbus_connect_irq(gicbusdev, i + smp_cpus,
-> > +                           qdev_get_gpio_in(cpudev, ARM_CPU_FIQ));
-> > +        sysbus_connect_irq(gicbusdev, i + 2 * smp_cpus,
-> > +                           qdev_get_gpio_in(cpudev, ARM_CPU_VIRQ));
-> > +        sysbus_connect_irq(gicbusdev, i + 3 * smp_cpus,
-> > +                           qdev_get_gpio_in(cpudev, ARM_CPU_VFIQ));
-> > +    }
-> > +
-> > +    for (i =3D 0; i < NUM_IRQS; i++) {
-> > +        pic[i] =3D qdev_get_gpio_in(gicdev, i);
-> > +    }
-> > +}
-> > +
-> > +static void create_uart(const SBSAMachineState *vms, qemu_irq *pic, in=
-t uart,
-> > +                        MemoryRegion *mem, Chardev *chr)
-> > +{
-> > +    hwaddr base =3D vms->memmap[uart].base;
-> > +    int irq =3D vms->irqmap[uart];
-> > +    DeviceState *dev =3D qdev_create(NULL, "pl011");
-> > +    SysBusDevice *s =3D SYS_BUS_DEVICE(dev);
-> > +
-> > +    qdev_prop_set_chr(dev, "chardev", chr);
-> > +    qdev_init_nofail(dev);
-> > +    memory_region_add_subregion(mem, base,
-> > +                                sysbus_mmio_get_region(s, 0));
-> > +    sysbus_connect_irq(s, 0, pic[irq]);
-> > +}
-> > +
-> > +static void create_rtc(const SBSAMachineState *vms, qemu_irq *pic)
-> > +{
-> > +    hwaddr base =3D vms->memmap[SBSA_RTC].base;
-> > +    int irq =3D vms->irqmap[SBSA_RTC];
-> > +
-> > +    sysbus_create_simple("pl031", base, pic[irq]);
-> > +}
-> > +
-> > +static DeviceState *gpio_key_dev;
-> > +static void sbsa_ref_powerdown_req(Notifier *n, void *opaque)
-> > +{
-> > +    /* use gpio Pin 3 for power button event */
-> > +    qemu_set_irq(qdev_get_gpio_in(gpio_key_dev, 0), 1);
-> > +}
-> > +
-> > +static Notifier sbsa_ref_powerdown_notifier =3D {
-> > +    .notify =3D sbsa_ref_powerdown_req
-> > +};
-> > +
-> > +static void create_gpio(const SBSAMachineState *vms, qemu_irq *pic)
-> > +{
-> > +    DeviceState *pl061_dev;
-> > +    hwaddr base =3D vms->memmap[SBSA_GPIO].base;
-> > +    int irq =3D vms->irqmap[SBSA_GPIO];
-> > +
-> > +    pl061_dev =3D sysbus_create_simple("pl061", base, pic[irq]);
-> > +
-> > +    gpio_key_dev =3D sysbus_create_simple("gpio-key", -1,
-> > +                                        qdev_get_gpio_in(pl061_dev, 3)=
-);
-> > +
-> > +    /* connect powerdown request */
-> > +    qemu_register_powerdown_notifier(&sbsa_ref_powerdown_notifier);
-> > +}
-> > +
-> > +static void create_ahci(const SBSAMachineState *vms, qemu_irq *pic)
-> > +{
-> > +    hwaddr base =3D vms->memmap[SBSA_AHCI].base;
-> > +    int irq =3D vms->irqmap[SBSA_AHCI];
-> > +    DeviceState *dev;
-> > +    DriveInfo *hd[NUM_SATA_PORTS];
-> > +    SysbusAHCIState *sysahci;
-> > +    AHCIState *ahci;
-> > +    int i;
-> > +
-> > +    dev =3D qdev_create(NULL, "sysbus-ahci");
-> > +    qdev_prop_set_uint32(dev, "num-ports", NUM_SATA_PORTS);
-> > +    qdev_init_nofail(dev);
-> > +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
-> > +    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[irq]);
-> > +
-> > +    sysahci =3D SYSBUS_AHCI(dev);
-> > +    ahci =3D &sysahci->ahci;
-> > +    ide_drive_get(hd, ARRAY_SIZE(hd));
-> > +    for (i =3D 0; i < ahci->ports; i++) {
-> > +        if (hd[i] =3D=3D NULL) {
-> > +            continue;
-> > +        }
-> > +        ide_create_drive(&ahci->dev[i].port, 0, hd[i]);
-> > +    }
-> > +}
-> > +
-> > +static void create_ehci(const SBSAMachineState *vms, qemu_irq *pic)
-> > +{
-> > +    hwaddr base =3D vms->memmap[SBSA_EHCI].base;
-> > +    int irq =3D vms->irqmap[SBSA_EHCI];
-> > +    USBBus *usb_bus;
-> > +
-> > +    sysbus_create_simple("platform-ehci-usb", base, pic[irq]);
-> > +
-> > +    usb_bus =3D usb_bus_find(-1);
-> > +    usb_create_simple(usb_bus, "usb-kbd");
-> > +    usb_create_simple(usb_bus, "usb-mouse");
-> > +}
-> > +
-> > +static void create_smmu(const SBSAMachineState *vms, qemu_irq *pic,
-> > +                        PCIBus *bus)
-> > +{
-> > +    hwaddr base =3D vms->memmap[SBSA_SMMU].base;
-> > +    int irq =3D  vms->irqmap[SBSA_SMMU];
-> > +    DeviceState *dev;
-> > +    int i;
-> > +
-> > +    dev =3D qdev_create(NULL, "arm-smmuv3");
-> > +
-> > +    object_property_set_link(OBJECT(dev), OBJECT(bus), "primary-bus",
-> > +                             &error_abort);
-> > +    qdev_init_nofail(dev);
-> > +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
-> > +    for (i =3D 0; i < NUM_SMMU_IRQS; i++) {
-> > +        sysbus_connect_irq(SYS_BUS_DEVICE(dev), i, pic[irq + i]);
-> > +    }
-> > +}
-> > +
-> > +static void create_pcie(SBSAMachineState *vms, qemu_irq *pic)
-> > +{
-> > +    hwaddr base_ecam =3D vms->memmap[SBSA_PCIE_ECAM].base;
-> > +    hwaddr size_ecam =3D vms->memmap[SBSA_PCIE_ECAM].size;
-> > +    hwaddr base_mmio =3D vms->memmap[SBSA_PCIE_MMIO].base;
-> > +    hwaddr size_mmio =3D vms->memmap[SBSA_PCIE_MMIO].size;
-> > +    hwaddr base_mmio_high =3D vms->memmap[SBSA_PCIE_MMIO_HIGH].base;
-> > +    hwaddr size_mmio_high =3D vms->memmap[SBSA_PCIE_MMIO_HIGH].size;
-> > +    hwaddr base_pio =3D vms->memmap[SBSA_PCIE_PIO].base;
-> > +    int irq =3D vms->irqmap[SBSA_PCIE];
-> > +    MemoryRegion *mmio_alias, *mmio_alias_high, *mmio_reg;
-> > +    MemoryRegion *ecam_alias, *ecam_reg;
-> > +    DeviceState *dev;
-> > +    PCIHostState *pci;
-> > +    int i;
-> > +
-> > +    dev =3D qdev_create(NULL, TYPE_GPEX_HOST);
-> > +    qdev_init_nofail(dev);
-> > +
-> > +    /* Map ECAM space */
-> > +    ecam_alias =3D g_new0(MemoryRegion, 1);
-> > +    ecam_reg =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
-> > +    memory_region_init_alias(ecam_alias, OBJECT(dev), "pcie-ecam",
-> > +                             ecam_reg, 0, size_ecam);
-> > +    memory_region_add_subregion(get_system_memory(), base_ecam, ecam_a=
-lias);
-> > +
-> > +    /* Map the MMIO space */
-> > +    mmio_alias =3D g_new0(MemoryRegion, 1);
-> > +    mmio_reg =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 1);
-> > +    memory_region_init_alias(mmio_alias, OBJECT(dev), "pcie-mmio",
-> > +                             mmio_reg, base_mmio, size_mmio);
-> > +    memory_region_add_subregion(get_system_memory(), base_mmio, mmio_a=
-lias);
-> > +
-> > +    /* Map the MMIO_HIGH space */
-> > +    mmio_alias_high =3D g_new0(MemoryRegion, 1);
-> > +    memory_region_init_alias(mmio_alias_high, OBJECT(dev), "pcie-mmio-=
-high",
-> > +                             mmio_reg, base_mmio_high, size_mmio_high)=
-;
-> > +    memory_region_add_subregion(get_system_memory(), base_mmio_high,
-> > +                                mmio_alias_high);
-> > +
-> > +    /* Map IO port space */
-> > +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 2, base_pio);
-> > +
-> > +    for (i =3D 0; i < GPEX_NUM_IRQS; i++) {
-> > +        sysbus_connect_irq(SYS_BUS_DEVICE(dev), i, pic[irq + i]);
-> > +        gpex_set_irq_num(GPEX_HOST(dev), i, irq + i);
-> > +    }
-> > +
-> > +    pci =3D PCI_HOST_BRIDGE(dev);
-> > +    if (pci->bus) {
-> > +        for (i =3D 0; i < nb_nics; i++) {
-> > +            NICInfo *nd =3D &nd_table[i];
-> > +
-> > +            if (!nd->model) {
-> > +                nd->model =3D g_strdup("e1000e");
-> > +            }
-> > +
-> > +            pci_nic_init_nofail(nd, pci->bus, nd->model, NULL);
-> > +        }
-> > +    }
-> > +
-> > +    pci_create_simple(pci->bus, -1, "VGA");
-> > +
-> > +    create_smmu(vms, pic, pci->bus);
-> > +}
-> > +
-> > +static void *sbsa_ref_dtb(const struct arm_boot_info *binfo, int *fdt_=
-size)
-> > +{
-> > +    const SBSAMachineState *board =3D container_of(binfo, SBSAMachineS=
-tate,
-> > +                                                 bootinfo);
-> > +
-> > +    *fdt_size =3D board->fdt_size;
-> > +    return board->fdt;
-> > +}
-> > +
-> >  static void sbsa_ref_init(MachineState *machine)
-> >  {
-> >      SBSAMachineState *vms =3D SBSA_MACHINE(machine);
-> > @@ -125,6 +552,7 @@ static void sbsa_ref_init(MachineState *machine)
-> >      bool firmware_loaded =3D bios_name || drive_get(IF_PFLASH, 0, 0);
-> >      const CPUArchIdList *possible_cpus;
-> >      int n, sbsa_max_cpus;
-> > +    qemu_irq pic[NUM_IRQS];
-> >
-> >      if (strcmp(machine->cpu_type, ARM_CPU_TYPE_NAME("cortex-a57"))) {
-> >          error_report("sbsa-ref: CPU type other than the built-in "
-> > @@ -209,11 +637,34 @@ static void sbsa_ref_init(MachineState *machine)
-> >                                           machine->ram_size);
-> >      memory_region_add_subregion(sysmem, vms->memmap[SBSA_MEM].base, ra=
-m);
-> >
-> > +    create_fdt(vms);
-> > +
-> > +    create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
-> > +
-> > +    create_secure_ram(vms, secure_sysmem);
-> > +
-> > +    create_gic(vms, pic);
-> > +
-> > +    create_uart(vms, pic, SBSA_UART, sysmem, serial_hd(0));
-> > +    create_uart(vms, pic, SBSA_SECURE_UART, secure_sysmem, serial_hd(1=
-));
-> > +    create_uart(vms, pic, SBSA_SECURE_UART_MM, secure_sysmem, serial_h=
-d(2));
-> > +
-> > +    create_rtc(vms, pic);
-> > +
-> > +    create_gpio(vms, pic);
-> > +
-> > +    create_ahci(vms, pic);
-> > +
-> > +    create_ehci(vms, pic);
-> > +
-> > +    create_pcie(vms, pic);
-> > +
-> >      vms->bootinfo.ram_size =3D machine->ram_size;
-> >      vms->bootinfo.kernel_filename =3D machine->kernel_filename;
-> >      vms->bootinfo.nb_cpus =3D smp_cpus;
-> >      vms->bootinfo.board_id =3D -1;
-> >      vms->bootinfo.loader_start =3D vms->memmap[SBSA_MEM].base;
-> > +    vms->bootinfo.get_dtb =3D sbsa_ref_dtb;
-> >      vms->bootinfo.firmware_loaded =3D firmware_loaded;
-> >      arm_load_kernel(ARM_CPU(first_cpu), &vms->bootinfo);
-> >  }
-> >
+> Here is the definition from 3.2.1.1 Placing Buffers Into The Descriptor
+> Table:
+> "A buffer consists of zero or more device-readable physically-contiguous
+> elements followed by zero or more physically-contiguous device-writable
+> elements (each has at least one element)."
+>
+> In other words, a "buffer" is an entire request-response and consists of
+> a scatter-gather list of driver->device and device->driver "elements".
+>
+>> + *
+>> + * 5.2.6.2 Device Requirements: Device Operation
+>> + *
+>> + * The device MUST place the result inside the output buffer allocated by the
+>> + * driver.
+>> + */
+>> +
+>> +#ifndef QEMU_VIRTIO_EXAMPLE_H
+>> +#define QEMU_VIRTIO_EXAMPLE_H
+>> +
+>> +#define VIRTIO_ID_EXAMPLE 21
+>> +
+>> +#define TYPE_VIRTIO_EXAMPLE "virtio-example-device"
+>> +#define VIRTIO_EXAMPLE(obj) \
+>> +        OBJECT_CHECK(VirtIOEXAMPLE, (obj), TYPE_VIRTIO_EXAMPLE)
+>> +#define VIRTIO_EXAMPLE_GET_PARENT_CLASS(obj) \
+>> +        OBJECT_GET_PARENT_CLASS(obj, TYPE_VIRTIO_EXAMPLE)
+>> +
+>> +typedef struct VirtIOEXAMPLE {
+>> +    VirtIODevice parent_obj;
+>> +
+>> +    /* Only one vq - guest puts buffer(s) on it when it needs computation */
+>> +    VirtQueue *vq;
+>> +
+>> +} VirtIOEXAMPLE;
+>> +
+>> +#endif
+>> -- 
+>> 2.17.2
+>>
 
