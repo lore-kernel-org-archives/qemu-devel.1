@@ -2,61 +2,68 @@ Return-Path: <SRS0=kfsH=UP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12DBFC31E50
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 19:10:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AF38C31E50
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 19:43:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC37E20862
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 19:10:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC37E20862
+	by mail.kernel.org (Postfix) with ESMTPS id ECE1620870
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 19:43:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECE1620870
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42272 helo=lists.gnu.org)
+Received: from localhost ([::1]:42528 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcaXQ-00088k-6q
-	for qemu-devel@archiver.kernel.org; Sun, 16 Jun 2019 15:10:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36372)
+	id 1hcb3V-0007D7-TB
+	for qemu-devel@archiver.kernel.org; Sun, 16 Jun 2019 15:43:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45143)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1hcaWe-0007Oi-9M
- for qemu-devel@nongnu.org; Sun, 16 Jun 2019 15:09:14 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hcb22-0006KL-SB
+ for qemu-devel@nongnu.org; Sun, 16 Jun 2019 15:41:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1hcaWa-0000hp-E1
- for qemu-devel@nongnu.org; Sun, 16 Jun 2019 15:09:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44368)
+ (envelope-from <imammedo@redhat.com>) id 1hcb21-00078q-JE
+ for qemu-devel@nongnu.org; Sun, 16 Jun 2019 15:41:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54026)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hcaWY-0000dz-AQ
- for qemu-devel@nongnu.org; Sun, 16 Jun 2019 15:09:08 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hcb21-00077f-BF
+ for qemu-devel@nongnu.org; Sun, 16 Jun 2019 15:41:37 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 213D488318;
- Sun, 16 Jun 2019 19:09:05 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0523B81129;
+ Sun, 16 Jun 2019 19:41:36 +0000 (UTC)
 Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ABB2890C5D;
- Sun, 16 Jun 2019 19:09:01 +0000 (UTC)
-Date: Sun, 16 Jun 2019 21:08:57 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EFADC19693;
+ Sun, 16 Jun 2019 19:41:31 +0000 (UTC)
+Date: Sun, 16 Jun 2019 21:41:27 +0200
 From: Igor Mammedov <imammedo@redhat.com>
-To: no-reply@patchew.org
-Message-ID: <20190616210857.1296de50@redhat.com>
-In-Reply-To: <156069829707.13573.17978894546059848812@ce79690b2cb9>
-References: <20190616142836.10614-1-ysato@users.sourceforge.jp>
- <156069829707.13573.17978894546059848812@ce79690b2cb9>
+To: Tao Xu <tao3.xu@intel.com>
+Message-ID: <20190616214127.20d1cd0e@redhat.com>
+In-Reply-To: <9159f119-0a98-bb6b-93c1-de64a3b1580a@intel.com>
+References: <20190508061726.27631-1-tao3.xu@intel.com>
+ <20190508061726.27631-8-tao3.xu@intel.com>
+ <20190604170456.5b3c198e@redhat.com>
+ <729bde4a-bcb9-dac5-3a8a-04cc5f4d2bf9@intel.com>
+ <20190605140841.63e8aa85@redhat.com>
+ <02c9615a-fb59-664f-e878-124c9f43e54a@intel.com>
+ <20190606184507.2c52cd41@redhat.com>
+ <9159f119-0a98-bb6b-93c1-de64a3b1580a@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Sun, 16 Jun 2019 19:09:05 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Sun, 16 Jun 2019 19:41:36 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v20 00/24] Add RX archtecture support
+Subject: Re: [Qemu-devel] [PATCH v4 07/11] hmat acpi: Build Memory Side
+ Cache Information Structure(s) in ACPI HMAT
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,209 +75,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, ysato@users.sourceforge.jp, philmd@redhat.com
+Cc: "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>,
+ "mst@redhat.com" <mst@redhat.com>, "Liu, Jingqi" <jingqi.liu@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 16 Jun 2019 08:18:18 -0700 (PDT)
-no-reply@patchew.org wrote:
+On Mon, 10 Jun 2019 21:39:12 +0800
+Tao Xu <tao3.xu@intel.com> wrote:
 
-> Patchew URL: https://patchew.org/QEMU/20190616142836.10614-1-ysato@users.sourceforge.jp/
-> 
-> 
-to fix MAINTAINERS warning, you can add new entry there at
-the first patch that introduces new directory/file and get rid of 23/24 patch
+> On 6/7/2019 12:45 AM, Igor Mammedov wrote:
+> > On Thu, 6 Jun 2019 11:00:33 +0800
+> > Tao Xu <tao3.xu@intel.com> wrote:
+> >  =20
+> ...
+> >>
+> >> But the kernel HMAT can read othe Memory Side Cache Information except
+> >> SMBIOS entries and the host HMAT tables also haven=E2=80=99t SMBIOS Ha=
+ndles it
+> >> also shows Number of SMBIOS handles (n) as 0. So I am wondering if it =
+is
+> >> better to setting "SMBIOS handles (n)" as 0, remove TODO and comment t=
+he
+> >> reason why set it 0? =20
+> >=20
+> > My understanding is that SMBIOS handles are used to associate side cache
+> > descriptions with RAM pointed by SMBIOS handles, so that OS would be
+> > able to figure out what RAM modules are cached by what cache.
+> > Hence I suspect that side cache table is useless in the best case witho=
+ut
+> > valid references to SMBIOS handles.
+> > (I might be totally mistaken but the matter requires clarification befo=
+re
+> > we commit to it)
+> >  =20
+>=20
+> I am sorry for not providing a detailed description for Memory Side=20
+> Cache use case. I will add more detailed description in next version of=20
+> patch.
+>=20
+> As the commit message and /Documentation/admin-guide/mm/numaperf.rst of=20
+> Kernel HMAT(listed blow), Memory Side Cache Structure is used to provide=
+=20
+> the cache information about System memory for the software to use. Then=20
+> the software can maximize the performance because it can choose the best=
+=20
+> node to use.
+>=20
+> Memory Side Cache Information Structure and System Locality Latency and=20
+> Bandwidth Information Structure can both provide more information than=20
+> numa distance for software to see. So back to the SMBIOS, in spec,=20
+> SMBIOS handles point to the memory side cache physical devices, but they=
+=20
+> are also information and not contribute to the performance of the=20
+> described memory. The field "Proximity Domain for the Memory" can show=20
+> the described memory.
+>=20
+> I am wondering if this explanation is clear? Thank you.
 
-> Hi,
-> 
-> This series seems to have some coding style problems. See output below for
-> more information:
-> 
-> Subject: [Qemu-devel] [PATCH v20 00/24] Add RX archtecture support
-> Type: series
-> Message-id: 20190616142836.10614-1-ysato@users.sourceforge.jp
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> git rev-parse base > /dev/null || exit 0
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
-> git config --local diff.algorithm histogram
-> ./scripts/checkpatch.pl --mailback base..
-> === TEST SCRIPT END ===
-> 
-> From https://github.com/patchew-project/qemu
->  * [new tag]               patchew/20190616142836.10614-1-ysato@users.sourceforge.jp -> patchew/20190616142836.10614-1-ysato@users.sourceforge.jp
-> Switched to a new branch 'test'
-> 233b18cbe7 BootLinuxConsoleTest: Test the RX-Virt machine
-> 904297282a MAINTAINERS: Add RX
-> 43952adb47 Add rx-softmmu
-> fb8cc7379b hw/registerfields.h: Add 8bit and 16bit register macros
-> 300109d593 qemu/bitops.h: Add extract8 and extract16
-> 298abac567 hw/rx: Restrict the RX62N microcontroller to the RX62N CPU core
-> b836e3b146 hw/rx: Honor -accel qtest
-> 781b6ec24c target/rx: Move rx_load_image to rx-virt.
-> 9577f3d230 hw/rx: RX Target hardware definition
-> 891f2de8d8 hw/char: RX62N serial communication interface (SCI)
-> 3495206576 hw/timer: RX62N internal timer modules
-> a905f500b4 hw/intc: RX62N interrupt controller (ICUa)
-> ece449ed10 target/rx: Dump bytes for each insn during disassembly
-> b95c9bad6b target/rx: Collect all bytes during disassembly
-> 3dff5695a3 target/rx: Emit all disassembly in one prt()
-> 704fec54d9 target/rx: Use prt_ldmi for XCHG_mr disassembly
-> 7396e2ece1 target/rx: Replace operand with prt_ldmi in disassembler
-> 60b13915e5 target/rx: Disassemble rx_index_addr into a string
-> d41d01e403 target/rx: RX disassembler
-> 85b88c8cd4 target/rx: simplify rx_cpu_class_by_name
-> 376f2b05c3 target/rx: Follow the change of tcg.
-> d86020dcdb target/rx: CPU definition
-> 014cc684fa target/rx: TCG helper
-> 4c5f19b6e4 target/rx: TCG translation
-> 
-> === OUTPUT BEGIN ===
-> 1/24 Checking commit 4c5f19b6e47c (target/rx: TCG translation)
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #20: 
-> new file mode 100644
-> 
-> total: 0 errors, 1 warnings, 3065 lines checked
-> 
-> Patch 1/24 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 2/24 Checking commit 014cc684fafc (target/rx: TCG helper)
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #20: 
-> new file mode 100644
-> 
-> total: 0 errors, 1 warnings, 649 lines checked
-> 
-> Patch 2/24 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 3/24 Checking commit d86020dcdb96 (target/rx: CPU definition)
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #20: 
-> new file mode 100644
-> 
-> total: 0 errors, 1 warnings, 645 lines checked
-> 
-> Patch 3/24 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 4/24 Checking commit 376f2b05c385 (target/rx: Follow the change of tcg.)
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #15: 
-> new file mode 100644
-> 
-> total: 0 errors, 1 warnings, 121 lines checked
-> 
-> Patch 4/24 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 5/24 Checking commit 85b88c8cd4f0 (target/rx: simplify rx_cpu_class_by_name)
-> 6/24 Checking commit d41d01e40305 (target/rx: RX disassembler)
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #38: 
-> new file mode 100644
-> 
-> total: 0 errors, 1 warnings, 1497 lines checked
-> 
-> Patch 6/24 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 7/24 Checking commit 60b13915e559 (target/rx: Disassemble rx_index_addr into a string)
-> 8/24 Checking commit 7396e2ece1ed (target/rx: Replace operand with prt_ldmi in disassembler)
-> 9/24 Checking commit 704fec54d904 (target/rx: Use prt_ldmi for XCHG_mr disassembly)
-> 10/24 Checking commit 3dff5695a3a3 (target/rx: Emit all disassembly in one prt())
-> 11/24 Checking commit b95c9bad6bb6 (target/rx: Collect all bytes during disassembly)
-> 12/24 Checking commit ece449ed1087 (target/rx: Dump bytes for each insn during disassembly)
-> 13/24 Checking commit a905f500b42f (hw/intc: RX62N interrupt controller (ICUa))
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #40: 
-> new file mode 100644
-> 
-> total: 0 errors, 1 warnings, 442 lines checked
-> 
-> Patch 13/24 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 14/24 Checking commit 3495206576c5 (hw/timer: RX62N internal timer modules)
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #50: 
-> new file mode 100644
-> 
-> total: 0 errors, 1 warnings, 839 lines checked
-> 
-> Patch 14/24 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 15/24 Checking commit 891f2de8d83b (hw/char: RX62N serial communication interface (SCI))
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #43: 
-> new file mode 100644
-> 
-> total: 0 errors, 1 warnings, 398 lines checked
-> 
-> Patch 15/24 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 16/24 Checking commit 9577f3d2304d (hw/rx: RX Target hardware definition)
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #21: 
-> new file mode 100644
-> 
-> total: 0 errors, 1 warnings, 457 lines checked
-> 
-> Patch 16/24 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 17/24 Checking commit 781b6ec24c97 (target/rx: Move rx_load_image to rx-virt.)
-> 18/24 Checking commit b836e3b14641 (hw/rx: Honor -accel qtest)
-> 19/24 Checking commit 298abac5672b (hw/rx: Restrict the RX62N microcontroller to the RX62N CPU core)
-> 20/24 Checking commit 300109d593d8 (qemu/bitops.h: Add extract8 and extract16)
-> 21/24 Checking commit fb8cc7379bdd (hw/registerfields.h: Add 8bit and 16bit register macros)
-> Use of uninitialized value within @rawlines in concatenation (.) or string at ./scripts/checkpatch.pl line 2467.
-> ERROR: Macros with multiple statements should be enclosed in a do - while loop
-> #27: FILE: include/hw/registerfields.h:25:
-> +#define REG8(reg, addr)                                                  \
-> +    enum { A_ ## reg = (addr) };                                          \
-> +    enum { R_ ## reg = (addr) };
-> 
-> ERROR: Macros with multiple statements should be enclosed in a do - while loop
-> #31: FILE: include/hw/registerfields.h:29:
-> +#define REG16(reg, addr)                                                  \
-> +    enum { A_ ## reg = (addr) };                                          \
-> +    enum { R_ ## reg = (addr) / 2 };
-> 
-> total: 2 errors, 0 warnings, 56 lines checked
-> 
-> Patch 21/24 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 
-> 22/24 Checking commit 43952adb472b (Add rx-softmmu)
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #61: 
-> new file mode 100644
-> 
-> total: 0 errors, 1 warnings, 73 lines checked
-> 
-> Patch 22/24 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 23/24 Checking commit 904297282a7f (MAINTAINERS: Add RX)
-> 24/24 Checking commit 233b18cbe7b0 (BootLinuxConsoleTest: Test the RX-Virt machine)
-> === OUTPUT END ===
-> 
-> Test command exited with code: 1
-> 
-> 
-> The full log is available at
-> http://patchew.org/logs/20190616142836.10614-1-ysato@users.sourceforge.jp/testing.checkpatch/?type=message.
-> ---
-> Email generated automatically by Patchew [https://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
+I didn't manage to find a definite answer in spec to what SMBIOS entry
+should describe. Another use of 'Physical Memory Component' is in PMTT
+table and it looks to me that it type 17 should reffer to DIMM device.
+
+But well, considering spec isn't clear about subject and that linux
+kernel doesn't seem to use this entries lets use it without SMBIOS
+entries for now. Like you suggested, lets set number of SMBIOS handles to 0
+and drop num_smbios_handles so that user won't be able to provide any.
+
+
+> "System memory may be constructed in a hierarchy of elements with=20
+> various performance characteristics in order to provide large address=20
+> space of slower performing memory cached by a smaller higher performing=20
+> memory."
+>=20
+> "An application does not need to know about caching attributes in order
+> to use the system. Software may optionally query the memory cache
+> attributes in order to maximize the performance out of such a setup.
+> If the system provides a way for the kernel to discover this=20
+> information, for example with ACPI HMAT (Heterogeneous Memory Attribute=20
+> Table), the kernel will append these attributes to the NUMA node memory=20
+> target."
+>=20
+> "Each cache level's directory provides its attributes. For example, the
+> following shows a single cache level and the attributes available for
+> software to query::
+>=20
+> 	# tree sys/devices/system/node/node0/memory_side_cache/
+> 	/sys/devices/system/node/node0/memory_side_cache/
+> 	|-- index1
+> 	|   |-- indexing
+> 	|   |-- line_size
+> 	|   |-- size
+> 	|   `-- write_policy
+> "
+>=20
+
 
