@@ -2,66 +2,60 @@ Return-Path: <SRS0=kfsH=UP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C21E8C31E50
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 15:20:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89306C31E50
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 15:46:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EB5621874
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 15:20:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EB5621874
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 60D2D2063F
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 15:46:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60D2D2063F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40758 helo=lists.gnu.org)
+Received: from localhost ([::1]:41132 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcWxD-0007yP-BA
-	for qemu-devel@archiver.kernel.org; Sun, 16 Jun 2019 11:20:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48511)
+	id 1hcXFY-0000ZS-QU
+	for qemu-devel@archiver.kernel.org; Sun, 16 Jun 2019 11:39:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53332)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hcWvm-00078c-Im
- for qemu-devel@nongnu.org; Sun, 16 Jun 2019 11:18:56 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1hcXEX-0007f4-2L
+ for qemu-devel@nongnu.org; Sun, 16 Jun 2019 11:38:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hcWvk-00021y-KO
- for qemu-devel@nongnu.org; Sun, 16 Jun 2019 11:18:54 -0400
-Resent-Date: Sun, 16 Jun 2019 11:18:54 -0400
-Resent-Message-Id: <E1hcWvk-00021y-KO@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21597)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hcWvk-0001yl-BR
- for qemu-devel@nongnu.org; Sun, 16 Jun 2019 11:18:52 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1560698298; cv=none; d=zoho.com; s=zohoarc; 
- b=VfawzY3W+gsoujlkNEvoQOCnkUC7AlPG3jCkFkqNJEwUGjUw7Ax0EKWF0uSYAxzPyoRgYYqMBJpDGSU01VAX1fVxU4cZs89PixHv3Ih3AZ+kH3ykaOPtB1MyPyNVd1wIxIzTXWC67EHpiVEQTaHfPyyqmaxU4aVX5G5T9XewJMg=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1560698298;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=Ch8YFUJ8Tskraa0blyVoJ8Tg5YZa6SHCsRcOErS7t9A=; 
- b=HWugoL7qMoDSfYy1xjjo/7t6+vOKJ6tD8wtC+pCee5hLRDGQFRvhOnrgm0tudkjDOLPKae0ExstF4nqFbnKO3Ga8njhTy0wpMdYHT+eZ1M4GbpAbQcqh8PXf4WuxfKB/W3IiNpycWSn8GkTuhbP4i9+datq7Kz6foNtId/FICS4=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1560698298176864.2358997525403;
- Sun, 16 Jun 2019 08:18:18 -0700 (PDT)
-In-Reply-To: <20190616142836.10614-1-ysato@users.sourceforge.jp>
-Message-ID: <156069829707.13573.17978894546059848812@ce79690b2cb9>
+ (envelope-from <tao3.xu@intel.com>) id 1hcXEV-0005wh-Vy
+ for qemu-devel@nongnu.org; Sun, 16 Jun 2019 11:38:17 -0400
+Received: from mga05.intel.com ([192.55.52.43]:22920)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hcXEV-0005hK-NH
+ for qemu-devel@nongnu.org; Sun, 16 Jun 2019 11:38:15 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+ by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 16 Jun 2019 08:38:05 -0700
+X-ExtLoop1: 1
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.104])
+ by FMSMGA003.fm.intel.com with ESMTP; 16 Jun 2019 08:38:03 -0700
+From: Tao Xu <tao3.xu@intel.com>
+To: pbonzini@redhat.com,
+	rth@twiddle.net,
+	ehabkost@redhat.com
+Date: Sun, 16 Jun 2019 23:35:25 +0800
+Message-Id: <20190616153525.27072-3-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190616153525.27072-1-tao3.xu@intel.com>
+References: <20190616153525.27072-1-tao3.xu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: ysato@users.sourceforge.jp
-Date: Sun, 16 Jun 2019 08:18:18 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH v20 00/24] Add RX archtecture support
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.43
+Subject: [Qemu-devel] [PATCH v3 2/2] target/i386: Add support for save/load
+ IA32_UMWAIT_CONTROL MSR
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,156 +67,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, ysato@users.sourceforge.jp, philmd@redhat.com
+Cc: cohuck@redhat.com, kvm@vger.kernel.org, mst@redhat.com,
+ jingqi.liu@intel.com, tao3.xu@intel.com, mtosatti@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYxNjE0MjgzNi4xMDYx
-NC0xLXlzYXRvQHVzZXJzLnNvdXJjZWZvcmdlLmpwLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1z
-IHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9y
-Cm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyMCAwMC8y
-NF0gQWRkIFJYIGFyY2h0ZWN0dXJlIHN1cHBvcnQKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIw
-MTkwNjE2MTQyODM2LjEwNjE0LTEteXNhdG9AdXNlcnMuc291cmNlZm9yZ2UuanAKCj09PSBURVNU
-IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9u
-dWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5h
-bGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFz
-ZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRj
-aGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTkw
-NjE2MTQyODM2LjEwNjE0LTEteXNhdG9AdXNlcnMuc291cmNlZm9yZ2UuanAgLT4gcGF0Y2hldy8y
-MDE5MDYxNjE0MjgzNi4xMDYxNC0xLXlzYXRvQHVzZXJzLnNvdXJjZWZvcmdlLmpwClN3aXRjaGVk
-IHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMjMzYjE4Y2JlNyBCb290TGludXhDb25zb2xlVGVzdDog
-VGVzdCB0aGUgUlgtVmlydCBtYWNoaW5lCjkwNDI5NzI4MmEgTUFJTlRBSU5FUlM6IEFkZCBSWAo0
-Mzk1MmFkYjQ3IEFkZCByeC1zb2Z0bW11CmZiOGNjNzM3OWIgaHcvcmVnaXN0ZXJmaWVsZHMuaDog
-QWRkIDhiaXQgYW5kIDE2Yml0IHJlZ2lzdGVyIG1hY3JvcwozMDAxMDlkNTkzIHFlbXUvYml0b3Bz
-Lmg6IEFkZCBleHRyYWN0OCBhbmQgZXh0cmFjdDE2CjI5OGFiYWM1NjcgaHcvcng6IFJlc3RyaWN0
-IHRoZSBSWDYyTiBtaWNyb2NvbnRyb2xsZXIgdG8gdGhlIFJYNjJOIENQVSBjb3JlCmI4MzZlM2Ix
-NDYgaHcvcng6IEhvbm9yIC1hY2NlbCBxdGVzdAo3ODFiNmVjMjRjIHRhcmdldC9yeDogTW92ZSBy
-eF9sb2FkX2ltYWdlIHRvIHJ4LXZpcnQuCjk1NzdmM2QyMzAgaHcvcng6IFJYIFRhcmdldCBoYXJk
-d2FyZSBkZWZpbml0aW9uCjg5MWYyZGU4ZDggaHcvY2hhcjogUlg2Mk4gc2VyaWFsIGNvbW11bmlj
-YXRpb24gaW50ZXJmYWNlIChTQ0kpCjM0OTUyMDY1NzYgaHcvdGltZXI6IFJYNjJOIGludGVybmFs
-IHRpbWVyIG1vZHVsZXMKYTkwNWY1MDBiNCBody9pbnRjOiBSWDYyTiBpbnRlcnJ1cHQgY29udHJv
-bGxlciAoSUNVYSkKZWNlNDQ5ZWQxMCB0YXJnZXQvcng6IER1bXAgYnl0ZXMgZm9yIGVhY2ggaW5z
-biBkdXJpbmcgZGlzYXNzZW1ibHkKYjk1YzliYWQ2YiB0YXJnZXQvcng6IENvbGxlY3QgYWxsIGJ5
-dGVzIGR1cmluZyBkaXNhc3NlbWJseQozZGZmNTY5NWEzIHRhcmdldC9yeDogRW1pdCBhbGwgZGlz
-YXNzZW1ibHkgaW4gb25lIHBydCgpCjcwNGZlYzU0ZDkgdGFyZ2V0L3J4OiBVc2UgcHJ0X2xkbWkg
-Zm9yIFhDSEdfbXIgZGlzYXNzZW1ibHkKNzM5NmUyZWNlMSB0YXJnZXQvcng6IFJlcGxhY2Ugb3Bl
-cmFuZCB3aXRoIHBydF9sZG1pIGluIGRpc2Fzc2VtYmxlcgo2MGIxMzkxNWU1IHRhcmdldC9yeDog
-RGlzYXNzZW1ibGUgcnhfaW5kZXhfYWRkciBpbnRvIGEgc3RyaW5nCmQ0MWQwMWU0MDMgdGFyZ2V0
-L3J4OiBSWCBkaXNhc3NlbWJsZXIKODViODhjOGNkNCB0YXJnZXQvcng6IHNpbXBsaWZ5IHJ4X2Nw
-dV9jbGFzc19ieV9uYW1lCjM3NmYyYjA1YzMgdGFyZ2V0L3J4OiBGb2xsb3cgdGhlIGNoYW5nZSBv
-ZiB0Y2cuCmQ4NjAyMGRjZGIgdGFyZ2V0L3J4OiBDUFUgZGVmaW5pdGlvbgowMTRjYzY4NGZhIHRh
-cmdldC9yeDogVENHIGhlbHBlcgo0YzVmMTliNmU0IHRhcmdldC9yeDogVENHIHRyYW5zbGF0aW9u
-Cgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzI0IENoZWNraW5nIGNvbW1pdCA0YzVmMTliNmU0N2Mg
-KHRhcmdldC9yeDogVENHIHRyYW5zbGF0aW9uKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVs
-ZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyMDogCm5ldyBm
-aWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDMwNjUgbGluZXMg
-Y2hlY2tlZAoKUGF0Y2ggMS8yNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyLzI0IENoZWNr
-aW5nIGNvbW1pdCAwMTRjYzY4NGZhZmMgKHRhcmdldC9yeDogVENHIGhlbHBlcikKV0FSTklORzog
-YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
-ZGF0aW5nPwojMjA6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdh
-cm5pbmdzLCA2NDkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8yNCBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgozLzI0IENoZWNraW5nIGNvbW1pdCBkODYwMjBkY2RiOTYgKHRhcmdldC9yeDogQ1BV
-IGRlZmluaXRpb24pCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRv
-ZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzIwOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQK
-CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNjQ1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMv
-MjQgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNC8yNCBDaGVja2luZyBjb21taXQgMzc2ZjJi
-MDVjMzg1ICh0YXJnZXQvcng6IEZvbGxvdyB0aGUgY2hhbmdlIG9mIHRjZy4pCldBUk5JTkc6IGFk
-ZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRh
-dGluZz8KIzE1OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJu
-aW5ncywgMTIxIGxpbmVzIGNoZWNrZWQKClBhdGNoIDQvMjQgaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KNS8yNCBDaGVja2luZyBjb21taXQgODViODhjOGNkNGYwICh0YXJnZXQvcng6IHNpbXBs
-aWZ5IHJ4X2NwdV9jbGFzc19ieV9uYW1lKQo2LzI0IENoZWNraW5nIGNvbW1pdCBkNDFkMDFlNDAz
-MDUgKHRhcmdldC9yeDogUlggZGlzYXNzZW1ibGVyKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3Ig
-ZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzODogCm5l
-dyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE0OTcgbGlu
-ZXMgY2hlY2tlZAoKUGF0Y2ggNi8yNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo3LzI0IENo
-ZWNraW5nIGNvbW1pdCA2MGIxMzkxNWU1NTkgKHRhcmdldC9yeDogRGlzYXNzZW1ibGUgcnhfaW5k
-ZXhfYWRkciBpbnRvIGEgc3RyaW5nKQo4LzI0IENoZWNraW5nIGNvbW1pdCA3Mzk2ZTJlY2UxZWQg
-KHRhcmdldC9yeDogUmVwbGFjZSBvcGVyYW5kIHdpdGggcHJ0X2xkbWkgaW4gZGlzYXNzZW1ibGVy
-KQo5LzI0IENoZWNraW5nIGNvbW1pdCA3MDRmZWM1NGQ5MDQgKHRhcmdldC9yeDogVXNlIHBydF9s
-ZG1pIGZvciBYQ0hHX21yIGRpc2Fzc2VtYmx5KQoxMC8yNCBDaGVja2luZyBjb21taXQgM2RmZjU2
-OTVhM2EzICh0YXJnZXQvcng6IEVtaXQgYWxsIGRpc2Fzc2VtYmx5IGluIG9uZSBwcnQoKSkKMTEv
-MjQgQ2hlY2tpbmcgY29tbWl0IGI5NWM5YmFkNmJiNiAodGFyZ2V0L3J4OiBDb2xsZWN0IGFsbCBi
-eXRlcyBkdXJpbmcgZGlzYXNzZW1ibHkpCjEyLzI0IENoZWNraW5nIGNvbW1pdCBlY2U0NDllZDEw
-ODcgKHRhcmdldC9yeDogRHVtcCBieXRlcyBmb3IgZWFjaCBpbnNuIGR1cmluZyBkaXNhc3NlbWJs
-eSkKMTMvMjQgQ2hlY2tpbmcgY29tbWl0IGE5MDVmNTAwYjQyZiAoaHcvaW50YzogUlg2Mk4gaW50
-ZXJydXB0IGNvbnRyb2xsZXIgKElDVWEpKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRl
-ZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0MDogCm5ldyBmaWxl
-IG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDQ0MiBsaW5lcyBjaGVj
-a2VkCgpQYXRjaCAxMy8yNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNC8yNCBDaGVja2lu
-ZyBjb21taXQgMzQ5NTIwNjU3NmM1IChody90aW1lcjogUlg2Mk4gaW50ZXJuYWwgdGltZXIgbW9k
-dWxlcykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlO
-VEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNTA6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6
-IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA4MzkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTQvMjQgaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTUvMjQgQ2hlY2tpbmcgY29tbWl0IDg5MWYyZGU4ZDgz
-YiAoaHcvY2hhcjogUlg2Mk4gc2VyaWFsIGNvbW11bmljYXRpb24gaW50ZXJmYWNlIChTQ0kpKQpX
-QVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJT
-IG5lZWQgdXBkYXRpbmc/CiM0MzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJv
-cnMsIDEgd2FybmluZ3MsIDM5OCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNS8yNCBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoxNi8yNCBDaGVja2luZyBjb21taXQgOTU3N2YzZDIzMDRkIChody9y
-eDogUlggVGFyZ2V0IGhhcmR3YXJlIGRlZmluaXRpb24pCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBv
-ciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzIxOiAK
-bmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNDU3IGxp
-bmVzIGNoZWNrZWQKClBhdGNoIDE2LzI0IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE3LzI0
-IENoZWNraW5nIGNvbW1pdCA3ODFiNmVjMjRjOTcgKHRhcmdldC9yeDogTW92ZSByeF9sb2FkX2lt
-YWdlIHRvIHJ4LXZpcnQuKQoxOC8yNCBDaGVja2luZyBjb21taXQgYjgzNmUzYjE0NjQxIChody9y
-eDogSG9ub3IgLWFjY2VsIHF0ZXN0KQoxOS8yNCBDaGVja2luZyBjb21taXQgMjk4YWJhYzU2NzJi
-IChody9yeDogUmVzdHJpY3QgdGhlIFJYNjJOIG1pY3JvY29udHJvbGxlciB0byB0aGUgUlg2Mk4g
-Q1BVIGNvcmUpCjIwLzI0IENoZWNraW5nIGNvbW1pdCAzMDAxMDlkNTkzZDggKHFlbXUvYml0b3Bz
-Lmg6IEFkZCBleHRyYWN0OCBhbmQgZXh0cmFjdDE2KQoyMS8yNCBDaGVja2luZyBjb21taXQgZmI4
-Y2M3Mzc5YmRkIChody9yZWdpc3RlcmZpZWxkcy5oOiBBZGQgOGJpdCBhbmQgMTZiaXQgcmVnaXN0
-ZXIgbWFjcm9zKQpVc2Ugb2YgdW5pbml0aWFsaXplZCB2YWx1ZSB3aXRoaW4gQHJhd2xpbmVzIGlu
-IGNvbmNhdGVuYXRpb24gKC4pIG9yIHN0cmluZyBhdCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCBs
-aW5lIDI0NjcuCkVSUk9SOiBNYWNyb3Mgd2l0aCBtdWx0aXBsZSBzdGF0ZW1lbnRzIHNob3VsZCBi
-ZSBlbmNsb3NlZCBpbiBhIGRvIC0gd2hpbGUgbG9vcAojMjc6IEZJTEU6IGluY2x1ZGUvaHcvcmVn
-aXN0ZXJmaWVsZHMuaDoyNToKKyNkZWZpbmUgUkVHOChyZWcsIGFkZHIpICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgZW51bSB7IEFfICMjIHJl
-ZyA9IChhZGRyKSB9OyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwK
-KyAgICBlbnVtIHsgUl8gIyMgcmVnID0gKGFkZHIpIH07CgpFUlJPUjogTWFjcm9zIHdpdGggbXVs
-dGlwbGUgc3RhdGVtZW50cyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gYSBkbyAtIHdoaWxlIGxvb3AK
-IzMxOiBGSUxFOiBpbmNsdWRlL2h3L3JlZ2lzdGVyZmllbGRzLmg6Mjk6CisjZGVmaW5lIFJFRzE2
-KHJlZywgYWRkcikgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIFwKKyAgICBlbnVtIHsgQV8gIyMgcmVnID0gKGFkZHIpIH07ICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIGVudW0geyBSXyAjIyByZWcgPSAoYWRkcikg
-LyAyIH07Cgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDU2IGxpbmVzIGNoZWNrZWQKClBh
-dGNoIDIxLzI0IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyMi8yNCBDaGVja2luZyBjb21t
-aXQgNDM5NTJhZGI0NzJiIChBZGQgcngtc29mdG1tdSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9y
-IGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNjE6IApu
-ZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA3MyBsaW5l
-cyBjaGVja2VkCgpQYXRjaCAyMi8yNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyMy8yNCBD
-aGVja2luZyBjb21taXQgOTA0Mjk3MjgyYTdmIChNQUlOVEFJTkVSUzogQWRkIFJYKQoyNC8yNCBD
-aGVja2luZyBjb21taXQgMjMzYjE4Y2JlN2IwIChCb290TGludXhDb25zb2xlVGVzdDogVGVzdCB0
-aGUgUlgtVmlydCBtYWNoaW5lKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0
-ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0
-Y2hldy5vcmcvbG9ncy8yMDE5MDYxNjE0MjgzNi4xMDYxNC0xLXlzYXRvQHVzZXJzLnNvdXJjZWZv
-cmdlLmpwL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
-c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+UMWAIT and TPAUSE instructions use IA32_UMWAIT_CONTROL at MSR index
+E1H to determines the maximum time in TSC-quanta that the processor
+can reside in either C0.1 or C0.2.
+
+This patch is to Add support for save/load IA32_UMWAIT_CONTROL MSR in
+guest.
+
+Co-developed-by: Jingqi Liu <jingqi.liu@intel.com>
+Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+Signed-off-by: Tao Xu <tao3.xu@intel.com>
+---
+
+no changes in v3:
+---
+ target/i386/cpu.h     |  2 ++
+ target/i386/kvm.c     | 13 +++++++++++++
+ target/i386/machine.c | 20 ++++++++++++++++++++
+ 3 files changed, 35 insertions(+)
+
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 2f7c57a3c2..eb98b2e54a 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -450,6 +450,7 @@ typedef enum X86Seg {
+ 
+ #define MSR_IA32_BNDCFGS                0x00000d90
+ #define MSR_IA32_XSS                    0x00000da0
++#define MSR_IA32_UMWAIT_CONTROL         0xe1
+ 
+ #define XSTATE_FP_BIT                   0
+ #define XSTATE_SSE_BIT                  1
+@@ -1348,6 +1349,7 @@ typedef struct CPUX86State {
+     uint16_t fpregs_format_vmstate;
+ 
+     uint64_t xss;
++    uint64_t umwait;
+ 
+     TPRAccess tpr_access_type;
+ } CPUX86State;
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 3efdb90f11..506c7cd038 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -91,6 +91,7 @@ static bool has_msr_hv_stimer;
+ static bool has_msr_hv_frequencies;
+ static bool has_msr_hv_reenlightenment;
+ static bool has_msr_xss;
++static bool has_msr_umwait;
+ static bool has_msr_spec_ctrl;
+ static bool has_msr_virt_ssbd;
+ static bool has_msr_smi_count;
+@@ -1486,6 +1487,9 @@ static int kvm_get_supported_msrs(KVMState *s)
+                 case MSR_IA32_XSS:
+                     has_msr_xss = true;
+                     break;
++                case MSR_IA32_UMWAIT_CONTROL:
++                    has_msr_umwait = true;
++                    break;
+                 case HV_X64_MSR_CRASH_CTL:
+                     has_msr_hv_crash = true;
+                     break;
+@@ -2023,6 +2027,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+     if (has_msr_xss) {
+         kvm_msr_entry_add(cpu, MSR_IA32_XSS, env->xss);
+     }
++    if (has_msr_umwait) {
++        kvm_msr_entry_add(cpu, MSR_IA32_UMWAIT_CONTROL, env->umwait);
++    }
+     if (has_msr_spec_ctrl) {
+         kvm_msr_entry_add(cpu, MSR_IA32_SPEC_CTRL, env->spec_ctrl);
+     }
+@@ -2416,6 +2423,9 @@ static int kvm_get_msrs(X86CPU *cpu)
+     if (has_msr_xss) {
+         kvm_msr_entry_add(cpu, MSR_IA32_XSS, 0);
+     }
++    if (has_msr_umwait) {
++        kvm_msr_entry_add(cpu, MSR_IA32_UMWAIT_CONTROL, 0);
++    }
+     if (has_msr_spec_ctrl) {
+         kvm_msr_entry_add(cpu, MSR_IA32_SPEC_CTRL, 0);
+     }
+@@ -2665,6 +2675,9 @@ static int kvm_get_msrs(X86CPU *cpu)
+         case MSR_IA32_XSS:
+             env->xss = msrs[i].data;
+             break;
++        case MSR_IA32_UMWAIT_CONTROL:
++            env->umwait = msrs[i].data;
++            break;
+         default:
+             if (msrs[i].index >= MSR_MC0_CTL &&
+                 msrs[i].index < MSR_MC0_CTL + (env->mcg_cap & 0xff) * 4) {
+diff --git a/target/i386/machine.c b/target/i386/machine.c
+index 4aff1a763f..db388b6b85 100644
+--- a/target/i386/machine.c
++++ b/target/i386/machine.c
+@@ -810,6 +810,25 @@ static const VMStateDescription vmstate_xss = {
+     }
+ };
+ 
++static bool umwait_needed(void *opaque)
++{
++    X86CPU *cpu = opaque;
++    CPUX86State *env = &cpu->env;
++
++    return env->umwait != 0;
++}
++
++static const VMStateDescription vmstate_umwait = {
++    .name = "cpu/umwait",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = umwait_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(env.umwait, X86CPU),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ #ifdef TARGET_X86_64
+ static bool pkru_needed(void *opaque)
+ {
+@@ -1100,6 +1119,7 @@ VMStateDescription vmstate_x86_cpu = {
+         &vmstate_msr_hyperv_reenlightenment,
+         &vmstate_avx512,
+         &vmstate_xss,
++        &vmstate_umwait,
+         &vmstate_tsc_khz,
+         &vmstate_msr_smi_count,
+ #ifdef TARGET_X86_64
+-- 
+2.20.1
 
 
