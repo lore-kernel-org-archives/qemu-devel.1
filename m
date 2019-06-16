@@ -2,73 +2,93 @@ Return-Path: <SRS0=kfsH=UP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBD6EC31E53
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 04:32:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55A3CC31E49
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 07:45:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96B842084D
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 04:32:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96B842084D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 20FB62133D
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 07:45:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20FB62133D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37588 helo=lists.gnu.org)
+Received: from localhost ([::1]:37934 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcMps-0001yx-QG
-	for qemu-devel@archiver.kernel.org; Sun, 16 Jun 2019 00:32:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50892)
+	id 1hcPqj-00034n-Hp
+	for qemu-devel@archiver.kernel.org; Sun, 16 Jun 2019 03:45:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50944)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hcMni-0000p9-Nz
- for qemu-devel@nongnu.org; Sun, 16 Jun 2019 00:29:56 -0400
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hcPpp-0002Za-3w
+ for qemu-devel@nongnu.org; Sun, 16 Jun 2019 03:44:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hcMng-0003pu-RE
- for qemu-devel@nongnu.org; Sun, 16 Jun 2019 00:29:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42800)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hcMng-0003lz-LW
- for qemu-devel@nongnu.org; Sun, 16 Jun 2019 00:29:52 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hcMnb-0008GX-9U
- for <qemu-devel@nongnu.org>; Sun, 16 Jun 2019 04:29:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 341742E80D3
- for <qemu-devel@nongnu.org>; Sun, 16 Jun 2019 04:29:47 +0000 (UTC)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hcPpn-0008SB-5W
+ for qemu-devel@nongnu.org; Sun, 16 Jun 2019 03:44:17 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:46090
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1hcPpl-0005zk-6x; Sun, 16 Jun 2019 03:44:14 -0400
+Received: from host86-173-229-95.range86-173.btcentralplus.com
+ ([86.173.229.95] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1hcPmJ-0000zu-3f; Sun, 16 Jun 2019 08:40:39 +0100
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20190602110903.3431-1-mark.cave-ayland@ilande.co.uk>
+ <20190602110903.3431-3-mark.cave-ayland@ilande.co.uk>
+ <20190612010459.GD3998@umbus.fritz.box>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <412e0398-fabf-9f6e-481f-ba2bea148d28@ilande.co.uk>
+Date: Sun, 16 Jun 2019 08:40:48 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 16 Jun 2019 04:17:22 -0000
-From: Launchpad Bug Tracker <1574572@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: janitor th-huth ztehypervisor
-X-Launchpad-Bug-Reporter: Michael liu (ztehypervisor)
-X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <20160425105439.5722.90720.malonedeb@chaenomeles.canonical.com>
-Message-Id: <156065864220.14650.14827537819853825912.malone@loganberry.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18981";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 79b720b35c49cf1967f2e58ef3b9f6242c543c9f
+In-Reply-To: <20190612010459.GD3998@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 86.173.229.95
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] =?utf-8?q?=5BBug_1574572=5D_Re=3A_config_20_sriov_di?=
- =?utf-8?q?rect_bond_ports=EF=BC=8Cvm_create_failed=2E?=
+X-Received-From: 46.43.2.167
+Subject: Re: [Qemu-devel] [PATCH v2 02/15] target/ppc: remove
+ getVSR()/putVSR() from mem_helper.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,119 +97,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1574572 <1574572@bugs.launchpad.net>
+Cc: gkurz@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+On 12/06/2019 02:04, David Gibson wrote:
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+> On Sun, Jun 02, 2019 at 12:08:50PM +0100, Mark Cave-Ayland wrote:
+>> Since commit 8a14d31b00 "target/ppc: switch fpr/vsrl registers so all VSX
+>> registers are in host endian order" functions getVSR() and putVSR() which used
+>> to convert the VSR registers into host endian order are no longer required.
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> ---
+>>  target/ppc/mem_helper.c | 25 ++++++++++++++-----------
+>>  1 file changed, 14 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
+>> index 5b0f9ee50d..17a3c931a9 100644
+>> --- a/target/ppc/mem_helper.c
+>> +++ b/target/ppc/mem_helper.c
+>> @@ -417,26 +417,27 @@ STVE(stvewx, cpu_stl_data_ra, bswap32, u32)
+>>  void helper_##name(CPUPPCState *env, target_ulong addr,                 \
+>>                     target_ulong xt_num, target_ulong rb)                \
+>>  {                                                                       \
+>> -    int i;                                                              \
+>> -    ppc_vsr_t xt;                                                       \
+>> +    ppc_vsr_t *xt = &env->vsr[xt_num];                                  \
+>> +    ppc_vsr_t t;                                                        \
+>>      uint64_t nb = GET_NB(rb);                                           \
+>> +    int i;                                                              \
+>>                                                                          \
+>> -    xt.s128 = int128_zero();                                            \
+>> +    t.s128 = int128_zero();                                             \
+>>      if (nb) {                                                           \
+>>          nb = (nb >= 16) ? 16 : nb;                                      \
+>>          if (msr_le && !lj) {                                            \
+>>              for (i = 16; i > 16 - nb; i--) {                            \
+>> -                xt.VsrB(i - 1) = cpu_ldub_data_ra(env, addr, GETPC());  \
+>> +                t.VsrB(i - 1) = cpu_ldub_data_ra(env, addr, GETPC());   \
+>>                  addr = addr_add(env, addr, 1);                          \
+>>              }                                                           \
+>>          } else {                                                        \
+>>              for (i = 0; i < nb; i++) {                                  \
+>> -                xt.VsrB(i) = cpu_ldub_data_ra(env, addr, GETPC());      \
+>> +                t.VsrB(i) = cpu_ldub_data_ra(env, addr, GETPC());       \
+>>                  addr = addr_add(env, addr, 1);                          \
+>>              }                                                           \
+>>          }                                                               \
+>>      }                                                                   \
+>> -    putVSR(xt_num, &xt, env);                                           \
+>> +    *xt = t;                                                            \
+>>  }
+>>  
+>>  VSX_LXVL(lxvl, 0)
+>> @@ -447,26 +448,28 @@ VSX_LXVL(lxvll, 1)
+>>  void helper_##name(CPUPPCState *env, target_ulong addr,           \
+>>                     target_ulong xt_num, target_ulong rb)          \
+>>  {                                                                 \
+>> -    int i;                                                        \
+>> -    ppc_vsr_t xt;                                                 \
+>> +    ppc_vsr_t *xt = &env->vsr[xt_num];                            \
+>> +    ppc_vsr_t t = *xt;                                            \
+>>      target_ulong nb = GET_NB(rb);                                 \
+>> +    int i;                                                        \
+>>                                                                    \
+>>      if (!nb) {                                                    \
+>>          return;                                                   \
+>>      }                                                             \
+>> -    getVSR(xt_num, &xt, env);                                     \
+>> +                                                                  \
+>>      nb = (nb >= 16) ? 16 : nb;                                    \
+>>      if (msr_le && !lj) {                                          \
+>>          for (i = 16; i > 16 - nb; i--) {                          \
+>> -            cpu_stb_data_ra(env, addr, xt.VsrB(i - 1), GETPC());  \
+>> +            cpu_stb_data_ra(env, addr, t.VsrB(i - 1), GETPC());   \
+>>              addr = addr_add(env, addr, 1);                        \
+>>          }                                                         \
+>>      } else {                                                      \
+>>          for (i = 0; i < nb; i++) {                                \
+>> -            cpu_stb_data_ra(env, addr, xt.VsrB(i), GETPC());      \
+>> +            cpu_stb_data_ra(env, addr, t.VsrB(i), GETPC())  ;     \
+>>              addr = addr_add(env, addr, 1);                        \
+>>          }                                                         \
+>>      }                                                             \
+>> +    *xt = t;                                                      \
+> 
+> Is this correct?  AFAICT the original wasn't writing back, so why does
+> the new version?
 
--- =
+Ooops yes, this shouldn't be here at all. I'll fix it up in the next version of the
+series, along with Richard's comments about using the xt pointer directly.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1574572
+>>  }
+>>  
+>>  VSX_STXVL(stxvl, 0)
 
-Title:
-  config 20 sriov direct bond ports=EF=BC=8Cvm create failed.
 
-Status in QEMU:
-  Expired
+ATB,
 
-Bug description:
-  nova log=EF=BC=9A
-
-   2016-04-08 09:57:48.640 5057 INFO nova.compute.manager [req-
-  4e1b4d70-62b6-4158-8413-3c9f226fd13b - - - - -] report
-  alarm_instance_shutoff success
-
-  2016-04-08 09:57:48.712 5057 INFO nova.compute.manager [req-
-  4e1b4d70-62b6-4158-8413-3c9f226fd13b - - - - -] [instance: d860169c-
-  0dac-448f-a644-01a9b200cebe] During _sync_instance_power_state the DB
-  power_state (1) does not match the vm_power_state from the hypervisor
-  (4). Updating power_state in the DB to match the hypervisor.
-
-  2016-04-08 09:57:48.791 5057 WARNING nova.compute.manager [req-
-  4e1b4d70-62b6-4158-8413-3c9f226fd13b - - - - -] [instance: d860169c-
-  0dac-448f-a644-01a9b200cebe] Instance shutdown by itself. Calling the
-  heal_instance_state. Current vm_state: active, current task_state:
-  None, original DB power_state: 1, current VM power_state: 4
-
-  2016-04-08 09:57:48.892 5057 INFO nova.compute.manager [req-
-  4e1b4d70-62b6-4158-8413-3c9f226fd13b - - - - -]
-  alarm_notice_heal_event result:1,host_name:tfg120,instance_id
-  :d860169c-0dac-
-  448f-a644-01a9b200cebe,instance_name:vfnicdirect,vm_state:active,power_st=
-ate:shutdown,action:start
-
-  2016-04-08 09:57:48.997 5057 INFO nova.compute.manager [req-
-  4e1b4d70-62b6-4158-8413-3c9f226fd13b - - - - -]
-  Refresh_instance_block_device_info:False
-
-  2016-04-08 09:57:48.998 5057 INFO nova.compute.manager [req-
-  4e1b4d70-62b6-4158-8413-3c9f226fd13b - - - - -] [instance: d860169c-
-  0dac-448f-a644-01a9b200cebe] Rebooting instance
-
-  2016-04-08 09:57:49.373 5057 WARNING nova.compute.manager [req-
-  4e1b4d70-62b6-4158-8413-3c9f226fd13b - - - - -] [instance: d860169c-
-  0dac-448f-a644-01a9b200cebe] trying to reboot a non-running instance:
-  (state: 4 expected: 1)
-
-  2016-04-08 09:57:49.479 5057 INFO nova.virt.libvirt.driver [-]
-  [instance: d860169c-0dac-448f-a644-01a9b200cebe] Instance destroyed
-  successfully.
-
-  =
-
-  libvirtd  log=EF=BC=9A
-
-  2016-04-08 02:05:05.785+0000: 4778: info : qemuDomainDestroyFlags:2227
-  : Log: VM: name=3D instance-000000b8
-
-  2016-04-08 02:05:16.156+0000: 4771: info :
-  qemuDomainDefineXMLFlags:7576 : Creating domain 'instance-000000b8'
-
-  2016-04-08 02:05:16.158+0000: 4773: info :
-  qemuDomainCreateWithFlags:7448 : Log: VM: name=3D instance-000000b8
-
-  2016-04-08 02:05:16.158+0000: 4773: info : qemuProcessStart:4412 :
-  vm=3D0x7f19482fdb30 name=3Dinstance-000000b8 id=3D-1 asyncJob=3D0
-  migrateFrom=3D<null> stdin_fd=3D-1 stdin_path=3D<null> snapshot=3D(nil) v=
-mop=3D0
-  flags=3D0x1
-
-  2016-04-08 02:05:16.169+0000: 4773: info :
-  virNetDevReplaceNetConfig:2541 : Replace Net Config of linkdev
-  enp132s0f0, vf 28, macaddress 00:d1:d4:00:05:03, vlanid 1250, stateDir
-  /var/run/libvirt/hostdevmgr
-
-  2016-04-08 02:05:16.169+0000: 4773: info :
-  virNetDevReplaceNetConfig:2566 : Replace  Vf Config of enp132s0f0, vf
-  28, vlanid 1250, stateDir /var/run/libvirt/hostdevmgr
-
-  2016-04-08 02:05:16.169+0000: 4773: info :
-  virNetDevReplaceVfConfig:2390 : pflinkdev enp132s0f0, vf 28,vlanid
-  1250
-
-  2016-04-08 02:05:16.178+0000: 4773: info :
-  virNetDevReplaceVfConfig:2428 : save oldmac 00:d1:d4:00:05:03,
-  oldvlanid 1250
-
-  2016-04-08 02:05:16.178+0000: 4773: info : virNetDevSetVfConfig:2196 :
-  ifname enp132s0f0,ifindex -1,vf 28,macaddress 00:d1:d4:00:05:03,
-  vlanid 1250
-
-  =
-
-  qemu log=EF=BC=9A
-
-  kvm_alloc_slot: no free slot available
-
-  2016-04-08 06:21:04.793+0000: shutting down
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1574572/+subscriptions
+Mark.
 
