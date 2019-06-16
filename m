@@ -2,68 +2,62 @@ Return-Path: <SRS0=kfsH=UP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AF38C31E50
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 19:43:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 638A9C31E50
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 19:54:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECE1620870
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 19:43:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECE1620870
+	by mail.kernel.org (Postfix) with ESMTPS id 357AB20657
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 19:54:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 357AB20657
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42528 helo=lists.gnu.org)
+Received: from localhost ([::1]:42584 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcb3V-0007D7-TB
-	for qemu-devel@archiver.kernel.org; Sun, 16 Jun 2019 15:43:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45143)
+	id 1hcbE4-0003jn-Fb
+	for qemu-devel@archiver.kernel.org; Sun, 16 Jun 2019 15:54:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47689)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1hcb22-0006KL-SB
- for qemu-devel@nongnu.org; Sun, 16 Jun 2019 15:41:40 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hcbCo-0002yZ-Cs
+ for qemu-devel@nongnu.org; Sun, 16 Jun 2019 15:52:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1hcb21-00078q-JE
- for qemu-devel@nongnu.org; Sun, 16 Jun 2019 15:41:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54026)
+ (envelope-from <imammedo@redhat.com>) id 1hcbCm-00005Z-TK
+ for qemu-devel@nongnu.org; Sun, 16 Jun 2019 15:52:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47182)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hcb21-00077f-BF
- for qemu-devel@nongnu.org; Sun, 16 Jun 2019 15:41:37 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hcbCm-00004s-L8
+ for qemu-devel@nongnu.org; Sun, 16 Jun 2019 15:52:44 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0523B81129;
- Sun, 16 Jun 2019 19:41:36 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 87C2E307D869;
+ Sun, 16 Jun 2019 19:52:43 +0000 (UTC)
 Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EFADC19693;
- Sun, 16 Jun 2019 19:41:31 +0000 (UTC)
-Date: Sun, 16 Jun 2019 21:41:27 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5FC6F5C1B5;
+ Sun, 16 Jun 2019 19:52:38 +0000 (UTC)
+Date: Sun, 16 Jun 2019 21:52:34 +0200
 From: Igor Mammedov <imammedo@redhat.com>
 To: Tao Xu <tao3.xu@intel.com>
-Message-ID: <20190616214127.20d1cd0e@redhat.com>
-In-Reply-To: <9159f119-0a98-bb6b-93c1-de64a3b1580a@intel.com>
+Message-ID: <20190616215234.685b8585@redhat.com>
+In-Reply-To: <20190508061726.27631-10-tao3.xu@intel.com>
 References: <20190508061726.27631-1-tao3.xu@intel.com>
- <20190508061726.27631-8-tao3.xu@intel.com>
- <20190604170456.5b3c198e@redhat.com>
- <729bde4a-bcb9-dac5-3a8a-04cc5f4d2bf9@intel.com>
- <20190605140841.63e8aa85@redhat.com>
- <02c9615a-fb59-664f-e878-124c9f43e54a@intel.com>
- <20190606184507.2c52cd41@redhat.com>
- <9159f119-0a98-bb6b-93c1-de64a3b1580a@intel.com>
+ <20190508061726.27631-10-tao3.xu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Sun, 16 Jun 2019 19:41:36 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Sun, 16 Jun 2019 19:52:43 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 07/11] hmat acpi: Build Memory Side
- Cache Information Structure(s) in ACPI HMAT
+Subject: Re: [Qemu-devel] [PATCH v4 09/11] numa: Extend the command-line to
+ provide memory side cache information
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,103 +69,233 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>,
- "mst@redhat.com" <mst@redhat.com>, "Liu, Jingqi" <jingqi.liu@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>
+Cc: xiaoguangrong.eric@gmail.com, mst@redhat.com, jingqi.liu@intel.com,
+ qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net,
+ ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 10 Jun 2019 21:39:12 +0800
+On Wed,  8 May 2019 14:17:24 +0800
 Tao Xu <tao3.xu@intel.com> wrote:
 
-> On 6/7/2019 12:45 AM, Igor Mammedov wrote:
-> > On Thu, 6 Jun 2019 11:00:33 +0800
-> > Tao Xu <tao3.xu@intel.com> wrote:
-> >  =20
-> ...
-> >>
-> >> But the kernel HMAT can read othe Memory Side Cache Information except
-> >> SMBIOS entries and the host HMAT tables also haven=E2=80=99t SMBIOS Ha=
-ndles it
-> >> also shows Number of SMBIOS handles (n) as 0. So I am wondering if it =
-is
-> >> better to setting "SMBIOS handles (n)" as 0, remove TODO and comment t=
-he
-> >> reason why set it 0? =20
-> >=20
-> > My understanding is that SMBIOS handles are used to associate side cache
-> > descriptions with RAM pointed by SMBIOS handles, so that OS would be
-> > able to figure out what RAM modules are cached by what cache.
-> > Hence I suspect that side cache table is useless in the best case witho=
-ut
-> > valid references to SMBIOS handles.
-> > (I might be totally mistaken but the matter requires clarification befo=
-re
-> > we commit to it)
-> >  =20
->=20
-> I am sorry for not providing a detailed description for Memory Side=20
-> Cache use case. I will add more detailed description in next version of=20
-> patch.
->=20
-> As the commit message and /Documentation/admin-guide/mm/numaperf.rst of=20
-> Kernel HMAT(listed blow), Memory Side Cache Structure is used to provide=
-=20
-> the cache information about System memory for the software to use. Then=20
-> the software can maximize the performance because it can choose the best=
-=20
-> node to use.
->=20
-> Memory Side Cache Information Structure and System Locality Latency and=20
-> Bandwidth Information Structure can both provide more information than=20
-> numa distance for software to see. So back to the SMBIOS, in spec,=20
-> SMBIOS handles point to the memory side cache physical devices, but they=
-=20
-> are also information and not contribute to the performance of the=20
-> described memory. The field "Proximity Domain for the Memory" can show=20
-> the described memory.
->=20
-> I am wondering if this explanation is clear? Thank you.
+> From: Liu Jingqi <jingqi.liu@intel.com>
+> 
+> Add -numa hmat-cache option to provide Memory Side Cache Information.
+> These memory attributes help to build Memory Side Cache Information
+> Structure(s) in ACPI Heterogeneous Memory Attribute Table (HMAT).
+> 
+> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
+> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> ---
+> 
+> Changes in v4 -> v3:
+>     - update the version tag from 4.0 to 4.1
+> ---
+>  numa.c         | 75 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  qapi/misc.json | 72 ++++++++++++++++++++++++++++++++++++++++++++++--
+>  2 files changed, 145 insertions(+), 2 deletions(-)
+> 
+> diff --git a/numa.c b/numa.c
+> index 1aecb7a2e9..4866736fc8 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -300,6 +300,75 @@ static void parse_numa_hmat_lb(MachineState *ms, NumaHmatLBOptions *node,
+>      }
+>  }
+>  
+> +static
+> +void parse_numa_hmat_cache(MachineState *ms, NumaHmatCacheOptions *node,
+> +                            Error **errp)
+> +{
+> +    int nb_numa_nodes = ms->numa_state->num_nodes;
+> +    HMAT_Cache_Info *hmat_cache = NULL;
+> +
+> +    if (node->node_id >= nb_numa_nodes) {
+> +        error_setg(errp, "Invalid node-id=%" PRIu32
+> +                   ", it should be less than %d.",
+> +                   node->node_id, nb_numa_nodes);
+> +        return;
+> +    }
+> +    if (!ms->numa_state->nodes[node->node_id].is_target) {
+> +        error_setg(errp, "Invalid node-id=%" PRIu32
+> +                   ", it isn't a target proximity domain.",
+> +                   node->node_id);
+> +        return;
+> +    }
+> +
+> +    if (node->total > MAX_HMAT_CACHE_LEVEL) {
+> +        error_setg(errp, "Invalid total=%" PRIu8
+> +                   ", it should be less than or equal to %d.",
+> +                   node->total, MAX_HMAT_CACHE_LEVEL);
+> +        return;
+> +    }
+> +    if (node->level > node->total) {
+> +        error_setg(errp, "Invalid level=%" PRIu8
+> +                   ", it should be less than or equal to"
+> +                   " total=%" PRIu8 ".",
+> +                   node->level, node->total);
+> +        return;
+> +    }
+> +    if (ms->numa_state->hmat_cache[node->node_id][node->level]) {
+> +        error_setg(errp, "Duplicate configuration of the side cache for "
+> +                   "node-id=%" PRIu32 " and level=%" PRIu8 ".",
+> +                   node->node_id, node->level);
+> +        return;
+> +    }
+> +
+> +    if ((node->level > 1) &&
+> +        ms->numa_state->hmat_cache[node->node_id][node->level - 1] &&
+> +        (node->size >=
+> +            ms->numa_state->hmat_cache[node->node_id][node->level - 1]->size)) {
+> +        error_setg(errp, "Invalid size=0x%" PRIx64
+> +                   ", the size of level=%" PRIu8
+> +                   " should be less than the size(0x%" PRIx64
+> +                   ") of level=%" PRIu8 ".",
+> +                   node->size, node->level,
+> +                   ms->numa_state->hmat_cache[node->node_id]
+> +                                             [node->level - 1]->size,
+> +                   node->level - 1);
+> +        return;
+> +    }
+> +
+> +    hmat_cache = g_malloc0(sizeof(*hmat_cache));
+> +
+> +    hmat_cache->mem_proximity = node->node_id;
+> +    hmat_cache->size = node->size;
+> +    hmat_cache->total_levels = node->total;
+> +    hmat_cache->level = node->level;
+> +    hmat_cache->associativity = node->assoc;
+> +    hmat_cache->write_policy = node->policy;
+> +    hmat_cache->line_size = node->line;
+> +    hmat_cache->num_smbios_handles = 0;
+> +
+> +    ms->numa_state->hmat_cache[node->node_id][node->level] = hmat_cache;
+> +}
+> +
+>  static
+>  void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
+>  {
+> @@ -344,6 +413,12 @@ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
+>              goto end;
+>          }
+>          break;
+> +    case NUMA_OPTIONS_TYPE_HMAT_CACHE:
+> +        parse_numa_hmat_cache(ms, &object->u.hmat_cache, &err);
+> +        if (err) {
+> +            goto end;
+> +        }
+> +        break;
+>      default:
+>          abort();
+>      }
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index d7fce75702..2b7e34b469 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -2541,10 +2541,12 @@
+>  #
+>  # @hmat-lb: memory latency and bandwidth information (Since: 4.1)
+>  #
+> +# @hmat-cache: memory side cache information (Since: 4.1)
+> +#
+>  # Since: 2.1
+>  ##
+>  { 'enum': 'NumaOptionsType',
+> -  'data': [ 'node', 'dist', 'cpu', 'hmat-lb' ] }
+> +   'data': [ 'node', 'dist', 'cpu', 'hmat-lb', 'hmat-cache' ] }
+stray whitespace in front???
 
-I didn't manage to find a definite answer in spec to what SMBIOS entry
-should describe. Another use of 'Physical Memory Component' is in PMTT
-table and it looks to me that it type 17 should reffer to DIMM device.
 
-But well, considering spec isn't clear about subject and that linux
-kernel doesn't seem to use this entries lets use it without SMBIOS
-entries for now. Like you suggested, lets set number of SMBIOS handles to 0
-and drop num_smbios_handles so that user won't be able to provide any.
+>  ##
+>  # @NumaOptions:
+> @@ -2560,7 +2562,8 @@
+>      'node': 'NumaNodeOptions',
+>      'dist': 'NumaDistOptions',
+>      'cpu': 'NumaCpuOptions',
+> -    'hmat-lb': 'NumaHmatLBOptions' }}
+> +    'hmat-lb': 'NumaHmatLBOptions',
+> +    'hmat-cache': 'NumaHmatCacheOptions' }}
+>  
+>  ##
+>  # @NumaNodeOptions:
+> @@ -2710,6 +2713,71 @@
+>     '*latency': 'uint16',
+>     '*bandwidth': 'uint16' }}
+>  
+> +##
+> +# @HmatCacheAssociativity:
+> +#
+> +# Cache associativity in the Memory Side Cache
+> +# Information Structure of HMAT
+> +#
+> +# @none: None
+> +#
+> +# @direct: Direct Mapped
+> +#
+> +# @complex: Complex Cache Indexing (implementation specific)
+it would be good to add reference to spec, like we do for ACPI API functions.
+So that reader would know where to look for values and their meaning.
 
+PS:
+It applies to all fields that come from spec (in this and previous patches that add QAPI structures)
 
-> "System memory may be constructed in a hierarchy of elements with=20
-> various performance characteristics in order to provide large address=20
-> space of slower performing memory cached by a smaller higher performing=20
-> memory."
->=20
-> "An application does not need to know about caching attributes in order
-> to use the system. Software may optionally query the memory cache
-> attributes in order to maximize the performance out of such a setup.
-> If the system provides a way for the kernel to discover this=20
-> information, for example with ACPI HMAT (Heterogeneous Memory Attribute=20
-> Table), the kernel will append these attributes to the NUMA node memory=20
-> target."
->=20
-> "Each cache level's directory provides its attributes. For example, the
-> following shows a single cache level and the attributes available for
-> software to query::
->=20
-> 	# tree sys/devices/system/node/node0/memory_side_cache/
-> 	/sys/devices/system/node/node0/memory_side_cache/
-> 	|-- index1
-> 	|   |-- indexing
-> 	|   |-- line_size
-> 	|   |-- size
-> 	|   `-- write_policy
-> "
->=20
+> +#
+> +# Since: 4.1
+> +##
+> +{ 'enum': 'HmatCacheAssociativity',
+> +  'data': [ 'none', 'direct', 'complex' ] }
+> +
+> +##
+> +# @HmatCacheWritePolicy:
+> +#
+> +# Cache write policy in the Memory Side Cache
+> +# Information Structure of HMAT
+> +#
+> +# @none: None
+> +#
+> +# @write-back: Write Back (WB)
+> +#
+> +# @write-through: Write Through (WT)
+> +#
+> +# Since: 4.1
+> +##
+> +{ 'enum': 'HmatCacheWritePolicy',
+> +  'data': [ 'none', 'write-back', 'write-through' ] }
+> +
+> +##
+> +# @NumaHmatCacheOptions:
+> +#
+> +# Set the memory side cache information for a given memory domain.
+> +#
+> +# @node-id: the memory proximity domain to which the memory belongs.
+> +#
+> +# @size: the size of memory side cache in bytes.
+> +#
+> +# @total: the total cache levels for this memory proximity domain.
+> +#
+> +# @level: the cache level described in this structure.
+> +#
+> +# @assoc: the cache associativity, none/direct-mapped/complex(complex cache indexing).
+> +
+> +# @policy: the write policy, none/write-back/write-through.
+> +#
+> +# @line: the cache Line size in bytes.
+> +#
+> +# Since: 4.1
+> +##
+> +{ 'struct': 'NumaHmatCacheOptions',
+> +  'data': {
+> +   'node-id': 'uint32',
+> +   'size': 'size',
+> +   'total': 'uint8',
+> +   'level': 'uint8',
+> +   'assoc': 'HmatCacheAssociativity',
+> +   'policy': 'HmatCacheWritePolicy',
+> +   'line': 'uint16' }}
+> +
+>  ##
+>  # @HostMemPolicy:
+>  #
 
 
