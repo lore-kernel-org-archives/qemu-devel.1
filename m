@@ -2,59 +2,66 @@ Return-Path: <SRS0=kfsH=UP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B15DCC31E50
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 13:13:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BF19C31E50
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 13:22:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70D9020866
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 13:13:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70D9020866
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id E508E20866
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 13:22:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E508E20866
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39724 helo=lists.gnu.org)
+Received: from localhost ([::1]:39791 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcUyK-0002Ku-LQ
-	for qemu-devel@archiver.kernel.org; Sun, 16 Jun 2019 09:13:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47769)
+	id 1hcV6k-0005Jv-2G
+	for qemu-devel@archiver.kernel.org; Sun, 16 Jun 2019 09:22:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51487)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hcUoZ-0003KL-51
- for qemu-devel@nongnu.org; Sun, 16 Jun 2019 09:03:23 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hcV42-00044m-Jf
+ for qemu-devel@nongnu.org; Sun, 16 Jun 2019 09:19:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hcUoW-0004Ng-MN
- for qemu-devel@nongnu.org; Sun, 16 Jun 2019 09:03:19 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:46526
- helo=mail.default.ilande.uk0.bigv.io)
+ (envelope-from <no-reply@patchew.org>) id 1hcV40-00035p-Cm
+ for qemu-devel@nongnu.org; Sun, 16 Jun 2019 09:19:18 -0400
+Resent-Date: Sun, 16 Jun 2019 09:19:17 -0400
+Resent-Message-Id: <E1hcV40-00035p-Cm@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21483)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1hcUoW-0004NL-E3; Sun, 16 Jun 2019 09:03:16 -0400
-Received: from host86-173-229-95.range86-173.btcentralplus.com
- ([86.173.229.95] helo=kentang.home)
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1hcUQ6-0001jp-T2; Sun, 16 Jun 2019 13:38:03 +0100
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au,
- rth@twiddle.net, gkurz@kaod.org
-Date: Sun, 16 Jun 2019 13:37:51 +0100
-Message-Id: <20190616123751.781-16-mark.cave-ayland@ilande.co.uk>
-X-Mailer: git-send-email 2.11.0
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hcV3z-0002xS-SG; Sun, 16 Jun 2019 09:19:16 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1560691101; cv=none; d=zoho.com; s=zohoarc; 
+ b=lP9s6RnMP6Af4np2PAhKEkrOQWgvlYuudGJyo+8bhjSg1xXx/9KlnTADF8wnBCFNjMsvRuB5ZeJCq1WuGMgxbkJMH8dpK3IOnUbzzFWcaICjp3SFcRcqoIrd+IA1h0O2ti20iChqnsJ3dyjWm61yCieh2GgG+tSQFWziUpjGj50=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1560691101;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=/nMvqUOKJhMCs5Lhe0jJWGxUUFbvT4RN6UwSnNZglqE=; 
+ b=HI7L9SiWPM4edpWhrzX5Jx5qh3+TFdTxIelECvWsu4gyqWBIvIZ3BKJ6TyWvWnTl5epAU0MbaLONU8wF6xfajiN5twM3LpMyF8D51GEghyQhZCr+HueT6gQJ4d0+IOr5vVJiUKTgzTP+lYH3WwxmK1BHQP+8OcrwdWL2M2G+wo4=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1560691099564533.8398632567064;
+ Sun, 16 Jun 2019 06:18:19 -0700 (PDT)
 In-Reply-To: <20190616123751.781-1-mark.cave-ayland@ilande.co.uk>
-References: <20190616123751.781-1-mark.cave-ayland@ilande.co.uk>
-X-SA-Exim-Connect-IP: 86.173.229.95
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Message-ID: <156069109845.13573.5344551317449916246@ce79690b2cb9>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: mark.cave-ayland@ilande.co.uk
+Date: Sun, 16 Jun 2019 06:18:19 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
-Subject: [Qemu-devel] [PATCH v3 15/15] target/ppc: improve VSX_FMADD with
- new GEN_VSX_HELPER_VSX_MADD macro
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH v3 00/15] target/ppc: remove
+ getVSR()/putVSR() and further tidy-up
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,438 +73,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: qemu-devel@nongnu.org
+Cc: gkurz@kaod.org, rth@twiddle.net, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Introduce a new GEN_VSX_HELPER_VSX_MADD macro for the generator function which
-enables the source and destination registers to be decoded at translation time.
-
-This enables the determination of a or m form to be made at translation time so
-that a single helper function can now be used for both variants.
-
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/ppc/fpu_helper.c             | 68 ++++++++++---------------------
- target/ppc/helper.h                 | 48 ++++++++--------------
- target/ppc/translate/vsx-impl.inc.c | 81 +++++++++++++++++++++----------------
- target/ppc/translate/vsx-ops.inc.c  | 70 +++++++++++++++++---------------
- 4 files changed, 122 insertions(+), 145 deletions(-)
-
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index f0a897cb9a..f437c88aad 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -2280,24 +2280,15 @@ VSX_TSQRT(xvtsqrtsp, 4, float32, VsrW(i), -126, 23)
-  *   fld   - vsr_t field (VsrD(*) or VsrW(*))
-  *   maddflgs - flags for the float*muladd routine that control the
-  *           various forms (madd, msub, nmadd, nmsub)
-- *   afrm  - A form (1=A, 0=M)
-  *   sfprf - set FPRF
-  */
--#define VSX_MADD(op, nels, tp, fld, maddflgs, afrm, sfprf, r2sp)              \
-+#define VSX_MADD(op, nels, tp, fld, maddflgs, sfprf, r2sp)                    \
- void helper_##op(CPUPPCState *env, ppc_vsr_t *xt,                             \
--                 ppc_vsr_t *xa, ppc_vsr_t *xb)                                \
-+                 ppc_vsr_t *xa, ppc_vsr_t *b, ppc_vsr_t *c)                   \
- {                                                                             \
--    ppc_vsr_t t = *xt, *b, *c;                                                \
-+    ppc_vsr_t t = *xt;                                                        \
-     int i;                                                                    \
-                                                                               \
--    if (afrm) { /* AxB + T */                                                 \
--        b = xb;                                                               \
--        c = xt;                                                               \
--    } else { /* AxT + B */                                                    \
--        b = xt;                                                               \
--        c = xb;                                                               \
--    }                                                                         \
--                                                                              \
-     helper_reset_fpstatus(env);                                               \
-                                                                               \
-     for (i = 0; i < nels; i++) {                                              \
-@@ -2336,41 +2327,24 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt,                             \
-     do_float_check_status(env, GETPC());                                      \
- }
- 
--VSX_MADD(xsmaddadp, 1, float64, VsrD(0), MADD_FLGS, 1, 1, 0)
--VSX_MADD(xsmaddmdp, 1, float64, VsrD(0), MADD_FLGS, 0, 1, 0)
--VSX_MADD(xsmsubadp, 1, float64, VsrD(0), MSUB_FLGS, 1, 1, 0)
--VSX_MADD(xsmsubmdp, 1, float64, VsrD(0), MSUB_FLGS, 0, 1, 0)
--VSX_MADD(xsnmaddadp, 1, float64, VsrD(0), NMADD_FLGS, 1, 1, 0)
--VSX_MADD(xsnmaddmdp, 1, float64, VsrD(0), NMADD_FLGS, 0, 1, 0)
--VSX_MADD(xsnmsubadp, 1, float64, VsrD(0), NMSUB_FLGS, 1, 1, 0)
--VSX_MADD(xsnmsubmdp, 1, float64, VsrD(0), NMSUB_FLGS, 0, 1, 0)
--
--VSX_MADD(xsmaddasp, 1, float64, VsrD(0), MADD_FLGS, 1, 1, 1)
--VSX_MADD(xsmaddmsp, 1, float64, VsrD(0), MADD_FLGS, 0, 1, 1)
--VSX_MADD(xsmsubasp, 1, float64, VsrD(0), MSUB_FLGS, 1, 1, 1)
--VSX_MADD(xsmsubmsp, 1, float64, VsrD(0), MSUB_FLGS, 0, 1, 1)
--VSX_MADD(xsnmaddasp, 1, float64, VsrD(0), NMADD_FLGS, 1, 1, 1)
--VSX_MADD(xsnmaddmsp, 1, float64, VsrD(0), NMADD_FLGS, 0, 1, 1)
--VSX_MADD(xsnmsubasp, 1, float64, VsrD(0), NMSUB_FLGS, 1, 1, 1)
--VSX_MADD(xsnmsubmsp, 1, float64, VsrD(0), NMSUB_FLGS, 0, 1, 1)
--
--VSX_MADD(xvmaddadp, 2, float64, VsrD(i), MADD_FLGS, 1, 0, 0)
--VSX_MADD(xvmaddmdp, 2, float64, VsrD(i), MADD_FLGS, 0, 0, 0)
--VSX_MADD(xvmsubadp, 2, float64, VsrD(i), MSUB_FLGS, 1, 0, 0)
--VSX_MADD(xvmsubmdp, 2, float64, VsrD(i), MSUB_FLGS, 0, 0, 0)
--VSX_MADD(xvnmaddadp, 2, float64, VsrD(i), NMADD_FLGS, 1, 0, 0)
--VSX_MADD(xvnmaddmdp, 2, float64, VsrD(i), NMADD_FLGS, 0, 0, 0)
--VSX_MADD(xvnmsubadp, 2, float64, VsrD(i), NMSUB_FLGS, 1, 0, 0)
--VSX_MADD(xvnmsubmdp, 2, float64, VsrD(i), NMSUB_FLGS, 0, 0, 0)
--
--VSX_MADD(xvmaddasp, 4, float32, VsrW(i), MADD_FLGS, 1, 0, 0)
--VSX_MADD(xvmaddmsp, 4, float32, VsrW(i), MADD_FLGS, 0, 0, 0)
--VSX_MADD(xvmsubasp, 4, float32, VsrW(i), MSUB_FLGS, 1, 0, 0)
--VSX_MADD(xvmsubmsp, 4, float32, VsrW(i), MSUB_FLGS, 0, 0, 0)
--VSX_MADD(xvnmaddasp, 4, float32, VsrW(i), NMADD_FLGS, 1, 0, 0)
--VSX_MADD(xvnmaddmsp, 4, float32, VsrW(i), NMADD_FLGS, 0, 0, 0)
--VSX_MADD(xvnmsubasp, 4, float32, VsrW(i), NMSUB_FLGS, 1, 0, 0)
--VSX_MADD(xvnmsubmsp, 4, float32, VsrW(i), NMSUB_FLGS, 0, 0, 0)
-+VSX_MADD(xsmadddp, 1, float64, VsrD(0), MADD_FLGS, 1, 0)
-+VSX_MADD(xsmsubdp, 1, float64, VsrD(0), MSUB_FLGS, 1, 0)
-+VSX_MADD(xsnmadddp, 1, float64, VsrD(0), NMADD_FLGS, 1, 0)
-+VSX_MADD(xsnmsubdp, 1, float64, VsrD(0), NMSUB_FLGS, 1, 0)
-+VSX_MADD(xsmaddsp, 1, float64, VsrD(0), MADD_FLGS, 1, 1)
-+VSX_MADD(xsmsubsp, 1, float64, VsrD(0), MSUB_FLGS, 1, 1)
-+VSX_MADD(xsnmaddsp, 1, float64, VsrD(0), NMADD_FLGS, 1, 1)
-+VSX_MADD(xsnmsubsp, 1, float64, VsrD(0), NMSUB_FLGS, 1, 1)
-+
-+VSX_MADD(xvmadddp, 2, float64, VsrD(i), MADD_FLGS, 0, 0)
-+VSX_MADD(xvmsubdp, 2, float64, VsrD(i), MSUB_FLGS, 0, 0)
-+VSX_MADD(xvnmadddp, 2, float64, VsrD(i), NMADD_FLGS, 0, 0)
-+VSX_MADD(xvnmsubdp, 2, float64, VsrD(i), NMSUB_FLGS, 0, 0)
-+
-+VSX_MADD(xvmaddsp, 4, float32, VsrW(i), MADD_FLGS, 0, 0)
-+VSX_MADD(xvmsubsp, 4, float32, VsrW(i), MSUB_FLGS, 0, 0)
-+VSX_MADD(xvnmaddsp, 4, float32, VsrW(i), NMADD_FLGS, 0, 0)
-+VSX_MADD(xvnmsubsp, 4, float32, VsrW(i), NMSUB_FLGS, 0, 0)
- 
- /*
-  * VSX_SCALAR_CMP_DP - VSX scalar floating point compare double precision
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 3d5150a524..380c9b1e2a 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -377,14 +377,10 @@ DEF_HELPER_3(xssqrtdp, void, env, vsr, vsr)
- DEF_HELPER_3(xsrsqrtedp, void, env, vsr, vsr)
- DEF_HELPER_4(xstdivdp, void, env, i32, vsr, vsr)
- DEF_HELPER_3(xstsqrtdp, void, env, i32, vsr)
--DEF_HELPER_4(xsmaddadp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xsmaddmdp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xsmsubadp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xsmsubmdp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xsnmaddadp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xsnmaddmdp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xsnmsubadp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xsnmsubmdp, void, env, vsr, vsr, vsr)
-+DEF_HELPER_5(xsmadddp, void, env, vsr, vsr, vsr, vsr)
-+DEF_HELPER_5(xsmsubdp, void, env, vsr, vsr, vsr, vsr)
-+DEF_HELPER_5(xsnmadddp, void, env, vsr, vsr, vsr, vsr)
-+DEF_HELPER_5(xsnmsubdp, void, env, vsr, vsr, vsr, vsr)
- DEF_HELPER_4(xscmpeqdp, void, env, vsr, vsr, vsr)
- DEF_HELPER_4(xscmpgtdp, void, env, vsr, vsr, vsr)
- DEF_HELPER_4(xscmpgedp, void, env, vsr, vsr, vsr)
-@@ -444,14 +440,10 @@ DEF_HELPER_3(xsresp, void, env, vsr, vsr)
- DEF_HELPER_2(xsrsp, i64, env, i64)
- DEF_HELPER_3(xssqrtsp, void, env, vsr, vsr)
- DEF_HELPER_3(xsrsqrtesp, void, env, vsr, vsr)
--DEF_HELPER_4(xsmaddasp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xsmaddmsp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xsmsubasp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xsmsubmsp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xsnmaddasp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xsnmaddmsp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xsnmsubasp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xsnmsubmsp, void, env, vsr, vsr, vsr)
-+DEF_HELPER_5(xsmaddsp, void, env, vsr, vsr, vsr, vsr)
-+DEF_HELPER_5(xsmsubsp, void, env, vsr, vsr, vsr, vsr)
-+DEF_HELPER_5(xsnmaddsp, void, env, vsr, vsr, vsr, vsr)
-+DEF_HELPER_5(xsnmsubsp, void, env, vsr, vsr, vsr, vsr)
- 
- DEF_HELPER_4(xvadddp, void, env, vsr, vsr, vsr)
- DEF_HELPER_4(xvsubdp, void, env, vsr, vsr, vsr)
-@@ -462,14 +454,10 @@ DEF_HELPER_3(xvsqrtdp, void, env, vsr, vsr)
- DEF_HELPER_3(xvrsqrtedp, void, env, vsr, vsr)
- DEF_HELPER_4(xvtdivdp, void, env, i32, vsr, vsr)
- DEF_HELPER_3(xvtsqrtdp, void, env, i32, vsr)
--DEF_HELPER_4(xvmaddadp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xvmaddmdp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xvmsubadp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xvmsubmdp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xvnmaddadp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xvnmaddmdp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xvnmsubadp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xvnmsubmdp, void, env, vsr, vsr, vsr)
-+DEF_HELPER_5(xvmadddp, void, env, vsr, vsr, vsr, vsr)
-+DEF_HELPER_5(xvmsubdp, void, env, vsr, vsr, vsr, vsr)
-+DEF_HELPER_5(xvnmadddp, void, env, vsr, vsr, vsr, vsr)
-+DEF_HELPER_5(xvnmsubdp, void, env, vsr, vsr, vsr, vsr)
- DEF_HELPER_4(xvmaxdp, void, env, vsr, vsr, vsr)
- DEF_HELPER_4(xvmindp, void, env, vsr, vsr, vsr)
- DEF_HELPER_FLAGS_4(xvcmpeqdp, TCG_CALL_NO_RWG, i32, env, vsr, vsr, vsr)
-@@ -500,14 +488,10 @@ DEF_HELPER_3(xvsqrtsp, void, env, vsr, vsr)
- DEF_HELPER_3(xvrsqrtesp, void, env, vsr, vsr)
- DEF_HELPER_4(xvtdivsp, void, env, i32, vsr, vsr)
- DEF_HELPER_3(xvtsqrtsp, void, env, i32, vsr)
--DEF_HELPER_4(xvmaddasp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xvmaddmsp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xvmsubasp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xvmsubmsp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xvnmaddasp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xvnmaddmsp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xvnmsubasp, void, env, vsr, vsr, vsr)
--DEF_HELPER_4(xvnmsubmsp, void, env, vsr, vsr, vsr)
-+DEF_HELPER_5(xvmaddsp, void, env, vsr, vsr, vsr, vsr)
-+DEF_HELPER_5(xvmsubsp, void, env, vsr, vsr, vsr, vsr)
-+DEF_HELPER_5(xvnmaddsp, void, env, vsr, vsr, vsr, vsr)
-+DEF_HELPER_5(xvnmsubsp, void, env, vsr, vsr, vsr, vsr)
- DEF_HELPER_4(xvmaxsp, void, env, vsr, vsr, vsr)
- DEF_HELPER_4(xvminsp, void, env, vsr, vsr, vsr)
- DEF_HELPER_FLAGS_4(xvcmpeqsp, TCG_CALL_NO_RWG, i32, env, vsr, vsr, vsr)
-diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
-index 7a4b7cb8f9..3922686ad6 100644
---- a/target/ppc/translate/vsx-impl.inc.c
-+++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -1182,14 +1182,6 @@ GEN_VSX_HELPER_X2(xssqrtdp, 0x16, 0x04, 0, PPC2_VSX)
- GEN_VSX_HELPER_X2(xsrsqrtedp, 0x14, 0x04, 0, PPC2_VSX)
- GEN_VSX_HELPER_X2_AB(xstdivdp, 0x14, 0x07, 0, PPC2_VSX)
- GEN_VSX_HELPER_X1(xstsqrtdp, 0x14, 0x06, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xsmaddadp, 0x04, 0x04, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xsmaddmdp, 0x04, 0x05, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xsmsubadp, 0x04, 0x06, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xsmsubmdp, 0x04, 0x07, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xsnmaddadp, 0x04, 0x14, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xsnmaddmdp, 0x04, 0x15, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xsnmsubadp, 0x04, 0x16, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xsnmsubmdp, 0x04, 0x17, 0, PPC2_VSX)
- GEN_VSX_HELPER_X3(xscmpeqdp, 0x0C, 0x00, 0, PPC2_ISA300)
- GEN_VSX_HELPER_X3(xscmpgtdp, 0x0C, 0x01, 0, PPC2_ISA300)
- GEN_VSX_HELPER_X3(xscmpgedp, 0x0C, 0x02, 0, PPC2_ISA300)
-@@ -1231,12 +1223,10 @@ GEN_VSX_HELPER_X2(xsrdpim, 0x12, 0x07, 0, PPC2_VSX)
- GEN_VSX_HELPER_X2(xsrdpip, 0x12, 0x06, 0, PPC2_VSX)
- GEN_VSX_HELPER_X2(xsrdpiz, 0x12, 0x05, 0, PPC2_VSX)
- GEN_VSX_HELPER_XT_XB_ENV(xsrsp, 0x12, 0x11, 0, PPC2_VSX207)
--
- GEN_VSX_HELPER_R2(xsrqpi, 0x05, 0x00, 0, PPC2_ISA300)
- GEN_VSX_HELPER_R2(xsrqpxp, 0x05, 0x01, 0, PPC2_ISA300)
- GEN_VSX_HELPER_R2(xssqrtqp, 0x04, 0x19, 0x1B, PPC2_ISA300)
- GEN_VSX_HELPER_R3(xssubqp, 0x04, 0x10, 0, PPC2_ISA300)
--
- GEN_VSX_HELPER_X3(xsaddsp, 0x00, 0x00, 0, PPC2_VSX207)
- GEN_VSX_HELPER_X3(xssubsp, 0x00, 0x01, 0, PPC2_VSX207)
- GEN_VSX_HELPER_X3(xsmulsp, 0x00, 0x02, 0, PPC2_VSX207)
-@@ -1244,14 +1234,6 @@ GEN_VSX_HELPER_X3(xsdivsp, 0x00, 0x03, 0, PPC2_VSX207)
- GEN_VSX_HELPER_X2(xsresp, 0x14, 0x01, 0, PPC2_VSX207)
- GEN_VSX_HELPER_X2(xssqrtsp, 0x16, 0x00, 0, PPC2_VSX207)
- GEN_VSX_HELPER_X2(xsrsqrtesp, 0x14, 0x00, 0, PPC2_VSX207)
--GEN_VSX_HELPER_X3(xsmaddasp, 0x04, 0x00, 0, PPC2_VSX207)
--GEN_VSX_HELPER_X3(xsmaddmsp, 0x04, 0x01, 0, PPC2_VSX207)
--GEN_VSX_HELPER_X3(xsmsubasp, 0x04, 0x02, 0, PPC2_VSX207)
--GEN_VSX_HELPER_X3(xsmsubmsp, 0x04, 0x03, 0, PPC2_VSX207)
--GEN_VSX_HELPER_X3(xsnmaddasp, 0x04, 0x10, 0, PPC2_VSX207)
--GEN_VSX_HELPER_X3(xsnmaddmsp, 0x04, 0x11, 0, PPC2_VSX207)
--GEN_VSX_HELPER_X3(xsnmsubasp, 0x04, 0x12, 0, PPC2_VSX207)
--GEN_VSX_HELPER_X3(xsnmsubmsp, 0x04, 0x13, 0, PPC2_VSX207)
- GEN_VSX_HELPER_X2(xscvsxdsp, 0x10, 0x13, 0, PPC2_VSX207)
- GEN_VSX_HELPER_X2(xscvuxdsp, 0x10, 0x12, 0, PPC2_VSX207)
- GEN_VSX_HELPER_X1(xststdcsp, 0x14, 0x12, 0, PPC2_ISA300)
-@@ -1267,14 +1249,6 @@ GEN_VSX_HELPER_X2(xvsqrtdp, 0x16, 0x0C, 0, PPC2_VSX)
- GEN_VSX_HELPER_X2(xvrsqrtedp, 0x14, 0x0C, 0, PPC2_VSX)
- GEN_VSX_HELPER_X2_AB(xvtdivdp, 0x14, 0x0F, 0, PPC2_VSX)
- GEN_VSX_HELPER_X1(xvtsqrtdp, 0x14, 0x0E, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xvmaddadp, 0x04, 0x0C, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xvmaddmdp, 0x04, 0x0D, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xvmsubadp, 0x04, 0x0E, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xvmsubmdp, 0x04, 0x0F, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xvnmaddadp, 0x04, 0x1C, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xvnmaddmdp, 0x04, 0x1D, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xvnmsubadp, 0x04, 0x1E, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xvnmsubmdp, 0x04, 0x1F, 0, PPC2_VSX)
- GEN_VSX_HELPER_X3(xvmaxdp, 0x00, 0x1C, 0, PPC2_VSX)
- GEN_VSX_HELPER_X3(xvmindp, 0x00, 0x1D, 0, PPC2_VSX)
- GEN_VSX_HELPER_X2(xvcvdpsp, 0x12, 0x18, 0, PPC2_VSX)
-@@ -1301,14 +1275,6 @@ GEN_VSX_HELPER_X2(xvsqrtsp, 0x16, 0x08, 0, PPC2_VSX)
- GEN_VSX_HELPER_X2(xvrsqrtesp, 0x14, 0x08, 0, PPC2_VSX)
- GEN_VSX_HELPER_X2_AB(xvtdivsp, 0x14, 0x0B, 0, PPC2_VSX)
- GEN_VSX_HELPER_X1(xvtsqrtsp, 0x14, 0x0A, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xvmaddasp, 0x04, 0x08, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xvmaddmsp, 0x04, 0x09, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xvmsubasp, 0x04, 0x0A, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xvmsubmsp, 0x04, 0x0B, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xvnmaddasp, 0x04, 0x18, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xvnmaddmsp, 0x04, 0x19, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xvnmsubasp, 0x04, 0x1A, 0, PPC2_VSX)
--GEN_VSX_HELPER_X3(xvnmsubmsp, 0x04, 0x1B, 0, PPC2_VSX)
- GEN_VSX_HELPER_X3(xvmaxsp, 0x00, 0x18, 0, PPC2_VSX)
- GEN_VSX_HELPER_X3(xvminsp, 0x00, 0x19, 0, PPC2_VSX)
- GEN_VSX_HELPER_X2(xvcvspdp, 0x12, 0x1C, 0, PPC2_VSX)
-@@ -1332,6 +1298,53 @@ GEN_VSX_HELPER_2(xvtstdcdp, 0x14, 0x1E, 0, PPC2_VSX)
- GEN_VSX_HELPER_X3(xxperm, 0x08, 0x03, 0, PPC2_ISA300)
- GEN_VSX_HELPER_X3(xxpermr, 0x08, 0x07, 0, PPC2_ISA300)
- 
-+#define GEN_VSX_HELPER_VSX_MADD(name, op1, aop, mop, inval, type)             \
-+static void gen_##name(DisasContext *ctx)                                     \
-+{                                                                             \
-+    TCGv_ptr xt, xa, b, c;                                                    \
-+    if (unlikely(!ctx->vsx_enabled)) {                                        \
-+        gen_exception(ctx, POWERPC_EXCP_VSXU);                                \
-+        return;                                                               \
-+    }                                                                         \
-+    xt = gen_vsr_ptr(xT(ctx->opcode));                                        \
-+    xa = gen_vsr_ptr(xA(ctx->opcode));                                        \
-+    if (ctx->opcode & PPC_BIT(25)) {                                          \
-+        /*                                                                    \
-+         * AxT + B                                                            \
-+         */                                                                   \
-+        b = gen_vsr_ptr(xT(ctx->opcode));                                     \
-+        c = gen_vsr_ptr(xB(ctx->opcode));                                     \
-+    } else {                                                                  \
-+        /*                                                                    \
-+         * AxB + T                                                            \
-+         */                                                                   \
-+        b = gen_vsr_ptr(xB(ctx->opcode));                                     \
-+        c = gen_vsr_ptr(xT(ctx->opcode));                                     \
-+    }                                                                         \
-+    gen_helper_##name(cpu_env, xt, xa, b, c);                                 \
-+    tcg_temp_free_ptr(xt);                                                    \
-+    tcg_temp_free_ptr(xa);                                                    \
-+    tcg_temp_free_ptr(b);                                                     \
-+    tcg_temp_free_ptr(c);                                                     \
-+}
-+
-+GEN_VSX_HELPER_VSX_MADD(xsmadddp, 0x04, 0x04, 0x05, 0, PPC2_VSX)
-+GEN_VSX_HELPER_VSX_MADD(xsmsubdp, 0x04, 0x06, 0x07, 0, PPC2_VSX)
-+GEN_VSX_HELPER_VSX_MADD(xsnmadddp, 0x04, 0x14, 0x15, 0, PPC2_VSX)
-+GEN_VSX_HELPER_VSX_MADD(xsnmsubdp, 0x04, 0x16, 0x17, 0, PPC2_VSX)
-+GEN_VSX_HELPER_VSX_MADD(xsmaddsp, 0x04, 0x00, 0x01, 0, PPC2_VSX207)
-+GEN_VSX_HELPER_VSX_MADD(xsmsubsp, 0x04, 0x02, 0x03, 0, PPC2_VSX207)
-+GEN_VSX_HELPER_VSX_MADD(xsnmaddsp, 0x04, 0x10, 0x11, 0, PPC2_VSX207)
-+GEN_VSX_HELPER_VSX_MADD(xsnmsubsp, 0x04, 0x12, 0x13, 0, PPC2_VSX207)
-+GEN_VSX_HELPER_VSX_MADD(xvmadddp, 0x04, 0x0C, 0x0D, 0, PPC2_VSX)
-+GEN_VSX_HELPER_VSX_MADD(xvmsubdp, 0x04, 0x0E, 0x0F, 0, PPC2_VSX)
-+GEN_VSX_HELPER_VSX_MADD(xvnmadddp, 0x04, 0x1C, 0x1D, 0, PPC2_VSX)
-+GEN_VSX_HELPER_VSX_MADD(xvnmsubdp, 0x04, 0x1E, 0x1F, 0, PPC2_VSX)
-+GEN_VSX_HELPER_VSX_MADD(xvmaddsp, 0x04, 0x08, 0x09, 0, PPC2_VSX)
-+GEN_VSX_HELPER_VSX_MADD(xvmsubsp, 0x04, 0x0A, 0x0B, 0, PPC2_VSX)
-+GEN_VSX_HELPER_VSX_MADD(xvnmaddsp, 0x04, 0x18, 0x19, 0, PPC2_VSX)
-+GEN_VSX_HELPER_VSX_MADD(xvnmsubsp, 0x04, 0x1A, 0x1B, 0, PPC2_VSX)
-+
- static void gen_xxbrd(DisasContext *ctx)
- {
-     TCGv_i64 xth;
-diff --git a/target/ppc/translate/vsx-ops.inc.c b/target/ppc/translate/vsx-ops.inc.c
-index 5030c4aceb..7fd3942b84 100644
---- a/target/ppc/translate/vsx-ops.inc.c
-+++ b/target/ppc/translate/vsx-ops.inc.c
-@@ -63,6 +63,12 @@ GEN_HANDLER2_E(name, #name, 0x3C, opc2 | 1, opc3, 0, PPC_NONE, fl2), \
- GEN_HANDLER2_E(name, #name, 0x3C, opc2 | 2, opc3, 0, PPC_NONE, fl2), \
- GEN_HANDLER2_E(name, #name, 0x3C, opc2 | 3, opc3, 0, PPC_NONE, fl2)
- 
-+#define GEN_XX3FORM_NAME(name, opcname, opc2, opc3, fl2)               \
-+GEN_HANDLER2_E(name, opcname, 0x3C, opc2 | 0, opc3, 0, PPC_NONE, fl2), \
-+GEN_HANDLER2_E(name, opcname, 0x3C, opc2 | 1, opc3, 0, PPC_NONE, fl2), \
-+GEN_HANDLER2_E(name, opcname, 0x3C, opc2 | 2, opc3, 0, PPC_NONE, fl2), \
-+GEN_HANDLER2_E(name, opcname, 0x3C, opc2 | 3, opc3, 0, PPC_NONE, fl2)
-+
- #define GEN_XX2IFORM(name, opc2, opc3, fl2)                           \
- GEN_HANDLER2_E(name, #name, 0x3C, opc2 | 0, opc3, 1, PPC_NONE, fl2), \
- GEN_HANDLER2_E(name, #name, 0x3C, opc2 | 1, opc3, 1, PPC_NONE, fl2), \
-@@ -182,14 +188,14 @@ GEN_XX2FORM(xssqrtdp,  0x16, 0x04, PPC2_VSX),
- GEN_XX2FORM(xsrsqrtedp,  0x14, 0x04, PPC2_VSX),
- GEN_XX3FORM(xstdivdp,  0x14, 0x07, PPC2_VSX),
- GEN_XX2FORM(xstsqrtdp,  0x14, 0x06, PPC2_VSX),
--GEN_XX3FORM(xsmaddadp, 0x04, 0x04, PPC2_VSX),
--GEN_XX3FORM(xsmaddmdp, 0x04, 0x05, PPC2_VSX),
--GEN_XX3FORM(xsmsubadp, 0x04, 0x06, PPC2_VSX),
--GEN_XX3FORM(xsmsubmdp, 0x04, 0x07, PPC2_VSX),
--GEN_XX3FORM(xsnmaddadp, 0x04, 0x14, PPC2_VSX),
--GEN_XX3FORM(xsnmaddmdp, 0x04, 0x15, PPC2_VSX),
--GEN_XX3FORM(xsnmsubadp, 0x04, 0x16, PPC2_VSX),
--GEN_XX3FORM(xsnmsubmdp, 0x04, 0x17, PPC2_VSX),
-+GEN_XX3FORM_NAME(xsmadddp, "xsmaddadp", 0x04, 0x04, PPC2_VSX),
-+GEN_XX3FORM_NAME(xsmadddp, "xsmaddmdp", 0x04, 0x05, PPC2_VSX),
-+GEN_XX3FORM_NAME(xsmsubdp, "xsmsubadp", 0x04, 0x06, PPC2_VSX),
-+GEN_XX3FORM_NAME(xsmsubdp, "xsmsubmdp", 0x04, 0x07, PPC2_VSX),
-+GEN_XX3FORM_NAME(xsnmadddp, "xsnmaddadp", 0x04, 0x14, PPC2_VSX),
-+GEN_XX3FORM_NAME(xsnmadddp, "xsnmaddmdp", 0x04, 0x15, PPC2_VSX),
-+GEN_XX3FORM_NAME(xsnmsubdp, "xsnmsubadp", 0x04, 0x16, PPC2_VSX),
-+GEN_XX3FORM_NAME(xsnmsubdp, "xsnmsubmdp", 0x04, 0x17, PPC2_VSX),
- GEN_XX3FORM(xscmpeqdp, 0x0C, 0x00, PPC2_ISA300),
- GEN_XX3FORM(xscmpgtdp, 0x0C, 0x01, PPC2_ISA300),
- GEN_XX3FORM(xscmpgedp, 0x0C, 0x02, PPC2_ISA300),
-@@ -235,14 +241,14 @@ GEN_XX2FORM(xsresp,  0x14, 0x01, PPC2_VSX207),
- GEN_XX2FORM(xsrsp, 0x12, 0x11, PPC2_VSX207),
- GEN_XX2FORM(xssqrtsp,  0x16, 0x00, PPC2_VSX207),
- GEN_XX2FORM(xsrsqrtesp,  0x14, 0x00, PPC2_VSX207),
--GEN_XX3FORM(xsmaddasp, 0x04, 0x00, PPC2_VSX207),
--GEN_XX3FORM(xsmaddmsp, 0x04, 0x01, PPC2_VSX207),
--GEN_XX3FORM(xsmsubasp, 0x04, 0x02, PPC2_VSX207),
--GEN_XX3FORM(xsmsubmsp, 0x04, 0x03, PPC2_VSX207),
--GEN_XX3FORM(xsnmaddasp, 0x04, 0x10, PPC2_VSX207),
--GEN_XX3FORM(xsnmaddmsp, 0x04, 0x11, PPC2_VSX207),
--GEN_XX3FORM(xsnmsubasp, 0x04, 0x12, PPC2_VSX207),
--GEN_XX3FORM(xsnmsubmsp, 0x04, 0x13, PPC2_VSX207),
-+GEN_XX3FORM_NAME(xsmaddsp, "xsmaddasp", 0x04, 0x00, PPC2_VSX207),
-+GEN_XX3FORM_NAME(xsmaddsp, "xsmaddmsp", 0x04, 0x01, PPC2_VSX207),
-+GEN_XX3FORM_NAME(xsmsubsp, "xsmsubasp", 0x04, 0x02, PPC2_VSX207),
-+GEN_XX3FORM_NAME(xsmsubsp, "xsmsubmsp", 0x04, 0x03, PPC2_VSX207),
-+GEN_XX3FORM_NAME(xsnmaddsp, "xsnmaddasp", 0x04, 0x10, PPC2_VSX207),
-+GEN_XX3FORM_NAME(xsnmaddsp, "xsnmaddmsp", 0x04, 0x11, PPC2_VSX207),
-+GEN_XX3FORM_NAME(xsnmsubsp, "xsnmsubasp", 0x04, 0x12, PPC2_VSX207),
-+GEN_XX3FORM_NAME(xsnmsubsp, "xsnmsubmsp", 0x04, 0x13, PPC2_VSX207),
- GEN_XX2FORM(xscvsxdsp, 0x10, 0x13, PPC2_VSX207),
- GEN_XX2FORM(xscvuxdsp, 0x10, 0x12, PPC2_VSX207),
- 
-@@ -255,14 +261,14 @@ GEN_XX2FORM(xvsqrtdp,  0x16, 0x0C, PPC2_VSX),
- GEN_XX2FORM(xvrsqrtedp,  0x14, 0x0C, PPC2_VSX),
- GEN_XX3FORM(xvtdivdp, 0x14, 0x0F, PPC2_VSX),
- GEN_XX2FORM(xvtsqrtdp, 0x14, 0x0E, PPC2_VSX),
--GEN_XX3FORM(xvmaddadp, 0x04, 0x0C, PPC2_VSX),
--GEN_XX3FORM(xvmaddmdp, 0x04, 0x0D, PPC2_VSX),
--GEN_XX3FORM(xvmsubadp, 0x04, 0x0E, PPC2_VSX),
--GEN_XX3FORM(xvmsubmdp, 0x04, 0x0F, PPC2_VSX),
--GEN_XX3FORM(xvnmaddadp, 0x04, 0x1C, PPC2_VSX),
--GEN_XX3FORM(xvnmaddmdp, 0x04, 0x1D, PPC2_VSX),
--GEN_XX3FORM(xvnmsubadp, 0x04, 0x1E, PPC2_VSX),
--GEN_XX3FORM(xvnmsubmdp, 0x04, 0x1F, PPC2_VSX),
-+GEN_XX3FORM_NAME(xvmadddp, "xvmaddadp", 0x04, 0x0C, PPC2_VSX),
-+GEN_XX3FORM_NAME(xvmadddp, "xvmaddmdp", 0x04, 0x0D, PPC2_VSX),
-+GEN_XX3FORM_NAME(xvmsubdp, "xvmsubadp", 0x04, 0x0E, PPC2_VSX),
-+GEN_XX3FORM_NAME(xvmsubdp, "xvmsubmdp", 0x04, 0x0F, PPC2_VSX),
-+GEN_XX3FORM_NAME(xvnmadddp, "xvnmaddadp", 0x04, 0x1C, PPC2_VSX),
-+GEN_XX3FORM_NAME(xvnmadddp, "xvnmaddmdp", 0x04, 0x1D, PPC2_VSX),
-+GEN_XX3FORM_NAME(xvnmsubdp, "xvnmsubadp", 0x04, 0x1E, PPC2_VSX),
-+GEN_XX3FORM_NAME(xvnmsubdp, "xvnmsubmdp", 0x04, 0x1F, PPC2_VSX),
- GEN_XX3FORM(xvmaxdp, 0x00, 0x1C, PPC2_VSX),
- GEN_XX3FORM(xvmindp, 0x00, 0x1D, PPC2_VSX),
- GEN_XX3_RC_FORM(xvcmpeqdp, 0x0C, 0x0C, PPC2_VSX),
-@@ -293,14 +299,14 @@ GEN_XX2FORM(xvsqrtsp, 0x16, 0x08, PPC2_VSX),
- GEN_XX2FORM(xvrsqrtesp, 0x14, 0x08, PPC2_VSX),
- GEN_XX3FORM(xvtdivsp, 0x14, 0x0B, PPC2_VSX),
- GEN_XX2FORM(xvtsqrtsp, 0x14, 0x0A, PPC2_VSX),
--GEN_XX3FORM(xvmaddasp, 0x04, 0x08, PPC2_VSX),
--GEN_XX3FORM(xvmaddmsp, 0x04, 0x09, PPC2_VSX),
--GEN_XX3FORM(xvmsubasp, 0x04, 0x0A, PPC2_VSX),
--GEN_XX3FORM(xvmsubmsp, 0x04, 0x0B, PPC2_VSX),
--GEN_XX3FORM(xvnmaddasp, 0x04, 0x18, PPC2_VSX),
--GEN_XX3FORM(xvnmaddmsp, 0x04, 0x19, PPC2_VSX),
--GEN_XX3FORM(xvnmsubasp, 0x04, 0x1A, PPC2_VSX),
--GEN_XX3FORM(xvnmsubmsp, 0x04, 0x1B, PPC2_VSX),
-+GEN_XX3FORM_NAME(xvmaddsp, "xvmaddasp", 0x04, 0x08, PPC2_VSX),
-+GEN_XX3FORM_NAME(xvmaddsp, "xvmaddmsp", 0x04, 0x09, PPC2_VSX),
-+GEN_XX3FORM_NAME(xvmsubsp, "xvmsubasp", 0x04, 0x0A, PPC2_VSX),
-+GEN_XX3FORM_NAME(xvmsubsp, "xvmsubmsp", 0x04, 0x0B, PPC2_VSX),
-+GEN_XX3FORM_NAME(xvnmaddsp, "xvnmaddasp", 0x04, 0x18, PPC2_VSX),
-+GEN_XX3FORM_NAME(xvnmaddsp, "xvnmaddmsp", 0x04, 0x19, PPC2_VSX),
-+GEN_XX3FORM_NAME(xvnmsubsp, "xvnmsubasp", 0x04, 0x1A, PPC2_VSX),
-+GEN_XX3FORM_NAME(xvnmsubsp, "xvnmsubmsp", 0x04, 0x1B, PPC2_VSX),
- GEN_XX3FORM(xvmaxsp, 0x00, 0x18, PPC2_VSX),
- GEN_XX3FORM(xvminsp, 0x00, 0x19, PPC2_VSX),
- GEN_XX3_RC_FORM(xvcmpeqsp, 0x0C, 0x08, PPC2_VSX),
--- 
-2.11.0
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYxNjEyMzc1MS43ODEt
+MS1tYXJrLmNhdmUtYXlsYW5kQGlsYW5kZS5jby51ay8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
+cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
+cgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwMC8x
+NV0gdGFyZ2V0L3BwYzogcmVtb3ZlIGdldFZTUigpL3B1dFZTUigpIGFuZCBmdXJ0aGVyIHRpZHkt
+dXAKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwNjE2MTIzNzUxLjc4MS0xLW1hcmsuY2F2
+ZS1heWxhbmRAaWxhbmRlLmNvLnVrCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
+YXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAt
+LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
+IFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3Njcmlw
+dHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
+PQoKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0
+YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDYxNjEyMzc1MS43ODEtMS1tYXJrLmNhdmUt
+YXlsYW5kQGlsYW5kZS5jby51ayAtPiBwYXRjaGV3LzIwMTkwNjE2MTIzNzUxLjc4MS0xLW1hcmsu
+Y2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
+Y2YyMTVmMDIxMSB0YXJnZXQvcHBjOiBpbXByb3ZlIFZTWF9GTUFERCB3aXRoIG5ldyBHRU5fVlNY
+X0hFTFBFUl9WU1hfTUFERCBtYWNybwo2MTgxYzA3MmMwIHRhcmdldC9wcGM6IGRlY29kZSB0YXJn
+ZXQgcmVnaXN0ZXIgaW4gVlNYX0VYVFJBQ1RfSU5TRVJUIGF0IHRyYW5zbGF0aW9uIHRpbWUKMTcy
+YmRjNGUyOSB0YXJnZXQvcHBjOiBkZWNvZGUgdGFyZ2V0IHJlZ2lzdGVyIGluIFZTWF9WRUNUT1Jf
+TE9BRF9TVE9SRV9MRU5HVEggYXQgdHJhbnNsYXRpb24gdGltZQoxNGNhMmVlZGZmIHRhcmdldC9w
+cGM6IGludHJvZHVjZSBHRU5fVlNYX0hFTFBFUl9SMl9BQiBtYWNybyB0byBmcHVfaGVscGVyLmMK
+ZTJjNDRmMDc5OSB0YXJnZXQvcHBjOiBpbnRyb2R1Y2UgR0VOX1ZTWF9IRUxQRVJfUjIgbWFjcm8g
+dG8gZnB1X2hlbHBlci5jCjJmNzllZDlhOWEgdGFyZ2V0L3BwYzogaW50cm9kdWNlIEdFTl9WU1hf
+SEVMUEVSX1IzIG1hY3JvIHRvIGZwdV9oZWxwZXIuYwoxN2FiZGNiNDg5IHRhcmdldC9wcGM6IGlu
+dHJvZHVjZSBHRU5fVlNYX0hFTFBFUl9YMSBtYWNybyB0byBmcHVfaGVscGVyLmMKMjA5MDI1ODYy
+NCB0YXJnZXQvcHBjOiBpbnRyb2R1Y2UgR0VOX1ZTWF9IRUxQRVJfWDJfQUIgbWFjcm8gdG8gZnB1
+X2hlbHBlci5jCjAxOTU4Njk0NDAgdGFyZ2V0L3BwYzogaW50cm9kdWNlIEdFTl9WU1hfSEVMUEVS
+X1gyIG1hY3JvIHRvIGZwdV9oZWxwZXIuYwpkYWNmNjUwZjYyIHRhcmdldC9wcGM6IGludHJvZHVj
+ZSBzZXBhcmF0ZSBnZW5lcmF0b3IgYW5kIGhlbHBlciBmb3IgeHNjdnFwZHAKODI3NGQxZGRkMyB0
+YXJnZXQvcHBjOiBpbnRyb2R1Y2UgR0VOX1ZTWF9IRUxQRVJfWDMgbWFjcm8gdG8gZnB1X2hlbHBl
+ci5jCjI1NjA1ZjJjYjYgdGFyZ2V0L3BwYzogaW50cm9kdWNlIHNlcGFyYXRlIFZTWF9DTVAgbWFj
+cm8gZm9yIHh2Y21wKiBpbnN0cnVjdGlvbnMKYjg3NzgzYWRlMyB0YXJnZXQvcHBjOiByZW1vdmUg
+Z2V0VlNSKCkvcHV0VlNSKCkgZnJvbSBpbnRfaGVscGVyLmMKMjdmODViYTdmNyB0YXJnZXQvcHBj
+OiByZW1vdmUgZ2V0VlNSKCkvcHV0VlNSKCkgZnJvbSBtZW1faGVscGVyLmMKYzExY2YyNDY3ZCB0
+YXJnZXQvcHBjOiByZW1vdmUgZ2V0VlNSKCkvcHV0VlNSKCkgZnJvbSBmcHVfaGVscGVyLmMKCj09
+PSBPVVRQVVQgQkVHSU4gPT09CjEvMTUgQ2hlY2tpbmcgY29tbWl0IGMxMWNmMjQ2N2QzMyAodGFy
+Z2V0L3BwYzogcmVtb3ZlIGdldFZTUigpL3B1dFZTUigpIGZyb20gZnB1X2hlbHBlci5jKQoyLzE1
+IENoZWNraW5nIGNvbW1pdCAyN2Y4NWJhN2Y3Y2UgKHRhcmdldC9wcGM6IHJlbW92ZSBnZXRWU1Io
+KS9wdXRWU1IoKSBmcm9tIG1lbV9oZWxwZXIuYykKMy8xNSBDaGVja2luZyBjb21taXQgYjg3Nzgz
+YWRlM2Y3ICh0YXJnZXQvcHBjOiByZW1vdmUgZ2V0VlNSKCkvcHV0VlNSKCkgZnJvbSBpbnRfaGVs
+cGVyLmMpCjQvMTUgQ2hlY2tpbmcgY29tbWl0IDI1NjA1ZjJjYjZhZiAodGFyZ2V0L3BwYzogaW50
+cm9kdWNlIHNlcGFyYXRlIFZTWF9DTVAgbWFjcm8gZm9yIHh2Y21wKiBpbnN0cnVjdGlvbnMpCjUv
+MTUgQ2hlY2tpbmcgY29tbWl0IDgyNzRkMWRkZDM3ZiAodGFyZ2V0L3BwYzogaW50cm9kdWNlIEdF
+Tl9WU1hfSEVMUEVSX1gzIG1hY3JvIHRvIGZwdV9oZWxwZXIuYykKNi8xNSBDaGVja2luZyBjb21t
+aXQgZGFjZjY1MGY2MmUyICh0YXJnZXQvcHBjOiBpbnRyb2R1Y2Ugc2VwYXJhdGUgZ2VuZXJhdG9y
+IGFuZCBoZWxwZXIgZm9yIHhzY3ZxcGRwKQo3LzE1IENoZWNraW5nIGNvbW1pdCAwMTk1ODY5NDQw
+ZGIgKHRhcmdldC9wcGM6IGludHJvZHVjZSBHRU5fVlNYX0hFTFBFUl9YMiBtYWNybyB0byBmcHVf
+aGVscGVyLmMpCjgvMTUgQ2hlY2tpbmcgY29tbWl0IDIwOTAyNTg2MjQwMSAodGFyZ2V0L3BwYzog
+aW50cm9kdWNlIEdFTl9WU1hfSEVMUEVSX1gyX0FCIG1hY3JvIHRvIGZwdV9oZWxwZXIuYykKOS8x
+NSBDaGVja2luZyBjb21taXQgMTdhYmRjYjQ4OTM1ICh0YXJnZXQvcHBjOiBpbnRyb2R1Y2UgR0VO
+X1ZTWF9IRUxQRVJfWDEgbWFjcm8gdG8gZnB1X2hlbHBlci5jKQoxMC8xNSBDaGVja2luZyBjb21t
+aXQgMmY3OWVkOWE5YWZmICh0YXJnZXQvcHBjOiBpbnRyb2R1Y2UgR0VOX1ZTWF9IRUxQRVJfUjMg
+bWFjcm8gdG8gZnB1X2hlbHBlci5jKQoxMS8xNSBDaGVja2luZyBjb21taXQgZTJjNDRmMDc5OTI4
+ICh0YXJnZXQvcHBjOiBpbnRyb2R1Y2UgR0VOX1ZTWF9IRUxQRVJfUjIgbWFjcm8gdG8gZnB1X2hl
+bHBlci5jKQoxMi8xNSBDaGVja2luZyBjb21taXQgMTRjYTJlZWRmZjljICh0YXJnZXQvcHBjOiBp
+bnRyb2R1Y2UgR0VOX1ZTWF9IRUxQRVJfUjJfQUIgbWFjcm8gdG8gZnB1X2hlbHBlci5jKQoxMy8x
+NSBDaGVja2luZyBjb21taXQgMTcyYmRjNGUyOTUyICh0YXJnZXQvcHBjOiBkZWNvZGUgdGFyZ2V0
+IHJlZ2lzdGVyIGluIFZTWF9WRUNUT1JfTE9BRF9TVE9SRV9MRU5HVEggYXQgdHJhbnNsYXRpb24g
+dGltZSkKMTQvMTUgQ2hlY2tpbmcgY29tbWl0IDYxODFjMDcyYzAwOSAodGFyZ2V0L3BwYzogZGVj
+b2RlIHRhcmdldCByZWdpc3RlciBpbiBWU1hfRVhUUkFDVF9JTlNFUlQgYXQgdHJhbnNsYXRpb24g
+dGltZSkKMTUvMTUgQ2hlY2tpbmcgY29tbWl0IGNmMjE1ZjAyMTFmMiAodGFyZ2V0L3BwYzogaW1w
+cm92ZSBWU1hfRk1BREQgd2l0aCBuZXcgR0VOX1ZTWF9IRUxQRVJfVlNYX01BREQgbWFjcm8pCldB
+Uk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5l
+CiMyNzk6IEZJTEU6IHRhcmdldC9wcGMvdHJhbnNsYXRlL3ZzeC1pbXBsLmluYy5jOjEzMTI6Cisg
+ICAgICAgIC8qICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBcCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFk
+aW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMjg1OiBGSUxFOiB0YXJnZXQvcHBjL3RyYW5zbGF0
+ZS92c3gtaW1wbC5pbmMuYzoxMzE4OgorICAgICAgICAvKiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAoKRVJST1I6IE1h
+Y3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNp
+cwojMzI2OiBGSUxFOiB0YXJnZXQvcHBjL3RyYW5zbGF0ZS92c3gtb3BzLmluYy5jOjY2OgorI2Rl
+ZmluZSBHRU5fWFgzRk9STV9OQU1FKG5hbWUsIG9wY25hbWUsIG9wYzIsIG9wYzMsIGZsMikgICAg
+ICAgICAgICAgICBcCitHRU5fSEFORExFUjJfRShuYW1lLCBvcGNuYW1lLCAweDNDLCBvcGMyIHwg
+MCwgb3BjMywgMCwgUFBDX05PTkUsIGZsMiksIFwKK0dFTl9IQU5ETEVSMl9FKG5hbWUsIG9wY25h
+bWUsIDB4M0MsIG9wYzIgfCAxLCBvcGMzLCAwLCBQUENfTk9ORSwgZmwyKSwgXAorR0VOX0hBTkRM
+RVIyX0UobmFtZSwgb3BjbmFtZSwgMHgzQywgb3BjMiB8IDIsIG9wYzMsIDAsIFBQQ19OT05FLCBm
+bDIpLCBcCitHRU5fSEFORExFUjJfRShuYW1lLCBvcGNuYW1lLCAweDNDLCBvcGMyIHwgMywgb3Bj
+MywgMCwgUFBDX05PTkUsIGZsMikKCnRvdGFsOiAxIGVycm9ycywgMiB3YXJuaW5ncywgMzc3IGxp
+bmVzIGNoZWNrZWQKClBhdGNoIDE1LzE1IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
+dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
+bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0g
+T1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1
+bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDYxNjEy
+Mzc1MS43ODEtMS1tYXJrLmNhdmUtYXlsYW5kQGlsYW5kZS5jby51ay90ZXN0aW5nLmNoZWNrcGF0
+Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
+dGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
+byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
 
