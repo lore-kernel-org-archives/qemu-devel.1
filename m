@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92545C31E49
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 07:59:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CD57C31E49
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 08:02:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6177D216C8
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 07:59:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6177D216C8
+	by mail.kernel.org (Postfix) with ESMTPS id 1AA4720861
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 08:02:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AA4720861
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37998 helo=lists.gnu.org)
+Received: from localhost ([::1]:38026 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcQ4M-0007As-H8
-	for qemu-devel@archiver.kernel.org; Sun, 16 Jun 2019 03:59:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53573)
+	id 1hcQ7s-0000Tf-EL
+	for qemu-devel@archiver.kernel.org; Sun, 16 Jun 2019 04:02:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54241)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hcQ32-0006eF-Rn
- for qemu-devel@nongnu.org; Sun, 16 Jun 2019 03:57:57 -0400
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hcQ6O-0008NM-HP
+ for qemu-devel@nongnu.org; Sun, 16 Jun 2019 04:01:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hcQ31-000615-Ve
- for qemu-devel@nongnu.org; Sun, 16 Jun 2019 03:57:56 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:46122
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hcQ6M-0000XY-KV
+ for qemu-devel@nongnu.org; Sun, 16 Jun 2019 04:01:24 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:46140
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1hcQ2z-0005x3-SZ; Sun, 16 Jun 2019 03:57:54 -0400
+ id 1hcQ6K-0000VK-CQ; Sun, 16 Jun 2019 04:01:20 -0400
 Received: from host86-173-229-95.range86-173.btcentralplus.com
  ([86.173.229.95] helo=[192.168.1.65])
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1hcQ2e-00012P-OA; Sun, 16 Jun 2019 08:57:32 +0100
+ id 1hcQ5z-00013Y-Ti; Sun, 16 Jun 2019 09:01:00 +0100
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
  qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net,
  gkurz@kaod.org
 References: <20190602110903.3431-1-mark.cave-ayland@ilande.co.uk>
- <20190602110903.3431-3-mark.cave-ayland@ilande.co.uk>
- <69cdfc94-c56f-1e72-8b84-311e2a820087@linaro.org>
+ <20190602110903.3431-2-mark.cave-ayland@ilande.co.uk>
+ <18b9c331-d61a-8cfb-1c12-56a7d818bf1e@linaro.org>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
@@ -71,12 +71,12 @@ Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
  Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
  KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
  imgcU9TTGC5qd9g=
-Message-ID: <271bf14e-2e03-3f62-1460-ef3c516ce649@ilande.co.uk>
-Date: Sun, 16 Jun 2019 08:57:44 +0100
+Message-ID: <204ea47c-8d2d-f92a-742a-a5667aef496b@ilande.co.uk>
+Date: Sun, 16 Jun 2019 09:01:11 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.1
 MIME-Version: 1.0
-In-Reply-To: <69cdfc94-c56f-1e72-8b84-311e2a820087@linaro.org>
+In-Reply-To: <18b9c331-d61a-8cfb-1c12-56a7d818bf1e@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
@@ -86,8 +86,8 @@ X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH v2 02/15] target/ppc: remove
- getVSR()/putVSR() from mem_helper.c
+Subject: Re: [Qemu-devel] [PATCH v2 01/15] target/ppc: remove
+ getVSR()/putVSR() from fpu_helper.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,35 +103,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/06/2019 20:47, Richard Henderson wrote:
+On 12/06/2019 20:45, Richard Henderson wrote:
 
 > On 6/2/19 4:08 AM, Mark Cave-Ayland wrote:
->> -    getVSR(xt_num, &xt, env);                                     \
->> +                                                                  \
->>      nb = (nb >= 16) ? 16 : nb;                                    \
->>      if (msr_le && !lj) {                                          \
->>          for (i = 16; i > 16 - nb; i--) {                          \
->> -            cpu_stb_data_ra(env, addr, xt.VsrB(i - 1), GETPC());  \
->> +            cpu_stb_data_ra(env, addr, t.VsrB(i - 1), GETPC());   \
->>              addr = addr_add(env, addr, 1);                        \
->>          }                                                         \
->>      } else {                                                      \
->>          for (i = 0; i < nb; i++) {                                \
->> -            cpu_stb_data_ra(env, addr, xt.VsrB(i), GETPC());      \
->> +            cpu_stb_data_ra(env, addr, t.VsrB(i), GETPC())  ;     \
->>              addr = addr_add(env, addr, 1);                        \
->>          }                                                         \
->>      }                                                             \
->> +    *xt = t;                                                      \
+>>  void helper_xvxsigsp(CPUPPCState *env, uint32_t opcode)
+>>  {
+>> -    ppc_vsr_t xt, xb;
+>> +    ppc_vsr_t *xt = &env->vsr[xT(opcode)];
+>> +    ppc_vsr_t *xb = &env->vsr[xB(opcode)];
+>> +    ppc_vsr_t t = *xt;
+>>      uint32_t exp, i, fraction;
+>>  
+>> -    getVSR(xB(opcode), &xb, env);
+>> -    memset(&xt, 0, sizeof(xt));
 > 
-> Do not write back stores.
+> Change in behaviour -- zero init to copy init.
+> 
+> Note for future cleanup: most of these initializations do not need to happen,
+> because we overwrite all elements of T without consuming the previous value.
+> 
+> 
+>> @@ -3410,23 +3382,22 @@ void helper_xsrqpi(CPUPPCState *env, uint32_t opcode)
+>>          env->fp_status.float_exception_flags &= ~float_flag_inexact;
+>>      }
+>>  
+>> -    helper_compute_fprf_float128(env, xt.f128);
+>> +    helper_compute_fprf_float128(env, t.f128);
+>> +    *xt = t;
+>>      do_float_check_status(env, GETPC());
+>> -    putVSR(rD(opcode) + 32, &xt, env);
+> 
+> Change in behaviour -- writeback happens before do_float_check_status instead
+> of after.  This may well be a bug fix, but if so should happen separately.
 
-Yeah, my mistake - David also managed to spot this one.
-
-> Actually, in this case there's no reason to copy t = *xt.  Just store directly
-> from xt->VsrB(i).
-
-Okay I'll fix that in v3.
+I've now fixed both of these. FWIW this is probably going to be my last bit of work
+on VSX for a while since as I don't have 64-bit reference hardware, and writing and
+testing these patchsets takes a long time. At least I feel that things are now in a
+place where people can start to take more advantage of the vector ops should they wish.
 
 
 ATB,
