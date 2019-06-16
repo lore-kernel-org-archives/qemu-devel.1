@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8DD6C31E49
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 04:32:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBD6EC31E53
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 04:32:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 705062084D
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 04:32:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 705062084D
+	by mail.kernel.org (Postfix) with ESMTPS id 96B842084D
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Jun 2019 04:32:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96B842084D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37586 helo=lists.gnu.org)
+Received: from localhost ([::1]:37588 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcMpr-0001wS-Mo
-	for qemu-devel@archiver.kernel.org; Sun, 16 Jun 2019 00:32:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50891)
+	id 1hcMps-0001yx-QG
+	for qemu-devel@archiver.kernel.org; Sun, 16 Jun 2019 00:32:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50892)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hcMni-0000p8-Nu
+ (envelope-from <bounces@canonical.com>) id 1hcMni-0000p9-Nz
  for qemu-devel@nongnu.org; Sun, 16 Jun 2019 00:29:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hcMng-0003q0-Rq
+ (envelope-from <bounces@canonical.com>) id 1hcMng-0003pu-RE
  for qemu-devel@nongnu.org; Sun, 16 Jun 2019 00:29:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42802)
+Received: from indium.canonical.com ([91.189.90.7]:42800)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hcMng-0003m0-MK
+ id 1hcMng-0003lz-LW
  for qemu-devel@nongnu.org; Sun, 16 Jun 2019 00:29:52 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hcMnb-0008Gv-O1
+ id 1hcMnb-0008GX-9U
  for <qemu-devel@nongnu.org>; Sun, 16 Jun 2019 04:29:47 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B27D82E80CC
+ by loganberry.canonical.com (Postfix) with ESMTP id 341742E80D3
  for <qemu-devel@nongnu.org>; Sun, 16 Jun 2019 04:29:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 16 Jun 2019 04:17:26 -0000
-From: Launchpad Bug Tracker <1529226@bugs.launchpad.net>
+Date: Sun, 16 Jun 2019 04:17:22 -0000
+From: Launchpad Bug Tracker <1574572@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
@@ -52,21 +52,21 @@ X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: davine-k janitor pmaydell th-huth
-X-Launchpad-Bug-Reporter: PeteVine (davine-k)
+X-Launchpad-Bug-Commenters: janitor th-huth ztehypervisor
+X-Launchpad-Bug-Reporter: Michael liu (ztehypervisor)
 X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <20151225114312.18411.84061.malonedeb@wampee.canonical.com>
-Message-Id: <156065864659.14650.5471122738605372540.malone@loganberry.canonical.com>
+References: <20160425105439.5722.90720.malonedeb@chaenomeles.canonical.com>
+Message-Id: <156065864220.14650.14827537819853825912.malone@loganberry.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18981";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: d7ba3f8fb9121d866b36b38bb9ab37db942e37dc
+X-Launchpad-Hash: 79b720b35c49cf1967f2e58ef3b9f6242c543c9f
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1529226] Re: qemu-i386-user on 32-bit Linux:
- uncaught target signal 11
+Subject: [Qemu-devel] =?utf-8?q?=5BBug_1574572=5D_Re=3A_config_20_sriov_di?=
+ =?utf-8?q?rect_bond_ports=EF=BC=8Cvm_create_failed=2E?=
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -77,7 +77,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1529226 <1529226@bugs.launchpad.net>
+Reply-To: Bug 1574572 <1574572@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -91,32 +91,105 @@ Sender: "Qemu-devel"
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1529226
+https://bugs.launchpad.net/bugs/1574572
 
 Title:
-  qemu-i386-user on 32-bit Linux: uncaught target signal 11
+  config 20 sriov direct bond ports=EF=BC=8Cvm create failed.
 
 Status in QEMU:
   Expired
 
 Bug description:
-  Even though the command I'm trying to run (a wrapper script for
-  qemu-i386-user running rustc, the rust compiler)  produces the
-  expected  compiled output, the build process is interrupted:
+  nova log=EF=BC=9A
 
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-  i686-unknown-linux-gnu/stage0/bin/rustc: line 1:  7474 Segmentation fault=
-      /usr/local/bin/qemu-i386 -cpu qemu32 /home/petevine/stage0/rustc.bin =
--C target-cpu=3Dpentium2 -L /home/petevine/unpacked/rust-master/i686-unknow=
-n-linux-gnu/stage0/lib/rustlib/i686-unknown-linux-gnu/lib/ "$@"
-  make: *** [i686-unknown-linux-gnu/stage0/lib/rustlib/i686-unknown-linux-g=
-nu/lib/stamp.rustc_back] Error 139
+   2016-04-08 09:57:48.640 5057 INFO nova.compute.manager [req-
+  4e1b4d70-62b6-4158-8413-3c9f226fd13b - - - - -] report
+  alarm_instance_shutoff success
 
-  The stamp file is not being created so this could be about forking
-  bash after finishing the wrapper script.
+  2016-04-08 09:57:48.712 5057 INFO nova.compute.manager [req-
+  4e1b4d70-62b6-4158-8413-3c9f226fd13b - - - - -] [instance: d860169c-
+  0dac-448f-a644-01a9b200cebe] During _sync_instance_power_state the DB
+  power_state (1) does not match the vm_power_state from the hypervisor
+  (4). Updating power_state in the DB to match the hypervisor.
 
-  Qemu was compiled from the latest git source.
+  2016-04-08 09:57:48.791 5057 WARNING nova.compute.manager [req-
+  4e1b4d70-62b6-4158-8413-3c9f226fd13b - - - - -] [instance: d860169c-
+  0dac-448f-a644-01a9b200cebe] Instance shutdown by itself. Calling the
+  heal_instance_state. Current vm_state: active, current task_state:
+  None, original DB power_state: 1, current VM power_state: 4
+
+  2016-04-08 09:57:48.892 5057 INFO nova.compute.manager [req-
+  4e1b4d70-62b6-4158-8413-3c9f226fd13b - - - - -]
+  alarm_notice_heal_event result:1,host_name:tfg120,instance_id
+  :d860169c-0dac-
+  448f-a644-01a9b200cebe,instance_name:vfnicdirect,vm_state:active,power_st=
+ate:shutdown,action:start
+
+  2016-04-08 09:57:48.997 5057 INFO nova.compute.manager [req-
+  4e1b4d70-62b6-4158-8413-3c9f226fd13b - - - - -]
+  Refresh_instance_block_device_info:False
+
+  2016-04-08 09:57:48.998 5057 INFO nova.compute.manager [req-
+  4e1b4d70-62b6-4158-8413-3c9f226fd13b - - - - -] [instance: d860169c-
+  0dac-448f-a644-01a9b200cebe] Rebooting instance
+
+  2016-04-08 09:57:49.373 5057 WARNING nova.compute.manager [req-
+  4e1b4d70-62b6-4158-8413-3c9f226fd13b - - - - -] [instance: d860169c-
+  0dac-448f-a644-01a9b200cebe] trying to reboot a non-running instance:
+  (state: 4 expected: 1)
+
+  2016-04-08 09:57:49.479 5057 INFO nova.virt.libvirt.driver [-]
+  [instance: d860169c-0dac-448f-a644-01a9b200cebe] Instance destroyed
+  successfully.
+
+  =
+
+  libvirtd  log=EF=BC=9A
+
+  2016-04-08 02:05:05.785+0000: 4778: info : qemuDomainDestroyFlags:2227
+  : Log: VM: name=3D instance-000000b8
+
+  2016-04-08 02:05:16.156+0000: 4771: info :
+  qemuDomainDefineXMLFlags:7576 : Creating domain 'instance-000000b8'
+
+  2016-04-08 02:05:16.158+0000: 4773: info :
+  qemuDomainCreateWithFlags:7448 : Log: VM: name=3D instance-000000b8
+
+  2016-04-08 02:05:16.158+0000: 4773: info : qemuProcessStart:4412 :
+  vm=3D0x7f19482fdb30 name=3Dinstance-000000b8 id=3D-1 asyncJob=3D0
+  migrateFrom=3D<null> stdin_fd=3D-1 stdin_path=3D<null> snapshot=3D(nil) v=
+mop=3D0
+  flags=3D0x1
+
+  2016-04-08 02:05:16.169+0000: 4773: info :
+  virNetDevReplaceNetConfig:2541 : Replace Net Config of linkdev
+  enp132s0f0, vf 28, macaddress 00:d1:d4:00:05:03, vlanid 1250, stateDir
+  /var/run/libvirt/hostdevmgr
+
+  2016-04-08 02:05:16.169+0000: 4773: info :
+  virNetDevReplaceNetConfig:2566 : Replace  Vf Config of enp132s0f0, vf
+  28, vlanid 1250, stateDir /var/run/libvirt/hostdevmgr
+
+  2016-04-08 02:05:16.169+0000: 4773: info :
+  virNetDevReplaceVfConfig:2390 : pflinkdev enp132s0f0, vf 28,vlanid
+  1250
+
+  2016-04-08 02:05:16.178+0000: 4773: info :
+  virNetDevReplaceVfConfig:2428 : save oldmac 00:d1:d4:00:05:03,
+  oldvlanid 1250
+
+  2016-04-08 02:05:16.178+0000: 4773: info : virNetDevSetVfConfig:2196 :
+  ifname enp132s0f0,ifindex -1,vf 28,macaddress 00:d1:d4:00:05:03,
+  vlanid 1250
+
+  =
+
+  qemu log=EF=BC=9A
+
+  kvm_alloc_slot: no free slot available
+
+  2016-04-08 06:21:04.793+0000: shutting down
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1529226/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1574572/+subscriptions
 
