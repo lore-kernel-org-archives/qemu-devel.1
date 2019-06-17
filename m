@@ -2,89 +2,63 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6391AC31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:20:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9FB7C31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:21:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 350AF20863
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:20:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 350AF20863
+	by mail.kernel.org (Postfix) with ESMTPS id BD37A2085A
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:21:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD37A2085A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51420 helo=lists.gnu.org)
+Received: from localhost ([::1]:51430 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcxAr-0006iH-7d
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 15:20:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48490)
+	id 1hcxC6-0008NQ-3s
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 15:21:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40511)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hcx9D-0005lG-09
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 15:18:32 -0400
+ (envelope-from <armbru@redhat.com>) id 1hcwh7-0001pV-Ci
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:49:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hcx9B-0000lK-QG
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 15:18:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50638)
+ (envelope-from <armbru@redhat.com>) id 1hcwh5-0007wa-Co
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:49:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:27358)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hcx9B-0000iv-CS
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 15:18:29 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hcwh5-0007ii-3q
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:49:27 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3A14322386E;
- Mon, 17 Jun 2019 19:18:21 +0000 (UTC)
-Received: from [10.3.118.50] (ovpn-118-50.phx2.redhat.com [10.3.118.50])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9BB8210021B4;
- Mon, 17 Jun 2019 19:18:17 +0000 (UTC)
-To: elena.ufimtseva@oracle.com, qemu-devel@nongnu.org
-References: <20190617181620.30047-1-elena.ufimtseva@oracle.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <9c747527-67c2-2e5c-4724-e0bf5c2a8822@redhat.com>
-Date: Mon, 17 Jun 2019 14:18:16 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ by mx1.redhat.com (Postfix) with ESMTPS id 52730B2DFB
+ for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 18:49:08 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-177.ams2.redhat.com
+ [10.36.117.177])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EF85F7D8C3;
+ Mon, 17 Jun 2019 18:49:07 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 86B831133023; Mon, 17 Jun 2019 20:49:03 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 17 Jun 2019 20:49:02 +0200
+Message-Id: <20190617184903.19436-16-armbru@redhat.com>
+In-Reply-To: <20190617184903.19436-1-armbru@redhat.com>
+References: <20190617184903.19436-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190617181620.30047-1-elena.ufimtseva@oracle.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="O1P3WWNDoMFqrbHVgUlmQkUNpYjADRCI9"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Mon, 17 Jun 2019 19:18:22 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Mon, 17 Jun 2019 18:49:08 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH v2 20/35] multi-process: Add QMP &
- extend HMP commands to list remote info
+Subject: [Qemu-devel] [PULL 15/16] monitor: Replace monitor_init() with
+ monitor_init_{hmp, qmp}()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,133 +70,257 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: john.g.johnson@oracle.com, jag.raman@oracle.com, konrad.wilk@oracle.com,
- dgilbert@redhat.com, armbru@redhat.com, ross.lagerwall@citrix.com,
- liran.alon@oracle.com, stefanha@redhat.com, kanth.ghatraju@oracle.com
+Cc: Kevin Wolf <kwolf@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---O1P3WWNDoMFqrbHVgUlmQkUNpYjADRCI9
-Content-Type: multipart/mixed; boundary="JUkilLTin4kjhdG2ynICvamvlQJM7Sk6v";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: elena.ufimtseva@oracle.com, qemu-devel@nongnu.org
-Cc: ross.lagerwall@citrix.com, stefanha@redhat.com, liran.alon@oracle.com,
- kanth.ghatraju@oracle.com, john.g.johnson@oracle.com, jag.raman@oracle.com,
- konrad.wilk@oracle.com, dgilbert@redhat.com, armbru@redhat.com
-Message-ID: <9c747527-67c2-2e5c-4724-e0bf5c2a8822@redhat.com>
-Subject: Re: [RFC PATCH v2 20/35] multi-process: Add QMP & extend HMP commands
- to list remote info
-References: <20190617181620.30047-1-elena.ufimtseva@oracle.com>
-In-Reply-To: <20190617181620.30047-1-elena.ufimtseva@oracle.com>
+From: Kevin Wolf <kwolf@redhat.com>
 
---JUkilLTin4kjhdG2ynICvamvlQJM7Sk6v
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Most callers know which monitor type they want to have. Instead of
+calling monitor_init() with flags that can describe both types of
+monitors, make monitor_init_{hmp,qmp}() public interfaces that take
+specific bools instead of flags and call these functions directly.
 
-On 6/17/19 1:16 PM, elena.ufimtseva@oracle.com wrote:
-> From: Jagannathan Raman <jag.raman@oracle.com>
->=20
-> Add query-remote QMP command and extend "info" HMP command, to list
-> the remote objects used by QEMU.
->=20
-> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-> ---
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Message-Id: <20190613153405.24769-15-kwolf@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ chardev/char.c             |  2 +-
+ gdbstub.c                  |  2 +-
+ include/monitor/monitor.h  |  9 ++-------
+ monitor/hmp.c              |  4 ++--
+ monitor/monitor-internal.h |  3 ---
+ monitor/monitor.c          |  9 ---------
+ monitor/qmp.c              |  7 ++-----
+ stubs/monitor.c            |  6 +++++-
+ tests/test-util-sockets.c  |  3 ++-
+ vl.c                       | 18 ++++++++++++------
+ 10 files changed, 27 insertions(+), 36 deletions(-)
 
-> +++ b/qapi/block-core.json
-> @@ -673,6 +673,23 @@
->             '*tray_open': 'bool', '*io-status': 'BlockDeviceIoStatus',
->             '*dirty-bitmaps': ['BlockDirtyInfo'] } }
-> =20
-> +##
-> +# @RemoteProc:
-
-Unless there's a compelling reason to abbreviate, naming this
-'RemoteProcess' is just fine.
-
-> +#
-> +# Remote process information.
-> +#
-> +# @id: Device ID
-> +#
-> +# @pid: Linux Process ID
-
-Is this information only available for Linux, or is it a generic pid
-appropriate to any operating system?  I'm wondering if you can just
-s/Linux//.
-
-> +#
-> +# @proc: Process name
-
-Again, no need to abbreviate, if @process or @name would be easier to
-document.
-
-> +#
-> +# Since:  3.0.93
-
-No such release. The next release will be 4.1.
-
-> +##
-> +{ 'struct': 'RemoteProc',
-> +  'data': {'id': 'str', 'pid': 'int32', 'proc': 'str' },
-> +  'if': 'defined(CONFIG_MPQEMU)' }
-> +
->  ##
->  # @BlockMeasureInfo:
->  #
-> @@ -795,6 +812,18 @@
->  ##
->  { 'command': 'query-block', 'returns': ['BlockInfo'] }
-> =20
-> +##
-> +# @query-remote:
-> +#
-> +# Get a list of all the remote processes spawned by QEMU.
-> +#
-> +# Returns: a list of @RemoteProc describing each remote process.
-> +#
-> +# Since: 3.0.93
-
-4.1
-
-> +#
-> +##
-> +{ 'command': 'query-remote', 'returns': ['RemoteProc'],
-> +  'if': 'defined(CONFIG_MPQEMU)' }
-> =20
->  ##
->  # @BlockDeviceTimedStats:
->=20
-
+diff --git a/chardev/char.c b/chardev/char.c
+index e4887bcc82..7b6b2cb123 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -731,7 +731,7 @@ Chardev *qemu_chr_new_noreplay(const char *label, con=
+st char *filename,
+=20
+     if (qemu_opt_get_bool(opts, "mux", 0)) {
+         assert(permit_mux_mon);
+-        monitor_init(chr, MONITOR_USE_READLINE);
++        monitor_init_hmp(chr, true);
+     }
+=20
+ out:
+diff --git a/gdbstub.c b/gdbstub.c
+index d614a1f3c0..8618e34311 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -3344,7 +3344,7 @@ int gdbserver_start(const char *device)
+         /* Initialize a monitor terminal for gdb */
+         mon_chr =3D qemu_chardev_new(NULL, TYPE_CHARDEV_GDB,
+                                    NULL, NULL, &error_abort);
+-        monitor_init(mon_chr, 0);
++        monitor_init_hmp(mon_chr, false);
+     } else {
+         qemu_chr_fe_deinit(&s->chr, true);
+         mon_chr =3D s->mon_chr;
+diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
+index 44ac43df34..a81eeff5f8 100644
+--- a/include/monitor/monitor.h
++++ b/include/monitor/monitor.h
+@@ -8,19 +8,14 @@
+ extern __thread Monitor *cur_mon;
+ typedef struct MonitorHMP MonitorHMP;
+=20
+-/* flags for monitor_init */
+-/* 0x01 unused */
+-#define MONITOR_USE_READLINE  0x02
+-#define MONITOR_USE_CONTROL   0x04
+-#define MONITOR_USE_PRETTY    0x08
+-
+ #define QMP_REQ_QUEUE_LEN_MAX 8
+=20
+ bool monitor_cur_is_qmp(void);
+=20
+ void monitor_init_globals(void);
+ void monitor_init_globals_core(void);
+-void monitor_init(Chardev *chr, int flags);
++void monitor_init_qmp(Chardev *chr, bool pretty);
++void monitor_init_hmp(Chardev *chr, bool use_readline);
+ void monitor_cleanup(void);
+=20
+ int monitor_suspend(Monitor *mon);
+diff --git a/monitor/hmp.c b/monitor/hmp.c
+index 07f827c90c..5349a81307 100644
+--- a/monitor/hmp.c
++++ b/monitor/hmp.c
+@@ -1394,14 +1394,14 @@ static void monitor_readline_flush(void *opaque)
+     monitor_flush(&mon->common);
+ }
+=20
+-void monitor_init_hmp(Chardev *chr, int flags)
++void monitor_init_hmp(Chardev *chr, bool use_readline)
+ {
+     MonitorHMP *mon =3D g_new0(MonitorHMP, 1);
+=20
+     monitor_data_init(&mon->common, false, false, false);
+     qemu_chr_fe_init(&mon->common.chr, chr, &error_abort);
+=20
+-    mon->use_readline =3D flags & MONITOR_USE_READLINE;
++    mon->use_readline =3D use_readline;
+     if (mon->use_readline) {
+         mon->rs =3D readline_init(monitor_readline_printf,
+                                 monitor_readline_flush,
+diff --git a/monitor/monitor-internal.h b/monitor/monitor-internal.h
+index 03ea0239ef..7760b22ba3 100644
+--- a/monitor/monitor-internal.h
++++ b/monitor/monitor-internal.h
+@@ -163,9 +163,6 @@ extern int mon_refcount;
+=20
+ extern HMPCommand hmp_cmds[];
+=20
+-void monitor_init_qmp(Chardev *chr, int flags);
+-void monitor_init_hmp(Chardev *chr, int flags);
+-
+ int monitor_puts(Monitor *mon, const char *str);
+ void monitor_data_init(Monitor *mon, bool is_qmp, bool skip_flush,
+                        bool use_io_thread);
+diff --git a/monitor/monitor.c b/monitor/monitor.c
+index 3f4808240a..3ef28171c0 100644
+--- a/monitor/monitor.c
++++ b/monitor/monitor.c
+@@ -551,15 +551,6 @@ void monitor_data_destroy(Monitor *mon)
+     qemu_mutex_destroy(&mon->mon_lock);
+ }
+=20
+-void monitor_init(Chardev *chr, int flags)
+-{
+-    if (flags & MONITOR_USE_CONTROL) {
+-        monitor_init_qmp(chr, flags);
+-    } else {
+-        monitor_init_hmp(chr, flags);
+-    }
+-}
+-
+ void monitor_cleanup(void)
+ {
+     /*
+diff --git a/monitor/qmp.c b/monitor/qmp.c
+index 940649f688..e1b196217d 100644
+--- a/monitor/qmp.c
++++ b/monitor/qmp.c
+@@ -364,18 +364,15 @@ static void monitor_qmp_setup_handlers_bh(void *opa=
+que)
+     monitor_list_append(&mon->common);
+ }
+=20
+-void monitor_init_qmp(Chardev *chr, int flags)
++void monitor_init_qmp(Chardev *chr, bool pretty)
+ {
+     MonitorQMP *mon =3D g_new0(MonitorQMP, 1);
+=20
+-    /* Only HMP supports readline */
+-    assert(!(flags & MONITOR_USE_READLINE));
+-
+     /* Note: we run QMP monitor in I/O thread when @chr supports that */
+     monitor_data_init(&mon->common, true, false,
+                       qemu_chr_has_feature(chr, QEMU_CHAR_FEATURE_GCONTE=
+XT));
+=20
+-    mon->pretty =3D flags & MONITOR_USE_PRETTY;
++    mon->pretty =3D pretty;
+=20
+     qemu_mutex_init(&mon->qmp_queue_lock);
+     mon->qmp_requests =3D g_queue_new();
+diff --git a/stubs/monitor.c b/stubs/monitor.c
+index cdbf5c5f9a..c3e9a2e4dc 100644
+--- a/stubs/monitor.c
++++ b/stubs/monitor.c
+@@ -16,7 +16,11 @@ int monitor_get_fd(Monitor *mon, const char *name, Err=
+or **errp)
+     return -1;
+ }
+=20
+-void monitor_init(Chardev *chr, int flags)
++void monitor_init_qmp(Chardev *chr, bool pretty)
++{
++}
++
++void monitor_init_hmp(Chardev *chr, bool use_readline)
+ {
+ }
+=20
+diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
+index fd1ced058c..f1ebffee5a 100644
+--- a/tests/test-util-sockets.c
++++ b/tests/test-util-sockets.c
+@@ -71,7 +71,8 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Er=
+ror **errp)
+  */
+ __thread Monitor *cur_mon;
+ int monitor_vprintf(Monitor *mon, const char *fmt, va_list ap) { abort()=
+; }
+-void monitor_init(Chardev *chr, int flags) {}
++void monitor_init_qmp(Chardev *chr, bool pretty) {}
++void monitor_init_hmp(Chardev *chr, bool use_readline) {}
+=20
+=20
+ static void test_socket_fd_pass_name_good(void)
+diff --git a/vl.c b/vl.c
+index 005468cbfb..32daa434eb 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2299,25 +2299,27 @@ static int fsdev_init_func(void *opaque, QemuOpts=
+ *opts, Error **errp)
+ static int mon_init_func(void *opaque, QemuOpts *opts, Error **errp)
+ {
+     Chardev *chr;
++    bool qmp;
++    bool pretty =3D false;
+     const char *chardev;
+     const char *mode;
+-    int flags;
+=20
+     mode =3D qemu_opt_get(opts, "mode");
+     if (mode =3D=3D NULL) {
+         mode =3D "readline";
+     }
+     if (strcmp(mode, "readline") =3D=3D 0) {
+-        flags =3D MONITOR_USE_READLINE;
++        qmp =3D false;
+     } else if (strcmp(mode, "control") =3D=3D 0) {
+-        flags =3D MONITOR_USE_CONTROL;
++        qmp =3D true;
+     } else {
+         error_setg(errp, "unknown monitor mode \"%s\"", mode);
+         return -1;
+     }
+=20
+-    if (qemu_opt_get_bool(opts, "pretty", 0))
+-        flags |=3D MONITOR_USE_PRETTY;
++    if (qemu_opt_get_bool(opts, "pretty", 0)) {
++        pretty =3D true;
++    }
+=20
+     chardev =3D qemu_opt_get(opts, "chardev");
+     if (!chardev) {
+@@ -2330,7 +2332,11 @@ static int mon_init_func(void *opaque, QemuOpts *o=
+pts, Error **errp)
+         return -1;
+     }
+=20
+-    monitor_init(chr, flags);
++    if (qmp) {
++        monitor_init_qmp(chr, pretty);
++    } else {
++        monitor_init_hmp(chr, true);
++    }
+     return 0;
+ }
+=20
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.21.0
 
-
---JUkilLTin4kjhdG2ynICvamvlQJM7Sk6v--
-
---O1P3WWNDoMFqrbHVgUlmQkUNpYjADRCI9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0H53gACgkQp6FrSiUn
-Q2pPEgf9Gt1KpGFwx//A3URBRsF14vNrcKZ5PoUrp0FIw0eaKttZW/wzabqWDdxw
-pBlvyzsORSH0z7bUlg9YttISBFI980SbN1eGXvxioUoOnaw2ZBzhKGa8/6E3wiTE
-BmEv/EqhCsA7G68tJZxFe/IfTfzdIsxPpQAt1HFhRIhjaCWjPcSF+sByMfKhneyI
-0+rwycV75PzgSnHZhxuZZPVVV1JLgtNy8JW1AxijooDRPl7SRnV2uIoizmcGvjS8
-Pml0Jhs0GwlKdFXZ9NP7HWFcy6dtyXbu6o856100gVFM7UrgSTQmCyyODcTf3zIg
-NgfkmCFmfGKnzRY6zVwXgTIV7U59og==
-=uXSQ
------END PGP SIGNATURE-----
-
---O1P3WWNDoMFqrbHVgUlmQkUNpYjADRCI9--
 
