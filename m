@@ -2,58 +2,89 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 937E7C31E57
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 10:11:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B0B1C31E58
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 10:19:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6024B2084D
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 10:11:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6024B2084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5BB0E2084D
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 10:19:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mV9uNmiW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BB0E2084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45756 helo=lists.gnu.org)
+Received: from localhost ([::1]:45820 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcoc8-000230-LX
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 06:11:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36088)
+	id 1hcojo-0005mH-4S
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 06:19:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37494)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <cohuck@redhat.com>) id 1hcob7-000194-1w
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 06:10:46 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hcoi0-0004r3-G6
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 06:17:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1hcob5-0005FG-VN
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 06:10:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49798)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>)
- id 1hcob5-0005ER-Me; Mon, 17 Jun 2019 06:10:43 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 87D2AC05091A;
- Mon, 17 Jun 2019 10:10:42 +0000 (UTC)
-Received: from localhost (dhcp-192-192.str.redhat.com [10.33.192.192])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0E7AF66069;
- Mon, 17 Jun 2019 10:10:39 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Eric Farman <farman@linux.ibm.com>,
-	Farhan Ali <alifm@linux.ibm.com>
-Date: Mon, 17 Jun 2019 12:10:36 +0200
-Message-Id: <20190617101036.4087-1-cohuck@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1hcohu-0002fJ-Co
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 06:17:48 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37751)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hcohu-0002dM-4V
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 06:17:46 -0400
+Received: by mail-wm1-x341.google.com with SMTP id f17so5945361wme.2
+ for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 03:17:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:subject:in-reply-to:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=U2LUWpqa0Y74pWJqAauN12bqJvcWstdQ7/a5GJqc8WM=;
+ b=mV9uNmiWN+W5/5G87kCf3uUloBmYsm1DdFEFqZmNPE22Qco7eXtX95WaU/LjbZ8t1F
+ vgY1bk51A4jb3TRdv3YXT+TyJgveXjdSrlGRAqKC0iGUEm6jBcs64qQ8whGh+irNsV0O
+ pCAwTg4YNs6TrCt836efyblqnvzCxp4Un7ODUP7C1EmwGWdIjx+f49+rabomokwk/z9L
+ HwPlfy6NubRTpJk6PWaHoOhJFelQ3z514zh+ZeXfdid14eRAXDEJ1NhkK4AI7+tfW76Y
+ 8Tht31FX7NBOxjtEp1cCQXmLP/sKcwYSedMClpoF10JE8r8jNoZUL7kJPrXZgpztYiDC
+ 8gZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=U2LUWpqa0Y74pWJqAauN12bqJvcWstdQ7/a5GJqc8WM=;
+ b=He5cOquo+sJKDrmuNi2hieX5JqSc/W58knVEwUKoLk+kpJ5YfVryD2Xz7OW1/yGBtr
+ Bsj6uCoRIdkBrifRd6HEMNcRJo0OjPuWjhoqaftncgTQB+tQUnnbqwtdw6wxQTgoDnxk
+ wW9v+xglsXDbAVzGngU6eStWAs5IWcgT8/CNTmxqh1f5cxnrjPWEFkDmE/4Gmt8+I0BC
+ jldoeIHu0vO3gGd1jJYYMMZKOjVwaLvI1sGECwn7BvtkfJoO9Y6Z+E9REkr76OGuFXsF
+ IPrSZ7kxike0HsFAwaD3Hc1Uew8ekhDoEamsBD32TjJvHmw9HrrT4QDaUmjhDiyVfmUW
+ /ZFQ==
+X-Gm-Message-State: APjAAAVfv1iPF9zSMGp0F1ZHnZLB30j0TejdAOPnca4/RvJNt5AS60Y6
+ tADme7yObU+A1EswWQfBSMA5t5yLQPU=
+X-Google-Smtp-Source: APXvYqz11kAjqNxBJLzDWPRUPi4glXCIxnSdGE4zWKxKGqqljWxIDxBOi+FW1LA8W+MWvDtSPjd2xQ==
+X-Received: by 2002:a1c:5546:: with SMTP id j67mr19225812wmb.80.1560766662969; 
+ Mon, 17 Jun 2019 03:17:42 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id y184sm9273955wmg.14.2019.06.17.03.17.42
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 17 Jun 2019 03:17:42 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 0E4401FF87
+ for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 11:17:42 +0100 (BST)
+References: <20190614135332.12777-1-vandersonmr2@gmail.com>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <20190614135332.12777-1-vandersonmr2@gmail.com>
+Date: Mon, 17 Jun 2019 11:17:42 +0100
+Message-ID: <87h88objnd.fsf@zen.linaroharston>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Mon, 17 Jun 2019 10:10:42 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2] vfio-ccw: use vfio_set_irq_signaling
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH 0/3] Collecting TB Execution Frequency
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,110 +96,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eric Auger <eric.auger@redhat.com>, qemu-s390x@nongnu.org,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use the new helper.
 
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
-v1->v2:
- - Don't go overboard with deleting, and keep the get_irq_info part.
----
- hw/vfio/ccw.c | 51 +++++++++++++--------------------------------------
- 1 file changed, 13 insertions(+), 38 deletions(-)
+vandersonmr <vandersonmr2@gmail.com> writes:
 
-diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-index 03a2becb3ec9..a18bbd33b055 100644
---- a/hw/vfio/ccw.c
-+++ b/hw/vfio/ccw.c
-@@ -198,9 +198,8 @@ static void vfio_ccw_register_io_notifier(VFIOCCWDevi=
-ce *vcdev, Error **errp)
- {
-     VFIODevice *vdev =3D &vcdev->vdev;
-     struct vfio_irq_info *irq_info;
--    struct vfio_irq_set *irq_set;
-     size_t argsz;
--    int32_t *pfd;
-+    int fd;
-=20
-     if (vdev->num_irqs < VFIO_CCW_IO_IRQ_INDEX + 1) {
-         error_setg(errp, "vfio: unexpected number of io irqs %u",
-@@ -224,56 +223,32 @@ static void vfio_ccw_register_io_notifier(VFIOCCWDe=
-vice *vcdev, Error **errp)
-         goto out_free_info;
-     }
-=20
--    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
--    irq_set =3D g_malloc0(argsz);
--    irq_set->argsz =3D argsz;
--    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD |
--                     VFIO_IRQ_SET_ACTION_TRIGGER;
--    irq_set->index =3D VFIO_CCW_IO_IRQ_INDEX;
--    irq_set->start =3D 0;
--    irq_set->count =3D 1;
--    pfd =3D (int32_t *) &irq_set->data;
--
--    *pfd =3D event_notifier_get_fd(&vcdev->io_notifier);
--    qemu_set_fd_handler(*pfd, vfio_ccw_io_notifier_handler, NULL, vcdev)=
-;
--    if (ioctl(vdev->fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
--        error_setg(errp, "vfio: Failed to set up io notification");
--        qemu_set_fd_handler(*pfd, NULL, NULL, vcdev);
-+    fd =3D event_notifier_get_fd(&vcdev->io_notifier);
-+    qemu_set_fd_handler(fd, vfio_ccw_io_notifier_handler, NULL, vcdev);
-+
-+    if (vfio_set_irq_signaling(vdev, VFIO_CCW_IO_IRQ_INDEX, 0,
-+                               VFIO_IRQ_SET_ACTION_TRIGGER, fd, errp)) {
-+        qemu_set_fd_handler(fd, NULL, NULL, vcdev);
-         event_notifier_cleanup(&vcdev->io_notifier);
-     }
-=20
--    g_free(irq_set);
--
- out_free_info:
-     g_free(irq_info);
- }
-=20
- static void vfio_ccw_unregister_io_notifier(VFIOCCWDevice *vcdev)
- {
--    struct vfio_irq_set *irq_set;
--    size_t argsz;
--    int32_t *pfd;
--
--    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
--    irq_set =3D g_malloc0(argsz);
--    irq_set->argsz =3D argsz;
--    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD |
--                     VFIO_IRQ_SET_ACTION_TRIGGER;
--    irq_set->index =3D VFIO_CCW_IO_IRQ_INDEX;
--    irq_set->start =3D 0;
--    irq_set->count =3D 1;
--    pfd =3D (int32_t *) &irq_set->data;
--    *pfd =3D -1;
--
--    if (ioctl(vcdev->vdev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
--        error_report("vfio: Failed to de-assign device io fd: %m");
-+    Error *err =3D NULL;
-+
-+    vfio_set_irq_signaling(&vcdev->vdev, VFIO_CCW_IO_IRQ_INDEX, 0,
-+                           VFIO_IRQ_SET_ACTION_TRIGGER, -1, &err);
-+    if (err) {
-+        error_reportf_err(err, VFIO_MSG_PREFIX, vcdev->vdev.name);
-     }
-=20
-     qemu_set_fd_handler(event_notifier_get_fd(&vcdev->io_notifier),
-                         NULL, NULL, vcdev);
-     event_notifier_cleanup(&vcdev->io_notifier);
--
--    g_free(irq_set);
- }
-=20
- static void vfio_ccw_get_region(VFIOCCWDevice *vcdev, Error **errp)
---=20
-2.20.1
+> This is the first series of patches related to the TCGCodeQuality GSoC pr=
+oject
+> More at https://wiki.qemu.org/Features/TCGCodeQuality
+>
+> It adds an option to instrument TBs and collects their execution frequenc=
+y.
+> The execution frequency is then store/accumulated in an auxiliary structu=
+re
+> every time a tb_flush or a read happens.
+>
+> [Qemu-Devel][PATCH 1/3] Adding an optional tb execution counter.
+> [Qemu-Devel][PATCH 2/3] Saving counters between tb_flush events.
+> [Qemu-Devel][PATCH 3/3] Adding command line option to linux-user.
 
+Did you explicitly set the patch prefix to qemu-devel? You don't need
+to, they are added by the mailing list software.
+
+--
+Alex Benn=C3=A9e
 
