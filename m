@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ADCFC31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 18:27:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1480C31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 18:27:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1873F2084D
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 18:27:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B2CCD2084D
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 18:27:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="cNuYhgM8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1873F2084D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="B3QrbzRR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2CCD2084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50940 helo=lists.gnu.org)
+Received: from localhost ([::1]:50942 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcwLk-000835-DE
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 14:27:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58755)
+	id 1hcwLl-00085A-UY
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 14:27:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58601)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1hcwB5-0005Yx-By
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:16:25 -0400
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1hcwAf-0005RG-Ue
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:16:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1hcwB1-0001pe-5E
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:16:22 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:55686)
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1hcwAe-0001Wf-Am
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:15:57 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:42840)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1hcwAz-0001j6-1K
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:16:19 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HI9Ofj159576;
- Mon, 17 Jun 2019 18:16:07 GMT
+ id 1hcwAd-0001VZ-V8
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:15:56 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HI8n18149250;
+ Mon, 17 Jun 2019 18:15:54 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id; s=corp-2018-07-02;
- bh=wAbYWjTDPTNdGXz4juao/Kn/TenPE6WdVD5YQrfPQwc=;
- b=cNuYhgM88UND9sEqbVSNa/REfrBAiZsy4z77idHqVaPTfLNozuLzX9Q+m/YXJ28BX1fE
- CnfyjkrXJjqKF7aNsDv05HFx9zis9fr1NxKVw8QWg43Dp1R8zZvCMN2nQ3c5g5ERn5h3
- em7bH2ndV6DBp0ptCaz3Hl/7zvxG2x2QqBYeF4832WcYni2SxZZPvaJUVZF+9gFhHze9
- g8d3NFuxy/JhHL9O0ZV8nEZvMywkYqUu8YTK65Q6EbOgkHaYBwcVU4zXU6vn/HWzD/sc
- 34HoJ+QUjsgQ7lDXqxLWUG4CmQBqyzJpHpQ4ftiduITep58JjzANmyhUEjJ+XKKfOt7y jQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2120.oracle.com with ESMTP id 2t4saq7yew-1
+ bh=QsrM+NGtd26oRHAt0LAUHOmtyzzuZEKIkpyw1SF0fu0=;
+ b=B3QrbzRRe5NYSPm30Lq26LPec0FkfJThinDssHrQcs6omlqpJWhRCrTANXSM8I/SL/ka
+ Q3RATlnZwEfGPpbDI4His/nfPcMLAa2GzyKtuJKxOR/Rj54eSiOPGpTUdVccYMADUYbf
+ ZXTO19RsQ3/xJlbBbnaF/KxJWnkldXQgtF3Xl8vqhQttBW63gmNZvawT3Zbun1Ql0IXX
+ mZv1BAvRykP9BgbxKcdP9bUAIVpwVsEMLFUOs6vWrSpC666lxKYm7f0+YHzYtEAMIV2K
+ uEhZeJ2kixyGM887t574Ctj21KkbkWIen/7IyBC4NFaKavrLPpZzVxjVudR7q3/NFfcd 6Q== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2130.oracle.com with ESMTP id 2t4r3tg2v8-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 17 Jun 2019 18:16:07 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HIEN2w175334;
- Mon, 17 Jun 2019 18:16:06 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3020.oracle.com with ESMTP id 2t5mgbgasa-1
+ Mon, 17 Jun 2019 18:15:54 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HIF5ud050139;
+ Mon, 17 Jun 2019 18:15:53 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by userp3020.oracle.com with ESMTP id 2t5h5t9ff7-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 17 Jun 2019 18:16:06 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5HIG5PR024976;
- Mon, 17 Jun 2019 18:16:05 GMT
+ Mon, 17 Jun 2019 18:15:53 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5HIFqtF014697;
+ Mon, 17 Jun 2019 18:15:52 GMT
 Received: from heatpipe.hsd1.ca.comcast.net (/73.170.27.202)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 17 Jun 2019 11:16:05 -0700
+ with ESMTP ; Mon, 17 Jun 2019 11:15:52 -0700
 From: elena.ufimtseva@oracle.com
 To: qemu-devel@nongnu.org
-Date: Mon, 17 Jun 2019 11:16:02 -0700
-Message-Id: <20190617181602.29817-1-elena.ufimtseva@oracle.com>
+Date: Mon, 17 Jun 2019 11:15:49 -0700
+Message-Id: <20190617181549.29631-1-elena.ufimtseva@oracle.com>
 X-Mailer: git-send-email 2.17.1
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
  signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=4
  malwarescore=0
  phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
@@ -81,14 +81,14 @@ X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
  signatures=668687
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
  priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ suspectscore=4 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
  lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
  definitions=main-1906170162
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.85
-Subject: [Qemu-devel] [RFC PATCH v2 15/35] multi-process: PCI BAR read
- handling for proxy & remote endpoints
+X-Received-From: 156.151.31.86
+Subject: [Qemu-devel] [RFC PATCH v2 11/35] multi-process: setup memory
+ manager for remote device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,166 +109,230 @@ Sender: "Qemu-devel"
 
 From: Jagannathan Raman <jag.raman@oracle.com>
 
-Proxy device object implements the read handler for PCI BAR accesses.
-The handler sends BAR_READ message to the remote process.
-The remote process implements handler for BAR_READ message.
+sync_sysmem_msg_t message format is defined. It is used to send
+file descriptors of the RAM regions to remote device.
+RAM on the remote device is configured with a set of file descriptors.
+Old RAM regions are deleted and new regions, each with an fd, is
+added to the RAM.
 
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 ---
- hw/proxy/qemu-proxy.c         | 22 ++++++++++++++++
- include/hw/proxy/qemu-proxy.h |  3 +++
- include/io/proxy-link.h       |  2 ++
- remote/remote-main.c          | 49 +++++++++++++++++++++++++++++++++++
- 4 files changed, 76 insertions(+)
+ Makefile.target         |  2 +
+ include/io/proxy-link.h | 11 +++++
+ include/remote/memory.h | 34 ++++++++++++++
+ remote/memory.c         | 98 +++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 145 insertions(+)
+ create mode 100644 include/remote/memory.h
+ create mode 100644 remote/memory.c
 
-diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
-index 7f796a8e67..3ee3854f40 100644
---- a/hw/proxy/qemu-proxy.c
-+++ b/hw/proxy/qemu-proxy.c
-@@ -254,6 +254,7 @@ static void send_bar_access_msg(ProxyLinkState *proxy_link, MemoryRegion *mr,
-                                 unsigned size, bool memory)
- {
-     ProcMsg msg;
-+    int wait;
+diff --git a/Makefile.target b/Makefile.target
+index f45af2b851..30e81ddb5a 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -133,6 +133,8 @@ remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/monitor.o
+ remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/replay.o
+ remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/xen-mapcache.o
  
-     memset(&msg, 0, sizeof(ProcMsg));
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) += remote/memory.o
++
+ #########################################################
+ # Linux user emulator target
  
-@@ -266,9 +267,20 @@ static void send_bar_access_msg(ProxyLinkState *proxy_link, MemoryRegion *mr,
-     if (write) {
-         msg.cmd = BAR_WRITE;
-         msg.data1.bar_access.val = *val;
-+    } else {
-+        wait = GET_REMOTE_WAIT;
-+
-+        msg.cmd = BAR_READ;
-+        msg.num_fds = 1;
-+        msg.fds[0] = wait;
-     }
- 
-     proxy_proc_send(proxy_link, &msg);
-+
-+    if (!write) {
-+        *val = wait_for_remote(wait);
-+        PUT_REMOTE_WAIT(wait);
-+    }
- }
- 
- void proxy_default_bar_write(PCIProxyDev *dev, MemoryRegion *mr, hwaddr addr,
-@@ -276,3 +288,13 @@ void proxy_default_bar_write(PCIProxyDev *dev, MemoryRegion *mr, hwaddr addr,
- {
-     send_bar_access_msg(dev->proxy_link, mr, true, addr, &val, size, memory);
- }
-+
-+uint64_t proxy_default_bar_read(PCIProxyDev *dev, MemoryRegion *mr, hwaddr addr,
-+                                unsigned size, bool memory)
-+{
-+    uint64_t val;
-+
-+    send_bar_access_msg(dev->proxy_link, mr, false, addr, &val, size, memory);
-+
-+    return val;
-+}
-diff --git a/include/hw/proxy/qemu-proxy.h b/include/hw/proxy/qemu-proxy.h
-index b717c8d767..a0db811de4 100644
---- a/include/hw/proxy/qemu-proxy.h
-+++ b/include/hw/proxy/qemu-proxy.h
-@@ -78,4 +78,7 @@ int remote_spawn(PCIProxyDev *pdev, const char *command, Error **errp);
- void proxy_default_bar_write(PCIProxyDev *dev, MemoryRegion *mr, hwaddr addr,
-                              uint64_t val, unsigned size, bool memory);
- 
-+uint64_t proxy_default_bar_read(PCIProxyDev *dev, MemoryRegion *mr, hwaddr addr,
-+                                unsigned size, bool memory);
-+
- #endif /* QEMU_PROXY_H */
 diff --git a/include/io/proxy-link.h b/include/io/proxy-link.h
-index 20bc217212..69074a3519 100644
+index 2f1584e87d..e9efe531ad 100644
 --- a/include/io/proxy-link.h
 +++ b/include/io/proxy-link.h
-@@ -57,6 +57,7 @@ typedef struct ProxyLinkState ProxyLinkState;
+@@ -35,6 +35,8 @@
+ #include "qemu/osdep.h"
+ #include "qom/object.h"
+ #include "qemu/thread.h"
++#include "exec/cpu-common.h"
++#include "exec/hwaddr.h"
+ 
+ typedef struct ProxyLinkState ProxyLinkState;
+ 
+@@ -53,12 +55,14 @@ typedef struct ProxyLinkState ProxyLinkState;
+  * Following commands are supported:
+  * CONF_READ        PCI config. space read
   * CONF_WRITE       PCI config. space write
-  * SYNC_SYSMEM      Shares QEMU's RAM with remote device's RAM
-  * BAR_WRITE        Writes to PCI BAR region
-+ * BAR_READ         Reads from PCI BAR region
++ * SYNC_SYSMEM      Shares QEMU's RAM with remote device's RAM
   *
   */
  typedef enum {
-@@ -65,6 +66,7 @@ typedef enum {
+     INIT = 0,
+     CONF_READ,
      CONF_WRITE,
-     SYNC_SYSMEM,
-     BAR_WRITE,
-+    BAR_READ,
++    SYNC_SYSMEM,
      MAX,
  } proc_cmd_t;
  
-diff --git a/remote/remote-main.c b/remote/remote-main.c
-index 90e979289c..4372b71e89 100644
---- a/remote/remote-main.c
-+++ b/remote/remote-main.c
-@@ -93,6 +93,49 @@ static void process_bar_write(ProcMsg *msg, Error **errp)
-     }
- }
+@@ -74,6 +78,12 @@ typedef enum {
+  * data2       Unstructured data
+  *
+  */
++typedef struct {
++    hwaddr gpas[REMOTE_MAX_FDS];
++    uint64_t sizes[REMOTE_MAX_FDS];
++    ram_addr_t offsets[REMOTE_MAX_FDS];
++} sync_sysmem_msg_t;
++
+ typedef struct {
+     proc_cmd_t cmd;
+     int bytestream;
+@@ -81,6 +91,7 @@ typedef struct {
  
-+static void process_bar_read(ProcMsg *msg, Error **errp)
+     union {
+         uint64_t u64;
++        sync_sysmem_msg_t sync_sysmem;
+     } data1;
+ 
+     int fds[REMOTE_MAX_FDS];
+diff --git a/include/remote/memory.h b/include/remote/memory.h
+new file mode 100644
+index 0000000000..0ffbca0145
+--- /dev/null
++++ b/include/remote/memory.h
+@@ -0,0 +1,34 @@
++/*
++ * Memory manager for remote device
++ *
++ * Copyright 2019, Oracle and/or its affiliates.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#ifndef REMOTE_MEMORY_H
++#define REMOTE_MEMORY_H
++
++#include "qemu/osdep.h"
++#include "exec/hwaddr.h"
++#include "io/proxy-link.h"
++
++void remote_sysmem_reconfig(ProcMsg *msg, Error **errp);
++
++#endif
+diff --git a/remote/memory.c b/remote/memory.c
+new file mode 100644
+index 0000000000..69a0ee8c6a
+--- /dev/null
++++ b/remote/memory.c
+@@ -0,0 +1,98 @@
++/*
++ * Memory manager for remote device
++ *
++ * Copyright 2019, Oracle and/or its affiliates.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include <stdint.h>
++#include <sys/types.h>
++
++#include "qemu/osdep.h"
++#include "qemu/queue.h"
++#include "qemu-common.h"
++#include "remote/memory.h"
++#include "exec/memory.h"
++#include "exec/address-spaces.h"
++#include "cpu.h"
++#include "exec/ram_addr.h"
++#include "io/proxy-link.h"
++#include "qemu/main-loop.h"
++#include "qapi/error.h"
++
++static void remote_ram_destructor(MemoryRegion *mr)
 +{
-+    bar_access_msg_t *bar_access = &msg->data1.bar_access;
-+    AddressSpace *as;
-+    int wait = msg->fds[0];
-+    MemTxResult res;
-+    uint64_t val = 0;
-+
-+    as = bar_access->memory ? &address_space_memory : &address_space_io;
-+
-+    assert(bar_access->size <= sizeof(uint64_t));
-+
-+    res = address_space_rw(as, bar_access->addr, MEMTXATTRS_UNSPECIFIED,
-+                           (uint8_t *)&val, bar_access->size, false);
-+
-+    if (res != MEMTX_OK) {
-+        error_setg(errp, "Could not perform address space read operation,"
-+                   " inaccessible address: %lx.", bar_access->addr);
-+        val = (uint64_t)-1;
-+        goto fail;
-+    }
-+
-+    switch (bar_access->size) {
-+    case 4:
-+        val = *((uint32_t *)&val);
-+        break;
-+    case 2:
-+        val = *((uint16_t *)&val);
-+        break;
-+    case 1:
-+        val = *((uint8_t *)&val);
-+        break;
-+    default:
-+        error_setg(errp, "Invalid PCI BAR read size");
-+        return;
-+    }
-+
-+fail:
-+    notify_proxy(wait, val);
-+
-+    PUT_REMOTE_WAIT(wait);
++    qemu_ram_free(mr->ram_block);
 +}
 +
- static void process_msg(GIOCondition cond)
- {
-     ProcMsg *msg = NULL;
-@@ -125,6 +168,12 @@ static void process_msg(GIOCondition cond)
-             goto finalize_loop;
-         }
-         break;
-+    case BAR_READ:
-+        process_bar_read(msg, &err);
-+        if (err) {
-+            goto finalize_loop;
++static void remote_ram_init_from_fd(MemoryRegion *mr, int fd, uint64_t size,
++                                    ram_addr_t offset, Error **errp)
++{
++    char *name = g_strdup_printf("%d", fd);
++
++    memory_region_init(mr, NULL, name, size);
++    mr->ram = true;
++    mr->terminates = true;
++    mr->destructor = remote_ram_destructor;
++    mr->align = 0;
++    mr->ram_block = qemu_ram_alloc_from_fd(size, mr, RAM_SHARED, fd, offset, errp);
++    mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
++
++    g_free(name);
++}
++
++void remote_sysmem_reconfig(ProcMsg *msg, Error **errp)
++{
++    sync_sysmem_msg_t *sysmem_info = &msg->data1.sync_sysmem;
++    MemoryRegion *sysmem, *subregion, *next;
++    Error *local_err = NULL;
++    int region;
++
++    sysmem = get_system_memory();
++
++    qemu_mutex_lock_iothread();
++
++    memory_region_transaction_begin();
++
++    QTAILQ_FOREACH_SAFE(subregion, &sysmem->subregions, subregions_link, next) {
++        if (subregion->ram) {
++            memory_region_del_subregion(sysmem, subregion);
++            /* TODO: should subregion be finalized separately? */
 +        }
-+        break;
-     default:
-         error_setg(&err, "Unknown command");
-         goto finalize_loop;
++    }
++
++    for (region = 0; region < msg->num_fds; region++) {
++        subregion = g_new(MemoryRegion, 1);
++        remote_ram_init_from_fd(subregion, msg->fds[region],
++                                sysmem_info->sizes[region],
++                                sysmem_info->offsets[region], &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            break;
++        }
++
++        memory_region_add_subregion(sysmem, sysmem_info->gpas[region],
++                                    subregion);
++    }
++
++    memory_region_transaction_commit();
++
++    qemu_mutex_unlock_iothread();
++}
 -- 
 2.17.1
 
