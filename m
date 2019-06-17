@@ -2,108 +2,54 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9198C31E44
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 08:04:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28093C31E44
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 08:20:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE1D021993
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 08:04:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="eqdYLQl/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE1D021993
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id EEAAA21C38
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 08:20:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEAAA21C38
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=birkelund.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44940 helo=lists.gnu.org)
+Received: from localhost ([::1]:45030 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcmci-0003ye-Ub
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 04:04:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37419)
+	id 1hcmsq-0007ki-0G
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 04:20:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40838)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <shmuel.eiderman@oracle.com>) id 1hcmaa-0003Lj-Vz
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 04:02:06 -0400
+ (envelope-from <klaus@birkelund.eu>) id 1hcmro-0006zd-PQ
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 04:19:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shmuel.eiderman@oracle.com>) id 1hcmaZ-0008IZ-C6
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 04:02:04 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:59056)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
- id 1hcmaT-00081p-SH; Mon, 17 Jun 2019 04:01:59 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5H7wunK031836;
- Mon, 17 Jun 2019 08:01:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : message-id :
- content-type : mime-version : subject : date : in-reply-to : cc : to :
- references; s=corp-2018-07-02;
- bh=iAa9PNiKdS4XfDmgI/Xy7/jOJpyLN+tjtD4fXkkwFgY=;
- b=eqdYLQl/Z68iXjV/9NAHIcGxZChGVELf1LNifZwx4gWd4+dNAsjYRRdnAjcpPeajR1O0
- FQZlCcwiEEP1bSawhvoGnyLWCJgjI5Jl2FNFU7zFrfpWu2Scy07f4pa2EpKgpMmorKww
- ywSIjWDyj/WHtLxteEMv3GF+kdbGSFT7KJd1P32GAcHvY1jn8RPaoc93YVTDeKnF/tXw
- C7EXNRKMh2wicPDshORSX0n1EvXkpYhg+qLxhgR4EhjqBPZ5NC3/f8her+au7BeL8+0c
- YGoWcdqH89wykmDck8E2zFO5KtfHGMJuaingVdk4+iIexjfBPqtITHbL5NPHyr61Ocqm tQ== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by userp2120.oracle.com with ESMTP id 2t4saq4vgv-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 17 Jun 2019 08:01:45 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5H7xSNf122908;
- Mon, 17 Jun 2019 07:59:45 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by userp3020.oracle.com with ESMTP id 2t5h5t0d19-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 17 Jun 2019 07:59:44 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5H7xhA1014974;
- Mon, 17 Jun 2019 07:59:43 GMT
-Received: from [10.0.5.157] (/213.57.127.10)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 17 Jun 2019 07:59:43 +0000
-From: Sam Eiderman <shmuel.eiderman@oracle.com>
-Message-Id: <28D338C3-AF42-4145-94A6-8C8175A23949@oracle.com>
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Date: Mon, 17 Jun 2019 10:59:36 +0300
-In-Reply-To: <20190617065050.nx76n6625tm3d2oo@sirius.home.kraxel.org>
-To: Gerd Hoffmann <kraxel@redhat.com>
-References: <20190612115939.23825-1-shmuel.eiderman@oracle.com>
- <20190612130650.xftda65kgnsefyvs@sirius.home.kraxel.org>
- <A3F8BD49-3C35-4A07-8DE2-85F7CC293DC9@oracle.com>
- <20190612191817.5bilt2abif2xvcbv@sirius.home.kraxel.org>
- <02844D7D-ED79-4744-A203-8E713DE7A717@oracle.com>
- <20190613093850.5k7prawn6x4qt3fi@sirius.home.kraxel.org>
- <730C65DE-A9B4-4553-B6A0-7A3B81A1FA12@oracle.com>
- <20190614044310.wxnkwxagr23d5cbt@sirius.home.kraxel.org>
- <985C60F2-999C-44C6-B8BC-B5603DD0F716@oracle.com>
- <20190617065050.nx76n6625tm3d2oo@sirius.home.kraxel.org>
-X-Mailer: Apple Mail (2.3445.104.11)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9290
- signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906170075
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9290
- signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906170075
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.85
-Content-Type: text/plain;
-	charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [QEMU] [PATCH v2 0/8] Add Qemu to SeaBIOS LCHS
- interface
+ (envelope-from <klaus@birkelund.eu>) id 1hcmrn-0006OY-BY
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 04:19:52 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:46532)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <klaus@birkelund.eu>)
+ id 1hcmrk-0006LG-8s; Mon, 17 Jun 2019 04:19:48 -0400
+Received: from apples.localdomain (soho-cph.cust-cnex.dsd101.net
+ [194.62.216.132])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 95277BF602;
+ Mon, 17 Jun 2019 08:12:10 +0000 (UTC)
+Date: Mon, 17 Jun 2019 10:12:05 +0200
+From: Klaus Birkelund <klaus@birkelund.eu>
+To: qemu-devel@nongnu.org
+Message-ID: <20190617081205.GA26990@apples.localdomain>
+Mail-Followup-To: qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>,
+ Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 128.199.63.193
+Subject: [Qemu-devel] [RFC] nvme: how to support multiple namespaces
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,118 +61,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org,
- Arbel Moshe <arbel.moshe@oracle.com>, seabios@seabios.org,
- QEMU <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Kevin O'Connor <kevin@koconnor.net>, liran.alon@oracle.com,
- Karl Heubaum <karl.heubaum@oracle.com>
+Cc: Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>,
+ Laszlo Ersek <lersek@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi all,
+
+I'm thinking about how to support multiple namespaces in the NVMe
+device. My first idea was to add a "namespaces" property array to the
+device that references blockdevs, but as Laszlo writes below, this might
+not be the best idea. It also makes it troublesome to add per-namespace
+parameters (which is something I will be required to do for other
+reasons). Some of you might remember my first attempt at this that
+included adding a new block driver (derived from raw) that could be
+given certain parameters that would then be stored in the image. But I
+understand that this is a no-go, and I can see why.
+
+I guess the optimal way would be such that the parameters was something
+like:
+
+   -blockdev raw,node-name=blk_ns1,file.driver=file,file.filename=blk_ns1.img
+   -blockdev raw,node-name=blk_ns2,file.driver=file,file.filename=blk_ns2.img
+   -device nvme-ns,drive=blk_ns1,ns-specific-options (nsfeat,mc,dlfeat)...
+   -device nvme-ns,drive=blk_ns2,...
+   -device nvme,...
+
+My question is how to state the parent/child relationship between the
+nvme and nvme-ns devices. I've been looking at how ide and virtio does
+this, and maybe a "bus" is the right way to go?
+
+Can anyone give any advice as to how to proceed? I have a functioning
+patch that adds multiple namespaces, but it uses the "namespaces" array
+method and I don't think that is the right approach.
+
+I've copied my initial discussion with Laszlo below.
 
 
-> On 17 Jun 2019, at 9:50, Gerd Hoffmann <kraxel@redhat.com> wrote:
->=20
->  Hi,
->=20
->>> Ok, given that seabios has no setup any manual configuration needs =
-to be done via qemu.
->>>=20
->>> But why do we need a new interface for that?  IDE can pass the =
-geometry
->>> to the guest.  virtio-blk has support too (VIRTIO_BLK_F_GEOMETRY).
->>> Likewise scsi (MODE_PAGE_HD_GEOMETRY).  So this should be doable =
-without
->>> any qemu changes.
->>=20
->> This was indeed considered (all 3 methods) but it has the following =
-issues:
->>=20
->> Physical geometries of devices must now also be logical geometries =
-with translation=3Dnone.
->=20
-> Yes.
->=20
->> When the OS will query these devices - It will now see different =
-physical geometries, adapted to be logical geometries.
->=20
-> Yes.
->=20
->> I=E2=80=99m not sure even how to implement this without breaking =
-existing
->> compatibility - since we don=E2=80=99t want to affect logical =
-geometries of
->> currently used guests.
->=20
-> We can copy the logic which calculates lchs from seabios to qemu and =
-use
-> it for pchs.
->=20
-> The tricky part of this is how to do the switch without requiring a
-> lockstep update of seabios and qemu.  seabios can't easily know =
-whenever
-> it should use the current logic (current qemu) or whenever it should
-> simply use pchs with translation=3Dnone (updated qemu).
->=20
-> Hmm ...
->=20
->> MODE_PAGE_HD_GEOMETRY does not contain the spts, only cylinders (as 3
->> byte number) and heads (as 1 byte number) and computes the spts =
-using:
->=20
-> Well, there also is MODE_PAGE_FLEXIBLE_DISK_GEOMETRY.
->=20
->> Moving a scsi-hd/virtio-blk with 255 physical heads to ide-hd, we =
-will
->> still need to report 255 heads - this is possible since a whole byte
->> can be used in the =E2=80=9Cide identify=E2=80=9D command, but goes =
-against the spec
->> of a maximum of 16 heads for IDE.
->=20
-> Why do you want migrate _to_ IDE?
+Cheers,
+Klaus
 
-Even without migration, now under SeaBIOS probably most IDE disks
-report 255 heads and 63 spts due to LBA translation, while exposing
-up to 16 physical heads (IDE spec).
-So you can=E2=80=99t really report in ATA identify command your wanted =
-logical
-heads (255).
 
-This can be solved in a very complicated way:
-
-For virtio-blk disks - report bios geometries as physical geometries.
-This might break current compatibility (showing different physical =
-geometries)
-For scsi disks - report bios geometries as physical geometries.
-Implement MODE_PAGE_FLEXIBLE_DISK_GEOMETRY and translation=3Dnone - this =
-new interface will help with compatibility
-For IDE disks - specially craft valid physical geometries (heads <=3D =
-16) with a specific translation,
-This is super complicated, for example to make an IDE disk report lchs =
-of 32 heads, 56 spts, you need a physical geometry of 16 heads, 56 spts =
-and report 2046 cylinders with a "large" translation - which will =
-effectively cut down the number of cylinders by 2 to 1023 and multiply =
-the heads by 2 to 32, achieving the desired lchs. Also we can not even =
-make an IDE report 255 heads with 56 spts with any translation (this is =
-an actual value from production) - so the disk must be moved to =
-scsi-hd/virtio-blk - which also breaks compatibility.
-
-This implementation creates 3 different non conventional (PV) ways of =
-reporting lchs directly between Qemu and SeaBIOS - which add a lot of =
-technical depth for resolving a legacy issue. A fw-cfg value named =
-=E2=80=9Cbootdevices=E2=80=9D (or =E2=80=9Cbios-geometry=E2=80=9D) is =
-much more straightforward and makes it more readable/explicit.
-
-WDYT?
-
->=20
->> Overall this approach is much more complicated.
->=20
-> Well, adding new fw_cfg interfaces has a long term maintenance cost.
-> So there should be a pretty good reason for them.
->=20
-> cheers,
->  Gerd
->=20
+On Wed, Jun 05, 2019 at 07:09:43PM +0200, Laszlo Ersek wrote:
+> On 06/05/19 15:44, Klaus Birkelund wrote:
+> > On Tue, Jun 04, 2019 at 06:52:38PM +0200, Laszlo Ersek wrote:
+> >> Hi Klaus,
+> >>
+> >> On 06/04/19 14:59, Klaus Birkelund wrote:
+> >>> Hi Laszlo,
+> >>>
+> >>> I'm implementing multiple namespace support for the NVMe device in QEMU
+> >>> and I'm not sure how to handle the bootindex property.
+> >>>
+> >>> Your commit message from a907ec52cc1a provides great insight, but do you
+> >>> have any recommendations to how the bootindex property should be
+> >>> handled?
+> >>>
+> >>> Multiple namespaces work by having multiple -blockdevs and then using
+> >>> the property array functionality to reference a list of blockdevs from
+> >>> the nvme device:
+> >>>
+> >>>     -device nvme,serial=<serial>,len-namespaces=1,namespace[0]=<drive_id>
+> >>>
+> >>> A bootindex property would be global to the device. Should it just
+> >>> always default to the first namespace? I'm really unsure about how the
+> >>> firmware handles it.
+> >>>
+> >>> Hope you can shed some light on this.
+> >>
+> >> this is getting quite seriously into QOM and QEMU options, so I
+> >> definitely suggest to take this to the list, because I'm not an expert
+> >> in all that, at all :)
+> >>
+> >> Based on a re-reading of the commit (which I have *completely* forgotten
+> >> about by now!), and based on your description, my opinion is that
+> >> introducing the "namespace" property to the "nvme" device as an array is
+> >> a bad fit. Because, as you say, a single device may only take a single
+> >> bootindex property. If it suffices to designate at most one namespace
+> >> for booting purposes, then I *guess* an extra property can be
+> >> introduced, to state *which* namespace the bootindex property should
+> >> apply to (and the rest of the namespaces will be ignored for that
+> >> purpose). However, if it's necessary to add at least two namespaces to
+> >> the boot order, then the namespaces will have to be split to distinct
+> >> "-device" options.
+> >>
+> >> My impression is that the "namespace" property isn't upstream yet; i.e.
+> >> it is your work in progress. As a "QOM noob" I would suggest introducing
+> >> a new device model, called "nvme-namespace". This could have its own
+> >> "bootindex" property. On the "nvme" device model's level, the currently
+> >> existing "bootindex" property would become mutually exclusive with the
+> >> "nvme" device having "nvme-namespace" child devices. The parent-child
+> >> relationship could be expressed from either direction, i.e. either the
+> >> "nvme" parent device could reference the children with the "namespace"
+> >> array property (it wouldn't refer to <drive_id>s but to the IDs of
+> >> "nvme-namespace" devices), or the "nvme-namespace" devices could
+> >> reference the parent "nvme" device via a "bus" property or similar.
+> >>
+> >> The idea is that "bootindex" would have to exist at the nvme-namespace
+> >> device model's level, and a parent ("bus") device would have to enforce
+> >> various properties, such as no namespace ID duplication and so on.
+> >>
+> >> I suggest that, if/when you respond to this email, keep all context, and
+> >> CC the qemu-devel list at once. (I could have done that myself right
+> >> now, but didn't want to, without your permission.)
+> >>
+> > 
+> > Hi Laszlo,
+> > 
+> > Thank you very much for the feedback!
+> > 
+> > I have a big patch series for the nvme device which the multiple
+> > namespace patch builds on. I'll post the big series tomorrow I hope.
+> > Then I'll post the multiple namespaces patch as an RFC and include our
+> > discussion here.
+> > 
+> > I hadn't thought about introducing a separate device model for the
+> > namespace. It's way beyond my QOM knowledge, so yeah, hopefully someone
+> > on the list have some opinions on this.
+> > 
+> > 
+> > Thanks again!
+> 
+> My pleasure! I'll attempt to follow the discussion (from a safe distance
+> :) ) because I'm curious about the proper device model hierarchy here.
+> 
+> Regarding OVMF, as long as your QEMU work keeps the *structure* of the
+> OpenFirmware device paths intact (and you just compose the NSID and
+> EUI-64 values dynamically, in the trailing "unit address" part), OVMF
+> should need no change.
+> 
+> Thanks!
+> Laszlo
 
