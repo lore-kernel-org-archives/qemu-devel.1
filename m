@@ -2,83 +2,96 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 531C5C31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:08:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D9B7C31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:08:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13AF9208C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:08:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF2BE208C4
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:08:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lH50E6tW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13AF9208C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="bYN0kUSM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF2BE208C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48882 helo=lists.gnu.org)
+Received: from localhost ([::1]:48886 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcuAu-0008Bd-BP
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 12:08:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51880)
+	id 1hcuB4-00008B-12
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 12:08:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57544)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hcszc-0003Oi-Dc
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:52:22 -0400
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hctJ1-0004St-TQ
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:12:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hcsza-0003rM-3h
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:52:20 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:40756)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hcszZ-0003qh-Vb
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:52:18 -0400
-Received: by mail-oi1-x243.google.com with SMTP id w196so7195249oie.7
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 07:52:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=QJZR1Az/4V69kQygQp+9DMhkA03qEndikj3JJAFD+6U=;
- b=lH50E6tWEvW7O1JnG0iKdOE4POA9mQil+6E4ZeO8VEzo28yuPihqSZaCblVoFNxBq4
- 4aWpeLEAY4sqJzinvLAuyyRlpKutcArQca6TNn2EXFhTyBvK0JCwrOU3eu5j4ElXKCfM
- LfCBrEP4zI9VBvUMMPtCTI/kZpRNnWIGu5YsYAiRLjYr00l3wY2P6ZrVhPBvnLcfDpRG
- kpsGdjZuY81a8srfHszh2x78e479+OpWoBukJTlw03JqJ5vrMQjSoLbx/SGFLDKrgPiJ
- JvuR4XXr0x2CztuUEbq1F0hq1kPPH29dcfEWRJLfY5rKGX71ohWn0vqNe0IqDMyZNhL3
- TOiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=QJZR1Az/4V69kQygQp+9DMhkA03qEndikj3JJAFD+6U=;
- b=Fe21zlxZtT8lzUR0qdT3XkUEabxUKtdNXl6QmwTG/Vp9T+m4Vj+R1jCCMUza5RW+B5
- h39Imm/k0mPcOJm1SEcDXPf6TJ2dgGlYjjbcyrLe160lKFXy3OjP0MyWVGxFj4qI6Cg2
- Z+j46KGecuF0wJO+9zisVtWsa6a/RT3jRJzMQbxgTAN/DaGALvVn89NFF8AT2bNVuHWC
- WaBptk220eTAklUKqX1XwKPBGYU6yWDNeO67KEDDHFbRlVzJjTBI4klw1ElZYhhQD2Vb
- BygkDS4AEcmU3hgWSD2dNnZ1SI9jTs2Gv++If5BGyWGc8YhO/9VhqOEnSPAOVsWDpcJo
- zILg==
-X-Gm-Message-State: APjAAAWj5a3LcfCjteweBjtJRVkd+Rp6lpwjQwgBSa+SfanAwkibWzRR
- faMR1m5bib2BHDqeZY3aQbs22lBeLf540OnIoW31dg==
-X-Google-Smtp-Source: APXvYqyh4oqRnWa1TDP75Wpicn3TAEw4pvR4VUGNApwJUO6lZGb9WdDek4PWJFuCym4FnH1eLh6/u/6CEoqSlbRnSCY=
-X-Received: by 2002:aca:ac48:: with SMTP id v69mr10102300oie.48.1560783136786; 
- Mon, 17 Jun 2019 07:52:16 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190615154352.26824-1-philmd@redhat.com>
- <20190615154352.26824-19-philmd@redhat.com>
- <87h88o9svq.fsf@zen.linaroharston>
-In-Reply-To: <87h88o9svq.fsf@zen.linaroharston>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 17 Jun 2019 15:52:05 +0100
-Message-ID: <CAFEAcA8t7EYC6PK24oHcsGsD7PazuqCzGcLuwiMmh2C4dKJF2A@mail.gmail.com>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 18/23] target/arm: Move CPU
- state dumping routines to helper.c
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hctIz-0002s0-95
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:12:23 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:58424)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
+ id 1hctIo-0002jA-RB; Mon, 17 Jun 2019 11:12:11 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HF3raS008761;
+ Mon, 17 Jun 2019 15:12:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
+ bh=IF99orgPl5PZbXP/iOJCxdKOiazKw347UHLBH9LWKbA=;
+ b=bYN0kUSMnMDoexKYxAOcSUQJ8rzuDXMnNP9kcXGFn4SJpGbuLbBlcgQBUIA0EB1eNlIf
+ Hzz6M+zPbyGrplxNLZL0N4uO+XveQjRhOMv07KWnXiyQj/4N9NF6yCbbc6QHJfvcZ7pG
+ rwGLTbMkvyXRlT2hoUWwu82eNxjSnxMdLl3FJ7Suku9l5hwTWihnBXd9VLDpWxf/u1/Q
+ a3L8BHy3hP8VpzMq3Gwo/TQA0aR47NvywnmtI5IOBNhiwSv3hlQSbV7D3uO1q9RZUdSx
+ ntR7o93hZHHOfx288Gwp5YskCJFhnziOkYIqKiPL78tkD/kdmSlxH9zwEtPpWkLlVTYB 4w== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2120.oracle.com with ESMTP id 2t4saq73tg-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 17 Jun 2019 15:12:07 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HF9WNu082329;
+ Mon, 17 Jun 2019 15:10:07 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by userp3030.oracle.com with ESMTP id 2t59gd9b3d-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 17 Jun 2019 15:10:07 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5HFA6YY025578;
+ Mon, 17 Jun 2019 15:10:06 GMT
+Received: from nexus.ravello.local (/213.57.127.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Mon, 17 Jun 2019 08:10:05 -0700
+From: Sam Eiderman <shmuel.eiderman@oracle.com>
+To: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ mreitz@redhat.com, seabios@seabios.org, kraxel@redhat.com,
+ kevin@koconnor.net
+Date: Mon, 17 Jun 2019 18:09:43 +0300
+Message-Id: <20190617150950.5264-2-shmuel.eiderman@oracle.com>
+X-Mailer: git-send-email 2.13.3
+In-Reply-To: <20190617150950.5264-1-shmuel.eiderman@oracle.com>
+References: <20190617150950.5264-1-shmuel.eiderman@oracle.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906170136
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906170136
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.85
+Subject: [Qemu-devel] [QEMU] [PATCH v3 1/8] block: Refactor macros - fix
+ tabbing
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,49 +103,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Robert Bradford <robert.bradford@intel.com>,
- Samuel Ortiz <sameo@linux.intel.com>
+Cc: liran.alon@oracle.com, shmuel.eiderman@oracle.com, karl.heubaum@oracle.com,
+ arbel.moshe@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 17 Jun 2019 at 15:41, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
-> Hmm so helper is a mix of non-TCG and TCG bits whereas helper-a64.c is
-> basically just TCG helpers. It makes me wonder if we are breaking a
-> convention here as helper.c is traditionally only TCG helpers.
+Fixing tabbing in block related macros.
 
-The original convention was:
- * op_helper.c has functions which need access to things which
-   TCG puts in specific registers and which are accessed from
-   C via gcc "register variables" (most notably the CPU env pointer)
- * helper.c has functions which don't need access to the register
-   variables (a mishmash of stuff, usually including interrupt/exception
-   handling)
- * some targets further split out some parts of the C code into other
-   foo-helper.c files
-This distinction became entirely moot when we reworked the TCG code
-to no longer use register variables (but instead pass in the env
-pointer and so on directly as a function argument). You can still
-see the comments at the top of target/i386/{op_helper,helper}.c that
-claim this is what the files are for, though :-)
+Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
+Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
+---
+ hw/ide/qdev.c            |  2 +-
+ include/hw/block/block.h | 16 ++++++++--------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
-So these days there is really no fixed convention, except that
-when we've added new things we've sometimes put them in their
-own .c file. helper-a64.c in particular is on its own because it's
-code that's only compiled into aarch64-softmmu, not arm-softmmu.
+diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+index 360cd20bd8..9cae3205df 100644
+--- a/hw/ide/qdev.c
++++ b/hw/ide/qdev.c
+@@ -285,7 +285,7 @@ static void ide_drive_realize(IDEDevice *dev, Error **errp)
+     DEFINE_BLOCK_PROPERTIES(IDEDrive, dev.conf),        \
+     DEFINE_BLOCK_ERROR_PROPERTIES(IDEDrive, dev.conf),  \
+     DEFINE_PROP_STRING("ver",  IDEDrive, dev.version),  \
+-    DEFINE_PROP_UINT64("wwn",  IDEDrive, dev.wwn, 0),    \
++    DEFINE_PROP_UINT64("wwn",  IDEDrive, dev.wwn, 0),   \
+     DEFINE_PROP_STRING("serial",  IDEDrive, dev.serial),\
+     DEFINE_PROP_STRING("model", IDEDrive, dev.model)
+ 
+diff --git a/include/hw/block/block.h b/include/hw/block/block.h
+index 607539057a..fd55a30bca 100644
+--- a/include/hw/block/block.h
++++ b/include/hw/block/block.h
+@@ -50,21 +50,21 @@ static inline unsigned int get_physical_block_exp(BlockConf *conf)
+                           _conf.logical_block_size),                    \
+     DEFINE_PROP_BLOCKSIZE("physical_block_size", _state,                \
+                           _conf.physical_block_size),                   \
+-    DEFINE_PROP_UINT16("min_io_size", _state, _conf.min_io_size, 0),  \
++    DEFINE_PROP_UINT16("min_io_size", _state, _conf.min_io_size, 0),    \
+     DEFINE_PROP_UINT32("opt_io_size", _state, _conf.opt_io_size, 0),    \
+-    DEFINE_PROP_UINT32("discard_granularity", _state, \
+-                       _conf.discard_granularity, -1), \
+-    DEFINE_PROP_ON_OFF_AUTO("write-cache", _state, _conf.wce, \
+-                            ON_OFF_AUTO_AUTO), \
++    DEFINE_PROP_UINT32("discard_granularity", _state,                   \
++                       _conf.discard_granularity, -1),                  \
++    DEFINE_PROP_ON_OFF_AUTO("write-cache", _state, _conf.wce,           \
++                            ON_OFF_AUTO_AUTO),                          \
+     DEFINE_PROP_BOOL("share-rw", _state, _conf.share_rw, false)
+ 
+ #define DEFINE_BLOCK_PROPERTIES(_state, _conf)                          \
+     DEFINE_PROP_DRIVE("drive", _state, _conf.blk),                      \
+     DEFINE_BLOCK_PROPERTIES_BASE(_state, _conf)
+ 
+-#define DEFINE_BLOCK_CHS_PROPERTIES(_state, _conf)      \
+-    DEFINE_PROP_UINT32("cyls", _state, _conf.cyls, 0),  \
+-    DEFINE_PROP_UINT32("heads", _state, _conf.heads, 0), \
++#define DEFINE_BLOCK_CHS_PROPERTIES(_state, _conf)                      \
++    DEFINE_PROP_UINT32("cyls", _state, _conf.cyls, 0),                  \
++    DEFINE_PROP_UINT32("heads", _state, _conf.heads, 0),                \
+     DEFINE_PROP_UINT32("secs", _state, _conf.secs, 0)
+ 
+ #define DEFINE_BLOCK_ERROR_PROPERTIES(_state, _conf)                    \
+-- 
+2.13.3
 
-> It feels like there should be different file that is unambiguously used
-> for both TCG and KVM based workloads where things like the cpu dump code
-> can live.
-
-Some sort of split like this seems like a good idea. I don't
-know if any of the other target archs have already got a
-good convention/naming scheme we could copy?
-
-thanks
--- PMM
 
