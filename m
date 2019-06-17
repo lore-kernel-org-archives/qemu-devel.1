@@ -2,85 +2,96 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9FD5C31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:14:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ABB9C31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:15:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9755D20B1F
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:14:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 69F21208C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:15:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uiICOJxl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9755D20B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="UV1/vxkT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69F21208C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49000 helo=lists.gnu.org)
+Received: from localhost ([::1]:49002 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcuHC-0007Xo-SG
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 12:14:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53402)
+	id 1hcuHo-0007yH-Ln
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 12:15:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56954)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hct4w-0000RE-3q
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:57:51 -0400
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hctHB-0003DR-AW
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:10:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hct4u-0007Mz-9n
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:57:50 -0400
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:36122)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hct4t-0007HA-Ov
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:57:47 -0400
-Received: by mail-wr1-x433.google.com with SMTP id n4so2237949wrs.3
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 07:57:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=OfRlriUcegMGyJMXyPC8qiO/SzfKh5oij1yWMrA7S44=;
- b=uiICOJxljTipTrT91dOiG7kabgZW3AgINocFDmuFbZXFUuqA4wTZs+Qc4AqnyS/AWS
- ucXsmblFTQ6bZDLFxkCn4XrDWE8v5w2V84rIzsOULYa0hP84uZKQOAnIwtFwBp0hpvLc
- zDAiKyjiVjS+K4rm5vLej6r2MPlSxMeoLoE965IW/W4I59sZili8v6rtq4nxKK2xY+2y
- clQo+ml9xH4TzwAowU6o6ch39Dchk6Vfs8J81Zd4vEEguGNQiL47vFZSCqjeP+whgM/I
- 5eokE1136FuUhcIT7gFKrENHkUcvmOc7jPGOmFsC9GjpxCsPIml6qMO35r7jRTy59zl7
- Me3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=OfRlriUcegMGyJMXyPC8qiO/SzfKh5oij1yWMrA7S44=;
- b=PYQfmgIvaBC4EJRmm56abl1n2UsfrWQlw/bdRLHx14U7fmYKv/yQyAOYvg7nm0yRjK
- SX3ENMjNwdSDkaI22aWjgiZVoxpUF2SEouGvjS+e+B1/5rZuuF4nosInidqanLfqUPaR
- FFppK+hvDQ5HENMwwOTNRUMhprr815HxHTcQxMwp420wyEr1fV5buLgGdiM9TyBijNAO
- 06FmGLO/D+Mn+xCCZq1xVxdxfIAe3pNXdENa4aaWDZFxIqHRCRJz7naA3JcABaAqy26n
- 876R3OFpfRRc7VsR2yYCEF2AAKVEEfyodnAh/zmJivIjnXV8vbjX2/lpr/T1GPcIJYrK
- rbUA==
-X-Gm-Message-State: APjAAAXLnN8r1gSgx4jxYzLbubrH57EfDrDLIN+8gY+9NoKlDHRwpvD3
- oHInnMITJ6Hr2VlPzuDSeXNJeZJDLar3AA==
-X-Google-Smtp-Source: APXvYqw0es24UilT+UELDgiW0QLNWzTo8gO9Pwuz8ZLKZKD/LkFmmtY49N+kmktRCOuB8ae8/2mAOA==
-X-Received: by 2002:adf:dd51:: with SMTP id u17mr60925723wrm.218.1560783462448; 
- Mon, 17 Jun 2019 07:57:42 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id s10sm14690750wmf.8.2019.06.17.07.57.41
- for <qemu-devel@nongnu.org>
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 17 Jun 2019 07:57:41 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Mon, 17 Jun 2019 15:57:36 +0100
-Message-Id: <20190617145740.9881-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::433
-Subject: [Qemu-devel] [PULL 0/4] docs queue
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hctH6-0001OX-Tj
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:10:27 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:56630)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
+ id 1hctH3-0001Jy-Gr; Mon, 17 Jun 2019 11:10:21 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HF3jZT008683;
+ Mon, 17 Jun 2019 15:10:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
+ bh=LGrComxyqN1TLgk8Bo9iKZ5zTEqxz7KVof3cokKzZBY=;
+ b=UV1/vxkTflPpgcGuVroPQl8PEzmYkvG1M8jPI4mNxfvbPRuVZcgu6YvNgqOUq1IfJdnO
+ stri79mkHwSrzT1ys49T+VT9J1RyzaqSl6k4dIorU45woIB+XJl/IO6MG/wyJUbHb1RE
+ ehihHN6YzzOgLa4rVCUYT1q7zmcu4Sd+e8945J1Xbwk7rxp/vNuP6JN3CdukFh8uW6E8
+ NPNFM4NDe5ZnnzD8FeX8duDCwNxhxWmsb9ElCivTYO3G3Ihl76BznuT1Mz+veVjL0W1m
+ KGKzkeP05YvLH10idMMQntdIOruEkqua3Puj0gSiLylDmnSA2B/rT1vJ96jdM32vcWe1 tg== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2120.oracle.com with ESMTP id 2t4saq73fg-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 17 Jun 2019 15:10:19 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HF99AV015910;
+ Mon, 17 Jun 2019 15:10:18 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by aserp3030.oracle.com with ESMTP id 2t5cpdgeew-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 17 Jun 2019 15:10:18 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5HFAIOc025733;
+ Mon, 17 Jun 2019 15:10:18 GMT
+Received: from nexus.ravello.local (/213.57.127.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Mon, 17 Jun 2019 08:10:18 -0700
+From: Sam Eiderman <shmuel.eiderman@oracle.com>
+To: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ mreitz@redhat.com, seabios@seabios.org, kraxel@redhat.com,
+ kevin@koconnor.net
+Date: Mon, 17 Jun 2019 18:09:47 +0300
+Message-Id: <20190617150950.5264-6-shmuel.eiderman@oracle.com>
+X-Mailer: git-send-email 2.13.3
+In-Reply-To: <20190617150950.5264-1-shmuel.eiderman@oracle.com>
+References: <20190617150950.5264-1-shmuel.eiderman@oracle.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=889
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906170136
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=932 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906170136
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.85
+Subject: [Qemu-devel] [QEMU] [PATCH v3 5/8] bootdevice: Gather LCHS from all
+ relevant devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,50 +103,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: liran.alon@oracle.com, shmuel.eiderman@oracle.com, karl.heubaum@oracle.com,
+ arbel.moshe@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I thought I'd put together a pullreq with some of the sphinx docs
-patches I've sent out recently, since they don't really have an
-obvious more sensible route to go through.
+Relevant devices are:
+    * ide-hd (and ide-cd, ide-drive)
+    * scsi-hd (and scsi-cd, scsi-disk, scsi-block)
+    * virtio-blk-pci
 
-thanks
--- PMM
+We do not call del_boot_device_lchs() for ide-* since we don't need to -
+IDE block devices do not support unplugging.
 
-The following changes since commit 5d0e5694470d2952b4f257bc985cac8c89b4fd92:
+Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
+Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
+---
+ hw/block/virtio-blk.c |  6 ++++++
+ hw/ide/qdev.c         |  5 +++++
+ hw/scsi/scsi-disk.c   | 14 ++++++++++++++
+ 3 files changed, 25 insertions(+)
 
-  Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2019-06-17 11:55:14 +0100)
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 06e57a4d39..787bbd768a 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -1182,6 +1182,11 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
+     blk_set_guest_block_size(s->blk, s->conf.conf.logical_block_size);
+ 
+     blk_iostatus_enable(s->blk);
++
++    add_boot_device_lchs(dev, "/disk@0,0",
++                         (&conf->conf)->lcyls,
++                         (&conf->conf)->lheads,
++                         (&conf->conf)->lsecs);
+ }
+ 
+ static void virtio_blk_device_unrealize(DeviceState *dev, Error **errp)
+@@ -1189,6 +1194,7 @@ static void virtio_blk_device_unrealize(DeviceState *dev, Error **errp)
+     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+     VirtIOBlock *s = VIRTIO_BLK(dev);
+ 
++    del_boot_device_lchs(dev, "/disk@0,0");
+     virtio_blk_data_plane_destroy(s->dataplane);
+     s->dataplane = NULL;
+     qemu_del_vm_change_state_handler(s->change);
+diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+index 9cae3205df..07f429d5e3 100644
+--- a/hw/ide/qdev.c
++++ b/hw/ide/qdev.c
+@@ -215,6 +215,11 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
+ 
+     add_boot_device_path(dev->conf.bootindex, &dev->qdev,
+                          dev->unit ? "/disk@1" : "/disk@0");
++
++    add_boot_device_lchs(&dev->qdev, dev->unit ? "/disk@1" : "/disk@0",
++                         (&dev->conf)->lcyls,
++                         (&dev->conf)->lheads,
++                         (&dev->conf)->lsecs);
+ }
+ 
+ static void ide_dev_get_bootindex(Object *obj, Visitor *v, const char *name,
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index 7b89ac798b..3451aefdea 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -2390,6 +2390,16 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
+     blk_set_guest_block_size(s->qdev.conf.blk, s->qdev.blocksize);
+ 
+     blk_iostatus_enable(s->qdev.conf.blk);
++
++    add_boot_device_lchs(&dev->qdev, NULL,
++                         (&dev->conf)->lcyls,
++                         (&dev->conf)->lheads,
++                         (&dev->conf)->lsecs);
++}
++
++static void scsi_unrealize(SCSIDevice *dev, Error **errp)
++{
++    del_boot_device_lchs(&dev->qdev, NULL);
+ }
+ 
+ static void scsi_hd_realize(SCSIDevice *dev, Error **errp)
+@@ -2988,6 +2998,7 @@ static void scsi_hd_class_initfn(ObjectClass *klass, void *data)
+     SCSIDeviceClass *sc = SCSI_DEVICE_CLASS(klass);
+ 
+     sc->realize      = scsi_hd_realize;
++    sc->unrealize    = scsi_unrealize;
+     sc->alloc_req    = scsi_new_request;
+     sc->unit_attention_reported = scsi_disk_unit_attention_reported;
+     dc->desc = "virtual SCSI disk";
+@@ -3019,6 +3030,7 @@ static void scsi_cd_class_initfn(ObjectClass *klass, void *data)
+     SCSIDeviceClass *sc = SCSI_DEVICE_CLASS(klass);
+ 
+     sc->realize      = scsi_cd_realize;
++    sc->unrealize    = scsi_unrealize;
+     sc->alloc_req    = scsi_new_request;
+     sc->unit_attention_reported = scsi_disk_unit_attention_reported;
+     dc->desc = "virtual SCSI CD-ROM";
+@@ -3054,6 +3066,7 @@ static void scsi_block_class_initfn(ObjectClass *klass, void *data)
+     SCSIDiskClass *sdc = SCSI_DISK_BASE_CLASS(klass);
+ 
+     sc->realize      = scsi_block_realize;
++    sc->unrealize    = scsi_unrealize;
+     sc->alloc_req    = scsi_block_new_request;
+     sc->parse_cdb    = scsi_block_parse_cdb;
+     sdc->dma_readv   = scsi_block_dma_readv;
+@@ -3095,6 +3108,7 @@ static void scsi_disk_class_initfn(ObjectClass *klass, void *data)
+     SCSIDeviceClass *sc = SCSI_DEVICE_CLASS(klass);
+ 
+     sc->realize      = scsi_disk_realize;
++    sc->unrealize    = scsi_unrealize;
+     sc->alloc_req    = scsi_new_request;
+     sc->unit_attention_reported = scsi_disk_unit_attention_reported;
+     dc->fw_name = "disk";
+-- 
+2.13.3
 
-are available in the Git repository at:
-
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-docs-20190617
-
-for you to fetch changes up to 0783a732f9ee2de28dc722d6cd87f04b2f264a48:
-
-  docs: Build and install specs manual (2019-06-17 15:35:31 +0100)
-
-----------------------------------------------------------------
-docs infrastructure queue:
- * fix some minor syntax issues in docs/specs/index.rst
- * build and install the 'specs' manual, since it now has some content
- * delete the "QEMU compared to other emulators" section of the docs
- * Convert "translator internals" docs to RST, move to devel manual
-
-----------------------------------------------------------------
-Peter Maydell (4):
-      Convert "translator internals" docs to RST, move to devel manual
-      qemu-tech.texi: Remove "QEMU compared to other emulators" section
-      docs/specs/index.rst: Fix minor syntax issues
-      docs: Build and install specs manual
-
- Makefile             |   7 +-
- docs/devel/index.rst |   1 +
- docs/devel/tcg.rst   | 111 +++++++++++++++++++++++++++
- docs/specs/conf.py   |  16 ++++
- docs/specs/index.rst |   9 ++-
- qemu-tech.texi       | 210 ---------------------------------------------------
- 6 files changed, 139 insertions(+), 215 deletions(-)
- create mode 100644 docs/devel/tcg.rst
- create mode 100644 docs/specs/conf.py
 
