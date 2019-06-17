@@ -2,91 +2,95 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E262C31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:02:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94111C31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:03:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF1C920652
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:02:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xFMorwB/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF1C920652
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 710EA208C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:03:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 710EA208C0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49818 helo=lists.gnu.org)
+Received: from localhost ([::1]:49826 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcv1t-0008DW-5I
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 13:02:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33184)
+	id 1hcv28-0000N8-KS
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 13:03:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57601)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hcuyD-00066O-1T
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 12:59:02 -0400
+ (envelope-from <anthony.perard@citrix.com>) id 1hculV-0001kX-Nk
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 12:45:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hcuyB-0001yi-0Z
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 12:59:00 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:39324)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hcuy8-0001s0-Tn
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 12:58:58 -0400
-Received: by mail-pg1-x541.google.com with SMTP id 196so6153956pgc.6
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 09:58:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=9hHmXjsmIgSXX6IxdG6kiYxinftCn7rjEAcGgSGhsgI=;
- b=xFMorwB/o2lItiYuW8gUWPfkL8KNoryWfEYSOuAjXuKq2qTqsgyioMs+opYfyVng7f
- HzELHqYLW7kdoaKLmZxT+iVSvdOW1/BuOBNdlO0oYP/x8sIlj3hgdEcaMKsv0du7jnfW
- gg+RdDj3FHmI5fShtl3M+pOhVKnZ9EfjYN/omQG9FqCF7nujU/oCxsUjDacnIkvjY5Hv
- LX8oHPOvlFpx510z+IMr7AqXgjCzpwfqUR4szWkUFb08M8wg8lgsvafNSB0BdRHprUUc
- lObs4Cwl8+4ugOsyDcneunIEy5nMG+oJ6A8bQNtvKw76bDc0Vx6vcXToyTcL5RsdPIMM
- lkHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=9hHmXjsmIgSXX6IxdG6kiYxinftCn7rjEAcGgSGhsgI=;
- b=DUBmDSaGTVMOPkVni+TvBdX+XqDSM7MbrZwZvDPHpYLRO3nbMKhIyLJ/dwrEXOUQGT
- TQf2HwmjfC4Tp9lMwz1Ksnxbj10MiTGzEnqVrf2AQak1J6Wr8vso30cr4FW9F59KjaXp
- sckaVuvJ/fMErloye9ABkQgeHjH9vaCY1g9P0YNVYkWTRkWktrLTY2wcBywwk7mtuSZR
- UhhIrz1YXUgNuF80DZB25YLpGi7VjvgsgbYyNY6VSx1svk+nvSZqEd6iQdfyqWOuvkrZ
- acxNzwKCa218YK5bp+n3/ekcRZf6blx73qPg4e+C1xkYS+X/PRj+PpE7I/xpBXGd63YT
- Xc6w==
-X-Gm-Message-State: APjAAAU0A3Cnq7r3RDIrhxUx3ah1+37k+j+ago0XRap6zMcORwYbCPSt
- FiInNCYgItx0gp7JHpsjfrZtZA==
-X-Google-Smtp-Source: APXvYqxLe0KtH9V1VNtds3QOto2JN6THbo8IjrdGu+Ds5bfwm0msuFtvKo1G9wpHuTumD8l5q/YziQ==
-X-Received: by 2002:a63:4d05:: with SMTP id a5mr46645366pgb.19.1560790735115; 
- Mon, 17 Jun 2019 09:58:55 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-2-33.tukw.qwest.net. [97.113.2.33])
- by smtp.gmail.com with ESMTPSA id y23sm15162676pfm.117.2019.06.17.09.58.54
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 17 Jun 2019 09:58:54 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20190616210546.17221-1-richard.henderson@linaro.org>
- <875zp49ocs.fsf@zen.linaroharston>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <f8e98c93-394f-835a-4ec0-d21746bd9c2f@linaro.org>
-Date: Mon, 17 Jun 2019 09:58:52 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <anthony.perard@citrix.com>) id 1hculU-0002om-0Q
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 12:45:53 -0400
+Received: from esa1.hc3370-68.iphmx.com ([216.71.145.142]:4781)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
+ id 1hculT-0002ft-KN
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 12:45:51 -0400
+Authentication-Results: esa1.hc3370-68.iphmx.com;
+ dkim=none (message not signed) header.i=none;
+ spf=None smtp.pra=anthony.perard@citrix.com;
+ spf=Pass smtp.mailfrom=anthony.perard@citrix.com;
+ spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa1.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ anthony.perard@citrix.com) identity=pra;
+ client-ip=162.221.158.21; receiver=esa1.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible
+Received-SPF: Pass (esa1.hc3370-68.iphmx.com: domain of
+ anthony.perard@citrix.com designates 162.221.158.21 as
+ permitted sender) identity=mailfrom;
+ client-ip=162.221.158.21; receiver=esa1.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible; x-record-type="v=spf1";
+ x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+ ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+ ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+ ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
+Received-SPF: None (esa1.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ postmaster@mail.citrix.com) identity=helo;
+ client-ip=162.221.158.21; receiver=esa1.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="postmaster@mail.citrix.com";
+ x-conformance=sidf_compatible
+IronPort-SDR: nbsi8hxYU8uehLQNpHdOUnkTBbXHr8DkPGtF7GnrdJYIoAaRLJDHZ+PeAprz9udzI+HGOxXSg3
+ MUcxFzyUKdHL3qSXYruhlV1niOT6Gc6u75w4QLxGWr5ZqNZiNiAf6Gz/cTC+mkB500+MpHhbrn
+ zh+rrrv4WbnN3Gi1AJB5gVUf+n59CTb3C0k32Vg++HQ55HLvrP1cwQICIYUX850HPt585yZbLy
+ Dn3MTtKYY9k/UEe4kwrl4I5OHdFuMqG+Pu3Eo0G3Wg2I1eukcNbwyc6gOrVIqASHMJObrLjyfp
+ +so=
+X-SBRS: 2.7
+X-MesageID: 1852595
+X-Ironport-Server: esa1.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.63,385,1557201600"; 
+   d="scan'208";a="1852595"
+Date: Mon, 17 Jun 2019 17:45:44 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+To: Paul Durrant <Paul.Durrant@citrix.com>
+Message-ID: <20190617164544.GA13449@perard.uk.xensource.com>
+References: <20190617154105.32323-1-anthony.perard@citrix.com>
+ <20190617154105.32323-4-anthony.perard@citrix.com>
+ <21258fd1788f418bb1a0007a43bf0250@AMSPEX02CL03.citrite.net>
 MIME-Version: 1.0
-In-Reply-To: <875zp49ocs.fsf@zen.linaroharston>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::541
-Subject: Re: [Qemu-devel] [PATCH] tcg: Fix mmap lock assert on translation
- failure
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <21258fd1788f418bb1a0007a43bf0250@AMSPEX02CL03.citrite.net>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 216.71.145.142
+Subject: Re: [Qemu-devel] [PATCH 3/4] xen: Import Xen public headers used by
+ xen-hvm.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,53 +102,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: christophe.lyon@linaro.org, qemu-devel@nongnu.org
+Cc: "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Stefano
+ Stabellini <sstabellini@kernel.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/17/19 9:18 AM, Alex Bennée wrote:
+On Mon, Jun 17, 2019 at 05:15:51PM +0100, Paul Durrant wrote:
+> > -----Original Message-----
+> > From: Anthony PERARD [mailto:anthony.perard@citrix.com]
+> > Sent: 17 June 2019 16:41
+> > To: qemu-devel@nongnu.org
+> > Cc: xen-devel@lists.xenproject.org; Anthony Perard <anthony.perard@citrix.com>; Stefano Stabellini
+> > <sstabellini@kernel.org>; Paul Durrant <Paul.Durrant@citrix.com>
+> > Subject: [PATCH 3/4] xen: Import Xen public headers used by xen-hvm.c
+> > 
+> > Following "xen: Fix build with public headers", import other Xen
+> > public headers that are describing interfaces.
+> > 
+> > The headers are cleaned up a bit while importing them. The header
+> > guard symbols are changed to match QEMU's coding style, some other
+> > part of the files that QEMU doesn't use are removed.
+> > 
+> > xen-mapcache.c doesn't needs params.h, so remove the include.
+> > 
+> > Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+> > ---
+> >  hw/i386/xen/xen-hvm.c                 |   6 +-
+> >  hw/i386/xen/xen-mapcache.c            |   2 -
+> >  include/hw/xen/interface/hvm/e820.h   |  28 +++++++
+> >  include/hw/xen/interface/hvm/ioreq.h  | 101 ++++++++++++++++++++++++++
+> >  include/hw/xen/interface/hvm/params.h |  33 +++++++++
+> >  5 files changed, 165 insertions(+), 5 deletions(-)
+> >  create mode 100644 include/hw/xen/interface/hvm/e820.h
+> >  create mode 100644 include/hw/xen/interface/hvm/ioreq.h
+> >  create mode 100644 include/hw/xen/interface/hvm/params.h
+> > 
+> > diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+> > index 2939122e7c..725f9c2278 100644
+> > --- a/hw/i386/xen/xen-hvm.c
+> > +++ b/hw/i386/xen/xen-hvm.c
+> > @@ -26,9 +26,9 @@
+> >  #include "trace.h"
+> >  #include "exec/address-spaces.h"
+> > 
+> > -#include <xen/hvm/ioreq.h>
+> > -#include <xen/hvm/params.h>
+> > -#include <xen/hvm/e820.h>
+> > +#include "hw/xen/interface/hvm/ioreq.h"
+> > +#include "hw/xen/interface/hvm/params.h"
 > 
-> Richard Henderson <richard.henderson@linaro.org> writes:
-> 
->> Check page flags before letting an invalid pc cause a SIGSEGV.
->>
->> Prepare for eventially validating PROT_EXEC.  The current wrinkle being
->> that we have a problem with our implementation of signals.  We should
->> be using a vdso like the kernel, but we instead put the trampoline on
->> the stack.  In the meantime, let PROT_READ match PROT_EXEC.
-> 
-> We can come up with a test case for this right? Would it be triggered by
-> having:
-> 
-> __attribute__((aligned(PAGE_SIZE)))
-> void some_func(void) {
->      /* does something */
-> }
-> 
-> __attribute__((aligned(PAGE_SIZE)))
-> ... rest of code ...
-> 
-> main () {
->      mmap(&some_func, PAGE_SIZE, PROT_READ, MAP_ANONYMOUS, 0, 0);
->      some_func()
->      /* causes SEGV */
->      mmap(&some_func, PAGE_SIZE, PROT_READ|PROT_EXEC, MAP_ANONYMOUS, 0, 0);
->      some_func()
->      /* works */
-> }
-> 
-> Or is it trickier to mess with your own mapped memory?
+> AFAICT the only place (apart from legacy code in xen_common.h) that
+> params.h is necessary is in xen_suspend_notifier(). I wonder whether
+> that would be better moved into xen_common.h too (since it's just a
+> wrapper round xc_set_hvm_param() and then the inclusion of params.h
+> can be moved there as well.
 
-It's trickier than that, but I do have a simple test case.
+:(, I didn't realised that xen_common.h needed params.h too. That patch
+series might not build on older version of Xen. I'll move the inclusion
+of params.h to xen_common.h, and fix params.h to have all the needed
+#defines.
 
-  https://bugs.launchpad.net/qemu/+bug/1832916
+About xen_suspend_notifier(), it's actually more than a wrapper, it's
+also a function. A pointer to the function is given to a notifier.
+So I don't think using "inline" will work, and I don't think it makes
+sense to have a function without "inline" in xen_common.h. So I think
+xen_{suspend,wakeup}_notifier are fine where there are, do you agree?
 
-But fixing that, as I mention above, makes signal trampolines fail.
+Thanks,
 
-Or did you mean for Christophe's failure?  That's easier -- just make a NULL
-function call.
-
-
-r~
+-- 
+Anthony PERARD
 
