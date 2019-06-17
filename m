@@ -2,73 +2,62 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AF72C31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:20:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 594FEC31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:23:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00CDE2084A
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:20:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00CDE2084A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 32DE12084A
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:23:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32DE12084A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49062 helo=lists.gnu.org)
+Received: from localhost ([::1]:49064 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcuNH-0004SO-99
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 12:20:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37361)
+	id 1hcuPz-0004yT-8v
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 12:23:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44285)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hctka-0003dH-Lz
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:40:54 -0400
+ (envelope-from <philmd@redhat.com>) id 1hcu56-0004Ys-MN
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 12:02:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hctkY-0007cn-Jj
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:40:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46952)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hctkW-0007ZE-PX
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:40:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hctkT-0002g5-MG
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 15:40:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 9B3C22E8076
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 15:40:45 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 17 Jun 2019 15:33:56 -0000
-From: David Lindsay <asmqb7@gmail.com>
+ (envelope-from <philmd@redhat.com>) id 1hcu54-0006lD-KK
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 12:02:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:63750)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>)
+ id 1hcu4x-0006QS-4l; Mon, 17 Jun 2019 12:01:55 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D98AEF9E85;
+ Mon, 17 Jun 2019 16:01:44 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-19.brq.redhat.com [10.40.204.19])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C03F6A480;
+ Mon, 17 Jun 2019 16:01:38 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: pl111 vexpress-a9
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: asmqb7
-X-Launchpad-Bug-Reporter: David Lindsay (asmqb7)
-X-Launchpad-Bug-Modifier: David Lindsay (asmqb7)
-Message-Id: <156078563656.24847.5055295179031840026.malonedeb@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18981";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 53694497b83d88193d67b325b712f597adf0f984
+Date: Mon, 17 Jun 2019 18:01:36 +0200
+Message-Id: <20190617160136.29930-1-philmd@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Mon, 17 Jun 2019 16:01:48 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1833101] [NEW] vexpress-a9 (but not -a15) creates
- two pl111 LCDs due to duplicate sysbus_create_simple("pl111", ...) calls
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH] hw/arm/msf2-som: Exit when the cpu is not the
+ expected one
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,132 +66,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1833101 <1833101@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Subbaraya Sundeep <sundeep.lkml@gmail.com>, qemu-arm@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+This machine correctly defines its default_cpu_type to cortex-m3
+and report an error if the user requested another cpu_type,
+however it does not exit, and this can confuse users trying
+to use another core:
 
-Hi,
+  $ qemu-system-arm -M emcraft-sf2 -cpu cortex-m4 -kernel test-m4.elf
+  qemu-system-arm: This board can only be used with CPU cortex-m3-arm-cpu
+  [output related to M3 core ...]
 
-Just a small report that (12ec8bd is current master)
+The CPU is indeed a M3 core:
 
-https://github.com/qemu/qemu/blob/12ec8bd/hw/arm/vexpress.c#L652:
+  (qemu) info qom-tree
+  /machine (emcraft-sf2-machine)
+    /unattached (container)
+      /device[0] (msf2-soc)
+        /armv7m (armv7m)
+          /cpu (cortex-m3-arm-cpu)
 
-  ...
-  vexpress_common_init() {
-    ...
-    sysbus_create_simple("pl111", map[VE_CLCD], pic[14]);
-    ...
-  ...
+Add the missing exit() call to return to the shell.
 
-and
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/arm/msf2-som.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-https://github.com/qemu/qemu/blob/12ec8bd/hw/arm/vexpress.c#L304:
+diff --git a/hw/arm/msf2-som.c b/hw/arm/msf2-som.c
+index 8c550a8bdd..2c9984bb3b 100644
+--- a/hw/arm/msf2-som.c
++++ b/hw/arm/msf2-som.c
+@@ -53,6 +53,7 @@ static void emcraft_sf2_s2s010_init(MachineState *machi=
+ne)
+     if (strcmp(machine->cpu_type, mc->default_cpu_type) !=3D 0) {
+         error_report("This board can only be used with CPU %s",
+                      mc->default_cpu_type);
++        exit(1);
+     }
+=20
+     memory_region_init_ram(ddr, NULL, "ddr-ram", DDR_SIZE,
+--=20
+2.20.1
 
-  ...
-  a9_daughterboard_init() {
-    ...
-    sysbus_create_simple("pl111", 0x10020000, pic[44]);
-    ...
-  ...
-
-result in two LCD panels when using vexpress-a9.
-
-vexpress-a15 does not appear to be affected (my -a9 kernel does not work
-with it, but I see only one pl111 created).
-
-Understandably (but still annoyingly), -nodefaults has no effect.
-
-This bug is most evident when using SDL (so I can use ",frame=3Doff"),
-which dumps two top-level windows onto the screen. GTK hides this
-because, coincidentally, the pl111 that ends up being used is the one
-that is selected (possibly the one created last?), relegating this to an
-obscure glitch only noticeable if you scrutinize the menu.
-
-This is a bugreport as opposed to a pull request as I have no idea which
-call to remove - and complete ignorance of the potential housekeeping
-and consideration that may be warranted first.
-
-FWIW, a simple testcase can be made with the vmlinuz from
-https://people.debian.org/~aurel32/qemu/armhf/ and
-
-qemu-system-arm -M vexpress-a9 -kernel vmlinuz-3.2.0-4-vexpress
--nodefaults -sdl
-
-Thanks!
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: pl111 vexpress-a9
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1833101
-
-Title:
-  vexpress-a9 (but not -a15) creates two pl111 LCDs due to duplicate
-  sysbus_create_simple("pl111", ...) calls
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hi,
-
-  Just a small report that (12ec8bd is current master)
-
-  https://github.com/qemu/qemu/blob/12ec8bd/hw/arm/vexpress.c#L652:
-
-    ...
-    vexpress_common_init() {
-      ...
-      sysbus_create_simple("pl111", map[VE_CLCD], pic[14]);
-      ...
-    ...
-
-  and
-
-  https://github.com/qemu/qemu/blob/12ec8bd/hw/arm/vexpress.c#L304:
-
-    ...
-    a9_daughterboard_init() {
-      ...
-      sysbus_create_simple("pl111", 0x10020000, pic[44]);
-      ...
-    ...
-
-  result in two LCD panels when using vexpress-a9.
-
-  vexpress-a15 does not appear to be affected (my -a9 kernel does not
-  work with it, but I see only one pl111 created).
-
-  Understandably (but still annoyingly), -nodefaults has no effect.
-
-  This bug is most evident when using SDL (so I can use ",frame=3Doff"),
-  which dumps two top-level windows onto the screen. GTK hides this
-  because, coincidentally, the pl111 that ends up being used is the one
-  that is selected (possibly the one created last?), relegating this to
-  an obscure glitch only noticeable if you scrutinize the menu.
-
-  This is a bugreport as opposed to a pull request as I have no idea
-  which call to remove - and complete ignorance of the potential
-  housekeeping and consideration that may be warranted first.
-
-  FWIW, a simple testcase can be made with the vmlinuz from
-  https://people.debian.org/~aurel32/qemu/armhf/ and
-
-  qemu-system-arm -M vexpress-a9 -kernel vmlinuz-3.2.0-4-vexpress
-  -nodefaults -sdl
-
-  Thanks!
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1833101/+subscriptions
 
