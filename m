@@ -2,66 +2,89 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F38C8C31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:26:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ADE2C31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:27:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C78432085A
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:26:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C78432085A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4CCCB2085A
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:27:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CCCB2085A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51482 helo=lists.gnu.org)
+Received: from localhost ([::1]:51498 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcxGq-0004fl-Vq
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 15:26:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45508)
+	id 1hcxIJ-000624-KQ
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 15:27:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47544)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hcwz9-0003Xp-NI
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 15:08:09 -0400
+ (envelope-from <eblake@redhat.com>) id 1hcx5r-0003ah-34
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 15:15:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hcwz8-0007Au-8g
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 15:08:07 -0400
-Resent-Date: Mon, 17 Jun 2019 15:08:07 -0400
-Resent-Message-Id: <E1hcwz8-0007Au-8g@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21450)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hcwz6-00077Y-7v
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 15:08:06 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1560798471; cv=none; d=zoho.com; s=zohoarc; 
- b=Mmkt6u8rjL+B9EdPLQMafIO5EvKAvf5pkEjTNLIxqANyXleMedjwLGwfNT63mFTe9aS3RKfKWbdtL5tdxVusabQcuGTww1tooInLQ5JLVqjpsVsO0F1s4GwIB7xxE3hcEPbRpaqOmmJC4FflAZVQZTpQsvndFxGWgeCF2jzpQNA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1560798471;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=PkTnQlGa8NpI0sqgYmvsixi3EV61HCjD31a4O0plhMk=; 
- b=G/QZVEN8rZN8omeQazNNnRTnJ6TypKQ6YYjZ5hGF0V0cXNX1/stL4M0rOrIgJxolXWOfGOT4zztdCFPdx3z1SaBmvGMEFo5APn5C572ZkYQMd7Ago/iKrx/ZJGqflDJwqvLLq87clSkrsPxDAJGtBM6XiSbXg0Q0ROuOsYPN8HU=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1560798470971506.700161314076;
- Mon, 17 Jun 2019 12:07:50 -0700 (PDT)
-In-Reply-To: <20190617143533.15013-1-kbastian@mail.uni-paderborn.de>
-Message-ID: <156079847002.13573.4992501560769954306@ce79690b2cb9>
+ (envelope-from <eblake@redhat.com>) id 1hcx5q-0006Fx-2Y
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 15:15:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38566)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hcx5p-0006ER-PG
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 15:15:02 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4F2A6301989A;
+ Mon, 17 Jun 2019 19:14:55 +0000 (UTC)
+Received: from [10.3.118.50] (ovpn-118-50.phx2.redhat.com [10.3.118.50])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 19C3552FA;
+ Mon, 17 Jun 2019 19:14:51 +0000 (UTC)
+To: elena.ufimtseva@oracle.com, qemu-devel@nongnu.org
+References: <20190617181459.29139-1-elena.ufimtseva@oracle.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <ae695f50-fa36-e6b8-9c8f-6e344da40fae@redhat.com>
+Date: Mon, 17 Jun 2019 14:14:49 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: kbastian@mail.uni-paderborn.de
-Date: Mon, 17 Jun 2019 12:07:50 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <20190617181459.29139-1-elena.ufimtseva@oracle.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="OSlLmDREVLF1yNk7tiQnAO9RZDoOZEHlk"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Mon, 17 Jun 2019 19:15:00 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [PATCH 0/3] tricore: Convert to translate_loop
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC PATCH v2 01/35] multi-process: memory: alloc
+ RAM from file at offset
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,51 +96,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kbastian@mail.uni-paderborn.de, david.brenken@efs-auto.de,
- qemu-devel@nongnu.org
+Cc: john.g.johnson@oracle.com, jag.raman@oracle.com, konrad.wilk@oracle.com,
+ ross.lagerwall@citrix.com, liran.alon@oracle.com, stefanha@redhat.com,
+ pbonzini@redhat.com, kanth.ghatraju@oracle.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYxNzE0MzUzMy4xNTAx
-My0xLWtiYXN0aWFuQG1haWwudW5pLXBhZGVyYm9ybi5kZS8KCgoKSGksCgpUaGlzIHNlcmllcyBz
-ZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93
-IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTA2MTcxNDM1MzMuMTUwMTMt
-MS1rYmFzdGlhbkBtYWlsLnVuaS1wYWRlcmJvcm4uZGUKVHlwZTogc2VyaWVzClN1YmplY3Q6IFtR
-ZW11LWRldmVsXSBbUEFUQ0ggMC8zXSB0cmljb3JlOiBDb252ZXJ0IHRvIHRyYW5zbGF0ZV9sb29w
-Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFz
-ZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
-aWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKRnJvbSBodHRwczovL2dpdGh1
-Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8y
-MDE5MDYxNzE0MzUzMy4xNTAxMy0xLWtiYXN0aWFuQG1haWwudW5pLXBhZGVyYm9ybi5kZSAtPiBw
-YXRjaGV3LzIwMTkwNjE3MTQzNTMzLjE1MDEzLTEta2Jhc3RpYW5AbWFpbC51bmktcGFkZXJib3Ju
-LmRlClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMzc5NWNlZiB0YXJnZXQvdHJpY29y
-ZTogVXNlIHRyYW5zbGF0ZV9sb29wCmQ1MGRjZTkgdGFyZ2V0LXRyaWNvcmU6IE1ha2UgZW52IGEg
-bWVtYmVyIG9mIERpc2FzQ29udGV4dAo2ZDMwZmQxIHRhcmdldC90cmljb3JlOiBVc2UgRGlzYXND
-b250ZXh0QmFzZSBBUEkKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMyBDaGVja2luZyBjb21taXQg
-NmQzMGZkMTRkNmM4ICh0YXJnZXQvdHJpY29yZTogVXNlIERpc2FzQ29udGV4dEJhc2UgQVBJKQoy
-LzMgQ2hlY2tpbmcgY29tbWl0IGQ1MGRjZTkyOGMyNiAodGFyZ2V0LXRyaWNvcmU6IE1ha2UgZW52
-IGEgbWVtYmVyIG9mIERpc2FzQ29udGV4dCkKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQg
-dGhhdCAnKycgKGN0eDpWeFYpCiM2NjA6IEZJTEU6IHRhcmdldC90cmljb3JlL3RyYW5zbGF0ZS5j
-OjY1ODY6CisgICAgICAgIGdlbl9kdmluaXRfYihjdHgsIGNwdV9ncHJfZFtyM10sIGNwdV9ncHJf
-ZFtyMysxXSwgY3B1X2dwcl9kW3IxXSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhh
-dCAnKycgKGN0eDpWeFYpCiM2Nzg6IEZJTEU6IHRhcmdldC90cmljb3JlL3RyYW5zbGF0ZS5jOjY2
-MTk6CisgICAgICAgIGdlbl9kdmluaXRfaChjdHgsIGNwdV9ncHJfZFtyM10sIGNwdV9ncHJfZFty
-MysxXSwgY3B1X2dwcl9kW3IxXSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMTU0IGxp
-bmVzIGNoZWNrZWQKClBhdGNoIDIvMyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMy8zIENo
-ZWNraW5nIGNvbW1pdCAzNzk1Y2VmYjllZDAgKHRhcmdldC90cmljb3JlOiBVc2UgdHJhbnNsYXRl
-X2xvb3ApCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6
-IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dz
-LzIwMTkwNjE3MTQzNTMzLjE1MDEzLTEta2Jhc3RpYW5AbWFpbC51bmktcGFkZXJib3JuLmRlL3Rl
-c3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
-YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5
-b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OSlLmDREVLF1yNk7tiQnAO9RZDoOZEHlk
+Content-Type: multipart/mixed; boundary="UVtdD2kVZR0rsp4fadEDqw2h2bnCdHZ9m";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: elena.ufimtseva@oracle.com, qemu-devel@nongnu.org
+Cc: john.g.johnson@oracle.com, jag.raman@oracle.com, konrad.wilk@oracle.com,
+ ross.lagerwall@citrix.com, liran.alon@oracle.com, stefanha@redhat.com,
+ pbonzini@redhat.com, kanth.ghatraju@oracle.com, rth@twiddle.net
+Message-ID: <ae695f50-fa36-e6b8-9c8f-6e344da40fae@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 01/35] multi-process: memory: alloc
+ RAM from file at offset
+References: <20190617181459.29139-1-elena.ufimtseva@oracle.com>
+In-Reply-To: <20190617181459.29139-1-elena.ufimtseva@oracle.com>
 
+--UVtdD2kVZR0rsp4fadEDqw2h2bnCdHZ9m
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 6/17/19 1:14 PM, elena.ufimtseva@oracle.com wrote:
+> From: Jagannathan Raman <jag.raman@oracle.com>
+>=20
+> Allow RAM MemoryRegion to be created from an offset in a file, instead
+> of allocating at offset of 0 by default. This is needed to synchronize
+> RAM between QEMU & remote process.
+> This will be needed for the following patches.
+
+This message and the rest of the series was sent unthreaded (no
+References: or In-Reply-To: headers), which makes it very difficult to
+track. You'll want to fix your sending environment to ensure that
+threading is preserved correctly.
+
+>=20
+> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> ---
+
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--UVtdD2kVZR0rsp4fadEDqw2h2bnCdHZ9m--
+
+--OSlLmDREVLF1yNk7tiQnAO9RZDoOZEHlk
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0H5qoACgkQp6FrSiUn
+Q2pRKQf/eDDn+c207udmPzexyDj0m1S8/wOJD060Vsv6lrDvc3G/nCT8dirfWon1
+zxmeLF38hg+Eo1mc+BHoqgws3APG633MBiKVOz/weOaNmYWbdi9o6zFCVM9fnJhV
+JWtIcMJ2n2AveHWJSEqAWml627fOknt2O9InWAMZ9zHPYl+IuU4npBbLKjUIv3U/
+oSsE+WFXX/of8JjVuJMLWfyjeqrI7JRVcQn35PmACmNotcvXz6RH+YZDWiEZZ9GD
+x88cZKe5jxA51hFoVgoFASAnlPOalOp65yxSV3LFDoXwBR3Fgyn8k8M1nFEle2pc
+LUIAIX8e8vt284kMT8fcZKjUwxYC4w==
+=KPJ9
+-----END PGP SIGNATURE-----
+
+--OSlLmDREVLF1yNk7tiQnAO9RZDoOZEHlk--
 
