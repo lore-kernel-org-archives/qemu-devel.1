@@ -7,89 +7,89 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D583C31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 23:10:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C104C31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 23:23:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08C7B2089E
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 23:10:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DC5EB208C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 23:23:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZMPf7IHt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08C7B2089E
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qNAUSPa6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC5EB208C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52510 helo=lists.gnu.org)
+Received: from localhost ([::1]:52546 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hd0li-0006Zp-2B
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 19:10:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43316)
+	id 1hd0yG-00018z-N5
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 19:23:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46056)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hd0kj-00068M-Ip
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 19:09:33 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hd0xh-0000jk-0J
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 19:22:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hd0kh-0003ym-OV
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 19:09:29 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:35828)
+ (envelope-from <richard.henderson@linaro.org>) id 1hd0xb-0002Fx-Or
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 19:22:49 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:43313)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hd0ke-0003rZ-NS
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 19:09:26 -0400
-Received: by mail-pg1-x542.google.com with SMTP id s27so6594101pgl.2
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 16:09:24 -0700 (PDT)
+ id 1hd0xX-00023o-9x
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 19:22:44 -0400
+Received: by mail-pl1-x641.google.com with SMTP id cl9so4826841plb.10
+ for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 16:22:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:openpgp:message-id:date:user-agent
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=3E2T8rbrudliHoY6EaeLuOcC8ryYIRlYDLo3bFuyDFY=;
- b=ZMPf7IHt06cN3gpKU7PnlMXPWXILvPiESSAGoI/PHdnY3tmlyo2drBIEZ9cbR7rTO6
- m1UWqqJiZ+n0t6DauRdgKELzoFgLwFoeKpuDqJ7TxSxPqqSL4zmGX2cQtm5ldkYR8ALt
- 8tp8tIR92Agq9Kjb3S/qJ7DC8dG5mnBQqeC2g2i3eDI09POlCbgGmYTQRO3l31Rlo2yK
- 97a//vgxanAOUpOtpefZ4gyOi9DIIjy8b+ydBx0GGUTW6z7oNajoh0ta6ARxq88+Gr7D
- V5wgjfbGw7Y0ajdQifJ4ZvD2Gmqx/iQSbRhGA092vNhYPXLXIN2sR66O59uXJIrO1F4R
- ub/w==
+ bh=HxHc8sgDRA6aZ4OnB3U7oz7N0NQdmPIUncCxTUvcdmc=;
+ b=qNAUSPa6Fj2bm+gpvoziHrWx9YZdKbweG0sQw0hXYwiGOzyVpK0zmfQyiDcq7fCfdL
+ LizIS5oVC1w0MJD6pbV+CaUXUQjbOKxXKTz8zxI6rCT9Pxm3mmcy0FqZ6vN6Q66wfx1l
+ X82nUCuxA2vUCEzfAy2Nzb27tVi1r2oDk5NrTfa5+zOIJ1YymmQaJYP4Yeh/mFAFwikO
+ Py24zx4XiNiNx1yEqq5iyGIuvCT/3s7Lv5cFGAP4k6CuIoaLzMMSfUKWvo+RbEQ0t0ob
+ Lj9uDI42gnwNxbZIgv9gcnPu7mZNxuc81pVVPHCSddRxg/pK9fzZu7trpBk47jZb6LcG
+ RfEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=3E2T8rbrudliHoY6EaeLuOcC8ryYIRlYDLo3bFuyDFY=;
- b=EkVwemtc+l658pZDScdQbnm4ka30+ADzrhrqvB3dya0VdH0kl0Lbf2upws9eB5y0G8
- fzX23SvOlkCz6J2lLo/X1kkJZwzoXy/ETV43ehIKa4t5S0g3wQnk8x4KDiV8aIXJQllx
- TBf8DxnADiy+mirU3eG1J3c8K5RammHe/pb3d02lx+kAe91YImx6Hz925HuhrRmpMotQ
- jIrwFly2MTzmHcJ5ANNL7Uvq+WmcZN9mw5OTCuocbBhTStQppGwsrU2apPhsJslu9jRn
- d5TlVLnvxTMLWajWs2ZyRbyrWBb6+A0RMAivLJp9UQfNMkkKxzMW2wcg8ERuRkgYS/P1
- Aw4A==
-X-Gm-Message-State: APjAAAX7Jnni4KNE/STAC3aUJc0q4pqU/JtTqsfwrntxNhp3O7yydGA1
- a2PoRu8+4HOLMnEJnq7lPqUaEla0PV8=
-X-Google-Smtp-Source: APXvYqwj5YVIEQeDRTaOtWzgie9YGMZtsndZWXLTNgvBb4XuJ0uFMAhbVF5iL1ajpWr4CjIMCyGPBA==
-X-Received: by 2002:a17:90a:376f:: with SMTP id
- u102mr1705126pjb.5.1560812962929; 
- Mon, 17 Jun 2019 16:09:22 -0700 (PDT)
+ bh=HxHc8sgDRA6aZ4OnB3U7oz7N0NQdmPIUncCxTUvcdmc=;
+ b=q1n2Q56Y2LLB0hJ8M3oUTkiFF/RDt/6txmCBg4O5JbA9XaIbDnCtnGlPAdYdHTQrs7
+ ect800iWPCCehklDbp5WO26VT+vUHUlzBhxs/XE228+yOymstAe193Rkd5nFdRgC2Jig
+ TJVCfLPNX9MYj4w607DvXPX58pow1HNcvxQHek+0fknwckmcLmW/ZcAwmahPcUGbJZ0k
+ SVwDP8IV9th8/U62ejmV+xA7uYA60ZRuPkYiUxWnIZhK1o1lG0EQx20m0khDhTXAuSZm
+ 0ckaw42LJ1M52E5ULfq6bzxIrKRD1avUaCRo/qmwNXRtMfIWa4An4vSPwMprTa3yATHe
+ M+4w==
+X-Gm-Message-State: APjAAAUDoKtoLHeZPmbz1GW3d5sQMaSLm5ooGJhkSweeFI+xmqfEbzvF
+ GveQLh/Inh5KnJ6bD9HCnCQ23A==
+X-Google-Smtp-Source: APXvYqxbMaXlXBmM8UAipaNy1X52pVFNdqN6nGJFhor/nHu6g1qlFJaqRFMg0VYKeAy8yfHnYsdE0w==
+X-Received: by 2002:a17:902:9689:: with SMTP id
+ n9mr14345787plp.241.1560813761921; 
+ Mon, 17 Jun 2019 16:22:41 -0700 (PDT)
 Received: from [192.168.1.11] (97-113-2-33.tukw.qwest.net. [97.113.2.33])
- by smtp.gmail.com with ESMTPSA id w187sm14230286pfb.4.2019.06.17.16.09.06
+ by smtp.gmail.com with ESMTPSA id s66sm14758672pgs.87.2019.06.17.16.22.32
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 17 Jun 2019 16:09:21 -0700 (PDT)
+ Mon, 17 Jun 2019 16:22:41 -0700 (PDT)
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
  qemu-devel@nongnu.org
 References: <20190614171200.21078-1-alex.bennee@linaro.org>
- <20190614171200.21078-45-alex.bennee@linaro.org>
+ <20190614171200.21078-48-alex.bennee@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <035fc23c-257b-23e7-f232-fc56c7737564@linaro.org>
-Date: Mon, 17 Jun 2019 16:09:01 -0700
+Message-ID: <cfd5b6b9-852c-6a34-3d07-1576f5b3f543@linaro.org>
+Date: Mon, 17 Jun 2019 16:22:30 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190614171200.21078-45-alex.bennee@linaro.org>
+In-Reply-To: <20190614171200.21078-48-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
-Subject: Re: [Qemu-devel] [PATCH v3 44/50] plugin: add
- qemu_plugin_insn_disas helper
+X-Received-From: 2607:f8b0:4864:20::641
+Subject: Re: [Qemu-devel] [PATCH v3 47/50] accel/stubs: reduce headers from
+ tcg-stub
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,24 +101,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 6/14/19 10:11 AM, Alex Bennée wrote:
-> Give the plugins access to the QEMU dissasembler so they don't have to
-> re-invent the wheel.
+> We don't need much for these. However I do wonder why these aren't
+> just null inlines in exec-all.h
 > 
 > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 > ---
->  disas.c                      | 103 +++++++++++++++++++++++++++++++++++
->  include/disas/disas.h        |   2 +
->  include/qemu/qemu-plugin.h   |   9 +++
->  plugins/api.c                |   7 +++
->  plugins/qemu-plugins.symbols |   1 +
->  5 files changed, 122 insertions(+)
+>  accel/stubs/tcg-stub.c | 3 ---
+>  1 file changed, 3 deletions(-)
 
-There are a couple of checkpatch errors, otherwise
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
