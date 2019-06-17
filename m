@@ -2,81 +2,62 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B099BC31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:11:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6914C31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:12:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79B42208C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:11:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X1TTHvtv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79B42208C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id AA85020863
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:12:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA85020863
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51318 helo=lists.gnu.org)
+Received: from localhost ([::1]:51326 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcx2a-0007Dj-MP
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 15:11:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42923)
+	id 1hcx3E-0000VA-Tb
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 15:12:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40429)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hcwpl-0003xV-5b
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:58:26 -0400
+ (envelope-from <armbru@redhat.com>) id 1hcwh2-0001cR-11
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:49:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hcwpi-0006h9-Iv
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:58:25 -0400
-Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:33032)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hcwpi-0006em-AI
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:58:22 -0400
-Received: by mail-ot1-x335.google.com with SMTP id p4so729374oti.0
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 11:58:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=vOC5waeg1fC7+3PNA9ugNh6FosdwOiiGKM2oKNXjJaY=;
- b=X1TTHvtv/xkWFlV/mJ0hui8X8qHOYLhl1W2UWXd7Gy+eHvrhdti3++9cKEP8yMmolT
- +3J0sd7lOri44Zy0XJh7RDP86Wp6Rn214CRAYEQ5uyMgT0L0Cn3sJJOL7IZMnpIvx2+z
- w6RXjh+QQjpan3+d1t32M/hoPObQFV5LTCdQzMxiOXcgHp7PbmyWYK+8nlZIY5sQ7G5p
- Sf72jYhlZAHyAzIWe4Gl9T8WBh4D4MHk/C/3ARhO69iQ0Iih+Sy/9noEaaaM8NRvX4ec
- FduQkj6KJldPKmS9s098xS/qmUMee8SA2dlPAQtYb0ikGCIN4sm4L4/Q3dU94TVlMMov
- iMzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=vOC5waeg1fC7+3PNA9ugNh6FosdwOiiGKM2oKNXjJaY=;
- b=CNAdeH/uHbjlPEgOzE4B9POFwwb4P19BPyMENQ8SWfsreOXlKk+Jg0GhUIWZtj22SD
- PbiD2zgd+H/GBuyiqX2aDuL7TOKbJ4ubL5Ac0qh0Q2keWoPZgD49w3tnvqPyIBbG/jx+
- FW8wP16Ams7qvfYrH36UqEmSoQw1iQDKWXoJPxaXFh6OZW/qoal1nmHgjXM2W1olXqPz
- iehU1668qoP8TXnZ9L1hGmFypPaR0BHtIHZ/VdyG3nHzrXJb6U57qZnTiUJff9Ua65hh
- F+fiDlOJgs7q0S7LOS+g9RtNiHmjgtxc+5H+xlpaYtZ6TCAKfCWbOd1GtM9ErI73QYtt
- Ozaw==
-X-Gm-Message-State: APjAAAU8OQQIJcVa7WtMEItouj7yO0gQ0vnIHQoNtREVxc6au7MsEaqg
- iNj3blv44kNyL58i1+qpWl5DyrG4dvOqwe0DZt9LLQ==
-X-Google-Smtp-Source: APXvYqyuBWecUexA6b5tW2OK5RrfCGVeByjoFKDV6VcHsVvYcQ8ZO3fULABIQdt+gDbeSbPBPYVQh6I7lZbFQZrHqgg=
-X-Received: by 2002:a9d:711e:: with SMTP id n30mr223281otj.97.1560797901111;
- Mon, 17 Jun 2019 11:58:21 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190617184903.19436-1-armbru@redhat.com>
+ (envelope-from <armbru@redhat.com>) id 1hcwh0-0007sL-Er
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:49:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42380)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hcwh0-0007hc-48
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:49:22 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id BD32F7FDF6
+ for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 18:49:06 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-177.ams2.redhat.com
+ [10.36.117.177])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 63EA180EB;
+ Mon, 17 Jun 2019 18:49:06 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 6CC491133007; Mon, 17 Jun 2019 20:49:03 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 17 Jun 2019 20:48:55 +0200
+Message-Id: <20190617184903.19436-9-armbru@redhat.com>
 In-Reply-To: <20190617184903.19436-1-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 17 Jun 2019 19:58:09 +0100
-Message-ID: <CAFEAcA9M0kEikXajCWX9BUtLU87P6=KHvbEWoW6xVq0Y7xvueQ@mail.gmail.com>
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20190617184903.19436-1-armbru@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Mon, 17 Jun 2019 18:49:06 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::335
-Subject: Re: [Qemu-devel] [PULL 00/16] Monitor patches for 2019-06-17
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 08/16] Move monitor.c to monitor/misc.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,108 +69,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 17 Jun 2019 at 19:51, Markus Armbruster <armbru@redhat.com> wrote:
->
-> The following changes since commit 076243ffe6c1b687e9e6d98348c3bf3398df78=
-f3:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-docs-20190617'=
- into staging (2019-06-17 16:41:25 +0100)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-monitor-2019-06-17
->
-> for you to fetch changes up to 092b8737c5e7695c4b9caa3b4eedc66763632755:
->
->   vl: Deprecate -mon pretty=3D... for HMP monitors (2019-06-17 20:36:56 +=
-0200)
->
-> ----------------------------------------------------------------
-> Monitor patches for 2019-06-17
->
+From: Kevin Wolf <kwolf@redhat.com>
 
-Hi; I'm afraid this doesn't compile:
+Create a new monitor/ subdirectory and move monitor.c there. As the plan
+is to move the monitor core into separate files, use the chance to
+rename it to misc.c.
 
-Most hosts (ppc64, s390, aarch64, aarch32, osx, and possibly
-the others too though they haven't failed immediately) fail
-something like this:
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20190613153405.24769-8-kwolf@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ MAINTAINERS                         |  4 ++--
+ Makefile.objs                       |  1 +
+ Makefile.target                     |  3 ++-
+ docs/devel/writing-qmp-commands.txt |  2 +-
+ monitor/Makefile.objs               |  1 +
+ monitor.c =3D> monitor/misc.c         |  2 +-
+ monitor/trace-events                | 11 +++++++++++
+ trace-events                        | 10 ----------
+ 8 files changed, 19 insertions(+), 15 deletions(-)
+ create mode 100644 monitor/Makefile.objs
+ rename monitor.c =3D> monitor/misc.c (99%)
+ create mode 100644 monitor/trace-events
 
-/home/pm215/qemu/monitor/misc.c: In function =E2=80=98netdev_del_completion=
-=E2=80=99:
-/home/pm215/qemu/monitor/misc.c:2165:9: error: implicit declaration of
-function =E2=80=98qemu_find_opts_err=E2=80=99 [-Werror=3Dimplicit-function-=
-declaration]
-         opts =3D qemu_opts_find(qemu_find_opts_err("netdev", NULL), name);
-         ^
-/home/pm215/qemu/monitor/misc.c:2165:9: error: nested extern
-declaration of =E2=80=98qemu_find_opts_err=E2=80=99 [-Werror=3Dnested-exter=
-ns]
-/home/pm215/qemu/monitor/misc.c:2165:9: error: passing argument 1 of
-=E2=80=98qemu_opts_find=E2=80=99 makes pointer from integer without a cast =
-[-Werror]
-In file included from /home/pm215/qemu/monitor/misc.c:64:0:
-/home/pm215/qemu/include/qemu/option.h:105:11: note: expected =E2=80=98stru=
-ct
-QemuOptsList *=E2=80=99 but argument is of type =E2=80=98int=E2=80=99
- QemuOpts *qemu_opts_find(QemuOptsList *list, const char *id);
-           ^
-cc1: all warnings being treated as errors
+diff --git a/MAINTAINERS b/MAINTAINERS
+index acbad134ec..575ea6e68d 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1918,7 +1918,7 @@ F: qapi/run-state.json
+ Human Monitor (HMP)
+ M: Dr. David Alan Gilbert <dgilbert@redhat.com>
+ S: Maintained
+-F: monitor.c
++F: monitor/misc.c
+ F: hmp.[ch]
+ F: hmp-commands*.hx
+ F: include/monitor/hmp-target.h
+@@ -2040,7 +2040,7 @@ QMP
+ M: Markus Armbruster <armbru@redhat.com>
+ S: Supported
+ F: qmp.c
+-F: monitor.c
++F: monitor/misc.c
+ F: docs/devel/*qmp-*
+ F: docs/interop/*qmp-*
+ F: scripts/qmp/
+diff --git a/Makefile.objs b/Makefile.objs
+index c8337fa34b..dd39a70b48 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -130,6 +130,7 @@ trace-events-subdirs =3D
+ trace-events-subdirs +=3D accel/kvm
+ trace-events-subdirs +=3D accel/tcg
+ trace-events-subdirs +=3D crypto
++trace-events-subdirs +=3D monitor
+ ifeq ($(CONFIG_USER_ONLY),y)
+ trace-events-subdirs +=3D linux-user
+ endif
+diff --git a/Makefile.target b/Makefile.target
+index ecd856e3a3..72c267f7dc 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -148,9 +148,10 @@ endif #CONFIG_BSD_USER
+ #########################################################
+ # System emulator target
+ ifdef CONFIG_SOFTMMU
+-obj-y +=3D arch_init.o cpus.o monitor.o gdbstub.o balloon.o ioport.o num=
+a.o
++obj-y +=3D arch_init.o cpus.o gdbstub.o balloon.o ioport.o numa.o
+ obj-y +=3D qtest.o
+ obj-y +=3D hw/
++obj-y +=3D monitor/
+ obj-y +=3D qapi/
+ obj-y +=3D memory.o
+ obj-y +=3D memory_mapping.o
+diff --git a/docs/devel/writing-qmp-commands.txt b/docs/devel/writing-qmp=
+-commands.txt
+index 9dfc62bf5a..cc6ecd6d5d 100644
+--- a/docs/devel/writing-qmp-commands.txt
++++ b/docs/devel/writing-qmp-commands.txt
+@@ -470,7 +470,7 @@ it's good practice to always check for errors.
+=20
+ Another important detail is that HMP's "info" commands don't go into the
+ hmp-commands.hx. Instead, they go into the info_cmds[] table, which is d=
+efined
+-in the monitor.c file. The entry for the "info alarmclock" follows:
++in the monitor/misc.c file. The entry for the "info alarmclock" follows:
+=20
+     {
+         .name       =3D "alarmclock",
+diff --git a/monitor/Makefile.objs b/monitor/Makefile.objs
+new file mode 100644
+index 0000000000..e783b0616b
+--- /dev/null
++++ b/monitor/Makefile.objs
+@@ -0,0 +1 @@
++obj-y +=3D misc.o
+diff --git a/monitor.c b/monitor/misc.c
+similarity index 99%
+rename from monitor.c
+rename to monitor/misc.c
+index 3015b6e9c7..c5f8483b7e 100644
+--- a/monitor.c
++++ b/monitor/misc.c
+@@ -64,7 +64,7 @@
+ #include "qapi/qmp/json-parser.h"
+ #include "qapi/qmp/qlist.h"
+ #include "qom/object_interfaces.h"
+-#include "trace-root.h"
++#include "trace.h"
+ #include "trace/control.h"
+ #include "monitor/hmp-target.h"
+ #ifdef CONFIG_TRACE_SIMPLE
+diff --git a/monitor/trace-events b/monitor/trace-events
+new file mode 100644
+index 0000000000..abfdf20b14
+--- /dev/null
++++ b/monitor/trace-events
+@@ -0,0 +1,11 @@
++# See docs/devel/tracing.txt for syntax documentation.
++
++# misc.c
++monitor_protocol_event_handler(uint32_t event, void *qdict) "event=3D%d =
+data=3D%p"
++monitor_protocol_event_emit(uint32_t event, void *data) "event=3D%d data=
+=3D%p"
++monitor_protocol_event_queue(uint32_t event, void *qdict, uint64_t rate)=
+ "event=3D%d data=3D%p rate=3D%" PRId64
++handle_hmp_command(void *mon, const char *cmdline) "mon %p cmdline: %s"
++handle_qmp_command(void *mon, const char *req) "mon %p req: %s"
++monitor_suspend(void *ptr, int cnt) "mon %p: %d"
++monitor_qmp_cmd_in_band(const char *id) "%s"
++monitor_qmp_cmd_out_of_band(const char *id) "%s"
+diff --git a/trace-events b/trace-events
+index 844ee58dd9..aeea3c2bdb 100644
+--- a/trace-events
++++ b/trace-events
+@@ -41,16 +41,6 @@ system_wakeup_request(int reason) "reason=3D%d"
+ qemu_system_shutdown_request(int reason) "reason=3D%d"
+ qemu_system_powerdown_request(void) ""
+=20
+-# monitor.c
+-monitor_protocol_event_handler(uint32_t event, void *qdict) "event=3D%d =
+data=3D%p"
+-monitor_protocol_event_emit(uint32_t event, void *data) "event=3D%d data=
+=3D%p"
+-monitor_protocol_event_queue(uint32_t event, void *qdict, uint64_t rate)=
+ "event=3D%d data=3D%p rate=3D%" PRId64
+-handle_hmp_command(void *mon, const char *cmdline) "mon %p cmdline: %s"
+-handle_qmp_command(void *mon, const char *req) "mon %p req: %s"
+-monitor_suspend(void *ptr, int cnt) "mon %p: %d"
+-monitor_qmp_cmd_in_band(const char *id) "%s"
+-monitor_qmp_cmd_out_of_band(const char *id) "%s"
+-
+ # dma-helpers.c
+ dma_blk_io(void *dbs, void *bs, int64_t offset, bool to_dev) "dbs=3D%p b=
+s=3D%p offset=3D%" PRId64 " to_dev=3D%d"
+ dma_aio_cancel(void *dbs) "dbs=3D%p"
+--=20
+2.21.0
 
-
-windows is a bit different:
-
-/home/petmay01/qemu-for-merges/monitor/hmp.c: In function 'file_completion'=
-:
-/home/petmay01/qemu-for-merges/monitor/hmp.c:1113:5: error: unknown
-type name 'DIR'
-     DIR *ffs;
-     ^
-/home/petmay01/qemu-for-merges/monitor/hmp.c:1135:11: error: implicit
-declaration of function 'opendir'
-[-Werror=3Dimplicit-function-declaration]
-     ffs =3D opendir(path);
-           ^
-/home/petmay01/qemu-for-merges/monitor/hmp.c:1135:5: error: nested
-extern declaration of 'opendir' [-Werror=3Dnested-externs]
-     ffs =3D opendir(path);
-     ^
-/home/petmay01/qemu-for-merges/monitor/hmp.c:1135:9: error: assignment
-makes pointer from integer without a cast [-Werror=3Dint-conversion]
-     ffs =3D opendir(path);
-         ^
-/home/petmay01/qemu-for-merges/monitor/hmp.c:1141:13: error: implicit
-declaration of function 'readdir'
-[-Werror=3Dimplicit-function-declaration]
-         d =3D readdir(ffs);
-             ^
-/home/petmay01/qemu-for-merges/monitor/hmp.c:1141:9: error: nested
-extern declaration of 'readdir' [-Werror=3Dnested-externs]
-         d =3D readdir(ffs);
-         ^
-/home/petmay01/qemu-for-merges/monitor/hmp.c:1141:11: error:
-assignment makes pointer from integer without a cast
-[-Werror=3Dint-conversion]
-         d =3D readdir(ffs);
-           ^
-/home/petmay01/qemu-for-merges/monitor/hmp.c:1146:21: error:
-dereferencing pointer to incomplete type 'struct dirent'
-         if (strcmp(d->d_name, ".") =3D=3D 0 || strcmp(d->d_name, "..") =3D=
-=3D 0) {
-                     ^
-/home/petmay01/qemu-for-merges/monitor/hmp.c:1166:5: error: implicit
-declaration of function 'closedir'
-[-Werror=3Dimplicit-function-declaration]
-     closedir(ffs);
-     ^
-/home/petmay01/qemu-for-merges/monitor/hmp.c:1166:5: error: nested
-extern declaration of 'closedir' [-Werror=3Dnested-externs]
-
-thanks
--- PMM
 
