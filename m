@@ -2,93 +2,100 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC0E9C31E5D
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:40:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60463C31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:51:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 985142084B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:40:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 275BD2084B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:51:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eDRI/JmH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 985142084B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="XGY59lDT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 275BD2084B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51576 helo=lists.gnu.org)
+Received: from localhost ([::1]:51602 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcxUR-0004aL-Lc
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 15:40:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53905)
+	id 1hcxeg-0007E7-D7
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 15:51:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55557)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hcxTr-0003wN-Dg
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 15:39:52 -0400
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1hcxcR-0006FF-8d
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 15:48:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hcxTq-0004uN-GV
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 15:39:51 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:38158)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hcxTq-0004sX-9O
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 15:39:50 -0400
-Received: by mail-pg1-x544.google.com with SMTP id v11so6355555pgl.5
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 12:39:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=M4FL6kafN/86dFFJvgvoteto8jq15yU12gnoNcxruBU=;
- b=eDRI/JmH39DEkDY3BmeUANLpR18GRVKoa+AScxu7RNgsDzpBvleZHnUJwBXqucwLMp
- NV336fh68dtJG+mlt+jf6C9wu5xYuFaNm0VQesqVEOhVlCv0m1ZFGxRiNQE1Qz085e3D
- v6pRuMGKUIQ5q2XYtXuiKwyJZ3A2QLA0QV9FhOYYWhv0Q7DDjgRtOb4tTBUHjAD+/vU9
- ZJdqB4Kr3mZmIDy5wh77ouSpCzaenxCfNB1z6ILo5HjdG1snm/ie4F3Ecn8I3OK9HxSo
- milw77jbepGQ0YQ5IJA5pXrt//ls7tTgbz7ixZwyKI+oJtvqDhrIYojslATdx8JdcVJX
- 0Y+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=M4FL6kafN/86dFFJvgvoteto8jq15yU12gnoNcxruBU=;
- b=IVpmNvtL483Q0YebOfIiboBqXn4285ZrKfb5Bhc1WRyhVQhW2+q6NVUP3hcwrUfVTE
- +oYjrbuAlJPvwjMb37n/uJoRnRCO4TXxAllZfdfqv5BD6yN6aRzgZSoKgcwDb5m2EuIa
- MxCA111naAFgvuyb0z/KXRE6ow+UKgsS4E0P7NnD6nNvK72CCNJTxiyrKu+QsD5vSALE
- hi8eDCOBBUJXGyD0Lw3NVczkgFAvczzC/atVx9Ox+zcf+VGr8wJ/mKkIrRluh69N+Z3E
- V2Jn8/HqONiywzEcH/h9CdYKJFWKIuGia/HRUEsCMUQ58KtN1+c0x1mFH32rmHQVU1Cq
- JACQ==
-X-Gm-Message-State: APjAAAWV5QRG81BxMdUai9LZrW8KUZUFti3mmtEycfV0T+qTMEQIdNDG
- dTaaoAb2jj24v++WmuC4LCoWYj28T+E=
-X-Google-Smtp-Source: APXvYqza9cyoC1PbA97X8nLSqJ/wEKFiczJ0O9PE9Twz20KLJNeWkGjHST0FVX7gDxYi+OU5TWnl3Q==
-X-Received: by 2002:a17:90a:9f0b:: with SMTP id
- n11mr590677pjp.98.1560800388793; 
- Mon, 17 Jun 2019 12:39:48 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-2-33.tukw.qwest.net. [97.113.2.33])
- by smtp.gmail.com with ESMTPSA id y133sm14085891pfb.28.2019.06.17.12.39.47
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 17 Jun 2019 12:39:48 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20190617175317.27557-1-peter.maydell@linaro.org>
- <20190617175317.27557-3-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <8d83d410-5db7-69d8-ac55-f6a9773b3cc1@linaro.org>
-Date: Mon, 17 Jun 2019 12:39:46 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1hcxcP-0004vC-Hc
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 15:48:42 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:48966)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
+ id 1hcxcO-0003hx-Ph
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 15:48:41 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HJT05H026644;
+ Mon, 17 Jun 2019 19:46:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2018-07-02;
+ bh=Nr6FzsvieLhdWwVmL2bswTdLwSXYR3eOlAeAbkwJGUQ=;
+ b=XGY59lDTrqudjlFjya1HFDDLRaSoAUCW1vss3y+FL6z7bfAXlt01vWu3X3MV2yBcNWVk
+ OqLdQMd3IFE3ke5irtkVS/F/SlboRe6uDGN49O8HNNKC45QOZNVtsvn5to2dfCNCWr3E
+ uIJYoU2Bw8Yv/J6Oj6ogkTY4c4Mmz+1XcXjz1mvi29Hj4s3buOWLUE5FGcNqc51smkq/
+ PzkfW94TVsJJ8eo5yCq++tdi8bZbwHDcrPAT4nR3kIANynNy+4Ll27z4qPwEtewzrGZJ
+ 4hwPpdTEJJCK7uPtPZcCu1uvbhhZK4N+j/Ce5uIeTqs7YQDUrS/CTJ2ZfmRi6JuKJj2g qA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2120.oracle.com with ESMTP id 2t4saq8c81-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 17 Jun 2019 19:46:57 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HJj5DS106915;
+ Mon, 17 Jun 2019 19:46:57 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by userp3020.oracle.com with ESMTP id 2t5h5tb1j9-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 17 Jun 2019 19:46:57 +0000
+Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5HJkpuj020193;
+ Mon, 17 Jun 2019 19:46:52 GMT
+Received: from heatpipe (/73.170.27.202)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Mon, 17 Jun 2019 12:46:51 -0700
+Date: Mon, 17 Jun 2019 12:46:49 -0700
+From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+To: Eric Blake <eblake@redhat.com>
+Message-ID: <20190617194648.GA24278@heatpipe>
+References: <20190617181459.29139-1-elena.ufimtseva@oracle.com>
+ <ae695f50-fa36-e6b8-9c8f-6e344da40fae@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190617175317.27557-3-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::544
-Subject: Re: [Qemu-devel] [PATCH 2/6] arm v8M: Forcibly clear
- negative-priority exceptions on deactivate
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ae695f50-fa36-e6b8-9c8f-6e344da40fae@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906170172
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906170172
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.85
+Subject: Re: [Qemu-devel] [RFC PATCH v2 01/35] multi-process: memory: alloc
+ RAM from file at offset
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,26 +107,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: john.g.johnson@oracle.com, jag.raman@oracle.com, konrad.wilk@oracle.com,
+ qemu-devel@nongnu.org, ross.lagerwall@citrix.com, liran.alon@oracle.com,
+ stefanha@redhat.com, pbonzini@redhat.com, kanth.ghatraju@oracle.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/17/19 10:53 AM, Peter Maydell wrote:
-> To prevent execution priority remaining negative if the guest
-> returns from an NMI or HardFault with a corrupted IPSR, the
-> v8M interrupt deactivation process forces the HardFault and NMI
-> to inactive based on the current raw execution priority,
-> even if the interrupt the guest is trying to deactivate
-> is something else. In the pseudocode this is done in the
-> Deactivate() function.
+On Mon, Jun 17, 2019 at 02:14:49PM -0500, Eric Blake wrote:
+> On 6/17/19 1:14 PM, elena.ufimtseva@oracle.com wrote:
+> > From: Jagannathan Raman <jag.raman@oracle.com>
+> > 
+> > Allow RAM MemoryRegion to be created from an offset in a file, instead
+> > of allocating at offset of 0 by default. This is needed to synchronize
+> > RAM between QEMU & remote process.
+> > This will be needed for the following patches.
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/intc/armv7m_nvic.c | 40 +++++++++++++++++++++++++++++++++++-----
->  1 file changed, 35 insertions(+), 5 deletions(-)
+> This message and the rest of the series was sent unthreaded (no
+> References: or In-Reply-To: headers), which makes it very difficult to
+> track. You'll want to fix your sending environment to ensure that
+> threading is preserved correctly.
+>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Hi Eric
+
+Yes, my bad. I have adjusted my scripts.
+
+Elena
+> > 
+> > Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> > Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+> > Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> > ---
+> 
+> 
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3226
+> Virtualization:  qemu.org | libvirt.org
+> 
 
 
-r~
+
 
