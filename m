@@ -2,61 +2,62 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE7EC31E44
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 04:45:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8CE3C31E53
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 04:45:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA105218A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 04:45:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA105218A0
+	by mail.kernel.org (Postfix) with ESMTPS id 85326205ED
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 04:45:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85326205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44228 helo=lists.gnu.org)
+Received: from localhost ([::1]:44230 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcjVw-0006mp-Ul
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 00:45:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60322)
+	id 1hcjVy-0006ql-Pp
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 00:45:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60160)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kraxel@redhat.com>) id 1hcjQJ-0001Sh-CY
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 00:39:17 -0400
+ (envelope-from <kraxel@redhat.com>) id 1hcjQE-0001Oz-FJ
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 00:39:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1hcjQH-0005xr-1v
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 00:39:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34122)
+ (envelope-from <kraxel@redhat.com>) id 1hcjQC-0005rc-3t
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 00:39:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37266)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hcjQG-0005w2-EZ
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 00:39:12 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hcjQB-0005oZ-Dd
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 00:39:07 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D24DC86658;
- Mon, 17 Jun 2019 04:39:10 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 15066C00732A;
+ Mon, 17 Jun 2019 04:39:05 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-116-33.ams2.redhat.com
  [10.36.116.33])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B55C57DDA0;
- Mon, 17 Jun 2019 04:39:05 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C01DD2CFD6;
+ Mon, 17 Jun 2019 04:38:59 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 0D95317446; Mon, 17 Jun 2019 06:38:59 +0200 (CEST)
+ id DA8EF16E08; Mon, 17 Jun 2019 06:38:58 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 17 Jun 2019 06:38:52 +0200
-Message-Id: <20190617043858.8290-6-kraxel@redhat.com>
-In-Reply-To: <20190617043858.8290-1-kraxel@redhat.com>
-References: <20190617043858.8290-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Date: Mon, 17 Jun 2019 06:38:47 +0200
+Message-Id: <20190617043858.8290-1-kraxel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Mon, 17 Jun 2019 04:39:10 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Mon, 17 Jun 2019 04:39:05 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 05/11] tests/vm: add vm-boot-{ssh,
- serial}-<guest> targets
+Subject: [Qemu-devel] [PATCH v4 00/11] tests/vm: serial console autoinstall,
+ misc fixes.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,55 +78,57 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For testing/troubleshooting convinience.
+This patch series changes the way virtual machines for test builds are
+managed.  They are created locally on the developer machine now.  The
+installer is booted on the serial console and the scripts walks through
+the dialogs to install and configure the guest.
 
-make vm-boot-serial-<guest>
-  Boot guest, with the serial console on stdio.
+That takes the download.patchew.org server out of the loop and makes it
+alot easier to tweak the guest images (adding build dependencies for
+example).
 
-make vm-boot-ssh-<guest>
-  Boot guest, login via ssh.
+The install scripts take care to apply host proxy settings (from *_proxy
+environment variables) to the guest, so any package downloads will be
+routed through the proxy and can be cached that way.  This also makes
+them work behind strict firewalls.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Tested-by: Thomas Huth <thuth@redhat.com>
----
- tests/vm/Makefile.include | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+There are also a bunch of smaller tweaks for tests/vm to fix issues I
+was struggling with.  See commit messages of individual patches for
+details.
 
-diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
-index 276b870216c4..e329129bd658 100644
---- a/tests/vm/Makefile.include
-+++ b/tests/vm/Makefile.include
-@@ -20,6 +20,10 @@ vm-test:
- 	@echo "  vm-build-all                    - Build QEMU in all VMs"
- 	@echo "  vm-clean-all                    - Clean up VM images"
- 	@echo
-+	@echo "For trouble-shooting:"
-+	@echo "  vm-boot-serial-<guest>          - Boot guest, serial console on stdio"
-+	@echo "  vm-boot-ssh-<guest>             - Boot guest and login via ssh"
-+	@echo
- 	@echo "Special variables:"
- 	@echo "    BUILD_TARGET=foo		 - Override the build target"
- 	@echo "    TARGET_LIST=a,b,c    	 - Override target list in builds"
-@@ -63,3 +67,18 @@ vm-build-%: $(IMAGES_DIR)/%.img
- 		$(if $(EXTRA_CONFIGURE_OPTS),$(EXTRA_CONFIGURE_OPTS)), \
- 		"  VM-BUILD $*")
- 
-+vm-boot-serial-%: $(IMAGES_DIR)/%.img
-+	qemu-system-x86_64 -enable-kvm -m 4G -smp 2 -nographic \
-+		-drive if=none,id=vblk,cache=writeback,file="$<" \
-+		-netdev user,id=vnet \
-+		-device virtio-blk-pci,drive=vblk \
-+		-device virtio-net-pci,netdev=vnet \
-+	|| true
-+
-+vm-boot-ssh-%: $(IMAGES_DIR)/%.img
-+	$(call quiet-command, \
-+		$(SRC_PATH)/tests/vm/$* \
-+		--image "$<" \
-+		--interactive \
-+		false, \
-+		"  VM-BOOT-SSH $*")
--- 
+v4:
+ - rebase, drop patches merged.
+ - use in-tree seabios binary, for serial console support.
+ - some minor tweaks.
+v3:
+ - python3 fixes.
+ - openbsd: configure memory limits.
+ - freebsd: configure autoboot delay.
+
+Gerd Hoffmann (11):
+  tests/vm: send proxy environment variables over ssh
+  tests/vm: use ssh with pty unconditionally
+  tests/vm: run test builds on snapshot
+  tests/vm: proper guest shutdown
+  tests/vm: add vm-boot-{ssh,serial}-<guest> targets
+  tests/vm: serial console support helpers
+  tests/vm: openbsd autoinstall, using serial console
+  tests/vm: freebsd autoinstall, using serial console
+  tests/vm: netbsd autoinstall, using serial console
+  tests/vm: fedora autoinstall, using serial console
+  tests/vm: ubuntu.i386: apt proxy setup
+
+ tests/vm/basevm.py        | 135 +++++++++++++++++++++++----
+ tests/vm/Makefile.include |  23 ++++-
+ tests/vm/fedora           | 189 ++++++++++++++++++++++++++++++++++++++
+ tests/vm/freebsd          | 180 ++++++++++++++++++++++++++++++++++--
+ tests/vm/netbsd           | 187 +++++++++++++++++++++++++++++++++++--
+ tests/vm/openbsd          | 159 +++++++++++++++++++++++++++++---
+ tests/vm/ubuntu.i386      |   4 +
+ 7 files changed, 825 insertions(+), 52 deletions(-)
+ create mode 100755 tests/vm/fedora
+
+--=20
 2.18.1
 
 
