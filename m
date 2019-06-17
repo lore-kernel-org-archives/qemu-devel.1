@@ -2,119 +2,73 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0490CC31E57
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 12:48:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB0DFC31E59
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 12:48:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3AC020861
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 12:48:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Tm8UUkyh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3AC020861
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id AC75120861
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 12:48:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC75120861
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=oldum.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47118 helo=lists.gnu.org)
+Received: from localhost ([::1]:47120 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcr3J-0001wR-2U
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 08:48:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45325)
+	id 1hcr3P-0001yf-WF
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 08:48:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33320)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <rkagan@virtuozzo.com>) id 1hcr0l-0000AG-OT
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 08:45:25 -0400
+ (envelope-from <bounces@canonical.com>) id 1hcoMZ-0002Kl-1S
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 05:55:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rkagan@virtuozzo.com>) id 1hcr0j-0002b9-PB
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 08:45:23 -0400
-Received: from mail-am5eur03hn0307.outbound.protection.outlook.com
- ([2a01:111:f400:fe08::307]:18398
- helo=EUR03-AM5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
- id 1hcr0h-0002TN-T3; Mon, 17 Jun 2019 08:45:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=L0b53u71ZOzuKuuTsPRXwhfXutQYDWR10ut6yErNiKI=;
- b=Tm8UUkyhS/x7v19P9VA/224gYcR/Lhoy7+xeahQLn60PhCp9Qm7g7srNlTGhCOLSDrkHJDzPDRPayZmvBhzU+22OdeyhBuMwTj5VpYoHk9aUtvNipzcl6j/c9Wks/+RcOrqDWSyOac5w3dXbEIDmqyxBJTylLwMvscMJJZDQ+GA=
-Received: from DB8PR08MB3977.eurprd08.prod.outlook.com (20.179.11.95) by
- DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1987.12; Mon, 17 Jun 2019 12:45:01 +0000
-Received: from DB8PR08MB3977.eurprd08.prod.outlook.com
- ([fe80::3530:3b13:be7f:2944]) by DB8PR08MB3977.eurprd08.prod.outlook.com
- ([fe80::3530:3b13:be7f:2944%4]) with mapi id 15.20.1987.014; Mon, 17 Jun 2019
- 12:45:01 +0000
-From: Roman Kagan <rkagan@virtuozzo.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Thread-Topic: [PATCH v2 6/7] iotests: amend QEMU NBD process synchronization
-Thread-Index: AQHVIH/W+4fzIICfOUahb05s1OWCZ6aZXH6AgAZ3cwA=
-Date: Mon, 17 Jun 2019 12:45:01 +0000
-Message-ID: <20190617124458.GD32624@rkaganb.sw.ru>
-References: <1560276131-683243-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1560276131-683243-7-git-send-email-andrey.shinkevich@virtuozzo.com>
- <98074e5c-028f-8cd0-f2ae-5b869ec18f70@virtuozzo.com>
-In-Reply-To: <98074e5c-028f-8cd0-f2ae-5b869ec18f70@virtuozzo.com>
-Accept-Language: en-US, ru-RU
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mutt/1.11.4 (2019-03-13)
-mail-followup-to: Roman Kagan <rkagan@virtuozzo.com>,	Vladimir
- Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,	Andrey Shinkevich
- <andrey.shinkevich@virtuozzo.com>,	"qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>,	"qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "kwolf@redhat.com" <kwolf@redhat.com>,	"mreitz@redhat.com"
- <mreitz@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, Denis Lunev
- <den@virtuozzo.com>
-x-originating-ip: [185.231.240.5]
-x-clientproxiedby: HE1PR1001CA0016.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:3:f7::26) To DB8PR08MB3977.eurprd08.prod.outlook.com
- (2603:10a6:10:ad::31)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=rkagan@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 2e8ea229-8390-4ceb-44cf-08d6f3219d07
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:DB8PR08MB5498; 
-x-ms-traffictypediagnostic: DB8PR08MB5498:|DB8PR08MB5498:
-x-microsoft-antispam-prvs: <DB8PR08MB54987EFB51F3DB98561CF21AC9EB0@DB8PR08MB5498.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:5236;
-x-forefront-prvs: 0071BFA85B
-x-forefront-antispam-report: SFV:SPM;
- SFS:(10019020)(979002)(396003)(376002)(366004)(39840400004)(136003)(346002)(189003)(199004)(76176011)(446003)(4326008)(54906003)(476003)(52116002)(8676002)(6486002)(81166006)(81156014)(6436002)(316002)(36756003)(11346002)(25786009)(102836004)(6636002)(486006)(14444005)(7736002)(6506007)(386003)(3846002)(71190400001)(8936002)(2906002)(66946007)(66446008)(64756008)(73956011)(66476007)(99286004)(6246003)(6862004)(68736007)(53936002)(6116002)(229853002)(14454004)(86362001)(71200400001)(107886003)(58126008)(186003)(26005)(5660300002)(478600001)(33656002)(66556008)(256004)(305945005)(1076003)(6512007)(66066001)(9686003)(30126002)(969003)(989001)(999001)(1009001)(1019001);
- DIR:OUT; SFP:1501; SCL:5; SRVR:DB8PR08MB5498;
- H:DB8PR08MB3977.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 9fLK34jGGdQb+QLZ8pL0yEw7pyjJkZzyqHiZ/FOd88jP4OW3bOya4AWY3lnel/K6UuK1iGlJm/28WwBMCie3usP5CasSoNrv+wC49iKQF6+Zm2EInPcm5jI9MTinyosJc6NkH+PyhygyOlBIzH2JPTir5n3EKLFAW7jUgC2zwycQUVVWVaNg68KJKmWNs92bs5J47/B7Xp3LKi7uurb52EkLi0EPHVe/+0GsF6X5gaRxP9x3pyx2lHaPiEzBCIt4XTOwukmOvFb68svkXbMgl5XVen8L5YV5rwpOjA7jyolGutjNsJKmrgFF0wxVVbMVah7Y0cwSydr91y7/jp+XaFk1oHSP6WZMm/laeavfaDEloK0f/KUXobcbmPB7dFv2x42knBsIeyuWoMKm93ZnGPP8f/FXKT5qFtxgRaFR6bperXNfnDFdHucKf41qypCDGAFwOHdTWZjuUe/KiOLGFLPdXHwOdOhteOlH/nh2ASRTIrNKEtcbrKXTQq60Kj4c
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <6B0809F76B45B6429A4809B4DFDB1F8E@eurprd08.prod.outlook.com>
+ (envelope-from <bounces@canonical.com>) id 1hcoMX-00017k-7F
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 05:55:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42212)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hcoMX-00014t-0I
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 05:55:41 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hcoMU-0008Qi-6S
+ for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 09:55:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id EF2DA2E8083
+ for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 09:55:37 +0000 (UTC)
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2e8ea229-8390-4ceb-44cf-08d6f3219d07
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jun 2019 12:45:01.5312 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: rkagan@virtuozzo.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5498
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe08::307
-Subject: Re: [Qemu-devel] [PATCH v2 6/7] iotests: amend QEMU NBD process
- synchronization
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 17 Jun 2019 09:42:38 -0000
+From: Nikolay Kichukov <hijacker@oldum.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: crash qemu spice usbredir
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: hijacker-c
+X-Launchpad-Bug-Reporter: Nikolay Kichukov (hijacker-c)
+X-Launchpad-Bug-Modifier: Nikolay Kichukov (hijacker-c)
+Message-Id: <156076455835.24347.5065510387911666481.malonedeb@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18981";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 6642d8c8e5239de22e7da754673ee10ff8f61340
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+X-Mailman-Approved-At: Mon, 17 Jun 2019 08:39:18 -0400
+Subject: [Qemu-devel] [Bug 1833053] [NEW] qemu guest crashes on spice client
+ USB redirected device removal
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -123,81 +77,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- "berrange@redhat.com" <berrange@redhat.com>, Denis Lunev <den@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Reply-To: Bug 1833053 <1833053@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 13, 2019 at 12:59:53PM +0300, Vladimir Sementsov-Ogievskiy wrote:
-> 11.06.2019 21:02, Andrey Shinkevich wrote:
-> > Processes are dying harder under the Valgring. It results in counting
-> > the dying process as a newborn one. Make it sure that old NBD job get
-> > finished before starting a new one.
-> > 
-> > Suggested-by: Roman Kagan <rkagan@virtuozzo.com>
-> > Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> > ---
-> >   tests/qemu-iotests/common.nbd | 6 ++++++
-> >   1 file changed, 6 insertions(+)
-> > 
-> > diff --git a/tests/qemu-iotests/common.nbd b/tests/qemu-iotests/common.nbd
-> > index 25fc9ff..e3dcc60 100644
-> > --- a/tests/qemu-iotests/common.nbd
-> > +++ b/tests/qemu-iotests/common.nbd
-> > @@ -22,6 +22,7 @@
-> >   nbd_unix_socket="${TEST_DIR}/qemu-nbd.sock"
-> >   nbd_tcp_addr="127.0.0.1"
-> >   nbd_pid_file="${TEST_DIR}/qemu-nbd.pid"
-> > +nbd_job_pid=""
-> >   
-> >   nbd_server_stop()
-> >   {
-> > @@ -33,6 +34,9 @@ nbd_server_stop()
-> >               kill "$NBD_PID"
-> >           fi
-> >       fi
-> 
-> Honestly, I don't understand the problem from commit message, but anyway comment
-> should be added here, to mark that this is for valgrind... But you don't check for
-> VALGRIND enabled.. I it intentional?
+Public bug reported:
 
-It is.  The problem this patch fixes exists regardless of valgrind.
-valgrind just makes it easier to notice.  See my reply to the patch
-itself.
+Hello,
 
-Roman.
+I am experiencing guest crashes, which cannot be reproduced at all
+times, but are pretty frequent (4 out of 5 tries it would crash). The
+guest crashes when a previously attached USB redirected device through
+SPICE has been removed by the client.
 
-> 
-> > +    if [ -n "$nbd_job_pid" ] && kill -s 0 "$nbd_job_pid" 2>/dev/null; then
-> > +        wait "$nbd_job_pid"
-> > +    fi
-> >       rm -f "$nbd_unix_socket"
-> >   }
-> >   
-> > @@ -61,6 +65,7 @@ nbd_server_start_unix_socket()
-> >   {
-> >       nbd_server_stop
-> >       $QEMU_NBD -v -t -k "$nbd_unix_socket" "$@" &
-> > +    nbd_job_pid=$!
-> >       nbd_server_wait_for_unix_socket $!
-> >   }
-> >   
-> > @@ -105,5 +110,6 @@ nbd_server_start_tcp_socket()
-> >   {
-> >       nbd_server_stop
-> >       $QEMU_NBD -v -t -b $nbd_tcp_addr -p $nbd_tcp_port "$@" &
-> > +    nbd_job_pid=$!
-> >       nbd_server_wait_for_tcp_socket $!
-> >   }
-> > 
-> 
-> 
-> -- 
-> Best regards,
-> Vladimir
+Steps to reproduce:
+1.) Start windows 10 guest with display driver Spice
+2.) Connect to the console with remote-viewer spice://IP:PORT or via virt-v=
+iewer (tunnelled through SSH)
+3.) Attach a client USB device, for example storage device, iPhone or Andro=
+id phone
+4.) Observe the guest OS detects it and sets it up
+5.) Go back to 'USB device selection' and untick the USB device
+6.) Observe the guest VM crashed and the below assertion was printed in the=
+ qemu log for this virtual machine:
+
+qemu-system-x86_64: /var/tmp/portage/app-emulation/qemu-4.0.0-r3/work/qemu-=
+4.0.0/hw/usb/core.c:720: usb_ep_get: Assertion `dev !=3D NULL' failed.
+2019-06-17 09:25:09.160+0000: shutting down, reason=3Dcrashed
+
+
+Versions of related packages on the host:
+app-emulation/qemu-4.0.0-r3
+app-emulation/spice-0.14.0-r2:0
+app-emulation/spice-protocol-0.12.14:0
+net-misc/spice-gtk-0.35:0
+Kernel: 5.1.7-gentoo on Intel x86_64 CPU
+
+Version of the spice-tools on the guest:
+virtio-win 0.1-126
+QXL 0.1-21
+mingw-vdagent-win 0.8.0
+
+QEMU command line (generated by libvirt):
+
+/usr/bin/qemu-system-x86_64 -name guest=3DW10VM,debug-threads=3Don -S
+-object
+secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-41-=
+W10VM
+/master-key.aes -machine pc-i440fx-2.12,accel=3Dkvm,usb=3Doff,vmport=3Doff
+,dump-guest-core=3Doff -cpu
+qemu64,hv_time,hv_relaxed,hv_vapic,hv_spinlocks=3D0x1fff,hv_synic,hv_stimer
+-m 4500 -realtime mlock=3Doff -smp 2,maxcpus=3D4,sockets=3D4,cores=3D1,thre=
+ads=3D1
+-uuid b39afae2-5085-4659-891c-b3c65e65af2e -no-user-config -nodefaults
+-chardev socket,id=3Dcharmonitor,fd=3D26,server,nowait -mon
+chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
+base=3Dlocaltime,driftfix=3Dslew -no-hpet -global kvm-
+pit.lost_tick_policy=3Ddelay -no-shutdown -global PIIX4_PM.disable_s3=3D1
+-global PIIX4_PM.disable_s4=3D1 -boot menu=3Doff,strict=3Don -device ich9-u=
+sb-
+ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0x5.0x7 -device ich9-usb-
+uhci1,masterbus=3Dusb.0,firstport=3D0,bus=3Dpci.0,multifunction=3Don,addr=
+=3D0x5
+-device ich9-usb-
+uhci2,masterbus=3Dusb.0,firstport=3D2,bus=3Dpci.0,addr=3D0x5.0x1 -device ic=
+h9
+-usb-uhci3,masterbus=3Dusb.0,firstport=3D4,bus=3Dpci.0,addr=3D0x5.0x2 -devi=
+ce
+virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.0,addr=3D0x8 -device virtio-serial-pci=
+,id
+=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x6 -drive
+file=3D/libvirt/images/W10VM.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-
+scsi0-0-0-1,cache=3Dunsafe,discard=3Dunmap,detect-zeroes=3Dunmap -device sc=
+si-
+hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D1,device_id=3Ddrive-
+scsi0-0-0-1,drive=3Ddrive-scsi0-0-0-1,id=3Dscsi0-0-0-1,bootindex=3D1,write-
+cache=3Don -netdev tap,fd=3D28,id=3Dhostnet0,vhost=3Don,vhostfd=3D29 -device
+virtio-net-
+pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:44:f6:21,bus=3Dpci.0,addr=3D=
+0x3
+-chardev spicevmc,id=3Dcharchannel0,name=3Dvdagent -device
+virtserialport,bus=3Dvirtio-
+serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dcom.redhat.spi=
+ce.0
+-chardev socket,id=3Dcharchannel1,fd=3D30,server,nowait -device
+virtserialport,bus=3Dvirtio-
+serial0.0,nr=3D3,chardev=3Dcharchannel1,id=3Dchannel1,name=3Dorg.qemu.guest=
+_agent.0
+-chardev spiceport,id=3Dcharchannel2,name=3Dorg.spice-space.webdav.0 -device
+virtserialport,bus=3Dvirtio-
+serial0.0,nr=3D2,chardev=3Dcharchannel2,id=3Dchannel2,name=3Dorg.spice-
+space.webdav.0 -spice port=3D5901,addr=3D0.0.0.0,seamless-migration=3Don
+-device qxl-
+vga,id=3Dvideo0,ram_size=3D134217728,vram_size=3D134217728,vram64_size_mb=
+=3D0,vgamem_mb=3D64,max_outputs=3D1,bus=3Dpci.0,addr=3D0x2
+-device intel-hda,id=3Dsound0,bus=3Dpci.0,addr=3D0x4 -device hda-
+duplex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 -chardev
+spicevmc,id=3Dcharredir0,name=3Dusbredir -device usb-
+redir,chardev=3Dcharredir0,id=3Dredir0,bus=3Dusb.0,port=3D1 -chardev
+spicevmc,id=3Dcharredir1,name=3Dusbredir -device usb-
+redir,chardev=3Dcharredir1,id=3Dredir1,bus=3Dusb.0,port=3D2 -device virtio-
+balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x7 -sandbox
+on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=3D=
+deny
+-msg timestamp=3Don
+
+
+I have attempted to collect a backtrace, but will need direction as I am no=
+t sure on which thread to listen and where to set the breakpoint, 'thread a=
+pply all backtrace' does not seem to work well with the qemu process...
+
+Thank you
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: crash qemu spice usbredir
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1833053
+
+Title:
+  qemu guest crashes on spice client USB redirected device removal
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+
+  I am experiencing guest crashes, which cannot be reproduced at all
+  times, but are pretty frequent (4 out of 5 tries it would crash). The
+  guest crashes when a previously attached USB redirected device through
+  SPICE has been removed by the client.
+
+  Steps to reproduce:
+  1.) Start windows 10 guest with display driver Spice
+  2.) Connect to the console with remote-viewer spice://IP:PORT or via virt=
+-viewer (tunnelled through SSH)
+  3.) Attach a client USB device, for example storage device, iPhone or And=
+roid phone
+  4.) Observe the guest OS detects it and sets it up
+  5.) Go back to 'USB device selection' and untick the USB device
+  6.) Observe the guest VM crashed and the below assertion was printed in t=
+he qemu log for this virtual machine:
+
+  qemu-system-x86_64: /var/tmp/portage/app-emulation/qemu-4.0.0-r3/work/qem=
+u-4.0.0/hw/usb/core.c:720: usb_ep_get: Assertion `dev !=3D NULL' failed.
+  2019-06-17 09:25:09.160+0000: shutting down, reason=3Dcrashed
+
+  =
+
+  Versions of related packages on the host:
+  app-emulation/qemu-4.0.0-r3
+  app-emulation/spice-0.14.0-r2:0
+  app-emulation/spice-protocol-0.12.14:0
+  net-misc/spice-gtk-0.35:0
+  Kernel: 5.1.7-gentoo on Intel x86_64 CPU
+
+  Version of the spice-tools on the guest:
+  virtio-win 0.1-126
+  QXL 0.1-21
+  mingw-vdagent-win 0.8.0
+
+  QEMU command line (generated by libvirt):
+
+  /usr/bin/qemu-system-x86_64 -name guest=3DW10VM,debug-threads=3Don -S
+  -object
+  secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-4=
+1-W10VM
+  /master-key.aes -machine pc-i440fx-2.12,accel=3Dkvm,usb=3Doff,vmport=3Doff
+  ,dump-guest-core=3Doff -cpu
+  qemu64,hv_time,hv_relaxed,hv_vapic,hv_spinlocks=3D0x1fff,hv_synic,hv_stim=
+er
+  -m 4500 -realtime mlock=3Doff -smp
+  2,maxcpus=3D4,sockets=3D4,cores=3D1,threads=3D1 -uuid b39afae2-5085-4659-=
+891c-
+  b3c65e65af2e -no-user-config -nodefaults -chardev
+  socket,id=3Dcharmonitor,fd=3D26,server,nowait -mon
+  chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
+  base=3Dlocaltime,driftfix=3Dslew -no-hpet -global kvm-
+  pit.lost_tick_policy=3Ddelay -no-shutdown -global PIIX4_PM.disable_s3=3D1
+  -global PIIX4_PM.disable_s4=3D1 -boot menu=3Doff,strict=3Don -device ich9
+  -usb-ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0x5.0x7 -device ich9-usb-
+  uhci1,masterbus=3Dusb.0,firstport=3D0,bus=3Dpci.0,multifunction=3Don,addr=
+=3D0x5
+  -device ich9-usb-
+  uhci2,masterbus=3Dusb.0,firstport=3D2,bus=3Dpci.0,addr=3D0x5.0x1 -device =
+ich9
+  -usb-uhci3,masterbus=3Dusb.0,firstport=3D4,bus=3Dpci.0,addr=3D0x5.0x2 -de=
+vice
+  virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.0,addr=3D0x8 -device virtio-serial-
+  pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x6 -drive
+  file=3D/libvirt/images/W10VM.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-
+  scsi0-0-0-1,cache=3Dunsafe,discard=3Dunmap,detect-zeroes=3Dunmap -device
+  scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D1,device_id=3Ddrive-
+  scsi0-0-0-1,drive=3Ddrive-scsi0-0-0-1,id=3Dscsi0-0-0-1,bootindex=3D1,writ=
+e-
+  cache=3Don -netdev tap,fd=3D28,id=3Dhostnet0,vhost=3Don,vhostfd=3D29 -dev=
+ice
+  virtio-net-
+  pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:44:f6:21,bus=3Dpci.0,addr=
+=3D0x3
+  -chardev spicevmc,id=3Dcharchannel0,name=3Dvdagent -device
+  virtserialport,bus=3Dvirtio-
+  serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dcom.redhat.s=
+pice.0
+  -chardev socket,id=3Dcharchannel1,fd=3D30,server,nowait -device
+  virtserialport,bus=3Dvirtio-
+  serial0.0,nr=3D3,chardev=3Dcharchannel1,id=3Dchannel1,name=3Dorg.qemu.gue=
+st_agent.0
+  -chardev spiceport,id=3Dcharchannel2,name=3Dorg.spice-space.webdav.0
+  -device virtserialport,bus=3Dvirtio-
+  serial0.0,nr=3D2,chardev=3Dcharchannel2,id=3Dchannel2,name=3Dorg.spice-
+  space.webdav.0 -spice port=3D5901,addr=3D0.0.0.0,seamless-migration=3Don
+  -device qxl-
+  vga,id=3Dvideo0,ram_size=3D134217728,vram_size=3D134217728,vram64_size_mb=
+=3D0,vgamem_mb=3D64,max_outputs=3D1,bus=3Dpci.0,addr=3D0x2
+  -device intel-hda,id=3Dsound0,bus=3Dpci.0,addr=3D0x4 -device hda-
+  duplex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 -chardev
+  spicevmc,id=3Dcharredir0,name=3Dusbredir -device usb-
+  redir,chardev=3Dcharredir0,id=3Dredir0,bus=3Dusb.0,port=3D1 -chardev
+  spicevmc,id=3Dcharredir1,name=3Dusbredir -device usb-
+  redir,chardev=3Dcharredir1,id=3Dredir1,bus=3Dusb.0,port=3D2 -device virti=
+o-
+  balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x7 -sandbox
+  on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=
+=3Ddeny
+  -msg timestamp=3Don
+
+  =
+
+  I have attempted to collect a backtrace, but will need direction as I am =
+not sure on which thread to listen and where to set the breakpoint, 'thread=
+ apply all backtrace' does not seem to work well with the qemu process...
+
+  Thank you
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1833053/+subscriptions
 
