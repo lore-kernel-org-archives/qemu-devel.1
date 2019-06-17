@@ -2,79 +2,79 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4333AC31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:06:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E18EEC31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:08:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BA4320652
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:06:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BA4320652
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AC53C20652
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:08:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GFFGmunR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC53C20652
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49896 helo=lists.gnu.org)
+Received: from localhost ([::1]:49936 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcv5T-0003Fl-Bg
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 13:06:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46313)
+	id 1hcv7W-0005UV-05
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 13:08:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46804)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hcuCJ-0002Ju-8i
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 12:09:32 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hcuDm-00045v-M8
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 12:11:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hcuCI-0003zj-8t
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 12:09:31 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:40406)
+ (envelope-from <peter.maydell@linaro.org>) id 1hcuDh-0005Af-HC
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 12:11:02 -0400
+Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:42355)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hcuCI-0003z4-35
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 12:09:30 -0400
-Received: by mail-wm1-f67.google.com with SMTP id v19so9734493wmj.5
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 09:09:30 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hcuDd-00056k-Cx
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 12:10:56 -0400
+Received: by mail-oi1-x22c.google.com with SMTP id s184so7397204oie.9
+ for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 09:10:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+ bh=zhVdBGwkEgCGSCEABkbGoGJC5V1QS+v9IpkM7WsdPBM=;
+ b=GFFGmunRYdmEDr2ddzIa4aLlpflfx11hV6XRf0ITLT4OuTRU7lg49NQqKooYx1M9Dx
+ WOGJBPx9ZChoA620OtANdPZHB9vRjzEXD3p4BTjXt8QDLyIadjNvGM6C+ljlxURGHS8J
+ nuzwbnMtiTgODLSx0xWqP12S6AePPutWb31XuvqyKK1NeITKZf9hvUihmG10BxL6aH1C
+ 5K5rro4aWmEK7yRS0TZ+E+OSwydWvRwy3DQtGO5KrTv657ZyaospRFASWlkUqTSWe2vZ
+ pt3la4hpAZHf3vKzqX8YQUFmpTnMTRyIMtVCAue7AREEwqpqdYlPVwU+VcuLlntXYtPv
+ XrBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Usp2DZtQd4O5xHqmPVmrFAaMrxG2FglYPRdUeJc2Hpo=;
- b=l6BNe7XJzf3KVokGqIhbYa+QFuw+fNLog9HkQLUE2K+GjX4hBEjS5GZ21Adi1gX91P
- LQTHW3dGYM5X6f41MQsDrlaKqRepw9QC8S6CbbZTMf6A0Di+p+vdIBoJ5dpuS6KBiKEz
- sNvH5ECX62rijIk6VgSf5qQ2rtsHsWwW80l5FNCSl3fjqhPXNChmZSk1QerBHXpomjG7
- vioBoa/pfqxXnhoiF9uBrjNm7DzMMn3n9UHZ+8HG9HUhL6wwyIdQF2Q44trLZehtODCo
- SP5DrUWtYVrn7SX8tcRpCul9NxTQdq7wtQ5NO46lfYD4wh8ZXf5Owgxz4aXcmIb41CCg
- vEZw==
-X-Gm-Message-State: APjAAAX1jNcXjdzA27v13SD9F+miHy2aP8A4SIzqdHpMm0dspWo+VunO
- F5ZuEk+aVq7YSWATLEuM9i8Flw==
-X-Google-Smtp-Source: APXvYqyANZFPgtq0W+jGo+OmdGX9BSBHEuI1eQeS0MYGLNmNEmVM6H0r1obPkzp7I9jrO+kEQIRq6g==
-X-Received: by 2002:a1c:a783:: with SMTP id q125mr20439066wme.94.1560787769125; 
- Mon, 17 Jun 2019 09:09:29 -0700 (PDT)
-Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.183])
- by smtp.gmail.com with ESMTPSA id y44sm12250622wrd.13.2019.06.17.09.09.28
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Mon, 17 Jun 2019 09:09:28 -0700 (PDT)
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-References: <20190617043858.8290-1-kraxel@redhat.com>
- <20190617043858.8290-5-kraxel@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <50ccf205-1be7-5d0e-c4b4-7fb94459330c@redhat.com>
-Date: Mon, 17 Jun 2019 18:09:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to;
+ bh=zhVdBGwkEgCGSCEABkbGoGJC5V1QS+v9IpkM7WsdPBM=;
+ b=UuoSJfCpB5MGIZ+w8/5AcspXryOReVENXUpIo6J3bQnB2AlhJpMRE7F4m+hNE/WTjS
+ Z4/zGeyKqh8WgmwXxYuhcLyJ4vbGKnqojhy6O1ExQ/6ItGDslandBkHzJkf2gMxBJ8rY
+ 6t9BAJJ02OOtoG6fS4NW1PixomKhTAjXqMoqWOflgkPYjw5v58CTx7C6q7WX+tYenxvN
+ nxZLobct4njmLYEJ/nSxGPhSm9VapDeA6SqzjWp2bW6zi61kXv8dvMj70oUgDhHScbFy
+ gBFOrLHkKc7vvwVfor+X1Vm52nn4GL34fQiku6/DbkJgBMedOKJDQzqYiR2eEjzfnyGq
+ 1FfQ==
+X-Gm-Message-State: APjAAAUfKGf38K4Cbhe/rAFUdqVWR3f5TqcBm7C3ubexulx9SdlEJt1I
+ RKyz8wCUGo9hEzRdmdy4Po35z36Tjc6f1fxqKLLJzDc3SkU=
+X-Google-Smtp-Source: APXvYqzYr/e5+SxhKspDp0mQYBvJIkx/ybtnejYhWilrmKddxpi29mhoRYnLqcxm26pwV7EqYv5qL2rvcfRdFuIs/1M=
+X-Received: by 2002:aca:6185:: with SMTP id v127mr1960670oib.163.1560787851897; 
+ Mon, 17 Jun 2019 09:10:51 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190617043858.8290-5-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [PATCH v4 04/11] tests/vm: proper guest shutdown
+References: <20190617145740.9881-1-peter.maydell@linaro.org>
+In-Reply-To: <20190617145740.9881-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 17 Jun 2019 17:10:40 +0100
+Message-ID: <CAFEAcA861J9fcV-kXB7SO_X1W2UMJSBJTu+DDk=M2krxiBcf4A@mail.gmail.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::22c
+Subject: Re: [Qemu-devel] [PULL 0/4] docs queue
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,23 +86,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
- Kamil Rytarowski <kamil@netbsd.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/17/19 6:38 AM, Gerd Hoffmann wrote:
-> When not running in snapshot mode ask the guest to poweroff and wait for
-> this to finish instead of simply quitting qemu, so the guest can flush
-> pending updates to disk.
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> Tested-by: Thomas Huth <thuth@redhat.com>
+On Mon, 17 Jun 2019 at 15:57, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> I thought I'd put together a pullreq with some of the sphinx docs
+> patches I've sent out recently, since they don't really have an
+> obvious more sensible route to go through.
+>
+> thanks
+> -- PMM
+>
+> The following changes since commit 5d0e5694470d2952b4f257bc985cac8c89b4fd92:
+>
+>   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2019-06-17 11:55:14 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-docs-20190617
+>
+> for you to fetch changes up to 0783a732f9ee2de28dc722d6cd87f04b2f264a48:
+>
+>   docs: Build and install specs manual (2019-06-17 15:35:31 +0100)
+>
+> ----------------------------------------------------------------
+> docs infrastructure queue:
+>  * fix some minor syntax issues in docs/specs/index.rst
+>  * build and install the 'specs' manual, since it now has some content
+>  * delete the "QEMU compared to other emulators" section of the docs
+>  * Convert "translator internals" docs to RST, move to devel manual
+>
+> ----------------------------------------------------------------
 
-Tags from v3:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
+
+-- PMM
 
