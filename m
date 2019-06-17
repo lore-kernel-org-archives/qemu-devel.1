@@ -2,79 +2,80 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E18EEC31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:08:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 172FBC31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:08:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC53C20652
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:08:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GFFGmunR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC53C20652
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E3B402084D
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:08:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3B402084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49936 helo=lists.gnu.org)
+Received: from localhost ([::1]:49938 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcv7W-0005UV-05
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 13:08:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46804)
+	id 1hcv7m-0005fG-8u
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 13:08:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48229)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hcuDm-00045v-M8
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 12:11:04 -0400
+ (envelope-from <philmd@redhat.com>) id 1hcuIN-0000gq-M2
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 12:15:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hcuDh-0005Af-HC
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 12:11:02 -0400
-Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:42355)
+ (envelope-from <philmd@redhat.com>) id 1hcuIL-00014K-9s
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 12:15:47 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:33219)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hcuDd-00056k-Cx
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 12:10:56 -0400
-Received: by mail-oi1-x22c.google.com with SMTP id s184so7397204oie.9
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 09:10:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=zhVdBGwkEgCGSCEABkbGoGJC5V1QS+v9IpkM7WsdPBM=;
- b=GFFGmunRYdmEDr2ddzIa4aLlpflfx11hV6XRf0ITLT4OuTRU7lg49NQqKooYx1M9Dx
- WOGJBPx9ZChoA620OtANdPZHB9vRjzEXD3p4BTjXt8QDLyIadjNvGM6C+ljlxURGHS8J
- nuzwbnMtiTgODLSx0xWqP12S6AePPutWb31XuvqyKK1NeITKZf9hvUihmG10BxL6aH1C
- 5K5rro4aWmEK7yRS0TZ+E+OSwydWvRwy3DQtGO5KrTv657ZyaospRFASWlkUqTSWe2vZ
- pt3la4hpAZHf3vKzqX8YQUFmpTnMTRyIMtVCAue7AREEwqpqdYlPVwU+VcuLlntXYtPv
- XrBg==
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hcuIG-0000z2-Bk
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 12:15:41 -0400
+Received: by mail-wm1-f65.google.com with SMTP id h19so323872wme.0
+ for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 09:15:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=zhVdBGwkEgCGSCEABkbGoGJC5V1QS+v9IpkM7WsdPBM=;
- b=UuoSJfCpB5MGIZ+w8/5AcspXryOReVENXUpIo6J3bQnB2AlhJpMRE7F4m+hNE/WTjS
- Z4/zGeyKqh8WgmwXxYuhcLyJ4vbGKnqojhy6O1ExQ/6ItGDslandBkHzJkf2gMxBJ8rY
- 6t9BAJJ02OOtoG6fS4NW1PixomKhTAjXqMoqWOflgkPYjw5v58CTx7C6q7WX+tYenxvN
- nxZLobct4njmLYEJ/nSxGPhSm9VapDeA6SqzjWp2bW6zi61kXv8dvMj70oUgDhHScbFy
- gBFOrLHkKc7vvwVfor+X1Vm52nn4GL34fQiku6/DbkJgBMedOKJDQzqYiR2eEjzfnyGq
- 1FfQ==
-X-Gm-Message-State: APjAAAUfKGf38K4Cbhe/rAFUdqVWR3f5TqcBm7C3ubexulx9SdlEJt1I
- RKyz8wCUGo9hEzRdmdy4Po35z36Tjc6f1fxqKLLJzDc3SkU=
-X-Google-Smtp-Source: APXvYqzYr/e5+SxhKspDp0mQYBvJIkx/ybtnejYhWilrmKddxpi29mhoRYnLqcxm26pwV7EqYv5qL2rvcfRdFuIs/1M=
-X-Received: by 2002:aca:6185:: with SMTP id v127mr1960670oib.163.1560787851897; 
- Mon, 17 Jun 2019 09:10:51 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=xj7F1/LF17MU8fv8q7eKJ4RAdNqP8Mk9Hzg/2wzsqFI=;
+ b=NwAUNTrhrArp/ahRwJ9EYeDb5+jHQqfvE22Z+xpZfHfR+XT/SGYzl0BqJyoB2jjQ+Y
+ zpvsaFhQKCgr0LfD19f63I05TAy9HuoxEMZ4JNc7YXtHtObNd079YRgmfGUpKOVnwuMf
+ bPj/6LqwRGTB2axh8D/dEqh86vNM8WpHowC3TSWM0dZbrEyEL7ovQ/AaJEki+WKlbgnH
+ w+eUUbvv9onNvgfVtIcQrmPiXE5cd202/uk7E8iJAIfaz03XeBiKnhBgSVMZ3Oibss52
+ BmfLHJfwhI5A6EZ6Pejsc1gUxTmLx2BQpEJtAaXiDO512Nva7GtRmmLueHqx2IY9vMyw
+ +Sjw==
+X-Gm-Message-State: APjAAAXA2fAAMiDJdPJl3VnZ2H0eGN/De1X8P3EPYbKyc9k+V3jEAj2M
+ d1edrk7tCqUg43Cs7u4DePhutQ==
+X-Google-Smtp-Source: APXvYqz0kp/iXNSK6V6GY/kFzSEnM1UZ80f1RfIt7EQbopF4jqNgwOjJ+FxtP/BtrXtH2sckxozsVQ==
+X-Received: by 2002:a7b:cae9:: with SMTP id t9mr19474693wml.126.1560788134778; 
+ Mon, 17 Jun 2019 09:15:34 -0700 (PDT)
+Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.183])
+ by smtp.gmail.com with ESMTPSA id c4sm12939533wrb.68.2019.06.17.09.15.33
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Mon, 17 Jun 2019 09:15:34 -0700 (PDT)
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20190617043858.8290-1-kraxel@redhat.com>
+ <20190617043858.8290-4-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <7bf59382-412f-025a-15f2-2d1dcc38b156@redhat.com>
+Date: Mon, 17 Jun 2019 18:15:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190617145740.9881-1-peter.maydell@linaro.org>
-In-Reply-To: <20190617145740.9881-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 17 Jun 2019 17:10:40 +0100
-Message-ID: <CAFEAcA861J9fcV-kXB7SO_X1W2UMJSBJTu+DDk=M2krxiBcf4A@mail.gmail.com>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22c
-Subject: Re: [Qemu-devel] [PULL 0/4] docs queue
+In-Reply-To: <20190617043858.8290-4-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH v4 03/11] tests/vm: run test builds on
+ snapshot
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,45 +87,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
+ Kamil Rytarowski <kamil@netbsd.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 17 Jun 2019 at 15:57, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> I thought I'd put together a pullreq with some of the sphinx docs
-> patches I've sent out recently, since they don't really have an
-> obvious more sensible route to go through.
->
-> thanks
-> -- PMM
->
-> The following changes since commit 5d0e5694470d2952b4f257bc985cac8c89b4fd92:
->
->   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2019-06-17 11:55:14 +0100)
->
-> are available in the Git repository at:
->
->   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-docs-20190617
->
-> for you to fetch changes up to 0783a732f9ee2de28dc722d6cd87f04b2f264a48:
->
->   docs: Build and install specs manual (2019-06-17 15:35:31 +0100)
->
-> ----------------------------------------------------------------
-> docs infrastructure queue:
->  * fix some minor syntax issues in docs/specs/index.rst
->  * build and install the 'specs' manual, since it now has some content
->  * delete the "QEMU compared to other emulators" section of the docs
->  * Convert "translator internals" docs to RST, move to devel manual
->
-> ----------------------------------------------------------------
+On 6/17/19 6:38 AM, Gerd Hoffmann wrote:
+> The build script doesn't shutdown the guest VMs properly,
+> which results in filesystem corruption and guest boot
+> failures sooner or later.
+> 
+> Use the --snapshot to run builds on a snapshot,
+> That way killing the VM doesn't corrupt the base image.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> Tested-by: Thomas Huth <thuth@redhat.com>
 
-
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
-
--- PMM
+From v3:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Acked-by: Ed Maste <emaste@freebsd.org>
 
