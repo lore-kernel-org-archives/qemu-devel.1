@@ -8,75 +8,77 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F40FEC31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:36:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF4B3C31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:40:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C532A2084D
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:36:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B23B0208C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:40:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O61tMpNT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C532A2084D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q7Cm14Uc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B23B0208C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50460 helo=lists.gnu.org)
+Received: from localhost ([::1]:50506 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcvYs-0005Ns-49
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 13:36:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37433)
+	id 1hcvbx-0007cC-T3
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 13:40:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41976)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alistair23@gmail.com>) id 1hcv7O-0005aY-AJ
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 13:08:31 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hcvKD-0000wC-4X
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 13:21:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1hcv7N-0000Bp-6f
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 13:08:30 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:39700)
+ (envelope-from <alistair23@gmail.com>) id 1hcvKB-0003Yh-NB
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 13:21:45 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:36761)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1hcv7M-00008D-Sv; Mon, 17 Jun 2019 13:08:29 -0400
-Received: by mail-lj1-x243.google.com with SMTP id v18so10042100ljh.6;
- Mon, 17 Jun 2019 10:08:28 -0700 (PDT)
+ id 1hcvK6-0003P9-K4; Mon, 17 Jun 2019 13:21:39 -0400
+Received: by mail-lf1-x141.google.com with SMTP id q26so7117563lfc.3;
+ Mon, 17 Jun 2019 10:21:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=0hrRRgMO2XtUkfzFyfRARDAR6X0+SctDDT9Im4dP8Vs=;
- b=O61tMpNTiqCuqJvEfhU0RpY5m+EgOAhk1sdhUpYhNkZWbCfbazN5cCPxNcQRVaWMF6
- P2s8VrNhj3+nQRgugfpFrdpATxsj4ZcPHRVN4vjxvrl3BVVkv6wfoLg81zY4bPtxADsw
- G/rUCzf/ryMKdKxVb4v9FNCPMnU8bk0yUw0nV3MT32pRLNUxu1hYHH4z+grPYnhmij0p
- nYnay7EVd003vmY0wnM0CnC4SWYffsToW1AtFJCcM3y8dMyOtXPvxpUHYmbVrIHtnNDM
- 1qoVa63wInP4H+gXAnxGFvKSowCDG1K5OZN0uvOP1I9BWhDestgk05XWg/+HUT0FHrJ7
- Vgeg==
+ :cc:content-transfer-encoding;
+ bh=UvEXy6R2Oa0rw1CPw6Eg9Azivk9jG3zrLJWOzgsj+sI=;
+ b=q7Cm14UcndjBBBGQs1VXcwRC8FOqZfvLoKvafiy+9Istjldw3CdnWgzwRiLLcMDfA8
+ k8WUdnUIMEsPR2rzBKY0yc5fFokRib8UpISVqE77ise2Omj9bf3NWtJnSxAop3vgxUlz
+ wTWOg/neRdw0uhxTI2SgqvvHL8A/KQfvPFoCGTe7mJQ2kynMmOmEz6ZIO+PEgCTfNUOG
+ Kz7/l56cS1tgHSHXg+bLNFBLIBb1khW/YwR74e8SlxVjC1MMLJMG6eNwjSgEhbtDSEuh
+ P3VxC+yG3fiUR3vOSXAJk4f4OcMIgfrVCLx8FoAsmI4h5ZOTi5XXfPXkJeiIDSqPgtiu
+ 6TVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=0hrRRgMO2XtUkfzFyfRARDAR6X0+SctDDT9Im4dP8Vs=;
- b=L2HuH0elz20aT6HHFkcQxl/ffSPgW+X7EpF4D6hJAc5DZlEBorCl2rsSnMuH9LGrGd
- WhRTkfh2Iz7C6NZnnbFTP+qSN121ewF9zSIfpqDxygP4gK/tnOR1GICQnitoNWskPhNT
- VevsRyVMQt776CCgxKGMFMUXzqjG8xndj9aebLJ0RGeixfo4Za5JKe0AcntcAlQgRnCE
- okEb2i7hSDuTPQZanHdfnXXcBDG0zsP6X0YyL978oUz7U4NPzMoghhRYKYJSiTJja4Wn
- dO/TSskl1cv4xR/vF6n6trxh3ZoMzefWy6mswByTDRxWkILgOMD0ZkewDxkLsykjs4VT
- J9OQ==
-X-Gm-Message-State: APjAAAU4+LPFcOHAVUgMnlAaZBG/3w1RUjNrUm10iy3mAbNwEngdeQeo
- xg+lqaRA/a4ARsVVlZ8cX3ukotDTWFEckrb6cB4=
-X-Google-Smtp-Source: APXvYqyP7APFa0lOxtv7oP+QeA+1h/YjUDHpPlP4U3tcUB3+Hbu0VL2lIx9mJXbhvz5bdHq7X4yJDc8jC0rvC1nRsLg=
-X-Received: by 2002:a2e:9188:: with SMTP id f8mr323422ljg.33.1560791306223;
- Mon, 17 Jun 2019 10:08:26 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=UvEXy6R2Oa0rw1CPw6Eg9Azivk9jG3zrLJWOzgsj+sI=;
+ b=U3UPb7Loz81y7inNPsw/g4RVtzjXrSTtpaLcZExxeCcwsLsB/WhQxR4hydmkaKoU8N
+ y9KFhdj0b93jydPOdO2kFHb1cEV70bOJWe7efAXYnvSygt/ZrVM0iA6+au2XxXtiCIn6
+ bjrAXApQq5ctzX/2Rfu+n+3eBp9DSMcYTS/8eCALrYJryA+i05POllADrXFdsENybqI5
+ GSMJWsi3Djs4DGgNTQuI7xDcbjQ/er095sHs3EQhaW9fwTPhg+cau39mkjiLywfgtdO5
+ IN473E+2IpiS9n248qbZ1DZ7yE98oH8SlVxcXUtrMkjWRUKaacycXE7PpWFPzzr4NbSl
+ pKyw==
+X-Gm-Message-State: APjAAAVRwkba3Scb+dOxeOYw74urNQiT589cZyO2WDkYXapOP+mazzKG
+ cZ6DDAo3hy1ggDBMyNULW30PPQHYbkKkMdBimFE=
+X-Google-Smtp-Source: APXvYqxzBbqiKphbJeBOyYKPL0V+OWiDjyEQraqhUILNDPVMtsIu9zFAriFzm9tMU7ZeEwX6hShWA0M0pOxZiy8xgfw=
+X-Received: by 2002:a19:4c05:: with SMTP id z5mr46726034lfa.5.1560792096478;
+ Mon, 17 Jun 2019 10:21:36 -0700 (PDT)
 MIME-Version: 1.0
-References: <d4664adffe008df43f2a0760dd4e2b9cb834b652.1558131003.git.alistair.francis@wdc.com>
- <mhng-bd7fc2fb-94f7-4afa-b03c-4f8674d5ade4@palmer-si-x1e>
-In-Reply-To: <mhng-bd7fc2fb-94f7-4afa-b03c-4f8674d5ade4@palmer-si-x1e>
+References: <13fe08a2-c89c-b015-3799-067e0f04bfd3@redhat.com>
+ <mhng-fb0f4eaf-5e38-4e66-958a-9942273b48c3@palmer-si-x1e>
+In-Reply-To: <mhng-fb0f4eaf-5e38-4e66-958a-9942273b48c3@palmer-si-x1e>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 17 Jun 2019 10:05:39 -0700
-Message-ID: <CAKmqyKNV8PY1hgXq7QO9SxwdXCWxCBGw5pvgSgBpPy4pVvB7Dw@mail.gmail.com>
+Date: Mon, 17 Jun 2019 10:18:49 -0700
+Message-ID: <CAKmqyKPCXy3_YMuXmhYpoGvay4m5BpsOrs4VtFF9cU9gL-bedg@mail.gmail.com>
 To: Palmer Dabbelt <palmer@sifive.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::243
-Subject: Re: [Qemu-devel] [PATCH v1 3/4] disas/riscv: Fix `rdinstreth`
- constraint
+X-Received-From: 2a00:1450:4864:20::141
+Subject: Re: [Qemu-devel] [PATCH] RISC-V: Fix a memory leak when realizing a
+ sifive_e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,49 +91,110 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
  "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 14, 2019 at 2:41 AM Palmer Dabbelt <palmer@sifive.com> wrote:
+On Sun, Jun 16, 2019 at 1:15 AM Palmer Dabbelt <palmer@sifive.com> wrote:
 >
-> On Fri, 17 May 2019 15:11:04 PDT (-0700), Alistair Francis wrote:
-> > From: Michael Clark <mjc@sifive.com>
+> On Fri, 14 Jun 2019 05:25:50 PDT (-0700), philmd@redhat.com wrote:
+> > On 6/14/19 2:08 PM, Palmer Dabbelt wrote:
+> >> Coverity pointed out a memory leak in riscv_sifive_e_soc_realize(),
+> >> where a pair of recently added MemoryRegion instances would not be fre=
+ed
+> >> if there were errors elsewhere in the function.  The fix here is to
+> >> simply not use dynamic allocation for these instances: there's always
+> >> one of each in SiFiveESoCState, so instead we just include them within
+> >> the struct.
+> >>
+> >> Thanks to Peter for pointing out the bug and suggesting the fix!
 > >
-> > The constraint for `rdinstreth` was comparing the csr number to 0xc80,
-> > which is `cycleh` instead. Fix this.
+> > a.k.a. Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 > >
-> > Author: Wladimir J. van der Laan <laanwj@gmail.com>
+> > Maybe the thanks can go below the '---' tag, so it doesn't stay in the
+> > git history.
 >
-> I'm not sure what this tag is supposed to mean.  If this is the actual author
-> of the patch, then shouldn't it also have a SOB?
+> Works for me.
 
-I'm not sure either, that is the line that the patch had and I didn't
-want to change it. I'm not sure what usually happens in cases like
-this.
+With the updated Suggested-by line:
+
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
 >
-> > Signed-off-by: Michael Clark <mjc@sifive.com>
-> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> > ---
-> >  disas/riscv.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
 > >
-> > diff --git a/disas/riscv.c b/disas/riscv.c
-> > index 3ab4586f0a..c2578a3c4b 100644
-> > --- a/disas/riscv.c
-> > +++ b/disas/riscv.c
-> > @@ -614,7 +614,7 @@ static const rvc_constraint rvcc_rdtime[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc01, r
-> >  static const rvc_constraint rvcc_rdinstret[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc02, rvc_end };
-> >  static const rvc_constraint rvcc_rdcycleh[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc80, rvc_end };
-> >  static const rvc_constraint rvcc_rdtimeh[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc81, rvc_end };
-> > -static const rvc_constraint rvcc_rdinstreth[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc80, rvc_end };
-> > +static const rvc_constraint rvcc_rdinstreth[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc82, rvc_end };
-> >  static const rvc_constraint rvcc_frcsr[] = { rvc_rs1_eq_x0, rvc_csr_eq_0x003, rvc_end };
-> >  static const rvc_constraint rvcc_frrm[] = { rvc_rs1_eq_x0, rvc_csr_eq_0x002, rvc_end };
-> >  static const rvc_constraint rvcc_frflags[] = { rvc_rs1_eq_x0, rvc_csr_eq_0x001, rvc_end };
+> >>
+> >> Fixes: 30efbf330a45 ("SiFive RISC-V GPIO Device")
+> >> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+> >
+> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>
+> Thanks!
+>
+> >
+> >> ---
+> >>  hw/riscv/sifive_e.c         | 12 +++++-------
+> >>  include/hw/riscv/sifive_e.h |  2 ++
+> >>  2 files changed, 7 insertions(+), 7 deletions(-)
+> >>
+> >> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+> >> index 80ac56fa7d5e..83375afcd1d6 100644
+> >> --- a/hw/riscv/sifive_e.c
+> >> +++ b/hw/riscv/sifive_e.c
+> >> @@ -158,17 +158,15 @@ static void riscv_sifive_e_soc_realize(DeviceSta=
+te *dev, Error **errp)
+> >>
+> >>      SiFiveESoCState *s =3D RISCV_E_SOC(dev);
+> >>      MemoryRegion *sys_mem =3D get_system_memory();
+> >> -    MemoryRegion *xip_mem =3D g_new(MemoryRegion, 1);
+> >> -    MemoryRegion *mask_rom =3D g_new(MemoryRegion, 1);
+> >>
+> >>      object_property_set_bool(OBJECT(&s->cpus), true, "realized",
+> >>                              &error_abort);
+> >>
+> >>      /* Mask ROM */
+> >> -    memory_region_init_rom(mask_rom, NULL, "riscv.sifive.e.mrom",
+> >> +    memory_region_init_rom(&s->mask_rom, NULL, "riscv.sifive.e.mrom",
+> >>          memmap[SIFIVE_E_MROM].size, &error_fatal);
+> >>      memory_region_add_subregion(sys_mem,
+> >> -        memmap[SIFIVE_E_MROM].base, mask_rom);
+> >> +        memmap[SIFIVE_E_MROM].base, &s->mask_rom);
+> >>
+> >>      /* MMIO */
+> >>      s->plic =3D sifive_plic_create(memmap[SIFIVE_E_PLIC].base,
+> >> @@ -228,10 +226,10 @@ static void riscv_sifive_e_soc_realize(DeviceSta=
+te *dev, Error **errp)
+> >>          memmap[SIFIVE_E_PWM2].base, memmap[SIFIVE_E_PWM2].size);
+> >>
+> >>      /* Flash memory */
+> >> -    memory_region_init_ram(xip_mem, NULL, "riscv.sifive.e.xip",
+> >> +    memory_region_init_ram(&s->xip_mem, NULL, "riscv.sifive.e.xip",
+> >>          memmap[SIFIVE_E_XIP].size, &error_fatal);
+> >> -    memory_region_set_readonly(xip_mem, true);
+> >> -    memory_region_add_subregion(sys_mem, memmap[SIFIVE_E_XIP].base, x=
+ip_mem);
+> >> +    memory_region_set_readonly(&s->xip_mem, true);
+> >> +    memory_region_add_subregion(sys_mem, memmap[SIFIVE_E_XIP].base, &=
+s->xip_mem);
+> >>  }
+> >>
+> >>  static void riscv_sifive_e_machine_init(MachineClass *mc)
+> >> diff --git a/include/hw/riscv/sifive_e.h b/include/hw/riscv/sifive_e.h
+> >> index 3b14eb74621f..d175b24cb209 100644
+> >> --- a/include/hw/riscv/sifive_e.h
+> >> +++ b/include/hw/riscv/sifive_e.h
+> >> @@ -33,6 +33,8 @@ typedef struct SiFiveESoCState {
+> >>      RISCVHartArrayState cpus;
+> >>      DeviceState *plic;
+> >>      SIFIVEGPIOState gpio;
+> >> +    MemoryRegion xip_mem;
+> >> +    MemoryRegion mask_rom;
+> >>  } SiFiveESoCState;
+> >>
+> >>  typedef struct SiFiveEState {
+> >>
+>
 
