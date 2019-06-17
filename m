@@ -2,114 +2,67 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3A74C31E57
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 13:21:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C0E4C31E57
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 13:22:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A053D20657
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 13:21:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="D/y5K9YE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A053D20657
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 11A5E20652
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 13:22:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11A5E20652
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47472 helo=lists.gnu.org)
+Received: from localhost ([::1]:47476 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcrZz-0002kd-VJ
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 09:21:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54505)
+	id 1hcraX-0003As-Uj
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 09:22:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54543)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <rkagan@virtuozzo.com>) id 1hcrZD-0001hJ-5K
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 09:21:00 -0400
+ (envelope-from <kwolf@redhat.com>) id 1hcrZM-0001t3-N9
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 09:21:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rkagan@virtuozzo.com>) id 1hcrZB-0002rn-Tx
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 09:20:59 -0400
-Received: from mail-db3eur04hn2027.outbound.protection.outlook.com
- ([52.101.138.27]:56889 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
- id 1hcrZB-0002pr-7Q; Mon, 17 Jun 2019 09:20:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tWUsynEssvLd0oU+7yNb+cgM75LrsCu8emi0qf3Pfo0=;
- b=D/y5K9YEn2mLuvGZKzGaneGMkpyx1JSvTl9dLj9LJnOdtAyopEP2vJFUN9X03Qb9cRSfE9lmvzNjc4q1KnHj7Qi5wwFvg5N7pN4R9GYOzGho3GXUIMVVG2TYu0xcVxi8jhiJE+UrFAyXat2m+z9/yqOcXxLqLzIDwFR9TMH55dg=
-Received: from DB8PR08MB3977.eurprd08.prod.outlook.com (20.179.11.95) by
- DB8PR08MB5164.eurprd08.prod.outlook.com (10.255.19.144) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1987.11; Mon, 17 Jun 2019 13:20:47 +0000
-Received: from DB8PR08MB3977.eurprd08.prod.outlook.com
- ([fe80::3530:3b13:be7f:2944]) by DB8PR08MB3977.eurprd08.prod.outlook.com
- ([fe80::3530:3b13:be7f:2944%4]) with mapi id 15.20.1987.014; Mon, 17 Jun 2019
- 13:20:47 +0000
-From: Roman Kagan <rkagan@virtuozzo.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Thread-Topic: [PATCH v2 2/7] iotests: exclude killed processes from running
- under Valgrind
-Thread-Index: AQHVIH/Wi8p8J0/z1kCgZMBwauxb2KafutMAgAAR14CAAAnHgIAAB32A
-Date: Mon, 17 Jun 2019 13:20:47 +0000
-Message-ID: <20190617132043.GE32624@rkaganb.sw.ru>
-References: <1560276131-683243-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1560276131-683243-3-git-send-email-andrey.shinkevich@virtuozzo.com>
- <20190617111504.GC7397@linux.fritz.box>
- <20190617121855.GB32624@rkaganb.sw.ru>
- <20190617125355.GH7397@linux.fritz.box>
-In-Reply-To: <20190617125355.GH7397@linux.fritz.box>
-Accept-Language: en-US, ru-RU
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mutt/1.11.4 (2019-03-13)
-mail-followup-to: Roman Kagan <rkagan@virtuozzo.com>,	Kevin Wolf
- <kwolf@redhat.com>,	Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com,
- berrange@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
-x-originating-ip: [185.231.240.5]
-x-clientproxiedby: HE1PR0901CA0048.eurprd09.prod.outlook.com
- (2603:10a6:3:45::16) To DB8PR08MB3977.eurprd08.prod.outlook.com
- (2603:10a6:10:ad::31)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=rkagan@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c445cf70-abd5-4ce5-cd63-08d6f3269bed
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
- SRVR:DB8PR08MB5164; 
-x-ms-traffictypediagnostic: DB8PR08MB5164:|DB8PR08MB5164:
-x-microsoft-antispam-prvs: <DB8PR08MB5164662A351183CB53B86514C9EB0@DB8PR08MB5164.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0071BFA85B
-x-forefront-antispam-report: SFV:SPM;
- SFS:(10019020)(396003)(136003)(346002)(376002)(39840400004)(366004)(199004)(189003)(66476007)(64756008)(66446008)(66556008)(6246003)(1076003)(33656002)(53936002)(52116002)(86362001)(76176011)(26005)(186003)(6916009)(4326008)(58126008)(54906003)(25786009)(107886003)(36756003)(2906002)(14454004)(66946007)(66066001)(73956011)(71200400001)(71190400001)(99286004)(81156014)(81166006)(5660300002)(68736007)(305945005)(3846002)(486006)(6116002)(6486002)(229853002)(8936002)(7736002)(8676002)(446003)(256004)(11346002)(316002)(14444005)(6512007)(9686003)(386003)(6506007)(6436002)(478600001)(476003)(102836004)(30126002);
- DIR:OUT; SFP:1501; SCL:5; SRVR:DB8PR08MB5164;
- H:DB8PR08MB3977.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: Ta++omPfUVR8rORnBTSEnQkr0rQ/qsUJPpnbiQm2Z6DqaQ7Gdvnk9qaqQy5mAalpT3QDoX5IbYYQtqVfVK3rAvwtwoK9O6ZMT23SjcgtYmUCZ0bJYxWdfJJUQyVwVkm1SYmwV5/hk34ngWbeyJd6c4ete230PyaAOz7PoWWuEvBGQTgbJ9LDR+odCmptXpTfmIN967n+KRnbL4WdpLo46ax2DSpdQ7YlCQd9BU+y8rrgugahXlbxW5ifzslbdRZLCe9JIXxZqZh3lGuakEOPGwM3mKOb73BbhWMh2MEugx1WM8EmG6c0oKgf99JcuyOi00YfKlPAWX/opwZxoOWPZsUkp4xdqSvVbzKGuWB8NF/MCjD94fsa9IwuY2C8nN4FQz8QkHOMg4r13pJajET3vZ178zMfK0BX8baPuDE9hkDOa1aVrDJlDhbEXxvr8AtfV+LM4lOM31wxiVx1tTCCudR7n7V245mRCmaKBBEvrh3Yw8bOCAwFV0yKjYkj0QfT
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <4493B3E7A9908940AA18545BE0C718E0@eurprd08.prod.outlook.com>
+ (envelope-from <kwolf@redhat.com>) id 1hcrZL-00034C-LB
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 09:21:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51140)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1hcrZJ-000318-C0; Mon, 17 Jun 2019 09:21:05 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D9B443149CFE;
+ Mon, 17 Jun 2019 13:20:56 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-99.ams2.redhat.com [10.36.117.99])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C829C6AD2C;
+ Mon, 17 Jun 2019 13:20:54 +0000 (UTC)
+Date: Mon, 17 Jun 2019 15:20:53 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Message-ID: <20190617132053.GI7397@linux.fritz.box>
+References: <20190606134814.123689-1-vsementsov@virtuozzo.com>
+ <f92b274d-1949-3afa-7353-d3e3d67ae705@redhat.com>
+ <dbacab33-ccb4-0c1e-5ce3-7214bd405701@virtuozzo.com>
+ <4ec35629-0c64-9727-780f-31e4e494f376@virtuozzo.com>
+ <20190617120929.GF7397@linux.fritz.box>
+ <cbec5fee-8c57-f929-28b0-e68e1992c757@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c445cf70-abd5-4ce5-cd63-08d6f3269bed
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jun 2019 13:20:47.3521 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: rkagan@virtuozzo.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5164
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 52.101.138.27
-Subject: Re: [Qemu-devel] [PATCH v2 2/7] iotests: exclude killed processes
- from running under Valgrind
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature"; boundary="SLDf9lqlvOQaIe6s"
+Content-Disposition: inline
+In-Reply-To: <cbec5fee-8c57-f929-28b0-e68e1992c757@redhat.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Mon, 17 Jun 2019 13:20:59 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/3] block: blk_co_pcache
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,77 +74,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "berrange@redhat.com" <berrange@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+Cc: "fam@euphon.net" <fam@euphon.net>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Denis Lunev <den@virtuozzo.com>,
  "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
  "mreitz@redhat.com" <mreitz@redhat.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "jsnow@redhat.com" <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 17, 2019 at 02:53:55PM +0200, Kevin Wolf wrote:
-> Am 17.06.2019 um 14:18 hat Roman Kagan geschrieben:
-> > On Mon, Jun 17, 2019 at 01:15:04PM +0200, Kevin Wolf wrote:
-> > > Am 11.06.2019 um 20:02 hat Andrey Shinkevich geschrieben:
-> > > > The Valgrind tool fails to manage its termination when QEMU raises the
-> > > > signal SIGKILL. Lets exclude such test cases from running under the
-> > > > Valgrind because there is no sense to check memory issues that way.
-> > > > 
-> > > > Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> > > 
-> > > I don't fully understand the reasoning here. Most interesting memory
-> > > access errors happen before a process terminates. (I'm not talking about
-> > > leaks here, but use-after-free, buffer overflows, uninitialised memory
-> > > etc.)
-> > 
-> > Nothing of the above, and nothing in general, happens in the usermode
-> > process upon SIGKILL delivery.
-> 
-> My point is, the interesting part is what the program does before
-> SIGKILL happens. There is value in reporting memory errors as long as we
-> can, even if the final check doesn't happen because of SIGKILL.
 
-Agreed in general, but here the testcases that include 'sigraise 9' only
-do simple operations before that which are covered elsewhere too.  So
-the extra effort on making valgrind work with these testcases arguably
-isn't worth the extra value to be gained.
+--SLDf9lqlvOQaIe6s
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > > However, I do see that running these test cases with -valgrind ends in a
-> > > hang because the valgrind process keeps hanging around as a zombie
-> > > process and the test case doesn't reap it. I'm not exactly sure why that
-> > > is, but it looks more like a problem with the parent process (i.e. the
-> > > bash script).
-> > 
-> > It rather looks like valgrind getting confused about what to do with
-> > raise(SIGKILL) in the multithreaded case.
-> 
-> Well, valgrind can't do anything with SIGKILL, obviously, because it's
-> killed immediately.
+Am 17.06.2019 um 15:09 hat Eric Blake geschrieben:
+> On 6/17/19 7:09 AM, Kevin Wolf wrote:
+>=20
+> >>>
+> >>> Hmm, don't you think that blk_co_pcache sends NBD_CMD_CACHE if called=
+ on nbd driver?
+> >>> I didn't implement it. But may be I should..
+> >>>
+> >>> May aim was only to avoid extra allocation and unnecessary reads. But=
+ if we implement
+> >>> full-featured io request, what should it do?
+> >>>
+> >>> On qcow2 with backing it should pull data from backing to top, like i=
+n copy-on-read.
+> >>> And for nbd it will send NBD_CMD_CACHE?
+> >>> These semantics seems different, but why not?
+> >>>
+> >>
+> >> Any opinions here? Should I resend or could we use it as a first step,
+> >> not touching external API but improving things a little bit?
+> >=20
+> > I'm not opposed to making only a first step now. The interface seems to
+> > make sense to me; the only thing that I don't really like is the naming
+> > both of the operation (blk_co_pcache) and of the flag (BDRV_REQ_CACHE)
+> > because to me, "cache" doesn't mean "read, but ignore the result".
+> >=20
+> > The operation only results in something being cached if the block graph
+> > is configured to cache things. And indeed, the most importatn use case
+> > for the flag is not populating a cache, but triggering copy-on-read. So
+> > I think calling this operation "cache" is misleading.
+> >=20
+> > Now, I don't have very good ideas for better names either. I guess
+> > BDRV_REQ_NO_DATA could work, though it's not perfect. (Also, not sure if
+> > a blk_co_preadv_no_read wrapper is even needed when you can just call
+> > blk_co_preadv with the right flag.)
+> >=20
+> > I'm open for good naming ideas.
+>=20
+> Would 'prefetch' be a more useful name? The name NBD_CMD_CACHE was
+> chosen in the NBD project, but we are not stuck to that name if we think
+> something better makes more sense.
 
-Right, but it can do whatever it wants with raise(SIGKILL).  I haven't
-looked at valgrind sources, but
+Whether 'prefetch' is entirely accurate really depends on the graph
+configuration, too. But at least it gives me the right idea of "read
+something, but don't return it yet", so yes, I think that would work for
+me.
 
-  # strace -ff valgind qemu-io -c 'sigraise 9'
+Kevin
 
-shows SIGKILL neither sent nor received by any thread; it just shows the
-main thread exit and the second thread getting stuck waiting on a futex.
+--SLDf9lqlvOQaIe6s
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> But maybe the kernel does get confused for some
-> reason. I get the main threads as a zombie, but a second is still
-> running. Sending SIGKILL to the second thread, too, makes the test case
-> complete successfully.
-> 
-> So I guess the main question is why the second thread isn't
-> automatically killed when the main thread receives SIGKILL.
+-----BEGIN PGP SIGNATURE-----
 
-I don't see any thread receive SIGKILL.  So I tend to think this is
-valgrind's bug/feature.
+iQIcBAEBAgAGBQJdB5O1AAoJEH8JsnLIjy/W2f0P/RgeY87CD5uzRE++FRRMp9g0
+LBE57/8xayMxf4O0qDmYKN1P46M+ZzWJidYVEkiEedCN7coMa4XsgQpbT57vZugF
+FZkbtUK0EoKhkMAgnE8l41PSLB1oXgzCAzo7sSDIIlKyFtodya9KyGAZnubOe7M4
+VCfaYqyCVTuthC9Vvj7O9oewQh5SFFJwS5buFq6ltlRwm4uALpb76pLf+AyG5c1k
+vAfORz+N6m3ZTaqJdjQjWphMoWqj/vkt8AmysqMSeNefhkf3PSzJxhSF7yjRlJPy
+hdvHb4N+vWqyzpOq+na/qvQnJVEqc+b+YhZfQcaNZ6w0E0ze4n2PdBbW3iyHWhQQ
+BVkZoy2oWGoNLH+4pydR+N6KGXiH4JXuWkGQef8ye1/GwsgM0uLTouoysgCE+AfC
+lWCm6FIl9L7mcdXm8TW4ADvWyCv1PxS26Hq5VwRBqKMMkwflpx2uqj+cYhzr0m8d
+QOiTNrzyrrBM+MY3gFkVvi3SIWsxBfg8WVZT+oWMFDsh43XDcRNyuGi/sceBV9qm
+wsc+B9DPr55NXN/E2rYwowVGYdbZNLyY7kAVIewe/gcIs7+5bwxwK7CPdd6iJQmc
+1CD67/pyOFz3FTetW7yT6To/tx1HzRYi+021Fw16F1qdwPzmCTeF6YyfEUOJ4YDj
+Ku17CVjZ2Zpd5f1KzJrr
+=SO3P
+-----END PGP SIGNATURE-----
 
-Anyway the problem is outside of QEMU, so I think we need to weigh the
-costs of investigating it and implementing a workaround with the
-potential benefit.
-
-Roman.
+--SLDf9lqlvOQaIe6s--
 
