@@ -2,60 +2,102 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HK_RANDOM_FROM,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE008C31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:37:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CC51C31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:39:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B03D42070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:37:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B03D42070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8FBC82070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:39:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="OOaC93eZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FBC82070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49228 helo=lists.gnu.org)
+Received: from localhost ([::1]:49270 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcudZ-0000k4-0C
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 12:37:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40279)
+	id 1hcufH-0002n3-NN
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 12:39:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58008)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <xiaoyao.li@linux.intel.com>) id 1hcttN-0002Tw-A6
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:49:59 -0400
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hctKd-0005uq-PY
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:14:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <xiaoyao.li@linux.intel.com>) id 1hcttL-0002oD-UK
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:49:57 -0400
-Received: from mga07.intel.com ([134.134.136.100]:39609)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <xiaoyao.li@linux.intel.com>)
- id 1hcttL-0002md-Ko
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:49:55 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
- by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 17 Jun 2019 08:49:53 -0700
-X-ExtLoop1: 1
-Received: from lxy-clx-4s.sh.intel.com ([10.239.48.10])
- by FMSMGA003.fm.intel.com with ESMTP; 17 Jun 2019 08:49:51 -0700
-From: Xiaoyao Li <xiaoyao.li@linux.intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>
-Date: Mon, 17 Jun 2019 23:36:54 +0800
-Message-Id: <20190617153654.916-1-xiaoyao.li@linux.intel.com>
-X-Mailer: git-send-email 2.19.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.100
-Subject: [Qemu-devel] [PATCH v2] target/i386: define a new MSR based feature
- word - FEAT_CORE_CAPABILITY
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hctKb-00045L-Ug
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:14:03 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:41204)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
+ id 1hctKX-0003zx-Ed; Mon, 17 Jun 2019 11:13:58 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HF3kBi194566;
+ Mon, 17 Jun 2019 15:13:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2018-07-02; bh=WCE/eVOInWRjDUXPI18eufrIj4kFcHynJE1+yfekyrk=;
+ b=OOaC93eZ00eHhS2ZM09A1qiRH09wsY/01xb9VqCAprjWP4lSHij1WbE7JTK7iYmDBWlG
+ h9VPjDyEGs5RhtUrtP91HZXjAdfctLIMfMElO3sDRY0TiKo1JiGvBWpY1qO7luLWNB3Y
+ q+duvgPurDn50b61AipqvV/AkuVprPHdPwFHGMLFcuqWJeLPXfrPqo5eALB0sD6uSfHG
+ WnAQUToEkbJL26Nd80Ol79JgW/l9JnJ2oQaI2sX9oFxzcSJt4oigTy8zMuTCzOm09fUz
+ JqGb+leWqQzUejX3kZ0FlMxt8oBiN5ZKF8IB2WE1bCB82IhXTo1MaBFlgIS7TOD4dTjA sg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2130.oracle.com with ESMTP id 2t4r3tf7h8-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 17 Jun 2019 15:13:55 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HFD6ij153602;
+ Mon, 17 Jun 2019 15:13:55 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by userp3020.oracle.com with ESMTP id 2t5h5t6gm9-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 17 Jun 2019 15:13:55 +0000
+Received: from abhmp0022.oracle.com (abhmp0022.oracle.com [141.146.116.28])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5HFDs2N005822;
+ Mon, 17 Jun 2019 15:13:54 GMT
+Received: from [10.0.5.157] (/213.57.127.10)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Mon, 17 Jun 2019 08:13:54 -0700
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+From: Sam Eiderman <shmuel.eiderman@oracle.com>
+In-Reply-To: <20190617144810.GA31709@morn.lan>
+Date: Mon, 17 Jun 2019 18:13:48 +0300
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <09CBB1C5-1091-43A2-BC09-126FA86DFD6E@oracle.com>
+References: <20190612115939.23825-1-shmuel.eiderman@oracle.com>
+ <20190612115939.23825-8-shmuel.eiderman@oracle.com>
+ <20190617072040.yriunmoffbjhvqc5@sirius.home.kraxel.org>
+ <ECEA4896-C290-45A7-9574-D1704C63842C@oracle.com>
+ <20190617144810.GA31709@morn.lan>
+To: "Kevin O'Connor" <kevin@koconnor.net>
+X-Mailer: Apple Mail (2.3445.104.11)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906170136
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906170136
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.86
+Subject: Re: [Qemu-devel] [QEMU] [PATCH v2 7/8] bootdevice: FW_CFG interface
+ for LCHS values
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,143 +109,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paul Lai <paul.c.lai@intel.com>, qemu-devel@nongnu.org,
- Xiaoyao Li <xiaoyao.li@linux.intel.com>, kvm@vger.kernel.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, arbel.moshe@oracle.com,
+ seabios@seabios.org, qemu-devel@nongnu.org, mreitz@redhat.com,
+ liran.alon@oracle.com, Gerd Hoffmann <kraxel@redhat.com>,
+ karl.heubaum@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MSR IA32_CORE_CAPABILITY is a feature-enumerating MSR, which only
-enumerates the feature split lock detection (via bit 5) by now.
 
-The existence of MSR IA32_CORE_CAPABILITY is enumerated by CPUID.7_0:EDX[30].
 
-The latest kernel patches about them can be found here:
-https://lkml.org/lkml/2019/4/24/1909
+> On 17 Jun 2019, at 17:48, Kevin O'Connor <kevin@koconnor.net> wrote:
+>=20
+> On Mon, Jun 17, 2019 at 10:36:54AM +0300, Sam Eiderman wrote:
+>> So overall, WDYT?
+>> Keep it extendible for a low price of ABI + =E2=80=9Cbootdevices=E2=80=9D=
+ name.
+>> Or go strict and rename to =E2=80=9Cbios-geometries=E2=80=9D?
+>=20
+> If we add another qemu to firmware interface I think the interface
+> should be documented.  I also think that a mix of an ascii and binary
+> interface is going to be difficult to describe and document.  I'd
+> prefer a pure ascii interface - for example a newline separated list
+> of four space separted fields: <device name> <cylinders> <heads> <spt>
 
-Signed-off-by: Xiaoyao Li <xiaoyao.li@linux.intel.com>
----
-Changelog:
-v2
-    Add definition of MSR_CORE_CAP_SPLIT_LOCK_DETECT for SNR cpu model
----
- target/i386/cpu.c | 22 +++++++++++++++++++++-
- target/i386/cpu.h |  5 +++++
- target/i386/kvm.c |  9 +++++++++
- 3 files changed, 35 insertions(+), 1 deletion(-)
+We can go pure ascii.
+I meanwhile sent a v3 QEMU and v2 SeaBIOS patches for more comments.
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index fbed2eb804..fc47c650b8 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1085,7 +1085,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, "spec-ctrl", "stibp",
--            NULL, "arch-capabilities", NULL, "ssbd",
-+            NULL, "arch-capabilities", "core-capability", "ssbd",
-         },
-         .cpuid = {
-             .eax = 7,
-@@ -1203,6 +1203,26 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             }
-         },
-     },
-+    [FEAT_CORE_CAPABILITY] = {
-+        .type = MSR_FEATURE_WORD,
-+        .feat_names = {
-+            NULL, NULL, NULL, NULL,
-+            NULL, "split-lock-detect", NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+        },
-+        .msr = {
-+            .index = MSR_IA32_CORE_CAPABILITY,
-+            .cpuid_dep = {
-+                FEAT_7_0_EDX,
-+                CPUID_7_0_EDX_CORE_CAPABILITY,
-+            },
-+        },
-+    },
- };
- 
- typedef struct X86RegisterInfo32 {
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 0732e059ec..192b0db076 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -345,6 +345,7 @@ typedef enum X86Seg {
- #define MSR_IA32_SPEC_CTRL              0x48
- #define MSR_VIRT_SSBD                   0xc001011f
- #define MSR_IA32_PRED_CMD               0x49
-+#define MSR_IA32_CORE_CAPABILITY        0xcf
- #define MSR_IA32_ARCH_CAPABILITIES      0x10a
- #define MSR_IA32_TSCDEADLINE            0x6e0
- 
-@@ -496,6 +497,7 @@ typedef enum FeatureWord {
-     FEAT_XSAVE_COMP_LO, /* CPUID[EAX=0xd,ECX=0].EAX */
-     FEAT_XSAVE_COMP_HI, /* CPUID[EAX=0xd,ECX=0].EDX */
-     FEAT_ARCH_CAPABILITIES,
-+    FEAT_CORE_CAPABILITY,
-     FEATURE_WORDS,
- } FeatureWord;
- 
-@@ -687,6 +689,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
- #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumulation Single Precision */
- #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
- #define CPUID_7_0_EDX_ARCH_CAPABILITIES (1U << 29)  /*Arch Capabilities*/
-+#define CPUID_7_0_EDX_CORE_CAPABILITY   (1U << 30)  /*Core Capability*/
- #define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store Bypass Disable */
- 
- #define CPUID_8000_0008_EBX_WBNOINVD  (1U << 9)  /* Write back and
-@@ -734,6 +737,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
- #define MSR_ARCH_CAP_SKIP_L1DFL_VMENTRY (1U << 3)
- #define MSR_ARCH_CAP_SSB_NO     (1U << 4)
- 
-+#define MSR_CORE_CAP_SPLIT_LOCK_DETECT  (1U << 5)
-+
- #ifndef HYPERV_SPINLOCK_NEVER_RETRY
- #define HYPERV_SPINLOCK_NEVER_RETRY             0xFFFFFFFF
- #endif
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 6899061b4e..da99e91ea9 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -95,6 +95,7 @@ static bool has_msr_spec_ctrl;
- static bool has_msr_virt_ssbd;
- static bool has_msr_smi_count;
- static bool has_msr_arch_capabs;
-+static bool has_msr_core_capabs;
- 
- static uint32_t has_architectural_pmu_version;
- static uint32_t num_architectural_pmu_gp_counters;
-@@ -1515,6 +1516,9 @@ static int kvm_get_supported_msrs(KVMState *s)
-                 case MSR_IA32_ARCH_CAPABILITIES:
-                     has_msr_arch_capabs = true;
-                     break;
-+                case MSR_IA32_CORE_CAPABILITY:
-+                    has_msr_core_capabs = true;
-+                    break;
-                 }
-             }
-         }
-@@ -2041,6 +2045,11 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-                           env->features[FEAT_ARCH_CAPABILITIES]);
-     }
- 
-+    if (has_msr_core_capabs) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_CORE_CAPABILITY,
-+                          env->features[FEAT_CORE_CAPABILITY]);
-+    }
-+
-     /*
-      * The following MSRs have side effects on the guest or are too heavy
-      * for normal writeback. Limit them to reset or full state updates.
--- 
-2.19.1
+Sam
+
+>=20
+> -Kevin
 
 
