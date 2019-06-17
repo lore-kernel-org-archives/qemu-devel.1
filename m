@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C065C46477
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 18:37:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 567C1C31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 18:38:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFFB820863
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 18:37:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 22DAA2084D
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 18:38:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JZlbFxMn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFFB820863
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="a/PHizzk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22DAA2084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51000 helo=lists.gnu.org)
+Received: from localhost ([::1]:51010 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcwVO-0007Us-9K
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 14:37:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58754)
+	id 1hcwWD-0000Kt-Ct
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 14:38:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59179)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1hcwB5-0005Yw-Bv
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:16:27 -0400
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1hcwBj-0005sA-PT
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:17:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1hcwB1-0001px-8R
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:16:23 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:43054)
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1hcwBh-0002JS-QO
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:17:03 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:56446)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1hcwAy-0001lH-W7
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:16:19 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HI8r7v149266;
- Mon, 17 Jun 2019 18:16:10 GMT
+ id 1hcwBh-0002HB-02
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:17:01 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HI8uWC159143;
+ Mon, 17 Jun 2019 18:16:59 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id; s=corp-2018-07-02;
- bh=xKcJJVM+Px1Efmb6GACuVRxl4kOaAuJgnkj4m6Ch378=;
- b=JZlbFxMnSyhxCbr10Px0XS4sc0wWqsODY7Dv4GvZDPEo2xZnJ1SeomVKSNp9SZDSEXTt
- /zQYd0ZFmf8GlF2q8Nv0EgxWh1sRmRX0/bjFc6EnmGzMdqrYlSN+H6ZIi4Ixp/Ym9S0K
- TTVSS0+a9S94THqHppbZglz8WI2CC3hwYguVRQ6fM0QnqfRy95GWa+ZcKlMRV/EpRJu8
- rnXOYASzcl58anb+5vWSNI1yvpz7gj2LJ+wdDwgSDA9wvNJVwH2g3hhLVWqkKWfcisk8
- kT2Sz5hvt3dzdte7qvgLRgZlxXAXnw8Z1EwwRhdJ44ig5i4c+qztDEXiJbChT0GRJiMY 3Q== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2130.oracle.com with ESMTP id 2t4r3tg2w5-1
+ bh=luvCTnUgcQuSR2sA80lgp+w2naBhphhsCAlzxkjYxZo=;
+ b=a/PHizzktPgDOWTbyoHmtW8iILBSe34hhJQKEI9HY3sEtU0AHnXYcM6myKR/aORnwTne
+ f/OV9AUK8Nitf+t+Szph/gmpwQqZUn1Utpzny5Or0S9jHvZk5FBzxhwTVeO8pWXNg5UJ
+ 7lXTOmatmmEHwDzMrGgCjRPiYqf4if9mDLuNLJ0Iya9a8HddUYZyIykmY6fMJ9E2Yg9k
+ OX2PtVm8H/FNvN9PL9iiFWGZhLMaguxpBPDlqNx2AQXZenrOXpH+UfnLmBdhyAimhokq
+ IWxw1M7WQKdMFj6qv4CddE5P3ntSJSIN4uCkGdW10j6uT+L0UTBfgQkRWb8n3J96+v62 aA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2120.oracle.com with ESMTP id 2t4saq7yk5-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 17 Jun 2019 18:16:10 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HIEOtm175517;
- Mon, 17 Jun 2019 18:16:09 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by aserp3020.oracle.com with ESMTP id 2t5mgbgat5-1
+ Mon, 17 Jun 2019 18:16:59 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HIF5D0050134;
+ Mon, 17 Jun 2019 18:16:58 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by userp3020.oracle.com with ESMTP id 2t5h5t9g38-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 17 Jun 2019 18:16:09 +0000
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5HIFnXl031921;
- Mon, 17 Jun 2019 18:15:49 GMT
+ Mon, 17 Jun 2019 18:16:58 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5HIGv7P015218;
+ Mon, 17 Jun 2019 18:16:57 GMT
 Received: from heatpipe.hsd1.ca.comcast.net (/73.170.27.202)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 17 Jun 2019 11:15:49 -0700
+ with ESMTP ; Mon, 17 Jun 2019 11:16:57 -0700
 From: elena.ufimtseva@oracle.com
 To: qemu-devel@nongnu.org
-Date: Mon, 17 Jun 2019 11:15:45 -0700
-Message-Id: <20190617181545.29586-1-elena.ufimtseva@oracle.com>
+Date: Mon, 17 Jun 2019 11:16:55 -0700
+Message-Id: <20190617181655.30551-1-elena.ufimtseva@oracle.com>
 X-Mailer: git-send-email 2.17.1
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
  signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3
  malwarescore=0
  phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
@@ -81,14 +81,14 @@ X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
  signatures=668687
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
  priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
  lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
  definitions=main-1906170162
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.86
-Subject: [Qemu-devel] [RFC PATCH v2 10/35] multi-process: setup a machine
- object for remote device process
+X-Received-From: 156.151.31.85
+Subject: [Qemu-devel] [RFC PATCH v2 31/35] multi-process: Extend drive_add
+ to add drive to remote device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,273 +101,232 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: elena.ufimtseva@oracle.com, john.g.johnson@oracle.com, jag.raman@oracle.com,
- konrad.wilk@oracle.com, ross.lagerwall@citrix.com, liran.alon@oracle.com,
- stefanha@redhat.com, pbonzini@redhat.com, kanth.ghatraju@oracle.com,
- rth@twiddle.net
+ konrad.wilk@oracle.com, dgilbert@redhat.com, ross.lagerwall@citrix.com,
+ liran.alon@oracle.com, berrange@redhat.com, stefanha@redhat.com,
+ kanth.ghatraju@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Jagannathan Raman <jag.raman@oracle.com>
 
-remote-machine object sets up various subsystems of the remote device
-process. Instantiate PCI host bridge object and initialize RAM, IO &
-PCI memory regions.
+Extend drive_add HMP command to hot-plug drive to a remote device.
 
-Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 ---
- exec.c                        |   3 +-
- include/exec/address-spaces.h |   2 +
- include/remote/machine.h      |  46 +++++++++++++
- remote/Makefile.objs          |   1 +
- remote/machine.c              | 118 ++++++++++++++++++++++++++++++++++
- remote/remote-main.c          |   7 ++
- 6 files changed, 175 insertions(+), 2 deletions(-)
- create mode 100644 include/remote/machine.h
- create mode 100644 remote/machine.c
+ device-hotplug.c        |  7 +++++++
+ hmp-commands.hx         |  5 +++--
+ hw/proxy/monitor.c      | 35 +++++++++++++++++++++++++++++++++++
+ include/io/proxy-link.h |  2 ++
+ include/sysemu/sysemu.h |  1 +
+ remote/machine.c        |  8 ++++++++
+ remote/remote-main.c    | 31 +++++++++++++++++++++++++++++++
+ 7 files changed, 87 insertions(+), 2 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index ffe25169a8..5de7eeb719 100644
---- a/exec.c
-+++ b/exec.c
-@@ -194,7 +194,6 @@ typedef struct subpage_t {
- #define PHYS_SECTION_WATCH 3
+diff --git a/device-hotplug.c b/device-hotplug.c
+index 6153259d71..094702ff3e 100644
+--- a/device-hotplug.c
++++ b/device-hotplug.c
+@@ -63,6 +63,13 @@ void hmp_drive_add(Monitor *mon, const QDict *qdict)
+     const char *opts = qdict_get_str(qdict, "opts");
+     bool node = qdict_get_try_bool(qdict, "node", false);
  
- static void io_mem_init(void);
--static void memory_map_init(void);
- static void tcg_commit(MemoryListener *listener);
++#ifdef CONFIG_MPQEMU
++    if (qdict_get_try_str(qdict, "rid")) {
++        hmp_rdrive_add(mon, qdict);
++        return;
++    }
++#endif
++
+     if (node) {
+         hmp_drive_add_node(mon, opts);
+         return;
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 605d18be85..2757b07ecf 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1341,12 +1341,13 @@ ETEXI
  
- static MemoryRegion io_mem_watch;
-@@ -3106,7 +3105,7 @@ static void tcg_commit(MemoryListener *listener)
-     tlb_flush(cpuas->cpu);
+     {
+         .name       = "drive_add",
+-        .args_type  = "node:-n,pci_addr:s,opts:s",
++        .args_type  = "node:-n,pci_addr:s,opts:s,rid:s?",
+         .params     = "[-n] [[<domain>:]<bus>:]<slot>\n"
+                       "[file=file][,if=type][,bus=n]\n"
+                       "[,unit=m][,media=d][,index=i]\n"
+                       "[,snapshot=on|off][,cache=on|off]\n"
+-                      "[,readonly=on|off][,copy-on-read=on|off]",
++                      "[,readonly=on|off][,copy-on-read=on|off]\n",
++                      "[rid=rid]",
+         .help       = "add drive to PCI storage controller",
+         .cmd        = hmp_drive_add,
+     },
+diff --git a/hw/proxy/monitor.c b/hw/proxy/monitor.c
+index c4d0ff1213..e3f368aa94 100644
+--- a/hw/proxy/monitor.c
++++ b/hw/proxy/monitor.c
+@@ -40,6 +40,7 @@
+ #include "qapi/qmp/qstring.h"
+ #include "qapi/error.h"
+ #include "io/proxy-link.h"
++#include "sysemu/sysemu.h"
+ 
+ /*
+  * TODO: Is there a callback where the allocated memory for QMP could be free'd
+@@ -194,3 +195,37 @@ void qmp_rdevice_del(const char *id, Error **errp)
+ 
+     qobject_unref(qdict);
+ }
++
++void hmp_rdrive_add(Monitor *mon, const QDict *qdict)
++{
++    MachineState *ms = MACHINE(current_machine);
++    Error *local_err = NULL;
++    PCIProxyDev *pdev = NULL;
++    const char *id, *optstr;
++    QemuOpts *opts;
++    char *data;
++    int ret;
++
++    pdev = get_proxy_device((QDict *)qdict, "rid", &local_err);
++    if (local_err) {
++        monitor_printf(mon, "rdrive_add error: %s\n",
++                       error_get_pretty(local_err));
++        error_free(local_err);
++        return;
++    }
++
++    optstr = qdict_get_str(qdict, "opts");
++    opts = drive_def(optstr);
++
++    id = g_strdup(qemu_opts_id(opts));
++    data = g_strdup(optstr);
++
++    ret = send_monitor_msg(pdev, DRIVE_ADD, strlen(data), (uint8_t *)data);
++
++    if (!ret) {
++        (void)g_hash_table_insert(ms->remote_devs, (gpointer)g_strdup(id),
++                                  (gpointer)pdev);
++    }
++
++    g_free(data);
++}
+diff --git a/include/io/proxy-link.h b/include/io/proxy-link.h
+index 2ba3e614f0..e102bcc8f5 100644
+--- a/include/io/proxy-link.h
++++ b/include/io/proxy-link.h
+@@ -62,6 +62,7 @@ typedef struct ProxyLinkState ProxyLinkState;
+  *                  from remote device
+  * DEVICE_ADD       QMP/HMP command to hotplug device
+  * DEVICE_DEL       QMP/HMP command to hot-unplug device
++ * DRIVE_ADD        HMP command to hotplug drive
+  *
+  */
+ typedef enum {
+@@ -76,6 +77,7 @@ typedef enum {
+     DRIVE_OPTS,
+     DEVICE_ADD,
+     DEVICE_DEL,
++    DRIVE_ADD,
+     PROXY_PING,
+     MAX,
+ } proc_cmd_t;
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 5f133cae83..be2c533b9a 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -138,6 +138,7 @@ extern unsigned int nb_prom_envs;
+ 
+ /* generic hotplug */
+ void hmp_drive_add(Monitor *mon, const QDict *qdict);
++void hmp_rdrive_add(Monitor *mon, const QDict *qdict);
+ 
+ /* pcie aer error injection */
+ void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict);
+diff --git a/remote/machine.c b/remote/machine.c
+index 5b03167dd5..3c9a53010e 100644
+--- a/remote/machine.c
++++ b/remote/machine.c
+@@ -74,6 +74,8 @@ static void remote_machine_init(Object *obj)
+     MemoryRegion *system_memory, *system_io, *pci_memory;
+     PCIHostState *pci_host;
+     PCIDevice *pci_dev;
++    MachineState *ms;
++    MachineClass *mc;
+ 
+     Error *error_abort = NULL;
+ 
+@@ -116,6 +118,12 @@ static void remote_machine_init(Object *obj)
+ 
+     pci_bus_irqs(pci_host->bus, remote_iohub_set_irq, remote_iohub_map_irq,
+                  s->iohub, REMOTE_IOHUB_NB_PIRQS);
++
++    ms = MACHINE(s);
++
++    mc = MACHINE_GET_CLASS(ms);
++
++    mc->block_default_type = IF_IDE;
  }
  
--static void memory_map_init(void)
-+void memory_map_init(void)
- {
-     system_memory = g_malloc(sizeof(*system_memory));
- 
-diff --git a/include/exec/address-spaces.h b/include/exec/address-spaces.h
-index db8bfa9a92..56a877b7ba 100644
---- a/include/exec/address-spaces.h
-+++ b/include/exec/address-spaces.h
-@@ -33,6 +33,8 @@ MemoryRegion *get_system_memory(void);
-  */
- MemoryRegion *get_system_io(void);
- 
-+void memory_map_init(void);
-+
- extern AddressSpace address_space_memory;
- extern AddressSpace address_space_io;
- 
-diff --git a/include/remote/machine.h b/include/remote/machine.h
-new file mode 100644
-index 0000000000..a00732d045
---- /dev/null
-+++ b/include/remote/machine.h
-@@ -0,0 +1,46 @@
-+/*
-+ * Remote machine configuration
-+ *
-+ * Copyright 2019, Oracle and/or its affiliates.
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#ifndef REMOTE_MACHINE_H
-+#define REMOTE_MACHINE_H
-+
-+#include "qemu/osdep.h"
-+#include "qom/object.h"
-+#include "hw/boards.h"
-+#include "remote/pcihost.h"
-+#include "qemu/notify.h"
-+
-+typedef struct RemMachineState {
-+    MachineState parent_obj;
-+
-+    RemPCIHost *host;
-+} RemMachineState;
-+
-+#define TYPE_REMOTE_MACHINE "remote-machine"
-+#define REMOTE_MACHINE(obj) \
-+    OBJECT_CHECK(RemMachineState, (obj), TYPE_REMOTE_MACHINE)
-+
-+void qemu_run_machine_init_done_notifiers(void);
-+
-+#endif
-diff --git a/remote/Makefile.objs b/remote/Makefile.objs
-index 2757f5a265..13d4c48988 100644
---- a/remote/Makefile.objs
-+++ b/remote/Makefile.objs
-@@ -1,2 +1,3 @@
- remote-pci-obj-$(CONFIG_MPQEMU) += remote-main.o
- remote-pci-obj-$(CONFIG_MPQEMU) += pcihost.o
-+remote-pci-obj-$(CONFIG_MPQEMU) += machine.o
-diff --git a/remote/machine.c b/remote/machine.c
-new file mode 100644
-index 0000000000..4ce197d300
---- /dev/null
-+++ b/remote/machine.c
-@@ -0,0 +1,118 @@
-+/*
-+ * Machine for remote device
-+ *
-+ * Copyright 2019, Oracle and/or its affiliates.
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include <stdint.h>
-+#include <sys/types.h>
-+
-+#include "qemu/osdep.h"
-+#include "remote/pcihost.h"
-+#include "remote/machine.h"
-+#include "exec/address-spaces.h"
-+#include "exec/memory.h"
-+#include "exec/ioport.h"
-+#include "exec/ramlist.h"
-+#include "qemu/thread.h"
-+#include "qom/object.h"
-+#include "qemu/module.h"
-+#include "qapi/error.h"
-+#include "qemu/main-loop.h"
-+#include "qemu-common.h"
-+#include "sysemu/sysemu.h"
-+#include "qemu/notify.h"
-+
-+static NotifierList machine_init_done_notifiers =
-+    NOTIFIER_LIST_INITIALIZER(machine_init_done_notifiers);
-+
-+bool machine_init_done;
-+
-+void qemu_add_machine_init_done_notifier(Notifier *notify)
-+{
-+    notifier_list_add(&machine_init_done_notifiers, notify);
-+    if (machine_init_done) {
-+        notify->notify(notify, NULL);
-+    }
-+}
-+
-+void qemu_remove_machine_init_done_notifier(Notifier *notify)
-+{
-+    notifier_remove(notify);
-+}
-+
-+void qemu_run_machine_init_done_notifiers(void)
-+{
-+    machine_init_done = true;
-+    notifier_list_notify(&machine_init_done_notifiers, NULL);
-+}
-+
-+static void remote_machine_init(Object *obj)
-+{
-+    RemMachineState *s = REMOTE_MACHINE(obj);
-+    RemPCIHost *rem_host;
-+    MemoryRegion *system_memory, *system_io, *pci_memory;
-+
-+    Error *error_abort = NULL;
-+
-+    qemu_mutex_init(&ram_list.mutex);
-+
-+    object_property_add_child(object_get_root(), "machine", obj, &error_abort);
-+    if (error_abort) {
-+        error_report_err(error_abort);
-+    }
-+
-+    memory_map_init();
-+
-+    system_memory = get_system_memory();
-+    system_io = get_system_io();
-+
-+    pci_memory = g_new(MemoryRegion, 1);
-+    memory_region_init(pci_memory, NULL, "pci", UINT64_MAX);
-+
-+    rem_host = REMOTE_HOST_DEVICE(qdev_create(NULL, TYPE_REMOTE_HOST_DEVICE));
-+
-+    rem_host->mr_pci_mem = pci_memory;
-+    rem_host->mr_sys_mem = system_memory;
-+    rem_host->mr_sys_io = system_io;
-+
-+    s->host = rem_host;
-+
-+    qemu_mutex_lock_iothread();
-+    memory_region_add_subregion_overlap(system_memory, 0x0, pci_memory, -1);
-+    qemu_mutex_unlock_iothread();
-+
-+    qdev_init_nofail(DEVICE(rem_host));
-+}
-+
-+static const TypeInfo remote_machine = {
-+    .name = TYPE_REMOTE_MACHINE,
-+    .parent = TYPE_MACHINE,
-+    .instance_size = sizeof(RemMachineState),
-+    .instance_init = remote_machine_init,
-+};
-+
-+static void remote_machine_register_types(void)
-+{
-+    type_register_static(&remote_machine);
-+}
-+
-+type_init(remote_machine_register_types);
+ static const TypeInfo remote_machine = {
 diff --git a/remote/remote-main.c b/remote/remote-main.c
-index ffcf47f185..97dd8327a2 100644
+index 43134762bc..860b5e30f9 100644
 --- a/remote/remote-main.c
 +++ b/remote/remote-main.c
-@@ -26,10 +26,17 @@
- 
- #include "qemu/osdep.h"
- #include "qemu/module.h"
-+#include "remote/pcihost.h"
-+#include "remote/machine.h"
-+#include "hw/boards.h"
-+#include "hw/qdev-core.h"
-+#include "qemu/main-loop.h"
- 
- int main(int argc, char *argv[])
- {
-     module_call_init(MODULE_INIT_QOM);
- 
-+    current_machine = MACHINE(REMOTE_MACHINE(object_new(TYPE_REMOTE_MACHINE)));
-+
-     return 0;
+@@ -234,6 +234,29 @@ fail:
+     PUT_REMOTE_WAIT(wait);
  }
+ 
++static void process_drive_add_msg(ProcMsg *msg)
++{
++    Error *local_err = NULL;
++    const char *optstr = (const char *)msg->data2;
++    int wait = msg->fds[0];
++    QemuOpts *opts;
++    MachineClass *mc;
++
++    opts = drive_def(optstr);
++    assert(opts);
++
++    mc = MACHINE_GET_CLASS(current_machine);
++    (void)drive_new(opts, mc->block_default_type, &local_err);
++
++    if (local_err) {
++        error_report_err(local_err);
++    }
++
++    notify_proxy(wait, 1);
++
++    PUT_REMOTE_WAIT(wait);
++}
++
+ static int init_drive(QDict *rqdict, Error **errp)
+ {
+     QemuOpts *opts;
+@@ -433,6 +456,9 @@ static void process_msg(GIOCondition cond)
+     case DEVICE_DEL:
+         process_device_del_msg(msg);
+         break;
++    case DRIVE_ADD:
++        process_drive_add_msg(msg);
++        break;
+     case PROXY_PING:
+         wait = msg->fds[0];
+         notify_proxy(wait, (uint32_t)getpid());
+@@ -464,6 +490,11 @@ int main(int argc, char *argv[])
+     bdrv_init_with_whitelist();
+ 
+     qemu_add_opts(&qemu_device_opts);
++    qemu_add_opts(&qemu_drive_opts);
++    qemu_add_drive_opts(&qemu_legacy_drive_opts);
++    qemu_add_drive_opts(&qemu_common_drive_opts);
++    qemu_add_drive_opts(&qemu_drive_opts);
++    qemu_add_drive_opts(&bdrv_runtime_opts);
+ 
+     if (qemu_init_main_loop(&err)) {
+         error_report_err(err);
 -- 
 2.17.1
 
