@@ -2,77 +2,77 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87204C31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 14:59:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA07FC31E5C
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 15:03:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58F272084A
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 14:59:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 998072086A
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 15:03:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ypAYlGCU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58F272084A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XCTIXWwF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 998072086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48226 helo=lists.gnu.org)
+Received: from localhost ([::1]:48278 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hct63-0001T2-Kf
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 10:58:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46826)
+	id 1hctAO-0004nl-0h
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 11:03:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46568)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hcsiU-0003nj-Gp
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:34:41 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hcsiF-0003R4-EU
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:34:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hcsiR-0008CS-Kf
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:34:38 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:43388)
+ (envelope-from <peter.maydell@linaro.org>) id 1hcsiE-0007zi-8i
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:34:23 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43875)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hcsiR-0008Bo-EM
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:34:35 -0400
-Received: by mail-wr1-x429.google.com with SMTP id p13so10199729wru.10
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 07:34:35 -0700 (PDT)
+ id 1hcsiE-0007wG-0L
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:34:22 -0400
+Received: by mail-wr1-x442.google.com with SMTP id p13so10198541wru.10
+ for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 07:34:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=QH/DDBGbAAKw5E22C6nxXcLX4pRMuc/olgVu3SfYiz4=;
- b=ypAYlGCUkGPn/rh81QbNCvQBjaiT4Sh/tsBPY9x5GEjPSynb04D8jP9+JPQdowCLmu
- hHUYyRxiE59IFEcgB3QgvBRj2tPbmuZv6rFGaJjXCmNNIRGEwjBCQEFeEKyXotkomytF
- FkO/BMebSuNgRTXgrl3qzICl29sq+t7CYBSgrYCUWvJ1xRKqA1fQ0rhV1yO8F5DBhgWS
- vfJ7QUgKveWFzuie449TVgjMxs4iF/Q+5VSWmnfp6hLqYtXFZI4z2RZRb+RI9SuMAidm
- cXWdbJrOXrKpaWbTECqMmlwrZEJPvR9Sq+gXh+zqyc+mOXvokjmtNRLpgRdVQrYa9QSp
- hfMQ==
+ bh=s25YCdPicJAtgC6ByMpACHrwGTStXvqFM1wqHAvS9fE=;
+ b=XCTIXWwFCofzeErDP/aCakt2vmm0Nm/6r1EQm0FF5qMDyRU+yfQ9EF69LipCRhk7u2
+ B8N8j0b8k2Cx50BEjiqdl3hlHEHVPFB1Gqked+jpX4WKFoAUB/6jyQWvZ6nT4bGD/wKq
+ 8wJWQ3CwhtPqHljI6dj+EmFGL9cK1hlKvwJUUEPBnTM43B6K4TSM5LLvOdJgI63J8O0M
+ Po8g6eLthjS6Oja93nGPcASM9pgYlZlrUJomhcr5fn3XqyaALKuBj8OmTpjitZ0i8ct1
+ tGQpTInzCl0Jm4qlLynHUfGQaCnTcjBI1UpChHsFDuMNlhx4Jsf5pr4hR1HEqeWI+H6D
+ o8aA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=QH/DDBGbAAKw5E22C6nxXcLX4pRMuc/olgVu3SfYiz4=;
- b=qzBuyCKtf05w7HQkXmnnnVHrU2ZskTLyiGBNANDIlymI2FlAEZexkYmgyByILxn1to
- VxqDfIEla56hzGIWRTK414NpvGY+yKjjcye9inkqo8gPAKu9NLvCCbQ1z9wNpYBozBl1
- 5LRMMWyX/TkFCPLgX1ocOrlqVNnQK8Vju6jAm7n6+b6W6rdToCspx0ylRDKD0mevfWNh
- AiZpp+sk6R8kYFTMHvtCISxJFc6ZTAa92IlZX4rF8vhrAHMg9ePihWIKLx1WXLJiq2f1
- uEF6x1jTYOVb6HInvn+V2ZYrz2cbX72UmEr5UBAn/7HGV2sLPu6n648wNjyFGg+ABbqS
- kGNA==
-X-Gm-Message-State: APjAAAWnW8FI08NEWzTJSHCGPDtrH5++o658L/W3TKj89+898xGMfmly
- Rhbr2agQdfylqzZiWcbhkru0XA+fjJOmag==
-X-Google-Smtp-Source: APXvYqyAGF+z5O4ron2iSQUIFW4K28hnkt6cQ21Lb6+17J5+dypQGi/g5jdjy/wOcx4MgkAOhvK4xg==
-X-Received: by 2002:adf:e8cb:: with SMTP id k11mr75161195wrn.244.1560782074327; 
- Mon, 17 Jun 2019 07:34:34 -0700 (PDT)
+ bh=s25YCdPicJAtgC6ByMpACHrwGTStXvqFM1wqHAvS9fE=;
+ b=cSXOIRIl1s1IxqgmPjYjI42QGpVHWTevRZHhmm03zaRy01AqHHkOPUV+SnOA1rVCqI
+ MpA2hVqg7R842sFLkDOpMugab7kM9Pcztj0y18FSBgUZ1zhYgrHV2PgDPgrohFls1te/
+ b4J++kK6ZynQCJjI7OnTrnGhRl9LpbYb/gz6dce6CdBhi69EApiM6ElNS/lUoOgzsA5E
+ FeKWKMM6011FS6sWAEWz01RZ3ztSjXrOz8z0c118lF3R1bKipsg6AEBpvqpWKvafLd6q
+ cb+aMHJ/nGlpOUlFs8eLcu3RNdNEfwAjgjtkdHwC2QW/fKwofJtd23vy9DaQ1KG4pbDP
+ ZvzA==
+X-Gm-Message-State: APjAAAVLC8iHdyaTLkJo8wUPCF3/s85lXQkgLP1FfJBpCnSZcpKLKFYh
+ 5CTLdfdE5Hzv1N5bR12ZQRVItmM+Lpdbgw==
+X-Google-Smtp-Source: APXvYqzqCBHfdrOW3toIIUri6HNQywZX52l2TvDNdj/UEjaQFCGWUSpdJawPqxbbyWB3oj0oBArx4g==
+X-Received: by 2002:adf:eecf:: with SMTP id a15mr3091759wrp.354.1560782055545; 
+ Mon, 17 Jun 2019 07:34:15 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id a67sm13819985wmh.40.2019.06.17.07.34.33
+ by smtp.gmail.com with ESMTPSA id a67sm13819985wmh.40.2019.06.17.07.34.14
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 17 Jun 2019 07:34:33 -0700 (PDT)
+ Mon, 17 Jun 2019 07:34:14 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 17 Jun 2019 15:34:06 +0100
-Message-Id: <20190617143412.5734-19-peter.maydell@linaro.org>
+Date: Mon, 17 Jun 2019 15:33:49 +0100
+Message-Id: <20190617143412.5734-2-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190617143412.5734-1-peter.maydell@linaro.org>
 References: <20190617143412.5734-1-peter.maydell@linaro.org>
@@ -81,9 +81,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::429
-Subject: [Qemu-devel] [PULL 18/24] target/arm: Stop using cpu_F0s for Neon
- f32/s32 VCVT
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PULL 01/24] hw/arm/boot: Don't assume RAM starts at
+ address zero
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,145 +99,61 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Stop using cpu_F0s for the Neon f32/s32 VCVT operations.
-Since this is the last user of cpu_F0s in the Neon 2rm-op
-loop, we can remove the handling code for it too.
+In the Arm kernel/initrd loading code, in some places we make the
+incorrect assumption that info->ram_size can be treated as the
+address of the end of RAM, as for instance when we calculate the
+available space for the initrd using "info->ram_size - info->initrd_start".
+This is wrong, because many Arm boards (including "virt") specify
+a non-zero info->loader_start to indicate that their RAM area
+starts at a non-zero physical address.
+
+Correct the places which make this incorrect assumption.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20190613163917.28589-9-peter.maydell@linaro.org
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Tested-by: Mark Rutland <mark.rutland@arm.com>
+Message-id: 20190516144733.32399-2-peter.maydell@linaro.org
 ---
- target/arm/translate.c | 82 ++++++++++++------------------------------
- 1 file changed, 22 insertions(+), 60 deletions(-)
+ hw/arm/boot.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 75ed7cc7cb0..0fb94b777bf 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -1374,38 +1374,6 @@ static TCGv_ptr get_fpstatus_ptr(int neon)
-     return statusptr;
- }
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index 0261fdabab0..bb37a9383f3 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -977,6 +977,7 @@ static void arm_setup_direct_kernel_boot(ARMCPU *cpu,
+     int elf_machine;
+     hwaddr entry;
+     static const ARMInsnFixup *primary_loader;
++    uint64_t ram_end = info->loader_start + info->ram_size;
  
--#define VFP_GEN_ITOF(name) \
--static inline void gen_vfp_##name(int dp, int neon) \
--{ \
--    TCGv_ptr statusptr = get_fpstatus_ptr(neon); \
--    if (dp) { \
--        gen_helper_vfp_##name##d(cpu_F0d, cpu_F0s, statusptr); \
--    } else { \
--        gen_helper_vfp_##name##s(cpu_F0s, cpu_F0s, statusptr); \
--    } \
--    tcg_temp_free_ptr(statusptr); \
--}
--
--VFP_GEN_ITOF(uito)
--VFP_GEN_ITOF(sito)
--#undef VFP_GEN_ITOF
--
--#define VFP_GEN_FTOI(name) \
--static inline void gen_vfp_##name(int dp, int neon) \
--{ \
--    TCGv_ptr statusptr = get_fpstatus_ptr(neon); \
--    if (dp) { \
--        gen_helper_vfp_##name##d(cpu_F0s, cpu_F0d, statusptr); \
--    } else { \
--        gen_helper_vfp_##name##s(cpu_F0s, cpu_F0s, statusptr); \
--    } \
--    tcg_temp_free_ptr(statusptr); \
--}
--
--VFP_GEN_FTOI(touiz)
--VFP_GEN_FTOI(tosiz)
--#undef VFP_GEN_FTOI
--
- #define VFP_GEN_FIX(name, round) \
- static inline void gen_vfp_##name(int dp, int shift, int neon) \
- { \
-@@ -4173,17 +4141,6 @@ static const uint8_t neon_3r_sizes[] = {
- #define NEON_2RM_VCVT_SF 62
- #define NEON_2RM_VCVT_UF 63
- 
--static int neon_2rm_is_float_op(int op)
--{
--    /*
--     * Return true if this neon 2reg-misc op is float-to-float.
--     * This is not a property of the operation but of our code --
--     * what we are asking here is "does the code for this case in
--     * the Neon for-each-pass loop use cpu_F0s?".
--     */
--    return op >= NEON_2RM_VCVT_FS;
--}
--
- static bool neon_2rm_is_v8_op(int op)
- {
-     /* Return true if this neon 2reg-misc op is ARMv8 and up */
-@@ -6599,13 +6556,7 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                 default:
-                 elementwise:
-                     for (pass = 0; pass < (q ? 4 : 2); pass++) {
--                        if (neon_2rm_is_float_op(op)) {
--                            tcg_gen_ld_f32(cpu_F0s, cpu_env,
--                                           neon_reg_offset(rm, pass));
--                            tmp = NULL;
--                        } else {
--                            tmp = neon_load_reg(rm, pass);
--                        }
-+                        tmp = neon_load_reg(rm, pass);
-                         switch (op) {
-                         case NEON_2RM_VREV32:
-                             switch (size) {
-@@ -6860,29 +6811,40 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                             break;
-                         }
-                         case NEON_2RM_VCVT_FS: /* VCVT.F32.S32 */
--                            gen_vfp_sito(0, 1);
-+                        {
-+                            TCGv_ptr fpstatus = get_fpstatus_ptr(1);
-+                            gen_helper_vfp_sitos(tmp, tmp, fpstatus);
-+                            tcg_temp_free_ptr(fpstatus);
-                             break;
-+                        }
-                         case NEON_2RM_VCVT_FU: /* VCVT.F32.U32 */
--                            gen_vfp_uito(0, 1);
-+                        {
-+                            TCGv_ptr fpstatus = get_fpstatus_ptr(1);
-+                            gen_helper_vfp_uitos(tmp, tmp, fpstatus);
-+                            tcg_temp_free_ptr(fpstatus);
-                             break;
-+                        }
-                         case NEON_2RM_VCVT_SF: /* VCVT.S32.F32 */
--                            gen_vfp_tosiz(0, 1);
-+                        {
-+                            TCGv_ptr fpstatus = get_fpstatus_ptr(1);
-+                            gen_helper_vfp_tosizs(tmp, tmp, fpstatus);
-+                            tcg_temp_free_ptr(fpstatus);
-                             break;
-+                        }
-                         case NEON_2RM_VCVT_UF: /* VCVT.U32.F32 */
--                            gen_vfp_touiz(0, 1);
-+                        {
-+                            TCGv_ptr fpstatus = get_fpstatus_ptr(1);
-+                            gen_helper_vfp_touizs(tmp, tmp, fpstatus);
-+                            tcg_temp_free_ptr(fpstatus);
-                             break;
-+                        }
-                         default:
-                             /* Reserved op values were caught by the
-                              * neon_2rm_sizes[] check earlier.
-                              */
-                             abort();
-                         }
--                        if (neon_2rm_is_float_op(op)) {
--                            tcg_gen_st_f32(cpu_F0s, cpu_env,
--                                           neon_reg_offset(rd, pass));
--                        } else {
--                            neon_store_reg(rd, pass, tmp);
--                        }
-+                        neon_store_reg(rd, pass, tmp);
-                     }
-                     break;
-                 }
+     if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
+         primary_loader = bootloader_aarch64;
+@@ -1048,8 +1049,7 @@ static void arm_setup_direct_kernel_boot(ARMCPU *cpu,
+         /* 32-bit ARM */
+         entry = info->loader_start + KERNEL_LOAD_ADDR;
+         kernel_size = load_image_targphys_as(info->kernel_filename, entry,
+-                                             info->ram_size - KERNEL_LOAD_ADDR,
+-                                             as);
++                                             ram_end - KERNEL_LOAD_ADDR, as);
+         is_linux = 1;
+     }
+     if (kernel_size < 0) {
+@@ -1063,12 +1063,11 @@ static void arm_setup_direct_kernel_boot(ARMCPU *cpu,
+         if (info->initrd_filename) {
+             initrd_size = load_ramdisk_as(info->initrd_filename,
+                                           info->initrd_start,
+-                                          info->ram_size - info->initrd_start,
+-                                          as);
++                                          ram_end - info->initrd_start, as);
+             if (initrd_size < 0) {
+                 initrd_size = load_image_targphys_as(info->initrd_filename,
+                                                      info->initrd_start,
+-                                                     info->ram_size -
++                                                     ram_end -
+                                                      info->initrd_start,
+                                                      as);
+             }
 -- 
 2.20.1
 
