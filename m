@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A8F1C31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:10:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5921BC31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:10:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEE3020863
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:10:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEE3020863
+	by mail.kernel.org (Postfix) with ESMTPS id 2600E20863
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:10:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2600E20863
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51290 helo=lists.gnu.org)
+Received: from localhost ([::1]:51305 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcx0y-00053Z-Rj
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 15:10:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40413)
+	id 1hcx1b-0005xe-CU
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 15:10:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40423)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hcwh1-0001bI-J7
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:49:24 -0400
+ (envelope-from <armbru@redhat.com>) id 1hcwh1-0001cE-VQ
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:49:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hcwh0-0007s8-Dv
+ (envelope-from <armbru@redhat.com>) id 1hcwh0-0007sF-E6
  for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:49:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:25982)
+Received: from mx1.redhat.com ([209.132.183.28]:56160)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hcwh0-0007jq-3x
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hcwh0-0007hi-3Z
  for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:49:22 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 27554285B4;
- Mon, 17 Jun 2019 18:49:05 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id EA76B81DF2
+ for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 18:49:06 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-177.ams2.redhat.com
  [10.36.117.177])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C32E880EB;
- Mon, 17 Jun 2019 18:49:04 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 90BC21001E93;
+ Mon, 17 Jun 2019 18:49:06 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 5358911386A7; Mon, 17 Jun 2019 20:49:03 +0200 (CEST)
+ id 709F6113300E; Mon, 17 Jun 2019 20:49:03 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 17 Jun 2019 20:48:48 +0200
-Message-Id: <20190617184903.19436-2-armbru@redhat.com>
+Date: Mon, 17 Jun 2019 20:48:56 +0200
+Message-Id: <20190617184903.19436-10-armbru@redhat.com>
 In-Reply-To: <20190617184903.19436-1-armbru@redhat.com>
 References: <20190617184903.19436-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Mon, 17 Jun 2019 18:49:05 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.25]); Mon, 17 Jun 2019 18:49:06 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 01/16] monitor: Fix return type of
- monitor_fdset_dup_fd_find
+Subject: [Qemu-devel] [PULL 09/16] monitor: Move {hmp, qmp}.c to monitor/{hmp,
+ qmp}-cmds.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,77 +70,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yury Kotov <yury-kotov@yandex-team.ru>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yury Kotov <yury-kotov@yandex-team.ru>
+From: Kevin Wolf <kwolf@redhat.com>
 
-monitor_fdset_dup_fd_find_remove() and monitor_fdset_dup_fd_find()
-return mon_fdset->id which is int64_t. Downcasting from int64_t to int
-leads to a bug with removing fd from fdset with id >=3D 2^32.
-So, fix return types for these function.
+Now that we have a monitor/ subdirectory, let's move hmp.c and qmp.c
+from the root directory there. As they contain implementations of
+monitor commands, rename them to {hmp,qmp}-cmds.c, so that {hmp,qmp}.c
+are free for the HMP and QMP infrastructure.
 
-Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20190523094433.30297-1-yury-kotov@yandex-team.ru>
+Message-Id: <20190613153405.24769-9-kwolf@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/monitor/monitor.h | 2 +-
- monitor.c                 | 4 ++--
- stubs/fdset.c             | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ MAINTAINERS                         | 5 +++--
+ Makefile.objs                       | 2 +-
+ docs/devel/writing-qmp-commands.txt | 9 +++++----
+ monitor/Makefile.objs               | 1 +
+ hmp.c =3D> monitor/hmp-cmds.c         | 2 +-
+ qmp.c =3D> monitor/qmp-cmds.c         | 2 +-
+ 6 files changed, 12 insertions(+), 9 deletions(-)
+ rename hmp.c =3D> monitor/hmp-cmds.c (99%)
+ rename qmp.c =3D> monitor/qmp-cmds.c (99%)
 
-diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
-index 06cfcd8f36..1e1d6d2269 100644
---- a/include/monitor/monitor.h
-+++ b/include/monitor/monitor.h
-@@ -44,6 +44,6 @@ AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_=
-id, int64_t fdset_id,
- int monitor_fdset_get_fd(int64_t fdset_id, int flags);
- int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd);
- void monitor_fdset_dup_fd_remove(int dup_fd);
--int monitor_fdset_dup_fd_find(int dup_fd);
-+int64_t monitor_fdset_dup_fd_find(int dup_fd);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 575ea6e68d..3c7d366727 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1919,7 +1919,8 @@ Human Monitor (HMP)
+ M: Dr. David Alan Gilbert <dgilbert@redhat.com>
+ S: Maintained
+ F: monitor/misc.c
+-F: hmp.[ch]
++F: monitor/hmp*
++F: hmp.h
+ F: hmp-commands*.hx
+ F: include/monitor/hmp-target.h
+ F: tests/test-hmp.c
+@@ -2039,7 +2040,7 @@ F: tests/check-qom-proplist.c
+ QMP
+ M: Markus Armbruster <armbru@redhat.com>
+ S: Supported
+-F: qmp.c
++F: monitor/qmp*
+ F: monitor/misc.c
+ F: docs/devel/*qmp-*
+ F: docs/interop/*qmp-*
+diff --git a/Makefile.objs b/Makefile.objs
+index dd39a70b48..9495fcbc7e 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -83,8 +83,8 @@ common-obj-$(CONFIG_FDT) +=3D device_tree.o
+ ######################################################################
+ # qapi
 =20
- #endif /* MONITOR_H */
-diff --git a/monitor.c b/monitor.c
-index 5c5cbe254a..dce3496920 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -2604,7 +2604,7 @@ err:
-     return -1;
- }
+-common-obj-y +=3D qmp.o hmp.o
+ common-obj-y +=3D qapi/
++common-obj-y +=3D monitor/
+ endif
 =20
--static int monitor_fdset_dup_fd_find_remove(int dup_fd, bool remove)
-+static int64_t monitor_fdset_dup_fd_find_remove(int dup_fd, bool remove)
+ #######################################################################
+diff --git a/docs/devel/writing-qmp-commands.txt b/docs/devel/writing-qmp=
+-commands.txt
+index cc6ecd6d5d..46a6c48683 100644
+--- a/docs/devel/writing-qmp-commands.txt
++++ b/docs/devel/writing-qmp-commands.txt
+@@ -20,7 +20,7 @@ new QMP command.
+=20
+ 2. Write the QMP command itself, which is a regular C function. Preferab=
+ly,
+    the command should be exported by some QEMU subsystem. But it can als=
+o be
+-   added to the qmp.c file
++   added to the monitor/qmp-cmds.c file
+=20
+ 3. At this point the command can be tested under the QMP protocol
+=20
+@@ -101,7 +101,8 @@ protocol data.
+=20
+ The next step is to write the "hello-world" implementation. As explained
+ earlier, it's preferable for commands to live in QEMU subsystems. But
+-"hello-world" doesn't pertain to any, so we put its implementation in qm=
+p.c:
++"hello-world" doesn't pertain to any, so we put its implementation in
++monitor/qmp-cmds.c:
+=20
+ void qmp_hello_world(Error **errp)
  {
-     MonFdset *mon_fdset;
-     MonFdsetFd *mon_fdset_fd_dup;
-@@ -2632,7 +2632,7 @@ err:
-     return -1;
- }
+@@ -146,7 +147,7 @@ for mandatory arguments). Finally, 'str' is the argum=
+ent's type, which
+ stands for "string". The QAPI also supports integers, booleans, enumerat=
+ions
+ and user defined types.
 =20
--int monitor_fdset_dup_fd_find(int dup_fd)
-+int64_t monitor_fdset_dup_fd_find(int dup_fd)
- {
-     return monitor_fdset_dup_fd_find_remove(dup_fd, false);
- }
-diff --git a/stubs/fdset.c b/stubs/fdset.c
-index f3d9980b7e..67dd5e1d34 100644
---- a/stubs/fdset.c
-+++ b/stubs/fdset.c
-@@ -6,7 +6,7 @@ int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd=
+-Now, let's update our C implementation in qmp.c:
++Now, let's update our C implementation in monitor/qmp-cmds.c:
+=20
+ void qmp_hello_world(bool has_message, const char *message, Error **errp=
 )
-     return -1;
- }
-=20
--int monitor_fdset_dup_fd_find(int dup_fd)
-+int64_t monitor_fdset_dup_fd_find(int dup_fd)
  {
-     return -1;
- }
+@@ -267,7 +268,7 @@ monitor (HMP).
+=20
+ With the introduction of the QAPI, HMP commands make QMP calls. Most of =
+the
+ time HMP commands are simple wrappers. All HMP commands implementation e=
+xist in
+-the hmp.c file.
++the monitor/hmp-cmds.c file.
+=20
+ Here's the implementation of the "hello-world" HMP command:
+=20
+diff --git a/monitor/Makefile.objs b/monitor/Makefile.objs
+index e783b0616b..a7170af6e1 100644
+--- a/monitor/Makefile.objs
++++ b/monitor/Makefile.objs
+@@ -1 +1,2 @@
+ obj-y +=3D misc.o
++common-obj-y +=3D qmp-cmds.o hmp-cmds.o
+diff --git a/hmp.c b/monitor/hmp-cmds.c
+similarity index 99%
+rename from hmp.c
+rename to monitor/hmp-cmds.c
+index e6ea7cb9c2..c917e24d9c 100644
+--- a/hmp.c
++++ b/monitor/hmp-cmds.c
+@@ -1,5 +1,5 @@
+ /*
+- * Human Monitor Interface
++ * Human Monitor Interface commands
+  *
+  * Copyright IBM, Corp. 2011
+  *
+diff --git a/qmp.c b/monitor/qmp-cmds.c
+similarity index 99%
+rename from qmp.c
+rename to monitor/qmp-cmds.c
+index 6797568444..f1b1e4f08b 100644
+--- a/qmp.c
++++ b/monitor/qmp-cmds.c
+@@ -1,5 +1,5 @@
+ /*
+- * QEMU Management Protocol
++ * QEMU Management Protocol commands
+  *
+  * Copyright IBM, Corp. 2011
+  *
 --=20
 2.21.0
 
