@@ -2,88 +2,96 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5BFAC31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 15:33:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81313C31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 15:34:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CE9C208CB
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 15:33:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4FD9E208C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 15:34:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CvFMte1e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CE9C208CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="BGNGP/5M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FD9E208C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48538 helo=lists.gnu.org)
+Received: from localhost ([::1]:48544 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hctdK-0003tL-R7
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 11:33:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46747)
+	id 1hcte8-0004eI-Lr
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 11:34:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56840)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hcsiN-0003hE-Sz
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:34:33 -0400
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hctH2-00031b-1d
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:10:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hcsiM-00087i-AY
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:34:31 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:46867)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hcsiM-00086z-3y
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:34:30 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id n4so10192276wrw.13
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 07:34:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=Ul7s+t7hXiN2ylOfOOWOvIZY61Jzqwc15l5S4ChbjBk=;
- b=CvFMte1edGk9eG8aLfxqr1dB7a84QSvtFjjuq7lkeTzTmBVgwE83VlUWCqVTNuVytC
- Sz0MOwq0w9oLGDbjx2SudKGXC0gAwuR5r0wdmnTiiLzEonSYmWsu9cFSvUiswtzzqY18
- HGvMqeXeVTvjbKTxEIDdzLYCrrgOwHZS5Y+fS0xb7itG3ItmRtuvtq6sjb3M3Rwr4l0V
- SJ13cOYCGeI8DQ2GFY2tDZUwwhkVGUGBD5HsKKfiV8K4bv2gFwHvUhZ7cJVHBcy03hdV
- 9P/oP6xdHr7cBFsXkYwuqg81qRzLWmaLseu5D2qkRgjZ1KvPfyc+WWnB4y+d55urNIeO
- /eYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Ul7s+t7hXiN2ylOfOOWOvIZY61Jzqwc15l5S4ChbjBk=;
- b=aHVPsbuJ2/V/3h+60eoSVRAjKhOkJyuOQscf+hdRnaE2RQSWOPuf5t+2eI+lVm5Mh+
- WYGtxTM/jaWjxupQnII1JwyXJo4a4r4vtOKpRtvelStTc3uImseEs3lA12aH/BJcNYmR
- 7hkmYIfoJyY6rBtFctVnQZ5wHaGYD3V8+Y4umS61i5rIsq0Vixt5KSV6f5yZVVslAPpn
- GEzXRBlittyEprr+O9nLTA7xTnQwtnrRUVBmPa9Kkeb/VkFIRQagvViK8TEb1B4sRzly
- FHkWtEo9z5rJgjb/PeiBj3Yrhp19cFnkO7MVvni5Fnu+qXHurvWw3uNbocVJtdiV7Rgh
- EEnQ==
-X-Gm-Message-State: APjAAAUVES4jqe9qRGBmVthaURQGcjrPzjXWGBnwy8awHeO12bgcdLhP
- ui9pnUYNCxJImb2thkCnR5APVXpOuhfiLQ==
-X-Google-Smtp-Source: APXvYqwGjbkH3UXRA7nFlilUNpcQMPxSsa78E0ubDZOtdiHrdrB5vNI2cjZn7AgnGCPJBAz08RzgCQ==
-X-Received: by 2002:a5d:6212:: with SMTP id y18mr29951084wru.178.1560782068873; 
- Mon, 17 Jun 2019 07:34:28 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id a67sm13819985wmh.40.2019.06.17.07.34.27
- for <qemu-devel@nongnu.org>
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 17 Jun 2019 07:34:28 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Mon, 17 Jun 2019 15:34:01 +0100
-Message-Id: <20190617143412.5734-14-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190617143412.5734-1-peter.maydell@linaro.org>
-References: <20190617143412.5734-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42c
-Subject: [Qemu-devel] [PULL 13/24] target/arm: Stop using cpu_F0s for
- NEON_2RM_VABS_F
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hctH0-0001Hz-SI
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:10:19 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:52292)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
+ id 1hctGy-0001Dl-32; Mon, 17 Jun 2019 11:10:16 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HF4OkR111905;
+ Mon, 17 Jun 2019 15:10:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
+ bh=VuvUHYBiIoed7M4Qt45n2olUqtuKHAeuaxDDCAKVfqc=;
+ b=BGNGP/5M13zDLeqYDczqIn+X64GGt+1WO0Gdn+HJVVk1YN/Se5DoJjAYD/r97KFxZfNT
+ K63ZYVSxOvKbNM9/8+Y11tLDuVxLH3PROCvWjjR5iHFzeC2AktClPOhT9LQcHxLompf2
+ GFqrqvnxPXwsRqEVeU7ill26GJsmceukM26xBVwV9Gr83jH8Giorewh7G/dRqQYEyVRB
+ iHie2ErBqHwsn36BxOIjtwDijqnONzjFc9AEex6rgt7VI+QnQD3EAXwGpjan5Jh9hAPL
+ J9eVC/smU6x+5z0OaboEMjvSwPvAc8S92dPjg+lQZH+FZYgImkR2HqUGTVmvvitcrHUj 7w== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by aserp2120.oracle.com with ESMTP id 2t4rmny4et-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 17 Jun 2019 15:10:14 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HF94Y7141083;
+ Mon, 17 Jun 2019 15:10:13 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by userp3020.oracle.com with ESMTP id 2t5h5t6eca-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 17 Jun 2019 15:10:13 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5HFACCW031859;
+ Mon, 17 Jun 2019 15:10:12 GMT
+Received: from nexus.ravello.local (/213.57.127.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Mon, 17 Jun 2019 08:10:12 -0700
+From: Sam Eiderman <shmuel.eiderman@oracle.com>
+To: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ mreitz@redhat.com, seabios@seabios.org, kraxel@redhat.com,
+ kevin@koconnor.net
+Date: Mon, 17 Jun 2019 18:09:45 +0300
+Message-Id: <20190617150950.5264-4-shmuel.eiderman@oracle.com>
+X-Mailer: git-send-email 2.13.3
+In-Reply-To: <20190617150950.5264-1-shmuel.eiderman@oracle.com>
+References: <20190617150950.5264-1-shmuel.eiderman@oracle.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906170136
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906170136
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 141.146.126.78
+Subject: [Qemu-devel] [QEMU] [PATCH v3 3/8] bootdevice: Add interface to
+ gather LCHS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,74 +103,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: liran.alon@oracle.com, shmuel.eiderman@oracle.com, karl.heubaum@oracle.com,
+ arbel.moshe@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Where Neon instructions are floating point operations, we
-mostly use the old VFP utility functions like gen_vfp_abs()
-which work on the TCG globals cpu_F0s and cpu_F1s. The
-Neon for-each-element loop conditionally loads the inputs
-into either a plain old TCG temporary for most operations
-or into cpu_F0s for float operations, and similarly stores
-back either cpu_F0s or the temporary.
+Add an interface to provide direct logical CHS values for boot devices.
+We will use this interface in the next commits.
 
-Switch NEON_2RM_VABS_F away from using cpu_F0s, and
-update neon_2rm_is_float_op() accordingly.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20190613163917.28589-4-peter.maydell@linaro.org
+Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
+Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
 ---
- target/arm/translate.c | 19 ++++++++-----------
- 1 file changed, 8 insertions(+), 11 deletions(-)
+ bootdevice.c            | 55 +++++++++++++++++++++++++++++++++++++++++++++++++
+ include/sysemu/sysemu.h |  3 +++
+ 2 files changed, 58 insertions(+)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index c274c8b4602..a10fded1f39 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -1374,14 +1374,6 @@ static TCGv_ptr get_fpstatus_ptr(int neon)
-     return statusptr;
+diff --git a/bootdevice.c b/bootdevice.c
+index 1d225202f9..bc5e1c2de4 100644
+--- a/bootdevice.c
++++ b/bootdevice.c
+@@ -343,3 +343,58 @@ void device_add_bootindex_property(Object *obj, int32_t *bootindex,
+     /* initialize devices' bootindex property to -1 */
+     object_property_set_int(obj, -1, name, NULL);
  }
++
++typedef struct FWLCHSEntry FWLCHSEntry;
++
++struct FWLCHSEntry {
++    QTAILQ_ENTRY(FWLCHSEntry) link;
++    DeviceState *dev;
++    char *suffix;
++    uint32_t lcyls;
++    uint32_t lheads;
++    uint32_t lsecs;
++};
++
++static QTAILQ_HEAD(, FWLCHSEntry) fw_lchs =
++    QTAILQ_HEAD_INITIALIZER(fw_lchs);
++
++void add_boot_device_lchs(DeviceState *dev, const char *suffix,
++                          uint32_t lcyls, uint32_t lheads, uint32_t lsecs)
++{
++    FWLCHSEntry *node;
++
++    if (!lcyls && !lheads && !lsecs) {
++        return;
++    }
++
++    assert(dev != NULL || suffix != NULL);
++
++    node = g_malloc0(sizeof(FWLCHSEntry));
++    node->suffix = g_strdup(suffix);
++    node->dev = dev;
++    node->lcyls = lcyls;
++    node->lheads = lheads;
++    node->lsecs = lsecs;
++
++    QTAILQ_INSERT_TAIL(&fw_lchs, node, link);
++}
++
++void del_boot_device_lchs(DeviceState *dev, const char *suffix)
++{
++    FWLCHSEntry *i;
++
++    if (dev == NULL) {
++        return;
++    }
++
++    QTAILQ_FOREACH(i, &fw_lchs, link) {
++        if ((!suffix || !g_strcmp0(i->suffix, suffix)) &&
++             i->dev == dev) {
++            QTAILQ_REMOVE(&fw_lchs, i, link);
++            g_free(i->suffix);
++            g_free(i);
++
++            break;
++        }
++    }
++}
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 61579ae71e..173dfbb539 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -171,6 +171,9 @@ void device_add_bootindex_property(Object *obj, int32_t *bootindex,
+                                    DeviceState *dev, Error **errp);
+ void restore_boot_order(void *opaque);
+ void validate_bootdevices(const char *devices, Error **errp);
++void add_boot_device_lchs(DeviceState *dev, const char *suffix,
++                          uint32_t lcyls, uint32_t lheads, uint32_t lsecs);
++void del_boot_device_lchs(DeviceState *dev, const char *suffix);
  
--static inline void gen_vfp_abs(int dp)
--{
--    if (dp)
--        gen_helper_vfp_absd(cpu_F0d, cpu_F0d);
--    else
--        gen_helper_vfp_abss(cpu_F0s, cpu_F0s);
--}
--
- static inline void gen_vfp_neg(int dp)
- {
-     if (dp)
-@@ -4191,8 +4183,13 @@ static const uint8_t neon_3r_sizes[] = {
- 
- static int neon_2rm_is_float_op(int op)
- {
--    /* Return true if this neon 2reg-misc op is float-to-float */
--    return (op == NEON_2RM_VABS_F || op == NEON_2RM_VNEG_F ||
-+    /*
-+     * Return true if this neon 2reg-misc op is float-to-float.
-+     * This is not a property of the operation but of our code --
-+     * what we are asking here is "does the code for this case in
-+     * the Neon for-each-pass loop use cpu_F0s?".
-+     */
-+    return (op == NEON_2RM_VNEG_F ||
-             (op >= NEON_2RM_VRINTN && op <= NEON_2RM_VRINTZ) ||
-             op == NEON_2RM_VRINTM ||
-             (op >= NEON_2RM_VRINTP && op <= NEON_2RM_VCVTMS) ||
-@@ -6761,7 +6758,7 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                             break;
-                         }
-                         case NEON_2RM_VABS_F:
--                            gen_vfp_abs(0);
-+                            gen_helper_vfp_abss(tmp, tmp);
-                             break;
-                         case NEON_2RM_VNEG_F:
-                             gen_vfp_neg(0);
+ /* handler to set the boot_device order for a specific type of MachineClass */
+ typedef void QEMUBootSetHandler(void *opaque, const char *boot_order,
 -- 
-2.20.1
+2.13.3
 
 
