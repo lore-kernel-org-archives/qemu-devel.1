@@ -2,61 +2,87 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DE93C31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 15:23:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCFCCC31E5C
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 15:24:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4639B20833
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 15:23:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4639B20833
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
+	by mail.kernel.org (Postfix) with ESMTPS id 8955520833
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 15:24:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WfhuD0Pz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8955520833
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48434 helo=lists.gnu.org)
+Received: from localhost ([::1]:48444 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hctUE-0001j2-50
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 11:23:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47233)
+	id 1hctVB-0002W9-Ri
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 11:24:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46675)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kbastian@mail.uni-paderborn.de>) id 1hcsjk-0004rD-Fv
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:35:57 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hcsiK-0003Zw-Fl
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:34:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kbastian@mail.uni-paderborn.de>) id 1hcsjj-0000bI-6a
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:35:56 -0400
-Received: from amazonia.uni-paderborn.de ([131.234.189.15]:34308)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
- id 1hcsji-0000as-W1
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:35:55 -0400
-Received: from magmaria.uni-paderborn.de ([131.234.189.24]
- helo=localhost.localdomain)
- by mail.uni-paderborn.de with esmtp (Exim 4.89 amazonia)
- id 1hcsjh-0000Jd-7m; Mon, 17 Jun 2019 16:35:53 +0200
-Received: from mail.uni-paderborn.de by magmaria with queue id 3427224-3;
- Mon, 17 Jun 2019 14:35:51 GMT
-X-Envelope-From: <kbastian@mail.uni-paderborn.de>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+ (envelope-from <peter.maydell@linaro.org>) id 1hcsiI-000851-Sj
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:34:28 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46168)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hcsiI-00084S-Jz
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:34:26 -0400
+Received: by mail-wr1-x441.google.com with SMTP id n4so10192048wrw.13
+ for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 07:34:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=ayi0GkBgLKY3AdrRPsXWIx7VD1COuTHMv3O+HeMPbB0=;
+ b=WfhuD0PzKdy+iiteBQFDe2da6G+5lxjDaa9BE4Mz8P6fZBfIum8Px3CFAS83lyP8u/
+ msLLlrVIqJkqN+gbHtcszpBGuwx/0qzYMS9phVHJA4UKZs9Zw7rZCUSNDfYXppYLo0TM
+ TwGA2PkMVJ8ugMibl9JMjwjVke9xjrj/VutHeRDZ5KHwK3O4OKO5JxqyA7YrmmiE6lGI
+ xukuH19e2vb1dZ1YqdRJ9w9citZaniyh0yvVQHimJnibiWdUPMjBKphAELkuBPLSRYFO
+ eQ7NZ6iOeQKamw7EhT+KjLLfGRynjMq4J5+6blS8c72P+Ce51pl3WacNE3h9B6PSsKCM
+ xCJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ayi0GkBgLKY3AdrRPsXWIx7VD1COuTHMv3O+HeMPbB0=;
+ b=NWrQmth9IfZhCo6snDtMA3/G+58N/7n2ateuBz5qMufbLOjTKqujxm81VHtDd29M8g
+ 1H0nEqOw9LsOUmZ4IYqAQOVwV7q9gpXSYU7f7Eag5YLCxwSgowHnJvgCYm9B93RBz15b
+ 0NBI4nlTvI5/sJJZZ4prS6UMjXH7a3nr4m20d4mgwch0+jgGtzc1LJpcWlrLWVXtIsSf
+ W1XGx/5fnQU6Jz2N73l+QGwVMTnxS15jo6H+sA2X+48y3t6WlnLnzOTzFbWwtWYlOofs
+ 0/iQw8V+TWr/+/SxrSnbcDj0nm2ECTuxPvXQvv5ZBZQJEMdh4K+z2Xh0Z41uQNPX+DS/
+ S37g==
+X-Gm-Message-State: APjAAAWyVVNMHf36wWrIe7uRO+mJGRr7JaE7WpGewj+gH8fZiUIFuHcx
+ zdu3VvuG5MKKWa3pn3CstFqlVWR3OgFs7w==
+X-Google-Smtp-Source: APXvYqyX5cK0m8KxamQYgJcBlGWQI49b9fOYO3fbsPrXiJGLJ4cIBKUH0HwVsnWjcYFT7V5V7RgtTw==
+X-Received: by 2002:a5d:4ac1:: with SMTP id y1mr1996411wrs.183.1560782065136; 
+ Mon, 17 Jun 2019 07:34:25 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id a67sm13819985wmh.40.2019.06.17.07.34.24
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 17 Jun 2019 07:34:24 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 17 Jun 2019 16:35:33 +0200
-Message-Id: <20190617143533.15013-4-kbastian@mail.uni-paderborn.de>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190617143533.15013-1-kbastian@mail.uni-paderborn.de>
-References: <20190617143533.15013-1-kbastian@mail.uni-paderborn.de>
+Date: Mon, 17 Jun 2019 15:33:58 +0100
+Message-Id: <20190617143412.5734-11-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190617143412.5734-1-peter.maydell@linaro.org>
+References: <20190617143412.5734-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-PMX-Version: 6.4.6.2792898, Antispam-Engine: 2.7.2.2107409,
- Antispam-Data: 2019.6.17.142717, AntiVirus-Engine: 5.63.0,
- AntiVirus-Data: 2019.6.4.5630002
-X-IMT-Spam-Score: 0.0 ()
-X-IMT-Authenticated-Sender: 
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 131.234.189.15
-Subject: [Qemu-devel] [PATCH 3/3] target/tricore: Use translate_loop
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
+Subject: [Qemu-devel] [PULL 10/24] hw/intc/arm_gicv3:
+ GICD_TYPER.SecurityExtn is RAZ if GICD_CTLR.DS == 1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,160 +94,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kbastian@mail.uni-paderborn.de, david.brenken@efs-auto.de
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
----
- target/tricore/translate.c | 117 +++++++++++++++++++++++--------------
- 1 file changed, 74 insertions(+), 43 deletions(-)
+The GICv3 specification says that the GICD_TYPER.SecurityExtn bit
+is RAZ if GICD_CTLR.DS is 1. We were incorrectly making it RAZ
+if the security extension is unsupported. "Security extension
+unsupported" always implies GICD_CTLR.DS == 1, but the guest can
+also set DS on a GIC which does support the security extension.
+Fix the condition to correctly check the GICD_CTLR.DS bit.
 
-diff --git a/target/tricore/translate.c b/target/tricore/translate.c
-index b4e332777a..f3b297639a 100644
---- a/target/tricore/translate.c
-+++ b/target/tricore/translate.c
-@@ -8763,7 +8763,7 @@ static void decode_32Bit_opc(DisasContext *ctx)
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20190524124248.28394-3-peter.maydell@linaro.org
+---
+ hw/intc/arm_gicv3_dist.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/hw/intc/arm_gicv3_dist.c b/hw/intc/arm_gicv3_dist.c
+index e6fe4905fd3..b65f56f9035 100644
+--- a/hw/intc/arm_gicv3_dist.c
++++ b/hw/intc/arm_gicv3_dist.c
+@@ -378,8 +378,14 @@ static MemTxResult gicd_readl(GICv3State *s, hwaddr offset,
+          * ITLinesNumber == (num external irqs / 32) - 1
+          */
+         int itlinesnumber = ((s->num_irq - GIC_INTERNAL) / 32) - 1;
++        /*
++         * SecurityExtn must be RAZ if GICD_CTLR.DS == 1, and
++         * "security extensions not supported" always implies DS == 1,
++         * so we only need to check the DS bit.
++         */
++        bool sec_extn = !(s->gicd_ctlr & GICD_CTLR_DS);
+ 
+-        *data = (1 << 25) | (1 << 24) | (s->security_extn << 10) |
++        *data = (1 << 25) | (1 << 24) | (sec_extn << 10) |
+             (0xf << 19) | itlinesnumber;
+         return MEMTX_OK;
      }
- }
- 
--static void decode_opc(DisasContext *ctx, int *is_branch)
-+static void decode_opc(DisasContext *ctx)
- {
-     /* 16-Bit Instruction */
-     if ((ctx->opcode & 0x1) == 0) {
-@@ -8776,56 +8776,87 @@ static void decode_opc(DisasContext *ctx, int *is_branch)
-     }
- }
- 
--void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
-+static void tricore_tr_init_disas_context(DisasContextBase *dcbase,
-+                                          CPUState *cs)
- {
-+    DisasContext *ctx = container_of(dcbase, DisasContext, base);
-     CPUTriCoreState *env = cs->env_ptr;
--    DisasContext ctx;
--    target_ulong pc_start;
--    int num_insns = 0;
--
--    pc_start = tb->pc;
--    ctx.base.pc_next = pc_start;
--    ctx.base.tb = tb;
--    ctx.base.singlestep_enabled = cs->singlestep_enabled;
--    ctx.base.is_jmp = DISAS_NEXT;
--    ctx.mem_idx = cpu_mmu_index(env, false);
--    ctx.env = env;
--
--    tcg_clear_temp_count();
--    gen_tb_start(tb);
--    while (ctx.base.is_jmp == DISAS_NEXT) {
--        tcg_gen_insn_start(ctx.base.pc_next);
--        num_insns++;
--
--        ctx.opcode = cpu_ldl_code(env, ctx.base.pc_next);
--        decode_opc(&ctx, 0);
--
--        if (num_insns >= max_insns || tcg_op_buf_full()) {
--            gen_save_pc(ctx.pc_succ_insn);
--            tcg_gen_exit_tb(NULL, 0);
--            break;
-+    ctx->base.pc_next = ctx->base.pc_first;
-+    ctx->mem_idx = cpu_mmu_index(env, false);
-+}
-+
-+static void tricore_tr_tb_start(DisasContextBase *db, CPUState *cpu)
-+{
-+}
-+
-+static void tricore_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
-+{
-+    DisasContext *ctx = container_of(dcbase, DisasContext, base);
-+
-+    tcg_gen_insn_start(ctx->base.pc_next);
-+}
-+
-+static bool tricore_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
-+                                      const CPUBreakpoint *bp)
-+{
-+    return true;
-+}
-+
-+static void tricore_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-+{
-+    DisasContext *ctx = container_of(dcbase, DisasContext, base);
-+    CPUTriCoreState *env = cpu->env_ptr;
-+
-+    ctx->opcode = cpu_ldl_code(env, ctx->base.pc_next);
-+    decode_opc(ctx);
-+    ctx->base.pc_next = ctx->pc_succ_insn;
-+
-+    if (ctx->base.is_jmp == DISAS_NEXT) {
-+        target_ulong page_start;
-+
-+        page_start = ctx->base.pc_first & TARGET_PAGE_MASK;
-+        if (ctx->base.pc_next - page_start >= TARGET_PAGE_SIZE) {
-+            ctx->base.is_jmp = DISAS_TOO_MANY;
-         }
--        ctx.base.pc_next = ctx.pc_succ_insn;
-     }
-+}
- 
--    gen_tb_end(tb, num_insns);
--    tb->size = ctx.base.pc_next - pc_start;
--    tb->icount = num_insns;
-+static void tricore_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
-+{
-+    DisasContext *ctx = container_of(dcbase, DisasContext, base);
- 
--    if (tcg_check_temp_count()) {
--        printf("LEAK at %08x\n", env->PC);
-+    switch (ctx->base.is_jmp) {
-+    case DISAS_TOO_MANY:
-+        gen_goto_tb(ctx, 0, ctx->base.pc_next);
-+        break;
-+    case DISAS_NORETURN:
-+        break;
-+    default:
-+        g_assert_not_reached();
-     }
-+}
- 
--#ifdef DEBUG_DISAS
--    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
--        && qemu_log_in_addr_range(pc_start)) {
--        qemu_log_lock();
--        qemu_log("IN: %s\n", lookup_symbol(pc_start));
--        log_target_disas(cs, pc_start, ctx.base.pc_next - pc_start);
--        qemu_log("\n");
--        qemu_log_unlock();
--    }
--#endif
-+static void tricore_tr_disas_log(const DisasContextBase *dcbase, CPUState *cpu)
-+{
-+    qemu_log("IN: %s\n", lookup_symbol(dcbase->pc_first));
-+    log_target_disas(cpu, dcbase->pc_first, dcbase->tb->size);
-+}
-+
-+static const TranslatorOps tricore_tr_ops = {
-+    .init_disas_context = tricore_tr_init_disas_context,
-+    .tb_start           = tricore_tr_tb_start,
-+    .insn_start         = tricore_tr_insn_start,
-+    .breakpoint_check   = tricore_tr_breakpoint_check,
-+    .translate_insn     = tricore_tr_translate_insn,
-+    .tb_stop            = tricore_tr_tb_stop,
-+    .disas_log          = tricore_tr_disas_log,
-+};
-+
-+
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
-+{
-+    DisasContext ctx;
-+    translator_loop(&tricore_tr_ops, &ctx.base, cs, tb, max_insns);
- }
- 
- void
 -- 
-2.22.0
+2.20.1
 
 
