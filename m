@@ -2,110 +2,92 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA4B3C31E57
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 12:35:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55671C31E57
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 12:37:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 871EF20657
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 12:35:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="brCSgsLC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 871EF20657
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 18FD720861
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 12:37:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18FD720861
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46982 helo=lists.gnu.org)
+Received: from localhost ([::1]:46986 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcqrZ-00087V-Kg
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 08:35:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41877)
+	id 1hcqtI-000194-Mm
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 08:37:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40140)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hcqo5-0006K7-MC
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 08:32:19 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hcqhy-0001lf-2c
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 08:25:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hcqo3-0000Vy-1J
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 08:32:16 -0400
-Received: from mail-eopbgr20129.outbound.protection.outlook.com
- ([40.107.2.129]:3905 helo=EUR02-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1hcqns-0000NT-Sk; Mon, 17 Jun 2019 08:32:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WL9ZT+xRKd2SeJHLYc0MfrvZWD+pHOG4nbRrZigE0m4=;
- b=brCSgsLCa4OPoEQRuGTi610Dhfm5rT49hkoUfV9EMENEzI0JZzVjJP97RtUoZAQt5gWqtq8a19nMItcEHARF9juzhioDDxki567ieaFdn4f0Cuw5P7WDJ+y2n0xUOjaHisTvgVmCCB2e4KtmgHYuL/QkmyBK4TMG28X6loNfTLg=
-Received: from DBBPR08MB4838.eurprd08.prod.outlook.com (20.179.46.151) by
- DBBPR08MB4377.eurprd08.prod.outlook.com (20.179.42.83) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1987.11; Mon, 17 Jun 2019 12:32:02 +0000
-Received: from DBBPR08MB4838.eurprd08.prod.outlook.com
- ([fe80::9c49:321c:cc13:35d3]) by DBBPR08MB4838.eurprd08.prod.outlook.com
- ([fe80::9c49:321c:cc13:35d3%3]) with mapi id 15.20.1987.014; Mon, 17 Jun 2019
- 12:32:01 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Thread-Topic: [PATCH 0/3] block: blk_co_pcache
-Thread-Index: AQHVHG6Gw8f3OdFEe0GxA9A7ku3zhaaOpkUAgAADMICAEU1cAP//21mAgAAGSAA=
-Date: Mon, 17 Jun 2019 12:32:01 +0000
-Message-ID: <07ffee0e-8860-f770-92be-d157d14f282a@virtuozzo.com>
-References: <20190606134814.123689-1-vsementsov@virtuozzo.com>
- <f92b274d-1949-3afa-7353-d3e3d67ae705@redhat.com>
- <dbacab33-ccb4-0c1e-5ce3-7214bd405701@virtuozzo.com>
- <4ec35629-0c64-9727-780f-31e4e494f376@virtuozzo.com>
- <20190617120929.GF7397@linux.fritz.box>
-In-Reply-To: <20190617120929.GF7397@linux.fritz.box>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0102CA0057.eurprd01.prod.exchangelabs.com
- (2603:10a6:7:7d::34) To DBBPR08MB4838.eurprd08.prod.outlook.com
- (2603:10a6:10:d9::23)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190617153158477
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e52c388a-e641-40df-e6b8-08d6f31fcc09
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:DBBPR08MB4377; 
-x-ms-traffictypediagnostic: DBBPR08MB4377:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <DBBPR08MB43774B0E93136BECD793EAA7C1EB0@DBBPR08MB4377.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 0071BFA85B
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(979002)(396003)(39840400004)(136003)(346002)(376002)(366004)(53754006)(199004)(189003)(8936002)(6246003)(478600001)(31686004)(5660300002)(68736007)(102836004)(305945005)(6512007)(76176011)(52116002)(14454004)(25786009)(6116002)(3846002)(107886003)(386003)(6506007)(71190400001)(36756003)(71200400001)(186003)(53546011)(6436002)(6486002)(6916009)(26005)(7736002)(53936002)(6306002)(2906002)(14444005)(256004)(54906003)(86362001)(476003)(486006)(11346002)(2616005)(4326008)(31696002)(66446008)(64756008)(66556008)(66476007)(66066001)(229853002)(316002)(99286004)(8676002)(446003)(81166006)(66946007)(73956011)(81156014)(969003)(989001)(999001)(1009001)(1019001);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DBBPR08MB4377;
- H:DBBPR08MB4838.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: SSpqBgThTFyW2HMz72i+VXvmrRPFH90VHI6Tx6+IeJNqZH9iTgFcLaDkBGxF9PUDgF/4kZbmcyJE2ek1rNZlbbvwd/oMbI9G6Z4lXYQeZ92g6Cy+TNSut6lVpoPPDetf1mkFYfVs1QQPnqVVhEzXVj4KqkOecHp03q83FS4LNx3y3FsRdozvQSium9+fsZU4ApBr+FWndPth2ue+ht0/KMqwFYJHp0/s32qExIGDr9L+pFqje6FsYQ0ESwxXCi4/lLTJ9WbEmbYTeJjZGskrXH0Bh7GGIRFhl4qm6IeZzEtxIQHF8C61Nb/PiL+1U+RAj3OaSp0b12HFTfDDNcLnOnMD0s/4v6Q0MyTfyotyTWJh6tZrqVRNZxWWKd0sOgUo3swUVpEgLI1/RZZfFfHZcCck28bPIEB/fSZItOPlttk=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D8E1CD279C43174CA980B5E77C003119@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <mreitz@redhat.com>) id 1hcqhv-0004Ig-4R
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 08:25:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35226)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hcqhp-00046h-28; Mon, 17 Jun 2019 08:25:49 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 83DC830C1AD7;
+ Mon, 17 Jun 2019 12:25:41 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.117])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 30F39619DB;
+ Mon, 17 Jun 2019 12:25:38 +0000 (UTC)
+To: qemu-block@nongnu.org, Keith Busch <keith.busch@intel.com>,
+ Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+References: <20190606092530.14206-1-klaus@birkelund.eu>
+ <639bcbb8-fabc-9bb8-b11d-909af4ed9cdc@redhat.com>
+ <20190617065419.GA15574@apples.localdomain>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <2151e0c9-6245-7164-31a5-50415d375e89@redhat.com>
+Date: Mon, 17 Jun 2019 14:25:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e52c388a-e641-40df-e6b8-08d6f31fcc09
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jun 2019 12:32:01.6068 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vsementsov@virtuozzo.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR08MB4377
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.2.129
-Subject: Re: [Qemu-devel] [PATCH 0/3] block: blk_co_pcache
+In-Reply-To: <20190617065419.GA15574@apples.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="2bvv9lMAQks8Um67Zi2xlb1XOQFTfM4DF"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Mon, 17 Jun 2019 12:25:41 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] nvme: do not advertise support for
+ unsupported arbitration mechanism
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,67 +99,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, Denis Lunev <den@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MTcuMDYuMjAxOSAxNTowOSwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMTcuMDYuMjAxOSB1bSAx
-MzoyMCBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IDA2
-LjA2LjIwMTkgMTc6MDcsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4g
-MDYuMDYuMjAxOSAxNjo1NSwgRXJpYyBCbGFrZSB3cm90ZToNCj4+Pj4gT24gNi82LzE5IDg6NDgg
-QU0sIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4+PiBIaSBhbGwhDQo+
-Pj4+Pg0KPj4+Pj4gSGVyZSBpcyBzbWFsbCBuZXcgaW8gQVBJOiBibGtfY29fcGNhY2hlLCB3aGlj
-aCBkb2VzIGNvcHktb24tcmVhZCB3aXRob3V0DQo+Pj4+PiBleHRyYSBidWZmZXIgZm9yIHJlYWQg
-ZGF0YS4gVGhpcyBtZWFucyB0aGF0IG9ubHkgcGFydHMgdGhhdCBuZWVkcyBDT1INCj4+Pj4+IHdp
-bGwgYmUgYWN0dWFsbHkgcmVhZCBhbmQgb25seSBjb3JyZXNwb25kaW5nIGJ1ZmZlcnMgYWxsb2Nh
-dGVkLCBubyBtb3JlLg0KPj4+Pj4NCj4+Pj4+IFRoaXMgYWxsb3dzIHRvIGltcHJvdmUgYSBiaXQg
-YmxvY2stc3RyZWFtIGFuZCBOQkRfQ01EX0NBQ0hFDQo+Pj4+DQo+Pj4+IEknZCByZWFsbHkgbGlr
-ZSB0byBzZWUgcWVtdS1pbyBnYWluIGFjY2VzcyB0byBjYWxsaW5nIHRoaXMgY29tbWFuZCwgc28N
-Cj4+Pj4gdGhhdCB3ZSBjYW4gYWRkIGlvdGVzdHMgY292ZXJhZ2Ugb2YgdGhpcyBuZXcgZmVhdHVy
-ZS4gTm90ZSB0aGF0IHRoZQ0KPj4+PiBpbi1kZXZlbG9wbWVudCBsaWJuYmQNCj4+Pj4gKGh0dHBz
-Oi8vZ2l0aHViLmNvbS9saWJndWVzdGZzL2xpYm5iZC9jb21taXRzL21hc3RlcikgaXMgYWxzbyB1
-c2FibGUgYXMNCj4+Pj4gYW4gTkJEIGNsaWVudCB0aGF0IGNhbiBkcml2ZSBOQkRfQ01EX0NBQ0hF
-LCBhbHRob3VnaCBpdCdzIHN0aWxsIG5ldw0KPj4+PiBlbm91Z2ggdGhhdCB3ZSBwcm9iYWJseSBk
-b24ndCB3YW50IHRvIHJlbHkgb24gaXQgYmVpbmcgYXZhaWxhYmxlIHlldC4NCj4+Pj4NCj4+Pg0K
-Pj4+IEhtbSwgZG9uJ3QgeW91IHRoaW5rIHRoYXQgYmxrX2NvX3BjYWNoZSBzZW5kcyBOQkRfQ01E
-X0NBQ0hFIGlmIGNhbGxlZCBvbiBuYmQgZHJpdmVyPw0KPj4+IEkgZGlkbid0IGltcGxlbWVudCBp
-dC4gQnV0IG1heSBiZSBJIHNob3VsZC4uDQo+Pj4NCj4+PiBNYXkgYWltIHdhcyBvbmx5IHRvIGF2
-b2lkIGV4dHJhIGFsbG9jYXRpb24gYW5kIHVubmVjZXNzYXJ5IHJlYWRzLiBCdXQgaWYgd2UgaW1w
-bGVtZW50DQo+Pj4gZnVsbC1mZWF0dXJlZCBpbyByZXF1ZXN0LCB3aGF0IHNob3VsZCBpdCBkbz8N
-Cj4+Pg0KPj4+IE9uIHFjb3cyIHdpdGggYmFja2luZyBpdCBzaG91bGQgcHVsbCBkYXRhIGZyb20g
-YmFja2luZyB0byB0b3AsIGxpa2UgaW4gY29weS1vbi1yZWFkLg0KPj4+IEFuZCBmb3IgbmJkIGl0
-IHdpbGwgc2VuZCBOQkRfQ01EX0NBQ0hFPw0KPj4+IFRoZXNlIHNlbWFudGljcyBzZWVtcyBkaWZm
-ZXJlbnQsIGJ1dCB3aHkgbm90Pw0KPj4+DQo+Pg0KPj4gQW55IG9waW5pb25zIGhlcmU/IFNob3Vs
-ZCBJIHJlc2VuZCBvciBjb3VsZCB3ZSB1c2UgaXQgYXMgYSBmaXJzdCBzdGVwLA0KPj4gbm90IHRv
-dWNoaW5nIGV4dGVybmFsIEFQSSBidXQgaW1wcm92aW5nIHRoaW5ncyBhIGxpdHRsZSBiaXQ/DQo+
-IA0KPiBJJ20gbm90IG9wcG9zZWQgdG8gbWFraW5nIG9ubHkgYSBmaXJzdCBzdGVwIG5vdy4gVGhl
-IGludGVyZmFjZSBzZWVtcyB0bw0KPiBtYWtlIHNlbnNlIHRvIG1lOyB0aGUgb25seSB0aGluZyB0
-aGF0IEkgZG9uJ3QgcmVhbGx5IGxpa2UgaXMgdGhlIG5hbWluZw0KPiBib3RoIG9mIHRoZSBvcGVy
-YXRpb24gKGJsa19jb19wY2FjaGUpIGFuZCBvZiB0aGUgZmxhZyAoQkRSVl9SRVFfQ0FDSEUpDQo+
-IGJlY2F1c2UgdG8gbWUsICJjYWNoZSIgZG9lc24ndCBtZWFuICJyZWFkLCBidXQgaWdub3JlIHRo
-ZSByZXN1bHQiLg0KPiANCj4gVGhlIG9wZXJhdGlvbiBvbmx5IHJlc3VsdHMgaW4gc29tZXRoaW5n
-IGJlaW5nIGNhY2hlZCBpZiB0aGUgYmxvY2sgZ3JhcGgNCj4gaXMgY29uZmlndXJlZCB0byBjYWNo
-ZSB0aGluZ3MuIEFuZCBpbmRlZWQsIHRoZSBtb3N0IGltcG9ydGF0biB1c2UgY2FzZQ0KPiBmb3Ig
-dGhlIGZsYWcgaXMgbm90IHBvcHVsYXRpbmcgYSBjYWNoZSwgYnV0IHRyaWdnZXJpbmcgY29weS1v
-bi1yZWFkLiBTbw0KPiBJIHRoaW5rIGNhbGxpbmcgdGhpcyBvcGVyYXRpb24gImNhY2hlIiBpcyBt
-aXNsZWFkaW5nLg0KPiANCj4gTm93LCBJIGRvbid0IGhhdmUgdmVyeSBnb29kIGlkZWFzIGZvciBi
-ZXR0ZXIgbmFtZXMgZWl0aGVyLiBJIGd1ZXNzDQo+IEJEUlZfUkVRX05PX0RBVEEgY291bGQgd29y
-aywgdGhvdWdoIGl0J3Mgbm90IHBlcmZlY3QuIChBbHNvLCBub3Qgc3VyZSBpZg0KPiBhIGJsa19j
-b19wcmVhZHZfbm9fcmVhZCB3cmFwcGVyIGlzIGV2ZW4gbmVlZGVkIHdoZW4geW91IGNhbiBqdXN0
-IGNhbGwNCj4gYmxrX2NvX3ByZWFkdiB3aXRoIHRoZSByaWdodCBmbGFnLikNCj4gDQo+IEknbSBv
-cGVuIGZvciBnb29kIG5hbWluZyBpZGVhcy4NCj4gDQoNCk15IGZpcnN0IHRyeSAobm90IHB1Ymxp
-c2hlZCkgd2FzIEJEUlZfUkVRX0ZBS0VfUkVBRCwgcGFzc2VkIGFzIGZsYWcgdG8gYmxrX2NvX3By
-ZWFkdiwNCndpdGhvdXQgc2VwYXJhdGUgaW8gcmVxdWVzdCBmdW5jdGlvbi4NCg0KSSBkZWNpZGVk
-IHRvIG1ha2UgaXQgdG8gYmUgQ2FjaGUgcmVxdWVzdCBpbnNwaXJlZCBieSBOQkRfQ01EX0NBQ0hF
-LCB3aGljaCB3YXMgY3JlYXRlZA0KdG8gZG8gZXhhY3RseSBjb3B5LW9uLXJlYWQgb3BlcmF0aW9u
-LiBTbyBpZiB3ZSBjYWxsIGl0IGNhY2hlIGl0IHdpbGwgY29ycmVzcG9uZCB0bw0KTkJEIHByb3Rv
-Y29sLg0KDQpfTk9fREFUQSBhbHNvIHdvcmtzIGZvciBtZSwgbm90IGEgcHJvYmxlbSB0byByZXNl
-bmQgd2l0aCB0aGlzIGZsYWcgYW5kIHdpdGhvdXQgYWRkaXRpb25hbA0Kd3JhcHBlciwgYXMgYSBm
-aXJzdCBzdGVwLg0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2bvv9lMAQks8Um67Zi2xlb1XOQFTfM4DF
+Content-Type: multipart/mixed; boundary="7cgtFLflGbOQDo1Xo8kVuA5iHqWLZtAuS";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org, Keith Busch <keith.busch@intel.com>,
+ Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <2151e0c9-6245-7164-31a5-50415d375e89@redhat.com>
+Subject: Re: [PATCH] nvme: do not advertise support for unsupported
+ arbitration mechanism
+References: <20190606092530.14206-1-klaus@birkelund.eu>
+ <639bcbb8-fabc-9bb8-b11d-909af4ed9cdc@redhat.com>
+ <20190617065419.GA15574@apples.localdomain>
+In-Reply-To: <20190617065419.GA15574@apples.localdomain>
+
+--7cgtFLflGbOQDo1Xo8kVuA5iHqWLZtAuS
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 17.06.19 08:54, Klaus Birkelund wrote:
+> On Fri, Jun 14, 2019 at 10:39:27PM +0200, Max Reitz wrote:
+>> On 06.06.19 11:25, Klaus Birkelund Jensen wrote:
+>>> The device mistakenly reports that the Weighted Round Robin with Urge=
+nt
+>>> Priority Class arbitration mechanism is supported.
+>>>
+>>> It is not.
+>>
+>> I believe you based on the fact that there is no =E2=80=9Cweight=E2=80=
+=9D or =E2=80=9Cpriority=E2=80=9D
+>> anywhere in nvme.c, and that it does not evaluate the Arbitration
+>> Mechanism Selected field.
+>>
+>=20
+> Not sure if you want me to change the commit message? Feel free to
+> change it if you want to ;)
+
+Oh, no, no.  It=E2=80=99s just that I have no idea how the NVMe interface=
+ works
+(well, I did download the spec then, but...), so this was basically just
+my excuse for =E2=80=9CI can review this!!=E2=80=9D.
+
+>>> Signed-off-by: Klaus Birkelund Jensen <klaus.jensen@cnexlabs.com>
+>>> ---
+>>>  hw/block/nvme.c | 1 -
+>>>  1 file changed, 1 deletion(-)
+>>>
+>>> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+>>> index 30e50f7a3853..415b4641d6b4 100644
+>>> --- a/hw/block/nvme.c
+>>> +++ b/hw/block/nvme.c
+>>> @@ -1383,7 +1383,6 @@ static void nvme_realize(PCIDevice *pci_dev, Er=
+ror **errp)
+>>>      n->bar.cap =3D 0;
+>>>      NVME_CAP_SET_MQES(n->bar.cap, 0x7ff);
+>>>      NVME_CAP_SET_CQR(n->bar.cap, 1);
+>>> -    NVME_CAP_SET_AMS(n->bar.cap, 1);
+>>
+>> I suppose the better way would be to pass 0, so it is more explicit, I=
+
+>> think.
+>>
+>> (Just removing it looks like it may have just been forgotten.)
+>>
+>=20
+> Not explicitly setting it to zero aligns with how the other fields in
+> CAP are also left out if kept at zero. If we explicitly set it to zero =
+I
+> think we should also set all the other fields that way (DSTRD, NSSRS,
+> etc.).
+
+OK then.
+
+Thanks, applied to my block branch:
+
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+
+Max
+
+
+--7cgtFLflGbOQDo1Xo8kVuA5iHqWLZtAuS--
+
+--2bvv9lMAQks8Um67Zi2xlb1XOQFTfM4DF
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0HhsAACgkQ9AfbAGHV
+z0DctggAgT4cxPrzD4TdBzWjvqExa7s200CEg6QG2fAynvVl99rRiu/+IM8ojoE+
+7UIQ3kS4BRqcCZ2pOZXp+nTh7iCHMBPpFv4/YjdQaCl7mTfIe+qu201FnGbv0epv
+V93YkgEA0xcbbKqrjLKOxymgC5q1cKaLgD4nwOu8x5kU3qQ1e0sE1f/g0dbHw2eb
+WzVL3myYgf5pfo6VFjdNv5OGmFaWeNrIGUm1tuWDc8AvDAfJ545SoK/LliV+6Bab
+WFfRHXnjDVN73pE8z8m3vgPCFQUWU5FpvlG+oVl5MjD0GcvYJTNbic5/SZwjoxBI
+tB+4LiQvyVaK0wcFrW5kpt+aCtPRhQ==
+=fgRf
+-----END PGP SIGNATURE-----
+
+--2bvv9lMAQks8Um67Zi2xlb1XOQFTfM4DF--
 
