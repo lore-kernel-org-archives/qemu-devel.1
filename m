@@ -2,88 +2,61 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-9.0 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A17AC31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 15:10:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95ABAC31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 15:14:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27803208CB
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 15:10:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rVHp5i6m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27803208CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5D516208C4
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 15:14:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D516208C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48336 helo=lists.gnu.org)
+Received: from localhost ([::1]:48396 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hctHB-0002PX-9r
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 11:10:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46913)
+	id 1hctKk-0005Pl-3g
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 11:14:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47182)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hcsib-0003pu-QL
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:34:47 -0400
+ (envelope-from <kbastian@mail.uni-paderborn.de>) id 1hcsje-0004e1-MX
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:35:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hcsia-0008I0-2y
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:34:45 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:33205)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hcsiX-0008Ff-LA
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:34:42 -0400
-Received: by mail-wr1-x429.google.com with SMTP id n9so10259275wru.0
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 07:34:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=HRNOi6ICfUn/2quaFaB6uVzcnt5OTh3SvAEE3S908PQ=;
- b=rVHp5i6mIKYkQ0TlSbSVOO5oo2WrzkzdJgj6SOLL6kAWn2xmQ1w57jkpU7hz5cWdnp
- Jq09qll9pCgO/PP8cNu4M1s4lm7dJowW++VyONJGNG0eGtcn8fxL+Qj/a11mGBAa2G9V
- 7OxanCZI2qDVUY9f66kv5qzi2mAeTQ+3nXs2rZnzhvL3bg/vcAM+2hyI4F7ReUOtA+Hx
- JlpjN9X3KXTKTFH13GQNC8aDM8Aaihj6dL3lJwclQyxLGIGQZJPbUj1l/V34nngHOkOy
- vSZsq+qOND4chLwnPS0zFQ1UpFi+586RHuMDxP3mofMzeOBIEoDfJcaSrSqtPesQZERo
- XiSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=HRNOi6ICfUn/2quaFaB6uVzcnt5OTh3SvAEE3S908PQ=;
- b=EZNWDlya3fIu/+KAnla+VUe31dqQe3P+L+QQe5MtPmWx2hlz/amTEpammMUl4pIOPB
- dY1syLLMQnXyRumsDdQgNW5bM1EPnBOe6/QRVaFHExVzd61YSSVrdOgseQMZCQQICmv2
- Ql728/xlfhVzdHG/geo9iGf5HDXvxVP9XfsWh0gfO1d9H99aAkqfsYhc1yH5ODjYih8W
- szh0ZDl9Kz+2GYY/DdWOZul6/nWnfT+bV8peVj7UDUvPm2/2ZP4olw1kHjBTOKcxcNx6
- 4kIlxRVm6DmyV9CZUmSjCXdCavC6bm5F9GJIWja3D1OyaDDsiPNj6uZtOH51mQRGGtUa
- DDvA==
-X-Gm-Message-State: APjAAAVylMkTlv3uEyDSJ8qGLrWO1wXaEHMmqZepdwebmTAlfMpeiVqC
- SngN2wqnvEtd5dkNjnlk1sEuEXS3nprrIw==
-X-Google-Smtp-Source: APXvYqxEoOqpoz0lysC9VREAN1dyH8CQWi1QKEwHcY1hlrKttOsx+YwIQCnLIfvGouRpBpjnoFlfvQ==
-X-Received: by 2002:adf:cf0a:: with SMTP id o10mr14240622wrj.37.1560782079347; 
- Mon, 17 Jun 2019 07:34:39 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id a67sm13819985wmh.40.2019.06.17.07.34.38
- for <qemu-devel@nongnu.org>
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 17 Jun 2019 07:34:38 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
+ (envelope-from <kbastian@mail.uni-paderborn.de>) id 1hcsjc-0000XS-TZ
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:35:50 -0400
+Received: from amazonia.uni-paderborn.de ([131.234.189.15]:34210)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+ id 1hcsjc-0000Wb-Mb
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:35:48 -0400
+Received: from magmaria.uni-paderborn.de ([131.234.189.24]
+ helo=localhost.localdomain)
+ by mail.uni-paderborn.de with esmtp (Exim 4.89 amazonia)
+ id 1hcsja-0000IV-95; Mon, 17 Jun 2019 16:35:47 +0200
+Received: from mail.uni-paderborn.de by magmaria with queue id 3427223-3;
+ Mon, 17 Jun 2019 14:35:45 GMT
+X-Envelope-From: <kbastian@mail.uni-paderborn.de>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 To: qemu-devel@nongnu.org
-Date: Mon, 17 Jun 2019 15:34:11 +0100
-Message-Id: <20190617143412.5734-24-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190617143412.5734-1-peter.maydell@linaro.org>
-References: <20190617143412.5734-1-peter.maydell@linaro.org>
+Date: Mon, 17 Jun 2019 16:35:31 +0200
+Message-Id: <20190617143533.15013-2-kbastian@mail.uni-paderborn.de>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190617143533.15013-1-kbastian@mail.uni-paderborn.de>
+References: <20190617143533.15013-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::429
-Subject: [Qemu-devel] [PULL 23/24] target/arm: Fix typos in trans function
- prototypes
+X-PMX-Version: 6.4.6.2792898, Antispam-Engine: 2.7.2.2107409,
+ Antispam-Data: 2019.6.17.142717, AntiVirus-Engine: 5.63.0,
+ AntiVirus-Data: 2019.6.4.5630002
+X-IMT-Spam-Score: 0.0 ()
+X-IMT-Authenticated-Sender: 
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 131.234.189.15
+Subject: [Qemu-devel] [PATCH 1/3] target/tricore: Use DisasContextBase API
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,156 +68,325 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kbastian@mail.uni-paderborn.de, david.brenken@efs-auto.de
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In several places cut and paste errors meant we were using the wrong
-type for the 'arg' struct in trans_ functions called by the
-decodetree decoder, because we were using the _sp version of the
-struct in the _dp function.  These were harmless, because the two
-structs were identical and so decodetree made them typedefs of the
-same underlying structure (and we'd have had a compile error if they
-were not harmless), but we should clean them up anyway.
+this gets rid of the copied fields of TriCore's DisasContext and now
+uses the shared DisasContextBase, which is necessary for the conversion
+to translate_loop.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20190614104457.24703-2-peter.maydell@linaro.org
+Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 ---
- target/arm/translate-vfp.inc.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ target/tricore/translate.c | 98 +++++++++++++++++---------------------
+ 1 file changed, 44 insertions(+), 54 deletions(-)
 
-diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
-index 8b732761f26..390441a1104 100644
---- a/target/arm/translate-vfp.inc.c
-+++ b/target/arm/translate-vfp.inc.c
-@@ -868,7 +868,7 @@ static bool trans_VMOV_64_sp(DisasContext *s, arg_VMOV_64_sp *a)
+diff --git a/target/tricore/translate.c b/target/tricore/translate.c
+index 06c4485e55..a66a10c376 100644
+--- a/target/tricore/translate.c
++++ b/target/tricore/translate.c
+@@ -30,6 +30,7 @@
+ #include "exec/helper-gen.h"
+ 
+ #include "tricore-opcodes.h"
++#include "exec/translator.h"
+ #include "exec/log.h"
+ 
+ /*
+@@ -64,24 +65,14 @@ static const char *regnames_d[] = {
+     };
+ 
+ typedef struct DisasContext {
+-    struct TranslationBlock *tb;
+-    target_ulong pc, saved_pc, next_pc;
++    DisasContextBase base;
++    target_ulong pc_succ_insn;
+     uint32_t opcode;
+-    int singlestep_enabled;
+     /* Routine used to access memory */
+     int mem_idx;
+     uint32_t hflags, saved_hflags;
+-    int bstate;
+ } DisasContext;
+ 
+-enum {
+-
+-    BS_NONE   = 0,
+-    BS_STOP   = 1,
+-    BS_BRANCH = 2,
+-    BS_EXCP   = 3,
+-};
+-
+ enum {
+     MODE_LL = 0,
+     MODE_LU = 1,
+@@ -3230,12 +3221,12 @@ static inline void gen_save_pc(target_ulong pc)
+ 
+ static inline bool use_goto_tb(DisasContext *ctx, target_ulong dest)
+ {
+-    if (unlikely(ctx->singlestep_enabled)) {
++    if (unlikely(ctx->base.singlestep_enabled)) {
+         return false;
+     }
+ 
+ #ifndef CONFIG_USER_ONLY
+-    return (ctx->tb->pc & TARGET_PAGE_MASK) == (dest & TARGET_PAGE_MASK);
++    return (ctx->base.tb->pc & TARGET_PAGE_MASK) == (dest & TARGET_PAGE_MASK);
+ #else
      return true;
+ #endif
+@@ -3246,10 +3237,10 @@ static inline void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
+     if (use_goto_tb(ctx, dest)) {
+         tcg_gen_goto_tb(n);
+         gen_save_pc(dest);
+-        tcg_gen_exit_tb(ctx->tb, n);
++        tcg_gen_exit_tb(ctx->base.tb, n);
+     } else {
+         gen_save_pc(dest);
+-        if (ctx->singlestep_enabled) {
++        if (ctx->base.singlestep_enabled) {
+             /* raise exception debug */
+         }
+         tcg_gen_exit_tb(NULL, 0);
+@@ -3261,9 +3252,9 @@ static void generate_trap(DisasContext *ctx, int class, int tin)
+     TCGv_i32 classtemp = tcg_const_i32(class);
+     TCGv_i32 tintemp = tcg_const_i32(tin);
+ 
+-    gen_save_pc(ctx->pc);
++    gen_save_pc(ctx->base.pc_next);
+     gen_helper_raise_exception_sync(cpu_env, classtemp, tintemp);
+-    ctx->bstate = BS_EXCP;
++    ctx->base.is_jmp = DISAS_NORETURN;
+ 
+     tcg_temp_free(classtemp);
+     tcg_temp_free(tintemp);
+@@ -3275,10 +3266,10 @@ static inline void gen_branch_cond(DisasContext *ctx, TCGCond cond, TCGv r1,
+     TCGLabel *jumpLabel = gen_new_label();
+     tcg_gen_brcond_tl(cond, r1, r2, jumpLabel);
+ 
+-    gen_goto_tb(ctx, 1, ctx->next_pc);
++    gen_goto_tb(ctx, 1, ctx->pc_succ_insn);
+ 
+     gen_set_label(jumpLabel);
+-    gen_goto_tb(ctx, 0, ctx->pc + address * 2);
++    gen_goto_tb(ctx, 0, ctx->base.pc_next + address * 2);
  }
  
--static bool trans_VMOV_64_dp(DisasContext *s, arg_VMOV_64_sp *a)
-+static bool trans_VMOV_64_dp(DisasContext *s, arg_VMOV_64_dp *a)
+ static inline void gen_branch_condi(DisasContext *ctx, TCGCond cond, TCGv r1,
+@@ -3295,9 +3286,9 @@ static void gen_loop(DisasContext *ctx, int r1, int32_t offset)
+ 
+     tcg_gen_subi_tl(cpu_gpr_a[r1], cpu_gpr_a[r1], 1);
+     tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_gpr_a[r1], -1, l1);
+-    gen_goto_tb(ctx, 1, ctx->pc + offset);
++    gen_goto_tb(ctx, 1, ctx->base.pc_next + offset);
+     gen_set_label(l1);
+-    gen_goto_tb(ctx, 0, ctx->next_pc);
++    gen_goto_tb(ctx, 0, ctx->pc_succ_insn);
+ }
+ 
+ static void gen_fcall_save_ctx(DisasContext *ctx)
+@@ -3306,7 +3297,7 @@ static void gen_fcall_save_ctx(DisasContext *ctx)
+ 
+     tcg_gen_addi_tl(temp, cpu_gpr_a[10], -4);
+     tcg_gen_qemu_st_tl(cpu_gpr_a[11], temp, ctx->mem_idx, MO_LESL);
+-    tcg_gen_movi_tl(cpu_gpr_a[11], ctx->next_pc);
++    tcg_gen_movi_tl(cpu_gpr_a[11], ctx->pc_succ_insn);
+     tcg_gen_mov_tl(cpu_gpr_a[10], temp);
+ 
+     tcg_temp_free(temp);
+@@ -3321,7 +3312,7 @@ static void gen_fret(DisasContext *ctx)
+     tcg_gen_addi_tl(cpu_gpr_a[10], cpu_gpr_a[10], 4);
+     tcg_gen_mov_tl(cpu_PC, temp);
+     tcg_gen_exit_tb(NULL, 0);
+-    ctx->bstate = BS_BRANCH;
++    ctx->base.is_jmp = DISAS_NORETURN;
+ 
+     tcg_temp_free(temp);
+ }
+@@ -3336,12 +3327,12 @@ static void gen_compute_branch(DisasContext *ctx, uint32_t opc, int r1,
+ /* SB-format jumps */
+     case OPC1_16_SB_J:
+     case OPC1_32_B_J:
+-        gen_goto_tb(ctx, 0, ctx->pc + offset * 2);
++        gen_goto_tb(ctx, 0, ctx->base.pc_next + offset * 2);
+         break;
+     case OPC1_32_B_CALL:
+     case OPC1_16_SB_CALL:
+-        gen_helper_1arg(call, ctx->next_pc);
+-        gen_goto_tb(ctx, 0, ctx->pc + offset * 2);
++        gen_helper_1arg(call, ctx->pc_succ_insn);
++        gen_goto_tb(ctx, 0, ctx->base.pc_next + offset * 2);
+         break;
+     case OPC1_16_SB_JZ:
+         gen_branch_condi(ctx, TCG_COND_EQ, cpu_gpr_d[15], 0, offset);
+@@ -3433,26 +3424,26 @@ static void gen_compute_branch(DisasContext *ctx, uint32_t opc, int r1,
+         break;
+ /* B-format */
+     case OPC1_32_B_CALLA:
+-        gen_helper_1arg(call, ctx->next_pc);
++        gen_helper_1arg(call, ctx->pc_succ_insn);
+         gen_goto_tb(ctx, 0, EA_B_ABSOLUT(offset));
+         break;
+     case OPC1_32_B_FCALL:
+         gen_fcall_save_ctx(ctx);
+-        gen_goto_tb(ctx, 0, ctx->pc + offset * 2);
++        gen_goto_tb(ctx, 0, ctx->base.pc_next + offset * 2);
+         break;
+     case OPC1_32_B_FCALLA:
+         gen_fcall_save_ctx(ctx);
+         gen_goto_tb(ctx, 0, EA_B_ABSOLUT(offset));
+         break;
+     case OPC1_32_B_JLA:
+-        tcg_gen_movi_tl(cpu_gpr_a[11], ctx->next_pc);
++        tcg_gen_movi_tl(cpu_gpr_a[11], ctx->pc_succ_insn);
+         /* fall through */
+     case OPC1_32_B_JA:
+         gen_goto_tb(ctx, 0, EA_B_ABSOLUT(offset));
+         break;
+     case OPC1_32_B_JL:
+-        tcg_gen_movi_tl(cpu_gpr_a[11], ctx->next_pc);
+-        gen_goto_tb(ctx, 0, ctx->pc + offset * 2);
++        tcg_gen_movi_tl(cpu_gpr_a[11], ctx->pc_succ_insn);
++        gen_goto_tb(ctx, 0, ctx->base.pc_next + offset * 2);
+         break;
+ /* BOL format */
+     case OPCM_32_BRC_EQ_NEQ:
+@@ -3551,7 +3542,7 @@ static void gen_compute_branch(DisasContext *ctx, uint32_t opc, int r1,
+             gen_loop(ctx, r2, offset * 2);
+         } else {
+             /* OPC2_32_BRR_LOOPU */
+-            gen_goto_tb(ctx, 0, ctx->pc + offset * 2);
++            gen_goto_tb(ctx, 0, ctx->base.pc_next + offset * 2);
+         }
+         break;
+     case OPCM_32_BRR_JNE:
+@@ -3585,7 +3576,7 @@ static void gen_compute_branch(DisasContext *ctx, uint32_t opc, int r1,
+     default:
+         generate_trap(ctx, TRAPC_INSN_ERR, TIN2_IOPC);
+     }
+-    ctx->bstate = BS_BRANCH;
++    ctx->base.is_jmp = DISAS_NORETURN;
+ }
+ 
+ 
+@@ -3933,7 +3924,7 @@ static void decode_sr_system(CPUTriCoreState *env, DisasContext *ctx)
+     case OPC2_16_SR_RFE:
+         gen_helper_rfe(cpu_env);
+         tcg_gen_exit_tb(NULL, 0);
+-        ctx->bstate = BS_BRANCH;
++        ctx->base.is_jmp = DISAS_NORETURN;
+         break;
+     case OPC2_16_SR_DEBUG:
+         /* raise EXCP_DEBUG */
+@@ -6557,11 +6548,11 @@ static void decode_rr_idirect(CPUTriCoreState *env, DisasContext *ctx)
+         tcg_gen_andi_tl(cpu_PC, cpu_gpr_a[r1], ~0x1);
+         break;
+     case OPC2_32_RR_JLI:
+-        tcg_gen_movi_tl(cpu_gpr_a[11], ctx->next_pc);
++        tcg_gen_movi_tl(cpu_gpr_a[11], ctx->pc_succ_insn);
+         tcg_gen_andi_tl(cpu_PC, cpu_gpr_a[r1], ~0x1);
+         break;
+     case OPC2_32_RR_CALLI:
+-        gen_helper_1arg(call, ctx->next_pc);
++        gen_helper_1arg(call, ctx->pc_succ_insn);
+         tcg_gen_andi_tl(cpu_PC, cpu_gpr_a[r1], ~0x1);
+         break;
+     case OPC2_32_RR_FCALLI:
+@@ -6572,7 +6563,7 @@ static void decode_rr_idirect(CPUTriCoreState *env, DisasContext *ctx)
+         generate_trap(ctx, TRAPC_INSN_ERR, TIN2_IOPC);
+     }
+     tcg_gen_exit_tb(NULL, 0);
+-    ctx->bstate = BS_BRANCH;
++    ctx->base.is_jmp = DISAS_NORETURN;
+ }
+ 
+ static void decode_rr_divide(CPUTriCoreState *env, DisasContext *ctx)
+@@ -8382,7 +8373,7 @@ static void decode_sys_interrupts(CPUTriCoreState *env, DisasContext *ctx)
+     case OPC2_32_SYS_RFE:
+         gen_helper_rfe(cpu_env);
+         tcg_gen_exit_tb(NULL, 0);
+-        ctx->bstate = BS_BRANCH;
++        ctx->base.is_jmp = DISAS_NORETURN;
+         break;
+     case OPC2_32_SYS_RFM:
+         if ((ctx->hflags & TRICORE_HFLAG_KUU) == TRICORE_HFLAG_SM) {
+@@ -8395,7 +8386,7 @@ static void decode_sys_interrupts(CPUTriCoreState *env, DisasContext *ctx)
+             gen_helper_rfm(cpu_env);
+             gen_set_label(l1);
+             tcg_gen_exit_tb(NULL, 0);
+-            ctx->bstate = BS_BRANCH;
++            ctx->base.is_jmp = DISAS_NORETURN;
+             tcg_temp_free(tmp);
+         } else {
+             /* generate privilege trap */
+@@ -8781,11 +8772,11 @@ static void decode_opc(CPUTriCoreState *env, DisasContext *ctx, int *is_branch)
  {
-     TCGv_i32 tmp;
+     /* 16-Bit Instruction */
+     if ((ctx->opcode & 0x1) == 0) {
+-        ctx->next_pc = ctx->pc + 2;
++        ctx->pc_succ_insn = ctx->base.pc_next + 2;
+         decode_16Bit_opc(env, ctx);
+     /* 32-Bit Instruction */
+     } else {
+-        ctx->next_pc = ctx->pc + 4;
++        ctx->pc_succ_insn = ctx->base.pc_next + 4;
+         decode_32Bit_opc(env, ctx);
+     }
+ }
+@@ -8798,32 +8789,31 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
+     int num_insns = 0;
  
-@@ -943,7 +943,7 @@ static bool trans_VLDR_VSTR_sp(DisasContext *s, arg_VLDR_VSTR_sp *a)
-     return true;
- }
+     pc_start = tb->pc;
+-    ctx.pc = pc_start;
+-    ctx.saved_pc = -1;
+-    ctx.tb = tb;
+-    ctx.singlestep_enabled = cs->singlestep_enabled;
+-    ctx.bstate = BS_NONE;
++    ctx.base.pc_next = pc_start;
++    ctx.base.tb = tb;
++    ctx.base.singlestep_enabled = cs->singlestep_enabled;
++    ctx.base.is_jmp = DISAS_NEXT;
+     ctx.mem_idx = cpu_mmu_index(env, false);
  
--static bool trans_VLDR_VSTR_dp(DisasContext *s, arg_VLDR_VSTR_sp *a)
-+static bool trans_VLDR_VSTR_dp(DisasContext *s, arg_VLDR_VSTR_dp *a)
- {
-     uint32_t offset;
-     TCGv_i32 addr;
-@@ -1533,7 +1533,7 @@ static void gen_VMLA_dp(TCGv_i64 vd, TCGv_i64 vn, TCGv_i64 vm, TCGv_ptr fpst)
-     tcg_temp_free_i64(tmp);
- }
+     tcg_clear_temp_count();
+     gen_tb_start(tb);
+-    while (ctx.bstate == BS_NONE) {
+-        tcg_gen_insn_start(ctx.pc);
++    while (ctx.base.is_jmp == DISAS_NEXT) {
++        tcg_gen_insn_start(ctx.base.pc_next);
+         num_insns++;
  
--static bool trans_VMLA_dp(DisasContext *s, arg_VMLA_sp *a)
-+static bool trans_VMLA_dp(DisasContext *s, arg_VMLA_dp *a)
- {
-     return do_vfp_3op_dp(s, gen_VMLA_dp, a->vd, a->vn, a->vm, true);
- }
-@@ -1571,7 +1571,7 @@ static void gen_VMLS_dp(TCGv_i64 vd, TCGv_i64 vn, TCGv_i64 vm, TCGv_ptr fpst)
-     tcg_temp_free_i64(tmp);
- }
+-        ctx.opcode = cpu_ldl_code(env, ctx.pc);
++        ctx.opcode = cpu_ldl_code(env, ctx.base.pc_next);
+         decode_opc(env, &ctx, 0);
  
--static bool trans_VMLS_dp(DisasContext *s, arg_VMLS_sp *a)
-+static bool trans_VMLS_dp(DisasContext *s, arg_VMLS_dp *a)
- {
-     return do_vfp_3op_dp(s, gen_VMLS_dp, a->vd, a->vn, a->vm, true);
- }
-@@ -1613,7 +1613,7 @@ static void gen_VNMLS_dp(TCGv_i64 vd, TCGv_i64 vn, TCGv_i64 vm, TCGv_ptr fpst)
-     tcg_temp_free_i64(tmp);
- }
+         if (num_insns >= max_insns || tcg_op_buf_full()) {
+-            gen_save_pc(ctx.next_pc);
++            gen_save_pc(ctx.pc_succ_insn);
+             tcg_gen_exit_tb(NULL, 0);
+             break;
+         }
+-        ctx.pc = ctx.next_pc;
++        ctx.base.pc_next = ctx.pc_succ_insn;
+     }
  
--static bool trans_VNMLS_dp(DisasContext *s, arg_VNMLS_sp *a)
-+static bool trans_VNMLS_dp(DisasContext *s, arg_VNMLS_dp *a)
- {
-     return do_vfp_3op_dp(s, gen_VNMLS_dp, a->vd, a->vn, a->vm, true);
- }
-@@ -1647,7 +1647,7 @@ static void gen_VNMLA_dp(TCGv_i64 vd, TCGv_i64 vn, TCGv_i64 vm, TCGv_ptr fpst)
-     tcg_temp_free_i64(tmp);
- }
+     gen_tb_end(tb, num_insns);
+-    tb->size = ctx.pc - pc_start;
++    tb->size = ctx.base.pc_next - pc_start;
+     tb->icount = num_insns;
  
--static bool trans_VNMLA_dp(DisasContext *s, arg_VNMLA_sp *a)
-+static bool trans_VNMLA_dp(DisasContext *s, arg_VNMLA_dp *a)
- {
-     return do_vfp_3op_dp(s, gen_VNMLA_dp, a->vd, a->vn, a->vm, true);
- }
-@@ -1657,7 +1657,7 @@ static bool trans_VMUL_sp(DisasContext *s, arg_VMUL_sp *a)
-     return do_vfp_3op_sp(s, gen_helper_vfp_muls, a->vd, a->vn, a->vm, false);
- }
- 
--static bool trans_VMUL_dp(DisasContext *s, arg_VMUL_sp *a)
-+static bool trans_VMUL_dp(DisasContext *s, arg_VMUL_dp *a)
- {
-     return do_vfp_3op_dp(s, gen_helper_vfp_muld, a->vd, a->vn, a->vm, false);
- }
-@@ -1681,7 +1681,7 @@ static void gen_VNMUL_dp(TCGv_i64 vd, TCGv_i64 vn, TCGv_i64 vm, TCGv_ptr fpst)
-     gen_helper_vfp_negd(vd, vd);
- }
- 
--static bool trans_VNMUL_dp(DisasContext *s, arg_VNMUL_sp *a)
-+static bool trans_VNMUL_dp(DisasContext *s, arg_VNMUL_dp *a)
- {
-     return do_vfp_3op_dp(s, gen_VNMUL_dp, a->vd, a->vn, a->vm, false);
- }
-@@ -1691,7 +1691,7 @@ static bool trans_VADD_sp(DisasContext *s, arg_VADD_sp *a)
-     return do_vfp_3op_sp(s, gen_helper_vfp_adds, a->vd, a->vn, a->vm, false);
- }
- 
--static bool trans_VADD_dp(DisasContext *s, arg_VADD_sp *a)
-+static bool trans_VADD_dp(DisasContext *s, arg_VADD_dp *a)
- {
-     return do_vfp_3op_dp(s, gen_helper_vfp_addd, a->vd, a->vn, a->vm, false);
- }
-@@ -1701,7 +1701,7 @@ static bool trans_VSUB_sp(DisasContext *s, arg_VSUB_sp *a)
-     return do_vfp_3op_sp(s, gen_helper_vfp_subs, a->vd, a->vn, a->vm, false);
- }
- 
--static bool trans_VSUB_dp(DisasContext *s, arg_VSUB_sp *a)
-+static bool trans_VSUB_dp(DisasContext *s, arg_VSUB_dp *a)
- {
-     return do_vfp_3op_dp(s, gen_helper_vfp_subd, a->vd, a->vn, a->vm, false);
- }
-@@ -1711,7 +1711,7 @@ static bool trans_VDIV_sp(DisasContext *s, arg_VDIV_sp *a)
-     return do_vfp_3op_sp(s, gen_helper_vfp_divs, a->vd, a->vn, a->vm, false);
- }
- 
--static bool trans_VDIV_dp(DisasContext *s, arg_VDIV_sp *a)
-+static bool trans_VDIV_dp(DisasContext *s, arg_VDIV_dp *a)
- {
-     return do_vfp_3op_dp(s, gen_helper_vfp_divd, a->vd, a->vn, a->vm, false);
- }
-@@ -1774,7 +1774,7 @@ static bool trans_VFM_sp(DisasContext *s, arg_VFM_sp *a)
-     return true;
- }
- 
--static bool trans_VFM_dp(DisasContext *s, arg_VFM_sp *a)
-+static bool trans_VFM_dp(DisasContext *s, arg_VFM_dp *a)
- {
-     /*
-      * VFNMA : fd = muladd(-fd,  fn, fm)
-@@ -2214,7 +2214,7 @@ static bool trans_VRINTR_sp(DisasContext *s, arg_VRINTR_sp *a)
-     return true;
- }
- 
--static bool trans_VRINTR_dp(DisasContext *s, arg_VRINTR_sp *a)
-+static bool trans_VRINTR_dp(DisasContext *s, arg_VRINTR_dp *a)
- {
-     TCGv_ptr fpst;
-     TCGv_i64 tmp;
-@@ -2270,7 +2270,7 @@ static bool trans_VRINTZ_sp(DisasContext *s, arg_VRINTZ_sp *a)
-     return true;
- }
- 
--static bool trans_VRINTZ_dp(DisasContext *s, arg_VRINTZ_sp *a)
-+static bool trans_VRINTZ_dp(DisasContext *s, arg_VRINTZ_dp *a)
- {
-     TCGv_ptr fpst;
-     TCGv_i64 tmp;
+     if (tcg_check_temp_count()) {
+@@ -8835,7 +8825,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
+         && qemu_log_in_addr_range(pc_start)) {
+         qemu_log_lock();
+         qemu_log("IN: %s\n", lookup_symbol(pc_start));
+-        log_target_disas(cs, pc_start, ctx.pc - pc_start);
++        log_target_disas(cs, pc_start, ctx.base.pc_next - pc_start);
+         qemu_log("\n");
+         qemu_log_unlock();
+     }
 -- 
-2.20.1
+2.22.0
 
 
