@@ -2,92 +2,63 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28EA6C31E58
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 11:44:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4515C31E57
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 11:44:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF1BA20861
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 11:44:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7371920861
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 11:44:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T1o/A/VO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF1BA20861
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="XpAMYv5I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7371920861
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46266 helo=lists.gnu.org)
+Received: from localhost ([::1]:46270 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcq3R-0004It-0u
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 07:44:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54704)
+	id 1hcq3V-0004mO-K4
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 07:44:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53644)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hcpwD-0002Oa-Au
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 07:36:38 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hcpso-0008AL-9s
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 07:33:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hcpwB-0008V3-CD
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 07:36:37 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38841)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hcpw9-0008LX-8t
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 07:36:35 -0400
-Received: by mail-wm1-x342.google.com with SMTP id s15so8728208wmj.3
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 04:36:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=LE/vgjgV3L2QM0IhA5UFBw8V9LoyfknCUTpbu7QPvNI=;
- b=T1o/A/VOJC+ADtmStZ6BxoB+a2eOyYxImY5l2dot5Em280oM8pnpc5MP1NpzlUCJA3
- Hbqi0DgxuMzXcLh2In4sUNFzv0Kgc44hSyFExNH9rzp8N6jZJOkKrRypt4NgPGWpyVG3
- nqOAvicSAN01SAl4qcXjCTflk8gIkhGpE3SGOK5EeGBCzvTM4rjREUAJuMrvwMhecTo4
- vATOZ/JumNX7MeTAC+Q6XTJqAawZPo8cAAc0gefW7wrm+nkEPLeFkYk3YCuHNZSP2e/X
- fjtzD+a523FXn5vU6mdzulbaYq6s+AL8mbsSxXdiRDUwc8muk/7Kj1p6Z+bW6dm+9x0D
- kl7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=LE/vgjgV3L2QM0IhA5UFBw8V9LoyfknCUTpbu7QPvNI=;
- b=qEA/sQiT/vlevjp7IPosbR0Q5AUXZ6kdlgc03jayl6E1UCNPG/8t0ApuS1AHOSFDYe
- O2hVy0Cy7A/kk3MVqBMRpZoVpXAj0/LS7eiLzFPNkzzn32+FEhVK1ZHu7ZmYI4/LYsZ0
- gqdBderxouCCSeennvFiCPG+cWbFtkEYctkkjeWbxHb2hZ2H+MmJh/NLpUre/d+o50FZ
- bZpZgI/uMQCaIovUzdS60o6VFOmb++G8NhB1yUmMyQFOX768woVfUlEUt9+D4lvRfl4H
- MeTALiUWNBu+LsoU1mEIgGev8sAaigdxOGnD1nJTjelVQf0c817bsIaTQ0yBrvArzcHD
- zM3g==
-X-Gm-Message-State: APjAAAVXUl9TctMTnvX1tRdaHPbu01n2AtsfszaWniCp10xDeKtFqZIw
- FpaE0GneriRE9YQbNjD2MRydZw==
-X-Google-Smtp-Source: APXvYqzqOZsB2Q2VizsHHRFqz7cmxncUWkl9gF2QkZ+5izyCfO3IhEQPQMen6RKH8sRvJV8vx0+lMw==
-X-Received: by 2002:a1c:c583:: with SMTP id
- v125mr17667477wmf.158.1560771388844; 
- Mon, 17 Jun 2019 04:36:28 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id v67sm15036224wme.24.2019.06.17.04.36.28
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 17 Jun 2019 04:36:28 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E931B1FF87;
- Mon, 17 Jun 2019 12:36:27 +0100 (BST)
-References: <20190615154352.26824-1-philmd@redhat.com>
- <20190615154352.26824-3-philmd@redhat.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-arm@nongnu.org
-In-reply-to: <20190615154352.26824-3-philmd@redhat.com>
-Date: Mon, 17 Jun 2019 12:36:27 +0100
-Message-ID: <87blywbg04.fsf@zen.linaroharston>
+ (envelope-from <dgibson@ozlabs.org>) id 1hcpsm-0003ss-OW
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 07:33:06 -0400
+Received: from ozlabs.org ([203.11.71.1]:57101)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1hcpsl-0003KS-VK; Mon, 17 Jun 2019 07:33:04 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 45S8G4117vz9sND; Mon, 17 Jun 2019 21:32:44 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1560771164;
+ bh=ntY+xd8E9iMLHdA8TSZ+Ie+RQU+E04gL8Pokm2x0+Ao=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=XpAMYv5IFvsV3L1YvM9oxwop+lidBqPMckmC9nmyiuvWAm0/IjiW4LwWLeJnzYv1a
+ A9pk8ibCL38PXUSYTDU+UhIsD1Df+XmVTWbTqOFsTC4j75xRAk6gEckm/R5ORYTxjs
+ jAzAnQmmydQ77g7EOwrIN11T9cLNvzApukm/6p3E=
+Date: Mon, 17 Jun 2019 21:12:05 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>
+Message-ID: <20190617111205.GA5929@umbus>
+References: <20190612020723.96802-1-aik@ozlabs.ru>
+ <20190617102510.341d71a5@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 02/23] target/arm: Makefile
- cleanup (ARM)
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="opJtzjQTFsWo+cga"
+Content-Disposition: inline
+In-Reply-To: <20190617102510.341d71a5@bahia.lan>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH qemu REPOST] spapr/rtas: Force
+ big endian compile for rtas
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,59 +70,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org,
  qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+--opJtzjQTFsWo+cga
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Group ARM objects together, TCG related ones at the bottom.
-> This will help when restricting TCG-only objects.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On Mon, Jun 17, 2019 at 10:25:10AM +0200, Greg Kurz wrote:
+65;5603;1c> On Wed, 12 Jun 2019 12:07:23 +1000
+> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+>=20
+> > At the moment the rtas's Makefile uses generic QEMU rules which means
+> > that when QEMU is compiled on a little endian system, the spapr-rtas.bin
+> > is compiled as little endian too which is incorrect as it is always
+> > executed in big endian mode.
+>=20
+> I'm naively thinking that executing code compiled as little endian
+> in big endian mode would result in an exception... Can you explain
+> how/why this ever worked ?
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Because basically nobody actually built the rtas blob from the
+sources, they just used the pre-compiled blob, which is correctly
+built BE.
 
-> ---
->  target/arm/Makefile.objs | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
->
-> diff --git a/target/arm/Makefile.objs b/target/arm/Makefile.objs
-> index 7c31fa01c1..3269dda613 100644
-> --- a/target/arm/Makefile.objs
-> +++ b/target/arm/Makefile.objs
-> @@ -4,11 +4,9 @@ obj-$(CONFIG_KVM) +=3D kvm.o
->  obj-$(call land,$(CONFIG_KVM),$(call lnot,$(TARGET_AARCH64))) +=3D kvm32=
-.o
->  obj-$(call land,$(CONFIG_KVM),$(TARGET_AARCH64)) +=3D kvm64.o
->  obj-$(call lnot,$(CONFIG_KVM)) +=3D kvm-stub.o
-> -obj-y +=3D translate.o op_helper.o helper.o cpu.o
-> -obj-y +=3D neon_helper.o iwmmxt_helper.o vec_helper.o vfp_helper.o
-> +obj-y +=3D helper.o cpu.o
->  obj-y +=3D gdbstub.o
->  obj-$(TARGET_AARCH64) +=3D cpu64.o gdbstub64.o
-> -obj-y +=3D crypto_helper.o
->  obj-$(CONFIG_SOFTMMU) +=3D arm-powerctl.o
->
->  DECODETREE =3D $(SRC_PATH)/scripts/decodetree.py
-> @@ -32,6 +30,11 @@ target/arm/translate-sve.o: target/arm/decode-sve.inc.c
->  target/arm/translate.o: target/arm/decode-vfp.inc.c
->  target/arm/translate.o: target/arm/decode-vfp-uncond.inc.c
->
-> +obj-y +=3D translate.o op_helper.o
-> +obj-y +=3D crypto_helper.o
-> +obj-y +=3D iwmmxt_helper.o vec_helper.o
-> +obj-y +=3D neon_helper.o vfp_helper.o
-> +
->  obj-$(TARGET_AARCH64) +=3D translate-a64.o helper-a64.o
->  obj-$(TARGET_AARCH64) +=3D translate-sve.o sve_helper.o
->  obj-$(TARGET_AARCH64) +=3D pauth_helper.o
+That said executing LE code in BE mode won't necessarily result in an
+exception - it'll just execute whatever the instructions are you get
+when you byte reverse the ones you inteded, which may or may not be
+valid.  It's *likely* to cause an exception fairly soon, but the
+opcode space is densely populated enough that there's a good chance it
+won't cause an immediate illegal instruction.
 
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
---
-Alex Benn=C3=A9e
+--opJtzjQTFsWo+cga
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0HdYMACgkQbDjKyiDZ
+s5Jv6RAAn1gG1giPOP55o7E3bRbgaUytpIpuOmqgxgOvEqoNpeKMdkJ0OzplkV2g
+9oabRLFclljhm3NUDB1hYuIQ94cwnmkno1o7grrlL2B6K+dJzb5OfkIfKXkeYZKe
+i1Q+eq1pKhjF7uudSmJlxc8aTvFqb6LVPd93sIFdO2SmZ1Q1vqkvCmZHIMsQAoQI
+G7xxasv7Ljq5RFlwikj1sjDhyzIOk/Kaqm4o9KJjkLPXX0sl/QWVvJ4UQBaEOC2G
+6b2PZrM0/rv+6Z1ScEztNf2uFb5bQIdJ3me06cmPgKO9Hu0O/MwxINaZgS8e5+Ky
+hC0WUusPS6tLvVwlpdXWzmCAXXnn7kTcB5YS7JQKikLiyQi54aKQwX4FbSwJkRDw
+gcqSqmCnOuj0/HIP2U7A685BMULuj68E2wZAdi8CKYV+LsX/nM1Xm2RsRkeGSsP/
+hJF7V5Zvoitr3GCyOl13YxzHAJ9Uki2KYltEY/mBsDytGzR+z6q4loVJC9yHcYtA
+jTFzL8ipdccR4FUT3+mvwe9voftTILuiI70tVunaxTb5pwckfY9aXjTeDQ/hwYOQ
+XR62NXAFNz2SAl1u4GnFeYIfcIINHg9DCxhxYvtE4PTHvEwb4Y5EwVcAXfKWEbBJ
+h7EwaOO17ShS+j0OjfhKyhjXOQYGJcuBI0SAfFZiUVriOMYQlxg=
+=MHwV
+-----END PGP SIGNATURE-----
+
+--opJtzjQTFsWo+cga--
 
