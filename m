@@ -2,108 +2,62 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C01D0C31E57
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF59EC46477
 	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 12:26:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96D9720657
+	by mail.kernel.org (Postfix) with ESMTPS id CB77720657
 	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 12:26:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96D9720657
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB77720657
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46780 helo=lists.gnu.org)
+Received: from localhost ([::1]:46782 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcqiu-0002Jd-PB
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 08:26:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35684)
+	id 1hcqiv-0002KV-0t
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 08:26:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33274)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <lvivier@redhat.com>) id 1hcqS1-0005sz-AG
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 08:09:30 -0400
+ (envelope-from <stefan.brankovic@rt-rk.com>) id 1hcqHV-0007Pf-Op
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 07:58:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1hcqS0-0003sa-6p
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 08:09:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40257)
+ (envelope-from <stefan.brankovic@rt-rk.com>) id 1hcqHT-0007WX-2A
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 07:58:37 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:55831 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hcqRz-0003ip-U7
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 08:09:28 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 10A3E7CBA0;
- Mon, 17 Jun 2019 12:09:13 +0000 (UTC)
-Received: from [10.36.117.10] (ovpn-117-10.ams2.redhat.com [10.36.117.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 651B71001DF3;
- Mon, 17 Jun 2019 12:09:08 +0000 (UTC)
-From: Laurent Vivier <lvivier@redhat.com>
-To: Amit Shah <amit@kernel.org>, Amit Shah <amit@infradead.org>
-References: <20190529143106.11789-1-lvivier@redhat.com>
- <c0e7e3e5-2670-da5d-8b8a-128568f401e6@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <85470e06-54be-4226-e087-ae93dd2cb503@redhat.com>
-Date: Mon, 17 Jun 2019 14:09:07 +0200
+ (Exim 4.71) (envelope-from <stefan.brankovic@rt-rk.com>)
+ id 1hcqHL-0007MJ-3b
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 07:58:29 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 0211D1A224F;
+ Mon, 17 Jun 2019 13:58:24 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from [10.10.13.132] (rtrkw870-lin.domain.local [10.10.13.132])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id C04211A1E6F;
+ Mon, 17 Jun 2019 13:58:23 +0200 (CEST)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <1559816130-17113-1-git-send-email-stefan.brankovic@rt-rk.com>
+ <1559816130-17113-5-git-send-email-stefan.brankovic@rt-rk.com>
+ <fac722ec-ea35-80c5-5820-2ff9d1296620@linaro.org>
+From: Stefan Brankovic <stefan.brankovic@rt-rk.com>
+Message-ID: <668541d9-cc9a-0fce-81f5-887e4b0b4fa6@rt-rk.com>
+Date: Mon, 17 Jun 2019 13:58:24 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <c0e7e3e5-2670-da5d-8b8a-128568f401e6@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <fac722ec-ea35-80c5-5820-2ff9d1296620@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Mon, 17 Jun 2019 12:09:13 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v7 0/4] rng-builtin: add an RNG backend
- that uses qemu_guest_getrandom()
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: Re: [Qemu-devel] [PATCH 4/8] target/ppc: Optimize emulation of
+ vgbbd instruction
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,78 +69,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- "Richard W . M . Jones" <rjones@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/06/2019 10:42, Laurent Vivier wrote:
-> Michael,
-> 
-> Could you pick this series in the next virtio pull request?
 
-Or perhaps Amit?
+On 6.6.19. 20:19, Richard Henderson wrote:
+> On 6/6/19 5:15 AM, Stefan Brankovic wrote:
+>> Optimize altivec instruction vgbbd (Vector Gather Bits by Bytes by Doubleword)
+>> All ith bits (i in range 1 to 8) of each byte of doubleword element in
+>> source register are concatenated and placed into ith byte of appropriate
+>> doubleword element in destination register.
+>>
+>> Following solution is done for every doubleword element of source register
+>> (placed in shifted variable):
+>> We gather bits in 2x8 iterations.
+>> In first iteration bit 1 of byte 1, bit 2 of byte 2,... bit 8 of byte 8 are
+>> in their final spots so we just and avr with mask. For every next iteration,
+>> we have to shift right both shifted(7 places) and mask(8 places), so we get
+>> bit 1 of byte 2, bit 2 of byte 3.. bit 7 of byte 8 in right places so we and
+>> shifted with new value of mask... After first 8 iteration(first for loop) we
+>> have all first bits in their final place all second bits but second bit from
+>> eight byte in their place,... only 1 eight bit from eight byte is in it's
+>> place), so we and result1 with mask1 to save those bits that are at right
+>> place and save them in result1. In second loop we do all operations
+>> symetrical, so we get other half of bits on their final spots, and save
+>> result in result2. Or of result1 and result2 is placed in appropriate
+>> doubleword element of vD. We repeat this 2 times.
+>>
+>> Signed-off-by: Stefan Brankovic <stefan.brankovic@rt-rk.com>
+>> ---
+>>   target/ppc/translate/vmx-impl.inc.c | 99 ++++++++++++++++++++++++++++++++++++-
+>>   1 file changed, 98 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
+>> index 87f69dc..010f337 100644
+>> --- a/target/ppc/translate/vmx-impl.inc.c
+>> +++ b/target/ppc/translate/vmx-impl.inc.c
+>> @@ -780,6 +780,103 @@ static void trans_vsr(DisasContext *ctx)
+>>       tcg_temp_free_i64(tmp);
+>>   }
+>>   
+>> +/*
+>> + * vgbbd VRT,VRB - Vector Gather Bits by Bytes by Doubleword
+>> + *
+>> + * All ith bits (i in range 1 to 8) of each byte of doubleword element in source
+>> + * register are concatenated and placed into ith byte of appropriate doubleword
+>> + * element in destination register.
+>> + *
+>> + * Following solution is done for every doubleword element of source register
+>> + * (placed in shifted variable):
+>> + * We gather bits in 2x8 iterations.
+>> + * In first iteration bit 1 of byte 1, bit 2 of byte 2,... bit 8 of byte 8 are
+>> + * in their final spots so we just and avr with mask. For every next iteration,
+>> + * we have to shift right both shifted(7 places) and mask(8 places), so we get
+>> + * bit 1 of byte 2, bit 2 of byte 3.. bit 7 of byte 8 in right places so we and
+>> + * shifted with new value of mask... After first 8 iteration(first for loop) we
+>> + * have all first bits in their final place all second bits but second bit from
+>> + * eight byte in their place,... only 1 eight bit from eight byte is in it's
+>> + * place), so we and result1 with mask1 to save those bits that are at right
+>> + * place and save them in result1. In second loop we do all operations
+>> + * symetrical, so we get other half of bits on their final spots, and save
+>> + * result in result2. Or of result1 and result2 is placed in appropriate
+>> + * doubleword element of vD. We repeat this 2 times.
+>> + */
+>> +static void trans_vgbbd(DisasContext *ctx)
+>> +{
+>> +    int VT = rD(ctx->opcode);
+>> +    int VB = rB(ctx->opcode);
+>> +    TCGv_i64 tmp = tcg_temp_new_i64();
+>> +    TCGv_i64 avr = tcg_temp_new_i64();
+>> +    TCGv_i64 shifted = tcg_temp_new_i64();
+>> +    TCGv_i64 result1 = tcg_temp_new_i64();
+>> +    TCGv_i64 result2 = tcg_temp_new_i64();
+>> +    uint64_t mask = 0x8040201008040201ULL;
+>> +    uint64_t mask1 = 0x80c0e0f0f8fcfeffULL;
+>> +    uint64_t mask2 = 0x7f3f1f0f07030100ULL;
+>> +    int i;
+>> +
+>> +    get_avr64(avr, VB, true);
+>> +    tcg_gen_movi_i64(result1, 0x0ULL);
+>> +    tcg_gen_mov_i64(shifted, avr);
+>> +    for (i = 0; i < 8; i++) {
+>> +        tcg_gen_andi_i64(tmp, shifted, mask);
+>> +        tcg_gen_or_i64(result1, result1, tmp);
+>> +
+>> +        tcg_gen_shri_i64(shifted, shifted, 7);
+>> +        mask = mask >> 8;
+>> +    }
+>> +    tcg_gen_andi_i64(result1, result1, mask1);
+> This masking appears to be redundant with the masking within the loop.
+>
+>> +
+>> +    mask = 0x8040201008040201ULL;
+>> +    tcg_gen_movi_i64(result2, 0x0ULL);
+>> +    for (i = 0; i < 8; i++) {
+>> +        tcg_gen_andi_i64(tmp, avr, mask);
+>> +        tcg_gen_or_i64(result2, result2, tmp);
+>> +
+>> +        tcg_gen_shli_i64(avr, avr, 7);
+>> +        mask = mask << 8;
+>> +    }
+>> +    tcg_gen_andi_i64(result2, result2, mask2);
+> Similarly.
+>
+> Also, the first iteration of the second loop is redundant with the first
+> iteration of the first loop.
+>
+> I will also note that these are large constants, not easily constructable.
+> Therefore it would be best to avoid needing to construct them twice.  You can
+> do this by processing the two doublewords simultaneously.  e.g.
+>
+> 	TCGv_i64 avr[2], out[2], tmp, tcg_mask;
+>
+> 	identity_mask = 0x8040201008040201ull;
+> 	tcg_gen_movi_i64(tcg_mask, identity_mask);
+> 	for (j = 0; j < 2; j++) {
+> 	    get_avr(avr[j], VB, j);
+> 	    tcg_gen_and_i64(out[j], avr[j], tcg_mask);
+> 	}
+> 	for (i = 1; i < 8; i++) {
+> 	    tcg_gen_movi_i64(tcg_mask, identity_mask >> (i * 8);
+> 	    for (j = 0; j < 2; j++) {
+> 	        tcg_gen_shri_i64(tmp, avr[j], i * 7);
+> 	        tcg_gen_and_i64(tmp, tmp, tcg_mask);
+> 	        tcg_gen_or_i64(out[j], out[j], tmp);
+> 	    }
+> 	}
+> 	for (i = 1; i < 8; i++) {
+> 	    tcg_gen_movi_i64(tcg_mask, identity_mask << (i * 8));
+> 	    for (j = 0; j < 2; j++) {
+> 	        tcg_gen_shli_i64(tmp, avr[j], i * 7);
+> 	        tcg_gen_and_i64(tmp, tmp, tcg_mask);
+> 	        tcg_gen_or_i64(out[j], out[j], tmp);
+> 	    }
+> 	}
+> 	for (j = 0; j < 2; j++) {
+> 	    set_avr(VT, out[j], j);
+> 	}
+>
+> This should produce the same results with fewer operations.
 
-Thanks,
-Laurent
+I agree with you, this should produce the same result with less 
+instructions. I will implement this in v2.
 
-> 
-> If you disagree with some of my patches, could you take at least the
-> first one (from Kashyap)?
-> 
-> Thanks,
-> Laurent
-> 
-> On 29/05/2019 16:31, Laurent Vivier wrote:
->> Add a new RNG backend using QEMU builtin getrandom function.
->>
->> v7: rebase on master
->>     Make rng-builtin asynchronous with QEMUBH (removed existing R-b)
->>
->> v6: remove "sysemu/rng-random.h" from virtio-rng.c
->>     rebase on qemu_getrandom v8
->>
->> v5: PATCH 1 s/linux/Linux/
->>     remove superfluous includes from rng-builtin.c
->>     don't update rng-random documentation
->>     add a patch from Markus to keep the default backend out of VirtIORNGConf
->>     move TYPE_RNG_BUILTIN to sysemu/rng.h and remove sysemu/rng-builtin.h
->>
->> v4: update PATCH 1 commit message
->>
->> v3: Include Kashyap's patch in the series
->>     Add a patch to change virtio-rng default backend to rng-builtin
->>
->> v2: Update qemu-options.hx
->>     describe the new backend and specify virtio-rng uses the
->>     rng-random by default
->>
->> Kashyap Chamarthy (1):
->>   VirtIO-RNG: Update default entropy source to `/dev/urandom`
->>
->> Laurent Vivier (2):
->>   rng-builtin: add an RNG backend that uses qemu_guest_getrandom()
->>   virtio-rng: change default backend to rng-builtin
->>
->> Markus Armbruster (1):
->>   virtio-rng: Keep the default backend out of VirtIORNGConf
->>
->>  backends/Makefile.objs         |  2 +-
->>  backends/rng-builtin.c         | 77 ++++++++++++++++++++++++++++++++++
->>  backends/rng-random.c          |  2 +-
->>  hw/virtio/virtio-rng.c         | 19 ++++-----
->>  include/hw/virtio/virtio-rng.h |  2 -
->>  include/sysemu/rng.h           |  2 +
->>  qemu-options.hx                |  9 +++-
->>  7 files changed, 97 insertions(+), 16 deletions(-)
->>  create mode 100644 backends/rng-builtin.c
->>
-> 
-> 
+Kind Regards,
 
+Stefan
+
+>
+> r~
 
