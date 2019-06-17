@@ -2,89 +2,91 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 925DCC31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:23:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77F2EC31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:25:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65F9B2085A
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:23:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65F9B2085A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3F12E2085A
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 19:25:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Kql0QhwS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F12E2085A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51444 helo=lists.gnu.org)
+Received: from localhost ([::1]:51466 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcxEB-0001c3-Em
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 15:23:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49295)
+	id 1hcxFi-0003A7-Pi
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 15:25:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44303)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hcxCz-0000ml-BS
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 15:22:26 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hcwub-0007zJ-UO
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 15:03:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hcxCx-0003Vb-JE
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 15:22:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53136)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hcxCx-0003U4-AJ
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 15:22:23 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DEA085D674;
- Mon, 17 Jun 2019 19:22:15 +0000 (UTC)
-Received: from [10.3.118.50] (ovpn-118-50.phx2.redhat.com [10.3.118.50])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CF8F72C16A;
- Mon, 17 Jun 2019 19:22:08 +0000 (UTC)
-To: elena.ufimtseva@oracle.com, qemu-devel@nongnu.org
-References: <20190617181631.30233-1-elena.ufimtseva@oracle.com>
-From: Eric Blake <eblake@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1hcwua-0002jd-Ve
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 15:03:25 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:43518)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hcwua-0002hN-LL
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 15:03:24 -0400
+Received: by mail-pf1-x444.google.com with SMTP id i189so6168328pfg.10
+ for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 12:03:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=iZHzBIb+2T7t0rnvFVP9Ixb3KVylrfKNn21WvVXuJpw=;
+ b=Kql0QhwS5l8zAR9vPZI7vrtQq1OwB8FP8vycgIHYqabKVPPUGprCKXDCBaDejKMYq+
+ +FAId42zOBwxMYPIV33lY4urr4ox0XYjzi6ZqPB3yAQsC6x0Fmaimnzsi24S+SQrhwOU
+ 3clk7KTmJmgKXKv1cWYHgpURFmy3NMaSwBoRWad6znW/SzNWumOFyENtgR0d7WbaRmlP
+ Ic+UlLH+PeeoSj3+54tIMfgpT+L7NG0gTTzBDgtwTZ75PjVLWrYlPUeeK0X2owhenxGx
+ u9pi79gDW+vdUfbmkh/Wp2hIg6pnyWWvoY46AWoSZC+dFHyOCGDayUwYVvNlsnAl2Hpv
+ 2KSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=iZHzBIb+2T7t0rnvFVP9Ixb3KVylrfKNn21WvVXuJpw=;
+ b=O+mJXeTtelPgZo8mvQwAoQj0bnOIQbc/a/gb3w4HGKwN9m1lUlO007RxOvQE+YfHCz
+ VO6HcH2cKqk22zJLm6iO+iUOZ4JeDV+kp/tKHEpu3sXislaZqwK4wQktmgpUM1xtwUU+
+ fFtXgklB4cn1yjtvu/0x6K6nUon/rbSkJIn83zjPvZFE/2DNsi82rULFjAMr2j8SJYkf
+ taA6egifBIOeaLv+Lhz5axWSacaG1LytZn0ypSSlaVgaCd1m7EFuMYi1Nuugrl/m8tpH
+ dfB/zeP7VxGMUZ+T5hcWbKc6HyUp6M6tbGh0jJuPMlQScuAjcxGDZSo4dWG66BWKpM0o
+ S1Ew==
+X-Gm-Message-State: APjAAAUgU1Ue8WdLZZMQjXSIX+iqCMxxYW5H41Xi3g95dX4Q4wT4zpiz
+ kW3slAsQAAvT5F9kMxuSt/Qr+GlzEyo=
+X-Google-Smtp-Source: APXvYqyNDgz9JJ/C7T6ZwRR5SPbfhFATm8W2mur1iqN7gba+ZtgPzBxfuqo+dC/9F24XE2PHK7xgJg==
+X-Received: by 2002:aa7:8dd2:: with SMTP id j18mr45558585pfr.88.1560798183183; 
+ Mon, 17 Jun 2019 12:03:03 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-2-33.tukw.qwest.net. [97.113.2.33])
+ by smtp.gmail.com with ESMTPSA id 128sm13061319pff.16.2019.06.17.12.03.02
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 17 Jun 2019 12:03:02 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20190617160130.3207-1-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <c8e6cb54-4b37-1452-c215-a9e071000635@redhat.com>
-Date: Mon, 17 Jun 2019 14:22:08 -0500
+Message-ID: <ee659698-d2fb-8fd1-dc73-baa7b63a94ba@linaro.org>
+Date: Mon, 17 Jun 2019 12:03:00 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190617181631.30233-1-elena.ufimtseva@oracle.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="il4TMiSFYngXZHfsYAjjayFCjR83qXQjv"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Mon, 17 Jun 2019 19:22:21 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH v2 24/35] multi-process: add
- qdev_proxy_add to create proxy devices
+In-Reply-To: <20190617160130.3207-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Check for dp support for dp
+ VFM, not sp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,91 +98,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: john.g.johnson@oracle.com, jag.raman@oracle.com, konrad.wilk@oracle.com,
- ross.lagerwall@citrix.com, liran.alon@oracle.com, stefanha@redhat.com,
- marcandre.lureau@redhat.com, imammedo@redhat.com, kanth.ghatraju@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---il4TMiSFYngXZHfsYAjjayFCjR83qXQjv
-Content-Type: multipart/mixed; boundary="W9qJcaDOgaG2ovDfufARvayecnG2WJ0IY";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: elena.ufimtseva@oracle.com, qemu-devel@nongnu.org
-Cc: john.g.johnson@oracle.com, jag.raman@oracle.com, konrad.wilk@oracle.com,
- ross.lagerwall@citrix.com, imammedo@redhat.com, liran.alon@oracle.com,
- stefanha@redhat.com, marcandre.lureau@redhat.com, kanth.ghatraju@oracle.com
-Message-ID: <c8e6cb54-4b37-1452-c215-a9e071000635@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 24/35] multi-process: add
- qdev_proxy_add to create proxy devices
-References: <20190617181631.30233-1-elena.ufimtseva@oracle.com>
-In-Reply-To: <20190617181631.30233-1-elena.ufimtseva@oracle.com>
-
---W9qJcaDOgaG2ovDfufARvayecnG2WJ0IY
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 6/17/19 1:16 PM, elena.ufimtseva@oracle.com wrote:
-> From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
->=20
-> This is handled while parsing the command line options.
-> The parsed options are being sent to remote process
-> as the messgaes containing JSON strings.
-
-s/messgaes/messages/
-
->=20
-> Changes in v2:
->  - parse socket and command suboptions of drive/device commands;
-
-The changelog paragraph belongs...
-
->=20
-> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+On 6/17/19 9:01 AM, Peter Maydell wrote:
+> In commit 1120827fa182f0e7622 we accidentally put the
+> "UNDEF unless FPU has double-precision support" check in
+> the single-precision VFM function. Put it in the dp
+> function where it belongs.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
+> I just merged the pullreq with 1120827fa182f0e7622 an hour
+> ago and then I spotted this bug in it...
+> 
+>  target/arm/translate-vfp.inc.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 
-=2E..here, after the --- divider. It is useful to reviewers, but gets
-stripped by 'git am' when the maintainer applies the series. A year from
-now, we won't care how many iterations the patches went through on list,
-only the one version that got committed to git.
+Oops.
 
->  include/hw/proxy/qemu-proxy.h |   7 ++
->  include/monitor/qdev.h        |   5 +
->  qdev-monitor.c                | 166 ++++++++++++++++++++++++++++++++++=
-
->  3 files changed, 178 insertions(+)
->=20
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---W9qJcaDOgaG2ovDfufARvayecnG2WJ0IY--
-
---il4TMiSFYngXZHfsYAjjayFCjR83qXQjv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0H6GAACgkQp6FrSiUn
-Q2pWJQgAiyPiV21AG+nQ4ncj9xO5FXs8NiVkWF4xVGZFr2PP27kZ+V8YvBMH9YkK
-XGj4ezSFMqTDejOhnhgrkxvSmEofyM9pHKmSgDY53wYlefih31nqYOlAtPbe7vg8
-prcvED9IJxuxwawsN96I4o5EKhC1HGLPi7S3myY2rrfpDwllf/79Tq+JzhLaci1C
-YdChg/Ls5xFBdEKD6p+x8QgdbsDjMA+bMjAM/lmOkqM752PIk/VaHCm3u7By/kcb
-hIVuLKslPpzt/dqviu9VHRfQRwgIeE5u62VbTVhvwrXj96kjJo3kxEni4sPmc4Xu
-n0IJApdzxw602SQdBSzpBRy2m2GOpg==
-=T8dH
------END PGP SIGNATURE-----
-
---il4TMiSFYngXZHfsYAjjayFCjR83qXQjv--
+r~
 
