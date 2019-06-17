@@ -2,112 +2,96 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC9B7C31E50
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 13:54:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A601AC31E50
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 13:55:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9E282080C
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 13:54:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ZxuB217E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9E282080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7C1812080C
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 13:55:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C1812080C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47678 helo=lists.gnu.org)
+Received: from localhost ([::1]:47684 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcs5D-0002BY-1P
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 09:54:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33812)
+	id 1hcs6A-0003GU-Ni
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 09:55:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33080)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <rkagan@virtuozzo.com>) id 1hcs0d-0006Fn-Ej
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 09:49:24 -0400
+ (envelope-from <groug@kaod.org>) id 1hcrye-0004Pr-Q5
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 09:47:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rkagan@virtuozzo.com>) id 1hcs0a-0002nq-8X
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 09:49:17 -0400
-Received: from mail-ve1eur01hn0312.outbound.protection.outlook.com
- ([2a01:111:f400:fe1f::312]:14074
- helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+ (envelope-from <groug@kaod.org>) id 1hcrya-0000sA-TY
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 09:47:15 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39702
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
- id 1hcs0X-0002kK-Ee
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 09:49:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KTVR4co0XMyNq13KQZEs1MARWzPK0+KQ1TSuAy4B0eQ=;
- b=ZxuB217EmWA+vgRZHYp8714HhdEYof79fAQr6l3snP6RSgPzdWkN6+3aDgJhACHspUyv1Rvd7VvJlU3ifJj3yKIsmk+UNqIhCADK2s+SHvoHuL8kEh1NZNCjqb+3twStCDBInwG2CAekbau9ekc+Ni64nlZDpM7+RxwaWw7Cj68=
-Received: from DB8PR08MB3977.eurprd08.prod.outlook.com (20.179.11.95) by
- DB8PR08MB4090.eurprd08.prod.outlook.com (20.179.10.208) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1987.11; Mon, 17 Jun 2019 13:49:00 +0000
-Received: from DB8PR08MB3977.eurprd08.prod.outlook.com
- ([fe80::3530:3b13:be7f:2944]) by DB8PR08MB3977.eurprd08.prod.outlook.com
- ([fe80::3530:3b13:be7f:2944%4]) with mapi id 15.20.1987.014; Mon, 17 Jun 2019
- 13:49:00 +0000
-From: Roman Kagan <rkagan@virtuozzo.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Thread-Topic: [PATCH] i386: Fix signedness of hyperv_spinlock_attempts
-Thread-Index: AQHVI7WqVFjrvk1Rm0af2n9zJo17vaaf32UA
-Date: Mon, 17 Jun 2019 13:48:59 +0000
-Message-ID: <20190617134856.GF32624@rkaganb.sw.ru>
-References: <20190615200505.31348-1-ehabkost@redhat.com>
-In-Reply-To: <20190615200505.31348-1-ehabkost@redhat.com>
-Accept-Language: en-US, ru-RU
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mutt/1.11.4 (2019-03-13)
-mail-followup-to: Roman Kagan <rkagan@virtuozzo.com>,	Eduardo Habkost
- <ehabkost@redhat.com>,	Vitaly Kuznetsov <vkuznets@redhat.com>,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson
- <rth@twiddle.net>
-x-originating-ip: [185.231.240.5]
-x-clientproxiedby: HE1PR05CA0350.eurprd05.prod.outlook.com
- (2603:10a6:7:92::45) To DB8PR08MB3977.eurprd08.prod.outlook.com
- (2603:10a6:10:ad::31)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=rkagan@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 1998b48b-f424-4c0f-9b03-08d6f32a8cdb
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:DB8PR08MB4090; 
-x-ms-traffictypediagnostic: DB8PR08MB4090:|DB8PR08MB4090:
-x-microsoft-antispam-prvs: <DB8PR08MB4090851A558CAB7A3930266DC9EB0@DB8PR08MB4090.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
-x-forefront-prvs: 0071BFA85B
-x-forefront-antispam-report: SFV:SPM;
- SFS:(10019020)(346002)(376002)(396003)(39850400004)(366004)(136003)(189003)(199004)(66066001)(8676002)(476003)(2906002)(102836004)(14454004)(256004)(6506007)(386003)(81166006)(73956011)(53936002)(14444005)(66946007)(305945005)(4326008)(11346002)(54906003)(86362001)(58126008)(316002)(186003)(229853002)(3846002)(52116002)(486006)(6916009)(66556008)(1076003)(66476007)(26005)(71200400001)(71190400001)(9686003)(6512007)(6116002)(446003)(7736002)(66446008)(68736007)(81156014)(25786009)(6486002)(33656002)(8936002)(36756003)(5660300002)(6436002)(478600001)(6246003)(99286004)(64756008)(76176011)(30126002);
- DIR:OUT; SFP:1501; SCL:5; SRVR:DB8PR08MB4090;
- H:DB8PR08MB3977.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: DbKZ5ROc0Gm6kxKyYad7yWf9vDeUtD7zsfwbGHGtRFfOwKB9XYjOu588YoiegTkmjqgHNC0d5D4i1XQKNdJxGsPFPCnWDybJ3HyZ8Q4DTNrxR4fOZFrKVPWStBACNLOt/QZ1NrfYjDUEHG74v4nWcerjjBR7aUgQbxQCCaxzels0UtRt16q2l6lTbcebtcAYVzyCsF478PJN1MDumSR/NyqVqzLEz2O2Frgt7Q+wF46TTyO1+MC9LRUq8IdnEKZtYFBIeGxDjVbrxbAEJGj2IoMmrbotm93qOoieOeCpNT7SVc6+2oWUSpINoIEzmcjc+OXUzLr0gRJIYZVOQoZlEc1ceKMRgQaANKm+JKJl5NhmZLHwajdOubWFMIZYHcawKlG3518Lm7IZPyi8ZIQJqNK8UFrkOedZDjWqNctS4DOBw9aSgZOBm/gcpiXKS4woqew9K+tG4Dp3mgMaIF8ufK8rRO+z5pBdzpjw+YZxmNk=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <4C693173E31E804E98BE2A52760FDF2C@eurprd08.prod.outlook.com>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1hcryY-0000pE-Sc
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 09:47:10 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x5HDbTUE113990
+ for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 09:47:08 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2t6bj89m1w-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 09:47:08 -0400
+Received: from localhost
+ by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+ Mon, 17 Jun 2019 14:47:06 +0100
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+ by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Mon, 17 Jun 2019 14:47:04 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id x5HDktEo35717558
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 17 Jun 2019 13:46:55 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B5400A405B;
+ Mon, 17 Jun 2019 13:47:03 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 86C51A4057;
+ Mon, 17 Jun 2019 13:47:03 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.14.35])
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon, 17 Jun 2019 13:47:03 +0000 (GMT)
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Mon, 17 Jun 2019 15:47:03 +0200
+In-Reply-To: <156077918969.433243.1416211899441569578.stgit@bahia.lan>
+References: <156077918969.433243.1416211899441569578.stgit@bahia.lan>
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1998b48b-f424-4c0f-9b03-08d6f32a8cdb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jun 2019 13:48:59.9320 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: rkagan@virtuozzo.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB4090
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe1f::312
-Subject: Re: [Qemu-devel] [PATCH] i386: Fix signedness of
- hyperv_spinlock_attempts
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19061713-0012-0000-0000-00000329DB04
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19061713-0013-0000-0000-00002162F2F0
+Message-Id: <156077922319.433243.609897156640506891.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-06-17_06:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=929 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906170126
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: [Qemu-devel] [PATCH 6/6] xics/kvm: Add proper rollback to
+ xics_kvm_init()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -119,48 +103,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-ppc@nongnu.org, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Jun 15, 2019 at 05:05:05PM -0300, Eduardo Habkost wrote:
-> The current default value for hv-spinlocks is 0xFFFFFFFF (meaning
-> "never retry").  However, the value is stored as a signed
-> integer, making the getter of the hv-spinlocks QOM property
-> return -1 instead of 0xFFFFFFFF.
-> 
-> Fix this by changing the type of X86CPU::hyperv_spinlock_attempts
-> to uint32_t.  This has no visible effect to guest operating
-> systems, affecting just the behavior of the QOM getter.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  target/i386/cpu.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+Make xics_kvm_disconnect() able to undo the changes of a partial execution
+of xics_kvm_connect() and use it to perform rollback.
 
-Reviewed-by: Roman Kagan <rkagan@virtuozzo.com>
+Note that kvmppc_define_rtas_kernel_token(0) never fails, no matter the
+RTAS call has been defined or not.
 
-That said, it's tempting to just nuke qdev_prop_spinlocks and make
-hv-spinlocks a regular DEFINE_PROP_UINT32...
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/intc/xics_kvm.c |   11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-> 
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 0732e059ec..8158d0de73 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1372,7 +1372,7 @@ struct X86CPU {
->  
->      bool hyperv_vapic;
->      bool hyperv_relaxed_timing;
-> -    int hyperv_spinlock_attempts;
-> +    uint32_t hyperv_spinlock_attempts;
->      char *hyperv_vendor_id;
->      bool hyperv_time;
->      bool hyperv_crash;
-> -- 
-> 2.18.0.rc1.1.g3f1ff2140
-> 
+diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+index 4bfbe1a84092..51433b19b076 100644
+--- a/hw/intc/xics_kvm.c
++++ b/hw/intc/xics_kvm.c
+@@ -421,10 +421,7 @@ int xics_kvm_connect(SpaprMachineState *spapr, Error **errp)
+ 
+ fail:
+     error_propagate(errp, local_err);
+-    kvmppc_define_rtas_kernel_token(0, "ibm,set-xive");
+-    kvmppc_define_rtas_kernel_token(0, "ibm,get-xive");
+-    kvmppc_define_rtas_kernel_token(0, "ibm,int-on");
+-    kvmppc_define_rtas_kernel_token(0, "ibm,int-off");
++    xics_kvm_disconnect(spapr, NULL);
+     return -1;
+ }
+ 
+@@ -448,8 +445,10 @@ void xics_kvm_disconnect(SpaprMachineState *spapr, Error **errp)
+      * removed from the list of devices of the VM. The VCPU presenters
+      * are also detached from the device.
+      */
+-    close(kernel_xics_fd);
+-    kernel_xics_fd = -1;
++    if (kernel_xics_fd != -1) {
++        close(kernel_xics_fd);
++        kernel_xics_fd = -1;
++    }
+ 
+     kvmppc_define_rtas_kernel_token(0, "ibm,set-xive");
+     kvmppc_define_rtas_kernel_token(0, "ibm,get-xive");
+
 
