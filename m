@@ -2,92 +2,96 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16ECDC31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:29:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FD3DC31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:29:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E30072084D
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:29:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E30072084D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
+	by mail.kernel.org (Postfix) with ESMTPS id F03F72084D
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:29:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="GCcE6ysN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F03F72084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49118 helo=lists.gnu.org)
+Received: from localhost ([::1]:49130 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcuVH-0001kv-76
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 12:29:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37544)
+	id 1hcuW2-0002xu-53
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 12:29:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56882)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <anthony.perard@citrix.com>) id 1hctlC-00046h-EJ
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:41:31 -0400
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hctH4-00037r-Cg
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:10:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <anthony.perard@citrix.com>) id 1hctlA-0008DA-3x
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:41:30 -0400
-Received: from esa4.hc3370-68.iphmx.com ([216.71.155.144]:62260)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
- id 1hctl2-00082L-Uo
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:41:24 -0400
-Authentication-Results: esa4.hc3370-68.iphmx.com;
- dkim=none (message not signed) header.i=none;
- spf=None smtp.pra=anthony.perard@citrix.com;
- spf=Pass smtp.mailfrom=anthony.perard@citrix.com;
- spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa4.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- anthony.perard@citrix.com) identity=pra;
- client-ip=162.221.158.21; receiver=esa4.hc3370-68.iphmx.com;
- envelope-from="anthony.perard@citrix.com";
- x-sender="anthony.perard@citrix.com";
- x-conformance=sidf_compatible
-Received-SPF: Pass (esa4.hc3370-68.iphmx.com: domain of
- anthony.perard@citrix.com designates 162.221.158.21 as
- permitted sender) identity=mailfrom;
- client-ip=162.221.158.21; receiver=esa4.hc3370-68.iphmx.com;
- envelope-from="anthony.perard@citrix.com";
- x-sender="anthony.perard@citrix.com";
- x-conformance=sidf_compatible; x-record-type="v=spf1";
- x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
- ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
- ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
- ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
-Received-SPF: None (esa4.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- postmaster@mail.citrix.com) identity=helo;
- client-ip=162.221.158.21; receiver=esa4.hc3370-68.iphmx.com;
- envelope-from="anthony.perard@citrix.com";
- x-sender="postmaster@mail.citrix.com";
- x-conformance=sidf_compatible
-IronPort-SDR: m8p7QSPWyD6XAlP0UCvQs8rrSZpRFRITJnOmdhyixFTQF+HI+KTQhyUcxt3Wzbd7aww30IHafu
- PM5jGuamTqsXMfNgjC99ipQShn66hGYE8f+KNXYQGtgGZVaRFmHSrH+ae4Dre9+jkV9DC+LWt6
- JrBm9ctvIIWM+cZRKH8V2TqzoaUlO2KVzqrzfkOrO+e/KOBKtTkpsyAQ1v0P/qHm02McQ3MEwM
- Nhx3hbhykEwGGG6ukfgPV9rLzbAfAVcMH5YwFtVkW2x9S/i9zwxBEBNmVfaxHfFd31t0mJLB6N
- 9Lc=
-X-SBRS: 2.7
-X-MesageID: 1846122
-X-Ironport-Server: esa4.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.63,385,1557201600"; 
-   d="scan'208";a="1846122"
-From: Anthony PERARD <anthony.perard@citrix.com>
-To: <qemu-devel@nongnu.org>
-Date: Mon, 17 Jun 2019 16:41:05 +0100
-Message-ID: <20190617154105.32323-5-anthony.perard@citrix.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190617154105.32323-1-anthony.perard@citrix.com>
-References: <20190617154105.32323-1-anthony.perard@citrix.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 216.71.155.144
-Subject: [Qemu-devel] [PATCH 4/4] xen: Avoid VLA
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hctH3-0001KC-8Y
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:10:22 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:37402)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
+ id 1hctH0-0001Gv-Hu; Mon, 17 Jun 2019 11:10:18 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HF3w3o194656;
+ Mon, 17 Jun 2019 15:10:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
+ bh=7xrUoYOu+9ElvUB5L88vzyRFGdPo+spBEQlM3TkzjbI=;
+ b=GCcE6ysNroabrI5ZmrZk/ajyt8IUOLZq3CTMpSU5CnQYcwc510PzGoKSOGa5x49MUauB
+ 4SYQH/5ASDHmwExp9kFspQtU+eEhw3ivfC7V5K5vNqJfUsMXcMJMV2N7iGJ9gpVZmX7Y
+ st78uMGATUBF2P7hmzIMNLNrlgYSXO5EUHZPSqJmCaP6HZpn6VMIWFq6/EzllS20VbTY
+ ddpNFUJV21jur2jdBpZ8A7sQA2cD6NuOLlh5hZzvZ2JOyXkB+3lJQoFRVL6BsxpeLoEC
+ lEyeYPITeDdzvrb23o6yzAYqda0FNQgfj+CW4UZmAeiFTOk7FRUOk86LIbIpzuV+dCVy XA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2130.oracle.com with ESMTP id 2t4r3tf6v6-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 17 Jun 2019 15:10:16 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HF99ki015861;
+ Mon, 17 Jun 2019 15:10:15 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3030.oracle.com with ESMTP id 2t5cpdgee1-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 17 Jun 2019 15:10:15 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5HFAF0Z020660;
+ Mon, 17 Jun 2019 15:10:15 GMT
+Received: from nexus.ravello.local (/213.57.127.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Mon, 17 Jun 2019 08:10:15 -0700
+From: Sam Eiderman <shmuel.eiderman@oracle.com>
+To: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ mreitz@redhat.com, seabios@seabios.org, kraxel@redhat.com,
+ kevin@koconnor.net
+Date: Mon, 17 Jun 2019 18:09:46 +0300
+Message-Id: <20190617150950.5264-5-shmuel.eiderman@oracle.com>
+X-Mailer: git-send-email 2.13.3
+In-Reply-To: <20190617150950.5264-1-shmuel.eiderman@oracle.com>
+References: <20190617150950.5264-1-shmuel.eiderman@oracle.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=971
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906170136
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906170136
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.86
+Subject: [Qemu-devel] [QEMU] [PATCH v3 4/8] scsi: Propagate unrealize()
+ callback to scsi-hd
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,72 +103,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Stefano Stabellini <sstabellini@kernel.org>,
- Paul Durrant <paul.durrant@citrix.com>
+Cc: liran.alon@oracle.com, shmuel.eiderman@oracle.com, karl.heubaum@oracle.com,
+ arbel.moshe@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Avoid using a variable length array.
+We will need to add LCHS removal logic to scsi-hd's unrealize() in the
+next commit.
 
-Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
+Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
 ---
+ hw/scsi/scsi-bus.c     | 15 +++++++++++++++
+ include/hw/scsi/scsi.h |  1 +
+ 2 files changed, 16 insertions(+)
 
-Notes:
-    Was suggested by Peter here:
-    <CAFEAcA88+A2oCkQnxKDEdpmfCZSmPzWMBg01wDDV68bMZoY5Jg@mail.gmail.com>
-    "should we try to stop using variable length arrays?"
-
- hw/i386/xen/xen-hvm.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
-
-diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index 725f9c2278..10d73b55b4 100644
---- a/hw/i386/xen/xen-hvm.c
-+++ b/hw/i386/xen/xen-hvm.c
-@@ -615,7 +615,8 @@ static void xen_sync_dirty_bitmap(XenIOState *state,
- {
-     hwaddr npages = size >> TARGET_PAGE_BITS;
-     const int width = sizeof(unsigned long) * 8;
--    unsigned long bitmap[DIV_ROUND_UP(npages, width)];
-+    unsigned long *bitmap = NULL;
-+    size_t bitmap_size = DIV_ROUND_UP(npages, width);
-     int rc, i, j;
-     const XenPhysmap *physmap = NULL;
- 
-@@ -632,6 +633,8 @@ static void xen_sync_dirty_bitmap(XenIOState *state,
-         return;
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index c480553083..f6fe497a1a 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -55,6 +55,14 @@ static void scsi_device_realize(SCSIDevice *s, Error **errp)
      }
- 
-+    bitmap = g_new0(unsigned long, bitmap_size);
-+
-     rc = xen_track_dirty_vram(xen_domid, start_addr >> TARGET_PAGE_BITS,
-                               npages, bitmap);
-     if (rc < 0) {
-@@ -644,10 +647,10 @@ static void xen_sync_dirty_bitmap(XenIOState *state,
-                     ", 0x" TARGET_FMT_plx "): %s\n",
-                     start_addr, start_addr + size, strerror(errno));
-         }
--        return;
-+        goto out;
-     }
- 
--    for (i = 0; i < ARRAY_SIZE(bitmap); i++) {
-+    for (i = 0; i < bitmap_size; i++) {
-         unsigned long map = bitmap[i];
-         while (map != 0) {
-             j = ctzl(map);
-@@ -657,6 +660,8 @@ static void xen_sync_dirty_bitmap(XenIOState *state,
-                                     TARGET_PAGE_SIZE);
-         };
-     }
-+out:
-+    g_free(bitmap);
  }
  
- static void xen_log_start(MemoryListener *listener,
++static void scsi_device_unrealize(SCSIDevice *s, Error **errp)
++{
++    SCSIDeviceClass *sc = SCSI_DEVICE_GET_CLASS(s);
++    if (sc->unrealize) {
++        sc->unrealize(s, errp);
++    }
++}
++
+ int scsi_bus_parse_cdb(SCSIDevice *dev, SCSICommand *cmd, uint8_t *buf,
+                        void *hba_private)
+ {
+@@ -213,11 +221,18 @@ static void scsi_qdev_realize(DeviceState *qdev, Error **errp)
+ static void scsi_qdev_unrealize(DeviceState *qdev, Error **errp)
+ {
+     SCSIDevice *dev = SCSI_DEVICE(qdev);
++    Error *local_err = NULL;
+ 
+     if (dev->vmsentry) {
+         qemu_del_vm_change_state_handler(dev->vmsentry);
+     }
+ 
++    scsi_device_unrealize(dev, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
+     scsi_device_purge_requests(dev, SENSE_CODE(NO_SENSE));
+     blockdev_mark_auto_del(dev->conf.blk);
+ }
+diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
+index 426566a5c6..8cf71f910d 100644
+--- a/include/hw/scsi/scsi.h
++++ b/include/hw/scsi/scsi.h
+@@ -59,6 +59,7 @@ struct SCSIRequest {
+ typedef struct SCSIDeviceClass {
+     DeviceClass parent_class;
+     void (*realize)(SCSIDevice *dev, Error **errp);
++    void (*unrealize)(SCSIDevice *dev, Error **errp);
+     int (*parse_cdb)(SCSIDevice *dev, SCSICommand *cmd, uint8_t *buf,
+                      void *hba_private);
+     SCSIRequest *(*alloc_req)(SCSIDevice *s, uint32_t tag, uint32_t lun,
 -- 
-Anthony PERARD
+2.13.3
 
 
