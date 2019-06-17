@@ -2,62 +2,68 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2170C31E57
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 12:51:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E52BBC31E57
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 12:54:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE2C920861
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 12:51:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE2C920861
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id BD6602086A
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 12:54:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD6602086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47178 helo=lists.gnu.org)
+Received: from localhost ([::1]:47202 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcr6l-0004TC-07
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 08:51:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46414)
+	id 1hcr9w-0005u7-VW
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 08:54:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47863)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <groug@kaod.org>) id 1hcr3f-0002ko-W9
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 08:48:25 -0400
+ (envelope-from <kwolf@redhat.com>) id 1hcr9L-0005O6-Mp
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 08:54:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1hcr3e-00055w-G8
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 08:48:23 -0400
-Received: from 5.mo68.mail-out.ovh.net ([46.105.62.179]:53606)
+ (envelope-from <kwolf@redhat.com>) id 1hcr9K-0000oH-NF
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 08:54:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53930)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1hcr3e-00054I-Ai
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 08:48:22 -0400
-Received: from player761.ha.ovh.net (unknown [10.109.159.69])
- by mo68.mail-out.ovh.net (Postfix) with ESMTP id 3CB7E12F5DF
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 14:48:18 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player761.ha.ovh.net (Postfix) with ESMTPSA id 526BF6EE6275;
- Mon, 17 Jun 2019 12:48:13 +0000 (UTC)
-Date: Mon, 17 Jun 2019 14:48:12 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190617144812.63b94658@bahia.lan>
-In-Reply-To: <20190617111205.GA5929@umbus>
-References: <20190612020723.96802-1-aik@ozlabs.ru>
- <20190617102510.341d71a5@bahia.lan> <20190617111205.GA5929@umbus>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1hcr9I-0000lP-Eg; Mon, 17 Jun 2019 08:54:12 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id EEC643082E68;
+ Mon, 17 Jun 2019 12:54:00 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-99.ams2.redhat.com [10.36.117.99])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4072A9F2E8;
+ Mon, 17 Jun 2019 12:53:57 +0000 (UTC)
+Date: Mon, 17 Jun 2019 14:53:55 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Roman Kagan <rkagan@virtuozzo.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com,
+ berrange@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+Message-ID: <20190617125355.GH7397@linux.fritz.box>
+References: <1560276131-683243-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1560276131-683243-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <20190617111504.GC7397@linux.fritz.box>
+ <20190617121855.GB32624@rkaganb.sw.ru>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- boundary="Sig_/fAA0gcrwRJjPJiiBqw.ECwt"; protocol="application/pgp-signature"
-X-Ovh-Tracer-Id: 10093129715404872166
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudeijedgheejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190617121855.GB32624@rkaganb.sw.ru>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Mon, 17 Jun 2019 12:54:06 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.62.179
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH qemu REPOST] spapr/rtas: Force
- big endian compile for rtas
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 2/7] iotests: exclude killed processes
+ from running under Valgrind
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,80 +75,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/fAA0gcrwRJjPJiiBqw.ECwt
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Am 17.06.2019 um 14:18 hat Roman Kagan geschrieben:
+> On Mon, Jun 17, 2019 at 01:15:04PM +0200, Kevin Wolf wrote:
+> > Am 11.06.2019 um 20:02 hat Andrey Shinkevich geschrieben:
+> > > The Valgrind tool fails to manage its termination when QEMU raises the
+> > > signal SIGKILL. Lets exclude such test cases from running under the
+> > > Valgrind because there is no sense to check memory issues that way.
+> > > 
+> > > Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> > 
+> > I don't fully understand the reasoning here. Most interesting memory
+> > access errors happen before a process terminates. (I'm not talking about
+> > leaks here, but use-after-free, buffer overflows, uninitialised memory
+> > etc.)
+> 
+> Nothing of the above, and nothing in general, happens in the usermode
+> process upon SIGKILL delivery.
 
-On Mon, 17 Jun 2019 21:12:05 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+My point is, the interesting part is what the program does before
+SIGKILL happens. There is value in reporting memory errors as long as we
+can, even if the final check doesn't happen because of SIGKILL.
 
-> On Mon, Jun 17, 2019 at 10:25:10AM +0200, Greg Kurz wrote:
-> 65;5603;1c> On Wed, 12 Jun 2019 12:07:23 +1000
-> > Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> >  =20
-> > > At the moment the rtas's Makefile uses generic QEMU rules which means
-> > > that when QEMU is compiled on a little endian system, the spapr-rtas.=
-bin
-> > > is compiled as little endian too which is incorrect as it is always
-> > > executed in big endian mode. =20
-> >=20
-> > I'm naively thinking that executing code compiled as little endian
-> > in big endian mode would result in an exception... Can you explain
-> > how/why this ever worked ? =20
->=20
-> Because basically nobody actually built the rtas blob from the
-> sources, they just used the pre-compiled blob, which is correctly
-> built BE.
->=20
+> > However, I do see that running these test cases with -valgrind ends in a
+> > hang because the valgrind process keeps hanging around as a zombie
+> > process and the test case doesn't reap it. I'm not exactly sure why that
+> > is, but it looks more like a problem with the parent process (i.e. the
+> > bash script).
+> 
+> It rather looks like valgrind getting confused about what to do with
+> raise(SIGKILL) in the multithreaded case.
 
-Ah ! Everyone has been using blob from this pre-ppc64le commit:
+Well, valgrind can't do anything with SIGKILL, obviously, because it's
+killed immediately. But maybe the kernel does get confused for some
+reason. I get the main threads as a zombie, but a second is still
+running. Sending SIGKILL to the second thread, too, makes the test case
+complete successfully.
 
-commit d818bfc5c34c59e9c6d03b3b9983bb5435967292
-Author: Aurelien Jarno <aurelien@aurel32.net>
-Date:   Fri Apr 1 20:04:24 2011 +0200
+So I guess the main question is why the second thread isn't
+automatically killed when the main thread receives SIGKILL.
 
-    pc-bios/spapr-rtas.bin: remove executable flag
-   =20
-    Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
-
-> That said executing LE code in BE mode won't necessarily result in an
-> exception - it'll just execute whatever the instructions are you get
-> when you byte reverse the ones you inteded, which may or may not be
-> valid.  It's *likely* to cause an exception fairly soon, but the
-> opcode space is densely populated enough that there's a good chance it
-> won't cause an immediate illegal instruction.
->=20
-
-In theory yes, but in this precise case, the first instruction of the
-rtas blob is 7c641b78 ('mr r4, r3') and I've manually checked that
-781b647c raises an exception on both POWER8 and POWER9.
-
---Sig_/fAA0gcrwRJjPJiiBqw.ECwt
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl0HjAwACgkQcdTV5YIv
-c9b0UQ//VMFWCqkXE6XPhmah+tTR2B5lOkfanKgPFzv8anecybmtANKuBm3YeY9A
-Zyb+ZHkYyA2grK5HcQgJLHZVnb5WLZMMOgOrf+UzC6qL5vRjXWfci80p6M0mPCIK
-VfVFM1YGZt3AIjWuQFzJGVKm2UQPWpORDF+AeRJDdakTGRnVJOABcIFnGiO6Bwrr
-70nyIxHPIWOmN8Xn/qI9bQ/nZSClJDDkOHqRR7Ji4ocfeQMwRg9OVXjdIFps7CJs
-5XFfcrcESpa257oG0VD6a5bYRNa4LSvzA/hY4FZQGBzUNnrQnTHsRekKJavNuzYl
-cDOiDNWfgkPfXbOQEbu8o2Poevix1Vjq8Tor4Cmmb4M7oBr4mE0i6uibon7xY+08
-8BZyzNhewGT8qhAgvOPAiAbc5bzI9Da70vzUP2vQFIg0prsm7jTeR2qF6TqlQ1WE
-FokqTtCuKFZEr0QzMa74PPWIdQNSjNGlmCgnDzVaLBJNc/bw2eUKHnX9ltnSJYCB
-gHOGji4kRFda4xfDfXQol6EBQTwk32uq5FcmNjwoWt6tqG6pSW5zMuLBRVFsYJ/i
-TVW41HdCqgXeKHSiYW6olBDvqVkZHeh5Len30uK3mGLpZ+a+JhAelzQ4pFUsV+3m
-CfZ6lPEpT2VPkAupshs9rLXyjcju9wPnwlgC7kUvpbNSrCenYFg=
-=aLqq
------END PGP SIGNATURE-----
-
---Sig_/fAA0gcrwRJjPJiiBqw.ECwt--
+Kevin
 
