@@ -2,96 +2,80 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ABB9C31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:15:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94B85C31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:16:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69F21208C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:15:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="UV1/vxkT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69F21208C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6D940208C4
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:16:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D940208C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49002 helo=lists.gnu.org)
+Received: from localhost ([::1]:49010 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcuHo-0007yH-Ln
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 12:15:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56954)
+	id 1hcuIq-00009b-9P
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 12:16:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35426)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <shmuel.eiderman@oracle.com>) id 1hctHB-0003DR-AW
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:10:31 -0400
+ (envelope-from <philmd@redhat.com>) id 1hctdv-0005A4-L9
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:34:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shmuel.eiderman@oracle.com>) id 1hctH6-0001OX-Tj
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:10:27 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:56630)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
- id 1hctH3-0001Jy-Gr; Mon, 17 Jun 2019 11:10:21 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HF3jZT008683;
- Mon, 17 Jun 2019 15:10:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
- bh=LGrComxyqN1TLgk8Bo9iKZ5zTEqxz7KVof3cokKzZBY=;
- b=UV1/vxkTflPpgcGuVroPQl8PEzmYkvG1M8jPI4mNxfvbPRuVZcgu6YvNgqOUq1IfJdnO
- stri79mkHwSrzT1ys49T+VT9J1RyzaqSl6k4dIorU45woIB+XJl/IO6MG/wyJUbHb1RE
- ehihHN6YzzOgLa4rVCUYT1q7zmcu4Sd+e8945J1Xbwk7rxp/vNuP6JN3CdukFh8uW6E8
- NPNFM4NDe5ZnnzD8FeX8duDCwNxhxWmsb9ElCivTYO3G3Ihl76BznuT1Mz+veVjL0W1m
- KGKzkeP05YvLH10idMMQntdIOruEkqua3Puj0gSiLylDmnSA2B/rT1vJ96jdM32vcWe1 tg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2120.oracle.com with ESMTP id 2t4saq73fg-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 17 Jun 2019 15:10:19 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HF99AV015910;
- Mon, 17 Jun 2019 15:10:18 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by aserp3030.oracle.com with ESMTP id 2t5cpdgeew-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 17 Jun 2019 15:10:18 +0000
-Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5HFAIOc025733;
- Mon, 17 Jun 2019 15:10:18 GMT
-Received: from nexus.ravello.local (/213.57.127.2)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 17 Jun 2019 08:10:18 -0700
-From: Sam Eiderman <shmuel.eiderman@oracle.com>
-To: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- mreitz@redhat.com, seabios@seabios.org, kraxel@redhat.com,
- kevin@koconnor.net
-Date: Mon, 17 Jun 2019 18:09:47 +0300
-Message-Id: <20190617150950.5264-6-shmuel.eiderman@oracle.com>
-X-Mailer: git-send-email 2.13.3
-In-Reply-To: <20190617150950.5264-1-shmuel.eiderman@oracle.com>
-References: <20190617150950.5264-1-shmuel.eiderman@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
- signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=889
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906170136
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
- signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=932 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906170136
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.85
-Subject: [Qemu-devel] [QEMU] [PATCH v3 5/8] bootdevice: Gather LCHS from all
- relevant devices
+ (envelope-from <philmd@redhat.com>) id 1hctds-0002GM-KT
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:33:58 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:53589)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hctds-0002FT-BU
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:33:56 -0400
+Received: by mail-wm1-f65.google.com with SMTP id x15so9779020wmj.3
+ for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 08:33:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=9lrRlMIMHEQC4vy/D8lyTESWp6sJBMthgCamSxf4p14=;
+ b=SQs4pQ7un8BbuqyH/Jj4hIl2hbA+g8Tai0J95kbx2GzEiVJYgs3vsZSyj+nf4wmqDm
+ tZX9N7FqNfnu8W8vZoa5tfolf+LtZvGfB6cUJMYOQLHIcs8QoOf1A648PzhSBJsQ1J4v
+ 93sNg01AUzxycSJPhqUgFx6itt15Sz/4s/mwF0ORoWeSJuPb3ELWJPL85HESQMgec1da
+ DH2eFPUWnMbEqcd/wkqf+HE2QRFYX+/PwYwZbmRFfCY32DbEAUSEuwqNCouYIQUh3BwI
+ I48+4pFRL5mCPRiHQOONwNcibMLb+kiXHEi2hwhxZ+bIxc/PVt1RE3VbfqdX7hdfMJpz
+ Qmmg==
+X-Gm-Message-State: APjAAAVazgFW1sWbYun37PHKnhGulrwOfzV1edjWp8E/RRkhA3H8R69M
+ ICl2vYzEMRGO3bINQMoEqyY9aQ==
+X-Google-Smtp-Source: APXvYqxVh+LaPVNZqFbh/L5PbBbUp7MBbTXMew0Efhdsub/O2ii/gQ34TzO9KcFCSSknIunqMeucrw==
+X-Received: by 2002:a1c:9d48:: with SMTP id g69mr16489571wme.31.1560785634770; 
+ Mon, 17 Jun 2019 08:33:54 -0700 (PDT)
+Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.183])
+ by smtp.gmail.com with ESMTPSA id t198sm18650719wmt.2.2019.06.17.08.33.53
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Mon, 17 Jun 2019 08:33:54 -0700 (PDT)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20190531154735.20809-1-philmd@redhat.com>
+ <20190531154735.20809-2-philmd@redhat.com> <878su09r38.fsf@zen.linaroharston>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <ff40b72b-3dc3-2d34-e5e4-5d110247c620@redhat.com>
+Date: Mon, 17 Jun 2019 17:33:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <878su09r38.fsf@zen.linaroharston>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [RFC PATCH 1/2] target/arm: Add stubs to build
+ with CONFIG_SEMIHOSTING disabled
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,123 +87,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liran.alon@oracle.com, shmuel.eiderman@oracle.com, karl.heubaum@oracle.com,
- arbel.moshe@oracle.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Miroslav Rezanina <mrezanin@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Relevant devices are:
-    * ide-hd (and ide-cd, ide-drive)
-    * scsi-hd (and scsi-cd, scsi-disk, scsi-block)
-    * virtio-blk-pci
+On 6/17/19 5:19 PM, Alex Bennée wrote:
+> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
+> 
+>> If a distribution wants to build QEMU without semihosting support,
+>> it currently gets this build failure:
+>>
+>>   $ ./configure --target-list=aarch64-softmmu --without-default-devices
+>>   $ sed -i s/CONFIG_SEMIHOSTING=y/CONFIG_SEMIHOSTING=n/default-configs/arm-softmmu.mak
+> 
+> I'm still not convinced we should be adding support for stuff being done
+> outside the normal build process...
 
-We do not call del_boot_device_lchs() for ide-* since we don't need to -
-IDE block devices do not support unplugging.
+If the "KVM/TCG split" series is accepted, then we can add a
+--disable-tcg job in the list of "normal builds" and we don't need this
+particular patch.
 
-Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
-Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
----
- hw/block/virtio-blk.c |  6 ++++++
- hw/ide/qdev.c         |  5 +++++
- hw/scsi/scsi-disk.c   | 14 ++++++++++++++
- 3 files changed, 25 insertions(+)
+> that said...
+> 
+>>   $ make subdir-aarch64-softmmu
+>>   [...]
+>>     LINK    aarch64-softmmu/qemu-system-aarch64
+>>   /usr/bin/ld: target/arm/arm-semi.o: in function `do_arm_semihosting':
+>>   ./target/arm/arm-semi.c:321: undefined reference to `qemu_semihosting_console_out'
+>>   /usr/bin/ld: ./target/arm/arm-semi.c:318: undefined reference to `qemu_semihosting_console_out'
+>>   collect2: error: ld returned 1 exit status
+>>   make[1]: *** [Makefile:204: qemu-system-aarch64] Error 1
+>>   make: *** [Makefile:472: subdir-aarch64-softmmu] Error 2
+>>
+>> Fix it by providing a stub when semihosting is disabled.
+>>
+>> Reported-by: Miroslav Rezanina <mrezanin@redhat.com>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>>  target/arm/Makefile.objs    |  3 ++-
+>>  target/arm/arm-semi-stubs.c | 21 +++++++++++++++++++++
+>>  2 files changed, 23 insertions(+), 1 deletion(-)
+>>  create mode 100644 target/arm/arm-semi-stubs.c
+>>
+>> diff --git a/target/arm/Makefile.objs b/target/arm/Makefile.objs
+>> index 6bdcc65c2c..39b02b1fa4 100644
+>> --- a/target/arm/Makefile.objs
+>> +++ b/target/arm/Makefile.objs
+>> @@ -1,4 +1,5 @@
+>> -obj-y += arm-semi.o
+>> +obj-$(CONFIG_SEMIHOSTING) += arm-semi.o
+>> +obj-$(call lnot,$(CONFIG_SEMIHOSTING)) += arm-semi-stubs.o
+>>  obj-$(CONFIG_SOFTMMU) += machine.o psci.o arch_dump.o monitor.o
+>>  obj-$(CONFIG_KVM) += kvm.o
+>>  obj-$(call land,$(CONFIG_KVM),$(call lnot,$(TARGET_AARCH64))) += kvm32.o
+>> diff --git a/target/arm/arm-semi-stubs.c b/target/arm/arm-semi-stubs.c
+>> new file mode 100644
+>> index 0000000000..a91ecbd9d5
+>> --- /dev/null
+>> +++ b/target/arm/arm-semi-stubs.c
+>> @@ -0,0 +1,21 @@
+>> +/*
+>> + *  Arm "Angel" semihosting stubs
+>> + *
+>> + * Copyright (c) 2019 Red Hat, Inc.
+>> + *
+>> + * Author:
+>> + *   Philippe Mathieu-Daudé <philmd@redhat.com>
+>> + *
+>> + * SPDX-License-Identifier: GPL-2.0-or-later
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+>> + * See the COPYING file in the top-level directory.
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "cpu.h"
+>> +
+>> +target_ulong do_arm_semihosting(CPUARMState *env)
+>> +{
+>> +    g_assert_not_reached();
+>> +}
+> 
+> Could this not just be added to arm-semi.c in an
+> 
+>   #ifndef CONFIG_SEMIHOSTING
+>   target_ulong do_arm_semihosting(CPUARMState *env)
+>   {
+>       g_assert_not_reached();
+>   }
+>   #else
+>   ... rest of arm-semi.c....
+>   #endif
 
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 06e57a4d39..787bbd768a 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -1182,6 +1182,11 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
-     blk_set_guest_block_size(s->blk, s->conf.conf.logical_block_size);
- 
-     blk_iostatus_enable(s->blk);
-+
-+    add_boot_device_lchs(dev, "/disk@0,0",
-+                         (&conf->conf)->lcyls,
-+                         (&conf->conf)->lheads,
-+                         (&conf->conf)->lsecs);
- }
- 
- static void virtio_blk_device_unrealize(DeviceState *dev, Error **errp)
-@@ -1189,6 +1194,7 @@ static void virtio_blk_device_unrealize(DeviceState *dev, Error **errp)
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VirtIOBlock *s = VIRTIO_BLK(dev);
- 
-+    del_boot_device_lchs(dev, "/disk@0,0");
-     virtio_blk_data_plane_destroy(s->dataplane);
-     s->dataplane = NULL;
-     qemu_del_vm_change_state_handler(s->change);
-diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
-index 9cae3205df..07f429d5e3 100644
---- a/hw/ide/qdev.c
-+++ b/hw/ide/qdev.c
-@@ -215,6 +215,11 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
- 
-     add_boot_device_path(dev->conf.bootindex, &dev->qdev,
-                          dev->unit ? "/disk@1" : "/disk@0");
-+
-+    add_boot_device_lchs(&dev->qdev, dev->unit ? "/disk@1" : "/disk@0",
-+                         (&dev->conf)->lcyls,
-+                         (&dev->conf)->lheads,
-+                         (&dev->conf)->lsecs);
- }
- 
- static void ide_dev_get_bootindex(Object *obj, Visitor *v, const char *name,
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 7b89ac798b..3451aefdea 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -2390,6 +2390,16 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
-     blk_set_guest_block_size(s->qdev.conf.blk, s->qdev.blocksize);
- 
-     blk_iostatus_enable(s->qdev.conf.blk);
-+
-+    add_boot_device_lchs(&dev->qdev, NULL,
-+                         (&dev->conf)->lcyls,
-+                         (&dev->conf)->lheads,
-+                         (&dev->conf)->lsecs);
-+}
-+
-+static void scsi_unrealize(SCSIDevice *dev, Error **errp)
-+{
-+    del_boot_device_lchs(&dev->qdev, NULL);
- }
- 
- static void scsi_hd_realize(SCSIDevice *dev, Error **errp)
-@@ -2988,6 +2998,7 @@ static void scsi_hd_class_initfn(ObjectClass *klass, void *data)
-     SCSIDeviceClass *sc = SCSI_DEVICE_CLASS(klass);
- 
-     sc->realize      = scsi_hd_realize;
-+    sc->unrealize    = scsi_unrealize;
-     sc->alloc_req    = scsi_new_request;
-     sc->unit_attention_reported = scsi_disk_unit_attention_reported;
-     dc->desc = "virtual SCSI disk";
-@@ -3019,6 +3030,7 @@ static void scsi_cd_class_initfn(ObjectClass *klass, void *data)
-     SCSIDeviceClass *sc = SCSI_DEVICE_CLASS(klass);
- 
-     sc->realize      = scsi_cd_realize;
-+    sc->unrealize    = scsi_unrealize;
-     sc->alloc_req    = scsi_new_request;
-     sc->unit_attention_reported = scsi_disk_unit_attention_reported;
-     dc->desc = "virtual SCSI CD-ROM";
-@@ -3054,6 +3066,7 @@ static void scsi_block_class_initfn(ObjectClass *klass, void *data)
-     SCSIDiskClass *sdc = SCSI_DISK_BASE_CLASS(klass);
- 
-     sc->realize      = scsi_block_realize;
-+    sc->unrealize    = scsi_unrealize;
-     sc->alloc_req    = scsi_block_new_request;
-     sc->parse_cdb    = scsi_block_parse_cdb;
-     sdc->dma_readv   = scsi_block_dma_readv;
-@@ -3095,6 +3108,7 @@ static void scsi_disk_class_initfn(ObjectClass *klass, void *data)
-     SCSIDeviceClass *sc = SCSI_DEVICE_CLASS(klass);
- 
-     sc->realize      = scsi_disk_realize;
-+    sc->unrealize    = scsi_unrealize;
-     sc->alloc_req    = scsi_new_request;
-     sc->unit_attention_reported = scsi_disk_unit_attention_reported;
-     dc->fw_name = "disk";
--- 
-2.13.3
+OK, thanks for your reviews!
 
+Phil.
 
