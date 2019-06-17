@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E52CDC31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 18:30:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD29AC31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 18:31:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B40A32084D
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 18:30:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AA1552084D
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 18:31:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="YPFJ+F4D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B40A32084D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="o6EJ/39C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA1552084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50962 helo=lists.gnu.org)
+Received: from localhost ([::1]:50970 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcwOo-0002jD-1H
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 14:30:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58842)
+	id 1hcwPS-0003TF-VP
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 14:31:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58949)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1hcwBR-0005bh-Hx
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:16:48 -0400
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1hcwBW-0005en-OC
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:16:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1hcwBO-00022W-Ky
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:16:45 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:57348)
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1hcwBS-00025S-Mg
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:16:48 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:57448)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1hcwBN-0001vU-Nv
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:16:42 -0400
+ id 1hcwBS-0001ym-AX
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 14:16:46 -0400
 Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HI8krm065843;
- Mon, 17 Jun 2019 18:16:26 GMT
+ by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HI8kVc065846;
+ Mon, 17 Jun 2019 18:16:33 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id; s=corp-2018-07-02;
- bh=LnCxHUpKKe53qjka/nW/IVl2C48b5NGyGGM3Oe5vEt4=;
- b=YPFJ+F4D1bgBa5kb34ZvfznjtbPEE0hfJUDU1OUy7slKVnkydJgZ0DqtMsgP5e6oJXfm
- nX8yUOi5Y/rSlMgE7X0iP/ivsq9vcWCdnzbMO7EIgtSTiImNTcXwQUDo3w3gIq2cHKVG
- WSWVOHfwQzmwyjS+8kQIsuxW19JwliahcLyv361btNcok6eO/GGJqQwFmKCdbI+p9tfn
- Uh2ON5+COazYuO16sVaZgrCqQQMLrZRTohNYdTvOlegSqVmdBl7+n62w4jW++D7mIYiB
- vCRYaYUqU5F17erKSk71q2WG+e9z82KOiXSo3NsbzBYkvhFe2gEQRMmIwbEYO3LP6NPU nw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by aserp2120.oracle.com with ESMTP id 2t4rmp00np-1
+ bh=qHA0XPWNpBUQCEDqLyXVYTH83m+elOu8Ro8OwumTiLs=;
+ b=o6EJ/39CTVnff8SG+xpuzF1gavK09pDx69afZ7YGGL5zNXcEuLJKuMKI8NENCaIj6Gpf
+ r6OBfgc8CzFkDF3KOJ0LzvQ5Mm1VlFCjDiAcutCRK/hSACR18i0k/gub2/Bn6zdxsFeD
+ lj6DZYw68UEU60Nxu8TjSG3H6tKOJXBtYnh1DfkmRhC52en13sSAL3v3ATpdqlWm7QIz
+ D7F7nXawiEjMwtlW/QQLmtRqC5cJMlORYW7Br7pmlHasxsRP3/tW7E6hjINnz+dumEZk
+ O+NPqDQlDkNOpnmR0RBV2kCEeAfshw0gQlAqPvFmWyqHfCmgYGSR5JG5dqyKta2WOt++ kg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by aserp2120.oracle.com with ESMTP id 2t4rmp00pd-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 17 Jun 2019 18:16:26 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HIGPtX181181;
- Mon, 17 Jun 2019 18:16:25 GMT
+ Mon, 17 Jun 2019 18:16:33 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HIF5X8050183;
+ Mon, 17 Jun 2019 18:16:32 GMT
 Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3020.oracle.com with ESMTP id 2t5mgbgayk-1
+ by userp3020.oracle.com with ESMTP id 2t5h5t9ftb-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 17 Jun 2019 18:16:25 +0000
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5HIGNsr025209;
- Mon, 17 Jun 2019 18:16:23 GMT
+ Mon, 17 Jun 2019 18:16:32 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5HIGVAf025270;
+ Mon, 17 Jun 2019 18:16:31 GMT
 Received: from heatpipe.hsd1.ca.comcast.net (/73.170.27.202)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 17 Jun 2019 11:16:22 -0700
+ with ESMTP ; Mon, 17 Jun 2019 18:16:31 +0000
 From: elena.ufimtseva@oracle.com
 To: qemu-devel@nongnu.org
-Date: Mon, 17 Jun 2019 11:16:20 -0700
-Message-Id: <20190617181620.30047-1-elena.ufimtseva@oracle.com>
+Date: Mon, 17 Jun 2019 11:16:29 -0700
+Message-Id: <20190617181629.30187-1-elena.ufimtseva@oracle.com>
 X-Mailer: git-send-email 2.17.1
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
  signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
  malwarescore=0
  phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
@@ -81,14 +81,14 @@ X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
  signatures=668687
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
  priorityscore=1501 malwarescore=0
- suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
  lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
  definitions=main-1906170162
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
 X-Received-From: 141.146.126.78
-Subject: [Qemu-devel] [RFC PATCH v2 20/35] multi-process: Add QMP & extend
- HMP commands to list remote info
+Subject: [Qemu-devel] [RFC PATCH v2 23/35] multi-process: configure remote
+ side devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,230 +101,121 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: elena.ufimtseva@oracle.com, john.g.johnson@oracle.com, jag.raman@oracle.com,
- konrad.wilk@oracle.com, dgilbert@redhat.com, armbru@redhat.com,
- ross.lagerwall@citrix.com, liran.alon@oracle.com, stefanha@redhat.com,
- kanth.ghatraju@oracle.com
+ konrad.wilk@oracle.com, berrange@redhat.com, ross.lagerwall@citrix.com,
+ liran.alon@oracle.com, stefanha@redhat.com, kanth.ghatraju@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jagannathan Raman <jag.raman@oracle.com>
+From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-Add query-remote QMP command and extend "info" HMP command, to list
-the remote objects used by QEMU.
+Add functions to configure remote devices.
 
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 ---
- hmp-commands-info.hx          | 16 +++++++
- hmp.h                         |  1 +
- hw/proxy/Makefile.objs        |  1 +
- hw/proxy/monitor.c            | 88 +++++++++++++++++++++++++++++++++++
- include/hw/proxy/qemu-proxy.h |  1 +
- qapi/block-core.json          | 29 ++++++++++++
- 6 files changed, 136 insertions(+)
- create mode 100644 hw/proxy/monitor.c
+ hw/proxy/qemu-proxy.c         | 38 ++++++++++++++++++++++++++++++++++-
+ include/hw/proxy/qemu-proxy.h |  2 ++
+ include/io/proxy-link.h       |  2 ++
+ 3 files changed, 41 insertions(+), 1 deletion(-)
 
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index c59444c461..b145e755eb 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -932,6 +932,22 @@ STEXI
- Show SEV information.
- ETEXI
+diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
+index c691a05dac..1666cc546e 100644
+--- a/hw/proxy/qemu-proxy.c
++++ b/hw/proxy/qemu-proxy.c
+@@ -51,6 +51,7 @@
+ #include "sysemu/kvm.h"
+ #include "util/event_notifier-posix.c"
+ #include "hw/boards.h"
++#include "include/qemu/log.h"
  
-+#if defined(CONFIG_MPQEMU)
-+    {
-+        .name       = "remote",
-+        .args_type  = "",
-+        .params     = "",
-+        .help       = "list remote objects",
-+        .cmd        = hmp_info_remote,
-+    },
-+
-+STEXI
-+@item remote
-+@findex remote
-+list remote objects.
-+ETEXI
-+#endif
-+
- STEXI
- @end table
- ETEXI
-diff --git a/hmp.h b/hmp.h
-index 43617f2646..6919f99218 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -150,5 +150,6 @@ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
- void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
- void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
- void hmp_info_sev(Monitor *mon, const QDict *qdict);
-+void hmp_info_remote(Monitor *mon, const QDict *qdict);
+ /*
+  * TODO: kvm_vm_ioctl is only available for per-target objects (NEED_CPU_H).
+@@ -60,6 +61,39 @@
+ int kvm_vm_ioctl(KVMState *s, int type, ...);
  
- #endif
-diff --git a/hw/proxy/Makefile.objs b/hw/proxy/Makefile.objs
-index f562f5a0e9..e6420602b8 100644
---- a/hw/proxy/Makefile.objs
-+++ b/hw/proxy/Makefile.objs
-@@ -1,2 +1,3 @@
- common-obj-$(CONFIG_MPQEMU) += qemu-proxy.o
- common-obj-$(CONFIG_MPQEMU) += proxy-lsi53c895a.o
-+common-obj-$(CONFIG_MPQEMU) += monitor.o
-diff --git a/hw/proxy/monitor.c b/hw/proxy/monitor.c
-new file mode 100644
-index 0000000000..694f34a446
---- /dev/null
-+++ b/hw/proxy/monitor.c
-@@ -0,0 +1,88 @@
-+/*
-+ * QEMU monitor command handler for multi-process QEMU
-+ *
-+ * Copyright 2019, Oracle and/or its affiliates.
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
+ static void pci_proxy_dev_realize(PCIDevice *dev, Error **errp);
++static void setup_irqfd(PCIProxyDev *dev);
 +
-+#include <sys/types.h>
-+
-+#include "qemu/osdep.h"
-+#include "qapi/qapi-types-block-core.h"
-+#include "qapi/qapi-commands-block-core.h"
-+#include "monitor/monitor.h"
-+#include "qemu/option.h"
-+#include "hmp.h"
-+#include "hw/boards.h"
-+#include "hw/proxy/qemu-proxy.h"
-+
-+/*
-+ * TODO: Is there a callback where the allocated memory for QMP could be free'd
-+ */
-+RemoteProcList *qmp_query_remote(Error **errp)
++static void proxy_ready(PCIDevice *dev)
 +{
-+    MachineState *ms = MACHINE(current_machine);
-+    RemoteProcList *proclist, *proc;
-+    GHashTableIter itr;
-+    PCIProxyDev *pdev;
-+    PCIProxyDevClass *k;
-+    DeviceState *d;
-+    char *id;
++    PCIProxyDev *pdev = PCI_PROXY_DEV(dev);
 +
-+    proclist = NULL;
-+
-+    g_hash_table_iter_init(&itr, ms->remote_devs);
-+
-+    while (g_hash_table_iter_next(&itr, (gpointer *)&id, (gpointer *)&pdev)) {
-+        k = PCI_PROXY_DEV_GET_CLASS(pdev);
-+        d = DEVICE(pdev);
-+
-+        proc = g_malloc0(sizeof(RemoteProcList));
-+        proc->next = proclist;
-+        proclist = proc;
-+        proc->value = g_malloc0(sizeof(RemoteProc));
-+        proc->value->pid = pdev->remote_pid;
-+        proc->value->id = g_strdup(d->id);
-+        proc->value->proc = g_strdup(k->command);
-+    }
-+
-+    return proclist;
++    setup_irqfd(pdev);
 +}
 +
-+void hmp_info_remote(Monitor *mon, const QDict *qdict)
++static void set_remote_opts(PCIDevice *dev, QDict *qdict, unsigned int cmd)
 +{
-+    MachineState *ms = MACHINE(current_machine);
-+    GHashTableIter itr;
++    QString *qstr;
++    ProcMsg msg;
++    const char *str;
 +    PCIProxyDev *pdev;
-+    PCIProxyDevClass *k;
-+    char *id;
 +
-+    g_hash_table_iter_init(&itr, ms->remote_devs);
++    pdev = PCI_PROXY_DEV(dev);
 +
-+    monitor_printf(mon, "%8.8s\t%16.16s\t%16.16s\t%16.16s\n\n", "PID", "RID",
-+                   "QEMU ID", "PROCESS NAME");
++    qstr = qobject_to_json(QOBJECT(qdict));
++    str = qstring_get_str(qstr);
 +
-+    while (g_hash_table_iter_next(&itr, (gpointer *)&id, (gpointer *)&pdev)) {
-+        k = PCI_PROXY_DEV_GET_CLASS(pdev);
++    memset(&msg, 0, sizeof(ProcMsg));
 +
-+        monitor_printf(mon, "%8.8d\t%16.16s\t%16.16s\t%16.16s\n",
-+                       pdev->remote_pid, pdev->rid, id, k->command);
-+    }
++    msg.data2 = (uint8_t *)str;
++    msg.cmd = cmd;
++    msg.bytestream = 1;
++    msg.size = qstring_get_length(qstr) + 1;
++    msg.num_fds = 0;
++
++    proxy_proc_send(pdev->proxy_link, &msg);
++
++    return;
 +}
+ 
+ int remote_spawn(PCIProxyDev *pdev, const char *command, Error **errp)
+ {
+@@ -292,7 +326,6 @@ static void init_proxy(PCIDevice *dev, char *command, Error **errp)
+ 
+     proxy_link_set_sock(pdev->proxy_link, pdev->rsocket);
+     configure_memory_sync(pdev->sync, pdev->proxy_link);
+-    setup_irqfd(pdev);
+ }
+ 
+ static void pci_proxy_dev_realize(PCIDevice *device, Error **errp)
+@@ -319,6 +352,9 @@ static void pci_proxy_dev_realize(PCIDevice *device, Error **errp)
+     dev->init_proxy = init_proxy;
+     dev->sync = REMOTE_MEM_SYNC(object_new(TYPE_MEMORY_LISTENER));
+ 
++    dev->set_remote_opts = set_remote_opts;
++    dev->proxy_ready = proxy_ready;
++
+ }
+ 
+ static void send_bar_access_msg(ProxyLinkState *proxy_link, MemoryRegion *mr,
 diff --git a/include/hw/proxy/qemu-proxy.h b/include/hw/proxy/qemu-proxy.h
-index c27817f780..b73077940c 100644
+index b73077940c..4e949f778b 100644
 --- a/include/hw/proxy/qemu-proxy.h
 +++ b/include/hw/proxy/qemu-proxy.h
-@@ -27,6 +27,7 @@
- 
- #include "io/proxy-link.h"
+@@ -29,6 +29,8 @@
  #include "hw/proxy/memory-sync.h"
-+#include "hw/pci/pci.h"
+ #include "hw/pci/pci.h"
  #include "qemu/event_notifier.h"
++#include "hw/pci/pci.h"
++#include "block/qdict.h"
  
  #define TYPE_PCI_PROXY_DEV "pci-proxy-dev"
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 7ccbfff9d0..6a0bfe26a2 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -673,6 +673,23 @@
-            '*tray_open': 'bool', '*io-status': 'BlockDeviceIoStatus',
-            '*dirty-bitmaps': ['BlockDirtyInfo'] } }
  
-+##
-+# @RemoteProc:
-+#
-+# Remote process information.
-+#
-+# @id: Device ID
-+#
-+# @pid: Linux Process ID
-+#
-+# @proc: Process name
-+#
-+# Since:  3.0.93
-+##
-+{ 'struct': 'RemoteProc',
-+  'data': {'id': 'str', 'pid': 'int32', 'proc': 'str' },
-+  'if': 'defined(CONFIG_MPQEMU)' }
-+
- ##
- # @BlockMeasureInfo:
- #
-@@ -795,6 +812,18 @@
- ##
- { 'command': 'query-block', 'returns': ['BlockInfo'] }
- 
-+##
-+# @query-remote:
-+#
-+# Get a list of all the remote processes spawned by QEMU.
-+#
-+# Returns: a list of @RemoteProc describing each remote process.
-+#
-+# Since: 3.0.93
-+#
-+##
-+{ 'command': 'query-remote', 'returns': ['RemoteProc'],
-+  'if': 'defined(CONFIG_MPQEMU)' }
- 
- ##
- # @BlockDeviceTimedStats:
+diff --git a/include/io/proxy-link.h b/include/io/proxy-link.h
+index bf2555c97e..38bd80535a 100644
+--- a/include/io/proxy-link.h
++++ b/include/io/proxy-link.h
+@@ -72,6 +72,8 @@ typedef enum {
+     BAR_WRITE,
+     BAR_READ,
+     SET_IRQFD,
++    DEV_OPTS,
++    DRIVE_OPTS,
+     DEVICE_ADD,
+     DEVICE_DEL,
+     MAX,
 -- 
 2.17.1
 
