@@ -7,86 +7,86 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F497C31E57
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 10:04:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DE64C31E57
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 10:04:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D04BC20833
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 10:04:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 48C6220833
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 10:04:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mwx2uxnd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D04BC20833
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="raPILevP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48C6220833
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45720 helo=lists.gnu.org)
+Received: from localhost ([::1]:45722 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcoUs-0006Dg-11
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 06:04:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34183)
+	id 1hcoVG-0006L7-Hg
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 06:04:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34484)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hcoQx-0003nJ-3C
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 06:00:16 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hcoSX-0004pL-Bg
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 06:02:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hcoQu-0005Hq-UM
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 06:00:14 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:53532)
+ (envelope-from <alex.bennee@linaro.org>) id 1hcoSS-0006ct-1n
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 06:01:52 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36066)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hcoQt-0005Ey-04
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 06:00:11 -0400
-Received: by mail-wm1-x344.google.com with SMTP id x15so8559210wmj.3
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 03:00:10 -0700 (PDT)
+ id 1hcoSQ-0006ax-9d
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 06:01:47 -0400
+Received: by mail-wm1-x343.google.com with SMTP id u8so8408752wmm.1
+ for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 03:01:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=USAMscVYg90cUyhJdMd4+GvTc6Htx/N5gCAcAOWkTq4=;
- b=mwx2uxndGvVBv7OTzctYCw/gjKXmu8VLNw3yWsnNRE1PtH7Tbb/GpMJDqBxnYAltJD
- rlTT6Aji3seItiFgQvWA1g4xsJ0BSw8id6mmgmUA8R5fPtQr1ZpSvaGe/al7IzElWsK+
- rePIwIDDaLGSuIton+xPIq6+OjxbE45RtgDPfD3jB/l9HVwxHsXwPFRisMPeZUzKogAM
- +lzXf5NIyQgYnxPTH5Yj1HxQ+mUWScWX6i849/gFfr+esHjXk3WWkLjzrRLUbLYqToBh
- spTr/EZktnbPYd/GZwKq7mKkCapaVwmURENtINT8GHBnz1lGlYXZ5Llu1PZh6w5bbtE9
- zjFg==
+ bh=NFutvvR5LuLvTE87745Aytjigi3UuLydf7sSIZ4qTbc=;
+ b=raPILevPD5Q58k4Ph0exLK6GEvjd3r4YDhyoLir5B1DKzphUjnANxnOSC5/4HmMIMB
+ FwKfRBvPTMUm+iG7awDoTSKqR4w6SfhET6Q1ygUdXiOU/D8jg69gyOaCkvXMDmiy4x5Y
+ 73FMmDeQ5vDX0UitRCunpAXWE3kvFviMKHjQq1XhtoaksfBFREyEysZW5cWgunPVTIdM
+ PuEFSl6kLBK9AIzO2pLlplmKBta54q3XatnoYurkcN1YuwqRsI8vevOvWoJ+rr2c4/Oh
+ cw5KXlT6qHuTrbBjpuuJLGGixXzMfcIZfdY89pL4rgojtXFbgCk2Ugxzck/a6wZINueD
+ BSbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=USAMscVYg90cUyhJdMd4+GvTc6Htx/N5gCAcAOWkTq4=;
- b=agyj7FSF3a2OOv858Y5Jz3fv7jaEcYkFLZbQU077dnosWcEOlvYAnXbEfhE2T34sSJ
- s4oE8zh0kEKxTiHl+t6rY/CISQJ+wMuLTr/e8dvIS4zN5k8EcreW2ZWSpSaESg0hQdFS
- jbSKJC9XZXQbO0srSOmULPo81WKoE/y+JLubnHY306A6kqDYfb/hVtGRQoJMEfaF6hmR
- 1ca/kxTDlA5HmYsAd3xHYZr5E39aoKkQfypMyzdVhQeypfAUXaisQwlFinC/TQmobCrw
- 2Q7RKTPsHaiz961vzebUWb7IZoMnmoP/zygHJNHmE6YoCiHRkKdrt+EX+UTWLygQ2tYE
- OHkw==
-X-Gm-Message-State: APjAAAUUDV75S4Lx6VZzKL7dMSnpVkpwb6A4/vJVtPBLYl1PMbOtya7x
- 8T2auDUw0PiVHubyPb+Dkcz2DQ==
-X-Google-Smtp-Source: APXvYqy0xdJGHsGbRygsSzQm8+CYkXbbUIRFytCfcdNNdT+dsc4+JchuzxF8cNGrHnJUP+YinUopTQ==
-X-Received: by 2002:a1c:8049:: with SMTP id b70mr17370449wmd.33.1560765608690; 
- Mon, 17 Jun 2019 03:00:08 -0700 (PDT)
+ bh=NFutvvR5LuLvTE87745Aytjigi3UuLydf7sSIZ4qTbc=;
+ b=cVjQlQd2pwD0yO6osrMyrzec5OHkL0J7ZvV8dmI9wgWniRDR2Wgo6qBeGSIUxgBpOV
+ 1iI8567Nxul3xJbBDT3xnojitkRoy+W5Q2RfuM9cI34aIYhhgHiawd5i9/HH4pXHGJir
+ p640Jni21Jv1RFp8yEkh8C/4ntkkAuLtwzKv/AZXmAjciZrUoK1xxPK1pfvjae8kLNzK
+ jQNkxqtTo6Ipg13PthB8HBpfA6O5GadXktnSfH+Hal/vRSPoeHcHDULgUy4xg47qGxF5
+ xu1F8gWkVX9eJbTcEUvAcx+WcXlqIPFJDudUnGlht7be8zIXwhQrfB9Vv9IG4Tu2ZMr6
+ JMZg==
+X-Gm-Message-State: APjAAAWLzaEQXjOHD0tVnNe7ahQWheQQmC40xNiQWelR0k/34s9XmxjG
+ Ck9HY3GsY13IH1OMRxZcM2WxzA==
+X-Google-Smtp-Source: APXvYqxjnZxxNvUJYW9GqDkS7M9O107DPSUbOrpx864PucEQyS5mf1v4IJ590PjTJBoCneyPlDzbMg==
+X-Received: by 2002:a1c:700b:: with SMTP id l11mr17897906wmc.106.1560765704795; 
+ Mon, 17 Jun 2019 03:01:44 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id j18sm12413316wre.23.2019.06.17.03.00.07
+ by smtp.gmail.com with ESMTPSA id e21sm11325637wra.27.2019.06.17.03.01.43
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 17 Jun 2019 03:00:08 -0700 (PDT)
+ Mon, 17 Jun 2019 03:01:43 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 8A9EC1FF87;
- Mon, 17 Jun 2019 11:00:07 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 856071FF87;
+ Mon, 17 Jun 2019 11:01:43 +0100 (BST)
 References: <20190614135332.12777-1-vandersonmr2@gmail.com>
- <20190614135332.12777-3-vandersonmr2@gmail.com>
+ <20190614135332.12777-2-vandersonmr2@gmail.com>
 User-agent: mu4e 1.3.2; emacs 26.1
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-In-reply-to: <20190614135332.12777-3-vandersonmr2@gmail.com>
-Date: Mon, 17 Jun 2019 11:00:07 +0100
-Message-ID: <87k1dkbkgo.fsf@zen.linaroharston>
+In-reply-to: <20190614135332.12777-2-vandersonmr2@gmail.com>
+Date: Mon, 17 Jun 2019 11:01:43 +0100
+Message-ID: <87imt4bke0.fsf@zen.linaroharston>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: Re: [Qemu-devel] [Qemu-Devel][PATCH 2/3] Saving counters between
- tb_flush events.
+X-Received-From: 2a00:1450:4864:20::343
+Subject: Re: [Qemu-devel] [Qemu-Devel][PATCH 1/3] Adding an optional tb
+ execution counter.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,253 +98,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, vandersonmr <vandersonmr2@gmail.com>,
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ vandersonmr <vandersonmr2@gmail.com>, Laurent Vivier <laurent@vivier.eu>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+[repeat of reply to wrong email...]
+
 vandersonmr <vandersonmr2@gmail.com> writes:
 
-> A new hash map was added to store the accumulated execution
-> frequency of the TBs even after tb_flush events. A dump
-> function was also added as a way to visualize these frequencies.
+> An uint64_t counter was added in the TranslationBlock struct and
+> it is incremented every time that the TB is executed.
 >
 > Signed-off-by: vandersonmr <vandersonmr2@gmail.com>
-
-I forgot to mention the formatting looks a little off here. It should be
-your full name (accents and all) before the email address, e.g:
-
-  Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
 > ---
->  accel/tcg/translate-all.c | 59 +++++++++++++++++++++++++++++++++++++++
->  accel/tcg/translate-all.h |  2 ++
->  exec.c                    |  7 +++++
->  include/exec/exec-all.h   |  3 ++
->  include/exec/tb-context.h |  9 ++++++
->  include/qom/cpu.h         |  2 ++
->  6 files changed, 82 insertions(+)
+>  accel/tcg/tcg-runtime.c   | 6 ++++++
+>  accel/tcg/tcg-runtime.h   | 2 ++
+>  include/exec/exec-all.h   | 1 +
+>  include/exec/gen-icount.h | 7 +++++++
+>  linux-user/main.c         | 1 +
+>  vl.c                      | 1 +
+>  6 files changed, 18 insertions(+)
 >
-> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index 5d1e08b169..0bc670ffad 100644
-> --- a/accel/tcg/translate-all.c
-> +++ b/accel/tcg/translate-all.c
-> @@ -1118,6 +1118,12 @@ static inline void code_gen_alloc(size_t tb_size)
->      }
->  }
->
-> +static bool statistics_cmp(const void* ap, const void *bp) {
-> +    const TBStatistics *a =3D ap;
-> +    const TBStatistics *b =3D bp;
-> +    return a->pc =3D=3D b->pc && a->cs_base =3D=3D b->cs_base && a->flag=
-s =3D=3D
-> b->flags;
-
-Looking at tb_cmp() bellow this I wonder if we should also take into
-account the page_address values. Some TB's will be translated over a
-page boundary and in theory that can change with new mappings so we need
-to ensure they are really equivalent.
-
-> +}
-> +
->  static bool tb_cmp(const void *ap, const void *bp)
+> diff --git a/accel/tcg/tcg-runtime.c b/accel/tcg/tcg-runtime.c
+> index 8a1e408e31..d1f4127d31 100644
+> --- a/accel/tcg/tcg-runtime.c
+> +++ b/accel/tcg/tcg-runtime.c
+> @@ -167,3 +167,9 @@ void HELPER(exit_atomic)(CPUArchState *env)
 >  {
->      const TranslationBlock *a =3D ap;
-> @@ -1137,6 +1143,7 @@ static void tb_htable_init(void)
->      unsigned int mode =3D QHT_MODE_AUTO_RESIZE;
->
->      qht_init(&tb_ctx.htable, tb_cmp, CODE_GEN_HTABLE_SIZE, mode);
-> +    qht_init(&tb_ctx.tb_statistics, statistics_cmp, CODE_GEN_HTABLE_SIZE=
-, QHT_MODE_AUTO_RESIZE);
+>      cpu_loop_exit_atomic(env_cpu(env), GETPC());
 >  }
->
->  /* Must be called before using the QEMU cpus. 'tb_size' is the size
-> @@ -1228,6 +1235,53 @@ static gboolean tb_host_size_iter(gpointer key, gp=
-ointer value, gpointer data)
->      return false;
->  }
->
-> +static void do_tb_dump_exec_freq(void *p, uint32_t hash, void *userp)
+> +
+> +void HELPER(inc_exec_freq)(void *ptr)
 > +{
-> +#if TARGET_LONG_SIZE =3D=3D 8
-> +    TBStatistics *tbs =3D p;
-> +    printf("%016lx\t%lu\n", tbs->pc, tbs->total_exec_freq);
-> +#elif TARGET_LONG_SIZE =3D=3D 4
-> +    TBStatistics *tbs =3D p;
-> +    printf("%016x\t%lu\n", tbs->pc, tbs->total_exec_freq);
-> +#endif
+> +    TranslationBlock* tb =3D (TranslationBlock*) ptr;
+> +    atomic_inc(&tb->exec_freq);
 > +}
-
-This will need some fixing up so deal with output to the HMP monitor. We
-don't want to be directly spamming stdout with results.
-
-> +
-> +void tb_dump_all_exec_freq(void)
-> +{
-> +    tb_read_exec_freq();
-> +    qht_iter(&tb_ctx.tb_statistics, do_tb_dump_exec_freq, NULL);
-> +}
-
-I would be tempted to insert these into a sorted GList first so we can
-dump the first N hotblocks.
-
-> +
-> +static void do_tb_read_exec_freq(void *p, uint32_t hash, void *userp)
-> +{
-> +    TranslationBlock *tb =3D p;
-> +    TBStatistics tbscmp;
-> +    tbscmp.pc =3D tb->pc;
-> +    tbscmp.cs_base =3D tb->cs_base;
-> +    tbscmp.flags =3D tb->flags;
-> +
-> +    TBStatistics *tbs =3D qht_lookup(userp, &tbscmp, hash);
-> +
-> +    uint64_t exec_freq =3D tb_get_and_reset_exec_freq((TranslationBlock*=
-) p);
-> +
-> +    if (tbs) {
-> +        tbs->total_exec_freq +=3D exec_freq;
-> +    } else {
-> +        void *existing;
-> +        tbs =3D malloc(sizeof(TBStatistics));
-
-use g_new0(TBStatistics, 1)
-
-> +        tbs->total_exec_freq =3D exec_freq;
-> +        tbs->pc =3D tb->pc;
-> +        tbs->cs_base =3D tb->cs_base;
-> +        tbs->flags =3D tb->flags;
-> +        qht_insert(userp, tbs, hash, &existing);
-> +    }
-> +}
-> +
-
-Comment here about what we are doing? Maybe tb_copy_old_counts()?
-
-> +void tb_read_exec_freq(void)
-> +{
-> +    qht_iter(&tb_ctx.htable, do_tb_read_exec_freq, &tb_ctx.tb_statistics=
-);
-> +}
-> +
->  /* flush all the translation blocks */
->  static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
->  {
-> @@ -1252,6 +1306,10 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_=
-data tb_flush_count)
->          cpu_tb_jmp_cache_clear(cpu);
->      }
+> diff --git a/accel/tcg/tcg-runtime.h b/accel/tcg/tcg-runtime.h
+> index 4fa61b49b4..bf0b75dbe8 100644
+> --- a/accel/tcg/tcg-runtime.h
+> +++ b/accel/tcg/tcg-runtime.h
+> @@ -28,6 +28,8 @@ DEF_HELPER_FLAGS_1(lookup_tb_ptr, TCG_CALL_NO_WG_SE, pt=
+r, env)
 >
-> +    if (enable_freq_count) {
-> +        tb_read_exec_freq();
-> +    }
+>  DEF_HELPER_FLAGS_1(exit_atomic, TCG_CALL_NO_WG, noreturn, env)
+>
+> +DEF_HELPER_FLAGS_1(inc_exec_freq, TCG_CALL_NO_RWG, void, ptr)
 > +
->      qht_reset_size(&tb_ctx.htable, CODE_GEN_HTABLE_SIZE);
->      page_flush_tb();
+>  #ifdef CONFIG_SOFTMMU
 >
-> @@ -1723,6 +1781,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
->      tb->flags =3D flags;
->      tb->cflags =3D cflags;
->      tb->trace_vcpu_dstate =3D *cpu->trace_dstate;
-> +    tb->exec_freq =3D 0;
->      tcg_ctx->tb_cflags =3D cflags;
->   tb_overflow:
->
-> diff --git a/accel/tcg/translate-all.h b/accel/tcg/translate-all.h
-> index 64f5fd9a05..e13088c36d 100644
-> --- a/accel/tcg/translate-all.h
-> +++ b/accel/tcg/translate-all.h
-> @@ -32,6 +32,8 @@ void tb_invalidate_phys_page_range(tb_page_addr_t start=
-, tb_page_addr_t end,
->                                     int is_cpu_write_access);
->  void tb_check_watchpoint(CPUState *cpu);
->
-> +extern bool enable_freq_count;
-> +
->  #ifdef CONFIG_USER_ONLY
->  int page_unprotect(target_ulong address, uintptr_t pc);
->  #endif
-> diff --git a/exec.c b/exec.c
-> index e7622d1956..9b64a012ee 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -1013,6 +1013,13 @@ const char *parse_cpu_option(const char *cpu_optio=
-n)
->      return cpu_type;
->  }
->
-> +uint64_t tb_get_and_reset_exec_freq(TranslationBlock *tb)
-> +{
-> +    uint64_t exec_freq =3D atomic_load_acquire(&tb->exec_freq);
-> +    atomic_store_release(&tb->exec_freq, 0);
-
-I'm not sure you need acquire/release semantics here as you are only
-reading this in an exclusive period when all in-flight updates should
-be synced (locks are implicit barriers). Folding this up into
-do_tb_read_exec_freq might make this clearer.
-
-> +    return exec_freq;
-> +}
-> +
->  #if defined(CONFIG_USER_ONLY)
->  void tb_invalidate_phys_addr(target_ulong addr)
->  {
+>  DEF_HELPER_FLAGS_5(atomic_cmpxchgb, TCG_CALL_NO_WG,
 > diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-> index a80407622e..5d3d829d18 100644
+> index 16034ee651..a80407622e 100644
 > --- a/include/exec/exec-all.h
 > +++ b/include/exec/exec-all.h
-> @@ -513,4 +513,7 @@ hwaddr memory_region_section_get_iotlb(CPUState *cpu,
->  /* vl.c */
->  extern int singlestep;
->
-> +void tb_read_exec_freq(void);
-> +void tb_dump_all_exec_freq(void);
-> +
->  #endif
-> diff --git a/include/exec/tb-context.h b/include/exec/tb-context.h
-> index feb585e0a7..ba518d47a0 100644
-> --- a/include/exec/tb-context.h
-> +++ b/include/exec/tb-context.h
-> @@ -28,6 +28,14 @@
->
->  typedef struct TranslationBlock TranslationBlock;
->  typedef struct TBContext TBContext;
-> +typedef struct TBStatistics TBStatistics;
-> +
-> +struct TBStatistics {
-> +    target_ulong pc;
-> +    target_ulong cs_base;
-> +    uint32_t flags;
-> +    uint64_t total_exec_freq;
-> +};
->
->  struct TBContext {
->
-> @@ -35,6 +43,7 @@ struct TBContext {
->
->      /* statistics */
->      unsigned tb_flush_count;
-> +    struct qht tb_statistics;
->  };
->
->  extern TBContext tb_ctx;
-> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-> index 5ee0046b62..593c1f1137 100644
-> --- a/include/qom/cpu.h
-> +++ b/include/qom/cpu.h
-> @@ -474,6 +474,8 @@ static inline void cpu_tb_jmp_cache_clear(CPUState *c=
-pu)
->      }
->  }
->
-> +uint64_t tb_get_and_reset_exec_freq(struct TranslationBlock*);
-> +
->  /**
->   * qemu_tcg_mttcg_enabled:
->   * Check whether we are running MultiThread TCG or not.
+> @@ -342,6 +342,7 @@ struct TranslationBlock {
+>      uint32_t flags; /* flags defining in which context the code was gene=
+rated */
+>      uint16_t size;      /* size of target code for this block (1 <=3D
+>                             size <=3D TARGET_PAGE_SIZE) */
+> +    uint64_t exec_freq;
 
+Maybe exec_count would be more correct. Frequency occurs over a given
+time. Also a single line comment would be useful.
+
+>      uint16_t icount;
+>      uint32_t cflags;    /* compile flags */
+>  #define CF_COUNT_MASK  0x00007fff
+> diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
+> index f7669b6841..a540d12005 100644
+> --- a/include/exec/gen-icount.h
+> +++ b/include/exec/gen-icount.h
+> @@ -6,11 +6,18 @@
+>  /* Helpers for instruction counting code generation.  */
+>
+>  static TCGOp *icount_start_insn;
+> +extern bool enable_freq_count;
+>
+>  static inline void gen_tb_start(TranslationBlock *tb)
+>  {
+>      TCGv_i32 count, imm;
+>
+> +    if (enable_freq_count) {
+> +        TCGv_ptr tb_ptr =3D tcg_temp_new_ptr();
+> +        tcg_gen_trunc_i64_ptr(tb_ptr, tcg_const_i64((int64_t) tb));
+
+TIL: tcg_const_ptr which elides the details of casting to a TCGv_ptr on
+32 and 64 bit hosts. So:
+
+    TCGv_ptr tb_ptr =3D tcg_const_ptr(tb);
+    gen_helper_inc_exec_freq(tb_ptr);
+    tcg_temp_free_ptr(tb_ptr);
+
+(don't forget to free temporaries once used, otherwise the translator
+will keep tracking them. This should show up in a --enable-debug-tcg build).
+
+
+> +        gen_helper_inc_exec_freq(tb_ptr);
+> +    }
+> +
+
+I think we should move the counter bellow the icount check otherwise we
+might be counting TB's that never execute because an IRQ was pending.
+
+>      tcg_ctx->exitreq_label =3D gen_new_label();
+>      if (tb_cflags(tb) & CF_USE_ICOUNT) {
+>          count =3D tcg_temp_local_new_i32();
+> diff --git a/linux-user/main.c b/linux-user/main.c
+> index a59ae9439d..1bf7155670 100644
+> --- a/linux-user/main.c
+> +++ b/linux-user/main.c
+> @@ -58,6 +58,7 @@ static const char *seed_optarg;
+>  unsigned long mmap_min_addr;
+>  unsigned long guest_base;
+>  int have_guest_base;
+> +bool enable_freq_count =3D false;
+>
+>  /*
+>   * When running 32-on-64 we should make sure we can fit all of the possi=
+ble
+> diff --git a/vl.c b/vl.c
+> index 005468cbfb..cb6c0ad63d 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -190,6 +190,7 @@ bool boot_strict;
+>  uint8_t *boot_splash_filedata;
+>  int only_migratable; /* turn it off unless user states otherwise */
+>  bool wakeup_suspend_enabled;
+> +bool enable_freq_count =3D false;
+
+We only need the space allocated once in common code. Maybe
+accel/tcg/translator.c?
+
+Also you don't need to initialise to false (=3D=3D 0 =3D=3D initial bss set=
+ting).
+
+>
+>  int icount_align_option;
 
 --
 Alex Benn=C3=A9e
