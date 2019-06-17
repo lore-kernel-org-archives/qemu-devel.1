@@ -2,91 +2,61 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46B6DC31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 15:22:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DE93C31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 15:23:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 124E42064A
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 15:22:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xNKMuaO4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 124E42064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4639B20833
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 15:23:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4639B20833
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48412 helo=lists.gnu.org)
+Received: from localhost ([::1]:48434 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hctT3-0007z0-76
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 11:22:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51420)
+	id 1hctUE-0001j2-50
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 11:23:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47233)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hcsxd-00021O-KA
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:50:25 -0400
+ (envelope-from <kbastian@mail.uni-paderborn.de>) id 1hcsjk-0004rD-Fv
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:35:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hcsxc-0002hQ-GL
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:50:17 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:34923)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hcsxc-0002gn-5y
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:50:16 -0400
-Received: by mail-wm1-x342.google.com with SMTP id c6so9449060wml.0
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 07:50:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=g8hI03drj9LBB6MPiVcpYjLLW+652AYjuNfh+Ht7kZg=;
- b=xNKMuaO43x4GqpMSL6d4jP5JjrhttR4BnVNgexqkTgj4FzKinqMUJRO9FUruC3eWza
- WSMVTvpuriWtnPu8lRqlsxcXGexKf0sSCT4HjA2auMQByVSvK7ndkEaexsKKTxel+KQq
- KN8+szo5om3aUYmEZ19S/XhP//1jixDiDj0APtFVtOHClpZDheWEACKdTpOlCkzOjsNA
- c5JNZlc8XBabUQTEjz2QSKIOdFyu7ZTn6wLapOq9laz+Lx0D0gQLadxv5wmPhTqUuh4L
- 6pkQc8f4m25+vnulRB4/kgu4AXU1TU35F6mtnwv8D6CFYB8uN6cRMuVdC3cI/f//11bW
- rF8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=g8hI03drj9LBB6MPiVcpYjLLW+652AYjuNfh+Ht7kZg=;
- b=W4YUl+2g76533xsp/OjWCDhs/SspOp79EhkhUeDcsc94n/M8OVJkiHlvNP8WVSyMRB
- O6Bdz14hJJLTo1/3tTPnzNUXil7MCYQuCicjkz0ZHhikXKuVEmqKQLcNDEc1BVFYY6yP
- +O0HfFoCPAbpHOQ9moDvMrrFFgr7yXzdE5T07pHCGpRHsPKdDS6jUw+psXoOJ2tloVpp
- De9BInEUe9G6pdaPauphxqm4sfyrWqj3YN1II93LWAK0Pa3JhnoU6SZVCQlQcHX2SiyM
- klyOGtUbYQt0QmhiYFkNt9H7OCkrorV0yumemcnFnnQelYJ1TZoOvIxvlgcWYU8AcD3A
- ugRg==
-X-Gm-Message-State: APjAAAVTa63TsLSk7GRiVkBhB1gtp/SCb1E3H8g9e5hhyolbTSQ9BEoH
- 14WcB8P3V5JjyVgcwhZxvkeK+A==
-X-Google-Smtp-Source: APXvYqz9nJpc2K7MO3NAtpivuvzsvEXmhCwKWf00tON3zT/SPwebH0zSDsowsXacq5noERW6miZlfA==
-X-Received: by 2002:a1c:9813:: with SMTP id a19mr18721364wme.11.1560783015132; 
- Mon, 17 Jun 2019 07:50:15 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id s10sm14667254wmf.8.2019.06.17.07.50.14
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 17 Jun 2019 07:50:14 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 4903B1FF87;
- Mon, 17 Jun 2019 15:50:14 +0100 (BST)
-References: <20190615154352.26824-1-philmd@redhat.com>
- <20190615154352.26824-21-philmd@redhat.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+ (envelope-from <kbastian@mail.uni-paderborn.de>) id 1hcsjj-0000bI-6a
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:35:56 -0400
+Received: from amazonia.uni-paderborn.de ([131.234.189.15]:34308)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+ id 1hcsji-0000as-W1
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:35:55 -0400
+Received: from magmaria.uni-paderborn.de ([131.234.189.24]
+ helo=localhost.localdomain)
+ by mail.uni-paderborn.de with esmtp (Exim 4.89 amazonia)
+ id 1hcsjh-0000Jd-7m; Mon, 17 Jun 2019 16:35:53 +0200
+Received: from mail.uni-paderborn.de by magmaria with queue id 3427224-3;
+ Mon, 17 Jun 2019 14:35:51 GMT
+X-Envelope-From: <kbastian@mail.uni-paderborn.de>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 To: qemu-devel@nongnu.org
-In-reply-to: <20190615154352.26824-21-philmd@redhat.com>
-Date: Mon, 17 Jun 2019 15:50:14 +0100
-Message-ID: <87d0jc9sgp.fsf@zen.linaroharston>
+Date: Mon, 17 Jun 2019 16:35:33 +0200
+Message-Id: <20190617143533.15013-4-kbastian@mail.uni-paderborn.de>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190617143533.15013-1-kbastian@mail.uni-paderborn.de>
+References: <20190617143533.15013-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH v2 20/23] target/arm: Define TCG dependent
- functions when TCG is enabled
+Content-Transfer-Encoding: 8bit
+X-PMX-Version: 6.4.6.2792898, Antispam-Engine: 2.7.2.2107409,
+ Antispam-Data: 2019.6.17.142717, AntiVirus-Engine: 5.63.0,
+ AntiVirus-Data: 2019.6.4.5630002
+X-IMT-Spam-Score: 0.0 ()
+X-IMT-Authenticated-Sender: 
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 131.234.189.15
+Subject: [Qemu-devel] [PATCH 3/3] target/tricore: Use translate_loop
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,79 +68,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Samuel Ortiz <sameo@linux.intel.com>,
- Robert Bradford <robert.bradford@intel.com>
+Cc: kbastian@mail.uni-paderborn.de, david.brenken@efs-auto.de
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+---
+ target/tricore/translate.c | 117 +++++++++++++++++++++++--------------
+ 1 file changed, 74 insertions(+), 43 deletions(-)
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+diff --git a/target/tricore/translate.c b/target/tricore/translate.c
+index b4e332777a..f3b297639a 100644
+--- a/target/tricore/translate.c
++++ b/target/tricore/translate.c
+@@ -8763,7 +8763,7 @@ static void decode_32Bit_opc(DisasContext *ctx)
+     }
+ }
+ 
+-static void decode_opc(DisasContext *ctx, int *is_branch)
++static void decode_opc(DisasContext *ctx)
+ {
+     /* 16-Bit Instruction */
+     if ((ctx->opcode & 0x1) == 0) {
+@@ -8776,56 +8776,87 @@ static void decode_opc(DisasContext *ctx, int *is_branch)
+     }
+ }
+ 
+-void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
++static void tricore_tr_init_disas_context(DisasContextBase *dcbase,
++                                          CPUState *cs)
+ {
++    DisasContext *ctx = container_of(dcbase, DisasContext, base);
+     CPUTriCoreState *env = cs->env_ptr;
+-    DisasContext ctx;
+-    target_ulong pc_start;
+-    int num_insns = 0;
+-
+-    pc_start = tb->pc;
+-    ctx.base.pc_next = pc_start;
+-    ctx.base.tb = tb;
+-    ctx.base.singlestep_enabled = cs->singlestep_enabled;
+-    ctx.base.is_jmp = DISAS_NEXT;
+-    ctx.mem_idx = cpu_mmu_index(env, false);
+-    ctx.env = env;
+-
+-    tcg_clear_temp_count();
+-    gen_tb_start(tb);
+-    while (ctx.base.is_jmp == DISAS_NEXT) {
+-        tcg_gen_insn_start(ctx.base.pc_next);
+-        num_insns++;
+-
+-        ctx.opcode = cpu_ldl_code(env, ctx.base.pc_next);
+-        decode_opc(&ctx, 0);
+-
+-        if (num_insns >= max_insns || tcg_op_buf_full()) {
+-            gen_save_pc(ctx.pc_succ_insn);
+-            tcg_gen_exit_tb(NULL, 0);
+-            break;
++    ctx->base.pc_next = ctx->base.pc_first;
++    ctx->mem_idx = cpu_mmu_index(env, false);
++}
++
++static void tricore_tr_tb_start(DisasContextBase *db, CPUState *cpu)
++{
++}
++
++static void tricore_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
++{
++    DisasContext *ctx = container_of(dcbase, DisasContext, base);
++
++    tcg_gen_insn_start(ctx->base.pc_next);
++}
++
++static bool tricore_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
++                                      const CPUBreakpoint *bp)
++{
++    return true;
++}
++
++static void tricore_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
++{
++    DisasContext *ctx = container_of(dcbase, DisasContext, base);
++    CPUTriCoreState *env = cpu->env_ptr;
++
++    ctx->opcode = cpu_ldl_code(env, ctx->base.pc_next);
++    decode_opc(ctx);
++    ctx->base.pc_next = ctx->pc_succ_insn;
++
++    if (ctx->base.is_jmp == DISAS_NEXT) {
++        target_ulong page_start;
++
++        page_start = ctx->base.pc_first & TARGET_PAGE_MASK;
++        if (ctx->base.pc_next - page_start >= TARGET_PAGE_SIZE) {
++            ctx->base.is_jmp = DISAS_TOO_MANY;
+         }
+-        ctx.base.pc_next = ctx.pc_succ_insn;
+     }
++}
+ 
+-    gen_tb_end(tb, num_insns);
+-    tb->size = ctx.base.pc_next - pc_start;
+-    tb->icount = num_insns;
++static void tricore_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
++{
++    DisasContext *ctx = container_of(dcbase, DisasContext, base);
+ 
+-    if (tcg_check_temp_count()) {
+-        printf("LEAK at %08x\n", env->PC);
++    switch (ctx->base.is_jmp) {
++    case DISAS_TOO_MANY:
++        gen_goto_tb(ctx, 0, ctx->base.pc_next);
++        break;
++    case DISAS_NORETURN:
++        break;
++    default:
++        g_assert_not_reached();
+     }
++}
+ 
+-#ifdef DEBUG_DISAS
+-    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
+-        && qemu_log_in_addr_range(pc_start)) {
+-        qemu_log_lock();
+-        qemu_log("IN: %s\n", lookup_symbol(pc_start));
+-        log_target_disas(cs, pc_start, ctx.base.pc_next - pc_start);
+-        qemu_log("\n");
+-        qemu_log_unlock();
+-    }
+-#endif
++static void tricore_tr_disas_log(const DisasContextBase *dcbase, CPUState *cpu)
++{
++    qemu_log("IN: %s\n", lookup_symbol(dcbase->pc_first));
++    log_target_disas(cpu, dcbase->pc_first, dcbase->tb->size);
++}
++
++static const TranslatorOps tricore_tr_ops = {
++    .init_disas_context = tricore_tr_init_disas_context,
++    .tb_start           = tricore_tr_tb_start,
++    .insn_start         = tricore_tr_insn_start,
++    .breakpoint_check   = tricore_tr_breakpoint_check,
++    .translate_insn     = tricore_tr_translate_insn,
++    .tb_stop            = tricore_tr_tb_stop,
++    .disas_log          = tricore_tr_disas_log,
++};
++
++
++void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
++{
++    DisasContext ctx;
++    translator_loop(&tricore_tr_ops, &ctx.base, cs, tb, max_insns);
+ }
+ 
+ void
+-- 
+2.22.0
 
-> From: Samuel Ortiz <sameo@linux.intel.com>
->
-> do_interrupt, do_unaligned_access, do_transaction_failed and debug_excp
-> are only relevant in the TCG context, so we should not define them
-> when TCG is disabled.
->
-> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Reviewed-by: Robert Bradford <robert.bradford@intel.com>
-> [PMD: Rebased]
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  target/arm/cpu.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
->
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 2335659a85..3ffea857c4 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -1557,7 +1557,7 @@ static void arm_v7m_class_init(ObjectClass *oc, voi=
-d *data)
->      CPUClass *cc =3D CPU_CLASS(oc);
->
->      acc->info =3D data;
-> -#ifndef CONFIG_USER_ONLY
-> +#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
->      cc->do_interrupt =3D arm_v7m_cpu_do_interrupt;
->  #endif
->
-> @@ -2172,22 +2172,24 @@ static void arm_cpu_class_init(ObjectClass *oc, v=
-oid *data)
->      cc->gdb_read_register =3D arm_cpu_gdb_read_register;
->      cc->gdb_write_register =3D arm_cpu_gdb_write_register;
->  #ifndef CONFIG_USER_ONLY
-> +#ifdef CONFIG_TCG
->      cc->do_interrupt =3D arm_cpu_do_interrupt;
->      cc->do_unaligned_access =3D arm_cpu_do_unaligned_access;
->      cc->do_transaction_failed =3D arm_cpu_do_transaction_failed;
-> +    cc->debug_excp_handler =3D arm_debug_excp_handler;
-> +#endif /* CONFIG_TCG */
->      cc->get_phys_page_attrs_debug =3D arm_cpu_get_phys_page_attrs_debug;
->      cc->asidx_from_attrs =3D arm_asidx_from_attrs;
->      cc->vmsd =3D &vmstate_arm_cpu;
->      cc->virtio_is_big_endian =3D arm_cpu_virtio_is_big_endian;
->      cc->write_elf64_note =3D arm_cpu_write_elf64_note;
->      cc->write_elf32_note =3D arm_cpu_write_elf32_note;
-> -#endif
-> +#endif /* CONFIG_USER_ONLY */
->      cc->gdb_num_core_regs =3D 26;
->      cc->gdb_core_xml_file =3D "arm-core.xml";
->      cc->gdb_arch_name =3D arm_gdb_arch_name;
->      cc->gdb_get_dynamic_xml =3D arm_gdb_get_dynamic_xml;
->      cc->gdb_stop_before_watchpoint =3D true;
-> -    cc->debug_excp_handler =3D arm_debug_excp_handler;
->      cc->debug_check_watchpoint =3D arm_debug_check_watchpoint;
->  #if !defined(CONFIG_USER_ONLY)
->      cc->adjust_watchpoint_address =3D arm_adjust_watchpoint_address;
-
-
---
-Alex Benn=C3=A9e
 
