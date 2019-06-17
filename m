@@ -6,76 +6,80 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CF27C31E44
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 07:38:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9198C31E44
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 08:04:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A5852064A
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 07:38:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE1D021993
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 08:04:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="domf7q0y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A5852064A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="eqdYLQl/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE1D021993
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44740 helo=lists.gnu.org)
+Received: from localhost ([::1]:44940 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcmDh-0005Re-3a
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 03:38:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60352)
+	id 1hcmci-0003ye-Ub
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 04:04:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37419)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <shmuel.eiderman@oracle.com>) id 1hcmCa-0004wH-0B
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 03:37:17 -0400
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hcmaa-0003Lj-Vz
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 04:02:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shmuel.eiderman@oracle.com>) id 1hcmCY-00025k-Pk
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 03:37:15 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:37656)
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hcmaZ-0008IZ-C6
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 04:02:04 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:59056)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
- id 1hcmCV-0001zC-Vu; Mon, 17 Jun 2019 03:37:12 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5H7XYYJ118874;
- Mon, 17 Jun 2019 07:37:04 GMT
+ id 1hcmaT-00081p-SH; Mon, 17 Jun 2019 04:01:59 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5H7wunK031836;
+ Mon, 17 Jun 2019 08:01:45 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2018-07-02; bh=VI+qSJCX5VHnkHspCUjFA1ItEg5AGL/pVoQlaFCMcVE=;
- b=domf7q0yphoFtA63Qxw59jc208zIOgiXmmLlJ6oLltuGYPZwXpK9HReJ9VMl306p1COm
- fdswF4phLBK3k22pqUQtIwmhF0eQ3/exmT584ekZsRhvynDtYTIeERB9v7BLiFLDb3Qa
- amVJmzFELDPQmVpmt1PdFBWV4EsoHeF7bGgte18TVTpU6lkdwolW2YzW5wZGV5wnhLnZ
- n6+JFM6HT+sJN9AfSPhgGbXYQCtX81PStS7NvzHyiywiFPsC+CKpL5OoGU6VpbDMMIBR
- demI+USILcyuD/hf5kjWf5WGPXcfzZ3BtXfcVqYnuZheSoJnIJ4/65uL/92TqL0PennO bw== 
+ h=from : message-id :
+ content-type : mime-version : subject : date : in-reply-to : cc : to :
+ references; s=corp-2018-07-02;
+ bh=iAa9PNiKdS4XfDmgI/Xy7/jOJpyLN+tjtD4fXkkwFgY=;
+ b=eqdYLQl/Z68iXjV/9NAHIcGxZChGVELf1LNifZwx4gWd4+dNAsjYRRdnAjcpPeajR1O0
+ FQZlCcwiEEP1bSawhvoGnyLWCJgjI5Jl2FNFU7zFrfpWu2Scy07f4pa2EpKgpMmorKww
+ ywSIjWDyj/WHtLxteEMv3GF+kdbGSFT7KJd1P32GAcHvY1jn8RPaoc93YVTDeKnF/tXw
+ C7EXNRKMh2wicPDshORSX0n1EvXkpYhg+qLxhgR4EhjqBPZ5NC3/f8her+au7BeL8+0c
+ YGoWcdqH89wykmDck8E2zFO5KtfHGMJuaingVdk4+iIexjfBPqtITHbL5NPHyr61Ocqm tQ== 
 Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by aserp2120.oracle.com with ESMTP id 2t4rmnvtfr-1
+ by userp2120.oracle.com with ESMTP id 2t4saq4vgv-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 17 Jun 2019 07:37:04 +0000
+ Mon, 17 Jun 2019 08:01:45 +0000
 Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5H7b3CO082071;
- Mon, 17 Jun 2019 07:37:03 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by userp3020.oracle.com with ESMTP id 2t5h5t05x8-1
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5H7xSNf122908;
+ Mon, 17 Jun 2019 07:59:45 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by userp3020.oracle.com with ESMTP id 2t5h5t0d19-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 17 Jun 2019 07:37:03 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5H7axiB006412;
- Mon, 17 Jun 2019 07:37:00 GMT
+ Mon, 17 Jun 2019 07:59:44 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5H7xhA1014974;
+ Mon, 17 Jun 2019 07:59:43 GMT
 Received: from [10.0.5.157] (/213.57.127.10)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 17 Jun 2019 00:36:59 -0700
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+ with ESMTP ; Mon, 17 Jun 2019 07:59:43 +0000
 From: Sam Eiderman <shmuel.eiderman@oracle.com>
-In-Reply-To: <20190617072040.yriunmoffbjhvqc5@sirius.home.kraxel.org>
-Date: Mon, 17 Jun 2019 10:36:54 +0300
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <ECEA4896-C290-45A7-9574-D1704C63842C@oracle.com>
-References: <20190612115939.23825-1-shmuel.eiderman@oracle.com>
- <20190612115939.23825-8-shmuel.eiderman@oracle.com>
- <20190617072040.yriunmoffbjhvqc5@sirius.home.kraxel.org>
+Message-Id: <28D338C3-AF42-4145-94A6-8C8175A23949@oracle.com>
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Date: Mon, 17 Jun 2019 10:59:36 +0300
+In-Reply-To: <20190617065050.nx76n6625tm3d2oo@sirius.home.kraxel.org>
 To: Gerd Hoffmann <kraxel@redhat.com>
+References: <20190612115939.23825-1-shmuel.eiderman@oracle.com>
+ <20190612130650.xftda65kgnsefyvs@sirius.home.kraxel.org>
+ <A3F8BD49-3C35-4A07-8DE2-85F7CC293DC9@oracle.com>
+ <20190612191817.5bilt2abif2xvcbv@sirius.home.kraxel.org>
+ <02844D7D-ED79-4744-A203-8E713DE7A717@oracle.com>
+ <20190613093850.5k7prawn6x4qt3fi@sirius.home.kraxel.org>
+ <730C65DE-A9B4-4553-B6A0-7A3B81A1FA12@oracle.com>
+ <20190614044310.wxnkwxagr23d5cbt@sirius.home.kraxel.org>
+ <985C60F2-999C-44C6-B8BC-B5603DD0F716@oracle.com>
+ <20190617065050.nx76n6625tm3d2oo@sirius.home.kraxel.org>
 X-Mailer: Apple Mail (2.3445.104.11)
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9290
  signatures=668687
@@ -83,7 +87,7 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
  malwarescore=0
  phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906170071
+ engine=8.0.1-1810050000 definitions=main-1906170075
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9290
  signatures=668687
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
@@ -91,11 +95,15 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
  suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
  lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906170071
+ definitions=main-1906170075
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 141.146.126.78
-Subject: Re: [Qemu-devel] [QEMU] [PATCH v2 7/8] bootdevice: FW_CFG interface
- for LCHS values
+X-Received-From: 156.151.31.85
+Content-Type: text/plain;
+	charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [QEMU] [PATCH v2 0/8] Add Qemu to SeaBIOS LCHS
+ interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,110 +115,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, arbel.moshe@oracle.com,
- seabios@seabios.org, qemu-devel@nongnu.org, mreitz@redhat.com,
- kevin@koconnor.net, liran.alon@oracle.com, karl.heubaum@oracle.com
+Cc: kwolf@redhat.com, qemu-block@nongnu.org,
+ Arbel Moshe <arbel.moshe@oracle.com>, seabios@seabios.org,
+ QEMU <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Kevin O'Connor <kevin@koconnor.net>, liran.alon@oracle.com,
+ Karl Heubaum <karl.heubaum@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-> On 17 Jun 2019, at 10:20, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> On 17 Jun 2019, at 9:50, Gerd Hoffmann <kraxel@redhat.com> wrote:
 >=20
 >  Hi,
 >=20
->> We serialize this information in a similar way to the "bootorder"
->> interface.
->> The fw_cfg entry is "bootdevices" and it serializes a struct.
->=20
-> Why "bootdevices"?  I'd suggest to use "geometry" or "lchs" instead.
-
-True, if we don=E2=80=99t think an extension will be required in the =
-future we might
-as well call it =E2=80=9Clchs" or "bios-geometry=E2=80=9D.
-
->=20
->> At the moment the struct holds the values of logical CHS values but =
-it
->> can be expanded easily due to the extendable ABI implemented.
+>>> Ok, given that seabios has no setup any manual configuration needs =
+to be done via qemu.
+>>>=20
+>>> But why do we need a new interface for that?  IDE can pass the =
+geometry
+>>> to the guest.  virtio-blk has support too (VIRTIO_BLK_F_GEOMETRY).
+>>> Likewise scsi (MODE_PAGE_HD_GEOMETRY).  So this should be doable =
+without
+>>> any qemu changes.
 >>=20
->> (In the future, we can pass the bootindex through "bootdevices" =
-instead
->> "bootorder" - unifying all bootdevice information in one fw_cfg =
-value)
+>> This was indeed considered (all 3 methods) but it has the following =
+issues:
+>>=20
+>> Physical geometries of devices must now also be logical geometries =
+with translation=3Dnone.
 >=20
-> I don't think deprecating bootorder is useful.  Nobody cares about the
-> disk geometry, except some legacy x86 bios guests.  So seabios will be
-> the only firmware using this new interface.  Switching all firmware to =
-a
-> new fw_cfg file is pointless churn.
+> Yes.
 >=20
-> Why make this extendable?  What possible extensions do you have in =
-mind?
+>> When the OS will query these devices - It will now see different =
+physical geometries, adapted to be logical geometries.
+>=20
+> Yes.
+>=20
+>> I=E2=80=99m not sure even how to implement this without breaking =
+existing
+>> compatibility - since we don=E2=80=99t want to affect logical =
+geometries of
+>> currently used guests.
+>=20
+> We can copy the logic which calculates lchs from seabios to qemu and =
+use
+> it for pchs.
+>=20
+> The tricky part of this is how to do the switch without requiring a
+> lockstep update of seabios and qemu.  seabios can't easily know =
+whenever
+> it should use the current logic (current qemu) or whenever it should
+> simply use pchs with translation=3Dnone (updated qemu).
+>=20
+> Hmm ...
+>=20
+>> MODE_PAGE_HD_GEOMETRY does not contain the spts, only cylinders (as 3
+>> byte number) and heads (as 1 byte number) and computes the spts =
+using:
+>=20
+> Well, there also is MODE_PAGE_FLEXIBLE_DISK_GEOMETRY.
+>=20
+>> Moving a scsi-hd/virtio-blk with 255 physical heads to ide-hd, we =
+will
+>> still need to report 255 heads - this is possible since a whole byte
+>> can be used in the =E2=80=9Cide identify=E2=80=9D command, but goes =
+against the spec
+>> of a maximum of 16 heads for IDE.
+>=20
+> Why do you want migrate _to_ IDE?
 
-I=E2=80=99m not sure about this but if =E2=80=9Cbootorder=E2=80=9D was =
-written in the first place using
-such an extension this could have been useful.
-I don=E2=80=99t have anything specific in mind.
-I don=E2=80=99t think deprecating bootorder is useful either, just =
-mentioned that it
-will be possible if we would like to unify all disk values someday.
+Even without migration, now under SeaBIOS probably most IDE disks
+report 255 heads and 63 spts due to LBA translation, while exposing
+up to 16 physical heads (IDE spec).
+So you can=E2=80=99t really report in ATA identify command your wanted =
+logical
+heads (255).
+
+This can be solved in a very complicated way:
+
+For virtio-blk disks - report bios geometries as physical geometries.
+This might break current compatibility (showing different physical =
+geometries)
+For scsi disks - report bios geometries as physical geometries.
+Implement MODE_PAGE_FLEXIBLE_DISK_GEOMETRY and translation=3Dnone - this =
+new interface will help with compatibility
+For IDE disks - specially craft valid physical geometries (heads <=3D =
+16) with a specific translation,
+This is super complicated, for example to make an IDE disk report lchs =
+of 32 heads, 56 spts, you need a physical geometry of 16 heads, 56 spts =
+and report 2046 cylinders with a "large" translation - which will =
+effectively cut down the number of cylinders by 2 to 1023 and multiply =
+the heads by 2 to 32, achieving the desired lchs. Also we can not even =
+make an IDE report 255 heads with 56 spts with any translation (this is =
+an actual value from production) - so the disk must be moved to =
+scsi-hd/virtio-blk - which also breaks compatibility.
+
+This implementation creates 3 different non conventional (PV) ways of =
+reporting lchs directly between Qemu and SeaBIOS - which add a lot of =
+technical depth for resolving a legacy issue. A fw-cfg value named =
+=E2=80=9Cbootdevices=E2=80=9D (or =E2=80=9Cbios-geometry=E2=80=9D) is =
+much more straightforward and makes it more readable/explicit.
+
+WDYT?
 
 >=20
-> Also note that with a possible extension you might end up in a =
-situation
-> where you have info A for device 1 and info B for device 2 and info =
-A+B
-> for device 3 while with your current patch there is no way to signal
-> whenever info A or B is available for a given device.
-
-Well for lchs (A) a non-existing value is 0, 0, 0 (uint32).
-So at the moment we=E2=80=99re good.
-We can signal other values with other magic numbers (such as -1 for =
-bootorder)
-or prefix the value with an additional boolean value =E2=80=9Cis =
-signaled=E2=80=9D.
-
+>> Overall this approach is much more complicated.
 >=20
->> +/* Serialized as: struct size (4) + (device name\0 + device struct) =
-x devices */
->> +char *get_boot_devices_info(size_t *size)
->> +{
->> +    FWLCHSEntry *i;
->> +    BootDeviceEntrySerialized s;
->> +    size_t total =3D 0;
->> +    char *list =3D NULL;
->=20
-> if (QTAILQ_EMPTY(&fw_lchs)) {
-> 	return NULL;
-> }
->=20
->> +    if (!mc->legacy_fw_cfg_order) {
->                ^^^^^^^^^^^^^^^^^^^
-> Hmm?
-
-Only making this available in non-legacy mode.
-Qemu complains in get_fw_cfg_order() (fw_cfg.c):
-
-	warn_report("Unknown firmware file in legacy mode: %s", name);
-
-Detected during qtests.
-
-
-So overall, WDYT?
-Keep it extendible for a low price of ABI + =E2=80=9Cbootdevices=E2=80=9D =
-name.
-Or go strict and rename to =E2=80=9Cbios-geometries=E2=80=9D?
-
-(The ABI will not change too much anyway, the struct_size will disappear
-and sizeof(12) struct of LCHS will be assumed)
-
-Sam
-
+> Well, adding new fw_cfg interfaces has a long term maintenance cost.
+> So there should be a pretty good reason for them.
 >=20
 > cheers,
 >  Gerd
 >=20
-
 
