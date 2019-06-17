@@ -2,82 +2,74 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DA95C31E44
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 06:05:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82382C31E44
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 06:52:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A7C4218B0
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 06:05:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FtQ9ZJox"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A7C4218B0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5172C21855
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 06:52:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5172C21855
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44436 helo=lists.gnu.org)
+Received: from localhost ([::1]:44590 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcklZ-0003je-IS
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 02:05:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43201)
+	id 1hclUo-00038B-Cb
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 02:52:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51486)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <elohimes@gmail.com>) id 1hckki-0003HO-16
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 02:04:25 -0400
+ (envelope-from <kraxel@redhat.com>) id 1hclTm-0002a8-2X
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 02:50:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <elohimes@gmail.com>) id 1hckkg-0006i5-Pp
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 02:04:23 -0400
-Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:36147)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1hckkg-0006hk-I2
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 02:04:22 -0400
-Received: by mail-qt1-x844.google.com with SMTP id p15so9400444qtl.3
- for <qemu-devel@nongnu.org>; Sun, 16 Jun 2019 23:04:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=0ZwWT79xovLicytd99A6TaPhtIDP9OH+aW0ONXbCoCo=;
- b=FtQ9ZJoxFfeqEj+eZdP9rDbgDBV8Dd6kARGwbbrBiC93/G+OQmU+m6f+pOGe/Jy3er
- 7UcjJJf9qUMmimld/NLPAfzB78aZIazFnmKfcRfXsY0AnGrPzqTmC4krmbV818Qb5+iu
- +sSBLDT8/0634rHzcBU/dZJuIxGZDCVS73IoZ4U7cOz5oPNWS4O5gdaI7VwVPtE+w2u0
- G20POKM1lFI6me7yHzRJvIn9787T1ww70aoMIbBlYKtXMWWznc6QqVXDeefrrF6Lg8JJ
- aNvtPRMhLfkaCr5ny+gYbnz43CeBMplIWYqggKtvvRanywudAe2ribNuS2O2T4DyonUc
- P4iA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=0ZwWT79xovLicytd99A6TaPhtIDP9OH+aW0ONXbCoCo=;
- b=gRLkpwRbvnpLZQWYg6vzNTbUfff3XpKmOtfwie3KQ/878VzQshsVyl1RyPy1042YMF
- JPV0dAiufFDokA5KfImjzh7RsTPyr16SMi0h2xnha1eeFJv5Rjwt0FNR6edBvkoOM8uo
- oBhcW3/I+K+RQ5VctcOEaRCNA+G4R+qAfwfPloySV6xG8gxqJUiUU5yb9qRXL3KFse4B
- qLXN6l9ZWQBhpyqVdArHvcDX3JXqWq8aOx4tlDgzD1DE3r1HfPGycDYWvpKx0tlW1pts
- N688Ypaf10B3abv0S5GYhZWTP7ZduUWd6rru+6aaBUzrNT82rcuRZckCfrpMzQOnEGTs
- wrvg==
-X-Gm-Message-State: APjAAAVWsNZryqCrulzqArQ4pE4e2ukUh+kNe8RsaInIx6H6AC1LYhpF
- Uw8vVGPSEb9nCdqRh39FTO9fH1PpnIzwOelN2s0=
-X-Google-Smtp-Source: APXvYqy1YmRsMgUszII2U0VAsWUmc8g012EBL0n53cMaZgjuIijoO5F6wtG2OeZQhSHc5oMDgk2SmPjfTftIxbIoT9c=
-X-Received: by 2002:ac8:3811:: with SMTP id q17mr62897201qtb.315.1560751462106; 
- Sun, 16 Jun 2019 23:04:22 -0700 (PDT)
+ (envelope-from <kraxel@redhat.com>) id 1hclTl-00055c-5d
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 02:50:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39384)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>)
+ id 1hclTj-00053b-4Q; Mon, 17 Jun 2019 02:50:55 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 84E26C04FFF1;
+ Mon, 17 Jun 2019 06:50:53 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-33.ams2.redhat.com
+ [10.36.116.33])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 209A04647A;
+ Mon, 17 Jun 2019 06:50:51 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 4CD0916E18; Mon, 17 Jun 2019 08:50:50 +0200 (CEST)
+Date: Mon, 17 Jun 2019 08:50:50 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Sam Eiderman <shmuel.eiderman@oracle.com>
+Message-ID: <20190617065050.nx76n6625tm3d2oo@sirius.home.kraxel.org>
+References: <20190612115939.23825-1-shmuel.eiderman@oracle.com>
+ <20190612130650.xftda65kgnsefyvs@sirius.home.kraxel.org>
+ <A3F8BD49-3C35-4A07-8DE2-85F7CC293DC9@oracle.com>
+ <20190612191817.5bilt2abif2xvcbv@sirius.home.kraxel.org>
+ <02844D7D-ED79-4744-A203-8E713DE7A717@oracle.com>
+ <20190613093850.5k7prawn6x4qt3fi@sirius.home.kraxel.org>
+ <730C65DE-A9B4-4553-B6A0-7A3B81A1FA12@oracle.com>
+ <20190614044310.wxnkwxagr23d5cbt@sirius.home.kraxel.org>
+ <985C60F2-999C-44C6-B8BC-B5603DD0F716@oracle.com>
 MIME-Version: 1.0
-References: <20190614093121.5580-1-xieyongji@baidu.com>
- <20190614093121.5580-2-xieyongji@baidu.com>
- <20190614134452.7924f135@bahia.lan>
- <CAONzpcYMmw+4q-VmBOnrBBNbfrG4XeSggk3R2tAKmF5u6b1VcA@mail.gmail.com>
- <20190617072044.3e95124f@bahia.lan>
-In-Reply-To: <20190617072044.3e95124f@bahia.lan>
-From: Yongji Xie <elohimes@gmail.com>
-Date: Mon, 17 Jun 2019 14:04:10 +0800
-Message-ID: <CAONzpcaPxf2aBrBhNYyFg11TFNLzjEE0qf1Hc_6ePPjb0CVYrA@mail.gmail.com>
-To: Greg Kurz <groug@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::844
-Subject: Re: [Qemu-devel] [PATCH v3 1/5] virtio: add "use-started" property
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <985C60F2-999C-44C6-B8BC-B5603DD0F716@oracle.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Mon, 17 Jun 2019 06:50:54 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [QEMU] [PATCH v2 0/8] Add Qemu to SeaBIOS LCHS
+ interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,63 +81,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>,
- Alex Williamson <alex.williamson@redhat.com>, pbonzini@redhat.com,
- Xie Yongji <xieyongji@baidu.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, arbel.moshe@oracle.com,
+ seabios@seabios.org, QEMU <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, Kevin O'Connor <kevin@koconnor.net>,
+ liran.alon@oracle.com, Karl Heubaum <karl.heubaum@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 17 Jun 2019 at 13:24, Greg Kurz <groug@kaod.org> wrote:
->
-> On Mon, 17 Jun 2019 10:14:30 +0800
-> Yongji Xie <elohimes@gmail.com> wrote:
->
-> > On Fri, 14 Jun 2019 at 19:45, Greg Kurz <groug@kaod.org> wrote:
-> > >
-> > > On Fri, 14 Jun 2019 17:31:17 +0800
-> > > elohimes@gmail.com wrote:
-> > >
-> > > > From: Xie Yongji <xieyongji@baidu.com>
-> > > >
-> > > > In order to avoid migration issues, we introduce a "use-started"
-> > > > property to the base virtio device to indicate whether use
-> > > > "started" flag or not. This property will be true by default and
-> > > > set to false when machine type <= 4.0.1.
-> > > >
-> > > > Suggested-by: Greg Kurz <groug@kaod.org>
-> > > > Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-> > > > ---
-> > > >  hw/block/vhost-user-blk.c  |  4 ++--
-> > > >  hw/core/machine.c          |  8 ++++++--
-> > >
-> > > This patch conflicts with latest upstream changes to hw_compat_4_0_1[].
-> > >
-> > > It seems you need to rebase. Also, I'm still not sure how we're supposed
-> > > to handle hw_compat_4_0_1[] versus hw_compat_4_0[]... nobody commented
-> > > on:
-> > >
-> > > https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg00637.html
-> > > https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg00641.html
-> > >
-> > > Maybe worth to sort that out before re-posting.
-> > >
-> >
-> > If hw_compat_4_0_1[] is introduced only for q35, I think this patch
-> > should be OK. If not, maybe we should handle hw_compat_4_0_1[] in
-> > other machine types (i440fx, arm, ppc, s390)?
-> >
->
-> It turns out that hw_compat_4_0_1[] isn't needed at all. Please see:
->
-> https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg03054.html
->
+  Hi,
 
-Oh, great! I will rebase my patch after this commit is merged.
+> > Ok, given that seabios has no setup any manual configuration needs to=
+ be done via qemu.
+> >=20
+> > But why do we need a new interface for that?  IDE can pass the geomet=
+ry
+> > to the guest.  virtio-blk has support too (VIRTIO_BLK_F_GEOMETRY).
+> > Likewise scsi (MODE_PAGE_HD_GEOMETRY).  So this should be doable with=
+out
+> > any qemu changes.
+>=20
+> This was indeed considered (all 3 methods) but it has the following iss=
+ues:
+>=20
+> Physical geometries of devices must now also be logical geometries with=
+ translation=3Dnone.
 
-Thanks,
-Yongji
+Yes.
+
+> When the OS will query these devices - It will now see different physic=
+al geometries, adapted to be logical geometries.
+
+Yes.
+
+> I=E2=80=99m not sure even how to implement this without breaking existi=
+ng
+> compatibility - since we don=E2=80=99t want to affect logical geometrie=
+s of
+> currently used guests.
+
+We can copy the logic which calculates lchs from seabios to qemu and use
+it for pchs.
+
+The tricky part of this is how to do the switch without requiring a
+lockstep update of seabios and qemu.  seabios can't easily know whenever
+it should use the current logic (current qemu) or whenever it should
+simply use pchs with translation=3Dnone (updated qemu).
+
+Hmm ...
+
+> MODE_PAGE_HD_GEOMETRY does not contain the spts, only cylinders (as 3
+> byte number) and heads (as 1 byte number) and computes the spts using:
+
+Well, there also is MODE_PAGE_FLEXIBLE_DISK_GEOMETRY.
+
+> Moving a scsi-hd/virtio-blk with 255 physical heads to ide-hd, we will
+> still need to report 255 heads - this is possible since a whole byte
+> can be used in the =E2=80=9Cide identify=E2=80=9D command, but goes aga=
+inst the spec
+> of a maximum of 16 heads for IDE.
+
+Why do you want migrate _to_ IDE?
+
+> Overall this approach is much more complicated.
+
+Well, adding new fw_cfg interfaces has a long term maintenance cost.
+So there should be a pretty good reason for them.
+
+cheers,
+  Gerd
+
 
