@@ -2,79 +2,111 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B72A2C31E57
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 12:44:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8BE4C31E57
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 12:47:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84A39208C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 12:44:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7323E20861
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 12:47:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hYI8KOdQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84A39208C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="W1b3y+Qu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7323E20861
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47042 helo=lists.gnu.org)
+Received: from localhost ([::1]:47108 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcqzg-0006t8-OI
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 08:44:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44158)
+	id 1hcr2U-0000x9-L3
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 08:47:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43479)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <christophe.lyon@linaro.org>) id 1hcqws-0004Mw-5X
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 08:41:23 -0400
+ (envelope-from <rkagan@virtuozzo.com>) id 1hcquP-0002Nz-9R
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 08:38:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <christophe.lyon@linaro.org>) id 1hcqwq-0007bE-Nw
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 08:41:22 -0400
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:40919)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <christophe.lyon@linaro.org>)
- id 1hcqwq-0007a9-Eg
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 08:41:20 -0400
-Received: by mail-lf1-x144.google.com with SMTP id a9so6379281lff.7
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 05:41:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Q4QZHR04tFJMDCJn2kX/l4auW5B3f6jJvLuZANJ601A=;
- b=hYI8KOdQoVgwgHqwvj49vXqZxDXffCWxbRLqluClwHk6l61PW3htAErPFSQreu9OtT
- MYGyLcsIjN6KklP9deRzF7nVDfQpSQpXNzBxrd69eqh9KDqtxyEDQpBNa9FaN99CxWk5
- 0BJYMZGDrrqRH2/twuIcfT6G6X4wPrEki7R1mjIpnUrszTncVGuboP1h8k6TnomtXQ7o
- r/sgksChCl+Vwb5QcdTceHuerXF3a46YAlmdALaEbrTbWKtIr2/KDAXx2JGWHAHkdLtW
- 8Q2WC7LEU09aEvhn2nKOkq/nPVtFbmdY4wa2gGOUw2+jyy8u9OXnffAzKO42AZGynvP7
- 4Ctg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Q4QZHR04tFJMDCJn2kX/l4auW5B3f6jJvLuZANJ601A=;
- b=CJ0MlRFPi0H1nIK8MCjov+UCKqs3Z9zw059hdeZ7KjBleSSkb7uZ83aNDHGUZ5xz+U
- v91P3J/S1/I1cbC2GcU7HHuGJ2Bny0Llp1rm7lWmoBOKCI3HgGEB2cokk384/sgERmRn
- tjLaEMnwQgolrn0Z7WMQiXaDzy6lj3tl8xbBf4w6hQUedCah5ew9QCHcCg7Y1SOz3+nG
- mLxCA0xTbTw4uacNbouBmqRoezbaIr6nKw4ZusWd4H3j4xS7r9SZMeHM+1lztdErQl0z
- 2+yelRA+X1jCgTCB+UcIunPyGNj3cD0UqrpSOylbqVrt+TEL9S5ClxweTT7MVrzzhdwO
- fWOQ==
-X-Gm-Message-State: APjAAAXFgRSpym+azyCNJfMopc2VIMuYCHbD3GTwuyFqQJ/wCG+1S9lW
- 5A8h+aIqlmMjiZEl3oNpbDA6nvmTw7hhnZ4lrkMSvw==
-X-Google-Smtp-Source: APXvYqw1A+1/Ypgrdtpf60rgownB39gNYKbEcWm34v9Ak2/kWeLbbX/W7bdRru62HWl+bXVsPYYQ0z/Xgg/ZKfdoERY=
-X-Received: by 2002:a19:6e41:: with SMTP id q1mr47872071lfk.20.1560775278338; 
- Mon, 17 Jun 2019 05:41:18 -0700 (PDT)
+ (envelope-from <rkagan@virtuozzo.com>) id 1hcquO-0005LE-9T
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 08:38:49 -0400
+Received: from mail-he1eur04hn2040.outbound.protection.outlook.com
+ ([52.101.137.40]:63553 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+ id 1hcquO-0005JW-0y; Mon, 17 Jun 2019 08:38:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OiK/uDe9lPyJubSFsJYSNEuGvO69KZRMW5g2KzI9saU=;
+ b=W1b3y+QuRhIeNrHjj+b7RBoVNZTaJD36E+AoeTGXHp6HdLFVJBJF59CqBlbKMlI8d/8VWzG8ub/qTLbNaQgm2dkZMOWRA1ZTqnMt2r9ibBWeoFZrlIGUz7U+SOGcvhLdrwXCGSIXBdA8i7vAo7eHoCjSHCOQ/QuWsZJ6F2AD5ME=
+Received: from DB8PR08MB3977.eurprd08.prod.outlook.com (20.179.11.95) by
+ DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1987.12; Mon, 17 Jun 2019 12:38:34 +0000
+Received: from DB8PR08MB3977.eurprd08.prod.outlook.com
+ ([fe80::3530:3b13:be7f:2944]) by DB8PR08MB3977.eurprd08.prod.outlook.com
+ ([fe80::3530:3b13:be7f:2944%4]) with mapi id 15.20.1987.014; Mon, 17 Jun 2019
+ 12:38:34 +0000
+From: Roman Kagan <rkagan@virtuozzo.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Thread-Topic: [PATCH v2 6/7] iotests: amend QEMU NBD process synchronization
+Thread-Index: AQHVIH/W+4fzIICfOUahb05s1OWCZ6af0iSA
+Date: Mon, 17 Jun 2019 12:38:34 +0000
+Message-ID: <20190617123831.GC32624@rkaganb.sw.ru>
+References: <1560276131-683243-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1560276131-683243-7-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1560276131-683243-7-git-send-email-andrey.shinkevich@virtuozzo.com>
+Accept-Language: en-US, ru-RU
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mutt/1.11.4 (2019-03-13)
+mail-followup-to: Roman Kagan <rkagan@virtuozzo.com>,	Andrey Shinkevich
+ <andrey.shinkevich@virtuozzo.com>,	qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, kwolf@redhat.com,	mreitz@redhat.com,
+ berrange@redhat.com, den@openvz.org,	vsementsov@virtuozzo.com
+x-originating-ip: [185.231.240.5]
+x-clientproxiedby: HE1PR0501CA0009.eurprd05.prod.outlook.com
+ (2603:10a6:3:1a::19) To DB8PR08MB3977.eurprd08.prod.outlook.com
+ (2603:10a6:10:ad::31)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=rkagan@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 82402d46-8768-4d1c-f8fb-08d6f320b664
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:DB8PR08MB5498; 
+x-ms-traffictypediagnostic: DB8PR08MB5498:|DB8PR08MB5498:
+x-microsoft-antispam-prvs: <DB8PR08MB5498460663F102B75F357E61C9EB0@DB8PR08MB5498.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 0071BFA85B
+x-forefront-antispam-report: SFV:SPM;
+ SFS:(10019020)(396003)(376002)(366004)(39840400004)(136003)(346002)(189003)(199004)(76176011)(446003)(4326008)(54906003)(476003)(52116002)(8676002)(6486002)(81166006)(81156014)(6436002)(316002)(36756003)(11346002)(25786009)(102836004)(6636002)(486006)(14444005)(7736002)(6506007)(386003)(3846002)(71190400001)(8936002)(2906002)(66946007)(66446008)(64756008)(73956011)(66476007)(99286004)(6246003)(6862004)(68736007)(53936002)(6116002)(229853002)(14454004)(86362001)(71200400001)(107886003)(58126008)(186003)(26005)(5660300002)(478600001)(33656002)(66556008)(256004)(305945005)(1076003)(6512007)(66066001)(9686003)(30126002);
+ DIR:OUT; SFP:1501; SCL:5; SRVR:DB8PR08MB5498;
+ H:DB8PR08MB3977.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: pFE9sA9Blr0bbh3ZHH5tjoEGqEc5ZRJ8cNwpdBBNHwdK6gOQ1IalwRA4PwXKENC/3Mb1oH7/Uh/seXduHehpIq2r8jRFQdX3yCM/WupOQSQjaHwgAxTi9+Cno3zv67MRI2IWT6M+2ks5Bb6J/bRW75CXpTShLRwMtS1clscWesdVCbAu3FBeRBokIN4MZOhq9BYhOc94RiRXLLAzrSlVyLKYEJgp9qBHx4JruF6a1smy4tcQmll5Zd8oF5jwtEb9CoS5uxQ5X66AhCMzXjOoLawGPnu3tkNFFg81IvBbMgKu+7hwTTW38J4c4WQLmTjOvn+vFV03EpxR/hVv6QGZ2plBP/8w6OFAYqylO0MxrGKnaGtbbcWJybnR5dVMLt7d/pOz+jcyLhFcJ/m2uedcKs7NLousZQi9s+I9rqdJnM9pohO2idoHznnQZqs7KQyRr28fwSz/bwJpoZc9GPUUkR1KVMiGRvpH3YDiR6s6PJimqwUa6SnQUGDjBcK3vc2w
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <823C91F4F69B5648BDF8D2DA7C91A41A@eurprd08.prod.outlook.com>
 MIME-Version: 1.0
-References: <20190616210546.17221-1-richard.henderson@linaro.org>
-In-Reply-To: <20190616210546.17221-1-richard.henderson@linaro.org>
-From: Christophe Lyon <christophe.lyon@linaro.org>
-Date: Mon, 17 Jun 2019 14:41:07 +0200
-Message-ID: <CAKdteOa9kCO4+yyrCNFabSQdMQjzNbbBxCx2Zk0p8Gsfm8ycOw@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::144
-Subject: Re: [Qemu-devel] [PATCH] tcg: Fix mmap lock assert on translation
- failure
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 82402d46-8768-4d1c-f8fb-08d6f320b664
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jun 2019 12:38:34.5966 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: rkagan@virtuozzo.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5498
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 52.101.137.40
+Subject: Re: [Qemu-devel] [PATCH v2 6/7] iotests: amend QEMU NBD process
+ synchronization
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,118 +118,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "berrange@redhat.com" <berrange@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 16 Jun 2019 at 23:05, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Check page flags before letting an invalid pc cause a SIGSEGV.
->
-> Prepare for eventially validating PROT_EXEC.  The current wrinkle being
-> that we have a problem with our implementation of signals.  We should
-> be using a vdso like the kernel, but we instead put the trampoline on
-> the stack.  In the meantime, let PROT_READ match PROT_EXEC.
->
+On Tue, Jun 11, 2019 at 09:02:10PM +0300, Andrey Shinkevich wrote:
+> Processes are dying harder under the Valgring. It results in counting
+> the dying process as a newborn one. Make it sure that old NBD job get
+> finished before starting a new one.
 
-Thanks for the quick fix, I can confirm it works for my testcase.
+I think this log message is confusing.
 
-Christophe
+The problem this patch addresses is that nbd_server_stop only sends a
+signal to the nbd process and immediately returns, without waiting for
+it to actually terminate.  The next operation is often starting a new
+instance of nbd; this races with the termination of the old one, and may
+result in various failures (like nbd_server_start_* taking the
+terminating nbd as the one just started, or the starting nbd
+encountering a busy listening socket).
 
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1832353
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Without valgrind the race window is very small and the problem didn't
+surface for long.  However, under valgrind process termination takes
+much longer so the race bites every test run.
+
+Since nbd is run in a background job of the test, record the nbd pid at
+the daemon start in a shell variable and perform a wait for it when
+terminating it.
+
+Roman.
+
+> Suggested-by: Roman Kagan <rkagan@virtuozzo.com>
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 > ---
->  include/exec/cpu-all.h                    |  1 +
->  include/exec/cpu_ldst_useronly_template.h |  8 +++++--
->  accel/tcg/translate-all.c                 | 29 +++++++++++++++++++++++
->  3 files changed, 36 insertions(+), 2 deletions(-)
->
-> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-> index 536ea58f81..58b8915617 100644
-> --- a/include/exec/cpu-all.h
-> +++ b/include/exec/cpu-all.h
-> @@ -259,6 +259,7 @@ int walk_memory_regions(void *, walk_memory_regions_fn);
->  int page_get_flags(target_ulong address);
->  void page_set_flags(target_ulong start, target_ulong end, int flags);
->  int page_check_range(target_ulong start, target_ulong len, int flags);
-> +void validate_exec_access(CPUArchState *env, target_ulong s, target_ulong l);
->  #endif
->
->  CPUArchState *cpu_copy(CPUArchState *env);
-> diff --git a/include/exec/cpu_ldst_useronly_template.h b/include/exec/cpu_ldst_useronly_template.h
-> index bc45e2b8d4..f095415149 100644
-> --- a/include/exec/cpu_ldst_useronly_template.h
-> +++ b/include/exec/cpu_ldst_useronly_template.h
-> @@ -64,7 +64,9 @@
->  static inline RES_TYPE
->  glue(glue(cpu_ld, USUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr)
+>  tests/qemu-iotests/common.nbd | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/tests/qemu-iotests/common.nbd b/tests/qemu-iotests/common.nbd
+> index 25fc9ff..e3dcc60 100644
+> --- a/tests/qemu-iotests/common.nbd
+> +++ b/tests/qemu-iotests/common.nbd
+> @@ -22,6 +22,7 @@
+>  nbd_unix_socket="${TEST_DIR}/qemu-nbd.sock"
+>  nbd_tcp_addr="127.0.0.1"
+>  nbd_pid_file="${TEST_DIR}/qemu-nbd.pid"
+> +nbd_job_pid=""
+>  
+>  nbd_server_stop()
 >  {
-> -#if !defined(CODE_ACCESS)
-> +#ifdef CODE_ACCESS
-> +    validate_exec_access(env, ptr, DATA_SIZE);
-> +#else
->      trace_guest_mem_before_exec(
->          env_cpu(env), ptr,
->          trace_mem_build_info(SHIFT, false, MO_TE, false));
-> @@ -88,7 +90,9 @@ glue(glue(glue(cpu_ld, USUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
->  static inline int
->  glue(glue(cpu_lds, SUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr)
->  {
-> -#if !defined(CODE_ACCESS)
-> +#ifdef CODE_ACCESS
-> +    validate_exec_access(env, ptr, DATA_SIZE);
-> +#else
->      trace_guest_mem_before_exec(
->          env_cpu(env), ptr,
->          trace_mem_build_info(SHIFT, true, MO_TE, false));
-> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index 5d1e08b169..1d4a8a260f 100644
-> --- a/accel/tcg/translate-all.c
-> +++ b/accel/tcg/translate-all.c
-> @@ -2600,10 +2600,39 @@ int page_check_range(target_ulong start, target_ulong len, int flags)
->                  }
->              }
->          }
-> +        /*
-> +         * FIXME: We place the signal trampoline on the stack,
-> +         * even when the guest expects that to be in the vdso.
-> +         * Until we fix that, allow execute on any readable page.
-> +         */
-> +        if ((flags & PAGE_EXEC) && !(p->flags & (PAGE_EXEC | PAGE_READ))) {
-> +            return -1;
-> +        }
->      }
->      return 0;
+> @@ -33,6 +34,9 @@ nbd_server_stop()
+>              kill "$NBD_PID"
+>          fi
+>      fi
+> +    if [ -n "$nbd_job_pid" ] && kill -s 0 "$nbd_job_pid" 2>/dev/null; then
+> +        wait "$nbd_job_pid"
+> +    fi
+>      rm -f "$nbd_unix_socket"
 >  }
->
-> +/*
-> + * Called for each code read, longjmp out to issue SIGSEGV if the page(s)
-> + * do not have execute access.
-> + */
-> +void validate_exec_access(CPUArchState *env,
-> +                          target_ulong ptr, target_ulong len)
-> +{
-> +    if (page_check_range(ptr, len, PAGE_EXEC) < 0) {
-> +        CPUState *cs = env_cpu(env);
-> +        CPUClass *cc = CPU_GET_CLASS(cs);
-> +
-> +        /* Like tb_gen_code, release the memory lock before cpu_loop_exit.  */
-> +        assert_memory_lock();
-> +        mmap_unlock();
-> +
-> +        /* This is user-only.  The target must raise an exception.  */
-> +        cc->tlb_fill(cs, ptr, 0, MMU_INST_FETCH, MMU_USER_IDX, false, 0);
-> +        g_assert_not_reached();
-> +    }
-> +}
-> +
->  /* called from signal handler: invalidate the code and unprotect the
->   * page. Return 0 if the fault was not handled, 1 if it was handled,
->   * and 2 if it was handled but the caller must cause the TB to be
-> --
-> 2.17.1
->
+>  
+> @@ -61,6 +65,7 @@ nbd_server_start_unix_socket()
+>  {
+>      nbd_server_stop
+>      $QEMU_NBD -v -t -k "$nbd_unix_socket" "$@" &
+> +    nbd_job_pid=$!
+>      nbd_server_wait_for_unix_socket $!
+>  }
+>  
+> @@ -105,5 +110,6 @@ nbd_server_start_tcp_socket()
+>  {
+>      nbd_server_stop
+>      $QEMU_NBD -v -t -b $nbd_tcp_addr -p $nbd_tcp_port "$@" &
+> +    nbd_job_pid=$!
+>      nbd_server_wait_for_tcp_socket $!
+>  }
+> -- 
+> 1.8.3.1
+> 
 
