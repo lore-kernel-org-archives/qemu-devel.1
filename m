@@ -2,90 +2,96 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4AE3C31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:02:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77F53C31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:02:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEE1620644
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:02:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 35FF120644
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 16:02:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="b8CZRBQk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEE1620644
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ujmjFvun"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35FF120644
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48834 helo=lists.gnu.org)
+Received: from localhost ([::1]:48842 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcu5a-00046o-PL
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 12:02:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51098)
+	id 1hcu5t-0004C3-Fl
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 12:02:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57128)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hcswX-000156-F4
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:49:10 -0400
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hctHT-0003Kd-PP
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:10:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hcswV-0001xR-FZ
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:49:09 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36927)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hcswV-0001vO-8y
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:49:07 -0400
-Received: by mail-wr1-x444.google.com with SMTP id v14so10292463wrr.4
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 07:49:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=4eADj56o5J+lh84KGfNJMQOHvIfyZq5AYuDxFcffxaU=;
- b=b8CZRBQky6XilAtlI9R97bXgr+tj4F0J+hodsenugNdxkqyKtLBRKVVuqk28XKyaG6
- D7wer/fIxN0pZ8YsYwZyEv68lXqX9JWmg4NU3sJpxHiHPVCaRHXQaN2FBQvncRoFbH1l
- mG6wqkrjJl/PEpOc6hDkoKcjyrLwvqDPpK1BTeqFt3cCnrqbEXRf2v/ygE1U3XEP1Phm
- yiLPJsrlZRmRK05AmSsQBZDeE7poR0o6B1l/IB4GR35gC26xoJwQBbOmfFX9zE21y+ih
- /2qUZPEh7KoXnKJIY3jqfDt9vu4xFqnMwG2axrRnOJyXFAJb+p35JiJ9w26qD9LrWc+I
- RdzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=4eADj56o5J+lh84KGfNJMQOHvIfyZq5AYuDxFcffxaU=;
- b=bERus50UTAXx/hcrOU5xLkRmzUx0N4/VYziBUylROXutmgLjCgUphaOb+H9eZroYz/
- j4L8iJaIW08PJzsNz5KFS31CaaOggTZiuSE5Dr7mfMcs29krdHewhCYlQQsZ261Q4MiP
- NnhBP8W5hFfV/D2qBoFsJnqoaOQPnOpSHeirLSGhM2rbNViS6byXzajQ6oWp/jvsl61u
- U/+/rzwYO29EgPebN9F6A0IHqT3SpdTrKqXsKdBoRpJ+thcQx3Yar/S9z9ZbQVB5AQ3q
- N2hj4B2osIPOZTx7QLWO+3FWqnGTNqGDxhg8i9jojbhEqZ1pmXJRABdeaWK/Yg8M+lzk
- pCFg==
-X-Gm-Message-State: APjAAAUOmIOhDx/gWzgLyyPQJrGybo7sDxZDUXskqnjX1f+jGE9mNxOn
- dJT6paQDFwRY78BpZW4+70CLjg==
-X-Google-Smtp-Source: APXvYqymG/d0xGaOEoMoE+bd55X3sLfu7J12dVM7MXCDK0XWTgd0qJvR1GQeJe8zS4f8boNMIOsgDw==
-X-Received: by 2002:adf:e88e:: with SMTP id d14mr14855696wrm.189.1560782943215; 
- Mon, 17 Jun 2019 07:49:03 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id l124sm17676421wmf.36.2019.06.17.07.49.02
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 17 Jun 2019 07:49:02 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 5B1391FF87;
- Mon, 17 Jun 2019 15:49:02 +0100 (BST)
-References: <20190615154352.26824-1-philmd@redhat.com>
- <20190615154352.26824-22-philmd@redhat.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-arm@nongnu.org
-In-reply-to: <20190615154352.26824-22-philmd@redhat.com>
-Date: Mon, 17 Jun 2019 15:49:02 +0100
-Message-ID: <87ef3s9sip.fsf@zen.linaroharston>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 21/23] target/arm: Do not
- build TCG objects when TCG is off
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hctHP-0001df-Qi
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 11:10:47 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:56812)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
+ id 1hctHF-0001Ue-B9; Mon, 17 Jun 2019 11:10:35 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HF3wXF008786;
+ Mon, 17 Jun 2019 15:10:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
+ bh=w/cOuN1BbelShft7xtXe73Ofy362XkV9IkyYB9bN76U=;
+ b=ujmjFvunWAsGlIBMNLjS3BALYRANhMMqE7HV9yIpAMMuVViiKvBNiAUCwlExu0W1r+WP
+ bfDiikPLhnG6NmapYciLfBjMcMkSpUDjWabvSDjHpxjpSoDAnAadFB7/aLhu7J7i9fAn
+ QiYjNNPrCBLct91r5+1rkr6N7XlI6s8xhvDv3B494P9Qy0IE6lvH4/JJPFbDNlpO3l2y
+ krjfl2BZU5Djogo0+MuP94Xs30vi4uOt+riVm/HwTO6rdQGKbYAQk6NqeqsbWPtoJaMu
+ Y43qnEW9lHx0c880u4Y7xIyvZp7RNPCwb5s7nPFKzOnumbbxpv37Wixk7Wz8HWkha766 GA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2120.oracle.com with ESMTP id 2t4saq73gk-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 17 Jun 2019 15:10:31 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HF99dP016015;
+ Mon, 17 Jun 2019 15:10:30 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by aserp3030.oracle.com with ESMTP id 2t5cpdgehv-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 17 Jun 2019 15:10:30 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5HFASOL003913;
+ Mon, 17 Jun 2019 15:10:29 GMT
+Received: from nexus.ravello.local (/213.57.127.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Mon, 17 Jun 2019 08:10:27 -0700
+From: Sam Eiderman <shmuel.eiderman@oracle.com>
+To: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ mreitz@redhat.com, seabios@seabios.org, kraxel@redhat.com,
+ kevin@koconnor.net
+Date: Mon, 17 Jun 2019 18:09:50 +0300
+Message-Id: <20190617150950.5264-9-shmuel.eiderman@oracle.com>
+X-Mailer: git-send-email 2.13.3
+In-Reply-To: <20190617150950.5264-1-shmuel.eiderman@oracle.com>
+References: <20190617150950.5264-1-shmuel.eiderman@oracle.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906170136
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906170136
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.85
+Subject: [Qemu-devel] [QEMU] [PATCH v3 8/8] hd-geo-test: Add tests for lchs
+ override
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,88 +103,639 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Robert Bradford <robert.bradford@intel.com>,
- Samuel Ortiz <sameo@linux.intel.com>
+Cc: liran.alon@oracle.com, shmuel.eiderman@oracle.com, karl.heubaum@oracle.com,
+ arbel.moshe@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Add QTest tests to check the logical geometry override option.
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+The tests in hd-geo-test are out of date - they only test IDE and do not
+test interesting MBRs.
 
-> From: Samuel Ortiz <sameo@linux.intel.com>
->
-> We can now safely turn all TCG dependent build off when CONFIG_TCG is
-> off. This allows building ARM binaries with --disable-tcg.
->
-> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Reviewed-by: Robert Bradford <robert.bradford@intel.com>
-> [PMD: Rebased]
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->
-> We can also use:
->
->   ifeq ($(CONFIG_TCG),y)
->   ...
->   endif
->
-> But long single line with macros from rules.mak are way easier to
-> rebase. Now that this series is stable, I could change to ifeq if
-> required.
+I added a few helper functions which will make adding more tests easier.
 
-Given you spent that time re-ordering stuff to keep it together I think
-ifeq for blocks would be better. Some commentary in the Makefile.objs so
-people know where to put their new files would also help.
+QTest's fw_cfg helper functions support only legacy fw_cfg, so I had to
+read the new fw_cfg layout on my own.
 
->
->  target/arm/Makefile.objs | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
->
-> diff --git a/target/arm/Makefile.objs b/target/arm/Makefile.objs
-> index 5f3f965cc6..b8aa9c032a 100644
-> --- a/target/arm/Makefile.objs
-> +++ b/target/arm/Makefile.objs
-> @@ -3,7 +3,7 @@ obj-y +=3D cpu.o helper.o gdbstub.o
->  obj-$(TARGET_AARCH64) +=3D cpu64.o gdbstub64.o
->
->  obj-$(CONFIG_SOFTMMU) +=3D machine.o arch_dump.o monitor.o arm-powerctl.o
-> -obj-$(CONFIG_SOFTMMU) +=3D psci.o
-> +obj-$(call land,$(CONFIG_TCG),$(CONFIG_SOFTMMU)) +=3D psci.o
->
->  obj-$(CONFIG_KVM) +=3D kvm.o
->  obj-$(call land,$(CONFIG_KVM),$(call lnot,$(TARGET_AARCH64))) +=3D kvm32=
-.o
-> @@ -31,12 +31,12 @@ target/arm/translate-sve.o: target/arm/decode-sve.inc=
-.c
->  target/arm/translate.o: target/arm/decode-vfp.inc.c
->  target/arm/translate.o: target/arm/decode-vfp-uncond.inc.c
->
-> -obj-y +=3D translate.o op_helper.o
-> -obj-y +=3D crypto_helper.o
-> -obj-y +=3D iwmmxt_helper.o vec_helper.o
-> -obj-y +=3D neon_helper.o vfp_helper.o
-> -obj-$(call lor,$(CONFIG_USER_ONLY),$(CONFIG_ARM_V7M)) +=3D v7m_helper.o
-> +obj-$(CONFIG_TCG) +=3D translate.o op_helper.o
-> +obj-$(CONFIG_TCG) +=3D crypto_helper.o
-> +obj-$(CONFIG_TCG) +=3D iwmmxt_helper.o vec_helper.o
-> +obj-$(CONFIG_TCG) +=3D neon_helper.o vfp_helper.o
-> +obj-$(call lor,$(CONFIG_USER_ONLY),$(call land,$(CONFIG_TCG),$(CONFIG_AR=
-M_V7M))) +=3D v7m_helper.o
->
-> -obj-$(TARGET_AARCH64) +=3D translate-a64.o helper-a64.o
-> -obj-$(TARGET_AARCH64) +=3D translate-sve.o sve_helper.o
-> -obj-$(TARGET_AARCH64) +=3D pauth_helper.o
-> +obj-$(call land,$(CONFIG_TCG),$(TARGET_AARCH64)) +=3D translate-a64.o he=
-lper-a64.o
-> +obj-$(call land,$(CONFIG_TCG),$(TARGET_AARCH64)) +=3D translate-sve.o sv=
-e_helper.o
-> +obj-$(call land,$(CONFIG_TCG),$(TARGET_AARCH64)) +=3D pauth_helper.o
+Creating qcow2 disks with specific size and MBR layout is currently
+unused - we only use a default empty MBR.
 
+Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
+Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
+---
+ tests/Makefile.include |   2 +-
+ tests/hd-geo-test.c    | 566 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 567 insertions(+), 1 deletion(-)
 
---
-Alex Benn=C3=A9e
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 46a36c2c95..55ea165ed4 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -765,7 +765,7 @@ tests/ide-test$(EXESUF): tests/ide-test.o $(libqos-pc-obj-y)
+ tests/ahci-test$(EXESUF): tests/ahci-test.o $(libqos-pc-obj-y) qemu-img$(EXESUF)
+ tests/ipmi-kcs-test$(EXESUF): tests/ipmi-kcs-test.o
+ tests/ipmi-bt-test$(EXESUF): tests/ipmi-bt-test.o
+-tests/hd-geo-test$(EXESUF): tests/hd-geo-test.o
++tests/hd-geo-test$(EXESUF): tests/hd-geo-test.o $(libqos-obj-y)
+ tests/boot-order-test$(EXESUF): tests/boot-order-test.o $(libqos-obj-y)
+ tests/boot-serial-test$(EXESUF): tests/boot-serial-test.o $(libqos-obj-y)
+ tests/bios-tables-test$(EXESUF): tests/bios-tables-test.o \
+diff --git a/tests/hd-geo-test.c b/tests/hd-geo-test.c
+index 62eb624726..8c523d51e6 100644
+--- a/tests/hd-geo-test.c
++++ b/tests/hd-geo-test.c
+@@ -17,7 +17,12 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
++#include "qemu/bswap.h"
++#include "qapi/qmp/qlist.h"
+ #include "libqtest.h"
++#include "libqos/fw_cfg.h"
++#include "libqos/libqos.h"
++#include "standard-headers/linux/qemu_fw_cfg.h"
+ 
+ #define ARGV_SIZE 256
+ 
+@@ -388,6 +393,552 @@ static void test_ide_drive_cd_0(void)
+     qtest_quit(qts);
+ }
+ 
++typedef struct {
++    bool active;
++    uint32_t head;
++    uint32_t sector;
++    uint32_t cyl;
++    uint32_t end_head;
++    uint32_t end_sector;
++    uint32_t end_cyl;
++    uint32_t start_sect;
++    uint32_t nr_sects;
++} MBRpartitions[4];
++
++static MBRpartitions empty_mbr = { {false, 0, 0, 0, 0, 0, 0, 0, 0},
++                                   {false, 0, 0, 0, 0, 0, 0, 0, 0},
++                                   {false, 0, 0, 0, 0, 0, 0, 0, 0},
++                                   {false, 0, 0, 0, 0, 0, 0, 0, 0} };
++
++static char *create_qcow2_with_mbr(MBRpartitions mbr, uint64_t sectors)
++{
++    const char *template = "/tmp/qtest.XXXXXX";
++    char *raw_path = strdup(template);
++    char *qcow2_path = strdup(template);
++    char cmd[100 + 2 * PATH_MAX];
++    uint8_t buf[512];
++    int i, ret, fd, offset;
++    uint64_t qcow2_size = sectors * 512;
++    uint8_t status, parttype, head, sector, cyl;
++
++    offset = 0xbe;
++
++    for (i = 0; i < 4; i++) {
++        status = mbr[i].active ? 0x80 : 0x00;
++        g_assert(mbr[i].head < 256);
++        g_assert(mbr[i].sector < 64);
++        g_assert(mbr[i].cyl < 1024);
++        head = mbr[i].head;
++        sector = mbr[i].sector + ((mbr[i].cyl & 0x300) >> 2);
++        cyl = mbr[i].cyl & 0xff;
++
++        buf[offset + 0x0] = status;
++        buf[offset + 0x1] = head;
++        buf[offset + 0x2] = sector;
++        buf[offset + 0x3] = cyl;
++
++        parttype = 0;
++        g_assert(mbr[i].end_head < 256);
++        g_assert(mbr[i].end_sector < 64);
++        g_assert(mbr[i].end_cyl < 1024);
++        head = mbr[i].end_head;
++        sector = mbr[i].end_sector + ((mbr[i].end_cyl & 0x300) >> 2);
++        cyl = mbr[i].end_cyl & 0xff;
++
++        buf[offset + 0x4] = parttype;
++        buf[offset + 0x5] = head;
++        buf[offset + 0x6] = sector;
++        buf[offset + 0x7] = cyl;
++
++        (*(uint32_t *)&buf[offset + 0x8]) = cpu_to_le32(mbr[i].start_sect);
++        (*(uint32_t *)&buf[offset + 0xc]) = cpu_to_le32(mbr[i].nr_sects);
++
++        offset += 0x10;
++    }
++
++    fd = mkstemp(raw_path);
++    g_assert(fd);
++    close(fd);
++
++    fd = open(raw_path, O_WRONLY);
++    g_assert(fd >= 0);
++    ret = write(fd, buf, sizeof(buf));
++    g_assert(ret == sizeof(buf));
++    close(fd);
++
++    fd = mkstemp(qcow2_path);
++    g_assert(fd);
++    close(fd);
++
++    ret = snprintf(cmd, sizeof(cmd),
++                   "$QTEST_QEMU_IMG convert -f raw -O qcow2 %s %s > /dev/null",
++                   raw_path, qcow2_path);
++    g_assert((0 < ret) && (ret <= sizeof(cmd)));
++    ret = system(cmd);
++    g_assert(ret == 0);
++
++    ret = snprintf(cmd, sizeof(cmd),
++                   "$QTEST_QEMU_IMG resize %s %" PRIu64 " > /dev/null",
++                   qcow2_path, qcow2_size);
++    g_assert((0 < ret) && (ret <= sizeof(cmd)));
++    ret = system(cmd);
++    g_assert(ret == 0);
++
++    unlink(raw_path);
++    free(raw_path);
++
++    return qcow2_path;
++}
++
++struct QemuCfgFile {
++    uint32_t  size;        /* file size */
++    uint16_t  select;      /* write this to 0x510 to read it */
++    uint16_t  reserved;
++    char name[56];
++};
++
++static uint16_t find_fw_cfg_file(QFWCFG *fw_cfg,
++                                 const char *filename)
++{
++    struct QemuCfgFile qfile;
++    uint32_t count, e;
++    uint16_t select;
++
++    count = qfw_cfg_get_u32(fw_cfg, FW_CFG_FILE_DIR);
++    count = be32_to_cpu(count);
++    for (select = 0, e = 0; e < count; e++) {
++        qfw_cfg_read_data(fw_cfg, &qfile, sizeof(qfile));
++        if (!strcmp(filename, qfile.name)) {
++            select = be16_to_cpu(qfile.select);
++        }
++    }
++
++    return select;
++}
++
++static void read_fw_cfg_file(QFWCFG *fw_cfg,
++                             const char *filename,
++                             void *data,
++                             size_t len)
++{
++    uint16_t select = find_fw_cfg_file(fw_cfg, filename);
++
++    g_assert(select);
++
++    qfw_cfg_get(fw_cfg, select, data, len);
++}
++
++#define BIOS_GEOMETRY_MAX_SIZE 10000
++
++typedef struct {
++    uint32_t c;
++    uint32_t h;
++    uint32_t s;
++} CHS;
++
++typedef struct {
++    const char *dev_path;
++    CHS chs;
++} CHSResult;
++
++static void read_bootdevices(QFWCFG *fw_cfg, CHSResult expected[])
++{
++    char *buf = g_malloc0(BIOS_GEOMETRY_MAX_SIZE);
++    void *cur;
++    char *name;
++    CHS *chs;
++    GList *results = NULL, *cur_result;
++    CHSResult *r;
++    int i;
++    bool found;
++
++    read_fw_cfg_file(fw_cfg, "bios-geometry", buf, BIOS_GEOMETRY_MAX_SIZE);
++
++    cur = buf;
++
++    while (strlen(cur)) {
++        name = cur;
++        chs = cur + strlen(cur) + 1;
++
++        r = g_malloc0(sizeof(*r));
++        r->dev_path = name;
++        r->chs.c = le32_to_cpu(chs->c);
++        r->chs.h = le32_to_cpu(chs->h);
++        r->chs.s = le32_to_cpu(chs->s);
++
++        results = g_list_prepend(results, r);
++
++        cur += strlen(cur) + 1 + sizeof(*chs);
++    }
++
++    i = 0;
++
++    while (expected[i].dev_path) {
++        found = false;
++        cur_result = results;
++        while (cur_result) {
++            r = cur_result->data;
++            if (!strcmp(r->dev_path, expected[i].dev_path) &&
++                !memcmp(&(r->chs), &(expected[i].chs), sizeof(r->chs))) {
++                found = true;
++                break;
++            }
++            cur_result = g_list_next(cur_result);
++        }
++        g_assert(found);
++        g_free(cur_result->data);
++        results = g_list_delete_link(results, cur_result);
++        i++;
++    }
++
++    g_assert(results == NULL);
++
++    g_free(buf);
++}
++
++#define MAX_DRIVES 30
++
++typedef struct {
++    char **argv;
++    int argc;
++    char **drives;
++    int n_drives;
++    int n_scsi_disks;
++    int n_scsi_controllers;
++    int n_virtio_disks;
++} TestArgs;
++
++static TestArgs *create_args(void)
++{
++    TestArgs *args = g_malloc0(sizeof(*args));
++    args->argv = g_new0(char *, ARGV_SIZE);
++    args->argc = append_arg(args->argc, args->argv,
++                            ARGV_SIZE, g_strdup("-nodefaults"));
++    args->drives = g_new0(char *, MAX_DRIVES);
++    return args;
++}
++
++static void add_drive_with_mbr(TestArgs *args,
++                               MBRpartitions mbr, uint64_t sectors)
++{
++    char *img_file_name;
++    char part[300];
++    int ret;
++
++    g_assert(args->n_drives < MAX_DRIVES);
++
++    img_file_name = create_qcow2_with_mbr(mbr, sectors);
++
++    args->drives[args->n_drives] = img_file_name;
++    ret = snprintf(part, sizeof(part),
++                   "-drive file=%s,if=none,format=qcow2,id=disk%d",
++                   img_file_name, args->n_drives);
++    g_assert((0 < ret) && (ret <= sizeof(part)));
++    args->argc = append_arg(args->argc, args->argv, ARGV_SIZE, g_strdup(part));
++    args->n_drives++;
++}
++
++static void add_ide_disk(TestArgs *args,
++                         int drive_idx, int bus, int unit, int c, int h, int s)
++{
++    char part[300];
++    int ret;
++
++    ret = snprintf(part, sizeof(part),
++                   "-device ide-hd,drive=disk%d,bus=ide.%d,unit=%d,"
++                   "lcyls=%d,lheads=%d,lsecs=%d",
++                   drive_idx, bus, unit, c, h, s);
++    g_assert((0 < ret) && (ret <= sizeof(part)));
++    args->argc = append_arg(args->argc, args->argv, ARGV_SIZE, g_strdup(part));
++}
++
++static void add_scsi_controller(TestArgs *args,
++                                const char *type,
++                                const char *bus,
++                                int addr)
++{
++    char part[300];
++    int ret;
++
++    ret = snprintf(part, sizeof(part),
++                   "-device %s,id=scsi%d,bus=%s,addr=%d",
++                   type, args->n_scsi_controllers, bus, addr);
++    g_assert((0 < ret) && (ret <= sizeof(part)));
++    args->argc = append_arg(args->argc, args->argv, ARGV_SIZE, g_strdup(part));
++    args->n_scsi_controllers++;
++}
++
++static void add_scsi_disk(TestArgs *args,
++                          int drive_idx, int bus,
++                          int channel, int scsi_id, int lun,
++                          int c, int h, int s)
++{
++    char part[300];
++    int ret;
++
++    ret = snprintf(part, sizeof(part),
++                   "-device scsi-hd,id=scsi-disk%d,drive=disk%d,"
++                   "bus=scsi%d.0,"
++                   "channel=%d,scsi-id=%d,lun=%d,"
++                   "lcyls=%d,lheads=%d,lsecs=%d",
++                   args->n_scsi_disks, drive_idx, bus, channel, scsi_id, lun,
++                   c, h, s);
++    g_assert((0 < ret) && (ret <= sizeof(part)));
++    args->argc = append_arg(args->argc, args->argv, ARGV_SIZE, g_strdup(part));
++    args->n_scsi_disks++;
++}
++
++static void add_virtio_disk(TestArgs *args,
++                            int drive_idx, const char *bus, int addr,
++                            int c, int h, int s)
++{
++    char part[300];
++    int ret;
++
++    ret = snprintf(part, sizeof(part),
++                   "-device virtio-blk-pci,id=virtio-disk%d,"
++                   "drive=disk%d,bus=%s,addr=%d,"
++                   "lcyls=%d,lheads=%d,lsecs=%d",
++                   args->n_virtio_disks, drive_idx, bus, addr, c, h, s);
++    g_assert((0 < ret) && (ret <= sizeof(part)));
++    args->argc = append_arg(args->argc, args->argv, ARGV_SIZE, g_strdup(part));
++    args->n_virtio_disks++;
++}
++
++static void test_override(TestArgs *args, CHSResult expected[])
++{
++    char *joined_args;
++    QFWCFG *fw_cfg;
++    int i;
++
++    joined_args = g_strjoinv(" ", args->argv);
++
++    qtest_start(joined_args);
++    fw_cfg = pc_fw_cfg_init(global_qtest);
++
++    read_bootdevices(fw_cfg, expected);
++
++    g_free(joined_args);
++    qtest_end();
++
++    g_free(fw_cfg);
++
++    for (i = 0; i < args->n_drives; i++) {
++        unlink(args->drives[i]);
++        free(args->drives[i]);
++    }
++    g_free(args->drives);
++    g_strfreev(args->argv);
++    g_free(args);
++}
++
++static void test_override_ide(void)
++{
++    TestArgs *args = create_args();
++    CHSResult expected[] = {
++        {"/pci@i0cf8/ide@1,1/drive@0/disk@0", {10000, 120, 30} },
++        {"/pci@i0cf8/ide@1,1/drive@0/disk@1", {9000, 120, 30} },
++        {"/pci@i0cf8/ide@1,1/drive@1/disk@0", {0, 1, 1} },
++        {"/pci@i0cf8/ide@1,1/drive@1/disk@1", {1, 0, 0} },
++        {NULL, {0, 0, 0} }
++    };
++    add_drive_with_mbr(args, empty_mbr, 1);
++    add_drive_with_mbr(args, empty_mbr, 1);
++    add_drive_with_mbr(args, empty_mbr, 1);
++    add_drive_with_mbr(args, empty_mbr, 1);
++    add_ide_disk(args, 0, 0, 0, 10000, 120, 30);
++    add_ide_disk(args, 1, 0, 1, 9000, 120, 30);
++    add_ide_disk(args, 2, 1, 0, 0, 1, 1);
++    add_ide_disk(args, 3, 1, 1, 1, 0, 0);
++    test_override(args, expected);
++}
++
++static void test_override_scsi(void)
++{
++    TestArgs *args = create_args();
++    CHSResult expected[] = {
++        {"/pci@i0cf8/scsi@3/channel@0/disk@0,0", {10000, 120, 30} },
++        {"/pci@i0cf8/scsi@3/channel@0/disk@1,0", {9000, 120, 30} },
++        {"/pci@i0cf8/scsi@3/channel@0/disk@2,0", {1, 0, 0} },
++        {"/pci@i0cf8/scsi@3/channel@0/disk@3,0", {0, 1, 0} },
++        {NULL, {0, 0, 0} }
++    };
++    add_drive_with_mbr(args, empty_mbr, 1);
++    add_drive_with_mbr(args, empty_mbr, 1);
++    add_drive_with_mbr(args, empty_mbr, 1);
++    add_drive_with_mbr(args, empty_mbr, 1);
++    add_scsi_controller(args, "lsi53c895a", "pci.0", 3);
++    add_scsi_disk(args, 0, 0, 0, 0, 0, 10000, 120, 30);
++    add_scsi_disk(args, 1, 0, 0, 1, 0, 9000, 120, 30);
++    add_scsi_disk(args, 2, 0, 0, 2, 0, 1, 0, 0);
++    add_scsi_disk(args, 3, 0, 0, 3, 0, 0, 1, 0);
++    test_override(args, expected);
++}
++
++static void test_override_scsi_2_controllers(void)
++{
++    TestArgs *args = create_args();
++    CHSResult expected[] = {
++        {"/pci@i0cf8/scsi@3/channel@0/disk@0,0", {10000, 120, 30} },
++        {"/pci@i0cf8/scsi@3/channel@0/disk@1,0", {9000, 120, 30} },
++        {"/pci@i0cf8/scsi@4/channel@0/disk@0,1", {1, 0, 0} },
++        {"/pci@i0cf8/scsi@4/channel@0/disk@1,2", {0, 1, 0} },
++        {NULL, {0, 0, 0} }
++    };
++    add_drive_with_mbr(args, empty_mbr, 1);
++    add_drive_with_mbr(args, empty_mbr, 1);
++    add_drive_with_mbr(args, empty_mbr, 1);
++    add_drive_with_mbr(args, empty_mbr, 1);
++    add_scsi_controller(args, "lsi53c895a", "pci.0", 3);
++    add_scsi_controller(args, "virtio-scsi-pci", "pci.0", 4);
++    add_scsi_disk(args, 0, 0, 0, 0, 0, 10000, 120, 30);
++    add_scsi_disk(args, 1, 0, 0, 1, 0, 9000, 120, 30);
++    add_scsi_disk(args, 2, 1, 0, 0, 1, 1, 0, 0);
++    add_scsi_disk(args, 3, 1, 0, 1, 2, 0, 1, 0);
++    test_override(args, expected);
++}
++
++static void test_override_virtio_blk(void)
++{
++    TestArgs *args = create_args();
++    CHSResult expected[] = {
++        {"/pci@i0cf8/scsi@3/disk@0,0", {10000, 120, 30} },
++        {"/pci@i0cf8/scsi@4/disk@0,0", {9000, 120, 30} },
++        {NULL, {0, 0, 0} }
++    };
++    add_drive_with_mbr(args, empty_mbr, 1);
++    add_drive_with_mbr(args, empty_mbr, 1);
++    add_virtio_disk(args, 0, "pci.0", 3, 10000, 120, 30);
++    add_virtio_disk(args, 1, "pci.0", 4, 9000, 120, 30);
++    test_override(args, expected);
++}
++
++static void test_override_zero_chs(void)
++{
++    TestArgs *args = create_args();
++    CHSResult expected[] = {
++        {NULL, {0, 0, 0} }
++    };
++    add_drive_with_mbr(args, empty_mbr, 1);
++    add_ide_disk(args, 0, 1, 1, 0, 0, 0);
++    test_override(args, expected);
++}
++
++static void test_override_scsi_hot_unplug(void)
++{
++    char *joined_args;
++    QFWCFG *fw_cfg;
++    QDict *response;
++    int i;
++    TestArgs *args = create_args();
++    CHSResult expected[] = {
++        {"/pci@i0cf8/scsi@2/channel@0/disk@0,0", {10000, 120, 30} },
++        {"/pci@i0cf8/scsi@2/channel@0/disk@1,0", {20, 20, 20} },
++        {NULL, {0, 0, 0} }
++    };
++    CHSResult expected2[] = {
++        {"/pci@i0cf8/scsi@2/channel@0/disk@1,0", {20, 20, 20} },
++        {NULL, {0, 0, 0} }
++    };
++    add_drive_with_mbr(args, empty_mbr, 1);
++    add_drive_with_mbr(args, empty_mbr, 1);
++    add_scsi_controller(args, "virtio-scsi-pci", "pci.0", 2);
++    add_scsi_disk(args, 0, 0, 0, 0, 0, 10000, 120, 30);
++    add_scsi_disk(args, 1, 0, 0, 1, 0, 20, 20, 20);
++
++    joined_args = g_strjoinv(" ", args->argv);
++
++    qtest_start(joined_args);
++    fw_cfg = pc_fw_cfg_init(global_qtest);
++
++    read_bootdevices(fw_cfg, expected);
++
++    /* unplug device an restart */
++    response = qmp("{ 'execute': 'device_del',"
++                   "  'arguments': {'id': 'scsi-disk0' }}");
++    g_assert(response);
++    g_assert(!qdict_haskey(response, "error"));
++    qobject_unref(response);
++    response = qmp("{ 'execute': 'system_reset', 'arguments': { }}");
++    g_assert(response);
++    g_assert(!qdict_haskey(response, "error"));
++    qobject_unref(response);
++
++    qtest_qmp_eventwait(global_qtest, "RESET");
++
++    read_bootdevices(fw_cfg, expected2);
++
++    g_free(joined_args);
++    qtest_end();
++
++    g_free(fw_cfg);
++
++    for (i = 0; i < args->n_drives; i++) {
++        unlink(args->drives[i]);
++        free(args->drives[i]);
++    }
++    g_free(args->drives);
++    g_strfreev(args->argv);
++    g_free(args);
++}
++
++static void test_override_virtio_hot_unplug(void)
++{
++    char *joined_args;
++    QFWCFG *fw_cfg;
++    QDict *response;
++    int i;
++    TestArgs *args = create_args();
++    CHSResult expected[] = {
++        {"/pci@i0cf8/scsi@2/disk@0,0", {10000, 120, 30} },
++        {"/pci@i0cf8/scsi@3/disk@0,0", {20, 20, 20} },
++        {NULL, {0, 0, 0} }
++    };
++    CHSResult expected2[] = {
++        {"/pci@i0cf8/scsi@3/disk@0,0", {20, 20, 20} },
++        {NULL, {0, 0, 0} }
++    };
++    add_drive_with_mbr(args, empty_mbr, 1);
++    add_drive_with_mbr(args, empty_mbr, 1);
++    add_virtio_disk(args, 0, "pci.0", 2, 10000, 120, 30);
++    add_virtio_disk(args, 1, "pci.0", 3, 20, 20, 20);
++
++    joined_args = g_strjoinv(" ", args->argv);
++
++    qtest_start(joined_args);
++    fw_cfg = pc_fw_cfg_init(global_qtest);
++
++    read_bootdevices(fw_cfg, expected);
++
++    /* unplug device an restart */
++    response = qmp("{ 'execute': 'device_del',"
++                   "  'arguments': {'id': 'virtio-disk0' }}");
++    g_assert(response);
++    g_assert(!qdict_haskey(response, "error"));
++    qobject_unref(response);
++    response = qmp("{ 'execute': 'system_reset', 'arguments': { }}");
++    g_assert(response);
++    g_assert(!qdict_haskey(response, "error"));
++    qobject_unref(response);
++
++    qtest_qmp_eventwait(global_qtest, "RESET");
++
++    read_bootdevices(fw_cfg, expected2);
++
++    g_free(joined_args);
++    qtest_end();
++
++    g_free(fw_cfg);
++
++    for (i = 0; i < args->n_drives; i++) {
++        unlink(args->drives[i]);
++        free(args->drives[i]);
++    }
++    g_free(args->drives);
++    g_strfreev(args->argv);
++    g_free(args);
++}
++
+ int main(int argc, char **argv)
+ {
+     Backend i;
+@@ -413,6 +964,21 @@ int main(int argc, char **argv)
+     qtest_add_func("hd-geo/ide/device/mbr/chs", test_ide_device_mbr_chs);
+     qtest_add_func("hd-geo/ide/device/user/chs", test_ide_device_user_chs);
+     qtest_add_func("hd-geo/ide/device/user/chst", test_ide_device_user_chst);
++    if (have_qemu_img()) {
++        qtest_add_func("hd-geo/override/ide", test_override_ide);
++        qtest_add_func("hd-geo/override/scsi", test_override_scsi);
++        qtest_add_func("hd-geo/override/scsi_2_controllers",
++                       test_override_scsi_2_controllers);
++        qtest_add_func("hd-geo/override/virtio_blk", test_override_virtio_blk);
++        qtest_add_func("hd-geo/override/zero_chs", test_override_zero_chs);
++        qtest_add_func("hd-geo/override/scsi_hot_unplug",
++                       test_override_scsi_hot_unplug);
++        qtest_add_func("hd-geo/override/virtio_hot_unplug",
++                       test_override_virtio_hot_unplug);
++    } else {
++        g_test_message("QTEST_QEMU_IMG not set or qemu-img missing; "
++                       "skipping hd-geo/override/* tests");
++    }
+ 
+     ret = g_test_run();
+ 
+-- 
+2.13.3
+
 
