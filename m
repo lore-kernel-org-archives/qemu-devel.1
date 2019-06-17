@@ -2,91 +2,64 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AEF6C31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 14:37:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F730C31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 14:38:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17EB420833
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 14:37:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mvpTG4Bb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17EB420833
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id F27E820833
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 14:38:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F27E820833
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48048 helo=lists.gnu.org)
+Received: from localhost ([::1]:48056 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcslb-0006C8-2p
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 10:37:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41357)
+	id 1hcsmC-00070D-82
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 10:38:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42133)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hcsQg-0001Fc-5B
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:16:15 -0400
+ (envelope-from <clg@kaod.org>) id 1hcsTR-0002J1-Cf
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:19:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hcsQd-0005L0-Ep
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:16:14 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40486)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hcsQc-0005KQ-Vo
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:16:11 -0400
-Received: by mail-wr1-x443.google.com with SMTP id p11so10159327wre.7
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 07:16:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=nnehQM8Sv1jpgMg1ksb+qmJfU7wSH141wt7vRUcBbH0=;
- b=mvpTG4Bbw4gpymjuLS3N+37svuximtBCe2nJjY5hx6l5sjUkHcF1gHKSDxFyefEn3P
- Ehg2wGNjZlkgkcWb6sGEBSmwd7A6Huz+KDctZHcNdx2A41sFmn8RpuwAfA5kbUZ3kqg0
- ssFiz7xltaUmFLg4G17KVX8o2eiMOzmnyjexOdOuwiPEKVZ81Lq115kUw+IFPWbDwEGP
- 5QrFZIej6wv0Fo4cmvveyq5Ud+blmIhpWKyPJQBfZ4sWSl34UfqaTQ99i8084u57YSww
- zQOfFWtTk7CfsGHO4YRRdA7J4OZgnWbfqsl8bo+k4UdjKhfKaW9Vr93frnyv0RPB5V4A
- AaXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=nnehQM8Sv1jpgMg1ksb+qmJfU7wSH141wt7vRUcBbH0=;
- b=ilgz40BAtixBR9AxmetvZribAk8SOq5Gjox2gaxE/ijrfyj7PkI3+q9Ez23ceN0WaG
- vlygnWEdLlVH/ZyUCqUZDhpADi86MMPpnzCAtdhdhjuUzh3aiOuV2CTxg0pdJRea/AB4
- pA2bCnp0/t/cTC554bMTT6cHrBaicKzL4V4WHvcvEmyBC/XgcZ3wfh4scJLzP3Kbc6Nv
- LI0Y5Ch0R/u3CU/m7vHSWyo+RELBVu3JfiOlf5uJpqqwi/8E2RsO4Bmq1fcWZ01d9iK2
- 6ZXak50jgR7aIbZUm3jenDM7UtFjbDmxof6KVqBU4ZZlLi2KKx46/eBW9TowzqkZsX2M
- x95Q==
-X-Gm-Message-State: APjAAAUGm9PnHZFGGERzG25OAgGMgu2hnQ0DPGhy3rH5yXHWuwUAmbbe
- Bm4dUv+1CmYj73H7OS/bIUq5aQ==
-X-Google-Smtp-Source: APXvYqwRDF+Dl2oXM4XmfRkPWT3tgQRchcl9cV+H539sgIAZu/TJ4PvIkArv889WxDq1bOWZU+EAZw==
-X-Received: by 2002:a5d:4a8d:: with SMTP id o13mr1684662wrq.350.1560780969779; 
- Mon, 17 Jun 2019 07:16:09 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id q20sm28543491wra.36.2019.06.17.07.16.09
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 17 Jun 2019 07:16:09 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id B389E1FF87;
- Mon, 17 Jun 2019 15:16:08 +0100 (BST)
-References: <20190615154352.26824-1-philmd@redhat.com>
- <20190615154352.26824-16-philmd@redhat.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-arm@nongnu.org
-In-reply-to: <20190615154352.26824-16-philmd@redhat.com>
-Date: Mon, 17 Jun 2019 15:16:08 +0100
-Message-ID: <87lfy09u1j.fsf@zen.linaroharston>
+ (envelope-from <clg@kaod.org>) id 1hcsTN-0006v2-1M
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:19:03 -0400
+Received: from 1.mo69.mail-out.ovh.net ([178.33.251.173]:51344)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hcsTM-0006qx-RW
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:19:00 -0400
+Received: from player759.ha.ovh.net (unknown [10.109.143.24])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id D09385C274
+ for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 16:18:58 +0200 (CEST)
+Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
+ (Authenticated sender: clg@kaod.org)
+ by player759.ha.ovh.net (Postfix) with ESMTPSA id 3A8166F57BCC;
+ Mon, 17 Jun 2019 14:18:54 +0000 (UTC)
+To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+References: <156077918969.433243.1416211899441569578.stgit@bahia.lan>
+ <156077920657.433243.13541093940589972734.stgit@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <974ab588-09b6-7952-f31e-34c534509f45@kaod.org>
+Date: Mon, 17 Jun 2019 16:18:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
+In-Reply-To: <156077920657.433243.13541093940589972734.stgit@bahia.lan>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 11624353590673640256
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudeijedgjeehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 15/23] target/arm: Make ARM
- TLB filling routine static
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 178.33.251.173
+Subject: Re: [Qemu-devel] [PATCH 3/6] xics/kvm: Skip rollback when KVM XICS
+ is absent
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,192 +71,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Samuel Ortiz <sameo@linux.intel.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 17/06/2019 15:46, Greg Kurz wrote:
+> There is no need to rollback anything at this point, so just return an
+> error.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> From: Samuel Ortiz <sameo@linux.intel.com>
->
-> It's only used in op_helper.c, it does not need to be exported and
-> moreover it should only be build when TCG is enabled.
->
-> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> [PMD: Rebased]
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
+Thanks,
+
+C.
+
 > ---
->  target/arm/helper.c    | 53 ---------------------------------------
->  target/arm/internals.h |  2 ++
->  target/arm/op_helper.c | 56 ++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 58 insertions(+), 53 deletions(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 673ada1e86..a4af02c984 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -10621,59 +10621,6 @@ hwaddr arm_cpu_get_phys_page_attrs_debug(CPUStat=
-e *cs, vaddr addr,
->
->  #endif
->
-> -bool arm_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-> -                      MMUAccessType access_type, int mmu_idx,
-> -                      bool probe, uintptr_t retaddr)
-> -{
-> -    ARMCPU *cpu =3D ARM_CPU(cs);
-> -
-> -#ifdef CONFIG_USER_ONLY
-> -    cpu->env.exception.vaddress =3D address;
-> -    if (access_type =3D=3D MMU_INST_FETCH) {
-> -        cs->exception_index =3D EXCP_PREFETCH_ABORT;
-> -    } else {
-> -        cs->exception_index =3D EXCP_DATA_ABORT;
-> -    }
-> -    cpu_loop_exit_restore(cs, retaddr);
-> -#else
-> -    hwaddr phys_addr;
-> -    target_ulong page_size;
-> -    int prot, ret;
-> -    MemTxAttrs attrs =3D {};
-> -    ARMMMUFaultInfo fi =3D {};
-> -
-> -    /*
-> -     * Walk the page table and (if the mapping exists) add the page
-> -     * to the TLB.  On success, return true.  Otherwise, if probing,
-> -     * return false.  Otherwise populate fsr with ARM DFSR/IFSR fault
-> -     * register format, and signal the fault.
-> -     */
-> -    ret =3D get_phys_addr(&cpu->env, address, access_type,
-> -                        core_to_arm_mmu_idx(&cpu->env, mmu_idx),
-> -                        &phys_addr, &attrs, &prot, &page_size, &fi,
-> NULL);
+>  hw/intc/xics_kvm.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+> index 534515143ea8..377ff88701c2 100644
+> --- a/hw/intc/xics_kvm.c
+> +++ b/hw/intc/xics_kvm.c
+> @@ -348,7 +348,7 @@ int xics_kvm_connect(SpaprMachineState *spapr, Erro=
+r **errp)
+>      if (!kvm_enabled() || !kvm_check_extension(kvm_state, KVM_CAP_IRQ_=
+XICS)) {
+>          error_setg(errp,
+>                     "KVM and IRQ_XICS capability must be present for in=
+-kernel XICS");
+> -        goto fail;
+> +        return -1;
+>      }
+> =20
+>      rc =3D kvmppc_define_rtas_kernel_token(RTAS_IBM_SET_XIVE, "ibm,set=
+-xive");
+>=20
 
-Shouldn't we be moving the rest of the tlb filling code that gets
-referred to here? Maybe we could keep it all together in tlb-helper.c?
-
-
-> -    if (likely(!ret)) {
-> -        /*
-> -         * Map a single [sub]page. Regions smaller than our declared
-> -         * target page size are handled specially, so for those we
-> -         * pass in the exact addresses.
-> -         */
-> -        if (page_size >=3D TARGET_PAGE_SIZE) {
-> -            phys_addr &=3D TARGET_PAGE_MASK;
-> -            address &=3D TARGET_PAGE_MASK;
-> -        }
-> -        tlb_set_page_with_attrs(cs, address, phys_addr, attrs,
-> -                                prot, mmu_idx, page_size);
-> -        return true;
-> -    } else if (probe) {
-> -        return false;
-> -    } else {
-> -        /* now we have a real cpu fault */
-> -        cpu_restore_state(cs, retaddr, true);
-> -        arm_deliver_fault(cpu, address, access_type, mmu_idx, &fi);
-> -    }
-> -#endif
-> -}
-> -
->  /* Note that signed overflow is undefined in C.  The following routines =
-are
->     careful to use unsigned types where modulo arithmetic is required.
->     Failure to do so _will_ break on newer gcc.  */
-> diff --git a/target/arm/internals.h b/target/arm/internals.h
-> index fe9e4665e2..37ca493635 100644
-> --- a/target/arm/internals.h
-> +++ b/target/arm/internals.h
-> @@ -761,9 +761,11 @@ static inline bool arm_extabort_type(MemTxResult res=
-ult)
->      return result !=3D MEMTX_DECODE_ERROR;
->  }
->
-> +#ifdef CONFIG_TCG
->  bool arm_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
->                        MMUAccessType access_type, int mmu_idx,
->                        bool probe, uintptr_t retaddr);
-> +#endif
->
->  void arm_deliver_fault(ARMCPU *cpu, vaddr addr, MMUAccessType access_typ=
-e,
->                         int mmu_idx, ARMMMUFaultInfo *fi) QEMU_NORETURN;
-> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-> index 29b56039e5..e43c99ebf0 100644
-> --- a/target/arm/op_helper.c
-> +++ b/target/arm/op_helper.c
-> @@ -179,6 +179,62 @@ void arm_deliver_fault(ARMCPU *cpu, vaddr addr, MMUA=
-ccessType access_type,
->      env->exception.fsr =3D fsr;
->      raise_exception(env, exc, syn, target_el);
->  }
-> +#endif
-> +
-> +bool arm_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-> +                      MMUAccessType access_type, int mmu_idx,
-> +                      bool probe, uintptr_t retaddr)
-> +{
-> +    ARMCPU *cpu =3D ARM_CPU(cs);
-> +
-> +#ifdef CONFIG_USER_ONLY
-> +    cpu->env.exception.vaddress =3D address;
-> +    if (access_type =3D=3D MMU_INST_FETCH) {
-> +        cs->exception_index =3D EXCP_PREFETCH_ABORT;
-> +    } else {
-> +        cs->exception_index =3D EXCP_DATA_ABORT;
-> +    }
-> +    cpu_loop_exit_restore(cs, retaddr);
-> +#else
-> +    hwaddr phys_addr;
-> +    target_ulong page_size;
-> +    int prot, ret;
-> +    MemTxAttrs attrs =3D {};
-> +    ARMMMUFaultInfo fi =3D {};
-> +
-> +    /*
-> +     * Walk the page table and (if the mapping exists) add the page
-> +     * to the TLB.  On success, return true.  Otherwise, if probing,
-> +     * return false.  Otherwise populate fsr with ARM DFSR/IFSR fault
-> +     * register format, and signal the fault.
-> +     */
-> +    ret =3D get_phys_addr(&cpu->env, address, access_type,
-> +                        core_to_arm_mmu_idx(&cpu->env, mmu_idx),
-> +                        &phys_addr, &attrs, &prot, &page_size, &fi, NULL=
-);
-> +    if (likely(!ret)) {
-> +        /*
-> +         * Map a single [sub]page. Regions smaller than our declared
-> +         * target page size are handled specially, so for those we
-> +         * pass in the exact addresses.
-> +         */
-> +        if (page_size >=3D TARGET_PAGE_SIZE) {
-> +            phys_addr &=3D TARGET_PAGE_MASK;
-> +            address &=3D TARGET_PAGE_MASK;
-> +        }
-> +        tlb_set_page_with_attrs(cs, address, phys_addr, attrs,
-> +                                prot, mmu_idx, page_size);
-> +        return true;
-> +    } else if (probe) {
-> +        return false;
-> +    } else {
-> +        /* now we have a real cpu fault */
-> +        cpu_restore_state(cs, retaddr, true);
-> +        arm_deliver_fault(cpu, address, access_type, mmu_idx, &fi);
-> +    }
-> +#endif
-> +}
-> +
-> +#if !defined(CONFIG_USER_ONLY)
->
->  /* Raise a data fault alignment exception for the specified virtual addr=
-ess */
->  void arm_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
-
-
---
-Alex Benn=C3=A9e
 
