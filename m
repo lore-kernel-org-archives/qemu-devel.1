@@ -2,83 +2,88 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83D41C31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:54:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3903C31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:54:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52A4920861
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:54:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7889720861
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:54:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZzjyTQ1K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52A4920861
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nRp4TDwe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7889720861
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50642 helo=lists.gnu.org)
+Received: from localhost ([::1]:50644 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcvqL-0000xV-5q
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 13:54:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50645)
+	id 1hcvqM-00011S-Ol
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 13:54:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50690)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hcvoq-0007eo-EU
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 13:53:26 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hcvot-0007fK-Sw
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 13:53:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hcvoo-0000Zg-8j
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 13:53:24 -0400
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:39027)
+ (envelope-from <peter.maydell@linaro.org>) id 1hcvos-0000bz-AG
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 13:53:27 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:56117)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hcvoo-0000Yt-01
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 13:53:22 -0400
-Received: by mail-wm1-x332.google.com with SMTP id z23so305337wma.4
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 10:53:21 -0700 (PDT)
+ id 1hcvos-0000ag-1I
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 13:53:26 -0400
+Received: by mail-wm1-x341.google.com with SMTP id a15so316309wmj.5
+ for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 10:53:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=bwrup4kLeXvOMHO6drVlshIwfFzLp0o5ivBB3kuYX/A=;
- b=ZzjyTQ1KPHAzjKtq9yamCZ+4dHe0nJ4bFUfWsaU/zXGTHo0WIOlNGN9kw4X1Zx5FtP
- Y9Et/NKhj8SroR5b8+NKAzndOf7MEkPqQji40qYJK6znBCbvCyjm3DE8dKgVCcBzaAii
- 2Vt2/PAhuqeg80XrgPJ9uSeGJxjb0dKJSz7BRx+8tIEFTBPPUzTZlNxeTN8Yv5ogig0t
- 57q8X5dIGDluXPQdj6jPk3zQ6UKR+z30fmmqcACzVICOCeOXnzhH2wgY5DYzC4bFErGU
- GcSG+GmFavqgO0YKZAvzokSmfg5UIckXuigkaPLXBkdjO0tMkvU/pr+TMCaBks286B5j
- 8Wow==
+ bh=tkA5eV6B+7bWXMQLTUuNg6Ny6QzZoudF4r4qdXt2dKw=;
+ b=nRp4TDwedZ2bj3uvzCgOxbHGnnIMrSlYGOSYYiyHPYh1po1TWvybV6Pwlhl7Fq2Vby
+ 37y1NjDzBOxUP72RK+H8m6+/ciJ3epPK9nK1chEsySdwlhzBZgO6JqJUqhKSBsdnu90f
+ lNXgKc0U/B/pBM8ZBS1VrHhce79nNl92Oi6InE1A9HvZDHhECJMYF9trq6ZPpSUL8Yn5
+ KfH0mLxTTPLq22qX2DyQIRaA75ecrOOaKbYcQpfrMcsMBSbP/ReX40n+M0P4YINsNQ3y
+ WsVmdC/B/c3RacMMyl+i1hjcES2ifsNFXqa1zjTbt4wG6jKCLO21neU0DvVSAuzO2XHo
+ gOgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=bwrup4kLeXvOMHO6drVlshIwfFzLp0o5ivBB3kuYX/A=;
- b=Bjq6mKIIx88HGFpkHu12hZcz+tYYAXbTi99MHzxnvUWpdmIG8f/FcXIexua8URo1s8
- 3U+t1s3VzuKdK17g6eEg2obbeGuuqXPqQJlSEd6r/6KIWINE9rWxjH9ReJZ/tPNfAFMp
- DTKczPhpkbo0Y3nzulyScu1Qiv39YYxQhVfmYaslgg3LGh14RjjdkWyP2ozTaGeDScE5
- 1QF6/sRjrUj8e9+/HbE58iqYyrVHG8FJ5yp9OBQpyikbAu6xE3htOK9GjkXVM3GcHU9a
- vbbdzQCVctVzY5fH1XQQhbLvASlfytTGZ3teZC7YaEDh9p5tK3H8xN4TxubmZdkBm7VJ
- 4Gsw==
-X-Gm-Message-State: APjAAAVhbk2k9U9XhbvkH4pAAtzxJrcyzA4qt9LM+KCs0/MPI7FR+H6X
- 9n62F3tgTNxcDcGF5hqNLyzm+w==
-X-Google-Smtp-Source: APXvYqzAGEq6pW6XsMaCw0VtipejCDEp7O9ZNNNQjSRYPotXJDA2leZby9rRxoV616JzZGpSxfJcxw==
-X-Received: by 2002:a1c:7a15:: with SMTP id v21mr19802236wmc.82.1560793999592; 
- Mon, 17 Jun 2019 10:53:19 -0700 (PDT)
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=tkA5eV6B+7bWXMQLTUuNg6Ny6QzZoudF4r4qdXt2dKw=;
+ b=NJrC+Zpr6iDKOQ2WpGdm1J0pN8VT9vTELYBZnrgh1cUc8SQ9wi5r/LC7kFy5CY4RH0
+ WMVDLTB7mmd3+ak+Nx9TGGRHbIn3gr+N/v9JVb4UYPIHEPpVuEw80qEBAkG3AvP9nZ7I
+ IX7Ivr2BvKGFth2LAqof4JdVsBvm1Gw54mE2bJoQCWtO/DnDXzg2dMj1I6P88rAiW0yb
+ 5TiBksHXR/C9voOx+OC6F/o8Lz3hLY5hj6p0veLperoy3jSFRlnAMuXl9Ox1pZTGMfrG
+ L03pyDaOTPDcLb9BjuPtMocwW1viVp4rXFwsOLLbV/ArBgCKmgBNc2Rj8Bzq7KxJVTb9
+ Impg==
+X-Gm-Message-State: APjAAAX0m8/0+xo5uJDVkUbX8DjgfSCQNT7Pg0qyUINqMLuIfk/PSZ/U
+ sdPJNp45Ym8djQgrHOJqutFSpX5SF7bq3g==
+X-Google-Smtp-Source: APXvYqx9OEZbQtxsL8JhzH1yuefk1SoZsB4UJixrCj4o8Fj+emBi9j7Ma5CGZzcuII0l30m3uiEeXQ==
+X-Received: by 2002:a05:600c:c6:: with SMTP id
+ u6mr20220508wmm.153.1560794003623; 
+ Mon, 17 Jun 2019 10:53:23 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id t14sm8713619wrr.33.2019.06.17.10.53.18
+ by smtp.gmail.com with ESMTPSA id t14sm8713619wrr.33.2019.06.17.10.53.22
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 17 Jun 2019 10:53:18 -0700 (PDT)
+ Mon, 17 Jun 2019 10:53:22 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Mon, 17 Jun 2019 18:53:11 +0100
-Message-Id: <20190617175317.27557-1-peter.maydell@linaro.org>
+Date: Mon, 17 Jun 2019 18:53:14 +0100
+Message-Id: <20190617175317.27557-4-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190617175317.27557-1-peter.maydell@linaro.org>
+References: <20190617175317.27557-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::332
-Subject: [Qemu-devel] [PATCH 0/6] Six minor M-profile bugfixes
+X-Received-From: 2a00:1450:4864:20::341
+Subject: [Qemu-devel] [PATCH 3/6] target/arm: v8M: Check state of exception
+ being returned from
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,28 +99,48 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series fixes half a dozen miscellaneous minor bugs
-in our M-profile emulation. (The condbits fix also affects
-A-profile cores.)
+In v8M, an attempt to return from an exception which is not
+active is an illegal exception return. For this purpose,
+exceptions which can configurably target either Secure or
+NonSecure are not considered to be active if they are
+configured for the opposite security state for the one
+we're trying to return from (eg attempt to return from
+an NS NMI but NMI targets Secure). In the pseudocode this
+is handled by IsActiveForState().
 
-thanks
--- PMM
+Detect this case rather than counting an active exception
+possibly of the wrong security state as being sufficient.
 
-Peter Maydell (6):
-  target/arm: NS BusFault on vector table fetch escalates to NS
-    HardFault
-  arm v8M: Forcibly clear negative-priority exceptions on deactivate
-  target/arm: v8M: Check state of exception being returned from
-  target/arm: Use _ra versions of cpu_stl_data() in v7M helpers
-  hw/timer/armv7m_systick: Forbid non-privileged accesses
-  target/arm: Execute Thumb instructions when their condbits are 0xf
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/intc/armv7m_nvic.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
- hw/intc/armv7m_nvic.c     | 54 ++++++++++++++++++++++++++++++++++-----
- hw/timer/armv7m_systick.c | 26 ++++++++++++++-----
- target/arm/helper.c       | 45 ++++++++++++++++++++++----------
- target/arm/translate.c    | 15 +++++++++--
- 4 files changed, 112 insertions(+), 28 deletions(-)
-
+diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+index 330eb728dd5..9f8f0d3ff55 100644
+--- a/hw/intc/armv7m_nvic.c
++++ b/hw/intc/armv7m_nvic.c
+@@ -860,7 +860,19 @@ int armv7m_nvic_complete_irq(void *opaque, int irq, bool secure)
+         return -1;
+     }
+ 
+-    ret = nvic_rettobase(s);
++    /*
++     * If this is a configurable exception and it is currently
++     * targeting the opposite security state from the one we're trying
++     * to complete it for, this counts as an illegal exception return.
++     * We still need to deactivate whatever vector the logic above has
++     * selected, though, as it might not be the same as the one for the
++     * requested exception number.
++     */
++    if (!exc_is_banked(irq) && exc_targets_secure(s, irq) != secure) {
++        ret = -1;
++    } else {
++        ret = nvic_rettobase(s);
++    }
+ 
+     vec->active = 0;
+     if (vec->level) {
 -- 
 2.20.1
 
