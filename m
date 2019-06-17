@@ -2,91 +2,67 @@ Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C97C4C31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 14:35:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A26B1C31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 14:36:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95ADE20833
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 14:35:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MBhY8doO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95ADE20833
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7EA7B208C4
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 14:36:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EA7B208C4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48026 helo=lists.gnu.org)
+Received: from localhost ([::1]:48034 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcsjW-0003Wn-RT
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 10:35:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42508)
+	id 1hcsk9-0004wE-51
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 10:36:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43914)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hcsUN-0002gv-4c
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:20:06 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hcsZL-0004gn-29
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:25:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hcsUL-0007Pj-78
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:20:02 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51450)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hcsUK-0007KF-U2
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:20:01 -0400
-Received: by mail-wm1-x342.google.com with SMTP id 207so9494484wma.1
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 07:19:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=T66yQ6m/u+i0sjA+UMK2rLqwipYfS8HuG6jfn9XXg4g=;
- b=MBhY8doORaSmFNRc36o5PjFExgON5q7ef9VvUd1AM95+hgsaP0ElITbBq5NDmbYtlA
- uDiLxT4VU5N5h2pbvclrkKMnYBTlJE46JcSzNT3fSdXebqgeo32eQYgqO7/jsOzyGpvU
- SZXsywkBEQM0ciJ0zY/8kSKD9xp6cXb8IS2RKUVUfBkmXTFulGkTaYl5woOPFvGfxFdD
- 0XrlX5z7wYCnZ4Hsby3iwYM4LEemrLIIEsuZiAzwSfr37qNq9aFeRRgg5tzBLnTKJhGt
- X9Q399NqLIUV8u0MBAZjpfXOIjF1IE2dwInh9OqG7BWHu2uMxCILDvZCnYhpL3MFBdzl
- HVwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=T66yQ6m/u+i0sjA+UMK2rLqwipYfS8HuG6jfn9XXg4g=;
- b=aHTgxQmcwUitshoTpSGVmCA0yPAVou1TFVRm/WlHSUqVffTWwuM+rWsBAGQbSD/Mw6
- UcGA6NtOzCD9xjxhcBJZN47Uub0mo/nf0hMgRoFOey8Pj4rW44EPpfnFWVTU7xT6BDo8
- V1Z60coZJ5ZSjp4tebWp5foFI64ZGJ7RmXu1aq3tVr66HcgexDfPedltm02TnDV+qB/q
- o7oRSIYY99gt0E9/6B34RoMaBrO9EaI3Tz2XZ2BMo+fZsxjo5rvPyUapPPa1WQ8tPUR9
- oqP1HjaAbW4SZ/NFxtWda60s7+T6nbGPIZApOlo78TggKV+lkPW6nji6qfaZSGiwwyLa
- K+2w==
-X-Gm-Message-State: APjAAAXyELF87YYX5c5WoZT2y2ZxdIxVoAHiapHK+b92M1KhyBEZqWLz
- U/F1kFiyfqrMbH8ANtNLelxrEg==
-X-Google-Smtp-Source: APXvYqzhZt8tOPpvgEncrhEi32cLUxNZpk/sk9baaFRb2jfuBqkYpNd9Tx2hJNR2FLE/ebyjHi5YaA==
-X-Received: by 2002:a1c:a5c1:: with SMTP id
- o184mr18447978wme.145.1560781193853; 
- Mon, 17 Jun 2019 07:19:53 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id o13sm23781164wra.92.2019.06.17.07.19.53
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 17 Jun 2019 07:19:53 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E557E1FF87;
- Mon, 17 Jun 2019 15:19:52 +0100 (BST)
-References: <20190615154352.26824-1-philmd@redhat.com>
- <20190615154352.26824-17-philmd@redhat.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-arm@nongnu.org
-In-reply-to: <20190615154352.26824-17-philmd@redhat.com>
-Date: Mon, 17 Jun 2019 15:19:52 +0100
-Message-ID: <87k1dk9tvb.fsf@zen.linaroharston>
+ (envelope-from <no-reply@patchew.org>) id 1hcsZJ-0002S4-3X
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:25:10 -0400
+Resent-Date: Mon, 17 Jun 2019 10:25:10 -0400
+Resent-Message-Id: <E1hcsZJ-0002S4-3X@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21545)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hcsZH-0002I8-3h
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 10:25:07 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1560781444; cv=none; d=zoho.com; s=zohoarc; 
+ b=mE5N5cu8zav1FMio3EchwWfMILPQlMl4hk8wgOG/TaonMNB09tS/uaU+v+6Kv2JnKn9czUMnvDNSkURvdnpnotZm50dY9qBSCJzBnVv9j9svnpi9EGtTVEiZ0ZM443hc89qyNrs/w8/CBjkgNtv+GtEu2KHx+c4Y+xWSawEFKAY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1560781444;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=3hHXPkvcZvo3Z6JOLD5VFHJDvIyFZ+NxTvUkraKEUMI=; 
+ b=MZiaegZXOtv06XjwKbq+S6A0amTrhJW+Ucpt8s3buGj6+1G0FnBu039g6Ko8GWAOV8NYT3ksQe8xV/SFVAavMLBjiMPQn0K6LvKbWixxJOZjjPz9Su3ZtsUr4bA45ctytfknu5vCiKJezylRCSa7zgk5wnyM0kzi+guCujvNlN4=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1560781442872904.5329668189513;
+ Mon, 17 Jun 2019 07:24:02 -0700 (PDT)
+In-Reply-To: <20190617131103.1413-1-berrange@redhat.com>
+Message-ID: <156078144156.13573.14809923576191207765@ce79690b2cb9>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 16/23] target/arm: Make
- arm_deliver_fault() static
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: berrange@redhat.com
+Date: Mon, 17 Jun 2019 07:24:02 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: fix to handle variably
+ sized SIOCGSTAMP with new kernels
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,68 +74,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: berrange@redhat.com, arnd@arndb.de, gerhard.stenzel@de.ibm.com,
+ riku.voipio@iki.fi, qemu-devel@nongnu.org, laurent@vivier.eu,
+ borntraeger@de.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYxNzEzMTEwMy4xNDEz
+LTEtYmVycmFuZ2VAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
+IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
+Zm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2Ml0gbGludXgtdXNlcjog
+Zml4IHRvIGhhbmRsZSB2YXJpYWJseSBzaXplZCBTSU9DR1NUQU1QIHdpdGggbmV3IGtlcm5lbHMK
+VHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwNjE3MTMxMTAzLjE0MTMtMS1iZXJyYW5nZUBy
+ZWRoYXQuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYt
+cGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRj
+aC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcg
+M2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0
+aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3
+LzIwMTkwNjE1MTU0MzUyLjI2ODI0LTEtcGhpbG1kQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5
+MDYxNTE1NDM1Mi4yNjgyNC0xLXBoaWxtZEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJy
+YW5jaCAndGVzdCcKYWViMTRiNSBsaW51eC11c2VyOiBmaXggdG8gaGFuZGxlIHZhcmlhYmx5IHNp
+emVkIFNJT0NHU1RBTVAgd2l0aCBuZXcga2VybmVscwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KRVJS
+T1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM3ODogRklMRTogbGludXgtdXNlci9zeXNjYWxs
+X2RlZnMuaDo3NTU6CisjZGVmaW5lIFRBUkdFVF9TSU9DR1NUQU1QX05FVyAgIFRBUkdFVF9JT0Mo
+VEFSR0VUX0lPQ19SRUFELCAncycsIDYsIHNpemVvZihsb25nIGxvbmcpICsgc2l6ZW9mKGxvbmcp
+KSAvKiBHZXQgc3RhbXAgKHRpbWV2YWw2NCkgKi8KCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFj
+dGVycwojNzk6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6NzU2OgorI2RlZmluZSBU
+QVJHRVRfU0lPQ0dTVEFNUE5TX05FVyBUQVJHRVRfSU9DKFRBUkdFVF9JT0NfUkVBRCwgJ3MnLCA3
+LCBzaXplb2YobG9uZyBsb25nKSArIHNpemVvZihsb25nKSkgLyogR2V0IHN0YW1wICh0aW1lc3Bl
+YzY0KSAqLwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA1MSBsaW5lcyBjaGVja2VkCgpD
+b21taXQgYWViMTRiNTk5ZDhiIChsaW51eC11c2VyOiBmaXggdG8gaGFuZGxlIHZhcmlhYmx5IHNp
+emVkIFNJT0NHU1RBTVAgd2l0aCBuZXcga2VybmVscykgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoK
+ClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAx
+OTA2MTcxMzExMDMuMTQxMy0xLWJlcnJhbmdlQHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNo
+Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
+aGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
+cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
-
-> This function is now only called within op_helper.c.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-(although if we move the tlb related bits that might be different)
-
-> ---
->  target/arm/internals.h | 3 ---
->  target/arm/op_helper.c | 5 +++--
->  2 files changed, 3 insertions(+), 5 deletions(-)
->
-> diff --git a/target/arm/internals.h b/target/arm/internals.h
-> index 37ca493635..06e676bf62 100644
-> --- a/target/arm/internals.h
-> +++ b/target/arm/internals.h
-> @@ -767,9 +767,6 @@ bool arm_cpu_tlb_fill(CPUState *cs, vaddr address, in=
-t size,
->                        bool probe, uintptr_t retaddr);
->  #endif
->
-> -void arm_deliver_fault(ARMCPU *cpu, vaddr addr, MMUAccessType access_typ=
-e,
-> -                       int mmu_idx, ARMMMUFaultInfo *fi) QEMU_NORETURN;
-> -
->  /* Return true if the stage 1 translation regime is using LPAE format pa=
-ge
->   * tables */
->  bool arm_s1_regime_using_lpae_format(CPUARMState *env, ARMMMUIdx mmu_idx=
-);
-> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-> index e43c99ebf0..63bce32810 100644
-> --- a/target/arm/op_helper.c
-> +++ b/target/arm/op_helper.c
-> @@ -127,8 +127,9 @@ static inline uint32_t merge_syn_data_abort(uint32_t =
-template_syn,
->      return syn;
->  }
->
-> -void arm_deliver_fault(ARMCPU *cpu, vaddr addr, MMUAccessType access_typ=
-e,
-> -                       int mmu_idx, ARMMMUFaultInfo *fi)
-> +static void QEMU_NORETURN arm_deliver_fault(ARMCPU *cpu, vaddr addr,
-> +                                            MMUAccessType access_type,
-> +                                            int mmu_idx, ARMMMUFaultInfo=
- *fi)
->  {
->      CPUARMState *env =3D &cpu->env;
->      int target_el;
-
-
---
-Alex Benn=C3=A9e
 
