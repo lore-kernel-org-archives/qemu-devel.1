@@ -7,73 +7,72 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3903C31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:54:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4C68C31E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:55:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7889720861
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:54:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9502A20861
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 17:55:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nRp4TDwe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7889720861
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U6Zfhjte"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9502A20861
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50644 helo=lists.gnu.org)
+Received: from localhost ([::1]:50646 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hcvqM-00011S-Ol
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 13:54:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50690)
+	id 1hcvqU-0001M2-Tr
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 13:55:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50785)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hcvot-0007fK-Sw
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 13:53:29 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hcvp1-0007iQ-OE
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 13:53:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hcvos-0000bz-AG
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 13:53:27 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:56117)
+ (envelope-from <peter.maydell@linaro.org>) id 1hcvp0-0000gL-1e
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 13:53:35 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43845)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hcvos-0000ag-1I
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 13:53:26 -0400
-Received: by mail-wm1-x341.google.com with SMTP id a15so316309wmj.5
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 10:53:24 -0700 (PDT)
+ id 1hcvox-0000eN-SE
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 13:53:33 -0400
+Received: by mail-wr1-x442.google.com with SMTP id p13so10916016wru.10
+ for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 10:53:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=tkA5eV6B+7bWXMQLTUuNg6Ny6QzZoudF4r4qdXt2dKw=;
- b=nRp4TDwedZ2bj3uvzCgOxbHGnnIMrSlYGOSYYiyHPYh1po1TWvybV6Pwlhl7Fq2Vby
- 37y1NjDzBOxUP72RK+H8m6+/ciJ3epPK9nK1chEsySdwlhzBZgO6JqJUqhKSBsdnu90f
- lNXgKc0U/B/pBM8ZBS1VrHhce79nNl92Oi6InE1A9HvZDHhECJMYF9trq6ZPpSUL8Yn5
- KfH0mLxTTPLq22qX2DyQIRaA75ecrOOaKbYcQpfrMcsMBSbP/ReX40n+M0P4YINsNQ3y
- WsVmdC/B/c3RacMMyl+i1hjcES2ifsNFXqa1zjTbt4wG6jKCLO21neU0DvVSAuzO2XHo
- gOgA==
+ bh=575i0kl12NVak4MXLXn7jsLioeAHAQ7GMt0OozyFMPE=;
+ b=U6Zfhjte7H1zjJkqBenhLCw1tAgmTlKq/0q9BWk2JkWrXIUcYqp+vqPBu0w7GL9Q4O
+ bEUqqAJN/f9/R+M3pjyh02+p0iUAkCilSBVAzSdKULqfFexI70Wplkuqpmty6iLFON3Y
+ exJ0/+7QXwOqxptLkkPrTg9ZvAIUobfhkqWcH5PVpcHxEkXDMmlNqhcuWHP8CaGc7GPL
+ b4b35DL4edaG3fv3hd3otwIAXnfTGQZ1n9gtk0nFoi8CVmQCbdjSjqoheZDym/ujS8hV
+ knl7w4+LRmHbRo72HdVzpfgtsAD4jGeB5LUo46tKYfPdifLzOYR7/gBVu6ZoT8cUksFJ
+ jTig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=tkA5eV6B+7bWXMQLTUuNg6Ny6QzZoudF4r4qdXt2dKw=;
- b=NJrC+Zpr6iDKOQ2WpGdm1J0pN8VT9vTELYBZnrgh1cUc8SQ9wi5r/LC7kFy5CY4RH0
- WMVDLTB7mmd3+ak+Nx9TGGRHbIn3gr+N/v9JVb4UYPIHEPpVuEw80qEBAkG3AvP9nZ7I
- IX7Ivr2BvKGFth2LAqof4JdVsBvm1Gw54mE2bJoQCWtO/DnDXzg2dMj1I6P88rAiW0yb
- 5TiBksHXR/C9voOx+OC6F/o8Lz3hLY5hj6p0veLperoy3jSFRlnAMuXl9Ox1pZTGMfrG
- L03pyDaOTPDcLb9BjuPtMocwW1viVp4rXFwsOLLbV/ArBgCKmgBNc2Rj8Bzq7KxJVTb9
- Impg==
-X-Gm-Message-State: APjAAAX0m8/0+xo5uJDVkUbX8DjgfSCQNT7Pg0qyUINqMLuIfk/PSZ/U
- sdPJNp45Ym8djQgrHOJqutFSpX5SF7bq3g==
-X-Google-Smtp-Source: APXvYqx9OEZbQtxsL8JhzH1yuefk1SoZsB4UJixrCj4o8Fj+emBi9j7Ma5CGZzcuII0l30m3uiEeXQ==
-X-Received: by 2002:a05:600c:c6:: with SMTP id
- u6mr20220508wmm.153.1560794003623; 
- Mon, 17 Jun 2019 10:53:23 -0700 (PDT)
+ bh=575i0kl12NVak4MXLXn7jsLioeAHAQ7GMt0OozyFMPE=;
+ b=MKbPW7c7LA217bFetVBhVxizsajVlEnZ0U0U5Na9wVAUoDWmmEPNkPc+AZh4YZPK1c
+ VugBTLg8dmUN8Rvls4EOpx6l0rieH+S9+crFmR4UvClrMFFOhSYPloUzzUDzaxUWf7VG
+ svfssgTvHuTtD9QVvc97mWF+D73UGOHa7OADv8WjloGCcx9BvhXs0F1ImyWhQfHarn4k
+ u/w81TuNqcCY6+CohK9V0+jqGBFuvkefyWkKOitOjjaMzvqFyNT81QjT7N6rDoeG9VV0
+ FtTUDTtlxWZvs3ajE+WVnJmECjsA+zgxxfPOc0a783YdVRWjLFNMBA4m2p/rsOggWXU/
+ Cc/w==
+X-Gm-Message-State: APjAAAX88vS1LD/OACiKKOEwXB0ShhbhLu7VbzO5OQgPBQfl+RhMYlih
+ hH0d9e/BV2ECIE5wK78ED3I0Pg==
+X-Google-Smtp-Source: APXvYqwCnzfbNl71vf1VjTNwpY2n3SFlq62hnzgtm++QyT5fIiqpC5CAXkNZiLm8eutY0+fQYKwY5w==
+X-Received: by 2002:a5d:51d1:: with SMTP id n17mr21127446wrv.52.1560794009196; 
+ Mon, 17 Jun 2019 10:53:29 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id t14sm8713619wrr.33.2019.06.17.10.53.22
+ by smtp.gmail.com with ESMTPSA id t14sm8713619wrr.33.2019.06.17.10.53.28
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 17 Jun 2019 10:53:22 -0700 (PDT)
+ Mon, 17 Jun 2019 10:53:28 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Mon, 17 Jun 2019 18:53:14 +0100
-Message-Id: <20190617175317.27557-4-peter.maydell@linaro.org>
+Date: Mon, 17 Jun 2019 18:53:17 +0100
+Message-Id: <20190617175317.27557-7-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190617175317.27557-1-peter.maydell@linaro.org>
 References: <20190617175317.27557-1-peter.maydell@linaro.org>
@@ -81,9 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: [Qemu-devel] [PATCH 3/6] target/arm: v8M: Check state of exception
- being returned from
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PATCH 6/6] target/arm: Execute Thumb instructions
+ when their condbits are 0xf
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,48 +98,60 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In v8M, an attempt to return from an exception which is not
-active is an illegal exception return. For this purpose,
-exceptions which can configurably target either Secure or
-NonSecure are not considered to be active if they are
-configured for the opposite security state for the one
-we're trying to return from (eg attempt to return from
-an NS NMI but NMI targets Secure). In the pseudocode this
-is handled by IsActiveForState().
+Thumb instructions in an IT block are set up to be conditionally
+executed depending on a set of condition bits encoded into the IT
+bits of the CPSR/XPSR.  The architecture specifies that if the
+condition bits are 0b1111 this means "always execute" (like 0b1110),
+not "never execute"; we were treating it as "never execute".  (See
+the ConditionHolds() pseudocode in both the A-profile and M-profile
+Arm ARM.)
 
-Detect this case rather than counting an active exception
-possibly of the wrong security state as being sufficient.
+This is a bit of an obscure corner case, because the only legal
+way to get to an 0b1111 set of condbits is to do an exception
+return which sets the XPSR/CPSR up that way. An IT instruction
+which encodes a condition sequence that would include an 0b1111 is
+UNPREDICTABLE, and for v8A the CONSTRAINED UNPREDICTABLE choices
+for such an IT insn are to NOP, UNDEF, or treat 0b1111 like 0b1110.
+Add a comment noting that we take the latter option.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/intc/armv7m_nvic.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ target/arm/translate.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 330eb728dd5..9f8f0d3ff55 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -860,7 +860,19 @@ int armv7m_nvic_complete_irq(void *opaque, int irq, bool secure)
-         return -1;
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 4750b9fa1bb..45ea0a11c7c 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -11595,7 +11595,14 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+                 gen_nop_hint(s, (insn >> 4) & 0xf);
+                 break;
+             }
+-            /* If Then.  */
++            /*
++             * IT (If-Then)
++             *
++             * Combinations of firstcond and mask which set up an 0b1111
++             * condition are UNPREDICTABLE; we take the CONSTRAINED
++             * UNPREDICTABLE choice to treat 0b1111 the same as 0b1110,
++             * i.e. both meaning "execute always".
++             */
+             s->condexec_cond = (insn >> 4) & 0xe;
+             s->condexec_mask = insn & 0x1f;
+             /* No actual code generated for this insn, just setup state.  */
+@@ -12129,7 +12136,11 @@ static void thumb_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
+     if (dc->condexec_mask && !thumb_insn_is_unconditional(dc, insn)) {
+         uint32_t cond = dc->condexec_cond;
+ 
+-        if (cond != 0x0e) {     /* Skip conditional when condition is AL. */
++        /*
++         * Conditionally skip the insn. Note that both 0xe and 0xf mean
++         * "always"; 0xf is not "never".
++         */
++        if (cond < 0x0e) {
+             arm_skip_unless(dc, cond);
+         }
      }
- 
--    ret = nvic_rettobase(s);
-+    /*
-+     * If this is a configurable exception and it is currently
-+     * targeting the opposite security state from the one we're trying
-+     * to complete it for, this counts as an illegal exception return.
-+     * We still need to deactivate whatever vector the logic above has
-+     * selected, though, as it might not be the same as the one for the
-+     * requested exception number.
-+     */
-+    if (!exc_is_banked(irq) && exc_targets_secure(s, irq) != secure) {
-+        ret = -1;
-+    } else {
-+        ret = nvic_rettobase(s);
-+    }
- 
-     vec->active = 0;
-     if (vec->level) {
 -- 
 2.20.1
 
