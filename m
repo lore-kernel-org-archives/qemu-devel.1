@@ -2,53 +2,53 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BED3C31E51
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 11:29:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49EF5C31E51
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 11:29:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 719F82082C
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 11:29:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 719F82082C
+	by mail.kernel.org (Postfix) with ESMTPS id 2213A2082C
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 11:29:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2213A2082C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55708 helo=lists.gnu.org)
+Received: from localhost ([::1]:55714 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdCIu-0005oG-2w
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 07:29:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44024)
+	id 1hdCJ2-0006C8-FB
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 07:29:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44062)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <anthony.perard@citrix.com>) id 1hdCDO-0001lf-5F
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:23:51 -0400
+ (envelope-from <anthony.perard@citrix.com>) id 1hdCDZ-0001sg-Uc
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:24:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <anthony.perard@citrix.com>) id 1hdCDM-00071N-O9
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:23:50 -0400
-Received: from esa5.hc3370-68.iphmx.com ([216.71.155.168]:47313)
+ (envelope-from <anthony.perard@citrix.com>) id 1hdCDQ-00074G-EL
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:23:58 -0400
+Received: from esa1.hc3370-68.iphmx.com ([216.71.145.142]:11328)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
- id 1hdCDM-0006yd-ES
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:23:48 -0400
-Authentication-Results: esa5.hc3370-68.iphmx.com;
+ id 1hdCDO-000714-Vi
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:23:52 -0400
+Authentication-Results: esa1.hc3370-68.iphmx.com;
  dkim=none (message not signed) header.i=none;
  spf=None smtp.pra=anthony.perard@citrix.com;
  spf=Pass smtp.mailfrom=anthony.perard@citrix.com;
  spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
+Received-SPF: None (esa1.hc3370-68.iphmx.com: no sender
  authenticity information available from domain of
  anthony.perard@citrix.com) identity=pra;
- client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
+ client-ip=162.221.158.21; receiver=esa1.hc3370-68.iphmx.com;
  envelope-from="anthony.perard@citrix.com";
  x-sender="anthony.perard@citrix.com";
  x-conformance=sidf_compatible
-Received-SPF: Pass (esa5.hc3370-68.iphmx.com: domain of
+Received-SPF: Pass (esa1.hc3370-68.iphmx.com: domain of
  anthony.perard@citrix.com designates 162.221.158.21 as
  permitted sender) identity=mailfrom;
- client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
+ client-ip=162.221.158.21; receiver=esa1.hc3370-68.iphmx.com;
  envelope-from="anthony.perard@citrix.com";
  x-sender="anthony.perard@citrix.com";
  x-conformance=sidf_compatible; x-record-type="v=spf1";
@@ -56,36 +56,38 @@ Received-SPF: Pass (esa5.hc3370-68.iphmx.com: domain of
  ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
  ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
  ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
-Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
+Received-SPF: None (esa1.hc3370-68.iphmx.com: no sender
  authenticity information available from domain of
  postmaster@mail.citrix.com) identity=helo;
- client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
+ client-ip=162.221.158.21; receiver=esa1.hc3370-68.iphmx.com;
  envelope-from="anthony.perard@citrix.com";
  x-sender="postmaster@mail.citrix.com";
  x-conformance=sidf_compatible
-IronPort-SDR: A2bladOBuTxayASWh72KMp+5U0jfv7eGwE94lJFaZrLMrBPbJs47GsZ2iNT22rCqE0MLJqeXfw
- 8KGdqEVAxzPV9RkgmJ3/QHw6MdLyz1fTp2Mx4LUNLZsQzNpyi1ZFR0Xsmj+wgwylE1D47ttfrb
- a8PZ2ZNyk2HDYWFPZHNXRTylP17PkdWIDC+5c1GoF27NKTYHKVmx7UKnL7FMyIh1jzPQZPzcoo
- ut/mHIBjYjGePtycN2FkH2Wvuz1nMilUznEsGTjbnZ0d+VTnker7KF1XEzEX7muRO/aXsycKYS
- jV4=
+IronPort-SDR: OcJzgzlo3IL+pq/7CWnXhz+sREFwNVBJeXlnOdmmpNoIinHrL60jbWq6F+AsxmGCJwTS79wgB5
+ sY21hff+x2wajYBwOU/PP/fqYsvCoHGITr1FmHrtvA8WEQ/OlJ9FleIe1CWpv825Dc7r1u81Ps
+ YIDUtPJcvDu5OU5Xc4niwoYu6Ys1YMKF6V6xVN1H7AKn8tafJ6czECiw1lsKXVEkIbXUDt5Ch2
+ aVLHGbfweJiU++DpAufBN+d5IjAZhFpVe1EphbfOF+KBfivJPBBM+gq5oXPS/xv9E/Zve1iFAC
+ /BU=
 X-SBRS: 2.7
-X-MesageID: 1860620
-X-Ironport-Server: esa5.hc3370-68.iphmx.com
+X-MesageID: 1889152
+X-Ironport-Server: esa1.hc3370-68.iphmx.com
 X-Remote-IP: 162.221.158.21
 X-Policy: $RELAYED
 X-IronPort-AV: E=Sophos;i="5.63,389,1557201600"; 
-   d="scan'208";a="1860620"
+   d="scan'208";a="1889152"
 From: Anthony PERARD <anthony.perard@citrix.com>
 To: <qemu-devel@nongnu.org>
-Date: Tue, 18 Jun 2019 12:23:37 +0100
-Message-ID: <20190618112341.513-1-anthony.perard@citrix.com>
+Date: Tue, 18 Jun 2019 12:23:40 +0100
+Message-ID: <20190618112341.513-4-anthony.perard@citrix.com>
 X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190618112341.513-1-anthony.perard@citrix.com>
+References: <20190618112341.513-1-anthony.perard@citrix.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 216.71.155.168
-Subject: [Qemu-devel] [PATCH v2 0/4] Fix build of Xen support + cleanup
+X-Received-From: 216.71.145.142
+Subject: [Qemu-devel] [PATCH v2 3/4] xen: Drop includes of xen/hvm/params.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,58 +106,54 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+xen-mapcache.c doesn't needs params.h.
 
-Fix the build in osstest and some cleanup
+xen-hvm.c uses defines available in params.h but so is xen_common.h
+which is included before. HVM_PARAM_* flags are only needed to make
+xc_hvm_param_{get,set} calls so including only xenctrl.h, which is
+where the definition the function is, should be enough.
+(xenctrl.h does include params.h)
 
-For reference:
+Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+---
 
-Recent flight failure:
-https://lists.xenproject.org/archives/html/xen-devel/2019-06/msg01022.html
+Notes:
+    v2:
+    - new patch replacing "xen: Import Xen public headers used by xen-hvm.c"
+    - only drop includes of params.h, and don't import the other two;
+    ioreq.h is an interface with Xen; e820.h is just used by QEMU to figure
+    out the guest memory layout without proper communication with the Xen
+    toolstacks or something like that.
 
-Bisect result:
-https://lists.xenproject.org/archives/html/xen-devel/2019-06/msg01029.html
+ hw/i386/xen/xen-hvm.c      | 1 -
+ hw/i386/xen/xen-mapcache.c | 2 --
+ 2 files changed, 3 deletions(-)
 
-Thanks.
-
-Anthony PERARD (4):
-  xen: Fix build with public headers
-  xen: Import other xen/io/*.h
-  xen: Drop includes of xen/hvm/params.h
-  xen: Avoid VLA
-
- hw/9pfs/xen-9pfs.h                       |    4 +-
- hw/block/xen_blkif.h                     |    5 +-
- hw/char/xen_console.c                    |    2 +-
- hw/display/xenfb.c                       |    7 +-
- hw/i386/xen/xen-hvm.c                    |   16 +-
- hw/i386/xen/xen-mapcache.c               |    2 -
- hw/net/xen_nic.c                         |    2 +-
- hw/usb/xen-usb.c                         |    3 +-
- hw/xen/xen-legacy-backend.c              |    2 -
- include/hw/xen/interface/grant_table.h   |   36 +
- include/hw/xen/interface/io/blkif.h      |  712 +++++++++++++++
- include/hw/xen/interface/io/console.h    |   46 +
- include/hw/xen/interface/io/fbif.h       |  156 ++++
- include/hw/xen/interface/io/kbdif.h      |  566 ++++++++++++
- include/hw/xen/interface/io/netif.h      | 1010 ++++++++++++++++++++++
- include/hw/xen/interface/io/protocols.h  |   42 +
- include/hw/xen/{ => interface}/io/ring.h |    0
- include/hw/xen/interface/io/usbif.h      |  254 ++++++
- include/hw/xen/interface/io/xenbus.h     |   70 ++
- include/hw/xen/xen_common.h              |    2 +-
- 20 files changed, 2914 insertions(+), 23 deletions(-)
- create mode 100644 include/hw/xen/interface/grant_table.h
- create mode 100644 include/hw/xen/interface/io/blkif.h
- create mode 100644 include/hw/xen/interface/io/console.h
- create mode 100644 include/hw/xen/interface/io/fbif.h
- create mode 100644 include/hw/xen/interface/io/kbdif.h
- create mode 100644 include/hw/xen/interface/io/netif.h
- create mode 100644 include/hw/xen/interface/io/protocols.h
- rename include/hw/xen/{ => interface}/io/ring.h (100%)
- create mode 100644 include/hw/xen/interface/io/usbif.h
- create mode 100644 include/hw/xen/interface/io/xenbus.h
-
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index 2939122e7c..ae3deb4ef3 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -27,7 +27,6 @@
+ #include "exec/address-spaces.h"
+ 
+ #include <xen/hvm/ioreq.h>
+-#include <xen/hvm/params.h>
+ #include <xen/hvm/e820.h>
+ 
+ //#define DEBUG_XEN_HVM
+diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
+index 254759f776..dc73c86c61 100644
+--- a/hw/i386/xen/xen-mapcache.c
++++ b/hw/i386/xen/xen-mapcache.c
+@@ -17,8 +17,6 @@
+ #include "hw/xen/xen-legacy-backend.h"
+ #include "qemu/bitmap.h"
+ 
+-#include <xen/hvm/params.h>
+-
+ #include "sysemu/xen-mapcache.h"
+ #include "trace.h"
+ 
 -- 
 Anthony PERARD
 
