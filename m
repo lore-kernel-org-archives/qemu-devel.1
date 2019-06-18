@@ -2,58 +2,80 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C337C31E51
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 05:19:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9372C31E51
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 05:21:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53B8A20873
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 05:19:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53B8A20873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id AAEE720873
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 05:21:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAEE720873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53734 helo=lists.gnu.org)
+Received: from localhost ([::1]:53744 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hd6X0-0004vm-9W
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 01:19:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51151)
+	id 1hd6Yg-00067N-VK
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 01:21:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51582)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tiwei.bie@intel.com>) id 1hd6W1-0004N3-1C
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 01:18:42 -0400
+ (envelope-from <philmd@redhat.com>) id 1hd6Xx-0005iB-6i
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 01:20:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tiwei.bie@intel.com>) id 1hd6W0-0006OM-0L
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 01:18:40 -0400
-Received: from mga03.intel.com ([134.134.136.65]:44962)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tiwei.bie@intel.com>)
- id 1hd6Vw-0006EU-01; Tue, 18 Jun 2019 01:18:37 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 17 Jun 2019 22:18:26 -0700
-X-ExtLoop1: 1
-Received: from npg-dpdk-virtio-tbie-2.sh.intel.com ([10.67.104.151])
- by fmsmga005.fm.intel.com with ESMTP; 17 Jun 2019 22:18:25 -0700
-From: Tiwei Bie <tiwei.bie@intel.com>
-To: mst@redhat.com, marcandre.lureau@gmail.com, jasowang@redhat.com,
- qemu-devel@nongnu.org
-Date: Tue, 18 Jun 2019 13:14:58 +0800
-Message-Id: <20190618051458.7855-1-tiwei.bie@intel.com>
-X-Mailer: git-send-email 2.17.1
+ (envelope-from <philmd@redhat.com>) id 1hd6Xw-0007YV-86
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 01:20:41 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:34020)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hd6Xw-0007Xw-1Q
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 01:20:40 -0400
+Received: by mail-wr1-f65.google.com with SMTP id k11so12403408wrl.1
+ for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 22:20:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Ag/dcsqh9dtFvFcQu+UeHXkU/kCy3YaWxZzzGdj4pLU=;
+ b=uVcFTAbUFIrp/NAsWP9APnmMp12A7eDNFk/Ms/k4xWXWgposDgBiTMQ7rV/PrkYuxp
+ GzSuNSkkqA8OpSJxt4UDCFmxlyE0X1mPTen1nicH3xBuew/bCNPoW3n/yWwTzHLdHozj
+ 2H8wReAezsA++tgkK+GTMRnoG9oxsn0HzFoZ0Iiaq6Acksx6fZ1qc81nZuZ1J88sJBLj
+ My2L7gfnYUG3yKKpa35GRHhaEy7dr0gKdYht6c3w4r9f5EGkz/CMFxbKD8bn/TYd52zk
+ TIqDUL2F4ARESx4WdIcVkCc8FdgxXeo04MPYl29+bqdcZITPHtxjEo64jpGmWO9uetvF
+ 63cw==
+X-Gm-Message-State: APjAAAXhX2x4+PgCKmD4lFMp89cidOeLzGwum2ZkSiPxAbU801ZIUACu
+ AFOGYM4jKjGkO7NmiKc4NZHQ6Q==
+X-Google-Smtp-Source: APXvYqzMl9YsKdzM/oGzQ2RSU+gT7k4yqUWeJKllMcfBsUgTTBt5EuzHKoPA5d7y+Qs6KU3u0hbHgA==
+X-Received: by 2002:adf:e311:: with SMTP id b17mr79799449wrj.11.1560835239113; 
+ Mon, 17 Jun 2019 22:20:39 -0700 (PDT)
+Received: from [192.168.1.103] (183.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.183])
+ by smtp.gmail.com with ESMTPSA id j32sm1685286wrj.43.2019.06.17.22.20.38
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Mon, 17 Jun 2019 22:20:38 -0700 (PDT)
+To: Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-arm@nongnu.org
+References: <20190416013902.4941-1-andrew.smirnov@gmail.com>
+ <20190416013902.4941-3-andrew.smirnov@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <acab44ce-83d4-fff4-db80-4345d940043f@redhat.com>
+Date: Tue, 18 Jun 2019 07:20:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20190416013902.4941-3-andrew.smirnov@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.65
-Subject: [Qemu-devel] [PATCH v2] vhost-user: fix reconnection support for
- host notifier
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH 2/5] i.mx7d: Add no-op/unimplemented PCIE
+ PHY IP block
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,86 +87,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cunming.liang@intel.com, qemu-stable@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We need to destroy the host notifiers when cleaning up
-the backend. Otherwise, some resources are not released
-after the connection is closed, and it may prevent the
-external backend from reopening them (e.g. VFIO files)
-during restart.
+On 4/16/19 3:38 AM, Andrey Smirnov wrote:
+> Add no-op/unimplemented PCIE PHY IP block. Needed by new kernels to
+> use PCIE.
+> 
+> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: qemu-devel@nongnu.org
+> Cc: qemu-arm@nongnu.org
+> ---
+>  include/hw/arm/fsl-imx7.h | 3 +++
+>  hw/arm/fsl-imx7.c         | 5 +++++
+>  2 files changed, 8 insertions(+)
+> 
+> diff --git a/include/hw/arm/fsl-imx7.h b/include/hw/arm/fsl-imx7.h
+> index aae4f860fc..3efa697adc 100644
+> --- a/include/hw/arm/fsl-imx7.h
+> +++ b/include/hw/arm/fsl-imx7.h
+> @@ -125,6 +125,9 @@ enum FslIMX7MemoryMap {
+>      FSL_IMX7_ADC2_ADDR            = 0x30620000,
+>      FSL_IMX7_ADCn_SIZE            = 0x1000,
+>  
+> +    FSL_IMX7_PCIE_PHY_ADDR        = 0x306D0000,
+> +    FSL_IMX7_PCIE_PHY_SIZE        = 0x10000,
+> +
+>      FSL_IMX7_GPC_ADDR             = 0x303A0000,
+>  
+>      FSL_IMX7_I2C1_ADDR            = 0x30A20000,
+> diff --git a/hw/arm/fsl-imx7.c b/hw/arm/fsl-imx7.c
+> index 1abfa5910c..813fb55ca9 100644
+> --- a/hw/arm/fsl-imx7.c
+> +++ b/hw/arm/fsl-imx7.c
+> @@ -532,6 +532,11 @@ static void fsl_imx7_realize(DeviceState *dev, Error **errp)
+>       */
+>      create_unimplemented_device("dma-apbh", FSL_IMX7_DMA_APBH_ADDR,
+>                                  FSL_IMX7_DMA_APBH_SIZE);
+> +    /*
+> +     * PCIe PHY
+> +     */
+> +    create_unimplemented_device("pcie-phy", FSL_IMX7_PCIE_PHY_ADDR,
+> +                                FSL_IMX7_PCIE_PHY_SIZE);
+>  }
+>  
+>  static void fsl_imx7_class_init(ObjectClass *oc, void *data)
+> 
 
-Fixes: 44866521bd6e ("vhost-user: support registering external host notifiers")
-Cc: qemu-stable@nongnu.org
-
-Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
----
-v2:
-- Drop superfluous memset() (Marc-André);
-- Factor the notifier code in a separate function (Marc-André);
-
- hw/virtio/vhost-user.c | 28 ++++++++++++++++++----------
- 1 file changed, 18 insertions(+), 10 deletions(-)
-
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 4ca5b2551e..e27a2a4647 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -226,6 +226,20 @@ static bool ioeventfd_enabled(void)
-     return !kvm_enabled() || kvm_eventfds_enabled();
- }
- 
-+static void
-+vhost_user_host_notifiers_cleanup(VhostUserState *user)
-+{
-+    int i;
-+
-+    for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
-+        if (user->notifier[i].addr) {
-+            object_unparent(OBJECT(&user->notifier[i].mr));
-+            munmap(user->notifier[i].addr, qemu_real_host_page_size);
-+            user->notifier[i].addr = NULL;
-+        }
-+    }
-+}
-+
- static int vhost_user_read_header(struct vhost_dev *dev, VhostUserMsg *msg)
- {
-     struct vhost_user *u = dev->opaque;
-@@ -1469,6 +1483,9 @@ static int vhost_user_backend_cleanup(struct vhost_dev *dev)
-     assert(dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_USER);
- 
-     u = dev->opaque;
-+    if (dev->vq_index == 0) {
-+        vhost_user_host_notifiers_cleanup(u->user);
-+    }
-     if (u->postcopy_notifier.notify) {
-         postcopy_remove_notifier(&u->postcopy_notifier);
-         u->postcopy_notifier.notify = NULL;
-@@ -1898,19 +1915,10 @@ bool vhost_user_init(VhostUserState *user, CharBackend *chr, Error **errp)
- 
- void vhost_user_cleanup(VhostUserState *user)
- {
--    int i;
--
-     if (!user->chr) {
-         return;
-     }
--
--    for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
--        if (user->notifier[i].addr) {
--            object_unparent(OBJECT(&user->notifier[i].mr));
--            munmap(user->notifier[i].addr, qemu_real_host_page_size);
--            user->notifier[i].addr = NULL;
--        }
--    }
-+    vhost_user_host_notifiers_cleanup(user);
-     user->chr = NULL;
- }
- 
--- 
-2.17.1
-
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
