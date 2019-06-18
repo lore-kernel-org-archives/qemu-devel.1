@@ -6,56 +6,57 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F041C31E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 17:29:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22A9BC31E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 17:32:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CCBC205F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 17:29:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CCBC205F4
+	by mail.kernel.org (Postfix) with ESMTPS id ED6B2205F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 17:32:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED6B2205F4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60526 helo=lists.gnu.org)
+Received: from localhost ([::1]:60546 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdHv6-0003mb-Jr
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 13:29:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60475)
+	id 1hdHy9-00069h-7C
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 13:32:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32875)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <clg@kaod.org>) id 1hdHN5-0008Ue-VA
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:54:13 -0400
+ (envelope-from <clg@kaod.org>) id 1hdHOV-0001UX-V4
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:55:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1hdHN4-0004DK-Qm
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:54:11 -0400
-Received: from 10.mo6.mail-out.ovh.net ([87.98.157.236]:57391)
+ (envelope-from <clg@kaod.org>) id 1hdHOR-00062y-9c
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:55:37 -0400
+Received: from 5.mo7.mail-out.ovh.net ([178.32.120.239]:35860)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hdHN4-0004BE-Le
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:54:10 -0400
-Received: from player157.ha.ovh.net (unknown [10.108.54.172])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id 5A08E1CC1D2
- for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 18:54:07 +0200 (CEST)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hdHOR-0005f3-0J
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:55:35 -0400
+Received: from player157.ha.ovh.net (unknown [10.109.159.68])
+ by mo7.mail-out.ovh.net (Postfix) with ESMTP id 1CD9712210F
+ for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 18:55:15 +0200 (CEST)
 Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
  (Authenticated sender: clg@kaod.org)
- by player157.ha.ovh.net (Postfix) with ESMTPSA id DE3B46EB51EE;
- Tue, 18 Jun 2019 16:53:59 +0000 (UTC)
+ by player157.ha.ovh.net (Postfix) with ESMTPSA id AD4816EB549D;
+ Tue, 18 Jun 2019 16:55:08 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 18 Jun 2019 18:52:56 +0200
-Message-Id: <20190618165311.27066-7-clg@kaod.org>
+Date: Tue, 18 Jun 2019 18:53:06 +0200
+Message-Id: <20190618165311.27066-17-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190618165311.27066-1-clg@kaod.org>
 References: <20190618165311.27066-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 1670553987857419025
+X-Ovh-Tracer-Id: 1689694286381288209
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrtddtgdejjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrtddtgdejkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 87.98.157.236
-Subject: [Qemu-devel] [PATCH v2 06/21] aspeed: add support for multiple NICs
+X-Received-From: 178.32.120.239
+Subject: [Qemu-devel] [PATCH v2 16/21] aspeed/smc: add DMA calibration
+ settings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,93 +75,118 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Aspeed SoCs have two MACs. Extend the Aspeed model to support a
-second NIC.
+When doing calibration, the SPI clock rate in the CE0 Control Register
+and the read delay cycles in the Read Timing Compensation Register are
+set using bit[11:4] of the DMA Control Register.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Acked-by: Joel Stanley <joel@jms.id.au>
 ---
- include/hw/arm/aspeed_soc.h |  3 ++-
- hw/arm/aspeed_soc.c         | 33 +++++++++++++++++++--------------
- 2 files changed, 21 insertions(+), 15 deletions(-)
+ hw/ssi/aspeed_smc.c | 64 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 63 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
-index b613b00600fc..75b557060b9b 100644
---- a/include/hw/arm/aspeed_soc.h
-+++ b/include/hw/arm/aspeed_soc.h
-@@ -25,6 +25,7 @@
- #define ASPEED_SPIS_NUM  2
- #define ASPEED_WDTS_NUM  3
- #define ASPEED_CPUS_NUM  2
-+#define ASPEED_MACS_NUM  2
-=20
- typedef struct AspeedSoCState {
-     /*< private >*/
-@@ -43,7 +44,7 @@ typedef struct AspeedSoCState {
-     AspeedSMCState spi[ASPEED_SPIS_NUM];
-     AspeedSDMCState sdmc;
-     AspeedWDTState wdt[ASPEED_WDTS_NUM];
--    FTGMAC100State ftgmac100;
-+    FTGMAC100State ftgmac100[ASPEED_MACS_NUM];
- } AspeedSoCState;
-=20
- #define TYPE_ASPEED_SOC "aspeed-soc"
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index d38fb0aaa0f5..736e52366a66 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -234,8 +234,10 @@ static void aspeed_soc_init(Object *obj)
-                                     sc->info->silicon_rev);
+diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+index e00cdebae232..4a2e3a9135b6 100644
+--- a/hw/ssi/aspeed_smc.c
++++ b/hw/ssi/aspeed_smc.c
+@@ -75,6 +75,10 @@
+ #define   CTRL_CMD_MASK            0xff
+ #define   CTRL_DUMMY_HIGH_SHIFT    14
+ #define   CTRL_AST2400_SPI_4BYTE   (1 << 13)
++#define CE_CTRL_CLOCK_FREQ_SHIFT   8
++#define CE_CTRL_CLOCK_FREQ_MASK    0xf
++#define CE_CTRL_CLOCK_FREQ(div)                                         =
+\
++    (((div) & CE_CTRL_CLOCK_FREQ_MASK) << CE_CTRL_CLOCK_FREQ_SHIFT)
+ #define   CTRL_DUMMY_LOW_SHIFT     6 /* 2 bits [7:6] */
+ #define   CTRL_CE_STOP_ACTIVE      (1 << 2)
+ #define   CTRL_CMD_MODE_MASK       0x3
+@@ -110,7 +114,7 @@
+ #define   DMA_CTRL_DELAY_SHIFT  8
+ #define   DMA_CTRL_FREQ_MASK    0xf
+ #define   DMA_CTRL_FREQ_SHIFT   4
+-#define   DMA_CTRL_MODE         (1 << 3)
++#define   DMA_CTRL_CALIB        (1 << 3)
+ #define   DMA_CTRL_CKSUM        (1 << 2)
+ #define   DMA_CTRL_WRITE        (1 << 1)
+ #define   DMA_CTRL_ENABLE       (1 << 0)
+@@ -809,6 +813,60 @@ static uint64_t aspeed_smc_read(void *opaque, hwaddr=
+ addr, unsigned int size)
      }
-=20
--    sysbus_init_child_obj(obj, "ftgmac100", OBJECT(&s->ftgmac100),
--                          sizeof(s->ftgmac100), TYPE_FTGMAC100);
-+    for (i =3D 0; i < ASPEED_MACS_NUM; i++) {
-+        sysbus_init_child_obj(obj, "ftgmac100[*]", OBJECT(&s->ftgmac100[=
-i]),
-+                              sizeof(s->ftgmac100[i]), TYPE_FTGMAC100);
-+    }
  }
 =20
- static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-@@ -382,19 +384,22 @@ static void aspeed_soc_realize(DeviceState *dev, Er=
-ror **errp)
-     }
-=20
-     /* Net */
--    qdev_set_nic_properties(DEVICE(&s->ftgmac100), &nd_table[0]);
--    object_property_set_bool(OBJECT(&s->ftgmac100), true, "aspeed", &err=
-);
--    object_property_set_bool(OBJECT(&s->ftgmac100), true, "realized",
--                             &local_err);
--    error_propagate(&err, local_err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
-+    for (i =3D 0; i < nb_nics; i++) {
-+        qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), &nd_table[i]);
-+        object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "aspeed=
-",
-+                                 &err);
-+        object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "realiz=
-ed",
-+                                 &local_err);
-+        error_propagate(&err, local_err);
-+        if (err) {
-+            error_propagate(errp, err);
-+           return;
++static uint8_t aspeed_smc_hclk_divisor(uint8_t hclk_mask)
++{
++    /* HCLK/1 .. HCLK/16 */
++    const uint8_t hclk_divisors[] =3D {
++        15, 7, 14, 6, 13, 5, 12, 4, 11, 3, 10, 2, 9, 1, 8, 0
++    };
++    int i;
++
++    for (i =3D 0; i < ARRAY_SIZE(hclk_divisors); i++) {
++        if (hclk_mask =3D=3D hclk_divisors[i]) {
++            return i + 1;
 +        }
-+        sysbus_mmio_map(SYS_BUS_DEVICE(&s->ftgmac100[i]), 0,
-+                        sc->info->memmap[ASPEED_ETH1 + i]);
-+        sysbus_connect_irq(SYS_BUS_DEVICE(&s->ftgmac100[i]), 0,
-+                           aspeed_soc_get_irq(s, ASPEED_ETH1 + i));
++    }
++
++    qemu_log_mask(LOG_GUEST_ERROR, "invalid HCLK mask %x", hclk_mask);
++    return 0;
++}
++
++/*
++ * When doing calibration, the SPI clock rate in the CE0 Control
++ * Register and the read delay cycles in the Read Timing Compensation
++ * Register are set using bit[11:4] of the DMA Control Register.
++ */
++static void aspeed_smc_dma_calibration(AspeedSMCState *s)
++{
++    uint8_t delay =3D
++        (s->regs[R_DMA_CTRL] >> DMA_CTRL_DELAY_SHIFT) & DMA_CTRL_DELAY_M=
+ASK;
++    uint8_t hclk_mask =3D
++        (s->regs[R_DMA_CTRL] >> DMA_CTRL_FREQ_SHIFT) & DMA_CTRL_FREQ_MAS=
+K;
++    uint8_t hclk_div =3D aspeed_smc_hclk_divisor(hclk_mask);
++    uint32_t hclk_shift =3D (hclk_div - 1) << 2;
++    uint8_t cs;
++
++    /*
++     * The Read Timing Compensation Register values apply to all CS on
++     * the SPI bus and only HCLK/1 - HCLK/5 can have tunable delays
++     */
++    if (hclk_div && hclk_div < 6) {
++        s->regs[s->r_timings] &=3D ~(0xf << hclk_shift);
++        s->regs[s->r_timings] |=3D delay << hclk_shift;
++    }
++
++    /*
++     * TODO: compute the CS from the DMA address and the segment
++     * registers. This is not really a problem for now because the
++     * Timing Register values apply to all CS and software uses CS0 to
++     * do calibration.
++     */
++    cs =3D 0;
++    s->regs[s->r_ctrl0 + cs] &=3D
++        ~(CE_CTRL_CLOCK_FREQ_MASK << CE_CTRL_CLOCK_FREQ_SHIFT);
++    s->regs[s->r_ctrl0 + cs] |=3D CE_CTRL_CLOCK_FREQ(hclk_div);
++}
++
+ /*
+  * Accumulate the result of the reads to provide a checksum that will
+  * be used to validate the read timing settings.
+@@ -824,6 +882,10 @@ static void aspeed_smc_dma_checksum(AspeedSMCState *=
+s)
+         return;
      }
--    sysbus_mmio_map(SYS_BUS_DEVICE(&s->ftgmac100), 0,
--                    sc->info->memmap[ASPEED_ETH1]);
--    sysbus_connect_irq(SYS_BUS_DEVICE(&s->ftgmac100), 0,
--                       aspeed_soc_get_irq(s, ASPEED_ETH1));
- }
- static Property aspeed_soc_properties[] =3D {
-     DEFINE_PROP_UINT32("num-cpus", AspeedSoCState, num_cpus, 0),
+=20
++    if (s->regs[R_DMA_CTRL] & DMA_CTRL_CALIB) {
++        aspeed_smc_dma_calibration(s);
++    }
++
+     while (s->regs[R_DMA_LEN]) {
+         result =3D address_space_read(&s->flash_as, s->regs[R_DMA_FLASH_=
+ADDR],
+                                     MEMTXATTRS_UNSPECIFIED,
 --=20
 2.21.0
 
