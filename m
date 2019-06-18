@@ -2,66 +2,78 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	T_HK_NAME_DR,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FF2FC31E5E
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:46:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BE67C31E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:49:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB0CC21530
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:46:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB0CC21530
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B98AB2084B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:49:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z9uVoH/N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B98AB2084B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59830 helo=lists.gnu.org)
+Received: from localhost ([::1]:59852 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdHFM-0007x4-5r
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 12:46:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34446)
+	id 1hdHIH-00022g-LH
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 12:49:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48714)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hdGG0-0007dg-QM
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:42:50 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hdGk2-0002dl-GM
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:13:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hdGFy-0006lj-Ez
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:42:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56128)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hdGFu-0006BP-Hg
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:42:44 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 03F27306E61C;
- Tue, 18 Jun 2019 15:42:24 +0000 (UTC)
-Received: from work-vm (ovpn-117-76.ams2.redhat.com [10.36.117.76])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D2CF7179E3;
- Tue, 18 Jun 2019 15:42:21 +0000 (UTC)
-Date: Tue, 18 Jun 2019 16:42:19 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Liran Alon <liran.alon@oracle.com>
-Message-ID: <20190618154218.GH2850@work-vm>
-References: <20190617175658.135869-1-liran.alon@oracle.com>
- <20190617175658.135869-7-liran.alon@oracle.com>
- <20190618085539.GB2850@work-vm>
- <AB34E76F-231C-4E66-B5CB-113AFCE7A20F@oracle.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1hdGjz-0001my-G7
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:13:50 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:41129)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hdGjv-0001fc-Ax
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:13:45 -0400
+Received: by mail-ot1-x344.google.com with SMTP id 107so15612569otj.8
+ for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 09:13:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=aWtydLlbh+4SVoON9ri1UIJDkqJw3P7a2zT1eN10LN0=;
+ b=Z9uVoH/NxRtDCm4qQOHnT7D+tc8WBknhDWSjXokhT6auK5baIQvJvTISOmy9Kk0yjb
+ p6z2NHy/Uc9Vx0huKuvs26/FKQmJlLsLgnbRxrA3ga1bv3BkDZCMnwp+rxELTufFY+cC
+ +Thm4Sw9pRg2bwFCwHsX5pF5xEc2GRM09QboRukBhR8TQzTIwNIHr/g9MAcbdbEBnyTX
+ mAfzmnR3rTL6P8s3G821Vu4drCiAREQYO0gVBIYaIISD34qdG0ySO0j505o8xiymc90+
+ dePnneij+tkbeYpzyKMooHJK/aVX33JBO4x8e6CQfAdlYcSfJHHdptqBwTJu1HXGUIyf
+ 13YQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=aWtydLlbh+4SVoON9ri1UIJDkqJw3P7a2zT1eN10LN0=;
+ b=eoTtO9/5gS3hWKIZqt3CwGB07gUDPci3Lh6KRdCDVHzz7CdRtGqPpOB/REiSjnbdb7
+ XJBJja+7c2HdmMu1oWBYFcPuDgBaYX6IjNOIBaUfMdoiKfGsYz9LCg8a4rOn+Z1kGR/1
+ QzKgDjbxtCl5RW6mvTcjtkP0uUqvxEBtLDFgpewEowiMWCcbBwZPaM0dyorPDyD2IqI8
+ Ri6uaSg0l/7gIGQCsRwrUcuq4uhrfLeOSAWD5A8YrbzLp0TieRaa9xTVX/BO30JVH2vN
+ cLJy2aghRZmvLqWGwpk6h0DC5RPj+/qMJQbBV0F3Zte93MfCEMoGjYg7S8ewt+Trk0bO
+ DlQQ==
+X-Gm-Message-State: APjAAAU+jDsHUZcBc6Fp6TBLQQPt61YHcfuJBJN2RZhoA/MO7CUE0mMP
+ tUU2yBNLrbacCP1al12nKqA8cCBEGmo9AnFWyesbAg==
+X-Google-Smtp-Source: APXvYqw6pVP0FzgshWhlMB0F+L0QnHmC/KD9Xt2Odnms1n+NyRACEqjPDyjwzAvCWDlg2Y/UkqIu217n42jjsDfMMJY=
+X-Received: by 2002:a9d:d17:: with SMTP id 23mr64154680oti.221.1560874420705; 
+ Tue, 18 Jun 2019 09:13:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <AB34E76F-231C-4E66-B5CB-113AFCE7A20F@oracle.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Tue, 18 Jun 2019 15:42:29 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [QEMU PATCH v3 6/9] vmstate: Add support for
- kernel integer types
+References: <20190604162526.10655-1-damien.hedde@greensocs.com>
+In-Reply-To: <20190604162526.10655-1-damien.hedde@greensocs.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 18 Jun 2019 17:13:29 +0100
+Message-ID: <CAFEAcA-BJehtxkMLkfrmDvMWMY137=L3i_7vGHNS5ozSPNSgGA@mail.gmail.com>
+To: Damien Hedde <damien.hedde@greensocs.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
+Subject: Re: [Qemu-devel] [RFC PATCH v2 00/12] Multi-phase reset
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,113 +85,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, kvm@vger.kernel.org, maran.wilson@oracle.com,
- mtosatti@redhat.com, qemu-devel@nongnu.org,
- Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
- jmattson@google.com, rth@twiddle.net
+Cc: Edgar Iglesias <edgar.iglesias@xilinx.com>, marc.burton@greensocs.com,
+ Alistair Francis <alistair@alistair23.me>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Liran Alon (liran.alon@oracle.com) wrote:
->=20
->=20
-> > On 18 Jun 2019, at 11:55, Dr. David Alan Gilbert <dgilbert@redhat.com=
-> wrote:
-> >=20
-> > * Liran Alon (liran.alon@oracle.com) wrote:
-> >> Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
-> >> Reviewed-by: Maran Wilson <maran.wilson@oracle.com>
-> >> Signed-off-by: Liran Alon <liran.alon@oracle.com>
-> >> ---
-> >> include/migration/vmstate.h | 18 ++++++++++++++++++
-> >> 1 file changed, 18 insertions(+)
-> >>=20
-> >> diff --git a/include/migration/vmstate.h b/include/migration/vmstate=
-.h
-> >> index 9224370ed59a..a85424fb0483 100644
-> >> --- a/include/migration/vmstate.h
-> >> +++ b/include/migration/vmstate.h
-> >> @@ -797,6 +797,15 @@ extern const VMStateInfo vmstate_info_qtailq;
-> >> #define VMSTATE_UINT64_V(_f, _s, _v)                                =
-  \
-> >>     VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint64, uint64_t)
-> >=20
-> > A comment here stating they're for Linux kernel types would be nice.
->=20
-> I didn=E2=80=99t want to state this because in theory these types can b=
-e used not in kernel context=E2=80=A6
-> I thought commit message is sufficient. I think comments in code should=
- be made to clarify
-> things. But to justify existence I think commit message should be used.
-> But if you insist, I have no strong objection of adding such comment.
+On Tue, 4 Jun 2019 at 17:25, Damien Hedde <damien.hedde@greensocs.com> wrote:
+>
+> Hi all,
+>
+> Here's the second version of the multi-phase reset proposal patches.
 
-It's only a 'would be nice' - it's just I don't want people trying to
-use them for other places (I'm not sure what happens if you pass a
-uint8_t to VMSTATE_U8 ???
+Sorry for leaving this one hanging again. Some initial general
+comments...
 
-> >=20
-> >> +#define VMSTATE_U8_V(_f, _s, _v)                                   =
-\
-> >> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint8, __u8)
-> >> +#define VMSTATE_U16_V(_f, _s, _v)                                  =
-\
-> >> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint16, __u16)
-> >> +#define VMSTATE_U32_V(_f, _s, _v)                                  =
-\
-> >> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint32, __u32)
-> >> +#define VMSTATE_U64_V(_f, _s, _v)                                  =
-\
-> >> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint64, __u64)
-> >> +
-> >=20
-> > Have you checked that builds OK on a non-Linux system?
->=20
-> Hmm that=E2=80=99s a good point. No. :P
+> # DESCRIPTION
+>
+> Basically the reset procedure is split in 3 parts:
+> INIT PHASE: Reset the object internal state, put a resetting flag and do the
+>     same for the reset subtree. No side effect on other devices to guarantee
+>     that, in a reset domain, everything get initialized first. This corresponds
+>     mostly to what is currently done in the device/bus reset method.
+>
+> HOLD PHASE: This phase allows to control a reset with a IO. When a IO control
+>     reset procedure based on the IO level (not edge), we may need to assert
+>     the reset, wait some time, and finally de-assert the reset. The consequence
+>     is that such a device can stay in a "resetting state" and may need to show
+>     this state to other devices through its outputs. For example, a clock
+>     controller will typically shutdown its clocks when it is in resetting state.
+>
+> EXIT PHASE: This phase sets outputs to state after reset. For a clock controller
+>      it starts the clocks. It also clears the "resetting" flag. A device should
+>      not react to inputs until this flag has been cleared. During this phase,
+>      outputs are propagated.
+>
+> The Resettable interface is detailed in the added doc in patch 7.
+>
+> # CHANGE SINCE V1
+>
+> The series now focus only on the Resettable interface (no more ResetDomain).
+> Proposed changed have been applied:
+>  - reset_count getter/modifier methods
+>  - a foreach_child method
+>
+> This last method allows some flexibility on what is the hierarchy of reset.
+> There is some discussion ongoing about this point. Althought the series does
+> not aim to modify the qdev/qbus-centric reset behavior, it is not fixed. An
+> object specialization can override it.
 
-Worth a check if you can find one lying around :-)
+I've looked through the patches, and I think my current concerns
+(stated briefly) are:
+ * I don't think we have the "don't call device implementations of
+   reset phase functions multiple times" semantics that I wanted;
+   OTOH I think the logic I suggested for those in comments on the
+   v1 of this series wouldn't work either.
+ * handling of "call the parent class's reset" is not very clean
+   (but this is a general QOM design issue)
+ * migration (see below)
 
-Dave
+> # RESET DEPRECATION
+>
+> There is 3 changes in the current way of handling reset (for users or
+> developers of Devices)
+>
+> 1. qdev/qbus_reset_all
+>
+> Theses functions are deprecated by this series and should be replaced by
+> direct call to device_reset or bus_reset. There is only a few existing calls
+> so I can probably replace them all and delete the original functions.
 
-> -Liran
->=20
-> >=20
-> > Dave
-> >=20
-> >> #define VMSTATE_BOOL(_f, _s)                                        =
-  \
-> >>     VMSTATE_BOOL_V(_f, _s, 0)
-> >>=20
-> >> @@ -818,6 +827,15 @@ extern const VMStateInfo vmstate_info_qtailq;
-> >> #define VMSTATE_UINT64(_f, _s)                                      =
-  \
-> >>     VMSTATE_UINT64_V(_f, _s, 0)
-> >>=20
-> >> +#define VMSTATE_U8(_f, _s)                                         =
-\
-> >> +    VMSTATE_U8_V(_f, _s, 0)
-> >> +#define VMSTATE_U16(_f, _s)                                        =
-\
-> >> +    VMSTATE_U16_V(_f, _s, 0)
-> >> +#define VMSTATE_U32(_f, _s)                                        =
-\
-> >> +    VMSTATE_U32_V(_f, _s, 0)
-> >> +#define VMSTATE_U64(_f, _s)                                        =
-\
-> >> +    VMSTATE_U64_V(_f, _s, 0)
-> >> +
-> >> #define VMSTATE_UINT8_EQUAL(_f, _s, _err_hint)                      =
-  \
-> >>     VMSTATE_SINGLE_FULL(_f, _s, 0, 0,                               =
-  \
-> >>                         vmstate_info_uint8_equal, uint8_t, _err_hint=
-)
-> >> --=20
-> >> 2.20.1
-> >>=20
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Sounds good.
+
+> 2. old's device_reset
+>
+> There is a few call to this function, I renamed it *device_legacy_reset* to
+> handle the transition. This function allowed to reset only a given device
+> (and not its eventual qbus subtree). This behavior is not possible with
+> the Resettable interface. At first glance it seemed that it is used only on
+> device having no sub-buses so we could just use the new device_reset.
+> But I need to look at them more closely to be sure. If this behavior is really
+> needed (but why would we not reset children ?), it's possible to do a specific
+> function for Device to to 3-phases reset without the children.
+
+Users of this function:
+ hw/audio/intel-hda.c
+  -- used by the HDA device to reset the HDACodecDevice, which has
+     no child buses
+ hw/hyperv/hyperv.c
+  -- resets the SynICState, which I think has no child buses
+ hw/i386/pc.c
+  -- resets the APIC, which has no child buses. (This reset is only
+     done as a workaround for lack of reset phases: the whole machine
+     is reset and then the APIC is re-reset last to undo any changes
+     that other devices might have made to it. Probably making the APIC
+     support phased reset would allow us to drop this hack.)
+ hw/ide/microdrive.c
+  -- called here to reset the MicroDriveState object. This does have
+     a child bus, but md_reset() explicitly calls ide_bus_reset(),
+     so it should be possible to clean this up.
+ hw/intc/spapr_xive.c
+  -- resets the SpaprXive device, which I think has no child buses
+ hw/ppc/pnv_psi.c
+  -- resets a XiveSource, which I think has no child buses
+ hw/ppc/spapr_pci.c
+  -- resets every QOM child of the SpaprPhbState. This one will
+     require closer checking, but my guess is that if there's a child
+     with a child bus then failure to reset the bus would be a bug.
+ hw/ppc/spapr_vio.c
+  -- resets an SpaprTceTable. This needs attention from an Spapr
+     expert but is probably ok.
+ hw/s390x/s390-pci-inst.c
+  -- resets the S390PCIBusDevice. Needs S390 expertise, but probably
+     either no child buses or failure to reset them is a bug.
+ hw/scsi/vmw_pvscsi.c
+  -- resets an individual SCSIDevice. I don't think those have child buses.
+ hw/sd/omap_mmc.c
+  -- resetting an SDState, which has no child bus
+ hw/sd/pl181.c
+  -- ditto.
+
+So there are one or two not-totally-trivial cases but we should
+be able to deal with these.
+
+> 3. DeviceClass's reset and BusClass's methods
+>
+> This is the major change. The method is deprecated because reset methods are
+> now located in the interface class. In the series, I make the init phase
+> redirect to the original reset method of DeviceClass (or BusClass). There a
+> lot of use of the method and transitioning to 3-phases only reset will need
+> some work.
+
+I think it should be possible to do the conversion mechanically
+(eg with coccinelle). We can look at doing that later.
+
+> # MIGRATION
+>
+> Bus reset state migration is right now not handled.
+>
+> Regarding "migration-during-reset should Just Work, without necessarily
+> needing any specific changes for a device". The included patch define a vmsd
+> subsection which must to be added to every device main vmsd structure for
+> migration-during-reset of theses devices to work. I tried to find a way to
+> avoid that but really don't see how to achieve that.
+>
+> So in the current state of this series, migration can only be supported for
+> leaf device (in term of qdev/qbus) where we add the subsection.
+>
+> I'm not sure the migration is the problem here. I doubt a device will
+> support staying in reset state (which is a new feature) without manual
+> intervention. So migration of this unsupported state without any specific
+> change may not be a real asset.
+
+The approach I thought would be good turns out not to actually work,
+so I need to think a bit more about this.
+
+I think what I would like to achieve is "default to doing the right
+thing" -- ideally devices that add support for being held in reset
+should not need to manually do something to make the bus/device reset
+state be migrated properly. Otherwise we have an easy mistake to
+make (forgetting to do the necessary handling of migration) when
+adding a new device or making a device support being held in reset.
+
+Regarding "devices not supporting staying in reset state without
+manual intervention" do you mean that they might not correctly
+deal with incoming signals or guest register write attempts
+in the held-in-reset state? That's true, but I don't think it's
+too terrible. (In particular it's a bug that can be fixed without
+breaking migration compatibility; and it seems unlikely that guest
+software would be trying to read or write a device that it's put
+into reset.)
+
+thanks
+-- PMM
 
