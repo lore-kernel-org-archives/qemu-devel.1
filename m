@@ -2,69 +2,74 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E288C31E51
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 13:03:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DC1AC31E51
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 13:11:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1799520665
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 13:03:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1799520665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 052D02084D
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 13:11:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 052D02084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57656 helo=lists.gnu.org)
+Received: from localhost ([::1]:57798 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdDlV-0005yH-CN
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 09:03:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41734)
+	id 1hdDtk-0000Ek-Pf
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 09:11:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45015)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <drjones@redhat.com>) id 1hdDir-0004mT-25
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 09:00:26 -0400
+ (envelope-from <bounces@canonical.com>) id 1hdDt3-0008Es-7i
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 09:10:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1hdDio-0000gM-Vy
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 09:00:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60372)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>)
- id 1hdDih-0000Pd-Fh; Tue, 18 Jun 2019 09:00:16 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C2A8C308623A;
- Tue, 18 Jun 2019 13:00:09 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EEED717B61;
- Tue, 18 Jun 2019 13:00:08 +0000 (UTC)
-Date: Tue, 18 Jun 2019 15:00:06 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <20190618130006.xhdezjtxbvzr63v2@kamzik.brq.redhat.com>
-References: <20190618083442.10407-1-drjones@redhat.com>
- <CAFEAcA9bwbev3efZ=LJPGgObBCbW-WX19fySMusLyMNC5ZExvA@mail.gmail.com>
- <20190618115558.uhygiqryxo4lbb5u@kamzik.brq.redhat.com>
- <CAFEAcA-66=jnVrdKAkY8EtY7BjoB5EscG1S15ABUd6yQij4YFw@mail.gmail.com>
- <20190618125015.ury6wbirdrqrrwdl@kamzik.brq.redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1hdDt1-0000Pb-Rx
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 09:10:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48996)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hdDt1-0000O7-MW
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 09:10:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hdDsz-0003T0-ES
+ for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 13:10:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 5A6282E80CC
+ for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 13:10:53 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190618125015.ury6wbirdrqrrwdl@kamzik.brq.redhat.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Tue, 18 Jun 2019 13:00:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 18 Jun 2019 12:56:09 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: pl111 vexpress-a9
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: asmqb7 pmaydell
+X-Launchpad-Bug-Reporter: David Lindsay (asmqb7)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <156078563656.24847.5055295179031840026.malonedeb@gac.canonical.com>
+Message-Id: <156086256942.24530.5770898525674471283.malone@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18981";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 0f0828ccd16110b6f7673ac8a1b467ceb4905f13
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/boot: fix direct kernel boot setup
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1833101] Re: vexpress-a9 (but not -a15) creates
+ two pl111 LCDs due to duplicate sysbus_create_simple("pl111", ...) calls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -73,75 +78,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Bug 1833101 <1833101@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 18, 2019 at 02:50:15PM +0200, Andrew Jones wrote:
-> On Tue, Jun 18, 2019 at 12:58:30PM +0100, Peter Maydell wrote:
-> > On Tue, 18 Jun 2019 at 12:56, Andrew Jones <drjones@redhat.com> wrote:
-> > >
-> > > On Tue, Jun 18, 2019 at 12:02:37PM +0100, Peter Maydell wrote:
-> > > > On Tue, 18 Jun 2019 at 09:34, Andrew Jones <drjones@redhat.com> wrote:
-> > > > >
-> > > > > We need to check ram_end, not ram_size.
-> > > > >
-> > > > > Fixes: 852dc64d665f ("hw/arm/boot: Diagnose layouts that put initrd or
-> > > > > DTB off the end of RAM")
-> > > > > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > > > > ---
-> > > > >  hw/arm/boot.c | 2 +-
-> > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > >
-> > > > > diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-> > > > > index b2f93f6beff6..8a280ab3ed49 100644
-> > > > > --- a/hw/arm/boot.c
-> > > > > +++ b/hw/arm/boot.c
-> > > > > @@ -1109,7 +1109,7 @@ static void arm_setup_direct_kernel_boot(ARMCPU *cpu,
-> > > > >                               info->initrd_filename);
-> > > > >                  exit(1);
-> > > > >              }
-> > > > > -            if (info->initrd_start + initrd_size > info->ram_size) {
-> > > > > +            if (info->initrd_start + initrd_size > ram_end) {
-> > > > >                  error_report("could not load initrd '%s': "
-> > > > >                               "too big to fit into RAM after the kernel",
-> > > > >                               info->initrd_filename);
-> > > > > --
-> > > > > 2.20.1
-> > > >
-> > > > Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> > > >
-> > > > I think I missed this because my test case doesn't have an
-> > > > initrd -- direct kernel boot works fine if all you're
-> > > > passing to QEMU is the kernel... I think we could clarify
-> > > > the commit message a little:
-> > >
-> > > I found it using kvm-unit-tests which uses a small initrd to
-> > > pass environment variables to the guest. All the tests started
-> > > to report FAIL.
-> > >
-> > > >
-> > > > hw/arm/boot: fix direct kernel boot with initrd
-> > > >
-> > > > Fix the condition used to check whether the initrd fits
-> > > > into RAM; this meant we were spuriously refusing to do
-> > > > a direct boot of a kernel in some cases if an initrd
-> > > > was also passed on the command line.
-> > >
-> > > Actually I think we need another fix for this error too. We
-> > > weren't actually refusing do direct boot the kernel, but we
-> > > should have been. We're missing the 'exit(1)' after the error
-> > > message.
-> > 
-> > Hmm, so we are. Do you want to send a v2 then, which fixes
-> > that too and fixes up the commit message?
-> 
-> On it's way.
->
+You might want to check our advice on how to pick a machine type for Arm: h=
+ttps://wiki.qemu.org/Documentation/Platforms/ARM#Guidelines_for_choosing_a_=
+QEMU_machine
+Basically we suggest 'virt' unless you have a strong reason for wanting to =
+emulate something else.
 
-Argh, just fired it off by forgot the '-v2' on my format-patch so
-the subject tag won't be right. Sorry about that.
+NB that we don't support PCI in our vexpress model (this is one reason
+we don't recommend it, it makes it a bit inflexible).
 
-drew
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1833101
+
+Title:
+  vexpress-a9 (but not -a15) creates two pl111 LCDs due to duplicate
+  sysbus_create_simple("pl111", ...) calls
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  Hi,
+
+  Just a small report that (12ec8bd is current master)
+
+  https://github.com/qemu/qemu/blob/12ec8bd/hw/arm/vexpress.c#L652:
+
+    ...
+    vexpress_common_init() {
+      ...
+      sysbus_create_simple("pl111", map[VE_CLCD], pic[14]);
+      ...
+    ...
+
+  and
+
+  https://github.com/qemu/qemu/blob/12ec8bd/hw/arm/vexpress.c#L304:
+
+    ...
+    a9_daughterboard_init() {
+      ...
+      sysbus_create_simple("pl111", 0x10020000, pic[44]);
+      ...
+    ...
+
+  result in two LCD panels when using vexpress-a9.
+
+  vexpress-a15 does not appear to be affected (my -a9 kernel does not
+  work with it, but I see only one pl111 created).
+
+  Understandably (but still annoyingly), -nodefaults has no effect.
+
+  This bug is most evident when using SDL (so I can use ",frame=3Doff"),
+  which dumps two top-level windows onto the screen. GTK hides this
+  because, coincidentally, the pl111 that ends up being used is the one
+  that is selected (possibly the one created last?), relegating this to
+  an obscure glitch only noticeable if you scrutinize the menu.
+
+  This is a bugreport as opposed to a pull request as I have no idea
+  which call to remove - and complete ignorance of the potential
+  housekeeping and consideration that may be warranted first.
+
+  FWIW, a simple testcase can be made with the vmlinuz from
+  https://people.debian.org/~aurel32/qemu/armhf/ and
+
+  qemu-system-arm -M vexpress-a9 -kernel vmlinuz-3.2.0-4-vexpress
+  -nodefaults -sdl
+
+  Thanks!
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1833101/+subscriptions
 
