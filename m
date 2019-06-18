@@ -6,57 +6,56 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAE1AC31E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 17:14:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F141C31E5E
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 17:15:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C53262084A
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 17:14:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C53262084A
+	by mail.kernel.org (Postfix) with ESMTPS id 4D95E214AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 17:15:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D95E214AF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60364 helo=lists.gnu.org)
+Received: from localhost ([::1]:60378 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdHhB-0004R4-W1
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 13:14:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60409)
+	id 1hdHi2-0005lm-JR
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 13:15:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60263)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <clg@kaod.org>) id 1hdHMx-0008AS-82
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:54:04 -0400
+ (envelope-from <clg@kaod.org>) id 1hdHMp-0007sd-3J
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:53:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1hdHMv-0003zg-ME
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:54:03 -0400
-Received: from 4.mo69.mail-out.ovh.net ([46.105.42.102]:39909)
+ (envelope-from <clg@kaod.org>) id 1hdHMn-0003nE-3p
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:53:54 -0400
+Received: from 10.mo68.mail-out.ovh.net ([46.105.79.203]:39571)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hdHMv-0003xb-Fq
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:54:01 -0400
-Received: from player157.ha.ovh.net (unknown [10.108.35.240])
- by mo69.mail-out.ovh.net (Postfix) with ESMTP id E9A805E048
- for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 18:53:59 +0200 (CEST)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hdHMl-0003iD-7b
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:53:53 -0400
+Received: from player157.ha.ovh.net (unknown [10.108.42.168])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id 2FE1D132554
+ for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 18:53:48 +0200 (CEST)
 Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
  (Authenticated sender: clg@kaod.org)
- by player157.ha.ovh.net (Postfix) with ESMTPSA id 679836EB51A4;
- Tue, 18 Jun 2019 16:53:53 +0000 (UTC)
+ by player157.ha.ovh.net (Postfix) with ESMTPSA id A8ED56EB510B;
+ Tue, 18 Jun 2019 16:53:42 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 18 Jun 2019 18:52:55 +0200
-Message-Id: <20190618165311.27066-6-clg@kaod.org>
+Date: Tue, 18 Jun 2019 18:52:53 +0200
+Message-Id: <20190618165311.27066-4-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190618165311.27066-1-clg@kaod.org>
 References: <20190618165311.27066-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 1668302190663994129
+X-Ovh-Tracer-Id: 1664924489653652241
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
 X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrtddtgdejjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.42.102
-Subject: [Qemu-devel] [PATCH v2 05/21] aspeed: introduce a configurable
- number of CPU per machine
+X-Received-From: 46.105.79.203
+Subject: [Qemu-devel] [PATCH v2 03/21] hw: timer: Add ASPEED RTC device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,219 +67,294 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org,
  qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The current models of the Aspeed SoCs only have one CPU but future
-ones will support SMP. Introduce a new num_cpus field at the SoC class
-level to define the number of available CPUs per SoC and also
-introduce a 'num-cpus' property to activate the CPUs configured for
-the machine.
+From: Joel Stanley <joel@jms.id.au>
 
-The max_cpus limit of the machine should depend on the SoC definition
-but, unfortunately, these values are not available when the machine
-class is initialized. This is the reason why we add a check on
-num_cpus in the AspeedSoC realize handler.
+The RTC is modeled to provide time and date functionality. It is
+initialised at zero to match the hardware.
 
-SMP support will be activated when models for such SoCs are implemented.
+There is no modelling of the alarm functionality, which includes the IRQ
+line. As there is no guest code to exercise this function that is
+acceptable for now.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: Joel Stanley <joel@jms.id.au>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
+ include/hw/timer/aspeed_rtc.h |  31 ++++++
+ hw/timer/aspeed_rtc.c         | 180 ++++++++++++++++++++++++++++++++++
+ hw/timer/Makefile.objs        |   2 +-
+ hw/timer/trace-events         |   4 +
+ 4 files changed, 216 insertions(+), 1 deletion(-)
+ create mode 100644 include/hw/timer/aspeed_rtc.h
+ create mode 100644 hw/timer/aspeed_rtc.c
 
- Changes sinve v1:
-
-  - reworked the logic to put the number of CPUs under the SoC
-
- include/hw/arm/aspeed_soc.h |  5 ++++-
- hw/arm/aspeed.c             |  7 +++++--
- hw/arm/aspeed_soc.c         | 33 +++++++++++++++++++++++++++------
- 3 files changed, 36 insertions(+), 9 deletions(-)
-
-diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
-index fa0ba957a611..b613b00600fc 100644
---- a/include/hw/arm/aspeed_soc.h
-+++ b/include/hw/arm/aspeed_soc.h
-@@ -24,13 +24,15 @@
-=20
- #define ASPEED_SPIS_NUM  2
- #define ASPEED_WDTS_NUM  3
-+#define ASPEED_CPUS_NUM  2
-=20
- typedef struct AspeedSoCState {
-     /*< private >*/
-     DeviceState parent;
-=20
-     /*< public >*/
--    ARMCPU cpu;
-+    ARMCPU cpu[ASPEED_CPUS_NUM];
-+    uint32_t num_cpus;
-     MemoryRegion sram;
-     AspeedVICState vic;
-     AspeedRtcState rtc;
-@@ -58,6 +60,7 @@ typedef struct AspeedSoCInfo {
-     int wdts_num;
-     const int *irqmap;
-     const hwaddr *memmap;
-+    uint32_t num_cpus;
- } AspeedSoCInfo;
-=20
- typedef struct AspeedSoCClass {
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index c692ca1dba90..96de4f5c2a87 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -22,13 +22,13 @@
- #include "hw/misc/tmp105.h"
- #include "qemu/log.h"
- #include "sysemu/block-backend.h"
-+#include "sysemu/sysemu.h"
- #include "hw/loader.h"
- #include "qemu/error-report.h"
- #include "qemu/units.h"
-=20
- static struct arm_boot_info aspeed_board_binfo =3D {
-     .board_id =3D -1, /* device-tree-only board */
--    .nb_cpus =3D 1,
- };
-=20
- struct AspeedBoardState {
-@@ -171,6 +171,8 @@ static void aspeed_board_init(MachineState *machine,
-                             &error_abort);
-     object_property_set_int(OBJECT(&bmc->soc), cfg->num_cs, "num-cs",
-                             &error_abort);
-+    object_property_set_int(OBJECT(&bmc->soc), smp_cpus, "num-cpus",
-+                            &error_abort);
-     if (machine->kernel_filename) {
-         /*
-          * When booting with a -kernel command line there is no u-boot
-@@ -230,6 +232,7 @@ static void aspeed_board_init(MachineState *machine,
-     aspeed_board_binfo.kernel_cmdline =3D machine->kernel_cmdline;
-     aspeed_board_binfo.ram_size =3D ram_size;
-     aspeed_board_binfo.loader_start =3D sc->info->memmap[ASPEED_SDRAM];
-+    aspeed_board_binfo.nb_cpus =3D bmc->soc.num_cpus;
-=20
-     if (cfg->i2c_init) {
-         cfg->i2c_init(bmc);
-@@ -326,7 +329,7 @@ static void aspeed_machine_class_init(ObjectClass *oc=
-, void *data)
-=20
-     mc->desc =3D board->desc;
-     mc->init =3D aspeed_machine_init;
--    mc->max_cpus =3D 1;
-+    mc->max_cpus =3D ASPEED_CPUS_NUM;
-     mc->no_sdcard =3D 1;
-     mc->no_floppy =3D 1;
-     mc->no_cdrom =3D 1;
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index 5faa78d81fd6..d38fb0aaa0f5 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -19,6 +19,7 @@
- #include "hw/char/serial.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
-+#include "qemu/error-report.h"
- #include "hw/i2c/aspeed_i2c.h"
- #include "net/net.h"
-=20
-@@ -123,6 +124,7 @@ static const AspeedSoCInfo aspeed_socs[] =3D {
-         .wdts_num     =3D 2,
-         .irqmap       =3D aspeed_soc_ast2400_irqmap,
-         .memmap       =3D aspeed_soc_ast2400_memmap,
-+        .num_cpus     =3D 1,
-     }, {
-         .name         =3D "ast2400-a1",
-         .cpu_type     =3D ARM_CPU_TYPE_NAME("arm926"),
-@@ -134,6 +136,7 @@ static const AspeedSoCInfo aspeed_socs[] =3D {
-         .wdts_num     =3D 2,
-         .irqmap       =3D aspeed_soc_ast2400_irqmap,
-         .memmap       =3D aspeed_soc_ast2400_memmap,
-+        .num_cpus     =3D 1,
-     }, {
-         .name         =3D "ast2400",
-         .cpu_type     =3D ARM_CPU_TYPE_NAME("arm926"),
-@@ -145,6 +148,7 @@ static const AspeedSoCInfo aspeed_socs[] =3D {
-         .wdts_num     =3D 2,
-         .irqmap       =3D aspeed_soc_ast2400_irqmap,
-         .memmap       =3D aspeed_soc_ast2400_memmap,
-+        .num_cpus     =3D 1,
-     }, {
-         .name         =3D "ast2500-a1",
-         .cpu_type     =3D ARM_CPU_TYPE_NAME("arm1176"),
-@@ -156,6 +160,7 @@ static const AspeedSoCInfo aspeed_socs[] =3D {
-         .wdts_num     =3D 3,
-         .irqmap       =3D aspeed_soc_ast2500_irqmap,
-         .memmap       =3D aspeed_soc_ast2500_memmap,
-+        .num_cpus     =3D 1,
-     },
- };
-=20
-@@ -172,8 +177,11 @@ static void aspeed_soc_init(Object *obj)
-     AspeedSoCClass *sc =3D ASPEED_SOC_GET_CLASS(s);
-     int i;
-=20
--    object_initialize_child(obj, "cpu", OBJECT(&s->cpu), sizeof(s->cpu),
--                            sc->info->cpu_type, &error_abort, NULL);
-+    for (i =3D 0; i < sc->info->num_cpus; i++) {
-+        object_initialize_child(obj, "cpu[*]", OBJECT(&s->cpu[i]),
-+                                sizeof(s->cpu[i]), sc->info->cpu_type,
-+                                &error_abort, NULL);
+diff --git a/include/hw/timer/aspeed_rtc.h b/include/hw/timer/aspeed_rtc.=
+h
+new file mode 100644
+index 000000000000..1f1155a676c1
+--- /dev/null
++++ b/include/hw/timer/aspeed_rtc.h
+@@ -0,0 +1,31 @@
++/*
++ * ASPEED Real Time Clock
++ * Joel Stanley <joel@jms.id.au>
++ *
++ * Copyright 2019 IBM Corp
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++#ifndef ASPEED_RTC_H
++#define ASPEED_RTC_H
++
++#include <stdint.h>
++
++#include "hw/hw.h"
++#include "hw/irq.h"
++#include "hw/sysbus.h"
++
++typedef struct AspeedRtcState {
++    SysBusDevice parent_obj;
++
++    MemoryRegion iomem;
++    qemu_irq irq;
++
++    uint32_t reg[0x18];
++    int offset;
++
++} AspeedRtcState;
++
++#define TYPE_ASPEED_RTC "aspeed.rtc"
++#define ASPEED_RTC(obj) OBJECT_CHECK(AspeedRtcState, (obj), TYPE_ASPEED_=
+RTC)
++
++#endif /* ASPEED_RTC_H */
+diff --git a/hw/timer/aspeed_rtc.c b/hw/timer/aspeed_rtc.c
+new file mode 100644
+index 000000000000..19f061c846e8
+--- /dev/null
++++ b/hw/timer/aspeed_rtc.c
+@@ -0,0 +1,180 @@
++/*
++ * ASPEED Real Time Clock
++ * Joel Stanley <joel@jms.id.au>
++ *
++ * Copyright 2019 IBM Corp
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "hw/timer/aspeed_rtc.h"
++#include "qemu/log.h"
++#include "qemu/timer.h"
++
++#include "trace.h"
++
++#define COUNTER1        (0x00 / 4)
++#define COUNTER2        (0x04 / 4)
++#define ALARM           (0x08 / 4)
++#define CONTROL         (0x10 / 4)
++#define ALARM_STATUS    (0x14 / 4)
++
++#define RTC_UNLOCKED    BIT(1)
++#define RTC_ENABLED     BIT(0)
++
++static void aspeed_rtc_calc_offset(AspeedRtcState *rtc)
++{
++    struct tm tm;
++    uint32_t year, cent;
++    uint32_t reg1 =3D rtc->reg[COUNTER1];
++    uint32_t reg2 =3D rtc->reg[COUNTER2];
++
++    tm.tm_mday =3D (reg1 >> 24) & 0x1f;
++    tm.tm_hour =3D (reg1 >> 16) & 0x1f;
++    tm.tm_min =3D (reg1 >> 8) & 0x3f;
++    tm.tm_sec =3D (reg1 >> 0) & 0x3f;
++
++    cent =3D (reg2 >> 16) & 0x1f;
++    year =3D (reg2 >> 8) & 0x7f;
++    tm.tm_mon =3D ((reg2 >>  0) & 0x0f) - 1;
++    tm.tm_year =3D year + (cent * 100) - 1900;
++
++    rtc->offset =3D qemu_timedate_diff(&tm);
++}
++
++static uint32_t aspeed_rtc_get_counter(AspeedRtcState *rtc, int r)
++{
++    uint32_t year, cent;
++    struct tm now;
++
++    qemu_get_timedate(&now, rtc->offset);
++
++    switch (r) {
++    case COUNTER1:
++        return (now.tm_mday << 24) | (now.tm_hour << 16) |
++            (now.tm_min << 8) | now.tm_sec;
++    case COUNTER2:
++        cent =3D (now.tm_year + 1900) / 100;
++        year =3D now.tm_year % 100;
++        return ((cent & 0x1f) << 16) | ((year & 0x7f) << 8) |
++            ((now.tm_mon + 1) & 0xf);
++    default:
++        g_assert_not_reached();
 +    }
-=20
-     sysbus_init_child_obj(obj, "scu", OBJECT(&s->scu), sizeof(s->scu),
-                           TYPE_ASPEED_SCU);
-@@ -241,11 +249,19 @@ static void aspeed_soc_realize(DeviceState *dev, Er=
-ror **errp)
-     create_unimplemented_device("aspeed_soc.io", sc->info->memmap[ASPEED=
-_IOMEM],
-                                 ASPEED_SOC_IOMEM_SIZE);
-=20
-+    if (s->num_cpus > sc->info->num_cpus) {
-+        warn_report("%s: invalid number of CPUs %d, using default %d",
-+                    sc->info->name, s->num_cpus, sc->info->num_cpus);
-+        s->num_cpus =3D sc->info->num_cpus;
++}
++
++static uint64_t aspeed_rtc_read(void *opaque, hwaddr addr,
++                                unsigned size)
++{
++    AspeedRtcState *rtc =3D opaque;
++    uint64_t val;
++    uint32_t r =3D addr >> 2;
++
++    switch (r) {
++    case COUNTER1:
++    case COUNTER2:
++        if (rtc->reg[CONTROL] & RTC_ENABLED) {
++            rtc->reg[r] =3D aspeed_rtc_get_counter(rtc, r);
++        }
++        /* fall through */
++    case CONTROL:
++        val =3D rtc->reg[r];
++        break;
++    case ALARM:
++    case ALARM_STATUS:
++    default:
++        qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx "\n", __func__, a=
+ddr);
++        return 0;
 +    }
 +
-     /* CPU */
--    object_property_set_bool(OBJECT(&s->cpu), true, "realized", &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
-+    for (i =3D 0; i < s->num_cpus; i++) {
-+        object_property_set_bool(OBJECT(&s->cpu[i]), true, "realized", &=
-err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
++    trace_aspeed_rtc_read(addr, val);
++
++    return val;
++}
++
++static void aspeed_rtc_write(void *opaque, hwaddr addr,
++                             uint64_t val, unsigned size)
++{
++    AspeedRtcState *rtc =3D opaque;
++    uint32_t r =3D addr >> 2;
++
++    switch (r) {
++    case COUNTER1:
++    case COUNTER2:
++        if (!(rtc->reg[CONTROL] & RTC_UNLOCKED)) {
++            break;
 +        }
-     }
-=20
-     /* SRAM */
-@@ -380,6 +396,10 @@ static void aspeed_soc_realize(DeviceState *dev, Err=
-or **errp)
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->ftgmac100), 0,
-                        aspeed_soc_get_irq(s, ASPEED_ETH1));
- }
-+static Property aspeed_soc_properties[] =3D {
-+    DEFINE_PROP_UINT32("num-cpus", AspeedSoCState, num_cpus, 0),
-+    DEFINE_PROP_END_OF_LIST(),
++        /* fall through */
++    case CONTROL:
++        rtc->reg[r] =3D val;
++        aspeed_rtc_calc_offset(rtc);
++        break;
++    case ALARM:
++    case ALARM_STATUS:
++    default:
++        qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx "\n", __func__, a=
+ddr);
++        break;
++    }
++    trace_aspeed_rtc_write(addr, val);
++}
++
++static void aspeed_rtc_reset(DeviceState *d)
++{
++    AspeedRtcState *rtc =3D ASPEED_RTC(d);
++
++    rtc->offset =3D 0;
++    memset(rtc->reg, 0, sizeof(rtc->reg));
++}
++
++static const MemoryRegionOps aspeed_rtc_ops =3D {
++    .read =3D aspeed_rtc_read,
++    .write =3D aspeed_rtc_write,
++    .endianness =3D DEVICE_NATIVE_ENDIAN,
 +};
++
++static const VMStateDescription vmstate_aspeed_rtc =3D {
++    .name =3D TYPE_ASPEED_RTC,
++    .version_id =3D 1,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(reg, AspeedRtcState, 0x18),
++        VMSTATE_INT32(offset, AspeedRtcState),
++        VMSTATE_INT32(offset, AspeedRtcState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void aspeed_rtc_realize(DeviceState *dev, Error **errp)
++{
++    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
++    AspeedRtcState *s =3D ASPEED_RTC(dev);
++
++    sysbus_init_irq(sbd, &s->irq);
++
++    memory_region_init_io(&s->iomem, OBJECT(s), &aspeed_rtc_ops, s,
++                          "aspeed-rtc", 0x18ULL);
++    sysbus_init_mmio(sbd, &s->iomem);
++}
++
++static void aspeed_rtc_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->realize =3D aspeed_rtc_realize;
++    dc->vmsd =3D &vmstate_aspeed_rtc;
++    dc->reset =3D aspeed_rtc_reset;
++}
++
++static const TypeInfo aspeed_rtc_info =3D {
++    .name          =3D TYPE_ASPEED_RTC,
++    .parent        =3D TYPE_SYS_BUS_DEVICE,
++    .instance_size =3D sizeof(AspeedRtcState),
++    .class_init    =3D aspeed_rtc_class_init,
++};
++
++static void aspeed_rtc_register_types(void)
++{
++    type_register_static(&aspeed_rtc_info);
++}
++
++type_init(aspeed_rtc_register_types)
+diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+index 0e9a4530f848..123d92c9692c 100644
+--- a/hw/timer/Makefile.objs
++++ b/hw/timer/Makefile.objs
+@@ -41,7 +41,7 @@ obj-$(CONFIG_MC146818RTC) +=3D mc146818rtc.o
+ obj-$(CONFIG_ALLWINNER_A10_PIT) +=3D allwinner-a10-pit.o
 =20
- static void aspeed_soc_class_init(ObjectClass *oc, void *data)
- {
-@@ -390,6 +410,7 @@ static void aspeed_soc_class_init(ObjectClass *oc, vo=
-id *data)
-     dc->realize =3D aspeed_soc_realize;
-     /* Reason: Uses serial_hds and nd_table in realize() directly */
-     dc->user_creatable =3D false;
-+    dc->props =3D aspeed_soc_properties;
- }
+ common-obj-$(CONFIG_STM32F2XX_TIMER) +=3D stm32f2xx_timer.o
+-common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_timer.o
++common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_timer.o aspeed_rtc.o
 =20
- static const TypeInfo aspeed_soc_type_info =3D {
+ common-obj-$(CONFIG_SUN4V_RTC) +=3D sun4v-rtc.o
+ common-obj-$(CONFIG_CMSDK_APB_TIMER) +=3D cmsdk-apb-timer.o
+diff --git a/hw/timer/trace-events b/hw/timer/trace-events
+index dcaf3d6da6c8..db02a9142cda 100644
+--- a/hw/timer/trace-events
++++ b/hw/timer/trace-events
+@@ -66,6 +66,10 @@ cmsdk_apb_dualtimer_read(uint64_t offset, uint64_t dat=
+a, unsigned size) "CMSDK A
+ cmsdk_apb_dualtimer_write(uint64_t offset, uint64_t data, unsigned size)=
+ "CMSDK APB dualtimer write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size=
+ %u"
+ cmsdk_apb_dualtimer_reset(void) "CMSDK APB dualtimer: reset"
+=20
++# hw/timer/aspeed-rtc.c
++aspeed_rtc_read(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " val=
+ue 0x%08" PRIx64
++aspeed_rtc_write(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " va=
+lue 0x%08" PRIx64
++
+ # sun4v-rtc.c
+ sun4v_rtc_read(uint64_t addr, uint64_t value) "read: addr 0x%" PRIx64 " =
+value 0x%" PRIx64
+ sun4v_rtc_write(uint64_t addr, uint64_t value) "write: addr 0x%" PRIx64 =
+" value 0x%" PRIx64
 --=20
 2.21.0
 
