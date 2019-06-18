@@ -6,55 +6,110 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91D86C31E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 18:05:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E415DC31E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 18:52:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75DF42063F
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 18:05:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75DF42063F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B9EA8206BA
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 18:52:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9EA8206BA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60836 helo=lists.gnu.org)
+Received: from localhost ([::1]:32874 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdITr-0000Uo-AV
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 14:05:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50938)
+	id 1hdJDH-0006Hj-7W
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 14:52:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33012)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <crosa@redhat.com>) id 1hdIR4-0007Fs-Mj
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 14:02:24 -0400
+ (envelope-from <laurent@vivier.eu>) id 1hdJBu-0005hH-H2
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 14:50:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1hdIR3-0003dp-28
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 14:02:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52592)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1hdIR2-0003cl-LV
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 14:02:20 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A9F4C23E6E7;
- Tue, 18 Jun 2019 18:02:19 +0000 (UTC)
-Received: from unused.bos.redhat.com (unknown [10.16.197.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4A1495E7C6;
- Tue, 18 Jun 2019 18:02:16 +0000 (UTC)
-From: Cleber Rosa <crosa@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 18 Jun 2019 14:02:15 -0400
-Message-Id: <20190618180215.25896-1-crosa@redhat.com>
+ (envelope-from <laurent@vivier.eu>) id 1hdJBt-0000g6-Ek
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 14:50:46 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:45939)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hdJBt-0000cf-5u
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 14:50:45 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1N9MlG-1iiYwA2Ztc-015H31; Tue, 18 Jun 2019 20:44:58 +0200
+To: Lucien Murray-Pitts <lucienmp_antispam@yahoo.com>, qemu-devel@nongnu.org
+References: <20190526075056.33865-1-lucienmp_antispam@yahoo.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Openpgp: preference=signencrypt
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <ab1edfe7-8498-eee6-096c-d66d6122d133@vivier.eu>
+Date: Tue, 18 Jun 2019 20:44:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Tue, 18 Jun 2019 18:02:19 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190526075056.33865-1-lucienmp_antispam@yahoo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:X/vrb1+Xjog3zPZBeqiyKAgGQTxqjf5PeGD9CA+SGT0/AcL7r0c
+ Ywt5jbOaR8vrlnh7lnSsgnK6xiW/HbCRq0CmOIBi+owOycnMK2q4xwUbivpXOpqOW0CH+JG
+ IkR7VTvbNnj19DF/S/+/XVuzhW4PM8/9TrKhNhoDjHWMS3wlj1SMbG7btt/gkZGKiJb3fNM
+ EEkHj1yXWDc8AqSf60W/Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Dl9s3Tq6AC0=:R8/HfhFtZ1cWpRfkFrPzJ5
+ mhIO2E6tmwk4pI+41JopDJaKvAo+P3kNopo1dI1XvHEFkAKdKNxMaTIP58nRHiYArygRv0f5t
+ jyT6haAcnC2Op5Lyu8zOJ7Cb+sTsITJ8FM051W14n731H+Ooj+cxjOyeQlNOMa3UEi8hUqN54
+ mRxumL2jLoTh54KnJSmJZ2QSVvpDWwCvC09D3MF9vn3tEUq+ybXXWwD+bQYtLMQjh9HV93AH9
+ qzRZ8EhC5UJhiV4RshjcIvcb1dEMmhArvl5+xhmOTJUmpzCxiNJhPTkyKyTUU71zafWis+DYe
+ KtHjvHjYB92MxizVIL6sRh/v92RqEJA8DDeYkjylD6HPfGcnPSFZe8Y3hY8xenPH70Blb5h1I
+ zn5KxczcH6L1NU4o2AY+4kp3tIP/Rjh58AgEwFWgSeaHy2gWACA78xCEaP/M6KvlNb8DJoAqH
+ RxPlsZouFvFOeTAFU6DuX88WE25rO4q0JkvknmgTn7SXpGaHopNp4H3NC6w0uSqUtiDKyq3vu
+ iEZxgHeP3eE/5amkrpTbXBYV5yu44dTMRJkO9HUVPnm7pJCMXvqQk00KvgWno4vZcOnftz+QA
+ lrGlK2NM67wv99S5y18ek5xwGOkYL9qsVra8QsvyWEW7dYRI0F1d4f/9e0xs/fEAGhB+mbtRH
+ ku99pUqXCLVaJP1M8/x1ghKN3eqbD3fkRMF2oOg3mcpnEqsnks0j/Fzf61hD8vUl3Em3boiD6
+ YPXymTU49vXnrt8Hjm0uO6EmhijA+mJtQZg9qqIFZLADeadSu8jtNsSCuO4=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] Acceptance tests: workaround for serial
- devices / console socket issue
+X-Received-From: 212.227.17.24
+Subject: Re: [Qemu-devel] [PATCH] Regression for m68k causing Single-Step
+ via GDB/RSP to not single step
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,107 +121,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: Thomas Huth <huth@tuxfamily.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "Emilio G . Cota" <cota@braap.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We're seeing constant failures on aarch64 and arm targets on CI
-on tests that have a kernel writing to a serial device used as console,
-and a socket file connected to it.
+Le 26/05/2019 à 09:50, Lucien Murray-Pitts a écrit :
+> A regression that was introduced, with the refactor to TranslatorOps,
+> drops two lines that update the PC when single-stepping is being performed.
+> ( short commit 11ab74b )
+> 
+> This patch resolves that issue.
 
-After investigation, it was noticed that when interacting with some
-devices, by means of the sockets around serial devices used as
-console, QEMU may block an entire thread (see 6ab3fc32e).
+Fixes: 11ab74b01e0a ("target/m68k: Convert to TranslatorOps")
 
-This attempts to work around the behavior of those devices, by
-closing the socket file connected to the chardev given to the
-serial device.
+> Signed-off-by: Lucien Murray-Pitts <lucienmp_antispam@yahoo.com>
+> ---
+>  target/m68k/translate.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+> index f0534a4ba0..2922ea79c3 100644
+> --- a/target/m68k/translate.c
+> +++ b/target/m68k/translate.c
+> @@ -6130,6 +6130,8 @@ static void m68k_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+>          return;
+>      }
+>      if (dc->base.singlestep_enabled) {
+> +        update_cc_op(dc);
+> +        tcg_gen_movi_i32(QREG_PC, dc->pc);
+>          gen_helper_raise_exception(cpu_env, tcg_const_i32(EXCP_DEBUG));
+>          return;
+>      }
+> 
 
-Related to bug: https://bugs.launchpad.net/qemu/+bug/1829779
+I've tested this fix single-stepping on a kernel, these two lines are 
+not enough to fix the problem. In fact four lines have been dropped and 
+we must re-add them all:
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
----
- tests/acceptance/boot_linux_console.py | 23 ++++++++++++++++-------
- 1 file changed, 16 insertions(+), 7 deletions(-)
+iff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index d0f6d1f5cc..6c78001501 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -6200,6 +6200,10 @@ static void m68k_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+         return;
+     }
+     if (dc->base.singlestep_enabled) {
++        if (dc->base.is_jmp != DISAS_JUMP) {
++            update_cc_op(dc);
++            tcg_gen_movi_i32(QREG_PC, dc->pc);
++        }
+         gen_helper_raise_exception(cpu_env, tcg_const_i32(EXCP_DEBUG));
+         return;
+     }
 
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
-ot_linux_console.py
-index 32159503e9..ae31d914a8 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -30,12 +30,15 @@ class BootLinuxConsole(Test):
-     KERNEL_COMMON_COMMAND_LINE =3D 'printk.time=3D0 '
-=20
-     def wait_for_console_pattern(self, success_message,
--                                 failure_message=3D'Kernel panic - not s=
-yncing'):
-+                                 failure_message=3D'Kernel panic - not s=
-yncing',
-+                                 close=3DTrue):
-         """
-         Waits for messages to appear on the console, while logging the c=
-ontent
-=20
-         :param success_message: if this message appears, test succeeds
-         :param failure_message: if this message appears, test fails
-+        :param close: close the socket file once the a final (success or
-+                      failure) message is found
-         """
-         console =3D self.vm.console_socket.makefile()
-         console_logger =3D logging.getLogger('console')
-@@ -45,15 +48,20 @@ class BootLinuxConsole(Test):
-                 continue
-             console_logger.debug(msg)
-             if success_message in msg:
-+                if close:
-+                    self.vm.console_socket.close()
-                 break
-             if failure_message in msg:
-+                if close:
-+                    self.vm.console_socket.close()
-                 fail =3D 'Failure message found in console: %s' % failur=
-e_message
-                 self.fail(fail)
-=20
--    def exec_command_and_wait_for_pattern(self, command, success_message=
-):
-+    def exec_command_and_wait_for_pattern(self, command, success_message=
-,
-+                                          close):
-         command +=3D '\n'
-         self.vm.console_socket.sendall(command.encode())
--        self.wait_for_console_pattern(success_message)
-+        self.wait_for_console_pattern(success_message, close=3Dclose)
-=20
-     def extract_from_deb(self, deb, path):
-         """
-@@ -180,14 +188,15 @@ class BootLinuxConsole(Test):
-                          '-append', kernel_command_line,
-                          '-no-reboot')
-         self.vm.launch()
--        self.wait_for_console_pattern('Boot successful.')
-+        self.wait_for_console_pattern('Boot successful.', close=3DFalse)
-=20
-         self.exec_command_and_wait_for_pattern('cat /proc/cpuinfo',
--                                               'BogoMIPS')
-+                                               'BogoMIPS', close=3DFalse=
-)
-         self.exec_command_and_wait_for_pattern('uname -a',
--                                               'Debian')
-+                                               'Debian', close=3DFalse)
-         self.exec_command_and_wait_for_pattern('reboot',
--                                               'reboot: Restarting syste=
-m')
-+                                               'reboot: Restarting syste=
-m',
-+                                               close=3DTrue)
-=20
-     def do_test_mips_malta32el_nanomips(self, kernel_url, kernel_hash):
-         kernel_path_xz =3D self.fetch_asset(kernel_url, asset_hash=3Dker=
-nel_hash)
---=20
-2.21.0
+The problem happens when we single-step over an "rts" instruction, 
+instead of returning to the caller the PC points to the following 
+instruction (PC + 2):
 
+0x00002e26 in arch_cpu_idle ()
+1: x/i $pc  0x2e26 <arch_cpu_idle+4>:	rts
+(gdb) si
+0x00002e28 in machine_restart ()
+1: x/i $pc  0x2e28 <machine_restart>:	moveal 0x438ae4 <mach_reset>,%a0
+
+The good instruction stream is:
+
+0x00002e26 in arch_cpu_idle ()
+1: x/i $pc  0x2e26 <arch_cpu_idle+4>:	rts
+(gdb) si
+0x0002be6a in do_idle ()
+1: x/i $pc  0x2be6a <do_idle+114>:	movew %sr,%d0
+
+Thanks,
+Laurent
 
