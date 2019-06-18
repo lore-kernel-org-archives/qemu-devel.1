@@ -2,82 +2,83 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D2D8C31E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:52:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 999ECC31E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:54:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54D38206E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:52:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54D38206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 66EC7206E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:54:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uJ9sT+Kh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66EC7206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59976 helo=lists.gnu.org)
+Received: from localhost ([::1]:59986 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdHLk-0006Fc-G1
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 12:52:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49672)
+	id 1hdHN0-0007dR-Dd
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 12:54:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45199)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hdGnE-0005B5-0P
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:17:10 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hdGZf-0007vS-2l
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:03:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hdGnA-0005kV-4G
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:17:06 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:36586)
+ (envelope-from <alistair23@gmail.com>) id 1hdGZE-0007EW-PW
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:03:06 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:46301)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hdGn9-0005F5-Of
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:17:03 -0400
-Received: by mail-wm1-f65.google.com with SMTP id u8so3904337wmm.1
- for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 09:16:41 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1hdGZE-00079O-Du; Tue, 18 Jun 2019 12:02:40 -0400
+Received: by mail-lj1-x241.google.com with SMTP id v24so48388ljg.13;
+ Tue, 18 Jun 2019 09:02:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=xnoRudHO2CuC9aj4VruAgmdpO4r/RXjyhyTGnuZx8V8=;
+ b=uJ9sT+KhCVRUQkLuSAf3lrJYN768pLXsc1i8yeI2mu+n19+l/axN+Z0wQVKeANWkKH
+ QP1j/NsK2mXOuamvuErOhZSB5RsYwyx4gVeBsx0GwmJ0W8dRHlbK+nmu1K3Nq347qLyL
+ eLSjlaBr4u+aAr0U0k5Voo1ny5H9T0NNDIDJys4tX/WERA6ftPuT8gPEOaUmi0To3FnE
+ ZNl6tj9FeomkpFqrg8FNZ9iUfErvatEuPFkr9dUft3fvzYzYLH8E9JibL38OgQsg1vR+
+ tANNpPgfHS1SxYhp2fgvzfqHomNx49t5iVNJVvCiJd1lE2/n8Qp74pLXe2Cn9W6ofknI
+ Li4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=5e9uLp89Gt+m5g88zVJ9D5G0JHLLMLu3Kl8Zr8OgjC8=;
- b=lcGoACooWqolyfbDuPBLtWRjvPSTpXfZwWLHg0sOrgsJRXk9y+PJUknFP0vZV9UJ6i
- rmxDtF2RP+ngLt/IMZNvBFqkYMmC23B3l9phUQGkPtjDtK1QrTF2jgRiDmy/GQazwl4l
- a/J6IKuiPouCEZS5xLfMTigbIqVwfY/DWiMqSVxJ9vy+6iNxSeTCfRBrWw1CF2+uAr55
- kKUfricfa6xzyfbERcZMbUCRJOdsrc0/af+pTPWSOYn5yLi02zNm29DI+rIQcMoB4cFw
- /296IpS5K3kyi/++1v6eRxHEzgKmCpn+Tec+632eR5aJUZTcAfNXCOvLrWoJIKozLmeq
- xw6A==
-X-Gm-Message-State: APjAAAVFZq98rnEgIipr4nDq22UTH4MQrEJeG2Zc26ycPFSiEc+wI+Uc
- F2YDGfGCK9sZiZp9nC1c/aZ/IA==
-X-Google-Smtp-Source: APXvYqw1J9CwL+z6Y1GnoG219YYSsmAGstLgCwPixXpJKUR7s+TMMAsy7qhDiA6bWSLkIly4qjc0Ww==
-X-Received: by 2002:a7b:c057:: with SMTP id u23mr4411268wmc.29.1560874600084; 
- Tue, 18 Jun 2019 09:16:40 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:51c0:d03f:68e:1f6d?
- ([2001:b07:6468:f312:51c0:d03f:68e:1f6d])
- by smtp.gmail.com with ESMTPSA id v27sm30359654wrv.45.2019.06.18.09.16.38
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Tue, 18 Jun 2019 09:16:39 -0700 (PDT)
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Liran Alon <liran.alon@oracle.com>
-References: <20190617175658.135869-1-liran.alon@oracle.com>
- <20190617175658.135869-8-liran.alon@oracle.com>
- <20190618090316.GC2850@work-vm>
- <32C4B530-A135-475B-B6AF-9288D372920D@oracle.com>
- <20190618154817.GI2850@work-vm>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <476e9ff5-133a-4ee0-6eec-6c55c5e98dfc@redhat.com>
-Date: Tue, 18 Jun 2019 18:16:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=xnoRudHO2CuC9aj4VruAgmdpO4r/RXjyhyTGnuZx8V8=;
+ b=o+GNWjpgJg3RRchR2A25P9ycgj21YHFcAGWfANGW6XRpSznmG4dZhuNJz09iM4GsK/
+ a9xpf0VmRjQB9y8w2TtJxlQFwkIGtPPHZYjPdnHL4CLql2FZAoILoMoylFgUQ1EWjm6W
+ hEftEE/tB0SipMFhW6s3YeN5h5LqQNhCeBmHGju+MtUtsnwPyq4CleGkXpIBF81xnuFr
+ WFNuyvKLatpj7cwVdzkGITTOfwD2qaPfLT+D4CDPIejfwgWUdI2mmnEXO0MW8p683iqV
+ C9Y5gXkFB+oKwMu4stkgP/siv50H/U2MyVREC+jI1Yef1OU7cWTFcYJscq6PpDivpLuh
+ GDYw==
+X-Gm-Message-State: APjAAAX3zQ/xLZax61WehGB1sYvnKZrlWGWtu7LG0WU4zwIsntWo/w3g
+ uLoglWyAQAFW/AXVLjyDaQ8LIrKExRBYfgpJXd4=
+X-Google-Smtp-Source: APXvYqy8wJnBFdgxqPs8MSq9XI+s0SjDtnftndF7/H1RNuEXAj2cp3DDV9HBAtf4rQt3KEoD/OqgAf37VTiMjADS8qQ=
+X-Received: by 2002:a2e:9188:: with SMTP id f8mr3813021ljg.33.1560873758010;
+ Tue, 18 Jun 2019 09:02:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190618154817.GI2850@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [QEMU PATCH v3 7/9] KVM: i386: Add support for
- save and restore nested state
+References: <cover.1560821342.git.alistair.francis@wdc.com>
+ <1483cda620f3bff57b7c47ad74c44f586cfde4a5.1560821342.git.alistair.francis@wdc.com>
+ <aec3b345-5ecd-6192-acee-dbfa296330d5@redhat.com>
+In-Reply-To: <aec3b345-5ecd-6192-acee-dbfa296330d5@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 18 Jun 2019 08:59:50 -0700
+Message-ID: <CAKmqyKPSRw29VSGirQ4XnRD5Pu4W8_-fRzeYZes5oh9bf0jTLw@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::241
+Subject: Re: [Qemu-devel] [PATCH v1 1/9] target/riscv: Restructure deprecatd
+ CPUs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,23 +90,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, kvm@vger.kernel.org, maran.wilson@oracle.com,
- mtosatti@redhat.com, qemu-devel@nongnu.org,
- Nikita Leshenko <nikita.leshchenko@oracle.com>, rth@twiddle.net,
- jmattson@google.com
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/06/19 17:48, Dr. David Alan Gilbert wrote:
->> Currently, KVM folks (including myself), haven’t decided yet to expose vmcs12 struct layout to userspace but instead to still leave it opaque.
->> The formal size of this size is VMCS12_SIZE (defined in kernel as 0x1000). I was wondering if we wish to expose VMCS12_SIZE constant to userspace or not.
->> So currently I defined these __u8 arrays as 0x1000. But in case Paolo agrees to expose VMCS12_SIZE, we can use that instead.
-> Well if it's not defined it's bound to change at some state!
-> Also, do we need to clear it before we get it from the kernel - e.g.
-> is the kernel guaranteed to give us 0x1000 ?
+On Mon, Jun 17, 2019 at 10:23 PM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> On 6/18/19 3:31 AM, Alistair Francis wrote:
+> > Restructure the deprecated CPUs to make it clear in the code that these
+> > are depreated. They are already marked as deprecated in
+> > qemu-deprecated.texi. There are no functional changes.
+> >
+> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > ---
+> >  target/riscv/cpu.c | 18 ++++++++++--------
+> >  target/riscv/cpu.h | 13 +++++++------
+> >  2 files changed, 17 insertions(+), 14 deletions(-)
+> >
+> > diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> > index 0632ac08cf..a4dd7ae6fc 100644
+> > --- a/target/riscv/cpu.c
+> > +++ b/target/riscv/cpu.c
+> > @@ -558,18 +558,20 @@ static const TypeInfo riscv_cpu_type_infos[] =3D =
+{
+> >      DEFINE_CPU(TYPE_RISCV_CPU_ANY,              riscv_any_cpu_init),
+> >  #if defined(TARGET_RISCV32)
+> >      DEFINE_CPU(TYPE_RISCV_CPU_BASE32,           riscv_base32_cpu_init)=
+,
+> > -    DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_09_1, rv32gcsu_priv1_09_1_cp=
+u_init),
+> > -    DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_10_0, rv32gcsu_priv1_10_0_cp=
+u_init),
+> > -    DEFINE_CPU(TYPE_RISCV_CPU_RV32IMACU_NOMMU,  rv32imacu_nommu_cpu_in=
+it),
+> >      DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E31,       rv32imacu_nommu_cpu_in=
+it),
+> > -    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rv32gcsu_priv1_10_0_cp=
+u_init)
+> > +    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rv32gcsu_priv1_10_0_cp=
+u_init),
+> > +    /* Depreacted */
+>
+> "Deprecated" in patch subject and here ;)
 
-It is defined, it is the size of data.vmx[0].vmx12.  We can define it.
+Thanks, fixed!
 
-Paolo
+Alistair
+
+>
+> > +    DEFINE_CPU(TYPE_RISCV_CPU_RV32IMACU_NOMMU,  rv32imacu_nommu_cpu_in=
+it),
+> > +    DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_09_1, rv32gcsu_priv1_09_1_cp=
+u_init),
+> > +    DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_10_0, rv32gcsu_priv1_10_0_cp=
+u_init)
+> >  #elif defined(TARGET_RISCV64)
+> >      DEFINE_CPU(TYPE_RISCV_CPU_BASE64,           riscv_base64_cpu_init)=
+,
+> > -    DEFINE_CPU(TYPE_RISCV_CPU_RV64GCSU_V1_09_1, rv64gcsu_priv1_09_1_cp=
+u_init),
+> > -    DEFINE_CPU(TYPE_RISCV_CPU_RV64GCSU_V1_10_0, rv64gcsu_priv1_10_0_cp=
+u_init),
+> > -    DEFINE_CPU(TYPE_RISCV_CPU_RV64IMACU_NOMMU,  rv64imacu_nommu_cpu_in=
+it),
+> >      DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E51,       rv64imacu_nommu_cpu_in=
+it),
+> > -    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U54,       rv64gcsu_priv1_10_0_cp=
+u_init)
+> > +    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U54,       rv64gcsu_priv1_10_0_cp=
+u_init),
+> > +    /* Deprecated */
+> > +    DEFINE_CPU(TYPE_RISCV_CPU_RV64IMACU_NOMMU,  rv64imacu_nommu_cpu_in=
+it),
+> > +    DEFINE_CPU(TYPE_RISCV_CPU_RV64GCSU_V1_09_1, rv64gcsu_priv1_09_1_cp=
+u_init),
+> > +    DEFINE_CPU(TYPE_RISCV_CPU_RV64GCSU_V1_10_0, rv64gcsu_priv1_10_0_cp=
+u_init)
+> >  #endif
+> >  };
+> >
+> > diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> > index b47cde5017..1668d12018 100644
+> > --- a/target/riscv/cpu.h
+> > +++ b/target/riscv/cpu.h
+> > @@ -35,16 +35,17 @@
+> >  #define TYPE_RISCV_CPU_ANY              RISCV_CPU_TYPE_NAME("any")
+> >  #define TYPE_RISCV_CPU_BASE32           RISCV_CPU_TYPE_NAME("rv32")
+> >  #define TYPE_RISCV_CPU_BASE64           RISCV_CPU_TYPE_NAME("rv64")
+> > -#define TYPE_RISCV_CPU_RV32GCSU_V1_09_1 RISCV_CPU_TYPE_NAME("rv32gcsu-=
+v1.9.1")
+> > -#define TYPE_RISCV_CPU_RV32GCSU_V1_10_0 RISCV_CPU_TYPE_NAME("rv32gcsu-=
+v1.10.0")
+> > -#define TYPE_RISCV_CPU_RV32IMACU_NOMMU  RISCV_CPU_TYPE_NAME("rv32imacu=
+-nommu")
+> > -#define TYPE_RISCV_CPU_RV64GCSU_V1_09_1 RISCV_CPU_TYPE_NAME("rv64gcsu-=
+v1.9.1")
+> > -#define TYPE_RISCV_CPU_RV64GCSU_V1_10_0 RISCV_CPU_TYPE_NAME("rv64gcsu-=
+v1.10.0")
+> > -#define TYPE_RISCV_CPU_RV64IMACU_NOMMU  RISCV_CPU_TYPE_NAME("rv64imacu=
+-nommu")
+> >  #define TYPE_RISCV_CPU_SIFIVE_E31       RISCV_CPU_TYPE_NAME("sifive-e3=
+1")
+> >  #define TYPE_RISCV_CPU_SIFIVE_E51       RISCV_CPU_TYPE_NAME("sifive-e5=
+1")
+> >  #define TYPE_RISCV_CPU_SIFIVE_U34       RISCV_CPU_TYPE_NAME("sifive-u3=
+4")
+> >  #define TYPE_RISCV_CPU_SIFIVE_U54       RISCV_CPU_TYPE_NAME("sifive-u5=
+4")
+> > +/* Deprecated */
+> > +#define TYPE_RISCV_CPU_RV32IMACU_NOMMU  RISCV_CPU_TYPE_NAME("rv32imacu=
+-nommu")
+> > +#define TYPE_RISCV_CPU_RV32GCSU_V1_09_1 RISCV_CPU_TYPE_NAME("rv32gcsu-=
+v1.9.1")
+> > +#define TYPE_RISCV_CPU_RV32GCSU_V1_10_0 RISCV_CPU_TYPE_NAME("rv32gcsu-=
+v1.10.0")
+> > +#define TYPE_RISCV_CPU_RV64IMACU_NOMMU  RISCV_CPU_TYPE_NAME("rv64imacu=
+-nommu")
+> > +#define TYPE_RISCV_CPU_RV64GCSU_V1_09_1 RISCV_CPU_TYPE_NAME("rv64gcsu-=
+v1.9.1")
+> > +#define TYPE_RISCV_CPU_RV64GCSU_V1_10_0 RISCV_CPU_TYPE_NAME("rv64gcsu-=
+v1.10.0")
+> >
+> >  #define RV32 ((target_ulong)1 << (TARGET_LONG_BITS - 2))
+> >  #define RV64 ((target_ulong)2 << (TARGET_LONG_BITS - 2))
+> >
 
