@@ -2,92 +2,60 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04133C31E5E
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 15:38:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FF80C31E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 15:40:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D478920873
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 15:38:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D478920873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 58EAB20673
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 15:40:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58EAB20673
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59090 helo=lists.gnu.org)
+Received: from localhost ([::1]:59092 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdGBm-00047O-2K
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 11:38:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42528)
+	id 1hdGDQ-0004Wa-FD
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 11:40:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39769)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hdFPI-0001bl-N7
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:48:22 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hdFGz-000316-56
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:39:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hdFPE-0001fU-Tu
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:48:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42216)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hdFOe-0001CH-6J; Tue, 18 Jun 2019 10:47:42 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 14BBDA9DB5;
- Tue, 18 Jun 2019 14:47:34 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-32.brq.redhat.com
- [10.40.204.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D2B2D8186D;
- Tue, 18 Jun 2019 14:47:32 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190612221004.2317-1-mreitz@redhat.com>
- <20190612221004.2317-26-mreitz@redhat.com>
- <ffaaf50e-ea9c-a75e-5868-7322d06b4062@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <f21fb0b0-3cee-dc4d-355c-ae197f071802@redhat.com>
-Date: Tue, 18 Jun 2019 16:47:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hdFGt-0000lv-0y
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:39:45 -0400
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:36579)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hdFGq-0000gf-IS
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:39:38 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
+ [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+ by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 363E144104;
+ Tue, 18 Jun 2019 23:39:35 +0900 (JST)
+Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
+ [222.8.5.235])
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id D1D56240086;
+ Tue, 18 Jun 2019 23:39:34 +0900 (JST)
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: qemu-devel@nongnu.org
+Date: Tue, 18 Jun 2019 23:39:18 +0900
+Message-Id: <20190618143923.53838-17-ysato@users.sourceforge.jp>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20190618143923.53838-1-ysato@users.sourceforge.jp>
+References: <20190618143923.53838-1-ysato@users.sourceforge.jp>
 MIME-Version: 1.0
-In-Reply-To: <ffaaf50e-ea9c-a75e-5868-7322d06b4062@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="Vb9Gkra91hgJZ21V800TJ2RZ1NYvqmnFI"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Tue, 18 Jun 2019 14:47:34 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v5 25/42] mirror: Deal with filters
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 202.224.55.14
+Subject: [Qemu-devel] [PATCH RESEND v21 16/21] hw/char: RX62N serial
+ communication interface (SCI)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,200 +67,462 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org, imammedo@redhat.com, richard.henderson@linaro.org,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Vb9Gkra91hgJZ21V800TJ2RZ1NYvqmnFI
-Content-Type: multipart/mixed; boundary="XzghRMaNcupdk1KlJl8JvpwG2aqDMevyW";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <f21fb0b0-3cee-dc4d-355c-ae197f071802@redhat.com>
-Subject: Re: [PATCH v5 25/42] mirror: Deal with filters
-References: <20190612221004.2317-1-mreitz@redhat.com>
- <20190612221004.2317-26-mreitz@redhat.com>
- <ffaaf50e-ea9c-a75e-5868-7322d06b4062@virtuozzo.com>
-In-Reply-To: <ffaaf50e-ea9c-a75e-5868-7322d06b4062@virtuozzo.com>
+This module supported only non FIFO type.
+Hardware manual.
+https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh0033=
+ej0140_rx62n.pdf
 
---XzghRMaNcupdk1KlJl8JvpwG2aqDMevyW
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20190607091116.49044-8-ysato@users.sourceforge.jp>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ include/hw/char/renesas_sci.h |  45 ++++++
+ hw/char/renesas_sci.c         | 340 ++++++++++++++++++++++++++++++++++++=
+++++++
+ hw/char/Kconfig               |   3 +
+ hw/char/Makefile.objs         |   1 +
+ 4 files changed, 389 insertions(+)
+ create mode 100644 include/hw/char/renesas_sci.h
+ create mode 100644 hw/char/renesas_sci.c
 
-On 18.06.19 15:12, Vladimir Sementsov-Ogievskiy wrote:
-> 13.06.2019 1:09, Max Reitz wrote:
->> This includes some permission limiting (for example, we only need to
->> take the RESIZE permission for active commits where the base is smalle=
-r
->> than the top).
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->=20
-> ohm, unfortunately I'm far from knowing block/mirror mechanics and inte=
-rfaces :(.
->=20
-> still some comments below.
->=20
->> ---
->>   block/mirror.c | 110 +++++++++++++++++++++++++++++++++++++----------=
---
->>   blockdev.c     |  47 +++++++++++++++++----
->>   2 files changed, 124 insertions(+), 33 deletions(-)
->>
->> diff --git a/block/mirror.c b/block/mirror.c
->> index 4fa8f57c80..3d767e3030 100644
->> --- a/block/mirror.c
->> +++ b/block/mirror.c
->> @@ -660,8 +660,10 @@ static int mirror_exit_common(Job *job)
->>                               &error_abort);
->>       if (!abort && s->backing_mode =3D=3D MIRROR_SOURCE_BACKING_CHAIN=
-) {
->>           BlockDriverState *backing =3D s->is_none_mode ? src : s->bas=
-e;
->> -        if (backing_bs(target_bs) !=3D backing) {
->> -            bdrv_set_backing_hd(target_bs, backing, &local_err);
->> +        BlockDriverState *unfiltered_target =3D bdrv_skip_rw_filters(=
-target_bs);
->> +
->> +        if (bdrv_filtered_cow_bs(unfiltered_target) !=3D backing) {
->> +            bdrv_set_backing_hd(unfiltered_target, backing, &local_er=
-r);
->>               if (local_err) {
->>                   error_report_err(local_err);
->>                   ret =3D -EPERM;
->> @@ -711,7 +713,7 @@ static int mirror_exit_common(Job *job)
->>       block_job_remove_all_bdrv(bjob);
->>       bdrv_child_try_set_perm(mirror_top_bs->backing, 0, BLK_PERM_ALL,=
+diff --git a/include/hw/char/renesas_sci.h b/include/hw/char/renesas_sci.=
+h
+new file mode 100644
+index 0000000000..50d1336944
+--- /dev/null
++++ b/include/hw/char/renesas_sci.h
+@@ -0,0 +1,45 @@
++/*
++ * Renesas Serial Communication Interface
++ *
++ * Copyright (c) 2018 Yoshinori Sato
++ *
++ * This code is licensed under the GPL version 2 or later.
++ *
++ */
++
++#include "chardev/char-fe.h"
++#include "qemu/timer.h"
++#include "hw/sysbus.h"
++
++#define TYPE_RENESAS_SCI "renesas-sci"
++#define RSCI(obj) OBJECT_CHECK(RSCIState, (obj), TYPE_RENESAS_SCI)
++
++enum {
++    ERI =3D 0,
++    RXI =3D 1,
++    TXI =3D 2,
++    TEI =3D 3,
++    SCI_NR_IRQ =3D 4,
++};
++
++typedef struct {
++    SysBusDevice parent_obj;
++    MemoryRegion memory;
++
++    uint8_t smr;
++    uint8_t brr;
++    uint8_t scr;
++    uint8_t tdr;
++    uint8_t ssr;
++    uint8_t rdr;
++    uint8_t scmr;
++    uint8_t semr;
++
++    uint8_t read_ssr;
++    int64_t trtime;
++    int64_t rx_next;
++    QEMUTimer *timer;
++    CharBackend chr;
++    uint64_t input_freq;
++    qemu_irq irq[SCI_NR_IRQ];
++} RSCIState;
+diff --git a/hw/char/renesas_sci.c b/hw/char/renesas_sci.c
+new file mode 100644
+index 0000000000..6298cbf43a
+--- /dev/null
++++ b/hw/char/renesas_sci.c
+@@ -0,0 +1,340 @@
++/*
++ * Renesas Serial Communication Interface
++ *
++ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
++ * (Rev.1.40 R01UH0033EJ0140)
++ *
++ * Copyright (c) 2019 Yoshinori Sato
++ *
++ * This program is free software; you can redistribute it and/or modify =
+it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOU=
+T
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
+ for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License alo=
+ng with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "qapi/error.h"
++#include "qemu-common.h"
++#include "cpu.h"
++#include "hw/hw.h"
++#include "hw/sysbus.h"
++#include "hw/registerfields.h"
++#include "hw/char/renesas_sci.h"
++#include "qemu/error-report.h"
++
++/* SCI register map */
++REG8(SMR, 0)
++  FIELD(SMR, CKS,  0, 2)
++  FIELD(SMR, MP,   2, 1)
++  FIELD(SMR, STOP, 3, 1)
++  FIELD(SMR, PM,   4, 1)
++  FIELD(SMR, PE,   5, 1)
++  FIELD(SMR, CHR,  6, 1)
++  FIELD(SMR, CM,   7, 1)
++REG8(BRR, 1)
++REG8(SCR, 2)
++  FIELD(SCR, CKE, 0, 2)
++  FIELD(SCR, TEIE, 2, 1)
++  FIELD(SCR, MPIE, 3, 1)
++  FIELD(SCR, RE,   4, 1)
++  FIELD(SCR, TE,   5, 1)
++  FIELD(SCR, RIE,  6, 1)
++  FIELD(SCR, TIE,  7, 1)
++REG8(TDR, 3)
++REG8(SSR, 4)
++  FIELD(SSR, MPBT, 0, 1)
++  FIELD(SSR, MPB,  1, 1)
++  FIELD(SSR, TEND, 2, 1)
++  FIELD(SSR, ERR, 3, 3)
++    FIELD(SSR, PER,  3, 1)
++    FIELD(SSR, FER,  4, 1)
++    FIELD(SSR, ORER, 5, 1)
++  FIELD(SSR, RDRF, 6, 1)
++  FIELD(SSR, TDRE, 7, 1)
++REG8(RDR, 5)
++REG8(SCMR, 6)
++  FIELD(SCMR, SMIF, 0, 1)
++  FIELD(SCMR, SINV, 2, 1)
++  FIELD(SCMR, SDIR, 3, 1)
++  FIELD(SCMR, BCP2, 7, 1)
++REG8(SEMR, 7)
++  FIELD(SEMR, ACS0, 0, 1)
++  FIELD(SEMR, ABCS, 4, 1)
++
++static int can_receive(void *opaque)
++{
++    RSCIState *sci =3D RSCI(opaque);
++    if (sci->rx_next > qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)) {
++        return 0;
++    } else {
++        return FIELD_EX8(sci->scr, SCR, RE);
++    }
++}
++
++static void receive(void *opaque, const uint8_t *buf, int size)
++{
++    RSCIState *sci =3D RSCI(opaque);
++    sci->rx_next =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime=
+;
++    if (FIELD_EX8(sci->ssr, SSR, RDRF) || size > 1) {
++        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, ORER, 1);
++        if (FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_set_irq(sci->irq[ERI], 1);
++        }
++    } else {
++        sci->rdr =3D buf[0];
++        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, RDRF, 1);
++        if (FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_irq_pulse(sci->irq[RXI]);
++        }
++    }
++}
++
++static void send_byte(RSCIState *sci)
++{
++    if (qemu_chr_fe_backend_connected(&sci->chr)) {
++        qemu_chr_fe_write_all(&sci->chr, &sci->tdr, 1);
++    }
++    timer_mod(sci->timer,
++              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime);
++    sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TEND, 0);
++    sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TDRE, 1);
++    qemu_set_irq(sci->irq[TEI], 0);
++    if (FIELD_EX8(sci->scr, SCR, TIE)) {
++        qemu_irq_pulse(sci->irq[TXI]);
++    }
++}
++
++static void txend(void *opaque)
++{
++    RSCIState *sci =3D RSCI(opaque);
++    if (!FIELD_EX8(sci->ssr, SSR, TDRE)) {
++        send_byte(sci);
++    } else {
++        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TEND, 1);
++        if (FIELD_EX8(sci->scr, SCR, TEIE)) {
++            qemu_set_irq(sci->irq[TEI], 1);
++        }
++    }
++}
++
++static void update_trtime(RSCIState *sci)
++{
++    /* char per bits */
++    sci->trtime =3D 8 - FIELD_EX8(sci->smr, SMR, CHR);
++    sci->trtime +=3D FIELD_EX8(sci->smr, SMR, PE);
++    sci->trtime +=3D FIELD_EX8(sci->smr, SMR, STOP) + 1;
++    /* x bit transmit time (32 * divrate * brr) / base freq */
++    sci->trtime *=3D 32 * sci->brr;
++    sci->trtime *=3D 1 << (2 * FIELD_EX8(sci->smr, SMR, CKS));
++    sci->trtime *=3D NANOSECONDS_PER_SECOND;
++    sci->trtime /=3D sci->input_freq;
++}
++
++#define IS_TR_ENABLED(scr) \
++    (FIELD_EX8(scr, SCR, TE) || FIELD_EX8(scr, SCR, RE))
++
++static void sci_write(void *opaque, hwaddr addr, uint64_t val, unsigned =
+size)
++{
++    hwaddr offset =3D addr & 0x07;
++    RSCIState *sci =3D RSCI(opaque);
++
++    switch (offset) {
++    case A_SMR:
++        if (!IS_TR_ENABLED(sci->scr)) {
++            sci->smr =3D val;
++            update_trtime(sci);
++        }
++        break;
++    case A_BRR:
++        if (!IS_TR_ENABLED(sci->scr)) {
++            sci->brr =3D val;
++            update_trtime(sci);
++        }
++        break;
++    case A_SCR:
++        sci->scr =3D val;
++        if (FIELD_EX8(sci->scr, SCR, TE)) {
++            sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TDRE, 1);
++            sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TEND, 1);
++            if (FIELD_EX8(sci->scr, SCR, TIE)) {
++                qemu_irq_pulse(sci->irq[TXI]);
++            }
++        }
++        if (!FIELD_EX8(sci->scr, SCR, TEIE)) {
++            qemu_set_irq(sci->irq[TEI], 0);
++        }
++        if (!FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_set_irq(sci->irq[ERI], 0);
++        }
++        break;
++    case A_TDR:
++        sci->tdr =3D val;
++        if (FIELD_EX8(sci->ssr, SSR, TEND)) {
++            send_byte(sci);
++        } else {
++            sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TDRE, 0);
++        }
++        break;
++    case A_SSR:
++        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, MPBT,
++                             FIELD_EX8(val, SSR, MPBT));
++        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, ERR,
++                             FIELD_EX8(val, SSR, ERR) & 0x07);
++        if (FIELD_EX8(sci->read_ssr, SSR, ERR) &&
++            FIELD_EX8(sci->ssr, SSR, ERR) =3D=3D 0) {
++            qemu_set_irq(sci->irq[ERI], 0);
++        }
++        break;
++    case A_RDR:
++        qemu_log_mask(LOG_GUEST_ERROR, "reneas_sci: RDR is read only.\n"=
+);
++        break;
++    case A_SCMR:
++        sci->scmr =3D val; break;
++    case A_SEMR: /* SEMR */
++        sci->semr =3D val; break;
++    default:
++        qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX
++                      " not implemented\n", offset);
++    }
++}
++
++static uint64_t sci_read(void *opaque, hwaddr addr, unsigned size)
++{
++    hwaddr offset =3D addr & 0x07;
++    RSCIState *sci =3D RSCI(opaque);
++
++    switch (offset) {
++    case A_SMR:
++        return sci->smr;
++    case A_BRR:
++        return sci->brr;
++    case A_SCR:
++        return sci->scr;
++    case A_TDR:
++        return sci->tdr;
++    case A_SSR:
++        sci->read_ssr =3D sci->ssr;
++        return sci->ssr;
++    case A_RDR:
++        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, RDRF, 0);
++        return sci->rdr;
++    case A_SCMR:
++        return sci->scmr;
++    case A_SEMR:
++        return sci->semr;
++    default:
++        qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX
++                      " not implemented.\n", offset);
++    }
++    return UINT64_MAX;
++}
++
++static const MemoryRegionOps sci_ops =3D {
++    .write =3D sci_write,
++    .read  =3D sci_read,
++    .endianness =3D DEVICE_NATIVE_ENDIAN,
++    .impl =3D {
++        .max_access_size =3D 1,
++    },
++};
++
++static void rsci_reset(DeviceState *dev)
++{
++    RSCIState *sci =3D RSCI(dev);
++    sci->smr =3D sci->scr =3D 0x00;
++    sci->brr =3D 0xff;
++    sci->tdr =3D 0xff;
++    sci->rdr =3D 0x00;
++    sci->ssr =3D 0x84;
++    sci->scmr =3D 0x00;
++    sci->semr =3D 0x00;
++    sci->rx_next =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++}
++
++static void sci_event(void *opaque, int event)
++{
++    RSCIState *sci =3D RSCI(opaque);
++    if (event =3D=3D CHR_EVENT_BREAK) {
++        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, FER, 1);
++        if (FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_set_irq(sci->irq[ERI], 1);
++        }
++    }
++}
++
++static void rsci_realize(DeviceState *dev, Error **errp)
++{
++    RSCIState *sci =3D RSCI(dev);
++
++    if (sci->input_freq =3D=3D 0) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "renesas_sci: input-freq property must be set.");
++        return;
++    }
++    qemu_chr_fe_set_handlers(&sci->chr, can_receive, receive,
++                             sci_event, NULL, sci, NULL, true);
++}
++
++static void rsci_init(Object *obj)
++{
++    SysBusDevice *d =3D SYS_BUS_DEVICE(obj);
++    RSCIState *sci =3D RSCI(obj);
++    int i;
++
++    memory_region_init_io(&sci->memory, OBJECT(sci), &sci_ops,
++                          sci, "renesas-sci", 0x8);
++    sysbus_init_mmio(d, &sci->memory);
++
++    for (i =3D 0; i < SCI_NR_IRQ; i++) {
++        sysbus_init_irq(d, &sci->irq[i]);
++    }
++    sci->timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, txend, sci);
++}
++
++static const VMStateDescription vmstate_rcmt =3D {
++    .name =3D "renesas-sci",
++    .version_id =3D 1,
++    .minimum_version_id =3D 1,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static Property rsci_properties[] =3D {
++    DEFINE_PROP_UINT64("input-freq", RSCIState, input_freq, 0),
++    DEFINE_PROP_CHR("chardev", RSCIState, chr),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void rsci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->realize =3D rsci_realize;
++    dc->props =3D rsci_properties;
++    dc->vmsd =3D &vmstate_rcmt;
++    dc->reset =3D rsci_reset;
++}
++
++static const TypeInfo rsci_info =3D {
++    .name       =3D TYPE_RENESAS_SCI,
++    .parent     =3D TYPE_SYS_BUS_DEVICE,
++    .instance_size =3D sizeof(RSCIState),
++    .instance_init =3D rsci_init,
++    .class_init =3D rsci_class_init,
++};
++
++static void rsci_register_types(void)
++{
++    type_register_static(&rsci_info);
++}
++
++type_init(rsci_register_types)
+diff --git a/hw/char/Kconfig b/hw/char/Kconfig
+index 40e7a8b8bb..874627520c 100644
+--- a/hw/char/Kconfig
++++ b/hw/char/Kconfig
+@@ -46,3 +46,6 @@ config SCLPCONSOLE
+=20
+ config TERMINAL3270
+     bool
++
++config RENESAS_SCI
++    bool
+diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+index 02d8a66925..4472d563b5 100644
+--- a/hw/char/Makefile.objs
++++ b/hw/char/Makefile.objs
+@@ -21,6 +21,7 @@ obj-$(CONFIG_PSERIES) +=3D spapr_vty.o
+ obj-$(CONFIG_DIGIC) +=3D digic-uart.o
+ obj-$(CONFIG_STM32F2XX_USART) +=3D stm32f2xx_usart.o
+ obj-$(CONFIG_RASPI) +=3D bcm2835_aux.o
++obj-$(CONFIG_RENESAS_SCI) +=3D renesas_sci.o
+=20
+ common-obj-$(CONFIG_CMSDK_APB_UART) +=3D cmsdk-apb-uart.o
+ common-obj-$(CONFIG_ETRAXFS) +=3D etraxfs_ser.o
+--=20
+2.11.0
 
->>                               &error_abort);
->> -    bdrv_replace_node(mirror_top_bs, backing_bs(mirror_top_bs), &erro=
-r_abort);
->> +    bdrv_replace_node(mirror_top_bs, mirror_top_bs->backing->bs, &err=
-or_abort);
->>  =20
->>       /* We just changed the BDS the job BB refers to (with either or =
-both of the
->>        * bdrv_replace_node() calls), so switch the BB back so the clea=
-nup does
->> @@ -757,6 +759,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBl=
-ockJob *s)
->>   {
->>       int64_t offset;
->>       BlockDriverState *base =3D s->base;
->> +    BlockDriverState *filtered_base;
->>       BlockDriverState *bs =3D s->mirror_top_bs->backing->bs;
->>       BlockDriverState *target_bs =3D blk_bs(s->target);
->>       int ret;
->> @@ -795,6 +798,9 @@ static int coroutine_fn mirror_dirty_init(MirrorBl=
-ockJob *s)
->>           s->initial_zeroing_ongoing =3D false;
->>       }
->>  =20
->> +    /* Will be NULL if @base is not in @bs's chain */
->=20
-> Should we assert that not NULL?
-
-Well, but it can be NULL.  It is only non-NULL for active commit.
-
-> Hmm, so this is the way to "skip filters reverse from the base", yes? W=
-orth add a comment?
-
-We need this because bdrv_is_allocated() will report everything as
-allocated in a filter if it is allocated in its filtered child.  So if
-we use @base in bdrv_is_allocated_above() and there is a filter on top
-of it, bdrv_is_allocated_above() will report everything as allocated
-that is allocated in @base (which we do not want).
-
-Therefor, we need to go to the topmost R/W filter on top of @base, so
-that bdrv_is_allocated_above() actually starts at the first COW chain
-element above @base.
-
-As for the comment, I thought the name =E2=80=9Cfiltered base=E2=80=9D wo=
-uld suffice,
-but sure.
-
-(=E2=80=9C@filtered_base is the topmost node in the @bs-@base chain that =
-is
-connected to @base only through filters=E2=80=9D or something; plus the
-explanation why we need it.)
-
->> +    filtered_base =3D bdrv_filtered_cow_bs(bdrv_find_overlay(bs, base=
-));
->> +
->>       /* First part, loop on the sectors and initialize the dirty bitm=
-ap.  */
->>       for (offset =3D 0; offset < s->bdev_length; ) {
->>           /* Just to make sure we are not exceeding int limit. */
-
-[...]
-
->> @@ -1583,15 +1590,42 @@ static void mirror_start_job(const char *job_i=
-d, BlockDriverState *bs,
->>        * In the case of active commit, things look a bit different, th=
-ough,
->>        * because the target is an already populated backing file in ac=
-tive use.
->>        * We can allow anything except resize there.*/
->> +
->> +    target_perms =3D BLK_PERM_WRITE;
->> +    target_shared_perms =3D BLK_PERM_WRITE_UNCHANGED;
->> +
->>       target_is_backing =3D bdrv_chain_contains(bs, target);
->=20
-> don't you want skip filters here? actual target node may be in backing =
-chain, but has separate
-> filters above it
-
-I don=E2=80=99t quite understand.  bdrv_chain_contains() iterates over th=
-e
-filter chain, so it shouldn=E2=80=99t matter whether there are filters ab=
-ove
-target or not.
-
-[...]
-
->> @@ -1641,15 +1675,39 @@ static void mirror_start_job(const char *job_i=
-d, BlockDriverState *bs,
->>       /* In commit_active_start() all intermediate nodes disappear, so=
-
->>        * any jobs in them must be blocked */
->=20
-> hmm, preexisting, it s/jobs/nodes/
-
-I think the idea was that no other jobs may be run on intermediate
-nodes.  (But by now it=E2=80=99s no longer just about jobs, so yes, shoul=
-d be
-s/jobs/nodes/.  I don=E2=80=99t know whether I should squeeze that in her=
-e, though.)
-
-Max
-
-
---XzghRMaNcupdk1KlJl8JvpwG2aqDMevyW--
-
---Vb9Gkra91hgJZ21V800TJ2RZ1NYvqmnFI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0I+YMACgkQ9AfbAGHV
-z0AfMQf/VkkxJPr6ywBBmRDIy0d+AX5xczpG9jW3kqMSlJoXqsZJDS9Y/Y8QW+Sa
-5qNDNiH9cD1Yeer+q+zv8t33R9Xwr7Nay9kH8vXoTGyA+G83gimZnnNcgbVDPzey
-F/y0BQNBnLD3cLefoimvdoylP8uUSP7f46UvEwXAfm/okfBhMBrlI9cJ8YrC8old
-i61asEBDX7Ktwtf3Ge8gnFVEPcSbhg7ddC+jdKultByIBYQpg9Jd/e8yLI8XvT2t
-5/ho/T75uPkOPklj2HfGaYpLcKYLphCbiulugCYrfP2QRsDG/S5R3s/wnHVye47y
-QYQF5yxRs0gbDJ32eDFrGlu7GSj0mQ==
-=IefT
------END PGP SIGNATURE-----
-
---Vb9Gkra91hgJZ21V800TJ2RZ1NYvqmnFI--
 
