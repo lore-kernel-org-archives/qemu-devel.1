@@ -2,99 +2,51 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92DCDC31E51
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 11:55:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D93DEC31E51
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 11:55:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6684E208E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 11:55:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6684E208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
+	by mail.kernel.org (Postfix) with ESMTPS id B69CB2070B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 11:55:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B69CB2070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55936 helo=lists.gnu.org)
+Received: from localhost ([::1]:55938 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdCi2-0006yX-LB
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 07:55:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50909)
+	id 1hdCi6-0007Ef-0I
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 07:55:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48330)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <Paul.Durrant@citrix.com>) id 1hdCfU-0003jP-TS
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:52:53 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hdCWX-00041p-9j
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:43:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Paul.Durrant@citrix.com>) id 1hdCfT-0006Va-Ms
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:52:52 -0400
-Received: from esa6.hc3370-68.iphmx.com ([216.71.155.175]:23237)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hdCWV-0000Mr-66
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:43:37 -0400
+Received: from relay.sw.ru ([185.231.240.75]:58014)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Paul.Durrant@citrix.com>)
- id 1hdCfT-0006UR-E6
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:52:51 -0400
-Authentication-Results: esa6.hc3370-68.iphmx.com;
- dkim=none (message not signed) header.i=none;
- spf=None smtp.pra=Paul.Durrant@citrix.com;
- spf=Pass smtp.mailfrom=Paul.Durrant@citrix.com;
- spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa6.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- Paul.Durrant@citrix.com) identity=pra;
- client-ip=162.221.158.21; receiver=esa6.hc3370-68.iphmx.com;
- envelope-from="Paul.Durrant@citrix.com";
- x-sender="Paul.Durrant@citrix.com"; x-conformance=sidf_compatible
-Received-SPF: Pass (esa6.hc3370-68.iphmx.com: domain of
- Paul.Durrant@citrix.com designates 162.221.158.21 as
- permitted sender) identity=mailfrom;
- client-ip=162.221.158.21; receiver=esa6.hc3370-68.iphmx.com;
- envelope-from="Paul.Durrant@citrix.com";
- x-sender="Paul.Durrant@citrix.com";
- x-conformance=sidf_compatible; x-record-type="v=spf1";
- x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
- ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
- ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
- ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
-Received-SPF: None (esa6.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- postmaster@mail.citrix.com) identity=helo;
- client-ip=162.221.158.21; receiver=esa6.hc3370-68.iphmx.com;
- envelope-from="Paul.Durrant@citrix.com";
- x-sender="postmaster@mail.citrix.com";
- x-conformance=sidf_compatible
-IronPort-SDR: zLY1YsY6pE43I81XtXl93HiV1GVsQGAuFZVXyJc7+kUAsTAqh9GGCdrYWSCOT1Jiwhm2/wzj3A
- bDWmdrLWKTvyoDoJTlhu3gbA3ZLdxELhLPL/+6oprC9QmNCC2T0Eyb1NuVn/o1jq/wtZq6gbf+
- sjNHtPKyHigkbpQQhDWBmnLjhSsyELY4vUvY7SIhSG84fcnM040uso8tMUlj/vZWjcekylhkgF
- +slb19Tx/t7srME0WLTbjtRyuSMvzJ5FYSS5Ket4J0u18G+VPuqLVyWiGoe0OdQSypGeDElGuM
- +00=
-X-SBRS: 2.7
-X-MesageID: 1866285
-X-Ironport-Server: esa6.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.63,389,1557201600"; 
-   d="scan'208";a="1866285"
-From: Paul Durrant <Paul.Durrant@citrix.com>
-To: Anthony Perard <anthony.perard@citrix.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Thread-Topic: [PATCH v2 4/4] xen: Avoid VLA
-Thread-Index: AQHVJchKT6z1AbWFfUC6DqRqpG72VqahTQUQ
-Date: Tue, 18 Jun 2019 11:52:46 +0000
-Message-ID: <3c5959420c754d208954f6da7730d87b@AMSPEX02CL03.citrite.net>
-References: <20190618112341.513-1-anthony.perard@citrix.com>
- <20190618112341.513-5-anthony.perard@citrix.com>
-In-Reply-To: <20190618112341.513-5-anthony.perard@citrix.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 216.71.155.175
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] xen: Avoid VLA
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1hdCWU-0000Jg-Rj; Tue, 18 Jun 2019 07:43:35 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1hdCWQ-00016b-3V; Tue, 18 Jun 2019 14:43:30 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org,
+	qemu-block@nongnu.org
+Date: Tue, 18 Jun 2019 14:43:28 +0300
+Message-Id: <20190618114328.55249-10-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.18.0
+In-Reply-To: <20190618114328.55249-1-vsementsov@virtuozzo.com>
+References: <20190618114328.55249-1-vsementsov@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
+Subject: [Qemu-devel] [PATCH v7 9/9] iotests: test nbd reconnect
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,28 +58,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Anthony Perard <anthony.perard@citrix.com>,
- "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
- Stefano Stabellini <sstabellini@kernel.org>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, armbru@redhat.com,
+ mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> -----Original Message-----
-> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
-> Sent: 18 June 2019 12:24
-> To: qemu-devel@nongnu.org
-> Cc: Anthony Perard <anthony.perard@citrix.com>; Paul Durrant <Paul.Durran=
-t@citrix.com>; Stefano
-> Stabellini <sstabellini@kernel.org>; xen-devel@lists.xenproject.org
-> Subject: [PATCH v2 4/4] xen: Avoid VLA
->=20
-> Avoid using a variable length array.
->=20
-> We allocate the `dirty_bitmap' buffer only once when we start tracking
-> for dirty bits.
->=20
-> Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+Add test, which starts backup to nbd target and restarts nbd server
+during backup.
 
-Reviewed-by: Paul Durrant <paul.durrant@citrix.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ tests/qemu-iotests/257        | 63 +++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/257.out    | 10 ++++++
+ tests/qemu-iotests/group      |  1 +
+ tests/qemu-iotests/iotests.py |  4 +++
+ 4 files changed, 78 insertions(+)
+ create mode 100755 tests/qemu-iotests/257
+ create mode 100644 tests/qemu-iotests/257.out
+
+diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
+new file mode 100755
+index 0000000000..a29a276207
+--- /dev/null
++++ b/tests/qemu-iotests/257
+@@ -0,0 +1,63 @@
++#!/usr/bin/env python
++#
++# Test nbd reconnect
++#
++# Copyright (c) 2019 Virtuozzo International GmbH. All rights reserved.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++import time
++
++import iotests
++from iotests import qemu_img_create, file_path, qemu_nbd_popen, log
++
++disk_a, disk_b, nbd_sock = file_path('disk_a', 'disk_b', 'nbd-sock')
++
++qemu_img_create('-f', iotests.imgfmt, disk_a, '5M')
++qemu_img_create('-f', iotests.imgfmt, disk_b, '5M')
++srv = qemu_nbd_popen('-k', nbd_sock, '-f', iotests.imgfmt, disk_b)
++time.sleep(1)
++
++vm = iotests.VM().add_drive(disk_a)
++vm.launch()
++vm.hmp_qemu_io('drive0', 'write 0 5M')
++
++vm.qmp_log('blockdev-add', filters=[iotests.filter_qmp_testfiles],
++           **{'node_name': 'backup0',
++              'driver': 'raw',
++              'file': {'driver': 'nbd',
++                       'server': {'type': 'unix', 'path': nbd_sock},
++                       'reconnect-delay': 10}})
++vm.qmp_log('blockdev-backup', device='drive0', sync='full', target='backup0')
++
++time.sleep(1)
++log('Kill NBD server')
++srv.kill()
++
++jobs = vm.qmp('query-block-jobs')['return']
++if jobs and jobs[0]['offset'] < jobs[0]['len']:
++    log('Backup job is still in progress')
++
++time.sleep(1)
++
++log('Start NBD server')
++srv = qemu_nbd_popen('-k', nbd_sock, '-f', iotests.imgfmt, disk_b)
++
++e = vm.event_wait('BLOCK_JOB_COMPLETED')
++log('Backup completed: {}'.format(e['data']['offset']))
++
++vm.qmp_log('blockdev-del', node_name='backup0')
++srv.kill()
++vm.shutdown()
+diff --git a/tests/qemu-iotests/257.out b/tests/qemu-iotests/257.out
+new file mode 100644
+index 0000000000..15a82ddefb
+--- /dev/null
++++ b/tests/qemu-iotests/257.out
+@@ -0,0 +1,10 @@
++{"execute": "blockdev-add", "arguments": {"driver": "raw", "file": {"driver": "nbd", "reconnect-delay": 10, "server": {"path": "TEST_DIR/PID-nbd-sock", "type": "unix"}}, "node-name": "backup0"}}
++{"return": {}}
++{"execute": "blockdev-backup", "arguments": {"device": "drive0", "sync": "full", "target": "backup0"}}
++{"return": {}}
++Kill NBD server
++Backup job is still in progress
++Start NBD server
++Backup completed: 5242880
++{"execute": "blockdev-del", "arguments": {"node-name": "backup0"}}
++{"return": {}}
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index b34c8e3c0c..00fbfefc8e 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -269,3 +269,4 @@
+ 254 rw auto backing quick
+ 255 rw auto quick
+ 256 rw auto quick
++257 rw auto quick
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 3ecef5bc90..3c77950877 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -226,6 +226,10 @@ def qemu_nbd_early_pipe(*args):
+     else:
+         return exitcode, subp.communicate()[0]
+ 
++def qemu_nbd_popen(*args):
++    '''Run qemu-nbd in daemon mode and return the parent's exit code'''
++    return subprocess.Popen(qemu_nbd_args + ['--persistent'] + list(args))
++
+ def compare_images(img1, img2, fmt1=imgfmt, fmt2=imgfmt):
+     '''Return True if two image files are identical'''
+     return qemu_img('compare', '-f', fmt1,
+-- 
+2.18.0
+
 
