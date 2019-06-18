@@ -2,80 +2,79 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FB2AC31E51
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 10:54:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21FFDC31E51
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 11:04:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6D752070B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 10:54:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E2B732070B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 11:04:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pyrkAWmR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6D752070B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QY7oqpfB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2B732070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55546 helo=lists.gnu.org)
+Received: from localhost ([::1]:55584 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdBl1-0007ii-26
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 06:54:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38355)
+	id 1hdBui-00029R-5o
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 07:04:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39862)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hdBk4-0007Ij-4W
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 06:53:33 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hdBt7-0001El-Ok
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:02:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hdBk3-0007JC-20
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 06:53:32 -0400
-Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:34680)
+ (envelope-from <peter.maydell@linaro.org>) id 1hdBt6-0002Jp-Mk
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:02:53 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:42467)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hdBk2-0007IE-R1
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 06:53:30 -0400
-Received: by mail-ot1-x333.google.com with SMTP id n5so13811295otk.1
- for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 03:53:30 -0700 (PDT)
+ id 1hdBt4-0002FO-OK
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:02:50 -0400
+Received: by mail-ot1-x343.google.com with SMTP id l15so4168797otn.9
+ for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 04:02:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=6T2xewx2U27mxuSKQ7pFHqjKIDfJdYRz2Ip1vfnma04=;
- b=pyrkAWmR9v9ZLlrmtA1+XgYoFipiZGToEAXbcbXdSzAT0Aze1Gy+84cTmUYlKAfEzo
- ottTggDUkosyXq19qRGn77N91MyqVuqdeJPIlhimAzZjnysM1oKFICKgw0TDFFIMKoyY
- sUFfDnRMRH7/3xccBCnZmFMZPYvQDtU0L2SmFQ/LM4nSfeBt63bWCNVA/VOebafPVf00
- 5bjmqgeJjaEtru1YHCryyD9DMERY+HYk67Nq8CpUYW8zh0HNkMkX9SNFP2ajgz3vu6fR
- bbtYzfTigAxMlF4oxK1Bnh/d35qJRMxcg4mbkXtuG4CWB6o2yB9k/XF546aXjc0HS9KK
- hBSQ==
+ :cc; bh=f8CQP83j89Nl2Th36p57uvmIreOMxHar8aEoN+/+jnk=;
+ b=QY7oqpfBouT7I8sXtlFZqQNHjDlf0ox8T21AeQT935VRHML4Svm5VdxlJP6Nwpmf9Z
+ fD0VGxuFDvl6/2l4i5E5KYWsJZsItp4mXDrv8cL7vGlssZDar72HcnsGWYLdQcX7HTQ7
+ BOBUFpFsGWI7JtGBRa9NPuGr5MZZ3hyje9tTDRa9nYaHqTAahLWmg3HCtj0DhOXb0G/e
+ kqRspsafbB9qtZpmX8vacW1Zz9obWMsBAiK5I6Lnkl98w+I7hw5elv1g25ipyu4jhYYb
+ 4ucfqKAOvVHVFI4Y7xJnJqJatJW9asp+tN9wdjyhPg7SZJmAC+lX3MZF/EyUsUQhZ603
+ iWfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=6T2xewx2U27mxuSKQ7pFHqjKIDfJdYRz2Ip1vfnma04=;
- b=o/qvv9Q07E9zWck6yMlzv4l7M5feGfneZnoN5oZoURw7HMLpR/a5RkcWAeFyQ0VWGP
- wQhGrV7GPko6UItjXX/We+Q9A0zFXLuiYo3RypEzAIzqiT1JyfWkreHJE1MIhP7Ytz+t
- ByeVv95oI0e2ym++Z8lSIaZdCuqfb3AjJkL7EuiYN4/3eIG6eVoiYuZClCbqeUtQ58Ie
- 8TRY5u0xf1VgeG/t0WpVJSLgNV/DD9iNRz0F3xq5/bVtXBi1sWMhTkvGpAYYqD6PeyK0
- SoTR0A7i4DTsOkF20LusdeZ5rPwTPSf4aoEnQRynT4HDFDirAYCWYjnD3gv37YGkSfaq
- v/nw==
-X-Gm-Message-State: APjAAAWuszW/iKm3TFqL/7G6EtJYI3o7Ltw4VyPtaThjtZILvE8Lxnwf
- l6aUlSkRYFqKAtRqk/K3wqnD94uC7h6i7VjyBhRO6w==
-X-Google-Smtp-Source: APXvYqz6Qfy4+9b6ya2GDFH31hQokZG933TA+pK2B4nzpp/C4i80KT2XdysYRbUthe2XaVs+mZDpOxKgJK32Y+F0Jlw=
-X-Received: by 2002:a05:6830:210f:: with SMTP id
- i15mr5675076otc.250.1560855210105; 
- Tue, 18 Jun 2019 03:53:30 -0700 (PDT)
+ bh=f8CQP83j89Nl2Th36p57uvmIreOMxHar8aEoN+/+jnk=;
+ b=C0L3rP5W0XYoKo6utfejNxzeAp8c8LD8FvZIY7vCIkla3sTWXyxDjme3LfycXwMIVO
+ t5BW21VdbVGMi/mhv4sJ+W4chAbgD4dT+BnMLc0PM9FeLpjpaEX+5JK9lc8o669EH94O
+ w0WQKSLsTY/BL5MnZogfh79L9ZM/3+7uvayiyAEZmFqnQtATrgC3ziUaaf032rrTAiWO
+ mYRATXICy44P+QjSDVExoXNiPtDa5B9ZJCE9G7IO4JcSA4rrYwYDfzBfaj729dnEUFU9
+ F0BwI9SlURLvzbnUiHNaUwCnsGAz5d90qsrQMxfjXQDbi12EUq+4kjzcfycQSaVwi2w8
+ o5cQ==
+X-Gm-Message-State: APjAAAUiuIBQKP7l1zzfCi7DA+NPYz3cgHNzDbGkVDO6bz1shDzdER0C
+ PziwitvtiErsFIv4HX8Eq2FGn5TFAA7pNhPojY0jpg==
+X-Google-Smtp-Source: APXvYqy/VkfZMGHkrlLbmf3pKpsMrJCNimcIXNdtOZOgYQDmaeix8C59Y5PLPz2AiOP4GXpdHpguSnEMfoAqopL/fFg=
+X-Received: by 2002:a9d:711e:: with SMTP id n30mr3991972otj.97.1560855768349; 
+ Tue, 18 Jun 2019 04:02:48 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190618062641.32214-1-armbru@redhat.com>
-In-Reply-To: <20190618062641.32214-1-armbru@redhat.com>
+References: <20190618083442.10407-1-drjones@redhat.com>
+In-Reply-To: <20190618083442.10407-1-drjones@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 18 Jun 2019 11:53:19 +0100
-Message-ID: <CAFEAcA9tcksaA8cvT9QbQzwbef746TtDnzqk7m6eG7zJ2LEYeQ@mail.gmail.com>
-To: Markus Armbruster <armbru@redhat.com>
+Date: Tue, 18 Jun 2019 12:02:37 +0100
+Message-ID: <CAFEAcA9bwbev3efZ=LJPGgObBCbW-WX19fySMusLyMNC5ZExvA@mail.gmail.com>
+To: Andrew Jones <drjones@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::333
-Subject: Re: [Qemu-devel] [PULL v2 00/16] Monitor patches for 2019-06-17
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/boot: fix direct kernel boot setup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,54 +86,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 18 Jun 2019 at 07:29, Markus Armbruster <armbru@redhat.com> wrote:
+On Tue, 18 Jun 2019 at 09:34, Andrew Jones <drjones@redhat.com> wrote:
 >
-> The following changes since commit 076243ffe6c1b687e9e6d98348c3bf3398df78f3:
+> We need to check ram_end, not ram_size.
 >
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-docs-20190617' into staging (2019-06-17 16:41:25 +0100)
+> Fixes: 852dc64d665f ("hw/arm/boot: Diagnose layouts that put initrd or
+> DTB off the end of RAM")
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  hw/arm/boot.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-monitor-2019-06-17-v2
->
-> for you to fetch changes up to 3c45f62570aeacadf4a05bfa1afaa12bea05ae86:
->
->   vl: Deprecate -mon pretty=... for HMP monitors (2019-06-18 08:14:17 +0200)
->
-> ----------------------------------------------------------------
-> Monitor patches for 2019-06-17
->
-> ----------------------------------------------------------------
-> Kevin Wolf (15):
->       monitor: Remove unused password prompting fields
->       monitor: Split monitor_init in HMP and QMP function
->       monitor: Make MonitorQMP a child class of Monitor
->       monitor: Create MonitorHMP with readline state
->       monitor: Remove Monitor.cmd_table indirection
->       monitor: Rename HMP command type and tables
->       Move monitor.c to monitor/misc.c
->       monitor: Move {hmp, qmp}.c to monitor/{hmp, qmp}-cmds.c
->       monitor: Create monitor-internal.h with common definitions
->       monitor: Split out monitor/qmp.c
->       monitor: Split out monitor/hmp.c
->       monitor: Split out monitor/monitor.c
->       monitor: Split Monitor.flags into separate bools
->       monitor: Replace monitor_init() with monitor_init_{hmp, qmp}()
->       vl: Deprecate -mon pretty=... for HMP monitors
->
-> Yury Kotov (1):
->       monitor: Fix return type of monitor_fdset_dup_fd_find
+> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+> index b2f93f6beff6..8a280ab3ed49 100644
+> --- a/hw/arm/boot.c
+> +++ b/hw/arm/boot.c
+> @@ -1109,7 +1109,7 @@ static void arm_setup_direct_kernel_boot(ARMCPU *cpu,
+>                               info->initrd_filename);
+>                  exit(1);
+>              }
+> -            if (info->initrd_start + initrd_size > info->ram_size) {
+> +            if (info->initrd_start + initrd_size > ram_end) {
+>                  error_report("could not load initrd '%s': "
+>                               "too big to fit into RAM after the kernel",
+>                               info->initrd_filename);
+> --
+> 2.20.1
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Applied, thanks.
+I think I missed this because my test case doesn't have an
+initrd -- direct kernel boot works fine if all you're
+passing to QEMU is the kernel... I think we could clarify
+the commit message a little:
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
+hw/arm/boot: fix direct kernel boot with initrd
 
+Fix the condition used to check whether the initrd fits
+into RAM; this meant we were spuriously refusing to do
+a direct boot of a kernel in some cases if an initrd
+was also passed on the command line.
+
+?
+
+(if you agree I can just fix up the commit message when I apply it.)
+
+thanks
 -- PMM
 
