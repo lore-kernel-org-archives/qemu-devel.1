@@ -1,91 +1,80 @@
-Return-Path: <SRS0=A34B=UQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32E53C31E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 23:53:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51A51C31E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 00:28:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC7D620578
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Jun 2019 23:53:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1770D20873
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 00:28:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yegAvp02"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC7D620578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nm/46+e+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1770D20873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52690 helo=lists.gnu.org)
+Received: from localhost ([::1]:52772 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hd1RY-00033J-P0
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 19:53:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51870)
+	id 1hd1zX-000196-Dy
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 20:28:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57604)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hd1R4-0002aP-12
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 19:53:14 -0400
+ (envelope-from <andrew.smirnov@gmail.com>) id 1hd1yF-0000P5-98
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 20:27:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hd1R3-0002Rn-31
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 19:53:13 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:44206)
+ (envelope-from <andrew.smirnov@gmail.com>) id 1hd1yE-0007Ck-C8
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 20:27:31 -0400
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:34747)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hd1R2-0002Qw-RB
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 19:53:13 -0400
-Received: by mail-pl1-x644.google.com with SMTP id t7so4867117plr.11
- for <qemu-devel@nongnu.org>; Mon, 17 Jun 2019 16:53:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=3g8pvPHolz0Gk1ulPnQrys06815XnZv3bWSjWLJcUl8=;
- b=yegAvp02oYXPpTrY3JmyIMZswNcifeFxyWjr3jKxxxSM9W5qI9wmHEweQ2NTAmfpBo
- nuerGmsgpH+heFkmHr+OsyCnrwdOyhClM1z6KZ2NsNklRvcT+Fe261UG9exlMi/gbYTS
- rr7CcL3slStuRtr007Ot5QxxZzPGmd4g2xWIkkP/ArwlOpbWys5ecC9uj4fY4vvp1N2M
- mFPkX1L7G+b30sHz6oOEcf/tslTF1YEKfHX295Vm0+1W9oW0JHRiE+CRKHO9yRLH0P7E
- 2AIRYBum3fAWtej5vcqq4aQfbG75EzidLIMhTfQgfIYdMdom68pI3E322SZ/x241QK7U
- B7Qg==
+ (Exim 4.71) (envelope-from <andrew.smirnov@gmail.com>)
+ id 1hd1yE-0007C6-4i; Mon, 17 Jun 2019 20:27:30 -0400
+Received: by mail-io1-xd44.google.com with SMTP id k8so25741485iot.1;
+ Mon, 17 Jun 2019 17:27:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=t9WIkMCJzUsCK/kU6QU/SflM6UsK/eYNYbFEXibPnKg=;
+ b=nm/46+e+FHzsWTPIIAhMwNsrhLG5uaMDMwhJgyn4AsmvpNYFHi6A4STUSLGJrk1bIO
+ 9NwUk2X+xmnUVfkdXhnk3gRX/G64CL6iaZMh4qXWzus1tYctrb5wDDG0GvJGLDi9MPr2
+ eGAxxsJZc5XU8w+m23nBC/0LAiuvXL/FRXPu8nfHxT8XaeKWA3OX99RKD9ZPCLdkZZoo
+ x5SumdkvOHiAZECqyayoYy5TZHXplRZqHbmCdpyxPbHklHQm7xeZa3lACA5lFLDxeL9j
+ +E8WyqAj4IAmCSRIfwd9MnJyS+b6FSY5CxggPBczj2r+ddo3rpzOxpdmN+B3skFYkRFH
+ qIlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=3g8pvPHolz0Gk1ulPnQrys06815XnZv3bWSjWLJcUl8=;
- b=lmDQow+BatA8F2OhdLc1pO2aax6qRNLkdCzkDb0xN2lEdeNrV/WGj+u1GLLzbj0DzS
- 5lC9OFuddhwVPN8H8EDgTsR/q9u0qHPq5yy94JhMbuNvlbGpsbq76kfWrlmeRJ9zMR8R
- dyWRrZlHXQfby06yW2dvUMrGfi8wNvav7D/zzrUhHzWYucO+vEsnWsm935jVfpqrSMB1
- Xm/mqp5xOBu3+PAVs54QnUy0g5qThzK7MXTQfhjc56IxL1ZWJpA7RAp+mug1R7UtRclZ
- yZL5pfNDAxAJb3E3sAWD3uXFO3MkzrAVHhqFp34AssT/NBAfKqYqyDHuTITz8aFXqDKv
- Iq5Q==
-X-Gm-Message-State: APjAAAUQOP9/7lSwLL3A5jLwyu4rYreTpE0mKov6IUVhAMKPuJeg9/i3
- Vf8XNs/mh175ko2w8DJEb2/vDw==
-X-Google-Smtp-Source: APXvYqzYBgEm0DlhXI1zV9rjEEXAEKSl6pGqFWr4vhZghUZOPEVCYnd4xvgcS6Z7rocbonTPe6L9dw==
-X-Received: by 2002:a17:902:7246:: with SMTP id
- c6mr50743677pll.248.1560815591586; 
- Mon, 17 Jun 2019 16:53:11 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-2-33.tukw.qwest.net. [97.113.2.33])
- by smtp.gmail.com with ESMTPSA id b37sm399803pjc.15.2019.06.17.16.52.59
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 17 Jun 2019 16:53:10 -0700 (PDT)
-To: Joel Sing <joel@sing.id.au>, qemu-devel@nongnu.org, qemu-riscv@nongnu.org
-References: <20190616191900.GH61734@hippo.sing.id.au>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <41ef5fbf-f438-e60a-2fba-a72e3ad422f9@linaro.org>
-Date: Mon, 17 Jun 2019 16:52:44 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=t9WIkMCJzUsCK/kU6QU/SflM6UsK/eYNYbFEXibPnKg=;
+ b=mKpagwIC1r2QhhAULdH7pG/wU1Y6ZFMWSXiUUY32Udq0K6+YUFQjFK1KvIdyeeh5ze
+ ZW1TQhdo4MCAXXNQHSCJHoFwlYFdmaqR1t05WIOBPWlidU+JqXivGFPfXnXX8zpgOoMb
+ 0Oijr6/Nr0LQRc0Rk7eNIYuI6lNOZFfizGM6+olECs18kpp5aP96nPJGGyEXrvHbK4n5
+ kDd0v7Aln46z8GHhRSsymMwkLykikC2dS+vZq/RYUM62fiAS7BWee/eHMqK5f6sdqd+e
+ TZ8A8gklu22itfYe95fj/BEnY6XRiNyyw8q9oyqDlWDXxL0+GM6ZjmGIZPHGnhXwXrba
+ MN4w==
+X-Gm-Message-State: APjAAAX7nlzlndg+Mz3BDjbFgVuv/VZJA4JsRngGXShUfQc+Kp6OGOm8
+ 9Olz65PXQ8QOLGmX6D4ncFFtjt/0rO3+a9xhvhE=
+X-Google-Smtp-Source: APXvYqypZE2oksrrhg9ZO89awHo0Xi05+eK0SJz/hUAbw7PO9AZzboqoFdGwGCtmzH1oqHWzz+4QtjdJ+yDV5BR0YBU=
+X-Received: by 2002:a6b:f00c:: with SMTP id w12mr1556777ioc.280.1560817648660; 
+ Mon, 17 Jun 2019 17:27:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190616191900.GH61734@hippo.sing.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190416013902.4941-1-andrew.smirnov@gmail.com>
+In-Reply-To: <20190416013902.4941-1-andrew.smirnov@gmail.com>
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Mon, 17 Jun 2019 17:27:17 -0700
+Message-ID: <CAHQ1cqE5RZVYB1N2+CxGKNDb5NrtBOiQANhruZ6_6EbOThNwiw@mail.gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S . Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::644
-Subject: Re: [Qemu-devel] [PATCH] atomic failures on qemu-system-riscv64
+X-Received-From: 2607:f8b0:4864:20::d44
+Subject: Re: [Qemu-devel] [PATCH 0/5] Various i.MX7 fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,29 +86,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: me@carlosedp.com, palmer@sifive.com, Alistair.Francis@wdc.com,
- marco@decred.org
+Cc: "open list:ARM" <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/16/19 12:19 PM, Joel Sing wrote:
-> +    /*
-> +     * Clear the load reservation, since an SC must fail if there is
-> +     * an SC to any address, in between an LR and SC pair.
-> +     */
-> +    tcg_gen_movi_tl(load_res, 0);
-> +
->      gen_set_label(l2);
+On Mon, Apr 15, 2019 at 6:39 PM Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
+>
+> Everyone:
+>
+> I recently revisited my i.MX7 work and this series contains all of the
+> fixes I had to make to get it to work with latest (5.1-rc1) Linux
+> kernel again as well as fixes for genuine bugs that I somehow missed
+> during original submission ("pci: designware" patches). Hopefully each
+> patch is self-explanatory.
+>
+> Feedback is welcome!
+>
 
-This clear needs to be moved down below label l2.
-Otherwise, with lr / sc / sc, the second sc could succeed in error.
+Is there any changes necessary for this to go in?
 
-FWIW, other targets have used -1 as the "invalid" load reservation, since the
-architecture does not require address 0 to be unmapped.  This should be quite
-visible in M-mode with paging disabled and ram at offset 0.  Often, other
-targets require alignment for the lr/sc address, though I don't see that for riscv.
-
-
-r~
+Thanks,
+Andrey Smirnov
 
