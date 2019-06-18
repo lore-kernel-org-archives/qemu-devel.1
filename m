@@ -2,79 +2,101 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2370C31E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:42:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15123C31E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:46:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93F59206B7
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:42:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D16E121855
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:46:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IaKhBIzQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93F59206B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="T/cifKLn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D16E121855
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59740 helo=lists.gnu.org)
+Received: from localhost ([::1]:59828 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdHC6-0004Me-MX
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 12:42:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38489)
+	id 1hdHFL-0007w0-PV
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 12:46:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36870)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hdGNl-0005GY-CB
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:50:50 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1hdGLA-0003Hw-DM
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:48:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hdGNj-0006BE-DB
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:50:49 -0400
-Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:33207)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hdGNi-00062u-U2
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:50:47 -0400
-Received: by mail-ot1-x329.google.com with SMTP id p4so5665949oti.0
- for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 08:50:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=QxQtM8Fhg0po3knQrY5ef5nPTR2bX/f1vmKCZYFXjJQ=;
- b=IaKhBIzQ+vPkxOsn1nvk6OyHwKULii0ETiWaYFdH2njzavf7A4hZdnBUGJwbsjmaaQ
- euAVv96ZHE8C6Dwd5zv9Btor4BXQHbWYBIofTx3mqdtwk9D7S1RYmOAkR1GMTqYq7jq7
- J4yuQ/6CaupDT+vw+u9cB6viUeFbR1Qj4bAlLXAqpUfg5EkXtfkIBE/jb23hR3LAeueF
- IRIV/PH946/fM5YWnbaV1rPI1fyyURKiHPT55EVW4+UiCjDJEj89u8hyT2BqzYtLI2nQ
- Efzs5dTpbkfLNkYrqV6P6S1Aj7Qo/M4tsZlvKTh0+zkA1if7/y1KYqsVHPqILPNA+Upc
- yMkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=QxQtM8Fhg0po3knQrY5ef5nPTR2bX/f1vmKCZYFXjJQ=;
- b=ZmtxQMXDmp9PtWLGxkfjmylAYwPIJQPLoUVBJOEsNTOifEBwDCqlmqeff0NM0hXb+0
- mgZ9mrRap47vTlRk3ecsMzelUmUA13ca1H5m+PmoiAOSEF0VWtL/RYl78+td1fLNUjkp
- Pum/8uOfx0gMBUQlMNGA4nQG4QranMYEuLbqHo+kS+P4SBCDif2Rm5aWqhf3hBScVmxV
- dA7fcTcxHCPr4KXQWd4HLqzu8KQ8LqPmzW57mk4TqI5rn6b9nF/QyQrsIw/Zw2PskWD8
- QoKkAfY4TaMDJy7qro/cFSg+cY6BCIVLemFrIVIUr1+OmWvYrHrXXDYplpZI3U1aqsEB
- 4ahg==
-X-Gm-Message-State: APjAAAXneLCBHl8P/YXdVFa7GjvnFRmMrXJbzLGwTK2rSAS9/edjBD/l
- edOc5kVjwnQ7XeW3eQjUeOf0q0cCGpXiWqF4YmMYrg==
-X-Google-Smtp-Source: APXvYqwOc5FAq7j+NsDwEJ6AVji4MtVSXGfudClA7LPEQAKoZKl0pZ8DNRmXMuPeE8gl/ffzolz6QSGIrszwxq3LWyU=
-X-Received: by 2002:a9d:6e8d:: with SMTP id a13mr5847302otr.303.1560873042800; 
- Tue, 18 Jun 2019 08:50:42 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190618144013.6537-1-ehabkost@redhat.com>
-In-Reply-To: <20190618144013.6537-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 18 Jun 2019 16:50:31 +0100
-Message-ID: <CAFEAcA-V86udi-kS6sg6W2y7z09+GdCQmWPS3stKbokOJ3kwUw@mail.gmail.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::329
-Subject: Re: [Qemu-devel] [PULL 0/2] Python queue, 2019-06-18
+ (envelope-from <liran.alon@oracle.com>) id 1hdGL8-0000v8-0I
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:48:07 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:39756)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1hdGL7-0000Kg-Ji
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:48:05 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5IFhstc181357;
+ Tue, 18 Jun 2019 15:47:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2018-07-02; bh=eQ0nzYc0ULSE4m2y4q5Mz8s0ptpwHBMMjmAA5sE9wTU=;
+ b=T/cifKLn+gaKLiMPSbleb/QR4ykPfNCEo5Qp2Jzyn83zQJgmLZMXNxtFIPIJyro9vRhM
+ LIsz4r5fvmSwY/wNij1IViAOP48noN1JeistJsBBH54+HtgIMaXksSJ4AiC6SSEEL2yp
+ 78sJo8wh8bmiAGme/ZmGdhmCFQzV/4i/ooc3gbmjmxxR0sZyd9qJZnO681Qs1NCz8MEA
+ wc07PVV7u6caNdjm3uFTtd1Uo+0EHxtWAAFS/NwAsEprotwtAD0H18rmUhKxRagvcHIe
+ OeHoTKHdEnCfYpbVbu7qm0b4ADNp9hjcRZ4tDbtkPAEqR83hHOFZLY6H4N+Puj71377k Ag== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by userp2120.oracle.com with ESMTP id 2t4saqdb6m-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 18 Jun 2019 15:47:49 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5IFiQqd181563;
+ Tue, 18 Jun 2019 15:45:49 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by aserp3020.oracle.com with ESMTP id 2t5mgc1dhm-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 18 Jun 2019 15:45:48 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5IFjmor019118;
+ Tue, 18 Jun 2019 15:45:48 GMT
+Received: from [192.168.14.112] (/109.67.217.108)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Tue, 18 Jun 2019 08:45:48 -0700
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+From: Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <20190618090752.GD2850@work-vm>
+Date: Tue, 18 Jun 2019 18:45:43 +0300
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <350BC330-8877-4B93-A8B3-0C001AEDD879@oracle.com>
+References: <20190617175658.135869-1-liran.alon@oracle.com>
+ <20190617175658.135869-9-liran.alon@oracle.com>
+ <20190618090752.GD2850@work-vm>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=944
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906180124
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=998 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906180124
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.85
+Subject: Re: [Qemu-devel] [QEMU PATCH v3 8/9] KVM: i386: Add support for
+ KVM_CAP_EXCEPTION_PAYLOAD
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,43 +108,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Aleksandar Rikalo <arikalo@wavecomp.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: ehabkost@redhat.com, kvm@vger.kernel.org, maran.wilson@oracle.com,
+ mtosatti@redhat.com, qemu-devel@nongnu.org,
+ Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
+ jmattson@google.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 18 Jun 2019 at 15:40, Eduardo Habkost <ehabkost@redhat.com> wrote:
->
-> The following changes since commit cdfaa2720f4a09e5254868bd1f6e33f3e9eae76f:
->
->   Merge remote-tracking branch 'remotes/armbru/tags/pull-monitor-2019-06-17-v2' into staging (2019-06-18 10:47:00 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/python-next-pull-request
->
-> for you to fetch changes up to c21f30ebc779cd4210b488dd702b3f8653aee82b:
->
->   Travis: print acceptance tests logs in case of job failure (2019-06-18 11:15:08 -0300)
->
-> ----------------------------------------------------------------
-> Python queue, 2019-06-18
->
-> Use a different method to dump avocado job log, to work around
-> timing-dependent issues in the arm test cases.
->
-> ----------------------------------------------------------------
 
 
-Applied, thanks.
+> On 18 Jun 2019, at 12:07, Dr. David Alan Gilbert <dgilbert@redhat.com> =
+wrote:
+>=20
+> * Liran Alon (liran.alon@oracle.com) wrote:
+>> Kernel commit c4f55198c7c2 ("kvm: x86: Introduce =
+KVM_CAP_EXCEPTION_PAYLOAD")
+>> introduced a new KVM capability which allows userspace to correctly
+>> distinguish between pending and injected exceptions.
+>>=20
+>> This distinguish is important in case of nested virtualization =
+scenarios
+>> because a L2 pending exception can still be intercepted by the L1 =
+hypervisor
+>> while a L2 injected exception cannot.
+>>=20
+>> Furthermore, when an exception is attempted to be injected by QEMU,
+>> QEMU should specify the exception payload (CR2 in case of #PF or
+>> DR6 in case of #DB) instead of having the payload already delivered =
+in
+>> the respective vCPU register. Because in case exception is injected =
+to
+>> L2 guest and is intercepted by L1 hypervisor, then payload needs to =
+be
+>> reported to L1 intercept (VMExit handler) while still preserving
+>> respective vCPU register unchanged.
+>>=20
+>> This commit adds support for QEMU to properly utilise this new KVM
+>> capability (KVM_CAP_EXCEPTION_PAYLOAD).
+>=20
+> Does this kvm capability become a requirement for the nested migration
+> then? If so, is it wired into the blockers?
+>=20
+> Dave
+>=20
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
+That=E2=80=99s a very good point.
+Yes this capability is required in order to correctly migrate VMs =
+running nested hypervisors.
+I agree that I should add a migration blocker for nested in case it =
+isn=E2=80=99t present.
+Nice catch.
 
--- PMM
+-Liran
+
+
 
