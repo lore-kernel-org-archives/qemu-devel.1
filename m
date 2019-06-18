@@ -2,79 +2,108 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78626C31E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 22:35:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3DB8C31E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 22:39:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 427AB20873
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 22:35:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6FBE82084D
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 22:39:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="aVZgzdht"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 427AB20873
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="jF6GNZQe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FBE82084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33916 helo=lists.gnu.org)
+Received: from localhost ([::1]:33924 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdMhm-0006sa-9B
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 18:35:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52937)
+	id 1hdMl1-0007zP-Kq
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 18:39:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53759)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jimw@sifive.com>) id 1hdMgV-0006Gh-Bf
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 18:34:36 -0400
+ (envelope-from <maran.wilson@oracle.com>) id 1hdMkW-0007aO-7P
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 18:38:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jimw@sifive.com>) id 1hdMgU-0000gJ-84
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 18:34:35 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:41109)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jimw@sifive.com>) id 1hdMgU-0000et-13
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 18:34:34 -0400
-Received: by mail-pf1-x443.google.com with SMTP id m30so8455842pff.8
- for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 15:34:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=from:to:cc:subject:date:message-id;
- bh=fcuIMm/pRv25rWLYXcWeKf5ZV92kO/2tcc3fCwRJkz4=;
- b=aVZgzdhtgAynbv2JxYCzpF8hUBZaKA/CgTiV7iPDx2j1PDQyfDK+A1g1dKhdFr1ER7
- yCk/PD/tulIDPPiX9ly2fAPNyzyFi/nWpnGTMX5ppqh8cqE+j7ynEglhsjCr51lkrZ/c
- HIsX8wz5o4sKrkq7JXes0s3+Vn9afVhiMOcXce1x6qqzGFGcWbgnhl31HCYLV0ltUxTy
- FJZ1+F4PYIYpndB+azNw3D6duHWiRWvoUCg9TwBritWmEpCWWEDxvRzFp9wBx84JqXZa
- hZKVzhMsC5Yi8zDOUOF5/xpQtu73tA1X/fsksI6bAJjNsKOsFAPb2yCWS82/nVsj1ylh
- yexA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=fcuIMm/pRv25rWLYXcWeKf5ZV92kO/2tcc3fCwRJkz4=;
- b=pqyBDB8GMjLqQgyKEJNBEay2huwCbFUuKNc1WYD+T32Yz8wrtnRopDRsUAe6K95SEC
- Is+fW3hQ3ZAwTuC2EyO/nI+jkyGqkrb5mbkKEAHFhdE+rwBOyFUyBWCZ3/JDPbDZGPMb
- fDrewBrs0s9A21wtGZx/YQy/Fvq9wOc3VEZXVZqWw0dxke+3LBhJSUBbbyVys5pSy/Sm
- tKJ3iRp+jL0iji6XQuzwUmtW3xu9QbbNOoJ4UlrPdaseVaMH+/SuVfG7roCugPuJuLcy
- oHJ3M4ly89jGQG5Mlzm4AaLJiYFiYfIIATTUavnvqELOgKbLw42aSdYCaB3W5habgCEa
- YM6A==
-X-Gm-Message-State: APjAAAXUVl0yPHAgNov70hROsfjtbi42LCzmcB8WCm042/dIVStvwqAf
- f68/MCrKMLY0tJx2r5iN6B8zNDnlAA20mw==
-X-Google-Smtp-Source: APXvYqxdlv7UU53fjh7nlbQvinyDoGklRnGodewgP12ObGVS+hRklSUB8neiCFabqSgF1TTjQZW9/g==
-X-Received: by 2002:a17:90a:a116:: with SMTP id
- s22mr7589570pjp.47.1560897272493; 
- Tue, 18 Jun 2019 15:34:32 -0700 (PDT)
-Received: from rohan.sifive.com ([12.206.222.5])
- by smtp.gmail.com with ESMTPSA id f5sm15389155pfn.161.2019.06.18.15.34.31
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 18 Jun 2019 15:34:32 -0700 (PDT)
-From: Jim Wilson <jimw@sifive.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 18 Jun 2019 15:32:52 -0700
-Message-Id: <20190618223252.10907-1-jimw@sifive.com>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::443
-Subject: [Qemu-devel] [PATCH] RISC-V: Update syscall list for 32-bit support.
+ (envelope-from <maran.wilson@oracle.com>) id 1hdMkV-0005QH-3n
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 18:38:44 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:37272)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <maran.wilson@oracle.com>)
+ id 1hdMkU-0005P5-Me
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 18:38:42 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5IMXkMi096658;
+ Tue, 18 Jun 2019 22:38:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=WqGcra+x5jYUz+XeUgk6o28zhSVfwy8g6C/Lwb6TJN4=;
+ b=jF6GNZQe6cKMXeB6lOcJxoPb/CYnCZ0RH0F8k8M7nPO78kuSfhgFAMii3WU+0X00Bd/9
+ 1dx1LN+m9IBZWx+n2gUXgKiEfkyuH2MHscCoFp+dwuU49EEb1F5b+VTSj+LNRoTnP24f
+ ISRVEFuZwiQkH5pCQnetxxcU6ZIkwCGIg+71gXTvFm+dXo35oaN1CwFrYMvKCGNyJJBO
+ X0qzXDTtjjjxoy+NO/CpGh2Zcs/e/vuKstyUBvTWeTDgTFGnBXiQNKFjYBrmB60mxnvq
+ qHU0Xf4tZvijx/mbCv+L4/MO1sBNd/pOCR74YNM6+dex1BJzhPOG/2DGTcT9KDo/xTFB gw== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2130.oracle.com with ESMTP id 2t780985dx-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 18 Jun 2019 22:38:40 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5IMbamr054032;
+ Tue, 18 Jun 2019 22:38:39 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by userp3030.oracle.com with ESMTP id 2t77ymrnrn-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 18 Jun 2019 22:38:39 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5IMccZI010683;
+ Tue, 18 Jun 2019 22:38:38 GMT
+Received: from [10.141.197.71] (/10.141.197.71)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Tue, 18 Jun 2019 15:38:38 -0700
+To: Paolo Bonzini <pbonzini@redhat.com>, Liran Alon <liran.alon@oracle.com>
+References: <20190615004256.16367-1-pbonzini@redhat.com>
+ <20190615004256.16367-4-pbonzini@redhat.com>
+ <EB7EDEC6-BD44-460E-B7B2-29060631E4FF@oracle.com>
+ <0144E234-98F2-4D05-B2AB-8DA23E418D46@oracle.com>
+ <74FC0FAA-54DE-4E72-90F5-32B0551F1D83@oracle.com>
+ <c281bf78-2753-effb-fb23-31600e272723@redhat.com>
+From: Maran Wilson <maran.wilson@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <363a4b01-4538-f45d-3d09-d9206b419587@oracle.com>
+Date: Tue, 18 Jun 2019 15:38:37 -0700
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <c281bf78-2753-effb-fb23-31600e272723@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9292
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906180181
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9292
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906180181
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by userp2130.oracle.com id
+ x5IMXkMi096658
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.86
+Subject: Re: [Qemu-devel] [PATCH 3/7] KVM: i386: Add support for
+ KVM_CAP_EXCEPTION_PAYLOAD
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,59 +115,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- Jim Wilson <jimw@sifive.com>
+Cc: qemu-devel@nongnu.org, Nikita Leshenko <nikita.leshchenko@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-32-bit RISC-V uses _llseek instead of lseek as syscall number 62.
-Update syscall list from open-embedded build, primarily because
-32-bit RISC-V requires statx support.
+On 6/17/2019 10:27 AM, Paolo Bonzini wrote:
+> On 17/06/19 13:34, Liran Alon wrote:
+>> Putting this all together, in case kernel doesn=E2=80=99t support extr=
+acting
+>> nested-state, there is no decent way to know if guest is running
+>> nested-virtualization. Which means that in theory we always need to
+>> fail migration in case kernel doesn=E2=80=99t support KVM_CAP_NESTED_S=
+TATE or
+>> KVM_CAP_EXCEPTION_PAYLOAD and vCPU is exposed with VMX/SVM
+>> capability.
+> For VMX this would be okay because we had a blocker before this series,
+> and this wouldn't be any worse.
 
-Tested with cross gcc testsuite runs for rv32 and rv64, with the
-pending statx patch also applied.
+I agree it shouldn't be a gating issue for this patch series, but I'd=20
+hate to see this discussion thread die off.
 
-Signed-off-by: Jim Wilson <jimw@sifive.com>
----
- linux-user/riscv/syscall_nr.h | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+I'm still pretty interested in hearing whether anyone has any good ideas=20
+for how to conclusively determine whether a given L1 VM has created a=20
+nested L2 or not when the host is running an older Kernel that doesn't=20
+support KVM_CAP_NESTED_STATE. That would be a very useful capability,=20
+especially for CSP use cases. If anyone has any suggestions about where=20
+to look, I don't mind spending some time digging into it and possibly=20
+testing out a few ideas. Again, separate from this particular patch=20
+series. So far I've been drawing a blank after Liran pointed out that=20
+corner case problems associated with env->cr[4] & CR4_VMXE_MASK.
 
-diff --git a/linux-user/riscv/syscall_nr.h b/linux-user/riscv/syscall_nr.h
-index dab6509..5c87282 100644
---- a/linux-user/riscv/syscall_nr.h
-+++ b/linux-user/riscv/syscall_nr.h
-@@ -72,7 +72,11 @@
- #define TARGET_NR_pipe2 59
- #define TARGET_NR_quotactl 60
- #define TARGET_NR_getdents64 61
-+#ifdef TARGET_RISCV32
-+#define TARGET_NR__llseek 62
-+#else
- #define TARGET_NR_lseek 62
-+#endif
- #define TARGET_NR_read 63
- #define TARGET_NR_write 64
- #define TARGET_NR_readv 65
-@@ -286,7 +290,16 @@
- #define TARGET_NR_membarrier 283
- #define TARGET_NR_mlock2 284
- #define TARGET_NR_copy_file_range 285
-+#define TARGET_NR_preadv2 286
-+#define TARGET_NR_pwritev2 287
-+#define TARGET_NR_pkey_mprotect 288
-+#define TARGET_NR_pkey_alloc 289
-+#define TARGET_NR_pkey_free 290
-+#define TARGET_NR_statx 291
-+#define TARGET_NR_io_pgetevents 292
-+#define TARGET_NR_rseq 293
-+#define TARGET_NR_kexec_file_load 294
- 
--#define TARGET_NR_syscalls (TARGET_NR_copy_file_range + 1)
-+#define TARGET_NR_syscalls (TARGET_NR_kexec_file_load + 1)
- 
- #endif
--- 
-2.7.4
+Thanks,
+-Maran
+
+> For SVM we can ignore the case and fix it when we have
+> KVM_CAP_NESTED_STATE, as again that wouldn't be any worse.
+>
+> Paolo
+>
+>> I can condition this behaviour with a flag that can be manipulated
+>> using QMP to allow user to indicate it wishes to migrate guest anyway
+>> in this case. This however bring me back to the entire discussion I
+>> had with Dr. David Alan Gilbert on migration backwards compatibility
+>> in general and the fact that I believe we should have a generic QMP
+>> command which allows to provide list of VMState subsections that can
+>> be ignored in migration=E2=80=A6 See:
+>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg622274.html
+>>
+>> Paolo, What are your thoughts on how I would proceed with this?
 
 
