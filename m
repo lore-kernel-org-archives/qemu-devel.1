@@ -4,49 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D93DEC31E51
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 11:55:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFC02C31E5D
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 11:58:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B69CB2070B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 11:55:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B69CB2070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9C3242070B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 11:58:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C3242070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55938 helo=lists.gnu.org)
+Received: from localhost ([::1]:55964 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdCi6-0007Ef-0I
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 07:55:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48330)
+	id 1hdCkk-0000ka-Rt
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 07:58:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51979)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hdCWX-00041p-9j
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:43:39 -0400
+ (envelope-from <drjones@redhat.com>) id 1hdCil-0008NB-GU
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:56:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hdCWV-0000Mr-66
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:43:37 -0400
-Received: from relay.sw.ru ([185.231.240.75]:58014)
+ (envelope-from <drjones@redhat.com>) id 1hdCic-0000Ln-2X
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:56:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:29387)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1hdCWU-0000Jg-Rj; Tue, 18 Jun 2019 07:43:35 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1hdCWQ-00016b-3V; Tue, 18 Jun 2019 14:43:30 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Date: Tue, 18 Jun 2019 14:43:28 +0300
-Message-Id: <20190618114328.55249-10-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20190618114328.55249-1-vsementsov@virtuozzo.com>
-References: <20190618114328.55249-1-vsementsov@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v7 9/9] iotests: test nbd reconnect
+ (Exim 4.71) (envelope-from <drjones@redhat.com>)
+ id 1hdCiY-0000FU-TL; Tue, 18 Jun 2019 07:56:03 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5617531628EF;
+ Tue, 18 Jun 2019 11:56:01 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7FD3B1001E61;
+ Tue, 18 Jun 2019 11:56:00 +0000 (UTC)
+Date: Tue, 18 Jun 2019 13:55:58 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <20190618115558.uhygiqryxo4lbb5u@kamzik.brq.redhat.com>
+References: <20190618083442.10407-1-drjones@redhat.com>
+ <CAFEAcA9bwbev3efZ=LJPGgObBCbW-WX19fySMusLyMNC5ZExvA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9bwbev3efZ=LJPGgObBCbW-WX19fySMusLyMNC5ZExvA@mail.gmail.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Tue, 18 Jun 2019 11:56:01 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/boot: fix direct kernel boot setup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -58,135 +70,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, armbru@redhat.com,
- mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add test, which starts backup to nbd target and restarts nbd server
-during backup.
+On Tue, Jun 18, 2019 at 12:02:37PM +0100, Peter Maydell wrote:
+> On Tue, 18 Jun 2019 at 09:34, Andrew Jones <drjones@redhat.com> wrote:
+> >
+> > We need to check ram_end, not ram_size.
+> >
+> > Fixes: 852dc64d665f ("hw/arm/boot: Diagnose layouts that put initrd or
+> > DTB off the end of RAM")
+> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > ---
+> >  hw/arm/boot.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+> > index b2f93f6beff6..8a280ab3ed49 100644
+> > --- a/hw/arm/boot.c
+> > +++ b/hw/arm/boot.c
+> > @@ -1109,7 +1109,7 @@ static void arm_setup_direct_kernel_boot(ARMCPU *cpu,
+> >                               info->initrd_filename);
+> >                  exit(1);
+> >              }
+> > -            if (info->initrd_start + initrd_size > info->ram_size) {
+> > +            if (info->initrd_start + initrd_size > ram_end) {
+> >                  error_report("could not load initrd '%s': "
+> >                               "too big to fit into RAM after the kernel",
+> >                               info->initrd_filename);
+> > --
+> > 2.20.1
+> 
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> 
+> I think I missed this because my test case doesn't have an
+> initrd -- direct kernel boot works fine if all you're
+> passing to QEMU is the kernel... I think we could clarify
+> the commit message a little:
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- tests/qemu-iotests/257        | 63 +++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/257.out    | 10 ++++++
- tests/qemu-iotests/group      |  1 +
- tests/qemu-iotests/iotests.py |  4 +++
- 4 files changed, 78 insertions(+)
- create mode 100755 tests/qemu-iotests/257
- create mode 100644 tests/qemu-iotests/257.out
+I found it using kvm-unit-tests which uses a small initrd to
+pass environment variables to the guest. All the tests started
+to report FAIL.
 
-diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
-new file mode 100755
-index 0000000000..a29a276207
---- /dev/null
-+++ b/tests/qemu-iotests/257
-@@ -0,0 +1,63 @@
-+#!/usr/bin/env python
-+#
-+# Test nbd reconnect
-+#
-+# Copyright (c) 2019 Virtuozzo International GmbH. All rights reserved.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import time
-+
-+import iotests
-+from iotests import qemu_img_create, file_path, qemu_nbd_popen, log
-+
-+disk_a, disk_b, nbd_sock = file_path('disk_a', 'disk_b', 'nbd-sock')
-+
-+qemu_img_create('-f', iotests.imgfmt, disk_a, '5M')
-+qemu_img_create('-f', iotests.imgfmt, disk_b, '5M')
-+srv = qemu_nbd_popen('-k', nbd_sock, '-f', iotests.imgfmt, disk_b)
-+time.sleep(1)
-+
-+vm = iotests.VM().add_drive(disk_a)
-+vm.launch()
-+vm.hmp_qemu_io('drive0', 'write 0 5M')
-+
-+vm.qmp_log('blockdev-add', filters=[iotests.filter_qmp_testfiles],
-+           **{'node_name': 'backup0',
-+              'driver': 'raw',
-+              'file': {'driver': 'nbd',
-+                       'server': {'type': 'unix', 'path': nbd_sock},
-+                       'reconnect-delay': 10}})
-+vm.qmp_log('blockdev-backup', device='drive0', sync='full', target='backup0')
-+
-+time.sleep(1)
-+log('Kill NBD server')
-+srv.kill()
-+
-+jobs = vm.qmp('query-block-jobs')['return']
-+if jobs and jobs[0]['offset'] < jobs[0]['len']:
-+    log('Backup job is still in progress')
-+
-+time.sleep(1)
-+
-+log('Start NBD server')
-+srv = qemu_nbd_popen('-k', nbd_sock, '-f', iotests.imgfmt, disk_b)
-+
-+e = vm.event_wait('BLOCK_JOB_COMPLETED')
-+log('Backup completed: {}'.format(e['data']['offset']))
-+
-+vm.qmp_log('blockdev-del', node_name='backup0')
-+srv.kill()
-+vm.shutdown()
-diff --git a/tests/qemu-iotests/257.out b/tests/qemu-iotests/257.out
-new file mode 100644
-index 0000000000..15a82ddefb
---- /dev/null
-+++ b/tests/qemu-iotests/257.out
-@@ -0,0 +1,10 @@
-+{"execute": "blockdev-add", "arguments": {"driver": "raw", "file": {"driver": "nbd", "reconnect-delay": 10, "server": {"path": "TEST_DIR/PID-nbd-sock", "type": "unix"}}, "node-name": "backup0"}}
-+{"return": {}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "sync": "full", "target": "backup0"}}
-+{"return": {}}
-+Kill NBD server
-+Backup job is still in progress
-+Start NBD server
-+Backup completed: 5242880
-+{"execute": "blockdev-del", "arguments": {"node-name": "backup0"}}
-+{"return": {}}
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index b34c8e3c0c..00fbfefc8e 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -269,3 +269,4 @@
- 254 rw auto backing quick
- 255 rw auto quick
- 256 rw auto quick
-+257 rw auto quick
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 3ecef5bc90..3c77950877 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -226,6 +226,10 @@ def qemu_nbd_early_pipe(*args):
-     else:
-         return exitcode, subp.communicate()[0]
- 
-+def qemu_nbd_popen(*args):
-+    '''Run qemu-nbd in daemon mode and return the parent's exit code'''
-+    return subprocess.Popen(qemu_nbd_args + ['--persistent'] + list(args))
-+
- def compare_images(img1, img2, fmt1=imgfmt, fmt2=imgfmt):
-     '''Return True if two image files are identical'''
-     return qemu_img('compare', '-f', fmt1,
--- 
-2.18.0
+> 
+> hw/arm/boot: fix direct kernel boot with initrd
+> 
+> Fix the condition used to check whether the initrd fits
+> into RAM; this meant we were spuriously refusing to do
+> a direct boot of a kernel in some cases if an initrd
+> was also passed on the command line.
 
+Actually I think we need another fix for this error too. We
+weren't actually refusing do direct boot the kernel, but we
+should have been. We're missing the 'exit(1)' after the error
+message.
+
+> 
+> ?
+> 
+> (if you agree I can just fix up the commit message when I apply it.)
+
+I agree with the improved commit message if we also add the
+'exit(1)', otherwise "refusing to boot" isn't the right thing
+to say.
+
+Thanks,
+drew
+
+> 
+> thanks
+> -- PMM
+> 
 
