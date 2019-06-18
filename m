@@ -2,60 +2,101 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE029C31E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:31:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FDF2C31E5D
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:32:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AEAF2054F
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:31:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AEAF2054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2161420673
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:32:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JmmaQtHH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2161420673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59602 helo=lists.gnu.org)
+Received: from localhost ([::1]:59608 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdH1E-0000r7-Ov
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 12:31:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56018)
+	id 1hdH2U-0002NI-6U
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 12:32:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60621)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hdFxZ-000840-6F
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:23:50 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1hdGAc-0003Pv-Fx
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:37:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hdFxW-0000mN-PB
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:23:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38246)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hdFxM-0000TS-W4; Tue, 18 Jun 2019 11:23:33 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1A08E30C1AE6;
- Tue, 18 Jun 2019 15:23:30 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-116-185.ams2.redhat.com
- [10.36.116.185])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 397645BBD2;
- Tue, 18 Jun 2019 15:23:29 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Date: Tue, 18 Jun 2019 17:23:09 +0200
-Message-Id: <20190618152318.24953-6-kwolf@redhat.com>
-In-Reply-To: <20190618152318.24953-1-kwolf@redhat.com>
-References: <20190618152318.24953-1-kwolf@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Tue, 18 Jun 2019 15:23:30 +0000 (UTC)
+ (envelope-from <liran.alon@oracle.com>) id 1hdGAW-0004N7-NW
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:37:10 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:55380)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1hdGAU-00047e-O3
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:37:06 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5IFOVY1151641;
+ Tue, 18 Jun 2019 15:36:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2018-07-02; bh=AApMw5TsMqN6YhoPm41GCwqHYefC7ikF/FburAdTeBc=;
+ b=JmmaQtHHEeTv8Q0MOzglhPEAuCKzTdKcD9OEfqLch2TLS0edOmkak2q3QEKb/gThXqbz
+ 7t10mOg1GlkPj2AosylouLRTA9qlwwPep/ubMKlqAs8mZiSTXXy1h9uvlLhujVt569mU
+ eqkuFbxhWZvg92iJnFFEgxqIFQ93EsahbDdRWD0gsfjsWssCOKQzQc7Ti4sPhygj9Arg
+ 1PBy9+ma15TZTU0mxQimAlXvaXubWWNZ9KUH/+X3OTOnY7K5p7BVBbgWbmWL/BP79gh9
+ D0a9nZI8wNrBTHNin0t+gxsNHCTwsHFHORKqKZXdQeRm+WS0tp4a5qaO14PcwTKqT1Gg kg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2130.oracle.com with ESMTP id 2t4r3tnbs6-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 18 Jun 2019 15:36:58 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5IFZ7bu030672;
+ Tue, 18 Jun 2019 15:36:58 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by userp3020.oracle.com with ESMTP id 2t5h5ttcxw-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 18 Jun 2019 15:36:57 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5IFauo6013961;
+ Tue, 18 Jun 2019 15:36:56 GMT
+Received: from [192.168.14.112] (/109.67.217.108)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Tue, 18 Jun 2019 08:36:56 -0700
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+From: Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <20190618085539.GB2850@work-vm>
+Date: Tue, 18 Jun 2019 18:36:51 +0300
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 05/14] block: drop bs->job
+Message-Id: <AB34E76F-231C-4E66-B5CB-113AFCE7A20F@oracle.com>
+References: <20190617175658.135869-1-liran.alon@oracle.com>
+ <20190617175658.135869-7-liran.alon@oracle.com>
+ <20190618085539.GB2850@work-vm>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906180123
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906180123
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.86
+Subject: Re: [Qemu-devel] [QEMU PATCH v3 6/9] vmstate: Add support for
+ kernel integer types
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,157 +108,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, kvm@vger.kernel.org, maran.wilson@oracle.com,
+ mtosatti@redhat.com, qemu-devel@nongnu.org,
+ Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
+ jmattson@google.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Drop remaining users of bs->job:
-1. assertions actually duplicated by assert(!bs->refcnt)
-2. trace-point seems not enough reason to change stream_start to return
-   BlockJob pointer
-3. Restricting creation of two jobs based on same bs is bad idea, as
-   3.1 Some jobs creates filters to be their main node, so, this check
-   don't actually prevent creating second job on same real node (which
-   will create another filter node) (but I hope it is restricted by
-   other mechanisms)
-   3.2 Even without bs->job we have two systems of permissions:
-   op-blockers and BLK_PERM
-   3.3 We may want to run several jobs on one node one day
 
-And finally, drop bs->job pointer itself. Hurrah!
+> On 18 Jun 2019, at 11:55, Dr. David Alan Gilbert <dgilbert@redhat.com> =
+wrote:
+>=20
+> * Liran Alon (liran.alon@oracle.com) wrote:
+>> Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+>> Reviewed-by: Maran Wilson <maran.wilson@oracle.com>
+>> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+>> ---
+>> include/migration/vmstate.h | 18 ++++++++++++++++++
+>> 1 file changed, 18 insertions(+)
+>>=20
+>> diff --git a/include/migration/vmstate.h =
+b/include/migration/vmstate.h
+>> index 9224370ed59a..a85424fb0483 100644
+>> --- a/include/migration/vmstate.h
+>> +++ b/include/migration/vmstate.h
+>> @@ -797,6 +797,15 @@ extern const VMStateInfo vmstate_info_qtailq;
+>> #define VMSTATE_UINT64_V(_f, _s, _v)                                  =
+\
+>>     VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint64, uint64_t)
+>=20
+> A comment here stating they're for Linux kernel types would be nice.
 
-Suggested-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- include/block/block_int.h | 3 ---
- block.c                   | 2 --
- blockdev.c                | 2 +-
- blockjob.c                | 8 --------
- tests/test-blockjob.c     | 5 +++--
- block/trace-events        | 2 +-
- 6 files changed, 5 insertions(+), 17 deletions(-)
+I didn=E2=80=99t want to state this because in theory these types can be =
+used not in kernel context=E2=80=A6
+I thought commit message is sufficient. I think comments in code should =
+be made to clarify
+things. But to justify existence I think commit message should be used.
+But if you insist, I have no strong objection of adding such comment.
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 8bb1cfb80a..a498c2670b 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -812,9 +812,6 @@ struct BlockDriverState {
-     /* operation blockers */
-     QLIST_HEAD(, BdrvOpBlocker) op_blockers[BLOCK_OP_TYPE_MAX];
-=20
--    /* long-running background operation */
--    BlockJob *job;
--
-     /* The node that this node inherited default options from (and a reo=
-pen on
-      * which can affect this node by changing these defaults). This is a=
-lways a
-      * parent node of this node. */
-diff --git a/block.c b/block.c
-index e3e77feee0..ceb2ea23c5 100644
---- a/block.c
-+++ b/block.c
-@@ -3905,7 +3905,6 @@ static void bdrv_close(BlockDriverState *bs)
-     BdrvAioNotifier *ban, *ban_next;
-     BdrvChild *child, *next;
-=20
--    assert(!bs->job);
-     assert(!bs->refcnt);
-=20
-     bdrv_drained_begin(bs); /* complete I/O */
-@@ -4146,7 +4145,6 @@ out:
-=20
- static void bdrv_delete(BlockDriverState *bs)
- {
--    assert(!bs->job);
-     assert(bdrv_op_blocker_is_empty(bs));
-     assert(!bs->refcnt);
-=20
-diff --git a/blockdev.c b/blockdev.c
-index a9dd73eafc..5d6a13dea9 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3260,7 +3260,7 @@ void qmp_block_stream(bool has_job_id, const char *=
-job_id, const char *device,
-         goto out;
-     }
-=20
--    trace_qmp_block_stream(bs, bs->job);
-+    trace_qmp_block_stream(bs);
-=20
- out:
-     aio_context_release(aio_context);
-diff --git a/blockjob.c b/blockjob.c
-index c3620ec544..458ae76f51 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -83,9 +83,7 @@ BlockJob *block_job_get(const char *id)
- void block_job_free(Job *job)
- {
-     BlockJob *bjob =3D container_of(job, BlockJob, job);
--    BlockDriverState *bs =3D blk_bs(bjob->blk);
-=20
--    bs->job =3D NULL;
-     block_job_remove_all_bdrv(bjob);
-     blk_unref(bjob->blk);
-     error_free(bjob->blocker);
-@@ -402,11 +400,6 @@ void *block_job_create(const char *job_id, const Blo=
-ckJobDriver *driver,
-     BlockJob *job;
-     int ret;
-=20
--    if (bs->job) {
--        error_setg(errp, QERR_DEVICE_IN_USE, bdrv_get_device_name(bs));
--        return NULL;
--    }
--
-     if (job_id =3D=3D NULL && !(flags & JOB_INTERNAL)) {
-         job_id =3D bdrv_get_device_name(bs);
-     }
-@@ -449,7 +442,6 @@ void *block_job_create(const char *job_id, const Bloc=
-kJobDriver *driver,
-     error_setg(&job->blocker, "block device is in use by block job: %s",
-                job_type_str(&job->job));
-     block_job_add_bdrv(job, "main node", bs, 0, BLK_PERM_ALL, &error_abo=
-rt);
--    bs->job =3D job;
-=20
-     bdrv_op_unblock(bs, BLOCK_OP_TYPE_DATAPLANE, job->blocker);
-=20
-diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index 8c91980c70..b33f899873 100644
---- a/tests/test-blockjob.c
-+++ b/tests/test-blockjob.c
-@@ -122,8 +122,9 @@ static void test_job_ids(void)
-     /* This one is valid */
-     job[0] =3D do_test_id(blk[0], "id0", true);
-=20
--    /* We cannot have two jobs in the same BDS */
--    do_test_id(blk[0], "id1", false);
-+    /* We can have two jobs in the same BDS */
-+    job[1] =3D do_test_id(blk[0], "id1", true);
-+    job_early_fail(&job[1]->job);
-=20
-     /* Duplicate job IDs are not allowed */
-     job[1] =3D do_test_id(blk[1], "id0", false);
-diff --git a/block/trace-events b/block/trace-events
-index f6e43ee023..9ccea755da 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -53,7 +53,7 @@ qmp_block_job_resume(void *job) "job %p"
- qmp_block_job_complete(void *job) "job %p"
- qmp_block_job_finalize(void *job) "job %p"
- qmp_block_job_dismiss(void *job) "job %p"
--qmp_block_stream(void *bs, void *job) "bs %p job %p"
-+qmp_block_stream(void *bs) "bs %p"
-=20
- # file-posix.c
- # file-win32.c
---=20
-2.20.1
+>=20
+>> +#define VMSTATE_U8_V(_f, _s, _v)                                   \
+>> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint8, __u8)
+>> +#define VMSTATE_U16_V(_f, _s, _v)                                  \
+>> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint16, __u16)
+>> +#define VMSTATE_U32_V(_f, _s, _v)                                  \
+>> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint32, __u32)
+>> +#define VMSTATE_U64_V(_f, _s, _v)                                  \
+>> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint64, __u64)
+>> +
+>=20
+> Have you checked that builds OK on a non-Linux system?
+
+Hmm that=E2=80=99s a good point. No. :P
+
+-Liran
+
+>=20
+> Dave
+>=20
+>> #define VMSTATE_BOOL(_f, _s)                                          =
+\
+>>     VMSTATE_BOOL_V(_f, _s, 0)
+>>=20
+>> @@ -818,6 +827,15 @@ extern const VMStateInfo vmstate_info_qtailq;
+>> #define VMSTATE_UINT64(_f, _s)                                        =
+\
+>>     VMSTATE_UINT64_V(_f, _s, 0)
+>>=20
+>> +#define VMSTATE_U8(_f, _s)                                         \
+>> +    VMSTATE_U8_V(_f, _s, 0)
+>> +#define VMSTATE_U16(_f, _s)                                        \
+>> +    VMSTATE_U16_V(_f, _s, 0)
+>> +#define VMSTATE_U32(_f, _s)                                        \
+>> +    VMSTATE_U32_V(_f, _s, 0)
+>> +#define VMSTATE_U64(_f, _s)                                        \
+>> +    VMSTATE_U64_V(_f, _s, 0)
+>> +
+>> #define VMSTATE_UINT8_EQUAL(_f, _s, _err_hint)                        =
+\
+>>     VMSTATE_SINGLE_FULL(_f, _s, 0, 0,                                 =
+\
+>>                         vmstate_info_uint8_equal, uint8_t, _err_hint)
+>> --=20
+>> 2.20.1
+>>=20
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
