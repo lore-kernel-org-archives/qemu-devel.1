@@ -2,62 +2,59 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D472DC31E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 15:32:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 205EDC31E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 15:34:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE33E20673
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 15:32:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE33E20673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EE63720673
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 15:34:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE63720673
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59026 helo=lists.gnu.org)
+Received: from localhost ([::1]:59052 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdG6O-00079e-SL
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 11:32:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40153)
+	id 1hdG7V-0000Gi-7s
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 11:34:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39624)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hdFID-0004Ei-B8
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:41:04 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hdFGs-0002o9-Pz
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:39:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hdFIC-0001nK-9O
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:41:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49572)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hdFI8-0001W9-Li
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:40:58 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id ECC5AA836;
- Tue, 18 Jun 2019 14:40:25 +0000 (UTC)
-Received: from localhost (ovpn-116-76.gru2.redhat.com [10.97.116.76])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7AA537D506;
- Tue, 18 Jun 2019 14:40:25 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Cleber Rosa <crosa@redhat.com>
-Date: Tue, 18 Jun 2019 11:40:13 -0300
-Message-Id: <20190618144013.6537-3-ehabkost@redhat.com>
-In-Reply-To: <20190618144013.6537-1-ehabkost@redhat.com>
-References: <20190618144013.6537-1-ehabkost@redhat.com>
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hdFGq-0000iw-Ks
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:39:38 -0400
+Received: from mail01.asahi-net.or.jp ([202.224.55.13]:33707)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hdFGq-0000eY-7l
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:39:36 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
+ [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+ by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 9B1E8126DD9;
+ Tue, 18 Jun 2019 23:39:33 +0900 (JST)
+Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
+ [222.8.5.235])
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 1B786240086;
+ Tue, 18 Jun 2019 23:39:33 +0900 (JST)
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: qemu-devel@nongnu.org
+Date: Tue, 18 Jun 2019 23:39:12 +0900
+Message-Id: <20190618143923.53838-11-ysato@users.sourceforge.jp>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20190618143923.53838-1-ysato@users.sourceforge.jp>
+References: <20190618143923.53838-1-ysato@users.sourceforge.jp>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Tue, 18 Jun 2019 14:40:26 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 2/2] Travis: print acceptance tests logs in case
- of job failure
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 202.224.55.13
+Subject: [Qemu-devel] [PATCH RESEND v21 10/21] target/rx: Use prt_ldmi for
+ XCHG_mr disassembly
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,50 +66,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Aleksandar Rikalo <arikalo@wavecomp.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: peter.maydell@linaro.org, imammedo@redhat.com,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cleber Rosa <crosa@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Because Travis doesn't allow us to keep files produced during tests
-(such as log files), let's print the complete job log to the "console"
-in case of job failures.
+Note that the ld =3D=3D 3 case handled by prt_ldmi is decoded as
+XCHG_rr and cannot appear here.
 
-This is a debugging aid, and given that there's been some timeouts
-happening on some tests, we absolutely needs the logs to have a proper
-action.
-
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
-Message-Id: <20190607152223.9467-2-crosa@redhat.com>
-Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Message-Id: <20190607091116.49044-21-ysato@users.sourceforge.jp>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- .travis.yml | 2 ++
- 1 file changed, 2 insertions(+)
+ target/rx/disas.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-diff --git a/.travis.yml b/.travis.yml
-index 2f1658602e..aeb9b211cd 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -233,6 +233,8 @@ matrix:
-     - env:
-         - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-s=
-oftmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-so=
-ftmmu,alpha-softmmu"
-         - TEST_CMD=3D"make check-acceptance"
-+      after_failure:
-+        - cat tests/results/latest/job.log
-       addons:
-         apt:
-           packages:
+diff --git a/target/rx/disas.c b/target/rx/disas.c
+index 515b365528..db10385fd0 100644
+--- a/target/rx/disas.c
++++ b/target/rx/disas.c
+@@ -366,13 +366,7 @@ static bool trans_XCHG_rr(DisasContext *ctx, arg_XCH=
+G_rr *a)
+ /* xchg dsp[rs].<mi>,rd */
+ static bool trans_XCHG_mr(DisasContext *ctx, arg_XCHG_mr *a)
+ {
+-    static const char msize[][4] =3D {
+-        "b", "w", "l", "ub", "uw",
+-    };
+-    char dsp[8];
+-
+-    rx_index_addr(ctx, dsp, a->ld, a->mi);
+-    prt("xchg\t%s[r%d].%s, r%d", dsp, a->rs, msize[a->mi], a->rd);
++    prt_ldmi(ctx, "xchg", a->ld, a->mi, a->rs, a->rd);
+     return true;
+ }
+=20
 --=20
-2.18.0.rc1.1.g3f1ff2140
+2.11.0
 
 
