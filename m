@@ -2,60 +2,49 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DF8DC31E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:21:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 660A6C31E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:22:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 440C820B1F
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:21:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 440C820B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2563E20673
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:22:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2563E20673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59500 helo=lists.gnu.org)
+Received: from localhost ([::1]:59506 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdGrk-0007d0-Gf
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 12:21:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56330)
+	id 1hdGrz-0007v9-9A
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 12:22:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34216)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hdFxm-0008T1-Qx
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:24:00 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hdGFf-0007QJ-M5
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:42:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hdFxh-0000zS-7I
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:23:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38372)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hdGFY-0005uz-Tu
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:42:24 -0400
+Received: from relay.sw.ru ([185.231.240.75]:38516)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hdFxY-0000lF-Qf; Tue, 18 Jun 2019 11:23:44 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id ED34D30001D8;
- Tue, 18 Jun 2019 15:23:35 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-116-185.ams2.redhat.com
- [10.36.116.185])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 199C719492;
- Tue, 18 Jun 2019 15:23:34 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Date: Tue, 18 Jun 2019 17:23:14 +0200
-Message-Id: <20190618152318.24953-11-kwolf@redhat.com>
-In-Reply-To: <20190618152318.24953-1-kwolf@redhat.com>
-References: <20190618152318.24953-1-kwolf@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Tue, 18 Jun 2019 15:23:35 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 10/14] block: Fix order in bdrv_replace_child()
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1hdGFT-0005Va-Ao; Tue, 18 Jun 2019 11:42:17 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1hdGFH-0002Sc-Ec; Tue, 18 Jun 2019 18:42:03 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org,
+	qemu-block@nongnu.org
+Date: Tue, 18 Jun 2019 18:41:59 +0300
+Message-Id: <20190618154202.89107-1-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.18.0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
+Subject: [Qemu-devel] [PATCH v2 0/3] block: BDRV_REQ_PREFETCH
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,64 +56,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
+ mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Max Reitz <mreitz@redhat.com>
+Hi all!
 
-We have to start by applying the permission restrictions to new_bs
-before we can loosen them on old_bs.  See the comment for the
-explanation.
+Here is small new read flag: BDRV_REQ_PREFETCH, which in combination with
+BDRV_REQ_COPY_ON_READ does copy-on-read without
+extra buffer for read data. This means that only parts that needs COR
+will be actually read and only corresponding buffers allocated, no more.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+This allows to improve a bit block-stream and NBD_CMD_CACHE
 
-diff --git a/block.c b/block.c
-index 013369851b..b7d4149c2f 100644
---- a/block.c
-+++ b/block.c
-@@ -2240,6 +2240,19 @@ static void bdrv_replace_child(BdrvChild *child, B=
-lockDriverState *new_bs)
-=20
-     bdrv_replace_child_noperm(child, new_bs);
-=20
-+    /*
-+     * Start with the new node's permissions.  If @new_bs is a (direct
-+     * or indirect) child of @old_bs, we must complete the permission
-+     * update on @new_bs before we loosen the restrictions on @old_bs.
-+     * Otherwise, bdrv_check_perm() on @old_bs would re-initiate
-+     * updating the permissions of @new_bs, and thus not purely loosen
-+     * restrictions.
-+     */
-+    if (new_bs) {
-+        bdrv_get_cumulative_perm(new_bs, &perm, &shared_perm);
-+        bdrv_set_perm(new_bs, perm, shared_perm);
-+    }
-+
-     if (old_bs) {
-         /* Update permissions for old node. This is guaranteed to succee=
-d
-          * because we're just taking a parent away, so we're loosening
-@@ -2252,11 +2265,6 @@ static void bdrv_replace_child(BdrvChild *child, B=
-lockDriverState *new_bs)
-          * node moves back to the main AioContext */
-         bdrv_try_set_aio_context(old_bs, qemu_get_aio_context(), NULL);
-     }
--
--    if (new_bs) {
--        bdrv_get_cumulative_perm(new_bs, &perm, &shared_perm);
--        bdrv_set_perm(new_bs, perm, shared_perm);
--    }
- }
-=20
- /*
---=20
-2.20.1
+v2: change interface to be just one flag BDRV_REQ_PREFETCH
+
+v1 was "[PATCH 0/3] block: blk_co_pcache"
+   https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg01047.html
+
+Vladimir Sementsov-Ogievskiy (3):
+  block: implement BDRV_REQ_PREFETCH
+  block/stream: use BDRV_REQ_PREFETCH
+  nbd: improve CMD_CACHE: use blk_co_pcache
+
+ include/block/block.h |  8 +++++++-
+ block/io.c            | 18 ++++++++++++------
+ block/stream.c        | 20 +++++++-------------
+ nbd/server.c          | 43 +++++++++++++++++++++++++++++++++++--------
+ 4 files changed, 61 insertions(+), 28 deletions(-)
+
+-- 
+2.18.0
 
 
