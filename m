@@ -2,81 +2,70 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99D70C31E51
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 12:06:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08535C31E5D
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 12:08:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BFB420679
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 12:06:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BFB420679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CB263208E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 12:08:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b="Tvdp1Fvm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB263208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56354 helo=lists.gnu.org)
+Received: from localhost ([::1]:56434 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdCss-0005QS-MG
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 08:06:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53802)
+	id 1hdCuy-0006ri-2h
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 08:08:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54877)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hdCpN-0002gb-PH
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 08:03:07 -0400
+ (envelope-from <kbastian@mail.uni-paderborn.de>) id 1hdCsW-00056C-Sl
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 08:06:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hdCpL-0005VW-KL
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 08:03:05 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:41659)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hdCpJ-0005OV-Jt
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 08:03:02 -0400
-Received: by mail-wr1-f68.google.com with SMTP id c2so13662999wrm.8
- for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 05:02:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=IGCHtVAKBdxxwabmbid3Uih1yuqLLDaIvPXVsbzNyHw=;
- b=tA5CRDXeTmQnLs6SgSmtHWxkyGT8RIsc4O7rxGQH4LzMIW5JqopEvU9HPvJOPRbK2l
- /JTs1ckUyKuidSB0m5cw/ANhwrmFSqTk8cTY1x6GNDdukRKWrBfhE4gSy8fTWJReEKPZ
- /9h5Qr/ot/ULPSHc91tRJvJJABL2vUoRnfeNzODHR1PjcE7V3r+T4CnADsOvODPYvbX5
- QRgPuHusBt8sOdDcqNLja2Y/9NQZz9ythNLh3Y+ZUpZlnk7gw3RLu4N1VCyD/zgdky+Z
- xv0NHQx9SNdIaRheCOdVbOgcpOjVXDiWW30J9yMF0URKY16r35Za/+1vbTWYSu9vMoXn
- uBQA==
-X-Gm-Message-State: APjAAAV0fzKtdIjmaX8IfmjJBvz6XFxDVdSKmG+7YQfBr8sxBNCCBo9C
- gmP3rc0MS9AvqkhTt6ibSJJUlQ==
-X-Google-Smtp-Source: APXvYqwLwe4+7Ft3fXs36NldqdpaROHdDP6l+tzZrt0H9bRKJPycHc6FJT7mons8HwH0f+LFAtHUHA==
-X-Received: by 2002:a5d:428d:: with SMTP id k13mr20040259wrq.142.1560859375317; 
- Tue, 18 Jun 2019 05:02:55 -0700 (PDT)
-Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.183])
- by smtp.gmail.com with ESMTPSA id l124sm3790128wmf.36.2019.06.18.05.02.54
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Tue, 18 Jun 2019 05:02:54 -0700 (PDT)
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20190531154735.20809-1-philmd@redhat.com>
- <20190531154735.20809-2-philmd@redhat.com> <878su09r38.fsf@zen.linaroharston>
- <ff40b72b-3dc3-2d34-e5e4-5d110247c620@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <80085fe0-d47c-29c0-8e1b-b1e2ca81c96f@redhat.com>
-Date: Tue, 18 Jun 2019 14:02:53 +0200
+ (envelope-from <kbastian@mail.uni-paderborn.de>) id 1hdCsU-0008Lq-EV
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 08:06:20 -0400
+Received: from zuban.uni-paderborn.de ([131.234.189.17]:56396)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+ id 1hdCsT-0008JI-7X
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 08:06:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=mail.uni-paderborn.de; s=20170601; h=Content-Transfer-Encoding:Content-Type
+ :In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:
+ Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+ Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+ List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+ bh=UpBc2gC0PNmBLe+ouO8lAHJvOj3PjD78VP1HxCCco7c=; b=Tvdp1FvmI+/zuNZ40kiLJmdg8g
+ 74JcVZASL4OB7y7Tuu9fnCyqF4RZx1bl7xyjc/4aOEAk3Q1L1R1fLoU3hxB7wiNhu9AKFNGSLxSDF
+ 1iRi2g5PkttID1tJBTgoO4ohqYWI0XreToqtXFz57QoSmUeMg86kSYaPp04RIkYkXoy4=;
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190617143533.15013-1-kbastian@mail.uni-paderborn.de>
+ <20190617143533.15013-4-kbastian@mail.uni-paderborn.de>
+ <b2f6e776-90e4-3809-350f-ce2bf6d69017@linaro.org>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <9d2149ef-57f5-c4b7-220c-81483b108f24@mail.uni-paderborn.de>
+Date: Tue, 18 Jun 2019 14:06:11 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-In-Reply-To: <ff40b72b-3dc3-2d34-e5e4-5d110247c620@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <b2f6e776-90e4-3809-350f-ce2bf6d69017@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US-large
+X-IMT-Spam-Score: 0.0 ()
+X-PMX-Version: 6.4.6.2792898, Antispam-Engine: 2.7.2.2107409,
+ Antispam-Data: 2019.6.18.115716, AntiVirus-Engine: 5.63.0,
+ AntiVirus-Data: 2019.6.4.5630002
+X-IMT-Authenticated-Sender: kbastian@UNI-PADERBORN.DE
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [RFC PATCH 1/2] target/arm: Add stubs to build
- with CONFIG_SEMIHOSTING disabled
+X-Received-From: 131.234.189.17
+Subject: Re: [Qemu-devel] [PATCH 3/3] target/tricore: Use translate_loop
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,105 +77,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <arikalo@wavecomp.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Miroslav Rezanina <mrezanin@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: david.brenken@efs-auto.de
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/17/19 5:33 PM, Philippe Mathieu-Daudé wrote:
-> On 6/17/19 5:19 PM, Alex Bennée wrote:
->> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
->>
->>> If a distribution wants to build QEMU without semihosting support,
->>> it currently gets this build failure:
->>>
->>>   $ ./configure --target-list=aarch64-softmmu --without-default-devices
->>>   $ sed -i s/CONFIG_SEMIHOSTING=y/CONFIG_SEMIHOSTING=n/default-configs/arm-softmmu.mak
->>
->> I'm still not convinced we should be adding support for stuff being done
->> outside the normal build process...
-> 
-> If the "KVM/TCG split" series is accepted, then we can add a
-> --disable-tcg job in the list of "normal builds" and we don't need this
-> particular patch.
-> 
->> that said...
->>
->>>   $ make subdir-aarch64-softmmu
->>>   [...]
->>>     LINK    aarch64-softmmu/qemu-system-aarch64
->>>   /usr/bin/ld: target/arm/arm-semi.o: in function `do_arm_semihosting':
->>>   ./target/arm/arm-semi.c:321: undefined reference to `qemu_semihosting_console_out'
->>>   /usr/bin/ld: ./target/arm/arm-semi.c:318: undefined reference to `qemu_semihosting_console_out'
->>>   collect2: error: ld returned 1 exit status
->>>   make[1]: *** [Makefile:204: qemu-system-aarch64] Error 1
->>>   make: *** [Makefile:472: subdir-aarch64-softmmu] Error 2
->>>
->>> Fix it by providing a stub when semihosting is disabled.
->>>
->>> Reported-by: Miroslav Rezanina <mrezanin@redhat.com>
->>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>> ---
->>>  target/arm/Makefile.objs    |  3 ++-
->>>  target/arm/arm-semi-stubs.c | 21 +++++++++++++++++++++
->>>  2 files changed, 23 insertions(+), 1 deletion(-)
->>>  create mode 100644 target/arm/arm-semi-stubs.c
->>>
->>> diff --git a/target/arm/Makefile.objs b/target/arm/Makefile.objs
->>> index 6bdcc65c2c..39b02b1fa4 100644
->>> --- a/target/arm/Makefile.objs
->>> +++ b/target/arm/Makefile.objs
->>> @@ -1,4 +1,5 @@
->>> -obj-y += arm-semi.o
->>> +obj-$(CONFIG_SEMIHOSTING) += arm-semi.o
->>> +obj-$(call lnot,$(CONFIG_SEMIHOSTING)) += arm-semi-stubs.o
->>>  obj-$(CONFIG_SOFTMMU) += machine.o psci.o arch_dump.o monitor.o
->>>  obj-$(CONFIG_KVM) += kvm.o
->>>  obj-$(call land,$(CONFIG_KVM),$(call lnot,$(TARGET_AARCH64))) += kvm32.o
->>> diff --git a/target/arm/arm-semi-stubs.c b/target/arm/arm-semi-stubs.c
->>> new file mode 100644
->>> index 0000000000..a91ecbd9d5
->>> --- /dev/null
->>> +++ b/target/arm/arm-semi-stubs.c
->>> @@ -0,0 +1,21 @@
->>> +/*
->>> + *  Arm "Angel" semihosting stubs
->>> + *
->>> + * Copyright (c) 2019 Red Hat, Inc.
->>> + *
->>> + * Author:
->>> + *   Philippe Mathieu-Daudé <philmd@redhat.com>
->>> + *
->>> + * SPDX-License-Identifier: GPL-2.0-or-later
->>> + *
->>> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
->>> + * See the COPYING file in the top-level directory.
->>> + */
->>> +
->>> +#include "qemu/osdep.h"
->>> +#include "cpu.h"
->>> +
->>> +target_ulong do_arm_semihosting(CPUARMState *env)
->>> +{
->>> +    g_assert_not_reached();
->>> +}
->>
->> Could this not just be added to arm-semi.c in an
->>
->>   #ifndef CONFIG_SEMIHOSTING
->>   target_ulong do_arm_semihosting(CPUARMState *env)
->>   {
->>       g_assert_not_reached();
->>   }
->>   #else
->>   ... rest of arm-semi.c....
->>   #endif
 
-Note that CONFIG_SEMIHOSTING is a Make definition, not a CPP one,
-and it doesn't look straight forward to get it added to config-target.h...
+On 6/17/19 6:45 PM, Richard Henderson wrote:
+> On 6/17/19 7:35 AM, Bastian Koppelmann wrote:
+>> +static void tricore_tr_init_disas_context(DisasContextBase *dcbase,
+>> +                                          CPUState *cs)
+>>   {
+>> +    DisasContext *ctx = container_of(dcbase, DisasContext, base);
+>>       CPUTriCoreState *env = cs->env_ptr;
+>> +    ctx->base.pc_next = ctx->base.pc_first;
+> This is already done in generic code.
+>
+> I don't see an initialization of hflags & saved_hflags?
+> Although I don't see that either before or afterward...
+Yes, I mentioned this problem in David's patch 
+(https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg01058.html). 
+If he doesn't fix it, I will in a follow-up patch.
+>
+>> +static bool tricore_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
+>> +                                      const CPUBreakpoint *bp)
+>> +{
+>> +    return true;
+>> +}
+> Not supporting breakpoints, I think it's better to return false here.
+>
+> Although it's not difficult -- just raise EXCP_DEBUG as an exception.
+> It'd be nice to follow up and fix this afterward.
+Yes, I will do that.
+>
+>> +static void tricore_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
+>> +{
+>> +    DisasContext *ctx = container_of(dcbase, DisasContext, base);
+>> +    CPUTriCoreState *env = cpu->env_ptr;
+>> +
+>> +    ctx->opcode = cpu_ldl_code(env, ctx->base.pc_next);
+>> +    decode_opc(ctx);
+>> +    ctx->base.pc_next = ctx->pc_succ_insn;
+>> +
+>> +    if (ctx->base.is_jmp == DISAS_NEXT) {
+>> +        target_ulong page_start;
+>> +
+>> +        page_start = ctx->base.pc_first & TARGET_PAGE_MASK;
+>> +        if (ctx->base.pc_next - page_start >= TARGET_PAGE_SIZE) {
+>> +            ctx->base.is_jmp = DISAS_TOO_MANY;
+>>           }
+> This isn't perfect as an ending, but you didn't seem to have one at all before,
+> so I guess improvements can come incrementally afterward.
+>
+> Have a look at the end of thumb_tr_translate_insn & insn_crosses_page to see
+> how to handle this properly.
+
+I copied it more or less from target/riscv. I guess that needs fixing as 
+well :)
+
+Cheers,
+
+Bastian
+
+
 
