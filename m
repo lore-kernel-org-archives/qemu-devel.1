@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75E39C31E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 14:23:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFC21C31E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 14:26:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F70D213F2
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 14:23:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F70D213F2
+	by mail.kernel.org (Postfix) with ESMTPS id 78D9F213F2
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 14:26:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78D9F213F2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58500 helo=lists.gnu.org)
+Received: from localhost ([::1]:58510 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdF1f-0006I7-I2
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 10:23:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60239)
+	id 1hdF4B-0007rX-Ou
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 10:26:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60140)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hdEq1-0002zM-G9
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:11:58 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hdEps-0002w3-Ba
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:11:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hdEpq-00081X-3w
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:11:47 -0400
-Received: from mail03.asahi-net.or.jp ([202.224.55.15]:57067)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hdEpk-0007uY-Em
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:11:42 -0400
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:35000)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hdEpl-0007uh-IC
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:11:39 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hdEpi-0007mo-St
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:11:35 -0400
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
  [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 8C0994A2E6;
- Tue, 18 Jun 2019 23:11:35 +0900 (JST)
+ by mail02.asahi-net.or.jp (Postfix) with ESMTPA id B398243F18;
+ Tue, 18 Jun 2019 23:11:29 +0900 (JST)
 Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
  [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 3BA9D240086;
- Tue, 18 Jun 2019 23:11:35 +0900 (JST)
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 5EA79240086;
+ Tue, 18 Jun 2019 23:11:29 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Date: Tue, 18 Jun 2019 23:11:07 +0900
-Message-Id: <20190618141118.52955-29-ysato@users.sourceforge.jp>
+Date: Tue, 18 Jun 2019 23:10:49 +0900
+Message-Id: <20190618141118.52955-11-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.11.0
 In-Reply-To: <20190618141118.52955-1-ysato@users.sourceforge.jp>
 References: <20190618141118.52955-1-ysato@users.sourceforge.jp>
@@ -52,8 +52,8 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 202.224.55.15
-Subject: [Qemu-devel] [PATCH v21 15/21] hw/rx: RX Target hardware definition
+X-Received-From: 202.224.55.14
+Subject: [Qemu-devel] [PATCH v21 06/21] target/rx: CPU definition
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,68 +71,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-rx62n - RX62N cpu.
-rx-virt - RX QEMU virtual target.
-
-v21 changes.
-rx_load_image move to rx-virt.c
+v21 changes
+Add cpu-param.h
+Remove CPU_COMMON
+rx_load_image move to rx-virt.
 
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 
-Message-Id: <20190616142836.10614-17-ysato@users.sourceforge.jp>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190607091116.49044-9-ysato@users.sourceforge.jp>
+Message-Id: <20190616142836.10614-4-ysato@users.sourceforge.jp>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20190607091116.49044-4-ysato@users.sourceforge.jp>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-[PMD: Use TYPE_RX62N_CPU, use #define for RX62N_NR_TMR/CMT/SCI,
- renamed CPU -> MCU, device -> microcontroller]
+[PMD: Use newer QOM style, split cpu-qom.h, restrict access to
+ extable array, use rx_cpu_tlb_fill() extracted from patch of
+ Yoshinori Sato 'Convert to CPUClass::tlb_fill']
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-v19: Fixed typo (Peter Maydell)
+
+cpu.c: remove rx_load_image
 
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 ---
- include/hw/rx/rx.h    |   7 ++
- include/hw/rx/rx62n.h |  91 +++++++++++++++++++
- hw/rx/rx-virt.c       | 127 +++++++++++++++++++++++++++
- hw/rx/rx62n.c         | 238 ++++++++++++++++++++++++++++++++++++++++++++=
+ target/rx/cpu-param.h |  31 ++++++++
+ target/rx/cpu-qom.h   |  42 ++++++++++
+ target/rx/cpu.h       | 182 ++++++++++++++++++++++++++++++++++++++++++
+ target/rx/cpu.c       | 217 ++++++++++++++++++++++++++++++++++++++++++++=
 ++++++
- hw/rx/Kconfig         |  14 +++
- hw/rx/Makefile.objs   |   2 +
- 6 files changed, 479 insertions(+)
- create mode 100644 include/hw/rx/rx.h
- create mode 100644 include/hw/rx/rx62n.h
- create mode 100644 hw/rx/rx-virt.c
- create mode 100644 hw/rx/rx62n.c
- create mode 100644 hw/rx/Kconfig
- create mode 100644 hw/rx/Makefile.objs
+ target/rx/gdbstub.c   | 112 ++++++++++++++++++++++++++
+ target/rx/monitor.c   |  38 +++++++++
+ 6 files changed, 622 insertions(+)
+ create mode 100644 target/rx/cpu-param.h
+ create mode 100644 target/rx/cpu-qom.h
+ create mode 100644 target/rx/cpu.h
+ create mode 100644 target/rx/cpu.c
+ create mode 100644 target/rx/gdbstub.c
+ create mode 100644 target/rx/monitor.c
 
-diff --git a/include/hw/rx/rx.h b/include/hw/rx/rx.h
+diff --git a/target/rx/cpu-param.h b/target/rx/cpu-param.h
 new file mode 100644
-index 0000000000..ff5924b81f
+index 0000000000..5da87fbebe
 --- /dev/null
-+++ b/include/hw/rx/rx.h
-@@ -0,0 +1,7 @@
-+#ifndef QEMU_RX_H
-+#define QEMU_RX_H
-+/* Definitions for RX board emulation.  */
-+
-+#include "target/rx/cpu-qom.h"
-+
-+#endif
-diff --git a/include/hw/rx/rx62n.h b/include/hw/rx/rx62n.h
-new file mode 100644
-index 0000000000..97ea8ddb8e
---- /dev/null
-+++ b/include/hw/rx/rx62n.h
-@@ -0,0 +1,91 @@
++++ b/target/rx/cpu-param.h
+@@ -0,0 +1,31 @@
 +/*
-+ * RX62N MCU Object
++ *  RX cpu parameters
 + *
-+ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
-+ * (Rev.1.40 R01UH0033EJ0140)
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
++ *  Copyright (c) 2019 Yoshinori Sato
 + *
 + * This program is free software; you can redistribute it and/or modify =
 it
@@ -151,86 +134,77 @@ ng with
 + * this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#ifndef HW_RX_RX62N_H
-+#define HW_RX_RX62N_H
++#ifndef RX_CPU_PARAM_H
++#define RX_CPU_PARAM_H
 +
-+#include "hw/sysbus.h"
-+#include "hw/intc/rx_icu.h"
-+#include "hw/timer/renesas_tmr.h"
-+#include "hw/timer/renesas_cmt.h"
-+#include "hw/char/renesas_sci.h"
-+#include "target/rx/cpu.h"
-+#include "qemu/units.h"
++#define TARGET_LONG_BITS 32
++#define TARGET_PAGE_BITS 12
 +
-+#define TYPE_RX62N "rx62n"
-+#define RX62N(obj) OBJECT_CHECK(RX62NState, (obj), TYPE_RX62N)
++#define TARGET_PHYS_ADDR_SPACE_BITS 32
++#define TARGET_VIRT_ADDR_SPACE_BITS 32
 +
-+#define RX62N_NR_TMR    2
-+#define RX62N_NR_CMT    2
-+#define RX62N_NR_SCI    6
++#define NB_MMU_MODES 1
++#define MMU_MODE0_SUFFIX _all
 +
-+typedef struct RX62NState {
-+    SysBusDevice parent_obj;
-+
-+    RXCPU cpu;
-+    RXICUState icu;
-+    RTMRState tmr[RX62N_NR_TMR];
-+    RCMTState cmt[RX62N_NR_CMT];
-+    RSCIState sci[RX62N_NR_SCI];
-+
-+    MemoryRegion *sysmem;
-+    bool kernel;
-+
-+    MemoryRegion iram;
-+    MemoryRegion iomem1;
-+    MemoryRegion d_flash;
-+    MemoryRegion iomem2;
-+    MemoryRegion iomem3;
-+    MemoryRegion c_flash;
-+    qemu_irq irq[NR_IRQS];
-+} RX62NState;
-+
-+/*
-+ * RX62N Peripheral Address
-+ * See users manual section 5
-+ */
-+#define RX62N_ICUBASE 0x00087000
-+#define RX62N_TMRBASE 0x00088200
-+#define RX62N_CMTBASE 0x00088000
-+#define RX62N_SCIBASE 0x00088240
-+
-+/*
-+ * RX62N Peripheral IRQ
-+ * See users manual section 11
-+ */
-+#define RX62N_TMR_IRQBASE 174
-+#define RX62N_CMT_IRQBASE 28
-+#define RX62N_SCI_IRQBASE 214
-+
-+/*
-+ * RX62N Internal Memory
-+ * It is the value of R5F562N8.
-+ * Please change the size for R5F562N7.
-+ */
-+#define RX62N_IRAM_BASE 0x00000000
-+#define RX62N_IRAM_SIZE (96 * KiB)
-+#define RX62N_DFLASH_BASE 0x00100000
-+#define RX62N_DFLASH_SIZE (32 * KiB)
-+#define RX62N_CFLASH_BASE 0xfff80000
-+#define RX62N_CFLASH_SIZE (512 * KiB)
-+
-+#define RX62N_PCLK (48 * 1000 * 1000)
 +#endif
-diff --git a/hw/rx/rx-virt.c b/hw/rx/rx-virt.c
+diff --git a/target/rx/cpu-qom.h b/target/rx/cpu-qom.h
 new file mode 100644
-index 0000000000..4cfe2e3123
+index 0000000000..4ae3b38b3e
 --- /dev/null
-+++ b/hw/rx/rx-virt.c
-@@ -0,0 +1,127 @@
++++ b/target/rx/cpu-qom.h
+@@ -0,0 +1,42 @@
++#ifndef QEMU_SUPERH_CPU_QOM_H
++#define QEMU_SUPERH_CPU_QOM_H
++
++#include "qom/cpu.h"
 +/*
-+ * RX QEMU virtual platform
++ * RX CPU
 + *
 + * Copyright (c) 2019 Yoshinori Sato
++ * SPDX-License-Identifier: LGPL-2.0+
++ */
++
++#define TYPE_RX_CPU "rx-cpu"
++
++#define TYPE_RX62N_CPU RX_CPU_TYPE_NAME("rx62n")
++
++#define RXCPU_CLASS(klass) \
++    OBJECT_CLASS_CHECK(RXCPUClass, (klass), TYPE_RX_CPU)
++#define RXCPU(obj) \
++    OBJECT_CHECK(RXCPU, (obj), TYPE_RX_CPU)
++#define RXCPU_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(RXCPUClass, (obj), TYPE_RX_CPU)
++
++/*
++ * RXCPUClass:
++ * @parent_realize: The parent class' realize handler.
++ * @parent_reset: The parent class' reset handler.
++ *
++ * A RX CPU model.
++ */
++typedef struct RXCPUClass {
++    /*< private >*/
++    CPUClass parent_class;
++    /*< public >*/
++
++    DeviceRealize parent_realize;
++    void (*parent_reset)(CPUState *cpu);
++
++} RXCPUClass;
++
++#define CPUArchState struct CPURXState
++
++#endif
+diff --git a/target/rx/cpu.h b/target/rx/cpu.h
+new file mode 100644
+index 0000000000..3f9c4fdd25
+--- /dev/null
++++ b/target/rx/cpu.h
+@@ -0,0 +1,182 @@
++/*
++ *  RX emulation definition
++ *
++ *  Copyright (c) 2019 Yoshinori Sato
 + *
 + * This program is free software; you can redistribute it and/or modify =
 it
@@ -249,127 +223,180 @@ ng with
 + * this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
++#ifndef RX_CPU_H
++#define RX_CPU_H
++
++#include "qemu/bitops.h"
 +#include "qemu-common.h"
-+#include "cpu.h"
-+#include "hw/hw.h"
-+#include "hw/sysbus.h"
-+#include "hw/loader.h"
-+#include "hw/rx/rx62n.h"
-+#include "sysemu/sysemu.h"
-+#include "sysemu/qtest.h"
-+#include "sysemu/device_tree.h"
-+#include "hw/boards.h"
++#include "hw/registerfields.h"
++#include "cpu-qom.h"
++#include "qom/cpu.h"
 +
-+/* Same address of GDB integrated simulator */
-+#define SDRAM_BASE 0x01000000
++#include "exec/cpu-defs.h"
 +
-+static void rx_load_image(RXCPU *cpu, const char *filename,
-+                          uint32_t start, uint32_t size)
-+{
-+    static uint32_t extable[32];
-+    long kernel_size;
-+    int i;
++/* PSW define */
++REG32(PSW, 0)
++FIELD(PSW, C, 0, 1)
++FIELD(PSW, Z, 1, 1)
++FIELD(PSW, S, 2, 1)
++FIELD(PSW, O, 3, 1)
++FIELD(PSW, I, 16, 1)
++FIELD(PSW, U, 17, 1)
++FIELD(PSW, PM, 20, 1)
++FIELD(PSW, IPL, 24, 4)
 +
-+    kernel_size =3D load_image_targphys(filename, start, size);
-+    if (kernel_size < 0) {
-+        fprintf(stderr, "qemu: could not load kernel '%s'\n", filename);
-+        exit(1);
-+    }
-+    cpu->env.pc =3D start;
++/* FPSW define */
++REG32(FPSW, 0)
++FIELD(FPSW, RM, 0, 2)
++FIELD(FPSW, CV, 2, 1)
++FIELD(FPSW, CO, 3, 1)
++FIELD(FPSW, CZ, 4, 1)
++FIELD(FPSW, CU, 5, 1)
++FIELD(FPSW, CX, 6, 1)
++FIELD(FPSW, CE, 7, 1)
++FIELD(FPSW, CAUSE, 2, 6)
++FIELD(FPSW, DN, 8, 1)
++FIELD(FPSW, EV, 10, 1)
++FIELD(FPSW, EO, 11, 1)
++FIELD(FPSW, EZ, 12, 1)
++FIELD(FPSW, EU, 13, 1)
++FIELD(FPSW, EX, 14, 1)
++FIELD(FPSW, ENABLE, 10, 5)
++FIELD(FPSW, FV, 26, 1)
++FIELD(FPSW, FO, 27, 1)
++FIELD(FPSW, FZ, 28, 1)
++FIELD(FPSW, FU, 29, 1)
++FIELD(FPSW, FX, 30, 1)
++FIELD(FPSW, FLAGS, 26, 4)
++FIELD(FPSW, FS, 31, 1)
 +
-+    /* setup exception trap trampoline */
-+    /* linux kernel only works little-endian mode */
-+    for (i =3D 0; i < ARRAY_SIZE(extable); i++) {
-+        extable[i] =3D cpu_to_le32(0x10 + i * 4);
-+    }
-+    rom_add_blob_fixed("extable", extable, sizeof(extable), 0xffffff80);
-+}
-+
-+static void rxvirt_init(MachineState *machine)
-+{
-+    RX62NState *s =3D g_new(RX62NState, 1);
-+    MemoryRegion *sysmem =3D get_system_memory();
-+    MemoryRegion *sdram =3D g_new(MemoryRegion, 1);
-+    const char *kernel_filename =3D machine->kernel_filename;
-+    const char *dtb_filename =3D machine->dtb;
-+    void *dtb =3D NULL;
-+    int dtb_size;
-+
-+    /* Allocate memory space */
-+    memory_region_init_ram(sdram, NULL, "sdram", 16 * MiB,
-+                           &error_fatal);
-+    memory_region_add_subregion(sysmem, SDRAM_BASE, sdram);
-+
-+    /* Initialize MCU */
-+    object_initialize_child(OBJECT(machine), "mcu", s,
-+                            sizeof(RX62NState), TYPE_RX62N,
-+                            &error_fatal, NULL);
-+    object_property_set_link(OBJECT(s), OBJECT(get_system_memory()),
-+                             "memory", &error_abort);
-+    object_property_set_bool(OBJECT(s), kernel_filename !=3D NULL,
-+                             "load-kernel", &error_abort);
-+    object_property_set_bool(OBJECT(s), true, "realized", &error_abort);
-+
-+    /* Load kernel and dtb */
-+    if (kernel_filename) {
-+        rx_load_image(RXCPU(first_cpu), kernel_filename,
-+                      SDRAM_BASE + 8 * MiB, 8 * MiB);
-+        if (dtb_filename) {
-+            dtb =3D load_device_tree(dtb_filename, &dtb_size);
-+            if (dtb =3D=3D NULL) {
-+                fprintf(stderr, "Couldn't open dtb file %s\n", dtb_filen=
-ame);
-+                exit(1);
-+            }
-+            if (machine->kernel_cmdline &&
-+                qemu_fdt_setprop_string(dtb, "/chosen", "bootargs",
-+                                        machine->kernel_cmdline) < 0) {
-+                fprintf(stderr, "couldn't set /chosen/bootargs\n");
-+                exit(1);
-+            }
-+            rom_add_blob_fixed("dtb", dtb, dtb_size,
-+                               SDRAM_BASE + 16 * MiB - dtb_size);
-+            /* Set dtb address to R1 */
-+            RXCPU(first_cpu)->env.regs[1] =3D 0x02000000 - dtb_size;
-+        }
-+    }
-+}
-+
-+static void rxvirt_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc =3D MACHINE_CLASS(oc);
-+
-+    mc->desc =3D "RX QEMU Virtual Target";
-+    mc->init =3D rxvirt_init;
-+    mc->is_default =3D 1;
-+    mc->default_cpu_type =3D TYPE_RX62N_CPU;
-+}
-+
-+static const TypeInfo rxvirt_type =3D {
-+    .name =3D MACHINE_TYPE_NAME("rx-virt"),
-+    .parent =3D TYPE_MACHINE,
-+    .class_init =3D rxvirt_class_init,
++enum {
++    NUM_REGS =3D 16,
 +};
 +
-+static void rxvirt_machine_init(void)
++typedef struct CPURXState {
++    /* CPU registers */
++    uint32_t regs[NUM_REGS];    /* general registers */
++    uint32_t psw_o;             /* O bit of status register */
++    uint32_t psw_s;             /* S bit of status register */
++    uint32_t psw_z;             /* Z bit of status register */
++    uint32_t psw_c;             /* C bit of status register */
++    uint32_t psw_u;
++    uint32_t psw_i;
++    uint32_t psw_pm;
++    uint32_t psw_ipl;
++    uint32_t bpsw;              /* backup status */
++    uint32_t bpc;               /* backup pc */
++    uint32_t isp;               /* global base register */
++    uint32_t usp;               /* vector base register */
++    uint32_t pc;                /* program counter */
++    uint32_t intb;              /* interrupt vector */
++    uint32_t fintv;
++    uint32_t fpsw;
++    uint64_t acc;
++
++    /* Fields up to this point are cleared by a CPU reset */
++    struct {} end_reset_fields;
++
++    /* Internal use */
++    uint32_t in_sleep;
++    uint32_t req_irq;           /* Requested interrupt no (hard) */
++    uint32_t req_ipl;           /* Requested interrupt level */
++    uint32_t ack_irq;           /* execute irq */
++    uint32_t ack_ipl;           /* execute ipl */
++    float_status fp_status;
++    qemu_irq ack;               /* Interrupt acknowledge */
++} CPURXState;
++
++/*
++ * RXCPU:
++ * @env: #CPURXState
++ *
++ * A RX CPU
++ */
++struct RXCPU {
++    /*< private >*/
++    CPUState parent_obj;
++    /*< public >*/
++
++    CPUNegativeOffsetState neg;
++    CPURXState env;
++};
++
++typedef struct RXCPU RXCPU;
++typedef RXCPU ArchCPU;
++
++#define ENV_OFFSET offsetof(RXCPU, env)
++
++#define RX_CPU_TYPE_SUFFIX "-" TYPE_RX_CPU
++#define RX_CPU_TYPE_NAME(model) model RX_CPU_TYPE_SUFFIX
++#define CPU_RESOLVING_TYPE TYPE_RX_CPU
++
++extern const char rx_crname[][6];
++
++void rx_cpu_do_interrupt(CPUState *cpu);
++bool rx_cpu_exec_interrupt(CPUState *cpu, int int_req);
++void rx_cpu_dump_state(CPUState *cpu, FILE *f, int flags);
++int rx_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
++int rx_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
++hwaddr rx_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
++
++void rx_translate_init(void);
++int cpu_rx_signal_handler(int host_signum, void *pinfo,
++                           void *puc);
++
++void rx_cpu_list(void);
++void rx_cpu_unpack_psw(CPURXState *env, uint32_t psw, int rte);
++
++#define cpu_signal_handler cpu_rx_signal_handler
++#define cpu_list rx_cpu_list
++
++#include "exec/cpu-all.h"
++
++#define CPU_INTERRUPT_SOFT CPU_INTERRUPT_TGT_INT_0
++#define CPU_INTERRUPT_FIR  CPU_INTERRUPT_TGT_INT_1
++
++#define RX_CPU_IRQ 0
++#define RX_CPU_FIR 1
++
++static inline void cpu_get_tb_cpu_state(CPURXState *env, target_ulong *p=
+c,
++                                        target_ulong *cs_base, uint32_t =
+*flags)
 +{
-+    type_register_static(&rxvirt_type);
++    *pc =3D env->pc;
++    *cs_base =3D 0;
++    *flags =3D FIELD_DP32(0, PSW, PM, env->psw_pm);
 +}
 +
-+type_init(rxvirt_machine_init)
-diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
++static inline int cpu_mmu_index(CPURXState *env, bool ifetch)
++{
++    return 0;
++}
++
++static inline uint32_t rx_cpu_pack_psw(CPURXState *env)
++{
++    uint32_t psw =3D 0;
++    psw =3D FIELD_DP32(psw, PSW, IPL, env->psw_ipl);
++    psw =3D FIELD_DP32(psw, PSW, PM,  env->psw_pm);
++    psw =3D FIELD_DP32(psw, PSW, U,   env->psw_u);
++    psw =3D FIELD_DP32(psw, PSW, I,   env->psw_i);
++    psw =3D FIELD_DP32(psw, PSW, O,   env->psw_o >> 31);
++    psw =3D FIELD_DP32(psw, PSW, S,   env->psw_s >> 31);
++    psw =3D FIELD_DP32(psw, PSW, Z,   env->psw_z =3D=3D 0);
++    psw =3D FIELD_DP32(psw, PSW, C,   env->psw_c);
++    return psw;
++}
++
++#endif /* RX_CPU_H */
+diff --git a/target/rx/cpu.c b/target/rx/cpu.c
 new file mode 100644
-index 0000000000..74d2fd0ee3
+index 0000000000..ea38639f47
 --- /dev/null
-+++ b/hw/rx/rx62n.c
-@@ -0,0 +1,238 @@
++++ b/target/rx/cpu.c
+@@ -0,0 +1,217 @@
 +/*
-+ * RX62N Microcontroller
-+ *
-+ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
-+ * (Rev.1.40 R01UH0033EJ0140)
++ * QEMU RX CPU
 + *
 + * Copyright (c) 2019 Yoshinori Sato
 + *
@@ -391,257 +418,386 @@ ng with
 + */
 +
 +#include "qemu/osdep.h"
++#include "qemu/qemu-print.h"
 +#include "qapi/error.h"
-+#include "hw/hw.h"
-+#include "hw/rx/rx62n.h"
-+#include "hw/loader.h"
-+#include "hw/sysbus.h"
-+#include "sysemu/sysemu.h"
 +#include "cpu.h"
++#include "qemu-common.h"
++#include "migration/vmstate.h"
++#include "exec/exec-all.h"
++#include "hw/loader.h"
++#include "fpu/softfloat.h"
 +
-+/*
-+ * IRQ -> IPR mapping table
-+ * 0x00 - 0x91: IPR no (IPR00 to IPR91)
-+ * 0xff: IPR not assigned
-+ * See "11.3.1 Interrupt Vector Table" in hardware manual.
-+ */
-+static const int ipr_table[NR_IRQS] =3D {
-+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* 15 */
-+    0x00, 0xff, 0xff, 0xff, 0xff, 0x01, 0xff, 0x02,
-+    0xff, 0xff, 0xff, 0x03, 0x04, 0x05, 0x06, 0x07, /* 31 */
-+    0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-+    0x10, 0x11, 0x12, 0x13, 0x14, 0x14, 0x14, 0x14, /* 47 */
-+    0x15, 0x15, 0x15, 0x15, 0xff, 0xff, 0xff, 0xff,
-+    0x18, 0x18, 0x18, 0x18, 0x18, 0x1d, 0x1e, 0x1f, /* 63 */
-+    0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
-+    0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, /* 79 */
-+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+    0xff, 0xff, 0x3a, 0x3b, 0x3c, 0xff, 0xff, 0xff, /* 95 */
-+    0x40, 0xff, 0x44, 0x45, 0xff, 0xff, 0x48, 0xff,
-+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* 111 */
-+    0xff, 0xff, 0x51, 0x51, 0x51, 0x51, 0x52, 0x52,
-+    0x52, 0x53, 0x53, 0x54, 0x54, 0x55, 0x55, 0x56, /* 127 */
-+    0x56, 0x57, 0x57, 0x57, 0x57, 0x58, 0x59, 0x59,
-+    0x59, 0x59, 0x5a, 0x5b, 0x5b, 0x5b, 0x5c, 0x5c, /* 143 */
-+    0x5c, 0x5c, 0x5d, 0x5d, 0x5d, 0x5e, 0x5e, 0x5f,
-+    0x5f, 0x60, 0x60, 0x61, 0x61, 0x62, 0x62, 0x62, /* 159 */
-+    0x62, 0x63, 0x64, 0x64, 0x64, 0x64, 0x65, 0x66,
-+    0x66, 0x66, 0x67, 0x67, 0x67, 0x67, 0x68, 0x68, /* 175 */
-+    0x68, 0x69, 0x69, 0x69, 0x6a, 0x6a, 0x6a, 0x6b,
-+    0x6b, 0x6b, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* 191 */
-+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x70, 0x71,
-+    0x72, 0x73, 0x74, 0x75, 0xff, 0xff, 0xff, 0xff, /* 207 */
-+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x80, 0x80,
-+    0x80, 0x80, 0x81, 0x81, 0x81, 0x81, 0x82, 0x82, /* 223 */
-+    0x82, 0x82, 0x83, 0x83, 0x83, 0x83, 0xff, 0xff,
-+    0xff, 0xff, 0x85, 0x85, 0x85, 0x85, 0x86, 0x86, /* 239 */
-+    0x86, 0x86, 0xff, 0xff, 0xff, 0xff, 0x88, 0x89,
-+    0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, 0x90, 0x91, /* 255 */
-+};
-+
-+/*
-+ * Level triggerd IRQ list
-+ * Not listed IRQ is Edge trigger.
-+ * See "11.3.1 Interrupt Vector Table" in hardware manual.
-+ */
-+static const uint32_t levelirq[] =3D {
-+     16,  21,  32,  44,  47,  48,  51,  64,  65,  66,
-+     67,  68,  69,  70,  71,  72,  73,  74,  75,  76,
-+     77,  78,  79,  90,  91, 170, 171, 172, 173, 214,
-+    217, 218, 221, 222, 225, 226, 229, 234, 237, 238,
-+    241, 246, 249, 250, 253,
-+};
-+
-+static void register_icu(RX62NState *s)
++static void rx_cpu_set_pc(CPUState *cs, vaddr value)
 +{
-+    int i;
-+    SysBusDevice *icu;
++    RXCPU *cpu =3D RXCPU(cs);
 +
-+    object_initialize_child(OBJECT(s), "icu", &s->icu, sizeof(RXICUState=
-),
-+                            TYPE_RXICU, &error_abort, NULL);
-+
-+    icu =3D SYS_BUS_DEVICE(&s->icu);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(icu), 0, RX62N_ICUBASE);
-+    qdev_prop_set_uint32(DEVICE(icu), "len-ipr-map", NR_IRQS);
-+    for (i =3D 0; i < NR_IRQS; i++) {
-+        char propname[32];
-+        snprintf(propname, sizeof(propname), "ipr-map[%d]", i);
-+        qdev_prop_set_uint32(DEVICE(icu), propname, ipr_table[i]);
-+    }
-+    qdev_prop_set_uint32(DEVICE(icu), "len-trigger-level",
-+                         ARRAY_SIZE(levelirq));
-+    for (i =3D 0; i < ARRAY_SIZE(levelirq); i++) {
-+        char propname[32];
-+        snprintf(propname, sizeof(propname), "trigger-level[%d]", i);
-+        qdev_prop_set_uint32(DEVICE(icu), propname, levelirq[i]);
-+    }
-+
-+    for (i =3D 0; i < NR_IRQS; i++) {
-+        s->irq[i] =3D qdev_get_gpio_in(DEVICE(icu), i);
-+    }
-+
-+    qdev_init_nofail(DEVICE(icu));
-+    sysbus_connect_irq(icu, 0, qdev_get_gpio_in(DEVICE(&s->cpu), RX_CPU_=
-IRQ));
-+    sysbus_connect_irq(icu, 1, qdev_get_gpio_in(DEVICE(&s->cpu), RX_CPU_=
-FIR));
-+    sysbus_connect_irq(icu, 2, s->irq[SWI]);
-+
++    cpu->env.pc =3D value;
 +}
 +
-+static void register_tmr(RX62NState *s, int unit)
++static void rx_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *t=
+b)
 +{
-+    SysBusDevice *tmr;
-+    int i, irqbase;
++    RXCPU *cpu =3D RXCPU(cs);
 +
-+    object_initialize_child(OBJECT(s), "tmr[*]", &s->tmr[unit],
-+                            sizeof(RTMRState), TYPE_RENESAS_TMR,
-+                            &error_abort, NULL);
-+
-+    tmr =3D SYS_BUS_DEVICE(&s->tmr[unit]);
-+    sysbus_mmio_map(tmr, 0, RX62N_TMRBASE + unit * 0x10);
-+    qdev_prop_set_uint64(DEVICE(tmr), "input-freq", RX62N_PCLK);
-+
-+    qdev_init_nofail(DEVICE(tmr));
-+    irqbase =3D RX62N_TMR_IRQBASE + TMR_NR_IRQ * unit;
-+    for (i =3D 0; i < TMR_NR_IRQ; i++) {
-+        sysbus_connect_irq(tmr, i, s->irq[irqbase + i]);
-+    }
++    cpu->env.pc =3D tb->pc;
 +}
 +
-+static void register_cmt(RX62NState *s, int unit)
++static bool rx_cpu_has_work(CPUState *cs)
 +{
-+    SysBusDevice *cmt;
-+    int i, irqbase;
++    return cs->interrupt_request &
++        (CPU_INTERRUPT_HARD | CPU_INTERRUPT_FIR);
++}
 +
-+    object_initialize_child(OBJECT(s), "cmt[*]", &s->cmt[unit],
-+                            sizeof(RCMTState), TYPE_RENESAS_CMT,
-+                            &error_abort, NULL);
++static void rx_cpu_reset(CPUState *s)
++{
++    RXCPU *cpu =3D RXCPU(s);
++    RXCPUClass *rcc =3D RXCPU_GET_CLASS(cpu);
++    CPURXState *env =3D &cpu->env;
++    uint32_t *resetvec;
 +
-+    cmt =3D SYS_BUS_DEVICE(&s->cmt[unit]);
-+    sysbus_mmio_map(cmt, 0, RX62N_CMTBASE + unit * 0x10);
-+    qdev_prop_set_uint64(DEVICE(cmt), "input-freq", RX62N_PCLK);
++    rcc->parent_reset(s);
 +
-+    qdev_init_nofail(DEVICE(cmt));
-+    irqbase =3D RX62N_CMT_IRQBASE + CMT_NR_IRQ * unit;
-+    for (i =3D 0; i < CMT_NR_IRQ; i++) {
-+        sysbus_connect_irq(cmt, i, s->irq[irqbase + i]);
++    memset(env, 0, offsetof(CPURXState, end_reset_fields));
++
++    resetvec =3D rom_ptr(0xfffffffc, 4);
++    if (resetvec) {
++        /* In the case of kernel, it is ignored because it is not set. *=
+/
++        env->pc =3D ldl_p(resetvec);
++    }
++    rx_cpu_unpack_psw(env, 0, 1);
++    env->regs[0] =3D env->isp =3D env->usp =3D 0;
++    env->fpsw =3D 0;
++    set_flush_to_zero(1, &env->fp_status);
++    set_flush_inputs_to_zero(1, &env->fp_status);
++}
++
++static void rx_cpu_list_entry(gpointer data, gpointer user_data)
++{
++    const char *typename =3D object_class_get_name(OBJECT_CLASS(data));
++
++    qemu_printf("%s\n", typename);
++}
++
++void rx_cpu_list(void)
++{
++    GSList *list;
++    list =3D object_class_get_list_sorted(TYPE_RX_CPU, false);
++    g_slist_foreach(list, rx_cpu_list_entry, NULL);
++    g_slist_free(list);
++}
++
++static ObjectClass *rx_cpu_class_by_name(const char *cpu_model)
++{
++    ObjectClass *oc;
++
++    oc =3D object_class_by_name(cpu_model);
++    if (object_class_dynamic_cast(oc, TYPE_RX_CPU) =3D=3D NULL ||
++        object_class_is_abstract(oc)) {
++        oc =3D NULL;
++    }
++
++    return oc;
++}
++
++static void rx_cpu_realize(DeviceState *dev, Error **errp)
++{
++    CPUState *cs =3D CPU(dev);
++    RXCPUClass *rcc =3D RXCPU_GET_CLASS(dev);
++    Error *local_err =3D NULL;
++
++    cpu_exec_realizefn(cs, &local_err);
++    if (local_err !=3D NULL) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    cpu_reset(cs);
++    qemu_init_vcpu(cs);
++
++    rcc->parent_realize(dev, errp);
++}
++
++static void rx_cpu_set_irq(void *opaque, int no, int request)
++{
++    RXCPU *cpu =3D opaque;
++    CPUState *cs =3D CPU(cpu);
++    int irq =3D request & 0xff;
++
++    static const int mask[] =3D {
++        [RX_CPU_IRQ] =3D CPU_INTERRUPT_HARD,
++        [RX_CPU_FIR] =3D CPU_INTERRUPT_FIR,
++    };
++    if (irq) {
++        cpu->env.req_irq =3D irq;
++        cpu->env.req_ipl =3D (request >> 8) & 0x0f;
++        cpu_interrupt(cs, mask[no]);
++    } else {
++        cpu_reset_interrupt(cs, mask[no]);
 +    }
 +}
 +
-+static void register_sci(RX62NState *s, int unit)
++static void rx_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
 +{
-+    SysBusDevice *sci;
-+    int i, irqbase;
-+
-+    object_initialize_child(OBJECT(s), "sci[*]", &s->sci[unit],
-+                            sizeof(RSCIState), TYPE_RENESAS_SCI,
-+                            &error_abort, NULL);
-+
-+    sci =3D SYS_BUS_DEVICE(&s->sci[unit]);
-+    sysbus_mmio_map(sci, 0, RX62N_SCIBASE + unit * 0x08);
-+    qdev_prop_set_chr(DEVICE(sci), "chardev", serial_hd(unit));
-+    qdev_prop_set_uint64(DEVICE(sci), "input-freq", RX62N_PCLK);
-+
-+    qdev_init_nofail(DEVICE(sci));
-+    irqbase =3D RX62N_SCI_IRQBASE + SCI_NR_IRQ * unit;
-+    for (i =3D 0; i < SCI_NR_IRQ; i++) {
-+        sysbus_connect_irq(sci, i, s->irq[irqbase + i]);
-+    }
++    info->mach =3D bfd_mach_rx;
++    info->print_insn =3D print_insn_rx;
 +}
 +
-+static void rx62n_realize(DeviceState *dev, Error **errp)
++static bool rx_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
++                            MMUAccessType access_type, int mmu_idx,
++                            bool probe, uintptr_t retaddr)
 +{
-+    RX62NState *s =3D RX62N(dev);
++    uint32_t address, physical, prot;
 +
-+    memory_region_init_ram(&s->iram, NULL, "iram", RX62N_IRAM_SIZE, errp=
-);
-+    memory_region_add_subregion(s->sysmem, RX62N_IRAM_BASE, &s->iram);
-+    memory_region_init_rom(&s->d_flash, NULL, "dataflash",
-+                           RX62N_DFLASH_SIZE, errp);
-+    memory_region_add_subregion(s->sysmem, RX62N_DFLASH_BASE, &s->d_flas=
-h);
-+    memory_region_init_rom(&s->c_flash, NULL, "codeflash",
-+                           RX62N_CFLASH_SIZE, errp);
-+    memory_region_add_subregion(s->sysmem, RX62N_CFLASH_BASE, &s->c_flas=
-h);
-+    if (!s->kernel) {
-+        rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
-+    }
-+
-+    /* Initialize CPU */
-+    object_initialize_child(OBJECT(s), "cpu", &s->cpu, sizeof(RXCPU),
-+                            TYPE_RX62N_CPU, errp, NULL);
-+    object_property_set_bool(OBJECT(&s->cpu), true, "realized", errp);
-+
-+    register_icu(s);
-+    s->cpu.env.ack =3D qdev_get_gpio_in_named(DEVICE(&s->icu), "ack", 0)=
++    /* Linear mapping */
++    address =3D physical =3D addr & TARGET_PAGE_MASK;
++    prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
++    tlb_set_page(cs, address, physical, prot, mmu_idx, TARGET_PAGE_SIZE)=
 ;
-+    register_tmr(s, 0);
-+    register_tmr(s, 1);
-+    register_cmt(s, 0);
-+    register_cmt(s, 1);
-+    register_sci(s, 0);
++    return true;
 +}
 +
-+static Property rx62n_properties[] =3D {
-+    DEFINE_PROP_LINK("memory", RX62NState, sysmem, TYPE_MEMORY_REGION,
-+                     MemoryRegion *),
-+    DEFINE_PROP_BOOL("load-kernel", RX62NState, kernel, false),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
++static void rx_cpu_init(Object *obj)
++{
++    CPUState *cs =3D CPU(obj);
++    RXCPU *cpu =3D RXCPU(obj);
++    CPURXState *env =3D &cpu->env;
 +
-+static void rx62n_class_init(ObjectClass *klass, void *data)
++    cpu_set_cpustate_pointers(cpu);
++    cs->env_ptr =3D env;
++    qdev_init_gpio_in(DEVICE(cpu), rx_cpu_set_irq, 2);
++}
++
++static void rx_cpu_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc =3D DEVICE_CLASS(klass);
++    CPUClass *cc =3D CPU_CLASS(klass);
++    RXCPUClass *rcc =3D RXCPU_CLASS(klass);
 +
-+    dc->realize =3D rx62n_realize;
-+    dc->props =3D rx62n_properties;
++    device_class_set_parent_realize(dc, rx_cpu_realize,
++                                    &rcc->parent_realize);
++
++    rcc->parent_reset =3D cc->reset;
++    cc->reset =3D rx_cpu_reset;
++
++    cc->class_by_name =3D rx_cpu_class_by_name;
++    cc->has_work =3D rx_cpu_has_work;
++    cc->do_interrupt =3D rx_cpu_do_interrupt;
++    cc->cpu_exec_interrupt =3D rx_cpu_exec_interrupt;
++    cc->dump_state =3D rx_cpu_dump_state;
++    cc->set_pc =3D rx_cpu_set_pc;
++    cc->synchronize_from_tb =3D rx_cpu_synchronize_from_tb;
++    cc->gdb_read_register =3D rx_cpu_gdb_read_register;
++    cc->gdb_write_register =3D rx_cpu_gdb_write_register;
++    cc->get_phys_page_debug =3D rx_cpu_get_phys_page_debug;
++    cc->disas_set_info =3D rx_cpu_disas_set_info;
++    cc->tcg_initialize =3D rx_translate_init;
++    cc->tlb_fill =3D rx_cpu_tlb_fill;
++
++    cc->gdb_num_core_regs =3D 26;
 +}
 +
-+static const TypeInfo rx62n_info =3D {
-+    .name =3D TYPE_RX62N,
-+    .parent =3D TYPE_SYS_BUS_DEVICE,
-+    .instance_size =3D sizeof(RX62NState),
-+    .class_init =3D rx62n_class_init,
++static const TypeInfo rx_cpu_info =3D {
++    .name =3D TYPE_RX_CPU,
++    .parent =3D TYPE_CPU,
++    .instance_size =3D sizeof(RXCPU),
++    .instance_init =3D rx_cpu_init,
++    .abstract =3D true,
++    .class_size =3D sizeof(RXCPUClass),
++    .class_init =3D rx_cpu_class_init,
 +};
 +
-+static void rx62n_register_types(void)
++static const TypeInfo rx62n_rx_cpu_info =3D {
++    .name =3D TYPE_RX62N_CPU,
++    .parent =3D TYPE_RX_CPU,
++};
++
++static void rx_cpu_register_types(void)
 +{
-+    type_register_static(&rx62n_info);
++    type_register_static(&rx_cpu_info);
++    type_register_static(&rx62n_rx_cpu_info);
 +}
 +
-+type_init(rx62n_register_types)
-diff --git a/hw/rx/Kconfig b/hw/rx/Kconfig
++type_init(rx_cpu_register_types)
+diff --git a/target/rx/gdbstub.c b/target/rx/gdbstub.c
 new file mode 100644
-index 0000000000..a07490a65e
+index 0000000000..d76ca52e82
 --- /dev/null
-+++ b/hw/rx/Kconfig
-@@ -0,0 +1,14 @@
-+config RX
-+    bool
++++ b/target/rx/gdbstub.c
+@@ -0,0 +1,112 @@
++/*
++ * RX gdb server stub
++ *
++ * Copyright (c) 2019 Yoshinori Sato
++ *
++ * This program is free software; you can redistribute it and/or modify =
+it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOU=
+T
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
+ for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License alo=
+ng with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "cpu.h"
++#include "exec/gdbstub.h"
 +
-+config RX62N
-+    bool
-+    select RX
-+    select RX_ICU
-+    select RENESAS_TMR8
-+    select RENESAS_CMT
-+    select RENESAS_SCI
++int rx_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
++{
++    RXCPU *cpu =3D RXCPU(cs);
++    CPURXState *env =3D &cpu->env;
 +
-+config RX_VIRT
-+    bool
-+    select RX62N
-diff --git a/hw/rx/Makefile.objs b/hw/rx/Makefile.objs
++    switch (n) {
++    case 0 ... 15:
++        return gdb_get_regl(mem_buf, env->regs[n]);
++    case 16:
++        return gdb_get_regl(mem_buf, (env->psw_u) ? env->regs[0] : env->=
+usp);
++    case 17:
++        return gdb_get_regl(mem_buf, (!env->psw_u) ? env->regs[0] : env-=
+>isp);
++    case 18:
++        return gdb_get_regl(mem_buf, rx_cpu_pack_psw(env));
++    case 19:
++        return gdb_get_regl(mem_buf, env->pc);
++    case 20:
++        return gdb_get_regl(mem_buf, env->intb);
++    case 21:
++        return gdb_get_regl(mem_buf, env->bpsw);
++    case 22:
++        return gdb_get_regl(mem_buf, env->bpc);
++    case 23:
++        return gdb_get_regl(mem_buf, env->fintv);
++    case 24:
++        return gdb_get_regl(mem_buf, env->fpsw);
++    case 25:
++        return 0;
++    }
++    return 0;
++}
++
++int rx_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
++{
++    RXCPU *cpu =3D RXCPU(cs);
++    CPURXState *env =3D &cpu->env;
++    uint32_t psw;
++    switch (n) {
++    case 0 ... 15:
++        env->regs[n] =3D ldl_p(mem_buf);
++        if (n =3D=3D 0) {
++            if (env->psw_u) {
++                env->usp =3D env->regs[0];
++            } else {
++                env->isp =3D env->regs[0];
++            }
++        }
++        break;
++    case 16:
++        env->usp =3D ldl_p(mem_buf);
++        if (env->psw_u) {
++            env->regs[0] =3D ldl_p(mem_buf);
++        }
++        break;
++    case 17:
++        env->isp =3D ldl_p(mem_buf);
++        if (!env->psw_u) {
++            env->regs[0] =3D ldl_p(mem_buf);
++        }
++        break;
++    case 18:
++        psw =3D ldl_p(mem_buf);
++        rx_cpu_unpack_psw(env, psw, 1);
++        break;
++    case 19:
++        env->pc =3D ldl_p(mem_buf);
++        break;
++    case 20:
++        env->intb =3D ldl_p(mem_buf);
++        break;
++    case 21:
++        env->bpsw =3D ldl_p(mem_buf);
++        break;
++    case 22:
++        env->bpc =3D ldl_p(mem_buf);
++        break;
++    case 23:
++        env->fintv =3D ldl_p(mem_buf);
++        break;
++    case 24:
++        env->fpsw =3D ldl_p(mem_buf);
++        break;
++    case 25:
++        return 8;
++    default:
++        return 0;
++    }
++
++    return 4;
++}
+diff --git a/target/rx/monitor.c b/target/rx/monitor.c
 new file mode 100644
-index 0000000000..63f8be0e82
+index 0000000000..5d7a1e58b5
 --- /dev/null
-+++ b/hw/rx/Makefile.objs
-@@ -0,0 +1,2 @@
-+obj-$(CONFIG_RX62N) +=3D rx62n.o
-+obj-$(CONFIG_RX_VIRT) +=3D rx-virt.o
++++ b/target/rx/monitor.c
+@@ -0,0 +1,38 @@
++/*
++ * QEMU monitor
++ *
++ * Copyright (c) 2003-2004 Fabrice Bellard
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
++ * of this software and associated documentation files (the "Software"),=
+ to deal
++ * in the Software without restriction, including without limitation the=
+ rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be includ=
+ed in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
++ * THE SOFTWARE.
++ */
++#include "qemu/osdep.h"
++#include "cpu.h"
++#include "monitor/monitor.h"
++#include "monitor/hmp-target.h"
++#include "hmp.h"
++
++void hmp_info_tlb(Monitor *mon, const QDict *qdict)
++{
++    CPUArchState *env =3D mon_get_cpu_env();
++
++    if (!env) {
++        monitor_printf(mon, "No CPU available\n");
++        return;
++    }
++}
 --=20
 2.11.0
 
