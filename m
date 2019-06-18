@@ -2,59 +2,93 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F1F2C31E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 15:16:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0EECC31E5D
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 15:18:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07B06213F2
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 15:16:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07B06213F2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
+	by mail.kernel.org (Postfix) with ESMTPS id C2C0C213F2
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 15:18:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pf+vQw9z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2C0C213F2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58892 helo=lists.gnu.org)
+Received: from localhost ([::1]:58902 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdFqx-0000Pk-9e
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 11:16:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39708)
+	id 1hdFsi-0001YS-3H
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 11:18:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36496)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hdFGw-0002xC-Sj
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:39:45 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hdF5z-0001XK-Js
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:28:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hdFGs-0000kt-MN
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:39:42 -0400
-Received: from mail02.asahi-net.or.jp ([202.224.55.14]:36570)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hdFGq-0000fS-LE
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:39:38 -0400
-Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
- [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail02.asahi-net.or.jp (Postfix) with ESMTPA id F310E44038;
- Tue, 18 Jun 2019 23:39:33 +0900 (JST)
-Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
- [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id A8FAB240086;
- Tue, 18 Jun 2019 23:39:33 +0900 (JST)
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
-To: qemu-devel@nongnu.org
-Date: Tue, 18 Jun 2019 23:39:14 +0900
-Message-Id: <20190618143923.53838-13-ysato@users.sourceforge.jp>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20190618143923.53838-1-ysato@users.sourceforge.jp>
-References: <20190618143923.53838-1-ysato@users.sourceforge.jp>
+ (envelope-from <richard.henderson@linaro.org>) id 1hdF5y-0004yF-Ms
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:28:23 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:44625)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hdF5y-0004tC-EH
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:28:22 -0400
+Received: by mail-pf1-x442.google.com with SMTP id t16so7756704pfe.11
+ for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 07:28:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Cq3AgLqu/86OUtTSuC/NjLSmU3fYskHmfcErEuZN4w8=;
+ b=pf+vQw9z/T8boiZiwobg/SFWO1f7ZEBNSrW9+x3VVu5aCQOnxnI6Fqp65/g+oSTilN
+ BIbvE4HVT8DUyeiX+m2LZXoNWqjmNxwoAuJEIl/vIPvo9YD7fDeQd+eoM+SW4UXYKrZb
+ xSHc58Go95lS6QWz345/6+VO7RpcSuR5hEN/X11rT4N1h8y1f56pMEdVqKYfah/hH4Pe
+ XOf+hDwuEs1vmTtncm8bbEXp7BDtI1NnoT2cNlTJtVZAvN4u7CWw0CkOGSkc3EsiMQku
+ 0eltAJ2IDDwZsnQ5D9FsI1skwIBHiQZczM9kLi0y2nC9LrTqMRNBLH0vMv+Cb7rGF4al
+ BEOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Cq3AgLqu/86OUtTSuC/NjLSmU3fYskHmfcErEuZN4w8=;
+ b=UqOyzA8S7a9BjSua5vqws1Xnj2Nak6tb+GuSGq5TzutwfX3IqEjOblv+fV2DB9aFvl
+ ZXtzb14DqEvUHYcCnfqdD2NjyReTJodXtD3hG31ZHbqF6KrQDH/6bgoy3zgT3stlwCzi
+ FgUxokemonMgoWzhYjIKlzq3cxEGvrtCjaPspKRFCk7KmWgRnZZMbhC4WCO4KeGlKx8A
+ JB38mh6NqpAKGB9BmlGB3a4Kb6vx2kCdKjD5U1bivM/OwWLizas2NdF5unVB8SjlimdX
+ iV5nljGp+gbjmRie+Z+q8lXsuA5iyTZDvDcgXzVPIwZJrUtNuuoRrGMhHCkeNZBpNUwL
+ lYog==
+X-Gm-Message-State: APjAAAU9a4Jdz5JGobeYHNoHYmAfZqjWuE+MMqWbbV6ts+RklGVyDOZk
+ NbF4qPtrJtFMND/KHHLHhfuH+nBwO/g=
+X-Google-Smtp-Source: APXvYqw1scy9Ohiy8f8IVYefhTdd8uNf1aUoMFy1cDYQjKHviJAF500z0b+CI12pcSZamsgWbdmxHw==
+X-Received: by 2002:a17:90a:2247:: with SMTP id
+ c65mr5296547pje.24.1560868099183; 
+ Tue, 18 Jun 2019 07:28:19 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-2-33.tukw.qwest.net. [97.113.2.33])
+ by smtp.gmail.com with ESMTPSA id j9sm15294714pff.88.2019.06.18.07.28.18
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 18 Jun 2019 07:28:18 -0700 (PDT)
+To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org
+References: <20190617143533.15013-1-kbastian@mail.uni-paderborn.de>
+ <20190617143533.15013-4-kbastian@mail.uni-paderborn.de>
+ <b2f6e776-90e4-3809-350f-ce2bf6d69017@linaro.org>
+ <9d2149ef-57f5-c4b7-220c-81483b108f24@mail.uni-paderborn.de>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <82d09d30-ec46-1cf6-c9c8-192932690c6f@linaro.org>
+Date: Tue, 18 Jun 2019 07:28:16 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <9d2149ef-57f5-c4b7-220c-81483b108f24@mail.uni-paderborn.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 202.224.55.14
-Subject: [Qemu-devel] [PATCH RESEND v21 12/21] target/rx: Collect all bytes
- during disassembly
+X-Received-From: 2607:f8b0:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH 3/3] target/tricore: Use translate_loop
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,156 +100,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, imammedo@redhat.com,
- Richard Henderson <richard.henderson@linaro.org>,
- Yoshinori Sato <ysato@users.sourceforge.jp>, philmd@redhat.com
+Cc: david.brenken@efs-auto.de
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+On 6/18/19 5:06 AM, Bastian Koppelmann wrote:
+>> Have a look at the end of thumb_tr_translate_insn & insn_crosses_page to see
+>> how to handle this properly.
+> 
+> I copied it more or less from target/riscv. I guess that needs fixing as well :)
 
-Collected, to be used in the next patch.
+Yes, I noticed the riscv problem during review of the plugin api.  :-)
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Message-Id: <20190607091116.49044-23-ysato@users.sourceforge.jp>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/rx/disas.c | 62 +++++++++++++++++++++++++++++++++++++------------=
-------
- 1 file changed, 42 insertions(+), 20 deletions(-)
 
-diff --git a/target/rx/disas.c b/target/rx/disas.c
-index ebc1a44249..5a32a87534 100644
---- a/target/rx/disas.c
-+++ b/target/rx/disas.c
-@@ -25,43 +25,59 @@ typedef struct DisasContext {
-     disassemble_info *dis;
-     uint32_t addr;
-     uint32_t pc;
-+    uint8_t len;
-+    uint8_t bytes[8];
- } DisasContext;
-=20
-=20
- static uint32_t decode_load_bytes(DisasContext *ctx, uint32_t insn,
--                           int i, int n)
-+                                  int i, int n)
- {
--    bfd_byte buf;
-+    uint32_t addr =3D ctx->addr;
-+
-+    g_assert(ctx->len =3D=3D i);
-+    g_assert(n <=3D ARRAY_SIZE(ctx->bytes));
-+
-     while (++i <=3D n) {
--        ctx->dis->read_memory_func(ctx->addr++, &buf, 1, ctx->dis);
--        insn |=3D buf << (32 - i * 8);
-+        ctx->dis->read_memory_func(addr++, &ctx->bytes[i - 1], 1, ctx->d=
-is);
-+        insn |=3D ctx->bytes[i - 1] << (32 - i * 8);
-     }
-+    ctx->addr =3D addr;
-+    ctx->len =3D n;
-+
-     return insn;
- }
-=20
- static int32_t li(DisasContext *ctx, int sz)
- {
--    int32_t addr;
--    bfd_byte buf[4];
--    addr =3D ctx->addr;
-+    uint32_t addr =3D ctx->addr;
-+    uintptr_t len =3D ctx->len;
-=20
-     switch (sz) {
-     case 1:
-+        g_assert(len + 1 <=3D ARRAY_SIZE(ctx->bytes));
-         ctx->addr +=3D 1;
--        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
--        return (int8_t)buf[0];
-+        ctx->len +=3D 1;
-+        ctx->dis->read_memory_func(addr, ctx->bytes + len, 1, ctx->dis);
-+        return (int8_t)ctx->bytes[len];
-     case 2:
-+        g_assert(len + 2 <=3D ARRAY_SIZE(ctx->bytes));
-         ctx->addr +=3D 2;
--        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
--        return ldsw_le_p(buf);
-+        ctx->len +=3D 2;
-+        ctx->dis->read_memory_func(addr, ctx->bytes + len, 2, ctx->dis);
-+        return ldsw_le_p(ctx->bytes + len);
-     case 3:
-+        g_assert(len + 3 <=3D ARRAY_SIZE(ctx->bytes));
-         ctx->addr +=3D 3;
--        ctx->dis->read_memory_func(addr, buf, 3, ctx->dis);
--        return (int8_t)buf[2] << 16 | lduw_le_p(buf);
-+        ctx->len +=3D 3;
-+        ctx->dis->read_memory_func(addr, ctx->bytes + len, 3, ctx->dis);
-+        return (int8_t)ctx->bytes[len + 2] << 16 | lduw_le_p(ctx->bytes =
-+ len);
-     case 0:
-+        g_assert(len + 4 <=3D ARRAY_SIZE(ctx->bytes));
-         ctx->addr +=3D 4;
--        ctx->dis->read_memory_func(addr, buf, 4, ctx->dis);
--        return ldl_le_p(buf);
-+        ctx->len +=3D 4;
-+        ctx->dis->read_memory_func(addr, ctx->bytes + len, 4, ctx->dis);
-+        return ldl_le_p(ctx->bytes + len);
-     default:
-         g_assert_not_reached();
-     }
-@@ -110,7 +126,7 @@ static const char psw[] =3D {
- static void rx_index_addr(DisasContext *ctx, char out[8], int ld, int mi=
-)
- {
-     uint32_t addr =3D ctx->addr;
--    uint8_t buf[2];
-+    uintptr_t len =3D ctx->len;
-     uint16_t dsp;
-=20
-     switch (ld) {
-@@ -119,14 +135,18 @@ static void rx_index_addr(DisasContext *ctx, char o=
-ut[8], int ld, int mi)
-         out[0] =3D '\0';
-         return;
-     case 1:
-+        g_assert(len + 1 <=3D ARRAY_SIZE(ctx->bytes));
-         ctx->addr +=3D 1;
--        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
--        dsp =3D buf[0];
-+        ctx->len +=3D 1;
-+        ctx->dis->read_memory_func(addr, ctx->bytes + len, 1, ctx->dis);
-+        dsp =3D ctx->bytes[len];
-         break;
-     case 2:
-+        g_assert(len + 2 <=3D ARRAY_SIZE(ctx->bytes));
-         ctx->addr +=3D 2;
--        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
--        dsp =3D lduw_le_p(buf);
-+        ctx->len +=3D 2;
-+        ctx->dis->read_memory_func(addr, ctx->bytes + len, 2, ctx->dis);
-+        dsp =3D lduw_le_p(ctx->bytes + len);
-         break;
-     default:
-         g_assert_not_reached();
-@@ -1392,8 +1412,10 @@ int print_insn_rx(bfd_vma addr, disassemble_info *=
-dis)
-     DisasContext ctx;
-     uint32_t insn;
-     int i;
-+
-     ctx.dis =3D dis;
-     ctx.pc =3D ctx.addr =3D addr;
-+    ctx.len =3D 0;
-=20
-     insn =3D decode_load(&ctx);
-     if (!decode(&ctx, insn)) {
---=20
-2.11.0
+r~
 
 
