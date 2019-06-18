@@ -2,59 +2,62 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64B0DC31E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 15:30:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D472DC31E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 15:32:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E3692085A
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 15:30:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E3692085A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
+	by mail.kernel.org (Postfix) with ESMTPS id AE33E20673
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 15:32:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE33E20673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59010 helo=lists.gnu.org)
+Received: from localhost ([::1]:59026 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdG3c-0005eD-Da
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 11:30:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39577)
+	id 1hdG6O-00079e-SL
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 11:32:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40153)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hdFGq-0002ml-GW
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:39:39 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hdFID-0004Ei-B8
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:41:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hdFGo-0000fL-6S
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:39:36 -0400
-Received: from mail01.asahi-net.or.jp ([202.224.55.13]:33704)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hdFGn-0000dT-P3
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:39:34 -0400
-Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
- [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 1FEFE126DD4;
- Tue, 18 Jun 2019 23:39:33 +0900 (JST)
-Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
- [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id C9CA9240085;
- Tue, 18 Jun 2019 23:39:32 +0900 (JST)
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
-To: qemu-devel@nongnu.org
-Date: Tue, 18 Jun 2019 23:39:11 +0900
-Message-Id: <20190618143923.53838-10-ysato@users.sourceforge.jp>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20190618143923.53838-1-ysato@users.sourceforge.jp>
-References: <20190618143923.53838-1-ysato@users.sourceforge.jp>
+ (envelope-from <ehabkost@redhat.com>) id 1hdFIC-0001nK-9O
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:41:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49572)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hdFI8-0001W9-Li
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:40:58 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id ECC5AA836;
+ Tue, 18 Jun 2019 14:40:25 +0000 (UTC)
+Received: from localhost (ovpn-116-76.gru2.redhat.com [10.97.116.76])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7AA537D506;
+ Tue, 18 Jun 2019 14:40:25 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Cleber Rosa <crosa@redhat.com>
+Date: Tue, 18 Jun 2019 11:40:13 -0300
+Message-Id: <20190618144013.6537-3-ehabkost@redhat.com>
+In-Reply-To: <20190618144013.6537-1-ehabkost@redhat.com>
+References: <20190618144013.6537-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Tue, 18 Jun 2019 14:40:26 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 202.224.55.13
-Subject: [Qemu-devel] [PATCH RESEND v21 09/21] target/rx: Replace operand
- with prt_ldmi in disassembler
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 2/2] Travis: print acceptance tests logs in case
+ of job failure
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,312 +69,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, imammedo@redhat.com,
- Richard Henderson <richard.henderson@linaro.org>,
- Yoshinori Sato <ysato@users.sourceforge.jp>, philmd@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Aleksandar Rikalo <arikalo@wavecomp.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Cleber Rosa <crosa@redhat.com>
 
-This has consistency with prt_ri().  It loads all data before
-beginning output.  It uses exactly one call to prt() to emit
-the full instruction.
+Because Travis doesn't allow us to keep files produced during tests
+(such as log files), let's print the complete job log to the "console"
+in case of job failures.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Message-Id: <20190607091116.49044-20-ysato@users.sourceforge.jp>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+This is a debugging aid, and given that there's been some timeouts
+happening on some tests, we absolutely needs the logs to have a proper
+action.
+
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+Message-Id: <20190607152223.9467-2-crosa@redhat.com>
+Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/rx/disas.c | 77 +++++++++++++++++++------------------------------=
-------
- 1 file changed, 27 insertions(+), 50 deletions(-)
+ .travis.yml | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/target/rx/disas.c b/target/rx/disas.c
-index 64342537ee..515b365528 100644
---- a/target/rx/disas.c
-+++ b/target/rx/disas.c
-@@ -135,18 +135,18 @@ static void rx_index_addr(DisasContext *ctx, char o=
-ut[8], int ld, int mi)
-     sprintf(out, "%u", dsp << (mi < 3 ? mi : 4 - mi));
- }
-=20
--static void operand(DisasContext *ctx, int ld, int mi, int rs, int rd)
-+static void prt_ldmi(DisasContext *ctx, const char *insn,
-+                     int ld, int mi, int rs, int rd)
- {
-     static const char sizes[][4] =3D {".b", ".w", ".l", ".uw", ".ub"};
-     char dsp[8];
-=20
-     if (ld < 3) {
-         rx_index_addr(ctx, dsp, ld, mi);
--        prt("%s[r%d]%s", dsp, rs, sizes[mi]);
-+        prt("%s\t%s[r%d]%s, r%d", insn, dsp, rs, sizes[mi], rd);
-     } else {
--        prt("r%d", rs);
-+        prt("%s\tr%d, r%d", insn, rs, rd);
-     }
--    prt(", r%d", rd);
- }
-=20
- static void prt_ir(DisasContext *ctx, const char *insn, int imm, int rd)
-@@ -416,8 +416,7 @@ static bool trans_AND_ir(DisasContext *ctx, arg_AND_i=
-r *a)
- /* and rs,rd */
- static bool trans_AND_mr(DisasContext *ctx, arg_AND_mr *a)
- {
--    prt("and\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "and", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -440,8 +439,7 @@ static bool trans_OR_ir(DisasContext *ctx, arg_OR_ir =
-*a)
- /* or rs,rd */
- static bool trans_OR_mr(DisasContext *ctx, arg_OR_mr *a)
- {
--    prt("or\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "or", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -463,8 +461,7 @@ static bool trans_XOR_ir(DisasContext *ctx, arg_XOR_i=
-r *a)
- /* xor rs,rd */
- static bool trans_XOR_mr(DisasContext *ctx, arg_XOR_mr *a)
- {
--    prt("xor\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "xor", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -479,8 +476,7 @@ static bool trans_TST_ir(DisasContext *ctx, arg_TST_i=
-r *a)
- /* tst rs, rd */
- static bool trans_TST_mr(DisasContext *ctx, arg_TST_mr *a)
- {
--    prt("tst\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "tst", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -548,8 +544,7 @@ static bool trans_ADD_irr(DisasContext *ctx, arg_ADD_=
-irr *a)
- /* add dsp[rs], rd */
- static bool trans_ADD_mr(DisasContext *ctx, arg_ADD_mr *a)
- {
--    prt("add\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "add", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -573,8 +568,7 @@ static bool trans_CMP_ir(DisasContext *ctx, arg_CMP_i=
-r *a)
- /* cmp dsp[rs], rs2 */
- static bool trans_CMP_mr(DisasContext *ctx, arg_CMP_mr *a)
- {
--    prt("cmp\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "cmp", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -589,8 +583,7 @@ static bool trans_SUB_ir(DisasContext *ctx, arg_SUB_i=
-r *a)
- /* sub dsp[rs], rd */
- static bool trans_SUB_mr(DisasContext *ctx, arg_SUB_mr *a)
- {
--    prt("sub\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "sub", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -611,8 +604,7 @@ static bool trans_SBB_rr(DisasContext *ctx, arg_SBB_r=
-r *a)
- /* sbb dsp[rs], rd */
- static bool trans_SBB_mr(DisasContext *ctx, arg_SBB_mr *a)
- {
--    prt("sbb\t");
--    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    prt_ldmi(ctx, "sbb", a->ld, RX_IM_LONG, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -640,8 +632,7 @@ static bool trans_MAX_ir(DisasContext *ctx, arg_MAX_i=
-r *a)
- /* max dsp[rs], rd */
- static bool trans_MAX_mr(DisasContext *ctx, arg_MAX_mr *a)
- {
--    prt("max\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "max", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -656,8 +647,7 @@ static bool trans_MIN_ir(DisasContext *ctx, arg_MIN_i=
-r *a)
- /* min dsp[rs], rd */
- static bool trans_MIN_mr(DisasContext *ctx, arg_MIN_mr *a)
- {
--    prt("max\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "min", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -673,8 +663,7 @@ static bool trans_MUL_ir(DisasContext *ctx, arg_MUL_i=
-r *a)
- /* mul dsp[rs], rd */
- static bool trans_MUL_mr(DisasContext *ctx, arg_MUL_mr *a)
- {
--    prt("mul\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "mul", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -696,8 +685,7 @@ static bool trans_EMUL_ir(DisasContext *ctx, arg_EMUL=
-_ir *a)
- /* emul dsp[rs], rd */
- static bool trans_EMUL_mr(DisasContext *ctx, arg_EMUL_mr *a)
- {
--    prt("emul\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "emul", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -712,8 +700,7 @@ static bool trans_EMULU_ir(DisasContext *ctx, arg_EMU=
-LU_ir *a)
- /* emulu dsp[rs], rd */
- static bool trans_EMULU_mr(DisasContext *ctx, arg_EMULU_mr *a)
- {
--    prt("emulu\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "emulu", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -728,8 +715,7 @@ static bool trans_DIV_ir(DisasContext *ctx, arg_DIV_i=
-r *a)
- /* div dsp[rs], rd */
- static bool trans_DIV_mr(DisasContext *ctx, arg_DIV_mr *a)
- {
--    prt("div\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "div", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -744,8 +730,7 @@ static bool trans_DIVU_ir(DisasContext *ctx, arg_DIVU=
-_ir *a)
- /* divu dsp[rs], rd */
- static bool trans_DIVU_mr(DisasContext *ctx, arg_DIVU_mr *a)
- {
--    prt("divu\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "divu", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -1089,8 +1074,7 @@ static bool trans_FADD_ir(DisasContext *ctx, arg_FA=
-DD_ir *a)
- /* fadd rs, rd */
- static bool trans_FADD_mr(DisasContext *ctx, arg_FADD_mr *a)
- {
--    prt("fadd\t");
--    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    prt_ldmi(ctx, "fadd", a->ld, RX_IM_LONG, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -1105,8 +1089,7 @@ static bool trans_FCMP_ir(DisasContext *ctx, arg_FC=
-MP_ir *a)
- /* fcmp rs, rd */
- static bool trans_FCMP_mr(DisasContext *ctx, arg_FCMP_mr *a)
- {
--    prt("fcmp\t");
--    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    prt_ldmi(ctx, "fcmp", a->ld, RX_IM_LONG, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -1121,8 +1104,7 @@ static bool trans_FSUB_ir(DisasContext *ctx, arg_FS=
-UB_ir *a)
- /* fsub rs, rd */
- static bool trans_FSUB_mr(DisasContext *ctx, arg_FSUB_mr *a)
- {
--    prt("fsub\t");
--    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    prt_ldmi(ctx, "fsub", a->ld, RX_IM_LONG, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -1130,8 +1112,7 @@ static bool trans_FSUB_mr(DisasContext *ctx, arg_FS=
-UB_mr *a)
- /* ftoi rs, rd */
- static bool trans_FTOI(DisasContext *ctx, arg_FTOI *a)
- {
--    prt("ftoi\t");
--    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    prt_ldmi(ctx, "ftoi", a->ld, RX_IM_LONG, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -1146,8 +1127,7 @@ static bool trans_FMUL_ir(DisasContext *ctx, arg_FM=
-UL_ir *a)
- /* fmul rs, rd */
- static bool trans_FMUL_mr(DisasContext *ctx, arg_FMUL_mr *a)
- {
--    prt("fmul\t");
--    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    prt_ldmi(ctx, "fmul", a->ld, RX_IM_LONG, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -1162,8 +1142,7 @@ static bool trans_FDIV_ir(DisasContext *ctx, arg_FD=
-IV_ir *a)
- /* fdiv rs, rd */
- static bool trans_FDIV_mr(DisasContext *ctx, arg_FDIV_mr *a)
- {
--    prt("fdiv\t");
--    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    prt_ldmi(ctx, "fdiv", a->ld, RX_IM_LONG, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -1171,8 +1150,7 @@ static bool trans_FDIV_mr(DisasContext *ctx, arg_FD=
-IV_mr *a)
- /* round rs, rd */
- static bool trans_ROUND(DisasContext *ctx, arg_ROUND *a)
- {
--    prt("round\t");
--    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    prt_ldmi(ctx, "round", a->ld, RX_IM_LONG, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -1180,8 +1158,7 @@ static bool trans_ROUND(DisasContext *ctx, arg_ROUN=
-D *a)
- /* itof dsp[rs], rd */
- static bool trans_ITOF(DisasContext *ctx, arg_ITOF *a)
- {
--    prt("itof\t");
--    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    prt_ldmi(ctx, "itof", a->ld, RX_IM_LONG, a->rs, a->rd);
-     return true;
- }
-=20
+diff --git a/.travis.yml b/.travis.yml
+index 2f1658602e..aeb9b211cd 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -233,6 +233,8 @@ matrix:
+     - env:
+         - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-s=
+oftmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-so=
+ftmmu,alpha-softmmu"
+         - TEST_CMD=3D"make check-acceptance"
++      after_failure:
++        - cat tests/results/latest/job.log
+       addons:
+         apt:
+           packages:
 --=20
-2.11.0
+2.18.0.rc1.1.g3f1ff2140
 
 
