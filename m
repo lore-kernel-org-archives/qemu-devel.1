@@ -2,64 +2,63 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	T_HK_NAME_DR,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 320DFC31E51
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 09:11:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D792C31E51
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 09:11:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2D62206BA
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 09:11:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2D62206BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D755E2084B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 09:11:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D755E2084B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55050 helo=lists.gnu.org)
+Received: from localhost ([::1]:55052 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdA91-0001IB-Ae
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 05:11:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48809)
+	id 1hdA9X-0001xY-4y
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 05:11:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47959)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hdA63-0007XB-90
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 05:08:09 -0400
+ (envelope-from <clg@kaod.org>) id 1hdA3C-0006Bo-RP
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 05:05:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hdA5x-0003gl-HY
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 05:08:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52564)
+ (envelope-from <clg@kaod.org>) id 1hdA36-0001Fq-2m
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 05:05:08 -0400
+Received: from 4.mo2.mail-out.ovh.net ([87.98.172.75]:53457)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hdA5x-0003b9-6i
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 05:08:01 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E79C0550CF;
- Tue, 18 Jun 2019 09:07:57 +0000 (UTC)
-Received: from work-vm (ovpn-117-76.ams2.redhat.com [10.36.117.76])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BE28482A26;
- Tue, 18 Jun 2019 09:07:55 +0000 (UTC)
-Date: Tue, 18 Jun 2019 10:07:53 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Liran Alon <liran.alon@oracle.com>
-Message-ID: <20190618090752.GD2850@work-vm>
-References: <20190617175658.135869-1-liran.alon@oracle.com>
- <20190617175658.135869-9-liran.alon@oracle.com>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hdA30-000135-GO
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 05:05:02 -0400
+Received: from player772.ha.ovh.net (unknown [10.109.146.76])
+ by mo2.mail-out.ovh.net (Postfix) with ESMTP id 322B419FCE7
+ for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 11:04:42 +0200 (CEST)
+Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
+ (Authenticated sender: clg@kaod.org)
+ by player772.ha.ovh.net (Postfix) with ESMTPSA id 8E2426EF4A90;
+ Tue, 18 Jun 2019 09:04:36 +0000 (UTC)
+To: Rashmica Gupta <rashmica.g@gmail.com>, qemu-arm@nongnu.org
+References: <20190618085154.21498-1-rashmica.g@gmail.com>
+ <20190618085154.21498-2-rashmica.g@gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <c749dc1e-be58-e7d9-6aee-af68776f0d32@kaod.org>
+Date: Tue, 18 Jun 2019 11:04:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190617175658.135869-9-liran.alon@oracle.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Tue, 18 Jun 2019 09:07:58 +0000 (UTC)
+In-Reply-To: <20190618085154.21498-2-rashmica.g@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 12189273870552304595
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudeiledguddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [QEMU PATCH v3 8/9] KVM: i386: Add support for
- KVM_CAP_EXCEPTION_PAYLOAD
+X-Received-From: 87.98.172.75
+Subject: Re: [Qemu-devel] [PATCH 1/2] hw/gpio: Add basic Aspeed GPIO model
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,450 +70,995 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, kvm@vger.kernel.org, maran.wilson@oracle.com,
- mtosatti@redhat.com, qemu-devel@nongnu.org,
- Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
- jmattson@google.com, rth@twiddle.net
+Cc: andrew@aj.id.au, qemu-devel@nongnu.org, joel@jms.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Liran Alon (liran.alon@oracle.com) wrote:
-> Kernel commit c4f55198c7c2 ("kvm: x86: Introduce KVM_CAP_EXCEPTION_PAYLOAD")
-> introduced a new KVM capability which allows userspace to correctly
-> distinguish between pending and injected exceptions.
-> 
-> This distinguish is important in case of nested virtualization scenarios
-> because a L2 pending exception can still be intercepted by the L1 hypervisor
-> while a L2 injected exception cannot.
-> 
-> Furthermore, when an exception is attempted to be injected by QEMU,
-> QEMU should specify the exception payload (CR2 in case of #PF or
-> DR6 in case of #DB) instead of having the payload already delivered in
-> the respective vCPU register. Because in case exception is injected to
-> L2 guest and is intercepted by L1 hypervisor, then payload needs to be
-> reported to L1 intercept (VMExit handler) while still preserving
-> respective vCPU register unchanged.
-> 
-> This commit adds support for QEMU to properly utilise this new KVM
-> capability (KVM_CAP_EXCEPTION_PAYLOAD).
+On 18/06/2019 10:51, Rashmica Gupta wrote:
+> Add in details for GPIO controller for AST 2400 and 2500
 
-Does this kvm capability become a requirement for the nested migration
-then? If so, is it wired into the blockers?
+I agree.
 
-Dave
+C. 
 
-> Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
-> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+
+> 
+> Signed-off-by: Rashmica Gupta <rashmica.g@gmail.com>
 > ---
->  target/i386/cpu.c        |   6 ++-
->  target/i386/cpu.h        |   6 ++-
->  target/i386/hvf/hvf.c    |  10 ++--
->  target/i386/hvf/x86hvf.c |   4 +-
->  target/i386/kvm.c        | 101 ++++++++++++++++++++++++++++++++-------
->  target/i386/machine.c    |  84 +++++++++++++++++++++++++++++++-
->  6 files changed, 187 insertions(+), 24 deletions(-)
+>  hw/gpio/Makefile.objs         |   1 +
+>  hw/gpio/aspeed_gpio.c         | 869 ++++++++++++++++++++++++++++++++++
+>  include/hw/gpio/aspeed_gpio.h |  76 +++
+>  3 files changed, 946 insertions(+)
+>  create mode 100644 hw/gpio/aspeed_gpio.c
+>  create mode 100644 include/hw/gpio/aspeed_gpio.h
 > 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 197201087e65..a026e49f5c0d 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -4774,7 +4774,11 @@ static void x86_cpu_reset(CPUState *s)
->      memset(env->mtrr_fixed, 0, sizeof(env->mtrr_fixed));
->  
->      env->interrupt_injected = -1;
-> -    env->exception_injected = -1;
-> +    env->exception_nr = -1;
-> +    env->exception_pending = 0;
-> +    env->exception_injected = 0;
-> +    env->exception_has_payload = false;
-> +    env->exception_payload = 0;
->      env->nmi_injected = false;
->  #if !defined(CONFIG_USER_ONLY)
->      /* We hard-wire the BSP to the first CPU. */
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index a6bb71849869..e2ac4132972d 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1338,10 +1338,14 @@ typedef struct CPUX86State {
->  
->      /* For KVM */
->      uint32_t mp_state;
-> -    int32_t exception_injected;
-> +    int32_t exception_nr;
->      int32_t interrupt_injected;
->      uint8_t soft_interrupt;
-> +    uint8_t exception_pending;
-> +    uint8_t exception_injected;
->      uint8_t has_error_code;
-> +    uint8_t exception_has_payload;
-> +    uint64_t exception_payload;
->      uint32_t ins_len;
->      uint32_t sipi_vector;
->      bool tsc_valid;
-> diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
-> index 2751c8125ca2..dc4bb63536c8 100644
-> --- a/target/i386/hvf/hvf.c
-> +++ b/target/i386/hvf/hvf.c
-> @@ -605,7 +605,9 @@ static void hvf_store_events(CPUState *cpu, uint32_t ins_len, uint64_t idtvec_in
->      X86CPU *x86_cpu = X86_CPU(cpu);
->      CPUX86State *env = &x86_cpu->env;
->  
-> -    env->exception_injected = -1;
-> +    env->exception_nr = -1;
-> +    env->exception_pending = 0;
-> +    env->exception_injected = 0;
->      env->interrupt_injected = -1;
->      env->nmi_injected = false;
->      if (idtvec_info & VMCS_IDT_VEC_VALID) {
-> @@ -619,7 +621,8 @@ static void hvf_store_events(CPUState *cpu, uint32_t ins_len, uint64_t idtvec_in
->              break;
->          case VMCS_IDT_VEC_HWEXCEPTION:
->          case VMCS_IDT_VEC_SWEXCEPTION:
-> -            env->exception_injected = idtvec_info & VMCS_IDT_VEC_VECNUM;
-> +            env->exception_nr = idtvec_info & VMCS_IDT_VEC_VECNUM;
-> +            env->exception_injected = 1;
->              break;
->          case VMCS_IDT_VEC_PRIV_SWEXCEPTION:
->          default:
-> @@ -912,7 +915,8 @@ int hvf_vcpu_exec(CPUState *cpu)
->              macvm_set_rip(cpu, rip + ins_len);
->              break;
->          case VMX_REASON_VMCALL:
-> -            env->exception_injected = EXCP0D_GPF;
-> +            env->exception_nr = EXCP0D_GPF;
-> +            env->exception_injected = 1;
->              env->has_error_code = true;
->              env->error_code = 0;
->              break;
-> diff --git a/target/i386/hvf/x86hvf.c b/target/i386/hvf/x86hvf.c
-> index df8e946fbcde..e0ea02d631e6 100644
-> --- a/target/i386/hvf/x86hvf.c
-> +++ b/target/i386/hvf/x86hvf.c
-> @@ -362,8 +362,8 @@ bool hvf_inject_interrupts(CPUState *cpu_state)
->      if (env->interrupt_injected != -1) {
->          vector = env->interrupt_injected;
->          intr_type = VMCS_INTR_T_SWINTR;
-> -    } else if (env->exception_injected != -1) {
-> -        vector = env->exception_injected;
-> +    } else if (env->exception_nr != -1) {
-> +        vector = env->exception_nr;
->          if (vector == EXCP03_INT3 || vector == EXCP04_INTO) {
->              intr_type = VMCS_INTR_T_SWEXCEPTION;
->          } else {
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 5950c3ed0d1c..797f8ac46435 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -104,6 +104,7 @@ static uint32_t num_architectural_pmu_fixed_counters;
->  static int has_xsave;
->  static int has_xcrs;
->  static int has_pit_state2;
-> +static int has_exception_payload;
->  
->  static bool has_msr_mcg_ext_ctl;
->  
-> @@ -584,15 +585,56 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
->      /* Hope we are lucky for AO MCE */
->  }
->  
-> +static void kvm_reset_exception(CPUX86State *env)
+> diff --git a/hw/gpio/Makefile.objs b/hw/gpio/Makefile.objs
+> index e5da0cb54f..d305b3b24b 100644
+> --- a/hw/gpio/Makefile.objs
+> +++ b/hw/gpio/Makefile.objs
+> @@ -9,3 +9,4 @@ obj-$(CONFIG_OMAP) += omap_gpio.o
+>  obj-$(CONFIG_IMX) += imx_gpio.o
+>  obj-$(CONFIG_RASPI) += bcm2835_gpio.o
+>  obj-$(CONFIG_NRF51_SOC) += nrf51_gpio.o
+> +obj-$(CONFIG_ASPEED_SOC) += aspeed_gpio.o
+> diff --git a/hw/gpio/aspeed_gpio.c b/hw/gpio/aspeed_gpio.c
+> new file mode 100644
+> index 0000000000..d84dd69255
+> --- /dev/null
+> +++ b/hw/gpio/aspeed_gpio.c
+> @@ -0,0 +1,869 @@
+> +/*
+> + *  ASPEED GPIO Controller
+> + *
+> + *  Copyright (C) 2017-2019 IBM Corp.
+> + *
+> + * This code is licensed under the GPL version 2 or later.  See
+> + * the COPYING file in the top-level directory.
+> + *
+> + *
+> + * This models the ast2400 and ast2500 GPIO controllers.
+> + *
+> + * GPIO pins are arranged in groups of 8 pins labeled A,B,..,Y,Z,AA,AB,AC.
+> + * (Note that the ast2400 controller only goes up to group AB).
+> + * A set has four groups (except set AC which only has one) and is
+> + * referred to by the groups it is composed of (eg ABCD,EFGH,...,YZAAAB).
+> + * Each set is accessed and controlled by a bank of 14 registers.
+> + *
+> + * These registers operate on a per pin level where each bit in the register
+> + * corresponds to a pin, except for the command source registers. The command
+> + * source registers operate on a per group level where bits 24, 16, 8 and 0
+> + * correspond to each group in the set.
+> + *
+> + *  eg. registers for set ABCD:
+> + *  |D7...D0|C7...C0|B7...B0|A7...A0| <- GPIOs
+> + *  |31...24|23...16|15....8|7.....0| <- bit position
+> + *
+> + * Note that there are a couple of groups that only have 4 pins.
+> +
+> + * There are three ways that this model deviates from the behaviour of the
+> + * actual controller:
+> + * (1) There are three debounce registers which aren't modeled and so the per
+> + * set debounce setting registers don't affect anything.
+> + *
+> + * (2) The only control source driving the GPIO pins in the model is the ARM
+> + * model (as there currently aren't models for the LPC or Coprocessor [TODO]).
+> + *
+> + * (3) None of the registers in the model are reset tolerant. [TODO]
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/log.h"
+> +#include "hw/gpio/aspeed_gpio.h"
+> +#include "include/hw/misc/aspeed_scu.h"
+> +#include "qapi/error.h"
+> +#include "qapi/visitor.h"
+> +
+> +#define ASPEED_GPIOS_PER_REG 32
+> +
+> +/* GPIO Source Types */
+> +#define ASPEED_CMD_SRC_MASK         0x01010101
+> +#define ASPEED_SOURCE_ARM           0
+> +#define ASPEED_SOURCE_LPC           1
+> +#define ASPEED_SOURCE_COPROCESSOR   2
+> +#define ASPEED_SOURCE_RESERVED      3
+> +
+> +/* GPIO Interrupt Triggers */
+> +#define ASPEED_FALLING_EDGE 0
+> +#define ASPEED_RISING_EDGE  1
+> +#define ASPEED_LEVEL_LOW    2
+> +#define ASPEED_LEVEL_HIGH   3
+> +#define ASPEED_DUAL_EDGE    4
+> +
+> +/* GPIO Register Address Offsets */
+> +#define GPIO_ABCD_DATA_VALUE     0x000
+> +#define GPIO_ABCD_DIRECTION      0x004
+> +#define GPIO_ABCD_INT_ENABLE     0x008
+> +#define GPIO_ABCD_INT_SENS_0     0x00C
+> +#define GPIO_ABCD_INT_SENS_1     0x010
+> +#define GPIO_ABCD_INT_SENS_2     0x014
+> +#define GPIO_ABCD_INT_STATUS     0x018
+> +#define GPIO_ABCD_RESET_TOLERANT 0x01C
+> +#define GPIO_EFGH_DATA_VALUE     0x020
+> +#define GPIO_EFGH_DIRECTION      0x024
+> +#define GPIO_EFGH_INT_ENABLE     0x028
+> +#define GPIO_EFGH_INT_SENS_0     0x02C
+> +#define GPIO_EFGH_INT_SENS_1     0x030
+> +#define GPIO_EFGH_INT_SENS_2     0x034
+> +#define GPIO_EFGH_INT_STATUS     0x038
+> +#define GPIO_EFGH_RESET_TOL      0x03C
+> +#define GPIO_ABCD_DEBOUNCE_1     0x040
+> +#define GPIO_ABCD_DEBOUNCE_2     0x044
+> +#define GPIO_EFGH_DEBOUNCE_1     0x048
+> +#define GPIO_EFGH_DEBOUNCE_2     0x04C
+> +#define GPIO_DEBOUNCE_TIME_1     0x050
+> +#define GPIO_DEBOUNCE_TIME_2     0x054
+> +#define GPIO_DEBOUNCE_TIME_3     0x058
+> +#define GPIO_ABCD_COMMAND_SRC_0  0x060
+> +#define GPIO_ABCD_COMMAND_SRC_1  0x064
+> +#define GPIO_EFGH_COMMAND_SRC_0  0x068
+> +#define GPIO_EFGH_COMMAND_SRC_1  0x06C
+> +#define GPIO_IJKL_DATA_VALUE     0x070
+> +#define GPIO_IJKL_DIRECTION      0x074
+> +#define GPIO_MNOP_DATA_VALUE     0x078
+> +#define GPIO_MNOP_DIRECTION      0x07C
+> +#define GPIO_QRST_DATA_VALUE     0x080
+> +#define GPIO_QRST_DIRECTION      0x084
+> +#define GPIO_UVWX_DATA_VALUE     0x088
+> +#define GPIO_UWVX_DIRECTION      0x08C
+> +#define GPIO_IJKL_COMMAND_SRC_0  0x090
+> +#define GPIO_IJKL_COMMAND_SRC_1  0x094
+> +#define GPIO_IJKL_INT_ENABLE     0x098
+> +#define GPIO_IJKL_INT_SENS_0     0x09C
+> +#define GPIO_IJKL_INT_SENS_1     0x0A0
+> +#define GPIO_IJKL_INT_SENS_2     0x0A4
+> +#define GPIO_IJKL_INT_STATUS     0x0A8
+> +#define GPIO_IJKL_RESET_TOLERANT 0x0AC
+> +#define GPIO_IJKL_DEBOUNCE_1     0x0B0
+> +#define GPIO_IJKL_DEBOUNCE_2     0x0B4
+> +#define GPIO_IJKL_INPUT_MASK     0x0B8
+> +#define GPIO_ABCD_DATA_READ      0x0C0
+> +#define GPIO_EFGH_DATA_READ      0x0C4
+> +#define GPIO_IJKL_DATA_READ      0x0C8
+> +#define GPIO_MNOP_DATA_READ      0x0CC
+> +#define GPIO_QRST_DATA_READ      0x0D0
+> +#define GPIO_UVWX_DATA_READ      0x0D4
+> +#define GPIO_YZAAAB_DATA_READ    0x0D8
+> +#define GPIO_AC_DATA_READ        0x0DC
+> +#define GPIO_MNOP_COMMAND_SRC_0  0x0E0
+> +#define GPIO_MNOP_COMMAND_SRC_1  0x0E4
+> +#define GPIO_MNOP_INT_ENABLE     0x0E8
+> +#define GPIO_MNOP_INT_SENS_0     0x0EC
+> +#define GPIO_MNOP_INT_SENS_1     0x0F0
+> +#define GPIO_MNOP_INT_SENS_2     0x0F4
+> +#define GPIO_MNOP_INT_STATUS     0x0F8
+> +#define GPIO_MNOP_RESET_TOLERANT 0x0FC
+> +#define GPIO_MNOP_DEBOUNCE_1     0x100
+> +#define GPIO_MNOP_DEBOUNCE_2     0x104
+> +#define GPIO_MNOP_INPUT_MASK     0x108
+> +#define GPIO_QRST_COMMAND_SRC_0  0x110
+> +#define GPIO_QRST_COMMAND_SRC_1  0x114
+> +#define GPIO_QRST_INT_ENABLE     0x118
+> +#define GPIO_QRST_INT_SENS_0     0x11C
+> +#define GPIO_QRST_INT_SENS_1     0x120
+> +#define GPIO_QRST_INT_SENS_2     0x124
+> +#define GPIO_QRST_INT_STATUS     0x128
+> +#define GPIO_QRST_RESET_TOLERANT 0x12C
+> +#define GPIO_QRST_DEBOUNCE_1     0x130
+> +#define GPIO_QRST_DEBOUNCE_2     0x134
+> +#define GPIO_QRST_INPUT_MASK     0x138
+> +#define GPIO_UVWX_COMMAND_SRC_0  0x140
+> +#define GPIO_UVWX_COMMAND_SRC_1  0x144
+> +#define GPIO_UVWX_INT_ENABLE     0x148
+> +#define GPIO_UVWX_INT_SENS_0     0x14C
+> +#define GPIO_UVWX_INT_SENS_1     0x150
+> +#define GPIO_UVWX_INT_SENS_2     0x154
+> +#define GPIO_UVWX_INT_STATUS     0x158
+> +#define GPIO_UVWX_RESET_TOLERANT 0x15C
+> +#define GPIO_UVWX_DEBOUNCE_1     0x160
+> +#define GPIO_UVWX_DEBOUNCE_2     0x164
+> +#define GPIO_UVWX_INPUT_MASK     0x168
+> +#define GPIO_YZAAAB_COMMAND_SRC_0 0x170
+> +#define GPIO_YZAAAB_COMMAND_SRC_1 0x174
+> +#define GPIO_YZAAAB_INT_ENABLE   0x178
+> +#define GPIO_YZAAAB_INT_SENS_0   0x17C
+> +#define GPIO_YZAAAB_INT_SENS_1   0x180
+> +#define GPIO_YZAAAB_INT_SENS_2   0x184
+> +#define GPIO_YZAAAB_INT_STATUS   0x188
+> +#define GPIO_YZAAAB_RESET_TOLERANT 0x18C
+> +#define GPIO_YZAAAB_DEBOUNCE_1   0x190
+> +#define GPIO_YZAAAB_DEBOUNCE_2   0x194
+> +#define GPIO_YZAAAB_INPUT_MASK   0x198
+> +#define GPIO_AC_COMMAND_SRC_0    0x1A0
+> +#define GPIO_AC_COMMAND_SRC_1    0x1A4
+> +#define GPIO_AC_INT_ENABLE       0x1A8
+> +#define GPIO_AC_INT_SENS_0       0x1AC
+> +#define GPIO_AC_INT_SENS_1       0x1B0
+> +#define GPIO_AC_INT_SENS_2       0x1B4
+> +#define GPIO_AC_INT_STATUS       0x1B8
+> +#define GPIO_AC_RESET_TOLERANT   0x1BC
+> +#define GPIO_AC_DEBOUNCE_1       0x1C0
+> +#define GPIO_AC_DEBOUNCE_2       0x1C4
+> +#define GPIO_AC_INPUT_MASK       0x1C8
+> +#define GPIO_ABCD_INPUT_MASK     0x1D0
+> +#define GPIO_EFGH_INPUT_MASK     0x1D4
+> +#define GPIO_YZAAAB_DATA_VALUE   0x1E0
+> +#define GPIO_YZAAAB_DIRECTION    0x1E4
+> +#define GPIO_AC_DATA_VALUE       0x1E8
+> +#define GPIO_AC_DIRECTION        0x1EC
+> +
+> +struct AspeedGPIO {
+> +    uint16_t set_idx;
+> +    uint32_t (*get)(GPIORegs *regs);
+> +    void (*set)(AspeedGPIOState *s, GPIORegs *regs,
+> +                GPIOSetProperties *props, uint32_t val);
+> +};
+> +
+> +static int aspeed_evaluate_irq(GPIORegs *regs, int prev_value_high, int bit)
 > +{
-> +	env->exception_nr = -1;
-> +	env->exception_pending = 0;
-> +	env->exception_injected = 0;
-> +	env->exception_has_payload = false;
-> +	env->exception_payload = 0;
+> +    uint32_t falling_edge = 0, rising_edge = 0;
+> +    uint32_t int_trigger = extract32(regs->int_sens_0, bit, 1)
+> +                           | extract32(regs->int_sens_1, bit, 1) << 1
+> +                           | extract32(regs->int_sens_2, bit, 1) << 2 ;
+> +    uint32_t curr_pin_high = extract32(regs->data_value, bit, 1);
+> +
+> +    /* Detect edges */
+> +    if (curr_pin_high && !prev_value_high) {
+> +            rising_edge = 1;
+> +    } else if (!curr_pin_high && prev_value_high) {
+> +            falling_edge = 1;
+> +    }
+> +
+> +    if (((int_trigger == ASPEED_FALLING_EDGE)  && falling_edge)  ||
+> +        ((int_trigger == ASPEED_RISING_EDGE)  && rising_edge)  ||
+> +        ((int_trigger == ASPEED_LEVEL_LOW)  && !curr_pin_high)  ||
+> +        ((int_trigger == ASPEED_LEVEL_HIGH)  && curr_pin_high)  ||
+> +        ((int_trigger >= ASPEED_DUAL_EDGE)  && (rising_edge || falling_edge)))
+> +    {
+> +        regs->int_status = deposit32(regs->int_status, bit, 1, 1);
+> +        return 1;
+> +    }
+> +    return 0;
 > +}
 > +
-> +static void kvm_queue_exception(CPUX86State *env,
-> +                                int32_t exception_nr,
-> +                                uint8_t exception_has_payload,
-> +                                uint64_t exception_payload)
+> +static void aspeed_gpio_update(AspeedGPIOState *s, GPIORegs *regs)
 > +{
-> +    assert(env->exception_nr == -1);
-> +    assert(!env->exception_pending);
-> +    assert(!env->exception_injected);
-> +    assert(!env->exception_has_payload);
+> +    uint32_t input_mask = regs->input_mask;
+> +    uint32_t direction = regs->direction;
+> +    uint32_t old = regs->data_value;
+> +    uint32_t new = regs->data_read;
+> +    uint32_t diff;
+> +    int bit;
 > +
-> +    env->exception_nr = exception_nr;
+> +    diff = old ^ new;
+> +    if (!diff) {
+> +        return;
+> +    }
 > +
-> +    if (has_exception_payload) {
-> +        env->exception_pending = 1;
+> +    if (!direction) {
+> +        return;
+> +    }
 > +
-> +        env->exception_has_payload = exception_has_payload;
-> +        env->exception_payload = exception_payload;
-> +    } else {
-> +        env->exception_injected = 1;
-> +
-> +        if (exception_nr == EXCP01_DB) {
-> +            assert(exception_has_payload);
-> +            env->dr[6] = exception_payload;
-> +        } else if (exception_nr == EXCP0E_PAGE) {
-> +            assert(exception_has_payload);
-> +            env->cr[2] = exception_payload;
+> +    for (bit = 0; bit < ASPEED_GPIOS_PER_REG; bit++) {
+> +        uint32_t mask = 1 << bit;
+> +        /* If the bit needs to be updated... */
+> +        if (!(diff & mask)) {
+> +            continue;
+> +        }
+> +        /* ...and corresponds to an output pin...*/
+> +        if (!(direction & mask)) {
+> +            continue;
+> +        }
+> +        /* ...and isn't masked...  */
+> +        if (input_mask & mask) {
+> +            continue;
+> +        }
+> +        /* ... then update it*/
+> +        if (mask & new) {
+> +            regs->data_value |= mask;
 > +        } else {
-> +            assert(!exception_has_payload);
+> +            regs->data_value &= ~mask;
+> +        }
+> +
+> +        if (aspeed_evaluate_irq(regs, old & mask, bit)) {
+> +            qemu_set_irq(s->output[bit], 1);
 > +        }
 > +    }
 > +}
 > +
->  static int kvm_inject_mce_oldstyle(X86CPU *cpu)
->  {
->      CPUX86State *env = &cpu->env;
->  
-> -    if (!kvm_has_vcpu_events() && env->exception_injected == EXCP12_MCHK) {
-> +    if (!kvm_has_vcpu_events() && env->exception_nr == EXCP12_MCHK) {
->          unsigned int bank, bank_num = env->mcg_cap & 0xff;
->          struct kvm_x86_mce mce;
->  
-> -        env->exception_injected = -1;
-> +        kvm_reset_exception(env);
->  
->          /*
->           * There must be at least one bank in use if an MCE is pending.
-> @@ -1610,6 +1652,16 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->  
->      hv_vpindex_settable = kvm_check_extension(s, KVM_CAP_HYPERV_VP_INDEX);
->  
-> +    has_exception_payload = kvm_check_extension(s, KVM_CAP_EXCEPTION_PAYLOAD);
-> +    if (has_exception_payload) {
-> +        ret = kvm_vm_enable_cap(s, KVM_CAP_EXCEPTION_PAYLOAD, 0, true);
-> +        if (ret < 0) {
-> +            error_report("kvm: Failed to enable exception payload cap: %s",
-> +                         strerror(-ret));
-> +            return ret;
-> +        }
-> +    }
-> +
->      ret = kvm_get_supported_msrs(s);
->      if (ret < 0) {
->          return ret;
-> @@ -2914,8 +2966,16 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
->          return 0;
->      }
->  
-> -    events.exception.injected = (env->exception_injected >= 0);
-> -    events.exception.nr = env->exception_injected;
-> +    events.flags = 0;
-> +
-> +    if (has_exception_payload) {
-> +        events.flags |= KVM_VCPUEVENT_VALID_PAYLOAD;
-> +        events.exception.pending = env->exception_pending;
-> +        events.exception_has_payload = env->exception_has_payload;
-> +        events.exception_payload = env->exception_payload;
-> +    }
-> +    events.exception.nr = env->exception_nr;
-> +    events.exception.injected = env->exception_injected;
->      events.exception.has_error_code = env->has_error_code;
->      events.exception.error_code = env->error_code;
->  
-> @@ -2928,7 +2988,6 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
->      events.nmi.masked = !!(env->hflags2 & HF2_NMI_MASK);
->  
->      events.sipi_vector = env->sipi_vector;
-> -    events.flags = 0;
->  
->      if (has_msr_smbase) {
->          events.smi.smm = !!(env->hflags & HF_SMM_MASK);
-> @@ -2978,8 +3037,19 @@ static int kvm_get_vcpu_events(X86CPU *cpu)
->      if (ret < 0) {
->         return ret;
->      }
-> -    env->exception_injected =
-> -       events.exception.injected ? events.exception.nr : -1;
-> +
-> +    if (events.flags & KVM_VCPUEVENT_VALID_PAYLOAD) {
-> +        env->exception_pending = events.exception.pending;
-> +        env->exception_has_payload = events.exception_has_payload;
-> +        env->exception_payload = events.exception_payload;
-> +    } else {
-> +        env->exception_pending = 0;
-> +        env->exception_has_payload = false;
-> +    }
-> +    env->exception_injected = events.exception.injected;
-> +    env->exception_nr =
-> +        (env->exception_pending || env->exception_injected) ?
-> +        events.exception.nr : -1;
->      env->has_error_code = events.exception.has_error_code;
->      env->error_code = events.exception.error_code;
->  
-> @@ -3031,12 +3101,12 @@ static int kvm_guest_debug_workarounds(X86CPU *cpu)
->      unsigned long reinject_trap = 0;
->  
->      if (!kvm_has_vcpu_events()) {
-> -        if (env->exception_injected == EXCP01_DB) {
-> +        if (env->exception_nr == EXCP01_DB) {
->              reinject_trap = KVM_GUESTDBG_INJECT_DB;
->          } else if (env->exception_injected == EXCP03_INT3) {
->              reinject_trap = KVM_GUESTDBG_INJECT_BP;
->          }
-> -        env->exception_injected = -1;
-> +        kvm_reset_exception(env);
->      }
->  
->      /*
-> @@ -3412,13 +3482,13 @@ int kvm_arch_process_async_events(CPUState *cs)
->  
->          kvm_cpu_synchronize_state(cs);
->  
-> -        if (env->exception_injected == EXCP08_DBLE) {
-> +        if (env->exception_nr == EXCP08_DBLE) {
->              /* this means triple fault */
->              qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
->              cs->exit_request = 1;
->              return 0;
->          }
-> -        env->exception_injected = EXCP12_MCHK;
-> +        kvm_queue_exception(env, EXCP12_MCHK, 0, 0);
->          env->has_error_code = 0;
->  
->          cs->halted = 0;
-> @@ -3633,14 +3703,13 @@ static int kvm_handle_debug(X86CPU *cpu,
->      }
->      if (ret == 0) {
->          cpu_synchronize_state(cs);
-> -        assert(env->exception_injected == -1);
-> +        assert(env->exception_nr == -1);
->  
->          /* pass to guest */
-> -        env->exception_injected = arch_info->exception;
-> +        kvm_queue_exception(env, arch_info->exception,
-> +                            arch_info->exception == EXCP01_DB,
-> +                            arch_info->dr6);
->          env->has_error_code = 0;
-> -        if (arch_info->exception == EXCP01_DB) {
-> -            env->dr[6] = arch_info->dr6;
-> -        }
->      }
->  
->      return ret;
-> diff --git a/target/i386/machine.c b/target/i386/machine.c
-> index 95299ebff44a..6aac0fe9cb56 100644
-> --- a/target/i386/machine.c
-> +++ b/target/i386/machine.c
-> @@ -240,6 +240,41 @@ static int cpu_pre_save(void *opaque)
->      }
->  #endif
->  
-> +    /*
-> +     * When vCPU is running L2 and exception is still pending,
-> +     * it can potentially be intercepted by L1 hypervisor.
-> +     * In contrast to an injected exception which cannot be
-> +     * intercepted anymore.
-> +     *
-> +     * Furthermore, when a L2 exception is intercepted by L1
-> +     * hypervisor, it's exception payload (CR2/DR6 on #PF/#DB)
-> +     * should not be set yet in the respective vCPU register.
-> +     * Thus, in case an exception is pending, it is
-> +     * important to save the exception payload seperately.
-> +     *
-> +     * Therefore, if an exception is not in a pending state
-> +     * or vCPU is not in guest-mode, it is not important to
-> +     * distinguish between a pending and injected exception
-> +     * and we don't need to store seperately the exception payload.
-> +     *
-> +     * In order to preserve better backwards-compatabile migration,
-> +     * convert a pending exception to an injected exception in
-> +     * case it is not important to distingiush between them
-> +     * as described above.
-> +     */
-> +    if (env->exception_pending && !(env->hflags & HF_GUEST_MASK)) {
-> +        env->exception_pending = 0;
-> +        env->exception_injected = 1;
-> +
-> +        if (env->exception_has_payload) {
-> +            if (env->exception_nr == EXCP01_DB) {
-> +                env->dr[6] = env->exception_payload;
-> +            } else if (env->exception_nr == EXCP0E_PAGE) {
-> +                env->cr[2] = env->exception_payload;
-> +            }
-> +        }
-> +    }
-> +
->      return 0;
->  }
->  
-> @@ -297,6 +332,23 @@ static int cpu_post_load(void *opaque, int version_id)
->      }
->  #endif
->  
-> +    /*
-> +     * There are cases that we can get valid exception_nr with both
-> +     * exception_pending and exception_injected being cleared.
-> +     * This can happen in one of the following scenarios:
-> +     * 1) Source is older QEMU without KVM_CAP_EXCEPTION_PAYLOAD support.
-> +     * 2) Source is running on kernel without KVM_CAP_EXCEPTION_PAYLOAD support.
-> +     * 3) "cpu/exception_info" subsection not sent because there is no exception
-> +     *	  pending or guest wasn't running L2 (See comment in cpu_pre_save()).
-> +     *
-> +     * In those cases, we can just deduce that a valid exception_nr means
-> +     * we can treat the exception as already injected.
-> +     */
-> +    if ((env->exception_nr != -1) &&
-> +        !env->exception_pending && !env->exception_injected) {
-> +        env->exception_injected = 1;
-> +    }
-> +
->      env->fpstt = (env->fpus_vmstate >> 11) & 7;
->      env->fpus = env->fpus_vmstate & ~0x3800;
->      env->fptag_vmstate ^= 0xff;
-> @@ -342,6 +394,35 @@ static bool steal_time_msr_needed(void *opaque)
->      return cpu->env.steal_time_msr != 0;
->  }
->  
-> +static bool exception_info_needed(void *opaque)
+> +static uint32_t aspeed_adjust_pin(AspeedGPIOState *s, uint32_t pin)
 > +{
-> +    X86CPU *cpu = opaque;
-> +    CPUX86State *env = &cpu->env;
+> +    if (pin >= s->ctrl->gap) {
+> +        pin += 4;
+> +    }
 > +
-> +    /*
-> +     * It is important to save exception-info only in case
-> +     * we need to distingiush between a pending and injected
-> +     * exception. Which is only required in case there is a
-> +     * pending exception and vCPU is running L2.
-> +     * For more info, refer to comment in cpu_pre_save().
-> +     */
-> +    return (env->exception_pending && (env->hflags & HF_GUEST_MASK));
+> +    return pin;
 > +}
 > +
-> +static const VMStateDescription vmstate_exception_info = {
-> +    .name = "cpu/exception_info",
+> +static uint32_t aspeed_get_set_idx_from_pin(AspeedGPIOState *s, uint32_t pin)
+> +{
+> +    /*
+> +     * For most pins, dividing by 32 gets the set index.
+> +     *
+> +     * However the 2500 has a 4 pin gap in group AB and the 2400 has a 4 pin
+> +     * gap in group Y (and only four pins in AB but this is the last group so
+> +     * it doesn't matter).
+> +     */
+> +    return aspeed_adjust_pin(s, pin) >> 5;
+> +}
+> +
+> +static bool aspeed_gpio_get_pin_level(AspeedGPIOState *s, uint32_t pin)
+> +{
+> +    uint32_t reg_val;
+> +    uint32_t mask = 1 << (pin);
+> +    uint32_t set_idx = aspeed_get_set_idx_from_pin(s, pin);
+> +
+> +    reg_val = s->sets[set_idx].data_value;
+> +
+> +    return !!(reg_val & mask);
+> +}
+> +
+> +static void aspeed_gpio_set_pin_level(AspeedGPIOState *s, uint32_t pin,
+> +                                      bool level)
+> +{
+> +    uint32_t mask  = 1 << (pin);
+> +    uint32_t set_idx = aspeed_get_set_idx_from_pin(s, pin);
+> +
+> +    if (level) {
+> +        s->sets[set_idx].data_read |= mask;
+> +    } else {
+> +        s->sets[set_idx].data_read &= !mask;
+> +    }
+> +
+> +    aspeed_gpio_update(s, &s->sets[set_idx]);
+> +}
+> +
+> +/*
+> + *  | src_1 | src_2 |  source     |
+> + *  |-----------------------------|
+> + *  |   0   |   0   |  ARM        |
+> + *  |   0   |   1   |  LPC        |
+> + *  |   1   |   0   |  Coprocessor|
+> + *  |   1   |   1   |  Reserved   |
+> + *
+> + *  Once the source of a set is programmed, corresponding bits in the
+> + *  data_value, direction, interrupt [enable, sens[0-2]], reset_tol and
+> + *  debounce registers can only be written by the source.
+> + *
+> + *  Source is ARM by default
+> + *  only bits 24, 16, 8, and 0 can be set
+> + *
+> + *  we don't currently have a model for the LPC or Coprocessor
+> + */
+> +static uint32_t update_value_control_source(GPIORegs *regs, uint32_t old_value,
+> +                                            uint32_t value)
+> +{
+> +    int i;
+> +    int cmd_source;
+> +
+> +    /* assume the source is always ARM for now */
+> +    int source = ASPEED_SOURCE_ARM;
+> +
+> +    uint32_t new_value = 0;
+> +
+> +    /* for each group in set */
+> +    for (i = 0; i < ASPEED_GPIOS_PER_REG; i += 8) {
+> +        cmd_source = extract32(regs->cmd_source_0, i, 1)
+> +                | (extract32(regs->cmd_source_1, i, 1) << 1);
+> +
+> +        if (source == cmd_source) {
+> +            new_value |= (0xff << i) & value;
+> +        } else {
+> +            new_value |= (0xff << i) & old_value;
+> +        }
+> +    }
+> +    return new_value;
+> +}
+> +
+> +/* Reader helper functions */
+> +static uint32_t read_direction(GPIORegs *regs)
+> +{
+> +    return regs->direction;
+> +}
+> +
+> +static uint32_t read_data_value(GPIORegs *regs)
+> +{
+> +    return regs->data_value;
+> +}
+> +
+> +static uint32_t read_int_enable(GPIORegs *regs)
+> +{
+> +    return regs->int_enable;
+> +}
+> +
+> +static uint32_t read_int_sens_0(GPIORegs *regs)
+> +{
+> +    return regs->int_sens_0;
+> +}
+> +
+> +static uint32_t read_int_sens_1(GPIORegs *regs)
+> +{
+> +    return regs->int_sens_1;
+> +}
+> +
+> +static uint32_t read_int_sens_2(GPIORegs *regs)
+> +{
+> +    return regs->int_sens_2;
+> +}
+> +
+> +static uint32_t read_int_status(GPIORegs *regs)
+> +{
+> +    return regs->int_status;
+> +}
+> +
+> +static uint32_t read_reset_tol(GPIORegs *regs)
+> +{
+> +    return regs->reset_tol;
+> +}
+> +
+> +static uint32_t read_debounce_1(GPIORegs *regs)
+> +{
+> +    return regs->debounce_1;
+> +}
+> +
+> +static uint32_t read_debounce_2(GPIORegs *regs)
+> +{
+> +    return regs->debounce_2;
+> +}
+> +
+> +static uint32_t read_cmd_source_0(GPIORegs *regs)
+> +{
+> +    return regs->cmd_source_0;
+> +}
+> +
+> +static uint32_t read_cmd_source_1(GPIORegs *regs)
+> +{
+> +    return regs->cmd_source_1;
+> +}
+> +
+> +static uint32_t read_data(GPIORegs *regs)
+> +{
+> +    return regs->data_read;
+> +}
+> +
+> +static uint32_t read_input_mask(GPIORegs *regs)
+> +{
+> +    return regs->input_mask;
+> +}
+> +
+> +/* Write helper functions */
+> +
+> +static void _write_data_value(AspeedGPIOState *s, GPIORegs *regs,
+> +                              GPIOSetProperties *props, uint32_t val)
+> +{
+> +    val &= props->output | ~props->input;
+> +    regs->data_read = update_value_control_source(regs, regs->data_read, val);
+> +    aspeed_gpio_update(s, regs);
+> +}
+> +
+> +static void _write_direction(AspeedGPIOState *s, GPIORegs *regs,
+> +                             GPIOSetProperties *props, uint32_t val)
+> +{
+> +    val &= props->output | ~props->input;
+> +    regs->direction = update_value_control_source(regs, regs->direction, val);
+> +    aspeed_gpio_update(s, regs);
+> +}
+> +
+> +static void _write_int_enable(AspeedGPIOState *s, GPIORegs *regs,
+> +                              GPIOSetProperties *props, uint32_t val)
+> +{
+> +    regs->int_enable = update_value_control_source(regs, regs->int_enable, val);
+> +    aspeed_gpio_update(s, regs);
+> +}
+> +
+> +static void _write_int_sens_0(AspeedGPIOState *s, GPIORegs *regs,
+> +                              GPIOSetProperties *props, uint32_t val)
+> +{
+> +    regs->int_sens_0 = update_value_control_source(regs, regs->int_sens_0, val);
+> +    aspeed_gpio_update(s, regs);
+> +}
+> +
+> +static void _write_int_sens_1(AspeedGPIOState *s, GPIORegs *regs,
+> +                              GPIOSetProperties *props, uint32_t val)
+> +{
+> +    regs->int_sens_1 = update_value_control_source(regs, regs->int_sens_1, val);
+> +    aspeed_gpio_update(s, regs);
+> +}
+> +
+> +static void _write_int_sens_2(AspeedGPIOState *s, GPIORegs *regs,
+> +                              GPIOSetProperties *props, uint32_t val)
+> +{
+> +    regs->int_sens_2 = update_value_control_source(regs, regs->int_sens_2, val);
+> +    aspeed_gpio_update(s, regs);
+> +}
+> +
+> +static void _write_int_status(AspeedGPIOState *s, GPIORegs *regs,
+> +                              GPIOSetProperties *props, uint32_t val)
+> +{
+> +    regs->int_status = val;
+> +    aspeed_gpio_update(s, regs);
+> +}
+> +
+> +static void _write_reset_tol(AspeedGPIOState *s, GPIORegs *regs,
+> +                             GPIOSetProperties *props, uint32_t val)
+> +{
+> +    regs->reset_tol = update_value_control_source(regs, regs->reset_tol, val);
+> +}
+> +
+> +static void _write_debounce_1(AspeedGPIOState *s, GPIORegs *regs,
+> +                              GPIOSetProperties *props, uint32_t val)
+> +{
+> +    regs->debounce_1 = update_value_control_source(regs, regs->debounce_1, val);
+> +}
+> +
+> +static void _write_debounce_2(AspeedGPIOState *s, GPIORegs *regs,
+> +                              GPIOSetProperties *props, uint32_t val)
+> +{
+> +    regs->debounce_2 = update_value_control_source(regs, regs->debounce_2, val);
+> +}
+> +
+> +static void _write_cmd_source_0(AspeedGPIOState *s, GPIORegs *regs,
+> +                                GPIOSetProperties *props, uint32_t val)
+> +{
+> +    regs->cmd_source_0 = val & ASPEED_CMD_SRC_MASK;
+> +}
+> +
+> +static void _write_cmd_source_1(AspeedGPIOState *s, GPIORegs *regs,
+> +                                GPIOSetProperties *props, uint32_t val)
+> +{
+> +    regs->cmd_source_1 = val & ASPEED_CMD_SRC_MASK;
+> +}
+> +
+> +/*
+> + * feeds into interrupt generation
+> + * 0: read from data value reg will be updated
+> + * 1: read from data value reg will not be updated
+> + */
+> +static void _write_input_mask(AspeedGPIOState *s, GPIORegs *regs,
+> +                              GPIOSetProperties *props, uint32_t val)
+> +{
+> +    regs->input_mask = val & props->input;
+> +    aspeed_gpio_update(s, regs);
+> +}
+> +
+> +static const struct AspeedGPIO gpios[0x1f0] = {
+> +    /* Set ABCD */
+> +    [GPIO_ABCD_DATA_VALUE] = {0, read_data_value, _write_data_value},
+> +    [GPIO_ABCD_DIRECTION] = {0, read_direction, _write_direction},
+> +    [GPIO_ABCD_INT_ENABLE] = {0, read_int_enable, _write_int_enable},
+> +    [GPIO_ABCD_INT_SENS_0] = {0, read_int_sens_0, _write_int_sens_0},
+> +    [GPIO_ABCD_INT_SENS_1] = {0, read_int_sens_1, _write_int_sens_1},
+> +    [GPIO_ABCD_INT_SENS_2] = {0, read_int_sens_2, _write_int_sens_2},
+> +    [GPIO_ABCD_INT_STATUS] = {0, read_int_status, _write_int_status},
+> +    [GPIO_ABCD_RESET_TOLERANT] = {0, read_reset_tol, _write_reset_tol},
+> +    [GPIO_ABCD_DEBOUNCE_1] = {0, read_debounce_1, _write_debounce_1},
+> +    [GPIO_ABCD_DEBOUNCE_2] = {0, read_debounce_2, _write_debounce_2},
+> +    [GPIO_ABCD_COMMAND_SRC_0] = {0, read_cmd_source_0, _write_cmd_source_0},
+> +    [GPIO_ABCD_COMMAND_SRC_1] = {0, read_cmd_source_1, _write_cmd_source_1},
+> +    [GPIO_ABCD_DATA_READ] = {0, read_data, NULL},
+> +    [GPIO_ABCD_INPUT_MASK] = {0, read_input_mask, _write_input_mask},
+> +    /* Set EFGH */
+> +    [GPIO_EFGH_DATA_VALUE] = {1, read_data_value, _write_data_value},
+> +    [GPIO_EFGH_DIRECTION] = {1, read_direction, _write_direction },
+> +    [GPIO_EFGH_INT_ENABLE] = {1, read_int_enable, _write_int_enable},
+> +    [GPIO_EFGH_INT_SENS_0] = {1, read_int_sens_0, _write_int_sens_0},
+> +    [GPIO_EFGH_INT_SENS_1] = {1, read_int_sens_1, _write_int_sens_1},
+> +    [GPIO_EFGH_INT_SENS_2] = {1, read_int_sens_2, _write_int_sens_2},
+> +    [GPIO_EFGH_INT_STATUS] = {1, read_int_status, _write_int_status},
+> +    [GPIO_EFGH_RESET_TOL] = {1, read_reset_tol,   _write_reset_tol},
+> +    [GPIO_EFGH_DEBOUNCE_1] = {1, read_debounce_1,  _write_debounce_1},
+> +    [GPIO_EFGH_DEBOUNCE_2] = {1, read_debounce_2,  _write_debounce_2},
+> +    [GPIO_EFGH_COMMAND_SRC_0] = {1, read_cmd_source_0,  _write_cmd_source_0},
+> +    [GPIO_EFGH_COMMAND_SRC_1] = {1, read_cmd_source_1,  _write_cmd_source_1},
+> +    [GPIO_EFGH_DATA_READ] = {1, read_data, NULL},
+> +    [GPIO_EFGH_INPUT_MASK] = {1, read_input_mask,  _write_input_mask},
+> +    /* Set IJKL */
+> +    [GPIO_IJKL_DATA_VALUE] = {2, read_data_value, _write_data_value},
+> +    [GPIO_IJKL_DIRECTION] = {2, read_direction, _write_direction},
+> +    [GPIO_IJKL_INT_ENABLE] = {2, read_int_enable, _write_int_enable},
+> +    [GPIO_IJKL_INT_SENS_0] = {2, read_int_sens_0, _write_int_sens_0},
+> +    [GPIO_IJKL_INT_SENS_1] = {2, read_int_sens_1, _write_int_sens_1},
+> +    [GPIO_IJKL_INT_SENS_2] = {2, read_int_sens_2, _write_int_sens_2},
+> +    [GPIO_IJKL_INT_STATUS] = {2, read_int_status, _write_int_status},
+> +    [GPIO_IJKL_RESET_TOLERANT] = {2, read_reset_tol, _write_reset_tol},
+> +    [GPIO_IJKL_DEBOUNCE_1] = {2, read_debounce_1, _write_debounce_1},
+> +    [GPIO_IJKL_DEBOUNCE_2] = {2, read_debounce_2, _write_debounce_2},
+> +    [GPIO_IJKL_COMMAND_SRC_0] = {2, read_cmd_source_0, _write_cmd_source_0},
+> +    [GPIO_IJKL_COMMAND_SRC_1] = {2, read_cmd_source_1, _write_cmd_source_1},
+> +    [GPIO_IJKL_DATA_READ] = {2, read_data, NULL},
+> +    [GPIO_IJKL_INPUT_MASK] = {2, read_input_mask, _write_input_mask},
+> +    /* Set MNOP */
+> +    [GPIO_MNOP_DATA_VALUE] = {3, read_data_value, _write_data_value},
+> +    [GPIO_MNOP_DIRECTION] = {3, read_direction, _write_direction},
+> +    [GPIO_MNOP_INT_ENABLE] = {3, read_int_enable, _write_int_enable},
+> +    [GPIO_MNOP_INT_SENS_0] = {3, read_int_sens_0, _write_int_sens_0},
+> +    [GPIO_MNOP_INT_SENS_1] = {3, read_int_sens_1, _write_int_sens_1},
+> +    [GPIO_MNOP_INT_SENS_2] = {3, read_int_sens_2, _write_int_sens_2},
+> +    [GPIO_MNOP_INT_STATUS] = {3, read_int_status, _write_int_status},
+> +    [GPIO_MNOP_RESET_TOLERANT] = {3, read_reset_tol,  _write_reset_tol},
+> +    [GPIO_MNOP_DEBOUNCE_1] = {3, read_debounce_1, _write_debounce_1},
+> +    [GPIO_MNOP_DEBOUNCE_2] = {3, read_debounce_2, _write_debounce_2},
+> +    [GPIO_MNOP_COMMAND_SRC_0] = {3, read_cmd_source_0, _write_cmd_source_0},
+> +    [GPIO_MNOP_COMMAND_SRC_1] = {3, read_cmd_source_1, _write_cmd_source_1},
+> +    [GPIO_MNOP_DATA_READ] = {3, read_data, NULL},
+> +    [GPIO_MNOP_INPUT_MASK] = {3, read_input_mask, _write_input_mask},
+> +    /* Set QRST */
+> +    [GPIO_QRST_DATA_VALUE] = {4, read_data_value, _write_data_value},
+> +    [GPIO_QRST_DIRECTION] = {4, read_direction, _write_direction},
+> +    [GPIO_QRST_INT_ENABLE] = {4, read_int_enable, _write_int_enable},
+> +    [GPIO_QRST_INT_SENS_0] = {4, read_int_sens_0, _write_int_sens_0},
+> +    [GPIO_QRST_INT_SENS_1] = {4, read_int_sens_1, _write_int_sens_1},
+> +    [GPIO_QRST_INT_SENS_2] = {4, read_int_sens_2, _write_int_sens_2},
+> +    [GPIO_QRST_INT_STATUS] = {4, read_int_status, _write_int_status},
+> +    [GPIO_QRST_RESET_TOLERANT] = {4, read_reset_tol, _write_reset_tol},
+> +    [GPIO_QRST_DEBOUNCE_1] = {4, read_debounce_1, _write_debounce_1},
+> +    [GPIO_QRST_DEBOUNCE_2] = {4, read_debounce_2, _write_debounce_2},
+> +    [GPIO_QRST_COMMAND_SRC_0] = {4, read_cmd_source_0, _write_cmd_source_0},
+> +    [GPIO_QRST_COMMAND_SRC_1] = {4, read_cmd_source_1, _write_cmd_source_1},
+> +    [GPIO_QRST_DATA_READ] = {4, read_data, NULL},
+> +    [GPIO_QRST_INPUT_MASK] = {4, read_input_mask,  _write_input_mask},
+> +    /* Set UVWX */
+> +    [GPIO_UVWX_DATA_VALUE] = {5, read_data_value, _write_data_value},
+> +    [GPIO_UWVX_DIRECTION] = {5, read_direction, _write_direction},
+> +    [GPIO_UVWX_INT_ENABLE] = {5, read_int_enable, _write_int_enable},
+> +    [GPIO_UVWX_INT_SENS_0] = {5, read_int_sens_0, _write_int_sens_0},
+> +    [GPIO_UVWX_INT_SENS_1] = {5, read_int_sens_1, _write_int_sens_1},
+> +    [GPIO_UVWX_INT_SENS_2] = {5, read_int_sens_2, _write_int_sens_2},
+> +    [GPIO_UVWX_INT_STATUS] = {5, read_int_status, _write_int_status},
+> +    [GPIO_UVWX_RESET_TOLERANT] = {5, read_reset_tol, _write_reset_tol},
+> +    [GPIO_UVWX_DEBOUNCE_1] = {5, read_debounce_1, _write_debounce_1},
+> +    [GPIO_UVWX_DEBOUNCE_2] = {5, read_debounce_2, _write_debounce_2},
+> +    [GPIO_UVWX_COMMAND_SRC_0] = {5, read_cmd_source_0, _write_cmd_source_0},
+> +    [GPIO_UVWX_COMMAND_SRC_1] = {5, read_cmd_source_1, _write_cmd_source_1},
+> +    [GPIO_UVWX_DATA_READ] = {5, read_data, NULL},
+> +    [GPIO_UVWX_INPUT_MASK] = {5, read_input_mask, _write_input_mask},
+> +    /* Set YZAAAB */
+> +    [GPIO_YZAAAB_DATA_VALUE] = {6, read_data_value, _write_data_value},
+> +    [GPIO_YZAAAB_DIRECTION] = {6, read_direction, _write_direction},
+> +    [GPIO_YZAAAB_INT_ENABLE] = {6, read_int_enable, _write_int_enable},
+> +    [GPIO_YZAAAB_INT_SENS_0] = {6, read_int_sens_0, _write_int_sens_0},
+> +    [GPIO_YZAAAB_INT_SENS_1] = {6, read_int_sens_1, _write_int_sens_1},
+> +    [GPIO_YZAAAB_INT_SENS_2] = {6, read_int_sens_2, _write_int_sens_2},
+> +    [GPIO_YZAAAB_INT_STATUS] = {6, read_int_status, _write_int_status},
+> +    [GPIO_YZAAAB_RESET_TOLERANT] = {6, read_reset_tol, _write_reset_tol},
+> +    [GPIO_YZAAAB_DEBOUNCE_1] = {6, read_debounce_1, _write_debounce_1},
+> +    [GPIO_YZAAAB_DEBOUNCE_2] = {6, read_debounce_2, _write_debounce_2},
+> +    [GPIO_YZAAAB_COMMAND_SRC_0] = {6, read_cmd_source_0, _write_cmd_source_0},
+> +    [GPIO_YZAAAB_COMMAND_SRC_1] = {6, read_cmd_source_1, _write_cmd_source_1},
+> +    [GPIO_YZAAAB_DATA_READ] = {6, read_data, NULL},
+> +    [GPIO_YZAAAB_INPUT_MASK] = {6, read_input_mask, _write_input_mask},
+> +    /* Set AC */
+> +    [GPIO_AC_DATA_VALUE] = {7, read_data_value, _write_data_value},
+> +    [GPIO_AC_DIRECTION] = {7, read_direction, _write_direction},
+> +    [GPIO_AC_INT_ENABLE] = {7, read_int_enable, _write_int_enable},
+> +    [GPIO_AC_INT_SENS_0] = {7, read_int_sens_0, _write_int_sens_0},
+> +    [GPIO_AC_INT_SENS_1] = {7, read_int_sens_1, _write_int_sens_1},
+> +    [GPIO_AC_INT_SENS_2] = {7, read_int_sens_2, _write_int_sens_2},
+> +    [GPIO_AC_INT_STATUS] = {7, read_int_status, _write_int_status},
+> +    [GPIO_AC_RESET_TOLERANT] = {7, read_reset_tol, _write_reset_tol},
+> +    [GPIO_AC_DEBOUNCE_1] = {7, read_debounce_1, _write_debounce_1},
+> +    [GPIO_AC_DEBOUNCE_2] = {7, read_debounce_2, _write_debounce_2},
+> +    [GPIO_AC_COMMAND_SRC_0] = {7, read_cmd_source_0, _write_cmd_source_0},
+> +    [GPIO_AC_COMMAND_SRC_1] = {7, read_cmd_source_1, _write_cmd_source_1},
+> +    [GPIO_AC_DATA_READ] = {7, read_data, NULL},
+> +    [GPIO_AC_INPUT_MASK] = {7, read_input_mask,     _write_input_mask},
+> +    /* Debounce registers */
+> +    [GPIO_DEBOUNCE_TIME_1] = {-1, NULL, NULL},
+> +};
+> +
+> +static uint64_t aspeed_gpio_read(void *opaque, hwaddr offset, uint32_t size)
+> +{
+> +    AspeedGPIOState *s = ASPEED_GPIO(opaque);
+> +    uint32_t val = 0;
+> +
+> +    if (size != 4) {
+> +        return 0;
+> +    }
+> +
+> +    if (gpios[offset].get == NULL) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "no getter for offset %lx", offset);
+> +        return 0;
+> +    }
+> +
+> +    val = gpios[offset].get(&s->sets[gpios[offset].set_idx]);
+> +    return (uint64_t) val;
+> +}
+> +
+> +static void aspeed_gpio_write(void *opaque, hwaddr offset, uint64_t data,
+> +                              uint32_t size)
+> +{
+> +    AspeedGPIOState *s = ASPEED_GPIO(opaque);
+> +    GPIOSetProperties *props = &s->ctrl->props[gpios[offset].set_idx];
+> +
+> +    if (gpios[offset].set == NULL) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "no setter for offset %lx", offset);
+> +        return;
+> +    }
+> +
+> +    uint32_t mask = props->input | props->output;
+> +
+> +    gpios[offset].set(s, &s->sets[gpios[offset].set_idx],
+> +                      props, data & mask);
+> +}
+> +
+> +static void aspeed_gpio_get_pin(Object *obj, Visitor *v, const char *name,
+> +                                void *opaque, Error **errp)
+> +{
+> +    int pin = 0xfff;
+> +    bool level = true;
+> +    char group[3];
+> +    AspeedGPIOState *s = ASPEED_GPIO(obj);
+> +    if (sscanf(name, "gpio%2[A-Z]%1d", group, &pin) != 2) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "error reading %s", name);
+> +        return;
+> +    }
+> +    level = aspeed_gpio_get_pin_level(s, pin);
+> +    visit_type_bool(v, name, &level, errp);
+> +}
+> +
+> +static void aspeed_gpio_set_pin(Object *obj, Visitor *v, const char *name,
+> +                               void *opaque, Error **errp)
+> +{
+> +    Error *local_err = NULL;
+> +    bool level;
+> +    int pin = 0xfff;
+> +    char group[3];
+> +    AspeedGPIOState *s = ASPEED_GPIO(obj);
+> +    visit_type_bool(v, name, &level, &local_err);
+> +    if (sscanf(name, "gpio%2[A-Z]%1d", group, &pin) != 2) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "error reading %s", name);
+> +        return;
+> +    }
+> +    aspeed_gpio_set_pin_level(s, pin, level);
+> +}
+> +
+> +
+> +/* Setup functions */
+> +static const MemoryRegionOps aspeed_gpio_ops = {
+> +    .read = aspeed_gpio_read,
+> +    .write = aspeed_gpio_write,
+> +    .endianness = DEVICE_LITTLE_ENDIAN,
+> +    .valid.min_access_size = 4,
+> +    .valid.max_access_size = 4,
+> +};
+> +
+> +static void aspeed_gpio_reset(DeviceState *dev)
+> +{
+> +    struct AspeedGPIOState *s = ASPEED_GPIO(dev);
+> +
+> +    /* TODO: respect the reset tolerance registers */
+> +    memset(s->sets, 0, sizeof(s->sets));
+> +}
+> +
+> +static void aspeed_gpio_realize(DeviceState *dev, Error **errp)
+> +{
+> +    AspeedGPIOState *s = ASPEED_GPIO(dev);
+> +    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+> +
+> +    sysbus_init_irq(sbd, &s->irq);
+> +
+> +    memory_region_init_io(&s->iomem, OBJECT(s), &aspeed_gpio_ops, s,
+> +            TYPE_ASPEED_GPIO, 0x1000);
+> +
+> +    sysbus_init_mmio(sbd, &s->iomem);
+> +}
+> +
+> +static const VMStateDescription vmstate_gpio_regs = {
+> +    .name = TYPE_ASPEED_GPIO"/regs",
 > +    .version_id = 1,
 > +    .minimum_version_id = 1,
-> +    .needed = exception_info_needed,
 > +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT8(env.exception_pending, X86CPU),
-> +        VMSTATE_UINT8(env.exception_injected, X86CPU),
-> +        VMSTATE_UINT8(env.exception_has_payload, X86CPU),
-> +        VMSTATE_UINT64(env.exception_payload, X86CPU),
-> +        VMSTATE_END_OF_LIST()
+> +        VMSTATE_UINT32(data_value,   GPIORegs),
+> +        VMSTATE_UINT32(data_read,    GPIORegs),
+> +        VMSTATE_UINT32(direction,    GPIORegs),
+> +        VMSTATE_UINT32(int_enable,   GPIORegs),
+> +        VMSTATE_UINT32(int_sens_0,   GPIORegs),
+> +        VMSTATE_UINT32(int_sens_1,   GPIORegs),
+> +        VMSTATE_UINT32(int_sens_2,   GPIORegs),
+> +        VMSTATE_UINT32(int_status,   GPIORegs),
+> +        VMSTATE_UINT32(reset_tol,    GPIORegs),
+> +        VMSTATE_UINT32(cmd_source_0, GPIORegs),
+> +        VMSTATE_UINT32(cmd_source_1, GPIORegs),
+> +        VMSTATE_UINT32(debounce_1,   GPIORegs),
+> +        VMSTATE_UINT32(debounce_2,   GPIORegs),
+> +        VMSTATE_UINT32(input_mask,   GPIORegs),
+> +        VMSTATE_END_OF_LIST(),
+> +    }
+> +};
+> +static const VMStateDescription vmstate_aspeed_gpio = {
+> +    .name = TYPE_ASPEED_GPIO,
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_STRUCT_ARRAY(sets, AspeedGPIOState, ASPEED_GPIO_MAX_NR_SETS,
+> +                             1, vmstate_gpio_regs, GPIORegs),
+> +        VMSTATE_END_OF_LIST(),
+> +   }
+> +};
+> +
+> +static void aspeed_gpio_init(Object *obj)
+> +{
+> +    AspeedGPIOState *s = ASPEED_GPIO(obj);
+> +    AspeedGPIOClass *agc = ASPEED_GPIO_GET_CLASS(s);
+> +    int pin;
+> +
+> +    s->ctrl = agc->ctrl;
+> +
+> +    for (pin = 0; pin < agc->ctrl->nr_gpio_pins; pin++) {
+> +        char *name;
+> +        int set_idx = aspeed_get_set_idx_from_pin(s, pin);
+> +        int _pin = aspeed_adjust_pin(s, pin);
+> +        int pin_idx = _pin - (set_idx * 32);
+> +        int group_idx = pin_idx >> 3;
+> +
+> +        name = g_strdup_printf("gpio%s%d",
+> +                               agc->ctrl->props[set_idx].set[group_idx],
+> +                               pin_idx % 8);
+> +        object_property_add(obj, name, "bool",
+> +                            aspeed_gpio_get_pin,
+> +                            aspeed_gpio_set_pin,
+> +                            NULL, NULL, NULL);
+> +    }
+> +}
+> +
+> +static void aspeed_gpio_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +    AspeedGPIOClass *agc = ASPEED_GPIO_CLASS(klass);
+> +
+> +    dc->realize = aspeed_gpio_realize;
+> +    dc->reset = aspeed_gpio_reset;
+> +    dc->desc = "Aspeed GPIO Controller";
+> +    dc->vmsd = &vmstate_aspeed_gpio;
+> +    agc->ctrl = data;
+> +}
+> +
+> +static GPIOSetProperties ast2400_set_props[] = {
+> +    [0] = {0xffffffff,  0xffffffff,  {"A", "B", "C", "D"} },
+> +    [1] = {0xffffffff,  0xffffffff,  {"E", "F", "G", "H"} },
+> +    [2] = {0xffffffff,  0xffffffff,  {"I", "J", "K", "L"} },
+> +    [3] = {0xffffffff,  0xffffffff,  {"M", "N", "O", "P"} },
+> +    [4] = {0xffffffff,  0xffffffff,  {"Q", "R", "S", "T"} },
+> +    [5] = {0xffffffff,  0x0000ffff,  {"U", "V", "W", "X"} },
+> +    [6] = {0x0000000f,  0x0fffff0f,  {"Y", "Z", "AA", "AB"} },
+> +};
+> +
+> +static GPIOSetProperties ast2500_set_props[] = {
+> +    [0] = {0xffffffff,  0xffffffff,  {"A", "B", "C", "D"} },
+> +    [1] = {0xffffffff,  0xffffffff,  {"E", "F", "G", "H"} },
+> +    [2] = {0xffffffff,  0xffffffff,  {"I", "J", "K", "L"} },
+> +    [3] = {0xffffffff,  0xffffffff,  {"M", "N", "O", "P"} },
+> +    [4] = {0xffffffff,  0xffffffff,  {"Q", "R", "S", "T"} },
+> +    [5] = {0xffffffff,  0x0000ffff,  {"U", "V", "W", "X"} },
+> +    [6] = {0xffffff0f,  0x0fffff0f,  {"Y", "Z", "AA", "AB"} },
+> +    [7] = {0x000000ff,  0x000000ff,  {"AC"} },
+> +};
+> +
+> +static AspeedGPIOController controllers[] = {
+> +    {
+> +        .name           = TYPE_ASPEED_GPIO "-ast2500",
+> +        .props          = ast2500_set_props,
+> +        .nr_gpio_pins   = 228,
+> +        .nr_gpio_sets   = 8,
+> +        .gap            = 220,
+> +    }, {
+> +        .name           = TYPE_ASPEED_GPIO "-ast2400",
+> +        .props          = ast2400_set_props,
+> +        .nr_gpio_pins   = 216,
+> +        .nr_gpio_sets   = 7,
+> +        .gap            = 196,
 > +    }
 > +};
 > +
->  static const VMStateDescription vmstate_steal_time_msr = {
->      .name = "cpu/steal_time_msr",
->      .version_id = 1,
-> @@ -1228,7 +1309,7 @@ VMStateDescription vmstate_x86_cpu = {
->          VMSTATE_INT32(env.interrupt_injected, X86CPU),
->          VMSTATE_UINT32(env.mp_state, X86CPU),
->          VMSTATE_UINT64(env.tsc, X86CPU),
-> -        VMSTATE_INT32(env.exception_injected, X86CPU),
-> +        VMSTATE_INT32(env.exception_nr, X86CPU),
->          VMSTATE_UINT8(env.soft_interrupt, X86CPU),
->          VMSTATE_UINT8(env.nmi_injected, X86CPU),
->          VMSTATE_UINT8(env.nmi_pending, X86CPU),
-> @@ -1252,6 +1333,7 @@ VMStateDescription vmstate_x86_cpu = {
->          /* The above list is not sorted /wrt version numbers, watch out! */
->      },
->      .subsections = (const VMStateDescription*[]) {
-> +        &vmstate_exception_info,
->          &vmstate_async_pf_msr,
->          &vmstate_pv_eoi_msr,
->          &vmstate_steal_time_msr,
-> -- 
-> 2.20.1
+> +static const TypeInfo aspeed_gpio_info = {
+> +    .name = TYPE_ASPEED_GPIO,
+> +    .parent = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(AspeedGPIOState),
+> +    .class_size     = sizeof(AspeedGPIOClass),
+> +    .instance_init = aspeed_gpio_init,
+> +    .abstract       = true,
+> +};
+> +
+> +static void aspeed_gpio_register_types(void)
+> +{
+> +    int i;
+> +
+> +    type_register_static(&aspeed_gpio_info);
+> +    for (i = 0; i < ARRAY_SIZE(controllers); i++) {
+> +        TypeInfo t = {
+> +            .name = controllers[i].name,
+> +            .parent = TYPE_ASPEED_GPIO,
+> +            .class_init = aspeed_gpio_class_init,
+> +            .class_data = (void *)&controllers[i],
+> +        };
+> +        type_register(&t);
+> +    };
+> +}
+> +
+> +type_init(aspeed_gpio_register_types);
+> diff --git a/include/hw/gpio/aspeed_gpio.h b/include/hw/gpio/aspeed_gpio.h
+> new file mode 100644
+> index 0000000000..97a84a5da1
+> --- /dev/null
+> +++ b/include/hw/gpio/aspeed_gpio.h
+> @@ -0,0 +1,76 @@
+> +/*
+> + *  ASPEED GPIO Controller
+> + *
+> + *  Copyright (C) 2017-2018 IBM Corp.
+> + *
+> + * This code is licensed under the GPL version 2 or later.  See
+> + * the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef ASPEED_GPIO_H
+> +#define ASPEED_GPIO_H
+> +
+> +#include "hw/sysbus.h"
+> +
+> +#define TYPE_ASPEED_GPIO "aspeed.gpio"
+> +#define ASPEED_GPIO(obj) OBJECT_CHECK(AspeedGPIOState, (obj), TYPE_ASPEED_GPIO)
+> +#define ASPEED_GPIO_CLASS(klass) \
+> +     OBJECT_CLASS_CHECK(AspeedGPIOClass, (klass), TYPE_ASPEED_GPIO)
+> +#define ASPEED_GPIO_GET_CLASS(obj) \
+> +     OBJECT_GET_CLASS(AspeedGPIOClass, (obj), TYPE_ASPEED_GPIO)
+> +
+> +#define ASPEED_GPIO_MAX_NR_SETS 8
+> +#define ASPEED_REGS_PER_BANK 14
+> +#define ASPEED_GPIO_MAX_NR_REGS (ASPEED_REGS_PER_BANK * ASPEED_GPIO_MAX_NR_SETS)
+> +#define ASPEED_GPIO_NR_PINS 228
+> +
+> +typedef struct GPIORegs GPIORegs;
+> +typedef const struct GPIOSetProperties {
+> +    uint32_t input;
+> +    uint32_t output;
+> +    char set[4][3];
+> +} GPIOSetProperties;
+> +
+> +typedef const struct AspeedGPIOController {
+> +    const char *name;
+> +    GPIOSetProperties *props;
+> +    uint32_t nr_gpio_pins;
+> +    uint32_t nr_gpio_sets;
+> +    uint32_t gap;
+> +} AspeedGPIOController;
+> +
+> +typedef struct  AspeedGPIOClass {
+> +    SysBusDevice parent_obj;
+> +    AspeedGPIOController *ctrl;
+> +}  AspeedGPIOClass;
+> +
+> +typedef struct AspeedGPIOState {
+> +    /* <private> */
+> +    SysBusDevice parent;
+> +
+> +    /*< public >*/
+> +    MemoryRegion iomem;
+> +    qemu_irq output[ASPEED_GPIO_NR_PINS];
+> +    qemu_irq irq;
+> +    AspeedGPIOController *ctrl;
+> +
+> +/* Parallel GPIO Registers */
+> +    struct GPIORegs {
+> +        uint32_t data_value; /* Reflects pin values */
+> +        uint32_t data_read; /* Contains last value written to data value */
+> +        uint32_t direction;
+> +        uint32_t int_enable;
+> +        uint32_t int_sens_0;
+> +        uint32_t int_sens_1;
+> +        uint32_t int_sens_2;
+> +        uint32_t int_status;
+> +        uint32_t reset_tol;
+> +        uint32_t cmd_source_0;
+> +        uint32_t cmd_source_1;
+> +        uint32_t debounce_1;
+> +        uint32_t debounce_2;
+> +        uint32_t input_mask;
+> +    } sets[ASPEED_GPIO_MAX_NR_SETS];
+> +} AspeedGPIOState;
+> +
+> +#endif /* _ASPEED_GPIO_H_ */
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
