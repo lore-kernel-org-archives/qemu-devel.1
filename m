@@ -2,56 +2,59 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B3D5C31E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 14:21:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B345C31E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 14:22:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07BA620873
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 14:21:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07BA620873
+	by mail.kernel.org (Postfix) with ESMTPS id 50F2C20673
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 14:22:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50F2C20673
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58482 helo=lists.gnu.org)
+Received: from localhost ([::1]:58488 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdEzV-0004Eg-5M
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 10:21:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60112)
+	id 1hdF0W-00052q-JU
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 10:22:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60046)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hdEpq-0002uK-4b
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:11:44 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hdEpl-0002sW-Iz
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:11:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hdEpk-0007u1-5D
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:11:39 -0400
-Received: from mail03.asahi-net.or.jp ([202.224.55.15]:57034)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hdEpj-0007sy-Eb
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:11:37 -0400
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:35002)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hdEpi-0007ml-To
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hdEpi-0007p2-PK
  for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:11:35 -0400
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
  [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 69B414A0C2;
- Tue, 18 Jun 2019 23:11:28 +0900 (JST)
+ by mail02.asahi-net.or.jp (Postfix) with ESMTPA id BCCA443F21;
+ Tue, 18 Jun 2019 23:11:31 +0900 (JST)
 Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
  [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 70AB6240085;
- Tue, 18 Jun 2019 23:11:25 +0900 (JST)
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 774E9240086;
+ Tue, 18 Jun 2019 23:11:31 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Date: Tue, 18 Jun 2019 23:10:39 +0900
-Message-Id: <20190618141118.52955-1-ysato@users.sourceforge.jp>
+Date: Tue, 18 Jun 2019 23:10:55 +0900
+Message-Id: <20190618141118.52955-17-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20190618141118.52955-1-ysato@users.sourceforge.jp>
+References: <20190618141118.52955-1-ysato@users.sourceforge.jp>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 202.224.55.15
-Subject: [Qemu-devel] [PATCH v21 00/21] Add RX archtecture support
+X-Received-From: 202.224.55.14
+Subject: [Qemu-devel] [PATCH v21 09/21] target/rx: Emit all disassembly in
+ one prt()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,147 +66,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, imammedo@redhat.com, richard.henderson@linaro.org,
+Cc: peter.maydell@linaro.org, imammedo@redhat.com,
+ Richard Henderson <richard.henderson@linaro.org>,
  Yoshinori Sato <ysato@users.sourceforge.jp>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello.
-This patch series is added Renesas RX target emulation.
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Chanegs for v20.
-Reorderd patches.
-Squashed v19 changes.
+Many of the multi-part prints have been eliminated by previous
+patches.  Eliminate the rest of them.
 
-Changes for v19.
-Follow tcg changes.
-Cleanup cpu.c.
-simplify rx_cpu_class_by_name and rx_load_image move to rx-virt.
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Message-Id: <20190607091116.49044-22-ysato@users.sourceforge.jp>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/rx/disas.c | 75 +++++++++++++++++++++++++++++--------------------=
+------
+ 1 file changed, 39 insertions(+), 36 deletions(-)
 
-My git repository is bellow.
-git://git.pf.osdn.net/gitroot/y/ys/ysato/qemu.git tags/rx-20190618
-
-Testing binaries bellow.
-u-boot
-Download - https://osdn.net/users/ysato/pf/qemu/dl/u-boot.bin.gz
-
-starting
-$ gzip -d u-boot.bin.gz
-$ qemu-system-rx -bios u-boot.bin
-
-linux and pico-root (only sash)
-Download - https://osdn.net/users/ysato/pf/qemu/dl/zImage (kernel)
-           https://osdn.net/users/ysato/pf/qemu/dl/rx-qemu.dtb (DeviceTre=
-e)
-
-starting
-$ qemu-system-rx -kernel zImage -dtb rx-qemu.dtb -append "earlycon"
-
-Philippe Mathieu-Daud=C3=A9 (3):
-  hw/registerfields.h: Add 8bit and 16bit register macros
-  hw/rx: Restrict the RX62N microcontroller to the RX62N CPU core
-  BootLinuxConsoleTest: Test the RX-Virt machine
-
-Richard Henderson (7):
-  target/rx: Disassemble rx_index_addr into a string
-  target/rx: Replace operand with prt_ldmi in disassembler
-  target/rx: Use prt_ldmi for XCHG_mr disassembly
-  target/rx: Emit all disassembly in one prt()
-  target/rx: Collect all bytes during disassembly
-  target/rx: Dump bytes for each insn during disassembly
-  hw/rx: Honor -accel qtest
-
-Yoshinori Sato (11):
-  MAINTAINERS: Add RX
-  qemu/bitops.h: Add extract8 and extract16
-  target/rx: TCG translation
-  target/rx: TCG helper
-  target/rx: CPU definition
-  target/rx: RX disassembler
-  hw/intc: RX62N interrupt controller (ICUa)
-  hw/timer: RX62N internal timer modules
-  hw/char: RX62N serial communication interface (SCI)
-  hw/rx: RX Target hardware definition
-  Add rx-softmmu
-
- configure                              |    8 +
- default-configs/rx-softmmu.mak         |    3 +
- qapi/common.json                       |    3 +-
- include/disas/dis-asm.h                |    5 +
- include/exec/poison.h                  |    1 +
- include/hw/char/renesas_sci.h          |   45 +
- include/hw/intc/rx_icu.h               |   56 +
- include/hw/registerfields.h            |   32 +-
- include/hw/rx/rx.h                     |    7 +
- include/hw/rx/rx62n.h                  |   91 ++
- include/hw/timer/renesas_cmt.h         |   38 +
- include/hw/timer/renesas_tmr.h         |   53 +
- include/qemu/bitops.h                  |   38 +
- include/sysemu/arch_init.h             |    1 +
- target/rx/cpu-param.h                  |   31 +
- target/rx/cpu-qom.h                    |   42 +
- target/rx/cpu.h                        |  182 +++
- target/rx/helper.h                     |   31 +
- arch_init.c                            |    2 +
- hw/char/renesas_sci.c                  |  340 +++++
- hw/intc/rx_icu.c                       |  376 +++++
- hw/rx/rx-virt.c                        |  135 ++
- hw/rx/rx62n.c                          |  246 ++++
- hw/timer/renesas_cmt.c                 |  275 ++++
- hw/timer/renesas_tmr.c                 |  455 ++++++
- target/rx/cpu.c                        |  217 +++
- target/rx/disas.c                      | 1446 +++++++++++++++++++
- target/rx/gdbstub.c                    |  112 ++
- target/rx/helper.c                     |  148 ++
- target/rx/monitor.c                    |   38 +
- target/rx/op_helper.c                  |  470 ++++++
- target/rx/translate.c                  | 2432 ++++++++++++++++++++++++++=
-++++++
- tests/machine-none-test.c              |    1 +
- MAINTAINERS                            |   19 +
- hw/Kconfig                             |    1 +
- hw/char/Kconfig                        |    3 +
- hw/char/Makefile.objs                  |    1 +
- hw/intc/Kconfig                        |    3 +
- hw/intc/Makefile.objs                  |    1 +
- hw/rx/Kconfig                          |   14 +
- hw/rx/Makefile.objs                    |    2 +
- hw/timer/Kconfig                       |    6 +
- hw/timer/Makefile.objs                 |    3 +
- target/rx/Makefile.objs                |   12 +
- target/rx/insns.decode                 |  621 ++++++++
- tests/acceptance/boot_linux_console.py |   46 +
- 46 files changed, 8090 insertions(+), 2 deletions(-)
- create mode 100644 default-configs/rx-softmmu.mak
- create mode 100644 include/hw/char/renesas_sci.h
- create mode 100644 include/hw/intc/rx_icu.h
- create mode 100644 include/hw/rx/rx.h
- create mode 100644 include/hw/rx/rx62n.h
- create mode 100644 include/hw/timer/renesas_cmt.h
- create mode 100644 include/hw/timer/renesas_tmr.h
- create mode 100644 target/rx/cpu-param.h
- create mode 100644 target/rx/cpu-qom.h
- create mode 100644 target/rx/cpu.h
- create mode 100644 target/rx/helper.h
- create mode 100644 hw/char/renesas_sci.c
- create mode 100644 hw/intc/rx_icu.c
- create mode 100644 hw/rx/rx-virt.c
- create mode 100644 hw/rx/rx62n.c
- create mode 100644 hw/timer/renesas_cmt.c
- create mode 100644 hw/timer/renesas_tmr.c
- create mode 100644 target/rx/cpu.c
- create mode 100644 target/rx/disas.c
- create mode 100644 target/rx/gdbstub.c
- create mode 100644 target/rx/helper.c
- create mode 100644 target/rx/monitor.c
- create mode 100644 target/rx/op_helper.c
- create mode 100644 target/rx/translate.c
- create mode 100644 hw/rx/Kconfig
- create mode 100644 hw/rx/Makefile.objs
- create mode 100644 target/rx/Makefile.objs
- create mode 100644 target/rx/insns.decode
-
+diff --git a/target/rx/disas.c b/target/rx/disas.c
+index db10385fd0..ebc1a44249 100644
+--- a/target/rx/disas.c
++++ b/target/rx/disas.c
+@@ -228,24 +228,21 @@ static bool trans_MOV_ra(DisasContext *ctx, arg_MOV=
+_ra *a)
+ /* mov.[bwl] rs,rd */
+ static bool trans_MOV_mm(DisasContext *ctx, arg_MOV_mm *a)
+ {
+-    char dspd[8], dsps[8];
++    char dspd[8], dsps[8], szc =3D size[a->sz];
+=20
+-    prt("mov.%c\t", size[a->sz]);
+     if (a->lds =3D=3D 3 && a->ldd =3D=3D 3) {
+         /* mov.[bwl] rs,rd */
+-        prt("r%d, r%d", a->rs, a->rd);
+-        return true;
+-    }
+-    if (a->lds =3D=3D 3) {
++        prt("mov.%c\tr%d, r%d", szc, a->rs, a->rd);
++    } else if (a->lds =3D=3D 3) {
+         rx_index_addr(ctx, dspd, a->ldd, a->sz);
+-        prt("r%d, %s[r%d]", a->rs, dspd, a->rd);
++        prt("mov.%c\tr%d, %s[r%d]", szc, a->rs, dspd, a->rd);
+     } else if (a->ldd =3D=3D 3) {
+         rx_index_addr(ctx, dsps, a->lds, a->sz);
+-        prt("%s[r%d], r%d", dsps, a->rs, a->rd);
++        prt("mov.%c\t%s[r%d], r%d", szc, dsps, a->rs, a->rd);
+     } else {
+         rx_index_addr(ctx, dsps, a->lds, a->sz);
+         rx_index_addr(ctx, dspd, a->ldd, a->sz);
+-        prt("%s[r%d], %s[r%d]", dsps, a->rs, dspd, a->rd);
++        prt("mov.%c\t%s[r%d], %s[r%d]", szc, dsps, a->rs, dspd, a->rd);
+     }
+     return true;
+ }
+@@ -254,8 +251,11 @@ static bool trans_MOV_mm(DisasContext *ctx, arg_MOV_=
+mm *a)
+ /* mov.[bwl] rs,[-rd] */
+ static bool trans_MOV_rp(DisasContext *ctx, arg_MOV_rp *a)
+ {
+-    prt("mov.%c\tr%d, ", size[a->sz], a->rs);
+-    prt((a->ad =3D=3D 0) ? "[r%d+]" : "[-r%d]", a->rd);
++    if (a->ad) {
++        prt("mov.%c\tr%d, [-r%d]", size[a->sz], a->rs, a->rd);
++    } else {
++        prt("mov.%c\tr%d, [r%d+]", size[a->sz], a->rs, a->rd);
++    }
+     return true;
+ }
+=20
+@@ -263,9 +263,11 @@ static bool trans_MOV_rp(DisasContext *ctx, arg_MOV_=
+rp *a)
+ /* mov.[bwl] [-rd],rs */
+ static bool trans_MOV_pr(DisasContext *ctx, arg_MOV_pr *a)
+ {
+-    prt("mov.%c\t", size[a->sz]);
+-    prt((a->ad =3D=3D 0) ? "[r%d+]" : "[-r%d]", a->rd);
+-    prt(", r%d", a->rs);
++    if (a->ad) {
++        prt("mov.%c\t[-r%d], r%d", size[a->sz], a->rd, a->rs);
++    } else {
++        prt("mov.%c\t[r%d+], r%d", size[a->sz], a->rd, a->rs);
++    }
+     return true;
+ }
+=20
+@@ -299,9 +301,11 @@ static bool trans_MOVU_ar(DisasContext *ctx, arg_MOV=
+U_ar *a)
+ /* movu.[bw] [-rs],rd */
+ static bool trans_MOVU_pr(DisasContext *ctx, arg_MOVU_pr *a)
+ {
+-    prt("movu.%c\t", size[a->sz]);
+-    prt((a->ad =3D=3D 0) ? "[r%d+]" : "[-r%d]", a->rd);
+-    prt(", r%d", a->rs);
++    if (a->ad) {
++        prt("movu.%c\t[-r%d], r%d", size[a->sz], a->rd, a->rs);
++    } else {
++        prt("movu.%c\t[r%d+], r%d", size[a->sz], a->rd, a->rs);
++    }
+     return true;
+ }
+=20
+@@ -478,11 +482,11 @@ static bool trans_TST_mr(DisasContext *ctx, arg_TST=
+_mr *a)
+ /* not rs, rd */
+ static bool trans_NOT_rr(DisasContext *ctx, arg_NOT_rr *a)
+ {
+-    prt("not\t");
+     if (a->rs !=3D a->rd) {
+-        prt("r%d, ", a->rs);
++        prt("not\tr%d, r%d", a->rs, a->rd);
++    } else {
++        prt("not\tr%d", a->rs);
+     }
+-    prt("r%d", a->rd);
+     return true;
+ }
+=20
+@@ -490,11 +494,11 @@ static bool trans_NOT_rr(DisasContext *ctx, arg_NOT=
+_rr *a)
+ /* neg rs, rd */
+ static bool trans_NEG_rr(DisasContext *ctx, arg_NEG_rr *a)
+ {
+-    prt("neg\t");
+     if (a->rs !=3D a->rd) {
+-        prt("r%d, ", a->rs);
++        prt("neg\tr%d, r%d", a->rs, a->rd);
++    } else {
++        prt("neg\tr%d", a->rs);
+     }
+-    prt("r%d", a->rd);
+     return true;
+ }
+=20
+@@ -606,11 +610,10 @@ static bool trans_SBB_mr(DisasContext *ctx, arg_SBB=
+_mr *a)
+ /* abs rs, rd */
+ static bool trans_ABS_rr(DisasContext *ctx, arg_ABS_rr *a)
+ {
+-    prt("abs\t");
+-    if (a->rs =3D=3D a->rd) {
+-        prt("r%d", a->rd);
++    if (a->rs !=3D a->rd) {
++        prt("abs\tr%d, r%d", a->rs, a->rd);
+     } else {
+-        prt("r%d, r%d", a->rs, a->rd);
++        prt("abs\tr%d", a->rs);
+     }
+     return true;
+ }
+@@ -733,11 +736,11 @@ static bool trans_DIVU_mr(DisasContext *ctx, arg_DI=
+VU_mr *a)
+ /* shll #imm:5, rs, rd */
+ static bool trans_SHLL_irr(DisasContext *ctx, arg_SHLL_irr *a)
+ {
+-    prt("shll\t#%d, ", a->imm);
+     if (a->rs2 !=3D a->rd) {
+-        prt("r%d, ", a->rs2);
++        prt("shll\t#%d, r%d, r%d", a->imm, a->rs2, a->rd);
++    } else {
++        prt("shll\t#%d, r%d", a->imm, a->rd);
+     }
+-    prt("r%d", a->rd);
+     return true;
+ }
+=20
+@@ -752,11 +755,11 @@ static bool trans_SHLL_rr(DisasContext *ctx, arg_SH=
+LL_rr *a)
+ /* shar #imm:5, rs, rd */
+ static bool trans_SHAR_irr(DisasContext *ctx, arg_SHAR_irr *a)
+ {
+-    prt("shar\t#%d,", a->imm);
+     if (a->rs2 !=3D a->rd) {
+-        prt("r%d, ", a->rs2);
++        prt("shar\t#%d, r%d, r%d", a->imm, a->rs2, a->rd);
++    } else {
++        prt("shar\t#%d, r%d", a->imm, a->rd);
+     }
+-    prt("r%d", a->rd);
+     return true;
+ }
+=20
+@@ -771,11 +774,11 @@ static bool trans_SHAR_rr(DisasContext *ctx, arg_SH=
+AR_rr *a)
+ /* shlr #imm:5, rs, rd */
+ static bool trans_SHLR_irr(DisasContext *ctx, arg_SHLR_irr *a)
+ {
+-    prt("shlr\t#%d, ", a->imm);
+     if (a->rs2 !=3D a->rd) {
+-        prt("r%d, ", a->rs2);
++        prt("shlr\t#%d, r%d, r%d", a->imm, a->rs2, a->rd);
++    } else {
++        prt("shlr\t#%d, r%d", a->imm, a->rd);
+     }
+-    prt("r%d", a->rd);
+     return true;
+ }
+=20
 --=20
 2.11.0
 
