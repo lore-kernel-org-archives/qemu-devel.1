@@ -2,71 +2,79 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19463C31E51
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 11:35:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FF8FC31E51
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 11:37:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6604208E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 11:35:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6604208E4
+	by mail.kernel.org (Postfix) with ESMTPS id 07F5F2070B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 11:37:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07F5F2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55770 helo=lists.gnu.org)
+Received: from localhost ([::1]:55776 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdCOk-00015J-Nf
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 07:35:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46389)
+	id 1hdCQb-0002HG-Bz
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 07:37:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46583)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1hdCNb-0000ZJ-T7
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:34:25 -0400
+ (envelope-from <philmd@redhat.com>) id 1hdCOd-0001CP-Ix
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:35:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1hdCNa-0000R4-Pv
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:34:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50760)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hdCNa-0000Po-K1
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:34:22 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BF71B30872DE;
- Tue, 18 Jun 2019 11:34:20 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EC8F15BBBD;
- Tue, 18 Jun 2019 11:34:14 +0000 (UTC)
-Date: Tue, 18 Jun 2019 13:34:10 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190618133410.18b93bcd@redhat.com>
-In-Reply-To: <20190617162700.GC19178@habkost.net>
-References: <20180202182326.GB22556@localhost.localdomain>
- <20180205122235.03fdeaad@redhat.com>
- <20180205135401.GA3300@localhost.localdomain>
- <20180205154202.7d1269a9@redhat.com>
- <20180205224205.GA3291@localhost.localdomain>
- <20180206154320.288acdc2@redhat.com>
- <62d7649e-e85d-43a2-2df8-85e2a0953e89@redhat.com>
- <20190617170106.48d776ca@redhat.com>
- <0a31228d-4d32-2c54-649b-6aef9953fffc@redhat.com>
- <20190617173343.68e3c9ec@redhat.com>
- <20190617162700.GC19178@habkost.net>
+ (envelope-from <philmd@redhat.com>) id 1hdCOc-0001Oo-2S
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:35:27 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:42448)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hdCOb-0001LM-Rk
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:35:26 -0400
+Received: by mail-wr1-f66.google.com with SMTP id x17so13561736wrl.9
+ for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 04:35:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=lS6qvJvzkkQKXebfKpOZWeaymyj1AiU1S8MFIcdf/LM=;
+ b=Nc92ToJGqb+NhPe7FpYfmo5xT/ILIVzwG7AiMVmB+qyj7zN2RgPjH81fBPI1y8/dWO
+ L+oDr7lZIWQcajUp1VDf5HNoi3jUstUlHFsjELxLRgv+oXXSXJlLstEuAv7pfJ0dtBBf
+ 4ypJp6K1r7TpDPJ+QCl61EbopxeXVWz1fXJZ34W28p4Va53SEOaeKosX9y3R0WT8iyXc
+ wlzd9qXhhzQ6o1tdSNTpHBVRgHNcyoUsYgg2+lWyYvxSR/j0Jj8sY3T4DnOOjFUlVZtS
+ VgqOgE2aiNVayxKnZW8R18Ae24jVipUCTxGkIEFIidLTbGaJhgJM7EvfvLbI5lg4Jt9L
+ ZTFQ==
+X-Gm-Message-State: APjAAAWxIE7M6CExSa6BjrIhAD/puT7oOW78ZNBFYglb+BhprXkAuhYp
+ Zt9JpG5a13dkRjsUp/r7gcFJhw==
+X-Google-Smtp-Source: APXvYqzVRjSJpYFxNInWulZeE/TIcse4SF6qjM6N0yJVsHcC4Q0fhbVQbn15zeg8IrurLJJBdQAWNw==
+X-Received: by 2002:a5d:4841:: with SMTP id n1mr23634326wrs.320.1560857724776; 
+ Tue, 18 Jun 2019 04:35:24 -0700 (PDT)
+Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.183])
+ by smtp.gmail.com with ESMTPSA id a64sm2199018wmf.1.2019.06.18.04.35.23
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Tue, 18 Jun 2019 04:35:24 -0700 (PDT)
+To: Anthony PERARD <anthony.perard@citrix.com>, qemu-devel@nongnu.org
+References: <20190618112341.513-1-anthony.perard@citrix.com>
+ <20190618112341.513-5-anthony.perard@citrix.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <47fc71d2-bb77-4744-b709-41b5d476252b@redhat.com>
+Date: Tue, 18 Jun 2019 13:35:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Tue, 18 Jun 2019 11:34:20 +0000 (UTC)
+In-Reply-To: <20190618112341.513-5-anthony.perard@citrix.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v5 1/6] machine: Convert the valid cpu
- types to use cpu_model
+ [fuzzy]
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] xen: Avoid VLA
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,53 +86,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcel@redhat.com, peter.maydell@linaro.org,
- Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, alistair23@gmail.com
+Cc: xen-devel@lists.xenproject.org, Paul Durrant <paul.durrant@citrix.com>,
+ Stefano Stabellini <sstabellini@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 17 Jun 2019 13:27:00 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+On 6/18/19 1:23 PM, Anthony PERARD wrote:
+> Avoid using a variable length array.
+> 
+> We allocate the `dirty_bitmap' buffer only once when we start tracking
+> for dirty bits.
+> 
 
-> On Mon, Jun 17, 2019 at 05:33:43PM +0200, Igor Mammedov wrote:
-> > On Mon, 17 Jun 2019 17:15:21 +0200
-> > Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote: =20
-> [...]
-> > > Yes. Eduardo and you should write some lines to explain this, and then
-> > > we will follow :) =20
-> > Unfortunately I don't recall details anymore. One could check out all
-> > implementations of class_by_name callbacks to find out current state. =
-=20
->=20
-> See this message for a summary of existing class_by_name quirks:
->=20
->   https://www.mail-archive.com/qemu-devel@nongnu.org/msg615503.html
->   Date: Wed, 08 May 2019 10:34:44 +0200
->   Message-ID: <877eb173a3.fsf@dusky.pond.sub.org>
->   Subject: Re: [Qemu-devel] [PATCH 0/7] Delete 16 *_cpu_class_by_name() f=
-unctions
->=20
-> I'm unsure about Igor's suggestion to get rid of CPU model names
-> and use only QOM type names in external interfaces.  In either
-> case, we can still simplify the rules rules and reduce the amount
-> of arch-specific code.
-as far as we have cpu_class_by_name, we have to watch over that
-new patches/targets won't add some custom handling/fallbac/whatnot.
+Suggested-by: Paul Durrant <Paul.Durrant@citrix.com>
 
-On contrary -device works just with type names for all devices,
-applying the same to -cpu which is basically translator
-   model->type[,-global type.foo,...]
-would be consistent with -device and less confusing for everyone
-(not counting significant code reduction).
-It would certainly simplify contributing new targets as contributor
-won't have to care about cpu model naming and do something about it.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-This option wasn't considered before because we didn't have deprecation
-back then, but now it opens possibility to simplify qemu and consolidate
-naming. (we probably would be able to fold '-cpu help' into '-device help'
-as well).
-
-
+> Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+> ---
+> 
+> Notes:
+>     v2:
+>     - Allocate the bitmap buffer only once when we start tracking dirty bits.
+>       (instead of at every function call)
+>     
+>     Was suggested by Peter here:
+>     <CAFEAcA88+A2oCkQnxKDEdpmfCZSmPzWMBg01wDDV68bMZoY5Jg@mail.gmail.com>
+>     "should we try to stop using variable length arrays?"
+> 
+>  hw/i386/xen/xen-hvm.c | 15 +++++++++++----
+>  1 file changed, 11 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+> index ae3deb4ef3..469f1260a4 100644
+> --- a/hw/i386/xen/xen-hvm.c
+> +++ b/hw/i386/xen/xen-hvm.c
+> @@ -119,6 +119,8 @@ typedef struct XenIOState {
+>      DeviceListener device_listener;
+>      hwaddr free_phys_offset;
+>      const XenPhysmap *log_for_dirtybit;
+> +    /* Buffer used by xen_sync_dirty_bitmap */
+> +    unsigned long *dirty_bitmap;
+>  
+>      Notifier exit;
+>      Notifier suspend;
+> @@ -464,6 +466,8 @@ static int xen_remove_from_physmap(XenIOState *state,
+>      QLIST_REMOVE(physmap, list);
+>      if (state->log_for_dirtybit == physmap) {
+>          state->log_for_dirtybit = NULL;
+> +        g_free(state->dirty_bitmap);
+> +        state->dirty_bitmap = NULL;
+>      }
+>      g_free(physmap);
+>  
+> @@ -614,7 +618,7 @@ static void xen_sync_dirty_bitmap(XenIOState *state,
+>  {
+>      hwaddr npages = size >> TARGET_PAGE_BITS;
+>      const int width = sizeof(unsigned long) * 8;
+> -    unsigned long bitmap[DIV_ROUND_UP(npages, width)];
+> +    size_t bitmap_size = DIV_ROUND_UP(npages, width);
+>      int rc, i, j;
+>      const XenPhysmap *physmap = NULL;
+>  
+> @@ -626,13 +630,14 @@ static void xen_sync_dirty_bitmap(XenIOState *state,
+>  
+>      if (state->log_for_dirtybit == NULL) {
+>          state->log_for_dirtybit = physmap;
+> +        state->dirty_bitmap = g_new(unsigned long, bitmap_size);
+>      } else if (state->log_for_dirtybit != physmap) {
+>          /* Only one range for dirty bitmap can be tracked. */
+>          return;
+>      }
+>  
+>      rc = xen_track_dirty_vram(xen_domid, start_addr >> TARGET_PAGE_BITS,
+> -                              npages, bitmap);
+> +                              npages, state->dirty_bitmap);
+>      if (rc < 0) {
+>  #ifndef ENODATA
+>  #define ENODATA  ENOENT
+> @@ -646,8 +651,8 @@ static void xen_sync_dirty_bitmap(XenIOState *state,
+>          return;
+>      }
+>  
+> -    for (i = 0; i < ARRAY_SIZE(bitmap); i++) {
+> -        unsigned long map = bitmap[i];
+> +    for (i = 0; i < bitmap_size; i++) {
+> +        unsigned long map = state->dirty_bitmap[i];
+>          while (map != 0) {
+>              j = ctzl(map);
+>              map &= ~(1ul << j);
+> @@ -677,6 +682,8 @@ static void xen_log_stop(MemoryListener *listener, MemoryRegionSection *section,
+>  
+>      if (old & ~new & (1 << DIRTY_MEMORY_VGA)) {
+>          state->log_for_dirtybit = NULL;
+> +        g_free(state->dirty_bitmap);
+> +        state->dirty_bitmap = NULL;
+>          /* Disable dirty bit tracking */
+>          xen_track_dirty_vram(xen_domid, 0, 0, NULL);
+>      }
+> 
 
