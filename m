@@ -2,65 +2,66 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CB17C31E5C
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 03:12:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE371C31E5C
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 03:13:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8CF520665
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 03:12:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8CF520665
+	by mail.kernel.org (Postfix) with ESMTPS id 84ADB2084B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 03:13:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84ADB2084B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53366 helo=lists.gnu.org)
+Received: from localhost ([::1]:53374 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hd4Xe-0008NJ-WB
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 23:12:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58823)
+	id 1hd4ZI-0001Au-PT
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 23:13:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59007)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jasowang@redhat.com>) id 1hd4XB-0007xt-87
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 23:11:46 -0400
+ (envelope-from <jasowang@redhat.com>) id 1hd4Xp-0000FH-N9
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 23:12:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1hd4XA-0001Wy-At
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 23:11:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44064)
+ (envelope-from <jasowang@redhat.com>) id 1hd4Xn-0002EK-Sl
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 23:12:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57908)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1hd4XA-0001TT-4N
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 23:11:44 -0400
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1hd4Xl-0002CR-Ri
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 23:12:23 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4DB12308219F
- for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 03:11:41 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2D915C057F3E
+ for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 03:12:21 +0000 (UTC)
 Received: from [10.72.12.155] (ovpn-12-155.pek2.redhat.com [10.72.12.155])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E13051017E31;
- Tue, 18 Jun 2019 03:11:32 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 593981017E31;
+ Tue, 18 Jun 2019 03:12:15 +0000 (UTC)
 To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
  qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com, laine@redhat.com
 References: <20190613095924.21908-1-dgilbert@redhat.com>
+ <20190613095924.21908-2-dgilbert@redhat.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <7768e0c1-0e85-5cb7-7fe1-e27429762c16@redhat.com>
-Date: Tue, 18 Jun 2019 11:11:30 +0800
+Message-ID: <36dd4c3b-334c-1a6c-74ca-3b3f06cbffbc@redhat.com>
+Date: Tue, 18 Jun 2019 11:12:14 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190613095924.21908-1-dgilbert@redhat.com>
+In-Reply-To: <20190613095924.21908-2-dgilbert@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Tue, 18 Jun 2019 03:11:41 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Tue, 18 Jun 2019 03:12:21 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 0/5] network announce;
- interface selection & IDs
+Subject: Re: [Qemu-devel] [PATCH v4 1/5] net/announce: Allow optional list
+ of interfaces
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,44 +81,171 @@ Sender: "Qemu-devel"
 On 2019/6/13 =E4=B8=8B=E5=8D=885:59, Dr. David Alan Gilbert (git) wrote:
 > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >
-> Laine asked for some extra features on the network announce support;
+> Allow the caller to restrict the set of interfaces that announces are
+> sent on.  The default is still to send on all interfaces.
+>
+> e.g.
+>
+>    { "execute": "announce-self", "arguments": { "initial": 50, "max": 5=
+50, "rounds": 5, "step": 50, "interfaces": ["vn2", "vn1"] } }
+>
+> This doesn't affect the behaviour of migraiton announcments.
+>
+> Note: There's still only one timer for the qmp command, so that
+> performing an 'announce-self' on one list of interfaces followed
+> by another 'announce-self' on another list will stop the announces
+> on the existing set.
+>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>   include/net/announce.h |  2 +-
+>   net/announce.c         | 39 ++++++++++++++++++++++++++++++++-------
+>   net/trace-events       |  2 +-
+>   qapi/net.json          | 11 ++++++++---
+>   4 files changed, 42 insertions(+), 12 deletions(-)
+>
+> diff --git a/include/net/announce.h b/include/net/announce.h
+> index 04a035f679..773470428b 100644
+> --- a/include/net/announce.h
+> +++ b/include/net/announce.h
+> @@ -22,7 +22,7 @@ struct AnnounceTimer {
+>   /* Returns: update the timer to the next time point */
+>   int64_t qemu_announce_timer_step(AnnounceTimer *timer);
+>  =20
+> -/* Delete the underlying timer */
+> +/* Delete the underlying timer and other data */
+>   void qemu_announce_timer_del(AnnounceTimer *timer);
+>  =20
+>   /*
+> diff --git a/net/announce.c b/net/announce.c
+> index 91e9a6e267..1ce42b571d 100644
+> --- a/net/announce.c
+> +++ b/net/announce.c
+> @@ -38,6 +38,8 @@ void qemu_announce_timer_del(AnnounceTimer *timer)
+>           timer_free(timer->tm);
+>           timer->tm =3D NULL;
+>       }
+> +    qapi_free_strList(timer->params.interfaces);
+> +    timer->params.interfaces =3D NULL;
+>   }
+>  =20
+>   /*
+> @@ -96,24 +98,47 @@ static int announce_self_create(uint8_t *buf,
+>  =20
+>   static void qemu_announce_self_iter(NICState *nic, void *opaque)
+>   {
+> +    AnnounceTimer *timer =3D opaque;
+>       uint8_t buf[60];
+>       int len;
+> +    bool skip;
+> +
+> +    if (timer->params.has_interfaces) {
+> +        strList *entry =3D timer->params.interfaces;
+> +        /* Skip unless we find our name in the requested list */
+> +        skip =3D true;
+> +
+> +        while (entry) {
+> +            if (!strcmp(entry->value, nic->ncs->name)) {
+> +                /* Found us */
+> +                skip =3D false;
+> +                break;
+> +            }
+> +            entry =3D entry->next;
+> +        }
+> +    } else {
+> +        skip =3D false;
+> +    }
 
 
-It's better to explain why this feature is needed.=C2=A0 Is this because=20
-libvirt can change the host network topology on the fly?
+I wonder whether or not it's better to filter the name on the caller.
 
 Thanks
 
 
->
-> The first allows the announce timer to announce on a subset of the
-> interfaces.
->
-> The second allows there to be multiple timers, each with their own
-> parameters (including the interface list).
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->
-> v4
->    Minor typo fixes
->    Expanded the test to check we can stop a running announce
->
-> Dr. David Alan Gilbert (5):
->    net/announce: Allow optional list of interfaces
->    net/announce: Add HMP optional interface list
->    net/announce: Add optional ID
->    net/announce: Add HMP optional ID
->    net/announce: Expand test for stopping self announce
->
->   hmp-commands.hx         |  7 +++-
->   hmp.c                   | 41 +++++++++++++++++++-
->   hw/net/virtio-net.c     |  4 +-
->   include/net/announce.h  |  8 +++-
->   net/announce.c          | 83 ++++++++++++++++++++++++++++++++++------=
--
->   net/trace-events        |  3 +-
->   qapi/net.json           | 16 ++++++--
->   tests/virtio-net-test.c | 57 ++++++++++++++++++++++++++--
->   8 files changed, 192 insertions(+), 27 deletions(-)
->
+> +
+> +    trace_qemu_announce_self_iter(nic->ncs->name,
+> +                                  qemu_ether_ntoa(&nic->conf->macaddr)=
+, skip);
+>  =20
+> -    trace_qemu_announce_self_iter(qemu_ether_ntoa(&nic->conf->macaddr)=
+);
+> -    len =3D announce_self_create(buf, nic->conf->macaddr.a);
+> +    if (!skip) {
+> +        len =3D announce_self_create(buf, nic->conf->macaddr.a);
+>  =20
+> -    qemu_send_packet_raw(qemu_get_queue(nic), buf, len);
+> +        qemu_send_packet_raw(qemu_get_queue(nic), buf, len);
+>  =20
+> -    /* if the NIC provides it's own announcement support, use it as we=
+ll */
+> -    if (nic->ncs->info->announce) {
+> -        nic->ncs->info->announce(nic->ncs);
+> +        /* if the NIC provides it's own announcement support, use it a=
+s well */
+> +        if (nic->ncs->info->announce) {
+> +            nic->ncs->info->announce(nic->ncs);
+> +        }
+>       }
+>   }
+>   static void qemu_announce_self_once(void *opaque)
+>   {
+>       AnnounceTimer *timer =3D (AnnounceTimer *)opaque;
+>  =20
+> -    qemu_foreach_nic(qemu_announce_self_iter, NULL);
+> +    qemu_foreach_nic(qemu_announce_self_iter, timer);
+>  =20
+>       if (--timer->round) {
+>           qemu_announce_timer_step(timer);
+> diff --git a/net/trace-events b/net/trace-events
+> index a7937f3f3a..875ef2a0f3 100644
+> --- a/net/trace-events
+> +++ b/net/trace-events
+> @@ -1,7 +1,7 @@
+>   # See docs/devel/tracing.txt for syntax documentation.
+>  =20
+>   # announce.c
+> -qemu_announce_self_iter(const char *mac) "%s"
+> +qemu_announce_self_iter(const char *name, const char *mac, int skip) "=
+%s:%s skip: %d"
+>  =20
+>   # vhost-user.c
+>   vhost_user_event(const char *chr, int event) "chr: %s got event: %d"
+> diff --git a/qapi/net.json b/qapi/net.json
+> index 5f7bff1637..6f2cd4f530 100644
+> --- a/qapi/net.json
+> +++ b/qapi/net.json
+> @@ -699,6 +699,9 @@
+>   #
+>   # @step: Delay increase (in ms) after each self-announcement attempt
+>   #
+> +# @interfaces: An optional list of interface names, which restricts th=
+e
+> +#        announcement to the listed interfaces. (Since 4.1)
+> +#
+>   # Since: 4.0
+>   ##
+>  =20
+> @@ -706,7 +709,8 @@
+>     'data': { 'initial': 'int',
+>               'max': 'int',
+>               'rounds': 'int',
+> -            'step': 'int' } }
+> +            'step': 'int',
+> +            '*interfaces': ['str'] } }
+>  =20
+>   ##
+>   # @announce-self:
+> @@ -718,9 +722,10 @@
+>   #
+>   # Example:
+>   #
+> -# -> { "execute": "announce-self"
+> +# -> { "execute": "announce-self",
+>   #      "arguments": {
+> -#          "initial": 50, "max": 550, "rounds": 10, "step": 50 } }
+> +#          "initial": 50, "max": 550, "rounds": 10, "step": 50,
+> +#          "interfaces": ["vn2", "vn3"] } }
+>   # <- { "return": {} }
+>   #
+>   # Since: 4.0
 
