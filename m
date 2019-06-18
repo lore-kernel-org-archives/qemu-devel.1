@@ -2,75 +2,68 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 919DCC31E51
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 12:52:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3634FC31E51
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 12:55:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67E9420665
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 12:52:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67E9420665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0A9B820665
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 12:55:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A9B820665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57004 helo=lists.gnu.org)
+Received: from localhost ([::1]:57298 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdDbT-0005jh-Lo
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 08:52:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37763)
+	id 1hdDeB-0000Jk-2d
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 08:55:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38583)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hdDZl-00041v-DK
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 08:51:03 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1hdDbf-00070s-CN
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 08:53:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hdDZj-00085U-7q
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 08:51:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44746)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hdDZh-0007p2-DR
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 08:50:59 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hdDZV-00019Q-OT
- for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 12:50:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B57022E80D3
- for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 12:50:45 +0000 (UTC)
+ (envelope-from <eric.auger@redhat.com>) id 1hdDbd-00034K-U2
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 08:52:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33430)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1hdDba-0002vs-Ji; Tue, 18 Jun 2019 08:52:54 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 95B86356E4;
+ Tue, 18 Jun 2019 12:52:35 +0000 (UTC)
+Received: from [10.36.117.84] (ovpn-117-84.ams2.redhat.com [10.36.117.84])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C93C35C207;
+ Tue, 18 Jun 2019 12:52:30 +0000 (UTC)
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, imammedo@redhat.com
+References: <20190522162252.28568-1-shameerali.kolothum.thodi@huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <653a6b3c-ac1a-f197-1240-a28f59890fa8@redhat.com>
+Date: Tue, 18 Jun 2019 14:52:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 18 Jun 2019 12:40:04 -0000
-From: David Lindsay <asmqb7@gmail.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: pl111 vexpress-a9
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: asmqb7 pmaydell
-X-Launchpad-Bug-Reporter: David Lindsay (asmqb7)
-X-Launchpad-Bug-Modifier: David Lindsay (asmqb7)
-References: <156078563656.24847.5055295179031840026.malonedeb@gac.canonical.com>
-Message-Id: <156086160457.22508.2412712603874412180.malone@soybean.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18981";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: e86dc612800fc61687ec47339bf2a367897af09a
+In-Reply-To: <20190522162252.28568-1-shameerali.kolothum.thodi@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Tue, 18 Jun 2019 12:52:48 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1833101] Re: vexpress-a9 (but not -a15) creates
- two pl111 LCDs due to duplicate sysbus_create_simple("pl111", ...) calls
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v5 0/8] ARM virt: ACPI memory hotplug
+ support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,97 +72,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1833101 <1833101@bugs.launchpad.net>
+Cc: peter.maydell@linaro.org, sameo@linux.intel.com, ard.biesheuvel@linaro.org,
+ linuxarm@huawei.com, xuwei5@hisilicon.com, shannon.zhaosl@gmail.com,
+ sebastien.boeuf@intel.com, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ah.
+Hi Shameer,
 
-:)
+On 5/22/19 6:22 PM, Shameer Kolothum wrote:
+> This series is an attempt to provide device memory hotplug support 
+> on ARM virt platform. This is based on Eric's recent works here[1]
+> and carries some of the pc-dimm related patches dropped from his
+> series.
+> 
+> The kernel support for arm64 memory hot add was added recently by
+> Robin and hence the guest kernel should be => 5.0-rc1.
+> 
+> NVDIM support is not included currently as we still have an unresolved
+> issue while hot adding NVDIMM[2]. However NVDIMM cold plug patches
+> can be included, but not done for now, for keeping it simple.
+> 
+> This makes use of GED device to sent hotplug ACPI events to the
+> Guest. GED code is based on Nemu. Thanks to the efforts of Samuel and
+> Sebastien to add the hardware-reduced support to Nemu using GED
+> device[3]. (Please shout if I got the author/signed-off wrong for
+> those patches or missed any names).
+> 
+> This is sanity tested on a HiSilicon ARM64 platform and appreciate
+> any further testing.
 
-As is probably somewhat evident at this point, I'm using vexpress-a9
-because it's such a convenient QEMU target, rather than because I have
-real hardware anywhere.
+I tested cold-plug and hot-plug of PCDIMM slots. I also tested
+system_powerdown and system_reset. The series has minor conflicts with
+master.
 
-Hm, I didn't once stop and think that maybe there actually were two LCD
-controllers. (And this is where software is great; I got to learn my
-assumptions were invalid without blowing anything up. :D)
+Feel free to add my T-b on next version:
+Tested-by: Eric Auger <eric.auger@redhat.com>
 
-I tried to find the actual Versatile Express board I'm "using"; the
-closest I was able to come was https://community.arm.com/developer
-/tools-software/tools/b/tools-software-ides-blog/posts/50-off-arm-
-versatile-express-development-boards. It looks like it has two
-(...three?) processors and four PCIe slots. Very nice.
+Thanks
 
-Thanks again.
-
-** Changed in: qemu
-       Status: New =3D> Invalid
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1833101
-
-Title:
-  vexpress-a9 (but not -a15) creates two pl111 LCDs due to duplicate
-  sysbus_create_simple("pl111", ...) calls
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  Hi,
-
-  Just a small report that (12ec8bd is current master)
-
-  https://github.com/qemu/qemu/blob/12ec8bd/hw/arm/vexpress.c#L652:
-
-    ...
-    vexpress_common_init() {
-      ...
-      sysbus_create_simple("pl111", map[VE_CLCD], pic[14]);
-      ...
-    ...
-
-  and
-
-  https://github.com/qemu/qemu/blob/12ec8bd/hw/arm/vexpress.c#L304:
-
-    ...
-    a9_daughterboard_init() {
-      ...
-      sysbus_create_simple("pl111", 0x10020000, pic[44]);
-      ...
-    ...
-
-  result in two LCD panels when using vexpress-a9.
-
-  vexpress-a15 does not appear to be affected (my -a9 kernel does not
-  work with it, but I see only one pl111 created).
-
-  Understandably (but still annoyingly), -nodefaults has no effect.
-
-  This bug is most evident when using SDL (so I can use ",frame=3Doff"),
-  which dumps two top-level windows onto the screen. GTK hides this
-  because, coincidentally, the pl111 that ends up being used is the one
-  that is selected (possibly the one created last?), relegating this to
-  an obscure glitch only noticeable if you scrutinize the menu.
-
-  This is a bugreport as opposed to a pull request as I have no idea
-  which call to remove - and complete ignorance of the potential
-  housekeeping and consideration that may be warranted first.
-
-  FWIW, a simple testcase can be made with the vmlinuz from
-  https://people.debian.org/~aurel32/qemu/armhf/ and
-
-  qemu-system-arm -M vexpress-a9 -kernel vmlinuz-3.2.0-4-vexpress
-  -nodefaults -sdl
-
-  Thanks!
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1833101/+subscriptions
+Eric
+> 
+> Thanks,
+> Shameer
+> 
+> [1] https://patchwork.kernel.org/cover/10837565/
+> [2] https://patchwork.kernel.org/cover/10783589/
+> [3] https://github.com/intel/nemu/blob/topic/virt-x86/hw/acpi/ged.c
+> [4] http://lists.infradead.org/pipermail/linux-arm-kernel/2019-May/651763.html
+> 
+> v4 --> v5
+> -Removed gsi/ged-irq routing in virt.
+> -Added Migration support.
+> -Dropped support for DT coldplug case based on the discussions
+>  here[4]
+> -Added system_powerdown support through GED.
+> 
+> v3 --> v4
+> Addressed comments from Igor and Eric,
+> -Renamed "virt-acpi" to "acpi-ged".
+> -Changed ged device parent to TYPE_DEVICE.
+> -Introduced DT memory node property "hotpluggable" to resolve device
+>  memory being treated as early boot memory issue(patch #7).
+> -Combined patches #3 and #9 from v3 into #3.
+> 
+> v2 --> v3
+> 
+> Addressed comments from Igor and Eric,
+> -Made virt acpi device platform independent and moved
+>  to hw/acpi/generic_event_device.c
+> -Moved ged specific code into hw/acpi/generic_event_device.c
+> -Introduced an opt-in feature "fdt" to resolve device-memory being
+>  treated as early boot memory.
+> -Dropped patch #1 from v2.
+> 
+> RFC --> v2
+> 
+> -Use GED device instead of GPIO for ACPI hotplug events.
+> -Removed NVDIMM support for now.
+> -Includes dropped patches from Eric's v9 series.
+> 
+> Eric Auger (1):
+>   hw/arm/virt: Add memory hotplug framework
+> 
+> Samuel Ortiz (2):
+>   hw/acpi: Do not create memory hotplug method when handler is not
+>     defined
+>   hw/acpi: Add ACPI Generic Event Device Support
+> 
+> Shameer Kolothum (5):
+>   hw/acpi: Make ACPI IO address space configurable
+>   hw/arm/virt: Enable device memory cold/hot plug with ACPI boot
+>   hw/arm/virt-acpi-build: Add PC-DIMM in SRAT
+>   hw/acpi: Add system power down support to GED
+>   hw/arm: Use GED for system_powerdown event
+> 
+>  hw/acpi/Kconfig                        |   4 +
+>  hw/acpi/Makefile.objs                  |   1 +
+>  hw/acpi/generic_event_device.c         | 348 +++++++++++++++++++++++++
+>  hw/acpi/memory_hotplug.c               |  35 +--
+>  hw/arm/Kconfig                         |   4 +
+>  hw/arm/virt-acpi-build.c               |  58 ++---
+>  hw/arm/virt.c                          |  88 ++++++-
+>  hw/i386/acpi-build.c                   |   3 +-
+>  include/hw/acpi/generic_event_device.h | 106 ++++++++
+>  include/hw/acpi/memory_hotplug.h       |   9 +-
+>  include/hw/arm/virt.h                  |   3 +
+>  11 files changed, 603 insertions(+), 56 deletions(-)
+>  create mode 100644 hw/acpi/generic_event_device.c
+>  create mode 100644 include/hw/acpi/generic_event_device.h
+> 
 
