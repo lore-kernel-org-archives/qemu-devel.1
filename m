@@ -2,51 +2,61 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7537BC31E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:24:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F0F8C31E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:25:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 529DE2054F
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:24:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 529DE2054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 114D12054F
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:25:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 114D12054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59542 helo=lists.gnu.org)
+Received: from localhost ([::1]:59546 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdGuf-0003gi-A8
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 12:24:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34215)
+	id 1hdGvP-0005Bp-W8
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 12:25:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56343)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hdGFf-0007QI-M5
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:42:29 -0400
+ (envelope-from <kwolf@redhat.com>) id 1hdFxn-0008Uq-GJ
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:24:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hdGFY-0005vE-Ti
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:42:24 -0400
-Received: from relay.sw.ru ([185.231.240.75]:38517)
+ (envelope-from <kwolf@redhat.com>) id 1hdFxk-00011g-91
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:23:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38442)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1hdGFT-0005Vb-Bx; Tue, 18 Jun 2019 11:42:17 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1hdGFH-0002Sc-OG; Tue, 18 Jun 2019 18:42:03 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Date: Tue, 18 Jun 2019 18:42:01 +0300
-Message-Id: <20190618154202.89107-3-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20190618154202.89107-1-vsementsov@virtuozzo.com>
-References: <20190618154202.89107-1-vsementsov@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v2 2/3] block/stream: use BDRV_REQ_PREFETCH
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1hdFxa-0000r2-TH; Tue, 18 Jun 2019 11:23:47 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A58F13001809;
+ Tue, 18 Jun 2019 15:23:40 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-116-185.ams2.redhat.com
+ [10.36.116.185])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C683019492;
+ Tue, 18 Jun 2019 15:23:39 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Date: Tue, 18 Jun 2019 17:23:18 +0200
+Message-Id: <20190618152318.24953-15-kwolf@redhat.com>
+In-Reply-To: <20190618152318.24953-1-kwolf@redhat.com>
+References: <20190618152318.24953-1-kwolf@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Tue, 18 Jun 2019 15:23:40 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 14/14] block/null: Expose read-zeroes option in
+ QAPI schema
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -58,99 +68,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
- mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This helps to avoid extra io, allocations and memory copying.
+Commit cd219eb1e55 added the read-zeroes option for the null-co and
+null-aio block driver, but forgot to add them to the QAPI schema.
+Therefore, this option wasn't available in -blockdev and blockdev-add
+until now.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Add the missing option in the schema to make it available there, too.
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/stream.c | 20 +++++++-------------
- 1 file changed, 7 insertions(+), 13 deletions(-)
+ qapi/block-core.json | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/block/stream.c b/block/stream.c
-index 1a906fd860..b316bfb290 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -22,11 +22,11 @@
- 
- enum {
-     /*
--     * Size of data buffer for populating the image file.  This should be large
-+     * Maximum chunk size to feed it to copy-on-read.  This should be large
-      * enough to process multiple clusters in a single call, so that populating
-      * contiguous regions of the image is efficient.
-      */
--    STREAM_BUFFER_SIZE = 512 * 1024, /* in bytes */
-+    STREAM_CHUNK = 512 * 1024, /* in bytes */
- };
- 
- typedef struct StreamBlockJob {
-@@ -39,13 +39,12 @@ typedef struct StreamBlockJob {
- } StreamBlockJob;
- 
- static int coroutine_fn stream_populate(BlockBackend *blk,
--                                        int64_t offset, uint64_t bytes,
--                                        void *buf)
-+                                        int64_t offset, uint64_t bytes)
- {
-     assert(bytes < SIZE_MAX);
- 
--    /* Copy-on-read the unallocated clusters */
--    return blk_co_pread(blk, offset, bytes, buf, BDRV_REQ_COPY_ON_READ);
-+    return blk_co_preadv(blk, offset, bytes, NULL,
-+                         BDRV_REQ_COPY_ON_READ | BDRV_REQ_PREFETCH);
- }
- 
- static void stream_abort(Job *job)
-@@ -117,7 +116,6 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
-     int error = 0;
-     int ret = 0;
-     int64_t n = 0; /* bytes */
--    void *buf;
- 
-     if (!bs->backing) {
-         goto out;
-@@ -130,8 +128,6 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
-     }
-     job_progress_set_remaining(&s->common.job, len);
- 
--    buf = qemu_blockalign(bs, STREAM_BUFFER_SIZE);
--
-     /* Turn on copy-on-read for the whole block device so that guest read
-      * requests help us make progress.  Only do this when copying the entire
-      * backing chain since the copy-on-read operation does not take base into
-@@ -154,7 +150,7 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
- 
-         copy = false;
- 
--        ret = bdrv_is_allocated(bs, offset, STREAM_BUFFER_SIZE, &n);
-+        ret = bdrv_is_allocated(bs, offset, STREAM_CHUNK, &n);
-         if (ret == 1) {
-             /* Allocated in the top, no need to copy.  */
-         } else if (ret >= 0) {
-@@ -172,7 +168,7 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
-         }
-         trace_stream_one_iteration(s, offset, n, ret);
-         if (copy) {
--            ret = stream_populate(blk, offset, n, buf);
-+            ret = stream_populate(blk, offset, n);
-         }
-         if (ret < 0) {
-             BlockErrorAction action =
-@@ -206,8 +202,6 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
-     /* Do not remove the backing file if an error was there but ignored.  */
-     ret = error;
- 
--    qemu_vfree(buf);
--
- out:
-     /* Modify backing chain and close BDSes in main loop */
-     return ret;
--- 
-2.18.0
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 61124431d8..0d43d4f37c 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2890,11 +2890,13 @@
+ # @latency-ns: emulated latency (in nanoseconds) in processing
+ #              requests. Default to zero which completes requests immedi=
+ately.
+ #              (Since 2.4)
++# @read-zeroes: if true, reads from the device produce zeroes; if false,=
+ the
++#               buffer is left unchanged. (default: false; since: 4.1)
+ #
+ # Since: 2.9
+ ##
+ { 'struct': 'BlockdevOptionsNull',
+-  'data': { '*size': 'int', '*latency-ns': 'uint64' } }
++  'data': { '*size': 'int', '*latency-ns': 'uint64', '*read-zeroes': 'bo=
+ol' } }
+=20
+ ##
+ # @BlockdevOptionsNVMe:
+--=20
+2.20.1
 
 
