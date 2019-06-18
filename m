@@ -2,65 +2,61 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
+X-Spam-Status: No, score=-10.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9203BC31E51
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 06:25:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8E47C31E51
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 06:29:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6329B2166E
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 06:25:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6329B2166E
+	by mail.kernel.org (Postfix) with ESMTPS id 5754F2166E
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 06:29:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5754F2166E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54056 helo=lists.gnu.org)
+Received: from localhost ([::1]:54066 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hd7Yv-0002aO-0T
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 02:25:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39274)
+	id 1hd7cs-0004R0-64
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 02:29:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39774)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kraxel@redhat.com>) id 1hd7Xk-0001zF-HW
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 02:24:33 -0400
+ (envelope-from <armbru@redhat.com>) id 1hd7Zu-0003Dy-2Y
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 02:26:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1hd7Xj-00044b-DT
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 02:24:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50234)
+ (envelope-from <armbru@redhat.com>) id 1hd7Zs-0005vt-Bf
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 02:26:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34050)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hd7Xj-00044B-7z
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 02:24:31 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hd7Zs-0005vB-4O
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 02:26:44 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D7D5530872CA;
- Tue, 18 Jun 2019 06:24:14 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-33.ams2.redhat.com
- [10.36.116.33])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A783C61981;
- Tue, 18 Jun 2019 06:24:07 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id DDB3C16E18; Tue, 18 Jun 2019 08:24:06 +0200 (CEST)
-Date: Tue, 18 Jun 2019 08:24:06 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: elena.ufimtseva@oracle.com
-Message-ID: <20190618062406.m67ytpr3fjpxhlbo@sirius.home.kraxel.org>
-References: <20190617181521.29371-1-elena.ufimtseva@oracle.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 369D2308A963
+ for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 06:26:43 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-177.ams2.redhat.com
+ [10.36.117.177])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 069647E5DC
+ for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 06:26:43 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 8E6E911386A6; Tue, 18 Jun 2019 08:26:41 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 18 Jun 2019 08:26:40 +0200
+Message-Id: <20190618062641.32214-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190617181521.29371-1-elena.ufimtseva@oracle.com>
-User-Agent: NeoMutt/20180716
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Tue, 18 Jun 2019 06:24:23 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.41]); Tue, 18 Jun 2019 06:26:43 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH v2 06/35] multi-process: build system
- for remote device process
+Subject: [Qemu-devel] [PULL v2 00/16] Monitor patches for 2019-06-17
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,67 +68,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, john.g.johnson@oracle.com, jag.raman@oracle.com,
- quintela@redhat.com, mst@redhat.com, konrad.wilk@oracle.com,
- qemu-devel@nongnu.org, dgilbert@redhat.com, ross.lagerwall@citrix.com,
- liran.alon@oracle.com, kwolf@redhat.com, stefanha@redhat.com, afaerber@suse.de,
- pbonzini@redhat.com, mreitz@redhat.com, kanth.ghatraju@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hi,
+The following changes since commit 076243ffe6c1b687e9e6d98348c3bf3398df78=
+f3:
 
-> +#########################################################
-> +# remote-pci-obj-y is common code used by remote devices
-> +
-> +remote-pci-obj-$(CONFIG_MPQEMU) += hw/
-> +remote-pci-obj-$(CONFIG_MPQEMU) += qom/
-> +remote-pci-obj-$(CONFIG_MPQEMU) += backends/
-> +remote-pci-obj-$(CONFIG_MPQEMU) += block/
-> +remote-pci-obj-$(CONFIG_MPQEMU) += migration/
-> +remote-pci-obj-$(CONFIG_MPQEMU) += remote/
-> +
-> +remote-pci-obj-$(CONFIG_MPQEMU) += cpus-common.o
-> +remote-pci-obj-$(CONFIG_MPQEMU) += dma-helpers.o
-> +remote-pci-obj-$(CONFIG_MPQEMU) += blockdev.o
-> +remote-pci-obj-$(CONFIG_MPQEMU) += qdev-monitor.o
-> +remote-pci-obj-$(CONFIG_MPQEMU) += bootdevice.o
-> +remote-pci-obj-$(CONFIG_MPQEMU) += iothread.o
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-docs-20190617'=
+ into staging (2019-06-17 16:41:25 +0100)
 
-> +all-remote-pci-obj-y += $(authz-obj-y)
-> +all-remote-pci-obj-y += $(block-obj-y)
-> +all-remote-pci-obj-y += $(crypto-obj-y)
-> +all-remote-pci-obj-y += $(io-obj-y)
-> +all-remote-pci-obj-y += $(chardev-obj-y)
-> +all-remote-pci-obj-y += $(remote-pci-obj-y)
+are available in the Git repository at:
 
-> +remote-pci-obj-$(CONFIG_MPQEMU) += core/
-> +remote-pci-obj-$(CONFIG_MPQEMU) += block/
-> +remote-pci-obj-$(CONFIG_MPQEMU) += pci/
-> +remote-pci-obj-$(CONFIG_MPQEMU) += nvram/
+  git://repo.or.cz/qemu/armbru.git tags/pull-monitor-2019-06-17-v2
 
-Phew.  So you are building half of qemu into the remote process.
+for you to fetch changes up to 3c45f62570aeacadf4a05bfa1afaa12bea05ae86:
 
-Wouldn't it be more useful to split off much smaller, well-defined
-pieces into separate processes?
+  vl: Deprecate -mon pretty=3D... for HMP monitors (2019-06-18 08:14:17 +=
+0200)
 
-Splitting off the block layer looks like a good candidate to me.  You'll
-have a qemu-remote-block[1] then which should not need much beside
-block/, and a small blockdev-proxy in qemu which talks to
-qemu-remote-block instead of accessing the disk image by itself.  It's
-also a nice improvement from the security point of view, even without
-moving the device emulation too, because the main qemu process doesn't
-need access to the image files any more.
+----------------------------------------------------------------
+Monitor patches for 2019-06-17
 
-Likewise network, especially useful for slirp.
+----------------------------------------------------------------
+Kevin Wolf (15):
+      monitor: Remove unused password prompting fields
+      monitor: Split monitor_init in HMP and QMP function
+      monitor: Make MonitorQMP a child class of Monitor
+      monitor: Create MonitorHMP with readline state
+      monitor: Remove Monitor.cmd_table indirection
+      monitor: Rename HMP command type and tables
+      Move monitor.c to monitor/misc.c
+      monitor: Move {hmp, qmp}.c to monitor/{hmp, qmp}-cmds.c
+      monitor: Create monitor-internal.h with common definitions
+      monitor: Split out monitor/qmp.c
+      monitor: Split out monitor/hmp.c
+      monitor: Split out monitor/monitor.c
+      monitor: Split Monitor.flags into separate bools
+      monitor: Replace monitor_init() with monitor_init_{hmp, qmp}()
+      vl: Deprecate -mon pretty=3D... for HMP monitors
 
-With that in place other remote device objects (the lsi/scsi emulation,
-but also vhost-user-blk) can just talk to the qemu-remote-block service
-instead of compiling in the block layer.
+Yury Kotov (1):
+      monitor: Fix return type of monitor_fdset_dup_fd_find
 
-cheers,
-  Gerd
+ MAINTAINERS                         |   13 +-
+ Makefile.objs                       |    4 +-
+ Makefile.target                     |    3 +-
+ chardev/char.c                      |    2 +-
+ docs/devel/writing-qmp-commands.txt |   11 +-
+ gdbstub.c                           |    2 +-
+ hmp-commands.hx                     |    2 +-
+ include/monitor/monitor.h           |   17 +-
+ monitor.c                           | 4729 -----------------------------=
+------
+ monitor/Makefile.objs               |    3 +
+ hmp.c =3D> monitor/hmp-cmds.c         |    7 +-
+ monitor/hmp.c                       | 1417 +++++++++++
+ monitor/misc.c                      | 2353 +++++++++++++++++
+ monitor/monitor-internal.h          |  183 ++
+ monitor/monitor.c                   |  628 +++++
+ qmp.c =3D> monitor/qmp-cmds.c         |    2 +-
+ monitor/qmp.c                       |  404 +++
+ monitor/trace-events                |   15 +
+ qemu-deprecated.texi                |    6 +
+ stubs/fdset.c                       |    2 +-
+ stubs/monitor.c                     |    6 +-
+ tests/test-util-sockets.c           |    3 +-
+ trace-events                        |   10 -
+ vl.c                                |   28 +-
+ 24 files changed, 5073 insertions(+), 4777 deletions(-)
+ delete mode 100644 monitor.c
+ create mode 100644 monitor/Makefile.objs
+ rename hmp.c =3D> monitor/hmp-cmds.c (99%)
+ create mode 100644 monitor/hmp.c
+ create mode 100644 monitor/misc.c
+ create mode 100644 monitor/monitor-internal.h
+ create mode 100644 monitor/monitor.c
+ rename qmp.c =3D> monitor/qmp-cmds.c (99%)
+ create mode 100644 monitor/qmp.c
+ create mode 100644 monitor/trace-events
 
-[1] maybe even qemu-remote-block-{raw,qcow2,vmdk,...)
+--=20
+2.21.0
+
 
