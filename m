@@ -2,66 +2,60 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 023E2C31E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 17:10:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C439C31E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 17:10:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD7BF2080A
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 17:10:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD7BF2080A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 657782080A
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 17:10:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 657782080A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60276 helo=lists.gnu.org)
+Received: from localhost ([::1]:60280 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdHco-0006nK-BY
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 13:10:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57066)
+	id 1hdHcx-0006tZ-Ne
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 13:10:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32803)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hdH9t-0003Ii-76
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:40:35 -0400
+ (envelope-from <clg@kaod.org>) id 1hdHOG-0001OR-FW
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:55:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hdH9r-0001SS-Iz
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:40:33 -0400
-Resent-Date: Tue, 18 Jun 2019 12:40:33 -0400
-Resent-Message-Id: <E1hdH9r-0001SS-Iz@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21451)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hdH9r-0001AG-AW
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:40:31 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1560875961; cv=none; d=zoho.com; s=zohoarc; 
- b=h6gCm/cFqsciabrZlPgFsC2EJmxwXJ+gz3LnX3zaHkKNWLfA/nGzLyAeVN9/0p0XVIDwN8TKv+yWmwfxZcrdq9Z7Hq7b0JFsc4DJT2OEE7Ynbkf0y+WC8AUkjU06wx1LT5LpaMBABaWW+hBNEvxiAbmjPdauY4bEAj7+b8z9dvI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1560875961;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=Xcn0H82bf0UPw2aOO/GJLvDXAyAC6hLfHU5IM44QjEA=; 
- b=ZIVAk+iY2AfORXLkn5VZDIG17l1asvQLQ6g4pD+RqOerFW6dhnJ7C4zbpcLrxkqlljj75ggkwDg9FX0X7YfTVmC4obLu8rCrGScqK8obd+/oxagJUhaiTtYpcJlW4m+toHGXX/NBtmdWFbteBOrUXqaFnsmhsBQv8CEeRZIw28U=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1560875958736396.9297071625582;
- Tue, 18 Jun 2019 09:39:18 -0700 (PDT)
-In-Reply-To: <20190618143923.53838-1-ysato@users.sourceforge.jp>
-Message-ID: <156087595747.19232.13851839986815811467@ce79690b2cb9>
+ (envelope-from <clg@kaod.org>) id 1hdHO6-0005dc-Hq
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:55:19 -0400
+Received: from 17.mo6.mail-out.ovh.net ([46.105.36.150]:49694)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hdHO6-0005Sk-6k
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:55:14 -0400
+Received: from player157.ha.ovh.net (unknown [10.109.159.139])
+ by mo6.mail-out.ovh.net (Postfix) with ESMTP id AA88E1CF9B1
+ for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 18:55:08 +0200 (CEST)
+Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
+ (Authenticated sender: clg@kaod.org)
+ by player157.ha.ovh.net (Postfix) with ESMTPSA id 41FB86EB5463;
+ Tue, 18 Jun 2019 16:55:01 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 18 Jun 2019 18:53:05 +0200
+Message-Id: <20190618165311.27066-16-clg@kaod.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190618165311.27066-1-clg@kaod.org>
+References: <20190618165311.27066-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: ysato@users.sourceforge.jp
-Date: Tue, 18 Jun 2019 09:39:18 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 1687723962951699217
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrtddtgdejjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [PATCH RESEND v21 00/21] Add RX archtecture support
+X-Received-From: 46.105.36.150
+Subject: [Qemu-devel] [PATCH v2 15/21] aspeed/smc: add support for DMAs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,149 +67,435 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, ysato@users.sourceforge.jp,
- richard.henderson@linaro.org, qemu-devel@nongnu.org, imammedo@redhat.com,
- philmd@redhat.com
+Cc: Andrew Jeffery <andrew@aj.id.au>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYxODE0MzkyMy41Mzgz
-OC0xLXlzYXRvQHVzZXJzLnNvdXJjZWZvcmdlLmpwLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1z
-IHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9y
-Cm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIFJFU0VORCB2
-MjEgMDAvMjFdICBBZGQgUlggYXJjaHRlY3R1cmUgc3VwcG9ydApUeXBlOiBzZXJpZXMKTWVzc2Fn
-ZS1pZDogMjAxOTA2MTgxNDM5MjMuNTM4MzgtMS15c2F0b0B1c2Vycy5zb3VyY2Vmb3JnZS5qcAoK
-PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2Ug
-PiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0
-IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWls
-YmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCkZyb20gaHR0cHM6Ly9naXRodWIu
-Y29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAgIDM0YmVhNGVkYjkuLjMzZDYwOTk5MDYgIG1hc3Rl
-ciAgICAgLT4gbWFzdGVyCkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9x
-ZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxOTA2MTgxNDM5MjMuNTM4
-MzgtMS15c2F0b0B1c2Vycy5zb3VyY2Vmb3JnZS5qcCAtPiBwYXRjaGV3LzIwMTkwNjE4MTQzOTIz
-LjUzODM4LTEteXNhdG9AdXNlcnMuc291cmNlZm9yZ2UuanAKQXV0byBwYWNraW5nIHRoZSByZXBv
-c2l0b3J5IGluIGJhY2tncm91bmQgZm9yIG9wdGltdW0gcGVyZm9ybWFuY2UuClNlZSAiZ2l0IGhl
-bHAgZ2MiIGZvciBtYW51YWwgaG91c2VrZWVwaW5nLgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
-J3Rlc3QnCjVkNjJlZjk2MmEgQm9vdExpbnV4Q29uc29sZVRlc3Q6IFRlc3QgdGhlIFJYLVZpcnQg
-bWFjaGluZQo5ZDE3MDk0ZDgxIEFkZCByeC1zb2Z0bW11CmExNDQxMjE1NWQgaHcvcng6IFJlc3Ry
-aWN0IHRoZSBSWDYyTiBtaWNyb2NvbnRyb2xsZXIgdG8gdGhlIFJYNjJOIENQVSBjb3JlCjA5ZTVl
-ZmVlNWIgaHcvcng6IEhvbm9yIC1hY2NlbCBxdGVzdApiZjlmYTRlM2FiIGh3L3J4OiBSWCBUYXJn
-ZXQgaGFyZHdhcmUgZGVmaW5pdGlvbgpmNjk1ZDg2ZTQ3IGh3L2NoYXI6IFJYNjJOIHNlcmlhbCBj
-b21tdW5pY2F0aW9uIGludGVyZmFjZSAoU0NJKQo2Y2QyZjI2ZmE0IGh3L3RpbWVyOiBSWDYyTiBp
-bnRlcm5hbCB0aW1lciBtb2R1bGVzCjdiMTUyMjg5ZjMgaHcvaW50YzogUlg2Mk4gaW50ZXJydXB0
-IGNvbnRyb2xsZXIgKElDVWEpCmRlMjFkZjJjNjIgdGFyZ2V0L3J4OiBEdW1wIGJ5dGVzIGZvciBl
-YWNoIGluc24gZHVyaW5nIGRpc2Fzc2VtYmx5CjQ5OTE0NDIzYzggdGFyZ2V0L3J4OiBDb2xsZWN0
-IGFsbCBieXRlcyBkdXJpbmcgZGlzYXNzZW1ibHkKNTE5YjJhYWY5MCB0YXJnZXQvcng6IEVtaXQg
-YWxsIGRpc2Fzc2VtYmx5IGluIG9uZSBwcnQoKQplMTc1MjRlOGQwIHRhcmdldC9yeDogVXNlIHBy
-dF9sZG1pIGZvciBYQ0hHX21yIGRpc2Fzc2VtYmx5Cjg1MGJmZjhiNGEgdGFyZ2V0L3J4OiBSZXBs
-YWNlIG9wZXJhbmQgd2l0aCBwcnRfbGRtaSBpbiBkaXNhc3NlbWJsZXIKYjViMDk2YjM4MiB0YXJn
-ZXQvcng6IERpc2Fzc2VtYmxlIHJ4X2luZGV4X2FkZHIgaW50byBhIHN0cmluZwoyMzg5YzMxNjBk
-IHRhcmdldC9yeDogUlggZGlzYXNzZW1ibGVyCjdjNzg2NDM3OWUgdGFyZ2V0L3J4OiBDUFUgZGVm
-aW5pdGlvbgo4MWYxYzdjZWIwIHRhcmdldC9yeDogVENHIGhlbHBlcgo5NjA2NWFkNWZlIHRhcmdl
-dC9yeDogVENHIHRyYW5zbGF0aW9uCjExY2M0MjllNzUgaHcvcmVnaXN0ZXJmaWVsZHMuaDogQWRk
-IDhiaXQgYW5kIDE2Yml0IHJlZ2lzdGVyIG1hY3Jvcwo0MjI1YTc1ZDcyIHFlbXUvYml0b3BzLmg6
-IEFkZCBleHRyYWN0OCBhbmQgZXh0cmFjdDE2Cjg3ZjM5NGEzZjIgTUFJTlRBSU5FUlM6IEFkZCBS
-WAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8yMSBDaGVja2luZyBjb21taXQgODdmMzk0YTNmMmM1
-IChNQUlOVEFJTkVSUzogQWRkIFJYKQoyLzIxIENoZWNraW5nIGNvbW1pdCA0MjI1YTc1ZDcyMWEg
-KHFlbXUvYml0b3BzLmg6IEFkZCBleHRyYWN0OCBhbmQgZXh0cmFjdDE2KQozLzIxIENoZWNraW5n
-IGNvbW1pdCAxMWNjNDI5ZTc1ODIgKGh3L3JlZ2lzdGVyZmllbGRzLmg6IEFkZCA4Yml0IGFuZCAx
-NmJpdCByZWdpc3RlciBtYWNyb3MpClVzZSBvZiB1bmluaXRpYWxpemVkIHZhbHVlIHdpdGhpbiBA
-cmF3bGluZXMgaW4gY29uY2F0ZW5hdGlvbiAoLikgb3Igc3RyaW5nIGF0IC4vc2NyaXB0cy9jaGVj
-a3BhdGNoLnBsIGxpbmUgMjQ2Ny4KRVJST1I6IE1hY3JvcyB3aXRoIG11bHRpcGxlIHN0YXRlbWVu
-dHMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIGEgZG8gLSB3aGlsZSBsb29wCiMyNzogRklMRTogaW5j
-bHVkZS9ody9yZWdpc3RlcmZpZWxkcy5oOjI1OgorI2RlZmluZSBSRUc4KHJlZywgYWRkcikgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICBlbnVt
-IHsgQV8gIyMgcmVnID0gKGFkZHIpIH07ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgXAorICAgIGVudW0geyBSXyAjIyByZWcgPSAoYWRkcikgfTsKCkVSUk9SOiBNYWNy
-b3Mgd2l0aCBtdWx0aXBsZSBzdGF0ZW1lbnRzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBhIGRvIC0g
-d2hpbGUgbG9vcAojMzE6IEZJTEU6IGluY2x1ZGUvaHcvcmVnaXN0ZXJmaWVsZHMuaDoyOToKKyNk
-ZWZpbmUgUkVHMTYocmVnLCBhZGRyKSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgXAorICAgIGVudW0geyBBXyAjIyByZWcgPSAoYWRkcikgfTsgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgZW51bSB7IFJfICMjIHJl
-ZyA9IChhZGRyKSAvIDIgfTsKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgNTYgbGluZXMg
-Y2hlY2tlZAoKUGF0Y2ggMy8yMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNC8yMSBDaGVj
-a2luZyBjb21taXQgOTYwNjVhZDVmZWU5ICh0YXJnZXQvcng6IFRDRyB0cmFuc2xhdGlvbikKV0FS
-TklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBu
-ZWVkIHVwZGF0aW5nPwojMjA6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3Jz
-LCAxIHdhcm5pbmdzLCAzMDY1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDQvMjEgaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KNS8yMSBDaGVja2luZyBjb21taXQgODFmMWM3Y2ViMGU4ICh0YXJnZXQv
-cng6IFRDRyBoZWxwZXIpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
-IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzI1OiAKbmV3IGZpbGUgbW9kZSAxMDA2
-NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNjQ5IGxpbmVzIGNoZWNrZWQKClBhdGNo
-IDUvMjEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNi8yMSBDaGVja2luZyBjb21taXQgN2M3
-ODY0Mzc5ZTBmICh0YXJnZXQvcng6IENQVSBkZWZpbml0aW9uKQpXQVJOSU5HOiBhZGRlZCwgbW92
-ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMy
-OTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDYy
-MiBsaW5lcyBjaGVja2VkCgpQYXRjaCA2LzIxIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
-dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
-dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjcv
-MjEgQ2hlY2tpbmcgY29tbWl0IDIzODljMzE2MGQ1NiAodGFyZ2V0L3J4OiBSWCBkaXNhc3NlbWJs
-ZXIpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRB
-SU5FUlMgbmVlZCB1cGRhdGluZz8KIzM4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAw
-IGVycm9ycywgMSB3YXJuaW5ncywgMTQ5NyBsaW5lcyBjaGVja2VkCgpQYXRjaCA3LzIxIGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjgvMjEgQ2hlY2tpbmcgY29tbWl0IGI1YjA5NmIzODIyNCAo
-dGFyZ2V0L3J4OiBEaXNhc3NlbWJsZSByeF9pbmRleF9hZGRyIGludG8gYSBzdHJpbmcpCjkvMjEg
-Q2hlY2tpbmcgY29tbWl0IDg1MGJmZjhiNGEwYyAodGFyZ2V0L3J4OiBSZXBsYWNlIG9wZXJhbmQg
-d2l0aCBwcnRfbGRtaSBpbiBkaXNhc3NlbWJsZXIpCjEwLzIxIENoZWNraW5nIGNvbW1pdCBlMTc1
-MjRlOGQwMWQgKHRhcmdldC9yeDogVXNlIHBydF9sZG1pIGZvciBYQ0hHX21yIGRpc2Fzc2VtYmx5
-KQoxMS8yMSBDaGVja2luZyBjb21taXQgNTE5YjJhYWY5MGQwICh0YXJnZXQvcng6IEVtaXQgYWxs
-IGRpc2Fzc2VtYmx5IGluIG9uZSBwcnQoKSkKMTIvMjEgQ2hlY2tpbmcgY29tbWl0IDQ5OTE0NDIz
-YzhjMCAodGFyZ2V0L3J4OiBDb2xsZWN0IGFsbCBieXRlcyBkdXJpbmcgZGlzYXNzZW1ibHkpCjEz
-LzIxIENoZWNraW5nIGNvbW1pdCBkZTIxZGYyYzYyZTcgKHRhcmdldC9yeDogRHVtcCBieXRlcyBm
-b3IgZWFjaCBpbnNuIGR1cmluZyBkaXNhc3NlbWJseSkKMTQvMjEgQ2hlY2tpbmcgY29tbWl0IDdi
-MTUyMjg5ZjMyMCAoaHcvaW50YzogUlg2Mk4gaW50ZXJydXB0IGNvbnRyb2xsZXIgKElDVWEpKQpX
-QVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJT
-IG5lZWQgdXBkYXRpbmc/CiM0MDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJv
-cnMsIDEgd2FybmluZ3MsIDQ0MiBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNC8yMSBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoxNS8yMSBDaGVja2luZyBjb21taXQgNmNkMmYyNmZhNGQ0IChody90
-aW1lcjogUlg2Mk4gaW50ZXJuYWwgdGltZXIgbW9kdWxlcykKV0FSTklORzogYWRkZWQsIG1vdmVk
-IG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNTA6
-IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA4Mzkg
-bGluZXMgY2hlY2tlZAoKUGF0Y2ggMTUvMjEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTYv
-MjEgQ2hlY2tpbmcgY29tbWl0IGY2OTVkODZlNDc1OSAoaHcvY2hhcjogUlg2Mk4gc2VyaWFsIGNv
-bW11bmljYXRpb24gaW50ZXJmYWNlIChTQ0kpKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVs
-ZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0MzogCm5ldyBm
-aWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDM5OCBsaW5lcyBj
-aGVja2VkCgpQYXRjaCAxNi8yMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNy8yMSBDaGVj
-a2luZyBjb21taXQgYmY5ZmE0ZTNhYjJkIChody9yeDogUlggVGFyZ2V0IGhhcmR3YXJlIGRlZmlu
-aXRpb24pCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJ
-TlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzI2OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFs
-OiAwIGVycm9ycywgMSB3YXJuaW5ncywgNDc5IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE3LzIxIGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE4LzIxIENoZWNraW5nIGNvbW1pdCAwOWU1ZWZlZTVi
-NTYgKGh3L3J4OiBIb25vciAtYWNjZWwgcXRlc3QpCjE5LzIxIENoZWNraW5nIGNvbW1pdCBhMTQ0
-MTIxNTVkNDIgKGh3L3J4OiBSZXN0cmljdCB0aGUgUlg2Mk4gbWljcm9jb250cm9sbGVyIHRvIHRo
-ZSBSWDYyTiBDUFUgY29yZSkKMjAvMjEgQ2hlY2tpbmcgY29tbWl0IDlkMTcwOTRkODEyZSAoQWRk
-IHJ4LXNvZnRtbXUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRv
-ZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzYxOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQK
-CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNzMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMjAv
-MjEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMjEvMjEgQ2hlY2tpbmcgY29tbWl0IDVkNjJl
-Zjk2MmEzYSAoQm9vdExpbnV4Q29uc29sZVRlc3Q6IFRlc3QgdGhlIFJYLVZpcnQgbWFjaGluZSkK
-PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRo
-ZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA2
-MTgxNDM5MjMuNTM4MzgtMS15c2F0b0B1c2Vycy5zb3VyY2Vmb3JnZS5qcC90ZXN0aW5nLmNoZWNr
-cGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
-IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
-ayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+The FMC controller on the Aspeed SoCs support DMA to access the flash
+modules. It can operate in a normal mode, to copy to or from the flash
+module mapping window, or in a checksum calculation mode, to evaluate
+the best clock settings for reads.
+
+The model introduces two custom address spaces for DMAs: one for the
+AHB window of the FMC flash devices and one for the DRAM. The latter
+is populated using a "dram" link set from the machine with the RAM
+container region.
+
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Acked-by: Joel Stanley <joel@jms.id.au>
+---
+ include/hw/ssi/aspeed_smc.h |   6 +
+ hw/arm/aspeed.c             |   2 +
+ hw/arm/aspeed_soc.c         |   2 +
+ hw/ssi/aspeed_smc.c         | 228 +++++++++++++++++++++++++++++++++++-
+ 4 files changed, 232 insertions(+), 6 deletions(-)
+
+diff --git a/include/hw/ssi/aspeed_smc.h b/include/hw/ssi/aspeed_smc.h
+index 591279ba1f43..453357cc09bf 100644
+--- a/include/hw/ssi/aspeed_smc.h
++++ b/include/hw/ssi/aspeed_smc.h
+@@ -45,6 +45,8 @@ typedef struct AspeedSMCController {
+     hwaddr flash_window_base;
+     uint32_t flash_window_size;
+     bool has_dma;
++    hwaddr dma_flash_mask;
++    hwaddr dma_dram_mask;
+     uint32_t nregs;
+ } AspeedSMCController;
+=20
+@@ -100,6 +102,10 @@ typedef struct AspeedSMCState {
+     /* for DMA support */
+     uint64_t sdram_base;
+=20
++    AddressSpace flash_as;
++    MemoryRegion *dram_mr;
++    AddressSpace dram_as;
++
+     AspeedSMCFlash *flashes;
+=20
+     uint8_t snoop_index;
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index 7f01df1b61d8..e404f8b244a9 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -178,6 +178,8 @@ static void aspeed_board_init(MachineState *machine,
+                             &error_abort);
+     object_property_set_int(OBJECT(&bmc->soc), smp_cpus, "num-cpus",
+                             &error_abort);
++    object_property_set_link(OBJECT(&bmc->soc), OBJECT(&bmc->ram_contain=
+er),
++                             "dram", &error_abort);
+     if (machine->kernel_filename) {
+         /*
+          * When booting with a -kernel command line there is no u-boot
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index 02feb4361ba4..8a1545545faf 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -212,6 +212,8 @@ static void aspeed_soc_init(Object *obj)
+                           sc->info->fmc_typename);
+     object_property_add_alias(obj, "num-cs", OBJECT(&s->fmc), "num-cs",
+                               &error_abort);
++    object_property_add_alias(obj, "dram", OBJECT(&s->fmc), "dram",
++                              &error_abort);
+=20
+     for (i =3D 0; i < sc->info->spis_num; i++) {
+         sysbus_init_child_obj(obj, "spi[*]", OBJECT(&s->spi[i]),
+diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+index 81f2fb7f707a..e00cdebae232 100644
+--- a/hw/ssi/aspeed_smc.c
++++ b/hw/ssi/aspeed_smc.c
+@@ -23,11 +23,13 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qapi/error.h"
+ #include "hw/sysbus.h"
+ #include "sysemu/sysemu.h"
+ #include "qemu/log.h"
+ #include "qemu/module.h"
+ #include "qemu/error-report.h"
++#include "exec/address-spaces.h"
+=20
+ #include "hw/ssi/aspeed_smc.h"
+=20
+@@ -110,8 +112,8 @@
+ #define   DMA_CTRL_FREQ_SHIFT   4
+ #define   DMA_CTRL_MODE         (1 << 3)
+ #define   DMA_CTRL_CKSUM        (1 << 2)
+-#define   DMA_CTRL_DIR          (1 << 1)
+-#define   DMA_CTRL_EN           (1 << 0)
++#define   DMA_CTRL_WRITE        (1 << 1)
++#define   DMA_CTRL_ENABLE       (1 << 0)
+=20
+ /* DMA Flash Side Address */
+ #define R_DMA_FLASH_ADDR  (0x84 / 4)
+@@ -143,6 +145,24 @@
+ #define ASPEED_SOC_SPI_FLASH_BASE   0x30000000
+ #define ASPEED_SOC_SPI2_FLASH_BASE  0x38000000
+=20
++/*
++ * DMA DRAM addresses should be 4 bytes aligned and the valid address
++ * range is 0x40000000 - 0x5FFFFFFF (AST2400)
++ *          0x80000000 - 0xBFFFFFFF (AST2500)
++ *
++ * DMA flash addresses should be 4 bytes aligned and the valid address
++ * range is 0x20000000 - 0x2FFFFFFF.
++ *
++ * DMA length is from 4 bytes to 32MB
++ *   0: 4 bytes
++ *   0x7FFFFF: 32M bytes
++ */
++#define DMA_DRAM_ADDR(s, val)   ((s)->sdram_base | \
++                                 ((val) & (s)->ctrl->dma_dram_mask))
++#define DMA_FLASH_ADDR(s, val)  ((s)->ctrl->flash_window_base | \
++                                ((val) & (s)->ctrl->dma_flash_mask))
++#define DMA_LENGTH(val)         ((val) & 0x01FFFFFC)
++
+ /* Flash opcodes. */
+ #define SPI_OP_READ       0x03    /* Read data bytes (low frequency) */
+=20
+@@ -212,6 +232,8 @@ static const AspeedSMCController controllers[] =3D {
+         .flash_window_base =3D ASPEED_SOC_FMC_FLASH_BASE,
+         .flash_window_size =3D 0x10000000,
+         .has_dma           =3D true,
++        .dma_flash_mask    =3D 0x0FFFFFFC,
++        .dma_dram_mask     =3D 0x1FFFFFFC,
+         .nregs             =3D ASPEED_SMC_R_MAX,
+     }, {
+         .name              =3D "aspeed.smc.spi",
+@@ -238,6 +260,8 @@ static const AspeedSMCController controllers[] =3D {
+         .flash_window_base =3D ASPEED_SOC_FMC_FLASH_BASE,
+         .flash_window_size =3D 0x10000000,
+         .has_dma           =3D true,
++        .dma_flash_mask    =3D 0x0FFFFFFC,
++        .dma_dram_mask     =3D 0x3FFFFFFC,
+         .nregs             =3D ASPEED_SMC_R_MAX,
+     }, {
+         .name              =3D "aspeed.smc.ast2500-spi1",
+@@ -730,9 +754,6 @@ static void aspeed_smc_reset(DeviceState *d)
+=20
+     memset(s->regs, 0, sizeof s->regs);
+=20
+-    /* Pretend DMA is done (u-boot initialization) */
+-    s->regs[R_INTR_CTRL] =3D INTR_CTRL_DMA_STATUS;
+-
+     /* Unselect all slaves */
+     for (i =3D 0; i < s->num_cs; ++i) {
+         s->regs[s->r_ctrl0 + i] |=3D CTRL_CE_STOP_ACTIVE;
+@@ -773,6 +794,11 @@ static uint64_t aspeed_smc_read(void *opaque, hwaddr=
+ addr, unsigned int size)
+         addr =3D=3D s->r_ce_ctrl ||
+         addr =3D=3D R_INTR_CTRL ||
+         addr =3D=3D R_DUMMY_DATA ||
++        (s->ctrl->has_dma && addr =3D=3D R_DMA_CTRL) ||
++        (s->ctrl->has_dma && addr =3D=3D R_DMA_FLASH_ADDR) ||
++        (s->ctrl->has_dma && addr =3D=3D R_DMA_DRAM_ADDR) ||
++        (s->ctrl->has_dma && addr =3D=3D R_DMA_LEN) ||
++        (s->ctrl->has_dma && addr =3D=3D R_DMA_CHECKSUM) ||
+         (addr >=3D R_SEG_ADDR0 && addr < R_SEG_ADDR0 + s->ctrl->max_slav=
+es) ||
+         (addr >=3D s->r_ctrl0 && addr < s->r_ctrl0 + s->ctrl->max_slaves=
+)) {
+         return s->regs[addr];
+@@ -783,6 +809,155 @@ static uint64_t aspeed_smc_read(void *opaque, hwadd=
+r addr, unsigned int size)
+     }
+ }
+=20
++/*
++ * Accumulate the result of the reads to provide a checksum that will
++ * be used to validate the read timing settings.
++ */
++static void aspeed_smc_dma_checksum(AspeedSMCState *s)
++{
++    MemTxResult result;
++    uint32_t data;
++
++    if (s->regs[R_DMA_CTRL] & DMA_CTRL_WRITE) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: invalid direction for DMA checksum\n",  __fun=
+c__);
++        return;
++    }
++
++    while (s->regs[R_DMA_LEN]) {
++        result =3D address_space_read(&s->flash_as, s->regs[R_DMA_FLASH_=
+ADDR],
++                                    MEMTXATTRS_UNSPECIFIED,
++                                    (uint8_t *)&data, 4);
++        if (result !=3D MEMTX_OK) {
++            qemu_log_mask(LOG_GUEST_ERROR, "%s: Flash read failed @%08x\=
+n",
++                          __func__, s->regs[R_DMA_FLASH_ADDR]);
++            return;
++        }
++
++        /*
++         * When the DMA is on-going, the DMA registers are updated
++         * with the current working addresses and length.
++         */
++        s->regs[R_DMA_CHECKSUM] +=3D data;
++        s->regs[R_DMA_FLASH_ADDR] +=3D 4;
++        s->regs[R_DMA_LEN] -=3D 4;
++    }
++}
++
++static void aspeed_smc_dma_rw(AspeedSMCState *s)
++{
++    MemTxResult result;
++    uint32_t data;
++
++    while (s->regs[R_DMA_LEN]) {
++        if (s->regs[R_DMA_CTRL] & DMA_CTRL_WRITE) {
++            result =3D address_space_read(&s->dram_as, s->regs[R_DMA_DRA=
+M_ADDR],
++                                        MEMTXATTRS_UNSPECIFIED,
++                                        (uint8_t *)&data, 4);
++            if (result !=3D MEMTX_OK) {
++                qemu_log_mask(LOG_GUEST_ERROR, "%s: DRAM read failed @%0=
+8x\n",
++                              __func__, s->regs[R_DMA_DRAM_ADDR]);
++                return;
++            }
++
++            result =3D address_space_write(&s->flash_as,
++                                         s->regs[R_DMA_FLASH_ADDR],
++                                         MEMTXATTRS_UNSPECIFIED,
++                                         (uint8_t *)&data, 4);
++            if (result !=3D MEMTX_OK) {
++                qemu_log_mask(LOG_GUEST_ERROR, "%s: Flash write failed @=
+%08x\n",
++                              __func__, s->regs[R_DMA_FLASH_ADDR]);
++                return;
++            }
++        } else {
++            result =3D address_space_read(&s->flash_as, s->regs[R_DMA_FL=
+ASH_ADDR],
++                                        MEMTXATTRS_UNSPECIFIED,
++                                        (uint8_t *)&data, 4);
++            if (result !=3D MEMTX_OK) {
++                qemu_log_mask(LOG_GUEST_ERROR, "%s: Flash read failed @%=
+08x\n",
++                              __func__, s->regs[R_DMA_FLASH_ADDR]);
++                return;
++            }
++
++            result =3D address_space_write(&s->dram_as, s->regs[R_DMA_DR=
+AM_ADDR],
++                                         MEMTXATTRS_UNSPECIFIED,
++                                         (uint8_t *)&data, 4);
++            if (result !=3D MEMTX_OK) {
++                qemu_log_mask(LOG_GUEST_ERROR, "%s: DRAM write failed @%=
+08x\n",
++                              __func__, s->regs[R_DMA_DRAM_ADDR]);
++                return;
++            }
++        }
++
++        /*
++         * When the DMA is on-going, the DMA registers are updated
++         * with the current working addresses and length.
++         */
++        s->regs[R_DMA_FLASH_ADDR] +=3D 4;
++        s->regs[R_DMA_DRAM_ADDR] +=3D 4;
++        s->regs[R_DMA_LEN] -=3D 4;
++    }
++}
++
++static void aspeed_smc_dma_stop(AspeedSMCState *s)
++{
++    /*
++     * When the DMA is disabled, INTR_CTRL_DMA_STATUS=3D0 means the
++     * engine is idle
++     */
++    s->regs[R_INTR_CTRL] &=3D ~INTR_CTRL_DMA_STATUS;
++    s->regs[R_DMA_CHECKSUM] =3D 0;
++
++    /*
++     * Lower the DMA irq in any case. The IRQ control register could
++     * have been cleared before disabling the DMA.
++     */
++    qemu_irq_lower(s->irq);
++}
++
++/*
++ * When INTR_CTRL_DMA_STATUS=3D1, the DMA has completed and a new DMA
++ * can start even if the result of the previous was not collected.
++ */
++static bool aspeed_smc_dma_in_progress(AspeedSMCState *s)
++{
++    return s->regs[R_DMA_CTRL] & DMA_CTRL_ENABLE &&
++        !(s->regs[R_INTR_CTRL] & INTR_CTRL_DMA_STATUS);
++}
++
++static void aspeed_smc_dma_done(AspeedSMCState *s)
++{
++    s->regs[R_INTR_CTRL] |=3D INTR_CTRL_DMA_STATUS;
++    if (s->regs[R_INTR_CTRL] & INTR_CTRL_DMA_EN) {
++        qemu_irq_raise(s->irq);
++    }
++}
++
++static void aspeed_smc_dma_ctrl(AspeedSMCState *s, uint64_t dma_ctrl)
++{
++    if (!(dma_ctrl & DMA_CTRL_ENABLE)) {
++        s->regs[R_DMA_CTRL] =3D dma_ctrl;
++
++        aspeed_smc_dma_stop(s);
++        return;
++    }
++
++    if (aspeed_smc_dma_in_progress(s)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: DMA in progress\n",  __func_=
+_);
++        return;
++    }
++
++    s->regs[R_DMA_CTRL] =3D dma_ctrl;
++
++    if (s->regs[R_DMA_CTRL] & DMA_CTRL_CKSUM) {
++        aspeed_smc_dma_checksum(s);
++    } else {
++        aspeed_smc_dma_rw(s);
++    }
++
++    aspeed_smc_dma_done(s);
++}
++
+ static void aspeed_smc_write(void *opaque, hwaddr addr, uint64_t data,
+                              unsigned int size)
+ {
+@@ -808,6 +983,16 @@ static void aspeed_smc_write(void *opaque, hwaddr ad=
+dr, uint64_t data,
+         }
+     } else if (addr =3D=3D R_DUMMY_DATA) {
+         s->regs[addr] =3D value & 0xff;
++    } else if (addr =3D=3D R_INTR_CTRL) {
++        s->regs[addr] =3D value;
++    } else if (s->ctrl->has_dma && addr =3D=3D R_DMA_CTRL) {
++        aspeed_smc_dma_ctrl(s, value);
++    } else if (s->ctrl->has_dma && addr =3D=3D R_DMA_DRAM_ADDR) {
++        s->regs[addr] =3D DMA_DRAM_ADDR(s, value);
++    } else if (s->ctrl->has_dma && addr =3D=3D R_DMA_FLASH_ADDR) {
++        s->regs[addr] =3D DMA_FLASH_ADDR(s, value);
++    } else if (s->ctrl->has_dma && addr =3D=3D R_DMA_LEN) {
++        s->regs[addr] =3D DMA_LENGTH(value);
+     } else {
+         qemu_log_mask(LOG_UNIMP, "%s: not implemented: 0x%" HWADDR_PRIx =
+"\n",
+                       __func__, addr);
+@@ -822,6 +1007,28 @@ static const MemoryRegionOps aspeed_smc_ops =3D {
+     .valid.unaligned =3D true,
+ };
+=20
++
++/*
++ * Initialize the custom address spaces for DMAs
++ */
++static void aspeed_smc_dma_setup(AspeedSMCState *s, Error **errp)
++{
++    char *name;
++
++    if (!s->dram_mr) {
++        error_setg(errp, TYPE_ASPEED_SMC ": 'dram' link not set");
++        return;
++    }
++
++    name =3D g_strdup_printf("%s-dma-flash", s->ctrl->name);
++    address_space_init(&s->flash_as, &s->mmio_flash, name);
++    g_free(name);
++
++    name =3D g_strdup_printf("%s-dma-dram", s->ctrl->name);
++    address_space_init(&s->dram_as, s->dram_mr, name);
++    g_free(name);
++}
++
+ static void aspeed_smc_realize(DeviceState *dev, Error **errp)
+ {
+     SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
+@@ -847,10 +1054,12 @@ static void aspeed_smc_realize(DeviceState *dev, E=
+rror **errp)
+         s->num_cs =3D s->ctrl->max_slaves;
+     }
+=20
++    /* DMA irq. Keep it first for the initialization in the SoC */
++    sysbus_init_irq(sbd, &s->irq);
++
+     s->spi =3D ssi_create_bus(dev, "spi");
+=20
+     /* Setup cs_lines for slaves */
+-    sysbus_init_irq(sbd, &s->irq);
+     s->cs_lines =3D g_new0(qemu_irq, s->num_cs);
+     ssi_auto_connect_slaves(dev, s->cs_lines, s->spi);
+=20
+@@ -897,6 +1106,11 @@ static void aspeed_smc_realize(DeviceState *dev, Er=
+ror **errp)
+         memory_region_add_subregion(&s->mmio_flash, offset, &fl->mmio);
+         offset +=3D fl->size;
+     }
++
++    /* DMA support */
++    if (s->ctrl->has_dma) {
++        aspeed_smc_dma_setup(s, errp);
++    }
+ }
+=20
+ static const VMStateDescription vmstate_aspeed_smc =3D {
+@@ -914,6 +1128,8 @@ static const VMStateDescription vmstate_aspeed_smc =3D=
+ {
+ static Property aspeed_smc_properties[] =3D {
+     DEFINE_PROP_UINT32("num-cs", AspeedSMCState, num_cs, 1),
+     DEFINE_PROP_UINT64("sdram-base", AspeedSMCState, sdram_base, 0),
++    DEFINE_PROP_LINK("dram", AspeedSMCState, dram_mr,
++                     TYPE_MEMORY_REGION, MemoryRegion *),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+=20
+--=20
+2.21.0
 
 
