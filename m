@@ -6,57 +6,56 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC415C31E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 17:29:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F041C31E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 17:29:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 975B9205F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 17:29:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 975B9205F4
+	by mail.kernel.org (Postfix) with ESMTPS id 4CCBC205F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 17:29:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CCBC205F4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60524 helo=lists.gnu.org)
+Received: from localhost ([::1]:60526 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdHuw-0003WU-U3
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 13:29:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60957)
+	id 1hdHv6-0003mb-Jr
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 13:29:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60475)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <clg@kaod.org>) id 1hdHO6-0001DE-1r
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:55:17 -0400
+ (envelope-from <clg@kaod.org>) id 1hdHN5-0008Ue-VA
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:54:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1hdHO0-0005S7-Kz
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:55:11 -0400
-Received: from 1.mo178.mail-out.ovh.net ([178.33.251.53]:35814)
+ (envelope-from <clg@kaod.org>) id 1hdHN4-0004DK-Qm
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:54:11 -0400
+Received: from 10.mo6.mail-out.ovh.net ([87.98.157.236]:57391)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hdHNy-0005Hf-RY
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:55:06 -0400
-Received: from player157.ha.ovh.net (unknown [10.109.159.224])
- by mo178.mail-out.ovh.net (Postfix) with ESMTP id 41DFF6CEF0
- for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 18:55:01 +0200 (CEST)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hdHN4-0004BE-Le
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 12:54:10 -0400
+Received: from player157.ha.ovh.net (unknown [10.108.54.172])
+ by mo6.mail-out.ovh.net (Postfix) with ESMTP id 5A08E1CC1D2
+ for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 18:54:07 +0200 (CEST)
 Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
  (Authenticated sender: clg@kaod.org)
- by player157.ha.ovh.net (Postfix) with ESMTPSA id D205C6EB5420;
- Tue, 18 Jun 2019 16:54:53 +0000 (UTC)
+ by player157.ha.ovh.net (Postfix) with ESMTPSA id DE3B46EB51EE;
+ Tue, 18 Jun 2019 16:53:59 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 18 Jun 2019 18:53:04 +0200
-Message-Id: <20190618165311.27066-15-clg@kaod.org>
+Date: Tue, 18 Jun 2019 18:52:56 +0200
+Message-Id: <20190618165311.27066-7-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190618165311.27066-1-clg@kaod.org>
 References: <20190618165311.27066-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 1685753638080252689
+X-Ovh-Tracer-Id: 1670553987857419025
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
 X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrtddtgdejjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.251.53
-Subject: [Qemu-devel] [PATCH v2 14/21] aspeed/smc: add a 'sdram_base'
- property
+X-Received-From: 87.98.157.236
+Subject: [Qemu-devel] [PATCH v2 06/21] aspeed: add support for multiple NICs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,72 +67,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Joel Stanley <joel@jms.id.au>
+Cc: Andrew Jeffery <andrew@aj.id.au>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The DRAM address of a DMA transaction depends on the DRAM base address
-of the SoC. Inform the SMC controller model with this value.
+The Aspeed SoCs have two MACs. Extend the Aspeed model to support a
+second NIC.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Joel Stanley <joel@jms.id.au>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- include/hw/ssi/aspeed_smc.h | 3 +++
- hw/arm/aspeed_soc.c         | 6 ++++++
- hw/ssi/aspeed_smc.c         | 1 +
- 3 files changed, 10 insertions(+)
+ include/hw/arm/aspeed_soc.h |  3 ++-
+ hw/arm/aspeed_soc.c         | 33 +++++++++++++++++++--------------
+ 2 files changed, 21 insertions(+), 15 deletions(-)
 
-diff --git a/include/hw/ssi/aspeed_smc.h b/include/hw/ssi/aspeed_smc.h
-index 3b1e7fce6c86..591279ba1f43 100644
---- a/include/hw/ssi/aspeed_smc.h
-+++ b/include/hw/ssi/aspeed_smc.h
-@@ -97,6 +97,9 @@ typedef struct AspeedSMCState {
-     uint8_t r_timings;
-     uint8_t conf_enable_w0;
+diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
+index b613b00600fc..75b557060b9b 100644
+--- a/include/hw/arm/aspeed_soc.h
++++ b/include/hw/arm/aspeed_soc.h
+@@ -25,6 +25,7 @@
+ #define ASPEED_SPIS_NUM  2
+ #define ASPEED_WDTS_NUM  3
+ #define ASPEED_CPUS_NUM  2
++#define ASPEED_MACS_NUM  2
 =20
-+    /* for DMA support */
-+    uint64_t sdram_base;
-+
-     AspeedSMCFlash *flashes;
+ typedef struct AspeedSoCState {
+     /*< private >*/
+@@ -43,7 +44,7 @@ typedef struct AspeedSoCState {
+     AspeedSMCState spi[ASPEED_SPIS_NUM];
+     AspeedSDMCState sdmc;
+     AspeedWDTState wdt[ASPEED_WDTS_NUM];
+-    FTGMAC100State ftgmac100;
++    FTGMAC100State ftgmac100[ASPEED_MACS_NUM];
+ } AspeedSoCState;
 =20
-     uint8_t snoop_index;
+ #define TYPE_ASPEED_SOC "aspeed-soc"
 diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index 736e52366a66..02feb4361ba4 100644
+index d38fb0aaa0f5..736e52366a66 100644
 --- a/hw/arm/aspeed_soc.c
 +++ b/hw/arm/aspeed_soc.c
-@@ -337,6 +337,12 @@ static void aspeed_soc_realize(DeviceState *dev, Err=
-or **errp)
-                        aspeed_soc_get_irq(s, ASPEED_I2C));
+@@ -234,8 +234,10 @@ static void aspeed_soc_init(Object *obj)
+                                     sc->info->silicon_rev);
+     }
 =20
-     /* FMC, The number of CS is set at the board level */
-+    object_property_set_int(OBJECT(&s->fmc), sc->info->memmap[ASPEED_SDR=
-AM],
-+                            "sdram-base", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
+-    sysbus_init_child_obj(obj, "ftgmac100", OBJECT(&s->ftgmac100),
+-                          sizeof(s->ftgmac100), TYPE_FTGMAC100);
++    for (i =3D 0; i < ASPEED_MACS_NUM; i++) {
++        sysbus_init_child_obj(obj, "ftgmac100[*]", OBJECT(&s->ftgmac100[=
+i]),
++                              sizeof(s->ftgmac100[i]), TYPE_FTGMAC100);
 +    }
-     object_property_set_bool(OBJECT(&s->fmc), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
-diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
-index 9eda0d720be6..81f2fb7f707a 100644
---- a/hw/ssi/aspeed_smc.c
-+++ b/hw/ssi/aspeed_smc.c
-@@ -913,6 +913,7 @@ static const VMStateDescription vmstate_aspeed_smc =3D=
- {
+ }
 =20
- static Property aspeed_smc_properties[] =3D {
-     DEFINE_PROP_UINT32("num-cs", AspeedSMCState, num_cs, 1),
-+    DEFINE_PROP_UINT64("sdram-base", AspeedSMCState, sdram_base, 0),
-     DEFINE_PROP_END_OF_LIST(),
- };
+ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+@@ -382,19 +384,22 @@ static void aspeed_soc_realize(DeviceState *dev, Er=
+ror **errp)
+     }
 =20
+     /* Net */
+-    qdev_set_nic_properties(DEVICE(&s->ftgmac100), &nd_table[0]);
+-    object_property_set_bool(OBJECT(&s->ftgmac100), true, "aspeed", &err=
+);
+-    object_property_set_bool(OBJECT(&s->ftgmac100), true, "realized",
+-                             &local_err);
+-    error_propagate(&err, local_err);
+-    if (err) {
+-        error_propagate(errp, err);
+-        return;
++    for (i =3D 0; i < nb_nics; i++) {
++        qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), &nd_table[i]);
++        object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "aspeed=
+",
++                                 &err);
++        object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "realiz=
+ed",
++                                 &local_err);
++        error_propagate(&err, local_err);
++        if (err) {
++            error_propagate(errp, err);
++           return;
++        }
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->ftgmac100[i]), 0,
++                        sc->info->memmap[ASPEED_ETH1 + i]);
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->ftgmac100[i]), 0,
++                           aspeed_soc_get_irq(s, ASPEED_ETH1 + i));
+     }
+-    sysbus_mmio_map(SYS_BUS_DEVICE(&s->ftgmac100), 0,
+-                    sc->info->memmap[ASPEED_ETH1]);
+-    sysbus_connect_irq(SYS_BUS_DEVICE(&s->ftgmac100), 0,
+-                       aspeed_soc_get_irq(s, ASPEED_ETH1));
+ }
+ static Property aspeed_soc_properties[] =3D {
+     DEFINE_PROP_UINT32("num-cpus", AspeedSoCState, num_cpus, 0),
 --=20
 2.21.0
 
