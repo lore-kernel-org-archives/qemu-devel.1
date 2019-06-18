@@ -2,101 +2,66 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	T_HK_NAME_DR,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15123C31E5B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FF2FC31E5E
 	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:46:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D16E121855
+	by mail.kernel.org (Postfix) with ESMTPS id EB0CC21530
 	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 16:46:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="T/cifKLn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D16E121855
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB0CC21530
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59828 helo=lists.gnu.org)
+Received: from localhost ([::1]:59830 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdHFL-0007w0-PV
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 12:46:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36870)
+	id 1hdHFM-0007x4-5r
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 12:46:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34446)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <liran.alon@oracle.com>) id 1hdGLA-0003Hw-DM
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:48:10 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hdGG0-0007dg-QM
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:42:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liran.alon@oracle.com>) id 1hdGL8-0000v8-0I
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:48:07 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:39756)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
- id 1hdGL7-0000Kg-Ji
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:48:05 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5IFhstc181357;
- Tue, 18 Jun 2019 15:47:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2018-07-02; bh=eQ0nzYc0ULSE4m2y4q5Mz8s0ptpwHBMMjmAA5sE9wTU=;
- b=T/cifKLn+gaKLiMPSbleb/QR4ykPfNCEo5Qp2Jzyn83zQJgmLZMXNxtFIPIJyro9vRhM
- LIsz4r5fvmSwY/wNij1IViAOP48noN1JeistJsBBH54+HtgIMaXksSJ4AiC6SSEEL2yp
- 78sJo8wh8bmiAGme/ZmGdhmCFQzV/4i/ooc3gbmjmxxR0sZyd9qJZnO681Qs1NCz8MEA
- wc07PVV7u6caNdjm3uFTtd1Uo+0EHxtWAAFS/NwAsEprotwtAD0H18rmUhKxRagvcHIe
- OeHoTKHdEnCfYpbVbu7qm0b4ADNp9hjcRZ4tDbtkPAEqR83hHOFZLY6H4N+Puj71377k Ag== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2120.oracle.com with ESMTP id 2t4saqdb6m-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 18 Jun 2019 15:47:49 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5IFiQqd181563;
- Tue, 18 Jun 2019 15:45:49 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by aserp3020.oracle.com with ESMTP id 2t5mgc1dhm-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 18 Jun 2019 15:45:48 +0000
-Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5IFjmor019118;
- Tue, 18 Jun 2019 15:45:48 GMT
-Received: from [192.168.14.112] (/109.67.217.108)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Tue, 18 Jun 2019 08:45:48 -0700
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-From: Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <20190618090752.GD2850@work-vm>
-Date: Tue, 18 Jun 2019 18:45:43 +0300
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <350BC330-8877-4B93-A8B3-0C001AEDD879@oracle.com>
+ (envelope-from <dgilbert@redhat.com>) id 1hdGFy-0006lj-Ez
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:42:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56128)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hdGFu-0006BP-Hg
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 11:42:44 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 03F27306E61C;
+ Tue, 18 Jun 2019 15:42:24 +0000 (UTC)
+Received: from work-vm (ovpn-117-76.ams2.redhat.com [10.36.117.76])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D2CF7179E3;
+ Tue, 18 Jun 2019 15:42:21 +0000 (UTC)
+Date: Tue, 18 Jun 2019 16:42:19 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Liran Alon <liran.alon@oracle.com>
+Message-ID: <20190618154218.GH2850@work-vm>
 References: <20190617175658.135869-1-liran.alon@oracle.com>
- <20190617175658.135869-9-liran.alon@oracle.com>
- <20190618090752.GD2850@work-vm>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
- signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=944
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906180124
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291
- signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=998 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906180124
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.85
-Subject: Re: [Qemu-devel] [QEMU PATCH v3 8/9] KVM: i386: Add support for
- KVM_CAP_EXCEPTION_PAYLOAD
+ <20190617175658.135869-7-liran.alon@oracle.com>
+ <20190618085539.GB2850@work-vm>
+ <AB34E76F-231C-4E66-B5CB-113AFCE7A20F@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <AB34E76F-231C-4E66-B5CB-113AFCE7A20F@oracle.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Tue, 18 Jun 2019 15:42:29 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [QEMU PATCH v3 6/9] vmstate: Add support for
+ kernel integer types
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,51 +81,105 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-> On 18 Jun 2019, at 12:07, Dr. David Alan Gilbert <dgilbert@redhat.com> =
-wrote:
+* Liran Alon (liran.alon@oracle.com) wrote:
 >=20
-> * Liran Alon (liran.alon@oracle.com) wrote:
->> Kernel commit c4f55198c7c2 ("kvm: x86: Introduce =
-KVM_CAP_EXCEPTION_PAYLOAD")
->> introduced a new KVM capability which allows userspace to correctly
->> distinguish between pending and injected exceptions.
->>=20
->> This distinguish is important in case of nested virtualization =
-scenarios
->> because a L2 pending exception can still be intercepted by the L1 =
-hypervisor
->> while a L2 injected exception cannot.
->>=20
->> Furthermore, when an exception is attempted to be injected by QEMU,
->> QEMU should specify the exception payload (CR2 in case of #PF or
->> DR6 in case of #DB) instead of having the payload already delivered =
-in
->> the respective vCPU register. Because in case exception is injected =
-to
->> L2 guest and is intercepted by L1 hypervisor, then payload needs to =
-be
->> reported to L1 intercept (VMExit handler) while still preserving
->> respective vCPU register unchanged.
->>=20
->> This commit adds support for QEMU to properly utilise this new KVM
->> capability (KVM_CAP_EXCEPTION_PAYLOAD).
 >=20
-> Does this kvm capability become a requirement for the nested migration
-> then? If so, is it wired into the blockers?
+> > On 18 Jun 2019, at 11:55, Dr. David Alan Gilbert <dgilbert@redhat.com=
+> wrote:
+> >=20
+> > * Liran Alon (liran.alon@oracle.com) wrote:
+> >> Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+> >> Reviewed-by: Maran Wilson <maran.wilson@oracle.com>
+> >> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+> >> ---
+> >> include/migration/vmstate.h | 18 ++++++++++++++++++
+> >> 1 file changed, 18 insertions(+)
+> >>=20
+> >> diff --git a/include/migration/vmstate.h b/include/migration/vmstate=
+.h
+> >> index 9224370ed59a..a85424fb0483 100644
+> >> --- a/include/migration/vmstate.h
+> >> +++ b/include/migration/vmstate.h
+> >> @@ -797,6 +797,15 @@ extern const VMStateInfo vmstate_info_qtailq;
+> >> #define VMSTATE_UINT64_V(_f, _s, _v)                                =
+  \
+> >>     VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint64, uint64_t)
+> >=20
+> > A comment here stating they're for Linux kernel types would be nice.
 >=20
-> Dave
+> I didn=E2=80=99t want to state this because in theory these types can b=
+e used not in kernel context=E2=80=A6
+> I thought commit message is sufficient. I think comments in code should=
+ be made to clarify
+> things. But to justify existence I think commit message should be used.
+> But if you insist, I have no strong objection of adding such comment.
+
+It's only a 'would be nice' - it's just I don't want people trying to
+use them for other places (I'm not sure what happens if you pass a
+uint8_t to VMSTATE_U8 ???
+
+> >=20
+> >> +#define VMSTATE_U8_V(_f, _s, _v)                                   =
+\
+> >> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint8, __u8)
+> >> +#define VMSTATE_U16_V(_f, _s, _v)                                  =
+\
+> >> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint16, __u16)
+> >> +#define VMSTATE_U32_V(_f, _s, _v)                                  =
+\
+> >> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint32, __u32)
+> >> +#define VMSTATE_U64_V(_f, _s, _v)                                  =
+\
+> >> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint64, __u64)
+> >> +
+> >=20
+> > Have you checked that builds OK on a non-Linux system?
 >=20
+> Hmm that=E2=80=99s a good point. No. :P
 
-That=E2=80=99s a very good point.
-Yes this capability is required in order to correctly migrate VMs =
-running nested hypervisors.
-I agree that I should add a migration blocker for nested in case it =
-isn=E2=80=99t present.
-Nice catch.
+Worth a check if you can find one lying around :-)
 
--Liran
+Dave
 
-
+> -Liran
+>=20
+> >=20
+> > Dave
+> >=20
+> >> #define VMSTATE_BOOL(_f, _s)                                        =
+  \
+> >>     VMSTATE_BOOL_V(_f, _s, 0)
+> >>=20
+> >> @@ -818,6 +827,15 @@ extern const VMStateInfo vmstate_info_qtailq;
+> >> #define VMSTATE_UINT64(_f, _s)                                      =
+  \
+> >>     VMSTATE_UINT64_V(_f, _s, 0)
+> >>=20
+> >> +#define VMSTATE_U8(_f, _s)                                         =
+\
+> >> +    VMSTATE_U8_V(_f, _s, 0)
+> >> +#define VMSTATE_U16(_f, _s)                                        =
+\
+> >> +    VMSTATE_U16_V(_f, _s, 0)
+> >> +#define VMSTATE_U32(_f, _s)                                        =
+\
+> >> +    VMSTATE_U32_V(_f, _s, 0)
+> >> +#define VMSTATE_U64(_f, _s)                                        =
+\
+> >> +    VMSTATE_U64_V(_f, _s, 0)
+> >> +
+> >> #define VMSTATE_UINT8_EQUAL(_f, _s, _err_hint)                      =
+  \
+> >>     VMSTATE_SINGLE_FULL(_f, _s, 0, 0,                               =
+  \
+> >>                         vmstate_info_uint8_equal, uint8_t, _err_hint=
+)
+> >> --=20
+> >> 2.20.1
+> >>=20
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
