@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13536C31E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 01:37:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC9EAC31E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 01:40:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC2902082C
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 01:37:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 765652082C
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 01:40:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="FJchp/Z0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC2902082C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="cB/pcKUP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 765652082C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52944 helo=lists.gnu.org)
+Received: from localhost ([::1]:52972 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hd33w-0000T8-5J
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 21:37:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40969)
+	id 1hd36r-0003lB-Mt
+	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 21:40:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40876)
  by lists.gnu.org with esmtp (Exim 4.86_2)
  (envelope-from <prvs=0651fb9a1=alistair.francis@wdc.com>)
- id 1hd30C-0006hL-EV
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 21:33:37 -0400
+ id 1hd307-0006cF-Ja
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 21:33:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <prvs=0651fb9a1=alistair.francis@wdc.com>)
- id 1hd30B-00005z-AT
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 21:33:36 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:60680)
+ id 1hd306-0008Ro-9p
+ for qemu-devel@nongnu.org; Mon, 17 Jun 2019 21:33:31 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:60672)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <prvs=0651fb9a1=alistair.francis@wdc.com>)
- id 1hd30A-0008QF-Uf; Mon, 17 Jun 2019 21:33:35 -0400
+ id 1hd305-0008L1-Gs; Mon, 17 Jun 2019 21:33:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1560821615; x=1592357615;
+ t=1560821609; x=1592357609;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=tqX0fYHQddrpY4KXEEAbz2+C779KVIJCqxSKXh0arRw=;
- b=FJchp/Z01A5fmDXCvNKYqOX/3R2AiWMy5qApG0DT/vEHHHjPoFOhXZ8V
- b5+jabbP0b0snfIk6LLw7ASCw/0OjjzvXD+aDNK4vF5fxzr07YnvWzXkV
- vgE9Gb5WOf8XQTxj69A2kFrDKHRD8oP83zRs0b8JO4+eVdArM1kpQx60z
- bC6tFT8lUE6U9tLv2cNzAD2FULisskfiR7f3J57AS/m/N5PKT1+PJYCMt
- VJJBCIEdCn7CLlR7/jsbOFgO22xvxnbYG9FVaZALJi8/CQV/cNPQ3mDsc
- 5SxmWG5NanayFReXDvj21xANCyLVNSUJQPktsjcW0zu0hu9DB1kL+2RJ2 g==;
-X-IronPort-AV: E=Sophos;i="5.63,386,1557158400"; d="scan'208";a="115717034"
+ bh=yjAxmHO+IlbgcE9s5eMCiJERcKojM3+lW9tXUnlXSrU=;
+ b=cB/pcKUPRcGQKzDHIUan4UjlvWrAdL6lfYLEQZbqG12NK4m1IG8N0TGc
+ kEqDeeRMBamty+vN93n2h0U7eSEbBf+q2q9poYGP44JlH+Ukv58wm6C7w
+ kfto8cBZZxuSDBkIFQPymcYYBI8Jp45zRYCLR/RYIFdU2X3p0cPkXb/Ws
+ zGl0s0x9VhmWhWvv+kbPVXcsq74d4kLnqMM+fxyQAzsuFDEp8LzopcQOI
+ Klj2PntFlCsKiJQrtkm4Fv0IazeCcDIJmqiJBwiW1KePKi8LKhohyjrX8
+ S82YWKblCyr0jx1W5/lo1wkYcd49mwR2rmRVqPWcwu2lhrcAZ/I8Cr8cz g==;
+X-IronPort-AV: E=Sophos;i="5.63,386,1557158400"; d="scan'208";a="115717009"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 18 Jun 2019 09:33:34 +0800
-IronPort-SDR: cp9ajpirFhe8vkpB/SRmOQGjypRngaLzn/Qu8ZpYkjVt9vT8hxP0pUfuN2OExOnVQdi28+nKx1
- DkAdFdu+p4Iv5qjjL7eyC7rHAya4Glouj4/ARKNy6g316SVmGmGmUF0bpkOnhg5/VptCVoNIr1
- 0BpbRsN1x3A9kW+vrrsnXDPxvhdybwqE5lmO7/zKSkcoSzCRMYnnwVVyAnw+IyzGzOQvSZY7ea
- GPGyWvb2ygi4C6mri144HMSFRgQ3ZhD2N+7X1DUHXmByrPPGW+enqJcXlTU8ko0TjroPMHOq2Q
- yfJeseQoraBko+hUmBZifApe
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep01.wdc.com with ESMTP; 17 Jun 2019 18:33:07 -0700
-IronPort-SDR: nL3S6vzMVwNY/N+ThlmOTPSJdMsRn9vKFmo6aWI4e84Mye16/5V6GAKGBKc++GOilzDaqdCfEA
- qOr0g4i5eICi6QMa92qz5Y8yCfo3n2zkBWJ580PQfssCjFKoUHYWAT8HCt483oaGcufTQ1WpQo
- wcO64g2W/gFTPYfiujwPJs10zhqpESjPTcN+sLNwL5oGBuNQT4wr0uQu6nkq5S6Zkr5lGxiarN
- qqeDUYOAh5AAeKbVZ9xuEoBs/1cc6mz8lOmb0Q7PfQhZjKcRqPMwbauzaADOWd3aPtbl2V979o
- H+w=
+ by ob1.hgst.iphmx.com with ESMTP; 18 Jun 2019 09:33:23 +0800
+IronPort-SDR: VG9tu8UusbKDclV52Qd+JWCPBXe80xj/UjdpEMallRNVW23hAcbkFcSpsYPRB7IGB+DP+QuAwD
+ CLLVDblnEZ0DdUtBlJX06FWDm9iTN4b9Bgoz4mjwxcQ8XwEV50QA8GIxeqHnEPi6xD2XgzDdB1
+ eQfomJy+P/qiWXVeRVDiYEyVpJHcabBNbmHlRfJdTPObpbB0t+peFZH1AhViputiF4y4O7/Fmk
+ 2L9/+YGsTwQGv2wE+YHBdV/wYcd2j6a1h5ekRKKm1nqKBF4d2TwUiagVoyCBOxfx2zIrZydVD0
+ ZpCajrvFv9WKskeEkUwa28HI
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep01.wdc.com with ESMTP; 17 Jun 2019 18:32:55 -0700
+IronPort-SDR: fYEWfEtGYkogHAAdOUQhiEpK0YpltRAVwxyjJ1ba6TtZ6/LYMtoK5UZXsF2+TBzCCrAm9UeKfM
+ p5X8FFSipXFcnI74gK78VrATK4acqM1jQ0Khzr52kH/+6pfcRKsVf6uBJt8Mkr0yySIM/TTJkN
+ ICGEkLqL8jcwiikC3JkblcrO7n6/6V6Nm6CGOCzJBVgCe3drfRBwwsaFsLg5S0WYdlMiJUvFyb
+ xmZ/NZDZvLAbdeVcsUBgh2fxEYzRfBDQXQU6aXLZOaqLVkEe3b7uxPMINmE2/f5SWwCAdKkn6M
+ uns=
 Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
  risc6-mainframe.int.fusionio.com) ([10.196.157.140])
- by uls-op-cesaip02.wdc.com with ESMTP; 17 Jun 2019 18:33:34 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 17 Jun 2019 18:33:23 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Date: Mon, 17 Jun 2019 18:31:13 -0700
-Message-Id: <6a7392df062afc1d7b4914d92da43f0711ec14ec.1560821342.git.alistair.francis@wdc.com>
+Date: Mon, 17 Jun 2019 18:31:02 -0700
+Message-Id: <1483cda620f3bff57b7c47ad74c44f586cfde4a5.1560821342.git.alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <cover.1560821342.git.alistair.francis@wdc.com>
 References: <cover.1560821342.git.alistair.francis@wdc.com>
@@ -81,8 +81,7 @@ Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 216.71.153.141
-Subject: [Qemu-devel] [PATCH v1 5/9] qemu-deprecated.texi: Deprecate the
- RISC-V privledge spec 1.09.1
+Subject: [Qemu-devel] [PATCH v1 1/9] target/riscv: Restructure deprecatd CPUs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,33 +98,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Deprecate the RISC-V privledge spec version 1.09.1 in favour of the new
-1.10.0 and the ratified 1.11.0.
+Restructure the deprecated CPUs to make it clear in the code that these
+are depreated. They are already marked as deprecated in
+qemu-deprecated.texi. There are no functional changes.
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- qemu-deprecated.texi | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ target/riscv/cpu.c | 18 ++++++++++--------
+ target/riscv/cpu.h | 13 +++++++------
+ 2 files changed, 17 insertions(+), 14 deletions(-)
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 50292d820b..b1111debf7 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -138,6 +138,14 @@ The ``acl_show'', ``acl_reset'', ``acl_policy'', ``acl_add'', and
- ``acl_remove'' commands are deprecated with no replacement. Authorization
- for VNC should be performed using the pluggable QAuthZ objects.
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 0632ac08cf..a4dd7ae6fc 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -558,18 +558,20 @@ static const TypeInfo riscv_cpu_type_infos[] = {
+     DEFINE_CPU(TYPE_RISCV_CPU_ANY,              riscv_any_cpu_init),
+ #if defined(TARGET_RISCV32)
+     DEFINE_CPU(TYPE_RISCV_CPU_BASE32,           riscv_base32_cpu_init),
+-    DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_09_1, rv32gcsu_priv1_09_1_cpu_init),
+-    DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_10_0, rv32gcsu_priv1_10_0_cpu_init),
+-    DEFINE_CPU(TYPE_RISCV_CPU_RV32IMACU_NOMMU,  rv32imacu_nommu_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E31,       rv32imacu_nommu_cpu_init),
+-    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rv32gcsu_priv1_10_0_cpu_init)
++    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rv32gcsu_priv1_10_0_cpu_init),
++    /* Depreacted */
++    DEFINE_CPU(TYPE_RISCV_CPU_RV32IMACU_NOMMU,  rv32imacu_nommu_cpu_init),
++    DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_09_1, rv32gcsu_priv1_09_1_cpu_init),
++    DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_10_0, rv32gcsu_priv1_10_0_cpu_init)
+ #elif defined(TARGET_RISCV64)
+     DEFINE_CPU(TYPE_RISCV_CPU_BASE64,           riscv_base64_cpu_init),
+-    DEFINE_CPU(TYPE_RISCV_CPU_RV64GCSU_V1_09_1, rv64gcsu_priv1_09_1_cpu_init),
+-    DEFINE_CPU(TYPE_RISCV_CPU_RV64GCSU_V1_10_0, rv64gcsu_priv1_10_0_cpu_init),
+-    DEFINE_CPU(TYPE_RISCV_CPU_RV64IMACU_NOMMU,  rv64imacu_nommu_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E51,       rv64imacu_nommu_cpu_init),
+-    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U54,       rv64gcsu_priv1_10_0_cpu_init)
++    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U54,       rv64gcsu_priv1_10_0_cpu_init),
++    /* Deprecated */
++    DEFINE_CPU(TYPE_RISCV_CPU_RV64IMACU_NOMMU,  rv64imacu_nommu_cpu_init),
++    DEFINE_CPU(TYPE_RISCV_CPU_RV64GCSU_V1_09_1, rv64gcsu_priv1_09_1_cpu_init),
++    DEFINE_CPU(TYPE_RISCV_CPU_RV64GCSU_V1_10_0, rv64gcsu_priv1_10_0_cpu_init)
+ #endif
+ };
  
-+@section Guest Emulator ISAs
-+
-+@subsection RISC-V ISA privledge specification version 1.09.1 (since 4.1)
-+
-+The RISC-V ISA privledge specification version 1.09.1 has been deprecated.
-+QEMU supports both the newer version 1.10.0 and the ratified version 1.11.0, these
-+should be used instead of the 1.09.1 version.
-+
- @section System emulator CPUS
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index b47cde5017..1668d12018 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -35,16 +35,17 @@
+ #define TYPE_RISCV_CPU_ANY              RISCV_CPU_TYPE_NAME("any")
+ #define TYPE_RISCV_CPU_BASE32           RISCV_CPU_TYPE_NAME("rv32")
+ #define TYPE_RISCV_CPU_BASE64           RISCV_CPU_TYPE_NAME("rv64")
+-#define TYPE_RISCV_CPU_RV32GCSU_V1_09_1 RISCV_CPU_TYPE_NAME("rv32gcsu-v1.9.1")
+-#define TYPE_RISCV_CPU_RV32GCSU_V1_10_0 RISCV_CPU_TYPE_NAME("rv32gcsu-v1.10.0")
+-#define TYPE_RISCV_CPU_RV32IMACU_NOMMU  RISCV_CPU_TYPE_NAME("rv32imacu-nommu")
+-#define TYPE_RISCV_CPU_RV64GCSU_V1_09_1 RISCV_CPU_TYPE_NAME("rv64gcsu-v1.9.1")
+-#define TYPE_RISCV_CPU_RV64GCSU_V1_10_0 RISCV_CPU_TYPE_NAME("rv64gcsu-v1.10.0")
+-#define TYPE_RISCV_CPU_RV64IMACU_NOMMU  RISCV_CPU_TYPE_NAME("rv64imacu-nommu")
+ #define TYPE_RISCV_CPU_SIFIVE_E31       RISCV_CPU_TYPE_NAME("sifive-e31")
+ #define TYPE_RISCV_CPU_SIFIVE_E51       RISCV_CPU_TYPE_NAME("sifive-e51")
+ #define TYPE_RISCV_CPU_SIFIVE_U34       RISCV_CPU_TYPE_NAME("sifive-u34")
+ #define TYPE_RISCV_CPU_SIFIVE_U54       RISCV_CPU_TYPE_NAME("sifive-u54")
++/* Deprecated */
++#define TYPE_RISCV_CPU_RV32IMACU_NOMMU  RISCV_CPU_TYPE_NAME("rv32imacu-nommu")
++#define TYPE_RISCV_CPU_RV32GCSU_V1_09_1 RISCV_CPU_TYPE_NAME("rv32gcsu-v1.9.1")
++#define TYPE_RISCV_CPU_RV32GCSU_V1_10_0 RISCV_CPU_TYPE_NAME("rv32gcsu-v1.10.0")
++#define TYPE_RISCV_CPU_RV64IMACU_NOMMU  RISCV_CPU_TYPE_NAME("rv64imacu-nommu")
++#define TYPE_RISCV_CPU_RV64GCSU_V1_09_1 RISCV_CPU_TYPE_NAME("rv64gcsu-v1.9.1")
++#define TYPE_RISCV_CPU_RV64GCSU_V1_10_0 RISCV_CPU_TYPE_NAME("rv64gcsu-v1.10.0")
  
- @subsection RISC-V ISA CPUs (since 4.1)
+ #define RV32 ((target_ulong)1 << (TARGET_LONG_BITS - 2))
+ #define RV64 ((target_ulong)2 << (TARGET_LONG_BITS - 2))
 -- 
 2.22.0
 
