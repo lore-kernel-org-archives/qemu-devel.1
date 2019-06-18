@@ -4,49 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C304C31E5E
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 11:45:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47E58C31E51
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 11:51:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57E192070B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 11:45:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57E192070B
+	by mail.kernel.org (Postfix) with ESMTPS id A2F942070B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 11:51:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2F942070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55850 helo=lists.gnu.org)
+Received: from localhost ([::1]:55882 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdCY8-0006HF-J1
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 07:45:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48387)
+	id 1hdCdq-00016r-99
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 07:51:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48338)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hdCWZ-00041y-7J
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:43:41 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hdCWV-0000NL-AS
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hdCWX-00041v-AX
  for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:43:39 -0400
-Received: from relay.sw.ru ([185.231.240.75]:58022)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hdCWV-0000Me-4v
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 07:43:37 -0400
+Received: from relay.sw.ru ([185.231.240.75]:57996)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1hdCWU-0000Jl-RV; Tue, 18 Jun 2019 07:43:35 -0400
+ id 1hdCWU-0000Jf-RU; Tue, 18 Jun 2019 07:43:35 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1hdCWQ-00016b-0B; Tue, 18 Jun 2019 14:43:30 +0300
+ id 1hdCWP-00016b-2t; Tue, 18 Jun 2019 14:43:29 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Date: Tue, 18 Jun 2019 14:43:27 +0300
-Message-Id: <20190618114328.55249-9-vsementsov@virtuozzo.com>
+Date: Tue, 18 Jun 2019 14:43:21 +0300
+Message-Id: <20190618114328.55249-3-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20190618114328.55249-1-vsementsov@virtuozzo.com>
 References: <20190618114328.55249-1-vsementsov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v7 8/9] block/nbd: nbd reconnect
+Subject: [Qemu-devel] [PATCH v7 2/9] block/nbd: use non-blocking io channel
+ for nbd negotiation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,558 +65,154 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Implement reconnect. To achieve this:
-
-1. add new modes:
-   connecting-wait: means, that reconnecting is in progress, and there
-     were small number of reconnect attempts, so all requests are
-     waiting for the connection.
-   connecting-nowait: reconnecting is in progress, there were a lot of
-     attempts of reconnect, all requests will return errors.
-
-   two old modes are used too:
-   connected: normal state
-   quit: exiting after fatal error or on close
-
-Possible transitions are:
-
-   * -> quit
-   connecting-* -> connected
-   connecting-wait -> connecting-nowait (transition is done after
-                      reconnect-delay seconds in connecting-wait mode)
-   connected -> connecting-wait
-
-2. Implement reconnect in connection_co. So, in connecting-* mode,
-    connection_co, tries to reconnect unlimited times.
-
-3. Retry nbd queries on channel error, if we are in connecting-wait
-    state.
+No reason to use blocking channel for negotiation and we'll benefit in
+further reconnect feature, as qio_channel reads and writes will do
+qemu_coroutine_yield while waiting for io completion.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/nbd.c | 336 ++++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 272 insertions(+), 64 deletions(-)
+ include/block/nbd.h |  3 ++-
+ block/nbd.c         | 16 +++++++---------
+ nbd/client.c        | 16 +++++++++++-----
+ qemu-nbd.c          |  2 +-
+ 4 files changed, 21 insertions(+), 16 deletions(-)
 
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index bb9f5bc021..7b36d672f0 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -304,7 +304,8 @@ struct NBDExportInfo {
+ };
+ typedef struct NBDExportInfo NBDExportInfo;
+ 
+-int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
++int nbd_receive_negotiate(AioContext *aio_context, QIOChannel *ioc,
++                          QCryptoTLSCreds *tlscreds,
+                           const char *hostname, QIOChannel **outioc,
+                           NBDExportInfo *info, Error **errp);
+ void nbd_free_export_list(NBDExportInfo *info, int count);
 diff --git a/block/nbd.c b/block/nbd.c
-index 68e0e168e8..42a9d14ea0 100644
+index 46a1de7220..16a38373fd 100644
 --- a/block/nbd.c
 +++ b/block/nbd.c
-@@ -1,6 +1,7 @@
- /*
-  * QEMU Block driver for  NBD
-  *
-+ * Copyright (c) 2019 Virtuozzo International GmbH.
-  * Copyright (C) 2016 Red Hat, Inc.
-  * Copyright (C) 2008 Bull S.A.S.
-  *     Author: Laurent Vivier <Laurent.Vivier@bull.net>
-@@ -33,6 +34,7 @@
- #include "qemu/uri.h"
- #include "qemu/option.h"
- #include "qemu/cutils.h"
-+#include "qemu/units.h"
- 
- #include "qapi/qapi-visit-sockets.h"
- #include "qapi/qmp/qstring.h"
-@@ -54,6 +56,8 @@ typedef struct {
- } NBDClientRequest;
- 
- typedef enum NBDClientState {
-+    NBD_CLIENT_CONNECTING_WAIT,
-+    NBD_CLIENT_CONNECTING_NOWAIT,
-     NBD_CLIENT_CONNECTED,
-     NBD_CLIENT_QUIT
- } NBDClientState;
-@@ -66,8 +70,14 @@ typedef struct BDRVNBDState {
-     CoMutex send_mutex;
-     CoQueue free_sema;
-     Coroutine *connection_co;
-+    void *connection_co_sleep_ns_state;
-+    bool drained;
-+    bool wait_drained_end;
-     int in_flight;
-     NBDClientState state;
-+    int connect_status;
-+    Error *connect_err;
-+    bool wait_in_flight;
- 
-     NBDClientRequest requests[MAX_NBD_REQUESTS];
-     NBDReply reply;
-@@ -82,10 +92,21 @@ typedef struct BDRVNBDState {
-     char *x_dirty_bitmap;
- } BDRVNBDState;
- 
--/* @ret will be used for reconnect in future */
-+static int nbd_client_connect(BlockDriverState *bs, Error **errp);
-+
- static void nbd_channel_error(BDRVNBDState *s, int ret)
- {
--    s->state = NBD_CLIENT_QUIT;
-+    if (ret == -EIO) {
-+        if (s->state == NBD_CLIENT_CONNECTED) {
-+            s->state = s->reconnect_delay ? NBD_CLIENT_CONNECTING_WAIT :
-+                                            NBD_CLIENT_CONNECTING_NOWAIT;
-+        }
-+    } else {
-+        if (s->state == NBD_CLIENT_CONNECTED) {
-+            qio_channel_shutdown(s->ioc, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
-+        }
-+        s->state = NBD_CLIENT_QUIT;
-+    }
- }
- 
- static void nbd_recv_coroutines_wake_all(BDRVNBDState *s)
-@@ -128,7 +149,13 @@ static void nbd_client_attach_aio_context(BlockDriverState *bs,
+@@ -1176,6 +1176,7 @@ static int nbd_client_connect(BlockDriverState *bs,
+                               Error **errp)
  {
      BDRVNBDState *s = (BDRVNBDState *)bs->opaque;
++    AioContext *aio_context = bdrv_get_aio_context(bs);
+     int ret;
  
--    qio_channel_attach_aio_context(QIO_CHANNEL(s->ioc), new_context);
-+    /*
-+     * s->connection_co is either yielded from nbd_receive_reply or from
-+     * nbd_reconnect_loop()
-+     */
-+    if (s->state == NBD_CLIENT_CONNECTED) {
-+        qio_channel_attach_aio_context(QIO_CHANNEL(s->ioc), new_context);
-+    }
+     /*
+@@ -1190,15 +1191,16 @@ static int nbd_client_connect(BlockDriverState *bs,
  
-     bdrv_inc_in_flight(bs);
+     /* NBD handshake */
+     trace_nbd_client_connect(export);
+-    qio_channel_set_blocking(QIO_CHANNEL(sioc), true, NULL);
++    qio_channel_set_blocking(QIO_CHANNEL(sioc), false, NULL);
++    qio_channel_attach_aio_context(QIO_CHANNEL(sioc), aio_context);
  
-@@ -139,29 +166,157 @@ static void nbd_client_attach_aio_context(BlockDriverState *bs,
-     aio_wait_bh_oneshot(new_context, nbd_client_attach_aio_context_bh, bs);
- }
- 
-+static void coroutine_fn nbd_client_co_drain_begin(BlockDriverState *bs)
-+{
-+    BDRVNBDState *s = (BDRVNBDState *)bs->opaque;
- 
--static void nbd_teardown_connection(BlockDriverState *bs)
-+    s->drained = true;
-+    if (s->connection_co_sleep_ns_state) {
-+        qemu_co_sleep_wake(s->connection_co_sleep_ns_state);
-+    }
-+}
-+
-+static void coroutine_fn nbd_client_co_drain_end(BlockDriverState *bs)
- {
-     BDRVNBDState *s = (BDRVNBDState *)bs->opaque;
- 
--    assert(s->ioc);
-+    s->drained = false;
-+    if (s->wait_drained_end) {
-+        s->wait_drained_end = false;
-+        aio_co_wake(s->connection_co);
-+    }
-+}
-+
- 
--    /* finish any pending coroutines */
--    qio_channel_shutdown(s->ioc,
--                         QIO_CHANNEL_SHUTDOWN_BOTH,
--                         NULL);
-+static void nbd_teardown_connection(BlockDriverState *bs)
-+{
-+    BDRVNBDState *s = (BDRVNBDState *)bs->opaque;
-+
-+    if (s->state == NBD_CLIENT_CONNECTED) {
-+        /* finish any pending coroutines */
-+        assert(s->ioc);
-+        qio_channel_shutdown(s->ioc, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
-+    }
-+    s->state = NBD_CLIENT_QUIT;
-+    if (s->connection_co) {
-+        if (s->connection_co_sleep_ns_state) {
-+            qemu_co_sleep_wake(s->connection_co_sleep_ns_state);
-+        }
-+    }
-     BDRV_POLL_WHILE(bs, s->connection_co);
-+}
- 
--    nbd_client_detach_aio_context(bs);
--    object_unref(OBJECT(s->sioc));
--    s->sioc = NULL;
--    object_unref(OBJECT(s->ioc));
--    s->ioc = NULL;
-+static bool nbd_client_connecting(BDRVNBDState *s)
-+{
-+    return s->state == NBD_CLIENT_CONNECTING_WAIT ||
-+            s->state == NBD_CLIENT_CONNECTING_NOWAIT;
-+}
-+
-+static bool nbd_client_connecting_wait(BDRVNBDState *s)
-+{
-+    return s->state == NBD_CLIENT_CONNECTING_WAIT;
-+}
-+
-+static coroutine_fn void nbd_reconnect_attempt(BDRVNBDState *s)
-+{
-+    Error *local_err = NULL;
-+
-+    if (!nbd_client_connecting(s)) {
-+        return;
-+    }
-+    assert(nbd_client_connecting(s));
-+
-+    /* Wait for completion of all in-flight requests */
-+
-+    qemu_co_mutex_lock(&s->send_mutex);
-+
-+    while (s->in_flight > 0) {
-+        qemu_co_mutex_unlock(&s->send_mutex);
-+        nbd_recv_coroutines_wake_all(s);
-+        s->wait_in_flight = true;
-+        qemu_coroutine_yield();
-+        s->wait_in_flight = false;
-+        qemu_co_mutex_lock(&s->send_mutex);
-+    }
-+
-+    qemu_co_mutex_unlock(&s->send_mutex);
-+
-+    if (!nbd_client_connecting(s)) {
-+        return;
-+    }
-+
-+    /*
-+     * Now we are sure that nobody is accessing the channel, and no one will
-+     * try until we set the state to CONNECTED.
-+     */
-+
-+    /* Finalize previous connection if any */
-+    if (s->ioc) {
-+        nbd_client_detach_aio_context(s->bs);
-+        object_unref(OBJECT(s->sioc));
-+        s->sioc = NULL;
-+        object_unref(OBJECT(s->ioc));
-+        s->ioc = NULL;
-+    }
-+
-+    s->connect_status = nbd_client_connect(s->bs, &local_err);
-+    error_free(s->connect_err);
-+    s->connect_err = NULL;
-+    error_propagate(&s->connect_err, local_err);
-+    local_err = NULL;
-+
-+    if (s->connect_status < 0) {
-+        /* failed attempt */
-+        return;
-+    }
-+
-+    /* successfully connected */
-+    s->state = NBD_CLIENT_CONNECTED;
-+    qemu_co_queue_restart_all(&s->free_sema);
-+}
-+
-+static coroutine_fn void nbd_reconnect_loop(BDRVNBDState *s)
-+{
-+    uint64_t start_time_ns = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-+    uint64_t delay_ns = s->reconnect_delay * SI_G;
-+    uint64_t timeout = SI_G; /* 1 sec */
-+    uint64_t max_timeout = 16 * SI_G;
-+
-+    nbd_reconnect_attempt(s);
-+
-+    while (nbd_client_connecting(s)) {
-+        if (s->state == NBD_CLIENT_CONNECTING_WAIT &&
-+            qemu_clock_get_ns(QEMU_CLOCK_REALTIME) - start_time_ns > delay_ns)
-+        {
-+            s->state = NBD_CLIENT_CONNECTING_NOWAIT;
-+            qemu_co_queue_restart_all(&s->free_sema);
-+        }
-+
-+        qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, timeout,
-+                         &s->connection_co_sleep_ns_state);
-+        if (s->drained) {
-+            bdrv_dec_in_flight(s->bs);
-+            s->wait_drained_end = true;
-+            while (s->drained) {
-+                /*
-+                 * We may be entered once from nbd_client_attach_aio_context_bh
-+                 * and then from nbd_client_co_drain_end. So here is a loop.
-+                 */
-+                qemu_coroutine_yield();
-+            }
-+            bdrv_inc_in_flight(s->bs);
-+        }
-+        if (timeout < max_timeout) {
-+            timeout *= 2;
-+        }
-+
-+        nbd_reconnect_attempt(s);
-+    }
- }
- 
- static coroutine_fn void nbd_connection_entry(void *opaque)
- {
--    BDRVNBDState *s = opaque;
-+    BDRVNBDState *s = (BDRVNBDState *)opaque;
-     uint64_t i;
-     int ret = 0;
-     Error *local_err = NULL;
-@@ -176,16 +331,26 @@ static coroutine_fn void nbd_connection_entry(void *opaque)
-          * Therefore we keep an additional in_flight reference all the time and
-          * only drop it temporarily here.
-          */
-+
-+        if (nbd_client_connecting(s)) {
-+            nbd_reconnect_loop(s);
-+        }
-+
-+        if (s->state != NBD_CLIENT_CONNECTED) {
-+            continue;
-+        }
-+
-         assert(s->reply.handle == 0);
-         ret = nbd_receive_reply(s->bs, s->ioc, &s->reply, &local_err);
- 
-         if (local_err) {
-             trace_nbd_read_reply_entry_fail(ret, error_get_pretty(local_err));
-             error_free(local_err);
-+            local_err = NULL;
-         }
-         if (ret <= 0) {
-             nbd_channel_error(s, ret ? ret : -EIO);
--            break;
-+            continue;
-         }
- 
-         /*
-@@ -200,7 +365,7 @@ static coroutine_fn void nbd_connection_entry(void *opaque)
-             (nbd_reply_is_structured(&s->reply) && !s->info.structured_reply))
-         {
-             nbd_channel_error(s, -EINVAL);
--            break;
-+            continue;
-         }
- 
-         /*
-@@ -219,10 +384,19 @@ static coroutine_fn void nbd_connection_entry(void *opaque)
-         qemu_coroutine_yield();
+     s->info.request_sizes = true;
+     s->info.structured_reply = true;
+     s->info.base_allocation = true;
+     s->info.x_dirty_bitmap = g_strdup(x_dirty_bitmap);
+     s->info.name = g_strdup(export ?: "");
+-    ret = nbd_receive_negotiate(QIO_CHANNEL(sioc), tlscreds, hostname,
+-                                &s->ioc, &s->info, errp);
++    ret = nbd_receive_negotiate(aio_context, QIO_CHANNEL(sioc), tlscreds,
++                                hostname, &s->ioc, &s->info, errp);
+     g_free(s->info.x_dirty_bitmap);
+     g_free(s->info.name);
+     if (ret < 0) {
+@@ -1232,18 +1234,14 @@ static int nbd_client_connect(BlockDriverState *bs,
+         object_ref(OBJECT(s->ioc));
      }
  
-+    qemu_co_queue_restart_all(&s->free_sema);
-     nbd_recv_coroutines_wake_all(s);
-     bdrv_dec_in_flight(s->bs);
- 
-     s->connection_co = NULL;
-+    if (s->ioc) {
-+        nbd_client_detach_aio_context(s->bs);
-+        object_unref(OBJECT(s->sioc));
-+        s->sioc = NULL;
-+        object_unref(OBJECT(s->ioc));
-+        s->ioc = NULL;
-+    }
-+
-     aio_wait_kick();
- }
- 
-@@ -234,7 +408,7 @@ static int nbd_co_send_request(BlockDriverState *bs,
-     int rc, i = -1;
- 
-     qemu_co_mutex_lock(&s->send_mutex);
--    while (s->in_flight == MAX_NBD_REQUESTS) {
-+    while (s->in_flight == MAX_NBD_REQUESTS || nbd_client_connecting_wait(s)) {
-         qemu_co_queue_wait(&s->free_sema, &s->send_mutex);
-     }
- 
-@@ -285,7 +459,11 @@ err:
-             s->requests[i].coroutine = NULL;
-             s->in_flight--;
-         }
--        qemu_co_queue_next(&s->free_sema);
-+        if (s->in_flight == 0 && s->wait_in_flight) {
-+            aio_co_wake(s->connection_co);
-+        } else {
-+            qemu_co_queue_next(&s->free_sema);
-+        }
-     }
-     qemu_co_mutex_unlock(&s->send_mutex);
-     return rc;
-@@ -666,10 +844,15 @@ static coroutine_fn int nbd_co_receive_one_chunk(
-         if (reply) {
-             *reply = s->reply;
-         }
--        s->reply.handle = 0;
-     }
-+    s->reply.handle = 0;
- 
--    if (s->connection_co) {
-+    if (s->connection_co && !s->wait_in_flight) {
-+        /*
-+         * We must check s->wait_in_flight, because we may entered by
-+         * nbd_recv_coroutines_wake_all(), in this case we should not
-+         * wake connection_co here, it will woken by last request.
-+         */
-         aio_co_wake(s->connection_co);
-     }
- 
-@@ -781,7 +964,11 @@ break_loop:
- 
-     qemu_co_mutex_lock(&s->send_mutex);
-     s->in_flight--;
--    qemu_co_queue_next(&s->free_sema);
-+    if (s->in_flight == 0 && s->wait_in_flight) {
-+        aio_co_wake(s->connection_co);
-+    } else {
-+        qemu_co_queue_next(&s->free_sema);
-+    }
-     qemu_co_mutex_unlock(&s->send_mutex);
- 
-     return false;
-@@ -927,20 +1114,26 @@ static int nbd_co_request(BlockDriverState *bs, NBDRequest *request,
-     } else {
-         assert(request->type != NBD_CMD_WRITE);
-     }
--    ret = nbd_co_send_request(bs, request, write_qiov);
--    if (ret < 0) {
--        return ret;
--    }
- 
--    ret = nbd_co_receive_return_code(s, request->handle,
--                                     &request_ret, &local_err);
--    if (local_err) {
--        trace_nbd_co_request_fail(request->from, request->len, request->handle,
--                                  request->flags, request->type,
--                                  nbd_cmd_lookup(request->type),
--                                  ret, error_get_pretty(local_err));
--        error_free(local_err);
--    }
-+    do {
-+        ret = nbd_co_send_request(bs, request, write_qiov);
-+        if (ret < 0) {
-+            continue;
-+        }
-+
-+        ret = nbd_co_receive_return_code(s, request->handle,
-+                                         &request_ret, &local_err);
-+        if (local_err) {
-+            trace_nbd_co_request_fail(request->from, request->len,
-+                                      request->handle, request->flags,
-+                                      request->type,
-+                                      nbd_cmd_lookup(request->type),
-+                                      ret, error_get_pretty(local_err));
-+            error_free(local_err);
-+            local_err = NULL;
-+        }
-+    } while (ret < 0 && nbd_client_connecting_wait(s));
-+
-     return ret ? ret : request_ret;
- }
- 
-@@ -981,20 +1174,24 @@ static int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
-         request.len -= slop;
-     }
- 
--    ret = nbd_co_send_request(bs, &request, NULL);
--    if (ret < 0) {
--        return ret;
--    }
-+    do {
-+        ret = nbd_co_send_request(bs, &request, NULL);
-+        if (ret < 0) {
-+            continue;
-+        }
-+
-+        ret = nbd_co_receive_cmdread_reply(s, request.handle, offset, qiov,
-+                                           &request_ret, &local_err);
-+        if (local_err) {
-+            trace_nbd_co_request_fail(request.from, request.len, request.handle,
-+                                      request.flags, request.type,
-+                                      nbd_cmd_lookup(request.type),
-+                                      ret, error_get_pretty(local_err));
-+            error_free(local_err);
-+            local_err = NULL;
-+        }
-+    } while (ret < 0 && nbd_client_connecting_wait(s));
- 
--    ret = nbd_co_receive_cmdread_reply(s, request.handle, offset, qiov,
--                                       &request_ret, &local_err);
--    if (local_err) {
--        trace_nbd_co_request_fail(request.from, request.len, request.handle,
--                                  request.flags, request.type,
--                                  nbd_cmd_lookup(request.type),
--                                  ret, error_get_pretty(local_err));
--        error_free(local_err);
--    }
-     return ret ? ret : request_ret;
- }
- 
-@@ -1127,20 +1324,25 @@ static int coroutine_fn nbd_client_co_block_status(
-     if (s->info.min_block) {
-         assert(QEMU_IS_ALIGNED(request.len, s->info.min_block));
-     }
--    ret = nbd_co_send_request(bs, &request, NULL);
--    if (ret < 0) {
--        return ret;
--    }
-+    do {
-+        ret = nbd_co_send_request(bs, &request, NULL);
-+        if (ret < 0) {
-+            continue;
-+        }
-+
-+        ret = nbd_co_receive_blockstatus_reply(s, request.handle, bytes,
-+                                               &extent, &request_ret,
-+                                               &local_err);
-+        if (local_err) {
-+            trace_nbd_co_request_fail(request.from, request.len, request.handle,
-+                                      request.flags, request.type,
-+                                      nbd_cmd_lookup(request.type),
-+                                      ret, error_get_pretty(local_err));
-+            error_free(local_err);
-+            local_err = NULL;
-+        }
-+    } while (ret < 0 && nbd_client_connecting_wait(s));
- 
--    ret = nbd_co_receive_blockstatus_reply(s, request.handle, bytes,
--                                           &extent, &request_ret, &local_err);
--    if (local_err) {
--        trace_nbd_co_request_fail(request.from, request.len, request.handle,
--                                  request.flags, request.type,
--                                  nbd_cmd_lookup(request.type),
--                                  ret, error_get_pretty(local_err));
--        error_free(local_err);
--    }
-     if (ret < 0 || request_ret < 0) {
-         return ret ? ret : request_ret;
-     }
-@@ -1159,9 +1361,9 @@ static void nbd_client_close(BlockDriverState *bs)
-     BDRVNBDState *s = (BDRVNBDState *)bs->opaque;
-     NBDRequest request = { .type = NBD_CMD_DISC };
- 
--    assert(s->ioc);
+-    qio_channel_set_blocking(QIO_CHANNEL(sioc), false, NULL);
+-    qio_channel_attach_aio_context(s->ioc, bdrv_get_aio_context(bs));
 -
--    nbd_send_request(s->ioc, &request);
-+    if (s->ioc) {
-+        nbd_send_request(s->ioc, &request);
-+    }
+     trace_nbd_client_connect_success(export);
  
-     nbd_teardown_connection(bs);
- }
-@@ -1808,6 +2010,8 @@ static BlockDriver bdrv_nbd = {
-     .bdrv_getlength             = nbd_getlength,
-     .bdrv_detach_aio_context    = nbd_client_detach_aio_context,
-     .bdrv_attach_aio_context    = nbd_client_attach_aio_context,
-+    .bdrv_co_drain_begin        = nbd_client_co_drain_begin,
-+    .bdrv_co_drain_end          = nbd_client_co_drain_end,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-     .bdrv_co_block_status       = nbd_client_co_block_status,
-     .bdrv_dirname               = nbd_dirname,
-@@ -1830,6 +2034,8 @@ static BlockDriver bdrv_nbd_tcp = {
-     .bdrv_getlength             = nbd_getlength,
-     .bdrv_detach_aio_context    = nbd_client_detach_aio_context,
-     .bdrv_attach_aio_context    = nbd_client_attach_aio_context,
-+    .bdrv_co_drain_begin        = nbd_client_co_drain_begin,
-+    .bdrv_co_drain_end          = nbd_client_co_drain_end,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-     .bdrv_co_block_status       = nbd_client_co_block_status,
-     .bdrv_dirname               = nbd_dirname,
-@@ -1852,6 +2058,8 @@ static BlockDriver bdrv_nbd_unix = {
-     .bdrv_getlength             = nbd_getlength,
-     .bdrv_detach_aio_context    = nbd_client_detach_aio_context,
-     .bdrv_attach_aio_context    = nbd_client_attach_aio_context,
-+    .bdrv_co_drain_begin        = nbd_client_co_drain_begin,
-+    .bdrv_co_drain_end          = nbd_client_co_drain_end,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-     .bdrv_co_block_status       = nbd_client_co_block_status,
-     .bdrv_dirname               = nbd_dirname,
+     return 0;
+ 
+  fail:
+     /*
+-     * We have connected, but must fail for other reasons. The
+-     * connection is still blocking; send NBD_CMD_DISC as a courtesy
+-     * to the server.
++     * We have connected, but must fail for other reasons.
++     * Send NBD_CMD_DISC as a courtesy to the server.
+      */
+     {
+         NBDRequest request = { .type = NBD_CMD_DISC };
+diff --git a/nbd/client.c b/nbd/client.c
+index 4de30630c7..8f524c3e35 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -867,7 +867,8 @@ static int nbd_list_meta_contexts(QIOChannel *ioc,
+  *          2: server is newstyle, but lacks structured replies
+  *          3: server is newstyle and set up for structured replies
+  */
+-static int nbd_start_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
++static int nbd_start_negotiate(AioContext *aio_context, QIOChannel *ioc,
++                               QCryptoTLSCreds *tlscreds,
+                                const char *hostname, QIOChannel **outioc,
+                                bool structured_reply, bool *zeroes,
+                                Error **errp)
+@@ -934,6 +935,10 @@ static int nbd_start_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
+                     return -EINVAL;
+                 }
+                 ioc = *outioc;
++                if (aio_context) {
++                    qio_channel_set_blocking(ioc, false, NULL);
++                    qio_channel_attach_aio_context(ioc, aio_context);
++                }
+             } else {
+                 error_setg(errp, "Server does not support STARTTLS");
+                 return -EINVAL;
+@@ -998,7 +1003,8 @@ static int nbd_negotiate_finish_oldstyle(QIOChannel *ioc, NBDExportInfo *info,
+  * Returns: negative errno: failure talking to server
+  *          0: server is connected
+  */
+-int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
++int nbd_receive_negotiate(AioContext *aio_context, QIOChannel *ioc,
++                          QCryptoTLSCreds *tlscreds,
+                           const char *hostname, QIOChannel **outioc,
+                           NBDExportInfo *info, Error **errp)
+ {
+@@ -1009,7 +1015,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
+     assert(info->name);
+     trace_nbd_receive_negotiate_name(info->name);
+ 
+-    result = nbd_start_negotiate(ioc, tlscreds, hostname, outioc,
++    result = nbd_start_negotiate(aio_context, ioc, tlscreds, hostname, outioc,
+                                  info->structured_reply, &zeroes, errp);
+ 
+     info->structured_reply = false;
+@@ -1129,8 +1135,8 @@ int nbd_receive_export_list(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
+     QIOChannel *sioc = NULL;
+ 
+     *info = NULL;
+-    result = nbd_start_negotiate(ioc, tlscreds, hostname, &sioc, true, NULL,
+-                                 errp);
++    result = nbd_start_negotiate(NULL, ioc, tlscreds, hostname, &sioc, true,
++                                 NULL, errp);
+     if (tlscreds && sioc) {
+         ioc = sioc;
+     }
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index a8cb39e510..049645491d 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -362,7 +362,7 @@ static void *nbd_client_thread(void *arg)
+         goto out;
+     }
+ 
+-    ret = nbd_receive_negotiate(QIO_CHANNEL(sioc),
++    ret = nbd_receive_negotiate(NULL, QIO_CHANNEL(sioc),
+                                 NULL, NULL, NULL, &info, &local_error);
+     if (ret < 0) {
+         if (local_error) {
 -- 
 2.18.0
 
