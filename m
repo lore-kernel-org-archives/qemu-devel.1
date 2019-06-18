@@ -2,87 +2,86 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FUZZY_XPILL,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1618DC31E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 22:19:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2555C31E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 22:22:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D89092082C
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 22:19:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6DD7D2082C
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 22:22:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="tZVXbsht"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D89092082C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="5cRtJ50Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DD7D2082C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33820 helo=lists.gnu.org)
+Received: from localhost ([::1]:33850 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdMRm-0005qV-6A
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 18:19:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48034)
+	id 1hdMUY-0000Ux-J7
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 18:22:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48450)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <maran.wilson@oracle.com>) id 1hdMP6-0004Pg-UR
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 18:16:38 -0400
+ (envelope-from <maran.wilson@oracle.com>) id 1hdMPr-0004jm-61
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 18:17:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <maran.wilson@oracle.com>) id 1hdMP5-0007OW-11
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 18:16:36 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:45848)
+ (envelope-from <maran.wilson@oracle.com>) id 1hdMPi-0007wQ-1h
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 18:17:18 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:52744)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <maran.wilson@oracle.com>)
- id 1hdMP4-0007BA-NN
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 18:16:34 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5IMGJIW194710;
- Tue, 18 Jun 2019 22:16:19 GMT
+ id 1hdMPc-0007s3-AC
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 18:17:10 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5IMEJUo084014;
+ Tue, 18 Jun 2019 22:17:03 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=lYY4RyxYhBasL45yqr6qcF0o7IiIm/ZUtdDad0aawUQ=;
- b=tZVXbshththemMMNodKWrH0KDUfEY/crlIHANFuhqYNAHQTqTcSReBpsNQJ8/OafN6au
- uhSMHT1Yxa0bcS368iMs7cgSO03y02O6QdsiEaWjQXDA2UZDwcSjd4rOIWCwvR6l0c0d
- BGFeNeZJMkxCY7FYz/z4ojFGdHGL0f6hDPSJE0kQgKot1DbGGUFkuIaJ5zk6HlhJMFGP
- l6JSE3XBjHq73ZNCUR1ewuLuF3q9AEoDzgXlpm8NtLLiqphbFP0FoJqBaoEuc52neSHO
- aPOew1fP9xFU89qxqc4yti1YmA8aGJQyeztcL5BbLr0lTolHaZ9OGU+VbK1c4CVfYsTq +A== 
+ bh=ErVOMnHLEU3iYCpPY/9GqzKz/EQai2BPkiy8hqBf6U8=;
+ b=5cRtJ50Zhns5cW4pmfht9ESqVvbgEZ++sHDMudmcHfV6NkRSpEm6BdzcWUhFXa6Oj5Q0
+ cOse2QQRlrRYdo7SpsibVhQjOQJ15pJqMuDw3UB8WU5Ts1gmCrlYfZGYSqVYa4DnfdJG
+ 1Jz4Y59M+BU0847EWQl7tVY9+85E16U2gE1wZFqBnd7llsNF2H1Oh1Br6mNBuBeaBgyv
+ T7Ie1QKPywdNI9cY83uy1BOFddmcgJ7YLJhvUOvpD6ShoLD+aoSkJqFcenC46gU+HdYO
+ FmnYRKLIclaV2NftiJt5N304OEVs8LBuV3Rk2pDD8iUBIaoWR3SkoR46RqVkFWjmgP7K zA== 
 Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by aserp2120.oracle.com with ESMTP id 2t780983tf-1
+ by userp2130.oracle.com with ESMTP id 2t780983sw-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 18 Jun 2019 22:16:18 +0000
+ Tue, 18 Jun 2019 22:17:03 +0000
 Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5IMF7vn069365;
- Tue, 18 Jun 2019 22:16:17 GMT
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5IMFAb1069654;
+ Tue, 18 Jun 2019 22:17:02 GMT
 Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by userp3020.oracle.com with ESMTP id 2t77ymred3-1
+ by userp3020.oracle.com with ESMTP id 2t77ymremn-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 18 Jun 2019 22:16:17 +0000
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5IMGGJW031854;
- Tue, 18 Jun 2019 22:16:16 GMT
+ Tue, 18 Jun 2019 22:17:02 +0000
+Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5IMH1kJ032165;
+ Tue, 18 Jun 2019 22:17:01 GMT
 Received: from [10.141.197.71] (/10.141.197.71)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Tue, 18 Jun 2019 15:16:16 -0700
+ with ESMTP ; Tue, 18 Jun 2019 15:17:01 -0700
 To: Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
 References: <20190617175658.135869-1-liran.alon@oracle.com>
- <20190617175658.135869-6-liran.alon@oracle.com>
+ <20190617175658.135869-10-liran.alon@oracle.com>
 From: Maran Wilson <maran.wilson@oracle.com>
 Organization: Oracle Corporation
-Message-ID: <fad1387b-54fd-cbfc-89c8-433d9e8da141@oracle.com>
-Date: Tue, 18 Jun 2019 15:16:15 -0700
+Message-ID: <907faf19-aaff-1d1a-422e-739ee5aa7d12@oracle.com>
+Date: Tue, 18 Jun 2019 15:17:00 -0700
 User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190617175658.135869-6-liran.alon@oracle.com>
+In-Reply-To: <20190617175658.135869-10-liran.alon@oracle.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9292
  signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2
  malwarescore=0
  phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
@@ -91,14 +90,14 @@ X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9292
  signatures=668687
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
  priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
  lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
  definitions=main-1906180178
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 141.146.126.78
-Subject: Re: [Qemu-devel] [QEMU PATCH v3 5/9] linux-headers: i386: Modify
- struct kvm_nested_state to have explicit fields for data
+X-Received-From: 156.151.31.86
+Subject: Re: [Qemu-devel] [QEMU PATCH v3 9/9] KVM: i386: Remove VMX
+ migration blocker
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,111 +116,54 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 6/17/2019 10:56 AM, Liran Alon wrote:
-> Improve the KVM_{GET,SET}_NESTED_STATE structs by detailing the format
-> of VMX nested state data in a struct.
+> This effectively reverts d98f26073beb ("target/i386: kvm: add VMX migration blocker").
+> This can now be done because previous commits added support for Intel VMX migration.
 >
-> In order to avoid changing the ioctl values of
-> KVM_{GET,SET}_NESTED_STATE, there is a need to preserve
-> sizeof(struct kvm_nested_state). This is done by defining the data
-> struct as "data.vmx[0]". It was the most elegant way I found to
-> preserve struct size while still keeping struct readable and easy to
-> maintain. It does have a misfortunate side-effect that now it has to be
-> accessed as "data.vmx[0]" rather than just "data.vmx".
->
-> Because we are already modifying these structs, I also modified the
-> following:
-> * Define the "format" field values as macros.
-> * Rename vmcs_pa to vmcs12_pa for better readability.
-> * Add stub structs for AMD SVM.
+> AMD SVM migration is still blocked. This is because kernel
+> KVM_CAP_{GET,SET}_NESTED_STATE in case of AMD SVM is not
+> implemented yet. Therefore, required vCPU nested state is still
+> missing in order to perform valid migration for vCPU exposed with SVM.
 >
 > Signed-off-by: Liran Alon <liran.alon@oracle.com>
 > ---
->   linux-headers/asm-x86/kvm.h | 41 +++++++++++++++++++++++++++----------
->   1 file changed, 30 insertions(+), 11 deletions(-)
+>   target/i386/kvm.c | 12 ++++++------
+>   1 file changed, 6 insertions(+), 6 deletions(-)
 >
-> diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.h
-> index 7a0e64ccd6ff..e655d108af19 100644
-> --- a/linux-headers/asm-x86/kvm.h
-> +++ b/linux-headers/asm-x86/kvm.h
-> @@ -383,6 +383,9 @@ struct kvm_sync_regs {
->   #define KVM_X86_QUIRK_LAPIC_MMIO_HOLE	(1 << 2)
->   #define KVM_X86_QUIRK_OUT_7E_INC_RIP	(1 << 3)
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 797f8ac46435..772c8619efc4 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -948,7 +948,7 @@ static int hyperv_init_vcpu(X86CPU *cpu)
+>   }
 >   
-> +#define KVM_STATE_NESTED_FORMAT_VMX	0
-> +#define KVM_STATE_NESTED_FORMAT_SVM	1
-> +
->   #define KVM_STATE_NESTED_GUEST_MODE	0x00000001
->   #define KVM_STATE_NESTED_RUN_PENDING	0x00000002
->   #define KVM_STATE_NESTED_EVMCS		0x00000004
-> @@ -390,35 +393,51 @@ struct kvm_sync_regs {
->   #define KVM_STATE_NESTED_SMM_GUEST_MODE	0x00000001
->   #define KVM_STATE_NESTED_SMM_VMXON	0x00000002
+>   static Error *invtsc_mig_blocker;
+> -static Error *nested_virt_mig_blocker;
+> +static Error *svm_mig_blocker;
 >   
-> -struct kvm_vmx_nested_state {
-> +struct kvm_vmx_nested_state_data {
-> +	__u8 vmcs12[0x1000];
-> +	__u8 shadow_vmcs12[0x1000];
+>   #define KVM_MAX_CPUID_ENTRIES  100
+>   
+> @@ -1313,13 +1313,13 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>                                     !!(c->ecx & CPUID_EXT_SMX);
+>       }
+>   
+> -    if (cpu_has_nested_virt(env) && !nested_virt_mig_blocker) {
+> -        error_setg(&nested_virt_mig_blocker,
+> -                   "Nested virtualization does not support live migration yet");
+> -        r = migrate_add_blocker(nested_virt_mig_blocker, &local_err);
+> +    if (cpu_has_svm(env) && !svm_mig_blocker) {
+> +        error_setg(&svm_mig_blocker,
+> +                   "AMD SVM does not support live migration yet");
+> +        r = migrate_add_blocker(svm_mig_blocker, &local_err);
+>           if (local_err) {
+>               error_report_err(local_err);
+> -            error_free(nested_virt_mig_blocker);
+> +            error_free(svm_mig_blocker);
+>               return r;
+>           }
+>       }
 
-I assume you will replace this magic 0x1000 value too, as discussed with 
-respect to patch 7?
+Reviewed-by: Maran Wilson <maran.wilson@oracle.com>
 
 Thanks,
 -Maran
-
-> +};
-> +
-> +struct kvm_vmx_nested_state_hdr {
->   	__u64 vmxon_pa;
-> -	__u64 vmcs_pa;
-> +	__u64 vmcs12_pa;
->   
->   	struct {
->   		__u16 flags;
->   	} smm;
->   };
->   
-> +struct kvm_svm_nested_state_data {
-> +	/* TODO: Implement */
-> +};
-> +
-> +struct kvm_svm_nested_state_hdr {
-> +	/* TODO: Implement */
-> +};
-> +
->   /* for KVM_CAP_NESTED_STATE */
->   struct kvm_nested_state {
-> -	/* KVM_STATE_* flags */
->   	__u16 flags;
-> -
-> -	/* 0 for VMX, 1 for SVM.  */
->   	__u16 format;
-> -
-> -	/* 128 for SVM, 128 + VMCS size for VMX.  */
->   	__u32 size;
->   
->   	union {
-> -		/* VMXON, VMCS */
-> -		struct kvm_vmx_nested_state vmx;
-> +		struct kvm_vmx_nested_state_hdr vmx;
-> +		struct kvm_svm_nested_state_hdr svm;
->   
->   		/* Pad the header to 128 bytes.  */
->   		__u8 pad[120];
-> -	};
-> +	} hdr;
->   
-> -	__u8 data[0];
-> +	/*
-> +	 * Define data region as 0 bytes to preserve backwards-compatability
-> +	 * to old definition of kvm_nested_state in order to avoid changing
-> +	 * KVM_{GET,PUT}_NESTED_STATE ioctl values.
-> +	 */
-> +	union {
-> +		struct kvm_vmx_nested_state_data vmx[0];
-> +		struct kvm_svm_nested_state_data svm[0];
-> +	} data;
->   };
->   
->   #endif /* _ASM_X86_KVM_H */
-
 
