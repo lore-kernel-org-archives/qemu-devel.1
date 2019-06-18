@@ -6,46 +6,55 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86133C31E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 14:09:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7E5DC46477
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 14:14:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 598C52085A
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 14:09:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 598C52085A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5511320B1F
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 14:14:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5511320B1F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58380 helo=lists.gnu.org)
+Received: from localhost ([::1]:58420 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdEne-0000lL-OU
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 10:09:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59161)
+	id 1hdEsQ-00052Y-KE
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 10:14:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60113)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hdEmT-00086A-67
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:08:18 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hdEpq-0002uL-4q
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:11:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hdEmQ-0003UM-Mh
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:08:13 -0400
-Received: from relay.sw.ru ([185.231.240.75]:35210)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1hdEmQ-0003Nt-Fv; Tue, 18 Jun 2019 10:08:10 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1hdEmL-0001ya-0C; Tue, 18 Jun 2019 17:08:05 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Date: Tue, 18 Jun 2019 17:08:04 +0300
-Message-Id: <20190618140804.59214-1-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.18.0
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH] blockdev: enable non-root nodes for
- transaction drive-backup source
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hdEpk-0007u7-5w
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:11:39 -0400
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:57035)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hdEpi-0007mm-OV
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 10:11:35 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
+ [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+ by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 6D6AD4A0E2;
+ Tue, 18 Jun 2019 23:11:28 +0900 (JST)
+Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
+ [222.8.5.235])
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id D0E56240089;
+ Tue, 18 Jun 2019 23:11:26 +0900 (JST)
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: qemu-devel@nongnu.org
+Date: Tue, 18 Jun 2019 23:10:43 +0900
+Message-Id: <20190618141118.52955-5-ysato@users.sourceforge.jp>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20190618141118.52955-1-ysato@users.sourceforge.jp>
+References: <20190618141118.52955-1-ysato@users.sourceforge.jp>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 202.224.55.15
+Subject: [Qemu-devel] [PATCH v21 03/21] hw/registerfields.h: Add 8bit and
+ 16bit register macros
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -57,40 +66,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, jsnow@redhat.com,
- armbru@redhat.com, mreitz@redhat.com
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We forget to enable it for transaction .prepare, while it is already
-enabled in do_drive_backup since commit a2d665c1bc362
-    "blockdev: loosen restrictions on drive-backup source node"
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Some RX peripheral using 8bit and 16bit registers.
+Added 8bit and 16bit APIs.
+
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20190607091116.49044-11-ysato@users.sourceforge.jp>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
+ include/hw/registerfields.h | 32 +++++++++++++++++++++++++++++++-
+ 1 file changed, 31 insertions(+), 1 deletion(-)
 
-Hmm, I've to add John by hand, get_maintainer.pl don't report him.
-Shouldn't we include blockdev.c into Block Jobs in MAINTAINERS?
-It definitely related to block jobs.
-
- blockdev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/blockdev.c b/blockdev.c
-index b5c0fd3c49..4ae81d687a 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1775,7 +1775,7 @@ static void drive_backup_prepare(BlkActionState *common, Error **errp)
-     assert(common->action->type == TRANSACTION_ACTION_KIND_DRIVE_BACKUP);
-     backup = common->action->u.drive_backup.data;
- 
--    bs = qmp_get_root_bs(backup->device, errp);
-+    bs = bdrv_lookup_bs(backup->device, backup->device, errp);
-     if (!bs) {
-         return;
-     }
--- 
-2.18.0
+diff --git a/include/hw/registerfields.h b/include/hw/registerfields.h
+index 2659a58737..a0bb0654d6 100644
+--- a/include/hw/registerfields.h
++++ b/include/hw/registerfields.h
+@@ -22,6 +22,14 @@
+     enum { A_ ## reg =3D (addr) };                                      =
+    \
+     enum { R_ ## reg =3D (addr) / 4 };
+=20
++#define REG8(reg, addr)                                                 =
+ \
++    enum { A_ ## reg =3D (addr) };                                      =
+    \
++    enum { R_ ## reg =3D (addr) };
++
++#define REG16(reg, addr)                                                =
+  \
++    enum { A_ ## reg =3D (addr) };                                      =
+    \
++    enum { R_ ## reg =3D (addr) / 2 };
++
+ /* Define SHIFT, LENGTH and MASK constants for a field within a register=
+ */
+=20
+ /* This macro will define R_FOO_BAR_MASK, R_FOO_BAR_SHIFT and R_FOO_BAR_=
+LENGTH
+@@ -34,6 +42,12 @@
+                                         MAKE_64BIT_MASK(shift, length)};
+=20
+ /* Extract a field from a register */
++#define FIELD_EX8(storage, reg, field)                                  =
+  \
++    extract8((storage), R_ ## reg ## _ ## field ## _SHIFT,              =
+  \
++              R_ ## reg ## _ ## field ## _LENGTH)
++#define FIELD_EX16(storage, reg, field)                                 =
+  \
++    extract16((storage), R_ ## reg ## _ ## field ## _SHIFT,             =
+  \
++              R_ ## reg ## _ ## field ## _LENGTH)
+ #define FIELD_EX32(storage, reg, field)                                 =
+  \
+     extract32((storage), R_ ## reg ## _ ## field ## _SHIFT,             =
+  \
+               R_ ## reg ## _ ## field ## _LENGTH)
+@@ -49,6 +63,22 @@
+  * Assigning values larger then the target field will result in
+  * compilation warnings.
+  */
++#define FIELD_DP8(storage, reg, field, val) ({                          =
+  \
++    struct {                                                            =
+  \
++        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
+  \
++    } v =3D { .v =3D val };                                             =
+      \
++    uint8_t d;                                                          =
+  \
++    d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
+    \
++                  R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
+  \
++    d; })
++#define FIELD_DP16(storage, reg, field, val) ({                         =
+  \
++    struct {                                                            =
+  \
++        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
+  \
++    } v =3D { .v =3D val };                                             =
+      \
++    uint16_t d;                                                         =
+  \
++    d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
+    \
++                  R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
+  \
++    d; })
+ #define FIELD_DP32(storage, reg, field, val) ({                         =
+  \
+     struct {                                                            =
+  \
+         unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
+  \
+@@ -57,7 +87,7 @@
+     d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
+    \
+                   R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
+  \
+     d; })
+-#define FIELD_DP64(storage, reg, field, val) ({                         =
+  \
++#define FIELD_DP64(storage, reg, field, val) ({                         =
+\
+     struct {                                                            =
+  \
+         unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
+  \
+     } v =3D { .v =3D val };                                             =
+      \
+--=20
+2.11.0
 
 
