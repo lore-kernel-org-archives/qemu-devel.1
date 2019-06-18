@@ -2,66 +2,76 @@ Return-Path: <SRS0=M8fn=UR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37E9DC31E51
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 03:34:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 185CFC31E51
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 04:32:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 081DB2085A
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 03:34:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 081DB2085A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DFD712084D
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Jun 2019 04:32:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFD712084D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53462 helo=lists.gnu.org)
+Received: from localhost ([::1]:53648 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hd4tT-0007a9-CK
-	for qemu-devel@archiver.kernel.org; Mon, 17 Jun 2019 23:34:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34219)
+	id 1hd5n5-00022k-Jy
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 00:32:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44341)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jasowang@redhat.com>) id 1hd4q9-0005lM-Pe
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 23:31:22 -0400
+ (envelope-from <bounces@canonical.com>) id 1hd5le-0001ag-3N
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 00:30:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1hd4q8-00013C-5F
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 23:31:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47994)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1hd4q6-00010E-C4
- for qemu-devel@nongnu.org; Mon, 17 Jun 2019 23:31:18 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7318330832C6
- for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 03:31:14 +0000 (UTC)
-Received: from [10.72.12.155] (ovpn-12-155.pek2.redhat.com [10.72.12.155])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3495380DF2;
- Tue, 18 Jun 2019 03:31:12 +0000 (UTC)
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190604115221.28364-1-armbru@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <565fb562-8c16-3d26-b08d-df41f76787df@redhat.com>
-Date: Tue, 18 Jun 2019 11:31:11 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <bounces@canonical.com>) id 1hd5lc-00083n-6K
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 00:30:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34406)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hd5lc-00080M-0l
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 00:30:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hd5lZ-0006SQ-RP
+ for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 04:30:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id CB35C2E80C8
+ for <qemu-devel@nongnu.org>; Tue, 18 Jun 2019 04:30:41 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190604115221.28364-1-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Tue, 18 Jun 2019 03:31:14 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Tue, 18 Jun 2019 04:17:20 -0000
+From: Launchpad Bug Tracker <639651@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: distribution=debian; sourcepackage=qemu; component=main;
+ status=Incomplete; importance=Undecided; assignee=None; 
+X-Launchpad-Bug-Tags: windows
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: hramrach janitor jes-sorensen th-huth
+X-Launchpad-Bug-Reporter: Michal Suchanek (hramrach)
+X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
+References: <20100915151259.29737.65112.malonedeb@potassium.ubuntu.com>
+Message-Id: <156083144036.16637.5692551740552337076.malone@loganberry.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18981";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 578c593eb59f03949362b6e4fe75889c58b4479f
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/3] Some qemu-bridge-helper work
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 639651] Re: DRIVER_IRQL_NOT_LESS_OR_EQUAL booting
+ WIndows XP with Synaptics driver installed
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -70,28 +80,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 639651 <639651@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+[Expired for QEMU because there has been no activity for 60 days.]
 
-On 2019/6/4 =E4=B8=8B=E5=8D=887:52, Markus Armbruster wrote:
-> Markus Armbruster (3):
->    MAINTAINERS: Add qemu-bridge-helper.c to "Network device backends"
->    net: Deprecate tap backend's parameter "helper"
->    qemu-bridge-helper: Document known shortcomings
->
->   MAINTAINERS          |  1 +
->   qapi/net.json        |  3 ++-
->   qemu-bridge-helper.c | 12 +++++++++++-
->   qemu-deprecated.texi |  4 ++++
->   qemu-options.hx      | 18 ++----------------
->   5 files changed, 20 insertions(+), 18 deletions(-)
->
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-I've queued patch 1 and 3. For patch 2, it still require more thought=20
-since tap is not tied to bridge in fact, it could be used independently.
+-- =
 
-Thanks
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/639651
 
+Title:
+  DRIVER_IRQL_NOT_LESS_OR_EQUAL booting WIndows XP with Synaptics driver
+  installed
+
+Status in QEMU:
+  Expired
+Status in qemu package in Debian:
+  Incomplete
+
+Bug description:
+  Positng the issue here since I did not get any reply on the ML.
+
+  I was trying to update some windows XP (SP3) images in kvm.
+
+  It worked fine several times but last time I added mass storage
+  drivers to sysprep and now on the second boot after reseal (the first
+  is mini-setup) I get a BSOD with message
+  DRIVER_IRQL_NOT_LESS_OR_EQUAL. =
+
+
+  It turns out that the error is unrelated to storage drivers. It is
+  triggered by Synaptics driver installing for the PS2 mouse in kvm
+  (which does not happen in VirtualBox or on real hardware).
+
+  The image is originally created on hardware with MP acpi (not
+  virtualization).
+
+  qemu-kvm                  0.12.5+dfsg-2
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/639651/+subscriptions
 
