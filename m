@@ -2,69 +2,67 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C625C31E49
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 06:43:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D7A7C31E49
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 07:58:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCA0F2084A
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 06:43:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCA0F2084A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 279D220823
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 07:58:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 279D220823
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=efs-auto.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35424 helo=lists.gnu.org)
+Received: from localhost ([::1]:35668 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdUK1-0007ZY-HC
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 02:43:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51841)
+	id 1hdVUC-0006Ih-5I
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 03:58:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36887)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hdUJH-00073G-Uk
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 02:43:08 -0400
+ (envelope-from <david.brenken@efs-auto.org>) id 1hdVSv-0005U1-L8
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 03:57:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hdUJG-0002ET-SW
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 02:43:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45786)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hdUJG-0001xD-Js
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 02:43:06 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F07DD30820EA
- for <qemu-devel@nongnu.org>; Wed, 19 Jun 2019 06:42:47 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-85.ams2.redhat.com
- [10.36.116.85])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BE4E55D9D6;
- Wed, 19 Jun 2019 06:42:47 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 329B611386A6; Wed, 19 Jun 2019 08:42:46 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20190617184903.19436-1-armbru@redhat.com>
- <20190617184903.19436-17-armbru@redhat.com>
- <20190618090153.GE28525@redhat.com>
- <20190618103449.GE4296@localhost.localdomain>
-Date: Wed, 19 Jun 2019 08:42:46 +0200
-In-Reply-To: <20190618103449.GE4296@localhost.localdomain> (Kevin Wolf's
- message of "Tue, 18 Jun 2019 12:34:49 +0200")
-Message-ID: <87lfxy5b4p.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Wed, 19 Jun 2019 06:42:48 +0000 (UTC)
+ (envelope-from <david.brenken@efs-auto.org>) id 1hdVSu-0008PP-OX
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 03:57:09 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:37495)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <david.brenken@efs-auto.org>)
+ id 1hdVSu-0008NI-FM
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 03:57:08 -0400
+Received: from localhost.localdomain ([178.239.76.114]) by
+ mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MWR6x-1i6HfJ03h5-00Xr3V; Wed, 19 Jun 2019 09:57:02 +0200
+From: David Brenken <david.brenken@efs-auto.org>
+To: qemu-devel@nongnu.org
+Date: Wed, 19 Jun 2019 09:56:43 +0200
+Message-Id: <20190619075643.10048-6-david.brenken@efs-auto.org>
+X-Mailer: git-send-email 2.16.1.windows.4
+In-Reply-To: <20190619075643.10048-1-david.brenken@efs-auto.org>
+References: <20190619075643.10048-1-david.brenken@efs-auto.org>
+X-Provags-ID: V03:K1:PMFTec9NeBKgCgCz6Vc23UuJa7y917vhJp6wGTFXYhxV8r3djs3
+ Avo/xf0kJzMmClJq0rouVraCucfUFb3kr1uvmFZkMH/RNayMU2qzw9leQDv/HDO331BDO5L
+ 63dv+B93Kz4myUMJtTt78XtyG8HjUJwAL0HEKJGX0vfOEfrrLStkjReAerme40O57VChitm
+ rxYhwCJp6XOcF8lnY5jPA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:94Rzijg9NAY=:pLskoi0Wcj3+KRw3fV6pmo
+ gzB3N8F4VOzxIj+2Ymx1cBC5BdQF4Bw4GGAaWgMFCc2boZQsVHhNlKozGxd/X1J6VN3rDRW4S
+ unEWPQ80vcm4CGajTcO8eUa8SGNxjGO2gAcUZuyOqCYMZ7C7MFWyLHwecJvQmgFZ8qrIojYos
+ dTbLjebff2Ss1rsoIwMuUXKCQskyzOcW3r7D8wppn5A7W6v706+MwpN/+U4nBKQYRl6q7JD7b
+ FfbjUIV5/olHL5wqYJshJ9TebmbaHTp/7OZ43c6k4FXFRnrgaVyRc+IXtxDrqfQWHfwNKV2zQ
+ mFXWDS+u7aNX1rkkVQNvzzTxFQEAy5gWE8AaVPcq5mi+ZXv41+2XylIGufnCj4djuYKzqVVTd
+ ctFn+G0qZf/YBOp7Tx1l0gHzEmLmEVVZflvXrMFGyRgFLm+BkmT2/SjjhY89F8gW87THrvS9L
+ z/9Fn7x1UOOyJ962o2L00CHxbK0d3FyzlzgQHrdmWPpY2T8yuRim5Ypz3LXChgl2/muvoB2N0
+ A38n0ha4UWQhO4C//v6JCJ5GNCKfYIGG5F8XP9etQk4TnnHZC4WkUtWxg8sA5+f6D08AQR6B1
+ P9cSKlKieh6hBQEm4qM+92GmBwjbB8iMmp4YkI3nU+U8poddnSb0r6ut0XSqByAt5q854drLa
+ m2XyFDujPnIrbSQFQTTVzKy50WeMF5R9Yclql4quV0GAx1ri7y8PLbFx4Icw7Q0rUplfAtguw
+ fiFreiqVe32XkUPWh2SeJpCoB9bgD8mB4j6SW/LRlk+FlRJrm4R57XHvwU8=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL 16/16] vl: Deprecate -mon pretty=... for HMP
- monitors
+X-Received-From: 212.227.126.134
+Subject: [Qemu-devel] [PATCH v2 5/5] tricore: reset DisasContext before
+ generating code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,84 +74,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- qemu-devel@nongnu.org
+Cc: kbastian@mail.uni-paderborn.de,
+ Lars Biermanski <lars.biermanski@efs-auto.de>,
+ Georg Hofstetter <georg.hofstetter@efs-auto.de>,
+ David Brenken <david.brenken@efs-auto.de>,
+ Robert Rasche <robert.rasche@efs-auto.de>,
+ Andreas Konopik <andreas.konopik@efs-auto.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin Wolf <kwolf@redhat.com> writes:
+From: Georg Hofstetter <georg.hofstetter@efs-auto.de>
 
-> Am 18.06.2019 um 11:01 hat Daniel P. Berrang=C3=A9 geschrieben:
->> On Mon, Jun 17, 2019 at 08:49:03PM +0200, Markus Armbruster wrote:
->> > From: Kevin Wolf <kwolf@redhat.com>
->> >=20
->> > The -mon pretty=3Don|off switch of the -mon option applies only to QMP
->> > monitors. It's silently ignored for HMP. Deprecate this combination so
->> > that we can make it an error in future versions.
->>=20
->> No objection to merging this PR as is, but how about we extend the
->> deprecation to QMP too ?
->>=20
->> I was responsible for adding this option back in 2010 and I don't
->> think I've used it since 2012 when I added pretty printing support
->> to scripts/qmp/qmp-shell. I struggle to imagine good reasons for
->> using QMP directly with pretty printing, as opposed to doing it
->> via qmp-shell or another wrapper tool.
->
-> qemu-iotests uses it. It doesn't only make the output (and espeically
-> diffs on failure) much more readable, but in fact also avoids very long
-> lines in the refernce output that used to break patch emails when we
-> didn't use pretty printing yet.
->
-> So let's keep it for QMP, please.
+Signed-off-by: Andreas Konopik <andreas.konopik@efs-auto.de>
+Signed-off-by: David Brenken <david.brenken@efs-auto.de>
+Signed-off-by: Georg Hofstetter <georg.hofstetter@efs-auto.de>
+Signed-off-by: Robert Rasche <robert.rasche@efs-auto.de>
+Signed-off-by: Lars Biermanski <lars.biermanski@efs-auto.de>
+---
+ target/tricore/translate.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Perhaps we can get rid of it if we find a suitable filter.
+diff --git a/target/tricore/translate.c b/target/tricore/translate.c
+index b3bfb3ca51..8f90c76d35 100644
+--- a/target/tricore/translate.c
++++ b/target/tricore/translate.c
+@@ -8806,6 +8806,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
+     target_ulong pc_start;
+     int num_insns = 0;
+ 
++    memset(&ctx, 0x00, sizeof(DisasContext));
+     pc_start = tb->pc;
+     ctx.pc = pc_start;
+     ctx.saved_pc = -1;
+-- 
+2.22.0.windows.1
 
-Hmm, Python comes with one: "python -m json.tool".  It expects just one
-expression, and fails if anything follows:
-
-    $ printf '{"execute": "qmp_capabilities"}\n{"execute": "query-version"}=
-\n' | socat UNIX:/work/armbru/images/test-qmp STDIO | python3 -m json.tool
-    Extra data: line 2 column 1 (char 134)
-
-To pretty print a sequence of expressions, you have to wrap a loop
-around it:
-
-    $ printf '{"execute": "qmp_capabilities"}\n{"execute": "query-version"}=
-\n' | socat UNIX:/work/armbru/images/test-qmp STDIO | { while read line; do=
- echo "$line" | python3 -m json.tool; done; }
-    {
-        "QMP": {
-            "version": {
-                "qemu": {
-                    "micro": 50,
-                    "minor": 0,
-                    "major": 4
-                },
-                "package": "v4.0.0-1467-g6385dd6613"
-            },
-            "capabilities": [
-                "oob"
-            ]
-        }
-    }
-    {
-        "return": {}
-    }
-    {
-        "return": {
-            "qemu": {
-                "micro": 50,
-                "minor": 0,
-                "major": 4
-            },
-            "package": "v4.0.0-1467-g6385dd6613"
-        }
-    }
-
-I figure we'd want to loop in Python instead of shell.
-
-My point is: pretty-printing is trivial in Python.  The case for
-maintaining C code to do it seems weak.
 
