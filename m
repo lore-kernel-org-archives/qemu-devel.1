@@ -2,49 +2,48 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B759CC31E5B
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:31:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68091C31E5B
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:36:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 525252084B
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:31:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 525252084B
+	by mail.kernel.org (Postfix) with ESMTPS id E9E0A2084B
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:36:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9E0A2084B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41358 helo=lists.gnu.org)
+Received: from localhost ([::1]:41386 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdgJ4-0001Fr-G2
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 15:31:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51022)
+	id 1hdgO2-0003r7-R4
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 15:36:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52490)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hdgH4-00007F-5D
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:29:40 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hdgMy-0002yF-CC
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:35:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hdgH2-0000It-UM
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:29:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43436)
+ (envelope-from <mreitz@redhat.com>) id 1hdgMx-0004oW-6L
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:35:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:8949)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hdgGy-0000FW-6k; Wed, 19 Jun 2019 15:29:32 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1hdgMu-0004k1-77; Wed, 19 Jun 2019 15:35:40 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5827A22386E;
- Wed, 19 Jun 2019 19:29:31 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6C05C3078ABD;
+ Wed, 19 Jun 2019 19:35:34 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-116-121.ams2.redhat.com
  [10.36.116.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6E57F5D9C6;
- Wed, 19 Jun 2019 19:29:24 +0000 (UTC)
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <1559152576-281803-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 70D97608A5;
+ Wed, 19 Jun 2019 19:35:33 +0000 (UTC)
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-block@nongnu.org
+References: <20190516143028.81155-1-anton.nefedov@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -71,21 +70,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <87a5ec62-6274-77c6-60a3-b4ad7b4ec822@redhat.com>
-Date: Wed, 19 Jun 2019 21:29:22 +0200
+Message-ID: <519a89b7-4584-4213-5a5d-2b4409eee565@redhat.com>
+Date: Wed, 19 Jun 2019 21:35:32 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <1559152576-281803-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <20190516143028.81155-1-anton.nefedov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="E5IJMqXoO5MUPn2rPE8uMxQnPqYSssdNm"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ boundary="Rj6jbvjNDRQb0Jrkb4ySeaAt7cDjHm8kZ"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Wed, 19 Jun 2019 19:29:31 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Wed, 19 Jun 2019 19:35:34 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v7 0/3] block/stream: get rid of the base
+Subject: Re: [Qemu-devel] [PATCH v2] iotest 134: test cluster-misaligned
+ encrypted write
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,105 +97,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
- berto@igalia.com, wencongyang2@huawei.com, xiechanglong.d@gmail.com,
- stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---E5IJMqXoO5MUPn2rPE8uMxQnPqYSssdNm
-Content-Type: multipart/mixed; boundary="z70sWiktRL7E3sohsTywm9Cd81VAwfl5y";
+--Rj6jbvjNDRQb0Jrkb4ySeaAt7cDjHm8kZ
+Content-Type: multipart/mixed; boundary="rL2DmWrJGAaDAfgboYckhlo17slyQM6MD";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, berto@igalia.com, jsnow@redhat.com,
- stefanha@redhat.com, fam@euphon.net, wencongyang2@huawei.com,
- xiechanglong.d@gmail.com, den@openvz.org, vsementsov@virtuozzo.com
-Message-ID: <87a5ec62-6274-77c6-60a3-b4ad7b4ec822@redhat.com>
-Subject: Re: [PATCH v7 0/3] block/stream: get rid of the base
-References: <1559152576-281803-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1559152576-281803-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com
+Message-ID: <519a89b7-4584-4213-5a5d-2b4409eee565@redhat.com>
+Subject: Re: [PATCH v2] iotest 134: test cluster-misaligned encrypted write
+References: <20190516143028.81155-1-anton.nefedov@virtuozzo.com>
+In-Reply-To: <20190516143028.81155-1-anton.nefedov@virtuozzo.com>
 
---z70sWiktRL7E3sohsTywm9Cd81VAwfl5y
+--rL2DmWrJGAaDAfgboYckhlo17slyQM6MD
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 29.05.19 19:56, Andrey Shinkevich wrote:
-> This series introduces a bottom intermediate node that eliminates the
-> dependency on the base that may change while stream job is running.
-> It happens when stream/commit parallel jobs are running on the same
-> backing chain. The base node of the stream job may be a top node of
-> the parallel commit job and can change before the stream job is
-> completed. We avoid that dependency by introducing the bottom node.
+On 16.05.19 16:30, Anton Nefedov wrote:
+> COW (even empty/zero) areas require encryption too
 >=20
-> v7: [resend by Andrey]
->   01: assert(intermediate) was inserted before the call to
->       bdrv_is_allocated() in the intermediate node loop of the
->       bdrv_is_allocated_above() as suggested by Max.
->   02: The change of the intermediate node loop in the stream_start() wa=
-s
->       rolled back to its original design and the reassignment of the ba=
-se
->       node pointer was added as Vladimir and Max suggested. The relevan=
-t
->       comment was amended.
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+> ---
 >=20
-> v6: [resend by Vladimir]
->   01: improve comment in block/io.c, suggested by Alberto
+> ..apparently v1 ended up in a weird base64 that would not easily git-am=
+=2E
+> Resending.
 >=20
-> v5: [resend by Vladimir]
->   01: use comment wording in block/io.c suggested by Alberto
+> used to be a part of 'qcow2: cluster space preallocation' series
+> http://lists.nongnu.org/archive/html/qemu-devel/2019-01/msg02769.html
 >=20
-> v4:
-> trace_stream_start reverted to the base.
-> bdrv_is_allocated_above_inclusive() deleted and the new parameter
-> 'bool include_base' was added to the bdrv_is_allocated_above().
+> ---
+>  tests/qemu-iotests/134     |  9 +++++++++
+>  tests/qemu-iotests/134.out | 10 ++++++++++
+>  2 files changed, 19 insertions(+)
 >=20
-> Andrey Shinkevich (3):
->   block: include base when checking image chain for block allocation
->   block/stream: refactor stream_run: drop goto
->   block/stream: introduce a bottom node
->=20
->  block/commit.c         |  2 +-
->  block/io.c             | 21 +++++++++++++------
->  block/mirror.c         |  2 +-
->  block/replication.c    |  2 +-
->  block/stream.c         | 56 ++++++++++++++++++++++++------------------=
---------
->  include/block/block.h  |  3 ++-
->  tests/qemu-iotests/245 |  4 ++--
->  7 files changed, 49 insertions(+), 41 deletions(-)
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Thanks, applied to my block branch:
 
-Just needs some simple changes to patch 1 to rebase it on 863cc78f1b3
-and c8bb23cbdbe.
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
 Max
 
 
---z70sWiktRL7E3sohsTywm9Cd81VAwfl5y--
+--rL2DmWrJGAaDAfgboYckhlo17slyQM6MD--
 
---E5IJMqXoO5MUPn2rPE8uMxQnPqYSssdNm
+--Rj6jbvjNDRQb0Jrkb4ySeaAt7cDjHm8kZ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0KjRMACgkQ9AfbAGHV
-z0CAtQf+OibHcNFuwNkfC8UebYt/SmPOMgnbu0oFOlf9NRzJFaCPGoB700oDu/35
-azkf1jAFewWxy6CV35budMtXssi0gH2BGMqSPTXj+YE0onVn6FYBMlpK9PGT9Y1m
-vaHYlFsaT5JcE7dfs4m+yEj88R62NswKWLZokfMFtOWVWGQVTyJFZEOp42bs3S/Z
-whJ56RymhMZ2ILkO8jNqSmrKUl5rlIxeLrQ/gDVsJBESPbHPMb66c6gLjsFRzLsK
-sdaQmRIgQTD7EZ3xEWYC47OT0gVLJjK1/F4/G+QSIJ0J1hQx7cPlk/mG3XE3ZjnY
-upVvZs02N97+1dfOAOu4Fgbeuv2MKw==
-=7hTm
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0KjoQACgkQ9AfbAGHV
+z0B6oQf/T+uNNzkHd+htBLvarex0zcviUlF5WyTT90aM8lnIu2oPdGTsw57+yJtH
+L6uBx3/fDF69M57nvaSbxeqR2l2dJ2koJc2u699hfaMHH0xRlUv0LZHWdysa6bSg
+LsgCzlFUZVFhwG85vt5AEyHul6CLRvbyJTvzoBP3NaS/tJD87jCBHL+wzN8BDLom
+zN3p1qRLgoja0raq0qBa2ZuOAW1/V/yGkSiJ0oHUfzCGj7yMBhSEHevq5dQTfICD
+SzTy94lpboZC2GUqyWUmDRnHFCyES8eJgAa61wttw3iHcZOsgVUmfFzn8EsjV32/
+1DQ94gBTPW+IrtEc85Id2nngEu+LJQ==
+=EvE2
 -----END PGP SIGNATURE-----
 
---E5IJMqXoO5MUPn2rPE8uMxQnPqYSssdNm--
+--Rj6jbvjNDRQb0Jrkb4ySeaAt7cDjHm8kZ--
 
