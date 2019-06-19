@@ -2,67 +2,82 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DC85C31E5B
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 14:59:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D85EC31E5B
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 15:03:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 062A62183F
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 14:59:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 062A62183F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 677BA21874
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 15:03:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eA2BFhiR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 677BA21874
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39040 helo=lists.gnu.org)
+Received: from localhost ([::1]:39086 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdc3q-0000kS-4z
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 10:59:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34372)
+	id 1hdc7J-0003dg-DO
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 11:03:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34998)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hdc0S-0005cr-Dy
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 10:56:13 -0400
+ (envelope-from <lukas.durfina@gmail.com>) id 1hdc1N-0006dr-Bv
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 10:57:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hdbwI-00035F-1q
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 10:51:55 -0400
-Resent-Date: Wed, 19 Jun 2019 10:51:55 -0400
-Resent-Message-Id: <E1hdbwI-00035F-1q@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21575)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hdbwH-00033Q-Ph
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 10:51:53 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1560955864; cv=none; d=zoho.com; s=zohoarc; 
- b=UJhxg3TR3UylewJCqrpqTA3bf4lMeZrPmMVGVSNSWN1fSto+32EOwQ7JhxawQusXTqtCTqQZK8t6uvpMHmk3a6LXxpFp5cItfHn977SnJdpa35KWIDxBYPWAEEPTkcvtVbw9KrMwAe7zWWck6NEtVVHdU8rx0AGi5XGDYgplFms=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1560955864;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=DgYTPDm/jhL9gSG08V54cGgU5k/mDZuQ8p7w2Gj9pSQ=; 
- b=ZPprlNJnKyCe1Be1yLQIRKjXgl0QwMyaJ7nDqCVcjaZZQVLAhxNzS/zgdQxLVOAl2DieoQNCTRmntHeS7VlNncTxUKsJpl6GrY4CJLFNQg0Xaux+x20DMP2er45dh4Uqq48OBFmhdqIgPFlEk6TcpYKHOEFNvQVk5kwLHBxGL+A=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 15609558632577.2080382852228695;
- Wed, 19 Jun 2019 07:51:03 -0700 (PDT)
-In-Reply-To: <1560953429-29203-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Message-ID: <156095586224.27251.8001461197679356681@ce79690b2cb9>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: aleksandar.markovic@rt-rk.com
-Date: Wed, 19 Jun 2019 07:51:03 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH v11 0/5] linux-user: A set of miscellaneous
- patches
+ (envelope-from <lukas.durfina@gmail.com>) id 1hdc1M-0006tY-Cn
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 10:57:09 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51214)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <lukas.durfina@gmail.com>)
+ id 1hdc1M-0006rz-5s
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 10:57:08 -0400
+Received: by mail-wm1-x342.google.com with SMTP id 207so2173356wma.1
+ for <qemu-devel@nongnu.org>; Wed, 19 Jun 2019 07:57:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id;
+ bh=ozeDcMYF7/Nrl2lmQXs5V+WaQacMnGyieLUIr2Ve3s8=;
+ b=eA2BFhiRHPJCX8VW8RLCm5PW8TXV3ucLR07geDnROX0Kv2OGB5ouYrixD1dQIwpL14
+ eP9fbi5Gce6dtZ2cnMDqFFXsNP/kcSqLPJFSMa0yDh9UGJr+Rn+gBlGbR/EQZb2HL+xh
+ 1C3o9gdsDl20KZnSBW/0TywIudV3hiJOp2LmgdE04p17IiiI/PEWEcZ9glAoGbvmcIrQ
+ z0FPl8HoMgMZm5E98tqdPuVF7vWGf6jS09wrgq6Ns+w+NXQPi9U7WHFygWFRPVHZbugo
+ 5I+CjhDPyR2fv2b+Ux7goMpoy6C5091uICrlS1lZWEH4GGk40HgjmOgMX1OWjRwbMxag
+ XEHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=ozeDcMYF7/Nrl2lmQXs5V+WaQacMnGyieLUIr2Ve3s8=;
+ b=R/j/2UHZ+/KxMnj0zW9sp1SnVzTZSDo8063CCdGvV/XTYtTaRRmDRhUSg0onH2ibFh
+ OJRH5QtjC9n8wEZGUmqUOCIDArId0jqQLJsyIAe4r2d4OjAEOFtis350PPi2F4CSuXlq
+ 8bnnYJ9z5HmgNmJQn+WrZnPjkyF+FMf5zi/wHIXWVCohq9KxyqNRO5OD0AXJ2tA3sQAL
+ nquk0Uy9EjjlTsGwgtV73b3KIJyq3WQklVeYgEbNHdSdLdL/Vq9i2ldY2RYaequi402X
+ Re2MgnLN5HpCa3Ti0fsjBLDNVhDeXL491LlAVNfRLj2WCIMq4sNiX0YlOTobMPWrfKZN
+ FPBw==
+X-Gm-Message-State: APjAAAUv5LvdVSxW7MLVWd4ishWjMevncZHGTGB/3sJw+9quCkocwlzF
+ ZH/UalnhFHhvX0UMYGRs/KaUWAzi9/Q=
+X-Google-Smtp-Source: APXvYqxr3WxYSC+F4IzmdEUoXxuM/MA9baAtSzz3ShdOKE2+cE+3Y8rD+L9d0y/Ix9KU+uHuBN+Mjw==
+X-Received: by 2002:a1c:2c41:: with SMTP id s62mr8851120wms.8.1560956225989;
+ Wed, 19 Jun 2019 07:57:05 -0700 (PDT)
+Received: from tachyum-sk-server.tachyum.com ([185.110.144.102])
+ by smtp.gmail.com with ESMTPSA id t12sm21986012wrw.53.2019.06.19.07.57.05
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 19 Jun 2019 07:57:05 -0700 (PDT)
+From: lukas.durfina@gmail.com
+X-Google-Original-From: ldurfina@tachyum.com
+To: qemu-devel@nongnu.org
+Date: Wed, 19 Jun 2019 16:56:54 +0200
+Message-Id: <20190619145654.118068-1-ldurfina@tachyum.com>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
+X-Mailman-Approved-At: Wed, 19 Jun 2019 10:59:12 -0400
+Subject: [Qemu-devel] [PATCH] gdbstub: print message on startup as gdbserver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,54 +89,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, amarkovic@wavecomp.com
+Cc: philmd@redhat.com, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTYwOTUzNDI5LTI5MjAzLTEt
-Z2l0LXNlbmQtZW1haWwtYWxla3NhbmRhci5tYXJrb3ZpY0BydC1yay5jb20vCgoKCkhpLAoKVGhp
-cyBzZXJpZXMgZmFpbGVkIGJ1aWxkIHRlc3Qgb24gczM5MHggaG9zdC4gUGxlYXNlIGZpbmQgdGhl
-IGRldGFpbHMgYmVsb3cuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCiMg
-VGVzdGluZyBzY3JpcHQgd2lsbCBiZSBpbnZva2VkIHVuZGVyIHRoZSBnaXQgY2hlY2tvdXQgd2l0
-aAojIEhFQUQgcG9pbnRpbmcgdG8gYSBjb21taXQgdGhhdCBoYXMgdGhlIHBhdGNoZXMgYXBwbGll
-ZCBvbiB0b3Agb2YgImJhc2UiCiMgYnJhbmNoCnNldCAtZQpDQz0kSE9NRS9iaW4vY2MKSU5TVEFM
-TD0kUFdEL2luc3RhbGwKQlVJTEQ9JFBXRC9idWlsZApta2RpciAtcCAkQlVJTEQgJElOU1RBTEwK
-U1JDPSRQV0QKY2QgJEJVSUxECiRTUkMvY29uZmlndXJlIC0tY2M9JENDIC0tcHJlZml4PSRJTlNU
-QUxMCm1ha2UgLWo0CiMgWFhYOiB3ZSBuZWVkIHJlbGlhYmxlIGNsZWFuIHVwCiMgbWFrZSBjaGVj
-ayAtajQgVj0xCm1ha2UgaW5zdGFsbAoKZWNobwplY2hvICI9PT0gRU5WID09PSIKZW52CgplY2hv
-CmVjaG8gIj09PSBQQUNLQUdFUyA9PT0iCnJwbSAtcWEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
-CiAgQ0MgICAgICBtaWNyb2JsYXplZWwtbGludXgtdXNlci9hY2NlbC90Y2cvdHJhbnNsYXRvci5v
-CiAgQ0MgICAgICBtaXBzNjRlbC1saW51eC11c2VyL2xpbnV4LXVzZXIvc3lzY2FsbC5vCiAgQ0Mg
-ICAgICBtaXBzNjRlbC1saW51eC11c2VyL2xpbnV4LXVzZXIvc3RyYWNlLm8KL3Zhci90bXAvcGF0
-Y2hldy10ZXN0ZXItdG1wLWJrcnE1ZHZoL3NyYy9saW51eC11c2VyL3N5c2NhbGwuYzozMjQ6MTY6
-IGVycm9yOiBjb25mbGljdGluZyB0eXBlcyBmb3Ig4oCYc3RhdHjigJkKICAzMjQgfCBfc3lzY2Fs
-bDUoaW50LCBzdGF0eCwgaW50LCBkaXJmZCwgY29uc3QgY2hhciAqLCBwYXRobmFtZSwgaW50LCBm
-bGFncywKICAgICAgfCAgICAgICAgICAgICAgICBefn5+fgovdmFyL3RtcC9wYXRjaGV3LXRlc3Rl
-ci10bXAtYmtycTVkdmgvc3JjL2xpbnV4LXVzZXIvc3lzY2FsbC5jOjIxNToxMzogbm90ZTogaW4g
-ZGVmaW5pdGlvbiBvZiBtYWNybyDigJhfc3lzY2FsbDXigJkKLS0tCiAgQ0MgICAgICBtaXBzNjQt
-bGludXgtdXNlci9hY2NlbC9zdHVicy9odmYtc3R1Yi5vCiAgQ0MgICAgICBtaXBzZWwtbGludXgt
-dXNlci9saW51eC11c2VyL21haW4ubwogIENDICAgICAgbWlwc2VsLWxpbnV4LXVzZXIvbGludXgt
-dXNlci9zeXNjYWxsLm8KL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWJrcnE1ZHZoL3NyYy9s
-aW51eC11c2VyL3N5c2NhbGwuYzozMjQ6MTY6IGVycm9yOiBjb25mbGljdGluZyB0eXBlcyBmb3Ig
-4oCYc3RhdHjigJkKICAzMjQgfCBfc3lzY2FsbDUoaW50LCBzdGF0eCwgaW50LCBkaXJmZCwgY29u
-c3QgY2hhciAqLCBwYXRobmFtZSwgaW50LCBmbGFncywKICAgICAgfCAgICAgICAgICAgICAgICBe
-fn5+fgovdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtYmtycTVkdmgvc3JjL2xpbnV4LXVzZXIv
-c3lzY2FsbC5jOjIxNToxMzogbm90ZTogaW4gZGVmaW5pdGlvbiBvZiBtYWNybyDigJhfc3lzY2Fs
-bDXigJkKLS0tCiAgQ0MgICAgICBtaXBzNjQtbGludXgtdXNlci9saW51eC11c2VyL3N5c2NhbGwu
-bwogIENDICAgICAgbWlwczY0LWxpbnV4LXVzZXIvbGludXgtdXNlci9zdHJhY2UubwogIENDICAg
-ICAgbWlwczY0LWxpbnV4LXVzZXIvbGludXgtdXNlci9tbWFwLm8KL3Zhci90bXAvcGF0Y2hldy10
-ZXN0ZXItdG1wLWJrcnE1ZHZoL3NyYy9saW51eC11c2VyL3N5c2NhbGwuYzozMjQ6MTY6IGVycm9y
-OiBjb25mbGljdGluZyB0eXBlcyBmb3Ig4oCYc3RhdHjigJkKICAzMjQgfCBfc3lzY2FsbDUoaW50
-LCBzdGF0eCwgaW50LCBkaXJmZCwgY29uc3QgY2hhciAqLCBwYXRobmFtZSwgaW50LCBmbGFncywK
-ICAgICAgfCAgICAgICAgICAgICAgICBefn5+fgovdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAt
-YmtycTVkdmgvc3JjL2xpbnV4LXVzZXIvc3lzY2FsbC5jOjIxNToxMzogbm90ZTogaW4gZGVmaW5p
-dGlvbiBvZiBtYWNybyDigJhfc3lzY2FsbDXigJkKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxl
-IGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1NjA5NTM0MjktMjkyMDMtMS1naXQtc2VuZC1l
-bWFpbC1hbGVrc2FuZGFyLm1hcmtvdmljQHJ0LXJrLmNvbS90ZXN0aW5nLnMzOTB4Lz90eXBlPW1l
-c3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRw
-czovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1k
-ZXZlbEByZWRoYXQuY29t
+From: Lukas Durfina <ldurfina@tachyum.com>
+
+It helps to test gdb running qemu instead of a gdbserver.
+It prints the same message as the gdbserver on startup.
+
+Signed-off-by: Lukas Durfina <ldurfina@tachyum.com>
+---
+ gdbstub.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/gdbstub.c b/gdbstub.c
+index 8618e34311..9ad9929968 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -3109,6 +3109,7 @@ int gdbserver_start(int port)
+     gdbserver_fd = gdbserver_open(port);
+     if (gdbserver_fd < 0)
+         return -1;
++    printf("Listening on port %d\n", port);
+     /* accept connections */
+     if (!gdb_accept()) {
+         close(gdbserver_fd);
+-- 
+2.17.1
 
 
