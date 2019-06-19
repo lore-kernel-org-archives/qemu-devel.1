@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31C89C43613
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 20:29:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C94AC43613
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 20:32:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05E7721537
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 20:29:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05E7721537
+	by mail.kernel.org (Postfix) with ESMTPS id E5FD7214AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 20:32:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5FD7214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41782 helo=lists.gnu.org)
+Received: from localhost ([::1]:41818 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdhCo-0005sE-8V
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 16:29:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37417)
+	id 1hdhGG-0000qu-Ho
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 16:32:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37670)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hdh2b-00036u-KU
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 16:18:46 -0400
+ (envelope-from <eblake@redhat.com>) id 1hdh3G-0003IO-Pg
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 16:19:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hdh2Z-0002C0-Kv
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 16:18:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43254)
+ (envelope-from <eblake@redhat.com>) id 1hdh3F-000379-Tw
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 16:19:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50170)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hdh2V-0001uk-NJ
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 16:18:41 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hdh3F-0002tG-Le
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 16:19:25 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 077B87F746;
- Wed, 19 Jun 2019 20:18:15 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id AA79DC049DFC
+ for <qemu-devel@nongnu.org>; Wed, 19 Jun 2019 20:19:19 +0000 (UTC)
 Received: from [10.3.116.44] (ovpn-116-44.phx2.redhat.com [10.3.116.44])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 788905C207;
- Wed, 19 Jun 2019 20:18:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D12A260142;
+ Wed, 19 Jun 2019 20:19:16 +0000 (UTC)
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20190619201050.19040-1-armbru@redhat.com>
- <20190619201050.19040-13-armbru@redhat.com>
+ <20190619201050.19040-18-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,22 +70,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <6b9e65f7-8525-6725-4387-f770e275df03@redhat.com>
-Date: Wed, 19 Jun 2019 15:18:13 -0500
+Message-ID: <a3ed96f0-4037-bdb5-60af-e537190587b6@redhat.com>
+Date: Wed, 19 Jun 2019 15:19:15 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190619201050.19040-13-armbru@redhat.com>
+In-Reply-To: <20190619201050.19040-18-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="csjPhYhGVCYpkVBVusEz8Uc9ozJbztCy7"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+ boundary="ObYOYY1k9FB0YO8cHTXgdnNsFJquXbn9s"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Wed, 19 Jun 2019 20:18:15 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Wed, 19 Jun 2019 20:19:19 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 12/17] qapi: Split machine-target.json off
- target.json and misc.json
+Subject: Re: [Qemu-devel] [PATCH 17/17] dump: Move HMP command handlers to
+ dump/
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,44 +97,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Eduardo Habkost <ehabkost@redhat.com>
+Cc: kwolf@redhat.com,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---csjPhYhGVCYpkVBVusEz8Uc9ozJbztCy7
-Content-Type: multipart/mixed; boundary="q9hFclaQgBeUQsmpLqTfaFrMvuP9uMTod";
+--ObYOYY1k9FB0YO8cHTXgdnNsFJquXbn9s
+Content-Type: multipart/mixed; boundary="aszYkjIZvCBLc0OuQD6ccSxFQM8gk5UDE";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <6b9e65f7-8525-6725-4387-f770e275df03@redhat.com>
-Subject: Re: [PATCH 12/17] qapi: Split machine-target.json off target.json and
- misc.json
+Cc: kwolf@redhat.com, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?=
+ <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <a3ed96f0-4037-bdb5-60af-e537190587b6@redhat.com>
+Subject: Re: [PATCH 17/17] dump: Move HMP command handlers to dump/
 References: <20190619201050.19040-1-armbru@redhat.com>
- <20190619201050.19040-13-armbru@redhat.com>
-In-Reply-To: <20190619201050.19040-13-armbru@redhat.com>
+ <20190619201050.19040-18-armbru@redhat.com>
+In-Reply-To: <20190619201050.19040-18-armbru@redhat.com>
 
---q9hFclaQgBeUQsmpLqTfaFrMvuP9uMTod
+--aszYkjIZvCBLc0OuQD6ccSxFQM8gk5UDE
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 6/19/19 3:10 PM, Markus Armbruster wrote:
-> Move commands query-cpu-definitions, query-cpu-model-baseline,
-> query-cpu-model-comparison, and query-cpu-model-expansion with their
-> types from target.json to machine-target.json.  Also move typee
+> Move the HMP handlers related to qapi/dump.json to
+> dimp/dump-hmp-cmds.c, where they are covered by MAINTAINERS section
 
-s/typee/types/
+s/dimp/dump/
 
-> CpuModelInfo, CpuModelExpansionType, and CpuModelCompareResult from
-> misc.json there.  Add machine-target.json to MAINTAINERS section
-> "Machine core".
+> "Dump", just like qapi/dump.json.
 >=20
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
 
@@ -144,24 +142,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---q9hFclaQgBeUQsmpLqTfaFrMvuP9uMTod--
+--aszYkjIZvCBLc0OuQD6ccSxFQM8gk5UDE--
 
---csjPhYhGVCYpkVBVusEz8Uc9ozJbztCy7
+--ObYOYY1k9FB0YO8cHTXgdnNsFJquXbn9s
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0KmIUACgkQp6FrSiUn
-Q2qd4wgAnjPvvQVMF0K4B9jzhtsNhq8p+0lENV00tadJLCqnNeNDuWd4t79y5OmJ
-gsovR69K5ltTir2QfxV+W02qSGljy1p/6IsuazmnDj6TynO/wxSixG2wCbDuvtts
-FYZJOh+Vz+viqqokmDViDJ/J3u1VBiLBPNh1t3LafjX/7PCSSFitbprtyXmdBl9y
-+B2NTS4d5Lvpndlc4hQlK5j0Jh6PczCI3PkDXYJKGVS9pBUeCqL+C6xDrpFWaEj2
-naPXYapaBwCVzQMwsqYsbvDocad4JRLWH0+Fqu3isA/sWu0+ZFZl/r8+H+G6RCjT
-jOpspdTZnuISCSZTa7lUKBY7V83HiA==
-=qeyz
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0KmMQACgkQp6FrSiUn
+Q2pm0Qf/U4rNnQvWyV0zeclxm4HT6KWgqlhwWqzkezvBmrtbIXqzlEV0iLKo3icP
+VtDvDKnd6TYJdHId562eZCS7X2A40AWm+Et5hZFWsJAYLOu93n6LkYMG6oUxGGTb
+M+QCe9kvkaDzvAZdqjLyiN6KMXt5gqm8nJtFWH6lo3D3Ka8K0XFP0tj4sz/xfai3
+ymwXWsWsYHLCvyXg0NxtRwow+LWSTvdjStMHz/1eEI2cJ/ejHMJC/6fMerr1xcK5
+0kw+6GBuHxVGsa1Mqy7JChgpTJtNV4UxNbWsf50ONTIMYi0FGky1SQ7EAma49JlB
+FSXrbd5jLFtG/XMv6oJGLd7CAdtlBQ==
+=F3It
 -----END PGP SIGNATURE-----
 
---csjPhYhGVCYpkVBVusEz8Uc9ozJbztCy7--
+--ObYOYY1k9FB0YO8cHTXgdnNsFJquXbn9s--
 
