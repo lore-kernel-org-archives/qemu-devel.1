@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E554C31E49
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 09:26:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74F94C31E49
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 09:26:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63FBF206BF
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 09:26:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 477DC206BF
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 09:26:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="y9Ik4do3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63FBF206BF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Y7Q0L2ZQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 477DC206BF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36106 helo=lists.gnu.org)
+Received: from localhost ([::1]:36108 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdWra-0002IM-EY
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 05:26:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35272)
+	id 1hdWrj-0002Mi-W0
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 05:26:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35324)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <shmuel.eiderman@oracle.com>) id 1hdWpE-0000FI-TF
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 05:24:18 -0400
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hdWpL-0000Iv-Ht
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 05:24:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shmuel.eiderman@oracle.com>) id 1hdWpD-0002Xm-El
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 05:24:16 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:36288)
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hdWpI-0002dw-M9
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 05:24:23 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:33252)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
- id 1hdWpA-0002S6-PT; Wed, 19 Jun 2019 05:24:13 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5J9O9OA078119;
- Wed, 19 Jun 2019 09:24:09 GMT
+ id 1hdWpE-0002YQ-LE; Wed, 19 Jun 2019 05:24:16 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5J9O95d177653;
+ Wed, 19 Jun 2019 09:24:14 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
- bh=XYssG+J/294GjGfqMpD5KUXLrc6cguktTtRRpAjXxbY=;
- b=y9Ik4do3tfeJEdpTvORrk7TpPmT8/LZgIF3u6owYv4l8dJRJvh8x94HfGAdvBxesM/hY
- wPHWOCERy2ILfHET0G99Rr26UEmVf02CxdwMM7MuYnGLL4jPs9kaEuR9WMrZDqCOd0iR
- ig4m99gZ3wLBB23HXRO2IDCJn7ilUJB4lIK4LC/WGlnuJmXRsi0Kzo9rGtVIK6RzlVZ/
- OFIVQ4mc+Yb8GnpmG/pHAX1eeqIdsC1+ExyGVD5PBq5bENKTYg/eclPtKB2y2b+SxmGe
- s7dt9ec7oQEmYR1hIorRgNlO/AL2Oh5Y6++uIj/Kbwsbgo3S+qXeiEjsbgY0dn+OPC/2 4w== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by aserp2120.oracle.com with ESMTP id 2t7809a81d-1
+ bh=wvpnkC7GQxdexKRwJnYoH+7QRuTfTDL3YzlS5ObIQe0=;
+ b=Y7Q0L2ZQgOJ00oeQADy+vkiwoFMjkv3UoC7M6Fg553DSvaeOsTLaNNRf/AV0yFsyiRY/
+ rN3qj3NY0Fdu1sqMZER2cpn4TxwNUt15H6MC1AbIeMh6EJUVF971U8J9ahY7jjQF091m
+ fUlnNa7OUaCPtdZFIUorsj1jx3C8WidCeQhoDXO39j4xbmiKAZebKd90q9pOzBxWv4J6
+ /jATz8+5QBDjmSbH4/CxaYn1qAqIcBvXqmv4xpklkq3pnbgOny6zIAzMW9ICWcByInT4
+ zWI5e5WaFzfdTTzQvbOVxv3kfS8i3fu5eb0gaEPERp2pS2476vkHr3jywSU6VxpWVtus Xw== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2120.oracle.com with ESMTP id 2t7809a8xk-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 19 Jun 2019 09:24:09 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5J9NDfo114792;
- Wed, 19 Jun 2019 09:24:09 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by aserp3030.oracle.com with ESMTP id 2t77yn7rt7-1
+ Wed, 19 Jun 2019 09:24:14 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5J9NbXv182190;
+ Wed, 19 Jun 2019 09:24:14 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by userp3030.oracle.com with ESMTP id 2t77ymyrbd-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 19 Jun 2019 09:24:09 +0000
+ Wed, 19 Jun 2019 09:24:14 +0000
 Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5J9O8OU008584;
- Wed, 19 Jun 2019 09:24:08 GMT
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5J9ODcg023988;
+ Wed, 19 Jun 2019 09:24:13 GMT
 Received: from nexus.ravello.local (/213.57.127.2)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 19 Jun 2019 02:24:07 -0700
+ with ESMTP ; Wed, 19 Jun 2019 02:24:13 -0700
 From: Sam Eiderman <shmuel.eiderman@oracle.com>
 To: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
  mreitz@redhat.com, seabios@seabios.org, kraxel@redhat.com,
  kevin@koconnor.net
-Date: Wed, 19 Jun 2019 12:23:49 +0300
-Message-Id: <20190619092352.23583-2-shmuel.eiderman@oracle.com>
+Date: Wed, 19 Jun 2019 12:23:51 +0300
+Message-Id: <20190619092352.23583-4-shmuel.eiderman@oracle.com>
 X-Mailer: git-send-email 2.13.3
 In-Reply-To: <20190619092352.23583-1-shmuel.eiderman@oracle.com>
 References: <20190619092352.23583-1-shmuel.eiderman@oracle.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9292
  signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
  malwarescore=0
  phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
@@ -84,14 +84,14 @@ X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9292
  signatures=668687
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
  priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
  lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
  definitions=main-1906190077
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 141.146.126.78
-Subject: [Qemu-devel] [SeaBIOS] [PATCH v3 1/4] geometry: Read LCHS from
- fw_cfg
+X-Received-From: 156.151.31.85
+Subject: [Qemu-devel] [SeaBIOS] [PATCH v3 3/4] geometry: Add
+ boot_lchs_find_*() utility functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,130 +109,147 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Read bios geometry for boot devices from fw_cfg.
+Adding the following utility functions:
 
-By receiving LCHS values directly from QEMU through fw_cfg we will be
-able to support logical geometries which can not be inferred by SeaBIOS
-itself.
-(For instance: A 8GB virtio-blk hard drive which was originally created
-as an IDE and must report LCHS of */32/63 for its operating system to
-function will always break under SeaBIOS since a LARGE/LBA translation
-will be used, causing the number of reported logical heads to be > 32.)
+    * boot_lchs_find_pci_device
+    * boot_lchs_find_scsi_device
+    * boot_lchs_find_ata_device
 
-The only LCHS paravirtual interface available at the moment is for IDE
-disks (rtc_read() in get_translation()) and it's limited to a maximum
-of 4 disks (this code existed in SeaBIOS's translation function before
-SCSI and VirtIO were even introduced).
-This is why we create a new interface which allows passing LCHS
-information per hdd.
-
-Boot device information is serialized in the following way:
-    * device_path lcyls lheads lsecs\n
-    ...
-    * device_path lcyls lheads lsecs\0
-
-Device path is a null terminated string in the "Open Firmware" device
-path format, the same path as used in bootorder.
+These will be used to apply LCHS values received through fw_cfg.
 
 Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
 Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
 Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
 ---
- src/boot.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 74 insertions(+)
+ src/Kconfig |  7 ++++++
+ src/boot.c  | 71 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/util.h  |  6 ++++++
+ 3 files changed, 84 insertions(+)
 
+diff --git a/src/Kconfig b/src/Kconfig
+index 55a87cb7..0b4c1c0d 100644
+--- a/src/Kconfig
++++ b/src/Kconfig
+@@ -72,6 +72,13 @@ endchoice
+         help
+             Support controlling of the boot order via the fw_cfg/CBFS
+             "bootorder" file.
++    config BIOS_GEOMETRY
++        depends on BOOT
++        bool "Boot device bios geometry override"
++        default y
++        help
++            Support overriding bios (logical) geometry of boot devices via the
++            fw_cfg/CBFS "bios-geometry" file.
+ 
+     config COREBOOT_FLASH
+         depends on COREBOOT
 diff --git a/src/boot.c b/src/boot.c
-index 5acf94fe..a2cb167c 100644
+index 70f639f4..308d9559 100644
 --- a/src/boot.c
 +++ b/src/boot.c
-@@ -24,6 +24,79 @@
- 
- 
- /****************************************************************
-+ * Boot device logical geometry
-+ ****************************************************************/
-+
-+typedef struct BootDeviceLCHS {
-+    char *name;
-+    u32 lcyls;
-+    u32 lheads;
-+    u32 lsecs;
-+} BootDeviceLCHS;
-+
-+static BootDeviceLCHS *BiosGeometry VARVERIFY32INIT;
-+static int BiosGeometryCount;
-+
-+static char *
-+parse_u32(char *cur, u32 *n)
-+{
-+    u32 m = 0;
-+    if (cur) {
-+        while ('0' <= *cur && *cur <= '9') {
-+            m = 10 * m + (*cur - '0');
-+            cur++;
-+        }
-+        if (*cur != '\0')
-+            cur++;
-+    }
-+    *n = m;
-+    return cur;
-+}
-+
-+static void
-+loadBiosGeometry(void)
-+{
-+    char *f = romfile_loadfile("bios-geometry", NULL);
-+    if (!f)
+@@ -105,6 +105,8 @@ parse_u32(char *cur, u32 *n)
+ static void
+ loadBiosGeometry(void)
+ {
++    if (!CONFIG_BIOS_GEOMETRY)
 +        return;
-+
-+    int i = 0;
-+    BiosGeometryCount = 1;
-+    while (f[i]) {
-+        if (f[i] == '\n')
-+            BiosGeometryCount++;
-+        i++;
-+    }
-+    BiosGeometry = malloc_tmphigh(BiosGeometryCount * sizeof(BootDeviceLCHS));
-+    if (!BiosGeometry) {
-+        warn_noalloc();
-+        free(f);
-+        BiosGeometryCount = 0;
-+        return;
-+    }
-+
-+    dprintf(1, "bios geometry:\n");
-+    i = 0;
-+    do {
-+        BootDeviceLCHS *d = &BiosGeometry[i];
-+        d->name = f;
-+        f = strchr(f, '\n');
-+        if (f)
-+            *(f++) = '\0';
-+        char *chs_values = strchr(d->name, ' ');
-+        if (chs_values)
-+            *(chs_values++) = '\0';
-+        chs_values = parse_u32(chs_values, &d->lcyls);
-+        chs_values = parse_u32(chs_values, &d->lheads);
-+        chs_values = parse_u32(chs_values, &d->lsecs);
-+        dprintf(1, "%s: (%u, %u, %u)\n",
-+                d->name, d->lcyls, d->lheads, d->lsecs);
-+        i++;
-+    } while (f);
-+}
-+
-+
-+/****************************************************************
-  * Boot priority ordering
-  ****************************************************************/
- 
-@@ -288,6 +361,7 @@ boot_init(void)
-     BootRetryTime = romfile_loadint("etc/boot-fail-wait", 60*1000);
- 
-     loadBootOrder();
-+    loadBiosGeometry();
+     char *f = romfile_loadfile("bios-geometry", NULL);
+     if (!f)
+         return;
+@@ -144,6 +146,75 @@ loadBiosGeometry(void)
+     } while (f);
  }
  
++// Search the bios-geometry list for the given glob pattern.
++static BootDeviceLCHS *
++boot_lchs_find(const char *glob)
++{
++    dprintf(1, "Searching bios-geometry for: %s\n", glob);
++    int i;
++    for (i = 0; i < BiosGeometryCount; i++)
++        if (glob_prefix(glob, BiosGeometry[i].name))
++            return &BiosGeometry[i];
++    return NULL;
++}
++
++int boot_lchs_find_pci_device(struct pci_device *pci, struct chs_s *chs)
++{
++    if (!CONFIG_BIOS_GEOMETRY)
++        return -1;
++    char desc[256];
++    build_pci_path(desc, sizeof(desc), "*", pci);
++    BootDeviceLCHS *b = boot_lchs_find(desc);
++    if (!b)
++        return -1;
++    chs->cylinder = (u16)b->lcyls;
++    chs->head = (u16)b->lheads;
++    chs->sector = (u16)b->lsecs;
++    return 0;
++}
++
++int boot_lchs_find_scsi_device(struct pci_device *pci, int target, int lun,
++                               struct chs_s *chs)
++{
++    if (!CONFIG_BIOS_GEOMETRY)
++        return -1;
++    if (!pci)
++        // support only pci machine for now
++        return -1;
++    // Find scsi drive - for example: /pci@i0cf8/scsi@5/channel@0/disk@1,0
++    char desc[256], *p;
++    p = build_pci_path(desc, sizeof(desc), "*", pci);
++    snprintf(p, desc+sizeof(desc)-p, "/*@0/*@%x,%x", target, lun);
++    BootDeviceLCHS *b = boot_lchs_find(desc);
++    if (!b)
++        return -1;
++    chs->cylinder = (u16)b->lcyls;
++    chs->head = (u16)b->lheads;
++    chs->sector = (u16)b->lsecs;
++    return 0;
++}
++
++int boot_lchs_find_ata_device(struct pci_device *pci, int chanid, int slave,
++                              struct chs_s *chs)
++{
++    if (!CONFIG_BIOS_GEOMETRY)
++        return -1;
++    if (!pci)
++        // support only pci machine for now
++        return -1;
++    // Find ata drive - for example: /pci@i0cf8/ide@1,1/drive@1/disk@0
++    char desc[256], *p;
++    p = build_pci_path(desc, sizeof(desc), "*", pci);
++    snprintf(p, desc+sizeof(desc)-p, "/drive@%x/disk@%x", chanid, slave);
++    BootDeviceLCHS *b = boot_lchs_find(desc);
++    if (!b)
++        return -1;
++    chs->cylinder = (u16)b->lcyls;
++    chs->head = (u16)b->lheads;
++    chs->sector = (u16)b->lsecs;
++    return 0;
++}
++
  
+ /****************************************************************
+  * Boot priority ordering
+diff --git a/src/util.h b/src/util.h
+index e2afc80c..b173fa88 100644
+--- a/src/util.h
++++ b/src/util.h
+@@ -38,6 +38,12 @@ struct usbdevice_s;
+ int bootprio_find_usb(struct usbdevice_s *usbdev, int lun);
+ int get_keystroke_full(int msec);
+ int get_keystroke(int msec);
++struct chs_s;
++int boot_lchs_find_pci_device(struct pci_device *pci, struct chs_s *chs);
++int boot_lchs_find_scsi_device(struct pci_device *pci, int target, int lun,
++                               struct chs_s *chs);
++int boot_lchs_find_ata_device(struct pci_device *pci, int chanid, int slave,
++                              struct chs_s *chs);
+ 
+ // bootsplash.c
+ void enable_vga_console(void);
 -- 
 2.13.3
 
