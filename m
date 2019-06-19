@@ -2,64 +2,73 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 610F1C31E49
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 10:55:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79E86C31E49
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 10:59:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2484D2070B
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 10:55:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2484D2070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 095F42070B
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 10:59:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 095F42070B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36836 helo=lists.gnu.org)
+Received: from localhost ([::1]:36868 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdYF3-000762-AC
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 06:55:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33500)
+	id 1hdYJB-0000Rz-3O
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 06:59:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34962)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mlevitsk@redhat.com>) id 1hdYCY-0006LN-1o
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 06:52:31 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1hdYIJ-0008QF-Hc
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 06:58:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1hdYCV-0005zl-SW
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 06:52:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46722)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1hdY7b-0000gV-Ex; Wed, 19 Jun 2019 06:47:19 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 72A5D30860A9;
- Wed, 19 Jun 2019 10:47:12 +0000 (UTC)
-Received: from dhcp-4-67.tlv.redhat.com (dhcp-4-67.tlv.redhat.com [10.35.4.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B9B0060A9A;
- Wed, 19 Jun 2019 10:47:03 +0000 (UTC)
-Message-ID: <f24926a73f00be2f1d7de2c8b09680a98c595fd5.camel@redhat.com>
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed, 19 Jun 2019 13:47:01 +0300
-In-Reply-To: <20190619101414.GA13569@stefanha-x1.localdomain>
-References: <20190610134905.22294-1-mehta.aaru20@gmail.com>
- <20190610134905.22294-5-mehta.aaru20@gmail.com>
- <81e4ab9b07d5678a3a28e1314c07ee0224e4d9ed.camel@redhat.com>
- <20190619101414.GA13569@stefanha-x1.localdomain>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Wed, 19 Jun 2019 10:47:12 +0000 (UTC)
+ (envelope-from <palmer@dabbelt.com>) id 1hdYII-0003CZ-D2
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 06:58:23 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:35622)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hdYII-0003BQ-5Q
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 06:58:22 -0400
+Received: by mail-pg1-f193.google.com with SMTP id s27so9472263pgl.2
+ for <qemu-devel@nongnu.org>; Wed, 19 Jun 2019 03:58:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=ug1+sTIOcguDXuV47ig3Ir+RrALqTw3KtFfEeZbCNWI=;
+ b=aYlQ9YJiyPJhrbs8L0ISiAJ6K9vQsjigniNX8RKuN27fxS4v/sZpFW+aLAxqwp3f7j
+ iYMROra4YZ+CaEYdAiR3ZQuoyBSmaGYcYqqkS6L8T+CiOIQytoONFfgvAaxDqwTETtHz
+ /3JsaTOykOkem6sLAi0EhZLeWsdxHveRTSczfmICEweawYcpN4/U9lX4B3GMugYYxRfa
+ FqJ9qlVk4X0JsFtBdVhGr3uCCxXofWkIJui6sUGQmilNGcsYj2Vxd6ibUbbrhb7dcrJT
+ acf2ZIwqdynh/v3FOp63zPJ2sCH4xvE/DqFtW1GZZD93xwieu2U4CFFW5qKZsRlOJKQy
+ kfdw==
+X-Gm-Message-State: APjAAAUx1C9FnuHyxI05dS3e47fsn8bixXTyxWd7oQ2OfdI8sk5YGrGw
+ 9MmXXcroYakjf+CrjMp/gKb7k2aM6U+jLw==
+X-Google-Smtp-Source: APXvYqyldb2X3lyR5+N43hUBL2cV+iEpZP0QBg50+htLuFimO0KvW7ROFDQJuwJiTKvA2ZHDB17hfg==
+X-Received: by 2002:a62:78c2:: with SMTP id
+ t185mr56756419pfc.142.1560941900737; 
+ Wed, 19 Jun 2019 03:58:20 -0700 (PDT)
+Received: from localhost (amx-tls3.starhub.net.sg. [203.116.164.13])
+ by smtp.gmail.com with ESMTPSA id a22sm21898713pfn.173.2019.06.19.03.58.19
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 19 Jun 2019 03:58:20 -0700 (PDT)
+Date: Wed, 19 Jun 2019 03:58:20 -0700 (PDT)
+X-Google-Original-Date: Wed, 19 Jun 2019 03:54:09 PDT (-0700)
+In-Reply-To: <cover.1560821342.git.alistair.francis@wdc.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>
+Message-ID: <mhng-966cacce-c410-473d-b043-996f3cff9a36@palmer-si-x1e>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v5 04/12] block/io_uring: implements
- interfaces for io_uring
+ [fuzzy]
+X-Received-From: 209.85.215.193
+Subject: Re: [Qemu-devel] [PATCH v1 0/9] Update the RISC-V specification
+ versions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,149 +80,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, saket.sinha89@gmail.com,
- Paolo Bonzini <pbonzini@redhat.com>, Julia Suvorova <jusual@mail.ru>,
- Aarushi Mehta <mehta.aaru20@gmail.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 2019-06-19 at 11:14 +0100, Stefan Hajnoczi wrote:
-> On Mon, Jun 17, 2019 at 03:26:50PM +0300, Maxim Levitsky wrote:
-> > On Mon, 2019-06-10 at 19:18 +0530, Aarushi Mehta wrote:
-> > > +        if (!cqes) {
-> > > +            break;
-> > > +        }
-> > > +        LuringAIOCB *luringcb = io_uring_cqe_get_data(cqes);
-> > > +        ret = cqes->res;
-> > > +
-> > > +        if (ret == luringcb->qiov->size) {
-> > > +            ret = 0;
-> > > +        } else if (ret >= 0) {
-> > 
-> > 
-> > You should very carefully check the allowed return values here.
-> > 
-> > It looks like you can get '-EINTR' here, which would ask you to rerun the read operation, and otherwise
-> > you will get the number of bytes read, which might be less that what was asked for, which implies that you
-> > need to retry the read operation with the remainder of the buffer rather that zero the end of the buffer IMHO 
-> > 
-> > (0 is returned on EOF according to 'read' semantics, which I think are used here, thus a short read might not be an EOF)
-> > 
-> > 
-> > Looking at linux-aio.c though I do see that it just passes through the returned value with no special treatments. 
-> > including lack of check for -EINTR.
-> > 
-> > I assume that since aio is linux specific, and it only supports direct IO, it happens
-> > to have assumption of no short reads/-EINTR (but since libaio has very sparse documentation I can't verify this)
-> > 
-> > On the other hand the aio=threads implementation actually does everything as specified on the 'write' manpage,
-> > retrying the reads on -EINTR, and doing additional reads if less that required number of bytes were read.
-> > 
-> > Looking at io_uring implementation in the kernel I see that it does support synchronous (non O_DIRECT mode), 
-> > and in this case, it goes through the same ->read_iter which is pretty much the same path that 
-> > regular read() takes and so it might return short reads and or -EINTR.
-> 
-> Interesting point.  Investigating EINTR should at least be a TODO
-> comment and needs to be resolved before io_uring lands in a QEMU
-> release.
-> 
-> > > +static int ioq_submit(LuringState *s)
-> > > +{
-> > > +    int ret = 0;
-> > > +    LuringAIOCB *luringcb, *luringcb_next;
-> > > +
-> > > +    while (s->io_q.in_queue > 0) {
-> > > +        QSIMPLEQ_FOREACH_SAFE(luringcb, &s->io_q.sq_overflow, next,
-> > > +                              luringcb_next) {
-> > 
-> > I am torn about the 'sq_overflow' name. it seems to me that its not immediately clear that these
-> > are the requests that are waiting because the io uring got full, but I can't now think of a better name.
-> > 
-> > Maybe add a comment here to explain what is going on here?
-> 
-> Hmm...I suggested this name because I thought it was clear.  But the
-> fact that it puzzled you proves it wasn't clear :-).
-> 
-> Can anyone think of a better name?  It's the queue we keep in QEMU to
-> hold requests while the io_uring sq ring is full.
-> 
-> > Also maybe we could somehow utilize the plug/unplug facility to avoid reaching that state in first place?
-> > Maybe the block layer has some kind of 'max outstanding requests' limit that could be used?
-> > 
-> > In my nvme-mdev I opted to not process the input queues when such a condition is detected, but here you can't as the block layer
-> > pretty much calls you to process the requests.
-> 
-> Block layer callers are allowed to submit as many I/O requests as they
-> like and there is no feedback mechanism.  It's up to linux-aio.c and
-> io_uring.c to handle the case where host kernel I/O submission resources
-> are exhausted.
-> 
-> Plug/unplug is a batching performance optimization to reduce the number
-> of io_uring_enter() calls but it does not stop the callers from
-> submitting more I/O requests.  So plug/unplug isn't directly applicable
-> here.
+On Mon, 17 Jun 2019 18:31:00 PDT (-0700), Alistair Francis wrote:
+> Based-on: <cover.1555726824.git.alistair.francis@wdc.com>
+>
+> Now that the RISC-V spec has started to be ratified let's update our
+> QEMU implementation. There are a few things going on here:
+>  - Add priv version 1.11.0 to QEMU
+>     - This is the ratified version of the Privledge spec
+>     - There are almost no changes to 1.10
+>  - Mark the 1.09.1 privledge spec as depreated
+>      - Let's aim to remove it in two releases
+>  - Set priv version 1.11.0 as the default
+>  - Remove the user_spec version
+>      - This doesn't really mean anything so let's remove it
+>  - Add support for the "Counters" extension
+>  - Add command line options for Zifencei and Zicsr
 
-Thanks for the explanation! I guess we can leave that name as is, but add some comment or so
-in the place where the queue is accessed.
+Thanks!  I'll look at the code, but I've currently got this queued up behind
+your hypervisor patches so it might take a bit.  LMK if you want me to invert
+the priority on these.  I'll probably be buried until the start of July.
 
-
-
-> 
-> > > +static int luring_do_submit(int fd, LuringAIOCB *luringcb, LuringState *s,
-> > > +                            uint64_t offset, int type)
-> > > +{
-> > > +    struct io_uring_sqe *sqes = io_uring_get_sqe(&s->ring);
-> > > +    if (!sqes) {
-> > > +        sqes = &luringcb->sqeq;
-> > > +        QSIMPLEQ_INSERT_TAIL(&s->io_q.sq_overflow, luringcb, next);
-> > > +    }
-> > > +
-> > > +    switch (type) {
-> > > +    case QEMU_AIO_WRITE:
-> > > +        io_uring_prep_writev(sqes, fd, luringcb->qiov->iov,
-> > > +                             luringcb->qiov->niov, offset);
-> > > +        break;
-> > > +    case QEMU_AIO_READ:
-> > > +        io_uring_prep_readv(sqes, fd, luringcb->qiov->iov,
-> > > +                            luringcb->qiov->niov, offset);
-> > > +        break;
-> > > +    case QEMU_AIO_FLUSH:
-> > > +        io_uring_prep_fsync(sqes, fd, 0);
-> > > +        break;
-> > > +    default:
-> > > +        fprintf(stderr, "%s: invalid AIO request type, aborting 0x%x.\n",
-> > > +                        __func__, type);
-> > 
-> > Nitpick: Don't we use some king of error printing functions like 'error_setg' rather that fprintf?
-> 
-> Here we're not in a context where an Error object can be returned (e.g.
-> printed by the QMP monitor).  We only have an errno return value that
-> the emulated storage controller may squash down further to a single
-> EIO-type error code.
-> 
-> 'type' is a QEMU-internal value so the default case is basically
-> assert(false); /* we should never get here */
-> 
-> For these reasons the fprintf() seems okay here.
-All right then.
-
-> 
-> > I plan on this or next week to do some benchmarks of the code and I will share the results as soon
-> > as I do them.
-> 
-> Excellent, Aarushi has been benchmarking too.  Perhaps you can share the
-> QEMU command-line and fio configuration so that the results can be
-> compared.
-
-I'll do that soon. I already did some initial benchmarks (didn't save the results yet), and in the current state the io_uring is a bit, tiny bit slower
-that libaio, which is nothing wrong because io_uring has lot of benefits in addition to performance, plus the current code can be optimized futher.
-
-I'll post all the benchmarks I am doing once again now, as soon as I have them.
-
-Best regards,
-	Maxim Levitsky
-
+> We can remove the spec version as it's unused and has never been exposed
+> to users. The idea is to match the specs in specifying the version. To
+> handle versions in the future we can extend the extension props to
+> handle version information.
+>
+> For example something like this: -cpu rv64,i=2.2,c=2.0,h=0.4,priv_spec=1.11
+>
+> NOTE: This isn't supported today as we only have one of each version.
+>
+> This will be a future change if we decide to support multiple versions
+> of extensions.
+>
+> The "priv_spec" string doesn't really match, but I don't have a better
+> way to say "Machine ISA" and "Supervisor ISA" which is what is included
+> in "priv_spec".
+>
+> For completeness I have also added the Counters, Zifencei and Zicsr
+> extensions.
+>
+> Everything else seems to match the spec names/style.
+>
+> Please let me know if I'm missing something. QEMU 4.1 is the first
+> release to support the extensions from the command line, so we can
+> easily change it until then. After that it'll take more work to change
+> the command line interface.
+>
+> Alistair Francis (9):
+>   target/riscv: Restructure deprecatd CPUs
+>   target/riscv: Add the privledge spec version 1.11.0
+>   target/riscv: Comment in the mcountinhibit CSR
+>   target/riscv: Set privledge spec 1.11.0 as default
+>   qemu-deprecated.texi: Deprecate the RISC-V privledge spec 1.09.1
+>   target/riscv: Require either I or E base extension
+>   target/riscv: Remove user version information
+>   target/riscv: Add support for disabling/enabling Counters
+>   target/riscv: Add Zifencei and Zicsr as command line options
+>
+>  qemu-deprecated.texi                          |  8 +++
+>  target/riscv/cpu.c                            | 72 ++++++++++---------
+>  target/riscv/cpu.h                            | 19 ++---
+>  target/riscv/cpu_bits.h                       |  1 +
+>  target/riscv/csr.c                            | 13 +++-
+>  .../riscv/insn_trans/trans_privileged.inc.c   |  2 +-
+>  6 files changed, 71 insertions(+), 44 deletions(-)
 
