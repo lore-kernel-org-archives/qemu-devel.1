@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C75AC43613
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 20:25:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BB4AC48BC5
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 20:25:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2103F2082C
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 20:25:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2103F2082C
+	by mail.kernel.org (Postfix) with ESMTPS id 23DF72082C
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 20:25:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23DF72082C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41748 helo=lists.gnu.org)
+Received: from localhost ([::1]:41750 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdh8l-00018B-D2
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 16:25:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35398)
+	id 1hdh8n-0001DL-Br
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 16:25:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35404)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hdgvC-0004Ks-BM
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 16:11:10 -0400
+ (envelope-from <armbru@redhat.com>) id 1hdgvC-0004Ku-Iu
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 16:11:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hdgv4-000167-4i
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 16:11:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51350)
+ (envelope-from <armbru@redhat.com>) id 1hdgv7-00019R-5R
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 16:11:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33818)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hdgv3-00012x-5C
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 16:10:57 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hdgv5-00015d-NN
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 16:11:00 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9F65DC1EB1FE;
- Wed, 19 Jun 2019 20:10:54 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B12AE30C132E
+ for <qemu-devel@nongnu.org>; Wed, 19 Jun 2019 20:10:57 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-85.ams2.redhat.com
  [10.36.116.85])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C4C2B5C21E;
- Wed, 19 Jun 2019 20:10:53 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 340961001B3D;
+ Wed, 19 Jun 2019 20:10:55 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id E75A01138407; Wed, 19 Jun 2019 22:10:50 +0200 (CEST)
+ id 15E5E1136444; Wed, 19 Jun 2019 22:10:51 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 19 Jun 2019 22:10:45 +0200
-Message-Id: <20190619201050.19040-13-armbru@redhat.com>
+Date: Wed, 19 Jun 2019 22:10:50 +0200
+Message-Id: <20190619201050.19040-18-armbru@redhat.com>
 In-Reply-To: <20190619201050.19040-1-armbru@redhat.com>
 References: <20190619201050.19040-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Wed, 19 Jun 2019 20:10:54 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Wed, 19 Jun 2019 20:10:57 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 12/17] qapi: Split machine-target.json off
- target.json and misc.json
+Subject: [Qemu-devel] [PATCH 17/17] dump: Move HMP command handlers to dump/
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,962 +70,248 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Eduardo Habkost <ehabkost@redhat.com>
+Cc: kwolf@redhat.com,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move commands query-cpu-definitions, query-cpu-model-baseline,
-query-cpu-model-comparison, and query-cpu-model-expansion with their
-types from target.json to machine-target.json.  Also move typee
-CpuModelInfo, CpuModelExpansionType, and CpuModelCompareResult from
-misc.json there.  Add machine-target.json to MAINTAINERS section
-"Machine core".
+Move the HMP handlers related to qapi/dump.json to
+dimp/dump-hmp-cmds.c, where they are covered by MAINTAINERS section
+"Dump", just like qapi/dump.json.
 
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- MAINTAINERS                     |   1 +
- qapi/Makefile.objs              |   2 +-
- qapi/machine-target.json        | 318 ++++++++++++++++++++++++++++++++
- qapi/misc.json                  |  74 --------
- qapi/qapi-schema.json           |   1 +
- qapi/target.json                | 242 ------------------------
- target/arm/helper.c             |   2 +-
- target/i386/cpu.c               |   2 +-
- target/mips/helper.c            |   2 +-
- target/ppc/translate_init.inc.c |   2 +-
- target/s390x/cpu_models.c       |   2 +-
- 11 files changed, 326 insertions(+), 322 deletions(-)
- create mode 100644 qapi/machine-target.json
+ Makefile.objs        |  1 +
+ dump/Makefile.objs   |  1 +
+ dump/dump-hmp-cmds.c | 88 ++++++++++++++++++++++++++++++++++++++++++++
+ monitor/hmp-cmds.c   | 76 --------------------------------------
+ 4 files changed, 90 insertions(+), 76 deletions(-)
+ create mode 100644 dump/dump-hmp-cmds.c
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0e6d0861ab..89e8c01cf3 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1271,6 +1271,7 @@ F: hw/core/null-machine.c
- F: hw/core/numa.c
- F: hw/cpu/cluster.c
- F: qapi/machine.json
-+F: qapi/machine-target.json
- F: qom/cpu.c
- F: include/hw/boards.h
- F: include/hw/cpu/cluster.h
-diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
-index 01dced01aa..4e87bef6e1 100644
---- a/qapi/Makefile.objs
-+++ b/qapi/Makefile.objs
-@@ -9,7 +9,7 @@ QAPI_COMMON_MODULES =3D audio authz block-core block char=
- common crypto
- QAPI_COMMON_MODULES +=3D introspect job machine migration misc net
- QAPI_COMMON_MODULES +=3D qdev qom rdma rocker run-state sockets tpm
- QAPI_COMMON_MODULES +=3D trace transaction ui
--QAPI_TARGET_MODULES =3D target
-+QAPI_TARGET_MODULES =3D machine-target target
- QAPI_MODULES =3D $(QAPI_COMMON_MODULES) $(QAPI_TARGET_MODULES)
-=20
- util-obj-y +=3D qapi-builtin-types.o
-diff --git a/qapi/machine-target.json b/qapi/machine-target.json
+diff --git a/Makefile.objs b/Makefile.objs
+index 7494d6143b..c93d731047 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -45,6 +45,7 @@ io-obj-y =3D io/
+ ifeq ($(CONFIG_SOFTMMU),y)
+ common-obj-y =3D blockdev.o blockdev-nbd.o block/
+ common-obj-y +=3D bootdevice.o iothread.o
++common-obj-y +=3D dump/
+ common-obj-y +=3D job-qmp.o
+ common-obj-y +=3D monitor/
+ common-obj-y +=3D net/
+diff --git a/dump/Makefile.objs b/dump/Makefile.objs
+index ea6b074967..d2a5db3b81 100644
+--- a/dump/Makefile.objs
++++ b/dump/Makefile.objs
+@@ -1,2 +1,3 @@
+ obj-y +=3D dump.o
++common-obj-y +=3D dump-hmp-cmds.o
+ obj-$(TARGET_X86_64) +=3D win_dump.o
+diff --git a/dump/dump-hmp-cmds.c b/dump/dump-hmp-cmds.c
 new file mode 100644
-index 0000000000..5d7480f6ab
+index 0000000000..3dbf44372c
 --- /dev/null
-+++ b/qapi/machine-target.json
-@@ -0,0 +1,318 @@
-+# -*- Mode: Python -*-
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or lat=
-er.
-+# See the COPYING file in the top-level directory.
++++ b/dump/dump-hmp-cmds.c
+@@ -0,0 +1,88 @@
++/*
++ * Human Monitor Interface commands
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
 +
-+##
-+# @CpuModelInfo:
-+#
-+# Virtual CPU model.
-+#
-+# A CPU model consists of the name of a CPU definition, to which
-+# delta changes are applied (e.g. features added/removed). Most magic va=
-lues
-+# that an architecture might require should be hidden behind the name.
-+# However, if required, architectures can expose relevant properties.
-+#
-+# @name: the name of the CPU definition the model is based on
-+# @props: a dictionary of QOM properties to be applied
-+#
-+# Since: 2.8.0
-+##
-+{ 'struct': 'CpuModelInfo',
-+  'data': { 'name': 'str',
-+            '*props': 'any' } }
++#include "qemu/osdep.h"
++#include "monitor/hmp.h"
++#include "monitor/monitor.h"
++#include "qapi/error.h"
++#include "qapi/qapi-commands-dump.h"
++#include "qapi/qmp/qdict.h"
 +
-+##
-+# @CpuModelExpansionType:
-+#
-+# An enumeration of CPU model expansion types.
-+#
-+# @static: Expand to a static CPU model, a combination of a static base
-+#          model name and property delta changes. As the static base mod=
-el will
-+#          never change, the expanded CPU model will be the same, indepe=
-ndent of
-+#          QEMU version, machine type, machine options, and accelerator =
-options.
-+#          Therefore, the resulting model can be used by tooling without=
- having
-+#          to specify a compatibility machine - e.g. when displaying the=
- "host"
-+#          model. The @static CPU models are migration-safe.
++void hmp_dump_guest_memory(Monitor *mon, const QDict *qdict)
++{
++    Error *err =3D NULL;
++    bool win_dmp =3D qdict_get_try_bool(qdict, "windmp", false);
++    bool paging =3D qdict_get_try_bool(qdict, "paging", false);
++    bool zlib =3D qdict_get_try_bool(qdict, "zlib", false);
++    bool lzo =3D qdict_get_try_bool(qdict, "lzo", false);
++    bool snappy =3D qdict_get_try_bool(qdict, "snappy", false);
++    const char *file =3D qdict_get_str(qdict, "filename");
++    bool has_begin =3D qdict_haskey(qdict, "begin");
++    bool has_length =3D qdict_haskey(qdict, "length");
++    bool has_detach =3D qdict_haskey(qdict, "detach");
++    int64_t begin =3D 0;
++    int64_t length =3D 0;
++    bool detach =3D false;
++    enum DumpGuestMemoryFormat dump_format =3D DUMP_GUEST_MEMORY_FORMAT_=
+ELF;
++    char *prot;
 +
-+# @full: Expand all properties. The produced model is not guaranteed to =
-be
-+#        migration-safe, but allows tooling to get an insight and work w=
-ith
-+#        model details.
-+#
-+# Note: When a non-migration-safe CPU model is expanded in static mode, =
-some
-+# features enabled by the CPU model may be omitted, because they can't b=
-e
-+# implemented by a static CPU model definition (e.g. cache info passthro=
-ugh and
-+# PMU passthrough in x86). If you need an accurate representation of the
-+# features enabled by a non-migration-safe CPU model, use @full. If you =
-need a
-+# static representation that will keep ABI compatibility even when chang=
-ing QEMU
-+# version or machine-type, use @static (but keep in mind that some featu=
-res may
-+# be omitted).
-+#
-+# Since: 2.8.0
-+##
-+{ 'enum': 'CpuModelExpansionType',
-+  'data': [ 'static', 'full' ] }
++    if (zlib + lzo + snappy + win_dmp > 1) {
++        error_setg(&err, "only one of '-z|-l|-s|-w' can be set");
++        hmp_handle_error(mon, &err);
++        return;
++    }
 +
++    if (win_dmp) {
++        dump_format =3D DUMP_GUEST_MEMORY_FORMAT_WIN_DMP;
++    }
 +
-+##
-+# @CpuModelCompareResult:
-+#
-+# An enumeration of CPU model comparison results. The result is usually
-+# calculated using e.g. CPU features or CPU generations.
-+#
-+# @incompatible: If model A is incompatible to model B, model A is not
-+#                guaranteed to run where model B runs and the other way =
-around.
-+#
-+# @identical: If model A is identical to model B, model A is guaranteed =
-to run
-+#             where model B runs and the other way around.
-+#
-+# @superset: If model A is a superset of model B, model B is guaranteed =
-to run
-+#            where model A runs. There are no guarantees about the other=
- way.
-+#
-+# @subset: If model A is a subset of model B, model A is guaranteed to r=
-un
-+#          where model B runs. There are no guarantees about the other w=
-ay.
-+#
-+# Since: 2.8.0
-+##
-+{ 'enum': 'CpuModelCompareResult',
-+  'data': [ 'incompatible', 'identical', 'superset', 'subset' ] }
++    if (zlib) {
++        dump_format =3D DUMP_GUEST_MEMORY_FORMAT_KDUMP_ZLIB;
++    }
 +
-+##
-+# @CpuModelBaselineInfo:
-+#
-+# The result of a CPU model baseline.
-+#
-+# @model: the baselined CpuModelInfo.
-+#
-+# Since: 2.8.0
-+##
-+{ 'struct': 'CpuModelBaselineInfo',
-+  'data': { 'model': 'CpuModelInfo' },
-+  'if': 'defined(TARGET_S390X)' }
++    if (lzo) {
++        dump_format =3D DUMP_GUEST_MEMORY_FORMAT_KDUMP_LZO;
++    }
 +
-+##
-+# @CpuModelCompareInfo:
-+#
-+# The result of a CPU model comparison.
-+#
-+# @result: The result of the compare operation.
-+# @responsible-properties: List of properties that led to the comparison=
- result
-+#                          not being identical.
-+#
-+# @responsible-properties is a list of QOM property names that led to
-+# both CPUs not being detected as identical. For identical models, this
-+# list is empty.
-+# If a QOM property is read-only, that means there's no known way to mak=
-e the
-+# CPU models identical. If the special property name "type" is included,=
- the
-+# models are by definition not identical and cannot be made identical.
-+#
-+# Since: 2.8.0
-+##
-+{ 'struct': 'CpuModelCompareInfo',
-+  'data': { 'result': 'CpuModelCompareResult',
-+            'responsible-properties': ['str'] },
-+  'if': 'defined(TARGET_S390X)' }
++    if (snappy) {
++        dump_format =3D DUMP_GUEST_MEMORY_FORMAT_KDUMP_SNAPPY;
++    }
 +
-+##
-+# @query-cpu-model-comparison:
-+#
-+# Compares two CPU models, returning how they compare in a specific
-+# configuration. The results indicates how both models compare regarding
-+# runnability. This result can be used by tooling to make decisions if a
-+# certain CPU model will run in a certain configuration or if a compatib=
-le
-+# CPU model has to be created by baselining.
-+#
-+# Usually, a CPU model is compared against the maximum possible CPU mode=
-l
-+# of a certain configuration (e.g. the "host" model for KVM). If that CP=
-U
-+# model is identical or a subset, it will run in that configuration.
-+#
-+# The result returned by this command may be affected by:
-+#
-+# * QEMU version: CPU models may look different depending on the QEMU ve=
-rsion.
-+#   (Except for CPU models reported as "static" in query-cpu-definitions=
-.)
-+# * machine-type: CPU model may look different depending on the machine-=
-type.
-+#   (Except for CPU models reported as "static" in query-cpu-definitions=
-.)
-+# * machine options (including accelerator): in some architectures, CPU =
-models
-+#   may look different depending on machine and accelerator options. (Ex=
-cept for
-+#   CPU models reported as "static" in query-cpu-definitions.)
-+# * "-cpu" arguments and global properties: arguments to the -cpu option=
- and
-+#   global properties may affect expansion of CPU models. Using
-+#   query-cpu-model-expansion while using these is not advised.
-+#
-+# Some architectures may not support comparing CPU models. s390x support=
-s
-+# comparing CPU models.
-+#
-+# Returns: a CpuModelBaselineInfo. Returns an error if comparing CPU mod=
-els is
-+#          not supported, if a model cannot be used, if a model contains
-+#          an unknown cpu definition name, unknown properties or propert=
-ies
-+#          with wrong types.
-+#
-+# Note: this command isn't specific to s390x, but is only implemented
-+# on this architecture currently.
-+#
-+# Since: 2.8.0
-+##
-+{ 'command': 'query-cpu-model-comparison',
-+  'data': { 'modela': 'CpuModelInfo', 'modelb': 'CpuModelInfo' },
-+  'returns': 'CpuModelCompareInfo',
-+  'if': 'defined(TARGET_S390X)' }
++    if (has_begin) {
++        begin =3D qdict_get_int(qdict, "begin");
++    }
++    if (has_length) {
++        length =3D qdict_get_int(qdict, "length");
++    }
++    if (has_detach) {
++        detach =3D qdict_get_bool(qdict, "detach");
++    }
 +
-+##
-+# @query-cpu-model-baseline:
-+#
-+# Baseline two CPU models, creating a compatible third model. The create=
-d
-+# model will always be a static, migration-safe CPU model (see "static"
-+# CPU model expansion for details).
-+#
-+# This interface can be used by tooling to create a compatible CPU model=
- out
-+# two CPU models. The created CPU model will be identical to or a subset=
- of
-+# both CPU models when comparing them. Therefore, the created CPU model =
-is
-+# guaranteed to run where the given CPU models run.
-+#
-+# The result returned by this command may be affected by:
-+#
-+# * QEMU version: CPU models may look different depending on the QEMU ve=
-rsion.
-+#   (Except for CPU models reported as "static" in query-cpu-definitions=
-.)
-+# * machine-type: CPU model may look different depending on the machine-=
-type.
-+#   (Except for CPU models reported as "static" in query-cpu-definitions=
-.)
-+# * machine options (including accelerator): in some architectures, CPU =
-models
-+#   may look different depending on machine and accelerator options. (Ex=
-cept for
-+#   CPU models reported as "static" in query-cpu-definitions.)
-+# * "-cpu" arguments and global properties: arguments to the -cpu option=
- and
-+#   global properties may affect expansion of CPU models. Using
-+#   query-cpu-model-expansion while using these is not advised.
-+#
-+# Some architectures may not support baselining CPU models. s390x suppor=
-ts
-+# baselining CPU models.
-+#
-+# Returns: a CpuModelBaselineInfo. Returns an error if baselining CPU mo=
-dels is
-+#          not supported, if a model cannot be used, if a model contains
-+#          an unknown cpu definition name, unknown properties or propert=
-ies
-+#          with wrong types.
-+#
-+# Note: this command isn't specific to s390x, but is only implemented
-+# on this architecture currently.
-+#
-+# Since: 2.8.0
-+##
-+{ 'command': 'query-cpu-model-baseline',
-+  'data': { 'modela': 'CpuModelInfo',
-+            'modelb': 'CpuModelInfo' },
-+  'returns': 'CpuModelBaselineInfo',
-+  'if': 'defined(TARGET_S390X)' }
++    prot =3D g_strconcat("file:", file, NULL);
 +
-+##
-+# @CpuModelExpansionInfo:
-+#
-+# The result of a cpu model expansion.
-+#
-+# @model: the expanded CpuModelInfo.
-+#
-+# Since: 2.8.0
-+##
-+{ 'struct': 'CpuModelExpansionInfo',
-+  'data': { 'model': 'CpuModelInfo' },
-+  'if': 'defined(TARGET_S390X) || defined(TARGET_I386)' }
++    qmp_dump_guest_memory(paging, prot, true, detach, has_begin, begin,
++                          has_length, length, true, dump_format, &err);
++    hmp_handle_error(mon, &err);
++    g_free(prot);
++}
 +
-+##
-+# @query-cpu-model-expansion:
-+#
-+# Expands a given CPU model (or a combination of CPU model + additional =
-options)
-+# to different granularities, allowing tooling to get an understanding w=
-hat a
-+# specific CPU model looks like in QEMU under a certain configuration.
-+#
-+# This interface can be used to query the "host" CPU model.
-+#
-+# The data returned by this command may be affected by:
-+#
-+# * QEMU version: CPU models may look different depending on the QEMU ve=
-rsion.
-+#   (Except for CPU models reported as "static" in query-cpu-definitions=
-.)
-+# * machine-type: CPU model  may look different depending on the machine=
--type.
-+#   (Except for CPU models reported as "static" in query-cpu-definitions=
-.)
-+# * machine options (including accelerator): in some architectures, CPU =
-models
-+#   may look different depending on machine and accelerator options. (Ex=
-cept for
-+#   CPU models reported as "static" in query-cpu-definitions.)
-+# * "-cpu" arguments and global properties: arguments to the -cpu option=
- and
-+#   global properties may affect expansion of CPU models. Using
-+#   query-cpu-model-expansion while using these is not advised.
-+#
-+# Some architectures may not support all expansion types. s390x supports
-+# "full" and "static".
-+#
-+# Returns: a CpuModelExpansionInfo. Returns an error if expanding CPU mo=
-dels is
-+#          not supported, if the model cannot be expanded, if the model =
-contains
-+#          an unknown CPU definition name, unknown properties or propert=
-ies
-+#          with a wrong type. Also returns an error if an expansion type=
- is
-+#          not supported.
-+#
-+# Since: 2.8.0
-+##
-+{ 'command': 'query-cpu-model-expansion',
-+  'data': { 'type': 'CpuModelExpansionType',
-+            'model': 'CpuModelInfo' },
-+  'returns': 'CpuModelExpansionInfo',
-+  'if': 'defined(TARGET_S390X) || defined(TARGET_I386)' }
++void hmp_info_dump(Monitor *mon, const QDict *qdict)
++{
++    DumpQueryResult *result =3D qmp_query_dump(NULL);
 +
-+##
-+# @CpuDefinitionInfo:
-+#
-+# Virtual CPU definition.
-+#
-+# @name: the name of the CPU definition
-+#
-+# @migration-safe: whether a CPU definition can be safely used for
-+#                  migration in combination with a QEMU compatibility ma=
-chine
-+#                  when migrating between different QEMU versions and be=
-tween
-+#                  hosts with different sets of (hardware or software)
-+#                  capabilities. If not provided, information is not ava=
-ilable
-+#                  and callers should not assume the CPU definition to b=
-e
-+#                  migration-safe. (since 2.8)
-+#
-+# @static: whether a CPU definition is static and will not change depend=
-ing on
-+#          QEMU version, machine type, machine options and accelerator o=
-ptions.
-+#          A static model is always migration-safe. (since 2.8)
-+#
-+# @unavailable-features: List of properties that prevent
-+#                        the CPU model from running in the current
-+#                        host. (since 2.8)
-+# @typename: Type name that can be used as argument to @device-list-prop=
-erties,
-+#            to introspect properties configurable using -cpu or -global=
-.
-+#            (since 2.9)
-+#
-+# @unavailable-features is a list of QOM property names that
-+# represent CPU model attributes that prevent the CPU from running.
-+# If the QOM property is read-only, that means there's no known
-+# way to make the CPU model run in the current host. Implementations
-+# that choose not to provide specific information return the
-+# property name "type".
-+# If the property is read-write, it means that it MAY be possible
-+# to run the CPU model in the current host if that property is
-+# changed. Management software can use it as hints to suggest or
-+# choose an alternative for the user, or just to generate meaningful
-+# error messages explaining why the CPU model can't be used.
-+# If @unavailable-features is an empty list, the CPU model is
-+# runnable using the current host and machine-type.
-+# If @unavailable-features is not present, runnability
-+# information for the CPU is not available.
-+#
-+# Since: 1.2.0
-+##
-+{ 'struct': 'CpuDefinitionInfo',
-+  'data': { 'name': 'str',
-+            '*migration-safe': 'bool',
-+            'static': 'bool',
-+            '*unavailable-features': [ 'str' ],
-+            'typename': 'str' },
-+  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
-86) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
++    assert(result && result->status < DUMP_STATUS__MAX);
++    monitor_printf(mon, "Status: %s\n", DumpStatus_str(result->status));
 +
-+##
-+# @query-cpu-definitions:
-+#
-+# Return a list of supported virtual CPU definitions
-+#
-+# Returns: a list of CpuDefInfo
-+#
-+# Since: 1.2.0
-+##
-+{ 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'],
-+  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
-86) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
-diff --git a/qapi/misc.json b/qapi/misc.json
-index b4f8c658b7..d7db863c81 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -1387,80 +1387,6 @@
- { 'command': 'query-memory-size-summary', 'returns': 'MemoryInfo' }
++    if (result->status =3D=3D DUMP_STATUS_ACTIVE) {
++        float percent =3D 0;
++        assert(result->total !=3D 0);
++        percent =3D 100.0 * result->completed / result->total;
++        monitor_printf(mon, "Finished: %.2f %%\n", percent);
++    }
++
++    qapi_free_DumpQueryResult(result);
++}
+diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+index 18ffeb7017..dc12ae6129 100644
+--- a/monitor/hmp-cmds.c
++++ b/monitor/hmp-cmds.c
+@@ -31,7 +31,6 @@
+ #include "qapi/qapi-builtin-visit.h"
+ #include "qapi/qapi-commands-block.h"
+ #include "qapi/qapi-commands-char.h"
+-#include "qapi/qapi-commands-dump.h"
+ #include "qapi/qapi-commands-migration.h"
+ #include "qapi/qapi-commands-misc.h"
+ #include "qapi/qapi-commands-net.h"
+@@ -2160,64 +2159,6 @@ void hmp_device_del(Monitor *mon, const QDict *qdi=
+ct)
+     hmp_handle_error(mon, &err);
+ }
 =20
+-void hmp_dump_guest_memory(Monitor *mon, const QDict *qdict)
+-{
+-    Error *err =3D NULL;
+-    bool win_dmp =3D qdict_get_try_bool(qdict, "windmp", false);
+-    bool paging =3D qdict_get_try_bool(qdict, "paging", false);
+-    bool zlib =3D qdict_get_try_bool(qdict, "zlib", false);
+-    bool lzo =3D qdict_get_try_bool(qdict, "lzo", false);
+-    bool snappy =3D qdict_get_try_bool(qdict, "snappy", false);
+-    const char *file =3D qdict_get_str(qdict, "filename");
+-    bool has_begin =3D qdict_haskey(qdict, "begin");
+-    bool has_length =3D qdict_haskey(qdict, "length");
+-    bool has_detach =3D qdict_haskey(qdict, "detach");
+-    int64_t begin =3D 0;
+-    int64_t length =3D 0;
+-    bool detach =3D false;
+-    enum DumpGuestMemoryFormat dump_format =3D DUMP_GUEST_MEMORY_FORMAT_=
+ELF;
+-    char *prot;
+-
+-    if (zlib + lzo + snappy + win_dmp > 1) {
+-        error_setg(&err, "only one of '-z|-l|-s|-w' can be set");
+-        hmp_handle_error(mon, &err);
+-        return;
+-    }
+-
+-    if (win_dmp) {
+-        dump_format =3D DUMP_GUEST_MEMORY_FORMAT_WIN_DMP;
+-    }
+-
+-    if (zlib) {
+-        dump_format =3D DUMP_GUEST_MEMORY_FORMAT_KDUMP_ZLIB;
+-    }
+-
+-    if (lzo) {
+-        dump_format =3D DUMP_GUEST_MEMORY_FORMAT_KDUMP_LZO;
+-    }
+-
+-    if (snappy) {
+-        dump_format =3D DUMP_GUEST_MEMORY_FORMAT_KDUMP_SNAPPY;
+-    }
+-
+-    if (has_begin) {
+-        begin =3D qdict_get_int(qdict, "begin");
+-    }
+-    if (has_length) {
+-        length =3D qdict_get_int(qdict, "length");
+-    }
+-    if (has_detach) {
+-        detach =3D qdict_get_bool(qdict, "detach");
+-    }
+-
+-    prot =3D g_strconcat("file:", file, NULL);
+-
+-    qmp_dump_guest_memory(paging, prot, true, detach, has_begin, begin,
+-                          has_length, length, true, dump_format, &err);
+-    hmp_handle_error(mon, &err);
+-    g_free(prot);
+-}
+-
+ void hmp_netdev_add(Monitor *mon, const QDict *qdict)
+ {
+     Error *err =3D NULL;
+@@ -2949,23 +2890,6 @@ void hmp_rocker_of_dpa_groups(Monitor *mon, const =
+QDict *qdict)
+     qapi_free_RockerOfDpaGroupList(list);
+ }
 =20
--##
--# @CpuModelInfo:
--#
--# Virtual CPU model.
--#
--# A CPU model consists of the name of a CPU definition, to which
--# delta changes are applied (e.g. features added/removed). Most magic va=
-lues
--# that an architecture might require should be hidden behind the name.
--# However, if required, architectures can expose relevant properties.
--#
--# @name: the name of the CPU definition the model is based on
--# @props: a dictionary of QOM properties to be applied
--#
--# Since: 2.8.0
--##
--{ 'struct': 'CpuModelInfo',
--  'data': { 'name': 'str',
--            '*props': 'any' } }
+-void hmp_info_dump(Monitor *mon, const QDict *qdict)
+-{
+-    DumpQueryResult *result =3D qmp_query_dump(NULL);
 -
--##
--# @CpuModelExpansionType:
--#
--# An enumeration of CPU model expansion types.
--#
--# @static: Expand to a static CPU model, a combination of a static base
--#          model name and property delta changes. As the static base mod=
-el will
--#          never change, the expanded CPU model will be the same, indepe=
-ndent of
--#          QEMU version, machine type, machine options, and accelerator =
-options.
--#          Therefore, the resulting model can be used by tooling without=
- having
--#          to specify a compatibility machine - e.g. when displaying the=
- "host"
--#          model. The @static CPU models are migration-safe.
+-    assert(result && result->status < DUMP_STATUS__MAX);
+-    monitor_printf(mon, "Status: %s\n", DumpStatus_str(result->status));
 -
--# @full: Expand all properties. The produced model is not guaranteed to =
-be
--#        migration-safe, but allows tooling to get an insight and work w=
-ith
--#        model details.
--#
--# Note: When a non-migration-safe CPU model is expanded in static mode, =
-some
--# features enabled by the CPU model may be omitted, because they can't b=
-e
--# implemented by a static CPU model definition (e.g. cache info passthro=
-ugh and
--# PMU passthrough in x86). If you need an accurate representation of the
--# features enabled by a non-migration-safe CPU model, use @full. If you =
-need a
--# static representation that will keep ABI compatibility even when chang=
-ing QEMU
--# version or machine-type, use @static (but keep in mind that some featu=
-res may
--# be omitted).
--#
--# Since: 2.8.0
--##
--{ 'enum': 'CpuModelExpansionType',
--  'data': [ 'static', 'full' ] }
+-    if (result->status =3D=3D DUMP_STATUS_ACTIVE) {
+-        float percent =3D 0;
+-        assert(result->total !=3D 0);
+-        percent =3D 100.0 * result->completed / result->total;
+-        monitor_printf(mon, "Finished: %.2f %%\n", percent);
+-    }
 -
+-    qapi_free_DumpQueryResult(result);
+-}
 -
--##
--# @CpuModelCompareResult:
--#
--# An enumeration of CPU model comparison results. The result is usually
--# calculated using e.g. CPU features or CPU generations.
--#
--# @incompatible: If model A is incompatible to model B, model A is not
--#                guaranteed to run where model B runs and the other way =
-around.
--#
--# @identical: If model A is identical to model B, model A is guaranteed =
-to run
--#             where model B runs and the other way around.
--#
--# @superset: If model A is a superset of model B, model B is guaranteed =
-to run
--#            where model A runs. There are no guarantees about the other=
- way.
--#
--# @subset: If model A is a subset of model B, model A is guaranteed to r=
-un
--#          where model B runs. There are no guarantees about the other w=
-ay.
--#
--# Since: 2.8.0
--##
--{ 'enum': 'CpuModelCompareResult',
--  'data': [ 'incompatible', 'identical', 'superset', 'subset' ] }
--
- ##
- # @AddfdInfo:
- #
-diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
-index 31611191db..8dc82fde31 100644
---- a/qapi/qapi-schema.json
-+++ b/qapi/qapi-schema.json
-@@ -100,6 +100,7 @@
- { 'include': 'qom.json' }
- { 'include': 'qdev.json' }
- { 'include': 'machine.json' }
-+{ 'include': 'machine-target.json' }
- { 'include': 'misc.json' }
- { 'include': 'target.json' }
- { 'include': 'audio.json' }
-diff --git a/qapi/target.json b/qapi/target.json
-index 1d4d54b600..e0a73581d8 100644
---- a/qapi/target.json
-+++ b/qapi/target.json
-@@ -5,8 +5,6 @@
- # =3D Target-specific commands & events
- ##
-=20
--{ 'include': 'misc.json' }
--
- ##
- # @RTC_CHANGE:
- #
-@@ -228,130 +226,6 @@
-   'data': { 'filename': 'str' },
-   'if': 'defined(TARGET_S390X)' }
-=20
--##
--# @CpuModelBaselineInfo:
--#
--# The result of a CPU model baseline.
--#
--# @model: the baselined CpuModelInfo.
--#
--# Since: 2.8.0
--##
--{ 'struct': 'CpuModelBaselineInfo',
--  'data': { 'model': 'CpuModelInfo' },
--  'if': 'defined(TARGET_S390X)' }
--
--##
--# @CpuModelCompareInfo:
--#
--# The result of a CPU model comparison.
--#
--# @result: The result of the compare operation.
--# @responsible-properties: List of properties that led to the comparison=
- result
--#                          not being identical.
--#
--# @responsible-properties is a list of QOM property names that led to
--# both CPUs not being detected as identical. For identical models, this
--# list is empty.
--# If a QOM property is read-only, that means there's no known way to mak=
-e the
--# CPU models identical. If the special property name "type" is included,=
- the
--# models are by definition not identical and cannot be made identical.
--#
--# Since: 2.8.0
--##
--{ 'struct': 'CpuModelCompareInfo',
--  'data': { 'result': 'CpuModelCompareResult',
--            'responsible-properties': ['str'] },
--  'if': 'defined(TARGET_S390X)' }
--
--##
--# @query-cpu-model-comparison:
--#
--# Compares two CPU models, returning how they compare in a specific
--# configuration. The results indicates how both models compare regarding
--# runnability. This result can be used by tooling to make decisions if a
--# certain CPU model will run in a certain configuration or if a compatib=
-le
--# CPU model has to be created by baselining.
--#
--# Usually, a CPU model is compared against the maximum possible CPU mode=
-l
--# of a certain configuration (e.g. the "host" model for KVM). If that CP=
-U
--# model is identical or a subset, it will run in that configuration.
--#
--# The result returned by this command may be affected by:
--#
--# * QEMU version: CPU models may look different depending on the QEMU ve=
-rsion.
--#   (Except for CPU models reported as "static" in query-cpu-definitions=
-.)
--# * machine-type: CPU model may look different depending on the machine-=
-type.
--#   (Except for CPU models reported as "static" in query-cpu-definitions=
-.)
--# * machine options (including accelerator): in some architectures, CPU =
-models
--#   may look different depending on machine and accelerator options. (Ex=
-cept for
--#   CPU models reported as "static" in query-cpu-definitions.)
--# * "-cpu" arguments and global properties: arguments to the -cpu option=
- and
--#   global properties may affect expansion of CPU models. Using
--#   query-cpu-model-expansion while using these is not advised.
--#
--# Some architectures may not support comparing CPU models. s390x support=
-s
--# comparing CPU models.
--#
--# Returns: a CpuModelBaselineInfo. Returns an error if comparing CPU mod=
-els is
--#          not supported, if a model cannot be used, if a model contains
--#          an unknown cpu definition name, unknown properties or propert=
-ies
--#          with wrong types.
--#
--# Note: this command isn't specific to s390x, but is only implemented
--# on this architecture currently.
--#
--# Since: 2.8.0
--##
--{ 'command': 'query-cpu-model-comparison',
--  'data': { 'modela': 'CpuModelInfo', 'modelb': 'CpuModelInfo' },
--  'returns': 'CpuModelCompareInfo',
--  'if': 'defined(TARGET_S390X)' }
--
--##
--# @query-cpu-model-baseline:
--#
--# Baseline two CPU models, creating a compatible third model. The create=
-d
--# model will always be a static, migration-safe CPU model (see "static"
--# CPU model expansion for details).
--#
--# This interface can be used by tooling to create a compatible CPU model=
- out
--# two CPU models. The created CPU model will be identical to or a subset=
- of
--# both CPU models when comparing them. Therefore, the created CPU model =
-is
--# guaranteed to run where the given CPU models run.
--#
--# The result returned by this command may be affected by:
--#
--# * QEMU version: CPU models may look different depending on the QEMU ve=
-rsion.
--#   (Except for CPU models reported as "static" in query-cpu-definitions=
-.)
--# * machine-type: CPU model may look different depending on the machine-=
-type.
--#   (Except for CPU models reported as "static" in query-cpu-definitions=
-.)
--# * machine options (including accelerator): in some architectures, CPU =
-models
--#   may look different depending on machine and accelerator options. (Ex=
-cept for
--#   CPU models reported as "static" in query-cpu-definitions.)
--# * "-cpu" arguments and global properties: arguments to the -cpu option=
- and
--#   global properties may affect expansion of CPU models. Using
--#   query-cpu-model-expansion while using these is not advised.
--#
--# Some architectures may not support baselining CPU models. s390x suppor=
-ts
--# baselining CPU models.
--#
--# Returns: a CpuModelBaselineInfo. Returns an error if baselining CPU mo=
-dels is
--#          not supported, if a model cannot be used, if a model contains
--#          an unknown cpu definition name, unknown properties or propert=
-ies
--#          with wrong types.
--#
--# Note: this command isn't specific to s390x, but is only implemented
--# on this architecture currently.
--#
--# Since: 2.8.0
--##
--{ 'command': 'query-cpu-model-baseline',
--  'data': { 'modela': 'CpuModelInfo',
--            'modelb': 'CpuModelInfo' },
--  'returns': 'CpuModelBaselineInfo',
--  'if': 'defined(TARGET_S390X)' }
--
- ##
- # @GICCapability:
- #
-@@ -396,119 +270,3 @@
- ##
- { 'command': 'query-gic-capabilities', 'returns': ['GICCapability'],
-   'if': 'defined(TARGET_ARM)' }
--
--##
--# @CpuModelExpansionInfo:
--#
--# The result of a cpu model expansion.
--#
--# @model: the expanded CpuModelInfo.
--#
--# Since: 2.8.0
--##
--{ 'struct': 'CpuModelExpansionInfo',
--  'data': { 'model': 'CpuModelInfo' },
--  'if': 'defined(TARGET_S390X) || defined(TARGET_I386)' }
--
--##
--# @query-cpu-model-expansion:
--#
--# Expands a given CPU model (or a combination of CPU model + additional =
-options)
--# to different granularities, allowing tooling to get an understanding w=
-hat a
--# specific CPU model looks like in QEMU under a certain configuration.
--#
--# This interface can be used to query the "host" CPU model.
--#
--# The data returned by this command may be affected by:
--#
--# * QEMU version: CPU models may look different depending on the QEMU ve=
-rsion.
--#   (Except for CPU models reported as "static" in query-cpu-definitions=
-.)
--# * machine-type: CPU model  may look different depending on the machine=
--type.
--#   (Except for CPU models reported as "static" in query-cpu-definitions=
-.)
--# * machine options (including accelerator): in some architectures, CPU =
-models
--#   may look different depending on machine and accelerator options. (Ex=
-cept for
--#   CPU models reported as "static" in query-cpu-definitions.)
--# * "-cpu" arguments and global properties: arguments to the -cpu option=
- and
--#   global properties may affect expansion of CPU models. Using
--#   query-cpu-model-expansion while using these is not advised.
--#
--# Some architectures may not support all expansion types. s390x supports
--# "full" and "static".
--#
--# Returns: a CpuModelExpansionInfo. Returns an error if expanding CPU mo=
-dels is
--#          not supported, if the model cannot be expanded, if the model =
-contains
--#          an unknown CPU definition name, unknown properties or propert=
-ies
--#          with a wrong type. Also returns an error if an expansion type=
- is
--#          not supported.
--#
--# Since: 2.8.0
--##
--{ 'command': 'query-cpu-model-expansion',
--  'data': { 'type': 'CpuModelExpansionType',
--            'model': 'CpuModelInfo' },
--  'returns': 'CpuModelExpansionInfo',
--  'if': 'defined(TARGET_S390X) || defined(TARGET_I386)' }
--
--##
--# @CpuDefinitionInfo:
--#
--# Virtual CPU definition.
--#
--# @name: the name of the CPU definition
--#
--# @migration-safe: whether a CPU definition can be safely used for
--#                  migration in combination with a QEMU compatibility ma=
-chine
--#                  when migrating between different QEMU versions and be=
-tween
--#                  hosts with different sets of (hardware or software)
--#                  capabilities. If not provided, information is not ava=
-ilable
--#                  and callers should not assume the CPU definition to b=
-e
--#                  migration-safe. (since 2.8)
--#
--# @static: whether a CPU definition is static and will not change depend=
-ing on
--#          QEMU version, machine type, machine options and accelerator o=
-ptions.
--#          A static model is always migration-safe. (since 2.8)
--#
--# @unavailable-features: List of properties that prevent
--#                        the CPU model from running in the current
--#                        host. (since 2.8)
--# @typename: Type name that can be used as argument to @device-list-prop=
-erties,
--#            to introspect properties configurable using -cpu or -global=
-.
--#            (since 2.9)
--#
--# @unavailable-features is a list of QOM property names that
--# represent CPU model attributes that prevent the CPU from running.
--# If the QOM property is read-only, that means there's no known
--# way to make the CPU model run in the current host. Implementations
--# that choose not to provide specific information return the
--# property name "type".
--# If the property is read-write, it means that it MAY be possible
--# to run the CPU model in the current host if that property is
--# changed. Management software can use it as hints to suggest or
--# choose an alternative for the user, or just to generate meaningful
--# error messages explaining why the CPU model can't be used.
--# If @unavailable-features is an empty list, the CPU model is
--# runnable using the current host and machine-type.
--# If @unavailable-features is not present, runnability
--# information for the CPU is not available.
--#
--# Since: 1.2.0
--##
--{ 'struct': 'CpuDefinitionInfo',
--  'data': { 'name': 'str',
--            '*migration-safe': 'bool',
--            'static': 'bool',
--            '*unavailable-features': [ 'str' ],
--            'typename': 'str' },
--  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
-86) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
--
--##
--# @query-cpu-definitions:
--#
--# Return a list of supported virtual CPU definitions
--#
--# Returns: a list of CpuDefInfo
--#
--# Since: 1.2.0
--##
--{ 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'],
--  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
-86) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index df4276f5f6..7caea52561 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -21,7 +21,7 @@
- #include "sysemu/kvm.h"
- #include "fpu/softfloat.h"
- #include "qemu/range.h"
--#include "qapi/qapi-commands-target.h"
-+#include "qapi/qapi-commands-machine-target.h"
- #include "qapi/error.h"
- #include "qemu/guest-random.h"
-=20
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index cb50f05e7e..4051066079 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -43,7 +43,7 @@
- #include "qapi/visitor.h"
- #include "qom/qom-qobject.h"
- #include "sysemu/arch_init.h"
--#include "qapi/qapi-commands-target.h"
-+#include "qapi/qapi-commands-machine-target.h"
-=20
- #include "standard-headers/asm-x86/kvm_para.h"
-=20
-diff --git a/target/mips/helper.c b/target/mips/helper.c
-index 6e6a44292f..a2b6459b05 100644
---- a/target/mips/helper.c
-+++ b/target/mips/helper.c
-@@ -24,7 +24,7 @@
- #include "exec/cpu_ldst.h"
- #include "exec/log.h"
- #include "hw/mips/cpudevs.h"
--#include "qapi/qapi-commands-target.h"
-+#include "qapi/qapi-commands-machine-target.h"
-=20
- enum {
-     TLBRET_XI =3D -6,
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-index 03cb6d0521..86fc8f2e31 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -41,7 +41,7 @@
- #include "qemu/cutils.h"
- #include "disas/capstone.h"
- #include "fpu/softfloat.h"
--#include "qapi/qapi-commands-target.h"
-+#include "qapi/qapi-commands-machine-target.h"
-=20
- /* #define PPC_DUMP_CPU */
- /* #define PPC_DEBUG_SPR */
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 19ebde14db..2cb09c0780 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -28,7 +28,7 @@
- #include "sysemu/arch_init.h"
- #include "hw/pci/pci.h"
- #endif
--#include "qapi/qapi-commands-target.h"
-+#include "qapi/qapi-commands-machine-target.h"
-=20
- #define CPUDEF_INIT(_type, _gen, _ec_ga, _mha_pow, _hmfai, _name, _desc)=
- \
-     {                                                                   =
- \
+ void hmp_info_ramblock(Monitor *mon, const QDict *qdict)
+ {
+     ram_block_dump(mon);
 --=20
 2.21.0
 
