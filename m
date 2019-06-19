@@ -2,62 +2,103 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D19A9C31E5B
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:18:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0E34C31E5B
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:19:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA57821721
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:18:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA57821721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C3C5821721
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:19:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="uwm9ikb3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3C5821721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41254 helo=lists.gnu.org)
+Received: from localhost ([::1]:41258 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdg6j-0006aC-Rd
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 15:18:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47117)
+	id 1hdg7e-0007Fj-TP
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 15:19:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47366)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hdg3w-00058j-Rr
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:16:06 -0400
+ (envelope-from <lidong.chen@oracle.com>) id 1hdg4g-0005e2-8h
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:16:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hdg3m-0006YW-C7
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:15:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39394)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hdg3i-0006RH-Jx
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:15:52 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C2D0E30860B7;
- Wed, 19 Jun 2019 19:15:48 +0000 (UTC)
-Received: from localhost (ovpn-116-76.gru2.redhat.com [10.97.116.76])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 504C76013D;
- Wed, 19 Jun 2019 19:15:48 +0000 (UTC)
-Date: Wed, 19 Jun 2019 16:15:46 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Like Xu <like.xu@linux.intel.com>
-Message-ID: <20190619191546.GD26409@habkost.net>
-References: <20190612084104.34984-1-like.xu@linux.intel.com>
- <20190612084104.34984-8-like.xu@linux.intel.com>
+ (envelope-from <lidong.chen@oracle.com>) id 1hdg4d-0007pl-B7
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:16:48 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:56590)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lidong.chen@oracle.com>)
+ id 1hdg4Y-0007Yb-Bq
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:16:44 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JJ8Zgl065645;
+ Wed, 19 Jun 2019 19:16:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : in-reply-to :
+ references : mime-version : content-type : content-transfer-encoding;
+ s=corp-2018-07-02; bh=+hIm15QIKJ+xsbaM2NNF5KWvBzjkV3dP0Rtjy3b/758=;
+ b=uwm9ikb3U2o9TQQUajKxk8CoIOHlOCRYlHUDokJ7o6+mV1cMnn5+ah1KKd+ACcV2Sg4r
+ 4Xn0Jr/KBE8gMaEHspT8+XKOij7qdYry52nYAKYXMT1JFSOdyllCF3OPn7W4qPAyPJmj
+ fDVUyCVTiF8auUlH62msZQbzjxYTVOm5HjdCTYtHwI/bvFwSgDZxQGCmB5LcoYfo6ZFl
+ 6rhm5LrzNgg85pz7g9QXM9Ua3RcxklwcWLIQasmdSmaSW3eIeWPkjI7VdkVs7RIJOxzh
+ QSucyVCBaTmKQHt20iTvqUMKS3F4C2+i57rlArK3EEjc82o7eoKNWU068fdRa3bLYgVl oQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2130.oracle.com with ESMTP id 2t7809d9f1-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 19 Jun 2019 19:16:30 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JJFEpf094589;
+ Wed, 19 Jun 2019 19:16:29 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by aserp3030.oracle.com with ESMTP id 2t7rdwtkvr-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 19 Jun 2019 19:16:29 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5JJGTbT008847;
+ Wed, 19 Jun 2019 19:16:29 GMT
+Received: from ca-virt2-2.us.oracle.com (/10.211.11.112)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Wed, 19 Jun 2019 12:16:28 -0700
+From: Lidong Chen <lidong.chen@oracle.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 19 Jun 2019 15:14:47 -0400
+Message-Id: <ded30967982811617ce7f0222d11228130c198b7.1560806687.git.lidong.chen@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <cover.1560806687.git.lidong.chen@oracle.com>
+References: <cover.1560806687.git.lidong.chen@oracle.com>
+In-Reply-To: <cover.1560806687.git.lidong.chen@oracle.com>
+References: <cover.1560806687.git.lidong.chen@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190612084104.34984-8-like.xu@linux.intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Wed, 19 Jun 2019 19:15:48 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 7/9] target/i386: Support multi-dies
- when host doesn't support CPUID.1F
+Content-Type: text/plain; charset=UTF-8
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906190157
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906190157
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by userp2130.oracle.com id
+ x5JJ8Zgl065645
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.86
+Subject: [Qemu-devel] [Qemu-devel PATCH v3 2/2] util/main-loop: Fix
+ incorrect assertion
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,91 +110,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: peter.maydell@linaro.org, berrange@redhat.com, liq3ea@gmail.com,
+ f4bug@amsat.org, armbru@redhat.com, lidong.chen@oracle.com,
+ darren.kenny@oracle.com, liran.alon@oracle.com, marcandre.lureau@gmail.com,
+ amarkovic@wavecomp.com, pbonzini@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 12, 2019 at 04:41:02PM +0800, Like Xu wrote:
-> In guest CPUID generation process, the cpuid_min_level would be adjusted to
-> the maximum passed value for basic CPUID configuration and it should not be
-> restricted by the limited value returned from cpu_x86_cpuid(). After the basic
-> cpu_x86_cpuid() loop is finished, the cpuid_0_entry.eax needs to be configured
-> again by the last adjusted cpuid_min_level value.
-> 
-> If a user wants to expose CPUID.1F by passing dies > 1 for any reason without
-> host support, a per-cpu smp topology warning will appear but it's not blocked.
-> 
-> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+The check for poll_fds in g_assert() was incorrect. The correct assertion
+should check "n_poll_fds + w->num <=3D ARRAY_SIZE(poll_fds)" because the
+subsequent for-loop is doing access to poll_fds[n_poll_fds + i] where i
+is in [0, w->num).
 
-This code doesn't look at host CPUID at all, as far as I can see.
-Isn't it simpler to just make cpuid_x86_cpuid() return the
-correct data?
+Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Suggested-by: Liam Merwick <liam.merwick@oracle.com>
+Reviewed-by: Liran Alon <liran.alon@oracle.com>
+Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ util/main-loop.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> ---
->  target/i386/kvm.c | 24 ++++++++++++++++++++++--
->  1 file changed, 22 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 9b4da9b265..8bf1604d2b 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -931,12 +931,12 @@ int kvm_arch_init_vcpu(CPUState *cs)
->      struct kvm_cpuid_entry2 *c;
->      uint32_t signature[3];
->      int kvm_base = KVM_CPUID_SIGNATURE;
-> -    int r;
-> +    int r, cpuid_0_entry, cpuid_min_level;
->      Error *local_err = NULL;
->  
->      memset(&cpuid_data, 0, sizeof(cpuid_data));
->  
-> -    cpuid_i = 0;
-> +    cpuid_i = cpuid_0_entry = cpuid_min_level = 0;
->  
->      r = kvm_arch_set_tsc_khz(cs);
->      if (r < 0) {
-> @@ -1050,6 +1050,12 @@ int kvm_arch_init_vcpu(CPUState *cs)
->  
->      cpu_x86_cpuid(env, 0, 0, &limit, &unused, &unused, &unused);
->  
-> +    /* Allow 0x1f setting regardless of kvm support if nr_dies > 1 */
-> +    if (limit < 0x1f && env->nr_dies > 1 && cpu->enable_cpuid_0x1f) {
-> +        limit = env->cpuid_level = env->cpuid_min_level = 0x1f;
-> +        warn_report("CPU topology: the CPUID.1F isn't supported on the host.");
-> +    }
-> +
->      for (i = 0; i <= limit; i++) {
->          if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
->              fprintf(stderr, "unsupported level value: 0x%x\n", limit);
-> @@ -1151,8 +1157,22 @@ int kvm_arch_init_vcpu(CPUState *cs)
->              cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->edx);
->              break;
->          }
-> +
-> +        /* Remember the index of cpuid.0 leaf for reconfiguration. */
-> +        cpuid_0_entry = (i == 0) ? (cpuid_i - 1) : cpuid_0_entry;
-> +
-> +        /* Adjust cpuid_min_level to the maximum index of valid basic cpuids. */
-> +        cpuid_min_level =
-> +                ((c->eax | c->ebx | c->ecx | c->edx | c->flags | c->index) &&
-> +                                (i > cpuid_min_level)) ? i : cpuid_min_level;
->      }
->  
-> +    env->cpuid_level = env->cpuid_min_level = cpuid_min_level;
-> +
-> +    /* Reconfigure cpuid_0_eax value to follow CPUID.0 instruction spec.*/
-> +    c = &cpuid_data.entries[cpuid_0_entry];
-> +    cpu_x86_cpuid(env, 0, 0, &c->eax, &c->ebx, &c->ecx, &c->edx);
-> +
->      if (limit >= 0x0a) {
->          uint32_t eax, edx;
->  
-> -- 
-> 2.21.0
-> 
+diff --git a/util/main-loop.c b/util/main-loop.c
+index e1e349c..a9f4e8d 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -422,7 +422,7 @@ static int os_host_main_loop_wait(int64_t timeout)
+     g_main_context_prepare(context, &max_priority);
+     n_poll_fds =3D g_main_context_query(context, max_priority, &poll_tim=
+eout,
+                                       poll_fds, ARRAY_SIZE(poll_fds));
+-    g_assert(n_poll_fds <=3D ARRAY_SIZE(poll_fds));
++    g_assert(n_poll_fds + w->num <=3D ARRAY_SIZE(poll_fds));
+=20
+     for (i =3D 0; i < w->num; i++) {
+         poll_fds[n_poll_fds + i].fd =3D (DWORD_PTR)w->events[i];
+--=20
+1.8.3.1
 
--- 
-Eduardo
 
