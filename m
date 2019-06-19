@@ -2,96 +2,87 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9471C31E5B
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:42:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7C0EC31E5B
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:42:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 818C0214AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:42:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 818C0214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 983CC214AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:42:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oIcWnkm+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 983CC214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41418 helo=lists.gnu.org)
+Received: from localhost ([::1]:41420 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdgTH-0007CF-9f
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 15:42:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53779)
+	id 1hdgTZ-0007p4-M4
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 15:42:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53859)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hdgRL-0005la-JZ
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:40:16 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hdgRV-0005ys-BW
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:40:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hdgRK-0008Js-By
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:40:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41292)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hdgRH-0008HP-J7; Wed, 19 Jun 2019 15:40:11 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 363AB301EA90;
- Wed, 19 Jun 2019 19:40:10 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-116-121.ams2.redhat.com
- [10.36.116.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C1A9E19C71;
- Wed, 19 Jun 2019 19:40:08 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20190612220839.1374-1-mreitz@redhat.com>
- <20190612220839.1374-2-mreitz@redhat.com>
- <b110b753-8546-0d34-f6ef-06c5726766ce@virtuozzo.com>
- <c1fbf12a-77af-d939-4266-67b822e5a923@redhat.com>
- <57ae7f82-ae02-a382-74f6-cb96672b2058@virtuozzo.com>
- <00cce102-a1f1-9205-6eb7-1e48d8991b00@redhat.com>
- <32adc55c-c71d-59bf-963b-48d2ae5b3e30@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <309c0932-a9b4-40a6-8db2-7940171f52e5@redhat.com>
-Date: Wed, 19 Jun 2019 21:40:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <alex.bennee@linaro.org>) id 1hdgRU-0008Ra-7E
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:40:25 -0400
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:44734)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hdgRT-0008Qi-Tc
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:40:24 -0400
+Received: by mail-wr1-x435.google.com with SMTP id r16so459032wrl.11
+ for <qemu-devel@nongnu.org>; Wed, 19 Jun 2019 12:40:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=bEp1SSgo0ytv7hyYNYxrIJVJbY4Oc223+ftTbWURO6A=;
+ b=oIcWnkm+q+s6YPzVqYrZX6hrw0I0YRq+p3oMLJO3AtzKI8JviQdm32mM52GXIp44TT
+ hXlmpelyOZ90zG/pBTFsMCkLXihAkY5RR9igT9bc7ab6VhdhIHdlOOaDhb0hyZsOuxVP
+ e5CjpJuM+cu/PaZkCpKjP52bMqeeMxIty58/7w+ZSIcevVjxdVCm+2ialAlqWEQMQxdc
+ Y8zXYsu8hAeI0/iF3g1sb6nvGeX+IGOxC2hdlopG/pL0aL2zyOXK1WE3olIQBun6g0GV
+ CFeCCt5tg3WuIahiRwSrufURUkSo6ReSNMdICxmwP1ZwybES9DxiCDlYYINqtOZ+BAgM
+ HH5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=bEp1SSgo0ytv7hyYNYxrIJVJbY4Oc223+ftTbWURO6A=;
+ b=lPGWoKXPI2axoATjpeYk4auToQh0x7fpX8Xa0MWa8sOqEZFR92d01gFSqdTX2rh/Gq
+ 82Dv23NYOO8Zn9vKE2mUkDIoHOrFHTYTj3zefLkpx/K7GY5QXdBz3o4tfUc9tFFynltq
+ vl68574N5nkmtYYelfHDbwcpbZi5e89faqDsxFRKp0SlnKmAOivKXhNxQ0IKpJsUrcbM
+ JslrAkcAw0owjajDlWEKDGb6pUGLZnTTfFl0YRogAeuxe8zQ9lxVwzGjs1UbOEQQRfV5
+ klrGf/iDkBlRwvkLFZIgZl3Q6vgYmTDe1KdBp7Y8dMXrcXRDZc9Fj5R69gc+44aoI1cW
+ 0ulA==
+X-Gm-Message-State: APjAAAXY9JiUZ8i+rgv/x9usLd3KY8J+Ij0kw4gZXhcmoPAUjDNV4OVf
+ gTo/dGL7c0ikEH1bPNsggUCZxw==
+X-Google-Smtp-Source: APXvYqwE1wkztCLBnYZcX+WsX8/fM8dU4394tp1sN5p+aLoo1Upgn/cuVhy0mPokMz6JltzdNLdhbw==
+X-Received: by 2002:adf:ea88:: with SMTP id s8mr70983275wrm.68.1560973222513; 
+ Wed, 19 Jun 2019 12:40:22 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id h23sm1592640wmb.46.2019.06.19.12.40.21
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 19 Jun 2019 12:40:21 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 74D291FF87;
+ Wed, 19 Jun 2019 20:40:21 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Wed, 19 Jun 2019 20:40:04 +0100
+Message-Id: <20190619194021.8240-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <32adc55c-c71d-59bf-963b-48d2ae5b3e30@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="BYIGlNaa67BThJz2eQtvTxpzr05cFRI9S"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Wed, 19 Jun 2019 19:40:10 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] vl: Drain before (block) job cancel
- when quitting
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::435
+Subject: [Qemu-devel] [PATCH  v1 00/17] testing/next (Travis fixes,
+ more tests/vm)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,163 +94,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Denis Plotnikov <dplotnikov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BYIGlNaa67BThJz2eQtvTxpzr05cFRI9S
-Content-Type: multipart/mixed; boundary="TcI4NUSvh7jQrYDOZx4OOsXlUGO5JLKIZ";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: Qemu-block <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Denis Plotnikov <dplotnikov@virtuozzo.com>
-Message-ID: <309c0932-a9b4-40a6-8db2-7940171f52e5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] vl: Drain before (block) job cancel when
- quitting
-References: <20190612220839.1374-1-mreitz@redhat.com>
- <20190612220839.1374-2-mreitz@redhat.com>
- <b110b753-8546-0d34-f6ef-06c5726766ce@virtuozzo.com>
- <c1fbf12a-77af-d939-4266-67b822e5a923@redhat.com>
- <57ae7f82-ae02-a382-74f6-cb96672b2058@virtuozzo.com>
- <00cce102-a1f1-9205-6eb7-1e48d8991b00@redhat.com>
- <32adc55c-c71d-59bf-963b-48d2ae5b3e30@virtuozzo.com>
-In-Reply-To: <32adc55c-c71d-59bf-963b-48d2ae5b3e30@virtuozzo.com>
+Hi,
 
---TcI4NUSvh7jQrYDOZx4OOsXlUGO5JLKIZ
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+This is the current state of testing/next which has fixes for the
+MacOS Travis failures. We also have the return of the bsd-over-serial
+autosetup patches which I've tested on the previously failing
+platform. The one thing I've not included is adding check-block to the
+default set of check tests. The blocker for that is it still bails on
+some iotests when the source tree filesystem (e.g. ZFS) doesn't
+support features it needs for some tests. It seems that they should
+skip a bit more gracefully:
 
-On 14.06.19 11:22, Vladimir Sementsov-Ogievskiy wrote:
-> 13.06.2019 19:03, Max Reitz wrote:
->> [re-adding the original CCs, why not]
->>
->> On 13.06.19 16:30, Vladimir Sementsov-Ogievskiy wrote:
->>> 13.06.2019 17:21, Max Reitz wrote:
->>>> On 13.06.19 16:19, Vladimir Sementsov-Ogievskiy wrote:
->>>>> 13.06.2019 1:08, Max Reitz wrote:
->>>>>> If the main loop cancels all block jobs while the block layer is n=
-ot
->>>>>> drained, this cancelling may not happen instantaneously.  We can s=
-tart a
->>>>>> drained section before vm_shutdown(), which entails another
->>>>>> bdrv_drain_all(); this nested bdrv_drain_all() will thus be a no-o=
-p,
->>>>>> basically.
->>>>>>
->>>>>> We do not have to end the drained section, because we actually do =
-not
->>>>>> want any requests to happen from this point on.
->>>>>>
->>>>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
->>>>>> ---
->>>>>> I don't know whether it actually makes sense to never end this dra=
-ined
->>>>>> section.  It makes sense to me.  Please correct me if I'm wrong.
->>>>>> ---
->>>>>>     vl.c | 11 +++++++++++
->>>>>>     1 file changed, 11 insertions(+)
->>>>>>
->>>>>> diff --git a/vl.c b/vl.c
->>>>>> index cd1fbc4cdc..3f8b3f74f5 100644
->>>>>> --- a/vl.c
->>>>>> +++ b/vl.c
->>>>>> @@ -4538,6 +4538,17 @@ int main(int argc, char **argv, char **envp=
-)
->>>>>>          */
->>>>>>         migration_shutdown();
->>>>>>    =20
->>>>>> +    /*
->>>>>> +     * We must cancel all block jobs while the block layer is dra=
-ined,
->>>>>> +     * or cancelling will be affected by throttling and thus may =
-block
->>>>>> +     * for an extended period of time.
->>>>>> +     * vm_shutdown() will bdrv_drain_all(), so we may as well inc=
-lude
->>>>>> +     * it in the drained section.
->>>>>> +     * We do not need to end this section, because we do not want=
- any
->>>>>> +     * requests happening from here on anyway.
->>>>>> +     */
->>>>>> +    bdrv_drain_all_begin();
->>>>>> +
->>>>>>         /* No more vcpu or device emulation activity beyond this p=
-oint */
->>>>>>         vm_shutdown();
->>>>>>    =20
->>>>>>
->>>>>
->>>>> So, actually, the problem is that we may wait for job requests twic=
-e:
->>>>> on drain and then on cancel.
->>>>
->>>> We don=E2=80=99t wait on drain.  When the throttle node is drained, =
-it will
->>>> ignore throttling (as noted in the cover letter).
->>>>
->>>> We do wait when cancelling a job while the throttle node isn=E2=80=99=
-t drained,
->>>> though.  That=E2=80=99s the problem.
->>>
->>> Ah, understand now.
->>>
->>> Is it safe to drain_begin before stopping cpus? We may finish up then=
- with some queued
->>> somewhere IO requests..
->>
->> Hm...  Aren=E2=80=99t guest devices prohibited from issuing requests t=
-o the
->> block layer while their respective block device is drained?
->=20
-> It's at least a buggy place, I remember Denis Plotnikov sent patch to f=
-ix it and had a huge
-> discussion with Kevin.
-> And here it is:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg00732.html
+  Not run: 045 059 064 070 075 077 078 081 084 088 092 094 101 106 113 116 119 123 128 131 146 148 160 162 171 175 211 212 213 221 225 231 233 237 239 241 253
+  Some cases not run in: 139
+  Failures: 102 243 250
+  Failed 3 of 138 tests
 
-Ah, I even have that in my inbox...  The latest reply I see came in April=
-:
+I'll try and send the PR for this out by the end of the week.
 
-https://lists.nongnu.org/archive/html/qemu-block/2019-04/msg00243.html
+The following patches need review
+ patch 0014/tests vm fedora autoinstall using serial console.patch
+ patch 0016/.travis.yml default the disable system build to s.patch
+ patch 0017/.travis.yml force a brew update for MacOS builds.patch
 
-Where Kevin asked for an RFC patch in the current state.
+Alex Bennée (2):
+  .travis.yml: default the --disable-system build to --static
+  .travis.yml: force a brew update for MacOS builds
 
-I=E2=80=99m not sure whether I should work around a potential bug here, i=
-f we
-can agree that it is a bug, and if it isn=E2=80=99t clear whether this pl=
-ace
-would actually be affected.
+Cleber Rosa (4):
+  tests/vm: avoid extra compressed image copy
+  tests/vm: avoid image presence check and removal
+  tests/vm: pin ubuntu.i386 image
+  tests/vm: add source repos on ubuntu.i386
 
-Max
+Gerd Hoffmann (11):
+  tests/vm: send proxy environment variables over ssh
+  tests/vm: use ssh with pty unconditionally
+  tests/vm: run test builds on snapshot
+  tests/vm: proper guest shutdown
+  tests/vm: add vm-boot-{ssh,serial}-<guest> targets
+  tests/vm: serial console support helpers
+  tests/vm: openbsd autoinstall, using serial console
+  tests/vm: freebsd autoinstall, using serial console
+  tests/vm: netbsd autoinstall, using serial console
+  tests/vm: fedora autoinstall, using serial console
+  tests/vm: ubuntu.i386: apt proxy setup
 
+ .travis.yml               |   3 +-
+ tests/vm/Makefile.include |  23 ++++-
+ tests/vm/basevm.py        | 135 +++++++++++++++++++++++----
+ tests/vm/centos           |   6 +-
+ tests/vm/fedora           | 189 ++++++++++++++++++++++++++++++++++++++
+ tests/vm/freebsd          | 180 ++++++++++++++++++++++++++++++++++--
+ tests/vm/netbsd           | 187 +++++++++++++++++++++++++++++++++++--
+ tests/vm/openbsd          | 159 +++++++++++++++++++++++++++++---
+ tests/vm/ubuntu.i386      |  11 ++-
+ 9 files changed, 833 insertions(+), 60 deletions(-)
+ create mode 100755 tests/vm/fedora
 
---TcI4NUSvh7jQrYDOZx4OOsXlUGO5JLKIZ--
+-- 
+2.20.1
 
---BYIGlNaa67BThJz2eQtvTxpzr05cFRI9S
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0Kj5cACgkQ9AfbAGHV
-z0DZEQf9HtoGDkyrHdM5Ql6zcLNzV58uxCPtUKv4dfKQ+k4fxO8E4NAX8pBtFhu+
-rMK59gkcYNLgUKw7SisdEdjig1TePCndljv1GQiOUwwZ5/jwtvVuBCWVCpqaAA0m
-MxD0Byp8HXCM7JrDozdO6VzC6zI9J3utK+cI7zBen82o4fKqa5q62UDn2K2jNuQB
-p5C0RiSwG+KJIXgt+YYd86KK6yuRMIVoNKoaZS5LGwaOW26Oe8Ho0j635R26eMo8
-wSyvo+2zAEGbDRFV1BgSNmoJGyYk4OqJxjcP/g3uR7mLhgvHmDC2H/SXZG+srTd0
-EeCFfB2mq0gLli5EGHTNvWjDOTAUOQ==
-=+n3J
------END PGP SIGNATURE-----
-
---BYIGlNaa67BThJz2eQtvTxpzr05cFRI9S--
 
