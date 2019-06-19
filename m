@@ -2,65 +2,58 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BBEDC31E49
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 09:55:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99912C31E49
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 09:56:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E2A720B1F
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 09:55:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="KNzcc9/b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E2A720B1F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 7191C20B1F
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 09:56:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7191C20B1F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36372 helo=lists.gnu.org)
+Received: from localhost ([::1]:36374 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdXJV-00047x-Ld
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 05:55:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43326)
+	id 1hdXJv-0004w7-OF
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 05:55:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43861)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hdXDs-0006CE-SZ
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 05:49:46 -0400
+ (envelope-from <pagupta@redhat.com>) id 1hdXFI-0007Nr-Du
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 05:51:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hdXDr-0000hg-Dh
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 05:49:44 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:33593 helo=ozlabs.org)
+ (envelope-from <pagupta@redhat.com>) id 1hdXFG-0002Fz-F7
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 05:51:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59854)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hdXDr-0000Xf-01; Wed, 19 Jun 2019 05:49:43 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 45TKt05QwCz9s7h; Wed, 19 Jun 2019 19:49:28 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1560937768;
- bh=091szy3YTEOWx2me8L+dqFWhkifzv09Zn4H0MaWf34M=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=KNzcc9/b/7UT7K3XHVL/VOazo0bXPYEc9yC2euYoB7QarMGbov1yaoFm/cyj5EPb2
- tg7OAQNJkyUOr/x04WXUYoJC6ffh47Nx+q0/xlLwQN2QzPWaAP9ZO6V3LBYeSUAPNt
- hVWfus1Cm+fZJ/mWbtbeAfGzcp3WJZ6pMktWieQw=
-Date: Wed, 19 Jun 2019 19:39:24 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Message-ID: <20190619093924.GD22560@umbus.BigPond>
-References: <20190614171200.21078-1-alex.bennee@linaro.org>
- <20190614171200.21078-28-alex.bennee@linaro.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="KdquIMZPjGJQvRdI"
-Content-Disposition: inline
-In-Reply-To: <20190614171200.21078-28-alex.bennee@linaro.org>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [PATCH v3 27/50] target/ppc: fetch code with
- translator_ld
+ (Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hdXFG-0002E7-3I
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 05:51:10 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3CAB720264;
+ Wed, 19 Jun 2019 09:51:09 +0000 (UTC)
+Received: from dhcp201-121.englab.pnq.redhat.com (ovpn-116-148.sin2.redhat.com
+ [10.67.116.148])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 442A410190A8;
+ Wed, 19 Jun 2019 09:50:50 +0000 (UTC)
+From: Pankaj Gupta <pagupta@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 19 Jun 2019 15:19:04 +0530
+Message-Id: <20190619094907.10131-5-pagupta@redhat.com>
+In-Reply-To: <20190619094907.10131-1-pagupta@redhat.com>
+References: <20190619094907.10131-1-pagupta@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Wed, 19 Jun 2019 09:51:09 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2 4/7] virtio-pci: Proxy for virtio-pmem
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,75 +65,245 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Emilio G. Cota" <cota@braap.org>,
- "open list:PowerPC TCG CPUs" <qemu-ppc@nongnu.org>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, aarcange@redhat.com, cohuck@redhat.com,
+ xiaoguangrong.eric@gmail.com, mst@redhat.com, pagupta@redhat.com,
+ riel@surriel.com, david@redhat.com, armbru@redhat.com, ehabkost@redhat.com,
+ lcapitulino@redhat.com, stefanha@redhat.com, pbonzini@redhat.com,
+ imammedo@redhat.com, dan.j.williams@intel.com, nilal@redhat.com,
+ dgilbert@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+We need a proxy device for virtio-pmem, and this device has to be the
+actual memory device so we can cleanly hotplug it.
 
---KdquIMZPjGJQvRdI
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Forward memory device class functions either to the actual device or use
+properties of the virtio-pmem device to implement these in the proxy.
 
-On Fri, Jun 14, 2019 at 06:11:37PM +0100, Alex Benn=E9e wrote:
-> From: "Emilio G. Cota" <cota@braap.org>
->=20
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
+virtio-pmem will only be compiled for selected, supported architectures
+(that can deal with virtio/pci devices being memory devices). An
+architecture that is prepared for that can simply enable
+CONFIG_VIRTIO_PMEM to make it work.
 
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+As not all architectures support memory devices (and CONFIG_VIRTIO_PMEM
+will be enabled per supported architecture), we have to move the PCI proxy
+to a separate file.
 
-> ---
->  target/ppc/translate.c | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
->=20
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index 4a5de28036..a27b5659f4 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -7864,11 +7864,9 @@ static void ppc_tr_translate_insn(DisasContextBase=
- *dcbase, CPUState *cs)
->      LOG_DISAS("nip=3D" TARGET_FMT_lx " super=3D%d ir=3D%d\n",
->                ctx->base.pc_next, ctx->mem_idx, (int)msr_ir);
-> =20
-> -    if (unlikely(need_byteswap(ctx))) {
-> -        ctx->opcode =3D bswap32(cpu_ldl_code(env, ctx->base.pc_next));
-> -    } else {
-> -        ctx->opcode =3D cpu_ldl_code(env, ctx->base.pc_next);
-> -    }
-> +    ctx->opcode =3D translator_ldl_swap(env, ctx->base.pc_next,
-> +                                      need_byteswap(ctx));
-> +
->      LOG_DISAS("translate opcode %08x (%02x %02x %02x %02x) (%s)\n",
->                ctx->opcode, opc1(ctx->opcode), opc2(ctx->opcode),
->                opc3(ctx->opcode), opc4(ctx->opcode),
+Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+[ split up patches, memory-device changes, move pci proxy]
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/virtio/Makefile.objs     |   1 +
+ hw/virtio/virtio-pmem-pci.c | 131 ++++++++++++++++++++++++++++++++++++++++++++
+ hw/virtio/virtio-pmem-pci.h |  34 ++++++++++++
+ include/hw/pci/pci.h        |   1 +
+ 4 files changed, 167 insertions(+)
+ create mode 100644 hw/virtio/virtio-pmem-pci.c
+ create mode 100644 hw/virtio/virtio-pmem-pci.h
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+index 5857e3b8e1..964ce78607 100644
+--- a/hw/virtio/Makefile.objs
++++ b/hw/virtio/Makefile.objs
+@@ -13,6 +13,7 @@ obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon.o
+ obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-crypto.o
+ obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) += virtio-crypto-pci.o
+ obj-$(CONFIG_VIRTIO_PMEM) += virtio-pmem.o
++common-obj-$(call land,$(CONFIG_VIRTIO_PMEM),$(CONFIG_VIRTIO_PCI)) += virtio-pmem-pci.o
+ obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
+ 
+ ifeq ($(CONFIG_VIRTIO_PCI),y)
+diff --git a/hw/virtio/virtio-pmem-pci.c b/hw/virtio/virtio-pmem-pci.c
+new file mode 100644
+index 0000000000..8b2d0dbccc
+--- /dev/null
++++ b/hw/virtio/virtio-pmem-pci.c
+@@ -0,0 +1,131 @@
++/*
++ * Virtio PMEM PCI device
++ *
++ * Copyright (C) 2018-2019 Red Hat, Inc.
++ *
++ * Authors:
++ *  Pankaj Gupta <pagupta@redhat.com>
++ *  David Hildenbrand <david@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++
++#include "virtio-pmem-pci.h"
++#include "hw/mem/memory-device.h"
++#include "qapi/error.h"
++
++static void virtio_pmem_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
++{
++    VirtIOPMEMPCI *pmem_pci = VIRTIO_PMEM_PCI(vpci_dev);
++    DeviceState *vdev = DEVICE(&pmem_pci->vdev);
++
++    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
++    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
++}
++
++static void virtio_pmem_pci_set_addr(MemoryDeviceState *md, uint64_t addr,
++                                     Error **errp)
++{
++    object_property_set_uint(OBJECT(md), addr, VIRTIO_PMEM_ADDR_PROP, errp);
++}
++
++static uint64_t virtio_pmem_pci_get_addr(const MemoryDeviceState *md)
++{
++    return object_property_get_uint(OBJECT(md), VIRTIO_PMEM_ADDR_PROP,
++                                    &error_abort);
++}
++
++static MemoryRegion *virtio_pmem_pci_get_memory_region(MemoryDeviceState *md,
++                                                       Error **errp)
++{
++    VirtIOPMEMPCI *pci_pmem = VIRTIO_PMEM_PCI(md);
++    VirtIOPMEM *pmem = VIRTIO_PMEM(&pci_pmem->vdev);
++    VirtIOPMEMClass *vpc = VIRTIO_PMEM_GET_CLASS(pmem);
++
++    return vpc->get_memory_region(pmem, errp);
++}
++
++static uint64_t virtio_pmem_pci_get_plugged_size(const MemoryDeviceState *md,
++                                                 Error **errp)
++{
++    VirtIOPMEMPCI *pci_pmem = VIRTIO_PMEM_PCI(md);
++    VirtIOPMEM *pmem = VIRTIO_PMEM(&pci_pmem->vdev);
++    VirtIOPMEMClass *vpc = VIRTIO_PMEM_GET_CLASS(pmem);
++    MemoryRegion *mr = vpc->get_memory_region(pmem, errp);
++
++    /* the plugged size corresponds to the region size */
++    return mr ? 0 : memory_region_size(mr);
++}
++
++static void virtio_pmem_pci_fill_device_info(const MemoryDeviceState *md,
++                                             MemoryDeviceInfo *info)
++{
++    VirtioPMEMDeviceInfo *vi = g_new0(VirtioPMEMDeviceInfo, 1);
++    VirtIOPMEMPCI *pci_pmem = VIRTIO_PMEM_PCI(md);
++    VirtIOPMEM *pmem = VIRTIO_PMEM(&pci_pmem->vdev);
++    VirtIOPMEMClass *vpc = VIRTIO_PMEM_GET_CLASS(pmem);
++    DeviceState *dev = DEVICE(md);
++
++    if (dev->id) {
++        vi->has_id = true;
++        vi->id = g_strdup(dev->id);
++    }
++
++    /* let the real device handle everything else */
++    vpc->fill_device_info(pmem, vi);
++
++    info->u.virtio_pmem.data = vi;
++    info->type = MEMORY_DEVICE_INFO_KIND_VIRTIO_PMEM;
++}
++
++static void virtio_pmem_pci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
++    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
++    MemoryDeviceClass *mdc = MEMORY_DEVICE_CLASS(klass);
++
++    k->realize = virtio_pmem_pci_realize;
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
++    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
++    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_PMEM;
++    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
++    pcidev_k->class_id = PCI_CLASS_OTHERS;
++
++    mdc->get_addr = virtio_pmem_pci_get_addr;
++    mdc->set_addr = virtio_pmem_pci_set_addr;
++    mdc->get_plugged_size = virtio_pmem_pci_get_plugged_size;
++    mdc->get_memory_region = virtio_pmem_pci_get_memory_region;
++    mdc->fill_device_info = virtio_pmem_pci_fill_device_info;
++}
++
++static void virtio_pmem_pci_instance_init(Object *obj)
++{
++    VirtIOPMEMPCI *dev = VIRTIO_PMEM_PCI(obj);
++
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VIRTIO_PMEM);
++}
++
++static const VirtioPCIDeviceTypeInfo virtio_pmem_pci_info = {
++    .base_name             = TYPE_VIRTIO_PMEM_PCI,
++    .generic_name          = "virtio-pmem-pci",
++    .transitional_name     = "virtio-pmem-pci-transitional",
++    .non_transitional_name = "virtio-pmem-pci-non-transitional",
++    .instance_size = sizeof(VirtIOPMEMPCI),
++    .instance_init = virtio_pmem_pci_instance_init,
++    .class_init    = virtio_pmem_pci_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_MEMORY_DEVICE },
++        { }
++    },
++};
++
++static void virtio_pmem_pci_register_types(void)
++{
++    virtio_pci_types_register(&virtio_pmem_pci_info);
++}
++type_init(virtio_pmem_pci_register_types)
+diff --git a/hw/virtio/virtio-pmem-pci.h b/hw/virtio/virtio-pmem-pci.h
+new file mode 100644
+index 0000000000..616abef093
+--- /dev/null
++++ b/hw/virtio/virtio-pmem-pci.h
+@@ -0,0 +1,34 @@
++/*
++ * Virtio PMEM PCI device
++ *
++ * Copyright (C) 2018-2019 Red Hat, Inc.
++ *
++ * Authors:
++ *  Pankaj Gupta <pagupta@redhat.com>
++ *  David Hildenbrand <david@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef QEMU_VIRTIO_PMEM_PCI_H
++#define QEMU_VIRTIO_PMEM_PCI_H
++
++#include "hw/virtio/virtio-pci.h"
++#include "hw/virtio/virtio-pmem.h"
++
++typedef struct VirtIOPMEMPCI VirtIOPMEMPCI;
++
++/*
++ * virtio-pmem-pci: This extends VirtioPCIProxy.
++ */
++#define TYPE_VIRTIO_PMEM_PCI "virtio-pmem-pci-base"
++#define VIRTIO_PMEM_PCI(obj) \
++        OBJECT_CHECK(VirtIOPMEMPCI, (obj), TYPE_VIRTIO_PMEM_PCI)
++
++struct VirtIOPMEMPCI {
++    VirtIOPCIProxy parent_obj;
++    VirtIOPMEM vdev;
++};
++
++#endif /* QEMU_VIRTIO_PMEM_PCI_H */
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index edf44de21d..097feb2cb7 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -85,6 +85,7 @@ extern bool pci_available;
+ #define PCI_DEVICE_ID_VIRTIO_RNG         0x1005
+ #define PCI_DEVICE_ID_VIRTIO_9P          0x1009
+ #define PCI_DEVICE_ID_VIRTIO_VSOCK       0x1012
++#define PCI_DEVICE_ID_VIRTIO_PMEM        0x1013
+ 
+ #define PCI_VENDOR_ID_REDHAT             0x1b36
+ #define PCI_DEVICE_ID_REDHAT_BRIDGE      0x0001
+-- 
+2.14.5
 
---KdquIMZPjGJQvRdI
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0KAswACgkQbDjKyiDZ
-s5KknxAA02oEzB0Vt5+0TwCp8n4Egfwcb05e/rFxq5A4SVxsbu9axOPrdZ5FgbeM
-JWaHdHfCeRjXe3lM9EUKyfM/r8B5YWUY4hl+uJF7OY/wGEg5SUQPzg9Yx7H74Osr
-yZzTLq+HH6zHLf3qkO66bcMFw7Arg+TLiidl08kuMgoQJfsmSR6x4A3AWSH8ejBk
-y6QBR2Xmmk3el/fmvDT1cZEZTCNmTTf60K21DupCc9vSK1pkLpqrx6InpODDFpVT
-EAQI71yXkaX3ndUqxUCFfXYbdutJyHiW5ZrYDCaUWLTMWkSWMp4vbyM/25D/f3ex
-tLMQaap+d8fg8DzAjFqoof24SR39FSQBbV5dkr1fZ4CPjz7CDJxJqUdQm3jgBt4z
-Oj4c3Vk7ENubaIs/keL6aADwRg/IitMZKpH48LKIx4K8elET41gn/9yDqzNyq6j6
-Kno/XS6IQm9YLTnilXl9cWdbzU1t6aJTgMzDgZMxCdqF0Ii3oYj7gSrNEzvHwXRc
-w6Rmi+7KhevPV6QDZ0/kwUcwOb6pkn63R8fx8bJRKvKOrorvGjjiIWHV6ICn73pG
-eu5U6DdWwmlkWaV9qVHQF/r5Z4sVCdEg29lddrhnSLWwKyIf/loYkDPfgdrFTdzs
-bqe7TYMfwOIZHr7oO8YlbLqwzceRoBcejk3wxGQe0P3ERP5UyA0=
-=9KO4
------END PGP SIGNATURE-----
-
---KdquIMZPjGJQvRdI--
 
