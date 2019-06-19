@@ -2,68 +2,69 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D43AC43613
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 22:30:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4674BC43613
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 22:31:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22C5E215EA
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 22:30:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22C5E215EA
+	by mail.kernel.org (Postfix) with ESMTPS id BD877215EA
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 22:31:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD877215EA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42372 helo=lists.gnu.org)
+Received: from localhost ([::1]:42374 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdj6S-0001va-Cr
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 18:30:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36098)
+	id 1hdj7E-0002HT-P4
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 18:31:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36068)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hdiww-0001or-Lq
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 18:21:04 -0400
+ (envelope-from <laurent@vivier.eu>) id 1hdiwu-0001lP-Tu
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 18:21:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hdiwu-0007rh-Pv
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 18:21:02 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:48279)
+ (envelope-from <laurent@vivier.eu>) id 1hdiws-0007pR-Dl
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 18:21:00 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:60899)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1hdiwq-0007kw-Td; Wed, 19 Jun 2019 18:20:57 -0400
+ id 1hdiwn-0007h2-Nx; Wed, 19 Jun 2019 18:20:53 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MIMOy-1hry1d184a-00EMcK; Thu, 20 Jun 2019 00:19:53 +0200
+ id 1MQNAv-1i032q1P3x-00MMqL; Thu, 20 Jun 2019 00:19:57 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Thu, 20 Jun 2019 00:19:26 +0200
-Message-Id: <20190619221933.1981-4-laurent@vivier.eu>
+Date: Thu, 20 Jun 2019 00:19:29 +0200
+Message-Id: <20190619221933.1981-7-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190619221933.1981-1-laurent@vivier.eu>
 References: <20190619221933.1981-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:OezYkuzxdEYCo1KHRSy3WGCmwYQBIEQd7IDEIGSHNRVjnRxAIeH
- r9DI/D9EDZLOjEmYMDORwBMi0EYkNiHs8zdNnLvPISZ6K4YSutrmdNbd241/TKIBDZyMwki
- VhpsYmH5G8ziR8L1kYxhOVMUUtPhgwRllkHlgKsU3ajYImpz2JUMaTMTN6ZIjM0kRH20KaC
- OpoSnQ/fMahq7JSZLO/3Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:NKO5DC2LVNo=:0/JNrXQVerKLX9yGYjQO5l
- kfnuxgd/r95129hCFZ5wbsubk4/tM3IajNB9y5DfhKCtoZZfDrObR5PHRIMlTYX5Yc0TYY282
- Li6NXAWCCix03Y9g6rlrsHtiKo6DsdbefNvjK76IM8FzqnjXBRemUf7u9ZUjulP69m/ACa0rW
- 0nXssWFNKDK9rB/ZbYggtRE8ng822IaI2JN8vkI1ZZEPTWydGyx0g06kVzBrG1XFLOHHL2ztV
- HQPXEgHF3b2Z/GWG2r3Uco7fyte6pWCEPvmW5P2IOddZxbgler8yWJv/0mbYrgWeSLyDw7tH+
- Fiiu6Ib98rv2JSqrSy51S62uXt6fIYJ0qLeeNH92H9e4d6tKbWIvsV1iONypvwZnPffBjuDtl
- 6j0KEzqbSQUbmjQ/zRTWT/MkiFEAbLiuuhbk6I16d/7pOlLwpNiTGL2NghpCEaQ1FWlY0bBCy
- 9kg+YyiMxHLYjYDNFT2K67A2oBe3Y7ZGJ7VOHouwi0OF+kxVbTsF/KdRApt082Eo+pCfpLlQ4
- AgQKGeV7FlcLylLSc+HHS58FVNy2ebN5OT8uKSkPsM/pR9rq3vt/WdpNmKlGfLpEW3WUtQadr
- cX7Gsro6/zeeIDVYX3SJ6+xro9phmdPrr6MW9s4U/+ZjEq3Scme+cPRwN0yQKUQTUmn1dNkQm
- Xquhfq380u8U8kfKZhshIGag6pRXmBQ0SwkaQTdZCK0Snu1pvhGlqg0jE+byeJtVL9dElejjy
- D1w38SfoGViiUkElHLGRb4ML0kdq8FBAfb3aLNoxuV7pqqAorTARUgiYRLY=
+X-Provags-ID: V03:K1:DJzWu//Mzz/9CMKkjUmi8T0DQ7iVnl/VcL1pGG7NReDS2LHHM0q
+ q7/CoPaIgb0ZLg+FSizV31GnjpOx5eM1Izg92YHPdCqIv6dAalWd7Z7uuDg0hKYCv88oFyn
+ CuPsBImS6o6QE7hiNTX9ITQwgKRAEs06Q4efK+Qvp6rpKeHu9uPWxFWoOBPmucPtjx0RXHs
+ JMnDav3gknA3oNN19VkRA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:NoIcE+jYajc=:e9KHh88Gt64wXpy+kfLH84
+ gEybGQgOs0wy4dmclBysuLTFfoY3Ecjqjxw8tF5Ikqw6ybdYY/OJJ7OckQNwcLEFj+ckTnSvu
+ T+jg4qFVsyMtVC18pacREVoI03ZvQ5CwB73v1TxcWRngJdGrTAXGQePC7xNR4L3/XUO+po3p6
+ bIBHvHHu45mrh+zSPEW8am1RHNSCErqF25gVbLhzbTmrqovkv+DIeYuQafVAUpqhqcj5fGjXN
+ FsuVY0Ps2sa8zJ7205NWFaGV8vCWsAyn9P7iHsHtUL4/svjEJdPoYv8tXPSOfHTnZrWwnrjyS
+ dYC2rnOGi3c5A40AT5MmL7N7z4nV7V/GfnSlG2GsB4srclTKp3iouGZSin9d4j+YitzysEhhY
+ IWnZ96BLOtv3whQ0FAXcFJ6fS99ZyWANQbNkeFThNmJ3K69Qf/GqbRIO+g36YL7XglsShe8RE
+ ilDiZhpMuUUsFqX6noImggGM4iieC8Q9LPaWQduuoVtMy0ofVn2bDCZC5xRbMGvijCA7Kzhjv
+ 5x1LitUb8I8yc9XeZmo2lMh4RnSKdv97gEznDHqTHqEkVzKp7MQVOqyWmGstwIZmNNSeOVHky
+ v7bN7wvbbiY0u+mX5MAjsjZNcZLuvONCGxeia/x4LZzu4o6EaBdCzinraAZJR86svnmu0wLMD
+ nEUjpqXjpBnsmqkY2rtWL47yPflqDdEQtODvP1ghZaHLUjBOt+bS2EyGOGzsuVdy3PZg6bocv
+ D+BdavBhnjey85XeVIytZWRGD/3oKbKZfr2g8HlcDmYz9vyHiGTsziLcP6s=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.187
-Subject: [Qemu-devel] [PATCH v8 03/10] dp8393x: manage big endian bus
+X-Received-From: 212.227.126.135
+Subject: [Qemu-devel] [PATCH v8 06/10] hw/m68k: add macfb video card
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,210 +85,567 @@ Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
  =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
  Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ Max Reitz <mreitz@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is needed by Quadra 800, this card can run on little-endian
-or big-endian bus.
-
+Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Tested-by: Hervé Poussineau <hpoussin@reactos.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
+Reviewed-by: Thomas Huth <huth@tuxfamily.org>
 ---
- hw/net/dp8393x.c | 88 +++++++++++++++++++++++++++++++-----------------
- 1 file changed, 57 insertions(+), 31 deletions(-)
+ arch_init.c                |   4 +
+ hw/display/Kconfig         |   3 +
+ hw/display/Makefile.objs   |   1 +
+ hw/display/macfb.c         | 419 +++++++++++++++++++++++++++++++++++++
+ include/hw/display/macfb.h |  43 ++++
+ qemu-options.hx            |   2 +-
+ vl.c                       |   3 +-
+ 7 files changed, 473 insertions(+), 2 deletions(-)
+ create mode 100644 hw/display/macfb.c
+ create mode 100644 include/hw/display/macfb.h
 
-diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-index bdb0b3b2c2..b014c015c6 100644
---- a/hw/net/dp8393x.c
-+++ b/hw/net/dp8393x.c
-@@ -150,6 +150,7 @@ typedef struct dp8393xState {
- 
-     /* Hardware */
-     uint8_t it_shift;
-+    bool big_endian;
-     qemu_irq irq;
- #ifdef DEBUG_SONIC
-     int irq_level;
-@@ -220,6 +221,29 @@ static uint32_t dp8393x_wt(dp8393xState *s)
-     return s->regs[SONIC_WT1] << 16 | s->regs[SONIC_WT0];
- }
- 
-+static uint16_t dp8393x_get(dp8393xState *s, int width, uint16_t *base,
-+                            int offset)
-+{
-+    uint16_t val;
+diff --git a/arch_init.c b/arch_init.c
+index 74b0708634..9e04cfb581 100644
+--- a/arch_init.c
++++ b/arch_init.c
+@@ -38,6 +38,10 @@
+ int graphic_width = 1024;
+ int graphic_height = 768;
+ int graphic_depth = 8;
++#elif defined(TARGET_M68K)
++int graphic_width = 800;
++int graphic_height = 600;
++int graphic_depth = 8;
+ #else
+ int graphic_width = 800;
+ int graphic_height = 600;
+diff --git a/hw/display/Kconfig b/hw/display/Kconfig
+index 910dccb2f7..035cd85bcf 100644
+--- a/hw/display/Kconfig
++++ b/hw/display/Kconfig
+@@ -130,3 +130,6 @@ config ATI_VGA
+     default y if PCI_DEVICES
+     depends on PCI
+     select VGA
 +
-+    if (s->big_endian) {
-+        val = be16_to_cpu(base[offset * width + width - 1]);
-+    } else {
-+        val = le16_to_cpu(base[offset * width]);
-+    }
-+    return val;
++config MACFB
++    bool
+diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
+index a64998fc7b..2a26709e9e 100644
+--- a/hw/display/Makefile.objs
++++ b/hw/display/Makefile.objs
+@@ -26,6 +26,7 @@ common-obj-$(CONFIG_EXYNOS4) += exynos4210_fimd.o
+ common-obj-$(CONFIG_FRAMEBUFFER) += framebuffer.o
+ obj-$(CONFIG_MILKYMIST) += milkymist-vgafb.o
+ common-obj-$(CONFIG_ZAURUS) += tc6393xb.o
++common-obj-$(CONFIG_MACFB) += macfb.o
+ 
+ obj-$(CONFIG_MILKYMIST_TMU2) += milkymist-tmu2.o
+ milkymist-tmu2.o-cflags := $(X11_CFLAGS) $(OPENGL_CFLAGS)
+diff --git a/hw/display/macfb.c b/hw/display/macfb.c
+new file mode 100644
+index 0000000000..61ba2e9e15
+--- /dev/null
++++ b/hw/display/macfb.c
+@@ -0,0 +1,419 @@
++/*
++ * QEMU Motorola 680x0 Macintosh Video Card Emulation
++ *                 Copyright (c) 2012-2018 Laurent Vivier
++ *
++ * some parts from QEMU G364 framebuffer Emulator.
++ *                 Copyright (c) 2007-2011 Herve Poussineau
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/units.h"
++#include "hw/sysbus.h"
++#include "ui/console.h"
++#include "ui/pixel_ops.h"
++#include "hw/display/macfb.h"
++#include "qapi/error.h"
++
++#define VIDEO_BASE 0x00001000
++#define DAFB_BASE  0x00800000
++
++#define MACFB_PAGE_SIZE 4096
++#define MACFB_VRAM_SIZE (4 * MiB)
++
++#define DAFB_RESET      0x200
++#define DAFB_LUT        0x213
++
++
++typedef void macfb_draw_line_func(MacfbState *s, uint8_t *d, uint32_t addr,
++                                  int width);
++
++static inline uint8_t macfb_read_byte(MacfbState *s, uint32_t addr)
++{
++    return s->vram[addr & s->vram_bit_mask];
 +}
 +
-+static void dp8393x_put(dp8393xState *s, int width, uint16_t *base, int offset,
-+                        uint16_t val)
++/* 1-bit color */
++static void macfb_draw_line1(MacfbState *s, uint8_t *d, uint32_t addr,
++                             int width)
 +{
-+    if (s->big_endian) {
-+        base[offset * width + width - 1] = cpu_to_be16(val);
-+    } else {
-+        base[offset * width] = cpu_to_le16(val);
++    uint8_t r, g, b;
++    int x;
++
++    for (x = 0; x < width; x++) {
++        int bit = x & 7;
++        int idx = (macfb_read_byte(s, addr) >> (7 - bit)) & 1;
++        r = g = b  = ((1 - idx) << 7);
++        addr += (bit == 7);
++
++        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
++        d += 4;
 +    }
 +}
 +
- static void dp8393x_update_irq(dp8393xState *s)
- {
-     int level = (s->regs[SONIC_IMR] & s->regs[SONIC_ISR]) ? 1 : 0;
-@@ -251,12 +275,12 @@ static void dp8393x_do_load_cam(dp8393xState *s)
-         /* Fill current entry */
-         address_space_rw(&s->as, dp8393x_cdp(s),
-             MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--        s->cam[index][0] = data[1 * width] & 0xff;
--        s->cam[index][1] = data[1 * width] >> 8;
--        s->cam[index][2] = data[2 * width] & 0xff;
--        s->cam[index][3] = data[2 * width] >> 8;
--        s->cam[index][4] = data[3 * width] & 0xff;
--        s->cam[index][5] = data[3 * width] >> 8;
-+        s->cam[index][0] = dp8393x_get(s, width, data, 1) & 0xff;
-+        s->cam[index][1] = dp8393x_get(s, width, data, 1) >> 8;
-+        s->cam[index][2] = dp8393x_get(s, width, data, 2) & 0xff;
-+        s->cam[index][3] = dp8393x_get(s, width, data, 2) >> 8;
-+        s->cam[index][4] = dp8393x_get(s, width, data, 3) & 0xff;
-+        s->cam[index][5] = dp8393x_get(s, width, data, 3) >> 8;
-         DPRINTF("load cam[%d] with %02x%02x%02x%02x%02x%02x\n", index,
-             s->cam[index][0], s->cam[index][1], s->cam[index][2],
-             s->cam[index][3], s->cam[index][4], s->cam[index][5]);
-@@ -269,7 +293,7 @@ static void dp8393x_do_load_cam(dp8393xState *s)
-     /* Read CAM enable */
-     address_space_rw(&s->as, dp8393x_cdp(s),
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--    s->regs[SONIC_CE] = data[0 * width];
-+    s->regs[SONIC_CE] = dp8393x_get(s, width, data, 0);
-     DPRINTF("load cam done. cam enable mask 0x%04x\n", s->regs[SONIC_CE]);
++/* 2-bit color */
++static void macfb_draw_line2(MacfbState *s, uint8_t *d, uint32_t addr,
++                             int width)
++{
++    uint8_t r, g, b;
++    int x;
++
++    for (x = 0; x < width; x++) {
++        int bit = (x & 3);
++        int idx = (macfb_read_byte(s, addr) >> ((3 - bit) << 1)) & 3;
++        r = s->color_palette[idx * 3];
++        g = s->color_palette[idx * 3 + 1];
++        b = s->color_palette[idx * 3 + 2];
++        addr += (bit == 3);
++
++        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
++        d += 4;
++    }
++}
++
++/* 4-bit color */
++static void macfb_draw_line4(MacfbState *s, uint8_t *d, uint32_t addr,
++                             int width)
++{
++    uint8_t r, g, b;
++    int x;
++
++    for (x = 0; x < width; x++) {
++        int bit = x & 1;
++        int idx = (macfb_read_byte(s, addr) >> ((1 - bit) << 2)) & 15;
++        r = s->color_palette[idx * 3];
++        g = s->color_palette[idx * 3 + 1];
++        b = s->color_palette[idx * 3 + 2];
++        addr += (bit == 1);
++
++        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
++        d += 4;
++    }
++}
++
++/* 8-bit color */
++static void macfb_draw_line8(MacfbState *s, uint8_t *d, uint32_t addr,
++                             int width)
++{
++    uint8_t r, g, b;
++    int x;
++
++    for (x = 0; x < width; x++) {
++        r = s->color_palette[macfb_read_byte(s, addr) * 3];
++        g = s->color_palette[macfb_read_byte(s, addr) * 3 + 1];
++        b = s->color_palette[macfb_read_byte(s, addr) * 3 + 2];
++        addr++;
++
++        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
++        d += 4;
++    }
++}
++
++/* 16-bit color */
++static void macfb_draw_line16(MacfbState *s, uint8_t *d, uint32_t addr,
++                              int width)
++{
++    uint8_t r, g, b;
++    int x;
++
++    for (x = 0; x < width; x++) {
++        uint16_t pixel;
++        pixel = (macfb_read_byte(s, addr) << 8) | macfb_read_byte(s, addr + 1);
++        r = ((pixel >> 10) & 0x1f) << 3;
++        g = ((pixel >> 5) & 0x1f) << 3;
++        b = (pixel & 0x1f) << 3;
++        addr += 2;
++
++        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
++        d += 4;
++    }
++}
++
++/* 24-bit color */
++static void macfb_draw_line24(MacfbState *s, uint8_t *d, uint32_t addr,
++                              int width)
++{
++    uint8_t r, g, b;
++    int x;
++
++    for (x = 0; x < width; x++) {
++        r = macfb_read_byte(s, addr);
++        g = macfb_read_byte(s, addr + 1);
++        b = macfb_read_byte(s, addr + 2);
++        addr += 3;
++
++        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
++        d += 4;
++    }
++}
++
++
++enum {
++    MACFB_DRAW_LINE1,
++    MACFB_DRAW_LINE2,
++    MACFB_DRAW_LINE4,
++    MACFB_DRAW_LINE8,
++    MACFB_DRAW_LINE16,
++    MACFB_DRAW_LINE24,
++    MACFB_DRAW_LINE_NB,
++};
++
++static macfb_draw_line_func * const
++                              macfb_draw_line_table[MACFB_DRAW_LINE_NB] = {
++    macfb_draw_line1,
++    macfb_draw_line2,
++    macfb_draw_line4,
++    macfb_draw_line8,
++    macfb_draw_line16,
++    macfb_draw_line24,
++};
++
++static int macfb_check_dirty(MacfbState *s, DirtyBitmapSnapshot *snap,
++                             ram_addr_t addr, int len)
++{
++    return memory_region_snapshot_get_dirty(&s->mem_vram, snap, addr, len);
++}
++
++static void macfb_draw_graphic(MacfbState *s)
++{
++    DisplaySurface *surface = qemu_console_surface(s->con);
++    DirtyBitmapSnapshot *snap = NULL;
++    ram_addr_t page;
++    uint32_t v = 0;
++    int y, ymin;
++    int macfb_stride = (s->depth * s->width + 7) / 8;
++    macfb_draw_line_func *macfb_draw_line;
++
++    switch (s->depth) {
++    case 1:
++        v = MACFB_DRAW_LINE1;
++        break;
++    case 2:
++        v = MACFB_DRAW_LINE2;
++        break;
++    case 4:
++        v = MACFB_DRAW_LINE4;
++        break;
++    case 8:
++        v = MACFB_DRAW_LINE8;
++        break;
++    case 16:
++        v = MACFB_DRAW_LINE16;
++        break;
++    case 24:
++        v = MACFB_DRAW_LINE24;
++        break;
++    }
++
++    macfb_draw_line = macfb_draw_line_table[v];
++    assert(macfb_draw_line != NULL);
++
++    snap = memory_region_snapshot_and_clear_dirty(&s->mem_vram, 0x0,
++                                             memory_region_size(&s->mem_vram),
++                                             DIRTY_MEMORY_VGA);
++
++    ymin = -1;
++    page = 0;
++    for (y = 0; y < s->height; y++, page += macfb_stride) {
++        if (macfb_check_dirty(s, snap, page, macfb_stride)) {
++            uint8_t *data_display;
++
++            data_display = surface_data(surface) + y * surface_stride(surface);
++            macfb_draw_line(s, data_display, page, s->width);
++
++            if (ymin < 0) {
++                ymin = y;
++            }
++        } else {
++            if (ymin >= 0) {
++                dpy_gfx_update(s->con, 0, ymin, s->width, y - ymin);
++                ymin = -1;
++            }
++        }
++    }
++
++    if (ymin >= 0) {
++        dpy_gfx_update(s->con, 0, ymin, s->width, y - ymin);
++    }
++
++    g_free(snap);
++}
++
++static void macfb_invalidate_display(void *opaque)
++{
++    MacfbState *s = opaque;
++
++    memory_region_set_dirty(&s->mem_vram, 0, MACFB_VRAM_SIZE);
++}
++
++static void macfb_update_display(void *opaque)
++{
++    MacfbState *s = opaque;
++    DisplaySurface *surface = qemu_console_surface(s->con);
++
++    qemu_flush_coalesced_mmio_buffer();
++
++    if (s->width == 0 || s->height == 0) {
++        return;
++    }
++
++    if (s->width != surface_width(surface) ||
++        s->height != surface_height(surface)) {
++        qemu_console_resize(s->con, s->width, s->height);
++    }
++
++    macfb_draw_graphic(s);
++}
++
++static void macfb_reset(MacfbState *s)
++{
++    int i;
++
++    s->palette_current = 0;
++    for (i = 0; i < 256; i++) {
++        s->color_palette[i * 3] = 255 - i;
++        s->color_palette[i * 3 + 1] = 255 - i;
++        s->color_palette[i * 3 + 2] = 255 - i;
++    }
++    memset(s->vram, 0, MACFB_VRAM_SIZE);
++    macfb_invalidate_display(s);
++}
++
++static uint64_t macfb_ctrl_read(void *opaque,
++                                hwaddr addr,
++                                unsigned int size)
++{
++    return 0;
++}
++
++static void macfb_ctrl_write(void *opaque,
++                             hwaddr addr,
++                             uint64_t val,
++                             unsigned int size)
++{
++    MacfbState *s = opaque;
++    switch (addr) {
++    case DAFB_RESET:
++        s->palette_current = 0;
++        break;
++    case DAFB_LUT:
++        s->color_palette[s->palette_current++] = val;
++        if (s->palette_current % 3) {
++            macfb_invalidate_display(s);
++        }
++        break;
++    }
++}
++
++static const MemoryRegionOps macfb_ctrl_ops = {
++    .read = macfb_ctrl_read,
++    .write = macfb_ctrl_write,
++    .endianness = DEVICE_BIG_ENDIAN,
++    .impl.min_access_size = 1,
++    .impl.max_access_size = 4,
++};
++
++static int macfb_post_load(void *opaque, int version_id)
++{
++    macfb_invalidate_display(opaque);
++    return 0;
++}
++
++static const VMStateDescription vmstate_macfb = {
++    .name = "macfb",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .minimum_version_id_old = 1,
++    .post_load = macfb_post_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT8_ARRAY(color_palette, MacfbState, 256 * 3),
++        VMSTATE_UINT32(palette_current, MacfbState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static const GraphicHwOps macfb_ops = {
++    .invalidate = macfb_invalidate_display,
++    .gfx_update = macfb_update_display,
++};
++
++static void macfb_common_realize(DeviceState *dev, MacfbState *s, Error **errp)
++{
++    DisplaySurface *surface;
++
++    if (s->depth != 1 && s->depth != 2 && s->depth != 4 && s->depth != 8 &&
++        s->depth != 16 && s->depth != 24) {
++        error_setg(errp, "unknown guest depth %d", s->depth);
++        return;
++    }
++
++    s->con = graphic_console_init(dev, 0, &macfb_ops, s);
++    surface = qemu_console_surface(s->con);
++
++    if (surface_bits_per_pixel(surface) != 32) {
++        error_setg(errp, "unknown host depth %d",
++                   surface_bits_per_pixel(surface));
++        return;
++    }
++
++    memory_region_init_io(&s->mem_ctrl, NULL, &macfb_ctrl_ops, s, "macfb-ctrl",
++                          0x1000);
++
++    memory_region_init_ram_nomigrate(&s->mem_vram, OBJECT(s), "macfb-vram",
++                                     MACFB_VRAM_SIZE, errp);
++    s->vram = memory_region_get_ram_ptr(&s->mem_vram);
++    s->vram_bit_mask = MACFB_VRAM_SIZE - 1;
++    vmstate_register_ram(&s->mem_vram, dev);
++    memory_region_set_coalescing(&s->mem_vram);
++}
++
++static void macfb_sysbus_realize(DeviceState *dev, Error **errp)
++{
++    MacfbSysBusState *s = MACFB(dev);
++    MacfbState *ms = &s->macfb;
++
++    macfb_common_realize(dev, ms, errp);
++    sysbus_init_mmio(SYS_BUS_DEVICE(s), &ms->mem_ctrl);
++    sysbus_init_mmio(SYS_BUS_DEVICE(s), &ms->mem_vram);
++}
++
++static void macfb_sysbus_reset(DeviceState *d)
++{
++    MacfbSysBusState *s = MACFB(d);
++    macfb_reset(&s->macfb);
++}
++
++static Property macfb_sysbus_properties[] = {
++    DEFINE_PROP_UINT32("width", MacfbSysBusState, macfb.width, 640),
++    DEFINE_PROP_UINT32("height", MacfbSysBusState, macfb.height, 480),
++    DEFINE_PROP_UINT8("depth", MacfbSysBusState, macfb.depth, 8),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void macfb_sysbus_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = macfb_sysbus_realize;
++    dc->desc = "SysBus Macintosh framebuffer";
++    dc->reset = macfb_sysbus_reset;
++    dc->vmsd = &vmstate_macfb;
++    dc->props = macfb_sysbus_properties;
++}
++
++static TypeInfo macfb_sysbus_info = {
++    .name          = TYPE_MACFB,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(MacfbSysBusState),
++    .class_init    = macfb_sysbus_class_init,
++};
++
++static void macfb_register_types(void)
++{
++    type_register_static(&macfb_sysbus_info);
++}
++
++type_init(macfb_register_types)
+diff --git a/include/hw/display/macfb.h b/include/hw/display/macfb.h
+new file mode 100644
+index 0000000000..3fe2592735
+--- /dev/null
++++ b/include/hw/display/macfb.h
+@@ -0,0 +1,43 @@
++/*
++ * QEMU Motorola 680x0 Macintosh Video Card Emulation
++ *                 Copyright (c) 2012-2018 Laurent Vivier
++ *
++ * some parts from QEMU G364 framebuffer Emulator.
++ *                 Copyright (c) 2007-2011 Herve Poussineau
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#ifndef MACFB_H
++#define MACFB_H
++
++#include "qemu/osdep.h"
++#include "exec/memory.h"
++#include "ui/console.h"
++
++typedef struct MacfbState {
++    MemoryRegion mem_vram;
++    MemoryRegion mem_ctrl;
++    QemuConsole *con;
++
++    uint8_t *vram;
++    uint32_t vram_bit_mask;
++    uint32_t palette_current;
++    uint8_t color_palette[256 * 3];
++    uint32_t width, height; /* in pixels */
++    uint8_t depth;
++} MacfbState;
++
++#define TYPE_MACFB "sysbus-macfb"
++#define MACFB(obj) \
++    OBJECT_CHECK(MacfbSysBusState, (obj), TYPE_MACFB)
++
++typedef struct {
++    SysBusDevice busdev;
++
++    MacfbState macfb;
++} MacfbSysBusState;
++
++#endif
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 0d8beb4afd..bf842c539a 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -1794,7 +1794,7 @@ ETEXI
  
-     /* Done */
-@@ -290,10 +314,10 @@ static void dp8393x_do_read_rra(dp8393xState *s)
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
- 
-     /* Update SONIC registers */
--    s->regs[SONIC_CRBA0] = data[0 * width];
--    s->regs[SONIC_CRBA1] = data[1 * width];
--    s->regs[SONIC_RBWC0] = data[2 * width];
--    s->regs[SONIC_RBWC1] = data[3 * width];
-+    s->regs[SONIC_CRBA0] = dp8393x_get(s, width, data, 0);
-+    s->regs[SONIC_CRBA1] = dp8393x_get(s, width, data, 1);
-+    s->regs[SONIC_RBWC0] = dp8393x_get(s, width, data, 2);
-+    s->regs[SONIC_RBWC1] = dp8393x_get(s, width, data, 3);
-     DPRINTF("CRBA0/1: 0x%04x/0x%04x, RBWC0/1: 0x%04x/0x%04x\n",
-         s->regs[SONIC_CRBA0], s->regs[SONIC_CRBA1],
-         s->regs[SONIC_RBWC0], s->regs[SONIC_RBWC1]);
-@@ -408,12 +432,12 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-         tx_len = 0;
- 
-         /* Update registers */
--        s->regs[SONIC_TCR] = data[0 * width] & 0xf000;
--        s->regs[SONIC_TPS] = data[1 * width];
--        s->regs[SONIC_TFC] = data[2 * width];
--        s->regs[SONIC_TSA0] = data[3 * width];
--        s->regs[SONIC_TSA1] = data[4 * width];
--        s->regs[SONIC_TFS] = data[5 * width];
-+        s->regs[SONIC_TCR] = dp8393x_get(s, width, data, 0) & 0xf000;
-+        s->regs[SONIC_TPS] = dp8393x_get(s, width, data, 1);
-+        s->regs[SONIC_TFC] = dp8393x_get(s, width, data, 2);
-+        s->regs[SONIC_TSA0] = dp8393x_get(s, width, data, 3);
-+        s->regs[SONIC_TSA1] = dp8393x_get(s, width, data, 4);
-+        s->regs[SONIC_TFS] = dp8393x_get(s, width, data, 5);
- 
-         /* Handle programmable interrupt */
-         if (s->regs[SONIC_TCR] & SONIC_TCR_PINT) {
-@@ -439,9 +463,9 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-                 address_space_rw(&s->as,
-                     dp8393x_ttda(s) + sizeof(uint16_t) * (4 + 3 * i) * width,
-                     MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--                s->regs[SONIC_TSA0] = data[0 * width];
--                s->regs[SONIC_TSA1] = data[1 * width];
--                s->regs[SONIC_TFS] = data[2 * width];
-+                s->regs[SONIC_TSA0] = dp8393x_get(s, width, data, 0);
-+                s->regs[SONIC_TSA1] = dp8393x_get(s, width, data, 1);
-+                s->regs[SONIC_TFS] = dp8393x_get(s, width, data, 2);
-             }
-         }
- 
-@@ -468,7 +492,8 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-         s->regs[SONIC_TCR] |= SONIC_TCR_PTX;
- 
-         /* Write status */
--        data[0 * width] = s->regs[SONIC_TCR] & 0x0fff; /* status */
-+        dp8393x_put(s, width, data, 0,
-+                    s->regs[SONIC_TCR] & 0x0fff); /* status */
-         size = sizeof(uint16_t) * width;
-         address_space_rw(&s->as,
-             dp8393x_ttda(s),
-@@ -482,8 +507,8 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-                              sizeof(uint16_t) *
-                              (4 + 3 * s->regs[SONIC_TFC]) * width,
-                 MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--            s->regs[SONIC_CTDA] = data[0 * width] & ~0x1;
--            if (data[0 * width] & 0x1) {
-+            s->regs[SONIC_CTDA] = dp8393x_get(s, width, data, 0) & ~0x1;
-+            if (dp8393x_get(s, width, data, 0) & 0x1) {
-                 /* EOL detected */
-                 break;
-             }
-@@ -746,7 +771,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-         address = dp8393x_crda(s) + sizeof(uint16_t) * 5 * width;
-         address_space_rw(&s->as, address, MEMTXATTRS_UNSPECIFIED,
-                          (uint8_t *)data, size, 0);
--        if (data[0 * width] & 0x1) {
-+        if (dp8393x_get(s, width, data, 0) & 0x1) {
-             /* Still EOL ; stop reception */
-             return -1;
-         } else {
-@@ -790,11 +815,11 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
- 
-     /* Write status to memory */
-     DPRINTF("Write status at %08x\n", dp8393x_crda(s));
--    data[0 * width] = s->regs[SONIC_RCR]; /* status */
--    data[1 * width] = rx_len; /* byte count */
--    data[2 * width] = s->regs[SONIC_TRBA0]; /* pkt_ptr0 */
--    data[3 * width] = s->regs[SONIC_TRBA1]; /* pkt_ptr1 */
--    data[4 * width] = s->regs[SONIC_RSC]; /* seq_no */
-+    dp8393x_put(s, width, data, 0, s->regs[SONIC_RCR]); /* status */
-+    dp8393x_put(s, width, data, 1, rx_len); /* byte count */
-+    dp8393x_put(s, width, data, 2, s->regs[SONIC_TRBA0]); /* pkt_ptr0 */
-+    dp8393x_put(s, width, data, 3, s->regs[SONIC_TRBA1]); /* pkt_ptr1 */
-+    dp8393x_put(s, width, data, 4, s->regs[SONIC_RSC]); /* seq_no */
-     size = sizeof(uint16_t) * 5 * width;
-     address_space_rw(&s->as, dp8393x_crda(s),
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 1);
-@@ -803,12 +828,12 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-     size = sizeof(uint16_t) * width;
-     address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 5 * width,
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--    s->regs[SONIC_LLFA] = data[0 * width];
-+    s->regs[SONIC_LLFA] = dp8393x_get(s, width, data, 0);
-     if (s->regs[SONIC_LLFA] & 0x1) {
-         /* EOL detected */
-         s->regs[SONIC_ISR] |= SONIC_ISR_RDE;
-     } else {
--        data[0 * width] = 0; /* in_use */
-+        dp8393x_put(s, width, data, 0, 0); /* in_use */
-         address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 6 * width,
-             MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, sizeof(uint16_t), 1);
-         s->regs[SONIC_CRDA] = s->regs[SONIC_LLFA];
-@@ -921,6 +946,7 @@ static Property dp8393x_properties[] = {
-     DEFINE_NIC_PROPERTIES(dp8393xState, conf),
-     DEFINE_PROP_PTR("dma_mr", dp8393xState, dma_mr),
-     DEFINE_PROP_UINT8("it_shift", dp8393xState, it_shift, 0),
-+    DEFINE_PROP_BOOL("big_endian", dp8393xState, big_endian, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
+ DEF("g", 1, QEMU_OPTION_g ,
+     "-g WxH[xDEPTH]  Set the initial graphical resolution and depth\n",
+-    QEMU_ARCH_PPC | QEMU_ARCH_SPARC)
++    QEMU_ARCH_PPC | QEMU_ARCH_SPARC | QEMU_ARCH_M68K)
+ STEXI
+ @item -g @var{width}x@var{height}[x@var{depth}]
+ @findex -g
+diff --git a/vl.c b/vl.c
+index 99a56b5556..770a1ee435 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3332,7 +3332,8 @@ int main(int argc, char **argv, char **envp)
+                     if (*p == 'x') {
+                         p++;
+                         depth = strtol(p, (char **)&p, 10);
+-                        if (depth != 8 && depth != 15 && depth != 16 &&
++                        if (depth != 1 && depth != 2 && depth != 4 &&
++                            depth != 8 && depth != 15 && depth != 16 &&
+                             depth != 24 && depth != 32)
+                             goto graphic_error;
+                     } else if (*p == '\0') {
 -- 
 2.21.0
 
