@@ -2,96 +2,62 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 860B1C31E49
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 09:45:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12878C31E49
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 09:46:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5319E2084A
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 09:45:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 95D012084A
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 09:46:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="k3DS82Ho"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5319E2084A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="eDWUGufB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95D012084A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36270 helo=lists.gnu.org)
+Received: from localhost ([::1]:36284 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdX9X-00026Y-Cj
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 05:45:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37416)
+	id 1hdXAx-0003Wg-SJ
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 05:46:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38512)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <shmuel.eiderman@oracle.com>) id 1hdWv0-0005GS-0L
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 05:30:15 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hdWxx-0007dI-9p
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 05:33:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shmuel.eiderman@oracle.com>) id 1hdWuw-00005n-9e
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 05:30:13 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:41206)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
- id 1hdWuj-0007rk-56; Wed, 19 Jun 2019 05:29:59 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5J9SV4u081454;
- Wed, 19 Jun 2019 09:29:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
- bh=7xrUoYOu+9ElvUB5L88vzyRFGdPo+spBEQlM3TkzjbI=;
- b=k3DS82HoJ+NNom7371+8RIKbP8KMlKzFpbWtOBNcSShpJ/fExiOG7j8/rb3wD2q8m+yn
- MkA2Sah0MUoe71jGtg+RyFIRFRQNDUcnItFj0JP5RqSwDr+q7QSqsuHZLR+UytvBWqVo
- CqjqBI8jQ0+/PsWx0INB89fA3BrU5H+E2B7y/pad2OzqacOU2Kj5uP+BCckU4rBCHr/j
- gL342f2bkrTHqodAqfqxhW1nnU1fcezg4YjLSFaU7028vCtdv5B7OOAR23488Ju9zS98
- Bk+tSwLPYQDLo7c4Xxk/5DgM1PSYBrapnruUVyrpCAOtcxKPcwhfy2N2sIX1SkDQjBT3 xA== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by aserp2120.oracle.com with ESMTP id 2t7809a8w1-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 19 Jun 2019 09:29:38 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5J9TbhM001124;
- Wed, 19 Jun 2019 09:29:37 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by userp3030.oracle.com with ESMTP id 2t77ymytw1-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 19 Jun 2019 09:29:37 +0000
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5J9TXta005122;
- Wed, 19 Jun 2019 09:29:33 GMT
-Received: from nexus.ravello.local (/213.57.127.2)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 19 Jun 2019 02:29:33 -0700
-From: Sam Eiderman <shmuel.eiderman@oracle.com>
-To: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- mreitz@redhat.com, seabios@seabios.org, kraxel@redhat.com,
- kevin@koconnor.net
-Date: Wed, 19 Jun 2019 12:29:01 +0300
-Message-Id: <20190619092905.24029-5-shmuel.eiderman@oracle.com>
-X-Mailer: git-send-email 2.13.3
-In-Reply-To: <20190619092905.24029-1-shmuel.eiderman@oracle.com>
-References: <20190619092905.24029-1-shmuel.eiderman@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9292
- signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=971
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906190077
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9292
- signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906190078
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 141.146.126.78
-Subject: [Qemu-devel] [QEMU] [PATCH v4 4/8] scsi: Propagate unrealize()
- callback to scsi-hd
+ (envelope-from <dgibson@ozlabs.org>) id 1hdWxv-00035n-MM
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 05:33:17 -0400
+Received: from ozlabs.org ([203.11.71.1]:57047)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1hdWxu-0002xX-HR
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 05:33:15 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 45TKWB3JKwz9s7h; Wed, 19 Jun 2019 19:33:10 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1560936790;
+ bh=VzP232tVULU4RWFzhGRv3vlmXFx4GcRmJ38+dmGTmaY=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=eDWUGufBsJeygYmcGe0bPNeztfmVbZDvrYz4GFIUb8NF4lfHT4J3T49MVm5J9qfdJ
+ 8UGFSmeErNigokku7a/kFA1cIbYI1LP4rQQGGFkATa8tVyhQVyNYJm6A/oAelpINy2
+ zTd5Naq81YSHl1iflK8qZL2449vxqgA00kIANaTQ=
+Date: Wed, 19 Jun 2019 18:11:10 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <20190619081110.GB22560@umbus.BigPond>
+References: <20190519041522.12327-1-richard.henderson@linaro.org>
+ <8f28d008-2608-a579-7505-4546b08deb41@linaro.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="z6Eq5LdranGa6ru8"
+Content-Disposition: inline
+In-Reply-To: <8f28d008-2608-a579-7505-4546b08deb41@linaro.org>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [PATCH v4 0/7] tcg/ppc: Add vector opcodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,74 +69,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liran.alon@oracle.com, shmuel.eiderman@oracle.com, karl.heubaum@oracle.com,
- arbel.moshe@oracle.com
+Cc: mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We will need to add LCHS removal logic to scsi-hd's unrealize() in the
-next commit.
 
-Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
-Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
----
- hw/scsi/scsi-bus.c     | 15 +++++++++++++++
- include/hw/scsi/scsi.h |  1 +
- 2 files changed, 16 insertions(+)
+--z6Eq5LdranGa6ru8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index c480553083..f6fe497a1a 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -55,6 +55,14 @@ static void scsi_device_realize(SCSIDevice *s, Error **errp)
-     }
- }
- 
-+static void scsi_device_unrealize(SCSIDevice *s, Error **errp)
-+{
-+    SCSIDeviceClass *sc = SCSI_DEVICE_GET_CLASS(s);
-+    if (sc->unrealize) {
-+        sc->unrealize(s, errp);
-+    }
-+}
-+
- int scsi_bus_parse_cdb(SCSIDevice *dev, SCSICommand *cmd, uint8_t *buf,
-                        void *hba_private)
- {
-@@ -213,11 +221,18 @@ static void scsi_qdev_realize(DeviceState *qdev, Error **errp)
- static void scsi_qdev_unrealize(DeviceState *qdev, Error **errp)
- {
-     SCSIDevice *dev = SCSI_DEVICE(qdev);
-+    Error *local_err = NULL;
- 
-     if (dev->vmsentry) {
-         qemu_del_vm_change_state_handler(dev->vmsentry);
-     }
- 
-+    scsi_device_unrealize(dev, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-     scsi_device_purge_requests(dev, SENSE_CODE(NO_SENSE));
-     blockdev_mark_auto_del(dev->conf.blk);
- }
-diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
-index 426566a5c6..8cf71f910d 100644
---- a/include/hw/scsi/scsi.h
-+++ b/include/hw/scsi/scsi.h
-@@ -59,6 +59,7 @@ struct SCSIRequest {
- typedef struct SCSIDeviceClass {
-     DeviceClass parent_class;
-     void (*realize)(SCSIDevice *dev, Error **errp);
-+    void (*unrealize)(SCSIDevice *dev, Error **errp);
-     int (*parse_cdb)(SCSIDevice *dev, SCSICommand *cmd, uint8_t *buf,
-                      void *hba_private);
-     SCSIRequest *(*alloc_req)(SCSIDevice *s, uint32_t tag, uint32_t lun,
--- 
-2.13.3
+On Mon, Jun 17, 2019 at 10:00:10PM -0700, Richard Henderson wrote:
+> Ping.  Otherwise I'll include it in my next tcg pull.
 
+Uh.. I'm not sure who this ping is directed at.  I'm afraid this
+series has dropped off my radar.
+
+>=20
+>=20
+> r~
+>=20
+> On 5/18/19 9:15 PM, Richard Henderson wrote:
+> > Based-on: <20190518190157.21255-1-richard.henderson@linaro.org>
+> > Aka "tcg: misc gvec improvements".
+> >=20
+> > Version 3 was last posted in March,
+> > https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg05859.html
+> >=20
+> > Changes since v3:
+> >   * Add support for bitsel, with the vsx xxsel insn.
+> >   * Rely on the new relocation overflow handling, so
+> >     we don't require 3 insns for a vector load.
+> >=20
+> > Changes since v2:
+> >   * Several generic tcg patches to improve dup vs dupi vs dupm.
+> >     In particular, if a global temp (like guest r10) is not in
+> >     a host register, we should duplicate from memory instead of
+> >     loading to an integer register, spilling to stack, loading
+> >     to a vector register, and then duplicating.
+> >   * I have more confidence that 32-bit ppc host should work
+> >     this time around.  No testing on that front yet, but I've
+> >     unified some code sequences with 64-bit ppc host.
+> >   * Base altivec now supports V128 only.  Moved V64 support to
+> >     Power7 (v2.06), which has 64-bit load/store.
+> >   * Dropped support for 64-bit vector multiply using Power8.
+> >     The expansion was too large compared to using integer regs.
+> >=20
+> >=20
+> > r~
+> >=20
+> >=20
+> > Richard Henderson (7):
+> >   tcg/ppc: Initial backend support for Altivec
+> >   tcg/ppc: Support vector shift by immediate
+> >   tcg/ppc: Support vector multiply
+> >   tcg/ppc: Support vector dup2
+> >   tcg/ppc: Update vector support to v2.06
+> >   tcg/ppc: Update vector support to v2.07
+> >   tcg/ppc: Update vector support to v3.00
+> >=20
+> >  tcg/ppc/tcg-target.h     |   39 +-
+> >  tcg/ppc/tcg-target.opc.h |   11 +
+> >  tcg/ppc/tcg-target.inc.c | 1077 +++++++++++++++++++++++++++++++++++---
+> >  3 files changed, 1063 insertions(+), 64 deletions(-)
+> >  create mode 100644 tcg/ppc/tcg-target.opc.h
+> >=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--z6Eq5LdranGa6ru8
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0J7hsACgkQbDjKyiDZ
+s5LZFw//STdKXnxBvcGl194EfFHGRq3wCn+77gjzuJHtZi8IOLmyr/9L/pxG7XWx
+ZsK7POY4x69NATDeqOIbXuck/4aMAYaNh0KkBiHWszJ/pODz6MgK9iS7eY7+Pz0f
+Hp/hPnTaApQY2o80kX61IUcNgAtDV6kqkVyTIZj0sSPudBp6TGd5L8VHPcEHbmpQ
+t0e4Yc03ax7U3sKOcE7HwI6P60kFXy28VLiiMtL4YfJTJF4RpGn1iGQhQnPI0S+6
+wCkLIfdNOyVKxADf1Da1B7EZkceU0UM66a1oQoqv60HYe/yCBtWzeLwXMTHG5t24
+ih6qQONejyCMltmwN1uy70/DjKvTmLrkyZ1FWnOM9MA7EL3x4bjvJTwy7w8BVdiY
+rkyH1b8zTdB91gNhBX2vg2YHpZgBKlJWKwUfVqlt84efySs4/nAFAkpREGahuaGb
+x64sOxA+TOYJtLLOdNV1IF0Uxf2mpM/PUm8EW6Hkw+1Hq6YCbcnyyXFm6Cv2QucL
+psBxhE0lQbbX2Cba/jZTY3vDzBM0rwW0K5frkRg33QfujwCfm24/edm94cvUozFU
+RAwzCVyP908OtgPelOvOMy4XXrj4VRkktH+TET+lFqse021ShPhjun354IsgCghc
+2wXso2vcKMlOzqyZApkFeqc+nqmv88RBy5rQrApEQ7xQF+qdzkE=
+=/oAl
+-----END PGP SIGNATURE-----
+
+--z6Eq5LdranGa6ru8--
 
