@@ -2,92 +2,142 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2C6BC31E5B
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 18:03:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5524EC31E5B
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 18:21:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABB732166E
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 18:03:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABB732166E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2CA0A21721
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 18:21:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CA0A21721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40946 helo=lists.gnu.org)
+Received: from localhost ([::1]:40980 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdevV-0003Qj-SM
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 14:03:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56435)
+	id 1hdfCy-0000Qg-7t
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 14:21:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58989)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1hdeu4-0002wM-FJ
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 14:01:50 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hdf7X-0006j4-3H
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 14:15:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1hdeu1-0001AX-Kd
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 14:01:48 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8810
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1hdetu-000147-JA
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 14:01:40 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x5JHv4cQ100344; Wed, 19 Jun 2019 14:01:29 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
- [169.63.214.131])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2t7r2p5ns1-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 19 Jun 2019 14:01:29 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x5JHt8hu031325;
- Wed, 19 Jun 2019 18:01:28 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com
- (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
- by ppma01dal.us.ibm.com with ESMTP id 2t75r0xk9t-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 19 Jun 2019 18:01:28 +0000
-Received: from b03ledav002.gho.boulder.ibm.com
- (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
- by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x5JI1Qsw32506186
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 19 Jun 2019 18:01:26 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7C2F013605E;
- Wed, 19 Jun 2019 18:01:25 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4A413136053;
- Wed, 19 Jun 2019 18:01:25 +0000 (GMT)
-Received: from localhost (unknown [9.53.179.212])
- by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
- Wed, 19 Jun 2019 18:01:25 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+ (envelope-from <jsnow@redhat.com>) id 1hdf7V-0002Gb-W5
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 14:15:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54920)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1hdf7P-00025u-Ph
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 14:15:40 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B3EAE3D955;
+ Wed, 19 Jun 2019 18:15:10 +0000 (UTC)
+Received: from [10.18.17.164] (dhcp-17-164.bos.redhat.com [10.18.17.164])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3E027604A3;
+ Wed, 19 Jun 2019 18:15:09 +0000 (UTC)
+To: Bruce Rogers <brogers@suse.com>, peter.maydell@linaro.org,
+ qemu-devel@nongnu.org
+References: <5D096A9302000048000A1D8C@prv-mh.provo.novell.com>
+ <5D0975BE02000048000A1D94@prv-mh.provo.novell.com>
+ <15622953-3be9-c639-b50c-56ed8d3310b9@redhat.com>
+ <5D09B9F402000048000A1DB3@prv-mh.provo.novell.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
+ IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
+ vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
+ rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
+ 1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
+ ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
+ 3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
+ h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
+ T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
+ LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
+ KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
+ BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
+ qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
+ LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
+ ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
+ J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
+ vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
+ il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
+ 1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
+ tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
+ 1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
+ 3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
+ d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
+ 5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
+ MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
+ NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
+ TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
+ L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
+ JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
+ /5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
+ nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
+ 9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
+ Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
+ e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
+ ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
+ vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
+ C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
+ fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
+ rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
+ TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
+ PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
+ Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
+ E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
+ Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
+ rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
+ cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
+ wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
+ jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
+ vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
+ eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
+ RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
+ CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
+ AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
+ VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
+ XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
+ Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
+ y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
+ sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
+ HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
+ 8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
+ 6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
+ y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
+ uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
+ YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
+ 2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
+ Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
+ TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
+ TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
+ GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
+ rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
+ i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
+ RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
+ glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
+Message-ID: <5a014061-224d-7fc9-313e-0a69a568c328@redhat.com>
+Date: Wed, 19 Jun 2019 14:15:08 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20190618104718.25433-1-peter.maydell@linaro.org>
-References: <20190618104718.25433-1-peter.maydell@linaro.org>
-Message-ID: <156096727672.4631.8497777036264668688@sif>
-User-Agent: alot/0.7
-Date: Wed, 19 Jun 2019 13:01:16 -0500
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-06-19_11:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=4 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906190146
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: Re: [Qemu-devel] [PATCH v2] qemu-ga: Convert invocation
- documentation to rST
+In-Reply-To: <5D09B9F402000048000A1DB3@prv-mh.provo.novell.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Wed, 19 Jun 2019 18:15:19 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] Recent python-sphinx errors out building doc
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,564 +149,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Quoting Peter Maydell (2019-06-18 05:47:18)
-> The qemu-ga documentation is currently in qemu-ga.texi in
-> Texinfo format, which we present to the user as:
->  * a qemu-ga manpage
->  * a section of the main qemu-doc HTML documentation
-> =
 
-> Convert the documentation to rST format, and present it to
-> the user as:
->  * a qemu-ga manpage
->  * part of the interop/ Sphinx manual
-> =
 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On 6/19/19 12:28 AM, Bruce Rogers wrote:
+>>>> On 6/18/2019 at 6:11 PM, John Snow <jsnow@redhat.com> wrote:
+> 
+>>
+>> On 6/18/19 7:37 PM, Bruce Rogers wrote:
+>>> Hi,
+>>>
+>>> (Resent with correct address for John)
+>>> I build recent upstream qemu in the openSUSE Build Service, and for
+>>> the Factory repository there, python-sphinx was recently updated to
+>>> version 2.1.1. This caused the build to fail as follows:
+>>> /home/abuild/rpmbuild/BUILD/qemu-4.0.50/docs/interop/bitmaps.rst:202:Could
+>>> not lex literal_block as "json". Highlighting skipped.
+>>>
+>>> The python-sphinx tools is called with warnings are treated as errors
+>>> it looks like. I don't know much at all about this tool, and hopefully
+>>> someone knows what to fix here. If you want to give me a pointer
+>>> on what needs to change, I could give a go at doing a fix however.
+>>>
+>>> Thanks,
+>>>
+>>> Bruce
+>>
+>> Hi, there's a series designed to fix this:
+>>
+>> https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg00348.html 
+>>
+>> I think it's up to Peter to merge it as the maintainer of the Sphinx
+>> machinery.
+> 
+> Yup, this series fixes it for me. Thanks!
+> 
+> Bruce
+> 
 
-Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-Tested-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Correction: Peter already merged it. Sorry for the noise!
 
-Assuming you're planning to pull this into your overall conversion, but let
-me know if you want it to go through my tree.
-
-> ---
-> v1->v2:
->  * filter out built manpages when installing the HTML manual
->  * default to /etc/qemu as the CONFDIR
->  * rather than duplicating the whole sphinx command line in
->    two macros, make the existing build-manual macro take an
->    extra argument to specify html or manpage creation. This
->    ensures we invoke the same way both times, which is important
->    since sphinx might cache parts of the config in .doctrees
->  * drop trailing '=3D' from 'key' column in table
-> ---
->  Makefile                 |  24 ++++---
->  MAINTAINERS              |   2 +-
->  docs/conf.py             |  18 ++---
->  docs/interop/conf.py     |   7 ++
->  docs/interop/index.rst   |   1 +
->  docs/interop/qemu-ga.rst | 133 +++++++++++++++++++++++++++++++++++++
->  qemu-doc.texi            |   5 --
->  qemu-ga.texi             | 137 ---------------------------------------
->  8 files changed, 166 insertions(+), 161 deletions(-)
->  create mode 100644 docs/interop/qemu-ga.rst
->  delete mode 100644 qemu-ga.texi
-> =
-
-> diff --git a/Makefile b/Makefile
-> index cfb18f15254..41c84890795 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -329,7 +329,7 @@ endif
->  endif
-> =
-
->  ifdef BUILD_DOCS
-> -DOCS=3Dqemu-doc.html qemu-doc.txt qemu.1 qemu-img.1 qemu-nbd.8 qemu-ga.8
-> +DOCS=3Dqemu-doc.html qemu-doc.txt qemu.1 qemu-img.1 qemu-nbd.8 docs/inte=
-rop/qemu-ga.8
->  DOCS+=3Ddocs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt doc=
-s/interop/qemu-qmp-ref.7
->  DOCS+=3Ddocs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/=
-interop/qemu-ga-ref.7
->  DOCS+=3Ddocs/qemu-block-drivers.7
-> @@ -771,10 +771,11 @@ DESCS=3D
->  endif
-> =
-
->  # Note that we manually filter-out the non-Sphinx documentation which
-> -# is currently built into the docs/interop directory in the build tree.
-> +# is currently built into the docs/interop directory in the build tree,
-> +# and also any sphinx-built manpages.
->  define install-manual =3D
->  for d in $$(cd $(MANUAL_BUILDDIR) && find $1 -type d); do $(INSTALL_DIR)=
- "$(DESTDIR)$(qemu_docdir)/$$d"; done
-> -for f in $$(cd $(MANUAL_BUILDDIR) && find $1 -type f -a '!' '(' -name 'q=
-emu-*-qapi.*' -o -name 'qemu-*-ref.*' ')' ); do $(INSTALL_DATA) "$(MANUAL_B=
-UILDDIR)/$$f" "$(DESTDIR)$(qemu_docdir)/$$f"; done
-> +for f in $$(cd $(MANUAL_BUILDDIR) && find $1 -type f -a '!' '(' -name '*=
-.[0-9]' -o -name 'qemu-*-qapi.*' -o -name 'qemu-*-ref.*' ')' ); do $(INSTAL=
-L_DATA) "$(MANUAL_BUILDDIR)/$$f" "$(DESTDIR)$(qemu_docdir)/$$f"; done
->  endef
-> =
-
->  # Note that we deliberately do not install the "devel" manual: it is
-> @@ -806,7 +807,7 @@ ifdef CONFIG_TRACE_SYSTEMTAP
->         $(INSTALL_DATA) scripts/qemu-trace-stap.1 "$(DESTDIR)$(mandir)/ma=
-n1"
->  endif
->  ifneq (,$(findstring qemu-ga,$(TOOLS)))
-> -       $(INSTALL_DATA) qemu-ga.8 "$(DESTDIR)$(mandir)/man8"
-> +       $(INSTALL_DATA) docs/interop/qemu-ga.8 "$(DESTDIR)$(mandir)/man8"
->         $(INSTALL_DATA) docs/interop/qemu-ga-ref.html "$(DESTDIR)$(qemu_d=
-ocdir)"
->         $(INSTALL_DATA) docs/interop/qemu-ga-ref.txt "$(DESTDIR)$(qemu_do=
-cdir)"
->         $(INSTALL_DATA) docs/interop/qemu-ga-ref.7 "$(DESTDIR)$(mandir)/m=
-an7"
-> @@ -967,18 +968,22 @@ docs/version.texi: $(SRC_PATH)/VERSION config-host.=
-mak
->  sphinxdocs: $(MANUAL_BUILDDIR)/devel/index.html $(MANUAL_BUILDDIR)/inter=
-op/index.html $(MANUAL_BUILDDIR)/specs/index.html
-> =
-
->  # Canned command to build a single manual
-> -build-manual =3D $(call quiet-command,sphinx-build $(if $(V),,-q) -W -n =
--b html -D version=3D$(VERSION) -D release=3D"$(FULL_VERSION)" -d .doctrees=
-/$1 $(SRC_PATH)/docs/$1 $(MANUAL_BUILDDIR)/$1 ,"SPHINX","$(MANUAL_BUILDDIR)=
-/$1")
-> +# Arguments: $1 =3D manual name, $2 =3D Sphinx builder ('html' or 'man')
-> +build-manual =3D $(call quiet-command,CONFDIR=3D"$(qemu_confdir)" sphinx=
--build $(if $(V),,-q) -W -n -b $2 -D version=3D$(VERSION) -D release=3D"$(F=
-ULL_VERSION)" -d .doctrees/$1 $(SRC_PATH)/docs/$1 $(MANUAL_BUILDDIR)/$1 ,"S=
-PHINX","$(MANUAL_BUILDDIR)/$1")
->  # We assume all RST files in the manual's directory are used in it
->  manual-deps =3D $(wildcard $(SRC_PATH)/docs/$1/*.rst) $(SRC_PATH)/docs/$=
-1/conf.py $(SRC_PATH)/docs/conf.py
-> =
-
->  $(MANUAL_BUILDDIR)/devel/index.html: $(call manual-deps,devel)
-> -       $(call build-manual,devel)
-> +       $(call build-manual,devel,html)
-> =
-
->  $(MANUAL_BUILDDIR)/interop/index.html: $(call manual-deps,interop)
-> -       $(call build-manual,interop)
-> +       $(call build-manual,interop,html)
-> =
-
->  $(MANUAL_BUILDDIR)/specs/index.html: $(call manual-deps,specs)
-> -       $(call build-manual,specs)
-> +       $(call build-manual,specs,html)
-> +
-> +$(MANUAL_BUILDDIR)/interop/qemu-ga.8: $(call manual-deps,interop)
-> +       $(call build-manual,interop,man)
-> =
-
->  qemu-options.texi: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
->         $(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,"=
-GEN","$@")
-> @@ -1003,7 +1008,6 @@ qemu.1: qemu-option-trace.texi
->  qemu-img.1: qemu-img.texi qemu-option-trace.texi qemu-img-cmds.texi
->  fsdev/virtfs-proxy-helper.1: fsdev/virtfs-proxy-helper.texi
->  qemu-nbd.8: qemu-nbd.texi qemu-option-trace.texi
-> -qemu-ga.8: qemu-ga.texi
->  docs/qemu-block-drivers.7: docs/qemu-block-drivers.texi
->  docs/qemu-cpu-models.7: docs/qemu-cpu-models.texi
->  scripts/qemu-trace-stap.1: scripts/qemu-trace-stap.texi
-> @@ -1015,7 +1019,7 @@ txt: qemu-doc.txt docs/interop/qemu-qmp-ref.txt doc=
-s/interop/qemu-ga-ref.txt
-> =
-
->  qemu-doc.html qemu-doc.info qemu-doc.pdf qemu-doc.txt: \
->         qemu-img.texi qemu-nbd.texi qemu-options.texi qemu-option-trace.t=
-exi \
-> -       qemu-deprecated.texi qemu-monitor.texi qemu-img-cmds.texi qemu-ga=
-.texi \
-> +       qemu-deprecated.texi qemu-monitor.texi qemu-img-cmds.texi \
->         qemu-monitor-info.texi docs/qemu-block-drivers.texi \
->         docs/qemu-cpu-models.texi docs/security.texi
-> =
-
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index acbad134ecb..c93ae2b17a7 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -2019,7 +2019,7 @@ QEMU Guest Agent
->  M: Michael Roth <mdroth@linux.vnet.ibm.com>
->  S: Maintained
->  F: qga/
-> -F: qemu-ga.texi
-> +F: docs/interop/qemu-ga.rst
->  F: scripts/qemu-guest-agent/
->  F: tests/test-qga.c
->  F: docs/interop/qemu-ga-ref.texi
-> diff --git a/docs/conf.py b/docs/conf.py
-> index befbcc6c3e1..4a960b25b3e 100644
-> --- a/docs/conf.py
-> +++ b/docs/conf.py
-> @@ -115,6 +115,14 @@ todo_include_todos =3D False
->  # with "option::" in the document being processed. Turn that off.
->  suppress_warnings =3D ["ref.option"]
-> =
-
-> +# The rst_epilog fragment is effectively included in every rST file.
-> +# We use it to define substitutions based on build config that
-> +# can then be used in the documentation. The fallback if the
-> +# environment variable is not set is for the benefit of readthedocs
-> +# style document building; our Makefile always sets the variable.
-> +confdir =3D os.getenv('CONFDIR', "/etc/qemu")
-> +rst_epilog =3D ".. |CONFDIR| replace:: ``" + confdir + "``\n"
-> +
->  # -- Options for HTML output -------------------------------------------=
----
-> =
-
->  # The theme to use for HTML and HTML Help pages.  See the documentation =
-for
-> @@ -192,14 +200,8 @@ latex_documents =3D [
-> =
-
-> =
-
->  # -- Options for manual page output ------------------------------------=
----
-> -
-> -# One entry per manual page. List of tuples
-> -# (source start file, name, description, authors, manual section).
-> -man_pages =3D [
-> -    (master_doc, 'qemu', u'QEMU Documentation',
-> -     [author], 1)
-> -]
-> -
-> +# Individual manual/conf.py can override this to create man pages
-> +man_pages =3D []
-> =
-
->  # -- Options for Texinfo output ----------------------------------------=
----
-> =
-
-> diff --git a/docs/interop/conf.py b/docs/interop/conf.py
-> index cf3c69d4a7e..e87b8c22bec 100644
-> --- a/docs/interop/conf.py
-> +++ b/docs/interop/conf.py
-> @@ -13,3 +13,10 @@ exec(compile(open(parent_config, "rb").read(), parent_=
-config, 'exec'))
->  # This slightly misuses the 'description', but is the best way to get
->  # the manual title to appear in the sidebar.
->  html_theme_options['description'] =3D u'System Emulation Management and =
-Interoperability Guide'
-> +
-> +# One entry per manual page. List of tuples
-> +# (source start file, name, description, authors, manual section).
-> +man_pages =3D [
-> +    ('qemu-ga', 'qemu-ga', u'QEMU Guest Agent',
-> +     ['Michael Roth <mdroth@linux.vnet.ibm.com>'], 8)
-> +]
-> diff --git a/docs/interop/index.rst b/docs/interop/index.rst
-> index b4bfcab4171..3e33fb59332 100644
-> --- a/docs/interop/index.rst
-> +++ b/docs/interop/index.rst
-> @@ -15,5 +15,6 @@ Contents:
->     bitmaps
->     live-block-operations
->     pr-helper
-> +   qemu-ga
->     vhost-user
->     vhost-user-gpu
-> diff --git a/docs/interop/qemu-ga.rst b/docs/interop/qemu-ga.rst
-> new file mode 100644
-> index 00000000000..1313a4ae1c9
-> --- /dev/null
-> +++ b/docs/interop/qemu-ga.rst
-> @@ -0,0 +1,133 @@
-> +QEMU Guest Agent
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +Synopsis
-> +--------
-> +
-> +**qemu-ga** [*OPTIONS*]
-> +
-> +Description
-> +-----------
-> +
-> +The QEMU Guest Agent is a daemon intended to be run within virtual
-> +machines. It allows the hypervisor host to perform various operations
-> +in the guest, such as:
-> +
-> +- get information from the guest
-> +- set the guest's system time
-> +- read/write a file
-> +- sync and freeze the filesystems
-> +- suspend the guest
-> +- reconfigure guest local processors
-> +- set user's password
-> +- ...
-> +
-> +qemu-ga will read a system configuration file on startup (located at
-> +|CONFDIR|\ ``/qemu-ga.conf`` by default), then parse remaining
-> +configuration options on the command line. For the same key, the last
-> +option wins, but the lists accumulate (see below for configuration
-> +file format).
-> +
-> +Options
-> +-------
-> +
-> +.. program:: qemu-ga
-> +
-> +.. option:: -m, --method=3DMETHOD
-> +
-> +  Transport method: one of ``unix-listen``, ``virtio-serial``, or
-> +  ``isa-serial`` (``virtio-serial`` is the default).
-> +
-> +.. option:: -p, --path=3DPATH
-> +
-> +  Device/socket path (the default for virtio-serial is
-> +  ``/dev/virtio-ports/org.qemu.guest_agent.0``,
-> +  the default for isa-serial is ``/dev/ttyS0``)
-> +
-> +.. option:: -l, --logfile=3DPATH
-> +
-> +  Set log file path (default is stderr).
-> +
-> +.. option:: -f, --pidfile=3DPATH
-> +
-> +  Specify pid file (default is ``/var/run/qemu-ga.pid``).
-> +
-> +.. option:: -F, --fsfreeze-hook=3DPATH
-> +
-> +  Enable fsfreeze hook. Accepts an optional argument that specifies
-> +  script to run on freeze/thaw. Script will be called with
-> +  'freeze'/'thaw' arguments accordingly (default is
-> +  |CONFDIR|\ ``/fsfreeze-hook``). If using -F with an argument, do
-> +  not follow -F with a space (for example:
-> +  ``-F/var/run/fsfreezehook.sh``).
-> +
-> +.. option:: -t, --statedir=3DPATH
-> +
-> +  Specify the directory to store state information (absolute paths only,
-> +  default is ``/var/run``).
-> +
-> +.. option:: -v, --verbose
-> +
-> +  Log extra debugging information.
-> +
-> +.. option:: -V, --version
-> +
-> +  Print version information and exit.
-> +
-> +.. option:: -d, --daemon
-> +
-> +  Daemonize after startup (detach from terminal).
-> +
-> +.. option:: -b, --blacklist=3DLIST
-> +
-> +  Comma-separated list of RPCs to disable (no spaces, ``?`` to list
-> +  available RPCs).
-> +
-> +.. option:: -D, --dump-conf
-> +
-> +  Dump the configuration in a format compatible with ``qemu-ga.conf``
-> +  and exit.
-> +
-> +.. option:: -h, --help
-> +
-> +  Display this help and exit.
-> +
-> +Files
-> +-----
-> +
-> +
-> +The syntax of the ``qemu-ga.conf`` configuration file follows the
-> +Desktop Entry Specification, here is a quick summary: it consists of
-> +groups of key-value pairs, interspersed with comments.
-> +
-> +::
-> +
-> +    # qemu-ga configuration sample
-> +    [general]
-> +    daemonize =3D 0
-> +    pidfile =3D /var/run/qemu-ga.pid
-> +    verbose =3D 0
-> +    method =3D virtio-serial
-> +    path =3D /dev/virtio-ports/org.qemu.guest_agent.0
-> +    statedir =3D /var/run
-> +
-> +The list of keys follows the command line options:
-> +
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-> +Key             Key type
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-> +daemon         boolean
-> +method         string
-> +path           string
-> +logfile        string
-> +pidfile        string
-> +fsfreeze-hook  string
-> +statedir       string
-> +verbose        boolean
-> +blacklist      string list
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-> +
-> +See also
-> +--------
-> +
-> +:manpage:`qemu(1)`
-> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> index 577d1e83764..fbdca1a992a 100644
-> --- a/qemu-doc.texi
-> +++ b/qemu-doc.texi
-> @@ -2525,11 +2525,6 @@ so should only be used with trusted guest OS.
-> =
-
->  @c man end
-> =
-
-> -@node QEMU Guest Agent
-> -@chapter QEMU Guest Agent invocation
-> -
-> -@include qemu-ga.texi
-> -
->  @node QEMU User space emulator
->  @chapter QEMU User space emulator
-> =
-
-> diff --git a/qemu-ga.texi b/qemu-ga.texi
-> deleted file mode 100644
-> index f00ad830f28..00000000000
-> --- a/qemu-ga.texi
-> +++ /dev/null
-> @@ -1,137 +0,0 @@
-> -@example
-> -@c man begin SYNOPSIS
-> -@command{qemu-ga} [@var{OPTIONS}]
-> -@c man end
-> -@end example
-> -
-> -@c man begin DESCRIPTION
-> -
-> -The QEMU Guest Agent is a daemon intended to be run within virtual
-> -machines. It allows the hypervisor host to perform various operations
-> -in the guest, such as:
-> -
-> -@itemize
-> -@item
-> -get information from the guest
-> -@item
-> -set the guest's system time
-> -@item
-> -read/write a file
-> -@item
-> -sync and freeze the filesystems
-> -@item
-> -suspend the guest
-> -@item
-> -reconfigure guest local processors
-> -@item
-> -set user's password
-> -@item
-> -...
-> -@end itemize
-> -
-> -qemu-ga will read a system configuration file on startup (located at
-> -@file{@value{CONFDIR}/qemu-ga.conf} by default), then parse remaining
-> -configuration options on the command line. For the same key, the last
-> -option wins, but the lists accumulate (see below for configuration
-> -file format).
-> -
-> -@c man end
-> -
-> -@c man begin OPTIONS
-> -@table @option
-> -@item -m, --method=3D@var{method}
-> -  Transport method: one of @samp{unix-listen}, @samp{virtio-serial}, or
-> -  @samp{isa-serial} (@samp{virtio-serial} is the default).
-> -
-> -@item -p, --path=3D@var{path}
-> -  Device/socket path (the default for virtio-serial is
-> -  @samp{/dev/virtio-ports/org.qemu.guest_agent.0},
-> -  the default for isa-serial is @samp{/dev/ttyS0})
-> -
-> -@item -l, --logfile=3D@var{path}
-> -  Set log file path (default is stderr).
-> -
-> -@item -f, --pidfile=3D@var{path}
-> -  Specify pid file (default is @samp{/var/run/qemu-ga.pid}).
-> -
-> -@item -F, --fsfreeze-hook=3D@var{path}
-> -  Enable fsfreeze hook. Accepts an optional argument that specifies
-> -  script to run on freeze/thaw. Script will be called with
-> -  'freeze'/'thaw' arguments accordingly (default is
-> -  @samp{@value{CONFDIR}/fsfreeze-hook}). If using -F with an argument, do
-> -  not follow -F with a space (for example:
-> -  @samp{-F/var/run/fsfreezehook.sh}).
-> -
-> -@item -t, --statedir=3D@var{path}
-> -  Specify the directory to store state information (absolute paths only,
-> -  default is @samp{/var/run}).
-> -
-> -@item -v, --verbose
-> -  Log extra debugging information.
-> -
-> -@item -V, --version
-> -  Print version information and exit.
-> -
-> -@item -d, --daemon
-> -  Daemonize after startup (detach from terminal).
-> -
-> -@item -b, --blacklist=3D@var{list}
-> -  Comma-separated list of RPCs to disable (no spaces, @samp{?} to list
-> -  available RPCs).
-> -
-> -@item -D, --dump-conf
-> -  Dump the configuration in a format compatible with @file{qemu-ga.conf}
-> -  and exit.
-> -
-> -@item -h, --help
-> -  Display this help and exit.
-> -@end table
-> -
-> -@c man end
-> -
-> -@c man begin FILES
-> -
-> -The syntax of the @file{qemu-ga.conf} configuration file follows the
-> -Desktop Entry Specification, here is a quick summary: it consists of
-> -groups of key-value pairs, interspersed with comments.
-> -
-> -@example
-> -# qemu-ga configuration sample
-> -[general]
-> -daemonize =3D 0
-> -pidfile =3D /var/run/qemu-ga.pid
-> -verbose =3D 0
-> -method =3D virtio-serial
-> -path =3D /dev/virtio-ports/org.qemu.guest_agent.0
-> -statedir =3D /var/run
-> -@end example
-> -
-> -The list of keys follows the command line options:
-> -@table @option
-> -@item daemon=3D boolean
-> -@item method=3D string
-> -@item path=3D string
-> -@item logfile=3D string
-> -@item pidfile=3D string
-> -@item fsfreeze-hook=3D string
-> -@item statedir=3D string
-> -@item verbose=3D boolean
-> -@item blacklist=3D string list
-> -@end table
-> -
-> -@c man end
-> -
-> -@ignore
-> -
-> -@setfilename qemu-ga
-> -@settitle QEMU Guest Agent
-> -
-> -@c man begin AUTHOR
-> -Michael Roth <mdroth@linux.vnet.ibm.com>
-> -@c man end
-> -
-> -@c man begin SEEALSO
-> -qemu(1)
-> -@c man end
-> -
-> -@end ignore
-> -- =
-
-> 2.20.1
->=20
+--js
 
