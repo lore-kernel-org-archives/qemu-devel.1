@@ -2,62 +2,67 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A1DAC43613
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 23:23:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9634C43613
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 23:49:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DBBE2085A
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 23:23:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DBBE2085A
+	by mail.kernel.org (Postfix) with ESMTPS id 8D8D720851
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 23:49:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D8D720851
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42530 helo=lists.gnu.org)
+Received: from localhost ([::1]:42578 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdjuw-0008Oy-0d
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 19:23:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49660)
+	id 1hdkKh-0006M1-89
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 19:49:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54049)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hdjtf-0007hG-A7
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 19:21:44 -0400
+ (envelope-from <lersek@redhat.com>) id 1hdkJ5-00052u-2R
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 19:48:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hdjte-0006vV-Ba
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 19:21:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:5406)
+ (envelope-from <lersek@redhat.com>) id 1hdkBd-0001DA-7e
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 19:40:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54190)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hdjte-0006u7-5c
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 19:21:42 -0400
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hdkBZ-00015A-9x
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 19:40:14 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 72E3589AD0;
- Wed, 19 Jun 2019 23:21:40 +0000 (UTC)
-Received: from localhost (ovpn-116-76.gru2.redhat.com [10.97.116.76])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D145C19C5B;
- Wed, 19 Jun 2019 23:21:39 +0000 (UTC)
-Date: Wed, 19 Jun 2019 20:21:37 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Like Xu <like.xu@linux.intel.com>
-Message-ID: <20190619232137.GA1542@habkost.net>
-References: <20190612084104.34984-1-like.xu@linux.intel.com>
- <20190612084104.34984-7-like.xu@linux.intel.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 14647307D910;
+ Wed, 19 Jun 2019 23:40:10 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-91.ams2.redhat.com
+ [10.36.116.91])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 74D6019C5B;
+ Wed, 19 Jun 2019 23:40:09 +0000 (UTC)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190614202333.19355-1-lersek@redhat.com>
+ <CAFEAcA9PcTTagxUcxba-_qFsC97T6uEe927akjj-G4na22rf6g@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <eecc2b21-c860-9071-4322-a9fbb40a40e1@redhat.com>
+Date: Thu, 20 Jun 2019 01:40:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190612084104.34984-7-like.xu@linux.intel.com>
+In-Reply-To: <CAFEAcA9PcTTagxUcxba-_qFsC97T6uEe927akjj-G4na22rf6g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Wed, 19 Jun 2019 23:21:40 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Wed, 19 Jun 2019 23:40:10 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 6/9] i386/cpu: Add CPUID.1F generation
- support for multi-dies PCMachine
+Subject: Re: [Qemu-devel] [PULL 0/6] update edk2 submodule & binaries to
+ edk2-stable201905
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,54 +74,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I've just noticed one thing I don't understand:
-
-On Wed, Jun 12, 2019 at 04:41:01PM +0800, Like Xu wrote:
-> The CPUID.1F as Intel V2 Extended Topology Enumeration Leaf would be
-> exposed if guests want to emulate multiple software-visible die within
-> each package. Per Intel's SDM, the 0x1f is a superset of 0xb, thus they
-> can be generated by almost same code as 0xb except die_offset setting.
+On 06/17/19 12:54, Peter Maydell wrote:
+> On Fri, 14 Jun 2019 at 21:25, Laszlo Ersek <lersek@redhat.com> wrote:
+>>
+>> The following changes since commit f3d0bec9f80e4ed7796fffa834ba0a53f2094f7f:
+>>
+>>   Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2019-06-14' into staging (2019-06-14 14:46:13 +0100)
+>>
+>> are available in the Git repository at:
+>>
+>>   https://github.com/lersek/qemu.git tags/edk2-pull-2019-06-14
+>>
+>> for you to fetch changes up to 541617cad3445fdc6735e9e5752e1f698e337737:
+>>
+>>   pc-bios: update the README file with edk2-stable201905 information (2019-06-14 21:48:00 +0200)
+>>
+>> ----------------------------------------------------------------
+>> edk2-stable201905 was released on 2019-06-06:
+>>
+>>   https://github.com/tianocore/edk2/releases/tag/edk2-stable201905
+>>
+>> Advance QEMU's edk2 submodule to edk2-stable201905, and rebuild the
+>> firmware binaries. This should be the edk2 release that goes into QEMU
+>> 4.1.
+>>
+>> Launchpad: https://bugs.launchpad.net/qemu/+bug/1831477
 > 
-> If the number of dies per package is less than 2, the qemu will not
-> expose CPUID.1F regardless of whether the host supports CPUID.1F.
 > 
-> Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> ---
->  target/i386/cpu.c | 37 +++++++++++++++++++++++++++++++++++++
->  target/i386/cpu.h |  4 ++++
->  target/i386/kvm.c | 12 ++++++++++++
->  3 files changed, 53 insertions(+)
+> Applied, thanks.
+
+Thanks!
+
 > 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 09e20a2c3b..127aff74a6 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -4437,6 +4437,42 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->              *ecx |= CPUID_TOPOLOGY_LEVEL_INVALID;
->          }
->  
-> +        assert(!(*eax & ~0x1f));
-> +        *ebx &= 0xffff; /* The count doesn't need to be reliable. */
-> +        break;
-> +    case 0x1F:
-> +        /* V2 Extended Topology Enumeration Leaf */
-> +        if (env->nr_dies < 2 || !cpu->enable_cpuid_0x1f) {
-> +            *eax = *ebx = *ecx = *edx = 0;
+> Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+> for any user-visible changes.
 
-Why exactly do you need cpu->enable_cpuid_0x1f?  When would it
-make sense to set dies > 1 but disable CPUID.1F?
+Done.
 
-
-> +            break;
-> +        }
-[...]
-
--- 
-Eduardo
+Laszlo
 
