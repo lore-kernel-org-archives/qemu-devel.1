@@ -2,140 +2,89 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B29D0C31E5B
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 00:12:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68001C31E5B
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 00:21:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76F0520657
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 00:12:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76F0520657
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 35B6E20863
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 00:21:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lT2ORDH+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35B6E20863
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34228 helo=lists.gnu.org)
+Received: from localhost ([::1]:34264 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdODM-0007Xs-Pw
-	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 20:12:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42136)
+	id 1hdOLg-0001KL-1q
+	for qemu-devel@archiver.kernel.org; Tue, 18 Jun 2019 20:21:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43343)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hdOCj-000736-Ox
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 20:11:58 -0400
+ (envelope-from <rashmica.g@gmail.com>) id 1hdOK8-0000R9-A6
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 20:19:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hdOCi-0006V4-Cz
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 20:11:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44010)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1hdOCi-0006T6-4z
- for qemu-devel@nongnu.org; Tue, 18 Jun 2019 20:11:56 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E0145307D8BE;
- Wed, 19 Jun 2019 00:11:54 +0000 (UTC)
-Received: from [10.18.17.177] (dhcp-17-177.bos.redhat.com [10.18.17.177])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5BE08611B8;
- Wed, 19 Jun 2019 00:11:54 +0000 (UTC)
-To: Bruce Rogers <brogers@suse.com>, peter.maydell@linaro.org,
- qemu-devel@nongnu.org
-References: <5D096A9302000048000A1D8C@prv-mh.provo.novell.com>
- <5D0975BE02000048000A1D94@prv-mh.provo.novell.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <15622953-3be9-c639-b50c-56ed8d3310b9@redhat.com>
-Date: Tue, 18 Jun 2019 20:11:53 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <5D0975BE02000048000A1D94@prv-mh.provo.novell.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Wed, 19 Jun 2019 00:11:54 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Recent python-sphinx errors out building doc
+ (envelope-from <rashmica.g@gmail.com>) id 1hdOK4-0007LO-CQ
+ for qemu-devel@nongnu.org; Tue, 18 Jun 2019 20:19:34 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:36654)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <rashmica.g@gmail.com>)
+ id 1hdOJx-00077x-Ha; Tue, 18 Jun 2019 20:19:25 -0400
+Received: by mail-pl1-x644.google.com with SMTP id k8so5417957plt.3;
+ Tue, 18 Jun 2019 17:19:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=message-id:subject:from:to:cc:date:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=K/1c8f1wGw2bxDm6YYyD89wi2cuLiWFSdw6J7k5V91c=;
+ b=lT2ORDH+bDOfU+U+3GZWNmJV7HZWIhmacVtSn6q/3SX2TsBzjz+FgBFnnE2DLWSVxl
+ ZWWdqxqVRomFQln7bzHeWGAe0ncVEUJ4nkqx9qhNJuorR5/ISmRDNcZvImKeDG4EiKVO
+ fn3GAUudVpYuPkzUMejZtSq/dJqlNX/lIDOTm0S38uXvEm1hI2CWDjlECJ4IqhJQU0Lj
+ eehnEC/2kBcNESjB9ilvOJyEOBRtLTil5As2y57EiKkQ4gNZiMlwX7Fg2MKrSi6Xl/r/
+ 8YESVdAkFgqO1qrhOQQv7ibxOjOO/mgWeRb/nD6xRRfSwxn1G9sAcKDulk7hB1stA6wR
+ i1Tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=K/1c8f1wGw2bxDm6YYyD89wi2cuLiWFSdw6J7k5V91c=;
+ b=WMD7vDsap97zp/0YLcW9EP7ZOt92Y8Xoo8bx4BjRmYihU+xH2NXmr8kzGr3OEbp9zE
+ q00Gv8GCCXoVh3TJ3HpjAsNdjBrX9QquEoaIxARSP0mQw+ARQ1SYN1jZ5aA6BVQwqBcL
+ Osbwl00l8epwXplOLky4mryl0roK8UJZP46ynBWnf4G8QX1ZFRktIEmiz+9RIdOCn2pn
+ kCNfzNIHhyl+gcfQU3UfxMpFy2cOXZbRKJ4SkQs+0AERqpsEqtgTVsbnkLSyKP3ygQAp
+ Z1dH05uBpSOQi8ogCkGmzOPhUAdh8aUICOBusb2nMtDm/sBEkoamdUSWsDLSgNbvClc/
+ C3rQ==
+X-Gm-Message-State: APjAAAXKFJVLBdFalUvB61Dtw4Xoqe2T0HzrCeu1jSounrTFcgRGhiBf
+ PvCH06gsxjjbkOJc0dd+eyc=
+X-Google-Smtp-Source: APXvYqx/DVj11nW9LFMxQOq3T4o6F9bcosumgsEAHqNoeAT2RqBjeXB/Ph2w3agngbfU3pqxbZ+/Og==
+X-Received: by 2002:a17:902:2a26:: with SMTP id
+ i35mr77084394plb.315.1560903561862; 
+ Tue, 18 Jun 2019 17:19:21 -0700 (PDT)
+Received: from rashmica.ozlabs.ibm.com ([122.99.82.10])
+ by smtp.googlemail.com with ESMTPSA id a18sm3705853pjq.0.2019.06.18.17.19.19
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Tue, 18 Jun 2019 17:19:21 -0700 (PDT)
+Message-ID: <c4f4eb5f0a347fed2325ffc6e97be54a36860b46.camel@gmail.com>
+From: Rashmica Gupta <rashmica.g@gmail.com>
+To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-arm@nongnu.org
+Date: Wed, 19 Jun 2019 10:19:17 +1000
+In-Reply-To: <07308eea-1249-98d2-6e3a-d701c97410ee@kaod.org>
+References: <20190618085154.21498-1-rashmica.g@gmail.com>
+ <20190618085154.21498-3-rashmica.g@gmail.com>
+ <07308eea-1249-98d2-6e3a-d701c97410ee@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-3.fc28) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::644
+Subject: Re: [Qemu-devel] [PATCH 2/2] aspeed: add a GPIO controller to the
+ SoC
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,37 +96,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: andrew@aj.id.au, qemu-devel@nongnu.org, joel@jms.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 6/18/19 7:37 PM, Bruce Rogers wrote:
-> Hi,
+On Tue, 2019-06-18 at 11:21 +0200, Cédric Le Goater wrote:
+> On 18/06/2019 10:51, Rashmica Gupta wrote:
+> > Signed-off-by: Rashmica Gupta <rashmica.g@gmail.com>
+> > ---
+> >  hw/arm/aspeed_soc.c         | 17 +++++++++++++++++
+> >  include/hw/arm/aspeed_soc.h |  3 +++
+> >  2 files changed, 20 insertions(+)
+> > 
+> > diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+> > index 1cc98b9f40..8583869acf 100644
+> > --- a/hw/arm/aspeed_soc.c
+> > +++ b/hw/arm/aspeed_soc.c
+> > @@ -23,6 +23,7 @@
+> >  #include "net/net.h"
+> >  
+> >  #define ASPEED_SOC_IOMEM_SIZE       0x00200000
+> > +#define ASPEED_SOC_GPIO_BASE        0x1E780000
+> > 
 > 
-> (Resent with correct address for John)
-> I build recent upstream qemu in the openSUSE Build Service, and for
-> the Factory repository there, python-sphinx was recently updated to
-> version 2.1.1. This caused the build to fail as follows:
-> /home/abuild/rpmbuild/BUILD/qemu-4.0.50/docs/interop/bitmaps.rst:202:Could
-> not lex literal_block as "json". Highlighting skipped.
+> You should put this value in the memmap array.
+>
+
+Oops, good spot!
+
+> C. 
 > 
-> The python-sphinx tools is called with warnings are treated as errors
-> it looks like. I don't know much at all about this tool, and hopefully
-> someone knows what to fix here. If you want to give me a pointer
-> on what needs to change, I could give a go at doing a fix however.
 > 
-> Thanks,
+> >  static const hwaddr aspeed_soc_ast2400_memmap[] = {
+> >      [ASPEED_IOMEM]  = 0x1E600000,
+> > @@ -120,6 +121,7 @@ static const AspeedSoCInfo aspeed_socs[] = {
+> >          .spis_num     = 1,
+> >          .fmc_typename = "aspeed.smc.fmc",
+> >          .spi_typename = aspeed_soc_ast2400_typenames,
+> > +        .gpio_typename = "aspeed.gpio-ast2400",
+> >          .wdts_num     = 2,
+> >          .irqmap       = aspeed_soc_ast2400_irqmap,
+> >          .memmap       = aspeed_soc_ast2400_memmap,
+> > @@ -131,6 +133,7 @@ static const AspeedSoCInfo aspeed_socs[] = {
+> >          .spis_num     = 1,
+> >          .fmc_typename = "aspeed.smc.fmc",
+> >          .spi_typename = aspeed_soc_ast2400_typenames,
+> > +        .gpio_typename = "aspeed.gpio-ast2400",
+> >          .wdts_num     = 2,
+> >          .irqmap       = aspeed_soc_ast2400_irqmap,
+> >          .memmap       = aspeed_soc_ast2400_memmap,
+> > @@ -142,6 +145,7 @@ static const AspeedSoCInfo aspeed_socs[] = {
+> >          .spis_num     = 1,
+> >          .fmc_typename = "aspeed.smc.fmc",
+> >          .spi_typename = aspeed_soc_ast2400_typenames,
+> > +        .gpio_typename = "aspeed.gpio-ast2400",
+> >          .wdts_num     = 2,
+> >          .irqmap       = aspeed_soc_ast2400_irqmap,
+> >          .memmap       = aspeed_soc_ast2400_memmap,
+> > @@ -153,6 +157,7 @@ static const AspeedSoCInfo aspeed_socs[] = {
+> >          .spis_num     = 2,
+> >          .fmc_typename = "aspeed.smc.ast2500-fmc",
+> >          .spi_typename = aspeed_soc_ast2500_typenames,
+> > +        .gpio_typename = "aspeed.gpio-ast2500",
+> >          .wdts_num     = 3,
+> >          .irqmap       = aspeed_soc_ast2500_irqmap,
+> >          .memmap       = aspeed_soc_ast2500_memmap,
+> > @@ -225,6 +230,8 @@ static void aspeed_soc_init(Object *obj)
+> >  
+> >      sysbus_init_child_obj(obj, "ftgmac100", OBJECT(&s->ftgmac100),
+> >                            sizeof(s->ftgmac100), TYPE_FTGMAC100);
+> > +    sysbus_init_child_obj(obj, "gpio", OBJECT(&s->gpio), sizeof(s-
+> > >gpio),
+> > +                          sc->info->gpio_typename);
+> >  }
+> >  
+> >  static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+> > @@ -366,6 +373,16 @@ static void aspeed_soc_realize(DeviceState
+> > *dev, Error **errp)
+> >                      sc->info->memmap[ASPEED_ETH1]);
+> >      sysbus_connect_irq(SYS_BUS_DEVICE(&s->ftgmac100), 0,
+> >                         aspeed_soc_get_irq(s, ASPEED_ETH1));
+> > +
+> > +    /* GPIO */
+> > +    object_property_set_bool(OBJECT(&s->gpio), true, "realized",
+> > &err);
+> > +    if (err) {
+> > +        error_propagate(errp, err);
+> > +        return;
+> > +    }
+> > +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpio), 0,
+> > ASPEED_SOC_GPIO_BASE);
+> > +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->gpio), 0,
+> > +            qdev_get_gpio_in(DEVICE(&s->vic), 20));
+> >  }
+> >  
+> >  static void aspeed_soc_class_init(ObjectClass *oc, void *data)
+> > diff --git a/include/hw/arm/aspeed_soc.h
+> > b/include/hw/arm/aspeed_soc.h
+> > index 88b901d5df..28ff2bedb4 100644
+> > --- a/include/hw/arm/aspeed_soc.h
+> > +++ b/include/hw/arm/aspeed_soc.h
+> > @@ -20,6 +20,7 @@
+> >  #include "hw/ssi/aspeed_smc.h"
+> >  #include "hw/watchdog/wdt_aspeed.h"
+> >  #include "hw/net/ftgmac100.h"
+> > +#include "hw/gpio/aspeed_gpio.h"
+> >  
+> >  #define ASPEED_SPIS_NUM  2
+> >  #define ASPEED_WDTS_NUM  3
+> > @@ -40,6 +41,7 @@ typedef struct AspeedSoCState {
+> >      AspeedSDMCState sdmc;
+> >      AspeedWDTState wdt[ASPEED_WDTS_NUM];
+> >      FTGMAC100State ftgmac100;
+> > +    AspeedGPIOState gpio;
+> >  } AspeedSoCState;
+> >  
+> >  #define TYPE_ASPEED_SOC "aspeed-soc"
+> > @@ -53,6 +55,7 @@ typedef struct AspeedSoCInfo {
+> >      int spis_num;
+> >      const char *fmc_typename;
+> >      const char **spi_typename;
+> > +    const char *gpio_typename;
+> >      int wdts_num;
+> >      const int *irqmap;
+> >      const hwaddr *memmap;
+> > 
 > 
-> Bruce
+> 
 
-Hi, there's a series designed to fix this:
-
-https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg00348.html
-
-I think it's up to Peter to merge it as the maintainer of the Sphinx
-machinery.
-
---js
 
