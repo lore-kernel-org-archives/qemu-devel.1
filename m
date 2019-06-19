@@ -6,58 +6,88 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDAA2C31E5B
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:28:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC694C31E5B
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:30:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99BAB2084B
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:28:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99BAB2084B
+	by mail.kernel.org (Postfix) with ESMTPS id ACA062084B
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:30:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACA062084B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41324 helo=lists.gnu.org)
+Received: from localhost ([::1]:41356 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdgGB-0007LG-El
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 15:28:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49630)
+	id 1hdgIK-0000xM-VL
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 15:30:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50630)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hdgD0-0004mr-6E
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:25:27 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hdgFf-0007Mc-9M
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:28:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hdgCw-0004NF-1O
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:25:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59302)
+ (envelope-from <mreitz@redhat.com>) id 1hdgFe-0007Pf-7R
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:28:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55638)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hdgCq-0004El-NW
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:25:18 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hdgFZ-0007KZ-SG; Wed, 19 Jun 2019 15:28:06 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1CA5B30C1AD5;
- Wed, 19 Jun 2019 19:25:09 +0000 (UTC)
-Received: from localhost (ovpn-116-76.gru2.redhat.com [10.97.116.76])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9BD685C21E;
- Wed, 19 Jun 2019 19:25:08 +0000 (UTC)
-Date: Wed, 19 Jun 2019 16:25:07 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Like Xu <like.xu@linux.intel.com>
-Message-ID: <20190619192507.GF26409@habkost.net>
-References: <20190612084104.34984-1-like.xu@linux.intel.com>
- <20190612084104.34984-10-like.xu@linux.intel.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 7109AC1EB20A;
+ Wed, 19 Jun 2019 19:28:04 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-116-121.ams2.redhat.com
+ [10.36.116.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 845F01001B12;
+ Wed, 19 Jun 2019 19:27:50 +0000 (UTC)
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <1559152576-281803-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1559152576-281803-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <e3cf99ae-62e9-8b6e-5a06-d3c8b9363b85@redhat.com>
+Date: Wed, 19 Jun 2019 21:27:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190612084104.34984-10-like.xu@linux.intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <1559152576-281803-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="vz8GapngQoo4zr3b03v0PJqnreuf6aNaW"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Wed, 19 Jun 2019 19:25:11 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Wed, 19 Jun 2019 19:28:05 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 9/9] vl.c: Add -smp,
- dies=* command line support and update doc
+Subject: Re: [Qemu-devel] [PATCH v7 1/3] block: include base when checking
+ image chain for block allocation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,174 +99,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
+ berto@igalia.com, wencongyang2@huawei.com, xiechanglong.d@gmail.com,
+ stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 12, 2019 at 04:41:04PM +0800, Like Xu wrote:
-> For PC target, users could configure the number of dies per one package
-> via command line with this patch, such as "-smp dies=2,cores=4".
-> 
-> The parsing rules of new cpu-topology model obey the same restrictions/logic
-> as the legacy socket/core/thread model especially on missing values computing.
-> 
-> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vz8GapngQoo4zr3b03v0PJqnreuf6aNaW
+Content-Type: multipart/mixed; boundary="qlNZh4IxgAv6wgZV2wqkcsRvhJ3wNMlel";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, berto@igalia.com, jsnow@redhat.com,
+ stefanha@redhat.com, fam@euphon.net, wencongyang2@huawei.com,
+ xiechanglong.d@gmail.com, den@openvz.org, vsementsov@virtuozzo.com
+Message-ID: <e3cf99ae-62e9-8b6e-5a06-d3c8b9363b85@redhat.com>
+Subject: Re: [PATCH v7 1/3] block: include base when checking image chain for
+ block allocation
+References: <1559152576-281803-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1559152576-281803-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1559152576-281803-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+
+--qlNZh4IxgAv6wgZV2wqkcsRvhJ3wNMlel
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 29.05.19 19:56, Andrey Shinkevich wrote:
+> This patch is used in the 'block/stream: introduce a bottom node'
+> that is following. Instead of the base node, the caller may pass
+> the node that has the base as its backing image to the function
+> bdrv_is_allocated_above() with a new parameter include_base =3D true
+> and get rid of the dependency on the base that may change during
+> commit/stream parallel jobs. Now, if the specified base is not
+> found in the backing image chain, the QEMU will abort.
+>=20
+> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
 > ---
->  hw/i386/pc.c    | 32 ++++++++++++++++++--------------
->  qemu-options.hx | 17 +++++++++--------
->  vl.c            |  3 +++
->  3 files changed, 30 insertions(+), 22 deletions(-)
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 63b44bd2bd..8a5da4f0c1 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1543,10 +1543,13 @@ static void pc_new_cpu(PCMachineState *pcms, int64_t apic_id, Error **errp)
->  
->  void pc_smp_parse(MachineState *ms, QemuOpts *opts)
->  {
-> -    /* copy it from legacy smp_parse() in vl.c */
-> +    PCMachineState *pcms = (PCMachineState *)
-> +        object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE);
-> +
+>  block/commit.c        |  2 +-
+>  block/io.c            | 21 +++++++++++++++------
+>  block/mirror.c        |  2 +-
+>  block/replication.c   |  2 +-
+>  block/stream.c        |  2 +-
+>  include/block/block.h |  3 ++-
+>  6 files changed, 21 insertions(+), 11 deletions(-)
 
-Any specific reason for doing this instead of PC_MACHINE(ms)?
+This needs the following hunk squashed in so it still compiles:
 
-The rest of the patch looks good.
+(I can do that, if you agree.)
+
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 9396d490d5..2a59eb27fe 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2148,7 +2148,8 @@ static bool is_unallocated(BlockDriverState *bs,
+int64_t offset, int64_t bytes)
+ {
+     int64_t nr;
+     return !bytes ||
+-        (!bdrv_is_allocated_above(bs, NULL, offset, bytes, &nr) && nr
+=3D=3D bytes);
++        (!bdrv_is_allocated_above(bs, NULL, false, offset, bytes, &nr) &=
+&
++         nr =3D=3D bytes);
+ }
+
+ static bool is_zero_cow(BlockDriverState *bs, QCowL2Meta *m)
+diff --git a/qemu-img.c b/qemu-img.c
+index 158b3a505f..79983772de 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -3518,7 +3518,7 @@ static int img_rebase(int argc, char **argv)
+                  * to take action
+                  */
+                 ret =3D bdrv_is_allocated_above(backing_bs(bs),
+prefix_chain_bs,
+-                                              offset, n, &n);
++                                              false, offset, n, &n);
+                 if (ret < 0) {
+                     error_report("error while reading image metadata: %s=
+",
+                                  strerror(-ret));
 
 
->      if (opts) {
->          unsigned cpus    = qemu_opt_get_number(opts, "cpus", 0);
->          unsigned sockets = qemu_opt_get_number(opts, "sockets", 0);
-> +        unsigned dies = qemu_opt_get_number(opts, "dies", 1);
->          unsigned cores   = qemu_opt_get_number(opts, "cores", 0);
->          unsigned threads = qemu_opt_get_number(opts, "threads", 0);
->  
-> @@ -1556,24 +1559,24 @@ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
->              threads = threads > 0 ? threads : 1;
->              if (cpus == 0) {
->                  sockets = sockets > 0 ? sockets : 1;
-> -                cpus = cores * threads * sockets;
-> +                cpus = cores * threads * dies * sockets;
->              } else {
->                  ms->smp.max_cpus =
->                          qemu_opt_get_number(opts, "maxcpus", cpus);
-> -                sockets = ms->smp.max_cpus / (cores * threads);
-> +                sockets = ms->smp.max_cpus / (cores * threads * dies);
->              }
->          } else if (cores == 0) {
->              threads = threads > 0 ? threads : 1;
-> -            cores = cpus / (sockets * threads);
-> +            cores = cpus / (sockets * dies * threads);
->              cores = cores > 0 ? cores : 1;
->          } else if (threads == 0) {
-> -            threads = cpus / (cores * sockets);
-> +            threads = cpus / (cores * dies * sockets);
->              threads = threads > 0 ? threads : 1;
-> -        } else if (sockets * cores * threads < cpus) {
-> +        } else if (sockets * dies * cores * threads < cpus) {
->              error_report("cpu topology: "
-> -                         "sockets (%u) * cores (%u) * threads (%u) < "
-> +                         "sockets (%u) * dies (%u) * cores (%u) * threads (%u) < "
->                           "smp_cpus (%u)",
-> -                         sockets, cores, threads, cpus);
-> +                         sockets, dies, cores, threads, cpus);
->              exit(1);
->          }
->  
-> @@ -1585,26 +1588,27 @@ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
->              exit(1);
->          }
->  
-> -        if (sockets * cores * threads > ms->smp.max_cpus) {
-> +        if (sockets * dies * cores * threads > ms->smp.max_cpus) {
->              error_report("cpu topology: "
-> -                         "sockets (%u) * cores (%u) * threads (%u) > "
-> +                         "sockets (%u) * dies (%u) * cores (%u) * threads (%u) > "
->                           "maxcpus (%u)",
-> -                         sockets, cores, threads,
-> +                         sockets, dies, cores, threads,
->                           ms->smp.max_cpus);
->              exit(1);
->          }
->  
-> -        if (sockets * cores * threads != ms->smp.max_cpus) {
-> +        if (sockets * dies * cores * threads != ms->smp.max_cpus) {
->              warn_report("Invalid CPU topology deprecated: "
-> -                        "sockets (%u) * cores (%u) * threads (%u) "
-> +                        "sockets (%u) * dies (%u) * cores (%u) * threads (%u) "
->                          "!= maxcpus (%u)",
-> -                        sockets, cores, threads,
-> +                        sockets, dies, cores, threads,
->                          ms->smp.max_cpus);
->          }
->  
->          ms->smp.cpus = cpus;
->          ms->smp.cores = cores;
->          ms->smp.threads = threads;
-> +        pcms->smp_dies = dies;
->      }
->  
->      if (ms->smp.cpus > 1) {
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 0d8beb4afd..a5b314a448 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -138,25 +138,26 @@ no incompatible TCG features have been enabled (e.g. icount/replay).
->  ETEXI
->  
->  DEF("smp", HAS_ARG, QEMU_OPTION_smp,
-> -    "-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,sockets=sockets]\n"
-> +    "-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,dies=dies][,sockets=sockets]\n"
->      "                set the number of CPUs to 'n' [default=1]\n"
->      "                maxcpus= maximum number of total cpus, including\n"
->      "                offline CPUs for hotplug, etc\n"
-> -    "                cores= number of CPU cores on one socket\n"
-> +    "                cores= number of CPU cores on one socket (for PC, it's on one die)\n"
->      "                threads= number of threads on one CPU core\n"
-> +    "                dies= number of CPU dies on one socket (for PC only)\n"
->      "                sockets= number of discrete sockets in the system\n",
->          QEMU_ARCH_ALL)
->  STEXI
-> -@item -smp [cpus=]@var{n}[,cores=@var{cores}][,threads=@var{threads}][,sockets=@var{sockets}][,maxcpus=@var{maxcpus}]
-> +@item -smp [cpus=]@var{n}[,cores=@var{cores}][,threads=@var{threads}][,dies=dies][,sockets=@var{sockets}][,maxcpus=@var{maxcpus}]
->  @findex -smp
->  Simulate an SMP system with @var{n} CPUs. On the PC target, up to 255
->  CPUs are supported. On Sparc32 target, Linux limits the number of usable CPUs
->  to 4.
-> -For the PC target, the number of @var{cores} per socket, the number
-> -of @var{threads} per cores and the total number of @var{sockets} can be
-> -specified. Missing values will be computed. If any on the three values is
-> -given, the total number of CPUs @var{n} can be omitted. @var{maxcpus}
-> -specifies the maximum number of hotpluggable CPUs.
-> +For the PC target, the number of @var{cores} per die, the number of @var{threads}
-> +per cores, the number of @var{dies} per packages and the total number of
-> +@var{sockets} can be specified. Missing values will be computed.
-> +If any on the three values is given, the total number of CPUs @var{n} can be omitted.
-> +@var{maxcpus} specifies the maximum number of hotpluggable CPUs.
->  ETEXI
->  
->  DEF("numa", HAS_ARG, QEMU_OPTION_numa,
-> diff --git a/vl.c b/vl.c
-> index 53ea9b6d6f..c6d1339442 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -1231,6 +1231,9 @@ static QemuOptsList qemu_smp_opts = {
->          }, {
->              .name = "sockets",
->              .type = QEMU_OPT_NUMBER,
-> +        }, {
-> +            .name = "dies",
-> +            .type = QEMU_OPT_NUMBER,
->          }, {
->              .name = "cores",
->              .type = QEMU_OPT_NUMBER,
-> -- 
-> 2.21.0
-> 
+--qlNZh4IxgAv6wgZV2wqkcsRvhJ3wNMlel--
 
--- 
-Eduardo
+--vz8GapngQoo4zr3b03v0PJqnreuf6aNaW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0KjLUACgkQ9AfbAGHV
+z0DFxgf/a5TALurJhT71ytdeLnr9pEOcOl7OBI3KVvquvW4a0KsYlkv5Nh+pefUU
++97QK8cJaoXcV3TokPXCt5YJe/r6oVfbNHOIgEDZvjmhiQF+13J08rVLpRMOq7Xb
+IOiPUY+4N6ay4nGRIAF0r5SFL9JH/vgfacD/qUUINkLQXJ1Y6x+ebAIbP++foHaQ
+v6S1Lp1WQcPiM5qeUgKHVs7UV3YLzMQm/VxeBXCnWJZzusR1HUpPJco0gnQdAEiz
+yt7WHk6E003n7YfWTrXHXsd8rQ9iyiGHD0FFzUf5Up1qu8x7igK54m014nIRz0Jn
+z2elq34yfzURUMbxq7fC2FDik5kvxg==
+=UpAa
+-----END PGP SIGNATURE-----
+
+--vz8GapngQoo4zr3b03v0PJqnreuf6aNaW--
 
