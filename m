@@ -2,63 +2,68 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04EF7C43613
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 23:52:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10853C43613
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 23:52:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEF8D20851
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 23:52:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEF8D20851
+	by mail.kernel.org (Postfix) with ESMTPS id DBA2320851
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 23:52:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBA2320851
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42594 helo=lists.gnu.org)
+Received: from localhost ([::1]:42596 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdkNK-0000dQ-4N
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 19:52:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54049)
+	id 1hdkNU-0000rd-4Y
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 19:52:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54166)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hdkJL-00052u-6C
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 19:48:16 -0400
+ (envelope-from <mlureau@redhat.com>) id 1hdkJD-000546-M5
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 19:48:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hdk7o-0004kL-Qu
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 19:36:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52972)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hdk7o-0004jF-LO
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 19:36:20 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B504759454;
- Wed, 19 Jun 2019 23:36:16 +0000 (UTC)
-Received: from localhost (ovpn-116-76.gru2.redhat.com [10.97.116.76])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 28CFA5D71D;
- Wed, 19 Jun 2019 23:36:14 +0000 (UTC)
-Date: Wed, 19 Jun 2019 20:36:13 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Like Xu <like.xu@linux.intel.com>
-Message-ID: <20190619233613.GG26409@habkost.net>
-References: <20190612084104.34984-1-like.xu@linux.intel.com>
- <20190612084104.34984-8-like.xu@linux.intel.com>
- <20190619191546.GD26409@habkost.net>
+ (envelope-from <mlureau@redhat.com>) id 1hdk8u-0006B9-Ej
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 19:37:29 -0400
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:41239)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1hdk8u-0006AJ-9V
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 19:37:28 -0400
+Received: by mail-ot1-f65.google.com with SMTP id 43so832585otf.8
+ for <qemu-devel@nongnu.org>; Wed, 19 Jun 2019 16:37:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=tqBv8ZkDQd9FZbHH96sKnDZMeY5Wv08jbJ8X8hxiNKg=;
+ b=rqiq1WbIjw7XhP6ngaS5cRgyoR75Qu03SqXPkUGr4mG/x/RJw9QYKbst/cw0w8T1zw
+ t/MBQlAPUOhJSbFdTS8FOsFSQGNXbO0Jka603Coino02UMDZ9444SoDvGltyHZouF4KE
+ MIXrsHmEI3SJc+pOOn5gE0TYPDhQ29y4aC3Wpx98u3aIGWyAjFNJujSTAJDugzltaWaw
+ DlusQB2KOqRJcINwH4hn9TY3ohoZIXkTma3/0K1R2bsmvAmXmeUGFFbcnj8MMw1SvRxz
+ vETXFDl9qTMqrIX9pqP8FaT55K6jCb6SlqYWXtF/azoY5OaaQYDCMl6TSwvRwmyOYDmy
+ x77A==
+X-Gm-Message-State: APjAAAVBx1zrhMKMnKsR7hevLIQ9kHFmSJ6z46DTmJovAu3HQOsknWc3
+ HYkFIOjzAiDMQIp0+6V1nUBgVJkEJC4j1f/rsNSPVw==
+X-Google-Smtp-Source: APXvYqydofnc7Chcla55z4rtggjiApItS4WHgiVYFMV9C60J032bAOYvjiAXJMROLr7ie10bChiHopNnyCIm5cndJ9E=
+X-Received: by 2002:a9d:6d12:: with SMTP id o18mr8714107otp.166.1560987447493; 
+ Wed, 19 Jun 2019 16:37:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190619191546.GD26409@habkost.net>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Wed, 19 Jun 2019 23:36:19 +0000 (UTC)
+References: <20190619201050.19040-1-armbru@redhat.com>
+ <20190619201050.19040-16-armbru@redhat.com>
+In-Reply-To: <20190619201050.19040-16-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Thu, 20 Jun 2019 01:37:16 +0200
+Message-ID: <CAMxuvayQ_BM1p4W5LvF2iEUKZzNepEDEuHYn4Xww_9jfhz_1MQ@mail.gmail.com>
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 7/9] target/i386: Support multi-dies
- when host doesn't support CPUID.1F
+ [fuzzy]
+X-Received-From: 209.85.210.65
+Subject: Re: [Qemu-devel] [PATCH 15/17] dump: Move the code to dump/
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,51 +75,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Wolf, Kevin" <kwolf@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 19, 2019 at 04:15:46PM -0300, Eduardo Habkost wrote:
-> On Wed, Jun 12, 2019 at 04:41:02PM +0800, Like Xu wrote:
-> > In guest CPUID generation process, the cpuid_min_level would be adjusted to
-> > the maximum passed value for basic CPUID configuration and it should not be
-> > restricted by the limited value returned from cpu_x86_cpuid(). After the basic
-> > cpu_x86_cpuid() loop is finished, the cpuid_0_entry.eax needs to be configured
-> > again by the last adjusted cpuid_min_level value.
-> > 
-> > If a user wants to expose CPUID.1F by passing dies > 1 for any reason without
-> > host support, a per-cpu smp topology warning will appear but it's not blocked.
-> > 
-> > Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> 
-> This code doesn't look at host CPUID at all, as far as I can see.
-> Isn't it simpler to just make cpuid_x86_cpuid() return the
-> correct data?
+On Wed, Jun 19, 2019 at 10:10 PM Markus Armbruster <armbru@redhat.com> wrot=
+e:
+>
+> Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-I suggest the following change instead.
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- target/i386/cpu.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 6db38e145b..d05a224092 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -5152,6 +5152,10 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
-             x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
-         }
- 
-+        if (env->nr_dies > 1) {
-+            x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x1F);
-+        }
-+
-         /* SVM requires CPUID[0x8000000A] */
-         if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
-             x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
--- 
-2.18.0.rc1.1.g3f1ff2140
+
+> ---
+>  MAINTAINERS                   | 2 +-
+>  Makefile.target               | 3 +--
+>  dump/Makefile.objs            | 2 ++
+>  dump.c =3D> dump/dump.c         | 0
+>  win_dump.c =3D> dump/win_dump.c | 0
+>  win_dump.h =3D> dump/win_dump.h | 0
+>  6 files changed, 4 insertions(+), 3 deletions(-)
+>  create mode 100644 dump/Makefile.objs
+>  rename dump.c =3D> dump/dump.c (100%)
+>  rename win_dump.c =3D> dump/win_dump.c (100%)
+>  rename win_dump.h =3D> dump/win_dump.h (100%)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index ea110e99ca..a3fdda015f 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1850,7 +1850,7 @@ F: include/sysemu/device_tree.h
+>  Dump
+>  S: Supported
+>  M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> -F: dump.c
+> +F: dump/dump.c
+>  F: hw/misc/vmcoreinfo.c
+>  F: include/hw/misc/vmcoreinfo.h
+>  F: include/sysemu/dump-arch.h
+> diff --git a/Makefile.target b/Makefile.target
+> index 167ae2174e..a6919e0caf 100644
+> --- a/Makefile.target
+> +++ b/Makefile.target
+> @@ -150,13 +150,12 @@ endif #CONFIG_BSD_USER
+>  ifdef CONFIG_SOFTMMU
+>  obj-y +=3D arch_init.o cpus.o gdbstub.o balloon.o ioport.o
+>  obj-y +=3D qtest.o
+> +obj-y +=3D dump/
+>  obj-y +=3D hw/
+>  obj-y +=3D monitor/
+>  obj-y +=3D qapi/
+>  obj-y +=3D memory.o
+>  obj-y +=3D memory_mapping.o
+> -obj-y +=3D dump.o
+> -obj-$(TARGET_X86_64) +=3D win_dump.o
+>  obj-y +=3D migration/ram.o
+>  LIBS :=3D $(libs_softmmu) $(LIBS)
+>
+> diff --git a/dump/Makefile.objs b/dump/Makefile.objs
+> new file mode 100644
+> index 0000000000..ea6b074967
+> --- /dev/null
+> +++ b/dump/Makefile.objs
+> @@ -0,0 +1,2 @@
+> +obj-y +=3D dump.o
+> +obj-$(TARGET_X86_64) +=3D win_dump.o
+> diff --git a/dump.c b/dump/dump.c
+> similarity index 100%
+> rename from dump.c
+> rename to dump/dump.c
+> diff --git a/win_dump.c b/dump/win_dump.c
+> similarity index 100%
+> rename from win_dump.c
+> rename to dump/win_dump.c
+> diff --git a/win_dump.h b/dump/win_dump.h
+> similarity index 100%
+> rename from win_dump.h
+> rename to dump/win_dump.h
+> --
+> 2.21.0
+>
 
