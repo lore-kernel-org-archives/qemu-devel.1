@@ -2,115 +2,98 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73AD1C31E5B
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 16:35:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08274C31E5B
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 16:36:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A9722084E
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 16:35:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A9722084E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id BB7552084E
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 16:36:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JerOC0Ym"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB7552084E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40354 helo=lists.gnu.org)
+Received: from localhost ([::1]:40370 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hddYw-0005oN-GN
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 12:35:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58839)
+	id 1hddZL-00077b-0n
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 12:36:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58946)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hddLm-0002Yh-5R
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 12:22:21 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1hddLy-0002g1-QE
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 12:22:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hddLb-0006g5-W7
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 12:22:12 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:36115)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hddLb-0006eO-Lh
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 12:22:07 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MuUvU-1iTx533CF8-00rZ3I; Wed, 19 Jun 2019 18:21:51 +0200
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-References: <1560953834-29584-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1560953834-29584-6-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Openpgp: preference=signencrypt
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <a45cb51c-68f0-f52e-17d0-a8926852c74c@vivier.eu>
-Date: Wed, 19 Jun 2019 18:21:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <liran.alon@oracle.com>) id 1hddLv-0006pm-Q4
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 12:22:30 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:46994)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1hddLv-0006or-I9
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 12:22:27 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JGDrlD030908;
+ Wed, 19 Jun 2019 16:22:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=corp-2018-07-02;
+ bh=xmlQIZjdzCbiOWyoW3XP6RdI+XBL3vEFkP3dwbFS9ak=;
+ b=JerOC0Ym/dsbk70/zrI2UzOmt9neFOuVX0t3FQTCDAvMt+ZYfH/WsALSVHVDqBA1K3Va
+ 8HqI8K3kFNfpN2cuLEI9QB/4/tfxa2NkLwrovm69D7FntT3MsXNH6Pff65vDtvnWG3e2
+ HJ2jSdHpbPPO9JGRiy8Dgxv8jQMGpH+WRcIRJFzB3vkJ4H1jq9NTL6cEXoShjMQ631Um
+ etuQFllAW0PVuDsJyvx5X5nuWpq43PEXBcMkzaP59ewaG4y65GnZRMbAwHfDf1E3ZHij
+ FU36qinEp1+WMioXA9ZjcDFaua8cpxh7747iT4siHW7kqA3c4QbqRvXqGT5A7L07Fy+F kQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by aserp2120.oracle.com with ESMTP id 2t7809cemv-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 19 Jun 2019 16:22:25 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JGLEtm059888;
+ Wed, 19 Jun 2019 16:22:25 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by aserp3030.oracle.com with ESMTP id 2t7rdwr2vv-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 19 Jun 2019 16:22:24 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5JGMNaw003201;
+ Wed, 19 Jun 2019 16:22:23 GMT
+Received: from spark.ravello.local (/213.57.127.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Wed, 19 Jun 2019 09:22:22 -0700
+From: Liran Alon <liran.alon@oracle.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 19 Jun 2019 19:21:38 +0300
+Message-Id: <20190619162140.133674-9-liran.alon@oracle.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190619162140.133674-1-liran.alon@oracle.com>
+References: <20190619162140.133674-1-liran.alon@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <1560953834-29584-6-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:rrqefQaezAYdRz65HnfIgM0FYovXtdDXvYJCKZ26qv8ErzzezQW
- +SKflSCHfqmzWxxqIkHaddqij0ENVoLmFNwttnm1vHasvqXxCdA2LNOKfN1OVIV9OxW7ljE
- sDPVS+W1PaucULhvdt7LK/UjyGHYbREHzTEgsRPv1CIQ1lqrONSt1AFgftG+u4Arn37zZZI
- Wi/erLpjXqQ1GvCrNHvfA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:dLioGXbc7o4=:QEljZEeReN6k9xHPEs3R9s
- qV7FBGSuCGQqWzif93mtEAv1/trCtKHCFvQYscUZ8oxeOJgdzi6YMQkPqzg0qJvZcfrZmF8de
- pt0ZiWmDzZeozvj2eeOVH45Mtj6mSCj91Kk8BBy6INrTT25aUnJ3NyQGxYLlOC0m/MXmqAJA7
- sYdueeMEcMaffORuuW7GqMBMazFc3C4v8WVVAceXtLyGTvF8K5v5mCV2hnavqBkGd9QrxC4tE
- I6aymmAvQEVzOvw3X4M3XXk1j2Zu5Th4xx0GwQqev7xZabeK5X87bqMqa+0mIFmX7zxpIL4vF
- +2F/US0u2bLP0RZagn1H+ccPFVOtyeM/kIk5hHC9MMHIeO9P/PmYtZeKDb1K/QcgbUgzjRmWo
- euikn/E+cv+MygZ32s9ApQKu6PcMlEZ67RiiWeFkL3nPrth1ANFiwnQpYMtc0KbFGVJUTY/a8
- I5q3tTT7/xgerg1sWJAs9yMFdiK5a+z2auD1yziE2PAVOnlkJ6fwG7/bbsN79dv6SnrUTODIN
- Rvoa3IbnPI7J2C21xCuQZaxkORa47ivdYk+i9BU/RDjTmWBktlsJij229QE1Orl9b3Ts0j/a8
- +pZzZtXBlKFcmoEyTPrILMD/UgdK3ETHarzoWyog3vsFZkJLi5QVPdHw7enQiHHJ0uMuhuTex
- tp5S+gANjHhkPLLTIfJQQg35daF39IYs4zGXF1zBA/mGdSkPKp41z+Ny3hYQrJRbUT3oiU0gy
- jX71/p+TJ+Ru7IRvSpkPddwpWHlmJjYX4o5d2OJTWiuRzBpD8h23B3xoklk=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.75
-Subject: Re: [Qemu-devel] [PATCH v12 5/5] linux-user: Fix flock structure
- for MIPS O64 ABI
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906190131
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906190131
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 141.146.126.78
+Subject: [Qemu-devel] [QEMU PATCH v4 08/10] target/i386: kvm: Add support
+ for save and restore nested state
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,60 +105,455 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: amarkovic@wavecomp.com
+Cc: ehabkost@redhat.com, kvm@vger.kernel.org, maran.wilson@oracle.com,
+ mtosatti@redhat.com, dgilbert@redhat.com, Liran Alon <liran.alon@oracle.com>,
+ Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
+ rth@twiddle.net, jmattson@google.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 19/06/2019 à 16:17, Aleksandar Markovic a écrit :
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
-> 
-> Only MIPS O32 and N32 have special (different than other
-> architectures) definition of structure flock in kernel.
-> 
-> Bring flock definition for MIPS O64 ABI to the correct state.
-> 
-> Reported-by: Dragan Mladjenovic <dmladjenovic@wavecomp.com>
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> ---
->  linux-user/generic/fcntl.h     | 2 +-
->  linux-user/mips/target_fcntl.h | 4 ++++
->  2 files changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/linux-user/generic/fcntl.h b/linux-user/generic/fcntl.h
-> index a775a49..1b48dde 100644
-> --- a/linux-user/generic/fcntl.h
-> +++ b/linux-user/generic/fcntl.h
-> @@ -129,7 +129,7 @@ struct target_flock {
->      short l_whence;
->      abi_long l_start;
->      abi_long l_len;
-> -#if defined(TARGET_MIPS)
-> +#if defined(TARGET_MIPS) && (TARGET_ABI_BITS == 32)
->      abi_long l_sysid;
->  #endif
->      int l_pid;
-> diff --git a/linux-user/mips/target_fcntl.h b/linux-user/mips/target_fcntl.h
-> index 000527c..795bba7 100644
-> --- a/linux-user/mips/target_fcntl.h
-> +++ b/linux-user/mips/target_fcntl.h
-> @@ -27,7 +27,11 @@
->  #define TARGET_F_SETOWN        24       /*  for sockets. */
->  #define TARGET_F_GETOWN        23       /*  for sockets. */
->  
-> +#if (TARGET_ABI_BITS == 32)
->  #define TARGET_ARCH_FLOCK_PAD abi_long pad[4];
-> +#else
-> +#define TARGET_ARCH_FLOCK_PAD
-> +#endif
->  #define TARGET_ARCH_FLOCK64_PAD
->  
->  #define TARGET_F_GETLK64       33      /*  using 'struct flock64' */
-> 
+Kernel commit 8fcc4b5923af ("kvm: nVMX: Introduce KVM_CAP_NESTED_STATE")
+introduced new IOCTLs to extract and restore vCPU state related to
+Intel VMX & AMD SVM.
 
-The patch is correct, but I think it would be cleaner to introduce an
-"TARGET_HAVE_ARCH_STRUCT_FLOCK" as we have in the kernel for the mips case.
+Utilize these IOCTLs to add support for migration of VMs which are
+running nested hypervisors.
 
-Thanks,
-Laurent
+Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+Reviewed-by: Maran Wilson <maran.wilson@oracle.com>
+Tested-by: Maran Wilson <maran.wilson@oracle.com>
+Signed-off-by: Liran Alon <liran.alon@oracle.com>
+---
+ accel/kvm/kvm-all.c   |   8 ++
+ include/sysemu/kvm.h  |   1 +
+ target/i386/cpu.h     |   3 +
+ target/i386/kvm.c     |  80 +++++++++++++++++
+ target/i386/machine.c | 198 ++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 290 insertions(+)
+
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 59a3aa3a40da..4fdf5b04b131 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -88,6 +88,7 @@ struct KVMState
+ #ifdef KVM_CAP_SET_GUEST_DEBUG
+     QTAILQ_HEAD(, kvm_sw_breakpoint) kvm_sw_breakpoints;
+ #endif
++    int max_nested_state_len;
+     int many_ioeventfds;
+     int intx_set_mask;
+     bool sync_mmu;
+@@ -1678,6 +1679,8 @@ static int kvm_init(MachineState *ms)
+     s->debugregs = kvm_check_extension(s, KVM_CAP_DEBUGREGS);
+ #endif
+ 
++    s->max_nested_state_len = kvm_check_extension(s, KVM_CAP_NESTED_STATE);
++
+ #ifdef KVM_CAP_IRQ_ROUTING
+     kvm_direct_msi_allowed = (kvm_check_extension(s, KVM_CAP_SIGNAL_MSI) > 0);
+ #endif
+@@ -2245,6 +2248,11 @@ int kvm_has_debugregs(void)
+     return kvm_state->debugregs;
+ }
+ 
++int kvm_max_nested_state_length(void)
++{
++    return kvm_state->max_nested_state_len;
++}
++
+ int kvm_has_many_ioeventfds(void)
+ {
+     if (!kvm_enabled()) {
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 64f55e519df7..acd90aebb6c4 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -210,6 +210,7 @@ bool kvm_has_sync_mmu(void);
+ int kvm_has_vcpu_events(void);
+ int kvm_has_robust_singlestep(void);
+ int kvm_has_debugregs(void);
++int kvm_max_nested_state_length(void);
+ int kvm_has_pit_state2(void);
+ int kvm_has_many_ioeventfds(void);
+ int kvm_has_gsi_routing(void);
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 64bb7fdcb231..c1a42aa8851a 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1350,6 +1350,9 @@ typedef struct CPUX86State {
+ #if defined(CONFIG_KVM) || defined(CONFIG_HVF)
+     void *xsave_buf;
+ #endif
++#if defined(CONFIG_KVM)
++    struct kvm_nested_state *nested_state;
++#endif
+ #if defined(CONFIG_HVF)
+     HVFX86EmulatorState *hvf_emul;
+ #endif
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index b2041ce5ec3c..8ae7598aac3d 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -931,6 +931,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     struct kvm_cpuid_entry2 *c;
+     uint32_t signature[3];
+     int kvm_base = KVM_CPUID_SIGNATURE;
++    int max_nested_state_len;
+     int r;
+     Error *local_err = NULL;
+ 
+@@ -1331,6 +1332,24 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     if (has_xsave) {
+         env->xsave_buf = qemu_memalign(4096, sizeof(struct kvm_xsave));
+     }
++
++    max_nested_state_len = kvm_max_nested_state_length();
++    if (max_nested_state_len > 0) {
++        assert(max_nested_state_len >= offsetof(struct kvm_nested_state, data));
++        env->nested_state = g_malloc0(max_nested_state_len);
++
++        env->nested_state->size = max_nested_state_len;
++
++        if (IS_INTEL_CPU(env)) {
++            struct kvm_vmx_nested_state_hdr *vmx_hdr =
++                &env->nested_state->hdr.vmx;
++
++            vmx_hdr->vmxon_pa = -1ull;
++            vmx_hdr->vmcs12_pa = -1ull;
++        }
++
++    }
++
+     cpu->kvm_msr_buf = g_malloc0(MSR_BUF_SIZE);
+ 
+     if (!(env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_RDTSCP)) {
+@@ -1355,12 +1374,18 @@ int kvm_arch_init_vcpu(CPUState *cs)
+ int kvm_arch_destroy_vcpu(CPUState *cs)
+ {
+     X86CPU *cpu = X86_CPU(cs);
++    CPUX86State *env = &cpu->env;
+ 
+     if (cpu->kvm_msr_buf) {
+         g_free(cpu->kvm_msr_buf);
+         cpu->kvm_msr_buf = NULL;
+     }
+ 
++    if (env->nested_state) {
++        g_free(env->nested_state);
++        env->nested_state = NULL;
++    }
++
+     return 0;
+ }
+ 
+@@ -3075,6 +3100,52 @@ static int kvm_get_debugregs(X86CPU *cpu)
+     return 0;
+ }
+ 
++static int kvm_put_nested_state(X86CPU *cpu)
++{
++    CPUX86State *env = &cpu->env;
++    int max_nested_state_len = kvm_max_nested_state_length();
++
++    if (max_nested_state_len <= 0) {
++        return 0;
++    }
++
++    assert(env->nested_state->size <= max_nested_state_len);
++    return kvm_vcpu_ioctl(CPU(cpu), KVM_SET_NESTED_STATE, env->nested_state);
++}
++
++static int kvm_get_nested_state(X86CPU *cpu)
++{
++    CPUX86State *env = &cpu->env;
++    int max_nested_state_len = kvm_max_nested_state_length();
++    int ret;
++
++    if (max_nested_state_len <= 0) {
++        return 0;
++    }
++
++    /*
++     * It is possible that migration restored a smaller size into
++     * nested_state->hdr.size than what our kernel support.
++     * We preserve migration origin nested_state->hdr.size for
++     * call to KVM_SET_NESTED_STATE but wish that our next call
++     * to KVM_GET_NESTED_STATE will use max size our kernel support.
++     */
++    env->nested_state->size = max_nested_state_len;
++
++    ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_NESTED_STATE, env->nested_state);
++    if (ret < 0) {
++        return ret;
++    }
++
++    if (env->nested_state->flags & KVM_STATE_NESTED_GUEST_MODE) {
++        env->hflags |= HF_GUEST_MASK;
++    } else {
++        env->hflags &= ~HF_GUEST_MASK;
++    }
++
++    return ret;
++}
++
+ int kvm_arch_put_registers(CPUState *cpu, int level)
+ {
+     X86CPU *x86_cpu = X86_CPU(cpu);
+@@ -3082,6 +3153,11 @@ int kvm_arch_put_registers(CPUState *cpu, int level)
+ 
+     assert(cpu_is_stopped(cpu) || qemu_cpu_is_self(cpu));
+ 
++    ret = kvm_put_nested_state(x86_cpu);
++    if (ret < 0) {
++        return ret;
++    }
++
+     if (level >= KVM_PUT_RESET_STATE) {
+         ret = kvm_put_msr_feature_control(x86_cpu);
+         if (ret < 0) {
+@@ -3197,6 +3273,10 @@ int kvm_arch_get_registers(CPUState *cs)
+     if (ret < 0) {
+         goto out;
+     }
++    ret = kvm_get_nested_state(cpu);
++    if (ret < 0) {
++        goto out;
++    }
+     ret = 0;
+  out:
+     cpu_sync_bndcs_hflags(&cpu->env);
+diff --git a/target/i386/machine.c b/target/i386/machine.c
+index 225b5d433bc4..e27115fdb756 100644
+--- a/target/i386/machine.c
++++ b/target/i386/machine.c
+@@ -231,6 +231,15 @@ static int cpu_pre_save(void *opaque)
+         env->segs[R_SS].flags &= ~(env->segs[R_SS].flags & DESC_DPL_MASK);
+     }
+ 
++#ifdef CONFIG_KVM
++    /* Verify we have nested virtualization state from kernel if required */
++    if (cpu_has_nested_virt(env) && !env->nested_state) {
++        error_report("Guest enabled nested virtualization but kernel "
++                "does not support saving of nested state");
++        return -EINVAL;
++    }
++#endif
++
+     return 0;
+ }
+ 
+@@ -278,6 +287,16 @@ static int cpu_post_load(void *opaque, int version_id)
+     env->hflags &= ~HF_CPL_MASK;
+     env->hflags |= (env->segs[R_SS].flags >> DESC_DPL_SHIFT) & HF_CPL_MASK;
+ 
++#ifdef CONFIG_KVM
++    if ((env->hflags & HF_GUEST_MASK) &&
++        (!env->nested_state ||
++        !(env->nested_state->flags & KVM_STATE_NESTED_GUEST_MODE))) {
++        error_report("vCPU set in guest-mode inconsistent with "
++                     "migrated kernel nested state");
++        return -EINVAL;
++    }
++#endif
++
+     env->fpstt = (env->fpus_vmstate >> 11) & 7;
+     env->fpus = env->fpus_vmstate & ~0x3800;
+     env->fptag_vmstate ^= 0xff;
+@@ -851,6 +870,182 @@ static const VMStateDescription vmstate_tsc_khz = {
+     }
+ };
+ 
++#ifdef CONFIG_KVM
++
++static bool vmx_vmcs12_needed(void *opaque)
++{
++    struct kvm_nested_state *nested_state = opaque;
++    return (nested_state->size >
++            offsetof(struct kvm_nested_state, data.vmx[0].vmcs12));
++}
++
++static const VMStateDescription vmstate_vmx_vmcs12 = {
++    .name = "cpu/kvm_nested_state/vmx/vmcs12",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = vmx_vmcs12_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT8_ARRAY(data.vmx[0].vmcs12,
++                            struct kvm_nested_state,
++                            KVM_STATE_NESTED_VMX_VMCS_SIZE),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static bool vmx_shadow_vmcs12_needed(void *opaque)
++{
++    struct kvm_nested_state *nested_state = opaque;
++    return (nested_state->size >
++            offsetof(struct kvm_nested_state, data.vmx[0].shadow_vmcs12));
++}
++
++static const VMStateDescription vmstate_vmx_shadow_vmcs12 = {
++    .name = "cpu/kvm_nested_state/vmx/shadow_vmcs12",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = vmx_shadow_vmcs12_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT8_ARRAY(data.vmx[0].shadow_vmcs12,
++                            struct kvm_nested_state,
++                            KVM_STATE_NESTED_VMX_VMCS_SIZE),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static bool vmx_nested_state_needed(void *opaque)
++{
++    struct kvm_nested_state *nested_state = opaque;
++
++    return ((nested_state->format == KVM_STATE_NESTED_FORMAT_VMX) &&
++            ((nested_state->hdr.vmx.vmxon_pa != -1ull) ||
++             (nested_state->hdr.vmx.smm.flags & KVM_STATE_NESTED_SMM_VMXON)));
++}
++
++static const VMStateDescription vmstate_vmx_nested_state = {
++    .name = "cpu/kvm_nested_state/vmx",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = vmx_nested_state_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_U64(hdr.vmx.vmxon_pa, struct kvm_nested_state),
++        VMSTATE_U64(hdr.vmx.vmcs12_pa, struct kvm_nested_state),
++        VMSTATE_U16(hdr.vmx.smm.flags, struct kvm_nested_state),
++        VMSTATE_END_OF_LIST()
++    },
++    .subsections = (const VMStateDescription*[]) {
++        &vmstate_vmx_vmcs12,
++        &vmstate_vmx_shadow_vmcs12,
++        NULL,
++    }
++};
++
++static bool svm_nested_state_needed(void *opaque)
++{
++    struct kvm_nested_state *nested_state = opaque;
++
++    return (nested_state->format == KVM_STATE_NESTED_FORMAT_SVM);
++}
++
++static const VMStateDescription vmstate_svm_nested_state = {
++    .name = "cpu/kvm_nested_state/svm",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = svm_nested_state_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static bool nested_state_needed(void *opaque)
++{
++    X86CPU *cpu = opaque;
++    CPUX86State *env = &cpu->env;
++
++    return (env->nested_state &&
++            (vmx_nested_state_needed(env->nested_state) ||
++             svm_nested_state_needed(env->nested_state)));
++}
++
++static int nested_state_post_load(void *opaque, int version_id)
++{
++    X86CPU *cpu = opaque;
++    CPUX86State *env = &cpu->env;
++    struct kvm_nested_state *nested_state = env->nested_state;
++    int min_nested_state_len = offsetof(struct kvm_nested_state, data);
++    int max_nested_state_len = kvm_max_nested_state_length();
++
++    /*
++     * If our kernel don't support setting nested state
++     * and we have received nested state from migration stream,
++     * we need to fail migration
++     */
++    if (max_nested_state_len <= 0) {
++        error_report("Received nested state when kernel cannot restore it");
++        return -EINVAL;
++    }
++
++    /*
++     * Verify that the size of received nested_state struct
++     * at least cover required header and is not larger
++     * than the max size that our kernel support
++     */
++    if (nested_state->size < min_nested_state_len) {
++        error_report("Received nested state size less than min: "
++                     "len=%d, min=%d",
++                     nested_state->size, min_nested_state_len);
++        return -EINVAL;
++    }
++    if (nested_state->size > max_nested_state_len) {
++        error_report("Recieved unsupported nested state size: "
++                     "nested_state->size=%d, max=%d",
++                     nested_state->size, max_nested_state_len);
++        return -EINVAL;
++    }
++
++    /* Verify format is valid */
++    if ((nested_state->format != KVM_STATE_NESTED_FORMAT_VMX) &&
++        (nested_state->format != KVM_STATE_NESTED_FORMAT_SVM)) {
++        error_report("Received invalid nested state format: %d",
++                     nested_state->format);
++        return -EINVAL;
++    }
++
++    return 0;
++}
++
++static const VMStateDescription vmstate_kvm_nested_state = {
++    .name = "cpu/kvm_nested_state",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_U16(flags, struct kvm_nested_state),
++        VMSTATE_U16(format, struct kvm_nested_state),
++        VMSTATE_U32(size, struct kvm_nested_state),
++        VMSTATE_END_OF_LIST()
++    },
++    .subsections = (const VMStateDescription*[]) {
++        &vmstate_vmx_nested_state,
++        &vmstate_svm_nested_state,
++        NULL
++    }
++};
++
++static const VMStateDescription vmstate_nested_state = {
++    .name = "cpu/nested_state",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = nested_state_needed,
++    .post_load = nested_state_post_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_STRUCT_POINTER(env.nested_state, X86CPU,
++                vmstate_kvm_nested_state,
++                struct kvm_nested_state),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++#endif
++
+ static bool mcg_ext_ctl_needed(void *opaque)
+ {
+     X86CPU *cpu = opaque;
+@@ -1089,6 +1284,9 @@ VMStateDescription vmstate_x86_cpu = {
+         &vmstate_msr_intel_pt,
+         &vmstate_msr_virt_ssbd,
+         &vmstate_svm_npt,
++#ifdef CONFIG_KVM
++        &vmstate_nested_state,
++#endif
+         NULL
+     }
+ };
+-- 
+2.20.1
+
 
