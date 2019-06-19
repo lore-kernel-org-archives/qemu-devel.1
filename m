@@ -2,106 +2,86 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0303FC43613
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 20:51:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F58DC43613
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 21:06:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA9172080C
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 20:51:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D0A321537
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 21:06:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="jK5HXuB8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA9172080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y7EGymSQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D0A321537
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41946 helo=lists.gnu.org)
+Received: from localhost ([::1]:42024 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdhYL-0001Ka-Gj
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 16:51:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45212)
+	id 1hdhmb-0006e0-GX
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 17:06:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47654)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <maran.wilson@oracle.com>) id 1hdhXT-0000vN-5i
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 16:50:40 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hdhk0-0005Uq-IH
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 17:03:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <maran.wilson@oracle.com>) id 1hdhXR-0004yN-RV
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 16:50:39 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:44102)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <maran.wilson@oracle.com>)
- id 1hdhXR-0004wY-IA
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 16:50:37 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JKnfPM049856;
- Wed, 19 Jun 2019 20:50:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=HpbFU3Fg71oAhWBsVHsm31dRVVdyYsHIxPUVSzfOZVg=;
- b=jK5HXuB87oL5BcRvaiZO1HCNmI7SNLWVaJXOrgn24Ajp5MEBJ83jvp3Tt9HeWtcBt286
- CctZuKb4QZvaPgctpWFMcTNymjEyvp3Up4okRa7jmdOAnTZtudKduK2EYMlN33STA2Qa
- GR7ItYf7o/xf28cA0+nnpRGK9s/bftaABm3IouksqkOgw0EnRGGEXCCdF7cFz2KN4FMn
- yTJ80bGznBMz/sszvZs4c4HrXNS57ODaOyDIZHfim6LeN6ysJ8cP5s2fEwRxHgbLYgNi
- s/jpiuonBlMVEFPQVqAt1UpbEATEv1eS3ZBscYMhuGUCSpJOgMgKVYphPOHJItLgIWqV Jg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by aserp2120.oracle.com with ESMTP id 2t7809dk2v-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 19 Jun 2019 20:50:33 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JKlFdq092829;
- Wed, 19 Jun 2019 20:48:32 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by aserp3030.oracle.com with ESMTP id 2t7rdwup7r-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 19 Jun 2019 20:48:32 +0000
-Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5JKmVIV000740;
- Wed, 19 Jun 2019 20:48:31 GMT
-Received: from [10.141.197.71] (/10.141.197.71)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 19 Jun 2019 13:48:31 -0700
-To: Liran Alon <liran.alon@oracle.com>
-References: <20190619162140.133674-1-liran.alon@oracle.com>
- <20190619162140.133674-2-liran.alon@oracle.com>
- <d7cf4dd5-13ca-9ba1-2424-25d0d2de8c58@oracle.com>
- <A469CD35-A0D9-4FB3-B9B5-3D3B97B32063@oracle.com>
-From: Maran Wilson <maran.wilson@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <f1966924-eb54-95a9-847c-a5b6aafe0caf@oracle.com>
-Date: Wed, 19 Jun 2019 13:48:28 -0700
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <alistair23@gmail.com>) id 1hdhjz-0003dY-5B
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 17:03:36 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:45262)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1hdhjq-0003PS-0r; Wed, 19 Jun 2019 17:03:29 -0400
+Received: by mail-lj1-x242.google.com with SMTP id m23so536250lje.12;
+ Wed, 19 Jun 2019 14:03:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Nhvb1xNnaxOCt74u1oVKsx4vkjdfV+cnmA4aS9DBrCA=;
+ b=Y7EGymSQKdVonxwR3B3UdurwDPhsIwNjZ+7XSuCISzkKVX/MAiBTuFba6GrjD8lieg
+ +P0EyuN00CquUUaIwAC51FIzk3A15L+3tpjxMMjuC8Fk6dvXztujk1sEGw2yzMlgjTEh
+ AcFF9rgqOdeSuOqSdJbG3y6c1MY5TfbtRK9b1RQ7N2WepJmJTPduXVFpfrW70vea0OL9
+ sB/FvYtYfoKWBNjPMVHfHED+WOlojljcJsBzkpdWQhsmhFtGHl8S687k0OdoAzEY7GuN
+ uB6+EIg5Wj7JsOLNC5dMFtq6LIBYspSkGVOclEmH2WlZ15MhT0r8saP3R1FVg1ajSUQ8
+ XFbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Nhvb1xNnaxOCt74u1oVKsx4vkjdfV+cnmA4aS9DBrCA=;
+ b=svttEbY+0xdhPjHlhqGbsmD8r+wNMygaWVVzlumriitKE7ht6N/YCtRmk7NSRdv0Ho
+ d18vrS9RU+fZYfmGAYZC9NmC4cCADVWWnI6K7C5mf60fFX7Z4jjwNofLmLr3QmD0SseV
+ jRVb7vhsx51V6z5MNuqHEW47S7HgwXpt3P5gUZ9KbgbvHYAHSk8cp0Bq8rV93fp4/p34
+ U8jAjSfndaA5MDjS4wvOX7pKg7Ki/gkrVw2NO7QZQ5krL5jh/Dvt618A70+HTXE+qrfn
+ N7+6dh/bi+FLkmSBFjDFmm9sa5I5JWPBm5wj0XteSB0ZWa2a1ElvTFHSVnat5zFQr2tx
+ Dy/w==
+X-Gm-Message-State: APjAAAUj1nVVBUek9kkxQQL6j/39NZ879P+Gwl/MSBQL0zzRPrUlShAs
+ JNjTdnaHqGCyZmvv2aaA3ViZvF/AfJ0nm0sbkpU=
+X-Google-Smtp-Source: APXvYqxfPXlZlF7TrSQVbARv9zk4bPgNHt6L9ax4lQEOTbHlRIdoXPv1yd1Ar3bqpYCO/IIZas+BY+BCSJ4ANrr7ljA=
+X-Received: by 2002:a2e:480a:: with SMTP id v10mr17213246lja.94.1560978197339; 
+ Wed, 19 Jun 2019 14:03:17 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <A469CD35-A0D9-4FB3-B9B5-3D3B97B32063@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293
- signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906190170
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293
- signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906190171
+References: <cover.1560904640.git.alistair.francis@wdc.com>
+ <e718da8df07915765217dece609255b6ad196955.1560904640.git.alistair.francis@wdc.com>
+ <CAEUhbmUz5xHqhuEvDWHBTpKN+k3uuNPQxNCGFWOfR21hMhWtPw@mail.gmail.com>
+ <CANnJOVH34B0efKNSjNHD5ZmuWqAsybsmiwFXEQYvTye+oJBV=A@mail.gmail.com>
+ <CAEUhbmU_fjS4-DeZwnC7u4gQc3h44m4yYQ7vUA3-N0Wk64z5uw@mail.gmail.com>
+In-Reply-To: <CAEUhbmU_fjS4-DeZwnC7u4gQc3h44m4yYQ7vUA3-N0Wk64z5uw@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 19 Jun 2019 14:00:28 -0700
+Message-ID: <CAKmqyKPsKs70kGpkGbpoO+QvA_8zkhc_39HHY41+3eJGXYfyng@mail.gmail.com>
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by aserp2120.oracle.com id
- x5JKnfPM049856
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 141.146.126.78
-Subject: Re: [Qemu-devel] [QEMU PATCH v4 01/10] target/i386: kvm: Delete VMX
- migration blocker on vCPU init failure
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::242
+Subject: Re: [Qemu-devel] [Qemu-riscv] [RFC v1 2/5] hw/riscv: Add support
+ for loading a firmware
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,108 +93,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, kvm@vger.kernel.org, mtosatti@redhat.com,
- qemu-devel@nongnu.org, dgilbert@redhat.com, pbonzini@redhat.com,
- rth@twiddle.net, jmattson@google.com
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Jonathan Behrens <fintelia@gmail.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/19/2019 1:33 PM, Liran Alon wrote:
->> On 19 Jun 2019, at 23:30, Maran Wilson <maran.wilson@oracle.com> wrote=
-:
->>
->> On 6/19/2019 9:21 AM, Liran Alon wrote:
->>> Commit d98f26073beb ("target/i386: kvm: add VMX migration blocker")
->>> added migration blocker for vCPU exposed with Intel VMX because QEMU
->>> doesn't yet contain code to support migration of nested virtualizatio=
-n
->>> workloads.
->>>
->>> However, that commit missed adding deletion of the migration blocker =
-in
->>> case init of vCPU failed. Similar to invtsc_mig_blocker. This commit =
-fix
->>> that issue.
->>>
->>> Fixes: d98f26073beb ("target/i386: kvm: add VMX migration blocker")
->>> Signed-off-by: Liran Alon <liran.alon@oracle.com>
->>> ---
->>>   target/i386/kvm.c | 7 +++++--
->>>   1 file changed, 5 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->>> index 3b29ce5c0d08..7aa7914a498c 100644
->>> --- a/target/i386/kvm.c
->>> +++ b/target/i386/kvm.c
->>> @@ -940,7 +940,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->>>         r =3D kvm_arch_set_tsc_khz(cs);
->>>       if (r < 0) {
->>> -        goto fail;
->>> +        return r;
->>>       }
->>>         /* vcpu's TSC frequency is either specified by user, or follo=
-wing
->>> @@ -1295,7 +1295,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->>>               if (local_err) {
->>>                   error_report_err(local_err);
->>>                   error_free(invtsc_mig_blocker);
->>> -                return r;
->>> +                goto fail2;
->>>               }
->>>           }
->>>       }
->>> @@ -1346,6 +1346,9 @@ int kvm_arch_init_vcpu(CPUState *cs)
->>>      fail:
->>>       migrate_del_blocker(invtsc_mig_blocker);
->>> + fail2:
->>> +    migrate_del_blocker(vmx_mig_blocker);
->>> +
->> At the risk of being a bit pedantic...
->>
->> Your changes don't introduce this problem, but they do make it worse -=
-- Since [vmx|invtsc]_mig_blocker are both global in scope, isn't it possi=
-ble you end up deleting one or both valid blockers that were created by a=
- previous invocation of kvm_arch_init_vcpu() ?  Seems to me that you woul=
-d need something like an additional pair of local boolean variables named=
- created_[vmx|invtsc]_mig_blocker and condition the calls to migrate_del_=
-blocker() accordingly. On the positive side, that would simplify some of =
-the logic around when and if it's ok to jump to "fail" (and you wouldn't =
-need the "fail2").
->>
->> Thanks,
->> -Maran
-> I actually thought about this as-well when I encountered this issue.
-> In general one can argue that every vCPU should introduce it=E2=80=99s =
-own migration blocker on init (if required) and remove it=E2=80=99s own m=
-igration blocker on deletion (on vCPU destroy).
-> On 99% of the time, all of this shouldn=E2=80=99t matter as all vCPUs o=
-f a given VM have exactly the same properties.
-
-The example I was thinking about is a VM that is created with a bunch of=20
-vCPUs -- all of which require installation of the blocker(s). Then at=20
-some point in the future, a failed CPU hotplug attempt wipes out all the=20
-pre-existing blockers and leaves the VM exposed.
-
-But I agree that the problem wasn't introduced by this patch series and=20
-so it is reasonable to argue that you shouldn't have to fix it here. As=20
-such:
-
-Reviewed-by: Maran Wilson <maran.wilson@oracle.com>
-
-Thanks,
--Maran
-
-> Anyway, I decided that this is entirely not relevant for this patch-ser=
-ies and therefore if this should be addressed further, let it be another =
-unrelated patch-series.
-> QEMU have too many issues to fix all at once :P. I need to filter.
+On Wed, Jun 19, 2019 at 8:30 AM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
-> -Liran
+> Hi,
 >
->>>       return r;
->>>   }
->>>  =20
+> On Wed, Jun 19, 2019 at 11:26 PM Jonathan Behrens <fintelia@gmail.com> wr=
+ote:
+> >
+> > I was actually just writing up the same thing.  Shifting all the addres=
+ses in the ELF file by 2 or 4MB is somewhat surprising behavior, especially=
+ because this will apply to segments that are mapped even at much higher ad=
+dresses. If you want a segment aligned to a 1GB superpage boundary you now =
+need to place it slightly below so that it will be bumped up to the right p=
+lace. Further, ANDing all addresses with 0x7fffffff makes it impossible to =
+map anything beyond the first 2GB of RAM.
+> >
 >
+> Yes, current kernel_translate() logic is tightly coupled to the kernel
+> entry VA, and if we link kernel at some other address it will just
+> fail.
 
+I thought this was required but it looks like it isn't. I have remove
+the kernel_translate() function.
+
+>
+> > Jonathan
+> >
+> > On Wed, Jun 19, 2019 at 11:16 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+> >>
+> >> On Wed, Jun 19, 2019 at 8:53 AM Alistair Francis
+> >> <alistair.francis@wdc.com> wrote:
+> >> >
+> >> > Add support for loading a firmware file for the virt machine and the
+> >> > SiFive U. This can be run with the following command:
+> >> >
+> >> >     qemu-system-riscv64 -machine virt -bios fw_jump.elf -kernel vmli=
+nux
+> >> >
+> >> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> >> > ---
+> >> >  hw/riscv/boot.c         | 41 ++++++++++++++++++++++++++++++++++++++=
++--
+> >> >  hw/riscv/sifive_e.c     |  2 +-
+> >> >  hw/riscv/sifive_u.c     |  6 +++++-
+> >> >  hw/riscv/spike.c        |  6 +++---
+> >> >  hw/riscv/virt.c         |  7 ++++++-
+> >> >  include/hw/riscv/boot.h |  4 +++-
+> >> >  6 files changed, 57 insertions(+), 9 deletions(-)
+> >> >
+> >> > diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
+> >> > index 62f94aaf8a..392ca0cb2e 100644
+> >> > --- a/hw/riscv/boot.c
+> >> > +++ b/hw/riscv/boot.c
+> >> > @@ -23,13 +23,50 @@
+> >> >  #include "exec/cpu-defs.h"
+> >> >  #include "hw/loader.h"
+> >> >  #include "hw/riscv/boot.h"
+> >> > +#include "hw/boards.h"
+> >> >  #include "elf.h"
+> >> >
+> >> > -target_ulong riscv_load_kernel(const char *kernel_filename)
+> >> > +#if defined(TARGET_RISCV32)
+> >> > +# define KERNEL_BOOT_ADDRESS 0x80400000
+> >> > +#else
+> >> > +# define KERNEL_BOOT_ADDRESS 0x80200000
+> >> > +#endif
+> >> > +
+> >> > +static uint64_t kernel_translate(void *opaque, uint64_t addr)
+> >> > +{
+> >> > +    MachineState *machine =3D opaque;
+> >> > +
+> >> > +    /*
+> >> > +     * If the user specified a firmware move the kernel to the offs=
+et
+> >> > +     * start address.
+> >> > +     */
+> >>
+> >> Why?
+
+Removed.
+
+> >>
+> >> > +    if (machine->firmware) {
+> >> > +        return (addr & 0x7fffffff) + KERNEL_BOOT_ADDRESS;
+> >>
+> >> So with both "-bios" and "-kernel", the kernel address will be moved
+> >> to another address other than 0x80200000 (for 64-bit). This does not
+> >> look good to me.
+> >>
+>
+> So why not simply return KERNEL_BOOT_ADDRESS in kernel_translate()?
+
+That's what I am doing now.
+
+Alistair
+
+>
+> Regards,
+> Bin
 
