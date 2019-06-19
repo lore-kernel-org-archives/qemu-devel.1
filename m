@@ -2,70 +2,67 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9C09C31E49
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 12:33:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59E9BC31E49
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 12:34:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C044A206BA
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 12:33:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C044A206BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 31E4E206BA
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 12:34:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31E4E206BA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37954 helo=lists.gnu.org)
+Received: from localhost ([::1]:37958 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdZmN-0000kt-Oo
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 08:33:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55901)
+	id 1hdZnO-0001Z5-8n
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 08:34:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56178)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kpouget@redhat.com>) id 1hdZkL-0008Qb-Iq
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 08:31:26 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hdZls-0000ZL-UR
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 08:33:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kpouget@redhat.com>) id 1hdZkH-0004DH-Sh
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 08:31:25 -0400
-Received: from mail-wm1-f50.google.com ([209.85.128.50]:40798)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <kpouget@redhat.com>) id 1hdZk9-0003cY-IX
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 08:31:14 -0400
-Received: by mail-wm1-f50.google.com with SMTP id v19so1639424wmj.5
- for <qemu-devel@nongnu.org>; Wed, 19 Jun 2019 05:30:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=jozFB0ctGaUjtpKGna3OuU7qYSP25GTS+AoCKSW0SxA=;
- b=SV3EpZfOVc8w14yPunppjX0d6IL2WvQJ6DHIiH9zs9Aq08dh0UkVVmF65KzOBjvOQ5
- I281DxTyLg78ZjClh6kqdgBHj4vWJcmUfNsnoZ2etnJd6RnW+QANgwGs8/P0svkyTGZE
- S3ZpH2Yk2He2++g96lADCqMawpjZ+TtbbdrYw+76XHW1j5qWTfJadIhBL0XPdLbTi0Oy
- Nm1AxhTXvNfmRvPycsbcUrRBqn74p47crJTuElfjLECxQdqoXd/j4FnDntPcfiVrtHXI
- j6W1b2UKu71Mqy4aohxbNu1zFdwjIst/blPWRL0X6ANTYbsOcyr3Q+sv3rehCCpQadsD
- DXYg==
-X-Gm-Message-State: APjAAAX4H+2dVUzbGRidzf17KNT9r9wBvs5Qlg/mRAI9LxdiGdSiyzbx
- KOaPpkfJU8PZqyyFDshBfGtNiduVCAI=
-X-Google-Smtp-Source: APXvYqwJj4fFllL9TgYoq0bJcAbpw9ONOVt2ctWHFuhgABgL/bTlgki/Q4tEiLBVVFWCXAXeYOi36w==
-X-Received: by 2002:a05:600c:2199:: with SMTP id
- e25mr3494786wme.72.1560947444528; 
- Wed, 19 Jun 2019 05:30:44 -0700 (PDT)
-Received: from pinea.redhat.com ([2001:861:3440:6a0:71b6:dd5f:657d:58e3])
- by smtp.gmail.com with ESMTPSA id f24sm829265wmb.16.2019.06.19.05.30.43
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 19 Jun 2019 05:30:43 -0700 (PDT)
-From: Kevin Pouget <kpouget@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 19 Jun 2019 14:30:42 +0200
-Message-Id: <20190619123042.4822-1-kpouget@redhat.com>
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <no-reply@patchew.org>) id 1hdZlr-0005jh-3X
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 08:33:00 -0400
+Resent-Date: Wed, 19 Jun 2019 08:33:00 -0400
+Resent-Message-Id: <E1hdZlr-0005jh-3X@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21461)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hdZlp-0005gh-Eh
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 08:32:59 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1560944826; cv=none; d=zoho.com; s=zohoarc; 
+ b=aGFkvb3wtP6eERroB730IPvqtLzJEIDNURZ5XqHwujxQJfiMmKoOh2XGBHjUpQkbXRle1yHAwefIhuglf4IXUsLxpLfnrWzoV4GcXRp00PCB2wQ2Wjhet/V+xd8DuMylclxQHg0yCQEfzIOtmUCcOUlSQIkEWAqwnPjoOkHjjFA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1560944826;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=j29+Usq3Jq+mg0vUi2oIIN1s9ZHP7XKdzd/EgZnt4Q4=; 
+ b=H9j+TCEGYk4xE692dRgxXwKDpoRo7J41jv2Q1PNZcaek/Ui1xGCEt71X+7EWzawRcyyJzG549NzMYANFVkfNT5h3gtaiCR/qldPPPz3JS1oGTKxaoJT44CSpGYYySHuRXa6wkCeTf7ksKkn3jA8zH/5W/O3dTs1vmSLnAtP2pmw=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1560944824558404.1510845374322;
+ Wed, 19 Jun 2019 04:47:04 -0700 (PDT)
+In-Reply-To: <1560942225-24728-1-git-send-email-stefan.brankovic@rt-rk.com>
+Message-ID: <156094482372.27031.3686344990594718096@ce79690b2cb9>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: stefan.brankovic@rt-rk.com
+Date: Wed, 19 Jun 2019 04:47:04 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.50
-Subject: [Qemu-devel] [RFC] spice-core: allow setting properties from QMP
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH 0/8] target/ppc: Optimize emulation of some
+ Altivec instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,91 +74,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marc-Andre Lureau <marcandre.lureau@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTYwOTQyMjI1LTI0NzI4LTEt
+Z2l0LXNlbmQtZW1haWwtc3RlZmFuLmJyYW5rb3ZpY0BydC1yay5jb20vCgoKCkhpLAoKVGhpcyBz
+ZXJpZXMgZmFpbGVkIGJ1aWxkIHRlc3Qgb24gczM5MHggaG9zdC4gUGxlYXNlIGZpbmQgdGhlIGRl
+dGFpbHMgYmVsb3cuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCiMgVGVz
+dGluZyBzY3JpcHQgd2lsbCBiZSBpbnZva2VkIHVuZGVyIHRoZSBnaXQgY2hlY2tvdXQgd2l0aAoj
+IEhFQUQgcG9pbnRpbmcgdG8gYSBjb21taXQgdGhhdCBoYXMgdGhlIHBhdGNoZXMgYXBwbGllZCBv
+biB0b3Agb2YgImJhc2UiCiMgYnJhbmNoCnNldCAtZQpDQz0kSE9NRS9iaW4vY2MKSU5TVEFMTD0k
+UFdEL2luc3RhbGwKQlVJTEQ9JFBXRC9idWlsZApta2RpciAtcCAkQlVJTEQgJElOU1RBTEwKU1JD
+PSRQV0QKY2QgJEJVSUxECiRTUkMvY29uZmlndXJlIC0tY2M9JENDIC0tcHJlZml4PSRJTlNUQUxM
+Cm1ha2UgLWo0CiMgWFhYOiB3ZSBuZWVkIHJlbGlhYmxlIGNsZWFuIHVwCiMgbWFrZSBjaGVjayAt
+ajQgVj0xCm1ha2UgaW5zdGFsbAoKZWNobwplY2hvICI9PT0gRU5WID09PSIKZW52CgplY2hvCmVj
+aG8gIj09PSBQQUNLQUdFUyA9PT0iCnJwbSAtcWEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAg
+Q0MgICAgICByaXNjdjY0LXNvZnRtbXUvYWNjZWwvdGNnL3RjZy1hbGwubwpJbiBmaWxlIGluY2x1
+ZGVkIGZyb20gL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXdwNmVkbGd4L3NyYy90YXJnZXQv
+cHBjL3RyYW5zbGF0ZS5jOjY4MjY6Ci92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC13cDZlZGxn
+eC9zcmMvdGFyZ2V0L3BwYy90cmFuc2xhdGUvdm14LWltcGwuaW5jLmM6IEluIGZ1bmN0aW9uIOKA
+mHRyYW5zX2x2c2zigJk6Ci92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC13cDZlZGxneC9zcmMv
+dGFyZ2V0L3BwYy90cmFuc2xhdGUvdm14LWltcGwuaW5jLmM6NTIwOjI5OiBlcnJvcjogcGFzc2lu
+ZyBhcmd1bWVudCAyIG9mIOKAmHRjZ19nZW5fZXh0X2kzMl9pNjTigJkgZnJvbSBpbmNvbXBhdGli
+bGUgcG9pbnRlciB0eXBlIFstV2Vycm9yPWluY29tcGF0aWJsZS1wb2ludGVyLXR5cGVzXQogIDUy
+MCB8ICAgICB0Y2dfZ2VuX2V4dF9pMzJfaTY0KHNoLCBFQSk7CiAgICAgIHwgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIF5+CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwK
+LS0tCiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfn5+fn5+
+fn5+Xn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAt
+d3A2ZWRsZ3gvc3JjL3RhcmdldC9wcGMvdHJhbnNsYXRlLmM6NjgyNjoKL3Zhci90bXAvcGF0Y2hl
+dy10ZXN0ZXItdG1wLXdwNmVkbGd4L3NyYy90YXJnZXQvcHBjL3RyYW5zbGF0ZS92bXgtaW1wbC5p
+bmMuYzogSW4gZnVuY3Rpb24g4oCYdHJhbnNfbHZzcuKAmToKL3Zhci90bXAvcGF0Y2hldy10ZXN0
+ZXItdG1wLXdwNmVkbGd4L3NyYy90YXJnZXQvcHBjL3RyYW5zbGF0ZS92bXgtaW1wbC5pbmMuYzo1
+NTk6Mjk6IGVycm9yOiBwYXNzaW5nIGFyZ3VtZW50IDIgb2Yg4oCYdGNnX2dlbl9leHRfaTMyX2k2
+NOKAmSBmcm9tIGluY29tcGF0aWJsZSBwb2ludGVyIHR5cGUgWy1XZXJyb3I9aW5jb21wYXRpYmxl
+LXBvaW50ZXItdHlwZXNdCiAgNTU5IHwgICAgIHRjZ19nZW5fZXh0X2kzMl9pNjQoc2gsIEVBKTsK
+ICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn4KICAgICAgfCAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgfAoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDov
+L3BhdGNoZXcub3JnL2xvZ3MvMTU2MDk0MjIyNS0yNDcyOC0xLWdpdC1zZW5kLWVtYWlsLXN0ZWZh
+bi5icmFua292aWNAcnQtcmsuY29tL3Rlc3RpbmcuczM5MHgvP3R5cGU9bWVzc2FnZS4KLS0tCkVt
+YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5v
+cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5j
+b20=
 
-we're investigating the possibility to set some spice properties at
-runtime, through the QMP interface, but we're not sure what's the best
-way to proceed.
-I've prepared the patch below, that adds a new QMP
-command, but is there another way like with a QOM object, that could
-reuse an existing command? I searched but couldn't find an easy/not
-hacky way to create such objects ...
-
-thanks,
-
-Kevin
-
----
-
-This patch allows setting spice properties from the QMP interface.
-
-At the moment, only the 'video-codecs' property is supported.
-
-Signed-off-by: Kevin Pouget <kpouget@redhat.com>
----
- qapi/ui.json    | 19 +++++++++++++++++++
- ui/spice-core.c | 13 +++++++++++++
- 2 files changed, 32 insertions(+)
-
-diff --git a/qapi/ui.json b/qapi/ui.json
-index 59e412139a..5483a9c003 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -265,6 +265,25 @@
- { 'command': 'query-spice', 'returns': 'SpiceInfo',
-   'if': 'defined(CONFIG_SPICE)' }
-
-+##
-+# @set-spice:
-+#
-+# Set Spice properties.
-+# @property: the SPICE property to modify
-+# @value: the new value to affect to this property
-+#
-+# Since: ...
-+#
-+# Example:
-+#
-+# -> { "execute": "set-spice", "arguments": { "property": "video-codecs",
-+#                                             "value": "spice:mjpeg;gst:mjpeg;" } }
-+# <- { "returns": {} }
-+##
-+{ 'command': 'set-spice',
-+  'data': {'property': 'str', 'value': 'str'},
-+  'if': 'defined(CONFIG_SPICE)' }
-+
- ##
- # @SPICE_CONNECTED:
- #
-diff --git a/ui/spice-core.c b/ui/spice-core.c
-index 2ffc3335f0..5408b16684 100644
---- a/ui/spice-core.c
-+++ b/ui/spice-core.c
-@@ -503,6 +503,19 @@ static QemuOptsList qemu_spice_opts = {
-     },
- };
-
-+void qmp_set_spice(const char *property, const char *value, Error **errp) {
-+    if (strcmp(property, "video-codecs") == 0) {
-+        int invalid_codecs = spice_server_set_video_codecs(spice_server, value);
-+
-+        if (invalid_codecs) {
-+            error_setg(errp, "Found %d invalic codecs while setting "
-+                       "the property %s=%s\n", invalid_codecs, property, value);
-+        }
-+    } else {
-+        error_setg(errp, "Setting an unknown spice property (%s=%s)\n", property, value);
-+    }
-+}
-+
- SpiceInfo *qmp_query_spice(Error **errp)
- {
-     QemuOpts *opts = QTAILQ_FIRST(&qemu_spice_opts.head);
---
-2.21.0
 
