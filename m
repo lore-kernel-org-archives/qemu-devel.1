@@ -2,69 +2,65 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1DC4C31E49
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 08:20:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFEEFC31E49
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 08:22:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A798F2080C
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 08:20:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A798F2080C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8870A20665
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 08:22:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8870A20665
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=efs-auto.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35808 helo=lists.gnu.org)
+Received: from localhost ([::1]:35820 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdVpg-0000XM-VP
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 04:20:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42378)
+	id 1hdVrg-0001m0-OP
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 04:22:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43044)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hdVnk-0007um-Q1
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 04:18:41 -0400
+ (envelope-from <david.brenken@efs-auto.org>) id 1hdVqJ-0000z9-Ve
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 04:21:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hdVni-0007jb-V6
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 04:18:40 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:45415 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hdVna-00075Y-9d; Wed, 19 Jun 2019 04:18:30 -0400
-Received: from lhreml708-cah.china.huawei.com (unknown [172.18.7.106])
- by Forcepoint Email with ESMTP id 7611219928A051FA66D4;
- Wed, 19 Jun 2019 09:18:07 +0100 (IST)
-Received: from LHREML524-MBS.china.huawei.com ([169.254.2.112]) by
- lhreml708-cah.china.huawei.com ([10.201.108.49]) with mapi id 14.03.0415.000; 
- Wed, 19 Jun 2019 09:18:01 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Auger Eric <eric.auger@redhat.com>, Peter Maydell
- <peter.maydell@linaro.org>
-Thread-Topic: [PATCH v5 0/8] ARM virt: ACPI memory hotplug support
-Thread-Index: AQHVELrXjlt3iCVXlkWsFxU/nLHFv6ahdyaAgAABhYCAAA0HgIABR4Eg
-Date: Wed, 19 Jun 2019 08:18:00 +0000
-Message-ID: <5FC3163CFD30C246ABAA99954A238FA83F2AA96B@lhreml524-mbs.china.huawei.com>
-References: <20190522162252.28568-1-shameerali.kolothum.thodi@huawei.com>
- <653a6b3c-ac1a-f197-1240-a28f59890fa8@redhat.com>
- <CAFEAcA9g=9u1Cj+1gqWqXWfg1phmZPw4=y7Ks_EzbYOEBW-WOA@mail.gmail.com>
- <2c08ff88-7e94-6f24-33f1-173957cee2ba@redhat.com>
-In-Reply-To: <2c08ff88-7e94-6f24-33f1-173957cee2ba@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.237]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+ (envelope-from <david.brenken@efs-auto.org>) id 1hdVqJ-0001E4-3j
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 04:21:19 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:35439)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <david.brenken@efs-auto.org>)
+ id 1hdVqI-0001DB-RB
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 04:21:19 -0400
+Received: from localhost.localdomain ([178.239.76.114]) by
+ mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MdwRi-1iEDal0oiM-00b5h2; Wed, 19 Jun 2019 09:57:01 +0200
+From: David Brenken <david.brenken@efs-auto.org>
+To: qemu-devel@nongnu.org
+Date: Wed, 19 Jun 2019 09:56:38 +0200
+Message-Id: <20190619075643.10048-1-david.brenken@efs-auto.org>
+X-Mailer: git-send-email 2.16.1.windows.4
+X-Provags-ID: V03:K1:GN0OTgSUdnHIlnKJaszyuOSvsINsBnNPmfT/qyV2poJ/QbIXv4T
+ ZnEBmPt6SNoALJMiX0DJCs/LZHzH8fvR+27J/W9ATV2BnAu9HbnAdg6vR6TRfGY3iPU5yxx
+ +iRQhDy96L/GZoTX1pO0+2vjm5Ixfb6XbxNfuD0XeNupU5LJNaA7ajtBsgkJuuLT28fccFa
+ DMF7ym0rOCyovEx8bkZGw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:XBOnKy6k+9U=:aYotFfrXxSjuGP6V1Co5Aw
+ M+rEj+e38WWTJIoSV6jy98VAWf4lceNsKtUAniYxrkNcLoOa+ozjzwaH6eoF0/RvY191Y8Mzc
+ SfGSGtCxtCkNL77I98/2LmkzllKbtVt2WxpmT7hW2I4YEGGguzSGdclw1rrbNvHbdOs3bpy/p
+ WZRocSSBvOGIrbHZVp4zrn/3M9iJvGEs3CHJFAbE9HGinlH4Mbyq6UdmHxzak/B/Pq1acEPzZ
+ 9hwpGXrBO0r1ltTtZ6Ig68jtgJ1FpBhmoQS7+ScOcPN8mRzPJ++sFObe2PTlCLbdU3jBhDvMd
+ A19cBXgmC3aO4AJMs38cDE9byeDJknJA3oxGqaHo0tP28gsAv5IYEgzCptvw2ZxlBogGCZWsc
+ fd7D4w+rNPEv2eAJoMIg12L4tuoKzSs6WTeV4EdKdL/FZ8LE5ayn/cs3CkitVylyDvFvGDKv1
+ oj079AKkRw4xKI3O1QZddtm8J4kQtRT16lfStULAqpYK9BqZClzKbXgBJOOKA0XFMqGBVAFmw
+ RVtxiJp4+9YgyCgtmIpIKPOx70D5K/eiVBnjofKZtlwKyNSeGGHVl4EWDe7BWX+2aO6qb9apS
+ cZ1FodIrt6xG1/ucWa4113o877tXTCxHf2WUqn2CvKXbjNnW8koFkavjUCxhmbV1B0eUWRVwt
+ jSw2rthoViib9n8ZHpfBjj97X/7H2+MaMxnj1iloCwLSCn3LVF7tYWtI+l73TL/4E/Z5nK0/D
+ hf+V6fyv1nopVwBWr9zr3VBkqm2h9CdEip3ecWP+59UpHGFelteP+Pql9QM=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 185.176.76.210
-Subject: Re: [Qemu-devel] [PATCH v5 0/8] ARM virt: ACPI memory hotplug
- support
+X-Received-From: 212.227.126.135
+Subject: [Qemu-devel] [PATCH v2 0/5] tricore: adding new instructions and
+ fixing issues
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,34 +72,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Samuel Ortiz <sameo@linux.intel.com>,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- "xuwei \(O\)" <xuwei5@huawei.com>, Igor Mammedov <imammedo@redhat.com>,
- "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>,
- Laszlo Ersek <lersek@redhat.com>
+Cc: kbastian@mail.uni-paderborn.de, David Brenken <david.brenken@efs-auto.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGkgRXJpYywNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBdWdlciBF
-cmljIFttYWlsdG86ZXJpYy5hdWdlckByZWRoYXQuY29tXQ0KPiBTZW50OiAxOCBKdW5lIDIwMTkg
-MTQ6NDUNCj4gVG86IFBldGVyIE1heWRlbGwgPHBldGVyLm1heWRlbGxAbGluYXJvLm9yZz4NCj4g
-Q2M6IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkgPHNoYW1lZXJhbGkua29sb3RodW0udGhvZGlA
-aHVhd2VpLmNvbT47DQo+IFFFTVUgRGV2ZWxvcGVycyA8cWVtdS1kZXZlbEBub25nbnUub3JnPjsg
-cWVtdS1hcm0NCj4gPHFlbXUtYXJtQG5vbmdudS5vcmc+OyBJZ29yIE1hbW1lZG92IDxpbWFtbWVk
-b0ByZWRoYXQuY29tPjsNCj4gU2hhbm5vbiBaaGFvIDxzaGFubm9uLnpoYW9zbEBnbWFpbC5jb20+
-OyBTYW11ZWwgT3J0aXoNCj4gPHNhbWVvQGxpbnV4LmludGVsLmNvbT47IHNlYmFzdGllbi5ib2V1
-ZkBpbnRlbC5jb207IHh1d2VpIChPKQ0KPiA8eHV3ZWk1QGh1YXdlaS5jb20+OyBMYXN6bG8gRXJz
-ZWsgPGxlcnNla0ByZWRoYXQuY29tPjsgQXJkIEJpZXNoZXV2ZWwNCj4gPGFyZC5iaWVzaGV1dmVs
-QGxpbmFyby5vcmc+OyBMaW51eGFybSA8bGludXhhcm1AaHVhd2VpLmNvbT4NCj4gU3ViamVjdDog
-UmU6IFtQQVRDSCB2NSAwLzhdIEFSTSB2aXJ0OiBBQ1BJIG1lbW9yeSBob3RwbHVnIHN1cHBvcnQN
-Cj4gDQo+IEhpIFBldGVyLA0KPiBPbiA2LzE4LzE5IDI6NTcgUE0sIFBldGVyIE1heWRlbGwgd3Jv
-dGU6DQo+ID4gSSdtIG5vdCBzdXJlIHdlIHNob3VsZCBjYXJyeSBhY3Jvc3MgVGVzdGVkLWJ5IHRh
-Z3MgbGlrZSB0aGF0OiBhbnkNCj4gPiByZXNwaW4gbWlnaHQgYWNjaWRlbnRhbGx5IGludHJvZHVj
-ZSBidWdzIHRoYXQgbWFrZSBpdCBzdG9wIHdvcmtpbmcuLi4NCj4gDQo+IE9LLiBObyBwcm9ibGVt
-LiBJIHdpbGwgdGVzdCB0aGUgbmV4dCB2ZXJzaW9uIHRoZW4uDQoNClRoYW5rcyBmb3IgdGVzdGlu
-ZyBhbmQgdmVyaWZ5aW5nLiBJIHdpbGwgcmVzcGluIHRoaXMgc29vbi4NCg0KQ2hlZXJzLA0KU2hh
-bWVlcg0KIA0K
+From: David Brenken <david.brenken@efs-auto.de>
+
+Hello everyone,
+
+as discussed here is the second version of the patchset.
+- We changed the implementation of the RRPW_INSERT to make use of 
+tcg_gen_deposit_tl.
+- We added more information of the implementation of QSEED in the code
+and changed parts of the implementation.
+- We do only sync ctx.hflags with tb->flags.
+
+Best regards
+
+David
+
+Andreas Konopik (1):
+  tricore: add QSEED instruction
+
+David Brenken (3):
+  tricore: add FTOIZ instruction
+  tricore: add UTOF instruction
+  tricore: fix RRPW_INSERT instruction
+
+Georg Hofstetter (1):
+  tricore: reset DisasContext before generating code
+
+ target/tricore/fpu_helper.c | 126 ++++++++++++++++++++++++++++++++++++
+ target/tricore/helper.h     |   3 +
+ target/tricore/translate.c  |  14 +++-
+ 3 files changed, 141 insertions(+), 2 deletions(-)
+
+-- 
+2.22.0.windows.1
 
