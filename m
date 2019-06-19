@@ -2,65 +2,58 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5B12C31E5E
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 09:59:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD115C31E49
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 09:59:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8012220B1F
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 09:59:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8012220B1F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 959AC20B1F
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 09:59:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 959AC20B1F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36410 helo=lists.gnu.org)
+Received: from localhost ([::1]:36412 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdXNJ-0008H8-PP
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 05:59:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45950)
+	id 1hdXNO-0008QI-S5
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 05:59:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44300)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <clg@kaod.org>) id 1hdXL9-0006aB-45
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 05:57:18 -0400
+ (envelope-from <pagupta@redhat.com>) id 1hdXFu-00088T-1P
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 05:51:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1hdXL5-00005y-Qr
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 05:57:13 -0400
-Received: from 4.mo3.mail-out.ovh.net ([178.33.46.10]:36338)
+ (envelope-from <pagupta@redhat.com>) id 1hdXFt-0003Zi-2Q
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 05:51:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58470)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hdXL3-0008Ge-VN
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 05:57:11 -0400
-Received: from player755.ha.ovh.net (unknown [10.109.143.223])
- by mo3.mail-out.ovh.net (Postfix) with ESMTP id 2F2D821A7DD
- for <qemu-devel@nongnu.org>; Wed, 19 Jun 2019 11:56:51 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
- (Authenticated sender: clg@kaod.org)
- by player755.ha.ovh.net (Postfix) with ESMTPSA id 9DABB719E821;
- Wed, 19 Jun 2019 09:56:46 +0000 (UTC)
-To: David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
-References: <156070574343.343123.16772707632470400458.stgit@bahia.lan>
- <20190619093617.GC22560@umbus.BigPond>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <4198cb84-c126-f523-1736-4eb4f96526e6@kaod.org>
-Date: Wed, 19 Jun 2019 11:56:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <20190619093617.GC22560@umbus.BigPond>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 496240388208429888
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrtddugdduheduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+ (Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hdXFs-0003Yo-PJ
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 05:51:48 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0E399C1EB203;
+ Wed, 19 Jun 2019 09:51:48 +0000 (UTC)
+Received: from dhcp201-121.englab.pnq.redhat.com (ovpn-116-148.sin2.redhat.com
+ [10.67.116.148])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 302C11001DCB;
+ Wed, 19 Jun 2019 09:51:29 +0000 (UTC)
+From: Pankaj Gupta <pagupta@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 19 Jun 2019 15:19:06 +0530
+Message-Id: <20190619094907.10131-7-pagupta@redhat.com>
+In-Reply-To: <20190619094907.10131-1-pagupta@redhat.com>
+References: <20190619094907.10131-1-pagupta@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.32]); Wed, 19 Jun 2019 09:51:48 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.46.10
-Subject: Re: [Qemu-devel] [PATCH] spapr/xive: Add proper rollback to
- kvmppc_xive_connect()
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2 6/7] numa: Handle virtio-pmem in NUMA stats
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,158 +65,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, aarcange@redhat.com, cohuck@redhat.com,
+ xiaoguangrong.eric@gmail.com, mst@redhat.com, pagupta@redhat.com,
+ riel@surriel.com, david@redhat.com, armbru@redhat.com, ehabkost@redhat.com,
+ lcapitulino@redhat.com, stefanha@redhat.com, pbonzini@redhat.com,
+ imammedo@redhat.com, dan.j.williams@intel.com, nilal@redhat.com,
+ dgilbert@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
+From: David Hildenbrand <david@redhat.com>
 
-On 19/06/2019 11:36, David Gibson wrote:
-> On Sun, Jun 16, 2019 at 07:22:23PM +0200, Greg Kurz wrote:
->> Make kvmppc_xive_disconnect() able to undo the changes of a partial
->> execution of kvmppc_xive_connect() and use it to perform rollback.
->>
->> Based-on: <20190614165920.12670-2-clg@kaod.org>
->> Signed-off-by: Greg Kurz <groug@kaod.org>
-> 
-> I'm afraid this doesn't apply clean on my current ppc-for-4.1.
+Account the memory to node 0 for now. Once (if ever) virtio-pmem
+supports NUMA, we can account it to the right node.
 
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ numa.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-You need these before :
-
-  spapr/xive: simplify spapr_irq_init_device() to remove the emulated init
-  spapr/xive: rework the mapping the KVM memory regions
-
-  https://patchwork.ozlabs.org/patch/1116146/
-  https://patchwork.ozlabs.org/patch/1116152/
-
-Then, these should follow :
-
-  xics/spapr: Only emulated XICS should use RTAS/hypercalls emulation
-  xics/spapr: Drop unused function declaration
-  xics/spapr: Rename xics_kvm_init()
-  xics/kvm: Skip rollback when KVM XICS is absent
-  xics/kvm: Always use local_err in xics_kvm_init()
-  xics/kvm: Add error propagation to ic*_set_kvm_state() functions
-  xics/kvm: Add proper rollback to xics_kvm_init()
-
-You can take a look at :
-  
-  https://github.com/legoater/qemu/commits/xive-next
-
-Thanks,
-
-C.
-
->> ---
->>  hw/intc/spapr_xive_kvm.c |   48 ++++++++++++++++++++++++++++------------------
->>  1 file changed, 29 insertions(+), 19 deletions(-)
->>
->> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
->> index 5559f8bce5ef..3bf8e7a20e14 100644
->> --- a/hw/intc/spapr_xive_kvm.c
->> +++ b/hw/intc/spapr_xive_kvm.c
->> @@ -724,8 +724,7 @@ void kvmppc_xive_connect(SpaprXive *xive, Error **errp)
->>      xsrc->esb_mmap = kvmppc_xive_mmap(xive, KVM_XIVE_ESB_PAGE_OFFSET, esb_len,
->>                                        &local_err);
->>      if (local_err) {
->> -        error_propagate(errp, local_err);
->> -        return;
->> +        goto fail;
->>      }
->>  
->>      memory_region_init_ram_device_ptr(&xsrc->esb_mmio_kvm, OBJECT(xsrc),
->> @@ -743,8 +742,7 @@ void kvmppc_xive_connect(SpaprXive *xive, Error **errp)
->>      xive->tm_mmap = kvmppc_xive_mmap(xive, KVM_XIVE_TIMA_PAGE_OFFSET, tima_len,
->>                                       &local_err);
->>      if (local_err) {
->> -        error_propagate(errp, local_err);
->> -        return;
->> +        goto fail;
->>      }
->>      memory_region_init_ram_device_ptr(&xive->tm_mmio_kvm, OBJECT(xive),
->>                                        "xive.tima", tima_len, xive->tm_mmap);
->> @@ -760,21 +758,24 @@ void kvmppc_xive_connect(SpaprXive *xive, Error **errp)
->>  
->>          kvmppc_xive_cpu_connect(spapr_cpu_state(cpu)->tctx, &local_err);
->>          if (local_err) {
->> -            error_propagate(errp, local_err);
->> -            return;
->> +            goto fail;
->>          }
->>      }
->>  
->>      /* Update the KVM sources */
->>      kvmppc_xive_source_reset(xsrc, &local_err);
->>      if (local_err) {
->> -            error_propagate(errp, local_err);
->> -            return;
->> +        goto fail;
->>      }
->>  
->>      kvm_kernel_irqchip = true;
->>      kvm_msi_via_irqfd_allowed = true;
->>      kvm_gsi_direct_mapping = true;
->> +    return;
->> +
->> +fail:
->> +    error_propagate(errp, local_err);
->> +    kvmppc_xive_disconnect(xive, NULL);
->>  }
->>  
->>  void kvmppc_xive_disconnect(SpaprXive *xive, Error **errp)
->> @@ -796,23 +797,29 @@ void kvmppc_xive_disconnect(SpaprXive *xive, Error **errp)
->>      xsrc = &xive->source;
->>      esb_len = (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
->>  
->> -    memory_region_del_subregion(&xsrc->esb_mmio, &xsrc->esb_mmio_kvm);
->> -    object_unparent(OBJECT(&xsrc->esb_mmio_kvm));
->> -    munmap(xsrc->esb_mmap, esb_len);
->> -    xsrc->esb_mmap = NULL;
->> +    if (xsrc->esb_mmap) {
->> +        memory_region_del_subregion(&xsrc->esb_mmio, &xsrc->esb_mmio_kvm);
->> +        object_unparent(OBJECT(&xsrc->esb_mmio_kvm));
->> +        munmap(xsrc->esb_mmap, esb_len);
->> +        xsrc->esb_mmap = NULL;
->> +    }
->>  
->> -    memory_region_del_subregion(&xive->tm_mmio, &xive->tm_mmio_kvm);
->> -    object_unparent(OBJECT(&xive->tm_mmio_kvm));
->> -    munmap(xive->tm_mmap, 4ull << TM_SHIFT);
->> -    xive->tm_mmap = NULL;
->> +    if (xive->tm_mmap) {
->> +        memory_region_del_subregion(&xive->tm_mmio, &xive->tm_mmio_kvm);
->> +        object_unparent(OBJECT(&xive->tm_mmio_kvm));
->> +        munmap(xive->tm_mmap, 4ull << TM_SHIFT);
->> +        xive->tm_mmap = NULL;
->> +    }
->>  
->>      /*
->>       * When the KVM device fd is closed, the KVM device is destroyed
->>       * and removed from the list of devices of the VM. The VCPU
->>       * presenters are also detached from the device.
->>       */
->> -    close(xive->fd);
->> -    xive->fd = -1;
->> +    if (xive->fd != -1) {
->> +        close(xive->fd);
->> +        xive->fd = -1;
->> +    }
->>  
->>      kvm_kernel_irqchip = false;
->>      kvm_msi_via_irqfd_allowed = false;
->> @@ -822,5 +829,8 @@ void kvmppc_xive_disconnect(SpaprXive *xive, Error **errp)
->>      kvm_cpu_disable_all();
->>  
->>      /* VM Change state handler is not needed anymore */
->> -    qemu_del_vm_change_state_handler(xive->change);
->> +    if (xive->change) {
->> +        qemu_del_vm_change_state_handler(xive->change);
->> +        xive->change = NULL;
->> +    }
->>  }
->>
-> 
+diff --git a/numa.c b/numa.c
+index 3875e1efda..42cca616e7 100644
+--- a/numa.c
++++ b/numa.c
+@@ -549,6 +549,7 @@ static void numa_stat_memory_devices(NumaNodeMem node_mem[])
+     MemoryDeviceInfoList *info_list = qmp_memory_device_list();
+     MemoryDeviceInfoList *info;
+     PCDIMMDeviceInfo     *pcdimm_info;
++    VirtioPMEMDeviceInfo *vpi;
+ 
+     for (info = info_list; info; info = info->next) {
+         MemoryDeviceInfo *value = info->value;
+@@ -556,22 +557,21 @@ static void numa_stat_memory_devices(NumaNodeMem node_mem[])
+         if (value) {
+             switch (value->type) {
+             case MEMORY_DEVICE_INFO_KIND_DIMM:
+-                pcdimm_info = value->u.dimm.data;
+-                break;
+-
+             case MEMORY_DEVICE_INFO_KIND_NVDIMM:
+-                pcdimm_info = value->u.nvdimm.data;
+-                break;
+-
+-            default:
+-                pcdimm_info = NULL;
+-                break;
+-            }
+-
+-            if (pcdimm_info) {
++                pcdimm_info = value->type == MEMORY_DEVICE_INFO_KIND_DIMM ?
++                              value->u.dimm.data : value->u.nvdimm.data;
+                 node_mem[pcdimm_info->node].node_mem += pcdimm_info->size;
+                 node_mem[pcdimm_info->node].node_plugged_mem +=
+                     pcdimm_info->size;
++                break;
++            case MEMORY_DEVICE_INFO_KIND_VIRTIO_PMEM:
++                vpi = value->u.virtio_pmem.data;
++                /* TODO: once we support numa, assign to right node */
++                node_mem[0].node_mem += vpi->size;
++                node_mem[0].node_plugged_mem += vpi->size;
++                break;
++            default:
++                g_assert_not_reached();
+             }
+         }
+     }
+-- 
+2.14.5
 
 
