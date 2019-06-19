@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0856C31E49
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 11:10:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EB2EC31E49
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 11:13:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 886DF208CB
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 11:10:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 886DF208CB
+	by mail.kernel.org (Postfix) with ESMTPS id 577912054F
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 11:13:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 577912054F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36958 helo=lists.gnu.org)
+Received: from localhost ([::1]:36966 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdYUL-0007fQ-Ck
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 07:10:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36338)
+	id 1hdYWe-0000KB-94
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 07:13:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36384)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefan.brankovic@rt-rk.com>) id 1hdYOk-0002Cw-Az
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 07:05:04 -0400
+ (envelope-from <stefan.brankovic@rt-rk.com>) id 1hdYOl-0002D2-QA
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 07:05:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefan.brankovic@rt-rk.com>) id 1hdYOi-0006Ka-5g
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 07:05:02 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:54794 helo=mail.rt-rk.com)
+ (envelope-from <stefan.brankovic@rt-rk.com>) id 1hdYOj-0006S6-Or
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 07:05:03 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:59481 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <stefan.brankovic@rt-rk.com>)
- id 1hdYOh-0001ii-Qy
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 07:05:00 -0400
+ id 1hdYOj-0006Lv-B8
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 07:05:01 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 177DA1A45CE;
+ by mail.rt-rk.com (Postfix) with ESMTP id 92AF51A472C;
  Wed, 19 Jun 2019 13:03:55 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw870-lin.domain.local (rtrkw870-lin.domain.local
  [10.10.13.132])
- by mail.rt-rk.com (Postfix) with ESMTPSA id E799C1A45D3;
- Wed, 19 Jun 2019 13:03:54 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 6A1DE1A485A;
+ Wed, 19 Jun 2019 13:03:55 +0200 (CEST)
 From: Stefan Brankovic <stefan.brankovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 19 Jun 2019 13:03:39 +0200
-Message-Id: <1560942225-24728-3-git-send-email-stefan.brankovic@rt-rk.com>
+Date: Wed, 19 Jun 2019 13:03:44 +0200
+Message-Id: <1560942225-24728-8-git-send-email-stefan.brankovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1560942225-24728-1-git-send-email-stefan.brankovic@rt-rk.com>
 References: <1560942225-24728-1-git-send-email-stefan.brankovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH 2/8] target/ppc: Optimize emulation of vsl and
- vsr instructions
+Subject: [Qemu-devel] [PATCH 7/8] target/ppc: Optimize emulation of vclzh
+ and vclzb instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,216 +68,220 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Optimization of altivec instructions vsl and vsr(Vector Shift Left/Rigt).
-Perform shift operation (left and right respectively) on 128 bit value of
-register vA by value specified in bits 125-127 of register vB. Lowest 3
-bits in each byte element of register vB must be identical or result is
-undefined.
+Optimize Altivec instruction vclzh (Vector Count Leading Zeros Halfword).
+This instruction counts the number of leading zeros of each halfword element
+in source register and places result in the appropriate halfword element of
+destination register.
 
-For vsl instruction, the first step is bits 125-127 of register vB have
-to be saved in variable sh. Then, the highest sh bits of the lower
-doubleword element of register vA are saved in variable shifted,
-in order not to lose those bits when shift operation is performed on
-the lower doubleword element of register vA, which is the next
-step. After shifting the lower doubleword element shift operation
-is performed on higher doubleword element of vA, with replacement of
-the lowest sh bits(that are now 0) with bits saved in shifted.
+In each iteration of outer for loop count operation is performed on one
+doubleword element of source register vB. In the first iteration, higher
+doubleword element of vB is placed in variable avr, and then counting
+for every halfword element is performed by  using tcg_gen_clzi_i64.
+Since it counts leading zeros on 64 bit lenght, ith byte element has to
+be moved to the highest 16 bits of tmp, or-ed with mask(in order to get all
+ones in lowest 48 bits), then perform tcg_gen_clzi_i64 and move it's result
+in appropriate halfword element of result. This is done in inner for loop.
+After the operation is finished, the result is saved in the appropriate
+doubleword element of destination register vD. The same sequence of orders
+is to be applied again for the  lower doubleword element of vB.
 
-For vsr instruction, firstly, the bits 125-127 of register vB have
-to be saved in variable sh. Then, the lowest sh bits of the higher
-doubleword element of register vA are saved in variable shifted,
-in odred not to lose those bits when the shift operation is
-performed on the higher doubleword element of register vA, which is
-the next step. After shifting higher doubleword element, shift operation
-is performed on lower doubleword element of vA, with replacement of
-highest sh bits(that are now 0) with bits saved in shifted.
+Optimize Altivec instruction vclzb (Vector Count Leading Zeros Byte).
+This instruction counts the number of leading zeros of each byte element
+in source register and places result in the appropriate byte element of
+destination register.
+
+In each iteration of the outer for loop, counting operation is done on one
+doubleword element of source register vB. In the first iteration, the
+higher doubleword element of vB is placed in variable avr, and then counting
+for every byte element is performed using tcg_gen_clzi_i64. Since it counts
+leading zeros on 64 bit lenght, ith byte element has to be moved to the highest
+8 bits of variable  tmp, or-ed with mask(in order to get all ones in the lowest
+56 bits), then perform tcg_gen_clzi_i64 and move it's result in the appropriate
+byte element of result. This is done in inner for loop. After the operation is
+finished, the result is saved in the  appropriate doubleword element of destination
+register vD. The same sequence of orders is to be applied again for the lower
+doubleword element of vB.
 
 Signed-off-by: Stefan Brankovic <stefan.brankovic@rt-rk.com>
 ---
- target/ppc/helper.h                 |  2 -
- target/ppc/int_helper.c             | 35 -------------
- target/ppc/translate/vmx-impl.inc.c | 99 ++++++++++++++++++++++++++++++++++++-
- 3 files changed, 97 insertions(+), 39 deletions(-)
+ target/ppc/helper.h                 |   2 -
+ target/ppc/int_helper.c             |   9 ---
+ target/ppc/translate/vmx-impl.inc.c | 122 +++++++++++++++++++++++++++++++++++-
+ 3 files changed, 120 insertions(+), 13 deletions(-)
 
 diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index c82105e..33dad6a 100644
+index 595241c..17b4b06 100644
 --- a/target/ppc/helper.h
 +++ b/target/ppc/helper.h
-@@ -213,8 +213,6 @@ DEF_HELPER_3(vrlb, void, avr, avr, avr)
- DEF_HELPER_3(vrlh, void, avr, avr, avr)
- DEF_HELPER_3(vrlw, void, avr, avr, avr)
- DEF_HELPER_3(vrld, void, avr, avr, avr)
--DEF_HELPER_3(vsl, void, avr, avr, avr)
--DEF_HELPER_3(vsr, void, avr, avr, avr)
- DEF_HELPER_4(vsldoi, void, avr, avr, avr, i32)
- DEF_HELPER_3(vextractub, void, avr, avr, i32)
- DEF_HELPER_3(vextractuh, void, avr, avr, i32)
+@@ -303,8 +303,6 @@ DEF_HELPER_4(vcfsx, void, env, avr, avr, i32)
+ DEF_HELPER_4(vctuxs, void, env, avr, avr, i32)
+ DEF_HELPER_4(vctsxs, void, env, avr, avr, i32)
+ 
+-DEF_HELPER_2(vclzb, void, avr, avr)
+-DEF_HELPER_2(vclzh, void, avr, avr)
+ DEF_HELPER_2(vctzb, void, avr, avr)
+ DEF_HELPER_2(vctzh, void, avr, avr)
+ DEF_HELPER_2(vctzw, void, avr, avr)
 diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 9505f4c..a23853e 100644
+index 82cb12e..264b5e7 100644
 --- a/target/ppc/int_helper.c
 +++ b/target/ppc/int_helper.c
-@@ -1738,41 +1738,6 @@ VEXTU_X_DO(vextuhrx, 16, 0)
- VEXTU_X_DO(vextuwrx, 32, 0)
- #undef VEXTU_X_DO
+@@ -1800,15 +1800,6 @@ VUPK(lsw, s64, s32, UPKLO)
+         }                                                               \
+     }
  
--/*
-- * The specification says that the results are undefined if all of the
-- * shift counts are not identical.  We check to make sure that they
-- * are to conform to what real hardware appears to do.
-- */
--#define VSHIFT(suffix, leftp)                                           \
--    void helper_vs##suffix(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)    \
--    {                                                                   \
--        int shift = b->VsrB(15) & 0x7;                                  \
--        int doit = 1;                                                   \
--        int i;                                                          \
--                                                                        \
--        for (i = 0; i < ARRAY_SIZE(r->u8); i++) {                       \
--            doit = doit && ((b->u8[i] & 0x7) == shift);                 \
--        }                                                               \
--        if (doit) {                                                     \
--            if (shift == 0) {                                           \
--                *r = *a;                                                \
--            } else if (leftp) {                                         \
--                uint64_t carry = a->VsrD(1) >> (64 - shift);            \
--                                                                        \
--                r->VsrD(0) = (a->VsrD(0) << shift) | carry;             \
--                r->VsrD(1) = a->VsrD(1) << shift;                       \
--            } else {                                                    \
--                uint64_t carry = a->VsrD(0) << (64 - shift);            \
--                                                                        \
--                r->VsrD(1) = (a->VsrD(1) >> shift) | carry;             \
--                r->VsrD(0) = a->VsrD(0) >> shift;                       \
--            }                                                           \
--        }                                                               \
--    }
--VSHIFT(l, 1)
--VSHIFT(r, 0)
--#undef VSHIFT
+-#define clzb(v) ((v) ? clz32((uint32_t)(v) << 24) : 8)
+-#define clzh(v) ((v) ? clz32((uint32_t)(v) << 16) : 16)
 -
- void helper_vslv(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
- {
-     int i;
+-VGENERIC_DO(clzb, u8)
+-VGENERIC_DO(clzh, u16)
+-
+-#undef clzb
+-#undef clzh
+-
+ #define ctzb(v) ((v) ? ctz32(v) : 8)
+ #define ctzh(v) ((v) ? ctz32(v) : 16)
+ #define ctzw(v) ctz32((v))
 diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index 482e2ee..e7ae979 100644
+index 2588a9e..81569a8 100644
 --- a/target/ppc/translate/vmx-impl.inc.c
 +++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -569,6 +569,101 @@ static void trans_lvsr(DisasContext *ctx)
-     tcg_temp_free(EA);
+@@ -831,6 +831,124 @@ static void trans_vgbbd(DisasContext *ctx)
  }
  
-+/*
-+ * vsl VRT,VRA,VRB - Vector Shift Left
+ /*
++ * vclzb VRT,VRB - Vector Count Leading Zeros Byte
 + *
-+ * Shifting left 128 bit value of vA by value specified in bits 125-127 of vB.
-+ * Lowest 3 bits in each byte element of register vB must be identical or
-+ * result is undefined.
++ * Counting the number of leading zero bits of each byte element in source
++ * register and placing result in appropriate byte element of destination
++ * register.
 + */
-+static void trans_vsl(DisasContext *ctx)
++static void trans_vclzb(DisasContext *ctx)
 +{
 +    int VT = rD(ctx->opcode);
-+    int VA = rA(ctx->opcode);
 +    int VB = rB(ctx->opcode);
-+    TCGv_i64 avrA = tcg_temp_new_i64();
-+    TCGv_i64 avrB = tcg_temp_new_i64();
-+    TCGv_i64 sh = tcg_temp_new_i64();
-+    TCGv_i64 shifted = tcg_temp_new_i64();
++    TCGv_i64 avr = tcg_temp_new_i64();
++    TCGv_i64 result = tcg_temp_new_i64();
 +    TCGv_i64 tmp = tcg_temp_new_i64();
++    TCGv_i64 mask = tcg_const_i64(0xffffffffffffffULL);
++    int i, j;
 +
-+    /* Place bits 125-127 of vB in sh. */
-+    get_avr64(avrB, VB, false);
-+    tcg_gen_andi_i64(sh, avrB, 0x07ULL);
++    for (i = 0; i < 2; i++) {
++        if (i == 0) {
++            /* Get high doubleword of vB in avr. */
++            get_avr64(avr, VB, true);
++        } else {
++            /* Get low doubleword of vB in avr. */
++            get_avr64(avr, VB, false);
++        }
++        /*
++         * Perform count for every byte element using tcg_gen_clzi_i64.
++         * Since it counts leading zeros on 64 bit lenght, we have to move
++         * ith byte element to highest 8 bits of tmp, or it with mask(so we get
++         * all ones in lowest 56 bits), then perform tcg_gen_clzi_i64 and move
++         * it's result in appropriate byte element of result.
++         */
++        tcg_gen_shli_i64(tmp, avr, 56);
++        tcg_gen_or_i64(tmp, tmp, mask);
++        tcg_gen_clzi_i64(result, tmp, 64);
++        for (j = 1; j < 7; j++) {
++            tcg_gen_shli_i64(tmp, avr, (7 - j) * 8);
++            tcg_gen_or_i64(tmp, tmp, mask);
++            tcg_gen_clzi_i64(tmp, tmp, 64);
++            tcg_gen_deposit_i64(result, result, tmp, j * 8, 8);
++        }
++        tcg_gen_or_i64(tmp, avr, mask);
++        tcg_gen_clzi_i64(tmp, tmp, 64);
++        tcg_gen_deposit_i64(result, result, tmp, 56, 8);
++        if (i == 0) {
++            /* Place result in high doubleword element of vD. */
++            set_avr64(VT, result, true);
++        } else {
++            /* Place result in low doubleword element of vD. */
++            set_avr64(VT, result, false);
++        }
++    }
 +
-+    /*
-+     * Save highest sh bits of lower doubleword element of vA in variable
-+     * shifted and perform shift on lower doubleword.
-+     */
-+    get_avr64(avrA, VA, false);
-+    tcg_gen_subfi_i64(tmp, 64, sh);
-+    tcg_gen_shr_i64(shifted, avrA, tmp);
-+    tcg_gen_shl_i64(avrA, avrA, sh);
-+    set_avr64(VT, avrA, false);
-+
-+    /*
-+     * Perform shift on higher doubleword element of vA and replace lowest
-+     * sh bits with shifted.
-+     */
-+    get_avr64(avrA, VA, true);
-+    tcg_gen_shl_i64(avrA, avrA, sh);
-+    tcg_gen_or_i64(avrA, avrA, shifted);
-+    set_avr64(VT, avrA, true);
-+
-+    tcg_temp_free_i64(avrA);
-+    tcg_temp_free_i64(avrB);
-+    tcg_temp_free_i64(sh);
-+    tcg_temp_free_i64(shifted);
++    tcg_temp_free_i64(avr);
++    tcg_temp_free_i64(result);
 +    tcg_temp_free_i64(tmp);
++    tcg_temp_free_i64(mask);
 +}
 +
 +/*
-+ * vsr VRT,VRA,VRB - Vector Shift Right
++ * vclzh VRT,VRB - Vector Count Leading Zeros Halfword
 + *
-+ * Shifting right 128 bit value of vA by value specified in bits 125-127 of vB.
-+ * Lowest 3 bits in each byte element of register vB must be identical or
-+ * result is undefined.
++ * Counting the number of leading zero bits of each halfword element in source
++ * register and placing result in appropriate halfword element of destination
++ * register.
 + */
-+static void trans_vsr(DisasContext *ctx)
++static void trans_vclzh(DisasContext *ctx)
 +{
 +    int VT = rD(ctx->opcode);
-+    int VA = rA(ctx->opcode);
 +    int VB = rB(ctx->opcode);
-+    TCGv_i64 avrA = tcg_temp_new_i64();
-+    TCGv_i64 avrB = tcg_temp_new_i64();
-+    TCGv_i64 sh = tcg_temp_new_i64();
-+    TCGv_i64 shifted = tcg_temp_new_i64();
++    TCGv_i64 avr = tcg_temp_new_i64();
++    TCGv_i64 result = tcg_temp_new_i64();
 +    TCGv_i64 tmp = tcg_temp_new_i64();
++    TCGv_i64 mask = tcg_const_i64(0xffffffffffffULL);
++    int i, j;
 +
-+    /* Place bits 125-127 of vB in sh. */
-+    get_avr64(avrB, VB, false);
-+    tcg_gen_andi_i64(sh, avrB, 0x07ULL);
++    for (i = 0; i < 2; i++) {
++        if (i == 0) {
++            /* Get high doubleword element of vB in avr. */
++            get_avr64(avr, VB, true);
++        } else {
++            /* Get low doubleword element of vB in avr. */
++            get_avr64(avr, VB, false);
++        }
++        /*
++         * Perform count for every halfword element using tcg_gen_clzi_i64.
++         * Since it counts leading zeros on 64 bit lenght, we have to move
++         * ith byte element to highest 16 bits of tmp, or it with mask(so we get
++         * all ones in lowest 48 bits), then perform tcg_gen_clzi_i64 and move
++         * it's result in appropriate halfword element of result.
++         */
++        tcg_gen_shli_i64(tmp, avr, 48);
++        tcg_gen_or_i64(tmp, tmp, mask);
++        tcg_gen_clzi_i64(result, tmp, 64);
++        for (j = 1; j < 3; j++) {
++            tcg_gen_shli_i64(tmp, avr, (3 - j) * 16);
++            tcg_gen_or_i64(tmp, tmp, mask);
++            tcg_gen_clzi_i64(tmp, tmp, 64);
++            tcg_gen_deposit_i64(result, result, tmp, j * 16, 16);
++        }
++        tcg_gen_or_i64(tmp, avr, mask);
++        tcg_gen_clzi_i64(tmp, tmp, 64);
++        tcg_gen_deposit_i64(result, result, tmp, 48, 16);
++        if (i == 0) {
++            /* Place result in high doubleword element of vD. */
++            set_avr64(VT, result, true);
++        } else {
++            /* Place result in low doubleword element of vD. */
++            set_avr64(VT, result, false);
++        }
++    }
 +
-+    /*
-+     * Save lowest sh bits of higher doubleword element of vA in variable
-+     * shifted and perform shift on higher doubleword.
-+     */
-+    get_avr64(avrA, VA, true);
-+    tcg_gen_subfi_i64(tmp, 64, sh);
-+    tcg_gen_shl_i64(shifted, avrA, tmp);
-+    tcg_gen_shr_i64(avrA, avrA, sh);
-+    set_avr64(VT, avrA, true);
-+    /*
-+     * Perform shift on lower doubleword element of vA and replace highest
-+     * sh bits with shifted.
-+     */
-+    get_avr64(avrA, VA, false);
-+    tcg_gen_shr_i64(avrA, avrA, sh);
-+    tcg_gen_or_i64(avrA, avrA, shifted);
-+    set_avr64(VT, avrA, false);
-+
-+    tcg_temp_free_i64(avrA);
-+    tcg_temp_free_i64(avrB);
-+    tcg_temp_free_i64(sh);
-+    tcg_temp_free_i64(shifted);
++    tcg_temp_free_i64(avr);
++    tcg_temp_free_i64(result);
 +    tcg_temp_free_i64(tmp);
++    tcg_temp_free_i64(mask);
 +}
 +
- GEN_VXFORM(vmuloub, 4, 0);
- GEN_VXFORM(vmulouh, 4, 1);
- GEN_VXFORM(vmulouw, 4, 2);
-@@ -681,11 +776,11 @@ GEN_VXFORM(vrld, 2, 3);
- GEN_VXFORM(vrldmi, 2, 3);
- GEN_VXFORM_DUAL(vrld, PPC_NONE, PPC2_ALTIVEC_207, \
-                 vrldmi, PPC_NONE, PPC2_ISA300)
--GEN_VXFORM(vsl, 2, 7);
-+GEN_VXFORM_TRANS(vsl, 2, 7);
- GEN_VXFORM(vrldnm, 2, 7);
- GEN_VXFORM_DUAL(vsl, PPC_ALTIVEC, PPC_NONE, \
-                 vrldnm, PPC_NONE, PPC2_ISA300)
--GEN_VXFORM(vsr, 2, 11);
-+GEN_VXFORM_TRANS(vsr, 2, 11);
- GEN_VXFORM_ENV(vpkuhum, 7, 0);
- GEN_VXFORM_ENV(vpkuwum, 7, 1);
- GEN_VXFORM_ENV(vpkudum, 7, 17);
++/*
+  * vclzw VRT,VRB - Vector Count Leading Zeros Word
+  *
+  * Counting the number of leading zero bits of each word element in source
+@@ -1395,8 +1513,8 @@ GEN_VAFORM_PAIRED(vmsumshm, vmsumshs, 20)
+ GEN_VAFORM_PAIRED(vsel, vperm, 21)
+ GEN_VAFORM_PAIRED(vmaddfp, vnmsubfp, 23)
+ 
+-GEN_VXFORM_NOA(vclzb, 1, 28)
+-GEN_VXFORM_NOA(vclzh, 1, 29)
++GEN_VXFORM_TRANS(vclzb, 1, 28)
++GEN_VXFORM_TRANS(vclzh, 1, 29)
+ GEN_VXFORM_TRANS(vclzw, 1, 30)
+ GEN_VXFORM_TRANS(vclzd, 1, 31)
+ GEN_VXFORM_NOA_2(vnegw, 1, 24, 6)
 -- 
 2.7.4
 
