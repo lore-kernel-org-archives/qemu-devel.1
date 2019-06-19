@@ -2,79 +2,81 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1059BC31E5B
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 15:18:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77300C31E5B
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 15:20:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3AD621880
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 15:18:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3E9CD21881
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 15:20:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uLa3oqbP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3AD621880
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RBZzIIJL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E9CD21881
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39320 helo=lists.gnu.org)
+Received: from localhost ([::1]:39338 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdcMA-0005Oh-30
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 11:18:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39951)
+	id 1hdcNv-00079N-GB
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 11:20:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40454)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bmeng.cn@gmail.com>) id 1hdcJs-00044T-QP
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 11:16:18 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1hdcM6-0005fh-AD
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 11:18:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1hdcJr-00053G-HT
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 11:16:16 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:45837)
+ (envelope-from <bmeng.cn@gmail.com>) id 1hdcM5-0006Pc-4z
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 11:18:34 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:38985)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1hdcJr-00051K-B2; Wed, 19 Jun 2019 11:16:15 -0400
-Received: by mail-ed1-x542.google.com with SMTP id a14so27704706edv.12;
- Wed, 19 Jun 2019 08:16:15 -0700 (PDT)
+ id 1hdcLu-0006Be-SA; Wed, 19 Jun 2019 11:18:24 -0400
+Received: by mail-ed1-x544.google.com with SMTP id m10so27773611edv.6;
+ Wed, 19 Jun 2019 08:18:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=CUcAH5CsXUAkg9VQuHl1C6HetctEYF20Kq7+gMk+jKw=;
- b=uLa3oqbP81fGKr8ZnPIekXNo+YEBTvLe/fe0p3288y/zjHNfVlPQwJOXrABDKv4uTe
- gqVG76RWZRliwof70STHOnm9B9CGw1HSrb9hlwOQ8Gt8kKAQi43w6iDDW8/QBwuQUiOd
- kO7cm4G28gqSr4R+MmRJdAYPJSwxG9iudX82gi1gUkfRHO21WmaJFBeKxh5euopyAMc9
- MvcfDbVRO3KU4F6abmA+0wECV6iVfuXup1UVOf6m74WSSzr3B9Dg6dtkoz1gqt2GZfvb
- VdL9QFR3WlB38u8P06wYFoOtxZRRe4YpTzQzIKifVf5qGwKZngz5GtwaGDxguKPyicyD
- rggw==
+ :cc; bh=7U8x15Ygol6ToivrArynOYp6txXvxaeGK2YxgLl1UGM=;
+ b=RBZzIIJLHxR3QRg2He2ht8kioDjZcw4E96Gf0zEYayXwIHgHWo8GWlLygqHWhAUglU
+ qcgM2/nKNprbF7s3ANOOj068R7l8DzPHGGG5zReaI3GqvbeZXdyp01FhJ+AgSOguSzKf
+ 0o1346JTsNKu9UxzkKZc4pQSgnl+UZ5yRKbFsMCrtKsnW95JKsXbDx76GSxpp935Yyq+
+ BQ8EJ4B3RDLaTVSXXCDcsiWcH7bg0pSfeQ9k0DD4/13IgR3QoJTkMULqZXZVSCsYmXvW
+ fVnJ3qBhTanIhfNFXhF+bTJlVODaf+Y8WQ9xB5zTUlW3KLfywwGK6CZj1jAM7LKe+d43
+ aW9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=CUcAH5CsXUAkg9VQuHl1C6HetctEYF20Kq7+gMk+jKw=;
- b=UHQ/ZON2XvCSaeDmzWAbsnRM05ivpp/SHAuGvUHkNb+bIo7xSlhhLFPzw77G4AbWKM
- V/utBFTDDn00cr6EQkoG5tDGbRyzWLb4qvtM1b5XIu/UIhLLzesp0hGPSqo74VKP2zrJ
- fJCq60j1U8G0BPCjxZhkjqp9fxJGHI8+EURqbIqgUFEM8xucvLEyrrSMkihWRz0W+gT0
- 64DuEu4Md0gzJzUrjKH5oEPrmFF2StLTqvwEljggcku5RRTKPeYocBgpecxx9e1phD99
- b4RwUw4vC/Z1XkvNCq+ySOPBMKyCwx+Trl56JWEeHRDSjc2eEf5Q9vzrSGD+5D1uHERs
- S0nA==
-X-Gm-Message-State: APjAAAWKsPgumm1t4x37ztb9qjYjHmg1606THk5KkHl60dId30tKrOoX
- JO0N83c0w/28Q37O0GBWPnJfDrH6r+DENuDJcqY=
-X-Google-Smtp-Source: APXvYqyIqd1LLLUSaUwp7hVuG4OX+WrjlwIV1EdWgSTfTWNB21e1iOCtgU7Nul1GMVfGlzaNPBonEMgZsqhzmt+1GNg=
-X-Received: by 2002:a50:c28a:: with SMTP id o10mr64395139edf.182.1560957374091; 
- Wed, 19 Jun 2019 08:16:14 -0700 (PDT)
+ bh=7U8x15Ygol6ToivrArynOYp6txXvxaeGK2YxgLl1UGM=;
+ b=ZulNYlGGVQK3KZk1pcRVFiVPJnVQlIZhfLP026/lZ5qklU4vSM1B0JEyIKOnhFftw1
+ JvxwxXrCqjwuD73R/AgMyGGLSDlu5+LXO39vJ4tov0NmZaDT60f+1lSY0I7et/H6pNar
+ zRUeiekPwVwn8d4t8HWM5WCJKcniVtJdR1MfbO0bvdeMjVQDh3uTE0OvVDx/rU0ZplZW
+ cKC1iC/YuXuh7/ATe8Epg0zNLNrFiBfuZd/S2vnJxhiu/8CKu5fh2zWZDlRFMimcv/fF
+ d/9YrOcat2ZmJalcCkX0+6OFx0MWa6VXrL8o/xkpsuvkC+Y3+Ozm5f2dhDMcOYsjn/p+
+ b15g==
+X-Gm-Message-State: APjAAAUDJ6sqOipNtqG5zyZjyKt/7Tzz60B01oLh5SxYE3I8V7ncfSMR
+ mh3Ds9FrdmVQ2PNxCCFgeTyIlS1LcGuVkK3+FK0=
+X-Google-Smtp-Source: APXvYqx7ongO0sh29usVxUbFne6vb7//im0Dx97b3A1jUFueAQbvquon2ni+3SnEx6GJdAZLrbxVnLYmA4ORybh6cSc=
+X-Received: by 2002:a50:94e6:: with SMTP id t35mr94208723eda.137.1560957496029; 
+ Wed, 19 Jun 2019 08:18:16 -0700 (PDT)
 MIME-Version: 1.0
 References: <cover.1560904640.git.alistair.francis@wdc.com>
- <b511243b947debd710ea225699a4d7e312568da8.1560904640.git.alistair.francis@wdc.com>
-In-Reply-To: <b511243b947debd710ea225699a4d7e312568da8.1560904640.git.alistair.francis@wdc.com>
+ <2fd2fa66cf561d8041f75351c28ed025828c56ff.1560904640.git.alistair.francis@wdc.com>
+ <CAAhSdy12uKV14cdxvUniSLFw_iF5WNKjoLCanS3Bs=33w-c9xA@mail.gmail.com>
+In-Reply-To: <CAAhSdy12uKV14cdxvUniSLFw_iF5WNKjoLCanS3Bs=33w-c9xA@mail.gmail.com>
 From: Bin Meng <bmeng.cn@gmail.com>
-Date: Wed, 19 Jun 2019 23:16:02 +0800
-Message-ID: <CAEUhbmWpxLHu3Tf9k+UT9K-6dqLGtDkybTb4S8beCQ0nv9Ghqw@mail.gmail.com>
-To: Alistair Francis <alistair.francis@wdc.com>
+Date: Wed, 19 Jun 2019 23:18:05 +0800
+Message-ID: <CAEUhbmXYfdAojDtNxXz8XYRk0X1jt+qLB6oVP1pFKNcjWjeh5w@mail.gmail.com>
+To: Anup Patel <anup@brainfault.org>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::542
-Subject: Re: [Qemu-devel] [RFC v1 1/5] hw/riscv: Split out the boot functions
+X-Received-From: 2a00:1450:4864:20::544
+Subject: Re: [Qemu-devel] [Qemu-riscv] [RFC v1 4/5] roms: Add OpenSBI
+ version 0.3
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,108 +89,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Alistair Francis <alistair23@gmail.com>, Palmer Dabbelt <palmer@sifive.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
  "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 19, 2019 at 8:51 AM Alistair Francis
-<alistair.francis@wdc.com> wrote:
+On Wed, Jun 19, 2019 at 1:14 PM Anup Patel <anup@brainfault.org> wrote:
 >
-> Split the common RISC-V boot functions into a seperate file. This allows
-> us to share the common code.
+> On Wed, Jun 19, 2019 at 6:24 AM Alistair Francis
+> <alistair.francis@wdc.com> wrote:
+> >
+> > Add OpenSBI version 0.3 as a git submodule and as a prebult binary.
+> >
+> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > ---
+> >  .gitmodules                         |   3 +++
+> >  Makefile                            |   3 ++-
+> >  configure                           |   1 +
+> >  pc-bios/opensbi-riscv32-fw_jump.elf | Bin 0 -> 197988 bytes
+> >  pc-bios/opensbi-riscv64-fw_jump.elf | Bin 0 -> 200192 bytes
+> >  roms/Makefile                       |  17 +++++++++++++++++
+> >  roms/opensbi                        |   1 +
+> >  7 files changed, 24 insertions(+), 1 deletion(-)
+> >  create mode 100644 pc-bios/opensbi-riscv32-fw_jump.elf
+> >  create mode 100644 pc-bios/opensbi-riscv64-fw_jump.elf
+> >  create mode 160000 roms/opensbi
+> >
 >
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
->  hw/riscv/Makefile.objs  |  1 +
->  hw/riscv/boot.c         | 69 +++++++++++++++++++++++++++++++++++++++++
->  hw/riscv/sifive_e.c     | 17 ++--------
->  hw/riscv/sifive_u.c     | 17 ++--------
->  hw/riscv/spike.c        | 21 +++----------
->  hw/riscv/virt.c         | 51 +++---------------------------
->  include/hw/riscv/boot.h | 27 ++++++++++++++++
->  7 files changed, 110 insertions(+), 93 deletions(-)
->  create mode 100644 hw/riscv/boot.c
->  create mode 100644 include/hw/riscv/boot.h
+> The OpenSBI firmwares are platform specific so we should have
+> machine directory under pc-bios/ directory
 >
-> diff --git a/hw/riscv/Makefile.objs b/hw/riscv/Makefile.objs
-> index a65027304a..eb9d4f9ffc 100644
-> --- a/hw/riscv/Makefile.objs
-> +++ b/hw/riscv/Makefile.objs
-> @@ -1,3 +1,4 @@
-> +obj-y += boot.o
->  obj-$(CONFIG_SPIKE) += riscv_htif.o
->  obj-$(CONFIG_HART) += riscv_hart.o
->  obj-$(CONFIG_SIFIVE_E) += sifive_e.o
-> diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
-> new file mode 100644
-> index 0000000000..62f94aaf8a
-> --- /dev/null
-> +++ b/hw/riscv/boot.c
-> @@ -0,0 +1,69 @@
-> +/*
-> + * QEMU RISC-V Boot Helper
-> + *
-> + * Copyright (c) 2017 SiFive, Inc.
-> + * Copyright (c) 2019 Alistair Francis <alistair.francis@wdc.com>
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/units.h"
-> +#include "qemu/error-report.h"
-> +#include "exec/cpu-defs.h"
-> +#include "hw/loader.h"
-> +#include "hw/riscv/boot.h"
-> +#include "elf.h"
-> +
-> +target_ulong riscv_load_kernel(const char *kernel_filename)
-> +{
-> +    uint64_t kernel_entry, kernel_high;
-> +
-> +    if (load_elf(kernel_filename, NULL, NULL, NULL,
-> +                 &kernel_entry, NULL, &kernel_high,
-> +                 0, EM_RISCV, 1, 0) < 0) {
-> +        error_report("could not load kernel '%s'", kernel_filename);
-> +        exit(1);
-> +    }
-> +
-> +    return kernel_entry;
-> +}
-> +
-> +hwaddr riscv_load_initrd(const char *filename, uint64_t mem_size,
-> +                         uint64_t kernel_entry, hwaddr *start)
-> +{
-> +    int size;
-> +
-> +    /* We want to put the initrd far enough into RAM that when the
+> So for virt machine we will have:
+> pc-bios/riscv32/virt/fw_jump.elf
+> pc-bios/riscv64/virt/fw_jump.elf
 
-nits: /* should be on a separate line
+And we should only integrate plain binary image for "bios" images here.
 
-> +     * kernel is uncompressed it will not clobber the initrd. However
-> +     * on boards without much RAM we must ensure that we still leave
-> +     * enough room for a decent sized initrd, and on boards with large
-> +     * amounts of RAM we must avoid the initrd being so far up in RAM
-> +     * that it is outside lowmem and inaccessible to the kernel.
-> +     * So for boards with less  than 256MB of RAM we put the initrd
-> +     * halfway into RAM, and for boards with 256MB of RAM or more we put
-> +     * the initrd at 128MB.
-> +     */
+pc-bios/riscv32/virt/fw_jump.bin
+pc-bios/riscv64/virt/fw_jump.bin
 
-[snip]
-
-Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
-Tested-by: Bin Meng <bmeng.cn@gmail.com>
+Regards,
+Bin
 
