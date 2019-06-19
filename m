@@ -2,93 +2,95 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5F51C31E5B
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 16:15:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C434FC31E5B
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 16:27:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D113217D7
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 16:15:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D113217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 92B8E2187F
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 16:27:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="3LpGS2of"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92B8E2187F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40160 helo=lists.gnu.org)
+Received: from localhost ([::1]:40260 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hddFG-0007No-KN
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 12:15:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52101)
+	id 1hddQN-0004xq-Qm
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 12:27:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58817)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hdd1n-0004qG-1F
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 12:01:40 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1hddLb-0002YI-LR
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 12:22:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hdd1i-0007WZ-M9
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 12:01:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47268)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hdd1Y-0007OH-Fo; Wed, 19 Jun 2019 12:01:24 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 927DB300181C;
- Wed, 19 Jun 2019 16:01:22 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-116-121.ams2.redhat.com
- [10.36.116.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 86E0819722;
- Wed, 19 Jun 2019 16:01:21 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190612221004.2317-1-mreitz@redhat.com>
- <20190612221004.2317-35-mreitz@redhat.com>
- <a1c7bbb0-a04c-821a-e46b-bb67e837a272@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <4f1f8404-f60d-2a33-0f5b-09de14643198@redhat.com>
-Date: Wed, 19 Jun 2019 18:01:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <liran.alon@oracle.com>) id 1hddLa-0006eV-CV
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 12:22:07 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:46640)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1hddLa-0006ai-1G
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 12:22:06 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JGDiCt030793;
+ Wed, 19 Jun 2019 16:22:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2018-07-02; bh=EJg/eQRY7dvdItaKwOXuCd4DrcjzwAV7ihD2i/za9Pw=;
+ b=3LpGS2ofD8lsvNodrlhVsiQwxKHC2OxTK73qmnr6ZPXnwPVv+7PfT0f69BuZfBCFUPbV
+ HzuqKUuKjSsqlUZD9OTG7LEGSRddOpQvBGzOMJz7uOe0bd6/ClTH1QBBXX44EFHSnfwI
+ ISiN266+JYEULkwvESyihR1CXjmFs+8xmMZJ0ScbndSrl97smC6YLC8+8+arCtu309oW
+ EOjgVbb2nliaax99Addn+tleOS7SKweca6eHvc8SoHIdxeBkRyaJ8+JZBd2wB7WuF9SG
+ goSWAZqlpUAJRFtYeSgt7xbitr/PdXoRscKFrj8ctLA81PvkTidqYLwTP8EhuYqM7HQU 6g== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by aserp2120.oracle.com with ESMTP id 2t7809cejx-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 19 Jun 2019 16:22:01 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JGKTkS120439;
+ Wed, 19 Jun 2019 16:22:00 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3020.oracle.com with ESMTP id 2t77ynxppg-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 19 Jun 2019 16:22:00 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5JGLxfY000685;
+ Wed, 19 Jun 2019 16:21:59 GMT
+Received: from spark.ravello.local (/213.57.127.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Wed, 19 Jun 2019 09:21:59 -0700
+From: Liran Alon <liran.alon@oracle.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 19 Jun 2019 19:21:30 +0300
+Message-Id: <20190619162140.133674-1-liran.alon@oracle.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <a1c7bbb0-a04c-821a-e46b-bb67e837a272@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="pQnqYQdLxsdutni20R69jbOZ3OtKxAV85"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Wed, 19 Jun 2019 16:01:22 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v5 34/42] block: Inline
- bdrv_co_block_status_from_*()
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=810
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906190131
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=860 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906190131
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 141.146.126.78
+Subject: [Qemu-devel] [QEMU PATCH v4 0/10]: target/i386: kvm: Add support
+ for save and restore of nested state
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,123 +102,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: ehabkost@redhat.com, kvm@vger.kernel.org, maran.wilson@oracle.com,
+ mtosatti@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, rth@twiddle.net,
+ jmattson@google.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pQnqYQdLxsdutni20R69jbOZ3OtKxAV85
-Content-Type: multipart/mixed; boundary="dtVn9fEEp3j0B8qODSYM2KEDEsm0zqVgp";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <4f1f8404-f60d-2a33-0f5b-09de14643198@redhat.com>
-Subject: Re: [PATCH v5 34/42] block: Inline bdrv_co_block_status_from_*()
-References: <20190612221004.2317-1-mreitz@redhat.com>
- <20190612221004.2317-35-mreitz@redhat.com>
- <a1c7bbb0-a04c-821a-e46b-bb67e837a272@virtuozzo.com>
-In-Reply-To: <a1c7bbb0-a04c-821a-e46b-bb67e837a272@virtuozzo.com>
+Hi,
 
---dtVn9fEEp3j0B8qODSYM2KEDEsm0zqVgp
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+This series aims to add support for QEMU to be able to migrate VMs that
+are running nested hypervisors. In order to do so, it utilizes the new
+IOCTLs introduced in KVM commit 8fcc4b5923af ("kvm: nVMX: Introduce
+KVM_CAP_NESTED_STATE") which was created for this purpose.
 
-On 19.06.19 11:34, Vladimir Sementsov-Ogievskiy wrote:
-> 13.06.2019 1:09, Max Reitz wrote:
->> With bdrv_filtered_rw_bs(), we can easily handle this default filter
->> behavior in bdrv_co_block_status().
->>
->> blkdebug wants to have an additional assertion, so it keeps its own
->> implementation, except bdrv_co_block_status_from_file() needs to be
->> inlined there.
->>
->> Suggested-by: Eric Blake <eblake@redhat.com>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>   include/block/block_int.h | 22 -----------------
->>   block/blkdebug.c          |  7 ++++--
->>   block/blklogwrites.c      |  1 -
->>   block/commit.c            |  1 -
->>   block/copy-on-read.c      |  2 --
->>   block/io.c                | 51 +++++++++++++------------------------=
---
->>   block/mirror.c            |  1 -
->>   block/throttle.c          |  1 -
->>   8 files changed, 22 insertions(+), 64 deletions(-)
+1st patch add a missed cleanup for deleting VMX migration blocker in
+case vCPU init fails.
 
-[...]
+2st patch introduce kvm_arch_destroy_vcpu() to perform per-vCPU
+destruction logic that is arch-dependent.
 
->> diff --git a/block/io.c b/block/io.c
->> index 14f99e1c00..0a832e30a3 100644
->> --- a/block/io.c
->> +++ b/block/io.c
+3st patch is just refactoring to use symbolic constants instead of hard-coded
+numbers.
 
-[...]
+4st patch fixes QEMU to update DR6 when QEMU re-inject #DB to guest after
+it was intercepted by KVM when guest is debugged.
 
->> @@ -2114,9 +2086,20 @@ static int coroutine_fn bdrv_co_block_status(Bl=
-ockDriverState *bs,
->>       aligned_offset =3D QEMU_ALIGN_DOWN(offset, align);
->>       aligned_bytes =3D ROUND_UP(offset + bytes, align) - aligned_offs=
-et;
->>  =20
->> -    ret =3D bs->drv->bdrv_co_block_status(bs, want_zero, aligned_offs=
-et,
->> -                                        aligned_bytes, pnum, &local_m=
-ap,
->> -                                        &local_file);
->> +    if (bs->drv->bdrv_co_block_status) {
->> +        ret =3D bs->drv->bdrv_co_block_status(bs, want_zero, aligned_=
-offset,
->> +                                            aligned_bytes, pnum, &loc=
-al_map,
->> +                                            &local_file);
->> +    } else {
->> +        /* Default code for filters */
->> +
->> +        local_file =3D bdrv_filtered_rw_bs(bs);
->> +        assert(local_file);
->> +
->> +        *pnum =3D aligned_bytes;
->> +        local_map =3D aligned_offset;
->> +        ret =3D BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
->=20
-> I now in a little doubt:
->=20
-> What is real difference between RAW for filters and UNALLOCATED for qco=
-w2 (when we
-> should look at backing) ?
+5th patch adds migration blocker for vCPU exposed with either Intel VMX
+or AMD SVM. Until now it was blocked only for Intel VMX.
 
-Maybe none, but I don=E2=80=99t think diving down that rabbit hole is goi=
-ng to
-make this seres shorter.
+6rd patch updates linux-headers to have updated struct kvm_nested_state.
+The updated struct now have explicit fields for the data portion.
 
-Max
+7rd patch add vmstate support for saving/restoring kernel integer types (e.g. __u16).
 
+8th patch adds support for saving and restoring nested state in order to migrate
+guests which run a nested hypervisor.
 
---dtVn9fEEp3j0B8qODSYM2KEDEsm0zqVgp--
+9th patch add support for KVM_CAP_EXCEPTION_PAYLOAD. This new KVM capability
+allows userspace to properly distingiush between pending and injecting exceptions.
 
---pQnqYQdLxsdutni20R69jbOZ3OtKxAV85
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+10th patch changes the nested virtualization migration blocker to only
+be added when kernel lack support for one of the capabilities required
+for correct nested migration. i.e. Either KVM_CAP_NESTED_STATE or
+KVM_CAP_EXCEPTION_PAYLOAD.
 
------BEGIN PGP SIGNATURE-----
+Regards,
+-Liran
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0KXFAACgkQ9AfbAGHV
-z0B7IQf9GcWSZlB7BrJYxGChEcCFZmVsvJn/2ixNOC3FGro/nx5hyisQjgMb8v+z
-3LQ66bf+ZGSj/9J+5Z0J4XYrHn8x33sMk4Rujl/NB4v8VxkEGhOZxdv0i//GUgmR
-n21ELZZQnkiC7EcNrzrAvhu/MflSaeDgqc6Odi4EWYLrqWgYyU9QJa4I40rA94S6
-dt19OVlE2/9A0pkzkcJf1l1M9nYZsummkRumVKM/wVrBEzWo2nIwuOyl0KE12t3K
-23LFHWvQsC9iEQT8Cc3auHDZrMD3FQyuWk7JyK71SgIB9zhc13qco1+MPUy66zNw
-O4aGsqErS8JPxMqBOY/j/agCuL+9/A==
-=Gqku
------END PGP SIGNATURE-----
+v1->v2 changes:
+* Add patch to fix bug when re-inject #DB to guest.
+* Add support for KVM_CAP_EXCEPTION_PAYLOAD.
+* Use explicit fields for struct kvm_nested_state data portion.
+* Use vmstate subsections to save/restore nested state in order to properly
+* support forward & backwards migration compatability.
+* Remove VMX migration blocker.
 
---pQnqYQdLxsdutni20R69jbOZ3OtKxAV85--
+v2->v3 changes:
+* Add kvm_arch_destroy_vcpu().
+* Use DR6_BS where appropriate.
+* Add cpu_pre_save() logic to convert pending exception to injected
+  exception if guest is running L2.
+* Converted max_nested_state_len to int instead of uint32_t.
+* Use kvm_arch_destroy_vcpu() to free nested_state.
+* Add migration blocker for vCPU exposed with AMD SVM.
+* Don't rely on CR4 or MSR_EFER to know if it is required to
+migrate new VMState subsections.
+* Signal if vCPU is in guest-mode in hflags as original intention by Paolo.
+
+v3->v4 changes:
+* Add delete of nested migration blocker in case vCPU init fail.
+* Change detection of VMX/SVM to not consider CPU vendor.
+* Modify linux-headers to not have SVM stubs and use constant for vmcs12 size.
+* Wrapped definition of kernel integer vmstate macros with #ifdef CONFIG_LINUX.
+* Add migration blocker in case vCPU is exposed with VMX/SVM and kernel
+  is lacking one of the KVM caps required to migrate nested workloads.
+
 
