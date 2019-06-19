@@ -2,81 +2,143 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B5A5C31E5B
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 18:39:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09DD2C31E5B
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 18:44:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DF04206E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 18:39:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MZwIzoGt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DF04206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id CE2062084A
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 18:44:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE2062084A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41076 helo=lists.gnu.org)
+Received: from localhost ([::1]:41096 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdfUf-0002GP-7z
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 14:39:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34094)
+	id 1hdfZO-0004t1-Kk
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 14:44:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34910)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alistair23@gmail.com>) id 1hdfN7-00069e-V7
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 14:31:52 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hdfPO-000752-O7
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 14:34:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1hdfN5-0007GG-AO
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 14:31:49 -0400
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:45311)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1hdfN1-0004gy-16; Wed, 19 Jun 2019 14:31:45 -0400
-Received: by mail-lf1-x144.google.com with SMTP id u10so347585lfm.12;
- Wed, 19 Jun 2019 11:27:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=baG0ZY48oeLj8bIsj23f144gEXebOMnLjiIPghc9Bk4=;
- b=MZwIzoGt+TjSFdj/GI3HoP2fZFBo8RngE2HghpF+nxE8OY7KK3EkXX85gBtncwI8RK
- vaQbdmr50A+dZKJIUpcCkx03CKeq9gPlA5skrWjxGO6D1fQfVrG2iE0VfiUGTqV9bQfL
- BqBi1TI5s3Z0DTqLyyyCFQq7NXxjWxvZRIjNmawMkw0iAlCzHoB7kFpjkPPYjgGsVcfm
- B9GvaZkGtEapTFuAF4vjIJVLbH1wh6KE7H4YC3TkkpXtja7RtelFZ6JjS0aF6OdT/STQ
- HWtQA073fhpwWOXFwBqkeiXHl2AA5zJE8r9gdmP1svMiAKTTOob87LRsk54P2vJkRb4r
- Gxtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=baG0ZY48oeLj8bIsj23f144gEXebOMnLjiIPghc9Bk4=;
- b=eZAT5o2E+wF3sdlIu+3Rw9ZaLt6jwS/rvzUrm9MgT1GjK8risoxBZpHuMVRbFYCyS/
- 4RMF9tXbA3m13PGczbwd0CM1mp7pu6+aYK6vkbFxTQn0ItKKrjZnX0EwebsBnyjHLFAX
- BfTo4eTK129N1aCXTmq3NCvmCPnjQn5NuwShMqGN4PwRel2T9LsIvO8xGJRqZWUJbybm
- I46loRr3alZSf9xldX66Cx94tBSIFMvWxWQydaBLKWpaBYdD7X5mWaxLg7SrBvuCMeYD
- Oa6Nq7XI/v2dR6OI/mlRTDrnvWuhDZce8axJqhDlkZsL8WtPKC11kH2i1A09gfGwhqdN
- 3mdA==
-X-Gm-Message-State: APjAAAUcVBb390iO5kXBkbUmBRBO4ZaqODmtiCt0YRpZuqTTTYrQmRrv
- v/k5yt8v8oVSw/4d48YQTTAw0fWOpEt/txityKg=
-X-Google-Smtp-Source: APXvYqxNNyXMTL4W4IIpx9Z1pkbz4iTbyIPquHTIvzZlyPI2MtFN3JW6YIUxb8syDuMt/NMiT4aNHuvSGUwR/QD9jBA=
-X-Received: by 2002:ac2:4990:: with SMTP id f16mr5665962lfl.93.1560968862450; 
- Wed, 19 Jun 2019 11:27:42 -0700 (PDT)
+ (envelope-from <jsnow@redhat.com>) id 1hdfPG-0000HH-0T
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 14:34:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57126)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1hdfPC-0000Av-QH
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 14:33:59 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C3581C04BD4A;
+ Wed, 19 Jun 2019 18:33:49 +0000 (UTC)
+Received: from [10.18.17.164] (dhcp-17-164.bos.redhat.com [10.18.17.164])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 39EB25C207;
+ Wed, 19 Jun 2019 18:33:49 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
+To: Bruce Rogers <brogers@suse.com>, peter.maydell@linaro.org,
+ qemu-devel@nongnu.org
+References: <5D096A9302000048000A1D8C@prv-mh.provo.novell.com>
+ <5D0975BE02000048000A1D94@prv-mh.provo.novell.com>
+ <15622953-3be9-c639-b50c-56ed8d3310b9@redhat.com>
+ <5D09B9F402000048000A1DB3@prv-mh.provo.novell.com>
+ <5a014061-224d-7fc9-313e-0a69a568c328@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <eb4dfc6a-563a-1f26-b566-cc6d640ab032@redhat.com>
+Date: Wed, 19 Jun 2019 14:33:48 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <cover.1560904640.git.alistair.francis@wdc.com>
- <b511243b947debd710ea225699a4d7e312568da8.1560904640.git.alistair.francis@wdc.com>
- <CAEUhbmWpxLHu3Tf9k+UT9K-6dqLGtDkybTb4S8beCQ0nv9Ghqw@mail.gmail.com>
-In-Reply-To: <CAEUhbmWpxLHu3Tf9k+UT9K-6dqLGtDkybTb4S8beCQ0nv9Ghqw@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 19 Jun 2019 11:24:53 -0700
-Message-ID: <CAKmqyKMLdJKsodh9gJq3vW+Rvo8g29frFxbXjVwqRQSgCs3-KQ@mail.gmail.com>
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::144
-Subject: Re: [Qemu-devel] [RFC v1 1/5] hw/riscv: Split out the boot functions
+In-Reply-To: <5a014061-224d-7fc9-313e-0a69a568c328@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Wed, 19 Jun 2019 18:33:49 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] Recent python-sphinx errors out building doc
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,119 +150,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Palmer Dabbelt <palmer@sifive.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 19, 2019 at 8:16 AM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> On Wed, Jun 19, 2019 at 8:51 AM Alistair Francis
-> <alistair.francis@wdc.com> wrote:
-> >
-> > Split the common RISC-V boot functions into a seperate file. This allows
-> > us to share the common code.
-> >
-> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> > ---
-> >  hw/riscv/Makefile.objs  |  1 +
-> >  hw/riscv/boot.c         | 69 +++++++++++++++++++++++++++++++++++++++++
-> >  hw/riscv/sifive_e.c     | 17 ++--------
-> >  hw/riscv/sifive_u.c     | 17 ++--------
-> >  hw/riscv/spike.c        | 21 +++----------
-> >  hw/riscv/virt.c         | 51 +++---------------------------
-> >  include/hw/riscv/boot.h | 27 ++++++++++++++++
-> >  7 files changed, 110 insertions(+), 93 deletions(-)
-> >  create mode 100644 hw/riscv/boot.c
-> >  create mode 100644 include/hw/riscv/boot.h
-> >
-> > diff --git a/hw/riscv/Makefile.objs b/hw/riscv/Makefile.objs
-> > index a65027304a..eb9d4f9ffc 100644
-> > --- a/hw/riscv/Makefile.objs
-> > +++ b/hw/riscv/Makefile.objs
-> > @@ -1,3 +1,4 @@
-> > +obj-y += boot.o
-> >  obj-$(CONFIG_SPIKE) += riscv_htif.o
-> >  obj-$(CONFIG_HART) += riscv_hart.o
-> >  obj-$(CONFIG_SIFIVE_E) += sifive_e.o
-> > diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
-> > new file mode 100644
-> > index 0000000000..62f94aaf8a
-> > --- /dev/null
-> > +++ b/hw/riscv/boot.c
-> > @@ -0,0 +1,69 @@
-> > +/*
-> > + * QEMU RISC-V Boot Helper
-> > + *
-> > + * Copyright (c) 2017 SiFive, Inc.
-> > + * Copyright (c) 2019 Alistair Francis <alistair.francis@wdc.com>
-> > + *
-> > + * This program is free software; you can redistribute it and/or modify it
-> > + * under the terms and conditions of the GNU General Public License,
-> > + * version 2 or later, as published by the Free Software Foundation.
-> > + *
-> > + * This program is distributed in the hope it will be useful, but WITHOUT
-> > + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> > + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> > + * more details.
-> > + *
-> > + * You should have received a copy of the GNU General Public License along with
-> > + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> > + */
-> > +
-> > +#include "qemu/osdep.h"
-> > +#include "qemu/units.h"
-> > +#include "qemu/error-report.h"
-> > +#include "exec/cpu-defs.h"
-> > +#include "hw/loader.h"
-> > +#include "hw/riscv/boot.h"
-> > +#include "elf.h"
-> > +
-> > +target_ulong riscv_load_kernel(const char *kernel_filename)
-> > +{
-> > +    uint64_t kernel_entry, kernel_high;
-> > +
-> > +    if (load_elf(kernel_filename, NULL, NULL, NULL,
-> > +                 &kernel_entry, NULL, &kernel_high,
-> > +                 0, EM_RISCV, 1, 0) < 0) {
-> > +        error_report("could not load kernel '%s'", kernel_filename);
-> > +        exit(1);
-> > +    }
-> > +
-> > +    return kernel_entry;
-> > +}
-> > +
-> > +hwaddr riscv_load_initrd(const char *filename, uint64_t mem_size,
-> > +                         uint64_t kernel_entry, hwaddr *start)
-> > +{
-> > +    int size;
-> > +
-> > +    /* We want to put the initrd far enough into RAM that when the
->
-> nits: /* should be on a separate line
 
-Fixed
 
->
-> > +     * kernel is uncompressed it will not clobber the initrd. However
-> > +     * on boards without much RAM we must ensure that we still leave
-> > +     * enough room for a decent sized initrd, and on boards with large
-> > +     * amounts of RAM we must avoid the initrd being so far up in RAM
-> > +     * that it is outside lowmem and inaccessible to the kernel.
-> > +     * So for boards with less  than 256MB of RAM we put the initrd
-> > +     * halfway into RAM, and for boards with 256MB of RAM or more we put
-> > +     * the initrd at 128MB.
-> > +     */
->
-> [snip]
->
-> Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
-> Tested-by: Bin Meng <bmeng.cn@gmail.com>
+On 6/19/19 2:15 PM, John Snow wrote:
+> 
+> 
+> On 6/19/19 12:28 AM, Bruce Rogers wrote:
+>>>>> On 6/18/2019 at 6:11 PM, John Snow <jsnow@redhat.com> wrote:
+>>
+>>>
+>>> On 6/18/19 7:37 PM, Bruce Rogers wrote:
+>>>> Hi,
+>>>>
+>>>> (Resent with correct address for John)
+>>>> I build recent upstream qemu in the openSUSE Build Service, and for
+>>>> the Factory repository there, python-sphinx was recently updated to
+>>>> version 2.1.1. This caused the build to fail as follows:
+>>>> /home/abuild/rpmbuild/BUILD/qemu-4.0.50/docs/interop/bitmaps.rst:202:Could
+>>>> not lex literal_block as "json". Highlighting skipped.
+>>>>
+>>>> The python-sphinx tools is called with warnings are treated as errors
+>>>> it looks like. I don't know much at all about this tool, and hopefully
+>>>> someone knows what to fix here. If you want to give me a pointer
+>>>> on what needs to change, I could give a go at doing a fix however.
+>>>>
+>>>> Thanks,
+>>>>
+>>>> Bruce
+>>>
+>>> Hi, there's a series designed to fix this:
+>>>
+>>> https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg00348.html 
+>>>
+>>> I think it's up to Peter to merge it as the maintainer of the Sphinx
+>>> machinery.
+>>
+>> Yup, this series fixes it for me. Thanks!
+>>
+>> Bruce
+>>
+> 
+> Correction: Peter already merged it. Sorry for the noise!
+> 
 
-Thanks!
+... Double correction, I misread the patch titles and it isn't merged.
+Nobody should ever let me email before about 3-4PM EST, because my brain
+isn't awake enough yet.
 
-Alistair
+...Sorry for the noise 2x...
+
+Peter, is the series ready for staging? I don't think the docs portion
+needs any additional review beyond what it's already received.
+
+--js
 
