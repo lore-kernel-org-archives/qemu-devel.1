@@ -6,55 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BE65C31E5B
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 15:39:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2EABC31E5B
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 15:39:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1584021881
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 15:39:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1584021881
+	by mail.kernel.org (Postfix) with ESMTPS id 7FA9021881
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 15:39:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FA9021881
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39534 helo=lists.gnu.org)
+Received: from localhost ([::1]:39536 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdcg8-0008Sh-5M
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 11:39:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42578)
+	id 1hdcgB-0000AE-LW
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 11:39:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42569)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hdcU1-0003TJ-BD
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 11:26:46 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hdcU0-0002G1-9E
+ (envelope-from <mreitz@redhat.com>) id 1hdcU0-0003Rq-Pn
  for qemu-devel@nongnu.org; Wed, 19 Jun 2019 11:26:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56020)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <mreitz@redhat.com>) id 1hdcTz-0002Fj-Mb
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 11:26:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49848)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hdcTx-00020a-NH; Wed, 19 Jun 2019 11:26:41 -0400
+ id 1hdcTw-0002Cr-NY; Wed, 19 Jun 2019 11:26:40 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 261BBF74CE;
- Wed, 19 Jun 2019 15:26:19 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id F341E2E95B0;
+ Wed, 19 Jun 2019 15:26:39 +0000 (UTC)
 Received: from localhost (ovpn-116-121.ams2.redhat.com [10.36.116.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B209B601A5;
- Wed, 19 Jun 2019 15:26:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1CDD7604CC;
+ Wed, 19 Jun 2019 15:26:36 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Wed, 19 Jun 2019 17:25:57 +0200
-Message-Id: <20190619152603.5937-4-mreitz@redhat.com>
+Date: Wed, 19 Jun 2019 17:26:03 +0200
+Message-Id: <20190619152603.5937-10-mreitz@redhat.com>
 In-Reply-To: <20190619152603.5937-1-mreitz@redhat.com>
 References: <20190619152603.5937-1-mreitz@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Wed, 19 Jun 2019 15:26:19 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Wed, 19 Jun 2019 15:26:40 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 3/9] block: Add bdrv_poll_drain_data_objs()
+Subject: [Qemu-devel] [PATCH v2 9/9] iotests: Test commit with a filter on
+ the chain
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,87 +73,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This function polls all of the involved AioContexts for a GSList of
-BdrvCoDrainData objects until all objects' .done is true.
+Before the previous patches, the first case resulted in a failed
+assertion (which is noted as qemu receiving a SIGABRT in the test
+output), and the second usually triggered a segmentation fault.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/io.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
+ tests/qemu-iotests/040     | 40 +++++++++++++++++++++++++++++++++++++-
+ tests/qemu-iotests/040.out |  4 ++--
+ 2 files changed, 41 insertions(+), 3 deletions(-)
 
-diff --git a/block/io.c b/block/io.c
-index 6b518e5eb0..eb84774abd 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -255,6 +255,63 @@ static void bdrv_drain_invoke(BlockDriverState *bs, =
-bool begin,
-     }
- }
+diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
+index b81133a474..aa0b1847e3 100755
+--- a/tests/qemu-iotests/040
++++ b/tests/qemu-iotests/040
+@@ -92,9 +92,10 @@ class TestSingleDrive(ImageCommitTestCase):
 =20
-+/* TODO: Actually use this function and drop this forward declaration */
-+static void bdrv_poll_drain_data_objs(GSList **data_objs, bool acquire_c=
-tx)
-+    __attribute__((unused));
+         self.vm.add_device("scsi-hd,id=3Dscsi0,drive=3Ddrive0")
+         self.vm.launch()
++        self.has_quit =3D False
+=20
+     def tearDown(self):
+-        self.vm.shutdown()
++        self.vm.shutdown(has_quit=3Dself.has_quit)
+         os.remove(test_img)
+         os.remove(mid_img)
+         os.remove(backing_img)
+@@ -109,6 +110,43 @@ class TestSingleDrive(ImageCommitTestCase):
+         self.assertEqual(-1, qemu_io('-f', 'raw', '-c', 'read -P 0xab 0 =
+524288', backing_img).find("verification failed"))
+         self.assertEqual(-1, qemu_io('-f', 'raw', '-c', 'read -P 0xef 52=
+4288 524288', backing_img).find("verification failed"))
+=20
++    def test_commit_with_filter_and_quit(self):
++        result =3D self.vm.qmp('object-add', qom_type=3D'throttle-group'=
+, id=3D'tg')
++        self.assert_qmp(result, 'return', {})
 +
-+/*
-+ * Poll the AioContexts in the given list of BdrvCoDrainData objects
-+ * until all of those objects are "done" (i.e. their .done field is
-+ * true).
-+ * Also, free all objects and the list.
-+ *
-+ * If @acquire_ctx is true, the AioContexts are locked while they are
-+ * polled.
-+ */
-+static void bdrv_poll_drain_data_objs(GSList **data_objs, bool acquire_c=
-tx)
-+{
-+    GSList *contexts =3D NULL;
-+    GSList *iter;
++        # Add a filter outside of the backing chain
++        result =3D self.vm.qmp('blockdev-add', driver=3D'throttle', node=
+_name=3D'filter', throttle_group=3D'tg', file=3D'mid')
++        self.assert_qmp(result, 'return', {})
 +
-+    /* First collect the contexts while the BDSs are not gone */
-+    for (iter =3D *data_objs; iter; iter =3D iter->next) {
-+        BdrvCoDrainData *drain_data =3D iter->data;
-+        contexts =3D g_slist_prepend(contexts,
-+                                   bdrv_get_aio_context(drain_data->bs))=
-;
-+    }
++        result =3D self.vm.qmp('block-commit', device=3D'drive0')
++        self.assert_qmp(result, 'return', {})
 +
-+    /*
-+     * Reverse the list so it is in the same order as *data_objs
-+     * (prepend and then reverse has better performance than appending)
-+     */
-+    contexts =3D g_slist_reverse(contexts);
++        # Quit immediately, thus forcing a simultaneous cancel of the
++        # block job and a bdrv_drain_all()
++        result =3D self.vm.qmp('quit')
++        self.assert_qmp(result, 'return', {})
 +
-+    /* The BDSs may disappear here, but we only need their contexts */
-+    while (*data_objs) {
-+        GSList *next;
-+        BdrvCoDrainData *drain_data =3D (*data_objs)->data;
-+        AioContext *ctx =3D contexts->data;
++        self.has_quit =3D True
 +
-+        if (acquire_ctx) {
-+            aio_context_acquire(ctx);
-+        }
-+        AIO_WAIT_WHILE(ctx, !drain_data->done);
-+        if (acquire_ctx) {
-+            aio_context_release(ctx);
-+        }
++    # Same as above, but this time we add the filter after starting the =
+job
++    def test_commit_plus_filter_and_quit(self):
++        result =3D self.vm.qmp('object-add', qom_type=3D'throttle-group'=
+, id=3D'tg')
++        self.assert_qmp(result, 'return', {})
 +
-+        g_free(drain_data);
++        result =3D self.vm.qmp('block-commit', device=3D'drive0')
++        self.assert_qmp(result, 'return', {})
 +
-+        next =3D (*data_objs)->next;
-+        g_slist_free_1(*data_objs);
-+        *data_objs =3D next;
++        # Add a filter outside of the backing chain
++        result =3D self.vm.qmp('blockdev-add', driver=3D'throttle', node=
+_name=3D'filter', throttle_group=3D'tg', file=3D'mid')
++        self.assert_qmp(result, 'return', {})
 +
-+        next =3D contexts->next;
-+        g_slist_free_1(contexts);
-+        contexts =3D next;
-+    }
-+}
++        # Quit immediately, thus forcing a simultaneous cancel of the
++        # block job and a bdrv_drain_all()
++        result =3D self.vm.qmp('quit')
++        self.assert_qmp(result, 'return', {})
 +
- /* Returns true if BDRV_POLL_WHILE() should go into a blocking aio_poll(=
-) */
- bool bdrv_drain_poll(BlockDriverState *bs, bool recursive,
-                      BdrvChild *ignore_parent, bool ignore_bds_parents)
++        self.has_quit =3D True
++
+     def test_device_not_found(self):
+         result =3D self.vm.qmp('block-commit', device=3D'nonexistent', t=
+op=3D'%s' % mid_img)
+         self.assert_qmp(result, 'error/class', 'DeviceNotFound')
+diff --git a/tests/qemu-iotests/040.out b/tests/qemu-iotests/040.out
+index 802ffaa0c0..220a5fa82c 100644
+--- a/tests/qemu-iotests/040.out
++++ b/tests/qemu-iotests/040.out
+@@ -1,5 +1,5 @@
+-...........................................
++...............................................
+ ----------------------------------------------------------------------
+-Ran 43 tests
++Ran 47 tests
+=20
+ OK
 --=20
 2.21.0
 
