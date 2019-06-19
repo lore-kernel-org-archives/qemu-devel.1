@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DC77C31E5B
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:12:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1B95C31E5B
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:13:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3991D21721
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:12:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3991D21721
+	by mail.kernel.org (Postfix) with ESMTPS id 8992021721
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:13:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8992021721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41220 helo=lists.gnu.org)
+Received: from localhost ([::1]:41230 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdg0h-0002Fw-G9
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 15:12:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45653)
+	id 1hdg1j-0003ai-NM
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 15:13:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46089)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hdfyV-0001J3-Jy
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:10:29 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hdg07-0002QS-Hr
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:12:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hdfyU-0001Wk-4J
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:10:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43774)
+ (envelope-from <ehabkost@redhat.com>) id 1hdg03-0002cU-4t
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:12:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49134)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hdfyT-0001W3-Rq
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:10:26 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hdfzz-0002Yg-UE
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:12:01 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0E14B3091DCF;
- Wed, 19 Jun 2019 19:10:25 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 082503082E72;
+ Wed, 19 Jun 2019 19:11:56 +0000 (UTC)
 Received: from localhost (ovpn-116-76.gru2.redhat.com [10.97.116.76])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9142D60FAB;
- Wed, 19 Jun 2019 19:10:24 +0000 (UTC)
-Date: Wed, 19 Jun 2019 16:10:23 -0300
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8819A19936;
+ Wed, 19 Jun 2019 19:11:55 +0000 (UTC)
+Date: Wed, 19 Jun 2019 16:11:54 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Like Xu <like.xu@linux.intel.com>
-Message-ID: <20190619191023.GB26409@habkost.net>
+Message-ID: <20190619191154.GC26409@habkost.net>
 References: <20190612084104.34984-1-like.xu@linux.intel.com>
- <20190612084104.34984-6-like.xu@linux.intel.com>
+ <20190612084104.34984-7-like.xu@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190612084104.34984-6-like.xu@linux.intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20190612084104.34984-7-like.xu@linux.intel.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Wed, 19 Jun 2019 19:10:25 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Wed, 19 Jun 2019 19:11:56 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 5/9] tests/x86-cpuid: Update testcases
- in test_topo_bits() with multiple dies
+Subject: Re: [Qemu-devel] [PATCH v3 6/9] i386/cpu: Add CPUID.1F generation
+ support for multi-dies PCMachine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,144 +75,139 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 12, 2019 at 04:41:00PM +0800, Like Xu wrote:
-> The corresponding topo_bits tests are updated to support die configurations.
+On Wed, Jun 12, 2019 at 04:41:01PM +0800, Like Xu wrote:
+> The CPUID.1F as Intel V2 Extended Topology Enumeration Leaf would be
+> exposed if guests want to emulate multiple software-visible die within
+> each package. Per Intel's SDM, the 0x1f is a superset of 0xb, thus they
+> can be generated by almost same code as 0xb except die_offset setting.
+> 
+> If the number of dies per package is less than 2, the qemu will not
+> expose CPUID.1F regardless of whether the host supports CPUID.1F.
 > 
 > Signed-off-by: Like Xu <like.xu@linux.intel.com>
 
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-This probably should be squashed into patch 4/9 to keep
-bisectability.  I can do this while committing.
-
 > ---
->  tests/test-x86-cpuid.c | 84 ++++++++++++++++++++++--------------------
->  1 file changed, 45 insertions(+), 39 deletions(-)
+>  target/i386/cpu.c | 37 +++++++++++++++++++++++++++++++++++++
+>  target/i386/cpu.h |  4 ++++
+>  target/i386/kvm.c | 12 ++++++++++++
+>  3 files changed, 53 insertions(+)
 > 
-> diff --git a/tests/test-x86-cpuid.c b/tests/test-x86-cpuid.c
-> index ff225006e4..1942287f33 100644
-> --- a/tests/test-x86-cpuid.c
-> +++ b/tests/test-x86-cpuid.c
-> @@ -28,74 +28,80 @@
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 09e20a2c3b..127aff74a6 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -4437,6 +4437,42 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>              *ecx |= CPUID_TOPOLOGY_LEVEL_INVALID;
+>          }
 >  
->  static void test_topo_bits(void)
->  {
-> -    /* simple tests for 1 thread per core, 1 core per socket */
-> -    g_assert_cmpuint(apicid_smt_width(1, 1), ==, 0);
-> -    g_assert_cmpuint(apicid_core_width(1, 1), ==, 0);
-> +    /* simple tests for 1 thread per core, 1 core per die, 1 die per package */
-> +    g_assert_cmpuint(apicid_smt_width(1, 1, 1), ==, 0);
-> +    g_assert_cmpuint(apicid_core_width(1, 1, 1), ==, 0);
-> +    g_assert_cmpuint(apicid_die_width(1, 1, 1), ==, 0);
+> +        assert(!(*eax & ~0x1f));
+> +        *ebx &= 0xffff; /* The count doesn't need to be reliable. */
+> +        break;
+> +    case 0x1F:
+> +        /* V2 Extended Topology Enumeration Leaf */
+> +        if (env->nr_dies < 2 || !cpu->enable_cpuid_0x1f) {
+> +            *eax = *ebx = *ecx = *edx = 0;
+> +            break;
+> +        }
+> +
+> +        *ecx = count & 0xff;
+> +        *edx = cpu->apic_id;
+> +        switch (count) {
+> +        case 0:
+> +            *eax = apicid_core_offset(env->nr_dies, cs->nr_cores,
+> +                                                    cs->nr_threads);
+> +            *ebx = cs->nr_threads;
+> +            *ecx |= CPUID_TOPOLOGY_LEVEL_SMT;
+> +            break;
+> +        case 1:
+> +            *eax = apicid_die_offset(env->nr_dies, cs->nr_cores,
+> +                                                   cs->nr_threads);
+> +            *ebx = cs->nr_cores * cs->nr_threads;
+> +            *ecx |= CPUID_TOPOLOGY_LEVEL_CORE;
+> +            break;
+> +        case 2:
+> +            *eax = apicid_pkg_offset(env->nr_dies, cs->nr_cores,
+> +                                                   cs->nr_threads);
+> +            *ebx = env->nr_dies * cs->nr_cores * cs->nr_threads;
+> +            *ecx |= CPUID_TOPOLOGY_LEVEL_DIE;
+> +            break;
+> +        default:
+> +            *eax = 0;
+> +            *ebx = 0;
+> +            *ecx |= CPUID_TOPOLOGY_LEVEL_INVALID;
+> +        }
+>          assert(!(*eax & ~0x1f));
+>          *ebx &= 0xffff; /* The count doesn't need to be reliable. */
+>          break;
+> @@ -5890,6 +5926,7 @@ static Property x86_cpu_properties[] = {
+>      DEFINE_PROP_BOOL("full-cpuid-auto-level", X86CPU, full_cpuid_auto_level, true),
+>      DEFINE_PROP_STRING("hv-vendor-id", X86CPU, hyperv_vendor_id),
+>      DEFINE_PROP_BOOL("cpuid-0xb", X86CPU, enable_cpuid_0xb, true),
+> +    DEFINE_PROP_BOOL("cpuid-0x1f", X86CPU, enable_cpuid_0x1f, true),
+>      DEFINE_PROP_BOOL("lmce", X86CPU, enable_lmce, false),
+>      DEFINE_PROP_BOOL("l3-cache", X86CPU, enable_l3_cache, true),
+>      DEFINE_PROP_BOOL("kvm-no-smi-migration", X86CPU, kvm_no_smi_migration,
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 69495f0a8a..0434dfb62a 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -726,6 +726,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+>  #define CPUID_TOPOLOGY_LEVEL_INVALID  (0U << 8)
+>  #define CPUID_TOPOLOGY_LEVEL_SMT      (1U << 8)
+>  #define CPUID_TOPOLOGY_LEVEL_CORE     (2U << 8)
+> +#define CPUID_TOPOLOGY_LEVEL_DIE      (5U << 8)
 >  
-> -    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 1, 0), ==, 0);
-> -    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 1, 1), ==, 1);
-> -    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 1, 2), ==, 2);
-> -    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 1, 3), ==, 3);
-> +    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 1, 1, 0), ==, 0);
-> +    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 1, 1, 1), ==, 1);
-> +    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 1, 1, 2), ==, 2);
-> +    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 1, 1, 3), ==, 3);
+>  /* MSR Feature Bits */
+>  #define MSR_ARCH_CAP_RDCL_NO    (1U << 0)
+> @@ -1444,6 +1445,9 @@ struct X86CPU {
+>      /* Compatibility bits for old machine types: */
+>      bool enable_cpuid_0xb;
 >  
+> +    /* V2 Compatibility bits for old machine types: */
+> +    bool enable_cpuid_0x1f;
+> +
+>      /* Enable auto level-increase for all CPUID leaves */
+>      bool full_cpuid_auto_level;
 >  
->      /* Test field width calculation for multiple values
->       */
-> -    g_assert_cmpuint(apicid_smt_width(1, 2), ==, 1);
-> -    g_assert_cmpuint(apicid_smt_width(1, 3), ==, 2);
-> -    g_assert_cmpuint(apicid_smt_width(1, 4), ==, 2);
-> +    g_assert_cmpuint(apicid_smt_width(1, 1, 2), ==, 1);
-> +    g_assert_cmpuint(apicid_smt_width(1, 1, 3), ==, 2);
-> +    g_assert_cmpuint(apicid_smt_width(1, 1, 4), ==, 2);
->  
-> -    g_assert_cmpuint(apicid_smt_width(1, 14), ==, 4);
-> -    g_assert_cmpuint(apicid_smt_width(1, 15), ==, 4);
-> -    g_assert_cmpuint(apicid_smt_width(1, 16), ==, 4);
-> -    g_assert_cmpuint(apicid_smt_width(1, 17), ==, 5);
-> +    g_assert_cmpuint(apicid_smt_width(1, 1, 14), ==, 4);
-> +    g_assert_cmpuint(apicid_smt_width(1, 1, 15), ==, 4);
-> +    g_assert_cmpuint(apicid_smt_width(1, 1, 16), ==, 4);
-> +    g_assert_cmpuint(apicid_smt_width(1, 1, 17), ==, 5);
->  
->  
-> -    g_assert_cmpuint(apicid_core_width(30, 2), ==, 5);
-> -    g_assert_cmpuint(apicid_core_width(31, 2), ==, 5);
-> -    g_assert_cmpuint(apicid_core_width(32, 2), ==, 5);
-> -    g_assert_cmpuint(apicid_core_width(33, 2), ==, 6);
-> +    g_assert_cmpuint(apicid_core_width(1, 30, 2), ==, 5);
-> +    g_assert_cmpuint(apicid_core_width(1, 31, 2), ==, 5);
-> +    g_assert_cmpuint(apicid_core_width(1, 32, 2), ==, 5);
-> +    g_assert_cmpuint(apicid_core_width(1, 33, 2), ==, 6);
->  
-> +    g_assert_cmpuint(apicid_die_width(1, 30, 2), ==, 0);
-> +    g_assert_cmpuint(apicid_die_width(2, 30, 2), ==, 1);
-> +    g_assert_cmpuint(apicid_die_width(3, 30, 2), ==, 2);
-> +    g_assert_cmpuint(apicid_die_width(4, 30, 2), ==, 2);
->  
->      /* build a weird topology and see if IDs are calculated correctly
->       */
->  
->      /* This will use 2 bits for thread ID and 3 bits for core ID
->       */
-> -    g_assert_cmpuint(apicid_smt_width(6, 3), ==, 2);
-> -    g_assert_cmpuint(apicid_core_width(6, 3), ==, 3);
-> -    g_assert_cmpuint(apicid_pkg_offset(6, 3), ==, 5);
-> +    g_assert_cmpuint(apicid_smt_width(1, 6, 3), ==, 2);
-> +    g_assert_cmpuint(apicid_core_offset(1, 6, 3), ==, 2);
-> +    g_assert_cmpuint(apicid_die_offset(1, 6, 3), ==, 5);
-> +    g_assert_cmpuint(apicid_pkg_offset(1, 6, 3), ==, 5);
->  
-> -    g_assert_cmpuint(x86_apicid_from_cpu_idx(6, 3, 0), ==, 0);
-> -    g_assert_cmpuint(x86_apicid_from_cpu_idx(6, 3, 1), ==, 1);
-> -    g_assert_cmpuint(x86_apicid_from_cpu_idx(6, 3, 2), ==, 2);
-> +    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 0), ==, 0);
-> +    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 1), ==, 1);
-> +    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 2), ==, 2);
->  
-> -    g_assert_cmpuint(x86_apicid_from_cpu_idx(6, 3, 1 * 3 + 0), ==,
-> +    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 1 * 3 + 0), ==,
->                       (1 << 2) | 0);
-> -    g_assert_cmpuint(x86_apicid_from_cpu_idx(6, 3, 1 * 3 + 1), ==,
-> +    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 1 * 3 + 1), ==,
->                       (1 << 2) | 1);
-> -    g_assert_cmpuint(x86_apicid_from_cpu_idx(6, 3, 1 * 3 + 2), ==,
-> +    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 1 * 3 + 2), ==,
->                       (1 << 2) | 2);
->  
-> -    g_assert_cmpuint(x86_apicid_from_cpu_idx(6, 3, 2 * 3 + 0), ==,
-> +    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 2 * 3 + 0), ==,
->                       (2 << 2) | 0);
-> -    g_assert_cmpuint(x86_apicid_from_cpu_idx(6, 3, 2 * 3 + 1), ==,
-> +    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 2 * 3 + 1), ==,
->                       (2 << 2) | 1);
-> -    g_assert_cmpuint(x86_apicid_from_cpu_idx(6, 3, 2 * 3 + 2), ==,
-> +    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 2 * 3 + 2), ==,
->                       (2 << 2) | 2);
->  
-> -    g_assert_cmpuint(x86_apicid_from_cpu_idx(6, 3, 5 * 3 + 0), ==,
-> +    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 5 * 3 + 0), ==,
->                       (5 << 2) | 0);
-> -    g_assert_cmpuint(x86_apicid_from_cpu_idx(6, 3, 5 * 3 + 1), ==,
-> +    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 5 * 3 + 1), ==,
->                       (5 << 2) | 1);
-> -    g_assert_cmpuint(x86_apicid_from_cpu_idx(6, 3, 5 * 3 + 2), ==,
-> +    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 5 * 3 + 2), ==,
->                       (5 << 2) | 2);
->  
-> -    g_assert_cmpuint(x86_apicid_from_cpu_idx(6, 3, 1 * 6 * 3 + 0 * 3 + 0), ==,
-> -                     (1 << 5));
-> -    g_assert_cmpuint(x86_apicid_from_cpu_idx(6, 3, 1 * 6 * 3 + 1 * 3 + 1), ==,
-> -                     (1 << 5) | (1 << 2) | 1);
-> -    g_assert_cmpuint(x86_apicid_from_cpu_idx(6, 3, 3 * 6 * 3 + 5 * 3 + 2), ==,
-> -                     (3 << 5) | (5 << 2) | 2);
-> +    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3,
-> +                     1 * 6 * 3 + 0 * 3 + 0), ==, (1 << 5));
-> +    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3,
-> +                     1 * 6 * 3 + 1 * 3 + 1), ==, (1 << 5) | (1 << 2) | 1);
-> +    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3,
-> +                     3 * 6 * 3 + 5 * 3 + 2), ==, (3 << 5) | (5 << 2) | 2);
->  }
->  
->  int main(int argc, char **argv)
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 3b29ce5c0d..9b4da9b265 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -1081,6 +1081,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>              }
+>              break;
+>          }
+> +        case 0x1f:
+> +            if (env->nr_dies < 2 || !cpu->enable_cpuid_0x1f) {
+> +                break;
+> +            }
+>          case 4:
+>          case 0xb:
+>          case 0xd:
+> @@ -1088,6 +1092,11 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>                  if (i == 0xd && j == 64) {
+>                      break;
+>                  }
+> +
+> +                if (i == 0x1f && j == 64) {
+> +                    break;
+> +                }
+> +
+>                  c->function = i;
+>                  c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+>                  c->index = j;
+> @@ -1099,6 +1108,9 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>                  if (i == 0xb && !(c->ecx & 0xff00)) {
+>                      break;
+>                  }
+> +                if (i == 0x1f && !(c->ecx & 0xff00)) {
+> +                    break;
+> +                }
+>                  if (i == 0xd && c->eax == 0) {
+>                      continue;
+>                  }
 > -- 
 > 2.21.0
 > 
