@@ -2,98 +2,115 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFBF9C31E5B
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 16:33:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73AD1C31E5B
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 16:35:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F30C2084E
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 16:33:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Bsul6HY4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F30C2084E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4A9722084E
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 16:35:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A9722084E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40320 helo=lists.gnu.org)
+Received: from localhost ([::1]:40354 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hddWx-000379-II
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 12:33:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58951)
+	id 1hddYw-0005oN-GN
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 12:35:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58839)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <liran.alon@oracle.com>) id 1hddLy-0002g5-RJ
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 12:22:35 -0400
+ (envelope-from <laurent@vivier.eu>) id 1hddLm-0002Yh-5R
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 12:22:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liran.alon@oracle.com>) id 1hddLw-0006q1-0j
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 12:22:30 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:57226)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
- id 1hddLv-0006hK-MJ
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 12:22:27 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JGDmuS130849;
- Wed, 19 Jun 2019 16:22:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2018-07-02;
- bh=F+Gcfp9dlPhla7i45Van9Vb6VGMrUmjoVKTqLpj7sQE=;
- b=Bsul6HY4C0qKV6VafRfLbcqHCusygoQDzerPepsKKJui7qEfZvahulBsQ0Bzko5uc/x9
- k0ra+naBc2nphYJmHK8UOql5MyGfVLxFEhIAy60Kr00om6LxO32uOZVSrLMVYCP8hVBH
- 0+/zcpZeBMAJQofIiHF3AKYuMg0WoRuX27kko7hvzN2FwpAll5EKyoR205SQnBl5yQM6
- 7OuQGfBzV5yuIXpNhX3jUNRj3Te+/KwnNgGoQReZZyPySLOdYRkPe2vTh2563rMtnSbS
- wdra7zSBvzahL1x8i9iSav0G6ODxHz8MnqG0rZgmi/KqbbQPX2cTu0ihn6jK/SeHGd7B 4Q== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by userp2120.oracle.com with ESMTP id 2t7809cfpx-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 19 Jun 2019 16:22:10 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JGLER3187116;
- Wed, 19 Jun 2019 16:22:09 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by userp3020.oracle.com with ESMTP id 2t77yn6nwp-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 19 Jun 2019 16:22:09 +0000
-Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5JGM8Yu000727;
- Wed, 19 Jun 2019 16:22:08 GMT
-Received: from spark.ravello.local (/213.57.127.2)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 19 Jun 2019 09:22:08 -0700
-From: Liran Alon <liran.alon@oracle.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 19 Jun 2019 19:21:33 +0300
-Message-Id: <20190619162140.133674-4-liran.alon@oracle.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190619162140.133674-1-liran.alon@oracle.com>
-References: <20190619162140.133674-1-liran.alon@oracle.com>
+ (envelope-from <laurent@vivier.eu>) id 1hddLb-0006g5-W7
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 12:22:12 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:36115)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hddLb-0006eO-Lh
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 12:22:07 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MuUvU-1iTx533CF8-00rZ3I; Wed, 19 Jun 2019 18:21:51 +0200
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+References: <1560953834-29584-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1560953834-29584-6-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Openpgp: preference=signencrypt
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <a45cb51c-68f0-f52e-17d0-a8926852c74c@vivier.eu>
+Date: Wed, 19 Jun 2019 18:21:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
+In-Reply-To: <1560953834-29584-6-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293
- signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=913
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906190131
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293
- signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=952 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906190131
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.85
-Subject: [Qemu-devel] [QEMU PATCH v4 03/10] target/i386: kvm: Use symbolic
- constant for #DB/#BP exception constants
+X-Provags-ID: V03:K1:rrqefQaezAYdRz65HnfIgM0FYovXtdDXvYJCKZ26qv8ErzzezQW
+ +SKflSCHfqmzWxxqIkHaddqij0ENVoLmFNwttnm1vHasvqXxCdA2LNOKfN1OVIV9OxW7ljE
+ sDPVS+W1PaucULhvdt7LK/UjyGHYbREHzTEgsRPv1CIQ1lqrONSt1AFgftG+u4Arn37zZZI
+ Wi/erLpjXqQ1GvCrNHvfA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:dLioGXbc7o4=:QEljZEeReN6k9xHPEs3R9s
+ qV7FBGSuCGQqWzif93mtEAv1/trCtKHCFvQYscUZ8oxeOJgdzi6YMQkPqzg0qJvZcfrZmF8de
+ pt0ZiWmDzZeozvj2eeOVH45Mtj6mSCj91Kk8BBy6INrTT25aUnJ3NyQGxYLlOC0m/MXmqAJA7
+ sYdueeMEcMaffORuuW7GqMBMazFc3C4v8WVVAceXtLyGTvF8K5v5mCV2hnavqBkGd9QrxC4tE
+ I6aymmAvQEVzOvw3X4M3XXk1j2Zu5Th4xx0GwQqev7xZabeK5X87bqMqa+0mIFmX7zxpIL4vF
+ +2F/US0u2bLP0RZagn1H+ccPFVOtyeM/kIk5hHC9MMHIeO9P/PmYtZeKDb1K/QcgbUgzjRmWo
+ euikn/E+cv+MygZ32s9ApQKu6PcMlEZ67RiiWeFkL3nPrth1ANFiwnQpYMtc0KbFGVJUTY/a8
+ I5q3tTT7/xgerg1sWJAs9yMFdiK5a+z2auD1yziE2PAVOnlkJ6fwG7/bbsN79dv6SnrUTODIN
+ Rvoa3IbnPI7J2C21xCuQZaxkORa47ivdYk+i9BU/RDjTmWBktlsJij229QE1Orl9b3Ts0j/a8
+ +pZzZtXBlKFcmoEyTPrILMD/UgdK3ETHarzoWyog3vsFZkJLi5QVPdHw7enQiHHJ0uMuhuTex
+ tp5S+gANjHhkPLLTIfJQQg35daF39IYs4zGXF1zBA/mGdSkPKp41z+Ny3hYQrJRbUT3oiU0gy
+ jX71/p+TJ+Ru7IRvSpkPddwpWHlmJjYX4o5d2OJTWiuRzBpD8h23B3xoklk=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 217.72.192.75
+Subject: Re: [Qemu-devel] [PATCH v12 5/5] linux-user: Fix flock structure
+ for MIPS O64 ABI
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,50 +122,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, kvm@vger.kernel.org, maran.wilson@oracle.com,
- mtosatti@redhat.com, dgilbert@redhat.com, Liran Alon <liran.alon@oracle.com>,
- Nikita Leshenko <nikita.leshchenko@oracle.com>,
- Krish Sadhukhan <krish.sadhukhan@oracle.com>, pbonzini@redhat.com,
- rth@twiddle.net, jmattson@google.com
+Cc: amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
-Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Signed-off-by: Liran Alon <liran.alon@oracle.com>
----
- target/i386/kvm.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Le 19/06/2019 à 16:17, Aleksandar Markovic a écrit :
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> 
+> Only MIPS O32 and N32 have special (different than other
+> architectures) definition of structure flock in kernel.
+> 
+> Bring flock definition for MIPS O64 ABI to the correct state.
+> 
+> Reported-by: Dragan Mladjenovic <dmladjenovic@wavecomp.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  linux-user/generic/fcntl.h     | 2 +-
+>  linux-user/mips/target_fcntl.h | 4 ++++
+>  2 files changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/linux-user/generic/fcntl.h b/linux-user/generic/fcntl.h
+> index a775a49..1b48dde 100644
+> --- a/linux-user/generic/fcntl.h
+> +++ b/linux-user/generic/fcntl.h
+> @@ -129,7 +129,7 @@ struct target_flock {
+>      short l_whence;
+>      abi_long l_start;
+>      abi_long l_len;
+> -#if defined(TARGET_MIPS)
+> +#if defined(TARGET_MIPS) && (TARGET_ABI_BITS == 32)
+>      abi_long l_sysid;
+>  #endif
+>      int l_pid;
+> diff --git a/linux-user/mips/target_fcntl.h b/linux-user/mips/target_fcntl.h
+> index 000527c..795bba7 100644
+> --- a/linux-user/mips/target_fcntl.h
+> +++ b/linux-user/mips/target_fcntl.h
+> @@ -27,7 +27,11 @@
+>  #define TARGET_F_SETOWN        24       /*  for sockets. */
+>  #define TARGET_F_GETOWN        23       /*  for sockets. */
+>  
+> +#if (TARGET_ABI_BITS == 32)
+>  #define TARGET_ARCH_FLOCK_PAD abi_long pad[4];
+> +#else
+> +#define TARGET_ARCH_FLOCK_PAD
+> +#endif
+>  #define TARGET_ARCH_FLOCK64_PAD
+>  
+>  #define TARGET_F_GETLK64       33      /*  using 'struct flock64' */
+> 
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index efbecfc9d7f0..7b3b80833fdd 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -3009,9 +3009,9 @@ static int kvm_guest_debug_workarounds(X86CPU *cpu)
-     unsigned long reinject_trap = 0;
- 
-     if (!kvm_has_vcpu_events()) {
--        if (env->exception_injected == 1) {
-+        if (env->exception_injected == EXCP01_DB) {
-             reinject_trap = KVM_GUESTDBG_INJECT_DB;
--        } else if (env->exception_injected == 3) {
-+        } else if (env->exception_injected == EXCP03_INT3) {
-             reinject_trap = KVM_GUESTDBG_INJECT_BP;
-         }
-         env->exception_injected = -1;
-@@ -3523,8 +3523,8 @@ static int kvm_handle_debug(X86CPU *cpu,
-     int ret = 0;
-     int n;
- 
--    if (arch_info->exception == 1) {
--        if (arch_info->dr6 & (1 << 14)) {
-+    if (arch_info->exception == EXCP01_DB) {
-+        if (arch_info->dr6 & DR6_BS) {
-             if (cs->singlestep_enabled) {
-                 ret = EXCP_DEBUG;
-             }
--- 
-2.20.1
+The patch is correct, but I think it would be cleaner to introduce an
+"TARGET_HAVE_ARCH_STRUCT_FLOCK" as we have in the kernel for the mips case.
 
+Thanks,
+Laurent
 
