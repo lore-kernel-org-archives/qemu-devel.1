@@ -2,48 +2,54 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68091C31E5B
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:36:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9471C31E5B
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:42:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9E0A2084B
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:36:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9E0A2084B
+	by mail.kernel.org (Postfix) with ESMTPS id 818C0214AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:42:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 818C0214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41386 helo=lists.gnu.org)
+Received: from localhost ([::1]:41418 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdgO2-0003r7-R4
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 15:36:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52490)
+	id 1hdgTH-0007CF-9f
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 15:42:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53779)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hdgMy-0002yF-CC
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:35:45 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hdgRL-0005la-JZ
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:40:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hdgMx-0004oW-6L
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:35:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:8949)
+ (envelope-from <mreitz@redhat.com>) id 1hdgRK-0008Js-By
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:40:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41292)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hdgMu-0004k1-77; Wed, 19 Jun 2019 15:35:40 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1hdgRH-0008HP-J7; Wed, 19 Jun 2019 15:40:11 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6C05C3078ABD;
- Wed, 19 Jun 2019 19:35:34 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 363AB301EA90;
+ Wed, 19 Jun 2019 19:40:10 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-116-121.ams2.redhat.com
  [10.36.116.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 70D97608A5;
- Wed, 19 Jun 2019 19:35:33 +0000 (UTC)
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-block@nongnu.org
-References: <20190516143028.81155-1-anton.nefedov@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C1A9E19C71;
+ Wed, 19 Jun 2019 19:40:08 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20190612220839.1374-1-mreitz@redhat.com>
+ <20190612220839.1374-2-mreitz@redhat.com>
+ <b110b753-8546-0d34-f6ef-06c5726766ce@virtuozzo.com>
+ <c1fbf12a-77af-d939-4266-67b822e5a923@redhat.com>
+ <57ae7f82-ae02-a382-74f6-cb96672b2058@virtuozzo.com>
+ <00cce102-a1f1-9205-6eb7-1e48d8991b00@redhat.com>
+ <32adc55c-c71d-59bf-963b-48d2ae5b3e30@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -70,22 +76,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <519a89b7-4584-4213-5a5d-2b4409eee565@redhat.com>
-Date: Wed, 19 Jun 2019 21:35:32 +0200
+Message-ID: <309c0932-a9b4-40a6-8db2-7940171f52e5@redhat.com>
+Date: Wed, 19 Jun 2019 21:40:07 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190516143028.81155-1-anton.nefedov@virtuozzo.com>
+In-Reply-To: <32adc55c-c71d-59bf-963b-48d2ae5b3e30@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="Rj6jbvjNDRQb0Jrkb4ySeaAt7cDjHm8kZ"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+ boundary="BYIGlNaa67BThJz2eQtvTxpzr05cFRI9S"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Wed, 19 Jun 2019 19:35:34 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Wed, 19 Jun 2019 19:40:10 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2] iotest 134: test cluster-misaligned
- encrypted write
+Subject: Re: [Qemu-devel] [PATCH 1/2] vl: Drain before (block) job cancel
+ when quitting
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,75 +103,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Denis Plotnikov <dplotnikov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Rj6jbvjNDRQb0Jrkb4ySeaAt7cDjHm8kZ
-Content-Type: multipart/mixed; boundary="rL2DmWrJGAaDAfgboYckhlo17slyQM6MD";
+--BYIGlNaa67BThJz2eQtvTxpzr05cFRI9S
+Content-Type: multipart/mixed; boundary="TcI4NUSvh7jQrYDOZx4OOsXlUGO5JLKIZ";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com
-Message-ID: <519a89b7-4584-4213-5a5d-2b4409eee565@redhat.com>
-Subject: Re: [PATCH v2] iotest 134: test cluster-misaligned encrypted write
-References: <20190516143028.81155-1-anton.nefedov@virtuozzo.com>
-In-Reply-To: <20190516143028.81155-1-anton.nefedov@virtuozzo.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: Qemu-block <qemu-block@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Denis Plotnikov <dplotnikov@virtuozzo.com>
+Message-ID: <309c0932-a9b4-40a6-8db2-7940171f52e5@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] vl: Drain before (block) job cancel when
+ quitting
+References: <20190612220839.1374-1-mreitz@redhat.com>
+ <20190612220839.1374-2-mreitz@redhat.com>
+ <b110b753-8546-0d34-f6ef-06c5726766ce@virtuozzo.com>
+ <c1fbf12a-77af-d939-4266-67b822e5a923@redhat.com>
+ <57ae7f82-ae02-a382-74f6-cb96672b2058@virtuozzo.com>
+ <00cce102-a1f1-9205-6eb7-1e48d8991b00@redhat.com>
+ <32adc55c-c71d-59bf-963b-48d2ae5b3e30@virtuozzo.com>
+In-Reply-To: <32adc55c-c71d-59bf-963b-48d2ae5b3e30@virtuozzo.com>
 
---rL2DmWrJGAaDAfgboYckhlo17slyQM6MD
+--TcI4NUSvh7jQrYDOZx4OOsXlUGO5JLKIZ
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 16.05.19 16:30, Anton Nefedov wrote:
-> COW (even empty/zero) areas require encryption too
+On 14.06.19 11:22, Vladimir Sementsov-Ogievskiy wrote:
+> 13.06.2019 19:03, Max Reitz wrote:
+>> [re-adding the original CCs, why not]
+>>
+>> On 13.06.19 16:30, Vladimir Sementsov-Ogievskiy wrote:
+>>> 13.06.2019 17:21, Max Reitz wrote:
+>>>> On 13.06.19 16:19, Vladimir Sementsov-Ogievskiy wrote:
+>>>>> 13.06.2019 1:08, Max Reitz wrote:
+>>>>>> If the main loop cancels all block jobs while the block layer is n=
+ot
+>>>>>> drained, this cancelling may not happen instantaneously.  We can s=
+tart a
+>>>>>> drained section before vm_shutdown(), which entails another
+>>>>>> bdrv_drain_all(); this nested bdrv_drain_all() will thus be a no-o=
+p,
+>>>>>> basically.
+>>>>>>
+>>>>>> We do not have to end the drained section, because we actually do =
+not
+>>>>>> want any requests to happen from this point on.
+>>>>>>
+>>>>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>>>>> ---
+>>>>>> I don't know whether it actually makes sense to never end this dra=
+ined
+>>>>>> section.  It makes sense to me.  Please correct me if I'm wrong.
+>>>>>> ---
+>>>>>>     vl.c | 11 +++++++++++
+>>>>>>     1 file changed, 11 insertions(+)
+>>>>>>
+>>>>>> diff --git a/vl.c b/vl.c
+>>>>>> index cd1fbc4cdc..3f8b3f74f5 100644
+>>>>>> --- a/vl.c
+>>>>>> +++ b/vl.c
+>>>>>> @@ -4538,6 +4538,17 @@ int main(int argc, char **argv, char **envp=
+)
+>>>>>>          */
+>>>>>>         migration_shutdown();
+>>>>>>    =20
+>>>>>> +    /*
+>>>>>> +     * We must cancel all block jobs while the block layer is dra=
+ined,
+>>>>>> +     * or cancelling will be affected by throttling and thus may =
+block
+>>>>>> +     * for an extended period of time.
+>>>>>> +     * vm_shutdown() will bdrv_drain_all(), so we may as well inc=
+lude
+>>>>>> +     * it in the drained section.
+>>>>>> +     * We do not need to end this section, because we do not want=
+ any
+>>>>>> +     * requests happening from here on anyway.
+>>>>>> +     */
+>>>>>> +    bdrv_drain_all_begin();
+>>>>>> +
+>>>>>>         /* No more vcpu or device emulation activity beyond this p=
+oint */
+>>>>>>         vm_shutdown();
+>>>>>>    =20
+>>>>>>
+>>>>>
+>>>>> So, actually, the problem is that we may wait for job requests twic=
+e:
+>>>>> on drain and then on cancel.
+>>>>
+>>>> We don=E2=80=99t wait on drain.  When the throttle node is drained, =
+it will
+>>>> ignore throttling (as noted in the cover letter).
+>>>>
+>>>> We do wait when cancelling a job while the throttle node isn=E2=80=99=
+t drained,
+>>>> though.  That=E2=80=99s the problem.
+>>>
+>>> Ah, understand now.
+>>>
+>>> Is it safe to drain_begin before stopping cpus? We may finish up then=
+ with some queued
+>>> somewhere IO requests..
+>>
+>> Hm...  Aren=E2=80=99t guest devices prohibited from issuing requests t=
+o the
+>> block layer while their respective block device is drained?
 >=20
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
-> ---
->=20
-> ..apparently v1 ended up in a weird base64 that would not easily git-am=
-=2E
-> Resending.
->=20
-> used to be a part of 'qcow2: cluster space preallocation' series
-> http://lists.nongnu.org/archive/html/qemu-devel/2019-01/msg02769.html
->=20
-> ---
->  tests/qemu-iotests/134     |  9 +++++++++
->  tests/qemu-iotests/134.out | 10 ++++++++++
->  2 files changed, 19 insertions(+)
->=20
+> It's at least a buggy place, I remember Denis Plotnikov sent patch to f=
+ix it and had a huge
+> discussion with Kevin.
+> And here it is:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg00732.html
 
-Thanks, applied to my block branch:
+Ah, I even have that in my inbox...  The latest reply I see came in April=
+:
 
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+https://lists.nongnu.org/archive/html/qemu-block/2019-04/msg00243.html
+
+Where Kevin asked for an RFC patch in the current state.
+
+I=E2=80=99m not sure whether I should work around a potential bug here, i=
+f we
+can agree that it is a bug, and if it isn=E2=80=99t clear whether this pl=
+ace
+would actually be affected.
 
 Max
 
 
---rL2DmWrJGAaDAfgboYckhlo17slyQM6MD--
+--TcI4NUSvh7jQrYDOZx4OOsXlUGO5JLKIZ--
 
---Rj6jbvjNDRQb0Jrkb4ySeaAt7cDjHm8kZ
+--BYIGlNaa67BThJz2eQtvTxpzr05cFRI9S
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0KjoQACgkQ9AfbAGHV
-z0B6oQf/T+uNNzkHd+htBLvarex0zcviUlF5WyTT90aM8lnIu2oPdGTsw57+yJtH
-L6uBx3/fDF69M57nvaSbxeqR2l2dJ2koJc2u699hfaMHH0xRlUv0LZHWdysa6bSg
-LsgCzlFUZVFhwG85vt5AEyHul6CLRvbyJTvzoBP3NaS/tJD87jCBHL+wzN8BDLom
-zN3p1qRLgoja0raq0qBa2ZuOAW1/V/yGkSiJ0oHUfzCGj7yMBhSEHevq5dQTfICD
-SzTy94lpboZC2GUqyWUmDRnHFCyES8eJgAa61wttw3iHcZOsgVUmfFzn8EsjV32/
-1DQ94gBTPW+IrtEc85Id2nngEu+LJQ==
-=EvE2
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0Kj5cACgkQ9AfbAGHV
+z0DZEQf9HtoGDkyrHdM5Ql6zcLNzV58uxCPtUKv4dfKQ+k4fxO8E4NAX8pBtFhu+
+rMK59gkcYNLgUKw7SisdEdjig1TePCndljv1GQiOUwwZ5/jwtvVuBCWVCpqaAA0m
+MxD0Byp8HXCM7JrDozdO6VzC6zI9J3utK+cI7zBen82o4fKqa5q62UDn2K2jNuQB
+p5C0RiSwG+KJIXgt+YYd86KK6yuRMIVoNKoaZS5LGwaOW26Oe8Ho0j635R26eMo8
+wSyvo+2zAEGbDRFV1BgSNmoJGyYk4OqJxjcP/g3uR7mLhgvHmDC2H/SXZG+srTd0
+EeCFfB2mq0gLli5EGHTNvWjDOTAUOQ==
+=+n3J
 -----END PGP SIGNATURE-----
 
---Rj6jbvjNDRQb0Jrkb4ySeaAt7cDjHm8kZ--
+--BYIGlNaa67BThJz2eQtvTxpzr05cFRI9S--
 
