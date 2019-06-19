@@ -2,68 +2,66 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HEXHASH_WORD,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 184D4C43613
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 22:38:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BF38C43613
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 22:45:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9128B2085A
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 22:38:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9128B2085A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 5EB972085A
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 22:45:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EB972085A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42404 helo=lists.gnu.org)
+Received: from localhost ([::1]:42434 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdjDz-0005mu-BD
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 18:38:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36168)
+	id 1hdjKa-0008Pb-31
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 18:45:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41420)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hdix5-0001yA-LN
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 18:21:15 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hdjIb-0007Wm-27
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 18:43:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hdix1-00082T-QC
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 18:21:11 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:55217)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1hdiwt-0007pB-1w; Wed, 19 Jun 2019 18:20:59 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MWRi7-1i64f324Md-00Xwdj; Thu, 20 Jun 2019 00:19:55 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Date: Thu, 20 Jun 2019 00:19:27 +0200
-Message-Id: <20190619221933.1981-5-laurent@vivier.eu>
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <no-reply@patchew.org>) id 1hdjIY-0006lo-Lw
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 18:43:24 -0400
+Resent-Date: Wed, 19 Jun 2019 18:43:24 -0400
+Resent-Message-Id: <E1hdjIY-0006lo-Lw@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21480)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hdjIY-0006iI-3e; Wed, 19 Jun 2019 18:43:22 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1560984137; cv=none; d=zoho.com; s=zohoarc; 
+ b=U5qk/QWxjH9d+pKnKIrlZHq0ZEvIyufloUO7ZNDKfzcV8GDP4XUnaw1RVo0rh6NVkV887ggNONBg6AJ6RLQX+VTX+B6BscMjrHY+1UV4tmxdrfcAKXfqxxVIY7RJD0tQVfg3PJraZvDDfdihEiXcRTsyOdEKy2RE7bvwi+FRLsg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1560984137;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=o+K5V049LP82GkvBnpNpUWmjzrnP2UXhfes7AqbYvfg=; 
+ b=eraD/O6gBEuRVaABOxKtsKtRzPJcgemMXkdN+1wbv5oQpDCztHiIGhUhPUKK41lJ5J7eVyoCPeCVyICsm/e2YkZ+3ohp1jKgUDkQ3r5YFJgfZfzEGeW49es4HYKCFaRKqAUW33G/CkZaOhP5wSUj3PlHfF5gCSN5ZR0Y/T5dOb4=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1560984135968645.8336550016418;
+ Wed, 19 Jun 2019 15:42:15 -0700 (PDT)
 In-Reply-To: <20190619221933.1981-1-laurent@vivier.eu>
-References: <20190619221933.1981-1-laurent@vivier.eu>
+Message-ID: <156098413409.29212.248225970185672710@ce79690b2cb9>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:rNIFdEuzlmM2yauzYycbeBb5qeTwADcm4yE6Tc2ddrdAN/k8/LO
- CiYRF7vJoR6xIQ+t5ZpZF95Z/W1sLBmaMkW2gN45tk+4C7qbmDcl2I9lH5QPFtD5zkJfEZv
- zajUgUv4JXfpvnTstfvc1+uRcIpepF5lk0eQGRAy5r5NXlCCFQ5WjN5ZA0HpcHJpXNciu3t
- meUnfJ7CQuJObhlHgkKyQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:keUqWNcmiaI=:YfW6Ayq+rhUZjnpttISqj8
- 5E0uwoWUsT5buKVEhtqT5wdKXjF4p0allF47GykpEFwkh+0Pk6wM983h+Xw+yW5H3PC1NG+Va
- x/JIt65ozcnc4wpz1bIKLNRYHrliXDZMyjH4ZEI1/Pj6foVMVdHio99J6ke415mDkSXFWKi0b
- kUiXf06srbbbX7Ti/WVoxpJoRMlmmYa79J2rXZYTK/RYDDwtaep7W56MtC2xTo1bg+ME9C76W
- +0xd0OXqh79eR1ntLQ0fAlNG1O9ArZkfBkYsOD2h9dgtWarcJXf6pBhGh1lUPWhBXSXDCcQlr
- g2w9u/SWrfAo8u4zOYpcPXQPbw6k+9b2s1yjCHqlqClDK0Ihl61fbVEAwqXCTbG69Och9NdlV
- fDm3UBmxZBz2lDz5cybUGO8Xdiel2M/aQjWqIosRg629vli/9k6ckZmwBqT9oHd0TGSujGFLG
- m/N/aaovLlI0e5NPXN4UfMkHu66JW73f+LyEX2ND86CszsVah8WMTbRBZXUR7ocDxuPZkidjg
- CN8bpYs6iA/VxIsLrPyOkqY4WKj0RRsvUpM2DMAUX5TF1nI56JgLipM6+bd6tKin2sBNgF/PS
- rUYzMrnEHFHxI++AwNklYzJloC2QIkF7Dv7ygkci/lC0c+jlfobwON76VbiYkC26DL2jQcnP4
- 1tFehYm4tGtruXQ6KmGy+M3XC/dbAUVYrxiv1oLgm9WC71qfDmliXSB0W9G+1waQqrtmTCA/D
- Uwg8mjHB93FoSQXDam6pFEEnF2tXIob4gsuFwxPDd79jopVXc4QsT2X+kQg=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: laurent@vivier.eu
+Date: Wed, 19 Jun 2019 15:42:15 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.135
-Subject: [Qemu-devel] [PATCH v8 04/10] hw/m68k: add via support
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH v8 00/10] hw/m68k: add Apple Machintosh
+ Quadra 800 machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,845 +73,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Thomas Huth <huth@tuxfamily.org>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Laurent Vivier <laurent@vivier.eu>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, fam@euphon.net, qemu-block@nongnu.org, huth@tuxfamily.org,
+ jasowang@redhat.com, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
+ laurent@vivier.eu, aurelien@aurel32.net, hpoussin@reactos.org,
+ kraxel@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ mreitz@redhat.com, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
----
- hw/misc/Kconfig           |   4 +
- hw/misc/Makefile.objs     |   1 +
- hw/misc/mac_via.c         | 667 ++++++++++++++++++++++++++++++++++++++
- include/hw/misc/mac_via.h | 107 ++++++
- 4 files changed, 779 insertions(+)
- create mode 100644 hw/misc/mac_via.c
- create mode 100644 include/hw/misc/mac_via.h
-
-diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-index 385e1b0cec..87312c3abb 100644
---- a/hw/misc/Kconfig
-+++ b/hw/misc/Kconfig
-@@ -117,4 +117,8 @@ config AUX
-     bool
-     select I2C
- 
-+config MAC_VIA
-+    bool
-+    select MOS6522
-+
- source macio/Kconfig
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 77b9df9796..ef0d0d5d9b 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -75,6 +75,7 @@ obj-$(CONFIG_ARMSSE_MHU) += armsse-mhu.o
- obj-$(CONFIG_PVPANIC) += pvpanic.o
- obj-$(CONFIG_AUX) += auxbus.o
- obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
-+obj-$(CONFIG_MAC_VIA) += mac_via.o
- obj-$(CONFIG_MSF2) += msf2-sysreg.o
- obj-$(CONFIG_NRF51_SOC) += nrf51_rng.o
- 
-diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
-new file mode 100644
-index 0000000000..baa87c2879
---- /dev/null
-+++ b/hw/misc/mac_via.c
-@@ -0,0 +1,667 @@
-+/*
-+ * QEMU m68k Macintosh VIA device support
-+ *
-+ * Copyright (c) 2011-2018 Laurent Vivier
-+ * Copyright (c) 2018 Mark Cave-Ayland
-+ *
-+ * Some parts from hw/misc/macio/cuda.c
-+ *
-+ * Copyright (c) 2004-2007 Fabrice Bellard
-+ * Copyright (c) 2007 Jocelyn Mayer
-+ *
-+ * some parts from linux-2.6.29, arch/m68k/include/asm/mac_via.h
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "hw/sysbus.h"
-+#include "qemu/timer.h"
-+#include "hw/misc/mac_via.h"
-+#include "hw/misc/mos6522.h"
-+#include "hw/input/adb.h"
-+#include "sysemu/sysemu.h"
-+#include "qapi/error.h"
-+#include "qemu/cutils.h"
-+
-+
-+/*
-+ * VIAs: There are two in every machine,
-+ */
-+
-+#define VIA_SIZE (0x2000)
-+
-+/*
-+ * Not all of these are true post MacII I think.
-+ * CSA: probably the ones CHRP marks as 'unused' change purposes
-+ * when the IWM becomes the SWIM.
-+ * http://www.rs6000.ibm.com/resource/technology/chrpio/via5.mak.html
-+ * ftp://ftp.austin.ibm.com/pub/technology/spec/chrp/inwork/CHRP_IORef_1.0.pdf
-+ *
-+ * also, http://developer.apple.com/technotes/hw/hw_09.html claims the
-+ * following changes for IIfx:
-+ * VIA1A_vSccWrReq not available and that VIA1A_vSync has moved to an IOP.
-+ * Also, "All of the functionality of VIA2 has been moved to other chips".
-+ */
-+
-+#define VIA1A_vSccWrReq 0x80   /* SCC write. (input)
-+                                * [CHRP] SCC WREQ: Reflects the state of the
-+                                * Wait/Request pins from the SCC.
-+                                * [Macintosh Family Hardware]
-+                                * as CHRP on SE/30,II,IIx,IIcx,IIci.
-+                                * on IIfx, "0 means an active request"
-+                                */
-+#define VIA1A_vRev8     0x40   /* Revision 8 board ???
-+                                * [CHRP] En WaitReqB: Lets the WaitReq_L
-+                                * signal from port B of the SCC appear on
-+                                * the PA7 input pin. Output.
-+                                * [Macintosh Family] On the SE/30, this
-+                                * is the bit to flip screen buffers.
-+                                * 0=alternate, 1=main.
-+                                * on II,IIx,IIcx,IIci,IIfx this is a bit
-+                                * for Rev ID. 0=II,IIx, 1=IIcx,IIci,IIfx
-+                                */
-+#define VIA1A_vHeadSel  0x20   /* Head select for IWM.
-+                                * [CHRP] unused.
-+                                * [Macintosh Family] "Floppy disk
-+                                * state-control line SEL" on all but IIfx
-+                                */
-+#define VIA1A_vOverlay  0x10   /* [Macintosh Family] On SE/30,II,IIx,IIcx
-+                                * this bit enables the "Overlay" address
-+                                * map in the address decoders as it is on
-+                                * reset for mapping the ROM over the reset
-+                                * vector. 1=use overlay map.
-+                                * On the IIci,IIfx it is another bit of the
-+                                * CPU ID: 0=normal IIci, 1=IIci with parity
-+                                * feature or IIfx.
-+                                * [CHRP] En WaitReqA: Lets the WaitReq_L
-+                                * signal from port A of the SCC appear
-+                                * on the PA7 input pin (CHRP). Output.
-+                                * [MkLinux] "Drive Select"
-+                                *  (with 0x20 being 'disk head select')
-+                                */
-+#define VIA1A_vSync     0x08   /* [CHRP] Sync Modem: modem clock select:
-+                                * 1: select the external serial clock to
-+                                *    drive the SCC's /RTxCA pin.
-+                                * 0: Select the 3.6864MHz clock to drive
-+                                *    the SCC cell.
-+                                * [Macintosh Family] Correct on all but IIfx
-+                                */
-+
-+/* Macintosh Family Hardware sez: bits 0-2 of VIA1A are volume control
-+ * on Macs which had the PWM sound hardware.  Reserved on newer models.
-+ * On IIci,IIfx, bits 1-2 are the rest of the CPU ID:
-+ * bit 2: 1=IIci, 0=IIfx
-+ * bit 1: 1 on both IIci and IIfx.
-+ * MkLinux sez bit 0 is 'burnin flag' in this case.
-+ * CHRP sez: VIA1A bits 0-2 and 5 are 'unused': if programmed as
-+ * inputs, these bits will read 0.
-+ */
-+#define VIA1A_vVolume   0x07    /* Audio volume mask for PWM */
-+#define VIA1A_CPUID0    0x02    /* CPU id bit 0 on RBV, others */
-+#define VIA1A_CPUID1    0x04    /* CPU id bit 0 on RBV, others */
-+#define VIA1A_CPUID2    0x10    /* CPU id bit 0 on RBV, others */
-+#define VIA1A_CPUID3    0x40    /* CPU id bit 0 on RBV, others */
-+
-+/* Info on VIA1B is from Macintosh Family Hardware & MkLinux.
-+ * CHRP offers no info. */
-+#define VIA1B_vSound   0x80    /* Sound enable (for compatibility with
-+                                * PWM hardware) 0=enabled.
-+                                * Also, on IIci w/parity, shows parity error
-+                                * 0=error, 1=OK. */
-+#define VIA1B_vMystery 0x40    /* On IIci, parity enable. 0=enabled,1=disabled
-+                                * On SE/30, vertical sync interrupt enable.
-+                                * 0=enabled. This vSync interrupt shows up
-+                                * as a slot $E interrupt. */
-+#define VIA1B_vADBS2   0x20    /* ADB state input bit 1 (unused on IIfx) */
-+#define VIA1B_vADBS1   0x10    /* ADB state input bit 0 (unused on IIfx) */
-+#define VIA1B_vADBInt  0x08    /* ADB interrupt 0=interrupt (unused on IIfx)*/
-+#define VIA1B_vRTCEnb  0x04    /* Enable Real time clock. 0=enabled. */
-+#define VIA1B_vRTCClk  0x02    /* Real time clock serial-clock line. */
-+#define VIA1B_vRTCData 0x01    /* Real time clock serial-data line. */
-+
-+/*
-+ *    VIA2 A register is the interrupt lines raised off the nubus
-+ *    slots.
-+ *      The below info is from 'Macintosh Family Hardware.'
-+ *      MkLinux calls the 'IIci internal video IRQ' below the 'RBV slot 0 irq.'
-+ *      It also notes that the slot $9 IRQ is the 'Ethernet IRQ' and
-+ *      defines the 'Video IRQ' as 0x40 for the 'EVR' VIA work-alike.
-+ *      Perhaps OSS uses vRAM1 and vRAM2 for ADB.
-+ */
-+
-+#define VIA2A_vRAM1    0x80    /* RAM size bit 1 (IIci: reserved) */
-+#define VIA2A_vRAM0    0x40    /* RAM size bit 0 (IIci: internal video IRQ) */
-+#define VIA2A_vIRQE    0x20    /* IRQ from slot $E */
-+#define VIA2A_vIRQD    0x10    /* IRQ from slot $D */
-+#define VIA2A_vIRQC    0x08    /* IRQ from slot $C */
-+#define VIA2A_vIRQB    0x04    /* IRQ from slot $B */
-+#define VIA2A_vIRQA    0x02    /* IRQ from slot $A */
-+#define VIA2A_vIRQ9    0x01    /* IRQ from slot $9 */
-+
-+/* RAM size bits decoded as follows:
-+ * bit1 bit0  size of ICs in bank A
-+ *  0    0    256 kbit
-+ *  0    1    1 Mbit
-+ *  1    0    4 Mbit
-+ *  1    1   16 Mbit
-+ */
-+
-+/*
-+ *    Register B has the fun stuff in it
-+ */
-+
-+#define VIA2B_vVBL    0x80    /* VBL output to VIA1 (60.15Hz) driven by
-+                               * timer T1.
-+                               * on IIci, parity test: 0=test mode.
-+                               * [MkLinux] RBV_PARODD: 1=odd,0=even. */
-+#define VIA2B_vSndJck 0x40    /* External sound jack status.
-+                               * 0=plug is inserted.  On SE/30, always 0 */
-+#define VIA2B_vTfr0   0x20    /* Transfer mode bit 0 ack from NuBus */
-+#define VIA2B_vTfr1   0x10    /* Transfer mode bit 1 ack from NuBus */
-+#define VIA2B_vMode32 0x08    /* 24/32bit switch - doubles as cache flush
-+                               * on II, AMU/PMMU control.
-+                               *   if AMU, 0=24bit to 32bit translation
-+                               *   if PMMU, 1=PMMU is accessing page table.
-+                               * on SE/30 tied low.
-+                               * on IIx,IIcx,IIfx, unused.
-+                               * on IIci/RBV, cache control. 0=flush cache.
-+                               */
-+#define VIA2B_vPower  0x04   /* Power off, 0=shut off power.
-+                              * on SE/30 this signal sent to PDS card.
-+                              */
-+#define VIA2B_vBusLk  0x02   /* Lock NuBus transactions, 0=locked.
-+                              * on SE/30 sent to PDS card.
-+                              */
-+#define VIA2B_vCDis   0x01   /* Cache control. On IIci, 1=disable cache card
-+                              * on others, 0=disable processor's instruction
-+                              * and data caches.
-+                              */
-+
-+/* interrupt flags */
-+
-+#define IRQ_SET         0x80
-+
-+/* common */
-+
-+#define VIA_IRQ_TIMER1      0x40
-+#define VIA_IRQ_TIMER2      0x20
-+
-+/* Apple sez: http://developer.apple.com/technotes/ov/ov_04.html
-+ * Another example of a valid function that has no ROM support is the use
-+ * of the alternate video page for page-flipping animation. Since there
-+ * is no ROM call to flip pages, it is necessary to go play with the
-+ * right bit in the VIA chip (6522 Versatile Interface Adapter).
-+ * [CSA: don't know which one this is, but it's one of 'em!]
-+ */
-+
-+/*
-+ *    6522 registers - see databook.
-+ * CSA: Assignments for VIA1 confirmed from CHRP spec.
-+ */
-+
-+/* partial address decode.  0xYYXX : XX part for RBV, YY part for VIA */
-+/* Note: 15 VIA regs, 8 RBV regs */
-+
-+#define vBufB    0x0000  /* [VIA/RBV]  Register B */
-+#define vBufAH   0x0200  /* [VIA only] Buffer A, with handshake. DON'T USE! */
-+#define vDirB    0x0400  /* [VIA only] Data Direction Register B. */
-+#define vDirA    0x0600  /* [VIA only] Data Direction Register A. */
-+#define vT1CL    0x0800  /* [VIA only] Timer one counter low. */
-+#define vT1CH    0x0a00  /* [VIA only] Timer one counter high. */
-+#define vT1LL    0x0c00  /* [VIA only] Timer one latches low. */
-+#define vT1LH    0x0e00  /* [VIA only] Timer one latches high. */
-+#define vT2CL    0x1000  /* [VIA only] Timer two counter low. */
-+#define vT2CH    0x1200  /* [VIA only] Timer two counter high. */
-+#define vSR      0x1400  /* [VIA only] Shift register. */
-+#define vACR     0x1600  /* [VIA only] Auxilary control register. */
-+#define vPCR     0x1800  /* [VIA only] Peripheral control register. */
-+                         /*            CHRP sez never ever to *write* this.
-+                          *            Mac family says never to *change* this.
-+                          * In fact we need to initialize it once at start.
-+                          */
-+#define vIFR     0x1a00  /* [VIA/RBV]  Interrupt flag register. */
-+#define vIER     0x1c00  /* [VIA/RBV]  Interrupt enable register. */
-+#define vBufA    0x1e00  /* [VIA/RBV] register A (no handshake) */
-+
-+/* from linux 2.6 drivers/macintosh/via-macii.c */
-+
-+/* Bits in ACR */
-+
-+#define VIA1ACR_vShiftCtrl         0x1c        /* Shift register control bits */
-+#define VIA1ACR_vShiftExtClk       0x0c        /* Shift on external clock */
-+#define VIA1ACR_vShiftOut          0x10        /* Shift out if 1 */
-+
-+/* Apple Macintosh Family Hardware Refenece
-+ * Table 19-10 ADB transaction states
-+ */
-+
-+#define VIA1B_vADB_StateMask    (VIA1B_vADBS1 | VIA1B_vADBS2)
-+#define VIA1B_vADB_StateShift   4
-+
-+#define VIA_TIMER_FREQ (783360)
-+
-+/* VIA returns time offset from Jan 1, 1904, not 1970 */
-+#define RTC_OFFSET 2082844800
-+
-+
-+static void via1_VBL(void *opaque)
-+{
-+    MacVIAState *m = opaque;
-+    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
-+    MOS6522State *s = MOS6522(v1s);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(s);
-+
-+    s->ifr |= VIA1_IRQ_VBLANK;
-+    mdc->update_irq(s);
-+
-+    timer_mod(m->VBL_timer, (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 16630)
-+              / 16630 * 16630);
-+}
-+
-+static void via1_one_second(void *opaque)
-+{
-+    MacVIAState *m = opaque;
-+    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
-+    MOS6522State *s = MOS6522(v1s);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(s);
-+
-+    s->ifr |= VIA1_IRQ_ONE_SECOND;
-+    mdc->update_irq(s);
-+
-+    timer_mod(m->one_second_timer, (qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL)
-+              + 1000) / 1000 * 1000);
-+}
-+
-+static void via1_irq_request(void *opaque, int irq, int level)
-+{
-+    MOS6522Q800VIA1State *v1s = opaque;
-+    MOS6522State *s = MOS6522(v1s);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(s);
-+
-+    if (level) {
-+        s->ifr |= 1 << irq;
-+    } else {
-+        s->ifr &= ~(1 << irq);
-+    }
-+
-+    mdc->update_irq(s);
-+}
-+
-+static void via2_irq_request(void *opaque, int irq, int level)
-+{
-+    MOS6522Q800VIA2State *v2s = opaque;
-+    MOS6522State *s = MOS6522(v2s);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(s);
-+
-+    if (level) {
-+        s->ifr |= 1 << irq;
-+    } else {
-+        s->ifr &= ~(1 << irq);
-+    }
-+
-+    mdc->update_irq(s);
-+}
-+
-+static void via1_rtc_update(MacVIAState *m)
-+{
-+    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
-+    MOS6522State *s = MOS6522(v1s);
-+
-+    if (s->b & VIA1B_vRTCEnb) {
-+        return;
-+    }
-+
-+    if (s->dirb & VIA1B_vRTCData) {
-+        /* send bits to the RTC */
-+        if (!(v1s->last_b & VIA1B_vRTCClk) && (s->b & VIA1B_vRTCClk)) {
-+            m->data_out <<= 1;
-+            m->data_out |= s->b & VIA1B_vRTCData;
-+            m->data_out_cnt++;
-+        }
-+    } else {
-+        /* receive bits from the RTC */
-+        if ((v1s->last_b & VIA1B_vRTCClk) &&
-+            !(s->b & VIA1B_vRTCClk) &&
-+            m->data_in_cnt) {
-+            s->b = (s->b & ~VIA1B_vRTCData) |
-+                   ((m->data_in >> 7) & VIA1B_vRTCData);
-+            m->data_in <<= 1;
-+            m->data_in_cnt--;
-+        }
-+    }
-+
-+    if (m->data_out_cnt == 8) {
-+        m->data_out_cnt = 0;
-+
-+        if (m->cmd == 0) {
-+            if (m->data_out & 0x80) {
-+                /* this is a read command */
-+                uint32_t time = m->tick_offset +
-+                               (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) /
-+                               NANOSECONDS_PER_SECOND);
-+                if (m->data_out == 0x81) {        /* seconds register 0 */
-+                    m->data_in = time & 0xff;
-+                    m->data_in_cnt = 8;
-+                } else if (m->data_out == 0x85) { /* seconds register 1 */
-+                    m->data_in = (time >> 8) & 0xff;
-+                    m->data_in_cnt = 8;
-+                } else if (m->data_out == 0x89) { /* seconds register 2 */
-+                    m->data_in = (time >> 16) & 0xff;
-+                    m->data_in_cnt = 8;
-+                } else if (m->data_out == 0x8d) { /* seconds register 3 */
-+                    m->data_in = (time >> 24) & 0xff;
-+                    m->data_in_cnt = 8;
-+                } else if ((m->data_out & 0xf3) == 0xa1) {
-+                    /* PRAM address 0x10 -> 0x13 */
-+                    int addr = (m->data_out >> 2) & 0x03;
-+                    m->data_in = v1s->PRAM[addr];
-+                    m->data_in_cnt = 8;
-+                } else if ((m->data_out & 0xf3) == 0xa1) {
-+                    /* PRAM address 0x00 -> 0x0f */
-+                    int addr = (m->data_out >> 2) & 0x0f;
-+                    m->data_in = v1s->PRAM[addr];
-+                    m->data_in_cnt = 8;
-+                } else if ((m->data_out & 0xf8) == 0xb8) {
-+                    /* extended memory designator and sector number */
-+                    m->cmd = m->data_out;
-+                }
-+            } else {
-+                /* this is a write command */
-+                m->cmd = m->data_out;
-+            }
-+        } else {
-+            if (m->cmd & 0x80) {
-+                if ((m->cmd & 0xf8) == 0xb8) {
-+                    /* extended memory designator and sector number */
-+                    int sector = m->cmd & 0x07;
-+                    int addr = (m->data_out >> 2) & 0x1f;
-+
-+                    m->data_in = v1s->PRAM[sector * 8 + addr];
-+                    m->data_in_cnt = 8;
-+                }
-+            } else if (!m->wprotect) {
-+                /* this is a write command */
-+                if (m->alt != 0) {
-+                    /* extended memory designator and sector number */
-+                    int sector = m->cmd & 0x07;
-+                    int addr = (m->alt >> 2) & 0x1f;
-+
-+                    v1s->PRAM[sector * 8 + addr] = m->data_out;
-+
-+                    m->alt = 0;
-+                } else if (m->cmd == 0x01) { /* seconds register 0 */
-+                    /* FIXME */
-+                } else if (m->cmd == 0x05) { /* seconds register 1 */
-+                    /* FIXME */
-+                } else if (m->cmd == 0x09) { /* seconds register 2 */
-+                    /* FIXME */
-+                } else if (m->cmd == 0x0d) { /* seconds register 3 */
-+                    /* FIXME */
-+                } else if (m->cmd == 0x31) {
-+                    /* Test Register */
-+                } else if (m->cmd == 0x35) {
-+                    /* Write Protect register */
-+                    m->wprotect = m->data_out & 1;
-+                } else if ((m->cmd & 0xf3) == 0xa1) {
-+                    /* PRAM address 0x10 -> 0x13 */
-+                    int addr = (m->cmd >> 2) & 0x03;
-+                    v1s->PRAM[addr] = m->data_out;
-+                } else if ((m->cmd & 0xf3) == 0xa1) {
-+                    /* PRAM address 0x00 -> 0x0f */
-+                    int addr = (m->cmd >> 2) & 0x0f;
-+                    v1s->PRAM[addr] = m->data_out;
-+                } else if ((m->cmd & 0xf8) == 0xb8) {
-+                    /* extended memory designator and sector number */
-+                    m->alt = m->cmd;
-+                }
-+            }
-+        }
-+        m->data_out = 0;
-+    }
-+}
-+
-+static uint64_t mos6522_q800_via1_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    MOS6522Q800VIA1State *s = MOS6522_Q800_VIA1(opaque);
-+    MOS6522State *ms = MOS6522(s);
-+
-+    addr = (addr >> 9) & 0xf;
-+    return mos6522_read(ms, addr, size);
-+}
-+
-+static void mos6522_q800_via1_write(void *opaque, hwaddr addr, uint64_t val,
-+                                    unsigned size)
-+{
-+    MOS6522Q800VIA1State *s = MOS6522_Q800_VIA1(opaque);
-+    MOS6522State *ms = MOS6522(s);
-+
-+    addr = (addr >> 9) & 0xf;
-+    mos6522_write(ms, addr, val, size);
-+}
-+
-+static const MemoryRegionOps mos6522_q800_via1_ops = {
-+    .read = mos6522_q800_via1_read,
-+    .write = mos6522_q800_via1_write,
-+    .endianness = DEVICE_BIG_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
-+};
-+
-+static uint64_t mos6522_q800_via2_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    MOS6522Q800VIA2State *s = MOS6522_Q800_VIA2(opaque);
-+    MOS6522State *ms = MOS6522(s);
-+
-+    addr = (addr >> 9) & 0xf;
-+    return mos6522_read(ms, addr, size);
-+}
-+
-+static void mos6522_q800_via2_write(void *opaque, hwaddr addr, uint64_t val,
-+                                    unsigned size)
-+{
-+    MOS6522Q800VIA2State *s = MOS6522_Q800_VIA2(opaque);
-+    MOS6522State *ms = MOS6522(s);
-+
-+    addr = (addr >> 9) & 0xf;
-+    mos6522_write(ms, addr, val, size);
-+}
-+
-+static const MemoryRegionOps mos6522_q800_via2_ops = {
-+    .read = mos6522_q800_via2_read,
-+    .write = mos6522_q800_via2_write,
-+    .endianness = DEVICE_BIG_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
-+};
-+
-+static void mac_via_reset(DeviceState *dev)
-+{
-+    MacVIAState *m = MAC_VIA(dev);
-+
-+    timer_mod(m->VBL_timer, (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 16630)
-+              / 16630 * 16630);
-+
-+    timer_mod(m->one_second_timer, (qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL)
-+              + 1000) / 1000 * 1000);
-+}
-+
-+static void mac_via_realize(DeviceState *dev, Error **errp)
-+{
-+    MacVIAState *m = MAC_VIA(dev);
-+    MOS6522State *ms;
-+    struct tm tm;
-+
-+    /* Init VIAs 1 and 2 */
-+    sysbus_init_child_obj(OBJECT(dev), "via1", &m->mos6522_via1,
-+                          sizeof(m->mos6522_via1), TYPE_MOS6522_Q800_VIA1);
-+
-+    sysbus_init_child_obj(OBJECT(dev), "via2", &m->mos6522_via2,
-+                          sizeof(m->mos6522_via2), TYPE_MOS6522_Q800_VIA2);
-+
-+    /* Pass through mos6522 output IRQs */
-+    ms = MOS6522(&m->mos6522_via1);
-+    object_property_add_alias(OBJECT(dev), "irq[0]", OBJECT(ms),
-+                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
-+    ms = MOS6522(&m->mos6522_via2);
-+    object_property_add_alias(OBJECT(dev), "irq[1]", OBJECT(ms),
-+                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
-+
-+    /* Pass through mos6522 input IRQs */
-+    qdev_pass_gpios(DEVICE(&m->mos6522_via1), dev, "via1-irq");
-+    qdev_pass_gpios(DEVICE(&m->mos6522_via2), dev, "via2-irq");
-+
-+    /* VIA 1 */
-+    m->one_second_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL, via1_one_second, m);
-+    m->VBL_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, via1_VBL, m);
-+
-+    qemu_get_timedate(&tm, 0);
-+    m->tick_offset = (uint32_t)mktimegm(&tm) + RTC_OFFSET;
-+}
-+
-+static void mac_via_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    MacVIAState *m = MAC_VIA(obj);
-+
-+    /* MMIO */
-+    memory_region_init(&m->mmio, obj, "mac-via", 2 * VIA_SIZE);
-+    sysbus_init_mmio(sbd, &m->mmio);
-+
-+    memory_region_init_io(&m->via1mem, obj, &mos6522_q800_via1_ops,
-+                          &m->mos6522_via1, "via1", VIA_SIZE);
-+    memory_region_add_subregion(&m->mmio, 0x0, &m->via1mem);
-+
-+    memory_region_init_io(&m->via2mem, obj, &mos6522_q800_via2_ops,
-+                          &m->mos6522_via2, "via2", VIA_SIZE);
-+    memory_region_add_subregion(&m->mmio, VIA_SIZE, &m->via2mem);
-+
-+    /* ADB */
-+    qbus_create_inplace((BusState *)&m->adb_bus, sizeof(m->adb_bus),
-+                        TYPE_ADB_BUS, DEVICE(obj), "adb.0");
-+}
-+
-+static void mac_via_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    dc->realize = mac_via_realize;
-+    dc->reset = mac_via_reset;
-+}
-+
-+static TypeInfo mac_via_info = {
-+    .name = TYPE_MAC_VIA,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(MacVIAState),
-+    .instance_init = mac_via_init,
-+    .class_init = mac_via_class_init,
-+};
-+
-+/* VIA 1 */
-+static void mos6522_q800_via1_portB_write(MOS6522State *s)
-+{
-+    MOS6522Q800VIA1State *v1s = container_of(s, MOS6522Q800VIA1State,
-+                                             parent_obj);
-+    MacVIAState *m = container_of(v1s, MacVIAState, mos6522_via1);
-+
-+    via1_rtc_update(m);
-+
-+    v1s->last_b = s->b;
-+}
-+
-+static void mos6522_q800_via1_reset(DeviceState *dev)
-+{
-+    MOS6522State *ms = MOS6522(dev);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(ms);
-+
-+    mdc->parent_reset(dev);
-+
-+    ms->timers[0].frequency = VIA_TIMER_FREQ;
-+    ms->timers[1].frequency = VIA_TIMER_FREQ;
-+
-+    ms->b = VIA1B_vADB_StateMask | VIA1B_vADBInt | VIA1B_vRTCEnb;
-+}
-+
-+static void mos6522_q800_via1_init(Object *obj)
-+{
-+    qdev_init_gpio_in_named(DEVICE(obj), via1_irq_request, "via1-irq",
-+                            VIA1_IRQ_NB);
-+}
-+
-+static void mos6522_q800_via1_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_CLASS(oc);
-+
-+    dc->reset = mos6522_q800_via1_reset;
-+    mdc->portB_write = mos6522_q800_via1_portB_write;
-+}
-+
-+static const TypeInfo mos6522_q800_via1_type_info = {
-+    .name = TYPE_MOS6522_Q800_VIA1,
-+    .parent = TYPE_MOS6522,
-+    .instance_size = sizeof(MOS6522Q800VIA1State),
-+    .instance_init = mos6522_q800_via1_init,
-+    .class_init = mos6522_q800_via1_class_init,
-+};
-+
-+/* VIA 2 */
-+static void mos6522_q800_via2_portB_write(MOS6522State *s)
-+{
-+    if (s->dirb & VIA2B_vPower && (s->b & VIA2B_vPower) == 0) {
-+        /* shutdown */
-+        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
-+    }
-+}
-+
-+static void mos6522_q800_via2_reset(DeviceState *dev)
-+{
-+    MOS6522State *ms = MOS6522(dev);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(ms);
-+
-+    mdc->parent_reset(dev);
-+
-+    ms->timers[0].frequency = VIA_TIMER_FREQ;
-+    ms->timers[1].frequency = VIA_TIMER_FREQ;
-+
-+    ms->dirb = 0;
-+    ms->b = 0;
-+}
-+
-+static void mos6522_q800_via2_init(Object *obj)
-+{
-+    qdev_init_gpio_in_named(DEVICE(obj), via2_irq_request, "via2-irq",
-+                            VIA2_IRQ_NB);
-+}
-+
-+static void mos6522_q800_via2_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_CLASS(oc);
-+
-+    dc->reset = mos6522_q800_via2_reset;
-+    mdc->portB_write = mos6522_q800_via2_portB_write;
-+}
-+
-+static const TypeInfo mos6522_q800_via2_type_info = {
-+    .name = TYPE_MOS6522_Q800_VIA2,
-+    .parent = TYPE_MOS6522,
-+    .instance_size = sizeof(MOS6522Q800VIA2State),
-+    .instance_init = mos6522_q800_via2_init,
-+    .class_init = mos6522_q800_via2_class_init,
-+};
-+
-+static void mac_via_register_types(void)
-+{
-+    type_register_static(&mos6522_q800_via1_type_info);
-+    type_register_static(&mos6522_q800_via2_type_info);
-+    type_register_static(&mac_via_info);
-+}
-+
-+type_init(mac_via_register_types);
-diff --git a/include/hw/misc/mac_via.h b/include/hw/misc/mac_via.h
-new file mode 100644
-index 0000000000..69bdecabb0
---- /dev/null
-+++ b/include/hw/misc/mac_via.h
-@@ -0,0 +1,107 @@
-+/*
-+ *
-+ * Copyright (c) 2011-2018 Laurent Vivier
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef HW_MISC_MAC_VIA_H
-+#define HW_MISC_MAC_VIA_H
-+
-+#include "exec/memory.h"
-+#include "hw/sysbus.h"
-+#include "hw/misc/mos6522.h"
-+
-+
-+/* VIA 1 */
-+#define VIA1_IRQ_ONE_SECOND_BIT 0
-+#define VIA1_IRQ_VBLANK_BIT     1
-+#define VIA1_IRQ_ADB_READY_BIT  2
-+#define VIA1_IRQ_ADB_DATA_BIT   3
-+#define VIA1_IRQ_ADB_CLOCK_BIT  4
-+
-+#define VIA1_IRQ_NB             8
-+
-+#define VIA1_IRQ_ONE_SECOND (1 << VIA1_IRQ_ONE_SECOND_BIT)
-+#define VIA1_IRQ_VBLANK     (1 << VIA1_IRQ_VBLANK_BIT)
-+#define VIA1_IRQ_ADB_READY  (1 << VIA1_IRQ_ADB_READY_BIT)
-+#define VIA1_IRQ_ADB_DATA   (1 << VIA1_IRQ_ADB_DATA_BIT)
-+#define VIA1_IRQ_ADB_CLOCK  (1 << VIA1_IRQ_ADB_CLOCK_BIT)
-+
-+
-+#define TYPE_MOS6522_Q800_VIA1 "mos6522-q800-via1"
-+#define MOS6522_Q800_VIA1(obj)  OBJECT_CHECK(MOS6522Q800VIA1State, (obj), \
-+                                    TYPE_MOS6522_Q800_VIA1)
-+
-+typedef struct MOS6522Q800VIA1State {
-+    /*< private >*/
-+    MOS6522State parent_obj;
-+
-+    qemu_irq irqs[VIA1_IRQ_NB];
-+    uint8_t last_b;
-+    uint8_t PRAM[256];
-+} MOS6522Q800VIA1State;
-+
-+
-+/* VIA 2 */
-+#define VIA2_IRQ_SCSI_DATA_BIT  0
-+#define VIA2_IRQ_SLOT_BIT       1
-+#define VIA2_IRQ_UNUSED_BIT     2
-+#define VIA2_IRQ_SCSI_BIT       3
-+#define VIA2_IRQ_ASC_BIT        4
-+
-+#define VIA2_IRQ_NB             8
-+
-+#define VIA2_IRQ_SCSI_DATA  (1 << VIA2_IRQ_SCSI_DATA_BIT)
-+#define VIA2_IRQ_SLOT       (1 << VIA2_IRQ_SLOT_BIT)
-+#define VIA2_IRQ_UNUSED     (1 << VIA2_IRQ_SCSI_BIT)
-+#define VIA2_IRQ_SCSI       (1 << VIA2_IRQ_UNUSED_BIT)
-+#define VIA2_IRQ_ASC        (1 << VIA2_IRQ_ASC_BIT)
-+
-+#define TYPE_MOS6522_Q800_VIA2 "mos6522-q800-via2"
-+#define MOS6522_Q800_VIA2(obj)  OBJECT_CHECK(MOS6522Q800VIA2State, (obj), \
-+                                    TYPE_MOS6522_Q800_VIA2)
-+
-+typedef struct MOS6522Q800VIA2State {
-+    /*< private >*/
-+    MOS6522State parent_obj;
-+} MOS6522Q800VIA2State;
-+
-+
-+#define TYPE_MAC_VIA "mac_via"
-+#define MAC_VIA(obj)   OBJECT_CHECK(MacVIAState, (obj), TYPE_MAC_VIA)
-+
-+typedef struct MacVIAState {
-+    SysBusDevice busdev;
-+
-+    /* MMIO */
-+    MemoryRegion mmio;
-+    MemoryRegion via1mem;
-+    MemoryRegion via2mem;
-+
-+    /* VIAs */
-+    MOS6522Q800VIA1State mos6522_via1;
-+    MOS6522Q800VIA2State mos6522_via2;
-+
-+    /* RTC */
-+    uint32_t tick_offset;
-+
-+    uint8_t data_out;
-+    int data_out_cnt;
-+    uint8_t data_in;
-+    uint8_t data_in_cnt;
-+    uint8_t cmd;
-+    int wprotect;
-+    int alt;
-+
-+    /* ADB */
-+    ADBBusState adb_bus;
-+
-+    /* external timers */
-+    QEMUTimer *one_second_timer;
-+    QEMUTimer *VBL_timer;
-+
-+} MacVIAState;
-+
-+#endif
--- 
-2.21.0
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYxOTIyMTkzMy4xOTgx
+LTEtbGF1cmVudEB2aXZpZXIuZXUvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
+b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
+cm1hdGlvbjoKClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjggMDAvMTBdIGh3L202OGs6
+IGFkZCBBcHBsZSBNYWNoaW50b3NoIFF1YWRyYSA4MDAgbWFjaGluZQpUeXBlOiBzZXJpZXMKTWVz
+c2FnZS1pZDogMjAxOTA2MTkyMjE5MzMuMTk4MS0xLWxhdXJlbnRAdml2aWVyLmV1Cgo9PT0gVEVT
+VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYv
+bnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
+Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+YWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJh
+c2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0
+Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE5
+MDYxOTIyMTkzMy4xOTgxLTEtbGF1cmVudEB2aXZpZXIuZXUgLT4gcGF0Y2hldy8yMDE5MDYxOTIy
+MTkzMy4xOTgxLTEtbGF1cmVudEB2aXZpZXIuZXUKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
+ZXN0JwpkODdmYjQyNDlmIGh3L202OGs6IGRlZmluZSBNYWNpbnRvc2ggUXVhZHJhIDgwMAo2NWY3
+OTU0NWEwIGh3L202OGs6IGFkZCBhIGR1bW15IFNXSU0gZmxvcHB5IGNvbnRyb2xsZXIKN2M2NTZk
+MDcyMiBody9tNjhrOiBhZGQgTnVidXMgc3VwcG9ydCBmb3IgbWFjZmIgdmlkZW8gY2FyZApiZTdi
+MjYwN2U4IGh3L202OGs6IGFkZCBOdWJ1cyBzdXBwb3J0CjU1YjVkNmM0NTEgaHcvbTY4azogYWRk
+IG1hY2ZiIHZpZGVvIGNhcmQKODE5NDExOWI5YyBody9tNjhrOiBpbXBsZW1lbnQgQURCIGJ1cyBz
+dXBwb3J0IGZvciB2aWEKOWYzNWVhYmNkZiBody9tNjhrOiBhZGQgdmlhIHN1cHBvcnQKOTk2ZmE2
+ZjVmMSBkcDgzOTN4OiBtYW5hZ2UgYmlnIGVuZGlhbiBidXMKMWMyYTcyMmYzMSBlc3A6IGFkZCBw
+c2V1ZG8tRE1BIGFzIHVzZWQgYnkgTWFjaW50b3NoCjBiYmZiODRlNjIgZXNjYzogaW50cm9kdWNl
+IGEgc2VsZWN0b3IgZm9yIHRoZSByZWdpc3RlciBiaXQKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEv
+MTAgQ2hlY2tpbmcgY29tbWl0IDBiYmZiODRlNjI1YyAoZXNjYzogaW50cm9kdWNlIGEgc2VsZWN0
+b3IgZm9yIHRoZSByZWdpc3RlciBiaXQpCjIvMTAgQ2hlY2tpbmcgY29tbWl0IDFjMmE3MjJmMzE0
+ZiAoZXNwOiBhZGQgcHNldWRvLURNQSBhcyB1c2VkIGJ5IE1hY2ludG9zaCkKMy8xMCBDaGVja2lu
+ZyBjb21taXQgOTk2ZmE2ZjVmMTE3IChkcDgzOTN4OiBtYW5hZ2UgYmlnIGVuZGlhbiBidXMpCjQv
+MTAgQ2hlY2tpbmcgY29tbWl0IDlmMzVlYWJjZGY5YSAoaHcvbTY4azogYWRkIHZpYSBzdXBwb3J0
+KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlO
+RVJTIG5lZWQgdXBkYXRpbmc/CiMzOTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpXQVJOSU5HOiBC
+bG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojOTI6IEZJ
+TEU6IGh3L21pc2MvbWFjX3ZpYS5jOjQ5OgorI2RlZmluZSBWSUExQV92U2NjV3JSZXEgMHg4MCAg
+IC8qIFNDQyB3cml0ZS4gKGlucHV0KQoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVh
+ZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzk5OiBGSUxFOiBody9taXNjL21hY192aWEuYzo1
+NjoKKyNkZWZpbmUgVklBMUFfdlJldjggICAgIDB4NDAgICAvKiBSZXZpc2lvbiA4IGJvYXJkID8/
+PwoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRl
+IGxpbmUKIzEwOTogRklMRTogaHcvbWlzYy9tYWNfdmlhLmM6NjY6CisjZGVmaW5lIFZJQTFBX3ZI
+ZWFkU2VsICAweDIwICAgLyogSGVhZCBzZWxlY3QgZm9yIElXTS4KCldBUk5JTkc6IEJsb2NrIGNv
+bW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMxMTQ6IEZJTEU6IGh3
+L21pc2MvbWFjX3ZpYS5jOjcxOgorI2RlZmluZSBWSUExQV92T3ZlcmxheSAgMHgxMCAgIC8qIFtN
+YWNpbnRvc2ggRmFtaWx5XSBPbiBTRS8zMCxJSSxJSXgsSUljeAoKV0FSTklORzogQmxvY2sgY29t
+bWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzEyODogRklMRTogaHcv
+bWlzYy9tYWNfdmlhLmM6ODU6CisjZGVmaW5lIFZJQTFBX3ZTeW5jICAgICAweDA4ICAgLyogW0NI
+UlBdIFN5bmMgTW9kZW06IG1vZGVtIGNsb2NrIHNlbGVjdDoKCldBUk5JTkc6IEJsb2NrIGNvbW1l
+bnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMxMzY6IEZJTEU6IGh3L21p
+c2MvbWFjX3ZpYS5jOjkzOgorLyogTWFjaW50b3NoIEZhbWlseSBIYXJkd2FyZSBzZXo6IGJpdHMg
+MC0yIG9mIFZJQTFBIGFyZSB2b2x1bWUgY29udHJvbAoKV0FSTklORzogQmxvY2sgY29tbWVudHMg
+dXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzE1MTogRklMRTogaHcvbWlzYy9t
+YWNfdmlhLmM6MTA4OgorLyogSW5mbyBvbiBWSUExQiBpcyBmcm9tIE1hY2ludG9zaCBGYW1pbHkg
+SGFyZHdhcmUgJiBNa0xpbnV4LgoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgdHJhaWxp
+bmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiMxNTI6IEZJTEU6IGh3L21pc2MvbWFjX3ZpYS5jOjEw
+OToKKyAqIENIUlAgb2ZmZXJzIG5vIGluZm8uICovCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1
+c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMTUzOiBGSUxFOiBody9taXNjL21h
+Y192aWEuYzoxMTA6CisjZGVmaW5lIFZJQTFCX3ZTb3VuZCAgIDB4ODAgICAgLyogU291bmQgZW5h
+YmxlIChmb3IgY29tcGF0aWJpbGl0eSB3aXRoCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2Ug
+YSB0cmFpbGluZyAqLyBvbiBhIHNlcGFyYXRlIGxpbmUKIzE1NjogRklMRTogaHcvbWlzYy9tYWNf
+dmlhLmM6MTEzOgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAqIDA9ZXJyb3IsIDE9
+T0suICovCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2Vw
+YXJhdGUgbGluZQojMTU3OiBGSUxFOiBody9taXNjL21hY192aWEuYzoxMTQ6CisjZGVmaW5lIFZJ
+QTFCX3ZNeXN0ZXJ5IDB4NDAgICAgLyogT24gSUljaSwgcGFyaXR5IGVuYWJsZS4gMD1lbmFibGVk
+LDE9ZGlzYWJsZWQKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIHRyYWlsaW5nICovIG9u
+IGEgc2VwYXJhdGUgbGluZQojMTYwOiBGSUxFOiBody9taXNjL21hY192aWEuYzoxMTc6CisgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICogYXMgYSBzbG90ICRFIGludGVycnVwdC4gKi8K
+CldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBs
+aW5lCiMxODc6IEZJTEU6IGh3L21pc2MvbWFjX3ZpYS5jOjE0NDoKKy8qIFJBTSBzaXplIGJpdHMg
+ZGVjb2RlZCBhcyBmb2xsb3dzOgoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGlu
+ZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzE5OTogRklMRTogaHcvbWlzYy9tYWNfdmlhLmM6MTU2
+OgorI2RlZmluZSBWSUEyQl92VkJMICAgIDB4ODAgICAgLyogVkJMIG91dHB1dCB0byBWSUExICg2
+MC4xNUh6KSBkcml2ZW4gYnkKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIHRyYWlsaW5n
+ICovIG9uIGEgc2VwYXJhdGUgbGluZQojMjAyOiBGSUxFOiBody9taXNjL21hY192aWEuYzoxNTk6
+CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgKiBbTWtMaW51eF0gUkJWX1BBUk9ERDog
+MT1vZGQsMD1ldmVuLiAqLwoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAv
+KiBvbiBhIHNlcGFyYXRlIGxpbmUKIzIwMzogRklMRTogaHcvbWlzYy9tYWNfdmlhLmM6MTYwOgor
+I2RlZmluZSBWSUEyQl92U25kSmNrIDB4NDAgICAgLyogRXh0ZXJuYWwgc291bmQgamFjayBzdGF0
+dXMuCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSB0cmFpbGluZyAqLyBvbiBhIHNlcGFy
+YXRlIGxpbmUKIzIwNDogRklMRTogaHcvbWlzYy9tYWNfdmlhLmM6MTYxOgorICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICogMD1wbHVnIGlzIGluc2VydGVkLiAgT24gU0UvMzAsIGFsd2F5
+cyAwICovCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2Vw
+YXJhdGUgbGluZQojMjA3OiBGSUxFOiBody9taXNjL21hY192aWEuYzoxNjQ6CisjZGVmaW5lIFZJ
+QTJCX3ZNb2RlMzIgMHgwOCAgICAvKiAyNC8zMmJpdCBzd2l0Y2ggLSBkb3VibGVzIGFzIGNhY2hl
+IGZsdXNoCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2Vw
+YXJhdGUgbGluZQojMjE1OiBGSUxFOiBody9taXNjL21hY192aWEuYzoxNzI6CisjZGVmaW5lIFZJ
+QTJCX3ZQb3dlciAgMHgwNCAgIC8qIFBvd2VyIG9mZiwgMD1zaHV0IG9mZiBwb3dlci4KCldBUk5J
+Tkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMy
+MTg6IEZJTEU6IGh3L21pc2MvbWFjX3ZpYS5jOjE3NToKKyNkZWZpbmUgVklBMkJfdkJ1c0xrICAw
+eDAyICAgLyogTG9jayBOdUJ1cyB0cmFuc2FjdGlvbnMsIDA9bG9ja2VkLgoKV0FSTklORzogQmxv
+Y2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzIyMTogRklM
+RTogaHcvbWlzYy9tYWNfdmlhLmM6MTc4OgorI2RlZmluZSBWSUEyQl92Q0RpcyAgIDB4MDEgICAv
+KiBDYWNoZSBjb250cm9sLiBPbiBJSWNpLCAxPWRpc2FibGUgY2FjaGUgY2FyZAoKV0FSTklORzog
+QmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzIzNTog
+RklMRTogaHcvbWlzYy9tYWNfdmlhLmM6MTkyOgorLyogQXBwbGUgc2V6OiBodHRwOi8vZGV2ZWxv
+cGVyLmFwcGxlLmNvbS90ZWNobm90ZXMvb3Yvb3ZfMDQuaHRtbAoKV0FSTklORzogQmxvY2sgY29t
+bWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzI2NDogRklMRTogaHcv
+bWlzYy9tYWNfdmlhLmM6MjIxOgorICAgICAgICAgICAgICAgICAgICAgICAgIC8qICAgICAgICAg
+ICAgQ0hSUCBzZXogbmV2ZXIgZXZlciB0byAqd3JpdGUqIHRoaXMuCgpXQVJOSU5HOiBCbG9jayBj
+b21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMjgwOiBGSUxFOiBo
+dy9taXNjL21hY192aWEuYzoyMzc6CisvKiBBcHBsZSBNYWNpbnRvc2ggRmFtaWx5IEhhcmR3YXJl
+IFJlZmVuZWNlCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBhZnRlciB0aGF0ICcmJicgKGN0eDpX
+eFcpCiMzNjI6IEZJTEU6IGh3L21pc2MvbWFjX3ZpYS5jOjMxOToKKyAgICAgICAgaWYgKCEodjFz
+LT5sYXN0X2IgJiBWSUExQl92UlRDQ2xrKSAmJiAocy0+YiAmIFZJQTFCX3ZSVENDbGspKSB7CiAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJy
+b3JzLCAyNSB3YXJuaW5ncywgNzg5IGxpbmVzIGNoZWNrZWQKClBhdGNoIDQvMTAgaGFzIHN0eWxl
+IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
+c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
+SCBpbiBNQUlOVEFJTkVSUy4KCjUvMTAgQ2hlY2tpbmcgY29tbWl0IDgxOTQxMTliOWMxYyAoaHcv
+bTY4azogaW1wbGVtZW50IEFEQiBidXMgc3VwcG9ydCBmb3IgdmlhKQo2LzEwIENoZWNraW5nIGNv
+bW1pdCA1NWI1ZDZjNDUxY2QgKGh3L202OGs6IGFkZCBtYWNmYiB2aWRlbyBjYXJkKQpXQVJOSU5H
+OiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQg
+dXBkYXRpbmc/CiM1MzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEg
+d2FybmluZ3MsIDUwMiBsaW5lcyBjaGVja2VkCgpQYXRjaCA2LzEwIGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCjcvMTAgQ2hlY2tpbmcgY29tbWl0IGJlN2IyNjA3ZThhMiAoaHcvbTY4azogYWRk
+IE51YnVzIHN1cHBvcnQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
+IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM4OiAKbmV3IGZpbGUgbW9kZSAxMDA2
+NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNTE4IGxpbmVzIGNoZWNrZWQKClBhdGNo
+IDcvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOC8xMCBDaGVja2luZyBjb21taXQgN2M2
+NTZkMDcyMmJkIChody9tNjhrOiBhZGQgTnVidXMgc3VwcG9ydCBmb3IgbWFjZmIgdmlkZW8gY2Fy
+ZCkKOS8xMCBDaGVja2luZyBjb21taXQgNjVmNzk1NDVhMGY5IChody9tNjhrOiBhZGQgYSBkdW1t
+eSBTV0lNIGZsb3BweSBjb250cm9sbGVyKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRl
+ZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzNzogCm5ldyBmaWxl
+IG1vZGUgMTAwNjQ0CgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9u
+IGEgc2VwYXJhdGUgbGluZQojMjMzOiBGSUxFOiBody9ibG9jay9zd2ltLmM6MTkyOgorICAgIC8q
+IHJlcnJvci93ZXJyb3IgYXJlbid0IHN1cHBvcnRlZCBieSBmZGMgYW5kIHRoZXJlZm9yZSBub3Qg
+ZXZlbiByZWdpc3RlcmVkCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSB0cmFpbGluZyAq
+LyBvbiBhIHNlcGFyYXRlIGxpbmUKIzIzNTogRklMRTogaHcvYmxvY2svc3dpbS5jOjE5NDoKKyAg
+ICAgKiBibGtjb25mX2FwcGx5X2JhY2tlbmRfb3B0aW9ucygpLiAqLwoKV0FSTklORzogQmxvY2sg
+Y29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzI0NTogRklMRTog
+aHcvYmxvY2svc3dpbS5jOjIwNDoKKyAgICAvKiAnZW5vc3BjJyBpcyB0aGUgZGVmYXVsdCBmb3Ig
+LWRyaXZlLCAncmVwb3J0JyBpcyB3aGF0IGJsa19uZXcoKSBnaXZlcyB1cwoKV0FSTklORzogQmxv
+Y2sgY29tbWVudHMgdXNlIGEgdHJhaWxpbmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiMyNDY6IEZJ
+TEU6IGh3L2Jsb2NrL3N3aW0uYzoyMDU6CisgICAgICogZm9yIGVtcHR5IGRyaXZlcy4gKi8KCnRv
+dGFsOiAwIGVycm9ycywgNSB3YXJuaW5ncywgNTA0IGxpbmVzIGNoZWNrZWQKClBhdGNoIDkvMTAg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTAvMTAgQ2hlY2tpbmcgY29tbWl0IGQ4N2ZiNDI0
+OWY1ZSAoaHcvbTY4azogZGVmaW5lIE1hY2ludG9zaCBRdWFkcmEgODAwKQpXQVJOSU5HOiBhZGRl
+ZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRp
+bmc/CiM5NTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1
+c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMjg5OiBGSUxFOiBody9tNjhrL3E4
+MDAuYzo3MDoKKy8qIHRoZSB2aWRlbyBiYXNlLCB3aGVyZWFzIGl0IGEgTnVidXMgYWRkcmVzcywK
+CldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBs
+aW5lCiM0MDk6IEZJTEU6IGh3L202OGsvcTgwMC5jOjE5MDoKKyAgICAvKiBNYWNTb25pYyBkcml2
+ZXIgbmVlZHMgYW4gQXBwbGUgTUFDIGFkZHJlc3MKCnRvdGFsOiAwIGVycm9ycywgMyB3YXJuaW5n
+cywgNTMzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDEwLzEwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
+ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
+UlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
+CgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIw
+MTkwNjE5MjIxOTMzLjE5ODEtMS1sYXVyZW50QHZpdmllci5ldS90ZXN0aW5nLmNoZWNrcGF0Y2gv
+P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
+ZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
+YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
 
