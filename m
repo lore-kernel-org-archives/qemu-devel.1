@@ -2,56 +2,53 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7E25C31E49
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 14:23:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD05EC31E49
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 14:24:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A053A214AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 14:23:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A053A214AF
+	by mail.kernel.org (Postfix) with ESMTPS id 821162166E
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 14:24:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 821162166E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38824 helo=lists.gnu.org)
+Received: from localhost ([::1]:38836 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdbV6-0000BC-UE
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 10:23:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54968)
+	id 1hdbVy-000276-Ox
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 10:24:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54845)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hdbPY-0004rr-Sl
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 10:18:05 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hdbP4-0004cU-Bt
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 10:17:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hdbPX-000195-P1
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 10:18:04 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:50672 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hdbP3-0000d4-9W
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 10:17:34 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:49413 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hdbPX-0000rn-IA
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 10:18:03 -0400
+ id 1hdbP2-0000at-FU
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 10:17:32 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 96D541A2255;
- Wed, 19 Jun 2019 16:17:50 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTP id 1B5EA1A416E;
+ Wed, 19 Jun 2019 16:17:29 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 7D2F51A1FB1;
- Wed, 19 Jun 2019 16:17:50 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 005A91A2274;
+ Wed, 19 Jun 2019 16:17:28 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 19 Jun 2019 16:17:14 +0200
-Message-Id: <1560953834-29584-6-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed, 19 Jun 2019 16:17:09 +0200
+Message-Id: <1560953834-29584-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1560953834-29584-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1560953834-29584-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v12 5/5] linux-user: Fix flock structure for
- MIPS O64 ABI
+Subject: [Qemu-devel] [PATCH v12 0/5]
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,47 +67,98 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Only MIPS O32 and N32 have special (different than other
-architectures) definition of structure flock in kernel.
+This is a collection of misc patches for Linux user that I recently
+accumulated from variuous sources. All of them originate from problems
+observed on mips target. However, most of these changes actually
+affect and fix linux-user problems on multiple targets.
 
-Bring flock definition for MIPS O64 ABI to the correct state.
+There are three checkpatch warninhs and two checkpatch errors that
+sould be ignored in the given circumstances.
 
-Reported-by: Dragan Mladjenovic <dmladjenovic@wavecomp.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- linux-user/generic/fcntl.h     | 2 +-
- linux-user/mips/target_fcntl.h | 4 ++++
- 2 files changed, 5 insertions(+), 1 deletion(-)
+v11->v12:
 
-diff --git a/linux-user/generic/fcntl.h b/linux-user/generic/fcntl.h
-index a775a49..1b48dde 100644
---- a/linux-user/generic/fcntl.h
-+++ b/linux-user/generic/fcntl.h
-@@ -129,7 +129,7 @@ struct target_flock {
-     short l_whence;
-     abi_long l_start;
-     abi_long l_len;
--#if defined(TARGET_MIPS)
-+#if defined(TARGET_MIPS) && (TARGET_ABI_BITS == 32)
-     abi_long l_sysid;
- #endif
-     int l_pid;
-diff --git a/linux-user/mips/target_fcntl.h b/linux-user/mips/target_fcntl.h
-index 000527c..795bba7 100644
---- a/linux-user/mips/target_fcntl.h
-+++ b/linux-user/mips/target_fcntl.h
-@@ -27,7 +27,11 @@
- #define TARGET_F_SETOWN        24       /*  for sockets. */
- #define TARGET_F_GETOWN        23       /*  for sockets. */
+  - used the preffered Laurent's email address for linux-user
+  - added a note on checkpetch warnings and errors in the commit letter
  
-+#if (TARGET_ABI_BITS == 32)
- #define TARGET_ARCH_FLOCK_PAD abi_long pad[4];
-+#else
-+#define TARGET_ARCH_FLOCK_PAD
-+#endif
- #define TARGET_ARCH_FLOCK64_PAD
- 
- #define TARGET_F_GETLK64       33      /*  using 'struct flock64' */
+
+v10->v11:
+
+  - patch on <ADD|DROP>_MEMEBERSHIP basically reverted to its first
+    version
+  - corrected patch on statx()
+  - added patch on strace support for statx()
+  - added patch on fixing flock structure for MIPS O64 ABI
+
+v9->v10:
+
+  - improved commit messages for patches 2 and 3
+
+v8->v9:
+
+  - fixed build error on some systems related to SOL_ALG
+
+v7->v8:
+
+  - added a patch on setsockopt() option SOL_ALG
+
+v6->v7:
+
+  - fixed a build error for older kernels related to the patch on
+    setsockopt() options
+  - removed four patches that on the meantime got accepted into the
+    main source tree
+
+v5->v6:
+
+  - fixed a mistake in patch #4
+  - improved commit messages in patches #4 and #6
+
+v4->v5:
+
+  - added the patch on statx() support
+  - improved the patch on IPV6_<ADD|DROP>_MEMBERSHIP to take into
+    account the possibility of different names for a field
+  - minor corrections in commit messages
+
+v3->v4:
+
+  - improved commit messages (fixed some typos, improved relevance)
+
+v2->v3:
+
+  - updated and improved commit messages
+  - added IPV6_DROP_MEMBERSHIP support to the patch on setsockopt()'s
+    option
+
+v1->v2:
+
+  - added the patch on setsockopt()'s option IPV6_ADD_MEMBERSHIP
+  - improved the commit messages
+
+Aleksandar Markovic (1):
+  linux-user: Fix flock structure for MIPS O64 ABI
+
+Aleksandar Rikalo (1):
+  linux-user: Add support for translation of statx() syscall
+
+Jim Wilson (1):
+  linux-user: Add support for strace for statx() syscall
+
+Neng Chen (1):
+  linux-user: Add support for setsockopt() options
+    IPV6_<ADD|DROP>_MEMBERSHIP
+
+Yunqiang Su (1):
+  linux-user: Add support for setsockopt() option SOL_ALG
+
+ linux-user/generic/fcntl.h     |   2 +-
+ linux-user/mips/target_fcntl.h |   4 +
+ linux-user/strace.c            |  86 +++++++++++++++++++
+ linux-user/strace.list         |   3 +
+ linux-user/syscall.c           | 186 ++++++++++++++++++++++++++++++++++++++++-
+ linux-user/syscall_defs.h      |  37 ++++++++
+ 6 files changed, 316 insertions(+), 2 deletions(-)
+
 -- 
 2.7.4
 
