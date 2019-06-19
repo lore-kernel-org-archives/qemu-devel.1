@@ -2,61 +2,107 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E5D2C31E49
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 11:57:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 413E3C31E49
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 12:13:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D8DD20665
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 11:57:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 08E272084A
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 12:13:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="MQYB3tTf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D8DD20665
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=wavesemi.onmicrosoft.com header.i=@wavesemi.onmicrosoft.com header.b="TtpUoAvX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08E272084A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37146 helo=lists.gnu.org)
+Received: from localhost ([::1]:37708 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdZDQ-0005Kg-Ix
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 07:57:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47278)
+	id 1hdZT2-000362-Js
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 08:13:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50898)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hdZCq-0004vk-Qo
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 07:56:49 -0400
+ (envelope-from <arikalo@wavecomp.com>) id 1hdZS0-0002h8-RO
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 08:12:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hdZCp-0000BZ-Ln
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 07:56:48 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:46535 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hdZCn-00007z-9J; Wed, 19 Jun 2019 07:56:47 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 45TNhk6JTxz9sN6; Wed, 19 Jun 2019 21:56:38 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1560945398;
- bh=v/GtsvSdmwRg41OkslfVPSiDPLYnM7AB+nC1XtQOlso=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=MQYB3tTf3F68LpLAEWNUGFuewFHbvZVxQ1Q/oZ5d9neNTq3CfO4K8bFxKh1VmORYB
- kjf0Us43UtoK8/o8YJHVZaANfdRomuOmjdRpGpHHJsAx1KI9mg7X6T3MdcB9PJWELA
- 8fK+MDz4NvMzS5+s3ntnhsUFq+0yKpx1LvHmtU0g=
-Date: Wed, 19 Jun 2019 21:13:51 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Message-ID: <20190619111350.GE22560@umbus.BigPond>
-References: <156051052402.224162.13664250996245267046.stgit@bahia.lan>
+ (envelope-from <arikalo@wavecomp.com>) id 1hdZRz-0004QJ-Oq
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 08:12:28 -0400
+Received: from mail-eopbgr690131.outbound.protection.outlook.com
+ ([40.107.69.131]:13575 helo=NAM04-CO1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <arikalo@wavecomp.com>)
+ id 1hdZRz-0004Ox-EL
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 08:12:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=wavesemi.onmicrosoft.com; s=selector1-wavesemi-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ikMTAgcUR5BCdHPG52EEiZ5TXBjuI1ilqSKmq7xIGj4=;
+ b=TtpUoAvXvyMU1gg6/PPpWSMZLBRG3/fvp8RQ1TMR9jRlW/ehcsaGy4CcbRB+wy2lUJpymel1C+NtZ65pP/Fsp77bWtolDlQ9ZwiPh/QD2oFguMsW9Q6cgoVSFXQnMGnoC1NadVLv8IHc5ZpuA9MiIrQyg28wHz2rCEdcQKpCkoQ=
+Received: from DM5PR22MB1658.namprd22.prod.outlook.com (10.164.152.163) by
+ DM5PR22MB0396.namprd22.prod.outlook.com (10.173.176.14) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1987.10; Wed, 19 Jun 2019 12:12:22 +0000
+Received: from DM5PR22MB1658.namprd22.prod.outlook.com
+ ([fe80::3579:1b6c:1f31:c6b9]) by DM5PR22MB1658.namprd22.prod.outlook.com
+ ([fe80::3579:1b6c:1f31:c6b9%7]) with mapi id 15.20.1987.014; Wed, 19 Jun 2019
+ 12:12:22 +0000
+From: Aleksandar Rikalo <arikalo@wavecomp.com>
+To: Laurent Vivier <laurent@vivier.eu>, Aleksandar Markovic
+ <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Thread-Topic: [Qemu-devel] [PATCH v10 3/3] linux-user: Add support for statx()
+ syscall
+Thread-Index: AQHVHRzKTQuNOQL9ykewDMeZY8PrY6aZcC+AgAmFrv8=
+Date: Wed, 19 Jun 2019 12:12:22 +0000
+Message-ID: <DM5PR22MB1658725207C159300EEC786AD2E50@DM5PR22MB1658.namprd22.prod.outlook.com>
+References: <1559903719-7162-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1559903719-7162-4-git-send-email-aleksandar.markovic@rt-rk.com>,
+ <6ceaa114-887b-b060-17b2-7d801e9f266b@vivier.eu>
+In-Reply-To: <6ceaa114-887b-b060-17b2-7d801e9f266b@vivier.eu>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=arikalo@wavecomp.com; 
+x-originating-ip: [82.117.201.26]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 86afc600-1f65-4dc6-e2d7-08d6f4af6241
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:DM5PR22MB0396; 
+x-ms-traffictypediagnostic: DM5PR22MB0396:
+x-microsoft-antispam-prvs: <DM5PR22MB03960DC948D5676F7CB6CBD2D2E50@DM5PR22MB0396.namprd22.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 0073BFEF03
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(39850400004)(396003)(136003)(346002)(366004)(376002)(199004)(189003)(6116002)(3846002)(66946007)(91956017)(76116006)(73956011)(486006)(66066001)(66556008)(66476007)(64756008)(66446008)(14454004)(81166006)(81156014)(476003)(68736007)(8676002)(446003)(8936002)(74316002)(7736002)(11346002)(86362001)(2906002)(186003)(26005)(7696005)(53936002)(6436002)(19627405001)(25786009)(5660300002)(71190400001)(6606003)(55236004)(71200400001)(6506007)(102836004)(2501003)(256004)(4326008)(478600001)(316002)(110136005)(54906003)(55016002)(99286004)(54896002)(9686003)(76176011)(6246003)(107886003)(52536014)(33656002)(229853002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DM5PR22MB0396;
+ H:DM5PR22MB1658.namprd22.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: wavecomp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: ZLIL1+ESxyj0w0uDIfFUYIacOX8boS7Kfz0AHW5nA7VyUhO69tjksOeoT2Lq8i3qn+tYWioG5zRcNfjolKbrlP2yE0iJRrBBPew5a2rRE7TdNsdaeTAaFVSmc1HjBQdC6x4TytzlALlfmzRFT/YeK7pX2yWFIMFPt8mdjWSabYUCk7FAxArJSq+JSyguVntFij79uIhRkmwqSjC6j63t2WHqjsS6SuzQORk8czuFXgQvyubm0U6uzRzjDWgw0bF6X0UHj2t7EIh6Q1pE3SYECe7TCKdP0FWwz2s3LRktbR11a1+RKqjoGoTtVrfXtiWL9n5qNahT30tyxIsi1mECt/bZz0BIc5XZ2Dq+JlaP2GKiGRe9mBwAe72CpviXYIAXUWwaP6/6v2qR0f4pEExRcygd4rdIIGIiSmpkKc3Vy3Y=
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="ZInfyf7laFu/Kiw7"
-Content-Disposition: inline
-In-Reply-To: <156051052402.224162.13664250996245267046.stgit@bahia.lan>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [PATCH 0/7] ppc: Get rid of some CONFIG_KVM guards
+X-OriginatorOrg: wavecomp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 86afc600-1f65-4dc6-e2d7-08d6f4af6241
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Jun 2019 12:12:22.3453 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: arikalo@wavecomp.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR22MB0396
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.69.131
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH v10 3/3] linux-user: Add support for
+ statx() syscall
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,59 +114,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: "lvivier@redhat.com" <lvivier@redhat.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Laurent,
 
---ZInfyf7laFu/Kiw7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> s/arhitecture/architecture/
 
-On Fri, Jun 14, 2019 at 01:08:44PM +0200, Greg Kurz wrote:
-> There are several places where CONFIG_KVM is used to guard code that
-> should only be built when KVM is supported. It is generally preferable
-> to avoid that and leave such guards in header files for improved
-> readability.
->=20
-> In many cases, the execution of the code is also conditionned by
-> kvm_enabled() which expands to (0) when CONFIG_KVM is not defined.
-> This is likely to cause the compiler to optimize the code out,
-> and if it doesn't, the right way to address compiling issues is
-> to add stubs.
->=20
-> Successfuly compile tested on x86_64 and ppc64le linux. Travis shows
-> this builds fine on OSX as well.
+Done.
 
-1..5 applied.  Still need to look at 6..7 more closely.
+> You should define sys_statx() using _syscall5() macro and use it.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Done.
 
---ZInfyf7laFu/Kiw7
-Content-Type: application/pgp-signature; name="signature.asc"
+> ret !=3D -TARGET_ENOSYS
 
------BEGIN PGP SIGNATURE-----
+Done.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0KGO4ACgkQbDjKyiDZ
-s5JWeRAAhzZp8WOoDL4JXoY6B6VP7nLsrz5CFXUDE/nRQZ6GpRmkGA+jieSgQlzD
-G71Fx4Lg08nD9rXhxE01X5dMGzVLeypbOhKUBc7abBwoanfA+et9G8ysBrbqhOFa
-KwryNA3PJnYLy204mTmSHs/gUPF8Sdu5WMuYQ1cJJ7/AuF1qpNZRkgHa+qgfC58H
-eyxOPOuzMMGSVADRSFyaNu1ZZi7IeFc6+USiXgaNb9xTwo8Iz5GZx5AAYvVphNLb
-oIrsdXiazEY123qkPqwh9xlTXIuvQ4i49jRCm8c358hXqg4lIwpJpQfIRuiqmle1
-oJzExuytzo03ocx3uyOnuc2UbO2qQxHoBp+n8hef6ju9s6YQwTtVPKzoZBarGKeo
-N0T2UBfcoEvbl+NHsbMFyef98ijOZv3ruTZSFGRaojaWZJF2BD1RjOikgOfj7JDB
-8bU9s5x378tS0qyzbVs51g2/UfBMJUcyM1YlqU3tQ37wfU660rxkFi5tXISYPoK8
-CBxxRj4eki3EQMnvc1RPybG0lz/67tDYELOt+F4njYwkyPWPXw5eEppMW5+0N/bR
-cyM1Yg8P4CSQTOtUJKCBoAJA2L/O4Z/BawT3+cekjnlsYwVxTwyme5SMeO7+h4e9
-+WCWW9wiK811O9t/94Ew0Bn0VeNBeGBy0U5fSqZOydDYDJM1XQI=
-=2MSr
------END PGP SIGNATURE-----
+> You already checked above p is not NULL and exited with -TARGET_EFAULT.
 
---ZInfyf7laFu/Kiw7--
+Done.
+
+> BTW, do we really need to emulate the syscall if it is not available?
+>
+> I think the user-space application calling statx() should be ready to
+> receive ENOSYS and define some kinds of fallback (like you do below). So
+> it should not be done by QEMU.
+
+nanoMIPS linux port doesn't support any of "stats" but the statx, so there
+is no fallback in nanoMIPS user-space applications.
+
+I think, we can expect similar situation for any new linux port.
+
+> Why do we divide the case in two parts, fstatat() should work here too.
+
+fstat() uses file descriptor, but here we have string which represents
+file name with absolute path.
+
+All system calls from 'stat' group whose name starts with letter f require
+file descriptor as an argument. Whereas remaining system calls require
+file name / path as string. In that sense, statx() is a hybrid between
+the two, hence the solution I propose.
+
+Aleksandar Rikalo
 
