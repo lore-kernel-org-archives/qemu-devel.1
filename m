@@ -2,91 +2,98 @@ Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C2E0C31E5B
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 16:38:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85ECDC31E5B
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 16:39:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6332B21783
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 16:38:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6332B21783
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 55EC121783
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 16:39:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="kZ7xEsTS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55EC121783
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40410 helo=lists.gnu.org)
+Received: from localhost ([::1]:40420 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hddbQ-0002b8-MK
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 12:38:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35440)
+	id 1hddc1-0003W9-IA
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 12:39:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58953)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hddaf-0001Hq-K8
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 12:37:42 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1hddLy-0002g7-Rn
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 12:22:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hddae-00038Z-FF
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 12:37:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32311)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hddaX-0002zq-88; Wed, 19 Jun 2019 12:37:34 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7A7C730860B8;
- Wed, 19 Jun 2019 16:37:30 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-116-121.ams2.redhat.com
- [10.36.116.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 37C8A5C2E6;
- Wed, 19 Jun 2019 16:37:26 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <20190619144447.215894-1-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <94df77c0-c44a-49c8-ab16-6a637c55088c@redhat.com>
-Date: Wed, 19 Jun 2019 18:37:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <liran.alon@oracle.com>) id 1hddLw-0006qz-CG
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 12:22:30 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:36978)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1hddLw-0006gn-1X
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 12:22:28 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JGDi8a121580;
+ Wed, 19 Jun 2019 16:22:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=corp-2018-07-02;
+ bh=UXe0e1TANKFu82uWO3nVvsP+tdQVKk7/VXjuuh4srmg=;
+ b=kZ7xEsTS2gBeDq867/ec/BhbjZA47VEjsS/bI2qmmtk3ZespQqnQo2Z6Wr5lfTIPuqiU
+ oedXCPeTtRNIdcT+sExgGwHke5O0JijX5wrclssAM8ZsHZxOeJmXVDAZ7ms+xGTJlkv1
+ xL+oTzfhrlni6by7khWTJmIvtxtKfJEjgy07kFxAXakMVOEvaL6pkLf8hvWdQ8aHqqiQ
+ ehU+2hnhgdi6dP2SOxBJVC5BlNyEy0lzY9avemBcoPslQF9Md2ayakzfIFYzlgZ+CDsq
+ viNLoBcEzileNyXBJZ23x7bikuABkMrRZfie1J1n+0UZ7hmyONWGf8nLa/3L44wmDk4y Tw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2130.oracle.com with ESMTP id 2t7809cgec-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 19 Jun 2019 16:22:07 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JGLFLZ060021;
+ Wed, 19 Jun 2019 16:22:07 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by aserp3030.oracle.com with ESMTP id 2t7rdwr2rg-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 19 Jun 2019 16:22:06 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5JGM5xg003070;
+ Wed, 19 Jun 2019 16:22:05 GMT
+Received: from spark.ravello.local (/213.57.127.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Wed, 19 Jun 2019 09:22:04 -0700
+From: Liran Alon <liran.alon@oracle.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 19 Jun 2019 19:21:32 +0300
+Message-Id: <20190619162140.133674-3-liran.alon@oracle.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190619162140.133674-1-liran.alon@oracle.com>
+References: <20190619162140.133674-1-liran.alon@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20190619144447.215894-1-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="Zuon5sJucPR1uhPa8ROYyiWeWu34uX5Yt"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Wed, 19 Jun 2019 16:37:30 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] blockjob: drain all job nodes in
- block_job_drain
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=806
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906190131
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=849 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906190131
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.86
+Subject: [Qemu-devel] [QEMU PATCH v4 02/10] KVM: Introduce
+ kvm_arch_destroy_vcpu()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,116 +105,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, jsnow@redhat.com
+Cc: ehabkost@redhat.com, kvm@vger.kernel.org, maran.wilson@oracle.com,
+ mtosatti@redhat.com, dgilbert@redhat.com, Liran Alon <liran.alon@oracle.com>,
+ pbonzini@redhat.com, rth@twiddle.net, jmattson@google.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Zuon5sJucPR1uhPa8ROYyiWeWu34uX5Yt
-Content-Type: multipart/mixed; boundary="kbzKnNEHy4E2uqOJEdH9EZKpR3t4eXMK3";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com
-Message-ID: <94df77c0-c44a-49c8-ab16-6a637c55088c@redhat.com>
-Subject: Re: [PATCH] blockjob: drain all job nodes in block_job_drain
-References: <20190619144447.215894-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20190619144447.215894-1-vsementsov@virtuozzo.com>
+Simiar to how kvm_init_vcpu() calls kvm_arch_init_vcpu() to perform
+arch-dependent initialisation, introduce kvm_arch_destroy_vcpu()
+to be called from kvm_destroy_vcpu() to perform arch-dependent
+destruction.
 
---kbzKnNEHy4E2uqOJEdH9EZKpR3t4eXMK3
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+This was added because some architectures (Such as i386)
+currently do not free memory that it have allocated in
+kvm_arch_init_vcpu().
 
-On 19.06.19 16:44, Vladimir Sementsov-Ogievskiy wrote:
-> Instead of draining additional nodes in each job code, let's do it in
-> common block_job_drain, draining just all job's children.
->=20
-> It's also a first step to finally get rid of blockjob->blk.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->=20
-> Hi all!
->=20
-> As a follow-up for "block: drop bs->job" recently merged, I'm now tryin=
-g
-> to drop BlockJob.blk pointer, jobs really works with several nodes and
-> now reason to keep special blk for one of the children, and no reason t=
-o
-> handle nodes differently in, for example, backup code..
->=20
-> And as a first step I need to sort out block_job_drain, and here is my
-> suggestion on it.
->=20
->  block/backup.c | 18 +-----------------
->  block/mirror.c | 26 +++-----------------------
->  blockjob.c     |  7 ++++++-
->  3 files changed, 10 insertions(+), 41 deletions(-)
+Suggested-by: Maran Wilson <maran.wilson@oracle.com>
+Reviewed-by: Maran Wilson <maran.wilson@oracle.com>
+Signed-off-by: Liran Alon <liran.alon@oracle.com>
+---
+ accel/kvm/kvm-all.c  |  5 +++++
+ include/sysemu/kvm.h |  1 +
+ target/arm/kvm32.c   |  5 +++++
+ target/arm/kvm64.c   |  5 +++++
+ target/i386/kvm.c    | 12 ++++++++++++
+ target/mips/kvm.c    |  5 +++++
+ target/ppc/kvm.c     |  5 +++++
+ target/s390x/kvm.c   | 10 ++++++++++
+ 8 files changed, 48 insertions(+)
 
-Looks good to me.  Two questions though:
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 524c4ddfbd0f..59a3aa3a40da 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -292,6 +292,11 @@ int kvm_destroy_vcpu(CPUState *cpu)
+ 
+     DPRINTF("kvm_destroy_vcpu\n");
+ 
++    ret = kvm_arch_destroy_vcpu(cpu);
++    if (ret < 0) {
++        goto err;
++    }
++
+     mmap_size = kvm_ioctl(s, KVM_GET_VCPU_MMAP_SIZE, 0);
+     if (mmap_size < 0) {
+         ret = mmap_size;
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index a6d1cd190fed..64f55e519df7 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -371,6 +371,7 @@ int kvm_arch_put_registers(CPUState *cpu, int level);
+ int kvm_arch_init(MachineState *ms, KVMState *s);
+ 
+ int kvm_arch_init_vcpu(CPUState *cpu);
++int kvm_arch_destroy_vcpu(CPUState *cpu);
+ 
+ bool kvm_vcpu_id_is_valid(int vcpu_id);
+ 
+diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
+index 4e54e372a668..51f78f722b18 100644
+--- a/target/arm/kvm32.c
++++ b/target/arm/kvm32.c
+@@ -240,6 +240,11 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     return kvm_arm_init_cpreg_list(cpu);
+ }
+ 
++int kvm_arch_destroy_vcpu(CPUState *cs)
++{
++	return 0;
++}
++
+ typedef struct Reg {
+     uint64_t id;
+     int offset;
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index 998d21f399f4..22d19c9aec6f 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -654,6 +654,11 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     return kvm_arm_init_cpreg_list(cpu);
+ }
+ 
++int kvm_arch_destroy_vcpu(CPUState *cs)
++{
++    return 0;
++}
++
+ bool kvm_arm_reg_syncs_via_cpreg_list(uint64_t regidx)
+ {
+     /* Return true if the regidx is a register we should synchronize
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 7aa7914a498c..efbecfc9d7f0 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1352,6 +1352,18 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     return r;
+ }
+ 
++int kvm_arch_destroy_vcpu(CPUState *cs)
++{
++    X86CPU *cpu = X86_CPU(cs);
++
++    if (cpu->kvm_msr_buf) {
++        g_free(cpu->kvm_msr_buf);
++        cpu->kvm_msr_buf = NULL;
++    }
++
++    return 0;
++}
++
+ void kvm_arch_reset_vcpu(X86CPU *cpu)
+ {
+     CPUX86State *env = &cpu->env;
+diff --git a/target/mips/kvm.c b/target/mips/kvm.c
+index 8e72850962e1..938f8f144b74 100644
+--- a/target/mips/kvm.c
++++ b/target/mips/kvm.c
+@@ -91,6 +91,11 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     return ret;
+ }
+ 
++int kvm_arch_destroy_vcpu(CPUState *cs)
++{
++    return 0;
++}
++
+ void kvm_mips_reset_vcpu(MIPSCPU *cpu)
+ {
+     CPUMIPSState *env = &cpu->env;
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 3bf0a46c3352..1967ccc51791 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -521,6 +521,11 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     return ret;
+ }
+ 
++int kvm_arch_destroy_vcpu(CPUState *cs)
++{
++    return 0;
++}
++
+ static void kvm_sw_tlb_put(PowerPCCPU *cpu)
+ {
+     CPUPPCState *env = &cpu->env;
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index e5e2b691f253..c2747c31649b 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -368,6 +368,16 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     return 0;
+ }
+ 
++int kvm_arch_destroy_vcpu(CPUState *cs)
++{
++    S390CPU *cpu = S390_CPU(cs);
++
++    g_free(cpu->irqstate);
++    cpu->irqstate = NULL;
++
++    return 0;
++}
++
+ void kvm_s390_reset_vcpu(S390CPU *cpu)
+ {
+     CPUState *cs = CPU(cpu);
+-- 
+2.20.1
 
-Would it make sense to remove BlockJobDriver.drain() now?  I think
-everything that isn=E2=80=99t =E2=80=9Cdrain the attached nodes=E2=80=9D =
-should be handled by
-JobDriver.pause(), no?
-
-> diff --git a/blockjob.c b/blockjob.c
-> index 458ae76f51..0cabdc867d 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -94,8 +94,13 @@ void block_job_drain(Job *job)
->      BlockJob *bjob =3D container_of(job, BlockJob, job);
->      const JobDriver *drv =3D job->driver;
->      BlockJobDriver *bjdrv =3D container_of(drv, BlockJobDriver, job_dr=
-iver);
-> +    GSList *l;
-> +
-> +    for (l =3D bjob->nodes; l; l =3D l->next) {
-> +        BdrvChild *c =3D l->data;
-> +        bdrv_drain(c->bs);
-> +    }
-
-Could it be more efficient to bdrv_drained_begin() all nodes in one loop
-and then bdrv_drained_end() them all in a second one?
-
-(Draining a node means draining its parents, and that is quicker if
-they=E2=80=99re drained already.  If the nodes are in a chain, just using=
-
-bdrv_drain() may mean some nodes are drained and undrained a couple of
-times.)
-
-Max
-
-> =20
-> -    blk_drain(bjob->blk);
->      if (bjdrv->drain) {
->          bjdrv->drain(bjob);
->      }
->=20
-
-
-
---kbzKnNEHy4E2uqOJEdH9EZKpR3t4eXMK3--
-
---Zuon5sJucPR1uhPa8ROYyiWeWu34uX5Yt
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0KZMUACgkQ9AfbAGHV
-z0AvGwf/Wi6vmtKC8X3ONQmzUElsCp0iiKrFjgyFFDbGAXraepI4/tuS8BKY+Jsz
-RSZWhM0gLuah1CBqGWcZueoijrmw/x7EYhz5VkrTVYQbL/HZfl72CU77W0uzvZGS
-/0od0G8t28Gmtfdv/RMsgrHZ82wGLn9ocpI9uB2skOVymG2iRV2ZqbJW0Yn/PC0P
-izdGYqjQe6hETap/KeyD8NkpYDnAK1moQNLSriqHvMU1LXnCuVmUK6wSxQDHjkfJ
-TB/jQoTBoX/f9AfzRPszYHRtx6zqyr9jDS7aor4ABlOqfAPmj7nwUJibttFi/L7T
-KZQKCJNAd6o2ZpWhLiCmu6ao+y4s7Q==
-=tYVD
------END PGP SIGNATURE-----
-
---Zuon5sJucPR1uhPa8ROYyiWeWu34uX5Yt--
 
