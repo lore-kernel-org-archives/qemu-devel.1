@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67F89C31E5B
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:48:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA9D1C31E5E
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:48:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37342214AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:48:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F76C21721
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:48:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CMVuiKku"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37342214AF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GOTKH/so"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F76C21721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41450 helo=lists.gnu.org)
+Received: from localhost ([::1]:41454 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdgZW-0003Xo-OH
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 15:48:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53875)
+	id 1hdgZe-0003c4-Lh
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 15:48:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53928)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hdgRW-00061J-AW
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:40:27 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hdgRZ-00067x-Kg
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:40:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hdgRV-0008SI-2p
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:40:26 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54856)
+ (envelope-from <alex.bennee@linaro.org>) id 1hdgRY-000062-8G
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:40:29 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38779)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hdgRU-0008Rk-So
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:40:25 -0400
-Received: by mail-wm1-x341.google.com with SMTP id g135so669846wme.4
- for <qemu-devel@nongnu.org>; Wed, 19 Jun 2019 12:40:24 -0700 (PDT)
+ id 1hdgRY-0008Vd-1r
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:40:28 -0400
+Received: by mail-wr1-x441.google.com with SMTP id d18so493485wrs.5
+ for <qemu-devel@nongnu.org>; Wed, 19 Jun 2019 12:40:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=QOjApRFyonn/7Cn6p2ojwBNi3DBnLp0ky5fDJ7UyreM=;
- b=CMVuiKkugnseipDzZesGcJkDxkHE4uiVbnBppHdgkmQB7s1Tsyy2+ABEjUjJc6tr4S
- ZY8TRLzR9QEvYIXXaWswWNzu2ldQzKDEIPuCKRA9argsWyHKwqSfw5tnhmc+JLihcZix
- zqZyW6VnxB1TTZKinUzaJ2RCp/mCFXdaY6kWweoUbXxSGesAhGFrBuV41tuRYTNhMGK0
- xOFMvyIIsW9xXIQAXL7NBF16eTFKy38q2qHrAl3MIf1z3x+ERM7WQ82OjJjGspdS53Ac
- iLOuaiqMa9LOGK6EFcyB52UgifTlUmBUjAh5Qzwr3drjw6cLlcWmXPoqvt0+qZ9G8aQv
- ekQw==
+ bh=qdTjyQaBb0/jp//KyLcDmonBqL8NDTLZR4EMwIjuiJg=;
+ b=GOTKH/soekvQHQvQQZP5TPI1o9LeBPGGBj4hpcm3CPKG6FJS53AN2siCH0/8AIWmb+
+ 0HnbD8z7Jf0isQiji37McaIHJtmIRpsC+eYQ0SfdVlhaBBCY3sWWQB8bB5Ius3YCqqMa
+ pinEzJ2r7BlCc9s1mxwrpiW6mC+Xp6cp+7myNa2KDis5aAPWK/Jr4Eq2hSnkYNYFY7H5
+ QMYkSt7ogRJ8XLtS2MMByFcrvh6ths0kkO5uTaC5oYeYJwH8Q5Z84yT2LG/pVQa8hOCQ
+ e9qypKc8m5sdlCQkTe680JjGtFcnxaX20XvdmXltfiWfvx8nKqB9ymqZsobAXGQsEjIn
+ DFsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=QOjApRFyonn/7Cn6p2ojwBNi3DBnLp0ky5fDJ7UyreM=;
- b=leTR3v5Y3bSkApGiO4Cq+NJwnDvB7a8NHWTMeEhc2LgCN9CnOmZkXnUnnXN0d8k8E6
- Ij9j4JSCVx6FUY/qFondhr+rkL2YQOVFb2yOazWKyUQm3z0+cSSsM123g7uIPW6+TImX
- y94YqoyFe6arI86exIqQINjlubZmIycrzCM2KpLOfXtpE8p4SYCgXfL5Aeb32k/vqZic
- lJsx4n8zz3YfigyvN/U8ZNnLkXTgnmiretllLv85X29iziDEaLyTqsgV9BtFMa1rEFk/
- uZOBBJkISSItS6it1AKteaxdEe9aDXKmZn7/Rmanezf995I5z4YHEUg146zAB33LZT9K
- 5gbA==
-X-Gm-Message-State: APjAAAUdVeC21q/KqtmJpA7/8bjAT4cAWNDmEGHdAhyPxwUGLwd4LH1h
- oYKxVvyM9rC9DBnNqu3vxdVQiA==
-X-Google-Smtp-Source: APXvYqzK5vhglbYC5MmULok/KEnE0eaUAO1Dl9JLrQ9pYfYPz9kcBdF2MAEQcpYaHdnLZxNdqF/bwg==
-X-Received: by 2002:a1c:6a06:: with SMTP id f6mr9493478wmc.159.1560973223794; 
- Wed, 19 Jun 2019 12:40:23 -0700 (PDT)
+ bh=qdTjyQaBb0/jp//KyLcDmonBqL8NDTLZR4EMwIjuiJg=;
+ b=IZBarWLlhwVkTcDNP0QXOtwnf1/8xbF6WEFut7No16d6orUxZ/xVAfhumyPBOdDt2p
+ h5qRiP0vBfU5CYVZtP/x6RzRtTAfL1Y4cwY1k6MEe73COaj6/kJyWKJyJyOZNCiLHokW
+ tchU/HTpp6Cem2+ICXbTT4lp9hpXgVvpHAHTaJV5ctdCNpqGyHpm1WvPPWEPvwubUHNQ
+ T4IQrg0tdEhfWDYEcTqSu7MJILat7lF26z8Sb4pAea9Jecl+xoXAnMIRrGwhRzN+8uLB
+ B3ppYVKpcVDNydU+kO7NYkLAKXoM4czkd684j5ARynOKUmON7kf7OkNlHmddT+gQapTq
+ vlfg==
+X-Gm-Message-State: APjAAAVSS2cOoqHkTielA8iwZzt1g4FPy4to2xt3jjlN+O6jheuOCVzr
+ CJfrZWAkEJ90fYymRc2DDGS7o+lTBZs=
+X-Google-Smtp-Source: APXvYqzDrYudV2r87KauE420Wnm/Nt62hqdSrM237yLMwfXyYKLsD4VDQ02JABe4i+pm3pfrZoXjug==
+X-Received: by 2002:adf:efc8:: with SMTP id i8mr11569882wrp.220.1560973226941; 
+ Wed, 19 Jun 2019 12:40:26 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id c65sm1375701wma.44.2019.06.19.12.40.21
+ by smtp.gmail.com with ESMTPSA id i25sm7844878wrc.91.2019.06.19.12.40.22
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 19 Jun 2019 12:40:22 -0700 (PDT)
+ Wed, 19 Jun 2019 12:40:23 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id A53231FF8F;
+ by zen.linaroharston (Postfix) with ESMTP id DD8FB1FF92;
  Wed, 19 Jun 2019 20:40:21 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 19 Jun 2019 20:40:06 +0100
-Message-Id: <20190619194021.8240-3-alex.bennee@linaro.org>
+Date: Wed, 19 Jun 2019 20:40:09 +0100
+Message-Id: <20190619194021.8240-6-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190619194021.8240-1-alex.bennee@linaro.org>
 References: <20190619194021.8240-1-alex.bennee@linaro.org>
@@ -83,9 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: [Qemu-devel] [PATCH v1 02/17] tests/vm: avoid image presence check
- and removal
+X-Received-From: 2a00:1450:4864:20::441
+Subject: [Qemu-devel] [PATCH v1 05/17] tests/vm: send proxy environment
+ variables over ssh
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,95 +98,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Cleber Rosa <crosa@redhat.com>
+ Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cleber Rosa <crosa@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
 
-Python's os.rename() will silently replace an existing file,
-so there's no need for the extra check and removal.
+Packages are fetched via proxy that way, if configured on the host.
+That might be required to pass firewalls, and it allows to route
+package downloads through a caching proxy server.
 
-Reference: https://docs.python.org/3/library/os.html#os.rename
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
-Message-Id: <20190613130718.3763-3-crosa@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Needs AcceptEnv setup in sshd_config on the guest side to work.
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20190617043858.8290-2-kraxel@redhat.com>
 ---
- tests/vm/centos      | 2 --
- tests/vm/freebsd     | 2 --
- tests/vm/netbsd      | 2 --
- tests/vm/openbsd     | 2 --
- tests/vm/ubuntu.i386 | 2 --
- 5 files changed, 10 deletions(-)
+ tests/vm/basevm.py | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/tests/vm/centos b/tests/vm/centos
-index b00b46a8dc..53976f1c4c 100755
---- a/tests/vm/centos
-+++ b/tests/vm/centos
-@@ -77,8 +77,6 @@ class CentosVM(basevm.BaseVM):
-         self.ssh_root_check("systemctl enable docker")
-         self.ssh_root("poweroff")
-         self.wait()
--        if os.path.exists(img):
--            os.remove(img)
-         os.rename(img_tmp, img)
-         return 0
+diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+index 4847549592..5e30bac661 100755
+--- a/tests/vm/basevm.py
++++ b/tests/vm/basevm.py
+@@ -38,6 +38,13 @@ class BaseVM(object):
+     GUEST_PASS = "qemupass"
+     ROOT_PASS = "qemupass"
  
-diff --git a/tests/vm/freebsd b/tests/vm/freebsd
-index 5575c23a6f..091be1a065 100755
---- a/tests/vm/freebsd
-+++ b/tests/vm/freebsd
-@@ -36,8 +36,6 @@ class FreeBSDVM(basevm.BaseVM):
-         sys.stderr.write("Extracting the image...\n")
-         subprocess.check_call(["ln", "-f", cimg, img_tmp_xz])
-         subprocess.check_call(["xz", "--keep", "-dvf", img_tmp_xz])
--        if os.path.exists(img):
--            os.remove(img)
-         os.rename(img_tmp, img)
- 
- if __name__ == "__main__":
-diff --git a/tests/vm/netbsd b/tests/vm/netbsd
-index d0508f4465..ee9eaeab50 100755
---- a/tests/vm/netbsd
-+++ b/tests/vm/netbsd
-@@ -36,8 +36,6 @@ class NetBSDVM(basevm.BaseVM):
-         sys.stderr.write("Extracting the image...\n")
-         subprocess.check_call(["ln", "-f", cimg, img_tmp_xz])
-         subprocess.check_call(["xz", "--keep", "-dvf", img_tmp_xz])
--        if os.path.exists(img):
--            os.remove(img)
-         os.rename(img_tmp, img)
- 
- if __name__ == "__main__":
-diff --git a/tests/vm/openbsd b/tests/vm/openbsd
-index 87ec982489..28c7d25e29 100755
---- a/tests/vm/openbsd
-+++ b/tests/vm/openbsd
-@@ -38,8 +38,6 @@ class OpenBSDVM(basevm.BaseVM):
-         sys.stderr.write("Extracting the image...\n")
-         subprocess.check_call(["ln", "-f", cimg, img_tmp_xz])
-         subprocess.check_call(["xz", "--keep", "-dvf", img_tmp_xz])
--        if os.path.exists(img):
--            os.remove(img)
-         os.rename(img_tmp, img)
- 
- if __name__ == "__main__":
-diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
-index a22d137e76..12867b193f 100755
---- a/tests/vm/ubuntu.i386
-+++ b/tests/vm/ubuntu.i386
-@@ -80,8 +80,6 @@ class UbuntuX86VM(basevm.BaseVM):
-         self.ssh_root_check("apt-get install -y libfdt-dev flex bison")
-         self.ssh_root("poweroff")
-         self.wait()
--        if os.path.exists(img):
--            os.remove(img)
-         os.rename(img_tmp, img)
-         return 0
- 
++    envvars = [
++        "https_proxy",
++        "http_proxy",
++        "ftp_proxy",
++        "no_proxy",
++    ]
++
+     # The script to run in the guest that builds QEMU
+     BUILD_SCRIPT = ""
+     # The guest name, to be overridden by subclasses
+@@ -106,6 +113,8 @@ class BaseVM(object):
+                    "-o", "UserKnownHostsFile=" + os.devnull,
+                    "-o", "ConnectTimeout=1",
+                    "-p", self.ssh_port, "-i", self._ssh_key_file]
++        for var in self.envvars:
++            ssh_cmd += ['-o', "SendEnv=%s" % var ]
+         if interactive:
+             ssh_cmd += ['-t']
+         assert not isinstance(cmd, str)
 -- 
 2.20.1
 
