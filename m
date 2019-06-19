@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA9D1C31E5E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A414EC31E5B
 	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:48:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F76C21721
+	by mail.kernel.org (Postfix) with ESMTPS id 74437214AF
 	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 19:48:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GOTKH/so"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F76C21721
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yLSSok3Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74437214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41454 helo=lists.gnu.org)
+Received: from localhost ([::1]:41452 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdgZe-0003c4-Lh
+	id 1hdgZe-0003bp-Ng
 	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 15:48:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53928)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53904)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hdgRZ-00067x-Kg
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:40:32 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hdgRX-00064r-UI
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:40:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hdgRY-000062-8G
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:40:29 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38779)
+ (envelope-from <alex.bennee@linaro.org>) id 1hdgRW-0008Tr-VH
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:40:27 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52108)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hdgRY-0008Vd-1r
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:40:28 -0400
-Received: by mail-wr1-x441.google.com with SMTP id d18so493485wrs.5
- for <qemu-devel@nongnu.org>; Wed, 19 Jun 2019 12:40:27 -0700 (PDT)
+ id 1hdgRW-0008T1-NA
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 15:40:26 -0400
+Received: by mail-wm1-x342.google.com with SMTP id 207so694700wma.1
+ for <qemu-devel@nongnu.org>; Wed, 19 Jun 2019 12:40:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=qdTjyQaBb0/jp//KyLcDmonBqL8NDTLZR4EMwIjuiJg=;
- b=GOTKH/soekvQHQvQQZP5TPI1o9LeBPGGBj4hpcm3CPKG6FJS53AN2siCH0/8AIWmb+
- 0HnbD8z7Jf0isQiji37McaIHJtmIRpsC+eYQ0SfdVlhaBBCY3sWWQB8bB5Ius3YCqqMa
- pinEzJ2r7BlCc9s1mxwrpiW6mC+Xp6cp+7myNa2KDis5aAPWK/Jr4Eq2hSnkYNYFY7H5
- QMYkSt7ogRJ8XLtS2MMByFcrvh6ths0kkO5uTaC5oYeYJwH8Q5Z84yT2LG/pVQa8hOCQ
- e9qypKc8m5sdlCQkTe680JjGtFcnxaX20XvdmXltfiWfvx8nKqB9ymqZsobAXGQsEjIn
- DFsA==
+ bh=6j/tPjZmC3evFe7OoozCDsXFpBZiOXO2+h6m9FK7slk=;
+ b=yLSSok3Qvl8AOpn0jUmJuUibKEqNNfg7Ajqpfj1TysSe6Iu+h9YRJqi8YKz4N+wOs+
+ 6FOtT4zzkTT4AeFRGxSVrVmWSkYnsOamIZiSnNMaSJtmQ9qwqgNZHvcMqXJdQYrhiUBg
+ 5EgSEDWP2Ej6kLjmQbCGua8MvowKbv3o+PWNKphem6DwkWhYTggD2mjFXJF7oP2n+PDy
+ Y5/0AOXiAZs5goOCQ5sSUjjsheY8h2IVTVjVv3SCwCkHliM6Ys/nb5PeT5wRDG25lcjw
+ 50V31RSA3stpqKLAxibaX5M0wvowAaqC1gXcPdTXr5e1DyvOJlyQ1lumENot1E96LRWF
+ T4nQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=qdTjyQaBb0/jp//KyLcDmonBqL8NDTLZR4EMwIjuiJg=;
- b=IZBarWLlhwVkTcDNP0QXOtwnf1/8xbF6WEFut7No16d6orUxZ/xVAfhumyPBOdDt2p
- h5qRiP0vBfU5CYVZtP/x6RzRtTAfL1Y4cwY1k6MEe73COaj6/kJyWKJyJyOZNCiLHokW
- tchU/HTpp6Cem2+ICXbTT4lp9hpXgVvpHAHTaJV5ctdCNpqGyHpm1WvPPWEPvwubUHNQ
- T4IQrg0tdEhfWDYEcTqSu7MJILat7lF26z8Sb4pAea9Jecl+xoXAnMIRrGwhRzN+8uLB
- B3ppYVKpcVDNydU+kO7NYkLAKXoM4czkd684j5ARynOKUmON7kf7OkNlHmddT+gQapTq
- vlfg==
-X-Gm-Message-State: APjAAAVSS2cOoqHkTielA8iwZzt1g4FPy4to2xt3jjlN+O6jheuOCVzr
- CJfrZWAkEJ90fYymRc2DDGS7o+lTBZs=
-X-Google-Smtp-Source: APXvYqzDrYudV2r87KauE420Wnm/Nt62hqdSrM237yLMwfXyYKLsD4VDQ02JABe4i+pm3pfrZoXjug==
-X-Received: by 2002:adf:efc8:: with SMTP id i8mr11569882wrp.220.1560973226941; 
- Wed, 19 Jun 2019 12:40:26 -0700 (PDT)
+ bh=6j/tPjZmC3evFe7OoozCDsXFpBZiOXO2+h6m9FK7slk=;
+ b=L8zRUOCp6iT3cfse4ofnXT1APoTpSCoFeE6HgEjWMmUesBi122O9ScMEAisfT8YRud
+ UrmO3NzkbpiZ+IVnsKe+YEjWyW2By3BTuAWroPWRzOM2MlJ1y1mOpbntsvCCohUvBlU5
+ ZrcGZQxcyHcfCWGQD7EUNsaJA8Gx19V6bZ5A6y2lRpPGkt7pRbTX8caxprQpAqmfEq/v
+ 9JyJ+WpYvsp9OH5+BlqNHhcY8ym4o9mIWj2PAtWOjuq/jo1sujUXgeo9Q59Mg3sKxvRx
+ eA2r7OubjzO75t03xVMC2RklGZAwP23wojzZF9Jp1R2wBpxPMeFyySyKsyMf44DS/pqc
+ u/ZA==
+X-Gm-Message-State: APjAAAU3N/OZQmp0i4l1U5/x8KtATOjhXAZ8vCWhsjPRX+Lux4+kJ6G0
+ PlKVfouGRCSpyYIBIYNhe0Ckiw==
+X-Google-Smtp-Source: APXvYqzjY6yaKnpsPn3Ou21UkSOrAVfEEZEp8n2C7Xmlg9gHc3ITAdGSDX7tGW7CrPKRoAaPyuj55g==
+X-Received: by 2002:a1c:7e85:: with SMTP id z127mr9804067wmc.95.1560973225536; 
+ Wed, 19 Jun 2019 12:40:25 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id i25sm7844878wrc.91.2019.06.19.12.40.22
+ by smtp.gmail.com with ESMTPSA id v65sm3571592wme.31.2019.06.19.12.40.22
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
  Wed, 19 Jun 2019 12:40:23 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id DD8FB1FF92;
+ by zen.linaroharston (Postfix) with ESMTP id CADC71FF91;
  Wed, 19 Jun 2019 20:40:21 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 19 Jun 2019 20:40:09 +0100
-Message-Id: <20190619194021.8240-6-alex.bennee@linaro.org>
+Date: Wed, 19 Jun 2019 20:40:08 +0100
+Message-Id: <20190619194021.8240-5-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190619194021.8240-1-alex.bennee@linaro.org>
 References: <20190619194021.8240-1-alex.bennee@linaro.org>
@@ -83,9 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: [Qemu-devel] [PATCH v1 05/17] tests/vm: send proxy environment
- variables over ssh
+X-Received-From: 2a00:1450:4864:20::342
+Subject: [Qemu-devel] [PATCH v1 04/17] tests/vm: add source repos on
+ ubuntu.i386
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,57 +98,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Thomas Huth <thuth@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Gerd Hoffmann <kraxel@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
 
-Packages are fetched via proxy that way, if configured on the host.
-That might be required to pass firewalls, and it allows to route
-package downloads through a caching proxy server.
+Possibly because of different behavior on the newly update
+cloud-image, trying to run 'apt-get build-dep' results in:
 
-Needs AcceptEnv setup in sshd_config on the guest side to work.
+   E: You must put some 'source' URIs in your sources.list
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20190617043858.8290-2-kraxel@redhat.com>
+This enables all source repos (even though some are not
+needed) for simplicity sake.
+
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+Message-Id: <20190613130718.3763-5-crosa@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/vm/basevm.py | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ tests/vm/ubuntu.i386 | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 4847549592..5e30bac661 100755
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -38,6 +38,13 @@ class BaseVM(object):
-     GUEST_PASS = "qemupass"
-     ROOT_PASS = "qemupass"
- 
-+    envvars = [
-+        "https_proxy",
-+        "http_proxy",
-+        "ftp_proxy",
-+        "no_proxy",
-+    ]
-+
-     # The script to run in the guest that builds QEMU
-     BUILD_SCRIPT = ""
-     # The guest name, to be overridden by subclasses
-@@ -106,6 +113,8 @@ class BaseVM(object):
-                    "-o", "UserKnownHostsFile=" + os.devnull,
-                    "-o", "ConnectTimeout=1",
-                    "-p", self.ssh_port, "-i", self._ssh_key_file]
-+        for var in self.envvars:
-+            ssh_cmd += ['-o', "SendEnv=%s" % var ]
-         if interactive:
-             ssh_cmd += ['-t']
-         assert not isinstance(cmd, str)
+diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
+index 7017e6d388..3ea459ee20 100755
+--- a/tests/vm/ubuntu.i386
++++ b/tests/vm/ubuntu.i386
+@@ -77,6 +77,7 @@ class UbuntuX86VM(basevm.BaseVM):
+         time.sleep(5)
+         self.wait_ssh()
+         # The previous update sometimes doesn't survive a reboot, so do it again
++        self.ssh_root_check("sed -ie s/^#\ deb-src/deb-src/g /etc/apt/sources.list")
+         self.ssh_root_check("apt-get update")
+         self.ssh_root_check("apt-get build-dep -y qemu")
+         self.ssh_root_check("apt-get install -y libfdt-dev flex bison")
 -- 
 2.20.1
 
