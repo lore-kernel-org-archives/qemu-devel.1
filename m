@@ -2,90 +2,89 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54E50C43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 14:21:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C0C8C43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 14:35:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19BAD20679
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 14:21:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19BAD20679
+	by mail.kernel.org (Postfix) with ESMTPS id 338982064B
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 14:35:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 338982064B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48114 helo=lists.gnu.org)
+Received: from localhost ([::1]:48330 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdxwf-0006Gv-U2
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 10:21:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58547)
+	id 1hdyAK-0003yP-UL
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 10:35:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37832)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hdxo8-0000Kk-4T
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:12:59 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hdy5r-0001AM-RT
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:33:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hdxlg-0005uS-FW
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:11:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58530)
+ (envelope-from <mreitz@redhat.com>) id 1hdxyP-0005Of-RU
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:25:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47324)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hdxej-0006ad-2p; Thu, 20 Jun 2019 10:03:14 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hdxwa-0004Jw-9W; Thu, 20 Jun 2019 10:21:41 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7CAA63086268;
- Thu, 20 Jun 2019 14:03:03 +0000 (UTC)
-Received: from [10.3.116.44] (ovpn-116-44.phx2.redhat.com [10.3.116.44])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B88E19C4F;
- Thu, 20 Jun 2019 14:03:01 +0000 (UTC)
-To: zhenwei pi <pizhenwei@bytedance.com>, kwolf@redhat.com, mreitz@redhat.com
-References: <1561020872-6214-1-git-send-email-pizhenwei@bytedance.com>
- <1561020872-6214-4-git-send-email-pizhenwei@bytedance.com>
-From: Eric Blake <eblake@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id B37E630C0DC2;
+ Thu, 20 Jun 2019 14:21:32 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.208])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1DD4019C4F;
+ Thu, 20 Jun 2019 14:21:27 +0000 (UTC)
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20190620010356.19164-1-jsnow@redhat.com>
+ <20190620010356.19164-2-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <cdb81887-5d68-9de5-e72b-3df8a45e52b4@redhat.com>
-Date: Thu, 20 Jun 2019 09:03:00 -0500
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <d671f373-77d1-d475-ff23-30bd7674c6df@redhat.com>
+Date: Thu, 20 Jun 2019 16:21:26 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <1561020872-6214-4-git-send-email-pizhenwei@bytedance.com>
+In-Reply-To: <20190620010356.19164-2-jsnow@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="pf8gkemO36K68wJkUNmYP6TAE5TZa9SA6"
+ boundary="iV4RdhEYnAWY9zIp5Im1BXp1uDa80diTE"
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Thu, 20 Jun 2019 14:03:03 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Thu, 20 Jun 2019 14:21:32 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/3] qapi: add block size histogram
- interface
+Subject: Re: [Qemu-devel] [PATCH 01/12] qapi: add BitmapSyncMode enum
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,245 +96,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ vsementsov@virtuozzo.com, Wen Congyang <wencongyang2@huawei.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pf8gkemO36K68wJkUNmYP6TAE5TZa9SA6
-Content-Type: multipart/mixed; boundary="ALqSs5PbiYQpPRmHYlRQ0CMeyFg6xtgso";
+--iV4RdhEYnAWY9zIp5Im1BXp1uDa80diTE
+Content-Type: multipart/mixed; boundary="ST1J5Omq9yA8FbeUpP3LhBMAEK5IiPnwh";
  protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: zhenwei pi <pizhenwei@bytedance.com>, kwolf@redhat.com, mreitz@redhat.com
-Cc: fam@euphon.net, qemu-block@nongnu.org, vsementsov@virtuozzo.com,
- qemu-devel@nongnu.org
-Message-ID: <cdb81887-5d68-9de5-e72b-3df8a45e52b4@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] qapi: add block size histogram interface
-References: <1561020872-6214-1-git-send-email-pizhenwei@bytedance.com>
- <1561020872-6214-4-git-send-email-pizhenwei@bytedance.com>
-In-Reply-To: <1561020872-6214-4-git-send-email-pizhenwei@bytedance.com>
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
+ eblake@redhat.com, vsementsov@virtuozzo.com,
+ Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Xie Changlong <xiechanglong.d@gmail.com>
+Message-ID: <d671f373-77d1-d475-ff23-30bd7674c6df@redhat.com>
+Subject: Re: [PATCH 01/12] qapi: add BitmapSyncMode enum
+References: <20190620010356.19164-1-jsnow@redhat.com>
+ <20190620010356.19164-2-jsnow@redhat.com>
+In-Reply-To: <20190620010356.19164-2-jsnow@redhat.com>
 
---ALqSs5PbiYQpPRmHYlRQ0CMeyFg6xtgso
+--ST1J5Omq9yA8FbeUpP3LhBMAEK5IiPnwh
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 6/20/19 3:54 AM, zhenwei pi wrote:
-> Set/Clear block size histograms through new command
-> x-block-size-histogram-set and show new statistics in
-> query-blockstats results.
+On 20.06.19 03:03, John Snow wrote:
+> Depending on what a user is trying to accomplish, there might be a few
+> bitmap cleanup actions that occur when an operation is finished that
+> could be useful.
 >=20
-
-I'm guessing this is modeled after the existing
-block-latency-histogram-set command?
-
-> Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
+> I am proposing three:
+> - NEVER: The bitmap is never synchronized against what was copied.
+> - ALWAYS: The bitmap is always synchronized, even on failures.
+> - CONDITIONAL: The bitmap is synchronized only on success.
+>=20
+> The existing incremental backup modes use 'conditional' semantics,
+> so add just that one for right now.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  block/qapi.c         |  24 ++++++++++++
->  blockdev.c           |  56 +++++++++++++++++++++++++++
->  qapi/block-core.json | 105 +++++++++++++++++++++++++++++++++++++++++++=
-+++++++-
->  3 files changed, 184 insertions(+), 1 deletion(-)
-
+>  qapi/block-core.json | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+>=20
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 0d43d4f37c..caf28a71a0 100644
+> --- a/qapi/block-core.json
 > +++ b/qapi/block-core.json
-> @@ -633,6 +633,100 @@
->             '*boundaries-flush': ['uint64'] } }
+> @@ -1134,6 +1134,20 @@
+>  { 'enum': 'MirrorSyncMode',
+>    'data': ['top', 'full', 'none', 'incremental'] }
 > =20
->  ##
-> +# @BlockSizeHistogramInfo:
-> +#
-> +# Block size histogram.
-> +#
-> +# @boundaries: list of interval boundary values in nanoseconds, all gr=
-eater
-> +#              than zero and in ascending order.
-> +#              For example, the list [8193, 32769, 131073] produces th=
-e
-> +#              following histogram intervals:
-> +#              [0, 8193), [8193, 32769), [32769, 131073), [131073, +in=
-f).
-> +#
-> +# @bins: list of io request counts corresponding to histogram interval=
-s.
-> +#        len(@bins) =3D len(@boundaries) + 1
-> +#        For the example above, @bins may be something like [6, 3, 7, =
-9],
-> +#        and corresponding histogram looks like:
-> +#
-> +# Since: 4.0
-
-You've missed 4.0; the next release is 4.1.
-
 > +##
-> +{ 'struct': 'BlockSizeHistogramInfo',
-> +  'data': {'boundaries': ['uint64'], 'bins': ['uint64'] } }
+> +# @BitmapSyncMode:
+> +#
+> +# An enumeration of possible behaviors for the synchronization of a bi=
+tmap
+> +# when used for data copy operations.
+> +#
+> +# @conditional: The bitmap is only synchronized when the operation is =
+successul.
 
-This is identical to struct BlockLatencyHistogramInfo; can we instead
-rename the type (which does not affect API) and share it between both
-implementations, instead of duplicating it?
+*successful
 
+> +#               This is useful for Incremental semantics.
+
+Hm, well.  All bitmap modes are for incremental semantics, in some way
+or another.  (=E2=80=9Cconditional=E2=80=9D and =E2=80=9Calways=E2=80=9D =
+just automatically create
+point-in-time snapshots, in a sense, where =E2=80=9Cnever=E2=80=9D requir=
+es the user to
+manually do so.)
+
+So maybe something more concrete would be better?  Like =E2=80=9CThis all=
+ows
+incremental use from one successful operation to the next, and
+restarting any operation on failure=E2=80=9D?
+
+Max
+
+> +#
+> +# Since: 4.1
+> +##
+> +{ 'enum': 'BitmapSyncMode',
+> +  'data': ['conditional'] }
 > +
-> +##
-> +# @x-block-size-histogram-set:
-
-Does this need to be experimental from the get-go? Or can it be stable
-by dropping 'x-' since it matches the fact that
-block-latency-histogram-set is stable?
-
-> +#
-> +# Manage read, write and flush size histograms for the device.
-> +#
-> +# If only @id parameter is specified, remove all present size histogra=
-ms
-> +# for the device. Otherwise, add/reset some of (or all) size histogram=
-s.
-> +#
-> +# @id: The name or QOM path of the guest device.
-> +#
-> +# @boundaries: list of interval boundary values (see description in
-> +#              BlockSizeHistogramInfo definition). If specified, all
-> +#              size histograms are removed, and empty ones created for=
- all
-> +#              io types with intervals corresponding to @boundaries (e=
-xcept for
-> +#              io types, for which specific boundaries are set through=
- the
-> +#              following parameters).
-> +#
-> +# @boundaries-read: list of interval boundary values for read size
-> +#                   histogram. If specified, old read size histogram i=
-s
-> +#                   removed, and empty one created with intervals
-> +#                   corresponding to @boundaries-read. The parameter h=
-as higher
-> +#                   priority then @boundaries.
-> +#
-> +# @boundaries-write: list of interval boundary values for write size
-> +#                    histogram.
-> +#
-> +# @boundaries-flush: list of interval boundary values for flush size
-> +#                    histogram.
-> +#
-> +# Returns: error if device is not found or any boundary arrays are inv=
-alid.
-> +#
-> +# Since: 4.0
-
-4.1
-
-> +#
-> +# Example: set new histograms for all io types with intervals
-> +# [0, 8193), [8193, 32769), [32769, 131073), [131073, +inf):
-> +#
-> +# -> { "execute": "x-block-size-histogram-set",
-> +#      "arguments": { "id": "drive0",
-> +#                     "boundaries": [8193, 32769, 131073] } }
-> +# <- { "return": {} }
-> +#
-> +# Example: set new histogram only for write, other histograms will rem=
-ain
-> +# not changed (or not created):
-> +#
-> +# -> { "execute": "x-block-size-histogram-set",
-> +#      "arguments": { "id": "drive0",
-> +#                     "boundaries-write": [8193, 32769, 131073] } }
-> +# <- { "return": {} }
-> +#
-> +# Example: set new histograms with the following intervals:
-> +#   read, flush: [0, 8193), [8193, 32769), [32769, 131073), [131073, +=
-inf)
-> +#   write: [0, 4097), [4097, 8193), [8193, 32769), [32769, +inf)
-> +#
-> +# -> { "execute": "x-block-size-histogram-set",
-> +#      "arguments": { "id": "drive0",
-> +#                     "boundaries": [8193, 32769, 131073],
-> +#                     "boundaries-write": [4097, 8193, 32769] } }
-> +# <- { "return": {} }
-> +#
-> +# Example: remove all size histograms:
-> +#
-> +# -> { "execute": "x-block-size-histogram-set",
-> +#      "arguments": { "id": "drive0" } }
-> +# <- { "return": {} }
-> +##
-> +{ 'command': 'x-block-size-histogram-set',
-> +  'data': {'id': 'str',
-> +           '*boundaries': ['uint64'],
-> +           '*boundaries-read': ['uint64'],
-> +           '*boundaries-write': ['uint64'],
-> +           '*boundaries-flush': ['uint64'] } }
-
-Again, this copies heavily from block-latency-histogram-set.  But
-changing the command name is not API compatible.  Should we have a
-single new command 'block-histogram-set' which takes an enum choosing
-between 'latency' and 'size', and start the deprecation clock on
-'block-latency-histogram-set'?
- (and defaulting to 'latency' for back-compat
-
-> +
-> +
-> +##
->  # @BlockInfo:
->  #
->  # Block device information.  This structure describes a virtual device=
- and
-> @@ -918,6 +1012,12 @@
->  #
->  # @flush_latency_histogram: @BlockLatencyHistogramInfo. (Since 4.0)
->  #
-> +# @x_rd_size_histogram: @BlockSizeHistogramInfo. (Since 4.0)
-> +#
-> +# @x_wr_size_histogram: @BlockSizeHistogramInfo. (Since 4.0)
-> +#
-> +# @x_flush_size_histogram: @BlockSizeHistogramInfo. (Since 4.0)
-
-since 4.1 on all of these additions.
-
-> +#
->  # Since: 0.14.0
 >  ##
->  { 'struct': 'BlockDeviceStats',
-> @@ -933,7 +1033,10 @@
->             'timed_stats': ['BlockDeviceTimedStats'],
->             '*rd_latency_histogram': 'BlockLatencyHistogramInfo',
->             '*wr_latency_histogram': 'BlockLatencyHistogramInfo',
-> -           '*flush_latency_histogram': 'BlockLatencyHistogramInfo' } }=
-
-> +           '*flush_latency_histogram': 'BlockLatencyHistogramInfo',
-> +           '*x_rd_size_histogram': 'BlockSizeHistogramInfo',
-> +           '*x_wr_size_histogram': 'BlockSizeHistogramInfo',
-> +           '*x_flush_size_histogram': 'BlockSizeHistogramInfo' } }
-> =20
->  ##
->  # @BlockStats:
+>  # @MirrorCopyMode:
+>  #
 >=20
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
 
 
---ALqSs5PbiYQpPRmHYlRQ0CMeyFg6xtgso--
+--ST1J5Omq9yA8FbeUpP3LhBMAEK5IiPnwh--
 
---pf8gkemO36K68wJkUNmYP6TAE5TZa9SA6
+--iV4RdhEYnAWY9zIp5Im1BXp1uDa80diTE
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0LkhQACgkQp6FrSiUn
-Q2oYsAf9Ex+OOLDcypEyAkscasi4ddl+sW2EmmRgVeyMHC9Tb0w0MNZj+WWF67LU
-yZOlCxyp9idK2rTVHytzA7K6wnaEh5eQOA7ZMLCpCyRhu/W0qyg2+RoXDpkZVISo
-nMHXaVjduwLo+G3PmvUI6jgOcpuZ1a0IMmKolnr7uVQxB9r0vm1EpQBFKI/Pn8LM
-Z8Xa9tNY3HUm9LtSXf1gluou5ljA+DDhk//K1WmwgjTAWKO2EUe6LWwc1uDy473a
-jMNkko6vw9RDNpgU9o6mNYNRmQGZiixx+e7/mXDoowWS0WYufBciLn43P+0pNgay
-6VyA5trg87pQ1zP/D2P1YHUfQm2HGw==
-=PDco
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0LlmYACgkQ9AfbAGHV
+z0AVtggAkVtU5NzSPC4wAXtTDZLrwXOOsfIMcGaozOWQjsEKMda6bXrR06FS4gZ+
+bI594qPuc6C1cIwEg4E1P/wVtYhJzHzbjTviiwF4F1lVniM7gsyT3enUco+gJgb+
+2RIMycIMRIMMSvmqr2F0bfRUKEE7lzew1wq2CdApCGgoorRoK7ht6WUsb2CYU8Rh
+/4PE7GBIjqxm8olbcrqUXfqIzTz0dNPgH9Q0ugp107a8/EIyoBTv4XaqhE8xlF0q
+ED27It91kYiYpoMyNda7pv7c/Y3WbMbIyGackfh5TO6b8c1xEPgk87sKpGvLxSjy
+40lZp/jdlkIsk8v8yNcMa3WS2ertJw==
+=ZLP/
 -----END PGP SIGNATURE-----
 
---pf8gkemO36K68wJkUNmYP6TAE5TZa9SA6--
+--iV4RdhEYnAWY9zIp5Im1BXp1uDa80diTE--
 
