@@ -2,90 +2,141 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ED5BC43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 16:22:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 472CAC43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 16:42:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9E9F2070B
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 16:22:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TRcenZYQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9E9F2070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1ECF32084E
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 16:42:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ECF32084E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50170 helo=lists.gnu.org)
+Received: from localhost ([::1]:50264 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdzp8-0005Uq-6T
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 12:22:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37323)
+	id 1he08X-0006J7-4E
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 12:42:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41367)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@gmail.com>) id 1hdzmK-0003QY-3y
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 12:19:13 -0400
+ (envelope-from <jsnow@redhat.com>) id 1he050-0003YU-58
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 12:38:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hdzmI-0007Wv-BT
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 12:19:11 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:32828)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hdzmI-0007HP-0B
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 12:19:10 -0400
-Received: by mail-wr1-x443.google.com with SMTP id n9so3701446wru.0
- for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 09:18:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=SZmR1ep04TT4dxQ6g5/nREwNCbAsY96WCGW2oGAla3M=;
- b=TRcenZYQqWHaid08KJxOMLjR049ZT9qGwLK45Y6UNq9LUajJpdzePgaCWfpZqM8p5q
- LSzwVyG6zERWgUZdWznJtZl3RNFmR1OZeeA0xmg+ausn3cvQ19vBGuIfo3fFfYXBrtJT
- zra1oBeizkuYK8LCT0Rb4/wVBXqoht8O9ZKlF3XxwdRpULkll/ja3i9pe1Fy13dj4pLO
- 6s7aZKLWqb4NIIz+vAK1r+UTHUl+Jb49Gbk0KpSWyyEvolhLL6XxBBvupctfo5AJkg1z
- +1syCe4NN3dUdSdNWh/1cqCLOhg1ofy62LzZtYUNJoYSf09VXJ0vIZaZonbDUShLxtIF
- wEnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=SZmR1ep04TT4dxQ6g5/nREwNCbAsY96WCGW2oGAla3M=;
- b=WRIgkjLZeFtvJ0unR/3LgcetwkA1+W3vaI59MmTckl23XW7VR1IIpu31aK0I0USLNK
- kQyxjaO8M5jjvLanxqokjwjchYyMSaA9/0h+u2gegpOXBgRF78Te9pj99YGRS3f1dxW1
- GTE/rjn3rloxlyAqeFdckT03nUgd1WXQj+TpmUZbH2QjNSeWiSR+SO/GBY2Oz4udUrIJ
- cu6JN9CZVumVWMcO2VJA2BdtsvCMNmvXl6P2KDoR3XEB9+ua8S/a6H6A6bfC6k8c/Q2R
- QmB1prX2yxxT1ay0yo2Cmed7DMRdtoD/v+kizuzVpDGwFA8mmS4C+O0u7dJcqTyN0fRB
- EYuQ==
-X-Gm-Message-State: APjAAAWa5nUT2S5lPLGK9dm4jySbmivOo75wvIXrs8kxfpPXIVasI/1b
- uPxZIpYYwxMrRi/twQDHUOI=
-X-Google-Smtp-Source: APXvYqzZQ9INCI6ocbo6J380+xtIjMmmtylsAM124bOw6SZpD6ut4wZrCS3Br36pffrP36snKdLrag==
-X-Received: by 2002:adf:db4c:: with SMTP id f12mr12036703wrj.342.1561047535856; 
- Thu, 20 Jun 2019 09:18:55 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id y16sm80767wru.28.2019.06.20.09.18.54
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 20 Jun 2019 09:18:55 -0700 (PDT)
-Date: Thu, 20 Jun 2019 17:18:50 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20190620161850.GA8395@stefanha-x1.localdomain>
-References: <20190612120421.20336-1-stefanha@redhat.com>
- <20190617122922.GG7397@linux.fritz.box>
- <25ad60d8-8860-b535-a42b-03d4d63d0802@redhat.com>
- <20190617175840.GO7397@linux.fritz.box>
- <6080d608-fd8d-1f09-6f40-735e212fbf9e@redhat.com>
+ (envelope-from <jsnow@redhat.com>) id 1he03n-0007xl-P0
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 12:37:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35916)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1he03k-0007tS-7K; Thu, 20 Jun 2019 12:37:13 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8A079A3813;
+ Thu, 20 Jun 2019 16:36:57 +0000 (UTC)
+Received: from [10.10.123.29] (ovpn-123-29.rdu2.redhat.com [10.10.123.29])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A1FEE601A5;
+ Thu, 20 Jun 2019 16:36:54 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20190620010356.19164-1-jsnow@redhat.com>
+ <20190620010356.19164-7-jsnow@redhat.com>
+ <f9296483-d48f-521f-1ddd-d514e56b8fdf@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <c956b213-24bf-355a-02e3-6b39ba682ae4@redhat.com>
+Date: Thu, 20 Jun 2019 12:36:53 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="5vNYLRcllDrimb99"
-Content-Disposition: inline
-In-Reply-To: <6080d608-fd8d-1f09-6f40-735e212fbf9e@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH v4] virtio-scsi: restart DMA after iothread
+In-Reply-To: <f9296483-d48f-521f-1ddd-d514e56b8fdf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Thu, 20 Jun 2019 16:37:11 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 06/12] block/dirty-bitmap: add
+ bdrv_dirty_bitmap_claim
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,47 +149,66 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+ vsementsov@virtuozzo.com, Wen Congyang <wencongyang2@huawei.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---5vNYLRcllDrimb99
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 17, 2019 at 08:27:04PM +0200, Paolo Bonzini wrote:
-> On 17/06/19 19:58, Kevin Wolf wrote:
-> > Of course, this makes me think that maybe for the actual proper
-> > solution, VM state change handlers should really be a feature that qdev
-> > provides for devices. Then if a HBA doesn't have anything else to do,
-> > the qdev core would just recurse into the children right away; if it has
-> > something to do, it would disable the device after its children, and
-> > re-enable it before the children.
+On 6/20/19 12:02 PM, Max Reitz wrote:
+> On 20.06.19 03:03, John Snow wrote:
+>> This function can claim an hbitmap to replace its own current hbitmap.
+>> In the case that the granularities do not match, it will use
+>> hbitmap_merge to copy the bit data instead.
 >=20
-> This was more or less my reply to this version of the patch. :)
+> I really do not like this name because to me it implies a relationship
+> to bdrv_reclaim_dirty_bitmap().  Maybe just bdrv_dirty_bitmap_take()?
+> Or, if you want to get more fancy, bdrv_dirty_dirty_bitmap_steal().
+> (Because references are taken or stolen.)
+>=20
 
-I'll send a new patch that is a combination of these ideas.
+take or steal is good. I just wanted to highlight that it truly takes
+ownership. The double-pointer and erasing the caller's reference for
+emphasis of this idea.
 
-Stefan
+> The latter might fit in nicely with the abdication theme.  We=E2=80=99d=
+ just
+> need to rename bdrv_reclaim_dirty_bitmap() to
+> bdrv_dirty_bitmap_backstab(), and it=E2=80=99d be perfect.
+>=20
 
---5vNYLRcllDrimb99
-Content-Type: application/pgp-signature; name="signature.asc"
+Don't tempt me; I do like my silly function names. You are lucky I don't
+call
 
------BEGIN PGP SIGNATURE-----
+> (On another note: bdrv_restore_dirty_bitmap() vs.
+> bdrv_dirty_bitmap_restore() =E2=80=93 really? :-/)
+>=20
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0LsecACgkQnKSrs4Gr
-c8i1cAf+JYWB7TRcjWzrDceS5elxV585qCfxPK1HboJhQ0LGdoS6c5jCA2C0eXlV
-X4oNDv5VA8oVU2iIdqF+0zmBYpjVqX/3dlPxU6o26qVOWEiN8Zb2lZ02xXaTxDJp
-kqYLM7u7IDAV45yppa4JTJ8OZJnEqTwC7bVCGd9Yeagsqw1IrT6LkjRbyZ3eFQz4
-eVeynrK+btDj7tdsKDeA7YcNqr6o1ZqtX6JYQjTA5gPc64tF4ANEpbwjNCkBOWJF
-5eW3Wcv80pPxwmbmIC8zN1R3pQwo5MWnVggv0TZr4Iq+WVfmBARz69jyjOaL+U1h
-0jMbxSbQafAxIAlUWVBnekMps7KR/A==
-=PfNm
------END PGP SIGNATURE-----
+I have done a terrible job at enforcing any kind of consistency here,
+and it gets me all the time too. I had a big series that re-arranged and
+re-named a ton of stuff just to make things a little more nicer, but I
+let it bitrot because I didn't want to deal with the bike-shedding.
 
---5vNYLRcllDrimb99--
+I do agree I am in desperate need of a spring cleaning in here.
+
+One thing that does upset me quite often is that the canonical name for
+the structure is "bdrv dirty bitmap", which makes the function names all
+quite long.
+
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  include/block/block_int.h |  1 +
+>>  include/qemu/hbitmap.h    |  8 ++++++++
+>>  block/dirty-bitmap.c      | 14 ++++++++++++++
+>>  util/hbitmap.c            |  5 +++++
+>>  4 files changed, 28 insertions(+)
+>=20
+> The implementation looks good to me.
+>=20
+> Max
+>=20
+
 
