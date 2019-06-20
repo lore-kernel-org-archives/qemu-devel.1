@@ -6,77 +6,77 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FDB9C43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 11:09:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CED9C43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 11:09:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 295EF206E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 11:09:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 295EF206E0
+	by mail.kernel.org (Postfix) with ESMTPS id E7DF82082C
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 11:09:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7DF82082C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46180 helo=lists.gnu.org)
+Received: from localhost ([::1]:46184 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hduwK-0006yY-Au
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 07:09:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45550)
+	id 1hduwt-0007k7-5t
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 07:09:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45284)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hdufU-0002J8-JB
+ (envelope-from <philmd@redhat.com>) id 1hdufU-00026z-Kv
  for qemu-devel@nongnu.org; Thu, 20 Jun 2019 06:51:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hduRw-0002oN-R3
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 06:39:37 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:51992)
+ (envelope-from <philmd@redhat.com>) id 1hduRY-0002kb-Pz
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 06:39:13 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:38994)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hduRw-0002o7-M3
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 06:37:48 -0400
-Received: by mail-wm1-f66.google.com with SMTP id 207so2561021wma.1
- for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 03:37:48 -0700 (PDT)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hduRY-0002kI-Bv
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 06:37:24 -0400
+Received: by mail-wm1-f67.google.com with SMTP id z23so2626497wma.4
+ for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 03:37:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=eHUX/y3Sb/DWW/S/XCbD7pIyatOUuN3iWSz7ievukq4=;
- b=exbAhONHeO9LpMVJj2nNLBqRv4sqcH2WDZWay6yakprcF+ZQQhy0y9v/zFJQq5syIw
- 29zo6af/BevLhBRk+yRiS6hlq4p6WSibc9dn7pjOKNEa6qKi1qgIceZUU4RqnmpgXCNV
- q3GCs4KBQ6BGwN/rSJMkvXpcHDFP+6AoJkbic5or/RXawgTTSn2zU6CkTLw9rFvtMx2Z
- 4t3tLRAu5y9sn/ls+miDU7jiiBN1oAVC/ANk80BUYHii+W8RqWpHjjhUpXi1Pu5/O4aD
- HKv4Cuz/TlGjf9jQyJGVaO4LobJCBMZQsbV6/RZs7hKswOfDJe5mg6nh/T9Okh/lRqSx
- gDjg==
-X-Gm-Message-State: APjAAAVJ3l/v9ldan00i8aA4tKX6Unet4SQzWVYc2Epp0QevYbDpBZ83
- iE5En+a3EQXZ8usUR0uNSBuVDw==
-X-Google-Smtp-Source: APXvYqwpqo0l8DLSxC/DTQiFv9MIxDEa8dtG8DKPJhePrUzB/I7My3mwvyr21e5GwGJ5p96xNUQoUQ==
-X-Received: by 2002:a1c:2c6:: with SMTP id 189mr2262874wmc.108.1561027067693; 
- Thu, 20 Jun 2019 03:37:47 -0700 (PDT)
+ bh=6XOkMNnu/oBbGb6IwW3PSO+VJZc+rgVboB98f1bhlX4=;
+ b=JzvYDtcE9Qzk/fEOVot21PzkH6FH3QLqoUCn0+hv4VoT+nRDmnlwk0eXkC5oioFkq+
+ g4fRI+7lpRdyExTxd81GF1uMKusHH2wBEg/32Q0BpZBvWxZa0/0FxjHhTBPbTfaXOjwa
+ m7MKteT0xuvnONB3hKK3ENJcG1h22lJPEXI43WlkuVr3hZ8c4qpDk9bPyoSgsCI6Mw8J
+ CTl9kpJb3zFa/Yo1irrYJ0rjuuY2UNuea9zNxBFpZAmzD1R8IxsPyHM529AciykEKK0H
+ t6lWo1vGqssdf0hCOUrKFM7bCpXF4IIMxQRxNWLDMCudtT7Urn5UpUZFKGyajXDjVyUP
+ W6yA==
+X-Gm-Message-State: APjAAAX8NHyUXvFhkbsq98CFUppz+loav16BNUT2m11hwrVYiNgSxcC1
+ 9bzL6Nz5OtYsRnl6IGijGlWPsw==
+X-Google-Smtp-Source: APXvYqx5BntLx0TqE7cgIp5Ha6JsyH0+h1c8mGpidp3W0QV+2VX3E26zrR2wfH9ClJ86NNJUO6P5bw==
+X-Received: by 2002:a1c:a1c1:: with SMTP id k184mr2430200wme.81.1561027043202; 
+ Thu, 20 Jun 2019 03:37:23 -0700 (PDT)
 Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.183])
- by smtp.gmail.com with ESMTPSA id w23sm5255551wmi.45.2019.06.20.03.37.46
+ by smtp.gmail.com with ESMTPSA id y12sm21614135wrr.3.2019.06.20.03.37.22
  (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 20 Jun 2019 03:37:47 -0700 (PDT)
+ Thu, 20 Jun 2019 03:37:22 -0700 (PDT)
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
  qemu-devel@nongnu.org
 References: <20190619194021.8240-1-alex.bennee@linaro.org>
- <20190619194021.8240-18-alex.bennee@linaro.org>
+ <20190619194021.8240-17-alex.bennee@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
  url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <8eb890c7-75a2-62e6-c7a7-86522251b527@redhat.com>
-Date: Thu, 20 Jun 2019 12:37:46 +0200
+Message-ID: <e91b8ecf-4e6f-c4a4-9d79-de504cc779dd@redhat.com>
+Date: Thu, 20 Jun 2019 12:37:22 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190619194021.8240-18-alex.bennee@linaro.org>
+In-Reply-To: <20190619194021.8240-17-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [PATCH v1 17/17] .travis.yml: force a brew update
- for MacOS builds
+X-Received-From: 209.85.128.67
+Subject: Re: [Qemu-devel] [PATCH v1 16/17] .travis.yml: default the
+ --disable-system build to --static
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,31 +94,33 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 6/19/19 9:40 PM, Alex Bennée wrote:
-> It looks like the Travis image package databases are out of date
-> causing the build to error with:
+> It's fairly common to build qemu-user binaries with --static linking
+> so the binary can be copied around without libraries. Enable --static
+> in the default qemu-user build to cover this.
 > 
->   Error: Your Homebrew is outdated. Please run `brew update`.
->   Error: Kernel.exit
+> There are other qemu-user builds that use dynamic linking so they
+> should catch any problems there.
 > 
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 > ---
->  .travis.yml | 1 +
->  1 file changed, 1 insertion(+)
+>  .travis.yml | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 > diff --git a/.travis.yml b/.travis.yml
-> index 9750dc905c..a891ce2485 100644
+> index aeb9b211cd..9750dc905c 100644
 > --- a/.travis.yml
 > +++ b/.travis.yml
-> @@ -43,6 +43,7 @@ addons:
->        - glib
->        - pixman
->        - gnu-sed
-> +    update: true
+> @@ -80,7 +80,7 @@ script:
+>  matrix:
+>    include:
+>      - env:
+> -        - CONFIG="--disable-system"
+> +        - CONFIG="--disable-system --static"
 >  
 >  
->  # The channel name "irc.oftc.net#qemu" is encrypted against qemu/qemu
+>      # we split the system builds as it takes a while to build them all
 > 
 
