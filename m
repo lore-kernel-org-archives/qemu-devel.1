@@ -2,60 +2,62 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D87EFC43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 18:50:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32FA8C48BE3
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 18:50:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEEF420656
+	by mail.kernel.org (Postfix) with ESMTPS id F1A2520656
 	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 18:50:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="nq6Kc6JI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEEF420656
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="eIM4l3FC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1A2520656
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52156 helo=lists.gnu.org)
+Received: from localhost ([::1]:52154 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1he28v-0003yH-W0
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 14:50:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43355)
+	id 1he28v-0003uU-Bi
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 14:50:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43151)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <brijesh.singh@amd.com>) id 1he1cb-0005MN-Mu
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 14:17:21 -0400
+ (envelope-from <brijesh.singh@amd.com>) id 1he1cW-0005Dx-O7
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 14:17:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <brijesh.singh@amd.com>) id 1he1P8-0003tw-UZ
+ (envelope-from <brijesh.singh@amd.com>) id 1he1PD-0003wz-P7
  for qemu-devel@nongnu.org; Thu, 20 Jun 2019 14:03:47 -0400
-Received: from mail-eopbgr790073.outbound.protection.outlook.com
- ([40.107.79.73]:37285 helo=NAM03-CO1-obe.outbound.protection.outlook.com)
+Received: from mail-eopbgr720059.outbound.protection.outlook.com
+ ([40.107.72.59]:35920 helo=NAM05-CO1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
- id 1he1P6-0003mO-TY
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 14:03:22 -0400
+ id 1he1PD-0003qK-Fu
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 14:03:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector1-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qVCBWcxuCdP4tzGZUnso/keG4BIXpWd9tzQZiSdM98g=;
- b=nq6Kc6JIj+bn+oUqoiKibjWNe5uTLVTI86GqfG7mpZCnL3e/teBnR8BfbQtqFP8yf3nxXtTD2EchH+h6Vu1Mfwa90i6hR4x9MzixbtVQgQN0nXzodf4ScIzQGi0ulup6hZ4TL9BQsPbP6CS5h4WepIaXl4lCDKa68aRNAsDUiJs=
+ bh=2yaW5b4zxJ8SbYaNWmSsPSjOVNESijemaqL82b30758=;
+ b=eIM4l3FCIDRAIo6GdlIxu88tzRoLuW18G3A2J375wXQwf/JdJY95xqoMK2Eyk0HZYOdIQOyyIMQZjgNxElqm1GoU9MN4ej8yPjlguYVCwheMMU8RniqpTToMmH6PSWEj98Yc/qwgbCvmSfZqhIsc6L83EAIoJ+p+azo6XjT+xZI=
 Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.116.31) by
- DM6PR12MB2842.namprd12.prod.outlook.com (20.176.116.80) with Microsoft SMTP
+ DM6PR12MB3260.namprd12.prod.outlook.com (20.179.105.216) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1987.13; Thu, 20 Jun 2019 18:03:05 +0000
+ 15.20.1987.15; Thu, 20 Jun 2019 18:03:24 +0000
 Received: from DM6PR12MB2682.namprd12.prod.outlook.com
  ([fe80::b9c1:b235:fff3:dba2]) by DM6PR12MB2682.namprd12.prod.outlook.com
  ([fe80::b9c1:b235:fff3:dba2%6]) with mapi id 15.20.1987.014; Thu, 20 Jun 2019
- 18:03:05 +0000
+ 18:03:24 +0000
 From: "Singh, Brijesh" <brijesh.singh@amd.com>
 To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Thread-Topic: [RFC PATCH v1 00/12] Add SEV guest live migration support
-Thread-Index: AQHVJ5JohKMZUl6sx0qZdgLCEug/WA==
-Date: Thu, 20 Jun 2019 18:03:04 +0000
-Message-ID: <20190620180247.8825-1-brijesh.singh@amd.com>
+Thread-Topic: [RFC PATCH v1 12/12] target/i386: sev: remove migration blocker
+Thread-Index: AQHVJ5Jzb+1ffDZU30OB/jyG/TiftA==
+Date: Thu, 20 Jun 2019 18:03:23 +0000
+Message-ID: <20190620180247.8825-13-brijesh.singh@amd.com>
+References: <20190620180247.8825-1-brijesh.singh@amd.com>
+In-Reply-To: <20190620180247.8825-1-brijesh.singh@amd.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -69,40 +71,39 @@ x-ms-exchange-messagesentrepresentingtype: 1
 x-mailer: git-send-email 2.17.1
 x-originating-ip: [165.204.77.1]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c6beb0f3-4b5e-4a07-d331-08d6f5a9895e
+x-ms-office365-filtering-correlation-id: 9a6f0ba3-44a4-49b0-98bf-08d6f5a99591
 x-ms-office365-filtering-ht: Tenant
 x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);
- SRVR:DM6PR12MB2842; 
-x-ms-traffictypediagnostic: DM6PR12MB2842:
-x-ms-exchange-purlcount: 2
-x-microsoft-antispam-prvs: <DM6PR12MB2842E04FC8A5A03298323B67E5E40@DM6PR12MB2842.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
+ SRVR:DM6PR12MB3260; 
+x-ms-traffictypediagnostic: DM6PR12MB3260:
+x-microsoft-antispam-prvs: <DM6PR12MB326075431AC57E6E2C9DB3F8E5E40@DM6PR12MB3260.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:124;
 x-forefront-prvs: 0074BBE012
 x-forefront-antispam-report: SFV:NSPM;
- SFS:(10009020)(136003)(376002)(396003)(366004)(346002)(39860400002)(189003)(199004)(81166006)(81156014)(386003)(86362001)(256004)(486006)(476003)(50226002)(186003)(2616005)(4326008)(8936002)(25786009)(68736007)(14454004)(5660300002)(26005)(66066001)(64756008)(5640700003)(6306002)(73956011)(3846002)(66556008)(6512007)(66476007)(53936002)(66946007)(966005)(2351001)(6486002)(66446008)(478600001)(99286004)(71200400001)(305945005)(14444005)(7736002)(6506007)(102836004)(71190400001)(52116002)(6436002)(8676002)(36756003)(54906003)(316002)(2501003)(6916009)(2906002)(1076003)(6116002)(6606295002);
- DIR:OUT; SFP:1101; SCL:1; SRVR:DM6PR12MB2842;
+ SFS:(10009020)(366004)(396003)(376002)(136003)(39860400002)(346002)(199004)(189003)(2351001)(53936002)(486006)(2616005)(11346002)(81156014)(8676002)(6436002)(446003)(5640700003)(50226002)(6512007)(476003)(102836004)(6916009)(99286004)(2501003)(6486002)(76176011)(8936002)(52116002)(81166006)(316002)(186003)(6506007)(26005)(478600001)(256004)(3846002)(2906002)(386003)(66066001)(14454004)(54906003)(6116002)(305945005)(25786009)(1076003)(66946007)(66556008)(73956011)(64756008)(66446008)(71190400001)(71200400001)(4744005)(68736007)(36756003)(66476007)(5660300002)(7736002)(86362001)(4326008);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:DM6PR12MB3260;
  H:DM6PR12MB2682.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
+ PTR:InfoNoRecords; A:1; MX:1; 
 received-spf: None (protection.outlook.com: amd.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 9epW2PqMgLSh2OdSE35nmxmelFJTPR2v3yW8/Fp18n8cEGKulW6xHZMUn+HY6WSm/BL5Ge6KjYhXAEAcXBhW+1kkiouXcJbMEOw+c0QUXnppyjOri58htgXToMZMfqbxD/7GMqw4RPlCjMIRtxnbGqRo359tsSd/Zyg6Z2O0urRvC8ouFxmlRNoDg3thl/DobCWCw0gcVsYqAsw3Sx0FtERLqM8DRW18GCz9ydPoY8MTu7DPUPJ9iJRhTx6qxROm89WOcUJ51L5xiCwNuBDsI2YsauZ4jo/vbD6VcZPxTCmZWCnCcMuYakyIaPqBS8REgyEjiDFofF9QQO6VL/wQ1bbLHnZiRr5rErKfx+CTP9RqJTppwCYSsG70MZ42+tWLNPQoGQChyA8wtapDiK/yJYOELga2Aketisw3mDzyTS4=
+x-microsoft-antispam-message-info: +oOETgPc7nqEwSYa2vNeVUTCNrQ8TpILwGI0Qz9ibuZjG43VPZzwLOqmc+MKnIxcumgDaoGy6a5sLaOthxCkytTVbHzcKA7ymLKZsfejdYroiAuVwV+YqlRqmaPSX2F7M2n69iPIeV05To5ex6vw/e2rrKh6DOuYqNek0jS/YARObLoM2GJ2lYSnsYAJCxJcACZTapK8u3iaNQUmv/6iUiMfPjwg55vhgtU6q8u4ufsiyBwh3ejKP4p/qF514JwAhjNqtp4ItpFVjbrpvMJy20Pyadr2UdYSUuitHCIT6qmoxhW+1Zha39h29tLiKqwZOE25d+y6y7tsrcAR5265vaes1DsRQwtVKw1CXrm6mCzqkFMh12/sahjc4e0jQnI3v9Z+C2XEm5nURppw1R2i8J9mAWenqiWt/mmglPvwZ3g=
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
 MIME-Version: 1.0
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c6beb0f3-4b5e-4a07-d331-08d6f5a9895e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jun 2019 18:03:04.9999 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9a6f0ba3-44a4-49b0-98bf-08d6f5a99591
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jun 2019 18:03:23.1196 (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
 X-MS-Exchange-CrossTenant-userprincipalname: sbrijesh@amd.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2842
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3260
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.79.73
-Subject: [Qemu-devel] [RFC PATCH v1 00/12] Add SEV guest live migration
- support
+X-Received-From: 40.107.72.59
+Subject: [Qemu-devel] [RFC PATCH v1 12/12] target/i386: sev: remove
+ migration blocker
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,47 +121,25 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QU1EIFNFViBlbmNyeXB0cyB0aGUgbWVtb3J5IG9mIFZNcyBhbmQgYmVjYXVzZSB0aGlzIGVuY3J5
-cHRpb24gaXMgZG9uZSB1c2luZw0KYW4gYWRkcmVzcyB0d2VhaywgdGhlIGh5cGVydmlzb3Igd2ls
-bCBub3QgYmUgYWJsZSB0byBzaW1wbHkgY29weSBjaXBoZXJ0ZXh0DQpiZXR3ZWVuIG1hY2hpbmVz
-IHRvIG1pZ3JhdGUgYSBWTS4gSW5zdGVhZCB0aGUgQU1EIFNFViBLZXkgTWFuYWdlbWVudCBBUEkN
-CnByb3ZpZGVzIGEgc2V0IG9mIGZ1bmN0aW9ucyB3aGljaCB0aGUgaHlwZXJ2aXNvciBjYW4gdXNl
-IHRvIHBhY2thZ2UgYQ0KZ3Vlc3QgZW5jcnlwdGVkIHBhZ2VzIGZvciBtaWdyYXRpb24sIHdoaWxl
-IG1haW50YWluaW5nIHRoZSBjb25maWRlbnRpYWxpdHkNCnByb3ZpZGVkIGJ5IEFNRCBTRVYuDQoN
-ClRoZSBwYXRjaCBzZXJpZXMgYWRkIHRoZSBzdXBwb3J0IHJlcXVpcmVkIGluIFFlbXUgdG8gcGVy
-Zm9ybSB0aGUgU0VWDQpndWVzdCBsaXZlIG1pZ3JhdGlvbi4gQmVmb3JlIGluaXRpYXRpbmcgdGhl
-IGxpdmUgbWlncmF0aW9uIGEgdXNlcg0Kc2hvdWxkIHVzZSBuZXdseSBhZGRlZCAnbWlncmF0ZS1z
-ZXQtc2V2LWluZm8nIGNvbW1hbmQgdG8gcGFzcyB0aGUNCnRhcmdldCBtYWNoaW5lcyBjZXJ0aWZp
-Y2F0ZSBjaGFpbi4gU2VlIHRoZSBkb2NzL2FtZC1tZW1vcnktZW5jcnlwdGlvbi50eHQNCmZvciBm
-dXJ0aGVyIGRldGFpbHMuDQoNClRoZSBwYXRjaCBzZXJpZXMgZGVwZW5kcyBvbiBrZXJuZWwgcGF0
-Y2hlcyBhdmFpbGFibGUgaGVyZToNCmh0dHBzOi8vbWFyYy5pbmZvLz9sPWt2bSZtPTE1NjEwNDg3
-MzQwOTg3NiZ3PTINCg0KVGhlIGNvbXBsZXRlIHRyZWUgd2l0aCBwYXRjaCBpcyBhdmFpbGFibGUg
-YXQ6DQpodHRwczovL2dpdGh1Yi5jb20vY29kb21hbmlhL3FlbXUvdHJlZS9zZXYtbWlncmF0aW9u
-LXJmYy12MQ0KDQpCcmlqZXNoIFNpbmdoICgxMik6DQogIGxpbnV4LWhlYWRlcnM6IHVwZGF0ZSBr
-ZXJuZWwgaGVhZGVyIHRvIGluY2x1ZGUgU0VWIG1pZ3JhdGlvbiBjb21tYW5kcw0KICBrdm06IGlu
-dHJvZHVjZSBoaWdoLWxldmVsIEFQSSB0byBzdXBwb3J0IGVuY3J5cHRlZCBndWVzdCBtaWdyYXRp
-b24NCiAgbWlncmF0aW9uL3JhbTogYWRkIHN1cHBvcnQgdG8gc2VuZCBlbmNyeXB0ZWQgcGFnZXMN
-CiAga3ZtOiBhZGQgc3VwcG9ydCB0byBzeW5jIHRoZSBwYWdlIGVuY3J5cHRpb24gc3RhdGUgYml0
-bWFwDQogIGRvYzogdXBkYXRlIEFNRCBTRVYgQVBJIHNwZWMgd2ViIGxpbmsNCiAgZG9jOiB1cGRh
-dGUgQU1EIFNFViB0byBpbmNsdWRlIExpdmUgbWlncmF0aW9uIGZsb3cNCiAgdGFyZ2V0L2kzODY6
-IHNldjogZG8gbm90IGNyZWF0ZSBsYXVuY2ggY29udGV4dCBmb3IgYW4gaW5jb21pbmcgZ3Vlc3QN
-CiAgdGFyZ2V0Lmpzb246IGFkZCBtaWdyYXRlLXNldC1zZXYtaW5mbyBjb21tYW5kDQogIHRhcmdl
-dC9pMzg2OiBzZXY6IGFkZCBzdXBwb3J0IHRvIGVuY3J5cHQgdGhlIG91dGdvaW5nIHBhZ2UNCiAg
-dGFyZ2V0L2kzODY6IHNldjogYWRkIHN1cHBvcnQgdG8gbG9hZCBpbmNvbWluZyBlbmNyeXB0ZWQg
-cGFnZQ0KICBtaWdyYXRpb246IGFkZCBzdXBwb3J0IHRvIG1pZ3JhdGUgcGFnZSBlbmNyeXB0aW9u
-IGJpdG1hcA0KICB0YXJnZXQvaTM4Njogc2V2OiByZW1vdmUgbWlncmF0aW9uIGJsb2NrZXINCg0K
-IGFjY2VsL2t2bS9rdm0tYWxsLmMgICAgICAgICAgICB8ICA3NSArKysrKysNCiBhY2NlbC9rdm0v
-c2V2LXN0dWIuYyAgICAgICAgICAgfCAgMjggKysNCiBhY2NlbC9zdHVicy9rdm0tc3R1Yi5jICAg
-ICAgICAgfCAgMzAgKysrDQogZG9jcy9hbWQtbWVtb3J5LWVuY3J5cHRpb24udHh0IHwgIDQ2ICsr
-Ky0NCiBpbmNsdWRlL2V4ZWMvcmFtX2FkZHIuaCAgICAgICAgfCAgIDIgKw0KIGluY2x1ZGUvc3lz
-ZW11L2t2bS5oICAgICAgICAgICB8ICAzMyArKysNCiBpbmNsdWRlL3N5c2VtdS9zZXYuaCAgICAg
-ICAgICAgfCAgIDkgKw0KIGxpbnV4LWhlYWRlcnMvbGludXgva3ZtLmggICAgICB8ICA1MyArKysr
-DQogbWlncmF0aW9uL3JhbS5jICAgICAgICAgICAgICAgIHwgMTIxICsrKysrKysrLQ0KIHFhcGkv
-dGFyZ2V0Lmpzb24gICAgICAgICAgICAgICB8ICAxOCArKw0KIHRhcmdldC9pMzg2L21vbml0b3Iu
-YyAgICAgICAgICB8ICAxMCArDQogdGFyZ2V0L2kzODYvc2V2LXN0dWIuYyAgICAgICAgIHwgICA1
-ICsNCiB0YXJnZXQvaTM4Ni9zZXYuYyAgICAgICAgICAgICAgfCA0NzEgKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKy0tDQogdGFyZ2V0L2kzODYvc2V2X2kzODYuaCAgICAgICAgIHwgIDEx
-ICstDQogdGFyZ2V0L2kzODYvdHJhY2UtZXZlbnRzICAgICAgIHwgICA5ICsNCiAxNSBmaWxlcyBj
-aGFuZ2VkLCA5MDIgaW5zZXJ0aW9ucygrKSwgMTkgZGVsZXRpb25zKC0pDQoNCi0tIA0KMi4xNy4x
-DQoNCg==
+U2lnbmVkLW9mZi1ieTogQnJpamVzaCBTaW5naCA8YnJpamVzaC5zaW5naEBhbWQuY29tPg0KLS0t
+DQogdGFyZ2V0L2kzODYvc2V2LmMgfCAxMiAtLS0tLS0tLS0tLS0NCiAxIGZpbGUgY2hhbmdlZCwg
+MTIgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS90YXJnZXQvaTM4Ni9zZXYuYyBiL3Rhcmdl
+dC9pMzg2L3Nldi5jDQppbmRleCBkYzFlOTc0ZDkzLi4wOTVlZjRjNzI5IDEwMDY0NA0KLS0tIGEv
+dGFyZ2V0L2kzODYvc2V2LmMNCisrKyBiL3RhcmdldC9pMzg2L3Nldi5jDQpAQCAtMzQsNyArMzQs
+NiBAQA0KICNkZWZpbmUgREVGQVVMVF9TRVZfREVWSUNFICAgICAgIi9kZXYvc2V2Ig0KIA0KIHN0
+YXRpYyBTRVZTdGF0ZSAqc2V2X3N0YXRlOw0KLXN0YXRpYyBFcnJvciAqc2V2X21pZ19ibG9ja2Vy
+Ow0KIA0KIHN0YXRpYyBjb25zdCBjaGFyICpjb25zdCBzZXZfZndfZXJybGlzdFtdID0gew0KICAg
+ICAiIiwNCkBAIC02ODUsNyArNjg0LDYgQEAgc3RhdGljIHZvaWQNCiBzZXZfbGF1bmNoX2Zpbmlz
+aChTRVZTdGF0ZSAqcykNCiB7DQogICAgIGludCByZXQsIGVycm9yOw0KLSAgICBFcnJvciAqbG9j
+YWxfZXJyID0gTlVMTDsNCiANCiAgICAgdHJhY2Vfa3ZtX3Nldl9sYXVuY2hfZmluaXNoKCk7DQog
+ICAgIHJldCA9IHNldl9pb2N0bChzZXZfc3RhdGUtPnNldl9mZCwgS1ZNX1NFVl9MQVVOQ0hfRklO
+SVNILCAwLCAmZXJyb3IpOw0KQEAgLTY5NiwxNiArNjk0LDYgQEAgc2V2X2xhdW5jaF9maW5pc2go
+U0VWU3RhdGUgKnMpDQogICAgIH0NCiANCiAgICAgc2V2X3NldF9ndWVzdF9zdGF0ZShTRVZfU1RB
+VEVfUlVOTklORyk7DQotDQotICAgIC8qIGFkZCBtaWdyYXRpb24gYmxvY2tlciAqLw0KLSAgICBl
+cnJvcl9zZXRnKCZzZXZfbWlnX2Jsb2NrZXIsDQotICAgICAgICAgICAgICAgIlNFVjogTWlncmF0
+aW9uIGlzIG5vdCBpbXBsZW1lbnRlZCIpOw0KLSAgICByZXQgPSBtaWdyYXRlX2FkZF9ibG9ja2Vy
+KHNldl9taWdfYmxvY2tlciwgJmxvY2FsX2Vycik7DQotICAgIGlmIChsb2NhbF9lcnIpIHsNCi0g
+ICAgICAgIGVycm9yX3JlcG9ydF9lcnIobG9jYWxfZXJyKTsNCi0gICAgICAgIGVycm9yX2ZyZWUo
+c2V2X21pZ19ibG9ja2VyKTsNCi0gICAgICAgIGV4aXQoMSk7DQotICAgIH0NCiB9DQogDQogc3Rh
+dGljIGludA0KLS0gDQoyLjE3LjENCg0K
 
