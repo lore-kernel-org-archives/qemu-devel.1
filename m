@@ -2,86 +2,79 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFF4BC43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 09:08:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F14E5C43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 09:10:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CCB12080C
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 09:08:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="m7aNdc8I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CCB12080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bytedance.com
+	by mail.kernel.org (Postfix) with ESMTPS id C996E2080C
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 09:10:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C996E2080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45038 helo=lists.gnu.org)
+Received: from localhost ([::1]:45060 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdt33-0006CL-To
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 05:08:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38483)
+	id 1hdt5A-0000ZK-2d
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 05:10:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36172)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pizhenwei@bytedance.com>) id 1hdsqQ-0006T1-PT
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 04:55:01 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hdsjE-0007SI-JG
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 04:47:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pizhenwei@bytedance.com>) id 1hdsqO-0006Zo-Rh
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 04:54:58 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:40353)
+ (envelope-from <pbonzini@redhat.com>) id 1hdsZX-00009J-9p
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 04:37:33 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:42541)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pizhenwei@bytedance.com>)
- id 1hdsqM-0006Pe-VF
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 04:54:55 -0400
-Received: by mail-pg1-x541.google.com with SMTP id w10so1217724pgj.7
- for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 01:54:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=bytedance-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=Q++PuXQ04Zp6hoQX9wFKwFojx0AIP28t8ItaEcjA+So=;
- b=m7aNdc8ItkosH5h4msOLDiFJbcU9S/tcUdIicv0UFXsvZdpehUqx4N7rlK0+Kibn9i
- e3PwA2vn1KKZZFAR/6X80DmRDdiGmQND9EEaeagfbTb48bSO4VsZMBNHQXiixBDaCJ4s
- 6r18SaIy7yAuCLPXmVmkVKpxa/Lo9ww73n6DJsfHj9u9thSc2oHcR5yzK5bZDHsqGH8K
- raNtFSd1CgRCsla68YNa9JooELnVmJnNbGZb2LAv/33Wp2mTxqBOZPyUSAu4vLVxn/Xm
- 1RSJpMaBHZff394SGhyNTeMZj48dES7oQei7QU6iMrdyQ8oaWsZ+EqaEsKqIvCtq8xqe
- G2og==
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hdsZX-00008m-35
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 04:37:31 -0400
+Received: by mail-wr1-f67.google.com with SMTP id x17so2058900wrl.9
+ for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 01:37:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=Q++PuXQ04Zp6hoQX9wFKwFojx0AIP28t8ItaEcjA+So=;
- b=a4mod8djic+FGFbOfDs5Hc+8vT9tPmx3k5c8sDr1fDTBavtsPdZXEnm6uYGk6L3je6
- DkhflUXE4Z74otvrS7gig8fP06kOEGgKxiq1kmQpVYrx3pMVFWYdP7BU3ywKwvVhIgCC
- OlDPV+cprBVyNRNEj6uCwZH1Y60kWq/Oe5zhiKNtv0zTDPTPndqBwSma5pVY2kT8LLSb
- /AlbjdgBX26Ii0nv6WBqOmb6kVkd1+3fueYvFPV9HwRgWYDwQcvEuB78FdpQGz2cwteI
- YsQE3Wb/r0FC8EVXkv5ueCO9ZhzmCIxzUEn1mmVtogcQkJ5n/KZwcq9Pwsng2gdLoqrM
- O1Vw==
-X-Gm-Message-State: APjAAAXgpiz87w2k4udHJ/0xPC/66S6NPjqFFcKVveec4/a7JowWQ+cL
- uCronAF7A+nUT6XHeeuUDg70Ww==
-X-Google-Smtp-Source: APXvYqxGgNIpP5m8hjt2XRXNjew6D43qZBDeycvm2oq0ajpQVwfCEyFY6dtZeJdWdrrrqzy5Jbilvg==
-X-Received: by 2002:a17:90a:950d:: with SMTP id
- t13mr1909178pjo.81.1561020884462; 
- Thu, 20 Jun 2019 01:54:44 -0700 (PDT)
-Received: from always-ThinkPad-T480.bytedance.net ([61.120.150.76])
- by smtp.gmail.com with ESMTPSA id c11sm19240635pgg.2.2019.06.20.01.54.41
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Thu, 20 Jun 2019 01:54:43 -0700 (PDT)
-From: zhenwei pi <pizhenwei@bytedance.com>
-To: kwolf@redhat.com,
-	mreitz@redhat.com
-Date: Thu, 20 Jun 2019 16:54:31 +0800
-Message-Id: <1561020872-6214-3-git-send-email-pizhenwei@bytedance.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1561020872-6214-1-git-send-email-pizhenwei@bytedance.com>
-References: <1561020872-6214-1-git-send-email-pizhenwei@bytedance.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::541
-Subject: [Qemu-devel] [PATCH 2/3] block/accounting: introduce block size
- histogram
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=icMDHJml4YzNC2+uMQPTyHMHzAQGuNXRDvXQiyxryo4=;
+ b=gaYF1vmT6vHvxLgZw3Aa2OfOFmMEWMSbqDkrj/EM6vRv6MXAY5V8Lglgb6AZGDzvZk
+ SmSUjPSYkKujh4PsWjZiv8QWtpjGEb6QSx2RVH7pfWbpbASJ0X3VJD/cJ8d/x6eKcKVT
+ s0tXaOD2Y5nyVMXOQS2SgzgMrpdz3PkocfaEzW64wqiNewJHxw6xuZay5raoEfqayHGT
+ GwVRao10RAGPYrWFQvTiFZCVB4eNdA0Sze6PjMbjLirovLZdWqZYWGIdfDvZv9P3Yu8N
+ aIO47IGtzjvFn28uThTJNJ/C5pFjWbmj2EZU1+HiN/SzcdjFyCBh33HRYaA6QJY3RK8d
+ YOgQ==
+X-Gm-Message-State: APjAAAUu+Y/r7Cnsh5e88qNgFJm+e299BmGgIOY9aNeD1z8vmPe+Indp
+ 5bGGsk6ElxGfQHBYRXgJYf/YGg==
+X-Google-Smtp-Source: APXvYqwdFvmhkOrT2UksJKAm8rN3pkMsvsfh368tDHeYshk1gk8WpjRmdZK8c82iJRJmPia2Asc/Fg==
+X-Received: by 2002:adf:dc4b:: with SMTP id m11mr30107683wrj.51.1561019849912; 
+ Thu, 20 Jun 2019 01:37:29 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:7822:aa18:a9d8:39ab?
+ ([2001:b07:6468:f312:7822:aa18:a9d8:39ab])
+ by smtp.gmail.com with ESMTPSA id d4sm17877488wra.38.2019.06.20.01.37.29
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Thu, 20 Jun 2019 01:37:29 -0700 (PDT)
+To: =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190619201050.19040-1-armbru@redhat.com>
+ <20190619201050.19040-2-armbru@redhat.com>
+ <e0595422-c115-ca7f-9e3c-cfb69602d5e2@suse.de>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <faad4d88-cd53-cd77-390d-088fc51d0f9c@redhat.com>
+Date: Thu, 20 Jun 2019 10:37:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <e0595422-c115-ca7f-9e3c-cfb69602d5e2@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH 01/17] MAINTAINERS: new maintainers for QOM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,88 +86,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, qemu-block@nongnu.org, vsementsov@virtuozzo.com,
- qemu-devel@nongnu.org, pizhenwei@bytedance.com
+Cc: kwolf@redhat.com, "Daniel P . Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Introduce block size histogram statics for block devices.
+On 19/06/19 22:31, Andreas Färber wrote:
+> Am 19.06.19 um 22:10 schrieb Markus Armbruster:
+>> From: Paolo Bonzini <pbonzini@redhat.com>
+>>
+>> QOM is not a particularly active subsystem now: 51 commits in two years.
+>> But, we need active maintainers to review and merge patches, and Git
+>> shows the following top committers taking on QOM:
+>>
+>>     Markus Armbruster <armbru@redhat.com>
+>>     Eduardo Habkost <ehabkost@redhat.com>
+>>     Paolo Bonzini <pbonzini@redhat.com>
+>>     Marc-André Lureau <marcandre.lureau@redhat.com>
+>>     Eric Blake <eblake@redhat.com>
+>>
+>> I volunteer myself, and also volunteer Eduardo and Daniel as reviewers
+>> since they understand the code well.
+>>
+>> Cc: Andreas Färber <afaerber@suse.de>
+>> Cc: Daniel P. Berrange <berrange@redhat.com>
+>> Cc: Eduardo Habkost <ehabkost@redhat.com>
+>> Suggested-by: Markus Armbruster <armbru@redhat.com>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> Message-Id: <20190607113737.13473-1-pbonzini@redhat.com>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> 
+> I'm pretty sure I gave an Acked-by that's missing above?
 
-For read/write/flush operation type, the block size region
-[0, +inf) is divided into subregions by several points.
-It works like block latency histogram.
+Yes, and Markus even replied to it:
 
-Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
----
- block/accounting.c         | 24 ++++++++++++++++++++++++
- include/block/accounting.h |  4 ++++
- 2 files changed, 28 insertions(+)
+https://patchew.org/QEMU/20190607113737.13473-1-pbonzini@redhat.com/
 
-diff --git a/block/accounting.c b/block/accounting.c
-index bb8148b6b1..94d5aa292e 100644
---- a/block/accounting.c
-+++ b/block/accounting.c
-@@ -187,6 +187,27 @@ void block_latency_histograms_clear(BlockAcctStats *stats)
-     }
- }
- 
-+int block_size_histogram_set(BlockAcctStats *stats, enum BlockAcctType type,
-+                                uint64List *boundaries)
-+{
-+    BlockHistogram *hist = &stats->size_histogram[type];
-+
-+    return block_histogram_set(hist, boundaries);
-+}
-+
-+void block_size_histograms_clear(BlockAcctStats *stats)
-+{
-+    int i;
-+
-+    for (i = 0; i < BLOCK_MAX_IOTYPE; i++) {
-+        BlockHistogram *hist = &stats->size_histogram[i];
-+        g_free(hist->bins);
-+        g_free(hist->boundaries);
-+        memset(hist, 0, sizeof(*hist));
-+    }
-+}
-+
-+
- static void block_account_one_io(BlockAcctStats *stats, BlockAcctCookie *cookie,
-                                  bool failed)
- {
-@@ -211,6 +232,9 @@ static void block_account_one_io(BlockAcctStats *stats, BlockAcctCookie *cookie,
- 
-     block_histogram_account(&stats->latency_histogram[cookie->type],
-                                     latency_ns);
-+    block_histogram_account(&stats->size_histogram[cookie->type],
-+                                    cookie->bytes);
-+
- 
-     if (!failed || stats->account_failed) {
-         stats->total_time_ns[cookie->type] += latency_ns;
-diff --git a/include/block/accounting.h b/include/block/accounting.h
-index 270fddb69c..49d3a78f48 100644
---- a/include/block/accounting.h
-+++ b/include/block/accounting.h
-@@ -89,6 +89,7 @@ struct BlockAcctStats {
-     bool account_invalid;
-     bool account_failed;
-     BlockHistogram latency_histogram[BLOCK_MAX_IOTYPE];
-+    BlockHistogram size_histogram[BLOCK_MAX_IOTYPE];
- };
- 
- typedef struct BlockAcctCookie {
-@@ -117,5 +118,8 @@ double block_acct_queue_depth(BlockAcctTimedStats *stats,
- int block_latency_histogram_set(BlockAcctStats *stats, enum BlockAcctType type,
-                                 uint64List *boundaries);
- void block_latency_histograms_clear(BlockAcctStats *stats);
-+int block_size_histogram_set(BlockAcctStats *stats, enum BlockAcctType type,
-+                                uint64List *boundaries);
-+void block_size_histograms_clear(BlockAcctStats *stats);
- 
- #endif
--- 
-2.11.0
+Paolo
 
 
