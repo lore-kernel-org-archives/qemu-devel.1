@@ -2,90 +2,78 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDCECC43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 15:06:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90658C43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 15:06:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BAB9D20673
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 15:06:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAB9D20673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5EA7A20673
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 15:06:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="hS0yLmph"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EA7A20673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48860 helo=lists.gnu.org)
+Received: from localhost ([::1]:48868 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdydo-0003VO-VI
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 11:06:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34750)
+	id 1hdyeI-0005Co-Kq
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 11:06:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37820)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hdyBs-0006bN-6q
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:37:31 -0400
+ (envelope-from <kwankhede@nvidia.com>) id 1hdyJm-0005qQ-JG
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:45:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hdyBp-0000Q3-3E
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:37:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51184)
+ (envelope-from <kwankhede@nvidia.com>) id 1hdyJk-0005KP-VK
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:45:38 -0400
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:1930)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hdxMM-0002Hm-2Z; Thu, 20 Jun 2019 09:44:15 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E214C5277E;
- Thu, 20 Jun 2019 13:44:12 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.208])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2DB726090E;
- Thu, 20 Jun 2019 13:44:10 +0000 (UTC)
-To: Sam Eiderman <shmuel.eiderman@oracle.com>, kwolf@redhat.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-References: <20190620091057.47441-1-shmuel.eiderman@oracle.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <4fd4cb44-9e96-4873-b271-4d293838676f@redhat.com>
-Date: Thu, 20 Jun 2019 15:44:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+ id 1hdyJk-0005Fs-LE
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:45:36 -0400
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by
+ hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5d0b9ac20002>; Thu, 20 Jun 2019 07:40:02 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate102.nvidia.com (PGP Universal service);
+ Thu, 20 Jun 2019 07:40:03 -0700
+X-PGP-Universal: processed;
+ by hqpgpgate102.nvidia.com on Thu, 20 Jun 2019 07:40:03 -0700
+Received: from HQMAIL106.nvidia.com (172.18.146.12) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 20 Jun
+ 2019 14:40:03 +0000
+Received: from kwankhede-dev.nvidia.com (172.20.13.39) by HQMAIL.nvidia.com
+ (172.18.146.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Thu, 20 Jun 2019 14:39:56 +0000
+From: Kirti Wankhede <kwankhede@nvidia.com>
+To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
+Date: Thu, 20 Jun 2019 20:07:29 +0530
+Message-ID: <1561041461-22326-2-git-send-email-kwankhede@nvidia.com>
+X-Mailer: git-send-email 2.7.0
+In-Reply-To: <1561041461-22326-1-git-send-email-kwankhede@nvidia.com>
+References: <1561041461-22326-1-git-send-email-kwankhede@nvidia.com>
+X-NVConfidentiality: public
 MIME-Version: 1.0
-In-Reply-To: <20190620091057.47441-1-shmuel.eiderman@oracle.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="qVwyhQhZiaZGLvFdjpK5D4D7Ro35aAYIB"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Thu, 20 Jun 2019 13:44:12 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] vmdk: Add read-only support for the
- new seSparse format
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1561041603; bh=THnmNciup8K6MltIgZk/d5O+MlQPVi/MbEN8A0oJa+Y=;
+ h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+ In-Reply-To:References:X-NVConfidentiality:MIME-Version:
+ Content-Type;
+ b=hS0yLmphazasVj+UCwipyFec04P+70ew/U7JKL6aJg1/09jkYH5YNjLwftmSDUt3P
+ JAGrtLPSnGCMhE0WurRwdOQeKsrTyaz23zzkhp2V2ZhYFyMTVLVU8FBsDXhSJI+0S4
+ 917TII1ZZOzH1/wD34ExlpbrFxgvEPKJ4yNqNcUD763bSFAT0IFgjzlsWEs3iX2LD8
+ CUZX+M+elFzztc/hS/bbPqovVHnWlglm2i2JpjmwWyvvVNOTKUcAq9OvJ6+eMxI6gE
+ tfjVkzuawjk5boFEr0+dx4zFoDrh6X+fOKsBT/vovfUr6U6ghIsuBs+6qF8ASWmCEJ
+ 4luoR0uXpmHZQ==
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8
+X-Received-From: 216.228.121.65
+Subject: [Qemu-devel] [PATCH v4 01/13] vfio: KABI for migration interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,85 +85,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liran.alon@oracle.com, karl.heubaum@oracle.com, arbel.moshe@oracle.com
+Cc: Kirti Wankhede <kwankhede@nvidia.com>, Zhengxiao.zx@Alibaba-inc.com,
+ kevin.tian@intel.com, yi.l.liu@intel.com, yan.y.zhao@intel.com,
+ eskultet@redhat.com, ziye.yang@intel.com, qemu-devel@nongnu.org,
+ cohuck@redhat.com, shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com,
+ zhi.a.wang@intel.com, mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
+ yulei.zhang@intel.com, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, changpeng.liu@intel.com, Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qVwyhQhZiaZGLvFdjpK5D4D7Ro35aAYIB
-Content-Type: multipart/mixed; boundary="UMW2yEuXdCoGovox0MnZZ6aAwnim1m46C";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Sam Eiderman <shmuel.eiderman@oracle.com>, kwolf@redhat.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: karl.heubaum@oracle.com, liran.alon@oracle.com, arbel.moshe@oracle.com
-Message-ID: <4fd4cb44-9e96-4873-b271-4d293838676f@redhat.com>
-Subject: Re: [PATCH v3 0/3] vmdk: Add read-only support for the new seSparse
- format
-References: <20190620091057.47441-1-shmuel.eiderman@oracle.com>
-In-Reply-To: <20190620091057.47441-1-shmuel.eiderman@oracle.com>
+- Defined MIGRATION region type and sub-type.
+- Used 3 bits to define VFIO device states.
+    Bit 0 => _RUNNING
+    Bit 1 => _SAVING
+    Bit 2 => _RESUMING
+    Combination of these bits defines VFIO device's state during migration
+    _STOPPED => All bits 0 indicates VFIO device stopped.
+    _RUNNING => Normal VFIO device running state.
+    _SAVING | _RUNNING => vCPUs are running, VFIO device is running but start
+                          saving state of device i.e. pre-copy state
+    _SAVING  => vCPUs are stoppped, VFIO device should be stopped, and
+                          save device state,i.e. stop-n-copy state
+    _RESUMING => VFIO device resuming state.
+    _SAVING | _RESUMING => Invalid state if _SAVING and _RESUMING bits are set
+- Defined vfio_device_migration_info structure which will be placed at 0th
+  offset of migration region to get/set VFIO device related information.
+  Defined members of structure and usage on read/write access:
+    * device_state: (read/write)
+        To convey VFIO device state to be transitioned to. Only 3 bits are used
+        as of now.
+    * pending bytes: (read only)
+        To get pending bytes yet to be migrated for VFIO device.
+    * data_offset: (read only)
+        To get data offset in migration from where data exist during _SAVING
+        and from where data should be written by user space application during
+         _RESUMING state
+    * data_size: (read/write)
+        To get and set size of data copied in migration region during _SAVING
+        and _RESUMING state.
+    * start_pfn, page_size, total_pfns: (write only)
+        To get bitmap of dirty pages from vendor driver from given
+        start address for total_pfns.
+    * copied_pfns: (read only)
+        To get number of pfns bitmap copied in migration region.
+        Vendor driver should copy the bitmap with bits set only for
+        pages to be marked dirty in migration region. Vendor driver
+        should return 0 if there are 0 pages dirty in requested
+        range. Vendor driver should return -1 to mark all pages in the section
+        as dirty
 
---UMW2yEuXdCoGovox0MnZZ6aAwnim1m46C
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Migration region looks like:
+ ------------------------------------------------------------------
+|vfio_device_migration_info|    data section                      |
+|                          |     ///////////////////////////////  |
+ ------------------------------------------------------------------
+ ^                              ^                              ^
+ offset 0-trapped part        data_offset                 data_size
 
-On 20.06.19 11:10, Sam Eiderman wrote:
-> v1:
->=20
-> VMware introduced a new snapshot format in VMFS6 - seSparse (Space
-> Efficient Sparse) which is the default format available in ESXi 6.7.
-> Add read-only support for the new snapshot format.
->=20
-> v2:
->=20
-> Fixed after Max's review:
->=20
-> * Removed strict sesparse checks
-> * Reduced maximal L1 table size
-> * Added non-write mode check in vmdk_open() on sesparse
->=20
-> v3:
->=20
-> Change non-write mode check in vmdk_open() to bdrv_apply_auto_read_only=
-().
->=20
-> Sam Eiderman (3):
->   vmdk: Fix comment regarding max l1_size coverage
->   vmdk: Reduce the max bound for L1 table size
->   vmdk: Add read-only support for seSparse snapshots
->=20
->  block/vmdk.c               | 372 +++++++++++++++++++++++++++++++++++++=
-+++++---
->  tests/qemu-iotests/059.out |   2 +-
->  2 files changed, 353 insertions(+), 21 deletions(-)
+Data section is always followed by vfio_device_migration_info
+structure in the region, so data_offset will always be none-0.
+Offset from where data is copied is decided by kernel driver, data
+section can be trapped or mapped depending on how kernel driver
+defines data section. If mmapped, then data_offset should be page
+aligned, where as initial section which contain
+vfio_device_migration_info structure might not end at offset which
+is page aligned.
 
-Thanks, applied to my block branch:
+Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+Reviewed-by: Neo Jia <cjia@nvidia.com>
+---
+ linux-headers/linux/vfio.h | 71 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 71 insertions(+)
 
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index 24f505199f83..274ec477eb82 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -372,6 +372,77 @@ struct vfio_region_gfx_edid {
+  */
+ #define VFIO_REGION_SUBTYPE_IBM_NVLINK2_ATSD	(1)
+ 
++/* Migration region type and sub-type */
++#define VFIO_REGION_TYPE_MIGRATION	        (2)
++#define VFIO_REGION_SUBTYPE_MIGRATION	        (1)
++
++/**
++ * Structure vfio_device_migration_info is placed at 0th offset of
++ * VFIO_REGION_SUBTYPE_MIGRATION region to get/set VFIO device related migration
++ * information. Field accesses from this structure are only supported at their
++ * native width and alignment, otherwise should return error.
++ *
++ * device_state: (read/write)
++ *      To indicate vendor driver the state VFIO device should be transitioned
++ *      to. If device state transition fails, write to this field return error.
++ *      It consists of 3 bits:
++ *      - If bit 0 set, indicates _RUNNING state. When its reset, that indicates
++ *        _STOPPED state. When device is changed to _STOPPED, driver should stop
++ *        device before write returns.
++ *      - If bit 1 set, indicates _SAVING state.
++ *      - If bit 2 set, indicates _RESUMING state.
++ *
++ * pending bytes: (read only)
++ *      Read pending bytes yet to be migrated from vendor driver
++ *
++ * data_offset: (read only)
++ *      User application should read data_offset in migration region from where
++ *      user application should read data during _SAVING state or write data
++ *      during _RESUMING state.
++ *
++ * data_size: (read/write)
++ *      User application should read data_size to know data copied in migration
++ *      region during _SAVING state and write size of data copied in migration
++ *      region during _RESUMING state.
++ *
++ * start_pfn: (write only)
++ *      Start address pfn to get bitmap of dirty pages from vendor driver duing
++ *      _SAVING state.
++ *
++ * page_size: (write only)
++ *      User application should write the page_size of pfn.
++ *
++ * total_pfns: (write only)
++ *      Total pfn count from start_pfn for which dirty bitmap is requested.
++ *
++ * copied_pfns: (read only)
++ *      pfn count for which dirty bitmap is copied to migration region.
++ *      Vendor driver should copy the bitmap with bits set only for pages to be
++ *      marked dirty in migration region.
++ *      Vendor driver should return 0 if there are 0 pages dirty in requested
++ *      range.
++ *      Vendor driver should return -1 to mark all pages in the section as
++ *      dirty.
++ */
++
++struct vfio_device_migration_info {
++        __u32 device_state;         /* VFIO device state */
++#define VFIO_DEVICE_STATE_STOPPED   (0)
++#define VFIO_DEVICE_STATE_RUNNING   (1 << 0)
++#define VFIO_DEVICE_STATE_SAVING    (1 << 1)
++#define VFIO_DEVICE_STATE_RESUMING  (1 << 2)
++#define VFIO_DEVICE_STATE_INVALID   (VFIO_DEVICE_STATE_SAVING | \
++                                     VFIO_DEVICE_STATE_RESUMING)
++        __u32 reserved;
++        __u64 pending_bytes;
++        __u64 data_offset;
++        __u64 data_size;
++        __u64 start_pfn;
++        __u64 page_size;
++        __u64 total_pfns;
++        __s64 copied_pfns;
++} __attribute__((packed));
++
+ /*
+  * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped
+  * which allows direct access to non-MSIX registers which happened to be within
+-- 
+2.7.0
 
-Max
-
-
---UMW2yEuXdCoGovox0MnZZ6aAwnim1m46C--
-
---qVwyhQhZiaZGLvFdjpK5D4D7Ro35aAYIB
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0LjakACgkQ9AfbAGHV
-z0BCLQf+JKrrTzxSkuwW51VO5NxdQleT8ce1UuWSD+mKxcF3aNTEKXJW5bH1bI5M
-s/PYb1Z5lKLR/OtFYe8hQl14oPgHtN3FeW82oSqffU0KhY5aYVfDAVT52XwU0aZo
-dlT1Ea0BO/QyIJLVyalbSmR7jC0xASVQ9tIHK8ImUsrOm9SORke15oDxI8V8u19I
-sow96yn5jWQeN/Unx0aILQtIbKgOl5LVMfycwVGvHO5J0KAZugRXV3ub9DFGG53w
-eigTHslqBRTuUqe7P3nX5J9gVYKX/aqv3cchheTYCmOttlaCHV0GVQ3r7hg3by6/
-D1Bza4dLMONqsCFJubx4QIu8CiwWfQ==
-=/y66
------END PGP SIGNATURE-----
-
---qVwyhQhZiaZGLvFdjpK5D4D7Ro35aAYIB--
 
