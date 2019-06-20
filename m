@@ -2,64 +2,62 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F640C43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 12:11:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC3ABC43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 12:23:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB2B32080C
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 12:11:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB2B32080C
+	by mail.kernel.org (Postfix) with ESMTPS id 82A75206E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 12:23:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82A75206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47006 helo=lists.gnu.org)
+Received: from localhost ([::1]:47274 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdvuD-0008EX-RH
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 08:11:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56966)
+	id 1hdw6W-0005JL-H7
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 08:23:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33214)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1hdvbw-0002nc-0T
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 07:52:13 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hdw2e-00017h-Uc
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 08:19:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hdvbt-00016D-P5
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 07:52:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59928)
+ (envelope-from <imammedo@redhat.com>) id 1hdvuE-0008MV-9Q
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 08:11:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43276)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hdvbt-00012q-Hj
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 07:52:09 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>)
+ id 1hdvuB-00084t-0D; Thu, 20 Jun 2019 08:11:03 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 21EA63D95D
- for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 11:52:07 +0000 (UTC)
-Received: from redhat.com (ovpn-112-65.ams2.redhat.com [10.36.112.65])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8940960156;
- Thu, 20 Jun 2019 11:52:03 +0000 (UTC)
-Date: Thu, 20 Jun 2019 12:52:00 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190620115200.GC31635@redhat.com>
-References: <20190620114116.27254-1-imammedo@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id B5DAA307D980;
+ Thu, 20 Jun 2019 12:11:01 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9657E608D0;
+ Thu, 20 Jun 2019 12:10:56 +0000 (UTC)
+Date: Thu, 20 Jun 2019 14:10:52 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Message-ID: <20190620141052.370788fb@redhat.com>
+In-Reply-To: <1557832703-42620-3-git-send-email-gengdongjiu@huawei.com>
+References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
+ <1557832703-42620-3-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190620114116.27254-1-imammedo@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Thu, 20 Jun 2019 11:52:07 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.48]); Thu, 20 Jun 2019 12:11:01 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] deprecate -mem-path fallback to anonymous
- RAM
+Subject: Re: [Qemu-devel] [PATCH v17 02/10] ACPI: add some GHES structures
+ and macros definition
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,43 +69,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: libvir-list@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, kvm@vger.kernel.org,
+ mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org,
+ linuxarm@huawei.com, shannon.zhaosl@gmail.com, zhengxiang9@huawei.com,
+ qemu-arm@nongnu.org, james.morse@arm.com, xuwei5@huawei.com,
+ jonathan.cameron@huawei.com, pbonzini@redhat.com, lersek@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 20, 2019 at 07:41:16AM -0400, Igor Mammedov wrote:
-> Fallback might affect guest or worse whole host performance
-> or functionality if backing file were used to share guest RAM
-> with another process.
->=20
-> Patch deprecates fallback so that we could remove it in future
-> and ensure that QEMU will provide expected behavior and fail if
-> it can't use user provided backing file.
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+On Tue, 14 May 2019 04:18:15 -0700
+Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+
+> Add Generic Error Status Block structures and some macros
+> definitions, which is referred to the ACPI 4.0 or ACPI 6.2. The
+> HEST table generation and CPER record will use them.
+> 
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 > ---
-> PS:
-> Patch is written on top of
->   [PATCH v4 0/3] numa: deprecate '-numa node,  mem' and default memory =
-distribution
-> to avoid conflicts in qemu-deprecated.texi
->=20
->  numa.c               | 4 ++--
->  qemu-deprecated.texi | 8 ++++++++
->  2 files changed, 10 insertions(+), 2 deletions(-)
+>  include/hw/acpi/acpi-defs.h | 52 +++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 52 insertions(+)
+> 
+> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> index f9aa4bd..d1996fb 100644
+> --- a/include/hw/acpi/acpi-defs.h
+> +++ b/include/hw/acpi/acpi-defs.h
+> @@ -224,6 +224,25 @@ typedef struct AcpiMultipleApicTable AcpiMultipleApicTable;
+>  #define ACPI_APIC_RESERVED              16   /* 16 and greater are reserved */
+>  
+>  /*
+> + * Values for Hardware Error Notification Type field
+> + */
+> +enum AcpiHestNotifyType {
+> +    ACPI_HEST_NOTIFY_POLLED = 0,
+> +    ACPI_HEST_NOTIFY_EXTERNAL = 1,
+> +    ACPI_HEST_NOTIFY_LOCAL = 2,
+> +    ACPI_HEST_NOTIFY_SCI = 3,
+> +    ACPI_HEST_NOTIFY_NMI = 4,
+> +    ACPI_HEST_NOTIFY_CMCI = 5,  /* ACPI 5.0: 18.3.2.7, Table 18-290 */
+> +    ACPI_HEST_NOTIFY_MCE = 6,   /* ACPI 5.0: 18.3.2.7, Table 18-290 */
+> +    ACPI_HEST_NOTIFY_GPIO = 7,  /* ACPI 6.0: 18.3.2.7, Table 18-332 */
+> +    ACPI_HEST_NOTIFY_SEA = 8,   /* ACPI 6.1: 18.3.2.9, Table 18-345 */
+> +    ACPI_HEST_NOTIFY_SEI = 9,   /* ACPI 6.1: 18.3.2.9, Table 18-345 */
+> +    ACPI_HEST_NOTIFY_GSIV = 10, /* ACPI 6.1: 18.3.2.9, Table 18-345 */
+> +    ACPI_HEST_NOTIFY_SDEI = 11, /* ACPI 6.2: 18.3.2.9, Table 18-383 */
+> +    ACPI_HEST_NOTIFY_RESERVED = 12 /* 12 and greater are reserved */
+> +};
+> +
+> +/*
+>   * MADT sub-structures (Follow MULTIPLE_APIC_DESCRIPTION_TABLE)
+>   */
+>  #define ACPI_SUB_HEADER_DEF   /* Common ACPI sub-structure header */\
+> @@ -400,6 +419,39 @@ struct AcpiSystemResourceAffinityTable {
+>  } QEMU_PACKED;
+>  typedef struct AcpiSystemResourceAffinityTable AcpiSystemResourceAffinityTable;
+>  
+> +/*
+> + * Generic Error Status Block
+> + */
+> +struct AcpiGenericErrorStatus {
+> +    /* It is a bitmask composed of ACPI_GEBS_xxx macros */
+> +    uint32_t block_status;
+> +    uint32_t raw_data_offset;
+> +    uint32_t raw_data_length;
+> +    uint32_t data_length;
+> +    uint32_t error_severity;
+> +} QEMU_PACKED;
+> +typedef struct AcpiGenericErrorStatus AcpiGenericErrorStatus;
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+there shouldn't be packed structures,
+is it a leftover from previous version?
 
+> +
+> +/*
+> + * Masks for block_status flags above
+> + */
+> +#define ACPI_GEBS_UNCORRECTABLE         1
+> +
+> +/*
+> + * Values for error_severity field above
+> + */
+> +enum AcpiGenericErrorSeverity {
+> +    ACPI_CPER_SEV_RECOVERABLE,
+> +    ACPI_CPER_SEV_FATAL,
+> +    ACPI_CPER_SEV_CORRECTED,
+> +    ACPI_CPER_SEV_NONE,
+> +};
+> +
+> +/*
+> + * Generic Hardware Error Source version 2
+> + */
+> +#define ACPI_HEST_SOURCE_GENERIC_ERROR_V2    10
+> +
+>  #define ACPI_SRAT_PROCESSOR_APIC     0
+>  #define ACPI_SRAT_MEMORY             1
+>  #define ACPI_SRAT_PROCESSOR_x2APIC   2
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
 
