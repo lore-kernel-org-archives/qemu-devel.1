@@ -4,65 +4,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B786EC43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 12:37:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 806BDC43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 12:39:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E3ED20675
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 12:37:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E3ED20675
+	by mail.kernel.org (Postfix) with ESMTPS id 186E72082C
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 12:39:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 186E72082C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47348 helo=lists.gnu.org)
+Received: from localhost ([::1]:47352 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdwJj-0004ZU-I0
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 08:37:27 -0400
+	id 1hdwLL-00064i-5a
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 08:39:07 -0400
 Received: from eggs.gnu.org ([2001:470:142:3::10]:33287)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kpouget@redhat.com>) id 1hdw2z-000194-U3
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 08:20:12 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hdw2v-000194-NG
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 08:20:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kpouget@redhat.com>) id 1hdvos-0002pE-UM
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 08:07:30 -0400
-Received: from mail-vs1-f65.google.com ([209.85.217.65]:36395)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <kpouget@redhat.com>) id 1hdve1-0003r9-MD
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 07:54:21 -0400
-Received: by mail-vs1-f65.google.com with SMTP id l20so1342708vsp.3
- for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 04:54:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=yUQwqDdIbNoYpNkbuA8Faf3YXQvLV4E9e0Z6rdP3frI=;
- b=C4+Iwn3mn6S4S76uvBR+QDyWwhSOLSsvMNSQtJ38ZwrtXMTrO7vg2vynC2Nko2BFef
- yoRXnbCTl2pnozTFnRTL9s7dosUqra0a9Cm5mtxLtLxokNi9V9CoEDx5h4UeUa7RJVwU
- R+OyHCh37Y71gNawSS0HzsD8xlFEvlTh332O9hOQHHfbjqOfMJgmuDiR4Ur3+FG6SYDa
- W2bkBNos/pMYGUwubUMenTtAO9B3+kNNTklX/3XhYjY4LFBd/+1p4XVWC1TcGuKOnlWk
- 0RWVQ8uWGQ6liepIyAYujqfZdKWxoXXZk22um7RK5PpeMXx3zve92UI8dhK5oY7bu49B
- nKLA==
-X-Gm-Message-State: APjAAAXLBt1E0o4fLbGeDG0mxejFpzP8KflOcyPzJJ23RNwOKHecrl5q
- m+EwBm7sQa7vfucHmSTjLSo0YGdjK2isaEU4pCeRrw==
-X-Google-Smtp-Source: APXvYqwbjteUqiSOd+WOKd3opWX5qOQ8Suq3d4GMSdT1j0es5rQhl7/s2mJUhnL9I/nlyur4noGkoJhECTnFyHuETZU=
-X-Received: by 2002:a67:f84d:: with SMTP id b13mr7082030vsp.151.1561031657675; 
- Thu, 20 Jun 2019 04:54:17 -0700 (PDT)
+ (envelope-from <imammedo@redhat.com>) id 1hdvq6-0003ab-CU
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 08:08:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40782)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>)
+ id 1hdvoI-0002Nz-6r; Thu, 20 Jun 2019 08:04:58 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 600E6307D871;
+ Thu, 20 Jun 2019 12:04:46 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 140AD19807;
+ Thu, 20 Jun 2019 12:04:13 +0000 (UTC)
+Date: Thu, 20 Jun 2019 14:04:09 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Message-ID: <20190620140409.3c713760@redhat.com>
+In-Reply-To: <1557832703-42620-2-git-send-email-gengdongjiu@huawei.com>
+References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
+ <1557832703-42620-2-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
-References: <20190619123042.4822-1-kpouget@redhat.com>
- <e9fcdbfd-cde2-fc91-ce1d-6bfe06d39c4f@redhat.com>
-In-Reply-To: <e9fcdbfd-cde2-fc91-ce1d-6bfe06d39c4f@redhat.com>
-From: Kevin Pouget <kpouget@redhat.com>
-Date: Thu, 20 Jun 2019 13:54:06 +0200
-Message-ID: <CADJ1XR3fh0cyOerSM8VQkpde6cHLb8WccP05Rwr7xWMOK59rog@mail.gmail.com>
-To: Eric Blake <eblake@redhat.com>, spice-devel@lists.freedesktop.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Thu, 20 Jun 2019 12:04:47 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.217.65
-Subject: Re: [Qemu-devel] [RFC] spice-core: allow setting properties from QMP
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v17 01/10] hw/arm/virt: Add RAS platform
+ version for migration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,167 +69,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marc-Andre Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, kvm@vger.kernel.org,
+ mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org,
+ linuxarm@huawei.com, shannon.zhaosl@gmail.com, zhengxiang9@huawei.com,
+ qemu-arm@nongnu.org, james.morse@arm.com, xuwei5@huawei.com,
+ jonathan.cameron@huawei.com, pbonzini@redhat.com, lersek@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello Eric,
+On Tue, 14 May 2019 04:18:14 -0700
+Dongjiu Geng <gengdongjiu@huawei.com> wrote:
 
-> A new command may be okay, however,
+> Support this feature since version 4.1, disable it by
+> default in the old version.
+> 
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> ---
+>  hw/arm/virt.c         | 6 ++++++
+>  include/hw/arm/virt.h | 1 +
+>  2 files changed, 7 insertions(+)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 5331ab7..7bdd41b 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -2043,8 +2043,14 @@ DEFINE_VIRT_MACHINE_AS_LATEST(4, 1)
+>  
+>  static void virt_machine_4_0_options(MachineClass *mc)
+>  {
+> +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
+> +
+>      virt_machine_4_1_options(mc);
+>      compat_props_add(mc->compat_props, hw_compat_4_0, hw_compat_4_0_len);
+> +    /* Disable memory recovery feature for 4.0 as RAS support was
+> +     * introduced with 4.1.
+> +     */
+> +    vmc->no_ras = true;
 
-thanks, I've fix the typos and updated the patch to use an Enum, which
-indeed makes more sense.
+So it would mean that the feature is enabled unconditionally for
+new machine types and consumes resources whether user needs it or not.
 
-I've also updated "spice-query" command to provide the current value
-of the "video-codec" property,
-but it made me wonder if I should improve this QMP interface with a
-json list, or keep the current string-based list
-("enc1:codec1;enc2:codec2").
-
-I CC the spice-devel list to get their point of view
-
-The current behavior is:
-
---> { "execute": "set-spice", "arguments": { "property":
-"video-codecs", "value": "spice:mjpeg;gstreamer:h264" } }
-<-- {"return":{},"id":"libvirt-23"}
-
---> { "execute": "query-spice" }
-<-- {.... "video-codecs": "spice:mjpeg;gstreamer:h264;" ....}
+In light of the race for leaner QEMU and faster startup times,
+it might be better to make RAS optional and make user explicitly
+enable it using a machine option.
 
 
-I put the new version of the RFC patch below
+>  }
+>  DEFINE_VIRT_MACHINE(4, 0)
+>  
+> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> index 4240709..7f1a033 100644
+> --- a/include/hw/arm/virt.h
+> +++ b/include/hw/arm/virt.h
+> @@ -104,6 +104,7 @@ typedef struct {
+>      bool disallow_affinity_adjustment;
+>      bool no_its;
+>      bool no_pmu;
+> +    bool no_ras;
+>      bool claim_edge_triggered_timers;
+>      bool smbios_old_sys_ver;
+>      bool no_highmem_ecam;
 
-best regards,
-
-Kevin
-
----
-
-This patch allows setting spice properties from the QMP interface.
-
-At the moment, only the 'video-codecs' property is supported.
-
-Signed-off-by: Kevin Pouget <kpouget@redhat.com>
----
- qapi/ui.json    | 42 ++++++++++++++++++++++++++++++++++++++++--
- ui/spice-core.c | 21 +++++++++++++++++++++
- 2 files changed, 61 insertions(+), 2 deletions(-)
-
-diff --git a/qapi/ui.json b/qapi/ui.json
-index 59e412139a..5f67096bcb 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -211,12 +211,16 @@
- #
- # @channels: a list of @SpiceChannel for each active spice channel
- #
-+# @video-codecs: The list of encoders:codecs currently allowed for
-+#                video streaming (since: ...)
-+#
- # Since: 0.14.0
- ##
- { 'struct': 'SpiceInfo',
-   'data': {'enabled': 'bool', 'migrated': 'bool', '*host': 'str',
-'*port': 'int',
-            '*tls-port': 'int', '*auth': 'str', '*compiled-version': 'str',
--           'mouse-mode': 'SpiceQueryMouseMode', '*channels': ['SpiceChannel']},
-+           'mouse-mode': 'SpiceQueryMouseMode', '*channels': ['SpiceChannel'],
-+           'video-codecs': 'str'},
-   'if': 'defined(CONFIG_SPICE)' }
-
- ##
-@@ -257,7 +261,8 @@
- #                "tls": false
- #             },
- #             [ ... more channels follow ... ]
--#          ]
-+#          ],
-+#          "video-codecs": "spice:mjpeg;gstreamer:h264;"
- #       }
- #    }
- #
-@@ -265,6 +270,39 @@
- { 'command': 'query-spice', 'returns': 'SpiceInfo',
-   'if': 'defined(CONFIG_SPICE)' }
-
-+##
-+# @SpiceProperty:
-+#
-+# An enumeration of Spice properties that can be set at runtime.
-+#
-+# @video-codecs: the ;-separated list of video-codecs allowed for
-+# spice-server video streaming.
-+#
-+# Since: ...
-+##
-+{ 'enum': 'SpiceProperty',
-+  'data': [ 'video-codecs'],
-+  'if': 'defined(CONFIG_SPICE)' }
-+
-+##
-+# @set-spice:
-+#
-+# Set Spice properties.
-+# @property: the SPICE property to modify
-+# @value: the new value to affect to this property
-+#
-+# Since: ...
-+#
-+# Example:
-+#
-+# -> { "execute": "set-spice", "arguments": { "property": "video-codecs",
-+#                                             "value": "spice:mjpeg;" } }
-+# <- { "returns": {} }
-+##
-+{ 'command': 'set-spice',
-+  'data': {'property': 'SpiceProperty', 'value': 'str'},
-+  'if': 'defined(CONFIG_SPICE)' }
-+
- ##
- # @SPICE_CONNECTED:
- #
-diff --git a/ui/spice-core.c b/ui/spice-core.c
-index 63e8694df8..1660f49f15 100644
---- a/ui/spice-core.c
-+++ b/ui/spice-core.c
-@@ -506,6 +506,25 @@ static QemuOptsList qemu_spice_opts = {
-     },
- };
-
-+void qmp_set_spice(SpiceProperty property, const char *value, Error **errp)
-+{
-+    int invalid_codecs;
-+
-+    switch(property) {
-+    case SPICE_PROPERTY_VIDEO_CODECS:
-+        invalid_codecs = spice_server_set_video_codecs(spice_server, value);
-+
-+        if (invalid_codecs) {
-+            error_setg(errp, "Found %d invalid video-codecs while
-setting spice"
-+                       " property 'video-codec=%s'", invalid_codecs, value);
-+        }
-+        break;
-+    default:
-+        /* only reached in case of version mismatched */
-+        error_setg(errp, "Property #%d not supported.", property);
-+    }
-+}
-+
- SpiceInfo *qmp_query_spice(Error **errp)
- {
-     QemuOpts *opts = QTAILQ_FIRST(&qemu_spice_opts.head);
-@@ -555,6 +574,8 @@ SpiceInfo *qmp_query_spice(Error **errp)
-                        SPICE_QUERY_MOUSE_MODE_SERVER :
-                        SPICE_QUERY_MOUSE_MODE_CLIENT;
-
-+    info->video_codecs = spice_server_get_video_codecs(spice_server);
-+
-     /* for compatibility with the original command */
-     info->has_channels = true;
-     info->channels = qmp_query_spice_channels();
--- 
-2.21.0
 
