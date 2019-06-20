@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=FROM_EXCESS_BASE64,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 078BFC43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 09:10:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9CB2C48BE2
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 09:11:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8CDC2080C
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 09:10:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8CDC2080C
+	by mail.kernel.org (Postfix) with ESMTPS id A68982080C
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 09:11:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A68982080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45062 helo=lists.gnu.org)
+Received: from localhost ([::1]:45066 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdt5Y-0000pX-3I
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 05:10:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36283)
+	id 1hdt6F-00022S-UO
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 05:11:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38529)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1hdsjY-0007hq-Hc
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 04:47:54 -0400
+ (envelope-from <berrange@redhat.com>) id 1hdsqT-0006Ts-PA
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 04:55:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hdsTz-0004S2-HJ
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 04:31:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36470)
+ (envelope-from <berrange@redhat.com>) id 1hdsqQ-0006bU-5m
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 04:55:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55626)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hdsTz-0004Iy-By
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 04:31:47 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hdsqP-0006Y7-Kn
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 04:54:57 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 572943004426;
- Thu, 20 Jun 2019 08:31:38 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id BCF3A223883
+ for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 08:54:54 +0000 (UTC)
 Received: from redhat.com (ovpn-112-65.ams2.redhat.com [10.36.112.65])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 149661001925;
- Thu, 20 Jun 2019 08:31:35 +0000 (UTC)
-Date: Thu, 20 Jun 2019 09:31:32 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C8AA45DA5B;
+ Thu, 20 Jun 2019 08:54:50 +0000 (UTC)
+Date: Thu, 20 Jun 2019 09:54:47 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>
-Message-ID: <20190620083132.GC25448@redhat.com>
+Message-ID: <20190620085447.GP25448@redhat.com>
 References: <20190619201050.19040-1-armbru@redhat.com>
- <20190619201050.19040-2-armbru@redhat.com>
+ <20190619201050.19040-15-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190619201050.19040-2-armbru@redhat.com>
+In-Reply-To: <20190619201050.19040-15-armbru@redhat.com>
 User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Thu, 20 Jun 2019 08:31:38 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.39]); Thu, 20 Jun 2019 08:54:54 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 01/17] MAINTAINERS: new maintainers for QOM
+Subject: Re: [Qemu-devel] [PATCH 14/17] qapi: Split dump.json off misc.json
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,40 +72,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: kwolf@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-devel@nongnu.org, Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: kwolf@redhat.com,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 19, 2019 at 10:10:34PM +0200, Markus Armbruster wrote:
-> From: Paolo Bonzini <pbonzini@redhat.com>
+On Wed, Jun 19, 2019 at 10:10:47PM +0200, Markus Armbruster wrote:
+> Move commands dump-guest-memory, query-dump,
+> query-dump-guest-memory-capability with their types from misc.json to
+> new dump.json.  Add dump.json to MAINTAINERS section "Dump".
 >=20
-> QOM is not a particularly active subsystem now: 51 commits in two years=
-.
-> But, we need active maintainers to review and merge patches, and Git
-> shows the following top committers taking on QOM:
->=20
->     Markus Armbruster <armbru@redhat.com>
->     Eduardo Habkost <ehabkost@redhat.com>
->     Paolo Bonzini <pbonzini@redhat.com>
->     Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->     Eric Blake <eblake@redhat.com>
->=20
-> I volunteer myself, and also volunteer Eduardo and Daniel as reviewers
-> since they understand the code well.
->=20
-> Cc: Andreas F=C3=A4rber <afaerber@suse.de>
-> Cc: Daniel P. Berrange <berrange@redhat.com>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Suggested-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Message-Id: <20190607113737.13473-1-pbonzini@redhat.com>
+> Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  MAINTAINERS | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+>  MAINTAINERS           |   1 +
+>  dump.c                |   4 +-
+>  include/sysemu/dump.h |   2 +-
+>  monitor/hmp-cmds.c    |   1 +
+>  qapi/Makefile.objs    |   2 +-
+>  qapi/dump.json        | 200 ++++++++++++++++++++++++++++++++++++++++++
+>  qapi/misc.json        | 192 ----------------------------------------
+>  qapi/qapi-schema.json |   1 +
+>  8 files changed, 207 insertions(+), 196 deletions(-)
+>  create mode 100644 qapi/dump.json
 
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
