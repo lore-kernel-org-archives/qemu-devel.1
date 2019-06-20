@@ -2,72 +2,83 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 070D8C43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 14:50:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B3F7C43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 14:55:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D24C52083B
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 14:50:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D24C52083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id ED58220673
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 14:55:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=koconnor.net header.i=@koconnor.net header.b="HGKw/kSD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED58220673
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=koconnor.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48630 helo=lists.gnu.org)
+Received: from localhost ([::1]:48660 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdyOA-0007JZ-6Q
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 10:50:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39353)
+	id 1hdyT4-0002Oz-H0
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 10:55:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34899)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <lersek@redhat.com>) id 1hdy9k-0004D8-Ky
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:35:19 -0400
+ (envelope-from <kevin@koconnor.net>) id 1hdyCN-0006rR-VQ
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:38:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1hdy9h-0006G6-Ho
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:35:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33802)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hdxTz-0006oi-Fl
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 09:52:08 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7E40B308FC4A
- for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 13:52:01 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-117-226.ams2.redhat.com
- [10.36.117.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CE0D21001E6F;
- Thu, 20 Jun 2019 13:51:51 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190310004749.27029-1-philmd@redhat.com>
- <20190310004749.27029-3-philmd@redhat.com>
- <5e2f3651-5f00-0c93-353e-e58f079998e9@redhat.com>
- <124e54f9-c7e1-0157-61f1-673154872749@redhat.com>
- <88b7370c-1b6f-11e0-9fbe-d532e5726aa6@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <c5fed053-5dcf-afef-010b-c261741c748f@redhat.com>
-Date: Thu, 20 Jun 2019 15:51:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ (envelope-from <kevin@koconnor.net>) id 1hdyCJ-0000qz-U8
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:37:59 -0400
+Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:42095)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <kevin@koconnor.net>) id 1hdyCJ-0000nI-Mr
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:37:55 -0400
+Received: by mail-qk1-x744.google.com with SMTP id b18so2033942qkc.9
+ for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 07:37:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=koconnor.net; s=google;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=aNKDNvClUyiTS4GUiOcDaW+Einh5AtS/yLc5zOLbd7U=;
+ b=HGKw/kSDHEFvBtmgf41QyWlKyzwdDYbeao/3+wPrZdAfkOofclAECeinXv7KxSQSgC
+ SKndW05QbVoT92SpJODWRSOfpkFrlxRr9K4qZqIZWfPZ0oCAM2m2JnGrIhHeU/9t9EjA
+ 25rKvwpSnjeON26FogN31RrMG52qtbnDckvGI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=aNKDNvClUyiTS4GUiOcDaW+Einh5AtS/yLc5zOLbd7U=;
+ b=GHRbKoKvF6mmCj5WGxtB8VrQvQdBEBOtPTdSbLxqkhycZ9x6QjXHu2iIQzGGN6W15z
+ fgOLqDe81WPB365kBVEWwpoZraZ0rcqSSQW0j2BdkoL56dgmAtDnf0M+CB6wHaer5pYM
+ 1l0J6tptqmLSu9VqFpuoWWtJPIqnhyG84g+JPQjXgARheqfK0FPPC+Z3G9nj8A5qoKT9
+ J8mcSIQy09dIN0/+qlQiCuT/UwiTT7crr0rlP6pyqpWXp33NULqVTinmxaPfDnGflkRi
+ CUUL8p1U90IyKsgqVu84VXFuxw8iQxYXMXOf5IGRBv19Tio2MuMf07MRFV3CQ0LAizPY
+ CgIA==
+X-Gm-Message-State: APjAAAXxEpc1VqCKZ+Kiu7exc/afHqQ4eJyUadh+B4wXhPqtjz/9Wy13
+ tzzOTobSDts9RJL23qJ4MxRJeQ==
+X-Google-Smtp-Source: APXvYqxHlMLJ1XTRmnc0J5YEyDjI+bhXJOy+QkfGfoJ/9OwcFAzH79ONOPZibnWuvhLmu8RKuvvLqg==
+X-Received: by 2002:ae9:ef92:: with SMTP id d140mr1112951qkg.443.1561041470584; 
+ Thu, 20 Jun 2019 07:37:50 -0700 (PDT)
+Received: from localhost ([64.9.249.162])
+ by smtp.gmail.com with ESMTPSA id v30sm14338799qtk.45.2019.06.20.07.37.49
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Thu, 20 Jun 2019 07:37:49 -0700 (PDT)
+Date: Thu, 20 Jun 2019 10:37:49 -0400
+From: Kevin O'Connor <kevin@koconnor.net>
+To: Sam Eiderman <shmuel.eiderman@oracle.com>
+Message-ID: <20190620143749.GC17015@morn.lan>
+References: <20190619092352.23583-1-shmuel.eiderman@oracle.com>
+ <20190619092352.23583-4-shmuel.eiderman@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <88b7370c-1b6f-11e0-9fbe-d532e5726aa6@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Thu, 20 Jun 2019 13:52:01 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] hw/firmware: Add Edk2Crypto and
- edk2_add_host_crypto_policy()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190619092352.23583-4-shmuel.eiderman@oracle.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::744
+Subject: Re: [Qemu-devel] [SeaBIOS] [PATCH v3 3/4] geometry: Add
+ boot_lchs_find_*() utility functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,213 +90,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P . Berrange" <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, arbel.moshe@oracle.com,
+ seabios@seabios.org, qemu-devel@nongnu.org, mreitz@redhat.com,
+ liran.alon@oracle.com, kraxel@redhat.com, karl.heubaum@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/20/19 14:07, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Laszlo,
->=20
-> On 3/13/19 11:11 AM, Laszlo Ersek wrote:
->> On 03/13/19 10:43, Laszlo Ersek wrote:
->>> On 03/10/19 01:47, Philippe Mathieu-Daud=C3=A9 wrote:
->>>> The Edk2Crypto object is used to hold configuration values specific
->>>> to EDK2.
->>>>
->>>> The edk2_add_host_crypto_policy() function loads crypto policies
->>>> from the host, and register them as fw_cfg named file items.
->>>> So far only the 'https' policy is supported.
->>>>
->>>> A usercase example is the 'HTTPS Boof' feature of OVMF [*].
->>>>
->>>> Usage example:
->>>>
->>>>   $ qemu-system-x86_64 \
->>>>       --object edk2_crypto,id=3Dhttps,\
->>>>               ciphers=3D/etc/crypto-policies/back-ends/openssl.confi=
-g,\
->>>>               cacerts=3D/etc/pki/ca-trust/extracted/edk2/cacerts.bin
->>>>
->>>> (On Fedora these files are provided by the ca-certificates and
->>>> crypto-policies packages).
->>>>
->>>> [*]: https://github.com/tianocore/edk2/blob/master/OvmfPkg/README
->>>>
->>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>>> ---
->>>> v3:
->>>> - '-object' -> '--object' in commit description (Eric)
->>>> - reworded the 'TODO: g_free' comment
->>>> ---
->>>>  MAINTAINERS                             |   8 ++
->>>>  hw/Makefile.objs                        |   1 +
->>>>  hw/firmware/Makefile.objs               |   1 +
->>>>  hw/firmware/uefi_edk2_crypto_policies.c | 177 +++++++++++++++++++++=
-+++
->>>>  include/hw/firmware/uefi_edk2.h         |  28 ++++
->>>>  5 files changed, 215 insertions(+)
->>>>  create mode 100644 hw/firmware/Makefile.objs
->>>>  create mode 100644 hw/firmware/uefi_edk2_crypto_policies.c
->>>>  create mode 100644 include/hw/firmware/uefi_edk2.h
->>>>
->>>> diff --git a/MAINTAINERS b/MAINTAINERS
->>>> index cf09a4c127..70122b3d0d 100644
->>>> --- a/MAINTAINERS
->>>> +++ b/MAINTAINERS
->>>> @@ -2206,6 +2206,14 @@ F: include/hw/i2c/smbus_master.h
->>>>  F: include/hw/i2c/smbus_slave.h
->>>>  F: include/hw/i2c/smbus_eeprom.h
->>>> =20
->>>> +EDK2 Firmware
->>>> +M: Laszlo Ersek <lersek@redhat.com>
->>>> +M: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>>> +S: Maintained
->>>> +F: docs/interop/firmware.json
->>>> +F: hw/firmware/uefi_edk2_crypto_policies.c
->>>> +F: include/hw/firmware/uefi_edk2.h
->>>> +
->>>
->>> I'm not happy with this.
->>>
->>> First, "docs/interop/firmware.json" is meant for more than just EDK2.=
- We
->>> shouldn't list it in a section called "EDK2 Firmware". I can't sugges=
-t
->>> an alternative (MAINTAINERS is *huge* -- 2500+ lines), but this one
->>> would be misleading.
->>>
->>> Second, we expose fw_cfg files to edk2 platform firmware from a bunch=
- of
->>> other places. For example -- and in this case I do mean to provide a
->>> complex example! --, see "etc/smi/supported-features",
->>> "etc/smi/requested-features", and "etc/smi/features-ok", in file
->>> "hw/isa/lpc_ich9.c". I'm unconvinced that the present feature merits =
-new
->>> directories and new files.
->>>
->>> Then again, I also don't know where to put the logic. I guess I'll ha=
-ve
->>> to defer to more experienced reviewers.
->>>
->>> [snipping lots of QOM boilerplate]
->>>
->>>> +void edk2_add_host_crypto_policy(FWCfgState *fw_cfg)
->>>> +{
->>>> +    Edk2Crypto *s;
->>>> +
->>>> +    s =3D edk2_crypto_by_id("https", NULL);
->>>> +    if (!s) {
->>>> +        return;
->>>> +    }
->>>> +
->>>> +    if (s->ciphers_path) {
->>>> +        /*
->>>> +         * Note:
->>>> +         * Unlike with fw_cfg_add_file() where the allocated data h=
-as
->>>> +         * to be valid for the lifetime of the FwCfg object, there =
-is
->>>> +         * no such contract interface with fw_cfg_add_file_from_hos=
-t().
->>>> +         * It would be easier that the FwCfg object keeps reference=
- of
->>>> +         * its allocated memory and releases it when destroy, but i=
-t
->>>> +         * currently doesn't. Meanwhile we simply add this TODO com=
-ment.
->>>> +         */
->>>> +        fw_cfg_add_file_from_host(fw_cfg, "etc/edk2/https/ciphers",
->>>> +                                  s->ciphers_path, NULL);
->>>> +    }
->>>> +
->>>> +    if (s->cacerts_path) {
->>>> +        /*
->>>> +         * TODO: g_free the returned pointer
->>>> +         * (see previous comment for ciphers_path in this function)=
-.
->>>> +         */
->>>> +        fw_cfg_add_file_from_host(fw_cfg, "etc/edk2/https/cacerts",
->>>> +                                  s->cacerts_path, NULL);
->>>> +    }
->>>> +}
->>>
->>> Shouldn't we do some error checking here?
->>>
->>> I mean, printing an error message in fw_cfg_add_file_from_host(), and
->>> then continuing without exposing the named files in question to the
->>> firmware, could be OK if this was a "default on" feature. But (IIUC)
->>> here the user provided an explicit "-object" option, and we've just
->>> failed to construct the object. Doesn't such a situation usually prev=
-ent
->>> QEMU startup?
->>
->> Wait, I could be totally confused here. (Returning to this patch after
->> seeing the rest of the series.)
->>
->> Is it actually the case that the Edk2Crypto object holds nothing more
->> than two pathnames -- and so its construction can virtually never fail=
-?
->> While the actual fw_cfg population occurs separately, in a machine_don=
-e
->> notifier?
->>
->> If that's the case, I don't think it's the right approach. Reading the
->> host files, and populating fw_cfg with them, should be part of the
->> object construction. And if those steps fail, the object should not be
->> possible to construct.
->>
->> We did something similar with the vmgenid device [hw/acpi/vmgenid.c], =
-if
->> I remember correctly. It also has a dependency on fw_cfg...
->>
->> Ahh, no, I'm absolutely wrong about that. vmgenid_realize() doesn't do
->> anything with fw_cfg. Instead, we have acpi_setup() in
->> "hw/i386/acpi-build.c", which calls find_vmgenid_dev() and
->> vmgenid_add_fw_cfg(). And acpi_setup() is certainly called from
->> pc_machine_done().
->>
->> In other words, the pattern that you use here matches existing practic=
-e.
->> Realize the device (or object) first, then add the fw_cfg thingies in
->> the "machine done" callback. OK.
->>
->> *Still*, I would like to see better error handling/reporting (or an
->> explanation why I'm wrong). How about reworking the edk2crypto class
->> itself -- it shouldn't just hold the pathnames of the files, but also
->> their contents. That is:
->>
->> - g_file_get_contents() should be called in the realize method
->> - the object would own the file contents
->> - the realize method would ensure that there wouldn't be any other
->> instance of the class (i.e. that it would be a singleton -- see the sa=
-me
->> idea in vmgenid)
->> - there would be no need for the fw_cfg_add_file_from_host() API
->> - the machine done notifier would be extended to locate the object
->> (there could be zero or one instances), and if the one instance were
->> found, the machine done callback would hook the file contents into
->> fw_cfg. fw_cfg_add_file() cannot fail, so no errors to report at this =
-stage.
->>
->> Again I think this would follow the pattern from vmgenid.
->=20
-> I want to say I am impressed by your deep review. Your design is
-> obviously way cleaner/safer. I think I was missing some part of the big
-> picture here, thank you for your detailed comments!
->=20
-> I did not know how vmgenid is processed. The only difference is I don't
-> want the edk2crypto class to be a device, but rather a simple user
-> object, and we already have an interface that does that:
-> TYPE_USER_CREATABLE. Its UserCreatableClass::complete() method is
-> similar to DeviceClass::realize() in managing errors at object
-> instantiation, so the machine done notifier never fails.
-> I'll respin.
+On Wed, Jun 19, 2019 at 12:23:51PM +0300, Sam Eiderman wrote:
+> Adding the following utility functions:
+> 
+>     * boot_lchs_find_pci_device
+>     * boot_lchs_find_scsi_device
+>     * boot_lchs_find_ata_device
 
-Sounds good to me, thanks! Please do CC reviewers with QOM experience,
-as I'm not familiar with TYPE_USER_CREATABLE.
+FWIW, this leads to a bit of code duplication.  I think it would be
+preferable to refactor the bootprio_find_XYZ() calls.  Instead of
+returning an 'int prio' they could return a znprintf'd 'char *devpath'
+instead.  Then the boot_add_XYZ() calls could directly call
+find_prio(devpath). The boot_add_hd() could then directly populate
+drive->lchs or call setup_translation().
 
-Thanks!
-Laszlo
+-Kevin
 
