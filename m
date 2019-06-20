@@ -2,144 +2,73 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 472CAC43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 16:42:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2683C43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 16:43:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1ECF32084E
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 16:42:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ECF32084E
+	by mail.kernel.org (Postfix) with ESMTPS id 670BF2084E
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 16:43:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 670BF2084E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50264 helo=lists.gnu.org)
+Received: from localhost ([::1]:50268 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1he08X-0006J7-4E
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 12:42:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41367)
+	id 1he09S-0007Yw-H2
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 12:43:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41717)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1he050-0003YU-58
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 12:38:49 -0400
+ (envelope-from <bounces@canonical.com>) id 1he061-0004Pc-If
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 12:40:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1he03n-0007xl-P0
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 12:37:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35916)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1he03k-0007tS-7K; Thu, 20 Jun 2019 12:37:13 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8A079A3813;
- Thu, 20 Jun 2019 16:36:57 +0000 (UTC)
-Received: from [10.10.123.29] (ovpn-123-29.rdu2.redhat.com [10.10.123.29])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A1FEE601A5;
- Thu, 20 Jun 2019 16:36:54 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <20190620010356.19164-1-jsnow@redhat.com>
- <20190620010356.19164-7-jsnow@redhat.com>
- <f9296483-d48f-521f-1ddd-d514e56b8fdf@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
- IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
- vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
- rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
- 1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
- ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
- 3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
- h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
- T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
- LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
- KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
- BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
- qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
- LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
- ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
- J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
- vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
- il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
- 1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
- tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
- 1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
- 3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
- d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
- 5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
- MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
- NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
- TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
- L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
- JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
- /5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
- nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
- 9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
- Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
- e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
- ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
- vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
- C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
- fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
- rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
- TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
- PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
- Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
- E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
- Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
- rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
- cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
- wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
- jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
- vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
- eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
- RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
- CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
- AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
- VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
- XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
- Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
- y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
- sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
- HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
- 8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
- 6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
- y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
- uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
- YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
- 2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
- Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
- TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
- TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
- GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
- rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
- i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
- RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
- glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <c956b213-24bf-355a-02e3-6b39ba682ae4@redhat.com>
-Date: Thu, 20 Jun 2019 12:36:53 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <bounces@canonical.com>) id 1he02e-0006ss-Gl
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 12:36:07 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37722)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1he02a-0006nZ-T9
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 12:36:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1he02V-0000QN-V7
+ for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 16:35:56 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 528542E80E1
+ for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 16:35:55 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <f9296483-d48f-521f-1ddd-d514e56b8fdf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Thu, 20 Jun 2019 16:37:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Thu, 20 Jun 2019 16:29:44 -0000
+From: Kashyap Chamarthy <kchamart@redhat.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: centos clock qemu-kvm redhat
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange qianxi416
+X-Launchpad-Bug-Reporter: qianxi (qianxi416)
+X-Launchpad-Bug-Modifier: Kashyap Chamarthy (kashyapc)
+References: <155832450585.26079.9550620234862222790.malonedeb@soybean.canonical.com>
+Message-Id: <156104818675.21625.2174800296415075048.launchpad@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18986";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: aacc251819cb724a1a1390752518efcb1e95eee0
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 06/12] block/dirty-bitmap: add
- bdrv_dirty_bitmap_claim
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1829696] Re: qemu-kvm takes 100% CPU when running
+ redhat/centos 7.6 guest VM OS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -148,67 +77,323 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- vsementsov@virtuozzo.com, Wen Congyang <wencongyang2@huawei.com>,
- Xie Changlong <xiechanglong.d@gmail.com>,
- Markus Armbruster <armbru@redhat.com>
+Reply-To: Bug 1829696 <1829696@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+** Project changed: nova =3D> qemu
 
+-- =
 
-On 6/20/19 12:02 PM, Max Reitz wrote:
-> On 20.06.19 03:03, John Snow wrote:
->> This function can claim an hbitmap to replace its own current hbitmap.
->> In the case that the granularities do not match, it will use
->> hbitmap_merge to copy the bit data instead.
->=20
-> I really do not like this name because to me it implies a relationship
-> to bdrv_reclaim_dirty_bitmap().  Maybe just bdrv_dirty_bitmap_take()?
-> Or, if you want to get more fancy, bdrv_dirty_dirty_bitmap_steal().
-> (Because references are taken or stolen.)
->=20
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1829696
 
-take or steal is good. I just wanted to highlight that it truly takes
-ownership. The double-pointer and erasing the caller's reference for
-emphasis of this idea.
+Title:
+  qemu-kvm takes 100% CPU when running redhat/centos 7.6 guest VM OS
 
-> The latter might fit in nicely with the abdication theme.  We=E2=80=99d=
- just
-> need to rename bdrv_reclaim_dirty_bitmap() to
-> bdrv_dirty_bitmap_backstab(), and it=E2=80=99d be perfect.
->=20
+Status in QEMU:
+  New
 
-Don't tempt me; I do like my silly function names. You are lucky I don't
-call
+Bug description:
+  Description
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  When running redhat or centos 7.6 guest os on vm,
+  the cpu usage is very low on vm(100% idle), but on host,
+  qemu-kvm reports 100% cpu busy usage.
 
-> (On another note: bdrv_restore_dirty_bitmap() vs.
-> bdrv_dirty_bitmap_restore() =E2=80=93 really? :-/)
->=20
+  After searching some related bugs report,
+  I suspect that it is due to the clock settings in vm's domain xml.
+  My Openstack cluster uses the default clock settings as follow:
+      <clock offset=3D'utc'>
+        <timer name=3D'rtc' tickpolicy=3D'catchup'/>
+        <timer name=3D'pit' tickpolicy=3D'delay'/>
+        <timer name=3D'hpet' present=3D'no'/>
+      </clock>
+  And in this report, https://bugs.launchpad.net/qemu/+bug/1174654
+  it claims that <timer name=3D'rtc' track=3D'guest'/> can solve the 100% c=
+pu usage problem when using Windows Image Guest OS,
+  but I makes some tests, the solusion dose not work for me.
 
-I have done a terrible job at enforcing any kind of consistency here,
-and it gets me all the time too. I had a big series that re-arranged and
-re-named a ton of stuff just to make things a little more nicer, but I
-let it bitrot because I didn't want to deal with the bike-shedding.
+  =
 
-I do agree I am in desperate need of a spring cleaning in here.
+  Steps to reproduce
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  * create a vm using centos or redhat 7.6 image
+  * using sar tool inside vm and host to check the cpu usage, and compare t=
+hem
 
-One thing that does upset me quite often is that the canonical name for
-the structure is "bdrv dirty bitmap", which makes the function names all
-quite long.
+  =
 
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  include/block/block_int.h |  1 +
->>  include/qemu/hbitmap.h    |  8 ++++++++
->>  block/dirty-bitmap.c      | 14 ++++++++++++++
->>  util/hbitmap.c            |  5 +++++
->>  4 files changed, 28 insertions(+)
->=20
-> The implementation looks good to me.
->=20
-> Max
->=20
+  Expected result
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  host's cpu usage report should be same with vm's cpu usage
 
+  =
+
+  Actual result
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  vm's cpu usage is 100% idle, host's cpu usage is 100% busy
+
+  =
+
+  Environment
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  1. Exact version of OpenStack you are running.
+  # rpm -qa | grep nova
+  openstack-nova-compute-13.1.2-1.el7.noarch
+  python2-novaclient-3.3.2-1.el7.noarch
+  python-nova-13.1.2-1.el7.noarch
+  openstack-nova-common-13.1.2-1.el7.noarch
+
+  2. Which hypervisor did you use?
+     (For example: Libvirt + KVM, Libvirt + XEN, Hyper-V, PowerKVM, ...)
+     What's the version of that?
+  # libvirtd -V
+  libvirtd (libvirt) 3.9.0
+
+  # /usr/libexec/qemu-kvm --version
+  QEMU emulator version 2.6.0 (qemu-kvm-ev-2.6.0-28.el7_3.6.1), Copyright (=
+c) 2003-2008 Fabrice Bellard
+
+  =
+
+  Logs & Configs
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  The VM xml:
+  <domain type=3D'kvm' id=3D'29'>
+    <name>instance-00005022</name>
+    <uuid>7f5a66a5-****-****-****-75dec****bbb</uuid>
+    <metadata>
+      <nova:instance xmlns:nova=3D"http://openstack.org/xmlns/libvirt/nova/=
+1.0">
+        <nova:package version=3D"13.1.2-1.el7"/>
+        <nova:name>*******</nova:name>
+        <nova:creationTime>2019-05-20 03:08:46</nova:creationTime>
+        <nova:flavor name=3D"2d2dab36-****-****-****-246e9****110">
+          <nova:memory>2048</nova:memory>
+          <nova:disk>12</nova:disk>
+          <nova:swap>2048</nova:swap>
+          <nova:ephemeral>0</nova:ephemeral>
+          <nova:vcpus>1</nova:vcpus>
+        </nova:flavor>
+        <nova:owner>
+          <nova:user uuid=3D"********************">****</nova:user>
+          <nova:project uuid=3D"********************">****</nova:project>
+        </nova:owner>
+        <nova:root type=3D"image" uuid=3D"4496a420-****-****-****-b50f****a=
+da3"/>
+      </nova:instance>
+    </metadata>
+    <memory unit=3D'KiB'>2097152</memory>
+    <currentMemory unit=3D'KiB'>2097152</currentMemory>
+    <vcpu placement=3D'static'>1</vcpu>
+    <cputune>
+      <shares>1024</shares>
+      <vcpupin vcpu=3D'0' cpuset=3D'27'/>
+      <emulatorpin cpuset=3D'27'/>
+    </cputune>
+    <numatune>
+      <memory mode=3D'strict' nodeset=3D'1'/>
+      <memnode cellid=3D'0' mode=3D'strict' nodeset=3D'1'/>
+    </numatune>
+    <resource>
+      <partition>/machine</partition>
+    </resource>
+    <sysinfo type=3D'smbios'>
+      <system>
+        <entry name=3D'manufacturer'>Fedora Project</entry>
+        <entry name=3D'product'>OpenStack Nova</entry>
+        <entry name=3D'version'>13.1.2-1.el7</entry>
+        <entry name=3D'serial'>64ab0e89-****-****-****-05312ef66983</entry>
+        <entry name=3D'uuid'>7f5a66a5-****-****-****-75decaf82bbb</entry>
+        <entry name=3D'family'>Virtual Machine</entry>
+      </system>
+    </sysinfo>
+    <os>
+      <type arch=3D'x86_64' machine=3D'pc-i440fx-rhel7.3.0'>hvm</type>
+      <boot dev=3D'hd'/>
+      <smbios mode=3D'sysinfo'/>
+    </os>
+    <features>
+      <acpi/>
+      <apic/>
+    </features>
+    <cpu mode=3D'custom' match=3D'exact' check=3D'full'>
+      <model fallback=3D'forbid'>IvyBridge</model>
+      <topology sockets=3D'1' cores=3D'1' threads=3D'1'/>
+      <feature policy=3D'require' name=3D'hypervisor'/>
+      <feature policy=3D'require' name=3D'arat'/>
+      <feature policy=3D'require' name=3D'xsaveopt'/>
+      <numa>
+        <cell id=3D'0' cpus=3D'0' memory=3D'2097152' unit=3D'KiB'/>
+      </numa>
+    </cpu>
+    <clock offset=3D'utc'>
+      <timer name=3D'pit' tickpolicy=3D'delay'/>
+      <timer name=3D'rtc' tickpolicy=3D'catchup'/>
+      <timer name=3D'hpet' present=3D'no'/>
+    </clock>
+    <on_poweroff>destroy</on_poweroff>
+    <on_reboot>restart</on_reboot>
+    <on_crash>destroy</on_crash>
+    <devices>
+      <emulator>/usr/libexec/qemu-kvm</emulator>
+      <disk type=3D'file' device=3D'disk'>
+        <driver name=3D'qemu' type=3D'raw' cache=3D'none'/>
+        <source file=3D'/data/instances/7f5a66a5-****-****-****-75decaf82bb=
+b/disk'/>
+        <backingStore/>
+        <target dev=3D'vda' bus=3D'virtio'/>
+        <alias name=3D'virtio-disk0'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x04' =
+function=3D'0x0'/>
+      </disk>
+      <disk type=3D'file' device=3D'disk'>
+        <driver name=3D'qemu' type=3D'raw' cache=3D'none'/>
+        <source file=3D'/data/instances/7f5a66a5-****-****-****-75decaf82bb=
+b/disk.swap'/>
+        <backingStore/>
+        <target dev=3D'vdb' bus=3D'virtio'/>
+        <alias name=3D'virtio-disk1'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x0'/>
+      </disk>
+      <disk type=3D'file' device=3D'cdrom'>
+        <driver name=3D'qemu' type=3D'raw' cache=3D'none'/>
+        <source file=3D'/data/instances/7f5a66a5-****-****-****-75decaf82bb=
+b/disk.config'/>
+        <backingStore/>
+        <target dev=3D'hdd' bus=3D'ide'/>
+        <readonly/>
+        <alias name=3D'ide0-1-1'/>
+        <address type=3D'drive' controller=3D'0' bus=3D'1' target=3D'0' uni=
+t=3D'1'/>
+      </disk>
+      <controller type=3D'usb' index=3D'0' model=3D'piix3-uhci'>
+        <alias name=3D'usb'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' =
+function=3D'0x2'/>
+      </controller>
+      <controller type=3D'pci' index=3D'0' model=3D'pci-root'>
+        <alias name=3D'pci.0'/>
+      </controller>
+      <controller type=3D'ide' index=3D'0'>
+        <alias name=3D'ide'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' =
+function=3D'0x1'/>
+      </controller>
+      <interface type=3D'bridge'>
+        <mac address=3D'fa:16:3e:a6:ea:4f'/>
+        <source bridge=3D'brq52c66dc3-64'/>
+        <bandwidth>
+          <inbound average=3D'102400'/>
+          <outbound average=3D'102400'/>
+        </bandwidth>
+        <target dev=3D'tapa29e94e5-42'/>
+        <model type=3D'virtio'/>
+        <alias name=3D'net0'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' =
+function=3D'0x0'/>
+      </interface>
+      <serial type=3D'file'>
+        <source path=3D'/data/instances/7f5a66a5-****-****-****-75decaf82bb=
+b/console.log'/>
+        <target type=3D'isa-serial' port=3D'0'>
+          <model name=3D'isa-serial'/>
+        </target>
+        <alias name=3D'serial0'/>
+      </serial>
+      <serial type=3D'pty'>
+        <source path=3D'/dev/pts/10'/>
+        <target type=3D'isa-serial' port=3D'1'>
+          <model name=3D'isa-serial'/>
+        </target>
+        <alias name=3D'serial1'/>
+      </serial>
+      <console type=3D'file'>
+        <source path=3D'/data/instances/7f5a66a5-****-****-****-75decaf82bb=
+b/console.log'/>
+        <target type=3D'serial' port=3D'0'/>
+        <alias name=3D'serial0'/>
+      </console>
+      <input type=3D'tablet' bus=3D'usb'>
+        <alias name=3D'input0'/>
+        <address type=3D'usb' bus=3D'0' port=3D'1'/>
+      </input>
+      <input type=3D'mouse' bus=3D'ps2'>
+        <alias name=3D'input1'/>
+      </input>
+      <input type=3D'keyboard' bus=3D'ps2'>
+        <alias name=3D'input2'/>
+      </input>
+      <graphics type=3D'vnc' port=3D'5910' autoport=3D'yes' listen=3D'0.0.0=
+.0' keymap=3D'en-us'>
+        <listen type=3D'address' address=3D'0.0.0.0'/>
+      </graphics>
+      <video>
+        <model type=3D'cirrus' vram=3D'16384' heads=3D'1' primary=3D'yes'/>
+        <alias name=3D'video0'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' =
+function=3D'0x0'/>
+      </video>
+      <memballoon model=3D'virtio'>
+        <stats period=3D'10'/>
+        <alias name=3D'balloon0'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x06' =
+function=3D'0x0'/>
+      </memballoon>
+    </devices>
+    <seclabel type=3D'dynamic' model=3D'dac' relabel=3D'yes'>
+      <label>+107:+107</label>
+      <imagelabel>+107:+107</imagelabel>
+    </seclabel>
+  </domain>
+
+  CPU Usage Report inside VM:
+  # sar -u -P 0 1 5
+  Linux 3.10.0-957.el7.x86_64 (******) 	05/20/2019 	_x86_64_	(1 CPU)
+
+  11:34:40 AM     CPU     %user     %nice   %system   %iowait    %steal    =
+ %idle
+  11:34:41 AM       0      0.00      0.00      0.00      0.00      0.00    =
+100.00
+  11:34:42 AM       0      0.00      0.00      0.00      0.00      0.00    =
+100.00
+  11:34:43 AM       0      0.00      0.00      0.00      0.00      0.00    =
+100.00
+  11:34:44 AM       0      0.00      0.00      0.00      0.00      0.00    =
+100.00
+  11:34:45 AM       0      0.00      0.00      0.00      0.00      0.00    =
+100.00
+  Average:          0      0.00      0.00      0.00      0.00      0.00    =
+100.00
+
+  CPU Usage Report ON HOST(the vm's cpu is pinned on host's no.27 physic cp=
+u):
+  # sar -u -P 27 1 5
+  Linux 3.10.0-862.el7.x86_64 (******) 	05/20/2019 	_x86_64_	(48 CPU)
+
+  11:34:40 AM     CPU     %user     %nice   %system   %iowait    %steal    =
+ %idle
+  11:34:41 AM      27    100.00      0.00      0.00      0.00      0.00    =
+  0.00
+  11:34:42 AM      27    100.00      0.00      0.00      0.00      0.00    =
+  0.00
+  11:34:43 AM      27    100.00      0.00      0.00      0.00      0.00    =
+  0.00
+  11:34:44 AM      27    100.00      0.00      0.00      0.00      0.00    =
+  0.00
+  11:34:45 AM      27    100.00      0.00      0.00      0.00      0.00    =
+  0.00
+  Average:         27    100.00      0.00      0.00      0.00      0.00    =
+  0.00
+
+  clocksource inside VM:
+  # cat /sys/devices/system/clocksource/clocksource0/current_clocksource
+  kvm_clock
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1829696/+subscriptions
 
