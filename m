@@ -2,77 +2,62 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E3A9C43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 12:57:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42F4BC43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 12:59:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5F5F2083B
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 12:57:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5F5F2083B
+	by mail.kernel.org (Postfix) with ESMTPS id 19DED2083B
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 12:59:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19DED2083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47494 helo=lists.gnu.org)
+Received: from localhost ([::1]:47506 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdwdX-0004Rj-VR
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 08:57:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40963)
+	id 1hdwem-0005ZT-SO
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 08:59:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40455)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hdwZA-00017W-HL
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 08:53:26 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hdwYU-0000TH-1K
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 08:52:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hdwKf-0001Y0-M3
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 08:38:26 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:40270)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hdwKe-0001QX-08
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 08:38:25 -0400
-Received: by mail-wr1-f68.google.com with SMTP id p11so2859837wre.7
- for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 05:38:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=PBe9hQeFMayLD/0ZRDInVi5N4QsHohL3ze/iPL3VAN0=;
- b=P/aQifjBSz2UDPSRmRDvf7jyO331JkLaRCO8dLDonh31uaKcEMLcgOFq7H/8cb+FPL
- 9c9wVrC5USGUOFhTpxtwFXAx/LKKZHpBUdOrsDQV5culCLWVTV7e+LgYhZTUaNn4VOCc
- 7X2aLSL+5Gzu+EVYuEPXaT4xYdB3cib+LBjg9gIfx/LQ5cgPQbbZghTQaP42hKGGKzC5
- 50DgDjYXko5MLePkakLbgxBTKAs+UY/B5iGN4POAL0LekgUA+141K28ZzjH6n1X7TLY+
- HsDslrEv2xwTF2OS6HwzdAi8cJfohfOwK2WD5C2KElnwwNhPXGJAhsBHjw1WHWSIVvIu
- zYLA==
-X-Gm-Message-State: APjAAAWehQpJmlg9y60SobHh/v0j9TbRbMycUGErX9bJfdrUG3myzQO1
- ZaFZUOLdm+JgtFpN3twY4sgj0w==
-X-Google-Smtp-Source: APXvYqy1Jw/TS72GgFtDeH8i1rM2d4XdyxY4oOs6mdaUyGtOWtneGJJdreyqFL2pxbg4xntCGufPBA==
-X-Received: by 2002:a5d:620f:: with SMTP id y15mr13438905wru.262.1561034287746; 
- Thu, 20 Jun 2019 05:38:07 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:7822:aa18:a9d8:39ab?
- ([2001:b07:6468:f312:7822:aa18:a9d8:39ab])
- by smtp.gmail.com with ESMTPSA id c17sm15734547wrv.82.2019.06.20.05.38.06
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 20 Jun 2019 05:38:07 -0700 (PDT)
-To: Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
-References: <20190619162140.133674-1-liran.alon@oracle.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bcb617b1-7d20-d2ff-81c5-9f165eae5683@redhat.com>
-Date: Thu, 20 Jun 2019 14:38:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ (envelope-from <imammedo@redhat.com>) id 1hdwPW-0005dA-PR
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 08:43:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54852)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>)
+ id 1hdwPH-00050u-1o; Thu, 20 Jun 2019 08:43:12 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 87215307D866;
+ Thu, 20 Jun 2019 12:43:07 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 470F95C205;
+ Thu, 20 Jun 2019 12:43:02 +0000 (UTC)
+Date: Thu, 20 Jun 2019 14:42:57 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Message-ID: <20190620144257.7400b0a7@redhat.com>
+In-Reply-To: <1557832703-42620-6-git-send-email-gengdongjiu@huawei.com>
+References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
+ <1557832703-42620-6-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20190619162140.133674-1-liran.alon@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Thu, 20 Jun 2019 12:43:07 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [QEMU PATCH v4 0/10]: target/i386: kvm: Add
- support for save and restore of nested state
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v17 05/10] acpi: add
+ build_append_ghes_generic_status() helper for Generic Error Status Block
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,59 +69,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, kvm@vger.kernel.org, maran.wilson@oracle.com,
- mtosatti@redhat.com, dgilbert@redhat.com, jmattson@google.com, rth@twiddle.net
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, kvm@vger.kernel.org,
+ mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org,
+ linuxarm@huawei.com, shannon.zhaosl@gmail.com, zhengxiang9@huawei.com,
+ qemu-arm@nongnu.org, james.morse@arm.com, xuwei5@huawei.com,
+ jonathan.cameron@huawei.com, pbonzini@redhat.com, lersek@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19/06/19 18:21, Liran Alon wrote:
-> Hi,
+On Tue, 14 May 2019 04:18:18 -0700
+Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+
+> It will help to add Generic Error Status Block to ACPI tables
+> without using packed C structures and avoid endianness
+> issues as API doesn't need explicit conversion.
 > 
-> This series aims to add support for QEMU to be able to migrate VMs that
-> are running nested hypervisors. In order to do so, it utilizes the new
-> IOCTLs introduced in KVM commit 8fcc4b5923af ("kvm: nVMX: Introduce
-> KVM_CAP_NESTED_STATE") which was created for this purpose.
-
-Applied with just three minor changes that should be uncontroversial:
-
-> 6rd patch updates linux-headers to have updated struct kvm_nested_state.
-> The updated struct now have explicit fields for the data portion.
-
-Changed patch title to "linux-headers: sync with latest KVM headers from
-Linux 5.2"
-
-> 7rd patch add vmstate support for saving/restoring kernel integer types (e.g. __u16).
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> ---
+>  hw/acpi/aml-build.c         | 14 ++++++++++++++
+>  include/hw/acpi/aml-build.h |  6 ++++++
+>  2 files changed, 20 insertions(+)
 > 
-> 8th patch adds support for saving and restoring nested state in order to migrate
-> guests which run a nested hypervisor.
+> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+> index 102a288..ce90970 100644
+> --- a/hw/acpi/aml-build.c
+> +++ b/hw/acpi/aml-build.c
+> @@ -296,6 +296,20 @@ void build_append_ghes_notify(GArray *table, const uint8_t type,
+>          build_append_int_noprefix(table, error_threshold_window, 4);
+>  }
+>  
+> +/* Generic Error Status Block
+> + * ACPI 4.0: 17.3.2.6.1 Generic Error Data
+> + */
+> +void build_append_ghes_generic_status(GArray *table, uint32_t block_status,
+maybe ..._generic_error_status???
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index e924663f32..f3cf6e1b27 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1671,10 +1671,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
-             struct kvm_vmx_nested_state_hdr *vmx_hdr =
-                 &env->nested_state->hdr.vmx;
+> +                      uint32_t raw_data_offset, uint32_t raw_data_length,
+> +                      uint32_t data_length, uint32_t error_severity)
+see CODING_STYLE, 1.1 Multiline Indent
 
-+            env->nested_state->format = KVM_STATE_NESTED_FORMAT_VMX;
-             vmx_hdr->vmxon_pa = -1ull;
-             vmx_hdr->vmcs12_pa = -1ull;
-         }
--
-     }
+> +{
+when describing filds from spec try to add 'verbatim' copy of the name from spec
+so it would be esy to grep for it. Like:
+       /* Block Status */
+> +    build_append_int_noprefix(table, block_status, 4);
+       /* Raw Data Offset */
 
-     cpu->kvm_msr_buf = g_malloc0(MSR_BUF_SIZE);
+note applies all other places where you compose ACPI tables
 
-which is a no-op since KVM_STATE_NESTED_FORMAT_VMX is zero, but it's tidy.
+> +    build_append_int_noprefix(table, raw_data_offset, 4);
+> +    build_append_int_noprefix(table, raw_data_length, 4);
+> +    build_append_int_noprefix(table, data_length, 4);
+> +    build_append_int_noprefix(table, error_severity, 4);
+> +}
+> +
+>  /* Generic Error Data Entry
+>   * ACPI 4.0: 17.3.2.6.1 Generic Error Data
+>   */
+> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+> index a71db2f..1ec7e1b 100644
+> --- a/include/hw/acpi/aml-build.h
+> +++ b/include/hw/acpi/aml-build.h
+> @@ -425,6 +425,12 @@ void build_append_ghes_generic_data(GArray *table, const char *section_type,
+>                                      uint32_t error_data_length, uint8_t *fru_id,
+>                                      uint8_t *fru_text, uint64_t time_stamp);
+>  
+> +void
+> +build_append_ghes_generic_status(GArray *table, uint32_t block_status,
+> +                                 uint32_t raw_data_offset,
+> +                                 uint32_t raw_data_length,
+> +                                 uint32_t data_length, uint32_t error_severity);
+this and previous patch, it might be better to to move declaration
+to its own header, for example to include/hw/acpi/acpi_ghes.h
+that you are adding later in the series.
+And maybe move helpers to hw/acpi/acpi_ghes.c
+They are not really independent ACPI primitives that are shared
+with other tables, aren't they?
+.
+> +
+>  void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
+>                         uint64_t len, int node, MemoryAffinityFlags flags);
+>  
 
-> 9th patch add support for KVM_CAP_EXCEPTION_PAYLOAD. This new KVM capability
-> allows userspace to properly distingiush between pending and injecting exceptions.
-> 
-> 10th patch changes the nested virtualization migration blocker to only
-> be added when kernel lack support for one of the capabilities required
-> for correct nested migration. i.e. Either KVM_CAP_NESTED_STATE or
-> KVM_CAP_EXCEPTION_PAYLOAD.
-
-Had to disable this for SVM unfortunately.
 
