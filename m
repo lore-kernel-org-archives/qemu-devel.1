@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67949C43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 16:10:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 346E7C43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 16:19:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CCB42070B
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 16:10:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CCB42070B
+	by mail.kernel.org (Postfix) with ESMTPS id 0D7342070B
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 16:19:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D7342070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50108 helo=lists.gnu.org)
+Received: from localhost ([::1]:50144 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdzdS-0000PD-UX
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 12:10:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56484)
+	id 1hdzmY-0003CG-0g
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 12:19:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36542)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hdzV5-00027h-CK
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 12:01:25 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hdzkZ-000299-A2
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 12:17:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hdzV3-0004aV-8t
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 12:01:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60264)
+ (envelope-from <jsnow@redhat.com>) id 1hdzhM-0001vh-9k
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 12:14:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40752)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hdzUy-0004VR-94; Thu, 20 Jun 2019 12:01:16 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1hdzhK-0001sn-LT; Thu, 20 Jun 2019 12:14:02 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 83E9B3003B36;
- Thu, 20 Jun 2019 16:01:14 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id BB9DC30821C1;
+ Thu, 20 Jun 2019 16:13:56 +0000 (UTC)
 Received: from [10.10.123.29] (ovpn-123-29.rdu2.redhat.com [10.10.123.29])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 381275D71C;
- Thu, 20 Jun 2019 16:01:12 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7CD2260579;
+ Thu, 20 Jun 2019 16:13:47 +0000 (UTC)
 To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 References: <20190620010356.19164-1-jsnow@redhat.com>
- <20190620010356.19164-3-jsnow@redhat.com>
- <e7143bb8-afb6-8326-6e93-49a7470b9b98@redhat.com>
+ <20190620010356.19164-5-jsnow@redhat.com>
+ <5a326b6e-eb17-60a5-a656-286a087cd939@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -121,22 +121,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <5a873055-72c2-ac4c-074d-2c31c8b4c863@redhat.com>
-Date: Thu, 20 Jun 2019 12:01:11 -0400
+Message-ID: <e0d8491c-e463-a6a5-b2af-4da6275dbb4e@redhat.com>
+Date: Thu, 20 Jun 2019 12:13:45 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <e7143bb8-afb6-8326-6e93-49a7470b9b98@redhat.com>
+In-Reply-To: <5a326b6e-eb17-60a5-a656-286a087cd939@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Thu, 20 Jun 2019 16:01:14 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.47]); Thu, 20 Jun 2019 16:13:56 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 02/12] block/backup: Add mirror sync mode
- 'bitmap'
+Subject: Re: [Qemu-devel] [PATCH 04/12] hbitmap: Fix merge when b is empty,
+ and result is not an alias of a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -158,276 +158,56 @@ Sender: "Qemu-devel"
 
 
 
-On 6/20/19 11:00 AM, Max Reitz wrote:
+On 6/20/19 11:39 AM, Max Reitz wrote:
 > On 20.06.19 03:03, John Snow wrote:
->> We don't need or want a new sync mode for simple differences in
->> semantics.  Create a new mode simply named "BITMAP" that is designed t=
-o
->> make use of the new Bitmap Sync Mode field.
->>
->> Because the only bitmap mode is 'conditional', this adds no new
->> functionality to the backup job (yet). The old incremental backup mode
->> is maintained as a syntactic sugar for sync=3Dbitmap, mode=3Dcondition=
-al.
->>
->> Add all of the plumbing necessary to support this new instruction.
+>> Nobody calls the function like this currently, but we neither prohibit
+>> or cope with this behavior. I decided to make the function cope with it.
 >>
 >> Signed-off-by: John Snow <jsnow@redhat.com>
 >> ---
->>  qapi/block-core.json      | 30 ++++++++++++++++++++++--------
->>  include/block/block_int.h |  6 +++++-
->>  block/backup.c            | 35 ++++++++++++++++++++++++++++-------
->>  block/mirror.c            |  6 ++++--
->>  block/replication.c       |  2 +-
->>  blockdev.c                |  8 ++++++--
->>  6 files changed, 66 insertions(+), 21 deletions(-)
+>>  util/hbitmap.c | 9 ++++++---
+>>  1 file changed, 6 insertions(+), 3 deletions(-)
 >>
->> diff --git a/qapi/block-core.json b/qapi/block-core.json
->> index caf28a71a0..6d05ad8f47 100644
->> --- a/qapi/block-core.json
->> +++ b/qapi/block-core.json
->> @@ -1127,12 +1127,15 @@
->>  #
->>  # @none: only copy data written from now on
->>  #
->> -# @incremental: only copy data described by the dirty bitmap. Since: =
-2.4
->> +# @incremental: only copy data described by the dirty bitmap. (since:=
- 2.4)
->=20
-> Why not deprecate this in the process and note that this is equal to
-> sync=3Dbitmap, bitmap-mode=3Dconditional?
->=20
-> (I don=E2=80=99t think there is a rule that forces us to actually remov=
-e
-> deprecated stuff after two releases if it doesn=E2=80=99t hurt to keep =
-it.)
->=20
-
-Mostly I thought it would be fine to keep as sugar. In your replies so
-far I gather that "incremental" and "differential" don't mean specific
-backup paradigms to you, so maybe these seem like worthless words.
-
-It was my general understanding that in terms of backup
-paradigms/methodologies that "incremental" and "differential" mean very
-specific things.
-
-Incremental: Each backup contains only the delta from the last
-incremental backup.
-Differential: Each backup contains the delta from the last FULL backup.
-
-You can search "incremental vs differential backup" on your search
-engine of choice and find many relevant results. I took a Networking/IT
-vocational degree in 2007 and these terms were taught in textbooks then.
-
-So I will resist quite strongly changing them, and for this reason, felt
-that it was strictly a good thing to keep incremental as sugar, because
-I thought that people would know what it meant.
-
-(More than "conditional", anyway, which is jargon I made up.)
-
->> +#
->> +# @bitmap: only copy data described by the dirty bitmap. (since: 4.1)
->> +#          Behavior on completion is determined by the BitmapSyncMode=
-.
->>  #
->>  # Since: 1.3
->>  ##
->>  { 'enum': 'MirrorSyncMode',
->> -  'data': ['top', 'full', 'none', 'incremental'] }
->> +  'data': ['top', 'full', 'none', 'incremental', 'bitmap'] }
->> =20
->>  ##
->>  # @BitmapSyncMode:
->> @@ -1352,10 +1355,14 @@
->>  #
->>  # @speed: the maximum speed, in bytes per second
->>  #
->> -# @bitmap: the name of dirty bitmap if sync is "incremental".
->> -#          Must be present if sync is "incremental", must NOT be pres=
-ent
->> +# @bitmap: the name of dirty bitmap if sync is "bitmap".
->> +#          Must be present if sync is "bitmap", must NOT be present
->>  #          otherwise. (Since 2.4)
->=20
-> Er, well, now this is too fast of a deprecation. :-)  It must still als=
-o
-> be present if sync is =E2=80=9Cincremental=E2=80=9D.
->=20
-
-OK; I will try to phrase it better. This is reflecting too much the
-implementation -- I think I was trying to communicate that incremental
-was just sugar for "bitmap", so I was trusting that was understood here.
-
-...But, depending on the order in which you read the docs, this could be
-confusing, so I guess I will change that.
-
->>  #
->> +# @bitmap-mode: Specifies the type of data the bitmap should contain =
-after
->> +#               the operation concludes. Must be present if sync is "=
-bitmap".
->> +#               Must NOT be present otherwise. (Since 4.1)
->=20
-> Do we have any rule that qemu must enforce =E2=80=9Cmust not=E2=80=9Ds?=
- :-)
->=20
-> (No, I don=E2=80=99t think so.  I think it=E2=80=99s very reasonable th=
-at you accept
-> bitmap-mode=3Dconditional for sync=3Dincremental.)
->=20
-
-Right, I left this a secret wiggle room. If you specify the correct
-bitmap sync mode for the incremental sugar, it will actually let it
-slide. If you specify the wrong one, it will error out.
-
-However, I think this is perfectly correct advice from the API: Please
-use this mode with sync=3Dbitmap and do not use it otherwise.
-
-Would you like me to change it to be more technically correct and
-document the little affordance I made?
-
->>  # @compress: true to compress data, if the target format supports it.
->>  #            (default: false) (since 2.8)
->>  #
->> @@ -1390,7 +1397,8 @@
->>    'data': { '*job-id': 'str', 'device': 'str', 'target': 'str',
->>              '*format': 'str', 'sync': 'MirrorSyncMode',
->>              '*mode': 'NewImageMode', '*speed': 'int',
->> -            '*bitmap': 'str', '*compress': 'bool',
->> +            '*bitmap': 'str', '*bitmap-mode': 'BitmapSyncMode',
->> +            '*compress': 'bool',
->>              '*on-source-error': 'BlockdevOnError',
->>              '*on-target-error': 'BlockdevOnError',
->>              '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
->> @@ -1412,10 +1420,14 @@
->>  # @speed: the maximum speed, in bytes per second. The default is 0,
->>  #         for unlimited.
->>  #
->> -# @bitmap: the name of dirty bitmap if sync is "incremental".
->> -#          Must be present if sync is "incremental", must NOT be pres=
-ent
->> +# @bitmap: the name of dirty bitmap if sync is "bitmap".
->> +#          Must be present if sync is "bitmap", must NOT be present
->>  #          otherwise. (Since 3.1)
->=20
-> Same as above.
->=20
-
-OK
-
->> +# @bitmap-mode: Specifies the type of data the bitmap should contain =
-after
->> +#               the operation concludes. Must be present if sync is "=
-bitmap".
->> +#               Must NOT be present otherwise. (Since 4.1)
->> +#
->>  # @compress: true to compress data, if the target format supports it.
->>  #            (default: false) (since 2.8)
->>  #
->> @@ -1449,7 +1461,9 @@
->>  { 'struct': 'BlockdevBackup',
->>    'data': { '*job-id': 'str', 'device': 'str', 'target': 'str',
->>              'sync': 'MirrorSyncMode', '*speed': 'int',
->> -            '*bitmap': 'str', '*compress': 'bool',
->> +            '*bitmap': 'str',
->> +            '*bitmap-mode': 'BitmapSyncMode',
->> +            '*compress': 'bool',
->>              '*on-source-error': 'BlockdevOnError',
->>              '*on-target-error': 'BlockdevOnError',
->>              '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
->> diff --git a/include/block/block_int.h b/include/block/block_int.h
->> index d6415b53c1..89370c1b9b 100644
->> --- a/include/block/block_int.h
->> +++ b/include/block/block_int.h
->> @@ -1132,7 +1132,9 @@ void mirror_start(const char *job_id, BlockDrive=
-rState *bs,
->>   * @target: Block device to write to.
->>   * @speed: The maximum speed, in bytes per second, or 0 for unlimited=
-.
->>   * @sync_mode: What parts of the disk image should be copied to the d=
-estination.
->> - * @sync_bitmap: The dirty bitmap if sync_mode is MIRROR_SYNC_MODE_IN=
-CREMENTAL.
->> + * @sync_bitmap: The dirty bitmap if sync_mode is 'bitmap' or 'increm=
-ental'
->> + * @has_bitmap_mode: true if @bitmap_sync carries a meaningful value.
->=20
-> Hmm...  If you moved the conversion of incremental/- =3D>
-> bitmap/conditional into blockdev.c, you could get rid of this parameter
-> because it would be equal to (sync_bitmap !=3D NULL).
->=20
-> (It itches me to get rid of this parameter because there is no other
-> has* parameter for this function yet.)
->=20
-
-Yeah, it annoyed me too, and I believe later you do correctly guess why
-I did it -- it's so that the sugar conversion occurs all in one place
-where the logic was easiest to condense.
-
-I ran into the issue that there's no way to define a QAPI enum that has
-a "default"/"unset" state without also allowing that value to be entered
-by the user explicitly; so there was no way to pass along an "unset
-enum" down this far.
-
-So... (thought continued below)
-
->> + * @bitmap_mode: The bitmap synchronization policy to use.
->>   * @on_source_error: The action to take upon error reading from the s=
-ource.
->>   * @on_target_error: The action to take upon error writing to the tar=
-get.
->>   * @creation_flags: Flags that control the behavior of the Job lifeti=
-me.
->> @@ -1148,6 +1150,8 @@ BlockJob *backup_job_create(const char *job_id, =
-BlockDriverState *bs,
->>                              BlockDriverState *target, int64_t speed,
->>                              MirrorSyncMode sync_mode,
->>                              BdrvDirtyBitmap *sync_bitmap,
->> +                            bool has_bitmap_mode,
->> +                            BitmapSyncMode bitmap_mode,
->>                              bool compress,
->>                              BlockdevOnError on_source_error,
->>                              BlockdevOnError on_target_error,
->> diff --git a/block/backup.c b/block/backup.c
->> index 715e1d3be8..c4f83d4ef7 100644
->> --- a/block/backup.c
->> +++ b/block/backup.c
->=20
-> [...]
->=20
->> @@ -584,9 +586,28 @@ BlockJob *backup_job_create(const char *job_id, B=
-lockDriverState *bs,
+>> diff --git a/util/hbitmap.c b/util/hbitmap.c
+>> index 7905212a8b..45d1725daf 100644
+>> --- a/util/hbitmap.c
+>> +++ b/util/hbitmap.c
+>> @@ -781,8 +781,9 @@ bool hbitmap_can_merge(const HBitmap *a, const HBitmap *b)
+>>  }
+>>  
+>>  /**
+>> - * Given HBitmaps A and B, let A := A (BITOR) B.
+>> - * Bitmap B will not be modified.
+>> + * Given HBitmaps A and B, let R := A (BITOR) B.
+>> + * Bitmaps A and B will not be modified,
+>> + *     except when bitmap R is an alias of A or B.
+>>   *
+>>   * @return true if the merge was successful,
+>>   *         false if it was not attempted.
+>> @@ -797,7 +798,9 @@ bool hbitmap_merge(const HBitmap *a, const HBitmap *b, HBitmap *result)
 >>      }
->> =20
->>      if (sync_mode =3D=3D MIRROR_SYNC_MODE_INCREMENTAL) {
->> +        if (has_bitmap_mode &&
->> +            bitmap_mode !=3D BITMAP_SYNC_MODE_CONDITIONAL) {
->> +            error_setg(errp, "Bitmap sync mode must be 'conditional' =
-"
->> +                       "when using sync mode '%s'",
->> +                       MirrorSyncMode_str(sync_mode));
->> +            return NULL;
->> +        }
->> +        has_bitmap_mode =3D true;
->> +        bitmap_mode =3D BITMAP_SYNC_MODE_CONDITIONAL;
->> +        effective_mode =3D MIRROR_SYNC_MODE_BITMAP;
->> +    }
->> +
->=20
-> I also just don=E2=80=99t quite feel like this is the correct place to =
-put this.
->  It=E2=80=99s a deprecated interface, so it should be translated in the
-> interface code, i.e. in blockdev.c.
->=20
-> (Sure, this gives you a central place for the translation, but you can
-> just as well add a function to the same effect to blockdev.c.)
->=20
+>>      assert(hbitmap_can_merge(b, result));
+>>  
+>> -    if (hbitmap_count(b) == 0) {
+>> +    if ((!hbitmap_count(a) && result == b) ||
+>> +        (!hbitmap_count(b) && result == a) ||
+>> +        (!hbitmap_count(a) && !hbitmap_count(b))) {
+>>          return true;
+>>      }
+> 
+> The rest of this function completely overwrites the @result bitmap.
+> Therefor, @result does not need to be cleared when calling this function.
+> 
+> Therfore, hbitmap_merge(hbitmap_alloc(), hbitmap_alloc(), output) should
+> actually clear @output, I think.
+> 
 > Max
->=20
+> 
 
-... I can toy around with your idea of making a helper that can be
-called in blockdev and see if I like it.
+Ah, wellp, you're right. That'd be the second problem with this function.
 
-Thank you for taking a look!
+It used to be strictly A = A | B, but we changed it -- very incompletely
+-- to R = A | B; which explains these two bugs.
+
+Thanks.
 
