@@ -2,82 +2,90 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EA3EC48BE4
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 15:04:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDCECC43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 15:06:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B68F2084E
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 15:04:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="Yqb4z967"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B68F2084E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	by mail.kernel.org (Postfix) with ESMTPS id BAB9D20673
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 15:06:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAB9D20673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48858 helo=lists.gnu.org)
+Received: from localhost ([::1]:48860 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdybZ-00033e-8G
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 11:04:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37863)
+	id 1hdydo-0003VO-VI
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 11:06:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34750)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwankhede@nvidia.com>) id 1hdyK1-0005xA-6v
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:45:55 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hdyBs-0006bN-6q
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:37:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1hdyJz-0005YR-R5
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:45:53 -0400
-Received: from hqemgate14.nvidia.com ([216.228.121.143]:13233)
+ (envelope-from <mreitz@redhat.com>) id 1hdyBp-0000Q3-3E
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:37:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51184)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1hdyJz-0005VS-IR
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:45:51 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5d0b9ae50000>; Thu, 20 Jun 2019 07:40:37 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate101.nvidia.com (PGP Universal service);
- Thu, 20 Jun 2019 07:40:37 -0700
-X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Thu, 20 Jun 2019 07:40:37 -0700
-Received: from HQMAIL112.nvidia.com (172.18.146.18) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 20 Jun
- 2019 14:40:37 +0000
-Received: from HQMAIL106.nvidia.com (172.18.146.12) by HQMAIL112.nvidia.com
- (172.18.146.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 20 Jun
- 2019 14:40:37 +0000
-Received: from kwankhede-dev.nvidia.com (172.20.13.39) by HQMAIL.nvidia.com
- (172.18.146.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Thu, 20 Jun 2019 14:40:31 +0000
-From: Kirti Wankhede <kwankhede@nvidia.com>
-To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Date: Thu, 20 Jun 2019 20:07:34 +0530
-Message-ID: <1561041461-22326-7-git-send-email-kwankhede@nvidia.com>
-X-Mailer: git-send-email 2.7.0
-In-Reply-To: <1561041461-22326-1-git-send-email-kwankhede@nvidia.com>
-References: <1561041461-22326-1-git-send-email-kwankhede@nvidia.com>
-X-NVConfidentiality: public
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hdxMM-0002Hm-2Z; Thu, 20 Jun 2019 09:44:15 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E214C5277E;
+ Thu, 20 Jun 2019 13:44:12 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.208])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2DB726090E;
+ Thu, 20 Jun 2019 13:44:10 +0000 (UTC)
+To: Sam Eiderman <shmuel.eiderman@oracle.com>, kwolf@redhat.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190620091057.47441-1-shmuel.eiderman@oracle.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <4fd4cb44-9e96-4873-b271-4d293838676f@redhat.com>
+Date: Thu, 20 Jun 2019 15:44:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1561041637; bh=lBhaXThY2cPoc8ul1w3nQGKRFmg6IBN6bpYoTDrFtTE=;
- h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
- In-Reply-To:References:X-NVConfidentiality:MIME-Version:
- Content-Type;
- b=Yqb4z967z8eaCKiK5yVu2pIZwmPoANmrsU0R3/ErqOosLfWdFewX510sgQpw0AF4R
- fz2NQK9z18FmWb3M+C1HUZJBtvm8nVP3UGrEbh8IwHRxKi7szt8D5s5akcp9+VnrX/
- EiC1/n8QIT1tMM9vBliwGkXjAAYFMUY7AvjVozjzDCnfrqUiH1J1+biJ5tFU2Mwq42
- cTISqzixXSaOpQvK5TLFRaEnrEsAUJlmy/5slrjVqJ6BYWfBnkNoxjEt/hHTbJ5X73
- 6yqvjL2fTvZyNm0h5xzqHaQ0N95ijyuSeIt950P+zyKjVw18danBhl57NMJ4cdkBGP
- QOk3B8OipHIkw==
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8
-X-Received-From: 216.228.121.143
-Subject: [Qemu-devel] [PATCH v4 06/13] vfio: Add migration state change
- notifier
+In-Reply-To: <20190620091057.47441-1-shmuel.eiderman@oracle.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="qVwyhQhZiaZGLvFdjpK5D4D7Ro35aAYIB"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Thu, 20 Jun 2019 13:44:12 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] vmdk: Add read-only support for the
+ new seSparse format
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,115 +97,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kirti Wankhede <kwankhede@nvidia.com>, Zhengxiao.zx@Alibaba-inc.com,
- kevin.tian@intel.com, yi.l.liu@intel.com, yan.y.zhao@intel.com,
- eskultet@redhat.com, ziye.yang@intel.com, qemu-devel@nongnu.org,
- cohuck@redhat.com, shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com,
- zhi.a.wang@intel.com, mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
- yulei.zhang@intel.com, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, changpeng.liu@intel.com, Ken.Xue@amd.com
+Cc: liran.alon@oracle.com, karl.heubaum@oracle.com, arbel.moshe@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Added migration state change notifier to get notification on migration state
-change. These states are translated to VFIO device state and conveyed to vendor
-driver.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--qVwyhQhZiaZGLvFdjpK5D4D7Ro35aAYIB
+Content-Type: multipart/mixed; boundary="UMW2yEuXdCoGovox0MnZZ6aAwnim1m46C";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Sam Eiderman <shmuel.eiderman@oracle.com>, kwolf@redhat.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: karl.heubaum@oracle.com, liran.alon@oracle.com, arbel.moshe@oracle.com
+Message-ID: <4fd4cb44-9e96-4873-b271-4d293838676f@redhat.com>
+Subject: Re: [PATCH v3 0/3] vmdk: Add read-only support for the new seSparse
+ format
+References: <20190620091057.47441-1-shmuel.eiderman@oracle.com>
+In-Reply-To: <20190620091057.47441-1-shmuel.eiderman@oracle.com>
 
-Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-Reviewed-by: Neo Jia <cjia@nvidia.com>
----
- hw/vfio/migration.c           | 49 +++++++++++++++++++++++++++++++++++++++++++
- include/hw/vfio/vfio-common.h |  1 +
- 2 files changed, 50 insertions(+)
+--UMW2yEuXdCoGovox0MnZZ6aAwnim1m46C
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-index 15af218c23d1..7f9858e6c995 100644
---- a/hw/vfio/migration.c
-+++ b/hw/vfio/migration.c
-@@ -112,6 +112,48 @@ static void vfio_vmstate_change(void *opaque, int running, RunState state)
-     vbasedev->vm_running = running;
- }
- 
-+static void vfio_migration_state_notifier(Notifier *notifier, void *data)
-+{
-+    MigrationState *s = data;
-+    VFIODevice *vbasedev = container_of(notifier, VFIODevice, migration_state);
-+    int ret;
-+
-+    switch (s->state) {
-+    case MIGRATION_STATUS_ACTIVE:
-+        if (vbasedev->device_state & VFIO_DEVICE_STATE_RUNNING) {
-+            if (vbasedev->vm_running) {
-+                ret = vfio_migration_set_state(vbasedev,
-+                          VFIO_DEVICE_STATE_RUNNING | VFIO_DEVICE_STATE_SAVING);
-+                if (ret) {
-+                    error_report("Failed to set state RUNNING and SAVING");
-+                }
-+            } else {
-+                ret = vfio_migration_set_state(vbasedev,
-+                                               VFIO_DEVICE_STATE_SAVING);
-+                if (ret) {
-+                    error_report("Failed to set state STOP and SAVING");
-+                }
-+            }
-+        } else {
-+            ret = vfio_migration_set_state(vbasedev,
-+                                           VFIO_DEVICE_STATE_RESUMING);
-+            if (ret) {
-+                error_report("Failed to set state RESUMING");
-+            }
-+        }
-+        return;
-+
-+    case MIGRATION_STATUS_CANCELLING:
-+    case MIGRATION_STATUS_CANCELLED:
-+    case MIGRATION_STATUS_FAILED:
-+        ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_RUNNING);
-+        if (ret) {
-+            error_report("Failed to set state RUNNING");
-+        }
-+        return;
-+    }
-+}
-+
- static int vfio_migration_init(VFIODevice *vbasedev,
-                                struct vfio_region_info *info)
- {
-@@ -131,6 +173,9 @@ static int vfio_migration_init(VFIODevice *vbasedev,
-     vbasedev->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
-                                                           vbasedev);
- 
-+    vbasedev->migration_state.notify = vfio_migration_state_notifier;
-+    add_migration_state_change_notifier(&vbasedev->migration_state);
-+
-     return 0;
- }
- 
-@@ -167,6 +212,10 @@ void vfio_migration_finalize(VFIODevice *vbasedev)
-         return;
-     }
- 
-+    if (vbasedev->migration_state.notify) {
-+        remove_migration_state_change_notifier(&vbasedev->migration_state);
-+    }
-+
-     if (vbasedev->vm_state) {
-         qemu_del_vm_change_state_handler(vbasedev->vm_state);
-     }
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index f2392e97fa57..1d26e6be8d48 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -133,6 +133,7 @@ typedef struct VFIODevice {
-     uint32_t device_state;
-     VMChangeStateEntry *vm_state;
-     int vm_running;
-+    Notifier migration_state;
- } VFIODevice;
- 
- struct VFIODeviceOps {
--- 
-2.7.0
+On 20.06.19 11:10, Sam Eiderman wrote:
+> v1:
+>=20
+> VMware introduced a new snapshot format in VMFS6 - seSparse (Space
+> Efficient Sparse) which is the default format available in ESXi 6.7.
+> Add read-only support for the new snapshot format.
+>=20
+> v2:
+>=20
+> Fixed after Max's review:
+>=20
+> * Removed strict sesparse checks
+> * Reduced maximal L1 table size
+> * Added non-write mode check in vmdk_open() on sesparse
+>=20
+> v3:
+>=20
+> Change non-write mode check in vmdk_open() to bdrv_apply_auto_read_only=
+().
+>=20
+> Sam Eiderman (3):
+>   vmdk: Fix comment regarding max l1_size coverage
+>   vmdk: Reduce the max bound for L1 table size
+>   vmdk: Add read-only support for seSparse snapshots
+>=20
+>  block/vmdk.c               | 372 +++++++++++++++++++++++++++++++++++++=
++++++---
+>  tests/qemu-iotests/059.out |   2 +-
+>  2 files changed, 353 insertions(+), 21 deletions(-)
 
+Thanks, applied to my block branch:
+
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+
+Max
+
+
+--UMW2yEuXdCoGovox0MnZZ6aAwnim1m46C--
+
+--qVwyhQhZiaZGLvFdjpK5D4D7Ro35aAYIB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0LjakACgkQ9AfbAGHV
+z0BCLQf+JKrrTzxSkuwW51VO5NxdQleT8ce1UuWSD+mKxcF3aNTEKXJW5bH1bI5M
+s/PYb1Z5lKLR/OtFYe8hQl14oPgHtN3FeW82oSqffU0KhY5aYVfDAVT52XwU0aZo
+dlT1Ea0BO/QyIJLVyalbSmR7jC0xASVQ9tIHK8ImUsrOm9SORke15oDxI8V8u19I
+sow96yn5jWQeN/Unx0aILQtIbKgOl5LVMfycwVGvHO5J0KAZugRXV3ub9DFGG53w
+eigTHslqBRTuUqe7P3nX5J9gVYKX/aqv3cchheTYCmOttlaCHV0GVQ3r7hg3by6/
+D1Bza4dLMONqsCFJubx4QIu8CiwWfQ==
+=/y66
+-----END PGP SIGNATURE-----
+
+--qVwyhQhZiaZGLvFdjpK5D4D7Ro35aAYIB--
 
