@@ -2,92 +2,56 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37F40C43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 11:56:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2B95C43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 11:59:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8696206E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 11:56:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cgXylL2X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8696206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 995EB206E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 11:59:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 995EB206E0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46632 helo=lists.gnu.org)
+Received: from localhost ([::1]:46668 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdvfr-0006EW-0C
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 07:56:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55169)
+	id 1hdvjK-0000wz-Ht
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 07:59:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55387)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hdvYc-00084S-3Y
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 07:48:48 -0400
+ (envelope-from <balaton@eik.bme.hu>) id 1hdvYa-0008DQ-L7
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 07:48:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hdvSF-0007zT-62
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 07:42:13 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54153)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hduox-0007yx-QC
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 07:01:36 -0400
-Received: by mail-wm1-x344.google.com with SMTP id x15so2607374wmj.3
- for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 04:01:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=23lOllzwVO9Te1xqUOmkdCLzUMMqU9E3cn6knh+gdiw=;
- b=cgXylL2XQxVzUFY2LVUGLbX5dWUwAgAk5XUVJN0j6YEoz9W60GcAM6u9hoZuUASLC5
- URE4bmvw7lf0oIFK3KeWcgYWUhgaAO/VX52DeNSXwn3FQS2cxrW5re+p6PBTb6uDCJBH
- tfWsHEHZzDoDOnU1qkrqVJOAK7jf96vv4X+hD82ZWQoR4KS/qfMADB3ywCyocEJDo/My
- sgG3lL2bQHBEBJeZFVWe66djNVsin296H88je+tyOWIxNwHAcBo5WW5W2QC/shNsQJPx
- Aw89EQ/DtqG76yMU/n4dnA6+oSca7gJhpiQEjKGaFAH48YT2xwO048CAW/7UCNRAvE3d
- 4GEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=23lOllzwVO9Te1xqUOmkdCLzUMMqU9E3cn6knh+gdiw=;
- b=icbrdRovR8/bszPaaLxmHSfWRpYwFFmyoP3FzHBgzddyOO0Bwdu8CAuAoFO5xR2TB6
- IWuJiFMByMIKfYvBEKeZw3bW+BgDFeHfa9hTrFpcVI7sPcFphs1NnMcaPfATQTdPVfP6
- 7ZU6hKimdy5iQ4WIeC7z6QbXNHUOBTLc52FTmJO/mIPibPc9i/5t9TbeZbv666SjmWbc
- F2QYO6g01LsV8wwRUszdmmUe1OkefcAhrqkX17Y2zibfoBncLE649v29Mgm8Nmf6MbgI
- AyrQL+mQA/LgY8UP/5McPOZ0hk9XZRURcZ8C2DCH28tHTlpPZDq8saxv3mnQQ+OIPrGf
- Rzsw==
-X-Gm-Message-State: APjAAAXhAMaJgHr3I5kNCHk5FDKswLD6wQ17TZYmJ5h2M7VVubiDqFzy
- 0hD2uuSdAHUc8oGpXXUvLGYhzg==
-X-Google-Smtp-Source: APXvYqy3No+Q9p5Jr/P6Z6em+L/oHum4oYex6Y8H4LOxM2s8bqPQkfXxTl6eYGur0e9bsNeHzlrT+Q==
-X-Received: by 2002:a05:600c:c4:: with SMTP id u4mr2469784wmm.96.1561028493603; 
- Thu, 20 Jun 2019 04:01:33 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id s10sm19443686wrt.49.2019.06.20.04.01.32
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 20 Jun 2019 04:01:32 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 7266F1FF87;
- Thu, 20 Jun 2019 12:01:32 +0100 (BST)
-References: <20190619194021.8240-1-alex.bennee@linaro.org>
- <20190619194021.8240-13-alex.bennee@linaro.org>
- <d9b49b4d-424b-1ad1-511e-fc5ad7cdafe6@redhat.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-In-reply-to: <d9b49b4d-424b-1ad1-511e-fc5ad7cdafe6@redhat.com>
-Date: Thu, 20 Jun 2019 12:01:32 +0100
-Message-ID: <87v9x08qr7.fsf@zen.linaroharston>
+ (envelope-from <balaton@eik.bme.hu>) id 1hdvT2-00007y-Kr
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 07:43:02 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:12613)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1hduqT-0008RC-Lf
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 07:03:09 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 14261746395;
+ Thu, 20 Jun 2019 13:02:50 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 6352E7462BB; Thu, 20 Jun 2019 13:02:49 +0200 (CEST)
+Message-Id: <046ddebb7ec8db48c4e877ee444ec1c41e385a74.1561028123.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1561028123.git.balaton@eik.bme.hu>
+References: <cover.1561028123.git.balaton@eik.bme.hu>
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Thu, 20 Jun 2019 12:55:23 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
+To: qemu-devel@nongnu.org
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH v1 12/17] tests/vm: freebsd autoinstall,
- using serial console
+X-Received-From: 2001:738:2001:2001::2001
+Subject: [Qemu-devel] [PATCH v5 2/2] ati-vga: Implement DDC and EDID info
+ from monitor
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,274 +63,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Corey Minyard <cminyard@mvista.com>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This adds DDC support to ati-vga and connects i2c-ddc to it. This
+allows at least MacOS with an ATI ndrv, Linux radeonfb and MorphOS to
+get monitor EDID info (although MorphOS splash screen is not displayed
+and radeonfb needs additional tables from vgabios-rv100). Xorg needs
+additional support from VESA vgabios, it's missing INT10 0x4F15
+function (see
+https://gitlab.freedesktop.org/xorg/xserver/blob/master/hw/xfree86/vbe/vb=
+e.c)
+without which no DDC is available that also prevents loading the
+accelerated X driver.
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+ hw/display/Kconfig    |  2 ++
+ hw/display/ati.c      | 60 +++++++++++++++++++++++++++++++++++++++++++++=
+++++--
+ hw/display/ati_int.h  |  5 +++++
+ hw/display/ati_regs.h |  2 ++
+ 4 files changed, 67 insertions(+), 2 deletions(-)
 
-> On 6/19/19 9:40 PM, Alex Benn=C3=A9e wrote:
->> From: Gerd Hoffmann <kraxel@redhat.com>
->>
->> Instead of fetching the prebuilt image from patchew download the install
->> iso and prepare the image locally.  Install to disk, using the serial
->> console.  Create qemu user, configure ssh login.  Install packages
->> needed for qemu builds.
->>
->> Note that freebsd package downloads are delivered as non-cachable
->> content, so I had to configure squid with "ignore-no-store
->> ignore-private ignore-reload" for pkgmir.geo.freebsd.org to make the
->> caching actually work.
->>
->> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> Tested-by: Thomas Huth <thuth@redhat.com>
->> Message-Id: <20190617043858.8290-9-kraxel@redhat.com>
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+diff --git a/hw/display/Kconfig b/hw/display/Kconfig
+index 910dccb2f7..cbdf7b1a67 100644
+--- a/hw/display/Kconfig
++++ b/hw/display/Kconfig
+@@ -130,3 +130,5 @@ config ATI_VGA
+     default y if PCI_DEVICES
+     depends on PCI
+     select VGA
++    select BITBANG_I2C
++    select DDC
+diff --git a/hw/display/ati.c b/hw/display/ati.c
+index 76595d9511..61e351a024 100644
+--- a/hw/display/ati.c
++++ b/hw/display/ati.c
+@@ -26,6 +26,7 @@
+ #include "qapi/error.h"
+ #include "hw/hw.h"
+ #include "ui/console.h"
++#include "hw/display/i2c-ddc.h"
+ #include "trace.h"
+=20
+ #define ATI_DEBUG_HW_CURSOR 0
+@@ -215,6 +216,24 @@ static void ati_cursor_draw_line(VGACommonState *vga=
+, uint8_t *d, int scr_y)
+     }
+ }
+=20
++static uint64_t ati_i2c(bitbang_i2c_interface *i2c, uint64_t data, int b=
+ase)
++{
++    bool c =3D (data & BIT(base + 17) ? !!(data & BIT(base + 1)) : 1);
++    bool d =3D (data & BIT(base + 16) ? !!(data & BIT(base)) : 1);
++
++    bitbang_i2c_set(i2c, BITBANG_I2C_SCL, c);
++    d =3D bitbang_i2c_set(i2c, BITBANG_I2C_SDA, d);
++
++    data &=3D ~0xf00ULL;
++    if (c) {
++        data |=3D BIT(base + 9);
++    }
++    if (d) {
++        data |=3D BIT(base + 8);
++    }
++    return data;
++}
++
+ static inline uint64_t ati_reg_read_offs(uint32_t reg, int offs,
+                                          unsigned int size)
+ {
+@@ -266,7 +285,16 @@ static uint64_t ati_mm_read(void *opaque, hwaddr add=
+r, unsigned int size)
+     case DAC_CNTL:
+         val =3D s->regs.dac_cntl;
+         break;
+-/*    case GPIO_MONID: FIXME hook up DDC I2C here */
++    case GPIO_VGA_DDC:
++        val =3D s->regs.gpio_vga_ddc;
++        break;
++    case GPIO_DVI_DDC:
++        val =3D s->regs.gpio_dvi_ddc;
++        break;
++    case GPIO_MONID ... GPIO_MONID + 3:
++        val =3D ati_reg_read_offs(s->regs.gpio_monid,
++                                addr - GPIO_MONID, size);
++        break;
+     case PALETTE_INDEX:
+         /* FIXME unaligned access */
+         val =3D vga_ioport_read(&s->vga, VGA_PEL_IR) << 16;
+@@ -497,7 +525,28 @@ static void ati_mm_write(void *opaque, hwaddr addr,
+         s->regs.dac_cntl =3D data & 0xffffe3ff;
+         s->vga.dac_8bit =3D !!(data & DAC_8BIT_EN);
+         break;
+-/*    case GPIO_MONID: FIXME hook up DDC I2C here */
++    case GPIO_VGA_DDC:
++        if (s->dev_id !=3D PCI_DEVICE_ID_ATI_RAGE128_PF) {
++            /* FIXME: Maybe add a property to select VGA or DVI port? */
++        }
++        break;
++    case GPIO_DVI_DDC:
++        if (s->dev_id !=3D PCI_DEVICE_ID_ATI_RAGE128_PF) {
++            s->regs.gpio_dvi_ddc =3D ati_i2c(s->bbi2c, data, 0);
++        }
++        break;
++    case GPIO_MONID ... GPIO_MONID + 3:
++        /* FIXME What does Radeon have here? */
++        if (s->dev_id =3D=3D PCI_DEVICE_ID_ATI_RAGE128_PF) {
++            /* Rage128p accesses DDC used to get EDID on these pins */
++            ati_reg_write_offs(&s->regs.gpio_monid,
++                               addr - GPIO_MONID, data, size);
++            if ((s->regs.gpio_monid & BIT(25)) &&
++                addr <=3D GPIO_MONID + 2 && addr + size > GPIO_MONID + 2=
+) {
++                s->regs.gpio_monid =3D ati_i2c(s->bbi2c, s->regs.gpio_mo=
+nid, 1);
++            }
++        }
++        break;
+     case PALETTE_INDEX ... PALETTE_INDEX + 3:
+         if (size =3D=3D 4) {
+             vga_ioport_write(&s->vga, VGA_PEL_IR, (data >> 16) & 0xff);
+@@ -788,6 +837,12 @@ static void ati_vga_realize(PCIDevice *dev, Error **=
+errp)
+         vga->cursor_draw_line =3D ati_cursor_draw_line;
+     }
+=20
++    /* ddc, edid */
++    I2CBus *i2cbus =3D i2c_init_bus(DEVICE(s), "ati-vga.ddc");
++    s->bbi2c =3D bitbang_i2c_init(i2cbus);
++    I2CSlave *i2cddc =3D I2C_SLAVE(qdev_create(BUS(i2cbus), TYPE_I2CDDC)=
+);
++    i2c_set_slave_address(i2cddc, 0x50);
++
+     /* mmio register space */
+     memory_region_init_io(&s->mm, OBJECT(s), &ati_mm_ops, s,
+                           "ati.mmregs", 0x4000);
+@@ -813,6 +868,7 @@ static void ati_vga_exit(PCIDevice *dev)
+     ATIVGAState *s =3D ATI_VGA(dev);
+=20
+     graphic_console_close(s->vga.con);
++    g_free(s->bbi2c);
+ }
+=20
+ static Property ati_vga_properties[] =3D {
+diff --git a/hw/display/ati_int.h b/hw/display/ati_int.h
+index 2f426064cf..51465f5630 100644
+--- a/hw/display/ati_int.h
++++ b/hw/display/ati_int.h
+@@ -10,6 +10,7 @@
+ #define ATI_INT_H
+=20
+ #include "hw/pci/pci.h"
++#include "hw/i2c/bitbang_i2c.h"
+ #include "vga_int.h"
+=20
+ /*#define DEBUG_ATI*/
+@@ -35,6 +36,9 @@ typedef struct ATIVGARegs {
+     uint32_t crtc_gen_cntl;
+     uint32_t crtc_ext_cntl;
+     uint32_t dac_cntl;
++    uint32_t gpio_vga_ddc;
++    uint32_t gpio_dvi_ddc;
++    uint32_t gpio_monid;
+     uint32_t crtc_h_total_disp;
+     uint32_t crtc_h_sync_strt_wid;
+     uint32_t crtc_v_total_disp;
+@@ -83,6 +87,7 @@ typedef struct ATIVGAState {
+     uint16_t cursor_size;
+     uint32_t cursor_offset;
+     QEMUCursor *cursor;
++    bitbang_i2c_interface *bbi2c;
+     MemoryRegion io;
+     MemoryRegion mm;
+     ATIVGARegs regs;
+diff --git a/hw/display/ati_regs.h b/hw/display/ati_regs.h
+index 923bfd33ce..1ec3498b73 100644
+--- a/hw/display/ati_regs.h
++++ b/hw/display/ati_regs.h
+@@ -37,6 +37,8 @@
+ #define CRTC_GEN_CNTL                           0x0050
+ #define CRTC_EXT_CNTL                           0x0054
+ #define DAC_CNTL                                0x0058
++#define GPIO_VGA_DDC                            0x0060
++#define GPIO_DVI_DDC                            0x0064
+ #define GPIO_MONID                              0x0068
+ #define I2C_CNTL_1                              0x0094
+ #define PALETTE_INDEX                           0x00b0
+--=20
+2.13.7
 
-So I do have a check for this in my PR scripts. I guess I should
-replicate it in my patch series workflow.
-
->
->> ---
->>  tests/vm/freebsd | 182 ++++++++++++++++++++++++++++++++++++++++++++---
->>  1 file changed, 172 insertions(+), 10 deletions(-)
->>
->> diff --git a/tests/vm/freebsd b/tests/vm/freebsd
->> index 091be1a065..2a19461a90 100755
->> --- a/tests/vm/freebsd
->> +++ b/tests/vm/freebsd
->> @@ -2,41 +2,203 @@
->>  #
->>  # FreeBSD VM image
->>  #
->> -# Copyright 2017 Red Hat Inc.
->> +# Copyright 2017-2019 Red Hat Inc.
->>  #
->>  # Authors:
->>  #  Fam Zheng <famz@redhat.com>
->> +#  Gerd Hoffmann <kraxel@redhat.com>
->>  #
->>  # This code is licensed under the GPL version 2 or later.  See
->>  # the COPYING file in the top-level directory.
->>  #
->>
->>  import os
->> +import re
->>  import sys
->> +import time
->> +import socket
->>  import subprocess
->>  import basevm
->>
->>  class FreeBSDVM(basevm.BaseVM):
->>      name =3D "freebsd"
->>      arch =3D "x86_64"
->> +
->> +    link =3D "https://download.freebsd.org/ftp/releases/ISO-IMAGES/12.0=
-/FreeBSD-12.0-RELEASE-amd64-disc1.iso.xz"
->> +    csum =3D "1d40015bea89d05b8bd13e2ed80c40b522a9ec1abd8e7c8b80954fb48=
-5fb99db"
->> +    size =3D "20G"
->> +    pkgs =3D [
->> +        # build tools
->> +        "git",
->> +        "pkgconf",
->> +        "bzip2",
->> +
->> +        # gnu tools
->> +        "bash",
->> +        "gmake",
->> +        "gsed",
->> +        "flex", "bison",
->> +
->> +        # libs: crypto
->> +        "gnutls",
->> +
->> +        # libs: images
->> +        "jpeg-turbo",
->> +        "png",
->> +
->> +        # libs: ui
->> +        "sdl2",
->> +        "gtk3",
->> +        "libxkbcommon",
->> +
->> +        # libs: opengl
->> +        "libepoxy",
->> +        "mesa-libs",
->> +    ]
->> +
->>      BUILD_SCRIPT =3D """
->>          set -e;
->> -        rm -rf /var/tmp/qemu-test.*
->> -        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
->> +        rm -rf /home/qemu/qemu-test.*
->> +        cd $(mktemp -d /home/qemu/qemu-test.XXXXXX);
->> +        mkdir src build; cd src;
->>          tar -xf /dev/vtbd1;
->> -        ./configure {configure_opts};
->> +        cd ../build
->> +        ../src/configure --python=3Dpython3.6 {configure_opts};
->>          gmake --output-sync -j{jobs} {target} {verbose};
->>      """
->>
->> +    def console_boot_serial(self):
->> +        self.console_wait_send("Autoboot", "3")
->> +        self.console_wait_send("OK", "set console=3Dcomconsole\n")
->> +        self.console_wait_send("OK", "boot\n")
->> +
->>      def build_image(self, img):
->> -        cimg =3D self._download_with_cache("http://download.patchew.org=
-/freebsd-11.1-amd64.img.xz",
->> -                sha256sum=3D'adcb771549b37bc63826c501f05121a206ed3d9f55=
-f49145908f7e1432d65891')
->> -        img_tmp_xz =3D img + ".tmp.xz"
->> +        self.print_step("Downloading install iso")
->> +        cimg =3D self._download_with_cache(self.link, sha256sum=3Dself.=
-csum)
->>          img_tmp =3D img + ".tmp"
->> -        sys.stderr.write("Extracting the image...\n")
->> -        subprocess.check_call(["ln", "-f", cimg, img_tmp_xz])
->> -        subprocess.check_call(["xz", "--keep", "-dvf", img_tmp_xz])
->> +        iso =3D img + ".install.iso"
->> +        iso_xz =3D iso + ".xz"
->> +
->> +        self.print_step("Preparing iso and disk image")
->> +        subprocess.check_call(["cp", "-f", cimg, iso_xz])
->> +        subprocess.check_call(["xz", "-dvf", iso_xz])
->> +        subprocess.check_call(["qemu-img", "create", "-f", "qcow2",
->> +                               img_tmp, self.size])
->> +
->> +        self.print_step("Booting installer")
->> +        self.boot(img_tmp, extra_args =3D [
->> +            "-bios", "pc-bios/bios-256k.bin",
->> +            "-machine", "graphics=3Doff",
->> +            "-cdrom", iso
->> +        ])
->> +        self.console_init()
->> +        self.console_boot_serial()
->> +        self.console_wait_send("Console type",          "xterm\n")
->> +
->> +        # pre-install configuration
->> +        self.console_wait_send("Welcome",               "\n")
->> +        self.console_wait_send("Keymap Selection",      "\n")
->> +        self.console_wait_send("Set Hostname",          "freebsd\n")
->> +        self.console_wait_send("Distribution Select",   "\n")
->> +        self.console_wait_send("Partitioning",          "\n")
->> +        self.console_wait_send("Partition",             "\n")
->> +        self.console_wait_send("Scheme",                "\n")
->> +        self.console_wait_send("Editor",                "f")
->> +        self.console_wait_send("Confirmation",          "c")
->> +
->> +        self.print_step("Installation started now, this will take a whi=
-le")
->> +
->> +        # post-install configuration
->> +        self.console_wait("New Password:")
->> +        self.console_send("%s\n" % self.ROOT_PASS)
->> +        self.console_wait("Retype New Password:")
->> +        self.console_send("%s\n" % self.ROOT_PASS)
->> +
->> +        self.console_wait_send("Network Configuration", "\n")
->> +        self.console_wait_send("IPv4",                  "y")
->> +        self.console_wait_send("DHCP",                  "y")
->> +        self.console_wait_send("IPv6",                  "n")
->> +        self.console_wait_send("Resolver",              "\n")
->> +
->> +        self.console_wait_send("Time Zone Selector",    "a\n")
->> +        self.console_wait_send("Confirmation",          "y")
->> +        self.console_wait_send("Time & Date",           "\n")
->> +        self.console_wait_send("Time & Date",           "\n")
->> +
->> +        self.console_wait_send("System Configuration",  "\n")
->> +        self.console_wait_send("System Hardening",      "\n")
->> +
->> +        # qemu user
->> +        self.console_wait_send("Add User Accounts", "y")
->> +        self.console_wait("Username")
->> +        self.console_send("%s\n" % self.GUEST_USER)
->> +        self.console_wait("Full name")
->> +        self.console_send("%s\n" % self.GUEST_USER)
->> +        self.console_wait_send("Uid",                   "\n")
->> +        self.console_wait_send("Login group",           "\n")
->> +        self.console_wait_send("Login group",           "\n")
->> +        self.console_wait_send("Login class",           "\n")
->> +        self.console_wait_send("Shell",                 "\n")
->> +        self.console_wait_send("Home directory",        "\n")
->> +        self.console_wait_send("Home directory perm",   "\n")
->> +        self.console_wait_send("Use password",          "\n")
->> +        self.console_wait_send("Use an empty password", "\n")
->> +        self.console_wait_send("Use a random password", "\n")
->> +        self.console_wait("Enter password:")
->> +        self.console_send("%s\n" % self.GUEST_PASS)
->> +        self.console_wait("Enter password again:")
->> +        self.console_send("%s\n" % self.GUEST_PASS)
->> +        self.console_wait_send("Lock out",              "\n")
->> +        self.console_wait_send("OK",                    "yes\n")
->> +        self.console_wait_send("Add another user",      "no\n")
->> +
->> +        self.console_wait_send("Final Configuration",   "\n")
->> +        self.console_wait_send("Manual Configuration",  "\n")
->> +        self.console_wait_send("Complete",              "\n")
->> +
->> +        self.print_step("Installation finished, rebooting")
->> +        self.console_boot_serial()
->> +
->> +        # setup qemu user
->> +        prompt =3D "$"
->> +        self.console_ssh_init(prompt, self.GUEST_USER, self.GUEST_PASS)
->> +        self.console_wait_send(prompt, "exit\n")
->> +
->> +        # setup root user
->> +        prompt =3D "root@freebsd:~ #"
->> +        self.console_ssh_init(prompt, "root", self.ROOT_PASS)
->> +        self.console_sshd_config(prompt)
->> +
->> +        # setup serial console
->> +        self.console_wait(prompt)
->> +        self.console_send("echo 'console=3Dcomconsole' >> /boot/loader.=
-conf\n")
->> +
->> +        # setup boot delay
->> +        self.console_wait(prompt)
->> +        self.console_send("echo 'autoboot_delay=3D1' >> /boot/loader.co=
-nf\n")
->> +
->> +        # setup virtio-blk #1 (tarfile)
->> +        self.console_wait(prompt)
->> +        self.console_send("echo 'chmod 666 /dev/vtbd1' >> /etc/rc.local=
-\n")
->> +
->> +        self.print_step("Configuration finished, rebooting")
->> +        self.console_wait_send(prompt, "reboot\n")
->> +        self.console_wait("login:")
->> +        self.wait_ssh()
->> +
->> +        self.print_step("Installing packages")
->> +        self.ssh_root_check("pkg install -y %s\n" % " ".join(self.pkgs))
->> +
->> +        # shutdown
->> +        self.ssh_root(self.poweroff)
->> +        self.console_wait("Uptime:")
->> +        self.wait()
->> +
->> +        if os.path.exists(img):
->> +            os.remove(img)
->>          os.rename(img_tmp, img)
->> +        os.remove(iso)
->> +        self.print_step("All done")
->>
->>  if __name__ =3D=3D "__main__":
->>      sys.exit(basevm.main(FreeBSDVM))
->>
-
-
---
-Alex Benn=C3=A9e
 
