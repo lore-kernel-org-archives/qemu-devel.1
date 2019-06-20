@@ -2,64 +2,111 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFD51C43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 20:06:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63865C43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 20:20:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D9B32084E
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 20:06:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D9B32084E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 25A3C2083B
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 20:20:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="R1zKgPjX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25A3C2083B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52660 helo=lists.gnu.org)
+Received: from localhost ([::1]:52712 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1he3Kg-00050E-FG
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 16:06:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58126)
+	id 1he3YC-0001OK-0q
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 16:20:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56824)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.williamson@redhat.com>) id 1he2gW-0000CY-GD
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 15:25:26 -0400
+ (envelope-from <brijesh.singh@amd.com>) id 1he2Zh-0004gO-JD
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 15:18:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1he2gU-0002dZ-Hv
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 15:25:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44452)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1he2gU-0002dR-9h
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 15:25:22 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 74360307B965;
- Thu, 20 Jun 2019 19:25:10 +0000 (UTC)
-Received: from x1.home (ovpn-117-35.phx2.redhat.com [10.3.117.35])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DDE8060477;
- Thu, 20 Jun 2019 19:25:05 +0000 (UTC)
-Date: Thu, 20 Jun 2019 13:25:05 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <20190620132505.1cf64ac5@x1.home>
-In-Reply-To: <1561041461-22326-9-git-send-email-kwankhede@nvidia.com>
-References: <1561041461-22326-1-git-send-email-kwankhede@nvidia.com>
- <1561041461-22326-9-git-send-email-kwankhede@nvidia.com>
-Organization: Red Hat
+ (envelope-from <brijesh.singh@amd.com>) id 1he2Zf-0000cj-7z
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 15:18:20 -0400
+Received: from mail-eopbgr820079.outbound.protection.outlook.com
+ ([40.107.82.79]:55539 helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+ id 1he2Zd-0000cI-0b
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 15:18:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector1-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=suR3vIpR2MAng/ZLvAGVHPBJ5O757B+AoQWyeHlSQps=;
+ b=R1zKgPjXNb9dhJdXaUufUGM/ntfqQTn1IqS4Vkt9qQpD15C5nn0/3wEwDIEFFc93of7fd3m8p6U28VFsYTXs/JYnmGmgQi1tCJGmXdv7CgmrHhGUKrA+QQ+W79Zr1O9z6qVFYOFFrrEg/dyLly9avX8t1NeJsKndoWCaiuWQf+U=
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.116.31) by
+ DM6PR12MB2746.namprd12.prod.outlook.com (20.176.118.88) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1987.15; Thu, 20 Jun 2019 19:18:10 +0000
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com
+ ([fe80::b9c1:b235:fff3:dba2]) by DM6PR12MB2682.namprd12.prod.outlook.com
+ ([fe80::b9c1:b235:fff3:dba2%6]) with mapi id 15.20.1987.014; Thu, 20 Jun 2019
+ 19:18:10 +0000
+From: "Singh, Brijesh" <brijesh.singh@amd.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Thread-Topic: [Qemu-devel] [RFC PATCH v1 08/12] target.json: add
+ migrate-set-sev-info command
+Thread-Index: AQHVJ5JxxSpSr3fdPkCv1Ymp5YKU2qak6W2AgAABNwA=
+Date: Thu, 20 Jun 2019 19:18:10 +0000
+Message-ID: <8d743a07-9561-4b8f-89e0-3322356f630e@amd.com>
+References: <20190620180247.8825-1-brijesh.singh@amd.com>
+ <20190620180247.8825-9-brijesh.singh@amd.com>
+ <7bade677-369a-74a5-206d-700626354028@redhat.com>
+In-Reply-To: <7bade677-369a-74a5-206d-700626354028@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: DM5PR22CA0010.namprd22.prod.outlook.com
+ (2603:10b6:3:101::20) To DM6PR12MB2682.namprd12.prod.outlook.com
+ (2603:10b6:5:4a::31)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=brijesh.singh@amd.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [165.204.77.1]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 327b7c1a-0786-414a-cd40-08d6f5b4086b
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);
+ SRVR:DM6PR12MB2746; 
+x-ms-traffictypediagnostic: DM6PR12MB2746:
+x-microsoft-antispam-prvs: <DM6PR12MB27469A0E7EDAB20CD413A0DAE5E40@DM6PR12MB2746.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 0074BBE012
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10009020)(136003)(346002)(366004)(396003)(39860400002)(376002)(199004)(189003)(486006)(229853002)(81156014)(81166006)(6486002)(478600001)(11346002)(446003)(31686004)(54906003)(8936002)(2501003)(110136005)(4326008)(53936002)(186003)(66066001)(8676002)(6246003)(14454004)(25786009)(7736002)(6512007)(6436002)(316002)(305945005)(99286004)(66446008)(64756008)(66476007)(36756003)(66556008)(66946007)(102836004)(71190400001)(52116002)(73956011)(53546011)(71200400001)(6506007)(76176011)(386003)(476003)(14444005)(256004)(31696002)(68736007)(2906002)(26005)(2616005)(3846002)(86362001)(6116002)(5660300002);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:DM6PR12MB2746;
+ H:DM6PR12MB2682.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: fYOWHfnu3a68XBw51M9+m/+NmBsxYBusIIjkOOPHQlshbkEOdPP7Xnjf3csoNst28n70KNu/aGH3sL14vjQoeVq8BZcDjnrRYPOm9YmML15YofdEtKo688Fb/V80lsAwcXOP6QT6NQPM0vQuynAWO9iKxBIYGq4xidPz8p3Nicq1rpnK2c++FFGXz7FrtlYeCHFENgeg367kAkO5aPjbBRXQ9mYGArrAlnkQ9uAPOfgut1ptLWdQklWHIDl14XOQxVgCcbt7IpZtoWxGIwURhJwdENAwWo0irPNIxArGnqsTluTm8LXE8AIg362AT2IF50mMo7hs8tAZAEDEE+E5lQTKiJZ5P7xapfkX4TiWaZ+p1IfdMdHkukh/Jtu9WXTatMbTCnU3zf3bnLqPrBkcYEpaxG26/Jv76SaRKbbrlck=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <E52CE6588423D0428541204F416FF1D0@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Thu, 20 Jun 2019 19:25:21 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 08/13] vfio: Add save state functions to
- SaveVMHandlers
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 327b7c1a-0786-414a-cd40-08d6f5b4086b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jun 2019 19:18:10.6053 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: sbrijesh@amd.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2746
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.82.79
+Subject: Re: [Qemu-devel] [RFC PATCH v1 08/12] target.json: add
+ migrate-set-sev-info command
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,330 +118,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
- dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, aik@ozlabs.ru, yulei.zhang@intel.com, eauger@redhat.com,
- felipe@nutanix.com, jonathan.davies@nutanix.com, yan.y.zhao@intel.com,
- changpeng.liu@intel.com, Ken.Xue@amd.com
+Cc: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, "Singh,
+ Brijesh" <brijesh.singh@amd.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 20 Jun 2019 20:07:36 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
-
-> Added .save_live_pending, .save_live_iterate and .save_live_complete_precopy
-> functions. These functions handles pre-copy and stop-and-copy phase.
-> 
-> In _SAVING|_RUNNING device state or pre-copy phase:
-> - read pending_bytes
-> - read data_offset - indicates kernel driver to write data to staging
->   buffer which is mmapped.
-
-Why is data_offset the trigger rather than data_size?  It seems that
-data_offset can't really change dynamically since it might be mmap'd,
-so it seems unnatural to bother re-reading it.
-
-> - read data_size - amount of data in bytes written by vendor driver in migration
->   region.
-> - if data section is trapped, pread() number of bytes in data_size, from
->   data_offset.
-> - if data section is mmaped, read mmaped buffer of size data_size.
-> - Write data packet to file stream as below:
-> {VFIO_MIG_FLAG_DEV_DATA_STATE, data_size, actual data,
-> VFIO_MIG_FLAG_END_OF_STATE }
-> 
-> In _SAVING device state or stop-and-copy phase
-> a. read config space of device and save to migration file stream. This
->    doesn't need to be from vendor driver. Any other special config state
->    from driver can be saved as data in following iteration.
-> b. read pending_bytes - indicates kernel driver to write data to staging
->    buffer which is mmapped.
-
-Is it pending_bytes or data_offset that triggers the write out of
-data?  Why pending_bytes vs data_size?  I was interpreting
-pending_bytes as the total data size while data_size is the size
-available to read now, so assumed data_size would be more closely
-aligned to making the data available.
-
-> c. read data_size - amount of data in bytes written by vendor driver in
->    migration region.
-> d. if data section is trapped, pread() from data_offset of size data_size.
-> e. if data section is mmaped, read mmaped buffer of size data_size.
-
-Should this read as "pread() from data_offset of data_size, or
-optionally if mmap is supported on the data area, read data_size from
-start of mapped buffer"?  IOW, pread should always work.  Same in
-previous section.
-
-> f. Write data packet as below:
->    {VFIO_MIG_FLAG_DEV_DATA_STATE, data_size, actual data}
-> g. iterate through steps b to f until (pending_bytes > 0)
-
-s/until/while/
-
-> h. Write {VFIO_MIG_FLAG_END_OF_STATE}
-> 
-> .save_live_iterate runs outside the iothread lock in the migration case, which
-> could race with asynchronous call to get dirty page list causing data corruption
-> in mapped migration region. Mutex added here to serial migration buffer read
-> operation.
-
-Would we be ahead to use different offsets within the region for device
-data vs dirty bitmap to avoid this?
- 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> ---
->  hw/vfio/migration.c | 212 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 212 insertions(+)
-> 
-> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> index fe0887c27664..0a2f30872316 100644
-> --- a/hw/vfio/migration.c
-> +++ b/hw/vfio/migration.c
-> @@ -107,6 +107,111 @@ static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t state)
->      return 0;
->  }
->  
-> +static int vfio_save_buffer(QEMUFile *f, VFIODevice *vbasedev)
-> +{
-> +    VFIOMigration *migration = vbasedev->migration;
-> +    VFIORegion *region = &migration->region.buffer;
-> +    uint64_t data_offset = 0, data_size = 0;
-> +    int ret;
-> +
-> +    ret = pread(vbasedev->fd, &data_offset, sizeof(data_offset),
-> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
-> +                                             data_offset));
-> +    if (ret != sizeof(data_offset)) {
-> +        error_report("Failed to get migration buffer data offset %d",
-> +                     ret);
-> +        return -EINVAL;
-> +    }
-> +
-> +    ret = pread(vbasedev->fd, &data_size, sizeof(data_size),
-> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
-> +                                             data_size));
-> +    if (ret != sizeof(data_size)) {
-> +        error_report("Failed to get migration buffer data size %d",
-> +                     ret);
-> +        return -EINVAL;
-> +    }
-> +
-> +    if (data_size > 0) {
-> +        void *buf = NULL;
-> +        bool buffer_mmaped = false;
-> +
-> +        if (region->mmaps) {
-> +            int i;
-> +
-> +            for (i = 0; i < region->nr_mmaps; i++) {
-> +                if ((data_offset >= region->mmaps[i].offset) &&
-> +                    (data_offset < region->mmaps[i].offset +
-> +                                   region->mmaps[i].size)) {
-> +                    buf = region->mmaps[i].mmap + (data_offset -
-> +                                                   region->mmaps[i].offset);
-
-So you're expecting that data_offset is somewhere within the data
-area.  Why doesn't the data always simply start at the beginning of the
-data area?  ie. data_offset would coincide with the beginning of the
-mmap'able area (if supported) and be static.  Does this enable some
-functionality in the vendor driver?  Does resume data need to be
-written from the same offset where it's read?
-
-> +                    buffer_mmaped = true;
-> +                    break;
-> +                }
-> +            }
-> +        }
-> +
-> +        if (!buffer_mmaped) {
-> +            buf = g_malloc0(data_size);
-> +            ret = pread(vbasedev->fd, buf, data_size,
-> +                        region->fd_offset + data_offset);
-> +            if (ret != data_size) {
-> +                error_report("Failed to get migration data %d", ret);
-> +                g_free(buf);
-> +                return -EINVAL;
-> +            }
-> +        }
-> +
-> +        qemu_put_be64(f, data_size);
-> +        qemu_put_buffer(f, buf, data_size);
-> +
-> +        if (!buffer_mmaped) {
-> +            g_free(buf);
-> +        }
-> +        migration->pending_bytes -= data_size;
-> +    } else {
-> +        qemu_put_be64(f, data_size);
-> +    }
-> +
-> +    ret = qemu_file_get_error(f);
-> +
-> +    return data_size;
-> +}
-> +
-> +static int vfio_update_pending(VFIODevice *vbasedev)
-> +{
-> +    VFIOMigration *migration = vbasedev->migration;
-> +    VFIORegion *region = &migration->region.buffer;
-> +    uint64_t pending_bytes = 0;
-> +    int ret;
-> +
-> +    ret = pread(vbasedev->fd, &pending_bytes, sizeof(pending_bytes),
-> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
-> +                                             pending_bytes));
-
-Did this trigger the vendor driver to write out to the data area when
-we don't need it to?
-
-> +    if ((ret < 0) || (ret != sizeof(pending_bytes))) {
-> +        error_report("Failed to get pending bytes %d", ret);
-> +        migration->pending_bytes = 0;
-> +        return (ret < 0) ? ret : -EINVAL;
-> +    }
-> +
-> +    migration->pending_bytes = pending_bytes;
-> +    return 0;
-> +}
-> +
-> +static int vfio_save_device_config_state(QEMUFile *f, void *opaque)
-> +{
-> +    VFIODevice *vbasedev = opaque;
-> +
-> +    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_CONFIG_STATE);
-> +
-> +    if (vbasedev->type == VFIO_DEVICE_TYPE_PCI) {
-> +        vfio_pci_save_config(vbasedev, f);
-> +    }
-> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
-> +
-> +    return qemu_file_get_error(f);
-> +}
-> +
->  /* ---------------------------------------------------------------------- */
->  
->  static int vfio_save_setup(QEMUFile *f, void *opaque)
-> @@ -163,9 +268,116 @@ static void vfio_save_cleanup(void *opaque)
->      }
->  }
->  
-> +static void vfio_save_pending(QEMUFile *f, void *opaque,
-> +                              uint64_t threshold_size,
-> +                              uint64_t *res_precopy_only,
-> +                              uint64_t *res_compatible,
-> +                              uint64_t *res_postcopy_only)
-> +{
-> +    VFIODevice *vbasedev = opaque;
-> +    VFIOMigration *migration = vbasedev->migration;
-> +    int ret;
-> +
-> +    ret = vfio_update_pending(vbasedev);
-> +    if (ret) {
-> +        return;
-> +    }
-> +
-> +    if (vbasedev->device_state & VFIO_DEVICE_STATE_RUNNING) {
-> +        *res_precopy_only += migration->pending_bytes;
-> +    } else {
-> +        *res_postcopy_only += migration->pending_bytes;
-> +    }
-> +    *res_compatible += 0;
-> +}
-> +
-> +static int vfio_save_iterate(QEMUFile *f, void *opaque)
-> +{
-> +    VFIODevice *vbasedev = opaque;
-> +    VFIOMigration *migration = vbasedev->migration;
-> +    int ret;
-> +
-> +    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_DATA_STATE);
-> +
-> +    qemu_mutex_lock(&migration->lock);
-> +    ret = vfio_save_buffer(f, vbasedev);
-> +    qemu_mutex_unlock(&migration->lock);
-> +
-> +    if (ret < 0) {
-> +        error_report("vfio_save_buffer failed %s",
-> +                     strerror(errno));
-> +        return ret;
-> +    }
-> +
-> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
-> +
-> +    ret = qemu_file_get_error(f);
-> +    if (ret) {
-> +        return ret;
-> +    }
-> +
-> +    return ret;
-> +}
-> +
-> +static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
-> +{
-> +    VFIODevice *vbasedev = opaque;
-> +    VFIOMigration *migration = vbasedev->migration;
-> +    int ret;
-> +
-> +    ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_SAVING);
-> +    if (ret) {
-> +        error_report("Failed to set state STOP and SAVING");
-> +        return ret;
-> +    }
-> +
-> +    ret = vfio_save_device_config_state(f, opaque);
-> +    if (ret) {
-> +        return ret;
-> +    }
-> +
-> +    ret = vfio_update_pending(vbasedev);
-> +    if (ret) {
-> +        return ret;
-> +    }
-> +
-> +    while (migration->pending_bytes > 0) {
-> +        qemu_put_be64(f, VFIO_MIG_FLAG_DEV_DATA_STATE);
-> +        ret = vfio_save_buffer(f, vbasedev);
-> +        if (ret < 0) {
-> +            error_report("Failed to save buffer");
-> +            return ret;
-> +        } else if (ret == 0) {
-> +            break;
-> +        }
-> +
-> +        ret = vfio_update_pending(vbasedev);
-> +        if (ret) {
-> +            return ret;
-> +        }
-> +    }
-> +
-> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
-> +
-> +    ret = qemu_file_get_error(f);
-> +    if (ret) {
-> +        return ret;
-> +    }
-> +
-> +    ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_STOPPED);
-> +    if (ret) {
-> +        error_report("Failed to set state STOPPED");
-> +        return ret;
-> +    }
-> +    return ret;
-> +}
-> +
->  static SaveVMHandlers savevm_vfio_handlers = {
->      .save_setup = vfio_save_setup,
->      .save_cleanup = vfio_save_cleanup,
-> +    .save_live_pending = vfio_save_pending,
-> +    .save_live_iterate = vfio_save_iterate,
-> +    .save_live_complete_precopy = vfio_save_complete_precopy,
->  };
->  
->  /* ---------------------------------------------------------------------- */
-
+DQoNCk9uIDYvMjAvMTkgMjoxMyBQTSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gNi8yMC8xOSAx
+OjAzIFBNLCBTaW5naCwgQnJpamVzaCB3cm90ZToNCj4+IFRoZSBjb21tYW5kIGNhbiBiZSB1c2Vk
+IGJ5IHRoZSBoeXBlcnZpc29yIHRvIHNwZWNpZnkgdGhlIHRhcmdldCBQbGF0Zm9ybQ0KPj4gRGlm
+ZmllLUhlbGxtYW4ga2V5IChQREgpIGFuZCBjZXJ0aWZpY2F0ZSBjaGFpbiBiZWZvcmUgc3RhcnRp
+bmcgdGhlIFNFVg0KPj4gZ3Vlc3QgbWlncmF0aW9uLiBUaGUgdmFsdWVzIHBhc3NlZCB0aHJvdWdo
+IHRoZSBjb21tYW5kIHdpbGwgYmUgdXNlZCB3aGlsZQ0KPj4gY3JlYXRpbmcgdGhlIG91dGdvaW5n
+IGVuY3J5cHRpb24gY29udGV4dC4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBCcmlqZXNoIFNpbmdo
+IDxicmlqZXNoLnNpbmdoQGFtZC5jb20+DQo+PiAtLS0NCj4+ICAgcWFwaS90YXJnZXQuanNvbiAg
+ICAgICB8IDE4ICsrKysrKysrKysrKysrKysrKw0KPj4gICB0YXJnZXQvaTM4Ni9tb25pdG9yLmMg
+IHwgMTAgKysrKysrKysrKw0KPj4gICB0YXJnZXQvaTM4Ni9zZXYtc3R1Yi5jIHwgIDUgKysrKysN
+Cj4+ICAgdGFyZ2V0L2kzODYvc2V2LmMgICAgICB8IDExICsrKysrKysrKysrDQo+PiAgIHRhcmdl
+dC9pMzg2L3Nldl9pMzg2LmggfCAgOSArKysrKysrKy0NCj4+ICAgNSBmaWxlcyBjaGFuZ2VkLCA1
+MiBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pDQo+Pg0KPiANCj4+ICsrKyBiL3FhcGkvdGFy
+Z2V0Lmpzb24NCj4+IEBAIC01MTIsMyArNTEyLDIxIEBADQo+PiAgICMjDQo+PiAgIHsgJ2NvbW1h
+bmQnOiAncXVlcnktY3B1LWRlZmluaXRpb25zJywgJ3JldHVybnMnOiBbJ0NwdURlZmluaXRpb25J
+bmZvJ10sDQo+PiAgICAgJ2lmJzogJ2RlZmluZWQoVEFSR0VUX1BQQykgfHwgZGVmaW5lZChUQVJH
+RVRfQVJNKSB8fCBkZWZpbmVkKFRBUkdFVF9JMzg2KSB8fCBkZWZpbmVkKFRBUkdFVF9TMzkwWCkg
+fHwgZGVmaW5lZChUQVJHRVRfTUlQUyknIH0NCj4+ICsNCj4+ICsjIw0KPj4gKyMgQG1pZ3JhdGUt
+c2V0LXNldi1pbmZvOg0KPj4gKyMNCj4+ICsjIFRoZSBjb21tYW5kIGlzIHVzZWQgdG8gcHJvdmlk
+ZSB0aGUgdGFyZ2V0IGhvc3QgaW5mb3JtYXRpb24gdXNlZCBkdXJpbmcgdGhlDQo+PiArIyBTRVYg
+Z3Vlc3QuDQo+PiArIw0KPj4gKyMgQHBkaCB0aGUgdGFyZ2V0IGhvc3QgcGxhdGZvcm0gZGlmZmll
+LWhlbGxtYW4ga2V5IGVuY29kZWQgaW4gYmFzZTY0DQo+PiArIw0KPj4gKyMgQHBsYXQtY2VydCB0
+aGUgdGFyZ2V0IGhvc3QgcGxhdGZvcm0gY2VydGlmaWNhdGUgY2hhaW4gZW5jb2RlZCBpbiBiYXNl
+NjQNCj4+ICsjDQo+PiArIyBAYW1kLWNlcnQgQU1EIGNlcnRpZmljYXRlIGNoYWluIHdoaWNoIGlu
+Y2x1ZGUgQVNLIGFuZCBPQ0EgZW5jb2RlZCBpbiBiYXNlNjQNCj4+ICsjDQo+PiArIyBTaW5jZSA0
+LjMNCj4gDQo+IFRoZSBuZXh0IHJlbGVhc2UgaXMgNC4xLCB0aGVuIGxpa2VseSA0LjIgbmVhciB0
+aGUgZW5kIG9mIHRoZSBjYWxlbmRhcg0KPiB5ZWFyLCB0aGVuIDUuMCBpbiAyMDIwLiBUaGVyZSBp
+cyBubyBwbGFubmVkIDQuMyByZWxlYXNlLiAgQXJlIHlvdSB0cnlpbmcNCj4gdG8gZ2V0IHRoaXMg
+aW4gNC4xPw0KDQoNCkFoLCBJIHdhcyBtZWFuaW5nIHRvIHR5cGUgNC4yIGFuZCBub3QgNC4zLiBU
+aGUgc2VyaWVzIGhhcyBkZXBlbmRlbmN5IG9uDQprZXJuZWwgcGF0Y2hlcywgbXkgYmVzdCBlZmZv
+cnQgaXQgdG8gZ2V0IGl0IHJlYWR5IGZvciA0LjIgbWVyZ2UNCndpbmRvdy4NCg==
 
