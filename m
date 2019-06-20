@@ -2,62 +2,77 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58EB8C43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 12:55:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E3A9C43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 12:57:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F4CD2082C
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 12:55:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F4CD2082C
+	by mail.kernel.org (Postfix) with ESMTPS id D5F5F2083B
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 12:57:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5F5F2083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47484 helo=lists.gnu.org)
+Received: from localhost ([::1]:47494 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdwbJ-0002DV-VY
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 08:55:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40455)
+	id 1hdwdX-0004Rj-VR
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 08:57:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40963)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1hdwYM-0000TH-Fl
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 08:52:35 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hdwZA-00017W-HL
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 08:53:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1hdwS5-0000iz-E4
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 08:46:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45438)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>)
- id 1hdwS4-0000hu-4b; Thu, 20 Jun 2019 08:46:04 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 373463079B8F;
- Thu, 20 Jun 2019 12:45:58 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8E2F65D9C6;
- Thu, 20 Jun 2019 12:45:51 +0000 (UTC)
-Date: Thu, 20 Jun 2019 14:45:50 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Message-ID: <20190620144550.7cbb23ed@redhat.com>
-In-Reply-To: <20190522162252.28568-3-shameerali.kolothum.thodi@huawei.com>
-References: <20190522162252.28568-1-shameerali.kolothum.thodi@huawei.com>
- <20190522162252.28568-3-shameerali.kolothum.thodi@huawei.com>
+ (envelope-from <pbonzini@redhat.com>) id 1hdwKf-0001Y0-M3
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 08:38:26 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:40270)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hdwKe-0001QX-08
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 08:38:25 -0400
+Received: by mail-wr1-f68.google.com with SMTP id p11so2859837wre.7
+ for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 05:38:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=PBe9hQeFMayLD/0ZRDInVi5N4QsHohL3ze/iPL3VAN0=;
+ b=P/aQifjBSz2UDPSRmRDvf7jyO331JkLaRCO8dLDonh31uaKcEMLcgOFq7H/8cb+FPL
+ 9c9wVrC5USGUOFhTpxtwFXAx/LKKZHpBUdOrsDQV5culCLWVTV7e+LgYhZTUaNn4VOCc
+ 7X2aLSL+5Gzu+EVYuEPXaT4xYdB3cib+LBjg9gIfx/LQ5cgPQbbZghTQaP42hKGGKzC5
+ 50DgDjYXko5MLePkakLbgxBTKAs+UY/B5iGN4POAL0LekgUA+141K28ZzjH6n1X7TLY+
+ HsDslrEv2xwTF2OS6HwzdAi8cJfohfOwK2WD5C2KElnwwNhPXGJAhsBHjw1WHWSIVvIu
+ zYLA==
+X-Gm-Message-State: APjAAAWehQpJmlg9y60SobHh/v0j9TbRbMycUGErX9bJfdrUG3myzQO1
+ ZaFZUOLdm+JgtFpN3twY4sgj0w==
+X-Google-Smtp-Source: APXvYqy1Jw/TS72GgFtDeH8i1rM2d4XdyxY4oOs6mdaUyGtOWtneGJJdreyqFL2pxbg4xntCGufPBA==
+X-Received: by 2002:a5d:620f:: with SMTP id y15mr13438905wru.262.1561034287746; 
+ Thu, 20 Jun 2019 05:38:07 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:7822:aa18:a9d8:39ab?
+ ([2001:b07:6468:f312:7822:aa18:a9d8:39ab])
+ by smtp.gmail.com with ESMTPSA id c17sm15734547wrv.82.2019.06.20.05.38.06
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Thu, 20 Jun 2019 05:38:07 -0700 (PDT)
+To: Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
+References: <20190619162140.133674-1-liran.alon@oracle.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <bcb617b1-7d20-d2ff-81c5-9f165eae5683@redhat.com>
+Date: Thu, 20 Jun 2019 14:38:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190619162140.133674-1-liran.alon@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Thu, 20 Jun 2019 12:45:58 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v5 2/8] hw/acpi: Do not create memory
- hotplug method when handler is not defined
+ [fuzzy]
+X-Received-From: 209.85.221.68
+Subject: Re: [Qemu-devel] [QEMU PATCH v4 0/10]: target/i386: kvm: Add
+ support for save and restore of nested state
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,54 +84,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, sameo@linux.intel.com, ard.biesheuvel@linaro.org,
- shannon.zhaosl@gmail.com, qemu-devel@nongnu.org, xuwei5@hisilicon.com,
- linuxarm@huawei.com, eric.auger@redhat.com, qemu-arm@nongnu.org,
- sebastien.boeuf@intel.com, lersek@redhat.com
+Cc: ehabkost@redhat.com, kvm@vger.kernel.org, maran.wilson@oracle.com,
+ mtosatti@redhat.com, dgilbert@redhat.com, jmattson@google.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 22 May 2019 17:22:46 +0100
-Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
-
-> From: Samuel Ortiz <sameo@linux.intel.com>
+On 19/06/19 18:21, Liran Alon wrote:
+> Hi,
 > 
-> With Hardware-reduced ACPI, the GED device will manage ACPI
-> hotplug entirely. As a consequence, make the memory specific
-> events AML generation optional. The code will only be added
-> when the method name is not NULL.
+> This series aims to add support for QEMU to be able to migrate VMs that
+> are running nested hypervisors. In order to do so, it utilizes the new
+> IOCTLs introduced in KVM commit 8fcc4b5923af ("kvm: nVMX: Introduce
+> KVM_CAP_NESTED_STATE") which was created for this purpose.
+
+Applied with just three minor changes that should be uncontroversial:
+
+> 6rd patch updates linux-headers to have updated struct kvm_nested_state.
+> The updated struct now have explicit fields for the data portion.
+
+Changed patch title to "linux-headers: sync with latest KVM headers from
+Linux 5.2"
+
+> 7rd patch add vmstate support for saving/restoring kernel integer types (e.g. __u16).
 > 
-> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> 8th patch adds support for saving and restoring nested state in order to migrate
+> guests which run a nested hypervisor.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index e924663f32..f3cf6e1b27 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1671,10 +1671,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
+             struct kvm_vmx_nested_state_hdr *vmx_hdr =
+                 &env->nested_state->hdr.vmx;
 
-> ---
->  hw/acpi/memory_hotplug.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
++            env->nested_state->format = KVM_STATE_NESTED_FORMAT_VMX;
+             vmx_hdr->vmxon_pa = -1ull;
+             vmx_hdr->vmcs12_pa = -1ull;
+         }
+-
+     }
+
+     cpu->kvm_msr_buf = g_malloc0(MSR_BUF_SIZE);
+
+which is a no-op since KVM_STATE_NESTED_FORMAT_VMX is zero, but it's tidy.
+
+> 9th patch add support for KVM_CAP_EXCEPTION_PAYLOAD. This new KVM capability
+> allows userspace to properly distingiush between pending and injecting exceptions.
 > 
-> diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
-> index c724f5f1e4..7e30e6f886 100644
-> --- a/hw/acpi/memory_hotplug.c
-> +++ b/hw/acpi/memory_hotplug.c
-> @@ -719,10 +719,12 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
->      }
->      aml_append(table, dev_container);
->  
-> -    method = aml_method(event_handler_method, 0, AML_NOTSERIALIZED);
-> -    aml_append(method,
-> -        aml_call0(MEMORY_DEVICES_CONTAINER "." MEMORY_SLOT_SCAN_METHOD));
-> -    aml_append(table, method);
-> +    if (event_handler_method) {
-> +        method = aml_method(event_handler_method, 0, AML_NOTSERIALIZED);
-> +        aml_append(method, aml_call0(MEMORY_DEVICES_CONTAINER "."
-> +                                     MEMORY_SLOT_SCAN_METHOD));
-> +        aml_append(table, method);
-> +    }
->  
->      g_free(mhp_res_path);
->  }
+> 10th patch changes the nested virtualization migration blocker to only
+> be added when kernel lack support for one of the capabilities required
+> for correct nested migration. i.e. Either KVM_CAP_NESTED_STATE or
+> KVM_CAP_EXCEPTION_PAYLOAD.
 
+Had to disable this for SVM unfortunately.
 
