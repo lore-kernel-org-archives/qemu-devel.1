@@ -2,64 +2,65 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2823AC43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 08:26:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 529E3C48BE2
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 08:26:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F21AC2064B
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 08:26:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F21AC2064B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 25E0A2064B
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 08:26:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="PMU2WSCv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25E0A2064B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44804 helo=lists.gnu.org)
+Received: from localhost ([::1]:44806 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdsOZ-0007i7-6m
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 04:26:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57563)
+	id 1hdsOu-0007tT-FB
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 04:26:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57648)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peterx@redhat.com>) id 1hdsFx-0001oZ-7I
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 04:17:18 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hdsGb-0001uW-WB
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 04:17:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1hdsDh-0001FL-JA
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 04:14:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37688)
+ (envelope-from <dgibson@ozlabs.org>) id 1hds65-0004PA-C8
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 04:07:08 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:39279 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hdsDh-0001En-CH
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 04:14:57 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 33C6820264;
- Thu, 20 Jun 2019 08:14:51 +0000 (UTC)
-Received: from xz-x1 (ovpn-12-58.pek2.redhat.com [10.72.12.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 575601001B04;
- Thu, 20 Jun 2019 08:14:45 +0000 (UTC)
-Date: Thu, 20 Jun 2019 16:14:37 +0800
-From: Peter Xu <peterx@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Message-ID: <20190620081437.GA11135@xz-x1>
-References: <1560934185-14152-1-git-send-email-yan.y.zhao@intel.com>
- <39c4c32b-e34a-8d8f-abbc-ab346ec5bed7@redhat.com>
- <20190620040230.GB9073@xz-x1>
- <20190620041400.GB9303@joy-OptiPlex-7040>
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1hds63-0004Cj-3w; Thu, 20 Jun 2019 04:07:03 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 45TvY36Bzrz9sCJ; Thu, 20 Jun 2019 18:06:47 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1561018007;
+ bh=MMKRSJhUNUXZnIHRyb9AyZ2Cj/9d97iwNstp4d2Qzb0=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=PMU2WSCvRIHtHySJAddQhKpU8qlcJkKtfIV+H8EOoQaKvZegQGI9DG9X3R5GESZBW
+ zA9U+JhbnBKnnZRIN7hALiK75O/1rk50w3VfjuPeaz3az2tFpGk+mxMeWe0D+0c8+1
+ gFbk1Bbei8mOPld/DbZv4VUS9ESJ4a8Wlkpy2bJo=
+Date: Thu, 20 Jun 2019 18:04:07 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>
+Message-ID: <20190620080407.GA8232@umbus.BigPond>
+References: <156077918969.433243.1416211899441569578.stgit@bahia.lan>
+ <156077920657.433243.13541093940589972734.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="AhhlLboLdkugWU4S"
 Content-Disposition: inline
-In-Reply-To: <20190620041400.GB9303@joy-OptiPlex-7040>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Thu, 20 Jun 2019 08:14:51 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] memory: do not do out of bound notification
+In-Reply-To: <156077920657.433243.13541093940589972734.stgit@bahia.lan>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: Re: [Qemu-devel] [PATCH 3/6] xics/kvm: Skip rollback when KVM XICS
+ is absent
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,88 +72,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Auger Eric <eric.auger@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 20, 2019 at 12:14:00AM -0400, Yan Zhao wrote:
-> On Thu, Jun 20, 2019 at 12:02:30PM +0800, Peter Xu wrote:
-> > On Wed, Jun 19, 2019 at 03:17:41PM +0200, Auger Eric wrote:
-> > > Hi Yan,
-> > > 
-> > > [+ Peter]
-> > > 
-> > > On 6/19/19 10:49 AM, Yan Zhao wrote:
-> > > > even if an entry overlaps with notifier's range, should not map/unmap
-> > > > out of bound part in the entry.
-> > > 
-> > > I don't think the patch was based on the master as the trace at the very
-> > > end if not part of the upstream code.
-> > > > 
-> > > > This would cause problem in below case:
-> > > > 1. initially there are two notifiers with ranges
-> > > > 0-0xfedfffff, 0xfef00000-0xffffffffffffffff,
-> > > > IOVAs from 0x3c000000 - 0x3c1fffff is in shadow page table.
-> > > > 
-> > > > 2. in vfio, memory_region_register_iommu_notifier() is followed by
-> > > > memory_region_iommu_replay(), which will first call address space unmap,
-> > > > and walk and add back all entries in vtd shadow page table. e.g.
-> > > > (1) for notifier 0-0xfedfffff,
-> > > >     IOVAs from 0 - 0xffffffff get unmapped,
-> > > >     and IOVAs from 0x3c000000 - 0x3c1fffff get mapped
-> > > 
-> > > While the patch looks sensible, the issue is the notifier scope used in
-> > > vtd_address_space_unmap is not a valid mask (ctpop64(size) != 1). Then
-> > > the size is recomputed (either using n = 64 - clz64(size) for the 1st
-> > > notifier or n = s->aw_bits for the 2d) and also the entry (especially
-> > > for the 2d notifier where it becomes 0) to get a proper alignment.
-> > > 
-> > > vtd_page_walk sends notifications per block or page (with valid
-> > > addr_mask) so stays within the notifier.
-> > > 
-> > > Modifying the entry->iova/addr_mask again in memory_region_notify_one
-> > > leads to unaligned start address / addr_mask. I don't think we want that.
-> > > 
-> > > Can't we modity the vtd_address_space_unmap() implementation to split
-> > > the invalidation in smaller chunks instead?
-> > 
-> > Seems workable, to be explicit - we can even cut it into chunks with
-> > different size to be efficient.  Like, this range:
-> > 
-> >   0x0e00_0000 - 0x1_0000_0000 (size 0xf200_0000)
-> > 
-> > can be one of this:
-> > 
-> >   0x0e000000 - 0x1000_0000 (size 0x0200_0000)
-> > 
-> > plus one of this:
-> > 
-> >   0x1000_0000 - 0x1_0000_0000 (size 0xf000_0000)
-> > 
-> > Yan, could you help explain the issue better on how to reproduce and
-> > what's the error when the problem occurs?  For example, is that
-> > happened when a device hot-plugged into an existing VFIO container
-> > (with some mapped IOVAs)?  Did you get host DMA errors later on?
-> > 
-> > Thanks,
-> > 
-> > -- 
-> > Peter Xu
-> 
-> Hi Peter
-> it happens when there's an RMRR region in my guest iommu driver.
 
-Do you mean a RMRR region in the ACPI table?  AFAIK current QEMU VT-d
-does not have RMRR at all, so that's a customized QEMU?
+--AhhlLboLdkugWU4S
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> if not adding this range check, IOVAs in this region would be unmapped and DMA
-> faults are met in host.
+On Mon, Jun 17, 2019 at 03:46:46PM +0200, Greg Kurz wrote:
+> There is no need to rollback anything at this point, so just return an
+> error.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-I see, thanks.
+Applied, thanks.
 
--- 
-Peter Xu
+> ---
+>  hw/intc/xics_kvm.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+> index 534515143ea8..377ff88701c2 100644
+> --- a/hw/intc/xics_kvm.c
+> +++ b/hw/intc/xics_kvm.c
+> @@ -348,7 +348,7 @@ int xics_kvm_connect(SpaprMachineState *spapr, Error =
+**errp)
+>      if (!kvm_enabled() || !kvm_check_extension(kvm_state, KVM_CAP_IRQ_XI=
+CS)) {
+>          error_setg(errp,
+>                     "KVM and IRQ_XICS capability must be present for in-k=
+ernel XICS");
+> -        goto fail;
+> +        return -1;
+>      }
+> =20
+>      rc =3D kvmppc_define_rtas_kernel_token(RTAS_IBM_SET_XIVE, "ibm,set-x=
+ive");
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--AhhlLboLdkugWU4S
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0LPfcACgkQbDjKyiDZ
+s5LNNg/+Px8E6CvkJEqU9hhR+S6E4FX5SDmSFD84aM+XNkk6yC8tAyt9Vj7Wd0jd
+0Vd+MKAmMxxMt2FL+f3dGyHPc3W2iyEMdRBpPoxjLETEPOznf+P3+TmTC1A4bS3D
+7JbH1tEC8/5JJxZuThpgQdJRq/QemaJYjR64XeWUncMUNmvKWn9e2Cuww/I6cDVD
+cntQMlP3CxJXGNrF2liKSapk1OT/I1LOvRANYerjGSBJZ++qM/U6AGVYW5iHjo6Z
+FO5sBFMXoIQ72oMd9cDsoaI6BJDESv17KcQZk6hl7kMRKgS3JWCfRSDkQe4A7Fgx
+yxUYwKMzNeOH3rPyXGXYG0OCLbSX1AWJ4IIvwJ1xz8fHr1DUiVs+3SofK1yRaijT
+2Y3U8B38s4a/lXcTQEnLRh+7dJzgDOSBDDi4kYoVAgnYBLf+R4GEJZjCS3Wk/sLv
+lamYbMbO7FqZ3tU6OFVIrkP1egupGUHYkZeM7cCXRanK0Q+8KLmYTfCZKB4iXUnk
+mfbBqy0AOEh/goKxpngvXrKcgKapk4o1FlLg6iu9vaZrnPufTX0QMurXolsnMPqz
+R2MosZOaGtGGy83VcYrUWzoyWNdOfhEQt3ptvfN1RBiIHBCea5ZofDIs06IGhZXN
+X/EeSpEz8gO0y+8IT7fWln3rHdqHM6byDnFqHy2fOMPd5mwUyb0=
+=4Vn7
+-----END PGP SIGNATURE-----
+
+--AhhlLboLdkugWU4S--
 
