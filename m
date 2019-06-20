@@ -2,91 +2,60 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EF22C48BE3
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 17:37:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7646CC48BE3
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 17:50:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F787206BA
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 17:37:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F787206BA
+	by mail.kernel.org (Postfix) with ESMTPS id 58DB0206BF
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 17:50:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58DB0206BF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51798 helo=lists.gnu.org)
+Received: from localhost ([::1]:51906 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1he0zg-0005R8-CT
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 13:37:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53173)
+	id 1he1Cf-0001KX-KF
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 13:50:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34839)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1he0pl-0000Re-AQ
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 13:26:50 -0400
+ (envelope-from <stefanha@redhat.com>) id 1he19O-0007Gv-Q9
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 13:47:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1he0pf-00042M-19
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 13:26:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43214)
+ (envelope-from <stefanha@redhat.com>) id 1he109-0004hb-Fl
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 13:37:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53936)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1he0pV-0003vq-Lm; Thu, 20 Jun 2019 13:26:35 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1he109-0004ez-8f
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 13:37:33 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1595C3082B69;
- Thu, 20 Jun 2019 17:26:32 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.208])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5FC3519735;
- Thu, 20 Jun 2019 17:26:22 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <20190620010356.19164-1-jsnow@redhat.com>
- <20190620010356.19164-9-jsnow@redhat.com>
- <be0cf312-a8e9-a39a-8d9d-47d76967d063@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <58389e59-4fdd-ddf1-9e71-dd0131ec5fe1@redhat.com>
-Date: Thu, 20 Jun 2019 19:26:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 25FCA223879;
+ Thu, 20 Jun 2019 17:37:31 +0000 (UTC)
+Received: from localhost (ovpn-116-108.ams2.redhat.com [10.36.116.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C23AE5C1A1;
+ Thu, 20 Jun 2019 17:37:25 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 20 Jun 2019 18:37:07 +0100
+Message-Id: <20190620173709.14753-2-stefanha@redhat.com>
+In-Reply-To: <20190620173709.14753-1-stefanha@redhat.com>
+References: <20190620173709.14753-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <be0cf312-a8e9-a39a-8d9d-47d76967d063@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="sEYXBk2CZzzhrJlj1F8EFwlZZA8bUGkXh"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Thu, 20 Jun 2019 17:26:32 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.39]); Thu, 20 Jun 2019 17:37:31 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 08/12] iotests: add testing shim for
- script-style python tests
+Subject: [Qemu-devel] [PATCH v5 1/3] vl: add
+ qemu_add_vm_change_state_handler_prio()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,91 +67,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- vsementsov@virtuozzo.com, Wen Congyang <wencongyang2@huawei.com>,
- Xie Changlong <xiechanglong.d@gmail.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Fam Zheng <fam@euphon.net>, Stefan Hajnoczi <stefanha@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---sEYXBk2CZzzhrJlj1F8EFwlZZA8bUGkXh
-Content-Type: multipart/mixed; boundary="7xJlTYJwmIhBHXCHZWtNrTpjsYsKb7tID";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
- eblake@redhat.com, vsementsov@virtuozzo.com,
- Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>,
- Xie Changlong <xiechanglong.d@gmail.com>
-Message-ID: <58389e59-4fdd-ddf1-9e71-dd0131ec5fe1@redhat.com>
-Subject: Re: [PATCH 08/12] iotests: add testing shim for script-style python
- tests
-References: <20190620010356.19164-1-jsnow@redhat.com>
- <20190620010356.19164-9-jsnow@redhat.com>
- <be0cf312-a8e9-a39a-8d9d-47d76967d063@redhat.com>
-In-Reply-To: <be0cf312-a8e9-a39a-8d9d-47d76967d063@redhat.com>
+Add an API for registering vm change state handlers with a well-defined
+ordering.  This is necessary when handlers depend on each other.
 
---7xJlTYJwmIhBHXCHZWtNrTpjsYsKb7tID
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Small coding style fixes are included to make checkpatch.pl happy.
 
-On 20.06.19 19:09, Max Reitz wrote:
-> On 20.06.19 03:03, John Snow wrote:
->> Because the new-style python tests don't use the iotests.main() test
->> launcher, we don't turn on the debugger logging for these scripts
->> when invoked via ./check -d.
->>
->> Refactor the launcher shim into new and old style shims so that they
->> share environmental configuration.
->>
->> Two cleanup notes: debug was not actually used as a global, and there
->> was no reason to create a class in an inner scope just to achieve
->> default variables; we can simply create an instance of the runner with=
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ include/sysemu/sysemu.h |  2 ++
+ vl.c                    | 59 ++++++++++++++++++++++++++++++++---------
+ 2 files changed, 49 insertions(+), 12 deletions(-)
 
->> the values we want instead.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  tests/qemu-iotests/iotests.py | 40 +++++++++++++++++++++++-----------=
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 61579ae71e..984c439ac9 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -29,6 +29,8 @@ typedef void VMChangeStateHandler(void *opaque, int run=
+ning, RunState state);
+=20
+ VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandle=
+r *cb,
+                                                      void *opaque);
++VMChangeStateEntry *qemu_add_vm_change_state_handler_prio(
++        VMChangeStateHandler *cb, void *opaque, int priority);
+ void qemu_del_vm_change_state_handler(VMChangeStateEntry *e);
+ void vm_state_notify(int running, RunState state);
+=20
+diff --git a/vl.c b/vl.c
+index 99a56b5556..7fac2ae7ca 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1471,28 +1471,57 @@ static int machine_help_func(QemuOpts *opts, Mach=
+ineState *machine)
+ struct vm_change_state_entry {
+     VMChangeStateHandler *cb;
+     void *opaque;
+-    QLIST_ENTRY (vm_change_state_entry) entries;
++    QTAILQ_ENTRY(vm_change_state_entry) entries;
++    int priority;
+ };
+=20
+-static QLIST_HEAD(, vm_change_state_entry) vm_change_state_head;
++static QTAILQ_HEAD(, vm_change_state_entry) vm_change_state_head;
+=20
+-VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandle=
+r *cb,
+-                                                     void *opaque)
++/**
++ * qemu_add_vm_change_state_handler_prio:
++ * @cb: the callback to invoke
++ * @opaque: user data passed to the callback
++ * @priority: low priorities execute first when the vm runs and the reve=
+rse is
++ *            true when the vm stops
++ *
++ * Register a callback function that is invoked when the vm starts or st=
+ops
++ * running.
++ *
++ * Returns: an entry to be freed using qemu_del_vm_change_state_handler(=
+)
++ */
++VMChangeStateEntry *qemu_add_vm_change_state_handler_prio(
++        VMChangeStateHandler *cb, void *opaque, int priority)
+ {
+     VMChangeStateEntry *e;
++    VMChangeStateEntry *other;
+=20
+-    e =3D g_malloc0(sizeof (*e));
 -
->>  1 file changed, 26 insertions(+), 14 deletions(-)
->=20
-> I don=E2=80=99t quite get how script_main() works (yes, both my Pythonf=
-u and my
-> Googlefu are that bad), but it works and looks good, so have a
++    e =3D g_malloc0(sizeof(*e));
+     e->cb =3D cb;
+     e->opaque =3D opaque;
+-    QLIST_INSERT_HEAD(&vm_change_state_head, e, entries);
++    e->priority =3D priority;
++
++    /* Keep list sorted in ascending priority order */
++    QTAILQ_FOREACH(other, &vm_change_state_head, entries) {
++        if (priority < other->priority) {
++            QTAILQ_INSERT_BEFORE(other, e, entries);
++            return e;
++        }
++    }
++
++    QTAILQ_INSERT_TAIL(&vm_change_state_head, e, entries);
+     return e;
+ }
+=20
++VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandle=
+r *cb,
++                                                     void *opaque)
++{
++    return qemu_add_vm_change_state_handler_prio(cb, opaque, 0);
++}
++
+ void qemu_del_vm_change_state_handler(VMChangeStateEntry *e)
+ {
+-    QLIST_REMOVE (e, entries);
+-    g_free (e);
++    QTAILQ_REMOVE(&vm_change_state_head, e, entries);
++    g_free(e);
+ }
+=20
+ void vm_state_notify(int running, RunState state)
+@@ -1501,8 +1530,14 @@ void vm_state_notify(int running, RunState state)
+=20
+     trace_vm_state_notify(running, state, RunState_str(state));
+=20
+-    QLIST_FOREACH_SAFE(e, &vm_change_state_head, entries, next) {
+-        e->cb(e->opaque, running, state);
++    if (running) {
++        QTAILQ_FOREACH_SAFE(e, &vm_change_state_head, entries, next) {
++            e->cb(e->opaque, running, state);
++        }
++    } else {
++        QTAILQ_FOREACH_REVERSE_SAFE(e, &vm_change_state_head, entries, n=
+ext) {
++            e->cb(e->opaque, running, state);
++        }
+     }
+ }
+=20
+@@ -3025,7 +3060,7 @@ int main(int argc, char **argv, char **envp)
+         exit(1);
+     }
+=20
+-    QLIST_INIT (&vm_change_state_head);
++    QTAILQ_INIT(&vm_change_state_head);
+     os_setup_early_signal_handling();
+=20
+     cpu_option =3D NULL;
+--=20
+2.21.0
 
-Oh, it doesn=E2=80=99t work (well, not automagically).  I just assumed se=
-eing
-the log output means it=E2=80=99s working.  Seeing that the test needs to=
- call
-iotests.script_main() explicitly does clear up my confusion.
-
-All OK with me.
-
-Max
-
-
---7xJlTYJwmIhBHXCHZWtNrTpjsYsKb7tID--
-
---sEYXBk2CZzzhrJlj1F8EFwlZZA8bUGkXh
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0LwbwACgkQ9AfbAGHV
-z0CSFAgAqh7PLgOkeS0f0HvmVeiQnE5t2n1f5B1yOLQw5UqRLuBRLCZx+gz/U+m6
-FRtiQ8i8WH8LRDz1J6qYC5ahZnax20fwJlxBzSUX5dq4g4MthQMUoLExWLE6bXc4
-E44z+j2r5u/dFG8zTFnyrcF+yElnbfgOv/trLSOV+Z8zeK3U6aM0xKviyvBEkCaf
-LUps6DOa569HU1jfIB9qztwkjjestFiBgGmGeXp3b4hpNDaboZQAdBYuFFmtkzi8
-Pbf7BsskUjb3V1IBf3lsxsiq1iVXhfmyh5F2hqfCB0DaM+tCLDdeOI0RbkcCChsu
-H1sCtpfyQcdCXP7eaFU3G8kRjaHxyw==
-=kF4O
------END PGP SIGNATURE-----
-
---sEYXBk2CZzzhrJlj1F8EFwlZZA8bUGkXh--
 
