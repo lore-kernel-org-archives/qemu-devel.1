@@ -1,103 +1,62 @@
-Return-Path: <SRS0=PARU=US=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DC19C43613
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 23:55:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96C08C43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 01:17:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 269C220656
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Jun 2019 23:55:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="n6+72eiI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 269C220656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6523F215EA
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 01:17:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6523F215EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42614 helo=lists.gnu.org)
+Received: from localhost ([::1]:42886 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdkQ9-0002mE-Bj
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 19:55:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55470)
+	id 1hdlhb-0004MI-5n
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 21:17:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40419)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <maran.wilson@oracle.com>) id 1hdkOC-0001hV-1G
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 19:53:19 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hdle3-000235-M8
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 21:13:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <maran.wilson@oracle.com>) id 1hdkO9-00023q-U5
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 19:53:15 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:32780)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <maran.wilson@oracle.com>)
- id 1hdkO9-00021J-K2
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 19:53:13 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JNnZXI076903;
- Wed, 19 Jun 2019 23:53:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=juZE9Qg2p6QoV0FADmXwZn45FspqngSNBEE+z0aiHAE=;
- b=n6+72eiI8B1UIGb08xvUPZz2XxuTbdrLFsVEu7FHkUN/7gz6NlvcDkqo8gKT8Ja5iZQR
- v4vxA8R2a0LmBkgn2H2+59zQ42SMhThbEmKzT45l4XXh7Xl+d2amHUF4TSe8dwCHjdHP
- oqAHvAYFeP3QwKiUAMIGs1JccBwH93PtCIL4k6+1FEuZ4Gt6K0i5e8CZMVK2tH2oiGVj
- SHHhF4ZmIfn3l0+n9umXuclcKMZaeIhgZIVP20Y3y5Jmu8PJfgh0orwz2ai6hZbN5Pwh
- C+1Xvr8N+1SY46SvJa4EGvAQgJFs8AJkKssrWg0FJ+P2PF3vltz49/PXbrFvzCnsL90X Iw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by userp2120.oracle.com with ESMTP id 2t7809e4bj-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 19 Jun 2019 23:53:04 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JNpdDg106385;
- Wed, 19 Jun 2019 23:53:03 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by userp3030.oracle.com with ESMTP id 2t77ync13w-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 19 Jun 2019 23:53:03 +0000
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5JNr1KK008938;
- Wed, 19 Jun 2019 23:53:01 GMT
-Received: from [10.159.140.81] (/10.159.140.81)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 19 Jun 2019 16:53:01 -0700
-To: Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
-References: <20190619162140.133674-1-liran.alon@oracle.com>
- <20190619162140.133674-11-liran.alon@oracle.com>
-From: Maran Wilson <maran.wilson@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <5ae979fd-39e0-50e2-df53-c6f70f939dd2@oracle.com>
-Date: Wed, 19 Jun 2019 16:52:59 -0700
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <jsnow@redhat.com>) id 1hdlV5-00053z-HA
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 21:04:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50496)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hdlUy-0004wZ-PK; Wed, 19 Jun 2019 21:04:21 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6E9F23004426;
+ Thu, 20 Jun 2019 01:04:18 +0000 (UTC)
+Received: from probe.bos.redhat.com (dhcp-17-164.bos.redhat.com [10.18.17.164])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 561B01001E67;
+ Thu, 20 Jun 2019 01:04:17 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org,
+	qemu-block@nongnu.org
+Date: Wed, 19 Jun 2019 21:03:56 -0400
+Message-Id: <20190620010356.19164-13-jsnow@redhat.com>
+In-Reply-To: <20190620010356.19164-1-jsnow@redhat.com>
+References: <20190620010356.19164-1-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190619162140.133674-11-liran.alon@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293
- signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906190193
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293
- signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906190193
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.85
-Subject: Re: [Qemu-devel] [QEMU PATCH v4 10/10] target/i386: kvm: Add nested
- migration blocker only when kernel lacks required capabilities
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Thu, 20 Jun 2019 01:04:18 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH 12/12] block/backup: loosen restriction on
+ readonly bitmaps
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,58 +68,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, kvm@vger.kernel.org, mtosatti@redhat.com,
- dgilbert@redhat.com, pbonzini@redhat.com, jmattson@google.com, rth@twiddle.net
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ vsementsov@virtuozzo.com, Wen Congyang <wencongyang2@huawei.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/19/2019 9:21 AM, Liran Alon wrote:
-> Previous commits have added support for migration of nested virtualization
-> workloads. This was done by utilising two new KVM capabilities:
-> KVM_CAP_NESTED_STATE and KVM_CAP_EXCEPTION_PAYLOAD. Both which are
-> required in order to correctly migrate such workloads.
->
-> Therefore, change code to add a migration blocker for vCPUs exposed with
-> Intel VMX or AMD SVM in case one of these kernel capabilities is
-> missing.
->
-> Signed-off-by: Liran Alon <liran.alon@oracle.com>
-> ---
->   target/i386/kvm.c | 9 +++++++--
->   1 file changed, 7 insertions(+), 2 deletions(-)
->
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 99480a52ad33..a3d0fbed3b35 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -1313,9 +1313,14 @@ int kvm_arch_init_vcpu(CPUState *cs)
->                                     !!(c->ecx & CPUID_EXT_SMX);
->       }
->   
-> -    if (cpu_has_nested_virt(env) && !nested_virt_mig_blocker) {
-> +    if (cpu_has_nested_virt(env) && !nested_virt_mig_blocker &&
-> +        ((kvm_max_nested_state_length() <= 0) || !has_exception_payload)) {
->           error_setg(&nested_virt_mig_blocker,
-> -                   "Nested virtualization does not support live migration yet");
-> +                   "Kernel do not provide required capabilities for "
+With the "never" sync policy, we actually can utilize readonly bitmaps
+now. Loosen the check at the QMP level, and tighten it based on
+provided arguments down at the job creation level instead.
 
-s/do/does/
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ block/backup.c | 6 ++++++
+ blockdev.c     | 4 ++--
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-And with that change:
-
-Reviewed-by: Maran Wilson <maran.wilson@oracle.com>
-
-Thanks,
--Maran
-
-
-> +                   "nested virtualization migration. "
-> +                   "(CAP_NESTED_STATE=%d, CAP_EXCEPTION_PAYLOAD=%d)",
-> +                   kvm_max_nested_state_length() > 0,
-> +                   has_exception_payload);
->           r = migrate_add_blocker(nested_virt_mig_blocker, &local_err);
->           if (local_err) {
->               error_report_err(local_err);
+diff --git a/block/backup.c b/block/backup.c
+index beb2078696..ead9a049e2 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -614,6 +614,12 @@ BlockJob *backup_job_create(const char *job_id, Bloc=
+kDriverState *bs,
+             return NULL;
+         }
+=20
++        /* If we need to write to this bitmap, check that we can: */
++        if (bitmap_mode !=3D BITMAP_SYNC_MODE_NEVER &&
++            bdrv_dirty_bitmap_check(sync_bitmap, BDRV_BITMAP_DEFAULT, er=
+rp)) {
++            return NULL;
++        }
++
+         /* Create a new bitmap, and freeze/disable this one. */
+         if (bdrv_dirty_bitmap_create_successor(bs, sync_bitmap, errp) < =
+0) {
+             return NULL;
+diff --git a/blockdev.c b/blockdev.c
+index 7abbd6bbf2..173a6b85c6 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3560,7 +3560,7 @@ static BlockJob *do_drive_backup(DriveBackup *backu=
+p, JobTxn *txn,
+             error_setg(errp, "Bitmap '%s' could not be found", backup->b=
+itmap);
+             goto unref;
+         }
+-        if (bdrv_dirty_bitmap_check(bmap, BDRV_BITMAP_DEFAULT, errp)) {
++        if (bdrv_dirty_bitmap_check(bmap, BDRV_BITMAP_ALLOW_RO, errp)) {
+             goto unref;
+         }
+     }
+@@ -3667,7 +3667,7 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup=
+, JobTxn *txn,
+             error_setg(errp, "Bitmap '%s' could not be found", backup->b=
+itmap);
+             goto out;
+         }
+-        if (bdrv_dirty_bitmap_check(bmap, BDRV_BITMAP_DEFAULT, errp)) {
++        if (bdrv_dirty_bitmap_check(bmap, BDRV_BITMAP_ALLOW_RO, errp)) {
+             goto out;
+         }
+     }
+--=20
+2.21.0
 
 
