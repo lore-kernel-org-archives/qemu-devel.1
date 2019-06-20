@@ -2,60 +2,58 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2560FC43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 15:24:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFE79C43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 15:26:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA1442070B
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 15:24:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA1442070B
+	by mail.kernel.org (Postfix) with ESMTPS id CC3922070B
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 15:26:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC3922070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49196 helo=lists.gnu.org)
+Received: from localhost ([::1]:49244 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdyvg-0004Z0-5x
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 11:24:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45261)
+	id 1hdyxi-0006h6-3N
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 11:26:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45319)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kraxel@redhat.com>) id 1hdypE-00061O-F2
+ (envelope-from <kraxel@redhat.com>) id 1hdypE-000652-Fr
  for qemu-devel@nongnu.org; Thu, 20 Jun 2019 11:18:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1hdyie-00041j-Kb
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 11:11:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55402)
+ (envelope-from <kraxel@redhat.com>) id 1hdyia-0003tr-3L
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 11:11:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:18983)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hdyie-00040O-De
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 11:11:20 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hdyiY-0003nz-RZ
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 11:11:15 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1C61D3086231;
- Thu, 20 Jun 2019 15:11:12 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8E2E0308339E;
+ Thu, 20 Jun 2019 15:11:09 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-116-212.ams2.redhat.com
  [10.36.116.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 07B585B683;
- Thu, 20 Jun 2019 15:11:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E538619C67;
+ Thu, 20 Jun 2019 15:11:06 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id CE5A717474; Thu, 20 Jun 2019 17:11:04 +0200 (CEST)
+ id B886916E08; Thu, 20 Jun 2019 17:11:04 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 20 Jun 2019 17:11:04 +0200
-Message-Id: <20190620151104.2678-4-kraxel@redhat.com>
-In-Reply-To: <20190620151104.2678-1-kraxel@redhat.com>
-References: <20190620151104.2678-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Date: Thu, 20 Jun 2019 17:11:01 +0200
+Message-Id: <20190620151104.2678-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Thu, 20 Jun 2019 15:11:12 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Thu, 20 Jun 2019 15:11:09 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 3/3] ati-vga: switch to vgabios-ati.bin
+Subject: [Qemu-devel] [PATCH 0/3] add ati vgabios
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,24 +70,20 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/display/ati.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/display/ati.c b/hw/display/ati.c
-index 61e351a0248d..6fbdda288f07 100644
---- a/hw/display/ati.c
-+++ b/hw/display/ati.c
-@@ -893,7 +893,7 @@ static void ati_vga_class_init(ObjectClass *klass, void *data)
-     k->class_id = PCI_CLASS_DISPLAY_VGA;
-     k->vendor_id = PCI_VENDOR_ID_ATI;
-     k->device_id = PCI_DEVICE_ID_ATI_RAGE128_PF;
--    k->romfile = "vgabios-stdvga.bin";
-+    k->romfile = "vgabios-ati.bin";
-     k->realize = ati_vga_realize;
-     k->exit = ati_vga_exit;
- }
+
+Gerd Hoffmann (3):
+  seabios: add config for ati vgabios
+  seabios: add ati vgabios binary
+  ati-vga: switch to vgabios-ati.bin
+
+ hw/display/ati.c        |   2 +-
+ pc-bios/vgabios-ati.bin | Bin 0 -> 38912 bytes
+ roms/config.vga-ati     |   4 ++++
+ 3 files changed, 5 insertions(+), 1 deletion(-)
+ create mode 100644 pc-bios/vgabios-ati.bin
+ create mode 100644 roms/config.vga-ati
+
 -- 
 2.18.1
 
