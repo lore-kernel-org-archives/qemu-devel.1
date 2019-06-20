@@ -2,64 +2,93 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	T_HK_NAME_DR,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EDC7C43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 19:40:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AC22C43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 19:41:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE8AF206BA
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 19:40:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE8AF206BA
+	by mail.kernel.org (Postfix) with ESMTPS id 7555B206BA
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 19:41:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7555B206BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52484 helo=lists.gnu.org)
+Received: from localhost ([::1]:52486 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1he2vS-00009s-4K
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 15:40:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50470)
+	id 1he2vr-0000ON-Tt
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 15:41:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47050)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1he28p-0004kp-8T
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 14:50:37 -0400
+ (envelope-from <mreitz@redhat.com>) id 1he2Hj-0003pH-NH
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 14:59:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1he28n-0004CW-9l
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 14:50:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39108)
+ (envelope-from <mreitz@redhat.com>) id 1he2EO-0007IH-55
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 14:56:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39926)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1he28l-000480-Ay
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 14:50:32 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1he2EM-0007GT-Gl; Thu, 20 Jun 2019 14:56:18 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 10C5F58E42;
- Thu, 20 Jun 2019 18:50:12 +0000 (UTC)
-Received: from work-vm (ovpn-117-203.ams2.redhat.com [10.36.117.203])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A8E945D9E5;
- Thu, 20 Jun 2019 18:50:02 +0000 (UTC)
-Date: Thu, 20 Jun 2019 19:50:00 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <20190620184959.GQ2907@work-vm>
-References: <1561041461-22326-1-git-send-email-kwankhede@nvidia.com>
- <1561041461-22326-14-git-send-email-kwankhede@nvidia.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 4DCDE307D971;
+ Thu, 20 Jun 2019 18:56:12 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.208])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 950545C2E8;
+ Thu, 20 Jun 2019 18:56:01 +0000 (UTC)
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20190620010356.19164-1-jsnow@redhat.com>
+ <20190620010356.19164-9-jsnow@redhat.com>
+ <be0cf312-a8e9-a39a-8d9d-47d76967d063@redhat.com>
+ <58389e59-4fdd-ddf1-9e71-dd0131ec5fe1@redhat.com>
+ <a81fad35-87ab-5af4-7beb-03f0750f4cef@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <9f239fc8-adc4-34e4-2d89-c556e7af38df@redhat.com>
+Date: Thu, 20 Jun 2019 20:55:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1561041461-22326-14-git-send-email-kwankhede@nvidia.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <a81fad35-87ab-5af4-7beb-03f0750f4cef@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="JhQA2FXjZ6ihnQ0o6mX4igP1nM62R5GbA"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Thu, 20 Jun 2019 18:50:26 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Thu, 20 Jun 2019 18:56:12 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 13/13] vfio: Add trace events in
- migration code path
+Subject: Re: [Qemu-devel] [PATCH 08/12] iotests: add testing shim for
+ script-style python tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,210 +100,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, eskultet@redhat.com, ziye.yang@intel.com,
- yulei.zhang@intel.com, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
- qemu-devel@nongnu.org, zhi.a.wang@intel.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, aik@ozlabs.ru, alex.williamson@redhat.com,
- eauger@redhat.com, felipe@nutanix.com, jonathan.davies@nutanix.com,
- yan.y.zhao@intel.com, changpeng.liu@intel.com, Ken.Xue@amd.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ vsementsov@virtuozzo.com, Wen Congyang <wencongyang2@huawei.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Kirti Wankhede (kwankhede@nvidia.com) wrote:
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--JhQA2FXjZ6ihnQ0o6mX4igP1nM62R5GbA
+Content-Type: multipart/mixed; boundary="a03hkbMsU4qQ9WdJQKo2X0Iig1YFlxjzd";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
+ eblake@redhat.com, vsementsov@virtuozzo.com,
+ Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Xie Changlong <xiechanglong.d@gmail.com>
+Message-ID: <9f239fc8-adc4-34e4-2d89-c556e7af38df@redhat.com>
+Subject: Re: [PATCH 08/12] iotests: add testing shim for script-style python
+ tests
+References: <20190620010356.19164-1-jsnow@redhat.com>
+ <20190620010356.19164-9-jsnow@redhat.com>
+ <be0cf312-a8e9-a39a-8d9d-47d76967d063@redhat.com>
+ <58389e59-4fdd-ddf1-9e71-dd0131ec5fe1@redhat.com>
+ <a81fad35-87ab-5af4-7beb-03f0750f4cef@redhat.com>
+In-Reply-To: <a81fad35-87ab-5af4-7beb-03f0750f4cef@redhat.com>
 
-Thanks, adding traces really helps; however, it might be easier
-if you just add them in your previous patches where you're
-adding the functions.
+--a03hkbMsU4qQ9WdJQKo2X0Iig1YFlxjzd
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Dave
+On 20.06.19 20:47, John Snow wrote:
+>=20
+>=20
+> On 6/20/19 1:26 PM, Max Reitz wrote:
+>> On 20.06.19 19:09, Max Reitz wrote:
+>>> On 20.06.19 03:03, John Snow wrote:
+>>>> Because the new-style python tests don't use the iotests.main() test=
 
-> ---
->  hw/vfio/migration.c  | 26 ++++++++++++++++++++++++++
->  hw/vfio/trace-events | 18 ++++++++++++++++++
->  2 files changed, 44 insertions(+)
-> 
-> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> index 68775b5dec11..70c03f1a969f 100644
-> --- a/hw/vfio/migration.c
-> +++ b/hw/vfio/migration.c
-> @@ -21,6 +21,7 @@
->  #include "exec/ramlist.h"
->  #include "exec/ram_addr.h"
->  #include "pci.h"
-> +#include "trace.h"
->  
->  /*
->   * Flags used as delimiter:
-> @@ -104,6 +105,7 @@ static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t state)
->      }
->  
->      vbasedev->device_state = state;
-> +    trace_vfio_migration_set_state(vbasedev->name, state);
->      return 0;
->  }
->  
-> @@ -173,6 +175,8 @@ static int vfio_save_buffer(QEMUFile *f, VFIODevice *vbasedev)
->          qemu_put_be64(f, data_size);
->      }
->  
-> +    trace_vfio_save_buffer(vbasedev->name, data_offset, data_size,
-> +                           migration->pending_bytes);
->      ret = qemu_file_get_error(f);
->  
->      return data_size;
-> @@ -195,6 +199,7 @@ static int vfio_update_pending(VFIODevice *vbasedev)
->      }
->  
->      migration->pending_bytes = pending_bytes;
-> +    trace_vfio_update_pending(vbasedev->name, pending_bytes);
->      return 0;
->  }
->  
-> @@ -209,6 +214,8 @@ static int vfio_save_device_config_state(QEMUFile *f, void *opaque)
->      }
->      qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
->  
-> +    trace_vfio_save_device_config_state(vbasedev->name);
-> +
->      return qemu_file_get_error(f);
->  }
->  
-> @@ -225,6 +232,7 @@ static int vfio_load_device_config_state(QEMUFile *f, void *opaque)
->          return -EINVAL;
->      }
->  
-> +    trace_vfio_load_device_config_state(vbasedev->name);
->      return qemu_file_get_error(f);
->  }
->  
-> @@ -343,6 +351,9 @@ void vfio_get_dirty_page_list(VFIODevice *vbasedev,
->          }
->      } while (count < pfn_count);
->  
-> +    trace_vfio_get_dirty_page_list(vbasedev->name, start_pfn, pfn_count,
-> +                                   page_size);
-> +
->  dpl_unlock:
->      qemu_mutex_unlock(&migration->lock);
->  }
-> @@ -390,6 +401,7 @@ static int vfio_save_setup(QEMUFile *f, void *opaque)
->          return ret;
->      }
->  
-> +    trace_vfio_save_setup(vbasedev->name);
->      return 0;
->  }
->  
-> @@ -401,6 +413,7 @@ static void vfio_save_cleanup(void *opaque)
->      if (migration->region.buffer.mmaps) {
->          vfio_region_unmap(&migration->region.buffer);
->      }
-> +    trace_vfio_cleanup(vbasedev->name);
->  }
->  
->  static void vfio_save_pending(QEMUFile *f, void *opaque,
-> @@ -424,6 +437,7 @@ static void vfio_save_pending(QEMUFile *f, void *opaque,
->          *res_postcopy_only += migration->pending_bytes;
->      }
->      *res_compatible += 0;
-> +    trace_vfio_save_pending(vbasedev->name);
->  }
->  
->  static int vfio_save_iterate(QEMUFile *f, void *opaque)
-> @@ -451,6 +465,7 @@ static int vfio_save_iterate(QEMUFile *f, void *opaque)
->          return ret;
->      }
->  
-> +    trace_vfio_save_iterate(vbasedev->name);
->      return ret;
->  }
->  
-> @@ -504,6 +519,8 @@ static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
->          error_report("Failed to set state STOPPED");
->          return ret;
->      }
-> +
-> +    trace_vfio_save_complete_precopy(vbasedev->name);
->      return ret;
->  }
->  
-> @@ -544,6 +561,9 @@ static int vfio_load_state(QEMUFile *f, void *opaque, int version_id)
->  
->      data = qemu_get_be64(f);
->      while (data != VFIO_MIG_FLAG_END_OF_STATE) {
-> +
-> +        trace_vfio_load_state(vbasedev->name, data);
-> +
->          switch (data) {
->          case VFIO_MIG_FLAG_DEV_CONFIG_STATE:
->          {
-> @@ -627,6 +647,8 @@ static int vfio_load_state(QEMUFile *f, void *opaque, int version_id)
->                      return -EINVAL;
->                  }
->              }
-> +            trace_vfio_load_state_device_data(vbasedev->name, data_offset,
-> +                                              data_size);
->              break;
->          }
->          }
-> @@ -668,6 +690,7 @@ static void vfio_vmstate_change(void *opaque, int running, RunState state)
->      }
->  
->      vbasedev->vm_running = running;
-> +    trace_vfio_vmstate_change(vbasedev->name, running);
->  }
->  
->  static void vfio_migration_state_notifier(Notifier *notifier, void *data)
-> @@ -676,6 +699,8 @@ static void vfio_migration_state_notifier(Notifier *notifier, void *data)
->      VFIODevice *vbasedev = container_of(notifier, VFIODevice, migration_state);
->      int ret;
->  
-> +    trace_vfio_migration_state_notifier(vbasedev->name, s->state);
-> +
->      switch (s->state) {
->      case MIGRATION_STATUS_ACTIVE:
->          if (vbasedev->device_state & VFIO_DEVICE_STATE_RUNNING) {
-> @@ -758,6 +783,7 @@ int vfio_migration_probe(VFIODevice *vbasedev, Error **errp)
->              return ret;
->          }
->      } else {
-> +        trace_vfio_migration_probe(vbasedev->name, info->index);
->          return vfio_migration_init(vbasedev, info);
->      }
->  
-> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> index 8cdc27946cb8..b1f19ae7a806 100644
-> --- a/hw/vfio/trace-events
-> +++ b/hw/vfio/trace-events
-> @@ -143,3 +143,21 @@ vfio_display_edid_link_up(void) ""
->  vfio_display_edid_link_down(void) ""
->  vfio_display_edid_update(uint32_t prefx, uint32_t prefy) "%ux%u"
->  vfio_display_edid_write_error(void) ""
-> +
-> +# migration.c
-> +vfio_migration_set_state(char *name, uint32_t state) " (%s) state %d"
-> +vfio_save_buffer(char *name, uint64_t data_offset, uint64_t data_size, uint64_t pending) " (%s), Offset 0x%"PRIx64" size 0x%"PRIx64" pending 0x%"PRIx64
-> +vfio_update_pending(char *name, uint64_t pending) " (%s), pending 0x%"PRIx64
-> +vfio_save_device_config_state(char *name) " (%s)"
-> +vfio_load_device_config_state(char *name) " (%s)"
-> +vfio_get_dirty_page_list(char *name, uint64_t start, uint64_t pfn_count, uint64_t page_size) " (%s) start 0x%"PRIx64" pfn_count 0x%"PRIx64 " page size 0x%"PRIx64
-> +vfio_save_setup(char *name) " (%s)"
-> +vfio_cleanup(char *name) " (%s)"
-> +vfio_save_pending(char *name) " (%s)"
-> +vfio_save_iterate(char *name) " (%s)"
-> +vfio_save_complete_precopy(char *name) " (%s)"
-> +vfio_load_state(char *name, uint64_t data) " (%s) data 0x%"PRIx64
-> +vfio_load_state_device_data(char *name, uint64_t data_offset, uint64_t data_size) " (%s), Offset 0x%"PRIx64" size 0x%"PRIx64
-> +vfio_vmstate_change(char *name, int running) " (%s) running %d"
-> +vfio_migration_state_notifier(char *name, int state) " (%s) state %d"
-> +vfio_migration_probe(char *name, uint32_t index) " (%s) Region %d"
-> -- 
-> 2.7.0
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>>> launcher, we don't turn on the debugger logging for these scripts
+>>>> when invoked via ./check -d.
+>>>>
+>>>> Refactor the launcher shim into new and old style shims so that they=
+
+>>>> share environmental configuration.
+>>>>
+>>>> Two cleanup notes: debug was not actually used as a global, and ther=
+e
+>>>> was no reason to create a class in an inner scope just to achieve
+>>>> default variables; we can simply create an instance of the runner wi=
+th
+>>>> the values we want instead.
+>>>>
+>>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>>> ---
+>>>>  tests/qemu-iotests/iotests.py | 40 +++++++++++++++++++++++---------=
+---
+>>>>  1 file changed, 26 insertions(+), 14 deletions(-)
+>>>
+>>> I don=E2=80=99t quite get how script_main() works (yes, both my Pytho=
+nfu and my
+>>> Googlefu are that bad), but it works and looks good, so have a
+>>
+>> Oh, it doesn=E2=80=99t work (well, not automagically).  I just assumed=
+ seeing
+>> the log output means it=E2=80=99s working.  Seeing that the test needs=
+ to call
+>> iotests.script_main() explicitly does clear up my confusion.
+>>
+>> All OK with me.
+>>
+>> Max
+>>
+>=20
+> Yes. I should convert the others to opt-in to the new format so that
+> copy-paste in the future will get us the right paradigm.
+>=20
+> Tests just need to be refactored to have a single point of entry so it
+> can be passed as a closure to the test runner.
+>=20
+> If this seems like a good change I will do that as a follow-up series
+> with only the churn.
+
+It does seem good to me.  Not even because of the test runner, but maybe
+even more so because it seems like better style to split the tests into
+one function per case.
+
+Max
+
+
+--a03hkbMsU4qQ9WdJQKo2X0Iig1YFlxjzd--
+
+--JhQA2FXjZ6ihnQ0o6mX4igP1nM62R5GbA
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0L1r8ACgkQ9AfbAGHV
+z0CrMgf+Pudm7McNerTL1ZlBf/FZ//2dxIgF5JWlMj/bpiB7KTXqyaFNFdD1w6+V
+zcjPDAsDNuPqQrLkzXBcl6+tYAvEHH98DLk88PHlPl3hauk2GKI2EspVFb8ngefj
+bbhvupHIJMcuBKq11q/oGupX4z4dMdHXm6wv/rBmWecfOenaXscvFsUA0mnG6oxS
+axbO9xM3PycNan3n82vhsAbdLCEf1z4atNPvPj1DdLcXRCvckQRz2vsPxWS5tEMz
+6NjxU7dmSTM9ja+1xhsA7326mlhLEPVqte6AiujXyXbA3qHSAC8BqGU1G2eroeJ8
+pujYogWxqp844p2geGtFlKjT3pbluA==
+=LiMm
+-----END PGP SIGNATURE-----
+
+--JhQA2FXjZ6ihnQ0o6mX4igP1nM62R5GbA--
 
