@@ -2,61 +2,66 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0A54C43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 05:55:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE84FC43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 05:55:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 785F420B1F
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 05:55:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 785F420B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8706B20B1F
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 05:55:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8706B20B1F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43866 helo=lists.gnu.org)
+Received: from localhost ([::1]:43868 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdq2H-0002yi-Jv
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 01:55:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56213)
+	id 1hdq2N-0003D0-QL
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 01:55:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56700)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <like.xu@linux.intel.com>) id 1hdpvg-0005yy-I2
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 01:48:14 -0400
+ (envelope-from <kraxel@redhat.com>) id 1hdpyE-0007pv-Vx
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 01:50:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <like.xu@linux.intel.com>) id 1hdpvf-0001rp-17
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 01:48:12 -0400
-Received: from mga05.intel.com ([192.55.52.43]:20328)
+ (envelope-from <kraxel@redhat.com>) id 1hdpyD-00047g-1F
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 01:50:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50452)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <like.xu@linux.intel.com>)
- id 1hdpvd-0001iJ-3f
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 01:48:10 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
- by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 19 Jun 2019 22:48:02 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,395,1557212400"; d="scan'208";a="162243116"
-Received: from unknown (HELO likexu-E5-2699-v4.sh.intel.com) ([10.239.48.178])
- by fmsmga007.fm.intel.com with ESMTP; 19 Jun 2019 22:48:01 -0700
-From: Like Xu <like.xu@linux.intel.com>
-To: qemu-devel@nongnu.org,
-	Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 20 Jun 2019 13:45:25 +0800
-Message-Id: <20190620054525.37188-4-like.xu@linux.intel.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190620054525.37188-1-like.xu@linux.intel.com>
-References: <20190620054525.37188-1-like.xu@linux.intel.com>
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>)
+ id 1hdpy8-00043F-UA; Thu, 20 Jun 2019 01:50:45 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1F4D175724;
+ Thu, 20 Jun 2019 05:50:44 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-212.ams2.redhat.com
+ [10.36.116.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B7E9B19C6F;
+ Thu, 20 Jun 2019 05:50:42 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 9D48316E19; Thu, 20 Jun 2019 07:50:38 +0200 (CEST)
+Date: Thu, 20 Jun 2019 07:50:38 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Message-ID: <20190620055038.w7zwwxviqfp4vxvr@sirius.home.kraxel.org>
+References: <20190619092905.24029-1-shmuel.eiderman@oracle.com>
+ <156093697557.22612.8821990862661724517@ce79690b2cb9>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.43
-Subject: [Qemu-devel]  [PATCH v4 3/3] vl.c: Add -smp,
- dies=* command line support and update doc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <156093697557.22612.8821990862661724517@ce79690b2cb9>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Thu, 20 Jun 2019 05:50:44 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [SeaBIOS] [QEMU] [PATCH v4 0/8] Add Qemu to
+ SeaBIOS LCHS interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,161 +73,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: like.xu@intel.com, Marcelo Tosatti <mtosatti@redhat.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, arbel.moshe@oracle.com,
+ seabios@seabios.org, mreitz@redhat.com, kevin@koconnor.net,
+ shmuel.eiderman@oracle.com, karl.heubaum@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For PC target, users could configure the number of dies per one package
-via command line with this patch, such as "-smp dies=2,cores=4".
+> === OUTPUT BEGIN ===
+> 1/8 Checking commit cf2168a66dbd (block: Refactor macros - fix tabbing)
+> ERROR: Macros with complex values should be enclosed in parenthesis
+> #55: FILE: include/hw/block/block.h:65:
+> +#define DEFINE_BLOCK_CHS_PROPERTIES(_state, _conf)                      \
+> +    DEFINE_PROP_UINT32("cyls", _state, _conf.cyls, 0),                  \
+> +    DEFINE_PROP_UINT32("heads", _state, _conf.heads, 0),                \
+>      DEFINE_PROP_UINT32("secs", _state, _conf.secs, 0)
 
-The parsing rules of new cpu-topology model obey the same restrictions/logic
-as the legacy socket/core/thread model especially on missing values computing.
+False positive.
 
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
----
- hw/i386/pc.c    | 30 +++++++++++++++++-------------
- qemu-options.hx | 17 +++++++++--------
- vl.c            |  3 +++
- 3 files changed, 29 insertions(+), 21 deletions(-)
+> 8/8 Checking commit 6664d7d898d5 (hd-geo-test: Add tests for lchs override)
+> WARNING: line over 80 characters
+> #242: FILE: tests/hd-geo-test.c:579:
+> +                     (char *)r->dev_path, &(r->chs.c), &(r->chs.h), &(r->chs.s));
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 092bd10d4d..2ed1b3f8de 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1548,9 +1548,12 @@ static void pc_new_cpu(PCMachineState *pcms, int64_t apic_id, Error **errp)
-  */
- void pc_smp_parse(MachineState *ms, QemuOpts *opts)
- {
-+    PCMachineState *pcms = PC_MACHINE(ms);
-+
-     if (opts) {
-         unsigned cpus    = qemu_opt_get_number(opts, "cpus", 0);
-         unsigned sockets = qemu_opt_get_number(opts, "sockets", 0);
-+        unsigned dies = qemu_opt_get_number(opts, "dies", 1);
-         unsigned cores   = qemu_opt_get_number(opts, "cores", 0);
-         unsigned threads = qemu_opt_get_number(opts, "threads", 0);
- 
-@@ -1560,24 +1563,24 @@ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
-             threads = threads > 0 ? threads : 1;
-             if (cpus == 0) {
-                 sockets = sockets > 0 ? sockets : 1;
--                cpus = cores * threads * sockets;
-+                cpus = cores * threads * dies * sockets;
-             } else {
-                 ms->smp.max_cpus =
-                         qemu_opt_get_number(opts, "maxcpus", cpus);
--                sockets = ms->smp.max_cpus / (cores * threads);
-+                sockets = ms->smp.max_cpus / (cores * threads * dies);
-             }
-         } else if (cores == 0) {
-             threads = threads > 0 ? threads : 1;
--            cores = cpus / (sockets * threads);
-+            cores = cpus / (sockets * dies * threads);
-             cores = cores > 0 ? cores : 1;
-         } else if (threads == 0) {
--            threads = cpus / (cores * sockets);
-+            threads = cpus / (cores * dies * sockets);
-             threads = threads > 0 ? threads : 1;
--        } else if (sockets * cores * threads < cpus) {
-+        } else if (sockets * dies * cores * threads < cpus) {
-             error_report("cpu topology: "
--                         "sockets (%u) * cores (%u) * threads (%u) < "
-+                         "sockets (%u) * dies (%u) * cores (%u) * threads (%u) < "
-                          "smp_cpus (%u)",
--                         sockets, cores, threads, cpus);
-+                         sockets, dies, cores, threads, cpus);
-             exit(1);
-         }
- 
-@@ -1589,26 +1592,27 @@ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
-             exit(1);
-         }
- 
--        if (sockets * cores * threads > ms->smp.max_cpus) {
-+        if (sockets * dies * cores * threads > ms->smp.max_cpus) {
-             error_report("cpu topology: "
--                         "sockets (%u) * cores (%u) * threads (%u) > "
-+                         "sockets (%u) * dies (%u) * cores (%u) * threads (%u) > "
-                          "maxcpus (%u)",
--                         sockets, cores, threads,
-+                         sockets, dies, cores, threads,
-                          ms->smp.max_cpus);
-             exit(1);
-         }
- 
--        if (sockets * cores * threads != ms->smp.max_cpus) {
-+        if (sockets * dies * cores * threads != ms->smp.max_cpus) {
-             warn_report("Invalid CPU topology deprecated: "
--                        "sockets (%u) * cores (%u) * threads (%u) "
-+                        "sockets (%u) * dies (%u) * cores (%u) * threads (%u) "
-                         "!= maxcpus (%u)",
--                        sockets, cores, threads,
-+                        sockets, dies, cores, threads,
-                         ms->smp.max_cpus);
-         }
- 
-         ms->smp.cpus = cpus;
-         ms->smp.cores = cores;
-         ms->smp.threads = threads;
-+        pcms->smp_dies = dies;
-     }
- 
-     if (ms->smp.cpus > 1) {
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 0d8beb4afd..a5b314a448 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -138,25 +138,26 @@ no incompatible TCG features have been enabled (e.g. icount/replay).
- ETEXI
- 
- DEF("smp", HAS_ARG, QEMU_OPTION_smp,
--    "-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,sockets=sockets]\n"
-+    "-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,dies=dies][,sockets=sockets]\n"
-     "                set the number of CPUs to 'n' [default=1]\n"
-     "                maxcpus= maximum number of total cpus, including\n"
-     "                offline CPUs for hotplug, etc\n"
--    "                cores= number of CPU cores on one socket\n"
-+    "                cores= number of CPU cores on one socket (for PC, it's on one die)\n"
-     "                threads= number of threads on one CPU core\n"
-+    "                dies= number of CPU dies on one socket (for PC only)\n"
-     "                sockets= number of discrete sockets in the system\n",
-         QEMU_ARCH_ALL)
- STEXI
--@item -smp [cpus=]@var{n}[,cores=@var{cores}][,threads=@var{threads}][,sockets=@var{sockets}][,maxcpus=@var{maxcpus}]
-+@item -smp [cpus=]@var{n}[,cores=@var{cores}][,threads=@var{threads}][,dies=dies][,sockets=@var{sockets}][,maxcpus=@var{maxcpus}]
- @findex -smp
- Simulate an SMP system with @var{n} CPUs. On the PC target, up to 255
- CPUs are supported. On Sparc32 target, Linux limits the number of usable CPUs
- to 4.
--For the PC target, the number of @var{cores} per socket, the number
--of @var{threads} per cores and the total number of @var{sockets} can be
--specified. Missing values will be computed. If any on the three values is
--given, the total number of CPUs @var{n} can be omitted. @var{maxcpus}
--specifies the maximum number of hotpluggable CPUs.
-+For the PC target, the number of @var{cores} per die, the number of @var{threads}
-+per cores, the number of @var{dies} per packages and the total number of
-+@var{sockets} can be specified. Missing values will be computed.
-+If any on the three values is given, the total number of CPUs @var{n} can be omitted.
-+@var{maxcpus} specifies the maximum number of hotpluggable CPUs.
- ETEXI
- 
- DEF("numa", HAS_ARG, QEMU_OPTION_numa,
-diff --git a/vl.c b/vl.c
-index 9218a718f3..e3908caa47 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1233,6 +1233,9 @@ static QemuOptsList qemu_smp_opts = {
-         }, {
-             .name = "sockets",
-             .type = QEMU_OPT_NUMBER,
-+        }, {
-+            .name = "dies",
-+            .type = QEMU_OPT_NUMBER,
-         }, {
-             .name = "cores",
-             .type = QEMU_OPT_NUMBER,
--- 
-2.21.0
+Should be fixed.
+
+> WARNING: Block comments use a leading /* on a separate line
+> #640: FILE: tests/hd-geo-test.c:995:
+> +                       "skipping hd-geo/override/* tests");
+
+False positive too.
+
+cheers,
+  Gerd
 
 
