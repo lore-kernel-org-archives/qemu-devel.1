@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 758F7C43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 12:05:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD672C48BE3
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 12:05:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E4C820675
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 12:05:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E4C820675
+	by mail.kernel.org (Postfix) with ESMTPS id 82A4420675
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 12:05:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82A4420675
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46850 helo=lists.gnu.org)
+Received: from localhost ([::1]:46852 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdvp5-0005E7-HE
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 08:05:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56374)
+	id 1hdvpC-0005Iy-Qw
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 08:05:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56368)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hdvZm-0000yI-Oh
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 07:50:06 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hdvZm-0000x1-3h
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 07:50:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hdvZe-0006e5-1E
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 07:49:58 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:38129 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hdvZc-0006bo-1u
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 07:49:57 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:38186 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hdvZb-0006OV-SG
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 07:49:49 -0400
+ id 1hdvZb-0006QO-4v
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 07:49:47 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id DB3051A2469;
+ by mail.rt-rk.com (Postfix) with ESMTP id CFF851A469C;
  Thu, 20 Jun 2019 13:49:31 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id AB1731A4536;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 9E8AE1A2469;
  Thu, 20 Jun 2019 13:49:31 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 20 Jun 2019 13:49:19 +0200
-Message-Id: <1561031359-6727-4-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 20 Jun 2019 13:49:18 +0200
+Message-Id: <1561031359-6727-3-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1561031359-6727-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1561031359-6727-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v2 3/3] tests/tcg: target/mips: Add tests for
- MSA bit move instructions
+Subject: [Qemu-devel] [PATCH v2 2/3] tests/tcg: target/mips: Amend tests for
+ MSA pack instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,169 +70,92 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add tests for MSA bit move instructions.
+Add tests for cases when destination register is the same as one
+of source registers.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 ---
- tests/tcg/mips/include/wrappers_msa.h              |   6 +
- .../mips/user/ase/msa/bit-move/test_msa_bmnz_v.c   | 214 +++++++++++++++++++++
- .../mips/user/ase/msa/bit-move/test_msa_bmz_v.c    | 214 +++++++++++++++++++++
- .../mips/user/ase/msa/bit-move/test_msa_bsel_v.c   | 214 +++++++++++++++++++++
- 4 files changed, 648 insertions(+)
- create mode 100644 tests/tcg/mips/user/ase/msa/bit-move/test_msa_bmnz_v.c
- create mode 100644 tests/tcg/mips/user/ase/msa/bit-move/test_msa_bmz_v.c
- create mode 100644 tests/tcg/mips/user/ase/msa/bit-move/test_msa_bsel_v.c
+ tests/tcg/mips/include/wrappers_msa.h              | 24 +++++++++
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c  | 58 +++++++++++++++++++++-
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c  | 58 +++++++++++++++++++++-
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c  | 58 +++++++++++++++++++++-
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c  | 58 +++++++++++++++++++++-
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c  | 58 +++++++++++++++++++++-
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c  | 58 +++++++++++++++++++++-
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c  | 58 +++++++++++++++++++++-
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c  | 58 +++++++++++++++++++++-
+ tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c | 58 +++++++++++++++++++++-
+ tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c | 58 +++++++++++++++++++++-
+ tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c | 58 +++++++++++++++++++++-
+ tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c | 58 +++++++++++++++++++++-
+ 13 files changed, 708 insertions(+), 12 deletions(-)
 
 diff --git a/tests/tcg/mips/include/wrappers_msa.h b/tests/tcg/mips/include/wrappers_msa.h
-index 9570aa8..3b1a403 100644
+index 5d28cb5..9570aa8 100644
 --- a/tests/tcg/mips/include/wrappers_msa.h
 +++ b/tests/tcg/mips/include/wrappers_msa.h
-@@ -197,8 +197,14 @@ DO_MSA__WD__WS_WT(BINSR_W, binsr.w)
- DO_MSA__WD__WS_WT(BINSR_D, binsr.d)
+@@ -555,19 +555,43 @@ DO_MSA__WD__WS_WT(XOR_V, xor.v)
+  */
  
- DO_MSA__WD__WS_WT(BMNZ_V, bmnz.v)
-+DO_MSA__WD__WD_WT(BMNZ_V__DDT, bmnz.b)
-+DO_MSA__WD__WS_WD(BMNZ_V__DSD, bmnz.b)
- DO_MSA__WD__WS_WT(BMZ_V, bmz.v)
-+DO_MSA__WD__WD_WT(BMZ_V__DDT, bmz.b)
-+DO_MSA__WD__WS_WD(BMZ_V__DSD, bmz.b)
- DO_MSA__WD__WS_WT(BSEL_V, bsel.v)
-+DO_MSA__WD__WD_WT(BSEL_V__DDT, bsel.b)
-+DO_MSA__WD__WS_WD(BSEL_V__DSD, bsel.b)
+ DO_MSA__WD__WS_WT(PCKEV_B, pckev.b)
++DO_MSA__WD__WD_WT(PCKEV_B__DDT, pckev.b)
++DO_MSA__WD__WS_WD(PCKEV_B__DSD, pckev.b)
+ DO_MSA__WD__WS_WT(PCKEV_H, pckev.h)
++DO_MSA__WD__WD_WT(PCKEV_H__DDT, pckev.h)
++DO_MSA__WD__WS_WD(PCKEV_H__DSD, pckev.h)
+ DO_MSA__WD__WS_WT(PCKEV_W, pckev.w)
++DO_MSA__WD__WD_WT(PCKEV_W__DDT, pckev.w)
++DO_MSA__WD__WS_WD(PCKEV_W__DSD, pckev.w)
+ DO_MSA__WD__WS_WT(PCKEV_D, pckev.d)
++DO_MSA__WD__WD_WT(PCKEV_D__DDT, pckev.d)
++DO_MSA__WD__WS_WD(PCKEV_D__DSD, pckev.d)
+ 
+ DO_MSA__WD__WS_WT(PCKOD_B, pckod.b)
++DO_MSA__WD__WD_WT(PCKOD_B__DDT, pckod.b)
++DO_MSA__WD__WS_WD(PCKOD_B__DSD, pckod.b)
+ DO_MSA__WD__WS_WT(PCKOD_H, pckod.h)
++DO_MSA__WD__WD_WT(PCKOD_H__DDT, pckod.h)
++DO_MSA__WD__WS_WD(PCKOD_H__DSD, pckod.h)
+ DO_MSA__WD__WS_WT(PCKOD_W, pckod.w)
++DO_MSA__WD__WD_WT(PCKOD_W__DDT, pckod.w)
++DO_MSA__WD__WS_WD(PCKOD_W__DSD, pckod.w)
+ DO_MSA__WD__WS_WT(PCKOD_D, pckod.d)
++DO_MSA__WD__WD_WT(PCKOD_D__DDT, pckod.d)
++DO_MSA__WD__WS_WD(PCKOD_D__DSD, pckod.d)
+ 
+ DO_MSA__WD__WS_WT(VSHF_B, vshf.b)
++DO_MSA__WD__WD_WT(VSHF_B__DDT, vshf.b)
++DO_MSA__WD__WS_WD(VSHF_B__DSD, vshf.b)
+ DO_MSA__WD__WS_WT(VSHF_H, vshf.h)
++DO_MSA__WD__WD_WT(VSHF_H__DDT, vshf.h)
++DO_MSA__WD__WS_WD(VSHF_H__DSD, vshf.h)
+ DO_MSA__WD__WS_WT(VSHF_W, vshf.w)
++DO_MSA__WD__WD_WT(VSHF_W__DDT, vshf.w)
++DO_MSA__WD__WS_WD(VSHF_W__DSD, vshf.w)
+ DO_MSA__WD__WS_WT(VSHF_D, vshf.d)
++DO_MSA__WD__WD_WT(VSHF_D__DDT, vshf.d)
++DO_MSA__WD__WS_WD(VSHF_D__DSD, vshf.d)
  
  
  /*
-diff --git a/tests/tcg/mips/user/ase/msa/bit-move/test_msa_bmnz_v.c b/tests/tcg/mips/user/ase/msa/bit-move/test_msa_bmnz_v.c
-new file mode 100644
-index 0000000..9b0f600
---- /dev/null
-+++ b/tests/tcg/mips/user/ase/msa/bit-move/test_msa_bmnz_v.c
-@@ -0,0 +1,214 @@
-+/*
-+ *  Test program for MSA instruction BMNZ.V
-+ *
-+ *  Copyright (C) 2019  Wave Computing, Inc.
-+ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
-+ *
-+ *  This program is free software: you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation, either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *`
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include <sys/time.h>
-+#include <stdint.h>
-+
-+#include "../../../../include/wrappers_msa.h"
-+#include "../../../../include/test_inputs_128.h"
-+#include "../../../../include/test_utils_128.h"
-+
-+#define TEST_COUNT_TOTAL (                                                \
-+            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c
+index 70cef5b..4a4c9d6 100644
+--- a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c
+@@ -28,7 +28,7 @@
+ 
+ #define TEST_COUNT_TOTAL (                                                \
+             (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
+-            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
 +            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
-+
-+
-+int32_t main(void)
-+{
-+    char *isa_ase_name = "MSA";
-+    char *group_name = "Bit Move";
-+    char *instruction_name =  "BMNZ.V";
-+    int32_t ret;
-+    uint32_t i, j;
-+    struct timeval start, end;
-+    double elapsed_time;
-+
-+    uint64_t b128_result[TEST_COUNT_TOTAL][2];
-+    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
-+        { 0x0000000000000000ULL, 0xffffffffffffffffULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xffffffffffffffffULL, },
-+        { 0x5555555555555555ULL, 0xffffffffffffffffULL, },
-+        { 0xccccccccccccccccULL, 0xffffffffffffffffULL, },
-+        { 0x3333333333333333ULL, 0xffffffffffffffffULL, },
-+        { 0xe3388ee38ee3388eULL, 0xffffffffffffffffULL, },
-+        { 0x1cc7711c711cc771ULL, 0xffffffffffffffffULL, },
-+        { 0xffffffffffffffffULL, 0x0000000000000000ULL, },    /*   8  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x0000000000000000ULL, },
-+        { 0x5555555555555555ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0x0000000000000000ULL, },
-+        { 0x3333333333333333ULL, 0x0000000000000000ULL, },
-+        { 0xe3388ee38ee3388eULL, 0x0000000000000000ULL, },
-+        { 0x1cc7711c711cc771ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
-+        { 0x0000000000000000ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x5555555555555555ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xccccccccccccccccULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x3333333333333333ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xe3388ee38ee3388eULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x1cc7711c711cc771ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xffffffffffffffffULL, 0x5555555555555555ULL, },    /*  24  */
-+        { 0x0000000000000000ULL, 0x5555555555555555ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x5555555555555555ULL, },
-+        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
-+        { 0xccccccccccccccccULL, 0x5555555555555555ULL, },
-+        { 0x3333333333333333ULL, 0x5555555555555555ULL, },
-+        { 0xe3388ee38ee3388eULL, 0x5555555555555555ULL, },
-+        { 0x1cc7711c711cc771ULL, 0x5555555555555555ULL, },
-+        { 0xffffffffffffffffULL, 0xccccccccccccccccULL, },    /*  32  */
-+        { 0x0000000000000000ULL, 0xccccccccccccccccULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xccccccccccccccccULL, },
-+        { 0x5555555555555555ULL, 0xccccccccccccccccULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x3333333333333333ULL, 0xccccccccccccccccULL, },
-+        { 0xe3388ee38ee3388eULL, 0xccccccccccccccccULL, },
-+        { 0x1cc7711c711cc771ULL, 0xccccccccccccccccULL, },
-+        { 0xffffffffffffffffULL, 0x3333333333333333ULL, },    /*  40  */
-+        { 0x0000000000000000ULL, 0x3333333333333333ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x3333333333333333ULL, },
-+        { 0x5555555555555555ULL, 0x3333333333333333ULL, },
-+        { 0xccccccccccccccccULL, 0x3333333333333333ULL, },
-+        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
-+        { 0xe3388ee38ee3388eULL, 0x3333333333333333ULL, },
-+        { 0x1cc7711c711cc771ULL, 0x3333333333333333ULL, },
-+        { 0xffffffffffffffffULL, 0xe3388ee38ee3388eULL, },    /*  48  */
-+        { 0x0000000000000000ULL, 0xe3388ee38ee3388eULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xe3388ee38ee3388eULL, },
-+        { 0x5555555555555555ULL, 0xe3388ee38ee3388eULL, },
-+        { 0xccccccccccccccccULL, 0xe3388ee38ee3388eULL, },
-+        { 0x3333333333333333ULL, 0xe3388ee38ee3388eULL, },
-+        { 0xe3388ee38ee3388eULL, 0xe3388ee38ee3388eULL, },
-+        { 0x1cc7711c711cc771ULL, 0xe3388ee38ee3388eULL, },
-+        { 0xffffffffffffffffULL, 0x1cc7711c711cc771ULL, },    /*  56  */
-+        { 0x0000000000000000ULL, 0x1cc7711c711cc771ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x1cc7711c711cc771ULL, },
-+        { 0x5555555555555555ULL, 0x1cc7711c711cc771ULL, },
-+        { 0xccccccccccccccccULL, 0x1cc7711c711cc771ULL, },
-+        { 0x3333333333333333ULL, 0x1cc7711c711cc771ULL, },
-+        { 0xe3388ee38ee3388eULL, 0x1cc7711c711cc771ULL, },
-+        { 0x1cc7711c711cc771ULL, 0x1cc7711c711cc771ULL, },
-+        { 0x675e7b0c6acc6240ULL, 0x675e7b0c6acc6240ULL, },    /*  64  */
-+        { 0xf71a3ffcbe639308ULL, 0x675e7b0c6acc6240ULL, },
-+        { 0xd8ff2b145aaacf80ULL, 0x675e7b0c6acc6240ULL, },
-+        { 0xf1d842a04f4d314eULL, 0x675e7b0c6acc6240ULL, },
-+        { 0x675e7b0c6acc6240ULL, 0xf71a3ffcbe639308ULL, },
-+        { 0xf71a3ffcbe639308ULL, 0xf71a3ffcbe639308ULL, },
-+        { 0xd8ff2b145aaacf80ULL, 0xf71a3ffcbe639308ULL, },
-+        { 0xf1d842a04f4d314eULL, 0xf71a3ffcbe639308ULL, },
-+        { 0x675e7b0c6acc6240ULL, 0xd8ff2b145aaacf80ULL, },    /*  72  */
-+        { 0xf71a3ffcbe639308ULL, 0xd8ff2b145aaacf80ULL, },
-+        { 0xd8ff2b145aaacf80ULL, 0xd8ff2b145aaacf80ULL, },
-+        { 0xf1d842a04f4d314eULL, 0xd8ff2b145aaacf80ULL, },
-+        { 0x675e7b0c6acc6240ULL, 0xf1d842a04f4d314eULL, },
-+        { 0xf71a3ffcbe639308ULL, 0xf1d842a04f4d314eULL, },
-+        { 0xd8ff2b145aaacf80ULL, 0xf1d842a04f4d314eULL, },
-+        { 0xf1d842a04f4d314eULL, 0xf1d842a04f4d314eULL, },
+ 
+ 
+ int32_t main(void)
+@@ -123,6 +123,38 @@ int32_t main(void)
+         { 0xf71a3ffcbe639308ULL, 0xf1d842a04f4d314eULL, },
+         { 0xd8ff2b145aaacf80ULL, 0xf1d842a04f4d314eULL, },
+         { 0xf1d842a04f4d314eULL, 0xf1d842a04f4d314eULL, },
 +        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
 +        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
 +        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
@@ -265,31 +188,680 @@ index 0000000..9b0f600
 +        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
 +        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
 +        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
-+    };
-+
-+    reset_msa_registers();
-+
-+    gettimeofday(&start, NULL);
-+
-+    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_BMNZ_V(b128_pattern[i], b128_pattern[j],
-+                          b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
+     };
+ 
+     reset_msa_registers();
+@@ -145,6 +177,30 @@ int32_t main(void)
+         }
+     }
+ 
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKEV_B__DDT(b128_random[i], b128_random[j],
++                                b128_result[
++                                    ((PATTERN_INPUTS_SHORT_COUNT) *
++                                     (PATTERN_INPUTS_SHORT_COUNT)) +
++                                    ((RANDOM_INPUTS_SHORT_COUNT) *
++                                     (RANDOM_INPUTS_SHORT_COUNT)) +
++                                    RANDOM_INPUTS_SHORT_COUNT * i + j]);
 +        }
 +    }
 +
 +    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
 +        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_BMNZ_V(b128_random[i], b128_random[j],
-+                          b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
-+                                       (PATTERN_INPUTS_SHORT_COUNT)) +
-+                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
++            do_msa_PCKEV_B__DSD(b128_random[i], b128_random[j],
++                                b128_result[
++                                    ((PATTERN_INPUTS_SHORT_COUNT) *
++                                     (PATTERN_INPUTS_SHORT_COUNT)) +
++                                    (2 * (RANDOM_INPUTS_SHORT_COUNT) *
++                                     (RANDOM_INPUTS_SHORT_COUNT)) +
++                                    RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
+     gettimeofday(&end, NULL);
+ 
+     elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c
+index 8a1d18f..67df606 100644
+--- a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c
+@@ -28,7 +28,7 @@
+ 
+ #define TEST_COUNT_TOTAL (                                                \
+             (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
+-            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
+ 
+ 
+ int32_t main(void)
+@@ -123,6 +123,38 @@ int32_t main(void)
+         { 0xfbbe00634d93c708ULL, 0x704f164d5e31e24eULL, },
+         { 0xac5aaeaab9cf8b80ULL, 0x704f164d5e31e24eULL, },
+         { 0x704f164d5e31e24eULL, 0x704f164d5e31e24eULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
++        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
++        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
++        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
++        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
++        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
++        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
++        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
++        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
++        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
++        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
++        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
++        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
++        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
++        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
++        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
++        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
++        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+     };
+ 
+     reset_msa_registers();
+@@ -145,6 +177,30 @@ int32_t main(void)
+         }
+     }
+ 
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKEV_D__DDT(b128_random[i], b128_random[j],
++                                b128_result[
++                                    ((PATTERN_INPUTS_SHORT_COUNT) *
++                                     (PATTERN_INPUTS_SHORT_COUNT)) +
++                                    ((RANDOM_INPUTS_SHORT_COUNT) *
++                                     (RANDOM_INPUTS_SHORT_COUNT)) +
++                                    RANDOM_INPUTS_SHORT_COUNT * i + j]);
 +        }
 +    }
 +
 +    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
 +        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_BMNZ_V__DDT(b128_random[i], b128_random[j],
++            do_msa_PCKEV_D__DSD(b128_random[i], b128_random[j],
++                                b128_result[
++                                    ((PATTERN_INPUTS_SHORT_COUNT) *
++                                     (PATTERN_INPUTS_SHORT_COUNT)) +
++                                    (2 * (RANDOM_INPUTS_SHORT_COUNT) *
++                                     (RANDOM_INPUTS_SHORT_COUNT)) +
++                                    RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
+     gettimeofday(&end, NULL);
+ 
+     elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c
+index c8636ba..22d043c 100644
+--- a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c
+@@ -28,7 +28,7 @@
+ 
+ #define TEST_COUNT_TOTAL (                                                \
+             (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
+-            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
+ 
+ 
+ int32_t main(void)
+@@ -123,6 +123,38 @@ int32_t main(void)
+         { 0xbb1a52fc0063c708ULL, 0x88d8e2a0164de24eULL, },
+         { 0xc6ff2514aeaa8b80ULL, 0x88d8e2a0164de24eULL, },
+         { 0x88d8e2a0164de24eULL, 0x88d8e2a0164de24eULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
++        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
++        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
++        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
++        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
++        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
++        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
++        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
++        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
++        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
++        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
++        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
++        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
++        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
++        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
++        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
++        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
++        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+     };
+ 
+     reset_msa_registers();
+@@ -145,6 +177,30 @@ int32_t main(void)
+         }
+     }
+ 
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKEV_H__DDT(b128_random[i], b128_random[j],
++                              b128_result[
++                                    ((PATTERN_INPUTS_SHORT_COUNT) *
++                                     (PATTERN_INPUTS_SHORT_COUNT)) +
++                                    ((RANDOM_INPUTS_SHORT_COUNT) *
++                                     (RANDOM_INPUTS_SHORT_COUNT)) +
++                                    RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKEV_H__DSD(b128_random[i], b128_random[j],
++                                b128_result[
++                                    ((PATTERN_INPUTS_SHORT_COUNT) *
++                                     (PATTERN_INPUTS_SHORT_COUNT)) +
++                                    (2 * (RANDOM_INPUTS_SHORT_COUNT) *
++                                     (RANDOM_INPUTS_SHORT_COUNT)) +
++                                    RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
+     gettimeofday(&end, NULL);
+ 
+     elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c
+index 7ceab05..1a9c2df 100644
+--- a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c
+@@ -28,7 +28,7 @@
+ 
+ #define TEST_COUNT_TOTAL (                                                \
+             (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
+-            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
+ 
+ 
+ int32_t main(void)
+@@ -123,6 +123,38 @@ int32_t main(void)
+         { 0x153f52fc4d93c708ULL, 0xa942e2a05e31e24eULL, },
+         { 0xab2b2514b9cf8b80ULL, 0xa942e2a05e31e24eULL, },
+         { 0xa942e2a05e31e24eULL, 0xa942e2a05e31e24eULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
++        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
++        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
++        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
++        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
++        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
++        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
++        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
++        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
++        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
++        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
++        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
++        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
++        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
++        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
++        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
++        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
++        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+     };
+ 
+     reset_msa_registers();
+@@ -145,6 +177,30 @@ int32_t main(void)
+         }
+     }
+ 
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKEV_W__DDT(b128_random[i], b128_random[j],
++                                b128_result[
++                                    ((PATTERN_INPUTS_SHORT_COUNT) *
++                                     (PATTERN_INPUTS_SHORT_COUNT)) +
++                                    ((RANDOM_INPUTS_SHORT_COUNT) *
++                                     (RANDOM_INPUTS_SHORT_COUNT)) +
++                                    RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKEV_W__DSD(b128_random[i], b128_random[j],
++                                b128_result[
++                                    ((PATTERN_INPUTS_SHORT_COUNT) *
++                                     (PATTERN_INPUTS_SHORT_COUNT)) +
++                                    (2 * (RANDOM_INPUTS_SHORT_COUNT) *
++                                     (RANDOM_INPUTS_SHORT_COUNT)) +
++                                    RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
+     gettimeofday(&end, NULL);
+ 
+     elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c
+index b6f5e08..15ef377 100644
+--- a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c
+@@ -28,7 +28,7 @@
+ 
+ #define TEST_COUNT_TOTAL (                                                \
+             (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
+-            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
+ 
+ 
+ int32_t main(void)
+@@ -123,6 +123,38 @@ int32_t main(void)
+         { 0x12bb1552fb004dc7ULL, 0x8d88a9e270165ee2ULL, },
+         { 0x27c6ab25acaeb98bULL, 0x8d88a9e270165ee2ULL, },
+         { 0x8d88a9e270165ee2ULL, 0x8d88a9e270165ee2ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
++        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
++        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
++        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
++        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
++        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
++        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
++        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
++        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
++        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
++        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
++        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
++        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
++        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
++        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
++        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
++        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
++        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+     };
+ 
+     reset_msa_registers();
+@@ -145,6 +177,30 @@ int32_t main(void)
+         }
+     }
+ 
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKOD_B__DDT(b128_random[i], b128_random[j],
++                                b128_result[
++                                    ((PATTERN_INPUTS_SHORT_COUNT) *
++                                     (PATTERN_INPUTS_SHORT_COUNT)) +
++                                    ((RANDOM_INPUTS_SHORT_COUNT) *
++                                     (RANDOM_INPUTS_SHORT_COUNT)) +
++                                    RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKOD_B__DSD(b128_random[i], b128_random[j],
++                                b128_result[
++                                    ((PATTERN_INPUTS_SHORT_COUNT) *
++                                     (PATTERN_INPUTS_SHORT_COUNT)) +
++                                    (2 * (RANDOM_INPUTS_SHORT_COUNT) *
++                                     (RANDOM_INPUTS_SHORT_COUNT)) +
++                                    RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
+     gettimeofday(&end, NULL);
+ 
+     elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c
+index c4b2386..e3997cd 100644
+--- a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c
+@@ -28,7 +28,7 @@
+ 
+ #define TEST_COUNT_TOTAL (                                                \
+             (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
+-            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
+ 
+ 
+ int32_t main(void)
+@@ -123,6 +123,38 @@ int32_t main(void)
+         { 0x12f7bb1a153f52fcULL, 0x8df188d8a942e2a0ULL, },
+         { 0x27d8c6ffab2b2514ULL, 0x8df188d8a942e2a0ULL, },
+         { 0x8df188d8a942e2a0ULL, 0x8df188d8a942e2a0ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
++        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
++        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
++        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
++        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
++        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
++        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
++        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
++        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
++        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
++        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
++        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
++        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
++        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
++        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
++        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
++        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
++        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+     };
+ 
+     reset_msa_registers();
+@@ -145,6 +177,30 @@ int32_t main(void)
+         }
+     }
+ 
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKOD_D__DDT(b128_random[i], b128_random[j],
++                                b128_result[
++                                    ((PATTERN_INPUTS_SHORT_COUNT) *
++                                     (PATTERN_INPUTS_SHORT_COUNT)) +
++                                    ((RANDOM_INPUTS_SHORT_COUNT) *
++                                     (RANDOM_INPUTS_SHORT_COUNT)) +
++                                    RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKOD_D__DSD(b128_random[i], b128_random[j],
++                                b128_result[
++                                    ((PATTERN_INPUTS_SHORT_COUNT) *
++                                     (PATTERN_INPUTS_SHORT_COUNT)) +
++                                    (2 * (RANDOM_INPUTS_SHORT_COUNT) *
++                                     (RANDOM_INPUTS_SHORT_COUNT)) +
++                                    RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
+     gettimeofday(&end, NULL);
+ 
+     elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c
+index 36329e7..2a29ac0 100644
+--- a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c
+@@ -28,7 +28,7 @@
+ 
+ #define TEST_COUNT_TOTAL (                                                \
+             (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
+-            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
+ 
+ 
+ int32_t main(void)
+@@ -123,6 +123,38 @@ int32_t main(void)
+         { 0x12f7153ffbbe4d93ULL, 0x8df1a942704f5e31ULL, },
+         { 0x27d8ab2bac5ab9cfULL, 0x8df1a942704f5e31ULL, },
+         { 0x8df1a942704f5e31ULL, 0x8df1a942704f5e31ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
++        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
++        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
++        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
++        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
++        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
++        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
++        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
++        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
++        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
++        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
++        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
++        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
++        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
++        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
++        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
++        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
++        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+     };
+ 
+     reset_msa_registers();
+@@ -145,6 +177,30 @@ int32_t main(void)
+         }
+     }
+ 
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKOD_H__DDT(b128_random[i], b128_random[j],
++                                b128_result[
++                                    ((PATTERN_INPUTS_SHORT_COUNT) *
++                                     (PATTERN_INPUTS_SHORT_COUNT)) +
++                                    ((RANDOM_INPUTS_SHORT_COUNT) *
++                                     (RANDOM_INPUTS_SHORT_COUNT)) +
++                                    RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKOD_H__DSD(b128_random[i], b128_random[j],
++                                b128_result[
++                                    ((PATTERN_INPUTS_SHORT_COUNT) *
++                                     (PATTERN_INPUTS_SHORT_COUNT)) +
++                                    (2 * (RANDOM_INPUTS_SHORT_COUNT) *
++                                     (RANDOM_INPUTS_SHORT_COUNT)) +
++                                    RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
+     gettimeofday(&end, NULL);
+ 
+     elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c
+index 3bc4223..a3fbe25 100644
+--- a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c
+@@ -28,7 +28,7 @@
+ 
+ #define TEST_COUNT_TOTAL (                                                \
+             (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
+-            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
+ 
+ 
+ int32_t main(void)
+@@ -123,6 +123,38 @@ int32_t main(void)
+         { 0x12f7bb1afbbe0063ULL, 0x8df188d8704f164dULL, },
+         { 0x27d8c6ffac5aaeaaULL, 0x8df188d8704f164dULL, },
+         { 0x8df188d8704f164dULL, 0x8df188d8704f164dULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
++        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
++        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
++        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
++        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
++        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
++        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
++        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
++        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
++        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
++        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
++        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
++        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
++        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
++        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
++        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
++        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
++        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+     };
+ 
+     reset_msa_registers();
+@@ -145,6 +177,30 @@ int32_t main(void)
+         }
+     }
+ 
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKOD_W__DDT(b128_random[i], b128_random[j],
++                                b128_result[
++                                    ((PATTERN_INPUTS_SHORT_COUNT) *
++                                     (PATTERN_INPUTS_SHORT_COUNT)) +
++                                    ((RANDOM_INPUTS_SHORT_COUNT) *
++                                     (RANDOM_INPUTS_SHORT_COUNT)) +
++                                    RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_PCKOD_W__DSD(b128_random[i], b128_random[j],
++                                b128_result[
++                                    ((PATTERN_INPUTS_SHORT_COUNT) *
++                                     (PATTERN_INPUTS_SHORT_COUNT)) +
++                                    (2 * (RANDOM_INPUTS_SHORT_COUNT) *
++                                     (RANDOM_INPUTS_SHORT_COUNT)) +
++                                    RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
+     gettimeofday(&end, NULL);
+ 
+     elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c
+index 16f63c2..eedb7d8 100644
+--- a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c
+@@ -28,7 +28,7 @@
+ 
+ #define TEST_COUNT_TOTAL (                                                \
+             (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
+-            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
+ 
+ 
+ int32_t main(void)
+@@ -123,6 +123,38 @@ int32_t main(void)
+         { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+         { 0x8080808080808080ULL, 0x8080808080808080ULL, },
+         { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
++        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
++        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
++        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
++        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
++        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
++        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
++        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
++        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
++        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
++        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
++        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
++        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
++        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
++        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
++        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
++        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
++        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+     };
+ 
+     reset_msa_registers();
+@@ -145,6 +177,30 @@ int32_t main(void)
+         }
+     }
+ 
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_VSHF_B__DDT(b128_random[i], b128_random[j],
 +                               b128_result[
 +                                   ((PATTERN_INPUTS_SHORT_COUNT) *
 +                                    (PATTERN_INPUTS_SHORT_COUNT)) +
@@ -301,7 +873,7 @@ index 0000000..9b0f600
 +
 +    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
 +        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_BMNZ_V__DSD(b128_random[i], b128_random[j],
++            do_msa_VSHF_B__DSD(b128_random[i], b128_random[j],
 +                               b128_result[
 +                                   ((PATTERN_INPUTS_SHORT_COUNT) *
 +                                    (PATTERN_INPUTS_SHORT_COUNT)) +
@@ -311,148 +883,26 @@ index 0000000..9b0f600
 +        }
 +    }
 +
-+    gettimeofday(&end, NULL);
-+
-+    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
-+    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
-+
-+    ret = check_results_128(isa_ase_name, group_name, instruction_name,
-+                            TEST_COUNT_TOTAL, elapsed_time,
-+                            &b128_result[0][0], &b128_expect[0][0]);
-+
-+    return ret;
-+}
-diff --git a/tests/tcg/mips/user/ase/msa/bit-move/test_msa_bmz_v.c b/tests/tcg/mips/user/ase/msa/bit-move/test_msa_bmz_v.c
-new file mode 100644
-index 0000000..dea384e
---- /dev/null
-+++ b/tests/tcg/mips/user/ase/msa/bit-move/test_msa_bmz_v.c
-@@ -0,0 +1,214 @@
-+/*
-+ *  Test program for MSA instruction BMZ.V
-+ *
-+ *  Copyright (C) 2019  Wave Computing, Inc.
-+ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
-+ *
-+ *  This program is free software: you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation, either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *`
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include <sys/time.h>
-+#include <stdint.h>
-+
-+#include "../../../../include/wrappers_msa.h"
-+#include "../../../../include/test_inputs_128.h"
-+#include "../../../../include/test_utils_128.h"
-+
-+#define TEST_COUNT_TOTAL (                                                \
-+            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
+     gettimeofday(&end, NULL);
+ 
+     elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c
+index 5033b63..85a8f0d 100644
+--- a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c
+@@ -28,7 +28,7 @@
+ 
+ #define TEST_COUNT_TOTAL (                                                \
+             (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
+-            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
 +            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
-+
-+
-+int32_t main(void)
-+{
-+    char *isa_ase_name = "MSA";
-+    char *group_name = "Bit Move";
-+    char *instruction_name =  "BMZ.V";
-+    int32_t ret;
-+    uint32_t i, j;
-+    struct timeval start, end;
-+    double elapsed_time;
-+
-+    uint64_t b128_result[TEST_COUNT_TOTAL][2];
-+    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
-+        { 0x0000000000000000ULL, 0xffffffffffffffffULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xffffffffffffffffULL, },
-+        { 0x5555555555555555ULL, 0xffffffffffffffffULL, },
-+        { 0xccccccccccccccccULL, 0xffffffffffffffffULL, },
-+        { 0x3333333333333333ULL, 0xffffffffffffffffULL, },
-+        { 0xe3388ee38ee3388eULL, 0xffffffffffffffffULL, },
-+        { 0x1cc7711c711cc771ULL, 0xffffffffffffffffULL, },
-+        { 0xffffffffffffffffULL, 0x0000000000000000ULL, },    /*   8  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x0000000000000000ULL, },
-+        { 0x5555555555555555ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0x0000000000000000ULL, },
-+        { 0x3333333333333333ULL, 0x0000000000000000ULL, },
-+        { 0xe3388ee38ee3388eULL, 0x0000000000000000ULL, },
-+        { 0x1cc7711c711cc771ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
-+        { 0x0000000000000000ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x5555555555555555ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xccccccccccccccccULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x3333333333333333ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xe3388ee38ee3388eULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x1cc7711c711cc771ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xffffffffffffffffULL, 0x5555555555555555ULL, },    /*  24  */
-+        { 0x0000000000000000ULL, 0x5555555555555555ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x5555555555555555ULL, },
-+        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
-+        { 0xccccccccccccccccULL, 0x5555555555555555ULL, },
-+        { 0x3333333333333333ULL, 0x5555555555555555ULL, },
-+        { 0xe3388ee38ee3388eULL, 0x5555555555555555ULL, },
-+        { 0x1cc7711c711cc771ULL, 0x5555555555555555ULL, },
-+        { 0xffffffffffffffffULL, 0xccccccccccccccccULL, },    /*  32  */
-+        { 0x0000000000000000ULL, 0xccccccccccccccccULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xccccccccccccccccULL, },
-+        { 0x5555555555555555ULL, 0xccccccccccccccccULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x3333333333333333ULL, 0xccccccccccccccccULL, },
-+        { 0xe3388ee38ee3388eULL, 0xccccccccccccccccULL, },
-+        { 0x1cc7711c711cc771ULL, 0xccccccccccccccccULL, },
-+        { 0xffffffffffffffffULL, 0x3333333333333333ULL, },    /*  40  */
-+        { 0x0000000000000000ULL, 0x3333333333333333ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x3333333333333333ULL, },
-+        { 0x5555555555555555ULL, 0x3333333333333333ULL, },
-+        { 0xccccccccccccccccULL, 0x3333333333333333ULL, },
-+        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
-+        { 0xe3388ee38ee3388eULL, 0x3333333333333333ULL, },
-+        { 0x1cc7711c711cc771ULL, 0x3333333333333333ULL, },
-+        { 0xffffffffffffffffULL, 0xe3388ee38ee3388eULL, },    /*  48  */
-+        { 0x0000000000000000ULL, 0xe3388ee38ee3388eULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xe3388ee38ee3388eULL, },
-+        { 0x5555555555555555ULL, 0xe3388ee38ee3388eULL, },
-+        { 0xccccccccccccccccULL, 0xe3388ee38ee3388eULL, },
-+        { 0x3333333333333333ULL, 0xe3388ee38ee3388eULL, },
-+        { 0xe3388ee38ee3388eULL, 0xe3388ee38ee3388eULL, },
-+        { 0x1cc7711c711cc771ULL, 0xe3388ee38ee3388eULL, },
-+        { 0xffffffffffffffffULL, 0x1cc7711c711cc771ULL, },    /*  56  */
-+        { 0x0000000000000000ULL, 0x1cc7711c711cc771ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x1cc7711c711cc771ULL, },
-+        { 0x5555555555555555ULL, 0x1cc7711c711cc771ULL, },
-+        { 0xccccccccccccccccULL, 0x1cc7711c711cc771ULL, },
-+        { 0x3333333333333333ULL, 0x1cc7711c711cc771ULL, },
-+        { 0xe3388ee38ee3388eULL, 0x1cc7711c711cc771ULL, },
-+        { 0x1cc7711c711cc771ULL, 0x1cc7711c711cc771ULL, },
-+        { 0x675e7b0c6acc6240ULL, 0x675e7b0c6acc6240ULL, },    /*  64  */
-+        { 0xf71a3ffcbe639308ULL, 0x675e7b0c6acc6240ULL, },
-+        { 0xd8ff2b145aaacf80ULL, 0x675e7b0c6acc6240ULL, },
-+        { 0xf1d842a04f4d314eULL, 0x675e7b0c6acc6240ULL, },
-+        { 0x675e7b0c6acc6240ULL, 0xf71a3ffcbe639308ULL, },
-+        { 0xf71a3ffcbe639308ULL, 0xf71a3ffcbe639308ULL, },
-+        { 0xd8ff2b145aaacf80ULL, 0xf71a3ffcbe639308ULL, },
-+        { 0xf1d842a04f4d314eULL, 0xf71a3ffcbe639308ULL, },
-+        { 0x675e7b0c6acc6240ULL, 0xd8ff2b145aaacf80ULL, },    /*  72  */
-+        { 0xf71a3ffcbe639308ULL, 0xd8ff2b145aaacf80ULL, },
-+        { 0xd8ff2b145aaacf80ULL, 0xd8ff2b145aaacf80ULL, },
-+        { 0xf1d842a04f4d314eULL, 0xd8ff2b145aaacf80ULL, },
-+        { 0x675e7b0c6acc6240ULL, 0xf1d842a04f4d314eULL, },
-+        { 0xf71a3ffcbe639308ULL, 0xf1d842a04f4d314eULL, },
-+        { 0xd8ff2b145aaacf80ULL, 0xf1d842a04f4d314eULL, },
-+        { 0xf1d842a04f4d314eULL, 0xf1d842a04f4d314eULL, },
+ 
+ 
+ int32_t main(void)
+@@ -123,6 +123,38 @@ int32_t main(void)
+         { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+         { 0xac5aaeaab9cf8b80ULL, 0xac5aaeaab9cf8b80ULL, },
+         { 0x0000000000000000ULL, 0x0000000000000000ULL, },
 +        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
 +        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
 +        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
@@ -485,251 +935,16 @@ index 0000000..dea384e
 +        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
 +        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
 +        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
-+    };
-+
-+    reset_msa_registers();
-+
-+    gettimeofday(&start, NULL);
-+
-+    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_BMZ_V(b128_pattern[i], b128_pattern[j],
-+                         b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
+     };
+ 
+     reset_msa_registers();
+@@ -145,6 +177,30 @@ int32_t main(void)
+         }
+     }
+ 
 +    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
 +        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_BMZ_V(b128_random[i], b128_random[j],
-+                         b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
-+                                      (PATTERN_INPUTS_SHORT_COUNT)) +
-+                                     RANDOM_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_BMZ_V__DDT(b128_random[i], b128_random[j],
-+                              b128_result[
-+                                  ((PATTERN_INPUTS_SHORT_COUNT) *
-+                                   (PATTERN_INPUTS_SHORT_COUNT)) +
-+                                  ((RANDOM_INPUTS_SHORT_COUNT) *
-+                                   (RANDOM_INPUTS_SHORT_COUNT)) +
-+                                  RANDOM_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_BMZ_V__DSD(b128_random[i], b128_random[j],
-+                              b128_result[
-+                                  ((PATTERN_INPUTS_SHORT_COUNT) *
-+                                   (PATTERN_INPUTS_SHORT_COUNT)) +
-+                                  (2 * (RANDOM_INPUTS_SHORT_COUNT) *
-+                                   (RANDOM_INPUTS_SHORT_COUNT)) +
-+                                  RANDOM_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    gettimeofday(&end, NULL);
-+
-+    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
-+    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
-+
-+    ret = check_results_128(isa_ase_name, group_name, instruction_name,
-+                            TEST_COUNT_TOTAL, elapsed_time,
-+                            &b128_result[0][0], &b128_expect[0][0]);
-+
-+    return ret;
-+}
-diff --git a/tests/tcg/mips/user/ase/msa/bit-move/test_msa_bsel_v.c b/tests/tcg/mips/user/ase/msa/bit-move/test_msa_bsel_v.c
-new file mode 100644
-index 0000000..ca1c389
---- /dev/null
-+++ b/tests/tcg/mips/user/ase/msa/bit-move/test_msa_bsel_v.c
-@@ -0,0 +1,214 @@
-+/*
-+ *  Test program for MSA instruction BSEL.V
-+ *
-+ *  Copyright (C) 2019  Wave Computing, Inc.
-+ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
-+ *
-+ *  This program is free software: you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation, either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *`
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include <sys/time.h>
-+#include <stdint.h>
-+
-+#include "../../../../include/wrappers_msa.h"
-+#include "../../../../include/test_inputs_128.h"
-+#include "../../../../include/test_utils_128.h"
-+
-+#define TEST_COUNT_TOTAL (                                                \
-+            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
-+            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
-+
-+
-+int32_t main(void)
-+{
-+    char *isa_ase_name = "MSA";
-+    char *group_name = "Bit Move";
-+    char *instruction_name =  "BSEL.V";
-+    int32_t ret;
-+    uint32_t i, j;
-+    struct timeval start, end;
-+    double elapsed_time;
-+
-+    uint64_t b128_result[TEST_COUNT_TOTAL][2];
-+    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
-+        { 0x0000000000000000ULL, 0xffffffffffffffffULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xffffffffffffffffULL, },
-+        { 0x5555555555555555ULL, 0xffffffffffffffffULL, },
-+        { 0xccccccccccccccccULL, 0xffffffffffffffffULL, },
-+        { 0x3333333333333333ULL, 0xffffffffffffffffULL, },
-+        { 0xe3388ee38ee3388eULL, 0xffffffffffffffffULL, },
-+        { 0x1cc7711c711cc771ULL, 0xffffffffffffffffULL, },
-+        { 0xffffffffffffffffULL, 0x0000000000000000ULL, },    /*   8  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x0000000000000000ULL, },
-+        { 0x5555555555555555ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0x0000000000000000ULL, },
-+        { 0x3333333333333333ULL, 0x0000000000000000ULL, },
-+        { 0xe3388ee38ee3388eULL, 0x0000000000000000ULL, },
-+        { 0x1cc7711c711cc771ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
-+        { 0x0000000000000000ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x5555555555555555ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xccccccccccccccccULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x3333333333333333ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xe3388ee38ee3388eULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x1cc7711c711cc771ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xffffffffffffffffULL, 0x5555555555555555ULL, },    /*  24  */
-+        { 0x0000000000000000ULL, 0x5555555555555555ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x5555555555555555ULL, },
-+        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
-+        { 0xccccccccccccccccULL, 0x5555555555555555ULL, },
-+        { 0x3333333333333333ULL, 0x5555555555555555ULL, },
-+        { 0xe3388ee38ee3388eULL, 0x5555555555555555ULL, },
-+        { 0x1cc7711c711cc771ULL, 0x5555555555555555ULL, },
-+        { 0xffffffffffffffffULL, 0xccccccccccccccccULL, },    /*  32  */
-+        { 0x0000000000000000ULL, 0xccccccccccccccccULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xccccccccccccccccULL, },
-+        { 0x5555555555555555ULL, 0xccccccccccccccccULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x3333333333333333ULL, 0xccccccccccccccccULL, },
-+        { 0xe3388ee38ee3388eULL, 0xccccccccccccccccULL, },
-+        { 0x1cc7711c711cc771ULL, 0xccccccccccccccccULL, },
-+        { 0xffffffffffffffffULL, 0x3333333333333333ULL, },    /*  40  */
-+        { 0x0000000000000000ULL, 0x3333333333333333ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x3333333333333333ULL, },
-+        { 0x5555555555555555ULL, 0x3333333333333333ULL, },
-+        { 0xccccccccccccccccULL, 0x3333333333333333ULL, },
-+        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
-+        { 0xe3388ee38ee3388eULL, 0x3333333333333333ULL, },
-+        { 0x1cc7711c711cc771ULL, 0x3333333333333333ULL, },
-+        { 0xffffffffffffffffULL, 0xe3388ee38ee3388eULL, },    /*  48  */
-+        { 0x0000000000000000ULL, 0xe3388ee38ee3388eULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xe3388ee38ee3388eULL, },
-+        { 0x5555555555555555ULL, 0xe3388ee38ee3388eULL, },
-+        { 0xccccccccccccccccULL, 0xe3388ee38ee3388eULL, },
-+        { 0x3333333333333333ULL, 0xe3388ee38ee3388eULL, },
-+        { 0xe3388ee38ee3388eULL, 0xe3388ee38ee3388eULL, },
-+        { 0x1cc7711c711cc771ULL, 0xe3388ee38ee3388eULL, },
-+        { 0xffffffffffffffffULL, 0x1cc7711c711cc771ULL, },    /*  56  */
-+        { 0x0000000000000000ULL, 0x1cc7711c711cc771ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x1cc7711c711cc771ULL, },
-+        { 0x5555555555555555ULL, 0x1cc7711c711cc771ULL, },
-+        { 0xccccccccccccccccULL, 0x1cc7711c711cc771ULL, },
-+        { 0x3333333333333333ULL, 0x1cc7711c711cc771ULL, },
-+        { 0xe3388ee38ee3388eULL, 0x1cc7711c711cc771ULL, },
-+        { 0x1cc7711c711cc771ULL, 0x1cc7711c711cc771ULL, },
-+        { 0x675e7b0c6acc6240ULL, 0x675e7b0c6acc6240ULL, },    /*  64  */
-+        { 0xf71a3ffcbe639308ULL, 0x675e7b0c6acc6240ULL, },
-+        { 0xd8ff2b145aaacf80ULL, 0x675e7b0c6acc6240ULL, },
-+        { 0xf1d842a04f4d314eULL, 0x675e7b0c6acc6240ULL, },
-+        { 0x675e7b0c6acc6240ULL, 0xf71a3ffcbe639308ULL, },
-+        { 0xf71a3ffcbe639308ULL, 0xf71a3ffcbe639308ULL, },
-+        { 0xd8ff2b145aaacf80ULL, 0xf71a3ffcbe639308ULL, },
-+        { 0xf1d842a04f4d314eULL, 0xf71a3ffcbe639308ULL, },
-+        { 0x675e7b0c6acc6240ULL, 0xd8ff2b145aaacf80ULL, },    /*  72  */
-+        { 0xf71a3ffcbe639308ULL, 0xd8ff2b145aaacf80ULL, },
-+        { 0xd8ff2b145aaacf80ULL, 0xd8ff2b145aaacf80ULL, },
-+        { 0xf1d842a04f4d314eULL, 0xd8ff2b145aaacf80ULL, },
-+        { 0x675e7b0c6acc6240ULL, 0xf1d842a04f4d314eULL, },
-+        { 0xf71a3ffcbe639308ULL, 0xf1d842a04f4d314eULL, },
-+        { 0xd8ff2b145aaacf80ULL, 0xf1d842a04f4d314eULL, },
-+        { 0xf1d842a04f4d314eULL, 0xf1d842a04f4d314eULL, },
-+        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
-+        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
-+        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
-+        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
-+        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
-+        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
-+        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
-+        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
-+        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
-+        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
-+        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
-+        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
-+        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
-+        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
-+        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
-+        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
-+        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
-+        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
-+        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
-+        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
-+        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
-+        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
-+        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
-+        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
-+        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
-+        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
-+        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
-+        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
-+        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
-+        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
-+        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
-+        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
-+    };
-+
-+    reset_msa_registers();
-+
-+    gettimeofday(&start, NULL);
-+
-+    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_BSEL_V(b128_pattern[i], b128_pattern[j],
-+                          b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_BSEL_V(b128_random[i], b128_random[j],
-+                          b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
-+                                       (PATTERN_INPUTS_SHORT_COUNT)) +
-+                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_BSEL_V__DDT(b128_random[i], b128_random[j],
++            do_msa_VSHF_D__DDT(b128_random[i], b128_random[j],
 +                               b128_result[
 +                                   ((PATTERN_INPUTS_SHORT_COUNT) *
 +                                    (PATTERN_INPUTS_SHORT_COUNT)) +
@@ -741,7 +956,7 @@ index 0000000..ca1c389
 +
 +    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
 +        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_BSEL_V__DSD(b128_random[i], b128_random[j],
++            do_msa_VSHF_D__DSD(b128_random[i], b128_random[j],
 +                               b128_result[
 +                                   ((PATTERN_INPUTS_SHORT_COUNT) *
 +                                    (PATTERN_INPUTS_SHORT_COUNT)) +
@@ -751,17 +966,175 @@ index 0000000..ca1c389
 +        }
 +    }
 +
-+    gettimeofday(&end, NULL);
+     gettimeofday(&end, NULL);
+ 
+     elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c
+index 7de1f36..8d416bc 100644
+--- a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c
+@@ -28,7 +28,7 @@
+ 
+ #define TEST_COUNT_TOTAL (                                                \
+             (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
+-            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
+ 
+ 
+ int32_t main(void)
+@@ -123,6 +123,38 @@ int32_t main(void)
+         { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+         { 0x8b808b808b808b80ULL, 0x8b808b808b808b80ULL, },
+         { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
++        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
++        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
++        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
++        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
++        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
++        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
++        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
++        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
++        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
++        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
++        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
++        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
++        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
++        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
++        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
++        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
++        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+     };
+ 
+     reset_msa_registers();
+@@ -145,6 +177,30 @@ int32_t main(void)
+         }
+     }
+ 
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_VSHF_H__DDT(b128_random[i], b128_random[j],
++                               b128_result[
++                                   ((PATTERN_INPUTS_SHORT_COUNT) *
++                                    (PATTERN_INPUTS_SHORT_COUNT)) +
++                                   ((RANDOM_INPUTS_SHORT_COUNT) *
++                                    (RANDOM_INPUTS_SHORT_COUNT)) +
++                                   RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
 +
-+    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
-+    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_VSHF_H__DSD(b128_random[i], b128_random[j],
++                               b128_result[
++                                   ((PATTERN_INPUTS_SHORT_COUNT) *
++                                    (PATTERN_INPUTS_SHORT_COUNT)) +
++                                   (2 * (RANDOM_INPUTS_SHORT_COUNT) *
++                                    (RANDOM_INPUTS_SHORT_COUNT)) +
++                                   RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
 +
-+    ret = check_results_128(isa_ase_name, group_name, instruction_name,
-+                            TEST_COUNT_TOTAL, elapsed_time,
-+                            &b128_result[0][0], &b128_expect[0][0]);
+     gettimeofday(&end, NULL);
+ 
+     elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
+diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c
+index c19fb72..fd8f02d 100644
+--- a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c
++++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c
+@@ -28,7 +28,7 @@
+ 
+ #define TEST_COUNT_TOTAL (                                                \
+             (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
+-            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
+ 
+ 
+ int32_t main(void)
+@@ -123,6 +123,38 @@ int32_t main(void)
+         { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+         { 0xb9cf8b80b9cf8b80ULL, 0xb9cf8b80b9cf8b80ULL, },
+         { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
++        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
++        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
++        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
++        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
++        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
++        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
++        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
++        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
++        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
++        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
++        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
++        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
++        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
++        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
++        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
++        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
++        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
++        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
++        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
++        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+     };
+ 
+     reset_msa_registers();
+@@ -145,6 +177,30 @@ int32_t main(void)
+         }
+     }
+ 
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_VSHF_W__DDT(b128_random[i], b128_random[j],
++                               b128_result[
++                                   ((PATTERN_INPUTS_SHORT_COUNT) *
++                                    (PATTERN_INPUTS_SHORT_COUNT)) +
++                                   ((RANDOM_INPUTS_SHORT_COUNT) *
++                                    (RANDOM_INPUTS_SHORT_COUNT)) +
++                                   RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
 +
-+    return ret;
-+}
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_VSHF_W__DSD(b128_random[i], b128_random[j],
++                               b128_result[
++                                   ((PATTERN_INPUTS_SHORT_COUNT) *
++                                    (PATTERN_INPUTS_SHORT_COUNT)) +
++                                   (2 * (RANDOM_INPUTS_SHORT_COUNT) *
++                                    (RANDOM_INPUTS_SHORT_COUNT)) +
++                                   RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
+     gettimeofday(&end, NULL);
+ 
+     elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
 -- 
 2.7.4
 
