@@ -2,81 +2,103 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9566C4646B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD96DC43613
 	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 11:05:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 966122083B
+	by mail.kernel.org (Postfix) with ESMTPS id 7BDB22075E
 	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 11:05:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 966122083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=wavesemi.onmicrosoft.com header.i=@wavesemi.onmicrosoft.com header.b="MnnNzdQ4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BDB22075E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46138 helo=lists.gnu.org)
+Received: from localhost ([::1]:46136 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdusm-0003ib-D5
+	id 1hdusm-0003hz-M4
 	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 07:05:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45442)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40642)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hdufI-0002G7-7s
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 06:51:38 -0400
+ (envelope-from <arikalo@wavecomp.com>) id 1hduff-0003JU-SN
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 06:52:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hduSu-00032N-JT
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 06:40:30 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:55642)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hduSu-00031Z-E1
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 06:38:48 -0400
-Received: by mail-wm1-f66.google.com with SMTP id a15so2531405wmj.5
- for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 03:38:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=IsljRLYWTjIQPmEFwNCyB8dqzHMxJyFO3IW64lGhZck=;
- b=a1yBZX4Bc6NPW3q321WcNGrIGdrZ9ojGOZJ06AXouXJXncL0x4fDRv4VVCH/yTTXEG
- pQPi58DwV5z1VDTe1j2c/GBm8RbAUBONTBJXfq3RUGEjoXgt5cmesoKXM+XSLyP2y0ey
- a4hSCWB4K5OIQhNHXqa/jLA0ewBmMDo/qolxVXdsk1WSTQv5T/LLbMLttxhPObmkfmSq
- tPyyyQIc5J+/tdnoNgG2xOHBNWm/Dn9qR9AhkH+acicibCu08yBRpZ8YFRPz0/eOl+lR
- v1kN75lrzKni7xwJBWyx/8/mGf/7IyfEd6C2LnICc+/T/0cjIVh0twv7FkU/44WE0QwK
- ZpAw==
-X-Gm-Message-State: APjAAAXwJQC7sz3tth/WQd4atf5TTVA2B+ymcVl5/3nS11OkEhQ0hxbV
- 6RTdtm390ePeJhl29oLj7gNlNA==
-X-Google-Smtp-Source: APXvYqwnfGrvhQWfd89DYdqm8wm6Hmf74q8evRxnVEpYeY4s/2XBMUybAV3apzmU7EBcjBdcpJJfkg==
-X-Received: by 2002:a1c:544d:: with SMTP id p13mr2440380wmi.78.1561027127083; 
- Thu, 20 Jun 2019 03:38:47 -0700 (PDT)
-Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.183])
- by smtp.gmail.com with ESMTPSA id 11sm4995682wmd.23.2019.06.20.03.38.46
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 20 Jun 2019 03:38:46 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20190619194021.8240-1-alex.bennee@linaro.org>
- <20190619194021.8240-6-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <711ca291-a349-64f4-d3d4-1017e95b737d@redhat.com>
-Date: Thu, 20 Jun 2019 12:38:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190619194021.8240-6-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <arikalo@wavecomp.com>) id 1hduF9-0006np-Ch
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 06:24:52 -0400
+Received: from mail-eopbgr680091.outbound.protection.outlook.com
+ ([40.107.68.91]:56964 helo=NAM04-BN3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <arikalo@wavecomp.com>)
+ id 1hduF8-0006lh-VC
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 06:24:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=wavesemi.onmicrosoft.com; s=selector1-wavesemi-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nEfTt9UZVCY5POd87p70mSVHcqXgPSlsh6h4VviLAD4=;
+ b=MnnNzdQ47F9hyQyw5sBo3+fRtbCfVZ0CeqsMhF8Q6rTU+GH+4Qdkt63kIXAJTHPVlXGb3wPScjneyh8Wq0Y3SCclQCcb1oP6Ks5wwKTgq4H/x6tWLFdoA0pnPjvYGsa0ecfeIQlzy8letkxyjmaoROr8loFS6xiATYEfpZq0QZY=
+Received: from DM5PR22MB1658.namprd22.prod.outlook.com (10.164.152.163) by
+ DM5PR22MB0795.namprd22.prod.outlook.com (10.171.158.148) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1987.12; Thu, 20 Jun 2019 10:24:30 +0000
+Received: from DM5PR22MB1658.namprd22.prod.outlook.com
+ ([fe80::3579:1b6c:1f31:c6b9]) by DM5PR22MB1658.namprd22.prod.outlook.com
+ ([fe80::3579:1b6c:1f31:c6b9%7]) with mapi id 15.20.1987.014; Thu, 20 Jun 2019
+ 10:24:30 +0000
+From: Aleksandar Rikalo <arikalo@wavecomp.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Thread-Topic: [PATCH v3 0/4] target/mips: Misc fixes and maintenance for 4.1
+Thread-Index: AQHVJ09CpTQdAwILcUmqxV0XMbM+JaakVYiI
+Date: Thu, 20 Jun 2019 10:24:30 +0000
+Message-ID: <DM5PR22MB1658FD6148E93CFAA6676F02D2E40@DM5PR22MB1658.namprd22.prod.outlook.com>
+References: <1561024929-26004-1-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1561024929-26004-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [PATCH v1 05/17] tests/vm: send proxy environment
- variables over ssh
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=arikalo@wavecomp.com; 
+x-originating-ip: [82.117.201.26]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 09259aa6-e53a-488b-7c88-08d6f5697af3
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:DM5PR22MB0795; 
+x-ms-traffictypediagnostic: DM5PR22MB0795:
+x-microsoft-antispam-prvs: <DM5PR22MB07953F54A08829E0ABC196A9D2E40@DM5PR22MB0795.namprd22.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
+x-forefront-prvs: 0074BBE012
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(366004)(136003)(346002)(376002)(39840400004)(396003)(189003)(199004)(6246003)(52536014)(71190400001)(71200400001)(107886003)(4326008)(66066001)(53546011)(53936002)(2906002)(6506007)(5660300002)(229853002)(478600001)(66446008)(64756008)(66556008)(66476007)(8936002)(91956017)(76116006)(66946007)(73956011)(2501003)(68736007)(256004)(14444005)(316002)(110136005)(14454004)(86362001)(6606003)(99286004)(74316002)(486006)(76176011)(7696005)(476003)(19627405001)(55016002)(7736002)(54896002)(26005)(3846002)(6116002)(102836004)(446003)(55236004)(186003)(25786009)(33656002)(81156014)(81166006)(11346002)(8676002)(9686003)(6436002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DM5PR22MB0795;
+ H:DM5PR22MB1658.namprd22.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: wavecomp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: MGHOt1m5SLZRDPQKVyDNU+dJ9Fodc+0POIEB/5Nxk0TUXA1pFbbjyQ90QqN5p2FMvFj4GdnICMp17P6EmVRD67TPg3/7CA/GBKX8YVuoVJg+/0BBQ0dqIdmGWN01IWARh0sv2Z+qZw0KQhhQVKXf5a/QyWWfLD9ZU/wolq/feke44Pd4xhUeL62dkMzM3GkGCuRAGbJD6OT2mQ5dYvkvaeIClgM0iI774zLwRkK27ah2u2yvws0SIBw0v5p8XSb3gNnNQvuXeKvoGF0zGIJUZDOE9Bbbclj2W/vNPRXb/JOpmZuVVEBrf4H/VaD6wJ6B4gZc4zanWdLt2lbCDmTY8KjpC2WxP8eIufR90tNFgvFS6QuBYU0bLDrtsuwAATXwDmX9W+ibmSk5TW7PWlh+Kvzuj1rH5Oasv2R0LZXqIqQ=
+MIME-Version: 1.0
+X-OriginatorOrg: wavecomp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 09259aa6-e53a-488b-7c88-08d6f5697af3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jun 2019 10:24:30.0423 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: arikalo@wavecomp.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR22MB0795
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.68.91
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] target/mips: Misc fixes and
+ maintenance for 4.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,61 +110,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/19/19 9:40 PM, Alex Bennée wrote:
-> From: Gerd Hoffmann <kraxel@redhat.com>
-> 
-> Packages are fetched via proxy that way, if configured on the host.
-> That might be required to pass firewalls, and it allows to route
-> package downloads through a caching proxy server.
-> 
-> Needs AcceptEnv setup in sshd_config on the guest side to work.
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Tested-by: Thomas Huth <thuth@redhat.com>
+> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+> Sent: Thursday, June 20, 2019 12:02 PM
+> To: qemu-devel@nongnu.org
+> Cc: Aleksandar Markovic; Aleksandar Rikalo
+> Subject: [PATCH v3 0/4] target/mips: Misc fixes and maintenance for 4.1
+>
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>
+> This series contains miscelaneous fixes, improvements, and
+> maintainance items intended to be integrated into QEMU 4.1.
+> I will gradually add patches by the end of June 2019.
+>
+> v2->v3:
+>
+>   - amendeded two patches on cleaning checkpatch warnings
+>
+> v1->v2:
+>
+>   - added two patches on cleaning checkpatch warnings
+>
+> Aleksandar Markovic (4):
+>   MAINTAINERS: Update file items for MIPS Malta board
+>   MAINTAINERS: Consolidate MIPS disassembler-related items
+>   target/mips: Fix some space checkpatch errors in translate.c
+>   target/mips: Fix if-else-switch-case arms checkpatch errors in
+>     translate.c
+>
+>  MAINTAINERS             |   6 +-
+>  target/mips/translate.c | 445 +++++++++++++++++++++++++++---------------=
+------
+>  2 files changed, 257 insertions(+), 194 deletions(-)
+>
+> --
+> 2.7.4
 
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+For the whole series.
+Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 
-> Message-Id: <20190617043858.8290-2-kraxel@redhat.com>
-
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
-> ---
->  tests/vm/basevm.py | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-> index 4847549592..5e30bac661 100755
-> --- a/tests/vm/basevm.py
-> +++ b/tests/vm/basevm.py
-> @@ -38,6 +38,13 @@ class BaseVM(object):
->      GUEST_PASS = "qemupass"
->      ROOT_PASS = "qemupass"
->  
-> +    envvars = [
-> +        "https_proxy",
-> +        "http_proxy",
-> +        "ftp_proxy",
-> +        "no_proxy",
-> +    ]
-> +
->      # The script to run in the guest that builds QEMU
->      BUILD_SCRIPT = ""
->      # The guest name, to be overridden by subclasses
-> @@ -106,6 +113,8 @@ class BaseVM(object):
->                     "-o", "UserKnownHostsFile=" + os.devnull,
->                     "-o", "ConnectTimeout=1",
->                     "-p", self.ssh_port, "-i", self._ssh_key_file]
-> +        for var in self.envvars:
-> +            ssh_cmd += ['-o', "SendEnv=%s" % var ]
->          if interactive:
->              ssh_cmd += ['-t']
->          assert not isinstance(cmd, str)
-> 
 
