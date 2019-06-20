@@ -2,141 +2,90 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39EE1C43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 16:19:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52F89C43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 16:21:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12A392070B
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 16:19:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12A392070B
+	by mail.kernel.org (Postfix) with ESMTPS id 2CCFB2070B
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 16:21:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CCFB2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50154 helo=lists.gnu.org)
+Received: from localhost ([::1]:50164 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdzmr-0003RQ-6w
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 12:19:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36542)
+	id 1hdzox-00057V-A3
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 12:21:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36566)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hdzkc-000299-Ta
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 12:17:27 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hdzlm-0002An-MY
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 12:18:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hdzfU-0008PY-IA
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 12:12:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53382)
+ (envelope-from <mreitz@redhat.com>) id 1hdzWa-00062H-Ov
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 12:02:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59732)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hdzfS-0008MW-CN; Thu, 20 Jun 2019 12:12:06 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hdzWY-0005r1-Al; Thu, 20 Jun 2019 12:02:54 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8F0142F8BD7;
- Thu, 20 Jun 2019 16:11:57 +0000 (UTC)
-Received: from [10.10.123.29] (ovpn-123-29.rdu2.redhat.com [10.10.123.29])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 18A7E5C221;
- Thu, 20 Jun 2019 16:11:50 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+ by mx1.redhat.com (Postfix) with ESMTPS id EBC753092676;
+ Thu, 20 Jun 2019 16:02:37 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.208])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 57F5A6090E;
+ Thu, 20 Jun 2019 16:02:33 +0000 (UTC)
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 References: <20190620010356.19164-1-jsnow@redhat.com>
- <20190620010356.19164-4-jsnow@redhat.com>
- <f3afc686-a37e-3c58-571c-96ae17c16414@redhat.com>
-From: John Snow <jsnow@redhat.com>
+ <20190620010356.19164-7-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
- IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
- vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
- rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
- 1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
- ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
- 3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
- h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
- T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
- LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
- KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
- BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
- qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
- LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
- ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
- J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
- vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
- il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
- 1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
- tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
- 1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
- 3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
- d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
- 5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
- MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
- NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
- TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
- L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
- JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
- /5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
- nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
- 9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
- Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
- e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
- ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
- vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
- C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
- fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
- rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
- TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
- PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
- Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
- E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
- Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
- rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
- cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
- wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
- jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
- vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
- eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
- RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
- CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
- AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
- VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
- XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
- Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
- y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
- sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
- HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
- 8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
- 6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
- y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
- uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
- YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
- 2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
- Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
- TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
- TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
- GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
- rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
- i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
- RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
- glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <997fce5c-4ffa-abe4-ea6a-3fec70c8533b@redhat.com>
-Date: Thu, 20 Jun 2019 12:11:50 -0400
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <f9296483-d48f-521f-1ddd-d514e56b8fdf@redhat.com>
+Date: Thu, 20 Jun 2019 18:02:31 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <f3afc686-a37e-3c58-571c-96ae17c16414@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20190620010356.19164-7-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="IWQgtMeWTPRJeX3Vjc3WMekGGekgDQNyA"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Thu, 20 Jun 2019 16:11:57 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.43]); Thu, 20 Jun 2019 16:02:38 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 03/12] block/backup: add 'never' policy to
- bitmap sync mode
+Subject: Re: [Qemu-devel] [PATCH 06/12] block/dirty-bitmap: add
+ bdrv_dirty_bitmap_claim
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -156,91 +105,76 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--IWQgtMeWTPRJeX3Vjc3WMekGGekgDQNyA
+Content-Type: multipart/mixed; boundary="8yW1ysFceDYwXtfrkUMdUQzVTFZVJY858";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
+ eblake@redhat.com, vsementsov@virtuozzo.com,
+ Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Xie Changlong <xiechanglong.d@gmail.com>
+Message-ID: <f9296483-d48f-521f-1ddd-d514e56b8fdf@redhat.com>
+Subject: Re: [PATCH 06/12] block/dirty-bitmap: add bdrv_dirty_bitmap_claim
+References: <20190620010356.19164-1-jsnow@redhat.com>
+ <20190620010356.19164-7-jsnow@redhat.com>
+In-Reply-To: <20190620010356.19164-7-jsnow@redhat.com>
+
+--8yW1ysFceDYwXtfrkUMdUQzVTFZVJY858
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 20.06.19 03:03, John Snow wrote:
+> This function can claim an hbitmap to replace its own current hbitmap.
+> In the case that the granularities do not match, it will use
+> hbitmap_merge to copy the bit data instead.
+
+I really do not like this name because to me it implies a relationship
+to bdrv_reclaim_dirty_bitmap().  Maybe just bdrv_dirty_bitmap_take()?
+Or, if you want to get more fancy, bdrv_dirty_dirty_bitmap_steal().
+(Because references are taken or stolen.)
+
+The latter might fit in nicely with the abdication theme.  We=E2=80=99d j=
+ust
+need to rename bdrv_reclaim_dirty_bitmap() to
+bdrv_dirty_bitmap_backstab(), and it=E2=80=99d be perfect.
+
+(On another note: bdrv_restore_dirty_bitmap() vs.
+bdrv_dirty_bitmap_restore() =E2=80=93 really? :-/)
+
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  include/block/block_int.h |  1 +
+>  include/qemu/hbitmap.h    |  8 ++++++++
+>  block/dirty-bitmap.c      | 14 ++++++++++++++
+>  util/hbitmap.c            |  5 +++++
+>  4 files changed, 28 insertions(+)
+
+The implementation looks good to me.
+
+Max
 
 
-On 6/20/19 11:25 AM, Max Reitz wrote:
-> On 20.06.19 03:03, John Snow wrote:
->> This adds a "never" policy for bitmap synchronization. Regardless of i=
-f
->> the job succeeds or fails, we never update the bitmap. This can be use=
-d
->> to perform differential backups, or simply to avoid the job modifying =
-a
->> bitmap.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  qapi/block-core.json | 6 +++++-
->>  block/backup.c       | 5 +++--
->>  2 files changed, 8 insertions(+), 3 deletions(-)
->>
->> diff --git a/qapi/block-core.json b/qapi/block-core.json
->> index 6d05ad8f47..0332dcaabc 100644
->> --- a/qapi/block-core.json
->> +++ b/qapi/block-core.json
->> @@ -1146,10 +1146,14 @@
->>  # @conditional: The bitmap is only synchronized when the operation is=
- successul.
->>  #               This is useful for Incremental semantics.
->>  #
->> +# @never: The bitmap is never synchronized with the operation, and is
->> +#         treated solely as a manifest of blocks to copy.
->> +#         This is useful for Differential semantics.
->> +#
->=20
-> Again, this is too buzzword-y for my taste.  I don=E2=80=99t find it as=
- bad
-> because there is not much to explain about this mode, and you do explai=
-n
-> it above, but still.
->=20
+--8yW1ysFceDYwXtfrkUMdUQzVTFZVJY858--
 
-Explained in my response to patch 2, I disagree.
+--IWQgtMeWTPRJeX3Vjc3WMekGGekgDQNyA
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> Like, I (me myself) read this and after the first sentence I think I=E2=
-=80=99ve
-> understood what this is.  Then I read =E2=80=9Cfor Differential semanti=
-cs=E2=80=9D and
-> I=E2=80=99m confused.  After a couple of seconds, I realize what you me=
-an
-> because I=E2=80=99ve described in my response to patch 1.
->=20
-> One reason it leaves the buzzword-y taste is because =E2=80=9Cdifferent=
-ial=E2=80=9D is
-> never explained anywhere.  bitmaps.rst makes two mentions of it, but it
-> too just assumes I know what you mean.  Also, incremental backups are
-> just a certain kind of differential backups.
->=20
+-----BEGIN PGP SIGNATURE-----
 
-This, however, is a real shortcoming of the doc. You'll notice I didn't
-propose a doc update in this patchset, because secretly it's an RFC and
-I did expect a v2+.
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0LrhcACgkQ9AfbAGHV
+z0AmMwf/RzAMt2wrtPGWp7a9t4WTD35wWNovVIu5lt6Y/rnjO6Mof78vc9JGQgsv
+rqm+c0Ln9Ov98rsmUL4kYfTERtWuLaeXgqmm/+DHVrxLH5JHnRgGtM90A1s8Z69F
+mf4WW08QGO+JjKGySEq0K8r6aVRA39/aW4Yupqq3rEe7/0VcHHXge8iZTKqG10z5
+oz+gWViTflQfLoJzXvpwBYbv4n0hdTfH3XZefRY5dcKDBNMLfILZrncJONaa3+LB
+4WTIyRejZUc884Jl9k7QQAAV6EmbSEIkd6kyim6OmfkqJ3m2s/6q2/K8skM/Lx1h
+r+rxKiYo4zWuPlxeBORRdNLUFcCSIg==
+=SuVz
+-----END PGP SIGNATURE-----
 
-> So you need to explain =E2=80=9Cdifferential=E2=80=9D somewhere and how=
- it differs from
-> =E2=80=9Cincremental=E2=80=9D in this regard.  Why not here?
->=20
-
-Too broad of a concept to explain down in qapi comment strings, or I'd
-have to explain it everywhere. bitmaps.rst is the correct place.
-
-> =E2=80=9CThis is useful when you wish to repeatedly perform operations =
-in
-> reference to a constant synchronization point (when the bitmap was
-> created).=E2=80=9D
->=20
-> Or something.
->=20
-> Max
->=20
->>  # Since: 4.1
->>  ##
->>  { 'enum': 'BitmapSyncMode',
->> -  'data': ['conditional'] }
->> +  'data': ['conditional', 'never'] }
->> =20
->>  ##
->>  # @MirrorCopyMode:
->=20
-
+--IWQgtMeWTPRJeX3Vjc3WMekGGekgDQNyA--
 
