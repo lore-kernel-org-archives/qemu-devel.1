@@ -2,89 +2,92 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C0C8C43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 14:35:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 941A9C43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 14:39:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 338982064B
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 14:35:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 338982064B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 60C902084A
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 14:39:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EdkmQuwX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60C902084A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48330 helo=lists.gnu.org)
+Received: from localhost ([::1]:48386 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdyAK-0003yP-UL
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 10:35:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37832)
+	id 1hdyE1-0007s9-RJ
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 10:39:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37988)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hdy5r-0001AM-RT
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:33:06 -0400
+ (envelope-from <richard.weiyang@gmail.com>) id 1hdy8H-00022u-5c
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:33:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hdxyP-0005Of-RU
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:25:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47324)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hdxwa-0004Jw-9W; Thu, 20 Jun 2019 10:21:41 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B37E630C0DC2;
- Thu, 20 Jun 2019 14:21:32 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.208])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1DD4019C4F;
- Thu, 20 Jun 2019 14:21:27 +0000 (UTC)
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <20190620010356.19164-1-jsnow@redhat.com>
- <20190620010356.19164-2-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <d671f373-77d1-d475-ff23-30bd7674c6df@redhat.com>
-Date: Thu, 20 Jun 2019 16:21:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <richard.weiyang@gmail.com>) id 1hdxtm-0002YP-Gh
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:20:35 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:35917)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
+ id 1hdxtm-0002Xv-Av
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 10:18:46 -0400
+Received: by mail-ed1-x542.google.com with SMTP id k21so4996720edq.3
+ for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 07:18:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=qdVDpTURAiB1SW/IAbXTaS4d4qTb3suKU1xREmXg18U=;
+ b=EdkmQuwXaVALYatY5/mocNlBXGRgL+PARVVZZVy4CWNm7zABXKY18rmqVuSQeQxLVt
+ R4oZ4wxGfJCdZcu8+wcljjtSpPtQUhQvmTA10eFmNCKX99ukBGH6bfdqmX7jAdd6DaWj
+ HsZGi1IdNlwg7svJ+VUXy24JtlguxC7H6fP4YhGMRkop/LJMdLCOTQfkax+vsQvESn3C
+ Ruz6Y+wochoahp1eaXssuz2Wv3+k66yiZiyLPg43Ra9dgxX67DpAqJ5LjSZ44f3a7etI
+ XE/XdrDiG1aPd187qeEP+eoaliEGkAra2A3jyea65vSQFIgPrjnbI3cehsU4bHKDSk1u
+ 2s1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
+ :references:mime-version:content-disposition:in-reply-to:user-agent;
+ bh=qdVDpTURAiB1SW/IAbXTaS4d4qTb3suKU1xREmXg18U=;
+ b=op5AfpgEogNZuwkR3fvELuyWKcN/Zj4Rpr+tRPitqFABX6rCdD9FpoW54Uk9ahXpH7
+ xjzwXcUvJ4mQfxpxAdk8lP8wK5wFswexM+GVtNvMEbD0Vkb5n6wBirgyZCzjx7vGYZ85
+ mxeRxIQVDrrUJP8evk5qiO3TbNBJmfzZJT55FhUGOEgUvD8S2r8s50aTxOIsMNqcYAIz
+ VfGzkkS5ZZQzEfKwGy2oaiwwt60ydZBg+CfTRkHL4fd+g1zBGzG0Mlg8ywaBUhEu7/HL
+ zW0Tcup1MMh5o9Ys5h8aZE9veIdCEcieIxBlqY93kTzrlNfVRPkLL4+PKzMCpFPl2bp1
+ UTEA==
+X-Gm-Message-State: APjAAAVm9fi5yq1Gg+S/frFTQ8vo/g7M6O8Azfya9MakR3tBUQv41BqQ
+ AsaRgkxovNX0hCqD0uFEBTM=
+X-Google-Smtp-Source: APXvYqzxCAohb/V1gPxW1e1x3KXn/fLgrKSsdZpCdzIgNjMruArul8JUNNmzeZOvcvtIXd60AtZysg==
+X-Received: by 2002:a50:94a2:: with SMTP id
+ s31mr100273775eda.290.1561040324419; 
+ Thu, 20 Jun 2019 07:18:44 -0700 (PDT)
+Received: from localhost ([185.92.221.13])
+ by smtp.gmail.com with ESMTPSA id g2sm2744135edg.81.2019.06.20.07.18.42
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Thu, 20 Jun 2019 07:18:43 -0700 (PDT)
+Date: Thu, 20 Jun 2019 14:18:42 +0000
+From: Wei Yang <richard.weiyang@gmail.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190620141842.ijqwozpjrkccy7qx@master>
+References: <20190513061913.9284-1-richardw.yang@linux.intel.com>
+ <20190618175956.4373ac7e@redhat.com>
+ <20190619062050.GA15665@richard>
+ <20190619110440.13a54848@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190620010356.19164-2-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="iV4RdhEYnAWY9zIp5Im1BXp1uDa80diTE"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Thu, 20 Jun 2019 14:21:32 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 01/12] qapi: add BitmapSyncMode enum
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190619110440.13a54848@redhat.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::542
+Subject: Re: [Qemu-devel] [RFC PATCH 0/9] hw/acpi: make build_madt arch
+ agnostic
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,120 +99,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- vsementsov@virtuozzo.com, Wen Congyang <wencongyang2@huawei.com>,
- Xie Changlong <xiechanglong.d@gmail.com>,
- Markus Armbruster <armbru@redhat.com>
+Reply-To: Wei Yang <richard.weiyang@gmail.com>
+Cc: yang.zhong@intel.com, ehabkost@redhat.com, mst@redhat.com,
+ qemu-devel@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
+ pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---iV4RdhEYnAWY9zIp5Im1BXp1uDa80diTE
-Content-Type: multipart/mixed; boundary="ST1J5Omq9yA8FbeUpP3LhBMAEK5IiPnwh";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
- eblake@redhat.com, vsementsov@virtuozzo.com,
- Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>,
- Xie Changlong <xiechanglong.d@gmail.com>
-Message-ID: <d671f373-77d1-d475-ff23-30bd7674c6df@redhat.com>
-Subject: Re: [PATCH 01/12] qapi: add BitmapSyncMode enum
-References: <20190620010356.19164-1-jsnow@redhat.com>
- <20190620010356.19164-2-jsnow@redhat.com>
-In-Reply-To: <20190620010356.19164-2-jsnow@redhat.com>
+On Wed, Jun 19, 2019 at 11:04:40AM +0200, Igor Mammedov wrote:
+>On Wed, 19 Jun 2019 14:20:50 +0800
+>Wei Yang <richardw.yang@linux.intel.com> wrote:
+>
+>> On Tue, Jun 18, 2019 at 05:59:56PM +0200, Igor Mammedov wrote:
+>> >
+>> >On Mon, 13 May 2019 14:19:04 +0800
+>> >Wei Yang <richardw.yang@linux.intel.com> wrote:
+>> >  
+>> >> Now MADT is highly depend in architecture and machine type and leaves
+>> >> duplicated code in different architecture. The series here tries to generalize
+>> >> it.
+>> >> 
+>> >> MADT contains one main table and several sub tables. These sub tables are
+>> >> highly related to architecture. Here we introduce one method to make it
+>> >> architecture agnostic.
+>> >> 
+>> >>   * each architecture define its sub-table implementation function in madt_sub
+>> >>   * introduces struct madt_input to collect sub table information and pass to
+>> >>     build_madt
+>> >> 
+>> >> By doing so, each architecture could prepare its own sub-table implementation
+>> >> and madt_input. And keep build_madt architecture agnostic.  
+>> >
+>> >I've skimmed over patches, and to me it looks mostly as code movement
+>> >without apparent benefits and probably a bit more complex than what we have now
+>> >(it might be ok cost if it simplifies MADT support for other boards).
+>> >
+>> >Before I do line by line review could you demonstrate what effect new way
+>> >to build MADT would have on arm/virt and i386/virt (from NEMU). So it would be
+>> >possible to estimate net benefits from new approach?
+>> >(PS: it doesn't have to be patches ready for merging, just a dirty hack
+>> >that would demonstrate adding MADT for new board using mad_sub[])
+>> >  
+>> 
+>> Per APIC spec 5.2.12, MADT contains a *main* table and several *sub* tables
+>> (Interrupt Controllere), so the idea is give a callback hook in
+>> AcpiDeviceIfClass for each table, including *main* and *sub* table.
+>> 
+>> Current AcpiDeviceIfClass has one callback pc_madt_cpu_entry for some *sub*
+>> tables, after replacing the AcpiDeviceIfClass will look like this:
+>> 
+>> typedef struct AcpiDeviceIfClass {
+>>     /* <private> */
+>>     InterfaceClass parent_class;
+>> 
+>>     /* <public> */
+>>     void (*ospm_status)(AcpiDeviceIf *adev, ACPIOSTInfoList ***list);
+>>     void (*send_event)(AcpiDeviceIf *adev, AcpiEventStatusBits ev);
+>> -   void (*madt_cpu)(AcpiDeviceIf *adev, int uid,
+>> -                    const CPUArchIdList *apic_ids, GArray *entry);
+>> +   madt_operation madt_main;
+>> +   madt_operation *madt_sub;
+>> } AcpiDeviceIfClass;
+>> 
+>> By doing so, each arch could have its own implementation for MADT.
+>> 
+>> After this refactoring, build_madt could be simplified to:
+>> 
+>> build_madt(GArray *table_data, BIOSLinker *linker, PCMachineState *pcms,
+>>            struct madt_input *input)
+>> {
+>>     ...
+>> 
+>>     if (adevc->madt_main) {
+>>         adevc->madt_main(table_data, madt);
+>>     }
+>> 
+>>     for (i = 0; ; i++) {
+>>         sub_id = input[i].sub_id;
+>>         if (sub_id == ACPI_APIC_RESERVED) {
+>>             break;
+>>         }
+>>         opaque = input[i].opaque;
+>>         adevc->madt_sub[sub_id](table_data, opaque);
+>>     }
+>> 
+>>     ...
+>> }
+>> 
+>> input is a list of data necessary to build *sub* table. Its details is also
+>> arch dependent.
+>I've got general idea reading patches in this series.
+>As I've mentioned before it's hard to generalize MADT since it
+>mostly contains entries unique for target/board.
+>Goal here isn't generalizing at any cost, but rather find out
+>if there is enough common code to justify generalization
+>and if it allows us to reduce code duplication and simplify.
+>
+>> For following new arch, what it need to do is prepare the input array and
+>> implement necessary *main*/*sub* table callbacks.
+>What I'd like to see is the actual patch that does this,
+>to see if it has any merit and to compare to the current
+>approach.
 
---ST1J5Omq9yA8FbeUpP3LhBMAEK5IiPnwh
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+I didn't get some idea about your approach. Would you mind sharing more light?
 
-On 20.06.19 03:03, John Snow wrote:
-> Depending on what a user is trying to accomplish, there might be a few
-> bitmap cleanup actions that occur when an operation is finished that
-> could be useful.
->=20
-> I am proposing three:
-> - NEVER: The bitmap is never synchronized against what was copied.
-> - ALWAYS: The bitmap is always synchronized, even on failures.
-> - CONDITIONAL: The bitmap is synchronized only on success.
->=20
-> The existing incremental backup modes use 'conditional' semantics,
-> so add just that one for right now.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  qapi/block-core.json | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
->=20
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 0d43d4f37c..caf28a71a0 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -1134,6 +1134,20 @@
->  { 'enum': 'MirrorSyncMode',
->    'data': ['top', 'full', 'none', 'incremental'] }
-> =20
-> +##
-> +# @BitmapSyncMode:
-> +#
-> +# An enumeration of possible behaviors for the synchronization of a bi=
-tmap
-> +# when used for data copy operations.
-> +#
-> +# @conditional: The bitmap is only synchronized when the operation is =
-successul.
-
-*successful
-
-> +#               This is useful for Incremental semantics.
-
-Hm, well.  All bitmap modes are for incremental semantics, in some way
-or another.  (=E2=80=9Cconditional=E2=80=9D and =E2=80=9Calways=E2=80=9D =
-just automatically create
-point-in-time snapshots, in a sense, where =E2=80=9Cnever=E2=80=9D requir=
-es the user to
-manually do so.)
-
-So maybe something more concrete would be better?  Like =E2=80=9CThis all=
-ows
-incremental use from one successful operation to the next, and
-restarting any operation on failure=E2=80=9D?
-
-Max
-
-> +#
-> +# Since: 4.1
-> +##
-> +{ 'enum': 'BitmapSyncMode',
-> +  'data': ['conditional'] }
-> +
->  ##
->  # @MirrorCopyMode:
->  #
->=20
-
-
-
---ST1J5Omq9yA8FbeUpP3LhBMAEK5IiPnwh--
-
---iV4RdhEYnAWY9zIp5Im1BXp1uDa80diTE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0LlmYACgkQ9AfbAGHV
-z0AVtggAkVtU5NzSPC4wAXtTDZLrwXOOsfIMcGaozOWQjsEKMda6bXrR06FS4gZ+
-bI594qPuc6C1cIwEg4E1P/wVtYhJzHzbjTviiwF4F1lVniM7gsyT3enUco+gJgb+
-2RIMycIMRIMMSvmqr2F0bfRUKEE7lzew1wq2CdApCGgoorRoK7ht6WUsb2CYU8Rh
-/4PE7GBIjqxm8olbcrqUXfqIzTz0dNPgH9Q0ugp107a8/EIyoBTv4XaqhE8xlF0q
-ED27It91kYiYpoMyNda7pv7c/Y3WbMbIyGackfh5TO6b8c1xEPgk87sKpGvLxSjy
-40lZp/jdlkIsk8v8yNcMa3WS2ertJw==
-=ZLP/
------END PGP SIGNATURE-----
-
---iV4RdhEYnAWY9zIp5Im1BXp1uDa80diTE--
+-- 
+Wei Yang
+Help you, Help me
 
