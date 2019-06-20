@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CA1DC43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 01:17:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25458C43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 01:17:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 748F121537
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 01:17:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 748F121537
+	by mail.kernel.org (Postfix) with ESMTPS id EBDD621537
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 01:17:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBDD621537
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42888 helo=lists.gnu.org)
+Received: from localhost ([::1]:42890 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdlhd-0004UI-HZ
-	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 21:17:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40379)
+	id 1hdli4-0004qd-4M
+	for qemu-devel@archiver.kernel.org; Wed, 19 Jun 2019 21:17:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40708)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hdle4-0001zb-9m
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 21:13:45 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hdle7-0002EK-L9
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 21:13:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hdlV1-00050V-8K
- for qemu-devel@nongnu.org; Wed, 19 Jun 2019 21:04:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53408)
+ (envelope-from <jsnow@redhat.com>) id 1hdlUo-0004pQ-Pi
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 21:04:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54584)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hdlUu-0004uB-Jv; Wed, 19 Jun 2019 21:04:16 -0400
+ id 1hdlUn-0004mk-40; Wed, 19 Jun 2019 21:04:09 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CB57F81F1B;
- Thu, 20 Jun 2019 01:04:15 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 55F4381129;
+ Thu, 20 Jun 2019 01:04:08 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-164.bos.redhat.com [10.18.17.164])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AF4FF1001E67;
- Thu, 20 Jun 2019 01:04:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 395671001E67;
+ Thu, 20 Jun 2019 01:04:07 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Date: Wed, 19 Jun 2019 21:03:54 -0400
-Message-Id: <20190620010356.19164-11-jsnow@redhat.com>
+Date: Wed, 19 Jun 2019 21:03:48 -0400
+Message-Id: <20190620010356.19164-5-jsnow@redhat.com>
 In-Reply-To: <20190620010356.19164-1-jsnow@redhat.com>
 References: <20190620010356.19164-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Thu, 20 Jun 2019 01:04:15 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.28]); Thu, 20 Jun 2019 01:04:08 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 10/12] iotests: teach FilePath to produce
- multiple paths
+Subject: [Qemu-devel] [PATCH 04/12] hbitmap: Fix merge when b is empty,
+ and result is not an alias of a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,66 +77,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use "FilePaths" instead of "FilePath" to request multiple files be
-cleaned up after we leave that object's scope.
-
-This is not crucial; but it saves a little typing.
+Nobody calls the function like this currently, but we neither prohibit
+or cope with this behavior. I decided to make the function cope with it.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 21 +++++++++++++++------
- 1 file changed, 15 insertions(+), 6 deletions(-)
+ util/hbitmap.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-index c544659ecb..b938fa9719 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -359,7 +359,7 @@ class Timeout:
-         raise Exception(self.errmsg)
+diff --git a/util/hbitmap.c b/util/hbitmap.c
+index 7905212a8b..45d1725daf 100644
+--- a/util/hbitmap.c
++++ b/util/hbitmap.c
+@@ -781,8 +781,9 @@ bool hbitmap_can_merge(const HBitmap *a, const HBitma=
+p *b)
+ }
 =20
+ /**
+- * Given HBitmaps A and B, let A :=3D A (BITOR) B.
+- * Bitmap B will not be modified.
++ * Given HBitmaps A and B, let R :=3D A (BITOR) B.
++ * Bitmaps A and B will not be modified,
++ *     except when bitmap R is an alias of A or B.
+  *
+  * @return true if the merge was successful,
+  *         false if it was not attempted.
+@@ -797,7 +798,9 @@ bool hbitmap_merge(const HBitmap *a, const HBitmap *b=
+, HBitmap *result)
+     }
+     assert(hbitmap_can_merge(b, result));
 =20
--class FilePath(object):
-+class FilePaths(object):
-     '''An auto-generated filename that cleans itself up.
+-    if (hbitmap_count(b) =3D=3D 0) {
++    if ((!hbitmap_count(a) && result =3D=3D b) ||
++        (!hbitmap_count(b) && result =3D=3D a) ||
++        (!hbitmap_count(a) && !hbitmap_count(b))) {
+         return true;
+     }
 =20
-     Use this context manager to generate filenames and ensure that the f=
-ile
-@@ -369,20 +369,29 @@ class FilePath(object):
-             qemu_img('create', img_path, '1G')
-         # migration_sock_path is automatically deleted
-     '''
--    def __init__(self, name):
--        filename =3D '{0}-{1}'.format(os.getpid(), name)
--        self.path =3D os.path.join(test_dir, filename)
-+    def __init__(self, names):
-+        self.paths =3D []
-+        for name in names:
-+            filename =3D '{0}-{1}'.format(os.getpid(), name)
-+            self.paths.append(os.path.join(test_dir, filename))
-=20
-     def __enter__(self):
--        return self.path
-+        return self.paths
-=20
-     def __exit__(self, exc_type, exc_val, exc_tb):
-         try:
--            os.remove(self.path)
-+            for path in self.paths:
-+                os.remove(path)
-         except OSError:
-             pass
-         return False
-=20
-+class FilePath(FilePaths):
-+    def __init__(self, name):
-+        super(FilePath, self).__init__([name])
-+
-+    def __enter__(self):
-+        return self.paths[0]
-=20
- def file_path_remover():
-     for path in reversed(file_path_remover.paths):
 --=20
 2.21.0
 
