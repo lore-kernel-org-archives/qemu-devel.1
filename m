@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 346E7C43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 16:19:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39EE1C43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 16:19:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D7342070B
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 16:19:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D7342070B
+	by mail.kernel.org (Postfix) with ESMTPS id 12A392070B
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 16:19:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12A392070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50144 helo=lists.gnu.org)
+Received: from localhost ([::1]:50154 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdzmY-0003CG-0g
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 12:19:26 -0400
+	id 1hdzmr-0003RQ-6w
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 12:19:45 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:36542)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hdzkZ-000299-A2
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 12:17:24 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hdzkc-000299-Ta
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 12:17:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hdzhM-0001vh-9k
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 12:14:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40752)
+ (envelope-from <jsnow@redhat.com>) id 1hdzfU-0008PY-IA
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 12:12:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53382)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hdzhK-0001sn-LT; Thu, 20 Jun 2019 12:14:02 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1hdzfS-0008MW-CN; Thu, 20 Jun 2019 12:12:06 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BB9DC30821C1;
- Thu, 20 Jun 2019 16:13:56 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8F0142F8BD7;
+ Thu, 20 Jun 2019 16:11:57 +0000 (UTC)
 Received: from [10.10.123.29] (ovpn-123-29.rdu2.redhat.com [10.10.123.29])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7CD2260579;
- Thu, 20 Jun 2019 16:13:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 18A7E5C221;
+ Thu, 20 Jun 2019 16:11:50 +0000 (UTC)
 To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 References: <20190620010356.19164-1-jsnow@redhat.com>
- <20190620010356.19164-5-jsnow@redhat.com>
- <5a326b6e-eb17-60a5-a656-286a087cd939@redhat.com>
+ <20190620010356.19164-4-jsnow@redhat.com>
+ <f3afc686-a37e-3c58-571c-96ae17c16414@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -121,22 +121,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <e0d8491c-e463-a6a5-b2af-4da6275dbb4e@redhat.com>
-Date: Thu, 20 Jun 2019 12:13:45 -0400
+Message-ID: <997fce5c-4ffa-abe4-ea6a-3fec70c8533b@redhat.com>
+Date: Thu, 20 Jun 2019 12:11:50 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <5a326b6e-eb17-60a5-a656-286a087cd939@redhat.com>
+In-Reply-To: <f3afc686-a37e-3c58-571c-96ae17c16414@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Thu, 20 Jun 2019 16:13:56 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.38]); Thu, 20 Jun 2019 16:11:57 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 04/12] hbitmap: Fix merge when b is empty,
- and result is not an alias of a
+Subject: Re: [Qemu-devel] [PATCH 03/12] block/backup: add 'never' policy to
+ bitmap sync mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -158,56 +158,89 @@ Sender: "Qemu-devel"
 
 
 
-On 6/20/19 11:39 AM, Max Reitz wrote:
+On 6/20/19 11:25 AM, Max Reitz wrote:
 > On 20.06.19 03:03, John Snow wrote:
->> Nobody calls the function like this currently, but we neither prohibit
->> or cope with this behavior. I decided to make the function cope with it.
+>> This adds a "never" policy for bitmap synchronization. Regardless of i=
+f
+>> the job succeeds or fails, we never update the bitmap. This can be use=
+d
+>> to perform differential backups, or simply to avoid the job modifying =
+a
+>> bitmap.
 >>
 >> Signed-off-by: John Snow <jsnow@redhat.com>
 >> ---
->>  util/hbitmap.c | 9 ++++++---
->>  1 file changed, 6 insertions(+), 3 deletions(-)
+>>  qapi/block-core.json | 6 +++++-
+>>  block/backup.c       | 5 +++--
+>>  2 files changed, 8 insertions(+), 3 deletions(-)
 >>
->> diff --git a/util/hbitmap.c b/util/hbitmap.c
->> index 7905212a8b..45d1725daf 100644
->> --- a/util/hbitmap.c
->> +++ b/util/hbitmap.c
->> @@ -781,8 +781,9 @@ bool hbitmap_can_merge(const HBitmap *a, const HBitmap *b)
->>  }
->>  
->>  /**
->> - * Given HBitmaps A and B, let A := A (BITOR) B.
->> - * Bitmap B will not be modified.
->> + * Given HBitmaps A and B, let R := A (BITOR) B.
->> + * Bitmaps A and B will not be modified,
->> + *     except when bitmap R is an alias of A or B.
->>   *
->>   * @return true if the merge was successful,
->>   *         false if it was not attempted.
->> @@ -797,7 +798,9 @@ bool hbitmap_merge(const HBitmap *a, const HBitmap *b, HBitmap *result)
->>      }
->>      assert(hbitmap_can_merge(b, result));
->>  
->> -    if (hbitmap_count(b) == 0) {
->> +    if ((!hbitmap_count(a) && result == b) ||
->> +        (!hbitmap_count(b) && result == a) ||
->> +        (!hbitmap_count(a) && !hbitmap_count(b))) {
->>          return true;
->>      }
-> 
-> The rest of this function completely overwrites the @result bitmap.
-> Therefor, @result does not need to be cleared when calling this function.
-> 
-> Therfore, hbitmap_merge(hbitmap_alloc(), hbitmap_alloc(), output) should
-> actually clear @output, I think.
-> 
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index 6d05ad8f47..0332dcaabc 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -1146,10 +1146,14 @@
+>>  # @conditional: The bitmap is only synchronized when the operation is=
+ successul.
+>>  #               This is useful for Incremental semantics.
+>>  #
+>> +# @never: The bitmap is never synchronized with the operation, and is
+>> +#         treated solely as a manifest of blocks to copy.
+>> +#         This is useful for Differential semantics.
+>> +#
+>=20
+> Again, this is too buzzword-y for my taste.  I don=E2=80=99t find it as=
+ bad
+> because there is not much to explain about this mode, and you do explai=
+n
+> it above, but still.
+>=20
+
+Explained in my response to patch 2, I disagree.
+
+> Like, I (me myself) read this and after the first sentence I think I=E2=
+=80=99ve
+> understood what this is.  Then I read =E2=80=9Cfor Differential semanti=
+cs=E2=80=9D and
+> I=E2=80=99m confused.  After a couple of seconds, I realize what you me=
+an
+> because I=E2=80=99ve described in my response to patch 1.
+>=20
+> One reason it leaves the buzzword-y taste is because =E2=80=9Cdifferent=
+ial=E2=80=9D is
+> never explained anywhere.  bitmaps.rst makes two mentions of it, but it
+> too just assumes I know what you mean.  Also, incremental backups are
+> just a certain kind of differential backups.
+>=20
+
+This, however, is a real shortcoming of the doc. You'll notice I didn't
+propose a doc update in this patchset, because secretly it's an RFC and
+I did expect a v2+.
+
+> So you need to explain =E2=80=9Cdifferential=E2=80=9D somewhere and how=
+ it differs from
+> =E2=80=9Cincremental=E2=80=9D in this regard.  Why not here?
+>=20
+
+Too broad of a concept to explain down in qapi comment strings, or I'd
+have to explain it everywhere. bitmaps.rst is the correct place.
+
+> =E2=80=9CThis is useful when you wish to repeatedly perform operations =
+in
+> reference to a constant synchronization point (when the bitmap was
+> created).=E2=80=9D
+>=20
+> Or something.
+>=20
 > Max
-> 
+>=20
+>>  # Since: 4.1
+>>  ##
+>>  { 'enum': 'BitmapSyncMode',
+>> -  'data': ['conditional'] }
+>> +  'data': ['conditional', 'never'] }
+>> =20
+>>  ##
+>>  # @MirrorCopyMode:
+>=20
 
-Ah, wellp, you're right. That'd be the second problem with this function.
-
-It used to be strictly A = A | B, but we changed it -- very incompletely
--- to R = A | B; which explains these two bugs.
-
-Thanks.
 
