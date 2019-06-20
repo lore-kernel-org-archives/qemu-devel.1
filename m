@@ -2,66 +2,61 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE84FC43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 05:55:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79B6CC43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 05:55:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8706B20B1F
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 05:55:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8706B20B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 503D820B1F
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 05:55:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 503D820B1F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43868 helo=lists.gnu.org)
+Received: from localhost ([::1]:43872 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdq2N-0003D0-QL
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 01:55:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56700)
+	id 1hdq2o-0003qd-HP
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 01:55:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56214)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kraxel@redhat.com>) id 1hdpyE-0007pv-Vx
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 01:50:51 -0400
+ (envelope-from <like.xu@linux.intel.com>) id 1hdpvg-0005yz-IJ
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 01:48:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1hdpyD-00047g-1F
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 01:50:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50452)
+ (envelope-from <like.xu@linux.intel.com>) id 1hdpvc-0001pv-T5
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 01:48:12 -0400
+Received: from mga05.intel.com ([192.55.52.43]:20328)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>)
- id 1hdpy8-00043F-UA; Thu, 20 Jun 2019 01:50:45 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1F4D175724;
- Thu, 20 Jun 2019 05:50:44 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-212.ams2.redhat.com
- [10.36.116.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B7E9B19C6F;
- Thu, 20 Jun 2019 05:50:42 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 9D48316E19; Thu, 20 Jun 2019 07:50:38 +0200 (CEST)
-Date: Thu, 20 Jun 2019 07:50:38 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Message-ID: <20190620055038.w7zwwxviqfp4vxvr@sirius.home.kraxel.org>
-References: <20190619092905.24029-1-shmuel.eiderman@oracle.com>
- <156093697557.22612.8821990862661724517@ce79690b2cb9>
+ (Exim 4.71) (envelope-from <like.xu@linux.intel.com>)
+ id 1hdpvc-0001iJ-KG
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 01:48:08 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+ by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 19 Jun 2019 22:47:59 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,395,1557212400"; d="scan'208";a="162243084"
+Received: from unknown (HELO likexu-E5-2699-v4.sh.intel.com) ([10.239.48.178])
+ by fmsmga007.fm.intel.com with ESMTP; 19 Jun 2019 22:47:58 -0700
+From: Like Xu <like.xu@linux.intel.com>
+To: qemu-devel@nongnu.org,
+	Eduardo Habkost <ehabkost@redhat.com>
+Date: Thu, 20 Jun 2019 13:45:23 +0800
+Message-Id: <20190620054525.37188-2-like.xu@linux.intel.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190620054525.37188-1-like.xu@linux.intel.com>
+References: <20190620054525.37188-1-like.xu@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <156093697557.22612.8821990862661724517@ce79690b2cb9>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Thu, 20 Jun 2019 05:50:44 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [SeaBIOS] [QEMU] [PATCH v4 0/8] Add Qemu to
- SeaBIOS LCHS interface
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.43
+Subject: [Qemu-devel] [PATCH v4 1/3] target/i386: Add CPUID.1F generation
+ support for multi-dies PCMachine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,38 +68,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, arbel.moshe@oracle.com,
- seabios@seabios.org, mreitz@redhat.com, kevin@koconnor.net,
- shmuel.eiderman@oracle.com, karl.heubaum@oracle.com
+Cc: like.xu@intel.com, Marcelo Tosatti <mtosatti@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> === OUTPUT BEGIN ===
-> 1/8 Checking commit cf2168a66dbd (block: Refactor macros - fix tabbing)
-> ERROR: Macros with complex values should be enclosed in parenthesis
-> #55: FILE: include/hw/block/block.h:65:
-> +#define DEFINE_BLOCK_CHS_PROPERTIES(_state, _conf)                      \
-> +    DEFINE_PROP_UINT32("cyls", _state, _conf.cyls, 0),                  \
-> +    DEFINE_PROP_UINT32("heads", _state, _conf.heads, 0),                \
->      DEFINE_PROP_UINT32("secs", _state, _conf.secs, 0)
+The CPUID.1F as Intel V2 Extended Topology Enumeration Leaf would be
+exposed if guests want to emulate multiple software-visible die within
+each package. Per Intel's SDM, the 0x1f is a superset of 0xb, thus they
+can be generated by almost same code as 0xb except die_offset setting.
 
-False positive.
+If the number of dies per package is greater than 1, the cpuid_min_level
+would be adjusted to 0x1f regardless of whether the host supports CPUID.1F.
+Likewise, the CPUID.1F wouldn't be exposed if env->nr_dies < 2.
 
-> 8/8 Checking commit 6664d7d898d5 (hd-geo-test: Add tests for lchs override)
-> WARNING: line over 80 characters
-> #242: FILE: tests/hd-geo-test.c:579:
-> +                     (char *)r->dev_path, &(r->chs.c), &(r->chs.h), &(r->chs.s));
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Like Xu <like.xu@linux.intel.com>
+---
+ target/i386/cpu.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ target/i386/cpu.h |  1 +
+ target/i386/kvm.c | 12 ++++++++++++
+ 3 files changed, 54 insertions(+)
 
-Should be fixed.
-
-> WARNING: Block comments use a leading /* on a separate line
-> #640: FILE: tests/hd-geo-test.c:995:
-> +                       "skipping hd-geo/override/* tests");
-
-False positive too.
-
-cheers,
-  Gerd
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 88908a6373..efcbe6a2b2 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -4439,6 +4439,42 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+             *ecx |= CPUID_TOPOLOGY_LEVEL_INVALID;
+         }
+ 
++        assert(!(*eax & ~0x1f));
++        *ebx &= 0xffff; /* The count doesn't need to be reliable. */
++        break;
++    case 0x1F:
++        /* V2 Extended Topology Enumeration Leaf */
++        if (env->nr_dies < 2) {
++            *eax = *ebx = *ecx = *edx = 0;
++            break;
++        }
++
++        *ecx = count & 0xff;
++        *edx = cpu->apic_id;
++        switch (count) {
++        case 0:
++            *eax = apicid_core_offset(env->nr_dies, cs->nr_cores,
++                                                    cs->nr_threads);
++            *ebx = cs->nr_threads;
++            *ecx |= CPUID_TOPOLOGY_LEVEL_SMT;
++            break;
++        case 1:
++            *eax = apicid_die_offset(env->nr_dies, cs->nr_cores,
++                                                   cs->nr_threads);
++            *ebx = cs->nr_cores * cs->nr_threads;
++            *ecx |= CPUID_TOPOLOGY_LEVEL_CORE;
++            break;
++        case 2:
++            *eax = apicid_pkg_offset(env->nr_dies, cs->nr_cores,
++                                                   cs->nr_threads);
++            *ebx = env->nr_dies * cs->nr_cores * cs->nr_threads;
++            *ecx |= CPUID_TOPOLOGY_LEVEL_DIE;
++            break;
++        default:
++            *eax = 0;
++            *ebx = 0;
++            *ecx |= CPUID_TOPOLOGY_LEVEL_INVALID;
++        }
+         assert(!(*eax & ~0x1f));
+         *ebx &= 0xffff; /* The count doesn't need to be reliable. */
+         break;
+@@ -5116,6 +5152,11 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+             x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
+         }
+ 
++        /* CPU topology with multi-dies support requires CPUID[0x1F] */
++        if (env->nr_dies > 1) {
++            x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x1F);
++        }
++
+         /* SVM requires CPUID[0x8000000A] */
+         if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
+             x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 46dd81f6b7..eec6e4b7b7 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -726,6 +726,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_TOPOLOGY_LEVEL_INVALID  (0U << 8)
+ #define CPUID_TOPOLOGY_LEVEL_SMT      (1U << 8)
+ #define CPUID_TOPOLOGY_LEVEL_CORE     (2U << 8)
++#define CPUID_TOPOLOGY_LEVEL_DIE      (5U << 8)
+ 
+ /* MSR Feature Bits */
+ #define MSR_ARCH_CAP_RDCL_NO    (1U << 0)
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 6899061b4e..5deb4248ac 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1080,6 +1080,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
+             }
+             break;
+         }
++        case 0x1f:
++            if (env->nr_dies < 2) {
++                break;
++            }
+         case 4:
+         case 0xb:
+         case 0xd:
+@@ -1087,6 +1091,11 @@ int kvm_arch_init_vcpu(CPUState *cs)
+                 if (i == 0xd && j == 64) {
+                     break;
+                 }
++
++                if (i == 0x1f && j == 64) {
++                    break;
++                }
++
+                 c->function = i;
+                 c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+                 c->index = j;
+@@ -1098,6 +1107,9 @@ int kvm_arch_init_vcpu(CPUState *cs)
+                 if (i == 0xb && !(c->ecx & 0xff00)) {
+                     break;
+                 }
++                if (i == 0x1f && !(c->ecx & 0xff00)) {
++                    break;
++                }
+                 if (i == 0xd && c->eax == 0) {
+                     continue;
+                 }
+-- 
+2.21.0
 
 
