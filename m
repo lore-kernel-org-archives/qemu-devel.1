@@ -2,81 +2,81 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C08E6C43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 11:25:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2DCAC43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 11:27:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 996EF2070B
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 11:25:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 996EF2070B
+	by mail.kernel.org (Postfix) with ESMTPS id A1FFE2070B
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 11:27:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1FFE2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46404 helo=lists.gnu.org)
+Received: from localhost ([::1]:46430 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdvBr-0007fi-Pj
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 07:25:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53355)
+	id 1hdvDm-00014e-NQ
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 07:27:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52851)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hdv4p-0004ex-Df
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 07:18:01 -0400
+ (envelope-from <philmd@redhat.com>) id 1hdv4H-0004QD-8u
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 07:17:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hduts-0000dm-0U
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 07:07:26 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:36748)
+ (envelope-from <philmd@redhat.com>) id 1hdv0D-0003BR-Pn
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 07:13:14 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:40818)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hdutr-0000dX-Ny
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 07:06:39 -0400
-Received: by mail-wm1-f66.google.com with SMTP id u8so2731783wmm.1
- for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 04:06:38 -0700 (PDT)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hdv0D-0003As-KR
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 07:13:13 -0400
+Received: by mail-wm1-f66.google.com with SMTP id v19so2731113wmj.5
+ for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 04:13:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=mmLDngDHszLUVUiZNs2ONhNZvlJP9Gva3wFf5XCqezs=;
- b=QNnHWYEL3v0UIjvh8N2LRaR0/Kv/7MwrS2E6qIICVTtFiniRFPL6dA8qKNHQAVJ0GO
- l/cHuMrPXEfNfRNMqNcaDorOL/HNrpJ5DLZI2EAKa4u55Y8jE60KF9kZM2wnKDaD0Z8t
- ZKdBlf7ztCdKxIq6ESsOjrIn9onWGBx9ahtnzKVEpc9Pyw2e9ak2Snaplg3TF213ISaM
- FmUcQMLb6lS0TcG2TXU8xcX1WD2jr8AgsPSCSWon34jBcuv1LA8qKsuB6xy47mxcmBfi
- /psMq/waGYyC64FbTLwdOVJ84vydKlcvKFGmDzzf2q1+yujJuTxWjTruEZgmHkQwM6Qc
- Xy/A==
-X-Gm-Message-State: APjAAAW1DB5AQI4euEr6jeb2OSFFgUG2HAdC81ZRiCuSS9HXQ1k1/fO7
- F4i/Z+9txN2tFr1Ho2IMPWvZSw==
-X-Google-Smtp-Source: APXvYqwX1knxFXcf/tLDXjQ/KmbI95NkqcknO0Gn+Gig7c6p33o/IK0iXxHBEXqAz27bd/yVp5MkCQ==
-X-Received: by 2002:a1c:7e90:: with SMTP id z138mr2367661wmc.128.1561028797810; 
- Thu, 20 Jun 2019 04:06:37 -0700 (PDT)
+ bh=716XKHodatM02Cxtj8XZxZhJd8kDjQVWNgZdEZm4Me0=;
+ b=onMUFtAIT33eV3aKjkT4uUQwt7fHGMIfvKi1gb3ByhxVzDWsJCaFDaEJWjhdnK/hxz
+ p1n/GGr7zYRtV8tcGT1FD7JxfYqmp1h78Z+029AdLlo4UHaNtvxDz0IBQcwLjXMsV1xs
+ VAQp0QNQp+7ZJIEhary/rYzqShlh23nehSkq6vdZOLmpcy3XPvHcDzMzm9t2M4pjF9z1
+ LI/z2tJYQNTa4fYL46p3WNb6+OJtYrBfPk55yXH3dgLXy/R7q4YBGeDOKNEDr2AwH55L
+ scapdyUG+Te1tahEQcX9f3FJdI+ZPWdlmzh5D1OUMo4s2Dsnyn5IQ7FCwwQQ2Ms5pRwA
+ Hm+A==
+X-Gm-Message-State: APjAAAUN/H1Jhybv69iG9jsuOpw4e/s17J/LCPTJAf85LH++n6PYnGb/
+ rNdhY3v7Xav32arQK6O6F8sX+w==
+X-Google-Smtp-Source: APXvYqw9xtiDchYecZ8KE1sHUB/Itz2UdtzddXrY5VSzt3NUaua49TUVkuq8JKcIUdfN9Qm5RTDABw==
+X-Received: by 2002:a7b:cc86:: with SMTP id p6mr2303029wma.123.1561029192519; 
+ Thu, 20 Jun 2019 04:13:12 -0700 (PDT)
 Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.183])
- by smtp.gmail.com with ESMTPSA id f197sm6160050wme.39.2019.06.20.04.06.37
+ by smtp.gmail.com with ESMTPSA id h133sm1866927wme.28.2019.06.20.04.13.11
  (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 20 Jun 2019 04:06:37 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20190619194021.8240-1-alex.bennee@linaro.org>
- <20190619194021.8240-5-alex.bennee@linaro.org>
+ Thu, 20 Jun 2019 04:13:12 -0700 (PDT)
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+References: <1561022396-20649-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1561022396-20649-2-git-send-email-aleksandar.markovic@rt-rk.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
  url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <8daaafb8-4d5d-16b2-d1d5-7eead85245cb@redhat.com>
-Date: Thu, 20 Jun 2019 13:06:36 +0200
+Message-ID: <197176a8-193c-1c58-ebe4-49fb8aee4fb4@redhat.com>
+Date: Thu, 20 Jun 2019 13:13:11 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190619194021.8240-5-alex.bennee@linaro.org>
+In-Reply-To: <1561022396-20649-2-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [PATCH v1 04/17] tests/vm: add source repos on
- ubuntu.i386
+Subject: Re: [Qemu-devel] [PATCH 1/4] MAINTAINERS: Update file items for
+ MIPS Malta board
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,44 +88,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Cleber Rosa <crosa@redhat.com>
+Cc: arikalo@wavecomp.com, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/19/19 9:40 PM, Alex Bennée wrote:
-> From: Cleber Rosa <crosa@redhat.com>
+On 6/20/19 11:19 AM, Aleksandar Markovic wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
 > 
-> Possibly because of different behavior on the newly update
-> cloud-image, trying to run 'apt-get build-dep' results in:
+> hw/mips/gt64xxx_pci.c is used for Malta only, so it is logical to
+> place this file in Malta board section of the MAINTAINERS file.
 > 
->    E: You must put some 'source' URIs in your sources.list
-> 
-> This enables all source repos (even though some are not
-> needed) for simplicity sake.
-> 
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> Message-Id: <20190613130718.3763-5-crosa@redhat.com>
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 > ---
->  tests/vm/ubuntu.i386 | 1 +
+>  MAINTAINERS | 1 +
 >  1 file changed, 1 insertion(+)
 > 
-> diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
-> index 7017e6d388..3ea459ee20 100755
-> --- a/tests/vm/ubuntu.i386
-> +++ b/tests/vm/ubuntu.i386
-> @@ -77,6 +77,7 @@ class UbuntuX86VM(basevm.BaseVM):
->          time.sleep(5)
->          self.wait_ssh()
->          # The previous update sometimes doesn't survive a reboot, so do it again
-> +        self.ssh_root_check("sed -ie s/^#\ deb-src/deb-src/g /etc/apt/sources.list")
->          self.ssh_root_check("apt-get update")
->          self.ssh_root_check("apt-get build-dep -y qemu")
->          self.ssh_root_check("apt-get install -y libfdt-dev flex bison")
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index acbad13..869e87b 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -930,6 +930,7 @@ M: Aurelien Jarno <aurelien@aurel32.net>
+>  R: Aleksandar Rikalo <arikalo@wavecomp.com>
+>  S: Maintained
+>  F: hw/mips/mips_malta.c
+> +F: hw/mips/gt64xxx_pci.c
+>  F: tests/acceptance/linux_ssh_mips_malta.py
+>  
+>  Mipssim
 > 
 
