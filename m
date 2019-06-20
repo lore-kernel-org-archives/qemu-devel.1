@@ -2,64 +2,143 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3BBAC43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 20:38:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14AA2C43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 20:40:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 736AA2082C
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 20:38:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 736AA2082C
+	by mail.kernel.org (Postfix) with ESMTPS id CC3672082C
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 20:40:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC3672082C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52864 helo=lists.gnu.org)
+Received: from localhost ([::1]:52866 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1he3ow-00044M-F2
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 16:38:10 -0400
+	id 1he3qg-00052L-4V
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 16:40:00 -0400
 Received: from eggs.gnu.org ([2001:470:142:3::10]:55409)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ptoscano@redhat.com>) id 1he3PT-0007Ei-Q9
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 16:11:54 -0400
+ (envelope-from <jsnow@redhat.com>) id 1he3Q2-0007Ei-88
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 16:12:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ptoscano@redhat.com>) id 1he3I6-0005h1-6W
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 16:04:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51314)
+ (envelope-from <jsnow@redhat.com>) id 1he3Dw-0002nU-A7
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 15:59:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52274)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ptoscano@redhat.com>)
- id 1he3I2-0005XQ-KT; Thu, 20 Jun 2019 16:04:10 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1he3De-0002Fp-8k; Thu, 20 Jun 2019 15:59:39 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0DDA9368E3;
- Thu, 20 Jun 2019 20:03:57 +0000 (UTC)
-Received: from lindworm.usersys.redhat.com (ovpn-204-93.brq.redhat.com
- [10.40.204.93])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 33DB460142;
- Thu, 20 Jun 2019 20:03:50 +0000 (UTC)
-From: Pino Toscano <ptoscano@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Date: Thu, 20 Jun 2019 22:03:45 +0200
-Message-ID: <4685183.8apt5qi6oh@lindworm.usersys.redhat.com>
-Organization: Red Hat
-In-Reply-To: <bca1ddde-652a-11df-5e48-826ab1799d98@redhat.com>
-References: <20190618092403.30006-1-ptoscano@redhat.com>
- <3681094.1Qnffhumos@lindworm.usersys.redhat.com>
- <bca1ddde-652a-11df-5e48-826ab1799d98@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 539403087958;
+ Thu, 20 Jun 2019 19:59:14 +0000 (UTC)
+Received: from [10.10.123.29] (ovpn-123-29.rdu2.redhat.com [10.10.123.29])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E0B1C608A7;
+ Thu, 20 Jun 2019 19:59:12 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20190620010356.19164-1-jsnow@redhat.com>
+ <20190620010356.19164-12-jsnow@redhat.com>
+ <4f98c07a-cc3a-f249-ba62-b8a98a47ab53@redhat.com>
+ <cf20b1e7-76e2-5107-d321-98521597bf58@redhat.com>
+ <2d906ba5-bc04-a43f-6a53-d18e67074a34@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <cb30c3dc-45ac-dd4f-8bea-c4ee1f291067@redhat.com>
+Date: Thu, 20 Jun 2019 15:59:06 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart3080213.AyQVvb27k6";
- micalg="pgp-sha256"; protocol="application/pgp-signature"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <2d906ba5-bc04-a43f-6a53-d18e67074a34@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Thu, 20 Jun 2019 20:03:57 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Thu, 20 Jun 2019 19:59:14 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v10] ssh: switch from libssh2 to libssh
+Subject: Re: [Qemu-devel] [PATCH 11/12] iotests: add test 257 for
+ bitmap-mode backups
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,279 +150,401 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, qemu-block@nongnu.org, philmd@redhat.com,
- qemu-devel@nongnu.org, rjones@redhat.com, sw@weilnetz.de,
- alex.bennee@linaro.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ vsementsov@virtuozzo.com, Wen Congyang <wencongyang2@huawei.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---nextPart3080213.AyQVvb27k6
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
 
-On Thursday, 20 June 2019 14:58:40 CEST Max Reitz wrote:
-> On 20.06.19 11:49, Pino Toscano wrote:
-> > On Tuesday, 18 June 2019 15:14:30 CEST Max Reitz wrote:
-> >> On 18.06.19 11:24, Pino Toscano wrote:
-> >>> Rewrite the implementation of the ssh block driver to use libssh inst=
-ead
-> >>> of libssh2.  The libssh library has various advantages over libssh2:
-> >>> - easier API for authentication (for example for using ssh-agent)
-> >>> - easier API for known_hosts handling
-> >>> - supports newer types of keys in known_hosts
-> >>>
-> >>> Use APIs/features available in libssh 0.8 conditionally, to support
-> >>> older versions (which are not recommended though).
-> >>>
-> >>> Adjust the tests according to the different error message, and to the
-> >>> newer host keys (ed25519) that are used by default with OpenSSH >=3D =
-6.7
-> >>> and libssh >=3D 0.7.0.
-> >>>
-> >>> Adjust the various Docker/Travis scripts to use libssh when available
-> >>> instead of libssh2. The mingw/mxe testing is dropped for now, as there
-> >>> are no packages for it.
-> >>>
-> >>> Signed-off-by: Pino Toscano <ptoscano@redhat.com>
-> >>> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> >>> Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> >>> ---
-> >>>
-> >>> Changes from v9:
-> >>> - restored "default" case in the server status switch for libssh < 0.=
-8.0
-> >>> - print the host key type & fingerprint on mismatch with known_hosts
-> >>> - improve/fix message for failed socket_set_nodelay()
-> >>> - reset s->sock properly
-> >>>
-> >>> Changes from v8:
-> >>> - use a newer key type in iotest 207
-> >>> - improve the commit message
-> >>>
-> >>> Changes from v7:
-> >>> - #if HAVE_LIBSSH_0_8 -> #ifdef HAVE_LIBSSH_0_8
-> >>> - ptrdiff_t -> size_t
-> >>>
-> >>> Changes from v6:
-> >>> - fixed few checkpatch style issues
-> >>> - detect libssh 0.8 via symbol detection
-> >>> - adjust travis/docker test material
-> >>> - remove dead "default" case in a switch
-> >>> - use variables for storing MIN() results
-> >>> - adapt a documentation bit
-> >>>
-> >>> Changes from v5:
-> >>> - adapt to newer tracing APIs
-> >>> - disable ssh compression (mimic what libssh2 does by default)
-> >>> - use build time checks for libssh 0.8, and use newer APIs directly
-> >>>
-> >>> Changes from v4:
-> >>> - fix wrong usages of error_setg/session_error_setg/sftp_error_setg
-> >>> - fix few return code checks
-> >>> - remove now-unused parameters in few internal functions
-> >>> - allow authentication with "none" method
-> >>> - switch to unsigned int for the port number
-> >>> - enable TCP_NODELAY on the socket
-> >>> - fix one reference error message in iotest 207
-> >>>
-> >>> Changes from v3:
-> >>> - fix socket cleanup in connect_to_ssh()
-> >>> - add comments about the socket cleanup
-> >>> - improve the error reporting (closer to what was with libssh2)
-> >>> - improve EOF detection on sftp_read()
-> >>>
-> >>> Changes from v2:
-> >>> - used again an own fd
-> >>> - fixed co_yield() implementation
-> >>>
-> >>> Changes from v1:
-> >>> - fixed jumbo packets writing
-> >>> - fixed missing 'err' assignment
-> >>> - fixed commit message
-> >>>
-> >>>  .travis.yml                                   |   4 +-
-> >>>  block/Makefile.objs                           |   6 +-
-> >>>  block/ssh.c                                   | 665 ++++++++++------=
-=2D-
-> >>>  block/trace-events                            |  14 +-
-> >>>  configure                                     |  65 +-
-> >>>  docs/qemu-block-drivers.texi                  |   2 +-
-> >>>  .../dockerfiles/debian-win32-cross.docker     |   1 -
-> >>>  .../dockerfiles/debian-win64-cross.docker     |   1 -
-> >>>  tests/docker/dockerfiles/fedora.docker        |   4 +-
-> >>>  tests/docker/dockerfiles/ubuntu.docker        |   2 +-
-> >>>  tests/docker/dockerfiles/ubuntu1804.docker    |   2 +-
-> >>>  tests/qemu-iotests/207                        |   4 +-
-> >>>  tests/qemu-iotests/207.out                    |   2 +-
-> >>>  13 files changed, 423 insertions(+), 349 deletions(-)
-> >>
-> >> [...]
-> >>
-> >>> diff --git a/block/ssh.c b/block/ssh.c
-> >>> index 6da7b9cbfe..644ae8b82c 100644
-> >>> --- a/block/ssh.c
-> >>> +++ b/block/ssh.c
-> >>
-> >> [...]
-> >>
-> >>> +    case SSH_SERVER_KNOWN_CHANGED:
-> >>> +        ret =3D -EINVAL;
-> >>> +        r =3D ssh_get_publickey(s->session, &pubkey);
-> >>> +        if (r =3D=3D 0) {
-> >>> +            r =3D ssh_get_publickey_hash(pubkey, SSH_PUBLICKEY_HASH_=
-SHA1,
-> >>> +                                       &server_hash, &server_hash_le=
-n);
-> >>> +            pubkey_type =3D ssh_key_type(pubkey);
-> >>> +            ssh_key_free(pubkey);
-> >>> +        }
-> >>> +        if (r =3D=3D 0) {
-> >>> +            fingerprint =3D ssh_get_fingerprint_hash(SSH_PUBLICKEY_H=
-ASH_SHA1,
-> >>> +                                                   server_hash,
-> >>> +                                                   server_hash_len);
-> >>> +            ssh_clean_pubkey_hash(&server_hash);
-> >>> +        }
-> >>> +        if (fingerprint) {
-> >>> +            error_setg(errp,
-> >>> +                       "host key (%s key with fingerprint %s) does n=
-ot match "
-> >>> +                       "the one in known_hosts",
-> >>> +                       ssh_key_type_to_char(pubkey_type), fingerprin=
-t);
-> >>> +            ssh_string_free_char(fingerprint);
-> >>> +        } else  {
-> >>> +            error_setg(errp, "host key does not match the one in kno=
-wn_hosts");
-> >>> +        }
-> >>
-> >> Usually I=E2=80=99d say that more information can=E2=80=99t be bad.  B=
-ut here I don=E2=80=99t
-> >> see how this additional information is useful.  known_hosts contains
-> >> base64-encoded full public keys.  This only prints the SHA-1 digest.
-> >=20
-> > Note that SHA-1 is printed with libssh < 0.8; with libssh >=3D 0.8 SHA-=
-256
-> > is used instead.
-> >=20
-> >> The user cannot add that to known_hosts, or easily scan known_hosts to
-> >> see whether it perhaps belongs to some other hosts (maybe because DHCP
-> >> scrambled something).
-> >>
-> >> Actually, even if this printed the base64 representation of the full
-> >> key, the user probably wouldn=E2=80=99t just add that to known_hosts o=
-r do
-> >> anything with it.  They=E2=80=99ll debug the problem with other tools.
-> >>
-> >> So I don=E2=80=99t think this new information is really useful...?
-> >=20
-> > When this situation happens with openssh, the big scary message prints
-> > three things:
-> > 1) the fingerprint of the server
-> > 2) the line of the server in the known_hosts file
-> > 3) how to remove the keys of the server from known_hosts, i.e. a
-> >    copy-paste'able `ssh-keygen -R host`
-> >=20
-> > Here I'm doing only (1).  Also, the current libssh2 driver does
-> > something else, i.e. print the base64/printable representation of the
-> > server key in known_hosts.
+
+On 6/20/19 3:48 PM, Max Reitz wrote:
+> On 20.06.19 21:08, John Snow wrote:
+>>
+>>
+>> On 6/20/19 2:35 PM, Max Reitz wrote:
+>>> On 20.06.19 03:03, John Snow wrote:
+>>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>>> ---
+>>>>  tests/qemu-iotests/257     |  412 +++++++
+>>>>  tests/qemu-iotests/257.out | 2199 +++++++++++++++++++++++++++++++++=
++++
+>>>>  tests/qemu-iotests/group   |    1 +
+>>>>  3 files changed, 2612 insertions(+)
+>>>>  create mode 100755 tests/qemu-iotests/257
+>>>>  create mode 100644 tests/qemu-iotests/257.out
+>>>
+>>> This test is actually quite nicely written.
+>>>
+>>
+>> Thanks!
+>>
+>>> I like that I don=E2=80=99t have to read the reference output but can=
+ just grep
+>>> for =E2=80=9Cerror=E2=80=9D.
+>>>
+>>
+>> Me too!! Actually, doing the math for what to expect and verifying the
+>> output by hand was becoming a major burden, so partially this test
+>> infrastructure was my attempt to procedurally verify that the results =
+I
+>> was seeing were what made sense.
+>>
+>> At the end of it, I felt it was nice to keep it in there.
+>>
+>>> Only minor notes below.
+>>>
+>>>> diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
+>>>> new file mode 100755
+>>>> index 0000000000..5f7f388504
+>>>> --- /dev/null
+>>>> +++ b/tests/qemu-iotests/257
+>>>
+>>> [...]
+>>>
+>>>> +class PatternGroup:
+>>>> +    """Grouping of Pattern objects. Initialize with an iterable of =
+Patterns."""
+>>>> +    def __init__(self, patterns):
+>>>> +        self.patterns =3D patterns
+>>>> +
+>>>> +    def bits(self, granularity):
+>>>> +        """Calculate the unique bits dirtied by this pattern groupi=
+ng"""
+>>>> +        res =3D set()
+>>>> +        for pattern in self.patterns:
+>>>> +            lower =3D math.floor(pattern.offset / granularity)
+>>>> +            upper =3D math.floor((pattern.offset + pattern.size - 1=
+) / granularity)
+>>>> +            res =3D res | set(range(lower, upper + 1))
+>>>
+>>> Why you=E2=80=99d do floor((x - 1) / y) + 1 has confused me quite a w=
+hile.
+>>> Until I realized that oh yeah, Python=E2=80=99s range() is a right-op=
+en
+>>> interval.  I don=E2=80=99t like Python=E2=80=99s range().
+>>>
+>>
+>> It confuses me constantly, but it's really meant to be used for
+>> iterating over lengths.
 >=20
-> Well, I don=E2=80=99t know whether it=E2=80=99s necessary to reproduce th=
-e exact message
-> with all the data it contains.  As I said, I think users can and will
-> investigate the exact root of the problem with tools outside of qemu.
-> (Such as openssh=E2=80=99s ssh itself.)
+> I can see the use for range(x), but not for range(a, b).
 >=20
-> >> (Hmm, I don=E2=80=99t know if this is a response to my =E2=80=9CBut th=
-e specification
-> >> requires a warning!!1!=E2=80=9D, but if so, I was actually not referri=
-ng to more
-> >> information but to this:
-> >=20
-> > You mentioned this few times: can you please point me to this bit?
-> > I read few RFCs related to ssh, and I did not find this information...
+> (At least it=E2=80=99s not Rust, where [a..b] is [a, b), too =E2=80=93 =
+it=E2=80=99s enclosed in
+> square brackets, it should be closed, damnit.)
 >=20
-> For example:
-> http://api.libssh.org/master/group__libssh__session.html#gacbc5d04fe66bee=
-e863a0c61a93fdf765
-> > SSH_KNOWN_HOSTS_CHANGED: The server key has changed. Either you are und=
-er attack or the administrator changed the key. You HAVE to warn the user a=
-bout a possible attack.
-
-Ah, now I see what you mean! I thought that "libssh specification" was
-any of the SSH RFCs, and that's why I did not find what you meant.
-I see you were talking about the libssh API documentation :-)
-(Never heard the API docs of a library called as "specification" before,
-TBH.)
-
-> This doesn=E2=80=99t require any specific formatting or data to be given =
-to the
-> user.  All it requires is =E2=80=9Cto warn the user about a possible atta=
-ck=E2=80=9D.
-> That can be as simple as appending =E2=80=9CThis may be due to a
-> man-in-the-middle attack=E2=80=9D to the error message.
-
-Makes sense -- I just asked to the libssh people, and appending
-"this may be a possible attack" should be enough, especially that this
-is not a UI message like the one written by the ssh client.
-
-> >> $ ssh 192.168.0.12
-> >> @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-> >> @    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
-> >> @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-> >> IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
-> >> Someone could be eavesdropping on you right now (man-in-the-middle att=
-ack)!
-> >> It is also possible that a host key has just been changed.
-> >>
-> >>
-> >> I mean, I was also only half-serious.  I should be serious because the
-> >> libssh specification requires us to print some warning like that, but,
-> >> well.  Yes, I=E2=80=99ll stop mumbling about this stuff now.)
-> >=20
-> > To be on the explic side: are you asking to basically put the first 6
-> > lines of the openssh error message (as you quoted them above) as error
-> > message in the ssh driver?
+>> This is somewhat of an abuse of it. I always
+>> test it out in a console first before using it, just in case.
+>>
+>>> (Yes, you=E2=80=99re right, this is better to read than just ceil(x /=
+ y).
+>>> Because it reminds people like me that range() is weird.)
+>>>
+>>>> +        return res
+>>>> +
+>>>> +GROUPS =3D [
+>>>> +    PatternGroup([
+>>>> +        # Batch 0: 4 clusters
+>>>> +        mkpattern('0x49', 0x0000000),
+>>>> +        mkpattern('0x6c', 0x0100000),   # 1M
+>>>> +        mkpattern('0x6f', 0x2000000),   # 32M
+>>>> +        mkpattern('0x76', 0x3ff0000)]), # 64M - 64K
+>>>> +    PatternGroup([
+>>>> +        # Batch 1: 6 clusters (3 new)
+>>>> +        mkpattern('0x65', 0x0000000),   # Full overwrite
+>>>> +        mkpattern('0x77', 0x00f8000),   # Partial-left (1M-32K)
+>>>> +        mkpattern('0x72', 0x2008000),   # Partial-right (32M+32K)
+>>>> +        mkpattern('0x69', 0x3fe0000)]), # Adjacent-left (64M - 128K=
+)
+>>>> +    PatternGroup([
+>>>> +        # Batch 2: 7 clusters (3 new)
+>>>> +        mkpattern('0x74', 0x0010000),   # Adjacent-right
+>>>> +        mkpattern('0x69', 0x00e8000),   # Partial-left  (1M-96K)
+>>>> +        mkpattern('0x6e', 0x2018000),   # Partial-right (32M+96K)
+>>>> +        mkpattern('0x67', 0x3fe0000,
+>>>> +                  2*GRANULARITY)]),     # Overwrite [(64M-128K)-64M=
+)
+>>>> +    PatternGroup([
+>>>> +        # Batch 3: 8 clusters (5 new)
+>>>> +        # Carefully chosen such that nothing re-dirties the one clu=
+ster
+>>>> +        # that copies out successfully before failure in Group #1.
+>>>> +        mkpattern('0xaa', 0x0010000,
+>>>> +                  3*GRANULARITY),       # Overwrite and 2x Adjacent=
+-right
+>>>> +        mkpattern('0xbb', 0x00d8000),   # Partial-left (1M-160K)
+>>>> +        mkpattern('0xcc', 0x2028000),   # Partial-right (32M+160K)
+>>>> +        mkpattern('0xdd', 0x3fc0000)]), # New; leaving a gap to the=
+ right
+>>>> +    ]
+>>>
+>>> I=E2=80=99d place this four spaces to the left.  But maybe placing it=
+ here is
+>>> proper Python indentation, while moving it to the left would be C
+>>> indentation.
+>>>
+>>
+>> Either is fine, I think. In this case it affords us more room for the
+>> commentary on the bit ranges. Maybe it's not necessary, but at least
+>> personally I get woozy looking at the bit patterns.
 >=20
-> God forbid no.  I was just making an example of =E2=80=9CHere is a warnin=
-g about
-> a possible attack=E2=80=9D.  I fully agree with Dan (and probably you) th=
-at this
-> is completely unsuitable to qemu=E2=80=99s interface.
+> Oh, no, no, I just meant the final closing =E2=80=9D]=E2=80=9D of GROUP=
+S.
 >=20
-> Sorry if that came across in another way.
+> (I did wonder about why you didn=E2=80=99t place every PatternGroups cl=
+osing ])
+> on a separate line, too, but I decided not to say anything, because it
+> looks Python-y this way.  But you=E2=80=99re right, this gives a nice e=
+xcuse why
+> to put more space between the patterns and the comments, which helps.)
+>=20
+>>>> +class Drive:
+>>>> +    """Represents, vaguely, a drive attached to a VM.
+>>>> +    Includes format, graph, and device information."""
+>>>> +
+>>>> +    def __init__(self, path, vm=3DNone):
+>>>> +        self.path =3D path
+>>>> +        self.vm =3D vm
+>>>> +        self.fmt =3D None
+>>>> +        self.size =3D None
+>>>> +        self.node =3D None
+>>>> +        self.device =3D None
+>>>> +
+>>>> +    @property
+>>>> +    def name(self):
+>>>> +        return self.node or self.device
+>>>> +
+>>>> +    def img_create(self, fmt, size):
+>>>> +        self.fmt =3D fmt
+>>>> +        self.size =3D size
+>>>> +        iotests.qemu_img_create('-f', self.fmt, self.path, str(self=
+.size))
+>>>> +
+>>>> +    def create_target(self, name, fmt, size):
+>>>> +        basename =3D os.path.basename(self.path)
+>>>> +        file_node_name =3D "file_{}".format(basename)
+>>>> +        vm =3D self.vm
+>>>> +
+>>>> +        log(vm.command('blockdev-create', job_id=3D'bdc-file-job',
+>>>> +                       options=3D{
+>>>> +                           'driver': 'file',
+>>>> +                           'filename': self.path,
+>>>> +                           'size': 0,
+>>>> +                       }))
+>>>> +        vm.run_job('bdc-file-job')
+>>>> +        log(vm.command('blockdev-add', driver=3D'file',
+>>>> +                       node_name=3Dfile_node_name, filename=3Dself.=
+path))
+>>>> +
+>>>> +        log(vm.command('blockdev-create', job_id=3D'bdc-fmt-job',
+>>>> +                       options=3D{
+>>>> +                           'driver': fmt,
+>>>> +                           'file': file_node_name,
+>>>> +                           'size': size,
+>>>> +                       }))
+>>>> +        vm.run_job('bdc-fmt-job')
+>>>> +        log(vm.command('blockdev-add', driver=3Dfmt,
+>>>> +                       node_name=3Dname,
+>>>> +                       file=3Dfile_node_name))
+>>>> +        self.fmt =3D fmt
+>>>> +        self.size =3D size
+>>>> +        self.node =3D name
+>>>
+>>> It=E2=80=99s cool that you use blockdev-create here, but would it not=
+ have been
+>>> easier to just use self.img_create() + blockdev-add?
+>>>
+>>> I mean, there=E2=80=99s no point in changing it now, I=E2=80=99m just=
+ wondering.
+>>>
+>>
+>> Mostly just because I already wrote this for the last test, and we
+>> already test incremental backups the other way. I figured this would
+>> just be nice for code coverage purposes, and also because using the
+>> blockdev interfaces exclusively does tend to reveal little gotchas
+>> everywhere.
+>>
+>> I also kind of want to refactor a lot of my tests and share some of th=
+e
+>> common code. I was tinkering with the idea of adding some common objec=
+ts
+>> to iotests, like "Drive" "Bitmap" and "Backup".
+>>
+>> That's why there's a kind of superfluous "Drive" object here.
+>>
+>>>> +
+>>>> +def query_bitmaps(vm):
+>>>> +    res =3D vm.qmp("query-block")
+>>>> +    return {"bitmaps": {device['device'] or device['qdev']:
+>>>> +                        device.get('dirty-bitmaps', []) for
+>>>> +                        device in res['return']}}
+>>>
+>>> Python=E2=80=99s just not for me if I find this syntax unintuitive an=
+d
+>>> confusing, hu?
+>>>
+>>> [...]
+>>>
+>>
+>> Sorry. It's a very functional-esque way of processing iterables.
+> I=E2=80=99m not blaming the basic idea, I=E2=80=99m blaming the syntax.=
+  In fact, I=E2=80=99m
+> blaming exactly that it isn=E2=80=99t literally functional because ther=
+e are no
+> functions here (but .get() and []).  I would like to have functions
+> because function names would tell me what=E2=80=99s going on.
+>=20
+> I can never remember what {:} means (why do they use such nice words
+> everywhere else, like =E2=80=9Cor=E2=80=9D, =E2=80=9Cfor=E2=80=9D, or =E2=
+=80=9Cin=E2=80=9D, and then they do that?).
+> And I find it weird that postfix-for can introduce variables after they
+> are used.  That may be the way I would read it aloud, but that=E2=80=99=
+s
+> definitely not the way I *think*.
+>=20
+>> I've been doing a lot of FP stuff lately and that skews what I find
+>> readable...
+>>
+>> It's a dict comprehension of the form:
+>>
+>> {key: value for atom in iterable}
+>=20
+> Ah.  Thanks.  I thought it was some filter where it would only return
+> elements where 'device' or 'qdev' is set.  So that seemed completely
+> stupid to me, to have the iteration in the end, but the filter in the
+> beginning.
+>=20
+>> Key here is either the device or qdev name,
+>> the value is the 'dirty-bitmaps' field of the atom, and
+>> res['return'] is the iterable.
+>>
+>> Effectively it turns a list of devices into a dict keyed by the device
+>> name, and the only field (if any) was its dirty-bitmap object.
+>=20
+> Why can=E2=80=99t they write it like normal human beings.  Like
+>=20
+> Hash[res['return'].map { |device| [device['device'] || device['qdev'],
+>                                    device['dirty-bitmaps'] or {}]}]
+>=20
 
-Not a problem. I preferred to ask explicitly to make sure to get it
-right -- any amount of information shown is fine for me, I want to make
-sure to follow QEMU best practices (if any).
+=F0=9F=A4=A0
 
-=2D-=20
-Pino Toscano
---nextPart3080213.AyQVvb27k6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
+> By the way, this is the reason why you=E2=80=99ll always see me using m=
+ap() and
+> filter() and then someone saying that there is a more Python-y way of
+> doing themes, namely postfix-for.  I hate postfix-for.  I also hate
+> postfix-if-else, by the way, but I felt like I didn=E2=80=99t want to g=
+o there.
+>=20
 
------BEGIN PGP SIGNATURE-----
+I actually really dislike the postfix-if-else too. I prefer C's ternary
+there, but when in Rome, etc.
 
-iQIzBAABCAAdFiEEbjdOQa52nq0tQalew9FMLZhkN80FAl0L5qEACgkQw9FMLZhk
-N80zLA/9GpK/+QjQE2EC27LQo18O4mnu4AKR0U+sZ5ppfDIxSM7YQHtR1cRRctb/
-pwi5x/dsYP+5laaA+c1Au9aRfvvHcr8KcGeCwpBIsEtMxM8Ui+i04DkUXP+4I8Xu
-GK0TOr1IqkzlhP+fK/3rxqCypY9EyAVZiHSoHOzkHewaYOx0mfP5KrmIQO+z+i+G
-3PpAN011ZW7HfcKGBYaULcQrY7lWQ+OA8f4JNItgkvr7Tnb9+93Ur/Ls4cpzqcZF
-Mh0J/Qj6U9jkXs8iV/Va2TN9R3RcoRPZ37ygjkjXTkzhXSF0Tvk+jcsfBeV5HzWu
-u2jC6Y+RQlJAu3N0La4e+gg9g7/kRaPx62MAVPsqrabT3mlItAeGDX7ghWQfF+i/
-SgXtP8waNEATp1F2M/T1yjR1skYooWPAtqQ5kdu3cjy0CBknUVMYmEGEak5iOJD0
-+AU76Pg8JBB/HLHVhnMEE+NFmhy0BQaoazv5MC2oaguUFs4b3arJigZuP0YQ9TGq
-ZQLgQbR1niwadSq285L2tMAlShW0I4FBv0fczcyrPltqtZvXr8fgLxLaAGLt8YNO
-5obHq07JXBcEQaqUNRaoCluBC+MtjIYHD3Xc3ilgUWOR3mI+1kAoa0lPd+SyT74v
-A3XHzY68rTgLYHfzxcoQ4C2K9mesRpqnzJVrcnk4uVBlnqUjyxc=
-=WHEu
------END PGP SIGNATURE-----
+>> However, in explaining this I do notice I have a bug -- the default
+>> value for the bitmap object ought to be {}, not [].
+>>
+>> This is code that should become common testing code too, as I've
+>> re-written it a few times now...
+>>
+>>>> +def bitmap_comparison(bitmap, groups=3DNone, want=3D0):
+>>>> +    """
+>>>> +    Print a nice human-readable message checking that this bitmap h=
+as as
+>>>> +    many bits set as we expect it to.
+>>>> +    """
+>>>> +    log("=3D Checking Bitmap {:s} =3D".format(bitmap.get('name', '(=
+anonymous)')))
+>>>> +
+>>>> +    if groups:
+>>>> +        want =3D calculate_bits(groups)
+>>>> +    have =3D int(bitmap['count'] / bitmap['granularity'])
+>>>
+>>> Or just bitmap['count'] // bitmap['granularity']?
+>>>
+>>> [...]
+>>>
+>>
+>> I forget that exists. If you prefer that, OK.
+>=20
+> Well, it is shorter and more optimal!!!  (Saves two conversions to FP,
+> then an FP division, and then one conversion back to integer!!)
+>=20
 
---nextPart3080213.AyQVvb27k6--
+ok!!!!!
 
+>>>> +def test_bitmap_sync(bsync_mode, failure=3DNone):
+>>>
+>>> [...]
+>>>
+>>>> +        log('--- Preparing image & VM ---\n')
+>>>> +        drive0 =3D Drive(img_path, vm=3Dvm)
+>>>> +        drive0.img_create(iotests.imgfmt, SIZE)
+>>>> +        vm.add_device('virtio-scsi-pci,id=3Dscsi0')
+>>>
+>>> Judging from 238, this should be virtio-scsi-ccw on s390-ccw-virtio.
+>>>
+>>> (This is the reason I cannot give an R-b.)
+>>>
+>>> [...]
+>>>
+>>
+>> Oh, good catch. Alright.
+>>
+>>>> +        vm.run_job(job, auto_dismiss=3DTrue, auto_finalize=3DFalse,
+>>>> +                   pre_finalize=3D_callback,
+>>>> +                   cancel=3Dfailure =3D=3D 'simulated')
+>>>
+>>> I=E2=80=99d prefer =E2=80=9Ccancel=3D(failure =3D=3D 'simulated')=E2=80=
+=9D.  (Or spaces around =3D).
+>>>
+>>> Also in other places elsewhere that are of the form x=3Dy where y con=
+tains
+>>> spaces.
+>>>
+>>> [...]
+>>>
+>>
+>> OK; I might need to make a pylintrc file to allow that style. Python i=
+s
+>> VERY aggressively tuned to omitting parentheses.
+>=20
+> It seems to me more and more like Python is very aggressively tuned to
+> what I find difficult to read.
+>=20
+> (You=E2=80=99re also still free to write =E2=80=9Ccancel =3D failure =3D=
+=3D 'simulated'=E2=80=9D.  I
+> wouldn=E2=80=99t write that in C, but well.)
+>=20
+
+It turns out that your suggestion is fine. I do agree, though: I like my
+unnecessary parentheses a lot.
+
+Python wants:
+
+assert a =3D=3D b
+
+And will get mad about:
+
+assert (a =3D=3D b)
+
+And that's just so hard to deal with when working with C-brain.
+
+>> (I do actually try to run pylint on my python patches now to make sure=
+ I
+>> am targeting SOME kind of style. I realize this is not standardized in
+>> this project.)
+>=20
+> Sorry for becoming very grumpy here (can=E2=80=99t help myself), but wh=
+y would I
+> run it when apparently Python has just bad opinions about what=E2=80=99=
+s
+> readable and what isn=E2=80=99t.
+>=20
+> Max
+>=20
 
 
 
