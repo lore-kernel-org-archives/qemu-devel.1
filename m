@@ -2,109 +2,61 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	T_HK_NAME_DR autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E343C43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 19:10:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FFDAC43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 19:10:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E68520665
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 19:10:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="EYvGNAAy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E68520665
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3BAFF20665
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 19:10:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BAFF20665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52286 helo=lists.gnu.org)
+Received: from localhost ([::1]:52288 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1he2Rb-0000pd-9M
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 15:09:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43248)
+	id 1he2S6-00019u-CM
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 15:10:30 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49687)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <brijesh.singh@amd.com>) id 1he1cb-0005KX-Iu
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 14:17:21 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1he26Y-0003c8-Gy
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 14:48:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <brijesh.singh@amd.com>) id 1he1PC-0003wY-N8
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 14:03:47 -0400
-Received: from mail-eopbgr720059.outbound.protection.outlook.com
- ([40.107.72.59]:35920 helo=NAM05-CO1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
- id 1he1PC-0003qK-FF
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 14:03:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector1-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bIIK3esCMPQSvmdFQmpZO+9pFUeNIETCcZlxkUt9c0M=;
- b=EYvGNAAyHpjy155/qzFt6KwuxJqHEQsN3QuUOrf3lcLeDHhj7Fc+wrxhzpBZBcvaiO7VIxnpzSeRTHqafmLI959PSZMhbOAaYLRDr5LImKOPAEgYa+4O8bjG1jDTMhp3w6UFBRwbEo6+kXhMJuqH/p2n9er0Xh5+b5saH3nZkxo=
-Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.116.31) by
- DM6PR12MB3260.namprd12.prod.outlook.com (20.179.105.216) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1987.15; Thu, 20 Jun 2019 18:03:23 +0000
-Received: from DM6PR12MB2682.namprd12.prod.outlook.com
- ([fe80::b9c1:b235:fff3:dba2]) by DM6PR12MB2682.namprd12.prod.outlook.com
- ([fe80::b9c1:b235:fff3:dba2%6]) with mapi id 15.20.1987.014; Thu, 20 Jun 2019
- 18:03:23 +0000
-From: "Singh, Brijesh" <brijesh.singh@amd.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Thread-Topic: [RFC PATCH v1 10/12] target/i386: sev: add support to load
- incoming encrypted page
-Thread-Index: AQHVJ5JyQwoOU+uwV02za7BB4A2ErA==
-Date: Thu, 20 Jun 2019 18:03:21 +0000
-Message-ID: <20190620180247.8825-11-brijesh.singh@amd.com>
-References: <20190620180247.8825-1-brijesh.singh@amd.com>
-In-Reply-To: <20190620180247.8825-1-brijesh.singh@amd.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: DM5PR16CA0025.namprd16.prod.outlook.com
- (2603:10b6:4:15::11) To DM6PR12MB2682.namprd12.prod.outlook.com
- (2603:10b6:5:4a::31)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=brijesh.singh@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-mailer: git-send-email 2.17.1
-x-originating-ip: [165.204.77.1]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a4c91a21-1243-429f-2b7e-08d6f5a994df
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
- SRVR:DM6PR12MB3260; 
-x-ms-traffictypediagnostic: DM6PR12MB3260:
-x-microsoft-antispam-prvs: <DM6PR12MB32602E5E02ACD80599E62AA3E5E40@DM6PR12MB3260.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1186;
-x-forefront-prvs: 0074BBE012
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10009020)(366004)(396003)(376002)(136003)(39860400002)(346002)(199004)(189003)(2351001)(53936002)(486006)(2616005)(11346002)(81156014)(8676002)(14444005)(6436002)(446003)(5640700003)(50226002)(6512007)(476003)(102836004)(6916009)(99286004)(2501003)(6486002)(76176011)(8936002)(52116002)(81166006)(316002)(186003)(6506007)(26005)(478600001)(256004)(3846002)(2906002)(386003)(66066001)(14454004)(54906003)(6116002)(305945005)(25786009)(1076003)(66946007)(66556008)(73956011)(64756008)(66446008)(71190400001)(71200400001)(68736007)(36756003)(66476007)(5660300002)(7736002)(86362001)(4326008);
- DIR:OUT; SFP:1101; SCL:1; SRVR:DM6PR12MB3260;
- H:DM6PR12MB2682.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: DAZEztOcF+0AmdXM1klP/mEzccMkGEbAD7EgdAJmDVAr7NbwgpFG7WXEkLIxhwuMNWG4Sdu+grKU4CWqFLuwesk+Bq1Bv1FkzHKWRnpYiszpAJ674Yx2zkmDCStSZDT6q7thl0ASfYkvUc42vAocxB3LBdT9XdgvnX1nYm9CR95an99BDnZubsukdTEGUfPm69tXgWpvbO4KcHLOWXpMHm2p0hbEdfn1V+1zC9iwEMoGbhRyRg4Dw+90i8lQ3bTydC9IWYlfHPjJ7dHpJ8G6QUcr750sohm0srVrbQo9ZXQV1TAgmDajqUiOLTaqj+1kZFq3YVsN6oIG67Zp+4TdyX6/KkIxw2EwUwthoVi70iZOiwngauwisd+lwDagjGuXoQtkXXJTORTzzhj2yFNpNOQKBKuqwhYB3Z8psk6N5C8=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (envelope-from <dgilbert@redhat.com>) id 1he26W-0000jV-FZ
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 14:48:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36346)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1he26U-0008Jr-NJ
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 14:48:10 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9D8305945D
+ for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 18:47:16 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-117-203.ams2.redhat.com
+ [10.36.117.203])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 70FD05D71C;
+ Thu, 20 Jun 2019 18:47:15 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, jasowang@redhat.com, eblake@redhat.com,
+ armbru@redhat.com, laine@redhat.com
+Date: Thu, 20 Jun 2019 19:47:04 +0100
+Message-Id: <20190620184706.19988-4-dgilbert@redhat.com>
+In-Reply-To: <20190620184706.19988-1-dgilbert@redhat.com>
+References: <20190620184706.19988-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a4c91a21-1243-429f-2b7e-08d6f5a994df
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jun 2019 18:03:21.9283 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: sbrijesh@amd.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3260
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.72.59
-Subject: [Qemu-devel] [RFC PATCH v1 10/12] target/i386: sev: add support to
- load incoming encrypted page
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.39]); Thu, 20 Jun 2019 18:47:16 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v5 3/5] net/announce: Add optional ID
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,127 +68,245 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, "Singh,
- Brijesh" <brijesh.singh@amd.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-VGhlIHNldl9sb2FkX2luY29taW5nX3BhZ2UoKSBwcm92aWRlIHRoZSBpbXBsZW1lbnRhdGlvbiB0
-byByZWFkIHRoZQ0KaW5jb21pbmcgZ3Vlc3QgcHJpdmF0ZSBwYWdlcyBmcm9tIHRoZSBzb2NrZXQg
-YW5kIGxvYWQgaXQgaW50byB0aGUgZ3Vlc3QNCm1lbW9yeS4gVGhlIHJvdXRpbmVzIHVzZXMgdGhl
-IFJFQ0VJVkVfU1RBUlQgY29tbWFuZCB0byBjcmVhdGUgdGhlDQppbmNvbWluZyBlbmNyeXB0aW9u
-IGNvbnRleHQgb24gdGhlIGZpcnN0IGNhbGwgdGhlbiB1c2VzIHRoZQ0KUkVDRUlFVkVfVVBEQVRF
-X0RBVEEgY29tbWFuZCB0byBsb2FkIHRoZSBlbmNyeXB0ZWQgcGFnZXMgaW50byB0aGUgZ3Vlc3QN
-Cm1lbW9yeS4gQWZ0ZXIgbWlncmF0aW9uIGlzIGNvbXBsZXRlZCwgd2UgaXNzdWUgdGhlIFJFQ0VJ
-VkVfRklOSVNIIGNvbW1hbmQNCnRvIHRyYW5zaXRpb24gdGhlIFNFViBndWVzdCB0byB0aGUgcnVu
-bmFibGUgc3RhdGUgc28gdGhhdCBpdCBjYW4gYmUNCmV4ZWN1dGVkLg0KDQpTaWduZWQtb2ZmLWJ5
-OiBCcmlqZXNoIFNpbmdoIDxicmlqZXNoLnNpbmdoQGFtZC5jb20+DQotLS0NCiBhY2NlbC9rdm0v
-a3ZtLWFsbC5jICAgICAgfCAgIDEgKw0KIHRhcmdldC9pMzg2L3Nldi5jICAgICAgICB8IDEyNiAr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0NCiB0YXJnZXQvaTM4Ni90cmFj
-ZS1ldmVudHMgfCAgIDMgKw0KIDMgZmlsZXMgY2hhbmdlZCwgMTI5IGluc2VydGlvbnMoKyksIDEg
-ZGVsZXRpb24oLSkNCg0KZGlmZiAtLWdpdCBhL2FjY2VsL2t2bS9rdm0tYWxsLmMgYi9hY2NlbC9r
-dm0va3ZtLWFsbC5jDQppbmRleCA4NWQ2NTA4ZTdmLi5mZTY1YzhlYjVkIDEwMDY0NA0KLS0tIGEv
-YWNjZWwva3ZtL2t2bS1hbGwuYw0KKysrIGIvYWNjZWwva3ZtL2t2bS1hbGwuYw0KQEAgLTE3ODUs
-NiArMTc4NSw3IEBAIHN0YXRpYyBpbnQga3ZtX2luaXQoTWFjaGluZVN0YXRlICptcykNCiAgICAg
-ICAgIGt2bV9zdGF0ZS0+bWVtY3J5cHRfZW5jcnlwdF9kYXRhID0gc2V2X2VuY3J5cHRfZGF0YTsN
-CiAgICAgICAgIGt2bV9zdGF0ZS0+bWVtY3J5cHRfc3luY19wYWdlX2VuY19iaXRtYXAgPSBzZXZf
-c3luY19wYWdlX2VuY19iaXRtYXA7DQogICAgICAgICBrdm1fc3RhdGUtPm1lbWNyeXB0X3NhdmVf
-b3V0Z29pbmdfcGFnZSA9IHNldl9zYXZlX291dGdvaW5nX3BhZ2U7DQorICAgICAgICBrdm1fc3Rh
-dGUtPm1lbWNyeXB0X2xvYWRfaW5jb21pbmdfcGFnZSA9IHNldl9sb2FkX2luY29taW5nX3BhZ2U7
-DQogICAgIH0NCiANCiAgICAgcmV0ID0ga3ZtX2FyY2hfaW5pdChtcywgcyk7DQpkaWZmIC0tZ2l0
-IGEvdGFyZ2V0L2kzODYvc2V2LmMgYi90YXJnZXQvaTM4Ni9zZXYuYw0KaW5kZXggYjVhYTUzZWM0
-NC4uYjdmZWVkY2U3ZCAxMDA2NDQNCi0tLSBhL3RhcmdldC9pMzg2L3Nldi5jDQorKysgYi90YXJn
-ZXQvaTM4Ni9zZXYuYw0KQEAgLTcwOCwxMyArNzA4LDM0IEBAIHNldl9sYXVuY2hfZmluaXNoKFNF
-VlN0YXRlICpzKQ0KICAgICB9DQogfQ0KIA0KK3N0YXRpYyBpbnQNCitzZXZfcmVjZWl2ZV9maW5p
-c2goU0VWU3RhdGUgKnMpDQorew0KKyAgICBpbnQgZXJyb3IsIHJldCA9IDE7DQorDQorICAgIHRy
-YWNlX2t2bV9zZXZfcmVjZWl2ZV9maW5pc2goKTsNCisgICAgcmV0ID0gc2V2X2lvY3RsKHMtPnNl
-dl9mZCwgS1ZNX1NFVl9SRUNFSVZFX0ZJTklTSCwgMCwgJmVycm9yKTsNCisgICAgaWYgKHJldCkg
-ew0KKyAgICAgICAgZXJyb3JfcmVwb3J0KCIlczogUkVDRUlWRV9GSU5JU0ggcmV0PSVkIGZ3X2Vy
-cm9yPSVkICclcyciLA0KKyAgICAgICAgICAgICAgICBfX2Z1bmNfXywgcmV0LCBlcnJvciwgZndf
-ZXJyb3JfdG9fc3RyKGVycm9yKSk7DQorICAgICAgICBnb3RvIGVycjsNCisgICAgfQ0KKw0KKyAg
-ICBzZXZfc2V0X2d1ZXN0X3N0YXRlKFNFVl9TVEFURV9SVU5OSU5HKTsNCitlcnI6DQorICAgIHJl
-dHVybiByZXQ7DQorfQ0KKw0KKw0KIHN0YXRpYyB2b2lkDQogc2V2X3ZtX3N0YXRlX2NoYW5nZSh2
-b2lkICpvcGFxdWUsIGludCBydW5uaW5nLCBSdW5TdGF0ZSBzdGF0ZSkNCiB7DQogICAgIFNFVlN0
-YXRlICpzID0gb3BhcXVlOw0KIA0KICAgICBpZiAocnVubmluZykgew0KLSAgICAgICAgaWYgKCFz
-ZXZfY2hlY2tfc3RhdGUoU0VWX1NUQVRFX1JVTk5JTkcpKSB7DQorICAgICAgICBpZiAoc2V2X2No
-ZWNrX3N0YXRlKFNFVl9TVEFURV9SRUNFSVZFX1VQREFURSkpIHsNCisgICAgICAgICAgICBzZXZf
-cmVjZWl2ZV9maW5pc2gocyk7DQorICAgICAgICB9IGVsc2UgaWYgKCFzZXZfY2hlY2tfc3RhdGUo
-U0VWX1NUQVRFX1JVTk5JTkcpKSB7DQogICAgICAgICAgICAgc2V2X2xhdW5jaF9maW5pc2gocyk7
-DQogICAgICAgICB9DQogICAgIH0NCkBAIC0xMDkyLDYgKzExMTMsMTA5IEBAIGludCBzZXZfc2F2
-ZV9vdXRnb2luZ19wYWdlKHZvaWQgKmhhbmRsZSwgUUVNVUZpbGUgKmYsIHVpbnQ4X3QgKnB0ciwN
-CiAgICAgcmV0dXJuIHNldl9zZW5kX3VwZGF0ZV9kYXRhKHMsIGYsIHB0ciwgc3osIGJ5dGVzX3Nl
-bnQpOw0KIH0NCiANCitzdGF0aWMgaW50DQorc2V2X3JlY2VpdmVfc3RhcnQoUVNldkd1ZXN0SW5m
-byAqc2V2LCBRRU1VRmlsZSAqZikNCit7DQorICAgIGludCByZXQgPSAxOw0KKyAgICBpbnQgZndf
-ZXJyb3I7DQorICAgIHN0cnVjdCBrdm1fc2V2X3JlY2VpdmVfc3RhcnQgKnN0YXJ0Ow0KKyAgICBn
-Y2hhciAqc2Vzc2lvbiA9IE5VTEwsICpwZGhfY2VydCA9IE5VTEw7DQorDQorICAgIHN0YXJ0ID0g
-Z19uZXcwKHN0cnVjdCBrdm1fc2V2X3JlY2VpdmVfc3RhcnQsIDEpOw0KKw0KKyAgICAvKiBnZXQg
-U0VWIGd1ZXN0IGhhbmRsZSAqLw0KKyAgICBzdGFydC0+aGFuZGxlID0gb2JqZWN0X3Byb3BlcnR5
-X2dldF9pbnQoT0JKRUNUKHNldiksICJoYW5kbGUiLA0KKyAgICAgICAgICAgICZlcnJvcl9hYm9y
-dCk7DQorDQorICAgIC8qIGdldCB0aGUgc291cmNlIHBvbGljeSAqLw0KKyAgICBzdGFydC0+cG9s
-aWN5ID0gcWVtdV9nZXRfYmUzMihmKTsNCisNCisgICAgLyogZ2V0IHNvdXJjZSBQREgga2V5ICov
-DQorICAgIHN0YXJ0LT5wZGhfbGVuID0gcWVtdV9nZXRfYmUzMihmKTsNCisgICAgcGRoX2NlcnQg
-PSBnX25ldyhnY2hhciwgc3RhcnQtPnBkaF9sZW4pOw0KKyAgICBxZW11X2dldF9idWZmZXIoZiwg
-KHVpbnQ4X3QgKilwZGhfY2VydCwgc3RhcnQtPnBkaF9sZW4pOw0KKyAgICBzdGFydC0+cGRoX3Vh
-ZGRyID0gKHVuc2lnbmVkIGxvbmcpcGRoX2NlcnQ7DQorDQorICAgIC8qIGdldCBzb3VyY2Ugc2Vz
-c2lvbiBkYXRhICovDQorICAgIHN0YXJ0LT5zZXNzaW9uX2xlbiA9IHFlbXVfZ2V0X2JlMzIoZik7
-DQorICAgIHNlc3Npb24gPSBnX25ldyhnY2hhciwgc3RhcnQtPnNlc3Npb25fbGVuKTsNCisgICAg
-cWVtdV9nZXRfYnVmZmVyKGYsICh1aW50OF90ICopc2Vzc2lvbiwgc3RhcnQtPnNlc3Npb25fbGVu
-KTsNCisgICAgc3RhcnQtPnNlc3Npb25fdWFkZHIgPSAodW5zaWduZWQgbG9uZylzZXNzaW9uOw0K
-Kw0KKyAgICB0cmFjZV9rdm1fc2V2X3JlY2VpdmVfc3RhcnQoc3RhcnQtPnBvbGljeSwgc2Vzc2lv
-biwgcGRoX2NlcnQpOw0KKw0KKyAgICByZXQgPSBzZXZfaW9jdGwoc2V2X3N0YXRlLT5zZXZfZmQs
-IEtWTV9TRVZfUkVDRUlWRV9TVEFSVCwgc3RhcnQsICZmd19lcnJvcik7DQorICAgIGlmIChyZXQg
-PCAwKSB7DQorICAgICAgICBlcnJvcl9yZXBvcnQoIkVycm9yIFJFQ0VJVkVfU1RBUlQgcmV0PSVk
-IGZ3X2Vycm9yPSVkICclcyciLA0KKyAgICAgICAgICAgICAgICByZXQsIGZ3X2Vycm9yLCBmd19l
-cnJvcl90b19zdHIoZndfZXJyb3IpKTsNCisgICAgICAgIGdvdG8gZXJyOw0KKyAgICB9DQorDQor
-ICAgIG9iamVjdF9wcm9wZXJ0eV9zZXRfaW50KE9CSkVDVChzZXYpLCBzdGFydC0+aGFuZGxlLCAi
-aGFuZGxlIiwgJmVycm9yX2Fib3J0KTsNCisgICAgc2V2X3NldF9ndWVzdF9zdGF0ZShTRVZfU1RB
-VEVfUkVDRUlWRV9VUERBVEUpOw0KK2VycjoNCisgICAgZ19mcmVlKHN0YXJ0KTsNCisgICAgZ19m
-cmVlKHNlc3Npb24pOw0KKyAgICBnX2ZyZWUocGRoX2NlcnQpOw0KKw0KKyAgICByZXR1cm4gcmV0
-Ow0KK30NCisNCitzdGF0aWMgaW50IHNldl9yZWNlaXZlX3VwZGF0ZV9kYXRhKFFFTVVGaWxlICpm
-LCB1aW50OF90ICpwdHIpDQorew0KKyAgICBpbnQgcmV0ID0gMSwgZndfZXJyb3IgPSAwOw0KKyAg
-ICBnY2hhciAqaGRyID0gTlVMTCwgKnRyYW5zID0gTlVMTDsNCisgICAgc3RydWN0IGt2bV9zZXZf
-cmVjZWl2ZV91cGRhdGVfZGF0YSAqdXBkYXRlOw0KKw0KKyAgICB1cGRhdGUgPSBnX25ldzAoc3Ry
-dWN0IGt2bV9zZXZfcmVjZWl2ZV91cGRhdGVfZGF0YSwgMSk7DQorDQorICAgIC8qIGdldCBwYWNr
-ZXQgaGVhZGVyICovDQorICAgIHVwZGF0ZS0+aGRyX2xlbiA9IHFlbXVfZ2V0X2JlMzIoZik7DQor
-ICAgIGhkciA9IGdfbmV3KGdjaGFyLCB1cGRhdGUtPmhkcl9sZW4pOw0KKyAgICBxZW11X2dldF9i
-dWZmZXIoZiwgKHVpbnQ4X3QgKiloZHIsIHVwZGF0ZS0+aGRyX2xlbik7DQorICAgIHVwZGF0ZS0+
-aGRyX3VhZGRyID0gKHVuc2lnbmVkIGxvbmcpaGRyOw0KKw0KKyAgICAvKiBnZXQgdHJhbnNwb3J0
-IGJ1ZmZlciAqLw0KKyAgICB1cGRhdGUtPnRyYW5zX2xlbiA9IHFlbXVfZ2V0X2JlMzIoZik7DQor
-ICAgIHRyYW5zID0gZ19uZXcoZ2NoYXIsIHVwZGF0ZS0+dHJhbnNfbGVuKTsNCisgICAgdXBkYXRl
-LT50cmFuc191YWRkciA9ICh1bnNpZ25lZCBsb25nKXRyYW5zOw0KKyAgICBxZW11X2dldF9idWZm
-ZXIoZiwgKHVpbnQ4X3QgKil1cGRhdGUtPnRyYW5zX3VhZGRyLCB1cGRhdGUtPnRyYW5zX2xlbik7
-DQorDQorICAgIHVwZGF0ZS0+Z3Vlc3RfdWFkZHIgPSAodW5zaWduZWQgbG9uZykgcHRyOw0KKyAg
-ICB1cGRhdGUtPmd1ZXN0X2xlbiA9IHVwZGF0ZS0+dHJhbnNfbGVuOw0KKw0KKyAgICB0cmFjZV9r
-dm1fc2V2X3JlY2VpdmVfdXBkYXRlX2RhdGEodHJhbnMsIHB0ciwgdXBkYXRlLT5ndWVzdF9sZW4s
-DQorICAgICAgICAgICAgaGRyLCB1cGRhdGUtPmhkcl9sZW4pOw0KKw0KKyAgICByZXQgPSBzZXZf
-aW9jdGwoc2V2X3N0YXRlLT5zZXZfZmQsIEtWTV9TRVZfUkVDRUlWRV9VUERBVEVfREFUQSwNCisg
-ICAgICAgICAgICAgICAgICAgIHVwZGF0ZSwgJmZ3X2Vycm9yKTsNCisgICAgaWYgKHJldCkgew0K
-KyAgICAgICAgZXJyb3JfcmVwb3J0KCJFcnJvciBSRUNFSVZFX1VQREFURV9EQVRBIHJldD0lZCBm
-d19lcnJvcj0lZCAnJXMnIiwNCisgICAgICAgICAgICAgICAgcmV0LCBmd19lcnJvciwgZndfZXJy
-b3JfdG9fc3RyKGZ3X2Vycm9yKSk7DQorICAgICAgICBnb3RvIGVycjsNCisgICAgfQ0KK2VycjoN
-CisgICAgZ19mcmVlKHRyYW5zKTsNCisgICAgZ19mcmVlKHVwZGF0ZSk7DQorICAgIGdfZnJlZSho
-ZHIpOw0KKyAgICByZXR1cm4gcmV0Ow0KK30NCisNCitpbnQgc2V2X2xvYWRfaW5jb21pbmdfcGFn
-ZSh2b2lkICpoYW5kbGUsIFFFTVVGaWxlICpmLCB1aW50OF90ICpwdHIpDQorew0KKyAgICBTRVZT
-dGF0ZSAqcyA9IChTRVZTdGF0ZSAqKWhhbmRsZTsNCisNCisgICAgLyogSWYgdGhpcyBpcyBmaXJz
-dCBidWZmZXIgYW5kIFNFViBpcyBub3QgaW4gcmVjaWVpdmluZyBzdGF0ZSB0aGVuDQorICAgICAq
-IHVzZSBSRUNFSVZFX1NUQVJUIGNvbW1hbmQgdG8gY3JlYXRlIGEgZW5jcnlwdGlvbiBjb250ZXh0
-Lg0KKyAgICAgKi8NCisgICAgaWYgKCFzZXZfY2hlY2tfc3RhdGUoU0VWX1NUQVRFX1JFQ0VJVkVf
-VVBEQVRFKSAmJg0KKyAgICAgICAgc2V2X3JlY2VpdmVfc3RhcnQocy0+c2V2X2luZm8sIGYpKSB7
-DQorICAgICAgICByZXR1cm4gMTsNCisgICAgfQ0KKw0KKyAgICByZXR1cm4gc2V2X3JlY2VpdmVf
-dXBkYXRlX2RhdGEoZiwgcHRyKTsNCit9DQorDQogc3RhdGljIHZvaWQNCiBzZXZfcmVnaXN0ZXJf
-dHlwZXModm9pZCkNCiB7DQpkaWZmIC0tZ2l0IGEvdGFyZ2V0L2kzODYvdHJhY2UtZXZlbnRzIGIv
-dGFyZ2V0L2kzODYvdHJhY2UtZXZlbnRzDQppbmRleCBiNDE1MTZjZjlmLi42MDk3NTJjY2E3IDEw
-MDY0NA0KLS0tIGEvdGFyZ2V0L2kzODYvdHJhY2UtZXZlbnRzDQorKysgYi90YXJnZXQvaTM4Ni90
-cmFjZS1ldmVudHMNCkBAIC0xOCwzICsxOCw2IEBAIGt2bV9zZXZfbGF1bmNoX2ZpbmlzaCh2b2lk
-KSAiIg0KIGt2bV9zZXZfc2VuZF9zdGFydCh1aW50NjRfdCBwZGgsIGludCBsMSwgdWludDY0X3Qg
-cGxhdCwgaW50IGwyLCB1aW50NjRfdCBhbWQsIGludCBsMykgInBkaCAweCUiIFBSSXg2NCAiIGxl
-biAlZCBwbGF0IDB4JSIgUFJJeDY0ICIgbGVuICVkIGFtZCAweCUiIFBSSXg2NCAiIGxlbiAlZCIN
-CiBrdm1fc2V2X3NlbmRfdXBkYXRlX2RhdGEodm9pZCAqc3JjLCB2b2lkICpkc3QsIGludCBsZW4p
-ICJndWVzdCAlcCB0cmFucyAlcCBsZW4gJWQiDQoga3ZtX3Nldl9zZW5kX2ZpbmlzaCh2b2lkKSAi
-Ig0KK2t2bV9zZXZfcmVjZWl2ZV9zdGFydChpbnQgcG9saWN5LCB2b2lkICpzZXNzaW9uLCB2b2lk
-ICpwZGgpICJwb2xpY3kgMHgleCBzZXNzaW9uICVwIHBkaCAlcCINCitrdm1fc2V2X3JlY2VpdmVf
-dXBkYXRlX2RhdGEodm9pZCAqc3JjLCB2b2lkICpkc3QsIGludCBsZW4sIHZvaWQgKmhkciwgaW50
-IGhkcl9sZW4pICJndWVzdCAlcCB0cmFucyAlcCBsZW4gJWQgaGRyICVwIGhkcl9sZW4gJWQiDQor
-a3ZtX3Nldl9yZWNlaXZlX2ZpbmlzaCh2b2lkKSAiIg0KLS0gDQoyLjE3LjENCg0K
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+
+Previously there was a single instance of the timer used by
+monitor triggered announces, that's OK, but when combined with the
+previous change that lets you have announces for subsets of interfaces
+it's a bit restrictive if you want to do different things to different
+interfaces.
+
+Add an 'id' field to the announce, and maintain a list of the
+timers based on id.
+
+This allows you to for example:
+    a) Start an announce going on interface eth0 for a long time
+    b) Start an announce going on interface eth1 for a long time
+    c) Kill the announce on eth0 while leaving eth1 going.
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ hw/net/virtio-net.c    |  4 ++--
+ include/net/announce.h |  8 +++++--
+ net/announce.c         | 52 ++++++++++++++++++++++++++++++++++++------
+ net/trace-events       |  3 ++-
+ qapi/net.json          |  9 ++++++--
+ 5 files changed, 62 insertions(+), 14 deletions(-)
+
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index c3f5fccfd1..b9e1cd71cf 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -2360,7 +2360,7 @@ static int virtio_net_post_load_device(void *opaque=
+, int version_id)
+             timer_mod(n->announce_timer.tm,
+                       qemu_clock_get_ms(n->announce_timer.type));
+         } else {
+-            qemu_announce_timer_del(&n->announce_timer);
++            qemu_announce_timer_del(&n->announce_timer, false);
+         }
+     }
+=20
+@@ -2784,7 +2784,7 @@ static void virtio_net_device_unrealize(DeviceState=
+ *dev, Error **errp)
+         virtio_net_del_queue(n, i);
+     }
+=20
+-    qemu_announce_timer_del(&n->announce_timer);
++    qemu_announce_timer_del(&n->announce_timer, false);
+     g_free(n->vqs);
+     qemu_del_nic(n->nic);
+     virtio_net_rsc_cleanup(n);
+diff --git a/include/net/announce.h b/include/net/announce.h
+index 773470428b..3d90c83c23 100644
+--- a/include/net/announce.h
++++ b/include/net/announce.h
+@@ -22,8 +22,12 @@ struct AnnounceTimer {
+ /* Returns: update the timer to the next time point */
+ int64_t qemu_announce_timer_step(AnnounceTimer *timer);
+=20
+-/* Delete the underlying timer and other data */
+-void qemu_announce_timer_del(AnnounceTimer *timer);
++/*
++ * Delete the underlying timer and other data
++ * If 'free_named' true and the timer is a named timer, then remove
++ * it from the list of named timers and free the AnnounceTimer itself.
++ */
++void qemu_announce_timer_del(AnnounceTimer *timer, bool free_named);
+=20
+ /*
+  * Under BQL/main thread
+diff --git a/net/announce.c b/net/announce.c
+index 1ce42b571d..db90d3bd4b 100644
+--- a/net/announce.c
++++ b/net/announce.c
+@@ -15,6 +15,8 @@
+ #include "qapi/qapi-commands-net.h"
+ #include "trace.h"
+=20
++static GData *named_timers;
++
+ int64_t qemu_announce_timer_step(AnnounceTimer *timer)
+ {
+     int64_t step;
+@@ -31,8 +33,13 @@ int64_t qemu_announce_timer_step(AnnounceTimer *timer)
+     return step;
+ }
+=20
+-void qemu_announce_timer_del(AnnounceTimer *timer)
++/*
++ * If 'free_named' is true, then remove the timer from the list
++ * and free the timer itself.
++ */
++void qemu_announce_timer_del(AnnounceTimer *timer, bool free_named)
+ {
++    bool free_timer =3D false;
+     if (timer->tm) {
+         timer_del(timer->tm);
+         timer_free(timer->tm);
+@@ -40,6 +47,24 @@ void qemu_announce_timer_del(AnnounceTimer *timer)
+     }
+     qapi_free_strList(timer->params.interfaces);
+     timer->params.interfaces =3D NULL;
++    if (free_named && timer->params.has_id) {
++        AnnounceTimer *list_timer;
++        /*
++         * Sanity check: There should only be one timer on the list with
++         * the id.
++         */
++        list_timer =3D g_datalist_get_data(&named_timers, timer->params.=
+id);
++        assert(timer =3D=3D list_timer);
++        free_timer =3D true;
++        g_datalist_remove_data(&named_timers, timer->params.id);
++    }
++    trace_qemu_announce_timer_del(free_named, free_timer, timer->params.=
+id);
++    g_free(timer->params.id);
++    timer->params.id =3D NULL;
++
++    if (free_timer) {
++        g_free(timer);
++    }
+ }
+=20
+ /*
+@@ -56,7 +81,7 @@ void qemu_announce_timer_reset(AnnounceTimer *timer,
+      * We're under the BQL, so the current timer can't
+      * be firing, so we should be able to delete it.
+      */
+-    qemu_announce_timer_del(timer);
++    qemu_announce_timer_del(timer, false);
+=20
+     QAPI_CLONE_MEMBERS(AnnounceParameters, &timer->params, params);
+     timer->round =3D params->rounds;
+@@ -120,7 +145,8 @@ static void qemu_announce_self_iter(NICState *nic, vo=
+id *opaque)
+         skip =3D false;
+     }
+=20
+-    trace_qemu_announce_self_iter(nic->ncs->name,
++    trace_qemu_announce_self_iter(timer->params.has_id ? timer->params.i=
+d : "_",
++                                  nic->ncs->name,
+                                   qemu_ether_ntoa(&nic->conf->macaddr), =
+skip);
+=20
+     if (!skip) {
+@@ -143,7 +169,7 @@ static void qemu_announce_self_once(void *opaque)
+     if (--timer->round) {
+         qemu_announce_timer_step(timer);
+     } else {
+-        qemu_announce_timer_del(timer);
++        qemu_announce_timer_del(timer, true);
+     }
+ }
+=20
+@@ -154,12 +180,24 @@ void qemu_announce_self(AnnounceTimer *timer, Annou=
+nceParameters *params)
+     if (params->rounds) {
+         qemu_announce_self_once(timer);
+     } else {
+-        qemu_announce_timer_del(timer);
++        qemu_announce_timer_del(timer, true);
+     }
+ }
+=20
+ void qmp_announce_self(AnnounceParameters *params, Error **errp)
+ {
+-    static AnnounceTimer announce_timer;
+-    qemu_announce_self(&announce_timer, params);
++    AnnounceTimer *named_timer;
++    if (!params->has_id) {
++        params->id =3D g_strdup("");
++        params->has_id =3D true;
++    }
++
++    named_timer =3D g_datalist_get_data(&named_timers, params->id);
++
++    if (!named_timer) {
++        named_timer =3D g_new0(AnnounceTimer, 1);
++        g_datalist_set_data(&named_timers, params->id, named_timer);
++    }
++
++    qemu_announce_self(named_timer, params);
+ }
+diff --git a/net/trace-events b/net/trace-events
+index 875ef2a0f3..ac57056497 100644
+--- a/net/trace-events
++++ b/net/trace-events
+@@ -1,7 +1,8 @@
+ # See docs/devel/tracing.txt for syntax documentation.
+=20
+ # announce.c
+-qemu_announce_self_iter(const char *name, const char *mac, int skip) "%s=
+:%s skip: %d"
++qemu_announce_self_iter(const char *id, const char *name, const char *ma=
+c, int skip) "%s:%s:%s skip: %d"
++qemu_announce_timer_del(bool free_named, bool free_timer, char *id) "fre=
+e named: %d free timer: %d id: %s"
+=20
+ # vhost-user.c
+ vhost_user_event(const char *chr, int event) "chr: %s got event: %d"
+diff --git a/qapi/net.json b/qapi/net.json
+index 6f2cd4f530..728990f4fb 100644
+--- a/qapi/net.json
++++ b/qapi/net.json
+@@ -702,6 +702,10 @@
+ # @interfaces: An optional list of interface names, which restricts the
+ #        announcement to the listed interfaces. (Since 4.1)
+ #
++# @id: A name to be used to identify an instance of announce-timers
++#        and to allow it to modified later.  Not for use as
++#        part of the migration parameters. (Since 4.1)
++#
+ # Since: 4.0
+ ##
+=20
+@@ -710,7 +714,8 @@
+             'max': 'int',
+             'rounds': 'int',
+             'step': 'int',
+-            '*interfaces': ['str'] } }
++            '*interfaces': ['str'],
++            '*id' : 'str' } }
+=20
+ ##
+ # @announce-self:
+@@ -725,7 +730,7 @@
+ # -> { "execute": "announce-self",
+ #      "arguments": {
+ #          "initial": 50, "max": 550, "rounds": 10, "step": 50,
+-#          "interfaces": ["vn2", "vn3"] } }
++#          "interfaces": ["vn2", "vn3"], "id": "bob" } }
+ # <- { "return": {} }
+ #
+ # Since: 4.0
+--=20
+2.21.0
+
 
