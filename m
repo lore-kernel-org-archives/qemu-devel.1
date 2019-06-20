@@ -2,170 +2,69 @@ Return-Path: <SRS0=JMAk=UT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E2EFC43613
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 05:57:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1252C43613
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 06:19:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F87E20B1F
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 05:57:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5D4672147A
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Jun 2019 06:19:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="QkLEAZAG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F87E20B1F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="jiZIBVSX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D4672147A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43890 helo=lists.gnu.org)
+Received: from localhost ([::1]:43980 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hdq4l-0005kW-Dh
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 01:57:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56758)
+	id 1hdqPr-00020i-9L
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 02:19:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35257)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aik@ozlabs.ru>) id 1hdpyX-00086i-1I
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 01:51:12 -0400
+ (envelope-from <winaes@yandex.ru>) id 1hdl9Y-0004WC-1O
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 20:42:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1hdpyU-0004Lf-3X
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 01:51:08 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:45971)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1hdpyQ-0004Fu-AR
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 01:51:04 -0400
-Received: by mail-pf1-x444.google.com with SMTP id r1so998540pfq.12
- for <qemu-devel@nongnu.org>; Wed, 19 Jun 2019 22:50:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
- h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=JRhfy40b4ieXjrMOChWaFl5raP7YbEqE9NZhMFUo3Ko=;
- b=QkLEAZAG74sgwFp1fLtqA3bGy/kveYmJZ+jB8hNiFoXjFfluuxDCUpLaSxIOx76Cef
- UsjkhLT1jR3JXC8qJvCuuDhW3LnZfd0MvHLzgsyktuw3TBzSVQKvTCbS2n7LXjzgE3NZ
- U/y3XDIhn82ffgwbfQhCg0Y3BE6CyB6wNQsRV5KQXqeP+sgOWYDRHsdKZ3FGN4y8b/6r
- aFFI36wXH9oGD0aJJ1oiQaLkXTO6yCWoP+bwVR4MimPcaRcLHrvomb4nvURwldsjev94
- thZmR6uTHi67UWuX6AYUp3BX9zbz5RUqeTkzw+n2AaDIK50rtgxrNQZsDwbvaTwpXPr0
- 7m8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=JRhfy40b4ieXjrMOChWaFl5raP7YbEqE9NZhMFUo3Ko=;
- b=AJOXOg+fnfwHL7UpbigjySIFzNv4c1Q3S5tcV6KmLBPiA0C3TigXAaKZGzW3ZJ7Xf2
- fnX1gwW4/idOBSJ6L7cTkME/ogYGH0J7wlNRekfkYl/A+7pSM+O6ma68kY5GMlb0ME0/
- RmKoCBfel0C0Pk2f6NZAiU3/M+YzoBRpDEU5CmaJa3bU0UiWHudeo0qcAg8Atp6/qXwB
- FGafAiBDMSBtDOGMkJGT+dn5grWYbx/nkLfengsr7O4UnoVDw8Vumssp0SPmjtFaJAnb
- R3IHcKewNCNTUHz9gxpT9wJyCZdPOAqMSw0zhgE7zvIuMOnD/Cczh6lSei9ocG0RFh0Y
- 7E5Q==
-X-Gm-Message-State: APjAAAU1J1BciMO5PKvHLT981sK+Seuki5Ao6zMMYMLaTPhd4qy9b4c+
- MdxN9u9WYdFlsTtxhSI7IAYaAA==
-X-Google-Smtp-Source: APXvYqwAFDSAgeIwrzP4bqlG8ZBMdjh4fV+woZBhSenM9ON9n+5shn6STVef/lbWC1x5rHVPYJwI5g==
-X-Received: by 2002:a17:90a:228b:: with SMTP id
- s11mr1215320pjc.23.1561009857229; 
- Wed, 19 Jun 2019 22:50:57 -0700 (PDT)
-Received: from [10.61.2.175] ([122.99.82.10])
- by smtp.gmail.com with ESMTPSA id r1sm17056555pfq.100.2019.06.19.22.50.54
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 19 Jun 2019 22:50:56 -0700 (PDT)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>
-References: <20190613050937.124903-1-aik@ozlabs.ru>
- <35361394-42ba-dcf0-6fe2-5a0a538d1440@redhat.com>
- <d20e26db-7157-d9bd-c707-d7f4443396c0@ozlabs.ru>
- <20190614093306.GG10957@stefanha-x1.localdomain>
- <33c70ea6-08d7-d4ba-210b-328ea275cfe5@ozlabs.ru>
- <fa361ec0-c734-567a-d617-6613b6e89f78@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Openpgp: preference=signencrypt
-Autocrypt: addr=aik@ozlabs.ru; keydata=
- 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
-Message-ID: <bbbf2fd0-34e5-c9a9-a11c-f87d07cc3b8f@ozlabs.ru>
-Date: Thu, 20 Jun 2019 15:50:53 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+ (envelope-from <winaes@yandex.ru>) id 1hdl5p-0005iI-D8
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 20:38:23 -0400
+Received: from forward105p.mail.yandex.net
+ ([2a02:6b8:0:1472:2741:0:8b7:108]:43549)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <winaes@yandex.ru>) id 1hdl5o-0005fl-Nb
+ for qemu-devel@nongnu.org; Wed, 19 Jun 2019 20:38:21 -0400
+Received: from mxback9j.mail.yandex.net (mxback9j.mail.yandex.net
+ [IPv6:2a02:6b8:0:1619::112])
+ by forward105p.mail.yandex.net (Yandex) with ESMTP id 785EF4D400DE
+ for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 03:38:15 +0300 (MSK)
+Received: from localhost (localhost [::1])
+ by mxback9j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id JAxnP49A15-cEJ8pq2w; 
+ Thu, 20 Jun 2019 03:38:14 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+ t=1560991094; bh=hfqClprz5GtHFcppOC1PDmw4SLpPW2IBerJ9I42JlTE=;
+ h=Message-Id:Date:Subject:To:From;
+ b=jiZIBVSXTRAHQpSGSyHzftj7z71TSrrV7BzSr6+8A/S2DRE8ZeqEaG9Ar3CbRwEl0
+ MJiFU6DYj2kLAXcvEiFBvUnclAog8duCHiyfL4rxayqi86bGjIakN4doSnRsxE4jEP
+ HJFftRzclNoQXYu0CDZCKfATSxH3Uzk4bx2x04V4=
+Authentication-Results: mxback9j.mail.yandex.net; dkim=pass header.i=@yandex.ru
+Received: by myt5-02b80404fd9e.qloud-c.yandex.net with HTTP;
+ Thu, 20 Jun 2019 03:38:14 +0300
+From: =?utf-8?B?0JzQtdGC0LvQuNGG0LrQuNC5INCu0YDQuNC5?= <winaes@yandex.ru>
+To: qemu-devel@nongnu.org
 MIME-Version: 1.0
-In-Reply-To: <fa361ec0-c734-567a-d617-6613b6e89f78@redhat.com>
+X-Mailer: Yamail [ http://yandex.ru ] 5.0
+Date: Thu, 20 Jun 2019 03:38:14 +0300
+Message-Id: <16163281560991094@myt5-02b80404fd9e.qloud-c.yandex.net>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH qemu] loader: Trace loaded images
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 2a02:6b8:0:1472:2741:0:8b7:108
+X-Mailman-Approved-At: Thu, 20 Jun 2019 02:17:44 -0400
+Subject: [Qemu-devel] [PATCH] some remarks to build last version of qemu in
+ MSYS2 (from user)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -177,64 +76,379 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hello!
+
+Today I tried to build qemu from git in the current version of MSYS2 for =
+Windows 10 (X64).
+As a result, got the file qemu-setup-4.0.50.exe
+But on the way to this I met several problems that I want to share.
+
+Sorry to be newbie and write in bad english. And so...
+
+After resolving all packages dependencies, I execute the commands:
+
+$ ./configure --enable-gtk --enable-sdl --enable-vnc-sasl --enable-capsto=
+ne=3Dsystem --enable-docs
+-------------------------------------------------------------------------=
+---------------------------------
+Install prefix    c:/Program Files/QEMU
+BIOS directory    c:/Program Files/QEMU
+firmware path     c:/Program Files/QEMU/share/qemu-firmware
+binary directory  c:/Program Files/QEMU
+library directory c:/Program Files/QEMU/lib
+module directory  c:/Program Files/QEMU/lib
+libexec directory c:/Program Files/QEMU/libexec
+include directory c:/Program Files/QEMU/include
+config directory  c:/Program Files/QEMU
+local state directory   queried at runtime
+Windows SDK       no
+Source path       /home/my/qemu
+GIT binary        git
+GIT submodules    ui/keycodemapdb tests/fp/berkeley-testfloat-3 tests/fp/=
+berkeley-softfloat-3 dtc slirp
+C compiler        cc
+Host C compiler   cc
+C++ compiler      c++
+Objective-C compiler cc
+ARFLAGS           rv
+CFLAGS            -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3D2 -g
+QEMU_CFLAGS       -IC:/msys64/mingw64/include/pixman-1 -I$(SRC_PATH)/dtc/=
+libfdt -Werror -DHAS_LIBSSH2_SFTP_FSYNC -IC:/msys64/mingw64/include -pthr=
+ead -mms-bitfields -IC:/msys64/mingw64/include -IC:/msys64/mingw64/includ=
+e/glib-2.0 -IC:/msys64/mingw64/lib/glib-2.0/include -IC:/msys64/mingw64/i=
+nclude -m64 -mcx16 -mthreads -D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LA=
+RGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrit=
+e-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -=
+std=3Dgnu99  -Wexpansion-to-defined -Wendif-labels -Wno-shift-negative-va=
+lue -Wno-missing-include-dirs -Wempty-body -Wnested-externs -Wformat-secu=
+rity -Wformat-y2k -Winit-self -Wignored-qualifiers -Wold-style-declaratio=
+n -Wold-style-definition -Wtype-limits -fstack-protector-strong -IC:/msys=
+64/mingw64/include -IC:/msys64/mingw64/include/p11-kit-1 -IC:/msys64/ming=
+w64/include   -IC:/msys64/mingw64/include/libpng16 -IC:/msys64/mingw64/in=
+clude -IC:/msys64/mingw64/include/capstone
+LDFLAGS           -Wl,--nxcompat -Wl,--no-seh -Wl,--dynamicbase -Wl,--war=
+n-common -m64 -g
+QEMU_LDFLAGS      -L$(BUILD_DIR)/dtc/libfdt
+make              make
+install           install
+python            python3 -B (3.7.3)
+slirp support     git
+smbd              /usr/sbin/smbd
+module support    no
+host CPU          x86_64
+host big endian   no
+target list       aarch64-softmmu alpha-softmmu arm-softmmu cris-softmmu =
+hppa-softmmu i386-softmmu lm32-softmmu m68k-softmmu microblazeel-softmmu =
+microblaze-softmmu mips64el-softmmu mips64-softmmu mipsel-softmmu mips-so=
+ftmmu moxie-softmmu nios2-softmmu or1k-softmmu ppc64-softmmu ppc-softmmu =
+riscv32-softmmu riscv64-softmmu s390x-softmmu sh4eb-softmmu sh4-softmmu s=
+parc64-softmmu sparc-softmmu tricore-softmmu unicore32-softmmu x86_64-sof=
+tmmu xtensaeb-softmmu xtensa-softmmu
+gprof enabled     no
+sparse enabled    no
+strip binaries    yes
+profiler          no
+static build      no
+SDL support       yes (2.0.9)
+SDL image support no
+GTK support       yes (3.24.8)
+GTK GL support    no
+VTE support       no
+TLS priority      NORMAL
+GNUTLS support    yes
+libgcrypt         no
+nettle            yes (3.4.1)
+libtasn1          yes
+PAM               no
+iconv support     yes
+curses support    no
+virgl support     no
+curl support      yes
+mingw32 support   yes
+Audio drivers     dsound
+Block whitelist (rw)
+Block whitelist (ro)
+VirtFS support    no
+Multipath support no
+VNC support       yes
+VNC SASL support  yes
+VNC JPEG support  yes
+VNC PNG support   yes
+xen support       no
+brlapi support    no
+bluez  support    no
+Documentation     yes
+PIE               no
+vde support       no
+netmap support    no
+Linux AIO support no
+ATTR/XATTR support no
+Install blobs     yes
+KVM support       no
+HAX support       yes
+HVF support       no
+WHPX support      no
+TCG support       yes
+TCG debug enabled no
+TCG interpreter   no
+malloc trim support no
+RDMA support      no
+PVRDMA support    no
+fdt support       git
+membarrier        no
+preadv support    no
+fdatasync         no
+madvise           no
+posix_madvise     no
+posix_memalign    no
+libcap-ng support no
+vhost-net support
+vhost-crypto support no
+vhost-scsi support no
+vhost-vsock support no
+vhost-user support no
+Trace backends    log
+spice support     no
+rbd support       no
+xfsctl support    no
+smartcard support no
+libusb            yes
+usb net redir     yes
+OpenGL support    no
+OpenGL dmabufs    no
+libiscsi support  no
+libnfs support    no
+build guest agent yes
+QGA VSS support   no
+QGA w32 disk info yes
+QGA MSI support   no
+seccomp support   no
+coroutine backend win32
+coroutine pool    yes
+debug stack usage no
+mutex debugging   no
+crypto afalg      no
+GlusterFS support no
+gcov              gcov
+gcov enabled      no
+TPM support       no
+libssh2 support   yes
+QOM debugging     yes
+Live block migration yes
+lzo support       yes
+snappy support    yes
+bzip2 support     yes
+lzfse support     no
+NUMA host support no
+libxml2           yes
+tcmalloc support  no
+jemalloc support  no
+avx2 optimization yes
+replication support yes
+VxHS block device no
+bochs support     yes
+cloop support     yes
+dmg support       yes
+qcow v1 support   yes
+vdi support       yes
+vvfat support     yes
+qed support       yes
+parallels support yes
+sheepdog support  yes
+capstone          system
+docker            no
+libpmem support   no
+libudev           no
+default devices   yes
+
+NOTE: cross-compilers enabled:  'cc'
+-------------------------------------------------------------------------=
+---------------------------------
+$ make installer
+
+Problem 1: if I do not use the --enable-capstone=3Dsystem option, the bui=
+ld is aborted
+
+$make -C /home/my/qemu/capstone CAPSTONE_SHARED=3Dno BUILDDIR=3D"/home/my=
+/qemu/capstone" CC=3D"cc" AR=3D"ar" LD=3D"ld" RANLIB=3D"ranlib" CFLAGS=3D=
+"-O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3D2 -g -IC:/msys64/mingw64/inclu=
+de/pixman-1 -I/home/my/qemu/dtc/libfdt -DHAS_LIBSSH2_SFTP_FSYNC -IC:/msys=
+64/mingw64/include -pthread -mms-bitfields -IC:/msys64/mingw64/include -I=
+C:/msys64/mingw64/include/glib-2.0 -IC:/msys64/mingw64/lib/glib-2.0/inclu=
+de -IC:/msys64/mingw64/include -m64 -mcx16 -mthreads -D_GNU_SOURCE -D_FIL=
+E_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE -fno-strict-aliasing -fno-common -=
+fwrapv -std=3Dgnu99 -fstack-protector-strong -IC:/msys64/mingw64/include =
+-IC:/msys64/mingw64/include/p11-kit-1 -IC:/msys64/mingw64/include -IC:/ms=
+ys64/mingw64/include/libpng16 -IC:/msys64/mingw64/include -I/home/my/qemu=
+/capstone/include -I/home/my/qemu/tests -DCAPSTONE_USE_SYS_DYN_MEM -DCAPS=
+TONE_HAS_ARM -DCAPSTONE_HAS_ARM64 -DCAPSTONE_HAS_POWERPC -DCAPSTONE_HAS_X=
+86"  BUILD_DIR=3D/home/my/qemu /home/my/qemu/capstone/capstone.lib
+
+make: Entering directory '/home/my/qemu/capstone'
+make: *** No rule to make target '/home/my/qemu/capstone/capstone.lib'.  =
+Stop.
+make: Leaving directory '/home/my/qemu/capstone'
+
+I found this solution:
+$ cd capstone
+$ make CROSS=3Dx86_64-w64-mingw32- capstone.lib
+  ...
+  AR      capstone.lib
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.1.0/../../../../x86=
+_64-w64-mingw32/bin/ar.exe: creating ./capstone.lib
+$ cd ..
+
+Problem 2: I wanted to use the --enable-vnc-sasl option, but the build st=
+opped due to a conflict of iovec structure definitions in files /mingw64/=
+x86_64-w64-mingw32/include/sasl.h and include/qemu/osdep.h
+I made simple patches:
+
+diff -Nurp cyrus-sasl-2.1.27-old/include/sasl.h cyrus-sasl-2.1.27/include=
+/sasl.h
+--- cyrus-sasl-old/include/sasl.h       2019-06-19 17:05:06.334050200 +03=
+00
++++ cyrus-sasl/include/sasl.h   2019-06-19 17:08:22.115365400 +0300
+@@ -189,8 +189,8 @@
+ #ifndef STRUCT_IOVEC_DEFINED
+ #define STRUCT_IOVEC_DEFINED 1
+ struct iovec {
+-    long iov_len;
+-    char *iov_base;
++    void *iov_base;
++    size_t iov_len;
+ };
+ #endif
+ #else
+
+diff -Nurp qemu-old/include/qemu/osdep.h qemu/include/qemu/osdep.h
+--- qemu-old/include/qemu/osdep.h       2019-06-19 18:10:22.808111000 +03=
+00
++++ qemu/include/qemu/osdep.h   2019-06-19 18:12:54.223226500 +0300
+@@ -483,10 +483,18 @@ bool qemu_write_pidfile(const char *pidf
+ int qemu_get_thread_id(void);
+
+ #ifndef CONFIG_IOVEC
++
++#ifdef _WIN32
++#ifndef STRUCT_IOVEC_DEFINED
++#define STRUCT_IOVEC_DEFINED 1
+ struct iovec {
+     void *iov_base;
+     size_t iov_len;
+ };
++#endif
++#else
++struct iovec;                               /* Defined in OS headers */
++#endif
+ /*
+  * Use the same value as Linux for now.
+  */
+
+Problem 3: when generating the html build stopped with
+
+Warning, treated as error:
+C:/msys64/home/my/qemu/docs/interop/bitmaps.rst:202:Could not lex literal=
+_block as "json". Highlighting skipped.
+
+Here I simply remove the -W option
+
+$ sphinx-build -v -T -n -b html -D version=3D4.0.50 -D release=3D"4.0.50 =
+(v4.0.0-1396-gf3d0bec9f8-dirty)" -d .doctrees/interop /home/my/qemu/docs/=
+interop docs/built/interop
+...
+C:/msys64/home/my/qemu/docs/interop/bitmaps.rst:1437: WARNING: Could not =
+lex literal_block as "json". Highlighting skipped.
+generating indices... genindex
+writing additional pages... search
+copying static files... done
+copying extra files... done
+dumping search index in English (code: en) ... done
+dumping object inventory... done
+build succeeded, 27 warnings.
+
+Problem 4: When installing files into a temporary directory, copying brea=
+ked
+I made a patch by deleting the "/".
+
+--- Makefile-orig       2019-06-16 23:23:49.352281900 +0300
++++ Makefile    2019-06-16 23:31:44.344762800 +0300
+@@ -873,19 +873,19 @@ ifneq ($(DESCS),)
+        done
+ endif
+        for s in $(ICON_SIZES); do \
+-               mkdir -p "$(DESTDIR)/$(qemu_icondir)/hicolor/$${s}/apps";=
+ \
++               mkdir -p "$(DESTDIR)$(qemu_icondir)/hicolor/$${s}/apps"; =
+\
+                $(INSTALL_DATA) $(SRC_PATH)/ui/icons/qemu_$${s}.png \
+-                       "$(DESTDIR)/$(qemu_icondir)/hicolor/$${s}/apps/qe=
+mu.png"; \
++                       "$(DESTDIR)$(qemu_icondir)/hicolor/$${s}/apps/qem=
+u.png"; \
+        done; \
+-       mkdir -p "$(DESTDIR)/$(qemu_icondir)/hicolor/32x32/apps"; \
++       mkdir -p "$(DESTDIR)$(qemu_icondir)/hicolor/32x32/apps"; \
+        $(INSTALL_DATA) $(SRC_PATH)/ui/icons/qemu_32x32.bmp \
+-               "$(DESTDIR)/$(qemu_icondir)/hicolor/32x32/apps/qemu.bmp";=
+ \
+-       mkdir -p "$(DESTDIR)/$(qemu_icondir)/hicolor/scalable/apps"; \
++               "$(DESTDIR)$(qemu_icondir)/hicolor/32x32/apps/qemu.bmp"; =
+\
++       mkdir -p "$(DESTDIR)$(qemu_icondir)/hicolor/scalable/apps"; \
+        $(INSTALL_DATA) $(SRC_PATH)/ui/icons/qemu.svg \
+-               "$(DESTDIR)/$(qemu_icondir)/hicolor/scalable/apps/qemu.sv=
+g"
+-       mkdir -p "$(DESTDIR)/$(qemu_desktopdir)"
++               "$(DESTDIR)$(qemu_icondir)/hicolor/scalable/apps/qemu.svg=
+"
++       mkdir -p "$(DESTDIR)$(qemu_desktopdir)"
+        $(INSTALL_DATA) $(SRC_PATH)/ui/qemu.desktop \
+-               "$(DESTDIR)/$(qemu_desktopdir)/qemu.desktop"
++               "$(DESTDIR)$(qemu_desktopdir)/qemu.desktop"
+ ifdef CONFIG_GTK
+        $(MAKE) -C po $@
+ endif
+
+Problem 5: No bmp files
+...
+File: "C:/msys64/tmp/qemu-nsis\*.bmp" -> no files found.
+Usage: File [/nonfatal] [/a] ([/r] [/x filespec [...]] filespec [...] |
+   /oname=3Doutfile one_file_only)
+Error in script "C:/msys64/home/my/qemu/qemu.nsi" on line 122 -- aborting=
+ creation process
+make: *** [Makefile:1073: qemu-setup-4.0.50.exe] Error 1
+
+Simple hack:
+
+--- qemu.nsi-orig       2019-06-17 00:33:33.148978300 +0300
++++ qemu.nsi    2019-06-20 02:57:19.030516900 +0300
+@@ -119,7 +119,7 @@ Section "${PRODUCT} (required)"
+     File "${SRCDIR}\README"
+     File "${SRCDIR}\VERSION"
+
+-    File "${BINDIR}\*.bmp"
++;    File "${BINDIR}\*.bmp"
+     File "${BINDIR}\*.bin"
+     File "${BINDIR}\*.dtb"
+     File "${BINDIR}\*.rom"
+@@ -206,7 +206,7 @@ Section "Uninstall"
+     Delete "$INSTDIR\COPYING.LIB"
+     Delete "$INSTDIR\README"
+     Delete "$INSTDIR\VERSION"
+-    Delete "$INSTDIR\*.bmp"
++;    Delete "$INSTDIR\*.bmp"
+     Delete "$INSTDIR\*.bin"
+     Delete "$INSTDIR\*.dll"
+     Delete "$INSTDIR\*.dtb"
+
+Finally, the build is over, but it was not very easy
 
 
-On 17/06/2019 14:56, Philippe Mathieu-Daudé wrote:
-> On 6/17/19 3:25 AM, Alexey Kardashevskiy wrote:
->> On 14/06/2019 19:33, Stefan Hajnoczi wrote:
->>> On Fri, Jun 14, 2019 at 10:13:04AM +1000, Alexey Kardashevskiy wrote:
->>>>
->>>>
->>>> On 13/06/2019 23:08, Philippe Mathieu-Daudé wrote:
->>>>> Hi Alexey,
->>>>>
->>>>> On 6/13/19 7:09 AM, Alexey Kardashevskiy wrote:
->>>>>> This adds a trace point which prints every loaded image. This includes
->>>>>> bios/firmware/kernel/initradmdisk/pcirom.
->>>>>>
->>>>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->>>>>> ---
->>>>>>
->>>>>> The example for a pseries guest:
->>>>>>
->>>>>> loader_write_rom slof.bin: @0x0 size=0xe22e0 ROM=0
->>>>>> loader_write_rom phdr #0: /home/aik/t/vml4120le: @0x400000 size=0x13df000 ROM=0
->>>>>> loader_write_rom /home/aik/t/le.cpio: @0x1ad0000 size=0x9463a00 ROM=0
->>>>>
->>>>> I find the "ROM=0" part confuse, maybe you can change to "ROM:false".
->>>>
->>>> How? I mean I can do that in the code as rom->isrom?"true":"false" and
->>>> make trace point accept "%s" but it is quite ugly and others seem to
->>>> just use %d for bool.
->>>
->>> Yes, %d is the convention for bool.  Perhaps you can name it "is_rom"
->>> instead of "ROM".  That way the name communicates that this is a boolean
->>> value.
->>
->> It is quite obvious though that it is boolean even as "ROM" (what else
->> can that be realistically?) and there does not seem to be a convention
->> about xxx:N vs is_xxx:N. And personally I find longer lines worse for
->> limited width screens (I run multiple qemus in tiled tmux). Whose tree
->> is this going to? Let's ask that person :)
-> 
-> Personally I find 'is_rom' clearer. I read 2 addresses, then my first
-> reaction was to parse it as another address. But it is also true we now
-> enforce traced hex values with '0x' prefix, so your 'ROM' is unlikely an
-> address. Tiled tmux is an acceptable argument. Anyway you already got my
-> R-b.
-> 
-> Tree: the PPC tree is likely to get it merged quicker than the MISC tree.
+--=C2=A0
+With best regards, Youry Metlitsky
 
-
-There is nothing specific about PPC though so I guess it is the MISC
-tree, who does maintain that?
-
-
--- 
-Alexey
 
