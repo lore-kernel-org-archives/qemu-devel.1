@@ -2,64 +2,61 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B11EFC43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 16:28:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBB42C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 16:39:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4864020673
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 16:28:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4864020673
+	by mail.kernel.org (Postfix) with ESMTPS id B5B7F20665
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 16:39:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5B7F20665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36694 helo=lists.gnu.org)
+Received: from localhost ([::1]:36736 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heMP4-0007SL-1u
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 12:28:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42716)
+	id 1heMZM-0004Zk-Lo
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 12:39:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44488)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@redhat.com>) id 1heMNv-0006oT-7O
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 12:27:32 -0400
+ (envelope-from <drjones@redhat.com>) id 1heMVH-0001Uo-M6
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 12:35:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1heMNu-0003r8-6Z
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 12:27:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56062)
+ (envelope-from <drjones@redhat.com>) id 1heMVF-0001GO-Kk
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 12:35:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35056)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1heMNt-0003pH-Vu
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 12:27:30 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <drjones@redhat.com>)
+ id 1heMUz-0008U6-P5; Fri, 21 Jun 2019 12:34:51 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3A79330BC100;
- Fri, 21 Jun 2019 16:27:24 +0000 (UTC)
-Received: from localhost (ovpn-117-248.ams2.redhat.com [10.36.117.248])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 08C18604CC;
- Fri, 21 Jun 2019 16:27:13 +0000 (UTC)
-Date: Fri, 21 Jun 2019 17:27:12 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <20190621162712.GA10947@stefanha-x1.localdomain>
-References: <20190621094005.4134-1-stefanha@redhat.com>
- <20190621094005.4134-3-stefanha@redhat.com>
- <CAMxuvaz64dd00mhoZ4QjOZ_eGPMw_WBJQN1tWS0ueUhpSsN1SQ@mail.gmail.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id A714930C584D;
+ Fri, 21 Jun 2019 16:34:34 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3A3D91001DC7;
+ Fri, 21 Jun 2019 16:34:30 +0000 (UTC)
+From: Andrew Jones <drjones@redhat.com>
+To: qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org
+Date: Fri, 21 Jun 2019 18:34:09 +0200
+Message-Id: <20190621163422.6127-2-drjones@redhat.com>
+In-Reply-To: <20190621163422.6127-1-drjones@redhat.com>
+References: <20190621163422.6127-1-drjones@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="WIyZ46R2i8wDzkSu"
-Content-Disposition: inline
-In-Reply-To: <CAMxuvaz64dd00mhoZ4QjOZ_eGPMw_WBJQN1tWS0ueUhpSsN1SQ@mail.gmail.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Fri, 21 Jun 2019 16:27:29 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Fri, 21 Jun 2019 16:34:35 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/4] libvhost-user: support many virtqueues
+Subject: [Qemu-devel] [PATCH v2 01/14] target/arm/cpu64: Ensure kvm really
+ supports aarch64=off
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,67 +68,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sebastien Boeuf <sebastien.boeuf@intel.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, armbru@redhat.com,
+ eric.auger@redhat.com, imammedo@redhat.com, alex.bennee@linaro.org,
+ Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+If -cpu <cpu>,aarch64=3Doff is used then KVM must also be used, and it
+and the host must support running the vcpu in 32-bit mode. Also, if
+-cpu <cpu>,aarch64=3Don is used, then it doesn't matter if kvm is
+enabled or not.
 
---WIyZ46R2i8wDzkSu
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ target/arm/cpu64.c   | 12 ++++++------
+ target/arm/kvm64.c   | 11 +++++++++++
+ target/arm/kvm_arm.h | 14 ++++++++++++++
+ 3 files changed, 31 insertions(+), 6 deletions(-)
 
-On Fri, Jun 21, 2019 at 03:48:36PM +0200, Marc-Andr=E9 Lureau wrote:
-> On Fri, Jun 21, 2019 at 11:40 AM Stefan Hajnoczi <stefanha@redhat.com> wr=
-ote:
-> > diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-us=
-er-blk/vhost-user-blk.c
-> > index 86a3987744..ae61034656 100644
-> > --- a/contrib/vhost-user-blk/vhost-user-blk.c
-> > +++ b/contrib/vhost-user-blk/vhost-user-blk.c
-> > @@ -25,6 +25,10 @@
-> >  #include <sys/ioctl.h>
-> >  #endif
-> >
-> > +enum {
-> > +    VHOST_USER_BLK_MAX_QUEUES =3D 8,
-> > +};
->=20
-> why do you use enum,(and not const int) ? (similarly for other devices)
->=20
-> other than than
-> Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 1901997a0645..946994838d8a 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -407,13 +407,13 @@ static void aarch64_cpu_set_aarch64(Object *obj, bo=
+ol value, Error **errp)
+      * restriction allows us to avoid fixing up functionality that assum=
+es a
+      * uniform execution state like do_interrupt.
+      */
+-    if (!kvm_enabled()) {
+-        error_setg(errp, "'aarch64' feature cannot be disabled "
+-                         "unless KVM is enabled");
+-        return;
+-    }
+-
+     if (value =3D=3D false) {
++        if (!kvm_enabled() || !kvm_arm_aarch32_supported(CPU(cpu))) {
++            error_setg(errp, "'aarch64' feature cannot be disabled "
++                             "unless KVM is enabled and 32-bit EL1 "
++                             "is supported");
++            return;
++        }
+         unset_feature(&cpu->env, ARM_FEATURE_AARCH64);
+     } else {
+         set_feature(&cpu->env, ARM_FEATURE_AARCH64);
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index 22d19c9aec6f..45ccda589903 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -24,7 +24,9 @@
+ #include "exec/gdbstub.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/kvm.h"
++#include "sysemu/kvm_int.h"
+ #include "kvm_arm.h"
++#include "hw/boards.h"
+ #include "internals.h"
+=20
+ static bool have_guest_debug;
+@@ -593,6 +595,15 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeature=
+s *ahcf)
+     return true;
+ }
+=20
++bool kvm_arm_aarch32_supported(CPUState *cpu)
++{
++    KVMState *s =3D KVM_STATE(current_machine->accelerator);
++    int ret;
++
++    ret =3D kvm_check_extension(s, KVM_CAP_ARM_EL1_32BIT);
++    return ret > 0;
++}
++
+ #define ARM_CPU_ID_MPIDR       3, 0, 0, 0, 5
+=20
+ int kvm_arch_init_vcpu(CPUState *cs)
+diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+index 2a07333c615f..812125f805a1 100644
+--- a/target/arm/kvm_arm.h
++++ b/target/arm/kvm_arm.h
+@@ -207,6 +207,15 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeature=
+s *ahcf);
+  */
+ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu);
+=20
++/**
++ * kvm_arm_aarch32_supported:
++ * @cs: CPUState
++ *
++ * Returns true if the KVM VCPU can enable AArch32 mode and false
++ * otherwise.
++ */
++bool kvm_arm_aarch32_supported(CPUState *cs);
++
+ /**
+  * kvm_arm_get_max_vm_ipa_size - Returns the number of bits in the
+  * IPA address space supported by KVM
+@@ -247,6 +256,11 @@ static inline void kvm_arm_set_cpu_features_from_hos=
+t(ARMCPU *cpu)
+     cpu->host_cpu_probe_failed =3D true;
+ }
+=20
++static inline bool kvm_arm_aarch32_supported(CPUState *cs)
++{
++    return false;
++}
++
+ static inline int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
+ {
+     return -ENOENT;
+--=20
+2.20.1
 
-This is how I was taught when I was a little boy.
-
-With an actual variable there's a risk that the compiler reserves space
-for a variable when you actually just need a constant.  Whether modern
-compilers do that or not, I don't know.
-
-The type is clearer when a variable is used instead of an enum.
-
-Pros and cons...
-
-Stefan
-
---WIyZ46R2i8wDzkSu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0NBWAACgkQnKSrs4Gr
-c8i6NggAp0i1+C51JiDFfBU8g1BCCR3UFaA8K7Q5pv/5IAB7Vm/Zh1oB7X/RqoVc
-WFFUqEg0z42LeGMyGExxkwkUfnq5saVbFLmP7AE4wEenBRKqQ4dRj6msxJhyYcM6
-BM9wegfyN15gDDFvbVt489aRpIe9+y/O3NdNuKtpvz3cPTY8RQ2r/WzCEMFJo4zi
-h8y4TfXdYCjLJjL83a8Clrk1x0F1PPBorVZG4CoaiOeEnjloJxm8f4tMcfB475hj
-iJ0Ci8ymqXpKnYLC+gvDYE79ZQZoKz4jkAxoUOGK4WbQlCmcu2wrfVi6AIEv4iNk
-tGgbBnCQ8TJs+TcONTOogMuZMm8RDw==
-=iDYn
------END PGP SIGNATURE-----
-
---WIyZ46R2i8wDzkSu--
 
