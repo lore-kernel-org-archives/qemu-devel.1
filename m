@@ -2,82 +2,83 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0333C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 11:38:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCFD4C48BE0
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 11:38:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 735522083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 11:38:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8EDCC2083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 11:38:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ICy7sHW5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 735522083B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KEn+RO9j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EDCC2083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59880 helo=lists.gnu.org)
+Received: from localhost ([::1]:59882 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heHrl-0006To-NH
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 07:38:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48963)
+	id 1heHrm-0006VX-RW
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 07:38:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49029)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1heHkT-0000ar-Fh
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:32 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1heHkY-0000fj-Ai
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1heHkQ-0005Ev-Bu
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:29 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:38544)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1heHkU-0005Qk-CV
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:34 -0400
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:45647)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1heHkQ-0005Cn-42
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:26 -0400
-Received: by mail-wm1-x341.google.com with SMTP id s15so6220186wmj.3
- for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 04:30:25 -0700 (PDT)
+ id 1heHkU-0005OJ-6A
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:30 -0400
+Received: by mail-wr1-x42d.google.com with SMTP id f9so6189824wre.12
+ for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 04:30:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=ke6hwa+fUFiQaqvIXIEK/11GyBhYea2HOMTU01E3LaM=;
- b=ICy7sHW5samAXJ7/H8BTDY1DCLswqB7AegKSlPf4opmnZtESAMSlHM81f2Apcj+kVs
- 2L2gEQgWet/3V+UkxfNj/r3pk5h5L1jhyZaPssTkmAg9WtzaJAixE5PUr9EDyT4qM3mH
- 0vZpL4nYLFomhC/jthDJxrKjhGd1O0D7QMQEq9phdFphKiH10dUVkYUa7xhv3pTRtjmw
- 481/vO99Z/Z7OhuTo5uhFQuyWWpFRfk7Y8LUZ+Pej1MHOgep3sOZ0WulmyVb3fNyMVUR
- Jp7atNdCP+9js/qzmV30yw+rDw3nL6fwtKTp9deFbDSwstKplmLRfbM2beaS8QiK6S8Y
- luLQ==
+ bh=Iq0W4QsPIXfjOn4JNS6Kd8bNeG3F7+GRE1ESQz9CIvE=;
+ b=KEn+RO9jA57d9xQy63pdzqzckOOwhKNmBSxlZAWjWyy8a4kWGeUZbLm+4R7hA8eeVI
+ NTQN1fULRyFxe2WBPveCWcTEsSTztQ8eP2VuS/pOfjJQ3E2yIA3NJOEo2zYmTlOG6jYs
+ d8UM/v/CGL+4yyYt7H4edWkot6A9O/dMPkHLy5s+ALo8NGC+h2DNJgX9OBfmDo3GnbCJ
+ yHnrUZlY8MZj4kt6LY2qN9Mx/fpptkLqt5wU9j9t3e/RhsB9l4aAq166K1BNvWCVmqvn
+ fTJB3yQszDPzsLuUcXJuFsMxYr3ymoirKnfRjXHbCIYE/yOceEVjpKUshu1yV9zdzZyj
+ TX1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=ke6hwa+fUFiQaqvIXIEK/11GyBhYea2HOMTU01E3LaM=;
- b=gw9K1KMr1L8xD97Z3wYO3cUugTehWandVZUFVaQEnfTOMjI9NP0RFghx6occgGOvh+
- gdszCflNB6wJdCZJKf9g+r+bA4j19qzzCU0kaiZ9irVkHr0s1S1D+7kxipM+rKm0/qzg
- l4qsWstlmswkaFYML8llugYBvn3cWxiqXVpk5U1zTi+JZ+y2R+4ZcK9oesP25LGxShrJ
- DStQgiC6M0dAarWgNJoZ7yhgikJkdpDdhsKnxYeK9sIZapYX682204VroNmjHG2YTRm2
- vsg4NWMOEYNttxB9ypOS8DQrK3jun9Oq5NYN7qCE/gPGrpAJdEr+Thg1b9SOE8RSH/lw
- bRYw==
-X-Gm-Message-State: APjAAAUx9mdGHBtANiE3IsoqR5cNieI7np0CGjdgmfQye3LlhOJHuILv
- iATpr6oBcpkBpbFQGHDVdaAjvZAe
-X-Google-Smtp-Source: APXvYqzs5bQBhvJk07wBq1ilqh66P6ED7DpRePxiIYfEagBtxpEVvAS4d3qjQcPgcanWWaewn20WZw==
-X-Received: by 2002:a1c:9a53:: with SMTP id c80mr3609041wme.173.1561116624284; 
- Fri, 21 Jun 2019 04:30:24 -0700 (PDT)
+ bh=Iq0W4QsPIXfjOn4JNS6Kd8bNeG3F7+GRE1ESQz9CIvE=;
+ b=Bk30HC6WTiIcod7DBuJyaI4mhr5kehg73tBId+z2jZlIirgTJbobtqGbvLKPKI7152
+ lO51E25ctEsJm09ERuKHiQnKhOP7sfst9wxfkgM5czqoh7tuPXuhrGI8BzO5lv8s97s5
+ YWbbCcR1N35Ir/ABMISNSqTevk1iSXnkoUyyzXRjkqy6D4BfwA1RIDI95tQN/UNqUPRl
+ MPUuI6ykmkqO5tJgp1b1A1F6k+uQd0p4ZOa3xt2xbdS/3pHAn83kdMjv0eTtgePqw/MY
+ La4KGQvXAkVS/GgL6hJVXD/Z9i+hMiWeV0mFTG4Sg3wjoRn4smhHgBtzau+QbwHuD4Nv
+ OnkA==
+X-Gm-Message-State: APjAAAVDri+nYchrSUx3PY1uY4VpNfvgLYGfQs+/bCp/a7BroGPu2Yla
+ eGrQ3MDS0lr03si1xH75sXnXhA7g
+X-Google-Smtp-Source: APXvYqxAARNKzFKDIO9jej04MkvryfmnCHMpL/lX/j6Ca2FsMPjjEnmYtiTZUWGrg11wo/ZoVNPotA==
+X-Received: by 2002:adf:eb4e:: with SMTP id u14mr49657531wrn.168.1561116628781; 
+ Fri, 21 Jun 2019 04:30:28 -0700 (PDT)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id r3sm2712851wrr.61.2019.06.21.04.30.23
+ by smtp.gmail.com with ESMTPSA id r3sm2712851wrr.61.2019.06.21.04.30.27
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 21 Jun 2019 04:30:23 -0700 (PDT)
+ Fri, 21 Jun 2019 04:30:27 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 21 Jun 2019 13:29:57 +0200
-Message-Id: <1561116620-22245-3-git-send-email-pbonzini@redhat.com>
+Date: Fri, 21 Jun 2019 13:30:01 +0200
+Message-Id: <1561116620-22245-7-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1561116620-22245-1-git-send-email-pbonzini@redhat.com>
 References: <1561116620-22245-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: [Qemu-devel] [PULL 02/25] hax: Honor CPUState::halted
+X-Received-From: 2a00:1450:4864:20::42d
+Subject: [Qemu-devel] [PULL 06/25] i386/kvm: document existing Hyper-V
+ enlightenments
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,131 +90,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Colin Xu <colin.xu@intel.com>, Yu Ning <yu.ning@intel.com>,
- Chuanxiao Dong <chuanxiao.dong@intel.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Colin Xu <colin.xu@intel.com>
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-QEMU tracks whether a vcpu is halted using CPUState::halted. E.g.,
-after initialization or reset, halted is 0 for the BSP (vcpu 0)
-and 1 for the APs (vcpu 1, 2, ...). A halted vcpu should not be
-handed to the hypervisor to run (e.g. hax_vcpu_run()).
+Currently, there is no doc describing hv-* CPU flags, people are
+encouraged to get the information from Microsoft Hyper-V Top Level
+Functional specification (TLFS). There is, however, a bit of QEMU
+specifics.
 
-Under HAXM, Android Emulator sometimes boots into a "vcpu shutdown
-request" error while executing in SeaBIOS, with the HAXM driver
-logging a guest triple fault in vcpu 1, 2, ... at RIP 0x3. That is
-ultimately because the HAX accelerator asks HAXM to run those APs
-when they are still in the halted state.
-
-Normally, the vcpu thread for an AP will start by looping in
-qemu_wait_io_event(), until the BSP kicks it via a pair of IPIs
-(INIT followed by SIPI). But because the HAX accelerator does not
-honor cpu->halted, it allows the AP vcpu thread to proceed to
-hax_vcpu_run() as soon as it receives any kick, even if the kick
-does not come from the BSP. It turns out that emulator has a
-worker thread which periodically kicks every vcpu thread (possibly
-to collect CPU usage data), and if one of these kicks comes before
-those by the BSP, the AP will start execution from the wrong RIP,
-resulting in the aforementioned SMP boot failure.
-
-The solution is inspired by the KVM accelerator (credit to
-Chuanxiao Dong <chuanxiao.dong@intel.com> for the pointer):
-
-1. Get rid of questionable logic that unconditionally resets
-   cpu->halted before hax_vcpu_run(). Instead, only reset it at the
-   right moments (there are only a few "unhalt" events).
-2. Add a check for cpu->halted before hax_vcpu_run().
-
-Note that although the non-Unrestricted Guest (!ug_platform) code
-path also forcibly resets cpu->halted, it is left untouched,
-because only the UG code path supports SMP guests.
-
-The patch is first merged to android emulator with Change-Id:
-I9c5752cc737fd305d7eace1768ea12a07309d716
-
-Cc: Yu Ning <yu.ning@intel.com>
-Cc: Chuanxiao Dong <chuanxiao.dong@intel.com>
-Signed-off-by: Colin Xu <colin.xu@intel.com>
-Message-Id: <20190610021939.13669-1-colin.xu@intel.com>
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Message-Id: <20190517141924.19024-5-vkuznets@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- cpus.c                |  1 -
- target/i386/hax-all.c | 36 ++++++++++++++++++++++++++++++++++--
- 2 files changed, 34 insertions(+), 3 deletions(-)
+ docs/hyperv.txt | 181 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 181 insertions(+)
+ create mode 100644 docs/hyperv.txt
 
-diff --git a/cpus.c b/cpus.c
-index dde3b7b..1af51b7 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1594,7 +1594,6 @@ static void *qemu_hax_cpu_thread_fn(void *arg)
- 
-     cpu->thread_id = qemu_get_thread_id();
-     cpu->created = true;
--    cpu->halted = 0;
-     current_cpu = cpu;
- 
-     hax_init_vcpu(cpu);
-diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-index 64fd51a..9e7b779 100644
---- a/target/i386/hax-all.c
-+++ b/target/i386/hax-all.c
-@@ -471,13 +471,35 @@ static int hax_vcpu_hax_exec(CPUArchState *env)
-         return 0;
-     }
- 
--    cpu->halted = 0;
--
-     if (cpu->interrupt_request & CPU_INTERRUPT_POLL) {
-         cpu->interrupt_request &= ~CPU_INTERRUPT_POLL;
-         apic_poll_irq(x86_cpu->apic_state);
-     }
- 
-+    /* After a vcpu is halted (either because it is an AP and has just been
-+     * reset, or because it has executed the HLT instruction), it will not be
-+     * run (hax_vcpu_run()) until it is unhalted. The next few if blocks check
-+     * for events that may change the halted state of this vcpu:
-+     *  a) Maskable interrupt, when RFLAGS.IF is 1;
-+     *     Note: env->eflags may not reflect the current RFLAGS state, because
-+     *           it is not updated after each hax_vcpu_run(). We cannot afford
-+     *           to fail to recognize any unhalt-by-maskable-interrupt event
-+     *           (in which case the vcpu will halt forever), and yet we cannot
-+     *           afford the overhead of hax_vcpu_sync_state(). The current
-+     *           solution is to err on the side of caution and have the HLT
-+     *           handler (see case HAX_EXIT_HLT below) unconditionally set the
-+     *           IF_MASK bit in env->eflags, which, in effect, disables the
-+     *           RFLAGS.IF check.
-+     *  b) NMI;
-+     *  c) INIT signal;
-+     *  d) SIPI signal.
-+     */
-+    if (((cpu->interrupt_request & CPU_INTERRUPT_HARD) &&
-+         (env->eflags & IF_MASK)) ||
-+        (cpu->interrupt_request & CPU_INTERRUPT_NMI)) {
-+        cpu->halted = 0;
-+    }
+diff --git a/docs/hyperv.txt b/docs/hyperv.txt
+new file mode 100644
+index 0000000..c423e0f
+--- /dev/null
++++ b/docs/hyperv.txt
+@@ -0,0 +1,181 @@
++Hyper-V Enlightenments
++======================
 +
-     if (cpu->interrupt_request & CPU_INTERRUPT_INIT) {
-         DPRINTF("\nhax_vcpu_hax_exec: handling INIT for %d\n",
-                 cpu->cpu_index);
-@@ -493,6 +515,16 @@ static int hax_vcpu_hax_exec(CPUArchState *env)
-         hax_vcpu_sync_state(env, 1);
-     }
- 
-+    if (cpu->halted) {
-+        /* If this vcpu is halted, we must not ask HAXM to run it. Instead, we
-+         * break out of hax_smp_cpu_exec() as if this vcpu had executed HLT.
-+         * That way, this vcpu thread will be trapped in qemu_wait_io_event(),
-+         * until the vcpu is unhalted.
-+         */
-+        cpu->exception_index = EXCP_HLT;
-+        return 0;
-+    }
 +
-     do {
-         int hax_ret;
- 
++1. Description
++===============
++In some cases when implementing a hardware interface in software is slow, KVM
++implements its own paravirtualized interfaces. This works well for Linux as
++guest support for such features is added simultaneously with the feature itself.
++It may, however, be hard-to-impossible to add support for these interfaces to
++proprietary OSes, namely, Microsoft Windows.
++
++KVM on x86 implements Hyper-V Enlightenments for Windows guests. These features
++make Windows and Hyper-V guests think they're running on top of a Hyper-V
++compatible hypervisor and use Hyper-V specific features.
++
++
++2. Setup
++=========
++No Hyper-V enlightenments are enabled by default by either KVM or QEMU. In
++QEMU, individual enlightenments can be enabled through CPU flags, e.g:
++
++  qemu-system-x86_64 --enable-kvm --cpu host,hv_relaxed,hv_vpindex,hv_time, ...
++
++Sometimes there are dependencies between enlightenments, QEMU is supposed to
++check that the supplied configuration is sane.
++
++When any set of the Hyper-V enlightenments is enabled, QEMU changes hypervisor
++identification (CPUID 0x40000000..0x4000000A) to Hyper-V. KVM identification
++and features are kept in leaves 0x40000100..0x40000101.
++
++
++3. Existing enlightenments
++===========================
++
++3.1. hv-relaxed
++================
++This feature tells guest OS to disable watchdog timeouts as it is running on a
++hypervisor. It is known that some Windows versions will do this even when they
++see 'hypervisor' CPU flag.
++
++3.2. hv-vapic
++==============
++Provides so-called VP Assist page MSR to guest allowing it to work with APIC
++more efficiently. In particular, this enlightenment allows paravirtualized
++(exit-less) EOI processing.
++
++3.3. hv-spinlocks=xxx
++======================
++Enables paravirtualized spinlocks. The parameter indicates how many times
++spinlock acquisition should be attempted before indicating the situation to the
++hypervisor. A special value 0xffffffff indicates "never to retry".
++
++3.4. hv-vpindex
++================
++Provides HV_X64_MSR_VP_INDEX (0x40000002) MSR to the guest which has Virtual
++processor index information. This enlightenment makes sense in conjunction with
++hv-synic, hv-stimer and other enlightenments which require the guest to know its
++Virtual Processor indices (e.g. when VP index needs to be passed in a
++hypercall).
++
++3.5. hv-runtime
++================
++Provides HV_X64_MSR_VP_RUNTIME (0x40000010) MSR to the guest. The MSR keeps the
++virtual processor run time in 100ns units. This gives guest operating system an
++idea of how much time was 'stolen' from it (when the virtual CPU was preempted
++to perform some other work).
++
++3.6. hv-crash
++==============
++Provides HV_X64_MSR_CRASH_P0..HV_X64_MSR_CRASH_P5 (0x40000100..0x40000105) and
++HV_X64_MSR_CRASH_CTL (0x40000105) MSRs to the guest. These MSRs are written to
++by the guest when it crashes, HV_X64_MSR_CRASH_P0..HV_X64_MSR_CRASH_P5 MSRs
++contain additional crash information. This information is outputted in QEMU log
++and through QAPI.
++Note: unlike under genuine Hyper-V, write to HV_X64_MSR_CRASH_CTL causes guest
++to shutdown. This effectively blocks crash dump generation by Windows.
++
++3.7. hv-time
++=============
++Enables two Hyper-V-specific clocksources available to the guest: MSR-based
++Hyper-V clocksource (HV_X64_MSR_TIME_REF_COUNT, 0x40000020) and Reference TSC
++page (enabled via MSR HV_X64_MSR_REFERENCE_TSC, 0x40000021). Both clocksources
++are per-guest, Reference TSC page clocksource allows for exit-less time stamp
++readings. Using this enlightenment leads to significant speedup of all timestamp
++related operations.
++
++3.8. hv-synic
++==============
++Enables Hyper-V Synthetic interrupt controller - an extension of a local APIC.
++When enabled, this enlightenment provides additional communication facilities
++to the guest: SynIC messages and Events. This is a pre-requisite for
++implementing VMBus devices (not yet in QEMU). Additionally, this enlightenment
++is needed to enable Hyper-V synthetic timers. SynIC is controlled through MSRs
++HV_X64_MSR_SCONTROL..HV_X64_MSR_EOM (0x40000080..0x40000084) and
++HV_X64_MSR_SINT0..HV_X64_MSR_SINT15 (0x40000090..0x4000009F)
++
++Requires: hv-vpindex
++
++3.9. hv-stimer
++===============
++Enables Hyper-V synthetic timers. There are four synthetic timers per virtual
++CPU controlled through HV_X64_MSR_STIMER0_CONFIG..HV_X64_MSR_STIMER3_COUNT
++(0x400000B0..0x400000B7) MSRs. These timers can work either in single-shot or
++periodic mode. It is known that certain Windows versions revert to using HPET
++(or even RTC when HPET is unavailable) extensively when this enlightenment is
++not provided; this can lead to significant CPU consumption, even when virtual
++CPU is idle.
++
++Requires: hv-vpindex, hv-synic, hv-time
++
++3.10. hv-tlbflush
++==================
++Enables paravirtualized TLB shoot-down mechanism. On x86 architecture, remote
++TLB flush procedure requires sending IPIs and waiting for other CPUs to perform
++local TLB flush. In virtualized environment some virtual CPUs may not even be
++scheduled at the time of the call and may not require flushing (or, flushing
++may be postponed until the virtual CPU is scheduled). hv-tlbflush enlightenment
++implements TLB shoot-down through hypervisor enabling the optimization.
++
++Requires: hv-vpindex
++
++3.11. hv-ipi
++=============
++Enables paravirtualized IPI send mechanism. HvCallSendSyntheticClusterIpi
++hypercall may target more than 64 virtual CPUs simultaneously, doing the same
++through APIC requires more than one access (and thus exit to the hypervisor).
++
++Requires: hv-vpindex
++
++3.12. hv-vendor-id=xxx
++=======================
++This changes Hyper-V identification in CPUID 0x40000000.EBX-EDX from the default
++"Microsoft Hv". The parameter should be no longer than 12 characters. According
++to the specification, guests shouldn't use this information and it is unknown
++if there is a Windows version which acts differently.
++Note: hv-vendor-id is not an enlightenment and thus doesn't enable Hyper-V
++identification when specified without some other enlightenment.
++
++3.13. hv-reset
++===============
++Provides HV_X64_MSR_RESET (0x40000003) MSR to the guest allowing it to reset
++itself by writing to it. Even when this MSR is enabled, it is not a recommended
++way for Windows to perform system reboot and thus it may not be used.
++
++3.14. hv-frequencies
++============================================
++Provides HV_X64_MSR_TSC_FREQUENCY (0x40000022) and HV_X64_MSR_APIC_FREQUENCY
++(0x40000023) allowing the guest to get its TSC/APIC frequencies without doing
++measurements.
++
++3.15 hv-reenlightenment
++========================
++The enlightenment is nested specific, it targets Hyper-V on KVM guests. When
++enabled, it provides HV_X64_MSR_REENLIGHTENMENT_CONTROL (0x40000106),
++HV_X64_MSR_TSC_EMULATION_CONTROL (0x40000107)and HV_X64_MSR_TSC_EMULATION_STATUS
++(0x40000108) MSRs allowing the guest to get notified when TSC frequency changes
++(only happens on migration) and keep using old frequency (through emulation in
++the hypervisor) until it is ready to switch to the new one. This, in conjunction
++with hv-frequencies, allows Hyper-V on KVM to pass stable clocksource (Reference
++TSC page) to its own guests.
++
++Recommended: hv-frequencies
++
++3.16. hv-evmcs
++===============
++The enlightenment is nested specific, it targets Hyper-V on KVM guests. When
++enabled, it provides Enlightened VMCS feature to the guest. The feature
++implements paravirtualized protocol between L0 (KVM) and L1 (Hyper-V)
++hypervisors making L2 exits to the hypervisor faster. The feature is Intel-only.
++Note: some virtualization features (e.g. Posted Interrupts) are disabled when
++hv-evmcs is enabled. It may make sense to measure your nested workload with and
++without the feature to find out if enabling it is beneficial.
++
++Requires: hv-vapic
++
++
++4. Useful links
++================
++Hyper-V Top Level Functional specification and other information:
++https://github.com/MicrosoftDocs/Virtualization-Documentation
 -- 
 1.8.3.1
 
