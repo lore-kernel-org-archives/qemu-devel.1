@@ -2,86 +2,62 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3D79C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 06:55:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20207C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:02:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C03332083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 06:55:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C03332083B
+	by mail.kernel.org (Postfix) with ESMTPS id E512D2083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:02:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E512D2083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55120 helo=lists.gnu.org)
+Received: from localhost ([::1]:55172 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heDRz-0006MV-0V
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 02:55:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56583)
+	id 1heDZG-0002Ia-Mn
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 03:02:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57475)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <chen.zhang@intel.com>) id 1heDKz-00084e-3n
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 02:48:02 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1heDRO-0006bg-P2
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 02:54:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chen.zhang@intel.com>) id 1heDHF-00070k-5I
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 02:44:03 -0400
-Received: from mga09.intel.com ([134.134.136.24]:63019)
+ (envelope-from <tao3.xu@intel.com>) id 1heDRM-0002P9-RU
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 02:54:30 -0400
+Received: from mga11.intel.com ([192.55.52.93]:33605)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
- id 1heDHD-0006vq-A8
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 02:44:01 -0400
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1heDRM-0001rD-FO
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 02:54:28 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
- by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 20 Jun 2019 23:43:55 -0700
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+ by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 20 Jun 2019 23:54:11 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,399,1557212400"; d="scan'208";a="243883645"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
- by orsmga001.jf.intel.com with ESMTP; 20 Jun 2019 23:43:55 -0700
-Received: from FMSMSX110.amr.corp.intel.com (10.18.116.10) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 20 Jun 2019 23:43:54 -0700
-Received: from shsmsx105.ccr.corp.intel.com (10.239.4.158) by
- fmsmsx110.amr.corp.intel.com (10.18.116.10) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 20 Jun 2019 23:43:54 -0700
-Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.33]) by
- SHSMSX105.ccr.corp.intel.com ([169.254.11.72]) with mapi id 14.03.0439.000;
- Fri, 21 Jun 2019 14:43:52 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: "Zhang, Chen" <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
- "Li Zhijian" <lizhijian@cn.fujitsu.com>, "Dr. David Alan Gilbert"
- <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, zhanghailiang
- <zhang.zhanghailiang@huawei.com>, qemu-dev <qemu-devel@nongnu.org>, "Stefano
- Stabellini" <sstabellini@kernel.org>, Paul Durrant <paul.durrant@citrix.com>
-Thread-Topic: [PATCH V2 0/5] Add Xen COLO support
-Thread-Index: AQHVHuNRBWevQzBoQk2i1pAZg06es6aTwJgAgACjccCAEVckwA==
-Date: Fri, 21 Jun 2019 06:43:52 +0000
-Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D780618AD39@shsmsx102.ccr.corp.intel.com>
-References: <20190609164433.5866-1-chen.zhang@intel.com>
- <e02f265c-a0f4-0b34-e3e9-48f0d9eefaf8@redhat.com>
- <9CFF81C0F6B98A43A459C9EDAD400D780615AACB@shsmsx102.ccr.corp.intel.com>
-In-Reply-To: <9CFF81C0F6B98A43A459C9EDAD400D780615AACB@shsmsx102.ccr.corp.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.0.600.7
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMzBmYWFhYTItYTBiNy00ZWM0LTllM2YtZGUzMDBiZTlmZTM4IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiQ0VSa0krdmRYemVheWFXQzkxTzRNKytIU0Q0RjdQVE5tcDQ5Z1pGcGN1U2xvS296SHNnWTFaVVkzdG9DT0xaQSJ9
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+X-IronPort-AV: E=Sophos;i="5.63,399,1557212400"; d="scan'208";a="335735526"
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.104])
+ by orsmga005.jf.intel.com with ESMTP; 20 Jun 2019 23:54:09 -0700
+From: Tao Xu <tao3.xu@intel.com>
+To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com,
+ cohuck@redhat.com, mst@redhat.com, mtosatti@redhat.com
+Date: Fri, 21 Jun 2019 14:51:33 +0800
+Message-Id: <20190621065134.7392-2-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190621065134.7392-1-tao3.xu@intel.com>
+References: <20190621065134.7392-1-tao3.xu@intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 134.134.136.24
-Subject: Re: [Qemu-devel] [PATCH V2 0/5] Add Xen COLO support
+X-Received-From: 192.55.52.93
+Subject: [Qemu-devel] [PATCH RESEND v3 1/2] x86/cpu: Add support for
+ UMONITOR/UMWAIT/TPAUSE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,59 +69,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <zhangckid@gmail.com>
+Cc: jingqi.liu@intel.com, tao3.xu@intel.com, xiaoyao.li@linux.intel.com,
+ qemu-devel@nongnu.org, kvm@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QW55b25lIGhhdmUgYW55IGNvbW1lbnRzIGFib3V0IHRoaXMgc2VyaWVzPw0KDQpUaGFua3MNClpo
-YW5nIENoZW4NCg0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFFlbXUt
-ZGV2ZWwgW21haWx0bzpxZW11LWRldmVsLQ0KPiBib3VuY2VzK2NoZW4uemhhbmc9aW50ZWwuY29t
-QG5vbmdudS5vcmddIE9uIEJlaGFsZiBPZiBaaGFuZywgQ2hlbg0KPiBTZW50OiBNb25kYXksIEp1
-bmUgMTAsIDIwMTkgMTo1NiBQTQ0KPiBUbzogSmFzb24gV2FuZyA8amFzb3dhbmdAcmVkaGF0LmNv
-bT47IExpIFpoaWppYW4gPGxpemhpamlhbkBjbi5mdWppdHN1LmNvbT47DQo+IERyLiBEYXZpZCBB
-bGFuIEdpbGJlcnQgPGRnaWxiZXJ0QHJlZGhhdC5jb20+OyBKdWFuIFF1aW50ZWxhDQo+IDxxdWlu
-dGVsYUByZWRoYXQuY29tPjsgemhhbmdoYWlsaWFuZyA8emhhbmcuemhhbmdoYWlsaWFuZ0BodWF3
-ZWkuY29tPjsNCj4gcWVtdS1kZXYgPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz47IFN0ZWZhbm8gU3Rh
-YmVsbGluaQ0KPiA8c3N0YWJlbGxpbmlAa2VybmVsLm9yZz47IFBhdWwgRHVycmFudCA8cGF1bC5k
-dXJyYW50QGNpdHJpeC5jb20+DQo+IENjOiBaaGFuZyBDaGVuIDx6aGFuZ2NraWRAZ21haWwuY29t
-Pg0KPiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtQQVRDSCBWMiAwLzVdIEFkZCBYZW4gQ09M
-TyBzdXBwb3J0DQo+IA0KPiANCj4gDQo+ID4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4g
-PiBGcm9tOiBKYXNvbiBXYW5nIFttYWlsdG86amFzb3dhbmdAcmVkaGF0LmNvbV0NCj4gPiBTZW50
-OiBNb25kYXksIEp1bmUgMTAsIDIwMTkgMTI6MDkgUE0NCj4gPiBUbzogWmhhbmcsIENoZW4gPGNo
-ZW4uemhhbmdAaW50ZWwuY29tPjsgTGkgWmhpamlhbg0KPiA+IDxsaXpoaWppYW5AY24uZnVqaXRz
-dS5jb20+OyBEci4gRGF2aWQgQWxhbiBHaWxiZXJ0DQo+ID4gPGRnaWxiZXJ0QHJlZGhhdC5jb20+
-OyBKdWFuIFF1aW50ZWxhIDxxdWludGVsYUByZWRoYXQuY29tPjsNCj4gPiB6aGFuZ2hhaWxpYW5n
-IDx6aGFuZy56aGFuZ2hhaWxpYW5nQGh1YXdlaS5jb20+OyBxZW11LWRldg0KPiA+IDxxZW11LWRl
-dmVsQG5vbmdudS5vcmc+OyBTdGVmYW5vIFN0YWJlbGxpbmkgPHNzdGFiZWxsaW5pQGtlcm5lbC5v
-cmc+Ow0KPiA+IFBhdWwgRHVycmFudCA8cGF1bC5kdXJyYW50QGNpdHJpeC5jb20+DQo+ID4gQ2M6
-IFpoYW5nIENoZW4gPHpoYW5nY2tpZEBnbWFpbC5jb20+DQo+ID4gU3ViamVjdDogUmU6IFtQQVRD
-SCBWMiAwLzVdIEFkZCBYZW4gQ09MTyBzdXBwb3J0DQo+ID4NCj4gPg0KPiA+IE9uIDIwMTkvNi8x
-MCDkuIrljYgxMjo0NCwgWmhhbmcgQ2hlbiB3cm90ZToNCj4gPiA+IEZyb206IFpoYW5nIENoZW4g
-PGNoZW4uemhhbmdAaW50ZWwuY29tPg0KPiA+ID4NCj4gPiA+IFhlbiBDT0xPIGJhc2VkIG9uIEtW
-TSBDT0xPIGFyY2hpdGVjdHVyZSwgaXQgc2hhcmVkIENPTE8gcHJveHkgYW5kDQo+ID4gPiBibG9j
-ayByZXBsaWNhdGlvbiB3aXRoIEtWTSBDT0xPLiBUaGUgb25seSBkaWZmZXJlY2UgaXMgWGVuIENP
-TE8gaGF2ZQ0KPiA+ID4gb3duIENPTE8tZnJhbWUgdG8gaGFuZGxlIGxpdmUgbWlncmF0aW9uIHJl
-bGF0ZWQgZnVuY3Rpb24sIHNvIHdlIG5lZWQNCj4gPiA+IHRoaXMgc2VyaWVzIG1ha2UgWGVuIENP
-TE8gZnJhbWUgY2FuIGNvbW11bmljYXRlIHdpdGggb3RoZXIgQ09MTw0KPiA+ID4gbW9kdWxlcyBp
-biBxZW11LiBYZW4gc2lkZSByZWxhdGVkIHBhdGNoZXMgaGF2ZSBiZWVuIG1lcmdlZC4NCj4gPg0K
-PiA+DQo+ID4gQW55IHBvaW50ZXIgdG8gdGhpcz8NCj4gPg0KPiANCj4gWWVzLCBwbGVhc2Ugc2Vl
-IHRoaXMgdGhyZWFkOg0KPiANCj4gaHR0cHM6Ly9saXN0cy54ZW4ub3JnL2FyY2hpdmVzL2h0bWwv
-eGVuLWRldmVsLzIwMTctMDMvbXNnMDA3MTguaHRtbA0KPiANCj4gVGhhbmtzDQo+IFpoYW5nIENo
-ZW4NCj4gDQo+ID4gVGhhbmtzDQo+ID4NCj4gPg0KPiA+ID4NCj4gPiA+IFYyOg0KPiA+ID4gICAt
-IFJlYmFzZSBvbiB1cHN0cmVhbSBjb2RlLg0KPiA+ID4gICAtIE9wdGltaXplIGNvZGUgYnkgWmhp
-amlhbidzIGNvbW1lbnRzIGluIHBhdGNoIDQvNS4NCj4gPiA+ICAgLSBSZW1vdmUgb3JpZ2luIDUv
-NiBwYXRjaC4NCj4gPiA+DQo+ID4gPiBWMToNCj4gPiA+ICAgLSBJbml0aWFsIHBhdGNoLg0KPiA+
-ID4NCj4gPiA+IFpoYW5nIENoZW4gKDUpOg0KPiA+ID4gICAgQ09MTy1jb21wYXJlOiBBZGQgbmV3
-IHBhcmFtZXRlciB0byBjb21tdW5pY2F0ZSB3aXRoIHJlbW90ZSBjb2xvLQ0KPiA+IGZyYW1lDQo+
-ID4gPiAgICBDT0xPLWNvbXBhcmU6IEFkZCByZW1vdGUgbm90aWZpY2F0aW9uIGNoYXJkZXYgaGFu
-ZGxlciBmcmFtZQ0KPiA+ID4gICAgQ09MTy1jb21wYXJlOiBNYWtlIHRoZSBjb21wYXJlX2Nocl9z
-ZW5kKCkgY2FuIHNlbmQgbm90aWZpY2F0aW9uDQo+ID4gPiAgICAgIG1lc3NhZ2UuDQo+ID4gPiAg
-ICBDT0xPLWNvbXBhcmU6IEFkZCBjb2xvLWNvbXBhcmUgcmVtb3RlIG5vdGlmeSBzdXBwb3J0DQo+
-ID4gPiAgICBtaWdyYXRpb24vY29sby5jOiBBZGQgbWlzc2VkIGZpbHRlciBub3RpZnkgZm9yIFhl
-biBDT0xPLg0KPiA+ID4NCj4gPiA+ICAgbWlncmF0aW9uL2NvbG8uYyAgIHwgICAyICsNCj4gPiA+
-ICAgbmV0L2NvbG8tY29tcGFyZS5jIHwgMTU1DQo+ID4gPiArKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKystLS0NCj4gPiAtLS0NCj4gPiA+ICAgcWVtdS1vcHRpb25zLmh4ICAg
-IHwgIDMzICsrKysrKysrKy0NCj4gPiA+ICAgMyBmaWxlcyBjaGFuZ2VkLCAxNzEgaW5zZXJ0aW9u
-cygrKSwgMTkgZGVsZXRpb25zKC0pDQo+ID4gPg0K
+UMONITOR, UMWAIT and TPAUSE are a set of user wait instructions.
+This patch adds support for user wait instructions in KVM. Availability
+of the user wait instructions is indicated by the presence of the CPUID
+feature flag WAITPKG CPUID.0x07.0x0:ECX[5]. User wait instructions may
+be executed at any privilege level, and use IA32_UMWAIT_CONTROL MSR to
+set the maximum time.
+
+The patch enable the umonitor, umwait and tpause features in KVM.
+Because umwait and tpause can put a (psysical) CPU into a power saving
+state, by default we dont't expose it to kvm and enable it only when
+guest CPUID has it. And use QEMU command-line "-overcommit cpu-pm=on"
+(enable_cpu_pm is enabled), a VM can use UMONITOR, UMWAIT and TPAUSE
+instructions. If the instruction causes a delay, the amount of time
+delayed is called here the physical delay. The physical delay is first
+computed by determining the virtual delay (the time to delay relative to
+the VM’s timestamp counter). Otherwise, UMONITOR, UMWAIT and TPAUSE cause
+an invalid-opcode exception(#UD).
+
+The release document ref below link:
+https://software.intel.com/sites/default/files/\
+managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
+
+Co-developed-by: Jingqi Liu <jingqi.liu@intel.com>
+Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+Signed-off-by: Tao Xu <tao3.xu@intel.com>
+---
+
+changes in v3:
+	Simplify the patches, expose user wait instructions when the guest
+	has CPUID (Paolo)
+	Resend to update the dependcy KVM link:
+	https://lkml.org/lkml/2019/6/21/23
+---
+ target/i386/cpu.c | 3 ++-
+ target/i386/cpu.h | 1 +
+ target/i386/kvm.c | 4 ++++
+ 3 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index fbed2eb804..0fb86c90db 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -1060,7 +1060,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+         .type = CPUID_FEATURE_WORD,
+         .feat_names = {
+             NULL, "avx512vbmi", "umip", "pku",
+-            NULL /* ospke */, NULL, "avx512vbmi2", NULL,
++            NULL /* ospke */, "waitpkg", "avx512vbmi2", NULL,
+             "gfni", "vaes", "vpclmulqdq", "avx512vnni",
+             "avx512bitalg", NULL, "avx512-vpopcntdq", NULL,
+             "la57", NULL, NULL, NULL,
+@@ -5222,6 +5222,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+             host_cpuid(5, 0, &cpu->mwait.eax, &cpu->mwait.ebx,
+                        &cpu->mwait.ecx, &cpu->mwait.edx);
+             env->features[FEAT_1_ECX] |= CPUID_EXT_MONITOR;
++            env->features[FEAT_7_0_ECX] |= CPUID_7_0_ECX_WAITPKG;
+         }
+     }
+ 
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 0732e059ec..2f7c57a3c2 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -670,6 +670,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_ECX_UMIP     (1U << 2)
+ #define CPUID_7_0_ECX_PKU      (1U << 3)
+ #define CPUID_7_0_ECX_OSPKE    (1U << 4)
++#define CPUID_7_0_ECX_WAITPKG  (1U << 5) /* UMONITOR/UMWAIT/TPAUSE Instructions */
+ #define CPUID_7_0_ECX_VBMI2    (1U << 6) /* Additional VBMI Instrs */
+ #define CPUID_7_0_ECX_GFNI     (1U << 8)
+ #define CPUID_7_0_ECX_VAES     (1U << 9)
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 6899061b4e..3efdb90f11 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -388,6 +388,10 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
+         if (host_tsx_blacklisted()) {
+             ret &= ~(CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_HLE);
+         }
++    } else if (function == 7 && index == 0 && reg == R_ECX) {
++        if (enable_cpu_pm) {
++            ret |= CPUID_7_0_ECX_WAITPKG;
++        }
+     } else if (function == 7 && index == 0 && reg == R_EDX) {
+         /*
+          * Linux v4.17-v4.20 incorrectly return ARCH_CAPABILITIES on SVM hosts.
+-- 
+2.20.1
+
 
