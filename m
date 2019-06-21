@@ -7,39 +7,39 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2594EC43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:53:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1E10C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:53:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF91220673
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:53:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF91220673
+	by mail.kernel.org (Postfix) with ESMTPS id BA75320673
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:53:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA75320673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55592 helo=lists.gnu.org)
+Received: from localhost ([::1]:55594 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heFIt-0008PW-7W
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 04:53:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58240)
+	id 1heFIv-0008UJ-TU
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 04:53:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58714)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1heEzZ-0004B9-1Z
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:33:56 -0400
+ (envelope-from <pavel.dovgaluk@gmail.com>) id 1heEzd-0004U0-SI
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:33:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1heEoa-0001QR-HV
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:22:33 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:41704)
+ (envelope-from <pavel.dovgaluk@gmail.com>) id 1heEnD-0000EA-RU
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:21:08 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:41318)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1heEoa-0001Pr-Ax
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:22:32 -0400
+ (envelope-from <pavel.dovgaluk@gmail.com>) id 1heEnD-0000Du-HP
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:21:07 -0400
 Received: from [127.0.1.1] (unknown [85.142.117.226])
- by mail.ispras.ru (Postfix) with ESMTPSA id 80FDE540082;
- Fri, 21 Jun 2019 11:22:31 +0300 (MSK)
+ by mail.ispras.ru (Postfix) with ESMTPSA id AD9DE54008C;
+ Fri, 21 Jun 2019 11:21:06 +0300 (MSK)
 From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 21 Jun 2019 11:22:31 +0300
-Message-ID: <156110535134.25431.18355326480887591547.stgit@pasha-Precision-3630-Tower>
+Date: Fri, 21 Jun 2019 11:21:06 +0300
+Message-ID: <156110526652.25431.1704646168245762049.stgit@pasha-Precision-3630-Tower>
 In-Reply-To: <156110523748.25431.9310430853468653085.stgit@pasha-Precision-3630-Tower>
 References: <156110523748.25431.9310430853468653085.stgit@pasha-Precision-3630-Tower>
 User-Agent: StGit/0.17.1-dirty
@@ -48,8 +48,8 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 83.149.199.45
-Subject: [Qemu-devel] [PATCH for-4.1 20/24] replay: document development
- rules
+Subject: [Qemu-devel] [PATCH for-4.1 05/24] replay: don't drain/flush bdrv
+ queue while RR is working
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,70 +74,105 @@ Sender: "Qemu-devel"
 
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-This patch introduces docs/devel/replay.txt which describes the rules
-that should be followed to make virtual devices usable in record/replay mode.
+In record/replay mode bdrv queue is controlled by replay mechanism.
+It does not allow saving or loading the snapshots
+when bdrv queue is not empty. Stopping the VM is not blocked by nonempty
+queue, but flushing the queue is still impossible there,
+because it may cause deadlocks in replay mode.
+This patch disables bdrv_drain_all and bdrv_flush_all in
+record/replay mode.
 
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgauk@ispras.ru>
+Stopping the machine when the IO requests are not finished is needed
+for the debugging. E.g., breakpoint may be set at the specified step,
+and forcing the IO requests to finish may break the determinism
+of the execution.
 
---
-
-v9: fixed external virtual clock description (reported by Artem Pisarenko)
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Acked-by: Kevin Wolf <kwolf@redhat.com>
 ---
- docs/devel/replay.txt |   46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
- create mode 100644 docs/devel/replay.txt
+ block/io.c |   28 ++++++++++++++++++++++++++++
+ cpus.c     |    2 --
+ 2 files changed, 28 insertions(+), 2 deletions(-)
 
-diff --git a/docs/devel/replay.txt b/docs/devel/replay.txt
-new file mode 100644
-index 0000000000..e641c35add
---- /dev/null
-+++ b/docs/devel/replay.txt
-@@ -0,0 +1,46 @@
-+Record/replay mechanism, that could be enabled through icount mode, expects
-+the virtual devices to satisfy the following requirements.
+diff --git a/block/io.c b/block/io.c
+index 9ba1bada36..607abc04b0 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -32,6 +32,7 @@
+ #include "qemu/cutils.h"
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
++#include "sysemu/replay.h"
+ 
+ #define NOT_DONE 0x7fffffff /* used while emulated sync operation in progress */
+ 
+@@ -539,6 +540,15 @@ void bdrv_drain_all_begin(void)
+         return;
+     }
+ 
++    /*
++     * bdrv queue is managed by record/replay,
++     * waiting for finishing the I/O requests may
++     * be infinite
++     */
++    if (replay_events_enabled()) {
++        return;
++    }
 +
-+The main idea behind this document is that everything that affects
-+the guest state during execution in icount mode should be deterministic.
+     /* AIO_WAIT_WHILE() with a NULL context can only be called from the main
+      * loop AioContext, so make sure we're in the main context. */
+     assert(qemu_get_current_aio_context() == qemu_get_aio_context());
+@@ -567,6 +577,15 @@ void bdrv_drain_all_end(void)
+ {
+     BlockDriverState *bs = NULL;
+ 
++    /*
++     * bdrv queue is managed by record/replay,
++     * waiting for finishing the I/O requests may
++     * be endless
++     */
++    if (replay_events_enabled()) {
++        return;
++    }
 +
-+Timers
-+======
+     while ((bs = bdrv_next_all_states(bs))) {
+         AioContext *aio_context = bdrv_get_aio_context(bs);
+ 
+@@ -1934,6 +1953,15 @@ int bdrv_flush_all(void)
+     BlockDriverState *bs = NULL;
+     int result = 0;
+ 
++    /*
++     * bdrv queue is managed by record/replay,
++     * creating new flush request for stopping
++     * the VM may break the determinism
++     */
++    if (replay_events_enabled()) {
++        return result;
++    }
 +
-+All virtual devices should use virtual clock for timers that change the guest
-+state. Virtual clock is deterministic, therefore such timers are deterministic
-+too.
-+
-+Virtual devices can also use realtime clock for the events that do not change
-+the guest state directly. When the clock ticking should depend on VM execution
-+speed, use virtual clock with EXTERNAL attribute. It is not deterministic,
-+but its speed depends on the guest execution. This clock is used by
-+the virtual devices (e.g., slirp routing device) that lie outside the
-+replayed guest.
-+
-+Bottom halves
-+=============
-+
-+Bottom half callbacks, that affect the guest state, should be invoked through
-+replay_bh_schedule_event or replay_bh_schedule_oneshot_event functions.
-+Their invocations are saved in record mode and synchronized with the existing
-+log in replay mode.
-+
-+Saving/restoring the VM state
-+=============================
-+
-+All fields in the device state structure (including virtual timers)
-+should be restored by loadvm to the same values they had before savevm.
-+
-+Avoid accessing other devices' state, because the order of saving/restoring
-+is not defined. It means that you should not call functions like
-+'update_irq' in post_load callback. Save everything explicitly to avoid
-+the dependencies that may make restoring the VM state non-deterministic.
-+
-+Stopping the VM
-+===============
-+
-+Stopping the guest should not interfere with its state (with the exception
-+of the network connections, that could be broken by the remote timeouts).
-+VM can be stopped at any moment of replay by the user. Restarting the VM
-+after that stop should not break the replay by the unneeded guest state change.
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+         AioContext *aio_context = bdrv_get_aio_context(bs);
+         int ret;
+diff --git a/cpus.c b/cpus.c
+index dde3b7b981..0a44253523 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1083,7 +1083,6 @@ static int do_vm_stop(RunState state, bool send_stop)
+     }
+ 
+     bdrv_drain_all();
+-    replay_disable_events();
+     ret = bdrv_flush_all();
+ 
+     return ret;
+@@ -2163,7 +2162,6 @@ int vm_prepare_start(void)
+     /* We are sending this now, but the CPUs will be resumed shortly later */
+     qapi_event_send_resume();
+ 
+-    replay_enable_events();
+     cpu_enable_ticks();
+     runstate_set(RUN_STATE_RUNNING);
+     vm_state_notify(1, RUN_STATE_RUNNING);
 
 
