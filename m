@@ -7,81 +7,78 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9D98C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 02:09:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20607C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 02:10:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8496720652
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 02:09:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0B2D20652
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 02:10:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UQqN+g+r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8496720652
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="epvkVwzN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0B2D20652
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54154 helo=lists.gnu.org)
+Received: from localhost ([::1]:54156 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1he901-000068-LL
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 22:09:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41124)
+	id 1he90I-0000Eh-52
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 22:10:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41258)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1he8a4-0006bX-5F
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 21:43:10 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1he8a6-0006e7-2x
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 21:43:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1he8a2-0006b9-88
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 21:43:07 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:42904)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1he8a3-0006el-8O
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 21:43:09 -0400
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:38435)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1he8Zz-0006PG-UB
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 21:43:05 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id x17so4853678wrl.9
- for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 18:42:56 -0700 (PDT)
+ id 1he8a2-0006L3-O2
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 21:43:06 -0400
+Received: by mail-wm1-x335.google.com with SMTP id s15so4890394wmj.3
+ for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 18:42:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=H+GIX/ew7P3W1KtFZyQEoH7Aekz0PvrQKasKssVk2dE=;
- b=UQqN+g+rGVJFiDtwxSCJ/I5UCMAg0iWU98+JJfS37weqiSaGUgVF3gpEtGRus4Nc3g
- 4IZ+1b+VwZYdn8m0C7kP78X5CAGub149gjaqJ32uH3jFTrL4ewu0iH3vVn+N5anj468V
- eWOAST9kUjg7n7YLi7zam6dAncsprTI4HShQCAyoYCIIO37xYMT92TgzvAi1mEcohbeI
- esNePagtKBzZ7fj0GJ6HUnWpHeOrCoGCfvvRIjpcESCkwNYVfF3qDFEhAiMjjq8+9cwH
- jlh0i1tOG4Ihb9zpa2wHgOZuK6vteIHogvWBLEq1qu8MsuWcKyfkB+4NGowBeMMUX1rY
- v2/w==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=HWP1ufHEPv6v1c0xa0Nf5LyDIweD+0VGMlRLkFfhXBk=;
+ b=epvkVwzNHao0+h5TuSqE8dKInBhPJV2vf+3ns4HkLHF+IsSKhDjLWZrDCZzKGopEc6
+ mlzSVS5gCx62gcPUsFiEIJ0w16aVhG4QfCu2Do7QgY5XoALhufZWdsxnFSqp1d+wN1oA
+ Q2St/IXhO1mrk81N1ABSFuscTrd7AHiaRDkXJA12d88uBf7cTxUDy7jDQuNpPAL99B7S
+ zz1EFft+HK8SCQpE9srKyk2R9bDDI3c+zUprq4Y8arPUsqqNlKs2zrDyQxWr/5Hw4JrA
+ ORQwlwf40ZLcJ/s/5yoyFQPabttTUb8eRgk52F7TA7WF6sXD74VMnS1IHpZXd340nhym
+ 6UEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=H+GIX/ew7P3W1KtFZyQEoH7Aekz0PvrQKasKssVk2dE=;
- b=CrOU1xafyi5MSx+gzGO0tFKKn3l48/tiw1thG1vgqgR3T5DlGVxtwav1yZcXTs8FQ3
- 3l5Bd5xaFubZOEIeTjAwTd/SoGYLkkkmC6gxk9e2TamohNrtXKDiL8xMmmvGJCjARv+N
- 3iYKz48UkUBI2IAly9EesJaaGOB4pVRdZAWawkFauUOF3UJDLV/RFW+A8CMGiM2rjD/R
- 1QolWOPtJlrUUwf+w2DEyRhhJRmH0bg7MgCyM2fhbTBmwstdtal30TK8ktgKOf8M7O58
- 7Wk6KDSgV/GhMdHxHaN2sixEIcYKatAhNz0wE7GTEdAe/yekDRcEw+IFlDtbWT+/eI5l
- 9FIQ==
-X-Gm-Message-State: APjAAAUpN93PbWkFQjY1hBF3taZY+D0z2u5nlWrI28+dM5zX4ALPD2rd
- sN51ayce6I+5o3XNL8vn6WYO/eC5
-X-Google-Smtp-Source: APXvYqzPFgdsHu8f1uF3j80J4QwlBMQwQ5bnufYUnTv2iaOZhEKcnSON0bKfMhf1KjJrbi+W1F4n1A==
-X-Received: by 2002:adf:9bd3:: with SMTP id e19mr15643087wrc.38.1561081375774; 
- Thu, 20 Jun 2019 18:42:55 -0700 (PDT)
+ :in-reply-to:references;
+ bh=HWP1ufHEPv6v1c0xa0Nf5LyDIweD+0VGMlRLkFfhXBk=;
+ b=iAykJ9TNmJv+AtUtpbtjduIxcEBUE7VPcrVwI2jdJKtTQZXxPTOn9YpMX5Ynk0tgS6
+ +aJYf7AtJozod/fxrev4KZEFATAm952fptVtIbuRDj1nieNf3Q5ELj8XHeYZIzchEnD+
+ Phhv4anetX5PH/yNnB2MnQv5rkVynIp9u5gsRw4GW5/HtsGoOMJ0Oov75RVSb6bNMZ+J
+ JrF1GTQO+3WCVLIAhXCZCQqcH6bVENw5aeTLX+srqJNHfX75DhIdOpkkncg3F7gkg4Ig
+ YZ9hAGinX/ghxkHbaQ4DgD7EtfdKP1jV1UV8dDPyRwsj0mz2qL8kI9Hk80tSDg6gohEy
+ HAyA==
+X-Gm-Message-State: APjAAAVPmy3WmAOKWSkdvipGrKIjFE0eiMk6E2gDIvnzo6YIDnRZ6ttL
+ wN+TdYcYemwHDp0iJ9fLGxZuI6L1
+X-Google-Smtp-Source: APXvYqxBaLgkxh39ik+M/tc0A0xbClld3Y2XXJ/9vr2tTEd8EQSE1LOF/HOPFX1m1kfWAfd9TWGBzQ==
+X-Received: by 2002:a1c:a842:: with SMTP id r63mr1500107wme.117.1561081368051; 
+ Thu, 20 Jun 2019 18:42:48 -0700 (PDT)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id d1sm1123125wru.41.2019.06.20.18.42.54
+ by smtp.gmail.com with ESMTPSA id d1sm1123125wru.41.2019.06.20.18.42.47
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 20 Jun 2019 18:42:55 -0700 (PDT)
+ Thu, 20 Jun 2019 18:42:47 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 21 Jun 2019 03:42:28 +0200
-Message-Id: <1561081350-3723-24-git-send-email-pbonzini@redhat.com>
+Date: Fri, 21 Jun 2019 03:42:20 +0200
+Message-Id: <1561081350-3723-16-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1561081350-3723-1-git-send-email-pbonzini@redhat.com>
 References: <1561081350-3723-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42c
-Subject: [Qemu-devel] [PULL 23/25] sd: Fix out-of-bounds assertions
+X-Received-From: 2a00:1450:4864:20::335
+Subject: [Qemu-devel] [PULL 15/25] target/i386: kvm: Use symbolic constant
+ for #DB/#BP exception constants
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,51 +90,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Lidong Chen <lidong.chen@oracle.com>
+Cc: Liran Alon <liran.alon@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Lidong Chen <lidong.chen@oracle.com>
+From: Liran Alon <liran.alon@oracle.com>
 
-Due to an off-by-one error, the assert statements allow an
-out-of-bound array access.  This doesn't happen in practice,
-but the static analyzer notices.
-
-Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
-Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
-Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
-Message-Id: <6b19cb7359a10a6bedc3ea0fce22fed3ef93c102.1560806687.git.lidong.chen@oracle.com>
+Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Signed-off-by: Liran Alon <liran.alon@oracle.com>
+Message-Id: <20190619162140.133674-4-liran.alon@oracle.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/sd/sd.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/i386/kvm.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 60500ec..917195a6 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -145,7 +145,7 @@ static const char *sd_state_name(enum SDCardStates state)
-     if (state == sd_inactive_state) {
-         return "inactive";
-     }
--    assert(state <= ARRAY_SIZE(state_name));
-+    assert(state < ARRAY_SIZE(state_name));
-     return state_name[state];
- }
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 26d8c61..c763643 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -3345,9 +3345,9 @@ static int kvm_guest_debug_workarounds(X86CPU *cpu)
+     unsigned long reinject_trap = 0;
  
-@@ -166,7 +166,7 @@ static const char *sd_response_name(sd_rsp_type_t rsp)
-     if (rsp == sd_r1b) {
-         rsp = sd_r1;
-     }
--    assert(rsp <= ARRAY_SIZE(response_name));
-+    assert(rsp < ARRAY_SIZE(response_name));
-     return response_name[rsp];
- }
+     if (!kvm_has_vcpu_events()) {
+-        if (env->exception_injected == 1) {
++        if (env->exception_injected == EXCP01_DB) {
+             reinject_trap = KVM_GUESTDBG_INJECT_DB;
+-        } else if (env->exception_injected == 3) {
++        } else if (env->exception_injected == EXCP03_INT3) {
+             reinject_trap = KVM_GUESTDBG_INJECT_BP;
+         }
+         env->exception_injected = -1;
+@@ -3859,8 +3859,8 @@ static int kvm_handle_debug(X86CPU *cpu,
+     int ret = 0;
+     int n;
  
+-    if (arch_info->exception == 1) {
+-        if (arch_info->dr6 & (1 << 14)) {
++    if (arch_info->exception == EXCP01_DB) {
++        if (arch_info->dr6 & DR6_BS) {
+             if (cs->singlestep_enabled) {
+                 ret = EXCP_DEBUG;
+             }
 -- 
 1.8.3.1
 
