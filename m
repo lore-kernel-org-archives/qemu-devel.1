@@ -2,94 +2,104 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F97EC43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 15:00:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA933C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 15:06:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 583E5208CA
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 15:00:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 583E5208CA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8743020449
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 15:06:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="amp4RluE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8743020449
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35866 helo=lists.gnu.org)
+Received: from localhost ([::1]:35902 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heL1Q-0007kS-Et
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 11:00:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48428)
+	id 1heL7I-0002QG-9k
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 11:06:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50618)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <groug@kaod.org>) id 1heKuV-0001xD-KZ
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:53:04 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1heL2C-0008UM-77
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 11:01:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1heKuU-00038Q-I1
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:53:03 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:5886
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <liran.alon@oracle.com>) id 1heL1s-00017B-S4
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 11:00:46 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:43206)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1heKuU-00032Y-Bn
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:53:02 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x5LEqlp1175272
- for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 10:52:56 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2t90btkdxb-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 10:52:51 -0400
-Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <groug@kaod.org>;
- Fri, 21 Jun 2019 15:52:22 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 21 Jun 2019 15:52:20 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id x5LEqKIZ34079156
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 21 Jun 2019 14:52:20 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 01240AE051;
- Fri, 21 Jun 2019 14:52:20 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C5BBFAE05A;
- Fri, 21 Jun 2019 14:52:19 +0000 (GMT)
-Received: from bahia.lan (unknown [9.145.7.212])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Fri, 21 Jun 2019 14:52:19 +0000 (GMT)
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>,
- =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>
-Date: Fri, 21 Jun 2019 16:52:19 +0200
-User-Agent: StGit/unknown-version
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19062114-4275-0000-0000-00000344758B
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19062114-4276-0000-0000-00003854A8FF
-Message-Id: <156112873945.115975.15513090884722011930.stgit@bahia.lan>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-06-21_10:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=971 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906210122
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1heL1n-0000yo-IG
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 11:00:37 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5LExQuD069311;
+ Fri, 21 Jun 2019 15:00:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2018-07-02; bh=iUueJpciRd5+L7Nyb1u2ZjUOAY3oI3QhAUxM/MUEwnc=;
+ b=amp4RluE2JuK7dgyTHplTXHpJkAfRzfJLRmF4UeWeSS2rT9JKpT33hcRndxQivqO8KWI
+ /353eBnVWc85FI/e9OEfa7Mgp0abaOk7rejnyWE5wqgEMi7Aa/z32L3OgOsOvuPHgtT2
+ 1q462vL8DSZoXk423WzN/GX6PKrQLcHkqXjFVTiQ/lnHsdDPfb5EK0R5/ph7oqvrPYfL
+ b4giSNwe2Qn+3bcKQAjwBxpe3223SpW7UqbJIs5opus47axe4IKPJWeOTifsnAuzCU//
+ zYSuOCLgEw5hwB9MNs/NZ43v77wgOAXhKt6B4q8CcRR4siHOmdysOz6US829YA/RBmoS 7w== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2120.oracle.com with ESMTP id 2t7809pybt-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 21 Jun 2019 15:00:33 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5LExg64070025;
+ Fri, 21 Jun 2019 15:00:33 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by userp3030.oracle.com with ESMTP id 2t77yp8byq-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 21 Jun 2019 15:00:32 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5LF0UIf010676;
+ Fri, 21 Jun 2019 15:00:30 GMT
+Received: from [192.168.14.112] (/109.64.216.174)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Fri, 21 Jun 2019 08:00:30 -0700
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+From: Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <beac3448-d66f-438f-c0bf-b35bc7c90137@redhat.com>
+Date: Fri, 21 Jun 2019 18:00:28 +0300
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <10C55D5F-B505-4172-8500-D8EBCEA43941@oracle.com>
+References: <1561116620-22245-1-git-send-email-pbonzini@redhat.com>
+ <1561116620-22245-21-git-send-email-pbonzini@redhat.com>
+ <C67C73E9-F0FA-4711-98F1-BB5CD782E473@oracle.com>
+ <3b4d778c-8c41-b8f2-7e1c-b7328072c3d5@redhat.com>
+ <96B0BE25-AA15-4FAA-9228-A68C0845E110@oracle.com>
+ <beac3448-d66f-438f-c0bf-b35bc7c90137@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9294
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906210123
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9294
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906210123
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: [Qemu-devel] [PATCH] spapr/xive: H_INT_ESB is used for LSIs only
+X-Received-From: 156.151.31.85
+Subject: Re: [Qemu-devel] [PULL 20/25] target/i386: kvm: Add support for
+ save and restore nested state
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,38 +111,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As indicated in the function header, this "hcall is only supported for
-LISNs that have the ESB hcall flag set to 1 when returned from hcall()
-H_INT_GET_SOURCE_INFO". We only set that flag for LSIs actually.
 
-Check that in h_int_esb().
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/intc/spapr_xive.c |    6 ++++++
- 1 file changed, 6 insertions(+)
+> On 21 Jun 2019, at 17:55, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> On 21/06/19 14:48, Liran Alon wrote:
+>>=20
+>>=20
+>>> On 21 Jun 2019, at 15:45, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>>=20
+>>> On 21/06/19 14:29, Liran Alon wrote:
+>>>>> +    max_nested_state_len =3D kvm_max_nested_state_length();
+>>>>> +    if (max_nested_state_len > 0) {
+>>>>> +        assert(max_nested_state_len >=3D offsetof(struct =
+kvm_nested_state, data));
+>>>>> +        env->nested_state =3D g_malloc0(max_nested_state_len);
+>>>>> +
+>>>>> +        env->nested_state->size =3D max_nested_state_len;
+>>>>> +
+>>>>> +        if (IS_INTEL_CPU(env)) {
+>>>> I think it=E2=80=99s better to change this to: =E2=80=9Cif =
+(cpu_has_vmx(env))=E2=80=9D {
+>>>>=20
+>>>>> +            struct kvm_vmx_nested_state_hdr *vmx_hdr =3D
+>>>>> +                &env->nested_state->hdr.vmx;
+>>>>> +
+>>>>> +            env->nested_state->format =3D =
+KVM_STATE_NESTED_FORMAT_VMX;
+>>>>> +            vmx_hdr->vmxon_pa =3D -1ull;
+>>>>> +            vmx_hdr->vmcs12_pa =3D -1ull;
+>>>>> +        }
+>>>>> +    }
+>>>> I think we should add here:
+>>>> } else if (cpu_has_svm(env)) {
+>>>>   env->nested_state->format =3D KVM_STATE_NESTED_FORMAT_SVM;
+>>>> }
+>>>=20
+>>> Or even force max_nested_state_len to 0 for AMD hosts, so that
+>>> kvm_get/put_nested_state are dropped completely.
+>>>=20
+>>> Paolo
+>>>=20
+>>=20
+>> On AMD hosts, KVM returns 0 for KVM_CAP_NESTED_STATE because
+>> Kvm-and.ko have kvm_x86_ops->get_nested_state set to NULL.
+>> See kvm_vm_ioctl_check_extension().
+>=20
+> Yes, now it does, my idea was to force that behavior in QEMU until we
+> know what SVM support actually looks like.
+>=20
+> In principle I don't like the idea of crossing fingers, even though
+> there's an actual possibility that it could work.  But it couldn't be
+> worse than what we have now, so maybe it *is* actually a good idea, =
+just
+> with some comment that explains the rationale.
+>=20
+> Paolo
 
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 58c2e5d890bd..01dd47ad5b02 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -1408,6 +1408,12 @@ static target_ulong h_int_esb(PowerPCCPU *cpu,
-         return H_P2;
-     }
- 
-+    if (!xive_source_irq_is_lsi(xsrc, lisn)) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: LISN " TARGET_FMT_lx "isn't LSI\n",
-+                      lisn);
-+        return H_P2;
-+    }
-+
-     if (offset > (1ull << xsrc->esb_shift)) {
-         return H_P3;
-     }
+Cool.
+Are you planning to make those changes when applying/merging or
+do you need me to submit a new patch-series version?
+Also note my comment on the other patch regarding block migration on AMD =
+vCPU which expose SVM.
+
+-Liran
+
+>=20
+>=20
+>> I just thought it will be nicer to add what I proposed above as when =
+kernel adds support
+>> for nested state on AMD host, QEMU would maybe just work.
+>> (Because maybe all state required for AMD nSVM is just flags in =
+env->nested_state->flags).
+>>=20
+>> -Liran
+>>=20
+>=20
 
 
