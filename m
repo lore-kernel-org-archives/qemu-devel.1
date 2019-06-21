@@ -2,83 +2,84 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBCF5C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 02:22:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B492C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 02:22:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91A522064B
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 02:22:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D6342084E
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 02:22:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kavWPgpG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91A522064B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UhpeazKf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D6342084E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54234 helo=lists.gnu.org)
+Received: from localhost ([::1]:54236 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1he9C4-0000rJ-Qf
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 22:22:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41412)
+	id 1he9C8-0000up-Bf
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 22:22:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41340)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1he8a8-0006j8-AW
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 21:43:14 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1he8a7-0006gg-9y
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 21:43:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1he8a2-0006cx-PW
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 21:43:12 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:36723)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1he8a3-0006ea-9S
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 21:43:11 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55714)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1he8a2-0006NR-3a
+ id 1he8a2-0006RK-Mw
  for qemu-devel@nongnu.org; Thu, 20 Jun 2019 21:43:06 -0400
-Received: by mail-wm1-x344.google.com with SMTP id u8so4905974wmm.1
- for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 18:42:53 -0700 (PDT)
+Received: by mail-wm1-x344.google.com with SMTP id a15so4783910wmj.5
+ for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 18:42:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=HGNVhh5Hqgn3qvbZX5LfBs/YDqW8d0pwwOKzE3d6Mfc=;
- b=kavWPgpGSYu7HeO+l7JgYZl/8yFPTaHsy7lGRkaluVHZNBraHC+THCyzjXZqjI27Q6
- nD+ERgri3DHMqtrkjIm/G+VE8PXind+yNCGPX9g5EwuIXPNJzGIsctgPRNzNSW83DbVU
- 4J8Po+UQPxT1QRgrIt3Uplfa5QjhFAbFcBHSXk/JBwN21eYMAUTes3KGLEMKXaWVtZZj
- cFSTT+uBTYLIiD+8tccC+Z+e2+ffAxxzRq/gUB5XZ5XjDL4ZM9HXpYHWmS9ESYK+F1mf
- EN89O1Y6nDqWsIFVKSON0nTJRCH4wQwMdDDCpqBIgkjwztCw7oPcdc0mX2Xo6Xiza2sb
- x1Dg==
+ bh=9dmj/U5AqjA5GQ9gcpPTO1P5uO7lsSOgQoq/OntyvQ4=;
+ b=UhpeazKfzrv0Oo30MZ+UlRD5RxP0q3utR4XmGArav6zQ76aAETorp1TMOE1Badz9C/
+ 9H8U9Ozp1FZTxo3mkD3k1KdQv9LIhs2DBasxxTUlVNoKmORFti5WadUIFKVnhNWeztPR
+ lwgCifWn2ZfmfLvclOthzocrEBdurIggoN/GVWm+nY5DE//MuSft3l5EDzJcC04q1A9j
+ RMu5tWlQklqghTxOvwV9iRU5i+c3sqFf9jbopc0ZzRkhUUoGuO3RdJX9Y06Fy7E+qZdt
+ NIjPiufPTldkY1ZwvakftJNZ6vpBLUpI5IudBs5qWy0NTwBkVK9s9tJIt+N99Wb9bAT7
+ YX4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=HGNVhh5Hqgn3qvbZX5LfBs/YDqW8d0pwwOKzE3d6Mfc=;
- b=rkFCYWH7YrCeAVkceM2oFeQS79nCvQs4Ew8sirhc+DfT/scaGIiIQuYiMNK5ch6k9z
- VF5hjh9FUej6XTB66cW4jMQ5zTQzOCH2Fhd+bo5vSg29yy2aJxbjAPfg3oa2IDQ2ZFrO
- U2mrHe7U2Csu7D5CnGR2iWIQ7bXvdFoKRcD8DImFaTZoylST21Arj4PmBdqKYZFUlsdJ
- MKlDwcEFWJU4qa9agKQ0lg8TnXsj1fkIPyQccL4KpmbMxVP8mcfMhA2FtGep1ds1+diY
- k14Q7BCmQKv3KZLqq6v+vV6ft6FDCyYJz+YS9SYNnBY86+bI936ZTAYIofKwP0xb6eWv
- 9vKg==
-X-Gm-Message-State: APjAAAUDQw9gAfr1u8ZvVHtZW1UIZSY2mS863TshBWDTTw3zlC8IFhvX
- 9O1j5CR3z0P+6y8rAC4BZEpq/Ugq
-X-Google-Smtp-Source: APXvYqz/OU8QhpyVMe+uLT5SLgW3Sdg0G80KpirkhzNZBcmeHSqG6lE27EB1UoXnfCqK0D1l+/iO2w==
-X-Received: by 2002:a1c:40c6:: with SMTP id n189mr1486992wma.118.1561081372634; 
- Thu, 20 Jun 2019 18:42:52 -0700 (PDT)
+ bh=9dmj/U5AqjA5GQ9gcpPTO1P5uO7lsSOgQoq/OntyvQ4=;
+ b=QR+UiAOyTWrUchUb5RUnVT7B42UZQ3OhSVz1VUL/sxXCgAWHVVqtmZ8BuI/AVQQb/Y
+ j1D3ST8XFQv9c/nMMWC7uBkHWYDO61tLyz9hTvvIoUhFatMhssRY1GFbvE+VGDApAduO
+ 8cXgCfnBNRpveMcz4vohRjtirjY6r5SLMiQeuWr/VCrkjDbpK4izy7RjoapWak5wLN9n
+ jkQm2FLf9B2WPKriNt3azn0sSPR40fulMveQgtLH0qraNAM8/Rq4FIGN1euCHCnnh4e8
+ NDOHGRfcYRa59H6EqeCmTG/TrCplv4yPsehvy43tL9GscI2Nm2X2gX9ytBgjD7y0CAj/
+ xi4w==
+X-Gm-Message-State: APjAAAUqZaCKrwiASh1z9P0TJxSXJaSkPgIFdfw5c0+nifxl1yQvjpiU
+ AlEn8AyXexPyAnwmwCziq2cSO0mH
+X-Google-Smtp-Source: APXvYqyEkiUKM71dbd5hrobmZ0DZgqUqg9/6QlFhLQ7NvCsol24y7hY6hAvkj7Mt9qC1yoG9ZAkNPg==
+X-Received: by 2002:a05:600c:389:: with SMTP id
+ w9mr1423182wmd.139.1561081377719; 
+ Thu, 20 Jun 2019 18:42:57 -0700 (PDT)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id d1sm1123125wru.41.2019.06.20.18.42.51
+ by smtp.gmail.com with ESMTPSA id d1sm1123125wru.41.2019.06.20.18.42.56
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 20 Jun 2019 18:42:52 -0700 (PDT)
+ Thu, 20 Jun 2019 18:42:56 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 21 Jun 2019 03:42:25 +0200
-Message-Id: <1561081350-3723-21-git-send-email-pbonzini@redhat.com>
+Date: Fri, 21 Jun 2019 03:42:30 +0200
+Message-Id: <1561081350-3723-26-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1561081350-3723-1-git-send-email-pbonzini@redhat.com>
 References: <1561081350-3723-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2a00:1450:4864:20::344
-Subject: [Qemu-devel] [PULL 20/25] target/i386: kvm: Add support for save
- and restore nested state
+Subject: [Qemu-devel] [PULL 25/25] hw: Nuke hw_compat_4_0_1 and
+ pc_compat_4_0_1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,457 +91,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Liran Alon <liran.alon@oracle.com>
+Cc: Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liran Alon <liran.alon@oracle.com>
+From: Greg Kurz <groug@kaod.org>
 
-Kernel commit 8fcc4b5923af ("kvm: nVMX: Introduce KVM_CAP_NESTED_STATE")
-introduced new IOCTLs to extract and restore vCPU state related to
-Intel VMX & AMD SVM.
+Commit c87759ce876a fixed a regression affecting pc-q35 machines by
+introducing a new pc-q35-4.0.1 machine version to be used instead
+of pc-q35-4.0. The only purpose was to revert the default behaviour
+of not using split irqchip, but the change also introduced the usual
+hw_compat and pc_compat bits, and wired them for pc-q35 only.
 
-Utilize these IOCTLs to add support for migration of VMs which are
-running nested hypervisors.
+This raises questions when it comes to add new compat properties for
+4.0* machine versions of any architecture. Where to add them ? In
+4.0, 4.0.1 or both ? Error prone. Another possibility would be to teach
+all other architectures about 4.0.1. This solution isn't satisfying,
+especially since this is a pc-q35 specific issue.
 
-Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
-Reviewed-by: Maran Wilson <maran.wilson@oracle.com>
-Tested-by: Maran Wilson <maran.wilson@oracle.com>
-Signed-off-by: Liran Alon <liran.alon@oracle.com>
-Message-Id: <20190619162140.133674-9-liran.alon@oracle.com>
+It turns out that the split irqchip default is handled in the machine
+option function and doesn't involve compat lists at all.
+
+Drop all the 4.0.1 compat lists and use the 4.0 ones instead in the 4.0.1
+machine option function.
+
+Move the compat props that were added to the 4.0.1 since c87759ce876a to
+4.0.
+
+Even if only hw_compat_4_0_1 had an impact on other architectures,
+drop pc_compat_4_0_1 as well for consistency.
+
+Fixes: c87759ce876a "q35: Revert to kernel irqchip"
+Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Message-Id: <156051774276.244890.8660277280145466396.stgit@bahia.lan>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- accel/kvm/kvm-all.c   |   8 ++
- include/sysemu/kvm.h  |   1 +
- target/i386/cpu.h     |   3 +
- target/i386/kvm.c     |  80 ++++++++++++++++++++
- target/i386/machine.c | 198 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 290 insertions(+)
+ hw/core/machine.c    |  5 +----
+ hw/i386/pc.c         |  3 ---
+ hw/i386/pc_q35.c     | 12 ++++++++----
+ include/hw/boards.h  |  3 ---
+ include/hw/i386/pc.h |  3 ---
+ 5 files changed, 9 insertions(+), 17 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index f0f5ab8..e3cf728 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -87,6 +87,7 @@ struct KVMState
- #ifdef KVM_CAP_SET_GUEST_DEBUG
-     QTAILQ_HEAD(, kvm_sw_breakpoint) kvm_sw_breakpoints;
- #endif
-+    int max_nested_state_len;
-     int many_ioeventfds;
-     int intx_set_mask;
-     bool sync_mmu;
-@@ -1681,6 +1682,8 @@ static int kvm_init(MachineState *ms)
-     s->debugregs = kvm_check_extension(s, KVM_CAP_DEBUGREGS);
- #endif
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 84ebb8d..ea5a01a 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -24,16 +24,13 @@
+ #include "hw/pci/pci.h"
+ #include "hw/mem/nvdimm.h"
  
-+    s->max_nested_state_len = kvm_check_extension(s, KVM_CAP_NESTED_STATE);
-+
- #ifdef KVM_CAP_IRQ_ROUTING
-     kvm_direct_msi_allowed = (kvm_check_extension(s, KVM_CAP_SIGNAL_MSI) > 0);
- #endif
-@@ -2248,6 +2251,11 @@ int kvm_has_debugregs(void)
-     return kvm_state->debugregs;
- }
- 
-+int kvm_max_nested_state_length(void)
-+{
-+    return kvm_state->max_nested_state_len;
-+}
-+
- int kvm_has_many_ioeventfds(void)
- {
-     if (!kvm_enabled()) {
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 64f55e5..acd90ae 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -210,6 +210,7 @@ bool kvm_has_sync_mmu(void);
- int kvm_has_vcpu_events(void);
- int kvm_has_robust_singlestep(void);
- int kvm_has_debugregs(void);
-+int kvm_max_nested_state_length(void);
- int kvm_has_pit_state2(void);
- int kvm_has_many_ioeventfds(void);
- int kvm_has_gsi_routing(void);
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 4ae4145..16d898c 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1360,6 +1360,9 @@ typedef struct CPUX86State {
- #if defined(CONFIG_KVM) || defined(CONFIG_HVF)
-     void *xsave_buf;
- #endif
-+#if defined(CONFIG_KVM)
-+    struct kvm_nested_state *nested_state;
-+#endif
- #if defined(CONFIG_HVF)
-     HVFX86EmulatorState *hvf_emul;
- #endif
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index f9872f1..e924663 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1324,6 +1324,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     struct kvm_cpuid_entry2 *c;
-     uint32_t signature[3];
-     int kvm_base = KVM_CPUID_SIGNATURE;
-+    int max_nested_state_len;
-     int r;
-     Error *local_err = NULL;
- 
-@@ -1658,6 +1659,24 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     if (has_xsave) {
-         env->xsave_buf = qemu_memalign(4096, sizeof(struct kvm_xsave));
-     }
-+
-+    max_nested_state_len = kvm_max_nested_state_length();
-+    if (max_nested_state_len > 0) {
-+        assert(max_nested_state_len >= offsetof(struct kvm_nested_state, data));
-+        env->nested_state = g_malloc0(max_nested_state_len);
-+
-+        env->nested_state->size = max_nested_state_len;
-+
-+        if (IS_INTEL_CPU(env)) {
-+            struct kvm_vmx_nested_state_hdr *vmx_hdr =
-+                &env->nested_state->hdr.vmx;
-+
-+            env->nested_state->format = KVM_STATE_NESTED_FORMAT_VMX;
-+            vmx_hdr->vmxon_pa = -1ull;
-+            vmx_hdr->vmcs12_pa = -1ull;
-+        }
-+    }
-+
-     cpu->kvm_msr_buf = g_malloc0(MSR_BUF_SIZE);
- 
-     if (!(env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_RDTSCP)) {
-@@ -1682,12 +1701,18 @@ int kvm_arch_init_vcpu(CPUState *cs)
- int kvm_arch_destroy_vcpu(CPUState *cs)
- {
-     X86CPU *cpu = X86_CPU(cs);
-+    CPUX86State *env = &cpu->env;
- 
-     if (cpu->kvm_msr_buf) {
-         g_free(cpu->kvm_msr_buf);
-         cpu->kvm_msr_buf = NULL;
-     }
- 
-+    if (env->nested_state) {
-+        g_free(env->nested_state);
-+        env->nested_state = NULL;
-+    }
-+
-     return 0;
- }
- 
-@@ -3411,6 +3436,52 @@ static int kvm_get_debugregs(X86CPU *cpu)
-     return 0;
- }
- 
-+static int kvm_put_nested_state(X86CPU *cpu)
-+{
-+    CPUX86State *env = &cpu->env;
-+    int max_nested_state_len = kvm_max_nested_state_length();
-+
-+    if (max_nested_state_len <= 0) {
-+        return 0;
-+    }
-+
-+    assert(env->nested_state->size <= max_nested_state_len);
-+    return kvm_vcpu_ioctl(CPU(cpu), KVM_SET_NESTED_STATE, env->nested_state);
-+}
-+
-+static int kvm_get_nested_state(X86CPU *cpu)
-+{
-+    CPUX86State *env = &cpu->env;
-+    int max_nested_state_len = kvm_max_nested_state_length();
-+    int ret;
-+
-+    if (max_nested_state_len <= 0) {
-+        return 0;
-+    }
-+
-+    /*
-+     * It is possible that migration restored a smaller size into
-+     * nested_state->hdr.size than what our kernel support.
-+     * We preserve migration origin nested_state->hdr.size for
-+     * call to KVM_SET_NESTED_STATE but wish that our next call
-+     * to KVM_GET_NESTED_STATE will use max size our kernel support.
-+     */
-+    env->nested_state->size = max_nested_state_len;
-+
-+    ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_NESTED_STATE, env->nested_state);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    if (env->nested_state->flags & KVM_STATE_NESTED_GUEST_MODE) {
-+        env->hflags |= HF_GUEST_MASK;
-+    } else {
-+        env->hflags &= ~HF_GUEST_MASK;
-+    }
-+
-+    return ret;
-+}
-+
- int kvm_arch_put_registers(CPUState *cpu, int level)
- {
-     X86CPU *x86_cpu = X86_CPU(cpu);
-@@ -3418,6 +3489,11 @@ int kvm_arch_put_registers(CPUState *cpu, int level)
- 
-     assert(cpu_is_stopped(cpu) || qemu_cpu_is_self(cpu));
- 
-+    ret = kvm_put_nested_state(x86_cpu);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-     if (level >= KVM_PUT_RESET_STATE) {
-         ret = kvm_put_msr_feature_control(x86_cpu);
-         if (ret < 0) {
-@@ -3533,6 +3609,10 @@ int kvm_arch_get_registers(CPUState *cs)
-     if (ret < 0) {
-         goto out;
-     }
-+    ret = kvm_get_nested_state(cpu);
-+    if (ret < 0) {
-+        goto out;
-+    }
-     ret = 0;
-  out:
-     cpu_sync_bndcs_hflags(&cpu->env);
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index a39ce7f..a6afdf8 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -231,6 +231,15 @@ static int cpu_pre_save(void *opaque)
-         env->segs[R_SS].flags &= ~(env->segs[R_SS].flags & DESC_DPL_MASK);
-     }
- 
-+#ifdef CONFIG_KVM
-+    /* Verify we have nested virtualization state from kernel if required */
-+    if (cpu_has_nested_virt(env) && !env->nested_state) {
-+        error_report("Guest enabled nested virtualization but kernel "
-+                "does not support saving of nested state");
-+        return -EINVAL;
-+    }
-+#endif
-+
-     return 0;
- }
- 
-@@ -278,6 +287,16 @@ static int cpu_post_load(void *opaque, int version_id)
-     env->hflags &= ~HF_CPL_MASK;
-     env->hflags |= (env->segs[R_SS].flags >> DESC_DPL_SHIFT) & HF_CPL_MASK;
- 
-+#ifdef CONFIG_KVM
-+    if ((env->hflags & HF_GUEST_MASK) &&
-+        (!env->nested_state ||
-+        !(env->nested_state->flags & KVM_STATE_NESTED_GUEST_MODE))) {
-+        error_report("vCPU set in guest-mode inconsistent with "
-+                     "migrated kernel nested state");
-+        return -EINVAL;
-+    }
-+#endif
-+
-     env->fpstt = (env->fpus_vmstate >> 11) & 7;
-     env->fpus = env->fpus_vmstate & ~0x3800;
-     env->fptag_vmstate ^= 0xff;
-@@ -851,6 +870,182 @@ static const VMStateDescription vmstate_tsc_khz = {
-     }
+-GlobalProperty hw_compat_4_0_1[] = {
++GlobalProperty hw_compat_4_0[] = {
+     { "VGA",            "edid", "false" },
+     { "secondary-vga",  "edid", "false" },
+     { "bochs-display",  "edid", "false" },
+     { "virtio-vga",     "edid", "false" },
+     { "virtio-gpu-pci", "edid", "false" },
  };
+-const size_t hw_compat_4_0_1_len = G_N_ELEMENTS(hw_compat_4_0_1);
+-
+-GlobalProperty hw_compat_4_0[] = {};
+ const size_t hw_compat_4_0_len = G_N_ELEMENTS(hw_compat_4_0);
  
-+#ifdef CONFIG_KVM
-+
-+static bool vmx_vmcs12_needed(void *opaque)
-+{
-+    struct kvm_nested_state *nested_state = opaque;
-+    return (nested_state->size >
-+            offsetof(struct kvm_nested_state, data.vmx[0].vmcs12));
-+}
-+
-+static const VMStateDescription vmstate_vmx_vmcs12 = {
-+    .name = "cpu/kvm_nested_state/vmx/vmcs12",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = vmx_vmcs12_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT8_ARRAY(data.vmx[0].vmcs12,
-+                            struct kvm_nested_state,
-+                            KVM_STATE_NESTED_VMX_VMCS_SIZE),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static bool vmx_shadow_vmcs12_needed(void *opaque)
-+{
-+    struct kvm_nested_state *nested_state = opaque;
-+    return (nested_state->size >
-+            offsetof(struct kvm_nested_state, data.vmx[0].shadow_vmcs12));
-+}
-+
-+static const VMStateDescription vmstate_vmx_shadow_vmcs12 = {
-+    .name = "cpu/kvm_nested_state/vmx/shadow_vmcs12",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = vmx_shadow_vmcs12_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT8_ARRAY(data.vmx[0].shadow_vmcs12,
-+                            struct kvm_nested_state,
-+                            KVM_STATE_NESTED_VMX_VMCS_SIZE),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static bool vmx_nested_state_needed(void *opaque)
-+{
-+    struct kvm_nested_state *nested_state = opaque;
-+
-+    return ((nested_state->format == KVM_STATE_NESTED_FORMAT_VMX) &&
-+            ((nested_state->hdr.vmx.vmxon_pa != -1ull) ||
-+             (nested_state->hdr.vmx.smm.flags & KVM_STATE_NESTED_SMM_VMXON)));
-+}
-+
-+static const VMStateDescription vmstate_vmx_nested_state = {
-+    .name = "cpu/kvm_nested_state/vmx",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = vmx_nested_state_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_U64(hdr.vmx.vmxon_pa, struct kvm_nested_state),
-+        VMSTATE_U64(hdr.vmx.vmcs12_pa, struct kvm_nested_state),
-+        VMSTATE_U16(hdr.vmx.smm.flags, struct kvm_nested_state),
-+        VMSTATE_END_OF_LIST()
-+    },
-+    .subsections = (const VMStateDescription*[]) {
-+        &vmstate_vmx_vmcs12,
-+        &vmstate_vmx_shadow_vmcs12,
-+        NULL,
-+    }
-+};
-+
-+static bool svm_nested_state_needed(void *opaque)
-+{
-+    struct kvm_nested_state *nested_state = opaque;
-+
-+    return (nested_state->format == KVM_STATE_NESTED_FORMAT_SVM);
-+}
-+
-+static const VMStateDescription vmstate_svm_nested_state = {
-+    .name = "cpu/kvm_nested_state/svm",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = svm_nested_state_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static bool nested_state_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+
-+    return (env->nested_state &&
-+            (vmx_nested_state_needed(env->nested_state) ||
-+             svm_nested_state_needed(env->nested_state)));
-+}
-+
-+static int nested_state_post_load(void *opaque, int version_id)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+    struct kvm_nested_state *nested_state = env->nested_state;
-+    int min_nested_state_len = offsetof(struct kvm_nested_state, data);
-+    int max_nested_state_len = kvm_max_nested_state_length();
-+
-+    /*
-+     * If our kernel don't support setting nested state
-+     * and we have received nested state from migration stream,
-+     * we need to fail migration
-+     */
-+    if (max_nested_state_len <= 0) {
-+        error_report("Received nested state when kernel cannot restore it");
-+        return -EINVAL;
-+    }
-+
-+    /*
-+     * Verify that the size of received nested_state struct
-+     * at least cover required header and is not larger
-+     * than the max size that our kernel support
-+     */
-+    if (nested_state->size < min_nested_state_len) {
-+        error_report("Received nested state size less than min: "
-+                     "len=%d, min=%d",
-+                     nested_state->size, min_nested_state_len);
-+        return -EINVAL;
-+    }
-+    if (nested_state->size > max_nested_state_len) {
-+        error_report("Recieved unsupported nested state size: "
-+                     "nested_state->size=%d, max=%d",
-+                     nested_state->size, max_nested_state_len);
-+        return -EINVAL;
-+    }
-+
-+    /* Verify format is valid */
-+    if ((nested_state->format != KVM_STATE_NESTED_FORMAT_VMX) &&
-+        (nested_state->format != KVM_STATE_NESTED_FORMAT_SVM)) {
-+        error_report("Received invalid nested state format: %d",
-+                     nested_state->format);
-+        return -EINVAL;
-+    }
-+
-+    return 0;
-+}
-+
-+static const VMStateDescription vmstate_kvm_nested_state = {
-+    .name = "cpu/kvm_nested_state",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_U16(flags, struct kvm_nested_state),
-+        VMSTATE_U16(format, struct kvm_nested_state),
-+        VMSTATE_U32(size, struct kvm_nested_state),
-+        VMSTATE_END_OF_LIST()
-+    },
-+    .subsections = (const VMStateDescription*[]) {
-+        &vmstate_vmx_nested_state,
-+        &vmstate_svm_nested_state,
-+        NULL
-+    }
-+};
-+
-+static const VMStateDescription vmstate_nested_state = {
-+    .name = "cpu/nested_state",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = nested_state_needed,
-+    .post_load = nested_state_post_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_STRUCT_POINTER(env.nested_state, X86CPU,
-+                vmstate_kvm_nested_state,
-+                struct kvm_nested_state),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+#endif
-+
- static bool mcg_ext_ctl_needed(void *opaque)
+ GlobalProperty hw_compat_3_1[] = {
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index e41192b..e96360b 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -111,9 +111,6 @@ struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
+ /* Physical Address of PVH entry point read from kernel ELF NOTE */
+ static size_t pvh_start_addr;
+ 
+-GlobalProperty pc_compat_4_0_1[] = {};
+-const size_t pc_compat_4_0_1_len = G_N_ELEMENTS(pc_compat_4_0_1);
+-
+ GlobalProperty pc_compat_4_0[] = {};
+ const size_t pc_compat_4_0_len = G_N_ELEMENTS(pc_compat_4_0);
+ 
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index dcddc64..57232ae 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -378,8 +378,13 @@ static void pc_q35_4_0_1_machine_options(MachineClass *m)
  {
-     X86CPU *cpu = opaque;
-@@ -1113,6 +1308,9 @@ VMStateDescription vmstate_x86_cpu = {
- #ifndef TARGET_X86_64
-         &vmstate_efer32,
- #endif
-+#ifdef CONFIG_KVM
-+        &vmstate_nested_state,
-+#endif
-         NULL
-     }
- };
+     pc_q35_4_1_machine_options(m);
+     m->alias = NULL;
+-    compat_props_add(m->compat_props, hw_compat_4_0_1, hw_compat_4_0_1_len);
+-    compat_props_add(m->compat_props, pc_compat_4_0_1, pc_compat_4_0_1_len);
++    /*
++     * This is the default machine for the 4.0-stable branch. It is basically
++     * a 4.0 that doesn't use split irqchip by default. It MUST hence apply the
++     * 4.0 compat props.
++     */
++    compat_props_add(m->compat_props, hw_compat_4_0, hw_compat_4_0_len);
++    compat_props_add(m->compat_props, pc_compat_4_0, pc_compat_4_0_len);
+ }
+ 
+ DEFINE_Q35_MACHINE(v4_0_1, "pc-q35-4.0.1", NULL,
+@@ -390,8 +395,7 @@ static void pc_q35_4_0_machine_options(MachineClass *m)
+     pc_q35_4_0_1_machine_options(m);
+     m->default_kernel_irqchip_split = true;
+     m->alias = NULL;
+-    compat_props_add(m->compat_props, hw_compat_4_0, hw_compat_4_0_len);
+-    compat_props_add(m->compat_props, pc_compat_4_0, pc_compat_4_0_len);
++    /* Compat props are applied by the 4.0.1 machine */
+ }
+ 
+ DEFINE_Q35_MACHINE(v4_0, "pc-q35-4.0", NULL,
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index b7362af..eaa050a 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -293,9 +293,6 @@ struct MachineState {
+     } \
+     type_init(machine_initfn##_register_types)
+ 
+-extern GlobalProperty hw_compat_4_0_1[];
+-extern const size_t hw_compat_4_0_1_len;
+-
+ extern GlobalProperty hw_compat_4_0[];
+ extern const size_t hw_compat_4_0_len;
+ 
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index a7d0b87..c54cc54 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -293,9 +293,6 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
+ int e820_get_num_entries(void);
+ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+ 
+-extern GlobalProperty pc_compat_4_0_1[];
+-extern const size_t pc_compat_4_0_1_len;
+-
+ extern GlobalProperty pc_compat_4_0[];
+ extern const size_t pc_compat_4_0_len;
+ 
 -- 
 1.8.3.1
-
 
 
