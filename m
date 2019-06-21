@@ -2,79 +2,81 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F023C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 17:19:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2982AC43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 17:28:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 570682070B
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 17:19:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 570682070B
+	by mail.kernel.org (Postfix) with ESMTPS id 006CD2075E
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 17:28:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 006CD2075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37016 helo=lists.gnu.org)
+Received: from localhost ([::1]:37044 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heNCJ-0006MO-5w
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 13:19:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55674)
+	id 1heNKS-0002EV-40
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 13:28:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57531)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1heNB5-0005uP-Ip
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 13:18:22 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1heNJb-0001lB-4N
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 13:27:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1heNB4-0003Qh-Av
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 13:18:19 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:40598)
+ (envelope-from <pbonzini@redhat.com>) id 1heNJa-000177-AG
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 13:27:07 -0400
+Received: from mail-wm1-f53.google.com ([209.85.128.53]:35587)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1heNAw-0003GT-36
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 13:18:12 -0400
-Received: by mail-wr1-f67.google.com with SMTP id p11so7305568wre.7
- for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 10:18:09 -0700 (PDT)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1heNJa-00016b-4H
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 13:27:06 -0400
+Received: by mail-wm1-f53.google.com with SMTP id c6so7387785wml.0
+ for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 10:27:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=IwbtsifUNKgRjDSiZ/SU6hpcC6jED5oalA7QwTttp+g=;
- b=XZm0YQbDxI+63iSjoQFVWA7XTJn9aBuId0Mi/fOtSRlh89HinMgQNJh+EuEnbUwAsE
- MDV3nSXPziQs6KYk1rC54uYiKi7/595NxEPft6fQjxiCSb+T6fKvj3vhE0i/UycTydXV
- kQ/Rh3LWaS801LMycTyqq+1pecNwYhr0CESTDG5Ug2m2aGc+7TByYTHyfJ7WrvFj1iWW
- r/J6Po2byd5Y0GLhvLUGsxPMmNrXIPIXbV/RI0Bnyyc+iTkYmeFwYqujV5P3HEBUH8o7
- j5frk72CLnayIHHTYbxxOpw6K/Dtohzid3msDe7Q2s/EQrIis6xnDv1YjBXGy8Hl0PFU
- IeWg==
-X-Gm-Message-State: APjAAAW881vKpiKQ8bFEdKkG14okvl78ZgB8Nz0amBi0sOEmcnx3FXvR
- yodVgeqWJtk8YfBl8OLJQPHIHQ==
-X-Google-Smtp-Source: APXvYqzjrX3POMGk+8nukhPDIqNIGMNaZU+2mJZBbXlSJqUL1Y9+72BbOVqEdFowKu+m+TqQR2BBCw==
-X-Received: by 2002:a5d:4d84:: with SMTP id b4mr16550714wru.242.1561137488338; 
- Fri, 21 Jun 2019 10:18:08 -0700 (PDT)
-Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.183])
- by smtp.gmail.com with ESMTPSA id u25sm2992835wmc.3.2019.06.21.10.18.07
+ bh=VfqyU+KbqTGgpolVPr0RsNKQAz1L3XqhPqCO2ensIuw=;
+ b=nsTfCKDzg1QBLRNtlxFHIkNRGlmO3ge3svDOi7Gx0JSCRj8srJXm5ihDsaur+J5jOM
+ YuqCuOVSqS9iSURimbZW8zcnpJJ9RiVlSqp6gk9UCzul8+KaRlYYIohRE8Un4cYjQmVV
+ z3Frf5Nx1y/ofZSt3mlw/rZoUFtQOXxQKRUlxSKWR5Xl2ovFRdOKoqAXOxIUMSTFqVEu
+ vDZR3p9mqfrNWmLPU/JV2xI8F+bCrl1v5bVuahT1Zwd91FLb3DulQ1Mwjm98Na4mlGi6
+ AF2xhgqmIPLpLdt9jLGZAzlm8aJJaXaLHGqNytGsy8zOlezY+IPJjC/GsgVYsAMdok/w
+ aIJQ==
+X-Gm-Message-State: APjAAAXRuhTDSHM37fzbju95z1bo5uAjtsMyUgXdTChGkRxrOb5ZFGHr
+ pCy6HRSv0RV3plOc/7bR/oDkh4foQPo=
+X-Google-Smtp-Source: APXvYqwHBazHFVklOADTu+3VC5OaJfp/OGOpjmYD7uo+SpzA5XGPxQy8JfbieFVQP+7Z18EdYpy7uw==
+X-Received: by 2002:a1c:e914:: with SMTP id q20mr5014387wmc.55.1561138024936; 
+ Fri, 21 Jun 2019 10:27:04 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:45fb:a0de:928e:79e8?
+ ([2001:b07:6468:f312:45fb:a0de:928e:79e8])
+ by smtp.gmail.com with ESMTPSA id g5sm3525497wrp.29.2019.06.21.10.27.02
  (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 21 Jun 2019 10:18:07 -0700 (PDT)
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-References: <20190621130544.18860-1-lvivier@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <2533033c-16a2-fc6d-74aa-e7cb5ee93817@redhat.com>
-Date: Fri, 21 Jun 2019 19:18:07 +0200
+ Fri, 21 Jun 2019 10:27:03 -0700 (PDT)
+To: Liran Alon <liran.alon@oracle.com>
+References: <1561116620-22245-1-git-send-email-pbonzini@redhat.com>
+ <1561116620-22245-23-git-send-email-pbonzini@redhat.com>
+ <96A3CC63-2B7D-44C2-AA9A-C02AF8FC3691@oracle.com>
+ <150eb2f8-3b1a-e0ab-df36-adcbd601055d@redhat.com>
+ <672D2B0A-E79C-467A-A9F0-57DC414842C3@oracle.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ab9169bb-5254-c928-c5f0-59fc3a7cd6d2@redhat.com>
+Date: Fri, 21 Jun 2019 19:27:01 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190621130544.18860-1-lvivier@redhat.com>
+In-Reply-To: <672D2B0A-E79C-467A-A9F0-57DC414842C3@oracle.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH] configure: linux-user doesn't need neither
- fdt nor slirp
+X-Received-From: 209.85.128.53
+Subject: Re: [Qemu-devel] [PULL 22/25] target/i386: kvm: Add nested
+ migration blocker only when kernel lacks required capabilities
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,67 +88,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/21/19 3:05 PM, Laurent Vivier wrote:
-> if softmmu is not enabled, we disable by default fdt and
-> slirp as they are only used by -softmmu targets.
-> 
-> A side effect is the git submodules are not cloned
-> if they are not needed.
-> 
-> Clone and build can be forced with --enable-fdt and
-> --enable-slirp.
-> 
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
->  configure | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/configure b/configure
-> index b091b82cb371..4b3853298c79 100755
-> --- a/configure
-> +++ b/configure
-> @@ -4066,6 +4066,11 @@ if test "$fdt_required" = "yes"; then
->    fdt=yes
->  fi
->  
-> +# linux-user doesn't need fdt
+On 21/06/19 17:07, Liran Alon wrote:
+>> So, overall I prefer not to block migration.
+> I’m not sure I agree.
+> It is quite likely that vCPU is currently in guest-mode while you are migrating…
+> A good hypervisor tries to maximise CPU time to be in guest-mode rather than host-mode. :)
 
-"fdt is only required when building softmmu targets"
+True, but it is even more likely that they are not using KVM at all and
+just happen to have the CPUID flag set. :)
 
-(we don't need it to build tools such qemu-img)
-
-> +if test -z "$fdt" -a "$softmmu" != "yes" ; then
-> +    fdt="no"
-> +fi
-> +
->  if test "$fdt" != "no" ; then
->    fdt_libs="-lfdt"
->    # explicitly check for libfdt_env.h as it is missing in some stable installs
-> @@ -5923,6 +5928,11 @@ fi
->  ##########################################
->  # check for slirp
->  
-> +# linux-user doesn't need slirp
-
-"slirp is only required when building softmmu targets"
-
-> +if test -z "$slirp" -a "$softmmu" != "yes" ; then
-> +    slirp="no"
-> +fi
-> +
->  case "$slirp" in
->    "" | yes)
->      if $pkg_config slirp; then
-> 
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Paolo
 
