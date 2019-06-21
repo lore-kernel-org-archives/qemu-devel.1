@@ -2,83 +2,56 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF4B5C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 12:06:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54EF6C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 12:07:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EA482084E
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 12:06:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wsy7NQPE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EA482084E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2B83E20673
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 12:07:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B83E20673
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60354 helo=lists.gnu.org)
+Received: from localhost ([::1]:60356 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heIJZ-0006d7-R6
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 08:06:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49137)
+	id 1heIKZ-0007WC-Fa
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 08:07:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55251)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1heHkh-0000mu-JS
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:46 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1heI7M-0003L3-Kq
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:54:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1heHke-0005uf-G9
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:43 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55526)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1heHkc-0005hI-Ci
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:40 -0400
-Received: by mail-wm1-x343.google.com with SMTP id a15so6005383wmj.5
- for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 04:30:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=yJQvGCIAx/7TCPsH6MnF6RRvIVhWqu77d3ySjfEx700=;
- b=Wsy7NQPEWK0RolMo9fdHrp9tqDQiAVnTbitD6kAmMkrbVgQz+Datifdpc+mC3Vefm8
- Df7DEYzKOEQ8x8FHeuLKwTpzA7stcUDDN9oII2BEcmaS8LJj0/xKEKbn087yFK+59c0/
- +KlxM5UgLDaM0dQ2PRS19c5Gdnh3+MBl/bp8ZW+8zAmZ+rnqEYqOKS7PHU5cOkdDRn84
- Nf+iPPdS4IKQUXvIA7rMkKNBkDx05063CmFccTQHBPWTJyoRRYjZdnBuebDUwrQNed8I
- 0uZIiPd2FhVQuXbKBXyNV//1XZL6IopR3cdNEuEjIN7RBwx9wwIiBShWeUKNd+ygEf9v
- Mzww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=yJQvGCIAx/7TCPsH6MnF6RRvIVhWqu77d3ySjfEx700=;
- b=ZSd0NyzHbRzt+ZSZKgO0Rn2UWBVqA2ipTMPsn4oMvP5JgDHKGIY4LCsAtajW78s5FG
- /ooZ6l/X+upX/4hbVgdwPg/s3BECQSzHexOF2iiZiT6AqKmVtSBxckFMBDu57StRogGf
- KfgSrXwQx5YgnJ6WmFLlDUkVDxFaipgdJH0+eThBmwYoC2HUcAWkpjtLGQi8xawPsYQl
- cgVnx9I+s2NJvg0id93WjLhluTK98hw4aKzL0DWtdWobw73u4QgUHg1i0l4hB75TBRbd
- 2zPipJecDLZg9/R2Ar59dEWaJM1JE5ew9I87EPbQtBroH3Gmv1mtU8aoWI2f5afxQfCF
- 29rQ==
-X-Gm-Message-State: APjAAAVWfXLkxxelSV3XqRQ9JLFFw1UW9L6wyh+0W2CFQMi+8cVMz77g
- jAelYA0605kY8AApdJOFrmt/1mpy
-X-Google-Smtp-Source: APXvYqx/Xu75/HMWQqpFerPLQ9i4eqnCZNjKoJZ4nWuhvIn6saX66B0atMixq9M1ZCkMznGJaXVCZQ==
-X-Received: by 2002:a1c:7f54:: with SMTP id a81mr3896341wmd.170.1561116634470; 
- Fri, 21 Jun 2019 04:30:34 -0700 (PDT)
-Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id r3sm2712851wrr.61.2019.06.21.04.30.33
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 21 Jun 2019 04:30:33 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1heI7E-0005Jh-US
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:54:05 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:37473 helo=mail.rt-rk.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1heI7A-00058C-NN
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:53:57 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 72D871A45ED;
+ Fri, 21 Jun 2019 13:53:51 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.13.43])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 1F7EF1A45F3;
+ Fri, 21 Jun 2019 13:53:51 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 21 Jun 2019 13:30:07 +0200
-Message-Id: <1561116620-22245-13-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1561116620-22245-1-git-send-email-pbonzini@redhat.com>
-References: <1561116620-22245-1-git-send-email-pbonzini@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [PULL 12/25] target/i386: define a new MSR based
- feature word - FEAT_CORE_CAPABILITY
+Date: Fri, 21 Jun 2019 13:53:39 +0200
+Message-Id: <1561118020-30489-5-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1561118020-30489-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1561118020-30489-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PATCH v3 4/5] tests/tcg: target/mips: Add tests for
+ MSA move instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,143 +63,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Xiaoyao Li <xiaoyao.li@linux.intel.com>
+Cc: arikalo@wavecomp.com, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Xiaoyao Li <xiaoyao.li@linux.intel.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-MSR IA32_CORE_CAPABILITY is a feature-enumerating MSR, which only
-enumerates the feature split lock detection (via bit 5) by now.
+Add tests for MSA move instructions.
 
-The existence of MSR IA32_CORE_CAPABILITY is enumerated by CPUID.7_0:EDX[30].
-
-The latest kernel patches about them can be found here:
-https://lkml.org/lkml/2019/4/24/1909
-
-Signed-off-by: Xiaoyao Li <xiaoyao.li@linux.intel.com>
-Message-Id: <20190617153654.916-1-xiaoyao.li@linux.intel.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/i386/cpu.c | 22 +++++++++++++++++++++-
- target/i386/cpu.h |  5 +++++
- target/i386/kvm.c |  9 +++++++++
- 3 files changed, 35 insertions(+), 1 deletion(-)
+ tests/tcg/mips/include/wrappers_msa.h              |   8 ++
+ tests/tcg/mips/user/ase/msa/move/test_msa_move_v.c | 149 +++++++++++++++++++++
+ 2 files changed, 157 insertions(+)
+ create mode 100644 tests/tcg/mips/user/ase/msa/move/test_msa_move_v.c
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 7beb8ab..c330fd9 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1085,7 +1085,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, "spec-ctrl", "stibp",
--            NULL, "arch-capabilities", NULL, "ssbd",
-+            NULL, "arch-capabilities", "core-capability", "ssbd",
-         },
-         .cpuid = {
-             .eax = 7,
-@@ -1203,6 +1203,26 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             }
-         },
-     },
-+    [FEAT_CORE_CAPABILITY] = {
-+        .type = MSR_FEATURE_WORD,
-+        .feat_names = {
-+            NULL, NULL, NULL, NULL,
-+            NULL, "split-lock-detect", NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+        },
-+        .msr = {
-+            .index = MSR_IA32_CORE_CAPABILITY,
-+            .cpuid_dep = {
-+                FEAT_7_0_EDX,
-+                CPUID_7_0_EDX_CORE_CAPABILITY,
-+            },
-+        },
-+    },
- };
+diff --git a/tests/tcg/mips/include/wrappers_msa.h b/tests/tcg/mips/include/wrappers_msa.h
+index 3f646ab..8f260f5 100644
+--- a/tests/tcg/mips/include/wrappers_msa.h
++++ b/tests/tcg/mips/include/wrappers_msa.h
+@@ -572,6 +572,14 @@ DO_MSA__WD__WS_WT(XOR_V, xor.v)
  
- typedef struct X86RegisterInfo32 {
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 7470acf..7f48136 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -345,6 +345,7 @@ typedef enum X86Seg {
- #define MSR_IA32_SPEC_CTRL              0x48
- #define MSR_VIRT_SSBD                   0xc001011f
- #define MSR_IA32_PRED_CMD               0x49
-+#define MSR_IA32_CORE_CAPABILITY        0xcf
- #define MSR_IA32_ARCH_CAPABILITIES      0x10a
- #define MSR_IA32_TSCDEADLINE            0x6e0
  
-@@ -496,6 +497,7 @@ typedef enum FeatureWord {
-     FEAT_XSAVE_COMP_LO, /* CPUID[EAX=0xd,ECX=0].EAX */
-     FEAT_XSAVE_COMP_HI, /* CPUID[EAX=0xd,ECX=0].EDX */
-     FEAT_ARCH_CAPABILITIES,
-+    FEAT_CORE_CAPABILITY,
-     FEATURE_WORDS,
- } FeatureWord;
- 
-@@ -687,6 +689,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
- #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumulation Single Precision */
- #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
- #define CPUID_7_0_EDX_ARCH_CAPABILITIES (1U << 29)  /*Arch Capabilities*/
-+#define CPUID_7_0_EDX_CORE_CAPABILITY   (1U << 30)  /*Core Capability*/
- #define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store Bypass Disable */
- 
- #define CPUID_8000_0008_EBX_WBNOINVD  (1U << 9)  /* Write back and
-@@ -734,6 +737,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
- #define MSR_ARCH_CAP_SKIP_L1DFL_VMENTRY (1U << 3)
- #define MSR_ARCH_CAP_SSB_NO     (1U << 4)
- 
-+#define MSR_CORE_CAP_SPLIT_LOCK_DETECT  (1U << 5)
+ /*
++ * Move
++ * ----
++ */
 +
- /* Supported Hyper-V Enlightenments */
- #define HYPERV_FEAT_RELAXED             0
- #define HYPERV_FEAT_VAPIC               1
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index a323b1f..279f99a 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -95,6 +95,7 @@ static bool has_msr_spec_ctrl;
- static bool has_msr_virt_ssbd;
- static bool has_msr_smi_count;
- static bool has_msr_arch_capabs;
-+static bool has_msr_core_capabs;
- 
- static uint32_t has_architectural_pmu_version;
- static uint32_t num_architectural_pmu_gp_counters;
-@@ -1842,6 +1843,9 @@ static int kvm_get_supported_msrs(KVMState *s)
-                 case MSR_IA32_ARCH_CAPABILITIES:
-                     has_msr_arch_capabs = true;
-                     break;
-+                case MSR_IA32_CORE_CAPABILITY:
-+                    has_msr_core_capabs = true;
-+                    break;
-                 }
-             }
-         }
-@@ -2368,6 +2372,11 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-                           env->features[FEAT_ARCH_CAPABILITIES]);
-     }
- 
-+    if (has_msr_core_capabs) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_CORE_CAPABILITY,
-+                          env->features[FEAT_CORE_CAPABILITY]);
++DO_MSA__WD__WS(MOVE_V, move.v)
++
++
++/*
+  * Pack
+  * ----
+  */
+diff --git a/tests/tcg/mips/user/ase/msa/move/test_msa_move_v.c b/tests/tcg/mips/user/ase/msa/move/test_msa_move_v.c
+new file mode 100644
+index 0000000..0683cfa
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/move/test_msa_move_v.c
+@@ -0,0 +1,149 @@
++/*
++ *  Test program for MSA instruction MOVE.V
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs_128.h"
++#include "../../../../include/test_utils_128.h"
++
++#define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
++
++
++int32_t main(void)
++{
++    char *isa_ase_name = "MSA";
++    char *group_name = "Bit Count";
++    char *instruction_name =  "MOVE.V";
++    int32_t ret;
++    uint32_t i;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0x0808080808080808ULL, 0x0808080808080808ULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0101010101010101ULL, 0x0101010101010101ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0202020202020202ULL, 0x0202020202020202ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0301000301000301ULL, 0x0003010003010003ULL, },
++        { 0x0000020000020000ULL, 0x0200000200000200ULL, },
++        { 0x0404040404040404ULL, 0x0404040404040404ULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0500000103050000ULL, 0x0103050000010305ULL, },
++        { 0x0002040000000204ULL, 0x0000000204000000ULL, },
++        { 0x0600020600020600ULL, 0x0206000206000206ULL, },
++        { 0x0004000004000004ULL, 0x0000040000040000ULL, },
++        { 0x0700050003000107ULL, 0x0005000300010700ULL, },
++        { 0x0006000400020000ULL, 0x0600040002000006ULL, },
++        { 0x0800080008000800ULL, 0x0800080008000800ULL, },    /*  16  */
++        { 0x0008000800080008ULL, 0x0008000800080008ULL, },
++        { 0x0801000300050007ULL, 0x0008010003000500ULL, },
++        { 0x0000020004000600ULL, 0x0800000200040006ULL, },
++        { 0x0802000600080200ULL, 0x0600080200060008ULL, },
++        { 0x0000040008000004ULL, 0x0008000004000800ULL, },
++        { 0x0803000801000700ULL, 0x0005000803000801ULL, },
++        { 0x0000060000040008ULL, 0x0200080000060000ULL, },
++        { 0x0804000804000804ULL, 0x0008040008040008ULL, },    /*  24  */
++        { 0x0000080000080000ULL, 0x0800000800000800ULL, },
++        { 0x0805000007000008ULL, 0x0100080300080500ULL, },
++        { 0x0000080200080400ULL, 0x0006000008000008ULL, },
++        { 0x0806000008020008ULL, 0x0600000802000806ULL, },
++        { 0x0000080400000800ULL, 0x0008040000080000ULL, },
++        { 0x0807000008050000ULL, 0x0803000008010008ULL, },
++        { 0x0000080600000804ULL, 0x0000080200000800ULL, },
++        { 0x0808000008080000ULL, 0x0808000008080000ULL, },    /*  32  */
++        { 0x0000080800000808ULL, 0x0000080800000808ULL, },
++        { 0x0808010000080300ULL, 0x0008050000080700ULL, },
++        { 0x0000000802000008ULL, 0x0400000806000008ULL, },
++        { 0x0808020000080600ULL, 0x0008080200000806ULL, },
++        { 0x0000000804000008ULL, 0x0800000008040000ULL, },
++        { 0x0808030000080801ULL, 0x0000080700000008ULL, },
++        { 0x0000000806000000ULL, 0x0804000008080200ULL, },
++        { 0x0808040000080804ULL, 0x0000080804000008ULL, },    /*  40  */
++        { 0x0000000808000000ULL, 0x0808000000080800ULL, },
++        { 0x0808050000000807ULL, 0x0000000808010000ULL, },
++        { 0x0000000808020000ULL, 0x0808040000000806ULL, },
++        { 0x0808060000000808ULL, 0x0200000808060000ULL, },
++        { 0x0000000808040000ULL, 0x0008080000000808ULL, },
++        { 0x0808070000000808ULL, 0x0500000008080300ULL, },
++        { 0x0000000808060000ULL, 0x0008080400000008ULL, },
++        { 0x0808080000000808ULL, 0x0800000008080800ULL, },    /*  48  */
++        { 0x0000000808080000ULL, 0x0008080800000008ULL, },
++        { 0x0808080100000008ULL, 0x0803000000080805ULL, },
++        { 0x0000000008080200ULL, 0x0000080804000000ULL, },
++        { 0x0808080200000008ULL, 0x0806000000080808ULL, },
++        { 0x0000000008080400ULL, 0x0000080808000000ULL, },
++        { 0x0808080300000008ULL, 0x0808010000000808ULL, },
++        { 0x0000000008080600ULL, 0x0000000808040000ULL, },
++        { 0x0808080400000008ULL, 0x0808040000000808ULL, },    /*  56  */
++        { 0x0000000008080800ULL, 0x0000000808080000ULL, },
++        { 0x0808080500000000ULL, 0x0808070000000008ULL, },
++        { 0x0000000008080802ULL, 0x0000000808080400ULL, },
++        { 0x0808080600000000ULL, 0x0808080200000008ULL, },
++        { 0x0000000008080804ULL, 0x0000000008080800ULL, },
++        { 0x0808080700000000ULL, 0x0808080500000000ULL, },
++        { 0x0000000008080806ULL, 0x0000000008080804ULL, },
++        { 0x0100030200000000ULL, 0x0000000007000100ULL, },    /*  64  */
++        { 0x0501000000010200ULL, 0x0004010000000006ULL, },
++        { 0x0100010101020101ULL, 0x0002020801000000ULL, },
++        { 0x0000000000000300ULL, 0x0104010201000301ULL, },
++        { 0x0101000000010000ULL, 0x0100000102020001ULL, },
++        { 0x0200010108000005ULL, 0x0000000007010000ULL, },
++        { 0x0100000000020100ULL, 0x0100000001040100ULL, },
++        { 0x0601000401010101ULL, 0x0106000000000001ULL, },
++        { 0x0000000200010300ULL, 0x0300030001010000ULL, },    /*  72  */
++        { 0x0100020000020302ULL, 0x0100010101030100ULL, },
++        { 0x0103040402020200ULL, 0x0102000000000000ULL, },
++        { 0x0101040400010001ULL, 0x0201030000010103ULL, },
++        { 0x0300000301000300ULL, 0x0100010200000200ULL, },
++        { 0x0100000600000001ULL, 0x0401000100000000ULL, },
++        { 0x0000000000010401ULL, 0x0300010402000000ULL, },
++        { 0x0100010104000201ULL, 0x0200020200000003ULL, },
++    };
++
++    reset_msa_registers();
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < TEST_COUNT_TOTAL; i++) {
++        if (i < PATTERN_INPUTS_COUNT) {
++            do_msa_MOVE_V(b128_pattern[i], b128_result[i]);
++        } else {
++            do_msa_MOVE_V(b128_random[i - PATTERN_INPUTS_COUNT],
++                          b128_result[i]);
++        }
 +    }
 +
-     /*
-      * The following MSRs have side effects on the guest or are too heavy
-      * for normal writeback. Limit them to reset or full state updates.
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results_128(isa_ase_name, group_name, instruction_name,
++                            TEST_COUNT_TOTAL, elapsed_time,
++                            &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
 -- 
-1.8.3.1
-
+2.7.4
 
 
