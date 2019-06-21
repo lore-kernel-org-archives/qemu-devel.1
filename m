@@ -2,81 +2,66 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F07C48BE5
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 14:51:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0C6CC43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 14:52:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5BD7208C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 14:50:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5BD7208C3
+	by mail.kernel.org (Postfix) with ESMTPS id CD6C920679
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 14:52:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD6C920679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35752 helo=lists.gnu.org)
+Received: from localhost ([::1]:35758 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heKsU-0000Kf-RR
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 10:50:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46049)
+	id 1heKtn-0000xs-4W
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 10:52:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45910)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1heKoA-0003PE-Lc
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:46:32 -0400
+ (envelope-from <crosa@redhat.com>) id 1heKoU-0003ID-Ge
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:46:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1heKo9-00067s-FK
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:46:30 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:40075)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1heKo8-00064w-9q
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:46:29 -0400
-Received: by mail-wm1-f68.google.com with SMTP id v19so6876832wmj.5
- for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 07:46:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=wqCpkprBc2J/oBbcTLMofDoxn5v207tp4CUDSZCZr2o=;
- b=UQVXKC1QSYa4Cq1cfcPXnRPLtv5MgaRIF7BxenirkShCIv7x+gmIFWSFmRRfubcaKl
- dttixQ87lV5KeU8tPV8oL4i7Y+6QwGy7xsl64Ba7kpVv4wRelD0D66la1N+akZT0GL2P
- 5hrsQcmcbQRPMMhiSbVLtFqR7U8hAdscNTBeI82s6BFUJhXuTURnz3BrGQvsPjKrvox0
- aZ3e7XXHLJhI4nwi28mcYeXII3r6upySPoYDTOgSnCejTH+eo5LIepi8Paoj8D+Nme5F
- 2rI0XpHzLJ1Jm3FofcsTpyEGH2vGMAo0mEvNB5hVY8ZHKFsKRoEcgBxUOLkkYKb1HgvR
- cB4g==
-X-Gm-Message-State: APjAAAVKn8wVwwYe1C2nm2nJmUd3WZ9jNpVGfc1aVTWzqVD2YPdDEaKw
- WZN1F0Q7ta88XpjzmfAzHgoMiA==
-X-Google-Smtp-Source: APXvYqwbs/aw62Zx0GKxq7ISurV0aIMZU9BnOo5SAgXPhv3Yzak1fFtZhMmZOA250vMgncTiuITw4w==
-X-Received: by 2002:a1c:dc07:: with SMTP id t7mr4633705wmg.164.1561128384767; 
- Fri, 21 Jun 2019 07:46:24 -0700 (PDT)
-Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.183])
- by smtp.gmail.com with ESMTPSA id 72sm4358583wrk.22.2019.06.21.07.46.23
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 21 Jun 2019 07:46:24 -0700 (PDT)
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20190613143446.23937-1-philmd@redhat.com>
- <20190613143446.23937-3-philmd@redhat.com>
- <20190620112805-mutt-send-email-mst@kernel.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <d7215a09-ecc2-9895-a00e-fd12091b3893@redhat.com>
-Date: Fri, 21 Jun 2019 16:46:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ (envelope-from <crosa@redhat.com>) id 1heKga-0002oK-0R
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:38:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35676)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1heKgZ-0002oB-Nt
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:38:39 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D866F6EB82;
+ Fri, 21 Jun 2019 14:38:28 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-120-204.rdu2.redhat.com
+ [10.10.120.204])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DB2F160572;
+ Fri, 21 Jun 2019 14:38:18 +0000 (UTC)
+Date: Fri, 21 Jun 2019 10:38:16 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Message-ID: <20190621143816.GA24282@localhost.localdomain>
+References: <20190621060925.16214-1-crosa@redhat.com>
+ <20190621060925.16214-2-crosa@redhat.com>
+ <f18a5df8-201e-b8a1-1a3e-3e2254ce8b1e@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190620112805-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <f18a5df8-201e-b8a1-1a3e-3e2254ce8b1e@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Fri, 21 Jun 2019 14:38:38 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PATCH v2 02/20] hw/i386/pc: Use size_t type to
- hold/return a size of array
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 1/2] Acceptance tests: exclude "flaky" tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,69 +73,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yang Zhong <yang.zhong@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
- kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
- Li Qiang <liq3ea@gmail.com>, qemu-devel@nongnu.org,
- Rob Bradford <robert.bradford@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Samuel Ortiz <sameo@linux.intel.com>, Richard Henderson <rth@twiddle.net>
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-devel@nongnu.org,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/20/19 5:28 PM, Michael S. Tsirkin wrote:
-> On Thu, Jun 13, 2019 at 04:34:28PM +0200, Philippe Mathieu-Daudé wrote:
->> Reviewed-by: Li Qiang <liq3ea@gmail.com>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
-> Motivation? do you expect more than 2^31 entries?
+On Fri, Jun 21, 2019 at 09:03:33AM +0200, Philippe Mathieu-Daud=E9 wrote:
+> On 6/21/19 8:09 AM, Cleber Rosa wrote:
+> > It's a fact that some tests may not be 100% reliable in all
+> > environments.  While it's a tough call to remove a useful test that
+> > from the tree because it may fail every 1/100th time (or so), having
+> > human attention drawn to known issues is very bad for humans and for
+> > the projects they manage.
+> >=20
+> > As a compromise solution, this marks tests that are known to have
+> > issues, or that exercises known issues in QEMU or other components,
+> > and excludes them from the entry point.  As a consequence, tests
+> > marked as "flaky" will not be executed as part of "make
+> > check-acceptance".
+> >=20
+> > Because such tests should be forgiven but never be forgotten, it's
+> > possible to list them with (assuming "make check-venv" or "make
+> > check-acceptance" has already initiatilized the venv):
+> >=20
+> >   $ ./tests/venv/bin/avocado list -t flaky tests/acceptance
+> >=20
+> > The current list of tests marked as flaky are a result of running
+> > the entire set of acceptance tests around 20 times.  The results
+> > were then processed with a helper script[1].  That either confirmed
+> > known issues (in the case of aarch64 and arm)[2] or revealed new
+> > ones (mips).
+> >=20
+> > This also bumps the Avocado version to one that includes a fix to the
+> > parsing of multiple and mix "key:val" and simple tag values.
+> >=20
+> > [1] https://raw.githubusercontent.com/avocado-framework/avocado/maste=
+r/contrib/scripts/summarize-job-failures.py
+> > [2] https://bugs.launchpad.net/qemu/+bug/1829779
+> >=20
+> > Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> > ---
+> >  docs/devel/testing.rst                   | 17 +++++++++++++++++
+> >  tests/Makefile.include                   |  6 +++++-
+> >  tests/acceptance/boot_linux_console.py   |  2 ++
+> >  tests/acceptance/linux_ssh_mips_malta.py |  2 ++
+> >  tests/requirements.txt                   |  2 +-
+> >  5 files changed, 27 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+> > index da2d0fc964..ff4d8e2e1c 100644
+> > --- a/docs/devel/testing.rst
+> > +++ b/docs/devel/testing.rst
+> > @@ -574,6 +574,23 @@ may be invoked by running:
+> > =20
+> >    tests/venv/bin/avocado run $OPTION1 $OPTION2 tests/acceptance/
+> > =20
+> > +Tagging tests
+> > +-------------
+> > +
+> > +flaky
+> > +~~~~~
+> > +
+> > +If a test is known to fail intermittently, even if only every one
+> > +hundredth time, it's highly advisable to mark it as a flaky test.
+> > +This will prevent these individual tests from failing much larger
+> > +jobs, will avoid human interaction and time wasted to verify a known
+> > +issue, and worse of all, can lead to the discredit of automated
+> > +testing.
+> > +
+> > +To mark a test as flaky, add to its docstring.::
+> > +
+> > +  :avocado: tags=3Dflaky
+>=20
+> I certainly disagree with this patch, failing tests have to be fixed.
+> Why not tag all the codebase flaky and sing "happy coding"?
+>
 
-Building with -Wsign-compare:
+That's a great idea! :)
 
-hw/i386/pc.c:973:36: warning: comparison of integers of different signs:
-'unsigned int' and 'int' [-Wsign-compare]
-    for (i = 0, array_count = 0; i < e820_get_num_entries(); i++) {
-                                 ~ ^ ~~~~~~~~~~~~~~~~~~~~~~
+Now, seriously, I also resisted this for quite a long time.  The
+reality, though, is that intermittent failures will continue to
+appear, and letting tests (and jobs, and CI pipelines, and whatnot)
+fail is a very bad idea.  We all agree that real fixes are better than
+this, but many times they don't come quickly.
 
->> ---
->>  hw/i386/pc.c         | 4 ++--
->>  include/hw/i386/pc.h | 2 +-
->>  2 files changed, 3 insertions(+), 3 deletions(-)
->>
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index bb3c74f4ca..ff0f6bbbb3 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -105,7 +105,7 @@ struct e820_table {
->>  
->>  static struct e820_table e820_reserve;
->>  static struct e820_entry *e820_table;
->> -static unsigned e820_entries;
->> +static size_t e820_entries;
->>  struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
->>  
->>  /* Physical Address of PVH entry point read from kernel ELF NOTE */
->> @@ -901,7 +901,7 @@ int e820_add_entry(uint64_t address, uint64_t length, uint32_t type)
->>      return e820_entries;
->>  }
->>  
->> -int e820_get_num_entries(void)
->> +size_t e820_get_num_entries(void)
->>  {
->>      return e820_entries;
->>  }
->> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
->> index 3b3a0d6e59..fc29893624 100644
->> --- a/include/hw/i386/pc.h
->> +++ b/include/hw/i386/pc.h
->> @@ -290,7 +290,7 @@ void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
->>  #define E820_UNUSABLE   5
->>  
->>  int e820_add_entry(uint64_t, uint64_t, uint32_t);
->> -int e820_get_num_entries(void);
->> +size_t e820_get_num_entries(void);
->>  bool e820_get_entry(unsigned int, uint32_t, uint64_t *, uint64_t *);
->>  
->>  extern GlobalProperty pc_compat_4_0_1[];
->> -- 
->> 2.20.1
+> Anyway if this get accepted, 'flaky' tags must have the intermittent
+> failure well described, and a Launchpad/Bugzilla tracking ticket refere=
+nced.
+>
+
+And here you have a key point that I absolutely agree with.  The
+"flaky" approach can either poison a lot of tests, and be seen as
+quick way out of a difficult issue revealed by a test.  Or, it can
+serve as an effective tool to keep track of these very important
+issues.
+
+If we add:
+
+   # https://bugs.launchpad.net/qemu/+bug/1829779
+   :avocado: flaky
+
+Topped with some human, I believe this can be very effective.  This goes
+without saying, but comments here are very much welcome.
+
+- Cleber.
+
+> > +
+> >  Manual Installation
+> >  -------------------
+> > =20
+> > diff --git a/tests/Makefile.include b/tests/Makefile.include
+> > index db750dd6d0..4c97da2878 100644
+> > --- a/tests/Makefile.include
+> > +++ b/tests/Makefile.include
+> > @@ -1125,7 +1125,11 @@ TESTS_RESULTS_DIR=3D$(BUILD_DIR)/tests/results
+> >  # Any number of command separated loggers are accepted.  For more
+> >  # information please refer to "avocado --help".
+> >  AVOCADO_SHOW=3Dapp
+> > -AVOCADO_TAGS=3D$(patsubst %-softmmu,-t arch:%, $(filter %-softmmu,$(=
+TARGET_DIRS)))
+> > +
+> > +# Additional tags that are added to each occurence of "--filter-by-t=
+ags"
+> > +AVOCADO_EXTRA_TAGS :=3D ,-flaky
+> > +
+> > +AVOCADO_TAGS=3D$(patsubst %-softmmu,--filter-by-tags=3Darch:%$(AVOCA=
+DO_EXTRA_TAGS), $(filter %-softmmu,$(TARGET_DIRS)))
+> > =20
+> >  ifneq ($(findstring v2,"v$(PYTHON_VERSION)"),v2)
+> >  $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
+> > diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptanc=
+e/boot_linux_console.py
+> > index 32159503e9..6bd5c1ab53 100644
+> > --- a/tests/acceptance/boot_linux_console.py
+> > +++ b/tests/acceptance/boot_linux_console.py
+> > @@ -249,6 +249,7 @@ class BootLinuxConsole(Test):
+> >          """
+> >          :avocado: tags=3Darch:aarch64
+> >          :avocado: tags=3Dmachine:virt
+> > +        :avocado: tags=3Dflaky
+> >          """
+> >          kernel_url =3D ('https://download.fedoraproject.org/pub/fedo=
+ra/linux/'
+> >                        'releases/29/Everything/aarch64/os/images/pxeb=
+oot/vmlinuz')
+> > @@ -270,6 +271,7 @@ class BootLinuxConsole(Test):
+> >          """
+> >          :avocado: tags=3Darch:arm
+> >          :avocado: tags=3Dmachine:virt
+> > +        :avocado: tags=3Dflaky
+> >          """
+> >          kernel_url =3D ('https://download.fedoraproject.org/pub/fedo=
+ra/linux/'
+> >                        'releases/29/Everything/armhfp/os/images/pxebo=
+ot/vmlinuz')
+> > diff --git a/tests/acceptance/linux_ssh_mips_malta.py b/tests/accepta=
+nce/linux_ssh_mips_malta.py
+> > index aafb0c39f6..ae70b658e0 100644
+> > --- a/tests/acceptance/linux_ssh_mips_malta.py
+> > +++ b/tests/acceptance/linux_ssh_mips_malta.py
+> > @@ -208,6 +208,7 @@ class LinuxSSH(Test):
+> >          :avocado: tags=3Dmachine:malta
+> >          :avocado: tags=3Dendian:big
+> >          :avocado: tags=3Ddevice:pcnet32
+> > +        :avocado: tags=3Dflaky
+> >          """
+> >          kernel_url =3D ('https://people.debian.org/~aurel32/qemu/mip=
+s/'
+> >                        'vmlinux-3.2.0-4-5kc-malta')
+> > @@ -222,6 +223,7 @@ class LinuxSSH(Test):
+> >          :avocado: tags=3Dmachine:malta
+> >          :avocado: tags=3Dendian:little
+> >          :avocado: tags=3Ddevice:pcnet32
+> > +        :avocado: tags=3Dflaky
+> >          """
+> >          kernel_url =3D ('https://people.debian.org/~aurel32/qemu/mip=
+sel/'
+> >                        'vmlinux-3.2.0-4-5kc-malta')
+> > diff --git a/tests/requirements.txt b/tests/requirements.txt
+> > index 3ae0e29ad7..58d63d171f 100644
+> > --- a/tests/requirements.txt
+> > +++ b/tests/requirements.txt
+> > @@ -1,5 +1,5 @@
+> >  # Add Python module requirements, one per line, to be installed
+> >  # in the tests/venv Python virtual environment. For more info,
+> >  # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
+> > -avocado-framework=3D=3D68.0
+> > +avocado-framework=3D=3D69.1
+> >  paramiko
+> >=20
+>=20
 
