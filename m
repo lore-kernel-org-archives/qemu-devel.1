@@ -2,84 +2,70 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C554C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:11:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D9B0C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:18:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5593820679
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:11:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t9MEcABT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5593820679
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 72052206E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:18:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72052206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55256 helo=lists.gnu.org)
+Received: from localhost ([::1]:55282 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heDhX-0007Ja-FV
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 03:11:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35278)
+	id 1heDok-0001BQ-B8
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 03:18:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35686)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <joel.stan@gmail.com>) id 1heDfO-0006Ew-V2
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:09:00 -0400
+ (envelope-from <fziglio@redhat.com>) id 1heDna-0000io-Rt
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:17:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <joel.stan@gmail.com>) id 1heDUr-0007V2-Pr
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 02:58:07 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:43491)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <joel.stan@gmail.com>)
- id 1heDPr-0008T2-4L; Fri, 21 Jun 2019 02:52:56 -0400
-Received: by mail-pg1-x542.google.com with SMTP id f25so2872727pgv.10;
- Thu, 20 Jun 2019 23:52:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=QrPb1I4hGgIdnSQDxicKRNj7Vi+MgOZceJ5iUqGk3p8=;
- b=t9MEcABTrVvPUw9UNLxvsfUsdMWlb/UtFwiat6FbeB+dYpuHLBwxy6AcI79w3NzdoZ
- Gr5/uV3k4hCNkG1szSwqGRi+2gMCii0O9HNuBHiZ1gZZzM7CHuKj4g6Pmni3CRcHGwsC
- YFAYSawf/C2DcIDzN65JXzAVjvj80Ghl63X9std2Eze5h/ftCN0KXxaRaF925VJAgHjJ
- OzMhJiGK6wypRtnn1XwSMcc/WSiwQXJvXZSEwNFV1KDEHQBN4tyTLSQ7QgeQD/PMWPyv
- bHCNKIPB1Lc7ClLloZl7QxVNmQYoxHPMq9UJQFg15epwtS8T5jyRmzua30nSo0ZHI0wM
- pFHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=QrPb1I4hGgIdnSQDxicKRNj7Vi+MgOZceJ5iUqGk3p8=;
- b=GJmPjYNaL/mKCdtEDVtImOYUjJAR+JKJBSZuOzaZHbp09M3wPmNfvklO+JuaQoBgGQ
- 5seyOpQy4tr7ax8BEd5AFtauUju3IE3B3mO9y0eNtG69r50UgHeeUTClNoIiTCCZtUhx
- P3N27+k2PPjYDnPWr/GtsQOlbT4inpsP3Ip7OL8Nrw75Lwx7QHzkxQ4B2JAt81T9EhL5
- 6yYGmr6uy/QwgNUmvSwICtHGbNy8LMrBs+HoHDyAfgZf+DDPEYs/O7xchHM/CRD/Q4hn
- F7RDndgqOwMZ0hnuLOzoYxWxM7o0ykkrZNuz1dW206/e2jeeTa4Epjpe3nyv0kf5PB26
- wneg==
-X-Gm-Message-State: APjAAAXm+uAXyKZDQBSDszvlApTvGEGUSZbnkqkU7c/AzVpRFAjj5++/
- A2E3Dknes3z0vW9XxUmUhZA=
-X-Google-Smtp-Source: APXvYqwPUo8K7Yy7BSHo3QAwaJI/jWlT/qI8OzIdy8OKTWtnltzZxVslVtS0j2dRYzh4SOU4rm+twQ==
-X-Received: by 2002:a63:1d5:: with SMTP id 204mr17261028pgb.207.1561099972851; 
- Thu, 20 Jun 2019 23:52:52 -0700 (PDT)
-Received: from voyager.ibm.com ([36.255.48.244])
- by smtp.gmail.com with ESMTPSA id m19sm2833108pff.153.2019.06.20.23.52.50
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 20 Jun 2019 23:52:52 -0700 (PDT)
-From: Joel Stanley <joel@jms.id.au>
-To: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 21 Jun 2019 16:22:42 +0930
-Message-Id: <20190621065242.32535-1-joel@jms.id.au>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <fziglio@redhat.com>) id 1heDnU-0005p6-P5
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:17:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46674)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <fziglio@redhat.com>) id 1heDnU-0005Mc-CZ
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:17:20 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id AB9726EB8A;
+ Fri, 21 Jun 2019 07:16:52 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+ (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8DBE060BEC;
+ Fri, 21 Jun 2019 07:16:52 +0000 (UTC)
+Received: from zmail25.collab.prod.int.phx2.redhat.com
+ (zmail25.collab.prod.int.phx2.redhat.com [10.5.83.31])
+ by colo-mx.corp.redhat.com (Postfix) with ESMTP id 995E924F19;
+ Fri, 21 Jun 2019 07:16:50 +0000 (UTC)
+Date: Fri, 21 Jun 2019 03:16:48 -0400 (EDT)
+From: Frediano Ziglio <fziglio@redhat.com>
+To: Kevin Pouget <kpouget@redhat.com>
+Message-ID: <2139720774.23871724.1561101408712.JavaMail.zimbra@redhat.com>
+In-Reply-To: <CADJ1XR3fh0cyOerSM8VQkpde6cHLb8WccP05Rwr7xWMOK59rog@mail.gmail.com>
+References: <20190619123042.4822-1-kpouget@redhat.com>
+ <e9fcdbfd-cde2-fc91-ce1d-6bfe06d39c4f@redhat.com>
+ <CADJ1XR3fh0cyOerSM8VQkpde6cHLb8WccP05Rwr7xWMOK59rog@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::542
-Subject: [Qemu-devel] [PATCH v2] aspeed: Link SCU to the watchdog
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.33.32.12, 10.4.195.28]
+Thread-Topic: spice-core: allow setting properties from QMP
+Thread-Index: JcZm5h4xS1Mxjqqfp/uZaSyKbIHTxQ==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Fri, 21 Jun 2019 07:16:57 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC] spice-core: allow setting properties from QMP
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,102 +77,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
+Cc: spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org,
+ Marc-Andre Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The ast2500 uses the watchdog to reset the SDRAM controller. This
-operation is usually performed by u-boot's memory training procedure,
-and it is enabled by setting a bit in the SCU and then causing the
-watchdog to expire. Therefore, we need the watchdog to be able to
-access the SCU's register space.
+> 
+> Hello Eric,
+> 
+> > A new command may be okay, however,
+> 
+> thanks, I've fix the typos and updated the patch to use an Enum, which
+> indeed makes more sense.
+> 
+> I've also updated "spice-query" command to provide the current value
+> of the "video-codec" property,
+> but it made me wonder if I should improve this QMP interface with a
+> json list, or keep the current string-based list
+> ("enc1:codec1;enc2:codec2").
+> 
+> I CC the spice-devel list to get their point of view
+> 
+> The current behavior is:
+> 
+> --> { "execute": "set-spice", "arguments": { "property":
+> "video-codecs", "value": "spice:mjpeg;gstreamer:h264" } }
+> <-- {"return":{},"id":"libvirt-23"}
 
-This causes the watchdog to not perform a system reset when the bit is
-set. In the future it could perform a reset of the SDMC model.
+It looks complicated from the user. Why not just
 
-Signed-off-by: Joel Stanley <joel@jms.id.au>
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
----
-v2: rebase on upstream, rework commit message
----
- hw/arm/aspeed_soc.c              |  2 ++
- hw/watchdog/wdt_aspeed.c         | 20 ++++++++++++++++++++
- include/hw/watchdog/wdt_aspeed.h |  1 +
- 3 files changed, 23 insertions(+)
+--> { "execute": "set-spice", "arguments": { "video-codecs": "spice:mjpeg;gstreamer:h264" } }
 
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index a2ea8c748449..ddd5dfacd7d6 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -155,6 +155,8 @@ static void aspeed_soc_init(Object *obj)
-                               sizeof(s->wdt[i]), TYPE_ASPEED_WDT);
-         qdev_prop_set_uint32(DEVICE(&s->wdt[i]), "silicon-rev",
-                                     sc->info->silicon_rev);
-+        object_property_add_const_link(OBJECT(&s->wdt[i]), "scu",
-+                                       OBJECT(&s->scu), &error_abort);
-     }
- 
-     sysbus_init_child_obj(obj, "ftgmac100", OBJECT(&s->ftgmac100),
-diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
-index 4a8409f0daf5..57fe24ae6b1f 100644
---- a/hw/watchdog/wdt_aspeed.c
-+++ b/hw/watchdog/wdt_aspeed.c
-@@ -44,6 +44,9 @@
- 
- #define WDT_RESTART_MAGIC               0x4755
- 
-+#define SCU_RESET_CONTROL1              (0x04 / 4)
-+#define    SCU_RESET_SDRAM              BIT(0)
-+
- static bool aspeed_wdt_is_enabled(const AspeedWDTState *s)
- {
-     return s->regs[WDT_CTRL] & WDT_CTRL_ENABLE;
-@@ -222,6 +225,13 @@ static void aspeed_wdt_timer_expired(void *dev)
- {
-     AspeedWDTState *s = ASPEED_WDT(dev);
- 
-+    /* Do not reset on SDRAM controller reset */
-+    if (s->scu->regs[SCU_RESET_CONTROL1] & SCU_RESET_SDRAM) {
-+        timer_del(s->timer);
-+        s->regs[WDT_CTRL] = 0;
-+        return;
-+    }
-+
-     qemu_log_mask(CPU_LOG_RESET, "Watchdog timer expired.\n");
-     watchdog_perform_action();
-     timer_del(s->timer);
-@@ -233,6 +243,16 @@ static void aspeed_wdt_realize(DeviceState *dev, Error **errp)
- {
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-     AspeedWDTState *s = ASPEED_WDT(dev);
-+    Error *err = NULL;
-+    Object *obj;
-+
-+    obj = object_property_get_link(OBJECT(dev), "scu", &err);
-+    if (!obj) {
-+        error_propagate(errp, err);
-+        error_prepend(errp, "required link 'scu' not found: ");
-+        return;
-+    }
-+    s->scu = ASPEED_SCU(obj);
- 
-     if (!is_supported_silicon_rev(s->silicon_rev)) {
-         error_setg(errp, "Unknown silicon revision: 0x%" PRIx32,
-diff --git a/include/hw/watchdog/wdt_aspeed.h b/include/hw/watchdog/wdt_aspeed.h
-index 88d8be4f78d6..daef0c0e230b 100644
---- a/include/hw/watchdog/wdt_aspeed.h
-+++ b/include/hw/watchdog/wdt_aspeed.h
-@@ -27,6 +27,7 @@ typedef struct AspeedWDTState {
-     MemoryRegion iomem;
-     uint32_t regs[ASPEED_WDT_REGS_MAX];
- 
-+    AspeedSCUState *scu;
-     uint32_t pclk_freq;
-     uint32_t silicon_rev;
-     uint32_t ext_pulse_width_mask;
--- 
-2.20.1
-
+> 
+> --> { "execute": "query-spice" }
+> <-- {.... "video-codecs": "spice:mjpeg;gstreamer:h264;" ....}
+> 
+> 
+> I put the new version of the RFC patch below
+> 
+> best regards,
+> 
+> Kevin
+> 
+> ---
+> 
+> This patch allows setting spice properties from the QMP interface.
+> 
+> At the moment, only the 'video-codecs' property is supported.
+> 
+> Signed-off-by: Kevin Pouget <kpouget@redhat.com>
+> ---
+>  qapi/ui.json    | 42 ++++++++++++++++++++++++++++++++++++++++--
+>  ui/spice-core.c | 21 +++++++++++++++++++++
+>  2 files changed, 61 insertions(+), 2 deletions(-)
+> 
+> diff --git a/qapi/ui.json b/qapi/ui.json
+> index 59e412139a..5f67096bcb 100644
+> --- a/qapi/ui.json
+> +++ b/qapi/ui.json
+> @@ -211,12 +211,16 @@
+>  #
+>  # @channels: a list of @SpiceChannel for each active spice channel
+>  #
+> +# @video-codecs: The list of encoders:codecs currently allowed for
+> +#                video streaming (since: ...)
+> +#
+>  # Since: 0.14.0
+>  ##
+>  { 'struct': 'SpiceInfo',
+>    'data': {'enabled': 'bool', 'migrated': 'bool', '*host': 'str',
+> '*port': 'int',
+>             '*tls-port': 'int', '*auth': 'str', '*compiled-version': 'str',
+> -           'mouse-mode': 'SpiceQueryMouseMode', '*channels':
+> ['SpiceChannel']},
+> +           'mouse-mode': 'SpiceQueryMouseMode', '*channels':
+> ['SpiceChannel'],
+> +           'video-codecs': 'str'},
+>    'if': 'defined(CONFIG_SPICE)' }
+> 
+>  ##
+> @@ -257,7 +261,8 @@
+>  #                "tls": false
+>  #             },
+>  #             [ ... more channels follow ... ]
+> -#          ]
+> +#          ],
+> +#          "video-codecs": "spice:mjpeg;gstreamer:h264;"
+>  #       }
+>  #    }
+>  #
+> @@ -265,6 +270,39 @@
+>  { 'command': 'query-spice', 'returns': 'SpiceInfo',
+>    'if': 'defined(CONFIG_SPICE)' }
+> 
+> +##
+> +# @SpiceProperty:
+> +#
+> +# An enumeration of Spice properties that can be set at runtime.
+> +#
+> +# @video-codecs: the ;-separated list of video-codecs allowed for
+> +# spice-server video streaming.
+> +#
+> +# Since: ...
+> +##
+> +{ 'enum': 'SpiceProperty',
+> +  'data': [ 'video-codecs'],
+> +  'if': 'defined(CONFIG_SPICE)' }
+> +
+> +##
+> +# @set-spice:
+> +#
+> +# Set Spice properties.
+> +# @property: the SPICE property to modify
+> +# @value: the new value to affect to this property
+> +#
+> +# Since: ...
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "set-spice", "arguments": { "property": "video-codecs",
+> +#                                             "value": "spice:mjpeg;" } }
+> +# <- { "returns": {} }
+> +##
+> +{ 'command': 'set-spice',
+> +  'data': {'property': 'SpiceProperty', 'value': 'str'},
+> +  'if': 'defined(CONFIG_SPICE)' }
+> +
+>  ##
+>  # @SPICE_CONNECTED:
+>  #
+> diff --git a/ui/spice-core.c b/ui/spice-core.c
+> index 63e8694df8..1660f49f15 100644
+> --- a/ui/spice-core.c
+> +++ b/ui/spice-core.c
+> @@ -506,6 +506,25 @@ static QemuOptsList qemu_spice_opts = {
+>      },
+>  };
+> 
+> +void qmp_set_spice(SpiceProperty property, const char *value, Error **errp)
+> +{
+> +    int invalid_codecs;
+> +
+> +    switch(property) {
+> +    case SPICE_PROPERTY_VIDEO_CODECS:
+> +        invalid_codecs = spice_server_set_video_codecs(spice_server, value);
+> +
+> +        if (invalid_codecs) {
+> +            error_setg(errp, "Found %d invalid video-codecs while
+> setting spice"
+> +                       " property 'video-codec=%s'", invalid_codecs, value);
+> +        }
+> +        break;
+> +    default:
+> +        /* only reached in case of version mismatched */
+> +        error_setg(errp, "Property #%d not supported.", property);
+> +    }
+> +}
+> +
+>  SpiceInfo *qmp_query_spice(Error **errp)
+>  {
+>      QemuOpts *opts = QTAILQ_FIRST(&qemu_spice_opts.head);
+> @@ -555,6 +574,8 @@ SpiceInfo *qmp_query_spice(Error **errp)
+>                         SPICE_QUERY_MOUSE_MODE_SERVER :
+>                         SPICE_QUERY_MOUSE_MODE_CLIENT;
+> 
+> +    info->video_codecs = spice_server_get_video_codecs(spice_server);
+> +
+>      /* for compatibility with the original command */
+>      info->has_channels = true;
+>      info->channels = qmp_query_spice_channels();
+> --
+> 2.21.0
+> 
+> 
 
