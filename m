@@ -2,67 +2,62 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3DA2C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:13:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1587EC43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:38:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACFFF208CA
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:13:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACFFF208CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DB9052089E
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:38:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB9052089E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55468 helo=lists.gnu.org)
+Received: from localhost ([::1]:55534 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heEg1-0008Hz-NP
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 04:13:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50908)
+	id 1heF45-0006xm-FB
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 04:38:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58308)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1heEeU-0007kg-4t
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:12:12 -0400
+ (envelope-from <clg@kaod.org>) id 1heEzJ-0004Ba-JK
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:33:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1heEeD-0002Vl-AR
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:12:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54754)
+ (envelope-from <clg@kaod.org>) id 1heErH-0003RS-AT
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:25:20 -0400
+Received: from 4.mo173.mail-out.ovh.net ([46.105.34.219]:47291)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1heEeB-0002S4-9O
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:11:47 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D509C308429B;
- Fri, 21 Jun 2019 08:11:40 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AE9DD1001B3D;
- Fri, 21 Jun 2019 08:11:35 +0000 (UTC)
-Date: Fri, 21 Jun 2019 10:11:31 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190621101131.5cf44250@redhat.com>
-In-Reply-To: <20190621005644.GA10591@richard>
-References: <20190513061913.9284-1-richardw.yang@linux.intel.com>
- <20190618175956.4373ac7e@redhat.com>
- <20190619062050.GA15665@richard>
- <20190619110440.13a54848@redhat.com>
- <20190620141842.ijqwozpjrkccy7qx@master>
- <20190620170429.7237cfa1@redhat.com>
- <20190621005644.GA10591@richard>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1heErH-0003P5-4y
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:25:19 -0400
+Received: from player750.ha.ovh.net (unknown [10.109.146.106])
+ by mo173.mail-out.ovh.net (Postfix) with ESMTP id 031DD10DCDD
+ for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 10:25:12 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
+ (Authenticated sender: clg@kaod.org)
+ by player750.ha.ovh.net (Postfix) with ESMTPSA id 573FA7309928;
+ Fri, 21 Jun 2019 08:25:06 +0000 (UTC)
+To: Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>
+References: <20190621065242.32535-1-joel@jms.id.au>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <6aec047c-81bd-e179-6fad-4bee896ea7a2@kaod.org>
+Date: Fri, 21 Jun 2019 10:25:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Fri, 21 Jun 2019 08:11:46 +0000 (UTC)
+In-Reply-To: <20190621065242.32535-1-joel@jms.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 10693515840636816192
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrtdeigddthecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH 0/9] hw/acpi: make build_madt arch
- agnostic
+X-Received-From: 46.105.34.219
+Subject: Re: [Qemu-devel] [PATCH v2] aspeed: Link SCU to the watchdog
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,138 +69,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yang.zhong@intel.com, ehabkost@redhat.com, mst@redhat.com,
- qemu-devel@nongnu.org, Wei Yang <richard.weiyang@gmail.com>,
- pbonzini@redhat.com, rth@twiddle.net
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 21 Jun 2019 08:56:44 +0800
-Wei Yang <richardw.yang@linux.intel.com> wrote:
+On 21/06/2019 08:52, Joel Stanley wrote:
+> The ast2500 uses the watchdog to reset the SDRAM controller. This
+> operation is usually performed by u-boot's memory training procedure,
+> and it is enabled by setting a bit in the SCU and then causing the
+> watchdog to expire. Therefore, we need the watchdog to be able to
+> access the SCU's register space.
+>=20
+> This causes the watchdog to not perform a system reset when the bit is
+> set. In the future it could perform a reset of the SDMC model.
+>=20
+> Signed-off-by: Joel Stanley <joel@jms.id.au>
 
-> On Thu, Jun 20, 2019 at 05:04:29PM +0200, Igor Mammedov wrote:
-> >On Thu, 20 Jun 2019 14:18:42 +0000
-> >Wei Yang <richard.weiyang@gmail.com> wrote:
-> >  
-> >> On Wed, Jun 19, 2019 at 11:04:40AM +0200, Igor Mammedov wrote:  
-> >> >On Wed, 19 Jun 2019 14:20:50 +0800
-> >> >Wei Yang <richardw.yang@linux.intel.com> wrote:
-> >> >    
-> >> >> On Tue, Jun 18, 2019 at 05:59:56PM +0200, Igor Mammedov wrote:    
-> >> >> >
-> >> >> >On Mon, 13 May 2019 14:19:04 +0800
-> >> >> >Wei Yang <richardw.yang@linux.intel.com> wrote:
-> >> >> >      
-> >> >> >> Now MADT is highly depend in architecture and machine type and leaves
-> >> >> >> duplicated code in different architecture. The series here tries to generalize
-> >> >> >> it.
-> >> >> >> 
-> >> >> >> MADT contains one main table and several sub tables. These sub tables are
-> >> >> >> highly related to architecture. Here we introduce one method to make it
-> >> >> >> architecture agnostic.
-> >> >> >> 
-> >> >> >>   * each architecture define its sub-table implementation function in madt_sub
-> >> >> >>   * introduces struct madt_input to collect sub table information and pass to
-> >> >> >>     build_madt
-> >> >> >> 
-> >> >> >> By doing so, each architecture could prepare its own sub-table implementation
-> >> >> >> and madt_input. And keep build_madt architecture agnostic.      
-> >> >> >
-> >> >> >I've skimmed over patches, and to me it looks mostly as code movement
-> >> >> >without apparent benefits and probably a bit more complex than what we have now
-> >> >> >(it might be ok cost if it simplifies MADT support for other boards).
-> >> >> >
-> >> >> >Before I do line by line review could you demonstrate what effect new way
-> >> >> >to build MADT would have on arm/virt and i386/virt (from NEMU). So it would be
-> >> >> >possible to estimate net benefits from new approach?
-> >> >> >(PS: it doesn't have to be patches ready for merging, just a dirty hack
-> >> >> >that would demonstrate adding MADT for new board using mad_sub[])
-> >> >> >      
-> >> >> 
-> >> >> Per APIC spec 5.2.12, MADT contains a *main* table and several *sub* tables
-> >> >> (Interrupt Controllere), so the idea is give a callback hook in
-> >> >> AcpiDeviceIfClass for each table, including *main* and *sub* table.
-> >> >> 
-> >> >> Current AcpiDeviceIfClass has one callback pc_madt_cpu_entry for some *sub*
-> >> >> tables, after replacing the AcpiDeviceIfClass will look like this:
-> >> >> 
-> >> >> typedef struct AcpiDeviceIfClass {
-> >> >>     /* <private> */
-> >> >>     InterfaceClass parent_class;
-> >> >> 
-> >> >>     /* <public> */
-> >> >>     void (*ospm_status)(AcpiDeviceIf *adev, ACPIOSTInfoList ***list);
-> >> >>     void (*send_event)(AcpiDeviceIf *adev, AcpiEventStatusBits ev);
-> >> >> -   void (*madt_cpu)(AcpiDeviceIf *adev, int uid,
-> >> >> -                    const CPUArchIdList *apic_ids, GArray *entry);
-> >> >> +   madt_operation madt_main;
-> >> >> +   madt_operation *madt_sub;
-> >> >> } AcpiDeviceIfClass;
-> >> >> 
-> >> >> By doing so, each arch could have its own implementation for MADT.
-> >> >> 
-> >> >> After this refactoring, build_madt could be simplified to:
-> >> >> 
-> >> >> build_madt(GArray *table_data, BIOSLinker *linker, PCMachineState *pcms,
-> >> >>            struct madt_input *input)
-> >> >> {
-> >> >>     ...
-> >> >> 
-> >> >>     if (adevc->madt_main) {
-> >> >>         adevc->madt_main(table_data, madt);
-> >> >>     }
-> >> >> 
-> >> >>     for (i = 0; ; i++) {
-> >> >>         sub_id = input[i].sub_id;
-> >> >>         if (sub_id == ACPI_APIC_RESERVED) {
-> >> >>             break;
-> >> >>         }
-> >> >>         opaque = input[i].opaque;
-> >> >>         adevc->madt_sub[sub_id](table_data, opaque);
-> >> >>     }
-> >> >> 
-> >> >>     ...
-> >> >> }
-> >> >> 
-> >> >> input is a list of data necessary to build *sub* table. Its details is also
-> >> >> arch dependent.    
-> >> >I've got general idea reading patches in this series.
-> >> >As I've mentioned before it's hard to generalize MADT since it
-> >> >mostly contains entries unique for target/board.
-> >> >Goal here isn't generalizing at any cost, but rather find out
-> >> >if there is enough common code to justify generalization
-> >> >and if it allows us to reduce code duplication and simplify.
-> >> >    
-> >> >> For following new arch, what it need to do is prepare the input array and
-> >> >> implement necessary *main*/*sub* table callbacks.    
-> >> >What I'd like to see is the actual patch that does this,
-> >> >to see if it has any merit and to compare to the current
-> >> >approach.    
-> >> 
-> >> I didn't get some idea about your approach. Would you mind sharing more light?  
-> >With current approach, 'each board' has its own MADT build routine.
-> >Considering that there is very little to share between different
-> >implementations it might be ok.
-> >
-> >This series just add extra data structure for board to populate
-> >and a bunch of callbacks for every record type. Essentially all
-> >the code we have now is still there. It was just moved elsewhere
-> >and made available via callbacks.  
-> 
-> Yes, you are right.
-> 
-> >This series touches only pc/q35 machines and it's not apparent
-> >to me why it's any better than what we have now.  
-> 
-> This is the demo for i386. In case you think this approach is reasonable, it
-> could be applied to arm. And then for new board, we can apply the same
-> approach.
-well, it's not obvious from i386 demo, how it's any better than what
-we have now. It lacks arm/virt patches so we could see if it would make
-anything better or not.
+I was keeping this patch in my tree (hence the Sob) hoping that
+someone could find the time to study the reset question. But this=20
+patch is useful as it is and I think we should merge it.
 
-If I were to talk about i386 demo alone, then I'd say it just makes
-code more complex and I'd leave existing MADT code as it.
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
+Thanks,
+
+C.
+
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+> v2: rebase on upstream, rework commit message
+> ---
+>  hw/arm/aspeed_soc.c              |  2 ++
+>  hw/watchdog/wdt_aspeed.c         | 20 ++++++++++++++++++++
+>  include/hw/watchdog/wdt_aspeed.h |  1 +
+>  3 files changed, 23 insertions(+)
+>=20
+> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+> index a2ea8c748449..ddd5dfacd7d6 100644
+> --- a/hw/arm/aspeed_soc.c
+> +++ b/hw/arm/aspeed_soc.c
+> @@ -155,6 +155,8 @@ static void aspeed_soc_init(Object *obj)
+>                                sizeof(s->wdt[i]), TYPE_ASPEED_WDT);
+>          qdev_prop_set_uint32(DEVICE(&s->wdt[i]), "silicon-rev",
+>                                      sc->info->silicon_rev);
+> +        object_property_add_const_link(OBJECT(&s->wdt[i]), "scu",
+> +                                       OBJECT(&s->scu), &error_abort);
+>      }
+> =20
+>      sysbus_init_child_obj(obj, "ftgmac100", OBJECT(&s->ftgmac100),
+> diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
+> index 4a8409f0daf5..57fe24ae6b1f 100644
+> --- a/hw/watchdog/wdt_aspeed.c
+> +++ b/hw/watchdog/wdt_aspeed.c
+> @@ -44,6 +44,9 @@
+> =20
+>  #define WDT_RESTART_MAGIC               0x4755
+> =20
+> +#define SCU_RESET_CONTROL1              (0x04 / 4)
+> +#define    SCU_RESET_SDRAM              BIT(0)
+> +
+>  static bool aspeed_wdt_is_enabled(const AspeedWDTState *s)
+>  {
+>      return s->regs[WDT_CTRL] & WDT_CTRL_ENABLE;
+> @@ -222,6 +225,13 @@ static void aspeed_wdt_timer_expired(void *dev)
+>  {
+>      AspeedWDTState *s =3D ASPEED_WDT(dev);
+> =20
+> +    /* Do not reset on SDRAM controller reset */
+> +    if (s->scu->regs[SCU_RESET_CONTROL1] & SCU_RESET_SDRAM) {
+> +        timer_del(s->timer);
+> +        s->regs[WDT_CTRL] =3D 0;
+> +        return;
+> +    }
+> +
+>      qemu_log_mask(CPU_LOG_RESET, "Watchdog timer expired.\n");
+>      watchdog_perform_action();
+>      timer_del(s->timer);
+> @@ -233,6 +243,16 @@ static void aspeed_wdt_realize(DeviceState *dev, E=
+rror **errp)
+>  {
+>      SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
+>      AspeedWDTState *s =3D ASPEED_WDT(dev);
+> +    Error *err =3D NULL;
+> +    Object *obj;
+> +
+> +    obj =3D object_property_get_link(OBJECT(dev), "scu", &err);
+> +    if (!obj) {
+> +        error_propagate(errp, err);
+> +        error_prepend(errp, "required link 'scu' not found: ");
+> +        return;
+> +    }
+> +    s->scu =3D ASPEED_SCU(obj);
+> =20
+>      if (!is_supported_silicon_rev(s->silicon_rev)) {
+>          error_setg(errp, "Unknown silicon revision: 0x%" PRIx32,
+> diff --git a/include/hw/watchdog/wdt_aspeed.h b/include/hw/watchdog/wdt=
+_aspeed.h
+> index 88d8be4f78d6..daef0c0e230b 100644
+> --- a/include/hw/watchdog/wdt_aspeed.h
+> +++ b/include/hw/watchdog/wdt_aspeed.h
+> @@ -27,6 +27,7 @@ typedef struct AspeedWDTState {
+>      MemoryRegion iomem;
+>      uint32_t regs[ASPEED_WDT_REGS_MAX];
+> =20
+> +    AspeedSCUState *scu;
+>      uint32_t pclk_freq;
+>      uint32_t silicon_rev;
+>      uint32_t ext_pulse_width_mask;
+>=20
 
 
