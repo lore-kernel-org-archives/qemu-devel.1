@@ -2,66 +2,69 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1D58C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:57:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E154C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:59:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F0EC208CA
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:57:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F0EC208CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 24CE72089E
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:59:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24CE72089E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55408 helo=lists.gnu.org)
+Received: from localhost ([::1]:55414 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heEQQ-0000bg-Ar
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 03:57:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46093)
+	id 1heESA-0001em-Du
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 03:59:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46121)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yan.y.zhao@intel.com>) id 1heEPe-000062-7D
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:56:48 -0400
+ (envelope-from <kpouget@redhat.com>) id 1heEPi-00007y-5h
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:56:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1heEPc-00032v-A5
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:56:46 -0400
-Received: from mga06.intel.com ([134.134.136.31]:18028)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1heEPa-0002xs-7U
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:56:42 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 21 Jun 2019 00:56:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,399,1557212400"; d="scan'208";a="311923500"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.9])
- by orsmga004.jf.intel.com with ESMTP; 21 Jun 2019 00:56:33 -0700
-Date: Fri, 21 Jun 2019 03:50:41 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <20190621075040.GA4304@joy-OptiPlex-7040>
-References: <1561041461-22326-1-git-send-email-kwankhede@nvidia.com>
- <1561041461-22326-4-git-send-email-kwankhede@nvidia.com>
- <20190621001228.GE9303@joy-OptiPlex-7040>
- <20a0f8c4-e555-6a4d-598a-b72beac6a62f@nvidia.com>
+ (envelope-from <kpouget@redhat.com>) id 1heEPg-00036m-Ui
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:56:50 -0400
+Received: from mail-ua1-f66.google.com ([209.85.222.66]:47062)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <kpouget@redhat.com>) id 1heEPg-0002s6-R0
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:56:48 -0400
+Received: by mail-ua1-f66.google.com with SMTP id o19so2620852uap.13
+ for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 00:56:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=IbJAK5l7HdF6/q1AeQbgGHAv8N9jSFXyEHrl5uP8358=;
+ b=VEnQrHc3M/m3vS+PlcRbU4+f2qqlQAY7rQJJE6OsHm7/cYYZs+Ko9yU5upitwGSVaW
+ lWSr6STsFbFHsOhtwiLvhbFoRfUJwPv2JUbtCH+mmT7D5xwwYpOw7D/jk1dOFBeER52G
+ d3DwLeiByFPcUTtACuxQlBuLKb1hE9XiLwAsZYvmsHT5aEVXWDP4nPz6V1iF2K0wmHce
+ NFWxMHHjf1vHMAA8l8RIZFaOqjIXOsdCHbusYb5XEbg3f/aFQ5rE0JgTZPCyZqASzi9L
+ 1SMcDZDLsXZbCwcuznLE57kGy1VSHMoAl9lcPADORg5chenGUbpm0IOiIup9C7vLduFw
+ iupA==
+X-Gm-Message-State: APjAAAVyogO3I/4wwJ2PIe/5PgbyV0oUDwrR23SK1uVbWV1T2SJ51fhS
+ WXetBwO/WO5HT3Qz9FU+p8VqbO0Sx4ajR9qDkIOuQw==
+X-Google-Smtp-Source: APXvYqwsoG4rqgwDWKBsMjJQMbemVZKH9RKVwnvl9CNzOHcjEqLMhtj71HJB/n+RfAwvzDgpN4aIZeibUxoMLv3DsY0=
+X-Received: by 2002:ab0:2756:: with SMTP id c22mr27886353uap.22.1561103788103; 
+ Fri, 21 Jun 2019 00:56:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20a0f8c4-e555-6a4d-598a-b72beac6a62f@nvidia.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.31
-Subject: Re: [Qemu-devel] [PATCH v4 03/13] vfio: Add save and load functions
- for VFIO PCI devices
+References: <20190619123042.4822-1-kpouget@redhat.com>
+ <e9fcdbfd-cde2-fc91-ce1d-6bfe06d39c4f@redhat.com>
+ <CADJ1XR3fh0cyOerSM8VQkpde6cHLb8WccP05Rwr7xWMOK59rog@mail.gmail.com>
+ <2139720774.23871724.1561101408712.JavaMail.zimbra@redhat.com>
+In-Reply-To: <2139720774.23871724.1561101408712.JavaMail.zimbra@redhat.com>
+From: Kevin Pouget <kpouget@redhat.com>
+Date: Fri, 21 Jun 2019 09:56:17 +0200
+Message-ID: <CADJ1XR3pq78_OCkNkGYnfUJWL+Tet72PZmGOr4gHzMGcDnRvFA@mail.gmail.com>
+To: Frediano Ziglio <fziglio@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.222.66
+Subject: Re: [Qemu-devel] [RFC] spice-core: allow setting properties from QMP
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,230 +76,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "cjia@nvidia.com" <cjia@nvidia.com>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org,
+ Marc-Andre Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 21, 2019 at 02:44:30PM +0800, Kirti Wankhede wrote:
-> 
-> 
-> On 6/21/2019 5:42 AM, Yan Zhao wrote:
-> > On Thu, Jun 20, 2019 at 10:37:31PM +0800, Kirti Wankhede wrote:
-> >> These functions save and restore PCI device specific data - config
-> >> space of PCI device.
-> >> Tested save and restore with MSI and MSIX type.
-> >>
-> >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> >> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> >> ---
-> >>  hw/vfio/pci.c | 112 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >>  hw/vfio/pci.h |  29 +++++++++++++++
-> >>  2 files changed, 141 insertions(+)
-> >>
-> >> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> >> index ce3fe96efe2c..09a0821a5b1c 100644
-> >> --- a/hw/vfio/pci.c
-> >> +++ b/hw/vfio/pci.c
-> >> @@ -1187,6 +1187,118 @@ void vfio_pci_write_config(PCIDevice *pdev,
-> >>      }
-> >>  }
-> >>  
-> >> +void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
-> >> +{
-> >> +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
-> >> +    PCIDevice *pdev = &vdev->pdev;
-> >> +    uint16_t pci_cmd;
-> >> +    int i;
-> >> +
-> >> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
-> >> +        uint32_t bar;
-> >> +
-> >> +        bar = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, 4);
-> >> +        qemu_put_be32(f, bar);
-> >> +    }
-> >> +
-> >> +    qemu_put_be32(f, vdev->interrupt);
-> >> +    if (vdev->interrupt == VFIO_INT_MSI) {
-> >> +        uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
-> >> +        bool msi_64bit;
-> >> +
-> >> +        msi_flags = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
-> >> +                                            2);
-> >> +        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
-> >> +
-> >> +        msi_addr_lo = pci_default_read_config(pdev,
-> >> +                                         pdev->msi_cap + PCI_MSI_ADDRESS_LO, 4);
-> >> +        qemu_put_be32(f, msi_addr_lo);
-> >> +
-> >> +        if (msi_64bit) {
-> >> +            msi_addr_hi = pci_default_read_config(pdev,
-> >> +                                             pdev->msi_cap + PCI_MSI_ADDRESS_HI,
-> >> +                                             4);
-> >> +        }
-> >> +        qemu_put_be32(f, msi_addr_hi);
-> >> +
-> >> +        msi_data = pci_default_read_config(pdev,
-> >> +                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
-> >> +                2);
-> >> +        qemu_put_be32(f, msi_data);
-> >> +    } else if (vdev->interrupt == VFIO_INT_MSIX) {
-> >> +        uint16_t offset;
-> >> +
-> >> +        /* save enable bit and maskall bit */
-> >> +        offset = pci_default_read_config(pdev,
-> >> +                                       pdev->msix_cap + PCI_MSIX_FLAGS + 1, 2);
-> >> +        qemu_put_be16(f, offset);
-> >> +        msix_save(pdev, f);
-> >> +    }
-> >> +    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
-> >> +    qemu_put_be16(f, pci_cmd);
-> >> +}
-> >> +
-> >> +void vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
-> >> +{
-> >> +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
-> >> +    PCIDevice *pdev = &vdev->pdev;
-> >> +    uint32_t interrupt_type;
-> >> +    uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
-> >> +    uint16_t pci_cmd;
-> >> +    bool msi_64bit;
-> >> +    int i;
-> >> +
-> >> +    /* retore pci bar configuration */
-> >> +    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
-> >> +    vfio_pci_write_config(pdev, PCI_COMMAND,
-> >> +                        pci_cmd & (!(PCI_COMMAND_IO | PCI_COMMAND_MEMORY)), 2);
-> >> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
-> >> +        uint32_t bar = qemu_get_be32(f);
-> >> +
-> >> +        vfio_pci_write_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, bar, 4);
-> >> +    }
-> >> +    vfio_pci_write_config(pdev, PCI_COMMAND,
-> >> +                          pci_cmd | PCI_COMMAND_IO | PCI_COMMAND_MEMORY, 2);
-> >> +
-> >> +    interrupt_type = qemu_get_be32(f);
-> >> +
-> >> +    if (interrupt_type == VFIO_INT_MSI) {
-> >> +        /* restore msi configuration */
-> >> +        msi_flags = pci_default_read_config(pdev,
-> >> +                                            pdev->msi_cap + PCI_MSI_FLAGS, 2);
-> >> +        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
-> >> +
-> >> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
-> >> +                              msi_flags & (!PCI_MSI_FLAGS_ENABLE), 2);
-> >> +
-> >> +        msi_addr_lo = qemu_get_be32(f);
-> >> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_LO,
-> >> +                              msi_addr_lo, 4);
-> >> +
-> >> +        msi_addr_hi = qemu_get_be32(f);
-> >> +        if (msi_64bit) {
-> >> +            vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_HI,
-> >> +                                  msi_addr_hi, 4);
-> >> +        }
-> >> +        msi_data = qemu_get_be32(f);
-> >> +        vfio_pci_write_config(pdev,
-> >> +                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
-> >> +                msi_data, 2);
-> >> +
-> >> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
-> >> +                              msi_flags | PCI_MSI_FLAGS_ENABLE, 2);
-> >> +    } else if (interrupt_type == VFIO_INT_MSIX) {
-> >> +        uint16_t offset = qemu_get_be16(f);
-> >> +
-> >> +        /* load enable bit and maskall bit */
-> >> +        vfio_pci_write_config(pdev, pdev->msix_cap + PCI_MSIX_FLAGS + 1,
-> >> +                              offset, 2);
-> >> +        msix_load(pdev, f);
-> >> +    }
-> >> +    pci_cmd = qemu_get_be16(f);
-> >> +    vfio_pci_write_config(pdev, PCI_COMMAND, pci_cmd, 2);
-> >> +}
-> >> +
-> > per the previous discussion, pci config state save/restore are better
-> > defined in fileds of VMStateDescription.
-> > 
-> > 
-> 
-> With that route there is no pre-copy phase and we do want pre-copy phase
-> for VFIO devices. Vendor driver can skip pre-copy phase by doing nothing
-> on any read/write operation during pre-copy phase.
-> 
-> Thanks,
-> Kirti
+On Fri, Jun 21, 2019 at 9:16 AM Frediano Ziglio <fziglio@redhat.com> wrote:
 >
-hi Kirti
-It is able to register both VMSTateDescritpion and SaveVMHandlers at the
-same time.
+> >
+> > Hello Eric,
+> >
+> > > A new command may be okay, however,
+> >
+> > thanks, I've fix the typos and updated the patch to use an Enum, which
+> > indeed makes more sense.
+> >
+> > I've also updated "spice-query" command to provide the current value
+> > of the "video-codec" property,
+> > but it made me wonder if I should improve this QMP interface with a
+> > json list, or keep the current string-based list
+> > ("enc1:codec1;enc2:codec2").
+> >
+> > I CC the spice-devel list to get their point of view
+> >
+> > The current behavior is:
+> >
+> > --> { "execute": "set-spice", "arguments": { "property":
+> > "video-codecs", "value": "spice:mjpeg;gstreamer:h264" } }
+> > <-- {"return":{},"id":"libvirt-23"}
+>
+> It looks complicated from the user. Why not just
+>
+> --> { "execute": "set-spice", "arguments": { "video-codecs": "spice:mjpeg;gstreamer:h264" } }
 
-Thanks
-Yan
+it makes sense indeed, I've updated the code:
 
-> >>  /*
-> >>   * Interrupt setup
-> >>   */
-> >> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-> >> index 834a90d64686..847be5f56478 100644
-> >> --- a/hw/vfio/pci.h
-> >> +++ b/hw/vfio/pci.h
-> >> @@ -19,6 +19,7 @@
-> >>  #include "qemu/queue.h"
-> >>  #include "qemu/timer.h"
-> >>  
-> >> +#ifdef CONFIG_LINUX
-> >>  #define PCI_ANY_ID (~0)
-> >>  
-> >>  struct VFIOPCIDevice;
-> >> @@ -202,4 +203,32 @@ void vfio_display_reset(VFIOPCIDevice *vdev);
-> >>  int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp);
-> >>  void vfio_display_finalize(VFIOPCIDevice *vdev);
-> >>  
-> >> +void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f);
-> >> +void vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f);
-> >> +
-> >> +static inline Object *vfio_pci_get_object(VFIODevice *vbasedev)
-> >> +{
-> >> +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
-> >> +
-> >> +    return OBJECT(vdev);
-> >> +}
-> >> +
-> >> +#else
-> >> +static inline void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
-> >> +{
-> >> +    g_assert(false);
-> >> +}
-> >> +
-> >> +static inline void vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
-> >> +{
-> >> +    g_assert(false);
-> >> +}
-> >> +
-> >> +static inline Object *vfio_pci_get_object(VFIODevice *vbasedev)
-> >> +{
-> >> +    return NULL;
-> >> +}
-> >> +
-> >> +#endif
-> >> +
-> >>  #endif /* HW_VFIO_VFIO_PCI_H */
-> >> -- 
-> >> 2.7.0
-> >>
+# -> { "execute": "set-spice", "arguments": { "video-codecs": "spice:mjpeg;" }
+# <- { "returns": {} }
+
++{ 'command': 'set-spice',
++  'data': {'*video-codecs': 'str'},
++  'if': 'defined(CONFIG_SPICE)' }
+
+
+---
+ qapi/ui.json    | 27 +++++++++++++++++++++++++--
+ ui/spice-core.c | 17 +++++++++++++++++
+ 2 files changed, 42 insertions(+), 2 deletions(-)
+
+diff --git a/qapi/ui.json b/qapi/ui.json
+index 59e412139a..cdbe04bda0 100644
+--- a/qapi/ui.json
++++ b/qapi/ui.json
+@@ -211,12 +211,16 @@
+ #
+ # @channels: a list of @SpiceChannel for each active spice channel
+ #
++# @video-codecs: The list of encoders:codecs currently allowed for
++#                video streaming (since: ...)
++#
+ # Since: 0.14.0
+ ##
+ { 'struct': 'SpiceInfo',
+   'data': {'enabled': 'bool', 'migrated': 'bool', '*host': 'str',
+'*port': 'int',
+            '*tls-port': 'int', '*auth': 'str', '*compiled-version': 'str',
+-           'mouse-mode': 'SpiceQueryMouseMode', '*channels': ['SpiceChannel']},
++           'mouse-mode': 'SpiceQueryMouseMode', '*channels': ['SpiceChannel'],
++           'video-codecs': 'str'},
+   'if': 'defined(CONFIG_SPICE)' }
+
+ ##
+@@ -257,7 +261,8 @@
+ #                "tls": false
+ #             },
+ #             [ ... more channels follow ... ]
+-#          ]
++#          ],
++#          "video-codecs": "spice:mjpeg;gstreamer:h264;"
+ #       }
+ #    }
+ #
+@@ -265,6 +270,24 @@
+ { 'command': 'query-spice', 'returns': 'SpiceInfo',
+   'if': 'defined(CONFIG_SPICE)' }
+
++##
++# @set-spice:
++#
++# Set Spice properties.
++# @video-codecs: the ;-separated list of video-codecs allowed for
++#                spice-server video streaming.
++#
++# Since: ...
++#
++# Example:
++#
++# -> { "execute": "set-spice", "arguments": { "video-codecs": "spice:mjpeg;" }
++# <- { "returns": {} }
++##
++{ 'command': 'set-spice',
++  'data': {'*video-codecs': 'str'},
++  'if': 'defined(CONFIG_SPICE)' }
++
+ ##
+ # @SPICE_CONNECTED:
+ #
+diff --git a/ui/spice-core.c b/ui/spice-core.c
+index 63e8694df8..a4b265b663 100644
+--- a/ui/spice-core.c
++++ b/ui/spice-core.c
+@@ -506,6 +506,21 @@ static QemuOptsList qemu_spice_opts = {
+     },
+ };
+
++void qmp_set_spice(bool has_video_codecs, const char *video_codecs,
++                   Error **errp)
++{
++    if (has_video_codecs) {
++        int invalid_codecs = spice_server_set_video_codecs(spice_server,
++                                                           video_codecs);
++
++        if (invalid_codecs) {
++            error_setg(errp, "Found %d invalid video-codecs while setting"
++                       " spice property 'video-codec=%s'", invalid_codecs,
++                       video_codecs);
++        }
++    }
++}
++
+ SpiceInfo *qmp_query_spice(Error **errp)
+ {
+     QemuOpts *opts = QTAILQ_FIRST(&qemu_spice_opts.head);
+@@ -555,6 +570,8 @@ SpiceInfo *qmp_query_spice(Error **errp)
+                        SPICE_QUERY_MOUSE_MODE_SERVER :
+                        SPICE_QUERY_MOUSE_MODE_CLIENT;
+
++    info->video_codecs = spice_server_get_video_codecs(spice_server);
++
+     /* for compatibility with the original command */
+     info->has_channels = true;
+     info->channels = qmp_query_spice_channels();
+-- 
+2.21.0
 
