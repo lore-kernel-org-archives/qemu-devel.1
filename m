@@ -2,85 +2,81 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76349C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 14:54:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCF29C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 14:57:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DE5B20679
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 14:54:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pBwj2OxK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DE5B20679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id A5DCB2070B
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 14:57:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5DCB2070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35782 helo=lists.gnu.org)
+Received: from localhost ([::1]:35852 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heKvw-0003Wg-SL
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 10:54:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46178)
+	id 1heKz1-0006hp-Jd
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 10:57:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47174)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <skrtbhtngr@gmail.com>) id 1heKoS-0003VW-C2
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:46:50 -0400
+ (envelope-from <philmd@redhat.com>) id 1heKqE-0005h9-VG
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:48:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <skrtbhtngr@gmail.com>) id 1heKoQ-0006Ky-6f
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:46:48 -0400
-Received: from mail-pf1-x42f.google.com ([2607:f8b0:4864:20::42f]:46773)
+ (envelope-from <philmd@redhat.com>) id 1heKqD-00084J-PB
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:48:38 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:51594)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <skrtbhtngr@gmail.com>)
- id 1heKoP-0006Bh-TZ
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:46:46 -0400
-Received: by mail-pf1-x42f.google.com with SMTP id 81so3702408pfy.13
- for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 07:46:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=8kxShQMD2pLEtqA5t1fFufIc2q0rmZaSupiozOi3vec=;
- b=pBwj2OxKn27nxYH8bBh5lHrtbL0Qi9cPvukb0Je+bPIegmzx18nD353U6TLMKMLV3y
- CftawFJSl0QlcOfiIZSLOJjqzCd09RiqHcTQa243VjJIY1+zBI54DruL+FNlLV39UoBI
- PPCo2UNdkG9gq8kiSvifhStCJ2Jz0BTA1BS5AcT3P+//LHrVkDBXqQKoFcMxX2U4hJKc
- HR0cv7af7TVkWRmhqSNJuvB8YhmQnkcKX3zteME93GAtJot+nqpuXK5pfefEJX6THzfV
- jRogRtPdZ/L8PnhTUo5A7hsFO7b9jhwnxX+s2v39Wt1yR7Jjspc3RqRWr9bo/uW0/aNE
- ZpKQ==
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1heKqD-00083Z-Ix
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:48:37 -0400
+Received: by mail-wm1-f66.google.com with SMTP id 207so6594324wma.1
+ for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 07:48:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=8kxShQMD2pLEtqA5t1fFufIc2q0rmZaSupiozOi3vec=;
- b=akS5DShg3XTYfaTq61/VhcT5nMq9oWCi+/0igbcMBRNVPpufzsp7A5xcYwGfzfOFGs
- ulYWFViuuvPRpe7XYP2pQqG6PXFFAJPLSRq7MPtyDPHlxqaJ2l/FmbfYqlRcn+NRzsW5
- /MfosIcARdG4lwY/3Tubecii06QGoSSNxRNfRIMNDqz9ic+4xV4bAMycvB0Ega+zq/+x
- O1DtmEHFT+1b5lwW2RZ1DMTV0jPWjsLFHLPrsaQdtSeVnqvCRN9bIRqWjUV6X+yHhYIU
- ick3yAOLxOBjmSjFucmY266H5ByItAuu7hEDRyUKE7O1l0GmEpjfFxXWrk9TvYdZqPal
- 7kmg==
-X-Gm-Message-State: APjAAAX788fk+gcOHPGGvvfQKBS5oM/3WsXFqXu556IMDP0CiZM/CTPa
- qCThH9ex0/SEfz6DXgnRH0XjcJPs
-X-Google-Smtp-Source: APXvYqxN4eRJ6j5nvVBllDVtTBnzMfXR9LI6FuuWMm+ael01FxLU+zM/8ZrhqXdIljiVlssw6hsRfw==
-X-Received: by 2002:a17:90a:d587:: with SMTP id
- v7mr7363237pju.28.1561128393170; 
- Fri, 21 Jun 2019 07:46:33 -0700 (PDT)
-Received: from localhost.localdomain ([2405:204:2081:a5f2:5e1e:1cae:baa8:1943])
- by smtp.gmail.com with ESMTPSA id v5sm3338591pgq.66.2019.06.21.07.46.29
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 21 Jun 2019 07:46:32 -0700 (PDT)
-From: Sukrit Bhatnagar <skrtbhtngr@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 21 Jun 2019 20:15:40 +0530
-Message-Id: <20190621144541.13770-1-skrtbhtngr@gmail.com>
-X-Mailer: git-send-email 2.21.0
+ bh=mni6q2gM6QRV8G+snx7TIr26ZzoLjFy5MNHHDUgwcig=;
+ b=NnWGGrYIiHRhll+3pU7RPDivmYj7NQDhMubzHIQAdLPdOGEmwWo2L9D3EXwaSMdfI0
+ 7OoXjPlHKXkIWmdxBApBk0OSCIeNNBJxzCoYO1otIVlnw8Kofa7M9D8qSiz3psrTa6vn
+ o9vCR+emNSW+F7fh70qv/gfkJGTAgGw95nDTz7Zh4US8tIBIjIPc1ZG9Z3COOOi6vzdz
+ /bCHwseL83FHlDPUhBWaCvzA+Lhr6HIWv9n4uwkq0K1MOsv0AiSJz5NICTcFj9gpUgTK
+ u+3xZ1CKYusTb/QasoqpckpJkQW5jJBGUo0jdgemQV6WOuZAO9mgx+D/kHr/E0gkATuz
+ FlJA==
+X-Gm-Message-State: APjAAAVW7ODkipXbsKE4FwWCsfcb2WqMih8LWINAgC4ycm6I9kW7FdjV
+ QRk2eMuvw6HnaZNcbjebwkYLWA==
+X-Google-Smtp-Source: APXvYqyf45eQwg+BbW/SjWqLGsYW7jTQ+yztokND0TEQ22Lj8Z9vJAXQxaiKLioE0/AGJo+QWZF3EA==
+X-Received: by 2002:a1c:808b:: with SMTP id b133mr4139936wmd.160.1561128516167; 
+ Fri, 21 Jun 2019 07:48:36 -0700 (PDT)
+Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.183])
+ by smtp.gmail.com with ESMTPSA id y19sm4074167wmc.21.2019.06.21.07.48.35
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 21 Jun 2019 07:48:35 -0700 (PDT)
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20190613143446.23937-1-philmd@redhat.com>
+ <20190613143446.23937-5-philmd@redhat.com>
+ <20190620112913-mutt-send-email-mst@kernel.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <d54c1df4-5ebb-ad3f-449c-5037ef560270@redhat.com>
+Date: Fri, 21 Jun 2019 16:48:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190620112913-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::42f
-Subject: [Qemu-devel] [RFC 0/1] Add live migration support to the PVRDMA
- device
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.66
+Subject: Re: [Qemu-devel] [PATCH v2 04/20] hw/i386/pc: Add the E820Type enum
+ type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,121 +88,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yuval Shaia <yuval.shaia@oracle.com>
+Cc: Yang Zhong <yang.zhong@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
+ qemu-devel@nongnu.org, Rob Bradford <robert.bradford@intel.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+On 6/20/19 5:31 PM, Michael S. Tsirkin wrote:
+> On Thu, Jun 13, 2019 at 04:34:30PM +0200, Philippe Mathieu-Daudé wrote:
+>> This ensure we won't use an incorrect value.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> 
+> It doesn't actually ensure anything: compiler does not check IIUC.
+> 
+> And OTOH it's stored in type field in struct e820_entry.
 
-I am a GSoC participant, trying to implement live migration for the
-pvrdma device with help from my mentors Marcel and Yuval.
-My current task is to save and load the various addresses that the
-device uses for DMA mapping. We will be adding the device state into
-live migration, incrementally. As the first step in the implementation,
-we are performing migration to the same host. This will save us from
-many complexities, such as GID change, at this stage, and we will
-address migration across hosts at a later point when same-host migration
-works.
+I totally missed that... Thanks!
 
-Currently, the save and load logic uses SaveVMHandlers, which is the
-legcay way, and will be ported to VMStateDescription once the
-existing issues are solved.
-
-This RFC is meant to request suggestions on the things which are
-working and for help on the things which are not.
-
-
-What is working:
-
-* pvrdma device is getting initialized in a VM, its GID entry is
-  getting added to the host, and rc_pingpong is successful between
-  two such VMs. This is when libvirt is used to launch the VMs.
-
-* The dma, cmd_slot_dma and resp_slot_dma addresses are saved at the
-  source and loaded properly in the destination upon migration. That is,
-  the values loaded at the dest during migration are the same as the
-  ones saved.
-
-  `dma` is provided by the guest device when it writes to BAR1, stored
-  in dev->dsr_info.dma. A DSR is created on mapping to this address.
-  `cmd_slot_dma` and `resp_slot_dma` are the dma addresses of the command
-  and response buffers, respectively, which are provided by the guest
-  through the DSR.
-
-* The DSR successfully (re)maps to the dma address loaded from
-  migration at the dest.
-
-
-What is not working:
-
-* In the pvrdma_load() logic, the mapping to DSR is successful at dest.
-  But the mapping for cmd and resp slots fails.
-  rdma_pci_dma_map() eventually calls address_space_map(). Inside the
-  latter, a global BounceBuffer bounce is checked to see if it is in use
-  (the atomic_xchg() primitive).
-  At the dest, it is in use and the dma remapping fails there, which
-  fails the whole migration process. Essentially, I am looking for a
-  way to remap guest physical address after a live migration (to the
-  same host). Any tips on avoiding the BounceBuffer will also be great.
-
-  I have also tried unmapping the cmd and resp slots at the source before
-  saving the dma addresses in pvrdma_save(), but the mapping fails anyway.
-
-* It seems that vmxnet3 migration itself is not working properly, at least
-  for me. The pvrdma device depends on it, vmxnet3 is function 0 and pvrdma
-  is function 1. This is happening even for a build of unmodified code from
-  the master branch.
-  After migration, the network connectivity is lost at destination.
-  Things are fine at the source before migration.
-  This is the command I am using at src:
-
-  sudo /home/skrtbhtngr/qemu/build/x86_64-softmmu/qemu-system-x86_64 \
-    -enable-kvm \
-    -m 2G -smp cpus=2 \
-    -hda /home/skrtbhtngr/fedora.img \
-    -netdev tap,id=hostnet0 \
-    -device vmxnet3,netdev=hostnet0,id=net0,mac=52:54:00:99:ff:bc \
-    -monitor telnet:127.0.0.1:4444,server,nowait \
-    -trace events=/home/skrtbhtngr/trace-events \
-    -vnc 0.0.0.0:0
-
-  Similar command is used for the dest. Currently, I am trying
-  same-host migration for testing purpose, without the pvrdma device.
-  Two tap interfaces, for src and dest were created successfully at
-  the host. Kernel logs:
-  ...
-  br0: port 2(tap0) entered forwarding state
-  ...
-  br0: port 3(tap1) entered forwarding state
-
-  tcpdump at the dest reports only outgoing ARP packets, which ask
-  for gateway: "ARP, Request who-has _gateway tell guest1".
-
-  Tried using user (slirp) as the network backend, but no luck.
-  
-  Also tried git bisect to find the issue using a working commit (given
-  by Marcel), but it turns out that it is very old and I faced build
-  errors one after another.
-
-  Please note that e1000 live migration is working fine in the same setup.
-
-* Since we are aiming at trying on same-host migration first, I cannot
-  use libvirt as it does not allow this. Currently, I am running the
-  VMs using qemu-system commands. But libvirt is needed to add the GID
-  entry of the guest device in the host. I am looking for a workaround,
-  if that is possible at all.
-  I started a thread few days ago for the same on libvirt-users:
-  https://www.redhat.com/archives/libvirt-users/2019-June/msg00011.html
-
-
-Sukrit Bhatnagar (1):
-  hw/pvrdma: Add live migration support
-
- hw/rdma/vmw/pvrdma_main.c | 56 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 56 insertions(+)
-
--- 
-2.21.0
-
+>> ---
+>> v2: Do not cast the enum (Li)
+>> ---
+>>  hw/i386/pc.c         |  4 ++--
+>>  include/hw/i386/pc.h | 16 ++++++++++------
+>>  2 files changed, 12 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>> index 5a7cffbb1a..86ba554439 100644
+>> --- a/hw/i386/pc.c
+>> +++ b/hw/i386/pc.c
+>> @@ -872,7 +872,7 @@ static void handle_a20_line_change(void *opaque, int irq, int level)
+>>      x86_cpu_set_a20(cpu, level);
+>>  }
+>>  
+>> -ssize_t e820_add_entry(uint64_t address, uint64_t length, uint32_t type)
+>> +ssize_t e820_add_entry(uint64_t address, uint64_t length, E820Type type)
+>>  {
+>>      unsigned int index = le32_to_cpu(e820_reserve.count);
+>>      struct e820_entry *entry;
+>> @@ -906,7 +906,7 @@ size_t e820_get_num_entries(void)
+>>      return e820_entries;
+>>  }
+>>  
+>> -bool e820_get_entry(unsigned int idx, uint32_t type,
+>> +bool e820_get_entry(unsigned int idx, E820Type type,
+>>                      uint64_t *address, uint64_t *length)
+>>  {
+>>      if (idx < e820_entries && e820_table[idx].type == cpu_to_le32(type)) {
+>> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+>> index c56116e6f6..7c07185dd5 100644
+>> --- a/include/hw/i386/pc.h
+>> +++ b/include/hw/i386/pc.h
+>> @@ -282,12 +282,16 @@ void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion *rom_memory);
+>>  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+>>                         const CPUArchIdList *apic_ids, GArray *entry);
+>>  
+>> -/* e820 types */
+>> -#define E820_RAM        1
+>> -#define E820_RESERVED   2
+>> -#define E820_ACPI       3
+>> -#define E820_NVS        4
+>> -#define E820_UNUSABLE   5
+>> +/**
+>> + * E820Type: Type of the e820 address range.
+>> + */
+>> +typedef enum {
+>> +    E820_RAM        = 1,
+>> +    E820_RESERVED   = 2,
+>> +    E820_ACPI       = 3,
+>> +    E820_NVS        = 4,
+>> +    E820_UNUSABLE   = 5
+>> +} E820Type;
+>>  
+>>  ssize_t e820_add_entry(uint64_t, uint64_t, uint32_t);
+>>  size_t e820_get_num_entries(void);
+>> -- 
+>> 2.20.1
 
