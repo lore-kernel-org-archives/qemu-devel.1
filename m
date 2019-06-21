@@ -2,66 +2,54 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 136C0C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:40:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FEE3C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:40:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC3322089E
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:40:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC3322089E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 066172089E
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:40:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 066172089E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55536 helo=lists.gnu.org)
+Received: from localhost ([::1]:55538 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heF5Y-0007Ew-1o
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 04:40:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58372)
+	id 1heF5r-0007RX-6i
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 04:40:23 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58773)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yan.y.zhao@intel.com>) id 1heEzJ-0004CE-28
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:33:38 -0400
+ (envelope-from <pavel.dovgaluk@gmail.com>) id 1heEza-0004Ud-Re
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:33:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1heEsB-00040T-Oy
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:26:21 -0400
-Received: from mga02.intel.com ([134.134.136.20]:17268)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1heEW4-0002WH-By
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:03:24 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
- by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 21 Jun 2019 01:03:06 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,399,1557212400"; d="scan'208";a="243901066"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.9])
- by orsmga001.jf.intel.com with ESMTP; 21 Jun 2019 01:03:05 -0700
-Date: Fri, 21 Jun 2019 03:57:13 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Peter Xu <peterx@redhat.com>
-Message-ID: <20190621075713.GB4304@joy-OptiPlex-7040>
-References: <1560934185-14152-1-git-send-email-yan.y.zhao@intel.com>
- <39c4c32b-e34a-8d8f-abbc-ab346ec5bed7@redhat.com>
- <20190620040230.GB9073@xz-x1>
- <6829b139-3eab-449e-04d6-07f1e381316d@redhat.com>
- <20190620125955.GB9657@xz-x1>
+ (envelope-from <pavel.dovgaluk@gmail.com>) id 1heEoJ-0001A2-Rj
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:22:17 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:41622)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <pavel.dovgaluk@gmail.com>) id 1heEoJ-00019Z-Hh
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:22:15 -0400
+Received: from [127.0.1.1] (unknown [85.142.117.226])
+ by mail.ispras.ru (Postfix) with ESMTPSA id ADC5754006B;
+ Fri, 21 Jun 2019 11:22:14 +0300 (MSK)
+From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 21 Jun 2019 11:22:14 +0300
+Message-ID: <156110533452.25431.5472128681314713978.stgit@pasha-Precision-3630-Tower>
+In-Reply-To: <156110523748.25431.9310430853468653085.stgit@pasha-Precision-3630-Tower>
+References: <156110523748.25431.9310430853468653085.stgit@pasha-Precision-3630-Tower>
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190620125955.GB9657@xz-x1>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.20
-Subject: Re: [Qemu-devel] [PATCH] memory: do not do out of bound notification
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 83.149.199.45
+Subject: [Qemu-devel] [PATCH for-4.1 17/24] gdbstub: add reverse continue
+ support in replay mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,227 +61,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Auger Eric <eric.auger@redhat.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru,
+ pbonzini@redhat.com, quintela@redhat.com, ciro.santilli@gmail.com,
+ jasowang@redhat.com, crosthwaite.peter@gmail.com, armbru@redhat.com,
+ mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru,
+ mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com,
+ thomas.dullien@googlemail.com, dovgaluk@ispras.ru, artem.k.pisarenko@gmail.com,
+ dgilbert@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 20, 2019 at 08:59:55PM +0800, Peter Xu wrote:
-> On Thu, Jun 20, 2019 at 10:35:29AM +0200, Paolo Bonzini wrote:
-> > On 20/06/19 06:02, Peter Xu wrote:
-> > > Seems workable, to be explicit - we can even cut it into chunks with
-> > > different size to be efficient.
-> > 
-> > Yes, this is not hard (completely untested):
-> > 
-> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > index 44b1231157..541538bc6c 100644
-> > --- a/hw/i386/intel_iommu.c
-> > +++ b/hw/i386/intel_iommu.c
-> > @@ -3388,39 +3388,34 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
-> >      }
-> >  
-> >      assert(start <= end);
-> > -    size = end - start;
-> > +    while (end > start) {
-> > +        size = end - start;
-> > +        /* Only keep the lowest bit of either size or start.  */
-> > +        size = MIN(size & -size, start & -start);
-> 
-> I feel like this can be problematic.  I'm imaging:
-> 
-> start=0x1000_0000, size=0x1000_1000
-> 
-> This will get size=0x1000 but actually we can do size=0x1000_0000 as
-> the first.
-> 
-> > +        /* Should not happen, but limit to address width too just in case */
-> > +        size = MIN(size, 1ULL << s->aw_bits);
-> >  
-> > -    if (ctpop64(size) != 1) {
-> > -        /*
-> > -         * This size cannot format a correct mask. Let's enlarge it to
-> > -         * suite the minimum available mask.
-> > -         */
-> > -        int n = 64 - clz64(size);
-> > -        if (n > s->aw_bits) {
-> > -            /* should not happen, but in case it happens, limit it */
-> > -            n = s->aw_bits;
-> > -        }
-> > -        size = 1ULL << n;
-> > -    }
-> > +        assert((start & (size - 1)) == 0);
-> >  
-> > -    entry.target_as = &address_space_memory;
-> > -    /* Adjust iova for the size */
-> > -    entry.iova = n->start & ~(size - 1);
-> > -    /* This field is meaningless for unmap */
-> > -    entry.translated_addr = 0;
-> > -    entry.perm = IOMMU_NONE;
-> > -    entry.addr_mask = size - 1;
-> > +        entry.target_as = &address_space_memory;
-> > +        entry.iova = start;
-> > +        /* This field is meaningless for unmap */
-> > +        entry.translated_addr = 0;
-> > +        entry.perm = IOMMU_NONE;
-> > +        entry.addr_mask = size - 1;
-> 
-> (some of the fields can be moved out of loop because they are
->  constants)
-> 
-> >  
-> > -    trace_vtd_as_unmap_whole(pci_bus_num(as->bus),
-> > -                             VTD_PCI_SLOT(as->devfn),
-> > -                             VTD_PCI_FUNC(as->devfn),
-> > -                             entry.iova, size);
-> > +        trace_vtd_as_unmap_whole(pci_bus_num(as->bus),
-> > +                                 VTD_PCI_SLOT(as->devfn),
-> > +                                 VTD_PCI_FUNC(as->devfn),
-> > +                                 entry.iova, size);
-> 
-> Can move this out because this is a trace only so we don't have
-> restriction on mask?
-> 
-> >  
-> > -    map.iova = entry.iova;
-> > -    map.size = entry.addr_mask;
-> > -    iova_tree_remove(as->iova_tree, &map);
-> > +        map.iova = entry.iova;
-> > +        map.size = entry.addr_mask;
-> > +        iova_tree_remove(as->iova_tree, &map);
-> 
-> Same here?
-> 
-> >  
-> > -    memory_region_notify_one(n, &entry);
-> > +        memory_region_notify_one(n, &entry);
-> > +        start += size;
-> > +    }
-> >  }
-> >  
-> >  static void vtd_address_space_unmap_all(IntelIOMMUState *s)
-> > 
-> > 
-> > Yan,
-> > 
-> > if something like this works for you, let me know and I will submit it
-> > as a proper patch.
-> > 
-> > Paolo
-> 
-> Since during review I'm thinking how to generate a correct sequence of
-> these masks... here's my try below with above issues fixed... :)
-> 
-> I've tried compile but not tested.  Yan can test it, or I can do it
-> too tomorrow after I find some machines.
-> 
-> Thanks,
->
-hi Peter and Paolo,
-I can help test it next week. Didn't manage to find a time for it today.
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-Thanks
-Yan
+This patch adds support of the reverse continue operation for gdbstub.
+Reverse continue finds the last breakpoint that would happen in normal
+execution from the beginning to the current moment.
+Implementation of the reverse continue replays the execution twice:
+to find the breakpoints that were hit and to seek to the last breakpoint.
+Reverse continue loads the previous snapshot and tries to find the breakpoint
+since that moment. If there are no such breakpoints, it proceeds to
+the earlier snapshot, and so on. When no breakpoints or watchpoints were
+hit at all, execution stops at the beginning of the replay log.
 
-> ------------------------------------------------------------
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 44b1231157..cfbd225f0a 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -3363,11 +3363,32 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
->      return vtd_dev_as;
->  }
-> 
-> +static uint64_t vtd_get_next_mask(uint64_t start, uint64_t size, int gaw)
-> +{
-> +    /* Tries to find smallest mask from start first */
-> +    uint64_t rmask = start & -start, max_mask = 1ULL << gaw;
-> +
-> +    assert(size && gaw > 0 && gaw < 64);
-> +
-> +    /* Zero start, or too big */
-> +    if (!rmask || rmask > max_mask) {
-> +        rmask = max_mask;
-> +    }
-> +
-> +    /* If the start mask worked, then use it */
-> +    if (rmask <= size) {
-> +        return rmask;
-> +    }
-> +
-> +    /* Find the largest page mask from size */
-> +    return 1ULL << (63 - clz64(size));
-> +}
-> +
->  /* Unmap the whole range in the notifier's scope. */
->  static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
->  {
->      IOMMUTLBEntry entry;
-> -    hwaddr size;
-> +    hwaddr size, remain;
->      hwaddr start = n->start;
->      hwaddr end = n->end;
->      IntelIOMMUState *s = as->iommu_state;
-> @@ -3388,39 +3409,28 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
->      }
-> 
->      assert(start <= end);
-> -    size = end - start;
-> -
-> -    if (ctpop64(size) != 1) {
-> -        /*
-> -         * This size cannot format a correct mask. Let's enlarge it to
-> -         * suite the minimum available mask.
-> -         */
-> -        int n = 64 - clz64(size);
-> -        if (n > s->aw_bits) {
-> -            /* should not happen, but in case it happens, limit it */
-> -            n = s->aw_bits;
-> -        }
-> -        size = 1ULL << n;
-> -    }
-> -
-> +    size = remain = end - start;
->      entry.target_as = &address_space_memory;
-> -    /* Adjust iova for the size */
-> -    entry.iova = n->start & ~(size - 1);
-> +    entry.perm = IOMMU_NONE;
->      /* This field is meaningless for unmap */
->      entry.translated_addr = 0;
-> -    entry.perm = IOMMU_NONE;
-> -    entry.addr_mask = size - 1;
-> +
-> +    while (remain) {
-> +        uint64_t mask = vtd_get_next_mask(start, remain, s->aw_bits);
-> +
-> +        entry.iova = start;
-> +        entry.addr_mask = mask - 1;
-> +        memory_region_notify_one(n, &entry);
-> +    }
-> 
->      trace_vtd_as_unmap_whole(pci_bus_num(as->bus),
->                               VTD_PCI_SLOT(as->devfn),
->                               VTD_PCI_FUNC(as->devfn),
-> -                             entry.iova, size);
-> +                             n->start, size);
-> 
-> -    map.iova = entry.iova;
-> -    map.size = entry.addr_mask;
-> +    map.iova = n->start;
-> +    map.size = size;
->      iova_tree_remove(as->iova_tree, &map);
-> -
-> -    memory_region_notify_one(n, &entry);
->  }
-> 
->  static void vtd_address_space_unmap_all(IntelIOMMUState *s)
-> ------------------------------------------------------------
-> 
-> Regards,
-> 
-> -- 
-> Peter Xu
+Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+---
+ cpus.c                    |    5 +++
+ exec.c                    |    1 +
+ gdbstub.c                 |    9 +++++-
+ include/sysemu/replay.h   |    8 +++++
+ replay/replay-debugging.c |   71 +++++++++++++++++++++++++++++++++++++++++++++
+ stubs/replay.c            |    5 +++
+ 6 files changed, 98 insertions(+), 1 deletion(-)
+
+diff --git a/cpus.c b/cpus.c
+index c2356f9836..e0e61abe64 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1115,6 +1115,11 @@ static void cpu_handle_guest_debug(CPUState *cpu)
+         cpu->stopped = true;
+     } else {
+         if (!cpu->singlestep_enabled) {
++            /*
++             * Report about the breakpoint and
++             * make a single step to skip it
++             */
++            replay_breakpoint();
+             cpu_single_step(cpu, SSTEP_ENABLE);
+         } else {
+             cpu_single_step(cpu, 0);
+diff --git a/exec.c b/exec.c
+index ee21e6de34..b3c70f8c9a 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2821,6 +2821,7 @@ static void check_watchpoint(int offset, int len, MemTxAttrs attrs, int flags)
+                  * Don't process the watchpoints when we are
+                  * in a reverse debugging operation.
+                  */
++                replay_breakpoint();
+                 return;
+             }
+             if (flags == BP_MEM_READ) {
+diff --git a/gdbstub.c b/gdbstub.c
+index 2fe718d0b7..8d4cd3cf6e 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -1859,6 +1859,13 @@ static void handle_backward(GdbCmdContext *gdb_ctx, void *user_ctx)
+                 put_packet(gdb_ctx->s, "E14");
+             }
+             return;
++        case 'c':
++            if (replay_reverse_continue()) {
++                gdb_continue(gdb_ctx->s);
++            } else {
++                put_packet(gdb_ctx->s, "E14");
++            }
++            return;
+         }
+     }
+ 
+@@ -2121,7 +2128,7 @@ static void handle_query_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
+                 ";qXfer:features:read+");
+     }
+     if (replay_mode == REPLAY_MODE_PLAY) {
+-        pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), ";ReverseStep+");
++        pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), ";ReverseStep+;ReverseContinue+");
+     }
+ 
+     if (gdb_ctx->num_params &&
+diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+index 533003f2b0..1d18c9b6ea 100644
+--- a/include/sysemu/replay.h
++++ b/include/sysemu/replay.h
+@@ -79,11 +79,19 @@ const char *replay_get_filename(void);
+  * Returns true on success.
+  */
+ bool replay_reverse_step(void);
++/*
++ * Start searching the last breakpoint/watchpoint.
++ * Used by gdbstub for backwards debugging.
++ * Returns true if the process successfully started.
++ */
++bool replay_reverse_continue(void);
+ /*
+  * Returns true if replay module is processing
+  * reverse_continue or reverse_step request
+  */
+ bool replay_running_debug(void);
++/* Called in reverse debugging mode to collect breakpoint information */
++void replay_breakpoint(void);
+ 
+ /* Processing the instructions */
+ 
+diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
+index 3d94859b8f..abb5fe687f 100644
+--- a/replay/replay-debugging.c
++++ b/replay/replay-debugging.c
+@@ -22,6 +22,8 @@
+ #include "migration/snapshot.h"
+ 
+ static bool replay_is_debugging;
++static int64_t replay_last_breakpoint;
++static int64_t replay_last_snapshot;
+ 
+ bool replay_running_debug(void)
+ {
+@@ -252,3 +254,72 @@ bool replay_reverse_step(void)
+ 
+     return false;
+ }
++
++static void replay_continue_end(void)
++{
++    replay_is_debugging = false;
++    vm_stop(RUN_STATE_DEBUG);
++    replay_delete_break();
++}
++
++static void replay_continue_stop(void *opaque)
++{
++    Error *err = NULL;
++    if (replay_last_breakpoint != -1LL) {
++        replay_seek(replay_last_breakpoint, replay_stop_vm_debug, &err);
++        if (err) {
++            error_free(err);
++            replay_continue_end();
++        }
++        return;
++    }
++    /*
++     * No breakpoints since the last snapshot.
++     * Find previous snapshot and try again.
++     */
++    if (replay_last_snapshot != 0) {
++        replay_seek(replay_last_snapshot - 1, replay_continue_stop, &err);
++        if (err) {
++            error_free(err);
++            replay_continue_end();
++        }
++        replay_last_snapshot = replay_get_current_step();
++        return;
++    } else {
++        /* Seek to the very first step */
++        replay_seek(0, replay_stop_vm_debug, &err);
++        if (err) {
++            error_free(err);
++            replay_continue_end();
++        }
++        return;
++    }
++    replay_continue_end();
++}
++
++bool replay_reverse_continue(void)
++{
++    Error *err = NULL;
++
++    assert(replay_mode == REPLAY_MODE_PLAY);
++
++    if (replay_get_current_step() != 0) {
++        replay_seek(replay_get_current_step() - 1, replay_continue_stop, &err);
++        if (err) {
++            error_free(err);
++            return false;
++        }
++        replay_last_breakpoint = -1LL;
++        replay_is_debugging = true;
++        replay_last_snapshot = replay_get_current_step();
++        return true;
++    }
++
++    return false;
++}
++
++void replay_breakpoint(void)
++{
++    assert(replay_mode == REPLAY_MODE_PLAY);
++    replay_last_breakpoint = replay_get_current_step();
++}
+diff --git a/stubs/replay.c b/stubs/replay.c
+index 521552fa83..ee649726f4 100644
+--- a/stubs/replay.c
++++ b/stubs/replay.c
+@@ -85,3 +85,8 @@ bool replay_reverse_step(void)
+ {
+     return false;
+ }
++
++bool replay_reverse_continue(void)
++{
++    return false;
++}
+
 
