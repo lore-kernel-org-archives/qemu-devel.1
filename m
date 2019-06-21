@@ -2,63 +2,56 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB151C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 11:10:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1DCAC48BE3
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 11:10:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A525821530
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 11:10:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A525821530
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 900CF21530
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 11:10:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 900CF21530
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59386 helo=lists.gnu.org)
+Received: from localhost ([::1]:59388 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heHRC-0002U7-Ue
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 07:10:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43485)
+	id 1heHRK-0002mV-Ot
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 07:10:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43528)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <cohuck@redhat.com>) id 1heHPD-0000vX-0R
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:08:34 -0400
+ (envelope-from <stefan.brankovic@rt-rk.com>) id 1heHPG-0000vh-U8
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:08:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1heHP8-00089o-A2
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:08:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:18752)
+ (envelope-from <stefan.brankovic@rt-rk.com>) id 1heHPD-0008D8-Qy
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:08:34 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:49932 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>)
- id 1heHP7-00088N-W6; Fri, 21 Jun 2019 07:08:26 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F1A69308623C;
- Fri, 21 Jun 2019 11:08:19 +0000 (UTC)
-Received: from gondolin (dhcp-192-192.str.redhat.com [10.33.192.192])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0FB3E61101;
- Fri, 21 Jun 2019 11:08:18 +0000 (UTC)
-Date: Fri, 21 Jun 2019 13:08:16 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Eric Farman <farman@linux.ibm.com>
-Message-ID: <20190621130816.58399a8c.cohuck@redhat.com>
-In-Reply-To: <08cdcd56-e6a1-8d36-fe77-c683f526feb3@linux.ibm.com>
-References: <20190613092542.2834-1-cohuck@redhat.com>
- <08cdcd56-e6a1-8d36-fe77-c683f526feb3@linux.ibm.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 21 Jun 2019 11:08:20 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6] vfio-ccw: support async command
- subregion
+ (Exim 4.71) (envelope-from <stefan.brankovic@rt-rk.com>)
+ id 1heHPC-0007Mb-Vd
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:08:31 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 4748C1A23F6;
+ Fri, 21 Jun 2019 13:07:25 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw870-lin.domain.local (rtrkw870-lin.domain.local
+ [10.10.13.132])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 206191A23A8;
+ Fri, 21 Jun 2019 13:07:25 +0200 (CEST)
+From: Stefan Brankovic <stefan.brankovic@rt-rk.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 21 Jun 2019 13:07:06 +0200
+Message-Id: <1561115232-17155-3-git-send-email-stefan.brankovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1561115232-17155-1-git-send-email-stefan.brankovic@rt-rk.com>
+References: <1561115232-17155-1-git-send-email-stefan.brankovic@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PATCH v3 2/8] target/ppc: Optimize emulation of vsl
+ and vsr instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,40 +63,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org,
- Farhan Ali <alifm@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 19 Jun 2019 15:05:25 -0400
-Eric Farman <farman@linux.ibm.com> wrote:
+Optimization of altivec instructions vsl and vsr(Vector Shift Left/Rigt).
+Perform shift operation (left and right respectively) on 128 bit value of
+register vA by value specified in bits 125-127 of register vB. Lowest 3
+bits in each byte element of register vB must be identical or result is
+undefined.
 
-> On 6/13/19 5:25 AM, Cornelia Huck wrote:
-> > A vfio-ccw device may provide an async command subregion for
-> > issuing halt/clear subchannel requests. If it is present, use
-> > it for sending halt/clear request to the device; if not, fall
-> > back to emulation (as done today).
-> > 
-> > Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > ---
-> > 
-> > v5->v6:
-> > - plug a memory leak [Farhan]
-> > 
-> > v4->v5:
-> > - It seems we need to take the indirection via the class for the
-> >   callbacks after all :(
-> > - Dropped Eric's R-b: for that reason  
-> 
-> I've finally looked over this version, and think it looks good.  Feel
-> free to add this back:
-> 
-> Reviewed-by: Eric Farman <farman@linux.ibm.com>
-> 
+For vsl instruction, the first step is bits 125-127 of register vB have
+to be saved in variable sh. Then, the highest sh bits of the lower
+doubleword element of register vA are saved in variable shifted,
+in order not to lose those bits when shift operation is performed on
+the lower doubleword element of register vA, which is the next
+step. After shifting the lower doubleword element shift operation
+is performed on higher doubleword element of vA, with replacement of
+the lowest sh bits(that are now 0) with bits saved in shifted.
 
-Thanks!
+For vsr instruction, firstly, the bits 125-127 of register vB have
+to be saved in variable sh. Then, the lowest sh bits of the higher
+doubleword element of register vA are saved in variable shifted,
+in odred not to lose those bits when the shift operation is
+performed on the higher doubleword element of register vA, which is
+the next step. After shifting higher doubleword element, shift operation
+is performed on lower doubleword element of vA, with replacement of
+highest sh bits(that are now 0) with bits saved in shifted.
 
-Queued to s390-next.
+Signed-off-by: Stefan Brankovic <stefan.brankovic@rt-rk.com>
+---
+ target/ppc/helper.h                 |  2 -
+ target/ppc/int_helper.c             | 35 -------------
+ target/ppc/translate/vmx-impl.inc.c | 99 ++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 97 insertions(+), 39 deletions(-)
+
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index c82105e..33dad6a 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -213,8 +213,6 @@ DEF_HELPER_3(vrlb, void, avr, avr, avr)
+ DEF_HELPER_3(vrlh, void, avr, avr, avr)
+ DEF_HELPER_3(vrlw, void, avr, avr, avr)
+ DEF_HELPER_3(vrld, void, avr, avr, avr)
+-DEF_HELPER_3(vsl, void, avr, avr, avr)
+-DEF_HELPER_3(vsr, void, avr, avr, avr)
+ DEF_HELPER_4(vsldoi, void, avr, avr, avr, i32)
+ DEF_HELPER_3(vextractub, void, avr, avr, i32)
+ DEF_HELPER_3(vextractuh, void, avr, avr, i32)
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index 9505f4c..a23853e 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -1738,41 +1738,6 @@ VEXTU_X_DO(vextuhrx, 16, 0)
+ VEXTU_X_DO(vextuwrx, 32, 0)
+ #undef VEXTU_X_DO
+ 
+-/*
+- * The specification says that the results are undefined if all of the
+- * shift counts are not identical.  We check to make sure that they
+- * are to conform to what real hardware appears to do.
+- */
+-#define VSHIFT(suffix, leftp)                                           \
+-    void helper_vs##suffix(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)    \
+-    {                                                                   \
+-        int shift = b->VsrB(15) & 0x7;                                  \
+-        int doit = 1;                                                   \
+-        int i;                                                          \
+-                                                                        \
+-        for (i = 0; i < ARRAY_SIZE(r->u8); i++) {                       \
+-            doit = doit && ((b->u8[i] & 0x7) == shift);                 \
+-        }                                                               \
+-        if (doit) {                                                     \
+-            if (shift == 0) {                                           \
+-                *r = *a;                                                \
+-            } else if (leftp) {                                         \
+-                uint64_t carry = a->VsrD(1) >> (64 - shift);            \
+-                                                                        \
+-                r->VsrD(0) = (a->VsrD(0) << shift) | carry;             \
+-                r->VsrD(1) = a->VsrD(1) << shift;                       \
+-            } else {                                                    \
+-                uint64_t carry = a->VsrD(0) << (64 - shift);            \
+-                                                                        \
+-                r->VsrD(1) = (a->VsrD(1) >> shift) | carry;             \
+-                r->VsrD(0) = a->VsrD(0) >> shift;                       \
+-            }                                                           \
+-        }                                                               \
+-    }
+-VSHIFT(l, 1)
+-VSHIFT(r, 0)
+-#undef VSHIFT
+-
+ void helper_vslv(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
+ {
+     int i;
+diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
+index eba6355..cc11d21 100644
+--- a/target/ppc/translate/vmx-impl.inc.c
++++ b/target/ppc/translate/vmx-impl.inc.c
+@@ -578,6 +578,101 @@ static void trans_lvsr(DisasContext *ctx)
+     tcg_temp_free(EA);
+ }
+ 
++/*
++ * vsl VRT,VRA,VRB - Vector Shift Left
++ *
++ * Shifting left 128 bit value of vA by value specified in bits 125-127 of vB.
++ * Lowest 3 bits in each byte element of register vB must be identical or
++ * result is undefined.
++ */
++static void trans_vsl(DisasContext *ctx)
++{
++    int VT = rD(ctx->opcode);
++    int VA = rA(ctx->opcode);
++    int VB = rB(ctx->opcode);
++    TCGv_i64 avrA = tcg_temp_new_i64();
++    TCGv_i64 avrB = tcg_temp_new_i64();
++    TCGv_i64 sh = tcg_temp_new_i64();
++    TCGv_i64 shifted = tcg_temp_new_i64();
++    TCGv_i64 tmp = tcg_temp_new_i64();
++
++    /* Place bits 125-127 of vB in sh. */
++    get_avr64(avrB, VB, false);
++    tcg_gen_andi_i64(sh, avrB, 0x07ULL);
++
++    /*
++     * Save highest sh bits of lower doubleword element of vA in variable
++     * shifted and perform shift on lower doubleword.
++     */
++    get_avr64(avrA, VA, false);
++    tcg_gen_subfi_i64(tmp, 64, sh);
++    tcg_gen_shr_i64(shifted, avrA, tmp);
++    tcg_gen_shl_i64(avrA, avrA, sh);
++    set_avr64(VT, avrA, false);
++
++    /*
++     * Perform shift on higher doubleword element of vA and replace lowest
++     * sh bits with shifted.
++     */
++    get_avr64(avrA, VA, true);
++    tcg_gen_shl_i64(avrA, avrA, sh);
++    tcg_gen_or_i64(avrA, avrA, shifted);
++    set_avr64(VT, avrA, true);
++
++    tcg_temp_free_i64(avrA);
++    tcg_temp_free_i64(avrB);
++    tcg_temp_free_i64(sh);
++    tcg_temp_free_i64(shifted);
++    tcg_temp_free_i64(tmp);
++}
++
++/*
++ * vsr VRT,VRA,VRB - Vector Shift Right
++ *
++ * Shifting right 128 bit value of vA by value specified in bits 125-127 of vB.
++ * Lowest 3 bits in each byte element of register vB must be identical or
++ * result is undefined.
++ */
++static void trans_vsr(DisasContext *ctx)
++{
++    int VT = rD(ctx->opcode);
++    int VA = rA(ctx->opcode);
++    int VB = rB(ctx->opcode);
++    TCGv_i64 avrA = tcg_temp_new_i64();
++    TCGv_i64 avrB = tcg_temp_new_i64();
++    TCGv_i64 sh = tcg_temp_new_i64();
++    TCGv_i64 shifted = tcg_temp_new_i64();
++    TCGv_i64 tmp = tcg_temp_new_i64();
++
++    /* Place bits 125-127 of vB in sh. */
++    get_avr64(avrB, VB, false);
++    tcg_gen_andi_i64(sh, avrB, 0x07ULL);
++
++    /*
++     * Save lowest sh bits of higher doubleword element of vA in variable
++     * shifted and perform shift on higher doubleword.
++     */
++    get_avr64(avrA, VA, true);
++    tcg_gen_subfi_i64(tmp, 64, sh);
++    tcg_gen_shl_i64(shifted, avrA, tmp);
++    tcg_gen_shr_i64(avrA, avrA, sh);
++    set_avr64(VT, avrA, true);
++    /*
++     * Perform shift on lower doubleword element of vA and replace highest
++     * sh bits with shifted.
++     */
++    get_avr64(avrA, VA, false);
++    tcg_gen_shr_i64(avrA, avrA, sh);
++    tcg_gen_or_i64(avrA, avrA, shifted);
++    set_avr64(VT, avrA, false);
++
++    tcg_temp_free_i64(avrA);
++    tcg_temp_free_i64(avrB);
++    tcg_temp_free_i64(sh);
++    tcg_temp_free_i64(shifted);
++    tcg_temp_free_i64(tmp);
++}
++
+ GEN_VXFORM(vmuloub, 4, 0);
+ GEN_VXFORM(vmulouh, 4, 1);
+ GEN_VXFORM(vmulouw, 4, 2);
+@@ -690,11 +785,11 @@ GEN_VXFORM(vrld, 2, 3);
+ GEN_VXFORM(vrldmi, 2, 3);
+ GEN_VXFORM_DUAL(vrld, PPC_NONE, PPC2_ALTIVEC_207, \
+                 vrldmi, PPC_NONE, PPC2_ISA300)
+-GEN_VXFORM(vsl, 2, 7);
++GEN_VXFORM_TRANS(vsl, 2, 7);
+ GEN_VXFORM(vrldnm, 2, 7);
+ GEN_VXFORM_DUAL(vsl, PPC_ALTIVEC, PPC_NONE, \
+                 vrldnm, PPC_NONE, PPC2_ISA300)
+-GEN_VXFORM(vsr, 2, 11);
++GEN_VXFORM_TRANS(vsr, 2, 11);
+ GEN_VXFORM_ENV(vpkuhum, 7, 0);
+ GEN_VXFORM_ENV(vpkuwum, 7, 1);
+ GEN_VXFORM_ENV(vpkudum, 7, 17);
+-- 
+2.7.4
+
 
