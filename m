@@ -2,62 +2,66 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1587EC43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:38:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 136C0C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:40:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB9052089E
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:38:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB9052089E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id DC3322089E
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:40:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC3322089E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55534 helo=lists.gnu.org)
+Received: from localhost ([::1]:55536 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heF45-0006xm-FB
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 04:38:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58308)
+	id 1heF5Y-0007Ew-1o
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 04:40:05 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58372)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <clg@kaod.org>) id 1heEzJ-0004Ba-JK
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:33:39 -0400
+ (envelope-from <yan.y.zhao@intel.com>) id 1heEzJ-0004CE-28
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:33:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1heErH-0003RS-AT
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:25:20 -0400
-Received: from 4.mo173.mail-out.ovh.net ([46.105.34.219]:47291)
+ (envelope-from <yan.y.zhao@intel.com>) id 1heEsB-00040T-Oy
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:26:21 -0400
+Received: from mga02.intel.com ([134.134.136.20]:17268)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1heErH-0003P5-4y
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:25:19 -0400
-Received: from player750.ha.ovh.net (unknown [10.109.146.106])
- by mo173.mail-out.ovh.net (Postfix) with ESMTP id 031DD10DCDD
- for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 10:25:12 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
- (Authenticated sender: clg@kaod.org)
- by player750.ha.ovh.net (Postfix) with ESMTPSA id 573FA7309928;
- Fri, 21 Jun 2019 08:25:06 +0000 (UTC)
-To: Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>
-References: <20190621065242.32535-1-joel@jms.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <6aec047c-81bd-e179-6fad-4bee896ea7a2@kaod.org>
-Date: Fri, 21 Jun 2019 10:25:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+ id 1heEW4-0002WH-By
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:03:24 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+ by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 21 Jun 2019 01:03:06 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,399,1557212400"; d="scan'208";a="243901066"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.9])
+ by orsmga001.jf.intel.com with ESMTP; 21 Jun 2019 01:03:05 -0700
+Date: Fri, 21 Jun 2019 03:57:13 -0400
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Peter Xu <peterx@redhat.com>
+Message-ID: <20190621075713.GB4304@joy-OptiPlex-7040>
+References: <1560934185-14152-1-git-send-email-yan.y.zhao@intel.com>
+ <39c4c32b-e34a-8d8f-abbc-ab346ec5bed7@redhat.com>
+ <20190620040230.GB9073@xz-x1>
+ <6829b139-3eab-449e-04d6-07f1e381316d@redhat.com>
+ <20190620125955.GB9657@xz-x1>
 MIME-Version: 1.0
-In-Reply-To: <20190621065242.32535-1-joel@jms.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 10693515840636816192
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrtdeigddthecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.34.219
-Subject: Re: [Qemu-devel] [PATCH v2] aspeed: Link SCU to the watchdog
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190620125955.GB9657@xz-x1>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.20
+Subject: Re: [Qemu-devel] [PATCH] memory: do not do out of bound notification
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,115 +73,227 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Auger Eric <eric.auger@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/06/2019 08:52, Joel Stanley wrote:
-> The ast2500 uses the watchdog to reset the SDRAM controller. This
-> operation is usually performed by u-boot's memory training procedure,
-> and it is enabled by setting a bit in the SCU and then causing the
-> watchdog to expire. Therefore, we need the watchdog to be able to
-> access the SCU's register space.
->=20
-> This causes the watchdog to not perform a system reset when the bit is
-> set. In the future it could perform a reset of the SDMC model.
->=20
-> Signed-off-by: Joel Stanley <joel@jms.id.au>
+On Thu, Jun 20, 2019 at 08:59:55PM +0800, Peter Xu wrote:
+> On Thu, Jun 20, 2019 at 10:35:29AM +0200, Paolo Bonzini wrote:
+> > On 20/06/19 06:02, Peter Xu wrote:
+> > > Seems workable, to be explicit - we can even cut it into chunks with
+> > > different size to be efficient.
+> > 
+> > Yes, this is not hard (completely untested):
+> > 
+> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> > index 44b1231157..541538bc6c 100644
+> > --- a/hw/i386/intel_iommu.c
+> > +++ b/hw/i386/intel_iommu.c
+> > @@ -3388,39 +3388,34 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+> >      }
+> >  
+> >      assert(start <= end);
+> > -    size = end - start;
+> > +    while (end > start) {
+> > +        size = end - start;
+> > +        /* Only keep the lowest bit of either size or start.  */
+> > +        size = MIN(size & -size, start & -start);
+> 
+> I feel like this can be problematic.  I'm imaging:
+> 
+> start=0x1000_0000, size=0x1000_1000
+> 
+> This will get size=0x1000 but actually we can do size=0x1000_0000 as
+> the first.
+> 
+> > +        /* Should not happen, but limit to address width too just in case */
+> > +        size = MIN(size, 1ULL << s->aw_bits);
+> >  
+> > -    if (ctpop64(size) != 1) {
+> > -        /*
+> > -         * This size cannot format a correct mask. Let's enlarge it to
+> > -         * suite the minimum available mask.
+> > -         */
+> > -        int n = 64 - clz64(size);
+> > -        if (n > s->aw_bits) {
+> > -            /* should not happen, but in case it happens, limit it */
+> > -            n = s->aw_bits;
+> > -        }
+> > -        size = 1ULL << n;
+> > -    }
+> > +        assert((start & (size - 1)) == 0);
+> >  
+> > -    entry.target_as = &address_space_memory;
+> > -    /* Adjust iova for the size */
+> > -    entry.iova = n->start & ~(size - 1);
+> > -    /* This field is meaningless for unmap */
+> > -    entry.translated_addr = 0;
+> > -    entry.perm = IOMMU_NONE;
+> > -    entry.addr_mask = size - 1;
+> > +        entry.target_as = &address_space_memory;
+> > +        entry.iova = start;
+> > +        /* This field is meaningless for unmap */
+> > +        entry.translated_addr = 0;
+> > +        entry.perm = IOMMU_NONE;
+> > +        entry.addr_mask = size - 1;
+> 
+> (some of the fields can be moved out of loop because they are
+>  constants)
+> 
+> >  
+> > -    trace_vtd_as_unmap_whole(pci_bus_num(as->bus),
+> > -                             VTD_PCI_SLOT(as->devfn),
+> > -                             VTD_PCI_FUNC(as->devfn),
+> > -                             entry.iova, size);
+> > +        trace_vtd_as_unmap_whole(pci_bus_num(as->bus),
+> > +                                 VTD_PCI_SLOT(as->devfn),
+> > +                                 VTD_PCI_FUNC(as->devfn),
+> > +                                 entry.iova, size);
+> 
+> Can move this out because this is a trace only so we don't have
+> restriction on mask?
+> 
+> >  
+> > -    map.iova = entry.iova;
+> > -    map.size = entry.addr_mask;
+> > -    iova_tree_remove(as->iova_tree, &map);
+> > +        map.iova = entry.iova;
+> > +        map.size = entry.addr_mask;
+> > +        iova_tree_remove(as->iova_tree, &map);
+> 
+> Same here?
+> 
+> >  
+> > -    memory_region_notify_one(n, &entry);
+> > +        memory_region_notify_one(n, &entry);
+> > +        start += size;
+> > +    }
+> >  }
+> >  
+> >  static void vtd_address_space_unmap_all(IntelIOMMUState *s)
+> > 
+> > 
+> > Yan,
+> > 
+> > if something like this works for you, let me know and I will submit it
+> > as a proper patch.
+> > 
+> > Paolo
+> 
+> Since during review I'm thinking how to generate a correct sequence of
+> these masks... here's my try below with above issues fixed... :)
+> 
+> I've tried compile but not tested.  Yan can test it, or I can do it
+> too tomorrow after I find some machines.
+> 
+> Thanks,
+>
+hi Peter and Paolo,
+I can help test it next week. Didn't manage to find a time for it today.
 
-I was keeping this patch in my tree (hence the Sob) hoping that
-someone could find the time to study the reset question. But this=20
-patch is useful as it is and I think we should merge it.
+Thanks
+Yan
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-
-Thanks,
-
-C.
-
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
-> v2: rebase on upstream, rework commit message
-> ---
->  hw/arm/aspeed_soc.c              |  2 ++
->  hw/watchdog/wdt_aspeed.c         | 20 ++++++++++++++++++++
->  include/hw/watchdog/wdt_aspeed.h |  1 +
->  3 files changed, 23 insertions(+)
->=20
-> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-> index a2ea8c748449..ddd5dfacd7d6 100644
-> --- a/hw/arm/aspeed_soc.c
-> +++ b/hw/arm/aspeed_soc.c
-> @@ -155,6 +155,8 @@ static void aspeed_soc_init(Object *obj)
->                                sizeof(s->wdt[i]), TYPE_ASPEED_WDT);
->          qdev_prop_set_uint32(DEVICE(&s->wdt[i]), "silicon-rev",
->                                      sc->info->silicon_rev);
-> +        object_property_add_const_link(OBJECT(&s->wdt[i]), "scu",
-> +                                       OBJECT(&s->scu), &error_abort);
+> ------------------------------------------------------------
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 44b1231157..cfbd225f0a 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -3363,11 +3363,32 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+>      return vtd_dev_as;
+>  }
+> 
+> +static uint64_t vtd_get_next_mask(uint64_t start, uint64_t size, int gaw)
+> +{
+> +    /* Tries to find smallest mask from start first */
+> +    uint64_t rmask = start & -start, max_mask = 1ULL << gaw;
+> +
+> +    assert(size && gaw > 0 && gaw < 64);
+> +
+> +    /* Zero start, or too big */
+> +    if (!rmask || rmask > max_mask) {
+> +        rmask = max_mask;
+> +    }
+> +
+> +    /* If the start mask worked, then use it */
+> +    if (rmask <= size) {
+> +        return rmask;
+> +    }
+> +
+> +    /* Find the largest page mask from size */
+> +    return 1ULL << (63 - clz64(size));
+> +}
+> +
+>  /* Unmap the whole range in the notifier's scope. */
+>  static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+>  {
+>      IOMMUTLBEntry entry;
+> -    hwaddr size;
+> +    hwaddr size, remain;
+>      hwaddr start = n->start;
+>      hwaddr end = n->end;
+>      IntelIOMMUState *s = as->iommu_state;
+> @@ -3388,39 +3409,28 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
 >      }
-> =20
->      sysbus_init_child_obj(obj, "ftgmac100", OBJECT(&s->ftgmac100),
-> diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
-> index 4a8409f0daf5..57fe24ae6b1f 100644
-> --- a/hw/watchdog/wdt_aspeed.c
-> +++ b/hw/watchdog/wdt_aspeed.c
-> @@ -44,6 +44,9 @@
-> =20
->  #define WDT_RESTART_MAGIC               0x4755
-> =20
-> +#define SCU_RESET_CONTROL1              (0x04 / 4)
-> +#define    SCU_RESET_SDRAM              BIT(0)
+> 
+>      assert(start <= end);
+> -    size = end - start;
+> -
+> -    if (ctpop64(size) != 1) {
+> -        /*
+> -         * This size cannot format a correct mask. Let's enlarge it to
+> -         * suite the minimum available mask.
+> -         */
+> -        int n = 64 - clz64(size);
+> -        if (n > s->aw_bits) {
+> -            /* should not happen, but in case it happens, limit it */
+> -            n = s->aw_bits;
+> -        }
+> -        size = 1ULL << n;
+> -    }
+> -
+> +    size = remain = end - start;
+>      entry.target_as = &address_space_memory;
+> -    /* Adjust iova for the size */
+> -    entry.iova = n->start & ~(size - 1);
+> +    entry.perm = IOMMU_NONE;
+>      /* This field is meaningless for unmap */
+>      entry.translated_addr = 0;
+> -    entry.perm = IOMMU_NONE;
+> -    entry.addr_mask = size - 1;
 > +
->  static bool aspeed_wdt_is_enabled(const AspeedWDTState *s)
->  {
->      return s->regs[WDT_CTRL] & WDT_CTRL_ENABLE;
-> @@ -222,6 +225,13 @@ static void aspeed_wdt_timer_expired(void *dev)
->  {
->      AspeedWDTState *s =3D ASPEED_WDT(dev);
-> =20
-> +    /* Do not reset on SDRAM controller reset */
-> +    if (s->scu->regs[SCU_RESET_CONTROL1] & SCU_RESET_SDRAM) {
-> +        timer_del(s->timer);
-> +        s->regs[WDT_CTRL] =3D 0;
-> +        return;
+> +    while (remain) {
+> +        uint64_t mask = vtd_get_next_mask(start, remain, s->aw_bits);
+> +
+> +        entry.iova = start;
+> +        entry.addr_mask = mask - 1;
+> +        memory_region_notify_one(n, &entry);
 > +    }
-> +
->      qemu_log_mask(CPU_LOG_RESET, "Watchdog timer expired.\n");
->      watchdog_perform_action();
->      timer_del(s->timer);
-> @@ -233,6 +243,16 @@ static void aspeed_wdt_realize(DeviceState *dev, E=
-rror **errp)
->  {
->      SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
->      AspeedWDTState *s =3D ASPEED_WDT(dev);
-> +    Error *err =3D NULL;
-> +    Object *obj;
-> +
-> +    obj =3D object_property_get_link(OBJECT(dev), "scu", &err);
-> +    if (!obj) {
-> +        error_propagate(errp, err);
-> +        error_prepend(errp, "required link 'scu' not found: ");
-> +        return;
-> +    }
-> +    s->scu =3D ASPEED_SCU(obj);
-> =20
->      if (!is_supported_silicon_rev(s->silicon_rev)) {
->          error_setg(errp, "Unknown silicon revision: 0x%" PRIx32,
-> diff --git a/include/hw/watchdog/wdt_aspeed.h b/include/hw/watchdog/wdt=
-_aspeed.h
-> index 88d8be4f78d6..daef0c0e230b 100644
-> --- a/include/hw/watchdog/wdt_aspeed.h
-> +++ b/include/hw/watchdog/wdt_aspeed.h
-> @@ -27,6 +27,7 @@ typedef struct AspeedWDTState {
->      MemoryRegion iomem;
->      uint32_t regs[ASPEED_WDT_REGS_MAX];
-> =20
-> +    AspeedSCUState *scu;
->      uint32_t pclk_freq;
->      uint32_t silicon_rev;
->      uint32_t ext_pulse_width_mask;
->=20
-
+> 
+>      trace_vtd_as_unmap_whole(pci_bus_num(as->bus),
+>                               VTD_PCI_SLOT(as->devfn),
+>                               VTD_PCI_FUNC(as->devfn),
+> -                             entry.iova, size);
+> +                             n->start, size);
+> 
+> -    map.iova = entry.iova;
+> -    map.size = entry.addr_mask;
+> +    map.iova = n->start;
+> +    map.size = size;
+>      iova_tree_remove(as->iova_tree, &map);
+> -
+> -    memory_region_notify_one(n, &entry);
+>  }
+> 
+>  static void vtd_address_space_unmap_all(IntelIOMMUState *s)
+> ------------------------------------------------------------
+> 
+> Regards,
+> 
+> -- 
+> Peter Xu
 
