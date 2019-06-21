@@ -6,65 +6,66 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=FROM_EXCESS_BASE64,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F663C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 14:01:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26F30C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 14:03:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD4BB2075E
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 14:01:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD4BB2075E
+	by mail.kernel.org (Postfix) with ESMTPS id D01782075E
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 14:03:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D01782075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35268 helo=lists.gnu.org)
+Received: from localhost ([::1]:35284 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heK6x-0005qC-07
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 10:01:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57921)
+	id 1heK87-00073M-10
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 10:03:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57920)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mlureau@redhat.com>) id 1heJuW-00015c-8v
+ (envelope-from <mlureau@redhat.com>) id 1heJuW-00015b-9H
  for qemu-devel@nongnu.org; Fri, 21 Jun 2019 09:49:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlureau@redhat.com>) id 1heJuP-0003un-P2
+ (envelope-from <mlureau@redhat.com>) id 1heJuQ-0003vH-20
  for qemu-devel@nongnu.org; Fri, 21 Jun 2019 09:48:56 -0400
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:40884)
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:42409)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1heJuO-0003lW-K8
+ (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1heJuP-0003u5-Sr
  for qemu-devel@nongnu.org; Fri, 21 Jun 2019 09:48:53 -0400
-Received: by mail-oi1-f196.google.com with SMTP id w196so4674051oie.7
- for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 06:48:43 -0700 (PDT)
+Received: by mail-ot1-f65.google.com with SMTP id l15so6326531otn.9
+ for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 06:48:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=sC3eG7l+MCt5I2DCXWmX9NdfMkzx1erIq66FBfz1xmc=;
- b=OGmbqAVmuDyRPxurNoGGzHv0V7SOw9jwmkOupBOxIFJF35lusKRjWsLc0+SvamSyKC
- CPDEnFzVY+hMmCsSYYS0eklf+rNYv5pgSOGzJXowSPRwDcy3+oGNAMuE1xkPyrfInz7Q
- gKF/IBPpPBE2taZJfK9tKKoLsaMxfm2wbwAHJFRjRvQZBTFeGjRTvTSJj5gLrOtGAJ5M
- W6xWWkeYHOyvWp6dJ8v9SZ5MIB22YFKtUCVWMilybjLFH9cdVXPuzXE8Snc61D46veaJ
- +dfTCxMKk4hFN+uW4pIQe2a5PYbGOtegMQxdigtpZ7lh54Q8mGobkM4sw5geEr2uh0au
- k+eg==
-X-Gm-Message-State: APjAAAUkrbKVqlecIlvXvcFCecVEpNWUB4+rR5hkhUXYtbzcDqQfm6at
- DiaMKgRVXvmFUOf8RAuHWYHi9zg65g+x/fCNmIsrvg==
-X-Google-Smtp-Source: APXvYqy1HKwjxKRKvy3lETJiPT6QCeTpQhDyYyiuNymZwHquxegcUIMxB1Cusmertwglce2RkTjbjrzj+l/hv/efHQU=
-X-Received: by 2002:aca:4255:: with SMTP id p82mr2973047oia.6.1561124922991;
- Fri, 21 Jun 2019 06:48:42 -0700 (PDT)
+ bh=fZRJhkyPs8QaDQFGILUFDlL1B//32xk1Po8cLgRKWM4=;
+ b=dNzFD8DfFJ9SXCVol/mLVn1w38RN64V32iIbX39SROAC2iwgptv1Yak7R/oEYxqBNX
+ uGtB/Z2VnaTDRtteYGY1QD5yho6cFAqYypV8u3/Mz7k3fNcRnTlVdLuD3eqrz/oJKdcM
+ Jco7DOEzLCqMgPFAPW72wpzVULlMB1p3bj3xHsuQEDDwfeOiFKeXiynhvt0GQrDTfUyy
+ 8vJcEbyxFlKQCIG9f7wgmRGZdZyDouf6pDpLAWDrBO2f0wAzTuxFDL8W+lEwl0/dveGe
+ BDmetkq+wCHUs00JcMWBuQYTUFQi2AcrEC5B6U24mKGmiw/M2+E2hU0/L0KztKVNs0vL
+ ARYw==
+X-Gm-Message-State: APjAAAXQMl/ZtU2HFPosxxtZ0yVS3wttz4GZsS5JS4Ue28irUs11GuiH
+ KtiIsmFnaCJcj+fA8ueuXrXpcB4wORKulu4kZw18Ow==
+X-Google-Smtp-Source: APXvYqyG29Ac1b2cY7C/78kPze1cHf+EEOcz72e2HQh6gHVL2UJNTWRyvR+dmNHd2JFDjSGMAu0+a9mKzVbMdaIQMN0=
+X-Received: by 2002:a05:6830:1009:: with SMTP id
+ a9mr13083771otp.331.1561124932653; 
+ Fri, 21 Jun 2019 06:48:52 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190621094005.4134-1-stefanha@redhat.com>
- <20190621094005.4134-4-stefanha@redhat.com>
-In-Reply-To: <20190621094005.4134-4-stefanha@redhat.com>
+ <20190621094005.4134-2-stefanha@redhat.com>
+In-Reply-To: <20190621094005.4134-2-stefanha@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Fri, 21 Jun 2019 15:48:32 +0200
-Message-ID: <CAMxuvawcDa3f8Rysq2n+S50kb4dNVN1LTygQ4gKOTUHb45M7+Q@mail.gmail.com>
+Date: Fri, 21 Jun 2019 15:48:41 +0200
+Message-ID: <CAMxuvayxbioSOGbH8HV+SKk6PjOXU01HOmf1otu_pB85MQtEAA@mail.gmail.com>
 To: Stefan Hajnoczi <stefanha@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.167.196
-Subject: Re: [Qemu-devel] [PATCH 3/4] libvhost-user: implement
- VHOST_USER_PROTOCOL_F_MQ
+X-Received-From: 209.85.210.65
+Subject: Re: [Qemu-devel] [PATCH 1/4] libvhost-user: add
+ vmsg_set_reply_u64() helper
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,61 +88,90 @@ Sender: "Qemu-devel"
 On Fri, Jun 21, 2019 at 11:40 AM Stefan Hajnoczi <stefanha@redhat.com> wrot=
 e:
 >
-> Existing vhost-user device backends, including vhost-user-scsi and
-> vhost-user-blk, support multiqueue but libvhost-user currently does not
-> advertise this.
+> The VhostUserMsg request is reused as the reply by message processing
+> functions.  This is risky since request fields may corrupt the reply if
+> the vhost-user message handler function forgets to re-initialize them.
 >
-> VHOST_USER_PROTOCOL_F_MQ enables the VHOST_USER_GET_QUEUE_NUM request
-> needed for a vhost-user master to query the number of queues.  For
-> example, QEMU's vhost-user-net master depends on
-> VHOST_USER_PROTOCOL_F_MQ for multiqueue.
+> Changing this practice would be very invasive but we can introduce a
+> helper function to make u64 payload replies safe.  This also eliminates
+> code duplication in message processing functions.
 >
-> If you're wondering how any device backend with more than one virtqueue
-> functions today, it's because device types with a fixed number of
-> virtqueues do not require querying the number of queues.  Therefore the
-> vhost-user master for vhost-user-input with 2 virtqueues, for example,
-> doesn't actually depend on VHOST_USER_PROTOCOL_F_MQ.  It just enables
-> virtqueues 0 and 1 without asking.
->
-> Let there be multiqueue!
->
-> Suggested-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
 > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
+
 > ---
->  contrib/libvhost-user/libvhost-user.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  contrib/libvhost-user/libvhost-user.c | 26 +++++++++++++-------------
+>  1 file changed, 13 insertions(+), 13 deletions(-)
 >
 > diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
 r/libvhost-user.c
-> index 0c88431e8f..312c54f260 100644
+> index 443b7e08c3..a8657c7af2 100644
 > --- a/contrib/libvhost-user/libvhost-user.c
 > +++ b/contrib/libvhost-user/libvhost-user.c
-> @@ -1160,7 +1160,8 @@ vu_set_vring_err_exec(VuDev *dev, VhostUserMsg *vms=
-g)
->  static bool
->  vu_get_protocol_features_exec(VuDev *dev, VhostUserMsg *vmsg)
->  {
-> -    uint64_t features =3D 1ULL << VHOST_USER_PROTOCOL_F_LOG_SHMFD |
-> +    uint64_t features =3D 1ULL << VHOST_USER_PROTOCOL_F_MQ |
-> +                        1ULL << VHOST_USER_PROTOCOL_F_LOG_SHMFD |
->                          1ULL << VHOST_USER_PROTOCOL_F_SLAVE_REQ |
->                          1ULL << VHOST_USER_PROTOCOL_F_HOST_NOTIFIER |
->                          1ULL << VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD;
-> @@ -1200,8 +1201,8 @@ vu_set_protocol_features_exec(VuDev *dev, VhostUser=
-Msg *vmsg)
->  static bool
->  vu_get_queue_num_exec(VuDev *dev, VhostUserMsg *vmsg)
->  {
-> -    DPRINT("Function %s() not implemented yet.\n", __func__);
-> -    return false;
-> +    vmsg_set_reply_u64(vmsg, dev->max_queues);
-> +    return true;
+> @@ -216,6 +216,15 @@ vmsg_close_fds(VhostUserMsg *vmsg)
+>      }
 >  }
 >
+> +/* Set reply payload.u64 and clear request flags and fd_num */
+> +static void vmsg_set_reply_u64(VhostUserMsg *vmsg, uint64_t val)
+> +{
+> +    vmsg->flags =3D 0; /* defaults will be set by vu_send_reply() */
+> +    vmsg->size =3D sizeof(vmsg->payload.u64);
+> +    vmsg->payload.u64 =3D val;
+> +    vmsg->fd_num =3D 0;
+> +}
+> +
+>  /* A test to see if we have userfault available */
 >  static bool
+>  have_userfault(void)
+> @@ -1168,10 +1177,7 @@ vu_get_protocol_features_exec(VuDev *dev, VhostUse=
+rMsg *vmsg)
+>          features |=3D dev->iface->get_protocol_features(dev);
+>      }
+>
+> -    vmsg->payload.u64 =3D features;
+> -    vmsg->size =3D sizeof(vmsg->payload.u64);
+> -    vmsg->fd_num =3D 0;
+> -
+> +    vmsg_set_reply_u64(vmsg, features);
+>      return true;
+>  }
+>
+> @@ -1307,17 +1313,14 @@ out:
+>  static bool
+>  vu_set_postcopy_listen(VuDev *dev, VhostUserMsg *vmsg)
+>  {
+> -    vmsg->payload.u64 =3D -1;
+> -    vmsg->size =3D sizeof(vmsg->payload.u64);
+> -
+>      if (dev->nregions) {
+>          vu_panic(dev, "Regions already registered at postcopy-listen");
+> +        vmsg_set_reply_u64(vmsg, -1);
+>          return true;
+>      }
+>      dev->postcopy_listening =3D true;
+>
+> -    vmsg->flags =3D VHOST_USER_VERSION |  VHOST_USER_REPLY_MASK;
+> -    vmsg->payload.u64 =3D 0; /* Success */
+> +    vmsg_set_reply_u64(vmsg, 0);
+>      return true;
+>  }
+>
+> @@ -1332,10 +1335,7 @@ vu_set_postcopy_end(VuDev *dev, VhostUserMsg *vmsg=
+)
+>          DPRINT("%s: Done close\n", __func__);
+>      }
+>
+> -    vmsg->fd_num =3D 0;
+> -    vmsg->payload.u64 =3D 0;
+> -    vmsg->size =3D sizeof(vmsg->payload.u64);
+> -    vmsg->flags =3D VHOST_USER_VERSION |  VHOST_USER_REPLY_MASK;
+> +    vmsg_set_reply_u64(vmsg, 0);
+>      DPRINT("%s: exit\n", __func__);
+>      return true;
+>  }
 > --
 > 2.21.0
 >
