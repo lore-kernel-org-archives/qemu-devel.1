@@ -2,72 +2,74 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E154C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:59:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B62A8C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:03:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24CE72089E
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:59:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24CE72089E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 808B22089E
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:03:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 808B22089E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55414 helo=lists.gnu.org)
+Received: from localhost ([::1]:55446 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heESA-0001em-Du
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 03:59:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46121)
+	id 1heEWM-0004SH-Cg
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 04:03:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47369)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kpouget@redhat.com>) id 1heEPi-00007y-5h
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:56:51 -0400
+ (envelope-from <bounces@canonical.com>) id 1heETh-0003Ae-Hd
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:00:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kpouget@redhat.com>) id 1heEPg-00036m-Ui
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:56:50 -0400
-Received: from mail-ua1-f66.google.com ([209.85.222.66]:47062)
+ (envelope-from <bounces@canonical.com>) id 1heETd-0000Op-M3
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:00:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47044)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <kpouget@redhat.com>) id 1heEPg-0002s6-R0
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:56:48 -0400
-Received: by mail-ua1-f66.google.com with SMTP id o19so2620852uap.13
- for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 00:56:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=IbJAK5l7HdF6/q1AeQbgGHAv8N9jSFXyEHrl5uP8358=;
- b=VEnQrHc3M/m3vS+PlcRbU4+f2qqlQAY7rQJJE6OsHm7/cYYZs+Ko9yU5upitwGSVaW
- lWSr6STsFbFHsOhtwiLvhbFoRfUJwPv2JUbtCH+mmT7D5xwwYpOw7D/jk1dOFBeER52G
- d3DwLeiByFPcUTtACuxQlBuLKb1hE9XiLwAsZYvmsHT5aEVXWDP4nPz6V1iF2K0wmHce
- NFWxMHHjf1vHMAA8l8RIZFaOqjIXOsdCHbusYb5XEbg3f/aFQ5rE0JgTZPCyZqASzi9L
- 1SMcDZDLsXZbCwcuznLE57kGy1VSHMoAl9lcPADORg5chenGUbpm0IOiIup9C7vLduFw
- iupA==
-X-Gm-Message-State: APjAAAVyogO3I/4wwJ2PIe/5PgbyV0oUDwrR23SK1uVbWV1T2SJ51fhS
- WXetBwO/WO5HT3Qz9FU+p8VqbO0Sx4ajR9qDkIOuQw==
-X-Google-Smtp-Source: APXvYqwsoG4rqgwDWKBsMjJQMbemVZKH9RKVwnvl9CNzOHcjEqLMhtj71HJB/n+RfAwvzDgpN4aIZeibUxoMLv3DsY0=
-X-Received: by 2002:ab0:2756:: with SMTP id c22mr27886353uap.22.1561103788103; 
- Fri, 21 Jun 2019 00:56:28 -0700 (PDT)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1heETd-0000NX-DV
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:00:53 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1heETc-0000pF-3A
+ for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 08:00:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 13CD22E80C9
+ for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 08:00:52 +0000 (UTC)
 MIME-Version: 1.0
-References: <20190619123042.4822-1-kpouget@redhat.com>
- <e9fcdbfd-cde2-fc91-ce1d-6bfe06d39c4f@redhat.com>
- <CADJ1XR3fh0cyOerSM8VQkpde6cHLb8WccP05Rwr7xWMOK59rog@mail.gmail.com>
- <2139720774.23871724.1561101408712.JavaMail.zimbra@redhat.com>
-In-Reply-To: <2139720774.23871724.1561101408712.JavaMail.zimbra@redhat.com>
-From: Kevin Pouget <kpouget@redhat.com>
-Date: Fri, 21 Jun 2019 09:56:17 +0200
-Message-ID: <CADJ1XR3pq78_OCkNkGYnfUJWL+Tet72PZmGOr4gHzMGcDnRvFA@mail.gmail.com>
-To: Frediano Ziglio <fziglio@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 21 Jun 2019 07:47:19 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1833668@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: arm linux-user
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: philmd
+X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+Message-Id: <156110323981.19354.11667763271761846721.malonedeb@wampee.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18989";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: b6bf23581950e2b2f85631d811591f8756aae8ef
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.222.66
-Subject: Re: [Qemu-devel] [RFC] spice-core: allow setting properties from QMP
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1833668] [NEW] linux-user: Unable to run ARM
+ binaries on Aarch64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,148 +78,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org,
- Marc-Andre Lureau <marcandre.lureau@redhat.com>
+Reply-To: Bug 1833668 <1833668@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 21, 2019 at 9:16 AM Frediano Ziglio <fziglio@redhat.com> wrote:
->
-> >
-> > Hello Eric,
-> >
-> > > A new command may be okay, however,
-> >
-> > thanks, I've fix the typos and updated the patch to use an Enum, which
-> > indeed makes more sense.
-> >
-> > I've also updated "spice-query" command to provide the current value
-> > of the "video-codec" property,
-> > but it made me wonder if I should improve this QMP interface with a
-> > json list, or keep the current string-based list
-> > ("enc1:codec1;enc2:codec2").
-> >
-> > I CC the spice-devel list to get their point of view
-> >
-> > The current behavior is:
-> >
-> > --> { "execute": "set-spice", "arguments": { "property":
-> > "video-codecs", "value": "spice:mjpeg;gstreamer:h264" } }
-> > <-- {"return":{},"id":"libvirt-23"}
->
-> It looks complicated from the user. Why not just
->
-> --> { "execute": "set-spice", "arguments": { "video-codecs": "spice:mjpeg;gstreamer:h264" } }
+Public bug reported:
 
-it makes sense indeed, I've updated the code:
+Download a ARM package from https://packages.debian.org/sid/busybox-
+static
 
-# -> { "execute": "set-spice", "arguments": { "video-codecs": "spice:mjpeg;" }
-# <- { "returns": {} }
+Here tested with: busybox-static_1.30.1-4_armel.deb
 
-+{ 'command': 'set-spice',
-+  'data': {'*video-codecs': 'str'},
-+  'if': 'defined(CONFIG_SPICE)' }
+$ file busybox.armel
+busybox.armel: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), stat=
+ically linked, for GNU/Linux 3.2.0, BuildID[sha1]=3D12cf572e016bafa240e113b=
+57b3641e94b837f37, stripped
+
+$ qemu-aarch64 --version
+qemu-aarch64 version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.14)
+
+$ qemu-aarch64 busybox.armel
+busybox.armel: Invalid ELF image for this architecture
+
+$ qemu-aarch64 -cpu cortex-a7 busybox.armel
+unable to find CPU model 'cortex-a7'
+
+Also reproduced with commit 33d609990621dea6c7d056c86f707b8811320ac1,
+while the aarch64_cpus[] array contains Aarch64 CPUs, the arm_cpus[] array =
+is empty:
+
+$ gdb -q aarch64-linux-user/qemu-aarch64
+(gdb) p aarch64_cpus
+$1 =3D {{name =3D 0x1fe4e8 "cortex-a57", initfn =3D 0x109bc0 <aarch64_a57_i=
+nitfn>, class_init =3D 0x0}, {name =3D 0x1fe508 "cortex-a53", initfn =3D 0x=
+109a10 <aarch64_a53_initfn>, class_init =3D 0x0}, {name =3D 0x1fe518 "corte=
+x-a72", =
+
+    initfn =3D 0x109868 <aarch64_a72_initfn>, class_init =3D 0x0}, {name =
+=3D 0x218020 "max", initfn =3D 0x109d70 <aarch64_max_initfn>, class_init =
+=3D 0x0}, {name =3D 0x0, initfn =3D 0x0, class_init =3D 0x0}}
+(gdb) p arm_cpus
+$2 =3D {{name =3D 0x0, initfn =3D 0x0, class_init =3D 0x0}}
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
 
----
- qapi/ui.json    | 27 +++++++++++++++++++++++++--
- ui/spice-core.c | 17 +++++++++++++++++
- 2 files changed, 42 insertions(+), 2 deletions(-)
+** Tags: arm linux-user
 
-diff --git a/qapi/ui.json b/qapi/ui.json
-index 59e412139a..cdbe04bda0 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -211,12 +211,16 @@
- #
- # @channels: a list of @SpiceChannel for each active spice channel
- #
-+# @video-codecs: The list of encoders:codecs currently allowed for
-+#                video streaming (since: ...)
-+#
- # Since: 0.14.0
- ##
- { 'struct': 'SpiceInfo',
-   'data': {'enabled': 'bool', 'migrated': 'bool', '*host': 'str',
-'*port': 'int',
-            '*tls-port': 'int', '*auth': 'str', '*compiled-version': 'str',
--           'mouse-mode': 'SpiceQueryMouseMode', '*channels': ['SpiceChannel']},
-+           'mouse-mode': 'SpiceQueryMouseMode', '*channels': ['SpiceChannel'],
-+           'video-codecs': 'str'},
-   'if': 'defined(CONFIG_SPICE)' }
+-- =
 
- ##
-@@ -257,7 +261,8 @@
- #                "tls": false
- #             },
- #             [ ... more channels follow ... ]
--#          ]
-+#          ],
-+#          "video-codecs": "spice:mjpeg;gstreamer:h264;"
- #       }
- #    }
- #
-@@ -265,6 +270,24 @@
- { 'command': 'query-spice', 'returns': 'SpiceInfo',
-   'if': 'defined(CONFIG_SPICE)' }
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1833668
 
-+##
-+# @set-spice:
-+#
-+# Set Spice properties.
-+# @video-codecs: the ;-separated list of video-codecs allowed for
-+#                spice-server video streaming.
-+#
-+# Since: ...
-+#
-+# Example:
-+#
-+# -> { "execute": "set-spice", "arguments": { "video-codecs": "spice:mjpeg;" }
-+# <- { "returns": {} }
-+##
-+{ 'command': 'set-spice',
-+  'data': {'*video-codecs': 'str'},
-+  'if': 'defined(CONFIG_SPICE)' }
-+
- ##
- # @SPICE_CONNECTED:
- #
-diff --git a/ui/spice-core.c b/ui/spice-core.c
-index 63e8694df8..a4b265b663 100644
---- a/ui/spice-core.c
-+++ b/ui/spice-core.c
-@@ -506,6 +506,21 @@ static QemuOptsList qemu_spice_opts = {
-     },
- };
+Title:
+  linux-user: Unable to run ARM binaries on Aarch64
 
-+void qmp_set_spice(bool has_video_codecs, const char *video_codecs,
-+                   Error **errp)
-+{
-+    if (has_video_codecs) {
-+        int invalid_codecs = spice_server_set_video_codecs(spice_server,
-+                                                           video_codecs);
-+
-+        if (invalid_codecs) {
-+            error_setg(errp, "Found %d invalid video-codecs while setting"
-+                       " spice property 'video-codec=%s'", invalid_codecs,
-+                       video_codecs);
-+        }
-+    }
-+}
-+
- SpiceInfo *qmp_query_spice(Error **errp)
- {
-     QemuOpts *opts = QTAILQ_FIRST(&qemu_spice_opts.head);
-@@ -555,6 +570,8 @@ SpiceInfo *qmp_query_spice(Error **errp)
-                        SPICE_QUERY_MOUSE_MODE_SERVER :
-                        SPICE_QUERY_MOUSE_MODE_CLIENT;
+Status in QEMU:
+  New
 
-+    info->video_codecs = spice_server_get_video_codecs(spice_server);
-+
-     /* for compatibility with the original command */
-     info->has_channels = true;
-     info->channels = qmp_query_spice_channels();
--- 
-2.21.0
+Bug description:
+  Download a ARM package from https://packages.debian.org/sid/busybox-
+  static
+
+  Here tested with: busybox-static_1.30.1-4_armel.deb
+
+  $ file busybox.armel
+  busybox.armel: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), st=
+atically linked, for GNU/Linux 3.2.0, BuildID[sha1]=3D12cf572e016bafa240e11=
+3b57b3641e94b837f37, stripped
+
+  $ qemu-aarch64 --version
+  qemu-aarch64 version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.14)
+
+  $ qemu-aarch64 busybox.armel
+  busybox.armel: Invalid ELF image for this architecture
+
+  $ qemu-aarch64 -cpu cortex-a7 busybox.armel
+  unable to find CPU model 'cortex-a7'
+
+  Also reproduced with commit 33d609990621dea6c7d056c86f707b8811320ac1,
+  while the aarch64_cpus[] array contains Aarch64 CPUs, the arm_cpus[] arra=
+y is empty:
+
+  $ gdb -q aarch64-linux-user/qemu-aarch64
+  (gdb) p aarch64_cpus
+  $1 =3D {{name =3D 0x1fe4e8 "cortex-a57", initfn =3D 0x109bc0 <aarch64_a57=
+_initfn>, class_init =3D 0x0}, {name =3D 0x1fe508 "cortex-a53", initfn =3D =
+0x109a10 <aarch64_a53_initfn>, class_init =3D 0x0}, {name =3D 0x1fe518 "cor=
+tex-a72", =
+
+      initfn =3D 0x109868 <aarch64_a72_initfn>, class_init =3D 0x0}, {name =
+=3D 0x218020 "max", initfn =3D 0x109d70 <aarch64_max_initfn>, class_init =
+=3D 0x0}, {name =3D 0x0, initfn =3D 0x0, class_init =3D 0x0}}
+  (gdb) p arm_cpus
+  $2 =3D {{name =3D 0x0, initfn =3D 0x0, class_init =3D 0x0}}
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1833668/+subscriptions
 
