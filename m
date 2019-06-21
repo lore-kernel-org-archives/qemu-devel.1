@@ -2,85 +2,143 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD5E5C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 19:39:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D13C6C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 19:40:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7850E2075E
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 19:39:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="TZJMM2li"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7850E2075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	by mail.kernel.org (Postfix) with ESMTPS id A8AD22075E
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 19:40:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8AD22075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37540 helo=lists.gnu.org)
+Received: from localhost ([::1]:37548 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hePNw-0007EI-KG
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 15:39:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56030)
+	id 1hePOy-0008RO-02
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 15:40:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56290)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwankhede@nvidia.com>) id 1hePND-0006pf-65
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 15:39:01 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hePOL-0007hp-97
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 15:40:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1hePNB-0001JG-9q
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 15:38:59 -0400
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:3439)
+ (envelope-from <jsnow@redhat.com>) id 1hePOJ-0002Ir-CL
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 15:40:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48636)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1hePNA-0001IZ-UA
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 15:38:57 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5d0d32510000>; Fri, 21 Jun 2019 12:38:57 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate101.nvidia.com (PGP Universal service);
- Fri, 21 Jun 2019 12:38:55 -0700
-X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Fri, 21 Jun 2019 12:38:55 -0700
-Received: from [10.24.71.210] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 21 Jun
- 2019 19:38:45 +0000
-To: Alex Williamson <alex.williamson@redhat.com>
-References: <1561041461-22326-1-git-send-email-kwankhede@nvidia.com>
- <1561041461-22326-9-git-send-email-kwankhede@nvidia.com>
- <20190620132505.1cf64ac5@x1.home>
- <9256515a-f815-58e1-c9ca-81d64bac6db1@nvidia.com>
- <20190621091638.18127e7a@x1.home>
-X-Nvconfidentiality: public
-From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <b345a59c-b34d-c589-be78-b7a7690e80b2@nvidia.com>
-Date: Sat, 22 Jun 2019 01:08:40 +0530
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hePOD-0001zF-IE; Fri, 21 Jun 2019 15:40:03 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2DCCC3082E5F;
+ Fri, 21 Jun 2019 19:39:49 +0000 (UTC)
+Received: from [10.18.17.164] (dhcp-17-164.bos.redhat.com [10.18.17.164])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 310F55C21E;
+ Fri, 21 Jun 2019 19:39:48 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190620010356.19164-1-jsnow@redhat.com>
+ <20190620010356.19164-3-jsnow@redhat.com>
+ <cb178623-e7a3-2d20-f193-9630257d9c3c@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <4537a8c5-c870-139e-f8ef-d6a4bc28f0b5@redhat.com>
+Date: Fri, 21 Jun 2019 15:39:47 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190621091638.18127e7a@x1.home>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL108.nvidia.com (172.18.146.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <cb178623-e7a3-2d20-f193-9630257d9c3c@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1561145937; bh=jZJWXD1NPWaSrJaO4igyig1LQLj++x3MoZucKBoe4QA=;
- h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
- Message-ID:Date:MIME-Version:In-Reply-To:X-Originating-IP:
- X-ClientProxiedBy:Content-Type:Content-Language:
- Content-Transfer-Encoding;
- b=TZJMM2liRBBaG/nZOq+gpF5gUI/msle7C310+tA6NGVd+n15Lum2I4vLPt/v9qYOL
- FmM4psERNRQPKYg75zy7Za5+5Uc89z+26JmVki88TTUvqAMOBcHlbGJRqczgAEUGP9
- YMGqyLh1Z7FF9mTYXWEt99I52/iKhJqL6ej7T6Q5NjbizTqRtWkV+OEwUmCV6YXVMO
- opIbhyGmu5C663bZLKqZKwTth6TLqijfJVh/C2qGjbrSqmWleUVTiRhjV2mFNFFy/R
- Cd9INvh0XHvcpjaRkH+qCHWKxkEb2yDkEyKFS16fuiub0HF74GlqOSme++L98QpIIo
- jKyRoYMGL11TA==
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8
-X-Received-From: 216.228.121.64
-Subject: Re: [Qemu-devel] [PATCH v4 08/13] vfio: Add save state functions to
- SaveVMHandlers
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Fri, 21 Jun 2019 19:39:49 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 02/12] block/backup: Add mirror sync mode
+ 'bitmap'
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,399 +150,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
- dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Wen Congyang <wencongyang2@huawei.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 6/21/2019 8:46 PM, Alex Williamson wrote:
-> On Fri, 21 Jun 2019 12:08:26 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+On 6/21/19 7:29 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 20.06.2019 4:03, John Snow wrote:
+>> We don't need or want a new sync mode for simple differences in
+>> semantics.  Create a new mode simply named "BITMAP" that is designed to
+>> make use of the new Bitmap Sync Mode field.
+>>
+>> Because the only bitmap mode is 'conditional', this adds no new
+>> functionality to the backup job (yet). The old incremental backup mode
+>> is maintained as a syntactic sugar for sync=bitmap, mode=conditional.
+>>
+>> Add all of the plumbing necessary to support this new instruction.
 > 
->> On 6/21/2019 12:55 AM, Alex Williamson wrote:
->>> On Thu, 20 Jun 2019 20:07:36 +0530
->>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
->>>   
->>>> Added .save_live_pending, .save_live_iterate and .save_live_complete_precopy
->>>> functions. These functions handles pre-copy and stop-and-copy phase.
->>>>
->>>> In _SAVING|_RUNNING device state or pre-copy phase:
->>>> - read pending_bytes
->>>> - read data_offset - indicates kernel driver to write data to staging
->>>>   buffer which is mmapped.  
->>>
->>> Why is data_offset the trigger rather than data_size?  It seems that
->>> data_offset can't really change dynamically since it might be mmap'd,
->>> so it seems unnatural to bother re-reading it.
->>>   
->>
->> Vendor driver can change data_offset, he can have different data_offset
->> for device data and dirty pages bitmap.
->>
->>>> - read data_size - amount of data in bytes written by vendor driver in migration
->>>>   region.
->>>> - if data section is trapped, pread() number of bytes in data_size, from
->>>>   data_offset.
->>>> - if data section is mmaped, read mmaped buffer of size data_size.
->>>> - Write data packet to file stream as below:
->>>> {VFIO_MIG_FLAG_DEV_DATA_STATE, data_size, actual data,
->>>> VFIO_MIG_FLAG_END_OF_STATE }
->>>>
->>>> In _SAVING device state or stop-and-copy phase
->>>> a. read config space of device and save to migration file stream. This
->>>>    doesn't need to be from vendor driver. Any other special config state
->>>>    from driver can be saved as data in following iteration.
->>>> b. read pending_bytes - indicates kernel driver to write data to staging
->>>>    buffer which is mmapped.  
->>>
->>> Is it pending_bytes or data_offset that triggers the write out of
->>> data?  Why pending_bytes vs data_size?  I was interpreting
->>> pending_bytes as the total data size while data_size is the size
->>> available to read now, so assumed data_size would be more closely
->>> aligned to making the data available.
->>>   
->>
->> Sorry, that's my mistake while editing, its read data_offset as in above
->> case.
->>
->>>> c. read data_size - amount of data in bytes written by vendor driver in
->>>>    migration region.
->>>> d. if data section is trapped, pread() from data_offset of size data_size.
->>>> e. if data section is mmaped, read mmaped buffer of size data_size.  
->>>
->>> Should this read as "pread() from data_offset of data_size, or
->>> optionally if mmap is supported on the data area, read data_size from
->>> start of mapped buffer"?  IOW, pread should always work.  Same in
->>> previous section.
->>>   
->>
->> ok. I'll update.
->>
->>>> f. Write data packet as below:
->>>>    {VFIO_MIG_FLAG_DEV_DATA_STATE, data_size, actual data}
->>>> g. iterate through steps b to f until (pending_bytes > 0)  
->>>
->>> s/until/while/  
->>
->> Ok.
->>
->>>   
->>>> h. Write {VFIO_MIG_FLAG_END_OF_STATE}
->>>>
->>>> .save_live_iterate runs outside the iothread lock in the migration case, which
->>>> could race with asynchronous call to get dirty page list causing data corruption
->>>> in mapped migration region. Mutex added here to serial migration buffer read
->>>> operation.  
->>>
->>> Would we be ahead to use different offsets within the region for device
->>> data vs dirty bitmap to avoid this?
->>>  
->>
->> Lock will still be required to serialize the read/write operations on
->> vfio_device_migration_info structure in the region.
->>
->>
->>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
->>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
->>>> ---
->>>>  hw/vfio/migration.c | 212 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->>>>  1 file changed, 212 insertions(+)
->>>>
->>>> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
->>>> index fe0887c27664..0a2f30872316 100644
->>>> --- a/hw/vfio/migration.c
->>>> +++ b/hw/vfio/migration.c
->>>> @@ -107,6 +107,111 @@ static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t state)
->>>>      return 0;
->>>>  }
->>>>  
->>>> +static int vfio_save_buffer(QEMUFile *f, VFIODevice *vbasedev)
->>>> +{
->>>> +    VFIOMigration *migration = vbasedev->migration;
->>>> +    VFIORegion *region = &migration->region.buffer;
->>>> +    uint64_t data_offset = 0, data_size = 0;
->>>> +    int ret;
->>>> +
->>>> +    ret = pread(vbasedev->fd, &data_offset, sizeof(data_offset),
->>>> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
->>>> +                                             data_offset));
->>>> +    if (ret != sizeof(data_offset)) {
->>>> +        error_report("Failed to get migration buffer data offset %d",
->>>> +                     ret);
->>>> +        return -EINVAL;
->>>> +    }
->>>> +
->>>> +    ret = pread(vbasedev->fd, &data_size, sizeof(data_size),
->>>> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
->>>> +                                             data_size));
->>>> +    if (ret != sizeof(data_size)) {
->>>> +        error_report("Failed to get migration buffer data size %d",
->>>> +                     ret);
->>>> +        return -EINVAL;
->>>> +    }
->>>> +
->>>> +    if (data_size > 0) {
->>>> +        void *buf = NULL;
->>>> +        bool buffer_mmaped = false;
->>>> +
->>>> +        if (region->mmaps) {
->>>> +            int i;
->>>> +
->>>> +            for (i = 0; i < region->nr_mmaps; i++) {
->>>> +                if ((data_offset >= region->mmaps[i].offset) &&
->>>> +                    (data_offset < region->mmaps[i].offset +
->>>> +                                   region->mmaps[i].size)) {
->>>> +                    buf = region->mmaps[i].mmap + (data_offset -
->>>> +                                                   region->mmaps[i].offset);  
->>>
->>> So you're expecting that data_offset is somewhere within the data
->>> area.  Why doesn't the data always simply start at the beginning of the
->>> data area?  ie. data_offset would coincide with the beginning of the
->>> mmap'able area (if supported) and be static.  Does this enable some
->>> functionality in the vendor driver?  
->>
->> Do you want to enforce that to vendor driver?
->> From the feedback on previous version I thought vendor driver should
->> define data_offset within the region
->> "I'd suggest that the vendor driver expose a read-only
->> data_offset that matches a sparse mmap capability entry should the
->> driver support mmap.  The use should always read or write data from the
->> vendor defined data_offset"
->>
->> This also adds flexibility to vendor driver such that vendor driver can
->> define different data_offset for device data and dirty page bitmap
->> within same mmaped region.
+> I don't follow, why you don't want to just add bitmap-mode optional parameter
+> for incremental mode?
 > 
-> I agree, it adds flexibility, the protocol was not evident to me until
-> I got here though.
-> 
->>>  Does resume data need to be
->>> written from the same offset where it's read?  
->>
->> No, resume data should be written from the data_offset that vendor
->> driver provided during resume.
-> 
-> s/resume/save/?
-> 
-> Or is this saying that on resume that the vendor driver is requesting a
-> specific block of data via data_offset? 
 
-Correct.
+Vocabulary reasons, see below.
 
-Thanks,
-Kirti
+> For this all looks similar to just two separate things:
+> 1. add bitmap-mode parameter
+> 2. rename incremental to bitmap
 
-> I think resume is going to be
-> directed by the user, writing in the same order they received the
-> data.  Thanks,
+This is exactly correct!
+
 > 
-> Alex
+> Why do we need [2.] ?
+> If we do only [1.], we'll avoid creating two similar modes, syntax sugar, a bit
+> of mess as it seems to me..
 > 
->>>> +                    buffer_mmaped = true;
->>>> +                    break;
->>>> +                }
->>>> +            }
->>>> +        }
->>>> +
->>>> +        if (!buffer_mmaped) {
->>>> +            buf = g_malloc0(data_size);
->>>> +            ret = pread(vbasedev->fd, buf, data_size,
->>>> +                        region->fd_offset + data_offset);
->>>> +            if (ret != data_size) {
->>>> +                error_report("Failed to get migration data %d", ret);
->>>> +                g_free(buf);
->>>> +                return -EINVAL;
->>>> +            }
->>>> +        }
->>>> +
->>>> +        qemu_put_be64(f, data_size);
->>>> +        qemu_put_buffer(f, buf, data_size);
->>>> +
->>>> +        if (!buffer_mmaped) {
->>>> +            g_free(buf);
->>>> +        }
->>>> +        migration->pending_bytes -= data_size;
->>>> +    } else {
->>>> +        qemu_put_be64(f, data_size);
->>>> +    }
->>>> +
->>>> +    ret = qemu_file_get_error(f);
->>>> +
->>>> +    return data_size;
->>>> +}
->>>> +
->>>> +static int vfio_update_pending(VFIODevice *vbasedev)
->>>> +{
->>>> +    VFIOMigration *migration = vbasedev->migration;
->>>> +    VFIORegion *region = &migration->region.buffer;
->>>> +    uint64_t pending_bytes = 0;
->>>> +    int ret;
->>>> +
->>>> +    ret = pread(vbasedev->fd, &pending_bytes, sizeof(pending_bytes),
->>>> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
->>>> +                                             pending_bytes));  
->>>
->>> Did this trigger the vendor driver to write out to the data area when
->>> we don't need it to?
->>>   
->>
->> No, as I mentioned above, I'll update the description.
->>
->> Thanks,
->> Kirti
->>
->>>> +    if ((ret < 0) || (ret != sizeof(pending_bytes))) {
->>>> +        error_report("Failed to get pending bytes %d", ret);
->>>> +        migration->pending_bytes = 0;
->>>> +        return (ret < 0) ? ret : -EINVAL;
->>>> +    }
->>>> +
->>>> +    migration->pending_bytes = pending_bytes;
->>>> +    return 0;
->>>> +}
->>>> +
->>>> +static int vfio_save_device_config_state(QEMUFile *f, void *opaque)
->>>> +{
->>>> +    VFIODevice *vbasedev = opaque;
->>>> +
->>>> +    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_CONFIG_STATE);
->>>> +
->>>> +    if (vbasedev->type == VFIO_DEVICE_TYPE_PCI) {
->>>> +        vfio_pci_save_config(vbasedev, f);
->>>> +    }
->>>> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
->>>> +
->>>> +    return qemu_file_get_error(f);
->>>> +}
->>>> +
->>>>  /* ---------------------------------------------------------------------- */
->>>>  
->>>>  static int vfio_save_setup(QEMUFile *f, void *opaque)
->>>> @@ -163,9 +268,116 @@ static void vfio_save_cleanup(void *opaque)
->>>>      }
->>>>  }
->>>>  
->>>> +static void vfio_save_pending(QEMUFile *f, void *opaque,
->>>> +                              uint64_t threshold_size,
->>>> +                              uint64_t *res_precopy_only,
->>>> +                              uint64_t *res_compatible,
->>>> +                              uint64_t *res_postcopy_only)
->>>> +{
->>>> +    VFIODevice *vbasedev = opaque;
->>>> +    VFIOMigration *migration = vbasedev->migration;
->>>> +    int ret;
->>>> +
->>>> +    ret = vfio_update_pending(vbasedev);
->>>> +    if (ret) {
->>>> +        return;
->>>> +    }
->>>> +
->>>> +    if (vbasedev->device_state & VFIO_DEVICE_STATE_RUNNING) {
->>>> +        *res_precopy_only += migration->pending_bytes;
->>>> +    } else {
->>>> +        *res_postcopy_only += migration->pending_bytes;
->>>> +    }
->>>> +    *res_compatible += 0;
->>>> +}
->>>> +
->>>> +static int vfio_save_iterate(QEMUFile *f, void *opaque)
->>>> +{
->>>> +    VFIODevice *vbasedev = opaque;
->>>> +    VFIOMigration *migration = vbasedev->migration;
->>>> +    int ret;
->>>> +
->>>> +    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_DATA_STATE);
->>>> +
->>>> +    qemu_mutex_lock(&migration->lock);
->>>> +    ret = vfio_save_buffer(f, vbasedev);
->>>> +    qemu_mutex_unlock(&migration->lock);
->>>> +
->>>> +    if (ret < 0) {
->>>> +        error_report("vfio_save_buffer failed %s",
->>>> +                     strerror(errno));
->>>> +        return ret;
->>>> +    }
->>>> +
->>>> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
->>>> +
->>>> +    ret = qemu_file_get_error(f);
->>>> +    if (ret) {
->>>> +        return ret;
->>>> +    }
->>>> +
->>>> +    return ret;
->>>> +}
->>>> +
->>>> +static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
->>>> +{
->>>> +    VFIODevice *vbasedev = opaque;
->>>> +    VFIOMigration *migration = vbasedev->migration;
->>>> +    int ret;
->>>> +
->>>> +    ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_SAVING);
->>>> +    if (ret) {
->>>> +        error_report("Failed to set state STOP and SAVING");
->>>> +        return ret;
->>>> +    }
->>>> +
->>>> +    ret = vfio_save_device_config_state(f, opaque);
->>>> +    if (ret) {
->>>> +        return ret;
->>>> +    }
->>>> +
->>>> +    ret = vfio_update_pending(vbasedev);
->>>> +    if (ret) {
->>>> +        return ret;
->>>> +    }
->>>> +
->>>> +    while (migration->pending_bytes > 0) {
->>>> +        qemu_put_be64(f, VFIO_MIG_FLAG_DEV_DATA_STATE);
->>>> +        ret = vfio_save_buffer(f, vbasedev);
->>>> +        if (ret < 0) {
->>>> +            error_report("Failed to save buffer");
->>>> +            return ret;
->>>> +        } else if (ret == 0) {
->>>> +            break;
->>>> +        }
->>>> +
->>>> +        ret = vfio_update_pending(vbasedev);
->>>> +        if (ret) {
->>>> +            return ret;
->>>> +        }
->>>> +    }
->>>> +
->>>> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
->>>> +
->>>> +    ret = qemu_file_get_error(f);
->>>> +    if (ret) {
->>>> +        return ret;
->>>> +    }
->>>> +
->>>> +    ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_STOPPED);
->>>> +    if (ret) {
->>>> +        error_report("Failed to set state STOPPED");
->>>> +        return ret;
->>>> +    }
->>>> +    return ret;
->>>> +}
->>>> +
->>>>  static SaveVMHandlers savevm_vfio_handlers = {
->>>>      .save_setup = vfio_save_setup,
->>>>      .save_cleanup = vfio_save_cleanup,
->>>> +    .save_live_pending = vfio_save_pending,
->>>> +    .save_live_iterate = vfio_save_iterate,
->>>> +    .save_live_complete_precopy = vfio_save_complete_precopy,
->>>>  };
->>>>  
->>>>  /* ---------------------------------------------------------------------- */  
->>>   
+> Hmm, about differential backups, as I understood, we call 'differential' an incremental
+> backup, but which considers difference not from latest incremental backup but from some
+> in the past.. Is it incorrect?
 > 
+
+The reason is because I have been treating "INCREMENTAL" as meaning
+something very specific -- I gather from you and Max that you don't
+consider this term to mean something specific.
+
+So, by other prominent backup vendors, they use these terms in this way:
+
+INCREMENTAL: This backup contains a delta from the last INCREMENTAL
+backup made. In effect, this creates a chain of backups that must be
+squashed together to recover data, but uses less info on copy.
+
+DIFFERENTIAL: This backup contains a delta from the last FULL backup
+made. In effect, each differential backup only requires a base image and
+a single differential. This usually wastes more data during the backup
+process, but makes restoration processes easier.
+
+
+I *always* use these terms in these *exact* ways; you can see that the
+bitmap behavior we use is exactly what MIRROR_SYNC_MODE_INCREMENTAL
+does. Even when we are using bitmap manipulation techniques to get it to
+do something else, the block job itself is engineered to think that it
+is producing an "Incremental" backup.
+
+
+In the early days of this feature, Fam actually proposed something like
+what I am proposing here:
+
+a BITMAP sync mode with an on_complete parameter for the backup job that
+would either roll the bitmap forward or not (like my "conditional",
+"never") based on the success of the job.
+
+We removed that because at the time we wanted to target a simpler
+feature. As part of that removal, I renamed the mode "INCREMENTAL" under
+the premise that if we ever wanted to add a "DIFFERENTIAL" mode like
+what Fam's original design allowed for, we could add
+MIRROR_SYNC_MODE_DIFFERENTIAL and that would differentiate the two
+modes. This rename was done with the specific knowledge and intent that
+the mode was named after the exact specific backup paradigm it was
+enabling. Otherwise, I would have left it "BITMAP" back then.
+
+I've had patches in my branch to add a DIFFERENTIAL mode ever since
+then! However, since we added bitmap merging, you'll notice that we
+actually CAN do "Differential" backups by playing around with the
+bitmaps ourselves, which has largely stopped me from wanting to
+introduce the new mode.
+
+You'll recall that recently Xie Changlong sent patches to add
+"incremental" support to mirror, but what they ACTUALLY implemented was
+"Differential" mode -- they didn't clear the bitmap afterwards. I
+actually responded as such on-list -- that if we implement a
+"Differential" mode that their patches would have been appropriate for
+that mode.
+
+As a result of that discussion, I went to add a "Differential" mode to
+mirror, but in the process realized that it's much easier to make the
+bitmap sync behavior its own parameter.
+
+However, because the new parameters no longer mean the backup is
+"Incremental" by that definition, I decided to rename the mode "BITMAP"
+again to be *less specific* and, perhaps now ironically, avoid confusion.
+
+Even given this confusion ... I actually still think that we should NOT
+use "Incremental" to mean something generic, and I will continue to
+enforce the idea that "Incremental" should mean a series of
+non-overlapping time-sliced deltas.
+
+--js
 
