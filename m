@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2EF1C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 11:49:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AACBDC43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 11:49:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC16C2083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 11:49:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E3F42083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 11:49:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bvzdz/Z5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC16C2083B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LsxcLYib"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E3F42083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59970 helo=lists.gnu.org)
+Received: from localhost ([::1]:59976 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heI2p-0007GE-1E
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 07:49:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49031)
+	id 1heI2z-0007Xs-QC
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 07:49:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49164)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1heHkY-0000fp-Ct
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:38 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1heHki-0000no-OS
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1heHkV-0005TU-8b
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:34 -0400
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:54498)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1heHkf-0005xi-MI
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:44 -0400
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:37201)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1heHkV-0005Qp-1U
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:31 -0400
-Received: by mail-wm1-x332.google.com with SMTP id g135so5999995wme.4
- for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 04:30:30 -0700 (PDT)
+ id 1heHkf-0005vX-Gb
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:41 -0400
+Received: by mail-wm1-x32b.google.com with SMTP id f17so6233318wme.2
+ for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 04:30:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=rLWxEjPZN+ttDy6470/jW3LY13Gz8VOEZike0sn0oXQ=;
- b=Bvzdz/Z513MYyxRbWwsxtM4IvKkQurc5MqVNLcsp4dDHTFAuGttSkA3OgieFIvxXeJ
- q5LO1OOZxPLmCV2WUbSsb+LCxSwx31K6Ym2L/i80vxKwEZFfSfJU4TN7KCxVMoP9uqYg
- JxHJB+5L68IaGs+YschFkoiMkXc5UdTyPlsG7rxCxF3Puqg/kX+eUwzK4pgrtu3frIcO
- hTwUXVSwFXouKBpWtnwAgHqClPBfg9nyNMwNUu6olSm9WeyNhFvVgeBL3QuKnVN4vCNC
- u9BtkmWYDnaITpEfok+pBtD7vbl/YFc9ti7i0XC+79seJvLC+NRMUSCDf9z4GxN5thrk
- qp4Q==
+ bh=jGOTUhh33OOT1Enfmvtwgh0euyeueOCeP1kgbRTa4fI=;
+ b=LsxcLYibqiJwqVVPEgMPe6DHkUaueCP51KdnuJZk3tuNhPrfndHQaUte9pjKJqrs0e
+ 1VL+rykF7gh+Ed2lzc5qouKZcY9G6gUL6fTAmcMUZRQ4Jef++JtXlJ2nqdcYJHvarMdP
+ 6BXLIBrKNT9ekStqKF/tRTh/0FzMdxGZSL6XG0fsOsDqs91o6Ni2kNXoS9EkSAdVA2NY
+ EifdbT2bh0J/85h6I68upQ/BB2ZCn/JceGldPgIMUwc4/LkhZrbzTo1vy7HLL5WqnwzT
+ TPTsF6gzrB8sgq+ZFui1mXEhaQrPkkGN+vDFysCjUMZrjpKCMh3tYEUC2vzL3Mngcrsr
+ VmDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=rLWxEjPZN+ttDy6470/jW3LY13Gz8VOEZike0sn0oXQ=;
- b=BiRMCsKhQcRsojlEtXLDuA/ocll2+MRoD6RDd3f2LHcgsutMF35a7dGDp704m573On
- Fh7QRpED+90lZrXtwGRbv/pN8qdd4QJPEW1I1oaPeSWCJ6pqyhm/EyfjkuEZlo4eB5ly
- JvTrSmfw/PHNHUjQ/iLB0joTFXPxD3l9ksfndd33uieiYQZ8MkDrUkl4r0vCC5rnvQPq
- yjHoHubneYn0lwMLc9LdiTMhqhXtCECVJtd+/r83BQ3qJAoZS0Q4GhPMF/opQW7ksBhl
- YFwGH12sa3e2YAGH1G9hvSc2hdRr1ao4OW+oUA6c509YYz5a/EnhXVtf/gA+eE3Rj0dX
- 4yvQ==
-X-Gm-Message-State: APjAAAXcLm+BO7UIm/AA0D92V3tKNwMJRmYoccMjVRh/y2VuGWLVp/j4
- zQGkKRWwBr2fUOt0ZpzeuKrhSiGQ
-X-Google-Smtp-Source: APXvYqwg8RHNJTJxZ6E+4Ov0SQTcWQxjYDlMCn20/q4lXJ6XWiopmJkeQoUWsz8mw59ot6L+RprW5Q==
-X-Received: by 2002:a7b:cb94:: with SMTP id m20mr3694471wmi.144.1561116629737; 
- Fri, 21 Jun 2019 04:30:29 -0700 (PDT)
+ bh=jGOTUhh33OOT1Enfmvtwgh0euyeueOCeP1kgbRTa4fI=;
+ b=moYBTKGMBp78bw2ybfKKP/VQgSSPv4nQCI0DHA2y462dvBdHd8C0e1a8gbVdzjzTIk
+ 3Xo9NmHBXRA3hi6WkeAI9DJ28diGvaGPEYKu/cQS6gBSyUGhJ7abEyZv9Gtm/G5PI0C0
+ Sk5vUCj2Y/+aYE8tsvAjyblaR3VkxeZWRVf66HBqDCFAqwdpbZn8V9tjF4jUQjMV4rK/
+ EUhS5IT5JE9N6ArxjOIS56Wn8PjWCRHXX2D6+VODClu4nYlB2JJzNuPXAzs9Hn3TscFU
+ MNzZQwaxFkgBb4XjPFF0c1V51hGYG5aIpSfAcwLENAvi9Fzkqhq8SlhzkDqHeLXYjSXG
+ 0hWA==
+X-Gm-Message-State: APjAAAW8gESPS+nOMqcjmc6S6YYOl1OPwjGtdqSZnjI3byRY1gV3SoJM
+ GKBeHlcNuUMksefSRM5NY/NeiJqX
+X-Google-Smtp-Source: APXvYqwx3PQfJse8vvms+8JS91gnEzw7tfxRRGjQx1usJmrz7eZ33+SCFuihYGkwl2Lx/OhjP3/uMA==
+X-Received: by 2002:a7b:c748:: with SMTP id w8mr3645177wmk.36.1561116639913;
+ Fri, 21 Jun 2019 04:30:39 -0700 (PDT)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id r3sm2712851wrr.61.2019.06.21.04.30.28
+ by smtp.gmail.com with ESMTPSA id r3sm2712851wrr.61.2019.06.21.04.30.38
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 21 Jun 2019 04:30:29 -0700 (PDT)
+ Fri, 21 Jun 2019 04:30:39 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 21 Jun 2019 13:30:02 +0200
-Message-Id: <1561116620-22245-8-git-send-email-pbonzini@redhat.com>
+Date: Fri, 21 Jun 2019 13:30:12 +0200
+Message-Id: <1561116620-22245-18-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1561116620-22245-1-git-send-email-pbonzini@redhat.com>
 References: <1561116620-22245-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::332
-Subject: [Qemu-devel] [PULL 07/25] i386/kvm: implement 'hv-passthrough' mode
+X-Received-From: 2a00:1450:4864:20::32b
+Subject: [Qemu-devel] [PULL 17/25] target/i386: kvm: Block migration for
+ vCPUs exposed with nested virtualization
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,245 +90,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Liran Alon <liran.alon@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
+From: Liran Alon <liran.alon@oracle.com>
 
-In many case we just want to give Windows guests all currently supported
-Hyper-V enlightenments and that's where this new mode may come handy. We
-pass through what was returned by KVM_GET_SUPPORTED_HV_CPUID.
+Commit d98f26073beb ("target/i386: kvm: add VMX migration blocker")
+added a migration blocker for vCPU exposed with Intel VMX.
+However, migration should also be blocked for vCPU exposed with
+AMD SVM.
 
-hv_cpuid_check_and_set() is modified to also set cpu->hyperv_* flags as
-we may want to check them later (and we actually do for hv_runtime,
-hv_synic,...).
+Both cases should be blocked because QEMU should extract additional
+vCPU state from KVM that should be migrated as part of vCPU VMState.
+E.g. Whether vCPU is running in guest-mode or host-mode.
 
-'hv-passthrough' is a development only feature, a migration blocker is
-added to prevent issues while migrating between hosts with different
-feature sets.
-
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Message-Id: <20190517141924.19024-6-vkuznets@redhat.com>
+Fixes: d98f26073beb ("target/i386: kvm: add VMX migration blocker")
+Reviewed-by: Maran Wilson <maran.wilson@oracle.com>
+Signed-off-by: Liran Alon <liran.alon@oracle.com>
+Message-Id: <20190619162140.133674-6-liran.alon@oracle.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- docs/hyperv.txt   | 10 +++++++
- target/i386/cpu.c |  1 +
- target/i386/cpu.h |  1 +
- target/i386/kvm.c | 89 ++++++++++++++++++++++++++++++++++++++++++++++---------
- 4 files changed, 87 insertions(+), 14 deletions(-)
+ target/i386/cpu.c |  6 ------
+ target/i386/cpu.h | 12 ++++++++++++
+ target/i386/kvm.c | 14 +++++++-------
+ 3 files changed, 19 insertions(+), 13 deletions(-)
 
-diff --git a/docs/hyperv.txt b/docs/hyperv.txt
-index c423e0f..beadb2d 100644
---- a/docs/hyperv.txt
-+++ b/docs/hyperv.txt
-@@ -175,6 +175,16 @@ without the feature to find out if enabling it is beneficial.
- Requires: hv-vapic
- 
- 
-+4. Development features
-+========================
-+In some cases (e.g. during development) it may make sense to use QEMU in
-+'pass-through' mode and give Windows guests all enlightenments currently
-+supported by KVM. This pass-through mode is enabled by "hv-passthrough" CPU
-+flag.
-+Note: enabling this flag effectively prevents migration as supported features
-+may differ between target and destination.
-+
-+
- 4. Useful links
- ================
- Hyper-V Top Level Functional specification and other information:
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index e90c1ac..e07996c 100644
+index c330fd9..61e44cb 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -5883,6 +5883,7 @@ static Property x86_cpu_properties[] = {
-                       HYPERV_FEAT_EVMCS, 0),
-     DEFINE_PROP_BIT64("hv-ipi", X86CPU, hyperv_features,
-                       HYPERV_FEAT_IPI, 0),
-+    DEFINE_PROP_BOOL("hv-passthrough", X86CPU, hyperv_passthrough, false),
+@@ -5215,12 +5215,6 @@ static int x86_cpu_filter_features(X86CPU *cpu)
+     return rv;
+ }
  
-     DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
-     DEFINE_PROP_BOOL("enforce", X86CPU, enforce_cpuid, false),
+-#define IS_INTEL_CPU(env) ((env)->cpuid_vendor1 == CPUID_VENDOR_INTEL_1 && \
+-                           (env)->cpuid_vendor2 == CPUID_VENDOR_INTEL_2 && \
+-                           (env)->cpuid_vendor3 == CPUID_VENDOR_INTEL_3)
+-#define IS_AMD_CPU(env) ((env)->cpuid_vendor1 == CPUID_VENDOR_AMD_1 && \
+-                         (env)->cpuid_vendor2 == CPUID_VENDOR_AMD_2 && \
+-                         (env)->cpuid_vendor3 == CPUID_VENDOR_AMD_3)
+ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+ {
+     CPUState *cs = CPU(dev);
 diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 30cd1a0..86edbf5 100644
+index 7f48136..bf0c9c2 100644
 --- a/target/i386/cpu.h
 +++ b/target/i386/cpu.h
-@@ -1390,6 +1390,7 @@ struct X86CPU {
-     char *hyperv_vendor_id;
-     bool hyperv_synic_kvm_only;
-     uint64_t hyperv_features;
-+    bool hyperv_passthrough;
+@@ -722,6 +722,13 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
  
-     bool check_cpuid;
-     bool enforce_cpuid;
+ #define CPUID_VENDOR_HYGON    "HygonGenuine"
+ 
++#define IS_INTEL_CPU(env) ((env)->cpuid_vendor1 == CPUID_VENDOR_INTEL_1 && \
++                           (env)->cpuid_vendor2 == CPUID_VENDOR_INTEL_2 && \
++                           (env)->cpuid_vendor3 == CPUID_VENDOR_INTEL_3)
++#define IS_AMD_CPU(env) ((env)->cpuid_vendor1 == CPUID_VENDOR_AMD_1 && \
++                         (env)->cpuid_vendor2 == CPUID_VENDOR_AMD_2 && \
++                         (env)->cpuid_vendor3 == CPUID_VENDOR_AMD_3)
++
+ #define CPUID_MWAIT_IBE     (1U << 1) /* Interrupts can exit capability */
+ #define CPUID_MWAIT_EMX     (1U << 0) /* enumeration supported */
+ 
+@@ -1848,6 +1855,11 @@ static inline int32_t x86_get_a20_mask(CPUX86State *env)
+     }
+ }
+ 
++static inline bool cpu_has_vmx(CPUX86State *env)
++{
++    return env->features[FEAT_1_ECX] & CPUID_EXT_VMX;
++}
++
+ /* fpu_helper.c */
+ void update_fp_status(CPUX86State *env);
+ void update_mxcsr_status(CPUX86State *env);
 diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index a041b4d..93ac6ba 100644
+index 9864aa0..f9872f1 100644
 --- a/target/i386/kvm.c
 +++ b/target/i386/kvm.c
-@@ -639,7 +639,7 @@ static bool hyperv_enabled(X86CPU *cpu)
-     CPUState *cs = CPU(cpu);
-     return kvm_check_extension(cs->kvm_state, KVM_CAP_HYPERV) > 0 &&
-         ((cpu->hyperv_spinlock_attempts != HYPERV_SPINLOCK_NEVER_RETRY) ||
--         cpu->hyperv_features);
-+         cpu->hyperv_features || cpu->hyperv_passthrough);
+@@ -1299,7 +1299,7 @@ static int hyperv_init_vcpu(X86CPU *cpu)
  }
  
- static int kvm_arch_set_tsc_khz(CPUState *cs)
-@@ -985,10 +985,10 @@ static int hv_cpuid_check_and_set(CPUState *cs, struct kvm_cpuid2 *cpuid,
- {
-     X86CPU *cpu = X86_CPU(cs);
-     CPUX86State *env = &cpu->env;
--    uint32_t r, fw, bits;;
-+    uint32_t r, fw, bits;
-     int i;
+ static Error *invtsc_mig_blocker;
+-static Error *vmx_mig_blocker;
++static Error *nested_virt_mig_blocker;
  
--    if (!hyperv_feat_enabled(cpu, feature)) {
-+    if (!hyperv_feat_enabled(cpu, feature) && !cpu->hyperv_passthrough) {
-         return 0;
+ #define KVM_MAX_CPUID_ENTRIES  100
+ 
+@@ -1597,13 +1597,13 @@ int kvm_arch_init_vcpu(CPUState *cs)
+                                   !!(c->ecx & CPUID_EXT_SMX);
      }
  
-@@ -1001,15 +1001,23 @@ static int hv_cpuid_check_and_set(CPUState *cs, struct kvm_cpuid2 *cpuid,
+-    if ((env->features[FEAT_1_ECX] & CPUID_EXT_VMX) && !vmx_mig_blocker) {
+-        error_setg(&vmx_mig_blocker,
+-                   "Nested VMX virtualization does not support live migration yet");
+-        r = migrate_add_blocker(vmx_mig_blocker, &local_err);
++    if (cpu_has_nested_virt(env) && !nested_virt_mig_blocker) {
++        error_setg(&nested_virt_mig_blocker,
++                   "Nested virtualization does not support live migration yet");
++        r = migrate_add_blocker(nested_virt_mig_blocker, &local_err);
+         if (local_err) {
+             error_report_err(local_err);
+-            error_free(vmx_mig_blocker);
++            error_free(nested_virt_mig_blocker);
+             return r;
          }
- 
-         if (hv_cpuid_get_fw(cpuid, fw, &r) || (r & bits) != bits) {
--            fprintf(stderr,
--                    "Hyper-V %s is not supported by kernel\n",
--                    kvm_hyperv_properties[feature].desc);
--            return 1;
-+            if (hyperv_feat_enabled(cpu, feature)) {
-+                fprintf(stderr,
-+                        "Hyper-V %s is not supported by kernel\n",
-+                        kvm_hyperv_properties[feature].desc);
-+                return 1;
-+            } else {
-+                return 0;
-+            }
-         }
- 
-         env->features[fw] |= bits;
      }
+@@ -1674,7 +1674,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+  fail:
+     migrate_del_blocker(invtsc_mig_blocker);
+  fail2:
+-    migrate_del_blocker(vmx_mig_blocker);
++    migrate_del_blocker(nested_virt_mig_blocker);
  
-+    if (cpu->hyperv_passthrough) {
-+        cpu->hyperv_features |= BIT(feature);
-+    }
-+
-     return 0;
- }
- 
-@@ -1027,22 +1035,29 @@ static int hyperv_handle_properties(CPUState *cs,
-     struct kvm_cpuid_entry2 *c;
-     uint32_t signature[3];
-     uint32_t cpuid_i = 0;
--    int r = 0;
-+    int r;
- 
-     if (!hyperv_enabled(cpu))
-         return 0;
- 
--    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_EVMCS)) {
-+    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_EVMCS) ||
-+        cpu->hyperv_passthrough) {
-         uint16_t evmcs_version;
- 
--        if (kvm_vcpu_enable_cap(cs, KVM_CAP_HYPERV_ENLIGHTENED_VMCS, 0,
--                                (uintptr_t)&evmcs_version)) {
-+        r = kvm_vcpu_enable_cap(cs, KVM_CAP_HYPERV_ENLIGHTENED_VMCS, 0,
-+                                (uintptr_t)&evmcs_version);
-+
-+        if (hyperv_feat_enabled(cpu, HYPERV_FEAT_EVMCS) && r) {
-             fprintf(stderr, "Hyper-V %s is not supported by kernel\n",
-                     kvm_hyperv_properties[HYPERV_FEAT_EVMCS].desc);
-             return -ENOSYS;
-         }
--        env->features[FEAT_HV_RECOMM_EAX] |= HV_ENLIGHTENED_VMCS_RECOMMENDED;
--        env->features[FEAT_HV_NESTED_EAX] = evmcs_version;
-+
-+        if (!r) {
-+            env->features[FEAT_HV_RECOMM_EAX] |=
-+                HV_ENLIGHTENED_VMCS_RECOMMENDED;
-+            env->features[FEAT_HV_NESTED_EAX] = evmcs_version;
-+        }
-     }
- 
-     if (kvm_check_extension(cs->kvm_state, KVM_CAP_HYPERV_CPUID) > 0) {
-@@ -1051,8 +1066,33 @@ static int hyperv_handle_properties(CPUState *cs,
-         cpuid = get_supported_hv_cpuid_legacy(cs);
-     }
- 
-+    if (cpu->hyperv_passthrough) {
-+        memcpy(cpuid_ent, &cpuid->entries[0],
-+               cpuid->nent * sizeof(cpuid->entries[0]));
-+
-+        c = cpuid_find_entry(cpuid, HV_CPUID_FEATURES, 0);
-+        if (c) {
-+            env->features[FEAT_HYPERV_EAX] = c->eax;
-+            env->features[FEAT_HYPERV_EBX] = c->ebx;
-+            env->features[FEAT_HYPERV_EDX] = c->eax;
-+        }
-+        c = cpuid_find_entry(cpuid, HV_CPUID_ENLIGHTMENT_INFO, 0);
-+        if (c) {
-+            env->features[FEAT_HV_RECOMM_EAX] = c->eax;
-+
-+            /* hv-spinlocks may have been overriden */
-+            if (cpu->hyperv_spinlock_attempts != HYPERV_SPINLOCK_NEVER_RETRY) {
-+                c->ebx = cpu->hyperv_spinlock_attempts;
-+            }
-+        }
-+        c = cpuid_find_entry(cpuid, HV_CPUID_NESTED_FEATURES, 0);
-+        if (c) {
-+            env->features[FEAT_HV_NESTED_EAX] = c->eax;
-+        }
-+    }
-+
-     /* Features */
--    r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_RELAXED);
-+    r = hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_RELAXED);
-     r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_VAPIC);
-     r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_TIME);
-     r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_CRASH);
-@@ -1085,6 +1125,12 @@ static int hyperv_handle_properties(CPUState *cs,
-         goto free;
-     }
- 
-+    if (cpu->hyperv_passthrough) {
-+        /* We already copied all feature words from KVM as is */
-+        r = cpuid->nent;
-+        goto free;
-+    }
-+
-     c = &cpuid_ent[cpuid_i++];
-     c->function = HV_CPUID_VENDOR_AND_MAX_FUNCTIONS;
-     if (!cpu->hyperv_vendor_id) {
-@@ -1156,11 +1202,26 @@ free:
      return r;
  }
- 
-+static Error *hv_passthrough_mig_blocker;
-+
- static int hyperv_init_vcpu(X86CPU *cpu)
- {
-     CPUState *cs = CPU(cpu);
-+    Error *local_err = NULL;
-     int ret;
- 
-+    if (cpu->hyperv_passthrough && hv_passthrough_mig_blocker == NULL) {
-+        error_setg(&hv_passthrough_mig_blocker,
-+                   "'hv-passthrough' CPU flag prevents migration, use explicit"
-+                   " set of hv-* flags instead");
-+        ret = migrate_add_blocker(hv_passthrough_mig_blocker, &local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+            error_free(hv_passthrough_mig_blocker);
-+            return ret;
-+        }
-+    }
-+
-     if (hyperv_feat_enabled(cpu, HYPERV_FEAT_VPINDEX) && !hv_vpindex_settable) {
-         /*
-          * the kernel doesn't support setting vp_index; assert that its value
 -- 
 1.8.3.1
 
