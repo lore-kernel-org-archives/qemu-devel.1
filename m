@@ -2,83 +2,85 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58616C48BE3
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56F4FC43613
 	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 01:54:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BA5C2084A
+	by mail.kernel.org (Postfix) with ESMTPS id 1BEE12084E
 	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 01:54:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nIFNT+/d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BA5C2084A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m83rH5Jz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BEE12084E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54066 helo=lists.gnu.org)
+Received: from localhost ([::1]:54064 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1he8ko-0004he-9S
+	id 1he8ko-0004h4-2n
 	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 21:54:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40876)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40642)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1he8Zu-0006Sw-6U
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 21:42:59 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1he8Za-0006Mx-Aj
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 21:42:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1he8Zo-0006Mb-Ke
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 21:42:57 -0400
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:36105)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1he8ZY-00067Z-On
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 21:42:38 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46109)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1he8Zh-0006Hi-4i
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 21:42:47 -0400
-Received: by mail-wr1-x433.google.com with SMTP id n4so3676919wrs.3
- for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 18:42:43 -0700 (PDT)
+ id 1he8ZY-00061Z-FL
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 21:42:36 -0400
+Received: by mail-wr1-x444.google.com with SMTP id n4so4829629wrw.13
+ for <qemu-devel@nongnu.org>; Thu, 20 Jun 2019 18:42:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=bNCR6BSZrVAsd51s0wYru1/heSmPhGDxRbakfLjjL5g=;
- b=nIFNT+/deS9pSOLA5AIOHk4M5bnC0XnTWzwNgIE9V1MYR5nRViNgWkOrTSVhk/o76u
- 4fEc95rWD23t1UsWYSw6wfdRhBQuOlpseyGHkxeIhZj+4EfM4n851FOBtyaylDZ/dbZN
- VnNvzkcxxZ+AORpRuj69fRph+ykEF2MTzE/5YP54Igls9dQm/qiDXgmaTrgAt0yfOEui
- GAO0z8/m90I9LSZmTzaU+uk6Rc3lZtxn2Yf2VtEbxD9fAV/O6ArLmbO+9dZ1JV8oe5+B
- TqnaL1DCPDcqME88m4CSdItKSBBADNrTOG9cfXtYhKoq0h5B3N2NERSsOOpirYDXljyC
- jEOA==
+ h=sender:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=w+7TSfA05al3vMslcz/SOoRJBM36JJMcPLAo6eroszE=;
+ b=m83rH5JzmClRQcxviYxQqQSExIoxbvRpDWMTslm1bGZluWJl24p7mU2Q48T4ANJVQu
+ vMveleM8ovplH4IZTbT2bATxY9oYBlJXZrCfncUwjDBF6DseVdnjqr6omxtEgYlAxW/t
+ eB0NMKMoeea88LF00p86gmNCm8Bakr2g7DCw278V20f9MIHTrhYds4YP4G0Sbr3oIKpb
+ C9zJUc1NzHlCDVcmceF8tzHEAxs8HgVc+2D7KKFcx2REcARWgmxrJ0gMoVR7Aczg3IGK
+ SxOJ7+3mMgUM5goJq4KkORxHZTY0lsyNLN2HAzcz2KMiJ/RvUCV9ofx1N03ZABv8ByHh
+ 2i9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=bNCR6BSZrVAsd51s0wYru1/heSmPhGDxRbakfLjjL5g=;
- b=KfNgUaA7IOkVVonlVoa9JN7WEh5DiNuycGpMlHNhJdExWJfRnzfNaZEm9506qwvrag
- cM3tL5d+ZogBL4C2LmSx2L78+abt62l2dcGAT25Vdue7C1iWpX8gPYwfaFsoWW+o5YKM
- Sfl8FQWT0eVTwAz41IgYtV/UG0HZA+j3iSdkSenxmXv5NPTBGvYSKPbK+ngzXzKPTA5l
- /GW1BDI8HHSMhDSh17BjeOMYQE0retYmjGZaGenOcetuTChN4Dr71AWSK3QiYxSTBUvm
- 6HU9Mza8Fmpela9LgImEkE6MhqQ0uP9bmBp2A2nwvrNW3n9oQuMl90KEFVmYcKEFa38+
- 5InA==
-X-Gm-Message-State: APjAAAX9PaW1IW7AKh6qFgiTaRs5mdEwjubGFINVAmmsNSb6daMW14S4
- rJhR2/EhfGvCMpicPGgdx4duiDL0
-X-Google-Smtp-Source: APXvYqyUwCJcL/6q6Iitne1OuIt4XXxrssT9TPxTKhfdyG8m0rDACFOGdYIlUnfVUghgCBZuWcxAqw==
-X-Received: by 2002:a5d:46cb:: with SMTP id g11mr3624013wrs.253.1561081362502; 
- Thu, 20 Jun 2019 18:42:42 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=w+7TSfA05al3vMslcz/SOoRJBM36JJMcPLAo6eroszE=;
+ b=Oqx4tn8vF9WViqOyxRyo9KLi94+msz+TUOkpq1WgC0o7vjdSGeGuRPvjEU+4utaFgh
+ RXrJQPPGKKdkc3dNOKsWV1oauB1DgP2oxy9YOhVVd/rV03GJCR4bm9+Qy8FjTmliafwA
+ J1R+PSw0BmpyhnneaScDlerJW7X/WvwAQz3zCb06Rrx981eIfphqrTSjEfDEkNkhabEh
+ qQIlu39jmAPMsq6wdYFwt8wXd7aZT9SwH1j23Bgofv3KDQMlqYhQvANP8xb5XK/Pmv6u
+ 37N3ue36rmRwTDhyLl6bGh3XurSmv1qih9qfa1l30kLWFs+gATRyByLTFPteGLBJGVjt
+ c+vg==
+X-Gm-Message-State: APjAAAXYbOBokruxjbnizKkrWBMCr2VhpvHnZZlxBV0m5mDZS2tRskHC
+ w6OAPFL6Qf2ujUiqul/lswhfSplV
+X-Google-Smtp-Source: APXvYqzcL+W9RHHl9XT4iNd8YFG/KTiBMK4KrLimZLiRByB8I83h+WDd9OgH9/3QFlkMqC3PW1pdOw==
+X-Received: by 2002:adf:f04d:: with SMTP id t13mr12675015wro.36.1561081352238; 
+ Thu, 20 Jun 2019 18:42:32 -0700 (PDT)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id d1sm1123125wru.41.2019.06.20.18.42.41
+ by smtp.gmail.com with ESMTPSA id d1sm1123125wru.41.2019.06.20.18.42.31
+ for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 20 Jun 2019 18:42:41 -0700 (PDT)
+ Thu, 20 Jun 2019 18:42:31 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 21 Jun 2019 03:42:14 +0200
-Message-Id: <1561081350-3723-10-git-send-email-pbonzini@redhat.com>
+Date: Fri, 21 Jun 2019 03:42:05 +0200
+Message-Id: <1561081350-3723-1-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1561081350-3723-1-git-send-email-pbonzini@redhat.com>
-References: <1561081350-3723-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::433
-Subject: [Qemu-devel] [PULL 09/25] i386/kvm: hv-tlbflush/ipi require
- hv-vpindex
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PULL 00/25] Misc (mostly x86) patches for 2019-06-21
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,48 +92,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
+The following changes since commit 33d609990621dea6c7d056c86f707b8811320ac1:
 
-The corresponding hypercalls require using VP indexes.
+  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-06-18 17:00:52 +0100)
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Message-Id: <20190517141924.19024-8-vkuznets@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- target/i386/kvm.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+are available in the git repository at:
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 58afa31..1dfa282 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -782,7 +782,8 @@ static struct {
-             {.fw = FEAT_HV_RECOMM_EAX,
-              .bits = HV_REMOTE_TLB_FLUSH_RECOMMENDED |
-              HV_EX_PROCESSOR_MASKS_RECOMMENDED}
--        }
-+        },
-+        .dependencies = BIT(HYPERV_FEAT_VPINDEX)
-     },
-     [HYPERV_FEAT_EVMCS] = {
-         .desc = "enlightened VMCS (hv-evmcs)",
-@@ -797,7 +798,8 @@ static struct {
-             {.fw = FEAT_HV_RECOMM_EAX,
-              .bits = HV_CLUSTER_IPI_RECOMMENDED |
-              HV_EX_PROCESSOR_MASKS_RECOMMENDED}
--        }
-+        },
-+        .dependencies = BIT(HYPERV_FEAT_VPINDEX)
-     },
- };
- 
+
+  git://github.com/bonzini/qemu.git tags/for-upstream
+
+for you to fetch changes up to 15e7ea4a8e0ed97361fefabb04c6a9aaebe321df:
+
+  hw: Nuke hw_compat_4_0_1 and pc_compat_4_0_1 (2019-06-21 02:29:40 +0200)
+
+----------------------------------------------------------------
+* Nuke hw_compat_4_0_1 and pc_compat_4_0_1 (Greg)
+* Static analysis fixes (Igor, Lidong)
+* X86 Hyper-V CPUID improvements (Vitaly)
+* X86 nested virt migration (Liran)
+* New MSR-based features (Xiaoyao)
+
+----------------------------------------------------------------
+Colin Xu (1):
+      hax: Honor CPUState::halted
+
+Greg Kurz (1):
+      hw: Nuke hw_compat_4_0_1 and pc_compat_4_0_1
+
+Lidong Chen (2):
+      sd: Fix out-of-bounds assertions
+      util/main-loop: Fix incorrect assertion
+
+Liran Alon (10):
+      target/i386: kvm: Delete VMX migration blocker on vCPU init failure
+      KVM: Introduce kvm_arch_destroy_vcpu()
+      target/i386: kvm: Use symbolic constant for #DB/#BP exception constants
+      target/i386: kvm: Re-inject #DB to guest with updated DR6
+      target/i386: kvm: Block migration for vCPUs exposed with nested virtualization
+      linux-headers: sync with latest KVM headers from Linux 5.2
+      vmstate: Add support for kernel integer types
+      target/i386: kvm: Add support for save and restore nested state
+      target/i386: kvm: Add support for KVM_CAP_EXCEPTION_PAYLOAD
+      target/i386: kvm: Add nested migration blocker only when kernel lacks required capabilities
+
+Vitaly Kuznetsov (9):
+      i386/kvm: convert hyperv enlightenments properties from bools to bits
+      i386/kvm: add support for KVM_GET_SUPPORTED_HV_CPUID
+      i386/kvm: move Hyper-V CPUID filling to hyperv_handle_properties()
+      i386/kvm: document existing Hyper-V enlightenments
+      i386/kvm: implement 'hv-passthrough' mode
+      i386/kvm: hv-stimer requires hv-time and hv-synic
+      i386/kvm: hv-tlbflush/ipi require hv-vpindex
+      i386/kvm: hv-evmcs requires hv-vapic
+      i386/kvm: add support for Direct Mode for Hyper-V synthetic timers
+
+Xiaoyao Li (1):
+      target/i386: define a new MSR based feature word - FEAT_CORE_CAPABILITY
+
+Yury Kotov (1):
+      kvm-all: Add/update fprintf's for kvm_*_ioeventfd_del
+
+ accel/kvm/kvm-all.c         |  25 +-
+ cpus.c                      |   1 -
+ docs/hyperv.txt             | 201 +++++++++
+ hw/core/machine.c           |   5 +-
+ hw/i386/pc.c                |   6 +-
+ hw/i386/pc_q35.c            |  12 +-
+ hw/sd/sd.c                  |   4 +-
+ include/hw/boards.h         |   3 -
+ include/hw/i386/pc.h        |   3 -
+ include/migration/vmstate.h |  26 ++
+ include/sysemu/kvm.h        |   2 +
+ linux-headers/asm-x86/kvm.h |  33 +-
+ target/arm/kvm32.c          |   5 +
+ target/arm/kvm64.c          |   5 +
+ target/i386/cpu.c           |  81 +++-
+ target/i386/cpu.h           |  75 +++-
+ target/i386/hax-all.c       |  36 +-
+ target/i386/hvf/hvf.c       |  10 +-
+ target/i386/hvf/x86hvf.c    |   4 +-
+ target/i386/hyperv-proto.h  |   1 +
+ target/i386/hyperv.c        |   2 +-
+ target/i386/kvm.c           | 999 +++++++++++++++++++++++++++++++++-----------
+ target/i386/machine.c       | 284 ++++++++++++-
+ target/mips/kvm.c           |   5 +
+ target/ppc/kvm.c            |   5 +
+ target/s390x/kvm.c          |  10 +
+ util/main-loop.c            |   2 +-
+ 27 files changed, 1516 insertions(+), 329 deletions(-)
+ create mode 100644 docs/hyperv.txt
 -- 
 1.8.3.1
-
 
 
