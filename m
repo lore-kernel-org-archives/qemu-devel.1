@@ -2,67 +2,69 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A37C2C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 14:03:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC925C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 14:06:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C6DA2083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 14:03:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C6DA2083B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 852D021537
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 14:06:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 852D021537
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35294 helo=lists.gnu.org)
+Received: from localhost ([::1]:35324 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heK8r-0000vF-JL
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 10:03:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59393)
+	id 1heKBJ-0003jN-Oc
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 10:06:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58791)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1heJze-0005oZ-MQ
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 09:54:20 -0400
+ (envelope-from <mlureau@redhat.com>) id 1heJxs-0004Da-OE
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 09:52:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1heJzc-0002Ck-Pf
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 09:54:18 -0400
-Resent-Date: Fri, 21 Jun 2019 09:54:18 -0400
-Resent-Message-Id: <E1heJzc-0002Ck-Pf@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21467)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1heJzc-00029Y-K8
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 09:54:16 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1561125228; cv=none; d=zoho.com; s=zohoarc; 
- b=RTyU71FIMbz8QiLnghMzbGtFxJYD2wwGiXdOiHMBs71KgO6bHVBydCBBQlhvLaVy+HQ8K51LrmSIYHPp4YQkpiIY/4e0dLAqThOGd8ZHlkN7YQ10r8lV8/09G2aNSVc/xgYe/8X4B6yCniIgDpdU615CDJeIZa1cnddYUBrhgAE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1561125228;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=9JmYmk/yg/XqxAeU9CcABAZNXsBUKGMn89Jn3KPIv0o=; 
- b=cSOET5aGyDZN5fcMWKb06bq5bcWFwlw6/1NNjQ5PTa3+lrDu//fX7LLPuzbMlhhewelXi4kyJn/nmktCWC0ALFzS5uPb3PpclfMm8nEFl4Mue4l/QT3aHb6k4c9QpLFRLEZFaqlEacfmYmXqDSJsMNfQVWBHx2yklIdlAPT45tU=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1561125227824410.8884676618551;
- Fri, 21 Jun 2019 06:53:47 -0700 (PDT)
-In-Reply-To: <1561116620-22245-1-git-send-email-pbonzini@redhat.com>
-Message-ID: <156112522699.1396.16881215372332861528@ce79690b2cb9>
+ (envelope-from <mlureau@redhat.com>) id 1heJxr-0000BX-KA
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 09:52:28 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:34373)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1heJxr-00008c-G4
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 09:52:27 -0400
+Received: by mail-ot1-f66.google.com with SMTP id n5so6385982otk.1
+ for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 06:52:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=IAXGhDuUFucViQqpG2UYLxicdRsxhydTaYPtkAwcF2U=;
+ b=dlPRJpV2bTZpgOW2jc0fa4OllWJc6+0jKiiAn0GupwhiJDcmsdGj4hGGf0xLx1y/Nw
+ RjYGuFlyXRSyBZA8OOcvIz4x3r3Ka78Z2ldi3xlgIUb3g0hd1QiED0+Zfinh0VnWPPGe
+ ewJHa3mLPELwwM/OGwI6PKNdTOkejhtfbZQaZJMFpmNJQPdDjUgSmdqJTRPedRHVwsla
+ aBtnUAl0idTeoSPqglCtGCEzMlhym0FNVK/vlOn5txKXjJqCsAvslKivMq7JvJNyUDVL
+ OA+w2+3szGsCswOKesHfrKPsFcth5JI9kCEipGSOU9onrcPa5wZ2PANq2WH0xHY0Yo/i
+ MBIA==
+X-Gm-Message-State: APjAAAV4S4sFb1L6v1dLt12NV8WbK5cNMUKWYFPuLWQY+4Euw9/8oajf
+ walo9R2oL2Yu96YldttV6ZUG8d1vDwVLBgcSVgYWlA==
+X-Google-Smtp-Source: APXvYqxT3r73tLPyBpqp6z++VDPSlAY0crq0owm6Y8JRwLZb1dp4PXD4rNsVPwI39lG6/GElBX4gTXRtbP8xk/lyDm0=
+X-Received: by 2002:a9d:3f06:: with SMTP id m6mr45407513otc.62.1561125145906; 
+ Fri, 21 Jun 2019 06:52:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: pbonzini@redhat.com
-Date: Fri, 21 Jun 2019 06:53:47 -0700 (PDT)
-X-ZohoMailClient: External
+References: <20190621094005.4134-1-stefanha@redhat.com>
+ <20190621094005.4134-5-stefanha@redhat.com>
+In-Reply-To: <20190621094005.4134-5-stefanha@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Fri, 21 Jun 2019 15:52:14 +0200
+Message-ID: <CAMxuvaw4EknmmpHhhN1HxvkkzE8qMuWc-AQDuCgpr-xOJE2f6Q@mail.gmail.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [PULL v2 00/25] Misc (mostly x86) patches for
- 2019-06-21
+ [fuzzy]
+X-Received-From: 209.85.210.66
+Subject: Re: [Qemu-devel] [PATCH 4/4] docs: avoid vhost-user-net specifics
+ in multiqueue section
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,140 +76,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org
+Cc: Sebastien Boeuf <sebastien.boeuf@intel.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTYxMTE2NjIwLTIyMjQ1LTEt
-Z2l0LXNlbmQtZW1haWwtcGJvbnppbmlAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBz
-ZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93
-IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVs
-XSBbUFVMTCB2MiAwMC8yNV0gTWlzYyAobW9zdGx5IHg4NikgcGF0Y2hlcyBmb3IgMjAxOS0wNi0y
-MQpNZXNzYWdlLWlkOiAxNTYxMTE2NjIwLTIyMjQ1LTEtZ2l0LXNlbmQtZW1haWwtcGJvbnppbmlA
-cmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2
-LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
-LnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0
-Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5n
-IDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dp
-dGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hl
-dy8yMDE5MDYyMTEzMjMyNC4yMTY1LTEtbXJlaXR6QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5
-MDYyMTEzMjMyNC4yMTY1LTEtbXJlaXR6QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJh
-bmNoICd0ZXN0JwpjZjY2ZTU1IGh3OiBOdWtlIGh3X2NvbXBhdF80XzBfMSBhbmQgcGNfY29tcGF0
-XzRfMF8xCjZjODhlM2EgdXRpbC9tYWluLWxvb3A6IEZpeCBpbmNvcnJlY3QgYXNzZXJ0aW9uCjEz
-MzcxYjEgc2Q6IEZpeCBvdXQtb2YtYm91bmRzIGFzc2VydGlvbnMKMGI4MzdkOSB0YXJnZXQvaTM4
-Njoga3ZtOiBBZGQgbmVzdGVkIG1pZ3JhdGlvbiBibG9ja2VyIG9ubHkgd2hlbiBrZXJuZWwgbGFj
-a3MgcmVxdWlyZWQgY2FwYWJpbGl0aWVzCjE1ODMwNDggdGFyZ2V0L2kzODY6IGt2bTogQWRkIHN1
-cHBvcnQgZm9yIEtWTV9DQVBfRVhDRVBUSU9OX1BBWUxPQUQKNGU0ZDM5MiB0YXJnZXQvaTM4Njog
-a3ZtOiBBZGQgc3VwcG9ydCBmb3Igc2F2ZSBhbmQgcmVzdG9yZSBuZXN0ZWQgc3RhdGUKYzk1MmZk
-MiB2bXN0YXRlOiBBZGQgc3VwcG9ydCBmb3Iga2VybmVsIGludGVnZXIgdHlwZXMKYmUwYmMyYSBs
-aW51eC1oZWFkZXJzOiBzeW5jIHdpdGggbGF0ZXN0IEtWTSBoZWFkZXJzIGZyb20gTGludXggNS4y
-CmZjYzEyM2MgdGFyZ2V0L2kzODY6IGt2bTogQmxvY2sgbWlncmF0aW9uIGZvciB2Q1BVcyBleHBv
-c2VkIHdpdGggbmVzdGVkIHZpcnR1YWxpemF0aW9uCmZmMGU3ZGYgdGFyZ2V0L2kzODY6IGt2bTog
-UmUtaW5qZWN0ICNEQiB0byBndWVzdCB3aXRoIHVwZGF0ZWQgRFI2CmIwM2MzZmYgdGFyZ2V0L2kz
-ODY6IGt2bTogVXNlIHN5bWJvbGljIGNvbnN0YW50IGZvciAjREIvI0JQIGV4Y2VwdGlvbiBjb25z
-dGFudHMKNjdlYTMzYiBLVk06IEludHJvZHVjZSBrdm1fYXJjaF9kZXN0cm95X3ZjcHUoKQo5ZTI2
-YjMyIHRhcmdldC9pMzg2OiBrdm06IERlbGV0ZSBWTVggbWlncmF0aW9uIGJsb2NrZXIgb24gdkNQ
-VSBpbml0IGZhaWx1cmUKNzAyMGY4OSB0YXJnZXQvaTM4NjogZGVmaW5lIGEgbmV3IE1TUiBiYXNl
-ZCBmZWF0dXJlIHdvcmQgLSBGRUFUX0NPUkVfQ0FQQUJJTElUWQozYTBkNDk1IGkzODYva3ZtOiBh
-ZGQgc3VwcG9ydCBmb3IgRGlyZWN0IE1vZGUgZm9yIEh5cGVyLVYgc3ludGhldGljIHRpbWVycwo2
-YTcxMjdhIGkzODYva3ZtOiBodi1ldm1jcyByZXF1aXJlcyBodi12YXBpYwpjNzUxNGI0IGkzODYv
-a3ZtOiBodi10bGJmbHVzaC9pcGkgcmVxdWlyZSBodi12cGluZGV4CjUxY2RmYWMgaTM4Ni9rdm06
-IGh2LXN0aW1lciByZXF1aXJlcyBodi10aW1lIGFuZCBodi1zeW5pYwoxZjAyZTczIGkzODYva3Zt
-OiBpbXBsZW1lbnQgJ2h2LXBhc3N0aHJvdWdoJyBtb2RlCmFlYWY2ZjggaTM4Ni9rdm06IGRvY3Vt
-ZW50IGV4aXN0aW5nIEh5cGVyLVYgZW5saWdodGVubWVudHMKODJkMWM4MSBpMzg2L2t2bTogbW92
-ZSBIeXBlci1WIENQVUlEIGZpbGxpbmcgdG8gaHlwZXJ2X2hhbmRsZV9wcm9wZXJ0aWVzKCkKZjVl
-MDkzMiBpMzg2L2t2bTogYWRkIHN1cHBvcnQgZm9yIEtWTV9HRVRfU1VQUE9SVEVEX0hWX0NQVUlE
-CmIwYjg5ZGEgaTM4Ni9rdm06IGNvbnZlcnQgaHlwZXJ2IGVubGlnaHRlbm1lbnRzIHByb3BlcnRp
-ZXMgZnJvbSBib29scyB0byBiaXRzCmQ0OWVmYjEgaGF4OiBIb25vciBDUFVTdGF0ZTo6aGFsdGVk
-CjExM2NmZTQga3ZtLWFsbDogQWRkL3VwZGF0ZSBmcHJpbnRmJ3MgZm9yIGt2bV8qX2lvZXZlbnRm
-ZF9kZWwKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMjUgQ2hlY2tpbmcgY29tbWl0IDExM2NmZTQy
-OWEwNyAoa3ZtLWFsbDogQWRkL3VwZGF0ZSBmcHJpbnRmJ3MgZm9yIGt2bV8qX2lvZXZlbnRmZF9k
-ZWwpCjIvMjUgQ2hlY2tpbmcgY29tbWl0IGQ0OWVmYjEzMWRlMSAoaGF4OiBIb25vciBDUFVTdGF0
-ZTo6aGFsdGVkKQpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEg
-c2VwYXJhdGUgbGluZQojNzc6IEZJTEU6IHRhcmdldC9pMzg2L2hheC1hbGwuYzo0Nzk6CisgICAg
-LyogQWZ0ZXIgYSB2Y3B1IGlzIGhhbHRlZCAoZWl0aGVyIGJlY2F1c2UgaXQgaXMgYW4gQVAgYW5k
-IGhhcyBqdXN0IGJlZW4KCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyog
-b24gYSBzZXBhcmF0ZSBsaW5lCiMxMDk6IEZJTEU6IHRhcmdldC9pMzg2L2hheC1hbGwuYzo1MTk6
-CisgICAgICAgIC8qIElmIHRoaXMgdmNwdSBpcyBoYWx0ZWQsIHdlIG11c3Qgbm90IGFzayBIQVhN
-IHRvIHJ1biBpdC4gSW5zdGVhZCwgd2UKCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgNjAg
-bGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8yNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgozLzI1
-IENoZWNraW5nIGNvbW1pdCBiMGI4OWRhYTNjNTkgKGkzODYva3ZtOiBjb252ZXJ0IGh5cGVydiBl
-bmxpZ2h0ZW5tZW50cyBwcm9wZXJ0aWVzIGZyb20gYm9vbHMgdG8gYml0cykKNC8yNSBDaGVja2lu
-ZyBjb21taXQgZjVlMDkzMjA2NzFiIChpMzg2L2t2bTogYWRkIHN1cHBvcnQgZm9yIEtWTV9HRVRf
-U1VQUE9SVEVEX0hWX0NQVUlEKQo1LzI1IENoZWNraW5nIGNvbW1pdCA4MmQxYzgxNDdhNTQgKGkz
-ODYva3ZtOiBtb3ZlIEh5cGVyLVYgQ1BVSUQgZmlsbGluZyB0byBoeXBlcnZfaGFuZGxlX3Byb3Bl
-cnRpZXMoKSkKNi8yNSBDaGVja2luZyBjb21taXQgYWVhZjZmODg1OThmIChpMzg2L2t2bTogZG9j
-dW1lbnQgZXhpc3RpbmcgSHlwZXItViBlbmxpZ2h0ZW5tZW50cykKV0FSTklORzogYWRkZWQsIG1v
-dmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwoj
-MTg6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAx
-ODEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNi8yNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo3
-LzI1IENoZWNraW5nIGNvbW1pdCAxZjAyZTczOGQ5NTMgKGkzODYva3ZtOiBpbXBsZW1lbnQgJ2h2
-LXBhc3N0aHJvdWdoJyBtb2RlKQo4LzI1IENoZWNraW5nIGNvbW1pdCA1MWNkZmFjNGZjYTMgKGkz
-ODYva3ZtOiBodi1zdGltZXIgcmVxdWlyZXMgaHYtdGltZSBhbmQgaHYtc3luaWMpCjkvMjUgQ2hl
-Y2tpbmcgY29tbWl0IGM3NTE0YjQ0ZTJkMCAoaTM4Ni9rdm06IGh2LXRsYmZsdXNoL2lwaSByZXF1
-aXJlIGh2LXZwaW5kZXgpCjEwLzI1IENoZWNraW5nIGNvbW1pdCA2YTcxMjdhOTc1NTIgKGkzODYv
-a3ZtOiBodi1ldm1jcyByZXF1aXJlcyBodi12YXBpYykKMTEvMjUgQ2hlY2tpbmcgY29tbWl0IDNh
-MGQ0OTUyNDg5OCAoaTM4Ni9rdm06IGFkZCBzdXBwb3J0IGZvciBEaXJlY3QgTW9kZSBmb3IgSHlw
-ZXItViBzeW50aGV0aWMgdGltZXJzKQoxMi8yNSBDaGVja2luZyBjb21taXQgNzAyMGY4OWYyZjA4
-ICh0YXJnZXQvaTM4NjogZGVmaW5lIGEgbmV3IE1TUiBiYXNlZCBmZWF0dXJlIHdvcmQgLSBGRUFU
-X0NPUkVfQ0FQQUJJTElUWSkKMTMvMjUgQ2hlY2tpbmcgY29tbWl0IDllMjZiMzI5YzM4NSAodGFy
-Z2V0L2kzODY6IGt2bTogRGVsZXRlIFZNWCBtaWdyYXRpb24gYmxvY2tlciBvbiB2Q1BVIGluaXQg
-ZmFpbHVyZSkKMTQvMjUgQ2hlY2tpbmcgY29tbWl0IDY3ZWEzM2JjYzQ5ZSAoS1ZNOiBJbnRyb2R1
-Y2Uga3ZtX2FyY2hfZGVzdHJveV92Y3B1KCkpCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2
-ZXIgdXNlIHRhYnMKIzYxOiBGSUxFOiB0YXJnZXQvYXJtL2t2bTMyLmM6MjQ1OgorXklyZXR1cm4g
-MDskCgpFUlJPUjogZ19mcmVlKE5VTEwpIGlzIHNhZmUgdGhpcyBjaGVjayBpcyBwcm9iYWJseSBu
-b3QgcmVxdWlyZWQKIzk2OiBGSUxFOiB0YXJnZXQvaTM4Ni9rdm0uYzoxNjg3OgorICAgIGlmIChj
-cHUtPmt2bV9tc3JfYnVmKSB7CisgICAgICAgIGdfZnJlZShjcHUtPmt2bV9tc3JfYnVmKTsKCnRv
-dGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgOTYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTQvMjUg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjE1LzI1IENoZWNraW5nIGNvbW1pdCBiMDNjM2Zm
-YmIyNmUgKHRhcmdldC9pMzg2OiBrdm06IFVzZSBzeW1ib2xpYyBjb25zdGFudCBmb3IgI0RCLyNC
-UCBleGNlcHRpb24gY29uc3RhbnRzKQoxNi8yNSBDaGVja2luZyBjb21taXQgZmYwZTdkZmExMjA3
-ICh0YXJnZXQvaTM4Njoga3ZtOiBSZS1pbmplY3QgI0RCIHRvIGd1ZXN0IHdpdGggdXBkYXRlZCBE
-UjYpCjE3LzI1IENoZWNraW5nIGNvbW1pdCBmY2MxMjNjYTVjOGUgKHRhcmdldC9pMzg2OiBrdm06
-IEJsb2NrIG1pZ3JhdGlvbiBmb3IgdkNQVXMgZXhwb3NlZCB3aXRoIG5lc3RlZCB2aXJ0dWFsaXph
-dGlvbikKMTgvMjUgQ2hlY2tpbmcgY29tbWl0IGJlMGJjMmE0MWNhOCAobGludXgtaGVhZGVyczog
-c3luYyB3aXRoIGxhdGVzdCBLVk0gaGVhZGVycyBmcm9tIExpbnV4IDUuMikKMTkvMjUgQ2hlY2tp
-bmcgY29tbWl0IGM5NTJmZDIzOThlZiAodm1zdGF0ZTogQWRkIHN1cHBvcnQgZm9yIGtlcm5lbCBp
-bnRlZ2VyIHR5cGVzKQoyMC8yNSBDaGVja2luZyBjb21taXQgNGU0ZDM5MmI1ZjMwICh0YXJnZXQv
-aTM4Njoga3ZtOiBBZGQgc3VwcG9ydCBmb3Igc2F2ZSBhbmQgcmVzdG9yZSBuZXN0ZWQgc3RhdGUp
-CkVSUk9SOiBnX2ZyZWUoTlVMTCkgaXMgc2FmZSB0aGlzIGNoZWNrIGlzIHByb2JhYmx5IG5vdCBy
-ZXF1aXJlZAojMTMwOiBGSUxFOiB0YXJnZXQvaTM4Ni9rdm0uYzoxNzEyOgorICAgIGlmIChlbnYt
-Pm5lc3RlZF9zdGF0ZSkgeworICAgICAgICBnX2ZyZWUoZW52LT5uZXN0ZWRfc3RhdGUpOwoKRVJS
-T1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiMzMTY6IEZJTEU6
-IHRhcmdldC9pMzg2L21hY2hpbmUuYzo5MzU6CisgICAgLnN1YnNlY3Rpb25zID0gKGNvbnN0IFZN
-U3RhdGVEZXNjcmlwdGlvbipbXSkgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBeCgpFUlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNl
-cyBhcmUgbm90IHJlcXVpcmVkCiMzNDU6IEZJTEU6IHRhcmdldC9pMzg2L21hY2hpbmUuYzo5NjQ6
-CisgICAgcmV0dXJuIChlbnYtPm5lc3RlZF9zdGF0ZSAmJgoKRVJST1I6IHNwYWNlcyByZXF1aXJl
-ZCBhcm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiM0MDc6IEZJTEU6IHRhcmdldC9pMzg2L21hY2hp
-bmUuYzoxMDI2OgorICAgIC5zdWJzZWN0aW9ucyA9IChjb25zdCBWTVN0YXRlRGVzY3JpcHRpb24q
-W10pIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90
-YWw6IDQgZXJyb3JzLCAwIHdhcm5pbmdzLCAzODYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMjAvMjUg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjIxLzI1IENoZWNraW5nIGNvbW1pdCAxNTgzMDQ4
-ODVlNTEgKHRhcmdldC9pMzg2OiBrdm06IEFkZCBzdXBwb3J0IGZvciBLVk1fQ0FQX0VYQ0VQVElP
-Tl9QQVlMT0FEKQoyMi8yNSBDaGVja2luZyBjb21taXQgMGI4MzdkOTU5NWQ4ICh0YXJnZXQvaTM4
-Njoga3ZtOiBBZGQgbmVzdGVkIG1pZ3JhdGlvbiBibG9ja2VyIG9ubHkgd2hlbiBrZXJuZWwgbGFj
-a3MgcmVxdWlyZWQgY2FwYWJpbGl0aWVzKQoyMy8yNSBDaGVja2luZyBjb21taXQgMTMzNzFiMWFk
-OTk1IChzZDogRml4IG91dC1vZi1ib3VuZHMgYXNzZXJ0aW9ucykKMjQvMjUgQ2hlY2tpbmcgY29t
-bWl0IDZjODhlM2E2Mjc0MSAodXRpbC9tYWluLWxvb3A6IEZpeCBpbmNvcnJlY3QgYXNzZXJ0aW9u
-KQoyNS8yNSBDaGVja2luZyBjb21taXQgY2Y2NmU1NWM0ZGJlIChodzogTnVrZSBod19jb21wYXRf
-NF8wXzEgYW5kIHBjX2NvbXBhdF80XzBfMSkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
-bmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0
-cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU2MTExNjYyMC0yMjI0NS0xLWdpdC1zZW5kLWVtYWlsLXBi
-b256aW5pQHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpF
-bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcu
-b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQu
-Y29t
+On Fri, Jun 21, 2019 at 11:41 AM Stefan Hajnoczi <stefanha@redhat.com> wrot=
+e:
+>
+> The "Multiple queue support" section makes references to vhost-user-net
+> "queue pairs".  This is confusing for two reasons:
+> 1. This actually applies to all device types, not just vhost-user-net.
+> 2. VHOST_USER_GET_QUEUE_NUM returns the number of virtqueues, not the
+>    number of queue pairs.
+>
+> Reword the section so that the vhost-user-net specific part is relegated
+> to the very end: we acknowledge that vhost-user-net historically
+> automatically enabled the first queue pair.
+>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+> ---
+>  docs/interop/vhost-user.rst | 21 +++++++++++----------
+>  1 file changed, 11 insertions(+), 10 deletions(-)
+>
+> diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
+> index dc0ff9211f..5750668aba 100644
+> --- a/docs/interop/vhost-user.rst
+> +++ b/docs/interop/vhost-user.rst
+> @@ -324,19 +324,20 @@ must support changing some configuration aspects on=
+ the fly.
+>  Multiple queue support
+>  ----------------------
+>
+> -Multiple queue is treated as a protocol extension, hence the slave has
+> -to implement protocol features first. The multiple queues feature is
+> -supported only when the protocol feature ``VHOST_USER_PROTOCOL_F_MQ``
+> -(bit 0) is set.
+> +Multiple queue support allows the slave to advertise the maximum number =
+of
+> +queues.  This is treated as a protocol extension, hence the slave has to
+> +implement protocol features first. The multiple queues feature is suppor=
+ted
+> +only when the protocol feature ``VHOST_USER_PROTOCOL_F_MQ`` (bit 0) is s=
+et.
+>
+> -The max number of queue pairs the slave supports can be queried with
+> -message ``VHOST_USER_GET_QUEUE_NUM``. Master should stop when the
+> -number of requested queues is bigger than that.
+> +The max number of queues the slave supports can be queried with message
+> +``VHOST_USER_GET_QUEUE_NUM``. Master should stop when the number of requ=
+ested
+> +queues is bigger than that.
+>
+>  As all queues share one connection, the master uses a unique index for e=
+ach
+> -queue in the sent message to identify a specified queue. One queue pair
+> -is enabled initially. More queues are enabled dynamically, by sending
+> -message ``VHOST_USER_SET_VRING_ENABLE``.
+> +queue in the sent message to identify a specified queue.
+> +
+> +The master enables queues by sending message ``VHOST_USER_SET_VRING_ENAB=
+LE``.
+> +vhost-user-net has historically automatically enabled the first queue pa=
+ir.
+>
+>  Migration
+>  ---------
+> --
+> 2.21.0
+>
 
