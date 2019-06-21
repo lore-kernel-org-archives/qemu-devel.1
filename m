@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AF39C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 06:54:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BD1CC43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 06:55:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5842F2083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 06:54:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 40A8F2083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 06:55:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="VzG0pRWh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5842F2083B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="m5PgaNpB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40A8F2083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55116 helo=lists.gnu.org)
+Received: from localhost ([::1]:55118 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heDRh-00065p-On
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 02:54:51 -0400
+	id 1heDRw-0006D5-D6
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 02:55:04 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:56672)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwankhede@nvidia.com>) id 1heDKv-0008Eu-67
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 02:47:54 -0400
+ (envelope-from <kwankhede@nvidia.com>) id 1heDLN-0008Eu-2f
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 02:48:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1heDI2-0000UX-1X
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 02:44:51 -0400
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:17428)
+ (envelope-from <kwankhede@nvidia.com>) id 1heDCC-0004LP-UK
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 02:38:50 -0400
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:17152)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1heDI1-0000NB-9i
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 02:44:49 -0400
+ id 1heDCC-0004JC-14
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 02:38:48 -0400
 Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
  hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5d0c7ce00000>; Thu, 20 Jun 2019 23:44:48 -0700
+ id <B5d0c7b740000>; Thu, 20 Jun 2019 23:38:44 -0700
 Received: from hqmail.nvidia.com ([172.20.161.6])
  by hqpgpgate101.nvidia.com (PGP Universal service);
- Thu, 20 Jun 2019 23:44:47 -0700
+ Thu, 20 Jun 2019 23:38:42 -0700
 X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Thu, 20 Jun 2019 23:44:47 -0700
-Received: from [10.24.71.210] (172.20.13.39) by HQMAIL107.nvidia.com
+ by hqpgpgate101.nvidia.com on Thu, 20 Jun 2019 23:38:42 -0700
+Received: from [10.24.71.210] (10.124.1.5) by HQMAIL107.nvidia.com
  (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 21 Jun
- 2019 06:44:35 +0000
-To: Yan Zhao <yan.y.zhao@intel.com>
+ 2019 06:38:32 +0000
+To: Alex Williamson <alex.williamson@redhat.com>
 References: <1561041461-22326-1-git-send-email-kwankhede@nvidia.com>
- <1561041461-22326-4-git-send-email-kwankhede@nvidia.com>
- <20190621001228.GE9303@joy-OptiPlex-7040>
+ <1561041461-22326-9-git-send-email-kwankhede@nvidia.com>
+ <20190620132505.1cf64ac5@x1.home>
 X-Nvconfidentiality: public
 From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <20a0f8c4-e555-6a4d-598a-b72beac6a62f@nvidia.com>
-Date: Fri, 21 Jun 2019 12:14:30 +0530
+Message-ID: <9256515a-f815-58e1-c9ca-81d64bac6db1@nvidia.com>
+Date: Fri, 21 Jun 2019 12:08:26 +0530
 MIME-Version: 1.0
-In-Reply-To: <20190621001228.GE9303@joy-OptiPlex-7040>
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL106.nvidia.com (172.18.146.12) To
+In-Reply-To: <20190620132505.1cf64ac5@x1.home>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL108.nvidia.com (172.18.146.13) To
  HQMAIL107.nvidia.com (172.20.187.13)
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1561099489; bh=ttEsADUXYr6aQeHpPG+ugVUie+6ZSbsA9GSH8lE5Ptg=;
+ t=1561099124; bh=Eexj3FijL5GRfasXvd/K2eVD0H6Q5w3bzGmMbqGkbx4=;
  h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
  Message-ID:Date:MIME-Version:In-Reply-To:X-Originating-IP:
  X-ClientProxiedBy:Content-Type:Content-Language:
  Content-Transfer-Encoding;
- b=VzG0pRWh20ZTeETPVXmAsY/wtS3OhVhMfz5QjDzE7nR/U+JNdb9WANEcWhqFZA9NQ
- cQRHInjGcARDRKt/PoWOiiPp4S3M2NGSETvOcHuD2iee/ugoGdozuaBHvEM+ut39RC
- 82s9KQGpitRJyZ1J/O539n88sqS/WK/YuTMl7L3iLPctJfI8wfj8nJ5bTSVr6Jey9b
- GUOeyj0YASHfW+IZcc2fpKS4fAi4vHFA7Y3xZQ35hYMmiza88D6iQhiKQItbfSeeAR
- 4qbDKxp1a8V1Dbe45qP0AETn2hGJHoWzBFa36VdIm6MDavg8a8jMiuQ2TfnWWpougE
- zDJ0gJoc778nQ==
+ b=m5PgaNpBD9rqM3FTeB7HaFl23k+6V0q/vOfhdggKWcIkpGsl5uM2jz0VPHI3vBGFW
+ PXrQkRu2xhX23mqJtaH9cSWPjLlZMbqJNmRso9N5wiL2fF5Z3/fHLVODRHrr6gzwq6
+ etzf0MReNuWwFbTd/Qal1DByj87WAqr3g3YFpFBn0Tk4DXoEn+slgneWYIwfdm/fuh
+ hZ3R7cB0/dZQnbnkTbM8l7Ee8hpFwONDyI/4vXo6bETjeFagILxs204LBwlOwgpxSg
+ wJryZqxUBkRQg/Hhrq+ToRTCwW+F8v5qklIuE2BmJ1oji/ACHUb9vXZjhhXaJQZWQD
+ EJCNv6+TMKNgg==
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8
 X-Received-From: 216.228.121.64
-Subject: Re: [Qemu-devel] [PATCH v4 03/13] vfio: Add save and load functions
- for VFIO PCI devices
+Subject: Re: [Qemu-devel] [PATCH v4 08/13] vfio: Add save state functions to
+ SaveVMHandlers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,221 +90,376 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "cjia@nvidia.com" <cjia@nvidia.com>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang, 
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, yulei.zhang@intel.com, eauger@redhat.com,
+ felipe@nutanix.com, jonathan.davies@nutanix.com, yan.y.zhao@intel.com,
+ changpeng.liu@intel.com, Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 6/21/2019 5:42 AM, Yan Zhao wrote:
-> On Thu, Jun 20, 2019 at 10:37:31PM +0800, Kirti Wankhede wrote:
->> These functions save and restore PCI device specific data - config
->> space of PCI device.
->> Tested save and restore with MSI and MSIX type.
+On 6/21/2019 12:55 AM, Alex Williamson wrote:
+> On Thu, 20 Jun 2019 20:07:36 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> 
+>> Added .save_live_pending, .save_live_iterate and .save_live_complete_precopy
+>> functions. These functions handles pre-copy and stop-and-copy phase.
 >>
+>> In _SAVING|_RUNNING device state or pre-copy phase:
+>> - read pending_bytes
+>> - read data_offset - indicates kernel driver to write data to staging
+>>   buffer which is mmapped.
+> 
+> Why is data_offset the trigger rather than data_size?  It seems that
+> data_offset can't really change dynamically since it might be mmap'd,
+> so it seems unnatural to bother re-reading it.
+> 
+
+Vendor driver can change data_offset, he can have different data_offset
+for device data and dirty pages bitmap.
+
+>> - read data_size - amount of data in bytes written by vendor driver in migration
+>>   region.
+>> - if data section is trapped, pread() number of bytes in data_size, from
+>>   data_offset.
+>> - if data section is mmaped, read mmaped buffer of size data_size.
+>> - Write data packet to file stream as below:
+>> {VFIO_MIG_FLAG_DEV_DATA_STATE, data_size, actual data,
+>> VFIO_MIG_FLAG_END_OF_STATE }
+>>
+>> In _SAVING device state or stop-and-copy phase
+>> a. read config space of device and save to migration file stream. This
+>>    doesn't need to be from vendor driver. Any other special config state
+>>    from driver can be saved as data in following iteration.
+>> b. read pending_bytes - indicates kernel driver to write data to staging
+>>    buffer which is mmapped.
+> 
+> Is it pending_bytes or data_offset that triggers the write out of
+> data?  Why pending_bytes vs data_size?  I was interpreting
+> pending_bytes as the total data size while data_size is the size
+> available to read now, so assumed data_size would be more closely
+> aligned to making the data available.
+> 
+
+Sorry, that's my mistake while editing, its read data_offset as in above
+case.
+
+>> c. read data_size - amount of data in bytes written by vendor driver in
+>>    migration region.
+>> d. if data section is trapped, pread() from data_offset of size data_size.
+>> e. if data section is mmaped, read mmaped buffer of size data_size.
+> 
+> Should this read as "pread() from data_offset of data_size, or
+> optionally if mmap is supported on the data area, read data_size from
+> start of mapped buffer"?  IOW, pread should always work.  Same in
+> previous section.
+> 
+
+ok. I'll update.
+
+>> f. Write data packet as below:
+>>    {VFIO_MIG_FLAG_DEV_DATA_STATE, data_size, actual data}
+>> g. iterate through steps b to f until (pending_bytes > 0)
+> 
+> s/until/while/
+
+Ok.
+
+> 
+>> h. Write {VFIO_MIG_FLAG_END_OF_STATE}
+>>
+>> .save_live_iterate runs outside the iothread lock in the migration case, which
+>> could race with asynchronous call to get dirty page list causing data corruption
+>> in mapped migration region. Mutex added here to serial migration buffer read
+>> operation.
+> 
+> Would we be ahead to use different offsets within the region for device
+> data vs dirty bitmap to avoid this?
+>
+
+Lock will still be required to serialize the read/write operations on
+vfio_device_migration_info structure in the region.
+
+
 >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 >> Reviewed-by: Neo Jia <cjia@nvidia.com>
 >> ---
->>  hw/vfio/pci.c | 112 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>  hw/vfio/pci.h |  29 +++++++++++++++
->>  2 files changed, 141 insertions(+)
+>>  hw/vfio/migration.c | 212 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 212 insertions(+)
 >>
->> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
->> index ce3fe96efe2c..09a0821a5b1c 100644
->> --- a/hw/vfio/pci.c
->> +++ b/hw/vfio/pci.c
->> @@ -1187,6 +1187,118 @@ void vfio_pci_write_config(PCIDevice *pdev,
->>      }
+>> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+>> index fe0887c27664..0a2f30872316 100644
+>> --- a/hw/vfio/migration.c
+>> +++ b/hw/vfio/migration.c
+>> @@ -107,6 +107,111 @@ static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t state)
+>>      return 0;
 >>  }
 >>  
->> +void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
+>> +static int vfio_save_buffer(QEMUFile *f, VFIODevice *vbasedev)
 >> +{
->> +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
->> +    PCIDevice *pdev = &vdev->pdev;
->> +    uint16_t pci_cmd;
->> +    int i;
+>> +    VFIOMigration *migration = vbasedev->migration;
+>> +    VFIORegion *region = &migration->region.buffer;
+>> +    uint64_t data_offset = 0, data_size = 0;
+>> +    int ret;
 >> +
->> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
->> +        uint32_t bar;
->> +
->> +        bar = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, 4);
->> +        qemu_put_be32(f, bar);
+>> +    ret = pread(vbasedev->fd, &data_offset, sizeof(data_offset),
+>> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
+>> +                                             data_offset));
+>> +    if (ret != sizeof(data_offset)) {
+>> +        error_report("Failed to get migration buffer data offset %d",
+>> +                     ret);
+>> +        return -EINVAL;
 >> +    }
 >> +
->> +    qemu_put_be32(f, vdev->interrupt);
->> +    if (vdev->interrupt == VFIO_INT_MSI) {
->> +        uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
->> +        bool msi_64bit;
->> +
->> +        msi_flags = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
->> +                                            2);
->> +        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
->> +
->> +        msi_addr_lo = pci_default_read_config(pdev,
->> +                                         pdev->msi_cap + PCI_MSI_ADDRESS_LO, 4);
->> +        qemu_put_be32(f, msi_addr_lo);
->> +
->> +        if (msi_64bit) {
->> +            msi_addr_hi = pci_default_read_config(pdev,
->> +                                             pdev->msi_cap + PCI_MSI_ADDRESS_HI,
->> +                                             4);
->> +        }
->> +        qemu_put_be32(f, msi_addr_hi);
->> +
->> +        msi_data = pci_default_read_config(pdev,
->> +                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
->> +                2);
->> +        qemu_put_be32(f, msi_data);
->> +    } else if (vdev->interrupt == VFIO_INT_MSIX) {
->> +        uint16_t offset;
->> +
->> +        /* save enable bit and maskall bit */
->> +        offset = pci_default_read_config(pdev,
->> +                                       pdev->msix_cap + PCI_MSIX_FLAGS + 1, 2);
->> +        qemu_put_be16(f, offset);
->> +        msix_save(pdev, f);
+>> +    ret = pread(vbasedev->fd, &data_size, sizeof(data_size),
+>> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
+>> +                                             data_size));
+>> +    if (ret != sizeof(data_size)) {
+>> +        error_report("Failed to get migration buffer data size %d",
+>> +                     ret);
+>> +        return -EINVAL;
 >> +    }
->> +    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
->> +    qemu_put_be16(f, pci_cmd);
->> +}
 >> +
->> +void vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
->> +{
->> +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
->> +    PCIDevice *pdev = &vdev->pdev;
->> +    uint32_t interrupt_type;
->> +    uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
->> +    uint16_t pci_cmd;
->> +    bool msi_64bit;
->> +    int i;
+>> +    if (data_size > 0) {
+>> +        void *buf = NULL;
+>> +        bool buffer_mmaped = false;
 >> +
->> +    /* retore pci bar configuration */
->> +    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
->> +    vfio_pci_write_config(pdev, PCI_COMMAND,
->> +                        pci_cmd & (!(PCI_COMMAND_IO | PCI_COMMAND_MEMORY)), 2);
->> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
->> +        uint32_t bar = qemu_get_be32(f);
+>> +        if (region->mmaps) {
+>> +            int i;
 >> +
->> +        vfio_pci_write_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, bar, 4);
->> +    }
->> +    vfio_pci_write_config(pdev, PCI_COMMAND,
->> +                          pci_cmd | PCI_COMMAND_IO | PCI_COMMAND_MEMORY, 2);
->> +
->> +    interrupt_type = qemu_get_be32(f);
->> +
->> +    if (interrupt_type == VFIO_INT_MSI) {
->> +        /* restore msi configuration */
->> +        msi_flags = pci_default_read_config(pdev,
->> +                                            pdev->msi_cap + PCI_MSI_FLAGS, 2);
->> +        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
->> +
->> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
->> +                              msi_flags & (!PCI_MSI_FLAGS_ENABLE), 2);
->> +
->> +        msi_addr_lo = qemu_get_be32(f);
->> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_LO,
->> +                              msi_addr_lo, 4);
->> +
->> +        msi_addr_hi = qemu_get_be32(f);
->> +        if (msi_64bit) {
->> +            vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_HI,
->> +                                  msi_addr_hi, 4);
->> +        }
->> +        msi_data = qemu_get_be32(f);
->> +        vfio_pci_write_config(pdev,
->> +                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
->> +                msi_data, 2);
->> +
->> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
->> +                              msi_flags | PCI_MSI_FLAGS_ENABLE, 2);
->> +    } else if (interrupt_type == VFIO_INT_MSIX) {
->> +        uint16_t offset = qemu_get_be16(f);
->> +
->> +        /* load enable bit and maskall bit */
->> +        vfio_pci_write_config(pdev, pdev->msix_cap + PCI_MSIX_FLAGS + 1,
->> +                              offset, 2);
->> +        msix_load(pdev, f);
->> +    }
->> +    pci_cmd = qemu_get_be16(f);
->> +    vfio_pci_write_config(pdev, PCI_COMMAND, pci_cmd, 2);
->> +}
->> +
-> per the previous discussion, pci config state save/restore are better
-> defined in fileds of VMStateDescription.
+>> +            for (i = 0; i < region->nr_mmaps; i++) {
+>> +                if ((data_offset >= region->mmaps[i].offset) &&
+>> +                    (data_offset < region->mmaps[i].offset +
+>> +                                   region->mmaps[i].size)) {
+>> +                    buf = region->mmaps[i].mmap + (data_offset -
+>> +                                                   region->mmaps[i].offset);
 > 
+> So you're expecting that data_offset is somewhere within the data
+> area.  Why doesn't the data always simply start at the beginning of the
+> data area?  ie. data_offset would coincide with the beginning of the
+> mmap'able area (if supported) and be static.  Does this enable some
+> functionality in the vendor driver?
+
+Do you want to enforce that to vendor driver?
+From the feedback on previous version I thought vendor driver should
+define data_offset within the region
+"I'd suggest that the vendor driver expose a read-only
+data_offset that matches a sparse mmap capability entry should the
+driver support mmap.  The use should always read or write data from the
+vendor defined data_offset"
+
+This also adds flexibility to vendor driver such that vendor driver can
+define different data_offset for device data and dirty page bitmap
+within same mmaped region.
+
+>  Does resume data need to be
+> written from the same offset where it's read?
+
+No, resume data should be written from the data_offset that vendor
+driver provided during resume.
+
+> 
+>> +                    buffer_mmaped = true;
+>> +                    break;
+>> +                }
+>> +            }
+>> +        }
+>> +
+>> +        if (!buffer_mmaped) {
+>> +            buf = g_malloc0(data_size);
+>> +            ret = pread(vbasedev->fd, buf, data_size,
+>> +                        region->fd_offset + data_offset);
+>> +            if (ret != data_size) {
+>> +                error_report("Failed to get migration data %d", ret);
+>> +                g_free(buf);
+>> +                return -EINVAL;
+>> +            }
+>> +        }
+>> +
+>> +        qemu_put_be64(f, data_size);
+>> +        qemu_put_buffer(f, buf, data_size);
+>> +
+>> +        if (!buffer_mmaped) {
+>> +            g_free(buf);
+>> +        }
+>> +        migration->pending_bytes -= data_size;
+>> +    } else {
+>> +        qemu_put_be64(f, data_size);
+>> +    }
+>> +
+>> +    ret = qemu_file_get_error(f);
+>> +
+>> +    return data_size;
+>> +}
+>> +
+>> +static int vfio_update_pending(VFIODevice *vbasedev)
+>> +{
+>> +    VFIOMigration *migration = vbasedev->migration;
+>> +    VFIORegion *region = &migration->region.buffer;
+>> +    uint64_t pending_bytes = 0;
+>> +    int ret;
+>> +
+>> +    ret = pread(vbasedev->fd, &pending_bytes, sizeof(pending_bytes),
+>> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
+>> +                                             pending_bytes));
+> 
+> Did this trigger the vendor driver to write out to the data area when
+> we don't need it to?
 > 
 
-With that route there is no pre-copy phase and we do want pre-copy phase
-for VFIO devices. Vendor driver can skip pre-copy phase by doing nothing
-on any read/write operation during pre-copy phase.
+No, as I mentioned above, I'll update the description.
 
 Thanks,
 Kirti
 
->>  /*
->>   * Interrupt setup
->>   */
->> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
->> index 834a90d64686..847be5f56478 100644
->> --- a/hw/vfio/pci.h
->> +++ b/hw/vfio/pci.h
->> @@ -19,6 +19,7 @@
->>  #include "qemu/queue.h"
->>  #include "qemu/timer.h"
+>> +    if ((ret < 0) || (ret != sizeof(pending_bytes))) {
+>> +        error_report("Failed to get pending bytes %d", ret);
+>> +        migration->pending_bytes = 0;
+>> +        return (ret < 0) ? ret : -EINVAL;
+>> +    }
+>> +
+>> +    migration->pending_bytes = pending_bytes;
+>> +    return 0;
+>> +}
+>> +
+>> +static int vfio_save_device_config_state(QEMUFile *f, void *opaque)
+>> +{
+>> +    VFIODevice *vbasedev = opaque;
+>> +
+>> +    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_CONFIG_STATE);
+>> +
+>> +    if (vbasedev->type == VFIO_DEVICE_TYPE_PCI) {
+>> +        vfio_pci_save_config(vbasedev, f);
+>> +    }
+>> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
+>> +
+>> +    return qemu_file_get_error(f);
+>> +}
+>> +
+>>  /* ---------------------------------------------------------------------- */
 >>  
->> +#ifdef CONFIG_LINUX
->>  #define PCI_ANY_ID (~0)
+>>  static int vfio_save_setup(QEMUFile *f, void *opaque)
+>> @@ -163,9 +268,116 @@ static void vfio_save_cleanup(void *opaque)
+>>      }
+>>  }
 >>  
->>  struct VFIOPCIDevice;
->> @@ -202,4 +203,32 @@ void vfio_display_reset(VFIOPCIDevice *vdev);
->>  int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp);
->>  void vfio_display_finalize(VFIOPCIDevice *vdev);
+>> +static void vfio_save_pending(QEMUFile *f, void *opaque,
+>> +                              uint64_t threshold_size,
+>> +                              uint64_t *res_precopy_only,
+>> +                              uint64_t *res_compatible,
+>> +                              uint64_t *res_postcopy_only)
+>> +{
+>> +    VFIODevice *vbasedev = opaque;
+>> +    VFIOMigration *migration = vbasedev->migration;
+>> +    int ret;
+>> +
+>> +    ret = vfio_update_pending(vbasedev);
+>> +    if (ret) {
+>> +        return;
+>> +    }
+>> +
+>> +    if (vbasedev->device_state & VFIO_DEVICE_STATE_RUNNING) {
+>> +        *res_precopy_only += migration->pending_bytes;
+>> +    } else {
+>> +        *res_postcopy_only += migration->pending_bytes;
+>> +    }
+>> +    *res_compatible += 0;
+>> +}
+>> +
+>> +static int vfio_save_iterate(QEMUFile *f, void *opaque)
+>> +{
+>> +    VFIODevice *vbasedev = opaque;
+>> +    VFIOMigration *migration = vbasedev->migration;
+>> +    int ret;
+>> +
+>> +    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_DATA_STATE);
+>> +
+>> +    qemu_mutex_lock(&migration->lock);
+>> +    ret = vfio_save_buffer(f, vbasedev);
+>> +    qemu_mutex_unlock(&migration->lock);
+>> +
+>> +    if (ret < 0) {
+>> +        error_report("vfio_save_buffer failed %s",
+>> +                     strerror(errno));
+>> +        return ret;
+>> +    }
+>> +
+>> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
+>> +
+>> +    ret = qemu_file_get_error(f);
+>> +    if (ret) {
+>> +        return ret;
+>> +    }
+>> +
+>> +    return ret;
+>> +}
+>> +
+>> +static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
+>> +{
+>> +    VFIODevice *vbasedev = opaque;
+>> +    VFIOMigration *migration = vbasedev->migration;
+>> +    int ret;
+>> +
+>> +    ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_SAVING);
+>> +    if (ret) {
+>> +        error_report("Failed to set state STOP and SAVING");
+>> +        return ret;
+>> +    }
+>> +
+>> +    ret = vfio_save_device_config_state(f, opaque);
+>> +    if (ret) {
+>> +        return ret;
+>> +    }
+>> +
+>> +    ret = vfio_update_pending(vbasedev);
+>> +    if (ret) {
+>> +        return ret;
+>> +    }
+>> +
+>> +    while (migration->pending_bytes > 0) {
+>> +        qemu_put_be64(f, VFIO_MIG_FLAG_DEV_DATA_STATE);
+>> +        ret = vfio_save_buffer(f, vbasedev);
+>> +        if (ret < 0) {
+>> +            error_report("Failed to save buffer");
+>> +            return ret;
+>> +        } else if (ret == 0) {
+>> +            break;
+>> +        }
+>> +
+>> +        ret = vfio_update_pending(vbasedev);
+>> +        if (ret) {
+>> +            return ret;
+>> +        }
+>> +    }
+>> +
+>> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
+>> +
+>> +    ret = qemu_file_get_error(f);
+>> +    if (ret) {
+>> +        return ret;
+>> +    }
+>> +
+>> +    ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_STOPPED);
+>> +    if (ret) {
+>> +        error_report("Failed to set state STOPPED");
+>> +        return ret;
+>> +    }
+>> +    return ret;
+>> +}
+>> +
+>>  static SaveVMHandlers savevm_vfio_handlers = {
+>>      .save_setup = vfio_save_setup,
+>>      .save_cleanup = vfio_save_cleanup,
+>> +    .save_live_pending = vfio_save_pending,
+>> +    .save_live_iterate = vfio_save_iterate,
+>> +    .save_live_complete_precopy = vfio_save_complete_precopy,
+>>  };
 >>  
->> +void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f);
->> +void vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f);
->> +
->> +static inline Object *vfio_pci_get_object(VFIODevice *vbasedev)
->> +{
->> +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
->> +
->> +    return OBJECT(vdev);
->> +}
->> +
->> +#else
->> +static inline void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
->> +{
->> +    g_assert(false);
->> +}
->> +
->> +static inline void vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
->> +{
->> +    g_assert(false);
->> +}
->> +
->> +static inline Object *vfio_pci_get_object(VFIODevice *vbasedev)
->> +{
->> +    return NULL;
->> +}
->> +
->> +#endif
->> +
->>  #endif /* HW_VFIO_VFIO_PCI_H */
->> -- 
->> 2.7.0
->>
+>>  /* ---------------------------------------------------------------------- */
+> 
 
