@@ -2,83 +2,101 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25F25C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 17:37:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1164EC43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 17:43:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9BB42083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 17:37:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C971F2083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 17:43:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eoiR3eiz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9BB42083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="KvWcegHK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C971F2083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37066 helo=lists.gnu.org)
+Received: from localhost ([::1]:37082 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heNTj-0005rp-PQ
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 13:37:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59345)
+	id 1heNZi-0007mq-Lr
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 13:43:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60446)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bobby.prani@gmail.com>) id 1heNT0-0005T3-EZ
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 13:36:51 -0400
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1heNYj-0007BU-Kr
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 13:42:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bobby.prani@gmail.com>) id 1heNSz-0006bj-3y
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 13:36:50 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:46912)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
- id 1heNSy-0006ZP-S4
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 13:36:49 -0400
-Received: by mail-io1-xd44.google.com with SMTP id i10so966242iol.13
- for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 10:36:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=5cfpFTXj48N+Gg9EW7pak7y3fghKsjChFuElCzgLo+I=;
- b=eoiR3eiz70GQlZqWVDGSiZ3p2c4Dz0tufqHwELvd2K/xct+ajLZSiNqqW26a3W4fGa
- EvuV3hTS5V+QenDd0l+hjvbACbinb30XbFjRcLqWOpEbzXKx0AbKAMP30BnSjq28hiNC
- 0T02qNYdHHHl5QLPtMmNzDWkZCtlkcVlcdEo9SJuz8Y9OJUqf0GOIcZp1a2cIDUOfGMD
- a+/qypFzrZRbvj4zo3AqgDZkXm4GkDuwXnxucv+hciVjH6sd+bjG3vBNJA4X5FJrKfZZ
- ZBy3xioOL4p0SQ+19fbgdnZx5v1n4+AOft0AnYfpmOqfzFl1Ot5zrJ6FxjZqZHRdq4tB
- 4PQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=5cfpFTXj48N+Gg9EW7pak7y3fghKsjChFuElCzgLo+I=;
- b=iEkk3Pqnqyz2RRgy9m3HTod5K7sQu828fZt4mQDuoiui3mwdIyIYl8ApKkM1KGI5AV
- 6X38/wjja8uEpR+yMNKL9x93H0id2DKL8mbkOoSY17rOuEbjgWD6TXyExFiwauOxAu3u
- 4mfx99X6QBL0BSye3bRuIQiDMb12I0vsnMtkWtmsm7kHWJ58fXxOPoNKz986iZ0i0rzL
- 4qfynicYgwMHyiL3UEqkcnYCNj8m4qVpvacVTSXOmffwZENbjpc2Uef4Mr5AWIhXgDRr
- eIlDXJOVmtZq6GK5EwJd2nkehuOZeh2uk0OvLIgWznzPqirM9EtVtnEsswOs2XUw1SSE
- hwMg==
-X-Gm-Message-State: APjAAAUl/1so7F9COevwWYmxD4wVC9LLkCC9fZ5PJD4w/Eo4jWmckEi0
- 42OCX1qbaGagnKy/M+c6i+O3rmZS4EWUdfBeki0=
-X-Google-Smtp-Source: APXvYqycIvq2arze/I2WRXENru0skbErbgnYiFc+Pbq4MXkrU6orEnxMindM47jdlqyZfSP4oE8lGuTD6uDRlF1fntM=
-X-Received: by 2002:a5e:c207:: with SMTP id v7mr27963303iop.163.1561138607260; 
- Fri, 21 Jun 2019 10:36:47 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190614171200.21078-1-alex.bennee@linaro.org>
- <CADYwmhFw8ujwz+NN9prKc+Za6=dD1aN==JnKmC0gnr4V7LPU4w@mail.gmail.com>
- <87r27n8i2f.fsf@zen.linaroharston>
-In-Reply-To: <87r27n8i2f.fsf@zen.linaroharston>
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Fri, 21 Jun 2019 10:36:21 -0700
-Message-ID: <CAJhHMCALe5K53OOmXae4dwa9wDn-RbDaPwdS-Xe+eA1PVbRG+Q@mail.gmail.com>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1heNYi-0005vg-Jw
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 13:42:45 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:48216)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
+ id 1heNYf-0005nH-M1; Fri, 21 Jun 2019 13:42:41 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5LHcjVo191239;
+ Fri, 21 Jun 2019 17:42:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : message-id :
+ content-type : mime-version : subject : date : in-reply-to : cc : to :
+ references; s=corp-2018-07-02;
+ bh=/VnxSNvJy4nP+dFtS48YFNI5Azr35fn9ScKh66OYdeo=;
+ b=KvWcegHK3e+jCBljT88tpRK38N4OchWSWPjKqhySZgQSIuOAkMlmHZrPMphnAoeQgp32
+ HS9AlOBb8AmshKAwMVWeEjfA51TbOVvcKuQMRSD+21h26T2vUCK/UB0TY17LXbvLTUld
+ /24tVTq8zjHU0cBDsZ/cqCFfCjU/vV+H0/JtDebviJeg1Uk4ju9du6Yr5h9dQ6OOUlXd
+ JJEmHw2kT7Fv5LjRbaGNONc5ueXEbYpXXZDwe5KWE32RHZEL20Zy2IeSDNDb9F+d7kBX
+ ycE4YN1GzFefokjQK68ArSnitfAKwmouOjsNou2BLjKmx7Lnh2QJ+HIjcI9yzuBmmeJh Ng== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2130.oracle.com with ESMTP id 2t7809qs9w-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 21 Jun 2019 17:42:35 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5LHgW6R083239;
+ Fri, 21 Jun 2019 17:42:35 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by userp3030.oracle.com with ESMTP id 2t77yparkc-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 21 Jun 2019 17:42:35 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5LHgXdA021010;
+ Fri, 21 Jun 2019 17:42:33 GMT
+Received: from [10.0.0.38] (/79.180.42.160)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Fri, 21 Jun 2019 10:42:33 -0700
+From: Sam Eiderman <shmuel.eiderman@oracle.com>
+Message-Id: <62F1EBAB-C7E8-42D1-BB6F-22C4945E51B5@oracle.com>
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Date: Fri, 21 Jun 2019 20:42:28 +0300
+In-Reply-To: <20190620143749.GC17015@morn.lan>
+To: "Kevin O'Connor" <kevin@koconnor.net>
+References: <20190619092352.23583-1-shmuel.eiderman@oracle.com>
+ <20190619092352.23583-4-shmuel.eiderman@oracle.com>
+ <20190620143749.GC17015@morn.lan>
+X-Mailer: Apple Mail (2.3445.104.11)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9295
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906210138
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9295
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906210137
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.86
+Content-Type: text/plain;
+	charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d44
-Subject: Re: [Qemu-devel] [PATCH v3 00/50] tcg plugin support
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [SeaBIOS] [PATCH v3 3/4] geometry: Add
+ boot_lchs_find_*() utility functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,140 +108,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Emilio G. Cota" <cota@braap.org>, qemu-devel <qemu-devel@nongnu.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, arbel.moshe@oracle.com,
+ seabios@seabios.org, qemu-devel@nongnu.org, mreitz@redhat.com,
+ liran.alon@oracle.com, kraxel@redhat.com, karl.heubaum@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 21, 2019 at 1:21 AM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
+Sounds reasonable, how do purpose to deal with:
 
-> > * Register and memory read/write API
-> >
-> >   It would be great to have register and memory read/write API i.e., ab=
-ility
-> >   to read/write to registers/memory from within the callback. This give=
-s the
-> >   plugin ability to do system introspection. (Not sure if the current p=
-atchset
-> >   implements this already).
->
-> Not currently. The trick is to have something flexible enough without
-> exposing internals. I guess we could consider the gdb register
-> enumeration or maybe hook into stuff declared as
-> tcg_global_mem_new_i[64|32]. That won't get every "register" but it
-> should certainly cover the main general purpose ones. Things like SVE
-> and AdvSIMD vector registers wouldn't be seen though.
+config BIOS_GEOMETRY
+config BOOTORDER
 
-I guess general registers could be a good starting point. We can then
-implement arch specific register access APIs.
+precompiler optouts?
 
->
-> > * Register callbacks
-> >
-> >   A callback needs to be invoked whenever a specified registers is read=
- or
-> >   written to.
->
-> Again tricky as not every register read/write is obvious from TCG -
-> vector registers tweaked from helpers would be a good example.
->
-> >
-> > * Where do new plugins live in the tree?
-> >
-> >   The current source files in plugins (api, core etc.,) I think are bet=
-ter if
-> >   moved to tcg/plugins/.  The various plugins we write would then live =
-in the
-> >   plugins/ folder instead of the current tests/plugin/ folder.
->
-> The example plugins are really just toys for experimenting with the API
-> - I don't see too much problem with them being in tests. However the
-> howvec plugin is very guest architecture specific so we could consider a
-> bit more of a hierarchy. Maybe these should all live in tests/tcg?
->
+If we don=E2=80=99t need any of them we also don=E2=80=99t need to call =
+=E2=80=9Cget_scsi_devpath", =E2=80=9Cget_ata_devpath=E2=80=9D, =
+=E2=80=9Cget_pci_dev_path=E2=80=9D.
 
-So where do you want 'real' plugins to live in the tree? It would be
-good to think about the structure for those.
+I=E2=80=99ll see what can be done.=20
 
-> >
-> > * Timer interrupts
-> >
-> >   What I observed is that the system execution is affected by what you =
-do in
-> >   the callbacks because of timer interrupts. For example, if you spend =
-time in
-> >   the memory callback doing a bit of processing and writing to a file, =
-you
-> >   will see more timer interrupt instructions. One solution to this woul=
-d be to
-> >   use 'icount', but it does not work that well. I think we need to do
-> >   something similar to what gdb does in debug mode. How would you handl=
-e MTTCG
-> >   guests in that case?
->
-> icount is going to be the best you can get for deterministic time -
-> other efforts to pause/restart virtual time going in and out of plugins
-> are just going to add a lot of overhead.
-
-I wonder why using icount is not working in this case. Are there any
-timers that fire non-deterministically even when icount is used?
-
->
-> Remember QEMU doesn't even try to be a cycle accurate emulation so
-> expecting to get reasonable timing information out of these plugins is a
-> stretch. Maybe I should make that clearer in the design document?
-
-It is less about being cycle accurate and more about being
-deterministic. For example, when tracing using plugins+callbacks, you
-will see a lot more interrupt code in the trace than when if you
-execute without tracing. How do we get them to be more similar?
-
-Another idea would be to provide an API for the plugin to generate the
-timer interrupt. This allows the plugin to generate regular interrupts
-irrespective of what is being done in the callbacks.
-
->
-> The gdb behaviour is just a massive hack. When single-stepping in GDB we
-> prevent timer IRQs from being delivered - they have still fired and are
-> pending and will execute as soon as you hit continue.
->
-> >   Another approach would be to offload callback generation to a separat=
-e
-> >   plugin thread. The main thread will copy data required by a callback =
-and
-> >   invoke the callback asynchronously (std::async in C++ if you are
-> >   familiar).
->
-> This would complicate things - the current iteration I'm working on
-> drops the haddr cb in favour of dynamically resolving the vaddr in the
-> callback. But that approach is only valid during the callback before
-> something else potentially pollutes the TLB.
->
-
-> >
-> > * Starting and stopping callback generation
-> >
-> >   It would be great if we have a mechanism to dynamically start/stop ca=
-llbacks
-> >   when a sequence of code (magic instruction) is executed. This would b=
-e
-> >   useful to annotate region-of-interest (ROI) in benchmarks to
-> > generate callbacks.
->
-> Well we have that now. At each TB generation event the callback is free t=
-o register
-> as many or few callbacks as it likes dynamically.
-
-But how does the plugin know that the TB being generated is the first
-TB in the ROI?
-Similarly the plugin needs to know the then end of ROI has been reached.
-
-Also, please note that there can be multiple ROIs. It would be good to
-know if we can assign ids to each ROI for the plugin.
-
-Thanks,
---=20
-Pranith
+> On 20 Jun 2019, at 17:37, Kevin O'Connor <kevin@koconnor.net> wrote:
+>=20
+> On Wed, Jun 19, 2019 at 12:23:51PM +0300, Sam Eiderman wrote:
+>> Adding the following utility functions:
+>>=20
+>>    * boot_lchs_find_pci_device
+>>    * boot_lchs_find_scsi_device
+>>    * boot_lchs_find_ata_device
+>=20
+> FWIW, this leads to a bit of code duplication.  I think it would be
+> preferable to refactor the bootprio_find_XYZ() calls.  Instead of
+> returning an 'int prio' they could return a znprintf'd 'char *devpath'
+> instead.  Then the boot_add_XYZ() calls could directly call
+> find_prio(devpath). The boot_add_hd() could then directly populate
+> drive->lchs or call setup_translation().
+>=20
+> -Kevin
 
