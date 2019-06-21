@@ -2,145 +2,101 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8C43C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 21:37:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F36E8C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 21:40:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98AE92075E
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 21:37:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98AE92075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BB8242075E
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 21:40:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="k66b4ThW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB8242075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38020 helo=lists.gnu.org)
+Received: from localhost ([::1]:38042 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heRDr-0002G8-Pw
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 17:37:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47022)
+	id 1heRGM-0004B4-2n
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 17:40:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47590)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1heRBL-0000o8-Qz
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 17:34:52 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1heRE6-0002sd-22
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 17:37:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1heRBK-0007ib-Mv
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 17:34:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54660)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1heRBF-0007bn-Qy; Fri, 21 Jun 2019 17:34:46 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 54CC7307CDF0;
- Fri, 21 Jun 2019 21:34:35 +0000 (UTC)
-Received: from [10.18.17.164] (dhcp-17-164.bos.redhat.com [10.18.17.164])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2317760BFB;
- Fri, 21 Jun 2019 21:34:34 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190620010356.19164-1-jsnow@redhat.com>
- <20190620010356.19164-7-jsnow@redhat.com>
- <f9296483-d48f-521f-1ddd-d514e56b8fdf@redhat.com>
- <c956b213-24bf-355a-02e3-6b39ba682ae4@redhat.com>
- <18f08b6a-fbe8-2899-6901-3ba59c39072d@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <ae88f725-d21a-28e8-0e6e-b78ec570129b@redhat.com>
-Date: Fri, 21 Jun 2019 17:34:33 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <liran.alon@oracle.com>) id 1heRE4-0001n6-3Q
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 17:37:41 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:39300)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1heRE1-0001lE-1Q
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 17:37:38 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5LLZ7wo070584;
+ Fri, 21 Jun 2019 21:37:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=mbp56QULTjJn+kLkBsD2OXcTeD+xe6Pzz2lTqaOV5tU=;
+ b=k66b4ThWEGUiZ51VOmx+QkWfNSqaqIK6mqzHBHvQmLcktUwQmXcTzYc49IJpLBa7nkqj
+ UVGTy4JG6KwobuGFvxGKBZqdMSKDLPpFVf8WLCY6GMmjS9Ce7FV752M6kDdLyc3pDXCb
+ FYpHif+FXzY5KY3cO2XU8fm5pn4+P4kqYI7NGWPm7mnJMvLtGQs1P88PBrEPtLGuzRxN
+ 0I4mtQ3r40Jd7iDOLOoEBNKN6xEdVWnYtt7CUvtibY+PxgR+MUOPcOjRVoO//w0zYw2X
+ rXkgIzsB3DOZ9VfVqoFDE4HeDKgslqhgJtRW9gRl+xDtNzZnLSRutRGx3FpO1Ie9Qu1j bQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by aserp2120.oracle.com with ESMTP id 2t7809rety-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 21 Jun 2019 21:37:34 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5LLaZgl186242;
+ Fri, 21 Jun 2019 21:37:34 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by aserp3020.oracle.com with ESMTP id 2t77yq5n83-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 21 Jun 2019 21:37:33 +0000
+Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5LLbWWM020889;
+ Fri, 21 Jun 2019 21:37:32 GMT
+Received: from Lirans-MBP.Home (/109.64.216.174)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Fri, 21 Jun 2019 14:37:32 -0700
+From: Liran Alon <liran.alon@oracle.com>
+To: qemu-devel@nongnu.org
+Date: Sat, 22 Jun 2019 00:37:11 +0300
+Message-Id: <20190621213712.16222-2-liran.alon@oracle.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190621213712.16222-1-liran.alon@oracle.com>
+References: <20190621213712.16222-1-liran.alon@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <18f08b6a-fbe8-2899-6901-3ba59c39072d@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Fri, 21 Jun 2019 21:34:35 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9295
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906210164
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9295
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906210164
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 06/12] block/dirty-bitmap: add
- bdrv_dirty_bitmap_claim
+X-MIME-Autoconverted: from 8bit to quoted-printable by aserp2120.oracle.com id
+ x5LLZ7wo070584
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 141.146.126.78
+Subject: [Qemu-devel] [PATCH 1/2] target/i386: kvm: Block migration on vCPU
+ exposed with SVM when kernel lacks caps to save/restore nested state
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -152,97 +108,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Xie Changlong <xiechanglong.d@gmail.com>,
- Markus Armbruster <armbru@redhat.com>, Wen Congyang <wencongyang2@huawei.com>
+Cc: maran.wilson@oracle.com, dgilbert@redhat.com,
+ Liran Alon <liran.alon@oracle.com>, pbonzini@redhat.com,
+ Karl Heubaum <karl.heubaum@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Commit 18ab37ba1cee ("target/i386: kvm: Block migration for vCPUs exposed=
+ with nested virtualization")
+was originally suppose to block migration for vCPUs exposed with nested v=
+irtualization, either Intel VMX
+or AMD SVM. However, during merge to upstream, commit was changed such th=
+at it doesn't even compile...
 
+This was done unintentionally in an attempt to modify submitted patch-ser=
+ies such that commit
+12604092e26c ("target/i386: kvm: Add nested migration blocker only when k=
+ernel lacks required capabilities")
+will only block migration of vCPU exposed with VMX but still allow migrat=
+ion of vCPU exposed
+with SVM.
 
-On 6/21/19 7:58 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 20.06.2019 19:36, John Snow wrote:
->>
->>
->> On 6/20/19 12:02 PM, Max Reitz wrote:
->>> On 20.06.19 03:03, John Snow wrote:
->>>> This function can claim an hbitmap to replace its own current hbitma=
-p.
->>>> In the case that the granularities do not match, it will use
->>>> hbitmap_merge to copy the bit data instead.
->>>
->>> I really do not like this name because to me it implies a relationshi=
-p
->>> to bdrv_reclaim_dirty_bitmap().  Maybe just bdrv_dirty_bitmap_take()?
->>> Or, if you want to get more fancy, bdrv_dirty_dirty_bitmap_steal().
->>> (Because references are taken or stolen.)
->>>
->>
->> take or steal is good. I just wanted to highlight that it truly takes
->> ownership. The double-pointer and erasing the caller's reference for
->> emphasis of this idea.
->=20
-> Didn't you consider bdrv_dirty_bitmap_set_hbitmap? Hmm, but your functi=
-on
-> actually eats pointer, so 'set' is not enough.. bdrv_dirty_bitmap_eat_h=
-bitmap?
->=20
+However, since QEMU commit 75d373ef9729 ("target-i386: Disable SVM by def=
+ault in KVM mode"),
+an AMD vCPU that is virtualized by KVM doesn=E2=80=99t expose SVM by defa=
+ult, even if you use "-cpu host".
+Therefore, it is unlikely that vCPU expose SVM CPUID flag when user is no=
+t running an SVM
+workload inside guest.
 
-:)
+Therefore, change code back to original intent to block migration in
+case of vCPU exposed with SVM if kernel does not support required
+capabilities to save/restore nested-state.
 
-> And to be serious: it is the point where we definitely should drop HBit=
-map:meta
-> field, as it in bad relation with parent hbitmap stealing.
->=20
+Fixes: 12604092e26c ("target/i386: kvm: Add nested migration blocker only=
+ when kernel lacks required capabilities")
+Reviewed-by: Mark Kanda <mark.kanda@oracle.com>
+Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+Signed-off-by: Liran Alon <liran.alon@oracle.com>
+---
+ target/i386/cpu.h     | 10 ++++++++++
+ target/i386/kvm.c     |  2 +-
+ target/i386/machine.c |  2 +-
+ 3 files changed, 12 insertions(+), 2 deletions(-)
 
-You're right, I didn't consider how this would interact with that. Allow
-me the time to re-audit how this feature works, there's clearly a lot of
-problems with what I've proposed for cross-granularity merging.
-
->>
->>> The latter might fit in nicely with the abdication theme.  We=E2=80=99=
-d just
->>> need to rename bdrv_reclaim_dirty_bitmap() to
->>> bdrv_dirty_bitmap_backstab(), and it=E2=80=99d be perfect.
->>>
->>
->> Don't tempt me; I do like my silly function names. You are lucky I don=
-'t
->> call
->>
->>> (On another note: bdrv_restore_dirty_bitmap() vs.
->>> bdrv_dirty_bitmap_restore() =E2=80=93 really? :-/)
->>>
->>
->> I have done a terrible job at enforcing any kind of consistency here,
->> and it gets me all the time too. I had a big series that re-arranged a=
-nd
->> re-named a ton of stuff just to make things a little more nicer, but I
->> let it bitrot because I didn't want to deal with the bike-shedding.
->>
->> I do agree I am in desperate need of a spring cleaning in here.
->>
->> One thing that does upset me quite often is that the canonical name fo=
-r
->> the structure is "bdrv dirty bitmap", which makes the function names a=
-ll
->> quite long.
->>
->>>> Signed-off-by: John Snow <jsnow@redhat.com>
->>>> ---
->>>>   include/block/block_int.h |  1 +
->>>>   include/qemu/hbitmap.h    |  8 ++++++++
->>>>   block/dirty-bitmap.c      | 14 ++++++++++++++
->>>>   util/hbitmap.c            |  5 +++++
->>>>   4 files changed, 28 insertions(+)
->>>
->>> The implementation looks good to me.
->>>
->>> Max
->>>
->>
->=20
->=20
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 93345792f4cb..cbe904beeb25 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1867,6 +1867,16 @@ static inline bool cpu_has_vmx(CPUX86State *env)
+     return env->features[FEAT_1_ECX] & CPUID_EXT_VMX;
+ }
+=20
++static inline bool cpu_has_svm(CPUX86State *env)
++{
++    return env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM;
++}
++
++static inline bool cpu_has_nested_virt(CPUX86State *env)
++{
++    return (cpu_has_vmx(env) || cpu_has_svm(env));
++}
++
+ /* fpu_helper.c */
+ void update_fp_status(CPUX86State *env);
+ void update_mxcsr_status(CPUX86State *env);
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index e4b4f5756a34..c2bae6a3023a 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1640,7 +1640,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+                                   !!(c->ecx & CPUID_EXT_SMX);
+     }
+=20
+-    if (cpu_has_vmx(env) && !nested_virt_mig_blocker &&
++    if (cpu_has_nested_virt(env) && !nested_virt_mig_blocker &&
+         ((kvm_max_nested_state_length() <=3D 0) || !has_exception_payloa=
+d)) {
+         error_setg(&nested_virt_mig_blocker,
+                    "Kernel do not provide required capabilities for "
+diff --git a/target/i386/machine.c b/target/i386/machine.c
+index 851b249d1a39..f4d502386df4 100644
+--- a/target/i386/machine.c
++++ b/target/i386/machine.c
+@@ -233,7 +233,7 @@ static int cpu_pre_save(void *opaque)
+=20
+ #ifdef CONFIG_KVM
+     /* Verify we have nested virtualization state from kernel if require=
+d */
+-    if (kvm_enabled() && cpu_has_vmx(env) && !env->nested_state) {
++    if (kvm_enabled() && cpu_has_nested_virt(env) && !env->nested_state)=
+ {
+         error_report("Guest enabled nested virtualization but kernel "
+                 "does not support saving of nested state");
+         return -EINVAL;
+--=20
+2.20.1
 
 
