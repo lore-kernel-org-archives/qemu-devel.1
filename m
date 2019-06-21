@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E52A3C48BE3
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 10:07:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B5EC43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 10:07:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C201120644
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 10:07:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C201120644
+	by mail.kernel.org (Postfix) with ESMTPS id D031C208CA
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 10:07:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D031C208CA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57908 helo=lists.gnu.org)
+Received: from localhost ([::1]:57912 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heGSH-0008Eg-N7
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 06:07:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53604)
+	id 1heGSJ-0008Iq-Tk
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 06:07:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53601)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1heGHE-0006Y1-2d
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1heGHE-0006Xz-2O
  for qemu-devel@nongnu.org; Fri, 21 Jun 2019 05:56:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1heGH9-0005dm-Jh
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1heGH9-0005df-IW
  for qemu-devel@nongnu.org; Fri, 21 Jun 2019 05:56:11 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:38827 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:38808 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1heGH9-0005d7-D2
+ id 1heGH9-0005d2-CL
  for qemu-devel@nongnu.org; Fri, 21 Jun 2019 05:56:07 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 41F4B1A45E5;
+ by mail.rt-rk.com (Postfix) with ESMTP id 0C8771A452A;
  Fri, 21 Jun 2019 11:54:57 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 014961A454A;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id ABED81A45D5;
  Fri, 21 Jun 2019 11:54:56 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 21 Jun 2019 11:54:48 +0200
-Message-Id: <1561110888-14022-11-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 21 Jun 2019 11:54:46 +0200
+Message-Id: <1561110888-14022-9-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1561110888-14022-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1561110888-14022-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PULL 10/10] target/mips: Fix emulation of
- ILVR.<B|H|W> on big endian host
+Subject: [Qemu-devel] [PULL 08/10] target/mips: Fix emulation of
+ ILVOD.<B|H|W> on big endian host
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,86 +70,86 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Fix emulation of ILVR.<B|H|W> on big endian host by applying
+Fix emulation of ILVOD.<B|H|W> on big endian host by applying
 mapping of data element indexes from one endian to another.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
-Message-Id: <1561038349-17105-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Message-Id: <1561038349-17105-3-git-send-email-aleksandar.markovic@rt-rk.com>
 ---
  target/mips/msa_helper.c | 37 +++++++++++++++++++++++++++++++++++++
  1 file changed, 37 insertions(+)
 
 diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index 458c840..7a9bfb3 100644
+index 215d8af..9f411c1 100644
 --- a/target/mips/msa_helper.c
 +++ b/target/mips/msa_helper.c
-@@ -2001,6 +2001,24 @@ void helper_msa_ilvr_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+@@ -1825,6 +1825,24 @@ void helper_msa_ilvod_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
  
      switch (df) {
      case DF_BYTE:
 +#if defined(TARGET_WORDS_BIGENDIAN)
-+        pwd->b[8]  = pws->b[0];
-+        pwd->b[9]  = pwt->b[0];
-+        pwd->b[10] = pws->b[1];
-+        pwd->b[11] = pwt->b[1];
-+        pwd->b[12] = pws->b[2];
-+        pwd->b[13] = pwt->b[2];
-+        pwd->b[14] = pws->b[3];
-+        pwd->b[15] = pwt->b[3];
-+        pwd->b[0]  = pws->b[4];
-+        pwd->b[1]  = pwt->b[4];
-+        pwd->b[2]  = pws->b[5];
-+        pwd->b[3]  = pwt->b[5];
-+        pwd->b[4]  = pws->b[6];
-+        pwd->b[5]  = pwt->b[6];
-+        pwd->b[6]  = pws->b[7];
-+        pwd->b[7]  = pwt->b[7];
++        pwd->b[7]  = pwt->b[6];
++        pwd->b[6]  = pws->b[6];
++        pwd->b[5]  = pwt->b[4];
++        pwd->b[4]  = pws->b[4];
++        pwd->b[3]  = pwt->b[2];
++        pwd->b[2]  = pws->b[2];
++        pwd->b[1]  = pwt->b[0];
++        pwd->b[0]  = pws->b[0];
++        pwd->b[15] = pwt->b[14];
++        pwd->b[14] = pws->b[14];
++        pwd->b[13] = pwt->b[12];
++        pwd->b[12] = pws->b[12];
++        pwd->b[11] = pwt->b[10];
++        pwd->b[10] = pws->b[10];
++        pwd->b[9]  = pwt->b[8];
++        pwd->b[8]  = pws->b[8];
 +#else
-         pwd->b[15] = pws->b[7];
-         pwd->b[14] = pwt->b[7];
-         pwd->b[13] = pws->b[6];
-@@ -2017,8 +2035,19 @@ void helper_msa_ilvr_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
-         pwd->b[2]  = pwt->b[1];
-         pwd->b[1]  = pws->b[0];
-         pwd->b[0]  = pwt->b[0];
+         pwd->b[0]  = pwt->b[1];
+         pwd->b[1]  = pws->b[1];
+         pwd->b[2]  = pwt->b[3];
+@@ -1841,8 +1859,19 @@ void helper_msa_ilvod_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+         pwd->b[13] = pws->b[13];
+         pwd->b[14] = pwt->b[15];
+         pwd->b[15] = pws->b[15];
 +#endif
          break;
      case DF_HALF:
 +#if defined(TARGET_WORDS_BIGENDIAN)
-+        pwd->h[4] = pws->h[0];
-+        pwd->h[5] = pwt->h[0];
-+        pwd->h[6] = pws->h[1];
-+        pwd->h[7] = pwt->h[1];
-+        pwd->h[0] = pws->h[2];
-+        pwd->h[1] = pwt->h[2];
-+        pwd->h[2] = pws->h[3];
-+        pwd->h[3] = pwt->h[3];
++        pwd->h[3] = pwt->h[2];
++        pwd->h[2] = pws->h[2];
++        pwd->h[1] = pwt->h[0];
++        pwd->h[0] = pws->h[0];
++        pwd->h[7] = pwt->h[6];
++        pwd->h[6] = pws->h[6];
++        pwd->h[5] = pwt->h[4];
++        pwd->h[4] = pws->h[4];
 +#else
-         pwd->h[7] = pws->h[3];
-         pwd->h[6] = pwt->h[3];
-         pwd->h[5] = pws->h[2];
-@@ -2027,12 +2056,20 @@ void helper_msa_ilvr_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
-         pwd->h[2] = pwt->h[1];
-         pwd->h[1] = pws->h[0];
-         pwd->h[0] = pwt->h[0];
+         pwd->h[0] = pwt->h[1];
+         pwd->h[1] = pws->h[1];
+         pwd->h[2] = pwt->h[3];
+@@ -1851,12 +1880,20 @@ void helper_msa_ilvod_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+         pwd->h[5] = pws->h[5];
+         pwd->h[6] = pwt->h[7];
+         pwd->h[7] = pws->h[7];
 +#endif
          break;
      case DF_WORD:
 +#if defined(TARGET_WORDS_BIGENDIAN)
-+        pwd->w[2] = pws->w[0];
-+        pwd->w[3] = pwt->w[0];
-+        pwd->w[0] = pws->w[1];
-+        pwd->w[1] = pwt->w[1];
++        pwd->w[1] = pwt->w[0];
++        pwd->w[0] = pws->w[0];
++        pwd->w[3] = pwt->w[2];
++        pwd->w[2] = pws->w[2];
 +#else
-         pwd->w[3] = pws->w[1];
-         pwd->w[2] = pwt->w[1];
-         pwd->w[1] = pws->w[0];
-         pwd->w[0] = pwt->w[0];
+         pwd->w[0] = pwt->w[1];
+         pwd->w[1] = pws->w[1];
+         pwd->w[2] = pwt->w[3];
+         pwd->w[3] = pws->w[3];
 +#endif
          break;
      case DF_DOUBLE:
-         pwd->d[1] = pws->d[0];
+         pwd->d[0] = pwt->d[1];
 -- 
 2.7.4
 
