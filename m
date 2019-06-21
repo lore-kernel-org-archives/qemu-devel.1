@@ -2,66 +2,85 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0C6CC43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 14:52:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76349C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 14:54:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD6C920679
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 14:52:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD6C920679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3DE5B20679
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 14:54:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pBwj2OxK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DE5B20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35758 helo=lists.gnu.org)
+Received: from localhost ([::1]:35782 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heKtn-0000xs-4W
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 10:52:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45910)
+	id 1heKvw-0003Wg-SL
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 10:54:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46178)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <crosa@redhat.com>) id 1heKoU-0003ID-Ge
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:46:52 -0400
+ (envelope-from <skrtbhtngr@gmail.com>) id 1heKoS-0003VW-C2
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:46:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1heKga-0002oK-0R
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:38:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35676)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1heKgZ-0002oB-Nt
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:38:39 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D866F6EB82;
- Fri, 21 Jun 2019 14:38:28 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-120-204.rdu2.redhat.com
- [10.10.120.204])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DB2F160572;
- Fri, 21 Jun 2019 14:38:18 +0000 (UTC)
-Date: Fri, 21 Jun 2019 10:38:16 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190621143816.GA24282@localhost.localdomain>
-References: <20190621060925.16214-1-crosa@redhat.com>
- <20190621060925.16214-2-crosa@redhat.com>
- <f18a5df8-201e-b8a1-1a3e-3e2254ce8b1e@redhat.com>
+ (envelope-from <skrtbhtngr@gmail.com>) id 1heKoQ-0006Ky-6f
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:46:48 -0400
+Received: from mail-pf1-x42f.google.com ([2607:f8b0:4864:20::42f]:46773)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <skrtbhtngr@gmail.com>)
+ id 1heKoP-0006Bh-TZ
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:46:46 -0400
+Received: by mail-pf1-x42f.google.com with SMTP id 81so3702408pfy.13
+ for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 07:46:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=8kxShQMD2pLEtqA5t1fFufIc2q0rmZaSupiozOi3vec=;
+ b=pBwj2OxKn27nxYH8bBh5lHrtbL0Qi9cPvukb0Je+bPIegmzx18nD353U6TLMKMLV3y
+ CftawFJSl0QlcOfiIZSLOJjqzCd09RiqHcTQa243VjJIY1+zBI54DruL+FNlLV39UoBI
+ PPCo2UNdkG9gq8kiSvifhStCJ2Jz0BTA1BS5AcT3P+//LHrVkDBXqQKoFcMxX2U4hJKc
+ HR0cv7af7TVkWRmhqSNJuvB8YhmQnkcKX3zteME93GAtJot+nqpuXK5pfefEJX6THzfV
+ jRogRtPdZ/L8PnhTUo5A7hsFO7b9jhwnxX+s2v39Wt1yR7Jjspc3RqRWr9bo/uW0/aNE
+ ZpKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=8kxShQMD2pLEtqA5t1fFufIc2q0rmZaSupiozOi3vec=;
+ b=akS5DShg3XTYfaTq61/VhcT5nMq9oWCi+/0igbcMBRNVPpufzsp7A5xcYwGfzfOFGs
+ ulYWFViuuvPRpe7XYP2pQqG6PXFFAJPLSRq7MPtyDPHlxqaJ2l/FmbfYqlRcn+NRzsW5
+ /MfosIcARdG4lwY/3Tubecii06QGoSSNxRNfRIMNDqz9ic+4xV4bAMycvB0Ega+zq/+x
+ O1DtmEHFT+1b5lwW2RZ1DMTV0jPWjsLFHLPrsaQdtSeVnqvCRN9bIRqWjUV6X+yHhYIU
+ ick3yAOLxOBjmSjFucmY266H5ByItAuu7hEDRyUKE7O1l0GmEpjfFxXWrk9TvYdZqPal
+ 7kmg==
+X-Gm-Message-State: APjAAAX788fk+gcOHPGGvvfQKBS5oM/3WsXFqXu556IMDP0CiZM/CTPa
+ qCThH9ex0/SEfz6DXgnRH0XjcJPs
+X-Google-Smtp-Source: APXvYqxN4eRJ6j5nvVBllDVtTBnzMfXR9LI6FuuWMm+ael01FxLU+zM/8ZrhqXdIljiVlssw6hsRfw==
+X-Received: by 2002:a17:90a:d587:: with SMTP id
+ v7mr7363237pju.28.1561128393170; 
+ Fri, 21 Jun 2019 07:46:33 -0700 (PDT)
+Received: from localhost.localdomain ([2405:204:2081:a5f2:5e1e:1cae:baa8:1943])
+ by smtp.gmail.com with ESMTPSA id v5sm3338591pgq.66.2019.06.21.07.46.29
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 21 Jun 2019 07:46:32 -0700 (PDT)
+From: Sukrit Bhatnagar <skrtbhtngr@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 21 Jun 2019 20:15:40 +0530
+Message-Id: <20190621144541.13770-1-skrtbhtngr@gmail.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <f18a5df8-201e-b8a1-1a3e-3e2254ce8b1e@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Fri, 21 Jun 2019 14:38:38 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] Acceptance tests: exclude "flaky" tests
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::42f
+Subject: [Qemu-devel] [RFC 0/1] Add live migration support to the PVRDMA
+ device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,198 +92,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Yuval Shaia <yuval.shaia@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 21, 2019 at 09:03:33AM +0200, Philippe Mathieu-Daud=E9 wrote:
-> On 6/21/19 8:09 AM, Cleber Rosa wrote:
-> > It's a fact that some tests may not be 100% reliable in all
-> > environments.  While it's a tough call to remove a useful test that
-> > from the tree because it may fail every 1/100th time (or so), having
-> > human attention drawn to known issues is very bad for humans and for
-> > the projects they manage.
-> >=20
-> > As a compromise solution, this marks tests that are known to have
-> > issues, or that exercises known issues in QEMU or other components,
-> > and excludes them from the entry point.  As a consequence, tests
-> > marked as "flaky" will not be executed as part of "make
-> > check-acceptance".
-> >=20
-> > Because such tests should be forgiven but never be forgotten, it's
-> > possible to list them with (assuming "make check-venv" or "make
-> > check-acceptance" has already initiatilized the venv):
-> >=20
-> >   $ ./tests/venv/bin/avocado list -t flaky tests/acceptance
-> >=20
-> > The current list of tests marked as flaky are a result of running
-> > the entire set of acceptance tests around 20 times.  The results
-> > were then processed with a helper script[1].  That either confirmed
-> > known issues (in the case of aarch64 and arm)[2] or revealed new
-> > ones (mips).
-> >=20
-> > This also bumps the Avocado version to one that includes a fix to the
-> > parsing of multiple and mix "key:val" and simple tag values.
-> >=20
-> > [1] https://raw.githubusercontent.com/avocado-framework/avocado/maste=
-r/contrib/scripts/summarize-job-failures.py
-> > [2] https://bugs.launchpad.net/qemu/+bug/1829779
-> >=20
-> > Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> > ---
-> >  docs/devel/testing.rst                   | 17 +++++++++++++++++
-> >  tests/Makefile.include                   |  6 +++++-
-> >  tests/acceptance/boot_linux_console.py   |  2 ++
-> >  tests/acceptance/linux_ssh_mips_malta.py |  2 ++
-> >  tests/requirements.txt                   |  2 +-
-> >  5 files changed, 27 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-> > index da2d0fc964..ff4d8e2e1c 100644
-> > --- a/docs/devel/testing.rst
-> > +++ b/docs/devel/testing.rst
-> > @@ -574,6 +574,23 @@ may be invoked by running:
-> > =20
-> >    tests/venv/bin/avocado run $OPTION1 $OPTION2 tests/acceptance/
-> > =20
-> > +Tagging tests
-> > +-------------
-> > +
-> > +flaky
-> > +~~~~~
-> > +
-> > +If a test is known to fail intermittently, even if only every one
-> > +hundredth time, it's highly advisable to mark it as a flaky test.
-> > +This will prevent these individual tests from failing much larger
-> > +jobs, will avoid human interaction and time wasted to verify a known
-> > +issue, and worse of all, can lead to the discredit of automated
-> > +testing.
-> > +
-> > +To mark a test as flaky, add to its docstring.::
-> > +
-> > +  :avocado: tags=3Dflaky
->=20
-> I certainly disagree with this patch, failing tests have to be fixed.
-> Why not tag all the codebase flaky and sing "happy coding"?
->
+Hi,
 
-That's a great idea! :)
+I am a GSoC participant, trying to implement live migration for the
+pvrdma device with help from my mentors Marcel and Yuval.
+My current task is to save and load the various addresses that the
+device uses for DMA mapping. We will be adding the device state into
+live migration, incrementally. As the first step in the implementation,
+we are performing migration to the same host. This will save us from
+many complexities, such as GID change, at this stage, and we will
+address migration across hosts at a later point when same-host migration
+works.
 
-Now, seriously, I also resisted this for quite a long time.  The
-reality, though, is that intermittent failures will continue to
-appear, and letting tests (and jobs, and CI pipelines, and whatnot)
-fail is a very bad idea.  We all agree that real fixes are better than
-this, but many times they don't come quickly.
+Currently, the save and load logic uses SaveVMHandlers, which is the
+legcay way, and will be ported to VMStateDescription once the
+existing issues are solved.
 
-> Anyway if this get accepted, 'flaky' tags must have the intermittent
-> failure well described, and a Launchpad/Bugzilla tracking ticket refere=
-nced.
->
+This RFC is meant to request suggestions on the things which are
+working and for help on the things which are not.
 
-And here you have a key point that I absolutely agree with.  The
-"flaky" approach can either poison a lot of tests, and be seen as
-quick way out of a difficult issue revealed by a test.  Or, it can
-serve as an effective tool to keep track of these very important
-issues.
 
-If we add:
+What is working:
 
-   # https://bugs.launchpad.net/qemu/+bug/1829779
-   :avocado: flaky
+* pvrdma device is getting initialized in a VM, its GID entry is
+  getting added to the host, and rc_pingpong is successful between
+  two such VMs. This is when libvirt is used to launch the VMs.
 
-Topped with some human, I believe this can be very effective.  This goes
-without saying, but comments here are very much welcome.
+* The dma, cmd_slot_dma and resp_slot_dma addresses are saved at the
+  source and loaded properly in the destination upon migration. That is,
+  the values loaded at the dest during migration are the same as the
+  ones saved.
 
-- Cleber.
+  `dma` is provided by the guest device when it writes to BAR1, stored
+  in dev->dsr_info.dma. A DSR is created on mapping to this address.
+  `cmd_slot_dma` and `resp_slot_dma` are the dma addresses of the command
+  and response buffers, respectively, which are provided by the guest
+  through the DSR.
 
-> > +
-> >  Manual Installation
-> >  -------------------
-> > =20
-> > diff --git a/tests/Makefile.include b/tests/Makefile.include
-> > index db750dd6d0..4c97da2878 100644
-> > --- a/tests/Makefile.include
-> > +++ b/tests/Makefile.include
-> > @@ -1125,7 +1125,11 @@ TESTS_RESULTS_DIR=3D$(BUILD_DIR)/tests/results
-> >  # Any number of command separated loggers are accepted.  For more
-> >  # information please refer to "avocado --help".
-> >  AVOCADO_SHOW=3Dapp
-> > -AVOCADO_TAGS=3D$(patsubst %-softmmu,-t arch:%, $(filter %-softmmu,$(=
-TARGET_DIRS)))
-> > +
-> > +# Additional tags that are added to each occurence of "--filter-by-t=
-ags"
-> > +AVOCADO_EXTRA_TAGS :=3D ,-flaky
-> > +
-> > +AVOCADO_TAGS=3D$(patsubst %-softmmu,--filter-by-tags=3Darch:%$(AVOCA=
-DO_EXTRA_TAGS), $(filter %-softmmu,$(TARGET_DIRS)))
-> > =20
-> >  ifneq ($(findstring v2,"v$(PYTHON_VERSION)"),v2)
-> >  $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
-> > diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptanc=
-e/boot_linux_console.py
-> > index 32159503e9..6bd5c1ab53 100644
-> > --- a/tests/acceptance/boot_linux_console.py
-> > +++ b/tests/acceptance/boot_linux_console.py
-> > @@ -249,6 +249,7 @@ class BootLinuxConsole(Test):
-> >          """
-> >          :avocado: tags=3Darch:aarch64
-> >          :avocado: tags=3Dmachine:virt
-> > +        :avocado: tags=3Dflaky
-> >          """
-> >          kernel_url =3D ('https://download.fedoraproject.org/pub/fedo=
-ra/linux/'
-> >                        'releases/29/Everything/aarch64/os/images/pxeb=
-oot/vmlinuz')
-> > @@ -270,6 +271,7 @@ class BootLinuxConsole(Test):
-> >          """
-> >          :avocado: tags=3Darch:arm
-> >          :avocado: tags=3Dmachine:virt
-> > +        :avocado: tags=3Dflaky
-> >          """
-> >          kernel_url =3D ('https://download.fedoraproject.org/pub/fedo=
-ra/linux/'
-> >                        'releases/29/Everything/armhfp/os/images/pxebo=
-ot/vmlinuz')
-> > diff --git a/tests/acceptance/linux_ssh_mips_malta.py b/tests/accepta=
-nce/linux_ssh_mips_malta.py
-> > index aafb0c39f6..ae70b658e0 100644
-> > --- a/tests/acceptance/linux_ssh_mips_malta.py
-> > +++ b/tests/acceptance/linux_ssh_mips_malta.py
-> > @@ -208,6 +208,7 @@ class LinuxSSH(Test):
-> >          :avocado: tags=3Dmachine:malta
-> >          :avocado: tags=3Dendian:big
-> >          :avocado: tags=3Ddevice:pcnet32
-> > +        :avocado: tags=3Dflaky
-> >          """
-> >          kernel_url =3D ('https://people.debian.org/~aurel32/qemu/mip=
-s/'
-> >                        'vmlinux-3.2.0-4-5kc-malta')
-> > @@ -222,6 +223,7 @@ class LinuxSSH(Test):
-> >          :avocado: tags=3Dmachine:malta
-> >          :avocado: tags=3Dendian:little
-> >          :avocado: tags=3Ddevice:pcnet32
-> > +        :avocado: tags=3Dflaky
-> >          """
-> >          kernel_url =3D ('https://people.debian.org/~aurel32/qemu/mip=
-sel/'
-> >                        'vmlinux-3.2.0-4-5kc-malta')
-> > diff --git a/tests/requirements.txt b/tests/requirements.txt
-> > index 3ae0e29ad7..58d63d171f 100644
-> > --- a/tests/requirements.txt
-> > +++ b/tests/requirements.txt
-> > @@ -1,5 +1,5 @@
-> >  # Add Python module requirements, one per line, to be installed
-> >  # in the tests/venv Python virtual environment. For more info,
-> >  # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
-> > -avocado-framework=3D=3D68.0
-> > +avocado-framework=3D=3D69.1
-> >  paramiko
-> >=20
->=20
+* The DSR successfully (re)maps to the dma address loaded from
+  migration at the dest.
+
+
+What is not working:
+
+* In the pvrdma_load() logic, the mapping to DSR is successful at dest.
+  But the mapping for cmd and resp slots fails.
+  rdma_pci_dma_map() eventually calls address_space_map(). Inside the
+  latter, a global BounceBuffer bounce is checked to see if it is in use
+  (the atomic_xchg() primitive).
+  At the dest, it is in use and the dma remapping fails there, which
+  fails the whole migration process. Essentially, I am looking for a
+  way to remap guest physical address after a live migration (to the
+  same host). Any tips on avoiding the BounceBuffer will also be great.
+
+  I have also tried unmapping the cmd and resp slots at the source before
+  saving the dma addresses in pvrdma_save(), but the mapping fails anyway.
+
+* It seems that vmxnet3 migration itself is not working properly, at least
+  for me. The pvrdma device depends on it, vmxnet3 is function 0 and pvrdma
+  is function 1. This is happening even for a build of unmodified code from
+  the master branch.
+  After migration, the network connectivity is lost at destination.
+  Things are fine at the source before migration.
+  This is the command I am using at src:
+
+  sudo /home/skrtbhtngr/qemu/build/x86_64-softmmu/qemu-system-x86_64 \
+    -enable-kvm \
+    -m 2G -smp cpus=2 \
+    -hda /home/skrtbhtngr/fedora.img \
+    -netdev tap,id=hostnet0 \
+    -device vmxnet3,netdev=hostnet0,id=net0,mac=52:54:00:99:ff:bc \
+    -monitor telnet:127.0.0.1:4444,server,nowait \
+    -trace events=/home/skrtbhtngr/trace-events \
+    -vnc 0.0.0.0:0
+
+  Similar command is used for the dest. Currently, I am trying
+  same-host migration for testing purpose, without the pvrdma device.
+  Two tap interfaces, for src and dest were created successfully at
+  the host. Kernel logs:
+  ...
+  br0: port 2(tap0) entered forwarding state
+  ...
+  br0: port 3(tap1) entered forwarding state
+
+  tcpdump at the dest reports only outgoing ARP packets, which ask
+  for gateway: "ARP, Request who-has _gateway tell guest1".
+
+  Tried using user (slirp) as the network backend, but no luck.
+  
+  Also tried git bisect to find the issue using a working commit (given
+  by Marcel), but it turns out that it is very old and I faced build
+  errors one after another.
+
+  Please note that e1000 live migration is working fine in the same setup.
+
+* Since we are aiming at trying on same-host migration first, I cannot
+  use libvirt as it does not allow this. Currently, I am running the
+  VMs using qemu-system commands. But libvirt is needed to add the GID
+  entry of the guest device in the host. I am looking for a workaround,
+  if that is possible at all.
+  I started a thread few days ago for the same on libvirt-users:
+  https://www.redhat.com/archives/libvirt-users/2019-June/msg00011.html
+
+
+Sukrit Bhatnagar (1):
+  hw/pvrdma: Add live migration support
+
+ hw/rdma/vmw/pvrdma_main.c | 56 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
+
+-- 
+2.21.0
+
 
