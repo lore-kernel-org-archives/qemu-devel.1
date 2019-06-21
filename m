@@ -3,47 +3,47 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	LOTS_OF_MONEY,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F419CC43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:37:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A9FAC43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:38:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8BB42083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:37:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8BB42083B
+	by mail.kernel.org (Postfix) with ESMTPS id 1FFCE2083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:38:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FFCE2083B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55324 helo=lists.gnu.org)
+Received: from localhost ([::1]:55326 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heE7Q-0006x9-L9
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 03:37:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40567)
+	id 1heE7Y-00071r-Dj
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 03:38:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40564)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1heE5n-0005qs-0i
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:36:16 -0400
+ (envelope-from <bounces@canonical.com>) id 1heE5o-0005qr-UM
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:36:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1heE54-0004Qs-4S
+ (envelope-from <bounces@canonical.com>) id 1heE54-0004RW-8g
  for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:35:31 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43106)
+Received: from indium.canonical.com ([91.189.90.7]:43130)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1heE53-0004KI-U2
+ id 1heE54-0004N5-3V
  for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:35:30 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1heE52-0006jT-DX
- for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 07:35:28 +0000
+ id 1heE52-0006k1-WF
+ for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 07:35:29 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 627372E8055
+ by loganberry.canonical.com (Postfix) with ESMTP id F13BC2E80C7
  for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 07:35:28 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 21 Jun 2019 07:26:30 -0000
+Date: Fri, 21 Jun 2019 07:26:51 -0000
 From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1833661@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -59,13 +59,13 @@ X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
 X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
  =?utf-8?q?=29?=
 References: <156110193683.18432.8339006487274258755.malonedeb@chaenomeles.canonical.com>
-Message-Id: <156110199080.19316.14676829907730298597.malone@wampee.canonical.com>
+Message-Id: <156110201112.18276.2218392113056923674.malone@chaenomeles.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18989";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 6882b5da1f605f16304e3b61bf1a842a4571619a
+X-Launchpad-Hash: 9625d10457d89940cb79bd4db627fedf6b7c3672
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 Subject: [Qemu-devel] [Bug 1833661] Re: Linux kernel oops on Malta board
@@ -85,78 +85,58 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Relevant 32-bit output:
+Relevant 64-bit output:
 
-tests/acceptance/linux_ssh_mips_malta.py:LinuxSSH.test_mips_malta32eb_kerne=
+tests/acceptance/linux_ssh_mips_malta.py:LinuxSSH.test_mips_malta64eb_kerne=
 l3_2_0
 
-[   34.968000] Using buffer write method
-[   38.324000] Searching for RedBoot partition table in physmap-flash.0 at =
-offset 0x3f0000
-[   38.328000] No RedBoot partition table detected in physmap-flash.0
-[   39.032000] Creating 3 MTD partitions on "physmap-flash.0":
-[   39.032000] 0x000000000000-0x000000100000 : "YAMON"
-[   39.052000] 0x000000100000-0x0000003e0000 : "User FS"
-[   39.068000] 0x0000003e0000-0x000000400000 : "Board Config"
-[   40.924000] CPU 0 Unable to handle kernel paging request at virtual addr=
-ess 00000014, epc =3D=3D c0203278, ra =3D=3D c0203254
-[   40.932000] Oops[#1]:
-[   40.932000] Cpu 0
-[   40.932000] $ 0   : 00000000 1000a400 00000000 00000001
-[   40.932000] $ 4   : c012f590 00000001 00000000 7fffffff
-[   40.932000] $ 8   : 8fbcbfe0 0000a400 00000000 8fae0000
-[   40.932000] $12   : 74646368 00000001 806c0078 61720053
-[   40.932000] $16   : 8fb38000 8fba63c0 c0200000 00000001
-[   40.932000] $20   : 00000000 c0205074 8020953c 7fac45e4
-[   40.932000] $24   : 00000003 80338058                  =
+[    0.000000] Initializing cgroup subsys cpuset
+[    0.000000] Initializing cgroup subsys cpu
+[    0.000000] Linux version 3.2.0-4-5kc-malta (debian-kernel@lists.debian.=
+org) (gcc version 4.6.3 (Debian 4.6.3-14) ) #1 Debian 3.2.51-1
+[    0.000000] bootconsole [early0] enabled
+[    0.000000] CPU revision is: 000182a0 (MIPS 20Kc)
+[    0.000000] FPU revision is: 000f8200
+[    0.000000] Checking for the multiply/shift bug... no.
+[    0.000000] Checking for the daddiu bug... no.
+[    0.000000] Determined physical RAM map:
+[    0.000000]  memory: 0000000000001000 @ 0000000000000000 (reserved)
+[    0.000000]  memory: 00000000000ef000 @ 0000000000001000 (ROM data)
+[    0.000000]  memory: 0000000000748000 @ 00000000000f0000 (reserved)
+[    0.000000]  memory: 00000000077c7000 @ 0000000000838000 (usable)
+[    0.000000] Wasting 117824 bytes for tracking 2104 unused pages
+[    0.000000] Initrd not found or empty - disabling initrd
+[    0.000000] Kernel command line: printk.time=3D0 console=3DttyS0 root=3D=
+/dev/sda1
+[...]
+Freeing prom memory: 956k freed
+Freeing unused kernel memory: 244k freed
 
-[   40.932000] $28   : 8fbca000 8fbcbcd0 00000008 c0203254
-[   40.932000] Hi    : 00000009
-[   40.932000] Lo    : 85d47900
-[   40.932000] epc   : c0203278 mtd_open+0x94/0x1d0 [mtdchar]
-[   40.932000]     Not tainted
-[   40.932000] ra    : c0203254 mtd_open+0x70/0x1d0 [mtdchar]
-[   40.932000] Status: 1000a403    KERNEL EXL IE =
+INIT: version 2.88 booting
 
-[   40.932000] Cause : 10800008
-[   40.932000] BadVA : 00000014
-[   40.932000] PrId  : 00019300 (MIPS 24Kc)
-[   40.932000] Modules linked in: mtdchar(+) redboot cfi_cmdset_0001 cfi_pr=
-obe cfi_util gen_probe sg evdev uhci_hcd ehci_hcd physmap map_funcs chipreg=
- usbcore mtd psmouse sr_mod i2c_piix4 i2c_core cdrom serio_raw usb_common
-[   40.932000] Process mtd_probe (pid: 268, threadinfo=3D8fbca000, task=3D8=
-fbbda88, tls=3D774b0490)
-[   40.932000] Stack : 00000000 8e9b9470 8fba63c0 8e9b9470 802094b0 8e9ad98=
-0 8e9b9470 8fba63c0
-[   40.932000]         8e9ad980 802095d4 00000000 00000000 00000000 7fac45e=
-4 00000003 8033768c
-[   40.932000]         8fba63c0 8f5a7518 8f811c80 8e9b9470 802094b0 0000000=
-0 00000000 7fac45e4
-[   40.932000]         00000008 80202bb4 8fbcbe14 8fbcbe68 8fbcbdc0 8f4f449=
-8 8f811c80 8fbcbe70
-[   40.932000]         8fa29140 8fbcbe68 8e9b9470 00000024 00000000 0000000=
-0 00000005 7fac45e4
-[   40.932000]         ...
-[   40.932000] Call Trace:
-[   40.932000] [<c0203278>] mtd_open+0x94/0x1d0 [mtdchar]
-[   40.932000] [<802095d4>] chrdev_open+0x124/0x250
-[   40.932000] [<80202bb4>] __dentry_open+0x27c/0x3d8
-[   40.932000] [<8020400c>] nameidata_to_filp+0x64/0x78
-[   40.932000] [<80214160>] do_last.isra.17+0x3a4/0x81c
-[   40.932000] [<802146d4>] path_openat+0xc0/0x4c4
-[   40.932000] [<80214bf0>] do_filp_open+0x3c/0xac
-[   40.932000] [<80204134>] do_sys_open+0x114/0x200
-[   40.932000] [<8010a9d0>] stack_done+0x20/0x40
-[   40.932000] =
+Using makefile-style concurrent boot in runlevel S.
+physmap platform flash device: 00400000 at 1e000000
+sr0: scsi3-mmc drive: 4x/4x cd/rw xa/form2 tray
+[...]
+sd 0:0:0:0: Attached scsi generic sg0 type 0
+sr 1:0:0:0: Attached scsi generic sg1 type 5
+physmap-flash.0: Found 1 x32 devices at 0x0 in 32-bit bank. Manufacturer ID=
+ 0x000000 Chip ID 0x000000
+input: ImExPS/2 Generic Explorer Mouse as /devices/platform/i8042/serio1/in=
+put/input1
+Intel/Sharp Extended Query Table at 0x0031
+Using buffer write method
+Searching for RedBoot partition table in physmap-flash.0 at offset 0x1003f0=
+000
+Creating 3 MTD partitions on "physmap-flash.0":
+0x000000000000-0x000000100000 : "YAMON"
+0x000000100000-0x0000003e0000 : "User FS"
+0x0000003e0000-0x000000400000 : "Board Config"
+CPU 0 Unable to handle kernel paging request at virtual address 00000000000=
+00028, epc =3D=3D ffffffffc00f9234, ra =3D=3D ffffffffc00f9210
 
-[   40.932000] =
-
-[   40.932000] Code: 3c02c013  3c02c020  8c425070 <8c440014> 3c028022  2442=
-eef4  0040f809  02602821  10400043 =
-
-[   40.956000] ---[ end trace e666aa8cbfdf5c7f ]---
-udevd[192]: 'mtd_probe /dev/.tmp-char-90:3'
-[hang]
+** Changed in: qemu
+     Assignee: (unassigned) =3D> Philippe Mathieu-Daud=C3=A9 (philmd)
 
 -- =
 
