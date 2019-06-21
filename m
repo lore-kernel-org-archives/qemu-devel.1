@@ -2,56 +2,83 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B953CC48BE3
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 12:02:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D264CC43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 12:03:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8552F208C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 12:02:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8552F208C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 975CB208C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 12:03:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gWLfH+xb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 975CB208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60186 helo=lists.gnu.org)
+Received: from localhost ([::1]:60192 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heIFc-0002Fb-PZ
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 08:02:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55249)
+	id 1heIGC-0003Ip-QL
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 08:03:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49104)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1heI7M-0003L2-Kk
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:54:14 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1heHkf-0000lF-IZ
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1heI7E-0005Jg-UP
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:54:05 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:37531 helo=mail.rt-rk.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1heI7A-00059g-Ml
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:53:57 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 823BF1A45C4;
- Fri, 21 Jun 2019 13:53:51 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 2B26D1A45FC;
- Fri, 21 Jun 2019 13:53:51 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+ (envelope-from <paolo.bonzini@gmail.com>) id 1heHkc-0005rV-Ek
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:41 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39048)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1heHkc-0005fu-8Q
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:38 -0400
+Received: by mail-wr1-x442.google.com with SMTP id x4so6228519wrt.6
+ for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 04:30:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=rRyKyx29XW5YjtibDxKmJQDBBERS19STiC5lOwnEoTA=;
+ b=gWLfH+xbFIXTdQ7wAVfukxJqFcrRIUB53jXQglFYvS8OOAJJGr/gLAAkT7p/UUv9KA
+ TBPmiyUpO9ev6T/Wd3RH83eU2ZVI04vtta+Vz2O2/0fg22HG2eYHVG40aSa3D1jqejhK
+ 7OB5c794iOeHEDnUseX1eU7/gpnVJedxFlITmMMjt7dizcNRD4phPlABMtKWXO4j3E5x
+ I3CM2OWfjSyObYUMdFS7u+GqhtNWOKlCM0/ycATfZmpHQWB5SrZsTnzzxyopveX/Wbk4
+ /XXNa1wWGx2dQIfz538MZoYhZJpM/HztzrXtlQDEH1ELuXm6U/wfb+WMJnhcNTSbTRkL
+ fRmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references;
+ bh=rRyKyx29XW5YjtibDxKmJQDBBERS19STiC5lOwnEoTA=;
+ b=P66DoJSsfStmwrOXdkc15u7nKMeMfm9J42NtwzRKmffN1vVlgicVFfS0XUuLHB+VJZ
+ 92elfNaOwVsHIlsj5n9OOTnBeQb85UYSJ0UnEcSy3EvqdVTNMeOimbBTtAQ0VmjB+i6I
+ GWX5zhc0cF2ZEjhfBetERXNMEeglWIfGAEJ5aGLPDlbaZf/GQ1g7t2nRsSkcxOpM6Ozv
+ W1vmOmCoTZ5eVI5/iqFXUU5esfGFdb5RyKhF8xceb66MjVSOc+ogTHCWYRqrUr8bGu1/
+ LzZWQHGNRlA5AAo9Tfna363mWTbA3jgBwilNBrYsYW6bJt5s1wKfDnPcwe/a35A94VM9
+ C4Yw==
+X-Gm-Message-State: APjAAAW0LAlyaxJGZZJDmHASR47jz+NlS6bZ1lX/FzsyKsXeV40/6QwL
+ Qi9F1ZMMwSVIWElgnUHlNKrzrheO
+X-Google-Smtp-Source: APXvYqzdXMbH2zdH/r3FTd2EiHXtHtBoMDnlapwBqvexNVvCIy2M3bfBVXPmiJtEXvuMYwobJF20sg==
+X-Received: by 2002:adf:f050:: with SMTP id t16mr77096796wro.99.1561116633570; 
+ Fri, 21 Jun 2019 04:30:33 -0700 (PDT)
+Received: from 640k.lan ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id r3sm2712851wrr.61.2019.06.21.04.30.32
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 21 Jun 2019 04:30:32 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 21 Jun 2019 13:53:40 +0200
-Message-Id: <1561118020-30489-6-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1561118020-30489-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1561118020-30489-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v3 5/5] tests/tcg: target/mips: Amend tests for
- MSA int dot product instructions
+Date: Fri, 21 Jun 2019 13:30:06 +0200
+Message-Id: <1561116620-22245-12-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1561116620-22245-1-git-send-email-pbonzini@redhat.com>
+References: <1561116620-22245-1-git-send-email-pbonzini@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PULL 11/25] i386/kvm: add support for Direct Mode for
+ Hyper-V synthetic timers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,259 +90,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arikalo@wavecomp.com, amarkovic@wavecomp.com
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-Add tests for instructions whose result depends on the value in destination
-register (prior to instruction execution).
+Hyper-V on KVM can only use Synthetic timers with Direct Mode (opting for
+an interrupt instead of VMBus message). This new capability is only
+announced in KVM_GET_SUPPORTED_HV_CPUID.
 
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Message-Id: <20190517141924.19024-10-vkuznets@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/tcg/mips/include/wrappers_msa.h              |   4 +
- .../ase/msa/int-dot-product/test_msa_dpadd_s_h.c   | 214 +++++++++++++++++++++
- 2 files changed, 218 insertions(+)
- create mode 100644 tests/tcg/mips/user/ase/msa/int-dot-product/test_msa_dpadd_s_h.c
+ docs/hyperv.txt            | 10 ++++++++++
+ target/i386/cpu.c          |  2 ++
+ target/i386/cpu.h          |  1 +
+ target/i386/hyperv-proto.h |  1 +
+ target/i386/kvm.c          |  9 +++++++++
+ 5 files changed, 23 insertions(+)
 
-diff --git a/tests/tcg/mips/include/wrappers_msa.h b/tests/tcg/mips/include/wrappers_msa.h
-index 8f260f5..6234703 100644
---- a/tests/tcg/mips/include/wrappers_msa.h
-+++ b/tests/tcg/mips/include/wrappers_msa.h
-@@ -411,6 +411,10 @@ DO_MSA__WD__WS_WT(DOTP_U_H, dotp_u.h)
- DO_MSA__WD__WS_WT(DOTP_U_W, dotp_u.w)
- DO_MSA__WD__WS_WT(DOTP_U_D, dotp_u.d)
+diff --git a/docs/hyperv.txt b/docs/hyperv.txt
+index beadb2d..8fdf25c 100644
+--- a/docs/hyperv.txt
++++ b/docs/hyperv.txt
+@@ -174,6 +174,16 @@ without the feature to find out if enabling it is beneficial.
  
-+DO_MSA__WD__WS_WT(DPADD_S_H, dpadd_s.h)
-+DO_MSA__WD__WD_WT(DPADD_S_H__DDT, dpadd_s.h)
-+DO_MSA__WD__WS_WD(DPADD_S_H__DSD, dpadd_s.h)
+ Requires: hv-vapic
+ 
++3.17. hv-stimer-direct
++=======================
++Hyper-V specification allows synthetic timer operation in two modes: "classic",
++when expiration event is delivered as SynIC message and "direct", when the event
++is delivered via normal interrupt. It is known that nested Hyper-V can only
++use synthetic timers in direct mode and thus 'hv-stimer-direct' needs to be
++enabled.
 +
++Requires: hv-vpindex, hv-synic, hv-time, hv-stimer
++
+ 
+ 4. Development features
+ ========================
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index e07996c..7beb8ab 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5883,6 +5883,8 @@ static Property x86_cpu_properties[] = {
+                       HYPERV_FEAT_EVMCS, 0),
+     DEFINE_PROP_BIT64("hv-ipi", X86CPU, hyperv_features,
+                       HYPERV_FEAT_IPI, 0),
++    DEFINE_PROP_BIT64("hv-stimer-direct", X86CPU, hyperv_features,
++                      HYPERV_FEAT_STIMER_DIRECT, 0),
+     DEFINE_PROP_BOOL("hv-passthrough", X86CPU, hyperv_passthrough, false),
+ 
+     DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 86edbf5..7470acf 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -749,6 +749,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define HYPERV_FEAT_TLBFLUSH            11
+ #define HYPERV_FEAT_EVMCS               12
+ #define HYPERV_FEAT_IPI                 13
++#define HYPERV_FEAT_STIMER_DIRECT       14
+ 
+ #ifndef HYPERV_SPINLOCK_NEVER_RETRY
+ #define HYPERV_SPINLOCK_NEVER_RETRY             0xFFFFFFFF
+diff --git a/target/i386/hyperv-proto.h b/target/i386/hyperv-proto.h
+index c0272b3..cffac10 100644
+--- a/target/i386/hyperv-proto.h
++++ b/target/i386/hyperv-proto.h
+@@ -49,6 +49,7 @@
+ #define HV_GUEST_IDLE_STATE_AVAILABLE           (1u << 5)
+ #define HV_FREQUENCY_MSRS_AVAILABLE             (1u << 8)
+ #define HV_GUEST_CRASH_MSR_AVAILABLE            (1u << 10)
++#define HV_STIMER_DIRECT_MODE_AVAILABLE         (1u << 19)
  
  /*
-  * Int Max Min
-diff --git a/tests/tcg/mips/user/ase/msa/int-dot-product/test_msa_dpadd_s_h.c b/tests/tcg/mips/user/ase/msa/int-dot-product/test_msa_dpadd_s_h.c
-new file mode 100644
-index 0000000..35b63a3
---- /dev/null
-+++ b/tests/tcg/mips/user/ase/msa/int-dot-product/test_msa_dpadd_s_h.c
-@@ -0,0 +1,214 @@
-+/*
-+ *  Test program for MSA instruction DPADD_S.H
-+ *
-+ *  Copyright (C) 2019  Wave Computing, Inc.
-+ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
-+ *
-+ *  This program is free software: you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation, either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *`
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include <sys/time.h>
-+#include <stdint.h>
-+
-+#include "../../../../include/wrappers_msa.h"
-+#include "../../../../include/test_inputs_128.h"
-+#include "../../../../include/test_utils_128.h"
-+
-+#define TEST_COUNT_TOTAL (                                                \
-+            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
-+            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
-+
-+
-+int32_t main(void)
-+{
-+    char *isa_ase_name = "MSA";
-+    char *group_name = "Int Dot Product";
-+    char *instruction_name =  "DPADD_S.H";
-+    int32_t ret;
-+    uint32_t i, j;
-+    struct timeval start, end;
-+    double elapsed_time;
-+
-+    uint64_t b128_result[TEST_COUNT_TOTAL][2];
-+    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
-+        { 0x0000000000000000ULL, 0xffffffffffffffffULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xffffffffffffffffULL, },
-+        { 0x5555555555555555ULL, 0xffffffffffffffffULL, },
-+        { 0xccccccccccccccccULL, 0xffffffffffffffffULL, },
-+        { 0x3333333333333333ULL, 0xffffffffffffffffULL, },
-+        { 0xe3388ee38ee3388eULL, 0xffffffffffffffffULL, },
-+        { 0x1cc7711c711cc771ULL, 0xffffffffffffffffULL, },
-+        { 0xffffffffffffffffULL, 0x0000000000000000ULL, },    /*   8  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x0000000000000000ULL, },
-+        { 0x5555555555555555ULL, 0x0000000000000000ULL, },
-+        { 0xccccccccccccccccULL, 0x0000000000000000ULL, },
-+        { 0x3333333333333333ULL, 0x0000000000000000ULL, },
-+        { 0xe3388ee38ee3388eULL, 0x0000000000000000ULL, },
-+        { 0x1cc7711c711cc771ULL, 0x0000000000000000ULL, },
-+        { 0xffffffffffffffffULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
-+        { 0x0000000000000000ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x5555555555555555ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xccccccccccccccccULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x3333333333333333ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xe3388ee38ee3388eULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x1cc7711c711cc771ULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0xffffffffffffffffULL, 0x5555555555555555ULL, },    /*  24  */
-+        { 0x0000000000000000ULL, 0x5555555555555555ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x5555555555555555ULL, },
-+        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
-+        { 0xccccccccccccccccULL, 0x5555555555555555ULL, },
-+        { 0x3333333333333333ULL, 0x5555555555555555ULL, },
-+        { 0xe3388ee38ee3388eULL, 0x5555555555555555ULL, },
-+        { 0x1cc7711c711cc771ULL, 0x5555555555555555ULL, },
-+        { 0xffffffffffffffffULL, 0xccccccccccccccccULL, },    /*  32  */
-+        { 0x0000000000000000ULL, 0xccccccccccccccccULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xccccccccccccccccULL, },
-+        { 0x5555555555555555ULL, 0xccccccccccccccccULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x3333333333333333ULL, 0xccccccccccccccccULL, },
-+        { 0xe3388ee38ee3388eULL, 0xccccccccccccccccULL, },
-+        { 0x1cc7711c711cc771ULL, 0xccccccccccccccccULL, },
-+        { 0xffffffffffffffffULL, 0x3333333333333333ULL, },    /*  40  */
-+        { 0x0000000000000000ULL, 0x3333333333333333ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x3333333333333333ULL, },
-+        { 0x5555555555555555ULL, 0x3333333333333333ULL, },
-+        { 0xccccccccccccccccULL, 0x3333333333333333ULL, },
-+        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
-+        { 0xe3388ee38ee3388eULL, 0x3333333333333333ULL, },
-+        { 0x1cc7711c711cc771ULL, 0x3333333333333333ULL, },
-+        { 0xffffffffffffffffULL, 0xe3388ee38ee3388eULL, },    /*  48  */
-+        { 0x0000000000000000ULL, 0xe3388ee38ee3388eULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xe3388ee38ee3388eULL, },
-+        { 0x5555555555555555ULL, 0xe3388ee38ee3388eULL, },
-+        { 0xccccccccccccccccULL, 0xe3388ee38ee3388eULL, },
-+        { 0x3333333333333333ULL, 0xe3388ee38ee3388eULL, },
-+        { 0xe3388ee38ee3388eULL, 0xe3388ee38ee3388eULL, },
-+        { 0x1cc7711c711cc771ULL, 0xe3388ee38ee3388eULL, },
-+        { 0xffffffffffffffffULL, 0x1cc7711c711cc771ULL, },    /*  56  */
-+        { 0x0000000000000000ULL, 0x1cc7711c711cc771ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0x1cc7711c711cc771ULL, },
-+        { 0x5555555555555555ULL, 0x1cc7711c711cc771ULL, },
-+        { 0xccccccccccccccccULL, 0x1cc7711c711cc771ULL, },
-+        { 0x3333333333333333ULL, 0x1cc7711c711cc771ULL, },
-+        { 0xe3388ee38ee3388eULL, 0x1cc7711c711cc771ULL, },
-+        { 0x1cc7711c711cc771ULL, 0x1cc7711c711cc771ULL, },
-+        { 0x675e7b0c6acc6240ULL, 0x675e7b0c6acc6240ULL, },    /*  64  */
-+        { 0xf71a3ffcbe639308ULL, 0x675e7b0c6acc6240ULL, },
-+        { 0xd8ff2b145aaacf80ULL, 0x675e7b0c6acc6240ULL, },
-+        { 0xf1d842a04f4d314eULL, 0x675e7b0c6acc6240ULL, },
-+        { 0x675e7b0c6acc6240ULL, 0xf71a3ffcbe639308ULL, },
-+        { 0xf71a3ffcbe639308ULL, 0xf71a3ffcbe639308ULL, },
-+        { 0xd8ff2b145aaacf80ULL, 0xf71a3ffcbe639308ULL, },
-+        { 0xf1d842a04f4d314eULL, 0xf71a3ffcbe639308ULL, },
-+        { 0x675e7b0c6acc6240ULL, 0xd8ff2b145aaacf80ULL, },    /*  72  */
-+        { 0xf71a3ffcbe639308ULL, 0xd8ff2b145aaacf80ULL, },
-+        { 0xd8ff2b145aaacf80ULL, 0xd8ff2b145aaacf80ULL, },
-+        { 0xf1d842a04f4d314eULL, 0xd8ff2b145aaacf80ULL, },
-+        { 0x675e7b0c6acc6240ULL, 0xf1d842a04f4d314eULL, },
-+        { 0xf71a3ffcbe639308ULL, 0xf1d842a04f4d314eULL, },
-+        { 0xd8ff2b145aaacf80ULL, 0xf1d842a04f4d314eULL, },
-+        { 0xf1d842a04f4d314eULL, 0xf1d842a04f4d314eULL, },
-+        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
-+        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
-+        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
-+        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
-+        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
-+        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
-+        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
-+        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
-+        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
-+        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
-+        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
-+        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
-+        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
-+        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
-+        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
-+        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
-+        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
-+        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
-+        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
-+        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
-+        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
-+        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
-+        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
-+        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
-+        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
-+        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
-+        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
-+        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
-+        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
-+        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
-+        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
-+        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
-+    };
-+
-+    reset_msa_registers();
-+
-+    gettimeofday(&start, NULL);
-+
-+    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_DPADD_S_H(b128_pattern[i], b128_pattern[j],
-+                             b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_DPADD_S_H(b128_random[i], b128_random[j],
-+                             b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
-+                                          (PATTERN_INPUTS_SHORT_COUNT)) +
-+                                         RANDOM_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_DPADD_S_H__DDT(b128_random[i], b128_random[j],
-+                                  b128_result[
-+                                      ((PATTERN_INPUTS_SHORT_COUNT) *
-+                                       (PATTERN_INPUTS_SHORT_COUNT)) +
-+                                      ((RANDOM_INPUTS_SHORT_COUNT) *
-+                                       (RANDOM_INPUTS_SHORT_COUNT)) +
-+                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
-+        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
-+            do_msa_DPADD_S_H__DSD(b128_random[i], b128_random[j],
-+                                  b128_result[
-+                                      ((PATTERN_INPUTS_SHORT_COUNT) *
-+                                       (PATTERN_INPUTS_SHORT_COUNT)) +
-+                                      (2 * (RANDOM_INPUTS_SHORT_COUNT) *
-+                                       (RANDOM_INPUTS_SHORT_COUNT)) +
-+                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
-+        }
-+    }
-+
-+    gettimeofday(&end, NULL);
-+
-+    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
-+    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
-+
-+    ret = check_results_128(isa_ase_name, group_name, instruction_name,
-+                            TEST_COUNT_TOTAL, elapsed_time,
-+                            &b128_result[0][0], &b128_expect[0][0]);
-+
-+    return ret;
-+}
+  * HV_CPUID_ENLIGHTMENT_INFO.EAX bits
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 86de510..a323b1f 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -802,6 +802,14 @@ static struct {
+         },
+         .dependencies = BIT(HYPERV_FEAT_VPINDEX)
+     },
++    [HYPERV_FEAT_STIMER_DIRECT] = {
++        .desc = "direct mode synthetic timers (hv-stimer-direct)",
++        .flags = {
++            {.fw = FEAT_HYPERV_EDX,
++             .bits = HV_STIMER_DIRECT_MODE_AVAILABLE}
++        },
++        .dependencies = BIT(HYPERV_FEAT_STIMER)
++    },
+ };
+ 
+ static struct kvm_cpuid2 *try_get_hv_cpuid(CPUState *cs, int max)
+@@ -1124,6 +1132,7 @@ static int hyperv_handle_properties(CPUState *cs,
+     r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_TLBFLUSH);
+     r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_EVMCS);
+     r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_IPI);
++    r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_STIMER_DIRECT);
+ 
+     /* Additional dependencies not covered by kvm_hyperv_properties[] */
+     if (hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC) &&
 -- 
-2.7.4
+1.8.3.1
+
 
 
