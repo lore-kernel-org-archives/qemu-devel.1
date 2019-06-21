@@ -2,58 +2,83 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77F55C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 15:39:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA377C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 15:40:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50D8020673
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 15:39:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50D8020673
+	by mail.kernel.org (Postfix) with ESMTPS id A25B820673
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 15:40:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A25B820673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36180 helo=lists.gnu.org)
+Received: from localhost ([::1]:36186 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heLd6-0007HM-U3
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 11:39:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59618)
+	id 1heLeL-0008P8-QQ
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 11:40:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59841)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <wainersm@redhat.com>) id 1heLcK-0006pp-DZ
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 11:38:21 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1heLdM-0007iP-G6
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 11:39:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wainersm@redhat.com>) id 1heLcJ-0002uR-7T
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 11:38:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58790)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1heLcJ-0002to-1k
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 11:38:19 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BBD45301988B;
- Fri, 21 Jun 2019 15:38:10 +0000 (UTC)
-Received: from hp-moonshot-03-c05.lab.eng.rdu2.redhat.com
- (hp-moonshot-03-c05.lab.eng.rdu2.redhat.com [10.8.2.59])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 76ABA5C21A;
- Fri, 21 Jun 2019 15:38:08 +0000 (UTC)
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-To: qemu-devel@nongnu.org,
-	crosa@redhat.com
-Date: Fri, 21 Jun 2019 11:38:06 -0400
-Message-Id: <20190621153806.13489-1-wainersm@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Fri, 21 Jun 2019 15:38:16 +0000 (UTC)
+ (envelope-from <pbonzini@redhat.com>) id 1heLdL-0003sJ-7Q
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 11:39:24 -0400
+Received: from mail-wr1-f48.google.com ([209.85.221.48]:37105)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1heLdL-0003rZ-0R
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 11:39:23 -0400
+Received: by mail-wr1-f48.google.com with SMTP id v14so7047562wrr.4
+ for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 08:39:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=/5Fl7jKdJw5qCmU35z+n5kM2fVIO3vsnKgfnMWCl5dE=;
+ b=MwSKMGDnfeAY33fJzZb2hr2DmyzzOwn7+9Sq3K1Lw2YNKTacKOkFD2xLKNrrxKnlfj
+ XHUkKwlJPr8pKM1x6WW7sd/8ML8InyMuXkztpp9JcedcHnKdAGPyjuKS9qDfRi0jucPV
+ BP2Bbf7HgJXZo5/Eq5LfTCEW4tHha9Nk2OKrjFLyOO/8UkyRBEHbtwiN2s2wvMXG2jHf
+ MiarlvEJUIeYPpUTqR8+5StdPQM6gLRq6cYM8c3QVTO/5Ar3er3Os8quYTZP9ZQlk7kF
+ nTcWPRyq0WD6PnnWOIg3ZYgRL1IJAnu9YBjdlvsUwkG/AB0+mPIaUn6hmhi2b9xuzI1q
+ H9iw==
+X-Gm-Message-State: APjAAAXOdw/M1Q250ndlSVMCUr7Ul23+bSdye9X9krlvyB/rW7Pv9qCQ
+ PHoqJbQd2MZcMe9/AG7ycnx8A5ReEc8=
+X-Google-Smtp-Source: APXvYqymKZBtSneuMK1tgWTN25mA0BULPrt71Y3plHA3mFmcQklbfXEN2Ur/O/PFr+iaDN4w5NzAgw==
+X-Received: by 2002:adf:e9c6:: with SMTP id l6mr20040441wrn.216.1561131561642; 
+ Fri, 21 Jun 2019 08:39:21 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:45fb:a0de:928e:79e8?
+ ([2001:b07:6468:f312:45fb:a0de:928e:79e8])
+ by smtp.gmail.com with ESMTPSA id g8sm2237917wme.20.2019.06.21.08.39.20
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 21 Jun 2019 08:39:20 -0700 (PDT)
+To: Liran Alon <liran.alon@oracle.com>
+References: <1561116620-22245-1-git-send-email-pbonzini@redhat.com>
+ <1561116620-22245-21-git-send-email-pbonzini@redhat.com>
+ <C67C73E9-F0FA-4711-98F1-BB5CD782E473@oracle.com>
+ <3b4d778c-8c41-b8f2-7e1c-b7328072c3d5@redhat.com>
+ <96B0BE25-AA15-4FAA-9228-A68C0845E110@oracle.com>
+ <beac3448-d66f-438f-c0bf-b35bc7c90137@redhat.com>
+ <10C55D5F-B505-4172-8500-D8EBCEA43941@oracle.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7c67d746-6095-25a8-d569-0d590024c3dc@redhat.com>
+Date: Fri, 21 Jun 2019 17:39:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <10C55D5F-B505-4172-8500-D8EBCEA43941@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC PATCH] tests/acceptance: Handle machine type for
- ARM target
+ [fuzzy]
+X-Received-From: 209.85.221.48
+Subject: Re: [Qemu-devel] [PULL 20/25] target/i386: kvm: Add support for
+ save and restore nested state
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,76 +90,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi all,
+On 21/06/19 17:00, Liran Alon wrote:
+> Cool.
+> Are you planning to make those changes when applying/merging or
+> do you need me to submit a new patch-series version?
+> Also note my comment on the other patch regarding block migration on AMD vCPU which expose SVM.
 
-I'm still unsure this is the best solution. I tend to think that
-any arch-independent test case (i.e. not tagged 'arch') should
-be skipped on all arches except for x86_64. Opening up for
-discussion though.
+It's already merged, but it's not a big deal since it's only AMD.  We
+can follow up before release.
 
-Note: It was decided that ARM targets should not default to any
-machine type: https://www.mail-archive.com/qemu-devel@nongnu.org/msg625999.html
-
--- 8< --
-Some tests are meant arch-independent and as such they don't set
-the machine type (i.e. relying to defaults) on launched VMs. The arm
-targets, however, don't provide any default machine so tests fail.
-
-This patch adds a logic on the base Test class so that machine type
-is set to 'virt' when:
-   a) The test case doesn't have arch:aarch64 or arch:arm tag. Here
-      I assume that if the test was tagged for a specific arch then
-      the writer took care of setting a machine type.
-   b) The target binary arch is any of aarch64 or arm. Note:
-      self.target_arch can end up None if qemu_bin is passed by
-      Avocado parameter and the filename doesn't match expected
-      format. In this case the test will fail.
-
-Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
----
- tests/acceptance/avocado_qemu/__init__.py | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
-index 2b236a1cf0..fb3e0dc2bc 100644
---- a/tests/acceptance/avocado_qemu/__init__.py
-+++ b/tests/acceptance/avocado_qemu/__init__.py
-@@ -9,6 +9,7 @@
- # later.  See the COPYING file in the top-level directory.
- 
- import os
-+import re
- import sys
- import uuid
- 
-@@ -65,10 +66,21 @@ class Test(avocado.Test):
-         if self.qemu_bin is None:
-             self.cancel("No QEMU binary defined or found in the source tree")
- 
-+        m = re.match('qemu-system-(.*)', self.qemu_bin.split('/').pop())
-+        if m:
-+            self.target_arch = m.group(1)
-+        else:
-+            self.target_arch = None
-+
-     def _new_vm(self, *args):
-         vm = QEMUMachine(self.qemu_bin)
-         if args:
-             vm.add_args(*args)
-+        # Handle lack of default machine type on some targets.
-+        # Assume that arch tagged tests have machine type set properly.
-+        if self.tags.get('arch') is None and \
-+           self.target_arch in ('aarch64', 'arm'):
-+            vm.set_machine('virt')
-         return vm
- 
-     @property
--- 
-2.18.1
-
+Paolo
 
