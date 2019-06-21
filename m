@@ -2,143 +2,67 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D13C6C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 19:40:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18382C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 20:03:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8AD22075E
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 19:40:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8AD22075E
+	by mail.kernel.org (Postfix) with ESMTPS id D641520673
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 20:03:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D641520673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37548 helo=lists.gnu.org)
+Received: from localhost ([::1]:37612 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hePOy-0008RO-02
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 15:40:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56290)
+	id 1hePlB-0006iL-NJ
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 16:03:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58216)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hePOL-0007hp-97
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 15:40:11 -0400
+ (envelope-from <alex.williamson@redhat.com>) id 1hePiz-0005wd-NP
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 16:01:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hePOJ-0002Ir-CL
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 15:40:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48636)
+ (envelope-from <alex.williamson@redhat.com>) id 1hePiu-0006om-8O
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 16:01:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33364)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hePOD-0001zF-IE; Fri, 21 Jun 2019 15:40:03 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1hePir-0005dO-5e
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 16:01:22 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2DCCC3082E5F;
- Fri, 21 Jun 2019 19:39:49 +0000 (UTC)
-Received: from [10.18.17.164] (dhcp-17-164.bos.redhat.com [10.18.17.164])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 310F55C21E;
- Fri, 21 Jun 2019 19:39:48 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190620010356.19164-1-jsnow@redhat.com>
- <20190620010356.19164-3-jsnow@redhat.com>
- <cb178623-e7a3-2d20-f193-9630257d9c3c@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <4537a8c5-c870-139e-f8ef-d6a4bc28f0b5@redhat.com>
-Date: Fri, 21 Jun 2019 15:39:47 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 15109C04AC69;
+ Fri, 21 Jun 2019 20:00:50 +0000 (UTC)
+Received: from x1.home (ovpn-117-35.phx2.redhat.com [10.3.117.35])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8F4C46090E;
+ Fri, 21 Jun 2019 20:00:39 +0000 (UTC)
+Date: Fri, 21 Jun 2019 14:00:39 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <20190621140039.3820dd5d@x1.home>
+In-Reply-To: <1648d75d-bda3-f5da-2684-312033ae9477@nvidia.com>
+References: <1561041461-22326-1-git-send-email-kwankhede@nvidia.com>
+ <1561041461-22326-2-git-send-email-kwankhede@nvidia.com>
+ <20190620111848.1bf70e99@x1.home>
+ <ff9f4aeb-1dd2-c44d-e513-b2f4a06ae780@nvidia.com>
+ <20190621090343.3be524f5@x1.home>
+ <1648d75d-bda3-f5da-2684-312033ae9477@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <cb178623-e7a3-2d20-f193-9630257d9c3c@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Fri, 21 Jun 2019 19:39:49 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Fri, 21 Jun 2019 20:00:59 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 02/12] block/backup: Add mirror sync mode
- 'bitmap'
+Subject: Re: [Qemu-devel] [PATCH v4 01/13] vfio: KABI for migration interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -150,114 +74,408 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Wen Congyang <wencongyang2@huawei.com>,
- Xie Changlong <xiechanglong.d@gmail.com>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Sat, 22 Jun 2019 01:05:48 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-
-On 6/21/19 7:29 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 20.06.2019 4:03, John Snow wrote:
->> We don't need or want a new sync mode for simple differences in
->> semantics.  Create a new mode simply named "BITMAP" that is designed to
->> make use of the new Bitmap Sync Mode field.
->>
->> Because the only bitmap mode is 'conditional', this adds no new
->> functionality to the backup job (yet). The old incremental backup mode
->> is maintained as a syntactic sugar for sync=bitmap, mode=conditional.
->>
->> Add all of the plumbing necessary to support this new instruction.
+> On 6/21/2019 8:33 PM, Alex Williamson wrote:
+> > On Fri, 21 Jun 2019 11:22:15 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >   
+> >> On 6/20/2019 10:48 PM, Alex Williamson wrote:  
+> >>> On Thu, 20 Jun 2019 20:07:29 +0530
+> >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >>>     
+> >>>> - Defined MIGRATION region type and sub-type.
+> >>>> - Used 3 bits to define VFIO device states.
+> >>>>     Bit 0 => _RUNNING
+> >>>>     Bit 1 => _SAVING
+> >>>>     Bit 2 => _RESUMING
+> >>>>     Combination of these bits defines VFIO device's state during migration
+> >>>>     _STOPPED => All bits 0 indicates VFIO device stopped.
+> >>>>     _RUNNING => Normal VFIO device running state.
+> >>>>     _SAVING | _RUNNING => vCPUs are running, VFIO device is running but start
+> >>>>                           saving state of device i.e. pre-copy state
+> >>>>     _SAVING  => vCPUs are stoppped, VFIO device should be stopped, and
+> >>>>                           save device state,i.e. stop-n-copy state
+> >>>>     _RESUMING => VFIO device resuming state.
+> >>>>     _SAVING | _RESUMING => Invalid state if _SAVING and _RESUMING bits are set
+> >>>> - Defined vfio_device_migration_info structure which will be placed at 0th
+> >>>>   offset of migration region to get/set VFIO device related information.
+> >>>>   Defined members of structure and usage on read/write access:
+> >>>>     * device_state: (read/write)
+> >>>>         To convey VFIO device state to be transitioned to. Only 3 bits are used
+> >>>>         as of now.
+> >>>>     * pending bytes: (read only)
+> >>>>         To get pending bytes yet to be migrated for VFIO device.
+> >>>>     * data_offset: (read only)
+> >>>>         To get data offset in migration from where data exist during _SAVING
+> >>>>         and from where data should be written by user space application during
+> >>>>          _RESUMING state
+> >>>>     * data_size: (read/write)
+> >>>>         To get and set size of data copied in migration region during _SAVING
+> >>>>         and _RESUMING state.
+> >>>>     * start_pfn, page_size, total_pfns: (write only)
+> >>>>         To get bitmap of dirty pages from vendor driver from given
+> >>>>         start address for total_pfns.
+> >>>>     * copied_pfns: (read only)
+> >>>>         To get number of pfns bitmap copied in migration region.
+> >>>>         Vendor driver should copy the bitmap with bits set only for
+> >>>>         pages to be marked dirty in migration region. Vendor driver
+> >>>>         should return 0 if there are 0 pages dirty in requested
+> >>>>         range. Vendor driver should return -1 to mark all pages in the section
+> >>>>         as dirty
+> >>>>
+> >>>> Migration region looks like:
+> >>>>  ------------------------------------------------------------------
+> >>>> |vfio_device_migration_info|    data section                      |
+> >>>> |                          |     ///////////////////////////////  |
+> >>>>  ------------------------------------------------------------------
+> >>>>  ^                              ^                              ^
+> >>>>  offset 0-trapped part        data_offset                 data_size
+> >>>>
+> >>>> Data section is always followed by vfio_device_migration_info
+> >>>> structure in the region, so data_offset will always be none-0.
+> >>>> Offset from where data is copied is decided by kernel driver, data
+> >>>> section can be trapped or mapped depending on how kernel driver
+> >>>> defines data section. If mmapped, then data_offset should be page
+> >>>> aligned, where as initial section which contain
+> >>>> vfio_device_migration_info structure might not end at offset which
+> >>>> is page aligned.
+> >>>>
+> >>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> >>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> >>>> ---
+> >>>>  linux-headers/linux/vfio.h | 71 ++++++++++++++++++++++++++++++++++++++++++++++
+> >>>>  1 file changed, 71 insertions(+)
+> >>>>
+> >>>> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+> >>>> index 24f505199f83..274ec477eb82 100644
+> >>>> --- a/linux-headers/linux/vfio.h
+> >>>> +++ b/linux-headers/linux/vfio.h
+> >>>> @@ -372,6 +372,77 @@ struct vfio_region_gfx_edid {
+> >>>>   */
+> >>>>  #define VFIO_REGION_SUBTYPE_IBM_NVLINK2_ATSD	(1)
+> >>>>  
+> >>>> +/* Migration region type and sub-type */
+> >>>> +#define VFIO_REGION_TYPE_MIGRATION	        (2)
+> >>>> +#define VFIO_REGION_SUBTYPE_MIGRATION	        (1)
+> >>>> +
+> >>>> +/**
+> >>>> + * Structure vfio_device_migration_info is placed at 0th offset of
+> >>>> + * VFIO_REGION_SUBTYPE_MIGRATION region to get/set VFIO device related migration
+> >>>> + * information. Field accesses from this structure are only supported at their
+> >>>> + * native width and alignment, otherwise should return error.
+> >>>> + *
+> >>>> + * device_state: (read/write)
+> >>>> + *      To indicate vendor driver the state VFIO device should be transitioned
+> >>>> + *      to. If device state transition fails, write to this field return error.
+> >>>> + *      It consists of 3 bits:
+> >>>> + *      - If bit 0 set, indicates _RUNNING state. When its reset, that indicates
+> >>>> + *        _STOPPED state. When device is changed to _STOPPED, driver should stop
+> >>>> + *        device before write returns.
+> >>>> + *      - If bit 1 set, indicates _SAVING state.
+> >>>> + *      - If bit 2 set, indicates _RESUMING state.
+> >>>> + *
+> >>>> + * pending bytes: (read only)
+> >>>> + *      Read pending bytes yet to be migrated from vendor driver
+> >>>> + *
+> >>>> + * data_offset: (read only)
+> >>>> + *      User application should read data_offset in migration region from where
+> >>>> + *      user application should read data during _SAVING state or write data
+> >>>> + *      during _RESUMING state.
+> >>>> + *
+> >>>> + * data_size: (read/write)
+> >>>> + *      User application should read data_size to know data copied in migration
+> >>>> + *      region during _SAVING state and write size of data copied in migration
+> >>>> + *      region during _RESUMING state.
+> >>>> + *
+> >>>> + * start_pfn: (write only)
+> >>>> + *      Start address pfn to get bitmap of dirty pages from vendor driver duing
+> >>>> + *      _SAVING state.
+> >>>> + *
+> >>>> + * page_size: (write only)
+> >>>> + *      User application should write the page_size of pfn.
+> >>>> + *
+> >>>> + * total_pfns: (write only)
+> >>>> + *      Total pfn count from start_pfn for which dirty bitmap is requested.
+> >>>> + *
+> >>>> + * copied_pfns: (read only)
+> >>>> + *      pfn count for which dirty bitmap is copied to migration region.
+> >>>> + *      Vendor driver should copy the bitmap with bits set only for pages to be
+> >>>> + *      marked dirty in migration region.
+> >>>> + *      Vendor driver should return 0 if there are 0 pages dirty in requested
+> >>>> + *      range.
+> >>>> + *      Vendor driver should return -1 to mark all pages in the section as
+> >>>> + *      dirty.    
+> >>>
+> >>> Is the protocol that the user writes start_pfn/page_size/total_pfns in
+> >>> any order and then the read of copied_pfns is what triggers the
+> >>> snapshot?    
+> >>
+> >> Yes.
+> >>  
+> >>>  Are start_pfn/page_size/total_pfns sticky such that a user
+> >>> can write them once and get repeated refreshes of the dirty bitmap by
+> >>> re-reading copied_pfns?    
+> >>
+> >> Yes and that bitmap should be for given range (from start_pfn till
+> >> start_pfn + tolal_pfns).
+> >> Re-reading of copied_pfns is to handle the case where it might be
+> >> possible that vendor driver reserved area for bitmap < total bitmap size
+> >> for range (start_pfn to start_pfn + tolal_pfns), then user will have to
+> >> iterate till copied_pfns == total_pfns or till copied_pfns == 0 (that
+> >> is, there are no pages dirty in rest of the range)  
+> > 
+> > So reading copied_pfns triggers the data range to be updated, but the
+> > caller cannot assume it to be synchronous and uses total_pfns to poll
+> > that the update is complete?  How does the vendor driver differentiate
+> > the user polling for the previous update to finish versus requesting a
+> > new update?
+> >   
 > 
-> I don't follow, why you don't want to just add bitmap-mode optional parameter
-> for incremental mode?
+> Write on start_pfn/page_size/total_pfns, then read on copied_pfns
+> indicates new update, where as sequential read on copied_pfns indicates
+> polling for previous update.
+
+Hmm, this seems to contradict the answer to my question above where I
+ask if the write fields are sticky so a user can trigger a refresh via
+copied_pfns.  Does it really make sense that this is asynchronous?  Are
+we going to need to specify polling intervals and completion eventfds?
+data_size is synchronous, right?  Thanks,
+
+Alex
+
+> >>>  What's the advantage to returning -1 versus
+> >>> returning copied_pfns == total_pfns?
+> >>>     
+> >>
+> >> If all bits in bitmap are 1, then return -1, that is, all pages in the
+> >> given range to be marked dirty.
+> >>
+> >> If all bits in bitmap are 0, then return 0, that is, no page to be
+> >> marked dirty in given range or rest of the range.
+> >>
+> >> Otherwise vendor driver should return copied_pfns == total_pfn and
+> >> provide bitmap for total_pfn, which means that bitmap copied for given
+> >> range contains information for all pages where some bits are 0s and some
+> >> are 1s.  
+> > 
+> > Given that the vendor driver can indicate zero dirty pfns and all dirty
+> > pfns, I interpreted copied_pfns as a synchronous operation where the
+> > return value could indicate the number of dirty pages within the
+> > requested range.
+> >   
+> >>> If the user then wants to switch back to reading device migration
+> >>> state, is it a read of data_size that switches the data area back to
+> >>> making that address space available?     
+> >>
+> >> No, Its not just read(data_size), before that there is a
+> >> read(data_offset). If Vendor driver wants to have different sub-regions
+> >> for device data and dirty page bitmap, vendor driver should return
+> >> corresponding offset on read(data_offset).  
+> > 
+> > The dynamic use of data_offset was not at all evident to me until I got
+> > further into the QEMU series.  The usage model needs to be well
+> > specified in the linux header.  I infer this behavior is such that the
+> > vendor driver can effectively identity map portions of device memory
+> > and the user will restore to the same offset.  I suppose this is a
+> > valid approach but it seems specifically tuned to devices which allow
+> > full direct mapping, whereas many devices have more device memory than
+> > is directly map'able and state beyond simple device memory.  Does this
+> > model unnecessarily burden such devices?  It is a nice feature that
+> > they data range can contain both mmap'd sections and trapped sections
+> > and by adjusting data_offset the vendor driver can select which is
+> > currently being used, but we really need to formalize all these details.
+> >   
+> >>> In each case, is it the user's
+> >>> responsibility to consume all the data provided before triggering the
+> >>> next data area?> For example, if I ask for a range of dirty bitmap, the
+> >>> vendor driver will provide that range and and clear it, such that the
+> >>> pages are considered clean regardless of whether the user consumed the
+> >>> data area.      
+> >>
+> >> Yes.
+> >>  
+> >>> Likewise if the user asks for data_size, that would be
+> >>> deducted from pending_bytes regardless of the user reading the data
+> >>> area.     
+> >>
+> >> User should read data before deducting data_size from pending_bytes.  
+> > 
+> > The user deducts data_size form pending_bytes?  pending_bytes is
+> > read-only, how does this work?  
 > 
-
-Vocabulary reasons, see below.
-
-> For this all looks similar to just two separate things:
-> 1. add bitmap-mode parameter
-> 2. rename incremental to bitmap
-
-This is exactly correct!
-
+> Pending_bytes is readonly from migration region. User should read device
+> data while pending_bytes > 0. How User would decide to iterate or not?
+> User will have to check if previously read pending_bytes - data_size is
+> still > 0, if yes then iterate. Before iterating, its users
+> responsibility to read data from data section.
 > 
-> Why do we need [2.] ?
-> If we do only [1.], we'll avoid creating two similar modes, syntax sugar, a bit
-> of mess as it seems to me..
+> >   
+> >> From vendor driver point of view, data_size will be deducted from
+> >> pending_bytes once data is copied to data region.  
+> > 
+> > If the data is entirely from an mmap'd range, how does the vendor
+> > driver know when the data is copied?
+> >   
+> >>> Are there any read side-effects to pending_bytes?    
+> >>
+> >> No, its query to vendor driver about pending bytes yet to be
+> >> migrated/read from vendor driver.
+> >>  
+> >>>  Are there
+> >>> read side-effects to the data area on SAVING?    
+> >>
+> >> No.  
+> > 
+> > So the vendor driver must make an assumption somewhere in the usage
+> > protocol that it's the user's responsibility, this needs to be
+> > specified.
+> >   
 > 
-> Hmm, about differential backups, as I understood, we call 'differential' an incremental
-> backup, but which considers difference not from latest incremental backup but from some
-> in the past.. Is it incorrect?
+> Ok.
 > 
+> >>>  Are there write
+> >>> side-effects on RESUMING, or is it only the write of data_size that
+> >>> triggers the buffer to be consumed?    
+> >>
+> >> Its write(data_size) triggers the buffer to be consumed, if region is
+> >> mmaped, then data is already copied to region, if its trapped then
+> >> following writes from data_offset is data to be consumed.
+> >>  
+> >>>  Is it the user's responsibility to
+> >>> write only full "packets" on RESUMING?  For example if the SAVING side
+> >>> provides data_size X, that full data_size X must be written to the
+> >>> RESUMING side, the user cannot write half of it to the data area on the
+> >>> RESUMING side, write data_size with X/2, write the second half, and
+> >>> again write X/2.  IOW, the data_size "packet" is indivisible at the
+> >>> point of resuming.
+> >>>     
+> >>
+> >> If source and destination are compatible or of same driver version, then
+> >> if user is reading data_size X at source/SAVING, destination should be
+> >> able to consume data_size X at restoring/RESUMING. Then why should user
+> >> write X/2 and iterate?  
+> > 
+> > Because users do things we don't expect ;)  Maybe they decide to chunk
+> > the data into smaller packets over the network, but the receiving side
+> > would rather write the packet immediately rather than queuing it.
+> > OTOH, does it necessarily matter so long as data_size is written on
+> > completion of a full "packet"?
+> >   
+> 
+> Doesn't matter. As long as data is written in same order as it was read,
+> size doesn't matter.
+> 
+> >>> What are the ordering requirements?  Must the user write data_size
+> >>> packets in the same order that they're read, or is it the vendor
+> >>> driver's responsibility to include sequence information and allow
+> >>> restore in any order?
+> >>>     
+> >>
+> >> For user, data is opaque. User should write data in the same order as he
+> >> received.  
+> > 
+> > Let's make sure that's specified.
+> >   
+> 
+> Ok.
+> 
+> Thanks,
+> Kirti
+> 
+> >>>> + */
+> >>>> +
+> >>>> +struct vfio_device_migration_info {
+> >>>> +        __u32 device_state;         /* VFIO device state */
+> >>>> +#define VFIO_DEVICE_STATE_STOPPED   (0)    
+> >>>
+> >>> We need to be careful with how this is used if we want to leave the
+> >>> possibility of using the remaining 29 bits of this register.  Maybe we
+> >>> want to define VFIO_DEVICE_STATE_MASK and be sure that we only do
+> >>> read-modify-write ops within the mask (ex. set_bit and clear_bit
+> >>> helpers).    
+> >>
+> >> Makes sense, I'll do changes in next iteration.
+> >>  
+> >>>  Also, above we define STOPPED to indicate simply
+> >>> not-RUNNING, but here it seems STOPPED means not-RUNNING, not-SAVING,
+> >>> and not-RESUMING.
+> >>>     
+> >>
+> >> That's correct.
+> >>  
+> >>>> +#define VFIO_DEVICE_STATE_RUNNING   (1 << 0)
+> >>>> +#define VFIO_DEVICE_STATE_SAVING    (1 << 1)
+> >>>> +#define VFIO_DEVICE_STATE_RESUMING  (1 << 2)
+> >>>> +#define VFIO_DEVICE_STATE_INVALID   (VFIO_DEVICE_STATE_SAVING | \
+> >>>> +                                     VFIO_DEVICE_STATE_RESUMING)
+> >>>> +        __u32 reserved;
+> >>>> +        __u64 pending_bytes;
+> >>>> +        __u64 data_offset;    
+> >>>
+> >>> Placing the data more than 4GB into the region seems a bit absurd, so
+> >>> this could probably be a __u32 and take the place of the reserved field.
+> >>>     
+> >>
+> >> Is there a maximum limit on VFIO region size?
+> >> There isn't any such limit, right? Vendor driver can define region of
+> >> any size and then place data section anywhere in the region. I prefer to
+> >> keep it __u64.  
+> > 
+> > We have a single file descriptor for all accesses to the device, which
+> > gives us quite a bit of per device address space.  As I mention above,
+> > it wasn't clear to me that data_offset is used dynamically until I got
+> > further into the series, so it seemed strange to me that we'd choose
+> > such a large offset, but given my new understanding I agree it requires
+> > a __u64 currently.  Thanks,
+> > 
+> > Alex
+> >   
+> >>>> +        __u64 data_size;
+> >>>> +        __u64 start_pfn;
+> >>>> +        __u64 page_size;
+> >>>> +        __u64 total_pfns;
+> >>>> +        __s64 copied_pfns;    
+> >>>
+> >>> If this is signed so that we can get -1 then the user could
+> >>> theoretically specify total_pfns that we can't represent in
+> >>> copied_pfns.  Probably best to use unsigned and specify ~0 rather than
+> >>> -1.
+> >>>     
+> >>
+> >> Ok.
+> >>  
+> >>> Overall this looks like a good interface, but we need to more
+> >>> thoroughly define the protocol with the data area and set expectations
+> >>> we're placing on the user and vendor driver.  There should be no usage
+> >>> assumptions, it should all be spelled out.  Thanks,
+> >>>    
+> >>
+> >> Thanks for your feedback. I'll update comments above to be more specific.
+> >>
+> >> Thanks,
+> >> Kirti
+> >>  
+> >>> Alex
+> >>>     
+> >>>> +} __attribute__((packed));
+> >>>> +
+> >>>>  /*
+> >>>>   * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped
+> >>>>   * which allows direct access to non-MSIX registers which happened to be within    
+> >>>     
+> >   
 
-The reason is because I have been treating "INCREMENTAL" as meaning
-something very specific -- I gather from you and Max that you don't
-consider this term to mean something specific.
-
-So, by other prominent backup vendors, they use these terms in this way:
-
-INCREMENTAL: This backup contains a delta from the last INCREMENTAL
-backup made. In effect, this creates a chain of backups that must be
-squashed together to recover data, but uses less info on copy.
-
-DIFFERENTIAL: This backup contains a delta from the last FULL backup
-made. In effect, each differential backup only requires a base image and
-a single differential. This usually wastes more data during the backup
-process, but makes restoration processes easier.
-
-
-I *always* use these terms in these *exact* ways; you can see that the
-bitmap behavior we use is exactly what MIRROR_SYNC_MODE_INCREMENTAL
-does. Even when we are using bitmap manipulation techniques to get it to
-do something else, the block job itself is engineered to think that it
-is producing an "Incremental" backup.
-
-
-In the early days of this feature, Fam actually proposed something like
-what I am proposing here:
-
-a BITMAP sync mode with an on_complete parameter for the backup job that
-would either roll the bitmap forward or not (like my "conditional",
-"never") based on the success of the job.
-
-We removed that because at the time we wanted to target a simpler
-feature. As part of that removal, I renamed the mode "INCREMENTAL" under
-the premise that if we ever wanted to add a "DIFFERENTIAL" mode like
-what Fam's original design allowed for, we could add
-MIRROR_SYNC_MODE_DIFFERENTIAL and that would differentiate the two
-modes. This rename was done with the specific knowledge and intent that
-the mode was named after the exact specific backup paradigm it was
-enabling. Otherwise, I would have left it "BITMAP" back then.
-
-I've had patches in my branch to add a DIFFERENTIAL mode ever since
-then! However, since we added bitmap merging, you'll notice that we
-actually CAN do "Differential" backups by playing around with the
-bitmaps ourselves, which has largely stopped me from wanting to
-introduce the new mode.
-
-You'll recall that recently Xie Changlong sent patches to add
-"incremental" support to mirror, but what they ACTUALLY implemented was
-"Differential" mode -- they didn't clear the bitmap afterwards. I
-actually responded as such on-list -- that if we implement a
-"Differential" mode that their patches would have been appropriate for
-that mode.
-
-As a result of that discussion, I went to add a "Differential" mode to
-mirror, but in the process realized that it's much easier to make the
-bitmap sync behavior its own parameter.
-
-However, because the new parameters no longer mean the backup is
-"Incremental" by that definition, I decided to rename the mode "BITMAP"
-again to be *less specific* and, perhaps now ironically, avoid confusion.
-
-Even given this confusion ... I actually still think that we should NOT
-use "Incremental" to mean something generic, and I will continue to
-enforce the idea that "Incremental" should mean a series of
-non-overlapping time-sliced deltas.
-
---js
 
