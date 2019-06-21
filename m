@@ -2,80 +2,84 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EE5EC43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:10:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C554C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:11:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60BA220679
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:10:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60BA220679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5593820679
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:11:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t9MEcABT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5593820679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55254 helo=lists.gnu.org)
+Received: from localhost ([::1]:55256 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heDh5-00078X-HR
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 03:10:43 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34753)
+	id 1heDhX-0007Ja-FV
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 03:11:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35278)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1heDf5-0005zW-IX
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:08:41 -0400
+ (envelope-from <joel.stan@gmail.com>) id 1heDfO-0006Ew-V2
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:09:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1heDaE-0007be-SD
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:03:40 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:40209)
+ (envelope-from <joel.stan@gmail.com>) id 1heDUr-0007V2-Pr
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 02:58:07 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:43491)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1heDaD-0007Z5-B4
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:03:37 -0400
-Received: by mail-wr1-f65.google.com with SMTP id p11so5403801wre.7
- for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 00:03:36 -0700 (PDT)
+ (Exim 4.71) (envelope-from <joel.stan@gmail.com>)
+ id 1heDPr-0008T2-4L; Fri, 21 Jun 2019 02:52:56 -0400
+Received: by mail-pg1-x542.google.com with SMTP id f25so2872727pgv.10;
+ Thu, 20 Jun 2019 23:52:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=QrPb1I4hGgIdnSQDxicKRNj7Vi+MgOZceJ5iUqGk3p8=;
+ b=t9MEcABTrVvPUw9UNLxvsfUsdMWlb/UtFwiat6FbeB+dYpuHLBwxy6AcI79w3NzdoZ
+ Gr5/uV3k4hCNkG1szSwqGRi+2gMCii0O9HNuBHiZ1gZZzM7CHuKj4g6Pmni3CRcHGwsC
+ YFAYSawf/C2DcIDzN65JXzAVjvj80Ghl63X9std2Eze5h/ftCN0KXxaRaF925VJAgHjJ
+ OzMhJiGK6wypRtnn1XwSMcc/WSiwQXJvXZSEwNFV1KDEHQBN4tyTLSQ7QgeQD/PMWPyv
+ bHCNKIPB1Lc7ClLloZl7QxVNmQYoxHPMq9UJQFg15epwtS8T5jyRmzua30nSo0ZHI0wM
+ pFHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=FsSvt2kljdqfU//U4CRsFXm6JmXXkMNLF0RQJy7HOEE=;
- b=nUsyTlUqk74+qJPgpufhXY31iB/kJ2UIHdHbxSC6LC87259buhKCxLqiymgN4i5ijl
- vd9N3C5ZEBWI3IjIIc3lkMfWHvsuNj2+yvUQGrZOAIpCxv4UhtkdCtkWuqQndDZ2OlXn
- ynM+TDQoU4urcnB1Uf/CEA7U6ULDVM31CEaPI3FrHZisy0iPv+Z5WXTq6RRVho5zuDKK
- xjJ8gUPf3Rl7nvfgJpe7NuZzvnhi/+r51x19OcLA97KRZ26j6iRDVAlJukPEcMeZAzj7
- H+2B6zDb8+66EKcZhgYAyWCmqme3cYpfkRxnUdfHtrafx8dBVIbVdnGKGrRSN3v9XkkV
- QgaA==
-X-Gm-Message-State: APjAAAWSd7fthWjOhXRnAkssq79jgy53hKJjmcDOi9MYCf7wSpmZ/SX5
- vuSHxfUjqwcOtRCzEcGdgppsRQ==
-X-Google-Smtp-Source: APXvYqxXacr4LTCAhhx11blTSuEG7UWKtIC6j3q+/QJ9+AzqLSfg4h6cHCBKsv6v4bsz+QtJzkU4Iw==
-X-Received: by 2002:a5d:5448:: with SMTP id w8mr61966075wrv.180.1561100615373; 
- Fri, 21 Jun 2019 00:03:35 -0700 (PDT)
-Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.183])
- by smtp.gmail.com with ESMTPSA id v65sm2108643wme.31.2019.06.21.00.03.34
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 21 Jun 2019 00:03:34 -0700 (PDT)
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-References: <20190621060925.16214-1-crosa@redhat.com>
- <20190621060925.16214-2-crosa@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <f18a5df8-201e-b8a1-1a3e-3e2254ce8b1e@redhat.com>
-Date: Fri, 21 Jun 2019 09:03:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=QrPb1I4hGgIdnSQDxicKRNj7Vi+MgOZceJ5iUqGk3p8=;
+ b=GJmPjYNaL/mKCdtEDVtImOYUjJAR+JKJBSZuOzaZHbp09M3wPmNfvklO+JuaQoBgGQ
+ 5seyOpQy4tr7ax8BEd5AFtauUju3IE3B3mO9y0eNtG69r50UgHeeUTClNoIiTCCZtUhx
+ P3N27+k2PPjYDnPWr/GtsQOlbT4inpsP3Ip7OL8Nrw75Lwx7QHzkxQ4B2JAt81T9EhL5
+ 6yYGmr6uy/QwgNUmvSwICtHGbNy8LMrBs+HoHDyAfgZf+DDPEYs/O7xchHM/CRD/Q4hn
+ F7RDndgqOwMZ0hnuLOzoYxWxM7o0ykkrZNuz1dW206/e2jeeTa4Epjpe3nyv0kf5PB26
+ wneg==
+X-Gm-Message-State: APjAAAXm+uAXyKZDQBSDszvlApTvGEGUSZbnkqkU7c/AzVpRFAjj5++/
+ A2E3Dknes3z0vW9XxUmUhZA=
+X-Google-Smtp-Source: APXvYqwPUo8K7Yy7BSHo3QAwaJI/jWlT/qI8OzIdy8OKTWtnltzZxVslVtS0j2dRYzh4SOU4rm+twQ==
+X-Received: by 2002:a63:1d5:: with SMTP id 204mr17261028pgb.207.1561099972851; 
+ Thu, 20 Jun 2019 23:52:52 -0700 (PDT)
+Received: from voyager.ibm.com ([36.255.48.244])
+ by smtp.gmail.com with ESMTPSA id m19sm2833108pff.153.2019.06.20.23.52.50
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 20 Jun 2019 23:52:52 -0700 (PDT)
+From: Joel Stanley <joel@jms.id.au>
+To: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 21 Jun 2019 16:22:42 +0930
+Message-Id: <20190621065242.32535-1-joel@jms.id.au>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190621060925.16214-2-crosa@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PATCH 1/2] Acceptance tests: exclude "flaky" tests
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::542
+Subject: [Qemu-devel] [PATCH v2] aspeed: Link SCU to the watchdog
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,157 +91,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/21/19 8:09 AM, Cleber Rosa wrote:
-> It's a fact that some tests may not be 100% reliable in all
-> environments.  While it's a tough call to remove a useful test that
-> from the tree because it may fail every 1/100th time (or so), having
-> human attention drawn to known issues is very bad for humans and for
-> the projects they manage.
-> 
-> As a compromise solution, this marks tests that are known to have
-> issues, or that exercises known issues in QEMU or other components,
-> and excludes them from the entry point.  As a consequence, tests
-> marked as "flaky" will not be executed as part of "make
-> check-acceptance".
-> 
-> Because such tests should be forgiven but never be forgotten, it's
-> possible to list them with (assuming "make check-venv" or "make
-> check-acceptance" has already initiatilized the venv):
-> 
->   $ ./tests/venv/bin/avocado list -t flaky tests/acceptance
-> 
-> The current list of tests marked as flaky are a result of running
-> the entire set of acceptance tests around 20 times.  The results
-> were then processed with a helper script[1].  That either confirmed
-> known issues (in the case of aarch64 and arm)[2] or revealed new
-> ones (mips).
-> 
-> This also bumps the Avocado version to one that includes a fix to the
-> parsing of multiple and mix "key:val" and simple tag values.
-> 
-> [1] https://raw.githubusercontent.com/avocado-framework/avocado/master/contrib/scripts/summarize-job-failures.py
-> [2] https://bugs.launchpad.net/qemu/+bug/1829779
-> 
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
->  docs/devel/testing.rst                   | 17 +++++++++++++++++
->  tests/Makefile.include                   |  6 +++++-
->  tests/acceptance/boot_linux_console.py   |  2 ++
->  tests/acceptance/linux_ssh_mips_malta.py |  2 ++
->  tests/requirements.txt                   |  2 +-
->  5 files changed, 27 insertions(+), 2 deletions(-)
-> 
-> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-> index da2d0fc964..ff4d8e2e1c 100644
-> --- a/docs/devel/testing.rst
-> +++ b/docs/devel/testing.rst
-> @@ -574,6 +574,23 @@ may be invoked by running:
->  
->    tests/venv/bin/avocado run $OPTION1 $OPTION2 tests/acceptance/
->  
-> +Tagging tests
-> +-------------
-> +
-> +flaky
-> +~~~~~
-> +
-> +If a test is known to fail intermittently, even if only every one
-> +hundredth time, it's highly advisable to mark it as a flaky test.
-> +This will prevent these individual tests from failing much larger
-> +jobs, will avoid human interaction and time wasted to verify a known
-> +issue, and worse of all, can lead to the discredit of automated
-> +testing.
-> +
-> +To mark a test as flaky, add to its docstring.::
-> +
-> +  :avocado: tags=flaky
+The ast2500 uses the watchdog to reset the SDRAM controller. This
+operation is usually performed by u-boot's memory training procedure,
+and it is enabled by setting a bit in the SCU and then causing the
+watchdog to expire. Therefore, we need the watchdog to be able to
+access the SCU's register space.
 
-I certainly disagree with this patch, failing tests have to be fixed.
-Why not tag all the codebase flaky and sing "happy coding"?
+This causes the watchdog to not perform a system reset when the bit is
+set. In the future it could perform a reset of the SDMC model.
 
-Anyway if this get accepted, 'flaky' tags must have the intermittent
-failure well described, and a Launchpad/Bugzilla tracking ticket referenced.
+Signed-off-by: Joel Stanley <joel@jms.id.au>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+---
+v2: rebase on upstream, rework commit message
+---
+ hw/arm/aspeed_soc.c              |  2 ++
+ hw/watchdog/wdt_aspeed.c         | 20 ++++++++++++++++++++
+ include/hw/watchdog/wdt_aspeed.h |  1 +
+ 3 files changed, 23 insertions(+)
 
-> +
->  Manual Installation
->  -------------------
->  
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index db750dd6d0..4c97da2878 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -1125,7 +1125,11 @@ TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
->  # Any number of command separated loggers are accepted.  For more
->  # information please refer to "avocado --help".
->  AVOCADO_SHOW=app
-> -AVOCADO_TAGS=$(patsubst %-softmmu,-t arch:%, $(filter %-softmmu,$(TARGET_DIRS)))
-> +
-> +# Additional tags that are added to each occurence of "--filter-by-tags"
-> +AVOCADO_EXTRA_TAGS := ,-flaky
-> +
-> +AVOCADO_TAGS=$(patsubst %-softmmu,--filter-by-tags=arch:%$(AVOCADO_EXTRA_TAGS), $(filter %-softmmu,$(TARGET_DIRS)))
->  
->  ifneq ($(findstring v2,"v$(PYTHON_VERSION)"),v2)
->  $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-> index 32159503e9..6bd5c1ab53 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -249,6 +249,7 @@ class BootLinuxConsole(Test):
->          """
->          :avocado: tags=arch:aarch64
->          :avocado: tags=machine:virt
-> +        :avocado: tags=flaky
->          """
->          kernel_url = ('https://download.fedoraproject.org/pub/fedora/linux/'
->                        'releases/29/Everything/aarch64/os/images/pxeboot/vmlinuz')
-> @@ -270,6 +271,7 @@ class BootLinuxConsole(Test):
->          """
->          :avocado: tags=arch:arm
->          :avocado: tags=machine:virt
-> +        :avocado: tags=flaky
->          """
->          kernel_url = ('https://download.fedoraproject.org/pub/fedora/linux/'
->                        'releases/29/Everything/armhfp/os/images/pxeboot/vmlinuz')
-> diff --git a/tests/acceptance/linux_ssh_mips_malta.py b/tests/acceptance/linux_ssh_mips_malta.py
-> index aafb0c39f6..ae70b658e0 100644
-> --- a/tests/acceptance/linux_ssh_mips_malta.py
-> +++ b/tests/acceptance/linux_ssh_mips_malta.py
-> @@ -208,6 +208,7 @@ class LinuxSSH(Test):
->          :avocado: tags=machine:malta
->          :avocado: tags=endian:big
->          :avocado: tags=device:pcnet32
-> +        :avocado: tags=flaky
->          """
->          kernel_url = ('https://people.debian.org/~aurel32/qemu/mips/'
->                        'vmlinux-3.2.0-4-5kc-malta')
-> @@ -222,6 +223,7 @@ class LinuxSSH(Test):
->          :avocado: tags=machine:malta
->          :avocado: tags=endian:little
->          :avocado: tags=device:pcnet32
-> +        :avocado: tags=flaky
->          """
->          kernel_url = ('https://people.debian.org/~aurel32/qemu/mipsel/'
->                        'vmlinux-3.2.0-4-5kc-malta')
-> diff --git a/tests/requirements.txt b/tests/requirements.txt
-> index 3ae0e29ad7..58d63d171f 100644
-> --- a/tests/requirements.txt
-> +++ b/tests/requirements.txt
-> @@ -1,5 +1,5 @@
->  # Add Python module requirements, one per line, to be installed
->  # in the tests/venv Python virtual environment. For more info,
->  # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
-> -avocado-framework==68.0
-> +avocado-framework==69.1
->  paramiko
-> 
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index a2ea8c748449..ddd5dfacd7d6 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -155,6 +155,8 @@ static void aspeed_soc_init(Object *obj)
+                               sizeof(s->wdt[i]), TYPE_ASPEED_WDT);
+         qdev_prop_set_uint32(DEVICE(&s->wdt[i]), "silicon-rev",
+                                     sc->info->silicon_rev);
++        object_property_add_const_link(OBJECT(&s->wdt[i]), "scu",
++                                       OBJECT(&s->scu), &error_abort);
+     }
+ 
+     sysbus_init_child_obj(obj, "ftgmac100", OBJECT(&s->ftgmac100),
+diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
+index 4a8409f0daf5..57fe24ae6b1f 100644
+--- a/hw/watchdog/wdt_aspeed.c
++++ b/hw/watchdog/wdt_aspeed.c
+@@ -44,6 +44,9 @@
+ 
+ #define WDT_RESTART_MAGIC               0x4755
+ 
++#define SCU_RESET_CONTROL1              (0x04 / 4)
++#define    SCU_RESET_SDRAM              BIT(0)
++
+ static bool aspeed_wdt_is_enabled(const AspeedWDTState *s)
+ {
+     return s->regs[WDT_CTRL] & WDT_CTRL_ENABLE;
+@@ -222,6 +225,13 @@ static void aspeed_wdt_timer_expired(void *dev)
+ {
+     AspeedWDTState *s = ASPEED_WDT(dev);
+ 
++    /* Do not reset on SDRAM controller reset */
++    if (s->scu->regs[SCU_RESET_CONTROL1] & SCU_RESET_SDRAM) {
++        timer_del(s->timer);
++        s->regs[WDT_CTRL] = 0;
++        return;
++    }
++
+     qemu_log_mask(CPU_LOG_RESET, "Watchdog timer expired.\n");
+     watchdog_perform_action();
+     timer_del(s->timer);
+@@ -233,6 +243,16 @@ static void aspeed_wdt_realize(DeviceState *dev, Error **errp)
+ {
+     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+     AspeedWDTState *s = ASPEED_WDT(dev);
++    Error *err = NULL;
++    Object *obj;
++
++    obj = object_property_get_link(OBJECT(dev), "scu", &err);
++    if (!obj) {
++        error_propagate(errp, err);
++        error_prepend(errp, "required link 'scu' not found: ");
++        return;
++    }
++    s->scu = ASPEED_SCU(obj);
+ 
+     if (!is_supported_silicon_rev(s->silicon_rev)) {
+         error_setg(errp, "Unknown silicon revision: 0x%" PRIx32,
+diff --git a/include/hw/watchdog/wdt_aspeed.h b/include/hw/watchdog/wdt_aspeed.h
+index 88d8be4f78d6..daef0c0e230b 100644
+--- a/include/hw/watchdog/wdt_aspeed.h
++++ b/include/hw/watchdog/wdt_aspeed.h
+@@ -27,6 +27,7 @@ typedef struct AspeedWDTState {
+     MemoryRegion iomem;
+     uint32_t regs[ASPEED_WDT_REGS_MAX];
+ 
++    AspeedSCUState *scu;
+     uint32_t pclk_freq;
+     uint32_t silicon_rev;
+     uint32_t ext_pulse_width_mask;
+-- 
+2.20.1
+
 
