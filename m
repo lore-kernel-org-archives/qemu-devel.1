@@ -2,52 +2,89 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58D58C48BE0
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:59:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6414C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 09:03:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34DA420673
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:59:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34DA420673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9012F20673
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 09:03:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xU670heP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9012F20673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55646 helo=lists.gnu.org)
+Received: from localhost ([::1]:55690 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heFOQ-0007Mz-GG
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 04:59:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58773)
+	id 1heFRv-0002e3-Kw
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 05:03:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58042)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1heEzm-0004Ud-S9
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:34:09 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1heEzc-00044x-7U
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:33:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1heEmn-00089R-7Y
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:20:42 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:41206)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1heEmm-00085m-TQ
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:20:41 -0400
-Received: from [127.0.1.1] (unknown [85.142.117.226])
- by mail.ispras.ru (Postfix) with ESMTPSA id 1F11354006B;
- Fri, 21 Jun 2019 11:20:38 +0300 (MSK)
-From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 21 Jun 2019 11:20:37 +0300
-Message-ID: <156110523748.25431.9310430853468653085.stgit@pasha-Precision-3630-Tower>
-User-Agent: StGit/0.17.1-dirty
+ (envelope-from <alex.bennee@linaro.org>) id 1heEnd-0000VS-DD
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:21:35 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55567)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1heEnb-0000TF-Ho
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:21:33 -0400
+Received: by mail-wm1-x344.google.com with SMTP id a15so5479564wmj.5
+ for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 01:21:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=oodsVL7vyAxVv9uT4qGXKR36RaCYnBzdwK+DfeAtf10=;
+ b=xU670hePXrDVV4Tq3XohrLxVTUujK1LO7xX/ay5ARY9mcLh9cmE+kNHKL3dv8FwK03
+ vUKmiFnu8qtpmyur4SgsDOQQQX363M0Ni1Rg1HcTPwk7a+TJgkPB1dn6Wm3fnFJaflf8
+ WJXEpPoXJFtzRiioX3FUdFfY1iV7lMBTG7sAR7c9jwlYzTYs1bdC2ZccCsF+4wJxO78W
+ HGiPvEaiWufoCe0tQh8zoKgQWPcePAT8srsX0Sf+H/EvG289MsAxrpFXGRss00AOI4aY
+ /d/lqeeEU9GNdmT8dj8NGFarrfQyQ2a4YzDLVvRW+8F+bFd0LGjz3mee3flagLMDTgbD
+ brOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=oodsVL7vyAxVv9uT4qGXKR36RaCYnBzdwK+DfeAtf10=;
+ b=b1zNUiz+mye2EU1iRzuhk8GiwUqaBdF4A6BbNGj1obsABO55ljipNoqfuZho+hWWfq
+ VZip/pFlaZxK4bsBB63tFBgsCvctiy1rQ8/2tD0YV2Bv3eJpI0uCcg/ArfyZkWB4h6tl
+ 6zxCq0+oWHTwW9kS8+SpiEwAAfFA8FimHJQmqrcQvhPdgKR1IQNEECrJNNVc++svpIJ+
+ nIxmwx7NnE+L6ViQi2XuqhbqYiYDW9YxJqxEteb0zkk243Qhy0uD0Q9mldBrAEfocVE9
+ yDYcUT8fqLrxfZ8WAtpy8Il09xNqhKmQ2BeCMSwCIfHBjHozDPtuXHWCkoMiHW1TTbxZ
+ +M8A==
+X-Gm-Message-State: APjAAAUIQWNWRjhy2t8XXtLXRVyP85yA3136NpcydPtNhJt6PwN33ypD
+ RMlDyqT3Ib4cEsVI0J04XK42SA==
+X-Google-Smtp-Source: APXvYqzlFKUyWQLKfy0skmFOvzSh5AYtNKxIuCO4COaFnP4Hp9w4kKiz/u9wPutuxG46UMbj2/xIzg==
+X-Received: by 2002:a1c:b457:: with SMTP id d84mr3290342wmf.153.1561105289199; 
+ Fri, 21 Jun 2019 01:21:29 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id g2sm1968588wmh.0.2019.06.21.01.21.28
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 21 Jun 2019 01:21:28 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 30EF51FF87;
+ Fri, 21 Jun 2019 09:21:28 +0100 (BST)
+References: <20190614171200.21078-1-alex.bennee@linaro.org>
+ <CADYwmhFw8ujwz+NN9prKc+Za6=dD1aN==JnKmC0gnr4V7LPU4w@mail.gmail.com>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Pranith Kumar <bobby.prani@gmail.com>
+In-reply-to: <CADYwmhFw8ujwz+NN9prKc+Za6=dD1aN==JnKmC0gnr4V7LPU4w@mail.gmail.com>
+Date: Fri, 21 Jun 2019 09:21:28 +0100
+Message-ID: <87r27n8i2f.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 83.149.199.45
-Subject: [Qemu-devel] [PATCH for-4.1 00/24] Fix record/replay and add
- reverse debugging
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH v3 00/50] tcg plugin support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,214 +96,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru,
- pbonzini@redhat.com, quintela@redhat.com, ciro.santilli@gmail.com,
- jasowang@redhat.com, crosthwaite.peter@gmail.com, armbru@redhat.com,
- mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru,
- mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com,
- thomas.dullien@googlemail.com, dovgaluk@ispras.ru, artem.k.pisarenko@gmail.com,
- dgilbert@redhat.com, rth@twiddle.net
+Cc: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-GDB remote protocol supports reverse debugging of the targets.
-It includes 'reverse step' and 'reverse continue' operations.
-The first one finds the previous step of the execution,
-and the second one is intended to stop at the last breakpoint that
-would happen when the program is executed normally.
 
-Reverse debugging is possible in the replay mode, when at least
-one snapshot was created at the record or replay phase.
-QEMU can use these snapshots for travelling back in time with GDB.
+Pranith Kumar <bobby.prani@gmail.com> writes:
 
-Running the execution in replay mode allows using GDB reverse debugging
-commands:
- - reverse-stepi (or rsi): Steps one instruction to the past.
-   QEMU loads on of the prior snapshots and proceeds to the desired
-   instruction forward. When that step is reaches, execution stops.
- - reverse-continue (or rc): Runs execution "backwards".
-   QEMU tries to find breakpoint or watchpoint by loaded prior snapshot
-   and replaying the execution. Then QEMU loads snapshots again and
-   replays to the latest breakpoint. When there are no breakpoints in
-   the examined section of the execution, QEMU finds one more snapshot
-   and tries again. After the first snapshot is processed, execution
-   stops at this snapshot.
+> Hi Alex/Emilio,
+>
+> I am really happy to see the progress you made on the plugin feature. Loo=
+king
+> forward to seeing it merged soon! Please CC me on future versions of the
+> patchset. I am happy to help review and contribute to this effort.
 
-The set of patches include the following modifications:
- - gdbstub update for reverse debugging support
- - functions that automatically perform reverse step and reverse
-   continue operations
- - hmp/qmp commands for manipulating the replay process
- - improvement of the snapshotting for saving the execution step
-   in the snapshot parameters
- - other record/replay fixes
+Will do.
 
-The patches are available in the repository:
-https://github.com/ispras/qemu/tree/rr-190419
+>
+> I have a few general comments from experience writing a very similar syst=
+em
+> (qsim) below.
+>
+> On Fri, Jun 14, 2019 at 10:23 AM Alex Benn=C3=A9e <alex.bennee@linaro.org=
+> wrote:
+>>
+>> Hi,
+>>
+>> This is v3 of the proposed plugins API for QEMU. As Emilio is busy
+>> having finished his time at Columbia I have volunteered to take the
+>> patch series forward. Emilio's RFC v2 was posted last year:
+>>
+>>   Subject: [RFC v2 00/38] Plugin support
+>>   Date: Sun,  9 Dec 2018 14:37:11 -0500
+>>   Message-Id: <20181209193749.12277-1-cota@braap.org>
+>>
+>
+> * Register and memory read/write API
+>
+>   It would be great to have register and memory read/write API i.e., abil=
+ity
+>   to read/write to registers/memory from within the callback. This gives =
+the
+>   plugin ability to do system introspection. (Not sure if the current pat=
+chset
+>   implements this already).
 
-v17 changes:
- - updated gdbstub patches according to the latest changes
+Not currently. The trick is to have something flexible enough without
+exposing internals. I guess we could consider the gdb register
+enumeration or maybe hook into stuff declared as
+tcg_global_mem_new_i[64|32]. That won't get every "register" but it
+should certainly cover the main general purpose ones. Things like SVE
+and AdvSIMD vector registers wouldn't be seen though.
 
-v16 changes:
- - rebased to 4.0
+> * Register callbacks
+>
+>   A callback needs to be invoked whenever a specified registers is read or
+>   written to.
 
-v15 changes:
- - rebased to the new master
- - removed obsolete rtc patch
- - fixed misprint in the test
+Again tricky as not every register read/write is obvious from TCG -
+vector registers tweaked from helpers would be a good example.
 
-v14 changes:
- - rebased to the new master
+>
+> * Where do new plugins live in the tree?
+>
+>   The current source files in plugins (api, core etc.,) I think are bette=
+r if
+>   moved to tcg/plugins/.  The various plugins we write would then live in=
+ the
+>   plugins/ folder instead of the current tests/plugin/ folder.
 
-v13 changes:
- - rebased to make QAPI stuff applicable
- - minor reverse step/reverse continue fix
+The example plugins are really just toys for experimenting with the API
+- I don't see too much problem with them being in tests. However the
+howvec plugin is very guest architecture specific so we could consider a
+bit more of a hierarchy. Maybe these should all live in tests/tcg?
 
-v12 changes:
- - style fixes
+>
+> * Timer interrupts
+>
+>   What I observed is that the system execution is affected by what you do=
+ in
+>   the callbacks because of timer interrupts. For example, if you spend ti=
+me in
+>   the memory callback doing a bit of processing and writing to a file, you
+>   will see more timer interrupt instructions. One solution to this would =
+be to
+>   use 'icount', but it does not work that well. I think we need to do
+>   something similar to what gdb does in debug mode. How would you handle =
+MTTCG
+>   guests in that case?
 
-v11 changes:
- - added can_do_io resetting before jumping to the next block in the chain
- - rebase to the latest master
+icount is going to be the best you can get for deterministic time -
+other efforts to pause/restart virtual time going in and out of plugins
+are just going to add a lot of overhead.
 
-v10 changes:
- - added patch for correct deadline calculation with external timers
- - updated icount-related documentation in json files
-   (suggested by Markus Armbruster)
- - fixed replay shutdown
- - renamed some functions and variables to make them consistent with
-   the documentation and displayed messages
- - minor changes
+Remember QEMU doesn't even try to be a cycle accurate emulation so
+expecting to get reasonable timing information out of these plugins is a
+stretch. Maybe I should make that clearer in the design document?
 
-v9 changes:
- - moved rr qapi stuff to the separate file (suggested by Markus Armbruster)
- - minor coding style fixes
+The gdb behaviour is just a massive hack. When single-stepping in GDB we
+prevent timer IRQs from being delivered - they have still fired and are
+pending and will execute as soon as you hit continue.
 
-v8 changes:
- - rebased to the new master
- - added missing fix for prior rr patch
- - updated 'since' version number in json-related patches
+>   Another approach would be to offload callback generation to a separate
+>   plugin thread. The main thread will copy data required by a callback and
+>   invoke the callback asynchronously (std::async in C++ if you are
+>   familiar).
 
-v7 changes:
- - rebased to the new master with upstreamed patches from the series
- - several improvements in hmp/qmp commands handling (suggested by Markus Armbruster)
- - fixed record/replay with '-rtc base' option enabled
- - added document with virtual hardware requirements
+This would complicate things - the current iteration I'm working on
+drops the haddr cb in favour of dynamically resolving the vaddr in the
+callback. But that approach is only valid during the callback before
+something else potentially pollutes the TLB.
 
-v6 changes:
- - rebased to the new version of master
- - fixed build of linux-user configurations
- - added new clock for slirp and vnc timers
+>
+> * Starting and stopping callback generation
+>
+>   It would be great if we have a mechanism to dynamically start/stop call=
+backs
+>   when a sequence of code (magic instruction) is executed. This would be
+>   useful to annotate region-of-interest (ROI) in benchmarks to
+> generate callbacks.
 
-v5 changes:
- - multiple fixes of record/replay bugs appeared after QEMU core update
- - changed reverse debugging to 'since 3.1'
+Well we have that now. At each TB generation event the callback is free to =
+register
+as many or few callbacks as it likes dynamically.
 
-v4 changes:
- - changed 'since 2.13' to 'since 3.0' in json (as suggested by Eric Blake)
+>
+>   Also, the return value from a callback can be used to decide further co=
+urse
+>   of action. For example, if our plugin needs 10000 callbacks, it can ind=
+icate
+>   to stop generating further callbacks in the return value of the callback
+>   once it got the necessary callbacks.
 
-v3 changes:
- - Fixed PS/2 bug with save/load vm, which caused failures of the replay.
- - Rebased to the new code base.
- - Minor fixes.
+This can be done internally - a plugin can unregister itself once it has
+collected everything it wanted. If it wants to hang around you can
+qemu_plugin_reset to reset all callbacks.
 
-v2 changes:
- - documented reverse debugging
- - fixed start vmstate loading in record mode
- - documented qcow2 changes (as suggested by Eric Blake)
- - made icount SnapshotInfo field optional (as suggested by Eric Blake)
- - renamed qmp commands (as suggested by Eric Blake)
- - minor changes
+Do you want something finer grained?
 
----
+> * State saving API
+>
+>   An API to save the state of the VM from the plugin code.
 
-Pavel Dovgalyuk (23):
-      block: implement bdrv_snapshot_goto for blkreplay
-      replay: disable default snapshot for record/replay
-      replay: update docs for record/replay with block devices
-      replay: don't drain/flush bdrv queue while RR is working
-      replay: finish record/replay before closing the disks
-      qcow2: introduce icount field for snapshots
-      migration: introduce icount field for snapshots
-      replay: provide an accessor for rr filename
-      qapi: introduce replay.json for record/replay-related stuff
-      replay: introduce info hmp/qmp command
-      replay: introduce breakpoint at the specified step
-      replay: implement replay-seek command
-      replay: refine replay-time module
-      replay: flush rr queue before loading the vmstate
-      gdbstub: add reverse step support in replay mode
-      gdbstub: add reverse continue support in replay mode
-      replay: describe reverse debugging in docs/replay.txt
-      replay: add BH oneshot event for block layer
-      replay: document development rules
-      util/qemu-timer: refactor deadline calculation for external timers
-      replay: fix replay shutdown
-      replay: rename step-related variables and functions
-      icount: clean up cpu_can_io before jumping to the next block
+This would be tricky for -smp > 1 because other threads will have run on
+while you are making your decision. It would certainly be useful for
+analyzing failed states though.
 
-pbonzini@redhat.com (1):
-      replay: add missing fix for internal function
+>
+> Let me know your thoughts and any other ideas you might have.
+>
+> Thanks,
 
 
- MAINTAINERS               |    1 
- accel/tcg/tcg-runtime.c   |    2 
- accel/tcg/translator.c    |    1 
- block/blkreplay.c         |    8 +
- block/block-backend.c     |    8 +
- block/io.c                |   32 ++++
- block/iscsi.c             |    5 -
- block/nfs.c               |    5 -
- block/null.c              |    4 -
- block/nvme.c              |    6 +
- block/qapi.c              |   18 ++
- block/qcow2-snapshot.c    |    9 +
- block/qcow2.h             |    2 
- block/rbd.c               |    5 -
- block/vxhs.c              |    5 -
- blockdev.c                |   10 +
- cpus.c                    |   30 +++-
- docs/devel/replay.txt     |   46 ++++++
- docs/interop/qcow2.txt    |    4 +
- docs/replay.txt           |   45 ++++++
- exec.c                    |    8 +
- gdbstub.c                 |   63 ++++++++-
- hmp-commands-info.hx      |   14 ++
- hmp-commands.hx           |   53 +++++++
- hmp.h                     |    4 +
- include/block/snapshot.h  |    1 
- include/qemu/timer.h      |    7 -
- include/sysemu/replay.h   |   30 ++++
- migration/savevm.c        |   11 ++
- qapi/Makefile.objs        |    2 
- qapi/block-core.json      |    8 +
- qapi/block.json           |    3 
- qapi/misc.json            |   18 --
- qapi/qapi-schema.json     |    1 
- qapi/replay.json          |  121 +++++++++++++++++
- qtest.c                   |    2 
- replay/Makefile.objs      |    3 
- replay/replay-debugging.c |  327 +++++++++++++++++++++++++++++++++++++++++++++
- replay/replay-events.c    |   18 ++
- replay/replay-internal.c  |   10 +
- replay/replay-internal.h  |   17 +-
- replay/replay-snapshot.c  |    6 -
- replay/replay-time.c      |   36 ++---
- replay/replay.c           |   56 ++++++--
- stubs/Makefile.objs       |    1 
- stubs/replay-user.c       |    9 +
- stubs/replay.c            |   10 +
- tests/ptimer-test-stubs.c |    4 -
- tests/ptimer-test.c       |    4 -
- util/qemu-timer.c         |   41 +++++-
- vl.c                      |   11 +-
- 51 files changed, 1014 insertions(+), 131 deletions(-)
- create mode 100644 docs/devel/replay.txt
- create mode 100644 qapi/replay.json
- create mode 100644 replay/replay-debugging.c
- create mode 100644 stubs/replay-user.c
-
--- 
-Pavel Dovgalyuk
+--
+Alex Benn=C3=A9e
 
