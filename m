@@ -2,81 +2,94 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCF29C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 14:57:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F97EC43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 15:00:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5DCB2070B
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 14:57:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5DCB2070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 583E5208CA
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 15:00:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 583E5208CA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35852 helo=lists.gnu.org)
+Received: from localhost ([::1]:35866 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heKz1-0006hp-Jd
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 10:57:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47174)
+	id 1heL1Q-0007kS-Et
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 11:00:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48428)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1heKqE-0005h9-VG
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:48:40 -0400
+ (envelope-from <groug@kaod.org>) id 1heKuV-0001xD-KZ
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:53:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1heKqD-00084J-PB
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:48:38 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:51594)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1heKqD-00083Z-Ix
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:48:37 -0400
-Received: by mail-wm1-f66.google.com with SMTP id 207so6594324wma.1
- for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 07:48:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=mni6q2gM6QRV8G+snx7TIr26ZzoLjFy5MNHHDUgwcig=;
- b=NnWGGrYIiHRhll+3pU7RPDivmYj7NQDhMubzHIQAdLPdOGEmwWo2L9D3EXwaSMdfI0
- 7OoXjPlHKXkIWmdxBApBk0OSCIeNNBJxzCoYO1otIVlnw8Kofa7M9D8qSiz3psrTa6vn
- o9vCR+emNSW+F7fh70qv/gfkJGTAgGw95nDTz7Zh4US8tIBIjIPc1ZG9Z3COOOi6vzdz
- /bCHwseL83FHlDPUhBWaCvzA+Lhr6HIWv9n4uwkq0K1MOsv0AiSJz5NICTcFj9gpUgTK
- u+3xZ1CKYusTb/QasoqpckpJkQW5jJBGUo0jdgemQV6WOuZAO9mgx+D/kHr/E0gkATuz
- FlJA==
-X-Gm-Message-State: APjAAAVW7ODkipXbsKE4FwWCsfcb2WqMih8LWINAgC4ycm6I9kW7FdjV
- QRk2eMuvw6HnaZNcbjebwkYLWA==
-X-Google-Smtp-Source: APXvYqyf45eQwg+BbW/SjWqLGsYW7jTQ+yztokND0TEQ22Lj8Z9vJAXQxaiKLioE0/AGJo+QWZF3EA==
-X-Received: by 2002:a1c:808b:: with SMTP id b133mr4139936wmd.160.1561128516167; 
- Fri, 21 Jun 2019 07:48:36 -0700 (PDT)
-Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.183])
- by smtp.gmail.com with ESMTPSA id y19sm4074167wmc.21.2019.06.21.07.48.35
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 21 Jun 2019 07:48:35 -0700 (PDT)
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20190613143446.23937-1-philmd@redhat.com>
- <20190613143446.23937-5-philmd@redhat.com>
- <20190620112913-mutt-send-email-mst@kernel.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <d54c1df4-5ebb-ad3f-449c-5037ef560270@redhat.com>
-Date: Fri, 21 Jun 2019 16:48:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ (envelope-from <groug@kaod.org>) id 1heKuU-00038Q-I1
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:53:03 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:5886
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1heKuU-00032Y-Bn
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 10:53:02 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x5LEqlp1175272
+ for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 10:52:56 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2t90btkdxb-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 10:52:51 -0400
+Received: from localhost
+ by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+ Fri, 21 Jun 2019 15:52:22 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 21 Jun 2019 15:52:20 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id x5LEqKIZ34079156
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 21 Jun 2019 14:52:20 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 01240AE051;
+ Fri, 21 Jun 2019 14:52:20 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C5BBFAE05A;
+ Fri, 21 Jun 2019 14:52:19 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.7.212])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 21 Jun 2019 14:52:19 +0000 (GMT)
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>,
+ =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>
+Date: Fri, 21 Jun 2019 16:52:19 +0200
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-In-Reply-To: <20190620112913-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [PATCH v2 04/20] hw/i386/pc: Add the E820Type enum
- type
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19062114-4275-0000-0000-00000344758B
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19062114-4276-0000-0000-00003854A8FF
+Message-Id: <156112873945.115975.15513090884722011930.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-06-21_10:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=971 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906210122
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: [Qemu-devel] [PATCH] spapr/xive: H_INT_ESB is used for LSIs only
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,83 +101,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yang Zhong <yang.zhong@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
- kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
- qemu-devel@nongnu.org, Rob Bradford <robert.bradford@intel.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/20/19 5:31 PM, Michael S. Tsirkin wrote:
-> On Thu, Jun 13, 2019 at 04:34:30PM +0200, Philippe Mathieu-Daudé wrote:
->> This ensure we won't use an incorrect value.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
-> It doesn't actually ensure anything: compiler does not check IIUC.
-> 
-> And OTOH it's stored in type field in struct e820_entry.
+As indicated in the function header, this "hcall is only supported for
+LISNs that have the ESB hcall flag set to 1 when returned from hcall()
+H_INT_GET_SOURCE_INFO". We only set that flag for LSIs actually.
 
-I totally missed that... Thanks!
+Check that in h_int_esb().
 
->> ---
->> v2: Do not cast the enum (Li)
->> ---
->>  hw/i386/pc.c         |  4 ++--
->>  include/hw/i386/pc.h | 16 ++++++++++------
->>  2 files changed, 12 insertions(+), 8 deletions(-)
->>
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index 5a7cffbb1a..86ba554439 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -872,7 +872,7 @@ static void handle_a20_line_change(void *opaque, int irq, int level)
->>      x86_cpu_set_a20(cpu, level);
->>  }
->>  
->> -ssize_t e820_add_entry(uint64_t address, uint64_t length, uint32_t type)
->> +ssize_t e820_add_entry(uint64_t address, uint64_t length, E820Type type)
->>  {
->>      unsigned int index = le32_to_cpu(e820_reserve.count);
->>      struct e820_entry *entry;
->> @@ -906,7 +906,7 @@ size_t e820_get_num_entries(void)
->>      return e820_entries;
->>  }
->>  
->> -bool e820_get_entry(unsigned int idx, uint32_t type,
->> +bool e820_get_entry(unsigned int idx, E820Type type,
->>                      uint64_t *address, uint64_t *length)
->>  {
->>      if (idx < e820_entries && e820_table[idx].type == cpu_to_le32(type)) {
->> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
->> index c56116e6f6..7c07185dd5 100644
->> --- a/include/hw/i386/pc.h
->> +++ b/include/hw/i386/pc.h
->> @@ -282,12 +282,16 @@ void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion *rom_memory);
->>  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
->>                         const CPUArchIdList *apic_ids, GArray *entry);
->>  
->> -/* e820 types */
->> -#define E820_RAM        1
->> -#define E820_RESERVED   2
->> -#define E820_ACPI       3
->> -#define E820_NVS        4
->> -#define E820_UNUSABLE   5
->> +/**
->> + * E820Type: Type of the e820 address range.
->> + */
->> +typedef enum {
->> +    E820_RAM        = 1,
->> +    E820_RESERVED   = 2,
->> +    E820_ACPI       = 3,
->> +    E820_NVS        = 4,
->> +    E820_UNUSABLE   = 5
->> +} E820Type;
->>  
->>  ssize_t e820_add_entry(uint64_t, uint64_t, uint32_t);
->>  size_t e820_get_num_entries(void);
->> -- 
->> 2.20.1
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/intc/spapr_xive.c |    6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index 58c2e5d890bd..01dd47ad5b02 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -1408,6 +1408,12 @@ static target_ulong h_int_esb(PowerPCCPU *cpu,
+         return H_P2;
+     }
+ 
++    if (!xive_source_irq_is_lsi(xsrc, lisn)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: LISN " TARGET_FMT_lx "isn't LSI\n",
++                      lisn);
++        return H_P2;
++    }
++
+     if (offset > (1ull << xsrc->esb_shift)) {
+         return H_P3;
+     }
+
 
