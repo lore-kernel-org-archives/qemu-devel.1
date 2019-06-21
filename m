@@ -2,63 +2,64 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DBD9C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 00:52:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B3A9C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 00:52:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E1602075E
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 00:52:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E1602075E
+	by mail.kernel.org (Postfix) with ESMTPS id D7E752075E
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 00:52:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7E752075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53674 helo=lists.gnu.org)
+Received: from localhost ([::1]:53676 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1he7nP-0001UM-8C
-	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 20:52:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59292)
+	id 1he7nT-0001g6-42
+	for qemu-devel@archiver.kernel.org; Thu, 20 Jun 2019 20:52:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59248)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yan.y.zhao@intel.com>) id 1he7kO-0008M0-Lc
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 20:49:46 -0400
+ (envelope-from <yan.y.zhao@intel.com>) id 1he7kP-0008Ld-O6
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 20:49:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1he7Sc-0005iM-Eu
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 20:31:25 -0400
-Received: from mga14.intel.com ([192.55.52.115]:63158)
+ (envelope-from <yan.y.zhao@intel.com>) id 1he7Yw-0004TJ-7N
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 20:37:55 -0400
+Received: from mga01.intel.com ([192.55.52.88]:1342)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1he7Sa-0005cV-TS
- for qemu-devel@nongnu.org; Thu, 20 Jun 2019 20:31:22 -0400
+ id 1he7Yv-0004Lq-SS
+ for qemu-devel@nongnu.org; Thu, 20 Jun 2019 20:37:54 -0400
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 20 Jun 2019 17:31:14 -0700
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 20 Jun 2019 17:37:48 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,398,1557212400"; d="scan'208";a="358713769"
+X-IronPort-AV: E=Sophos;i="5.63,398,1557212400"; d="scan'208";a="311840447"
 Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
  ([10.239.13.9])
- by fmsmga005.fm.intel.com with ESMTP; 20 Jun 2019 17:31:11 -0700
-Date: Thu, 20 Jun 2019 20:25:18 -0400
+ by orsmga004.jf.intel.com with ESMTP; 20 Jun 2019 17:37:45 -0700
+Date: Thu, 20 Jun 2019 20:31:53 -0400
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <20190621002518.GF9303@joy-OptiPlex-7040>
+Message-ID: <20190621003153.GG9303@joy-OptiPlex-7040>
 References: <1561041461-22326-1-git-send-email-kwankhede@nvidia.com>
+ <1561041461-22326-9-git-send-email-kwankhede@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1561041461-22326-1-git-send-email-kwankhede@nvidia.com>
+In-Reply-To: <1561041461-22326-9-git-send-email-kwankhede@nvidia.com>
 User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.115
-Subject: Re: [Qemu-devel] [PATCH v4 00/13] Add migration support for VFIO
- device
+X-Received-From: 192.55.52.88
+Subject: Re: [Qemu-devel] [PATCH v4 08/13] vfio: Add save state functions to
+ SaveVMHandlers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,143 +92,285 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 20, 2019 at 10:37:28PM +0800, Kirti Wankhede wrote:
-> Add migration support for VFIO device
+On Thu, Jun 20, 2019 at 10:37:36PM +0800, Kirti Wankhede wrote:
+> Added .save_live_pending, .save_live_iterate and .save_live_complete_precopy
+> functions. These functions handles pre-copy and stop-and-copy phase.
 > 
-> This Patch set include patches as below:
-> - Define KABI for VFIO device for migration support.
-> - Added save and restore functions for PCI configuration space
-> - Generic migration functionality for VFIO device.
->   * This patch set adds functionality only for PCI devices, but can be
->     extended to other VFIO devices.
->   * Added all the basic functions required for pre-copy, stop-and-copy and
->     resume phases of migration.
->   * Added state change notifier and from that notifier function, VFIO
->     device's state changed is conveyed to VFIO device driver.
->   * During save setup phase and resume/load setup phase, migration region
->     is queried and is used to read/write VFIO device data.
->   * .save_live_pending and .save_live_iterate are implemented to use QEMU's
->     functionality of iteration during pre-copy phase.
->   * In .save_live_complete_precopy, that is in stop-and-copy phase,
->     iteration to read data from VFIO device driver is implemented till pending
->     bytes returned by driver are not zero.
->   * Added function to get dirty pages bitmap for the pages which are used by
->     driver.
-> - Add vfio_listerner_log_sync to mark dirty pages.
-> - Make VFIO PCI device migration capable. If migration region is not provided by
->   driver, migration is blocked.
-> 
-> Below is the flow of state change for live migration where states in brackets
-> represent VM state, migration state and VFIO device state as:
->     (VM state, MIGRATION_STATUS, VFIO_DEVICE_STATE)
-> 
-> Live migration save path:
->         QEMU normal running state
->         (RUNNING, _NONE, _RUNNING)
->                         |
->     migrate_init spawns migration_thread.
->     (RUNNING, _SETUP, _RUNNING|_SAVING)
->     Migration thread then calls each device's .save_setup()
->                         |
->     (RUNNING, _ACTIVE, _RUNNING|_SAVING)
->     If device is active, get pending bytes by .save_live_pending()
->     if pending bytes >= threshold_size,  call save_live_iterate()
->     Data of VFIO device for pre-copy phase is copied.
->     Iterate till pending bytes converge and are less than threshold
->                         |
->     On migration completion, vCPUs stops and calls .save_live_complete_precopy
->     for each active device. VFIO device is then transitioned in
->      _SAVING state.
->     (FINISH_MIGRATE, _DEVICE, _SAVING)
->     For VFIO device, iterate in  .save_live_complete_precopy  until
->     pending data is 0.
->     (FINISH_MIGRATE, _DEVICE, _STOPPED)
-
-I suggest we also register to VMStateDescription, whose .pre_save
-handler would get called after .save_live_complete_precopy in pre-copy
-only case, and will called before .save_live_iterate in post-copy
-enabled case.
-In the .pre_save handler, we can save all device state which must be
-copied after device stop in source vm and before device state in target vm.
-
->                         |
->     (FINISH_MIGRATE, _COMPLETED, STOPPED)
->     Migraton thread schedule cleanup bottom half and exit
-> 
-> Live migration resume path:
->     Incomming migration calls .load_setup for each device
->     (RESTORE_VM, _ACTIVE, STOPPED)
->                         |
->     For each device, .load_state is called for that device section data
->                         |
->     At the end, called .load_cleanup for each device and vCPUs are started.
->                         |
->         (RUNNING, _NONE, _RUNNING)
-> 
-> Note that:
-> - Migration post copy is not supported.
-> 
-> v3 -> v4:
-> - Added one more bit for _RESUMING flag to be set explicitly.
-> - data_offset field is read-only for user space application.
-> - data_size is read for every iteration before reading data from migration, that
->   is removed assumption that data will be till end of migration region.
-> - If vendor driver supports mappable sparsed region, map those region during
->   setup state of save/load, similarly unmap those from cleanup routines.
-> - Handles race condition that causes data corruption in migration region during
->   save device state by adding mutex and serialiaing save_buffer and
->   get_dirty_pages routines.
-> - Skip called get_dirty_pages routine for mapped MMIO region of device.
-> - Added trace events.
-> - Splitted into multiple functional patches.
-> 
-> v2 -> v3:
-> - Removed enum of VFIO device states. Defined VFIO device state with 2 bits.
-> - Re-structured vfio_device_migration_info to keep it minimal and defined action
->   on read and write access on its members.
-> 
-> v1 -> v2:
-> - Defined MIGRATION region type and sub-type which should be used with region
->   type capability.
-> - Re-structured vfio_device_migration_info. This structure will be placed at 0th
->   offset of migration region.
-> - Replaced ioctl with read/write for trapped part of migration region.
-> - Added both type of access support, trapped or mmapped, for data section of the
+> In _SAVING|_RUNNING device state or pre-copy phase:
+> - read pending_bytes
+> - read data_offset - indicates kernel driver to write data to staging
+>   buffer which is mmapped.
+> - read data_size - amount of data in bytes written by vendor driver in migration
 >   region.
-> - Moved PCI device functions to pci file.
-> - Added iteration to get dirty page bitmap until bitmap for all requested pages
->   are copied.
+> - if data section is trapped, pread() number of bytes in data_size, from
+>   data_offset.
+> - if data section is mmaped, read mmaped buffer of size data_size.
+> - Write data packet to file stream as below:
+> {VFIO_MIG_FLAG_DEV_DATA_STATE, data_size, actual data,
+> VFIO_MIG_FLAG_END_OF_STATE }
 > 
-> Thanks,
-> Kirti
+> In _SAVING device state or stop-and-copy phase
+> a. read config space of device and save to migration file stream. This
+>    doesn't need to be from vendor driver. Any other special config state
+>    from driver can be saved as data in following iteration.
+> b. read pending_bytes - indicates kernel driver to write data to staging
+>    buffer which is mmapped.
+> c. read data_size - amount of data in bytes written by vendor driver in
+>    migration region.
+> d. if data section is trapped, pread() from data_offset of size data_size.
+> e. if data section is mmaped, read mmaped buffer of size data_size.
+> f. Write data packet as below:
+>    {VFIO_MIG_FLAG_DEV_DATA_STATE, data_size, actual data}
+> g. iterate through steps b to f until (pending_bytes > 0)
+> h. Write {VFIO_MIG_FLAG_END_OF_STATE}
 > 
+> .save_live_iterate runs outside the iothread lock in the migration case, which
+> could race with asynchronous call to get dirty page list causing data corruption
+> in mapped migration region. Mutex added here to serial migration buffer read
+> operation.
 > 
-> Kirti Wankhede (13):
->   vfio: KABI for migration interface
->   vfio: Add function to unmap VFIO region
->   vfio: Add save and load functions for VFIO PCI devices
->   vfio: Add migration region initialization and finalize function
->   vfio: Add VM state change handler to know state of VM
->   vfio: Add migration state change notifier
->   vfio: Register SaveVMHandlers for VFIO device
->   vfio: Add save state functions to SaveVMHandlers
->   vfio: Add load state functions to SaveVMHandlers
->   vfio: Add function to get dirty page list
->   vfio: Add vfio_listerner_log_sync to mark dirty pages
->   vfio: Make vfio-pci device migration capable.
->   vfio: Add trace events in migration code path
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> ---
+>  hw/vfio/migration.c | 212 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 212 insertions(+)
 > 
->  hw/vfio/Makefile.objs         |   2 +-
->  hw/vfio/common.c              |  55 +++
->  hw/vfio/migration.c           | 815 ++++++++++++++++++++++++++++++++++++++++++
->  hw/vfio/pci.c                 | 126 ++++++-
->  hw/vfio/pci.h                 |  29 ++
->  hw/vfio/trace-events          |  19 +
->  include/hw/vfio/vfio-common.h |  22 ++
->  linux-headers/linux/vfio.h    |  71 ++++
->  8 files changed, 1132 insertions(+), 7 deletions(-)
->  create mode 100644 hw/vfio/migration.c
-> 
+> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+> index fe0887c27664..0a2f30872316 100644
+> --- a/hw/vfio/migration.c
+> +++ b/hw/vfio/migration.c
+> @@ -107,6 +107,111 @@ static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t state)
+>      return 0;
+>  }
+>  
+> +static int vfio_save_buffer(QEMUFile *f, VFIODevice *vbasedev)
+> +{
+> +    VFIOMigration *migration = vbasedev->migration;
+> +    VFIORegion *region = &migration->region.buffer;
+> +    uint64_t data_offset = 0, data_size = 0;
+> +    int ret;
+> +
+> +    ret = pread(vbasedev->fd, &data_offset, sizeof(data_offset),
+> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
+> +                                             data_offset));
+> +    if (ret != sizeof(data_offset)) {
+> +        error_report("Failed to get migration buffer data offset %d",
+> +                     ret);
+> +        return -EINVAL;
+> +    }
+> +
+> +    ret = pread(vbasedev->fd, &data_size, sizeof(data_size),
+> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
+> +                                             data_size));
+> +    if (ret != sizeof(data_size)) {
+> +        error_report("Failed to get migration buffer data size %d",
+> +                     ret);
+> +        return -EINVAL;
+> +    }
+> +
+how big is the data_size ? 
+if this size is too big, it may take too much time and block others.
+
+> +    if (data_size > 0) {
+> +        void *buf = NULL;
+> +        bool buffer_mmaped = false;
+> +
+> +        if (region->mmaps) {
+> +            int i;
+> +
+> +            for (i = 0; i < region->nr_mmaps; i++) {
+> +                if ((data_offset >= region->mmaps[i].offset) &&
+> +                    (data_offset < region->mmaps[i].offset +
+> +                                   region->mmaps[i].size)) {
+> +                    buf = region->mmaps[i].mmap + (data_offset -
+> +                                                   region->mmaps[i].offset);
+> +                    buffer_mmaped = true;
+> +                    break;
+> +                }
+> +            }
+> +        }
+> +
+> +        if (!buffer_mmaped) {
+> +            buf = g_malloc0(data_size);
+> +            ret = pread(vbasedev->fd, buf, data_size,
+> +                        region->fd_offset + data_offset);
+> +            if (ret != data_size) {
+> +                error_report("Failed to get migration data %d", ret);
+> +                g_free(buf);
+> +                return -EINVAL;
+> +            }
+> +        }
+> +
+> +        qemu_put_be64(f, data_size);
+> +        qemu_put_buffer(f, buf, data_size);
+> +
+> +        if (!buffer_mmaped) {
+> +            g_free(buf);
+> +        }
+> +        migration->pending_bytes -= data_size;
+> +    } else {
+> +        qemu_put_be64(f, data_size);
+> +    }
+> +
+> +    ret = qemu_file_get_error(f);
+> +
+> +    return data_size;
+> +}
+> +
+> +static int vfio_update_pending(VFIODevice *vbasedev)
+> +{
+> +    VFIOMigration *migration = vbasedev->migration;
+> +    VFIORegion *region = &migration->region.buffer;
+> +    uint64_t pending_bytes = 0;
+> +    int ret;
+> +
+> +    ret = pread(vbasedev->fd, &pending_bytes, sizeof(pending_bytes),
+> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
+> +                                             pending_bytes));
+> +    if ((ret < 0) || (ret != sizeof(pending_bytes))) {
+> +        error_report("Failed to get pending bytes %d", ret);
+> +        migration->pending_bytes = 0;
+> +        return (ret < 0) ? ret : -EINVAL;
+> +    }
+> +
+> +    migration->pending_bytes = pending_bytes;
+> +    return 0;
+> +}
+> +
+> +static int vfio_save_device_config_state(QEMUFile *f, void *opaque)
+> +{
+> +    VFIODevice *vbasedev = opaque;
+> +
+> +    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_CONFIG_STATE);
+> +
+> +    if (vbasedev->type == VFIO_DEVICE_TYPE_PCI) {
+> +        vfio_pci_save_config(vbasedev, f);
+> +    }
+> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
+> +
+> +    return qemu_file_get_error(f);
+> +}
+> +
+>  /* ---------------------------------------------------------------------- */
+>  
+>  static int vfio_save_setup(QEMUFile *f, void *opaque)
+> @@ -163,9 +268,116 @@ static void vfio_save_cleanup(void *opaque)
+>      }
+>  }
+>  
+> +static void vfio_save_pending(QEMUFile *f, void *opaque,
+> +                              uint64_t threshold_size,
+> +                              uint64_t *res_precopy_only,
+> +                              uint64_t *res_compatible,
+> +                              uint64_t *res_postcopy_only)
+> +{
+> +    VFIODevice *vbasedev = opaque;
+> +    VFIOMigration *migration = vbasedev->migration;
+> +    int ret;
+> +
+> +    ret = vfio_update_pending(vbasedev);
+> +    if (ret) {
+> +        return;
+> +    }
+> +
+> +    if (vbasedev->device_state & VFIO_DEVICE_STATE_RUNNING) {
+> +        *res_precopy_only += migration->pending_bytes;
+> +    } else {
+> +        *res_postcopy_only += migration->pending_bytes;
+> +    }
+> +    *res_compatible += 0;
+> +}
+> +
+> +static int vfio_save_iterate(QEMUFile *f, void *opaque)
+> +{
+> +    VFIODevice *vbasedev = opaque;
+> +    VFIOMigration *migration = vbasedev->migration;
+> +    int ret;
+> +
+> +    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_DATA_STATE);
+> +
+> +    qemu_mutex_lock(&migration->lock);
+> +    ret = vfio_save_buffer(f, vbasedev);
+> +    qemu_mutex_unlock(&migration->lock);
+> +
+> +    if (ret < 0) {
+> +        error_report("vfio_save_buffer failed %s",
+> +                     strerror(errno));
+> +        return ret;
+> +    }
+> +
+> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
+> +
+> +    ret = qemu_file_get_error(f);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+> +    return ret;
+> +}
+> +
+> +static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
+> +{
+> +    VFIODevice *vbasedev = opaque;
+> +    VFIOMigration *migration = vbasedev->migration;
+> +    int ret;
+> +
+> +    ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_SAVING);
+> +    if (ret) {
+> +        error_report("Failed to set state STOP and SAVING");
+> +        return ret;
+> +    }
+> +
+> +    ret = vfio_save_device_config_state(f, opaque);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+> +    ret = vfio_update_pending(vbasedev);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+> +    while (migration->pending_bytes > 0) {
+> +        qemu_put_be64(f, VFIO_MIG_FLAG_DEV_DATA_STATE);
+> +        ret = vfio_save_buffer(f, vbasedev);
+> +        if (ret < 0) {
+> +            error_report("Failed to save buffer");
+> +            return ret;
+> +        } else if (ret == 0) {
+> +            break;
+> +        }
+> +
+> +        ret = vfio_update_pending(vbasedev);
+> +        if (ret) {
+> +            return ret;
+> +        }
+> +    }
+> +
+> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
+> +
+> +    ret = qemu_file_get_error(f);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+> +    ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_STOPPED);
+> +    if (ret) {
+> +        error_report("Failed to set state STOPPED");
+> +        return ret;
+> +    }
+> +    return ret;
+> +}
+> +
+>  static SaveVMHandlers savevm_vfio_handlers = {
+>      .save_setup = vfio_save_setup,
+>      .save_cleanup = vfio_save_cleanup,
+> +    .save_live_pending = vfio_save_pending,
+> +    .save_live_iterate = vfio_save_iterate,
+> +    .save_live_complete_precopy = vfio_save_complete_precopy,
+>  };
+>  
+>  /* ---------------------------------------------------------------------- */
 > -- 
 > 2.7.0
 > 
