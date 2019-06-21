@@ -6,58 +6,62 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1BE0C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:50:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1D58C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:57:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEA012084E
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:50:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEA012084E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6F0EC208CA
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 07:57:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F0EC208CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55376 helo=lists.gnu.org)
+Received: from localhost ([::1]:55408 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heEJm-0005Sh-1A
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 03:50:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46217)
+	id 1heEQQ-0000bg-Ar
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 03:57:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46093)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richardw.yang@linux.intel.com>) id 1heEIE-0004Iz-M3
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:49:12 -0400
+ (envelope-from <yan.y.zhao@intel.com>) id 1heEPe-000062-7D
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:56:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1heECo-0003Jy-Ka
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:43:35 -0400
-Received: from mga03.intel.com ([134.134.136.65]:45006)
+ (envelope-from <yan.y.zhao@intel.com>) id 1heEPc-00032v-A5
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:56:46 -0400
+Received: from mga06.intel.com ([134.134.136.31]:18028)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1heECl-0002xF-Kj
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:43:28 -0400
+ (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+ id 1heEPa-0002xs-7U
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 03:56:42 -0400
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
- by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 21 Jun 2019 00:43:25 -0700
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 21 Jun 2019 00:56:37 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,399,1557212400"; d="scan'208";a="243896410"
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by orsmga001.jf.intel.com with ESMTP; 21 Jun 2019 00:43:24 -0700
-Date: Fri, 21 Jun 2019 15:43:00 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: Juan Quintela <quintela@redhat.com>
-Message-ID: <20190621074300.GA17378@richard>
-References: <20190402003106.17614-1-richardw.yang@linux.intel.com>
- <20190611082520.GA11125@richard> <87zhmottba.fsf@trasno.org>
+X-IronPort-AV: E=Sophos;i="5.63,399,1557212400"; d="scan'208";a="311923500"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.9])
+ by orsmga004.jf.intel.com with ESMTP; 21 Jun 2019 00:56:33 -0700
+Date: Fri, 21 Jun 2019 03:50:41 -0400
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <20190621075040.GA4304@joy-OptiPlex-7040>
+References: <1561041461-22326-1-git-send-email-kwankhede@nvidia.com>
+ <1561041461-22326-4-git-send-email-kwankhede@nvidia.com>
+ <20190621001228.GE9303@joy-OptiPlex-7040>
+ <20a0f8c4-e555-6a4d-598a-b72beac6a62f@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87zhmottba.fsf@trasno.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20a0f8c4-e555-6a4d-598a-b72beac6a62f@nvidia.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 134.134.136.65
-Subject: Re: [Qemu-devel] [PATCH] migration: remove unused field bytes_xfer
+X-Received-From: 134.134.136.31
+Subject: Re: [Qemu-devel] [PATCH v4 03/13] vfio: Add save and load functions
+ for VFIO PCI devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,69 +73,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: Wei Yang <richardw.yang@linux.intel.com>, dgilbert@redhat.com,
- qemu-devel@nongnu.org
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "cjia@nvidia.com" <cjia@nvidia.com>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 11, 2019 at 10:33:29AM +0200, Juan Quintela wrote:
->Wei Yang <richardw.yang@linux.intel.com> wrote:
->> On Tue, Apr 02, 2019 at 08:31:06AM +0800, Wei Yang wrote:
->>>MigrationState->bytes_xfer is only set to 0 in migrate_init().
->>>
->>>Remove this unnecessary field.
->>>
->>>Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->>
->> Hi, David
+On Fri, Jun 21, 2019 at 02:44:30PM +0800, Kirti Wankhede wrote:
+> 
+> 
+> On 6/21/2019 5:42 AM, Yan Zhao wrote:
+> > On Thu, Jun 20, 2019 at 10:37:31PM +0800, Kirti Wankhede wrote:
+> >> These functions save and restore PCI device specific data - config
+> >> space of PCI device.
+> >> Tested save and restore with MSI and MSIX type.
+> >>
+> >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> >> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> >> ---
+> >>  hw/vfio/pci.c | 112 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >>  hw/vfio/pci.h |  29 +++++++++++++++
+> >>  2 files changed, 141 insertions(+)
+> >>
+> >> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> >> index ce3fe96efe2c..09a0821a5b1c 100644
+> >> --- a/hw/vfio/pci.c
+> >> +++ b/hw/vfio/pci.c
+> >> @@ -1187,6 +1187,118 @@ void vfio_pci_write_config(PCIDevice *pdev,
+> >>      }
+> >>  }
+> >>  
+> >> +void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
+> >> +{
+> >> +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
+> >> +    PCIDevice *pdev = &vdev->pdev;
+> >> +    uint16_t pci_cmd;
+> >> +    int i;
+> >> +
+> >> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
+> >> +        uint32_t bar;
+> >> +
+> >> +        bar = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, 4);
+> >> +        qemu_put_be32(f, bar);
+> >> +    }
+> >> +
+> >> +    qemu_put_be32(f, vdev->interrupt);
+> >> +    if (vdev->interrupt == VFIO_INT_MSI) {
+> >> +        uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
+> >> +        bool msi_64bit;
+> >> +
+> >> +        msi_flags = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
+> >> +                                            2);
+> >> +        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
+> >> +
+> >> +        msi_addr_lo = pci_default_read_config(pdev,
+> >> +                                         pdev->msi_cap + PCI_MSI_ADDRESS_LO, 4);
+> >> +        qemu_put_be32(f, msi_addr_lo);
+> >> +
+> >> +        if (msi_64bit) {
+> >> +            msi_addr_hi = pci_default_read_config(pdev,
+> >> +                                             pdev->msi_cap + PCI_MSI_ADDRESS_HI,
+> >> +                                             4);
+> >> +        }
+> >> +        qemu_put_be32(f, msi_addr_hi);
+> >> +
+> >> +        msi_data = pci_default_read_config(pdev,
+> >> +                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
+> >> +                2);
+> >> +        qemu_put_be32(f, msi_data);
+> >> +    } else if (vdev->interrupt == VFIO_INT_MSIX) {
+> >> +        uint16_t offset;
+> >> +
+> >> +        /* save enable bit and maskall bit */
+> >> +        offset = pci_default_read_config(pdev,
+> >> +                                       pdev->msix_cap + PCI_MSIX_FLAGS + 1, 2);
+> >> +        qemu_put_be16(f, offset);
+> >> +        msix_save(pdev, f);
+> >> +    }
+> >> +    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
+> >> +    qemu_put_be16(f, pci_cmd);
+> >> +}
+> >> +
+> >> +void vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
+> >> +{
+> >> +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
+> >> +    PCIDevice *pdev = &vdev->pdev;
+> >> +    uint32_t interrupt_type;
+> >> +    uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
+> >> +    uint16_t pci_cmd;
+> >> +    bool msi_64bit;
+> >> +    int i;
+> >> +
+> >> +    /* retore pci bar configuration */
+> >> +    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
+> >> +    vfio_pci_write_config(pdev, PCI_COMMAND,
+> >> +                        pci_cmd & (!(PCI_COMMAND_IO | PCI_COMMAND_MEMORY)), 2);
+> >> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
+> >> +        uint32_t bar = qemu_get_be32(f);
+> >> +
+> >> +        vfio_pci_write_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, bar, 4);
+> >> +    }
+> >> +    vfio_pci_write_config(pdev, PCI_COMMAND,
+> >> +                          pci_cmd | PCI_COMMAND_IO | PCI_COMMAND_MEMORY, 2);
+> >> +
+> >> +    interrupt_type = qemu_get_be32(f);
+> >> +
+> >> +    if (interrupt_type == VFIO_INT_MSI) {
+> >> +        /* restore msi configuration */
+> >> +        msi_flags = pci_default_read_config(pdev,
+> >> +                                            pdev->msi_cap + PCI_MSI_FLAGS, 2);
+> >> +        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
+> >> +
+> >> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
+> >> +                              msi_flags & (!PCI_MSI_FLAGS_ENABLE), 2);
+> >> +
+> >> +        msi_addr_lo = qemu_get_be32(f);
+> >> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_LO,
+> >> +                              msi_addr_lo, 4);
+> >> +
+> >> +        msi_addr_hi = qemu_get_be32(f);
+> >> +        if (msi_64bit) {
+> >> +            vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_HI,
+> >> +                                  msi_addr_hi, 4);
+> >> +        }
+> >> +        msi_data = qemu_get_be32(f);
+> >> +        vfio_pci_write_config(pdev,
+> >> +                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
+> >> +                msi_data, 2);
+> >> +
+> >> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
+> >> +                              msi_flags | PCI_MSI_FLAGS_ENABLE, 2);
+> >> +    } else if (interrupt_type == VFIO_INT_MSIX) {
+> >> +        uint16_t offset = qemu_get_be16(f);
+> >> +
+> >> +        /* load enable bit and maskall bit */
+> >> +        vfio_pci_write_config(pdev, pdev->msix_cap + PCI_MSIX_FLAGS + 1,
+> >> +                              offset, 2);
+> >> +        msix_load(pdev, f);
+> >> +    }
+> >> +    pci_cmd = qemu_get_be16(f);
+> >> +    vfio_pci_write_config(pdev, PCI_COMMAND, pci_cmd, 2);
+> >> +}
+> >> +
+> > per the previous discussion, pci config state save/restore are better
+> > defined in fileds of VMStateDescription.
+> > 
+> > 
+> 
+> With that route there is no pre-copy phase and we do want pre-copy phase
+> for VFIO devices. Vendor driver can skip pre-copy phase by doing nothing
+> on any read/write operation during pre-copy phase.
+> 
+> Thanks,
+> Kirti
 >
->Hi
->
->I am on duty this week, will get it.
->
+hi Kirti
+It is able to register both VMSTateDescritpion and SaveVMHandlers at the
+same time.
 
-Hi, Juan,
+Thanks
+Yan
 
-May I ask when you are willing to pick it up?
-
->>
->> Are you willing to pick up this one?
->>
->>>---
->>> migration/migration.c | 1 -
->>> migration/migration.h | 1 -
->>> 2 files changed, 2 deletions(-)
->>>
->>>diff --git a/migration/migration.c b/migration/migration.c
->>>index dea7078bf4..c929cf8d0f 100644
->>>--- a/migration/migration.c
->>>+++ b/migration/migration.c
->>>@@ -1681,7 +1681,6 @@ void migrate_init(MigrationState *s)
->>>      * parameters/capabilities that the user set, and
->>>      * locks.
->>>      */
->>>-    s->bytes_xfer = 0;
->>>     s->cleanup_bh = 0;
->>>     s->to_dst_file = NULL;
->>>     s->rp_state.from_dst_file = NULL;
->>>diff --git a/migration/migration.h b/migration/migration.h
->>>index 852eb3c4e9..b9efbe9168 100644
->>>--- a/migration/migration.h
->>>+++ b/migration/migration.h
->>>@@ -116,7 +116,6 @@ struct MigrationState
->>>     DeviceState parent_obj;
->>> 
->>>     /*< public >*/
->>>-    size_t bytes_xfer;
->>>     QemuThread thread;
->>>     QEMUBH *cleanup_bh;
->>>     QEMUFile *to_dst_file;
->>>-- 
->>>2.19.1
-
--- 
-Wei Yang
-Help you, Help me
+> >>  /*
+> >>   * Interrupt setup
+> >>   */
+> >> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+> >> index 834a90d64686..847be5f56478 100644
+> >> --- a/hw/vfio/pci.h
+> >> +++ b/hw/vfio/pci.h
+> >> @@ -19,6 +19,7 @@
+> >>  #include "qemu/queue.h"
+> >>  #include "qemu/timer.h"
+> >>  
+> >> +#ifdef CONFIG_LINUX
+> >>  #define PCI_ANY_ID (~0)
+> >>  
+> >>  struct VFIOPCIDevice;
+> >> @@ -202,4 +203,32 @@ void vfio_display_reset(VFIOPCIDevice *vdev);
+> >>  int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp);
+> >>  void vfio_display_finalize(VFIOPCIDevice *vdev);
+> >>  
+> >> +void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f);
+> >> +void vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f);
+> >> +
+> >> +static inline Object *vfio_pci_get_object(VFIODevice *vbasedev)
+> >> +{
+> >> +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
+> >> +
+> >> +    return OBJECT(vdev);
+> >> +}
+> >> +
+> >> +#else
+> >> +static inline void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
+> >> +{
+> >> +    g_assert(false);
+> >> +}
+> >> +
+> >> +static inline void vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
+> >> +{
+> >> +    g_assert(false);
+> >> +}
+> >> +
+> >> +static inline Object *vfio_pci_get_object(VFIODevice *vbasedev)
+> >> +{
+> >> +    return NULL;
+> >> +}
+> >> +
+> >> +#endif
+> >> +
+> >>  #endif /* HW_VFIO_VFIO_PCI_H */
+> >> -- 
+> >> 2.7.0
+> >>
 
