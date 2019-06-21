@@ -2,49 +2,87 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82D69C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 18:16:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B490EC43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 19:02:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C3952075E
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 18:16:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C3952075E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 89E6A2075E
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 19:02:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=koconnor.net header.i=@koconnor.net header.b="OfaqrZxm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89E6A2075E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=koconnor.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37222 helo=lists.gnu.org)
+Received: from localhost ([::1]:37428 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heO5g-0001Al-9k
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 14:16:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38107)
+	id 1heOo3-0005e0-MR
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 15:02:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47119)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <balaton@eik.bme.hu>) id 1heO4C-0000T2-78
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 14:15:17 -0400
+ (envelope-from <kevin@koconnor.net>) id 1heOlS-0004JB-AG
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 14:59:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1heO4B-0000pE-A5
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 14:15:16 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:41875)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1heO47-0000Wu-Ix
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 14:15:13 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 493B47462B8;
- Fri, 21 Jun 2019 20:14:59 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 2F8207462AA; Fri, 21 Jun 2019 20:14:59 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Fri, 21 Jun 2019 20:12:28 +0200
-To: qemu-devel@nongnu.org
-Message-Id: <20190621181459.2F8207462AA@zero.eik.bme.hu>
+ (envelope-from <kevin@koconnor.net>) id 1heOlR-0000Cu-71
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 14:59:58 -0400
+Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:36191)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <kevin@koconnor.net>) id 1heOlQ-0000C4-MM
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 14:59:57 -0400
+Received: by mail-qt1-x843.google.com with SMTP id p15so8011919qtl.3
+ for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 11:59:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=koconnor.net; s=google;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to
+ :user-agent; bh=wSZKVWaU13Lldt+uoeDTm6X0Hu3SIy1ANPDm7fEqQGI=;
+ b=OfaqrZxm5zAsN+c9/+aTqYgkhqQid3dOvb4D8Pz5KOmK5cePQ51vkN2Q+eZLzEYmIJ
+ E5PFTMoQ7ozbF2PFUHW4oPzGXHAtysrKWW8R+VTE0cyDfKqzK+Cxq0RIEJrY6yFBckRH
+ egVXAJYWPJxqncP+1UwV5P0mwOpYu/AKKjCdI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=wSZKVWaU13Lldt+uoeDTm6X0Hu3SIy1ANPDm7fEqQGI=;
+ b=iZJDz02p9TKCsWbTdkePXdQS0cpRSmVof+4n9AM6uicUfgGPM1AL2ObAWO9V3+eEVL
+ y7ygZSGuFRwDD4+JMSRHbT2RiGtQaqrk8V35UGjErMm1wddn5Y4zQCWLxTLfoGtJmFUo
+ Wb0IA+P5hahKk9oNKITYcdwzrZcsLIlx3qbwchl9IeHhxnBS3n1qrA/U+UQmtXZ1WD6B
+ QGQ3597ygozx24xE1+d5IPCzqkwkfgUB8XZYSzg97z/Ry/AF93oZtVjpPyXPWLu3VV7Z
+ EUJfY7TdoySNuZDdbXLK+WzjSnWl7Kz/fQmYVRdcQCFmyVMS9ckXCrdnQCL3gHe2nKDk
+ ttYA==
+X-Gm-Message-State: APjAAAXXJ9aV+c50ZgXsXVJ6Y+CL13ZLObIneGRr9idmjtVrfrdgkkx9
+ 1KGBV5ftHbFqdDK6v5OIKDamSA==
+X-Google-Smtp-Source: APXvYqxbuycj8AMuhPv2e7m2bSQxqsw2tFrGhKVcsXI/iwqrDw1yA60dI9jklHBcs3RO425smNfkKA==
+X-Received: by 2002:a0c:b04d:: with SMTP id l13mr46803805qvc.104.1561143595173; 
+ Fri, 21 Jun 2019 11:59:55 -0700 (PDT)
+Received: from localhost ([64.9.249.135])
+ by smtp.gmail.com with ESMTPSA id l5sm2011268qte.9.2019.06.21.11.59.54
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Fri, 21 Jun 2019 11:59:54 -0700 (PDT)
+Date: Fri, 21 Jun 2019 14:59:53 -0400
+From: Kevin O'Connor <kevin@koconnor.net>
+To: Sam Eiderman <shmuel.eiderman@oracle.com>
+Message-ID: <20190621185953.GA6620@morn.lan>
+References: <20190619092352.23583-1-shmuel.eiderman@oracle.com>
+ <20190619092352.23583-4-shmuel.eiderman@oracle.com>
+ <20190620143749.GC17015@morn.lan>
+ <62F1EBAB-C7E8-42D1-BB6F-22C4945E51B5@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <62F1EBAB-C7E8-42D1-BB6F-22C4945E51B5@oracle.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2001:738:2001:2001::2001
-Subject: [Qemu-devel] [PATCH] ati-vga: Add DDC reg names for debug
+X-Received-From: 2607:f8b0:4864:20::843
+Subject: Re: [Qemu-devel] [SeaBIOS] [PATCH v3 3/4] geometry: Add
+ boot_lchs_find_*() utility functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -56,32 +94,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, arbel.moshe@oracle.com,
+ seabios@seabios.org, qemu-devel@nongnu.org, mreitz@redhat.com,
+ liran.alon@oracle.com, kraxel@redhat.com, karl.heubaum@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Incremental patch to squash into last series
+On Fri, Jun 21, 2019 at 08:42:28PM +0300, Sam Eiderman wrote:
+> Sounds reasonable, how do purpose to deal with:
+> 
+> config BIOS_GEOMETRY
+> config BOOTORDER
+> 
+> precompiler optouts?
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
- hw/display/ati_dbg.c | 2 ++
- 1 file changed, 2 insertions(+)
+I think you can stick them both under BOOTORDER.  That option is only
+there in case someone wants to reduce the size of the SeaBIOS binary.
+I can't think of a reasonable situation where one cares that much
+about binary size, yet wants to override legacy disk translations..
 
-diff --git a/hw/display/ati_dbg.c b/hw/display/ati_dbg.c
-index b045f81d06..88b3a11315 100644
---- a/hw/display/ati_dbg.c
-+++ b/hw/display/ati_dbg.c
-@@ -19,6 +19,8 @@ static struct ati_regdesc ati_reg_names[] = {
-     {"CRTC_GEN_CNTL", 0x0050},
-     {"CRTC_EXT_CNTL", 0x0054},
-     {"DAC_CNTL", 0x0058},
-+    {"GPIO_VGA_DDC", 0x0060},
-+    {"GPIO_DVI_DDC", 0x0064},
-     {"GPIO_MONID", 0x0068},
-     {"I2C_CNTL_1", 0x0094},
-     {"PALETTE_INDEX", 0x00b0},
--- 
-2.13.7
+> If we don’t need any of them we also don’t need to call “get_scsi_devpath", “get_ata_devpath”, “get_pci_dev_path”.
+> 
+> I’ll see what can be done. 
 
+Thanks.
+-Kevin
 
