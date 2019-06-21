@@ -2,83 +2,86 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B0FAC43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 11:52:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75986C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 11:52:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06B9F208C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 11:52:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43258208C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 11:52:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aRsQOzfF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06B9F208C3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vfnsTVvp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43258208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59992 helo=lists.gnu.org)
+Received: from localhost ([::1]:59996 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heI5I-0001aw-9o
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 07:52:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49044)
+	id 1heI5Q-0001tp-DY
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 07:52:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49229)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1heHka-0000hb-CI
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:40 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1heHl1-0000wo-99
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:31:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1heHkW-0005YJ-8p
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:36 -0400
-Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:51021)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1heHkm-00067Y-9c
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:55 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51500)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1heHkW-0005V5-15
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:32 -0400
-Received: by mail-wm1-x32a.google.com with SMTP id c66so6035179wmf.0
- for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 04:30:31 -0700 (PDT)
+ id 1heHkm-00066q-34
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:30:48 -0400
+Received: by mail-wm1-x341.google.com with SMTP id 207so6031510wma.1
+ for <qemu-devel@nongnu.org>; Fri, 21 Jun 2019 04:30:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=HAAne3y/gROX4bU2C72LMlD4mSuvEZFb/lzmz3j4hms=;
- b=aRsQOzfFlJ7SUog+PSDnEfue3a52L44GPhkTjV8O6fCWQJO/0ZsyH6UmjtOA16VnMT
- t7W3MOho8lw8W1tXHGFwzRrSOXCWJnoYF41SFR9qdb7c7CYGPSeNtVl7oKNUY4hYSQ0g
- oPKNknuc1t5VCDnliamzLRFPL+1XCCbbB7Lorc8TNF/+LxFkp7UCOPZR8vkYzB744Pgn
- HrvPfIdTI3twTapZPDGuHneyBNfTCXRyaH5ynVKhaWdfRbqF+PuqcmxSK8oz09HGTr9t
- PhnkjgByNEC3HgwZmA0AnAXuqp2x9DpnNW/AmdoTNHuJlgv+3onoEB6Ua+6hLtoUM+Kw
- DOfA==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=a3VGuwnoGM9LiZBZHhLPfux9Kyat183XzMS8uuGHjKk=;
+ b=vfnsTVvpoLsCV3J9zxaZqMHgDbWFpYiznQGay7eixnslFrrXf6aaHfu/LuUcQ3zzUQ
+ iSKdr2mNqA8+lC+FALXYH/E2iUegO5ESxvOvCYo5J2ITcYKqwkMoQUaTnLoI0Lb7wPzl
+ YzFfu8WE95I9HTJHx4Oc1J0bnQOAFqrfFXMPGKhiyXwJtGvpOtMiuLP1a3URV8bXmTR8
+ Lk8Uklm02kAI+plAP6R7VHwfQxtqsrQSohd4Dl0Dl04V4DB4dV+UiwkHZimhZnp1y23d
+ 8qshSMOOgs9pIkbtjux5AKVg2hbqif0+pai00AevWUAAgQM+yNMCAXWBcYpEzyvUMzB0
+ VUkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=HAAne3y/gROX4bU2C72LMlD4mSuvEZFb/lzmz3j4hms=;
- b=Pc/5tiSfIs2w0jBC602v83SEDSkfjao+BOM5zyh/ANipfR3rkkn+/Nn/Y387ZMTKwV
- wVmiIXuNl0prOZYPUIpPe++EI4yJX1PdoogPZGXQkujxZhLKFy46tUBFEdzEejV33Apf
- dJMCXJ+u44ovVnIrV1XMfQ4NirOWTk8yjvbhuCR+0wHIdJIAIMeX108ECpXxPMx9uUUH
- BjdB43AxgRt+NcQfVl90naW3v0uYOgSHD9VEhSkrAbkH+VpGJWI570A2np20iTzJ0Ycl
- leezsO/LDIbFHISlII3HGhajB4ascOGDekDmVUA3j8eCQzT7fWkG33Uj4o9mOz71z2aD
- hrsQ==
-X-Gm-Message-State: APjAAAW1zfUgOj5BYZL0XVVGx+lK+I8K7gWt+kfxnAvUbGnP8GWObzBM
- 68uLQ0OwXR7j/EDfF+aWnq3bwbY3
-X-Google-Smtp-Source: APXvYqyG5BrQN1PUI/eKhI1tgGenUMLv3s8wYiseKBj/N1e94pZZvVflVS9nuijn3DP6M//+LRl3/Q==
-X-Received: by 2002:a7b:c3d5:: with SMTP id t21mr3480297wmj.87.1561116630797; 
- Fri, 21 Jun 2019 04:30:30 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=a3VGuwnoGM9LiZBZHhLPfux9Kyat183XzMS8uuGHjKk=;
+ b=gYoEtvlK9hi3DRqPzqU+B492pZvRIxDzs5XV4Sf7NEzqNVr68W6SSSS/+BI6wg7wQL
+ yvgyEPIjjiXTeyc2P6hNwUaYPVRle0Yer4o+RMyYBcYbT5TEgcSB/BjxoVCNyb7GzGRx
+ O0PLgVrQ4QT6RTturzUikg79i4kHdgNSw2xBJhmOx+IsFd1xDQE20Ai7mSW6bVOCe2Id
+ XUnvFCVnkYPSDoglVqVeJkhHox6IqgDmqenZ7TtzA1lRDMCfNfhaKaK3LzG70Ld77z92
+ 4qcbUrgomsP/JOhUbHGIfeae+T/05yE7VWqxHzTNiol48H/dBiG8R0/VMhCyf/zRLb0E
+ 4lDw==
+X-Gm-Message-State: APjAAAVZ6riUeHYMv53RRFaoJVjifrWXnM21Zy36y67jJVRfVRdOkq7i
+ +Bk4A0Ht4C+VRc7tGVz1Z4dcb9sN
+X-Google-Smtp-Source: APXvYqykY5Odf/j/xE+rxPQq1QqQ6UYmgViZuKeBIK6KH4Iz3JOnPODDY2Ri9Y90KAwqSXcAOoyxBQ==
+X-Received: by 2002:a7b:cc97:: with SMTP id p23mr4031210wma.120.1561116646861; 
+ Fri, 21 Jun 2019 04:30:46 -0700 (PDT)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id r3sm2712851wrr.61.2019.06.21.04.30.29
+ by smtp.gmail.com with ESMTPSA id r3sm2712851wrr.61.2019.06.21.04.30.46
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 21 Jun 2019 04:30:30 -0700 (PDT)
+ Fri, 21 Jun 2019 04:30:46 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 21 Jun 2019 13:30:03 +0200
-Message-Id: <1561116620-22245-9-git-send-email-pbonzini@redhat.com>
+Date: Fri, 21 Jun 2019 13:30:19 +0200
+Message-Id: <1561116620-22245-25-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1561116620-22245-1-git-send-email-pbonzini@redhat.com>
 References: <1561116620-22245-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32a
-Subject: [Qemu-devel] [PULL 08/25] i386/kvm: hv-stimer requires hv-time and
- hv-synic
+X-Received-From: 2a00:1450:4864:20::341
+Subject: [Qemu-devel] [PULL 24/25] util/main-loop: Fix incorrect assertion
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,89 +93,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Lidong Chen <lidong.chen@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
+From: Lidong Chen <lidong.chen@oracle.com>
 
-Synthetic timers operate in hv-time time and Windows won't use these
-without SynIC.
+The check for poll_fds in g_assert() was incorrect. The correct assertion
+should check "n_poll_fds + w->num <= ARRAY_SIZE(poll_fds)" because the
+subsequent for-loop is doing access to poll_fds[n_poll_fds + i] where i
+is in [0, w->num).  This could happen with a very high number of file
+descriptors and/or wait objects.
 
-Add .dependencies field to kvm_hyperv_properties[] and a generic mechanism
-to check dependencies between features.
-
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Message-Id: <20190517141924.19024-7-vkuznets@redhat.com>
+Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Suggested-by: Liam Merwick <liam.merwick@oracle.com>
+Reviewed-by: Liran Alon <liran.alon@oracle.com>
+Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <ded30967982811617ce7f0222d11228130c198b7.1560806687.git.lidong.chen@oracle.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/kvm.c | 23 +++++++++++++++++++----
- 1 file changed, 19 insertions(+), 4 deletions(-)
+ util/main-loop.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 93ac6ba..58afa31 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -689,6 +689,7 @@ static struct {
-         uint32_t fw;
-         uint32_t bits;
-     } flags[2];
-+    uint64_t dependencies;
- } kvm_hyperv_properties[] = {
-     [HYPERV_FEAT_RELAXED] = {
-         .desc = "relaxed timing (hv-relaxed)",
-@@ -756,7 +757,8 @@ static struct {
-         .flags = {
-             {.fw = FEAT_HYPERV_EAX,
-              .bits = HV_SYNTIMERS_AVAILABLE}
--        }
-+        },
-+        .dependencies = BIT(HYPERV_FEAT_SYNIC) | BIT(HYPERV_FEAT_TIME)
-     },
-     [HYPERV_FEAT_FREQUENCIES] = {
-         .desc = "frequency MSRs (hv-frequencies)",
-@@ -986,12 +988,25 @@ static int hv_cpuid_check_and_set(CPUState *cs, struct kvm_cpuid2 *cpuid,
-     X86CPU *cpu = X86_CPU(cs);
-     CPUX86State *env = &cpu->env;
-     uint32_t r, fw, bits;
--    int i;
-+    uint64_t deps;
-+    int i, dep_feat = 0;
+diff --git a/util/main-loop.c b/util/main-loop.c
+index e1e349c..a9f4e8d 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -422,7 +422,7 @@ static int os_host_main_loop_wait(int64_t timeout)
+     g_main_context_prepare(context, &max_priority);
+     n_poll_fds = g_main_context_query(context, max_priority, &poll_timeout,
+                                       poll_fds, ARRAY_SIZE(poll_fds));
+-    g_assert(n_poll_fds <= ARRAY_SIZE(poll_fds));
++    g_assert(n_poll_fds + w->num <= ARRAY_SIZE(poll_fds));
  
-     if (!hyperv_feat_enabled(cpu, feature) && !cpu->hyperv_passthrough) {
-         return 0;
-     }
- 
-+    deps = kvm_hyperv_properties[feature].dependencies;
-+    while ((dep_feat = find_next_bit(&deps, 64, dep_feat)) < 64) {
-+        if (!(hyperv_feat_enabled(cpu, dep_feat))) {
-+                fprintf(stderr,
-+                        "Hyper-V %s requires Hyper-V %s\n",
-+                        kvm_hyperv_properties[feature].desc,
-+                        kvm_hyperv_properties[dep_feat].desc);
-+                return 1;
-+        }
-+        dep_feat++;
-+    }
-+
-     for (i = 0; i < ARRAY_SIZE(kvm_hyperv_properties[feature].flags); i++) {
-         fw = kvm_hyperv_properties[feature].flags[i].fw;
-         bits = kvm_hyperv_properties[feature].flags[i].bits;
-@@ -1107,11 +1122,11 @@ static int hyperv_handle_properties(CPUState *cs,
-     r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_EVMCS);
-     r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_IPI);
- 
--    /* Dependencies */
-+    /* Additional dependencies not covered by kvm_hyperv_properties[] */
-     if (hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC) &&
-         !cpu->hyperv_synic_kvm_only &&
-         !hyperv_feat_enabled(cpu, HYPERV_FEAT_VPINDEX)) {
--        fprintf(stderr, "Hyper-V %s requires %s\n",
-+        fprintf(stderr, "Hyper-V %s requires Hyper-V %s\n",
-                 kvm_hyperv_properties[HYPERV_FEAT_SYNIC].desc,
-                 kvm_hyperv_properties[HYPERV_FEAT_VPINDEX].desc);
-         r |= 1;
+     for (i = 0; i < w->num; i++) {
+         poll_fds[n_poll_fds + i].fd = (DWORD_PTR)w->events[i];
 -- 
 1.8.3.1
 
