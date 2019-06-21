@@ -2,54 +2,66 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A51CAC43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 09:22:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DA92C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 09:25:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 789CD21530
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 09:22:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 789CD21530
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 38D062089E
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 09:25:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38D062089E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56562 helo=lists.gnu.org)
+Received: from localhost ([::1]:56688 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heFkT-0002k9-H0
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 05:22:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58240)
+	id 1heFn1-0004e9-Au
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 05:24:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39588)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1heEze-0004B9-5Y
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:33:59 -0400
+ (envelope-from <yan.y.zhao@intel.com>) id 1heFYr-0000tl-GE
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 05:10:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1heEn2-0008PV-IL
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:20:57 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:41278)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1heEn2-0008P7-Bk
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:20:56 -0400
-Received: from [127.0.1.1] (unknown [85.142.117.226])
- by mail.ispras.ru (Postfix) with ESMTPSA id 70F0D54008A;
- Fri, 21 Jun 2019 11:20:55 +0300 (MSK)
-From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 21 Jun 2019 11:20:55 +0300
-Message-ID: <156110525518.25431.4178984201371684282.stgit@pasha-Precision-3630-Tower>
-In-Reply-To: <156110523748.25431.9310430853468653085.stgit@pasha-Precision-3630-Tower>
-References: <156110523748.25431.9310430853468653085.stgit@pasha-Precision-3630-Tower>
-User-Agent: StGit/0.17.1-dirty
+ (envelope-from <yan.y.zhao@intel.com>) id 1heFKY-0004In-Os
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:57:23 -0400
+Received: from mga14.intel.com ([192.55.52.115]:18706)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+ id 1heFKV-0004FQ-AC
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:55:31 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+ by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 21 Jun 2019 01:52:24 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,399,1557212400"; d="scan'208";a="335761363"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.9])
+ by orsmga005.jf.intel.com with ESMTP; 21 Jun 2019 01:52:20 -0700
+Date: Fri, 21 Jun 2019 04:46:28 -0400
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <20190621084627.GC4304@joy-OptiPlex-7040>
+References: <1561041461-22326-1-git-send-email-kwankhede@nvidia.com>
+ <20190621002518.GF9303@joy-OptiPlex-7040>
+ <20190621012404.GA4173@joy-OptiPlex-7040>
+ <67726e08-f159-7054-57a7-36b08f691756@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 83.149.199.45
-Subject: [Qemu-devel] [PATCH for-4.1 03/24] replay: disable default snapshot
- for record/replay
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <67726e08-f159-7054-57a7-36b08f691756@nvidia.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.115
+Subject: Re: [Qemu-devel] [PATCH v4 00/13] Add migration support for VFIO
+ device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,56 +73,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru,
- pbonzini@redhat.com, quintela@redhat.com, ciro.santilli@gmail.com,
- jasowang@redhat.com, crosthwaite.peter@gmail.com, armbru@redhat.com,
- mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru,
- mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com,
- thomas.dullien@googlemail.com, dovgaluk@ispras.ru, artem.k.pisarenko@gmail.com,
- dgilbert@redhat.com, rth@twiddle.net
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "cjia@nvidia.com" <cjia@nvidia.com>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+On Fri, Jun 21, 2019 at 04:02:50PM +0800, Kirti Wankhede wrote:
+> 
+> 
+> On 6/21/2019 6:54 AM, Yan Zhao wrote:
+> > On Fri, Jun 21, 2019 at 08:25:18AM +0800, Yan Zhao wrote:
+> >> On Thu, Jun 20, 2019 at 10:37:28PM +0800, Kirti Wankhede wrote:
+> >>> Add migration support for VFIO device
+> >>>
+> >>> This Patch set include patches as below:
+> >>> - Define KABI for VFIO device for migration support.
+> >>> - Added save and restore functions for PCI configuration space
+> >>> - Generic migration functionality for VFIO device.
+> >>>   * This patch set adds functionality only for PCI devices, but can be
+> >>>     extended to other VFIO devices.
+> >>>   * Added all the basic functions required for pre-copy, stop-and-copy and
+> >>>     resume phases of migration.
+> >>>   * Added state change notifier and from that notifier function, VFIO
+> >>>     device's state changed is conveyed to VFIO device driver.
+> >>>   * During save setup phase and resume/load setup phase, migration region
+> >>>     is queried and is used to read/write VFIO device data.
+> >>>   * .save_live_pending and .save_live_iterate are implemented to use QEMU's
+> >>>     functionality of iteration during pre-copy phase.
+> >>>   * In .save_live_complete_precopy, that is in stop-and-copy phase,
+> >>>     iteration to read data from VFIO device driver is implemented till pending
+> >>>     bytes returned by driver are not zero.
+> >>>   * Added function to get dirty pages bitmap for the pages which are used by
+> >>>     driver.
+> >>> - Add vfio_listerner_log_sync to mark dirty pages.
+> >>> - Make VFIO PCI device migration capable. If migration region is not provided by
+> >>>   driver, migration is blocked.
+> >>>
+> >>> Below is the flow of state change for live migration where states in brackets
+> >>> represent VM state, migration state and VFIO device state as:
+> >>>     (VM state, MIGRATION_STATUS, VFIO_DEVICE_STATE)
+> >>>
+> >>> Live migration save path:
+> >>>         QEMU normal running state
+> >>>         (RUNNING, _NONE, _RUNNING)
+> >>>                         |
+> >>>     migrate_init spawns migration_thread.
+> >>>     (RUNNING, _SETUP, _RUNNING|_SAVING)
+> >>>     Migration thread then calls each device's .save_setup()
+> >>>                         |
+> >>>     (RUNNING, _ACTIVE, _RUNNING|_SAVING)
+> >>>     If device is active, get pending bytes by .save_live_pending()
+> >>>     if pending bytes >= threshold_size,  call save_live_iterate()
+> >>>     Data of VFIO device for pre-copy phase is copied.
+> >>>     Iterate till pending bytes converge and are less than threshold
+> >>>                         |
+> >>>     On migration completion, vCPUs stops and calls .save_live_complete_precopy
+> >>>     for each active device. VFIO device is then transitioned in
+> >>>      _SAVING state.
+> >>>     (FINISH_MIGRATE, _DEVICE, _SAVING)
+> >>>     For VFIO device, iterate in  .save_live_complete_precopy  until
+> >>>     pending data is 0.
+> >>>     (FINISH_MIGRATE, _DEVICE, _STOPPED)
+> >>
+> >> I suggest we also register to VMStateDescription, whose .pre_save
+> >> handler would get called after .save_live_complete_precopy in pre-copy
+> >> only case, and will called before .save_live_iterate in post-copy
+> >> enabled case.
+> >> In the .pre_save handler, we can save all device state which must be
+> >> copied after device stop in source vm and before device start in target vm.
+> >>
+> > hi
+> > to better describe this idea:
+> > 
+> > in pre-copy only case, the flow is
+> > 
+> > start migration --> .save_live_iterate (several round) -> stop source vm
+> > --> .save_live_complete_precopy --> .pre_save  -->start target vm
+> > -->migration complete
+> > 
+> > 
+> > in post-copy enabled case, the flow is
+> > 
+> > start migration --> .save_live_iterate (several round) --> start post copy --> 
+> > stop source vm --> .pre_save --> start target vm --> .save_live_iterate (several round) 
+> > -->migration complete
+> > 
+> > Therefore, we should put saving of device state in .pre_save interface
+> > rather than in .save_live_complete_precopy. 
+> > The device state includes pci config data, page tables, register state, etc.
+> > 
+> > The .save_live_iterate and .save_live_complete_precopy should only deal
+> > with saving dirty memory.
+> > 
+> 
+> Vendor driver can decide when to save device state depending on the VFIO
+> device state set by user. Vendor driver doesn't have to depend on which
+> callback function QEMU or user application calls. In pre-copy case,
+> save_live_complete_precopy sets VFIO device state to
+> VFIO_DEVICE_STATE_SAVING which means vCPUs are stopped and vendor driver
+> should save all device state.
+>
+when post copy stops vCPUs and vfio device, vendor driver only needs to
+provide device state. but how vendor driver knows that, if no extra
+interface or no extra device state is provides?
 
-This patch disables setting '-snapshot' option on by default
-in record/replay mode. This is needed for creating vmstates in record
-and replay modes.
-
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Acked-by: Kevin Wolf <kwolf@redhat.com>
----
- vl.c |   10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
-
-diff --git a/vl.c b/vl.c
-index 99a56b5556..8fcfd905ee 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1208,7 +1208,7 @@ static void configure_blockdev(BlockdevOptionsQueue *bdo_queue,
-         qapi_free_BlockdevOptions(bdo->bdo);
-         g_free(bdo);
-     }
--    if (snapshot || replay_mode != REPLAY_MODE_NONE) {
-+    if (snapshot) {
-         qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
-                           NULL, NULL);
-     }
-@@ -3128,7 +3128,13 @@ int main(int argc, char **argv, char **envp)
-                 drive_add(IF_PFLASH, -1, optarg, PFLASH_OPTS);
-                 break;
-             case QEMU_OPTION_snapshot:
--                snapshot = 1;
-+                {
-+                    Error *blocker = NULL;
-+                    snapshot = 1;
-+                    error_setg(&blocker, QERR_REPLAY_NOT_SUPPORTED,
-+                               "-snapshot");
-+                    replay_add_blocker(blocker);
-+                }
-                 break;
-             case QEMU_OPTION_numa:
-                 opts = qemu_opts_parse_noisily(qemu_find_opts("numa"),
-
+> > 
+> > I know current implementation does not support post-copy. but at least
+> > it should not require huge change when we decide to enable it in future.
+> > 
+> 
+> .has_postcopy and .save_live_complete_postcopy need to be implemented to
+> support post-copy. I think .save_live_complete_postcopy should be
+> similar to vfio_save_complete_precopy.
+> 
+> Thanks,
+> Kirti
+> 
+> > Thanks
+> > Yan
+> > 
+> >>>                         |
+> >>>     (FINISH_MIGRATE, _COMPLETED, STOPPED)
+> >>>     Migraton thread schedule cleanup bottom half and exit
+> >>>
+> >>> Live migration resume path:
+> >>>     Incomming migration calls .load_setup for each device
+> >>>     (RESTORE_VM, _ACTIVE, STOPPED)
+> >>>                         |
+> >>>     For each device, .load_state is called for that device section data
+> >>>                         |
+> >>>     At the end, called .load_cleanup for each device and vCPUs are started.
+> >>>                         |
+> >>>         (RUNNING, _NONE, _RUNNING)
+> >>>
+> >>> Note that:
+> >>> - Migration post copy is not supported.
+> >>>
+> >>> v3 -> v4:
+> >>> - Added one more bit for _RESUMING flag to be set explicitly.
+> >>> - data_offset field is read-only for user space application.
+> >>> - data_size is read for every iteration before reading data from migration, that
+> >>>   is removed assumption that data will be till end of migration region.
+> >>> - If vendor driver supports mappable sparsed region, map those region during
+> >>>   setup state of save/load, similarly unmap those from cleanup routines.
+> >>> - Handles race condition that causes data corruption in migration region during
+> >>>   save device state by adding mutex and serialiaing save_buffer and
+> >>>   get_dirty_pages routines.
+> >>> - Skip called get_dirty_pages routine for mapped MMIO region of device.
+> >>> - Added trace events.
+> >>> - Splitted into multiple functional patches.
+> >>>
+> >>> v2 -> v3:
+> >>> - Removed enum of VFIO device states. Defined VFIO device state with 2 bits.
+> >>> - Re-structured vfio_device_migration_info to keep it minimal and defined action
+> >>>   on read and write access on its members.
+> >>>
+> >>> v1 -> v2:
+> >>> - Defined MIGRATION region type and sub-type which should be used with region
+> >>>   type capability.
+> >>> - Re-structured vfio_device_migration_info. This structure will be placed at 0th
+> >>>   offset of migration region.
+> >>> - Replaced ioctl with read/write for trapped part of migration region.
+> >>> - Added both type of access support, trapped or mmapped, for data section of the
+> >>>   region.
+> >>> - Moved PCI device functions to pci file.
+> >>> - Added iteration to get dirty page bitmap until bitmap for all requested pages
+> >>>   are copied.
+> >>>
+> >>> Thanks,
+> >>> Kirti
+> >>>
+> >>>
+> >>> Kirti Wankhede (13):
+> >>>   vfio: KABI for migration interface
+> >>>   vfio: Add function to unmap VFIO region
+> >>>   vfio: Add save and load functions for VFIO PCI devices
+> >>>   vfio: Add migration region initialization and finalize function
+> >>>   vfio: Add VM state change handler to know state of VM
+> >>>   vfio: Add migration state change notifier
+> >>>   vfio: Register SaveVMHandlers for VFIO device
+> >>>   vfio: Add save state functions to SaveVMHandlers
+> >>>   vfio: Add load state functions to SaveVMHandlers
+> >>>   vfio: Add function to get dirty page list
+> >>>   vfio: Add vfio_listerner_log_sync to mark dirty pages
+> >>>   vfio: Make vfio-pci device migration capable.
+> >>>   vfio: Add trace events in migration code path
+> >>>
+> >>>  hw/vfio/Makefile.objs         |   2 +-
+> >>>  hw/vfio/common.c              |  55 +++
+> >>>  hw/vfio/migration.c           | 815 ++++++++++++++++++++++++++++++++++++++++++
+> >>>  hw/vfio/pci.c                 | 126 ++++++-
+> >>>  hw/vfio/pci.h                 |  29 ++
+> >>>  hw/vfio/trace-events          |  19 +
+> >>>  include/hw/vfio/vfio-common.h |  22 ++
+> >>>  linux-headers/linux/vfio.h    |  71 ++++
+> >>>  8 files changed, 1132 insertions(+), 7 deletions(-)
+> >>>  create mode 100644 hw/vfio/migration.c
+> >>>
+> >>> -- 
+> >>> 2.7.0
+> >>>
 
