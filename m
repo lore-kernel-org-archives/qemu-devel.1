@@ -2,93 +2,60 @@ Return-Path: <SRS0=2JTU=UU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A992C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 11:00:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D57CC43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 11:06:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09092208CA
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 11:00:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09092208CA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2778B21530
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 11:06:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2778B21530
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=efs-auto.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59198 helo=lists.gnu.org)
+Received: from localhost ([::1]:59328 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heHHI-0005Jt-RI
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 07:00:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40294)
+	id 1heHNM-0007s9-8x
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 07:06:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42747)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <anthony.perard@citrix.com>) id 1heHC4-0002Fk-Qz
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 06:55:02 -0400
+ (envelope-from <andreas.konopik@efs-auto.de>) id 1heHMS-0007Ki-ED
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:05:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <anthony.perard@citrix.com>) id 1heHC0-0008Vc-Vh
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 06:54:56 -0400
-Received: from esa3.hc3370-68.iphmx.com ([216.71.145.155]:13604)
+ (envelope-from <andreas.konopik@efs-auto.de>) id 1heHMP-0005Hg-Br
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:05:40 -0400
+Received: from mailin3.audi.de ([143.164.102.17]:58034)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
- id 1heHBy-0008De-U2
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 06:54:52 -0400
-Authentication-Results: esa3.hc3370-68.iphmx.com;
- dkim=none (message not signed) header.i=none;
- spf=None smtp.pra=anthony.perard@citrix.com;
- spf=Pass smtp.mailfrom=anthony.perard@citrix.com;
- spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- anthony.perard@citrix.com) identity=pra;
- client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
- envelope-from="anthony.perard@citrix.com";
- x-sender="anthony.perard@citrix.com";
- x-conformance=sidf_compatible
-Received-SPF: Pass (esa3.hc3370-68.iphmx.com: domain of
- anthony.perard@citrix.com designates 162.221.158.21 as
- permitted sender) identity=mailfrom;
- client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
- envelope-from="anthony.perard@citrix.com";
- x-sender="anthony.perard@citrix.com";
- x-conformance=sidf_compatible; x-record-type="v=spf1";
- x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
- ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
- ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
- ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
-Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- postmaster@mail.citrix.com) identity=helo;
- client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
- envelope-from="anthony.perard@citrix.com";
- x-sender="postmaster@mail.citrix.com";
- x-conformance=sidf_compatible
-IronPort-SDR: uAUANqurQVuiHmctksfiUbTsh9YirwrEq7cQDny0WDE1k5j9VTlY8PligOUtu0II1ORd2cCqUV
- PtRSr2qv6xsJGnBEzvO15j1hpPRucJZdtf/b2z9GMmJvVpP4UOvObJoD4CXcVMkhECq7MPC48Y
- KQKSqf8O/oDBWExJA+JngQyDDKK4RtaEG31+kAyAntkOaoWeIiXI099K/rZftP7CO4ieYB81GZ
- UdKVtxAUUIiRLQUVi7pp4pC4SioD312mVTHv8SfQKFLyHbii7Jphj319cPJEMnpF6wkqow2MBy
- DFk=
-X-SBRS: 2.7
-X-MesageID: 2052042
-X-Ironport-Server: esa3.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.63,400,1557201600"; 
-   d="scan'208";a="2052042"
-From: Anthony PERARD <anthony.perard@citrix.com>
-To: <qemu-devel@nongnu.org>
-Date: Fri, 21 Jun 2019 11:54:40 +0100
-Message-ID: <20190621105441.3025-2-anthony.perard@citrix.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190621105441.3025-1-anthony.perard@citrix.com>
-References: <20190621105441.3025-1-anthony.perard@citrix.com>
+ (Exim 4.71) (envelope-from <andreas.konopik@efs-auto.de>)
+ id 1heHMP-0003gk-5i
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 07:05:37 -0400
+From: "Konopik, Andreas (EFS-GH2)" <andreas.konopik@efs-auto.de>
+To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, David Brenken
+ <david.brenken@efs-auto.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Thread-Topic: [Qemu-devel] [PATCH v2 4/5] tricore: add QSEED instruction
+Thread-Index: AQHVJnSahp6nxEePnkqPadw3nWiQ6KaixacAgAMsbRA=
+Date: Fri, 21 Jun 2019 10:55:55 +0000
+Message-ID: <F5B10EA5F04CF44F81B685A0E281578720CA35@AUDIINSX0385.audi.vwg>
+References: <20190619075643.10048-1-david.brenken@efs-auto.org>
+ <20190619075643.10048-5-david.brenken@efs-auto.org>
+ <cd1adeb4-6006-fcc8-4301-0604623f3991@mail.uni-paderborn.de>
+In-Reply-To: <cd1adeb4-6006-fcc8-4301-0604623f3991@mail.uni-paderborn.de>
+Accept-Language: de-DE, en-US
+Content-Language: de-DE
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.246.66.213]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 216.71.145.155
-Subject: [Qemu-devel] [PATCH v3 1/2] Revert xen/io/ring.h of "Clean up a few
- header guard symbols"
+X-TM-AS-GCONF: 00
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 143.164.102.17
+Subject: Re: [Qemu-devel] [PATCH v2 4/5] tricore: add QSEED instruction
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,74 +67,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefano Stabellini <sstabellini@kernel.org>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Paul Durrant <paul.durrant@citrix.com>,
- Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org
+Cc: "Brenken, David \(EFS-GH2\)" <david.brenken@efs-auto.de>, "Rasche,
+ Robert \(EFS-GH2\)" <robert.rasche@efs-auto.de>, "Hofstetter, 
+ Georg \(EFS-GH2\)" <Georg.Hofstetter@efs-auto.de>, "Biermanski,
+ Lars \(EFS-GH3\)" <lars.biermanski@efs-auto.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This reverts changes to include/hw/xen/io/ring.h from commit
-37677d7db39a3c250ad661d00fb7c3b59d047b1f.
-
-Following 37677d7db3 "Clean up a few header guard symbols", QEMU start
-to fail to build:
-
-In file included from ~/xen/tools/../tools/include/xen/io/blkif.h:31:0,
-                 from ~/xen/tools/qemu-xen-dir/hw/block/xen_blkif.h:5,
-                 from ~/xen/tools/qemu-xen-dir/hw/block/xen-block.c:22:
-~/xen/tools/../tools/include/xen/io/ring.h:68:0: error: "__CONST_RING_SIZE" redefined [-Werror]
- #define __CONST_RING_SIZE(_s, _sz) \
-
-In file included from ~/xen/tools/qemu-xen-dir/hw/block/xen_blkif.h:4:0,
-                 from ~/xen/tools/qemu-xen-dir/hw/block/xen-block.c:22:
-~/xen/tools/qemu-xen-dir/include/hw/xen/io/ring.h:66:0: note: this is the location of the previous definition
- #define __CONST_RING_SIZE(_s, _sz) \
-
-The issue is that some public xen headers have been imported (by
-f65eadb639 "xen: import ring.h from xen") but not all. With the change
-in the guards symbole, the ring.h header start to be imported twice.
-
-Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
----
-CC: Markus Armbruster <armbru@redhat.com>
----
-
-Notes:
-    v3:
-    - new patch, replace "xen: Fix build with public headers" from previous
-      patch series version
-    - Revert problematic change instead.
-
- include/hw/xen/io/ring.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/include/hw/xen/io/ring.h b/include/hw/xen/io/ring.h
-index 62abfd7a6e..1adacf09f9 100644
---- a/include/hw/xen/io/ring.h
-+++ b/include/hw/xen/io/ring.h
-@@ -24,8 +24,8 @@
-  * Tim Deegan and Andrew Warfield November 2004.
-  */
- 
--#ifndef XEN_PUBLIC_IO_RING_H
--#define XEN_PUBLIC_IO_RING_H
-+#ifndef __XEN_PUBLIC_IO_RING_H__
-+#define __XEN_PUBLIC_IO_RING_H__
- 
- /*
-  * When #include'ing this header, you need to provide the following
-@@ -469,7 +469,7 @@ struct name##_data_intf {                                                     \
- };                                                                            \
- DEFINE_XEN_FLEX_RING(name)
- 
--#endif /* XEN_PUBLIC_IO_RING_H */
-+#endif /* __XEN_PUBLIC_IO_RING_H__ */
- 
- /*
-  * Local variables:
--- 
-Anthony PERARD
-
+SGkgQmFzdGlhbiwNCg0KYWxscmlnaHQgdGhhbmsgeW91LiBBIGZpeCBpcyBhbHJlYWR5IG9uIHRo
+ZSB3YXkuDQoNCkJlc3QgcmVnYXJkcywNCg0KQW5kcmVhcyANCg0KPiAtLS0tLVVyc3Byw7xuZ2xp
+Y2hlIE5hY2hyaWNodC0tLS0tDQo+IFZvbjogQmFzdGlhbiBLb3BwZWxtYW5uIDxrYmFzdGlhbkBt
+YWlsLnVuaS1wYWRlcmJvcm4uZGU+DQo+IEdlc2VuZGV0OiBNaXR0d29jaCwgMTkuIEp1bmkgMjAx
+OSAxNDoyNQ0KPiBBbjogRGF2aWQgQnJlbmtlbiA8ZGF2aWQuYnJlbmtlbkBlZnMtYXV0by5vcmc+
+OyBxZW11LWRldmVsQG5vbmdudS5vcmcNCj4gQ2M6IEJpZXJtYW5za2ksIExhcnMgKEVGUy1HSDMp
+IDxsYXJzLmJpZXJtYW5za2lAZWZzLWF1dG8uZGU+OyBIb2ZzdGV0dGVyLA0KPiBHZW9yZyAoRUZT
+LUdIMikgPEdlb3JnLkhvZnN0ZXR0ZXJAZWZzLWF1dG8uZGU+OyBCcmVua2VuLCBEYXZpZCAoRUZT
+LUdIMikNCj4gPGRhdmlkLmJyZW5rZW5AZWZzLWF1dG8uZGU+OyBSYXNjaGUsIFJvYmVydCAoRUZT
+LUdIMikgPHJvYmVydC5yYXNjaGVAZWZzLQ0KPiBhdXRvLmRlPjsgS29ub3BpaywgQW5kcmVhcyAo
+RUZTLUdIMikgPGFuZHJlYXMua29ub3Bpa0BlZnMtYXV0by5kZT4NCj4gQmV0cmVmZjogUmU6IFtR
+ZW11LWRldmVsXSBbUEFUQ0ggdjIgNC81XSB0cmljb3JlOiBhZGQgUVNFRUQgaW5zdHJ1Y3Rpb24N
+Cj4gDQo+IA0KPiBPbiA2LzE5LzE5IDk6NTYgQU0sIERhdmlkIEJyZW5rZW4gd3JvdGU6DQo+ID4g
+Kw0KPiA+ICsgICAgICAgIHJlc3VsdCA9IDA7DQo+ID4gKyAgICAgICAgcmVzdWx0ID0gZGVwb3Np
+dDMyKHJlc3VsdCwgMzEsIDEsIG5ld19TKTsNCj4gPiArICAgICAgICByZXN1bHQgPSBkZXBvc2l0
+MzIocmVzdWx0LCAyMywgOCwgbmV3X0UpOw0KPiA+ICsgICAgICAgIHJlc3VsdCA9IGRlcG9zaXQz
+MihyZXN1bHQsIDE1LCA4LCBuZXdfTSk7DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+ICsgICAgaWYg
+KGZsb2F0MzJfaXNfYW55X25hbihhcmcxKSB8fCByZXN1bHQgPT0gZmxvYXQzMl9zcXJ0X25hbikg
+ew0KPiANCj4gDQo+IFlvdSBuZWVkIGZsb2F0MzJfaXNfc2lnbmFsaW5nX25hbiwgc2luY2Ugb25s
+eSBzaWduYWxpbmcgbmFuIHJhaXNlcyB0aGUgaW52YWxpZA0KPiBmbGFnLg0KPiANCj4gDQo+ID4g
+KyAgICAgICAgZW52LT5GUFVfRkkgPSAxOw0KPiANCj4gZW52LT5GUFVfRkkgPSAxIDw8IDMxOw0K
+PiANCj4gU2VlIGZfdXBkYXRlX3Bzd19mbGFncygpLiBGUFVfRknCoCBhbmQgUFNXX1YgYXJlIHRo
+ZSBzYW1lIGFuZCB3ZSBkZWZpbmVkDQo+IGJpdCAzMSBhcyB0aGUgViBiaXQgZm9yIG9wdGltaXph
+dGlvbiBwdXJwb3Nlcy4NCj4gDQo+IENoZWVycywNCj4gDQo+IEJhc3RpYW4NCg0K
 
