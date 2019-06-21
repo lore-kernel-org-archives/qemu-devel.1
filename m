@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91325C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 16:48:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25F18C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 16:52:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B79620665
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 16:48:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B79620665
+	by mail.kernel.org (Postfix) with ESMTPS id 94CDC205F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 16:52:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94CDC205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36812 helo=lists.gnu.org)
+Received: from localhost ([::1]:36820 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heMiT-0004kf-Eq
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 12:48:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44957)
+	id 1heMlz-0006IF-Eh
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 12:52:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44721)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <drjones@redhat.com>) id 1heMVv-0002Fb-Ax
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 12:35:51 -0400
+ (envelope-from <drjones@redhat.com>) id 1heMVf-0001sq-PF
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 12:35:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1heMVr-0002mL-FV
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 12:35:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33176)
+ (envelope-from <drjones@redhat.com>) id 1heMVW-0001ye-Dk
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 12:35:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60186)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <drjones@redhat.com>)
- id 1heMVf-0002DR-43; Fri, 21 Jun 2019 12:35:32 -0400
+ id 1heMVF-00011n-Nj; Fri, 21 Jun 2019 12:35:07 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 54205301EA82;
- Fri, 21 Jun 2019 16:35:28 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 32A843082B02;
+ Fri, 21 Jun 2019 16:35:01 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3E7BA1001DDE;
- Fri, 21 Jun 2019 16:35:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D15CA1001DC7;
+ Fri, 21 Jun 2019 16:34:56 +0000 (UTC)
 From: Andrew Jones <drjones@redhat.com>
 To: qemu-devel@nongnu.org,
 	qemu-arm@nongnu.org
-Date: Fri, 21 Jun 2019 18:34:21 +0200
-Message-Id: <20190621163422.6127-14-drjones@redhat.com>
+Date: Fri, 21 Jun 2019 18:34:15 +0200
+Message-Id: <20190621163422.6127-8-drjones@redhat.com>
 In-Reply-To: <20190621163422.6127-1-drjones@redhat.com>
 References: <20190621163422.6127-1-drjones@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Fri, 21 Jun 2019 16:35:28 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Fri, 21 Jun 2019 16:35:01 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 13/14] target/arm/cpu64: max cpu: Support
- sve properties with KVM
+Subject: [Qemu-devel] [PATCH v2 07/14] target/arm/cpu64: max cpu: Introduce
+ sve<vl-bits> properties
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,715 +75,894 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Extend the SVE vq map initialization and validation with KVM's
-supported vector lengths when KVM is enabled. In order to determine
-and select supported lengths we add two new KVM functions for getting
-and setting the KVM_REG_ARM64_SVE_VLS pseudo-register.
+Introduce cpu properties to give fine control over SVE vector lengths.
+We introduce a property for each valid length up to the current
+maximum supported, which is 2048-bits. The properties are named, e.g.
+sve128, sve256, sve512, ..., where the number is the number of bits.
+
+It's now possible to do something like -cpu max,sve-max-vq=3D4,sve384=3Do=
+ff
+to provide a guest vector lengths 128, 256, and 512 bits. The resulting
+set must conform to the architectural constraint of having all power-of-2
+lengths smaller than the maximum length present. It's also possible to
+only provide sve<vl-bits> properties, e.g. -cpu max,sve512=3Don. That
+example provides the machine with 128, 256, and 512 bit vector lengths.
+It doesn't hurt to explicitly ask for all expected vector lengths,
+which is what, for example, libvirt should do.
+
+Note1, it is not possible to use sve<vl-bits> properties before
+sve-max-vq, e.g. -cpu max,sve384=3Doff,sve-max-vq=3D4, as supporting
+that overly complicates the user input validation.
+
+Note2, while one might expect -cpu max,sve-max-vq=3D4,sve512=3Don to be t=
+he
+same as -cpu max,sve512=3Don, they are not. The former enables all vector
+lengths 512 bits and smaller, while the latter only sets the 512-bit
+length and its smaller power-of-2 lengths. It's probably best not to use
+sve-max-vq with sve<vl-bits> properties, but it can't be completely
+forbidden as we want qmp_query_cpu_model_expansion to work with guests
+launched with e.g. -cpu max,sve-max-vq=3D8 on their command line.
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- target/arm/cpu.h         |   3 +-
- target/arm/cpu64.c       | 171 +++++++++++++++++++++++++++------------
- target/arm/kvm64.c       | 117 +++++++++++++++++++++++++--
- target/arm/kvm_arm.h     |  19 +++++
- target/arm/monitor.c     |   2 +-
- tests/arm-cpu-features.c |  86 +++++++++++++++++---
- 6 files changed, 331 insertions(+), 67 deletions(-)
+ target/arm/cpu.c         |   6 +
+ target/arm/cpu.h         |  14 ++
+ target/arm/cpu64.c       | 360 ++++++++++++++++++++++++++++++++++++++-
+ target/arm/helper.c      |  11 +-
+ target/arm/monitor.c     |  16 ++
+ tests/arm-cpu-features.c | 217 +++++++++++++++++++++++
+ 6 files changed, 620 insertions(+), 4 deletions(-)
 
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index f08e178fc84b..e060a0d9df0e 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1019,6 +1019,12 @@ static void arm_cpu_realizefn(DeviceState *dev, Er=
+ror **errp)
+         return;
+     }
+=20
++    arm_cpu_sve_finalize(cpu, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
+     if (arm_feature(env, ARM_FEATURE_AARCH64) &&
+         cpu->has_vfp !=3D cpu->has_neon) {
+         /*
 diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index cbb155cf72a5..8a1c6c66a462 100644
+index f9da672be575..cbb155cf72a5 100644
 --- a/target/arm/cpu.h
 +++ b/target/arm/cpu.h
-@@ -926,7 +926,8 @@ struct ARMCPU {
-      * (bit-number + 1) * 16 bytes, i.e. each bit number + 1 is the vect=
+@@ -184,8 +184,13 @@ typedef struct {
+=20
+ #ifdef TARGET_AARCH64
+ # define ARM_MAX_VQ    16
++void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp);
++uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uint32_t vq);
+ #else
+ # define ARM_MAX_VQ    1
++static inline void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp) { }
++static inline uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uint32_t=
+ vq)
++{ return 0; }
+ #endif
+=20
+ typedef struct ARMVectorReg {
+@@ -915,6 +920,15 @@ struct ARMCPU {
+=20
+     /* Used to set the maximum vector length the cpu will support.  */
+     uint32_t sve_max_vq;
++
++    /*
++     * In sve_vq_map each set bit is a supported vector length of
++     * (bit-number + 1) * 16 bytes, i.e. each bit number + 1 is the vect=
 or
-      * length in quadwords. We need a map size twice the maximum
-      * quadword length though because we use two bits for each vector
--     * length in order to track three states: uninitialized, off, and on=
++     * length in quadwords. We need a map size twice the maximum
++     * quadword length though because we use two bits for each vector
++     * length in order to track three states: uninitialized, off, and on=
 .
-+     * length in order to track four states: uninitialized, uninitialize=
-d
-+     * but supported by KVM, off, and on.
-      */
-     DECLARE_BITMAP(sve_vq_map, ARM_MAX_VQ * 2);
++     */
++    DECLARE_BITMAP(sve_vq_map, ARM_MAX_VQ * 2);
  };
+=20
+ void arm_cpu_post_init(Object *obj);
 diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 2e595ad53137..6e92aa54b9c8 100644
+index 02ada65f240c..5def82111dee 100644
 --- a/target/arm/cpu64.c
 +++ b/target/arm/cpu64.c
-@@ -261,10 +261,11 @@ static void aarch64_a72_initfn(Object *obj)
-  * While we eventually use cpu->sve_vq_map as a typical bitmap, where ea=
-ch vq
-  * has only two states (off/on), until we've finalized the map at realiz=
-e time
-  * we use an extra bit, at the vq - 1 + ARM_MAX_VQ bit number, to also a=
-llow
-- * tracking of the uninitialized state. The arm_vq_state typedef and fol=
-lowing
-- * functions allow us to more easily work with the bitmap. Also, while t=
-he map
-- * is still initializing, sve-max-vq has an additional three states, bri=
-nging
-- * the number of its states to five, which are the following:
-+ * tracking of the uninitialized state and the uninitialized but support=
-ed by
-+ * KVM state. The arm_vq_state typedef and following functions allow us =
-to more
-+ * easily work with the bitmap. Also, while the map is still initializin=
-g,
-+ * sve-max-vq has an additional three states, bringing the number of its=
- states
-+ * to five, which are the following:
-  *
-  * sve-max-vq:
-  *   0:    SVE is disabled. The default value for a vq in the map is 'OF=
-F'.
-@@ -296,6 +297,11 @@ typedef enum arm_vq_state {
-     ARM_VQ_OFF,
-     ARM_VQ_ON,
-     ARM_VQ_UNINITIALIZED,
-+    ARM_VQ_UNINITIALIZED_KVM_SUPPORTED
-+    /*
-+     * More states cannot be added without adding bits to sve_vq_map
-+     * and modifying its supporting functions.
-+     */
- } arm_vq_state;
-=20
- static arm_vq_state arm_cpu_vq_map_get(ARMCPU *cpu, int vq)
-@@ -324,6 +330,23 @@ static void arm_cpu_vq_map_init(ARMCPU *cpu)
- {
-     bitmap_zero(cpu->sve_vq_map, ARM_MAX_VQ * 2);
-     bitmap_set(cpu->sve_vq_map, ARM_MAX_VQ, ARM_MAX_VQ);
-+
-+    if (kvm_enabled()) {
-+        DECLARE_BITMAP(kvm_supported, ARM_MAX_VQ);
-+        uint32_t kvm_max_vq;
-+
-+        bitmap_zero(kvm_supported, ARM_MAX_VQ);
-+
-+        kvm_arm_sve_get_vls(CPU(cpu), kvm_supported, ARM_MAX_VQ, &kvm_ma=
-x_vq);
-+
-+        if (kvm_max_vq > ARM_MAX_VQ) {
-+            warn_report("KVM supports vector lengths larger than "
-+                        "QEMU can enable");
-+        }
-+
-+        bitmap_or(cpu->sve_vq_map, cpu->sve_vq_map,
-+                  kvm_supported, ARM_MAX_VQ);
-+    }
+@@ -257,6 +257,149 @@ static void aarch64_a72_initfn(Object *obj)
+     define_arm_cp_regs(cpu, cortex_a72_a57_a53_cp_reginfo);
  }
 =20
- static bool arm_cpu_vq_map_is_finalized(ARMCPU *cpu)
-@@ -371,12 +394,7 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
-         return;
-     }
-=20
--    /* sve-max-vq and sve<vl-bits> properties not yet implemented for KV=
-M */
--    if (kvm_enabled()) {
--        return;
--    }
--
--    if (cpu->sve_max_vq =3D=3D ARM_SVE_INIT) {
-+    if (!kvm_enabled() && cpu->sve_max_vq =3D=3D ARM_SVE_INIT) {
-         object_property_set_uint(OBJECT(cpu), ARM_MAX_VQ, "sve-max-vq", =
++/*
++ * While we eventually use cpu->sve_vq_map as a typical bitmap, where ea=
+ch vq
++ * has only two states (off/on), until we've finalized the map at realiz=
+e time
++ * we use an extra bit, at the vq - 1 + ARM_MAX_VQ bit number, to also a=
+llow
++ * tracking of the uninitialized state. The arm_vq_state typedef and fol=
+lowing
++ * functions allow us to more easily work with the bitmap. Also, while t=
+he map
++ * is still initializing, sve-max-vq has an additional three states, bri=
+nging
++ * the number of its states to five, which are the following:
++ *
++ * sve-max-vq:
++ *   0:    SVE is disabled. The default value for a vq in the map is 'OF=
+F'.
++ *  -1:    SVE is enabled, but neither sve-max-vq nor sve<vl-bits> prope=
+rties
++ *         have yet been specified by the user. The default value for a =
+vq in
++ *         the map is 'ON'.
++ *  -2:    SVE is enabled and one or more sve<vl-bits> properties have b=
+een
++ *         set to 'OFF' by the user, but no sve<vl-bits> properties have=
+ yet
++ *         been set to 'ON'. The user is now blocked from setting sve-ma=
+x-vq
++ *         and the default value for a vq in the map is 'ON'.
++ *  -3:    SVE is enabled and one or more sve<vl-bits> properties have b=
+een
++ *         set to 'ON' by the user. The user is blocked from setting sve=
+-max-vq
++ *         and the default value for a vq in the map is 'OFF'. sve-max-v=
+q never
++ *         transitions back to -2, even if later inputs disable the vect=
+or
++ *         lengths that initially transitioned sve-max-vq to this state.=
+ This
++ *         avoids the default values from flip-flopping.
++ *  [1-ARM_MAX_VQ]: SVE is enabled and the user has specified a valid
++ *                  sve-max-vq. The sve-max-vq specified vq and all smal=
+ler
++ *                  vq's will be initially enabled. All larger vq's will=
+ have
++ *                  a default of 'OFF'.
++ */
++#define ARM_SVE_INIT          -1
++#define ARM_VQ_DEFAULT_ON     -2
++#define ARM_VQ_DEFAULT_OFF    -3
++
++#define arm_sve_have_max_vq(cpu) ((int32_t)(cpu)->sve_max_vq > 0)
++
++typedef enum arm_vq_state {
++    ARM_VQ_OFF,
++    ARM_VQ_ON,
++    ARM_VQ_UNINITIALIZED,
++} arm_vq_state;
++
++static arm_vq_state arm_cpu_vq_map_get(ARMCPU *cpu, int vq)
++{
++    assert(vq <=3D ARM_MAX_VQ);
++
++    return test_bit(vq - 1, cpu->sve_vq_map) |
++           test_bit(vq - 1 + ARM_MAX_VQ, cpu->sve_vq_map) << 1;
++}
++
++static void arm_cpu_vq_map_set(ARMCPU *cpu, int vq, arm_vq_state state)
++{
++    assert(state =3D=3D ARM_VQ_OFF || state =3D=3D ARM_VQ_ON);
++    assert(vq <=3D ARM_MAX_VQ);
++
++    clear_bit(vq - 1 + ARM_MAX_VQ, cpu->sve_vq_map);
++
++    if (state =3D=3D ARM_VQ_ON) {
++        set_bit(vq - 1, cpu->sve_vq_map);
++    } else {
++        clear_bit(vq - 1, cpu->sve_vq_map);
++    }
++}
++
++static void arm_cpu_vq_map_init(ARMCPU *cpu)
++{
++    bitmap_zero(cpu->sve_vq_map, ARM_MAX_VQ * 2);
++    bitmap_set(cpu->sve_vq_map, ARM_MAX_VQ, ARM_MAX_VQ);
++}
++
++static bool arm_cpu_vq_map_is_finalized(ARMCPU *cpu)
++{
++    DECLARE_BITMAP(map, ARM_MAX_VQ * 2);
++
++    bitmap_zero(map, ARM_MAX_VQ * 2);
++    bitmap_set(map, ARM_MAX_VQ, ARM_MAX_VQ);
++    bitmap_and(map, map, cpu->sve_vq_map, ARM_MAX_VQ * 2);
++
++    return bitmap_empty(map, ARM_MAX_VQ * 2);
++}
++
++static void arm_cpu_vq_map_finalize(ARMCPU *cpu)
++{
++    Error *err =3D NULL;
++    char name[8];
++    uint32_t vq;
++    bool value;
++
++    /*
++     * We use the property get accessor because it knows what default
++     * values to return for uninitialized vector lengths.
++     */
++    for (vq =3D 1; vq <=3D ARM_MAX_VQ; ++vq) {
++        sprintf(name, "sve%d", vq * 128);
++        value =3D object_property_get_bool(OBJECT(cpu), name, &err);
++        assert(!err);
++        if (value) {
++            arm_cpu_vq_map_set(cpu, vq, ARM_VQ_ON);
++        } else {
++            arm_cpu_vq_map_set(cpu, vq, ARM_VQ_OFF);
++        }
++    }
++
++    assert(arm_cpu_vq_map_is_finalized(cpu));
++}
++
++void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
++{
++    Error *err =3D NULL;
++
++    if (!cpu->sve_max_vq) {
++        bitmap_zero(cpu->sve_vq_map, ARM_MAX_VQ * 2);
++        return;
++    }
++
++    if (cpu->sve_max_vq =3D=3D ARM_SVE_INIT) {
++        object_property_set_uint(OBJECT(cpu), ARM_MAX_VQ, "sve-max-vq", =
 &err);
-         if (err) {
-             error_propagate(errp, err);
-@@ -431,6 +449,11 @@ static void cpu_max_set_sve_max_vq(Object *obj, Visi=
-tor *v, const char *name,
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
++        assert(cpu->sve_max_vq =3D=3D ARM_MAX_VQ);
++        arm_cpu_vq_map_finalize(cpu);
++    } else {
++        arm_cpu_vq_map_finalize(cpu);
++        if (!arm_sve_have_max_vq(cpu)) {
++            cpu->sve_max_vq =3D arm_cpu_vq_map_next_smaller(cpu, ARM_MAX=
+_VQ + 1);
++        }
++    }
++
++    assert(cpu->sve_max_vq =3D=3D arm_cpu_vq_map_next_smaller(cpu, ARM_M=
+AX_VQ + 1));
++}
++
++uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uint32_t vq)
++{
++    uint32_t bitnum;
++
++    assert(vq <=3D ARM_MAX_VQ + 1);
++    assert(arm_cpu_vq_map_is_finalized(cpu));
++
++    bitnum =3D find_last_bit(cpu->sve_vq_map, vq - 1);
++    return bitnum =3D=3D vq - 1 ? 0 : bitnum + 1;
++}
++
+ static void cpu_max_get_sve_max_vq(Object *obj, Visitor *v, const char *=
+name,
+                                    void *opaque, Error **errp)
+ {
+@@ -283,12 +426,203 @@ static void cpu_max_set_sve_max_vq(Object *obj, Vi=
+sitor *v, const char *name,
          return;
      }
 =20
-+    if (kvm_enabled() && !kvm_arm_sve_supported(CPU(cpu))) {
-+        error_setg(errp, "'sve' feature not supported by KVM on this hos=
-t");
++    /*
++     * It gets complicated trying to support both sve-max-vq and
++     * sve<vl-bits> properties together, so we mostly don't. We
++     * do allow both if sve-max-vq is specified first and only once
++     * though.
++     */
++    if (cpu->sve_max_vq !=3D ARM_SVE_INIT) {
++        error_setg(errp, "sve<vl-bits> in use or sve-max-vq already "
++                   "specified");
++        error_append_hint(errp, "sve-max-vq must come before all "
++                          "sve<vl-bits> properties and it must only "
++                          "be specified once.\n");
 +        return;
 +    }
 +
-     /*
-      * It gets complicated trying to support both sve-max-vq and
-      * sve<vl-bits> properties together, so we mostly don't. We
-@@ -460,6 +483,12 @@ static void cpu_max_set_sve_max_vq(Object *obj, Visi=
-tor *v, const char *name,
-             sprintf(name, "sve%d", vq * 128);
-             object_property_set_bool(obj, true, name, &err);
-             if (err) {
-+                if (kvm_enabled()) {
-+                    error_append_hint(&err, "It is not possible to use "
-+                                      "sve-max-vq with this KVM host. Tr=
-y "
-+                                      "using only sve<vl-bits> "
-+                                      "properties.\n");
-+                }
-                 error_propagate(errp, err);
-                 return;
-             }
-@@ -484,6 +513,12 @@ static void cpu_arm_get_sve_vq(Object *obj, Visitor =
-*v, const char *name,
-         value =3D true;
-     } else if (vq_state =3D=3D ARM_VQ_OFF) {
-         value =3D false;
-+    } else if (kvm_enabled() && vq_state =3D=3D ARM_VQ_UNINITIALIZED) {
-+        /*
-+         * When KVM is enabled, anything not supported by the host must =
-have
-+         * 'OFF' for the default.
-+         */
-+        value =3D false;
-     } else {
-         /*
-          * vq is uninitialized. We pick a default here based on the
-@@ -539,6 +574,11 @@ static void cpu_arm_set_sve_vq(Object *obj, Visitor =
-*v, const char *name,
-         return;
-     }
+     cpu->sve_max_vq =3D value;
 =20
-+    if (value && kvm_enabled() && !kvm_arm_sve_supported(CPU(cpu))) {
-+        error_setg(errp, "'sve' feature not supported by KVM on this hos=
-t");
-+        return;
-+    }
+     if (cpu->sve_max_vq =3D=3D 0 || cpu->sve_max_vq > ARM_MAX_VQ) {
+         error_setg(errp, "unsupported SVE vector length");
+         error_append_hint(errp, "Valid sve-max-vq in range [1-%d]\n",
+                           ARM_MAX_VQ);
++    } else {
++        uint32_t vq;
 +
-     if (arm_sve_have_max_vq(cpu)) {
-         max_vq =3D cpu->sve_max_vq;
-     } else {
-@@ -569,6 +609,8 @@ static void cpu_arm_set_sve_vq(Object *obj, Visitor *=
-v, const char *name,
-         }
-     }
-=20
++        for (vq =3D 1; vq <=3D cpu->sve_max_vq; ++vq) {
++            char name[8];
++            sprintf(name, "sve%d", vq * 128);
++            object_property_set_bool(obj, true, name, &err);
++            if (err) {
++                error_propagate(errp, err);
++                return;
++            }
++        }
++    }
++}
++
++static void cpu_arm_get_sve_vq(Object *obj, Visitor *v, const char *name=
+,
++                               void *opaque, Error **errp)
++{
++    ARMCPU *cpu =3D ARM_CPU(obj);
++    int vq =3D atoi(&name[3]) / 128;
++    arm_vq_state vq_state;
++    bool value;
++
 +    vq_state =3D arm_cpu_vq_map_get(cpu, vq);
 +
-     if (arm_sve_have_max_vq(cpu) && value && vq > cpu->sve_max_vq) {
-         error_setg(errp, "cannot enable %s", name);
-         error_append_hint(errp, "vq=3D%d (%d bits) is larger than the "
-@@ -580,19 +622,31 @@ static void cpu_arm_set_sve_vq(Object *obj, Visitor=
- *v, const char *name,
-         error_append_hint(errp, "The maximum vector length must be "
-                           "enabled, sve-max-vq=3D%d (%d bits)\n",
-                           cpu->sve_max_vq, cpu->sve_max_vq * 128);
--    } else if (arm_sve_have_max_vq(cpu) && !value && vq < cpu->sve_max_v=
-q &&
--               is_power_of_2(vq)) {
-+    } else if (!kvm_enabled() && arm_sve_have_max_vq(cpu) && !value &&
-+               vq < cpu->sve_max_vq && is_power_of_2(vq)) {
-         error_setg(errp, "cannot disable %s", name);
-         error_append_hint(errp, "vq=3D%d (%d bits) is required as it is =
-a "
-                           "power-of-2 length smaller than the maximum, "
-                           "sve-max-vq=3D%d (%d bits)\n", vq, vq * 128,
-                           cpu->sve_max_vq, cpu->sve_max_vq * 128);
--    } else if (!value && vq < max_vq && is_power_of_2(vq)) {
-+    } else if (!kvm_enabled() && !value && vq < max_vq && is_power_of_2(=
-vq)) {
-         error_setg(errp, "cannot disable %s", name);
-         error_append_hint(errp, "Vector length %d-bits is required as it=
- "
-                           "is a power-of-2 length smaller than another "
-                           "enabled vector length. Disable all larger vec=
-tor "
-                           "lengths first.\n", vq * 128);
-+    } else if (kvm_enabled() && value && vq_state =3D=3D ARM_VQ_UNINITIA=
-LIZED) {
-+        error_setg(errp, "cannot enable %s", name);
-+        error_append_hint(errp, "This KVM host does not support "
-+                          "the vector length %d-bits.\n", vq * 128);
-+    } else if (kvm_enabled() && !value && vq < max_vq &&
-+               (vq_state =3D=3D ARM_VQ_ON ||
-+                vq_state =3D=3D ARM_VQ_UNINITIALIZED_KVM_SUPPORTED)) {
-+        error_setg(errp, "cannot disable %s", name);
-+        error_append_hint(errp, "Vector length %d-bits is a KVM supporte=
-d "
-+                          "length smaller than another enabled vector "
-+                          "length. Disable all larger vector lengths "
-+                          "first.\n", vq * 128);
-     } else {
-         if (value) {
-             bool fail =3D false;
-@@ -602,31 +656,53 @@ static void cpu_arm_set_sve_vq(Object *obj, Visitor=
- *v, const char *name,
-              * Enabling a vector length automatically enables all
-              * uninitialized power-of-2 lengths smaller than it, as
-              * per the architecture.
-+             *
-+             * For KVM we have to automatically enable all supported,
-+             * uninitialized lengths smaller than this length, even
-+             * when it's not a power-of-2.
-              */
-             for (s =3D 1; s < vq; ++s) {
--                if (is_power_of_2(s)) {
--                    vq_state =3D arm_cpu_vq_map_get(cpu, s);
--                    if (vq_state =3D=3D ARM_VQ_UNINITIALIZED) {
--                        arm_cpu_vq_map_set(cpu, s, ARM_VQ_ON);
--                    } else if (vq_state =3D=3D ARM_VQ_OFF) {
--                        fail =3D true;
--                        break;
--                    }
-+                vq_state =3D arm_cpu_vq_map_get(cpu, s);
-+                if (!kvm_enabled() && is_power_of_2(s) &&
-+                    vq_state =3D=3D ARM_VQ_UNINITIALIZED) {
-+                    arm_cpu_vq_map_set(cpu, s, ARM_VQ_ON);
-+                } else if (vq_state =3D=3D ARM_VQ_UNINITIALIZED_KVM_SUPP=
-ORTED) {
-+                    assert(kvm_enabled());
-+                    arm_cpu_vq_map_set(cpu, s, ARM_VQ_ON);
-+                } else if ((kvm_enabled() || is_power_of_2(s)) &&
-+                           vq_state =3D=3D ARM_VQ_OFF) {
-+                    fail =3D true;
-+                    break;
-                 }
-             }
-=20
--            if (fail) {
-+            if (!kvm_enabled() && fail) {
-                 error_setg(errp, "cannot enable %s", name);
-                 error_append_hint(errp, "Vector length %d-bits is disabl=
-ed "
-                                   "and is a power-of-2 length smaller th=
-an "
-                                   "%s. All power-of-2 vector lengths sma=
-ller "
-                                   "than the maximum length are required.=
-\n",
-                                   s * 128, name);
++    if (!cpu->sve_max_vq) {
++        /* All vector lengths are disabled when SVE is off. */
++        value =3D false;
++    } else if (vq_state =3D=3D ARM_VQ_ON) {
++        value =3D true;
++    } else if (vq_state =3D=3D ARM_VQ_OFF) {
++        value =3D false;
++    } else {
++        /*
++         * vq is uninitialized. We pick a default here based on the
++         * the state of sve-max-vq and other sve<vl-bits> properties.
++         */
++        if (arm_sve_have_max_vq(cpu)) {
++            /*
++             * If we have sve-max-vq, then all remaining uninitialized
++             * vq's are 'OFF'.
++             */
++            value =3D false;
++        } else {
++            switch (cpu->sve_max_vq) {
++            case ARM_SVE_INIT:
++            case ARM_VQ_DEFAULT_ON:
++                value =3D true;
++                break;
++            case ARM_VQ_DEFAULT_OFF:
++                value =3D false;
++                break;
++            }
++        }
++    }
 +
-+            } else if (fail) {
++    visit_type_bool(v, name, &value, errp);
++}
++
++static void cpu_arm_set_sve_vq(Object *obj, Visitor *v, const char *name=
+,
++                               void *opaque, Error **errp)
++{
++    ARMCPU *cpu =3D ARM_CPU(obj);
++    int vq =3D atoi(&name[3]) / 128;
++    arm_vq_state vq_state;
++    Error *err =3D NULL;
++    uint32_t max_vq =3D 0;
++    bool value;
++
++    visit_type_bool(v, name, &value, &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    if (value && !cpu->sve_max_vq) {
++        error_setg(errp, "cannot enable %s", name);
++        error_append_hint(errp, "SVE has been disabled with sve=3Doff\n"=
+);
++        return;
++    } else if (!cpu->sve_max_vq) {
++        /*
++         * We don't complain about disabling vector lengths when SVE
++         * is off, but we don't do anything either.
++         */
++        return;
++    }
++
++    if (arm_sve_have_max_vq(cpu)) {
++        max_vq =3D cpu->sve_max_vq;
++    } else {
++        if (value) {
++            cpu->sve_max_vq =3D ARM_VQ_DEFAULT_OFF;
++        } else if (cpu->sve_max_vq !=3D ARM_VQ_DEFAULT_OFF) {
++            cpu->sve_max_vq =3D ARM_VQ_DEFAULT_ON;
++        }
++    }
++
++    /*
++     * We need to know the maximum vector length, which may just current=
+ly
++     * be the maximum length, in order to validate the enabling/disablin=
+g
++     * of this vector length. We use the property get accessor in order =
+to
++     * get the appropriate default value for any uninitialized lengths.
++     */
++    if (!max_vq) {
++        char tmp[8];
++        bool s;
++
++        for (max_vq =3D ARM_MAX_VQ; max_vq >=3D 1; --max_vq) {
++            sprintf(tmp, "sve%d", max_vq * 128);
++            s =3D object_property_get_bool(OBJECT(cpu), tmp, &err);
++            assert(!err);
++            if (s) {
++                break;
++            }
++        }
++    }
++
++    if (arm_sve_have_max_vq(cpu) && value && vq > cpu->sve_max_vq) {
++        error_setg(errp, "cannot enable %s", name);
++        error_append_hint(errp, "vq=3D%d (%d bits) is larger than the "
++                          "maximum vector length, sve-max-vq=3D%d "
++                          "(%d bits)\n", vq, vq * 128,
++                          cpu->sve_max_vq, cpu->sve_max_vq * 128);
++    } else if (arm_sve_have_max_vq(cpu) && !value && vq =3D=3D cpu->sve_=
+max_vq) {
++        error_setg(errp, "cannot disable %s", name);
++        error_append_hint(errp, "The maximum vector length must be "
++                          "enabled, sve-max-vq=3D%d (%d bits)\n",
++                          cpu->sve_max_vq, cpu->sve_max_vq * 128);
++    } else if (arm_sve_have_max_vq(cpu) && !value && vq < cpu->sve_max_v=
+q &&
++               is_power_of_2(vq)) {
++        error_setg(errp, "cannot disable %s", name);
++        error_append_hint(errp, "vq=3D%d (%d bits) is required as it is =
+a "
++                          "power-of-2 length smaller than the maximum, "
++                          "sve-max-vq=3D%d (%d bits)\n", vq, vq * 128,
++                          cpu->sve_max_vq, cpu->sve_max_vq * 128);
++    } else if (!value && vq < max_vq && is_power_of_2(vq)) {
++        error_setg(errp, "cannot disable %s", name);
++        error_append_hint(errp, "Vector length %d-bits is required as it=
+ "
++                          "is a power-of-2 length smaller than another "
++                          "enabled vector length. Disable all larger vec=
+tor "
++                          "lengths first.\n", vq * 128);
++    } else {
++        if (value) {
++            bool fail =3D false;
++            uint32_t s;
++
++            /*
++             * Enabling a vector length automatically enables all
++             * uninitialized power-of-2 lengths smaller than it, as
++             * per the architecture.
++             */
++            for (s =3D 1; s < vq; ++s) {
++                if (is_power_of_2(s)) {
++                    vq_state =3D arm_cpu_vq_map_get(cpu, s);
++                    if (vq_state =3D=3D ARM_VQ_UNINITIALIZED) {
++                        arm_cpu_vq_map_set(cpu, s, ARM_VQ_ON);
++                    } else if (vq_state =3D=3D ARM_VQ_OFF) {
++                        fail =3D true;
++                        break;
++                    }
++                }
++            }
++
++            if (fail) {
 +                error_setg(errp, "cannot enable %s", name);
 +                error_append_hint(errp, "Vector length %d-bits is disabl=
 ed "
-+                                  "and the KVM host requires all support=
-ed "
-+                                  "vector lengths smaller than %s to als=
-o be "
-+                                  "enabled.\n", s * 128, name);
-             } else {
-                 arm_cpu_vq_map_set(cpu, vq, ARM_VQ_ON);
-             }
-         } else {
--            arm_cpu_vq_map_set(cpu, vq, ARM_VQ_OFF);
-+            /*
-+             * For KVM if the vq wasn't supported then we leave it in
-+             * the ARM_VQ_UNINITIALIZED state in order to keep that
-+             * unsupported information. It'll be set to OFF later when
-+             * we finalize the map.
-+             */
-+            if (!kvm_enabled() || vq_state !=3D ARM_VQ_UNINITIALIZED) {
-+                arm_cpu_vq_map_set(cpu, vq, ARM_VQ_OFF);
++                                  "and is a power-of-2 length smaller th=
+an "
++                                  "%s. All power-of-2 vector lengths sma=
+ller "
++                                  "than the maximum length are required.=
+\n",
++                                  s * 128, name);
++            } else {
++                arm_cpu_vq_map_set(cpu, vq, ARM_VQ_ON);
 +            }
-         }
++        } else {
++            arm_cpu_vq_map_set(cpu, vq, ARM_VQ_OFF);
++        }
      }
  }
-@@ -689,11 +765,6 @@ static void aarch64_max_initfn(Object *obj)
+=20
+@@ -318,10 +652,11 @@ static void cpu_arm_set_sve(Object *obj, Visitor *v=
+, const char *name,
+         /*
+          * We handle the -cpu <cpu>,sve=3Doff,sve=3Don case by reinitial=
+izing,
+          * but otherwise we don't do anything as an sve=3Don could come =
+after
+-         * a sve-max-vq setting.
++         * a sve-max-vq or sve<vl-bits> setting.
+          */
+         if (!cpu->sve_max_vq) {
+-            cpu->sve_max_vq =3D ARM_MAX_VQ;
++            cpu->sve_max_vq =3D ARM_SVE_INIT;
++            arm_cpu_vq_map_init(cpu);
+         }
+     } else {
+         cpu->sve_max_vq =3D 0;
+@@ -336,6 +671,7 @@ static void cpu_arm_set_sve(Object *obj, Visitor *v, =
+const char *name,
+ static void aarch64_max_initfn(Object *obj)
+ {
+     ARMCPU *cpu =3D ARM_CPU(obj);
++    uint32_t vq;
 =20
      if (kvm_enabled()) {
          kvm_arm_set_cpu_features_from_host(cpu);
--        /*
--         * KVM doesn't yet support the sve-max-vq property, but
--         * setting cpu->sve_max_vq is also used to turn SVE on.
--         */
--        cpu->sve_max_vq =3D ARM_SVE_INIT;
-     } else {
-         uint64_t t;
-         uint32_t u;
-@@ -774,32 +845,32 @@ static void aarch64_max_initfn(Object *obj)
-         cpu->ctr =3D 0x80038003; /* 32 byte I and D cacheline size, VIPT=
- icache */
+@@ -420,11 +756,29 @@ static void aarch64_max_initfn(Object *obj)
          cpu->dcz_blocksize =3D 7; /*  512 bytes */
  #endif
--
--        /*
--         * sve_max_vq is initially unspecified, but must be initialized =
+=20
+-        cpu->sve_max_vq =3D ARM_MAX_VQ;
++        /*
++         * sve_max_vq is initially unspecified, but must be initialized =
 to a
--         * non-zero value (ARM_SVE_INIT) to indicate that this cpu type =
++         * non-zero value (ARM_SVE_INIT) to indicate that this cpu type =
 has
--         * SVE. It will be finalized in arm_cpu_realizefn().
--         */
--        cpu->sve_max_vq =3D ARM_SVE_INIT;
--        object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve=
++         * SVE. It will be finalized in arm_cpu_realizefn().
++         */
++        cpu->sve_max_vq =3D ARM_SVE_INIT;
+         object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve=
 _max_vq,
--                            cpu_max_set_sve_max_vq, NULL, NULL, &error_f=
+                             cpu_max_set_sve_max_vq, NULL, NULL, &error_f=
 atal);
--
--        /*
--         * sve_vq_map uses a special state while setting properties, so
--         * we initialize it here with its init function and finalize it
--         * in arm_cpu_realizefn().
--         */
--        arm_cpu_vq_map_init(cpu);
--        for (vq =3D 1; vq <=3D ARM_MAX_VQ; ++vq) {
--            char name[8];
--            sprintf(name, "sve%d", vq * 128);
--            object_property_add(obj, name, "bool", cpu_arm_get_sve_vq,
--                                cpu_arm_set_sve_vq, NULL, NULL, &error_f=
+         object_property_add(obj, "sve", "bool", cpu_arm_get_sve,
+                             cpu_arm_set_sve, NULL, NULL, &error_fatal);
++
++        /*
++         * sve_vq_map uses a special state while setting properties, so
++         * we initialize it here with its init function and finalize it
++         * in arm_cpu_realizefn().
++         */
++        arm_cpu_vq_map_init(cpu);
++        for (vq =3D 1; vq <=3D ARM_MAX_VQ; ++vq) {
++            char name[8];
++            sprintf(name, "sve%d", vq * 128);
++            object_property_add(obj, name, "bool", cpu_arm_get_sve_vq,
++                                cpu_arm_set_sve_vq, NULL, NULL, &error_f=
 atal);
--        }
++        }
      }
-=20
-     object_property_add(obj, "sve", "bool", cpu_arm_get_sve,
-                         cpu_arm_set_sve, NULL, NULL, &error_fatal);
-+
-+    /*
-+     * sve_max_vq is initially unspecified, but must be initialized to a
-+     * non-zero value (ARM_SVE_INIT) to indicate that this cpu type has
-+     * SVE. It will be finalized in arm_cpu_realizefn().
-+     */
-+    cpu->sve_max_vq =3D ARM_SVE_INIT;
-+    object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve_max=
-_vq,
-+                        cpu_max_set_sve_max_vq, NULL, NULL, &error_fatal=
-);
-+
-+    /*
-+     * sve_vq_map uses a special state while setting properties, so
-+     * we initialize it here with its init function and finalize it
-+     * in arm_cpu_realizefn().
-+     */
-+    arm_cpu_vq_map_init(cpu);
-+    for (vq =3D 1; vq <=3D ARM_MAX_VQ; ++vq) {
-+        char name[8];
-+        sprintf(name, "sve%d", vq * 128);
-+        object_property_add(obj, name, "bool", cpu_arm_get_sve_vq,
-+                            cpu_arm_set_sve_vq, NULL, NULL, &error_fatal=
-);
-+    }
  }
 =20
- struct ARMCPUInfo {
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 2821135a4d0e..5b0707e1192b 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -617,6 +617,110 @@ bool kvm_arm_sve_supported(CPUState *cpu)
-     return ret > 0;
- }
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index f500ccb6d31b..b7b719dba57f 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -5324,7 +5324,16 @@ static void zcr_write(CPUARMState *env, const ARMC=
+PRegInfo *ri,
 =20
-+QEMU_BUILD_BUG_ON(KVM_ARM64_SVE_VQ_MIN !=3D 1);
+     /* Bits other than [3:0] are RAZ/WI.  */
+     QEMU_BUILD_BUG_ON(ARM_MAX_VQ > 16);
+-    raw_write(env, ri, value & 0xf);
++    value &=3D 0xf;
 +
-+void kvm_arm_sve_get_vls(CPUState *cs, unsigned long *map,
-+                         uint32_t qemu_max_vq, uint32_t *kvm_max_vq)
-+{
-+    static uint64_t vls[KVM_ARM64_SVE_VLS_WORDS];
-+    static uint32_t host_max_vq =3D -1;
-+    uint32_t vq;
-+    int i, j;
-+
-+    bitmap_clear(map, 0, qemu_max_vq);
-+    *kvm_max_vq =3D 0;
-+
-+    /*
-+     * KVM ensures all host CPUs support the same set of vector lengths.
-+     * So we only need to create a scratch VCPU once and then cache the
-+     * results.
-+     */
-+    if (host_max_vq =3D=3D -1) {
-+        int fdarray[3], ret =3D -1;
-+
-+        if (!kvm_arm_create_scratch_host_vcpu(NULL, fdarray, NULL)) {
-+            error_report("failed to create scratch vcpu");
-+            abort();
-+        }
-+
-+        if (ioctl(fdarray[0], KVM_CHECK_EXTENSION, KVM_CAP_ARM_SVE) > 0)=
- {
-+            struct kvm_vcpu_init init =3D {
-+                .target =3D -1,
-+                .features[0] =3D (1 << KVM_ARM_VCPU_SVE),
-+            };
-+            struct kvm_one_reg reg =3D {
-+                .id =3D KVM_REG_ARM64_SVE_VLS,
-+                .addr =3D (uint64_t)&vls[0],
-+            };
-+
-+            kvm_arm_destroy_scratch_host_vcpu(fdarray);
-+
-+            if (!kvm_arm_create_scratch_host_vcpu(NULL, fdarray, &init))=
- {
-+                error_report("failed to create scratch vcpu");
-+                abort();
-+            }
-+
-+            ret =3D ioctl(fdarray[2], KVM_GET_ONE_REG, &reg);
-+            if (ret) {
-+                error_report("failed to get KVM_REG_ARM64_SVE_VLS: %s",
-+                             strerror(errno));
-+                abort();
-+            }
-+        }
-+
-+        kvm_arm_destroy_scratch_host_vcpu(fdarray);
-+
-+        if (ret) {
-+            /* The host doesn't support SVE. */
-+            return;
-+        }
++    if (value) {
++        /* get next vq that is smaller than or equal to value's vq */
++        uint32_t vq =3D value + 1;
++        vq =3D arm_cpu_vq_map_next_smaller(cpu, vq + 1);
++        value =3D vq - 1;
 +    }
 +
-+    for (i =3D KVM_ARM64_SVE_VLS_WORDS - 1; i >=3D 0; --i) {
-+        if (!vls[i]) {
-+            continue;
-+        }
-+        if (host_max_vq =3D=3D -1) {
-+            host_max_vq =3D 64 - clz64(vls[i]) + i * 64;
-+        }
-+        for (j =3D 1; j <=3D 64; ++j) {
-+            vq =3D j + i * 64;
-+            if (vq > qemu_max_vq) {
-+                break;
-+            }
-+            if (vls[i] & (1UL << (j - 1))) {
-+                set_bit(vq - 1, map);
-+            }
-+        }
-+    }
-+
-+    *kvm_max_vq =3D host_max_vq;
-+}
-+
-+static int kvm_arm_sve_set_vls(CPUState *cs)
-+{
-+    uint64_t vls[KVM_ARM64_SVE_VLS_WORDS] =3D {0};
-+    struct kvm_one_reg reg =3D {
-+        .id =3D KVM_REG_ARM64_SVE_VLS,
-+        .addr =3D (uint64_t)&vls[0],
-+    };
-+    ARMCPU *cpu =3D ARM_CPU(cs);
-+    uint32_t vq;
-+    int i, j;
-+
-+    assert(cpu->sve_max_vq <=3D KVM_ARM64_SVE_VQ_MAX);
-+
-+    for (vq =3D 1; vq <=3D cpu->sve_max_vq; ++vq) {
-+        if (test_bit(vq - 1, cpu->sve_vq_map)) {
-+            i =3D (vq - 1) / 64;
-+            j =3D (vq - 1) % 64;
-+            vls[i] |=3D 1UL << j;
-+        }
-+    }
-+
-+    return kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
-+}
-+
- #define ARM_CPU_ID_MPIDR       3, 0, 0, 0, 5
++    raw_write(env, ri, value);
 =20
- int kvm_arch_init_vcpu(CPUState *cs)
-@@ -628,7 +732,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-=20
-     if (cpu->kvm_target =3D=3D QEMU_KVM_ARM_TARGET_NONE ||
-         !object_dynamic_cast(OBJECT(cpu), TYPE_AARCH64_CPU)) {
--        fprintf(stderr, "KVM is not supported for this guest CPU type\n"=
-);
-+        error_report("KVM is not supported for this guest CPU type");
-         return -EINVAL;
-     }
-=20
-@@ -653,11 +757,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         unset_feature(&env->features, ARM_FEATURE_PMU);
-     }
-     if (cpu->sve_max_vq) {
--        if (!kvm_arm_sve_supported(cs)) {
--            cpu->sve_max_vq =3D 0;
--        } else {
--            cpu->kvm_init_features[0] |=3D 1 << KVM_ARM_VCPU_SVE;
--        }
-+        assert(kvm_arm_sve_supported(cs));
-+        cpu->kvm_init_features[0] |=3D 1 << KVM_ARM_VCPU_SVE;
-     }
-=20
-     /* Do KVM_ARM_VCPU_INIT ioctl */
-@@ -667,6 +768,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     }
-=20
-     if (cpu->sve_max_vq) {
-+        ret =3D kvm_arm_sve_set_vls(cs);
-+        if (ret) {
-+            return ret;
-+        }
-         ret =3D kvm_arm_vcpu_finalize(cs, KVM_ARM_VCPU_SVE);
-         if (ret) {
-             return ret;
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index 2367f8ab78ed..d5eb341e906d 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -212,6 +212,22 @@ typedef struct ARMHostCPUFeatures {
-  */
- bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf);
-=20
-+/**
-+ * kvm_arm_sve_get_vls:
-+ * @cs: CPUState
-+ * @map: bitmap to fill in
-+ * @qemu_max_vq: the maximum vector length QEMU supports in quadwords
-+ *               (size of the bitmap to fill in)
-+ * @kvm_max_vq: the maximum vector length KVM supports in quadwords
-+ *
-+ * Get all the SVE vector lengths supported by the KVM host, setting
-+ * the bits corresponding to their length in quadwords minus one
-+ * (vq - 1) in @map up to @qemu_max_vq. Also assign @kvm_max_vq to the
-+ * maximum vector length the KVM host supports.
-+ */
-+void kvm_arm_sve_get_vls(CPUState *cs, unsigned long *map,
-+                         uint32_t qemu_max_vq, uint32_t *kvm_max_vq);
-+
- /**
-  * kvm_arm_set_cpu_features_from_host:
-  * @cpu: ARMCPU to set the features for
-@@ -314,6 +330,9 @@ static inline int kvm_arm_vgic_probe(void)
- static inline void kvm_arm_pmu_set_irq(CPUState *cs, int irq) {}
- static inline void kvm_arm_pmu_init(CPUState *cs) {}
-=20
-+static inline void kvm_arm_sve_get_vls(CPUState *cs, unsigned long *map,
-+                                       uint32_t qemu_max_vq,
-+                                       uint32_t *kvm_max_vq) {}
- #endif
-=20
- static inline const char *gic_class_name(void)
+     /*
+      * Because we arrived here, we know both FP and SVE are enabled;
 diff --git a/target/arm/monitor.c b/target/arm/monitor.c
-index 1e213906fd8f..284818fb4a51 100644
+index 157c487a1551..1e213906fd8f 100644
 --- a/target/arm/monitor.c
 +++ b/target/arm/monitor.c
-@@ -100,7 +100,7 @@ QEMU_BUILD_BUG_ON(ARM_MAX_VQ > 16);
-  *
-  * The sve<vl-bits> features need to be in reverse order in order to
-  * enable/disable the largest vector lengths first, ensuring all
-- * power-of-2 vector lengths smaller can also be enabled/disabled.
-+ * smaller required vector lengths can also be enabled/disabled.
-  */
- static const char *cpu_model_advertised_features[] =3D {
-     "aarch64", "pmu", "sve",
-diff --git a/tests/arm-cpu-features.c b/tests/arm-cpu-features.c
-index 67ad5f2b78d5..349bd0dca6d1 100644
---- a/tests/arm-cpu-features.c
-+++ b/tests/arm-cpu-features.c
-@@ -324,23 +324,35 @@ static void sve_tests_sve_max_vq_8(const void *data=
-)
-     qtest_quit(qts);
+@@ -89,8 +89,24 @@ GICCapabilityList *qmp_query_gic_capabilities(Error **=
+errp)
+     return head;
  }
 =20
--static void sve_tests_sve_off(const void *data)
-+static void sve_tests_off(QTestState *qts, const char *cpu_type)
- {
--    QTestState *qts;
--
--    qts =3D qtest_init(MACHINE "-cpu max,sve=3Doff");
--
-     /*
-      * SVE is off, so the map should be empty.
-      */
--    assert_sve_vls(qts, "max", 0, NULL);
-+    assert_sve_vls(qts, cpu_type, 0, NULL);
++QEMU_BUILD_BUG_ON(ARM_MAX_VQ > 16);
++
++/*
++ * These are cpu model features we want to advertise. The order here
++ * matters as this is the order in which qmp_query_cpu_model_expansion
++ * will attempt to set them. If there are dependencies between features,
++ * as there are with the sve<vl-bits> features, then the order that
++ * considers those dependencies must be used.
++ *
++ * The sve<vl-bits> features need to be in reverse order in order to
++ * enable/disable the largest vector lengths first, ensuring all
++ * power-of-2 vector lengths smaller can also be enabled/disabled.
++ */
+ static const char *cpu_model_advertised_features[] =3D {
+     "aarch64", "pmu", "sve",
++    "sve2048", "sve1920", "sve1792", "sve1664", "sve1536", "sve1408",
++    "sve1280", "sve1152", "sve1024", "sve896", "sve768", "sve640",
++    "sve512", "sve384", "sve256", "sve128",
+     NULL
+ };
 =20
-     /*
-      * We can't turn anything on, but off is OK.
-      */
--    assert_error(qts, "max", "cannot enable sve128", "{ 'sve128': true }=
-");
--    assert_sve_vls(qts, "max", 0, "{ 'sve128': false }");
-+    assert_error(qts, cpu_type, "cannot enable sve128", "{ 'sve128': tru=
-e }");
-+    assert_sve_vls(qts, cpu_type, 0, "{ 'sve128': false }");
+diff --git a/tests/arm-cpu-features.c b/tests/arm-cpu-features.c
+index 509e458e9c2f..a4bf6aec00df 100644
+--- a/tests/arm-cpu-features.c
++++ b/tests/arm-cpu-features.c
+@@ -13,6 +13,18 @@
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qjson.h"
+=20
++#if __SIZEOF_LONG__ =3D=3D 8
++#define BIT(n) (1UL << (n))
++#else
++#define BIT(n) (1ULL << (n))
++#endif
++
++/*
++ * We expect the SVE max-vq to be 16. Also it must be <=3D 64
++ * for our test code, otherwise 'vls' can't just be a uint64_t.
++ */
++#define SVE_MAX_VQ 16
++
+ #define MACHINE    "-machine virt,gic-version=3Dmax "
+ #define QUERY_HEAD "{ 'execute': 'query-cpu-model-expansion', " \
+                      "'arguments': { 'type': 'full', "
+@@ -137,6 +149,201 @@ static void assert_bad_props(QTestState *qts, const=
+ char *cpu_type)
+     qobject_unref(resp);
+ }
+=20
++static void resp_get_sve_vls(QDict *resp, uint64_t *vls, uint32_t *max_v=
+q)
++{
++    const QDictEntry *e;
++    QDict *qdict;
++    int n =3D 0;
++
++    *vls =3D 0;
++
++    qdict =3D resp_get_props(resp);
++
++    for (e =3D qdict_first(qdict); e; e =3D qdict_next(qdict, e)) {
++        if (strlen(e->key) > 3 && !strncmp(e->key, "sve", 3) &&
++            g_ascii_isdigit(e->key[3])) {
++            char *endptr;
++            int bits;
++
++            bits =3D g_ascii_strtoll(&e->key[3], &endptr, 10);
++            if (!bits || *endptr !=3D '\0') {
++                continue;
++            }
++
++            if (qdict_get_bool(qdict, e->key)) {
++                *vls |=3D BIT((bits / 128) - 1);
++            }
++            ++n;
++        }
++    }
++
++    g_assert(n =3D=3D SVE_MAX_VQ);
++
++    *max_vq =3D !*vls ? 0 : 64 - __builtin_clzll(*vls);
 +}
-=20
++
++static uint64_t sve_get_vls(QTestState *qts, const char *cpu_type,
++                            const char *fmt, ...)
++{
++    QDict *resp;
++    uint64_t vls;
++    uint32_t max_vq;
++
++    if (fmt) {
++        QDict *args;
++        va_list ap;
++
++        va_start(ap, fmt);
++        args =3D qdict_from_vjsonf_nofail(fmt, ap);
++        va_end(ap);
++
++        resp =3D qtest_qmp(qts, QUERY_HEAD "'model': { 'name': %s, "
++                                                    "'props': %p }"
++                              QUERY_TAIL, cpu_type, args);
++    } else {
++        resp =3D do_query_no_props(qts, cpu_type);
++    }
++
++    g_assert(resp);
++    resp_get_sve_vls(resp, &vls, &max_vq);
++    qobject_unref(resp);
++
++    return vls;
++}
++
++#define assert_sve_vls(qts, cpu_type, expected_vls, fmt, ...) \
++    g_assert(sve_get_vls(qts, cpu_type, fmt, ##__VA_ARGS__) =3D=3D expec=
+ted_vls)
++
++static void sve_tests_default(QTestState *qts, const char *cpu_type)
++{
++    /*
++     * With no sve-max-vq or sve<vl-bits> properties on the command line
++     * the default is to have all vector lengths enabled.
++     */
++    assert_sve_vls(qts, cpu_type, BIT(SVE_MAX_VQ) - 1, NULL);
++
++    /*
++     * -----------------------------------------------------------------=
+--
++     *               power-of-2(vq)   all-power-            can      can
++     *                                of-2(< vq)          enable   disab=
+le
++     * -----------------------------------------------------------------=
+--
++     * vq < max_vq      no            MUST*                yes      yes
++     * vq < max_vq      yes           MUST*                yes      no
++     * -----------------------------------------------------------------=
+--
++     * vq =3D=3D max_vq     n/a           MUST*                yes**    =
+yes**
++     * -----------------------------------------------------------------=
+--
++     * vq > max_vq      n/a           no                   no       yes
++     * vq > max_vq      n/a           yes                  yes      yes
++     * -----------------------------------------------------------------=
+--
++     *
++     * [*] "MUST" means this requirement must already be satisfied,
++     *     otherwise 'max_vq' couldn't itself be enabled.
++     *
++     * [**] Not testable with the QMP interface, only with the command l=
+ine.
++     */
++
++    /* max_vq :=3D 8 */
++    assert_sve_vls(qts, cpu_type, 0x8b, "{ 'sve1024': true }");
++
++    /* max_vq :=3D 8, vq < max_vq, !power-of-2(vq) */
++    assert_sve_vls(qts, cpu_type, 0x8f,
++                   "{ 'sve1024': true, 'sve384': true }");
++    assert_sve_vls(qts, cpu_type, 0x8b,
++                   "{ 'sve1024': true, 'sve384': false }");
++
++    /* max_vq :=3D 8, vq < max_vq, power-of-2(vq) */
++    assert_sve_vls(qts, cpu_type, 0x8b,
++                   "{ 'sve1024': true, 'sve256': true }");
++    assert_error(qts, cpu_type, "cannot disable sve256",
++                 "{ 'sve1024': true, 'sve256': false }");
++
++    /*
++     * max_vq :=3D 3, vq > max_vq, !all-power-of-2(< vq)
++     *
++     * If given sve384=3Don,sve512=3Doff,sve640=3Don the command line er=
+ror would be
++     * "cannot enable sve640", but QMP visits the vector lengths in reve=
+rse
++     * order, so we get "cannot disable sve512" instead. The command lin=
+e would
++     * also give that error if given sve384=3Don,sve640=3Don,sve512=3Dof=
+f, so this is
++     * all fine. The important thing is that we get an error.
++     */
++    assert_error(qts, cpu_type, "cannot disable sve512",
++                 "{ 'sve384': true, 'sve512': false, 'sve640': true }");
++
++    /*
++     * We can disable power-of-2 vector lengths when all larger lengths
++     * are also disabled. The shorter, sve384=3Don,sve512=3Doff,sve640=3D=
+off
++     * works on the command line, but QMP doesn't know that all the
++     * vector lengths larger than 384-bits will be disabled until it
++     * sees the enabling of sve384, which comes near the end since it
++     * visits the lengths in reverse order. So we just have to explicitl=
+y
++     * disable them all.
++     */
++    assert_sve_vls(qts, cpu_type, 0x7,
++                   "{ 'sve384': true, 'sve512': false, 'sve640': false, =
+"
++                   "  'sve768': false, 'sve896': false, 'sve1024': false=
+, "
++                   "  'sve1152': false, 'sve1280': false, 'sve1408': fal=
+se, "
++                   "  'sve1536': false, 'sve1664': false, 'sve1792': fal=
+se, "
++                   "  'sve1920': false, 'sve2048': false }");
++
++    /* max_vq :=3D 3, vq > max_vq, all-power-of-2(< vq) */
++    assert_sve_vls(qts, cpu_type, 0x1f,
++                   "{ 'sve384': true, 'sve512': true, 'sve640': true }")=
+;
++    assert_sve_vls(qts, cpu_type, 0xf,
++                   "{ 'sve384': true, 'sve512': true, 'sve640': false }"=
+);
++}
++
++static void sve_tests_sve_max_vq_8(const void *data)
++{
++    QTestState *qts;
++
++    qts =3D qtest_init(MACHINE "-cpu max,sve-max-vq=3D8");
++
++    assert_sve_vls(qts, "max", BIT(8) - 1, NULL);
++
++    /*
++     * Disabling the max-vq set by sve-max-vq is not allowed, but
++     * of course enabling it is OK.
++     */
++    assert_error(qts, "max", "cannot disable sve1024", "{ 'sve1024': fal=
+se }");
++    assert_sve_vls(qts, "max", 0xff, "{ 'sve1024': true }");
++
++    /*
++     * Enabling anything larger than max-vq set by sve-max-vq is not
++     * allowed, but of course disabling everything larger is OK.
++     */
++    assert_error(qts, "max", "cannot enable sve1152", "{ 'sve1152': true=
+ }");
++    assert_sve_vls(qts, "max", 0xff, "{ 'sve1152': false }");
++
++    /*
++     * We can disable non power-of-2 lengths smaller than the max-vq
++     * set by sve-max-vq, but not power-of-2 lengths.
++     */
++    assert_sve_vls(qts, "max", 0xfb, "{ 'sve384': false }");
++    assert_error(qts, "max", "cannot disable sve256", "{ 'sve256': false=
+ }");
++
++    qtest_quit(qts);
++}
++
 +static void sve_tests_sve_off(const void *data)
 +{
 +    QTestState *qts;
 +
 +    qts =3D qtest_init(MACHINE "-cpu max,sve=3Doff");
-+    sve_tests_off(qts, "max");
++
++    /*
++     * SVE is off, so the map should be empty.
++     */
++    assert_sve_vls(qts, "max", 0, NULL);
++
++    /*
++     * We can't turn anything on, but off is OK.
++     */
++    assert_error(qts, "max", "cannot enable sve128", "{ 'sve128': true }=
+");
++    assert_sve_vls(qts, "max", 0, "{ 'sve128': false }");
++
 +    qtest_quit(qts);
 +}
 +
-+static void sve_tests_sve_off_kvm(const void *data)
-+{
-+    QTestState *qts;
-+
-+    qts =3D qtest_init(MACHINE "-accel kvm -cpu max,sve=3Doff");
-+    sve_tests_off(qts, "max");
-     qtest_quit(qts);
- }
-=20
-@@ -392,12 +404,66 @@ static void test_query_cpu_model_expansion_kvm(cons=
-t void *data)
-     assert_has_feature(qts, "host", "pmu");
-=20
+ static void test_query_cpu_model_expansion(const void *data)
+ {
+     QTestState *qts;
+@@ -159,9 +366,12 @@ static void test_query_cpu_model_expansion(const voi=
+d *data)
      if (g_str_equal(qtest_get_arch(), "aarch64")) {
-+        bool kvm_supports_sve;
-+        uint32_t max_vq, vq;
-+        uint64_t vls;
-+        char name[8];
-+        QDict *resp;
-+        char *error;
-+
-         assert_has_feature(qts, "host", "aarch64");
--        assert_has_feature(qts, "max", "sve");
+         assert_has_feature(qts, "max", "aarch64");
+         assert_has_feature(qts, "max", "sve");
++        assert_has_feature(qts, "max", "sve128");
+         assert_has_feature(qts, "cortex-a57", "pmu");
+         assert_has_feature(qts, "cortex-a57", "aarch64");
 =20
-         assert_error(qts, "cortex-a15",
-             "The CPU definition 'cortex-a15' cannot "
-             "be used with KVM on this host", NULL);
++        sve_tests_default(qts, "max");
 +
-+        assert_has_feature(qts, "max", "sve");
-+        resp =3D do_query_no_props(qts, "max");
-+        g_assert(resp);
-+        kvm_supports_sve =3D qdict_get_bool(resp_get_props(resp), "sve")=
-;
-+        qobject_unref(resp);
+         /* Test that features that depend on KVM generate errors without=
+. */
+         assert_error(qts, "max",
+                      "'aarch64' feature cannot be disabled "
+@@ -213,6 +423,13 @@ int main(int argc, char **argv)
+     qtest_add_data_func("/arm/query-cpu-model-expansion",
+                         NULL, test_query_cpu_model_expansion);
+=20
++    if (g_str_equal(qtest_get_arch(), "aarch64")) {
++        qtest_add_data_func("/arm/max/query-cpu-model-expansion/sve-max-=
+vq-8",
++                            NULL, sve_tests_sve_max_vq_8);
++        qtest_add_data_func("/arm/max/query-cpu-model-expansion/sve-off"=
+,
++                            NULL, sve_tests_sve_off);
++    }
 +
-+        if (kvm_supports_sve) {
-+            resp =3D do_query_no_props(qts, "max");
-+            resp_get_sve_vls(resp, &vls, &max_vq);
-+            g_assert(max_vq !=3D 0);
-+            qobject_unref(resp);
-+
-+            /* Enabling a supported length is of course fine. */
-+            sprintf(name, "sve%d", max_vq * 128);
-+            assert_sve_vls(qts, "max", vls, "{ %s: true }", name);
-+
-+            /* Also disabling the largest lengths is fine. */
-+            assert_sve_vls(qts, "max", (vls & ~BIT(max_vq - 1)),
-+                           "{ %s: false }", name);
-+
-+            for (vq =3D 1; vq <=3D max_vq; ++vq) {
-+                if (!(vls & BIT(vq - 1))) {
-+                    /* vq is unsupported */
-+                    break;
-+                }
-+            }
-+            if (vq <=3D SVE_MAX_VQ) {
-+                sprintf(name, "sve%d", vq * 128);
-+                error =3D g_strdup_printf("cannot enable %s", name);
-+                assert_error(qts, "max", error, "{ %s: true }", name);
-+                g_free(error);
-+            }
-+
-+            if (max_vq > 1) {
-+                /* The next smaller, supported vq is required */
-+                vq =3D 64 - __builtin_clzll(vls & ~BIT(max_vq - 1));
-+                sprintf(name, "sve%d", vq * 128);
-+                error =3D g_strdup_printf("cannot disable %s", name);
-+                assert_error(qts, "max", error, "{ %s: false }", name);
-+                g_free(error);
-+            }
-+        } else {
-+            resp =3D do_query_no_props(qts, "max");
-+            resp_get_sve_vls(resp, &vls, &max_vq);
-+            g_assert(max_vq =3D=3D 0);
-+            qobject_unref(resp);
-+        }
-     } else {
-         assert_error(qts, "host",
-                      "'pmu' feature not supported by KVM on this host",
-@@ -434,6 +500,8 @@ int main(int argc, char **argv)
      if (kvm_available) {
          qtest_add_data_func("/arm/kvm/query-cpu-model-expansion",
                              NULL, test_query_cpu_model_expansion_kvm);
-+        qtest_add_data_func("/arm/kvm/query-cpu-model-expansion/sve-off"=
-,
-+                            NULL, sve_tests_sve_off_kvm);
-     }
-=20
-     return g_test_run();
 --=20
 2.20.1
 
