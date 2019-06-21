@@ -7,39 +7,39 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAD55C43613
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:59:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1156C43613
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:59:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C055420673
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:59:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C055420673
+	by mail.kernel.org (Postfix) with ESMTPS id A68C120673
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Jun 2019 08:59:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A68C120673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55642 helo=lists.gnu.org)
+Received: from localhost ([::1]:55644 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heFOK-00078s-1r
-	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 04:59:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58236)
+	id 1heFOP-0007LT-VJ
+	for qemu-devel@archiver.kernel.org; Fri, 21 Jun 2019 04:59:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58773)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1heEzc-0004B8-5b
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:33:57 -0400
+ (envelope-from <pavel.dovgaluk@gmail.com>) id 1heEzk-0004Ud-Qm
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:34:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1heEo6-0000qv-89
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:22:04 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:41546)
+ (envelope-from <pavel.dovgaluk@gmail.com>) id 1heEmr-0008Dc-8E
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:20:46 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:41240)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1heEo4-0000ni-9z
- for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:22:01 -0400
+ (envelope-from <pavel.dovgaluk@gmail.com>) id 1heEmr-0008DL-1T
+ for qemu-devel@nongnu.org; Fri, 21 Jun 2019 04:20:45 -0400
 Received: from [127.0.1.1] (unknown [85.142.117.226])
- by mail.ispras.ru (Postfix) with ESMTPSA id DA02054006B;
- Fri, 21 Jun 2019 11:21:57 +0300 (MSK)
+ by mail.ispras.ru (Postfix) with ESMTPSA id 3307D540082;
+ Fri, 21 Jun 2019 11:20:44 +0300 (MSK)
 From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 21 Jun 2019 11:21:57 +0300
-Message-ID: <156110531770.25431.1723541151762958457.stgit@pasha-Precision-3630-Tower>
+Date: Fri, 21 Jun 2019 11:20:43 +0300
+Message-ID: <156110524358.25431.14663615410203260527.stgit@pasha-Precision-3630-Tower>
 In-Reply-To: <156110523748.25431.9310430853468653085.stgit@pasha-Precision-3630-Tower>
 References: <156110523748.25431.9310430853468653085.stgit@pasha-Precision-3630-Tower>
 User-Agent: StGit/0.17.1-dirty
@@ -48,7 +48,8 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 83.149.199.45
-Subject: [Qemu-devel] [PATCH for-4.1 14/24] replay: refine replay-time module
+Subject: [Qemu-devel] [PATCH for-4.1 01/24] replay: add missing fix for
+ internal function
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,74 +72,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+From: pbonzini@redhat.com <pbonzini@redhat.com>
 
-This patch removes refactoring artifacts from the replay/replay-time.c
+This is a fix which was missed by patch
+74c0b816adfc6aa1b01b4426fdf385e32e35cbac, which added current_step
+parameter to the replay_advance_current_step function.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 ---
- replay/replay-time.c |   36 ++++++++++++++++--------------------
- 1 file changed, 16 insertions(+), 20 deletions(-)
+ replay/replay-internal.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/replay/replay-time.c b/replay/replay-time.c
-index 5154cb0ce9..49c9e5d8b2 100644
---- a/replay/replay-time.c
-+++ b/replay/replay-time.c
-@@ -14,18 +14,19 @@
- #include "replay-internal.h"
- #include "qemu/error-report.h"
+diff --git a/replay/replay-internal.c b/replay/replay-internal.c
+index 9e41ed1dcf..979f3a0b39 100644
+--- a/replay/replay-internal.c
++++ b/replay/replay-internal.c
+@@ -228,7 +228,7 @@ void replay_mutex_unlock(void)
  
--int64_t replay_save_clock(ReplayClockKind kind, int64_t clock, int64_t raw_icount)
-+int64_t replay_save_clock(ReplayClockKind kind, int64_t clock,
-+                          int64_t raw_icount)
+ void replay_advance_current_step(uint64_t current_step)
  {
--    if (replay_file) {
--        g_assert(replay_mutex_locked());
-+    g_assert(replay_file);
-+    g_assert(replay_mutex_locked());
+-    int diff = (int)(replay_get_current_step() - replay_state.current_step);
++    int diff = (int)(current_step - replay_state.current_step);
  
--        /* Due to the caller's locking requirements we get the icount from it
--         * instead of using replay_save_instructions().
--         */
--        replay_advance_current_step(raw_icount);
--        replay_put_event(EVENT_CLOCK + kind);
--        replay_put_qword(clock);
--    }
-+    /*
-+     * Due to the caller's locking requirements we get the icount from it
-+     * instead of using replay_save_instructions().
-+     */
-+    replay_advance_current_step(raw_icount);
-+    replay_put_event(EVENT_CLOCK + kind);
-+    replay_put_qword(clock);
- 
-     return clock;
- }
-@@ -47,20 +48,15 @@ void replay_read_next_clock(ReplayClockKind kind)
- /*! Reads next clock event from the input. */
- int64_t replay_read_clock(ReplayClockKind kind)
- {
-+    int64_t ret;
-     g_assert(replay_file && replay_mutex_locked());
- 
-     replay_account_executed_instructions();
- 
--    if (replay_file) {
--        int64_t ret;
--        if (replay_next_event_is(EVENT_CLOCK + kind)) {
--            replay_read_next_clock(kind);
--        }
--        ret = replay_state.cached_clock[kind];
--
--        return ret;
-+    if (replay_next_event_is(EVENT_CLOCK + kind)) {
-+        replay_read_next_clock(kind);
-     }
-+    ret = replay_state.cached_clock[kind];
- 
--    error_report("REPLAY INTERNAL ERROR %d", __LINE__);
--    exit(1);
-+    return ret;
- }
+     /* Time can only go forward */
+     assert(diff >= 0);
 
 
