@@ -2,80 +2,91 @@ Return-Path: <SRS0=QkNH=UV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20525C43613
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Jun 2019 15:15:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17333C43613
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Jun 2019 15:16:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBC5A2070B
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Jun 2019 15:15:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KJTgumBs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBC5A2070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id E0B7720675
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Jun 2019 15:16:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0B7720675
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41212 helo=lists.gnu.org)
+Received: from localhost ([::1]:41146 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hehjp-0007wl-Vi
-	for qemu-devel@archiver.kernel.org; Sat, 22 Jun 2019 11:15:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35526)
+	id 1hehXy-0002zL-7b
+	for qemu-devel@archiver.kernel.org; Sat, 22 Jun 2019 11:03:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33687)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@gmail.com>) id 1hehhq-0006aZ-0m
- for qemu-devel@nongnu.org; Sat, 22 Jun 2019 11:13:30 -0400
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hehXH-0002RT-JZ
+ for qemu-devel@nongnu.org; Sat, 22 Jun 2019 11:02:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hehhn-0008M8-BR
- for qemu-devel@nongnu.org; Sat, 22 Jun 2019 11:13:29 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43545)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>)
- id 1hehhk-0008Fg-Ub; Sat, 22 Jun 2019 11:13:25 -0400
-Received: by mail-wr1-x442.google.com with SMTP id p13so9311080wru.10;
- Sat, 22 Jun 2019 08:13:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ok2BF4nPIsyIuxRVw3FE28hapxJKdu2X9EtlblHX7ds=;
- b=KJTgumBsIkXyNP11+HFcGr9V+501iYx20nJxnNjvVJjH8W7b+DYBdleqp8Tr7gXVjP
- wTRPA4MiuOml01Lh3enGiSesgh6sUPd8Ut8ZPw1CjLK1bM+rqIQ2obJ8FR+FMJ9uu2F/
- aP2Q7/Q8XUSC4qmzIexysUqqEgQYMKCUbKoMu/qE5fRHVcMUyi/RqtxCxpvdZtR2lcj+
- nSSw1al8yi2O1BftzuresaRDl4Y48ZvELa7Q93+KAl1ehrbipqyGU8Y2ZHd63/DZJ032
- R88AGx8jvh6Kl9aHOUP3a3XOzciZe0nx2tsaomNLgB45CQJkEGaOp9Kr7TT0lXJb2Jjq
- dMaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ok2BF4nPIsyIuxRVw3FE28hapxJKdu2X9EtlblHX7ds=;
- b=CLnUTn/cSB8kwJ76iJGnlTh7kqpN55v6BVfhuavLLrg6tTapJkH2VUDJjxFbAve2yW
- XoN+n/UZOzozbNDCnv1or+y34MR1MIilhTgbr3a0cFHQJuduTzKy+8ID9CXJ5tYnW5l/
- 67y/hPPDrgZjpwJSFZ/Pb+kzreulBsvkKWGmIkwSvCMIrPqshTfguNnFaoiVvsMrz34x
- H+AjStIWWEdCScfVwOz7BaMNx0LsMHRkyGIHObJSNTa/HSGIbd9v5DhXyXNlMkQNNP3a
- qvZeAqSLVEq3Y7sEm3Fs0NFY99xsXdn4VSIZM0vFsLbXjRZXzRcHa1N6Bx4/hIOXXh4O
- 3M8Q==
-X-Gm-Message-State: APjAAAUr4+8Q/UNn0NaykKTgtDXCrBwlkgiVmfBgw+Za734MM4PIUcBZ
- zMHsY6mZJ6wy5bWUSWIiiXrSu/Ykao60IivryHM=
-X-Google-Smtp-Source: APXvYqzEeN5XU6HZt/e4G+DYfXSQsYAobrz9aaYlGCDtc272eG8l71Bb2zizAM82om5HE63MbUpIJETvMCEpTYp9zoA=
-X-Received: by 2002:adf:f3cc:: with SMTP id g12mr96297546wrp.149.1561216403834; 
- Sat, 22 Jun 2019 08:13:23 -0700 (PDT)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hehXC-0001d6-BE
+ for qemu-devel@nongnu.org; Sat, 22 Jun 2019 11:02:32 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:56224
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1hehX1-0000cN-9g
+ for qemu-devel@nongnu.org; Sat, 22 Jun 2019 11:02:21 -0400
+Received: from host86-173-229-95.range86-173.btcentralplus.com
+ ([86.173.229.95] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1hehWN-000435-Ao; Sat, 22 Jun 2019 16:01:39 +0100
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190519041522.12327-1-richard.henderson@linaro.org>
+ <8f28d008-2608-a579-7505-4546b08deb41@linaro.org>
+ <085d6881-f518-9888-a13e-081cdc09de46@ilande.co.uk>
+ <0b9f4772-37f6-1453-e4ea-5ad9d0f52a5b@ilande.co.uk>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <acc57487-c8a0-9380-bc2a-4de22541eabf@ilande.co.uk>
+Date: Sat, 22 Jun 2019 16:01:59 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-References: <20190610134905.22294-1-mehta.aaru20@gmail.com>
- <20190611095654.GS14257@stefanha-x1.localdomain>
-In-Reply-To: <20190611095654.GS14257@stefanha-x1.localdomain>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Sat, 22 Jun 2019 16:13:12 +0100
-Message-ID: <CAJSP0QWZKJ3KiAM2ZU8spYd13UWxW9xVhMAg_s-PxWcjCp9AdQ@mail.gmail.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 00/12] Add support for
- io_uring
+In-Reply-To: <0b9f4772-37f6-1453-e4ea-5ad9d0f52a5b@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 86.173.229.95
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.43.2.167
+Subject: Re: [Qemu-devel] [PATCH v4 0/7] tcg/ppc: Add vector opcodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,40 +98,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu block <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- saket.sinha89@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- Julia Suvorova <jusual@mail.ru>, Aarushi Mehta <mehta.aaru20@gmail.com>
+Cc: Howard Spoelstra <hsp.cat7@gmail.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 11, 2019 at 10:57 AM Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> On Mon, Jun 10, 2019 at 07:18:53PM +0530, Aarushi Mehta wrote:
-> > This patch series adds support for the newly developed io_uring Linux AIO
-> > interface. Linux io_uring is faster than Linux's AIO asynchronous I/O code,
-> > offers efficient buffered asynchronous I/O support, the ability to do I/O
-> > without performing a system call via polled I/O, and other efficiency enhancements.
-> >
-> > Testing it requires a host kernel (5.1+) and the liburing library.
-> > Use the option -drive aio=io_uring to enable it.
-> >
-> > v5:
-> > - Adds completion polling
-> > - Extends qemu-io
-> > - Adds qemu-iotest
->
-> Flush is not hooked up.  Please use the io_uring IOURING_OP_FSYNC that
-> you've already written and connect it to file-posix.c.
+On 22/06/2019 15:20, Mark Cave-Ayland wrote:
 
-IOURING_OP_FSYNC is in fact synchronous.  This means io_uring_enter()
-blocks until this operation completes.  This is not desirable since
-the AIO engine should not block the QEMU thread it's running from for
-a long time (e.g. network file system that is not responding).
+> I've just given your tcg-ppc-vsx branch a spin here, and like Howard I'm getting
+> segfaults trying to launch my MacOS images :(  The segfault is weird: it doesn't get
+> caught by an attached gdb and the qemu-system-ppc process seems to hang around like a
+> zombie which makes me think that it's probably an illegal instruction of some kind,
+> but the PPC kernel can't handle it as well as x86 does.
+> 
+> With a bit more work I bisected it down to the first commit in the patchset
+> (d8dcbb57e9: "tcg/ppc: Initial backend support for Altivec") and then as an
+> experiment I hacked tcg_can_emit_vec_op() to always return 0 to see if that made a
+> difference, but the segfault still appears.
+> 
+> The commit message mentions that the load and store helpers are also improved, so I
+> wonder if they are what is causing the error rather than the vector parts? Also in
+> the kernel log I see the following messages appearing:
+> 
+> [3639669.374942] qemu-system-ppc[28591]: segfault (11) at 64b8 nip f87280 lr f8723c
+> code 1 in qemu-system-ppc[94e000+aa0000]
+> [3639669.380015] qemu-system-ppc[28591]: code: 93c10038 91810020 90010044 7fc802a6
+> 3fde0059 2e030000 3bde6c18 7c9d2378
+> [3639669.385056] qemu-system-ppc[28591]: code: 813e80a0 7cbb2b78 7cda3378 7cf93b78
+> <81428ff8> 9141001c 39400000 81290000
+> 
+> Does that help at all? If not let me know if there are any other tests that you'd
+> like me to try to help debug this.
 
-I think it's best *not* to use io_uring for fsync.  Instead we can
-continue to use the thread pool, just like Linux AIO.
+One more hint: if I try a build of d8dcbb57e9 along with my tcg_can_emit_vec_op()
+hack and pass --enable-debug-tcg to configure then I get an assert on startup:
 
-Stefan
+qemu-system-ppc: /home/mca/src/qemu/tcg/tcg.c:2207: process_op_defs: Assertion `tdefs
+!= ((void *)0)' failed.
+Aborted
+
+
+ATB,
+
+Mark.
 
