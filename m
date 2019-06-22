@@ -2,81 +2,104 @@ Return-Path: <SRS0=QkNH=UV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA4F5C43613
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Jun 2019 16:01:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AEEBC43613
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Jun 2019 17:34:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E6A820665
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Jun 2019 16:01:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6B4FF20679
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Jun 2019 17:34:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ldsJyRj2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E6A820665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="xhcXLIA2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B4FF20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41436 helo=lists.gnu.org)
+Received: from localhost ([::1]:41882 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1heiRr-0004Tk-Nd
-	for qemu-devel@archiver.kernel.org; Sat, 22 Jun 2019 12:01:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43505)
+	id 1hejuF-0001Di-8c
+	for qemu-devel@archiver.kernel.org; Sat, 22 Jun 2019 13:34:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59477)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1heiPW-0003vK-Ps
- for qemu-devel@nongnu.org; Sat, 22 Jun 2019 11:58:39 -0400
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hejtV-0000kv-Hu
+ for qemu-devel@nongnu.org; Sat, 22 Jun 2019 13:33:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1heiPV-0003Jh-Nz
- for qemu-devel@nongnu.org; Sat, 22 Jun 2019 11:58:38 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33055)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1heiPV-0003It-GO
- for qemu-devel@nongnu.org; Sat, 22 Jun 2019 11:58:37 -0400
-Received: by mail-ot1-x342.google.com with SMTP id i4so9457274otk.0
- for <qemu-devel@nongnu.org>; Sat, 22 Jun 2019 08:58:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=imCTxdPEt5J++AIJaO2+JaMor4MuSWehoKKHw0VfX4A=;
- b=ldsJyRj2+fKmIGTN/FepHU07GBewmcV4938R+cDf6IP9HCBBxCWoMjYXbIqn9aR3OO
- VuWPkX3NYZ67BaKdAsut5AQ1odEEfxNk1fFYGa3Dm/tsyBoxCs43+qGoAsism/6mdoJp
- Ulcp1MxrdYRoFej7XJlOoOiNEL9lencHDWvjUtM5YOCzrOEPkvD2cZXMKFD+kR5eFQ1u
- ixk+393vFHiZWAWW17eTbG9S/tKXbT+v6o4TcNLbx5HsBpfuigZeeMCcRGntCGh1xwWs
- QtMbupFv+ocIkyGppjKyKaHDMkhG0L3GkK+GZBDL60GDK/ikuqCEJpI7NB5Ph72M8X7I
- ipKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=imCTxdPEt5J++AIJaO2+JaMor4MuSWehoKKHw0VfX4A=;
- b=RKyjDUOzFqTQUPDzOOLsMDLATOhygud0GbLnX+tQgzn4nkm4mgJMbDnLOATJVFMswW
- ltDRRmEwEhtDvuzqVL9ydsK1gNT9aSzTfZ2dTAjVmydwBeiZoXD/egWqwQa8sLGnLVQ/
- neHR9jTFXV/QPp3Fcftq+fQyzwn9I3vztdyqMxIkZCKSJhcNd5ghpkUGa5OoTlFISnYZ
- ixUt/tng193hZz/b8iwVq537pNDxU8qYULWuW1kObiFRQoJeY9N72+1h0/bJMbQG28Y1
- EmOrtSzKd0mbb2FdegsNJuK/dMzMaqg7CWMPWxj5Y34lNB3jqQSGZbLtxe8/4eQ9Uero
- HMOg==
-X-Gm-Message-State: APjAAAX3UVTavAsJ86WuGwEF/JmhS3qz4ixalPri36pddb0fixW/O4v+
- MsvtR+h8TxdHZKZMn7RAhSf8hDNmzbhwagGEGRFggQ==
-X-Google-Smtp-Source: APXvYqyCNJuXJmpa0eiHmJA3xKlUOFGv7El3pLDyf8V37yVbDNpyO8K8z89iUCyu8gCryNVlnRMnGOqmv1mJUHValMI=
-X-Received: by 2002:a9d:711e:: with SMTP id n30mr22171787otj.97.1561219116481; 
- Sat, 22 Jun 2019 08:58:36 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190620222314.2670-1-wainersm@redhat.com>
- <CAFEAcA92m9n7FR2a6=ecnr5bn-Sq97LZRxHRuzWO-OcbdgA4fw@mail.gmail.com>
- <20190621190421.GA679@localhost.localdomain>
-In-Reply-To: <20190621190421.GA679@localhost.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 22 Jun 2019 16:58:25 +0100
-Message-ID: <CAFEAcA-x_GSxiULrxvRj7dtCLM-r4YvRpwkVosW+1SutAUJMoA@mail.gmail.com>
-To: Cleber Rosa <crosa@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Subject: Re: [Qemu-devel] [RFC v2 PATCH] hw/arm/virt: makes virt a default
- machine type
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hejtU-0006CS-L1
+ for qemu-devel@nongnu.org; Sat, 22 Jun 2019 13:33:41 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:48124)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
+ id 1hejtS-00064a-8U; Sat, 22 Jun 2019 13:33:38 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5MHUjs1095081;
+ Sat, 22 Jun 2019 17:33:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2018-07-02; bh=j/yMY4pj0yv88CoDyA0KUkiKPl5+NbMChya9kXlxn1I=;
+ b=xhcXLIA2p3ksLvUjDJIpvCZBZCFRkk3RB5m6nftaLNipFe1Q30EO0wiWz0wq7aLXy8zS
+ N+4jtjeX0UtYuaa0pMSls3V5pvogIxSu76z5wVFY8Gx8SSNwzM0Mo05tYuQ4EwGwPly/
+ uEe1JNBaA0ly2HxjGS1Fp0rhYOXM8M5+GdL3UC5AJA4uigq+auAK8eDfZ6IM2+HoHLKe
+ a1haZkS0gfSSAoWwMbNy6tlUPWYoG6bWyKOvlW+tTEh78UvsMtoq+X7/kEn8p8EtY3bp
+ DoCImgADFC53rnGYN6knE5Ikp/Srl6W7uJv7+0+83fMHECck6FIw8+wfjYVImHSMQi7u UA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2120.oracle.com with ESMTP id 2t9cyq17e9-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Sat, 22 Jun 2019 17:33:33 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5MHWDs1084586;
+ Sat, 22 Jun 2019 17:33:33 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by userp3030.oracle.com with ESMTP id 2t99f2q2kg-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Sat, 22 Jun 2019 17:33:33 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5MHXToT019997;
+ Sat, 22 Jun 2019 17:33:32 GMT
+Received: from [10.0.0.38] (/79.180.42.160)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Sat, 22 Jun 2019 10:33:29 -0700
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+From: Sam Eiderman <shmuel.eiderman@oracle.com>
+In-Reply-To: <20190622152723.GA3357@morn.lan>
+Date: Sat, 22 Jun 2019 20:33:22 +0300
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <4CD0FD44-FB0F-4D76-88FC-C853E874563B@oracle.com>
+References: <20190619092352.23583-1-shmuel.eiderman@oracle.com>
+ <20190619092352.23583-4-shmuel.eiderman@oracle.com>
+ <20190620143749.GC17015@morn.lan>
+ <62F1EBAB-C7E8-42D1-BB6F-22C4945E51B5@oracle.com>
+ <20190621185953.GA6620@morn.lan>
+ <78884F3A-DA66-43B0-B504-AD12BC7BDC3C@oracle.com>
+ <20190622152723.GA3357@morn.lan>
+To: "Kevin O'Connor" <kevin@koconnor.net>
+X-Mailer: Apple Mail (2.3445.104.11)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9296
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=773
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906220159
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9296
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=822 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906220159
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.85
+Subject: Re: [Qemu-devel] [SeaBIOS] [PATCH v3 3/4] geometry: Add
+ boot_lchs_find_*() utility functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,67 +111,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, arbel.moshe@oracle.com,
+ seabios@seabios.org, QEMU <qemu-devel@nongnu.org>, mreitz@redhat.com,
+ liran.alon@oracle.com, kraxel@redhat.com, karl.heubaum@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 21 Jun 2019 at 20:04, Cleber Rosa <crosa@redhat.com> wrote:
-> The experience acquired here deserves the highest consideration, but I
-> can't help myself to wonder if this isn't one of the (conceptual)
-> reasons for parameters such as '-nodefaults'.  I know QEMU doesn't
-> promise the same behavior across different targets, but that could
-> improve considerably with very cheap actions.
 
-Yeah, there are probably improvements we could make. The
-usual constraints apply:
- * we don't want to break compatibility with existing used
-   command lines in the wild
- * ideally, we should be consistent across target architectures
-   and across machine types about how things work (this is
-   an ideal we obviously don't live up to today in many places)
- * we don't want to back ourselves into awkward corners for
-   the future (the qemu-system-arm default machine type was
-   originally 'integratorcp' which no doubt made sense in 1998
-   or whenever it was, but was nothing but confusing and the
-   wrong choice for 99% of users by a decade or so later.
-   x86 is kind of an outlier for having such longevity of "all
-   hardware looks basically the same".)
 
-> You can consider me biased (I do consider myself), but trying to wear
-> the hat of a user first interacting with QEMU, I would expect a (any)
-> reasonably capable environment that can represent the given target.
-> That will probably be a different environment than the one I may need,
-> and I think that's fine.
+> On 22 Jun 2019, at 18:27, Kevin O'Connor <kevin@koconnor.net> wrote:
+>=20
+> On Sat, Jun 22, 2019 at 11:51:48AM +0300, Sam Eiderman wrote:
+>> But maybe someone wants bootorder but doesn=E2=80=99t want to =
+override legacy disk translations=E2=80=A6
+>>=20
+>> I=E2=80=99m thinking of maybe adding
+>>=20
+>> if (!CONFIG_BOOTORDER || !CONFIG_BIOS_GEOMETRY)
+>>    return NULL;
+>=20
+> That's fine - though it's (!CONFIG_BOOTORDER && =
+!CONFIG_BIOS_GEOMETRY).
 
-I'm really not sure what you're trying to suggest here; maybe
-you could clarify? If you specify a target (ie a machine type),
-you get that machine type. If you don't specify a target, then
-we can't really guess what you were hoping to run and
-magically pick something that works.
+Yes of course, my bad
 
-The main problem here is that users expect "all the world is a PC"
-type behaviour, ie they can just provide qemu-system-arm or
-qemu-system-aarch64 with no command line arguments except
-a guest kernel (which is half the time something they found under
-a rock or extracted from some firmware image) or a guest CDROM
-image and have it boot, because that generally works for x86. It
-doesn't and can't work for Arm, because of the much greater
-diversity of machine types and the way that kernels are often
-only compiled to work on a specific subset of machines.
-Making the user specify a machine type means they do at least
-get prompted that the world is more complicated than they
-think it is and there are decisions that have to be made.
+>=20
+> FYI, I think BIOS_GEOMETRY is a little confusing - maybe
+> CUSTOM_DISK_GEOMETRY.
 
-In any case even if we did default to "virt" the user still
-has to specify a CPU type, may well also want to provide
-a GIC version (gicv3 being better than the default v2),
-likely more RAM than the very small default, they need to provide
-all the virtio devices, and so on and so on. So giving
-them one option they no longer need to specify doesn't
-really make it any easier IMHO.
+The thing is that disk geometry is actually (physical geometry, reported =
+by the disk controller) and here
+bios geometry stands for the geometry reported from bios int13.
+Also =E2=80=9Cbios geometry=E2=80=9D =3D=3D=3D =E2=80=9Clogical =
+geometry=E2=80=9D =3D=3D=3D =E2=80=9Clchs=E2=80=9D.
+So following previous discussion with Gerd, maybe =
+CONFIG_HOST_BIOS_GEOMETRY is better?
 
-thanks
--- PMM
+Sam
+
+>=20
+> -Kevin
+
 
