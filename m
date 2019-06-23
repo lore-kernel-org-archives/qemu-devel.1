@@ -6,52 +6,51 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E028AC43613
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Jun 2019 17:08:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71CA3C48BE4
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Jun 2019 17:08:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3B9D208C3
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Jun 2019 17:08:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3B9D208C3
+	by mail.kernel.org (Postfix) with ESMTPS id 4D5A2208C3
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Jun 2019 17:08:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D5A2208C3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45802 helo=lists.gnu.org)
+Received: from localhost ([::1]:45804 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hf5yP-0003Oj-Ts
-	for qemu-devel@archiver.kernel.org; Sun, 23 Jun 2019 13:08:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34158)
+	id 1hf5yQ-0003Po-Fe
+	for qemu-devel@archiver.kernel.org; Sun, 23 Jun 2019 13:08:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34234)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hf5wM-0001dB-Q2
- for qemu-devel@nongnu.org; Sun, 23 Jun 2019 13:06:08 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hf5wR-0001hL-8s
+ for qemu-devel@nongnu.org; Sun, 23 Jun 2019 13:06:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hf5wL-0004Iu-GF
- for qemu-devel@nongnu.org; Sun, 23 Jun 2019 13:06:06 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:41125 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hf5wO-0004P5-NM
+ for qemu-devel@nongnu.org; Sun, 23 Jun 2019 13:06:11 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:39418 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hf5wL-0004H9-4A
- for qemu-devel@nongnu.org; Sun, 23 Jun 2019 13:06:05 -0400
+ id 1hf5wN-00039X-RR
+ for qemu-devel@nongnu.org; Sun, 23 Jun 2019 13:06:08 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 779C61A1DC5;
- Sun, 23 Jun 2019 19:05:45 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTP id DD1CE1A1D00;
+ Sun, 23 Jun 2019 19:05:04 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 4DA051A1DB6;
- Sun, 23 Jun 2019 19:05:45 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id BE7381A0EDA;
+ Sun, 23 Jun 2019 19:05:04 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Sun, 23 Jun 2019 19:04:41 +0200
-Message-Id: <1561309489-16146-9-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Sun, 23 Jun 2019 19:04:34 +0200
+Message-Id: <1561309489-16146-2-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1561309489-16146-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1561309489-16146-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v5 08/16] tcg/ppc: Add support for vector
- saturated add/subtract
+Subject: [Qemu-devel] [PATCH v5 01/16] tcg/ppc: Introduce Altivec registers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,112 +73,172 @@ Sender: "Qemu-devel"
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Add support for vector saturated add/subtract using Altivec
-instructions:
-VADDSBS, VADDSHS, VADDSWS, VADDUBS, VADDUHS, VADDUWS, and
-VSUBSBS, VSUBSHS, VSUBSWS, VSUBUBS, VSUBUHS, VSUBUWS.
+Altivec (in all its versions) supports 32 128-bit vector registers,
+whase names are by convention v0, v1,..., and v32.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- tcg/ppc/tcg-target.h     |  2 +-
- tcg/ppc/tcg-target.inc.c | 36 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 37 insertions(+), 1 deletion(-)
+ tcg/ppc/tcg-target.h     | 11 +++++-
+ tcg/ppc/tcg-target.inc.c | 88 ++++++++++++++++++++++++++++++------------------
+ 2 files changed, 65 insertions(+), 34 deletions(-)
 
 diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
-index a86ed57..368c250 100644
+index 7627fb6..690fa74 100644
 --- a/tcg/ppc/tcg-target.h
 +++ b/tcg/ppc/tcg-target.h
-@@ -155,7 +155,7 @@ extern bool have_isa_3_00;
- #define TCG_TARGET_HAS_shv_vec          0
- #define TCG_TARGET_HAS_cmp_vec          1
- #define TCG_TARGET_HAS_mul_vec          0
--#define TCG_TARGET_HAS_sat_vec          0
-+#define TCG_TARGET_HAS_sat_vec          1
- #define TCG_TARGET_HAS_minmax_vec       1
- #define TCG_TARGET_HAS_bitsel_vec       0
- #define TCG_TARGET_HAS_cmpsel_vec       0
+@@ -31,7 +31,7 @@
+ # define TCG_TARGET_REG_BITS  32
+ #endif
+ 
+-#define TCG_TARGET_NB_REGS 32
++#define TCG_TARGET_NB_REGS 64
+ #define TCG_TARGET_INSN_UNIT_SIZE 4
+ #define TCG_TARGET_TLB_DISPLACEMENT_BITS 16
+ 
+@@ -45,6 +45,15 @@ typedef enum {
+     TCG_REG_R24, TCG_REG_R25, TCG_REG_R26, TCG_REG_R27,
+     TCG_REG_R28, TCG_REG_R29, TCG_REG_R30, TCG_REG_R31,
+ 
++    TCG_REG_V0,  TCG_REG_V1,  TCG_REG_V2,  TCG_REG_V3,
++    TCG_REG_V4,  TCG_REG_V5,  TCG_REG_V6,  TCG_REG_V7,
++    TCG_REG_V8,  TCG_REG_V9,  TCG_REG_V10, TCG_REG_V11,
++    TCG_REG_V12, TCG_REG_V13, TCG_REG_V14, TCG_REG_V15,
++    TCG_REG_V16, TCG_REG_V17, TCG_REG_V18, TCG_REG_V19,
++    TCG_REG_V20, TCG_REG_V21, TCG_REG_V22, TCG_REG_V23,
++    TCG_REG_V24, TCG_REG_V25, TCG_REG_V26, TCG_REG_V27,
++    TCG_REG_V28, TCG_REG_V29, TCG_REG_V30, TCG_REG_V31,
++
+     TCG_REG_CALL_STACK = TCG_REG_R1,
+     TCG_AREG0 = TCG_REG_R27
+ } TCGReg;
 diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-index e254fa4..108882f 100644
+index 852b894..8e1bba7 100644
 --- a/tcg/ppc/tcg-target.inc.c
 +++ b/tcg/ppc/tcg-target.inc.c
-@@ -474,12 +474,24 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
- #define STVX       XO31(231)
- #define STVEWX     XO31(199)
+@@ -42,6 +42,9 @@
+ # define TCG_REG_TMP1   TCG_REG_R12
+ #endif
  
-+#define VADDSBS    VX4(768)
-+#define VADDUBS    VX4(512)
- #define VADDUBM    VX4(0)
-+#define VADDSHS    VX4(832)
-+#define VADDUHS    VX4(576)
- #define VADDUHM    VX4(64)
-+#define VADDSWS    VX4(896)
-+#define VADDUWS    VX4(640)
- #define VADDUWM    VX4(128)
++#define TCG_VEC_TMP1    TCG_REG_V0
++#define TCG_VEC_TMP2    TCG_REG_V1
++
+ #define TCG_REG_TB     TCG_REG_R31
+ #define USE_REG_TB     (TCG_TARGET_REG_BITS == 64)
  
-+#define VSUBSBS    VX4(1792)
-+#define VSUBUBS    VX4(1536)
- #define VSUBUBM    VX4(1024)
-+#define VSUBSHS    VX4(1856)
-+#define VSUBUHS    VX4(1600)
- #define VSUBUHM    VX4(1088)
-+#define VSUBSWS    VX4(1920)
-+#define VSUBUWS    VX4(1664)
- #define VSUBUWM    VX4(1152)
+@@ -72,39 +75,15 @@ bool have_isa_3_00;
+ #endif
  
- #define VMAXSB     VX4(258)
-@@ -2845,6 +2857,10 @@ int tcg_can_emit_vec_op(TCGOpcode opc, TCGType type, unsigned vece)
-     case INDEX_op_smin_vec:
-     case INDEX_op_umax_vec:
-     case INDEX_op_umin_vec:
-+    case INDEX_op_ssadd_vec:
-+    case INDEX_op_sssub_vec:
-+    case INDEX_op_usadd_vec:
-+    case INDEX_op_ussub_vec:
-         return vece <= MO_32;
-     case INDEX_op_cmp_vec:
-         return vece <= MO_32 ? -1 : 0;
-@@ -2947,6 +2963,10 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
-         eq_op[4]  = { VCMPEQUB, VCMPEQUH, VCMPEQUW, 0 },
-         gts_op[4] = { VCMPGTSB, VCMPGTSH, VCMPGTSW, 0 },
-         gtu_op[4] = { VCMPGTUB, VCMPGTUH, VCMPGTUW, 0 },
-+        ssadd_op[4] = { VADDSBS, VADDSHS, VADDSWS, 0 },
-+        usadd_op[4] = { VADDUBS, VADDUHS, VADDUWS, 0 },
-+        sssub_op[4] = { VSUBSBS, VSUBSHS, VSUBSWS, 0 },
-+        ussub_op[4] = { VSUBUBS, VSUBUHS, VSUBUWS, 0 },
-         umin_op[4] = { VMINUB, VMINUH, VMINUW, 0 },
-         smin_op[4] = { VMINSB, VMINSH, VMINSW, 0 },
-         umax_op[4] = { VMAXUB, VMAXUH, VMAXUW, 0 },
-@@ -2973,6 +2993,18 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
-     case INDEX_op_sub_vec:
-         insn = sub_op[vece];
-         break;
-+    case INDEX_op_ssadd_vec:
-+        insn = ssadd_op[vece];
-+        break;
-+    case INDEX_op_sssub_vec:
-+        insn = sssub_op[vece];
-+        break;
-+    case INDEX_op_usadd_vec:
-+        insn = usadd_op[vece];
-+        break;
-+    case INDEX_op_ussub_vec:
-+        insn = ussub_op[vece];
-+        break;
-     case INDEX_op_smin_vec:
-         insn = smin_op[vece];
-         break;
-@@ -3279,6 +3311,10 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     case INDEX_op_andc_vec:
-     case INDEX_op_orc_vec:
-     case INDEX_op_cmp_vec:
-+    case INDEX_op_ssadd_vec:
-+    case INDEX_op_sssub_vec:
-+    case INDEX_op_usadd_vec:
-+    case INDEX_op_ussub_vec:
-     case INDEX_op_smax_vec:
-     case INDEX_op_smin_vec:
-     case INDEX_op_umax_vec:
+ #ifdef CONFIG_DEBUG_TCG
+-static const char * const tcg_target_reg_names[TCG_TARGET_NB_REGS] = {
+-    "r0",
+-    "r1",
+-    "r2",
+-    "r3",
+-    "r4",
+-    "r5",
+-    "r6",
+-    "r7",
+-    "r8",
+-    "r9",
+-    "r10",
+-    "r11",
+-    "r12",
+-    "r13",
+-    "r14",
+-    "r15",
+-    "r16",
+-    "r17",
+-    "r18",
+-    "r19",
+-    "r20",
+-    "r21",
+-    "r22",
+-    "r23",
+-    "r24",
+-    "r25",
+-    "r26",
+-    "r27",
+-    "r28",
+-    "r29",
+-    "r30",
+-    "r31"
++static const char tcg_target_reg_names[TCG_TARGET_NB_REGS][4] = {
++    "r0",  "r1",  "r2",  "r3",  "r4",  "r5",  "r6",  "r7",
++    "r8",  "r9",  "r10", "r11", "r12", "r13", "r14", "r15",
++    "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23",
++    "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31",
++    "v0",  "v1",  "v2",  "v3",  "v4",  "v5",  "v6",  "v7",
++    "v8",  "v9",  "v10", "v11", "v12", "v13", "v14", "v15",
++    "v16", "v17", "v18", "v19", "v20", "v21", "v22", "v23",
++    "v24", "v25", "v26", "v27", "v28", "v29", "v30", "v31",
+ };
+ #endif
+ 
+@@ -139,6 +118,26 @@ static const int tcg_target_reg_alloc_order[] = {
+     TCG_REG_R5,
+     TCG_REG_R4,
+     TCG_REG_R3,
++
++    /* V0 and V1 reserved as temporaries; V20 - V31 are call-saved */
++    TCG_REG_V2,   /* call clobbered, vectors */
++    TCG_REG_V3,
++    TCG_REG_V4,
++    TCG_REG_V5,
++    TCG_REG_V6,
++    TCG_REG_V7,
++    TCG_REG_V8,
++    TCG_REG_V9,
++    TCG_REG_V10,
++    TCG_REG_V11,
++    TCG_REG_V12,
++    TCG_REG_V13,
++    TCG_REG_V14,
++    TCG_REG_V15,
++    TCG_REG_V16,
++    TCG_REG_V17,
++    TCG_REG_V18,
++    TCG_REG_V19,
+ };
+ 
+ static const int tcg_target_call_iarg_regs[] = {
+@@ -2808,6 +2807,27 @@ static void tcg_target_init(TCGContext *s)
+     tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_R11);
+     tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_R12);
+ 
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_V0);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_V1);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_V2);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_V3);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_V4);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_V5);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_V6);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_V7);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_V8);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_V9);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_V10);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_V11);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_V12);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_V13);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_V14);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_V15);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_V16);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_V17);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_V18);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_V19);
++
+     s->reserved_regs = 0;
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_R0); /* tcg temp */
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_R1); /* stack pointer */
+@@ -2818,6 +2838,8 @@ static void tcg_target_init(TCGContext *s)
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_R13); /* thread pointer */
+ #endif
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_TMP1); /* mem temp */
++    tcg_regset_set_reg(s->reserved_regs, TCG_VEC_TMP1);
++    tcg_regset_set_reg(s->reserved_regs, TCG_VEC_TMP2);
+     if (USE_REG_TB) {
+         tcg_regset_set_reg(s->reserved_regs, TCG_REG_TB);  /* tb->tc_ptr */
+     }
 -- 
 2.7.4
 
