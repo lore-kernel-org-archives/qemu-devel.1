@@ -2,56 +2,81 @@ Return-Path: <SRS0=JchA=UW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7573BC43613
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Jun 2019 17:28:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9192DC43613
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Jun 2019 17:30:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D58B2073F
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Jun 2019 17:28:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D58B2073F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 52FB92073F
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Jun 2019 17:30:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eFX4+IYH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52FB92073F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45958 helo=lists.gnu.org)
+Received: from localhost ([::1]:45990 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hf6Hy-0004ua-G9
-	for qemu-devel@archiver.kernel.org; Sun, 23 Jun 2019 13:28:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34294)
+	id 1hf6KG-0007ND-K4
+	for qemu-devel@archiver.kernel.org; Sun, 23 Jun 2019 13:30:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39814)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hf5wh-0001kw-0E
- for qemu-devel@nongnu.org; Sun, 23 Jun 2019 13:06:28 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hf6IJ-0005Xl-KK
+ for qemu-devel@nongnu.org; Sun, 23 Jun 2019 13:28:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hf5wf-0004oY-3q
- for qemu-devel@nongnu.org; Sun, 23 Jun 2019 13:06:26 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:41135 helo=mail.rt-rk.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hf5wX-0004Jt-AF
- for qemu-devel@nongnu.org; Sun, 23 Jun 2019 13:06:21 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id E83DF1A1DBF;
- Sun, 23 Jun 2019 19:05:45 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id A97A71A1DB7;
- Sun, 23 Jun 2019 19:05:45 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Date: Sun, 23 Jun 2019 19:04:48 +0200
-Message-Id: <1561309489-16146-16-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1561309489-16146-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1561309489-16146-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v5 15/16] tcg/ppc: Update vector support to
- v2.07
+ (envelope-from <peter.maydell@linaro.org>) id 1hf6IH-0006Tp-1r
+ for qemu-devel@nongnu.org; Sun, 23 Jun 2019 13:28:47 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40096)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hf6IC-0006Mn-Ke
+ for qemu-devel@nongnu.org; Sun, 23 Jun 2019 13:28:42 -0400
+Received: by mail-ot1-x344.google.com with SMTP id e8so11201817otl.7
+ for <qemu-devel@nongnu.org>; Sun, 23 Jun 2019 10:28:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=ocu7dvhfT6qKErnmwC9GM3wR+wDZgRONvgHkwHbb7KM=;
+ b=eFX4+IYHJ0tpKWlZLpLzsTT+gSpiaItRin5eYmrIzWgL8OjI/Cs+7dHG0NIR+0JOWX
+ Eq/RBZ/FlqCHbo0lljfeqsAZEOwCmLrzKBxNtBDBD0ocJQiETYO4YwVjV/6vR77EvfYh
+ gSySDTxKPOPMsLby0aw3vvoU8D+Z+3VMT8iuwsXACf064dU8UMP1pMh424MX/F/dowB5
+ GF6yPB7E/vwHSIwGmvYJHt1L/7cmhaBeB9HtDWyeFLWZzXlKhBreSZoaE0AKD0EHmifp
+ h7R12moTZWOpvkwhdWyWDFT1yvfG0Td00fjUqoiZscm1qnkOSOL0x+JftwE73VjMOj8r
+ 2cHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=ocu7dvhfT6qKErnmwC9GM3wR+wDZgRONvgHkwHbb7KM=;
+ b=nyh1H5W/zjseKw0eYzfomD71RKj6cA+eK9kdZ7Z9QfaVnBY7GmPHp611Xw6/YDsKrt
+ Ijn0RIRf4NzOn0RKmOzUJdquOPIDx5s1up3uZCeMRs9qBZ0c2n7IzNndFsy9QrbdK320
+ j+mD5Ivr77OydBQYUuljdKWQkr45IVb9e4AGZjrxi1uCrn5Gh/BzJECpuoAJwJoaIjbF
+ OG9PUi1p8f34oam3iiYqXkf99NnsX8y28t3Myebd+lEvkFT7ZEilZtMcCRgqR+Gv/s6D
+ jqOWijE5M46ghOE6YydDG7fW8dA0Ld33Mc2NO5jFPIi0xUQWxoRVtsbZcSSNwacmZsOX
+ tDRQ==
+X-Gm-Message-State: APjAAAVQrTXBrL9JtGDS1TqCCRuvKoJQ4Vg16d2y+bz3TLMKaaddA25E
+ SRLdNY8OMbOeSs8mW/LaIfkGDszKtV+99sNX04w4cg==
+X-Google-Smtp-Source: APXvYqzZns4E/jIOHqrNi8IqZSqGbUxBM9t9O1aX9vVLa+d3PvKO3xX0kFZQoPsGDaAs597PIPxckg2oNUEzudvIIiE=
+X-Received: by 2002:a9d:4d81:: with SMTP id u1mr8807008otk.221.1561310917626; 
+ Sun, 23 Jun 2019 10:28:37 -0700 (PDT)
+MIME-Version: 1.0
+References: <C95C3BAC-3DE1-44F3-BB08-715D3121371A@gmail.com>
+In-Reply-To: <C95C3BAC-3DE1-44F3-BB08-715D3121371A@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 23 Jun 2019 18:28:26 +0100
+Message-ID: <CAFEAcA8mcQJiYkHdzNJT3m+9-vak_CWaxGBQ0TME1tZQQK7f_w@mail.gmail.com>
+To: =?UTF-8?Q?Juan_Rafael_Garc=C3=ADa_Blanco?= <juanrgar@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
+Subject: Re: [Qemu-devel] [Qemu-discuss] qemu-io-cmds does not compile on
+ macOS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,343 +88,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org,
- "David Gibson --cc=amarkovic @ wavecomp . com"
- <david@gibson.dropbear.id.au>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Aleksandar Markovic <amarkovic@wavecomp.com>, hsp.cat7@gmail.com
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ qemu-discuss <qemu-discuss@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+On Sun, 23 Jun 2019 at 16:22, Juan Rafael Garc=C3=ADa Blanco
+<juanrgar@gmail.com> wrote:
+> I think the latest changes to qemu-io-cmds.c make it impossible to compil=
+e under macOS. It now uses clock_gettime, which is not available in this OS=
+. I=E2=80=99m using 10.9.5; I think this function is now included in 10.12.
+>
+> I would step up to try to prepare a patch that uses a replacement in case=
+ it is being compiled in a macOS version that does not include that functio=
+n. But I do not know if you want to support these =E2=80=98old' macOS versi=
+ons=E2=80=A6
 
-This includes single-word loads and stores, lots of double-word
-arithmetic, and a few extra logical operations.
+Hi; thanks for this report. (This kind of bug report is better sent
+to qemu-devel or to the launchpad bug tracker -- qemu-discuss
+is mostly user-to-user conversations, and developers tend to
+be on -devel; I've cc'd -devel on this.)
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- tcg/ppc/tcg-target.h     |   3 +-
- tcg/ppc/tcg-target.inc.c | 111 +++++++++++++++++++++++++++++++++++++----------
- 2 files changed, 91 insertions(+), 23 deletions(-)
+Our official support policy is that we support building with the
+two most recent versions of macOS; in practice we might support
+building with some earlier versions; as of commit 5588840ff77800e839
+we definitely dropped support for anything earlier than 10.10.
+So in theory we don't strongly care about anything before 10.13
+at the moment; but if it's easy to avoid the problem it might be
+worth doing that.
 
-diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
-index 40544f9..b8355d0 100644
---- a/tcg/ppc/tcg-target.h
-+++ b/tcg/ppc/tcg-target.h
-@@ -61,6 +61,7 @@ typedef enum {
- extern bool have_isa_altivec;
- extern bool have_isa_2_06;
- extern bool have_isa_2_06_vsx;
-+extern bool have_isa_2_07_vsx;
- extern bool have_isa_3_00;
- 
- /* optional instructions automatically implemented */
-@@ -147,7 +148,7 @@ extern bool have_isa_3_00;
- #define TCG_TARGET_HAS_v256             0
- 
- #define TCG_TARGET_HAS_andc_vec         1
--#define TCG_TARGET_HAS_orc_vec          0
-+#define TCG_TARGET_HAS_orc_vec          have_isa_2_07_vsx
- #define TCG_TARGET_HAS_not_vec          1
- #define TCG_TARGET_HAS_neg_vec          0
- #define TCG_TARGET_HAS_abs_vec          0
-diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-index 0c2ad8d..badbe2c 100644
---- a/tcg/ppc/tcg-target.inc.c
-+++ b/tcg/ppc/tcg-target.inc.c
-@@ -67,6 +67,7 @@ static tcg_insn_unit *tb_ret_addr;
- bool have_isa_altivec;
- bool have_isa_2_06;
- bool have_isa_2_06_vsx;
-+bool have_isa_2_07_vsx;
- bool have_isa_3_00;
- 
- #define HAVE_ISA_2_06  have_isa_2_06
-@@ -473,10 +474,12 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
- #define LVEWX      XO31(71)
- #define LXSDX      XO31(588)      /* v2.06 */
- #define LXVDSX     XO31(332)      /* v2.06 */
-+#define LXSIWZX    XO31(12)       /* v2.07 */
- 
- #define STVX       XO31(231)
- #define STVEWX     XO31(199)
- #define STXSDX     XO31(716)      /* v2.06 */
-+#define STXSIWX    XO31(140)      /* v2.07 */
- 
- #define VADDSBS    VX4(768)
- #define VADDUBS    VX4(512)
-@@ -487,6 +490,7 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
- #define VADDSWS    VX4(896)
- #define VADDUWS    VX4(640)
- #define VADDUWM    VX4(128)
-+#define VADDUDM    VX4(192)       /* v2.07 */
- 
- #define VSUBSBS    VX4(1792)
- #define VSUBUBS    VX4(1536)
-@@ -497,47 +501,62 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
- #define VSUBSWS    VX4(1920)
- #define VSUBUWS    VX4(1664)
- #define VSUBUWM    VX4(1152)
-+#define VSUBUDM    VX4(1216)      /* v2.07 */
- 
- #define VMAXSB     VX4(258)
- #define VMAXSH     VX4(322)
- #define VMAXSW     VX4(386)
-+#define VMAXSD     VX4(450)       /* v2.07 */
- #define VMAXUB     VX4(2)
- #define VMAXUH     VX4(66)
- #define VMAXUW     VX4(130)
-+#define VMAXUD     VX4(194)       /* v2.07 */
- #define VMINSB     VX4(770)
- #define VMINSH     VX4(834)
- #define VMINSW     VX4(898)
-+#define VMINSD     VX4(962)       /* v2.07 */
- #define VMINUB     VX4(514)
- #define VMINUH     VX4(578)
- #define VMINUW     VX4(642)
-+#define VMINUD     VX4(706)       /* v2.07 */
- 
- #define VCMPEQUB   VX4(6)
- #define VCMPEQUH   VX4(70)
- #define VCMPEQUW   VX4(134)
-+#define VCMPEQUD   VX4(199)       /* v2.07 */
- #define VCMPGTSB   VX4(774)
- #define VCMPGTSH   VX4(838)
- #define VCMPGTSW   VX4(902)
-+#define VCMPGTSD   VX4(967)       /* v2.07 */
- #define VCMPGTUB   VX4(518)
- #define VCMPGTUH   VX4(582)
- #define VCMPGTUW   VX4(646)
-+#define VCMPGTUD   VX4(711)       /* v2.07 */
- 
- #define VSLB       VX4(260)
- #define VSLH       VX4(324)
- #define VSLW       VX4(388)
-+#define VSLD       VX4(1476)      /* v2.07 */
- #define VSRB       VX4(516)
- #define VSRH       VX4(580)
- #define VSRW       VX4(644)
-+#define VSRD       VX4(1732)      /* v2.07 */
- #define VSRAB      VX4(772)
- #define VSRAH      VX4(836)
- #define VSRAW      VX4(900)
-+#define VSRAD      VX4(964)       /* v2.07 */
- #define VRLB       VX4(4)
- #define VRLH       VX4(68)
- #define VRLW       VX4(132)
-+#define VRLD       VX4(196)       /* v2.07 */
- 
- #define VMULEUB    VX4(520)
- #define VMULEUH    VX4(584)
-+#define VMULEUW    VX4(648)       /* v2.07 */
- #define VMULOUB    VX4(8)
- #define VMULOUH    VX4(72)
-+#define VMULOUW    VX4(136)       /* v2.07 */
-+#define VMULUWM    VX4(137)       /* v2.07 */
- #define VMSUMUHM   VX4(38)
- 
- #define VMRGHB     VX4(12)
-@@ -555,6 +574,9 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
- #define VNOR       VX4(1284)
- #define VOR        VX4(1156)
- #define VXOR       VX4(1220)
-+#define VEQV       VX4(1668)      /* v2.07 */
-+#define VNAND      VX4(1412)      /* v2.07 */
-+#define VORC       VX4(1348)      /* v2.07 */
- 
- #define VSPLTB     VX4(524)
- #define VSPLTH     VX4(588)
-@@ -568,6 +590,11 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
- #define XXPERMDI   (OPCD(60) | (10 << 3))   /* v2.06 */
- #define XXSEL      (OPCD(60) | (3 << 4))    /* v2.06 */
- 
-+#define MFVSRD     XO31(51)       /* v2.07 */
-+#define MFVSRWZ    XO31(115)      /* v2.07 */
-+#define MTVSRD     XO31(179)      /* v2.07 */
-+#define MTVSRWZ    XO31(179)      /* v2.07 */
-+
- #define RT(r) ((r)<<21)
- #define RS(r) ((r)<<21)
- #define RA(r) ((r)<<16)
-@@ -700,7 +727,15 @@ static bool tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg)
-         if (ret < 32 && arg < 32) {
-             tcg_out32(s, OR | SAB(arg, ret, arg));
-             break;
--        } else if (ret < 32 || arg < 32) {
-+        } else if (ret < 32 && have_isa_2_07_vsx) {
-+            tcg_out32(s, (type == TCG_TYPE_I32 ? MFVSRWZ : MFVSRD)
-+                      | VRT(arg) | RA(ret) | 1);
-+            break;
-+        } else if (arg < 32 && have_isa_2_07_vsx) {
-+            tcg_out32(s, (type == TCG_TYPE_I32 ? MTVSRWZ : MTVSRD)
-+                      | VRT(ret) | RA(arg) | 1);
-+            break;
-+        } else {
-             /* Altivec does not support vector/integer moves.  */
-             return false;
-         }
-@@ -1140,6 +1175,10 @@ static void tcg_out_ld(TCGContext *s, TCGType type, TCGReg ret,
-             tcg_out_mem_long(s, LWZ, LWZX, ret, base, offset);
-             break;
-         }
-+        if (have_isa_2_07_vsx) {
-+            tcg_out_mem_long(s, 0, LXSIWZX | 1, ret & 31, base, offset);
-+            break;
-+        }
-         assert((offset & 3) == 0);
-         tcg_out_mem_long(s, 0, LVEWX, ret & 31, base, offset);
-         shift = (offset - 4) & 0xc;
-@@ -1186,6 +1225,10 @@ static void tcg_out_st(TCGContext *s, TCGType type, TCGReg arg,
-             tcg_out_mem_long(s, STW, STWX, arg, base, offset);
-             break;
-         }
-+        if (have_isa_2_07_vsx) {
-+            tcg_out_mem_long(s, 0, STXSIWX | 1, arg & 31, base, offset);
-+            break;
-+        }
-         assert((offset & 3) == 0);
-         shift = (offset - 4) & 0xc;
-         if (shift) {
-@@ -2905,26 +2948,37 @@ int tcg_can_emit_vec_op(TCGOpcode opc, TCGType type, unsigned vece)
-     case INDEX_op_andc_vec:
-     case INDEX_op_not_vec:
-         return 1;
-+    case INDEX_op_orc_vec:
-+        return have_isa_2_07_vsx;
-     case INDEX_op_add_vec:
-     case INDEX_op_sub_vec:
-     case INDEX_op_smax_vec:
-     case INDEX_op_smin_vec:
-     case INDEX_op_umax_vec:
-     case INDEX_op_umin_vec:
-+    case INDEX_op_shlv_vec:
-+    case INDEX_op_shrv_vec:
-+    case INDEX_op_sarv_vec:
-+        return vece <= MO_32 || have_isa_2_07_vsx;
-     case INDEX_op_ssadd_vec:
-     case INDEX_op_sssub_vec:
-     case INDEX_op_usadd_vec:
-     case INDEX_op_ussub_vec:
--    case INDEX_op_shlv_vec:
--    case INDEX_op_shrv_vec:
--    case INDEX_op_sarv_vec:
-         return vece <= MO_32;
-     case INDEX_op_cmp_vec:
--    case INDEX_op_mul_vec:
-     case INDEX_op_shli_vec:
-     case INDEX_op_shri_vec:
-     case INDEX_op_sari_vec:
--        return vece <= MO_32 ? -1 : 0;
-+        return vece <= MO_32 || have_isa_2_07_vsx ? -1 : 0;
-+    case INDEX_op_mul_vec:
-+        switch (vece) {
-+        case MO_8:
-+        case MO_16:
-+            return -1;
-+        case MO_32:
-+            return have_isa_2_07_vsx ? 1 : -1;
-+        }
-+        return 0;
-     case INDEX_op_bitsel_vec:
-         return have_isa_2_06_vsx;
-     default:
-@@ -3029,28 +3083,28 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
-                            const TCGArg *args, const int *const_args)
- {
-     static const uint32_t
--        add_op[4] = { VADDUBM, VADDUHM, VADDUWM, 0 },
--        sub_op[4] = { VSUBUBM, VSUBUHM, VSUBUWM, 0 },
--        eq_op[4]  = { VCMPEQUB, VCMPEQUH, VCMPEQUW, 0 },
--        gts_op[4] = { VCMPGTSB, VCMPGTSH, VCMPGTSW, 0 },
--        gtu_op[4] = { VCMPGTUB, VCMPGTUH, VCMPGTUW, 0 },
-+        add_op[4] = { VADDUBM, VADDUHM, VADDUWM, VADDUDM },
-+        sub_op[4] = { VSUBUBM, VSUBUHM, VSUBUWM, VSUBUDM },
-+        eq_op[4]  = { VCMPEQUB, VCMPEQUH, VCMPEQUW, VCMPEQUD },
-+        gts_op[4] = { VCMPGTSB, VCMPGTSH, VCMPGTSW, VCMPGTSD },
-+        gtu_op[4] = { VCMPGTUB, VCMPGTUH, VCMPGTUW, VCMPGTUD },
-         ssadd_op[4] = { VADDSBS, VADDSHS, VADDSWS, 0 },
-         usadd_op[4] = { VADDUBS, VADDUHS, VADDUWS, 0 },
-         sssub_op[4] = { VSUBSBS, VSUBSHS, VSUBSWS, 0 },
-         ussub_op[4] = { VSUBUBS, VSUBUHS, VSUBUWS, 0 },
--        umin_op[4] = { VMINUB, VMINUH, VMINUW, 0 },
--        smin_op[4] = { VMINSB, VMINSH, VMINSW, 0 },
--        umax_op[4] = { VMAXUB, VMAXUH, VMAXUW, 0 },
--        smax_op[4] = { VMAXSB, VMAXSH, VMAXSW, 0 },
--        shlv_op[4] = { VSLB, VSLH, VSLW, 0 },
--        shrv_op[4] = { VSRB, VSRH, VSRW, 0 },
--        sarv_op[4] = { VSRAB, VSRAH, VSRAW, 0 },
-+        umin_op[4] = { VMINUB, VMINUH, VMINUW, VMINUD },
-+        smin_op[4] = { VMINSB, VMINSH, VMINSW, VMINSD },
-+        umax_op[4] = { VMAXUB, VMAXUH, VMAXUW, VMAXUD },
-+        smax_op[4] = { VMAXSB, VMAXSH, VMAXSW, VMAXSD },
-+        shlv_op[4] = { VSLB, VSLH, VSLW, VSLD },
-+        shrv_op[4] = { VSRB, VSRH, VSRW, VSRD },
-+        sarv_op[4] = { VSRAB, VSRAH, VSRAW, VSRAD },
-         mrgh_op[4] = { VMRGHB, VMRGHH, VMRGHW, 0 },
-         mrgl_op[4] = { VMRGLB, VMRGLH, VMRGLW, 0 },
--        muleu_op[4] = { VMULEUB, VMULEUH, 0, 0 },
--        mulou_op[4] = { VMULOUB, VMULOUH, 0, 0 },
-+        muleu_op[4] = { VMULEUB, VMULEUH, VMULEUW, 0 },
-+        mulou_op[4] = { VMULOUB, VMULOUH, VMULOUW, 0 },
-         pkum_op[4] = { VPKUHUM, VPKUWUM, 0, 0 },
--        rotl_op[4] = { VRLB, VRLH, VRLW, 0 };
-+        rotl_op[4] = { VRLB, VRLH, VRLW, VRLD };
- 
-     TCGType type = vecl + TCG_TYPE_V64;
-     TCGArg a0 = args[0], a1 = args[1], a2 = args[2];
-@@ -3073,6 +3127,10 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
-     case INDEX_op_sub_vec:
-         insn = sub_op[vece];
-         break;
-+    case INDEX_op_mul_vec:
-+        tcg_debug_assert(vece == MO_32 && have_isa_2_07_vsx);
-+        insn = VMULUWM;
-+        break;
-     case INDEX_op_ssadd_vec:
-         insn = ssadd_op[vece];
-         break;
-@@ -3122,6 +3180,9 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
-         insn = VNOR;
-         a2 = a1;
-         break;
-+    case INDEX_op_orc_vec:
-+        insn = VORC;
-+        break;
- 
-     case INDEX_op_cmp_vec:
-         switch (args[3]) {
-@@ -3202,7 +3263,7 @@ static void expand_vec_cmp(TCGType type, unsigned vece, TCGv_vec v0,
- {
-     bool need_swap = false, need_inv = false;
- 
--    tcg_debug_assert(vece <= MO_32);
-+    tcg_debug_assert(vece <= MO_32 || have_isa_2_07_vsx);
- 
-     switch (cond) {
-     case TCG_COND_EQ:
-@@ -3266,6 +3327,7 @@ static void expand_vec_mul(TCGType type, unsigned vece, TCGv_vec v0,
- 	break;
- 
-     case MO_32:
-+        tcg_debug_assert(!have_isa_2_07_vsx);
-         t3 = tcg_temp_new_vec(type);
-         t4 = tcg_temp_new_vec(type);
-         tcg_gen_dupi_vec(MO_8, t4, -16);
-@@ -3561,6 +3623,11 @@ static void tcg_target_init(TCGContext *s)
-             have_isa_2_06_vsx = true;
-         }
-     }
-+    if (hwcap2 & PPC_FEATURE2_ARCH_2_07) {
-+        if (hwcap & PPC_FEATURE_HAS_VSX) {
-+            have_isa_2_07_vsx = true;
-+        }
-+    }
- #ifdef PPC_FEATURE2_ARCH_3_00
-     if (hwcap2 & PPC_FEATURE2_ARCH_3_00) {
-         have_isa_3_00 = true;
--- 
-2.7.4
+Alex, it looks like the relevant commit was one of yours.
+Could you have a look at how easy it would be to support
+systems without clock_gettime/CLOCK_MONOTONIC ?
+I notice that other places in QEMU have #ifdeffery for
+a lack of CLOCK_MONOTONIC, so we should ideally be
+consistent, and either support systems without it, or else
+say we require it and remove the remaining legacy ifdefs...
 
+thanks
+-- PMM
 
