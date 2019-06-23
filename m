@@ -2,55 +2,66 @@ Return-Path: <SRS0=JchA=UW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HEXHASH_WORD,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE205C43613
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Jun 2019 17:31:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18883C43613
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Jun 2019 18:24:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B66E12073F
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Jun 2019 17:31:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B66E12073F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id E6C8520645
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Jun 2019 18:24:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6C8520645
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45994 helo=lists.gnu.org)
+Received: from localhost ([::1]:46312 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hf6KY-0007tx-2W
-	for qemu-devel@archiver.kernel.org; Sun, 23 Jun 2019 13:31:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34335)
+	id 1hf7AV-0006b9-4l
+	for qemu-devel@archiver.kernel.org; Sun, 23 Jun 2019 14:24:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55424)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hf5wk-0001o7-QM
- for qemu-devel@nongnu.org; Sun, 23 Jun 2019 13:06:32 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hf78I-0005Yx-Gc
+ for qemu-devel@nongnu.org; Sun, 23 Jun 2019 14:22:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hf5wg-0004rA-Mx
- for qemu-devel@nongnu.org; Sun, 23 Jun 2019 13:06:28 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:41133 helo=mail.rt-rk.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hf5wZ-0004Ja-E1
- for qemu-devel@nongnu.org; Sun, 23 Jun 2019 13:06:22 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id B5C001A1E02;
- Sun, 23 Jun 2019 19:05:45 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 84D531A1D85;
- Sun, 23 Jun 2019 19:05:45 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Date: Sun, 23 Jun 2019 19:04:45 +0200
-Message-Id: <1561309489-16146-13-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
+ (envelope-from <no-reply@patchew.org>) id 1hf78B-0006WJ-Jp
+ for qemu-devel@nongnu.org; Sun, 23 Jun 2019 14:22:25 -0400
+Resent-Date: Sun, 23 Jun 2019 14:22:24 -0400
+Resent-Message-Id: <E1hf78B-0006WJ-Jp@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21430)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hf785-0006LH-4s
+ for qemu-devel@nongnu.org; Sun, 23 Jun 2019 14:22:19 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1561311374; cv=none; d=zoho.com; s=zohoarc; 
+ b=LeCX5rWartUN7u9Zy5xWMVaZe2U/B7cENJAFlB270OyqGEzp4+te02XqPyQyMqLaRw/w3RZ/kOuw5XHvU9wW3Lvnv3r6PlVM4iadcUOW6CP1jLzOwUA/1JUt9tfEl3u4STyvqm+OR+eOQSrDSeHhlvEeFC1fXwWMZ4MVFp1x9iQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1561311374;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=L5/nSCRymEDojfpOxfWgiztQyhO9MigLVABwj+tu8tk=; 
+ b=ZYu+jcVg7S3IewAXKammYw3wC+SpKtFJK4MqrK71T3tJeeHp/QTnam0C0jL3u6PwXLd3X+P6ZQxaMWK8ieESNfjYMFyYEB9p5Sd/MLvH7vZ7hk9up394JrdfJi99ujmAdoGdVUZsv6s4MX+Ncj8DQjkBGKHl+21VAd2uqLOTb3k=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1561311373759627.9100495419506;
+ Sun, 23 Jun 2019 10:36:13 -0700 (PDT)
 In-Reply-To: <1561309489-16146-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1561309489-16146-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v5 12/16] tcg/ppc: Support vector multiply
+Message-ID: <156131137251.4070.16221244619259102410@ce79690b2cb9>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: aleksandar.markovic@rt-rk.com
+Date: Sun, 23 Jun 2019 10:36:13 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH v5 00/16] tcg/ppc: Add vector opcodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,236 +73,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org,
- "David Gibson --cc=amarkovic @ wavecomp . com"
- <david@gibson.dropbear.id.au>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Aleksandar Markovic <amarkovic@wavecomp.com>, hsp.cat7@gmail.com
+Reply-To: qemu-devel@nongnu.org
+Cc: richard.henderson@linaro.org, mark.cave-ayland@ilande.co.uk,
+ qemu-devel@nongnu.org, amarkovic@wavecomp.com, hsp.cat7@gmail.com,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
-
-For Altivec, this is always an expansion.
-
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- tcg/ppc/tcg-target.h     |   2 +-
- tcg/ppc/tcg-target.inc.c | 112 ++++++++++++++++++++++++++++++++++++++++++++++-
- tcg/ppc/tcg-target.opc.h |   8 ++++
- 3 files changed, 120 insertions(+), 2 deletions(-)
-
-diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
-index 766706f..a130192 100644
---- a/tcg/ppc/tcg-target.h
-+++ b/tcg/ppc/tcg-target.h
-@@ -154,7 +154,7 @@ extern bool have_isa_3_00;
- #define TCG_TARGET_HAS_shs_vec          0
- #define TCG_TARGET_HAS_shv_vec          1
- #define TCG_TARGET_HAS_cmp_vec          1
--#define TCG_TARGET_HAS_mul_vec          0
-+#define TCG_TARGET_HAS_mul_vec          1
- #define TCG_TARGET_HAS_sat_vec          1
- #define TCG_TARGET_HAS_minmax_vec       1
- #define TCG_TARGET_HAS_bitsel_vec       0
-diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-index 3eb18cb..3005c51 100644
---- a/tcg/ppc/tcg-target.inc.c
-+++ b/tcg/ppc/tcg-target.inc.c
-@@ -526,6 +526,25 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
- #define VSRAB      VX4(772)
- #define VSRAH      VX4(836)
- #define VSRAW      VX4(900)
-+#define VRLB       VX4(4)
-+#define VRLH       VX4(68)
-+#define VRLW       VX4(132)
-+
-+#define VMULEUB    VX4(520)
-+#define VMULEUH    VX4(584)
-+#define VMULOUB    VX4(8)
-+#define VMULOUH    VX4(72)
-+#define VMSUMUHM   VX4(38)
-+
-+#define VMRGHB     VX4(12)
-+#define VMRGHH     VX4(76)
-+#define VMRGHW     VX4(140)
-+#define VMRGLB     VX4(268)
-+#define VMRGLH     VX4(332)
-+#define VMRGLW     VX4(396)
-+
-+#define VPKUHUM    VX4(14)
-+#define VPKUWUM    VX4(78)
- 
- #define VAND       VX4(1028)
- #define VANDC      VX4(1092)
-@@ -2876,6 +2895,7 @@ int tcg_can_emit_vec_op(TCGOpcode opc, TCGType type, unsigned vece)
-     case INDEX_op_sarv_vec:
-         return vece <= MO_32;
-     case INDEX_op_cmp_vec:
-+    case INDEX_op_mul_vec:
-     case INDEX_op_shli_vec:
-     case INDEX_op_shri_vec:
-     case INDEX_op_sari_vec:
-@@ -2989,7 +3009,13 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
-         smax_op[4] = { VMAXSB, VMAXSH, VMAXSW, 0 },
-         shlv_op[4] = { VSLB, VSLH, VSLW, 0 },
-         shrv_op[4] = { VSRB, VSRH, VSRW, 0 },
--        sarv_op[4] = { VSRAB, VSRAH, VSRAW, 0 };
-+        sarv_op[4] = { VSRAB, VSRAH, VSRAW, 0 },
-+        mrgh_op[4] = { VMRGHB, VMRGHH, VMRGHW, 0 },
-+        mrgl_op[4] = { VMRGLB, VMRGLH, VMRGLW, 0 },
-+        muleu_op[4] = { VMULEUB, VMULEUH, 0, 0 },
-+        mulou_op[4] = { VMULOUB, VMULOUH, 0, 0 },
-+        pkum_op[4] = { VPKUHUM, VPKUWUM, 0, 0 },
-+        rotl_op[4] = { VRLB, VRLH, VRLW, 0 };
- 
-     TCGType type = vecl + TCG_TYPE_V64;
-     TCGArg a0 = args[0], a1 = args[1], a2 = args[2];
-@@ -3078,6 +3104,29 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
-         }
-         break;
- 
-+    case INDEX_op_ppc_mrgh_vec:
-+        insn = mrgh_op[vece];
-+        break;
-+    case INDEX_op_ppc_mrgl_vec:
-+        insn = mrgl_op[vece];
-+        break;
-+    case INDEX_op_ppc_muleu_vec:
-+        insn = muleu_op[vece];
-+        break;
-+    case INDEX_op_ppc_mulou_vec:
-+        insn = mulou_op[vece];
-+        break;
-+    case INDEX_op_ppc_pkum_vec:
-+        insn = pkum_op[vece];
-+        break;
-+    case INDEX_op_ppc_rotl_vec:
-+        insn = rotl_op[vece];
-+        break;
-+    case INDEX_op_ppc_msum_vec:
-+        tcg_debug_assert(vece == MO_16);
-+        tcg_out32(s, VMSUMUHM | VRT(a0) | VRA(a1) | VRB(a2) | VRC(args[3]));
-+        return;
-+
-     case INDEX_op_mov_vec:  /* Always emitted via tcg_out_mov.  */
-     case INDEX_op_dupi_vec: /* Always emitted via tcg_out_movi.  */
-     case INDEX_op_dup_vec:  /* Always emitted via tcg_out_dup_vec.  */
-@@ -3147,6 +3196,53 @@ static void expand_vec_cmp(TCGType type, unsigned vece, TCGv_vec v0,
-     }
- }
- 
-+static void expand_vec_mul(TCGType type, unsigned vece, TCGv_vec v0,
-+                           TCGv_vec v1, TCGv_vec v2)
-+{
-+    TCGv_vec t1 = tcg_temp_new_vec(type);
-+    TCGv_vec t2 = tcg_temp_new_vec(type);
-+    TCGv_vec t3, t4;
-+
-+    switch (vece) {
-+    case MO_8:
-+    case MO_16:
-+        vec_gen_3(INDEX_op_ppc_muleu_vec, type, vece, tcgv_vec_arg(t1),
-+                  tcgv_vec_arg(v1), tcgv_vec_arg(v2));
-+        vec_gen_3(INDEX_op_ppc_mulou_vec, type, vece, tcgv_vec_arg(t2),
-+                  tcgv_vec_arg(v1), tcgv_vec_arg(v2));
-+        vec_gen_3(INDEX_op_ppc_mrgh_vec, type, vece + 1, tcgv_vec_arg(v0),
-+                  tcgv_vec_arg(t1), tcgv_vec_arg(t2));
-+        vec_gen_3(INDEX_op_ppc_mrgl_vec, type, vece + 1, tcgv_vec_arg(t1),
-+                  tcgv_vec_arg(t1), tcgv_vec_arg(t2));
-+        vec_gen_3(INDEX_op_ppc_pkum_vec, type, vece, tcgv_vec_arg(v0),
-+                  tcgv_vec_arg(v0), tcgv_vec_arg(t1));
-+	break;
-+
-+    case MO_32:
-+        t3 = tcg_temp_new_vec(type);
-+        t4 = tcg_temp_new_vec(type);
-+        tcg_gen_dupi_vec(MO_8, t4, -16);
-+        vec_gen_3(INDEX_op_ppc_rotl_vec, type, MO_32, tcgv_vec_arg(t1),
-+                  tcgv_vec_arg(v2), tcgv_vec_arg(t4));
-+        vec_gen_3(INDEX_op_ppc_mulou_vec, type, MO_16, tcgv_vec_arg(t2),
-+                  tcgv_vec_arg(v1), tcgv_vec_arg(v2));
-+        tcg_gen_dupi_vec(MO_8, t3, 0);
-+        vec_gen_4(INDEX_op_ppc_msum_vec, type, MO_16, tcgv_vec_arg(t3),
-+                  tcgv_vec_arg(v1), tcgv_vec_arg(t1), tcgv_vec_arg(t3));
-+        vec_gen_3(INDEX_op_shlv_vec, type, MO_32, tcgv_vec_arg(t3),
-+                  tcgv_vec_arg(t3), tcgv_vec_arg(t4));
-+        tcg_gen_add_vec(MO_32, v0, t2, t3);
-+        tcg_temp_free_vec(t3);
-+        tcg_temp_free_vec(t4);
-+        break;
-+
-+    default:
-+        g_assert_not_reached();
-+    }
-+    tcg_temp_free_vec(t1);
-+    tcg_temp_free_vec(t2);
-+}
-+
- void tcg_expand_vec_op(TCGOpcode opc, TCGType type, unsigned vece,
-                        TCGArg a0, ...)
- {
-@@ -3173,6 +3269,10 @@ void tcg_expand_vec_op(TCGOpcode opc, TCGType type, unsigned vece,
-         v2 = temp_tcgv_vec(arg_temp(a2));
-         expand_vec_cmp(type, vece, v0, v1, v2, va_arg(va, TCGArg));
-         break;
-+    case INDEX_op_mul_vec:
-+        v2 = temp_tcgv_vec(arg_temp(a2));
-+        expand_vec_mul(type, vece, v0, v1, v2);
-+        break;
-     default:
-         g_assert_not_reached();
-     }
-@@ -3219,6 +3319,8 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     static const TCGTargetOpDef v_r = { .args_ct_str = { "v", "r" } };
-     static const TCGTargetOpDef v_v = { .args_ct_str = { "v", "v" } };
-     static const TCGTargetOpDef v_v_v = { .args_ct_str = { "v", "v", "v" } };
-+    static const TCGTargetOpDef v_v_v_v
-+        = { .args_ct_str = { "v", "v", "v", "v" } };
- 
-     switch (op) {
-     case INDEX_op_goto_ptr:
-@@ -3374,6 +3476,12 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     case INDEX_op_shlv_vec:
-     case INDEX_op_shrv_vec:
-     case INDEX_op_sarv_vec:
-+    case INDEX_op_ppc_mrgh_vec:
-+    case INDEX_op_ppc_mrgl_vec:
-+    case INDEX_op_ppc_muleu_vec:
-+    case INDEX_op_ppc_mulou_vec:
-+    case INDEX_op_ppc_pkum_vec:
-+    case INDEX_op_ppc_rotl_vec:
-         return &v_v_v;
-     case INDEX_op_not_vec:
-     case INDEX_op_dup_vec:
-@@ -3382,6 +3490,8 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     case INDEX_op_st_vec:
-     case INDEX_op_dupm_vec:
-         return &v_r;
-+    case INDEX_op_ppc_msum_vec:
-+        return &v_v_v_v;
- 
-     default:
-         return NULL;
-diff --git a/tcg/ppc/tcg-target.opc.h b/tcg/ppc/tcg-target.opc.h
-index 4816a6c..5c6a5ad 100644
---- a/tcg/ppc/tcg-target.opc.h
-+++ b/tcg/ppc/tcg-target.opc.h
-@@ -1,3 +1,11 @@
- /* Target-specific opcodes for host vector expansion.  These will be
-    emitted by tcg_expand_vec_op.  For those familiar with GCC internals,
-    consider these to be UNSPEC with names.  */
-+
-+DEF(ppc_mrgh_vec, 1, 2, 0, IMPLVEC)
-+DEF(ppc_mrgl_vec, 1, 2, 0, IMPLVEC)
-+DEF(ppc_msum_vec, 1, 3, 0, IMPLVEC)
-+DEF(ppc_muleu_vec, 1, 2, 0, IMPLVEC)
-+DEF(ppc_mulou_vec, 1, 2, 0, IMPLVEC)
-+DEF(ppc_pkum_vec, 1, 2, 0, IMPLVEC)
-+DEF(ppc_rotl_vec, 1, 2, 0, IMPLVEC)
--- 
-2.7.4
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTYxMzA5NDg5LTE2MTQ2LTEt
+Z2l0LXNlbmQtZW1haWwtYWxla3NhbmRhci5tYXJrb3ZpY0BydC1yay5jb20vCgoKCkhpLAoKVGhp
+cyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91
+dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtRZW11LWRldmVsXSBb
+UEFUQ0ggdjUgMDAvMTZdIHRjZy9wcGM6IEFkZCB2ZWN0b3Igb3Bjb2RlcwpUeXBlOiBzZXJpZXMK
+TWVzc2FnZS1pZDogMTU2MTMwOTQ4OS0xNjE0Ni0xLWdpdC1zZW5kLWVtYWlsLWFsZWtzYW5kYXIu
+bWFya292aWNAcnQtcmsuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
+CmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRy
+dWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMv
+Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
+RnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWdd
+ICAgICAgICAgICAgICAgcGF0Y2hldy8xNTYxMzA5NDg5LTE2MTQ2LTEtZ2l0LXNlbmQtZW1haWwt
+YWxla3NhbmRhci5tYXJrb3ZpY0BydC1yay5jb20gLT4gcGF0Y2hldy8xNTYxMzA5NDg5LTE2MTQ2
+LTEtZ2l0LXNlbmQtZW1haWwtYWxla3NhbmRhci5tYXJrb3ZpY0BydC1yay5jb20KU3dpdGNoZWQg
+dG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoyMmQxMzNiN2QzIHRjZy9wcGM6IFVwZGF0ZSB2ZWN0b3Ig
+c3VwcG9ydCB0byB2My4wMAo5MGJiZjUxMTYzIHRjZy9wcGM6IFVwZGF0ZSB2ZWN0b3Igc3VwcG9y
+dCB0byB2Mi4wNwpiNTMzNTY4OGM4IHRjZy9wcGM6IFVwZGF0ZSB2ZWN0b3Igc3VwcG9ydCB0byB2
+Mi4wNgpiNTIxOTAxNDg4IHRjZy9wcGM6IFN1cHBvcnQgdmVjdG9yIGR1cDIKODkyNGU2OGY5NyB0
+Y2cvcHBjOiBTdXBwb3J0IHZlY3RvciBtdWx0aXBseQplMjkzZmZmODBiIHRjZy9wcGM6IFN1cHBv
+cnQgdmVjdG9yIHNoaWZ0IGJ5IGltbWVkaWF0ZQpmNjkwMjIzNzIyIHRjZy9wcGM6IEFkZCBlbXB0
+eSBmaWxlIHRjZy10YXJnZXQub3BjLmgKZTRlNjQxOWY4YyB0Y2cvcHBjOiBQcmVwYXJlIGNhc2Ug
+Zm9yIHZlY3RvciBtdWx0aXBseQo3OTU3ZjhmNDFjIHRjZy9wcGM6IEFkZCBzdXBwb3J0IGZvciB2
+ZWN0b3Igc2F0dXJhdGVkIGFkZC9zdWJ0cmFjdApmZTgwNTM5NmFlIHRjZy9wcGM6IEFkZCBzdXBw
+b3J0IGZvciB2ZWN0b3IgYWRkL3N1YnRyYWN0CjVjYjZjZDBmYzAgdGNnL3BwYzogQWRkIHN1cHBv
+cnQgZm9yIHZlY3RvciBtYXhpbXVtL21pbmltdW0KNDc0N2NlY2RiMSB0Y2cvcHBjOiBBZGQgc3Vw
+cG9ydCBmb3IgbG9hZC9zdG9yZS9sb2dpYy9jb21wYXJpc29uCjQyMWJjNmQ3ZDMgdGNnL3BwYzog
+SW50cm9kdWNlIG1hY3JvcyBWUlQoKSwgVlJBKCksIFZSQigpLCBWUkMoKQowMzc5NzA1ZjhkIHRj
+Zy9wcGM6IEludHJvZHVjZSBtYWNybyBWWDQoKQo3ZmM0NTU0NjQ3IHRjZy9wcGM6IEludHJvZHVj
+ZSBmbGFnIGhhdmVfaXNhX2FsdGl2ZWMKMjljNTVkZGQ5ZiB0Y2cvcHBjOiBJbnRyb2R1Y2UgQWx0
+aXZlYyByZWdpc3RlcnMKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTYgQ2hlY2tpbmcgY29tbWl0
+IDI5YzU1ZGRkOWYyZSAodGNnL3BwYzogSW50cm9kdWNlIEFsdGl2ZWMgcmVnaXN0ZXJzKQoyLzE2
+IENoZWNraW5nIGNvbW1pdCA3ZmM0NTU0NjQ3ODkgKHRjZy9wcGM6IEludHJvZHVjZSBmbGFnIGhh
+dmVfaXNhX2FsdGl2ZWMpCjMvMTYgQ2hlY2tpbmcgY29tbWl0IDAzNzk3MDVmOGQzMSAodGNnL3Bw
+YzogSW50cm9kdWNlIG1hY3JvIFZYNCgpKQpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0
+aGF0ICd8JyAoY3R4OlZ4VikKIzIxOiBGSUxFOiB0Y2cvcHBjL3RjZy10YXJnZXQuaW5jLmM6MzIz
+OgorI2RlZmluZSBWWDQob3BjKSAgKE9QQ0QoNCl8KG9wYykpCiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIF4KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNyBsaW5lcyBjaGVja2VkCgpQ
+YXRjaCAzLzE2IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
+aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
+aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo0LzE2IENoZWNraW5nIGNvbW1p
+dCA0MjFiYzZkN2QzMDggKHRjZy9wcGM6IEludHJvZHVjZSBtYWNyb3MgVlJUKCksIFZSQSgpLCBW
+UkIoKSwgVlJDKCkpCjUvMTYgQ2hlY2tpbmcgY29tbWl0IDQ3NDdjZWNkYjFiMCAodGNnL3BwYzog
+QWRkIHN1cHBvcnQgZm9yIGxvYWQvc3RvcmUvbG9naWMvY29tcGFyaXNvbikKNi8xNiBDaGVja2lu
+ZyBjb21taXQgNWNiNmNkMGZjMDQzICh0Y2cvcHBjOiBBZGQgc3VwcG9ydCBmb3IgdmVjdG9yIG1h
+eGltdW0vbWluaW11bSkKNy8xNiBDaGVja2luZyBjb21taXQgZmU4MDUzOTZhZWUzICh0Y2cvcHBj
+OiBBZGQgc3VwcG9ydCBmb3IgdmVjdG9yIGFkZC9zdWJ0cmFjdCkKOC8xNiBDaGVja2luZyBjb21t
+aXQgNzk1N2Y4ZjQxYzYzICh0Y2cvcHBjOiBBZGQgc3VwcG9ydCBmb3IgdmVjdG9yIHNhdHVyYXRl
+ZCBhZGQvc3VidHJhY3QpCjkvMTYgQ2hlY2tpbmcgY29tbWl0IGU0ZTY0MTlmOGM4OCAodGNnL3Bw
+YzogUHJlcGFyZSBjYXNlIGZvciB2ZWN0b3IgbXVsdGlwbHkpCjEwLzE2IENoZWNraW5nIGNvbW1p
+dCBmNjkwMjIzNzIyMDIgKHRjZy9wcGM6IEFkZCBlbXB0eSBmaWxlIHRjZy10YXJnZXQub3BjLmgp
+CldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5F
+UlMgbmVlZCB1cGRhdGluZz8KIzE0OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCldBUk5JTkc6IEJs
+b2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMxOTogRklM
+RTogdGNnL3BwYy90Y2ctdGFyZ2V0Lm9wYy5oOjE6CisvKiBUYXJnZXQtc3BlY2lmaWMgb3Bjb2Rl
+cyBmb3IgaG9zdCB2ZWN0b3IgZXhwYW5zaW9uLiAgVGhlc2Ugd2lsbCBiZQoKV0FSTklORzogQmxv
+Y2sgY29tbWVudHMgdXNlICogb24gc3Vic2VxdWVudCBsaW5lcwojMjA6IEZJTEU6IHRjZy9wcGMv
+dGNnLXRhcmdldC5vcGMuaDoyOgorLyogVGFyZ2V0LXNwZWNpZmljIG9wY29kZXMgZm9yIGhvc3Qg
+dmVjdG9yIGV4cGFuc2lvbi4gIFRoZXNlIHdpbGwgYmUKKyAgIGVtaXR0ZWQgYnkgdGNnX2V4cGFu
+ZF92ZWNfb3AuICBGb3IgdGhvc2UgZmFtaWxpYXIgd2l0aCBHQ0MgaW50ZXJuYWxzLAoKV0FSTklO
+RzogQmxvY2sgY29tbWVudHMgdXNlIGEgdHJhaWxpbmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiMy
+MTogRklMRTogdGNnL3BwYy90Y2ctdGFyZ2V0Lm9wYy5oOjM6CisgICBjb25zaWRlciB0aGVzZSB0
+byBiZSBVTlNQRUMgd2l0aCBuYW1lcy4gICovCgp0b3RhbDogMCBlcnJvcnMsIDQgd2FybmluZ3Ms
+IDMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTAvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+MTEvMTYgQ2hlY2tpbmcgY29tbWl0IGUyOTNmZmY4MGIzOSAodGNnL3BwYzogU3VwcG9ydCB2ZWN0
+b3Igc2hpZnQgYnkgaW1tZWRpYXRlKQoxMi8xNiBDaGVja2luZyBjb21taXQgODkyNGU2OGY5N2M2
+ICh0Y2cvcHBjOiBTdXBwb3J0IHZlY3RvciBtdWx0aXBseSkKRVJST1I6IGNvZGUgaW5kZW50IHNo
+b3VsZCBuZXZlciB1c2UgdGFicwojMTMzOiBGSUxFOiB0Y2cvcHBjL3RjZy10YXJnZXQuaW5jLmM6
+MzIxOToKK15JYnJlYWs7JAoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxODUgbGluZXMg
+Y2hlY2tlZAoKUGF0Y2ggMTIvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjEzLzE2IENo
+ZWNraW5nIGNvbW1pdCBiNTIxOTAxNDg4NDUgKHRjZy9wcGM6IFN1cHBvcnQgdmVjdG9yIGR1cDIp
+CjE0LzE2IENoZWNraW5nIGNvbW1pdCBiNTMzNTY4OGM4MjcgKHRjZy9wcGM6IFVwZGF0ZSB2ZWN0
+b3Igc3VwcG9ydCB0byB2Mi4wNikKMTUvMTYgQ2hlY2tpbmcgY29tbWl0IDkwYmJmNTExNjM0OSAo
+dGNnL3BwYzogVXBkYXRlIHZlY3RvciBzdXBwb3J0IHRvIHYyLjA3KQoxNi8xNiBDaGVja2luZyBj
+b21taXQgMjJkMTMzYjdkMzI2ICh0Y2cvcHBjOiBVcGRhdGUgdmVjdG9yIHN1cHBvcnQgdG8gdjMu
+MDApCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
+CgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1
+NjEzMDk0ODktMTYxNDYtMS1naXQtc2VuZC1lbWFpbC1hbGVrc2FuZGFyLm1hcmtvdmljQHJ0LXJr
+LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRl
+ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
+IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
 
