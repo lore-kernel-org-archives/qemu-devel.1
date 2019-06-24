@@ -2,90 +2,114 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=BAD_ENC_HEADER,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A1A5C48BE8
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 14:01:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6417BC43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 14:02:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3993A208E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 14:01:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3149520820
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 14:02:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n7L6nSdY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3993A208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="IKsT9Unz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3149520820
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51420 helo=lists.gnu.org)
+Received: from localhost ([::1]:51424 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfPX1-000675-FM
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 10:01:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41590)
+	id 1hfPXm-0006f2-78
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 10:02:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44835)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hfPGJ-0006jE-9z
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 09:44:02 -0400
+ (envelope-from <rkagan@virtuozzo.com>) id 1hfPSJ-0001HI-Iw
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 09:56:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hfPGG-0007fQ-BS
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 09:43:58 -0400
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:37795)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hfPGE-0007Te-Dp
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 09:43:54 -0400
-Received: by mail-wm1-x32f.google.com with SMTP id f17so13455974wme.2
- for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 06:43:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=uy+t0RIuw/tzOoTJEZrmneCaAg6fEiVS+nMeJyBAP3k=;
- b=n7L6nSdYpkNsaNLeVCkJZbgX2kxUGZi3y+GUNDnBySKiSFheCTg+XbRgvVzDqnIAc3
- xI4O4HWe431FqGD4fHwECSF97kcbg3dY6wjk7+pyHD0ZJuGDkfE3OBpdXsisPNQC6vj+
- a4LoJfQPm3K2sHzAY097CBiVHlO5n3LT4iigUWsPaN212/slZ8tNG2SUHjFoMx8wPyej
- MZfoGeoM4ljaehTJhARrCyCmqTZIpRdYkn1rLIv+heONEGFlsQWg1F2TluDHEIdnL/NU
- ZtoUv2N71Kz46Ou+ei3zlLV6f8f6snZzXMI12HejHwHCIryP2IXT6GeYYrjsFN7+CMEi
- a0Ng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=uy+t0RIuw/tzOoTJEZrmneCaAg6fEiVS+nMeJyBAP3k=;
- b=UcONvuvZ9abDTlKHI2iw/B+UZVjDittD9rQd7+/jFi925Y/docotuwG+TaYSqwsx86
- kpYvCCBxdo7C/M1YjgnSQVzscIUBtIjgLIpX0+lJerY0nq2Fhu3xaZYV5dj6J9fuh4c9
- d51nBDElCg9eRjBh1aXiTHR6x3ld3zvDtSRx1vCQoEb0OdMCy6e86ZRNG2ETumQ5SxL+
- 61uvTyMpIVY9G0gcug8ESertKuPwvCwo5SWZNpzqablczlza8gQ9MXkkioVGNszoEOAv
- gSLn9v9IjoSrxiopaUpb4U/LtK6X5thUes7InmsEul3BGZDuztFi8X6hw6F8lQkbR2LR
- vP6g==
-X-Gm-Message-State: APjAAAVB9ZGpRx2cnedzuocty7MlAnU5dMB1fxLv42I49Y2RUaAOCa5B
- uR/9j0CrZLcXtO+7rqpJp9+DCw==
-X-Google-Smtp-Source: APXvYqxRC8zMw1upwti8Y8vWt9odXsZJ0E/rFYA1NdjXTv2JTYTiulwWoGW8heA1rhxOdgBIVKVmAQ==
-X-Received: by 2002:a1c:c255:: with SMTP id s82mr16863185wmf.6.1561383827350; 
- Mon, 24 Jun 2019 06:43:47 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id v15sm9612712wrt.25.2019.06.24.06.43.41
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 24 Jun 2019 06:43:42 -0700 (PDT)
-Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 86B4E1FF87;
- Mon, 24 Jun 2019 14:43:38 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Date: Mon, 24 Jun 2019 14:43:30 +0100
-Message-Id: <20190624134337.10532-13-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190624134337.10532-1-alex.bennee@linaro.org>
-References: <20190624134337.10532-1-alex.bennee@linaro.org>
+ (envelope-from <rkagan@virtuozzo.com>) id 1hfPSI-0004qX-K4
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 09:56:23 -0400
+Received: from mail-bgr052101135048.outbound.protection.outlook.com
+ ([52.101.135.48]:46977 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+ id 1hfPSG-0004j3-9n
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 09:56:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YOZZQe8qSqcBDnTrWpMCHc9KhtWHYFks342NGKUlEgU=;
+ b=IKsT9UnzrHEvDbMgaAy3akmeeYdTwJVc6p/UJJNr10ZdqG6TczFUUIKiy9jB/qRIPIMPYvKL3kNPvAgnYUs87GmfyXOXbXnMg2MBwP+3jArCkKsDiimRvQmCoj5wOtSna0pdFlT+ArDJHm1V30X2BOL9gMKRoeOIiAg1JqXzNUI=
+Received: from VI1PR08MB3981.eurprd08.prod.outlook.com (20.178.126.10) by
+ VI1PR08MB3216.eurprd08.prod.outlook.com (52.133.15.156) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2008.16; Mon, 24 Jun 2019 13:56:10 +0000
+Received: from VI1PR08MB3981.eurprd08.prod.outlook.com
+ ([fe80::70f3:9c8:b21:58]) by VI1PR08MB3981.eurprd08.prod.outlook.com
+ ([fe80::70f3:9c8:b21:58%5]) with mapi id 15.20.2008.014; Mon, 24 Jun 2019
+ 13:56:10 +0000
+From: Roman Kagan <rkagan@virtuozzo.com>
+To: =?iso-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>
+Thread-Topic: [PATCH] target/i386: fix feature check in hyperv-stub.c
+Thread-Index: AQHVKonHdWlzk0C+XUaoVDKJqx3fE6aq1BCA
+Date: Mon, 24 Jun 2019 13:56:10 +0000
+Message-ID: <20190624135607.GA2457@rkaganb.sw.ru>
+References: <20190624123835.28869-1-alex.bennee@linaro.org>
+In-Reply-To: <20190624123835.28869-1-alex.bennee@linaro.org>
+Accept-Language: en-US, ru-RU
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mutt/1.12.0 (2019-05-25)
+mail-followup-to: =?iso-8859-1?Q?Roman_Kagan_<rkagan@virtuozzo.com>,
+ =09Alex_Benn=E9e_<alex.?=
+ =?iso-8859-1?Q?bennee@linaro.org>,=09peter.maydell@linaro.org,_qemu-devel?=
+ =?iso-8859-1?Q?@nongnu.org,=09Vitaly_Kuznetsov_<vkuznets@redhat.com>,=09P?=
+ =?iso-8859-1?Q?aolo_Bonzini_<pbonzini@redhat.com>,=09Richard_Henderson_<r?=
+ =?iso-8859-1?Q?th@twiddle.net>,=09Eduardo_Habkost_<ehabkost@redhat.com>?=
+x-originating-ip: [185.231.240.5]
+x-clientproxiedby: HE1PR02CA0108.eurprd02.prod.outlook.com
+ (2603:10a6:7:29::37) To VI1PR08MB3981.eurprd08.prod.outlook.com
+ (2603:10a6:803:e0::10)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=rkagan@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 71069648-3cc0-4afb-0785-08d6f8abb62d
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:VI1PR08MB3216; 
+x-ms-traffictypediagnostic: VI1PR08MB3216:|VI1PR08MB3216:
+x-microsoft-antispam-prvs: <VI1PR08MB3216CCBE048E731B7F7372F7C9E00@VI1PR08MB3216.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 007814487B
+x-forefront-antispam-report: SFV:SPM;
+ SFS:(10019020)(136003)(346002)(396003)(366004)(376002)(39840400004)(199004)(189003)(6246003)(14454004)(5660300002)(71200400001)(52116002)(71190400001)(66946007)(53936002)(186003)(446003)(316002)(7736002)(486006)(476003)(229853002)(66476007)(8936002)(6436002)(66446008)(25786009)(66556008)(86362001)(64756008)(76176011)(73956011)(81156014)(1076003)(8676002)(6512007)(9686003)(81166006)(6506007)(99286004)(386003)(14444005)(66574012)(6486002)(305945005)(26005)(102836004)(66066001)(6916009)(3846002)(6116002)(54906003)(11346002)(33656002)(58126008)(36756003)(4326008)(2906002)(478600001)(68736007)(256004)(30126002);
+ DIR:OUT; SFP:1501; SCL:5; SRVR:VI1PR08MB3216;
+ H:VI1PR08MB3981.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: AWv0uTkHj1OXZmMlnEPxPrz+CxY5WwRD+ysx3LnlPdYX9TEDRZJ55U3haKfLI0FNAeiX5N62EOMvEFZ0MUhZMIl5UNr7qfKS4Kj5upLHHTZ8ynkymHWwFgSv21C1fTsrArkVPRgqwYecjT6Y6cJ6IYnS4zqbm8BKrFn/tJulKf+QuR5I+NGGdo+oPSLzUaCpT7RmKFDUIqZkOlNjLT/sFvhcY3reFi+WlNCp7uqyWpMSvs3axT5pZyUNOaXSMnP1Zf2e3HC6QjPPXuMhxFKzqoEdXjXGyvevKG10U/NgutE3MU7cYLjx1xHECBLK/7Bav/C98L822EgyMwFd2OAOidagXXQ22FXouPCvoZmMFWMwgGRZCpKbxA1pHjcx+w2xS2btXXYDJRkkqRWWTKEWPjHznJLMu3IcDtRhVyVYq87Qk9t2pkDzkJg5TjH7SllMM2+fBFwgfDyCUPmwEVGF37DJpcea8SI6msdYYpi7WREWj7mgYQtYTqQHHXja3zgR
+Content-Type: text/plain; charset="iso-8859-1"
+Content-ID: <8CCB7F646F3C5B47BF6EE330BDC64F4E@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::32f
-Subject: [Qemu-devel] [PULL 12/19] tests/vm: freebsd autoinstall,
- using serial console
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 71069648-3cc0-4afb-0785-08d6f8abb62d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Jun 2019 13:56:10.1982 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: rkagan@virtuozzo.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3216
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 52.101.135.48
+Subject: Re: [Qemu-devel] [PATCH] target/i386: fix feature check in
+ hyperv-stub.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,252 +121,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Gerd Hoffmann <kraxel@redhat.com>
+On Mon, Jun 24, 2019 at 01:38:35PM +0100, Alex Benn=E9e wrote:
+> Commit 2d384d7c8 broken the build when built with:
+>=20
+>   configure --without-default-devices --disable-user
+>=20
+> The reason was the conversion of cpu->hyperv_synic to
+> cpu->hyperv_synic_kvm_only although the rest of the patch introduces a
+> feature checking mechanism. So I've fixed the KVM_EXIT_HYPERV_SYNIC in
+> hyperv-stub to do the same feature check as in the real hyperv.c
+>=20
+> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Roman Kagan <rkagan@virtuozzo.com>
+> ---
+>  target/i386/hyperv-stub.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Instead of fetching the prebuilt image from patchew download the install
-iso and prepare the image locally.  Install to disk, using the serial
-console.  Create qemu user, configure ssh login.  Install packages
-needed for qemu builds.
+Reviewed-by: Roman Kagan <rkagan@virtuozzo.com>
 
-Note that freebsd package downloads are delivered as non-cachable
-content, so I had to configure squid with "ignore-no-store
-ignore-private ignore-reload" for pkgmir.geo.freebsd.org to make the
-caching actually work.
-
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20190617043858.8290-9-kraxel@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
-diff --git a/tests/vm/freebsd b/tests/vm/freebsd
-index 091be1a065..2a19461a90 100755
---- a/tests/vm/freebsd
-+++ b/tests/vm/freebsd
-@@ -2,41 +2,203 @@
- #
- # FreeBSD VM image
- #
--# Copyright 2017 Red Hat Inc.
-+# Copyright 2017-2019 Red Hat Inc.
- #
- # Authors:
- #  Fam Zheng <famz@redhat.com>
-+#  Gerd Hoffmann <kraxel@redhat.com>
- #
- # This code is licensed under the GPL version 2 or later.  See
- # the COPYING file in the top-level directory.
- #
- 
- import os
-+import re
- import sys
-+import time
-+import socket
- import subprocess
- import basevm
- 
- class FreeBSDVM(basevm.BaseVM):
-     name = "freebsd"
-     arch = "x86_64"
-+
-+    link = "https://download.freebsd.org/ftp/releases/ISO-IMAGES/12.0/FreeBSD-12.0-RELEASE-amd64-disc1.iso.xz"
-+    csum = "1d40015bea89d05b8bd13e2ed80c40b522a9ec1abd8e7c8b80954fb485fb99db"
-+    size = "20G"
-+    pkgs = [
-+        # build tools
-+        "git",
-+        "pkgconf",
-+        "bzip2",
-+
-+        # gnu tools
-+        "bash",
-+        "gmake",
-+        "gsed",
-+        "flex", "bison",
-+
-+        # libs: crypto
-+        "gnutls",
-+
-+        # libs: images
-+        "jpeg-turbo",
-+        "png",
-+
-+        # libs: ui
-+        "sdl2",
-+        "gtk3",
-+        "libxkbcommon",
-+
-+        # libs: opengl
-+        "libepoxy",
-+        "mesa-libs",
-+    ]
-+
-     BUILD_SCRIPT = """
-         set -e;
--        rm -rf /var/tmp/qemu-test.*
--        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
-+        rm -rf /home/qemu/qemu-test.*
-+        cd $(mktemp -d /home/qemu/qemu-test.XXXXXX);
-+        mkdir src build; cd src;
-         tar -xf /dev/vtbd1;
--        ./configure {configure_opts};
-+        cd ../build
-+        ../src/configure --python=python3.6 {configure_opts};
-         gmake --output-sync -j{jobs} {target} {verbose};
-     """
- 
-+    def console_boot_serial(self):
-+        self.console_wait_send("Autoboot", "3")
-+        self.console_wait_send("OK", "set console=comconsole\n")
-+        self.console_wait_send("OK", "boot\n")
-+
-     def build_image(self, img):
--        cimg = self._download_with_cache("http://download.patchew.org/freebsd-11.1-amd64.img.xz",
--                sha256sum='adcb771549b37bc63826c501f05121a206ed3d9f55f49145908f7e1432d65891')
--        img_tmp_xz = img + ".tmp.xz"
-+        self.print_step("Downloading install iso")
-+        cimg = self._download_with_cache(self.link, sha256sum=self.csum)
-         img_tmp = img + ".tmp"
--        sys.stderr.write("Extracting the image...\n")
--        subprocess.check_call(["ln", "-f", cimg, img_tmp_xz])
--        subprocess.check_call(["xz", "--keep", "-dvf", img_tmp_xz])
-+        iso = img + ".install.iso"
-+        iso_xz = iso + ".xz"
-+
-+        self.print_step("Preparing iso and disk image")
-+        subprocess.check_call(["cp", "-f", cimg, iso_xz])
-+        subprocess.check_call(["xz", "-dvf", iso_xz])
-+        subprocess.check_call(["qemu-img", "create", "-f", "qcow2",
-+                               img_tmp, self.size])
-+
-+        self.print_step("Booting installer")
-+        self.boot(img_tmp, extra_args = [
-+            "-bios", "pc-bios/bios-256k.bin",
-+            "-machine", "graphics=off",
-+            "-cdrom", iso
-+        ])
-+        self.console_init()
-+        self.console_boot_serial()
-+        self.console_wait_send("Console type",          "xterm\n")
-+
-+        # pre-install configuration
-+        self.console_wait_send("Welcome",               "\n")
-+        self.console_wait_send("Keymap Selection",      "\n")
-+        self.console_wait_send("Set Hostname",          "freebsd\n")
-+        self.console_wait_send("Distribution Select",   "\n")
-+        self.console_wait_send("Partitioning",          "\n")
-+        self.console_wait_send("Partition",             "\n")
-+        self.console_wait_send("Scheme",                "\n")
-+        self.console_wait_send("Editor",                "f")
-+        self.console_wait_send("Confirmation",          "c")
-+
-+        self.print_step("Installation started now, this will take a while")
-+
-+        # post-install configuration
-+        self.console_wait("New Password:")
-+        self.console_send("%s\n" % self.ROOT_PASS)
-+        self.console_wait("Retype New Password:")
-+        self.console_send("%s\n" % self.ROOT_PASS)
-+
-+        self.console_wait_send("Network Configuration", "\n")
-+        self.console_wait_send("IPv4",                  "y")
-+        self.console_wait_send("DHCP",                  "y")
-+        self.console_wait_send("IPv6",                  "n")
-+        self.console_wait_send("Resolver",              "\n")
-+
-+        self.console_wait_send("Time Zone Selector",    "a\n")
-+        self.console_wait_send("Confirmation",          "y")
-+        self.console_wait_send("Time & Date",           "\n")
-+        self.console_wait_send("Time & Date",           "\n")
-+
-+        self.console_wait_send("System Configuration",  "\n")
-+        self.console_wait_send("System Hardening",      "\n")
-+
-+        # qemu user
-+        self.console_wait_send("Add User Accounts", "y")
-+        self.console_wait("Username")
-+        self.console_send("%s\n" % self.GUEST_USER)
-+        self.console_wait("Full name")
-+        self.console_send("%s\n" % self.GUEST_USER)
-+        self.console_wait_send("Uid",                   "\n")
-+        self.console_wait_send("Login group",           "\n")
-+        self.console_wait_send("Login group",           "\n")
-+        self.console_wait_send("Login class",           "\n")
-+        self.console_wait_send("Shell",                 "\n")
-+        self.console_wait_send("Home directory",        "\n")
-+        self.console_wait_send("Home directory perm",   "\n")
-+        self.console_wait_send("Use password",          "\n")
-+        self.console_wait_send("Use an empty password", "\n")
-+        self.console_wait_send("Use a random password", "\n")
-+        self.console_wait("Enter password:")
-+        self.console_send("%s\n" % self.GUEST_PASS)
-+        self.console_wait("Enter password again:")
-+        self.console_send("%s\n" % self.GUEST_PASS)
-+        self.console_wait_send("Lock out",              "\n")
-+        self.console_wait_send("OK",                    "yes\n")
-+        self.console_wait_send("Add another user",      "no\n")
-+
-+        self.console_wait_send("Final Configuration",   "\n")
-+        self.console_wait_send("Manual Configuration",  "\n")
-+        self.console_wait_send("Complete",              "\n")
-+
-+        self.print_step("Installation finished, rebooting")
-+        self.console_boot_serial()
-+
-+        # setup qemu user
-+        prompt = "$"
-+        self.console_ssh_init(prompt, self.GUEST_USER, self.GUEST_PASS)
-+        self.console_wait_send(prompt, "exit\n")
-+
-+        # setup root user
-+        prompt = "root@freebsd:~ #"
-+        self.console_ssh_init(prompt, "root", self.ROOT_PASS)
-+        self.console_sshd_config(prompt)
-+
-+        # setup serial console
-+        self.console_wait(prompt)
-+        self.console_send("echo 'console=comconsole' >> /boot/loader.conf\n")
-+
-+        # setup boot delay
-+        self.console_wait(prompt)
-+        self.console_send("echo 'autoboot_delay=1' >> /boot/loader.conf\n")
-+
-+        # setup virtio-blk #1 (tarfile)
-+        self.console_wait(prompt)
-+        self.console_send("echo 'chmod 666 /dev/vtbd1' >> /etc/rc.local\n")
-+
-+        self.print_step("Configuration finished, rebooting")
-+        self.console_wait_send(prompt, "reboot\n")
-+        self.console_wait("login:")
-+        self.wait_ssh()
-+
-+        self.print_step("Installing packages")
-+        self.ssh_root_check("pkg install -y %s\n" % " ".join(self.pkgs))
-+
-+        # shutdown
-+        self.ssh_root(self.poweroff)
-+        self.console_wait("Uptime:")
-+        self.wait()
-+
-+        if os.path.exists(img):
-+            os.remove(img)
-         os.rename(img_tmp, img)
-+        os.remove(iso)
-+        self.print_step("All done")
- 
- if __name__ == "__main__":
-     sys.exit(basevm.main(FreeBSDVM))
--- 
-2.20.1
-
+>=20
+> diff --git a/target/i386/hyperv-stub.c b/target/i386/hyperv-stub.c
+> index fe548cbae2..0028527e79 100644
+> --- a/target/i386/hyperv-stub.c
+> +++ b/target/i386/hyperv-stub.c
+> @@ -15,7 +15,7 @@ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_e=
+xit *exit)
+>  {
+>      switch (exit->type) {
+>      case KVM_EXIT_HYPERV_SYNIC:
+> -        if (!cpu->hyperv_synic) {
+> +        if (!hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC)) {
+>              return -1;
+>          }
+> =20
+> --=20
+> 2.20.1
+>=20
 
