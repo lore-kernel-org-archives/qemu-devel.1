@@ -2,66 +2,66 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 834B4C43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 06:14:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 342F1C43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 06:17:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4997E20663
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 06:14:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4997E20663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id EFE1720679
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 06:17:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFE1720679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48178 helo=lists.gnu.org)
+Received: from localhost ([::1]:48200 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfIEp-00014k-7v
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 02:13:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38631)
+	id 1hfIIR-000358-Nm
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 02:17:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39297)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hfIDK-0000M6-CK
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 02:12:28 -0400
+ (envelope-from <peterx@redhat.com>) id 1hfIGK-0001mi-9k
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 02:15:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hfIDI-0005WR-Cy
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 02:12:26 -0400
-Resent-Date: Mon, 24 Jun 2019 02:12:26 -0400
-Resent-Message-Id: <E1hfIDI-0005WR-Cy@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21405)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hfIDI-0005TU-4F
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 02:12:24 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1561356732; cv=none; d=zoho.com; s=zohoarc; 
- b=IwOfpr3WAVukZyrdo6S9fgOGpDkaBGABeQlJ3gmGOcMlTuT3xlyaNnfDtzkV/BvJTBDkOI1z0YegK7HVzmmErRUTOEKrWAiWF6aA8nwgnf8WR6HnESVVEQ+OEHgb/OSS38Dpyqac2Yc3ntsFZpjQgneKf1dSBoUXIkrgsPeunRI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1561356732;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=GoSPoB3Wg/P25Bm3WnMzMMr7UEyf9tDaF9VU/T5bgVk=; 
- b=fSgD3bphDx1TBLsxeWzPgru+HKDGlf2X2xjn4knizOkvntri2tBLk8Z4eAvw/9dgu9zA3aBzcIEqcVd4lLrTPUWjJrGxEQ40VQnkToVKgjU4MTE2jUfdTcAXG3c4zwR7rSsHjYiiAG10Kt4r9D8Z/mAIqS3B38sJwJUC7E2mhsw=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1561356730773410.50512660127856;
- Sun, 23 Jun 2019 23:12:10 -0700 (PDT)
-In-Reply-To: <20190624055442.2973-1-vandersonmr2@gmail.com>
-Message-ID: <156135672991.4070.5354174349753457909@ce79690b2cb9>
+ (envelope-from <peterx@redhat.com>) id 1hfIGI-0002Pi-Fe
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 02:15:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49432)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hfIGI-0002Lj-6G
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 02:15:30 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B92A1308FC4B;
+ Mon, 24 Jun 2019 06:15:26 +0000 (UTC)
+Received: from xz-x1 (ovpn-12-60.pek2.redhat.com [10.72.12.60])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C59E600C4;
+ Mon, 24 Jun 2019 06:15:02 +0000 (UTC)
+Date: Mon, 24 Jun 2019 14:14:59 +0800
+From: Peter Xu <peterx@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Message-ID: <20190624061459.GD6279@xz-x1>
+References: <1560934185-14152-1-git-send-email-yan.y.zhao@intel.com>
+ <39c4c32b-e34a-8d8f-abbc-ab346ec5bed7@redhat.com>
+ <20190620040230.GB9073@xz-x1>
+ <6829b139-3eab-449e-04d6-07f1e381316d@redhat.com>
+ <20190620125955.GB9657@xz-x1> <20190620130443.GC9657@xz-x1>
+ <20190624052255.GA27894@joy-OptiPlex-7040>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: vandersonmr2@gmail.com
-Date: Sun, 23 Jun 2019 23:12:10 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190624052255.GA27894@joy-OptiPlex-7040>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Mon, 24 Jun 2019 06:15:26 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] dumping hot TBs
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] memory: do not do out of bound notification
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,251 +73,365 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Auger Eric <eric.auger@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYyNDA1NTQ0Mi4yOTcz
-LTEtdmFuZGVyc29ubXIyQGdtYWlsLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
-YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
-IGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwLzRdIGR1bXBp
-bmcgaG90IFRCcwpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTA2MjQwNTU0NDIuMjk3My0x
-LXZhbmRlcnNvbm1yMkBnbWFpbC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
-L2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
-ZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2Ny
-aXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQg
-PT09CgpGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3
-IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTkwNjI0MDU1NDQyLjI5NzMtMS12YW5kZXJz
-b25tcjJAZ21haWwuY29tIC0+IHBhdGNoZXcvMjAxOTA2MjQwNTU0NDIuMjk3My0xLXZhbmRlcnNv
-bm1yMkBnbWFpbC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoyMzFjMjgwN2Rk
-IGFkZGluZyAtZCBob3RfdGJzOmxpbWl0IGNvbW1hbmQgbGluZSBvcHRpb24KZDA1OTcxNWRlZCBJ
-bnRyb2R1Y2UgZHVtcCBvZiBob3QgVEJzCjI1ZmU0MmNmYWQgQWRkaW5nIGFuIG9wdGlvbmFsIHRi
-IGV4ZWN1dGlvbiBjb3VudGVyLgo5ZDNlOWIyNWUwIGFkZCBhbmQgbGluayBhIHN0YXRpc3RpYyBz
-dHJ1Y3QgdG8gVEJzCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzQgQ2hlY2tpbmcgY29tbWl0IDlk
-M2U5YjI1ZTAzNiAoYWRkIGFuZCBsaW5rIGEgc3RhdGlzdGljIHN0cnVjdCB0byBUQnMpCkVSUk9S
-OiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMyMzogRklMRTogYWNjZWwvdGNnL3RyYW5zbGF0ZS1hbGwu
-YzoxMTIxOgorc3RhdGljIGdpbnQgc3RhdGlzdGljc19jbXAoZ2NvbnN0cG9pbnRlciBwMSwgZ2Nv
-bnN0cG9pbnRlciBwMikgJAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzI4OiBGSUxFOiBh
-Y2NlbC90Y2cvdHJhbnNsYXRlLWFsbC5jOjExMjY6CisgICAgcmV0dXJuIChhLT5wYyA9PSBiLT5w
-YyAmJiAkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyOTogRklM
-RTogYWNjZWwvdGNnL3RyYW5zbGF0ZS1hbGwuYzoxMTI3OgorXkleSSAgIGEtPmNzX2Jhc2UgPT0g
-Yi0+Y3NfYmFzZSAmJiQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMzMDogRklMRTogYWNj
-ZWwvdGNnL3RyYW5zbGF0ZS1hbGwuYzoxMTI4OgorXkleSSAgIGEtPmZsYWdzID09IGItPmZsYWdz
-ICYmICQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzMwOiBGSUxF
-OiBhY2NlbC90Y2cvdHJhbnNsYXRlLWFsbC5jOjExMjg6CiteSV5JICAgYS0+ZmxhZ3MgPT0gYi0+
-ZmxhZ3MgJiYgJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzE6
-IEZJTEU6IGFjY2VsL3RjZy90cmFuc2xhdGUtYWxsLmM6MTEyOToKK15JICAgICAgIGEtPnBhZ2Vf
-YWRkclswXSA9PSBiLT5wYWdlX2FkZHJbMF0gJiYkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFj
-ZQojMzI6IEZJTEU6IGFjY2VsL3RjZy90cmFuc2xhdGUtYWxsLmM6MTEzMDoKKyAgICBeSSAgIGEt
-PnBhZ2VfYWRkclsxXSA9PSBiLT5wYWdlX2FkZHJbMV0pID8gMCA6IDE7ICQKCkVSUk9SOiBjb2Rl
-IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzMyOiBGSUxFOiBhY2NlbC90Y2cvdHJhbnNs
-YXRlLWFsbC5jOjExMzA6CisgICAgXkkgICBhLT5wYWdlX2FkZHJbMV0gPT0gYi0+cGFnZV9hZGRy
-WzFdKSA/IDAgOiAxOyAkCgpFUlJPUjogb3BlbiBicmFjZSAneycgZm9sbG93aW5nIGZ1bmN0aW9u
-IGRlY2xhcmF0aW9ucyBnbyBvbiB0aGUgbmV4dCBsaW5lCiM0MjogRklMRTogYWNjZWwvdGNnL3Ry
-YW5zbGF0ZS1hbGwuYzoxNjAxOgorc3RhdGljIHZvaWQgdGJfaW5zZXJ0X3N0YXRpc3RpY3Nfc3Ry
-dWN0dXJlKFRyYW5zbGF0aW9uQmxvY2sgKnRiKSB7CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJh
-Y3RlcnMKIzUwOiBGSUxFOiBhY2NlbC90Y2cvdHJhbnNsYXRlLWFsbC5jOjE2MDk6CisgICAgICAg
-R0xpc3QgKmxvb2t1cF9yZXN1bHQgPSBnX2xpc3RfZmluZF9jdXN0b20odGJfY3R4LnRiX3N0YXRp
-c3RpY3MsIG5ld19zdGF0cywgc3RhdGlzdGljc19jbXApOwoKRVJST1I6IGNvZGUgaW5kZW50IHNo
-b3VsZCBuZXZlciB1c2UgdGFicwojNTA6IEZJTEU6IGFjY2VsL3RjZy90cmFuc2xhdGUtYWxsLmM6
-MTYwOToKK15JR0xpc3QgKmxvb2t1cF9yZXN1bHQgPSBnX2xpc3RfZmluZF9jdXN0b20odGJfY3R4
-LnRiX3N0YXRpc3RpY3MsIG5ld19zdGF0cywgc3RhdGlzdGljc19jbXApOyQKCkVSUk9SOiBjb2Rl
-IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzUyOiBGSUxFOiBhY2NlbC90Y2cvdHJhbnNs
-YXRlLWFsbC5jOjE2MTE6CiteSWlmIChsb29rdXBfcmVzdWx0KSB7JAoKV0FSTklORzogbGluZSBv
-dmVyIDgwIGNoYXJhY3RlcnMKIzUzOiBGSUxFOiBhY2NlbC90Y2cvdHJhbnNsYXRlLWFsbC5jOjE2
-MTI6CisgICAgICAgICAgICAgICAvKiBJZiB0aGVyZSBpcyBhbHJlYWR5IGEgVEJTdGF0aXN0aWMg
-Zm9yIHRoaXMgVEIgZnJvbSBhIHByZXZpb3VzIGZsdXNoCgpFUlJPUjogY29kZSBpbmRlbnQgc2hv
-dWxkIG5ldmVyIHVzZSB0YWJzCiM1MzogRklMRTogYWNjZWwvdGNnL3RyYW5zbGF0ZS1hbGwuYzox
-NjEyOgorXkleSS8qIElmIHRoZXJlIGlzIGFscmVhZHkgYSBUQlN0YXRpc3RpYyBmb3IgdGhpcyBU
-QiBmcm9tIGEgcHJldmlvdXMgZmx1c2gkCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBs
-ZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojNTM6IEZJTEU6IGFjY2VsL3RjZy90cmFuc2xh
-dGUtYWxsLmM6MTYxMjoKKyAgICAgICAgICAgICAgIC8qIElmIHRoZXJlIGlzIGFscmVhZHkgYSBU
-QlN0YXRpc3RpYyBmb3IgdGhpcyBUQiBmcm9tIGEgcHJldmlvdXMgZmx1c2gKCkVSUk9SOiBjb2Rl
-IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzU0OiBGSUxFOiBhY2NlbC90Y2cvdHJhbnNs
-YXRlLWFsbC5jOjE2MTM6CiteSV5JKiB0aGVuIGp1c3QgbWFrZSB0aGUgbmV3IFRCIHBvaW50IHRv
-IHRoZSBvbGRlciBUQlN0YXRpc3RpYyQKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHNob3VsZCBh
-bGlnbiB0aGUgKiBvbiBlYWNoIGxpbmUKIzU0OiBGSUxFOiBhY2NlbC90Y2cvdHJhbnNsYXRlLWFs
-bC5jOjE2MTM6CisgICAgICAgICAgICAgICAvKiBJZiB0aGVyZSBpcyBhbHJlYWR5IGEgVEJTdGF0
-aXN0aWMgZm9yIHRoaXMgVEIgZnJvbSBhIHByZXZpb3VzIGZsdXNoCisgICAgICAgICAgICAgICAq
-IHRoZW4ganVzdCBtYWtlIHRoZSBuZXcgVEIgcG9pbnQgdG8gdGhlIG9sZGVyIFRCU3RhdGlzdGlj
-CgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM1NTogRklMRTogYWNj
-ZWwvdGNnL3RyYW5zbGF0ZS1hbGwuYzoxNjE0OgorXkleSSovJAoKRVJST1I6IGNvZGUgaW5kZW50
-IHNob3VsZCBuZXZlciB1c2UgdGFicwojNTY6IEZJTEU6IGFjY2VsL3RjZy90cmFuc2xhdGUtYWxs
-LmM6MTYxNToKK15JXklmcmVlKG5ld19zdGF0cyk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3Vs
-ZCBuZXZlciB1c2UgdGFicwojNTc6IEZJTEU6IGFjY2VsL3RjZy90cmFuc2xhdGUtYWxsLmM6MTYx
-NjoKKyAgICBeSXRiLT50Yl9zdGF0cyA9IGxvb2t1cF9yZXN1bHQtPmRhdGE7JAoKRVJST1I6IGNv
-ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNTg6IEZJTEU6IGFjY2VsL3RjZy90cmFu
-c2xhdGUtYWxsLmM6MTYxNzoKK15JfSBlbHNlIHskCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
-cmFjdGVycwojNTk6IEZJTEU6IGFjY2VsL3RjZy90cmFuc2xhdGUtYWxsLmM6MTYxODoKKyAgICAg
-ICAgICAgICAgIC8qIElmIG5vdCwgdGhlbiBwb2ludHMgdG8gdGhlIG5ldyB0Yl9zdGF0aXN0aWNz
-IGFuZCBhZGQgaXQgdG8gdGhlIGhhc2ggKi8KCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2
-ZXIgdXNlIHRhYnMKIzU5OiBGSUxFOiBhY2NlbC90Y2cvdHJhbnNsYXRlLWFsbC5jOjE2MTg6Cite
-SV5JLyogSWYgbm90LCB0aGVuIHBvaW50cyB0byB0aGUgbmV3IHRiX3N0YXRpc3RpY3MgYW5kIGFk
-ZCBpdCB0byB0aGUgaGFzaCAqLyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNl
-IHRhYnMKIzYwOiBGSUxFOiBhY2NlbC90Y2cvdHJhbnNsYXRlLWFsbC5jOjE2MTk6CiteSV5JdGIt
-PnRiX3N0YXRzID0gbmV3X3N0YXRzOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIg
-dXNlIHRhYnMKIzYxOiBGSUxFOiBhY2NlbC90Y2cvdHJhbnNsYXRlLWFsbC5jOjE2MjA6CisgICAg
-Xkl0Yl9jdHgudGJfc3RhdGlzdGljcyA9IGdfbGlzdF9wcmVwZW5kKHRiX2N0eC50Yl9zdGF0aXN0
-aWNzLCBuZXdfc3RhdHMpOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRh
-YnMKIzYyOiBGSUxFOiBhY2NlbC90Y2cvdHJhbnNsYXRlLWFsbC5jOjE2MjE6CiteSX0kCgpFUlJP
-UjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM3MzogRklMRTogYWNjZWwvdGNn
-L3RyYW5zbGF0ZS1hbGwuYzoxNjc1OgorICAgICAgICBeSS8qIGNyZWF0ZSBhbmQgbGluayB0byBp
-dHMgVEIgYSBzdHJ1Y3R1cmUgdG8gc3RvcmUgc3RhdGlzdGljcyAqLyQKCkVSUk9SOiBjb2RlIGlu
-ZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzc0OiBGSUxFOiBhY2NlbC90Y2cvdHJhbnNsYXRl
-LWFsbC5jOjE2NzY6CisgICAgICAgIF5JdGJfaW5zZXJ0X3N0YXRpc3RpY3Nfc3RydWN0dXJlKHRi
-KTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM3NTogRklMRTog
-YWNjZWwvdGNnL3RyYW5zbGF0ZS1hbGwuYzoxNjc3OgorXkleSX0kCgpFUlJPUjogdHJhaWxpbmcg
-d2hpdGVzcGFjZQojODg6IEZJTEU6IGluY2x1ZGUvZXhlYy9leGVjLWFsbC5oOjMyNzoKK3R5cGVk
-ZWYgc3RydWN0IFRCU3RhdGlzdGljcyBUQlN0YXRpc3RpY3M7ICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJAoKRVJST1I6IGxpbmUgb3ZlciA5MCBj
-aGFyYWN0ZXJzCiM4ODogRklMRTogaW5jbHVkZS9leGVjL2V4ZWMtYWxsLmg6MzI3OgordHlwZWRl
-ZiBzdHJ1Y3QgVEJTdGF0aXN0aWNzIFRCU3RhdGlzdGljczsgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNw
-YWNlCiM5MDogRklMRTogaW5jbHVkZS9leGVjL2V4ZWMtYWxsLmg6MzI5OgorLyogJAoKV0FSTklO
-RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzkxOiBGSUxFOiBpbmNsdWRlL2V4ZWMvZXhlYy1h
-bGwuaDozMzA6CisgKiBUaGlzIHN0cnVjdCBzdG9yZXMgc3RhdGlzdGljcyBzdWNoIGFzIGV4ZWN1
-dGlvbiBjb3VudCBvZiB0aGUgVHJhbnNsYXRpb25CbG9ja3MuCgpFUlJPUjogdHJhaWxpbmcgd2hp
-dGVzcGFjZQojOTI6IEZJTEU6IGluY2x1ZGUvZXhlYy9leGVjLWFsbC5oOjMzMToKKyAqIEVhY2gg
-VEIgaGFzIGl0cyBvd24gVEJTdGF0aXN0aWNzLiBUQlN0YXRpc3RpY3MgaXMgc3VwcG9zZSB0byBs
-aXZlIGV2ZW4gYWZ0ZXIgJAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzk1OiBGSUxFOiBp
-bmNsdWRlL2V4ZWMvZXhlYy1hbGwuaDozMzQ6CitzdHJ1Y3QgVEJTdGF0aXN0aWNzIHsgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICQKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojOTU6IEZJTEU6IGlu
-Y2x1ZGUvZXhlYy9leGVjLWFsbC5oOjMzNDoKK3N0cnVjdCBUQlN0YXRpc3RpY3MgeyAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojOTY6IEZJTEU6IGluY2x1ZGUv
-ZXhlYy9leGVjLWFsbC5oOjMzNToKKyAgICB0YXJnZXRfdWxvbmcgcGM7ICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgJAoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM5NjogRklMRTogaW5jbHVkZS9l
-eGVjL2V4ZWMtYWxsLmg6MzM1OgorICAgIHRhcmdldF91bG9uZyBwYzsgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM5NzogRklMRTogaW5jbHVkZS9leGVjL2V4
-ZWMtYWxsLmg6MzM2OgorICAgIHRhcmdldF91bG9uZyBjc19iYXNlOyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAkCgpF
-UlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzk3OiBGSUxFOiBpbmNsdWRlL2V4ZWMvZXhl
-Yy1hbGwuaDozMzY6CisgICAgdGFyZ2V0X3Vsb25nIGNzX2Jhc2U7ICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAoKRVJS
-T1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzk4OiBGSUxFOiBpbmNsdWRlL2V4ZWMvZXhlYy1hbGwu
-aDozMzc6CisgICAgdWludDMyX3QgZmxhZ3M7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICQKCkVSUk9SOiBs
-aW5lIG92ZXIgOTAgY2hhcmFjdGVycwojOTg6IEZJTEU6IGluY2x1ZGUvZXhlYy9leGVjLWFsbC5o
-OjMzNzoKKyAgICB1aW50MzJfdCBmbGFnczsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCgpFUlJPUjogdHJh
-aWxpbmcgd2hpdGVzcGFjZQojOTk6IEZJTEU6IGluY2x1ZGUvZXhlYy9leGVjLWFsbC5oOjMzODoK
-KyAgICB0Yl9wYWdlX2FkZHJfdCBwYWdlX2FkZHJbMl07ICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJAoKRVJST1I6IGxpbmUgb3Zl
-ciA5MCBjaGFyYWN0ZXJzCiM5OTogRklMRTogaW5jbHVkZS9leGVjL2V4ZWMtYWxsLmg6MzM4Ogor
-ICAgIHRiX3BhZ2VfYWRkcl90IHBhZ2VfYWRkclsyXTsgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKCkVSUk9SOiB0cmFpbGluZyB3
-aGl0ZXNwYWNlCiMxMDE6IEZJTEU6IGluY2x1ZGUvZXhlYy9leGVjLWFsbC5oOjM0MDoKKyAgICAv
-LyB0b3RhbCBudW1iZXIgb2YgdGltZXMgdGhhdCB0aGUgcmVsYXRlZCBUQiBoYXZlIGJlaW5nIGV4
-ZWN1dGVkICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJAoKRVJST1I6IGxpbmUgb3ZlciA5MCBj
-aGFyYWN0ZXJzCiMxMDE6IEZJTEU6IGluY2x1ZGUvZXhlYy9leGVjLWFsbC5oOjM0MDoKKyAgICAv
-LyB0b3RhbCBudW1iZXIgb2YgdGltZXMgdGhhdCB0aGUgcmVsYXRlZCBUQiBoYXZlIGJlaW5nIGV4
-ZWN1dGVkICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCgpFUlJPUjogZG8gbm90IHVzZSBDOTkg
-Ly8gY29tbWVudHMKIzEwMTogRklMRTogaW5jbHVkZS9leGVjL2V4ZWMtYWxsLmg6MzQwOgorICAg
-IC8vIHRvdGFsIG51bWJlciBvZiB0aW1lcyB0aGF0IHRoZSByZWxhdGVkIFRCIGhhdmUgYmVpbmcg
-ZXhlY3V0ZWQgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKCkVSUk9SOiB0cmFpbGluZyB3aGl0
-ZXNwYWNlCiMxMDI6IEZJTEU6IGluY2x1ZGUvZXhlYy9leGVjLWFsbC5oOjM0MToKKyAgICB1aW50
-MzJfdCBleGVjX2NvdW50OyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJAoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFy
-YWN0ZXJzCiMxMDI6IEZJTEU6IGluY2x1ZGUvZXhlYy9leGVjLWFsbC5oOjM0MToKKyAgICB1aW50
-MzJfdCBleGVjX2NvdW50OyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFj
-ZQojMTAzOiBGSUxFOiBpbmNsdWRlL2V4ZWMvZXhlYy1hbGwuaDozNDI6CisgICAgdWludDMyX3Qg
-ZXhlY19jb3VudF9vdmVyZmxvd3M7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICQKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVy
-cwojMTAzOiBGSUxFOiBpbmNsdWRlL2V4ZWMvZXhlYy1hbGwuaDozNDI6CisgICAgdWludDMyX3Qg
-ZXhlY19jb3VudF9vdmVyZmxvd3M7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzEw
-NDogRklMRTogaW5jbHVkZS9leGVjL2V4ZWMtYWxsLmg6MzQzOgorfTsgICQKCkVSUk9SOiBkbyBu
-b3QgdXNlIEM5OSAvLyBjb21tZW50cwojMTE0OiBGSUxFOiBpbmNsdWRlL2V4ZWMvZXhlYy1hbGwu
-aDo0MjU6CisgICAgLy8gUG9pbnRlciB0byBhIHN0cnVjdCB3aGVyZSBzdGF0aXN0aWNzIGZyb20g
-dGhlIFRCIGlzIHN0b3JlZAoKdG90YWw6IDQ4IGVycm9ycywgNSB3YXJuaW5ncywgMTA1IGxpbmVz
-IGNoZWNrZWQKClBhdGNoIDEvNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMi80IENoZWNr
-aW5nIGNvbW1pdCAyNWZlNDJjZmFkMDggKEFkZGluZyBhbiBvcHRpb25hbCB0YiBleGVjdXRpb24g
-Y291bnRlci4pCkVSUk9SOiAiKGZvbyopIiBzaG91bGQgYmUgIihmb28gKikiCiMyNTogRklMRTog
-YWNjZWwvdGNnL3RjZy1ydW50aW1lLmM6MTczOgorICAgIFRyYW5zbGF0aW9uQmxvY2sgKnRiID0g
-KFRyYW5zbGF0aW9uQmxvY2sqKSBwdHI7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
-cwojMjY6IEZJTEU6IGFjY2VsL3RjZy90Y2ctcnVudGltZS5jOjE3NDoKKyAgICAvLyBpZiBvdmVy
-Zmxvd3MsIHRoZW4gcmVzZXQgdGhlIGV4ZWN1dGlvbiBjb3VudGVyIGFuZCBpbmNyZW1lbnQgdGhl
-IG92ZXJmbG93IGNvdW50ZXIKCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMjY6
-IEZJTEU6IGFjY2VsL3RjZy90Y2ctcnVudGltZS5jOjE3NDoKKyAgICAvLyBpZiBvdmVyZmxvd3Ms
-IHRoZW4gcmVzZXQgdGhlIGV4ZWN1dGlvbiBjb3VudGVyIGFuZCBpbmNyZW1lbnQgdGhlIG92ZXJm
-bG93IGNvdW50ZXIKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNzogRklMRTog
-YWNjZWwvdGNnL3RjZy1ydW50aW1lLmM6MTc1OgorICAgIGlmIChhdG9taWNfY21weGNoZygmdGIt
-PnRiX3N0YXRzLT5leGVjX2NvdW50LCAweEZGRkZGRkZGLCAwKSA9PSAweEZGRkZGRkZGKSB7Cgp0
-b3RhbDogMiBlcnJvcnMsIDIgd2FybmluZ3MsIDQzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvNCBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMy80IENoZWNraW5nIGNvbW1pdCBkMDU5NzE1ZGVk
-YTAgKEludHJvZHVjZSBkdW1wIG9mIGhvdCBUQnMpCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFj
-dGVycwojMzA6IEZJTEU6IGFjY2VsL3RjZy90cmFuc2xhdGUtYWxsLmM6MTI1MjoKKyAgICBxZW11
-X2xvZygiRXhlY3V0aW9uIENvdW50OiBcdCVsdVxuXG4iLCAodWludDY0X3QpICh0YnMtPmV4ZWNf
-Y291bnQgKyB0YnMtPmV4ZWNfY291bnRfb3ZlcmZsb3dzKjB4RkZGRkZGRkYpKTsKCkVSUk9SOiBz
-cGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6VnhWKQojMzA6IEZJTEU6IGFjY2Vs
-L3RjZy90cmFuc2xhdGUtYWxsLmM6MTI1MjoKKyAgICBxZW11X2xvZygiRXhlY3V0aW9uIENvdW50
-OiBcdCVsdVxuXG4iLCAodWludDY0X3QpICh0YnMtPmV4ZWNfY291bnQgKyB0YnMtPmV4ZWNfY291
-bnRfb3ZlcmZsb3dzKjB4RkZGRkZGRkYpKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgXgoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzMzogRklMRTog
-YWNjZWwvdGNnL3RyYW5zbGF0ZS1hbGwuYzoxMjU1OgorICAgIFRyYW5zbGF0aW9uQmxvY2sgKnRi
-ID0gdGJfZ2VuX2NvZGUoY3VycmVudF9jcHUsIHRicy0+cGMsIHRicy0+Y3NfYmFzZSwgdGJzLT5m
-bGFncywgY2ZsYWdzKTsKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM0OTogRklMRTogYWNj
-ZWwvdGNnL3RyYW5zbGF0ZS1hbGwuYzoxMzAwOgorc3RhdGljIGdpbnQgaW52ZXJzZV9zb3J0X3Ri
-cyhnY29uc3Rwb2ludGVyIHAxLCBnY29uc3Rwb2ludGVyIHAyKSAkCgpFUlJPUjogbGluZSBvdmVy
-IDkwIGNoYXJhY3RlcnMKIzUzOiBGSUxFOiBhY2NlbC90Y2cvdHJhbnNsYXRlLWFsbC5jOjEzMDQ6
-CisgICAgdWludDY0X3QgcDFfY291bnQgPSAodWludDY0X3QpICh0YnMxLT5leGVjX2NvdW50ICsg
-dGJzMS0+ZXhlY19jb3VudF9vdmVyZmxvd3MqMHhGRkZGRkZGRik7CgpFUlJPUjogc3BhY2VzIHJl
-cXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4OlZ4VikKIzUzOiBGSUxFOiBhY2NlbC90Y2cvdHJh
-bnNsYXRlLWFsbC5jOjEzMDQ6CisgICAgdWludDY0X3QgcDFfY291bnQgPSAodWludDY0X3QpICh0
-YnMxLT5leGVjX2NvdW50ICsgdGJzMS0+ZXhlY19jb3VudF9vdmVyZmxvd3MqMHhGRkZGRkZGRik7
-CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3Rl
-cnMKIzU0OiBGSUxFOiBhY2NlbC90Y2cvdHJhbnNsYXRlLWFsbC5jOjEzMDU6CisgICAgdWludDY0
-X3QgcDJfY291bnQgPSAodWludDY0X3QpICh0YnMyLT5leGVjX2NvdW50ICsgdGJzMi0+ZXhlY19j
-b3VudF9vdmVyZmxvd3MqMHhGRkZGRkZGRik7CgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3Vu
-ZCB0aGF0ICcqJyAoY3R4OlZ4VikKIzU0OiBGSUxFOiBhY2NlbC90Y2cvdHJhbnNsYXRlLWFsbC5j
-OjEzMDU6CisgICAgdWludDY0X3QgcDJfY291bnQgPSAodWludDY0X3QpICh0YnMyLT5leGVjX2Nv
-dW50ICsgdGJzMi0+ZXhlY19jb3VudF9vdmVyZmxvd3MqMHhGRkZGRkZGRik7CiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBeCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJz
-CiM2NjogRklMRTogYWNjZWwvdGNnL3RyYW5zbGF0ZS1hbGwuYzoxMzE3OgorXkkgICAgdGJfZHVt
-cF9zdGF0aXN0aWNzKChUQlN0YXRpc3RpY3MgKikgaS0+ZGF0YSk7JAoKdG90YWw6IDkgZXJyb3Jz
-LCAwIHdhcm5pbmdzLCA2MyBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzQgaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KCjQvNCBDaGVja2luZyBjb21taXQgMjMxYzI4MDdkZDc4IChhZGRpbmcgLWQg
-aG90X3RiczpsaW1pdCBjb21tYW5kIGxpbmUgb3B0aW9uKQo9PT0gT1VUUFVUIEVORCA9PT0KClRl
-c3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJs
-ZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDYyNDA1NTQ0Mi4yOTczLTEtdmFuZGVy
-c29ubXIyQGdtYWlsLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVt
-YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5v
-cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5j
-b20=
+On Mon, Jun 24, 2019 at 01:22:55AM -0400, Yan Zhao wrote:
+> On Thu, Jun 20, 2019 at 09:04:43PM +0800, Peter Xu wrote:
+> > On Thu, Jun 20, 2019 at 08:59:55PM +0800, Peter Xu wrote:
+> > > On Thu, Jun 20, 2019 at 10:35:29AM +0200, Paolo Bonzini wrote:
+> > > > On 20/06/19 06:02, Peter Xu wrote:
+> > > > > Seems workable, to be explicit - we can even cut it into chunks with
+> > > > > different size to be efficient.
+> > > > 
+> > > > Yes, this is not hard (completely untested):
+> > > > 
+> > > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> > > > index 44b1231157..541538bc6c 100644
+> > > > --- a/hw/i386/intel_iommu.c
+> > > > +++ b/hw/i386/intel_iommu.c
+> > > > @@ -3388,39 +3388,34 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+> > > >      }
+> > > >  
+> > > >      assert(start <= end);
+> > > > -    size = end - start;
+> > > > +    while (end > start) {
+> > > > +        size = end - start;
+> > > > +        /* Only keep the lowest bit of either size or start.  */
+> > > > +        size = MIN(size & -size, start & -start);
+> > > 
+> > > I feel like this can be problematic.  I'm imaging:
+> > > 
+> > > start=0x1000_0000, size=0x1000_1000
+> > > 
+> > > This will get size=0x1000 but actually we can do size=0x1000_0000 as
+> > > the first.
+> > > 
+> > > > +        /* Should not happen, but limit to address width too just in case */
+> > > > +        size = MIN(size, 1ULL << s->aw_bits);
+> > > >  
+> > > > -    if (ctpop64(size) != 1) {
+> > > > -        /*
+> > > > -         * This size cannot format a correct mask. Let's enlarge it to
+> > > > -         * suite the minimum available mask.
+> > > > -         */
+> > > > -        int n = 64 - clz64(size);
+> > > > -        if (n > s->aw_bits) {
+> > > > -            /* should not happen, but in case it happens, limit it */
+> > > > -            n = s->aw_bits;
+> > > > -        }
+> > > > -        size = 1ULL << n;
+> > > > -    }
+> > > > +        assert((start & (size - 1)) == 0);
+> > > >  
+> > > > -    entry.target_as = &address_space_memory;
+> > > > -    /* Adjust iova for the size */
+> > > > -    entry.iova = n->start & ~(size - 1);
+> > > > -    /* This field is meaningless for unmap */
+> > > > -    entry.translated_addr = 0;
+> > > > -    entry.perm = IOMMU_NONE;
+> > > > -    entry.addr_mask = size - 1;
+> > > > +        entry.target_as = &address_space_memory;
+> > > > +        entry.iova = start;
+> > > > +        /* This field is meaningless for unmap */
+> > > > +        entry.translated_addr = 0;
+> > > > +        entry.perm = IOMMU_NONE;
+> > > > +        entry.addr_mask = size - 1;
+> > > 
+> > > (some of the fields can be moved out of loop because they are
+> > >  constants)
+> > > 
+> > > >  
+> > > > -    trace_vtd_as_unmap_whole(pci_bus_num(as->bus),
+> > > > -                             VTD_PCI_SLOT(as->devfn),
+> > > > -                             VTD_PCI_FUNC(as->devfn),
+> > > > -                             entry.iova, size);
+> > > > +        trace_vtd_as_unmap_whole(pci_bus_num(as->bus),
+> > > > +                                 VTD_PCI_SLOT(as->devfn),
+> > > > +                                 VTD_PCI_FUNC(as->devfn),
+> > > > +                                 entry.iova, size);
+> > > 
+> > > Can move this out because this is a trace only so we don't have
+> > > restriction on mask?
+> > > 
+> > > >  
+> > > > -    map.iova = entry.iova;
+> > > > -    map.size = entry.addr_mask;
+> > > > -    iova_tree_remove(as->iova_tree, &map);
+> > > > +        map.iova = entry.iova;
+> > > > +        map.size = entry.addr_mask;
+> > > > +        iova_tree_remove(as->iova_tree, &map);
+> > > 
+> > > Same here?
+> > > 
+> > > >  
+> > > > -    memory_region_notify_one(n, &entry);
+> > > > +        memory_region_notify_one(n, &entry);
+> > > > +        start += size;
+> > > > +    }
+> > > >  }
+> > > >  
+> > > >  static void vtd_address_space_unmap_all(IntelIOMMUState *s)
+> > > > 
+> > > > 
+> > > > Yan,
+> > > > 
+> > > > if something like this works for you, let me know and I will submit it
+> > > > as a proper patch.
+> > > > 
+> > > > Paolo
+> > > 
+> > > Since during review I'm thinking how to generate a correct sequence of
+> > > these masks... here's my try below with above issues fixed... :)
+> > > 
+> > > I've tried compile but not tested.  Yan can test it, or I can do it
+> > > too tomorrow after I find some machines.
+> > > 
+> > > Thanks,
+> > > 
+> > > ------------------------------------------------------------
+> > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> > > index 44b1231157..cfbd225f0a 100644
+> > > --- a/hw/i386/intel_iommu.c
+> > > +++ b/hw/i386/intel_iommu.c
+> > > @@ -3363,11 +3363,32 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+> > >      return vtd_dev_as;
+> > >  }
+> > > 
+> > > +static uint64_t vtd_get_next_mask(uint64_t start, uint64_t size, int gaw)
+> > > +{
+> > > +    /* Tries to find smallest mask from start first */
+> > > +    uint64_t rmask = start & -start, max_mask = 1ULL << gaw;
+> > > +
+> > > +    assert(size && gaw > 0 && gaw < 64);
+> > > +
+> > > +    /* Zero start, or too big */
+> > > +    if (!rmask || rmask > max_mask) {
+> > > +        rmask = max_mask;
+> > > +    }
+> > > +
+> > > +    /* If the start mask worked, then use it */
+> > > +    if (rmask <= size) {
+> > > +        return rmask;
+> > > +    }
+> > > +
+> > > +    /* Find the largest page mask from size */
+> > > +    return 1ULL << (63 - clz64(size));
+> > > +}
+> > > +
+> > >  /* Unmap the whole range in the notifier's scope. */
+> > >  static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+> > >  {
+> > >      IOMMUTLBEntry entry;
+> > > -    hwaddr size;
+> > > +    hwaddr size, remain;
+> > >      hwaddr start = n->start;
+> > >      hwaddr end = n->end;
+> > >      IntelIOMMUState *s = as->iommu_state;
+> > > @@ -3388,39 +3409,28 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+> > >      }
+> > > 
+> > >      assert(start <= end);
+> > > -    size = end - start;
+> > > -
+> > > -    if (ctpop64(size) != 1) {
+> > > -        /*
+> > > -         * This size cannot format a correct mask. Let's enlarge it to
+> > > -         * suite the minimum available mask.
+> > > -         */
+> > > -        int n = 64 - clz64(size);
+> > > -        if (n > s->aw_bits) {
+> > > -            /* should not happen, but in case it happens, limit it */
+> > > -            n = s->aw_bits;
+> > > -        }
+> > > -        size = 1ULL << n;
+> > > -    }
+> > > -
+> > > +    size = remain = end - start;
+> > >      entry.target_as = &address_space_memory;
+> > > -    /* Adjust iova for the size */
+> > > -    entry.iova = n->start & ~(size - 1);
+> > > +    entry.perm = IOMMU_NONE;
+> > >      /* This field is meaningless for unmap */
+> > >      entry.translated_addr = 0;
+> > > -    entry.perm = IOMMU_NONE;
+> > > -    entry.addr_mask = size - 1;
+> > > +
+> > > +    while (remain) {
+> > > +        uint64_t mask = vtd_get_next_mask(start, remain, s->aw_bits);
+> > > +
+> > > +        entry.iova = start;
+> > > +        entry.addr_mask = mask - 1;
+> > > +        memory_region_notify_one(n, &entry);
+> > 
+> > Sorry, I at least missed these lines:
+> > 
+> >            start += mask;
+> >            remain -= mask;
+> > 
+> > > +    }
+> > > 
+> > >      trace_vtd_as_unmap_whole(pci_bus_num(as->bus),
+> > >                               VTD_PCI_SLOT(as->devfn),
+> > >                               VTD_PCI_FUNC(as->devfn),
+> > > -                             entry.iova, size);
+> > > +                             n->start, size);
+> > > 
+> > > -    map.iova = entry.iova;
+> > > -    map.size = entry.addr_mask;
+> > > +    map.iova = n->start;
+> > > +    map.size = size;
+> > >      iova_tree_remove(as->iova_tree, &map);
+> > > -
+> > > -    memory_region_notify_one(n, &entry);
+> > >  }
+> > > 
+> > >  static void vtd_address_space_unmap_all(IntelIOMMUState *s)
+> > > ------------------------------------------------------------
+> > > 
+> > > Regards,
+> > > 
+> > > -- 
+> > > Peter Xu
+> > 
+> > Regards,
+> > 
+> > -- 
+> > Peter Xu
+> 
+> hi Peter and Paolo,
+> I tested with code and it's fine in my side.
+> It's base on your version with some minor modifications, such as size is
+> now  (end - start + 1) now.
+> Thanks
+> Yan
 
+Hi, Yan,
+
+Thanks for testing the patches.  I think below change [1] is not
+related to the problem so I tend to split it out.  For [2] I'll change
+to an assertion if you won't disagree.  I'll reorganize the patches
+and post a formal version with proper authorships soon.
+
+Thanks,
+
+> 
+> +static uint64_t vtd_get_next_mask(uint64_t start, uint64_t size, int gaw)
+> +{
+> +    /* Tries to find smallest mask from start first */
+> +    uint64_t rmask = start & -start, max_mask = 1ULL << gaw;
+> +    assert(size && gaw > 0 && gaw < 64);
+> +    /* Zero start, or too big */
+> +    if (!rmask || rmask > max_mask) {
+> +        rmask = max_mask;
+> +    }
+> +    /* If the start mask worked, then use it */
+> +    if (rmask <= size) {
+> +        return rmask;
+> +    }
+> +
+> +    /* Find the largest page mask from size */
+> +    return 1ULL << (63 - clz64(size));
+> +}
+> +
+>  /* Unmap the whole range in the notifier's scope. */
+>  static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+>  {
+>      IOMMUTLBEntry entry;
+> -    hwaddr size;
+> +    hwaddr size, remain;
+>      hwaddr start = n->start;
+>      hwaddr end = n->end;
+>      IntelIOMMUState *s = as->iommu_state;
+> @@ -3380,48 +3398,46 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+>       * VT-d spec), otherwise we need to consider overflow of 64 bits.
+>       */
+> 
+> -    if (end > VTD_ADDRESS_SIZE(s->aw_bits)) {
+> +    if (end > VTD_ADDRESS_SIZE(s->aw_bits) - 1) {
+>          /*
+>           * Don't need to unmap regions that is bigger than the whole
+>           * VT-d supported address space size
+>           */
+> -        end = VTD_ADDRESS_SIZE(s->aw_bits);
+> +        end = VTD_ADDRESS_SIZE(s->aw_bits) - 1;
+
+[1]
+
+>      }
+> 
+>      assert(start <= end);
+> -    size = end - start;
+> 
+> -    if (ctpop64(size) != 1) {
+> -        /*
+> -         * This size cannot format a correct mask. Let's enlarge it to
+> -         * suite the minimum available mask.
+> -         */
+> -        int n = 64 - clz64(size);
+> -        if (n > s->aw_bits) {
+> -            /* should not happen, but in case it happens, limit it */
+> -            n = s->aw_bits;
+> -        }
+> -        size = 1ULL << n;
+> -    }
+> +    size = remain = end - start + 1;
+> 
+>      entry.target_as = &address_space_memory;
+> -    /* Adjust iova for the size */
+> -    entry.iova = n->start & ~(size - 1);
+> +
+> +    entry.perm = IOMMU_NONE;
+>      /* This field is meaningless for unmap */
+>      entry.translated_addr = 0;
+> -    entry.perm = IOMMU_NONE;
+> -    entry.addr_mask = size - 1;
+> +
+> +    while (remain >= VTD_PAGE_SIZE) {
+> +        uint64_t mask = vtd_get_next_mask(start, remain, s->aw_bits);
+> +
+> +        entry.iova = start;
+> +        entry.addr_mask = mask - 1;
+> +        memory_region_notify_one(n, &entry);
+> +        start += mask;
+> +        remain -= mask;
+> +    }
+> +
+> +    if (remain) {
+> +        warn_report("Unmapping unaligned range %lx-%lx", start, end);
+
+[2]
+
+> +    }
+> 
+>      trace_vtd_as_unmap_whole(pci_bus_num(as->bus),
+>                               VTD_PCI_SLOT(as->devfn),
+>                               VTD_PCI_FUNC(as->devfn),
+> -                             entry.iova, size);
+> -
+> -    map.iova = entry.iova;
+> -    map.size = entry.addr_mask;
+> +                             n->start, size);
+> +    map.iova = n->start;
+> +    map.size = size;
+>      iova_tree_remove(as->iova_tree, &map);
+> 
+> -    memory_region_notify_one(n, &entry);
+>  }
+> 
+>  static void vtd_address_space_unmap_all(IntelIOMMUState *s)
+> --
+> 2.7.4
+> 
+> 
+> 
+
+Regards,
+
+-- 
+Peter Xu
 
