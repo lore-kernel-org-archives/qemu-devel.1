@@ -2,82 +2,74 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B95C8C43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 13:23:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 685F7C43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 13:37:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D1FC212F5
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 13:23:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D1FC212F5
+	by mail.kernel.org (Postfix) with ESMTPS id 3D37E2063F
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 13:37:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D37E2063F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51148 helo=lists.gnu.org)
+Received: from localhost ([::1]:51266 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfOwg-0007k8-P5
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 09:23:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36083)
+	id 1hfP9n-0002xE-29
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 09:37:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39465)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hfOw0-0006lq-NC
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 09:23:01 -0400
+ (envelope-from <bounces@canonical.com>) id 1hfP8e-0002JD-7N
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 09:36:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hfOvy-0005Io-OR
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 09:23:00 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:38804)
+ (envelope-from <bounces@canonical.com>) id 1hfP8Z-0006R4-Tj
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 09:36:01 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59778)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hfOvw-0005Fz-Qi
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 09:22:57 -0400
-Received: by mail-wr1-f65.google.com with SMTP id d18so13915055wrs.5
- for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 06:22:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=IxC5K3hKa9tC3R9rtfu9sMpXSzuWl/8E7PGxgNeSKhk=;
- b=YdqK9ra7qxqeW4ejZmJSs0mZ3XiI96oB151Z8PHcRvtF62Coq+X8knaI3zMiviS0Rh
- P8oCSFh7UUdlKewdLe6n2ngLEw+ERa/aYSkgQd9R6i5b+0O//XlNeW2UzylIxaMnp8S1
- 29wBCsOgPuRnMUuD3H4Q93BZ/oCquN9guZrzX+gXV6bDfhBwWQKpWFY2DwMRQHWBFeFw
- 7v89QCAbaNGd3n25qbz0NxAcCJv6QT1+bHCypPi2fribaCADKiMGxT7pe31cqx6aT77G
- 6VTQ1EKn8tNVVyIaVRb9iUdG+VZ1ME3wEhZtSAHkga2HlfI+XDdc1PiA8HlQqpv5fhDy
- W+3Q==
-X-Gm-Message-State: APjAAAWTPVERuVo7XDuNcQ1uA4/cxQqVnbw/d+852mhFFbHTqEqfXbRu
- aYxod7Vw903RpG8QxeEvXTmYMg==
-X-Google-Smtp-Source: APXvYqwOW2FsjQkoFWKzWCGodDlMXmiJ2+sJ1oLOHfVQD84hwmB7kknvHHtRpf5wk3ICMz3j7Z6TCg==
-X-Received: by 2002:a05:6000:1203:: with SMTP id
- e3mr44585489wrx.300.1561382574920; 
- Mon, 24 Jun 2019 06:22:54 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:7822:aa18:a9d8:39ab?
- ([2001:b07:6468:f312:7822:aa18:a9d8:39ab])
- by smtp.gmail.com with ESMTPSA id r5sm23973230wrg.10.2019.06.24.06.22.53
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Mon, 24 Jun 2019 06:22:54 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- peter.maydell@linaro.org
-References: <20190624123835.28869-1-alex.bennee@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c191c41f-a9a5-48de-2700-ed2065a9ee24@redhat.com>
-Date: Mon, 24 Jun 2019 15:22:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hfP8W-0006He-Lw
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 09:35:58 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hfP8S-000082-F3
+ for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 13:35:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 70FB62E80CD
+ for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 13:35:52 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190624123835.28869-1-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 24 Jun 2019 13:28:02 -0000
+From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
+ assignee=lersek@redhat.com; 
+X-Launchpad-Bug-Tags: feature-request
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: lersek
+X-Launchpad-Bug-Reporter: Laszlo Ersek (Red Hat) (lersek)
+X-Launchpad-Bug-Modifier: Laszlo Ersek (Red Hat) (lersek)
+References: <155958011528.16346.9132826883162987130.malonedeb@chaenomeles.canonical.com>
+Message-Id: <156138288360.31249.5119702192513499737.malone@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18991";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 9fc026434846dc9d5dd7d79143fd92cabe7f6c30
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PATCH] target/i386: fix feature check in
- hyperv-stub.c
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1831477] Re: update edk2 submodule & binaries to
+ edk2-stable201905
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,47 +78,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>, Richard Henderson <rth@twiddle.net>,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Roman Kagan <rkagan@virtuozzo.com>
+Reply-To: Bug 1831477 <1831477@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24/06/19 14:38, Alex Bennée wrote:
-> Commit 2d384d7c8 broken the build when built with:
-> 
->   configure --without-default-devices --disable-user
-> 
-> The reason was the conversion of cpu->hyperv_synic to
-> cpu->hyperv_synic_kvm_only although the rest of the patch introduces a
-> feature checking mechanism. So I've fixed the KVM_EXIT_HYPERV_SYNIC in
-> hyperv-stub to do the same feature check as in the real hyperv.c
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Roman Kagan <rkagan@virtuozzo.com>
-> ---
->  target/i386/hyperv-stub.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/target/i386/hyperv-stub.c b/target/i386/hyperv-stub.c
-> index fe548cbae2..0028527e79 100644
-> --- a/target/i386/hyperv-stub.c
-> +++ b/target/i386/hyperv-stub.c
-> @@ -15,7 +15,7 @@ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
->  {
->      switch (exit->type) {
->      case KVM_EXIT_HYPERV_SYNIC:
-> -        if (!cpu->hyperv_synic) {
-> +        if (!hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC)) {
->              return -1;
->          }
->  
-> 
+Merged in commit 53defa05701b ("Merge remote-tracking branch
+'remotes/lersek/tags/edk2-pull-2019-06-14' into staging", 2019-06-17).
 
-Queued, thanks.
 
-Paolo
+** Changed in: qemu
+       Status: In Progress =3D> Fix Committed
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1831477
+
+Title:
+  update edk2 submodule & binaries to edk2-stable201905
+
+Status in QEMU:
+  Fix Committed
+
+Bug description:
+  The edk2 project will soon release edk2-stable201905. Update the edk2
+  submodule in QEMU, and the bundled edk2 binaries, accordingly.
+
+  https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Release-Plan=
+ning#edk2-stable201905-tag-planning
+  https://github.com/tianocore/edk2/releases/tag/edk2-stable201905 [upcomin=
+g link]
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1831477/+subscriptions
 
