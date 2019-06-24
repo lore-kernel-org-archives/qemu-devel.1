@@ -6,37 +6,37 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 356AFC4646C
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 20:57:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11230C4646B
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 21:02:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 017A820656
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 20:57:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 017A820656
+	by mail.kernel.org (Postfix) with ESMTPS id DAF8C20656
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 21:02:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAF8C20656
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54656 helo=lists.gnu.org)
+Received: from localhost ([::1]:54684 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfW1Q-0007ez-3Y
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 16:57:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40915)
+	id 1hfW6s-0001EA-GF
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 17:02:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42171)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hfW07-0007AT-UB
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 16:55:44 -0400
+ (envelope-from <laurent@vivier.eu>) id 1hfW5u-0000me-Lm
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 17:01:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hfW06-0000st-OA
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 16:55:43 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:39421)
+ (envelope-from <laurent@vivier.eu>) id 1hfW5t-0004Zz-9G
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 17:01:42 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:55789)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hfW06-0000UN-1W
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 16:55:42 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hfW5s-0004NZ-VR
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 17:01:41 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
  (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MnIxu-1iOieW3YLU-00jHWI; Mon, 24 Jun 2019 22:55:33 +0200
-To: Jim Wilson <jimw@sifive.com>, qemu-devel@nongnu.org
-References: <20190618223252.10907-1-jimw@sifive.com>
+ 1McYP5-1iHsEm0dWn-00cukr; Mon, 24 Jun 2019 23:00:57 +0200
+To: qemu-devel@nongnu.org
+References: <20190529084804.25950-1-laurent@vivier.eu>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -81,35 +81,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <7f3c6313-ee21-c281-1527-1e6e4fef3bf5@vivier.eu>
-Date: Mon, 24 Jun 2019 22:55:30 +0200
+Message-ID: <8174b26f-e440-6d55-54f0-4ea1bba9dbb2@vivier.eu>
+Date: Mon, 24 Jun 2019 23:00:54 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190618223252.10907-1-jimw@sifive.com>
+In-Reply-To: <20190529084804.25950-1-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:xMTAjhNF4A5RL7RRMZ/Xaj9WXBz1Ik3cHoOe/YPYOn0ScN16C6y
- MPvotB8qeua76/NMJ4OeaXtTukdO7fF00FbDSVVsMwPh3aQFI233mgJf98lreAULe7CNnyq
- x/XmOBsNO8Vzc0k5FazbxS/dAVYVY4NL2GWmVXji1AZV/m5aI4sdt36eW2xJK4glKIT75h9
- CUEhb0KA2Ll+vF5xdz3OA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:eP8RZ5TGD+U=:7Jzu2j+b6HU3btYotgQgUz
- W2ajfBYq4eu9p8xisS1Puik/BhATe50h8p6k+amqvy3lnbp1DVVahlU8Y/UwR+ooWz3AuNdjD
- Y2ptycJUQHCpL//RwCie7kM5d68shKgHDwO+YXS1LM5uRwMOV9XiMaWuw7FEA2rtmvuUMXbJ7
- LEL62PYTeUTs40xYK0uRZhDqBsKGZt9nGlNWTHKu254P40ve54E2Kq2OIfwqBwmf0XleaZZVK
- q/fm9o6FLBCurkMygI9vXvm4LrfrQNvKKpkSvbR1nWsp4jD1VGRTUrpU3A+Yeh5NssGzNBR7X
- yhd03QVyMwRPprfg5vD+NeVMRja47SMBUus7CbcBJfW2iaqmU5YcEesCruIKLR63H2rCM5PK5
- I4gX6vrbT8MdN4/B6JSu9fPIlcNQWXnt00rRNKtSeKTq895N+BKZDTsxPqUXqDu6qELmqHv7H
- 2EuXMy/ljW7eMK0qLeKeDyQNK9HpBlxTexIJOjNdNNQdQjzo6Tvqc6rqNGK4MJIv4oLAkrZ/1
- UWx2QdB+5AYYjZTwffMlMmgVABr0LsV8nMK5Do2qsYFtmmKF2cK+6W/i7ubzkXA/OFfRMPeZm
- tXQF624pftZU6lceGAKE+GyQPel8oIJGi5FPVSmvkyKofmVQkA4JZMzjp7H9LDobqIIao39lD
- zrC04mi1N3tbVTcDssB2YObjhpojw5n6o/gZhXjoCiRQ8/T6GJhkY3Ndq0eBdEAhqbq+UIq2S
- SoabkhDc/pPAzvLGwmEv0GkwKOMKnc0HsSG9J1Pkhj4WkmnbsH1ycO1/Nn4=
+X-Provags-ID: V03:K1:GNu6mbSFdqZC3ZRcJK0U9TBsCxHj+BBvKFzEx5LlRrZ/jnROzoV
+ CCltkAi+lq73vUW17gfOAKAoR85hi6UTSf6vPqc7+bPboPe1sX0oh56oyUvQ4JVKPPBHuS0
+ /A/OEXsS5dAwLDnWjYxXm8p1mP+j6SvIx37AxGLSzW8YRZ1qEcIxoQJMzL8oJ2Q5bXmZigb
+ YD9zFKxVMkvKHFeLuArxQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ZDCsdHOSDhc=:wq4RXx7YRBpw5t4p4Qhfs3
+ 2AoZZUZNeDh394C+yHsDM/xxh34unoVrazSnf15k5i1lsMBVKAsTy0kuZE4hFPDvM8Ebm4dYR
+ VnxMjev6mhWNoT1wO9wA+af7c4wk4SDyzOq25WS5AvT5FduEtQN453xXICB0Iyj31vqyLalPU
+ RGjh/6e7ZpBubBiITdFnISdKRZRwN27TuvFcHjmM2yMI5vuUAx1M6buDufgOh7RWcgP/Ai+cH
+ ZJkThFf4qyO2/287dZAqgq4U8eJRvhnh6O8akhc7hnAtLLdt8x3mz1l+YIh7GJtYjgYQpppCx
+ jIbmI46J4JufqALTQBlfpGANcz4En5zUdW99GUl36wYg/PgzFDEC5Bt7NbTDyy9FFu6P29nl7
+ +yvo1X609hCuqX2sRhzCx5ixPLKweXLfxBLjx2SBPAhwbCnk72gzzN1aJ4lpghdzLKOFB9EVP
+ lt5pNQg1J3XE6gXZaLuqcA/zJllhM1sUkuKz2MALNnZmH0Q5LGBj5zqF5bUH5MIkFNaKtQ3Nd
+ odXONUiC6Ubz0SLq75LVsOP4rEW0iUzeeGG++IQnJm/uAorBx8eK7MqSKs8DXdPAde0SYs+9Y
+ uvGOmdmtRMyMUKLX15lclkelznWTVmS5dqwj8aT1ToxcVPKTWZkakwpmxze0YFGxZfEMMJS4y
+ O9cPySKRDAYlJeuRpP5a5tgiUDneNn5k+aZ4Upn3z0Lj+pikxlvqvQ4iPHWqyOpqxCTThr6ar
+ sdxMXg2LPYoUWyhzn3FvZAl9oradjG5IJ7ktbCrWaFyvjMgMofW3obQodo4=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 212.227.17.24
-Subject: Re: [Qemu-devel] [PATCH] RISC-V: Update syscall list for 32-bit
- support.
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: emulate msgsnd(),
+ msgrcv() and semtimedop()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,59 +121,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Riku Voipio <riku.voipio@iki.fi>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 19/06/2019 à 00:32, Jim Wilson a écrit :
-> 32-bit RISC-V uses _llseek instead of lseek as syscall number 62.
-> Update syscall list from open-embedded build, primarily because
-> 32-bit RISC-V requires statx support.
+Le 29/05/2019 à 10:48, Laurent Vivier a écrit :
+> When we have updated kernel headers to 5.2-rc1 we have introduced
+> new syscall numbers that can be not supported by older kernels
+> and fail with ENOSYS while the guest emulation succeeded before
+> because the syscalls were emulated with ipc().
 > 
-> Tested with cross gcc testsuite runs for rv32 and rv64, with the
-> pending statx patch also applied.
+> This patch fixes the problem by using ipc() if the new syscall
+> returns ENOSYS.
 > 
-> Signed-off-by: Jim Wilson <jimw@sifive.com>
+> Fixes: 86e636951ddc ("linux-user: fix __NR_semtimedop undeclared error")
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 > ---
->  linux-user/riscv/syscall_nr.h | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
 > 
-> diff --git a/linux-user/riscv/syscall_nr.h b/linux-user/riscv/syscall_nr.h
-> index dab6509..5c87282 100644
-> --- a/linux-user/riscv/syscall_nr.h
-> +++ b/linux-user/riscv/syscall_nr.h
-> @@ -72,7 +72,11 @@
->  #define TARGET_NR_pipe2 59
->  #define TARGET_NR_quotactl 60
->  #define TARGET_NR_getdents64 61
-> +#ifdef TARGET_RISCV32
-> +#define TARGET_NR__llseek 62
-> +#else
->  #define TARGET_NR_lseek 62
-> +#endif
->  #define TARGET_NR_read 63
->  #define TARGET_NR_write 64
->  #define TARGET_NR_readv 65
-> @@ -286,7 +290,16 @@
->  #define TARGET_NR_membarrier 283
->  #define TARGET_NR_mlock2 284
->  #define TARGET_NR_copy_file_range 285
-> +#define TARGET_NR_preadv2 286
-> +#define TARGET_NR_pwritev2 287
-> +#define TARGET_NR_pkey_mprotect 288
-> +#define TARGET_NR_pkey_alloc 289
-> +#define TARGET_NR_pkey_free 290
-> +#define TARGET_NR_statx 291
-> +#define TARGET_NR_io_pgetevents 292
-> +#define TARGET_NR_rseq 293
-> +#define TARGET_NR_kexec_file_load 294
->  
-> -#define TARGET_NR_syscalls (TARGET_NR_copy_file_range + 1)
-> +#define TARGET_NR_syscalls (TARGET_NR_kexec_file_load + 1)
->  
+> Notes:
+>     v2: replace ENOSYS by TARGET_ENOSYS
+> 
+>  linux-user/syscall.c      | 61 +++++++++++++++++++--------------------
+>  linux-user/syscall_defs.h |  1 +
+>  2 files changed, 31 insertions(+), 31 deletions(-)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 5e29e675e9cf..9ecbac463385 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -763,50 +763,21 @@ safe_syscall2(int, nanosleep, const struct timespec *, req,
+>  safe_syscall4(int, clock_nanosleep, const clockid_t, clock, int, flags,
+>                const struct timespec *, req, struct timespec *, rem)
 >  #endif
+> -#if !defined(__NR_msgsnd) || !defined(__NR_msgrcv) || !defined(__NR_semtimedop)
+> -/* This host kernel architecture uses a single ipc syscall; fake up
+> - * wrappers for the sub-operations to hide this implementation detail.
+> - * Annoyingly we can't include linux/ipc.h to get the constant definitions
+> - * for the call parameter because some structs in there conflict with the
+> - * sys/ipc.h ones. So we just define them here, and rely on them being
+> - * the same for all host architectures.
+> - */
+> -#define Q_SEMTIMEDOP 4
+> -#define Q_MSGSND 11
+> -#define Q_MSGRCV 12
+> -#define Q_IPCCALL(VERSION, OP) ((VERSION) << 16 | (OP))
+> -
+> +#ifdef __NR_ipc
+>  safe_syscall6(int, ipc, int, call, long, first, long, second, long, third,
+>                void *, ptr, long, fifth)
+>  #endif
+>  #ifdef __NR_msgsnd
+>  safe_syscall4(int, msgsnd, int, msgid, const void *, msgp, size_t, sz,
+>                int, flags)
+> -#else
+> -static int safe_msgsnd(int msgid, const void *msgp, size_t sz, int flags)
+> -{
+> -    return safe_ipc(Q_IPCCALL(0, Q_MSGSND), msgid, sz, flags, (void *)msgp, 0);
+> -}
+>  #endif
+>  #ifdef __NR_msgrcv
+>  safe_syscall5(int, msgrcv, int, msgid, void *, msgp, size_t, sz,
+>                long, msgtype, int, flags)
+> -#else
+> -static int safe_msgrcv(int msgid, void *msgp, size_t sz, long type, int flags)
+> -{
+> -    return safe_ipc(Q_IPCCALL(1, Q_MSGRCV), msgid, sz, flags, msgp, type);
+> -}
+>  #endif
+>  #ifdef __NR_semtimedop
+>  safe_syscall4(int, semtimedop, int, semid, struct sembuf *, tsops,
+>                unsigned, nsops, const struct timespec *, timeout)
+> -#else
+> -static int safe_semtimedop(int semid, struct sembuf *tsops, unsigned nsops,
+> -                           const struct timespec *timeout)
+> -{
+> -    return safe_ipc(Q_IPCCALL(0, Q_SEMTIMEDOP), semid, nsops, 0, tsops,
+> -                    (long)timeout);
+> -}
+>  #endif
+>  #if defined(TARGET_NR_mq_open) && defined(__NR_mq_open)
+>  safe_syscall5(int, mq_timedsend, int, mqdes, const char *, msg_ptr,
+> @@ -3530,11 +3501,21 @@ static inline abi_long target_to_host_sembuf(struct sembuf *host_sembuf,
+>  static inline abi_long do_semop(int semid, abi_long ptr, unsigned nsops)
+>  {
+>      struct sembuf sops[nsops];
+> +    abi_long ret;
+>  
+>      if (target_to_host_sembuf(sops, ptr, nsops))
+>          return -TARGET_EFAULT;
+>  
+> -    return get_errno(safe_semtimedop(semid, sops, nsops, NULL));
+> +    ret = -TARGET_ENOSYS;
+> +#ifdef __NR_semtimedop
+> +    ret = get_errno(safe_semtimedop(semid, sops, nsops, NULL));
+> +#endif
+> +#ifdef __NR_ipc
+> +    if (ret == -TARGET_ENOSYS) {
+> +        ret = get_errno(safe_ipc(IPCOP_semtimedop, semid, nsops, 0, sops, 0));
+> +    }
+> +#endif
+> +    return ret;
+>  }
+>  
+>  struct target_msqid_ds
+> @@ -3689,7 +3670,16 @@ static inline abi_long do_msgsnd(int msqid, abi_long msgp,
+>      }
+>      host_mb->mtype = (abi_long) tswapal(target_mb->mtype);
+>      memcpy(host_mb->mtext, target_mb->mtext, msgsz);
+> +    ret = -TARGET_ENOSYS;
+> +#ifdef __NR_msgsnd
+>      ret = get_errno(safe_msgsnd(msqid, host_mb, msgsz, msgflg));
+> +#endif
+> +#ifdef __NR_ipc
+> +    if (ret == -TARGET_ENOSYS) {
+> +        ret = get_errno(safe_ipc(IPCOP_msgsnd, msqid, msgsz, msgflg,
+> +                                 host_mb, 0));
+> +    }
+> +#endif
+>      g_free(host_mb);
+>      unlock_user_struct(target_mb, msgp, 0);
+>  
+> @@ -3717,7 +3707,16 @@ static inline abi_long do_msgrcv(int msqid, abi_long msgp,
+>          ret = -TARGET_ENOMEM;
+>          goto end;
+>      }
+> +    ret = -TARGET_ENOSYS;
+> +#ifdef __NR_msgrcv
+>      ret = get_errno(safe_msgrcv(msqid, host_mb, msgsz, msgtyp, msgflg));
+> +#endif
+> +#ifdef __NR_ipc
+> +    if (ret == -TARGET_ENOSYS) {
+> +        ret = get_errno(safe_ipc(IPCOP_CALL(1, IPCOP_msgrcv), msqid, msgsz,
+> +                        msgflg, host_mb, msgtyp));
+> +    }
+> +#endif
+>  
+>      if (ret > 0) {
+>          abi_ulong target_mtext_addr = msgp + sizeof(abi_ulong);
+> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+> index 7f141f699c1a..3175440e9dd9 100644
+> --- a/linux-user/syscall_defs.h
+> +++ b/linux-user/syscall_defs.h
+> @@ -32,6 +32,7 @@
+>  #define TARGET_SYS_RECVMMSG     19        /* recvmmsg()            */
+>  #define TARGET_SYS_SENDMMSG     20        /* sendmmsg()            */
+>  
+> +#define IPCOP_CALL(VERSION, OP) ((VERSION) << 16 | (OP))
+>  #define IPCOP_semop		1
+>  #define IPCOP_semget		2
+>  #define IPCOP_semctl		3
 > 
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Applied to my linux-user branch.
+
+Thanks,
+Laurent
 
