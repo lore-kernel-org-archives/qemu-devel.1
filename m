@@ -2,93 +2,82 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MIME_QP_LONG_LINE,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36921C43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 20:38:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 401F0C4646B
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 20:45:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE12E20665
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 20:38:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oberlin.edu header.i=@oberlin.edu header.b="JB/J679z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE12E20665
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=oberlin.edu
+	by mail.kernel.org (Postfix) with ESMTPS id 18C6E20665
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 20:45:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18C6E20665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54574 helo=lists.gnu.org)
+Received: from localhost ([::1]:54608 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfVjo-0008Ni-1G
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 16:38:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49636)
+	id 1hfVq7-0003aL-0n
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 16:45:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37739)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <scheckow@oberlin.edu>) id 1hfUlS-0003pu-IB
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 15:36:32 -0400
+ (envelope-from <wentong.wu@intel.com>) id 1hfVoa-0002Pa-Go
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 16:43:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <scheckow@oberlin.edu>) id 1hfUlO-0002NK-In
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 15:36:30 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:43208)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <scheckow@oberlin.edu>)
- id 1hfUlE-00028J-TD
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 15:36:19 -0400
-Received: by mail-pf1-x444.google.com with SMTP id i189so8081349pfg.10
- for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 12:36:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oberlin.edu; s=google;
- h=mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=Zrhol/4u5kdGsa3kthkiEPW1M/fmG81jnRGDThTgxHM=;
- b=JB/J679zHGqqZlx0fO+6mw1jhsIK5PKzLwnPCW63oLzNaRWHsqjUZb0+7SQJzXbXyE
- 5PUglbcv+7oiMcO+U4maT53IzabNBSymFndBVuLS3BESi0C3uWDRnVfxQRS+n4KwJtd/
- RQlsMUWyMTMC7VkfjaGMesW6HEjFBuL2S5no6jlSjxh1jmunZsitygVE+VcmAZFZeypH
- SgvoggXA8JeH81p1aQ6x/XvZ5HDzad2gFcHemYCEA7OOkomdablo4nsYnZ1Y3YWGlXiW
- Hd+8CfQ6uzItWPA+W7BQTXMXFXBstixd1OnHOL2YuWLvXAaHEQfGD/oC5u09ox7t8mu9
- RNow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=Zrhol/4u5kdGsa3kthkiEPW1M/fmG81jnRGDThTgxHM=;
- b=gcSqwAlSr5/A1qDj7mNDZRNJab5Yt3i8kW7zFXSDVIXE25QESzGAgJKbGYcn4WlnmN
- LSjM2QdLkuDXdArqYQ3SKHq/Zb+KgixUBCux7PfvYnjyxbU8KxHKblUjd33KzenZAfkn
- OSCPHB5BDsF/+NA1MLMLAC+hTpIbrMevqlhnetT7KQx+Ns3G4JQbzHMEBXcZ5/Fopf+T
- zbg6ueHz4JiydfGStIrupuH3KFxew0xbon+ukRgWhBK5eLk1AZSYLePvQFpxfsZ2waau
- 0tpidRWbwIb/js7syHfgDXcjdL5XaMMm4Ft+a59v0l5uHs03NKVxDXsydhgdf0pLi5K7
- YoQA==
-X-Gm-Message-State: APjAAAVJiy13EXC26RWxPJkhsQCYkKgGnwduhccyhllBqXSHrkKxO0iR
- J6HRQOlG/r+6vlWnYJlyymTTIg==
-X-Google-Smtp-Source: APXvYqyO7hn6//r4aV2rOTcKgBn9cXtqRzoA3Ilj726GMRwX7LHUEhoZ6fFShh8WOBqsHyy9PjGkEg==
-X-Received: by 2002:a17:90a:9503:: with SMTP id
- t3mr26616191pjo.47.1561404968438; 
- Mon, 24 Jun 2019 12:36:08 -0700 (PDT)
-Received: from [10.252.5.100] ([198.134.98.50])
- by smtp.gmail.com with ESMTPSA id h21sm12215783pgg.75.2019.06.24.12.36.07
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 24 Jun 2019 12:36:07 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (1.0)
-From: Stephen Checkoway <scheckow@oberlin.edu>
-X-Mailer: iPhone Mail (16F203)
-In-Reply-To: <b7730260-bfb6-f2b1-7c01-9d7b6a10c71e@amsat.org>
-Date: Mon, 24 Jun 2019 12:36:05 -0700
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <F2BE0BC3-0C7D-42FB-8B3A-04FE2D0523E6@oberlin.edu>
-References: <20190426162624.55977-1-stephen.checkoway@oberlin.edu>
- <20190426162624.55977-5-stephen.checkoway@oberlin.edu>
- <6d2c9dcc-06f5-4eed-d779-b0c4d2b60182@amsat.org>
- <b7730260-bfb6-f2b1-7c01-9d7b6a10c71e@amsat.org>
-To: =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ (envelope-from <wentong.wu@intel.com>) id 1hfVoX-00026U-Ql
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 16:43:47 -0400
+Received: from mga06.intel.com ([134.134.136.31]:56034)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <wentong.wu@intel.com>)
+ id 1hfVoS-0001yK-Mk
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 16:43:42 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 24 Jun 2019 13:43:35 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,413,1557212400"; d="scan'208";a="312830797"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+ by orsmga004.jf.intel.com with ESMTP; 24 Jun 2019 13:43:35 -0700
+Received: from fmsmsx161.amr.corp.intel.com (10.18.125.9) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 24 Jun 2019 13:43:35 -0700
+Received: from shsmsx102.ccr.corp.intel.com (10.239.4.154) by
+ FMSMSX161.amr.corp.intel.com (10.18.125.9) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 24 Jun 2019 13:43:34 -0700
+Received: from shsmsx106.ccr.corp.intel.com ([169.254.10.89]) by
+ shsmsx102.ccr.corp.intel.com ([169.254.2.33]) with mapi id 14.03.0439.000;
+ Tue, 25 Jun 2019 04:43:32 +0800
+From: "Wu, Wentong" <wentong.wu@intel.com>
+To: =?utf-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Thread-Topic: [Qemu-devel] icount mode
+Thread-Index: AQHVKqTNpfOZh+BR/0K8hbLSyzkSQaarOgFw
+Date: Mon, 24 Jun 2019 20:43:31 +0000
+Message-ID: <228A20DABA3D9846AF1B64E31C217296010A5C86@SHSMSX106.ccr.corp.intel.com>
+References: <228A20DABA3D9846AF1B64E31C217296010A5383@SHSMSX106.ccr.corp.intel.com>
+ <87lfxr0yu3.fsf@zen.linaroharston>
+In-Reply-To: <87lfxr0yu3.fsf@zen.linaroharston>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNjQ3NjkzMGYtNzIxMC00MWExLWIxY2EtMmFlZjRmZDU2YzZjIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiSFo4ekJGZTlacno4aWRNdnVQa2F0S3pcLzMyWmxJNytPSk1nS2RmSldHcnpBaTlwb1FmaHBVWkdBS1crMWIrMmsifQ==
+x-ctpclassification: CTP_NT
+dlp-product: dlpe-windows
+dlp-version: 11.0.600.7
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
-X-Mailman-Approved-At: Mon, 24 Jun 2019 16:35:39 -0400
-Subject: Re: [Qemu-devel] [PATCH v4 04/10] block/pflash_cfi02: Implement
- intereleaved flash devices
+X-Received-From: 134.134.136.31
+Subject: Re: [Qemu-devel] icount mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,241 +89,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
- Thomas Huth <thuth@redhat.com>,
- Stephen Checkoway <stephen.checkoway@oberlin.edu>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-> On Jun 24, 2019, at 12:05, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> w=
-rote:
->=20
->> On 6/22/19 2:25 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> Hi Stephen,
->>=20
->> This series haven't fall through the cracks, however it is taking me
->> longer than expected to review it.
->>=20
->>> On 4/26/19 6:26 PM, Stephen Checkoway wrote:
->>> It's common for multiple narrow flash chips to be hooked up in parallel
->>> to support wider buses. For example, four 8-bit wide flash chips (x8)
->>> may be combined in parallel to produce a 32-bit wide device. Similarly,
->>> two 16-bit wide chips (x16) may be combined.
->>>=20
->>> This commit introduces `device-width` and `max-device-width` properties,=
-
->>> similar to pflash_cfi01, with the following meanings:
->>> - `width`: The width of the logical, qemu device (same as before);
->>> - `device-width`: The width of an individual flash chip, defaulting to
->>>  `width`; and
->>> - `max-device-width`: The maximum width of an individual flash chip,
->>>  defaulting to `device-width`.
->>>=20
->>> Nothing needs to change to support reading such interleaved devices but
->>> commands (e.g., erase and programming) must be sent to all devices at
->>> the same time or else the various chips will be in different states.
->>=20
->> After some thoughts on this, I'd rather we model how hardware manage
->> interleaved devices: do it at the bus level, and instanciate N devices
->> in an interleaved config.
->> I believe that would drastically reduce this device complexity, and we
->> would match the real internal state machine.
->> Also this could be reused by other parallel devices used in a such config=
-.
->>=20
->>> For example, a 4-byte wide logical device can be composed of four x8/x16=
-
->>> devices in x8 mode. That is, each device supports both x8 or x16 and
->>> they're being used in the byte, rather than word, mode. This
->>> configuration would have `width=3D4`, `device-width=3D1`, and
->>> `max-device-width=3D2`.
->>=20
->>=20
->> I'm thinking of this draft:
->>=20
->> FlashDevice # x8
->>  MemoryRegionOps
->>    .valid.max_access_size =3D 1
->>=20
->> FlashDevice # x16
->>  MemoryRegionOps
->>    .valid.min_access_size =3D 2
->>    .valid.max_access_size =3D 2
->>=20
->> FlashDevice # x8/x16
->>  MemoryRegionOps
->>    .valid.min_access_size =3D 1
->>    .valid.max_access_size =3D 2
->>=20
->> We might use .impl.min_access_size =3D 2 and consider all NOR flash using=
-
->> 16-bit words internally.
->>    .impl.max_access_size =3D 2 is implicit.
->>=20
->> So for you example we'd instanciate one:
->>=20
->> InterleaverDevice
->>  Property
->>    .bus_width =3D 4 # 4-byte wide logical device, `width=3D4`
->>    .device_width =3D 1 # `device-width=3D1`
->>  MemoryRegionOps
->>    .valid.max_access_size =3D .bus_width # 4, set at realize()
->>    .impl.max_access_size =3D .device_width # 1, set at realize()
->>=20
->> Then instanciate 4 pflash devices, and link them to the interleaver
->> using object_property_set_link().
->>=20
->> typedef struct {
->>    SysBusDevice parent_obj;
->>    MemoryRegion iomem;
->>    char *name;
->>    /*
->>     * On a 64-bit wide bus we can have at most
->>     * 8 devices in 8-bit access mode.
->>     */
->>    MemoryRegion device[8];
->>    unsigned device_count;
->>    unsigned device_index_mask;
->>    /* Properties */
->>    unsigned bus_width;
->>    unsigned device_width;
->> } InterleaverDeviceState;
->>=20
->> static Property interleaver_properties[] =3D {
->>    DEFINE_PROP_LINK("device[0]", InterleaverDeviceState,
->>                     device[0],
->>                     TYPE_MEMORY_REGION, MemoryRegion *),
->>    ...
->>    DEFINE_PROP_LINK("device[7]", InterleaverDeviceState,
->>                     device[7],
->>                     TYPE_MEMORY_REGION, MemoryRegion *),
->>    DEFINE_PROP_END_OF_LIST(),
->> };
->>=20
->> Then previous to call InterleaverDevice.realize():
->>=20
->> In the board realize():
->>=20
->>=20
->>    for (i =3D 0; i < interleaved_devices; i++) {
->>        pflash[i] =3D create_pflash(...);
->>        ...
->>    }
->>=20
->>    ild =3D ... create InterleaverDevice ...
->>    for (i =3D 0; i < interleaved_devices; i++) {
->>        char *propname =3D g_strdup_printf("device[%u]", i);
->>=20
->>=20
->>        object_property_set_link(OBJECT(&ild->device[i]),
->>                                 OBJECT(pflash[i]),
->>                                 propname, &err);
->>        ...
->>    }
->>=20
->> Finally,
->>=20
->> static void interleaved_realize(DeviceState *dev, Error **errp)
->> {
->>    InterleaverDeviceState *s =3D INTERLEAVER_DEVICE(opaque);
->>=20
->>    s->device_count =3D s->bus_width / s->device_width;
->>    s->device_index_mask =3D ~(s->device_count - 1);
->>    ...
->> }
->>=20
->> static void interleaved_write(void *opaque, hwaddr offset,
->>                              uint64_t value, unsigned size)
->> {
->>    InterleaverDeviceState *s =3D INTERLEAVER_DEVICE(opaque);
->>    MemoryRegion *mr;
->>=20
->>    /*
->>     * Since we set .impl.max_access_size =3D device_width,
->>     * access_with_adjusted_size() always call this with
->>     * size =3D device_width.
->>     *
->>     * Adjust the address (offset).
->>     */
->>    offset >>=3D size;
->>    /* Access the N interleaved device */
->>    mr =3D s->device[offset & s->device_index_mask];
->>    memory_region_dispatch_write(mr, offset, &value, size,
->>                                 MEMTXATTRS_UNSPECIFIED);
->> }
->>=20
->> I'll try a PoC.
->=20
-> So I have a PoC, but then realize I can not use the same flash dump...
->=20
-> I need to deinterleave is. This is easily fixed with few lines of
-> Python, then if I want to store/share the dump (aka 'backend storage') I
-> have to re-interleave it.
->=20
-> I wonder if it would be possible/easy to add a 'interleave' option to
-> blockdev to be able to have 2 pflash devices sharing the same backend...
-> Is it worthwhile? Kevin/Markus/Max any thought on this?
-
-Hi Phil,
-
-Sorry for the delay, I=E2=80=99ve been traveling.
-
-I considered something like this approach and I think it could work. Ultimat=
-ely, I opted not to go that route for a few reasons:
-- duplicated CFI tables and other state waste (a small amount of) memory whe=
-n the flash chips are the same (the usual case in my limited experience)
-- it adds an extra layer of read/write calls plus recombining from/splitting=
- into the component parts
-- duplicated timers firing to walk the programming/erasing state machine for=
-ward for each chip
-- the firmware or data stored in the chips is likely already interleaved nec=
-essitating either splitting it up before use or adding functionality to a lo=
-wer layer to split it (as you=E2=80=99ve suggested here)
-
-None of the above seem like a big deal separately or together but I didn=E2=80=
-=99t find the advantages of this approach to be sufficiently compelling to j=
-ustify it. Namely, it allows using a heterogeneous set of flash chips to imp=
-lement a logical device.
-
-Nevertheless, if that=E2=80=99s the route you think is best, I have no objec=
-tions.
-
-Cheers,
-
-Steve
-
->=20
-> Thanks,
->=20
-> Phil.
->=20
->>> In addition to commands being sent to all devices, guest firmware
->>> expects the status and CFI queries to be replicated for each device.
->>> (The one exception to the response replication is that each device gets
->>> to report its own status bit DQ7 while programming because its value
->>> depends on the value being programmed which will usually differ for each=
-
->>> device.)
->>>=20
->>> Testing is limited to 16-bit wide devices due to the current inability
->>> to override the properties set by `pflash_cfi02_register`, but multiple
->>> configurations are tested.
->>>=20
->>> Stop using global_qtest. Instead, package the qtest variable inside the
->>> FlashConfig structure.
->>>=20
->>> Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
->>> Acked-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>> hw/block/pflash_cfi02.c   | 270 +++++++++++++++------
->>> tests/pflash-cfi02-test.c | 476 ++++++++++++++++++++++++++++++--------
->>> 2 files changed, 576 insertions(+), 170 deletions(-)
+SGkgQWxleCwNCg0KVGhhbmtzIGZvciB5b3VyIHJlcGx5Lg0KDQpGb3IgdGhlIGRpZmZlcmVudCBm
+cmVxdWVuY2llcywgcGxlYXNlIHNlZSBiZWxvdyBjb2RlIGluIGFybXY3bV9zeXN0aWNrLmMgYW5k
+IG1wczIuYyBmaXJzdCwgdGhlIHMtPnJlbG9hZCB3aWxsIGJlIHNldCBieSB0aGUgZ3Vlc3Qgb3Mg
+Y29kZSBhY2NvcmRpbmcgdG8gdGhlIENQVSdzIGZyZXF1ZW5jeSB3aGljaCB3aWxsIGJlIFNZU0NM
+S19GUlEsIGFuZCBzLT50aWNrIHdpbGwgYmUgc2V0IGFzICJzLT50aWNrICs9IChzLT5yZWxvYWQg
+KyAxKSAqIHN5c3RpY2tfc2NhbGUocyk7IiwgaXQgbWVhbnMgdGhlIGZyZXF1ZW5jeSBvZiB0aGlz
+IHRpbWVyIHdoaWNoIEkgY2FsbGVkIHFlbXUgdGltZXIgd2lsbCBiZSBOQU5PU0VDT05EU19QRVJf
+U0VDT05ELg0Kc3RhdGljIHZvaWQgc3lzdGlja19yZWxvYWQoU3lzVGlja1N0YXRlICpzLCBpbnQg
+cmVzZXQpDQp7DQogICAgLyogVGhlIENvcnRleC1NMyBEZXZpY2VzIEdlbmVyaWMgVXNlciBHdWlk
+ZSBzYXlzIHRoYXQgIldoZW4gdGhlDQogICAgICogRU5BQkxFIGJpdCBpcyBzZXQgdG8gMSwgdGhl
+IGNvdW50ZXIgbG9hZHMgdGhlIFJFTE9BRCB2YWx1ZSBmcm9tIHRoZQ0KICAgICAqIFNZU1QgUlZS
+IHJlZ2lzdGVyIGFuZCB0aGVuIGNvdW50cyBkb3duIi4gU28sIHdlIG5lZWQgdG8gY2hlY2sgdGhl
+DQogICAgICogRU5BQkxFIGJpdCBiZWZvcmUgcmVsb2FkaW5nIHRoZSB2YWx1ZS4NCiAgICAgKi8N
+CiAgICB0cmFjZV9zeXN0aWNrX3JlbG9hZCgpOw0KDQogICAgaWYgKChzLT5jb250cm9sICYgU1lT
+VElDS19FTkFCTEUpID09IDApIHsNCiAgICAgICAgcmV0dXJuOw0KICAgIH0NCg0KICAgIGlmIChy
+ZXNldCkgew0KICAgICAgICBzLT50aWNrID0gcWVtdV9jbG9ja19nZXRfbnMoUUVNVV9DTE9DS19W
+SVJUVUFMKTsNCiAgICB9DQogICAgcy0+dGljayArPSAocy0+cmVsb2FkICsgMSkgKiBzeXN0aWNr
+X3NjYWxlKHMpOw0KICAgIHRpbWVyX21vZChzLT50aW1lciwgcy0+dGljayk7DQp9DQoNCnN0YXRp
+YyB2b2lkIG1wczJfY29tbW9uX2luaXQoTWFjaGluZVN0YXRlICptYWNoaW5lKQ0Kew0KICAgICAg
+Li4uDQogICAgICBzeXN0ZW1fY2xvY2tfc2NhbGUgPSBOQU5PU0VDT05EU19QRVJfU0VDT05EIC8g
+U1lTQ0xLX0ZSUTsNCiAgICAgIC4uLg0KfQ0KDQpCdXQgZm9yIGJlbG93IGNvZGUsIGl0IHdpbGwg
+dXNlIHFlbXVfY2xvY2tfZ2V0X25zKFFFTVVfQ0xPQ0tfVklSVFVBTCkgdG8gZ2V0IHRoZSBjdXJy
+ZW50IHRpbWUgd2hpY2ggd2lsbCBiZSBjYWxjdWxhdGVkIGJ5IDJeTiBucyAqIGluc3RydWN0aW9u
+IGNvdW50ZXIsIGJ1dCB0aGlzIGZyZXF1ZW5jeSB3aWxsIGJlIE5BTk9TRUNPTkRTX1BFUl9TRUNP
+TkQgLyAgMl5OLiBCZWxvdyBjb2RlIGlzIGFuIGV4YW1wbGUgdHdvIGRpZmZlcmVudCBmcmVxdWVu
+Y2llcyBhcmUgdXNlZCwgYWN0dWFsbHkgaW4gY3B1cy5jLCBxZW11X2Nsb2NrX2RlYWRsaW5lX25z
+X2FsbChRRU1VX0NMT0NLX1ZJUlRVQUwpIHdpbGwgdXNlIHRoZSBxZW11IHRpbWVyKGZyZXEgaXMg
+TkFOT1NFQ09ORFNfUEVSX1NFQ09ORCksIGFuZCBjcHVfaWNvdW50X3RvX25zIHdpbGwgY2FsY2F1
+dGUgdGltZSB3aXRoIGZyZXF1ZW5jeSBOQU5PU0VDT05EU19QRVJfU0VDT05EIC8gIDJeTi4NCg0K
+c3RhdGljIHZvaWQgc3lzdGlja193cml0ZSh2b2lkICpvcGFxdWUsIGh3YWRkciBhZGRyLA0KICAg
+ICAgICAgICAgICAgICAgICAgICAgICB1aW50NjRfdCB2YWx1ZSwgdW5zaWduZWQgc2l6ZSkNCnsN
+CiAgICBTeXNUaWNrU3RhdGUgKnMgPSBvcGFxdWU7DQoNCiAgICB0cmFjZV9zeXN0aWNrX3dyaXRl
+KGFkZHIsIHZhbHVlLCBzaXplKTsNCg0KICAgIHN3aXRjaCAoYWRkcikgew0KICAgIGNhc2UgMHgw
+OiAvKiBTeXNUaWNrIENvbnRyb2wgYW5kIFN0YXR1cy4gICovDQogICAgew0KICAgICAgICB1aW50
+MzJfdCBvbGR2YWwgPSBzLT5jb250cm9sOw0KDQogICAgICAgIHMtPmNvbnRyb2wgJj0gMHhmZmZm
+ZmZmODsNCiAgICAgICAgcy0+Y29udHJvbCB8PSB2YWx1ZSAmIDc7DQogICAgICAgIGlmICgob2xk
+dmFsIF4gdmFsdWUpICYgU1lTVElDS19FTkFCTEUpIHsNCiAgICAgICAgICAgIGludDY0X3Qgbm93
+ID0gcWVtdV9jbG9ja19nZXRfbnMoUUVNVV9DTE9DS19WSVJUVUFMKTsNCiAgICAgICAgICAgIGlm
+ICh2YWx1ZSAmIFNZU1RJQ0tfRU5BQkxFKSB7DQogICAgICAgICAgICAgICAgaWYgKHMtPnRpY2sp
+IHsNCiAgICAgICAgICAgICAgICAgICAgcy0+dGljayArPSBub3c7DQogICAgICAgICAgICAgICAg
+ICAgIHRpbWVyX21vZChzLT50aW1lciwgcy0+dGljayk7DQogICAgICAgICAgICAgICAgfSBlbHNl
+IHsNCiAgICAgICAgICAgICAgICAgICAgc3lzdGlja19yZWxvYWQocywgMSk7DQogICAgICAgICAg
+ICAgICAgfQ0KICAgICAgICAgICAgfSBlbHNlIHsNCiAgICAgICAgICAgICAgICB0aW1lcl9kZWwo
+cy0+dGltZXIpOw0KICAgICAgICAgICAgICAgIHMtPnRpY2sgLT0gbm93Ow0KICAgICAgICAgICAg
+ICAgIGlmIChzLT50aWNrIDwgMCkgew0KICAgICAgICAgICAgICAgICAgICBzLT50aWNrID0gMDsN
+CiAgICAgICAgICAgICAgICB9DQogICAgICAgICAgICB9DQogICAgICAgIH0gZWxzZSBpZiAoKG9s
+ZHZhbCBeIHZhbHVlKSAmIFNZU1RJQ0tfQ0xLU09VUkNFKSB7DQogICAgICAgICAgICAvKiBUaGlz
+IGlzIGEgaGFjay4gRm9yY2UgdGhlIHRpbWVyIHRvIGJlIHJlbG9hZGVkDQogICAgICAgICAgICAg
+ICB3aGVuIHRoZSByZWZlcmVuY2UgY2xvY2sgaXMgY2hhbmdlZC4gICovDQogICAgICAgICAgICBz
+eXN0aWNrX3JlbG9hZChzLCAxKTsNCiAgICAgICAgfQ0KICAgICAgICBicmVhazsNCiAgICB9DQog
+ICAgY2FzZSAweDQ6IC8qIFN5c1RpY2sgUmVsb2FkIFZhbHVlLiAgKi8NCiAgICAgICAgcy0+cmVs
+b2FkID0gdmFsdWU7DQogICAgICAgIGJyZWFrOw0KICAgIC4uLi4uLg0KDQpZZXMsIEknbSBmb3Ig
+dGhlIGZvciBkZXRlcm1pbmlzbSwgaW4gbXkgZ3Vlc3QgaW1hZ2UgdGhlcmUgYXJlIHNvbWUgdGVz
+dGluZyBjYXNlcyBmb3IgdGltZXIgc3lzdGVtIHdoaWNoIGxvY2F0ZSBpbiBhIHNtYWxsIHJ0b3Mu
+DQpBbmQgZm9yIHNoaWZ0IHZhbHVlLCBJIG1lYW4gaXQgc2VlbXMgc2hpZnQgdmFsdWUgaW1wYWN0
+IHN5c3RlbSBncmVhdGx5LCBmb3IgdGhlIHNhbWUgb25lIGd1ZXN0IGltYWdlIGFuZCBkaWZmZXJl
+bnQgc2hpZnQgdmFsdWUgaW4gY291bnQgbW9kZSgtaWNvdW50IHNoaWZ0PTQsYWxpZ249b2ZmLHNs
+ZWVwPW9mZiAtcnRjIGNsb2NrPXZtKSBnaXZlIHZlcnkgZGlmZmVyZW50IGFjY3VyYWN5IGZvciBn
+dWVzdCB0aW1lci4gU28gbXkgcXVlc3Rpb24gaXMgaG93IHRvIGNhbGN1bGF0ZSB0aGUgc2hpZnQg
+dmFsdWUgZm9yIHRoZSBlbmQgdXNlci4NCg0KVGhhbmtzIGFnYWluIGZvciB5b3VyIGhlbHAuDQoN
+ClRoYW5rcyAgDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBRZW11LWRldmVs
+IFttYWlsdG86cWVtdS1kZXZlbC1ib3VuY2VzK3dlbnRvbmcud3U9aW50ZWwuY29tQG5vbmdudS5v
+cmddIE9uIEJlaGFsZiBPZiBBbGV4IEJlbm7DqWUNClNlbnQ6IE1vbmRheSwgSnVuZSAyNCwgMjAx
+OSAxMTo0OCBQTQ0KVG86IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KU3ViamVjdDogUmU6IFtRZW11
+LWRldmVsXSBpY291bnQgbW9kZQ0KDQoNCld1LCBXZW50b25nIDx3ZW50b25nLnd1QGludGVsLmNv
+bT4gd3JpdGVzOg0KDQo+IEhpIGFsbCwNCj4NCj4gUmVjZW50bHkgSSdtIHVzaW5nIFFlbXUgVENH
+IGljb3VudCBtb2RlLCBmcm9tIHRoZSBjb2RlIEkgZm91bmQgUWVtdSANCj4gdGltZXJzIHJ1biBh
+dCAxR0h6LCBhbmQgZm9yIEFybVY3TSBleGFtcGxlLCB0aGVyZSB3aWxsIGJlIGNvbnZlcnNpb24N
+Cg0KQXJlIHlvdSB0YWxraW5nIGFib3V0Og0KDQogICNkZWZpbmUgQVJNX0NQVV9GUkVRIDEwMDAw
+MDAwMDAgLyogRklYTUU6IDEgR0h6LCBzaG91bGQgYmUgY29uZmlndXJhYmxlICovDQoNCmJlY2F1
+c2UgYXMgZmFyIGFzIEkgY2FuIHRlbGwgdGhhdCBvbmx5IGFmZmVjdHMgdGhlIHNjYWxpbmcgZmFj
+dG9ycyBhcHBsaWVkIHRvIFBNVSBjb3VudGVycy4gVGhlIGludGVybmFsIGNvdW50ZXJzIChDTlRG
+UlFfRUwwIGFuZCBmcmllbmRzKSBhcmUgaGFyZHdpcmVkIHRvOg0KDQogICAvKiBTY2FsZSBmYWN0
+b3IgZm9yIGdlbmVyaWMgdGltZXJzLCBpZSBudW1iZXIgb2YgbnMgcGVyIHRpY2suDQogICAgKiBU
+aGlzIGdpdmVzIGEgNjIuNU1IeiB0aW1lci4NCiAgICAqLw0KICAgI2RlZmluZSBHVElNRVJfU0NB
+TEUgMTYNCg0KYnV0IHRoaXMgb25seSBhZmZlY3RzIHRoZSBub21pbmFsIHJhdGUgdGhlIGNvdW50
+ZXJzIGV4cGlyZSBhdC4gU29mdHdhcmUgY291bGQgYXR0ZW1wdCB0byByZXByb2dyYW0gaXQgYW5k
+IHRoZSBlbXVsYXRpb24gd2lsbCByZWFkLWFzLXdyaXR0ZW4gYnV0IGl0IHdvbid0IGFjdHVhbGx5
+IGNoYW5nZSBhbnl0aGluZy4gSG93ZXZlciB0aGlzIG9ubHkgYWZmZWN0cyB0aGUgY2xvY2tzDQot
+IGl0IGltcGxpZXMgbm90aGluZyBhYm91dCBob3cgZmFzdCB0aGUgY29yZSBtYXkgYmUgZXhlY3V0
+aW5nLiBJbiBmYWN0IHVubGVzcyB5b3UgYXJlIHVzaW5nIGljb3VudCB3ZSB3aWxsIGp1c3QgcnVu
+IGFzIGZhc3QgYSBwb3NzaWJsZS4NCg0KPiBmYWN0b3IgZnJvbSBxZW11IHRpbWVyIHRvIFN5c1Rp
+Y2sgZnJlcXVlbmN5IHdoaWNoIHdpbGwgYmUgY2FsY3VsYXRlZCANCj4gYnkgTkFOT1NFQ09ORFNf
+UEVSX1NFQ09ORCAvIFNZU0NMS19GUlEuDQoNCllvdSBuZWVkIHRvIGJlIGEgbGl0dGxlIG1vcmUg
+cHJlY2lzZSBoZXJlLiBBUk0gc3lzdGVtcyB2YXJ5IGluIHRoZSBudW1iZXIgb2YgdGltZXIgc291
+cmNlcyB0aGV5IGhhdmUuIFRoZSBxZW11IHRpbWVycyBhcmUgYW4gaW50ZXJuYWwgaW1wbGVtZW50
+YXRpb24gZGV0YWlsIGZvciBwcm92aWRpbmcgYSB3YXkgdG8gdHJhY2sgdGltZS4gVGhlIHZhbHVl
+IG9mIFNZU0NMS19GUlEgdmFyaWVzIGRlcGVuZGluZyBvbiB3aGF0IGJvYXJkIHlvdSBoYXZlIGxh
+dW5jaGVkIGFuZCBtb3N0bHkgc2VlbXMgdG8gYmUgdXNlZCB0byBjYWxjdWxhdGUgdGhlIGFkZGl0
+aW9uYWwgdGltZXIgdmFsdWVzIGZvciB2YXJpb3VzIHBlcmlwaGVyYWxzLg0KDQo+IEJ1dCB0aGUg
+c2hpZnQgdmFsdWUgYWxzbyBkZWZpbmUgdGhlIHRhcmdldCBjcHUgZnJlcXVlbmN5KDJeTiBucyAv
+b25lIA0KPiBpbnN0cnVjdGlvbiksIGFuZCBib3RoIGZyZXF1ZW5jaWVzIHdpbGwgYmUgdXNlZCB0
+b2dldGhlciB0byBjYWxjdWxhdGUgDQo+IHRoZSBndWVzdCB0aW1lciwgc28gSSB0aGluayB0aGVy
+ZSBpcyBidWdneSBiZWNhdXNlIG9mIHRoZSBkaWZmZXJlbnQgDQo+IGZyZXF1ZW5jeSwgY2FuIGFu
+eW9uZSBnaXZlIHNvbWUgZXhwbGFuYXRpb24gZm9yIHRoaXM/IFRoYW5rcyBhIGxvdCENCg0KQWxs
+IGljb3VudCBkb2VzIGlzIHBlZyB0aGUgZWxhcHNlZCB2aXJ0dWFsIHRpbWUgdG8gdGhlIG51bWJl
+ciBvZiBpbnN0cnVjdGlvbnMgZXhlY3V0ZWQgKHRoZSBpbnN0cnVjdGlvbiBjb3VudCkuIFRoaXMg
+bWVhbnMgd2hlbmV2ZXIgdGhlIGNvZGUgcmVxdWVzdHM6DQoNCiAgcWVtdV9jbG9ja19nZXRfbnMo
+UUVNVV9DTE9DS19WSVJUVUFMKQ0KDQpJbnN0ZWFkIG9mIHJldHVybmluZyB0aGUgbnVtYmVyIG9m
+IG5zIHRoZSBndWVzdCBoYXMgYmVlbiBydW5uaW5nIGJhc2VkIG9uIGVsYXBzZWQgaG9zdCB0aW1l
+IGl0IHdpbGwgcmV0dXJuIHRoZSBudW1iZXIgb2YgaW5zdHJ1Y3Rpb25zIHJ1biBzaGlmdGVkIGJ5
+IGljb3VudF9zaGlmdC4gU28gd2l0aCBoaWdoZXIgc2hpZnQgdmFsdWVzIGVhY2ggaW5zdHJ1Y3Rp
+b24gc2VlcyBhbiBpbmNyZWFzZWQgYW1vdW50IG9mIHZpcnR1YWwgdGltZSBwYXNzIC0gdGhlIHBy
+YWN0aWNhbCBlZmZlY3Qgd2lsbCBiZSB5b3Ugc2VlIGxlc3MgaW5zdHJ1Y3Rpb25zIGV4ZWN1dGVk
+IGJldHdlZW4gdGltZXIgaW50ZXJydXB0cy4NCg0KPg0KPiBBbHNvIGNhbiBhbnlvbmUgZ2l2ZSBz
+b21lIGhpbnRzIGFib3V0IGhvdyB0byBnaXZlIHRoZSBzaGlmdCB2YWx1ZSB3aGVuIA0KPiB1c2Ug
+aWNvdW50IFRDRyBtb2RlPw0KDQogICRRRU1VICRRRU1VX0FSR1MgLWljb3VudCBODQoNCm9yDQoN
+CiAgJFFFTVUgJFFFTVVfQVJHUyAtaWNvdW50IHNoaWZ0PU4NCg0KV2hhdCBpcyB5b3VyIGludGVy
+ZXN0IGluIGljb3VudD8gSXMgaXQgcHVyZWx5IGZvciBkZXRlcm1pbmlzbT8NCg0KLS0NCkFsZXgg
+QmVubsOpZQ0KDQo=
 
