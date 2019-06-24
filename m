@@ -2,72 +2,93 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D685C43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 15:31:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47ECDC4646B
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 15:35:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D62A620652
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 15:31:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D62A620652
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 215A520652
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 15:35:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 215A520652
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52342 helo=lists.gnu.org)
+Received: from localhost ([::1]:52390 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfQwl-0002cc-T9
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 11:31:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44035)
+	id 1hfR0S-0005PL-5L
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 11:35:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44850)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hfQvh-0002Dt-0H
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 11:30:50 -0400
+ (envelope-from <anthony.perard@citrix.com>) id 1hfQy0-0003VK-IO
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 11:33:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hfQve-0005Yg-Gh
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 11:30:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35692)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hfQvc-0005U9-LT
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 11:30:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hfQva-0003jT-As
- for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 15:30:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5142D2E8024
- for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 15:30:42 +0000 (UTC)
+ (envelope-from <anthony.perard@citrix.com>) id 1hfQxz-0000Kv-1J
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 11:33:12 -0400
+Received: from esa3.hc3370-68.iphmx.com ([216.71.145.155]:11946)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
+ id 1hfQxy-0000GL-LO
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 11:33:10 -0400
+Authentication-Results: esa3.hc3370-68.iphmx.com;
+ dkim=none (message not signed) header.i=none;
+ spf=None smtp.pra=anthony.perard@citrix.com;
+ spf=Pass smtp.mailfrom=anthony.perard@citrix.com;
+ spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ anthony.perard@citrix.com) identity=pra;
+ client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible
+Received-SPF: Pass (esa3.hc3370-68.iphmx.com: domain of
+ anthony.perard@citrix.com designates 162.221.158.21 as
+ permitted sender) identity=mailfrom;
+ client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible; x-record-type="v=spf1";
+ x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+ ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+ ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+ ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
+Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ postmaster@mail.citrix.com) identity=helo;
+ client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="postmaster@mail.citrix.com";
+ x-conformance=sidf_compatible
+IronPort-SDR: w5lZWeFNe0Mt5GGtO6902sMa5nS1nV2xADuKuRQrGBgAgx31QkWiqGQGMdacZW9phAMfUm4Igl
+ VQ/s9CQ17PbJ//+BE+ma5u8bgbEkNykZamyaiR/otO1OIOv/zsrJmFZ3ulhFI99vBlEuzIMBxT
+ eHF0PBSjMjLE+7dKSKxBxQxLeHBVcOdp0ZOgSywvs5ALd/nd6BzDaIt0i4PibR3ivjWcOKn4+T
+ lSjhuICS/xIdcNcEI0rSAEJzZtZ7wPq1VIsV8u9r2DGszoHxXG4+FN6LR3Zo/4MehbVzUyiWYq
+ G5g=
+X-SBRS: 2.7
+X-MesageID: 2148093
+X-Ironport-Server: esa3.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.63,412,1557201600"; 
+   d="scan'208";a="2148093"
+From: Anthony PERARD <anthony.perard@citrix.com>
+To: <qemu-devel@nongnu.org>
+Date: Mon, 24 Jun 2019 16:32:49 +0100
+Message-ID: <20190624153257.20163-1-anthony.perard@citrix.com>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 24 Jun 2019 15:20:36 -0000
-From: roblabla <1834051@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: roblabla
-X-Launchpad-Bug-Reporter: roblabla (roblabla)
-X-Launchpad-Bug-Modifier: roblabla (roblabla)
-References: <156138866047.31005.4592891012762616724.malonedeb@chaenomeles.canonical.com>
-Message-Id: <156138963655.17814.17558605662796879437.launchpad@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18991";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: cec8d0e8c08de96fca65c3dcb4d728ebf4923b83
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1834051] Re: IRQ2 ignored under KVM when using
- IOAPIC
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 216.71.145.155
+Subject: [Qemu-devel] [PULL 0/8] xen queue 2019-06-24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,82 +97,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1834051 <1834051@bugs.launchpad.net>
+Cc: Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Description changed:
+The following changes since commit 474f3938d79ab36b9231c9ad3b5a9314c2aeacde:
 
-  When using KVM, and an OS that supports the IOAPIC, interrupts mapped on
-  IRQ2 (for instance, routing an HPET timer on interrupt 2) will cause the
-  interrupts to never be delivered. This is because QEmu, when setting up
-  the KVM interrupt routes, will not set one up for IRQ2[0]. When running
-  without KVM, IRQ2 is identity-mapped to GSI2.
-  =
+  Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-jun-21-2019' into staging (2019-06-21 15:40:50 +0100)
 
-  My understanding is that IRQs should be identity mapped to their
-  equivalent GSI unless a redirection entry is present in the MADT. This
-  is supported by ACPI 6.2 spec[1], 5.2.12.5 Interrupt Source Override
-  Structure, which claims: "It is assumed that the ISA interrupts will be
-  identity-mapped into the first I/O APIC sources.".
-  =
+are available in the Git repository at:
 
-  I stumbled across this while working on my own custom OS, got very
-  confused why the HPET wasn't triggering any interruption - and even more
-  confused why the behavior only happened in KVM and not in non-KVM.
-  =
+  https://xenbits.xen.org/git-http/people/aperard/qemu-dm.git tags/pull-xen-20190624
 
-+ Version tested: QEMU emulator version 4.0.50
-+ (v4.0.0-226-g8482ff2eb3-dirty)
-+ =
+for you to fetch changes up to a3434a2d56aee3018f4a0f55c7e0f0cda11f3d9e:
 
-  [0]:
-  https://github.com/qemu/qemu/blob/37560c259d7a0d6aceb96e9d6903ee002f4e5e0=
-c/hw/i386/kvm/ioapic.c#L40
-  =
+  xen: Import other xen/io/*.h (2019-06-24 10:42:30 +0100)
 
-  [1]: https://uefi.org/sites/default/files/resources/ACPI_6_2.pdf
+----------------------------------------------------------------
+Xen queue
 
--- =
+* Fix build
+* xen-block: support feature-large-sector-size
+* xen-block: Support IOThread polling for PV shared rings
+* Avoid usage of a VLA
+* Cleanup Xen headers usage
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1834051
+----------------------------------------------------------------
+Anthony PERARD (4):
+      xen: Avoid VLA
+      xen: Drop includes of xen/hvm/params.h
+      Revert xen/io/ring.h of "Clean up a few header guard symbols"
+      xen: Import other xen/io/*.h
 
-Title:
-  IRQ2 ignored under KVM when using IOAPIC
+Paul Durrant (4):
+      xen-block: support feature-large-sector-size
+      xen-bus: use a separate fd for each event channel
+      xen-bus: allow AioContext to be specified for each event channel
+      xen-bus / xen-block: add support for event channel polling
 
-Status in QEMU:
-  New
-
-Bug description:
-  When using KVM, and an OS that supports the IOAPIC, interrupts mapped
-  on IRQ2 (for instance, routing an HPET timer on interrupt 2) will
-  cause the interrupts to never be delivered. This is because QEmu, when
-  setting up the KVM interrupt routes, will not set one up for IRQ2[0].
-  When running without KVM, IRQ2 is identity-mapped to GSI2.
-
-  My understanding is that IRQs should be identity mapped to their
-  equivalent GSI unless a redirection entry is present in the MADT. This
-  is supported by ACPI 6.2 spec[1], 5.2.12.5 Interrupt Source Override
-  Structure, which claims: "It is assumed that the ISA interrupts will
-  be identity-mapped into the first I/O APIC sources.".
-
-  I stumbled across this while working on my own custom OS, got very
-  confused why the HPET wasn't triggering any interruption - and even
-  more confused why the behavior only happened in KVM and not in non-
-  KVM.
-
-  Version tested: QEMU emulator version 4.0.50
-  (v4.0.0-226-g8482ff2eb3-dirty)
-
-  [0]:
-  https://github.com/qemu/qemu/blob/37560c259d7a0d6aceb96e9d6903ee002f4e5e0=
-c/hw/i386/kvm/ioapic.c#L40
-
-  [1]: https://uefi.org/sites/default/files/resources/ACPI_6_2.pdf
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1834051/+subscriptions
+ hw/9pfs/xen-9pfs.h                       |    4 +-
+ hw/block/dataplane/xen-block.c           |   44 +-
+ hw/block/dataplane/xen-block.h           |    3 +-
+ hw/block/xen-block.c                     |   38 +-
+ hw/block/xen_blkif.h                     |    5 +-
+ hw/char/xen_console.c                    |    2 +-
+ hw/display/xenfb.c                       |    7 +-
+ hw/i386/xen/xen-hvm.c                    |   16 +-
+ hw/i386/xen/xen-mapcache.c               |    2 -
+ hw/net/xen_nic.c                         |    2 +-
+ hw/usb/xen-usb.c                         |    3 +-
+ hw/xen/xen-bus.c                         |   92 +--
+ hw/xen/xen-legacy-backend.c              |    2 -
+ include/hw/xen/interface/grant_table.h   |   36 ++
+ include/hw/xen/interface/io/blkif.h      |  712 +++++++++++++++++++++
+ include/hw/xen/interface/io/console.h    |   46 ++
+ include/hw/xen/interface/io/fbif.h       |  156 +++++
+ include/hw/xen/interface/io/kbdif.h      |  566 +++++++++++++++++
+ include/hw/xen/interface/io/netif.h      | 1010 ++++++++++++++++++++++++++++++
+ include/hw/xen/interface/io/protocols.h  |   42 ++
+ include/hw/xen/{ => interface}/io/ring.h |    6 +-
+ include/hw/xen/interface/io/usbif.h      |  254 ++++++++
+ include/hw/xen/interface/io/xenbus.h     |   70 +++
+ include/hw/xen/xen-bus.h                 |    9 +-
+ include/hw/xen/xen_common.h              |    2 +-
+ 25 files changed, 3023 insertions(+), 106 deletions(-)
+ create mode 100644 include/hw/xen/interface/grant_table.h
+ create mode 100644 include/hw/xen/interface/io/blkif.h
+ create mode 100644 include/hw/xen/interface/io/console.h
+ create mode 100644 include/hw/xen/interface/io/fbif.h
+ create mode 100644 include/hw/xen/interface/io/kbdif.h
+ create mode 100644 include/hw/xen/interface/io/netif.h
+ create mode 100644 include/hw/xen/interface/io/protocols.h
+ rename include/hw/xen/{ => interface}/io/ring.h (99%)
+ create mode 100644 include/hw/xen/interface/io/usbif.h
+ create mode 100644 include/hw/xen/interface/io/xenbus.h
 
