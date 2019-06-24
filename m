@@ -2,91 +2,91 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B402AC43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 12:44:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ADB3C43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 12:45:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40CB6212F5
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 12:44:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DC87F212F5
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 12:45:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aERU0Szv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40CB6212F5
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="stJXWE93"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC87F212F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50826 helo=lists.gnu.org)
+Received: from localhost ([::1]:50834 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfOKR-0004t1-Ux
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 08:44:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55273)
+	id 1hfOLN-0005md-7D
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 08:45:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55448)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hfOJU-0004QY-Ee
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 08:43:13 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hfOKA-0004w9-64
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 08:43:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hfOJT-0000AB-Ai
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 08:43:12 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34932)
+ (envelope-from <alex.bennee@linaro.org>) id 1hfOK9-0000w1-8m
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 08:43:54 -0400
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:37872)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hfOJT-00006t-27
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 08:43:11 -0400
-Received: by mail-wr1-x441.google.com with SMTP id f15so3866282wrp.2
- for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 05:43:09 -0700 (PDT)
+ id 1hfOK9-0000ud-2G
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 08:43:53 -0400
+Received: by mail-wr1-x435.google.com with SMTP id v14so13760599wrr.4
+ for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 05:43:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=G28Q+EMDKkzGh3KaTkKxgT2SRhdPorEtwOi6uXEbimM=;
- b=aERU0SzvlekmvNXZmd2LV7en3U6PRriPj6Ej6vlmg3kayDCz9rWrw8hIbwGSEu+WuH
- e66KzUkKqr2qvCgLnKi+l1qU5681r7T1vlOOOQO6KA7en07/YkQyqM1TAf9r7OtATm7/
- GcDrX8+QeWrbrYCmgK2QoPrXfln6dp9OFZ1sNHKHSPekuy0MLtLJP+PNdvI8znLDrnfz
- S7OL3gDRcf47kFL6acECHKoBtM1J6F4lrkTsqY+8NzypicwLd7UOowBltpCkEZCeA2rN
- Nz4GooYymJTSoWeSQZsHIXN49jIqfvwSuHoj7hwuvvbWBPSVtPK/CxiBYjhI5MR7cZjf
- Tnxg==
+ bh=bDAK4be8VdrGNnZPF3joFPMPResO1usv5rXfRIQiG+I=;
+ b=stJXWE93xW7pTaWM+3DhXfMkTXJ30h8TKftIkd1Y5H8YWehjZ4QtB/jQqjTtbDUv9p
+ BwZzj1/12WGbjM9ghiWlD7dMLFU/KfdurwOUX/qjmkLNFD2wTxhtD9L+27XcYLcuL+gQ
+ W2anAvEZfaEmP6VAaDeo8ULzemat3U3VTSPXO8wfK35gC+Nhdg0MMIwnBTvpAgV4qSGc
+ DzEvjc4vTokdl2Y3fdji8+cbQlbl5rmwHc6GfOPzuTrIpqQF/FXd+ZiJ/7W4p71FEplk
+ sZT43EyA0ZFV7dCnkvWWvvthshXOs6u0L2NmVNEX6HG69kBLyxua1l8Ynqgbyghj7loX
+ EsCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=G28Q+EMDKkzGh3KaTkKxgT2SRhdPorEtwOi6uXEbimM=;
- b=PnJgopDUPT5DfMzWWrn1Tps49/Kv5i0kGeEdVlwmhoEcUpY7/hxNA02689LjzPAwYh
- 2VB9i1TpYIXMNCMua/TnV++JSABr4c6gdqmNHPpJPUIO2Z+bCb0ZDvMH8mi+TlqUr+Tj
- DaVilaecRt+py5T4hRN41brye2eMxY/KXfVVVqgmtPSdmfAxptVdDi1Edvqn4HvnrH1v
- gwmTz5bgly1nxcVBgwzlMoUaTISJcZqEW7PPdqVIjFDlrPw+bHrjj/3hBJZklVR78Klv
- PZaxUBiFCL+23gdCNMDovsiwD+HGcS+PRlrSN8/qQA+hHeg7orL3mPtsge/WAV3OGxRW
- P5gw==
-X-Gm-Message-State: APjAAAWOZZlOXAajh1UNksho2rZWNTeyjfwfYzZwjB8f9UJ2iQdMj6GL
- hXtzcucjgiK4zaP6tYc5UUKt+LY0q6k=
-X-Google-Smtp-Source: APXvYqwXU4/qOoETdCnjHcextc1IySzcJ8yS4sd3HdEP+bCa/c05V6AqpeqPMhAHYBjEXUkbLzl2yg==
-X-Received: by 2002:a5d:4fc1:: with SMTP id h1mr24125663wrw.83.1561380187880; 
- Mon, 24 Jun 2019 05:43:07 -0700 (PDT)
+ bh=bDAK4be8VdrGNnZPF3joFPMPResO1usv5rXfRIQiG+I=;
+ b=pFrkLrdmA1zFVDic7/Em+RgrCSvYPzhHh2sNMJaDWwwZaNeXO6NkpW45jK+gNVLUL7
+ ZIgG5Lz5sLuuwtvw7u/bOkI7awYgeCGDxRlNPP6xIobcTsUJr62tW0+YMAZztAgnEh0K
+ QL3wju0tYAFZZgMNnT6IITtqhhWw+Y9KggJLMhOwXCdbUN8o/BOks822oNG2OruhMGvI
+ qycZb3y2vwz36FT0pakxRjgtZOGkY6sAspEIEXcWuursswsmztCzyDjRXPiqjDQEkxLi
+ Jq2SmoTj6CpV72OCGgkBVQb4Wmg57XtdlyLTxQXCSJcjbMCgVe1L3Hn+VYXMvR7o3N/o
+ Im7A==
+X-Gm-Message-State: APjAAAVHRKhDTyZBE7Ls3cKlOgO5MYIXgZrEy8L775wAEDbwZx1I+74T
+ 91BKX6PjHO9xsuWRmufx9/aaO8JXIOA=
+X-Google-Smtp-Source: APXvYqyI8lip6TN8OKkwdgifV471ua54sdDf4PYYo4KdQLXr/I4adYudSPwvfZeZV0L38ZSzjb+hrw==
+X-Received: by 2002:adf:ec8e:: with SMTP id z14mr24700051wrn.125.1561380231697; 
+ Mon, 24 Jun 2019 05:43:51 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id j17sm8901509wrw.6.2019.06.24.05.43.07
+ by smtp.gmail.com with ESMTPSA id b203sm12884141wmd.41.2019.06.24.05.43.51
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 24 Jun 2019 05:43:07 -0700 (PDT)
+ Mon, 24 Jun 2019 05:43:51 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id CDF481FF87;
- Mon, 24 Jun 2019 13:43:06 +0100 (BST)
-References: <20190523105440.27045-1-rkagan@virtuozzo.com>
- <20190523105440.27045-2-rkagan@virtuozzo.com>
- <87sgrz1c8g.fsf@zen.linaroharston> <20190624115045.GA2557@rkaganb.sw.ru>
+ by zen.linaroharston (Postfix) with ESMTP id D891B1FF87;
+ Mon, 24 Jun 2019 13:43:50 +0100 (BST)
+References: <1561116620-22245-1-git-send-email-pbonzini@redhat.com>
+ <1561116620-22245-4-git-send-email-pbonzini@redhat.com>
+ <87r27j1byq.fsf@zen.linaroharston> <875zovf9un.fsf@vitty.brq.redhat.com>
 User-agent: mu4e 1.3.2; emacs 26.1
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Roman Kagan <rkagan@virtuozzo.com>
-In-reply-to: <20190624115045.GA2557@rkaganb.sw.ru>
-Date: Mon, 24 Jun 2019 13:43:06 +0100
-Message-ID: <87pnn317dx.fsf@zen.linaroharston>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+In-reply-to: <875zovf9un.fsf@vitty.brq.redhat.com>
+Date: Mon, 24 Jun 2019 13:43:50 +0100
+Message-ID: <87o92n17cp.fsf@zen.linaroharston>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: Re: [Qemu-devel] [RFC PATCH 1/2] cpus-common: nuke finish_safe_work
+X-Received-From: 2a00:1450:4864:20::435
+Subject: Re: [Qemu-devel] [PULL 03/25] i386/kvm: convert hyperv
+ enlightenments properties from bools to bits
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,99 +98,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Roman Kagan <rkagan@virtuozzo.com> writes:
+Vitaly Kuznetsov <vkuznets@redhat.com> writes:
 
-> On Mon, Jun 24, 2019 at 11:58:23AM +0100, Alex Benn=C3=A9e wrote:
->> Roman Kagan <rkagan@virtuozzo.com> writes:
->>
->> > It was introduced in commit b129972c8b41e15b0521895a46fd9c752b68a5e,
->> > with the following motivation:
->>
->> I can't find this commit in my tree.
->
-> OOPS, that was supposed to be ab129972c8b41e15b0521895a46fd9c752b68a5e,
-> sorry.
+> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
 >
 >>
->> >
->> >   Because start_exclusive uses CPU_FOREACH, merge exclusive_lock with
->> >   qemu_cpu_list_lock: together with a call to exclusive_idle (via
->> >   cpu_exec_start/end) in cpu_list_add, this protects exclusive work
->> >   against concurrent CPU addition and removal.
->> >
->> > However, it seems to be redundant, because the cpu-exclusive
->> > infrastructure provides suffificent protection against the newly added
->> > CPU starting execution while the cpu-exclusive work is running, and the
->> > aforementioned traversing of the cpu list is protected by
->> > qemu_cpu_list_lock.
->> >
->> > Besides, this appears to be the only place where the cpu-exclusive
->> > section is entered with the BQL taken, which has been found to trigger
->> > AB-BA deadlock as follows:
->> >
->> >     vCPU thread                             main thread
->> >     -----------                             -----------
->> > async_safe_run_on_cpu(self,
->> >                       async_synic_update)
->> > ...                                         [cpu hot-add]
->> > process_queued_cpu_work()
->> >   qemu_mutex_unlock_iothread()
->> >                                             [grab BQL]
->> >   start_exclusive()                         cpu_list_add()
->> >   async_synic_update()                        finish_safe_work()
->> >     qemu_mutex_lock_iothread()                  cpu_exec_start()
->> >
->> > So remove it.  This paves the way to establishing a strict nesting rule
->> > of never entering the exclusive section with the BQL taken.
->> >
->> > Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
->> > ---
->> >  cpus-common.c | 8 --------
->> >  1 file changed, 8 deletions(-)
->> >
->> > diff --git a/cpus-common.c b/cpus-common.c
->> > index 3ca58c64e8..023cfebfa3 100644
->> > --- a/cpus-common.c
->> > +++ b/cpus-common.c
->> > @@ -69,12 +69,6 @@ static int cpu_get_free_index(void)
->> >      return cpu_index;
->> >  }
->> >
->> > -static void finish_safe_work(CPUState *cpu)
->> > -{
->> > -    cpu_exec_start(cpu);
->> > -    cpu_exec_end(cpu);
->> > -}
->> > -
+>> This looks like it's broken the build:
 >>
->> This makes sense to me intellectually but I'm worried I've missed the
->> reason for it being introduced. Without finish_safe_work we have to wait
->> for the actual vCPU thread function to acquire and release the BQL and
->> enter it's first cpu_exec_start().
+>>   configure' '--without-default-devices' '--disable-user'
 >>
->> I guess I'd be happier if we had a hotplug test where we could stress
->> test the operation and be sure we've not just moved the deadlock
->> somewhere else.
+>> with:
+>>
+>>   /home/alex/lsrc/qemu.git/target/i386/hyperv-stub.c: In function =E2=80=
+=98kvm_hv_handle_exit=E2=80=99:
+>>   /home/alex/lsrc/qemu.git/target/i386/hyperv-stub.c:18:19: error: =E2=
+=80=98X86CPU=E2=80=99 {aka =E2=80=98struct X86CPU=E2=80=99} has no member n=
+amed =E2=80=98hyperv_synic=E2=80=99; did you mean =E2=80=98hyperv_vendor_id=
+=E2=80=99?
+>>            if (!cpu->hyperv_synic) {
+>>                      ^~~~~~~~~~~~
+>>
+>> Does the stub need updating for the new flag? I'm a little confused
+>> about the relationship between HyperV and KVM. I thought they were
+>> different hypervisors?
 >
-> Me too.  Unfortunately I haven't managed to come up with an idea how to
-> do this test.  One of the race participants, the safe work in a vCPU
-> thread, happens in response to an MSR write by the guest.  ATM there's
-> no way to do it without an actual guest running.  I'll have a look if I
-> can make a vm test for it, using a linux guest and its /dev/cpu/*/msr.
+> Yes, they are. But to run Windows guests we can pretend being Hyper-V
+> :-)
+>
+> I'll send a patch to fix the stub if nobody beats me to it. Thanks!
 
-Depending on how much machinery is required to trigger this we could
-add a system mode test. However there isn't much point if it requires
-duplicating the entire guest hotplug stack. It maybe easier to trigger
-on ARM - the PCSI sequence isn't overly complicated to deal with but I
-don't know what the impact of MSIs is.
+See:
 
+  Subject: [PATCH] target/i386: fix feature check in hyperv-stub.c
+  Date: Mon, 24 Jun 2019 13:38:35 +0100
+  Message-Id: <20190624123835.28869-1-alex.bennee@linaro.org>
+
+And let me know if it is correct. I'll include it in testing/next as
+it is a build fix.
 
 --
 Alex Benn=C3=A9e
