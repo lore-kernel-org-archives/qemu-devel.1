@@ -6,55 +6,62 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E07E9C43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 08:03:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68AB9C43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 08:07:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE4692083D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 08:03:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE4692083D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=birkelund.eu
+	by mail.kernel.org (Postfix) with ESMTPS id E6DF320679
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 08:07:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6DF320679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48648 helo=lists.gnu.org)
+Received: from localhost ([::1]:48654 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfJwT-0000Gi-L2
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 04:03:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33500)
+	id 1hfK0n-0001eZ-BN
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 04:07:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34731)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <klaus@birkelund.eu>) id 1hfJvR-00080x-FO
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:02:10 -0400
+ (envelope-from <peterx@redhat.com>) id 1hfK0H-0001Fd-L1
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:07:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <klaus@birkelund.eu>) id 1hfJvQ-00031S-B5
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:02:05 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:40372)
+ (envelope-from <peterx@redhat.com>) id 1hfK0G-0008WE-Nl
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:07:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56560)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <klaus@birkelund.eu>)
- id 1hfJvN-0002vj-1k; Mon, 24 Jun 2019 04:02:01 -0400
-Received: from apples.localdomain (ip-5-186-120-196.cgn.fibianet.dk
- [5.186.120.196])
- by charlie.dont.surf (Postfix) with ESMTPSA id 60387BF66B;
- Mon, 24 Jun 2019 08:01:58 +0000 (UTC)
-Date: Mon, 24 Jun 2019 10:01:54 +0200
-From: Klaus Birkelund <klaus@birkelund.eu>
-To: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <20190624080154.GA4263@apples.localdomain>
-Mail-Followup-To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org,
- Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>
-References: <20190617081205.GA26990@apples.localdomain>
- <c754211f-b41d-4b69-585b-b287fb776d81@redhat.com>
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hfK0G-0008V3-Gk
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:07:04 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 27F49307D84B;
+ Mon, 24 Jun 2019 08:07:03 +0000 (UTC)
+Received: from xz-x1 (ovpn-12-60.pek2.redhat.com [10.72.12.60])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A746560BF7;
+ Mon, 24 Jun 2019 08:06:55 +0000 (UTC)
+Date: Mon, 24 Jun 2019 16:06:49 +0800
+From: Peter Xu <peterx@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Message-ID: <20190624080649.GG6279@xz-x1>
+References: <20190624063733.22079-1-peterx@redhat.com>
+ <20190624063733.22079-3-peterx@redhat.com>
+ <20190624064122.GB27894@joy-OptiPlex-7040>
+ <20190624065750.GE6279@xz-x1>
+ <20190624070450.GC27894@joy-OptiPlex-7040>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <c754211f-b41d-4b69-585b-b287fb776d81@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+In-Reply-To: <20190624070450.GC27894@joy-OptiPlex-7040>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Mon, 24 Jun 2019 08:07:03 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 128.199.63.193
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC] nvme: how to support multiple
- namespaces
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 2/2] intel_iommu: Fix unexpected unmaps
+ during global unmap
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,62 +73,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- Keith Busch <keith.busch@intel.com>, Max Reitz <mreitz@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Auger Eric <eric.auger@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 20, 2019 at 05:37:24PM +0200, Laszlo Ersek wrote:
-> On 06/17/19 10:12, Klaus Birkelund wrote:
-> > Hi all,
-> > 
-> > I'm thinking about how to support multiple namespaces in the NVMe
-> > device. My first idea was to add a "namespaces" property array to the
-> > device that references blockdevs, but as Laszlo writes below, this might
-> > not be the best idea. It also makes it troublesome to add per-namespace
-> > parameters (which is something I will be required to do for other
-> > reasons). Some of you might remember my first attempt at this that
-> > included adding a new block driver (derived from raw) that could be
-> > given certain parameters that would then be stored in the image. But I
-> > understand that this is a no-go, and I can see why.
-> > 
-> > I guess the optimal way would be such that the parameters was something
-> > like:
-> > 
-> >    -blockdev raw,node-name=blk_ns1,file.driver=file,file.filename=blk_ns1.img
-> >    -blockdev raw,node-name=blk_ns2,file.driver=file,file.filename=blk_ns2.img
-> >    -device nvme-ns,drive=blk_ns1,ns-specific-options (nsfeat,mc,dlfeat)...
-> >    -device nvme-ns,drive=blk_ns2,...
-> >    -device nvme,...
-> > 
-> > My question is how to state the parent/child relationship between the
-> > nvme and nvme-ns devices. I've been looking at how ide and virtio does
-> > this, and maybe a "bus" is the right way to go?
-> 
-> I've added Markus to the address list, because of this question. No
-> other (new) comments from me on the thread starter at this time, just
-> keeping the full context.
-> 
+On Mon, Jun 24, 2019 at 03:04:50AM -0400, Yan Zhao wrote:
 
-Hi all,
+[...]
 
-I've succesfully implemented this by introducing a new 'nvme-ns' device
-model. The nvme device creates a bus named from the device id ('id'
-parameter) and the nvme-ns devices are then registered on this.
+> I think it might be helpful if there anything wrong in code.
+> for example, when previously, size = end - start, it will happen that
+> size will eventually be less than page size.
 
-This results in an nvme device being creates like this (two namespaces
-example):
+Well, if with such an error we'd better fix it right away in this
+patch... :)
 
-  -drive file=nvme0n1.img,if=none,id=disk1
-  -drive file=nvme0n2.img,if=none,id=disk2
-  -device nvme,serial=deadbeef,id=nvme0
-  -device nvme-ns,drive=disk1,bus=nvme0,nsid=1
-  -device nvme-ns,drive=disk2,bus=nvme0,nsid=2
+Let me wait for some more comments, I'll touch that up too if I need a
+repost.
 
-How does that look as a way forward?
+Regards,
 
-Cheers,
-Klaus
+-- 
+Peter Xu
 
