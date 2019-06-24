@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62C19C4646C
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 22:36:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7330EC4646C
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 22:37:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C1EC20674
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 22:36:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 41D2420665
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 22:37:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QKEi8l4k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C1EC20674
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t/5pRsq4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41D2420665
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55121 helo=lists.gnu.org)
+Received: from localhost ([::1]:55128 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfXZk-0002L2-FQ
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 18:36:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34176)
+	id 1hfXaa-000329-JK
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 18:37:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34070)
  by lists.gnu.org with esmtp (Exim 4.86_2)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1hfXSP-0004Bx-MN
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 18:29:03 -0400
+ id 1hfXSL-00047P-Lx
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 18:28:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1hfXSO-0005Ow-5b
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 18:29:01 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53314)
+ id 1hfXSH-0005K5-Mt
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 18:28:57 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45921)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1hfXSN-0005NI-SP
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 18:29:00 -0400
-Received: by mail-wm1-x341.google.com with SMTP id x15so829669wmj.3
- for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 15:28:59 -0700 (PDT)
+ id 1hfXSG-0005Dv-Ev
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 18:28:53 -0400
+Received: by mail-wr1-x442.google.com with SMTP id f9so15528965wre.12
+ for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 15:28:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=dutpFDVMpS+BeonIxVWBTDXWqsqJ8Tyi/t5MVWPpXKY=;
- b=QKEi8l4kIr2ObtABOD1ZIE74YpSdn0pJPP/tE0BO3FcytFamUo8VjIG/gMWCaMlV+L
- voaaPNLOqbbXpotXfi1GKP9rABAT0HDCzDYwIAMgT8cKc660BSKYXrBFGQNSYajC/15U
- cGRcs76J+2WxYj7PkvociNDTmOoZqPSZ46uNaMtZUHJK+5R4Vvr38YTEvN9oGk0Cn4VM
- OSrxIRvUEOzYGKVDRf6lACogJbPMiIfnhvh18awQbQagfwpSKYApU4ufmln9l5Q6lUTR
- v+Oh+Ety7ZE/vtur1ZeMCH/45t9As9NTQDYnS7vivklb1NiRzqufa7d/xBxgsE9Ek/7F
- 90xg==
+ bh=AW/xKO7mT5etUQtESYRRO4Lg0VmgTpD5DqdFMv+nnSk=;
+ b=t/5pRsq4kx9n6VdI7kt7a6mIBirBRCuz9f0XwXGJIb/QrFoVSEfOB2D8Sg1U1jdqIg
+ 3hEXPS+1UJU0B6psU1rImYNu7UaxO30Bx8Y7wea/NUlSFLVQsZAMlJNvJeXmniUxJphc
+ yLdY5sSD2CrhmQCHRkNX76AEXcmLSvpwH6tr8qzccunMvs3k8V0rewjIexpwjAKBsP+N
+ IP2NXMt40nsDVz76VlVfLExm+czkbWStu6Nnrk81xU3HEtNBnQ+t4Qk/LxJeUFwnDDL6
+ jrgY3IRXuaS1nfBv0Z0lVa2Ozh5jngPIXjV7gkjMc6/wUIqVJAcRgRhJW/USFOrCcohJ
+ YO8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=dutpFDVMpS+BeonIxVWBTDXWqsqJ8Tyi/t5MVWPpXKY=;
- b=s8BtDhG2TL9+w0B5HnW5F7PgrgaRyMpsG91uSqftubqOCfhDfbQCqqhUPMV+9y4iGv
- hmU0rPtsdMkcWVV2t9C1kdCZFETGVjrxDvXnQiV2N7Wk01KOZ6dPpIonFc5wOO0Ri8hL
- 5sLyLieSmicKwot8lkflMXBgafvkPYtd4G0RAOpivAtgmiYt+Nucu6webnAPOh4pKDCY
- wBbsRdHSQN/WpTJdihpSAxAmCGKutZjl18uMaPHtjuSCto76gL8BDIiM4Z/uwZulNG4r
- 42qr50DrgB/OBeK9dF114YmOfxGPRsjGYpflLxjuudsUyHweo7nnix7RS08eK2ZNZy5Y
- 9CtQ==
-X-Gm-Message-State: APjAAAUHIeZ4QBibm8e77cqqqLzu9hgiWyAavnXUz6VNK8EVvHCmr1F6
- UYZR4j23I9DmzF2UvFbPDNw17a9A
-X-Google-Smtp-Source: APXvYqxAJ3wff9BPORMRJIt1T391LX8v/bFTHEbTk4+7Leeg4gvaJzB2CaKYOsnSnmf0hRPaANSIGg==
-X-Received: by 2002:a7b:c301:: with SMTP id k1mr16826731wmj.43.1561415338112; 
- Mon, 24 Jun 2019 15:28:58 -0700 (PDT)
+ bh=AW/xKO7mT5etUQtESYRRO4Lg0VmgTpD5DqdFMv+nnSk=;
+ b=PAxpLZV3wgY4aOt4nTu7+PA4KPZbgM8ftp/lBNCibW8wNhx4d3GydOmokvrX3MSqoy
+ 1zs7aiE5rK1Qaf7fVa60do78ofjulUkUkriUegrQNgTfWBq73JgX/3pTp9CPwLvnU6uk
+ M3m8eEYFncC4pXk4fiHJLWh36a1wNtxoRrFcuvuPqJTvJQXT03byqflH4ezrPfPRH1ya
+ ZcLHTMAX7socB66zixucaaGQ9nfWvo3wocEA8crMYUHAwsq2hHlmTnA7JdC2TFOoR4dz
+ +/5N4gI9u6nvI8oZCF5bE3nXdJxo7QWEpf7mqUtV/1VYl/9/tS8SsHW41CWWVpy8ug86
+ IhCQ==
+X-Gm-Message-State: APjAAAUmvWHERltrJoRNl6dkgMYuIVBMZ2Z2FwJQFDACc9eqy64hX0vY
+ Mw+26J8upAAS6G0kbBlJZPQEQALG
+X-Google-Smtp-Source: APXvYqwcEMzwaNOiA92PIjeXDSc/AxkEbAT4quzy0ms2scZsajbMRma2w6av9ON1TRzbY93InRwF+w==
+X-Received: by 2002:adf:f581:: with SMTP id f1mr16415389wro.179.1561415328149; 
+ Mon, 24 Jun 2019 15:28:48 -0700 (PDT)
 Received: from x1.local (183.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.183])
- by smtp.gmail.com with ESMTPSA id l1sm646781wmg.13.2019.06.24.15.28.56
+ by smtp.gmail.com with ESMTPSA id l1sm646781wmg.13.2019.06.24.15.28.46
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 24 Jun 2019 15:28:57 -0700 (PDT)
+ Mon, 24 Jun 2019 15:28:47 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Date: Tue, 25 Jun 2019 00:28:43 +0200
-Message-Id: <20190624222844.26584-10-f4bug@amsat.org>
+Date: Tue, 25 Jun 2019 00:28:35 +0200
+Message-Id: <20190624222844.26584-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190624222844.26584-1-f4bug@amsat.org>
 References: <20190624222844.26584-1-f4bug@amsat.org>
@@ -83,9 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: [Qemu-devel] [PATCH 09/10] hw/mips/gt64xxx_pci: Move it to
- hw/pci-host/
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PATCH 01/10] hw/mips/gt64xxx_pci: Fix multiline
+ comment syntax
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,85 +108,149 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The GT-64120 is a north-bridge, and it is not MIPS specific.
-Move it with the other north-bridge devices.
-
-We move this device in the common-obj, and compile it once for
-the 4 different MIPS targets.
+Since commit 8c06fbdf36b checkpatch.pl enforce a new multiline
+comment syntax. Since we'll move this code around, fix its style
+first.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/{mips/gt64xxx_pci.c => pci-host/gt64120.c} | 0
- MAINTAINERS                                   | 2 +-
- hw/mips/Makefile.objs                         | 2 +-
- hw/mips/trace-events                          | 4 ----
- hw/pci-host/Makefile.objs                     | 2 +-
- hw/pci-host/trace-events                      | 5 +++++
- 6 files changed, 8 insertions(+), 7 deletions(-)
- rename hw/{mips/gt64xxx_pci.c => pci-host/gt64120.c} (100%)
+ hw/mips/gt64xxx_pci.c | 64 +++++++++++++++++++++++--------------------
+ 1 file changed, 35 insertions(+), 29 deletions(-)
 
-diff --git a/hw/mips/gt64xxx_pci.c b/hw/pci-host/gt64120.c
-similarity index 100%
-rename from hw/mips/gt64xxx_pci.c
-rename to hw/pci-host/gt64120.c
-diff --git a/MAINTAINERS b/MAINTAINERS
-index abef4a1cfc..da348e1af1 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -928,7 +928,7 @@ M: Aurelien Jarno <aurelien@aurel32.net>
- R: Aleksandar Rikalo <arikalo@wavecomp.com>
- S: Maintained
- F: hw/mips/mips_malta.c
--F: hw/mips/gt64xxx_pci.c
-+F: hw/pci-host/gt64120.c
- F: tests/acceptance/linux_ssh_mips_malta.py
+diff --git a/hw/mips/gt64xxx_pci.c b/hw/mips/gt64xxx_pci.c
+index f707e59c7a..c0924646b5 100644
+--- a/hw/mips/gt64xxx_pci.c
++++ b/hw/mips/gt64xxx_pci.c
+@@ -248,10 +248,11 @@ typedef struct GT64120State {
+ } GT64120State;
  
- Mipssim
-diff --git a/hw/mips/Makefile.objs b/hw/mips/Makefile.objs
-index 525809af07..da65e19c20 100644
---- a/hw/mips/Makefile.objs
-+++ b/hw/mips/Makefile.objs
-@@ -1,6 +1,6 @@
- obj-y += addr.o mips_int.o
- obj-$(CONFIG_R4K) += mips_r4k.o
--obj-$(CONFIG_MALTA) += gt64xxx_pci.o mips_malta.o
-+obj-$(CONFIG_MALTA) += mips_malta.o
- obj-$(CONFIG_MIPSSIM) += mips_mipssim.o
- obj-$(CONFIG_JAZZ) += mips_jazz.o
- obj-$(CONFIG_FULONG) += mips_fulong2e.o
-diff --git a/hw/mips/trace-events b/hw/mips/trace-events
-index 75d4c73f2e..e69de29bb2 100644
---- a/hw/mips/trace-events
-+++ b/hw/mips/trace-events
-@@ -1,4 +0,0 @@
--# gt64xxx.c
--gt64120_read(const char *regname, int width, uint64_t value) "gt64120 read %s value:0x%0*" PRIx64
--gt64120_write(const char *regname, int width, uint64_t value) "gt64120 write %s value:0x%0*" PRIx64
--gt64120_isd_remap(uint64_t from_length, uint64_t from_addr, uint64_t to_length, uint64_t to_addr) "ISD: 0x%08" PRIx64 "@0x%08" PRIx64 " -> 0x%08" PRIx64 "@0x%08" PRIx64
-diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
-index a9cd3e022d..3e1657774d 100644
---- a/hw/pci-host/Makefile.objs
-+++ b/hw/pci-host/Makefile.objs
-@@ -17,5 +17,5 @@ common-obj-$(CONFIG_PCI_PIIX) += piix.o
- common-obj-$(CONFIG_PCI_EXPRESS_Q35) += q35.o
- common-obj-$(CONFIG_PCI_EXPRESS_GENERIC_BRIDGE) += gpex.o
- common-obj-$(CONFIG_PCI_EXPRESS_XILINX) += xilinx-pcie.o
--
-+common-obj-$(CONFIG_MALTA) += gt64120.o
- common-obj-$(CONFIG_PCI_EXPRESS_DESIGNWARE) += designware.o
-diff --git a/hw/pci-host/trace-events b/hw/pci-host/trace-events
-index d19ca9aef6..eecc233670 100644
---- a/hw/pci-host/trace-events
-+++ b/hw/pci-host/trace-events
-@@ -20,3 +20,8 @@ unin_data_write(uint64_t addr, unsigned len, uint64_t val) "write addr 0x%"PRIx6
- unin_data_read(uint64_t addr, unsigned len, uint64_t val) "read addr 0x%"PRIx64 " len %d val 0x%"PRIx64
- unin_write(uint64_t addr, uint64_t value) "addr=0x%" PRIx64 " val=0x%"PRIx64
- unin_read(uint64_t addr, uint64_t value) "addr=0x%" PRIx64 " val=0x%"PRIx64
-+
-+# gt64120.c
-+gt64120_read(const char *regname, int width, uint64_t value) "gt64120 read %s value:0x%0*" PRIx64
-+gt64120_write(const char *regname, int width, uint64_t value) "gt64120 write %s value:0x%0*" PRIx64
-+gt64120_isd_remap(uint64_t from_length, uint64_t from_addr, uint64_t to_length, uint64_t to_addr) "ISD: 0x%08" PRIx64 "@0x%08" PRIx64 " -> 0x%08" PRIx64 "@0x%08" PRIx64
+ /* Adjust range to avoid touching space which isn't mappable via PCI */
+-/* XXX: Hardcoded values for Malta: 0x1e000000 - 0x1f100000
+-                                    0x1fc00000 - 0x1fd00000  */
+-static void check_reserved_space (hwaddr *start,
+-                                  hwaddr *length)
++/*
++ * XXX: Hardcoded values for Malta: 0x1e000000 - 0x1f100000
++ *                                  0x1fc00000 - 0x1fd00000
++ */
++static void check_reserved_space(hwaddr *start, hwaddr *length)
+ {
+     hwaddr begin = *start;
+     hwaddr end = *start + *length;
+@@ -650,8 +651,10 @@ static void gt64120_writel (void *opaque, hwaddr addr,
+     case GT_SDRAM_B1:
+     case GT_SDRAM_B2:
+     case GT_SDRAM_B3:
+-        /* We don't simulate electrical parameters of the SDRAM.
+-           Accept, but ignore the values. */
++        /*
++         * We don't simulate electrical parameters of the SDRAM.
++         * Accept, but ignore the values.
++         */
+         s->regs[saddr] = val;
+         break;
+ 
+@@ -674,8 +677,10 @@ static uint64_t gt64120_readl (void *opaque,
+ 
+     /* CPU Configuration */
+     case GT_MULTI:
+-        /* Only one GT64xxx is present on the CPU bus, return
+-           the initial value */
++        /*
++         * Only one GT64xxx is present on the CPU bus, return
++         * the initial value.
++         */
+         val = s->regs[saddr];
+         break;
+ 
+@@ -685,17 +690,18 @@ static uint64_t gt64120_readl (void *opaque,
+     case GT_CPUERR_DATALO:
+     case GT_CPUERR_DATAHI:
+     case GT_CPUERR_PARITY:
+-        /* Emulated memory has no error, always return the initial
+-           values */
++        /* Emulated memory has no error, always return the initial values. */
+         val = s->regs[saddr];
+         break;
+ 
+     /* CPU Sync Barrier */
+     case GT_PCI0SYNC:
+     case GT_PCI1SYNC:
+-        /* Reading those register should empty all FIFO on the PCI
+-           bus, which are not emulated. The return value should be
+-           a random value that should be ignored. */
++        /*
++         * Reading those register should empty all FIFO on the PCI
++         * bus, which are not emulated. The return value should be
++         * a random value that should be ignored.
++         */
+         val = 0xc000ffee;
+         break;
+ 
+@@ -705,8 +711,7 @@ static uint64_t gt64120_readl (void *opaque,
+     case GT_ECC_MEM:
+     case GT_ECC_CALC:
+     case GT_ECC_ERRADDR:
+-        /* Emulated memory has no error, always return the initial
+-           values */
++        /* Emulated memory has no error, always return the initial values. */
+         val = s->regs[saddr];
+         break;
+ 
+@@ -785,8 +790,10 @@ static uint64_t gt64120_readl (void *opaque,
+     case GT_SDRAM_B1:
+     case GT_SDRAM_B2:
+     case GT_SDRAM_B3:
+-        /* We don't simulate electrical parameters of the SDRAM.
+-           Just return the last written value. */
++        /*
++         * We don't simulate electrical parameters of the SDRAM.
++         * Just return the last written value.
++         */
+         val = s->regs[saddr];
+         break;
+ 
+@@ -949,20 +956,20 @@ static int gt64120_pci_map_irq(PCIDevice *pci_dev, int irq_num)
+     slot = (pci_dev->devfn >> 3);
+ 
+     switch (slot) {
+-      /* PIIX4 USB */
+-      case 10:
++    /* PIIX4 USB */
++    case 10:
+         return 3;
+-      /* AMD 79C973 Ethernet */
+-      case 11:
++    /* AMD 79C973 Ethernet */
++    case 11:
+         return 1;
+-      /* Crystal 4281 Sound */
+-      case 12:
++    /* Crystal 4281 Sound */
++    case 12:
+         return 2;
+-      /* PCI slot 1 to 4 */
+-      case 18 ... 21:
++    /* PCI slot 1 to 4 */
++    case 18 ... 21:
+         return ((slot - 18) + irq_num) & 0x03;
+-      /* Unknown device, don't do any translation */
+-      default:
++    /* Unknown device, don't do any translation */
++    default:
+         return irq_num;
+     }
+ }
+@@ -980,8 +987,7 @@ static void gt64120_pci_set_irq(void *opaque, int irq_num, int level)
+     /* XXX: optimize */
+     pic_irq = piix4_dev->config[0x60 + irq_num];
+     if (pic_irq < 16) {
+-        /* The pic level is the logical OR of all the PCI irqs mapped
+-           to it */
++        /* The pic level is the logical OR of all the PCI irqs mapped to it. */
+         pic_level = 0;
+         for (i = 0; i < 4; i++) {
+             if (pic_irq == piix4_dev->config[0x60 + i])
 -- 
 2.19.1
 
