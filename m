@@ -2,65 +2,61 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1117AC43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 08:39:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0EB0C43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 08:40:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C54F2089F
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 08:39:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C54F2089F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 984382089F
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 08:40:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 984382089F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48798 helo=lists.gnu.org)
+Received: from localhost ([::1]:48808 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfKVa-0004zL-Di
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 04:39:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41241)
+	id 1hfKX4-0006m6-J2
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 04:40:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41347)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <abologna@redhat.com>) id 1hfKTx-0004Ex-63
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:37:46 -0400
+ (envelope-from <groug@kaod.org>) id 1hfKUG-0004UO-TE
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:38:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <abologna@redhat.com>) id 1hfKTu-0004Q8-4a
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:37:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48268)
+ (envelope-from <groug@kaod.org>) id 1hfKUF-000511-IU
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:38:04 -0400
+Received: from 6.mo4.mail-out.ovh.net ([188.165.36.253]:51683)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <abologna@redhat.com>)
- id 1hfKTk-00045H-4b; Mon, 24 Jun 2019 04:37:32 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 74009A7DD;
- Mon, 24 Jun 2019 08:37:30 +0000 (UTC)
-Received: from kinshicho (unknown [10.43.2.73])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 66EB45D721;
- Mon, 24 Jun 2019 08:37:26 +0000 (UTC)
-Message-ID: <7745c47186278c1b7f1781c9173ef0e2e8a55910.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>, Cleber Rosa <crosa@redhat.com>
-Date: Mon, 24 Jun 2019 10:37:24 +0200
-In-Reply-To: <CAFEAcA-x_GSxiULrxvRj7dtCLM-r4YvRpwkVosW+1SutAUJMoA@mail.gmail.com>
-References: <20190620222314.2670-1-wainersm@redhat.com>
- <CAFEAcA92m9n7FR2a6=ecnr5bn-Sq97LZRxHRuzWO-OcbdgA4fw@mail.gmail.com>
- <20190621190421.GA679@localhost.localdomain>
- <CAFEAcA-x_GSxiULrxvRj7dtCLM-r4YvRpwkVosW+1SutAUJMoA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.32.3 (3.32.3-1.fc30) 
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1hfKUF-0004jR-8o
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:38:03 -0400
+Received: from player772.ha.ovh.net (unknown [10.108.35.13])
+ by mo4.mail-out.ovh.net (Postfix) with ESMTP id 0295A1F92FA
+ for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 10:37:51 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player772.ha.ovh.net (Postfix) with ESMTPSA id 8D9B8723C171;
+ Mon, 24 Jun 2019 08:37:46 +0000 (UTC)
+Date: Mon, 24 Jun 2019 10:37:45 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Message-ID: <20190624103745.08a32221@bahia.lan>
+In-Reply-To: <20190624013921.11944-1-sjitindarsingh@gmail.com>
+References: <20190624013921.11944-1-sjitindarsingh@gmail.com>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Mon, 24 Jun 2019 08:37:30 +0000 (UTC)
+X-Ovh-Tracer-Id: 10078493018734107032
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddruddvgddtiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-arm] [RFC v2 PATCH] hw/arm/virt: makes virt
- a default machine type
+X-Received-From: 188.165.36.253
+Subject: Re: [Qemu-devel] [Qemu-ppc] [QEMU-PPC] [PATCH] powerpc/spapr: Add
+ host threads parameter to ibm, get_system_parameter
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,59 +68,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 2019-06-22 at 16:58 +0100, Peter Maydell wrote:
-> On Fri, 21 Jun 2019 at 20:04, Cleber Rosa <crosa@redhat.com> wrote:
-> > You can consider me biased (I do consider myself), but trying to wear
-> > the hat of a user first interacting with QEMU, I would expect a (any)
-> > reasonably capable environment that can represent the given target.
-> > That will probably be a different environment than the one I may need,
-> > and I think that's fine.
-> 
-> I'm really not sure what you're trying to suggest here; maybe
-> you could clarify? If you specify a target (ie a machine type),
-> you get that machine type. If you don't specify a target, then
-> we can't really guess what you were hoping to run and
-> magically pick something that works.
-> 
-> The main problem here is that users expect "all the world is a PC"
-> type behaviour, ie they can just provide qemu-system-arm or
-> qemu-system-aarch64 with no command line arguments except
-> a guest kernel (which is half the time something they found under
-> a rock or extracted from some firmware image) or a guest CDROM
-> image and have it boot, because that generally works for x86. It
-> doesn't and can't work for Arm, because of the much greater
-> diversity of machine types and the way that kernels are often
-> only compiled to work on a specific subset of machines.
-> Making the user specify a machine type means they do at least
-> get prompted that the world is more complicated than they
-> think it is and there are decisions that have to be made.
-> 
-> In any case even if we did default to "virt" the user still
-> has to specify a CPU type, may well also want to provide
-> a GIC version (gicv3 being better than the default v2),
-> likely more RAM than the very small default, they need to provide
-> all the virtio devices, and so on and so on. So giving
-> them one option they no longer need to specify doesn't
-> really make it any easier IMHO.
+On Mon, 24 Jun 2019 11:39:21 +1000
+Suraj Jitindar Singh <sjitindarsingh@gmail.com> wrote:
 
-Additional note on GIC: most server-grade machines you can buy today
-do *not* support GICv2, so you will need to opt-in to GICv3 if you
-want your guest to even start.
+> The ibm,get_system_parameter rtas call is used by the guest to retrieve
+> data relating to certain parameters of the system. The SPLPAR
+> characteristics option (token 20) is used to determin characteristics of
+> the environment in which the lpar will run.
+> 
+> It may be useful for a guest to know the number of physical host threads
+> present on the underlying system where it is being run. Add the
+> characteristic "HostThrs" to the SPLPAR Characteristics
+> ibm,get_system_parameter rtas call to expose this information to a
+> guest and provide an implementation which determines this information
+> based on the number of interrupt servers present in the device tree.
+> 
 
-More generally, as someone who has worked on supporting non-x86
-guests in libvirt for the past few years, I can tell you from
-experience that you're always going to need some arch-specific logic
-to deal with the small (and not so small :) differences in behavior
-between QEMU targets: as Peter correctly says, machine type is just
-a single example among many.
+Shouldn't this also take split core into account, ie. divide the
+result by "/sys/devices/system/cpu/subcores_per_core" like the 
+ppc64_cpu command from powerpc-utils does ?
 
--- 
-Andrea Bolognani / Red Hat / Virtualization
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> ---
+>  hw/ppc/spapr_rtas.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 44 insertions(+)
+> 
+> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> index 5bc1a93271..a33d87794c 100644
+> --- a/hw/ppc/spapr_rtas.c
+> +++ b/hw/ppc/spapr_rtas.c
+> @@ -229,6 +229,40 @@ static inline int sysparm_st(target_ulong addr, target_ulong len,
+>      return RTAS_OUT_SUCCESS;
+>  }
+>  
+> +static int rtas_get_num_host_threads(void)
+> +{
+> +    const char *entry, *name = "/proc/device-tree/cpus/";
+> +    int num_threads = -1;
+> +    GDir *dir;
+> +
+> +    if (!kvm_enabled())
+> +        return 1;
+> +
+> +    dir = g_dir_open(name, 0, NULL);
+> +    if (!dir)
+> +        return -1;
+> +
+> +    while ((entry = g_dir_read_name(dir))) {
+> +        if (!strncmp(entry, "PowerPC,POWER", strlen("PowerPC,POWER"))) {
+> +            unsigned long len;
+> +            char *path, *buf;
+> +
+> +            path = g_strconcat(name, entry, "/ibm,ppc-interrupt-server#s",
+> +                               NULL);
+> +            if (g_file_get_contents(path, &buf, &len, NULL)) {
+> +                num_threads = len / sizeof(int);
+> +                g_free(buf);
+> +            }
+> +
+> +            g_free(path);
+> +            break;
+> +        }
+> +    }
+> +
+> +    g_dir_close(dir);
+> +    return num_threads;
+> +}
+> +
+>  static void rtas_ibm_get_system_parameter(PowerPCCPU *cpu,
+>                                            SpaprMachineState *spapr,
+>                                            uint32_t token, uint32_t nargs,
+> @@ -250,6 +284,16 @@ static void rtas_ibm_get_system_parameter(PowerPCCPU *cpu,
+>                                            current_machine->ram_size / MiB,
+>                                            smp_cpus,
+>                                            max_cpus);
+> +        int num_host_threads = rtas_get_num_host_threads();
+> +
+> +        if (num_host_threads > 0) {
+> +            char *hostthr_val, *old = param_val;
+> +
+> +            hostthr_val = g_strdup_printf(",HostThrs=%d", num_host_threads);
+> +            param_val = g_strconcat(param_val, hostthr_val, NULL);
+> +            g_free(hostthr_val);
+> +            g_free(old);
+> +        }
+>          ret = sysparm_st(buffer, length, param_val, strlen(param_val) + 1);
+>          g_free(param_val);
+>          break;
 
 
