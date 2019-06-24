@@ -4,88 +4,89 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85FA7C43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 10:59:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3622EC43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 11:05:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50F1520820
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 10:59:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0300A20820
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 11:05:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KOvGPADx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50F1520820
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gSkbcmMu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0300A20820
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49752 helo=lists.gnu.org)
+Received: from localhost ([::1]:49788 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfMhX-0007LQ-Fp
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 06:59:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50748)
+	id 1hfMnH-0000oy-VT
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 07:05:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52151)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hfMg7-0006si-MR
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 06:58:28 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hfMlm-0008Rn-DM
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 07:04:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hfMg6-0007Pr-KN
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 06:58:27 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:33895)
+ (envelope-from <alex.bennee@linaro.org>) id 1hfMll-0001Fl-8g
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 07:04:18 -0400
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:39015)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hfMg6-0007M9-Cx
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 06:58:26 -0400
-Received: by mail-wm1-x342.google.com with SMTP id w9so13972287wmd.1
- for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 03:58:26 -0700 (PDT)
+ id 1hfMlk-00018Z-WA
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 07:04:17 -0400
+Received: by mail-wr1-x430.google.com with SMTP id x4so13405768wrt.6
+ for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 04:04:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=mxsXIae0jHJhD9qMhmOZ1UD7fM0YC33jCIgvSCj7eC4=;
- b=KOvGPADxXaan2/1eX9NJFzDyqpp/GgT5xTj4NctpZ7L0hWmtYtG4M4XmuprVsSYgj0
- VsRzkWAOHamUIbLbwrcF7SowsVxdxTb8Y7LYYdDC+Ob1CUflb94qo1oXtmLiR/hK6rtk
- DJJmnlmIH4kALPjWQwBUwXgt3KL4tv+dQPeB/8CcnOd+NoWeb7ccP7Sf/Kj2FuIY/ooh
- uJlkHbxZtEIv914S01p/hqEUqOaTXy5qfiVZT3bns6Tkuc5VsAxCGIatH99/oM5nuCsL
- WS30YSERzOQ+CU3/NKFZAXTY/0VflJEIQBTjA+hSo3nMOJtCp5SnB+89D5DnuVV+qnM/
- CyUQ==
+ bh=8FPs/hw1/dJZRg0MRnndtAJARwr5rRaTNukyhAdcTmM=;
+ b=gSkbcmMuMUckw8SemUpCE2HA1aASqpuB6h0+LTEmQfVISGxtyQu/0l3cEoAuzukw4r
+ S+cUJM9WLnf3z+F/Je65E8nmyLNUBPxn7IHHYVMindpPpg/rcWxuvGzPd7O//xV8Dq1f
+ WrwwtQEqjWq7oIRebV/jhuR3KB8s+JZ5QCPR/24xe7Qz2BAz8b3bNn/Fij04jWEU+ZTG
+ 6SSArjIRL9t1qNIOPuA7WvyppMMNnQwhO+b1aws9FuobtvITU14E53nT8CghpUFaoRa3
+ OTcPqCXN6dT6+ms+6TS3nXX6FUU4L3shCR97XBFijyBOwM0sgRJdudM2TzyTYv2Cr0CQ
+ ifqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=mxsXIae0jHJhD9qMhmOZ1UD7fM0YC33jCIgvSCj7eC4=;
- b=qjSjfpAijunCdLoaV+b+FeQQTXZ2PvgumNMf/3aM8e2Bv3OEYbYwn2Qw9JMmvo+A00
- niM1jjj8v/0HPEXXk8kxHKw8EWr6Y/OB8jMOv5kYGTmPMDGoEMFsfbxpB0PukC6gFpvV
- j9KgcAhYcIAFbi4dE1dGO6XWS5ftRY5ZQp1AmcwwhJ7701Ew2aIPS+/6/wTJPVuCMJr5
- xGwbzlSR/DrU3ZPljxTiSllFFhW9gvK5N2XiAb96i6PhxxtiLh5U/IGU6BJ7OKzI5RX2
- ekllpxIAXJ3DFod/4UGZ8/mQ4RP9Qf4/S/J3WAFDuB/0ALm0lKBOID97vlrP3QU3d/zH
- nkwA==
-X-Gm-Message-State: APjAAAXiB6EIAk4VuwHLk0BumB9/jujpP7RqsxI9SccFgZQhSbBqMNYK
- M+t3HXxwvytWS4milloLXNV1PK1jyok=
-X-Google-Smtp-Source: APXvYqwqN8zIt9mhGB/Y896fb/Yh9YXteKU9NgeHS3LecM07QN3xJBWBoYCcvtL7rJLIVEPzLq10FQ==
-X-Received: by 2002:a1c:c549:: with SMTP id v70mr15220921wmf.135.1561373904581; 
- Mon, 24 Jun 2019 03:58:24 -0700 (PDT)
+ bh=8FPs/hw1/dJZRg0MRnndtAJARwr5rRaTNukyhAdcTmM=;
+ b=mjnTlS8BQtWgBnDm+WQtjf4WAjjdBCww++RQ1VOrUWV3Si/ci3/VAhQNfplmgqFcoO
+ sIzkUSbJsLZyVDUmrhliEvgNEk2F5rxcBOHsSCk8X7+NmeHjYr0zJC2xQbh2L1WMnZyN
+ E50VXi51N3qeeOl50a65jiWsX70rxEf/UIgKJak42yj0pOXisAnkG41S/AyCUbhMMrSG
+ nmLALzd1J7PKDwap8K7xGwuvzKYFYEirtkvbN5GGcf0tkHQ9tFTOOAMsXaJ8dsVHXM8/
+ Tq4owhOhqnCg/NiplObSHHA45OUTpI5fVh/Ed4YZy9NnJ3TSvgI1FR5M6Dx8ztiguOkg
+ xXiQ==
+X-Gm-Message-State: APjAAAXp5aj8lZGeEQOQvFuz/xcgZCPLaAZRsYnuE7BtIW2BqyiF5lUz
+ 6GGYtfkOaLnao+axioE5HLZB6A94xek=
+X-Google-Smtp-Source: APXvYqwBdbKP6M09WSQgHtr/n9t8kEcs+RV/4SYXCY+jWKY5h1hMR7d07tBUS7rR7AxOc27/0gvkzw==
+X-Received: by 2002:adf:f84f:: with SMTP id d15mr108875166wrq.53.1561374254875; 
+ Mon, 24 Jun 2019 04:04:14 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id f12sm23922824wrg.5.2019.06.24.03.58.23
+ by smtp.gmail.com with ESMTPSA id t1sm13242652wra.74.2019.06.24.04.04.14
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 24 Jun 2019 03:58:23 -0700 (PDT)
+ Mon, 24 Jun 2019 04:04:14 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 6D2061FF87;
- Mon, 24 Jun 2019 11:58:23 +0100 (BST)
-References: <20190523105440.27045-1-rkagan@virtuozzo.com>
- <20190523105440.27045-2-rkagan@virtuozzo.com>
+ by zen.linaroharston (Postfix) with ESMTP id B75B01FF87;
+ Mon, 24 Jun 2019 12:04:13 +0100 (BST)
+References: <1561116620-22245-1-git-send-email-pbonzini@redhat.com>
+ <1561116620-22245-4-git-send-email-pbonzini@redhat.com>
 User-agent: mu4e 1.3.2; emacs 26.1
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-In-reply-to: <20190523105440.27045-2-rkagan@virtuozzo.com>
-Date: Mon, 24 Jun 2019 11:58:23 +0100
-Message-ID: <87sgrz1c8g.fsf@zen.linaroharston>
+In-reply-to: <1561116620-22245-4-git-send-email-pbonzini@redhat.com>
+Date: Mon, 24 Jun 2019 12:04:13 +0100
+Message-ID: <87r27j1byq.fsf@zen.linaroharston>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] [RFC PATCH 1/2] cpus-common: nuke finish_safe_work
+X-Received-From: 2a00:1450:4864:20::430
+Subject: Re: [Qemu-devel] [PULL 03/25] i386/kvm: convert hyperv
+ enlightenments properties from bools to bits
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,92 +98,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Roman Kagan <rkagan@virtuozzo.com> writes:
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> It was introduced in commit b129972c8b41e15b0521895a46fd9c752b68a5e,
-> with the following motivation:
-
-I can't find this commit in my tree.
-
+> From: Vitaly Kuznetsov <vkuznets@redhat.com>
 >
->   Because start_exclusive uses CPU_FOREACH, merge exclusive_lock with
->   qemu_cpu_list_lock: together with a call to exclusive_idle (via
->   cpu_exec_start/end) in cpu_list_add, this protects exclusive work
->   against concurrent CPU addition and removal.
+> Representing Hyper-V properties as bits will allow us to check features
+> and dependencies between them in a natural way.
 >
-> However, it seems to be redundant, because the cpu-exclusive
-> infrastructure provides suffificent protection against the newly added
-> CPU starting execution while the cpu-exclusive work is running, and the
-> aforementioned traversing of the cpu list is protected by
-> qemu_cpu_list_lock.
->
-> Besides, this appears to be the only place where the cpu-exclusive
-> section is entered with the BQL taken, which has been found to trigger
-> AB-BA deadlock as follows:
->
->     vCPU thread                             main thread
->     -----------                             -----------
-> async_safe_run_on_cpu(self,
->                       async_synic_update)
-> ...                                         [cpu hot-add]
-> process_queued_cpu_work()
->   qemu_mutex_unlock_iothread()
->                                             [grab BQL]
->   start_exclusive()                         cpu_list_add()
->   async_synic_update()                        finish_safe_work()
->     qemu_mutex_lock_iothread()                  cpu_exec_start()
->
-> So remove it.  This paves the way to establishing a strict nesting rule
-> of never entering the exclusive section with the BQL taken.
->
-> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+> Suggested-by: Roman Kagan <rkagan@virtuozzo.com>
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Message-Id: <20190517141924.19024-2-vkuznets@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  cpus-common.c | 8 --------
->  1 file changed, 8 deletions(-)
+>  hw/i386/pc.c          |  3 +-
+>  target/i386/cpu.c     | 44 ++++++++++++++++++---------
+>  target/i386/cpu.h     | 37 ++++++++++++++---------
+>  target/i386/hyperv.c  |  2 +-
+>  target/i386/kvm.c     | 83 +++++++++++++++++++++------------------------=
+------
+>  target/i386/machine.c |  2 +-
+>  6 files changed, 91 insertions(+), 80 deletions(-)
 >
-> diff --git a/cpus-common.c b/cpus-common.c
-> index 3ca58c64e8..023cfebfa3 100644
-> --- a/cpus-common.c
-> +++ b/cpus-common.c
-> @@ -69,12 +69,6 @@ static int cpu_get_free_index(void)
->      return cpu_index;
->  }
+<snip>
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 0732e05..30cd1a0 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -734,6 +734,22 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+>  #define MSR_ARCH_CAP_SKIP_L1DFL_VMENTRY (1U << 3)
+>  #define MSR_ARCH_CAP_SSB_NO     (1U << 4)
 >
-> -static void finish_safe_work(CPUState *cpu)
-> -{
-> -    cpu_exec_start(cpu);
-> -    cpu_exec_end(cpu);
-> -}
-> -
-
-This makes sense to me intellectually but I'm worried I've missed the
-reason for it being introduced. Without finish_safe_work we have to wait
-for the actual vCPU thread function to acquire and release the BQL and
-enter it's first cpu_exec_start().
-
-I guess I'd be happier if we had a hotplug test where we could stress
-test the operation and be sure we've not just moved the deadlock
-somewhere else.
-
->  void cpu_list_add(CPUState *cpu)
->  {
->      qemu_mutex_lock(&qemu_cpu_list_lock);
-> @@ -86,8 +80,6 @@ void cpu_list_add(CPUState *cpu)
->      }
->      QTAILQ_INSERT_TAIL_RCU(&cpus, cpu, node);
->      qemu_mutex_unlock(&qemu_cpu_list_lock);
-> -
-> -    finish_safe_work(cpu);
->  }
+> +/* Supported Hyper-V Enlightenments */
+> +#define HYPERV_FEAT_RELAXED             0
+> +#define HYPERV_FEAT_VAPIC               1
+> +#define HYPERV_FEAT_TIME                2
+> +#define HYPERV_FEAT_CRASH               3
+> +#define HYPERV_FEAT_RESET               4
+> +#define HYPERV_FEAT_VPINDEX             5
+> +#define HYPERV_FEAT_RUNTIME             6
+> +#define HYPERV_FEAT_SYNIC               7
+> +#define HYPERV_FEAT_STIMER              8
+> +#define HYPERV_FEAT_FREQUENCIES         9
+> +#define HYPERV_FEAT_REENLIGHTENMENT     10
+> +#define HYPERV_FEAT_TLBFLUSH            11
+> +#define HYPERV_FEAT_EVMCS               12
+> +#define HYPERV_FEAT_IPI                 13
+> +
+>  #ifndef HYPERV_SPINLOCK_NEVER_RETRY
+>  #define HYPERV_SPINLOCK_NEVER_RETRY             0xFFFFFFFF
+>  #endif
+> @@ -1370,23 +1386,11 @@ struct X86CPU {
+>      CPUNegativeOffsetState neg;
+>      CPUX86State env;
 >
->  void cpu_list_remove(CPUState *cpu)
+> -    bool hyperv_vapic;
+> -    bool hyperv_relaxed_timing;
+>      int hyperv_spinlock_attempts;
+>      char *hyperv_vendor_id;
+> -    bool hyperv_time;
+> -    bool hyperv_crash;
+> -    bool hyperv_reset;
+> -    bool hyperv_vpindex;
+> -    bool hyperv_runtime;
+> -    bool hyperv_synic;
+>      bool hyperv_synic_kvm_only;
 
+This looks like it's broken the build:
+
+  configure' '--without-default-devices' '--disable-user'
+
+with:
+
+  /home/alex/lsrc/qemu.git/target/i386/hyperv-stub.c: In function =E2=80=98=
+kvm_hv_handle_exit=E2=80=99:
+  /home/alex/lsrc/qemu.git/target/i386/hyperv-stub.c:18:19: error: =E2=80=
+=98X86CPU=E2=80=99 {aka =E2=80=98struct X86CPU=E2=80=99} has no member name=
+d =E2=80=98hyperv_synic=E2=80=99; did you mean =E2=80=98hyperv_vendor_id=E2=
+=80=99?
+           if (!cpu->hyperv_synic) {
+                     ^~~~~~~~~~~~
+
+Does the stub need updating for the new flag? I'm a little confused
+about the relationship between HyperV and KVM. I thought they were
+different hypervisors?
 
 --
 Alex Benn=C3=A9e
