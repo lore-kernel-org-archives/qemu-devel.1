@@ -2,61 +2,57 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0EB0C43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 08:40:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07996C43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 08:42:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 984382089F
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 08:40:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 984382089F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id C7B882089F
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 08:42:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7B882089F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48808 helo=lists.gnu.org)
+Received: from localhost ([::1]:48826 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfKX4-0006m6-J2
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 04:40:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41347)
+	id 1hfKYH-0007hk-5D
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 04:42:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43244)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <groug@kaod.org>) id 1hfKUG-0004UO-TE
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:38:06 -0400
+ (envelope-from <yan.y.zhao@intel.com>) id 1hfKW1-0005Vz-Kd
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:39:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1hfKUF-000511-IU
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:38:04 -0400
-Received: from 6.mo4.mail-out.ovh.net ([188.165.36.253]:51683)
+ (envelope-from <yan.y.zhao@intel.com>) id 1hfKVz-0000F9-FU
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:39:53 -0400
+Received: from mga01.intel.com ([192.55.52.88]:30403)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1hfKUF-0004jR-8o
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:38:03 -0400
-Received: from player772.ha.ovh.net (unknown [10.108.35.13])
- by mo4.mail-out.ovh.net (Postfix) with ESMTP id 0295A1F92FA
- for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 10:37:51 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player772.ha.ovh.net (Postfix) with ESMTPSA id 8D9B8723C171;
- Mon, 24 Jun 2019 08:37:46 +0000 (UTC)
-Date: Mon, 24 Jun 2019 10:37:45 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Message-ID: <20190624103745.08a32221@bahia.lan>
-In-Reply-To: <20190624013921.11944-1-sjitindarsingh@gmail.com>
-References: <20190624013921.11944-1-sjitindarsingh@gmail.com>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 10078493018734107032
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddruddvgddtiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 188.165.36.253
-Subject: Re: [Qemu-devel] [Qemu-ppc] [QEMU-PPC] [PATCH] powerpc/spapr: Add
- host threads parameter to ibm, get_system_parameter
+ (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+ id 1hfKVy-0008Et-UE
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:39:51 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+ by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 24 Jun 2019 01:39:37 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,411,1557212400"; d="scan'208";a="169398196"
+Received: from joy-desktop.sh.intel.com ([10.239.13.126])
+ by FMSMGA003.fm.intel.com with ESMTP; 24 Jun 2019 01:39:36 -0700
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: pbonzini@redhat.com
+Date: Mon, 24 Jun 2019 16:39:19 +0800
+Message-Id: <1561365559-10235-1-git-send-email-yan.y.zhao@intel.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1561364781-6897-1-git-send-email-yan.y.zhao@intel.com>
+References: <1561364781-6897-1-git-send-email-yan.y.zhao@intel.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.88
+Subject: [Qemu-devel] [PATCH v3] memory: warning on out of scope notification
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,97 +64,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+Cc: Auger Eric <eric.auger@redhat.com>, Yan Zhao <yan.y.zhao@intel.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 24 Jun 2019 11:39:21 +1000
-Suraj Jitindar Singh <sjitindarsingh@gmail.com> wrote:
+if an entry has parts out of scope of notifier's range, print warning
+message.
 
-> The ibm,get_system_parameter rtas call is used by the guest to retrieve
-> data relating to certain parameters of the system. The SPLPAR
-> characteristics option (token 20) is used to determin characteristics of
-> the environment in which the lpar will run.
-> 
-> It may be useful for a guest to know the number of physical host threads
-> present on the underlying system where it is being run. Add the
-> characteristic "HostThrs" to the SPLPAR Characteristics
-> ibm,get_system_parameter rtas call to expose this information to a
-> guest and provide an implementation which determines this information
-> based on the number of interrupt servers present in the device tree.
-> 
+Out of scope mapping/unmapping would cause problem, as in below case:
 
-Shouldn't this also take split core into account, ie. divide the
-result by "/sys/devices/system/cpu/subcores_per_core" like the 
-ppc64_cpu command from powerpc-utils does ?
+1. initially there are two notifiers with ranges
+0-0xfedfffff, 0xfef00000-0xffffffffffffffff,
+IOVAs from 0x3c000000 - 0x3c1fffff is in shadow page table.
 
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> ---
->  hw/ppc/spapr_rtas.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 44 insertions(+)
-> 
-> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> index 5bc1a93271..a33d87794c 100644
-> --- a/hw/ppc/spapr_rtas.c
-> +++ b/hw/ppc/spapr_rtas.c
-> @@ -229,6 +229,40 @@ static inline int sysparm_st(target_ulong addr, target_ulong len,
->      return RTAS_OUT_SUCCESS;
->  }
->  
-> +static int rtas_get_num_host_threads(void)
-> +{
-> +    const char *entry, *name = "/proc/device-tree/cpus/";
-> +    int num_threads = -1;
-> +    GDir *dir;
-> +
-> +    if (!kvm_enabled())
-> +        return 1;
-> +
-> +    dir = g_dir_open(name, 0, NULL);
-> +    if (!dir)
-> +        return -1;
-> +
-> +    while ((entry = g_dir_read_name(dir))) {
-> +        if (!strncmp(entry, "PowerPC,POWER", strlen("PowerPC,POWER"))) {
-> +            unsigned long len;
-> +            char *path, *buf;
-> +
-> +            path = g_strconcat(name, entry, "/ibm,ppc-interrupt-server#s",
-> +                               NULL);
-> +            if (g_file_get_contents(path, &buf, &len, NULL)) {
-> +                num_threads = len / sizeof(int);
-> +                g_free(buf);
-> +            }
-> +
-> +            g_free(path);
-> +            break;
-> +        }
-> +    }
-> +
-> +    g_dir_close(dir);
-> +    return num_threads;
-> +}
-> +
->  static void rtas_ibm_get_system_parameter(PowerPCCPU *cpu,
->                                            SpaprMachineState *spapr,
->                                            uint32_t token, uint32_t nargs,
-> @@ -250,6 +284,16 @@ static void rtas_ibm_get_system_parameter(PowerPCCPU *cpu,
->                                            current_machine->ram_size / MiB,
->                                            smp_cpus,
->                                            max_cpus);
-> +        int num_host_threads = rtas_get_num_host_threads();
-> +
-> +        if (num_host_threads > 0) {
-> +            char *hostthr_val, *old = param_val;
-> +
-> +            hostthr_val = g_strdup_printf(",HostThrs=%d", num_host_threads);
-> +            param_val = g_strconcat(param_val, hostthr_val, NULL);
-> +            g_free(hostthr_val);
-> +            g_free(old);
-> +        }
->          ret = sysparm_st(buffer, length, param_val, strlen(param_val) + 1);
->          g_free(param_val);
->          break;
+2. in vfio, memory_region_register_iommu_notifier() is followed by
+memory_region_iommu_replay(), which will first call address space
+unmap,
+and walk and add back all entries in vtd shadow page table. e.g.
+(1) for notifier 0-0xfedfffff,
+    IOVAs from 0 - 0xffffffff get unmapped,
+    and IOVAs from 0x3c000000 - 0x3c1fffff get mapped
+(2) for notifier 0xfef00000-0xffffffffffffffff
+    IOVAs from 0 - 0x7fffffffff get unmapped,
+    but IOVAs from 0x3c000000 - 0x3c1fffff cannot get mapped back.
+
+Cc: Auger Eric <eric.auger@redhat.com>
+Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+
+---
+v3:
+refined code style and message format
+
+v2:
+1. added a local variable entry_end (Auger Eric)
+2. using PRIx64 as format for address range in warning message
+(Auger Eric)
+---
+ memory.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/memory.c b/memory.c
+index 0a089a7..c7154ab 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1937,13 +1937,13 @@ void memory_region_notify_one(IOMMUNotifier *notifier,
+                               IOMMUTLBEntry *entry)
+ {
+     IOMMUNotifierFlag request_flags;
++    hwaddr entry_end = entry->iova + entry->addr_mask;
+ 
+     /*
+      * Skip the notification if the notification does not overlap
+      * with registered range.
+      */
+-    if (notifier->start > entry->iova + entry->addr_mask ||
+-        notifier->end < entry->iova) {
++    if (notifier->start > entry_end || notifier->end < entry->iova) {
+         return;
+     }
+ 
+@@ -1953,6 +1953,15 @@ void memory_region_notify_one(IOMMUNotifier *notifier,
+         request_flags = IOMMU_NOTIFIER_UNMAP;
+     }
+ 
++    if (entry->iova < notifier->start || entry_end > notifier->end) {
++        warn_report("%s IOMMUTLBEntry 0x%" PRIx64 " - 0x%" PRIx64
++                " outside of notifier scope 0x%" PRIx64 " - 0x%" PRIx64,
++                (request_flags == IOMMU_NOTIFIER_MAP) ?
++                "Mapping" : "Unmapping",
++                entry->iova, entry->iova + entry->addr_mask,
++                notifier->start, notifier->end);
++    }
++
+     if (notifier->notifier_flags & request_flags) {
+         notifier->notify(notifier, entry);
+     }
+-- 
+2.7.4
 
 
