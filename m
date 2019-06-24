@@ -2,64 +2,66 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB8B1C43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 06:59:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F216C43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 07:06:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7800B2089F
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 06:59:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7800B2089F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 664812089F
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 07:06:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 664812089F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=efs-auto.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48348 helo=lists.gnu.org)
+Received: from localhost ([::1]:48372 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfIx0-0002bV-J0
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 02:59:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47844)
+	id 1hfJ3X-0004pf-Gu
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 03:06:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48980)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peterx@redhat.com>) id 1hfIvY-0001qw-Ie
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 02:58:09 -0400
+ (envelope-from <david.brenken@efs-auto.org>) id 1hfJ1N-0003bM-G2
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 03:04:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1hfIvX-0006R1-5U
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 02:58:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54090)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hfIvU-0006NW-If
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 02:58:05 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E6ABE3082B45;
- Mon, 24 Jun 2019 06:58:02 +0000 (UTC)
-Received: from xz-x1 (ovpn-12-60.pek2.redhat.com [10.72.12.60])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1F4C6608E4;
- Mon, 24 Jun 2019 06:57:55 +0000 (UTC)
-Date: Mon, 24 Jun 2019 14:57:50 +0800
-From: Peter Xu <peterx@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Message-ID: <20190624065750.GE6279@xz-x1>
-References: <20190624063733.22079-1-peterx@redhat.com>
- <20190624063733.22079-3-peterx@redhat.com>
- <20190624064122.GB27894@joy-OptiPlex-7040>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190624064122.GB27894@joy-OptiPlex-7040>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Mon, 24 Jun 2019 06:58:02 +0000 (UTC)
+ (envelope-from <david.brenken@efs-auto.org>) id 1hfJ1M-0002xk-3v
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 03:04:09 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:59567)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <david.brenken@efs-auto.org>)
+ id 1hfJ1L-0002vI-Kd
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 03:04:08 -0400
+Received: from localhost.localdomain ([178.239.76.114]) by
+ mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1M9Wqa-1hbz6b0PuW-005VKq; Mon, 24 Jun 2019 09:04:01 +0200
+From: David Brenken <david.brenken@efs-auto.org>
+To: qemu-devel@nongnu.org
+Date: Mon, 24 Jun 2019 09:03:36 +0200
+Message-Id: <20190624070339.4408-3-david.brenken@efs-auto.org>
+X-Mailer: git-send-email 2.16.1.windows.4
+In-Reply-To: <20190624070339.4408-1-david.brenken@efs-auto.org>
+References: <20190624070339.4408-1-david.brenken@efs-auto.org>
+X-Provags-ID: V03:K1:Z9+2iBbciBKCIS3KKIyY9wV/ZenbicUrCBy5QeDDpTv5Z2flY6q
+ OsBq83+wEf88Tzkr15ufS0neXHAqByrO7sJegneKsR9kTFau4J6I2KAb0rYQgtrFygBQl2A
+ LlAEi5ZpBYc6IWxcSmBvBRslZ8kZWuenRCBGzvQt/xeY5HKcIDMsxoiXLqJCVMZaV+Ki/zI
+ r/OT25KM7frbpBKpnU3/A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:WdBCc6q1Mh4=:sY52BVC2OpkTPUiRM/eLD/
+ SKaQe2B1DyvAIQ5FT3ld0MiySI2/moYjfNC9BQp/S8V2o/3+E+vCDNOhP96HaSwFQh2mEzQ9/
+ CxKImcEa6FNrwAyZrKsRNpanS6F2xar7AvdAw57aVw4MNAlEyTPNOpHcmMb7+tDRd8Yesbqyk
+ 3A2UqGMGId7uQYCteu6J+5PrccmYuasllhuGuq5Blaw+jB8aOHQAdaYzThSdo7lfPpO+xAP+v
+ KRZIsjE+4K0DXTvOQkUVW58IVNokmtwfMpsvo4Y4BqhEzvMQrd6SPbhEyEMm4H7hQO2bceMJP
+ y34/TUtmrYGXJLat7YENCIWWVrsWu8BsfbQdz4rbwNjuPk0ljCPmn0SZPMZNq1/Mfn5Huajkt
+ mNgaYpHX4iE0bEP4bsng4wDsi+Ub2+0GbTroVWuAQd43oXYVBx14CdTB5NWaBL52+qhuC4guo
+ czR95WYlVsyr4lpG8GfiHgjsOFsjFU/TbNm01Xd6pUbQs07JAj2biJO9NOLzFgN3gYR9DVCwc
+ iRckTTjkkykMB0dlpHHhnpE9Ybl+QkagnR7A+ui1gam2WEwtwiea/g4oFPwJU/z/hSqrJAmD4
+ oMZcRVnNemP8hSFEihJeLB1BZUjEistCkg1znPebqewqhm9qQVJX1lwqP+wCaI/ZyfABEydfA
+ dlJu+as1EZuE93YWVmU/yxMvUf+eGb+ab6I/RdNJF3ZbnydTEszuxpcIECBpml275eRmgYkc7
+ Skt0jGYx7zJunp668E4KG9NCkh48lcg4Ia35ngsKVIhnFtegrnWXZfx62AM=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/2] intel_iommu: Fix unexpected unmaps
- during global unmap
+X-Received-From: 212.227.126.135
+Subject: [Qemu-devel] [PATCH v3 2/5] tricore: add UTOF instruction
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,174 +73,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Auger Eric <eric.auger@redhat.com>
+Cc: kbastian@mail.uni-paderborn.de,
+ Lars Biermanski <lars.biermanski@efs-auto.de>,
+ Georg Hofstetter <georg.hofstetter@efs-auto.de>,
+ David Brenken <david.brenken@efs-auto.de>,
+ Robert Rasche <robert.rasche@efs-auto.de>,
+ Andreas Konopik <andreas.konopik@efs-auto.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 24, 2019 at 02:41:22AM -0400, Yan Zhao wrote:
-> On Mon, Jun 24, 2019 at 02:37:33PM +0800, Peter Xu wrote:
-> > From: Paolo Bonzini <pbonzini@redhat.com>
-> > 
-> > This is an replacement work of Yan Zhao's patch:
-> > 
-> > https://www.mail-archive.com/qemu-devel@nongnu.org/msg625340.html
-> > 
-> > vtd_address_space_unmap() will do proper page mask alignment to make
-> > sure each IOTLB message will have correct masks for notification
-> > messages (2^N-1), but sometimes it can be expanded to even supercede
-> > the registered range.  That could lead to unexpected UNMAP of already
-> > mapped regions in some other notifiers.
-> > 
-> > Instead of doing mindless expension of the start address and address
-> > mask, we split the range into smaller ones and guarantee that each
-> > small range will have correct masks (2^N-1) and at the same time we
-> > should also try our best to generate as less IOTLB messages as
-> > possible.
-> > 
-> > Reported-by: Yan Zhao <yan.y.zhao@intel.com>
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > [peterx: fixup mask generation algos and other touchups, introduce
-> >  vtd_get_next_mask(), write commit message]
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  hw/i386/intel_iommu.c | 70 +++++++++++++++++++++++++++----------------
-> >  1 file changed, 44 insertions(+), 26 deletions(-)
-> > 
-> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > index 719ce19ab3..39cedf73b8 100644
-> > --- a/hw/i386/intel_iommu.c
-> > +++ b/hw/i386/intel_iommu.c
-> > @@ -3363,11 +3363,31 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
-> >      return vtd_dev_as;
-> >  }
-> >  
-> > +static uint64_t vtd_get_next_mask(uint64_t start, uint64_t size, int gaw)
-> > +{
-> > +    /* Tries to find smallest mask from start first */
-> > +    uint64_t rmask = start & -start, max_mask = 1ULL << gaw;
-> > +
-> > +    assert(size && gaw > 0 && gaw < 64);
-> > +
-> > +    /* Zero start, or too big */
-> > +    if (!rmask || rmask > max_mask) {
-> > +        rmask = max_mask;
-> > +    }
-> > +
-> > +    /* If the start mask worked, then use it */
-> > +    if (rmask <= size) {
-> > +        return rmask;
-> > +    }
-> > +
-> > +    /* Find the largest page mask from size */
-> > +    return 1ULL << (63 - clz64(size));
-> > +}
-> > +
-> >  /* Unmap the whole range in the notifier's scope. */
-> >  static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
-> >  {
-> > -    IOMMUTLBEntry entry;
-> > -    hwaddr size;
-> > +    hwaddr size, remain;
-> >      hwaddr start = n->start;
-> >      hwaddr end = n->end;
-> >      IntelIOMMUState *s = as->iommu_state;
-> > @@ -3388,39 +3408,37 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
-> >      }
-> >  
-> >      assert(start <= end);
-> > -    size = end - start;
-> > +    size = remain = end - start + 1;
-> >  
-> > -    if (ctpop64(size) != 1) {
-> > -        /*
-> > -         * This size cannot format a correct mask. Let's enlarge it to
-> > -         * suite the minimum available mask.
-> > -         */
-> > -        int n = 64 - clz64(size);
-> > -        if (n > s->aw_bits) {
-> > -            /* should not happen, but in case it happens, limit it */
-> > -            n = s->aw_bits;
-> > -        }
-> > -        size = 1ULL << n;
-> > +    while (remain > 0) {
-> hi 
-> I think here remain should still be "remain >= VTD_PAGE_SIZE"
-> because we cannot unmap entry less than PAGE_SIZE.
+From: David Brenken <david.brenken@efs-auto.de>
 
-Yes we can.
+Signed-off-by: Andreas Konopik <andreas.konopik@efs-auto.de>
+Signed-off-by: David Brenken <david.brenken@efs-auto.de>
+Signed-off-by: Georg Hofstetter <georg.hofstetter@efs-auto.de>
+Signed-off-by: Robert Rasche <robert.rasche@efs-auto.de>
+Signed-off-by: Lars Biermanski <lars.biermanski@efs-auto.de>
+Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+---
+ target/tricore/fpu_helper.c | 16 ++++++++++++++++
+ target/tricore/helper.h     |  1 +
+ target/tricore/translate.c  |  3 +++
+ 3 files changed, 20 insertions(+)
 
-I'd say this is purely for protection purpose no matter what.  If we
-did write the code correctly when registering the IOMMU notifier then
-we'll always have aligned "remain" here and these checks will be
-meaningless...  So we'll definitely fail in the case you mentioned,
-imho the only difference is when it happens.
-
-If we want to fail at the earliest point, we can probably check during
-registering of the notifiers for page alignment.
-
-> 
-> > +        IOMMUTLBEntry entry;
-> > +        uint64_t mask = vtd_get_next_mask(start, remain, s->aw_bits);
-> > +
-> > +        assert(mask);
-> > +
-> 
-> > +        entry.iova = start;
-> > +        entry.addr_mask = mask - 1;
-> > +        entry.target_as = &address_space_memory;
-> > +        entry.perm = IOMMU_NONE;
-> > +        /* This field is meaningless for unmap */
-> > +        entry.translated_addr = 0;
-> > +
-> > +        memory_region_notify_one(n, &entry);
-> > +
-> > +        start += mask;
-> > +        remain -= mask;
-> >      }
-> Add assert(remain) here?
-
-Do you mean assert(!remain)?  If so, it's below [1].
-
-> 
-> >  
-> > -    entry.target_as = &address_space_memory;
-> > -    /* Adjust iova for the size */
-> > -    entry.iova = n->start & ~(size - 1);
-> > -    /* This field is meaningless for unmap */
-> > -    entry.translated_addr = 0;
-> > -    entry.perm = IOMMU_NONE;
-> > -    entry.addr_mask = size - 1;
-> > +    assert(!remain);
-
-[1]
-
-> >  
-> >      trace_vtd_as_unmap_whole(pci_bus_num(as->bus),
-> >                               VTD_PCI_SLOT(as->devfn),
-> >                               VTD_PCI_FUNC(as->devfn),
-> > -                             entry.iova, size);
-> > +                             n->start, size);
-> >  
-> > -    map.iova = entry.iova;
-> > -    map.size = entry.addr_mask;
-> > +    map.iova = n->start;
-> > +    map.size = size;
-> >      iova_tree_remove(as->iova_tree, &map);
-> > -
-> > -    memory_region_notify_one(n, &entry);
-> >  }
-> >  
-> >  static void vtd_address_space_unmap_all(IntelIOMMUState *s)
-> > -- 
-> > 2.21.0
-> > 
-
-Regards,
-
+diff --git a/target/tricore/fpu_helper.c b/target/tricore/fpu_helper.c
+index f079d9e939..432079c8e2 100644
+--- a/target/tricore/fpu_helper.c
++++ b/target/tricore/fpu_helper.c
+@@ -303,6 +303,22 @@ uint32_t helper_itof(CPUTriCoreState *env, uint32_t arg)
+     return (uint32_t)f_result;
+ }
+ 
++uint32_t helper_utof(CPUTriCoreState *env, uint32_t arg)
++{
++    float32 f_result;
++    uint32_t flags;
++
++    f_result = uint32_to_float32(arg, &env->fp_status);
++
++    flags = f_get_excp_flags(env);
++    if (flags) {
++        f_update_psw_flags(env, flags);
++    } else {
++        env->FPU_FS = 0;
++    }
++    return (uint32_t)f_result;
++}
++
+ uint32_t helper_ftoiz(CPUTriCoreState *env, uint32_t arg)
+ {
+     float32 f_arg = make_float32(arg);
+diff --git a/target/tricore/helper.h b/target/tricore/helper.h
+index 16b62edf7f..f1a5cb367e 100644
+--- a/target/tricore/helper.h
++++ b/target/tricore/helper.h
+@@ -111,6 +111,7 @@ DEF_HELPER_4(fmsub, i32, env, i32, i32, i32)
+ DEF_HELPER_3(fcmp, i32, env, i32, i32)
+ DEF_HELPER_2(ftoi, i32, env, i32)
+ DEF_HELPER_2(itof, i32, env, i32)
++DEF_HELPER_2(utof, i32, env, i32)
+ DEF_HELPER_2(ftoiz, i32, env, i32)
+ DEF_HELPER_2(ftouz, i32, env, i32)
+ DEF_HELPER_2(updfl, void, env, i32)
+diff --git a/target/tricore/translate.c b/target/tricore/translate.c
+index 5e1c4f54b9..bd913d71a1 100644
+--- a/target/tricore/translate.c
++++ b/target/tricore/translate.c
+@@ -6747,6 +6747,9 @@ static void decode_rr_divide(CPUTriCoreState *env, DisasContext *ctx)
+     case OPC2_32_RR_UPDFL:
+         gen_helper_updfl(cpu_env, cpu_gpr_d[r1]);
+         break;
++    case OPC2_32_RR_UTOF:
++        gen_helper_utof(cpu_gpr_d[r3], cpu_env, cpu_gpr_d[r1]);
++        break;
+     case OPC2_32_RR_FTOIZ:
+         gen_helper_ftoiz(cpu_gpr_d[r3], cpu_env, cpu_gpr_d[r1]);
+         break;
 -- 
-Peter Xu
+2.22.0.windows.1
+
 
