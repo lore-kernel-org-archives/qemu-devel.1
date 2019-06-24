@@ -2,78 +2,65 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 508AFC43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 08:35:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1117AC43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 08:39:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 272042089F
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 08:35:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 272042089F
+	by mail.kernel.org (Postfix) with ESMTPS id 9C54F2089F
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 08:39:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C54F2089F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48782 helo=lists.gnu.org)
+Received: from localhost ([::1]:48798 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfKRb-0003A4-5m
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 04:35:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40276)
+	id 1hfKVa-0004zL-Di
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 04:39:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41241)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sgarzare@redhat.com>) id 1hfKPl-0002L2-6p
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:33:27 -0400
+ (envelope-from <abologna@redhat.com>) id 1hfKTx-0004Ex-63
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:37:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1hfKPR-0005WX-M8
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:33:10 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:38839)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hfKPP-0005KZ-MQ
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:33:03 -0400
-Received: by mail-wm1-f68.google.com with SMTP id s15so12365595wmj.3
- for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 01:32:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=M0Ho630Iw9f+gDCgXdYZ6dxrnR0PbhXPz9gl10vbPjQ=;
- b=csP9u9gKV3rMkk4++0DWNMXqZaCtHZ6IpLXL/kCWnAn4ab9CmsmPPbfDrZE9sjkKfA
- Fs8N7uF6WHRJXKDXRK56avtEtL0I9exOm/JjQ/rNByqnqTSIEQTQmYJLpGWfMsrQwJ33
- 4W2ju97BKGifFIeopYdaUGvwk4PxDge3RkomaCrbZtcoVTZkcYQInws/LhOCTuuygbqm
- w0qyUvqW1iRpubp6LJytRJ5vd0a6YjTNUlhFf4ySxdMWxyHXvPr2KzIssF5K4zowmhqH
- 16xPxV7BMAe1kfE+ehYqI1441QQFxkCNuTMrMsFD29IvaHvSch4Vc6GgejTJaHeUah6b
- KL2A==
-X-Gm-Message-State: APjAAAV7ryzg4lyQdiASGMLdk+oy+j+kYvAIQ7TV0NbzzE/5hk17bfye
- ZkiJDnt/Y/gibxL8tV+CP6NC9w==
-X-Google-Smtp-Source: APXvYqysvdA3msPi+hzEkEnC+tqnZOGDl29y4ktUdda+7eJOMMcTIhOFho46md38zomULXqs64aZ4w==
-X-Received: by 2002:a1c:343:: with SMTP id 64mr15521728wmd.116.1561365177279; 
- Mon, 24 Jun 2019 01:32:57 -0700 (PDT)
-Received: from steredhat (host21-207-dynamic.52-79-r.retail.telecomitalia.it.
- [79.52.207.21])
- by smtp.gmail.com with ESMTPSA id u25sm9679489wmc.3.2019.06.24.01.32.56
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 24 Jun 2019 01:32:56 -0700 (PDT)
-Date: Mon, 24 Jun 2019 10:32:54 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Message-ID: <20190624083254.aoeizlwpet24ib52@steredhat>
-References: <20190531064341.29730-1-philmd@redhat.com>
- <20190531073859.ojouyr3urzcarn4f@steredhat.homenet.telecomitalia.it>
- <5489328b-92d7-6595-a6da-3f27d0839882@redhat.com>
+ (envelope-from <abologna@redhat.com>) id 1hfKTu-0004Q8-4a
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:37:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48268)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <abologna@redhat.com>)
+ id 1hfKTk-00045H-4b; Mon, 24 Jun 2019 04:37:32 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 74009A7DD;
+ Mon, 24 Jun 2019 08:37:30 +0000 (UTC)
+Received: from kinshicho (unknown [10.43.2.73])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 66EB45D721;
+ Mon, 24 Jun 2019 08:37:26 +0000 (UTC)
+Message-ID: <7745c47186278c1b7f1781c9173ef0e2e8a55910.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Cleber Rosa <crosa@redhat.com>
+Date: Mon, 24 Jun 2019 10:37:24 +0200
+In-Reply-To: <CAFEAcA-x_GSxiULrxvRj7dtCLM-r4YvRpwkVosW+1SutAUJMoA@mail.gmail.com>
+References: <20190620222314.2670-1-wainersm@redhat.com>
+ <CAFEAcA92m9n7FR2a6=ecnr5bn-Sq97LZRxHRuzWO-OcbdgA4fw@mail.gmail.com>
+ <20190621190421.GA679@localhost.localdomain>
+ <CAFEAcA-x_GSxiULrxvRj7dtCLM-r4YvRpwkVosW+1SutAUJMoA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.32.3 (3.32.3-1.fc30) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5489328b-92d7-6595-a6da-3f27d0839882@redhat.com>
-User-Agent: NeoMutt/20180716
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Mon, 24 Jun 2019 08:37:30 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PATCH] Makefile: Rename the 'vm-test' target as
- 'vm-help'
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [Qemu-arm] [RFC v2 PATCH] hw/arm/virt: makes virt
+ a default machine type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,94 +72,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 20, 2019 at 01:03:28PM +0200, Philippe Mathieu-Daudé wrote:
-> Hi Stefano,
+On Sat, 2019-06-22 at 16:58 +0100, Peter Maydell wrote:
+> On Fri, 21 Jun 2019 at 20:04, Cleber Rosa <crosa@redhat.com> wrote:
+> > You can consider me biased (I do consider myself), but trying to wear
+> > the hat of a user first interacting with QEMU, I would expect a (any)
+> > reasonably capable environment that can represent the given target.
+> > That will probably be a different environment than the one I may need,
+> > and I think that's fine.
 > 
-> On 5/31/19 9:38 AM, Stefano Garzarella wrote:
-> > On Fri, May 31, 2019 at 08:43:41AM +0200, Philippe Mathieu-Daudé wrote:
-> >> We already have 'make check-help', use the 'make vm-help' form
-> >> to display helps about VM testing. Keep the old target to not
-> >> bother old customs.
-> >>
-> >> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> >> ---
-> >> Based-on: <20190530101603.22254-1-alex.bennee@linaro.org>
-> >>           "testing/next queue"
-> >> ---
-> >>  Makefile                  | 4 ++--
-> >>  docs/devel/testing.rst    | 4 ++--
-> >>  tests/vm/Makefile.include | 5 +++--
-> >>  3 files changed, 7 insertions(+), 6 deletions(-)
-> >>
-> >> diff --git a/Makefile b/Makefile
-> >> index f0be624f47..f67739df7c 100644
-> >> --- a/Makefile
-> >> +++ b/Makefile
-> >> @@ -9,7 +9,7 @@ SRC_PATH=.
-> >>  UNCHECKED_GOALS := %clean TAGS cscope ctags dist \
-> >>      html info pdf txt \
-> >>      help check-help print-% \
-> >> -    docker docker-% vm-test vm-build-%
-> >> +    docker docker-% vm-help vm-test vm-build-%
-> >>  
-> >>  print-%:
-> >>  	@echo '$*=$($*)'
-> >> @@ -1121,7 +1121,7 @@ endif
-> >>  	@echo  'Test targets:'
-> >>  	@echo  '  check           - Run all tests (check-help for details)'
-> >>  	@echo  '  docker          - Help about targets running tests inside Docker containers'
-> >> -	@echo  '  vm-test         - Help about targets running tests inside VM'
-> >> +	@echo  '  vm-help         - Help about targets running tests inside VM'
-> >>  	@echo  ''
-> >>  	@echo  'Documentation targets:'
-> >>  	@echo  '  html info pdf txt'
-> >> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-> >> index da2d0fc964..68aba3926e 100644
-> >> --- a/docs/devel/testing.rst
-> >> +++ b/docs/devel/testing.rst
-> >> @@ -399,12 +399,12 @@ VM testing
-> >>  
-> >>  This test suite contains scripts that bootstrap various guest images that have
-> >>  necessary packages to build QEMU. The basic usage is documented in ``Makefile``
-> >> -help which is displayed with ``make vm-test``.
-> >> +help which is displayed with ``make vm-help``.
-> >>  
-> >>  Quickstart
-> >>  ----------
-> >>  
-> >> -Run ``make vm-test`` to list available make targets. Invoke a specific make
-> >> +Run ``make vm-help`` to list available make targets. Invoke a specific make
-> >>  command to run build test in an image. For example, ``make vm-build-freebsd``
-> >>  will build the source tree in the FreeBSD image. The command can be executed
-> >>  from either the source tree or the build dir; if the former, ``./configure`` is
-> >> diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
-> >> index 5e37063d32..b7311d7bd9 100644
-> >> --- a/tests/vm/Makefile.include
-> >> +++ b/tests/vm/Makefile.include
-> >> @@ -8,8 +8,9 @@ IMAGE_FILES := $(patsubst %, $(IMAGES_DIR)/%.img, $(IMAGES))
-> >>  
-> >>  .PRECIOUS: $(IMAGE_FILES)
-> >>  
-> >> -vm-test:
-> >> -	@echo "vm-test: Test QEMU in preconfigured virtual machines"
-> > 
-> > What about adding something like this?
-> > vm-test: vm-help
-> > 	@echo ""
-> > 	@echo "vm-test is deprecated, please use vm-help"
+> I'm really not sure what you're trying to suggest here; maybe
+> you could clarify? If you specify a target (ie a machine type),
+> you get that machine type. If you don't specify a target, then
+> we can't really guess what you were hoping to run and
+> magically pick something that works.
 > 
-> I wouldn't worry about deprecation warnings for dev tools, it would be
-> just noise :)
+> The main problem here is that users expect "all the world is a PC"
+> type behaviour, ie they can just provide qemu-system-arm or
+> qemu-system-aarch64 with no command line arguments except
+> a guest kernel (which is half the time something they found under
+> a rock or extracted from some firmware image) or a guest CDROM
+> image and have it boot, because that generally works for x86. It
+> doesn't and can't work for Arm, because of the much greater
+> diversity of machine types and the way that kernels are often
+> only compiled to work on a specific subset of machines.
+> Making the user specify a machine type means they do at least
+> get prompted that the world is more complicated than they
+> think it is and there are decisions that have to be made.
+> 
+> In any case even if we did default to "virt" the user still
+> has to specify a CPU type, may well also want to provide
+> a GIC version (gicv3 being better than the default v2),
+> likely more RAM than the very small default, they need to provide
+> all the virtio devices, and so on and so on. So giving
+> them one option they no longer need to specify doesn't
+> really make it any easier IMHO.
 
-Make sense :)
+Additional note on GIC: most server-grade machines you can buy today
+do *not* support GICv2, so you will need to opt-in to GICv3 if you
+want your guest to even start.
 
-Cheers,
-Stefano
+More generally, as someone who has worked on supporting non-x86
+guests in libvirt for the past few years, I can tell you from
+experience that you're always going to need some arch-specific logic
+to deal with the small (and not so small :) differences in behavior
+between QEMU targets: as Peter correctly says, machine type is just
+a single example among many.
+
+-- 
+Andrea Bolognani / Red Hat / Virtualization
 
 
