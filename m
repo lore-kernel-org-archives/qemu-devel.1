@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.5 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
 	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72962C43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 14:31:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4D49C48BE8
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 14:33:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30F6A208E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 14:31:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30F6A208E4
+	by mail.kernel.org (Postfix) with ESMTPS id 6D24D208E4
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 14:33:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D24D208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=qq.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51714 helo=lists.gnu.org)
+Received: from localhost ([::1]:51730 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfQ0W-0003CH-51
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 10:31:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60228)
+	id 1hfQ2Q-0004Kx-ND
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 10:33:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33025)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hfHik-0007N1-BQ
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 01:40:52 -0400
+ (envelope-from <bounces@canonical.com>) id 1hfHnk-0007yg-Oy
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 01:46:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hfHii-00032w-0M
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 01:40:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45584)
+ (envelope-from <bounces@canonical.com>) id 1hfHnb-0000rF-QM
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 01:45:54 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46288)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hfHih-000316-MN
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 01:40:47 -0400
+ id 1hfHnQ-0000Yw-T7
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 01:45:42 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hfHif-0007y4-AJ
- for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 05:40:45 +0000
+ id 1hfHnO-0008Q9-QF
+ for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 05:45:38 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 13B452E80CC
- for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 05:40:45 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id C4F682E80C7
+ for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 05:45:38 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 24 Jun 2019 05:30:37 -0000
+Date: Mon, 24 Jun 2019 05:39:23 -0000
 From: qianxi <qianxi416@qq.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -56,16 +56,16 @@ X-Launchpad-Bug-Commenters: berrange qianxi416
 X-Launchpad-Bug-Reporter: qianxi (qianxi416)
 X-Launchpad-Bug-Modifier: qianxi (qianxi416)
 References: <155832450585.26079.9550620234862222790.malonedeb@soybean.canonical.com>
-Message-Id: <156135423757.29693.8879471959989470479.malone@gac.canonical.com>
+Message-Id: <156135476370.18815.2706266729000575261.malone@wampee.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18989";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: bd648479317e0842c216b47cadadeb925ca1d309
+X-Launchpad-Hash: 095eff3cfea7975d9f9ef064744777a3bb32d7e1
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-X-Mailman-Approved-At: Mon, 24 Jun 2019 10:30:00 -0400
+X-Mailman-Approved-At: Mon, 24 Jun 2019 10:30:01 -0400
 Subject: [Qemu-devel] [Bug 1829696] Re: qemu-kvm takes 100% CPU when running
  redhat/centos 7.6 guest VM OS
 X-BeenThere: qemu-devel@nongnu.org
@@ -83,145 +83,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I tested two newest QEMU versions these days, and sadly, the problem
-still happens.
+=3D=3D=3Dvmstat on the host=3D=3D=3D
+# vmstat 1 5
+procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu=
+-----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id =
+wa st
+ 2  0      0 252897184 366768 7497768    0    0     0     0    0    0  0  0=
+ 100  0  0
+ 1  0      0 252896752 366768 7497768    0    0     0     0 1394  367  2  0=
+ 98  0  0
+ 1  0      0 252896752 366768 7497768    0    0     0     0 1442  387  2  0=
+ 98  0  0
+ 1  0      0 252896752 366768 7497768    0    0     0     0 1479  470  2  0=
+ 98  0  0
+ 1  0      0 252896752 366776 7497768    0    0     0    12 1373  371  2  0=
+ 98  0  0
 
-I tried to find the reason why the qemu process take 100% usage of cpu, and=
- collected some facts about it.
-I compared the facts with other normal vm's qemu process(who's cpu usage is=
- normal) and didn't turn out any interesting result.
-
-Please give me some guides to debug this problem if you could, thanks
-very much.
-
-
-(The full content of facts is in the attachment)
-1.
-=3D=3D=3D=3D=3D=3Dthe command line to start a VM=3D=3D=3D=3D=3D=3D
-# ps -ef |grep 1567284 | cat
-qemu     1567284       1 99 Jun21 ?        2-18:09:33 /usr/libexec/qemu-kvm=
- -name guest=3Dinstance-0000530a,debug-threads=3Don -S -object secret,id=3D=
-masterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-1-instance-0000=
-530a/master-key.aes -machine pc-i440fx-4.0,accel=3Dkvm,usb=3Doff,dump-guest=
--core=3Doff -cpu IvyBridge -m 2048 -realtime mlock=3Doff -smp 1,sockets=3D1=
-,cores=3D1,threads=3D1 -object memory-backend-ram,id=3Dram-node0,size=3D214=
-7483648,host-nodes=3D1,policy=3Dbind -numa node,nodeid=3D0,cpus=3D0,memdev=
-=3Dram-node0 -uuid 60d3ad85-1004-47e7-b2cb-5cf1a029ab47 -smbios type=3D1,ma=
-nufacturer=3DFedora Project,product=3DOpenStack Nova,version=3D13.1.2-1.el7=
-,serial=3Dc0700413-4a28-4e97-85c4-66fe3ec367dc,uuid=3D60d3ad85-1004-47e7-b2=
-cb-5cf1a029ab47,family=3DVirtual Machine -no-user-config -nodefaults -chard=
-ev socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-1-instance-0=
-000530a/monitor.sock,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,=
-mode=3Dcontrol -rtc base=3Dutc,driftfix=3Dslew -global kvm-pit.lost_tick_po=
-licy=3Ddelay -no-hpet -no-shutdown -boot strict=3Don -device piix3-usb-uhci=
-,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive file=3D/data/instances/60d3ad85=
--1004-47e7-b2cb-5cf1a029ab47/disk,format=3Draw,if=3Dnone,id=3Ddrive-virtio-=
-disk0,cache=3Dnone -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4=
-,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1 -drive file=3D/=
-data/instances/60d3ad85-1004-47e7-b2cb-5cf1a029ab47/disk.swap,format=3Draw,=
-if=3Dnone,id=3Ddrive-virtio-disk1,cache=3Dnone -device virtio-blk-pci,scsi=
-=3Doff,bus=3Dpci.0,addr=3D0x5,drive=3Ddrive-virtio-disk1,id=3Dvirtio-disk1 =
--drive file=3D/data/instances/60d3ad85-1004-47e7-b2cb-5cf1a029ab47/disk.con=
-fig,format=3Draw,if=3Dnone,id=3Ddrive-ide0-1-1,readonly=3Don,cache=3Dnone -=
-device ide-cd,bus=3Dide.1,unit=3D1,drive=3Ddrive-ide0-1-1,id=3Dide0-1-1 -ne=
-tdev tap,fd=3D27,id=3Dhostnet0,vhost=3Don,vhostfd=3D29 -device virtio-net-p=
-ci,netdev=3Dhostnet0,id=3Dnet0,mac=3Dfa:16:3e:21:2c:70,bus=3Dpci.0,addr=3D0=
-x3 -add-fd set=3D2,fd=3D31 -chardev file,id=3Dcharserial0,path=3D/dev/fdset=
-/2,append=3Don -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chard=
-ev pty,id=3Dcharserial1 -device isa-serial,chardev=3Dcharserial1,id=3Dseria=
-l1 -device usb-tablet,id=3Dinput0,bus=3Dusb.0,port=3D1 -vnc 0.0.0.0:0 -k en=
--us -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 -device virtio-ba=
-lloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x6 -msg timestamp=3Don
-root     1567288       2  0 Jun21 ?        00:00:01 [vhost-1567284]
-root     1567291       2  0 Jun21 ?        00:00:00 [kvm-pit/1567284]
-
-2.
-=3D=3D=3Dversion of QEMU=3D=3D=3D
-# /usr/libexec/qemu-kvm --version
-QEMU emulator version 4.0.0
-Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
-
-=3D=3D=3Dversion of libvirt=3D=3D=3D
-# libvirtd -V
-libvirtd (libvirt) 3.9.0
-
-=3D=3D=3Dversion of kernal=3D=3D=3D
-# uname -a
-Linux txyz_40_92 3.10.0-862.el7.x86_64 #1 SMP Wed Mar 21 18:14:51 EDT 2018 =
-x86_64 x86_64 x86_64 GNU/Linux
-Red Hat Enterprise Linux Server (3.10.0-862.el7.x86_64) 7.5 (Maipo)
-# modinfo kvm
-filename:       /lib/modules/3.10.0-862.el7.x86_64/kernel/arch/x86/kvm/kvm.=
-ko.xz
-license:        GPL
-author:         Qumranet
-retpoline:      Y
-rhelversion:    7.5
-srcversion:     8A3372406CDF0ACF69A0E58
-depends:        irqbypass
-intree:         Y
-vermagic:       3.10.0-862.el7.x86_64 SMP mod_unload modversions =
-
-signer:         Red Hat Enterprise Linux kernel signing key
-sig_key:        51:73:02:3B:F8:16:37:D7:BF:3C:51:50:13:4E:EC:84:1B:96:FD:0B
-sig_hashalgo:   sha256
-parm:           ignore_msrs:bool
-parm:           min_timer_period_us:uint
-parm:           kvmclock_periodic_sync:bool
-parm:           tsc_tolerance_ppm:uint
-parm:           lapic_timer_advance_ns:uint
-parm:           vector_hashing:bool
-parm:           halt_poll_ns:uint
-parm:           halt_poll_ns_grow:uint
-parm:           halt_poll_ns_shrink:uint
-
-3.
-=3D=3D=3Dthreads=3D=3D=3D
-# ps -Lp 1567284
-    PID     LWP TTY          TIME CMD
-1567284 1567284 ?        00:00:12 qemu-kvm
-1567284 1567286 ?        00:00:00 call_rcu
-1567284 1567289 ?        00:00:00 IO mon_iothread
-1567284 1567290 ?        2-19:07:09 CPU 0/KVM
-1567284 1567293 ?        00:00:00 vnc_worker
-1567284 1637413 ?        00:00:00 worker
-
-=3D=3D=3Dtop=3D=3D=3D
-# top -H -p 1567284
-top - 13:02:07 up 164 days, 21:53,  2 users,  load average: 1.00, 1.01, 1.05
-Threads:   6 total,   1 running,   5 sleeping,   0 stopped,   0 zombie
-%Cpu(s):  2.1 us,  0.0 sy,  0.0 ni, 97.9 id,  0.0 wa,  0.0 hi,  0.0 si,  0.=
-0 st
-KiB Mem : 26353241+total, 25289752+free,  2771140 used,  7863752 buff/cache
-KiB Swap:  8388604 total,  8388604 free,        0 used. 25926534+avail Mem =
-
-  scroll coordinates: y =3D 1/6 (tasks), x =3D 1/12 (fields)
-    PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAN=
-D                =
-
-1567290 qemu      20   0 6683072 647416   8336 R 99.7  0.2   4028:04 CPU 0/=
-KVM              =
-
-1567284 qemu      20   0 6683072 647416   8336 S  0.0  0.2   0:12.93 qemu-k=
-vm               =
-
-1567286 qemu      20   0 6683072 647416   8336 S  0.0  0.2   0:00.00 call_r=
-cu               =
-
-1567289 qemu      20   0 6683072 647416   8336 S  0.0  0.2   0:00.00 IO mon=
-_iothread        =
-
-1567293 qemu      20   0 6683072 647416   8336 S  0.0  0.2   0:00.27 vnc_wo=
-rker             =
-
-1637464 qemu      20   0 6683072 647416   8336 S  0.0  0.2   0:00.00 worker
-
-=3D=3D=3Dhtop=3D=3D=3D
-....
-
-** Attachment added: "100_cpu_usage_problem.txt"
-   https://bugs.launchpad.net/qemu/+bug/1829696/+attachment/5272644/+files/=
-100_cpu_usage_problem.txt
+=3D=3D=3Dvmstat on the VM=3D=3D=3D
+# vmstat 1 5
+procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu=
+-----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id =
+wa st
+ 1  0      0 1490564 81708 238688    0    0     1     2   14   30  0  0 99 =
+ 1  0
+ 0  0      0 1490564 81708 238688    0    0     0     0   29   55  0  0 100=
+  0  0
+ 0  0      0 1490564 81708 238688    0    0     0     0   26   56  0  0 100=
+  0  0
+ 0  0      0 1490564 81708 238688    0    0     0     0   17   31  0  0 99 =
+ 0  0
+ 0  0      0 1490564 81708 238688    0    0     0     0   19   41  0  0 100=
+  0  0
 
 -- =
 
