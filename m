@@ -2,83 +2,70 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76A35C43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 10:23:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78017C43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 10:29:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EC4120652
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 10:23:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qoz9IG7E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EC4120652
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4C01820674
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 10:29:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C01820674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49536 helo=lists.gnu.org)
+Received: from localhost ([::1]:49586 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfM8e-0004K9-AF
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 06:23:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41750)
+	id 1hfMEQ-0007ly-3P
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 06:29:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44213)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <marcandre.lureau@gmail.com>) id 1hfM51-00029b-Td
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 06:20:10 -0400
+ (envelope-from <peterx@redhat.com>) id 1hfMDL-0007KL-Lb
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 06:28:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1hfM4w-0001Lb-T7
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 06:20:07 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:36342)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1hfM4w-0001JD-JL
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 06:20:02 -0400
-Received: by mail-wm1-x344.google.com with SMTP id u8so12774736wmm.1
- for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 03:20:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=1ObYhkY4AFQtKGtE6wxOzY6hNIXkfB8b9EcmTCPa1Vg=;
- b=Qoz9IG7EOmJHtn4csJ4w3BCBRECU1FOp1PyuJcw+WT5X7dI5FzD4nmzc3qkpL+lj9M
- /qyBRgrio6UKn0sv0TVbADfuLfrDzUAuNRz9/1pYpWY3h9S0LTxCoDMYMKz5Vhy54yFA
- I8n+Tp2aNjIUW3m+6SEK3q+ocF0YRJ1qkDT+pdLMRwS9ZikkIFFlxuZYPX4YqaL74oGh
- hsVpgGApp5baokvIdh5U9rIcgBN6fCAXXtiSLiEH61B5Xhi20OlgcqPJFdZknCIhkaoG
- cG6pTegMgswhILGk95ogNZeoObU8Jnooiuz4Fmy7ggb7jHk8//XosCKmWBjcER1TRxos
- QPsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=1ObYhkY4AFQtKGtE6wxOzY6hNIXkfB8b9EcmTCPa1Vg=;
- b=tzBbkbiyAv4XnREy47WwcIJmfkPhShCvg0QWvKxma1MTCAro8CXdH8yN4rU8+6j+lK
- 8tEs0JHR7GohgI92EaRRfE4JBm4T27CIto0hjVEKjEfFsojVRagRh4L1vAqI/n9TiK/F
- J6Y4Xrb4UvIVBdFr0iTKKsf64qPJSccOn9swFx+z7LP2Bym41I24qEV1/68rh/Vl1dRg
- cZy3y0cd4imJse28Bl5TZIACC9QPZJ7Q7AXk1OOFQtoHKBnoxce4fF6vUjsN5M6eLay4
- plyG/CU/22anq0OdCJDJjIMSy8KpotTmEQW8r6hZOZSrgAWdu8X7p8hnQuCPKxeJpUtX
- mNIw==
-X-Gm-Message-State: APjAAAXOvRb2cUw4rwozqyM1VeQ5teuEERRmGrqhO5sEmVhbOnwLFoQw
- 36m05mqWpia9mupZqbHH1Z1voKpABOd0ZSsZzhQ=
-X-Google-Smtp-Source: APXvYqzFF2D5NiyxgdER9Qq8VW0WJA9Y9R9Ay/y1yxCp1DiXvR7vapjTlI1tusxlNLzQw4yOWFEozHJIc5Bmi/U/1Hw=
-X-Received: by 2002:a1c:b782:: with SMTP id h124mr15299279wmf.20.1561371600719; 
- Mon, 24 Jun 2019 03:20:00 -0700 (PDT)
+ (envelope-from <peterx@redhat.com>) id 1hfMDJ-0004nn-Gz
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 06:28:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46708)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hfMDJ-0004kt-8j
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 06:28:41 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id AD26880F79;
+ Mon, 24 Jun 2019 10:28:39 +0000 (UTC)
+Received: from xz-x1 (ovpn-12-60.pek2.redhat.com [10.72.12.60])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6604E5D721;
+ Mon, 24 Jun 2019 10:28:32 +0000 (UTC)
+Date: Mon, 24 Jun 2019 18:28:28 +0800
+From: Peter Xu <peterx@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <20190624102828.GK6279@xz-x1>
+References: <20190624063733.22079-1-peterx@redhat.com>
+ <20190624063733.22079-3-peterx@redhat.com>
+ <20190624064122.GB27894@joy-OptiPlex-7040>
+ <20190624065750.GE6279@xz-x1>
+ <20190624070450.GC27894@joy-OptiPlex-7040>
+ <20190624080649.GG6279@xz-x1>
+ <a0a6a698-d671-9b4c-badf-75bc258242ff@redhat.com>
+ <20190624090940.GH6279@xz-x1>
+ <ae70a81a-f9ec-b230-79a1-3258cfe7ec8a@redhat.com>
 MIME-Version: 1.0
-References: <20190624091304.666-1-stefanha@redhat.com>
-In-Reply-To: <20190624091304.666-1-stefanha@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 24 Jun 2019 12:19:49 +0200
-Message-ID: <CAJ+F1CKC2Sr4DVrsK7RO6Zz9F5e5Fu_899u+Yj+aKBzzbsCVbw@mail.gmail.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH] docs: clarify multiqueue vs multiple
- virtqueues
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ae70a81a-f9ec-b230-79a1-3258cfe7ec8a@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Mon, 24 Jun 2019 10:28:39 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 2/2] intel_iommu: Fix unexpected unmaps
+ during global unmap
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,97 +77,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sebastien Boeuf <sebastien.boeuf@intel.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>,
- Cathy Zhang <cathy.zhang@intel.com>
+Cc: Auger Eric <eric.auger@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Yan Zhao <yan.y.zhao@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+On Mon, Jun 24, 2019 at 12:11:54PM +0200, Paolo Bonzini wrote:
+> On 24/06/19 11:09, Peter Xu wrote:
+> > On Mon, Jun 24, 2019 at 10:43:21AM +0200, Paolo Bonzini wrote:
+> >> On 24/06/19 10:06, Peter Xu wrote:
+> >>> Well, if with such an error we'd better fix it right away in this
+> >>> patch... :)
+> >>>
+> >>> Let me wait for some more comments, I'll touch that up too if I need a
+> >>> repost.
+> >>
+> >> Looks good to me, except for one minor issue in this patch.  But do not
+> >> attribute this one to me, it's basically all code from you.
+> > 
+> > OK.
+> > 
+> >>
+> >>> +static uint64_t vtd_get_next_mask(uint64_t start, uint64_t size, int gaw)
+> >>> +{
+> >>> +    /* Tries to find smallest mask from start first */
+> >>> +    uint64_t rmask = start & -start, max_mask = 1ULL << gaw;
+> >>> +
+> >>> +    assert(size && gaw > 0 && gaw < 64);
+> >>> +
+> >>> +    /* Zero start, or too big */
+> >>> +    if (!rmask || rmask > max_mask) {
+> >>> +        rmask = max_mask;
+> >>> +    }
+> >>
+> >> Perhaps simpler:
+> >>
+> >>     uint64_t max_mask = 1ULL << gaw;
+> >>     uint64_t alignment = start ? start & -start : max_mask;
+> >>
+> > 
+> > (I'll add another "alignment = MIN(alignment, max_mask)" here if no
+> >  one disagree...)
+> 
+> I do! :)  If alignment > max_mask, then it will also be > size below so
+> clamping is unnecessary.
 
-On Mon, Jun 24, 2019 at 11:13 AM Stefan Hajnoczi <stefanha@redhat.com> wrot=
-e:
->
-> The vhost-user specification does not explain when
-> VHOST_USER_PROTOCOL_F_MQ must be implemented.  This may lead
-> implementors of vhost-user masters to believe that this protocol feature
-> is required for any device that has multiple virtqueues.  That would be
-> a mistake since existing vhost-user slaves offer multiple virtqueues but
-> do not advertise VHOST_USER_PROTOCOL_F_MQ.
->
-> For example, a vhost-net device with one rx/tx queue pair is not
-> multiqueue.  The slave does not need to advertise
-> VHOST_USER_PROTOCOL_F_MQ.  Therefore the master must assume it has these
-> virtqueues and cannot rely on askingt the slave how many virtqueues
-> exist.
->
-> Extend the specification to explain the different between true
-> multiqueue and regular devices with a fixed virtqueue layout.
->
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+You are right. ;)
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> 
+> There is another way which is to compute on the mask, so that start == 0
+> underflows to all-ones:
+> 
+>     uint64_t max_mask = (1ULL << gaw) - 1;
+>     uint64_t start_mask = (start & -start) - 1;
+>     uint64_t size_mask = pow2floor(size) - 1;
+>     return MIN(MIN(size_mask, start_mask), max_mask) + 1;
 
-> ---
-> Based-on: <20190621094005.4134-1-stefanha@redhat.com>
-> ---
->  docs/interop/vhost-user.rst | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
->
-> diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
-> index 5750668aba..7827b710aa 100644
-> --- a/docs/interop/vhost-user.rst
-> +++ b/docs/interop/vhost-user.rst
-> @@ -324,6 +324,15 @@ must support changing some configuration aspects on =
-the fly.
->  Multiple queue support
->  ----------------------
->
-> +Many devices have a fixed number of virtqueues.  In this case the master
-> +already knows the number of available virtqueues without communicating w=
-ith the
-> +slave.
-> +
-> +Some devices do not have a fixed number of virtqueues.  Instead the maxi=
-mum
-> +number of virtqueues is chosen by the slave.  The number can depend on h=
-ost
-> +resource availability or slave implementation details.  Such devices are=
- called
-> +multiple queue devices.
-> +
->  Multiple queue support allows the slave to advertise the maximum number =
-of
->  queues.  This is treated as a protocol extension, hence the slave has to
->  implement protocol features first. The multiple queues feature is suppor=
-ted
-> @@ -339,6 +348,14 @@ queue in the sent message to identify a specified qu=
-eue.
->  The master enables queues by sending message ``VHOST_USER_SET_VRING_ENAB=
-LE``.
->  vhost-user-net has historically automatically enabled the first queue pa=
-ir.
->
-> +Slaves should always implement the ``VHOST_USER_PROTOCOL_F_MQ`` protocol
-> +feature, even for devices with a fixed number of virtqueues, since it is=
- simple
-> +to implement and offers a degree of introspection.
-> +
-> +Masters must not rely on the ``VHOST_USER_PROTOCOL_F_MQ`` protocol featu=
-re for
-> +devices with a fixed number of virtqueues.  Only true multiqueue devices
-> +require this protocol feature.
-> +
->  Migration
->  ---------
->
-> --
-> 2.21.0
->
->
+The last line still seems problematic, but I just want to say the
+calculation of size_mask is indeed a smart move! (I did think the zero
+check was a bit ugly)
 
+Thanks,
 
---=20
-Marc-Andr=C3=A9 Lureau
+-- 
+Peter Xu
 
