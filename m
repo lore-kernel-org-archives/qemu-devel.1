@@ -2,55 +2,84 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3623C43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 05:34:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D97DC43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 05:56:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB9672083D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 05:34:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB9672083D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1B5B32083D
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 05:56:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FVXD56kh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B5B32083D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48058 helo=lists.gnu.org)
+Received: from localhost ([::1]:48104 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfHcI-0005xT-14
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 01:34:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58867)
+	id 1hfHyB-0001cn-4z
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 01:56:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35100)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yan.y.zhao@intel.com>) id 1hfHbX-0005VP-Cp
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 01:33:24 -0400
+ (envelope-from <vandersonmr2@gmail.com>) id 1hfHxC-0000ei-MZ
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 01:55:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1hfHbW-0003CX-BM
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 01:33:23 -0400
-Received: from mga05.intel.com ([192.55.52.43]:62445)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1hfHbW-00039I-24
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 01:33:22 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
- by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 23 Jun 2019 22:33:18 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,411,1557212400"; d="scan'208";a="151844409"
-Received: from joy-desktop.sh.intel.com ([10.239.13.126])
- by orsmga007.jf.intel.com with ESMTP; 23 Jun 2019 22:33:17 -0700
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: pbonzini@redhat.com
-Date: Mon, 24 Jun 2019 13:33:03 +0800
-Message-Id: <1561354383-21322-1-git-send-email-yan.y.zhao@intel.com>
-X-Mailer: git-send-email 2.7.4
+ (envelope-from <vandersonmr2@gmail.com>) id 1hfHxB-0003tr-QJ
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 01:55:46 -0400
+Received: from mail-qt1-x82a.google.com ([2607:f8b0:4864:20::82a]:45723)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <vandersonmr2@gmail.com>)
+ id 1hfHxB-0003sS-MJ
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 01:55:45 -0400
+Received: by mail-qt1-x82a.google.com with SMTP id j19so13236292qtr.12
+ for <qemu-devel@nongnu.org>; Sun, 23 Jun 2019 22:55:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=zA8ZWKYF7wiR6/oE1xobBuTt6PuxRqboUQZr8hwOW6s=;
+ b=FVXD56khhyl3bKzlNoHbZpJmTMMA0rEr/a8uHPTzMeM+3bdUHSII80bwatj6iZZ5Ah
+ wAzfW2ZnEdFQs6RITg5RnnoaNiwWslwuPOip9z8pUgf5S2Z0ztEsoyU3ZTFmpgcM2HND
+ Vck8AlmevX7/mc3O000RhthxJ7DNKtbrQf8TRtnaFp9yCy8qZT7RuJyZsml/lRs2vg7V
+ WxjqdQdcYPbUTiEaToGAXJe0H8Qp7pLSIK8BsVcb6y49ipknIILaPDpfVZfIaUXCCBzP
+ rmVdjNIoNh8RMzEX0fxTrzp5XQGR/3BOsXI534CN6v3zKMmGGWlUsVIAZrksTMwxs61E
+ sbSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=zA8ZWKYF7wiR6/oE1xobBuTt6PuxRqboUQZr8hwOW6s=;
+ b=CgEclFlyfokSFLiQ//E/Ws9z3VhI1MzwVPgR4IZKA5Gvs5CLiwy7ppJRPKp6HWBRaK
+ qVH++lxKS2dA2qdDYJQh9oWBGEwj4//EYrJyMFpzsHEOLKpqcvz7zxA3OEXbNTMGTDXx
+ AwbPcJLmkrt56AUEoq05trWx9Cd39r4k/jhNCVx2/9sIucxQeFCaEVtERNUaRN2Lx6vI
+ it+f0B90C6oiwUML9QSba6McdBgYMSUsdGvNfH4ExbpArZ4dAf8hFIXFQUEgi1dvGEZY
+ xysUUzuJ9tl4rSvxpbwZ2AiOEuOyhOKqmxQ016uHgymC4+MCsue7ACBJsN4r4qInvWsJ
+ VlVQ==
+X-Gm-Message-State: APjAAAUFSwHZoT5Vl+iw+Ss9QM6Ad5ddqinMccZdmy6X2UmOTQTBJzA2
+ /ZYvd4AyUSxZjkDXIddKAbBQH2/S
+X-Google-Smtp-Source: APXvYqzN6DWvMavBUcYERcJNtfw8pdleiXCJSHmoDPbX1x8IJNTmDdNFKeoBCdVHO1Sip/dpPoiyDQ==
+X-Received: by 2002:a0c:ae5a:: with SMTP id z26mr56066454qvc.65.1561355742093; 
+ Sun, 23 Jun 2019 22:55:42 -0700 (PDT)
+Received: from localhost.localdomain ([2804:7f4:548d:5237:c368:80a0:cb96:64bf])
+ by smtp.googlemail.com with ESMTPSA id t80sm5154440qka.87.2019.06.23.22.55.40
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Sun, 23 Jun 2019 22:55:41 -0700 (PDT)
+From: vandersonmr <vandersonmr2@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 24 Jun 2019 02:54:38 -0300
+Message-Id: <20190624055442.2973-1-vandersonmr2@gmail.com>
+X-Mailer: git-send-email 2.22.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.43
-Subject: [Qemu-devel] [PATCH] memory: warning on out of scope notification
+X-Received-From: 2607:f8b0:4864:20::82a
+Subject: [Qemu-devel] [PATCH v2 0/4] dumping hot TBs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,60 +91,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Auger Eric <eric.auger@redhat.com>, Yan Zhao <yan.y.zhao@intel.com>,
- qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-if an entry has parts out of scope of notifier's range, print warning
-message.
+It adds a new structure which is linked with each TBs and stores its statistics.
+We collect the execution count of the TBs and store in this new structure.
+The information stored in this new struct is then used to support a new
+command line -d hot_tbs:N which dumps information of the N most hot TBs.
 
-Out of scope mapping/unmapping would cause problem, as in below case:
+Different from v1 now the execution count is being updated directly
+from the TBStatistics so we do not need to copy the data when flushing.
 
-1. initially there are two notifiers with ranges
-0-0xfedfffff, 0xfef00000-0xffffffffffffffff,
-IOVAs from 0x3c000000 - 0x3c1fffff is in shadow page table.
-
-2. in vfio, memory_region_register_iommu_notifier() is followed by
-memory_region_iommu_replay(), which will first call address space
-unmap,
-and walk and add back all entries in vtd shadow page table. e.g.
-(1) for notifier 0-0xfedfffff,
-    IOVAs from 0 - 0xffffffff get unmapped,
-    and IOVAs from 0x3c000000 - 0x3c1fffff get mapped
-(2) for notifier 0xfef00000-0xffffffffffffffff
-    IOVAs from 0 - 0x7fffffffff get unmapped,
-    but IOVAs from 0x3c000000 - 0x3c1fffff cannot get mapped back.
-
-Cc: Auger Eric <eric.auger@redhat.com>
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
----
- memory.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/memory.c b/memory.c
-index 0a089a7..18927f2 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1953,6 +1953,16 @@ void memory_region_notify_one(IOMMUNotifier *notifier,
-         request_flags = IOMMU_NOTIFIER_UNMAP;
-     }
- 
-+    if (entry->iova < notifier->start ||
-+            entry->iova + entry->addr_mask > notifier->end) {
-+        warn_report("%s IOMMUTLBEntry %lx-%lx outside of "
-+                "notifier scope %lx-%lx",
-+                (request_flags == IOMMU_NOTIFIER_MAP) ?
-+                "Mapping" : "Unmapping",
-+                entry->iova, entry->iova + entry->addr_mask,
-+                notifier->start, notifier->end);
-+    }
-+
-     if (notifier->notifier_flags & request_flags) {
-         notifier->notify(notifier, entry);
-     }
--- 
-2.7.4
+[PATCH v2 1/4] add and link a statistic struct to TBs
+[PATCH v2 2/4] Adding an optional tb execution counter.
+[PATCH v2 3/4] Introduce dump of hot TBs
+[PATCH v2 4/4] adding -d hot_tbs:limit command line option
 
 
