@@ -6,33 +6,33 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 342D6C43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 15:44:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 810FAC43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 15:44:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 095B02054F
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 15:44:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 095B02054F
+	by mail.kernel.org (Postfix) with ESMTPS id 5BB232054F
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 15:44:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BB232054F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52472 helo=lists.gnu.org)
+Received: from localhost ([::1]:52394 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfR8W-0004SI-5z
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 11:44:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44912)
+	id 1hfR0j-0005T8-EI
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 11:36:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44930)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <anthony.perard@citrix.com>) id 1hfQy3-0003Ya-Nq
+ (envelope-from <anthony.perard@citrix.com>) id 1hfQy4-0003Ze-Fk
  for qemu-devel@nongnu.org; Mon, 24 Jun 2019 11:33:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <anthony.perard@citrix.com>) id 1hfQy1-0000PJ-Lh
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 11:33:15 -0400
+ (envelope-from <anthony.perard@citrix.com>) id 1hfQy2-0000ST-Hz
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 11:33:16 -0400
 Received: from esa3.hc3370-68.iphmx.com ([216.71.145.155]:11946)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
- id 1hfQy1-0000GL-1g
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 11:33:13 -0400
+ id 1hfQy2-0000GL-00
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 11:33:14 -0400
 Authentication-Results: esa3.hc3370-68.iphmx.com;
  dkim=none (message not signed) header.i=none;
  spf=None smtp.pra=anthony.perard@citrix.com;
@@ -63,22 +63,22 @@ Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
  envelope-from="anthony.perard@citrix.com";
  x-sender="postmaster@mail.citrix.com";
  x-conformance=sidf_compatible
-IronPort-SDR: 8a/f3n8FrzsCNMdKRAJOtwsqjTiA0a4FLq3A2XI0xZ1DlDQZvuVaC/p1tV6/EnLfA1kf33mOz5
- 1uslDhMrijaO7GqLdogyXwL6HQZwIV+qmYliRtpRp1Xzb4W8cLVNbQH+uJJ0v7EqfB4j06/kBt
- bVklUXfDvjjFgkLrvN3FMPmByYOg8KBRgluadUaH9LXz5HeI0+2GdEvQKYpuvue96rDucnQdko
- 8Rle0HnjzCkMnvZQx0971bA7WoNY8ngDjF0HenocJ33ZIhzxLQd6uagwUxZW5G0LrYEqmOxPne
- g+Y=
+IronPort-SDR: K5kUsN90E5VToN2tpmS2SfG7x98Z94kiLli0DChz2RnWbjCXjckGfa9ZpXH+d42unqqhcEvu1k
+ GljG4mhfzqFgczTE9LqCIjgBzT2qL+YWJgHX/9A7a/JyNELUdRZWCI9gfSLt/C7cighXPiJyLC
+ 4PYm6+npJL4WkNrgwhrjkOEiefvapW+OBq+d+gMvbJid427JxRVyLFGLe9yv5utZdk2np7S2zv
+ qVKgP0LFFnOI7YNg7g2HkjP1/1j6S4C0nnGEZ4ZB+NmrZQ2r0XM+Hiw0m1GKT0Igqej9zVM+Fz
+ +Y8=
 X-SBRS: 2.7
-X-MesageID: 2148104
+X-MesageID: 2148105
 X-Ironport-Server: esa3.hc3370-68.iphmx.com
 X-Remote-IP: 162.221.158.21
 X-Policy: $RELAYED
 X-IronPort-AV: E=Sophos;i="5.63,412,1557201600"; 
-   d="scan'208";a="2148104"
+   d="scan'208";a="2148105"
 From: Anthony PERARD <anthony.perard@citrix.com>
 To: <qemu-devel@nongnu.org>
-Date: Mon, 24 Jun 2019 16:32:56 +0100
-Message-ID: <20190624153257.20163-8-anthony.perard@citrix.com>
+Date: Mon, 24 Jun 2019 16:32:54 +0100
+Message-ID: <20190624153257.20163-6-anthony.perard@citrix.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190624153257.20163-1-anthony.perard@citrix.com>
 References: <20190624153257.20163-1-anthony.perard@citrix.com>
@@ -87,8 +87,7 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
 X-Received-From: 216.71.145.155
-Subject: [Qemu-devel] [PULL 7/8] Revert xen/io/ring.h of "Clean up a few
- header guard symbols"
+Subject: [Qemu-devel] [PULL 5/8] xen: Avoid VLA
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,59 +105,86 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This reverts changes to include/hw/xen/io/ring.h from commit
-37677d7db39a3c250ad661d00fb7c3b59d047b1f.
+Avoid using a variable length array.
 
-Following 37677d7db3 "Clean up a few header guard symbols", QEMU start
-to fail to build:
-
-In file included from ~/xen/tools/../tools/include/xen/io/blkif.h:31:0,
-                 from ~/xen/tools/qemu-xen-dir/hw/block/xen_blkif.h:5,
-                 from ~/xen/tools/qemu-xen-dir/hw/block/xen-block.c:22:
-~/xen/tools/../tools/include/xen/io/ring.h:68:0: error: "__CONST_RING_SIZE" redefined [-Werror]
- #define __CONST_RING_SIZE(_s, _sz) \
-
-In file included from ~/xen/tools/qemu-xen-dir/hw/block/xen_blkif.h:4:0,
-                 from ~/xen/tools/qemu-xen-dir/hw/block/xen-block.c:22:
-~/xen/tools/qemu-xen-dir/include/hw/xen/io/ring.h:66:0: note: this is the location of the previous definition
- #define __CONST_RING_SIZE(_s, _sz) \
-
-The issue is that some public xen headers have been imported (by
-f65eadb639 "xen: import ring.h from xen") but not all. With the change
-in the guards symbole, the ring.h header start to be imported twice.
+We allocate the `dirty_bitmap' buffer only once when we start tracking
+for dirty bits.
 
 Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 Reviewed-by: Paul Durrant <paul.durrant@citrix.com>
-Message-Id: <20190621105441.3025-2-anthony.perard@citrix.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20190618112341.513-5-anthony.perard@citrix.com>
 ---
- include/hw/xen/io/ring.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ hw/i386/xen/xen-hvm.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/xen/io/ring.h b/include/hw/xen/io/ring.h
-index 62abfd7a6e..1adacf09f9 100644
---- a/include/hw/xen/io/ring.h
-+++ b/include/hw/xen/io/ring.h
-@@ -24,8 +24,8 @@
-  * Tim Deegan and Andrew Warfield November 2004.
-  */
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index 2939122e7c..ed9c37c72d 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -120,6 +120,8 @@ typedef struct XenIOState {
+     DeviceListener device_listener;
+     hwaddr free_phys_offset;
+     const XenPhysmap *log_for_dirtybit;
++    /* Buffer used by xen_sync_dirty_bitmap */
++    unsigned long *dirty_bitmap;
  
--#ifndef XEN_PUBLIC_IO_RING_H
--#define XEN_PUBLIC_IO_RING_H
-+#ifndef __XEN_PUBLIC_IO_RING_H__
-+#define __XEN_PUBLIC_IO_RING_H__
+     Notifier exit;
+     Notifier suspend;
+@@ -465,6 +467,8 @@ static int xen_remove_from_physmap(XenIOState *state,
+     QLIST_REMOVE(physmap, list);
+     if (state->log_for_dirtybit == physmap) {
+         state->log_for_dirtybit = NULL;
++        g_free(state->dirty_bitmap);
++        state->dirty_bitmap = NULL;
+     }
+     g_free(physmap);
  
- /*
-  * When #include'ing this header, you need to provide the following
-@@ -469,7 +469,7 @@ struct name##_data_intf {                                                     \
- };                                                                            \
- DEFINE_XEN_FLEX_RING(name)
+@@ -615,7 +619,7 @@ static void xen_sync_dirty_bitmap(XenIOState *state,
+ {
+     hwaddr npages = size >> TARGET_PAGE_BITS;
+     const int width = sizeof(unsigned long) * 8;
+-    unsigned long bitmap[DIV_ROUND_UP(npages, width)];
++    size_t bitmap_size = DIV_ROUND_UP(npages, width);
+     int rc, i, j;
+     const XenPhysmap *physmap = NULL;
  
--#endif /* XEN_PUBLIC_IO_RING_H */
-+#endif /* __XEN_PUBLIC_IO_RING_H__ */
+@@ -627,13 +631,14 @@ static void xen_sync_dirty_bitmap(XenIOState *state,
  
- /*
-  * Local variables:
+     if (state->log_for_dirtybit == NULL) {
+         state->log_for_dirtybit = physmap;
++        state->dirty_bitmap = g_new(unsigned long, bitmap_size);
+     } else if (state->log_for_dirtybit != physmap) {
+         /* Only one range for dirty bitmap can be tracked. */
+         return;
+     }
+ 
+     rc = xen_track_dirty_vram(xen_domid, start_addr >> TARGET_PAGE_BITS,
+-                              npages, bitmap);
++                              npages, state->dirty_bitmap);
+     if (rc < 0) {
+ #ifndef ENODATA
+ #define ENODATA  ENOENT
+@@ -647,8 +652,8 @@ static void xen_sync_dirty_bitmap(XenIOState *state,
+         return;
+     }
+ 
+-    for (i = 0; i < ARRAY_SIZE(bitmap); i++) {
+-        unsigned long map = bitmap[i];
++    for (i = 0; i < bitmap_size; i++) {
++        unsigned long map = state->dirty_bitmap[i];
+         while (map != 0) {
+             j = ctzl(map);
+             map &= ~(1ul << j);
+@@ -678,6 +683,8 @@ static void xen_log_stop(MemoryListener *listener, MemoryRegionSection *section,
+ 
+     if (old & ~new & (1 << DIRTY_MEMORY_VGA)) {
+         state->log_for_dirtybit = NULL;
++        g_free(state->dirty_bitmap);
++        state->dirty_bitmap = NULL;
+         /* Disable dirty bit tracking */
+         xen_track_dirty_vram(xen_domid, 0, 0, NULL);
+     }
 -- 
 Anthony PERARD
 
