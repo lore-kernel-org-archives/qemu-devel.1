@@ -6,78 +6,66 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 401F0C4646B
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 20:45:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D557DC4646C
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 20:49:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18C6E20665
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 20:45:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18C6E20665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 63AFD20665
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 20:49:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63AFD20665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54608 helo=lists.gnu.org)
+Received: from localhost ([::1]:54638 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfVq7-0003aL-0n
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 16:45:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37739)
+	id 1hfVuV-0005M2-3V
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 16:49:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38576)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <wentong.wu@intel.com>) id 1hfVoa-0002Pa-Go
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 16:43:50 -0400
+ (envelope-from <lersek@redhat.com>) id 1hfVre-0004KY-GF
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 16:47:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wentong.wu@intel.com>) id 1hfVoX-00026U-Ql
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 16:43:47 -0400
-Received: from mga06.intel.com ([134.134.136.31]:56034)
+ (envelope-from <lersek@redhat.com>) id 1hfVrc-000595-Fs
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 16:46:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46232)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wentong.wu@intel.com>)
- id 1hfVoS-0001yK-Mk
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 16:43:42 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 24 Jun 2019 13:43:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,413,1557212400"; d="scan'208";a="312830797"
-Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
- by orsmga004.jf.intel.com with ESMTP; 24 Jun 2019 13:43:35 -0700
-Received: from fmsmsx161.amr.corp.intel.com (10.18.125.9) by
- FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 24 Jun 2019 13:43:35 -0700
-Received: from shsmsx102.ccr.corp.intel.com (10.239.4.154) by
- FMSMSX161.amr.corp.intel.com (10.18.125.9) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 24 Jun 2019 13:43:34 -0700
-Received: from shsmsx106.ccr.corp.intel.com ([169.254.10.89]) by
- shsmsx102.ccr.corp.intel.com ([169.254.2.33]) with mapi id 14.03.0439.000;
- Tue, 25 Jun 2019 04:43:32 +0800
-From: "Wu, Wentong" <wentong.wu@intel.com>
-To: =?utf-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] icount mode
-Thread-Index: AQHVKqTNpfOZh+BR/0K8hbLSyzkSQaarOgFw
-Date: Mon, 24 Jun 2019 20:43:31 +0000
-Message-ID: <228A20DABA3D9846AF1B64E31C217296010A5C86@SHSMSX106.ccr.corp.intel.com>
-References: <228A20DABA3D9846AF1B64E31C217296010A5383@SHSMSX106.ccr.corp.intel.com>
- <87lfxr0yu3.fsf@zen.linaroharston>
-In-Reply-To: <87lfxr0yu3.fsf@zen.linaroharston>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNjQ3NjkzMGYtNzIxMC00MWExLWIxY2EtMmFlZjRmZDU2YzZjIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiSFo4ekJGZTlacno4aWRNdnVQa2F0S3pcLzMyWmxJNytPSk1nS2RmSldHcnpBaTlwb1FmaHBVWkdBS1crMWIrMmsifQ==
-x-ctpclassification: CTP_NT
-dlp-product: dlpe-windows
-dlp-version: 11.0.600.7
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <lersek@redhat.com>)
+ id 1hfVrG-0004Gd-06; Mon, 24 Jun 2019 16:46:35 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7C5AC368FF;
+ Mon, 24 Jun 2019 20:46:22 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-226.ams2.redhat.com
+ [10.36.116.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1A94F608BA;
+ Mon, 24 Jun 2019 20:46:20 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Keith Busch <keith.busch@intel.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>
+References: <20190617081205.GA26990@apples.localdomain>
+ <c754211f-b41d-4b69-585b-b287fb776d81@redhat.com>
+ <20190624080154.GA4263@apples.localdomain>
+ <20190624101828.GC12855@linux.fritz.box>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <3571317f-84c2-8649-ba63-0e6508679b05@redhat.com>
+Date: Mon, 24 Jun 2019 22:46:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.31
-Subject: Re: [Qemu-devel] icount mode
+In-Reply-To: <20190624101828.GC12855@linux.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Mon, 24 Jun 2019 20:46:22 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC] nvme: how to support multiple
+ namespaces
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,114 +81,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGkgQWxleCwNCg0KVGhhbmtzIGZvciB5b3VyIHJlcGx5Lg0KDQpGb3IgdGhlIGRpZmZlcmVudCBm
-cmVxdWVuY2llcywgcGxlYXNlIHNlZSBiZWxvdyBjb2RlIGluIGFybXY3bV9zeXN0aWNrLmMgYW5k
-IG1wczIuYyBmaXJzdCwgdGhlIHMtPnJlbG9hZCB3aWxsIGJlIHNldCBieSB0aGUgZ3Vlc3Qgb3Mg
-Y29kZSBhY2NvcmRpbmcgdG8gdGhlIENQVSdzIGZyZXF1ZW5jeSB3aGljaCB3aWxsIGJlIFNZU0NM
-S19GUlEsIGFuZCBzLT50aWNrIHdpbGwgYmUgc2V0IGFzICJzLT50aWNrICs9IChzLT5yZWxvYWQg
-KyAxKSAqIHN5c3RpY2tfc2NhbGUocyk7IiwgaXQgbWVhbnMgdGhlIGZyZXF1ZW5jeSBvZiB0aGlz
-IHRpbWVyIHdoaWNoIEkgY2FsbGVkIHFlbXUgdGltZXIgd2lsbCBiZSBOQU5PU0VDT05EU19QRVJf
-U0VDT05ELg0Kc3RhdGljIHZvaWQgc3lzdGlja19yZWxvYWQoU3lzVGlja1N0YXRlICpzLCBpbnQg
-cmVzZXQpDQp7DQogICAgLyogVGhlIENvcnRleC1NMyBEZXZpY2VzIEdlbmVyaWMgVXNlciBHdWlk
-ZSBzYXlzIHRoYXQgIldoZW4gdGhlDQogICAgICogRU5BQkxFIGJpdCBpcyBzZXQgdG8gMSwgdGhl
-IGNvdW50ZXIgbG9hZHMgdGhlIFJFTE9BRCB2YWx1ZSBmcm9tIHRoZQ0KICAgICAqIFNZU1QgUlZS
-IHJlZ2lzdGVyIGFuZCB0aGVuIGNvdW50cyBkb3duIi4gU28sIHdlIG5lZWQgdG8gY2hlY2sgdGhl
-DQogICAgICogRU5BQkxFIGJpdCBiZWZvcmUgcmVsb2FkaW5nIHRoZSB2YWx1ZS4NCiAgICAgKi8N
-CiAgICB0cmFjZV9zeXN0aWNrX3JlbG9hZCgpOw0KDQogICAgaWYgKChzLT5jb250cm9sICYgU1lT
-VElDS19FTkFCTEUpID09IDApIHsNCiAgICAgICAgcmV0dXJuOw0KICAgIH0NCg0KICAgIGlmIChy
-ZXNldCkgew0KICAgICAgICBzLT50aWNrID0gcWVtdV9jbG9ja19nZXRfbnMoUUVNVV9DTE9DS19W
-SVJUVUFMKTsNCiAgICB9DQogICAgcy0+dGljayArPSAocy0+cmVsb2FkICsgMSkgKiBzeXN0aWNr
-X3NjYWxlKHMpOw0KICAgIHRpbWVyX21vZChzLT50aW1lciwgcy0+dGljayk7DQp9DQoNCnN0YXRp
-YyB2b2lkIG1wczJfY29tbW9uX2luaXQoTWFjaGluZVN0YXRlICptYWNoaW5lKQ0Kew0KICAgICAg
-Li4uDQogICAgICBzeXN0ZW1fY2xvY2tfc2NhbGUgPSBOQU5PU0VDT05EU19QRVJfU0VDT05EIC8g
-U1lTQ0xLX0ZSUTsNCiAgICAgIC4uLg0KfQ0KDQpCdXQgZm9yIGJlbG93IGNvZGUsIGl0IHdpbGwg
-dXNlIHFlbXVfY2xvY2tfZ2V0X25zKFFFTVVfQ0xPQ0tfVklSVFVBTCkgdG8gZ2V0IHRoZSBjdXJy
-ZW50IHRpbWUgd2hpY2ggd2lsbCBiZSBjYWxjdWxhdGVkIGJ5IDJeTiBucyAqIGluc3RydWN0aW9u
-IGNvdW50ZXIsIGJ1dCB0aGlzIGZyZXF1ZW5jeSB3aWxsIGJlIE5BTk9TRUNPTkRTX1BFUl9TRUNP
-TkQgLyAgMl5OLiBCZWxvdyBjb2RlIGlzIGFuIGV4YW1wbGUgdHdvIGRpZmZlcmVudCBmcmVxdWVu
-Y2llcyBhcmUgdXNlZCwgYWN0dWFsbHkgaW4gY3B1cy5jLCBxZW11X2Nsb2NrX2RlYWRsaW5lX25z
-X2FsbChRRU1VX0NMT0NLX1ZJUlRVQUwpIHdpbGwgdXNlIHRoZSBxZW11IHRpbWVyKGZyZXEgaXMg
-TkFOT1NFQ09ORFNfUEVSX1NFQ09ORCksIGFuZCBjcHVfaWNvdW50X3RvX25zIHdpbGwgY2FsY2F1
-dGUgdGltZSB3aXRoIGZyZXF1ZW5jeSBOQU5PU0VDT05EU19QRVJfU0VDT05EIC8gIDJeTi4NCg0K
-c3RhdGljIHZvaWQgc3lzdGlja193cml0ZSh2b2lkICpvcGFxdWUsIGh3YWRkciBhZGRyLA0KICAg
-ICAgICAgICAgICAgICAgICAgICAgICB1aW50NjRfdCB2YWx1ZSwgdW5zaWduZWQgc2l6ZSkNCnsN
-CiAgICBTeXNUaWNrU3RhdGUgKnMgPSBvcGFxdWU7DQoNCiAgICB0cmFjZV9zeXN0aWNrX3dyaXRl
-KGFkZHIsIHZhbHVlLCBzaXplKTsNCg0KICAgIHN3aXRjaCAoYWRkcikgew0KICAgIGNhc2UgMHgw
-OiAvKiBTeXNUaWNrIENvbnRyb2wgYW5kIFN0YXR1cy4gICovDQogICAgew0KICAgICAgICB1aW50
-MzJfdCBvbGR2YWwgPSBzLT5jb250cm9sOw0KDQogICAgICAgIHMtPmNvbnRyb2wgJj0gMHhmZmZm
-ZmZmODsNCiAgICAgICAgcy0+Y29udHJvbCB8PSB2YWx1ZSAmIDc7DQogICAgICAgIGlmICgob2xk
-dmFsIF4gdmFsdWUpICYgU1lTVElDS19FTkFCTEUpIHsNCiAgICAgICAgICAgIGludDY0X3Qgbm93
-ID0gcWVtdV9jbG9ja19nZXRfbnMoUUVNVV9DTE9DS19WSVJUVUFMKTsNCiAgICAgICAgICAgIGlm
-ICh2YWx1ZSAmIFNZU1RJQ0tfRU5BQkxFKSB7DQogICAgICAgICAgICAgICAgaWYgKHMtPnRpY2sp
-IHsNCiAgICAgICAgICAgICAgICAgICAgcy0+dGljayArPSBub3c7DQogICAgICAgICAgICAgICAg
-ICAgIHRpbWVyX21vZChzLT50aW1lciwgcy0+dGljayk7DQogICAgICAgICAgICAgICAgfSBlbHNl
-IHsNCiAgICAgICAgICAgICAgICAgICAgc3lzdGlja19yZWxvYWQocywgMSk7DQogICAgICAgICAg
-ICAgICAgfQ0KICAgICAgICAgICAgfSBlbHNlIHsNCiAgICAgICAgICAgICAgICB0aW1lcl9kZWwo
-cy0+dGltZXIpOw0KICAgICAgICAgICAgICAgIHMtPnRpY2sgLT0gbm93Ow0KICAgICAgICAgICAg
-ICAgIGlmIChzLT50aWNrIDwgMCkgew0KICAgICAgICAgICAgICAgICAgICBzLT50aWNrID0gMDsN
-CiAgICAgICAgICAgICAgICB9DQogICAgICAgICAgICB9DQogICAgICAgIH0gZWxzZSBpZiAoKG9s
-ZHZhbCBeIHZhbHVlKSAmIFNZU1RJQ0tfQ0xLU09VUkNFKSB7DQogICAgICAgICAgICAvKiBUaGlz
-IGlzIGEgaGFjay4gRm9yY2UgdGhlIHRpbWVyIHRvIGJlIHJlbG9hZGVkDQogICAgICAgICAgICAg
-ICB3aGVuIHRoZSByZWZlcmVuY2UgY2xvY2sgaXMgY2hhbmdlZC4gICovDQogICAgICAgICAgICBz
-eXN0aWNrX3JlbG9hZChzLCAxKTsNCiAgICAgICAgfQ0KICAgICAgICBicmVhazsNCiAgICB9DQog
-ICAgY2FzZSAweDQ6IC8qIFN5c1RpY2sgUmVsb2FkIFZhbHVlLiAgKi8NCiAgICAgICAgcy0+cmVs
-b2FkID0gdmFsdWU7DQogICAgICAgIGJyZWFrOw0KICAgIC4uLi4uLg0KDQpZZXMsIEknbSBmb3Ig
-dGhlIGZvciBkZXRlcm1pbmlzbSwgaW4gbXkgZ3Vlc3QgaW1hZ2UgdGhlcmUgYXJlIHNvbWUgdGVz
-dGluZyBjYXNlcyBmb3IgdGltZXIgc3lzdGVtIHdoaWNoIGxvY2F0ZSBpbiBhIHNtYWxsIHJ0b3Mu
-DQpBbmQgZm9yIHNoaWZ0IHZhbHVlLCBJIG1lYW4gaXQgc2VlbXMgc2hpZnQgdmFsdWUgaW1wYWN0
-IHN5c3RlbSBncmVhdGx5LCBmb3IgdGhlIHNhbWUgb25lIGd1ZXN0IGltYWdlIGFuZCBkaWZmZXJl
-bnQgc2hpZnQgdmFsdWUgaW4gY291bnQgbW9kZSgtaWNvdW50IHNoaWZ0PTQsYWxpZ249b2ZmLHNs
-ZWVwPW9mZiAtcnRjIGNsb2NrPXZtKSBnaXZlIHZlcnkgZGlmZmVyZW50IGFjY3VyYWN5IGZvciBn
-dWVzdCB0aW1lci4gU28gbXkgcXVlc3Rpb24gaXMgaG93IHRvIGNhbGN1bGF0ZSB0aGUgc2hpZnQg
-dmFsdWUgZm9yIHRoZSBlbmQgdXNlci4NCg0KVGhhbmtzIGFnYWluIGZvciB5b3VyIGhlbHAuDQoN
-ClRoYW5rcyAgDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBRZW11LWRldmVs
-IFttYWlsdG86cWVtdS1kZXZlbC1ib3VuY2VzK3dlbnRvbmcud3U9aW50ZWwuY29tQG5vbmdudS5v
-cmddIE9uIEJlaGFsZiBPZiBBbGV4IEJlbm7DqWUNClNlbnQ6IE1vbmRheSwgSnVuZSAyNCwgMjAx
-OSAxMTo0OCBQTQ0KVG86IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KU3ViamVjdDogUmU6IFtRZW11
-LWRldmVsXSBpY291bnQgbW9kZQ0KDQoNCld1LCBXZW50b25nIDx3ZW50b25nLnd1QGludGVsLmNv
-bT4gd3JpdGVzOg0KDQo+IEhpIGFsbCwNCj4NCj4gUmVjZW50bHkgSSdtIHVzaW5nIFFlbXUgVENH
-IGljb3VudCBtb2RlLCBmcm9tIHRoZSBjb2RlIEkgZm91bmQgUWVtdSANCj4gdGltZXJzIHJ1biBh
-dCAxR0h6LCBhbmQgZm9yIEFybVY3TSBleGFtcGxlLCB0aGVyZSB3aWxsIGJlIGNvbnZlcnNpb24N
-Cg0KQXJlIHlvdSB0YWxraW5nIGFib3V0Og0KDQogICNkZWZpbmUgQVJNX0NQVV9GUkVRIDEwMDAw
-MDAwMDAgLyogRklYTUU6IDEgR0h6LCBzaG91bGQgYmUgY29uZmlndXJhYmxlICovDQoNCmJlY2F1
-c2UgYXMgZmFyIGFzIEkgY2FuIHRlbGwgdGhhdCBvbmx5IGFmZmVjdHMgdGhlIHNjYWxpbmcgZmFj
-dG9ycyBhcHBsaWVkIHRvIFBNVSBjb3VudGVycy4gVGhlIGludGVybmFsIGNvdW50ZXJzIChDTlRG
-UlFfRUwwIGFuZCBmcmllbmRzKSBhcmUgaGFyZHdpcmVkIHRvOg0KDQogICAvKiBTY2FsZSBmYWN0
-b3IgZm9yIGdlbmVyaWMgdGltZXJzLCBpZSBudW1iZXIgb2YgbnMgcGVyIHRpY2suDQogICAgKiBU
-aGlzIGdpdmVzIGEgNjIuNU1IeiB0aW1lci4NCiAgICAqLw0KICAgI2RlZmluZSBHVElNRVJfU0NB
-TEUgMTYNCg0KYnV0IHRoaXMgb25seSBhZmZlY3RzIHRoZSBub21pbmFsIHJhdGUgdGhlIGNvdW50
-ZXJzIGV4cGlyZSBhdC4gU29mdHdhcmUgY291bGQgYXR0ZW1wdCB0byByZXByb2dyYW0gaXQgYW5k
-IHRoZSBlbXVsYXRpb24gd2lsbCByZWFkLWFzLXdyaXR0ZW4gYnV0IGl0IHdvbid0IGFjdHVhbGx5
-IGNoYW5nZSBhbnl0aGluZy4gSG93ZXZlciB0aGlzIG9ubHkgYWZmZWN0cyB0aGUgY2xvY2tzDQot
-IGl0IGltcGxpZXMgbm90aGluZyBhYm91dCBob3cgZmFzdCB0aGUgY29yZSBtYXkgYmUgZXhlY3V0
-aW5nLiBJbiBmYWN0IHVubGVzcyB5b3UgYXJlIHVzaW5nIGljb3VudCB3ZSB3aWxsIGp1c3QgcnVu
-IGFzIGZhc3QgYSBwb3NzaWJsZS4NCg0KPiBmYWN0b3IgZnJvbSBxZW11IHRpbWVyIHRvIFN5c1Rp
-Y2sgZnJlcXVlbmN5IHdoaWNoIHdpbGwgYmUgY2FsY3VsYXRlZCANCj4gYnkgTkFOT1NFQ09ORFNf
-UEVSX1NFQ09ORCAvIFNZU0NMS19GUlEuDQoNCllvdSBuZWVkIHRvIGJlIGEgbGl0dGxlIG1vcmUg
-cHJlY2lzZSBoZXJlLiBBUk0gc3lzdGVtcyB2YXJ5IGluIHRoZSBudW1iZXIgb2YgdGltZXIgc291
-cmNlcyB0aGV5IGhhdmUuIFRoZSBxZW11IHRpbWVycyBhcmUgYW4gaW50ZXJuYWwgaW1wbGVtZW50
-YXRpb24gZGV0YWlsIGZvciBwcm92aWRpbmcgYSB3YXkgdG8gdHJhY2sgdGltZS4gVGhlIHZhbHVl
-IG9mIFNZU0NMS19GUlEgdmFyaWVzIGRlcGVuZGluZyBvbiB3aGF0IGJvYXJkIHlvdSBoYXZlIGxh
-dW5jaGVkIGFuZCBtb3N0bHkgc2VlbXMgdG8gYmUgdXNlZCB0byBjYWxjdWxhdGUgdGhlIGFkZGl0
-aW9uYWwgdGltZXIgdmFsdWVzIGZvciB2YXJpb3VzIHBlcmlwaGVyYWxzLg0KDQo+IEJ1dCB0aGUg
-c2hpZnQgdmFsdWUgYWxzbyBkZWZpbmUgdGhlIHRhcmdldCBjcHUgZnJlcXVlbmN5KDJeTiBucyAv
-b25lIA0KPiBpbnN0cnVjdGlvbiksIGFuZCBib3RoIGZyZXF1ZW5jaWVzIHdpbGwgYmUgdXNlZCB0
-b2dldGhlciB0byBjYWxjdWxhdGUgDQo+IHRoZSBndWVzdCB0aW1lciwgc28gSSB0aGluayB0aGVy
-ZSBpcyBidWdneSBiZWNhdXNlIG9mIHRoZSBkaWZmZXJlbnQgDQo+IGZyZXF1ZW5jeSwgY2FuIGFu
-eW9uZSBnaXZlIHNvbWUgZXhwbGFuYXRpb24gZm9yIHRoaXM/IFRoYW5rcyBhIGxvdCENCg0KQWxs
-IGljb3VudCBkb2VzIGlzIHBlZyB0aGUgZWxhcHNlZCB2aXJ0dWFsIHRpbWUgdG8gdGhlIG51bWJl
-ciBvZiBpbnN0cnVjdGlvbnMgZXhlY3V0ZWQgKHRoZSBpbnN0cnVjdGlvbiBjb3VudCkuIFRoaXMg
-bWVhbnMgd2hlbmV2ZXIgdGhlIGNvZGUgcmVxdWVzdHM6DQoNCiAgcWVtdV9jbG9ja19nZXRfbnMo
-UUVNVV9DTE9DS19WSVJUVUFMKQ0KDQpJbnN0ZWFkIG9mIHJldHVybmluZyB0aGUgbnVtYmVyIG9m
-IG5zIHRoZSBndWVzdCBoYXMgYmVlbiBydW5uaW5nIGJhc2VkIG9uIGVsYXBzZWQgaG9zdCB0aW1l
-IGl0IHdpbGwgcmV0dXJuIHRoZSBudW1iZXIgb2YgaW5zdHJ1Y3Rpb25zIHJ1biBzaGlmdGVkIGJ5
-IGljb3VudF9zaGlmdC4gU28gd2l0aCBoaWdoZXIgc2hpZnQgdmFsdWVzIGVhY2ggaW5zdHJ1Y3Rp
-b24gc2VlcyBhbiBpbmNyZWFzZWQgYW1vdW50IG9mIHZpcnR1YWwgdGltZSBwYXNzIC0gdGhlIHBy
-YWN0aWNhbCBlZmZlY3Qgd2lsbCBiZSB5b3Ugc2VlIGxlc3MgaW5zdHJ1Y3Rpb25zIGV4ZWN1dGVk
-IGJldHdlZW4gdGltZXIgaW50ZXJydXB0cy4NCg0KPg0KPiBBbHNvIGNhbiBhbnlvbmUgZ2l2ZSBz
-b21lIGhpbnRzIGFib3V0IGhvdyB0byBnaXZlIHRoZSBzaGlmdCB2YWx1ZSB3aGVuIA0KPiB1c2Ug
-aWNvdW50IFRDRyBtb2RlPw0KDQogICRRRU1VICRRRU1VX0FSR1MgLWljb3VudCBODQoNCm9yDQoN
-CiAgJFFFTVUgJFFFTVVfQVJHUyAtaWNvdW50IHNoaWZ0PU4NCg0KV2hhdCBpcyB5b3VyIGludGVy
-ZXN0IGluIGljb3VudD8gSXMgaXQgcHVyZWx5IGZvciBkZXRlcm1pbmlzbT8NCg0KLS0NCkFsZXgg
-QmVubsOpZQ0KDQo=
+On 06/24/19 12:18, Kevin Wolf wrote:
+> Am 24.06.2019 um 10:01 hat Klaus Birkelund geschrieben:
+>> On Thu, Jun 20, 2019 at 05:37:24PM +0200, Laszlo Ersek wrote:
+>>> On 06/17/19 10:12, Klaus Birkelund wrote:
+>>>> Hi all,
+>>>>
+>>>> I'm thinking about how to support multiple namespaces in the NVMe
+>>>> device. My first idea was to add a "namespaces" property array to the
+>>>> device that references blockdevs, but as Laszlo writes below, this might
+>>>> not be the best idea. It also makes it troublesome to add per-namespace
+>>>> parameters (which is something I will be required to do for other
+>>>> reasons). Some of you might remember my first attempt at this that
+>>>> included adding a new block driver (derived from raw) that could be
+>>>> given certain parameters that would then be stored in the image. But I
+>>>> understand that this is a no-go, and I can see why.
+>>>>
+>>>> I guess the optimal way would be such that the parameters was something
+>>>> like:
+>>>>
+>>>>    -blockdev raw,node-name=blk_ns1,file.driver=file,file.filename=blk_ns1.img
+>>>>    -blockdev raw,node-name=blk_ns2,file.driver=file,file.filename=blk_ns2.img
+>>>>    -device nvme-ns,drive=blk_ns1,ns-specific-options (nsfeat,mc,dlfeat)...
+>>>>    -device nvme-ns,drive=blk_ns2,...
+>>>>    -device nvme,...
+>>>>
+>>>> My question is how to state the parent/child relationship between the
+>>>> nvme and nvme-ns devices. I've been looking at how ide and virtio does
+>>>> this, and maybe a "bus" is the right way to go?
+>>>
+>>> I've added Markus to the address list, because of this question. No
+>>> other (new) comments from me on the thread starter at this time, just
+>>> keeping the full context.
+>>>
+>>
+>> Hi all,
+>>
+>> I've succesfully implemented this by introducing a new 'nvme-ns' device
+>> model. The nvme device creates a bus named from the device id ('id'
+>> parameter) and the nvme-ns devices are then registered on this.
+>>
+>> This results in an nvme device being creates like this (two namespaces
+>> example):
+>>
+>>   -drive file=nvme0n1.img,if=none,id=disk1
+>>   -drive file=nvme0n2.img,if=none,id=disk2
+>>   -device nvme,serial=deadbeef,id=nvme0
+>>   -device nvme-ns,drive=disk1,bus=nvme0,nsid=1
+>>   -device nvme-ns,drive=disk2,bus=nvme0,nsid=2
+>>
+>> How does that look as a way forward?
+> 
+> This looks very similar to what other devices do (one bus controller
+> that has multiple devices on its but), so I like it.
+
++1
+
+Also, I believe it's more modern nowadays to express the same example
+with "blockdev" syntax, rather than "drive". (Not that I could suggest
+the exact spelling for that :)) I don't expect the modern syntax to
+behave differently, I just guess it's better to stick with the new in
+examples / commit messages etc.
+
+> The thing that is special here is that -device nvme is already a block
+> device by itself that can take a drive property. So how does this play
+> together? Can I choose to either specify a drive directly for the nvme
+> device or nvme-ns devices, but when I do both, I will get an error? What
+> happens if I don't specify a drive for nvme, but also don't add nvme-ns
+> devices?
+
+Great questions!
+
+Thanks!
+Laszlo
 
