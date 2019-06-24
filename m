@@ -2,62 +2,67 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DE98C43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 11:42:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69988C43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 11:47:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E449020674
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 11:42:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E449020674
+	by mail.kernel.org (Postfix) with ESMTPS id 425A020674
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 11:47:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 425A020674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50110 helo=lists.gnu.org)
+Received: from localhost ([::1]:50138 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfNN5-0008RP-5n
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 07:42:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35899)
+	id 1hfNRU-0001TW-9s
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 07:47:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37259)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1hfNJo-0006PF-6Z
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 07:39:29 -0400
+ (envelope-from <berrange@redhat.com>) id 1hfNPn-00012R-Cg
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 07:45:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1hfNJm-0000rb-RI
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 07:39:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40760)
+ (envelope-from <berrange@redhat.com>) id 1hfNPl-0007yk-NA
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 07:45:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47254)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>)
- id 1hfNJh-0000h5-9t; Mon, 24 Jun 2019 07:39:22 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hfNPl-0007tf-Gr
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 07:45:37 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BB4353082B46;
- Mon, 24 Jun 2019 11:39:19 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 31715608D0;
- Mon, 24 Jun 2019 11:39:13 +0000 (UTC)
-Date: Mon, 24 Jun 2019 13:39:08 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Dongjiu Geng <gengdongjiu@huawei.com>
-Message-ID: <20190624133908.635ff763@redhat.com>
-In-Reply-To: <1557832703-42620-7-git-send-email-gengdongjiu@huawei.com>
-References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
- <1557832703-42620-7-git-send-email-gengdongjiu@huawei.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 51A9687633
+ for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 11:45:28 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.17.95])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 66C405D717;
+ Mon, 24 Jun 2019 11:45:26 +0000 (UTC)
+Date: Mon, 24 Jun 2019 12:45:24 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190624114524.GG17698@redhat.com>
+References: <20190619201050.19040-1-armbru@redhat.com>
+ <20190619201050.19040-5-armbru@redhat.com>
+ <6cca5383-fdd4-ab9b-d227-d2de1083d398@redhat.com>
+ <87imsvs01m.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87imsvs01m.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Mon, 24 Jun 2019 11:39:19 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Mon, 24 Jun 2019 11:45:28 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v17 06/10] docs: APEI GHES generation and
- CPER record description
+Subject: Re: [Qemu-devel] [PATCH 04/17] qapi: Split qom.json and qdev.json
+ off misc.json
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,152 +74,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, kvm@vger.kernel.org,
- mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org,
- linuxarm@huawei.com, shannon.zhaosl@gmail.com, zhengxiang9@huawei.com,
- qemu-arm@nongnu.org, james.morse@arm.com, xuwei5@huawei.com,
- jonathan.cameron@huawei.com, pbonzini@redhat.com, lersek@redhat.com,
- rth@twiddle.net
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: kwolf@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 14 May 2019 04:18:19 -0700
-Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+On Mon, Jun 24, 2019 at 01:19:33PM +0200, Markus Armbruster wrote:
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+>=20
+> > On 19/06/19 22:10, Markus Armbruster wrote:
+> >> Move commands device-list-properties, device_add, device-del, and
+> >> event DEVICE_DELETED from misc.json to new qdev.json.  qdev.json
+> >> remains uncovered by MAINTAINERS, like the rest of qdev.
+> >
+> > qdev should be added to either QOM or machine core.  QOM would be fin=
+e
+> > for me as the (newly,self)-appointed maintainer.
+>=20
+> Awesome!  Daniel, Eduardo, any objections?
+>=20
+> I figure these are the files to add:
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 63390eadb5..e2cb1726dd 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -2033,12 +2033,18 @@ M: Paolo Bonzini <pbonzini@redhat.com>
+>  R: Daniel P. Berrange <berrange@redhat.com>
+>  R: Eduardo Habkost <ehabkost@redhat.com>
+>  S: Supported
+> +F: docs/qdev-device-use.txt
+> +F: hw/core/qdev*
+> +F: include/hw/qdev*
+> +F: include/monitor/qdev.h
+>  F: include/qom/
+>  X: include/qom/cpu.h
+> +F: qdev-monitor.c
+>  F: qom/
+>  X: qom/cpu.c
+>  F: tests/check-qom-interface.c
+>  F: tests/check-qom-proplist.c
+> +F: tests/test-qdev-global-props.c
+> =20
+>  QMP
+>  M: Markus Armbruster <armbru@redhat.com>
 
-> Add APEI/GHES detailed design document
-> 
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> ---
->  docs/specs/acpi_hest_ghes.txt | 97 +++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 97 insertions(+)
->  create mode 100644 docs/specs/acpi_hest_ghes.txt
-> 
-> diff --git a/docs/specs/acpi_hest_ghes.txt b/docs/specs/acpi_hest_ghes.txt
-> new file mode 100644
-> index 0000000..fbfc787
-> --- /dev/null
-> +++ b/docs/specs/acpi_hest_ghes.txt
-> @@ -0,0 +1,97 @@
-> +APEI tables generating and CPER record
-> +=============================
-> +
-> +Copyright (C) 2017 HuaWei Corporation.
-> +
-> +Design Details:
-> +-------------------
-> +
-> +       etc/acpi/tables                                 etc/hardware_errors
-> +    ====================                      ==========================================
-> ++ +--------------------------+            +-----------------------+
-> +| | HEST                     |            |    address            |            +--------------+
-> +| +--------------------------+            |    registers          |            | Error Status |
-> +| | GHES1                    |            | +---------------------+            | Data Block 1 |
-> +| +--------------------------+ +--------->| |error_block_address1 |----------->| +------------+
-> +| | .................        | |          | +---------------------+            | |  CPER      |
-> +| | error_status_address-----+-+ +------->| |error_block_address2 |--------+   | |  CPER      |
-> +| | .................        |   |        | +---------------------+        |   | |  ....      |
-> +| | read_ack_register--------+-+ |        | |    ..............   |        |   | |  CPER      |
-> +| | read_ack_preserve        | | |        +-----------------------+        |   | +------------+
-> +| | read_ack_write           | | | +----->| |error_block_addressN |------+ |   | Error Status |
-> ++ +--------------------------+ | | |      | +---------------------+      | |   | Data Block 2 |
-> +| | GHES2                    | +-+-+----->| |read_ack_register1   |      | +-->| +------------+
-> ++ +--------------------------+   | |      | +---------------------+      |     | |  CPER      |
-> +| | .................        |   | | +--->| |read_ack_register2   |      |     | |  CPER      |
-> +| | error_status_address-----+---+ | |    | +---------------------+      |     | |  ....      |
-> +| | .................        |     | |    | |  .............      |      |     | |  CPER      |
-> +| | read_ack_register--------+-----+-+    | +---------------------+      |     +-+------------+
-> +| | read_ack_preserve        |     |   +->| |read_ack_registerN   |      |     | |..........  |
-> +| | read_ack_write           |     |   |  | +---------------------+      |     | +------------+
-> ++ +--------------------------|     |   |                                 |     | Error Status |
-> +| | ...............          |     |   |                                 |     | Data Block N |
-> ++ +--------------------------+     |   |                                 +---->| +------------+
-> +| | GHESN                    |     |   |                                       | |  CPER      |
-> ++ +--------------------------+     |   |                                       | |  CPER      |
-> +| | .................        |     |   |                                       | |  ....      |
-> +| | error_status_address-----+-----+   |                                       | |  CPER      |
-> +| | .................        |         |                                       +-+------------+
-> +| | read_ack_register--------+---------+
-> +| | read_ack_preserve        |
-> +| | read_ack_write           |
-> ++ +--------------------------+
-> +
-> +(1) QEMU generates the ACPI HEST table. This table goes in the current
-> +    "etc/acpi/tables" fw_cfg blob. Each error source has different
-> +    notification type.
-> +
-> +(2) A new fw_cfg blob called "etc/hardware_errors" is introduced. QEMU
-> +    also need to populate this blob. The "etc/hardwre_errors" fw_cfg blob
-> +    contains one address registers table and one Error Status Data Block
+For this addition
 
-s/one/a/
-in both cases
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-> +    table, all of which are pre-allocated.
-
-drop /, all of which are pre-allocated./
-
-> +
-> +(3) The address registers table contains N Error Block Address entries
-> +    and N Read Ack Address entries, the size for each entry is 8-byte.
-> +    The Error Status Data Block table contains N Error Status Data Block
-> +    entries, the size for each entry is 4096(0x1000) bytes. The total size
-> +    for "etc/hardware_errors" fw_cfg blob is (N * 8 * 2 + N * 4096) bytes.
-where 'N' is specified?
-
-> +
-> +(4) QEMU generates the ACPI linker/loader script for the firmware
-> +
-> +(4a) The HEST table is part of "etc/acpi/tables", the firmware already
-> +    allocates the memory for it, because QEMU already generates an ALLOCATE
-> +    linker/loader command for it
-> +
-> +(4b) QEMU creates another ALLOCATE command for the "etc/hardware_errors"
-> +    blob. The firmware allocates memory for this blob and downloads it.
-may be merge both points, like:
-
-    the firmware pre-allocates memory for "etc/acpi/tables", "etc/hardware_errors"
-    and copies blobs content there.
-
-> +
-> +(5) QEMU generates N ADD_POINTER commands, which patch address in the
-> +    "error_status_address" fields of the HEST table with a pointer to the
-> +    corresponding "address registers" in the downloaded "etc/hardware_errors"
-> +    blob.
-
-s/the downloaded//
-the same applies to to other similar occurrences below
-
-> +
-> +(6) QEMU generates N ADD_POINTER commands, which patch address in the
-> +    "read_ack_register" fields of the HEST table with a pointer to the
-> +    corresponding "address registers" in the downloaded "etc/hardware_errors" blob.
-> +
-> +(7) QEMU generates N ADD_POINTER commands for the firmware, which patch
-> +    address in the " error_block_address" fields with a pointer to the
-> +    respective "Error Status Data Block" in the downloaded "etc/hardware_errors"
-> +    blob.
-> +
-> +(8) QEMU Defines a third and write-only fw_cfg blob which is called
-> +    "etc/hardware_errors_addr". Through that blob, the firmware can send back
-> +    the guest-side allocation addresses to QEMU. The "etc/hardware_errors_addr"
-> +    blob contains a 8-byte entry. QEMU generates a single WRITE_POINTER commands
-> +    for the firmware, the firmware will write back the start address of
-> +    "etc/hardware_errors" blob to fw_cfg file "etc/hardware_errors_addr". 
-
-> Then
-> +    Qemu will know the Error Status Data Block for every error source. Each of
-> +    Error Status Data Block has fixed size which is 4096(0x1000).
-
-this probably is not necessary.
-
-> +
-> +(9) When QEMU gets SIGBUS from the kernel, QEMU formats the CPER right into
-> +    guest memory, and then injects whatever interrupt (or assert whatever GPIO line)
-> +    as a notification which is necessary for notifying the guest.
-> +
-> +(10) This notification (in virtual hardware) will be handled by guest kernel,
-> +    guest APEI driver will read the CPER which is recorded by QEMU and do the
-> +    recovery.
-
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
