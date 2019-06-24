@@ -2,91 +2,80 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31E3AC43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 20:13:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40C73C43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 20:18:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E83DE20645
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 20:13:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E83DE20645
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0677520645
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 20:18:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HsNBigXc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0677520645
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54434 helo=lists.gnu.org)
+Received: from localhost ([::1]:54478 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfVLO-0006Dm-9p
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 16:13:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57141)
+	id 1hfVQY-0000kL-8P
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 16:18:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59793)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hfVF1-0000XP-Bd
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 16:07:05 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hfVNu-0007nq-TU
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 16:16:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hfVEz-0008BL-EW
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 16:07:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60832)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hfVEv-0007xd-5D; Mon, 24 Jun 2019 16:06:57 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A3BAD3087955;
- Mon, 24 Jun 2019 20:06:52 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-152.brq.redhat.com
- [10.40.204.152])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2EDF819936;
- Mon, 24 Jun 2019 20:06:47 +0000 (UTC)
-To: qemu-block@nongnu.org
-References: <20190624173935.25747-1-mreitz@redhat.com>
- <20190624173935.25747-12-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <dc4268a2-8aa6-273c-1052-ca84f8468fcd@redhat.com>
-Date: Mon, 24 Jun 2019 22:06:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <alistair23@gmail.com>) id 1hfVNs-0001t7-Mw
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 16:16:14 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:40841)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1hfVNs-0001qY-Ac; Mon, 24 Jun 2019 16:16:12 -0400
+Received: by mail-lj1-x242.google.com with SMTP id a21so13872201ljh.7;
+ Mon, 24 Jun 2019 13:16:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=5PQ5wmDY5RAVnyBwr117W10VjHZMVuGv+wq1nmeJyqo=;
+ b=HsNBigXcs+wmP1ZRAr1PBmp8Jk4OY+PHDlxliy6rmsOCp2YOnGsgxe+gaiUEZkVXSU
+ P6CJRJBmBrlHJRYsclJJdolIZ+E8X9EUkgJC1O+UN143meCqMpPiojduBL2W/tpvokJc
+ 0dDpdFWh4HvtrypfJbGifi0fQD1SRnf1BbqA5RlDr4lV+Y6n5bnmO2osiKa/FMAqISkf
+ Fxy1vZB3NrDaDpht6OiavagcRx+EfVLQGm+lxrek20kk/6WgDca4kfMBs1nSjHsR8pBh
+ aQBHMIVYsT7JPovoq7COGEuqzG1wyN2s/O1ZtjFyVfxiQb0p7Po5WwkcmOmRq5iQIXnE
+ gCIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=5PQ5wmDY5RAVnyBwr117W10VjHZMVuGv+wq1nmeJyqo=;
+ b=XFyBGHcwU+HsIp1Iy7eZt3VUWTQduTfKaowwpq3aCGJQqWHrIaMTE5DK4bkkWRKT9c
+ N+O5bQPKqdpHlk0OxGNbyd61qD8hdRIXdNFKMWSytFVo5pOS6mteDOHkEFgptn/r3RZK
+ J7TtVtuIYWOptHU/NndVrIH1U25EOTqy0BPJRSAgNBigYVLRobev0tKIV0CkmnoySLt6
+ 2sAZBAFuG6g06JDl6ONXXMMlkT9LZo9avCQ2UcrMRMqgRz6j+amEq9XUo+izoVIUAMrp
+ LAht7vrqLyc+LoXzexxnaQofEKIbqqzx20fwbneLwRwk+RZz9TWGxOvlgSLqEQJspiTq
+ WCBw==
+X-Gm-Message-State: APjAAAWI5HCiVY77On7ak5bQThgMgeBOpQHPz/VwKOu5bNZLdS59nWaW
+ knatzpCcqPflKWyOHQlEEe/a7UFq1jfSbw19KXc=
+X-Google-Smtp-Source: APXvYqxLleBKFFqbRU3rF6kr4AlVZ3YJcalXYks+89F4X3sRDsgvL2kxKL3EdpSxQXJI7tz8uT30cyvSxuKxgLPC8z0=
+X-Received: by 2002:a2e:9758:: with SMTP id f24mr30378518ljj.58.1561407370029; 
+ Mon, 24 Jun 2019 13:16:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190624173935.25747-12-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="McOXRtVHfYklkOSczlkmtLzn6MMLF6tiU"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Mon, 24 Jun 2019 20:06:52 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 11/14] block: Try to create well typed
- json:{} filenames
+References: <cover.1560821342.git.alistair.francis@wdc.com>
+ <mhng-1bb3bc4e-1846-4e2a-ab19-ab4436041f63@palmer-si-x1e>
+In-Reply-To: <mhng-1bb3bc4e-1846-4e2a-ab19-ab4436041f63@palmer-si-x1e>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 24 Jun 2019 13:13:15 -0700
+Message-ID: <CAKmqyKN01ZWxSZH+VLa1QTXuwiSUZ9mycY9iOMZm7=b1E6xDOQ@mail.gmail.com>
+To: Palmer Dabbelt <palmer@sifive.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::242
+Subject: Re: [Qemu-devel] [PATCH v1 0/9] Update the RISC-V specification
+ versions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,297 +87,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, Kevin Wolf <kwolf@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---McOXRtVHfYklkOSczlkmtLzn6MMLF6tiU
-Content-Type: multipart/mixed; boundary="NpzidxgdNTa9VJj6t27eEp6JGUoBHYy3I";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <dc4268a2-8aa6-273c-1052-ca84f8468fcd@redhat.com>
-Subject: Re: [PATCH v4 11/14] block: Try to create well typed json:{}
- filenames
-References: <20190624173935.25747-1-mreitz@redhat.com>
- <20190624173935.25747-12-mreitz@redhat.com>
-In-Reply-To: <20190624173935.25747-12-mreitz@redhat.com>
+On Mon, Jun 24, 2019 at 2:33 AM Palmer Dabbelt <palmer@sifive.com> wrote:
+>
+> On Mon, 17 Jun 2019 18:31:00 PDT (-0700), Alistair Francis wrote:
+> > Based-on: <cover.1555726824.git.alistair.francis@wdc.com>
+> >
+> > Now that the RISC-V spec has started to be ratified let's update our
+> > QEMU implementation. There are a few things going on here:
+> >  - Add priv version 1.11.0 to QEMU
+> >     - This is the ratified version of the Privledge spec
+> >     - There are almost no changes to 1.10
+> >  - Mark the 1.09.1 privledge spec as depreated
+> >      - Let's aim to remove it in two releases
+> >  - Set priv version 1.11.0 as the default
+> >  - Remove the user_spec version
+> >      - This doesn't really mean anything so let's remove it
+> >  - Add support for the "Counters" extension
+> >  - Add command line options for Zifencei and Zicsr
+> >
+> > We can remove the spec version as it's unused and has never been exposed
+> > to users. The idea is to match the specs in specifying the version. To
+> > handle versions in the future we can extend the extension props to
+> > handle version information.
+> >
+> > For example something like this: -cpu rv64,i=2.2,c=2.0,h=0.4,priv_spec=1.11
+> >
+> > NOTE: This isn't supported today as we only have one of each version.
+> >
+> > This will be a future change if we decide to support multiple versions
+> > of extensions.
+> >
+> > The "priv_spec" string doesn't really match, but I don't have a better
+> > way to say "Machine ISA" and "Supervisor ISA" which is what is included
+> > in "priv_spec".
+> >
+> > For completeness I have also added the Counters, Zifencei and Zicsr
+> > extensions.
+> >
+> > Everything else seems to match the spec names/style.
+> >
+> > Please let me know if I'm missing something. QEMU 4.1 is the first
+> > release to support the extensions from the command line, so we can
+> > easily change it until then. After that it'll take more work to change
+> > the command line interface.
+> >
+> > Alistair Francis (9):
+> >   target/riscv: Restructure deprecatd CPUs
+> >   target/riscv: Add the privledge spec version 1.11.0
+> >   target/riscv: Comment in the mcountinhibit CSR
+> >   target/riscv: Set privledge spec 1.11.0 as default
+> >   qemu-deprecated.texi: Deprecate the RISC-V privledge spec 1.09.1
+> >   target/riscv: Require either I or E base extension
+> >   target/riscv: Remove user version information
+> >   target/riscv: Add support for disabling/enabling Counters
+> >   target/riscv: Add Zifencei and Zicsr as command line options
+> >
+> >  qemu-deprecated.texi                          |  8 +++
+> >  target/riscv/cpu.c                            | 72 ++++++++++---------
+> >  target/riscv/cpu.h                            | 19 ++---
+> >  target/riscv/cpu_bits.h                       |  1 +
+> >  target/riscv/csr.c                            | 13 +++-
+> >  .../riscv/insn_trans/trans_privileged.inc.c   |  2 +-
+> >  6 files changed, 71 insertions(+), 44 deletions(-)
+>
+> Aside from the comments on 3 and 9
+>
+> Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+>
+> I've got these, along with my proposed modifications, queued up.  LMK if that's
+> a problem, particularly the two-patch replacement for 9 needs a review as it's
+> entirely new code.
 
---NpzidxgdNTa9VJj6t27eEp6JGUoBHYy3I
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+I haven't looked at the new code yet, but it all passes my tests so LGTM.
 
-On 24.06.19 19:39, Max Reitz wrote:
-> By applying qdict_flatten(), the flat-confused input visitor, and the
-> output visitor, we can at least try to bring bs->full_open_options into=
-
-> accordance with the QAPI schema.  This may not always work (there are
-> some options left that have not been QAPI-fied yet), but in practice it=
-
-> usually will.
->=20
-> In any case, sometimes emitting wrongly typed json:{} filenames is
-> better than doing it effectively half the time.
->=20
-> This affects some iotests because json:{} filenames are now usually
-> crumpled.  In 198, "format": "auto" now appears in the qcow2 encryption=
-
-> options because going through a visitor makes optional members' default=
-
-> values explicit.
->=20
-> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1534396
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  block.c                    | 68 +++++++++++++++++++++++++++++++++++++-=
-
->  tests/qemu-iotests/059.out |  2 +-
->  tests/qemu-iotests/099.out |  4 +--
->  tests/qemu-iotests/110.out |  2 +-
->  tests/qemu-iotests/198.out |  4 +--
->  5 files changed, 73 insertions(+), 7 deletions(-)
->=20
-> diff --git a/block.c b/block.c
-> index c139540f2b..d3c1041087 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -36,6 +36,7 @@
->  #include "qapi/qmp/qjson.h"
->  #include "qapi/qmp/qnull.h"
->  #include "qapi/qmp/qstring.h"
-> +#include "qapi/qobject-input-visitor.h"
->  #include "qapi/qobject-output-visitor.h"
->  #include "qapi/qapi-visit-block-core.h"
->  #include "sysemu/block-backend.h"
-> @@ -6283,6 +6284,56 @@ static bool bdrv_backing_overridden(BlockDriverS=
-tate *bs)
->      }
->  }
-> =20
-> +/**
-> + * Take a blockdev @options QDict and convert its values to the
-> + * correct type.
-> + *
-> + * Fail if @options does not match the QAPI schema of BlockdevOptions.=
-
-> + *
-> + * In case of failure, return NULL and set @errp.
-> + *
-> + * In case of success, return a correctly typed new QDict.
-> + */
-> +static QDict *bdrv_type_blockdev_opts(const QDict *options, Error **er=
-rp)
-> +{
-> +    Visitor *v;
-> +    BlockdevOptions *blockdev_options;
-> +    QObject *typed_opts;
-> +    QDict *string_options;
-> +    Error *local_err =3D NULL;
-> +
-> +    string_options =3D qdict_clone_shallow(options);
-> +
-> +    qdict_flatten(string_options);
-> +    v =3D qobject_input_visitor_new_flat_confused(string_options, errp=
-);
-
-Imagine a
-
-+    qobject_unref(string_options);
-
-here.
-
-Max
-
-> +    if (!v) {
-> +        error_prepend(errp, "Failed to prepare options: ");
-> +        return NULL;
-> +    }
-> +
-> +    visit_type_BlockdevOptions(v, NULL, &blockdev_options, &local_err)=
-;
-> +    visit_free(v);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        error_prepend(errp, "Not a valid BlockdevOptions object: ");
-> +        return NULL;
-> +    }
-> +
-> +    v =3D qobject_output_visitor_new(&typed_opts);
-> +    visit_type_BlockdevOptions(v, NULL, &blockdev_options, &local_err)=
-;
-> +    if (!local_err) {
-> +        visit_complete(v, &typed_opts);
-> +    }
-> +    visit_free(v);
-> +    qapi_free_BlockdevOptions(blockdev_options);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return NULL;
-> +    }
-> +
-> +    return qobject_to(QDict, typed_opts);
-> +}
-> +
->  /* Updates the following BDS fields:
->   *  - exact_filename: A filename which may be used for opening a block=
- device
->   *                    which (mostly) equals the given BDS (even withou=
-t any
-> @@ -6400,10 +6451,25 @@ void bdrv_refresh_filename(BlockDriverState *bs=
-)
->      if (bs->exact_filename[0]) {
->          pstrcpy(bs->filename, sizeof(bs->filename), bs->exact_filename=
-);
->      } else {
-> -        QString *json =3D qobject_to_json(QOBJECT(bs->full_open_option=
-s));
-> +        QString *json;
-> +        QDict *typed_opts, *json_opts;
-> +
-> +        typed_opts =3D bdrv_type_blockdev_opts(bs->full_open_options, =
-NULL);
-> +
-> +        /*
-> +         * We cannot be certain that bs->full_open_options matches
-> +         * BlockdevOptions, so bdrv_type_blockdev_opts() may fail.
-> +         * That is not fatal, we can just emit bs->full_open_options
-> +         * directly -- qemu will accept that, even if it does not
-> +         * match the schema.
-> +         */
-> +        json_opts =3D typed_opts ?: bs->full_open_options;
-> +
-> +        json =3D qobject_to_json(QOBJECT(json_opts));
->          snprintf(bs->filename, sizeof(bs->filename), "json:%s",
->                   qstring_get_str(json));
->          qobject_unref(json);
-> +        qobject_unref(typed_opts);
->      }
->  }
-> =20
-> diff --git a/tests/qemu-iotests/059.out b/tests/qemu-iotests/059.out
-> index 4fab42a28c..53109b2d49 100644
-> --- a/tests/qemu-iotests/059.out
-> +++ b/tests/qemu-iotests/059.out
-> @@ -2050,7 +2050,7 @@ wrote 512/512 bytes at offset 10240
-> =20
->  =3D=3D=3D Testing monolithicFlat with internally generated JSON file n=
-ame =3D=3D=3D
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 subformat=
-=3DmonolithicFlat
-> -qemu-io: can't open: Cannot use relative extent paths with VMDK descri=
-ptor file 'json:{"image": {"driver": "file", "filename": "TEST_DIR/t.IMGF=
-MT"}, "driver": "blkdebug", "inject-error.0.event": "read_aio"}'
-> +qemu-io: can't open: Cannot use relative extent paths with VMDK descri=
-ptor file 'json:{"inject-error": [{"event": "read_aio"}], "image": {"driv=
-er": "file", "filename": "TEST_DIR/t.IMGFMT"}, "driver": "blkdebug"}'
-> =20
->  =3D=3D=3D Testing version 3 =3D=3D=3D
->  image: TEST_DIR/iotest-version3.IMGFMT
-> diff --git a/tests/qemu-iotests/099.out b/tests/qemu-iotests/099.out
-> index 8cce627529..0a9c434148 100644
-> --- a/tests/qemu-iotests/099.out
-> +++ b/tests/qemu-iotests/099.out
-> @@ -12,11 +12,11 @@ blkverify:TEST_DIR/t.IMGFMT.compare:TEST_DIR/t.IMGF=
-MT
-> =20
->  =3D=3D=3D Testing JSON filename for blkdebug =3D=3D=3D
-> =20
-> -json:{"driver": "IMGFMT", "file": {"image": {"driver": "file", "filena=
-me": "TEST_DIR/t.IMGFMT"}, "driver": "blkdebug", "inject-error.0.event": =
-"l1_update"}}
-> +json:{"driver": "IMGFMT", "file": {"inject-error": [{"event": "l1_upda=
-te"}], "image": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, "dri=
-ver": "blkdebug"}}
-> =20
->  =3D=3D=3D Testing indirectly enforced JSON filename =3D=3D=3D
-> =20
-> -json:{"driver": "raw", "file": {"test": {"driver": "IMGFMT", "file": {=
-"image": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, "driver": "=
-blkdebug", "inject-error.0.event": "l1_update"}}, "driver": "blkverify", =
-"raw": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.compare"}}}
-> +json:{"driver": "raw", "file": {"test": {"driver": "IMGFMT", "file": {=
-"inject-error": [{"event": "l1_update"}], "image": {"driver": "file", "fi=
-lename": "TEST_DIR/t.IMGFMT"}, "driver": "blkdebug"}}, "driver": "blkveri=
-fy", "raw": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.compare"}}}=
-
-> =20
->  =3D=3D=3D Testing plain filename for blkdebug =3D=3D=3D
-> =20
-> diff --git a/tests/qemu-iotests/110.out b/tests/qemu-iotests/110.out
-> index f60b26390e..d95b92bee7 100644
-> --- a/tests/qemu-iotests/110.out
-> +++ b/tests/qemu-iotests/110.out
-> @@ -11,7 +11,7 @@ backing file: t.IMGFMT.base (actual path: TEST_DIR/t.=
-IMGFMT.base)
-> =20
->  =3D=3D=3D Non-reconstructable filename =3D=3D=3D
-> =20
-> -image: json:{"driver": "IMGFMT", "file": {"set-state.0.event": "read_a=
-io", "image": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, "drive=
-r": "blkdebug", "set-state.0.new_state": 42}}
-> +image: json:{"driver": "IMGFMT", "file": {"set-state": [{"new_state": =
-42, "event": "read_aio"}], "image": {"driver": "file", "filename": "TEST_=
-DIR/t.IMGFMT"}, "driver": "blkdebug"}}
->  file format: IMGFMT
->  virtual size: 64 MiB (67108864 bytes)
->  backing file: t.IMGFMT.base (actual path: TEST_DIR/t.IMGFMT.base)
-> diff --git a/tests/qemu-iotests/198.out b/tests/qemu-iotests/198.out
-> index e86b175e39..eef8af3cdc 100644
-> --- a/tests/qemu-iotests/198.out
-> +++ b/tests/qemu-iotests/198.out
-> @@ -32,7 +32,7 @@ read 16777216/16777216 bytes at offset 0
->  16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> =20
->  =3D=3D checking image base =3D=3D
-> -image: json:{"encrypt.key-secret": "sec0", "driver": "IMGFMT", "file":=
- {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}
-> +image: json:{"driver": "IMGFMT", "encrypt": {"format": "auto", "key-se=
-cret": "sec0"}, "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT=
-=2Ebase"}}
->  file format: IMGFMT
->  virtual size: 16 MiB (16777216 bytes)
->  Format specific information:
-> @@ -74,7 +74,7 @@ Format specific information:
->          master key iters: 1024
-> =20
->  =3D=3D checking image layer =3D=3D
-> -image: json:{"encrypt.key-secret": "sec1", "driver": "IMGFMT", "file":=
- {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}}
-> +image: json:{"driver": "IMGFMT", "encrypt": {"format": "auto", "key-se=
-cret": "sec1"}, "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT=
-"}}
->  file format: IMGFMT
->  virtual size: 16 MiB (16777216 bytes)
->  backing file: TEST_DIR/t.IMGFMT.base
->=20
-
-
-
---NpzidxgdNTa9VJj6t27eEp6JGUoBHYy3I--
-
---McOXRtVHfYklkOSczlkmtLzn6MMLF6tiU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0RLVYACgkQ9AfbAGHV
-z0C0qwf/aqeanLfeCmYR0byezcwLrdDNf0rvKrl133BP57HxSgolTZa6D6i2FfaB
-EwlxYuBimK18/x/FsOSbkZL1qmKoC0pA4VLLX6dKVyeYIvaGAunuL1fnOuYd2LHp
-fJJnprEX6a1sI6wl65X70OdsLA8XHT2pEJEATp92JBzcAkBlvsmRh0LEsMA/DLVb
-ZRDKktgzgHWIn8D8tb/ys7bS01uuCAx8NGEPr3t6wkclANXz4DqgY0go8u8zXIOp
-p1Fm7V8lCpfOd1doWZ/rIHlTzZd+WvqWgqnZXj579cRTqcsqRsdVtQJJztcAOQqF
-tVubaCbVKV9gatDrziNdUIX9u1GobQ==
-=RiJN
------END PGP SIGNATURE-----
-
---McOXRtVHfYklkOSczlkmtLzn6MMLF6tiU--
+Alistair
 
