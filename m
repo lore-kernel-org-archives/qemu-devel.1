@@ -2,80 +2,79 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A4E0C4646C
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 22:09:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46E17C4646C
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 22:11:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBC2D20663
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 22:09:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1019E20663
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 22:11:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DpwGZqRW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBC2D20663
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gZdgE9M+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1019E20663
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54912 helo=lists.gnu.org)
+Received: from localhost ([::1]:54928 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfX9F-0005O5-6q
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 18:09:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54931)
+	id 1hfXBW-0007kc-QR
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 18:11:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54693)
  by lists.gnu.org with esmtp (Exim 4.86_2)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1hfX2B-0007xQ-T3
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 18:01:58 -0400
+ id 1hfX1R-0007jP-DE
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 18:01:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1hfX29-00048T-SD
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 18:01:55 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36634)
+ id 1hfX1L-000340-MZ
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 18:01:04 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:33235)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1hfX29-0003Bk-K9
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 18:01:53 -0400
-Received: by mail-wr1-x444.google.com with SMTP id n4so14307432wrs.3
- for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 15:01:10 -0700 (PDT)
+ id 1hfX1K-00031R-LU
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 18:01:03 -0400
+Received: by mail-wm1-x342.google.com with SMTP id h19so890721wme.0
+ for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 15:01:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=NSm3cZqHH/H9Xl/1qUBzg4MSsd8N7p36v5WOTsFnvFI=;
- b=DpwGZqRWkKIh6RUDNi9bb/rODZnY1AeMANICf9+oudzvbUU2W7PqG9qy7rLIjGztXY
- ytk3eqrySw17H7OA6+467a5Ci2ymuCHMgFpavcp8WfGYDNWfNgHTxN10VMW6dP9A0413
- g/WMqdXU0LmHvmM5+3I8vsko7XB428Vcnlviuo2mAMoNfb+NH22NlXXhbnS+eA0UQefz
- GEt/8zAZWoyV7W8jvh+g+BBAVWiTA9KWbcGxTuBX6FWghSTh15l1WF7+2Yiw3BR2Fyn0
- ZuD81zIr0u3TqIpT7OwqMnALDv0ONdIqrvlTF11X0zcIpp6kura2DY8HuKFa+IHe9kPW
- ffzA==
+ bh=aBqxrS2+6+Ym/rs4g7maJmz+R7nY9F00WICb45xxr6c=;
+ b=gZdgE9M+DoSv6ZkiBFY/h2BQqJjX3O6wwj/K/4+PD1YgV9fQg0TPtIBHyy9vOES5d5
+ MIA7noZWBfnLZsLoiLRIiF8JvBcIh5pw6AOjrhPyFZT6heUUl39W1+BZoeqjRYBYYZ6m
+ bwCG6c0YDDK4U0Ne5dbt3FL6UCN0xok1PbsKl1Bx7Lh/GeutAmNUVNSE0HWoolWEOUtQ
+ S9Swpxdn1YsCc5SnvMAP1nlzKf0S9BswMtaT3dq7fear/AGiU3yQL+MDqlpxZbqDGT3H
+ JopRQuhIJXVBXN9kCXbdOtV9CSzZW/Ue2nzcjUVUmW+I1FEL/0bBvM3obq2r84DoEshp
+ SPTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=NSm3cZqHH/H9Xl/1qUBzg4MSsd8N7p36v5WOTsFnvFI=;
- b=hb1W3GFhd3hFVNW7Gq1obR/lWJfjD0yJC4+SRkTPRfqqAuhw2mWHRqZCdFX7TOwwko
- f6v16VM6719FiJJUmtj6t4Tj1fSxiV9SSX0PHfwg4a8BBQqkJYa4XWuBbi/Nku4+6L89
- zd1f103tBLAtWmvSFtlcuGUUIFaEkV7iSmSMIc8jjuyN86qqjKRQTeCLcvr6IY1N9UVd
- /FRSR2+8wxpnpMcQhhoIKra2y5KmWNX/N/cK1cOGecSbR4wih+DLNqcVMh6ci9twZDgv
- ruQKtw3dBaoBE9ewuY77Dw07O+CRcC22KoPHgbQe3Vj4APgUmntX7V+p9WfBa3wINiVp
- 8hrg==
-X-Gm-Message-State: APjAAAVxdiMVWXt+Xomua/T+cNskD5+whRv2hLEn9ws7eC2b/zArSpbN
- 1tss+iV06U5sBuTTJOZlBuucVYkE
-X-Google-Smtp-Source: APXvYqz5Wf1kOYa6V33yDPG0EK9jBkZI5wFT4Q8bCe/rBQXbcLVPbMeOdlYcxCh2CKoUD0u3L1kbbQ==
-X-Received: by 2002:a05:6000:124a:: with SMTP id
- j10mr10330123wrx.191.1561413669297; 
- Mon, 24 Jun 2019 15:01:09 -0700 (PDT)
+ bh=aBqxrS2+6+Ym/rs4g7maJmz+R7nY9F00WICb45xxr6c=;
+ b=iA2ozcSBzSJDrsgsUotDla7PrP/fUDgJwK5579D8gPv6jqDxgIMGw8XIGOLqxHfKpR
+ r5xHv5n5LuAuWUl11PdNiTn3jGjsW2zY0VULV82dLOt9kBl5MGWHp83pTmKFk82deuIo
+ xOkLcgJ2bgArYsR8cVuIfbMakRVDQQa8FIMtHefoP62gSGC7UoVSBxrwEY0dKP95h3eL
+ g6q6spwIe4v6FY/3hFnc6IYbUjVh2Cdg2VF1DLqf8VWLi92D5m5yfSqu6xFtrVkM6jpl
+ bc6XHECaJJrCLDZ5OaSvTC+f3S0jJXBGivxXDTrqftDnOHT5bSHjry0sCT5CWvtrQcs0
+ kDIA==
+X-Gm-Message-State: APjAAAV8/wBXFrLQ+3CkbbvYyD1In0RlM7OAqPZFFdrHh6WqY3nMhmjk
+ heScJbDYtKlz1PcqCfBBHX5cq4Lg
+X-Google-Smtp-Source: APXvYqyDwTsmwnY1ELVjqSytaPdzaZ7RQCFi0jiFSwQJ18TbakYtNig3lT8TwW852wUqj0t0YiXQwA==
+X-Received: by 2002:a1c:5f56:: with SMTP id t83mr16233899wmb.37.1561413661353; 
+ Mon, 24 Jun 2019 15:01:01 -0700 (PDT)
 Received: from x1.local (183.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.183])
- by smtp.gmail.com with ESMTPSA id z126sm1118612wmb.32.2019.06.24.15.01.08
+ by smtp.gmail.com with ESMTPSA id z126sm1118612wmb.32.2019.06.24.15.01.00
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 24 Jun 2019 15:01:08 -0700 (PDT)
+ Mon, 24 Jun 2019 15:01:00 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Date: Tue, 25 Jun 2019 00:00:55 +0200
-Message-Id: <20190624220056.25861-9-f4bug@amsat.org>
+Date: Tue, 25 Jun 2019 00:00:49 +0200
+Message-Id: <20190624220056.25861-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190624220056.25861-1-f4bug@amsat.org>
 References: <20190624220056.25861-1-f4bug@amsat.org>
@@ -84,8 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH 8/9] hw/sparc/sun4m: Simplify the RAM creation
+X-Received-From: 2a00:1450:4864:20::342
+Subject: [Qemu-devel] [RFC PATCH 2/9] MAINTAINERS: Add the 'empty_slot'
+ device with the 'unimp' one
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,134 +108,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now than the empty_slot device can be overlapped, use it to cover
-the maximum memory range.
-We can simplify now the main RAM is created.
-The TYPE_SUN4M_MEMORY is not migratable, simply remove it.
+The EmptySlot and UnimplementedDevice are very similar, the only
+difference is how they log guest accesses.
+Maintain them altogether.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sparc/sun4m.c | 85 ++++++++----------------------------------------
- 1 file changed, 13 insertions(+), 72 deletions(-)
+Peter, are you OK with that? Do you prefer 2 distinct sections?
 
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index 0df5a8edfc..d55753d5cb 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -767,71 +767,6 @@ static const TypeInfo prom_info = {
-     .class_init    = prom_class_init,
- };
+ MAINTAINERS | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index cad58b9487..abef4a1cfc 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1643,11 +1643,13 @@ F: docs/specs/vmgenid.txt
+ F: tests/vmgenid-test.c
+ F: stubs/vmgenid.c
  
--#define TYPE_SUN4M_MEMORY "memory"
--#define SUN4M_RAM(obj) OBJECT_CHECK(RamDevice, (obj), TYPE_SUN4M_MEMORY)
--
--typedef struct RamDevice {
--    SysBusDevice parent_obj;
--
--    MemoryRegion ram;
--    uint64_t size;
--} RamDevice;
--
--/* System RAM */
--static void ram_realize(DeviceState *dev, Error **errp)
--{
--    RamDevice *d = SUN4M_RAM(dev);
--    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
--
--    memory_region_allocate_system_memory(&d->ram, OBJECT(d), "sun4m.ram",
--                                         d->size);
--    sysbus_init_mmio(sbd, &d->ram);
--}
--
--static void ram_init(hwaddr addr, ram_addr_t RAM_size,
--                     uint64_t max_mem)
--{
--    DeviceState *dev;
--    SysBusDevice *s;
--    RamDevice *d;
--
--    /* allocate RAM */
--    if ((uint64_t)RAM_size > max_mem) {
--        error_report("Too much memory for this machine: %" PRId64 ","
--                     " maximum %" PRId64,
--                     RAM_size / MiB, max_mem / MiB);
--        exit(1);
--    }
--    dev = qdev_create(NULL, "memory");
--    s = SYS_BUS_DEVICE(dev);
--
--    d = SUN4M_RAM(dev);
--    d->size = RAM_size;
--    qdev_init_nofail(dev);
--
--    sysbus_mmio_map(s, 0, addr);
--}
--
--static Property ram_properties[] = {
--    DEFINE_PROP_UINT64("size", RamDevice, size, 0),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
--static void ram_class_init(ObjectClass *klass, void *data)
--{
--    DeviceClass *dc = DEVICE_CLASS(klass);
--
--    dc->realize = ram_realize;
--    dc->props = ram_properties;
--}
--
--static const TypeInfo ram_info = {
--    .name          = TYPE_SUN4M_MEMORY,
--    .parent        = TYPE_SYS_BUS_DEVICE,
--    .instance_size = sizeof(RamDevice),
--    .class_init    = ram_class_init,
--};
--
- static void cpu_devinit(const char *cpu_type, unsigned int id,
-                         uint64_t prom_addr, qemu_irq **cpu_irqs)
- {
-@@ -872,6 +807,19 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
-     FWCfgState *fw_cfg;
-     DeviceState *dev;
-     SysBusDevice *s;
-+    MemoryRegion ram;
-+
-+    if ((uint64_t)machine->ram_size > hwdef->max_mem) {
-+        error_report("Too much memory for this machine: %" PRId64 ","
-+                     " maximum %" PRId64,
-+                     machine->ram_size / MiB, hwdef->max_mem / MiB);
-+        exit(1);
-+    }
-+    memory_region_allocate_system_memory(&ram, OBJECT(machine), "sun4m.ram",
-+                                         machine->ram_size);
-+    memory_region_add_subregion(get_system_memory(), 0x00000000, &ram);
-+    /* models without ECC don't trap when missing ram is accessed */
-+    empty_slot_init(0x00000000, hwdef->max_mem);
+-Unimplemented device
++Unimplemented device, empty slot device
+ M: Peter Maydell <peter.maydell@linaro.org>
+ R: Philippe Mathieu-Daudé <f4bug@amsat.org>
+ S: Maintained
++F: include/hw/misc/empty_slot.h
+ F: include/hw/misc/unimp.h
++F: hw/misc/empty_slot.c
+ F: hw/misc/unimp.c
  
-     /* init CPUs */
-     for(i = 0; i < smp_cpus; i++) {
-@@ -881,13 +829,7 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
-     for (i = smp_cpus; i < MAX_CPUS; i++)
-         cpu_irqs[i] = qemu_allocate_irqs(dummy_cpu_set_irq, NULL, MAX_PILS);
- 
--
-     /* set up devices */
--    ram_init(0, machine->ram_size, hwdef->max_mem);
--    /* models without ECC don't trap when missing ram is accessed */
--    if (!hwdef->ecc_base) {
--        empty_slot_init(machine->ram_size, hwdef->max_mem - machine->ram_size);
--    }
- 
-     prom_init(hwdef->slavio_base, bios_name);
- 
-@@ -1561,7 +1503,6 @@ static void sun4m_register_types(void)
-     type_register_static(&idreg_info);
-     type_register_static(&afx_info);
-     type_register_static(&prom_info);
--    type_register_static(&ram_info);
- 
-     type_register_static(&ss5_type);
-     type_register_static(&ss10_type);
+ Standard VGA
 -- 
 2.19.1
 
