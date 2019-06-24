@@ -2,95 +2,81 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6764C4646C
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 23:08:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A38BC4646B
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 23:20:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 920DC20674
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 23:08:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 39EAB20674
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 23:20:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="4AMs/1XW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 920DC20674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IhZyO0hH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39EAB20674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55352 helo=lists.gnu.org)
+Received: from localhost ([::1]:55394 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfY4j-0004l0-OD
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 19:08:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43602)
+	id 1hfYGM-0008O1-Ih
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 19:20:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46346)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <liran.alon@oracle.com>) id 1hfY3Z-0003if-09
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 19:07:25 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hfYFF-0007jc-02
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 19:19:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liran.alon@oracle.com>) id 1hfY3X-0005dB-1G
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 19:07:24 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:47672)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
- id 1hfY3V-0004N8-2p
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 19:07:21 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5OMxd9U036398;
- Mon, 24 Jun 2019 23:05:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2018-07-02; bh=yUBEZia5gsuqxQ69vNng00iBJBoO065TVcwKIsFBCF0=;
- b=4AMs/1XWaPckBZwOgJMgOaZLtE4WpFsA1IdegEGmRkTmLPVc1A15OUIGzAXsG4Yb91un
- DsH9ZfYASvGkFQE2EiAyZpOuGO5XWuKdo78FtW6aBAgMB5MdnaK0sN6Gq5dM7q7yw7Cj
- 1HwzJ5nPjfR7mW1ZziRBnpqNbnJ9AKbyN/98mV6NbzNHB73u8EdsI9xEv4/uVU6zImXo
- 1mNG7AEAdKHE/d1X78v6ifGBLWdohL4bICiyv0g+F6niWlOEDoHs0lmHmzuR6s6nNIx1
- /4T2CfFO9OgL/1ExHspeu1K/+t/NfrFezB719qL/OUaJnLnatLQJucvsRLIJNoESnBCs Zg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2120.oracle.com with ESMTP id 2t9cyq8vyp-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 24 Jun 2019 23:05:24 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5ON4mh6024774;
- Mon, 24 Jun 2019 23:05:24 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by aserp3020.oracle.com with ESMTP id 2t9p6tuhge-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 24 Jun 2019 23:05:23 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5ON5MpY000353;
- Mon, 24 Jun 2019 23:05:22 GMT
-Received: from Lirans-MBP.Home (/109.64.216.174)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 24 Jun 2019 16:05:21 -0700
-From: Liran Alon <liran.alon@oracle.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 25 Jun 2019 02:05:14 +0300
-Message-Id: <20190624230514.53326-1-liran.alon@oracle.com>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <alistair23@gmail.com>) id 1hfYFD-0008Jn-9B
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 19:19:28 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:42539)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1hfYFC-0008Gb-TB; Mon, 24 Jun 2019 19:19:27 -0400
+Received: by mail-lj1-x244.google.com with SMTP id t28so14249861lje.9;
+ Mon, 24 Jun 2019 16:19:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=c5pXB5nAiQkVfsvg4fyR95ZzqMz3N1eH1It140VuJ1A=;
+ b=IhZyO0hH7jf1U1is8usXeXpFjof5cDMFUnJJSGipTRUcEtUHcffH7plNpQ3+4BPBsR
+ EeV2pQeX3LjwWUzOFZq0I7kM7XgBYjVRj9Ai0uQ25pjrJgwftAcXFNZBg0WuniMzYM04
+ ACwTCZvaXpYSKv8N0wg9S+Av05wHnKzsCC09Gi4njG82PvQYJChVw4cVcMA98k9wMlH+
+ BtD/CQDHhoqZDDvZoC6yQQ0ykU8XzRfB/3ypt3OPDZcyeGRstdu/9QnY9hSUu3E4gyJ/
+ IbU1WVS7CoNOecFQeRfefWB8i9JjRUWRiPzUNA7kqe32oFTPVtwH6YNhIUQPP0xUiAH2
+ 00pA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=c5pXB5nAiQkVfsvg4fyR95ZzqMz3N1eH1It140VuJ1A=;
+ b=FZ3oAU6huJA2wYYZLwdmWCw8K3H43JuCkBu9RKMkLYloiRWaJLmA7N+wmx5lhlF0RP
+ AyhaGNEzIE/Ed/9/F9VDr2QWEF+XVhb7lzCcSpAIiODUkK5QORHOQ+vAmuGnow4Txc/y
+ 3mY2JAB1GsjUgCyMtzRJtrvP6ZEMWRsNZmPbsm1L3q/ytz7h/prMsu5jZ7pObEAmQRwa
+ SJlLaeywlM/vrkS+X3ucitNXmyEqi0ZI63t9PktEc+0IVO/yhDwPBrHe2eTbeVLe2YRS
+ QQAVPT7ZmKXE2sW1+LiBhJWrsTuvaM9juxUxD1lCVU6RnT/rHreJrudZVlxnmQ7y/VbY
+ 3J9w==
+X-Gm-Message-State: APjAAAWg2HMVC1YVPweE/DnPiVHfmDBPcgJ5Muo7dxSx0u2nCrBOLCMS
+ qVuy2s89Gh2rfmQaj6hfNeP98tG/2PNgCKZDI+U=
+X-Google-Smtp-Source: APXvYqwfv7lDwhkd+KTn+jfL1eXcPhPjuyZ1QSBxDTCToQFpc4PBtXWkGYGYEJUoboc6k4V89Hakq3KYzDrkPSG23qE=
+X-Received: by 2002:a2e:86cc:: with SMTP id n12mr4862329ljj.146.1561418365089; 
+ Mon, 24 Jun 2019 16:19:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9298
- signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=991
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906240181
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9298
- signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906240181
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.85
-Subject: [Qemu-devel] [PATCH] target/i386: kvm: Fix when nested state is
- needed for migration
+References: <b1a3188a4d5538d4d0ed0a77114926a2fdae1258.1560821342.git.alistair.francis@wdc.com>
+ <mhng-32c41f8f-e2b3-4880-89d9-0e56340538ec@palmer-si-x1e>
+In-Reply-To: <mhng-32c41f8f-e2b3-4880-89d9-0e56340538ec@palmer-si-x1e>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 24 Jun 2019 16:16:30 -0700
+Message-ID: <CAKmqyKPhty4-EbgXTHMhUOGVkVnxCzmRB14wSbLG0BSrdzbv1A@mail.gmail.com>
+To: Palmer Dabbelt <palmer@sifive.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::244
+Subject: Re: [Qemu-devel] [PATCH v1 9/9] target/riscv: Add Zifencei and
+ Zicsr as command line options
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,46 +88,295 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, Liran Alon <liran.alon@oracle.com>,
- Karl Heubaum <karl.heubaum@oracle.com>, kvm@vger.kernel.org
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When vCPU is in VMX operation and enters SMM mode,
-it temporarily exits VMX operation but KVM maintained nested-state
-still stores the VMXON region physical address, i.e. even when the
-vCPU is in SMM mode then (nested_state->hdr.vmx.vmxon_pa != -1ull).
+On Mon, Jun 24, 2019 at 2:31 AM Palmer Dabbelt <palmer@sifive.com> wrote:
+>
+> On Mon, 17 Jun 2019 18:31:25 PDT (-0700), Alistair Francis wrote:
+> > For completeness let's add Zifencei and Zicsr as command line options,
+> > even though they can't be disabled at the moment.
+> >
+> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > ---
+> >  target/riscv/cpu.c | 9 +++++++++
+> >  target/riscv/cpu.h | 2 ++
+> >  2 files changed, 11 insertions(+)
+> >
+> > diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> > index 5af1c9b38c..53cf8607f7 100644
+> > --- a/target/riscv/cpu.c
+> > +++ b/target/riscv/cpu.c
+> > @@ -409,6 +409,13 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+> >          set_misa(env, RVXLEN | target_misa);
+> >      }
+> >
+> > +    if (!cpu->cfg.ext_ifencei) {
+> > +        warn_report("QEMU does not support disabling Zifencei");
+> > +    }
+> > +    if (!cpu->cfg.ext_icsr) {
+> > +        warn_report("QEMU does not support disabling Zicsr");
+> > +    }
+> > +
+> >      riscv_cpu_register_gdb_regs_for_features(cs);
+> >
+> >      qemu_init_vcpu(cs);
+> > @@ -441,6 +448,8 @@ static Property riscv_cpu_properties[] = {
+> >      DEFINE_PROP_BOOL("s", RISCVCPU, cfg.ext_s, true),
+> >      DEFINE_PROP_BOOL("u", RISCVCPU, cfg.ext_u, true),
+> >      DEFINE_PROP_BOOL("Counters", RISCVCPU, cfg.ext_counters, true),
+> > +    DEFINE_PROP_BOOL("Zifencei", RISCVCPU, cfg.ext_ifencei, true),
+> > +    DEFINE_PROP_BOOL("Zicsr", RISCVCPU, cfg.ext_icsr, true),
+> >      DEFINE_PROP_STRING("priv_spec", RISCVCPU, cfg.priv_spec),
+> >      DEFINE_PROP_BOOL("mmu", RISCVCPU, cfg.mmu, true),
+> >      DEFINE_PROP_BOOL("pmp", RISCVCPU, cfg.pmp, true),
+> > diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> > index 786f620564..b4c212dfcf 100644
+> > --- a/target/riscv/cpu.h
+> > +++ b/target/riscv/cpu.h
+> > @@ -222,6 +222,8 @@ typedef struct RISCVCPU {
+> >          bool ext_s;
+> >          bool ext_u;
+> >          bool ext_counters;
+> > +        bool ext_ifencei;
+> > +        bool ext_icsr;
+> >
+> >          char *priv_spec;
+> >          char *user_spec;
+>
+> I'd rather just support these, which seems about as hard as emitting a warning.
+> Disabling Zifencei is particularly useful, as the Linux ABI forbids it so this
+> way we can run tests that way.  Unless I'm missing something, I think these two
+> should do it:
+>
+> From 6d645eb1e8ba4d16431af40bf04e5c165475bf5a Mon Sep 17 00:00:00 2001
+> From: Palmer Dabbelt <palmer@sifive.com>
+> Date: Mon, 24 Jun 2019 01:59:05 -0700
+> Subject: [PATCH 1/2] RISC-V: Add support for the Zifencei extension
+>
+> fence.i has been split out of the base ISA as part of the ratification
+> process.  This patch adds a Zifencei argument, which disables the
+> fence.i instruction.
+>
+> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 
-Therefore, there is no need to explicitly check for
-KVM_STATE_NESTED_SMM_VMXON to determine if it is necessary
-to save nested-state as part of migration stream.
+This looks good.
 
-In addition, destination must enable eVMCS if it is enabled on
-source as specified by the KVM_STATE_NESTED_EVMCS flag, even if
-the VMXON region is not set. Thus, change the code to require saving
-nested-state as part of migration stream in case it is set.
+> ---
+>  target/riscv/cpu.c                      | 1 +
+>  target/riscv/cpu.h                      | 1 +
+>  target/riscv/insn_trans/trans_rvi.inc.c | 3 +++
+>  target/riscv/translate.c                | 3 +++
+>  4 files changed, 8 insertions(+)
+>
+> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> index be90fa7d0808..bbad39a337b3 100644
+> --- a/target/riscv/cpu.c
+> +++ b/target/riscv/cpu.c
+> @@ -441,6 +441,7 @@ static Property riscv_cpu_properties[] = {
+>      DEFINE_PROP_BOOL("s", RISCVCPU, cfg.ext_s, true),
+>      DEFINE_PROP_BOOL("u", RISCVCPU, cfg.ext_u, true),
+>      DEFINE_PROP_BOOL("Counters", RISCVCPU, cfg.ext_counters, true),
+> +    DEFINE_PROP_BOOL("Zifencei", RISCVCPU, cfg.ext_ifencei, true),
+>      DEFINE_PROP_STRING("priv_spec", RISCVCPU, cfg.priv_spec),
+>      DEFINE_PROP_BOOL("mmu", RISCVCPU, cfg.mmu, true),
+>      DEFINE_PROP_BOOL("pmp", RISCVCPU, cfg.pmp, true),
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> index 4d4e0f89e206..ba551cd3082c 100644
+> --- a/target/riscv/cpu.h
+> +++ b/target/riscv/cpu.h
+> @@ -223,6 +223,7 @@ typedef struct RISCVCPU {
+>          bool ext_s;
+>          bool ext_u;
+>          bool ext_counters;
+> +        bool ext_ifencei;
+>
+>          char *priv_spec;
+>          char *user_spec;
+> diff --git a/target/riscv/insn_trans/trans_rvi.inc.c b/target/riscv/insn_trans/trans_rvi.inc.c
+> index 6cda078ed6ba..766594ba08ce 100644
+> --- a/target/riscv/insn_trans/trans_rvi.inc.c
+> +++ b/target/riscv/insn_trans/trans_rvi.inc.c
+> @@ -484,6 +484,9 @@ static bool trans_fence(DisasContext *ctx, arg_fence *a)
+>
+>  static bool trans_fence_i(DisasContext *ctx, arg_fence_i *a)
+>  {
+> +    if (!ctx->ext_ifencei)
+> +        return false;
+> +
+>      /*
+>       * FENCE_I is a no-op in QEMU,
+>       * however we need to end the translation block
+> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+> index 313c27b70073..8d6ab732588d 100644
+> --- a/target/riscv/translate.c
+> +++ b/target/riscv/translate.c
+> @@ -54,6 +54,7 @@ typedef struct DisasContext {
+>         to any system register, which includes CSR_FRM, so we do not have
+>         to reset this known value.  */
+>      int frm;
+> +    bool ext_ifencei;
+>  } DisasContext;
+>
+>  #ifdef TARGET_RISCV64
+> @@ -752,6 +753,7 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+>  {
+>      DisasContext *ctx = container_of(dcbase, DisasContext, base);
+>      CPURISCVState *env = cs->env_ptr;
+> +    RISCVCPU *cpu = RISCV_CPU(cs);
+>
+>      ctx->pc_succ_insn = ctx->base.pc_first;
+>      ctx->mem_idx = ctx->base.tb->flags & TB_FLAGS_MMU_MASK;
+> @@ -759,6 +761,7 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+>      ctx->priv_ver = env->priv_ver;
+>      ctx->misa = env->misa;
+>      ctx->frm = -1;  /* unknown rounding mode */
+> +    ctx->ext_ifencei = cpu->cfg.ext_ifencei;
+>  }
+>
+>  static void riscv_tr_tb_start(DisasContextBase *db, CPUState *cpu)
+> --
+> 2.21.0
+>
+>
+> From 6d280048f076eb0f28ee0c4454a1ed8b130240cb Mon Sep 17 00:00:00 2001
+> From: Palmer Dabbelt <palmer@sifive.com>
+> Date: Mon, 24 Jun 2019 01:59:51 -0700
+> Subject: [PATCH 2/2] RISC-V: Add support for the Zicsr extension
+>
+> The various CSR instructions have been split out of the base ISA as part
+> of the ratification process.  This patch adds a Zicsr argument, which
+> disables all the CSR instructions.
+>
+> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 
-Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-Signed-off-by: Liran Alon <liran.alon@oracle.com>
----
- target/i386/machine.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Couldn't we just do this in riscv_csrrw() to avoid passing it down to
+the translation?
 
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 851b249d1a39..e7d72faf9e24 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -999,7 +999,7 @@ static bool vmx_nested_state_needed(void *opaque)
- 
-     return ((nested_state->format == KVM_STATE_NESTED_FORMAT_VMX) &&
-             ((nested_state->hdr.vmx.vmxon_pa != -1ull) ||
--             (nested_state->hdr.vmx.smm.flags & KVM_STATE_NESTED_SMM_VMXON)));
-+             (nested_state->flags & KVM_STATE_NESTED_EVMCS)));
- }
- 
- static const VMStateDescription vmstate_vmx_nested_state = {
--- 
-2.20.1
+It gets called by all of these functions anyway.
 
+Alistair
+
+> ---
+>  target/riscv/cpu.c                      |  1 +
+>  target/riscv/cpu.h                      |  1 +
+>  target/riscv/insn_trans/trans_rvi.inc.c | 18 ++++++++++++++++++
+>  target/riscv/translate.c                |  2 ++
+>  4 files changed, 22 insertions(+)
+>
+> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> index bbad39a337b3..915b9e77df33 100644
+> --- a/target/riscv/cpu.c
+> +++ b/target/riscv/cpu.c
+> @@ -442,6 +442,7 @@ static Property riscv_cpu_properties[] = {
+>      DEFINE_PROP_BOOL("u", RISCVCPU, cfg.ext_u, true),
+>      DEFINE_PROP_BOOL("Counters", RISCVCPU, cfg.ext_counters, true),
+>      DEFINE_PROP_BOOL("Zifencei", RISCVCPU, cfg.ext_ifencei, true),
+> +    DEFINE_PROP_BOOL("Zicsr", RISCVCPU, cfg.ext_icsr, true),
+>      DEFINE_PROP_STRING("priv_spec", RISCVCPU, cfg.priv_spec),
+>      DEFINE_PROP_BOOL("mmu", RISCVCPU, cfg.mmu, true),
+>      DEFINE_PROP_BOOL("pmp", RISCVCPU, cfg.pmp, true),
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> index ba551cd3082c..0adb307f3298 100644
+> --- a/target/riscv/cpu.h
+> +++ b/target/riscv/cpu.h
+> @@ -224,6 +224,7 @@ typedef struct RISCVCPU {
+>          bool ext_u;
+>          bool ext_counters;
+>          bool ext_ifencei;
+> +        bool ext_icsr;
+>
+>          char *priv_spec;
+>          char *user_spec;
+> diff --git a/target/riscv/insn_trans/trans_rvi.inc.c b/target/riscv/insn_trans/trans_rvi.inc.c
+> index 766594ba08ce..66c5202cc5d6 100644
+> --- a/target/riscv/insn_trans/trans_rvi.inc.c
+> +++ b/target/riscv/insn_trans/trans_rvi.inc.c
+> @@ -524,6 +524,9 @@ static bool trans_fence_i(DisasContext *ctx, arg_fence_i *a)
+>
+>  static bool trans_csrrw(DisasContext *ctx, arg_csrrw *a)
+>  {
+> +    if (!ctx->ext_icsr)
+> +        return false;
+> +
+>      TCGv source1, csr_store, dest, rs1_pass;
+>      RISCV_OP_CSR_PRE;
+>      gen_helper_csrrw(dest, cpu_env, source1, csr_store);
+> @@ -533,6 +536,9 @@ static bool trans_csrrw(DisasContext *ctx, arg_csrrw *a)
+>
+>  static bool trans_csrrs(DisasContext *ctx, arg_csrrs *a)
+>  {
+> +    if (!ctx->ext_icsr)
+> +        return false;
+> +
+>      TCGv source1, csr_store, dest, rs1_pass;
+>      RISCV_OP_CSR_PRE;
+>      gen_helper_csrrs(dest, cpu_env, source1, csr_store, rs1_pass);
+> @@ -542,6 +548,9 @@ static bool trans_csrrs(DisasContext *ctx, arg_csrrs *a)
+>
+>  static bool trans_csrrc(DisasContext *ctx, arg_csrrc *a)
+>  {
+> +    if (!ctx->ext_icsr)
+> +        return false;
+> +
+>      TCGv source1, csr_store, dest, rs1_pass;
+>      RISCV_OP_CSR_PRE;
+>      gen_helper_csrrc(dest, cpu_env, source1, csr_store, rs1_pass);
+> @@ -551,6 +560,9 @@ static bool trans_csrrc(DisasContext *ctx, arg_csrrc *a)
+>
+>  static bool trans_csrrwi(DisasContext *ctx, arg_csrrwi *a)
+>  {
+> +    if (!ctx->ext_icsr)
+> +        return false;
+> +
+>      TCGv source1, csr_store, dest, rs1_pass;
+>      RISCV_OP_CSR_PRE;
+>      gen_helper_csrrw(dest, cpu_env, rs1_pass, csr_store);
+> @@ -560,6 +572,9 @@ static bool trans_csrrwi(DisasContext *ctx, arg_csrrwi *a)
+>
+>  static bool trans_csrrsi(DisasContext *ctx, arg_csrrsi *a)
+>  {
+> +    if (!ctx->ext_icsr)
+> +        return false;
+> +
+>      TCGv source1, csr_store, dest, rs1_pass;
+>      RISCV_OP_CSR_PRE;
+>      gen_helper_csrrs(dest, cpu_env, rs1_pass, csr_store, rs1_pass);
+> @@ -569,6 +584,9 @@ static bool trans_csrrsi(DisasContext *ctx, arg_csrrsi *a)
+>
+>  static bool trans_csrrci(DisasContext *ctx, arg_csrrci *a)
+>  {
+> +    if (!ctx->ext_icsr)
+> +        return false;
+> +
+>      TCGv source1, csr_store, dest, rs1_pass;
+>      RISCV_OP_CSR_PRE;
+>      gen_helper_csrrc(dest, cpu_env, rs1_pass, csr_store, rs1_pass);
+> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+> index 8d6ab732588d..be46435b9a7b 100644
+> --- a/target/riscv/translate.c
+> +++ b/target/riscv/translate.c
+> @@ -55,6 +55,7 @@ typedef struct DisasContext {
+>         to reset this known value.  */
+>      int frm;
+>      bool ext_ifencei;
+> +    bool ext_icsr;
+>  } DisasContext;
+>
+>  #ifdef TARGET_RISCV64
+> @@ -762,6 +763,7 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+>      ctx->misa = env->misa;
+>      ctx->frm = -1;  /* unknown rounding mode */
+>      ctx->ext_ifencei = cpu->cfg.ext_ifencei;
+> +    ctx->ext_icsr = cpu->cfg.ext_icsr;
+>  }
+>
+>  static void riscv_tr_tb_start(DisasContextBase *db, CPUState *cpu)
+> --
+> 2.21.0
+>
 
