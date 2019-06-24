@@ -2,64 +2,78 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8791FC43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 08:31:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 508AFC43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 08:35:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9ABA22089F
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 08:31:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9ABA22089F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 272042089F
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 08:35:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 272042089F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48756 helo=lists.gnu.org)
+Received: from localhost ([::1]:48782 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfKNo-0001WX-Ui
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 04:31:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39612)
+	id 1hfKRb-0003A4-5m
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 04:35:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40276)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <yan.y.zhao@intel.com>) id 1hfKMq-00014l-EF
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:30:25 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1hfKPl-0002L2-6p
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:33:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1hfKMp-0001es-1T
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:30:24 -0400
-Received: from mga18.intel.com ([134.134.136.126]:1121)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1hfKMo-0001ab-OE
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:30:22 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
- by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 24 Jun 2019 01:28:16 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,411,1557212400"; d="scan'208";a="161558728"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.9])
- by fmsmga008.fm.intel.com with ESMTP; 24 Jun 2019 01:28:14 -0700
-Date: Mon, 24 Jun 2019 04:22:21 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Peter Xu <peterx@redhat.com>
-Message-ID: <20190624082221.GE27894@joy-OptiPlex-7040>
-References: <20190624063733.22079-1-peterx@redhat.com>
- <20190624063733.22079-3-peterx@redhat.com>
+ (envelope-from <sgarzare@redhat.com>) id 1hfKPR-0005WX-M8
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:33:10 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:38839)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hfKPP-0005KZ-MQ
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 04:33:03 -0400
+Received: by mail-wm1-f68.google.com with SMTP id s15so12365595wmj.3
+ for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 01:32:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=M0Ho630Iw9f+gDCgXdYZ6dxrnR0PbhXPz9gl10vbPjQ=;
+ b=csP9u9gKV3rMkk4++0DWNMXqZaCtHZ6IpLXL/kCWnAn4ab9CmsmPPbfDrZE9sjkKfA
+ Fs8N7uF6WHRJXKDXRK56avtEtL0I9exOm/JjQ/rNByqnqTSIEQTQmYJLpGWfMsrQwJ33
+ 4W2ju97BKGifFIeopYdaUGvwk4PxDge3RkomaCrbZtcoVTZkcYQInws/LhOCTuuygbqm
+ w0qyUvqW1iRpubp6LJytRJ5vd0a6YjTNUlhFf4ySxdMWxyHXvPr2KzIssF5K4zowmhqH
+ 16xPxV7BMAe1kfE+ehYqI1441QQFxkCNuTMrMsFD29IvaHvSch4Vc6GgejTJaHeUah6b
+ KL2A==
+X-Gm-Message-State: APjAAAV7ryzg4lyQdiASGMLdk+oy+j+kYvAIQ7TV0NbzzE/5hk17bfye
+ ZkiJDnt/Y/gibxL8tV+CP6NC9w==
+X-Google-Smtp-Source: APXvYqysvdA3msPi+hzEkEnC+tqnZOGDl29y4ktUdda+7eJOMMcTIhOFho46md38zomULXqs64aZ4w==
+X-Received: by 2002:a1c:343:: with SMTP id 64mr15521728wmd.116.1561365177279; 
+ Mon, 24 Jun 2019 01:32:57 -0700 (PDT)
+Received: from steredhat (host21-207-dynamic.52-79-r.retail.telecomitalia.it.
+ [79.52.207.21])
+ by smtp.gmail.com with ESMTPSA id u25sm9679489wmc.3.2019.06.24.01.32.56
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 24 Jun 2019 01:32:56 -0700 (PDT)
+Date: Mon, 24 Jun 2019 10:32:54 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Message-ID: <20190624083254.aoeizlwpet24ib52@steredhat>
+References: <20190531064341.29730-1-philmd@redhat.com>
+ <20190531073859.ojouyr3urzcarn4f@steredhat.homenet.telecomitalia.it>
+ <5489328b-92d7-6595-a6da-3f27d0839882@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20190624063733.22079-3-peterx@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.126
-Subject: Re: [Qemu-devel] [PATCH 2/2] intel_iommu: Fix unexpected unmaps
- during global unmap
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5489328b-92d7-6595-a6da-3f27d0839882@redhat.com>
+User-Agent: NeoMutt/20180716
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.68
+Subject: Re: [Qemu-devel] [PATCH] Makefile: Rename the 'vm-test' target as
+ 'vm-help'
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,146 +85,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Auger Eric <eric.auger@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Tested-by: Yan Zhao <yan.y.zhao@intel.com>
+On Thu, Jun 20, 2019 at 01:03:28PM +0200, Philippe Mathieu-Daudé wrote:
+> Hi Stefano,
+> 
+> On 5/31/19 9:38 AM, Stefano Garzarella wrote:
+> > On Fri, May 31, 2019 at 08:43:41AM +0200, Philippe Mathieu-Daudé wrote:
+> >> We already have 'make check-help', use the 'make vm-help' form
+> >> to display helps about VM testing. Keep the old target to not
+> >> bother old customs.
+> >>
+> >> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> >> ---
+> >> Based-on: <20190530101603.22254-1-alex.bennee@linaro.org>
+> >>           "testing/next queue"
+> >> ---
+> >>  Makefile                  | 4 ++--
+> >>  docs/devel/testing.rst    | 4 ++--
+> >>  tests/vm/Makefile.include | 5 +++--
+> >>  3 files changed, 7 insertions(+), 6 deletions(-)
+> >>
+> >> diff --git a/Makefile b/Makefile
+> >> index f0be624f47..f67739df7c 100644
+> >> --- a/Makefile
+> >> +++ b/Makefile
+> >> @@ -9,7 +9,7 @@ SRC_PATH=.
+> >>  UNCHECKED_GOALS := %clean TAGS cscope ctags dist \
+> >>      html info pdf txt \
+> >>      help check-help print-% \
+> >> -    docker docker-% vm-test vm-build-%
+> >> +    docker docker-% vm-help vm-test vm-build-%
+> >>  
+> >>  print-%:
+> >>  	@echo '$*=$($*)'
+> >> @@ -1121,7 +1121,7 @@ endif
+> >>  	@echo  'Test targets:'
+> >>  	@echo  '  check           - Run all tests (check-help for details)'
+> >>  	@echo  '  docker          - Help about targets running tests inside Docker containers'
+> >> -	@echo  '  vm-test         - Help about targets running tests inside VM'
+> >> +	@echo  '  vm-help         - Help about targets running tests inside VM'
+> >>  	@echo  ''
+> >>  	@echo  'Documentation targets:'
+> >>  	@echo  '  html info pdf txt'
+> >> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+> >> index da2d0fc964..68aba3926e 100644
+> >> --- a/docs/devel/testing.rst
+> >> +++ b/docs/devel/testing.rst
+> >> @@ -399,12 +399,12 @@ VM testing
+> >>  
+> >>  This test suite contains scripts that bootstrap various guest images that have
+> >>  necessary packages to build QEMU. The basic usage is documented in ``Makefile``
+> >> -help which is displayed with ``make vm-test``.
+> >> +help which is displayed with ``make vm-help``.
+> >>  
+> >>  Quickstart
+> >>  ----------
+> >>  
+> >> -Run ``make vm-test`` to list available make targets. Invoke a specific make
+> >> +Run ``make vm-help`` to list available make targets. Invoke a specific make
+> >>  command to run build test in an image. For example, ``make vm-build-freebsd``
+> >>  will build the source tree in the FreeBSD image. The command can be executed
+> >>  from either the source tree or the build dir; if the former, ``./configure`` is
+> >> diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
+> >> index 5e37063d32..b7311d7bd9 100644
+> >> --- a/tests/vm/Makefile.include
+> >> +++ b/tests/vm/Makefile.include
+> >> @@ -8,8 +8,9 @@ IMAGE_FILES := $(patsubst %, $(IMAGES_DIR)/%.img, $(IMAGES))
+> >>  
+> >>  .PRECIOUS: $(IMAGE_FILES)
+> >>  
+> >> -vm-test:
+> >> -	@echo "vm-test: Test QEMU in preconfigured virtual machines"
+> > 
+> > What about adding something like this?
+> > vm-test: vm-help
+> > 	@echo ""
+> > 	@echo "vm-test is deprecated, please use vm-help"
+> 
+> I wouldn't worry about deprecation warnings for dev tools, it would be
+> just noise :)
 
-On Mon, Jun 24, 2019 at 02:37:33PM +0800, Peter Xu wrote:
-> From: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> This is an replacement work of Yan Zhao's patch:
-> 
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg625340.html
-> 
-> vtd_address_space_unmap() will do proper page mask alignment to make
-> sure each IOTLB message will have correct masks for notification
-> messages (2^N-1), but sometimes it can be expanded to even supercede
-> the registered range.  That could lead to unexpected UNMAP of already
-> mapped regions in some other notifiers.
-> 
-> Instead of doing mindless expension of the start address and address
-> mask, we split the range into smaller ones and guarantee that each
-> small range will have correct masks (2^N-1) and at the same time we
-> should also try our best to generate as less IOTLB messages as
-> possible.
-> 
-> Reported-by: Yan Zhao <yan.y.zhao@intel.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> [peterx: fixup mask generation algos and other touchups, introduce
->  vtd_get_next_mask(), write commit message]
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  hw/i386/intel_iommu.c | 70 +++++++++++++++++++++++++++----------------
->  1 file changed, 44 insertions(+), 26 deletions(-)
-> 
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 719ce19ab3..39cedf73b8 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -3363,11 +3363,31 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
->      return vtd_dev_as;
->  }
->  
-> +static uint64_t vtd_get_next_mask(uint64_t start, uint64_t size, int gaw)
-> +{
-> +    /* Tries to find smallest mask from start first */
-> +    uint64_t rmask = start & -start, max_mask = 1ULL << gaw;
-> +
-> +    assert(size && gaw > 0 && gaw < 64);
-> +
-> +    /* Zero start, or too big */
-> +    if (!rmask || rmask > max_mask) {
-> +        rmask = max_mask;
-> +    }
-> +
-> +    /* If the start mask worked, then use it */
-> +    if (rmask <= size) {
-> +        return rmask;
-> +    }
-> +
-> +    /* Find the largest page mask from size */
-> +    return 1ULL << (63 - clz64(size));
-> +}
-> +
->  /* Unmap the whole range in the notifier's scope. */
->  static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
->  {
-> -    IOMMUTLBEntry entry;
-> -    hwaddr size;
-> +    hwaddr size, remain;
->      hwaddr start = n->start;
->      hwaddr end = n->end;
->      IntelIOMMUState *s = as->iommu_state;
-> @@ -3388,39 +3408,37 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
->      }
->  
->      assert(start <= end);
-> -    size = end - start;
-> +    size = remain = end - start + 1;
->  
-> -    if (ctpop64(size) != 1) {
-> -        /*
-> -         * This size cannot format a correct mask. Let's enlarge it to
-> -         * suite the minimum available mask.
-> -         */
-> -        int n = 64 - clz64(size);
-> -        if (n > s->aw_bits) {
-> -            /* should not happen, but in case it happens, limit it */
-> -            n = s->aw_bits;
-> -        }
-> -        size = 1ULL << n;
-> +    while (remain > 0) {
-> +        IOMMUTLBEntry entry;
-> +        uint64_t mask = vtd_get_next_mask(start, remain, s->aw_bits);
-> +
-> +        assert(mask);
-> +
-> +        entry.iova = start;
-> +        entry.addr_mask = mask - 1;
-> +        entry.target_as = &address_space_memory;
-> +        entry.perm = IOMMU_NONE;
-> +        /* This field is meaningless for unmap */
-> +        entry.translated_addr = 0;
-> +
-> +        memory_region_notify_one(n, &entry);
-> +
-> +        start += mask;
-> +        remain -= mask;
->      }
->  
-> -    entry.target_as = &address_space_memory;
-> -    /* Adjust iova for the size */
-> -    entry.iova = n->start & ~(size - 1);
-> -    /* This field is meaningless for unmap */
-> -    entry.translated_addr = 0;
-> -    entry.perm = IOMMU_NONE;
-> -    entry.addr_mask = size - 1;
-> +    assert(!remain);
->  
->      trace_vtd_as_unmap_whole(pci_bus_num(as->bus),
->                               VTD_PCI_SLOT(as->devfn),
->                               VTD_PCI_FUNC(as->devfn),
-> -                             entry.iova, size);
-> +                             n->start, size);
->  
-> -    map.iova = entry.iova;
-> -    map.size = entry.addr_mask;
-> +    map.iova = n->start;
-> +    map.size = size;
->      iova_tree_remove(as->iova_tree, &map);
-> -
-> -    memory_region_notify_one(n, &entry);
->  }
->  
->  static void vtd_address_space_unmap_all(IntelIOMMUState *s)
-> -- 
-> 2.21.0
-> 
+Make sense :)
+
+Cheers,
+Stefano
+
 
