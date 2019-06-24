@@ -2,72 +2,63 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7558DC43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 16:19:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC8FFC48BE8
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 16:23:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46E4120657
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 16:19:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46E4120657
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 5499620673
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 16:23:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5499620673
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52956 helo=lists.gnu.org)
+Received: from localhost ([::1]:52970 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfRh3-00020I-Om
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 12:19:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55768)
+	id 1hfRkW-0003YC-Be
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 12:23:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55160)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hfRZ0-0004wh-DT
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 12:11:27 -0400
+ (envelope-from <Dave.Martin@arm.com>) id 1hfRWs-00023z-Fs
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 12:09:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hfRYz-0006eK-3g
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 12:11:26 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50122)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hfRYy-0006cx-Tt
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 12:11:25 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hfRYw-00036a-Ri
- for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 16:11:22 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id CFB282E80CB
- for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 16:11:22 +0000 (UTC)
+ (envelope-from <Dave.Martin@arm.com>) id 1hfRWr-0004JQ-E8
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 12:09:14 -0400
+Received: from foss.arm.com ([217.140.110.172]:52816)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <Dave.Martin@arm.com>)
+ id 1hfRWl-00047P-J8; Mon, 24 Jun 2019 12:09:09 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 723DF2B;
+ Mon, 24 Jun 2019 09:09:03 -0700 (PDT)
+Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
+ [10.121.207.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 19E0E3F71E;
+ Mon, 24 Jun 2019 09:09:01 -0700 (PDT)
+Date: Mon, 24 Jun 2019 17:09:00 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+To: Andrew Jones <drjones@redhat.com>
+Message-ID: <20190624160859.GV2790@e103592.cambridge.arm.com>
+References: <20190621163422.6127-1-drjones@redhat.com>
+ <20190621163422.6127-11-drjones@redhat.com>
+ <20190624110535.GI2790@e103592.cambridge.arm.com>
+ <20190624115553.ef22fdempvxkzzog@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 24 Jun 2019 15:56:53 -0000
-From: roblabla <1834051@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: roblabla
-X-Launchpad-Bug-Reporter: roblabla (roblabla)
-X-Launchpad-Bug-Modifier: roblabla (roblabla)
-References: <156138866047.31005.4592891012762616724.malonedeb@chaenomeles.canonical.com>
-Message-Id: <156139181396.18147.18062095652882733100.launchpad@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18991";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: d06998f39724fcdf4347fc2848104f0a9a4c517e
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190624115553.ef22fdempvxkzzog@kamzik.brq.redhat.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1834051] Re: IRQ2 ignored under KVM when using
- IOAPIC
+X-Received-From: 217.140.110.172
+Subject: Re: [Qemu-devel] [PATCH v2 10/14] target/arm/kvm64: Add
+ kvm_arch_get/put_sve
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,86 +67,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1834051 <1834051@bugs.launchpad.net>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "imammedo@redhat.com" <imammedo@redhat.com>,
+ "alex.bennee@linaro.org" <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Description changed:
+On Mon, Jun 24, 2019 at 12:55:53PM +0100, Andrew Jones wrote:
+> On Mon, Jun 24, 2019 at 12:05:35PM +0100, Dave Martin wrote:
+> > On Fri, Jun 21, 2019 at 05:34:18PM +0100, Andrew Jones wrote:
+> > > These are the SVE equivalents to kvm_arch_get/put_fpsimd. Note, the
+> > > swabbing is different than it is for fpsmid because the vector format
+> > > is a little-endian stream of words.
+> > 
+> > Note, on big-endian hosts the FPSIMD view Vn and the SVE view Zn[127:0]
+> > of the FPSIMD/SVE common register bits has the opposite endianness for
+> > SVE_{GET,SET}_ONE_REG.
+> > 
+> > This only matters if mixing the two views: just from this patch I don't
+> > know whether this is an issue for QEMU or not.
+> 
+> I don't know either. My experience with the emulation side of QEMU is
+> mostly the zcr_write tweak in this series. And, TBH, I didn't put too
+> much thought into the endianness stuff, nor test this series with big
+> endian.
 
-  When using KVM, and an OS that supports the IOAPIC, interrupts mapped on
-  IRQ2 (for instance, routing an HPET timer on interrupt 2) will cause the
-  interrupts to never be delivered. This is because QEmu, when setting up
-  the KVM interrupt routes, will not set one up for IRQ2[0]. When running
-  without KVM, IRQ2 is identity-mapped to GSI2.
-  =
+Neither did I (at least beyond the "does it boot" level) -- hence the
+bug ;)
 
-  My understanding is that IRQs should be identity mapped to their
-  equivalent GSI unless a redirection entry is present in the MADT. This
-  is supported by ACPI 6.2 spec[1], 5.2.12.5 Interrupt Source Override
-  Structure, which claims: "It is assumed that the ISA interrupts will be
-  identity-mapped into the first I/O APIC sources.".
-  =
+And of course, few people are using big-endian, so nobody complained.
 
-  I stumbled across this while working on my own custom OS, got very
-  confused why the HPET wasn't triggering any interruption - and even more
-  confused why the behavior only happened in KVM and not in non-KVM.
-  =
+Just flagging it up so it doesn't get missed!
 
-- EDIT: Interestingly, the HPET only supports IRQ2 under qemu, which,
-- combined with this bug, makes it completely unusable.
-+ EDIT: Interestingly, the HPET only supports IRQ2 when using the default
-+ PIIX chipset, which, combined with this bug, makes it completely
-+ unusable.
-  =
+> Hopefully Richard can chime in on this.
 
-  [0]:
-  https://github.com/qemu/qemu/blob/37560c259d7a0d6aceb96e9d6903ee002f4e5e0=
-c/hw/i386/kvm/ioapic.c#L40
-  =
+It would be interesting to know whether you do hit this issue
+somewhere, or whether you have a strong view about the clarification to
+the KVM ABI.
 
-  [1]: https://uefi.org/sites/default/files/resources/ACPI_6_2.pdf
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1834051
-
-Title:
-  IRQ2 ignored under KVM when using IOAPIC
-
-Status in QEMU:
-  New
-
-Bug description:
-  When using KVM, and an OS that supports the IOAPIC, interrupts mapped
-  on IRQ2 (for instance, routing an HPET timer on interrupt 2) will
-  cause the interrupts to never be delivered. This is because QEmu, when
-  setting up the KVM interrupt routes, will not set one up for IRQ2[0].
-  When running without KVM, IRQ2 is identity-mapped to GSI2.
-
-  My understanding is that IRQs should be identity mapped to their
-  equivalent GSI unless a redirection entry is present in the MADT. This
-  is supported by ACPI 6.2 spec[1], 5.2.12.5 Interrupt Source Override
-  Structure, which claims: "It is assumed that the ISA interrupts will
-  be identity-mapped into the first I/O APIC sources.".
-
-  I stumbled across this while working on my own custom OS, got very
-  confused why the HPET wasn't triggering any interruption - and even
-  more confused why the behavior only happened in KVM and not in non-
-  KVM.
-
-  EDIT: Interestingly, the HPET only supports IRQ2 when using the
-  default PIIX chipset, which, combined with this bug, makes it
-  completely unusable.
-
-  [0]:
-  https://github.com/qemu/qemu/blob/37560c259d7a0d6aceb96e9d6903ee002f4e5e0=
-c/hw/i386/kvm/ioapic.c#L40
-
-  [1]: https://uefi.org/sites/default/files/resources/ACPI_6_2.pdf
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1834051/+subscriptions
+Cheers
+---Dave
 
