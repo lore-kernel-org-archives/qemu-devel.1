@@ -2,66 +2,85 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 759EDC4646B
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 22:49:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2060C4646B
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 22:58:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4762220665
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 22:49:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4762220665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 96B0720663
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 22:58:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="HYJv474W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96B0720663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55228 helo=lists.gnu.org)
+Received: from localhost ([::1]:55278 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfXmV-0004SZ-94
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 18:49:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39154)
+	id 1hfXuR-0007vu-Nq
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 18:57:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41037)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <wainersm@redhat.com>) id 1hfXl2-000392-Rp
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 18:48:17 -0400
+ (envelope-from <prvs=0714f841a=atish.patra@wdc.com>)
+ id 1hfXsp-0006tB-H2
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 18:56:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wainersm@redhat.com>) id 1hfXl1-0008O5-OX
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 18:48:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48266)
+ (envelope-from <prvs=0714f841a=atish.patra@wdc.com>)
+ id 1hfXso-00065y-6S
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 18:56:19 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:56763)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1hfXl1-0008Ln-Hi
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 18:48:15 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AB58530917AC
- for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 22:48:11 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-123-99.rdu2.redhat.com
- [10.10.123.99])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6DE6F100033E;
- Mon, 24 Jun 2019 22:48:07 +0000 (UTC)
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-References: <20190608233447.27970-1-ehabkost@redhat.com>
- <20190624180326.GJ1862@habkost.net>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <b55a1b4d-7aa4-ccb4-33f8-aae583776d3d@redhat.com>
-Date: Mon, 24 Jun 2019 19:48:06 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.5.2
+ (Exim 4.71) (envelope-from <prvs=0714f841a=atish.patra@wdc.com>)
+ id 1hfXsn-00063f-D4; Mon, 24 Jun 2019 18:56:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1561416977; x=1592952977;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=3AUXQQAZEh4jzG7H7BvgMbcDXA2spgGdkyHwKqSnOD8=;
+ b=HYJv474WpI8VdNLinkCciL7MGy6GHcPsFPRNDUEFlfwfhaSfivxFFQAW
+ 2TW/0QS17XSHQcHUwVBO6IrYYsiJJp4DvH7AsW+xYHwHZIg7mJWyr4lku
+ 6FZo7F6qPZEzcMdmS9PvPoWVk0t0vS08OKHhpCURatH9t/iNvnslSqcH6
+ yeiAugZ0mNWzLCacSiKuL81K8c9y6CsRyFJNXPiaPdQqVynSQONzcjfcp
+ 5uEiX5R0SYRUjk96s6Rt2Sig81b+RM8OIOz4KgOk4jTWsYnbS+xnyPBIW
+ tyiT8Fkugk6gA9jRx1Ekd+JaO2LcFWgkShsXkkv062t1OPA90bpA4DibU Q==;
+X-IronPort-AV: E=Sophos;i="5.63,413,1557158400"; d="scan'208";a="112640758"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 25 Jun 2019 06:56:13 +0800
+IronPort-SDR: Jyex/PcCaIWT7aFA/2ILmMqn/z92QR4jsWLoX+4ct4LK/DDorOSZerdSnqHhKE7c3DS+UE1NdA
+ r8Mo+08ZIqe0jkFKhUUvCfDyoQeF2RAkY3HoeCxhH6nm6ocY0aLPTjzIDPl/MzoSywCEyI7hUs
+ ZdXWmDkp9Dy2V+tr6dEuZJGQyYTWV9dMyUaQ0QfYK2htZ0UbVpnGHlJB/bmarDuyocvTHERXcE
+ ngbwMrldjLisI8KkgJhsHMPO5gge0A7JoRzfz+pthMP0DDaugblHIi9mgWSDrT29VoTSTcP0Jq
+ xUinqvvt/50RueA24VhTR65k
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep01.wdc.com with ESMTP; 24 Jun 2019 15:55:25 -0700
+IronPort-SDR: Nel1QvdyK91cMWxn3Xw6K+qj82jIFE2HpfBHAzjRoVkcWHXbWvOChewBzgCZ4Gfjy9uVrDAtrO
+ /ilFSkBOj5NI1ybnehf9SB4DDboZvwO9dIazGW/7KhfONz6McTOgqIzlxAzQQfIjdDy7I+h/mc
+ EY6vSjn8hH3RR4AUQNzbYPp8vs8Ko+ijHCko0cEkNxEgMqigyMcIleChHcRDGbpJUmwbVUqM+Z
+ cQ39PC2OWD2Tj14LBN3GSEgcZNtuyDGqqwNRg8G9m9Xe0D8RnExxGBsli++nWu064QN2sGO/e1
+ y5M=
+Received: from jedi-01.sdcorp.global.sandisk.com (HELO
+ jedi-01.int.fusionio.com) ([10.11.143.218])
+ by uls-op-cesaip01.wdc.com with ESMTP; 24 Jun 2019 15:56:14 -0700
+From: Atish Patra <atish.patra@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Date: Mon, 24 Jun 2019 15:54:46 -0700
+Message-Id: <20190624225446.22597-1-atish.patra@wdc.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <20190624180326.GJ1862@habkost.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Mon, 24 Jun 2019 22:48:11 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 0/1] Export machine type deprecation
- info through QMP
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 216.71.153.144
+X-Mailman-Approved-At: Mon, 24 Jun 2019 18:56:58 -0400
+Subject: [Qemu-devel]  [PATCH] riscv: virt: Add cpu-topology DT node.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,44 +92,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>,
- Michal Privoznik <mprivozn@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Atish Patra <atish.patra@wdc.com>, Palmer Dabbelt <palmer@sifive.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Currently, there is no cpu topology defined in RISC-V.
+Define a device tree node that clearly describes the
+entire topology. This saves the trouble of scanning individual
+cache to figure out the topology.
 
+Here is the linux kernel patch series that enables topology
+for RISC-V.
 
-On 06/24/2019 03:03 PM, Eduardo Habkost wrote:
-> Any objections to this?  I'm planning to merge it this week.
+http://lists.infradead.org/pipermail/linux-riscv/2019-June/005072.html
 
-IMHO, 1+. So I don't have objections.
+CPU topology after applying this patch in QEMU & above series in kernel
 
-- Wainer
+/ # cat /sys/devices/system/cpu/cpu2/topology/thread_siblings_list
+2
+/ # cat /sys/devices/system/cpu/cpu2/topology/physical_package_id
+0
+/ # cat /sys/devices/system/cpu/cpu2/topology/core_siblings_list
+0-7
 
->
-> On Sat, Jun 08, 2019 at 08:34:46PM -0300, Eduardo Habkost wrote:
->> Changes v1 -> v2:
->> * I've decided to get rid of the status-message and
->>    suggested-alternative fields, to avoid more bikeshedding.
->>
->> This series adds machine type deprecation information to the
->> output of the `query-machines` QMP command.  With this, libvirt
->> and management software will be able to show this information to
->> users and/or suggest changes to VM configuration to avoid
->> deprecated machine types.
->>
->> Eduardo Habkost (1):
->>    qmp: Add deprecation information to query-machines
->>
->>   qapi/misc.json | 7 ++++++-
->>   vl.c           | 1 +
->>   2 files changed, 7 insertions(+), 1 deletion(-)
->>
->> -- 
->> 2.18.0.rc1.1.g3f1ff2140
->>
+Signed-off-by: Atish Patra <atish.patra@wdc.com>
+---
+ hw/riscv/virt.c | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
+
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index 84d94d0c42d8..da0b8aa18747 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -203,9 +203,12 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+         qemu_fdt_setprop_string(fdt, nodename, "status", "okay");
+         qemu_fdt_setprop_cell(fdt, nodename, "reg", cpu);
+         qemu_fdt_setprop_string(fdt, nodename, "device_type", "cpu");
++        qemu_fdt_setprop_cell(fdt, nodename, "phandle", cpu_phandle);
++        qemu_fdt_setprop_cell(fdt, nodename, "linux,phandle", cpu_phandle);
++        int intc_phandle = phandle++;
+         qemu_fdt_add_subnode(fdt, intc);
+-        qemu_fdt_setprop_cell(fdt, intc, "phandle", cpu_phandle);
+-        qemu_fdt_setprop_cell(fdt, intc, "linux,phandle", cpu_phandle);
++        qemu_fdt_setprop_cell(fdt, intc, "phandle", intc_phandle);
++        qemu_fdt_setprop_cell(fdt, intc, "linux,phandle", intc_phandle);
+         qemu_fdt_setprop_string(fdt, intc, "compatible", "riscv,cpu-intc");
+         qemu_fdt_setprop(fdt, intc, "interrupt-controller", NULL, 0);
+         qemu_fdt_setprop_cell(fdt, intc, "#interrupt-cells", 1);
+@@ -214,6 +217,20 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+         g_free(nodename);
+     }
+ 
++    /* Add cpu-topology node */
++    qemu_fdt_add_subnode(fdt, "/cpus/cpu-map");
++    qemu_fdt_add_subnode(fdt, "/cpus/cpu-map/cluster0");
++    for (cpu = s->soc.num_harts - 1; cpu >= 0; cpu--) {
++        char *core_nodename = g_strdup_printf("/cpus/cpu-map/cluster0/core%d",
++                                              cpu);
++        char *cpu_nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
++        uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, cpu_nodename);
++        qemu_fdt_add_subnode(fdt, core_nodename);
++        qemu_fdt_setprop_cell(fdt, core_nodename, "cpu", intc_phandle);
++        g_free(core_nodename);
++        g_free(cpu_nodename);
++    }
++
+     cells =  g_new0(uint32_t, s->soc.num_harts * 4);
+     for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
+         nodename =
+-- 
+2.21.0
 
 
