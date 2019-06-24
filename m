@@ -2,112 +2,72 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 986E9C43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 15:53:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFE6BC43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 16:09:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CC9F20663
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 15:53:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CC9F20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8716720652
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 16:09:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8716720652
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52568 helo=lists.gnu.org)
+Received: from localhost ([::1]:52808 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfRHs-00029j-8I
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 11:53:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49262)
+	id 1hfRXG-00023m-N8
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 12:09:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52843)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <lvivier@redhat.com>) id 1hfRCo-0007im-KF
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 11:48:32 -0400
+ (envelope-from <bounces@canonical.com>) id 1hfRP5-0005j1-T7
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 12:01:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1hfRCm-0004dl-Eh
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 11:48:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39314)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hfRCm-0004Is-4O
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 11:48:28 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 891A98667E
- for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 15:48:07 +0000 (UTC)
-Received: from [10.36.117.25] (ovpn-117-25.ams2.redhat.com [10.36.117.25])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A7B2E60BFB;
- Mon, 24 Jun 2019 15:47:59 +0000 (UTC)
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-References: <20190529044020.27003-1-kraxel@redhat.com>
- <20190529044020.27003-9-kraxel@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <af1192c3-1b56-eee3-35ef-25787f6ad67d@redhat.com>
-Date: Mon, 24 Jun 2019 17:47:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <bounces@canonical.com>) id 1hfRP2-0005Ei-Bz
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 12:01:10 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45078)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hfROz-00055t-1A
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 12:01:08 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hfROl-0000fz-RN
+ for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 16:00:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id CC5392E806F
+ for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 16:00:51 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190529044020.27003-9-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Mon, 24 Jun 2019 15:48:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Mon, 24 Jun 2019 15:48:16 -0000
+From: roblabla <1834051@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: roblabla
+X-Launchpad-Bug-Reporter: roblabla (roblabla)
+X-Launchpad-Bug-Modifier: roblabla (roblabla)
+References: <156138866047.31005.4592891012762616724.malonedeb@chaenomeles.canonical.com>
+Message-Id: <156139129648.31249.9749384155457458398.launchpad@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18991";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: af4db308cdae79ffa619b58c87448436729be3a2
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL 8/9] virtio-gpu: split virtio-gpu-pci &
- virtio-vga
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1834051] Re: IRQ2 ignored under KVM when using
+ IOAPIC
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -116,59 +76,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Reply-To: Bug 1834051 <1834051@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29/05/2019 06:40, Gerd Hoffmann wrote:
-> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> Add base classes that are common to vhost-user-gpu-pci and
-> vhost-user-vga.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Message-id: 20190524130946.31736-9-marcandre.lureau@redhat.com
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/display/virtio-vga.h     |  32 +++++++++
->  hw/display/virtio-gpu-pci.c |  52 +++++++++-----
->  hw/display/virtio-vga.c     | 135 ++++++++++++++++++------------------
->  MAINTAINERS                 |   2 +-
->  4 files changed, 137 insertions(+), 84 deletions(-)
->  create mode 100644 hw/display/virtio-vga.h
->=20
+** Description changed:
 
-This patch breaks something in the migration (no need of an OS, tested du=
-ring SLOF sequence).
+  When using KVM, and an OS that supports the IOAPIC, interrupts mapped on
+  IRQ2 (for instance, routing an HPET timer on interrupt 2) will cause the
+  interrupts to never be delivered. This is because QEmu, when setting up
+  the KVM interrupt routes, will not set one up for IRQ2[0]. When running
+  without KVM, IRQ2 is identity-mapped to GSI2.
+  =
 
-Tested between v4.0.0 and master.
+  My understanding is that IRQs should be identity mapped to their
+  equivalent GSI unless a redirection entry is present in the MADT. This
+  is supported by ACPI 6.2 spec[1], 5.2.12.5 Interrupt Source Override
+  Structure, which claims: "It is assumed that the ISA interrupts will be
+  identity-mapped into the first I/O APIC sources.".
+  =
 
-v4.0.0: ppc64-softmmu/qemu-system-ppc64 -machine pseries-4.0 \
-                                        -device virtio-gpu-pci \
-                                        -serial mon:stdio -incoming tcp:0=
-:4444
+  I stumbled across this while working on my own custom OS, got very
+  confused why the HPET wasn't triggering any interruption - and even more
+  confused why the behavior only happened in KVM and not in non-KVM.
+  =
 
-master: ppc64-softmmu/qemu-system-ppc64 -machine pseries-4.0 \
-                                        -device virtio-gpu-pci \
-                                        -serial mon:stdio
+- Version tested: QEMU emulator version 4.0.50
+- (v4.0.0-226-g8482ff2eb3-dirty)
++ EDIT: Interestingly, the HPET only supports IRQ2 under qemu, which,
++ combined with this bug, makes it completely unusable.
+  =
 
+  [0]:
+  https://github.com/qemu/qemu/blob/37560c259d7a0d6aceb96e9d6903ee002f4e5e0=
+c/hw/i386/kvm/ioapic.c#L40
+  =
 
-master: (qemu) migrate tcp:localhost:4444
+  [1]: https://uefi.org/sites/default/files/resources/ACPI_6_2.pdf
 
-v4.0.0:
+-- =
 
-  qemu-system-ppc64: get_pci_config_device: Bad config data: i=3D0x34 rea=
-d: 98 device: 84 cmask: ff wmask: 0 w1cmask:0
-  qemu-system-ppc64: Failed to load PCIDevice:config
-  qemu-system-ppc64: Failed to load virtio-gpu:virtio
-  qemu-system-ppc64: error while loading state for instance 0x0 of device=
- 'pci@800000020000000:02.0/virtio-gpu'
-  qemu-system-ppc64: load of migration failed: Invalid argument
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1834051
 
-Is this something known?
+Title:
+  IRQ2 ignored under KVM when using IOAPIC
 
-Thanks,
-Laurent
+Status in QEMU:
+  New
 
+Bug description:
+  When using KVM, and an OS that supports the IOAPIC, interrupts mapped
+  on IRQ2 (for instance, routing an HPET timer on interrupt 2) will
+  cause the interrupts to never be delivered. This is because QEmu, when
+  setting up the KVM interrupt routes, will not set one up for IRQ2[0].
+  When running without KVM, IRQ2 is identity-mapped to GSI2.
+
+  My understanding is that IRQs should be identity mapped to their
+  equivalent GSI unless a redirection entry is present in the MADT. This
+  is supported by ACPI 6.2 spec[1], 5.2.12.5 Interrupt Source Override
+  Structure, which claims: "It is assumed that the ISA interrupts will
+  be identity-mapped into the first I/O APIC sources.".
+
+  I stumbled across this while working on my own custom OS, got very
+  confused why the HPET wasn't triggering any interruption - and even
+  more confused why the behavior only happened in KVM and not in non-
+  KVM.
+
+  EDIT: Interestingly, the HPET only supports IRQ2 when using the
+  default PIIX chipset, which, combined with this bug, makes it
+  completely unusable.
+
+  [0]:
+  https://github.com/qemu/qemu/blob/37560c259d7a0d6aceb96e9d6903ee002f4e5e0=
+c/hw/i386/kvm/ioapic.c#L40
+
+  [1]: https://uefi.org/sites/default/files/resources/ACPI_6_2.pdf
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1834051/+subscriptions
 
