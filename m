@@ -2,59 +2,66 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FE05C43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 18:22:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A088C43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 18:37:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D21B120645
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 18:22:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D21B120645
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sing.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 5145F20657
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 18:37:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5145F20657
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53766 helo=lists.gnu.org)
+Received: from localhost ([::1]:53842 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfTbp-0005lg-Sp
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 14:22:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57364)
+	id 1hfTqo-0002m7-7a
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 14:37:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34694)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <joel@sing.id.au>) id 1hfTPm-0007kS-2u
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 14:10:03 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hfToy-00025b-QD
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 14:36:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <joel@sing.id.au>) id 1hfTPk-0002Lq-0s
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 14:10:01 -0400
-Received: from stingray.exigere.com.au ([162.217.113.74]:23701)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <joel@sing.id.au>)
- id 1hfTPb-0000UC-AS; Mon, 24 Jun 2019 14:09:52 -0400
-Received: from hippo.sing.id.au (exi2311632.lnk.telstra.net [144.139.233.124])
- by stingray.exigere.com.au (OpenSMTPD) with ESMTPSA id a7f122bb
- (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO); 
- Tue, 25 Jun 2019 04:34:49 +1000 (AEST)
-Received: from localhost (hippo.sing.id.au [local])
- by hippo.sing.id.au (OpenSMTPD) with ESMTPA id c019513a;
- Tue, 25 Jun 2019 04:08:38 +1000 (AEST)
-Date: Tue, 25 Jun 2019 04:08:38 +1000
-From: Joel Sing <joel@sing.id.au>
-To: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <20190624180837.GM61734@hippo.sing.id.au>
-References: <20190616191900.GH61734@hippo.sing.id.au>
- <41ef5fbf-f438-e60a-2fba-a72e3ad422f9@linaro.org>
+ (envelope-from <no-reply@patchew.org>) id 1hfTox-0002eA-Fx
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 14:36:04 -0400
+Resent-Date: Mon, 24 Jun 2019 14:36:04 -0400
+Resent-Message-Id: <E1hfTox-0002eA-Fx@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21821)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hfTou-0002aT-Gu; Mon, 24 Jun 2019 14:36:00 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1561401335; cv=none; d=zoho.com; s=zohoarc; 
+ b=HZ3wq/DBwtsuwo2x2i+iYq86VrnrQNjoCTENbR8nkbmz435bORM4LLfIjfKDm9OsgpOD60x20t0GkNE4pdrknd1d6I/ESAZTbxBwx8fx8Nd2MQhbfvR7u8PZcPdMxPH6tr5StrQdadywXFO0EmSUwaSNMXjMjdKJx08Je3zBGq8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1561401335;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=gdW1+zA7U9nQbKoEF1GLVSCxvDA9hAJgi1fiKLQH+yY=; 
+ b=fC4UZVOVFhGdu8BOmbnbbXmnmjrx5tkXk4tI2NjC7CjniIme8OQn2dQTiqLHHRF9BGOgWQdD8m8kvn1UUXlmGP5NgkrFbEk4zEEEzmrSo7AQPsAneowd5W8lnNapYNvYD1BvSIb8AHaQ5+kJVVO5dSv1b5x+3JJ/H+nUSeRUIDA=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1561401333485467.54896003538715;
+ Mon, 24 Jun 2019 11:35:33 -0700 (PDT)
+Message-ID: <156140133234.24.13306518272551026541@c4a48874b076>
+In-Reply-To: <20190624173935.25747-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <41ef5fbf-f438-e60a-2fba-a72e3ad422f9@linaro.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 162.217.113.74
-Subject: Re: [Qemu-devel] [PATCH] atomic failures on qemu-system-riscv64
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: mreitz@redhat.com
+Date: Mon, 24 Jun 2019 11:35:33 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 135.84.80.218
+Subject: Re: [Qemu-devel] [PATCH v4 00/14] block: Try to create well-typed
+ json:{} filenames
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,113 +73,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: me@carlosedp.com, qemu-riscv@nongnu.org, palmer@sifive.com,
- qemu-devel@nongnu.org, Alistair.Francis@wdc.com, marco@decred.org
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mdroth@linux.vnet.ibm.com, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, armbru@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19-06-17 16:52:44, Richard Henderson wrote:
-> On 6/16/19 12:19 PM, Joel Sing wrote:
-> > +    /*
-> > +     * Clear the load reservation, since an SC must fail if there is
-> > +     * an SC to any address, in between an LR and SC pair.
-> > +     */
-> > +    tcg_gen_movi_tl(load_res, 0);
-> > +
-> >      gen_set_label(l2);
-> 
-> This clear needs to be moved down below label l2.
-> Otherwise, with lr / sc / sc, the second sc could succeed in error.
-
-Indeed, thanks.
-
-> FWIW, other targets have used -1 as the "invalid" load reservation, since the
-> architecture does not require address 0 to be unmapped.  This should be quite
-> visible in M-mode with paging disabled and ram at offset 0.  Often, other
-> targets require alignment for the lr/sc address, though I don't see that for riscv.
-
-I've switched to -1 as suggested. Regarding the alignment for reservations, the
-specification does require this, although I do not recall seeing any enforcement
-of this by qemu itself.
-
-New diff follows.
-
-From 8ef31a2ce8ef1cbeee92995a0b2994f480e9bb6d Mon Sep 17 00:00:00 2001
-From: Joel Sing <joel@sing.id.au>
-Date: Tue, 25 Jun 2019 02:44:24 +1000
-Subject: [PATCH] Clear load reservations on qemu riscv target
-
-This prevents a load reservation from being placed in one context/process,
-then being used in another, resulting in an SC succeeding incorrectly and
-breaking atomics.
-
-Signed-off-by: Joel Sing <joel@sing.id.au>
----
- target/riscv/cpu.c                      | 1 +
- target/riscv/cpu_helper.c               | 9 +++++++++
- target/riscv/insn_trans/trans_rva.inc.c | 8 +++++++-
- 3 files changed, 17 insertions(+), 1 deletion(-)
-
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index d61bce6d55..e7c8bf48fc 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -281,6 +281,7 @@ static void riscv_cpu_reset(CPUState *cs)
-     env->pc = env->resetvec;
- #endif
-     cs->exception_index = EXCP_NONE;
-+    env->load_res = -1;
-     set_default_nan_mode(1, &env->fp_status);
- }
- 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index b17f169681..6a07b12e65 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -113,6 +113,15 @@ void riscv_cpu_set_mode(CPURISCVState *env, target_ulong newpriv)
-     }
-     /* tlb_flush is unnecessary as mode is contained in mmu_idx */
-     env->priv = newpriv;
-+
-+    /* Clear the load reservation - otherwise a reservation placed in one
-+     * context/process can be used by another, resulting in an SC succeeding
-+     * incorrectly. Version 2.2 of the ISA specification explicitly requires
-+     * this behaviour, while later revisions say that the kernel "should" use
-+     * an SC instruction to force the yielding of a load reservation on a
-+     * preemptive context switch. As a result, do both.
-+     */
-+    env->load_res = -1;
- }
- 
- /* get_physical_address - get the physical address for this virtual address
-diff --git a/target/riscv/insn_trans/trans_rva.inc.c b/target/riscv/insn_trans/trans_rva.inc.c
-index f6dbbc065e..fadd88849e 100644
---- a/target/riscv/insn_trans/trans_rva.inc.c
-+++ b/target/riscv/insn_trans/trans_rva.inc.c
-@@ -61,7 +61,7 @@ static inline bool gen_sc(DisasContext *ctx, arg_atomic *a, TCGMemOp mop)
- 
-     gen_set_label(l1);
-     /*
--     * Address comparion failure.  However, we still need to
-+     * Address comparison failure.  However, we still need to
-      * provide the memory barrier implied by AQ/RL.
-      */
-     tcg_gen_mb(TCG_MO_ALL + a->aq * TCG_BAR_LDAQ + a->rl * TCG_BAR_STRL);
-@@ -69,6 +69,12 @@ static inline bool gen_sc(DisasContext *ctx, arg_atomic *a, TCGMemOp mop)
-     gen_set_gpr(a->rd, dat);
- 
-     gen_set_label(l2);
-+    /*
-+     * Clear the load reservation, since an SC must fail if there is
-+     * an SC to any address, in between an LR and SC pair.
-+     */
-+    tcg_gen_movi_tl(load_res, -1);
-+
-     tcg_temp_free(dat);
-     tcg_temp_free(src1);
-     tcg_temp_free(src2);
--- 
-2.21.0
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYyNDE3MzkzNS4yNTc0
+Ny0xLW1yZWl0ekByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDYyNDE3MzkzNS4yNTc0Ny0xLW1yZWl0ekByZWRo
+YXQuY29tClR5cGU6IHNlcmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0IDAwLzE0
+XSBibG9jazogVHJ5IHRvIGNyZWF0ZSB3ZWxsLXR5cGVkIGpzb246e30gZmlsZW5hbWVzCgo9PT0g
+VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9k
+ZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
+IGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
+ICd0ZXN0JwpkZGQ2NjlhIGJsb2NrOiBNYWtlIHVzZSBvZiBRQVBJIGRlZmF1bHRzCjNiY2Y5MjIg
+aW90ZXN0czogcWNvdzIncyBlbmNyeXB0LmZvcm1hdCBpcyBub3cgb3B0aW9uYWwKMTU1YzFkYiBp
+b3Rlc3RzOiBUZXN0IGludGVybmFsIG9wdGlvbiB0eXBpbmcKMzY0ZWFjMSBibG9jazogVHJ5IHRv
+IGNyZWF0ZSB3ZWxsIHR5cGVkIGpzb246e30gZmlsZW5hbWVzCjExNzI2ZDIgcWFwaTogRm9ybWFs
+aXplIHFjb3cgZW5jcnlwdGlvbiBwcm9iaW5nCjU2NzY0NGYgcWFwaTogRm9ybWFsaXplIHFjb3cy
+IGVuY3J5cHRpb24gcHJvYmluZwo0ZWIzY2E0IHRlc3RzOiBBZGQgUUFQSSBvcHRpb25hbCBkaXNj
+cmltaW5hdG9yIHRlc3RzCmYzZDlmNTMgdGVzdHM6IFRlc3QgUUFQSSBkZWZhdWx0IHZhbHVlcyBm
+b3Igc3RydWN0IG1lbWJlcnMKMjg2MjgyNCB0ZXN0LXFhcGk6IFByaW50IHN0cnVjdCBtZW1iZXJz
+JyBkZWZhdWx0IHZhbHVlcwpmZjdhN2M1IHFhcGk6IERvY3VtZW50IGRlZmF1bHQgdmFsdWVzIGZv
+ciBzdHJ1Y3QgbWVtYmVycwpmYWVmMzdmIHFhcGk6IEFsbG93IG9wdGlvbmFsIGRpc2NyaW1pbmF0
+b3JzCjY0YWU3M2MgcWFwaTogSW50cm9kdWNlIGRlZmF1bHQgdmFsdWVzIGZvciBzdHJ1Y3QgbWVt
+YmVycwpmNDg1OTUwIHFhcGk6IE1vdmUgdG9fY19zdHJpbmcoKSB0byBjb21tb24ucHkKODcxMWJi
+NCBxYXBpOiBQYXJzZSBudW1lcmljIHZhbHVlcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xNCBD
+aGVja2luZyBjb21taXQgODcxMWJiNGMzMGYzIChxYXBpOiBQYXJzZSBudW1lcmljIHZhbHVlcykK
+Mi8xNCBDaGVja2luZyBjb21taXQgZjQ4NTk1MGM0NTk1IChxYXBpOiBNb3ZlIHRvX2Nfc3RyaW5n
+KCkgdG8gY29tbW9uLnB5KQozLzE0IENoZWNraW5nIGNvbW1pdCA2NGFlNzNjZmVkZDYgKHFhcGk6
+IEludHJvZHVjZSBkZWZhdWx0IHZhbHVlcyBmb3Igc3RydWN0IG1lbWJlcnMpCjQvMTQgQ2hlY2tp
+bmcgY29tbWl0IGZhZWYzN2Y2Y2Q0NSAocWFwaTogQWxsb3cgb3B0aW9uYWwgZGlzY3JpbWluYXRv
+cnMpCjUvMTQgQ2hlY2tpbmcgY29tbWl0IGZmN2E3YzViNjAyNCAocWFwaTogRG9jdW1lbnQgZGVm
+YXVsdCB2YWx1ZXMgZm9yIHN0cnVjdCBtZW1iZXJzKQo2LzE0IENoZWNraW5nIGNvbW1pdCAyODYy
+ODI0OWRjZjEgKHRlc3QtcWFwaTogUHJpbnQgc3RydWN0IG1lbWJlcnMnIGRlZmF1bHQgdmFsdWVz
+KQo3LzE0IENoZWNraW5nIGNvbW1pdCBmM2Q5ZjUzNDNhOTkgKHRlc3RzOiBUZXN0IFFBUEkgZGVm
+YXVsdCB2YWx1ZXMgZm9yIHN0cnVjdCBtZW1iZXJzKQpFUlJPUjogSW52YWxpZCBVVEYtOCwgcGF0
+Y2ggYW5kIGNvbW1pdCBtZXNzYWdlIHNob3VsZCBiZSBlbmNvZGVkIGluIFVURi04CiMxMDY6IEZJ
+TEU6IHRlc3RzL3FhcGktc2NoZW1hL3FhcGktc2NoZW1hLXRlc3Qub3V0OjQyMDoKKyAgICBtZW1i
+ZXIgc3RyOiBzdHIgb3B0aW9uYWw9VHJ1ZSBkZWZhdWx0PWZvbyBc6bm/IiInCiAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpXQVJOSU5HOiBhZGRl
+ZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRp
+bmc/CiMxMTE6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5p
+bmdzLCAxNjIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNy8xNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
+ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
+cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
+RVJTLgoKOC8xNCBDaGVja2luZyBjb21taXQgNGViM2NhNDU3Y2EzICh0ZXN0czogQWRkIFFBUEkg
+b3B0aW9uYWwgZGlzY3JpbWluYXRvciB0ZXN0cykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRl
+bGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzM6IApuZXcg
+ZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA2NyBsaW5lcyBj
+aGVja2VkCgpQYXRjaCA4LzE0IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjkvMTQgQ2hlY2tp
+bmcgY29tbWl0IDU2NzY0NGY2YWFhOCAocWFwaTogRm9ybWFsaXplIHFjb3cyIGVuY3J5cHRpb24g
+cHJvYmluZykKMTAvMTQgQ2hlY2tpbmcgY29tbWl0IDExNzI2ZDI1YzM2NyAocWFwaTogRm9ybWFs
+aXplIHFjb3cgZW5jcnlwdGlvbiBwcm9iaW5nKQoxMS8xNCBDaGVja2luZyBjb21taXQgMzY0ZWFj
+MWYzMWZjIChibG9jazogVHJ5IHRvIGNyZWF0ZSB3ZWxsIHR5cGVkIGpzb246e30gZmlsZW5hbWVz
+KQoxMi8xNCBDaGVja2luZyBjb21taXQgMTU1YzFkYmRmM2YwIChpb3Rlc3RzOiBUZXN0IGludGVy
+bmFsIG9wdGlvbiB0eXBpbmcpCjEzLzE0IENoZWNraW5nIGNvbW1pdCAzYmNmOTIyNzBlODYgKGlv
+dGVzdHM6IHFjb3cyJ3MgZW5jcnlwdC5mb3JtYXQgaXMgbm93IG9wdGlvbmFsKQoxNC8xNCBDaGVj
+a2luZyBjb21taXQgZGRkNjY5YWQ5NmEwIChibG9jazogTWFrZSB1c2Ugb2YgUUFQSSBkZWZhdWx0
+cykKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoK
+ClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAx
+OTA2MjQxNzM5MzUuMjU3NDctMS1tcmVpdHpAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gv
+P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
+ZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
+YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
 
