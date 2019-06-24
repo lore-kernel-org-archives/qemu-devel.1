@@ -8,82 +8,74 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 178D2C43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 06:02:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D3D1C43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 06:05:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5E252083D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 06:02:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6B4922089F
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 06:05:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bgwUEwz+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5E252083D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GUt5ecBz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B4922089F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48142 helo=lists.gnu.org)
+Received: from localhost ([::1]:48154 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfI3U-0005yV-2k
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 02:02:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35140)
+	id 1hfI6a-0007OF-AK
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 02:05:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35879)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vandersonmr2@gmail.com>) id 1hfHxI-0000jh-01
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 01:55:52 -0400
+ (envelope-from <sjitindarsingh@gmail.com>) id 1hfHzp-0003Yd-1z
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 01:58:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vandersonmr2@gmail.com>) id 1hfHxH-00040M-1F
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 01:55:51 -0400
-Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:41255)
+ (envelope-from <sjitindarsingh@gmail.com>) id 1hfHzn-0005zn-O5
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 01:58:28 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:36795)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <vandersonmr2@gmail.com>)
- id 1hfHxG-0003zV-TO
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 01:55:50 -0400
-Received: by mail-qt1-x841.google.com with SMTP id d17so13222051qtj.8
- for <qemu-devel@nongnu.org>; Sun, 23 Jun 2019 22:55:50 -0700 (PDT)
+ (Exim 4.71) (envelope-from <sjitindarsingh@gmail.com>)
+ id 1hfHzk-0005wp-0r; Mon, 24 Jun 2019 01:58:24 -0400
+Received: by mail-pf1-x442.google.com with SMTP id r7so6870312pfl.3;
+ Sun, 23 Jun 2019 22:58:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=sk8uSCdQ3hpnmo3bU04NmJku/FzpWj9gaS0iIIIjZe8=;
- b=bgwUEwz+jk2hAR+SpgR14G2rp6yZetZ3n2wHPX7LJKei0CVC2CjGn5YgzstJNtLagu
- AMdkFigZ/FvWyJI8IJpaM3FMdNcCFu1FOxndDHdgYzRVrhHFcJpoJQzZhjBSnibIGI6j
- dEnfmfTxoCUJwys2qUUvdbGJ+fhUlg+/gZDv5y/SZhckQZRf9G6SDD0oT8FFjBOLSZEn
- v4H2PQBv0KdA13WaIcf0Z55qBaqkl8TLXG8hyIie4kVpVwSoCcq6jgsaMyRN/QJ7ACuW
- 7Fmji7pRCcN0d9deR0WvS8bPd6oFHt0+68IU5v6yY/WPlIeZYxIiloiIZR/7ujm0sfmn
- RYmw==
+ h=from:to:cc:subject:date:message-id;
+ bh=e1sCAFcw0EvnjOzpHw97/K0fRePmkZE8GMoO+SZykS0=;
+ b=GUt5ecBzxgnbVLwWuVs+RcvW3DvNrqnRwZ+Fg2HiTr2GEVQhxSkpTRG/V7G2hNlcGq
+ SnA3/h73O/eKLOm9VddjrDlxwF8dceHYh85NsioWqck2Eh4+gQ7IhCNNkddtNwBdI4Qi
+ iLbgvJ08zYmNE5b/EVwuT41uKClJzb6TGUqERY3NP5zh+JI7V1N6D6qHfZhG7NcGsTX1
+ fg3nFobLMRKhIMGPsp17qgy28hD3N1YZBBbsVqJ2OYXnn/Xnia8FF44rUDy4GUwvh9uL
+ aNrJNGhhSZODGA/eN66i3D+1hXmxY/DV/WLNP0jjIQwGKrG/gTPr6CEpCCThwwExLu/W
+ YCRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=sk8uSCdQ3hpnmo3bU04NmJku/FzpWj9gaS0iIIIjZe8=;
- b=QqVEuBUAG4A8QxENfvAoVm8WryYyeLwD0RLV17oGCFiFzWGTPyZUnJzhZBFK0XheQs
- WXWOjJI/TaO0JLEg66qgqJQwCxRisTALC/tFWaR3zS6mY4qx9doVsjxPnJ2ysrD6DpKD
- e6TpIaEzrsIjVdUKc9CHnxNFzsAvaZtOuP0mpbPOP5IjKaFr/7f7V7g9rVVoKMV2CtzP
- sUoXYhVooBfIWhOOHoeSQsi+ST0LJRVNcJgg4cYn+q5mHJRdWdjLyDWDcK/2o5RJPEPh
- IaO9C86fd/iXmmKL4ZL1quesVhggzy5JKWsXZIcMPgmkRG7ZsEdn3q9N8QpHDgxR5IoG
- JTtg==
-X-Gm-Message-State: APjAAAVj5kBVrWXVU2toHiNyYSyGRmhZEzJXhaJUzO4naY795ZVoiF9a
- xm4lbd8ejQuykN4BUNXTrHbP8AmfUKs=
-X-Google-Smtp-Source: APXvYqwfn7KY9bzRr/H8RSQIkhLEhALGt1LNPTy29pzS9uW0mbyynqjl8+hF9QWiZ1WDWZyjG9yPGQ==
-X-Received: by 2002:aed:24d9:: with SMTP id
- u25mr130587406qtc.111.1561355750187; 
- Sun, 23 Jun 2019 22:55:50 -0700 (PDT)
-Received: from localhost.localdomain ([2804:7f4:548d:5237:c368:80a0:cb96:64bf])
- by smtp.googlemail.com with ESMTPSA id t80sm5154440qka.87.2019.06.23.22.55.48
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sun, 23 Jun 2019 22:55:49 -0700 (PDT)
-From: vandersonmr <vandersonmr2@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 24 Jun 2019 02:54:42 -0300
-Message-Id: <20190624055442.2973-5-vandersonmr2@gmail.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190624055442.2973-1-vandersonmr2@gmail.com>
-References: <20190624055442.2973-1-vandersonmr2@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=e1sCAFcw0EvnjOzpHw97/K0fRePmkZE8GMoO+SZykS0=;
+ b=IgwOhszau7MxwlxymTeBs3XlPqHFBPksm2iFHd6ptCgEZFnObOcatC0f+dlaI8ovmp
+ pYrMOMsTSlrdt4aoGWYh2SdrVAnQ1LdiBH2fGKrxzBBX5z5cksCx3CFM/33jrIl50eqt
+ wO7grBTXvl6gjKqVP+Z0IwCWNkSGj8fY7O92+IYAREpuVNGmDsG+OVG/Nlfd2qefr7eP
+ tDEdtG97oXS3fwzgWw17EykHL8X3rxjKTOF+279ddub6uRVFonxmYDQMAuwp1AfTeO0n
+ Du8jabkFrgtB8nISLMA88DHIn83IVmW+zvw8JNgh0Xd43hgvJmz9HFPoXundw94YrcMV
+ vvug==
+X-Gm-Message-State: APjAAAXD/A1dwMmPnhbnbMhB4OgDANi+Czj2BfOzEtHivGkAtiLDOaPm
+ XY4winoCqDafm5V09M/utNjpzzg2
+X-Google-Smtp-Source: APXvYqxXNLJLs/cXf50gfS8EdmTPuXi6RewIEFUg+msRrrSZ8Ot09TqtLDM3pozlFX8Kfzq35e+EKg==
+X-Received: by 2002:a63:d211:: with SMTP id a17mr31184187pgg.269.1561355902273; 
+ Sun, 23 Jun 2019 22:58:22 -0700 (PDT)
+Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
+ by smtp.gmail.com with ESMTPSA id s15sm12579335pfd.183.2019.06.23.22.58.20
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Sun, 23 Jun 2019 22:58:21 -0700 (PDT)
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To: qemu-ppc@nongnu.org
+Date: Mon, 24 Jun 2019 15:58:11 +1000
+Message-Id: <20190624055812.3906-1-sjitindarsingh@gmail.com>
+X-Mailer: git-send-email 2.13.6
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::841
-Subject: [Qemu-devel] [PATCH v2 4/4] adding -d hot_tbs:limit command line
- option
+X-Received-From: 2607:f8b0:4864:20::442
+Subject: [Qemu-devel] [QEMU-PPC] [PATCH 1/2] ppc/spapr: Add implementation
+ of hcall H_PURR
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,84 +87,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, vandersonmr <vandersonmr2@gmail.com>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, sjitindarsingh@gmail.com,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-add option to dump the N most hot TB blocks.
--d hot_tbs:N
+The hcall H_PURR is used by a guest to read the PURR (processor
+utilisation of resources register). A guest expects that this register
+will count at a rate of timebase scaled by the number of guest vcpus
+present in the vcore. That is the per vcpu purr will count at a rate of
+timebase / # vcpus per vcore.
 
-Signed-off-by: vandersonmr <vandersonmr2@gmail.com>
+Implement a handler for the H_PURR hcall and return the purr value
+divided by smp_threads so that the sum of the purr deltas across the
+vcpus of a vcore equals the timebase delta
+
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 ---
- include/qemu/log-for-trace.h | 2 ++
- linux-user/exit.c            | 3 +++
- util/log.c                   | 9 +++++++++
- 3 files changed, 14 insertions(+)
+ hw/ppc/spapr_hcall.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/include/qemu/log-for-trace.h b/include/qemu/log-for-trace.h
-index 2f0a5b080e..d65eb83037 100644
---- a/include/qemu/log-for-trace.h
-+++ b/include/qemu/log-for-trace.h
-@@ -21,6 +21,8 @@
- /* Private global variable, don't use */
- extern int qemu_loglevel;
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index aae9fd2b3e..88b3343f04 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1819,6 +1819,27 @@ static target_ulong h_update_dt(PowerPCCPU *cpu, SpaprMachineState *spapr,
+     return H_SUCCESS;
+ }
  
-+extern int32_t max_num_hot_tbs_to_dump;
++static target_ulong h_purr(PowerPCCPU *cpu, SpaprMachineState *spapr,
++                           target_ulong opcode, target_ulong *args)
++{
++    CPUPPCState *env = &cpu->env;
++    target_ulong purr;
 +
- #define LOG_TRACE          (1 << 15)
- 
- /* Returns true if a bit is set in the current loglevel mask */
-diff --git a/linux-user/exit.c b/linux-user/exit.c
-index bdda720553..08b86dfd61 100644
---- a/linux-user/exit.c
-+++ b/linux-user/exit.c
-@@ -28,6 +28,9 @@ extern void __gcov_dump(void);
- 
- void preexit_cleanup(CPUArchState *env, int code)
- {
-+    if (qemu_loglevel_mask(CPU_LOG_HOT_TBS)) {
-+        tb_dump_exec_freq(max_num_hot_tbs_to_dump);
++    if (kvm_enabled()) {
++        cpu_synchronize_state(CPU(cpu));
++        /*
++         * Divide by smp_threads so that the sum of the purr deltas across the
++         * vcpus of a vcore equal the timebase delta.
++         */
++        purr = env->spr[SPR_PURR] / smp_threads;
++    } else {
++        purr = cpu_ppc_load_purr(env);
 +    }
- #ifdef TARGET_GPROF
-         _mcleanup();
- #endif
-diff --git a/util/log.c b/util/log.c
-index 1d1b33f7d9..e71c663143 100644
---- a/util/log.c
-+++ b/util/log.c
-@@ -30,6 +30,7 @@ FILE *qemu_logfile;
- int qemu_loglevel;
- static int log_append = 0;
- static GArray *debug_regions;
-+int32_t max_num_hot_tbs_to_dump;
++    args[0] = purr;
++
++    return H_SUCCESS;
++}
++
+ static spapr_hcall_fn papr_hypercall_table[(MAX_HCALL_OPCODE / 4) + 1];
+ static spapr_hcall_fn kvmppc_hypercall_table[KVMPPC_HCALL_MAX - KVMPPC_HCALL_BASE + 1];
  
- /* Return the number of characters emitted.  */
- int qemu_log(const char *fmt, ...)
-@@ -273,6 +274,9 @@ const QEMULogItem qemu_log_items[] = {
-     { CPU_LOG_TB_NOCHAIN, "nochain",
-       "do not chain compiled TBs so that \"exec\" and \"cpu\" show\n"
-       "complete traces" },
-+    { CPU_LOG_HOT_TBS, "hot_tbs(:limit)",
-+      "show TBs (until given a limit) ordered by their hotness.\n"
-+      "(if no limit is given, show all)" },
-     { 0, NULL, NULL },
- };
+@@ -1915,6 +1936,9 @@ static void hypercall_register_types(void)
+     spapr_register_hypercall(H_LOGICAL_DCBF, h_logical_dcbf);
+     spapr_register_hypercall(KVMPPC_H_LOGICAL_MEMOP, h_logical_memop);
  
-@@ -294,6 +298,11 @@ int qemu_str_to_log_mask(const char *str)
-             trace_enable_events((*tmp) + 6);
-             mask |= LOG_TRACE;
- #endif
-+        } else if (g_str_has_prefix(*tmp, "hot_tbs")) {
-+            if (g_str_has_prefix(*tmp, "hot_tbs:") && (*tmp)[8] != '\0') {
-+                max_num_hot_tbs_to_dump = atoi((*tmp) + 8);
-+            }
-+            mask |= CPU_LOG_HOT_TBS;
-         } else {
-             for (item = qemu_log_items; item->mask != 0; item++) {
-                 if (g_str_equal(*tmp, item->name)) {
++    /* hcall-purr */
++    spapr_register_hypercall(H_PURR, h_purr);
++
+     /* qemu/KVM-PPC specific hcalls */
+     spapr_register_hypercall(KVMPPC_H_RTAS, h_rtas);
+ 
 -- 
-2.22.0
+2.13.6
 
 
