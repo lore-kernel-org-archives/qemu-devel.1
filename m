@@ -2,87 +2,64 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35E62C43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 06:54:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB8B1C43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 06:59:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0140520679
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 06:54:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="IFtiLPEb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0140520679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bytedance.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7800B2089F
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 06:59:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7800B2089F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48324 helo=lists.gnu.org)
+Received: from localhost ([::1]:48348 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfIs0-0000Bu-Av
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 02:54:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46177)
+	id 1hfIx0-0002bV-J0
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 02:59:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47844)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pizhenwei@bytedance.com>) id 1hfInc-0004dF-TL
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 02:49:58 -0400
+ (envelope-from <peterx@redhat.com>) id 1hfIvY-0001qw-Ie
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 02:58:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pizhenwei@bytedance.com>) id 1hfIna-0003Hl-0Q
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 02:49:56 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:37952)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pizhenwei@bytedance.com>)
- id 1hfInX-00035t-Rf
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 02:49:52 -0400
-Received: by mail-pl1-x642.google.com with SMTP id g4so6301971plb.5
- for <qemu-devel@nongnu.org>; Sun, 23 Jun 2019 23:49:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=bytedance-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=h8g/nC6vUT95D9nx3c9BGLOpS2Xrlhhb+4JSssXi+BA=;
- b=IFtiLPEbF3y2XTvShN4yk9BIFbZWnS9SjMG5Pd1YD3wACDtubaRGgQ4ZR/WhZVHr5d
- b8y7kdeydwwJ64+c8YHOF+JQbgzT982Nm64ctTgSNHtTvLg/2BmRteA5LegtaOplOml7
- W9LDTNYyZBZiLz4OEscdiiL5G/Rjdo9/SdWkqdF+jApf7R/EmGjggm5B007TYqK/iS6d
- Ppr7FyNIcMfZfscKnl1w6y+v+a+dbv73HJ0c4uNPX0eFpDmlo0jk0ProoELvARwEhMbx
- 8uRJ0sNnKbIEqtcRHowWQX9/yCM3jiWdhNnkL/7ZXcRmqVyZQ7mx8C+Cm9Mk80HK5UHL
- qT1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=h8g/nC6vUT95D9nx3c9BGLOpS2Xrlhhb+4JSssXi+BA=;
- b=pA9dg3VN6ZPmMPknCblVYfG3D7Qu/xexbD4dPAVlmRhZ3K7nnklQ7RALijHnTRoWDV
- 4ZUUwdcyIATNKnZuc1UzIBxL27HEN+kDyi5jsEUE17fTZ4SwaEA8SRL3i1RYuJheJbzj
- ld/alcq4S+LqPO52fcp5qGsi0jdiY3owQdJXYiu28EVP9teJ+78v0vcgMuxFtiZphhc/
- BvCmsJd+sNkSjICYwhogZ/agEShwAXoy2N+emd/Tg0hy7Ehdq8EA2SdkW5ko97CuQZb4
- B4GuxRzM+0JerdR34ATOVmRvbpru+CrXhH/gJC+xug933Fd7y2yoIvI1IXYhSzwG+qMt
- GQTg==
-X-Gm-Message-State: APjAAAXmV1kOJbQ78i24rRS6akqcCMAbjOMB5GMxuqjLBVO5sMjcjkAa
- ENy+/dzxVSTP7yqLjp2Axa3BnQ==
-X-Google-Smtp-Source: APXvYqwpCmcMvTfnVXBoxY1paM6DWUYbBjd6EZTR+7lZ2h55ByO/PJsnEatwV85Nzq5uwxSlWXYnOQ==
-X-Received: by 2002:a17:902:2ae7:: with SMTP id
- j94mr62003836plb.270.1561358988845; 
- Sun, 23 Jun 2019 23:49:48 -0700 (PDT)
-Received: from always-ThinkPad-T480.bytedance.net ([61.120.150.76])
- by smtp.gmail.com with ESMTPSA id n17sm17734259pfq.182.2019.06.23.23.49.46
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Sun, 23 Jun 2019 23:49:48 -0700 (PDT)
-From: zhenwei pi <pizhenwei@bytedance.com>
-To: kwolf@redhat.com,
-	mreitz@redhat.com,
-	eblake@redhat.com
-Date: Mon, 24 Jun 2019 14:49:35 +0800
-Message-Id: <1561358976-5183-3-git-send-email-pizhenwei@bytedance.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1561358976-5183-1-git-send-email-pizhenwei@bytedance.com>
-References: <1561358976-5183-1-git-send-email-pizhenwei@bytedance.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::642
-Subject: [Qemu-devel] [PATCH V2 2/3] block/accounting: introduce block size
- histogram
+ (envelope-from <peterx@redhat.com>) id 1hfIvX-0006R1-5U
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 02:58:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54090)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hfIvU-0006NW-If
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 02:58:05 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E6ABE3082B45;
+ Mon, 24 Jun 2019 06:58:02 +0000 (UTC)
+Received: from xz-x1 (ovpn-12-60.pek2.redhat.com [10.72.12.60])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1F4C6608E4;
+ Mon, 24 Jun 2019 06:57:55 +0000 (UTC)
+Date: Mon, 24 Jun 2019 14:57:50 +0800
+From: Peter Xu <peterx@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Message-ID: <20190624065750.GE6279@xz-x1>
+References: <20190624063733.22079-1-peterx@redhat.com>
+ <20190624063733.22079-3-peterx@redhat.com>
+ <20190624064122.GB27894@joy-OptiPlex-7040>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190624064122.GB27894@joy-OptiPlex-7040>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Mon, 24 Jun 2019 06:58:02 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 2/2] intel_iommu: Fix unexpected unmaps
+ during global unmap
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,83 +71,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, qemu-block@nongnu.org, vsementsov@virtuozzo.com,
- qemu-devel@nongnu.org, pizhenwei@bytedance.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Auger Eric <eric.auger@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Introduce block size histogram statics for block devices.
+On Mon, Jun 24, 2019 at 02:41:22AM -0400, Yan Zhao wrote:
+> On Mon, Jun 24, 2019 at 02:37:33PM +0800, Peter Xu wrote:
+> > From: Paolo Bonzini <pbonzini@redhat.com>
+> > 
+> > This is an replacement work of Yan Zhao's patch:
+> > 
+> > https://www.mail-archive.com/qemu-devel@nongnu.org/msg625340.html
+> > 
+> > vtd_address_space_unmap() will do proper page mask alignment to make
+> > sure each IOTLB message will have correct masks for notification
+> > messages (2^N-1), but sometimes it can be expanded to even supercede
+> > the registered range.  That could lead to unexpected UNMAP of already
+> > mapped regions in some other notifiers.
+> > 
+> > Instead of doing mindless expension of the start address and address
+> > mask, we split the range into smaller ones and guarantee that each
+> > small range will have correct masks (2^N-1) and at the same time we
+> > should also try our best to generate as less IOTLB messages as
+> > possible.
+> > 
+> > Reported-by: Yan Zhao <yan.y.zhao@intel.com>
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > [peterx: fixup mask generation algos and other touchups, introduce
+> >  vtd_get_next_mask(), write commit message]
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  hw/i386/intel_iommu.c | 70 +++++++++++++++++++++++++++----------------
+> >  1 file changed, 44 insertions(+), 26 deletions(-)
+> > 
+> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> > index 719ce19ab3..39cedf73b8 100644
+> > --- a/hw/i386/intel_iommu.c
+> > +++ b/hw/i386/intel_iommu.c
+> > @@ -3363,11 +3363,31 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+> >      return vtd_dev_as;
+> >  }
+> >  
+> > +static uint64_t vtd_get_next_mask(uint64_t start, uint64_t size, int gaw)
+> > +{
+> > +    /* Tries to find smallest mask from start first */
+> > +    uint64_t rmask = start & -start, max_mask = 1ULL << gaw;
+> > +
+> > +    assert(size && gaw > 0 && gaw < 64);
+> > +
+> > +    /* Zero start, or too big */
+> > +    if (!rmask || rmask > max_mask) {
+> > +        rmask = max_mask;
+> > +    }
+> > +
+> > +    /* If the start mask worked, then use it */
+> > +    if (rmask <= size) {
+> > +        return rmask;
+> > +    }
+> > +
+> > +    /* Find the largest page mask from size */
+> > +    return 1ULL << (63 - clz64(size));
+> > +}
+> > +
+> >  /* Unmap the whole range in the notifier's scope. */
+> >  static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+> >  {
+> > -    IOMMUTLBEntry entry;
+> > -    hwaddr size;
+> > +    hwaddr size, remain;
+> >      hwaddr start = n->start;
+> >      hwaddr end = n->end;
+> >      IntelIOMMUState *s = as->iommu_state;
+> > @@ -3388,39 +3408,37 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+> >      }
+> >  
+> >      assert(start <= end);
+> > -    size = end - start;
+> > +    size = remain = end - start + 1;
+> >  
+> > -    if (ctpop64(size) != 1) {
+> > -        /*
+> > -         * This size cannot format a correct mask. Let's enlarge it to
+> > -         * suite the minimum available mask.
+> > -         */
+> > -        int n = 64 - clz64(size);
+> > -        if (n > s->aw_bits) {
+> > -            /* should not happen, but in case it happens, limit it */
+> > -            n = s->aw_bits;
+> > -        }
+> > -        size = 1ULL << n;
+> > +    while (remain > 0) {
+> hi 
+> I think here remain should still be "remain >= VTD_PAGE_SIZE"
+> because we cannot unmap entry less than PAGE_SIZE.
 
-For read/write/flush operation type, the block size region
-[0, +inf) is divided into subregions by several points.
-It works like block latency histogram.
+Yes we can.
 
-Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/accounting.c         | 18 ++++++++++++++++++
- include/block/accounting.h |  5 ++++-
- 2 files changed, 22 insertions(+), 1 deletion(-)
+I'd say this is purely for protection purpose no matter what.  If we
+did write the code correctly when registering the IOMMU notifier then
+we'll always have aligned "remain" here and these checks will be
+meaningless...  So we'll definitely fail in the case you mentioned,
+imho the only difference is when it happens.
 
-diff --git a/block/accounting.c b/block/accounting.c
-index d210a73fe9..3a1e41a971 100644
---- a/block/accounting.c
-+++ b/block/accounting.c
-@@ -192,6 +192,22 @@ void block_latency_histograms_clear(BlockAcctStats *stats)
-     }
- }
- 
-+int block_size_histogram_set(BlockAcctStats *stats, enum BlockAcctType type,
-+                             uint64List *boundaries)
-+{
-+    BlockHistogram *hist = &stats->size_histogram[type];
-+
-+    return block_histogram_set(hist, boundaries);
-+}
-+
-+void block_size_histograms_clear(BlockAcctStats *stats)
-+{
-+    int i;
-+
-+    for (i = 0; i < BLOCK_MAX_IOTYPE; i++) {
-+        block_histogram_clear(&stats->size_histogram[i]);
-+    }
-+}
- static void block_account_one_io(BlockAcctStats *stats, BlockAcctCookie *cookie,
-                                  bool failed)
- {
-@@ -216,6 +232,8 @@ static void block_account_one_io(BlockAcctStats *stats, BlockAcctCookie *cookie,
- 
-     block_histogram_account(&stats->latency_histogram[cookie->type],
-                             latency_ns);
-+    block_histogram_account(&stats->size_histogram[cookie->type],
-+                            cookie->bytes);
- 
-     if (!failed || stats->account_failed) {
-         stats->total_time_ns[cookie->type] += latency_ns;
-diff --git a/include/block/accounting.h b/include/block/accounting.h
-index 270fddb69c..0fbba64408 100644
---- a/include/block/accounting.h
-+++ b/include/block/accounting.h
-@@ -89,6 +89,7 @@ struct BlockAcctStats {
-     bool account_invalid;
-     bool account_failed;
-     BlockHistogram latency_histogram[BLOCK_MAX_IOTYPE];
-+    BlockHistogram size_histogram[BLOCK_MAX_IOTYPE];
- };
- 
- typedef struct BlockAcctCookie {
-@@ -117,5 +118,7 @@ double block_acct_queue_depth(BlockAcctTimedStats *stats,
- int block_latency_histogram_set(BlockAcctStats *stats, enum BlockAcctType type,
-                                 uint64List *boundaries);
- void block_latency_histograms_clear(BlockAcctStats *stats);
--
-+int block_size_histogram_set(BlockAcctStats *stats, enum BlockAcctType type,
-+                             uint64List *boundaries);
-+void block_size_histograms_clear(BlockAcctStats *stats);
- #endif
+If we want to fail at the earliest point, we can probably check during
+registering of the notifiers for page alignment.
+
+> 
+> > +        IOMMUTLBEntry entry;
+> > +        uint64_t mask = vtd_get_next_mask(start, remain, s->aw_bits);
+> > +
+> > +        assert(mask);
+> > +
+> 
+> > +        entry.iova = start;
+> > +        entry.addr_mask = mask - 1;
+> > +        entry.target_as = &address_space_memory;
+> > +        entry.perm = IOMMU_NONE;
+> > +        /* This field is meaningless for unmap */
+> > +        entry.translated_addr = 0;
+> > +
+> > +        memory_region_notify_one(n, &entry);
+> > +
+> > +        start += mask;
+> > +        remain -= mask;
+> >      }
+> Add assert(remain) here?
+
+Do you mean assert(!remain)?  If so, it's below [1].
+
+> 
+> >  
+> > -    entry.target_as = &address_space_memory;
+> > -    /* Adjust iova for the size */
+> > -    entry.iova = n->start & ~(size - 1);
+> > -    /* This field is meaningless for unmap */
+> > -    entry.translated_addr = 0;
+> > -    entry.perm = IOMMU_NONE;
+> > -    entry.addr_mask = size - 1;
+> > +    assert(!remain);
+
+[1]
+
+> >  
+> >      trace_vtd_as_unmap_whole(pci_bus_num(as->bus),
+> >                               VTD_PCI_SLOT(as->devfn),
+> >                               VTD_PCI_FUNC(as->devfn),
+> > -                             entry.iova, size);
+> > +                             n->start, size);
+> >  
+> > -    map.iova = entry.iova;
+> > -    map.size = entry.addr_mask;
+> > +    map.iova = n->start;
+> > +    map.size = size;
+> >      iova_tree_remove(as->iova_tree, &map);
+> > -
+> > -    memory_region_notify_one(n, &entry);
+> >  }
+> >  
+> >  static void vtd_address_space_unmap_all(IntelIOMMUState *s)
+> > -- 
+> > 2.21.0
+> > 
+
+Regards,
+
 -- 
-2.11.0
-
+Peter Xu
 
