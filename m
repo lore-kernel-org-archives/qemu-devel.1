@@ -2,66 +2,89 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A088C43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 18:37:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5005C43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 18:53:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5145F20657
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 18:37:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5145F20657
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6EA3F20663
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 18:53:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="jLt2q5qy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EA3F20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53842 helo=lists.gnu.org)
+Received: from localhost ([::1]:53918 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfTqo-0002m7-7a
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 14:37:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34694)
+	id 1hfU5d-0007s2-M6
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 14:53:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38812)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hfToy-00025b-QD
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 14:36:06 -0400
+ (envelope-from <kwankhede@nvidia.com>) id 1hfU4v-0007Qt-L5
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 14:52:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hfTox-0002eA-Fx
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 14:36:04 -0400
-Resent-Date: Mon, 24 Jun 2019 14:36:04 -0400
-Resent-Message-Id: <E1hfTox-0002eA-Fx@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21821)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hfTou-0002aT-Gu; Mon, 24 Jun 2019 14:36:00 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1561401335; cv=none; d=zoho.com; s=zohoarc; 
- b=HZ3wq/DBwtsuwo2x2i+iYq86VrnrQNjoCTENbR8nkbmz435bORM4LLfIjfKDm9OsgpOD60x20t0GkNE4pdrknd1d6I/ESAZTbxBwx8fx8Nd2MQhbfvR7u8PZcPdMxPH6tr5StrQdadywXFO0EmSUwaSNMXjMjdKJx08Je3zBGq8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1561401335;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=gdW1+zA7U9nQbKoEF1GLVSCxvDA9hAJgi1fiKLQH+yY=; 
- b=fC4UZVOVFhGdu8BOmbnbbXmnmjrx5tkXk4tI2NjC7CjniIme8OQn2dQTiqLHHRF9BGOgWQdD8m8kvn1UUXlmGP5NgkrFbEk4zEEEzmrSo7AQPsAneowd5W8lnNapYNvYD1BvSIb8AHaQ5+kJVVO5dSv1b5x+3JJ/H+nUSeRUIDA=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1561401333485467.54896003538715;
- Mon, 24 Jun 2019 11:35:33 -0700 (PDT)
-Message-ID: <156140133234.24.13306518272551026541@c4a48874b076>
-In-Reply-To: <20190624173935.25747-1-mreitz@redhat.com>
+ (envelope-from <kwankhede@nvidia.com>) id 1hfU4t-0001Yo-Ly
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 14:52:33 -0400
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:18079)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+ id 1hfU4t-0001VT-7Q
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 14:52:31 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5d111bef0001>; Mon, 24 Jun 2019 11:52:31 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Mon, 24 Jun 2019 11:52:29 -0700
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Mon, 24 Jun 2019 11:52:29 -0700
+Received: from [10.24.70.40] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 24 Jun
+ 2019 18:52:20 +0000
+To: Alex Williamson <alex.williamson@redhat.com>
+References: <1561041461-22326-1-git-send-email-kwankhede@nvidia.com>
+ <1561041461-22326-2-git-send-email-kwankhede@nvidia.com>
+ <20190620111848.1bf70e99@x1.home>
+ <ff9f4aeb-1dd2-c44d-e513-b2f4a06ae780@nvidia.com>
+ <20190621090343.3be524f5@x1.home>
+ <1648d75d-bda3-f5da-2684-312033ae9477@nvidia.com>
+ <20190621140039.3820dd5d@x1.home>
+ <24404cfe-bb2d-551b-af8f-609a4bdfce38@nvidia.com>
+ <20190621160104.6893958f@x1.home>
+ <72da05c6-eae9-c34c-20e1-da8d4846839d@nvidia.com>
+ <20190624092535.4b66bac5@x1.home>
+X-Nvconfidentiality: public
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <c26273f7-0f05-860c-fb4d-5e8f641140a4@nvidia.com>
+Date: Tue, 25 Jun 2019 00:22:16 +0530
 MIME-Version: 1.0
+In-Reply-To: <20190624092535.4b66bac5@x1.home>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: mreitz@redhat.com
-Date: Mon, 24 Jun 2019 11:35:33 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.218
-Subject: Re: [Qemu-devel] [PATCH v4 00/14] block: Try to create well-typed
- json:{} filenames
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1561402351; bh=6Ll2jrEnSwPrPgjUXgpoVSpeUsdPuONGt8qhKB92CQQ=;
+ h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+ Message-ID:Date:MIME-Version:In-Reply-To:X-Originating-IP:
+ X-ClientProxiedBy:Content-Type:Content-Language:
+ Content-Transfer-Encoding;
+ b=jLt2q5qybpzihxtUJPXVxtkYxwnZhsOb+RHFvQepAdoptVxdA0nxunFx5Qy9DdQUl
+ o32NEBMDyJFRpqxbmNu/CO+43kxeabI50LbBSG/vgh1HAUOOo4iea3quPlyiYOAtrQ
+ IfGUL7GvXEFbE/jfQzi4pVvIPyY6WQ95U327DKSG/bOcgobpHZMvsYP+D2mkgmz809
+ mte+8HwLBk1kz9NLzKD0oVzd3dHKrgHGT6TRgfpDOKsD6YWqeX0RNeNN7Zo3Q66jaP
+ ioMjgU5Wu+UzBaJql/3cp0DyDaLGNKByFS2ugUv5+644cM5wqWzklA1QziUWoOSTmc
+ 51J/tWrcIIKLw==
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8
+X-Received-From: 216.228.121.64
+Subject: Re: [Qemu-devel] [PATCH v4 01/13] vfio: KABI for migration interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,76 +96,281 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mdroth@linux.vnet.ibm.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, armbru@redhat.com, mreitz@redhat.com
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYyNDE3MzkzNS4yNTc0
-Ny0xLW1yZWl0ekByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDYyNDE3MzkzNS4yNTc0Ny0xLW1yZWl0ekByZWRo
-YXQuY29tClR5cGU6IHNlcmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0IDAwLzE0
-XSBibG9jazogVHJ5IHRvIGNyZWF0ZSB3ZWxsLXR5cGVkIGpzb246e30gZmlsZW5hbWVzCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9k
-ZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
-IGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
-ICd0ZXN0JwpkZGQ2NjlhIGJsb2NrOiBNYWtlIHVzZSBvZiBRQVBJIGRlZmF1bHRzCjNiY2Y5MjIg
-aW90ZXN0czogcWNvdzIncyBlbmNyeXB0LmZvcm1hdCBpcyBub3cgb3B0aW9uYWwKMTU1YzFkYiBp
-b3Rlc3RzOiBUZXN0IGludGVybmFsIG9wdGlvbiB0eXBpbmcKMzY0ZWFjMSBibG9jazogVHJ5IHRv
-IGNyZWF0ZSB3ZWxsIHR5cGVkIGpzb246e30gZmlsZW5hbWVzCjExNzI2ZDIgcWFwaTogRm9ybWFs
-aXplIHFjb3cgZW5jcnlwdGlvbiBwcm9iaW5nCjU2NzY0NGYgcWFwaTogRm9ybWFsaXplIHFjb3cy
-IGVuY3J5cHRpb24gcHJvYmluZwo0ZWIzY2E0IHRlc3RzOiBBZGQgUUFQSSBvcHRpb25hbCBkaXNj
-cmltaW5hdG9yIHRlc3RzCmYzZDlmNTMgdGVzdHM6IFRlc3QgUUFQSSBkZWZhdWx0IHZhbHVlcyBm
-b3Igc3RydWN0IG1lbWJlcnMKMjg2MjgyNCB0ZXN0LXFhcGk6IFByaW50IHN0cnVjdCBtZW1iZXJz
-JyBkZWZhdWx0IHZhbHVlcwpmZjdhN2M1IHFhcGk6IERvY3VtZW50IGRlZmF1bHQgdmFsdWVzIGZv
-ciBzdHJ1Y3QgbWVtYmVycwpmYWVmMzdmIHFhcGk6IEFsbG93IG9wdGlvbmFsIGRpc2NyaW1pbmF0
-b3JzCjY0YWU3M2MgcWFwaTogSW50cm9kdWNlIGRlZmF1bHQgdmFsdWVzIGZvciBzdHJ1Y3QgbWVt
-YmVycwpmNDg1OTUwIHFhcGk6IE1vdmUgdG9fY19zdHJpbmcoKSB0byBjb21tb24ucHkKODcxMWJi
-NCBxYXBpOiBQYXJzZSBudW1lcmljIHZhbHVlcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xNCBD
-aGVja2luZyBjb21taXQgODcxMWJiNGMzMGYzIChxYXBpOiBQYXJzZSBudW1lcmljIHZhbHVlcykK
-Mi8xNCBDaGVja2luZyBjb21taXQgZjQ4NTk1MGM0NTk1IChxYXBpOiBNb3ZlIHRvX2Nfc3RyaW5n
-KCkgdG8gY29tbW9uLnB5KQozLzE0IENoZWNraW5nIGNvbW1pdCA2NGFlNzNjZmVkZDYgKHFhcGk6
-IEludHJvZHVjZSBkZWZhdWx0IHZhbHVlcyBmb3Igc3RydWN0IG1lbWJlcnMpCjQvMTQgQ2hlY2tp
-bmcgY29tbWl0IGZhZWYzN2Y2Y2Q0NSAocWFwaTogQWxsb3cgb3B0aW9uYWwgZGlzY3JpbWluYXRv
-cnMpCjUvMTQgQ2hlY2tpbmcgY29tbWl0IGZmN2E3YzViNjAyNCAocWFwaTogRG9jdW1lbnQgZGVm
-YXVsdCB2YWx1ZXMgZm9yIHN0cnVjdCBtZW1iZXJzKQo2LzE0IENoZWNraW5nIGNvbW1pdCAyODYy
-ODI0OWRjZjEgKHRlc3QtcWFwaTogUHJpbnQgc3RydWN0IG1lbWJlcnMnIGRlZmF1bHQgdmFsdWVz
-KQo3LzE0IENoZWNraW5nIGNvbW1pdCBmM2Q5ZjUzNDNhOTkgKHRlc3RzOiBUZXN0IFFBUEkgZGVm
-YXVsdCB2YWx1ZXMgZm9yIHN0cnVjdCBtZW1iZXJzKQpFUlJPUjogSW52YWxpZCBVVEYtOCwgcGF0
-Y2ggYW5kIGNvbW1pdCBtZXNzYWdlIHNob3VsZCBiZSBlbmNvZGVkIGluIFVURi04CiMxMDY6IEZJ
-TEU6IHRlc3RzL3FhcGktc2NoZW1hL3FhcGktc2NoZW1hLXRlc3Qub3V0OjQyMDoKKyAgICBtZW1i
-ZXIgc3RyOiBzdHIgb3B0aW9uYWw9VHJ1ZSBkZWZhdWx0PWZvbyBc6bm/IiInCiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpXQVJOSU5HOiBhZGRl
-ZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRp
-bmc/CiMxMTE6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5p
-bmdzLCAxNjIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNy8xNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
-ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
-cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
-RVJTLgoKOC8xNCBDaGVja2luZyBjb21taXQgNGViM2NhNDU3Y2EzICh0ZXN0czogQWRkIFFBUEkg
-b3B0aW9uYWwgZGlzY3JpbWluYXRvciB0ZXN0cykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRl
-bGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzM6IApuZXcg
-ZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA2NyBsaW5lcyBj
-aGVja2VkCgpQYXRjaCA4LzE0IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjkvMTQgQ2hlY2tp
-bmcgY29tbWl0IDU2NzY0NGY2YWFhOCAocWFwaTogRm9ybWFsaXplIHFjb3cyIGVuY3J5cHRpb24g
-cHJvYmluZykKMTAvMTQgQ2hlY2tpbmcgY29tbWl0IDExNzI2ZDI1YzM2NyAocWFwaTogRm9ybWFs
-aXplIHFjb3cgZW5jcnlwdGlvbiBwcm9iaW5nKQoxMS8xNCBDaGVja2luZyBjb21taXQgMzY0ZWFj
-MWYzMWZjIChibG9jazogVHJ5IHRvIGNyZWF0ZSB3ZWxsIHR5cGVkIGpzb246e30gZmlsZW5hbWVz
-KQoxMi8xNCBDaGVja2luZyBjb21taXQgMTU1YzFkYmRmM2YwIChpb3Rlc3RzOiBUZXN0IGludGVy
-bmFsIG9wdGlvbiB0eXBpbmcpCjEzLzE0IENoZWNraW5nIGNvbW1pdCAzYmNmOTIyNzBlODYgKGlv
-dGVzdHM6IHFjb3cyJ3MgZW5jcnlwdC5mb3JtYXQgaXMgbm93IG9wdGlvbmFsKQoxNC8xNCBDaGVj
-a2luZyBjb21taXQgZGRkNjY5YWQ5NmEwIChibG9jazogTWFrZSB1c2Ugb2YgUUFQSSBkZWZhdWx0
-cykKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoK
-ClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAx
-OTA2MjQxNzM5MzUuMjU3NDctMS1tcmVpdHpAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gv
-P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
+
+On 6/24/2019 8:55 PM, Alex Williamson wrote:
+> On Mon, 24 Jun 2019 20:30:08 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> 
+>> On 6/22/2019 3:31 AM, Alex Williamson wrote:
+>>> On Sat, 22 Jun 2019 02:00:08 +0530
+>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:  
+>>>> On 6/22/2019 1:30 AM, Alex Williamson wrote:  
+>>>>> On Sat, 22 Jun 2019 01:05:48 +0530
+>>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>>>>>     
+>>>>>> On 6/21/2019 8:33 PM, Alex Williamson wrote:    
+>>>>>>> On Fri, 21 Jun 2019 11:22:15 +0530
+>>>>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>>>>>>>       
+>>>>>>>> On 6/20/2019 10:48 PM, Alex Williamson wrote:      
+>>>>>>>>> On Thu, 20 Jun 2019 20:07:29 +0530
+>>>>>>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>>>>>>>>>         
+>>>>>>>>>> - Defined MIGRATION region type and sub-type.
+>>>>>>>>>> - Used 3 bits to define VFIO device states.
+>>>>>>>>>>     Bit 0 => _RUNNING
+>>>>>>>>>>     Bit 1 => _SAVING
+>>>>>>>>>>     Bit 2 => _RESUMING
+>>>>>>>>>>     Combination of these bits defines VFIO device's state during migration
+>>>>>>>>>>     _STOPPED => All bits 0 indicates VFIO device stopped.
+>>>>>>>>>>     _RUNNING => Normal VFIO device running state.
+>>>>>>>>>>     _SAVING | _RUNNING => vCPUs are running, VFIO device is running but start
+>>>>>>>>>>                           saving state of device i.e. pre-copy state
+>>>>>>>>>>     _SAVING  => vCPUs are stoppped, VFIO device should be stopped, and
+>>>>>>>>>>                           save device state,i.e. stop-n-copy state
+>>>>>>>>>>     _RESUMING => VFIO device resuming state.
+>>>>>>>>>>     _SAVING | _RESUMING => Invalid state if _SAVING and _RESUMING bits are set
+>>>>>>>>>> - Defined vfio_device_migration_info structure which will be placed at 0th
+>>>>>>>>>>   offset of migration region to get/set VFIO device related information.
+>>>>>>>>>>   Defined members of structure and usage on read/write access:
+>>>>>>>>>>     * device_state: (read/write)
+>>>>>>>>>>         To convey VFIO device state to be transitioned to. Only 3 bits are used
+>>>>>>>>>>         as of now.
+>>>>>>>>>>     * pending bytes: (read only)
+>>>>>>>>>>         To get pending bytes yet to be migrated for VFIO device.
+>>>>>>>>>>     * data_offset: (read only)
+>>>>>>>>>>         To get data offset in migration from where data exist during _SAVING
+>>>>>>>>>>         and from where data should be written by user space application during
+>>>>>>>>>>          _RESUMING state
+>>>>>>>>>>     * data_size: (read/write)
+>>>>>>>>>>         To get and set size of data copied in migration region during _SAVING
+>>>>>>>>>>         and _RESUMING state.
+>>>>>>>>>>     * start_pfn, page_size, total_pfns: (write only)
+>>>>>>>>>>         To get bitmap of dirty pages from vendor driver from given
+>>>>>>>>>>         start address for total_pfns.
+>>>>>>>>>>     * copied_pfns: (read only)
+>>>>>>>>>>         To get number of pfns bitmap copied in migration region.
+>>>>>>>>>>         Vendor driver should copy the bitmap with bits set only for
+>>>>>>>>>>         pages to be marked dirty in migration region. Vendor driver
+>>>>>>>>>>         should return 0 if there are 0 pages dirty in requested
+>>>>>>>>>>         range. Vendor driver should return -1 to mark all pages in the section
+>>>>>>>>>>         as dirty
+>>>>>>>>>>
+>>>>>>>>>> Migration region looks like:
+>>>>>>>>>>  ------------------------------------------------------------------
+>>>>>>>>>> |vfio_device_migration_info|    data section                      |
+>>>>>>>>>> |                          |     ///////////////////////////////  |
+>>>>>>>>>>  ------------------------------------------------------------------
+>>>>>>>>>>  ^                              ^                              ^
+>>>>>>>>>>  offset 0-trapped part        data_offset                 data_size
+>>>>>>>>>>
+>>>>>>>>>> Data section is always followed by vfio_device_migration_info
+>>>>>>>>>> structure in the region, so data_offset will always be none-0.
+>>>>>>>>>> Offset from where data is copied is decided by kernel driver, data
+>>>>>>>>>> section can be trapped or mapped depending on how kernel driver
+>>>>>>>>>> defines data section. If mmapped, then data_offset should be page
+>>>>>>>>>> aligned, where as initial section which contain
+>>>>>>>>>> vfio_device_migration_info structure might not end at offset which
+>>>>>>>>>> is page aligned.
+>>>>>>>>>>
+>>>>>>>>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>>>>>>>>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+>>>>>>>>>> ---
+>>>>>>>>>>  linux-headers/linux/vfio.h | 71 ++++++++++++++++++++++++++++++++++++++++++++++
+>>>>>>>>>>  1 file changed, 71 insertions(+)
+>>>>>>>>>>
+>>>>>>>>>> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+>>>>>>>>>> index 24f505199f83..274ec477eb82 100644
+>>>>>>>>>> --- a/linux-headers/linux/vfio.h
+>>>>>>>>>> +++ b/linux-headers/linux/vfio.h
+>>>>>>>>>> @@ -372,6 +372,77 @@ struct vfio_region_gfx_edid {
+>>>>>>>>>>   */
+>>>>>>>>>>  #define VFIO_REGION_SUBTYPE_IBM_NVLINK2_ATSD	(1)
+>>>>>>>>>>  
+>>>>>>>>>> +/* Migration region type and sub-type */
+>>>>>>>>>> +#define VFIO_REGION_TYPE_MIGRATION	        (2)
+>>>>>>>>>> +#define VFIO_REGION_SUBTYPE_MIGRATION	        (1)
+>>>>>>>>>> +
+>>>>>>>>>> +/**
+>>>>>>>>>> + * Structure vfio_device_migration_info is placed at 0th offset of
+>>>>>>>>>> + * VFIO_REGION_SUBTYPE_MIGRATION region to get/set VFIO device related migration
+>>>>>>>>>> + * information. Field accesses from this structure are only supported at their
+>>>>>>>>>> + * native width and alignment, otherwise should return error.
+>>>>>>>>>> + *
+>>>>>>>>>> + * device_state: (read/write)
+>>>>>>>>>> + *      To indicate vendor driver the state VFIO device should be transitioned
+>>>>>>>>>> + *      to. If device state transition fails, write to this field return error.
+>>>>>>>>>> + *      It consists of 3 bits:
+>>>>>>>>>> + *      - If bit 0 set, indicates _RUNNING state. When its reset, that indicates
+>>>>>>>>>> + *        _STOPPED state. When device is changed to _STOPPED, driver should stop
+>>>>>>>>>> + *        device before write returns.
+>>>>>>>>>> + *      - If bit 1 set, indicates _SAVING state.
+>>>>>>>>>> + *      - If bit 2 set, indicates _RESUMING state.
+>>>>>>>>>> + *
+>>>>>>>>>> + * pending bytes: (read only)
+>>>>>>>>>> + *      Read pending bytes yet to be migrated from vendor driver
+>>>>>>>>>> + *
+>>>>>>>>>> + * data_offset: (read only)
+>>>>>>>>>> + *      User application should read data_offset in migration region from where
+>>>>>>>>>> + *      user application should read data during _SAVING state or write data
+>>>>>>>>>> + *      during _RESUMING state.
+>>>>>>>>>> + *
+>>>>>>>>>> + * data_size: (read/write)
+>>>>>>>>>> + *      User application should read data_size to know data copied in migration
+>>>>>>>>>> + *      region during _SAVING state and write size of data copied in migration
+>>>>>>>>>> + *      region during _RESUMING state.
+>>>>>>>>>> + *
+>>>>>>>>>> + * start_pfn: (write only)
+>>>>>>>>>> + *      Start address pfn to get bitmap of dirty pages from vendor driver duing
+>>>>>>>>>> + *      _SAVING state.
+>>>>>>>>>> + *
+>>>>>>>>>> + * page_size: (write only)
+>>>>>>>>>> + *      User application should write the page_size of pfn.
+>>>>>>>>>> + *
+>>>>>>>>>> + * total_pfns: (write only)
+>>>>>>>>>> + *      Total pfn count from start_pfn for which dirty bitmap is requested.
+>>>>>>>>>> + *
+>>>>>>>>>> + * copied_pfns: (read only)
+>>>>>>>>>> + *      pfn count for which dirty bitmap is copied to migration region.
+>>>>>>>>>> + *      Vendor driver should copy the bitmap with bits set only for pages to be
+>>>>>>>>>> + *      marked dirty in migration region.
+>>>>>>>>>> + *      Vendor driver should return 0 if there are 0 pages dirty in requested
+>>>>>>>>>> + *      range.
+>>>>>>>>>> + *      Vendor driver should return -1 to mark all pages in the section as
+>>>>>>>>>> + *      dirty.        
+>>>>>>>>>
+>>>>>>>>> Is the protocol that the user writes start_pfn/page_size/total_pfns in
+>>>>>>>>> any order and then the read of copied_pfns is what triggers the
+>>>>>>>>> snapshot?        
+>>>>>>>>
+>>>>>>>> Yes.
+>>>>>>>>      
+>>>>>>>>>  Are start_pfn/page_size/total_pfns sticky such that a user
+>>>>>>>>> can write them once and get repeated refreshes of the dirty bitmap by
+>>>>>>>>> re-reading copied_pfns?        
+>>>>>>>>
+>>>>>>>> Yes and that bitmap should be for given range (from start_pfn till
+>>>>>>>> start_pfn + tolal_pfns).
+>>>>>>>> Re-reading of copied_pfns is to handle the case where it might be
+>>>>>>>> possible that vendor driver reserved area for bitmap < total bitmap size
+>>>>>>>> for range (start_pfn to start_pfn + tolal_pfns), then user will have to
+>>>>>>>> iterate till copied_pfns == total_pfns or till copied_pfns == 0 (that
+>>>>>>>> is, there are no pages dirty in rest of the range)      
+>>>>>>>
+>>>>>>> So reading copied_pfns triggers the data range to be updated, but the
+>>>>>>> caller cannot assume it to be synchronous and uses total_pfns to poll
+>>>>>>> that the update is complete?  How does the vendor driver differentiate
+>>>>>>> the user polling for the previous update to finish versus requesting a
+>>>>>>> new update?
+>>>>>>>       
+>>>>>>
+>>>>>> Write on start_pfn/page_size/total_pfns, then read on copied_pfns
+>>>>>> indicates new update, where as sequential read on copied_pfns indicates
+>>>>>> polling for previous update.    
+>>>>>
+>>>>> Hmm, this seems to contradict the answer to my question above where I
+>>>>> ask if the write fields are sticky so a user can trigger a refresh via
+>>>>> copied_pfns.    
+>>>>
+>>>> Sorry, how its contradict? pasting it again below:  
+>>>>>>>>>  Are start_pfn/page_size/total_pfns sticky such that a user
+>>>>>>>>> can write them once and get repeated refreshes of the dirty bitmap by
+>>>>>>>>> re-reading copied_pfns?    
+>>>>>>>>
+>>>>>>>> Yes and that bitmap should be for given range (from start_pfn till
+>>>>>>>> start_pfn + tolal_pfns).
+>>>>>>>> Re-reading of copied_pfns is to handle the case where it might be
+>>>>>>>> possible that vendor driver reserved area for bitmap < total bitmap    
+>>>> size  
+>>>>>>>> for range (start_pfn to start_pfn + tolal_pfns), then user will have to
+>>>>>>>> iterate till copied_pfns == total_pfns or till copied_pfns == 0 (that
+>>>>>>>> is, there are no pages dirty in rest of the range)    
+>>>
+>>> Sorry, I guess I misinterpreted again.  So the vendor driver can return
+>>> copied_pfns < total_pfns if it has a buffer limitation, not as an
+>>> indication of its background progress in writing out the bitmap.  Just
+>>> as a proof of concept, let's say the vendor driver has a 1 bit buffer
+>>> and I write 0 to start_pfn and 3 to total_pfns.  I read copied_pfns,
+>>> which returns 1, so I read data_offset to find where this 1 bit is
+>>> located and then read my bit from that location.  This is the dirty
+>>> state of the first pfn.  I read copied_pfns again and it reports 2,  
+>>
+>> It should report 1 to indicate its data for one pfn.
+>>
+>>> I again read data_offset to find where the data is located, and it's my
+>>> job to remember that I've already read 1 bit, so 2 means there's only 1
+>>> bit available and it's the second pfn.  
+>>
+>> No.
+>> Here 'I' means User application, right?
+> 
+> Yes
+> 
+>> User application knows for how many pfns bitmap he had already received,
+>> i.e. see 'count' in function vfio_get_dirty_page_list().
+>>
+>> Here copied_pfns is the number of pfns for which bitmap is available in
+>> buffer. Start address for that bitmap is then calculated by user
+>> application as :
+>> ((start_pfn + count) * page_size)
+>>
+>> Then QEMU calls:
+>>
+>> cpu_physical_memory_set_dirty_lebitmap((unsigned long *)buf,
+>>                                        (start_pfn + count) * page_size,
+>>                                         copied_pfns);
+>>
+>>>  I read the bit.  I again read
+>>> copied_pfns, which now reports 3, I read data_offset to find the
+>>> location of the data, I remember that I've already read 2 bits, so I
+>>> read my bit into the 3rd pfn.  This seems rather clumsy.
+>>>  
+>>
+>> Hope above explanation helps.
+> 
+> Still seems rather clumsy, the knowledge of which bit(s) are available
+> in the buffer can only be known by foreknowledge of which bits have
+> already been read.  That seems error prone for both the user and the
+> vendor driver to stay in sync.
+> 
+>>> Now that copied_pfns == total_pfns, what happens if I read copied_pfns
+>>> again?  This is actually what I thought I was asking previously.
+>>>   
+>>
+>> It should return 0.
+> 
+> Are we assuming no new pages have been dirtied?  What if pages have
+> been dirtied?
+> 
+>>> Should we expose the pfn buffer size and fault on writes of larger than that
+>>> size, requiring the user to iterate start_pfn themselves?  
+>>
+>> Who should fault, vendor driver or user application?
+>>
+>> Here Vendor driver is writing data to data section.
+>> In the steps in this patch-set, user application is incrementing
+>> start_pfn by adding copied_pfn count.
+> 
+> The user app is writing total_pfns to get a range, correct?  The vendor
+> driver could return errno on that write if total_pfns exceeds the
+> available buffer size.
+> 
+
+ok. If vendor driver returns error, then will user application retry
+with smaller size?
+
+Thanks,
+Kirti
 
