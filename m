@@ -2,73 +2,62 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D466C43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 12:52:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80453C43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 13:09:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53F5F20679
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 12:52:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53F5F20679
+	by mail.kernel.org (Postfix) with ESMTPS id 46604204EC
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 13:09:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46604204EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50900 helo=lists.gnu.org)
+Received: from localhost ([::1]:51062 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfOSb-0002ez-F3
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 08:52:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57432)
+	id 1hfOia-0000tm-BE
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 09:09:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33081)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vkuznets@redhat.com>) id 1hfORx-0001o5-Vl
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 08:51:58 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hfOi2-0000Na-If
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 09:08:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vkuznets@redhat.com>) id 1hfORu-0007aQ-RM
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 08:51:56 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:35264)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1hfORt-0007Ot-EF
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 08:51:54 -0400
-Received: by mail-wm1-f68.google.com with SMTP id c6so13295167wml.0
- for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 05:51:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
- :message-id:mime-version:content-transfer-encoding;
- bh=EjyJVNaH0An7l3HNMRO5nkT465x+UE9Jzj1FPB9sExk=;
- b=R/rSZMrKCbWeyIGuuhvGAWfuxoG663giYvwHZvghE8xHE2uMDxzpcrVlkKaPkP4/f6
- 4KHDAdgH6cDMKG6mfv0Yb519T5l59zHpOfx0LKMD4IEmUGCu2SZWi49MnKib3vdSn+VN
- dVplpGgZn7jMBbhHL6WrdKDNTN/OiWaUWYgaqgJ042aYD57eGqE2warh0wZgCALJ/0/a
- b31mIwzrcVTbmoj2EGRlFQkHe0Jae/ai9Woi1ixUDMMv3PvtYJJn0Ttj4u/QI40Y5kdu
- egZjO/lyJknrdy2iZ2ei7HmICZPcVqXqJZK+joXEDm/WafkEZN251nKBiiIQHgjGwNXf
- O7lQ==
-X-Gm-Message-State: APjAAAXFCygqKGILs/86JtRmqC5+lUBGOualXalN8now2uloRWN8y2N2
- /JPMedkUBuSVFW74UcFujKax9Q==
-X-Google-Smtp-Source: APXvYqyXSDa4cNA3OTVBF7FPRLru7mhpXDBv90ZnXGWjjPooG8d7Z3cw3pZU780hChDo0mFpeAzqaw==
-X-Received: by 2002:a1c:4c1a:: with SMTP id z26mr15422859wmf.2.1561380710727; 
- Mon, 24 Jun 2019 05:51:50 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com.
- [213.175.37.10])
- by smtp.gmail.com with ESMTPSA id w2sm10087809wrr.31.2019.06.24.05.51.49
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 24 Jun 2019 05:51:50 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-Reply-To: <20190624123835.28869-1-alex.bennee@linaro.org>
-References: <20190624123835.28869-1-alex.bennee@linaro.org>
-Date: Mon, 24 Jun 2019 14:51:49 +0200
-Message-ID: <87zhm7du3e.fsf@vitty.brq.redhat.com>
+ (envelope-from <imammedo@redhat.com>) id 1hfOi0-00030a-Ms
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 09:08:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51308)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>)
+ id 1hfOhw-0002wt-RS; Mon, 24 Jun 2019 09:08:29 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 41B2981DEB;
+ Mon, 24 Jun 2019 13:08:22 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5E9E019C69;
+ Mon, 24 Jun 2019 13:08:14 +0000 (UTC)
+Date: Mon, 24 Jun 2019 15:08:10 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Message-ID: <20190624150810.1287160e@redhat.com>
+In-Reply-To: <1557832703-42620-11-git-send-email-gengdongjiu@huawei.com>
+References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
+ <1557832703-42620-11-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Mon, 24 Jun 2019 13:08:27 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PATCH] target/i386: fix feature check in
- hyperv-stub.c
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v17 10/10] target-arm: kvm64: handle SIGBUS
+ signal from kernel or KVM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,52 +69,336 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-devel@nongnu.org, Roman Kagan <rkagan@virtuozzo.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, kvm@vger.kernel.org,
+ mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org,
+ linuxarm@huawei.com, shannon.zhaosl@gmail.com, zhengxiang9@huawei.com,
+ qemu-arm@nongnu.org, james.morse@arm.com, xuwei5@huawei.com,
+ jonathan.cameron@huawei.com, pbonzini@redhat.com, lersek@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Alex Bennée <alex.bennee@linaro.org> writes:
+On Tue, 14 May 2019 04:18:23 -0700
+Dongjiu Geng <gengdongjiu@huawei.com> wrote:
 
-> Commit 2d384d7c8 broken the build when built with:
->
->   configure --without-default-devices --disable-user
->
-> The reason was the conversion of cpu->hyperv_synic to
-> cpu->hyperv_synic_kvm_only although the rest of the patch introduces a
-> feature checking mechanism. So I've fixed the KVM_EXIT_HYPERV_SYNIC in
-> hyperv-stub to do the same feature check as in the real hyperv.c
->
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Roman Kagan <rkagan@virtuozzo.com>
+> Add SIGBUS signal handler. In this handler, it checks the SIGBUS type,
+> translates the host VA delivered by host to guest PA, then fill this PA
+> to guest APEI GHES memory, then notify guest according to the SIGBUS type.
+> 
+> If guest accesses the poisoned memory, it generates Synchronous External
+> Abort(SEA). Then host kernel gets an APEI notification and call memory_failure()
+> to unmapped the affected page for the guest's stage 2, finally return
+> to guest.
+> 
+> Guest continues to access PG_hwpoison page, it will trap to KVM as stage2 fault,
+> then a SIGBUS_MCEERR_AR synchronous signal is delivered to Qemu, Qemu record this
+> error address into guest APEI GHES memory and notify guest using
+> Synchronous-External-Abort(SEA).
+> 
+> Suggested-by: James Morse <james.morse@arm.com>
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 > ---
->  target/i386/hyperv-stub.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/target/i386/hyperv-stub.c b/target/i386/hyperv-stub.c
-> index fe548cbae2..0028527e79 100644
-> --- a/target/i386/hyperv-stub.c
-> +++ b/target/i386/hyperv-stub.c
-> @@ -15,7 +15,7 @@ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
+>  hw/acpi/acpi_ghes.c         | 177 ++++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/acpi/acpi_ghes.h |   6 +-
+>  include/sysemu/kvm.h        |   2 +-
+>  target/arm/kvm64.c          |  39 ++++++++++
+>  4 files changed, 222 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/acpi/acpi_ghes.c b/hw/acpi/acpi_ghes.c
+> index d03e797..06b7374 100644
+> --- a/hw/acpi/acpi_ghes.c
+> +++ b/hw/acpi/acpi_ghes.c
+> @@ -26,6 +26,101 @@
+>  #include "sysemu/sysemu.h"
+>  #include "qemu/error-report.h"
+>  
+> +/* UEFI 2.6: N.2.5 Memory Error Section */
+> +static void build_append_mem_cper(GArray *table, uint64_t error_physical_addr)
+> +{
+> +    /*
+> +     * Memory Error Record
+> +     */
+> +    build_append_int_noprefix(table,
+> +                 (1UL << 14) | /* Type Valid */
+> +                 (1UL << 1) /* Physical Address Valid */,
+> +                 8);
+bad indent
+
+> +    /* Memory error status information */
+> +    build_append_int_noprefix(table, 0, 8);
+> +    /* The physical address at which the memory error occurred */
+> +    build_append_int_noprefix(table, error_physical_addr, 8);
+> +    build_append_int_noprefix(table, 0, 48);
+> +    build_append_int_noprefix(table, 0 /* Unknown error */, 1);
+> +    build_append_int_noprefix(table, 0, 7);
+> +}
+> +
+> +static int ghes_record_mem_error(uint64_t error_block_address,
+> +                                    uint64_t error_physical_addr)
+bad indent
+
+
+> +{
+> +    GArray *block;
+> +    uint64_t current_block_length;
+> +    uint32_t data_length;
+> +    /* Memory section */
+> +    char mem_section_id_le[] = {0x14, 0x11, 0xBC, 0xA5, 0x64, 0x6F, 0xDE,
+> +                                0x4E, 0xB8, 0x63, 0x3E, 0x83, 0xED, 0x7C,
+> +                                0x83, 0xB1};
+> +    uint8_t fru_id[16] = {0};
+> +    uint8_t fru_text[20] = {0};
+> +
+> +    /* Generic Error Status Block
+> +     * | +---------------------+
+> +     * | |     block_status    |
+> +     * | +---------------------+
+> +     * | |    raw_data_offset  |
+> +     * | +---------------------+
+> +     * | |    raw_data_length  |
+> +     * | +---------------------+
+> +     * | |     data_length     |
+> +     * | +---------------------+
+> +     * | |   error_severity    |
+> +     * | +---------------------+
+> +     */
+> +    block = g_array_new(false, true /* clear */, 1);
+> +
+> +    /* Get the length of the Generic Error Data Entries */
+> +    cpu_physical_memory_read(error_block_address +
+> +        offsetof(AcpiGenericErrorStatus, data_length), &data_length, 4);
+> +    /* The current whole length of the generic error status block */
+> +    current_block_length = sizeof(AcpiGenericErrorStatus) + le32_to_cpu(data_length);
+I might be missing something but why do you read length from guest?
+Isn't it something provided by QEMU/host?
+
+> +
+> +    /* This is the length if adding a new generic error data entry*/
+> +    data_length += GHES_DATA_LENGTH;
+> +    data_length += GHES_MEM_CPER_LENGTH;
+> +
+> +    /* Check whether it will run out of the preallocated memory if adding a new
+> +     * generic error data entry
+> +     */
+> +    if ((data_length + sizeof(AcpiGenericErrorStatus)) > GHES_MAX_RAW_DATA_LENGTH) {
+> +        error_report("Record CPER out of boundary!!!");
+> +        return GHES_CPER_FAIL;
+> +    }
+> +
+> +    /* Build the new generic error status block header */
+> +    build_append_ghes_generic_status(block, cpu_to_le32(ACPI_GEBS_UNCORRECTABLE), 0, 0,
+> +        cpu_to_le32(data_length), cpu_to_le32(ACPI_CPER_SEV_RECOVERABLE));
+> +
+> +    /* Write back above generic error status block header to guest memory */
+> +    cpu_physical_memory_write(error_block_address, block->data,
+> +                              block->len);
+> +
+> +    /* Add a new generic error data entry */
+> +
+> +    data_length = block->len;
+> +    /* Build this new generic error data entry header */
+> +    build_append_ghes_generic_data(block, mem_section_id_le,
+> +                    cpu_to_le32(ACPI_CPER_SEV_RECOVERABLE), cpu_to_le32(0x300), 0, 0,
+> +                    cpu_to_le32(80)/* the total size of Memory Error Record */, fru_id,
+> +                    fru_text, 0);
+> +
+> +    /* Build the memory section CPER for above new generic error data entry */
+> +    build_append_mem_cper(block, error_physical_addr);
+> +
+> +    /* Write back above this new generic error data entry to guest memory */
+> +    cpu_physical_memory_write(error_block_address + current_block_length,
+> +                    block->data + data_length, block->len - data_length);
+> +
+> +    g_array_free(block, true);
+> +
+> +    return GHES_CPER_OK;
+> +}
+> +
+>  /* Build table for the hardware error fw_cfg blob */
+>  void build_hardware_error_table(GArray *hardware_errors, BIOSLinker *linker)
 >  {
->      switch (exit->type) {
->      case KVM_EXIT_HYPERV_SYNIC:
-> -        if (!cpu->hyperv_synic) {
-> +        if (!hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC)) {
->              return -1;
->          }
+> @@ -169,3 +264,85 @@ void ghes_add_fw_cfg(FWCfgState *s, GArray *hardware_error)
+>      fw_cfg_add_file_callback(s, GHES_DATA_ADDR_FW_CFG_FILE, NULL, NULL, NULL,
+>          &ges.ghes_addr_le, sizeof(ges.ghes_addr_le), false);
+>  }
+> +
+> +bool ghes_record_errors(uint32_t notify, uint64_t physical_address)
+> +{
+> +    uint64_t error_block_addr, read_ack_register_addr;
+> +    int read_ack_register = 0, loop = 0;
+> +    uint64_t start_addr = le32_to_cpu(ges.ghes_addr_le);
+> +    bool ret = GHES_CPER_FAIL;
+> +    const uint8_t error_source_id[] = { 0xff, 0xff, 0xff, 0xff,
+> +                                        0xff, 0xff, 0xff, 0, 1};
+> +
+> +    /*
+> +     * | +---------------------+ ges.ghes_addr_le
+> +     * | |error_block_address0 |
+> +     * | +---------------------+ --+--
+> +     * | |    .............    | GHES_ADDRESS_SIZE
+> +     * | +---------------------+ --+--
+> +     * | |error_block_addressN |
+> +     * | +---------------------+
+> +     * | | read_ack_register0  |
+> +     * | +---------------------+ --+--
+> +     * | |   .............     | GHES_ADDRESS_SIZE
+> +     * | +---------------------+ --+--
+> +     * | | read_ack_registerN  |
+> +     * | +---------------------+ --+--
+> +     * | |      CPER           |   |
+> +     * | |      ....           | GHES_MAX_RAW_DATA_LENGT
+> +     * | |      CPER           |   |
+> +     * | +---------------------+ --+--
+> +     * | |    ..........       |
+> +     * | +---------------------+
+> +     * | |      CPER           |
+> +     * | |      ....           |
+> +     * | |      CPER           |
+> +     * | +---------------------+
+> +     */
+> +    if (physical_address && notify < ACPI_HEST_NOTIFY_RESERVED) {
+> +        /* Find and check the source id for this new CPER */
+> +        if (error_source_id[notify] != 0xff) {
+> +            start_addr += error_source_id[notify] * GHES_ADDRESS_SIZE;
+> +        } else {
+> +            goto out;
+> +        }
+> +
+> +        cpu_physical_memory_read(start_addr, &error_block_addr,
+> +                                    GHES_ADDRESS_SIZE);
+> +
+> +        read_ack_register_addr = start_addr +
+> +                        ACPI_HEST_ERROR_SOURCE_COUNT * GHES_ADDRESS_SIZE;
+> +retry:
+> +        cpu_physical_memory_read(read_ack_register_addr,
+> +                                 &read_ack_register, GHES_ADDRESS_SIZE);
+> +
+> +        /* zero means OSPM does not acknowledge the error */
+> +        if (!read_ack_register) {
+> +            if (loop < 3) {
+> +                usleep(100 * 1000);
+> +                loop++;
+> +                goto retry;
+> +            } else {
+> +                error_report("OSPM does not acknowledge previous error,"
+> +                    " so can not record CPER for current error, forcibly acknowledge"
+> +                    " previous error to avoid blocking next time CPER record! Exit");
+> +                read_ack_register = 1;
+> +                cpu_physical_memory_write(read_ack_register_addr,
+> +                    &read_ack_register, GHES_ADDRESS_SIZE);
+> +            }
+> +        } else {
+> +            if (error_block_addr) {
+> +                read_ack_register = 0;
+> +                /* Clear the Read Ack Register, OSPM will write it to 1 when
+> +                 * acknowledge this error.
+> +                 */
+> +                cpu_physical_memory_write(read_ack_register_addr,
+> +                    &read_ack_register, GHES_ADDRESS_SIZE);
+> +                ret = ghes_record_mem_error(error_block_addr, physical_address);
+> +            }
+> +        }
+> +    }
+> +
+> +out:
+> +    return ret;
+> +}
+> diff --git a/include/hw/acpi/acpi_ghes.h b/include/hw/acpi/acpi_ghes.h
+> index 38fd87c..6b38097 100644
+> --- a/include/hw/acpi/acpi_ghes.h
+> +++ b/include/hw/acpi/acpi_ghes.h
+> @@ -32,11 +32,14 @@
+>  #define GHES_ADDRESS_SIZE           8
+>  
+>  #define GHES_DATA_LENGTH            72
+> -#define GHES_CPER_LENGTH            80
+> +#define GHES_MEM_CPER_LENGTH        80
+>  
+>  #define ReadAckPreserve             0xfffffffe
+>  #define ReadAckWrite                0x1
+>  
+> +#define GHES_CPER_OK                1
+> +#define GHES_CPER_FAIL              0
+> +
+>  /* The max size in bytes for one error block */
+>  #define GHES_MAX_RAW_DATA_LENGTH        0x1000
+>  /* Now only have GPIO-Signal and ARMv8 SEA notification types error sources
+> @@ -76,4 +79,5 @@ void build_apei_hest(GArray *table_data, GArray *hardware_error,
+>  
+>  void build_hardware_error_table(GArray *hardware_errors, BIOSLinker *linker);
+>  void ghes_add_fw_cfg(FWCfgState *s, GArray *hardware_errors);
+> +bool ghes_record_errors(uint32_t notify, uint64_t error_physical_addr);
+>  #endif
+> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+> index a6d1cd1..1d1a7a8 100644
+> --- a/include/sysemu/kvm.h
+> +++ b/include/sysemu/kvm.h
+> @@ -377,7 +377,7 @@ bool kvm_vcpu_id_is_valid(int vcpu_id);
+>  /* Returns VCPU ID to be used on KVM_CREATE_VCPU ioctl() */
+>  unsigned long kvm_arch_vcpu_id(CPUState *cpu);
+>  
+> -#ifdef TARGET_I386
+> +#if defined(TARGET_I386) || defined(TARGET_AARCH64)
+>  #define KVM_HAVE_MCE_INJECTION 1
+>  void kvm_arch_on_sigbus_vcpu(CPUState *cpu, int code, void *addr);
+>  #endif
+> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> index c7bdc6a..d2eac28 100644
+> --- a/target/arm/kvm64.c
+> +++ b/target/arm/kvm64.c
+> @@ -27,6 +27,10 @@
+>  #include "kvm_arm.h"
+>  #include "internals.h"
+>  #include "hw/arm/arm.h"
+> +#include "exec/ram_addr.h"
+> +#include "hw/acpi/acpi-defs.h"
+> +#include "hw/acpi/acpi_ghes.h"
+> +#include "hw/acpi/acpi.h"
+>  
+>  static bool have_guest_debug;
+>  
+> @@ -1029,6 +1033,41 @@ int kvm_arch_get_registers(CPUState *cs)
+>      return ret;
+>  }
+>  
+> +void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
+> +{
+> +    ram_addr_t ram_addr;
+> +    hwaddr paddr;
+> +
+> +    assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
+> +
+> +    if (acpi_enabled && addr) {
+> +        ram_addr = qemu_ram_addr_from_host(addr);
+> +        if (ram_addr != RAM_ADDR_INVALID &&
+> +            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
+> +            kvm_hwpoison_page_add(ram_addr);
+> +            /* Asynchronous signal will be masked by main thread, so
+> +             * only handle synchronous signal.
+> +             */
+> +            if (code == BUS_MCEERR_AR) {
+> +                kvm_cpu_synchronize_state(c);
+> +                if (GHES_CPER_FAIL != ghes_record_errors(ACPI_HEST_NOTIFY_SEA, paddr)) {
+> +                    kvm_inject_arm_sea(c);
+> +                } else {
+> +                    fprintf(stderr, "failed to record the error\n");
+> +                }
+> +            }
+> +            return;
+> +        }
+> +        fprintf(stderr, "Hardware memory error for memory used by "
+> +                "QEMU itself instead of guest system!\n");
+> +    }
+> +
+> +    if (code == BUS_MCEERR_AR) {
+> +        fprintf(stderr, "Hardware memory error!\n");
+> +        exit(1);
+> +    }
+> +}
+> +
+>  /* C6.6.29 BRK instruction */
+>  static const uint32_t brk_insn = 0xd4200000;
+>  
 
-As I just sent out exactly the same patch, this probably means the fix
-is uncontroversial :-)
-
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
--- 
-Vitaly
 
