@@ -2,83 +2,64 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A29DAC43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 11:10:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B96C0C43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 11:14:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F39C2089F
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 11:10:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eU/mV8uw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F39C2089F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8FDF620449
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 11:14:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FDF620449
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49826 helo=lists.gnu.org)
+Received: from localhost ([::1]:49870 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfMs4-0005qI-PK
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 07:10:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53203)
+	id 1hfMvg-0007Zf-RK
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 07:14:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53637)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <liq3ea@gmail.com>) id 1hfMqT-0004MA-IH
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 07:09:11 -0400
+ (envelope-from <peterx@redhat.com>) id 1hfMrl-0005e2-3f
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 07:10:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liq3ea@gmail.com>) id 1hfMqS-0006Rd-4c
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 07:09:09 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:34829)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hfMqR-0006QT-R3
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 07:09:08 -0400
-Received: by mail-ot1-x343.google.com with SMTP id j19so13086883otq.2
- for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 04:09:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=UVzbIZc4EBciOaQptpV3eLW93DDK64nenvgyquyswow=;
- b=eU/mV8uwD07eF+4EOK8mTJe8+pjo/fkiJCa0YHD+gN4ErxMqc2gZAxbzGTAIIULyUX
- 5WZhDoEHjOUH4GM6G2ZDe9y10QQuknl1xYqMO5zg/JfZUa0lZrzxMRntPkrsBgGB1IRi
- 0YZvbbu9YLI2G2YDnN7Buj3HxR73qfT9OLtY9Ftz31LZzYNpAXENzoZTtMCq/4RnxCXq
- khPCHU9dCmZ4FtL/i/gi7bB75Tde/0EjRB+Z0HmXsQ3lKZAWONIpd/lE0KbVBxTonhAT
- ijMMwnzRMV+zdqdkhrwcESXWyhj++Rg7xWDcHUfxxqYRAargtV2UpkU8QK963IblWAu9
- G3XA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=UVzbIZc4EBciOaQptpV3eLW93DDK64nenvgyquyswow=;
- b=Rj0kFq8+/teickDIXPvtqNZFbDBU/jHG4eRwytlR4BA/TUAMszualfFZmacixRcEOf
- mewVWB0QS1LdWQStr335tuGer7pAjasPNbmZSLX0vJlLSajiGLK6SKkXiq+ZLNfxeOkm
- sfhwkjsAH5Apx6tLrdXIWqRN5O3MsZh+B0Eea85n6kOtzQDaiqIAaPF8diSZ35kqI11G
- 6lhG4nwRUvdit8KnFCZ+bq809s6/I7rnnI9MfZAE4uSr7LKmkDTxi1PLHyrlcHQOJvnb
- /PIptgY64GF+g3NYN+eoz0u5YOLMmfmASAh7dvR38YLQ4g3Swvqe4DmRENpCqXbYsR96
- 5VaA==
-X-Gm-Message-State: APjAAAVmCGVdxu5Xmv83WQ7zv/jAiUWtJ/IV7xwqis/sRUhZ6hYPLBu5
- xXNrxSGHVwVNKenUwVjeY6aDFQHHwYZXDSV8XhI=
-X-Google-Smtp-Source: APXvYqyG2g/7PpKoEs1Mw2Lr6IoVhg4tsORTAxDEd+wYhYbYoS6ooZxgUnOVrSwbrOp98qg7BLldGALRe92NHj+NQ7U=
-X-Received: by 2002:a05:6830:14c:: with SMTP id
- j12mr10602909otp.181.1561374546220; 
- Mon, 24 Jun 2019 04:09:06 -0700 (PDT)
+ (envelope-from <peterx@redhat.com>) id 1hfMrj-0007hK-1D
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 07:10:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34974)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hfMri-0007fw-PC
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 07:10:26 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A026B7FDCA;
+ Mon, 24 Jun 2019 11:10:25 +0000 (UTC)
+Received: from xz-x1 (ovpn-12-60.pek2.redhat.com [10.72.12.60])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EB56D608E4;
+ Mon, 24 Jun 2019 11:10:17 +0000 (UTC)
+Date: Mon, 24 Jun 2019 19:10:13 +0800
+From: Peter Xu <peterx@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>
+Message-ID: <20190624111013.GL6279@xz-x1>
+References: <20190624091811.30412-1-peterx@redhat.com>
+ <20190624091811.30412-3-peterx@redhat.com>
+ <b4e30868-dc87-99ee-0696-a796421b00fc@redhat.com>
 MIME-Version: 1.0
-References: <20190622002119.126834-1-liq3ea@163.com>
- <20190624094216.GI6279@xz-x1>
-In-Reply-To: <20190624094216.GI6279@xz-x1>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Mon, 24 Jun 2019 19:08:30 +0800
-Message-ID: <CAKXe6S+5Ad-WHYpX9E8EFv61ASxSQYL+RQoqnG6NVbysgtv4FQ@mail.gmail.com>
-To: Peter Xu <peterx@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v2] ioapic: use irq number instead of
- vector in ioapic_eoi_broadcast
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <b4e30868-dc87-99ee-0696-a796421b00fc@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Mon, 24 Jun 2019 11:10:25 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] intel_iommu: Fix unexpected unmaps
+ during global unmap
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,96 +71,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Li Qiang <liq3ea@163.com>,
- Qemu Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Yan Zhao <yan.y.zhao@intel.com>, qemu-devel@nongnu.org,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Xu <peterx@redhat.com> =E4=BA=8E2019=E5=B9=B46=E6=9C=8824=E6=97=A5=E5=
-=91=A8=E4=B8=80 =E4=B8=8B=E5=8D=885:42=E5=86=99=E9=81=93=EF=BC=9A
+On Mon, Jun 24, 2019 at 12:09:48PM +0200, Auger Eric wrote:
+> Hi Peter,
+> 
+> On 6/24/19 11:18 AM, Peter Xu wrote:
+> > This is an replacement work of Yan Zhao's patch:
+> > 
+> > https://www.mail-archive.com/qemu-devel@nongnu.org/msg625340.html
+> > 
+> > vtd_address_space_unmap() will do proper page mask alignment to make
+> > sure each IOTLB message will have correct masks for notification
+> > messages (2^N-1), but sometimes it can be expanded to even supercede
+> > the registered range.  That could lead to unexpected UNMAP of already
+> > mapped regions in some other notifiers.
+> > 
+> > Instead of doing mindless expension of the start address and address
+> > mask, we split the range into smaller ones and guarantee that each
+> > small range will have correct masks (2^N-1) and at the same time we
+> > should also try our best to generate as less IOTLB messages as
+> > possible.
+> > 
+> > Reported-by: Yan Zhao <yan.y.zhao@intel.com>
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  hw/i386/intel_iommu.c | 67 ++++++++++++++++++++++++++-----------------
+> >  1 file changed, 41 insertions(+), 26 deletions(-)
+> > 
+> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> > index 719ce19ab3..de86f53b4e 100644
+> > --- a/hw/i386/intel_iommu.c
+> > +++ b/hw/i386/intel_iommu.c
+> > @@ -3363,11 +3363,28 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+> >      return vtd_dev_as;
+> >  }
+> >  
+> > +static uint64_t get_naturally_aligned_size(uint64_t start,
+> > +                                           uint64_t size, int gaw)
+> > +{
+> > +    uint64_t max_mask = 1ULL << gaw;
+> > +    uint64_t alignment = start ? start & -start : max_mask;
+> > +
+> > +    alignment = MIN(alignment, max_mask);
+> > +    size = MIN(size, max_mask);
+> this does not not prevent from invalidating beyond gaw if start != 0, right?
 
-> On Fri, Jun 21, 2019 at 05:21:19PM -0700, Li Qiang wrote:
-> > When emulating irqchip in qemu, such as following command:
-> >
-> > x86_64-softmmu/qemu-system-x86_64 -m 1024 -smp 4 -hda /home/test/test.i=
-mg
-> > -machine kernel-irqchip=3Doff --enable-kvm -vnc :0 -device edu -monitor
-> stdio
-> >
-> > We will get a crash with following asan output:
-> >
-> > (qemu) /home/test/qemu5/qemu/hw/intc/ioapic.c:266:27: runtime error:
-> index 35 out of bounds for type 'int [24]'
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > =3D=3D113504=3D=3DERROR: AddressSanitizer: heap-buffer-overflow on addr=
-ess
-> 0x61b000003114 at pc 0x5579e3c7a80f bp 0x7fd004bf8c10 sp 0x7fd004bf8c00
-> > WRITE of size 4 at 0x61b000003114 thread T4
-> >     #0 0x5579e3c7a80e in ioapic_eoi_broadcast
-> /home/test/qemu5/qemu/hw/intc/ioapic.c:266
-> >     #1 0x5579e3c6f480 in apic_eoi
-> /home/test/qemu5/qemu/hw/intc/apic.c:428
-> >     #2 0x5579e3c720a7 in apic_mem_write
-> /home/test/qemu5/qemu/hw/intc/apic.c:802
-> >     #3 0x5579e3b1e31a in memory_region_write_accessor
-> /home/test/qemu5/qemu/memory.c:503
-> >     #4 0x5579e3b1e6a2 in access_with_adjusted_size
-> /home/test/qemu5/qemu/memory.c:569
-> >     #5 0x5579e3b28d77 in memory_region_dispatch_write
-> /home/test/qemu5/qemu/memory.c:1497
-> >     #6 0x5579e3a1b36b in flatview_write_continue
-> /home/test/qemu5/qemu/exec.c:3323
-> >     #7 0x5579e3a1b633 in flatview_write /home/test/qemu5/qemu/exec.c:33=
-62
-> >     #8 0x5579e3a1bcb1 in address_space_write
-> /home/test/qemu5/qemu/exec.c:3452
-> >     #9 0x5579e3a1bd03 in address_space_rw
-> /home/test/qemu5/qemu/exec.c:3463
-> >     #10 0x5579e3b8b979 in kvm_cpu_exec
-> /home/test/qemu5/qemu/accel/kvm/kvm-all.c:2045
-> >     #11 0x5579e3ae4499 in qemu_kvm_cpu_thread_fn
-> /home/test/qemu5/qemu/cpus.c:1287
-> >     #12 0x5579e4cbdb9f in qemu_thread_start util/qemu-thread-posix.c:50=
-2
-> >     #13 0x7fd0146376da in start_thread
-> (/lib/x86_64-linux-gnu/libpthread.so.0+0x76da)
-> >     #14 0x7fd01436088e in __clone
-> (/lib/x86_64-linux-gnu/libc.so.6+0x12188e
-> >
-> > This is because in ioapic_eoi_broadcast function, we uses 'vector' to
-> > index the 's->irq_eoi'. To fix this, we should uses the irq number.
-> >
-> > Signed-off-by: Li Qiang <liq3ea@163.com>
->
-> Reviewed-by: Peter Xu <peterx@redhat.com>
->
->
-Thanks Peter.
+Yes.  But at the start of vtd_address_space_unmap(), we have:
 
+    if (end > VTD_ADDRESS_SIZE(s->aw_bits) - 1) {
+        /*
+         * Don't need to unmap regions that is bigger than the whole
+         * VT-d supported address space size
+         */
+        end = VTD_ADDRESS_SIZE(s->aw_bits) - 1;
+    }
 
+So we don't need to worry about (start+size) exceeding GAW?
 
-> Maybe also add:
->
-> Fixes: 958a01dab8 ("ioapic: allow buggy guests mishandling ...")
->
-> Should we better clear irq_eoi when the entries are updated in
-> ioapic_mem_write()?
->
->
-Do you mean the redirect table entry of ioapic update?
-I think this is reasonable, I will prepare a separate patch with this one
-as a patchset later.
+[1]
+
+> > +
+> > +    if (alignment <= size) {
+> > +        /* Increase the alignment of start */
+> I don't really get this comment
+
+This comment comes from Paolo, but I'll try to explain - it tries to
+mean that this "alignment" will be used as an increasement to "start"
+variable, so finally variable "start" will align with larger mask
+size.
+
+Better comments welcomed... :)
+
+> > +        return alignment;
+> > +    } else {
+> > +        /* Find the largest page mask from size */
+> > +        return 1ULL << (63 - clz64(size));
+> > +    }> +}
+> > +
+> >  /* Unmap the whole range in the notifier's scope. */
+> >  static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+> >  {
+> > -    IOMMUTLBEntry entry;
+> > -    hwaddr size;
+> > +    hwaddr size, remain;
+> >      hwaddr start = n->start;
+> >      hwaddr end = n->end;
+> >      IntelIOMMUState *s = as->iommu_state;
+> > @@ -3388,39 +3405,37 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+> >      }
+> >  
+> >      assert(start <= end);
+> > -    size = end - start;
+> > +    size = remain = end - start + 1;
+> >  
+> > -    if (ctpop64(size) != 1) {
+> > -        /*
+> > -         * This size cannot format a correct mask. Let's enlarge it to
+> > -         * suite the minimum available mask.
+> > -         */
+> > -        int n = 64 - clz64(size);
+> > -        if (n > s->aw_bits) {
+> > -            /* should not happen, but in case it happens, limit it */
+> > -            n = s->aw_bits;
+> > -        }
+> > -        size = 1ULL << n;
+> > +    while (remain >= VTD_PAGE_SIZE) {
+> Can't we stop as soon as entry.iova exceeds gaw as well?
+
+As explained at [1], I think we've already checked it.
 
 Thanks,
-Li Qiang
 
+-- 
+Peter Xu
 
-
-> Regards,
->
-> --
-> Peter Xu
->
