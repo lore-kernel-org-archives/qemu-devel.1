@@ -2,69 +2,73 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 342F1C43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 06:17:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2EA8C43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 06:18:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFE1720679
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 06:17:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFE1720679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A837C20679
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 06:18:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A837C20679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48200 helo=lists.gnu.org)
+Received: from localhost ([::1]:48204 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfIIR-000358-Nm
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 02:17:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39297)
+	id 1hfIIy-0003SV-U7
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 02:18:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39382)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peterx@redhat.com>) id 1hfIGK-0001mi-9k
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 02:15:34 -0400
+ (envelope-from <bounces@canonical.com>) id 1hfIGl-0001uy-6m
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 02:16:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1hfIGI-0002Pi-Fe
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 02:15:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49432)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hfIGI-0002Lj-6G
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 02:15:30 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B92A1308FC4B;
- Mon, 24 Jun 2019 06:15:26 +0000 (UTC)
-Received: from xz-x1 (ovpn-12-60.pek2.redhat.com [10.72.12.60])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C59E600C4;
- Mon, 24 Jun 2019 06:15:02 +0000 (UTC)
-Date: Mon, 24 Jun 2019 14:14:59 +0800
-From: Peter Xu <peterx@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Message-ID: <20190624061459.GD6279@xz-x1>
-References: <1560934185-14152-1-git-send-email-yan.y.zhao@intel.com>
- <39c4c32b-e34a-8d8f-abbc-ab346ec5bed7@redhat.com>
- <20190620040230.GB9073@xz-x1>
- <6829b139-3eab-449e-04d6-07f1e381316d@redhat.com>
- <20190620125955.GB9657@xz-x1> <20190620130443.GC9657@xz-x1>
- <20190624052255.GA27894@joy-OptiPlex-7040>
+ (envelope-from <bounces@canonical.com>) id 1hfIGj-00036R-7M
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 02:15:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54310)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hfIGh-0002z2-Bh
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 02:15:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hfIGd-0003G7-Q0
+ for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 06:15:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id B80292E80C7
+ for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 06:15:51 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190624052255.GA27894@joy-OptiPlex-7040>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Mon, 24 Jun 2019 06:15:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 24 Jun 2019 06:06:28 -0000
+From: Alex <1833053@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: crash qemu spice usbredir
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: gsanic hijacker-c
+X-Launchpad-Bug-Reporter: Nikolay Kichukov (hijacker-c)
+X-Launchpad-Bug-Modifier: Alex (gsanic)
+References: <156076455835.24347.5065510387911666481.malonedeb@gac.canonical.com>
+Message-Id: <156135638888.18276.13440248414787508100.malone@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18989";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 40a6d0aff33a908fb7944dea56e09ce6f49d1419
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] memory: do not do out of bound notification
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1833053] Re: qemu guest crashes on spice client
+ USB redirected device removal
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -73,365 +77,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Auger Eric <eric.auger@redhat.com>
+Reply-To: Bug 1833053 <1833053@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 24, 2019 at 01:22:55AM -0400, Yan Zhao wrote:
-> On Thu, Jun 20, 2019 at 09:04:43PM +0800, Peter Xu wrote:
-> > On Thu, Jun 20, 2019 at 08:59:55PM +0800, Peter Xu wrote:
-> > > On Thu, Jun 20, 2019 at 10:35:29AM +0200, Paolo Bonzini wrote:
-> > > > On 20/06/19 06:02, Peter Xu wrote:
-> > > > > Seems workable, to be explicit - we can even cut it into chunks with
-> > > > > different size to be efficient.
-> > > > 
-> > > > Yes, this is not hard (completely untested):
-> > > > 
-> > > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > > > index 44b1231157..541538bc6c 100644
-> > > > --- a/hw/i386/intel_iommu.c
-> > > > +++ b/hw/i386/intel_iommu.c
-> > > > @@ -3388,39 +3388,34 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
-> > > >      }
-> > > >  
-> > > >      assert(start <= end);
-> > > > -    size = end - start;
-> > > > +    while (end > start) {
-> > > > +        size = end - start;
-> > > > +        /* Only keep the lowest bit of either size or start.  */
-> > > > +        size = MIN(size & -size, start & -start);
-> > > 
-> > > I feel like this can be problematic.  I'm imaging:
-> > > 
-> > > start=0x1000_0000, size=0x1000_1000
-> > > 
-> > > This will get size=0x1000 but actually we can do size=0x1000_0000 as
-> > > the first.
-> > > 
-> > > > +        /* Should not happen, but limit to address width too just in case */
-> > > > +        size = MIN(size, 1ULL << s->aw_bits);
-> > > >  
-> > > > -    if (ctpop64(size) != 1) {
-> > > > -        /*
-> > > > -         * This size cannot format a correct mask. Let's enlarge it to
-> > > > -         * suite the minimum available mask.
-> > > > -         */
-> > > > -        int n = 64 - clz64(size);
-> > > > -        if (n > s->aw_bits) {
-> > > > -            /* should not happen, but in case it happens, limit it */
-> > > > -            n = s->aw_bits;
-> > > > -        }
-> > > > -        size = 1ULL << n;
-> > > > -    }
-> > > > +        assert((start & (size - 1)) == 0);
-> > > >  
-> > > > -    entry.target_as = &address_space_memory;
-> > > > -    /* Adjust iova for the size */
-> > > > -    entry.iova = n->start & ~(size - 1);
-> > > > -    /* This field is meaningless for unmap */
-> > > > -    entry.translated_addr = 0;
-> > > > -    entry.perm = IOMMU_NONE;
-> > > > -    entry.addr_mask = size - 1;
-> > > > +        entry.target_as = &address_space_memory;
-> > > > +        entry.iova = start;
-> > > > +        /* This field is meaningless for unmap */
-> > > > +        entry.translated_addr = 0;
-> > > > +        entry.perm = IOMMU_NONE;
-> > > > +        entry.addr_mask = size - 1;
-> > > 
-> > > (some of the fields can be moved out of loop because they are
-> > >  constants)
-> > > 
-> > > >  
-> > > > -    trace_vtd_as_unmap_whole(pci_bus_num(as->bus),
-> > > > -                             VTD_PCI_SLOT(as->devfn),
-> > > > -                             VTD_PCI_FUNC(as->devfn),
-> > > > -                             entry.iova, size);
-> > > > +        trace_vtd_as_unmap_whole(pci_bus_num(as->bus),
-> > > > +                                 VTD_PCI_SLOT(as->devfn),
-> > > > +                                 VTD_PCI_FUNC(as->devfn),
-> > > > +                                 entry.iova, size);
-> > > 
-> > > Can move this out because this is a trace only so we don't have
-> > > restriction on mask?
-> > > 
-> > > >  
-> > > > -    map.iova = entry.iova;
-> > > > -    map.size = entry.addr_mask;
-> > > > -    iova_tree_remove(as->iova_tree, &map);
-> > > > +        map.iova = entry.iova;
-> > > > +        map.size = entry.addr_mask;
-> > > > +        iova_tree_remove(as->iova_tree, &map);
-> > > 
-> > > Same here?
-> > > 
-> > > >  
-> > > > -    memory_region_notify_one(n, &entry);
-> > > > +        memory_region_notify_one(n, &entry);
-> > > > +        start += size;
-> > > > +    }
-> > > >  }
-> > > >  
-> > > >  static void vtd_address_space_unmap_all(IntelIOMMUState *s)
-> > > > 
-> > > > 
-> > > > Yan,
-> > > > 
-> > > > if something like this works for you, let me know and I will submit it
-> > > > as a proper patch.
-> > > > 
-> > > > Paolo
-> > > 
-> > > Since during review I'm thinking how to generate a correct sequence of
-> > > these masks... here's my try below with above issues fixed... :)
-> > > 
-> > > I've tried compile but not tested.  Yan can test it, or I can do it
-> > > too tomorrow after I find some machines.
-> > > 
-> > > Thanks,
-> > > 
-> > > ------------------------------------------------------------
-> > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > > index 44b1231157..cfbd225f0a 100644
-> > > --- a/hw/i386/intel_iommu.c
-> > > +++ b/hw/i386/intel_iommu.c
-> > > @@ -3363,11 +3363,32 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
-> > >      return vtd_dev_as;
-> > >  }
-> > > 
-> > > +static uint64_t vtd_get_next_mask(uint64_t start, uint64_t size, int gaw)
-> > > +{
-> > > +    /* Tries to find smallest mask from start first */
-> > > +    uint64_t rmask = start & -start, max_mask = 1ULL << gaw;
-> > > +
-> > > +    assert(size && gaw > 0 && gaw < 64);
-> > > +
-> > > +    /* Zero start, or too big */
-> > > +    if (!rmask || rmask > max_mask) {
-> > > +        rmask = max_mask;
-> > > +    }
-> > > +
-> > > +    /* If the start mask worked, then use it */
-> > > +    if (rmask <= size) {
-> > > +        return rmask;
-> > > +    }
-> > > +
-> > > +    /* Find the largest page mask from size */
-> > > +    return 1ULL << (63 - clz64(size));
-> > > +}
-> > > +
-> > >  /* Unmap the whole range in the notifier's scope. */
-> > >  static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
-> > >  {
-> > >      IOMMUTLBEntry entry;
-> > > -    hwaddr size;
-> > > +    hwaddr size, remain;
-> > >      hwaddr start = n->start;
-> > >      hwaddr end = n->end;
-> > >      IntelIOMMUState *s = as->iommu_state;
-> > > @@ -3388,39 +3409,28 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
-> > >      }
-> > > 
-> > >      assert(start <= end);
-> > > -    size = end - start;
-> > > -
-> > > -    if (ctpop64(size) != 1) {
-> > > -        /*
-> > > -         * This size cannot format a correct mask. Let's enlarge it to
-> > > -         * suite the minimum available mask.
-> > > -         */
-> > > -        int n = 64 - clz64(size);
-> > > -        if (n > s->aw_bits) {
-> > > -            /* should not happen, but in case it happens, limit it */
-> > > -            n = s->aw_bits;
-> > > -        }
-> > > -        size = 1ULL << n;
-> > > -    }
-> > > -
-> > > +    size = remain = end - start;
-> > >      entry.target_as = &address_space_memory;
-> > > -    /* Adjust iova for the size */
-> > > -    entry.iova = n->start & ~(size - 1);
-> > > +    entry.perm = IOMMU_NONE;
-> > >      /* This field is meaningless for unmap */
-> > >      entry.translated_addr = 0;
-> > > -    entry.perm = IOMMU_NONE;
-> > > -    entry.addr_mask = size - 1;
-> > > +
-> > > +    while (remain) {
-> > > +        uint64_t mask = vtd_get_next_mask(start, remain, s->aw_bits);
-> > > +
-> > > +        entry.iova = start;
-> > > +        entry.addr_mask = mask - 1;
-> > > +        memory_region_notify_one(n, &entry);
-> > 
-> > Sorry, I at least missed these lines:
-> > 
-> >            start += mask;
-> >            remain -= mask;
-> > 
-> > > +    }
-> > > 
-> > >      trace_vtd_as_unmap_whole(pci_bus_num(as->bus),
-> > >                               VTD_PCI_SLOT(as->devfn),
-> > >                               VTD_PCI_FUNC(as->devfn),
-> > > -                             entry.iova, size);
-> > > +                             n->start, size);
-> > > 
-> > > -    map.iova = entry.iova;
-> > > -    map.size = entry.addr_mask;
-> > > +    map.iova = n->start;
-> > > +    map.size = size;
-> > >      iova_tree_remove(as->iova_tree, &map);
-> > > -
-> > > -    memory_region_notify_one(n, &entry);
-> > >  }
-> > > 
-> > >  static void vtd_address_space_unmap_all(IntelIOMMUState *s)
-> > > ------------------------------------------------------------
-> > > 
-> > > Regards,
-> > > 
-> > > -- 
-> > > Peter Xu
-> > 
-> > Regards,
-> > 
-> > -- 
-> > Peter Xu
-> 
-> hi Peter and Paolo,
-> I tested with code and it's fine in my side.
-> It's base on your version with some minor modifications, such as size is
-> now  (end - start + 1) now.
-> Thanks
-> Yan
+Hello,
+I have the same qemu behaviour. It happens every time I have unplugged phys=
+ical usb device attached to guest from the host system. My device is USB GS=
+M dongle. Some times it disconnects and reconnects again for unknown reason=
+, may be power loss... With version 3.1.0 qemu (gentoo linux) this disconne=
+cts had normal USB device disconnects in guest system. But with version 4.0=
+.0 it gets guest VM to crash.
 
-Hi, Yan,
+-- =
 
-Thanks for testing the patches.  I think below change [1] is not
-related to the problem so I tend to split it out.  For [2] I'll change
-to an assertion if you won't disagree.  I'll reorganize the patches
-and post a formal version with proper authorships soon.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1833053
 
-Thanks,
+Title:
+  qemu guest crashes on spice client USB redirected device removal
 
-> 
-> +static uint64_t vtd_get_next_mask(uint64_t start, uint64_t size, int gaw)
-> +{
-> +    /* Tries to find smallest mask from start first */
-> +    uint64_t rmask = start & -start, max_mask = 1ULL << gaw;
-> +    assert(size && gaw > 0 && gaw < 64);
-> +    /* Zero start, or too big */
-> +    if (!rmask || rmask > max_mask) {
-> +        rmask = max_mask;
-> +    }
-> +    /* If the start mask worked, then use it */
-> +    if (rmask <= size) {
-> +        return rmask;
-> +    }
-> +
-> +    /* Find the largest page mask from size */
-> +    return 1ULL << (63 - clz64(size));
-> +}
-> +
->  /* Unmap the whole range in the notifier's scope. */
->  static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
->  {
->      IOMMUTLBEntry entry;
-> -    hwaddr size;
-> +    hwaddr size, remain;
->      hwaddr start = n->start;
->      hwaddr end = n->end;
->      IntelIOMMUState *s = as->iommu_state;
-> @@ -3380,48 +3398,46 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
->       * VT-d spec), otherwise we need to consider overflow of 64 bits.
->       */
-> 
-> -    if (end > VTD_ADDRESS_SIZE(s->aw_bits)) {
-> +    if (end > VTD_ADDRESS_SIZE(s->aw_bits) - 1) {
->          /*
->           * Don't need to unmap regions that is bigger than the whole
->           * VT-d supported address space size
->           */
-> -        end = VTD_ADDRESS_SIZE(s->aw_bits);
-> +        end = VTD_ADDRESS_SIZE(s->aw_bits) - 1;
+Status in QEMU:
+  New
 
-[1]
+Bug description:
+  Hello,
 
->      }
-> 
->      assert(start <= end);
-> -    size = end - start;
-> 
-> -    if (ctpop64(size) != 1) {
-> -        /*
-> -         * This size cannot format a correct mask. Let's enlarge it to
-> -         * suite the minimum available mask.
-> -         */
-> -        int n = 64 - clz64(size);
-> -        if (n > s->aw_bits) {
-> -            /* should not happen, but in case it happens, limit it */
-> -            n = s->aw_bits;
-> -        }
-> -        size = 1ULL << n;
-> -    }
-> +    size = remain = end - start + 1;
-> 
->      entry.target_as = &address_space_memory;
-> -    /* Adjust iova for the size */
-> -    entry.iova = n->start & ~(size - 1);
-> +
-> +    entry.perm = IOMMU_NONE;
->      /* This field is meaningless for unmap */
->      entry.translated_addr = 0;
-> -    entry.perm = IOMMU_NONE;
-> -    entry.addr_mask = size - 1;
-> +
-> +    while (remain >= VTD_PAGE_SIZE) {
-> +        uint64_t mask = vtd_get_next_mask(start, remain, s->aw_bits);
-> +
-> +        entry.iova = start;
-> +        entry.addr_mask = mask - 1;
-> +        memory_region_notify_one(n, &entry);
-> +        start += mask;
-> +        remain -= mask;
-> +    }
-> +
-> +    if (remain) {
-> +        warn_report("Unmapping unaligned range %lx-%lx", start, end);
+  I am experiencing guest crashes, which cannot be reproduced at all
+  times, but are pretty frequent (4 out of 5 tries it would crash). The
+  guest crashes when a previously attached USB redirected device through
+  SPICE has been removed by the client.
 
-[2]
+  Steps to reproduce:
+  1.) Start windows 10 guest with display driver Spice
+  2.) Connect to the console with remote-viewer spice://IP:PORT or via virt=
+-viewer (tunnelled through SSH)
+  3.) Attach a client USB device, for example storage device, iPhone or And=
+roid phone
+  4.) Observe the guest OS detects it and sets it up
+  5.) Go back to 'USB device selection' and untick the USB device
+  6.) Observe the guest VM crashed and the below assertion was printed in t=
+he qemu log for this virtual machine:
 
-> +    }
-> 
->      trace_vtd_as_unmap_whole(pci_bus_num(as->bus),
->                               VTD_PCI_SLOT(as->devfn),
->                               VTD_PCI_FUNC(as->devfn),
-> -                             entry.iova, size);
-> -
-> -    map.iova = entry.iova;
-> -    map.size = entry.addr_mask;
-> +                             n->start, size);
-> +    map.iova = n->start;
-> +    map.size = size;
->      iova_tree_remove(as->iova_tree, &map);
-> 
-> -    memory_region_notify_one(n, &entry);
->  }
-> 
->  static void vtd_address_space_unmap_all(IntelIOMMUState *s)
-> --
-> 2.7.4
-> 
-> 
-> 
+  qemu-system-x86_64: /var/tmp/portage/app-emulation/qemu-4.0.0-r3/work/qem=
+u-4.0.0/hw/usb/core.c:720: usb_ep_get: Assertion `dev !=3D NULL' failed.
+  2019-06-17 09:25:09.160+0000: shutting down, reason=3Dcrashed
 
-Regards,
+  =
 
--- 
-Peter Xu
+  Versions of related packages on the host:
+  app-emulation/qemu-4.0.0-r3
+  app-emulation/spice-0.14.0-r2:0
+  app-emulation/spice-protocol-0.12.14:0
+  net-misc/spice-gtk-0.35:0
+  Kernel: 5.1.7-gentoo on Intel x86_64 CPU
+
+  Version of the spice-tools on the guest:
+  virtio-win 0.1-126
+  QXL 0.1-21
+  mingw-vdagent-win 0.8.0
+
+  QEMU command line (generated by libvirt):
+
+  /usr/bin/qemu-system-x86_64 -name guest=3DW10VM,debug-threads=3Don -S
+  -object
+  secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-4=
+1-W10VM
+  /master-key.aes -machine pc-i440fx-2.12,accel=3Dkvm,usb=3Doff,vmport=3Doff
+  ,dump-guest-core=3Doff -cpu
+  qemu64,hv_time,hv_relaxed,hv_vapic,hv_spinlocks=3D0x1fff,hv_synic,hv_stim=
+er
+  -m 4500 -realtime mlock=3Doff -smp
+  2,maxcpus=3D4,sockets=3D4,cores=3D1,threads=3D1 -uuid b39afae2-5085-4659-=
+891c-
+  b3c65e65af2e -no-user-config -nodefaults -chardev
+  socket,id=3Dcharmonitor,fd=3D26,server,nowait -mon
+  chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
+  base=3Dlocaltime,driftfix=3Dslew -no-hpet -global kvm-
+  pit.lost_tick_policy=3Ddelay -no-shutdown -global PIIX4_PM.disable_s3=3D1
+  -global PIIX4_PM.disable_s4=3D1 -boot menu=3Doff,strict=3Don -device ich9
+  -usb-ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0x5.0x7 -device ich9-usb-
+  uhci1,masterbus=3Dusb.0,firstport=3D0,bus=3Dpci.0,multifunction=3Don,addr=
+=3D0x5
+  -device ich9-usb-
+  uhci2,masterbus=3Dusb.0,firstport=3D2,bus=3Dpci.0,addr=3D0x5.0x1 -device =
+ich9
+  -usb-uhci3,masterbus=3Dusb.0,firstport=3D4,bus=3Dpci.0,addr=3D0x5.0x2 -de=
+vice
+  virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.0,addr=3D0x8 -device virtio-serial-
+  pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x6 -drive
+  file=3D/libvirt/images/W10VM.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-
+  scsi0-0-0-1,cache=3Dunsafe,discard=3Dunmap,detect-zeroes=3Dunmap -device
+  scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D1,device_id=3Ddrive-
+  scsi0-0-0-1,drive=3Ddrive-scsi0-0-0-1,id=3Dscsi0-0-0-1,bootindex=3D1,writ=
+e-
+  cache=3Don -netdev tap,fd=3D28,id=3Dhostnet0,vhost=3Don,vhostfd=3D29 -dev=
+ice
+  virtio-net-
+  pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:44:f6:21,bus=3Dpci.0,addr=
+=3D0x3
+  -chardev spicevmc,id=3Dcharchannel0,name=3Dvdagent -device
+  virtserialport,bus=3Dvirtio-
+  serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dcom.redhat.s=
+pice.0
+  -chardev socket,id=3Dcharchannel1,fd=3D30,server,nowait -device
+  virtserialport,bus=3Dvirtio-
+  serial0.0,nr=3D3,chardev=3Dcharchannel1,id=3Dchannel1,name=3Dorg.qemu.gue=
+st_agent.0
+  -chardev spiceport,id=3Dcharchannel2,name=3Dorg.spice-space.webdav.0
+  -device virtserialport,bus=3Dvirtio-
+  serial0.0,nr=3D2,chardev=3Dcharchannel2,id=3Dchannel2,name=3Dorg.spice-
+  space.webdav.0 -spice port=3D5901,addr=3D0.0.0.0,seamless-migration=3Don
+  -device qxl-
+  vga,id=3Dvideo0,ram_size=3D134217728,vram_size=3D134217728,vram64_size_mb=
+=3D0,vgamem_mb=3D64,max_outputs=3D1,bus=3Dpci.0,addr=3D0x2
+  -device intel-hda,id=3Dsound0,bus=3Dpci.0,addr=3D0x4 -device hda-
+  duplex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 -chardev
+  spicevmc,id=3Dcharredir0,name=3Dusbredir -device usb-
+  redir,chardev=3Dcharredir0,id=3Dredir0,bus=3Dusb.0,port=3D1 -chardev
+  spicevmc,id=3Dcharredir1,name=3Dusbredir -device usb-
+  redir,chardev=3Dcharredir1,id=3Dredir1,bus=3Dusb.0,port=3D2 -device virti=
+o-
+  balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x7 -sandbox
+  on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=
+=3Ddeny
+  -msg timestamp=3Don
+
+  =
+
+  I have attempted to collect a backtrace, but will need direction as I am =
+not sure on which thread to listen and where to set the breakpoint, 'thread=
+ apply all backtrace' does not seem to work well with the qemu process...
+
+  Thank you
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1833053/+subscriptions
 
