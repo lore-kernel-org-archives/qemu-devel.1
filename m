@@ -6,46 +6,47 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E35C43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 19:29:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C254C43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 19:32:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 342C620657
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 19:29:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 342C620657
+	by mail.kernel.org (Postfix) with ESMTPS id CD19020657
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 19:32:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD19020657
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54178 helo=lists.gnu.org)
+Received: from localhost ([::1]:54192 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfUeC-0000xL-4p
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 15:29:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47416)
+	id 1hfUh7-0002NF-3X
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 15:32:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48185)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hfUbw-0008HX-Vw
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 15:26:41 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hfUfg-0001tE-SZ
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 15:30:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hfUbw-0002LE-2s
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 15:26:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38884)
+ (envelope-from <mreitz@redhat.com>) id 1hfUff-0005g0-SJ
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 15:30:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54476)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1hfUbv-0002HI-R2
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 15:26:40 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1hfUff-0005dF-KS
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 15:30:31 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F231B89AD0;
- Mon, 24 Jun 2019 19:26:32 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7CB0430832E3;
+ Mon, 24 Jun 2019 19:30:29 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-204-152.brq.redhat.com
  [10.40.204.152])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 603856085B;
- Mon, 24 Jun 2019 19:26:29 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4D9595D70D;
+ Mon, 24 Jun 2019 19:30:28 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
 To: Eduardo Habkost <ehabkost@redhat.com>
 References: <20190624190214.14468-1-mreitz@redhat.com>
  <20190624192108.GL1862@habkost.net>
-From: Max Reitz <mreitz@redhat.com>
+ <8cfbd3c5-9473-46bf-b59b-b7d7711d636f@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -71,17 +72,17 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <8cfbd3c5-9473-46bf-b59b-b7d7711d636f@redhat.com>
-Date: Mon, 24 Jun 2019 21:26:27 +0200
+Message-ID: <a75ac63e-c84b-c674-4a42-e96c4c0d9326@redhat.com>
+Date: Mon, 24 Jun 2019 21:30:26 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190624192108.GL1862@habkost.net>
+In-Reply-To: <8cfbd3c5-9473-46bf-b59b-b7d7711d636f@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Mon, 24 Jun 2019 19:26:38 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Mon, 24 Jun 2019 19:30:29 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -103,34 +104,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24.06.19 21:21, Eduardo Habkost wrote:
-> On Mon, Jun 24, 2019 at 09:02:14PM +0200, Max Reitz wrote:
->> find_next_bit() takes a pointer of type "const unsigned long *", but t=
-he
->> first argument passed here is a "uint64_t *".  These types are
->> incompatible when compiling qemu with -m32.
+On 24.06.19 21:26, Max Reitz wrote:
+> On 24.06.19 21:21, Eduardo Habkost wrote:
+>> On Mon, Jun 24, 2019 at 09:02:14PM +0200, Max Reitz wrote:
+>>> find_next_bit() takes a pointer of type "const unsigned long *", but =
+the
+>>> first argument passed here is a "uint64_t *".  These types are
+>>> incompatible when compiling qemu with -m32.
+>>>
+>>> Just cast it to "const void *", find_next_bit() works fine with any t=
+ype
+>>> on little-endian hosts (which x86 is).
+>>>
+>>> Fixes: c686193072a47032d83cb4e131dc49ae30f9e5d
+>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >>
->> Just cast it to "const void *", find_next_bit() works fine with any ty=
-pe
->> on little-endian hosts (which x86 is).
->>
->> Fixes: c686193072a47032d83cb4e131dc49ae30f9e5d
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> Why not declare kvm_hyperv_properties.dependencies with the right
+>> type for bitmaps, using
+>>   unsigned long dependencies[BITS_TO_LONGS(64)]
+>> ?
 >=20
-> Why not declare kvm_hyperv_properties.dependencies with the right
-> type for bitmaps, using
->   unsigned long dependencies[BITS_TO_LONGS(64)]
-> ?
+> How would you (statically) initialize that field, then?
+>=20
+> I cannot imagine a reasonable static way that does not invoke the same
+> =E2=80=9CThe host must be little-endian, so it=E2=80=99s OK=E2=80=9D as=
+sumption.
 
-How would you (statically) initialize that field, then?
+Sorry, brain fart.  That=E2=80=99s not the problem because in either case=
+, the
+lower index will receive the lower-indexed bits.
 
-I cannot imagine a reasonable static way that does not invoke the same
-=E2=80=9CThe host must be little-endian, so it=E2=80=99s OK=E2=80=9D assu=
-mption.
-
-The better question is perhaps, why not use ffsll().  Hm.  I don=E2=80=99=
-t know,
-maybe I should?
+But we=E2=80=99d still have to deal with the fact that it could either be=
+ one or
+two indices, which doesn=E2=80=99t seem nice to initialize either.
 
 Max
+
+> The better question is perhaps, why not use ffsll().  Hm.  I don=E2=80=99=
+t know,
+> maybe I should?
+>=20
+> Max
+>=20
+
 
