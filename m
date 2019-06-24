@@ -2,66 +2,65 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 656F8C4646B
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 07:12:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06358C43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 07:13:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BA5F205F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 07:12:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BA5F205F4
+	by mail.kernel.org (Postfix) with ESMTPS id CE4B72083D
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 07:13:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE4B72083D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=efs-auto.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48398 helo=lists.gnu.org)
+Received: from localhost ([::1]:48414 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfJ90-0008N7-Is
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 03:12:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50254)
+	id 1hfJAh-0001qZ-52
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 03:13:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50273)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <david.brenken@efs-auto.org>) id 1hfJ6F-0006zf-JL
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 03:09:12 -0400
+ (envelope-from <david.brenken@efs-auto.org>) id 1hfJ6G-0006zm-Vl
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 03:09:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david.brenken@efs-auto.org>) id 1hfJ6E-0007dg-HR
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 03:09:11 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:41315)
+ (envelope-from <david.brenken@efs-auto.org>) id 1hfJ6F-0007ex-TL
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 03:09:12 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:43379)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <david.brenken@efs-auto.org>)
- id 1hfJ6E-0007bs-76
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 03:09:10 -0400
+ id 1hfJ6F-0007du-Ik
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 03:09:11 -0400
 Received: from localhost.localdomain ([178.239.76.114]) by
  mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MeCxj-1iGYul3wZz-00bHed; Mon, 24 Jun 2019 09:04:00 +0200
+ id 1MIMXE-1hkkWy3Ew8-00EL1U; Mon, 24 Jun 2019 09:04:00 +0200
 From: David Brenken <david.brenken@efs-auto.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 24 Jun 2019 09:03:35 +0200
-Message-Id: <20190624070339.4408-2-david.brenken@efs-auto.org>
+Date: Mon, 24 Jun 2019 09:03:34 +0200
+Message-Id: <20190624070339.4408-1-david.brenken@efs-auto.org>
 X-Mailer: git-send-email 2.16.1.windows.4
-In-Reply-To: <20190624070339.4408-1-david.brenken@efs-auto.org>
-References: <20190624070339.4408-1-david.brenken@efs-auto.org>
-X-Provags-ID: V03:K1:GfeyzLucv3vXouiJizBMI0y7u6R2dREfa1W2rp2f9kbBDSoev0T
- PcmPcA8Qx6vhsoSWqPcZr8vlwyR1lZICKoTjmGQVH81aUNNmmKRmHmfC+rYdS93zgu5clg5
- WjapadcFXIXprJzMWS1niSPDy7rqHnR+02zTykNl9tlKz9Oa0BJo50+OQUQ8fkbjDX73bwS
- gJJ/DLxfC7IqapZ9iFtaA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:T/0rAzzNjBc=:RvB6ixjCx/nDpC3oZUPAIN
- 517uELng0O8GuuKQZLxFLexcJDCGX9K/kfumeeSh7gnaz62oLxEcxDNKqNtAxkiRO8rwJbHrI
- 2cneoADf7MQzHEZ5ilOUsxJGiS4afbwXV+m8ombcE7dQWkNac7ZIxduj9z2EaOICTIJS+Ykh0
- V0xVZ4sNE9E9jwq3d/iu2sEMpzIp9VI1sjwJ1faE/EEnP4B21qthQXrh4vqqk/VqoxqgpLf3W
- Nb62+y/ZkVeOfgdP9YfqSHgeJXC0wwYRh7QnwPE/dEcl4LpksGukk4H3BEF9OLzAt9I0U6yTR
- bsHSGvr8vadshN9eVTbsmyTQHna4vcvHN3FCHknIUc/hf3Ln+ZO89b/x8nxA0JrShqEw2zjsX
- w7YOHuZeC/upOgHMFj8jsb4xEsSm+6Tmke5uKXFuX/YH3tPqnwXieuZfqjSzFIjZ7nv27elT5
- J5qls4Gfix6EpOTiR+5U4MZ8aeYlHELMzYx/xSoFiBKcxX4ChVRBhVnvW84xTvZnLHKSfuql8
- ZTWmqjWBahNH/yf75w1y9gP6WTAGV/CDQng+lKjF6ZxEYutEUU+VpNpKc12z555g1UQ1aNARN
- O6bQwLRRfhrQzK4a1jwJZWwbg1OlV63fcVHIPeIacCi/ZvzodBzjj+QFzQeDCLh8YTIpYBQme
- usYzl5KmpIej/8bMfym5m8hFeAbmmEPFxs7k+UEA5X2ajUcbvNjypNRb4CHIrtxnBrRry7/ff
- H44BlD70DWHws2Npn/U3YoL8WeIQc3/TB7DV+hJ/u80Gee+eBpR64Es9tGY=
+X-Provags-ID: V03:K1:dAC/+7feklQbpuTL+vIAYwysSkPEU+3EdO7UBUAtMQDje700H37
+ 1dYO2/Sw/Gn1t0FvnSxeLTS1WxuhQiTUEsG+BDqehlePs8Gloh3Wckdo6WuNP08oe0oiK9r
+ dzarTyigGebsn/VMLt2go5As5iIuOqRQcsIlX90auq2aFoT5qyNvxoXS7tcGnPibNONy/4v
+ qeluAXGjPPpZUdg3i0+rg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:zQPK480QSog=:BNXN5zmF9yebmi0vyuhZ/T
+ joHVw7w0F7UM6XKUsT3r1DPsJZ4AlKPxjpTND/PCj1vHaakk1nra795RGVfTuAoE/vd7frYAG
+ JMsViN36GaZFZdIGL34jlWaZDvHYu8kL3dRHB4EPsEXlki6WIcxAGMkmjqdSyGVFB23hUO7eE
+ kOio9YHMM8qvDbmTThzKjkwD79GGU5djmsnrh+bDP0lDtmjuOK1JS647kjXzaZ1+MVl+yRHIc
+ Y9s8sE5CmZgpd3yh1Dx+ZBy/DIsJK02uO+/AK9sTJFMx11aLHOggrRdmt2Xov74y+LSzF5Lcu
+ AbTF4IedFwWqpQbeivTjDrfo1ezd4saUNNblPORmMx8xGZfMmgKUBMbuHnqybRErZSCFlHPc5
+ 5lxr49X6XYFE/+wc2scbV/u/k0zNXEkx/34zPSbzc75Um4yDonDnDEZjUf82UzrkXgFgxi34R
+ ug92PprFgGoTUbUQgDNU8YV37/PHNQHfpDNUiIsTK+1FOVY88l/iFg8WO6CIZl+MZue/ySf+U
+ jdBn/fbwca5mDGG7wo0TCPP+uFBS6oWjWR0CIBWEMuJMvnyY0ml5t+6yub7PZEqHHOEMCDWVQ
+ kH5LTYbi1WmETBxzWV8IeA1PkeIDEfCA9YM2MvS8+fsqbf3V1J/M2ZaB4GnotyyrA9UnqLkw6
+ MKvMcZzWuR4TWQXLv8F33Kov9xIcsT6m69G4RbryPDtrZ/7dTkOevGb1w1N8KAb+tLqtM/hrB
+ zgOChC58DuAKMZWX08QRsLvDhyg+LGdV2MXCY8Db0Px7DRgnAkrkR/0Rlus=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.134
-Subject: [Qemu-devel] [PATCH v3 1/5] tricore: add FTOIZ instruction
+X-Received-From: 212.227.126.135
+Subject: [Qemu-devel] [PATCH v3 0/5] tricore: adding new instructions and
+ fixing
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,92 +72,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kbastian@mail.uni-paderborn.de,
- Lars Biermanski <lars.biermanski@efs-auto.de>,
- Georg Hofstetter <georg.hofstetter@efs-auto.de>,
- David Brenken <david.brenken@efs-auto.de>,
- Robert Rasche <robert.rasche@efs-auto.de>,
- Andreas Konopik <andreas.konopik@efs-auto.de>
+Cc: kbastian@mail.uni-paderborn.de, David Brenken <david.brenken@efs-auto.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: David Brenken <david.brenken@efs-auto.de>
 
-Signed-off-by: Andreas Konopik <andreas.konopik@efs-auto.de>
-Signed-off-by: David Brenken <david.brenken@efs-auto.de>
-Signed-off-by: Georg Hofstetter <georg.hofstetter@efs-auto.de>
-Signed-off-by: Robert Rasche <robert.rasche@efs-auto.de>
-Signed-off-by: Lars Biermanski <lars.biermanski@efs-auto.de>
-Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
----
- target/tricore/fpu_helper.c | 25 +++++++++++++++++++++++++
- target/tricore/helper.h     |  1 +
- target/tricore/translate.c  |  3 +++
- 3 files changed, 29 insertions(+)
 
-diff --git a/target/tricore/fpu_helper.c b/target/tricore/fpu_helper.c
-index d8a6c0d25b..f079d9e939 100644
---- a/target/tricore/fpu_helper.c
-+++ b/target/tricore/fpu_helper.c
-@@ -303,6 +303,31 @@ uint32_t helper_itof(CPUTriCoreState *env, uint32_t arg)
-     return (uint32_t)f_result;
- }
- 
-+uint32_t helper_ftoiz(CPUTriCoreState *env, uint32_t arg)
-+{
-+    float32 f_arg = make_float32(arg);
-+    uint32_t result;
-+    int32_t flags;
-+
-+    result = float32_to_int32_round_to_zero(f_arg, &env->fp_status);
-+
-+    flags = f_get_excp_flags(env);
-+    if (flags & float_flag_invalid) {
-+        flags &= ~float_flag_inexact;
-+        if (float32_is_any_nan(f_arg)) {
-+            result = 0;
-+        }
-+    }
-+
-+    if (flags) {
-+        f_update_psw_flags(env, flags);
-+    } else {
-+        env->FPU_FS = 0;
-+    }
-+
-+    return result;
-+}
-+
- uint32_t helper_ftouz(CPUTriCoreState *env, uint32_t arg)
- {
-     float32 f_arg = make_float32(arg);
-diff --git a/target/tricore/helper.h b/target/tricore/helper.h
-index f60e81096b..16b62edf7f 100644
---- a/target/tricore/helper.h
-+++ b/target/tricore/helper.h
-@@ -111,6 +111,7 @@ DEF_HELPER_4(fmsub, i32, env, i32, i32, i32)
- DEF_HELPER_3(fcmp, i32, env, i32, i32)
- DEF_HELPER_2(ftoi, i32, env, i32)
- DEF_HELPER_2(itof, i32, env, i32)
-+DEF_HELPER_2(ftoiz, i32, env, i32)
- DEF_HELPER_2(ftouz, i32, env, i32)
- DEF_HELPER_2(updfl, void, env, i32)
- /* dvinit */
-diff --git a/target/tricore/translate.c b/target/tricore/translate.c
-index 06c4485e55..5e1c4f54b9 100644
---- a/target/tricore/translate.c
-+++ b/target/tricore/translate.c
-@@ -6747,6 +6747,9 @@ static void decode_rr_divide(CPUTriCoreState *env, DisasContext *ctx)
-     case OPC2_32_RR_UPDFL:
-         gen_helper_updfl(cpu_env, cpu_gpr_d[r1]);
-         break;
-+    case OPC2_32_RR_FTOIZ:
-+        gen_helper_ftoiz(cpu_gpr_d[r3], cpu_env, cpu_gpr_d[r1]);
-+        break;
-     default:
-         generate_trap(ctx, TRAPC_INSN_ERR, TIN2_IOPC);
-     }
+Hello everyone,
+
+as discussed here is the third version of the patchset.
+- We finalized the implementation of QSEED according to Bastians
+annotations.
+- We do only sync ctx.hflags with tb->flags.
+
+Best regards
+
+David
+
+Andreas Konopik (1):
+  tricore: add QSEED instruction
+
+David Brenken (3):
+  tricore: add FTOIZ instruction
+  tricore: add UTOF instruction
+  tricore: fix RRPW_INSERT instruction
+
+Georg Hofstetter (1):
+  tricore: sync ctx.hflags with tb->flags
+
+ target/tricore/fpu_helper.c | 125 ++++++++++++++++++++++++++++++++++++
+ target/tricore/helper.h     |   3 +
+ target/tricore/translate.c  |  13 +++-
+ 3 files changed, 139 insertions(+), 2 deletions(-)
+
 -- 
 2.22.0.windows.1
 
