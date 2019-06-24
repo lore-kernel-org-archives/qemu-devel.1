@@ -2,59 +2,65 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEABCC43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 12:02:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC033C43613
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 12:14:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 636DC212F5
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 12:02:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 636DC212F5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id C81E720663
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 12:14:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C81E720663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50438 helo=lists.gnu.org)
+Received: from localhost ([::1]:50632 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfNg4-0001nG-I6
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 08:02:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42781)
+	id 1hfNrN-0006wY-Ne
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 08:14:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45252)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <Stefan.Brankovic@rt-rk.com>) id 1hfNeA-00012L-2u
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 08:00:32 -0400
+ (envelope-from <drjones@redhat.com>) id 1hfNoO-0005ha-6o
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 08:11:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Stefan.Brankovic@rt-rk.com>) id 1hfNe7-00083j-MH
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 08:00:29 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:41315 helo=mail.rt-rk.com)
+ (envelope-from <drjones@redhat.com>) id 1hfNoM-0002jK-SY
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 08:11:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54680)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Stefan.Brankovic@rt-rk.com>)
- id 1hfNe7-0007r2-9T
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 08:00:27 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id D38FE1A20BF;
- Mon, 24 Jun 2019 14:00:17 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: by mail.rt-rk.com (Postfix, from userid 492)
- id BB8E81A491D; Mon, 24 Jun 2019 14:00:12 +0200 (CEST)
-in-reply-to: <CABLmASF=aftaoCa_JBS-DstcmWnRCp8ajQSsaJjhp4iQA0t2tA@mail.gmail.com>
-to: "Howard Spoelstra" <hsp.cat7@gmail.com>
-from: "Stefan Brankovic" <Stefan.Brankovic@rt-rk.com>
-message-id: <53c0-5d10bb80-1-33a06ec0@196763601>
-X-Forward: 127.0.0.1
-date: Mon, 24 Jun 2019 14:00:12 +0200
+ (Exim 4.71) (envelope-from <drjones@redhat.com>)
+ id 1hfNoH-0002aD-6o; Mon, 24 Jun 2019 08:10:57 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1F3603086220;
+ Mon, 24 Jun 2019 12:10:53 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6092D5C1B5;
+ Mon, 24 Jun 2019 12:10:44 +0000 (UTC)
+Date: Mon, 24 Jun 2019 14:10:41 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Dave Martin <Dave.Martin@arm.com>
+Message-ID: <20190624121041.tgrbmvk4bgs5eepy@kamzik.brq.redhat.com>
+References: <20190621163422.6127-1-drjones@redhat.com>
+ <20190621163422.6127-8-drjones@redhat.com>
+ <20190624110526.GH2790@e103592.cambridge.arm.com>
+ <20190624114911.xb4xdcbv55p2rufv@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-User-Agent: SOGoMail 2.3.10
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] 
- =?utf-8?b?Pz09P3V0Zi04P3E/IFtQQVRDSCB2MyAwLzhdIHRh?=
- =?utf-8?q?rget/ppc=3A_Optimize_emulation_of_some_Altivec?=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190624114911.xb4xdcbv55p2rufv@kamzik.brq.redhat.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Mon, 24 Jun 2019 12:10:55 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 07/14] target/arm/cpu64: max cpu:
+ Introduce sve<vl-bits> properties
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,49 +72,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "imammedo@redhat.com" <imammedo@redhat.com>,
+ "alex.bennee@linaro.org" <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, Jun 24, 2019 at 01:49:11PM +0200, Andrew Jones wrote:
+> On Mon, Jun 24, 2019 at 12:05:26PM +0100, Dave Martin wrote:
+> > On Fri, Jun 21, 2019 at 05:34:15PM +0100, Andrew Jones wrote:
+> > > Introduce cpu properties to give fine control over SVE vector lengths.
+> > > We introduce a property for each valid length up to the current
+> > > maximum supported, which is 2048-bits. The properties are named, e.g.
+> > > sve128, sve256, sve512, ..., where the number is the number of bits.
+> > > 
+> > > It's now possible to do something like -cpu max,sve-max-vq=4,sve384=off
+> > > to provide a guest vector lengths 128, 256, and 512 bits. The resulting
+> > > set must conform to the architectural constraint of having all power-of-2
+> > > lengths smaller than the maximum length present. It's also possible to
+> > > only provide sve<vl-bits> properties, e.g. -cpu max,sve512=on. That
+> > > example provides the machine with 128, 256, and 512 bit vector lengths.
+> > > It doesn't hurt to explicitly ask for all expected vector lengths,
+> > > which is what, for example, libvirt should do.
+> > > 
+> > > Note1, it is not possible to use sve<vl-bits> properties before
+> > > sve-max-vq, e.g. -cpu max,sve384=off,sve-max-vq=4, as supporting
+> > > that overly complicates the user input validation.
+> > > 
+> > > Note2, while one might expect -cpu max,sve-max-vq=4,sve512=on to be the
+> > > same as -cpu max,sve512=on, they are not. The former enables all vector
+> > > lengths 512 bits and smaller, while the latter only sets the 512-bit
+> > > length and its smaller power-of-2 lengths. It's probably best not to use
+> > > sve-max-vq with sve<vl-bits> properties, but it can't be completely
+> > > forbidden as we want qmp_query_cpu_model_expansion to work with guests
+> > > launched with e.g. -cpu max,sve-max-vq=8 on their command line.
+> > 
+> > Supporting both options together in a non-idempotent way seems to
+> > complicate things.
+> > 
+> > Would it be simpler to allow sve-max-vq only when there are no sve<bits>
+> > options?
+> 
+> Not really. Since we can't simply remove sve-max-vq from the 'max' cpu
+> type, then we'd still need conditions to check when we can use it. The
+> restriction that it has to come first reduces the complexity
+> substantially, and I think restricting to not being allowed
+> at all, when sve<vl-bits> are used, would only give us a net check
+> reduction of one or two.
+> 
+> > 
+> > Alternatively, the two options would be defined so that their meanings
+> > are independent of parse order.
+> > 
+> > So, way sve-max-vq=<max> means that:
+> > 
+> >  * all VQs up to max for which there is no corresponding sve<bits>=off,
+> >    are enabled; and
+> > 
+> >  * VQ max is enabled; and
+> > 
+> >  * all VQs exceeding max are disabled.
+> > 
+> > While sve<bits>=(on|off) means
+> > 
+> >  * the VQ coresponding to <bits> is enabled (for on) or disabled (for
+> >    off).
+> >  
+> > After parsing all the options, you check that the sve-max-vq and
+> > sve<bits> optinos are consistent.  If you disallow duplicate sve-max-vq
+> > or sve<bits> options, then there is no possibility of ambiguity and the
+> > order or options doesn't matter.
+> 
+> I don't want to put any final checks at the end of parsing all options,
+> because that won't work with the QMP query.
 
-Hi Howard,
+Actually, I think I can allow sve-max-vq to come after sve<vl-bits>
+without adding much code, and without requiring a final check. I
+could try that if you'd like, but I'm not sure it's worth it. Also, I
+feel like I tried this once already and rejected it for some reason,
+but atm I can't remember why.
 
-Would you be so kind to send me exact qemu command line and applicable =
-files(OS images or similar) that you used to bring this exact situation=
- up. Thanks in advance.
+> 
+> > 
+> > (There may be constraints on the way qemu options parsing works that
+> > make this hard, though...)
+> 
+> I can't think of any issue with the parsing, but the QMP query only using
+> the property get accessors, without any finalizing, does put constraints
+> on what we can do.
+> 
+> > 
+> > Having sve-max-vq in 128-bit units while sve<bits> are named in terms of
+> > bit counts also feels a bit odd now.
+> 
+> sve-max-vq already exists, so it'd have to be deprecated if we don't want
+> it anymore. And I think sve<vl-bits> is the right naming to go with for
+> that. Of course using sve-max-vq is completely optional. If you don't want
+> it for backward compatible reasons, or as a shorthand to restrict the
+> lengths, then you can just use the sve<vl-bits> properties. Indeed, with
+> KVM, if you use the 'host' cpu type (the default for use with KVM), then
+> you won't even have the sve-max-vq property. As 'host' never had it, I
+> didn't have to keep it, nor adopt it. And of course I didn't want to
+> adopt it.
+> 
+> Thanks,
+> drew
+> 
 
-Kind Regards,
-Stefan
-
--------- Original Message --------
-Subject: Re: [PATCH v3 0/8] target/ppc: Optimize emulation of some Alti=
-vec
-Date: Monday, June 24, 2019 13:20 CEST
-From: Howard Spoelstra <hsp.cat7@gmail.com>
-To: Stefan Brankovic <Stefan.Brankovic@rt-rk.com>
-CC: qemu-devel qemu-devel <qemu-devel@nongnu.org>
-References: <1561371065-3637-1-git-send-email-stefan.brankovic@rt-rk.co=
-m> <43c6-5d10a600-15-34dab4c0@176981179>
-
-
-=C2=A0=C2=A0=C2=A0On Mon, Jun 24, 2019 at 12:28 PM Stefan Brankovic <St=
-efan.Brankovic@rt-rk.com> wrote:Hi Howard,
-
-Thanks for letting me know about compilation errors in my patch, I real=
-ly appreciate it. Those should be fixed=C2=A0 in the latest version of =
-this patch (v3), so please take a look and let me know if there is anyt=
-hing else that should be changed.
-
-Kind Regards,
-Stefan
-
--------- Original Message --------
-Subject: [PATCH v3 0/8] target/ppc: Optimize emulation of some Altivec
-Date: Monday, June 24, 2019 12:10 CEST
-From: Stefan Brankovic <stefan.brankovic@rt-rk.com>
-To: stefan.brankovic@rt-rk.com=C2=A0Hi Stefan,=C2=A0V3 applies and buil=
-ds cleanly on top of current master. The resulting qemu-system-ppc show=
-s graphical distortions with OSX 10.2-4 guests. Mac OS 9.x guests seem =
-OK.Please see screen dump.=C2=A0Best,Howard=C2=A0=C2=A0
-=C2=A0
