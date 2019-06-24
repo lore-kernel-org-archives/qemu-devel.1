@@ -2,62 +2,87 @@ Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 320F2C43613
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 12:39:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 760B2C48BE8
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 12:40:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4769212F5
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 12:39:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4769212F5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 47415212F5
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 12:40:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ao9hyd51"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47415212F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50790 helo=lists.gnu.org)
+Received: from localhost ([::1]:50804 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfOFS-0002Qb-Gv
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 08:39:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53345)
+	id 1hfOH1-0003RK-HC
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 08:40:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53776)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <gengdongjiu@huawei.com>) id 1hfOEJ-0001d1-E4
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 08:37:52 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hfOFL-0002aD-Mz
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 08:38:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gengdongjiu@huawei.com>) id 1hfOEI-0000W5-8O
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 08:37:51 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2176 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
- id 1hfOEF-0000P5-9Y; Mon, 24 Jun 2019 08:37:47 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 07410A2BE2C0F14BCE0C;
- Mon, 24 Jun 2019 20:37:40 +0800 (CST)
-Received: from [127.0.0.1] (10.142.68.147) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Mon, 24 Jun 2019
- 20:37:29 +0800
-To: Igor Mammedov <imammedo@redhat.com>
-References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
- <1557832703-42620-5-git-send-email-gengdongjiu@huawei.com>
- <20190620142814.7caf9c3c@redhat.com>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <b1ef7ea4-acc9-1f97-b320-37f4600cd9f4@huawei.com>
-Date: Mon, 24 Jun 2019 20:37:26 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.3.0
+ (envelope-from <alex.bennee@linaro.org>) id 1hfOFJ-0001lZ-Na
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 08:38:55 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46710)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hfOFH-0001fX-Pw
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 08:38:53 -0400
+Received: by mail-wr1-x443.google.com with SMTP id n4so13690610wrw.13
+ for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 05:38:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=AtHi5q/cNknUVhZfWVBa3uQSrmuqAHZIqdQKWtwfbR8=;
+ b=Ao9hyd511aFQrrEA3NBpvSK9bCYt1TlOJHEfpV5llpbaYpqLIxFpz213Ud61yuqfgQ
+ EFoY0QBx6D5rsVA3lH0jqCiUgDxhmIP9d8B8YNX0FXJ5MMffSUZHNMX6OJ0BIkaknRuP
+ VJByA79YGOo6maDwnTuSzyZZtRlQlb6PfEAmN9ansIihdPUTHXUbWygtv40RewqqvMpD
+ UWgy8G9Bwubu3iUFIEmzwnZYLqx0tYCkAwpNzRZfqEQFHHxMrrwfuMToVID4UBejouyT
+ xHqdIArGAbKLxBaIPDK+Y0p84/Tl0zPS7yxBi5cZ5WKcMbAzXn21BZvRQDBTjRQbfdEt
+ sbGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=AtHi5q/cNknUVhZfWVBa3uQSrmuqAHZIqdQKWtwfbR8=;
+ b=aQK/qFyGbTfXk1TS6LzN53CGE3S4k/BDAiRc3h+dgEZNEohPPFoyLwgAbL+wSLKcup
+ Ck0EK8gEYZ03iL0w+3vQ0FLHfnT7lDLBgLcXTz5IME/qnU/VI8PdyUbzbEi0W93DqYMC
+ bq66NfN67kGIXevBR6/vig9/F3RC+kADGeYeSgFZz765+s5J4NROpB9drXE0IAGlmC4x
+ RTGytMTHpu52GtFqaIrDaywLi9PWKZaAmBY48RYpRsbY+Fu1oY7iW+dRgsCogzM+goKp
+ hxF0fsf9KrYnVs9fMPgpiSJfhRNnsxulGXtuYsPJUsT+26geZ4hpyjrydeP430Sp4ngs
+ EA4w==
+X-Gm-Message-State: APjAAAUg37LdzuSBRrEZgSVUsjKC6MY9r7pd92CsY+8aMqqg80IO3J5m
+ AMsFIq97oyEcInVB5qdpR9eqLw==
+X-Google-Smtp-Source: APXvYqwo73JeN5LmtvHVeO68gSQODEmqtGqXzI+WW4Uyglc1nW+rRCDm9Ke8RvESIZzTKVP97dC4Dw==
+X-Received: by 2002:a5d:40ca:: with SMTP id b10mr51670531wrq.171.1561379928703; 
+ Mon, 24 Jun 2019 05:38:48 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id u1sm9781666wml.14.2019.06.24.05.38.47
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 24 Jun 2019 05:38:48 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 964561FF87;
+ Mon, 24 Jun 2019 13:38:47 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Date: Mon, 24 Jun 2019 13:38:35 +0100
+Message-Id: <20190624123835.28869-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190620142814.7caf9c3c@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.142.68.147]
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.190
-Subject: Re: [Qemu-devel] [PATCH v17 04/10] acpi: add
- build_append_ghes_generic_data() helper for Generic Error Data Entry
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
+Subject: [Qemu-devel] [PATCH] target/i386: fix feature check in hyperv-stub.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,122 +94,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, kvm@vger.kernel.org,
- mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org,
- linuxarm@huawei.com, shannon.zhaosl@gmail.com, zhengxiang9@huawei.com,
- qemu-arm@nongnu.org, james.morse@arm.com, xuwei5@huawei.com,
- jonathan.cameron@huawei.com, pbonzini@redhat.com, lersek@redhat.com,
- rth@twiddle.net
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Commit 2d384d7c8 broken the build when built with:
 
+  configure --without-default-devices --disable-user
 
-On 2019/6/20 20:28, Igor Mammedov wrote:
-> On Tue, 14 May 2019 04:18:17 -0700
-> Dongjiu Geng <gengdongjiu@huawei.com> wrote:
-> 
->> It will help to add Generic Error Data Entry to ACPI tables
->> without using packed C structures and avoid endianness
->> issues as API doesn't need explicit conversion.
->>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->> ---
->>  hw/acpi/aml-build.c         | 32 ++++++++++++++++++++++++++++++++
->>  include/hw/acpi/aml-build.h |  6 ++++++
->>  2 files changed, 38 insertions(+)
->>
->> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
->> index fb53f21..102a288 100644
->> --- a/hw/acpi/aml-build.c
->> +++ b/hw/acpi/aml-build.c
->> @@ -296,6 +296,38 @@ void build_append_ghes_notify(GArray *table, const uint8_t type,
->>          build_append_int_noprefix(table, error_threshold_window, 4);
->>  }
->>  
->> +/* Generic Error Data Entry
->> + * ACPI 4.0: 17.3.2.6.1 Generic Error Data
->> + */
->> +void build_append_ghes_generic_data(GArray *table, const char *section_type,
-> s/build_append_ghes_generic_data/build_append_ghes_generic_error_data/
-> 
->> +                                    uint32_t error_severity, uint16_t revision,
->> +                                    uint8_t validation_bits, uint8_t flags,
->> +                                    uint32_t error_data_length, uint8_t *fru_id,
->> +                                    uint8_t *fru_text, uint64_t time_stamp)
-> checkpatch probably will complain due to too long lines
-> you can use:
-> void build_append_ghe...
->          uint32_t error_severity, uint16_t revision,
->          ...
-> 
->> +{
->> +    int i;
->> +
->> +    for (i = 0; i < 16; i++) {
->> +        build_append_int_noprefix(table, section_type[i], 1);
->                                             ^^^
-> use QemuUUID instead, see vmgenid_build_acpi
-ok.
+The reason was the conversion of cpu->hyperv_synic to
+cpu->hyperv_synic_kvm_only although the rest of the patch introduces a
+feature checking mechanism. So I've fixed the KVM_EXIT_HYPERV_SYNIC in
+hyperv-stub to do the same feature check as in the real hyperv.c
 
-> 
->> +    }
->> +
->> +    build_append_int_noprefix(table, error_severity, 4);
->> +    build_append_int_noprefix(table, revision, 2);
->> +    build_append_int_noprefix(table, validation_bits, 1);
->> +    build_append_int_noprefix(table, flags, 1);
->> +    build_append_int_noprefix(table, error_data_length, 4);
->> +
->> +    for (i = 0; i < 16; i++) {
->> +        build_append_int_noprefix(table, fru_id[i], 1);
-> same as section_type
-ok.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Roman Kagan <rkagan@virtuozzo.com>
+---
+ target/i386/hyperv-stub.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> 
->> +    }
->> +
->> +    for (i = 0; i < 20; i++) {
->> +        build_append_int_noprefix(table, fru_text[i], 1);
->> +    }
-> instead of loop use g_array_insert_vals()
-ok
-
-> 
->> +
->> +    build_append_int_noprefix(table, time_stamp, 8);
-> that's not part of 'Table 17-13'
-> where does it come from?
-
-
-It comes from "ACPI 6.1: Table 18-343 Generic Error Data Entry", I will update the comments, thanks for the pointing out.
-
-> 
->> +}
->> +
->>  /*
->>   * Build NAME(XXXX, 0x00000000) where 0x00000000 is encoded as a dword,
->>   * and return the offset to 0x00000000 for runtime patching.
->> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
->> index 90c8ef8..a71db2f 100644
->> --- a/include/hw/acpi/aml-build.h
->> +++ b/include/hw/acpi/aml-build.h
->> @@ -419,6 +419,12 @@ void build_append_ghes_notify(GArray *table, const uint8_t type,
->>                                uint32_t error_threshold_value,
->>                                uint32_t error_threshold_window);
->>  
->> +void build_append_ghes_generic_data(GArray *table, const char *section_type,
->> +                                    uint32_t error_severity, uint16_t revision,
->> +                                    uint8_t validation_bits, uint8_t flags,
->> +                                    uint32_t error_data_length, uint8_t *fru_id,
->> +                                    uint8_t *fru_text, uint64_t time_stamp);
->> +
->>  void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
->>                         uint64_t len, int node, MemoryAffinityFlags flags);
->>  
-> 
-> .
-> 
+diff --git a/target/i386/hyperv-stub.c b/target/i386/hyperv-stub.c
+index fe548cbae2..0028527e79 100644
+--- a/target/i386/hyperv-stub.c
++++ b/target/i386/hyperv-stub.c
+@@ -15,7 +15,7 @@ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
+ {
+     switch (exit->type) {
+     case KVM_EXIT_HYPERV_SYNIC:
+-        if (!cpu->hyperv_synic) {
++        if (!hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC)) {
+             return -1;
+         }
+ 
+-- 
+2.20.1
 
 
