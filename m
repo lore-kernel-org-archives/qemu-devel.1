@@ -2,67 +2,79 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A63E2C48BD5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 10:50:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1E79C48BD4
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 10:53:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DE25213F2
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 10:50:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DE25213F2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 68E2C204EC
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 10:53:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68E2C204EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58704 helo=lists.gnu.org)
+Received: from localhost ([::1]:58712 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfj1d-0006mi-QJ
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 06:50:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43193)
+	id 1hfj4w-0008Lb-Dm
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 06:53:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44300)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hfj0B-0005e9-KB
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:48:40 -0400
+ (envelope-from <philmd@redhat.com>) id 1hfj40-0007tp-2c
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:52:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hfj0A-0007Jt-DD
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:48:39 -0400
-Resent-Date: Tue, 25 Jun 2019 06:48:39 -0400
-Resent-Message-Id: <E1hfj0A-0007Jt-DD@eggs.gnu.org>
-Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21942)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hfj0A-0006zO-1d
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:48:38 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1561459650; cv=none; d=zoho.com; s=zohoarc; 
- b=mHv08LsJ88kC4hfzTe+bVV4VIJYaFCR/Akmh6oWu+cT32xT9pf7pn8rhf5o3CnqRpBT1y+Gz8A6gOs8DRQ/zIJtKGyhSdumCUYbMLXcu6UGojuxYJKHNpy0cPzmqvsM1T9gXrWq0qXK1/3iOvEefuSLw48Bu2AhlVsgA90ybOwQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1561459650;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=xxMp4QBD9D83/oXMaxE55ZpTSGtfvvY2loukiJzHT5Y=; 
- b=dYl59EuMxk/VrwRHHdcLeJ5ThcSy1iUigOzyd09tKWUTG9k/iCUvFyEZHbc5NfAgaw65qYmv7BjCLMLCx77Y6Y1QkZAWrUwJLnCEZutQLxoXUIM1MG9lpalzS2ih8M4hm6lCJc7ojL4MG1+tegpYIzDsOgehXaIk86U3jSlvGco=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1561459648386479.568069992284;
- Tue, 25 Jun 2019 03:47:28 -0700 (PDT)
-Message-ID: <156145964700.24.1996610342612780259@c4a48874b076>
-In-Reply-To: <20190625101524.13447-1-philmd@redhat.com>
+ (envelope-from <philmd@redhat.com>) id 1hfj3x-0002kY-Uu
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:52:35 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:36502)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hfj3w-0002ia-03
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:52:32 -0400
+Received: by mail-wr1-f65.google.com with SMTP id n4so16115985wrs.3
+ for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 03:52:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=/034iMw4N2o8o2zeO7jU7OT16EBNfVC2YaHl8KaGDVc=;
+ b=WpNF6CV19CJkyR1KJ5Rzw6qPHQ8tzA6NleGUdCTR/Gf5pD/eFOmhcjIkgh32owQRh9
+ isuX/N8ygC5VT8wl53kFEOObmLGBF8vrUEO/9TkwU9ItL9VyCoaMvaNcWittljl+w0dV
+ I6va2ylBWPuFd/b6uZpPXfQ1TJlL7/t7JGQqxsM3/UdDrEgFjfidR//FgdYifhyKYpTT
+ FehEMONL4deX3DPF21ng1EGJvz/VuG5HXBftLARH7/DaJ8r6IEISJzImJlYABVCL1960
+ itc25oxYXfXNcySAvnTkgOERpgH6hbJyPdbraCe6rMmN8gGTHLtlI7+I3wSvVu2nzdUZ
+ azkQ==
+X-Gm-Message-State: APjAAAUudtUA31AvDrTd+QnOtFLGHkpU/OacWxswEksN49s/ul30cmV0
+ taSRF2i6UZTmJUYfnLwvKoKznQ==
+X-Google-Smtp-Source: APXvYqzq8UbEvqAghdQ/LDX6711zB/wvPj3/E59TjzgKyuVD6pzKN+O69o8va3tXgpkfQwNdBHxtfw==
+X-Received: by 2002:adf:ea45:: with SMTP id j5mr21131717wrn.281.1561459950792; 
+ Tue, 25 Jun 2019 03:52:30 -0700 (PDT)
+Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.183])
+ by smtp.gmail.com with ESMTPSA id v18sm11333854wrs.80.2019.06.25.03.52.30
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Tue, 25 Jun 2019 03:52:30 -0700 (PDT)
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20190625081339.9176-1-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <4bc3239b-f3cf-3374-5d50-8980b413dfaa@redhat.com>
+Date: Tue, 25 Jun 2019 12:52:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: philmd@redhat.com
-Date: Tue, 25 Jun 2019 03:47:28 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <20190625081339.9176-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.59
-Subject: Re: [Qemu-devel] [PATCH 0/5] tests/acceptance: Add bFLT loader
- linux-user test
+ [fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH] minikconf: do not include variables from
+ MINIKCONF_ARGS in config-all-devices.mak
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,34 +86,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, ehabkost@redhat.com, alex.bennee@linaro.org,
- qemu-devel@nongnu.org, wainersm@redhat.com, maxime.coquelin@redhat.com,
- alistair.francis@wdc.com, crosa@redhat.com, philmd@redhat.com
+Cc: Christophe de Dinechin <cdupontd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYyNTEwMTUyNC4xMzQ0
-Ny0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCBidWlsZCB0
-ZXN0IG9uIHMzOTB4IGhvc3QuIFBsZWFzZSBmaW5kIHRoZSBkZXRhaWxzIGJlbG93LgoKPT09IFRF
-U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAojIFRlc3Rpbmcgc2NyaXB0IHdpbGwgYmUg
-aW52b2tlZCB1bmRlciB0aGUgZ2l0IGNoZWNrb3V0IHdpdGgKIyBIRUFEIHBvaW50aW5nIHRvIGEg
-Y29tbWl0IHRoYXQgaGFzIHRoZSBwYXRjaGVzIGFwcGxpZWQgb24gdG9wIG9mICJiYXNlIgojIGJy
-YW5jaApzZXQgLWUKQ0M9JEhPTUUvYmluL2NjCklOU1RBTEw9JFBXRC9pbnN0YWxsCkJVSUxEPSRQ
-V0QvYnVpbGQKbWtkaXIgLXAgJEJVSUxEICRJTlNUQUxMClNSQz0kUFdECmNkICRCVUlMRAokU1JD
-L2NvbmZpZ3VyZSAtLWNjPSRDQyAtLXByZWZpeD0kSU5TVEFMTAptYWtlIC1qNAojIFhYWDogd2Ug
-bmVlZCByZWxpYWJsZSBjbGVhbiB1cAojIG1ha2UgY2hlY2sgLWo0IFY9MQptYWtlIGluc3RhbGwK
-CmVjaG8KZWNobyAiPT09IEVOViA9PT0iCmVudgoKZWNobwplY2hvICI9PT0gUEFDS0FHRVMgPT09
-IgpycG0gLXFhCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgcWFwaS9xbXAtcmVn
-aXN0cnkubwogIENDICAgICAgcWFwaS9xbXAtZGlzcGF0Y2gubwoKV2FybmluZywgdHJlYXRlZCBh
-cyBlcnJvcjoKL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTYzdGJ6aWtvL3NyYy9kb2NzL2Rl
-dmVsL3Rlc3RpbmcucnN0OjYyNzpUaXRsZSB1bmRlcmxpbmUgdG9vIHNob3J0LgoKVGhlIGBgYXZv
-Y2Fkb19xZW11Lk1hY2hpbmVUZXN0YGAgYmFzZSB0ZXN0IGNsYXNzCgoKVGhlIGZ1bGwgbG9nIGlz
-IGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDYyNTEwMTUyNC4xMzQ0
-Ny0xLXBoaWxtZEByZWRoYXQuY29tL3Rlc3RpbmcuczM5MHgvP3R5cGU9bWVzc2FnZS4KLS0tCkVt
-YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5v
-cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5j
-b20=
+On 6/25/19 10:13 AM, Paolo Bonzini wrote:
+> When minikconf writes config-devices.mak, it includes all variables including
+> those from MINIKCONF_ARGS.  This causes values from config-host.mak to "stick" to
+> the ones used in generating config-devices.mak, because config-devices.mak is
+> included after config-host.mak.  Avoid this by omitting assignments coming
+> from the command line in the output of minikconf.
+> 
+> Reported-by: Christophe de Dinechin <cdupontd@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> ---
+>  scripts/minikconf.py | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/scripts/minikconf.py b/scripts/minikconf.py
+> index 0ffc6c38da..3109a81db7 100644
+> --- a/scripts/minikconf.py
+> +++ b/scripts/minikconf.py
+> @@ -688,11 +688,13 @@ if __name__ == '__main__':
+>  
+>      data = KconfigData(mode)
+>      parser = KconfigParser(data)
+> +    external_vars = set()
+>      for arg in argv[3:]:
+>          m = re.match(r'^(CONFIG_[A-Z0-9_]+)=([yn]?)$', arg)
+>          if m is not None:
+>              name, value = m.groups()
+>              parser.do_assignment(name, value == 'y')
+> +            external_vars.add(name[7:])
+>          else:
+>              fp = open(arg, 'r')
+>              parser.parse_file(fp)
+> @@ -700,7 +702,8 @@ if __name__ == '__main__':
+>  
+>      config = data.compute_config()
+>      for key in sorted(config.keys()):
+> -        print ('CONFIG_%s=%s' % (key, ('y' if config[key] else 'n')))
+> +        if key not in external_vars:
+> +            print ('CONFIG_%s=%s' % (key, ('y' if config[key] else 'n')))
+>  
+>      deps = open(argv[2], 'w')
+>      for fname in data.previously_included:
+> 
 
