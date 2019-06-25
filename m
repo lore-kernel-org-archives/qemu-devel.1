@@ -2,80 +2,95 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14813C48BD5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 16:07:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E543CC48BD5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 16:07:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0E392080C
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 16:07:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0E392080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BBE672080C
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 16:07:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBE672080C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33470 helo=lists.gnu.org)
+Received: from localhost ([::1]:33482 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfnyr-0003vW-As
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 12:07:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39104)
+	id 1hfnyy-0004G6-Sl
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 12:07:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35362)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hfnp2-0000Xj-91
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 11:57:30 -0400
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hfnZK-0006eO-OJ
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 11:41:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hfnox-000700-HC
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 11:57:27 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:44648)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hfnot-0006o4-C1
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 11:57:21 -0400
-Received: by mail-wr1-f66.google.com with SMTP id r16so18453461wrl.11
- for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 08:57:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=hhQsN+W37ny4w5jzDEau2B6ofWiev4JriTg1PVeUmrU=;
- b=TaUkJfvBXGK1XMSN9F8lWQyQo48X7EEBxJ7sRFqnhyBeslWiDphS8+lricsiUdV6kO
- Xc88t4/S6iQThz9ZqjAjNqdnkbkt4fsc6uYX1FGimrQKmYZwWPCFwNsenMRhNSZrzHVu
- 3y7Ojf2ziWKcemk6OrwGQW/0IYc1LUoFJ/q2YTK4oCoV3oLAdjF2IJRh8+plfCHtEOcu
- x8MTLXAZh0l/l+P123US0nbhofNg74s0gs5pEHeIIEm+j4TYm2ucsVl2CO6oPXmiynJd
- hJgQXXvZ6xM7i1qlx2ErubyhUbAV86nQwsiVnyoqdoYlmC9JlKVrnejFG4BC2f2DwOmb
- Qnog==
-X-Gm-Message-State: APjAAAWACcsgBnu1Xv09AnK91Qg08S5DqqyXnmHmuDnVyLsAvLq1Ioev
- FoXeOgCLAH3LEDwlAFck0iJlVA==
-X-Google-Smtp-Source: APXvYqw4FoREJsbfUQL24oOfoJzGWGnHapOpHigPUxJ/8prWbIWu6lBHM4JQL/h3+S0fG0rUWcOnJg==
-X-Received: by 2002:adf:e8c8:: with SMTP id k8mr4535wrn.285.1561478227231;
- Tue, 25 Jun 2019 08:57:07 -0700 (PDT)
-Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.183])
- by smtp.gmail.com with ESMTPSA id x16sm1915392wmj.4.2019.06.25.08.57.05
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Jun 2019 08:57:06 -0700 (PDT)
-To: Laurent Vivier <laurent@vivier.eu>, Jason Wang <jasowang@redhat.com>
-References: <20190619221933.1981-1-laurent@vivier.eu>
- <20190619221933.1981-4-laurent@vivier.eu>
- <f302ca04-e517-f72a-0067-2ab85ef238f0@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <e9ccdbf4-3703-b6a2-7f58-0739a4cfe7bd@redhat.com>
-Date: Tue, 25 Jun 2019 17:57:05 +0200
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hfnZI-0002ua-OT
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 11:41:14 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:59968
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1hfnZB-0001SZ-2m
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 11:41:07 -0400
+Received: from host86-173-229-95.range86-173.btcentralplus.com
+ ([86.173.229.95] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1hfnVX-0007MI-AC; Tue, 25 Jun 2019 16:37:19 +0100
+To: Richard Henderson <richard.henderson@linaro.org>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+References: <20190519041522.12327-1-richard.henderson@linaro.org>
+ <8f28d008-2608-a579-7505-4546b08deb41@linaro.org>
+ <085d6881-f518-9888-a13e-081cdc09de46@ilande.co.uk>
+ <0b9f4772-37f6-1453-e4ea-5ad9d0f52a5b@ilande.co.uk>
+ <acc57487-c8a0-9380-bc2a-4de22541eabf@ilande.co.uk>
+ <CAL1e-=iavFqEeFuNm2efVM7mu5OaABBVo90wqJEhmoWa4DQv=Q@mail.gmail.com>
+ <ffae3651-5daf-e008-6562-2de09d82ace9@linaro.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <b8aab3f4-e3eb-a137-62b4-ba5ac1a2ad8f@ilande.co.uk>
+Date: Tue, 25 Jun 2019 16:37:40 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <f302ca04-e517-f72a-0067-2ab85ef238f0@vivier.eu>
+In-Reply-To: <ffae3651-5daf-e008-6562-2de09d82ace9@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.173.229.95
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH v8 03/10] dp8393x: manage big endian bus
+X-Received-From: 46.43.2.167
+Subject: Re: [Qemu-devel] [PATCH v4 0/7] tcg/ppc: Add vector opcodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,288 +102,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Thomas Huth <huth@tuxfamily.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Gerd Hoffmann <kraxel@redhat.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Howard Spoelstra <hsp.cat7@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/24/19 10:07 PM, Laurent Vivier wrote:
-> Hi,
-> 
-> Jason, Can I have an Acked-by from you (as network devices maintainer)?
+On 25/06/2019 07:56, Richard Henderson wrote:
 
-Hmm something seems odd here indeed...
-
-What a stable model! This file has no logical modification since its
-introduction, a65f56eeba "Implement sonic netcard (MIPS Jazz)"
-
-Here we had:
-
-static void dp8393x_writeb(void *opaque, hwaddr addr, uint32_t val)
-{
-    uint16_t old_val = dp8393x_readw(opaque, addr & ~0x1);
-
-    switch (addr & 3) {
-    case 0:
-        val = val | (old_val & 0xff00);
-        break;
-    case 1:
-        val = (val << 8) | (old_val & 0x00ff);
-        break;
-    }
-    dp8393x_writew(opaque, addr & ~0x1, val);
-}
-
-So we had 16-bit endian shifting there.
-
-And few lines below:
-
-    /* XXX: Check byte ordering */
-    ...
-    /* Calculate the ethernet checksum */
-    #ifdef SONIC_CALCULATE_RXCRC
-        checksum = cpu_to_le32(crc32(0, buf, rx_len));
-    #else
-        checksum = 0;
-    #endif
-
-After various housekeeping, we get:
-
-84689cbb97 "net/dp8393x: do not use old_mmio accesses"
-
-The MIPS Jazz is known to run in both endianess, but I haven't checked
-if at that time both were available.
-
-Have you tried this patch?
-
--- >8 --
-diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-index bdb0b3b2c2..646e11206f 100644
-@@ -651,7 +651,7 @@ static const MemoryRegionOps dp8393x_ops = {
-     .write = dp8393x_write,
-     .impl.min_access_size = 2,
-     .impl.max_access_size = 2,
--    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
- };
----
-
-(but then mips64-softmmu Jazz would have networking broken).
-
-Regards,
-
-Phil.
-
-> Le 20/06/2019 à 00:19, Laurent Vivier a écrit :
->> This is needed by Quadra 800, this card can run on little-endian
->> or big-endian bus.
+>>> One more hint: if I try a build of d8dcbb57e9 along with my tcg_can_emit_vec_op()
+>>> hack and pass --enable-debug-tcg to configure then I get an assert on startup:
+>>>
+>>> qemu-system-ppc: /home/mca/src/qemu/tcg/tcg.c:2207: process_op_defs: Assertion `tdefs
+>>> != ((void *)0)' failed.
+>>> Aborted
+>>>
 >>
->> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
->> Tested-by: Hervé Poussineau <hpoussin@reactos.org>
->> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
->> ---
->>  hw/net/dp8393x.c | 88 +++++++++++++++++++++++++++++++-----------------
->>  1 file changed, 57 insertions(+), 31 deletions(-)
+>> Mark, Richard, Howard, David,
 >>
->> diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
->> index bdb0b3b2c2..b014c015c6 100644
->> --- a/hw/net/dp8393x.c
->> +++ b/hw/net/dp8393x.c
->> @@ -150,6 +150,7 @@ typedef struct dp8393xState {
->>  
->>      /* Hardware */
->>      uint8_t it_shift;
->> +    bool big_endian;
->>      qemu_irq irq;
->>  #ifdef DEBUG_SONIC
->>      int irq_level;
->> @@ -220,6 +221,29 @@ static uint32_t dp8393x_wt(dp8393xState *s)
->>      return s->regs[SONIC_WT1] << 16 | s->regs[SONIC_WT0];
->>  }
->>  
->> +static uint16_t dp8393x_get(dp8393xState *s, int width, uint16_t *base,
->> +                            int offset)
->> +{
->> +    uint16_t val;
->> +
->> +    if (s->big_endian) {
->> +        val = be16_to_cpu(base[offset * width + width - 1]);
->> +    } else {
->> +        val = le16_to_cpu(base[offset * width]);
->> +    }
->> +    return val;
->> +}
->> +
->> +static void dp8393x_put(dp8393xState *s, int width, uint16_t *base, int offset,
->> +                        uint16_t val)
->> +{
->> +    if (s->big_endian) {
->> +        base[offset * width + width - 1] = cpu_to_be16(val);
->> +    } else {
->> +        base[offset * width] = cpu_to_le16(val);
->> +    }
->> +}
->> +
->>  static void dp8393x_update_irq(dp8393xState *s)
->>  {
->>      int level = (s->regs[SONIC_IMR] & s->regs[SONIC_ISR]) ? 1 : 0;
->> @@ -251,12 +275,12 @@ static void dp8393x_do_load_cam(dp8393xState *s)
->>          /* Fill current entry */
->>          address_space_rw(&s->as, dp8393x_cdp(s),
->>              MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
->> -        s->cam[index][0] = data[1 * width] & 0xff;
->> -        s->cam[index][1] = data[1 * width] >> 8;
->> -        s->cam[index][2] = data[2 * width] & 0xff;
->> -        s->cam[index][3] = data[2 * width] >> 8;
->> -        s->cam[index][4] = data[3 * width] & 0xff;
->> -        s->cam[index][5] = data[3 * width] >> 8;
->> +        s->cam[index][0] = dp8393x_get(s, width, data, 1) & 0xff;
->> +        s->cam[index][1] = dp8393x_get(s, width, data, 1) >> 8;
->> +        s->cam[index][2] = dp8393x_get(s, width, data, 2) & 0xff;
->> +        s->cam[index][3] = dp8393x_get(s, width, data, 2) >> 8;
->> +        s->cam[index][4] = dp8393x_get(s, width, data, 3) & 0xff;
->> +        s->cam[index][5] = dp8393x_get(s, width, data, 3) >> 8;
->>          DPRINTF("load cam[%d] with %02x%02x%02x%02x%02x%02x\n", index,
->>              s->cam[index][0], s->cam[index][1], s->cam[index][2],
->>              s->cam[index][3], s->cam[index][4], s->cam[index][5]);
->> @@ -269,7 +293,7 @@ static void dp8393x_do_load_cam(dp8393xState *s)
->>      /* Read CAM enable */
->>      address_space_rw(&s->as, dp8393x_cdp(s),
->>          MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
->> -    s->regs[SONIC_CE] = data[0 * width];
->> +    s->regs[SONIC_CE] = dp8393x_get(s, width, data, 0);
->>      DPRINTF("load cam done. cam enable mask 0x%04x\n", s->regs[SONIC_CE]);
->>  
->>      /* Done */
->> @@ -290,10 +314,10 @@ static void dp8393x_do_read_rra(dp8393xState *s)
->>          MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
->>  
->>      /* Update SONIC registers */
->> -    s->regs[SONIC_CRBA0] = data[0 * width];
->> -    s->regs[SONIC_CRBA1] = data[1 * width];
->> -    s->regs[SONIC_RBWC0] = data[2 * width];
->> -    s->regs[SONIC_RBWC1] = data[3 * width];
->> +    s->regs[SONIC_CRBA0] = dp8393x_get(s, width, data, 0);
->> +    s->regs[SONIC_CRBA1] = dp8393x_get(s, width, data, 1);
->> +    s->regs[SONIC_RBWC0] = dp8393x_get(s, width, data, 2);
->> +    s->regs[SONIC_RBWC1] = dp8393x_get(s, width, data, 3);
->>      DPRINTF("CRBA0/1: 0x%04x/0x%04x, RBWC0/1: 0x%04x/0x%04x\n",
->>          s->regs[SONIC_CRBA0], s->regs[SONIC_CRBA1],
->>          s->regs[SONIC_RBWC0], s->regs[SONIC_RBWC1]);
->> @@ -408,12 +432,12 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
->>          tx_len = 0;
->>  
->>          /* Update registers */
->> -        s->regs[SONIC_TCR] = data[0 * width] & 0xf000;
->> -        s->regs[SONIC_TPS] = data[1 * width];
->> -        s->regs[SONIC_TFC] = data[2 * width];
->> -        s->regs[SONIC_TSA0] = data[3 * width];
->> -        s->regs[SONIC_TSA1] = data[4 * width];
->> -        s->regs[SONIC_TFS] = data[5 * width];
->> +        s->regs[SONIC_TCR] = dp8393x_get(s, width, data, 0) & 0xf000;
->> +        s->regs[SONIC_TPS] = dp8393x_get(s, width, data, 1);
->> +        s->regs[SONIC_TFC] = dp8393x_get(s, width, data, 2);
->> +        s->regs[SONIC_TSA0] = dp8393x_get(s, width, data, 3);
->> +        s->regs[SONIC_TSA1] = dp8393x_get(s, width, data, 4);
->> +        s->regs[SONIC_TFS] = dp8393x_get(s, width, data, 5);
->>  
->>          /* Handle programmable interrupt */
->>          if (s->regs[SONIC_TCR] & SONIC_TCR_PINT) {
->> @@ -439,9 +463,9 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
->>                  address_space_rw(&s->as,
->>                      dp8393x_ttda(s) + sizeof(uint16_t) * (4 + 3 * i) * width,
->>                      MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
->> -                s->regs[SONIC_TSA0] = data[0 * width];
->> -                s->regs[SONIC_TSA1] = data[1 * width];
->> -                s->regs[SONIC_TFS] = data[2 * width];
->> +                s->regs[SONIC_TSA0] = dp8393x_get(s, width, data, 0);
->> +                s->regs[SONIC_TSA1] = dp8393x_get(s, width, data, 1);
->> +                s->regs[SONIC_TFS] = dp8393x_get(s, width, data, 2);
->>              }
->>          }
->>  
->> @@ -468,7 +492,8 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
->>          s->regs[SONIC_TCR] |= SONIC_TCR_PTX;
->>  
->>          /* Write status */
->> -        data[0 * width] = s->regs[SONIC_TCR] & 0x0fff; /* status */
->> +        dp8393x_put(s, width, data, 0,
->> +                    s->regs[SONIC_TCR] & 0x0fff); /* status */
->>          size = sizeof(uint16_t) * width;
->>          address_space_rw(&s->as,
->>              dp8393x_ttda(s),
->> @@ -482,8 +507,8 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
->>                               sizeof(uint16_t) *
->>                               (4 + 3 * s->regs[SONIC_TFC]) * width,
->>                  MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
->> -            s->regs[SONIC_CTDA] = data[0 * width] & ~0x1;
->> -            if (data[0 * width] & 0x1) {
->> +            s->regs[SONIC_CTDA] = dp8393x_get(s, width, data, 0) & ~0x1;
->> +            if (dp8393x_get(s, width, data, 0) & 0x1) {
->>                  /* EOL detected */
->>                  break;
->>              }
->> @@ -746,7 +771,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
->>          address = dp8393x_crda(s) + sizeof(uint16_t) * 5 * width;
->>          address_space_rw(&s->as, address, MEMTXATTRS_UNSPECIFIED,
->>                           (uint8_t *)data, size, 0);
->> -        if (data[0 * width] & 0x1) {
->> +        if (dp8393x_get(s, width, data, 0) & 0x1) {
->>              /* Still EOL ; stop reception */
->>              return -1;
->>          } else {
->> @@ -790,11 +815,11 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
->>  
->>      /* Write status to memory */
->>      DPRINTF("Write status at %08x\n", dp8393x_crda(s));
->> -    data[0 * width] = s->regs[SONIC_RCR]; /* status */
->> -    data[1 * width] = rx_len; /* byte count */
->> -    data[2 * width] = s->regs[SONIC_TRBA0]; /* pkt_ptr0 */
->> -    data[3 * width] = s->regs[SONIC_TRBA1]; /* pkt_ptr1 */
->> -    data[4 * width] = s->regs[SONIC_RSC]; /* seq_no */
->> +    dp8393x_put(s, width, data, 0, s->regs[SONIC_RCR]); /* status */
->> +    dp8393x_put(s, width, data, 1, rx_len); /* byte count */
->> +    dp8393x_put(s, width, data, 2, s->regs[SONIC_TRBA0]); /* pkt_ptr0 */
->> +    dp8393x_put(s, width, data, 3, s->regs[SONIC_TRBA1]); /* pkt_ptr1 */
->> +    dp8393x_put(s, width, data, 4, s->regs[SONIC_RSC]); /* seq_no */
->>      size = sizeof(uint16_t) * 5 * width;
->>      address_space_rw(&s->as, dp8393x_crda(s),
->>          MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 1);
->> @@ -803,12 +828,12 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
->>      size = sizeof(uint16_t) * width;
->>      address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 5 * width,
->>          MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
->> -    s->regs[SONIC_LLFA] = data[0 * width];
->> +    s->regs[SONIC_LLFA] = dp8393x_get(s, width, data, 0);
->>      if (s->regs[SONIC_LLFA] & 0x1) {
->>          /* EOL detected */
->>          s->regs[SONIC_ISR] |= SONIC_ISR_RDE;
->>      } else {
->> -        data[0 * width] = 0; /* in_use */
->> +        dp8393x_put(s, width, data, 0, 0); /* in_use */
->>          address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 6 * width,
->>              MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, sizeof(uint16_t), 1);
->>          s->regs[SONIC_CRDA] = s->regs[SONIC_LLFA];
->> @@ -921,6 +946,7 @@ static Property dp8393x_properties[] = {
->>      DEFINE_NIC_PROPERTIES(dp8393xState, conf),
->>      DEFINE_PROP_PTR("dma_mr", dp8393xState, dma_mr),
->>      DEFINE_PROP_UINT8("it_shift", dp8393xState, it_shift, 0),
->> +    DEFINE_PROP_BOOL("big_endian", dp8393xState, big_endian, false),
->>      DEFINE_PROP_END_OF_LIST(),
->>  };
->>  
->>
+>> I just sent v5 of the series, that is (in the sense of net-result of
+>> code changes) equivalent to v4, but the patch 1/7 from v4 is now split
+>> into ten smaller patches. This was done mainly to enable Mark to
+>> perhaps try v5 and bisect, in order to at least somewhat narrow down
+>> the culprit. Most likely it will be patch 5 from v5, that is still
+>> sizeable, but even if this is the case, we can eliminate other smaller
+>> things from consideration.
 > 
+> Thanks for the help on that.
 > 
+> I don't believe your split is actually bisectable -- there's a minimum amount
+> that is required to enable vector opcodes at all.  Patch 5 is the first that
+> enables tcg_out_{mov,ld,st}, so while patches beforehand may compile, they
+> certainly will not run.
+> 
+> I can retain your split, but for real bisectability we need to move the enable
+> of TCG_TARGET_HAS_v128 from patch 2 to patch 5.
+> 
+> Given that all this works for me on a Power9 host, I expect that there's a
+> simple fix for Mark's G5 host.  Given the above assertion, a missing opcode
+> definition, perhaps for -m32 vs -m64?
+
+Right, I'm starting to dig into this a bit more now. First of all, I've figured out
+what is triggering the above assertion:
+
+"qemu-system-ppc: /home/mca/src/qemu/tcg/tcg.c:2207: process_op_defs: Assertion
+`tdefs != ((void *)0)' failed."
+
+The problem is that in tcg/tcg-op.h we define "DEF(dup2_vec, 1, 2, 0, IMPLVEC |
+IMPL(TCG_TARGET_REG_BITS == 32))" and in the last patchset dup2_vec isn't introduced
+until towards the end. Unfortunately it's not a simple as bringing the patch forward
+within the series to maintain bisectability because the current implementation
+depends on VMRG which only appears in the patch just before it...
+
+Next to try and figure out what exactly is causing the fault. Just a quick question
+out of curiosity: is your Power9 system BE or LE?
+
+
+ATB,
+
+Mark.
 
