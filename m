@@ -2,64 +2,83 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2E77C48BD5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 07:04:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39F2DC48BD4
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 07:08:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB9482054F
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 07:04:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB9482054F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id BAB4120665
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 07:08:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pmcj47vs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAB4120665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56996 helo=lists.gnu.org)
+Received: from localhost ([::1]:57016 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hffUt-0000uv-TY
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 03:04:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57650)
+	id 1hffYv-0002lE-31
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 03:08:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58551)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <groug@kaod.org>) id 1hffRY-00083K-Q6
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 03:00:50 -0400
+ (envelope-from <atar4qemu@gmail.com>) id 1hffUv-0001Pk-AD
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 03:04:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1hffRW-00066h-Ia
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 03:00:40 -0400
-Received: from 10.mo69.mail-out.ovh.net ([46.105.73.241]:41135)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1hffRW-00065N-B2
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 03:00:38 -0400
-Received: from player698.ha.ovh.net (unknown [10.109.146.163])
- by mo69.mail-out.ovh.net (Postfix) with ESMTP id 0EECB5CEA2
- for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 09:00:34 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player698.ha.ovh.net (Postfix) with ESMTPSA id 0FE99730AAAF;
- Tue, 25 Jun 2019 07:00:25 +0000 (UTC)
-Date: Tue, 25 Jun 2019 09:00:23 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Message-ID: <20190625090023.10c26982@bahia.lan>
-In-Reply-To: <658ed3c3-9722-e23a-b65c-89df6025461e@linux.vnet.ibm.com>
-References: <156033104292.26635.15759339817253067370.stgit@aravinda>
- <156033129836.26635.3348706829139659071.stgit@aravinda>
- <20190624162935.02d08837@bahia.lan>
- <658ed3c3-9722-e23a-b65c-89df6025461e@linux.vnet.ibm.com>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <atar4qemu@gmail.com>) id 1hffUs-0000FG-GP
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 03:04:07 -0400
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:39175)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1hffUs-0000Bg-AH
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 03:04:06 -0400
+Received: by mail-io1-xd43.google.com with SMTP id r185so705266iod.6
+ for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 00:04:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=KrXnJ5YvWdU3UegtaiF+6vuAdH4k7Ayo6tMH4ry+F0Y=;
+ b=Pmcj47vs2j5u4pmtBBp+m+BriQKAIEXN+Xk4yq/BK+jSxqJ2PiXVCkcs7+cB4E5Lc7
+ 8Yty6V2mX3K0p+q/sPqPfabWRAPI5jJDJSFmXT9vY+p+6wyklb/7MJYhLYtIhCDanrdZ
+ 39eIsXspv03lv/S3YWmmpOYtNhYxeByjhB3faNV3SwvT/xMJvKgU1x2ds4VaZ6OENh2E
+ aSnUANBTP4h937DfmZcmk+tGri6E7LFIDi2+MP/kVNFAlxwsQN4yrL0uzpZK+u2StHnY
+ YyCaxlfxmxHZF/Eq2rtbQ6L0Ojn8ySFTkDbLslXxfcQ1kG+4Xnwbq1UmnoDtb9SnJsML
+ JY/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=KrXnJ5YvWdU3UegtaiF+6vuAdH4k7Ayo6tMH4ry+F0Y=;
+ b=qwQ76FznkHnVCxurOpszqSl4pIEKGOXIsR3e3bmdHlN3zOgKDJ1YHobOvVZ7apYlH5
+ Ujhp6aJqKZrBpCB99HcPm2MjP4giupifHfXtLJSVWWQ211Vcbb+Db3Nz39jVpDibLhRg
+ NrUOFLi7+FSGDj61PEkY/tuhEa4LRU7WeALNtNX4SLG2jDvjKt6ZAwznxXovlBZcewN+
+ sc8msT/cItBGGq/oavmMgZXJ5RkMAZLSpolKao5Btd/4vA+h3mzadCwrr4GVm6SEFLFF
+ cZMoi1UWi5Q6vCAWM98JY1LORZQV/lM1AM0g3nC+lLmvJSWAtku9FuybQb2KCWDTZGhs
+ 3rFQ==
+X-Gm-Message-State: APjAAAUble6C00cnDb3ay7EmGbdJzXKZe1Pf8iknFz1LwVl4dUgtb3h1
+ D76zAp8qZydE9blRh9Cn/+h0g87fVGou9lI664A=
+X-Google-Smtp-Source: APXvYqwKdjHgFM1mQyvCmfmNCYDhac5IvdSKki36PE8hzNE/IVMIqTAhsx90gkW4KtSmYfJ38xIVyMApsbK4i1dLYYY=
+X-Received: by 2002:a5d:964d:: with SMTP id d13mr21975558ios.224.1561446244272; 
+ Tue, 25 Jun 2019 00:04:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 14308498969527097748
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrudefgdduudelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.73.241
-Subject: Re: [Qemu-devel] [PATCH v10 6/6] ppc: spapr: Handle "ibm,
- nmi-register" and "ibm, nmi-interlock" RTAS calls
+References: <20190624220056.25861-1-f4bug@amsat.org>
+ <20190624220056.25861-10-f4bug@amsat.org>
+In-Reply-To: <20190624220056.25861-10-f4bug@amsat.org>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Tue, 25 Jun 2019 09:03:53 +0200
+Message-ID: <CACXAS8B1iSM1TKOW5E3cgT7tsbRrOw8OvO+ATKLpdQsGQ98Tew@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d43
+Subject: Re: [Qemu-devel] [PATCH 9/9] hw/misc/empty_slot: Pass the slot name
+ as argument
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,241 +90,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@au1.ibm.com, qemu-devel@nongnu.org, paulus@ozlabs.org,
- qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ qemu-devel <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 25 Jun 2019 11:46:06 +0530
-Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
+On Tue, Jun 25, 2019 at 12:01 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+>
+> Use the slot name to have more meaningful tracing logs.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-> On Monday 24 June 2019 07:59 PM, Greg Kurz wrote:
-> > On Wed, 12 Jun 2019 14:51:38 +0530
-> > Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
-> >   
-> >> This patch adds support in QEMU to handle "ibm,nmi-register"
-> >> and "ibm,nmi-interlock" RTAS calls and sets the default
-> >> value of SPAPR_CAP_FWNMI_MCE to SPAPR_CAP_ON for machine
-> >> type 4.0.
-> >>  
-> > 
-> > Next machine type is 4.1.  
-> 
-> ok.
-> 
-> >   
-> >> The machine check notification address is saved when the
-> >> OS issues "ibm,nmi-register" RTAS call.
-> >>
-> >> This patch also handles the case when multiple processors
-> >> experience machine check at or about the same time by
-> >> handling "ibm,nmi-interlock" call. In such cases, as per
-> >> PAPR, subsequent processors serialize waiting for the first
-> >> processor to issue the "ibm,nmi-interlock" call. The second
-> >> processor that also received a machine check error waits
-> >> till the first processor is done reading the error log.
-> >> The first processor issues "ibm,nmi-interlock" call
-> >> when the error log is consumed.
-> >>
-> >> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-> >> ---
-> >>  hw/ppc/spapr.c         |    6 ++++-
-> >>  hw/ppc/spapr_rtas.c    |   63 ++++++++++++++++++++++++++++++++++++++++++++++++
-> >>  include/hw/ppc/spapr.h |    5 +++-
-> >>  3 files changed, 72 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> >> index 3d6d139..213d493 100644
-> >> --- a/hw/ppc/spapr.c
-> >> +++ b/hw/ppc/spapr.c
-> >> @@ -2946,6 +2946,9 @@ static void spapr_machine_init(MachineState *machine)
-> >>          /* Create the error string for live migration blocker */
-> >>          error_setg(&spapr->fwnmi_migration_blocker,
-> >>                  "Live migration not supported during machine check handling");
-> >> +
-> >> +        /* Register ibm,nmi-register and ibm,nmi-interlock RTAS calls */
-> >> +        spapr_fwnmi_register();  
-> > 
-> > IIRC this was supposed to depend on SPAPR_CAP_FWNMI_MCE being ON.  
-> 
-> Yes this is inside SPAPR_CAP_FWNMI_MCE check:
-> 
-> if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI_MCE) == SPAPR_CAP_ON) {
->     /*
->      * Ensure that the rtas image size is less than RTAS_ERROR_LOG_OFFSET
->      * or else the rtas image will be overwritten with the rtas error log
->      * when a machine check exception is encountered.
->      */
->     g_assert(spapr->rtas_size < RTAS_ERROR_LOG_OFFSET);
-> 
->     /* Resize rtas blob to accommodate error log */
->     spapr->rtas_size = RTAS_ERROR_LOG_MAX;
-> 
->     /* Create the error string for live migration blocker */
->     error_setg(&spapr->fwnmi_migration_blocker,
->             "Live migration not supported during machine check handling");
-> 
->     /* Register ibm,nmi-register and ibm,nmi-interlock RTAS calls */
->     spapr_fwnmi_register();
-> }
-> 
+Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
 
-Oops my bad... sorry for the noise.
+> ---
+>  include/hw/misc/empty_slot.h | 3 ++-
+>  hw/mips/mips_malta.c         | 2 +-
+>  hw/misc/empty_slot.c         | 6 ++++--
+>  hw/sparc/sun4m.c             | 9 ++++++---
+>  4 files changed, 13 insertions(+), 7 deletions(-)
+>
+> diff --git a/include/hw/misc/empty_slot.h b/include/hw/misc/empty_slot.h
+> index 46483f24c3..d0cd989d2d 100644
+> --- a/include/hw/misc/empty_slot.h
+> +++ b/include/hw/misc/empty_slot.h
+> @@ -14,6 +14,7 @@
+>
+>  /**
+>   * empty_slot_init: create and map a RAZ/WI device
+> + * @name: name of the device for debug logging
+>   * @base: base address of the device's MMIO region
+>   * @size: size of the device's MMIO region
+>   *
+> @@ -27,6 +28,6 @@
+>   * use it to cover a large region and then map other devices on top of i=
+t
+>   * if necessary.
+>   */
+> -void empty_slot_init(hwaddr addr, uint64_t slot_size);
+> +void empty_slot_init(const char *name, hwaddr addr, uint64_t slot_size);
+>
+>  #endif
+> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+> index 7008be2e5b..51db5212be 100644
+> --- a/hw/mips/mips_malta.c
+> +++ b/hw/mips/mips_malta.c
+> @@ -1212,7 +1212,7 @@ void mips_malta_init(MachineState *machine)
+>      /* The whole address space decoded by the GT-64120A doesn't generate
+>         exception when accessing invalid memory. Create an empty slot to
+>         emulate this feature. */
+> -    empty_slot_init(0, 0x20000000);
+> +    empty_slot_init("gt64120-ad", 0x00000000, 0x20000000);
+>
+>      qdev_init_nofail(dev);
+>
+> diff --git a/hw/misc/empty_slot.c b/hw/misc/empty_slot.c
+> index b810655554..396f9dd06a 100644
+> --- a/hw/misc/empty_slot.c
+> +++ b/hw/misc/empty_slot.c
+> @@ -52,12 +52,13 @@ static const MemoryRegionOps empty_slot_ops =3D {
+>      .endianness =3D DEVICE_NATIVE_ENDIAN,
+>  };
+>
+> -void empty_slot_init(hwaddr addr, uint64_t slot_size)
+> +void empty_slot_init(const char *name, hwaddr addr, uint64_t slot_size)
+>  {
+>      DeviceState *dev;
+>
+>      dev =3D qdev_create(NULL, TYPE_EMPTY_SLOT);
+>
+> +    qdev_prop_set_string(dev, "name", name);
+>      qdev_prop_set_uint64(dev, "size", slot_size);
+>      qdev_init_nofail(dev);
+>
+> @@ -77,7 +78,8 @@ static void empty_slot_realize(DeviceState *dev, Error =
+**errp)
+>          return;
+>      }
+>      if (s->name =3D=3D NULL) {
+> -        s->name =3D g_strdup("empty-slot");
+> +        error_setg(errp, "property 'name' not specified");
+> +        return;
+>      }
+>
+>      memory_region_init_io(&s->iomem, OBJECT(s), &empty_slot_ops, s,
+> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+> index d55753d5cb..b17be3ddb8 100644
+> --- a/hw/sparc/sun4m.c
+> +++ b/hw/sparc/sun4m.c
+> @@ -819,7 +819,7 @@ static void sun4m_hw_init(const struct sun4m_hwdef *h=
+wdef,
+>                                           machine->ram_size);
+>      memory_region_add_subregion(get_system_memory(), 0x00000000, &ram);
+>      /* models without ECC don't trap when missing ram is accessed */
+> -    empty_slot_init(0x00000000, hwdef->max_mem);
+> +    empty_slot_init("dram", 0x00000000, hwdef->max_mem);
+>
+>      /* init CPUs */
+>      for(i =3D 0; i < smp_cpus; i++) {
+> @@ -859,7 +859,8 @@ static void sun4m_hw_init(const struct sun4m_hwdef *h=
+wdef,
+>             Software shouldn't use aliased addresses, neither should it c=
+rash
+>             when does. Using empty_slot instead of aliasing can help with
+>             debugging such accesses */
+> -        empty_slot_init(hwdef->iommu_pad_base,hwdef->iommu_pad_len);
+> +        empty_slot_init("iommu.alias",
+> +                        hwdef->iommu_pad_base, hwdef->iommu_pad_len);
+>      }
+>
+>      sparc32_dma_init(hwdef->dma_base,
+> @@ -908,7 +909,9 @@ static void sun4m_hw_init(const struct sun4m_hwdef *h=
+wdef,
+>      for (i =3D 0; i < MAX_VSIMMS; i++) {
+>          /* vsimm registers probed by OBP */
+>          if (hwdef->vsimm[i].reg_base) {
+> -            empty_slot_init(hwdef->vsimm[i].reg_base, 0x2000);
+> +            char *name =3D g_strdup_printf("vsimm[%d]", i);
+> +            empty_slot_init(name, hwdef->vsimm[i].reg_base, 0x2000);
+> +            g_free(name);
+>          }
+>      }
+>
+> --
+> 2.19.1
+>
 
-> 
-> >   
-> >>      }
-> >>  
-> >>      spapr->rtas_blob = g_malloc(spapr->rtas_size);
-> >> @@ -4408,7 +4411,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-> >>      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] = SPAPR_CAP_OFF;
-> >>      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_ON;
-> >>      smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] = SPAPR_CAP_OFF;
-> >> -    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_OFF;
-> >> +    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_ON;
-> >>      spapr_caps_add_properties(smc, &error_abort);
-> >>      smc->irq = &spapr_irq_dual;
-> >>      smc->dr_phb_enabled = true;
-> >> @@ -4512,6 +4515,7 @@ static void spapr_machine_3_1_class_options(MachineClass *mc)
-> >>      smc->default_caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_BROKEN;
-> >>      smc->default_caps.caps[SPAPR_CAP_IBS] = SPAPR_CAP_BROKEN;
-> >>      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_OFF;
-> >> +    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_OFF;  
-> > 
-> > This should have been put into spapr_machine_4_0_class_options().  
-> 
-> ok. I will change it.
-> 
-> > 
-> > But unless you manage to get this merged before soft-freeze (2019-07-02),
-> > I'm afraid this will be a 4.2 feature.  
-> 
-> If there are no other comments, can this be merged to 4.1? I will send a
-> revised version with the above changes.
-> 
 
-This is David's call.
+--=20
+Regards,
+Artyom Tarasenko
 
-> Regards,
-> Aravinda
-> 
-> >   
-> >>  }
-> >>  
-> >>  DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
-> >> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> >> index a015a80..e010cb2 100644
-> >> --- a/hw/ppc/spapr_rtas.c
-> >> +++ b/hw/ppc/spapr_rtas.c
-> >> @@ -49,6 +49,7 @@
-> >>  #include "hw/ppc/fdt.h"
-> >>  #include "target/ppc/mmu-hash64.h"
-> >>  #include "target/ppc/mmu-book3s-v3.h"
-> >> +#include "migration/blocker.h"
-> >>  
-> >>  static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineState *spapr,
-> >>                                     uint32_t token, uint32_t nargs,
-> >> @@ -352,6 +353,60 @@ static void rtas_get_power_level(PowerPCCPU *cpu, SpaprMachineState *spapr,
-> >>      rtas_st(rets, 1, 100);
-> >>  }
-> >>  
-> >> +static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
-> >> +                                  SpaprMachineState *spapr,
-> >> +                                  uint32_t token, uint32_t nargs,
-> >> +                                  target_ulong args,
-> >> +                                  uint32_t nret, target_ulong rets)
-> >> +{
-> >> +    int ret;
-> >> +    hwaddr rtas_addr = spapr_get_rtas_addr();
-> >> +
-> >> +    if (!rtas_addr) {
-> >> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI_MCE) == SPAPR_CAP_OFF) {
-> >> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    ret = kvmppc_fwnmi_enable(cpu);
-> >> +    if (ret == 1) {
-> >> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
-> >> +        return;
-> >> +    } else if (ret < 0) {
-> >> +        error_report("Couldn't enable KVM FWNMI capability");
-> >> +        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    spapr->guest_machine_check_addr = rtas_ld(args, 1);
-> >> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-> >> +}
-> >> +
-> >> +static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
-> >> +                                   SpaprMachineState *spapr,
-> >> +                                   uint32_t token, uint32_t nargs,
-> >> +                                   target_ulong args,
-> >> +                                   uint32_t nret, target_ulong rets)
-> >> +{
-> >> +    if (spapr->guest_machine_check_addr == -1) {
-> >> +        /* NMI register not called */
-> >> +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-> >> +    } else {
-> >> +        /*
-> >> +         * vCPU issuing "ibm,nmi-interlock" is done with NMI handling,
-> >> +         * hence unset mc_status.
-> >> +         */
-> >> +        spapr->mc_status = -1;
-> >> +        qemu_cond_signal(&spapr->mc_delivery_cond);
-> >> +        migrate_del_blocker(spapr->fwnmi_migration_blocker);
-> >> +        rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-> >> +    }
-> >> +}
-> >> +
-> >>  static struct rtas_call {
-> >>      const char *name;
-> >>      spapr_rtas_fn fn;
-> >> @@ -496,6 +551,14 @@ hwaddr spapr_get_rtas_addr(void)
-> >>      return (hwaddr)fdt32_to_cpu(*rtas_data);
-> >>  }
-> >>  
-> >> +void spapr_fwnmi_register(void)
-> >> +{
-> >> +    spapr_rtas_register(RTAS_IBM_NMI_REGISTER, "ibm,nmi-register",
-> >> +                        rtas_ibm_nmi_register);
-> >> +    spapr_rtas_register(RTAS_IBM_NMI_INTERLOCK, "ibm,nmi-interlock",
-> >> +                        rtas_ibm_nmi_interlock);
-> >> +}
-> >> +
-> >>  static void core_rtas_register_types(void)
-> >>  {
-> >>      spapr_rtas_register(RTAS_DISPLAY_CHARACTER, "display-character",
-> >> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> >> index 0dedf0a..7ae53e2 100644
-> >> --- a/include/hw/ppc/spapr.h
-> >> +++ b/include/hw/ppc/spapr.h
-> >> @@ -637,8 +637,10 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu, target_ulong opcode,
-> >>  #define RTAS_IBM_CREATE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x27)
-> >>  #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x28)
-> >>  #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BASE + 0x29)
-> >> +#define RTAS_IBM_NMI_REGISTER                   (RTAS_TOKEN_BASE + 0x2A)
-> >> +#define RTAS_IBM_NMI_INTERLOCK                  (RTAS_TOKEN_BASE + 0x2B)
-> >>  
-> >> -#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2A)
-> >> +#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2C)
-> >>  
-> >>  /* RTAS ibm,get-system-parameter token values */
-> >>  #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
-> >> @@ -894,4 +896,5 @@ void spapr_check_pagesize(SpaprMachineState *spapr, hwaddr pagesize,
-> >>  
-> >>  void spapr_set_all_lpcrs(target_ulong value, target_ulong mask);
-> >>  hwaddr spapr_get_rtas_addr(void);
-> >> +void spapr_fwnmi_register(void);
-> >>  #endif /* HW_SPAPR_H */
-> >>  
-> >   
-> 
-
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/q=
+emu
 
