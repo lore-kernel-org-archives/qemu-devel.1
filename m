@@ -2,84 +2,76 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44101C48BD4
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 15:37:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99D31C48BD5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 15:38:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 200A92080C
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 15:37:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 200A92080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 73E77208E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 15:38:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73E77208E3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33170 helo=lists.gnu.org)
+Received: from localhost ([::1]:33198 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfnVH-0001EC-8U
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 11:37:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60405)
+	id 1hfnWJ-0002iv-PT
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 11:38:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33754)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sgarzare@redhat.com>) id 1hfnNc-0004mV-Hm
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 11:29:09 -0400
+ (envelope-from <bounces@canonical.com>) id 1hfnTn-0000ix-1z
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 11:35:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1hfnNa-0000bB-Vt
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 11:29:08 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:36749)
+ (envelope-from <bounces@canonical.com>) id 1hfnTl-0005ld-Me
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 11:35:30 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44672)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hfnNW-0000Po-5i
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 11:29:03 -0400
-Received: by mail-wm1-f65.google.com with SMTP id u8so3423659wmm.1
- for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 08:28:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=maX/9ZztO3o0ap2K1rEyN53t8p8liQm0W+YzEPOCuR4=;
- b=IA0eaX2zyYxHYEHoAYVzHGAmy+OXByEbbgPWz4UE7XxsLwTa78MQ97qAmFSk8YiuMH
- g/LbqRW94ORxRc2q6ik3FW9s3oFPY/8omgEwlsCvESILhWvCLWR357s6DMcHpd7P0eNB
- yie+GY2J9VrCcu52z4himh5Ohi2E2043oKOPQUM5Sq7DJ/gYr4/D6xke05WoJZAGM0n9
- NTsBeN9jai8mg4M6tHpOHxJST3pz3N85uG0jjmIvD6w8iDk1AqccCZqLcKwGy3ifqbFn
- Md8jeGPeGoPMSzNUThrmr+xutMjUB7M1cCOmm8vkRaotdhixegxpuwwycLmPqpuW5/bb
- rxAA==
-X-Gm-Message-State: APjAAAV1KdOkMNHHOqlePFnDymwEXJI5PyTYlVrxVr4rYm5oITsiYDrQ
- wd2KMgLn3/CM3UmwPiRGt8Mtng==
-X-Google-Smtp-Source: APXvYqwD+C8CpdGTf0vCXVjHgzKxV5G803HHIeULW8hWC/syH1G7ZLjpdWIZsn54iBqsGyfFyFoQIg==
-X-Received: by 2002:a05:600c:228b:: with SMTP id
- 11mr20662968wmf.26.1561476535681; 
- Tue, 25 Jun 2019 08:28:55 -0700 (PDT)
-Received: from steredhat (host21-207-dynamic.52-79-r.retail.telecomitalia.it.
- [79.52.207.21])
- by smtp.gmail.com with ESMTPSA id x3sm15155729wrp.78.2019.06.25.08.28.54
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 25 Jun 2019 08:28:55 -0700 (PDT)
-Date: Tue, 25 Jun 2019 17:28:52 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Message-ID: <20190625152852.6xbswgit7f5gszq5@steredhat>
-References: <20190509145927.293369-1-sgarzare@redhat.com>
- <7a3e37bd-dd24-a97f-5354-7793df44c53e@redhat.com>
- <20190625144710.xvlwcqcbp5bipbku@steredhat>
- <b02a2b04-4955-c341-8639-b03d3a125927@redhat.com>
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hfnTl-0005kn-F8
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 11:35:29 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hfnTj-0003gT-W5
+ for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 15:35:28 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id EBC062E8078
+ for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 15:35:27 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b02a2b04-4955-c341-8639-b03d3a125927@redhat.com>
-User-Agent: NeoMutt/20180716
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 25 Jun 2019 15:27:50 -0000
+From: Laurent Vivier <Laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: arm linux-user
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: laurent-vivier philmd rth
+X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
+References: <156110323981.19354.11667763271761846721.malonedeb@wampee.canonical.com>
+ <156147381286.18147.1572558561573422063.malone@gac.canonical.com>
+Message-Id: <d5c913aa-0edf-ff4b-f21e-8c1a375e10fd@vivier.eu>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18991";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 1140a9ecac8d9d59f05bad407b4c6b90b42fe7d3
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PATCH v3] block/rbd: increase dynamically the
- image size
+X-Received-From: 91.189.90.7
+Subject: Re: [Qemu-devel] [Bug 1833668] Re: linux-user: Unable to run ARM
+ binaries on Aarch64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,85 +80,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
- Jason Dillaman <jdillama@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Reply-To: Bug 1833668 <1833668@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20190625152750.J0oBE7CEHcFIcx9IK6leMQnrwaIKbt_MWeofBa84Ghs@z>
 
-On Tue, Jun 25, 2019 at 04:57:53PM +0200, Max Reitz wrote:
-> On 25.06.19 16:47, Stefano Garzarella wrote:
-> > On Tue, Jun 25, 2019 at 04:02:04PM +0200, Max Reitz wrote:
-> >> On 09.05.19 16:59, Stefano Garzarella wrote:
-> >>> RBD APIs don't allow us to write more than the size set with
-> >>> rbd_create() or rbd_resize().
-> >>> In order to support growing images (eg. qcow2), we resize the
-> >>> image before write operations that exceed the current size.
-> >>>
-> >>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> >>> ---
-> >>> v3:
-> >>>   - add 'image_size' field in the BDRVRBDState to keep track of the
-> >>>     current size of the RBD image [Jason, Kevin]
-> >>> ---
-> >>>  block/rbd.c | 42 +++++++++++++++++++++++++++++++++++++++---
-> >>>  1 file changed, 39 insertions(+), 3 deletions(-)
-> >>>
-> >>> diff --git a/block/rbd.c b/block/rbd.c
-> >>> index 0c549c9935..b0355a2ce0 100644
-> >>> --- a/block/rbd.c
-> >>> +++ b/block/rbd.c
-> >>
-> >> [...]
-> >>
-> >>> @@ -833,6 +842,22 @@ static void qemu_rbd_close(BlockDriverState *bs)
-> >>>      rados_shutdown(s->cluster);
-> >>>  }
-> >>>  
-> >>> +/* Resize the RBD image and update the 'image_size' with the current size */
-> >>> +static int qemu_rbd_resize(BlockDriverState *bs, uint64_t size)
-> >>> +{
-> >>> +    BDRVRBDState *s = bs->opaque;
-> >>> +    int r;
-> >>> +
-> >>> +    r = rbd_resize(s->image, size);
-> >>> +    if (r < 0) {
-> >>> +        return r;
-> >>> +    }
-> >>> +
-> >>> +    s->image_size = size;
-> >>
-> >> I think this should update bs->total_sectors, too.  In fact, I’m
-> >> wondering why you don’t just use bs->total_sectors (or bdrv_getlength(),
-> >> which returns bs->total_sectors * 512) instead of adding this new field?
-> >>
-> > 
-> > Hi Max,
-> > thanks for taking a look!
-> > 
-> > I used bs->total_sectors in the v2, but Jason pointed out a possible
-> > issue with this, so I proposed to add a variable in the BDRVRBDState to
-> > track the latest resize and Kevin acked [1].
-> > 
-> > IIUC what Kevin said on his comment, the 'bs->total_sectors' should be
-> > updated by bdrv_co_write_req_finish(), for this reason I didn't update
-> > it.
-> > 
-> > [1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg615195.html
-> 
-> Ah, right!  Yeah, sure, now that I think about it, the block layer must
-> have general code for successful writes beyond EOF...  (Read: Now that
-> I’m pointed towards it...)
+Le 25/06/2019 =C3=A0 16:43, Richard Henderson a =C3=A9crit=C2=A0:
+> Of course.  There's a separate qemu-arm executable for that.
 
-Yeah, do you mean for example to call .bdrv_co_truncate() (or a new
-callback implemented only in the driver that need to be resized like
-rbd) in the bdrv_driver_pwritev() if we will write beyond EOF?
+On some other architectures (like ppc/ppc64) the idea is the 64bit
+version supports also all 32bit versions CPUs.
 
-> 
-> OK then; thanks for the patch, applied to my block branch:
+I think it's why this bug has been opened.
 
-Thanks to take this!
-Stefano
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1833668
+
+Title:
+  linux-user: Unable to run ARM binaries on Aarch64
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  Download a ARM package from https://packages.debian.org/sid/busybox-
+  static
+
+  Here tested with: busybox-static_1.30.1-4_armel.deb
+
+  $ file busybox.armel
+  busybox.armel: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), st=
+atically linked, for GNU/Linux 3.2.0, BuildID[sha1]=3D12cf572e016bafa240e11=
+3b57b3641e94b837f37, stripped
+
+  $ qemu-aarch64 --version
+  qemu-aarch64 version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.14)
+
+  $ qemu-aarch64 busybox.armel
+  busybox.armel: Invalid ELF image for this architecture
+
+  $ qemu-aarch64 -cpu cortex-a7 busybox.armel
+  unable to find CPU model 'cortex-a7'
+
+  Also reproduced with commit 33d609990621dea6c7d056c86f707b8811320ac1,
+  while the aarch64_cpus[] array contains Aarch64 CPUs, the arm_cpus[] arra=
+y is empty:
+
+  $ gdb -q aarch64-linux-user/qemu-aarch64
+  (gdb) p aarch64_cpus
+  $1 =3D {{name =3D 0x1fe4e8 "cortex-a57", initfn =3D 0x109bc0 <aarch64_a57=
+_initfn>, class_init =3D 0x0}, {name =3D 0x1fe508 "cortex-a53", initfn =3D =
+0x109a10 <aarch64_a53_initfn>, class_init =3D 0x0}, {name =3D 0x1fe518 "cor=
+tex-a72", =
+
+      initfn =3D 0x109868 <aarch64_a72_initfn>, class_init =3D 0x0}, {name =
+=3D 0x218020 "max", initfn =3D 0x109d70 <aarch64_max_initfn>, class_init =
+=3D 0x0}, {name =3D 0x0, initfn =3D 0x0, class_init =3D 0x0}}
+  (gdb) p arm_cpus
+  $2 =3D {{name =3D 0x0, initfn =3D 0x0, class_init =3D 0x0}}
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1833668/+subscriptions
 
