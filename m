@@ -2,65 +2,96 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEA69C48BD4
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 07:38:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F22B6C48BD5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 07:43:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6FAE2054F
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 07:38:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6FAE2054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8209720659
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 07:43:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m+NMfU+S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8209720659
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57250 helo=lists.gnu.org)
+Received: from localhost ([::1]:57278 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfg1w-0000Mv-RZ
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 03:38:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40019)
+	id 1hfg6V-0002KT-Rc
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 03:43:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41151)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1hfg1Q-0008OE-Q3
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 03:37:45 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1hfg5b-0001q0-Or
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 03:42:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1hfg1N-00072o-4t
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 03:37:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53452)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1hfg1M-0006X6-Px
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 03:37:41 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 903FD81DEE;
- Tue, 25 Jun 2019 07:37:04 +0000 (UTC)
-Received: from [10.36.116.89] (ovpn-116-89.ams2.redhat.com [10.36.116.89])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 44840600D1;
- Tue, 25 Jun 2019 07:36:58 +0000 (UTC)
-To: Yan Zhao <yan.y.zhao@intel.com>, pbonzini@redhat.com
-References: <1561432878-13754-1-git-send-email-yan.y.zhao@intel.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <5481acca-fffa-e99c-dcc1-ce41119dee17@redhat.com>
-Date: Tue, 25 Jun 2019 09:36:57 +0200
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1hfg5a-0002BF-Nc
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 03:42:03 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39204)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1hfg5Z-00028Q-6D
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 03:42:02 -0400
+Received: by mail-wr1-x441.google.com with SMTP id x4so16611488wrt.6
+ for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 00:42:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:openpgp:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=2s5Npqs6ABsXpmiSmq0845R3+8uM/BxBmNlwowaZrXc=;
+ b=m+NMfU+SibqoI0A6jAPBPjUmDB+hrgDAou8uLr8n6tMuNfMpIFAPsSrdwD0X2sOw3M
+ BUTYKSlt5m+FIcSNy/YU+CBvhlQ96ZzFRneVHMbZ5JYutKg/CX05WasO16PYov1Y04xu
+ cah//Au0K0wgVFGy114AxcLODx0wNNKeKaSuaSBgtZq3zx08yrJyLCWr+6/+kOSB9lnu
+ WDvb8x1N2dREP55IeY6NRWrg6vrmQd8b0pd57NP1NjLLfbwuDifBi6cyM3jdaxQnXuIe
+ Au6E0LJZ1JobEjfYrB9nvuUFMilbIbmKumQXA7Duv24JrixhUNySxKfwEjweOhNHZgbS
+ rkcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:openpgp
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=2s5Npqs6ABsXpmiSmq0845R3+8uM/BxBmNlwowaZrXc=;
+ b=IyGS53hHl7k1KZajK0FXoUYSupl2Nn3gGxosZ3LdnhkM6SzDwtGMUZQ4IPPv2W21v8
+ TrMHDZVqN9/LM6++lEzwfzcIXaWkYCJzIvWFi0Bk6+KIW4qRDbXjLDOmkwZQOA4swdTo
+ pFOgZj7Onz9g76VRcGRKzomVm2KlNfBHECXgxXg2hOB8ta7RSYdr9fBqQOor/NDmfbk8
+ fRC9mK41XE+z7JkOrFGlv2inc5dWY5+tw0VGNPWmcmCiTX6cTG21PCctPML79s4ZLn0C
+ mk1VHony98U7YACfLG20R/vX1VTvkB83CnadauaQsNs/aSljNedJcgeqYxP6lTVuti4F
+ 9FQQ==
+X-Gm-Message-State: APjAAAVOZ4JzniNXasKWKKTftqSfDj4xEpeRfWdYjRH/8VsVnwGxQUy+
+ Sg9v723UN5F6lyyeSxSEiL8=
+X-Google-Smtp-Source: APXvYqxtbnXehwQtdqYTpZ+37A6JyH9mkvTNlGkgONQ+3tpEyDGbwYIKIPo4qxRYMKlLzxPmXiZx3g==
+X-Received: by 2002:a5d:634d:: with SMTP id b13mr15688410wrw.177.1561448519441; 
+ Tue, 25 Jun 2019 00:41:59 -0700 (PDT)
+Received: from [192.168.1.103] (183.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.183])
+ by smtp.gmail.com with ESMTPSA id g10sm11363937wrw.60.2019.06.25.00.41.58
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Tue, 25 Jun 2019 00:41:58 -0700 (PDT)
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+References: <20190624222844.26584-1-f4bug@amsat.org>
+ <20190624222844.26584-8-f4bug@amsat.org>
+ <CAL1e-=gNKxSt9qAEGx4akJULMNE1KK2OF5X3wfSO=WUfnC5KSw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Openpgp: url=http://pgp.mit.edu/pks/lookup?op=get&search=0xE3E32C2CDEADC0DE
+Message-ID: <cdf34023-c08a-c5f3-0bee-5998849536a7@amsat.org>
+Date: Tue, 25 Jun 2019 09:41:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <1561432878-13754-1-git-send-email-yan.y.zhao@intel.com>
+In-Reply-To: <CAL1e-=gNKxSt9qAEGx4akJULMNE1KK2OF5X3wfSO=WUfnC5KSw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Tue, 25 Jun 2019 07:37:04 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4] memory: assert on out of scope
- notification
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
+Subject: Re: [Qemu-devel] [PATCH 07/10] hw/mips/gt64xxx_pci: Align the
+ pci0-mem size
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,97 +103,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-devel@nongnu.org,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Artyom Tarasenko <atar4qemu@gmail.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Yan,
+On 6/25/19 2:43 AM, Aleksandar Markovic wrote:
+> 
+> On Jun 25, 2019 12:44 AM, "Philippe Mathieu-Daudé" <f4bug@amsat.org
+> <mailto:f4bug@amsat.org>> wrote:
+>>
+>> One byte is missing, use an aligned size.
+>>
+>>     (qemu) info mtree
+>>     memory-region: pci0-mem
+>>       0000000000000000-00000000fffffffe (prio 0, i/o): pci0-mem
+>>                                       ^
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org
+> <mailto:f4bug@amsat.org>>
+>> ---
+> 
+> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com
+> <mailto:amarkovic@wavecomp.com>>
 
-[ + Peter]
+Thanks!
 
+> I agree with this change, but do we have similar situations in QEMU code
+> elsewhere?
 
-On 6/25/19 5:21 AM, Yan Zhao wrote:
-> It is wrong for an entry to have parts out of scope of notifier's range.
-> assert this condition.
-> 
-> Out of scope mapping/unmapping would cause problem, as in below case:
-> 
-> 1. initially there are two notifiers with ranges
-> 0-0xfedfffff, 0xfef00000-0xffffffffffffffff,
-> IOVAs from 0x3c000000 - 0x3c1fffff is in shadow page table.
-> 
-> 2. in vfio, memory_region_register_iommu_notifier() is followed by
-> memory_region_iommu_replay(), which will first call address space
-> unmap,
-> and walk and add back all entries in vtd shadow page table. e.g.
-> (1) for notifier 0-0xfedfffff,
->     IOVAs from 0 - 0xffffffff get unmapped,
->     and IOVAs from 0x3c000000 - 0x3c1fffff get mapped
-> (2) for notifier 0xfef00000-0xffffffffffffffff
->     IOVAs from 0 - 0x7fffffffff get unmapped,
->     but IOVAs from 0x3c000000 - 0x3c1fffff cannot get mapped back.
-> 
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> 
-> ---
-> v4:
-> 1. modified commit title
-> 2. using "assert" instead of printing warning message> (Eric Auger)
-Sorry my last reply mentioning the relevance of an assert was rather a
-question (for you and other reviewers) actually. Your bug report
-emphasized the fact that having an entry which has non inclusive overlap
-with the notifier can be dangerous.
+Good reflex :)
 
-Now we also have memory_region_notify_iommu() that loops over all
-notifiers of the iommu mr and notifies each of them with the entry. Some
-other callers than vtd (spapr_iommu.c, tz-mpc.c, s390-pci-inst.c,
-smmuv3) may hit this assert and this may cause a regression. I checked
-with smmuv3 and it looks OK.
+We have the Jazz boards:
 
-Also if we enforce the rule that the entry span shall be within the
-notifier one, this should be documented in memory.h.
+address-space: rc4030-dma
+  0000000000000000-00000000fffffffe (prio 0, i/o): rc4030.dma
 
-Thanks
+address-space: dp8393x
+  0000000000000000-00000000fffffffe (prio 0, i/o): rc4030.dma
 
-Eric
-> 
-> v3:
-> refined code style and message format
-> 
-> v2:
-> 1. added a local variable entry_end (Eric Auger)
-> 2. using PRIx64 as format for address range in warning message
-> (Eric Auger)
-> ---
->  memory.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/memory.c b/memory.c
-> index 0a089a7..35e8e77 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -1937,16 +1937,18 @@ void memory_region_notify_one(IOMMUNotifier *notifier,
->                                IOMMUTLBEntry *entry)
->  {
->      IOMMUNotifierFlag request_flags;
-> +    hwaddr entry_end = entry->iova + entry->addr_mask;
->  
->      /*
->       * Skip the notification if the notification does not overlap
->       * with registered range.
->       */
-> -    if (notifier->start > entry->iova + entry->addr_mask ||
-> -        notifier->end < entry->iova) {
-> +    if (notifier->start > entry_end || notifier->end < entry->iova) {
->          return;
->      }
->  
-> +    assert(entry->iova >= notifier->start && entry_end <= notifier->end);
-> +
->      if (entry->perm & IOMMU_RW) {
->          request_flags = IOMMU_NOTIFIER_MAP;
->      } else {
+>>  hw/mips/gt64xxx_pci.c | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/mips/gt64xxx_pci.c b/hw/mips/gt64xxx_pci.c
+>> index 815ef0711d..2fa313f498 100644
+>> --- a/hw/mips/gt64xxx_pci.c
+>> +++ b/hw/mips/gt64xxx_pci.c
+>> @@ -23,6 +23,7 @@
+>>   */
+>>
+>>  #include "qemu/osdep.h"
+>> +#include "qemu/units.h"
+>>  #include "qemu/log.h"
+>>  #include "hw/hw.h"
+>>  #include "hw/mips/mips.h"
+>> @@ -1201,7 +1202,7 @@ PCIBus *gt64120_register(qemu_irq *pic)
+>>      dev = qdev_create(NULL, TYPE_GT64120_PCI_HOST_BRIDGE);
+>>      d = GT64120_PCI_HOST_BRIDGE(dev);
+>>      phb = PCI_HOST_BRIDGE(dev);
+>> -    memory_region_init(&d->pci0_mem, OBJECT(dev), "pci0-mem",
+> UINT32_MAX);
+>> +    memory_region_init(&d->pci0_mem, OBJECT(dev), "pci0-mem", 4 * GiB);
+>>      address_space_init(&d->pci0_mem_as, &d->pci0_mem, "pci0-mem");
+>>      phb->bus = pci_register_root_bus(dev, "pci",
+>>                                       gt64120_pci_set_irq,
+> gt64120_pci_map_irq,
+>> --
+>> 2.19.1
+>>
+>>
 > 
 
