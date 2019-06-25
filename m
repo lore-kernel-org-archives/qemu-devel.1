@@ -8,83 +8,82 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94A32C48BD6
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 18:17:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD6BEC48BD6
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 18:19:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B43C2086D
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 18:17:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 941792080C
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 18:19:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YbGF/SBf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B43C2086D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pu5wGeRT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 941792080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34516 helo=lists.gnu.org)
+Received: from localhost ([::1]:34542 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfq0u-0003oe-BG
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 14:17:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48103)
+	id 1hfq2J-0004us-Uo
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 14:19:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48348)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hfpzB-000300-U3
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 14:16:07 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hfq0P-0003w1-CY
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 14:17:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hfpzA-0006dN-8Q
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 14:16:05 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:36442)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hfq0L-0007M1-QO
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 14:17:19 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:42332)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1hfpz9-0006cf-US
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 14:16:04 -0400
-Received: by mail-ot1-x341.google.com with SMTP id r6so18249790oti.3
- for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 11:16:03 -0700 (PDT)
+ id 1hfq0J-0007I8-Mc
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 14:17:17 -0400
+Received: by mail-ot1-x342.google.com with SMTP id l15so18239762otn.9
+ for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 11:17:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=ZHlrIuSk11MD61W0v3vDArvKslWzs4N0mg5AH7eJoDA=;
- b=YbGF/SBfoRPaBdx7FJlql2LShSXthSS1EG2HiW7PQKMeUh/Cp8XUPN/Ce8q7ejSTh4
- V0NGdla+cYb1V+66fa4AooLl8Da9cA1LIOhckMunb84ohpWqQqN6sBs5AXxwBpbSRrdH
- mvPTCZwqaEAaa3+j+2hhQollCZNTcU7H08K0C2sbBzlcqPZEdzAWZpqLlZbZhwOFGxtO
- ajnLBozQYGDMX7/kod301PHSAxZLOqi2UsKrGAAZdRDipl5BgjePNG3mfcDiayaw1wa0
- Xg++7omfYPczTs1O94rqFYNCWOC5iMt5ZduGUqqEsAuHcjBF/dmQbI/6bbva5+1hvtcd
- g44w==
+ :cc; bh=aWJmttSRlJsPa4EGIopet8NzVUeONC4+1Cajku0uBHc=;
+ b=Pu5wGeRTG2OVwchqrrMttyXl11HSfRKjSIG+A9YZALg65FQNEDfBIFT0lOYp7r5KRH
+ mdWzi/xVOE4j1/WZWs2NQROM2jwKxH4jYvFJF3g+OoHlmsrdQVOr+EN4m+OTvNIChI0e
+ BLDI+J6uFE6orH+Kzv4M9SVkU+7N2UsjCheurudCQ+IcZHVudn1Tkwu52P3HsKSw50mS
+ BTRf+Z6ZVgIi3sT4BMOCBAf8W92yoCDR7jKnedYC/CY/J7SjeaPVFsDrjbre7WQdoBcM
+ AvmHsQIa+YxbjNLQSzn/+tRXDi+/ZOM64nWk+kG5Vyjr1A9heKUDMw1v+5UgJZqImPF4
+ nckg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:in-reply-to:references:from:date
  :message-id:subject:to:cc;
- bh=ZHlrIuSk11MD61W0v3vDArvKslWzs4N0mg5AH7eJoDA=;
- b=Q5iB/RjMTQPuyv8hS136WYfcmdtusbt2OqpYtzy0YpLJa1UUfWDetP5lyweWDdT2GT
- QmWLOKJ3M+exhJy0tt0HF6xf4awP9cK0L0+MnFXs0JUjO0Lifa/yX0r+eJt15L71pu4k
- FGDVfR3oFh0PlWBGHejTgS8s1XCvEi+ycMjnXuzGP+gfdJt+olfCz/Kq/1VgGHt4UDVC
- xhOg6ki3NsYPZJc1bELL7NCQfnfswSzWFZvUY+ItxO9VWFzBHNrBIV1ksezUko4nlhiR
- E/Q6HTSTp5li4MKZD7/Zwu6C+dOVuQx1daDxVoUhn7xHUKy+ypxAninBgz38vfMKwbsQ
- +nDA==
-X-Gm-Message-State: APjAAAVeYj/u/lZrP0QFEsmRozi0lwLhqkqTns0uvU7El4iOLdG6NQkf
- Hb/52xqm6ibHYkUn2yMfyqtzqzpCQm2KM+YhNrY=
-X-Google-Smtp-Source: APXvYqx1l2foBujIyBvQKgYfsqb3aqa3IEcjXXKgcycVujN9YqAQ/7DBaQ0V5QeNQoy9ft23ZiNB+sCPZrLFDCPWqTs=
-X-Received: by 2002:a05:6830:11d4:: with SMTP id
- v20mr20232619otq.121.1561486562998; 
- Tue, 25 Jun 2019 11:16:02 -0700 (PDT)
+ bh=aWJmttSRlJsPa4EGIopet8NzVUeONC4+1Cajku0uBHc=;
+ b=jhDm7RLx6fuCQRRtbsqdHfLs9cb6mpo2BHkujReUYbT2WiiQoMbHJUEjyQ92nboZHr
+ QX6A7ILC1FD4RNEyJ38dd7VVqMxnh0zp40nBOrVQZ1kASL8o53zBxwQgMA+3rs3H6gIB
+ baTd2rdR5ERb12Xj1D2EArh21SfdvMXwMeowjyFcxgdB2r7KZ8uMTXJpne/vFRl0zcsK
+ wwwsTnTihAYQXjHQ50jxqwrYTQbiM6n0bnIGJ9Pge94h2g3yenva/S+TSn9gYATNyJeQ
+ gfspWuSTV2EwYb7JV8Esw6hDJzr82zXAIRN5nXNYcLTwzZx1laIvsaX2D5F28EAc7Omc
+ J5+A==
+X-Gm-Message-State: APjAAAWtrybWNU2N0JUIwpoclXuRHin9iLvk7Isfeg0i5wDgs7i73bDW
+ vPG3U8L4sLp8lujp95aQOp4Xwsd0oAN7Vf5SFdQ=
+X-Google-Smtp-Source: APXvYqw5ySD0TdQHhDioGlyYJ+e7T7YCHcbl5fovvDoojxNjU/uPFi2v2SZile+IjzgEr3VzOWFohBKu7LuQn9TEjzE=
+X-Received: by 2002:a9d:6e8a:: with SMTP id a10mr16521405otr.295.1561486634843; 
+ Tue, 25 Jun 2019 11:17:14 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP; Tue, 25 Jun 2019 11:16:02
+Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP; Tue, 25 Jun 2019 11:17:14
  -0700 (PDT)
-Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP; Tue, 25 Jun 2019 11:16:02
+Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP; Tue, 25 Jun 2019 11:17:14
  -0700 (PDT)
-In-Reply-To: <20190624222844.26584-6-f4bug@amsat.org>
+In-Reply-To: <20190624222844.26584-7-f4bug@amsat.org>
 References: <20190624222844.26584-1-f4bug@amsat.org>
- <20190624222844.26584-6-f4bug@amsat.org>
+ <20190624222844.26584-7-f4bug@amsat.org>
 From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 25 Jun 2019 20:16:02 +0200
-Message-ID: <CAL1e-=h31uYzZ3dpdvwcW5fq5+g9Q5RMpb2r7sB4U3M9DK9T5A@mail.gmail.com>
+Date: Tue, 25 Jun 2019 20:17:14 +0200
+Message-ID: <CAL1e-=giXst=2SuaqLF=gB4SJy-Q7QnT8PVztDighsc323Xg_A@mail.gmail.com>
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+X-Received-From: 2607:f8b0:4864:20::342
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH 05/10] hw/mips/gt64xxx_pci: Use
- qemu_log_mask() instead of debug printf()
+Subject: Re: [Qemu-devel] [PATCH 06/10] hw/mips/gt64xxx_pci: Convert debug
+ printf()s to trace events
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,7 +105,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Jun 25, 2019 12:42 AM, "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org> w=
+On Jun 25, 2019 12:46 AM, "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org> w=
 rote:
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
@@ -114,152 +113,120 @@ rote:
 
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
->  hw/mips/gt64xxx_pci.c | 48 +++++++++++++++++++++++++++++++++----------
->  1 file changed, 37 insertions(+), 11 deletions(-)
+>  Makefile.objs         |  1 +
+>  hw/mips/gt64xxx_pci.c | 29 ++++++++++-------------------
+>  hw/mips/trace-events  |  4 ++++
+>  3 files changed, 15 insertions(+), 19 deletions(-)
+>  create mode 100644 hw/mips/trace-events
 >
+> diff --git a/Makefile.objs b/Makefile.objs
+> index 658cfc9d9f..3b83621f32 100644
+> --- a/Makefile.objs
+> +++ b/Makefile.objs
+> @@ -163,6 +163,7 @@ trace-events-subdirs +=3D hw/input
+>  trace-events-subdirs +=3D hw/intc
+>  trace-events-subdirs +=3D hw/isa
+>  trace-events-subdirs +=3D hw/mem
+> +trace-events-subdirs +=3D hw/mips
+>  trace-events-subdirs +=3D hw/misc
+>  trace-events-subdirs +=3D hw/misc/macio
+>  trace-events-subdirs +=3D hw/net
 > diff --git a/hw/mips/gt64xxx_pci.c b/hw/mips/gt64xxx_pci.c
-> index 0b9fb02475..f44326f14f 100644
+> index f44326f14f..815ef0711d 100644
 > --- a/hw/mips/gt64xxx_pci.c
 > +++ b/hw/mips/gt64xxx_pci.c
-> @@ -23,6 +23,7 @@
->   */
+> @@ -30,14 +30,7 @@
+>  #include "hw/pci/pci_host.h"
+>  #include "hw/i386/pc.h"
+>  #include "exec/address-spaces.h"
+> -
+> -//#define DEBUG
+> -
+> -#ifdef DEBUG
+> -#define DPRINTF(fmt, ...) fprintf(stderr, "%s: " fmt, __func__,
+##__VA_ARGS__)
+> -#else
+> -#define DPRINTF(fmt, ...)
+> -#endif
+> +#include "trace.h"
 >
->  #include "qemu/osdep.h"
-> +#include "qemu/log.h"
->  #include "hw/hw.h"
->  #include "hw/mips/mips.h"
->  #include "hw/pci/pci.h"
-> @@ -466,12 +467,20 @@ static void gt64120_writel(void *opaque, hwaddr
+>  #define GT_REGS                 (0x1000 >> 2)
+>
+> @@ -294,9 +287,7 @@ static void gt64120_isd_mapping(GT64120State *s)
+>      check_reserved_space(&start, &length);
+>      length =3D 0x1000;
+>      /* Map new address */
+> -    DPRINTF("ISD: "TARGET_FMT_plx"@"TARGET_FMT_plx
+> -        " -> "TARGET_FMT_plx"@"TARGET_FMT_plx"\n",
+> -        s->ISD_length, s->ISD_start, length, start);
+> +    trace_gt64120_isd_remap(s->ISD_length, s->ISD_start, length, start);
+>      s->ISD_start =3D start;
+>      s->ISD_length =3D length;
+>      memory_region_add_subregion(get_system_memory(), s->ISD_start,
+&s->ISD_mem);
+> @@ -648,19 +639,19 @@ static void gt64120_writel(void *opaque, hwaddr
 addr,
->      case GT_CPUERR_DATAHI:
->      case GT_CPUERR_PARITY:
->          /* Read-only registers, do nothing */
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "gt64120: Read-only register write "
-> +                      "reg:0x03%x size:%u value:0x%0*" PRIx64 "\n",
-> +                      saddr << 2, size, size << 1, val);
+>          /* not really implemented */
+>          s->regs[saddr] =3D ~(~(s->regs[saddr]) | ~(val & 0xfffffffe));
+>          s->regs[saddr] |=3D !!(s->regs[saddr] & 0xfffffffe);
+> -        DPRINTF("INTRCAUSE %" PRIx64 "\n", val);
+> +        trace_gt64120_write("INTRCAUSE", size << 1, val);
+>          break;
+>      case GT_INTRMASK:
+>          s->regs[saddr] =3D val & 0x3c3ffffe;
+> -        DPRINTF("INTRMASK %" PRIx64 "\n", val);
+> +        trace_gt64120_write("INTRMASK", size << 1, val);
+>          break;
+>      case GT_PCI0_ICMASK:
+>          s->regs[saddr] =3D val & 0x03fffffe;
+> -        DPRINTF("ICMASK %" PRIx64 "\n", val);
+> +        trace_gt64120_write("ICMASK", size << 1, val);
+>          break;
+>      case GT_PCI0_SERR0MASK:
+>          s->regs[saddr] =3D val & 0x0000003f;
+> -        DPRINTF("SERR0MASK %" PRIx64 "\n", val);
+> +        trace_gt64120_write("SERR0MASK", size << 1, val);
 >          break;
 >
->      /* CPU Sync Barrier */
->      case GT_PCI0SYNC:
->      case GT_PCI1SYNC:
->          /* Read-only registers, do nothing */
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "gt64120: Read-only register write "
-> +                      "reg:0x03%x size:%u value:0x%0*" PRIx64 "\n",
-> +                      saddr << 2, size, size << 1, val);
->          break;
->
->      /* SDRAM and Device Address Decode */
-> @@ -510,7 +519,10 @@ static void gt64120_writel(void *opaque, hwaddr addr=
-,
->      case GT_DEV_B3:
->      case GT_DEV_BOOT:
->          /* Not implemented */
-> -        DPRINTF ("Unimplemented device register offset 0x%x\n", saddr <<
-2);
-> +        qemu_log_mask(LOG_UNIMP,
-> +                      "gt64120: Unimplemented device register write "
-> +                      "reg:0x03%x size:%u value:0x%0*" PRIx64 "\n",
-> +                      saddr << 2, size, size << 1, val);
->          break;
->
->      /* ECC */
-> @@ -520,6 +532,10 @@ static void gt64120_writel(void *opaque, hwaddr addr=
-,
->      case GT_ECC_CALC:
->      case GT_ECC_ERRADDR:
->          /* Read-only registers, do nothing */
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "gt64120: Read-only register write "
-> +                      "reg:0x03%x size:%u value:0x%0*" PRIx64 "\n",
-> +                      saddr << 2, size, size << 1, val);
->          break;
->
->      /* DMA Record */
-> @@ -543,23 +559,20 @@ static void gt64120_writel(void *opaque, hwaddr
-addr,
->      case GT_DMA1_CUR:
->      case GT_DMA2_CUR:
->      case GT_DMA3_CUR:
-> -        /* Not implemented */
-> -        DPRINTF ("Unimplemented DMA register offset 0x%x\n", saddr << 2)=
-;
-> -        break;
->
->      /* DMA Channel Control */
->      case GT_DMA0_CTRL:
->      case GT_DMA1_CTRL:
->      case GT_DMA2_CTRL:
->      case GT_DMA3_CTRL:
-> -        /* Not implemented */
-> -        DPRINTF ("Unimplemented DMA register offset 0x%x\n", saddr << 2)=
-;
-> -        break;
->
->      /* DMA Arbiter */
->      case GT_DMA_ARB:
->          /* Not implemented */
-> -        DPRINTF ("Unimplemented DMA register offset 0x%x\n", saddr << 2)=
-;
-> +        qemu_log_mask(LOG_UNIMP,
-> +                      "gt64120: Unimplemented DMA register write "
-> +                      "reg:0x03%x size:%u value:0x%0*" PRIx64 "\n",
-> +                      saddr << 2, size, size << 1, val);
->          break;
->
->      /* Timer/Counter */
-> @@ -569,7 +582,10 @@ static void gt64120_writel(void *opaque, hwaddr addr=
-,
->      case GT_TC3:
->      case GT_TC_CONTROL:
->          /* Not implemented */
-> -        DPRINTF ("Unimplemented timer register offset 0x%x\n", saddr <<
-2);
-> +        qemu_log_mask(LOG_UNIMP,
-> +                      "gt64120: Unimplemented timer register write "
-> +                      "reg:0x03%x size:%u value:0x%0*" PRIx64 "\n",
-> +                      saddr << 2, size, size << 1, val);
->          break;
->
->      /* PCI Internal */
-> @@ -610,6 +626,10 @@ static void gt64120_writel(void *opaque, hwaddr addr=
-,
->      case GT_PCI1_CFGADDR:
->      case GT_PCI1_CFGDATA:
->          /* not implemented */
-> +        qemu_log_mask(LOG_UNIMP,
-> +                      "gt64120: Unimplemented timer register write "
-> +                      "reg:0x03%x size:%u value:0x%0*" PRIx64 "\n",
-> +                      saddr << 2, size, size << 1, val);
->          break;
->      case GT_PCI0_CFGADDR:
->          phb->config_reg =3D val & 0x80fffffc;
-> @@ -666,7 +686,10 @@ static void gt64120_writel(void *opaque, hwaddr addr=
-,
->          break;
->
->      default:
-> -        DPRINTF ("Bad register offset 0x%x\n", (int)addr);
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "gt64120: Illegal register write "
-> +                      "reg:0x03%x size:%u value:0x%0*" PRIx64 "\n",
-> +                      saddr << 2, size, size << 1, val);
->          break;
->      }
->  }
-> @@ -940,7 +963,10 @@ static uint64_t gt64120_readl(void *opaque,
->
->      default:
+>      /* Reserved when only PCI_0 is configured. */
+> @@ -936,19 +927,19 @@ static uint64_t gt64120_readl(void *opaque,
+>      /* Interrupts */
+>      case GT_INTRCAUSE:
 >          val =3D s->regs[saddr];
-> -        DPRINTF ("Bad register offset 0x%x\n", (int)addr);
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "gt64120: Illegal register read "
-> +                      "reg:0x03%x size:%u value:0x%0*x\n",
-> +                      saddr << 2, size, size << 1, val);
+> -        DPRINTF("INTRCAUSE %x\n", val);
+> +        trace_gt64120_read("INTRCAUSE", size << 1, val);
 >          break;
->      }
+>      case GT_INTRMASK:
+>          val =3D s->regs[saddr];
+> -        DPRINTF("INTRMASK %x\n", val);
+> +        trace_gt64120_read("INTRMASK", size << 1, val);
+>          break;
+>      case GT_PCI0_ICMASK:
+>          val =3D s->regs[saddr];
+> -        DPRINTF("ICMASK %x\n", val);
+> +        trace_gt64120_read("ICMASK", size << 1, val);
+>          break;
+>      case GT_PCI0_SERR0MASK:
+>          val =3D s->regs[saddr];
+> -        DPRINTF("SERR0MASK %x\n", val);
+> +        trace_gt64120_read("SERR0MASK", size << 1, val);
+>          break;
 >
+>      /* Reserved when only PCI_0 is configured. */
+> diff --git a/hw/mips/trace-events b/hw/mips/trace-events
+> new file mode 100644
+> index 0000000000..75d4c73f2e
+> --- /dev/null
+> +++ b/hw/mips/trace-events
+> @@ -0,0 +1,4 @@
+> +# gt64xxx.c
+> +gt64120_read(const char *regname, int width, uint64_t value) "gt64120
+read %s value:0x%0*" PRIx64
+> +gt64120_write(const char *regname, int width, uint64_t value) "gt64120
+write %s value:0x%0*" PRIx64
+> +gt64120_isd_remap(uint64_t from_length, uint64_t from_addr, uint64_t
+to_length, uint64_t to_addr) "ISD: 0x%08" PRIx64 "@0x%08" PRIx64 " ->
+0x%08" PRIx64 "@0x%08" PRIx64
 > --
 > 2.19.1
 >
