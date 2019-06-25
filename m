@@ -2,58 +2,65 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63205C4646C
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 03:23:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC515C4646C
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 03:37:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36043206DD
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 03:23:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36043206DD
+	by mail.kernel.org (Postfix) with ESMTPS id 725A420656
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 03:37:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 725A420656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56160 helo=lists.gnu.org)
+Received: from localhost ([::1]:56214 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfc2z-0001t4-IP
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 23:23:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38966)
+	id 1hfcGw-0006D8-8l
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 23:37:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42978)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <colin.xu@intel.com>) id 1hfc21-00012O-RA
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 23:22:06 -0400
+ (envelope-from <yan.y.zhao@intel.com>) id 1hfcG7-0005nD-IO
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 23:36:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <colin.xu@intel.com>) id 1hfc20-0002V8-PL
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 23:22:05 -0400
-Received: from mga18.intel.com ([134.134.136.126]:49794)
+ (envelope-from <yan.y.zhao@intel.com>) id 1hfcG5-0007RN-3F
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 23:36:39 -0400
+Received: from mga02.intel.com ([134.134.136.20]:13922)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <colin.xu@intel.com>) id 1hfc20-0002El-HF
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 23:22:04 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
+ (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+ id 1hfcG1-0007A3-4C
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 23:36:34 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
- by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 24 Jun 2019 20:21:46 -0700
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+ by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 24 Jun 2019 20:36:28 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,413,1557212400"; d="scan'208";a="172208174"
-Received: from coxu-arch-shz.sh.intel.com ([10.239.160.21])
- by orsmga002.jf.intel.com with ESMTP; 24 Jun 2019 20:21:45 -0700
-From: Colin Xu <colin.xu@intel.com>
-To: qemu-devel@nongnu.org,
-	berrange@redhat.com,
-	kraxel@redhat.com
-Date: Tue, 25 Jun 2019 11:21:42 +0800
-Message-Id: <20190625032142.13854-1-colin.xu@intel.com>
-X-Mailer: git-send-email 2.22.0
+X-IronPort-AV: E=Sophos;i="5.63,413,1557212400"; d="scan'208";a="155374195"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.9])
+ by orsmga008.jf.intel.com with ESMTP; 24 Jun 2019 20:36:23 -0700
+Date: Mon, 24 Jun 2019 23:30:29 -0400
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <20190625033029.GC6971@joy-OptiPlex-7040>
+References: <1561041461-22326-1-git-send-email-kwankhede@nvidia.com>
+ <1561041461-22326-9-git-send-email-kwankhede@nvidia.com>
+ <20190621003153.GG9303@joy-OptiPlex-7040>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190621003153.GG9303@joy-OptiPlex-7040>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 134.134.136.126
-Subject: [Qemu-devel] [PATCH] ui: Correct icon install path
+X-Received-From: 134.134.136.20
+Subject: Re: [Qemu-devel] [PATCH v4 08/13] vfio: Add save state functions to
+ SaveVMHandlers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,53 +72,324 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: colin.xu@intel.com
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "cjia@nvidia.com" <cjia@nvidia.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>,
+ "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "yulei.zhang@intel.com" <yulei.zhang@intel.com>,
+ "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "eauger@redhat.com" <eauger@redhat.com>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The double slash in path will fail the installation on MINGW/MSYS.
+On Fri, Jun 21, 2019 at 08:31:53AM +0800, Yan Zhao wrote:
+> On Thu, Jun 20, 2019 at 10:37:36PM +0800, Kirti Wankhede wrote:
+> > Added .save_live_pending, .save_live_iterate and .save_live_complete_precopy
+> > functions. These functions handles pre-copy and stop-and-copy phase.
+> > 
+> > In _SAVING|_RUNNING device state or pre-copy phase:
+> > - read pending_bytes
+> > - read data_offset - indicates kernel driver to write data to staging
+> >   buffer which is mmapped.
+> > - read data_size - amount of data in bytes written by vendor driver in migration
+> >   region.
+> > - if data section is trapped, pread() number of bytes in data_size, from
+> >   data_offset.
+> > - if data section is mmaped, read mmaped buffer of size data_size.
+> > - Write data packet to file stream as below:
+> > {VFIO_MIG_FLAG_DEV_DATA_STATE, data_size, actual data,
+> > VFIO_MIG_FLAG_END_OF_STATE }
+> > 
+> > In _SAVING device state or stop-and-copy phase
+> > a. read config space of device and save to migration file stream. This
+> >    doesn't need to be from vendor driver. Any other special config state
+> >    from driver can be saved as data in following iteration.
+> > b. read pending_bytes - indicates kernel driver to write data to staging
+> >    buffer which is mmapped.
+> > c. read data_size - amount of data in bytes written by vendor driver in
+> >    migration region.
+> > d. if data section is trapped, pread() from data_offset of size data_size.
+> > e. if data section is mmaped, read mmaped buffer of size data_size.
+> > f. Write data packet as below:
+> >    {VFIO_MIG_FLAG_DEV_DATA_STATE, data_size, actual data}
+> > g. iterate through steps b to f until (pending_bytes > 0)
+> > h. Write {VFIO_MIG_FLAG_END_OF_STATE}
+> > 
+> > .save_live_iterate runs outside the iothread lock in the migration case, which
+> > could race with asynchronous call to get dirty page list causing data corruption
+> > in mapped migration region. Mutex added here to serial migration buffer read
+> > operation.
+> > 
+> > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> > Reviewed-by: Neo Jia <cjia@nvidia.com>
+> > ---
+> >  hw/vfio/migration.c | 212 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 212 insertions(+)
+> > 
+> > diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+> > index fe0887c27664..0a2f30872316 100644
+> > --- a/hw/vfio/migration.c
+> > +++ b/hw/vfio/migration.c
+> > @@ -107,6 +107,111 @@ static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t state)
+> >      return 0;
+> >  }
+> >  
+> > +static int vfio_save_buffer(QEMUFile *f, VFIODevice *vbasedev)
+> > +{
+> > +    VFIOMigration *migration = vbasedev->migration;
+> > +    VFIORegion *region = &migration->region.buffer;
+> > +    uint64_t data_offset = 0, data_size = 0;
+> > +    int ret;
+> > +
+> > +    ret = pread(vbasedev->fd, &data_offset, sizeof(data_offset),
+> > +                region->fd_offset + offsetof(struct vfio_device_migration_info,
+> > +                                             data_offset));
+> > +    if (ret != sizeof(data_offset)) {
+> > +        error_report("Failed to get migration buffer data offset %d",
+> > +                     ret);
+> > +        return -EINVAL;
+> > +    }
+> > +
+> > +    ret = pread(vbasedev->fd, &data_size, sizeof(data_size),
+> > +                region->fd_offset + offsetof(struct vfio_device_migration_info,
+> > +                                             data_size));
+> > +    if (ret != sizeof(data_size)) {
+> > +        error_report("Failed to get migration buffer data size %d",
+> > +                     ret);
+> > +        return -EINVAL;
+> > +    }
+> > +
+> how big is the data_size ? 
+> if this size is too big, it may take too much time and block others.
+> 
+> > +    if (data_size > 0) {
+> > +        void *buf = NULL;
+> > +        bool buffer_mmaped = false;
+> > +
+> > +        if (region->mmaps) {
+> > +            int i;
+> > +
+> > +            for (i = 0; i < region->nr_mmaps; i++) {
+> > +                if ((data_offset >= region->mmaps[i].offset) &&
+> > +                    (data_offset < region->mmaps[i].offset +
+> > +                                   region->mmaps[i].size)) {
+> > +                    buf = region->mmaps[i].mmap + (data_offset -
+> > +                                                   region->mmaps[i].offset);
+> > +                    buffer_mmaped = true;
+> > +                    break;
+> > +                }
+> > +            }
+> > +        }
+> > +
+> > +        if (!buffer_mmaped) {
+> > +            buf = g_malloc0(data_size);
+> > +            ret = pread(vbasedev->fd, buf, data_size,
+> > +                        region->fd_offset + data_offset);
+> > +            if (ret != data_size) {
+> > +                error_report("Failed to get migration data %d", ret);
+> > +                g_free(buf);
+> > +                return -EINVAL;
+> > +            }
+> > +        }
+> > +
+> > +        qemu_put_be64(f, data_size);
+> > +        qemu_put_buffer(f, buf, data_size);
+> > +
+> > +        if (!buffer_mmaped) {
+> > +            g_free(buf);
+> > +        }
+> > +        migration->pending_bytes -= data_size;
+> > +    } else {
+> > +        qemu_put_be64(f, data_size);
+> > +    }
+> > +
+> > +    ret = qemu_file_get_error(f);
+> > +
+> > +    return data_size;
+> > +}
+> > +
+> > +static int vfio_update_pending(VFIODevice *vbasedev)
+> > +{
+> > +    VFIOMigration *migration = vbasedev->migration;
+> > +    VFIORegion *region = &migration->region.buffer;
+> > +    uint64_t pending_bytes = 0;
+> > +    int ret;
+> > +
+> > +    ret = pread(vbasedev->fd, &pending_bytes, sizeof(pending_bytes),
+> > +                region->fd_offset + offsetof(struct vfio_device_migration_info,
+> > +                                             pending_bytes));
+> > +    if ((ret < 0) || (ret != sizeof(pending_bytes))) {
+> > +        error_report("Failed to get pending bytes %d", ret);
+> > +        migration->pending_bytes = 0;
+> > +        return (ret < 0) ? ret : -EINVAL;
+> > +    }
+> > +
+> > +    migration->pending_bytes = pending_bytes;
+> > +    return 0;
+> > +}
+> > +
+> > +static int vfio_save_device_config_state(QEMUFile *f, void *opaque)
+> > +{
+> > +    VFIODevice *vbasedev = opaque;
+> > +
+> > +    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_CONFIG_STATE);
+> > +
+> > +    if (vbasedev->type == VFIO_DEVICE_TYPE_PCI) {
+> > +        vfio_pci_save_config(vbasedev, f);
+> > +    }
+> > +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
+> > +
+> > +    return qemu_file_get_error(f);
+> > +}
+> > +
+> >  /* ---------------------------------------------------------------------- */
+> >  
+> >  static int vfio_save_setup(QEMUFile *f, void *opaque)
+> > @@ -163,9 +268,116 @@ static void vfio_save_cleanup(void *opaque)
+> >      }
+> >  }
+> >  
+> > +static void vfio_save_pending(QEMUFile *f, void *opaque,
+> > +                              uint64_t threshold_size,
+> > +                              uint64_t *res_precopy_only,
+> > +                              uint64_t *res_compatible,
+> > +                              uint64_t *res_postcopy_only)
+> > +{
+> > +    VFIODevice *vbasedev = opaque;
+> > +    VFIOMigration *migration = vbasedev->migration;
+> > +    int ret;
+> > +
+> > +    ret = vfio_update_pending(vbasedev);
+> > +    if (ret) {
+> > +        return;
+> > +    }
+> > +
+> > +    if (vbasedev->device_state & VFIO_DEVICE_STATE_RUNNING) {
+> > +        *res_precopy_only += migration->pending_bytes;
+> > +    } else {
+> > +        *res_postcopy_only += migration->pending_bytes;
+> > +    }
+by definition,
+- res_precopy_only is for data which must be migrated in precopy phase
+   or in stopped state, in other words - before target vm start
+- res_postcopy_only is for data which must be migrated in postcopy phase
+  or in stopped state, in other words - after source vm stop
+So, we can only determining data type by the nature of the data. i.e.
+if it is device state data which must be copied after source vm stop and
+before target vm start, it belongs to res_precopy_only.
 
-Fixes: a8260d387638 (ui: install logo icons to $prefix/share/icons)
+It is not right to determining data type by current device state.
 
-Signed-off-by: Colin Xu <colin.xu@intel.com>
----
- Makefile | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+Thanks
+Yan
 
-diff --git a/Makefile b/Makefile
-index cfb18f152544..562205be290c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -875,19 +875,19 @@ ifneq ($(DESCS),)
- 	done
- endif
- 	for s in $(ICON_SIZES); do \
--		mkdir -p "$(DESTDIR)/$(qemu_icondir)/hicolor/$${s}/apps"; \
-+		mkdir -p "$(DESTDIR)$(qemu_icondir)/hicolor/$${s}/apps"; \
- 		$(INSTALL_DATA) $(SRC_PATH)/ui/icons/qemu_$${s}.png \
--			"$(DESTDIR)/$(qemu_icondir)/hicolor/$${s}/apps/qemu.png"; \
-+			"$(DESTDIR)$(qemu_icondir)/hicolor/$${s}/apps/qemu.png"; \
- 	done; \
--	mkdir -p "$(DESTDIR)/$(qemu_icondir)/hicolor/32x32/apps"; \
-+	mkdir -p "$(DESTDIR)$(qemu_icondir)/hicolor/32x32/apps"; \
- 	$(INSTALL_DATA) $(SRC_PATH)/ui/icons/qemu_32x32.bmp \
--		"$(DESTDIR)/$(qemu_icondir)/hicolor/32x32/apps/qemu.bmp"; \
--	mkdir -p "$(DESTDIR)/$(qemu_icondir)/hicolor/scalable/apps"; \
-+		"$(DESTDIR)$(qemu_icondir)/hicolor/32x32/apps/qemu.bmp"; \
-+	mkdir -p "$(DESTDIR)$(qemu_icondir)/hicolor/scalable/apps"; \
- 	$(INSTALL_DATA) $(SRC_PATH)/ui/icons/qemu.svg \
--		"$(DESTDIR)/$(qemu_icondir)/hicolor/scalable/apps/qemu.svg"
--	mkdir -p "$(DESTDIR)/$(qemu_desktopdir)"
-+		"$(DESTDIR)$(qemu_icondir)/hicolor/scalable/apps/qemu.svg"
-+	mkdir -p "$(DESTDIR)$(qemu_desktopdir)"
- 	$(INSTALL_DATA) $(SRC_PATH)/ui/qemu.desktop \
--		"$(DESTDIR)/$(qemu_desktopdir)/qemu.desktop"
-+		"$(DESTDIR)$(qemu_desktopdir)/qemu.desktop"
- ifdef CONFIG_GTK
- 	$(MAKE) -C po $@
- endif
--- 
-2.22.0
-
+> > +    *res_compatible += 0;
+> > +}
+> > +
+> > +static int vfio_save_iterate(QEMUFile *f, void *opaque)
+> > +{
+> > +    VFIODevice *vbasedev = opaque;
+> > +    VFIOMigration *migration = vbasedev->migration;
+> > +    int ret;
+> > +
+> > +    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_DATA_STATE);
+> > +
+> > +    qemu_mutex_lock(&migration->lock);
+> > +    ret = vfio_save_buffer(f, vbasedev);
+> > +    qemu_mutex_unlock(&migration->lock);
+> > +
+> > +    if (ret < 0) {
+> > +        error_report("vfio_save_buffer failed %s",
+> > +                     strerror(errno));
+> > +        return ret;
+> > +    }
+> > +
+> > +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
+> > +
+> > +    ret = qemu_file_get_error(f);
+> > +    if (ret) {
+> > +        return ret;
+> > +    }
+> > +
+> > +    return ret;
+> > +}
+> > +
+> > +static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
+> > +{
+> > +    VFIODevice *vbasedev = opaque;
+> > +    VFIOMigration *migration = vbasedev->migration;
+> > +    int ret;
+> > +
+> > +    ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_SAVING);
+> > +    if (ret) {
+> > +        error_report("Failed to set state STOP and SAVING");
+> > +        return ret;
+> > +    }
+> > +
+> > +    ret = vfio_save_device_config_state(f, opaque);
+> > +    if (ret) {
+> > +        return ret;
+> > +    }
+> > +
+> > +    ret = vfio_update_pending(vbasedev);
+> > +    if (ret) {
+> > +        return ret;
+> > +    }
+> > +
+> > +    while (migration->pending_bytes > 0) {
+> > +        qemu_put_be64(f, VFIO_MIG_FLAG_DEV_DATA_STATE);
+> > +        ret = vfio_save_buffer(f, vbasedev);
+> > +        if (ret < 0) {
+> > +            error_report("Failed to save buffer");
+> > +            return ret;
+> > +        } else if (ret == 0) {
+> > +            break;
+> > +        }
+> > +
+> > +        ret = vfio_update_pending(vbasedev);
+> > +        if (ret) {
+> > +            return ret;
+> > +        }
+> > +    }
+> > +
+> > +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
+> > +
+> > +    ret = qemu_file_get_error(f);
+> > +    if (ret) {
+> > +        return ret;
+> > +    }
+> > +
+> > +    ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_STOPPED);
+> > +    if (ret) {
+> > +        error_report("Failed to set state STOPPED");
+> > +        return ret;
+> > +    }
+> > +    return ret;
+> > +}
+> > +
+> >  static SaveVMHandlers savevm_vfio_handlers = {
+> >      .save_setup = vfio_save_setup,
+> >      .save_cleanup = vfio_save_cleanup,
+> > +    .save_live_pending = vfio_save_pending,
+> > +    .save_live_iterate = vfio_save_iterate,
+> > +    .save_live_complete_precopy = vfio_save_complete_precopy,
+> >  };
+> >  
+> >  /* ---------------------------------------------------------------------- */
+> > -- 
+> > 2.7.0
+> > 
+> 
 
