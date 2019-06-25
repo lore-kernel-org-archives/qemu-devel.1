@@ -2,73 +2,64 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	T_HK_NAME_DR,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A28EC48BD5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 10:27:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FB63C48BD5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 10:30:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 217CA214DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 10:27:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 217CA214DA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 24092214DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 10:30:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24092214DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58478 helo=lists.gnu.org)
+Received: from localhost ([::1]:58564 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfig3-0000oy-Ed
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 06:27:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35095)
+	id 1hfiiz-0003Ye-9l
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 06:30:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38368)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <palmer@dabbelt.com>) id 1hfiYZ-0000E5-Vh
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:20:09 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hfiiP-00032D-RG
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:30:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1hfiYY-00030n-GM
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:20:07 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:42676)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hfiYY-0002zZ-8Y
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:20:06 -0400
-Received: by mail-pf1-f195.google.com with SMTP id q10so9239077pff.9
- for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 03:20:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=eYufa29gR8Qoq691MeFTHr9ktSdVsXgSvRUvOy0sXpM=;
- b=SuTXikpHl+jKC3tQKf5Jw/kmyAL5t4a7mmsToBrEK8rgJmDAHfrIRqbp1YjDRzZ1ZU
- W0Ezxy9winrQbwBjjuhbvxFIwM6uOHRAAGBufeUaLtsJ6YYuU3hg1rpvo++/W37MuM9L
- zfUgprMa/taNXYQdaZ5KeI1X35zYWbVCV1LRP0UEvzZRgv/I2lsg/JgFR/PTm2py81Hp
- PGfMxPEMMPCb1ABPUmCMzJg1pqdulgkRe9jM2qxkGa9f1js9RmejDCkSQm0014AyK28H
- lB7NX62W2SAk+z3WOrs1QLUyEYAxk68rPyg3nQGDpRH/derLTXz/QQ4kQVwIesnBVpMA
- kccg==
-X-Gm-Message-State: APjAAAXdM5mbemH+6EVouoWA7Xul5IHdnA/nTlDTn0wVwOAtS0cFa2Eh
- bv3dsU0yqWQr/FsKE4s8MioghA==
-X-Google-Smtp-Source: APXvYqyNg+Y5CTHPzBny3L/12ops6+PaQFKzzzwPHDQTZWTYBhXFA5OShJ/UrOo6bLBsTQjNSznQjQ==
-X-Received: by 2002:a17:90a:9a83:: with SMTP id
- e3mr30365096pjp.105.1561458004906; 
- Tue, 25 Jun 2019 03:20:04 -0700 (PDT)
-Received: from localhost (220-132-236-182.HINET-IP.hinet.net.
- [220.132.236.182])
- by smtp.gmail.com with ESMTPSA id i126sm18198466pfb.32.2019.06.25.03.20.04
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 25 Jun 2019 03:20:04 -0700 (PDT)
-Date: Tue, 25 Jun 2019 03:20:04 -0700 (PDT)
-X-Google-Original-Date: Tue, 25 Jun 2019 03:09:31 PDT (-0700)
-In-Reply-To: <20190624234144.10768-1-atish.patra@wdc.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: Atish Patra <Atish.Patra@wdc.com>
-Message-ID: <mhng-7c1a8a81-ee0d-4e95-87b9-ef9543ad121c@palmer-si-x1e>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ (envelope-from <dgilbert@redhat.com>) id 1hfiiO-0003oq-3E
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:30:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56270)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hfiiL-0003kE-VM
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:30:15 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 899CE7FD6C;
+ Tue, 25 Jun 2019 10:30:02 +0000 (UTC)
+Received: from work-vm (ovpn-117-108.ams2.redhat.com [10.36.117.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AD07019936;
+ Tue, 25 Jun 2019 10:29:47 +0000 (UTC)
+Date: Tue, 25 Jun 2019 11:29:45 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <20190625102945.GI3226@work-vm>
+References: <1561041461-22326-1-git-send-email-kwankhede@nvidia.com>
+ <1561041461-22326-6-git-send-email-kwankhede@nvidia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1561041461-22326-6-git-send-email-kwankhede@nvidia.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Tue, 25 Jun 2019 10:30:09 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.210.195
-Subject: Re: [Qemu-devel] [PATCH v2] riscv: virt: Add cpu-topology DT node.
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v4 05/13] vfio: Add VM state change handler
+ to know state of VM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,89 +71,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org,
- Atish Patra <Atish.Patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>
+Cc: Zhengxiao.zx@alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, eskultet@redhat.com, ziye.yang@intel.com,
+ yulei.zhang@intel.com, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, alex.williamson@redhat.com,
+ eauger@redhat.com, felipe@nutanix.com, jonathan.davies@nutanix.com,
+ yan.y.zhao@intel.com, changpeng.liu@intel.com, Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 24 Jun 2019 16:41:44 PDT (-0700), Atish Patra wrote:
-> Currently, there is no cpu topology defined in RISC-V.
-> Define a device tree node that clearly describes the
-> entire topology. This saves the trouble of scanning individual
-> cache to figure out the topology.
->
-> Here is the linux kernel patch series that enables topology
-> for RISC-V.
->
-> http://lists.infradead.org/pipermail/linux-riscv/2019-June/005072.html
->
-> CPU topology after applying this patch in QEMU & above series in kernel
->
-> / # cat /sys/devices/system/cpu/cpu2/topology/thread_siblings_list
-> 2
-> / # cat /sys/devices/system/cpu/cpu2/topology/physical_package_id
-> 0
-> / # cat /sys/devices/system/cpu/cpu2/topology/core_siblings_list
-> 0-7
->
-> Signed-off-by: Atish Patra <atish.patra@wdc.com>
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+* Kirti Wankhede (kwankhede@nvidia.com) wrote:
+> VM state change handler gets called on change in VM's state. This is used to set
+> VFIO device state to _RUNNING.
+> VM state change handler, migration state change handler and log_sync listener
+> are called asynchronously, which sometimes lead to data corruption in migration
+> region. Initialised mutex that is used to serialize operations on migration data
+> region during saving state.
+> 
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
 
-Thanks.  This is in the queue for 4.1, which is just pending Alistar's review
-on those two Z patches I reworked.
 
 > ---
->  hw/riscv/virt.c | 22 ++++++++++++++++++++--
->  1 file changed, 20 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> index 84d94d0c42d8..45a1edcd6c4a 100644
-> --- a/hw/riscv/virt.c
-> +++ b/hw/riscv/virt.c
-> @@ -191,6 +191,7 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
->
->      for (cpu = s->soc.num_harts - 1; cpu >= 0; cpu--) {
->          int cpu_phandle = phandle++;
-> +        int intc_phandle;
->          nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
->          char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
->          char *isa = riscv_isa_string(&s->soc.harts[cpu]);
-> @@ -203,9 +204,12 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
->          qemu_fdt_setprop_string(fdt, nodename, "status", "okay");
->          qemu_fdt_setprop_cell(fdt, nodename, "reg", cpu);
->          qemu_fdt_setprop_string(fdt, nodename, "device_type", "cpu");
-> +        qemu_fdt_setprop_cell(fdt, nodename, "phandle", cpu_phandle);
-> +        qemu_fdt_setprop_cell(fdt, nodename, "linux,phandle", cpu_phandle);
-> +        intc_phandle = phandle++;
->          qemu_fdt_add_subnode(fdt, intc);
-> -        qemu_fdt_setprop_cell(fdt, intc, "phandle", cpu_phandle);
-> -        qemu_fdt_setprop_cell(fdt, intc, "linux,phandle", cpu_phandle);
-> +        qemu_fdt_setprop_cell(fdt, intc, "phandle", intc_phandle);
-> +        qemu_fdt_setprop_cell(fdt, intc, "linux,phandle", intc_phandle);
->          qemu_fdt_setprop_string(fdt, intc, "compatible", "riscv,cpu-intc");
->          qemu_fdt_setprop(fdt, intc, "interrupt-controller", NULL, 0);
->          qemu_fdt_setprop_cell(fdt, intc, "#interrupt-cells", 1);
-> @@ -214,6 +218,20 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
->          g_free(nodename);
->      }
->
-> +    /* Add cpu-topology node */
-> +    qemu_fdt_add_subnode(fdt, "/cpus/cpu-map");
-> +    qemu_fdt_add_subnode(fdt, "/cpus/cpu-map/cluster0");
-> +    for (cpu = s->soc.num_harts - 1; cpu >= 0; cpu--) {
-> +        char *core_nodename = g_strdup_printf("/cpus/cpu-map/cluster0/core%d",
-> +                                              cpu);
-> +        char *cpu_nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
-> +        uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, cpu_nodename);
-> +        qemu_fdt_add_subnode(fdt, core_nodename);
-> +        qemu_fdt_setprop_cell(fdt, core_nodename, "cpu", intc_phandle);
-> +        g_free(core_nodename);
-> +        g_free(cpu_nodename);
+>  hw/vfio/migration.c           | 45 +++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/vfio/vfio-common.h |  4 ++++
+>  2 files changed, 49 insertions(+)
+> 
+> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+> index ba58d9253d26..15af218c23d1 100644
+> --- a/hw/vfio/migration.c
+> +++ b/hw/vfio/migration.c
+> @@ -77,6 +77,41 @@ err:
+>      return ret;
+>  }
+>  
+> +static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t state)
+> +{
+> +    VFIOMigration *migration = vbasedev->migration;
+> +    VFIORegion *region = &migration->region.buffer;
+> +    int ret = 0;
+> +
+> +    ret = pwrite(vbasedev->fd, &state, sizeof(state),
+> +                 region->fd_offset + offsetof(struct vfio_device_migration_info,
+> +                                              device_state));
+> +    if (ret < 0) {
+> +        error_report("Failed to set migration state %d %s",
+> +                     ret, strerror(errno));
+
+Please include the device name/id in errors; it just makes it easier to
+figure out the cause when someone sends me a log.
+
+Other than that;
+
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> +        return ret;
 > +    }
 > +
->      cells =  g_new0(uint32_t, s->soc.num_harts * 4);
->      for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
->          nodename =
+> +    vbasedev->device_state = state;
+> +    return 0;
+> +}
+> +
+> +static void vfio_vmstate_change(void *opaque, int running, RunState state)
+> +{
+> +    VFIODevice *vbasedev = opaque;
+> +
+> +    if ((vbasedev->vm_running != running) && running) {
+> +        int ret;
+> +
+> +        ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_RUNNING);
+> +        if (ret) {
+> +            error_report("Failed to set state RUNNING");
+> +        }
+> +    }
+> +
+> +    vbasedev->vm_running = running;
+> +}
+> +
+>  static int vfio_migration_init(VFIODevice *vbasedev,
+>                                 struct vfio_region_info *info)
+>  {
+> @@ -91,6 +126,11 @@ static int vfio_migration_init(VFIODevice *vbasedev,
+>          return ret;
+>      }
+>  
+> +    qemu_mutex_init(&vbasedev->migration->lock);
+> +
+> +    vbasedev->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
+> +                                                          vbasedev);
+> +
+>      return 0;
+>  }
+>  
+> @@ -127,11 +167,16 @@ void vfio_migration_finalize(VFIODevice *vbasedev)
+>          return;
+>      }
+>  
+> +    if (vbasedev->vm_state) {
+> +        qemu_del_vm_change_state_handler(vbasedev->vm_state);
+> +    }
+> +
+>      if (vbasedev->migration_blocker) {
+>          migrate_del_blocker(vbasedev->migration_blocker);
+>          error_free(vbasedev->migration_blocker);
+>      }
+>  
+> +    qemu_mutex_destroy(&vbasedev->migration->lock);
+>      vfio_migration_region_exit(vbasedev);
+>      g_free(vbasedev->migration);
+>  }
+> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> index 1374a03470d8..f2392e97fa57 100644
+> --- a/include/hw/vfio/vfio-common.h
+> +++ b/include/hw/vfio/vfio-common.h
+> @@ -29,6 +29,7 @@
+>  #ifdef CONFIG_LINUX
+>  #include <linux/vfio.h>
+>  #endif
+> +#include "sysemu/sysemu.h"
+>  
+>  #define VFIO_MSG_PREFIX "vfio %s: "
+>  
+> @@ -129,6 +130,9 @@ typedef struct VFIODevice {
+>      unsigned int flags;
+>      VFIOMigration *migration;
+>      Error *migration_blocker;
+> +    uint32_t device_state;
+> +    VMChangeStateEntry *vm_state;
+> +    int vm_running;
+>  } VFIODevice;
+>  
+>  struct VFIODeviceOps {
+> -- 
+> 2.7.0
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
