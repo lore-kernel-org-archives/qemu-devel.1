@@ -2,65 +2,57 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87B4AC48BD5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 16:37:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D693C48BD4
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 16:37:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E5D4208E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 16:37:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E5D4208E3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6E09720663
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 16:37:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E09720663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33938 helo=lists.gnu.org)
+Received: from localhost ([::1]:33942 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfoRL-0001rV-Ma
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 12:37:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49069)
+	id 1hfoS5-0002bg-Q3
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 12:37:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44152)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hfoPy-0000YA-Lm
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 12:35:39 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hfo7i-0004Fa-Jv
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 12:16:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hfoPw-00089L-SZ
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 12:35:38 -0400
-Resent-Date: Tue, 25 Jun 2019 12:35:38 -0400
-Resent-Message-Id: <E1hfoPw-00089L-SZ@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21813)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hfoPw-00088k-JX; Tue, 25 Jun 2019 12:35:36 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1561480497; cv=none; d=zoho.com; s=zohoarc; 
- b=FnkpOuKB1+lhnhZpYKMbcLDo4jtmgwtbdTrHziUCHTPYeeDsLEf1/C8gxdPwdexqvN8oOClH7PUBZgOck+F4ddqcCn4KE35Akizigb5+//nQDxyGJaA5RRe+9N+KEbVCPH+YuVHW/3zmn08YZ0OCNpVGWb+6Rg7gv+LuaMjZJHc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1561480497;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=nNv/F3UtR3DkmDHXQCkDHRx64dhTFSQ3kiIocrSIdGw=; 
- b=Iw0lJMf7zd2bIR/6y4/AXlpWGnoB5TcE/kifO3/ck+gBPc0sItpJ0AiR3HkPgDtFD4nrC/rZcbvNowjouE4gClaH4L+y3FVbsTQxJRprHq7rtdS01LwhB1EuouJ5tDKckZbWVJIAI9q0X0AijQn5qT1wPLUavvtEpq2P42nFxoQ=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1561480496400176.43585904483007;
- Tue, 25 Jun 2019 09:34:56 -0700 (PDT)
-Message-ID: <156148049495.4374.2975977607094009414@c4a48874b076>
-In-Reply-To: <1561475829-19202-1-git-send-email-walling@linux.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: walling@linux.ibm.com
-Date: Tue, 25 Jun 2019 09:34:56 -0700 (PDT)
-X-ZohoMailClient: External
+ (envelope-from <imammedo@redhat.com>) id 1hfo7h-0000U0-Ib
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 12:16:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43386)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hfo7f-0000QX-IK
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 12:16:45 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A0238300183C
+ for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 16:16:37 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BAAAB1001281;
+ Tue, 25 Jun 2019 16:16:33 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 25 Jun 2019 12:16:29 -0400
+Message-Id: <20190625161629.302-1-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Tue, 25 Jun 2019 16:16:37 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.218
-Subject: Re: [Qemu-devel] [PATCH v5 0/2] Guest Support for DIAGNOSE 0x318
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2] deprecate -mem-path fallback to anonymous
+ RAM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,49 +64,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: david@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org,
- pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
- mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net
+Cc: libvir-list@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
+ dgilbert@redhat.com, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTYxNDc1ODI5LTE5MjAyLTEt
-Z2l0LXNlbmQtZW1haWwtd2FsbGluZ0BsaW51eC5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVz
-IHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVs
-b3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY1
-IDAvMl0gR3Vlc3QgU3VwcG9ydCBmb3IgRElBR05PU0UgMHgzMTgKVHlwZTogc2VyaWVzCk1lc3Nh
-Z2UtaWQ6IDE1NjE0NzU4MjktMTkyMDItMS1naXQtc2VuZC1lbWFpbC13YWxsaW5nQGxpbnV4Lmli
-bS5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJz
-ZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
-bWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
-IC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpGcm9tIGh0dHBzOi8v
-Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRj
-aGV3LzE1NjE0NzU4MjktMTkyMDItMS1naXQtc2VuZC1lbWFpbC13YWxsaW5nQGxpbnV4LmlibS5j
-b20gLT4gcGF0Y2hldy8xNTYxNDc1ODI5LTE5MjAyLTEtZ2l0LXNlbmQtZW1haWwtd2FsbGluZ0Bs
-aW51eC5pYm0uY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMmNkNjAyMSBzMzkw
-OiBkaWFnbm9zZSAzMTggaW5mbyByZXNldCBhbmQgbWlncmF0aW9uIHN1cHBvcnQKZjAxNzg1YiBz
-MzkwL2t2bTogaGVhZGVyIHN5bmMgZm9yIGRpYWczMTgKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEv
-MiBDaGVja2luZyBjb21taXQgZjAxNzg1YjkwMzEwIChzMzkwL2t2bTogaGVhZGVyIHN5bmMgZm9y
-IGRpYWczMTgpCjIvMiBDaGVja2luZyBjb21taXQgMmNkNjAyMWI2ZDJhIChzMzkwOiBkaWFnbm9z
-ZSAzMTggaW5mbyByZXNldCBhbmQgbWlncmF0aW9uIHN1cHBvcnQpCldBUk5JTkc6IGFkZGVkLCBt
-b3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8K
-IzM3OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBhZGRpbmcgYSBsaW5lIHdpdGhvdXQg
-bmV3bGluZSBhdCBlbmQgb2YgZmlsZQojMTY1OiBGSUxFOiBody9zMzkweC9kaWFnMzE4Lmg6Mzg6
-CisjZW5kaWYgLyogSFdfRElBRzMxOF9IICovCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3Rl
-cnMKIzI4NTogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9mZWF0dXJlcy5jOjEzMToKKyAgICBGRUFU
-X0lOSVQoImRpYWczMTgiLCBTMzkwX0ZFQVRfVFlQRV9TQ0xQX0JZVEVfMTM0LCAwLCAiQ29udHJv
-bCBwcm9ncmFtIG5hbWUgYW5kIHZlcnNpb24gY29kZXMiKSwKCnRvdGFsOiAyIGVycm9ycywgMSB3
-YXJuaW5ncywgMzAwIGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvMiBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29k
-ZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xv
-Z3MvMTU2MTQ3NTgyOS0xOTIwMi0xLWdpdC1zZW5kLWVtYWlsLXdhbGxpbmdAbGludXguaWJtLmNv
-bS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBh
-dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
-bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Fallback might affect guest or worse whole host performance
+or functionality if backing file were used to share guest RAM
+with another process.
+
+Patch deprecates fallback so that we could remove it in future
+and ensure that QEMU will provide expected behavior and fail if
+it can't use user provided backing file.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+v2:
+ * improve text language
+    (Markus Armbruster <armbru@redhat.com>)
+
+ numa.c               | 6 ++++--
+ qemu-deprecated.texi | 9 +++++++++
+ 2 files changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/numa.c b/numa.c
+index 91a29138a2..c15e53e92d 100644
+--- a/numa.c
++++ b/numa.c
+@@ -494,8 +494,10 @@ static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
+             if (mem_prealloc) {
+                 exit(1);
+             }
+-            error_report("falling back to regular RAM allocation.");
+-
++            warn_report("falling back to regular RAM allocation");
++            error_printf("This is deprecated. Make sure that -mem-path "
++                         " specified path has sufficient resources to allocate"
++                         " -m specified RAM amount or QEMU will fail to start");
+             /* Legacy behavior: if allocation failed, fall back to
+              * regular RAM allocation.
+              */
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 2fe9b72121..1b7f3b10dc 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -112,6 +112,15 @@ QEMU using implicit generic or board specific splitting rule.
+ Use @option{memdev} with @var{memory-backend-ram} backend or @option{mem} (if
+ it's supported by used machine type) to define mapping explictly instead.
+ 
++@subsection -mem-path fallback to RAM (since 4.1)
++Currently if guest RAM allocation from file pointed by @option{mem-path}
++fails, QEMU falls back to allocating from RAM, which might result
++in unpredictable behavior since the backing file specified by the user
++is ignored. In the future, users will be responsible for making sure
++the backing storage specified with @option{-mem-path} can actually provide
++the guest RAM configured with @option{-m} and fail to start up if RAM allocation
++is unsuccessful.
++
+ @section QEMU Machine Protocol (QMP) commands
+ 
+ @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
+-- 
+2.18.1
 
 
