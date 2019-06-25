@@ -2,82 +2,65 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B1E8C48BD6
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36906C48BD4
 	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 13:37:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B8E82133F
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 13:37:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Khcit/JW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B8E82133F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0CC112080C
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 13:37:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CC112080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60310 helo=lists.gnu.org)
+Received: from localhost ([::1]:60308 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfldu-0005L1-Bo
+	id 1hfldu-0005JH-3z
 	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 09:37:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53832)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57983)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <renyime@gmail.com>) id 1hflLA-0001XJ-KU
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 09:18:29 -0400
+ (envelope-from <armbru@redhat.com>) id 1hflZK-0002mR-Gt
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 09:33:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <renyime@gmail.com>) id 1hflL9-0007L0-NW
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 09:18:28 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:36469)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <renyime@gmail.com>) id 1hflL9-0007KM-E5
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 09:18:27 -0400
-Received: by mail-pg1-x542.google.com with SMTP id f21so8979543pgi.3
- for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 06:18:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id;
- bh=+mvwjYgLWyjKWcLHV58N51syiwUJURFH8odBAzC6P7A=;
- b=Khcit/JWtVqPgIL7U/OmHbD1Ommr9BU/LbEpnXiIhcUdKVGQm4fy4TgLQ0iccYlzjc
- mmQndH6AMhzjltszJ5UQo/t3sESnxIlYP/LMMDMMQpCIioerEzA4LNtDxAQPeP1esI2E
- WehwmVIGB9Y2YTafZMsYdcCfbXPPOWy5DM3c5MgYwWKo8qzxuIwdVV1Fzw9pi7IU5onD
- 2N18cUfk6HgkkxrYVXQuQ4A7F+5CDfkuW5KaQ9R1vWsxdAqzjxDNuOUwURLjm16EIIgx
- wrM8k1J+hKtH3236WC8Y4s7m+bZ25i8eFQBLqTe4jKm8juumynGPzPdWRHkKmYvDKvBb
- HT1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=+mvwjYgLWyjKWcLHV58N51syiwUJURFH8odBAzC6P7A=;
- b=n5xf4cWtptfoZ2tF2f2XqyD9WjXumevcd9UN4f52N6hI9rFjrLcePGsLRS/INlveBh
- 5KlaLOmnCXtmzF9tjl65s86t6TiiCTvmOs5GdNX/Wg0h6z3SUFnJeU7rwq0zfIicVa2n
- apmG1jnQC+kms+9amPIH/ZQAKvtEAR6WJWYNJJ7ZJ/isMxolMQ4NxIn0l2UJitZSTYFv
- 3P+HifJkAZedvXNCYaPxqASsQapore4pXZHPvjLsjmEluz+eVmTGqtVYgG9JCRvccYn0
- ECiUr89TyzcKU6thldmy3AlW61pCJtwxZ58a1mQn9EZApm9Z1sUi0//lQ/AmOLF9855j
- zxpQ==
-X-Gm-Message-State: APjAAAV5vE8cbw9h9JrXITSS7nRrZvfD3i16lNBn6owsdGrzCdJ6P+ir
- pSE9v7nXOuZDfvq0fvOnqi/oyF57pbGOVA1N
-X-Google-Smtp-Source: APXvYqy/fGjJX8IN7A5m0eNAkjhP9TkKtW1CMGrrQK9Mncok+202Lls7et1YrZy7jyPvjcZ2dfMkvA==
-X-Received: by 2002:a17:90a:e397:: with SMTP id
- b23mr32081243pjz.117.1561468705779; 
- Tue, 25 Jun 2019 06:18:25 -0700 (PDT)
-Received: from VM_64_241_centos.localdomain ([129.226.57.92])
- by smtp.gmail.com with ESMTPSA id f186sm15675814pfb.5.2019.06.25.06.18.24
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Jun 2019 06:18:25 -0700 (PDT)
-From: Ivan Ren <renyime@gmail.com>
-X-Google-Original-From: Ivan Ren <ivanren@tencent.com>
-To: quintela@redhat.com,
-	dgilbert@redhat.com
-Date: Tue, 25 Jun 2019 21:18:16 +0800
-Message-Id: <1561468699-9819-1-git-send-email-ivanren@tencent.com>
-X-Mailer: git-send-email 1.8.3.1
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::542
-Subject: [Qemu-devel] [PATCH 0/3] migration: fix migrate_cancel problems of
- multifd
+ (envelope-from <armbru@redhat.com>) id 1hflZI-0000UQ-7c
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 09:33:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36758)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hflZ6-0000MX-Oe
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 09:32:56 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 49A5230821AE;
+ Tue, 25 Jun 2019 13:32:36 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-169.ams2.redhat.com
+ [10.36.117.169])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DC7F460C4C;
+ Tue, 25 Jun 2019 13:32:32 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 3A5B611386A0; Tue, 25 Jun 2019 15:32:31 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20190614173140.19159-1-vsementsov@virtuozzo.com>
+Date: Tue, 25 Jun 2019 15:32:31 +0200
+In-Reply-To: <20190614173140.19159-1-vsementsov@virtuozzo.com> (Vladimir
+ Sementsov-Ogievskiy's message of "Fri, 14 Jun 2019 20:31:40 +0300")
+Message-ID: <87v9wtn634.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Tue, 25 Jun 2019 13:32:36 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3] qapi: Add InetSocketAddress member
+ keep-alive
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,24 +72,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: den@openvz.org, kraxel@redhat.com, berrange@redhat.com,
+ qemu-devel@nongnu.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The patches fix the problems encountered in multifd migration when try
-to cancel the migration by migrate_cancel.
+I apologize for dragging my feet on this review.
 
-Ivan Ren (3):
-  migration: fix migrate_cancel leads live_migration thread endless loop
-  migration: fix migrate_cancel leads live_migration thread hung forever
-  migration: fix migrate_cancel multifd migration leads destination hung
-    forever
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 
- migration/ram.c | 62 ++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 51 insertions(+), 11 deletions(-)
+> It's needed to provide keepalive for nbd client to track server
+> availability.
+>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>
+> v3: [by Markus's comments]
+>
+> - Fix commit subject
+> - Add comment to qapi and restrict server-side connections
+> - Fix s/"keep-alive="/",keep-alive"/
+>
+>
+>  qapi/sockets.json   |  6 +++++-
+>  util/qemu-sockets.c | 28 ++++++++++++++++++++++++++++
+>  2 files changed, 33 insertions(+), 1 deletion(-)
+>
+> diff --git a/qapi/sockets.json b/qapi/sockets.json
+> index fc81d8d5e8..c44af481a1 100644
+> --- a/qapi/sockets.json
+> +++ b/qapi/sockets.json
+> @@ -53,6 +53,9 @@
+>  #
+>  # @ipv6: whether to accept IPv6 addresses, default try both IPv4 and IPv6
+>  #
+> +# @keep-alive: enable keep-alive when connecting to this socket. Not supported
+> +#              for server-side connections. (Since 4.1)
+> +#
 
--- 
-2.17.2 (Apple Git-113)
+Is "server-side connection" is an established term?
 
+For what it's worth, "passive socket" is, see listen(2).
+
+>  # Since: 1.3
+>  ##
+>  { 'struct': 'InetSocketAddress',
+> @@ -61,7 +64,8 @@
+>      '*numeric':  'bool',
+>      '*to': 'uint16',
+>      '*ipv4': 'bool',
+> -    '*ipv6': 'bool' } }
+> +    '*ipv6': 'bool',
+> +    '*keep-alive': 'bool' } }
+>  
+>  ##
+>  # @UnixSocketAddress:
+> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+> index 8850a280a8..813063761b 100644
+> --- a/util/qemu-sockets.c
+> +++ b/util/qemu-sockets.c
+> @@ -438,6 +438,12 @@ int inet_connect_saddr(InetSocketAddress *saddr, Error **errp)
+>      struct addrinfo *res, *e;
+>      int sock = -1;
+>  
+> +    if (saddr->keep_alive) {
+> +        error_setg(errp, "keep-alive options is not supported for server-side "
+> +                   "connection");
+> +        return -1;
+> +    }
+> +
+>      res = inet_parse_connect_saddr(saddr, errp);
+>      if (!res) {
+>          return -1;
+
+I'm afraid you added this to the wrong function; ...
+
+> @@ -457,6 +463,19 @@ int inet_connect_saddr(InetSocketAddress *saddr, Error **errp)
+>      }
+>  
+>      freeaddrinfo(res);
+> +
+> +    if (saddr->keep_alive) {
+
+... it renders this code unreachable.
+
+I guess the "not supported for passive sockets" check should go into
+inet_listen_saddr() instead.
+
+> +        int val = 1;
+> +        int ret = qemu_setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE,
+> +                                  &val, sizeof(val));
+> +
+> +        if (ret < 0) {
+> +            error_setg_errno(errp, errno, "Unable to set KEEPALIVE");
+> +            close(sock);
+> +            return -1;
+> +        }
+> +    }
+> +
+>      return sock;
+>  }
+>  
+> @@ -652,6 +671,15 @@ int inet_parse(InetSocketAddress *addr, const char *str, Error **errp)
+>          }
+>          addr->has_ipv6 = true;
+>      }
+> +    begin = strstr(optstr, ",keep-alive");
+> +    if (begin) {
+> +        if (inet_parse_flag("keep-alive", begin + strlen(",keep-alive"),
+> +                            &addr->keep_alive, errp) < 0)
+> +        {
+> +            return -1;
+> +        }
+> +        addr->has_keep_alive = true;
+> +    }
+>      return 0;
+>  }
 
