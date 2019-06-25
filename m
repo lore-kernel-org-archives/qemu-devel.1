@@ -2,64 +2,78 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	T_HK_NAME_DR,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FB63C48BD5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 10:30:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74BC6C48BD4
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 10:32:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24092214DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 10:30:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24092214DA
+	by mail.kernel.org (Postfix) with ESMTPS id EC268214DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 10:32:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC268214DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58564 helo=lists.gnu.org)
+Received: from localhost ([::1]:58596 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfiiz-0003Ye-9l
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 06:30:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38368)
+	id 1hfikb-0004nI-5E
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 06:32:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38605)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hfiiP-00032D-RG
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:30:19 -0400
+ (envelope-from <philmd@redhat.com>) id 1hfij4-0003nt-Oa
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:30:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hfiiO-0003oq-3E
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:30:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56270)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hfiiL-0003kE-VM
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:30:15 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 899CE7FD6C;
- Tue, 25 Jun 2019 10:30:02 +0000 (UTC)
-Received: from work-vm (ovpn-117-108.ams2.redhat.com [10.36.117.108])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AD07019936;
- Tue, 25 Jun 2019 10:29:47 +0000 (UTC)
-Date: Tue, 25 Jun 2019 11:29:45 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <20190625102945.GI3226@work-vm>
-References: <1561041461-22326-1-git-send-email-kwankhede@nvidia.com>
- <1561041461-22326-6-git-send-email-kwankhede@nvidia.com>
+ (envelope-from <philmd@redhat.com>) id 1hfij3-0004Rg-NG
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:30:58 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:41598)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hfij3-0004QU-H3
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:30:57 -0400
+Received: by mail-wr1-f65.google.com with SMTP id c2so17231601wrm.8
+ for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 03:30:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=s2YvqycvtNztQgARyw45xRUHNiteTkGkqMMl25QJBWY=;
+ b=pTLvEq/VwTLANcTH3KLYNe1DVVCE5ZSxY3zWjvRLWCc5iHY3cO1ysGNTfycETQqXfO
+ RxHx1/jXI97eDP4B1Bn33l8BHHE/UIQVBAoKy1LKf9EEg6OFIZCmDscJJW0Vimcsx+IX
+ 0aSNpOi3NQ/jf6T/Li5amxHeMIj+eekrqQ+/h7B5Zht0cMI+DcVQSmv/TTi1lMQuXNM3
+ KvMLC0RbGap2MUrn1h9bNGdaNCFidZk0ybq2QFDg+MND2SWRY64MkAXBRnXxdGjk9cy6
+ FIGUdI7EaaB1pbX6yZ4eASN29GKVsGjk4Z8yndmU/+3MJWRlLuZJBBXlfFT3V++5uXIJ
+ Vavw==
+X-Gm-Message-State: APjAAAXm1ayh35P9bglOc8Tsyod59EVqC3DvWHhaYrtWwM5TnHeZVtYg
+ qyMdKj7+6zTDuolvnpu8GwJp6g==
+X-Google-Smtp-Source: APXvYqyRBx4Xk9UoPCkcaL7KvfYkg1zbdu+q/O3MS6nm4lZ1DmEOV2SrDCMIRgsWO706Gmtqk5x2nQ==
+X-Received: by 2002:adf:f1d2:: with SMTP id z18mr1868725wro.262.1561458656500; 
+ Tue, 25 Jun 2019 03:30:56 -0700 (PDT)
+Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.183])
+ by smtp.gmail.com with ESMTPSA id e11sm31840050wrc.9.2019.06.25.03.30.55
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Tue, 25 Jun 2019 03:30:56 -0700 (PDT)
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+References: <20190624193913.28343-1-mreitz@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <67508f65-6eda-bf80-533a-a86949328156@redhat.com>
+Date: Tue, 25 Jun 2019 12:30:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1561041461-22326-6-git-send-email-kwankhede@nvidia.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Tue, 25 Jun 2019 10:30:09 +0000 (UTC)
+In-Reply-To: <20190624193913.28343-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 05/13] vfio: Add VM state change handler
- to know state of VM
+ [fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH v2] i386/kvm: Fix build with -m32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,143 +85,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, eskultet@redhat.com, ziye.yang@intel.com,
- yulei.zhang@intel.com, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
- qemu-devel@nongnu.org, zhi.a.wang@intel.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, aik@ozlabs.ru, alex.williamson@redhat.com,
- eauger@redhat.com, felipe@nutanix.com, jonathan.davies@nutanix.com,
- yan.y.zhao@intel.com, changpeng.liu@intel.com, Ken.Xue@amd.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Kirti Wankhede (kwankhede@nvidia.com) wrote:
-> VM state change handler gets called on change in VM's state. This is used to set
-> VFIO device state to _RUNNING.
-> VM state change handler, migration state change handler and log_sync listener
-> are called asynchronously, which sometimes lead to data corruption in migration
-> region. Initialised mutex that is used to serialize operations on migration data
-> region during saving state.
+On 6/24/19 9:39 PM, Max Reitz wrote:
+> find_next_bit() takes a pointer of type "const unsigned long *", but the
+> first argument passed here is a "uint64_t *".  These types are
+> incompatible when compiling qemu with -m32.
 > 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-
-
+> Just use ctz64() instead.
+> 
+> Fixes: c686193072a47032d83cb4e131dc49ae30f9e5d
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  hw/vfio/migration.c           | 45 +++++++++++++++++++++++++++++++++++++++++++
->  include/hw/vfio/vfio-common.h |  4 ++++
->  2 files changed, 49 insertions(+)
+>  target/i386/kvm.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 > 
-> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> index ba58d9253d26..15af218c23d1 100644
-> --- a/hw/vfio/migration.c
-> +++ b/hw/vfio/migration.c
-> @@ -77,6 +77,41 @@ err:
->      return ret;
->  }
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index e4b4f5756a..31490bf8b5 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -1043,14 +1043,15 @@ static int hv_cpuid_check_and_set(CPUState *cs, struct kvm_cpuid2 *cpuid,
+>      CPUX86State *env = &cpu->env;
+>      uint32_t r, fw, bits;
+>      uint64_t deps;
+> -    int i, dep_feat = 0;
+> +    int i, dep_feat;
 >  
-> +static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t state)
-> +{
-> +    VFIOMigration *migration = vbasedev->migration;
-> +    VFIORegion *region = &migration->region.buffer;
-> +    int ret = 0;
-> +
-> +    ret = pwrite(vbasedev->fd, &state, sizeof(state),
-> +                 region->fd_offset + offsetof(struct vfio_device_migration_info,
-> +                                              device_state));
-> +    if (ret < 0) {
-> +        error_report("Failed to set migration state %d %s",
-> +                     ret, strerror(errno));
-
-Please include the device name/id in errors; it just makes it easier to
-figure out the cause when someone sends me a log.
-
-Other than that;
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> +        return ret;
-> +    }
-> +
-> +    vbasedev->device_state = state;
-> +    return 0;
-> +}
-> +
-> +static void vfio_vmstate_change(void *opaque, int running, RunState state)
-> +{
-> +    VFIODevice *vbasedev = opaque;
-> +
-> +    if ((vbasedev->vm_running != running) && running) {
-> +        int ret;
-> +
-> +        ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_RUNNING);
-> +        if (ret) {
-> +            error_report("Failed to set state RUNNING");
-> +        }
-> +    }
-> +
-> +    vbasedev->vm_running = running;
-> +}
-> +
->  static int vfio_migration_init(VFIODevice *vbasedev,
->                                 struct vfio_region_info *info)
->  {
-> @@ -91,6 +126,11 @@ static int vfio_migration_init(VFIODevice *vbasedev,
->          return ret;
+>      if (!hyperv_feat_enabled(cpu, feature) && !cpu->hyperv_passthrough) {
+>          return 0;
 >      }
 >  
-> +    qemu_mutex_init(&vbasedev->migration->lock);
-> +
-> +    vbasedev->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
-> +                                                          vbasedev);
-> +
->      return 0;
->  }
->  
-> @@ -127,11 +167,16 @@ void vfio_migration_finalize(VFIODevice *vbasedev)
->          return;
+>      deps = kvm_hyperv_properties[feature].dependencies;
+> -    while ((dep_feat = find_next_bit(&deps, 64, dep_feat)) < 64) {
+> +    while (deps) {
+> +        dep_feat = ctz64(deps);
+>          if (!(hyperv_feat_enabled(cpu, dep_feat))) {
+>                  fprintf(stderr,
+>                          "Hyper-V %s requires Hyper-V %s\n",
+> @@ -1058,7 +1059,7 @@ static int hv_cpuid_check_and_set(CPUState *cs, struct kvm_cpuid2 *cpuid,
+>                          kvm_hyperv_properties[dep_feat].desc);
+>                  return 1;
+>          }
+> -        dep_feat++;
+> +        deps &= ~(1ull << dep_feat);
+
+Easier than using deposit64(), OK.
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
 >      }
 >  
-> +    if (vbasedev->vm_state) {
-> +        qemu_del_vm_change_state_handler(vbasedev->vm_state);
-> +    }
-> +
->      if (vbasedev->migration_blocker) {
->          migrate_del_blocker(vbasedev->migration_blocker);
->          error_free(vbasedev->migration_blocker);
->      }
->  
-> +    qemu_mutex_destroy(&vbasedev->migration->lock);
->      vfio_migration_region_exit(vbasedev);
->      g_free(vbasedev->migration);
->  }
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> index 1374a03470d8..f2392e97fa57 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -29,6 +29,7 @@
->  #ifdef CONFIG_LINUX
->  #include <linux/vfio.h>
->  #endif
-> +#include "sysemu/sysemu.h"
->  
->  #define VFIO_MSG_PREFIX "vfio %s: "
->  
-> @@ -129,6 +130,9 @@ typedef struct VFIODevice {
->      unsigned int flags;
->      VFIOMigration *migration;
->      Error *migration_blocker;
-> +    uint32_t device_state;
-> +    VMChangeStateEntry *vm_state;
-> +    int vm_running;
->  } VFIODevice;
->  
->  struct VFIODeviceOps {
-> -- 
-> 2.7.0
+>      for (i = 0; i < ARRAY_SIZE(kvm_hyperv_properties[feature].flags); i++) {
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
