@@ -2,95 +2,66 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E480AC48BD7
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 06:57:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EB1CC48BD4
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 07:02:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7EB4204EC
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 06:57:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VYvG7RPE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7EB4204EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 334C6204EC
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 07:02:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 334C6204EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56966 helo=lists.gnu.org)
+Received: from localhost ([::1]:56986 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hffOv-0006WX-9M
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 02:57:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56866)
+	id 1hffT5-0008TM-Dx
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 03:02:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57578)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hffO8-000657-Qq
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 02:57:11 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1hffRK-0007ne-Ky
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 03:00:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hffO5-0003jZ-OI
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 02:57:07 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42162)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hffO3-0003gh-Oa
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 02:57:04 -0400
-Received: by mail-wr1-x444.google.com with SMTP id x17so16451741wrl.9
- for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 23:57:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=9sJuLSlZHV7pA/c1XeCjbNNVA1Os9l6+wI/Pw4XZ+6s=;
- b=VYvG7RPEoJMhDYyqJyoYW0feIkH3cvObUfzXhMYqFF5LeTXoGhXuKECuSZvuRpLrSr
- 1c6d9DRIjNB4KQFzBrm6MXq6jsHNuEhAwjJMILdV+TjXQkYFlasN1/Eqtr1Sa1YS4YAx
- HSFimPVpcjHtn20pQJ+Vgp3tjxJ0E3PlrUPaX1kLco1TJyGDWn7ib513F2J2GlacihwV
- M9QUs0J42ybDGGqzT9hE0MVJKCCAHpA6gwrRuoHzuUn4xpVkbYtLtapmY0W2mJSdnntq
- dm739+CU3XCN3q68O/4jB3V7pxog1uaECyXoGjNUhdnZtEX8gnreD3FOVPzGzC1jUfW4
- IpyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=9sJuLSlZHV7pA/c1XeCjbNNVA1Os9l6+wI/Pw4XZ+6s=;
- b=W2liQdbxgaUBrMb7jcwBTWqaNSGn60bIOReZUp/ikLhNA37vSypclEd/lu2Wt68nz5
- TmKIh2kBJdoIqqKNRtvGRb9P7kkO5f3NZBwFagpRKJPnqyiJQZFSvyTbAIigoajGDpsq
- A1ddO4WGObIZI79wn0u7kQZKIA+WG/ub54z+ROKs8WmrD+0q+Xg+LWzz6V1qvN5bmHBu
- JGTtdDPVJo9+yiwfywuY6smMKQAA25rRqa2zhKThtkmKqywBrSSBksFnB6FMQ1a2uLMb
- AlUNkcE54jx72BWlin1QpezeczgPBZEP6UYUOBBm23J3R2Uh6V+xGw1A64UMw11KBHSJ
- QsdQ==
-X-Gm-Message-State: APjAAAXOVKcV6a7Ph1rzxfpbmCxF7dHUuM9ee/tMLL3BB6uMa4LIeDMf
- 7Mgp3HfoofC0bNrbJRbyE8yVpw==
-X-Google-Smtp-Source: APXvYqy3e48LI3t+jhb9wvTq18FBjGn1xB4T/66puYqDDdvEaYFr9432pONqyC6QDHN9yBJROQzBjw==
-X-Received: by 2002:adf:b605:: with SMTP id f5mr56876511wre.305.1561445820506; 
- Mon, 24 Jun 2019 23:57:00 -0700 (PDT)
-Received: from [192.168.42.31] ([62.94.96.158])
- by smtp.gmail.com with ESMTPSA id c1sm26361949wrh.1.2019.06.24.23.56.59
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 24 Jun 2019 23:56:59 -0700 (PDT)
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-References: <20190519041522.12327-1-richard.henderson@linaro.org>
- <8f28d008-2608-a579-7505-4546b08deb41@linaro.org>
- <085d6881-f518-9888-a13e-081cdc09de46@ilande.co.uk>
- <0b9f4772-37f6-1453-e4ea-5ad9d0f52a5b@ilande.co.uk>
- <acc57487-c8a0-9380-bc2a-4de22541eabf@ilande.co.uk>
- <CAL1e-=iavFqEeFuNm2efVM7mu5OaABBVo90wqJEhmoWa4DQv=Q@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <ffae3651-5daf-e008-6562-2de09d82ace9@linaro.org>
-Date: Tue, 25 Jun 2019 08:56:59 +0200
+ (envelope-from <eric.auger@redhat.com>) id 1hffRJ-0005u5-4R
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 03:00:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59886)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1hffRI-0005tZ-Re
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 03:00:25 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E4B817FDCC;
+ Tue, 25 Jun 2019 07:00:23 +0000 (UTC)
+Received: from [10.36.116.89] (ovpn-116-89.ams2.redhat.com [10.36.116.89])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C48B60BE2;
+ Tue, 25 Jun 2019 07:00:17 +0000 (UTC)
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+References: <20190624091811.30412-1-peterx@redhat.com>
+ <20190624091811.30412-3-peterx@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <b092bd1f-3c00-3069-b183-ca3632c9d9e5@redhat.com>
+Date: Tue, 25 Jun 2019 09:00:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=iavFqEeFuNm2efVM7mu5OaABBVo90wqJEhmoWa4DQv=Q@mail.gmail.com>
+In-Reply-To: <20190624091811.30412-3-peterx@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH v4 0/7] tcg/ppc: Add vector opcodes
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Tue, 25 Jun 2019 07:00:23 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] intel_iommu: Fix unexpected unmaps
+ during global unmap
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,75 +73,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <david@gibson.dropbear.id.au>,
- QEMU Developers <qemu-devel@nongnu.org>, Howard Spoelstra <hsp.cat7@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Yan Zhao <yan.y.zhao@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/23/19 7:10 PM, Aleksandar Markovic wrote:
-> On Sat, Jun 22, 2019 at 5:02 PM Mark Cave-Ayland
-> <mark.cave-ayland@ilande.co.uk> wrote:
->>
->> On 22/06/2019 15:20, Mark Cave-Ayland wrote:
->>
->>> I've just given your tcg-ppc-vsx branch a spin here, and like Howard I'm getting
->>> segfaults trying to launch my MacOS images :(  The segfault is weird: it doesn't get
->>> caught by an attached gdb and the qemu-system-ppc process seems to hang around like a
->>> zombie which makes me think that it's probably an illegal instruction of some kind,
->>> but the PPC kernel can't handle it as well as x86 does.
->>>
->>> With a bit more work I bisected it down to the first commit in the patchset
->>> (d8dcbb57e9: "tcg/ppc: Initial backend support for Altivec") and then as an
->>> experiment I hacked tcg_can_emit_vec_op() to always return 0 to see if that made a
->>> difference, but the segfault still appears.
->>>
->>> The commit message mentions that the load and store helpers are also improved, so I
->>> wonder if they are what is causing the error rather than the vector parts? Also in
->>> the kernel log I see the following messages appearing:
->>>
->>> [3639669.374942] qemu-system-ppc[28591]: segfault (11) at 64b8 nip f87280 lr f8723c
->>> code 1 in qemu-system-ppc[94e000+aa0000]
->>> [3639669.380015] qemu-system-ppc[28591]: code: 93c10038 91810020 90010044 7fc802a6
->>> 3fde0059 2e030000 3bde6c18 7c9d2378
->>> [3639669.385056] qemu-system-ppc[28591]: code: 813e80a0 7cbb2b78 7cda3378 7cf93b78
->>> <81428ff8> 9141001c 39400000 81290000
->>>
->>> Does that help at all? If not let me know if there are any other tests that you'd
->>> like me to try to help debug this.
->>
->> One more hint: if I try a build of d8dcbb57e9 along with my tcg_can_emit_vec_op()
->> hack and pass --enable-debug-tcg to configure then I get an assert on startup:
->>
->> qemu-system-ppc: /home/mca/src/qemu/tcg/tcg.c:2207: process_op_defs: Assertion `tdefs
->> != ((void *)0)' failed.
->> Aborted
->>
+Hi Peter,
+
+On 6/24/19 11:18 AM, Peter Xu wrote:
+> This is an replacement work of Yan Zhao's patch:
 > 
-> Mark, Richard, Howard, David,
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg625340.html
 > 
-> I just sent v5 of the series, that is (in the sense of net-result of
-> code changes) equivalent to v4, but the patch 1/7 from v4 is now split
-> into ten smaller patches. This was done mainly to enable Mark to
-> perhaps try v5 and bisect, in order to at least somewhat narrow down
-> the culprit. Most likely it will be patch 5 from v5, that is still
-> sizeable, but even if this is the case, we can eliminate other smaller
-> things from consideration.
+> vtd_address_space_unmap() will do proper page mask alignment to make
+> sure each IOTLB message will have correct masks for notification
+> messages (2^N-1), but sometimes it can be expanded to even supercede
+> the registered range.  That could lead to unexpected UNMAP of already
+> mapped regions in some other notifiers.
+> 
+> Instead of doing mindless expension of the start address and address
+> mask, we split the range into smaller ones and guarantee that each
+> small range will have correct masks (2^N-1) and at the same time we
+> should also try our best to generate as less IOTLB messages as
+> possible.
+> 
+> Reported-by: Yan Zhao <yan.y.zhao@intel.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Thanks for the help on that.
+Thanks
 
-I don't believe your split is actually bisectable -- there's a minimum amount
-that is required to enable vector opcodes at all.  Patch 5 is the first that
-enables tcg_out_{mov,ld,st}, so while patches beforehand may compile, they
-certainly will not run.
-
-I can retain your split, but for real bisectability we need to move the enable
-of TCG_TARGET_HAS_v128 from patch 2 to patch 5.
-
-Given that all this works for me on a Power9 host, I expect that there's a
-simple fix for Mark's G5 host.  Given the above assertion, a missing opcode
-definition, perhaps for -m32 vs -m64?
-
-
-r~
+Eric
+> ---
+>  hw/i386/intel_iommu.c | 67 ++++++++++++++++++++++++++-----------------
+>  1 file changed, 41 insertions(+), 26 deletions(-)
+> 
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 719ce19ab3..de86f53b4e 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -3363,11 +3363,28 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+>      return vtd_dev_as;
+>  }
+>  
+> +static uint64_t get_naturally_aligned_size(uint64_t start,
+> +                                           uint64_t size, int gaw)
+> +{
+> +    uint64_t max_mask = 1ULL << gaw;
+> +    uint64_t alignment = start ? start & -start : max_mask;
+> +
+> +    alignment = MIN(alignment, max_mask);
+> +    size = MIN(size, max_mask);
+> +
+> +    if (alignment <= size) {
+> +        /* Increase the alignment of start */
+> +        return alignment;
+> +    } else {
+> +        /* Find the largest page mask from size */
+> +        return 1ULL << (63 - clz64(size));
+> +    }
+> +}
+> +
+>  /* Unmap the whole range in the notifier's scope. */
+>  static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+>  {
+> -    IOMMUTLBEntry entry;
+> -    hwaddr size;
+> +    hwaddr size, remain;
+>      hwaddr start = n->start;
+>      hwaddr end = n->end;
+>      IntelIOMMUState *s = as->iommu_state;
+> @@ -3388,39 +3405,37 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+>      }
+>  
+>      assert(start <= end);
+> -    size = end - start;
+> +    size = remain = end - start + 1;
+>  
+> -    if (ctpop64(size) != 1) {
+> -        /*
+> -         * This size cannot format a correct mask. Let's enlarge it to
+> -         * suite the minimum available mask.
+> -         */
+> -        int n = 64 - clz64(size);
+> -        if (n > s->aw_bits) {
+> -            /* should not happen, but in case it happens, limit it */
+> -            n = s->aw_bits;
+> -        }
+> -        size = 1ULL << n;
+> +    while (remain >= VTD_PAGE_SIZE) {
+> +        IOMMUTLBEntry entry;
+> +        uint64_t mask = get_naturally_aligned_size(start, remain, s->aw_bits);
+> +
+> +        assert(mask);
+> +
+> +        entry.iova = start;
+> +        entry.addr_mask = mask - 1;
+> +        entry.target_as = &address_space_memory;
+> +        entry.perm = IOMMU_NONE;
+> +        /* This field is meaningless for unmap */
+> +        entry.translated_addr = 0;
+> +
+> +        memory_region_notify_one(n, &entry);
+> +
+> +        start += mask;
+> +        remain -= mask;
+>      }
+>  
+> -    entry.target_as = &address_space_memory;
+> -    /* Adjust iova for the size */
+> -    entry.iova = n->start & ~(size - 1);
+> -    /* This field is meaningless for unmap */
+> -    entry.translated_addr = 0;
+> -    entry.perm = IOMMU_NONE;
+> -    entry.addr_mask = size - 1;
+> +    assert(!remain);
+>  
+>      trace_vtd_as_unmap_whole(pci_bus_num(as->bus),
+>                               VTD_PCI_SLOT(as->devfn),
+>                               VTD_PCI_FUNC(as->devfn),
+> -                             entry.iova, size);
+> +                             n->start, size);
+>  
+> -    map.iova = entry.iova;
+> -    map.size = entry.addr_mask;
+> +    map.iova = n->start;
+> +    map.size = size;
+>      iova_tree_remove(as->iova_tree, &map);
+> -
+> -    memory_region_notify_one(n, &entry);
+>  }
+>  
+>  static void vtd_address_space_unmap_all(IntelIOMMUState *s)
+> 
 
