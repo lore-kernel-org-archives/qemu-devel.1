@@ -1,88 +1,89 @@
-Return-Path: <SRS0=7PyC=UX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 021EFC4646B
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 23:50:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80F06C48BD3
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 00:22:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C451D20663
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Jun 2019 23:50:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5159F2083D
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 00:22:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ME6ezsvK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C451D20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ki67G67N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5159F2083D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55562 helo=lists.gnu.org)
+Received: from localhost ([::1]:55660 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfYjT-0006L0-3n
-	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 19:50:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52034)
+	id 1hfZDn-0004ks-Vb
+	for qemu-devel@archiver.kernel.org; Mon, 24 Jun 2019 20:22:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59309)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <prvs=07161884e=alistair.francis@wdc.com>)
- id 1hfYe8-0001Ky-2O
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 19:45:14 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hfZCe-0004M8-32
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 20:20:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=07161884e=alistair.francis@wdc.com>)
- id 1hfYe6-0001Nv-EU
- for qemu-devel@nongnu.org; Mon, 24 Jun 2019 19:45:11 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:22363)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <prvs=07161884e=alistair.francis@wdc.com>)
- id 1hfYe5-0001FV-EN; Mon, 24 Jun 2019 19:45:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1561420075; x=1592956075;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=b+EHrskRbgiYN4wK+XpeJIoohi/4XorSgGeJtVGGG7g=;
- b=ME6ezsvKIqizIX3Z+ON5il/vREhxfS3HVd3rVvNAIR/P0dxkXjAn7qq6
- kB5Lu02o7ylPjoJBaitek1nqhJ7k3fBaP8FRfFi/pS4plSbktYhAbFBCG
- mRVP2MhI8LTNBrIzSnxrrQIn/1KczJLJDc9PYUFcbf6ZNkGFczl7ushTS
- ojqoxu1Qyiv5SzP3qWKoTezTNjJEbYs63AXjBUykTdmc78WX/+dTl/Ew8
- j16kfPExKHuoZBV0/m/N8TOhG1G27j9hLARDjLGNJY6RpLxfaVdS7sjoK
- Beo2umzZS5tU00NV/tCxRv34IeCB7KnvIRH9YyTGgWh54wKOQGTVbPwTF g==;
-X-IronPort-AV: E=Sophos;i="5.63,413,1557158400"; d="scan'208";a="211216781"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 25 Jun 2019 07:47:51 +0800
-IronPort-SDR: 5UOn+JMLSqZtamn3rY2jCrKOrGJkQLVztlbVcQSu8b1z/cVuAOlVHMypk+AKO6dEFvacdNehCD
- s+OeDr6Mjwh+toG6TmgtEzJ425qQtkhKyQ3pzG/4tR1zm+84dlovtXY0ERzG/5uWWeMdAFh3ko
- bS8pmUWwIZ99Lxt3raiKFw28aZXDZnG4xBEXxLJib4YTkjlbMp50qZwxpAUK7Aqy9QoF/UbFzm
- na0zyRBKaGE91j08+EBdkn9nXBw6zI3nXDJP33lyinGI11PmUtvo3IiQPKzYKGfxmjTW7aig/B
- 2aV3hKN/xqKyjkKIXuVcJCp7
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep02.wdc.com with ESMTP; 24 Jun 2019 16:44:24 -0700
-IronPort-SDR: i5q57TWw4ofEtAL0b8zvgBb4DuY7EP8djwGUNWo7yUCRTWCdW86t1aDgb7v7olL/Xhu1bnFSFt
- rVMHjcSfn4WsBvwjUrvG7Rwmus/5E5lpQPCN0zyOgF6X5q3IvCCLcNOh0XiumW6Ojdc2ebusTR
- Wf6UYzOOrmurdhbmwucvrC+eqgzIrn5MfBb64DQ1NtEMuSLFdSws2itJsdlJnPn86SUhet1Bsg
- aIRVDZRUkIQMO8SpzWItKBtIqnr3xmLNkmV24kUQnA3qwVtfUf0+dNrUv1A+uFButwQaqqASoY
- Ulc=
-Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
- risc6-mainframe.int.fusionio.com) ([10.196.157.140])
- by uls-op-cesaip01.wdc.com with ESMTP; 24 Jun 2019 16:45:06 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Date: Mon, 24 Jun 2019 16:42:38 -0700
-Message-Id: <e762ccdb1ca778aff7a0d987a722b3246faf1cce.1561419713.git.alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <cover.1561419713.git.alistair.francis@wdc.com>
-References: <cover.1561419713.git.alistair.francis@wdc.com>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hfZCc-00081n-BH
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 20:20:52 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:35273)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1hfZCc-0007xr-2H
+ for qemu-devel@nongnu.org; Mon, 24 Jun 2019 20:20:50 -0400
+Received: by mail-ot1-x341.google.com with SMTP id j19so15450683otq.2
+ for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 17:20:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=/W6AV2imFZqc2JmrNTx2Qp01LOJ2Wywf3ogSnVzwQ7E=;
+ b=ki67G67Nh77pNwJlyJKrXIh54qaheNXFzFkH1VqPm7r+OK/iN6ZWcnz4toF+OQTr9C
+ k3jqGxQXL0RfehQDLWvx/Qx6YljEiY/j/DrFFvu8n6f83LJUSE3mF7YmeJ3k9M0TfvmQ
+ pVdI04btqgaCjezbrCTJ2LUR/9vRPbisYlCjgAZnZJZner+oSXHwX4s3DwcM8q8nXYOj
+ Oy10I05T7nJxz/Sc47O4ua+l7j1gXXUtQPLRpuG4RdeD+i/joiAfqupfCsPAqUmjbaGf
+ 7KaccMIiTOhOXnyhhW7Ic9z+LnF3+onkF1Mc3HwgJfPGhWEO+M+wB4V5DpQUHMIGSR+4
+ A2xg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=/W6AV2imFZqc2JmrNTx2Qp01LOJ2Wywf3ogSnVzwQ7E=;
+ b=MUwPZyzCvYejdrX7FP83vwcnkEecJcfOBXAovBsPjxHJlxxhoskYPJQyPSOpL5etHw
+ B52vdwYfYVd/1kQbrzL+L9tlaIrzWDPUtxai/q5dPLyzCJYyhFngO2y8lcvtt8oVSatZ
+ DqW0DUPiu3TzGYgJLiQFddnIIXUxk7doeX6q6Pgau3vUEd/nOdnh2W5go31i9H1RMtHo
+ Bj88G4JP0S518gEQb1shLxjBMVI0BuU3Z+LoojMPyAx+QykmGFOUfvQUFmENjSbRv90y
+ sn1reKXDJ7Z0uCXwMFuYRpdFfdzJqWcfhRbjupHDyLMqrWW4It1f7ljCtcy/5KuWCAIy
+ s8WQ==
+X-Gm-Message-State: APjAAAVG8lMTcyqrwmhKe4T1DbR8vjPUH90TN3Aqnq8ZZhHDuaZLEBCe
+ JSyMETB75eKD08vxfMy3kT5BtlvOGMT23aCsCWM=
+X-Google-Smtp-Source: APXvYqyxnqstSue7UViDm1pyRupyb0A2aR/VK0X96WXLuS8j7TxPcfdy5OkGFIXyFAdrgp7EEuHQ0tw0xn5gYwv/3N0=
+X-Received: by 2002:a9d:6ad7:: with SMTP id m23mr22943394otq.306.1561422046967; 
+ Mon, 24 Jun 2019 17:20:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: by 2002:a9d:20e4:0:0:0:0:0 with HTTP; Mon, 24 Jun 2019 17:20:46
+ -0700 (PDT)
+Received: by 2002:a9d:20e4:0:0:0:0:0 with HTTP; Mon, 24 Jun 2019 17:20:46
+ -0700 (PDT)
+In-Reply-To: <20190624222844.26584-2-f4bug@amsat.org>
+References: <20190624222844.26584-1-f4bug@amsat.org>
+ <20190624222844.26584-2-f4bug@amsat.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 25 Jun 2019 02:20:46 +0200
+Message-ID: <CAL1e-=j+VjzC62pQ0B3+Yb=Yd4kAhe1haGKtyQGbmQPFoavcxg@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 68.232.143.124
-Subject: [Qemu-devel] [PATCH v2 4/4] target/riscv: Implement
- riscv_cpu_unassigned_access
+X-Received-From: 2607:f8b0:4864:20::341
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH 01/10] hw/mips/gt64xxx_pci: Fix multiline
+ comment syntax
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,81 +95,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, palmer@sifive.com, alistair.francis@wdc.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-devel@nongnu.org,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Artyom Tarasenko <atar4qemu@gmail.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Michael Clark <mjc@sifive.com>
+On Jun 25, 2019 12:36 AM, "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org> w=
+rote:
+>
+> Since commit 8c06fbdf36b checkpatch.pl enforce a new multiline
+> comment syntax. Since we'll move this code around, fix its style
+> first.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
 
-This patch adds support for the riscv_cpu_unassigned_access call
-and will raise a load or store access fault.
+Yes, I find that this a very good practice (this makes make the file moving
+in one of subsequent patches pure moving, which is important for future
+=E2=80=9Cgit blames=E2=80=9D and similar commands).
 
-Signed-off-by: Michael Clark <mjc@sifive.com>
-[Changes by AF:
- - Squash two patches and rewrite commit message
- - Set baddr to the access address
-]
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/cpu.c        |  1 +
- target/riscv/cpu.h        |  2 ++
- target/riscv/cpu_helper.c | 16 ++++++++++++++++
- 3 files changed, 19 insertions(+)
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 6f2b644220..f656714d59 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -416,6 +416,7 @@ static void riscv_cpu_class_init(ObjectClass *c, void *data)
-     cc->gdb_stop_before_watchpoint = true;
-     cc->disas_set_info = riscv_cpu_disas_set_info;
- #ifndef CONFIG_USER_ONLY
-+    cc->do_unassigned_access = riscv_cpu_unassigned_access;
-     cc->do_unaligned_access = riscv_cpu_do_unaligned_access;
-     cc->get_phys_page_debug = riscv_cpu_get_phys_page_debug;
- #endif
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 6c5de37b25..dc31b16dcb 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -248,6 +248,8 @@ void  riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
- bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                         MMUAccessType access_type, int mmu_idx,
-                         bool probe, uintptr_t retaddr);
-+void riscv_cpu_unassigned_access(CPUState *cpu, hwaddr addr, bool is_write,
-+                                 bool is_exec, int unused, unsigned size);
- char *riscv_isa_string(RISCVCPU *cpu);
- void riscv_cpu_list(void);
- 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 8b6754b917..0bbfb7f48b 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -375,6 +375,22 @@ hwaddr riscv_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-     return phys_addr;
- }
- 
-+void riscv_cpu_unassigned_access(CPUState *cs, hwaddr addr, bool is_write,
-+                                 bool is_exec, int unused, unsigned size)
-+{
-+    RISCVCPU *cpu = RISCV_CPU(cs);
-+    CPURISCVState *env = &cpu->env;
-+
-+    if (is_write) {
-+        cs->exception_index = RISCV_EXCP_STORE_AMO_ACCESS_FAULT;
-+    } else {
-+        cs->exception_index = RISCV_EXCP_LOAD_ACCESS_FAULT;
-+    }
-+
-+    env->badaddr = addr;
-+    riscv_raise_exception(&cpu->env, cs->exception_index, GETPC());
-+}
-+
- void riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-                                    MMUAccessType access_type, int mmu_idx,
-                                    uintptr_t retaddr)
--- 
-2.22.0
-
-
+>  hw/mips/gt64xxx_pci.c | 64 +++++++++++++++++++++++--------------------
+>  1 file changed, 35 insertions(+), 29 deletions(-)
+>
+> diff --git a/hw/mips/gt64xxx_pci.c b/hw/mips/gt64xxx_pci.c
+> index f707e59c7a..c0924646b5 100644
+> --- a/hw/mips/gt64xxx_pci.c
+> +++ b/hw/mips/gt64xxx_pci.c
+> @@ -248,10 +248,11 @@ typedef struct GT64120State {
+>  } GT64120State;
+>
+>  /* Adjust range to avoid touching space which isn't mappable via PCI */
+> -/* XXX: Hardcoded values for Malta: 0x1e000000 - 0x1f100000
+> -                                    0x1fc00000 - 0x1fd00000  */
+> -static void check_reserved_space (hwaddr *start,
+> -                                  hwaddr *length)
+> +/*
+> + * XXX: Hardcoded values for Malta: 0x1e000000 - 0x1f100000
+> + *                                  0x1fc00000 - 0x1fd00000
+> + */
+> +static void check_reserved_space(hwaddr *start, hwaddr *length)
+>  {
+>      hwaddr begin =3D *start;
+>      hwaddr end =3D *start + *length;
+> @@ -650,8 +651,10 @@ static void gt64120_writel (void *opaque, hwaddr
+addr,
+>      case GT_SDRAM_B1:
+>      case GT_SDRAM_B2:
+>      case GT_SDRAM_B3:
+> -        /* We don't simulate electrical parameters of the SDRAM.
+> -           Accept, but ignore the values. */
+> +        /*
+> +         * We don't simulate electrical parameters of the SDRAM.
+> +         * Accept, but ignore the values.
+> +         */
+>          s->regs[saddr] =3D val;
+>          break;
+>
+> @@ -674,8 +677,10 @@ static uint64_t gt64120_readl (void *opaque,
+>
+>      /* CPU Configuration */
+>      case GT_MULTI:
+> -        /* Only one GT64xxx is present on the CPU bus, return
+> -           the initial value */
+> +        /*
+> +         * Only one GT64xxx is present on the CPU bus, return
+> +         * the initial value.
+> +         */
+>          val =3D s->regs[saddr];
+>          break;
+>
+> @@ -685,17 +690,18 @@ static uint64_t gt64120_readl (void *opaque,
+>      case GT_CPUERR_DATALO:
+>      case GT_CPUERR_DATAHI:
+>      case GT_CPUERR_PARITY:
+> -        /* Emulated memory has no error, always return the initial
+> -           values */
+> +        /* Emulated memory has no error, always return the initial
+values. */
+>          val =3D s->regs[saddr];
+>          break;
+>
+>      /* CPU Sync Barrier */
+>      case GT_PCI0SYNC:
+>      case GT_PCI1SYNC:
+> -        /* Reading those register should empty all FIFO on the PCI
+> -           bus, which are not emulated. The return value should be
+> -           a random value that should be ignored. */
+> +        /*
+> +         * Reading those register should empty all FIFO on the PCI
+> +         * bus, which are not emulated. The return value should be
+> +         * a random value that should be ignored.
+> +         */
+>          val =3D 0xc000ffee;
+>          break;
+>
+> @@ -705,8 +711,7 @@ static uint64_t gt64120_readl (void *opaque,
+>      case GT_ECC_MEM:
+>      case GT_ECC_CALC:
+>      case GT_ECC_ERRADDR:
+> -        /* Emulated memory has no error, always return the initial
+> -           values */
+> +        /* Emulated memory has no error, always return the initial
+values. */
+>          val =3D s->regs[saddr];
+>          break;
+>
+> @@ -785,8 +790,10 @@ static uint64_t gt64120_readl (void *opaque,
+>      case GT_SDRAM_B1:
+>      case GT_SDRAM_B2:
+>      case GT_SDRAM_B3:
+> -        /* We don't simulate electrical parameters of the SDRAM.
+> -           Just return the last written value. */
+> +        /*
+> +         * We don't simulate electrical parameters of the SDRAM.
+> +         * Just return the last written value.
+> +         */
+>          val =3D s->regs[saddr];
+>          break;
+>
+> @@ -949,20 +956,20 @@ static int gt64120_pci_map_irq(PCIDevice *pci_dev,
+int irq_num)
+>      slot =3D (pci_dev->devfn >> 3);
+>
+>      switch (slot) {
+> -      /* PIIX4 USB */
+> -      case 10:
+> +    /* PIIX4 USB */
+> +    case 10:
+>          return 3;
+> -      /* AMD 79C973 Ethernet */
+> -      case 11:
+> +    /* AMD 79C973 Ethernet */
+> +    case 11:
+>          return 1;
+> -      /* Crystal 4281 Sound */
+> -      case 12:
+> +    /* Crystal 4281 Sound */
+> +    case 12:
+>          return 2;
+> -      /* PCI slot 1 to 4 */
+> -      case 18 ... 21:
+> +    /* PCI slot 1 to 4 */
+> +    case 18 ... 21:
+>          return ((slot - 18) + irq_num) & 0x03;
+> -      /* Unknown device, don't do any translation */
+> -      default:
+> +    /* Unknown device, don't do any translation */
+> +    default:
+>          return irq_num;
+>      }
+>  }
+> @@ -980,8 +987,7 @@ static void gt64120_pci_set_irq(void *opaque, int
+irq_num, int level)
+>      /* XXX: optimize */
+>      pic_irq =3D piix4_dev->config[0x60 + irq_num];
+>      if (pic_irq < 16) {
+> -        /* The pic level is the logical OR of all the PCI irqs mapped
+> -           to it */
+> +        /* The pic level is the logical OR of all the PCI irqs mapped to
+it. */
+>          pic_level =3D 0;
+>          for (i =3D 0; i < 4; i++) {
+>              if (pic_irq =3D=3D piix4_dev->config[0x60 + i])
+> --
+> 2.19.1
+>
+>
