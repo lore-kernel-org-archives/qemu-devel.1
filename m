@@ -3,57 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB45CC48BD4
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 12:48:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93C57C48BD5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 12:51:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 947AC208CA
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 12:48:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 947AC208CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 64275208CA
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 12:51:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64275208CA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59866 helo=lists.gnu.org)
+Received: from localhost ([::1]:59898 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfks1-0005Z4-H2
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 08:48:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43777)
+	id 1hfkuq-0007gj-Fy
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 08:51:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40822)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dinechin@redhat.com>) id 1hfkjA-0006IA-Be
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 08:39:13 -0400
+ (envelope-from <gengdongjiu@huawei.com>) id 1hfkZU-0007u7-I3
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 08:29:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dinechin@redhat.com>) id 1hfkj9-0001gA-Al
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 08:39:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37104)
+ (envelope-from <gengdongjiu@huawei.com>) id 1hfkZS-0000Js-DX
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 08:29:12 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2181 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dinechin@redhat.com>) id 1hfkj9-0001fH-5K
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 08:39:11 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 331BAC049E23
- for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 12:39:10 +0000 (UTC)
-Received: from turbo.com (unknown [10.36.118.42])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3A7595C22F;
- Tue, 25 Jun 2019 12:39:08 +0000 (UTC)
-From: Christophe de Dinechin <dinechin@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 25 Jun 2019 14:39:05 +0200
-Message-Id: <20190625123905.25434-1-dinechin@redhat.com>
+ (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
+ id 1hfkZA-0008Mw-7c; Tue, 25 Jun 2019 08:29:01 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 3820CEB960A9AD7D3429;
+ Tue, 25 Jun 2019 20:28:45 +0800 (CST)
+Received: from [127.0.0.1] (10.142.68.147) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.439.0; Tue, 25 Jun 2019
+ 20:28:38 +0800
+To: Igor Mammedov <imammedo@redhat.com>, <pbonzini@redhat.com>
+References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
+ <1557832703-42620-9-git-send-email-gengdongjiu@huawei.com>
+ <20190624143249.37a5e6d5@redhat.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <d7edd19e-340f-98ff-6613-34a5e85c05e2@huawei.com>
+Date: Tue, 25 Jun 2019 20:28:36 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Tue, 25 Jun 2019 12:39:10 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190624143249.37a5e6d5@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.142.68.147]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2] Fix build error when VNC is configured out
+X-Received-From: 45.249.212.190
+Subject: Re: [Qemu-devel] [PATCH v17 08/10] KVM: Move related hwpoison page
+ functions to accel/kvm/ folder
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,53 +69,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, kvm@vger.kernel.org,
+ mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org,
+ linuxarm@huawei.com, shannon.zhaosl@gmail.com, zhengxiang9@huawei.com,
+ qemu-arm@nongnu.org, james.morse@arm.com, xuwei5@huawei.com,
+ jonathan.cameron@huawei.com, lersek@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In hmp_change(), the variable hmp_mon is only used
-by code under #ifdef CONFIG_VNC. This results in a build
-error when VNC is configured out with the default of
-treating warnings as errors:
 
-monitor/hmp-cmds.c: In function =E2=80=98hmp_change=E2=80=99:
-monitor/hmp-cmds.c:1946:17: error: unused variable =E2=80=98hmp_mon=E2=80=
-=99 [-Werror=3Dunused-variable]
-1946 |     MonitorHMP *hmp_mon =3D container_of(mon, MonitorHMP, common);
-     |                 ^~~~~~~
 
-v2: Move variable down as suggested by Philippe Mathieu-Daud=C3=A9
+On 2019/6/24 20:32, Igor Mammedov wrote:
+> On Tue, 14 May 2019 04:18:21 -0700
+> Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+> 
+>> kvm_hwpoison_page_add() and kvm_unpoison_all() will be used both
+>> by X86 and ARM platforms, so move these functions to a common
+>> accel/kvm/ folder to avoid duplicate code.
+>>
+>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>> ---
+>>  accel/kvm/kvm-all.c     | 33 +++++++++++++++++++++++++++++++++
+>>  include/exec/ram_addr.h | 24 ++++++++++++++++++++++++
+>>  target/arm/kvm.c        |  3 +++
+>>  target/i386/kvm.c       | 34 +---------------------------------
+>>  4 files changed, 61 insertions(+), 33 deletions(-)
+>>
+>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+>> index 524c4dd..b9f9f29 100644
+>> --- a/accel/kvm/kvm-all.c
+>> +++ b/accel/kvm/kvm-all.c
+>> @@ -625,6 +625,39 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension)
+>>      return ret;
+>>  }
+>>  
+>> +typedef struct HWPoisonPage {
+>> +    ram_addr_t ram_addr;
+>> +    QLIST_ENTRY(HWPoisonPage) list;
+>> +} HWPoisonPage;
+>> +
+>> +static QLIST_HEAD(, HWPoisonPage) hwpoison_page_list =
+>> +    QLIST_HEAD_INITIALIZER(hwpoison_page_list);
+>> +
+>> +void kvm_unpoison_all(void *param)
+>> +{
+>> +    HWPoisonPage *page, *next_page;
+>> +
+>> +    QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
+>> +        QLIST_REMOVE(page, list);
+>> +        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
+>> +        g_free(page);
+>> +    }
+>> +}
+>> +
+>> +void kvm_hwpoison_page_add(ram_addr_t ram_addr)
+>> +{
+>> +    HWPoisonPage *page;
+>> +
+>> +    QLIST_FOREACH(page, &hwpoison_page_list, list) {
+>> +        if (page->ram_addr == ram_addr) {
+>> +            return;
+>> +        }
+>> +    }
+>> +    page = g_new(HWPoisonPage, 1);
+>> +    page->ram_addr = ram_addr;
+>> +    QLIST_INSERT_HEAD(&hwpoison_page_list, page, list);
+>> +}
+>> +
+>>  static uint32_t adjust_ioeventfd_endianness(uint32_t val, uint32_t size)
+>>  {
+>>  #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
+>> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+>> index 139ad79..193b0a7 100644
+>> --- a/include/exec/ram_addr.h
+>> +++ b/include/exec/ram_addr.h
+> 
+> it's not file for KVM specific code,
+> maybe Paolo could suggest a bettor place ...
+I remember some people suggests me to move the code to KVM before, may be he is Peter.
+Paolo, can you give a better place?
 
-Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
----
- monitor/hmp-cmds.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index c283dde0e9..2ae784b9b8 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -1943,7 +1943,6 @@ static void hmp_change_read_arg(void *opaque, const=
- char *password,
-=20
- void hmp_change(Monitor *mon, const QDict *qdict)
- {
--    MonitorHMP *hmp_mon =3D container_of(mon, MonitorHMP, common);
-     const char *device =3D qdict_get_str(qdict, "device");
-     const char *target =3D qdict_get_str(qdict, "target");
-     const char *arg =3D qdict_get_try_str(qdict, "arg");
-@@ -1961,6 +1960,7 @@ void hmp_change(Monitor *mon, const QDict *qdict)
-         if (strcmp(target, "passwd") =3D=3D 0 ||
-             strcmp(target, "password") =3D=3D 0) {
-             if (!arg) {
-+                MonitorHMP *hmp_mon =3D container_of(mon, MonitorHMP, co=
-mmon);
-                 monitor_read_password(hmp_mon, hmp_change_read_arg, NULL=
-);
-                 return;
-             }
---=20
-2.21.0
+> 
+> 
+>> @@ -116,6 +116,30 @@ void qemu_ram_free(RAMBlock *block);
+>>  
+>>  int qemu_ram_resize(RAMBlock *block, ram_addr_t newsize, Error **errp);
+>>  
+>> +/**
+>> + * kvm_hwpoison_page_add:
+>> + *
+>> + * Parameters:
+>> + *  @ram_addr: the address in the RAM for the poisoned page
+>> + *
+>> + * Add a poisoned page to the list
+>> + *
+>> + * Return: None.
+>> + */
+>> +void kvm_hwpoison_page_add(ram_addr_t ram_addr);
+>> +
+>> +/**
+>> + * kvm_unpoison_all:
+>> + *
+>> + * Parameters:
+>> + *  @param: some data may be passed to this function
+>> + *
+>> + * Free and remove all the poisoned pages in the list
+>> + *
+>> + * Return: None.
+>> + */
+>> +void kvm_unpoison_all(void *param);
+>> +
+>>  #define DIRTY_CLIENTS_ALL     ((1 << DIRTY_MEMORY_NUM) - 1)
+>>  #define DIRTY_CLIENTS_NOCODE  (DIRTY_CLIENTS_ALL & ~(1 << DIRTY_MEMORY_CODE))
+>>  
+>> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+>> index 5995634..6d3b25b 100644
+>> --- a/target/arm/kvm.c
+>> +++ b/target/arm/kvm.c
+>> @@ -29,6 +29,7 @@
+>>  #include "exec/address-spaces.h"
+>>  #include "hw/boards.h"
+>>  #include "qemu/log.h"
+>> +#include "exec/ram_addr.h"
+>>  
+>>  const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
+>>      KVM_CAP_LAST_INFO
+>> @@ -187,6 +188,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>>  
+>>      cap_has_mp_state = kvm_check_extension(s, KVM_CAP_MP_STATE);
+>>  
+>> +    qemu_register_reset(kvm_unpoison_all, NULL);
+>> +
+>>      return 0;
+>>  }
+>>  
+>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+>> index 3b29ce5..9bdb879 100644
+>> --- a/target/i386/kvm.c
+>> +++ b/target/i386/kvm.c
+>> @@ -46,6 +46,7 @@
+>>  #include "migration/blocker.h"
+>>  #include "exec/memattrs.h"
+>>  #include "trace.h"
+>> +#include "exec/ram_addr.h"
+>>  
+>>  //#define DEBUG_KVM
+>>  
+>> @@ -467,39 +468,6 @@ uint32_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
+>>  }
+>>  
+>>  
+>> -typedef struct HWPoisonPage {
+>> -    ram_addr_t ram_addr;
+>> -    QLIST_ENTRY(HWPoisonPage) list;
+>> -} HWPoisonPage;
+>> -
+>> -static QLIST_HEAD(, HWPoisonPage) hwpoison_page_list =
+>> -    QLIST_HEAD_INITIALIZER(hwpoison_page_list);
+>> -
+>> -static void kvm_unpoison_all(void *param)
+>> -{
+>> -    HWPoisonPage *page, *next_page;
+>> -
+>> -    QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
+>> -        QLIST_REMOVE(page, list);
+>> -        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
+>> -        g_free(page);
+>> -    }
+>> -}
+>> -
+>> -static void kvm_hwpoison_page_add(ram_addr_t ram_addr)
+>> -{
+>> -    HWPoisonPage *page;
+>> -
+>> -    QLIST_FOREACH(page, &hwpoison_page_list, list) {
+>> -        if (page->ram_addr == ram_addr) {
+>> -            return;
+>> -        }
+>> -    }
+>> -    page = g_new(HWPoisonPage, 1);
+>> -    page->ram_addr = ram_addr;
+>> -    QLIST_INSERT_HEAD(&hwpoison_page_list, page, list);
+>> -}
+>> -
+>>  static int kvm_get_mce_cap_supported(KVMState *s, uint64_t *mce_cap,
+>>                                       int *max_banks)
+>>  {
+> 
+> .
+> 
 
 
