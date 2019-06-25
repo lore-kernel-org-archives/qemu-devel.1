@@ -2,77 +2,80 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09BFFC48BD5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 14:56:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AABBCC48BD5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 14:57:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5FDF208E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 14:56:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5FDF208E3
+	by mail.kernel.org (Postfix) with ESMTPS id 42FD6208E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 14:57:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42FD6208E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32828 helo=lists.gnu.org)
+Received: from localhost ([::1]:32832 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfmrg-0001Uh-V6
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 10:56:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50513)
+	id 1hfmtQ-00035L-BI
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 10:57:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48318)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sgarzare@redhat.com>) id 1hfmjF-0005Ni-Ux
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 10:47:27 -0400
+ (envelope-from <philmd@redhat.com>) id 1hfmc6-0000o4-3E
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 10:40:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1hfmjD-000880-1D
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 10:47:24 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:52308)
+ (envelope-from <philmd@redhat.com>) id 1hfmc4-0000P3-2q
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 10:40:01 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:40658)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hfmjA-00084M-L6
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 10:47:20 -0400
-Received: by mail-wm1-f67.google.com with SMTP id s3so3143621wms.2
- for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 07:47:20 -0700 (PDT)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hfmc2-0000GG-0s
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 10:39:58 -0400
+Received: by mail-wr1-f66.google.com with SMTP id p11so18171369wre.7
+ for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 07:39:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=f29OXgzObWKmch49Da0RFamZ2zfhq4D4gpvDqbKtncA=;
- b=c95MIjC5HDc2SDB8igOCS370jnb8qk62Bwycsoc7CMtQHayYwAPHI5jzmx4qxoYTyC
- I3+DI0MbVcO1DQlzM20GZtOmpBUCeWlRzLNtZJRNmBBfV+ONCNqSWJrH1xbbIYJPJRus
- DBleoq4+zkD9yl7eC7xpdJcRZdICLE7kjUW4flFDGVHln8eUyZgVq1raed1bhX9LzZ2O
- KPoV6d8gl/M60skAdiydhLM9syFoSu/EXBVUVyp7cQLJF7ydt0j7zhWQC7KoOKaofakO
- 62HTEtdPUTKUfBlU0aWX/yRyPD+8JJ9h9emdaKdUpDAp6TjBXUglMBIQffMlKQRE2aK3
- ESVQ==
-X-Gm-Message-State: APjAAAUly32pzpKQU2OEbEud4uaoDzm54Vp99sLYAmytWudmscFjm77b
- N23Ql0XdOMZsjnK8ZoEqKXiWpA==
-X-Google-Smtp-Source: APXvYqxmhLhP/gpD0EFpaKKz9Xz4uw9I+45F+7vQfhvQpulGw9e9X3yvX89+O/yyxRJW9dQX7413Gw==
-X-Received: by 2002:a7b:c148:: with SMTP id z8mr14226833wmi.142.1561474039158; 
- Tue, 25 Jun 2019 07:47:19 -0700 (PDT)
-Received: from steredhat (host21-207-dynamic.52-79-r.retail.telecomitalia.it.
- [79.52.207.21])
- by smtp.gmail.com with ESMTPSA id z6sm14037357wrw.2.2019.06.25.07.47.18
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 25 Jun 2019 07:47:18 -0700 (PDT)
-Date: Tue, 25 Jun 2019 16:47:10 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Message-ID: <20190625144710.xvlwcqcbp5bipbku@steredhat>
-References: <20190509145927.293369-1-sgarzare@redhat.com>
- <7a3e37bd-dd24-a97f-5354-7793df44c53e@redhat.com>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=j1ecm2KfToermzYuR3x6+mpOHLA0t947Ln9n8tcC4/s=;
+ b=G0WE+gX/Agjftym86EU+vbo87BHwGkqlkE1XXpbv/U4pWAf7V3MfSBXa3HvL1bkIjJ
+ vcQD7wp2ZYATFGDCbtkA+VPlA3WtaDUcmnxalkeVopALTiSGJJZ51PyKPaB4DewbDkbV
+ h1pHSSHKJDMPAAAdbQTfII+TZK7ZaCTkedaoobOK4osxGIMhfWA9e55Y3xd82T86Tf/Y
+ aPJh2P3SJYsGfUCMoumLL+BBv2np7KnWmepEDf1e8GEvMlmeCDXKLt7DPkSMNKViQe7C
+ 1nvNty+0naRpGg3ZkFVzOnKXA6wbYgl29DaW6r7/HAdnJ754I/sWOzvtsMHsVNEfeybf
+ U/GA==
+X-Gm-Message-State: APjAAAUw9Cp/uJQI5BRWWsQX01VFIFhpaeSmVb2pwX51cA13SMi31HvH
+ LxYgJ2KTrtHfRlGrJ0l5+GI09g==
+X-Google-Smtp-Source: APXvYqy9/oH+Km20lhfFz64mYlzmAZYjuffszOFhrhmdGZTm87MmdU1CLaGh0G5s0OcTmm8Ma6TZKQ==
+X-Received: by 2002:adf:f3cc:: with SMTP id g12mr3625654wrp.149.1561473595326; 
+ Tue, 25 Jun 2019 07:39:55 -0700 (PDT)
+Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.183])
+ by smtp.gmail.com with ESMTPSA id b2sm19176038wrp.72.2019.06.25.07.39.54
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Tue, 25 Jun 2019 07:39:54 -0700 (PDT)
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+References: <1561472838-32272-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1561472838-32272-2-git-send-email-aleksandar.markovic@rt-rk.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <fdd0b7d8-270d-bdc6-ab56-f1925f82e97b@redhat.com>
+Date: Tue, 25 Jun 2019 16:39:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
+In-Reply-To: <1561472838-32272-2-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <7a3e37bd-dd24-a97f-5354-7793df44c53e@redhat.com>
-User-Agent: NeoMutt/20180716
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [PATCH v3] block/rbd: increase dynamically the
- image size
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH 1/2] dma/rc4030: Fix off-by-one error in
+ specified memory region size
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,71 +87,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
- Jason Dillaman <jdillama@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Cc: arikalo@wavecomp.com, hpoussin@reactos.org, f4bug@amsat.org,
+ amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 25, 2019 at 04:02:04PM +0200, Max Reitz wrote:
-> On 09.05.19 16:59, Stefano Garzarella wrote:
-> > RBD APIs don't allow us to write more than the size set with
-> > rbd_create() or rbd_resize().
-> > In order to support growing images (eg. qcow2), we resize the
-> > image before write operations that exceed the current size.
-> > 
-> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > ---
-> > v3:
-> >   - add 'image_size' field in the BDRVRBDState to keep track of the
-> >     current size of the RBD image [Jason, Kevin]
-> > ---
-> >  block/rbd.c | 42 +++++++++++++++++++++++++++++++++++++++---
-> >  1 file changed, 39 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/block/rbd.c b/block/rbd.c
-> > index 0c549c9935..b0355a2ce0 100644
-> > --- a/block/rbd.c
-> > +++ b/block/rbd.c
+On 6/25/19 4:27 PM, Aleksandar Markovic wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
 > 
-> [...]
+> The size is one byte less than it should be:
 > 
-> > @@ -833,6 +842,22 @@ static void qemu_rbd_close(BlockDriverState *bs)
-> >      rados_shutdown(s->cluster);
-> >  }
-> >  
-> > +/* Resize the RBD image and update the 'image_size' with the current size */
-> > +static int qemu_rbd_resize(BlockDriverState *bs, uint64_t size)
-> > +{
-> > +    BDRVRBDState *s = bs->opaque;
-> > +    int r;
-> > +
-> > +    r = rbd_resize(s->image, size);
-> > +    if (r < 0) {
-> > +        return r;
-> > +    }
-> > +
-> > +    s->image_size = size;
+> address-space: rc4030-dma
+>   0000000000000000-00000000fffffffe (prio 0, i/o): rc4030.dma
 > 
-> I think this should update bs->total_sectors, too.  In fact, I’m
-> wondering why you don’t just use bs->total_sectors (or bdrv_getlength(),
-> which returns bs->total_sectors * 512) instead of adding this new field?
+> rc4030 is used in MIPS Jazz board context.
+
+Ah thanks :) I was planing to send this once at home tonight.
+
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+  (qemu) info mtree
+  ...
+  address-space: rc4030-dma
+    0000000000000000-00000000ffffffff (prio 0, i/o): rc4030.dma
+
+  address-space: dp8393x
+    0000000000000000-00000000ffffffff (prio 0, i/o): rc4030.dma
+
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> ---
+>  hw/dma/rc4030.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-
-Hi Max,
-thanks for taking a look!
-
-I used bs->total_sectors in the v2, but Jason pointed out a possible
-issue with this, so I proposed to add a variable in the BDRVRBDState to
-track the latest resize and Kevin acked [1].
-
-IIUC what Kevin said on his comment, the 'bs->total_sectors' should be
-updated by bdrv_co_write_req_finish(), for this reason I didn't update
-it.
-
-[1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg615195.html
-
-Thanks,
-Stefano
+> diff --git a/hw/dma/rc4030.c b/hw/dma/rc4030.c
+> index 6ccafec..88ff271 100644
+> --- a/hw/dma/rc4030.c
+> +++ b/hw/dma/rc4030.c
+> @@ -23,6 +23,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> +#include "qemu/units.h"
+>  #include "hw/hw.h"
+>  #include "hw/mips/mips.h"
+>  #include "hw/sysbus.h"
+> @@ -678,7 +679,7 @@ static void rc4030_realize(DeviceState *dev, Error **errp)
+>  
+>      memory_region_init_iommu(&s->dma_mr, sizeof(s->dma_mr),
+>                               TYPE_RC4030_IOMMU_MEMORY_REGION,
+> -                             o, "rc4030.dma", UINT32_MAX);
+> +                             o, "rc4030.dma", 4 * GiB);
+>      address_space_init(&s->dma_as, MEMORY_REGION(&s->dma_mr), "rc4030-dma");
+>  }
+>  
+> 
 
