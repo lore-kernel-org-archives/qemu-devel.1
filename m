@@ -2,66 +2,91 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AC6DC48BD5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 09:37:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E8FFC48BD5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 09:52:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F576208CA
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 09:37:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F576208CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id F026A20883
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 09:52:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tsTiaWqL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F026A20883
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58074 helo=lists.gnu.org)
+Received: from localhost ([::1]:58180 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfhtR-0004Ta-Or
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 05:37:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46254)
+	id 1hfi7q-0000VF-5r
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 05:52:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55823)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1hfhrF-0002iK-1I
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 05:35:22 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hfi73-0008FH-Pm
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 05:51:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1hfhrD-0005Xv-Nk
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 05:35:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49243)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1hfhrA-0005Rb-TE; Tue, 25 Jun 2019 05:35:17 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2B2F35F72C;
- Tue, 25 Jun 2019 09:35:16 +0000 (UTC)
-Received: from [10.36.116.89] (ovpn-116-89.ams2.redhat.com [10.36.116.89])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CEB435C22F;
- Tue, 25 Jun 2019 09:35:13 +0000 (UTC)
-From: Auger Eric <eric.auger@redhat.com>
-To: Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org
-References: <20190621163422.6127-1-drjones@redhat.com>
- <20190621163422.6127-2-drjones@redhat.com>
-Message-ID: <1ed69063-eaae-2c02-1fe1-2650492496d4@redhat.com>
-Date: Tue, 25 Jun 2019 11:35:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (envelope-from <alex.bennee@linaro.org>) id 1hfi72-0007sw-9x
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 05:51:41 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37810)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hfi72-0007pM-0K
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 05:51:40 -0400
+Received: by mail-wr1-x441.google.com with SMTP id v14so17110489wrr.4
+ for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 02:51:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=1lAHR5oTFCXo0fFe3w4Ev+BS0Wj3LkqFFKPjN9hbCz8=;
+ b=tsTiaWqLampQDtz360gJofpuzkwiB+8heZ3n87zUa2Ha8WR9nHSjl84NV073RzWxHl
+ H/j6CucXnCZRiVi/rPcgIipk+H1OptQySbWYHN5bWC7e6prVITJT21M3gjt+CU3rHyf/
+ 5ac+o/J31n73IkgqoBbgOrrQZyZuzWWV0lluWZPtqMjxdWTHDo5O5o+nuH53a4xZPRmY
+ 26Wzq9bJUWzOFdKqEc6g3ni/6gJrY1sTTB0OLChi9UuLJeLHl8RH/0TlEqVMjaJtrIKa
+ KPFaNsprtOtPULiHwzZMNDBddyA9ul/4jLhIver2NfcHBiJEvbKl6Jop1Ck/R8JNVa1m
+ 4w6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=1lAHR5oTFCXo0fFe3w4Ev+BS0Wj3LkqFFKPjN9hbCz8=;
+ b=dqAX+P2G/fmfgEH+xaBGS/ukPhPpAD5kF33xcAHMP3jOlloLd+bCQSUin78DYluUfG
+ lB52oGMll9hUo0CBEKiz074tiMcapymLQMWBwfyZqvXaUJ5LF9L8jPWJBtPNwgsWl+5E
+ A6YEaeVyJPVAfnJrU8mYYhvv+GMcLg+XaQnKw/0PtJP3G3rCUITGArYuqGm7KW5QM4vr
+ Ab5msyMAkoQUUn2SGaWn3T1Aj2s4XgZNUyTPwEn2888DblJYmlq8U7BOURY53XiHlgGS
+ VzDFKGPyYbrpHsu+QlA40MQPkxGWIbtjO2PVVfR0bUt1JfAv/Tf/xjBMYUrRGqH6E92N
+ cdWw==
+X-Gm-Message-State: APjAAAUyYPlIsn76z+mpnpsFoGfJsnUmovQtayYFxQcgje/rUcF+S4Xe
+ YG49AgbJwJA6S+3Wsz1iYr06TA==
+X-Google-Smtp-Source: APXvYqwGXA98clcSJw3u4FmR6qjIjlWwzAWeuvVxOsidiIg+zU8ZjpgCqQ+pPxyAQJ2OhebToeW6qw==
+X-Received: by 2002:adf:ec0c:: with SMTP id x12mr21089176wrn.342.1561456297387; 
+ Tue, 25 Jun 2019 02:51:37 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id o4sm1826720wmh.35.2019.06.25.02.51.36
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 25 Jun 2019 02:51:36 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 63EAD1FF87;
+ Tue, 25 Jun 2019 10:51:36 +0100 (BST)
+References: <20190624055442.2973-1-vandersonmr2@gmail.com>
+ <20190624055442.2973-3-vandersonmr2@gmail.com>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <20190624055442.2973-3-vandersonmr2@gmail.com>
+Date: Tue, 25 Jun 2019 10:51:36 +0100
+Message-ID: <87k1da0z87.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <20190621163422.6127-2-drjones@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Tue, 25 Jun 2019 09:35:16 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 01/14] target/arm/cpu64: Ensure kvm
- really supports aarch64=off
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] Adding an optional tb execution
+ counter.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,120 +98,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, armbru@redhat.com,
- imammedo@redhat.com, alex.bennee@linaro.org, Dave.Martin@arm.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, vandersonmr <vandersonmr2@gmail.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Drew,
 
-On 6/21/19 6:34 PM, Andrew Jones wrote:
-> If -cpu <cpu>,aarch64=off is used then KVM must also be used, and it
-> and the host must support running the vcpu in 32-bit mode. Also, if
-> -cpu <cpu>,aarch64=on is used, then it doesn't matter if kvm is
-> enabled or not.
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
+vandersonmr <vandersonmr2@gmail.com> writes:
 
-
+> We collect the number of times each TB is executed
+> and store it in the its TBStatistics.
+> We also count the number of times the execution counter overflows.
+>
+> Signed-off-by: Vanderson M. do Rosario <vandersonmr2@gmail.com>
 > ---
->  target/arm/cpu64.c   | 12 ++++++------
->  target/arm/kvm64.c   | 11 +++++++++++
->  target/arm/kvm_arm.h | 14 ++++++++++++++
->  3 files changed, 31 insertions(+), 6 deletions(-)
-> 
-> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> index 1901997a0645..946994838d8a 100644
-> --- a/target/arm/cpu64.c
-> +++ b/target/arm/cpu64.c
-> @@ -407,13 +407,13 @@ static void aarch64_cpu_set_aarch64(Object *obj, bool value, Error **errp)
->       * restriction allows us to avoid fixing up functionality that assumes a
->       * uniform execution state like do_interrupt.
->       */> -    if (!kvm_enabled()) {
-> -        error_setg(errp, "'aarch64' feature cannot be disabled "
-> -                         "unless KVM is enabled");
-> -        return;
-> -    }
-> -
->      if (value == false) {
-> +        if (!kvm_enabled() || !kvm_arm_aarch32_supported(CPU(cpu))) {
-> +            error_setg(errp, "'aarch64' feature cannot be disabled "
-> +                             "unless KVM is enabled and 32-bit EL1 "
-> +                             "is supported");
-> +            return;
-> +        }
->          unset_feature(&cpu->env, ARM_FEATURE_AARCH64);
->      } else {
->          set_feature(&cpu->env, ARM_FEATURE_AARCH64);
-> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index 22d19c9aec6f..45ccda589903 100644
-> --- a/target/arm/kvm64.c
-> +++ b/target/arm/kvm64.c
-> @@ -24,7 +24,9 @@
->  #include "exec/gdbstub.h"
->  #include "sysemu/sysemu.h"
->  #include "sysemu/kvm.h"
-> +#include "sysemu/kvm_int.h"
->  #include "kvm_arm.h"
-> +#include "hw/boards.h"
->  #include "internals.h"
->  
->  static bool have_guest_debug;
-> @@ -593,6 +595,15 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
->      return true;
->  }
->  
-> +bool kvm_arm_aarch32_supported(CPUState *cpu)
-> +{
-> +    KVMState *s = KVM_STATE(current_machine->accelerator);
-> +    int ret;
-> +
-> +    ret = kvm_check_extension(s, KVM_CAP_ARM_EL1_32BIT);
-> +    return ret > 0;
-nit: return kvm_check_extension() should be sufficient
-> +}
-> +
->  #define ARM_CPU_ID_MPIDR       3, 0, 0, 0, 5
->  
->  int kvm_arch_init_vcpu(CPUState *cs)
-> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-> index 2a07333c615f..812125f805a1 100644
-> --- a/target/arm/kvm_arm.h
-> +++ b/target/arm/kvm_arm.h
-> @@ -207,6 +207,15 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf);
->   */
->  void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu);
->  
-> +/**
-> + * kvm_arm_aarch32_supported:
-> + * @cs: CPUState
-use kernel-doc comment style?
-> + *
-> + * Returns true if the KVM VCPU can enable AArch32 mode and false
-> + * otherwise.
-> + */
-> +bool kvm_arm_aarch32_supported(CPUState *cs);
-> +
->  /**
->   * kvm_arm_get_max_vm_ipa_size - Returns the number of bits in the
->   * IPA address space supported by KVM
-> @@ -247,6 +256,11 @@ static inline void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
->      cpu->host_cpu_probe_failed = true;
->  }
->  
-> +static inline bool kvm_arm_aarch32_supported(CPUState *cs)
-> +{
-> +    return false;
-> +}
-> +
->  static inline int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
+>  accel/tcg/tcg-runtime.c   | 10 ++++++++++
+>  accel/tcg/tcg-runtime.h   |  2 ++
+>  accel/tcg/translator.c    |  1 +
+>  include/exec/gen-icount.h |  9 +++++++++
+>  4 files changed, 22 insertions(+)
+>
+> diff --git a/accel/tcg/tcg-runtime.c b/accel/tcg/tcg-runtime.c
+> index 8a1e408e31..9888a7fce8 100644
+> --- a/accel/tcg/tcg-runtime.c
+> +++ b/accel/tcg/tcg-runtime.c
+> @@ -167,3 +167,13 @@ void HELPER(exit_atomic)(CPUArchState *env)
 >  {
->      return -ENOENT;
-> 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+>      cpu_loop_exit_atomic(env_cpu(env), GETPC());
+>  }
+> +
+> +void HELPER(inc_exec_freq)(void *ptr)
+> +{
+> +    TranslationBlock *tb =3D (TranslationBlock*) ptr;
 
-Thanks
+To make things clearer:
 
-Eric
+  TBStatistics *stats =3D tb->tb_stats;
+
+> +    // if overflows, then reset the execution counter and increment the =
+overflow counter
+> +    if (atomic_cmpxchg(&tb->tb_stats->exec_count, 0xFFFFFFFF, 0) =3D=3D =
+0xFFFFFFFF) {
+> +        atomic_inc(&tb->tb_stats->exec_count_overflows);
+> +    }
+
+This is all very nice but how often do you actually see overflows?
+You'll see them even less on 32 bit hosts as they have much less memory
+for translations so will flush them out more often. I'd suggest making
+the counter "unsigned long" and just living with the fact the 32 bit
+might get the execution stats wrong if a block executes more than 4
+billion times.
+
+> +    atomic_inc(&tb->tb_stats->exec_count);
+> +}
+> diff --git a/accel/tcg/tcg-runtime.h b/accel/tcg/tcg-runtime.h
+> index 4fa61b49b4..bf0b75dbe8 100644
+> --- a/accel/tcg/tcg-runtime.h
+> +++ b/accel/tcg/tcg-runtime.h
+> @@ -28,6 +28,8 @@ DEF_HELPER_FLAGS_1(lookup_tb_ptr, TCG_CALL_NO_WG_SE, pt=
+r, env)
+>
+>  DEF_HELPER_FLAGS_1(exit_atomic, TCG_CALL_NO_WG, noreturn, env)
+>
+> +DEF_HELPER_FLAGS_1(inc_exec_freq, TCG_CALL_NO_RWG, void, ptr)
+> +
+>  #ifdef CONFIG_SOFTMMU
+>
+>  DEF_HELPER_FLAGS_5(atomic_cmpxchgb, TCG_CALL_NO_WG,
+> diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
+> index 9226a348a3..cc06070e7e 100644
+> --- a/accel/tcg/translator.c
+> +++ b/accel/tcg/translator.c
+> @@ -54,6 +54,7 @@ void translator_loop(const TranslatorOps *ops, DisasCon=
+textBase *db,
+>      gen_tb_start(db->tb);
+>      ops->tb_start(db, cpu);
+>      tcg_debug_assert(db->is_jmp =3D=3D DISAS_NEXT);  /* no early exit */
+> +    gen_tb_exec_count(tb);
+>
+>      while (true) {
+>          db->num_insns++;
+> diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
+> index f7669b6841..6d38b6e1fb 100644
+> --- a/include/exec/gen-icount.h
+> +++ b/include/exec/gen-icount.h
+> @@ -7,6 +7,15 @@
+>
+>  static TCGOp *icount_start_insn;
+>
+> +static inline void gen_tb_exec_count(TranslationBlock *tb)
+> +{
+> +  if (qemu_loglevel_mask(CPU_LOG_HOT_TBS)) {
+> +    TCGv_ptr tb_ptr =3D tcg_const_ptr(tb);
+
+Why not pass the address of the counter itself to save the cost of the
+indirection calculation at runtime?
+
+> +    gen_helper_inc_exec_freq(tb_ptr);
+> +    tcg_temp_free_ptr(tb_ptr);
+> +  }
+> +}
+> +
+>  static inline void gen_tb_start(TranslationBlock *tb)
+>  {
+>      TCGv_i32 count, imm;
+
+
+--
+Alex Benn=C3=A9e
 
