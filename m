@@ -2,64 +2,65 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C059C48BD5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 16:35:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87B4AC48BD5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 16:37:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB943208E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 16:35:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB943208E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5E5D4208E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 16:37:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E5D4208E3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33930 helo=lists.gnu.org)
+Received: from localhost ([::1]:33938 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfoQ5-0000WD-9t
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 12:35:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43997)
+	id 1hfoRL-0001rV-Ma
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 12:37:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49069)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1hfo6x-0003ef-Q9
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 12:16:02 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hfoPy-0000YA-Lm
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 12:35:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hfo6w-00081c-E7
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 12:15:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52420)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hfo6w-0007m4-6J
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 12:15:58 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E6CE7C047B7A
- for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 16:15:38 +0000 (UTC)
-Received: from redhat.com (ovpn-112-73.ams2.redhat.com [10.36.112.73])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 43F065D9C5;
- Tue, 25 Jun 2019 16:15:36 +0000 (UTC)
-Date: Tue, 25 Jun 2019 17:15:33 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190625161533.GJ3139@redhat.com>
-References: <20190625050008.12789-1-ehabkost@redhat.com>
- <20190625050008.12789-4-ehabkost@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1hfoPw-00089L-SZ
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 12:35:38 -0400
+Resent-Date: Tue, 25 Jun 2019 12:35:38 -0400
+Resent-Message-Id: <E1hfoPw-00089L-SZ@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21813)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hfoPw-00088k-JX; Tue, 25 Jun 2019 12:35:36 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1561480497; cv=none; d=zoho.com; s=zohoarc; 
+ b=FnkpOuKB1+lhnhZpYKMbcLDo4jtmgwtbdTrHziUCHTPYeeDsLEf1/C8gxdPwdexqvN8oOClH7PUBZgOck+F4ddqcCn4KE35Akizigb5+//nQDxyGJaA5RRe+9N+KEbVCPH+YuVHW/3zmn08YZ0OCNpVGWb+6Rg7gv+LuaMjZJHc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1561480497;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=nNv/F3UtR3DkmDHXQCkDHRx64dhTFSQ3kiIocrSIdGw=; 
+ b=Iw0lJMf7zd2bIR/6y4/AXlpWGnoB5TcE/kifO3/ck+gBPc0sItpJ0AiR3HkPgDtFD4nrC/rZcbvNowjouE4gClaH4L+y3FVbsTQxJRprHq7rtdS01LwhB1EuouJ5tDKckZbWVJIAI9q0X0AijQn5qT1wPLUavvtEpq2P42nFxoQ=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1561480496400176.43585904483007;
+ Tue, 25 Jun 2019 09:34:56 -0700 (PDT)
+Message-ID: <156148049495.4374.2975977607094009414@c4a48874b076>
+In-Reply-To: <1561475829-19202-1-git-send-email-walling@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190625050008.12789-4-ehabkost@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Tue, 25 Jun 2019 16:15:38 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: walling@linux.ibm.com
+Date: Tue, 25 Jun 2019 09:34:56 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/6] qmp: Add "alias-of" field to
- query-cpu-definitions
+X-Received-From: 135.84.80.218
+Subject: Re: [Qemu-devel] [PATCH v5 0/2] Guest Support for DIAGNOSE 0x318
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,61 +72,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: david@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
+ mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 25, 2019 at 02:00:05AM -0300, Eduardo Habkost wrote:
-> Management software will be expected to resolve CPU model name
-> aliases using the new field.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: Markus Armbruster <armbru@redhat.com>
-> ---
->  qapi/target.json | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/qapi/target.json b/qapi/target.json
-> index 1d4d54b600..0197c7962c 100644
-> --- a/qapi/target.json
-> +++ b/qapi/target.json
-> @@ -475,6 +475,12 @@
->  #            to introspect properties configurable using -cpu or -global.
->  #            (since 2.9)
->  #
-> +# @alias-of: Name of CPU model this model is an alias for.  The target of the
-> +#            CPU model alias may change depending on the machine type.
-> +#            Management software is supposed to translate CPU model aliases
-> +#            in the VM configuration, because aliases may stop being
-> +#            migration-safe in the future (since 4.1)
-> +#
->  # @unavailable-features is a list of QOM property names that
->  # represent CPU model attributes that prevent the CPU from running.
->  # If the QOM property is read-only, that means there's no known
-> @@ -498,7 +504,8 @@
->              '*migration-safe': 'bool',
->              'static': 'bool',
->              '*unavailable-features': [ 'str' ],
-> -            'typename': 'str' },
-> +            'typename': 'str',
-> +            '*alias-of' : 'str' },
->    'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I386) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTYxNDc1ODI5LTE5MjAyLTEt
+Z2l0LXNlbmQtZW1haWwtd2FsbGluZ0BsaW51eC5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVz
+IHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVs
+b3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY1
+IDAvMl0gR3Vlc3QgU3VwcG9ydCBmb3IgRElBR05PU0UgMHgzMTgKVHlwZTogc2VyaWVzCk1lc3Nh
+Z2UtaWQ6IDE1NjE0NzU4MjktMTkyMDItMS1naXQtc2VuZC1lbWFpbC13YWxsaW5nQGxpbnV4Lmli
+bS5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJz
+ZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
+bWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
+IC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpGcm9tIGh0dHBzOi8v
+Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRj
+aGV3LzE1NjE0NzU4MjktMTkyMDItMS1naXQtc2VuZC1lbWFpbC13YWxsaW5nQGxpbnV4LmlibS5j
+b20gLT4gcGF0Y2hldy8xNTYxNDc1ODI5LTE5MjAyLTEtZ2l0LXNlbmQtZW1haWwtd2FsbGluZ0Bs
+aW51eC5pYm0uY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMmNkNjAyMSBzMzkw
+OiBkaWFnbm9zZSAzMTggaW5mbyByZXNldCBhbmQgbWlncmF0aW9uIHN1cHBvcnQKZjAxNzg1YiBz
+MzkwL2t2bTogaGVhZGVyIHN5bmMgZm9yIGRpYWczMTgKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEv
+MiBDaGVja2luZyBjb21taXQgZjAxNzg1YjkwMzEwIChzMzkwL2t2bTogaGVhZGVyIHN5bmMgZm9y
+IGRpYWczMTgpCjIvMiBDaGVja2luZyBjb21taXQgMmNkNjAyMWI2ZDJhIChzMzkwOiBkaWFnbm9z
+ZSAzMTggaW5mbyByZXNldCBhbmQgbWlncmF0aW9uIHN1cHBvcnQpCldBUk5JTkc6IGFkZGVkLCBt
+b3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8K
+IzM3OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBhZGRpbmcgYSBsaW5lIHdpdGhvdXQg
+bmV3bGluZSBhdCBlbmQgb2YgZmlsZQojMTY1OiBGSUxFOiBody9zMzkweC9kaWFnMzE4Lmg6Mzg6
+CisjZW5kaWYgLyogSFdfRElBRzMxOF9IICovCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3Rl
+cnMKIzI4NTogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9mZWF0dXJlcy5jOjEzMToKKyAgICBGRUFU
+X0lOSVQoImRpYWczMTgiLCBTMzkwX0ZFQVRfVFlQRV9TQ0xQX0JZVEVfMTM0LCAwLCAiQ29udHJv
+bCBwcm9ncmFtIG5hbWUgYW5kIHZlcnNpb24gY29kZXMiKSwKCnRvdGFsOiAyIGVycm9ycywgMSB3
+YXJuaW5ncywgMzAwIGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvMiBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29k
+ZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xv
+Z3MvMTU2MTQ3NTgyOS0xOTIwMi0xLWdpdC1zZW5kLWVtYWlsLXdhbGxpbmdAbGludXguaWJtLmNv
+bS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBh
+dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
+bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
-IIUC, this means that data for a "Haswell" CPU model will now report
-"alias-of": "Haswell-NNN"  (for some arbitrary NNN which may change
-at will in any release).
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
