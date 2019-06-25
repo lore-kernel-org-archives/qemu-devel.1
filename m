@@ -2,92 +2,63 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19BD1C48BD5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 08:17:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83D10C48BD4
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 08:27:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA209204EC
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 08:17:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U0S1ZE2H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA209204EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5DD67215EA
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 08:27:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DD67215EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57426 helo=lists.gnu.org)
+Received: from localhost ([::1]:57490 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfgdg-0004rZ-6h
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 04:17:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48836)
+	id 1hfgnf-0008Fi-5X
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 04:27:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52168)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <marcel.apfelbaum@gmail.com>) id 1hfgbO-0002aw-Lb
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 04:14:55 -0400
+ (envelope-from <cohuck@redhat.com>) id 1hfgm3-0007Ki-Hs
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 04:25:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcel.apfelbaum@gmail.com>) id 1hfgbM-0001jR-OK
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 04:14:54 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35258)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
- id 1hfgbK-0001ZH-EM
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 04:14:50 -0400
-Received: by mail-wr1-x444.google.com with SMTP id f15so6862508wrp.2
- for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 01:14:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-transfer-encoding:content-language;
- bh=X2mwrltJlhx5CwqrPyN34TTsbDY7KmAwyOKXEZG9/GI=;
- b=U0S1ZE2H84SOyPvQ0Za0TanjwMyBg3ovWV2bkesw8mzDuoaIPpTbhLcRCBaKcacfJK
- AiVLPUkWjaYVoOhi97IIXn2TE6k5S3TplSR82ET40cxU+6RawKzM87BGsysvIRoaBQAO
- Z/f8xet4COUbjccl4CPP6V8qFVQlciaB4BHKfMY+0rbu90yODuDd1K1Hk9/WVcd1CDZl
- A0MtYorsef8+nTha54MtCzYkb+k5pZdEBGPiGWfuWgA+wDVrpaakuIjnf7cRi44JjtyI
- Ww44BkPqunfHvMAfOKJfFSiR+qLWw8jBP9dpPj05xHYMCgwZ0pPzdt+2j+jFVpwCmaKk
- /1tA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-transfer-encoding
- :content-language;
- bh=X2mwrltJlhx5CwqrPyN34TTsbDY7KmAwyOKXEZG9/GI=;
- b=aW/FmM5hWlj37R8956c+7Ce5XwOAe6x/WkWeoyojRNOmn0zfuU4OHSf/Iz6ZJ3anOq
- BBaq02EpsRWuAtpEl+Bcv+CpPHII1vN3lp5kAnRiOkIwfZiHbg8AGBjP+jbBMHSWsu/r
- UXViQ9QdJjVKG9ttbOPNg0AVIggQVGkYr4n3+BACjf2LMO+7rSe0lYwk7PNj1PJGqcIC
- eeJLdhHa70BOOzQCN0WKn6Tz+fY/0n8EA8sG0YGTnva8Bm/0MZySrIT+xXhoxMBHK4dQ
- DpIrZMIhZxmRzAZIN9jpymLFXPZM4X78ZQ1gyUvAOtrSnYZEv7IWvZFV5A149qljCx/I
- r/tw==
-X-Gm-Message-State: APjAAAUPP174R/9S5+hOQj9v5zOqA87psW6YyYwiXdieaZjXOiungADi
- +uUhQBjiUEmRjfqHVwlUjTTT9h9i
-X-Google-Smtp-Source: APXvYqxEH1QxqtJ+CGm80pfFBQFN1NpIH6hf+Zqk8X3EgiPngWC8gRqN32SQCcOIzZUkF0F/YgLRYg==
-X-Received: by 2002:adf:fc85:: with SMTP id g5mr26565688wrr.324.1561450486402; 
- Tue, 25 Jun 2019 01:14:46 -0700 (PDT)
-Received: from localhost.localdomain ([37.142.144.27])
- by smtp.gmail.com with ESMTPSA id t12sm14098963wrw.53.2019.06.25.01.14.44
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Jun 2019 01:14:45 -0700 (PDT)
-To: Sukrit Bhatnagar <skrtbhtngr@gmail.com>, qemu-devel@nongnu.org,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <20190621144541.13770-1-skrtbhtngr@gmail.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <a80f7beb-48c1-553a-f137-731e5500b608@gmail.com>
-Date: Tue, 25 Jun 2019 11:14:56 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ (envelope-from <cohuck@redhat.com>) id 1hfgm2-0004av-Fk
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 04:25:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55174)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>)
+ id 1hfgm2-0004Zw-9c; Tue, 25 Jun 2019 04:25:54 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3AB8586677;
+ Tue, 25 Jun 2019 08:25:49 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7FA40608D0;
+ Tue, 25 Jun 2019 08:25:44 +0000 (UTC)
+Date: Tue, 25 Jun 2019 10:25:42 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Message-ID: <20190625102542.4c0d52a7.cohuck@redhat.com>
+In-Reply-To: <20190621134338.8425-1-david@redhat.com>
+References: <20190621134338.8425-1-david@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20190621144541.13770-1-skrtbhtngr@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [RFC 0/1] Add live migration support to the PVRDMA
- device
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Tue, 25 Jun 2019 08:25:52 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PULL SUBSYSTEM s390x 0/3] s390x/tcg: pending
+ patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,75 +70,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yuval Shaia <yuval.shaia@oracle.com>
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Sukrit
+On Fri, 21 Jun 2019 15:43:35 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-On 6/21/19 5:45 PM, Sukrit Bhatnagar wrote:
-> Hi,
-[...]
-> This RFC is meant to request suggestions on the things which are
-> working and for help on the things which are not.
->
-[...]
-> What is not working:
->
-[...]
->
-> * It seems that vmxnet3 migration itself is not working properly, at least
->    for me. The pvrdma device depends on it, vmxnet3 is function 0 and pvrdma
->    is function 1. This is happening even for a build of unmodified code from
->    the master branch.
->    After migration, the network connectivity is lost at destination.
->    Things are fine at the source before migration.
->    This is the command I am using at src:
->
->    sudo /home/skrtbhtngr/qemu/build/x86_64-softmmu/qemu-system-x86_64 \
->      -enable-kvm \
->      -m 2G -smp cpus=2 \
->      -hda /home/skrtbhtngr/fedora.img \
->      -netdev tap,id=hostnet0 \
->      -device vmxnet3,netdev=hostnet0,id=net0,mac=52:54:00:99:ff:bc \
->      -monitor telnet:127.0.0.1:4444,server,nowait \
->      -trace events=/home/skrtbhtngr/trace-events \
->      -vnc 0.0.0.0:0
->
->    Similar command is used for the dest. Currently, I am trying
->    same-host migration for testing purpose, without the pvrdma device.
->    Two tap interfaces, for src and dest were created successfully at
->    the host. Kernel logs:
->    ...
->    br0: port 2(tap0) entered forwarding state
->    ...
->    br0: port 3(tap1) entered forwarding state
->
->    tcpdump at the dest reports only outgoing ARP packets, which ask
->    for gateway: "ARP, Request who-has _gateway tell guest1".
->
->    Tried using user (slirp) as the network backend, but no luck.
->    
->    Also tried git bisect to find the issue using a working commit (given
->    by Marcel), but it turns out that it is very old and I faced build
->    errors one after another.
->
->    Please note that e1000 live migration is working fine in the same setup.
->
+> This pull request is not for master.
+> 
+> Hi Conny,
+> 
+> The following changes since commit 33d609990621dea6c7d056c86f707b8811320ac1:
+> 
+>   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-06-18 17:00:52 +0100)
+> 
+> are available in the Git repository at:
+> 
+>   https://github.com/davidhildenbrand/qemu.git tags/s390x-tcg-2019-06-21
+> 
+> for you to fetch changes up to ef506f804a48a6fb7983d721092f1b32a4543f3e:
+> 
+>   s390x/cpumodel: Prepend KDSA features with "KDSA" (2019-06-21 15:26:53 +0200)
+> 
+> ----------------------------------------------------------------
+> One fix for a tcg test case and two cleanups/refactorings of cpu feature
+> definitions.
+> 
+> ----------------------------------------------------------------
+> David Hildenbrand (2):
+>   s390x/cpumodel: Rework CPU feature definition
+>   s390x/cpumodel: Prepend KDSA features with "KDSA"
+> 
+> Richard Henderson (1):
+>   tests/tcg/s390x: Fix alignment of csst parameter list
+> 
+>  target/s390x/cpu_features.c         | 352 +-------------------------
+>  target/s390x/cpu_features_def.h     | 352 +-------------------------
+>  target/s390x/cpu_features_def.inc.h | 369 ++++++++++++++++++++++++++++
+>  target/s390x/gen-features.c         |  30 +--
+>  tests/tcg/s390x/csst.c              |   2 +-
+>  5 files changed, 402 insertions(+), 703 deletions(-)
+>  create mode 100644 target/s390x/cpu_features_def.inc.h
+> 
 
-I tried to git bisect , but I couldn't find a working version of vmxnet 
-supporting live migration ....
-I tried even a commit from December 2014 and it didn't work.
-
-What is strange (to me) is that the networking packets can't be sent 
-from the guest (after migration)
-even after rebooting the guest.
-
-Any help or pointer would be greatly appreciated.
-Thanks,
-Marcel
-
-
-[...]
+Thanks, pulled.
 
