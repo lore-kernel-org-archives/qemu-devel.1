@@ -2,79 +2,95 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B71AC48BD4
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 06:49:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E480AC48BD7
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 06:57:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51DDD20656
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 06:49:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7EB4204EC
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 06:57:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="c6uZPUud"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51DDD20656
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VYvG7RPE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7EB4204EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56872 helo=lists.gnu.org)
+Received: from localhost ([::1]:56966 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hffGQ-0003vt-4f
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 02:49:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54926)
+	id 1hffOv-0006WX-9M
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 02:57:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56866)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <joel.stan@gmail.com>) id 1hffFS-0003NC-NF
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 02:48:11 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hffO8-000657-Qq
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 02:57:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <joel.stan@gmail.com>) id 1hffFR-0006YQ-N6
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 02:48:10 -0400
-Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:35126)
+ (envelope-from <richard.henderson@linaro.org>) id 1hffO5-0003jZ-OI
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 02:57:07 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42162)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <joel.stan@gmail.com>)
- id 1hffFO-0006WW-Ru; Tue, 25 Jun 2019 02:48:07 -0400
-Received: by mail-qk1-x741.google.com with SMTP id l128so11734058qke.2;
- Mon, 24 Jun 2019 23:48:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Qgw/UEmTi+EnyEYVz+R14jW+cx7uhlztrfnIC1iFJkA=;
- b=c6uZPUudMoomhfjYM4Ec0lS2jtRu3EyRTYNcegeqdXSjsWI92qmE0cnZ4jUO71MXNh
- VAMBcJuk6VQLjzIcuQWbDMVlSkI7swjP8Oy3RC0+QKbzIp2RN6BTUxrf/0PvZkh+2SpZ
- MrPRUrE4ChWW+AhH0IYQtmOVVvUfp9aZYADzs=
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hffO3-0003gh-Oa
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 02:57:04 -0400
+Received: by mail-wr1-x444.google.com with SMTP id x17so16451741wrl.9
+ for <qemu-devel@nongnu.org>; Mon, 24 Jun 2019 23:57:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=9sJuLSlZHV7pA/c1XeCjbNNVA1Os9l6+wI/Pw4XZ+6s=;
+ b=VYvG7RPEoJMhDYyqJyoYW0feIkH3cvObUfzXhMYqFF5LeTXoGhXuKECuSZvuRpLrSr
+ 1c6d9DRIjNB4KQFzBrm6MXq6jsHNuEhAwjJMILdV+TjXQkYFlasN1/Eqtr1Sa1YS4YAx
+ HSFimPVpcjHtn20pQJ+Vgp3tjxJ0E3PlrUPaX1kLco1TJyGDWn7ib513F2J2GlacihwV
+ M9QUs0J42ybDGGqzT9hE0MVJKCCAHpA6gwrRuoHzuUn4xpVkbYtLtapmY0W2mJSdnntq
+ dm739+CU3XCN3q68O/4jB3V7pxog1uaECyXoGjNUhdnZtEX8gnreD3FOVPzGzC1jUfW4
+ IpyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Qgw/UEmTi+EnyEYVz+R14jW+cx7uhlztrfnIC1iFJkA=;
- b=eAYr9nyXZyXDqqDjg3dtGgOz4yIUfd6kczIU0hUozhVxxx24zWxwtYyS2tJoH2E0Sp
- gcvmmCepY9zvhnf5lTjJR7iK5k6LeaChP4ClIdM8B+aK6stsTO8qt2HrwNRMhF1bMLKj
- HNE+Y+gZ7Tg0aRgsxysUdIMuX4aR84iSNBiUZFQP6aUsS0G9hUxjonkI5/jqdNlimpHL
- F720iX0XksjbA28KiMxl9SeDdMeCZWhQRedFciGEAuXPYz/wS+udwXHreNu/rr/a7G/J
- Lc8BEMD+MJZIBqpbpZq7vvgm8hDltg9ICiK8BN9/rO8bwN3YfXondt6cST4i7HG5j08q
- z/Xw==
-X-Gm-Message-State: APjAAAVeyl0lwkvuK1aka2QEk8bpmCgfOMu/vis41P8uDtxvsIf254ic
- Ps/NiGbg6Wo2impJyLj4SPAVV4DN5zxhuQQUrlg=
-X-Google-Smtp-Source: APXvYqyT0nYksZC7XUh76ZUdtStKvijqz1suVQmwXHG2X0U4Mpi4PlDGR7/PPjQJtJ3LWwj9LN6QmAEbCbVl2TH4dsk=
-X-Received: by 2002:a37:b0c6:: with SMTP id
- z189mr76395184qke.208.1561445284779; 
- Mon, 24 Jun 2019 23:48:04 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=9sJuLSlZHV7pA/c1XeCjbNNVA1Os9l6+wI/Pw4XZ+6s=;
+ b=W2liQdbxgaUBrMb7jcwBTWqaNSGn60bIOReZUp/ikLhNA37vSypclEd/lu2Wt68nz5
+ TmKIh2kBJdoIqqKNRtvGRb9P7kkO5f3NZBwFagpRKJPnqyiJQZFSvyTbAIigoajGDpsq
+ A1ddO4WGObIZI79wn0u7kQZKIA+WG/ub54z+ROKs8WmrD+0q+Xg+LWzz6V1qvN5bmHBu
+ JGTtdDPVJo9+yiwfywuY6smMKQAA25rRqa2zhKThtkmKqywBrSSBksFnB6FMQ1a2uLMb
+ AlUNkcE54jx72BWlin1QpezeczgPBZEP6UYUOBBm23J3R2Uh6V+xGw1A64UMw11KBHSJ
+ QsdQ==
+X-Gm-Message-State: APjAAAXOVKcV6a7Ph1rzxfpbmCxF7dHUuM9ee/tMLL3BB6uMa4LIeDMf
+ 7Mgp3HfoofC0bNrbJRbyE8yVpw==
+X-Google-Smtp-Source: APXvYqy3e48LI3t+jhb9wvTq18FBjGn1xB4T/66puYqDDdvEaYFr9432pONqyC6QDHN9yBJROQzBjw==
+X-Received: by 2002:adf:b605:: with SMTP id f5mr56876511wre.305.1561445820506; 
+ Mon, 24 Jun 2019 23:57:00 -0700 (PDT)
+Received: from [192.168.42.31] ([62.94.96.158])
+ by smtp.gmail.com with ESMTPSA id c1sm26361949wrh.1.2019.06.24.23.56.59
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 24 Jun 2019 23:56:59 -0700 (PDT)
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+References: <20190519041522.12327-1-richard.henderson@linaro.org>
+ <8f28d008-2608-a579-7505-4546b08deb41@linaro.org>
+ <085d6881-f518-9888-a13e-081cdc09de46@ilande.co.uk>
+ <0b9f4772-37f6-1453-e4ea-5ad9d0f52a5b@ilande.co.uk>
+ <acc57487-c8a0-9380-bc2a-4de22541eabf@ilande.co.uk>
+ <CAL1e-=iavFqEeFuNm2efVM7mu5OaABBVo90wqJEhmoWa4DQv=Q@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <ffae3651-5daf-e008-6562-2de09d82ace9@linaro.org>
+Date: Tue, 25 Jun 2019 08:56:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <20190621065242.32535-1-joel@jms.id.au>
- <6aec047c-81bd-e179-6fad-4bee896ea7a2@kaod.org>
- <21bd02d0-d051-e730-bfb9-bca2f57babe8@redhat.com>
-In-Reply-To: <21bd02d0-d051-e730-bfb9-bca2f57babe8@redhat.com>
-From: Joel Stanley <joel@jms.id.au>
-Date: Tue, 25 Jun 2019 06:47:52 +0000
-Message-ID: <CACPK8XcVZ68g+6BCvAszZubJOE1Y=Ac2EvZ84u_740Lo4Rqx1A@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAL1e-=iavFqEeFuNm2efVM7mu5OaABBVo90wqJEhmoWa4DQv=Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::741
-Subject: Re: [Qemu-devel] [PATCH v2] aspeed: Link SCU to the watchdog
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH v4 0/7] tcg/ppc: Add vector opcodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,72 +102,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>,
+ QEMU Developers <qemu-devel@nongnu.org>, Howard Spoelstra <hsp.cat7@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 21 Jun 2019 at 09:06, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
->
-> On 6/21/19 10:25 AM, C=C3=A9dric Le Goater wrote:
-> > On 21/06/2019 08:52, Joel Stanley wrote:
-> >> The ast2500 uses the watchdog to reset the SDRAM controller. This
-> >> operation is usually performed by u-boot's memory training procedure,
-> >> and it is enabled by setting a bit in the SCU and then causing the
-> >> watchdog to expire. Therefore, we need the watchdog to be able to
-> >> access the SCU's register space.
-> >>
-> >> This causes the watchdog to not perform a system reset when the bit is
-> >> set. In the future it could perform a reset of the SDMC model.
-> >>
-> >> Signed-off-by: Joel Stanley <joel@jms.id.au>
-> >
-> > I was keeping this patch in my tree (hence the Sob) hoping that
-> > someone could find the time to study the reset question. But this
-> > patch is useful as it is and I think we should merge it.
-> >
-> > Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> >
-> > Thanks,
-> >
-> > C.
-> >
-> >> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+On 6/23/19 7:10 PM, Aleksandar Markovic wrote:
+> On Sat, Jun 22, 2019 at 5:02 PM Mark Cave-Ayland
+> <mark.cave-ayland@ilande.co.uk> wrote:
+>>
+>> On 22/06/2019 15:20, Mark Cave-Ayland wrote:
+>>
+>>> I've just given your tcg-ppc-vsx branch a spin here, and like Howard I'm getting
+>>> segfaults trying to launch my MacOS images :(  The segfault is weird: it doesn't get
+>>> caught by an attached gdb and the qemu-system-ppc process seems to hang around like a
+>>> zombie which makes me think that it's probably an illegal instruction of some kind,
+>>> but the PPC kernel can't handle it as well as x86 does.
+>>>
+>>> With a bit more work I bisected it down to the first commit in the patchset
+>>> (d8dcbb57e9: "tcg/ppc: Initial backend support for Altivec") and then as an
+>>> experiment I hacked tcg_can_emit_vec_op() to always return 0 to see if that made a
+>>> difference, but the segfault still appears.
+>>>
+>>> The commit message mentions that the load and store helpers are also improved, so I
+>>> wonder if they are what is causing the error rather than the vector parts? Also in
+>>> the kernel log I see the following messages appearing:
+>>>
+>>> [3639669.374942] qemu-system-ppc[28591]: segfault (11) at 64b8 nip f87280 lr f8723c
+>>> code 1 in qemu-system-ppc[94e000+aa0000]
+>>> [3639669.380015] qemu-system-ppc[28591]: code: 93c10038 91810020 90010044 7fc802a6
+>>> 3fde0059 2e030000 3bde6c18 7c9d2378
+>>> [3639669.385056] qemu-system-ppc[28591]: code: 813e80a0 7cbb2b78 7cda3378 7cf93b78
+>>> <81428ff8> 9141001c 39400000 81290000
+>>>
+>>> Does that help at all? If not let me know if there are any other tests that you'd
+>>> like me to try to help debug this.
+>>
+>> One more hint: if I try a build of d8dcbb57e9 along with my tcg_can_emit_vec_op()
+>> hack and pass --enable-debug-tcg to configure then I get an assert on startup:
+>>
+>> qemu-system-ppc: /home/mca/src/qemu/tcg/tcg.c:2207: process_op_defs: Assertion `tdefs
+>> != ((void *)0)' failed.
+>> Aborted
+>>
+> 
+> Mark, Richard, Howard, David,
+> 
+> I just sent v5 of the series, that is (in the sense of net-result of
+> code changes) equivalent to v4, but the patch 1/7 from v4 is now split
+> into ten smaller patches. This was done mainly to enable Mark to
+> perhaps try v5 and bisect, in order to at least somewhat narrow down
+> the culprit. Most likely it will be patch 5 from v5, that is still
+> sizeable, but even if this is the case, we can eliminate other smaller
+> things from consideration.
 
-> >> --- a/hw/watchdog/wdt_aspeed.c
-> >> +++ b/hw/watchdog/wdt_aspeed.c
-> >> @@ -44,6 +44,9 @@
-> >>
-> >>  #define WDT_RESTART_MAGIC               0x4755
-> >>
-> >> +#define SCU_RESET_CONTROL1              (0x04 / 4)
-> >> +#define    SCU_RESET_SDRAM              BIT(0)
-> >> +
-> >>  static bool aspeed_wdt_is_enabled(const AspeedWDTState *s)
-> >>  {
-> >>      return s->regs[WDT_CTRL] & WDT_CTRL_ENABLE;
-> >> @@ -222,6 +225,13 @@ static void aspeed_wdt_timer_expired(void *dev)
-> >>  {
-> >>      AspeedWDTState *s =3D ASPEED_WDT(dev);
-> >>
-> >> +    /* Do not reset on SDRAM controller reset */
-> >> +    if (s->scu->regs[SCU_RESET_CONTROL1] & SCU_RESET_SDRAM) {
->
-> This would be cleaner as an static inlined function in
-> "hw/misc/aspeed_scu.h" IMO, maybe 'bool scu_sdram_is_reset()'.
+Thanks for the help on that.
 
-I will take this suggestion on board in the future when I model the
-watchdog reset behavior in more detail.
+I don't believe your split is actually bisectable -- there's a minimum amount
+that is required to enable vector opcodes at all.  Patch 5 is the first that
+enables tcg_out_{mov,ld,st}, so while patches beforehand may compile, they
+certainly will not run.
 
->
-> Anyway the patch looks sane:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+I can retain your split, but for real bisectability we need to move the enable
+of TCG_TARGET_HAS_v128 from patch 2 to patch 5.
 
-Thanks.
+Given that all this works for me on a Power9 host, I expect that there's a
+simple fix for Mark's G5 host.  Given the above assertion, a missing opcode
+definition, perhaps for -m32 vs -m64?
 
-Joel
+
+r~
 
