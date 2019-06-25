@@ -2,93 +2,97 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86517C48BD4
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 15:24:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D4CFC48BD4
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 15:24:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1759C2080C
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 15:24:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1759C2080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 751202080C
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 15:24:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 751202080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33038 helo=lists.gnu.org)
+Received: from localhost ([::1]:33054 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfnIy-0008Rb-28
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 11:24:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54532)
+	id 1hfnJT-0001T9-Lu
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 11:24:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57647)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hfmyu-0007aE-SF
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 11:03:38 -0400
+ (envelope-from <walling@linux.ibm.com>) id 1hfnDD-00046L-EV
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 11:18:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hfmys-0000hd-9n
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 11:03:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33636)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hfmyo-0000br-Hd; Tue, 25 Jun 2019 11:03:30 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 39B9E307D945;
- Tue, 25 Jun 2019 15:03:23 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-156.brq.redhat.com
- [10.40.204.156])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 59FCB1019303;
- Tue, 25 Jun 2019 15:03:07 +0000 (UTC)
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <1559152576-281803-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <87a5ec62-6274-77c6-60a3-b4ad7b4ec822@redhat.com>
- <3362e8ef-d698-e860-9830-45a3f924ef48@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <a63c700d-8206-06c5-ee5e-70d0534dd147@redhat.com>
-Date: Tue, 25 Jun 2019 17:03:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <3362e8ef-d698-e860-9830-45a3f924ef48@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="naesmTpyGTh4gWMrzve75dQXPgeaBjflU"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Tue, 25 Jun 2019 15:03:28 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v7 0/3] block/stream: get rid of the base
+ (envelope-from <walling@linux.ibm.com>) id 1hfnDA-0007Fl-VK
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 11:18:22 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43598
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+ id 1hfnD9-00078K-1d
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 11:18:19 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x5PF3R8N025384
+ for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 11:18:13 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2tbnn9hp3w-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 11:18:13 -0400
+Received: from localhost
+ by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
+ Tue, 25 Jun 2019 16:18:12 +0100
+Received: from b01cxnp22034.gho.pok.ibm.com (9.57.198.24)
+ by e13.ny.us.ibm.com (146.89.104.200) with IBM ESMTP SMTP Gateway: Authorized
+ Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Tue, 25 Jun 2019 16:18:09 +0100
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com
+ [9.57.199.107])
+ by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x5PFI8MJ49938898
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 25 Jun 2019 15:18:08 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 035BE124054;
+ Tue, 25 Jun 2019 15:18:08 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id EE5E912405A;
+ Tue, 25 Jun 2019 15:18:07 +0000 (GMT)
+Received: from collin-T470p.pok.ibm.com (unknown [9.63.14.221])
+ by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+ Tue, 25 Jun 2019 15:18:07 +0000 (GMT)
+From: Collin Walling <walling@linux.ibm.com>
+To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com,
+ rth@twiddle.net, david@redhat.com, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, mst@redhat.com, pbonzini@redhat.com
+Date: Tue, 25 Jun 2019 11:17:07 -0400
+X-Mailer: git-send-email 2.7.4
+X-TM-AS-GCONF: 00
+x-cbid: 19062515-0064-0000-0000-000003F3864D
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011328; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000286; SDB=6.01223108; UDB=6.00643639; IPR=6.01004281; 
+ MB=3.00027462; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-25 15:18:11
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19062515-0065-0000-0000-00003E071D9D
+Message-Id: <1561475829-19202-1-git-send-email-walling@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-06-25_11:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906250116
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: [Qemu-devel] [PATCH v5 0/2] Guest Support for DIAGNOSE 0x318
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,141 +104,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "berto@igalia.com" <berto@igalia.com>, Denis Lunev <den@virtuozzo.com>,
- "wencongyang2@huawei.com" <wencongyang2@huawei.com>,
- "xiechanglong.d@gmail.com" <xiechanglong.d@gmail.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---naesmTpyGTh4gWMrzve75dQXPgeaBjflU
-Content-Type: multipart/mixed; boundary="1c2ynLPIb71Ys6PSBgV8FO7cJMtSipvWs";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "berto@igalia.com"
- <berto@igalia.com>, "jsnow@redhat.com" <jsnow@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>, "fam@euphon.net"
- <fam@euphon.net>, "wencongyang2@huawei.com" <wencongyang2@huawei.com>,
- "xiechanglong.d@gmail.com" <xiechanglong.d@gmail.com>,
- Denis Lunev <den@virtuozzo.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <a63c700d-8206-06c5-ee5e-70d0534dd147@redhat.com>
-Subject: Re: [PATCH v7 0/3] block/stream: get rid of the base
-References: <1559152576-281803-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <87a5ec62-6274-77c6-60a3-b4ad7b4ec822@redhat.com>
- <3362e8ef-d698-e860-9830-45a3f924ef48@virtuozzo.com>
-In-Reply-To: <3362e8ef-d698-e860-9830-45a3f924ef48@virtuozzo.com>
+Changelog:
 
---1c2ynLPIb71Ys6PSBgV8FO7cJMtSipvWs
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+    v5
+        - split off header updates in kvm_s390x.h to a separate patch
+        - implemented CPU model feature for this insn made available with
+            zEC12-full and later models
+        - s/cpc/diag318_info in order to make the relevant data more clear
+        - reduced S390_MAX_CPUS from 248 to 247
 
-On 25.06.19 16:40, Andrey Shinkevich wrote:
->=20
->=20
-> On 19/06/2019 22:29, Max Reitz wrote:
->> On 29.05.19 19:56, Andrey Shinkevich wrote:
->>> This series introduces a bottom intermediate node that eliminates the=
+The DIAGNOSE 0x318 instruction is a privileged instruction that is executed by the
+linux kernel once and only once during setup. This requires interception by KVM to 
+handle the instruction call safely. The instruction assists with determining the 
+environment the VM is running in -- this is better described in the KVM patches.
 
->>> dependency on the base that may change while stream job is running.
->>> It happens when stream/commit parallel jobs are running on the same
->>> backing chain. The base node of the stream job may be a top node of
->>> the parallel commit job and can change before the stream job is
->>> completed. We avoid that dependency by introducing the bottom node.
->>>
->>> v7: [resend by Andrey]
->>>    01: assert(intermediate) was inserted before the call to
->>>        bdrv_is_allocated() in the intermediate node loop of the
->>>        bdrv_is_allocated_above() as suggested by Max.
->>>    02: The change of the intermediate node loop in the stream_start()=
- was
->>>        rolled back to its original design and the reassignment of the=
- base
->>>        node pointer was added as Vladimir and Max suggested. The rele=
-vant
->>>        comment was amended.
->>>
->>> v6: [resend by Vladimir]
->>>    01: improve comment in block/io.c, suggested by Alberto
->>>
->>> v5: [resend by Vladimir]
->>>    01: use comment wording in block/io.c suggested by Alberto
->>>
->>> v4:
->>> trace_stream_start reverted to the base.
->>> bdrv_is_allocated_above_inclusive() deleted and the new parameter
->>> 'bool include_base' was added to the bdrv_is_allocated_above().
->>>
->>> Andrey Shinkevich (3):
->>>    block: include base when checking image chain for block allocation=
+The analogous KVM patches still under review can be found here:
+https://marc.info/?l=linux-s390&m=156147521528818&w=2
 
->>>    block/stream: refactor stream_run: drop goto
->>>    block/stream: introduce a bottom node
->>>
->>>   block/commit.c         |  2 +-
->>>   block/io.c             | 21 +++++++++++++------
->>>   block/mirror.c         |  2 +-
->>>   block/replication.c    |  2 +-
->>>   block/stream.c         | 56 ++++++++++++++++++++++++---------------=
------------
->>>   include/block/block.h  |  3 ++-
->>>   tests/qemu-iotests/245 |  4 ++--
->>>   7 files changed, 49 insertions(+), 41 deletions(-)
->>
->> Reviewed-by: Max Reitz <mreitz@redhat.com>
->>
->> Just needs some simple changes to patch 1 to rebase it on 863cc78f1b3
->> and c8bb23cbdbe.
->>
->> Max
->>
->=20
-> Please let us know who would take this series for pull request?
+Guest support for the diag 318 instruction is accomplished by implementing a device 
+class, a cpu model feature, and adjusting the Read Info struct. The Read Info struct
+adjustment coincidentally reduces the maximum number of VCPUs we can have by one.
 
-Nothing, I was just waiting for my current pull request (lingering from
-last week due to a build failure because of one of the patches) to be
-processed.
+A device class is used for this instruction in order to streamline the migration and 
+reset of the DIAG 318 related data.
 
-I suppose I won=E2=80=99t wait longer and just take this series now and d=
-eal
-with the fallout later if there=E2=80=99s something else in my last week=E2=
-=80=99s pull
-request that needs fixing...
+A CPU model feature is added for this instruction, appropriately named diag318.
 
-So: Thanks, applied to my block branch:
+The instruction is determined by a Read Info byte 134 bit 0. This is a new byte that
+expands into the space of the Read Info SCCB that is also used to contain CPU entry
+data. Due to this expansion, we lose space for one CPU entry and we must reduce the
+maximum possible CPUs from 248 to 247. Hopefully this drawback does not affect many 
+VMs.
 
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+Collin Walling (2):
+  s390/kvm: header sync for diag318
+  s390: diagnose 318 info reset and migration support
 
-Max
+ hw/s390x/Makefile.objs          |  1 +
+ hw/s390x/diag318.c              | 80 +++++++++++++++++++++++++++++++++++++++++
+ hw/s390x/diag318.h              | 38 ++++++++++++++++++++
+ hw/s390x/s390-virtio-ccw.c      | 17 +++++++++
+ hw/s390x/sclp.c                 |  3 ++
+ include/hw/s390x/sclp.h         |  2 ++
+ linux-headers/asm-s390/kvm.h    |  4 +++
+ target/s390x/cpu.h              |  8 ++++-
+ target/s390x/cpu_features.c     |  3 ++
+ target/s390x/cpu_features.h     |  1 +
+ target/s390x/cpu_features_def.h |  3 ++
+ target/s390x/gen-features.c     |  1 +
+ target/s390x/kvm-stub.c         | 10 ++++++
+ target/s390x/kvm.c              | 29 +++++++++++++++
+ target/s390x/kvm_s390x.h        |  2 ++
+ 15 files changed, 201 insertions(+), 1 deletion(-)
+ create mode 100644 hw/s390x/diag318.c
+ create mode 100644 hw/s390x/diag318.h
 
+-- 
+2.7.4
 
---1c2ynLPIb71Ys6PSBgV8FO7cJMtSipvWs--
-
---naesmTpyGTh4gWMrzve75dQXPgeaBjflU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0SN6kACgkQ9AfbAGHV
-z0AV0gf8C26hTvBJFcjt42I1OLimAiFs+GFiSpfjcexjmC91UmhBGOkfFVbIU15v
-MyPz8uZK8hqQDZZAPNAOiKV8HECdfVql5Jyj4dPbjj8DcmFzQwreBNacaWUgbui5
-0DRl/JaQRjAjlY8/5tiZEVaMFC4IIMn71qSfq8oVrN5HVW1ifge1M2/SBsGyebI1
-jhTWA2hqJ9qxwEOvyybiu4XxeYZFmLJPr5oBmzw5rWb3UfJjURAQKwsBwbGJO6Rt
-6wt3g3QsZ6K6wA/pSov5xrl+jUneu68K7BU0jLW/uST8UbupMtC8F+zUBdN3UjW+
-6yC0IaAs8Zvap9z+WpoKfTTknNm4fg==
-=0i/f
------END PGP SIGNATURE-----
-
---naesmTpyGTh4gWMrzve75dQXPgeaBjflU--
 
