@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C722C48BD5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 09:22:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A616C48BD4
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 09:22:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2AF8F2146E
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 09:22:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 086352146E
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 09:22:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vR/F/Kto"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AF8F2146E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oJT6s9AR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 086352146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57822 helo=lists.gnu.org)
+Received: from localhost ([::1]:57824 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfheU-0003oR-Ra
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 05:22:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40898)
+	id 1hfhee-0003ra-8U
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 05:22:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40919)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bmeng.cn@gmail.com>) id 1hfhcr-0002Y4-Tw
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 05:20:30 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1hfhcs-0002YK-MO
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 05:20:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1hfhcq-0000YP-R4
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 05:20:29 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:34320)
+ (envelope-from <bmeng.cn@gmail.com>) id 1hfhcr-0000aJ-Q7
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 05:20:30 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:42623)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1hfhcq-0000St-HU; Tue, 25 Jun 2019 05:20:28 -0400
-Received: by mail-ed1-x541.google.com with SMTP id s49so26150004edb.1;
- Tue, 25 Jun 2019 02:20:26 -0700 (PDT)
+ id 1hfhcr-0000YJ-Jf; Tue, 25 Jun 2019 05:20:29 -0400
+Received: by mail-ed1-x542.google.com with SMTP id z25so26100354edq.9;
+ Tue, 25 Jun 2019 02:20:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=mBnU8emzgSKaSu5jklqTb1oBzlbL+zoEDZxrzwhlNaE=;
- b=vR/F/KtoLa3wvDVLgw2z8FPDZeCc9Fc5bywf+02FP0tZUY3VrXQDtBxjCiXrbTs9Wr
- joyCHEKCqAivwx4/qcAFU/XNuwARaYioQpkLKoHDk4Bgfa5j5BTu75zEi36Xptg0BAdV
- oTo0xricH3cxX7Bpn5vcanzcNGcbPxoKCpB1muwA6KEO+1xcmr/QoOqnmbXEVsAfEHgD
- pzb6KdNzh5Vwlq+tr2F4MtsPW2w+Gr7QB08RGeXg8o91NxxUeKzNRQeHPhp8aYT5cRO1
- iUpaEWIGzhXQwR2mppbkvQs+bAUIzr1LNNRH1XGyJusqKfr+7byFoyOmcFVWbDqffHw9
- onGw==
+ :cc; bh=5nNAQ6TNFgZWa3+/JyB2SRv7ZznuPusxfkmaMheDPq8=;
+ b=oJT6s9ARd0QA2NaBdyHxQmZq0SnBDDblqg1lFiOa+TJg+B1HryiLcI+ITlFg+kPv4z
+ RDPwUn64rNxcwzcSil6g0ZsLQNF4jzHUmb1umcgUdH103PbIN8xxBqZlDB+WD1PGDxXR
+ v5XJhFuB+5lj0P9dTKWawQHYrLiSkU9BZ1E0Xcc+hQUPF1Kpk4WaA4ryUTju141pyvLD
+ RPSD0lfxFhC8DQoL7KGwiHACOPqOOffARvenuxx+6ucGwIeXQ4YibYSTKpFFuNFZhgcv
+ cryYW+/jSleN2l9PgzZluYfTKuMAKo82wpm4eAlRZ5ybmVAM5OZfCYcQ+9rhG7em99eS
+ BHbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=mBnU8emzgSKaSu5jklqTb1oBzlbL+zoEDZxrzwhlNaE=;
- b=t5BUl9D2HnIISsgNZPIT6jxknlDBZO1M45CqfXko/GUwDurF+TUIdhwCCY58rD6pCt
- Fh+YbTpdwLrP2toWNIF9qTUK6UA9C7le7EbnA8f3VUOziuBixGU0XyBJ8RR+G1Hi7Uny
- esSyBF/KgpmVlI3NR0NlaBX80bJf17ou0myAitfz2gUN3T/rNcOT3J+3xLfPOFw5BEmY
- XC3C9TXHdSPfnzuMdJ1BwKHvRmkLAy4FON43mxH4FE3KgxuwMQpVL6pVvtMrRiYJuNI9
- jDBq/pKxnZAYtwj44SEr4szbRTCOCHxcIRIfHQGYfeaNy/5dxbKAeder9e0+msIi2rM0
- PdfA==
-X-Gm-Message-State: APjAAAUNYh9uml2Prbr9pgwRcrluxXcjJkAGmCDxMkcoCT50bQYWRV70
- WH/oJrRbXLczYA1X76I0tz0dhJliGj+d3ZfCGJM=
-X-Google-Smtp-Source: APXvYqz71ZYIsjUsygMx0mrym9NQvyz+/ISoeGQ1kaJtGfZP7i9QgCEWDGIW9IhbZJA5EDHbbB+Kj/f32x4XQtj6vhk=
-X-Received: by 2002:a50:c28a:: with SMTP id
- o10mr100739365edf.182.1561454425573; 
- Tue, 25 Jun 2019 02:20:25 -0700 (PDT)
+ bh=5nNAQ6TNFgZWa3+/JyB2SRv7ZznuPusxfkmaMheDPq8=;
+ b=RlG6D2806HNLoSJWD47wjkUh9KTrQ85pClplrOPKSrjixPYC3gKK8nSEehWYDXV2SW
+ uwZJ5Bm+Em7FLCGWR4qZZ5sL1pSZmHyljavrPSW72uyO0BggCmk7TqrsNHFIacXkHnh9
+ QrKaTjZphHsGR58/sKpP3FATWDzJPaEFX7IW5D6aw9+aXw0SY65cYed1ri0rsz6I/uW6
+ e2Ww0DsC7hjfHExlnyY6lIAPd2mRFg4nP62F7tjC3Que9GwpWD2+6XwIB189ejqV37BN
+ +iVAH3bkFpUqnQL9psy/WaggA6D1MqAfcDlC43guAIbS4YT3kLgxidGQxfE76nCV7hdW
+ 7opQ==
+X-Gm-Message-State: APjAAAVeEI7sts7ZdLKKuo88mdaC7pU0eiz4FK4V7LhX+YskkG2qi1nW
+ hSU+Na+xWQfPnpfgtxqP1I1S+ImjsshRhyVngvXgrg==
+X-Google-Smtp-Source: APXvYqyzUvJl33mB7K8d4gN/wpm7HtZBV9E13tXsEOWArAGpiHI8XyE9Tj5aMmg08dXySlAQmG/G6vY2aWUGetS2yuI=
+X-Received: by 2002:a50:9451:: with SMTP id
+ q17mr106854310eda.119.1561454428577; 
+ Tue, 25 Jun 2019 02:20:28 -0700 (PDT)
 MIME-Version: 1.0
 References: <cover.1561414240.git.alistair.francis@wdc.com>
- <03f453d45b8565472386fdb7403b6713ddbb8683.1561414240.git.alistair.francis@wdc.com>
-In-Reply-To: <03f453d45b8565472386fdb7403b6713ddbb8683.1561414240.git.alistair.francis@wdc.com>
+ <03cdfe700a884b52a9f6da0e50bc0693c9a61e03.1561414240.git.alistair.francis@wdc.com>
+In-Reply-To: <03cdfe700a884b52a9f6da0e50bc0693c9a61e03.1561414240.git.alistair.francis@wdc.com>
 From: Bin Meng <bmeng.cn@gmail.com>
-Date: Tue, 25 Jun 2019 17:20:14 +0800
-Message-ID: <CAEUhbmVyDyx-YPdZPj2sj_Xfc1PDbRLO96nTWRQF4ax3+ofWLg@mail.gmail.com>
+Date: Tue, 25 Jun 2019 17:20:17 +0800
+Message-ID: <CAEUhbmWPo5YtaCrzaQZutGHMjj-7ddRk2kUQzxyZg9MsCM=CKA@mail.gmail.com>
 To: Alistair Francis <alistair.francis@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::541
-Subject: Re: [Qemu-devel] [PATCH v1 2/5] hw/riscv: Add support for loading a
- firmware
+X-Received-From: 2a00:1450:4864:20::542
+Subject: Re: [Qemu-devel] [PATCH v1 3/5] hw/riscv: Extend the kernel loading
+ support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,21 +95,18 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 25, 2019 at 6:19 AM Alistair Francis
+On Tue, Jun 25, 2019 at 6:18 AM Alistair Francis
 <alistair.francis@wdc.com> wrote:
 >
-> Add support for loading a firmware file for the virt machine and the
-> SiFive U. This can be run with the following command:
+> Extend the RISC-V kernel loader to support Image and uImage files.
+> A Linux kernel can now be booted with:
 >
->     qemu-system-riscv64 -machine virt -bios fw_jump.bin -kernel vmlinux
+>     qemu-system-riscv64 -machine virt -bios fw_jump.bin -kernel Image
 >
 > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->  hw/riscv/boot.c         | 26 ++++++++++++++++++++++++++
->  hw/riscv/sifive_u.c     |  4 ++++
->  hw/riscv/virt.c         |  4 ++++
->  include/hw/riscv/boot.h |  2 ++
->  4 files changed, 36 insertions(+)
+>  hw/riscv/boot.c | 18 ++++++++++++++----
+>  1 file changed, 14 insertions(+), 4 deletions(-)
 >
 
 Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
