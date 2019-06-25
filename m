@@ -2,66 +2,78 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25506C48BD4
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 16:26:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 814C3C48BD5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 16:29:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1727208E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 16:26:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1727208E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 54DE9208E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 16:29:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54DE9208E3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33856 helo=lists.gnu.org)
+Received: from localhost ([::1]:33878 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfoHW-0002GS-68
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 12:26:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46483)
+	id 1hfoJi-0004Cg-MQ
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 12:29:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42848)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1hfoGp-0001Ol-Hp
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 12:26:13 -0400
+ (envelope-from <bounces@canonical.com>) id 1hfo2D-00008a-VV
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 12:11:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hfoGo-0000Pa-6A
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 12:26:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37376)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hfoGn-0000N8-Ve
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 12:26:10 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B3F4DB0CF5;
- Tue, 25 Jun 2019 16:26:08 +0000 (UTC)
-Received: from redhat.com (ovpn-112-73.ams2.redhat.com [10.36.112.73])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 09FE5608A4;
- Tue, 25 Jun 2019 16:26:05 +0000 (UTC)
-Date: Tue, 25 Jun 2019 17:26:03 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190625162603.GK3139@redhat.com>
-References: <20190625050008.12789-1-ehabkost@redhat.com>
- <20190625050008.12789-5-ehabkost@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1hfo2C-000362-1a
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 12:11:05 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57384)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hfo2B-00032A-Rj
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 12:11:03 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hfo28-0001ls-W0
+ for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 16:11:01 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id F0FE22E807D
+ for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 16:11:00 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190625050008.12789-5-ehabkost@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Tue, 25 Jun 2019 16:26:08 +0000 (UTC)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 25 Jun 2019 15:59:47 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1833668@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: arm linux-user
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: laurent-vivier philmd rth
+X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+References: <156110323981.19354.11667763271761846721.malonedeb@wampee.canonical.com>
+ <156147381286.18147.1572558561573422063.malone@gac.canonical.com>
+ <d5c913aa-0edf-ff4b-f21e-8c1a375e10fd@vivier.eu>
+Message-Id: <43eac243-bfb9-fc66-d0ce-8135c68e14a4@redhat.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18991";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: fe542addc7f060d820f6a9df9167061a874f180f
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 4/6] i386: Infrastructure for versioned CPU
- models
+X-Received-From: 91.189.90.7
+Subject: Re: [Qemu-devel] [Bug 1833668] Re: linux-user: Unable to run ARM
+ binaries on Aarch64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -70,66 +82,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1833668 <1833668@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20190625155947.IPtUUtSONiUysdn-ooYRUkkbtSRkbhXKSSlAHIwlNoc@z>
 
-On Tue, Jun 25, 2019 at 02:00:06AM -0300, Eduardo Habkost wrote:
-> Base code for versioned CPU models.  This will register a "-4.1"
-> version of all existing CPU models, and make the unversioned CPU
-> models be an alias for the -4.1 versions on the pc-*-4.1 machine
-> types.
-> 
-> On older machine types, the unversioned CPU models will keep the
-> old behavior.  This way, management software can use old machine
-> types while resolving aliases if compatibility with older QEMU
-> versions is required.
-> 
-> Using "-machine none", the unversioned CPU models will be aliases
-> to the latest CPU model version.
-> 
-> Includes a test case to ensure that:
-> old machine types won't report any alias to versioned CPU models;
-> "pc-*-4.1" will return aliases to -4.1 CPU models;
-> and "-machine none" will report aliases to some versioned CPU model.
+On 6/25/19 5:27 PM, Laurent Vivier wrote:
+> Le 25/06/2019 =C3=A0 16:43, Richard Henderson a =C3=A9crit=C2=A0:
+>> Of course.  There's a separate qemu-arm executable for that.
+> =
 
-I'm wondering about the of tieing CPU versions to the release version
-number and whether its a good idea or not ?
+> On some other architectures (like ppc/ppc64) the idea is the 64bit
+> version supports also all 32bit versions CPUs.
+> =
 
-Could there be a reason for us to introduce 2 or more variants
-of a CPU in the same release & would that be a problem if we needed
-todo it ?
+> I think it's why this bug has been opened.
 
-Consider if we did not have a Broadwell CPU model defined yet
-and we were adding it at the same time as Spectre came out. We
-might have needed to add "Broadwell-NN" and "Broadwell-MM" one
-with "spec-ctrl" and one without, in order to ensure runability
-on hosts with & without the microcode upgrade.  "Broadwell" alias
-would resolve to either the NN or MM variant according to what
-the current host supported.
+At any rate the error message could be more explicit, to avoid
+confusion.
 
-One way to cope with that would have been to add a 3rd digit
-after the version number. eg a Broadwell-4.1.1 and Broadwell-4.1.2
+-- =
 
-An alternative could consider using a plain counter for the CPU
-versions eg Broadwell-1, Broadwell-2, etc.... ?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1833668
 
+Title:
+  linux-user: Unable to run ARM binaries on Aarch64
 
-If we want to backport the newly added CPU model variants to
-exist branches, plain counters don't have the unsightly mismatch.
-eg we'd backport Broadwell-3 to QEMU 3.1, not Broadwell-4.1 to
-QEMU 3.1.  This isn't a functional problem, just something looking
-a bit odd.
+Status in QEMU:
+  Invalid
 
+Bug description:
+  Download a ARM package from https://packages.debian.org/sid/busybox-
+  static
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+  Here tested with: busybox-static_1.30.1-4_armel.deb
+
+  $ file busybox.armel
+  busybox.armel: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), st=
+atically linked, for GNU/Linux 3.2.0, BuildID[sha1]=3D12cf572e016bafa240e11=
+3b57b3641e94b837f37, stripped
+
+  $ qemu-aarch64 --version
+  qemu-aarch64 version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.14)
+
+  $ qemu-aarch64 busybox.armel
+  busybox.armel: Invalid ELF image for this architecture
+
+  $ qemu-aarch64 -cpu cortex-a7 busybox.armel
+  unable to find CPU model 'cortex-a7'
+
+  Also reproduced with commit 33d609990621dea6c7d056c86f707b8811320ac1,
+  while the aarch64_cpus[] array contains Aarch64 CPUs, the arm_cpus[] arra=
+y is empty:
+
+  $ gdb -q aarch64-linux-user/qemu-aarch64
+  (gdb) p aarch64_cpus
+  $1 =3D {{name =3D 0x1fe4e8 "cortex-a57", initfn =3D 0x109bc0 <aarch64_a57=
+_initfn>, class_init =3D 0x0}, {name =3D 0x1fe508 "cortex-a53", initfn =3D =
+0x109a10 <aarch64_a53_initfn>, class_init =3D 0x0}, {name =3D 0x1fe518 "cor=
+tex-a72", =
+
+      initfn =3D 0x109868 <aarch64_a72_initfn>, class_init =3D 0x0}, {name =
+=3D 0x218020 "max", initfn =3D 0x109d70 <aarch64_max_initfn>, class_init =
+=3D 0x0}, {name =3D 0x0, initfn =3D 0x0, class_init =3D 0x0}}
+  (gdb) p arm_cpus
+  $2 =3D {{name =3D 0x0, initfn =3D 0x0, class_init =3D 0x0}}
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1833668/+subscriptions
 
