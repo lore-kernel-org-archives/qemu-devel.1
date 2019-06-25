@@ -2,61 +2,79 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F553C48BD4
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 16:52:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F2ABC48BD4
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 17:10:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 179E2204FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 16:52:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 179E2204FD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=birkelund.eu
+	by mail.kernel.org (Postfix) with ESMTPS id F14F7208CA
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 17:10:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QhS0CHPZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F14F7208CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34050 helo=lists.gnu.org)
+Received: from localhost ([::1]:34160 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfofs-0001F6-8R
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 12:52:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51243)
+	id 1hfoy8-0000Sc-6i
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 13:10:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55835)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <klaus@birkelund.eu>) id 1hfoZX-0006KT-CY
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 12:45:32 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hfowm-00083a-Ls
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 13:09:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <klaus@birkelund.eu>) id 1hfoZW-000064-7f
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 12:45:31 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:44872)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <klaus@birkelund.eu>)
- id 1hfoZT-0008RN-FA; Tue, 25 Jun 2019 12:45:27 -0400
-Received: from apples.localdomain (ip-5-186-120-196.cgn.fibianet.dk
- [5.186.120.196])
- by charlie.dont.surf (Postfix) with ESMTPSA id C33F7BF988;
- Tue, 25 Jun 2019 16:45:22 +0000 (UTC)
-Date: Tue, 25 Jun 2019 18:45:19 +0200
-From: Klaus Birkelund <klaus@birkelund.eu>
-To: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190625164445.GA21148@apples.localdomain>
-Mail-Followup-To: Kevin Wolf <kwolf@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org,
- Keith Busch <keith.busch@intel.com>, Max Reitz <mreitz@redhat.com>,
- qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>
-References: <20190617081205.GA26990@apples.localdomain>
- <c754211f-b41d-4b69-585b-b287fb776d81@redhat.com>
- <20190624080154.GA4263@apples.localdomain>
- <20190624101828.GC12855@linux.fritz.box>
+ (envelope-from <alistair23@gmail.com>) id 1hfowl-0003rx-Jc
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 13:09:32 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:39373)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1hfowl-0003qq-B8; Tue, 25 Jun 2019 13:09:31 -0400
+Received: by mail-lf1-x141.google.com with SMTP id p24so13182622lfo.6;
+ Tue, 25 Jun 2019 10:09:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=lmVDqZcXAzlpBStGwkiT9Uw2BMcZ0MeP+OnYTD8rSgY=;
+ b=QhS0CHPZHYLSMLXU9XNrzbRIZl5+yokkq4xiasNT+lHu9iBha3dEZ1oyazYxcU60m7
+ f+/w7/yHXzjyvmEoC6cVP1h5fElbxe/ahkK54Pkq68Mgd8vV+axwaA35NH+ibsN3vvlf
+ fABEVwRpcc6h6DenwHWfH/4NNAW8O5XiShv4OMFfIlzJycOyMYnpQvPQMcQxpgqC9A4a
+ M8YX6NNSC9AABB/GITovqi7THgDNRWqU2lVri+qJPIJCiw5AAh6dUTCZgKmKuOzEA0A5
+ VbVaZYTZIlUBhYSgw94MubstwQ2Fy5TgORE2cqUP/sb2x+Luo9lkpgVdT/ch4+0tnCWu
+ B2QQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=lmVDqZcXAzlpBStGwkiT9Uw2BMcZ0MeP+OnYTD8rSgY=;
+ b=tANrJQy2E3Yb4hUvwMiCNgvEcUatv2Vey3LZfNQmJmATwTkgmGBG5gYXwRDfYZu4qM
+ stV9jWeipKrZCOPHXa/reOA02RBWtaSCcjn7McwZ215UeS1WcLgKFEiUJ7LNWTBH8NGZ
+ Vo/hWevtVXnYVip1+P2zzSKvoUWQRMUWuInhVi+5WW1TbiJfr2c66PjADu+2lWrD/coW
+ Xs3i62TX8P0A4geKrLhC4GZ5w9WaBjLdCCJBTm67kw99A71NW/vbAQ1L/Bk5Oh6iGiLj
+ mcKp67UvNjv6zpXipbegZQ6zLPRvHfMjLcyV/Sy7a+NlQhqrb23o5VLg3Yrie9mV8pmA
+ g3Dw==
+X-Gm-Message-State: APjAAAVdysiO+MngLGZC/wqZantdVpmg0nq5hP6vzoddi/eKSvlR2dbi
+ 6oiQVVDmKRER3DMlaqi8UFPhBztlxPsPkhDvEdc=
+X-Google-Smtp-Source: APXvYqzWM40d1wWSSTqaSHRf9o09sK1TaS6EytbDp9CooyT4o6TiZX6UaIGdHxOohHxJJOyRoJ27627sp90to4zA/ww=
+X-Received: by 2002:a19:6a01:: with SMTP id u1mr14684005lfu.141.1561482569618; 
+ Tue, 25 Jun 2019 10:09:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190624101828.GC12855@linux.fritz.box>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 128.199.63.193
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC] nvme: how to support multiple
- namespaces
+References: <cover.1561414240.git.alistair.francis@wdc.com>
+In-Reply-To: <cover.1561414240.git.alistair.francis@wdc.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 25 Jun 2019 10:06:33 -0700
+Message-ID: <CAKmqyKOpxtB7SrT2i_UjVsE38=nzf1_q0fmYPhJ4D716j3ZriQ@mail.gmail.com>
+To: Alistair Francis <alistair.francis@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::141
+Subject: Re: [Qemu-devel] [PATCH v1 0/5] RISC-V: Add firmware loading
+ support and default
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,90 +86,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org, Keith Busch <keith.busch@intel.com>,
- Max Reitz <mreitz@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: Palmer Dabbelt <palmer@sifive.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 24, 2019 at 12:18:45PM +0200, Kevin Wolf wrote:
-> Am 24.06.2019 um 10:01 hat Klaus Birkelund geschrieben:
-> > On Thu, Jun 20, 2019 at 05:37:24PM +0200, Laszlo Ersek wrote:
-> > > On 06/17/19 10:12, Klaus Birkelund wrote:
-> > > > Hi all,
-> > > > 
-> > > > I'm thinking about how to support multiple namespaces in the NVMe
-> > > > device. My first idea was to add a "namespaces" property array to the
-> > > > device that references blockdevs, but as Laszlo writes below, this might
-> > > > not be the best idea. It also makes it troublesome to add per-namespace
-> > > > parameters (which is something I will be required to do for other
-> > > > reasons). Some of you might remember my first attempt at this that
-> > > > included adding a new block driver (derived from raw) that could be
-> > > > given certain parameters that would then be stored in the image. But I
-> > > > understand that this is a no-go, and I can see why.
-> > > > 
-> > > > I guess the optimal way would be such that the parameters was something
-> > > > like:
-> > > > 
-> > > >    -blockdev raw,node-name=blk_ns1,file.driver=file,file.filename=blk_ns1.img
-> > > >    -blockdev raw,node-name=blk_ns2,file.driver=file,file.filename=blk_ns2.img
-> > > >    -device nvme-ns,drive=blk_ns1,ns-specific-options (nsfeat,mc,dlfeat)...
-> > > >    -device nvme-ns,drive=blk_ns2,...
-> > > >    -device nvme,...
-> > > > 
-> > > > My question is how to state the parent/child relationship between the
-> > > > nvme and nvme-ns devices. I've been looking at how ide and virtio does
-> > > > this, and maybe a "bus" is the right way to go?
-> > > 
-> > > I've added Markus to the address list, because of this question. No
-> > > other (new) comments from me on the thread starter at this time, just
-> > > keeping the full context.
-> > > 
-> > 
-> > Hi all,
-> > 
-> > I've succesfully implemented this by introducing a new 'nvme-ns' device
-> > model. The nvme device creates a bus named from the device id ('id'
-> > parameter) and the nvme-ns devices are then registered on this.
-> > 
-> > This results in an nvme device being creates like this (two namespaces
-> > example):
-> > 
-> >   -drive file=nvme0n1.img,if=none,id=disk1
-> >   -drive file=nvme0n2.img,if=none,id=disk2
-> >   -device nvme,serial=deadbeef,id=nvme0
-> >   -device nvme-ns,drive=disk1,bus=nvme0,nsid=1
-> >   -device nvme-ns,drive=disk2,bus=nvme0,nsid=2
-> > 
-> > How does that look as a way forward?
-> 
-> This looks very similar to what other devices do (one bus controller
-> that has multiple devices on its but), so I like it.
-> 
-> The thing that is special here is that -device nvme is already a block
-> device by itself that can take a drive property. So how does this play
-> together? Can I choose to either specify a drive directly for the nvme
-> device or nvme-ns devices, but when I do both, I will get an error? What
-> happens if I don't specify a drive for nvme, but also don't add nvme-ns
-> devices?
-> 
+On Mon, Jun 24, 2019 at 3:14 PM Alistair Francis
+<alistair.francis@wdc.com> wrote:
+>
+> This series consolidates the current RISC-V kernel loading
+> impelementation while also adding support for the -bios option and more
+> advanced kernel image types.
+>
+> After consolidating the kernel loading we can extend the boot loader to
+> support a -bios option. We can also extend the kernel loading options to
+> support not just ELF files but other standard formats.
+>
+> Finally we can include the OpenSBI firmware for QEMU users.
+>
+> To avoid breakages we have not changed the default behaviour of QEMU.
+> The plan is to change the default though, which is why an entry to the
+> qemu-deprecated.texi file has been added as well as a new warning.
+>
+> After this series QEMU 4.1 has three options:
+>  1. ``-bios none`` - This is the current default behavior if no -bios option
+>       is included. QEMU will not automatically load any firmware. It is up
+>       to the user to load all the images they need.
+>  2. ``-bios default`` - In a future QEMU release this will become the default
+>       behaviour if no -bios option is specified. This option will load the
+>       default OpenSBI firmware automatically. The firmware is included with
+>       the QEMU release and no user interaction is required. All a user needs
+>       to do is specify the kernel they want to boot with the -kernel option
+>  3. ``-bios <file>`` - Tells QEMU to load the specified file as the firmwrae.
+>
+> All users should transition to using a -bios option. We can start
+> updating all documentation after the release of 4.1.
+>
+> At the end of this series and the transition period we are in the good
+> place of no longer requiring users to build firmware to boot a kernel.
+> Instead users can just run QEMU with the -kernel option and everything
+> will work. They can also override the firmware with their own using
+> the -bios option. Using "-bios none" will result in no firmware being
+> loaded (as it is today).
+>
 
-Hi Kevin,
+@Palmer Dabbelt can this go in your 4.1 PR? It has been reviewed and tested.
 
-Yes, the nvme device is already a block device. My current patch removes
-that property from the nvme device. I guess this breaks backward
-compatibiltiy. We could accept a drive for the nvme device only if no
-nvme-ns devices are configured and connected on the bus.
+Alistair
 
-I'm not entirely sure on the spec, but my gut tells me that an nvme
-device without any namespaces is technically a valid device, although it
-is a bit useless.
-
-I will post my patch (as part of a larger series) and we can discuss it
-there.
-
-Thanks for the feedback!
-
-Klaus
+>
+> Alistair Francis (5):
+>   hw/riscv: Split out the boot functions
+>   hw/riscv: Add support for loading a firmware
+>   hw/riscv: Extend the kernel loading support
+>   roms: Add OpenSBI version 0.3
+>   hw/riscv: Load OpenSBI as the default firmware
+>
+>  .gitmodules                                  |   3 +
+>  Makefile                                     |   5 +-
+>  hw/riscv/Makefile.objs                       |   1 +
+>  hw/riscv/boot.c                              | 154 +++++++++++++++++++
+>  hw/riscv/sifive_e.c                          |  17 +-
+>  hw/riscv/sifive_u.c                          |  22 +--
+>  hw/riscv/spike.c                             |  21 +--
+>  hw/riscv/virt.c                              |  60 ++------
+>  include/hw/riscv/boot.h                      |  32 ++++
+>  pc-bios/opensbi-riscv32-virt-fw_jump.bin     | Bin 0 -> 28848 bytes
+>  pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin | Bin 0 -> 28904 bytes
+>  pc-bios/opensbi-riscv64-virt-fw_jump.bin     | Bin 0 -> 28904 bytes
+>  qemu-deprecated.texi                         |  20 +++
+>  roms/Makefile                                |  48 ++++--
+>  roms/opensbi                                 |   1 +
+>  15 files changed, 278 insertions(+), 106 deletions(-)
+>  create mode 100644 hw/riscv/boot.c
+>  create mode 100644 include/hw/riscv/boot.h
+>  create mode 100644 pc-bios/opensbi-riscv32-virt-fw_jump.bin
+>  create mode 100644 pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin
+>  create mode 100644 pc-bios/opensbi-riscv64-virt-fw_jump.bin
+>  create mode 160000 roms/opensbi
+>
+> --
+> 2.22.0
+>
 
