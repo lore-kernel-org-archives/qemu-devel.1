@@ -2,92 +2,75 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 481FAC48BD5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 08:50:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C337EC48BD4
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 09:04:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12E58215EA
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 08:50:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="axHhpT1U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12E58215EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9CD45214DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 09:04:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CD45214DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57628 helo=lists.gnu.org)
+Received: from localhost ([::1]:57696 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfh9a-00006R-Lf
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 04:50:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60902)
+	id 1hfhNe-0004dB-9l
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 05:04:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36280)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <marcel.apfelbaum@gmail.com>) id 1hfh8p-00086g-5P
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 04:49:28 -0400
+ (envelope-from <dinechin@redhat.com>) id 1hfhK4-0003X8-Tz
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 05:01:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcel.apfelbaum@gmail.com>) id 1hfh8o-0001gs-1B
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 04:49:27 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42036)
+ (envelope-from <dinechin@redhat.com>) id 1hfhJy-0003uE-6b
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 05:01:00 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:44056)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
- id 1hfh8n-0001db-Pw
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 04:49:25 -0400
-Received: by mail-wr1-x442.google.com with SMTP id x17so16839037wrl.9
- for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 01:49:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-transfer-encoding:content-language;
- bh=2xgWGW5YYwBeir2g59IFHHTy/C3LKY1IPFZV46tjMn4=;
- b=axHhpT1UpAEb9Sb2c68meWIa/nxwM5qroPDe1jGj+m/6EpgB791JEARiN2Zww4jzCf
- oAKF10/zvfO+9FOQNykxyx5El2B7cf/K5tEySFIMUS7ynC19Uoed634Ug2CGnzliu/rd
- NgNlOWNay5g5ftah6TjpkqDUxjS0wM2HGQ3ACynXFTvFr49HZQFI/Opz5E9NTWHjVMih
- mGtfKtxqrCtzrpwN0xWPvblIJXJJuj1iO8CGhvX96MFzMfH3Yoh5/zaHn1KKPzwQh2LQ
- xAIk1fEHJLykoyZBVnet+zn303w2diQNIse6Hf6KEnXjp1mnTQ99CXeScKcx9KRA466J
- hWOg==
+ (Exim 4.71) (envelope-from <dinechin@redhat.com>) id 1hfhJu-0003jL-DJ
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 05:00:55 -0400
+Received: by mail-wr1-f66.google.com with SMTP id r16so16871548wrl.11
+ for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 02:00:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-transfer-encoding
- :content-language;
- bh=2xgWGW5YYwBeir2g59IFHHTy/C3LKY1IPFZV46tjMn4=;
- b=LEa/KGbnd1QarN+w2tQgePDp8Bw5lNZbXXRYi7qQKXtIswTBYoW5RZ8Kp23OyyD1n2
- 7UJGKcVDRTnA+8Ak3AEqTKpq9BZ1/OUknfztmwi4q0C1lkQO0nYWdKI9Z7SBhFBF5POK
- xjR+JpblTI9eNbk3OrnUqG1BiYZVDyKV4yZdO3MM9vVGjQkktwxFzCm4Yo8Q2ADDsdFq
- jbVnyPJcwnJMczYMbiZ1KYSEpJjw78+2XBxanZzpquoYjfHN3nw0WEtNyn4UUNgYg3HF
- P4PW8vlTkbI+Yp38EqxXHWeEFXG5rxXqtSN2IgMYCw5eAeZVgIXhUhBw0sj7LaLeKm4Q
- Ecow==
-X-Gm-Message-State: APjAAAWrWv06AGZM1JWyQrM9zuOYNYCkusBFJBcAWj1VYBB9viy0TWL9
- bQEMM/fxs/gEqJJpceTWzN8=
-X-Google-Smtp-Source: APXvYqx2PXwS+JDeWoOJuHmoE6KTpkt9j3dMW4a0ufQmyt7fw1o5osyaLWOF1LqpeiBY7o3vBbDLrQ==
-X-Received: by 2002:adf:da47:: with SMTP id r7mr27332824wrl.56.1561452562772; 
- Tue, 25 Jun 2019 01:49:22 -0700 (PDT)
-Received: from localhost.localdomain ([37.142.144.27])
- by smtp.gmail.com with ESMTPSA id j7sm18577809wru.54.2019.06.25.01.49.21
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Jun 2019 01:49:22 -0700 (PDT)
-To: Dmitry Fleytman <dmitry.fleytman@gmail.com>
-References: <20190621144541.13770-1-skrtbhtngr@gmail.com>
- <a80f7beb-48c1-553a-f137-731e5500b608@gmail.com>
- <1AD565D7-F99E-4879-BFEF-0E2C7474A09A@gmail.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <91874483-215c-1ccc-6f33-5ceeb8f6ec47@gmail.com>
-Date: Tue, 25 Jun 2019 11:49:33 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <1AD565D7-F99E-4879-BFEF-0E2C7474A09A@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: Re: [Qemu-devel] [RFC 0/1] Add live migration support to the PVRDMA
- device
+ h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+ :content-transfer-encoding:message-id:references:to;
+ bh=d9ahpKE7sH2SH5j3Lrdal3YlScUkOLx1/zKcDhQbm3I=;
+ b=Eeb7RM9+NBjptmlUe+NH+EDtbeP9Pq7HSlY7JXcv5yL8RrQ8R12nWcQaYu0AJo3nB8
+ Ipdb9x5jZSvBiI4g2pxC/EqVjsaO1ud0kQDx00yR2tk5bMUk6nyxtNkQEImCplxTLVV/
+ WHrnBX1GzYaINuoCM5iUff8/17j1xVp3pD7h8/WP5zzLaPX5uUpo27BBFOEOcjM1ZzMF
+ CmAdN1sWTdk4tEcjxN4SIAoKHZOqLKyn98MxqmqW+qOpMWGiNmtEf94nVHWbiK4Iv5wb
+ MjyprNpIgMqyQzbG43AA3vawgxHUg5Phrtw7nnY+qW8txHcO9SBvmYFv9KIsIIcKd0Gx
+ Hvag==
+X-Gm-Message-State: APjAAAX6UXE8mxOxSZ6LKCcQ8+7hLtTtwhuxTTpsfIEXl60JV3ytDWd5
+ wqsfNhD3dJnl1i5O5P12iSgAAA==
+X-Google-Smtp-Source: APXvYqxniLZSJdOHUTy0MrSU2SMD9ZGSawwfPBc+oyyWMbvHC/fqa/tQFFueH9/0QRDOz4PKA0TACg==
+X-Received: by 2002:adf:ce03:: with SMTP id p3mr4279007wrn.94.1561453239676;
+ Tue, 25 Jun 2019 02:00:39 -0700 (PDT)
+Received: from ?IPv6:2a01:e35:8b6a:1220:e1dd:b35b:b1e3:d497?
+ ([2a01:e35:8b6a:1220:e1dd:b35b:b1e3:d497])
+ by smtp.gmail.com with ESMTPSA id g11sm12807217wru.24.2019.06.25.02.00.38
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 25 Jun 2019 02:00:38 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+From: Christophe de Dinechin <dinechin@redhat.com>
+In-Reply-To: <20190625081339.9176-1-pbonzini@redhat.com>
+Date: Tue, 25 Jun 2019 11:00:37 +0200
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <07028450-D777-4A5C-A8F8-796B29E362BB@redhat.com>
+References: <20190625081339.9176-1-pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3445.104.11)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH] minikconf: do not include variables from
+ MINIKCONF_ARGS in config-all-devices.mak
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,93 +82,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sukrit Bhatnagar <skrtbhtngr@gmail.com>, qemu-devel@nongnu.org,
- Yuval Shaia <yuval.shaia@oracle.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Dmitry,
 
-On 6/25/19 11:39 AM, Dmitry Fleytman wrote:
->
->> On 25 Jun 2019, at 11:14, Marcel Apfelbaum <marcel.apfelbaum@gmail.com> wrote:
->>
->> Hi Sukrit
->>
->> On 6/21/19 5:45 PM, Sukrit Bhatnagar wrote:
->>> Hi,
->> [...]
->>> This RFC is meant to request suggestions on the things which are
->>> working and for help on the things which are not.
->>>
->> [...]
->>> What is not working:
->>>
->> [...]
->>> * It seems that vmxnet3 migration itself is not working properly, at least
->>>    for me. The pvrdma device depends on it, vmxnet3 is function 0 and pvrdma
->>>    is function 1. This is happening even for a build of unmodified code from
->>>    the master branch.
->>>    After migration, the network connectivity is lost at destination.
->>>    Things are fine at the source before migration.
->>>    This is the command I am using at src:
->>>
->>>    sudo /home/skrtbhtngr/qemu/build/x86_64-softmmu/qemu-system-x86_64 \
->>>      -enable-kvm \
->>>      -m 2G -smp cpus=2 \
->>>      -hda /home/skrtbhtngr/fedora.img \
->>>      -netdev tap,id=hostnet0 \
->>>      -device vmxnet3,netdev=hostnet0,id=net0,mac=52:54:00:99:ff:bc \
->>>      -monitor telnet:127.0.0.1:4444,server,nowait \
->>>      -trace events=/home/skrtbhtngr/trace-events \
->>>      -vnc 0.0.0.0:0
->>>
->>>    Similar command is used for the dest. Currently, I am trying
->>>    same-host migration for testing purpose, without the pvrdma device.
->>>    Two tap interfaces, for src and dest were created successfully at
->>>    the host. Kernel logs:
->>>    ...
->>>    br0: port 2(tap0) entered forwarding state
->>>    ...
->>>    br0: port 3(tap1) entered forwarding state
->>>
->>>    tcpdump at the dest reports only outgoing ARP packets, which ask
->>>    for gateway: "ARP, Request who-has _gateway tell guest1".
->>>
->>>    Tried using user (slirp) as the network backend, but no luck.
->>>       Also tried git bisect to find the issue using a working commit (given
->>>    by Marcel), but it turns out that it is very old and I faced build
->>>    errors one after another.
->>>
->>>    Please note that e1000 live migration is working fine in the same setup.
->>>
->> I tried to git bisect , but I couldn't find a working version of vmxnet supporting live migration ....
->> I tried even a commit from December 2014 and it didn't work.
->>
->> What is strange (to me) is that the networking packets can't be sent from the guest (after migration)
->> even after rebooting the guest.
-> This makes me think that some network offload configuration wasn’t properly migrated or applied.
-> What network backend are you using?
 
-Suktrit tried with tap device, I tried with slirp.
-If you can point me to the property that disables all the offloads it 
-will really help.
+> On 25 Jun 2019, at 10:13, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> When minikconf writes config-devices.mak, it includes all variables =
+including
+> those from MINIKCONF_ARGS.  This causes values from config-host.mak to =
+"stick" to
+> the ones used in generating config-devices.mak, because =
+config-devices.mak is
+> included after config-host.mak.  Avoid this by omitting assignments =
+coming
+> from the command line in the output of minikconf.
+>=20
+> Reported-by: Christophe de Dinechin <cdupontd@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+> scripts/minikconf.py | 5 ++++-
+> 1 file changed, 4 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/scripts/minikconf.py b/scripts/minikconf.py
+> index 0ffc6c38da..3109a81db7 100644
+> --- a/scripts/minikconf.py
+> +++ b/scripts/minikconf.py
+> @@ -688,11 +688,13 @@ if __name__ =3D=3D '__main__':
+>=20
+>     data =3D KconfigData(mode)
+>     parser =3D KconfigParser(data)
+> +    external_vars =3D set()
+>     for arg in argv[3:]:
+>         m =3D re.match(r'^(CONFIG_[A-Z0-9_]+)=3D([yn]?)$', arg)
+>         if m is not None:
+>             name, value =3D m.groups()
+>             parser.do_assignment(name, value =3D=3D 'y')
+> +            external_vars.add(name[7:])
+>         else:
+>             fp =3D open(arg, 'r')
+>             parser.parse_file(fp)
+> @@ -700,7 +702,8 @@ if __name__ =3D=3D '__main__':
+>=20
+>     config =3D data.compute_config()
+>     for key in sorted(config.keys()):
+> -        print ('CONFIG_%s=3D%s' % (key, ('y' if config[key] else =
+'n')))
+> +        if key not in external_vars:
+> +            print ('CONFIG_%s=3D%s' % (key, ('y' if config[key] else =
+'n')))
 
-> Do you see any outgoing packets in the sniffer?
+The approach is interesting, and shorter than the fix
+I had in mind, which was to add a target to generate
+all the config*.mak, then call that from the configure script,
+forcing external variables on the command-line to
+override config*.mak values
 
-I didn't use the sniffer, I checked dmesg in guest, there was a line 
-complaining that it can't send packets.
+>=20
+>     deps =3D open(argv[2], 'w')
+>     for fname in data.previously_included:
+> --=20
+> 2.21.0
 
-Thanks,
-Marcel
+This seems to address the leftover CONFIG_SPICE=3Dy, but
+I ran into what looks like new compilation errors with this.
+For example, with a configure that strips quite a lot away:
 
->> Any help or pointer would be greatly appreciated.
->> Thanks,
->> Marcel
->>
->>
->> [...]
+monitor/hmp-cmds.c: In function =E2=80=98hmp_change=E2=80=99:
+monitor/hmp-cmds.c:1946:17: error: unused variable =E2=80=98hmp_mon=E2=80=99=
+ [-Werror=3Dunused-variable]
+ 1946 |     MonitorHMP *hmp_mon =3D container_of(mon, MonitorHMP, =
+common);
+      |                 ^~~~~~~
+
+This is apparently a side effect of that variable being used
+only under CONFIG_VNC. Patch upcoming. There may be
+other similar side effects.
+
+
+Tested-by: Christophe de Dinechin <dinechin@redhat.com>
+Reviewed-by: Christophe de DInechin <dinechin@redhat.com>
 
 
