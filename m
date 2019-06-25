@@ -2,62 +2,89 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B917C48BD5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 18:13:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94A32C48BD6
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 18:17:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7854E2080C
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 18:13:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7854E2080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2B43C2086D
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 18:17:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YbGF/SBf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B43C2086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34488 helo=lists.gnu.org)
+Received: from localhost ([::1]:34516 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfpx5-0001ft-P6
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 14:13:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46876)
+	id 1hfq0u-0003oe-BG
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 14:17:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48103)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hfpuv-0000Jg-2a
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 14:11:42 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hfpzB-000300-U3
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 14:16:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hfpus-0003NN-64
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 14:11:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:9481)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hfpuo-00039m-Bz
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 14:11:35 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AC29F309266D;
- Tue, 25 Jun 2019 18:11:07 +0000 (UTC)
-Received: from localhost (ovpn-116-76.gru2.redhat.com [10.97.116.76])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2F40A6085B;
- Tue, 25 Jun 2019 18:11:05 +0000 (UTC)
-Date: Tue, 25 Jun 2019 15:11:03 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Message-ID: <20190625181103.GV1862@habkost.net>
-References: <20190625050008.12789-1-ehabkost@redhat.com>
- <20190625161357.GI3139@redhat.com>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hfpzA-0006dN-8Q
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 14:16:05 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:36442)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1hfpz9-0006cf-US
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 14:16:04 -0400
+Received: by mail-ot1-x341.google.com with SMTP id r6so18249790oti.3
+ for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 11:16:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=ZHlrIuSk11MD61W0v3vDArvKslWzs4N0mg5AH7eJoDA=;
+ b=YbGF/SBfoRPaBdx7FJlql2LShSXthSS1EG2HiW7PQKMeUh/Cp8XUPN/Ce8q7ejSTh4
+ V0NGdla+cYb1V+66fa4AooLl8Da9cA1LIOhckMunb84ohpWqQqN6sBs5AXxwBpbSRrdH
+ mvPTCZwqaEAaa3+j+2hhQollCZNTcU7H08K0C2sbBzlcqPZEdzAWZpqLlZbZhwOFGxtO
+ ajnLBozQYGDMX7/kod301PHSAxZLOqi2UsKrGAAZdRDipl5BgjePNG3mfcDiayaw1wa0
+ Xg++7omfYPczTs1O94rqFYNCWOC5iMt5ZduGUqqEsAuHcjBF/dmQbI/6bbva5+1hvtcd
+ g44w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=ZHlrIuSk11MD61W0v3vDArvKslWzs4N0mg5AH7eJoDA=;
+ b=Q5iB/RjMTQPuyv8hS136WYfcmdtusbt2OqpYtzy0YpLJa1UUfWDetP5lyweWDdT2GT
+ QmWLOKJ3M+exhJy0tt0HF6xf4awP9cK0L0+MnFXs0JUjO0Lifa/yX0r+eJt15L71pu4k
+ FGDVfR3oFh0PlWBGHejTgS8s1XCvEi+ycMjnXuzGP+gfdJt+olfCz/Kq/1VgGHt4UDVC
+ xhOg6ki3NsYPZJc1bELL7NCQfnfswSzWFZvUY+ItxO9VWFzBHNrBIV1ksezUko4nlhiR
+ E/Q6HTSTp5li4MKZD7/Zwu6C+dOVuQx1daDxVoUhn7xHUKy+ypxAninBgz38vfMKwbsQ
+ +nDA==
+X-Gm-Message-State: APjAAAVeYj/u/lZrP0QFEsmRozi0lwLhqkqTns0uvU7El4iOLdG6NQkf
+ Hb/52xqm6ibHYkUn2yMfyqtzqzpCQm2KM+YhNrY=
+X-Google-Smtp-Source: APXvYqx1l2foBujIyBvQKgYfsqb3aqa3IEcjXXKgcycVujN9YqAQ/7DBaQ0V5QeNQoy9ft23ZiNB+sCPZrLFDCPWqTs=
+X-Received: by 2002:a05:6830:11d4:: with SMTP id
+ v20mr20232619otq.121.1561486562998; 
+ Tue, 25 Jun 2019 11:16:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190625161357.GI3139@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Tue, 25 Jun 2019 18:11:11 +0000 (UTC)
+Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP; Tue, 25 Jun 2019 11:16:02
+ -0700 (PDT)
+Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP; Tue, 25 Jun 2019 11:16:02
+ -0700 (PDT)
+In-Reply-To: <20190624222844.26584-6-f4bug@amsat.org>
+References: <20190624222844.26584-1-f4bug@amsat.org>
+ <20190624222844.26584-6-f4bug@amsat.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 25 Jun 2019 20:16:02 +0200
+Message-ID: <CAL1e-=h31uYzZ3dpdvwcW5fq5+g9Q5RMpb2r7sB4U3M9DK9T5A@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/6] x86 CPU model versioning
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH 05/10] hw/mips/gt64xxx_pci: Use
+ qemu_log_mask() instead of debug printf()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,98 +96,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pavel Hrdina <phrdina@redhat.com>, Tao Xu <tao3.xu@intel.com>, "Hu,
- Robert" <robert.hu@intel.com>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-devel@nongnu.org,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Artyom Tarasenko <atar4qemu@gmail.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 25, 2019 at 05:13:57PM +0100, Daniel P. Berrang=E9 wrote:
-> On Tue, Jun 25, 2019 at 02:00:02AM -0300, Eduardo Habkost wrote:
-> > This series implements basic infrastructure for CPU model
-> > versioning, as discussed before[1][2][3].  This will finally
-> > allow us to update CPU models in ways that introduce new software
-> > or hardware requirements.
-> >=20
-> > My original plan was to use "query-cpu-model-expansion
-> > mode=3Dstatic" to resolve aliases, but I dropped that plan because
-> > it would increase complexity for management software a lot.
-> > static CPU models are documented as not being affected by the
-> > machine type and accelerator at all, which would make the
-> > versioned CPU models very inconvenient to use in the command
-> > line.  e.g.: users would be forced to replace:
-> >=20
-> >   -cpu Haswell
-> >=20
-> > with:
-> >=20
-> >   -cpu Haswell-4.1,+2apic,+monitor,+kvmclock,+kvm-nopiodelay,+kvm-asy=
-ncpf,+kvm-steal-time,+kvm-pv-eoi,+kvmclock-stable-bit,+x2apic,-acpi,-moni=
-tor,-svm
-> >=20
-> > In the end, making the versioned CPU models static is not a
-> > requirement at all: what we really need is to drop the
-> > runnability guarantees from unversioned CPU model names, and
-> > require management software to resolve the unversioned alias
-> > before saving the VM configuration.
-> >=20
-> > Guest ABI compatibility and live migration guarantees are going
-> > to be kept: unversioned CPU models will still be usable with live
-> > migration.  Only runnability guarantees when updating the machine
-> > type will be dropped.  This means unversioned CPU models are
-> > still reported as migration-safe in query-cpu-definitions.
->=20
-> I'm having a little bit of a hard time parsing the overall behaviour
-> from the above description. Let me outline the examples so you can
-> confirm if I've got it right.
->=20
-> Lets assume there is a VM configured using "Haswell"
->=20
-> Today a mgmt app would pass the CPU model name in to QEMU as is,
-> and thus we get
->=20
->   $QEMU -machine pc-i440fx-4.0 -cpu Haswell ...more args...
->=20
-> The semantics of "Haswell" here is going to vary according to
-> what the machine type pc-i440fx-4.0 customizes wrt Haswell.
->=20
-> If the config later has the machine type changed to pc-i440fx-4.1
-> the semantics of Haswell might change in an arbitrary way. It
-> might even become unrunnable on the current hardware.
+On Jun 25, 2019 12:42 AM, "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org> w=
+rote:
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
 
-If we follow our deprecation policy, this shouldn't happen until
-pc-*-4.3.  On pc-*-4.1 and pc-*-4.2, I expect "-cpu Haswell" to
-stay runnable if it's already runnable with pc-*-4.0.  This will
-give libvirt and other management software some time to adapt.
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-CPU model changes that don't affect runnability, though, are
-already allowed and will still be allowed.
-
-
->=20
-> With the new versioned machine types, the VM config of "Haswell"
-> would be resolved into some arbitrary versioned machine type
-> "Haswell-NNN" and thus the mgmt app would launch
->=20
->   $QEMU -machine pc-i440fx-4.0 -cpu Haswell-NNN ...more args...
->=20
-> The semantics of "Haswell-NNN" will never change no matter what
-> the machine type does.
-
-Exactly.
-
->=20
-> The end user has the option to explicitly give "Haswell-NNN" to
-> the mgmt app if they know they want that particular variant, and
-> in this case the mgmt app won't need to resolve anything (or at
-> least the process of trying to resolve it won't change it).
-
-Yes.  Management software should see that "Haswell-NNN" has no
-"alias-of" field, so it doesn't need to be changed.
-
---=20
-Eduardo
-
+>  hw/mips/gt64xxx_pci.c | 48 +++++++++++++++++++++++++++++++++----------
+>  1 file changed, 37 insertions(+), 11 deletions(-)
+>
+> diff --git a/hw/mips/gt64xxx_pci.c b/hw/mips/gt64xxx_pci.c
+> index 0b9fb02475..f44326f14f 100644
+> --- a/hw/mips/gt64xxx_pci.c
+> +++ b/hw/mips/gt64xxx_pci.c
+> @@ -23,6 +23,7 @@
+>   */
+>
+>  #include "qemu/osdep.h"
+> +#include "qemu/log.h"
+>  #include "hw/hw.h"
+>  #include "hw/mips/mips.h"
+>  #include "hw/pci/pci.h"
+> @@ -466,12 +467,20 @@ static void gt64120_writel(void *opaque, hwaddr
+addr,
+>      case GT_CPUERR_DATAHI:
+>      case GT_CPUERR_PARITY:
+>          /* Read-only registers, do nothing */
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "gt64120: Read-only register write "
+> +                      "reg:0x03%x size:%u value:0x%0*" PRIx64 "\n",
+> +                      saddr << 2, size, size << 1, val);
+>          break;
+>
+>      /* CPU Sync Barrier */
+>      case GT_PCI0SYNC:
+>      case GT_PCI1SYNC:
+>          /* Read-only registers, do nothing */
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "gt64120: Read-only register write "
+> +                      "reg:0x03%x size:%u value:0x%0*" PRIx64 "\n",
+> +                      saddr << 2, size, size << 1, val);
+>          break;
+>
+>      /* SDRAM and Device Address Decode */
+> @@ -510,7 +519,10 @@ static void gt64120_writel(void *opaque, hwaddr addr=
+,
+>      case GT_DEV_B3:
+>      case GT_DEV_BOOT:
+>          /* Not implemented */
+> -        DPRINTF ("Unimplemented device register offset 0x%x\n", saddr <<
+2);
+> +        qemu_log_mask(LOG_UNIMP,
+> +                      "gt64120: Unimplemented device register write "
+> +                      "reg:0x03%x size:%u value:0x%0*" PRIx64 "\n",
+> +                      saddr << 2, size, size << 1, val);
+>          break;
+>
+>      /* ECC */
+> @@ -520,6 +532,10 @@ static void gt64120_writel(void *opaque, hwaddr addr=
+,
+>      case GT_ECC_CALC:
+>      case GT_ECC_ERRADDR:
+>          /* Read-only registers, do nothing */
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "gt64120: Read-only register write "
+> +                      "reg:0x03%x size:%u value:0x%0*" PRIx64 "\n",
+> +                      saddr << 2, size, size << 1, val);
+>          break;
+>
+>      /* DMA Record */
+> @@ -543,23 +559,20 @@ static void gt64120_writel(void *opaque, hwaddr
+addr,
+>      case GT_DMA1_CUR:
+>      case GT_DMA2_CUR:
+>      case GT_DMA3_CUR:
+> -        /* Not implemented */
+> -        DPRINTF ("Unimplemented DMA register offset 0x%x\n", saddr << 2)=
+;
+> -        break;
+>
+>      /* DMA Channel Control */
+>      case GT_DMA0_CTRL:
+>      case GT_DMA1_CTRL:
+>      case GT_DMA2_CTRL:
+>      case GT_DMA3_CTRL:
+> -        /* Not implemented */
+> -        DPRINTF ("Unimplemented DMA register offset 0x%x\n", saddr << 2)=
+;
+> -        break;
+>
+>      /* DMA Arbiter */
+>      case GT_DMA_ARB:
+>          /* Not implemented */
+> -        DPRINTF ("Unimplemented DMA register offset 0x%x\n", saddr << 2)=
+;
+> +        qemu_log_mask(LOG_UNIMP,
+> +                      "gt64120: Unimplemented DMA register write "
+> +                      "reg:0x03%x size:%u value:0x%0*" PRIx64 "\n",
+> +                      saddr << 2, size, size << 1, val);
+>          break;
+>
+>      /* Timer/Counter */
+> @@ -569,7 +582,10 @@ static void gt64120_writel(void *opaque, hwaddr addr=
+,
+>      case GT_TC3:
+>      case GT_TC_CONTROL:
+>          /* Not implemented */
+> -        DPRINTF ("Unimplemented timer register offset 0x%x\n", saddr <<
+2);
+> +        qemu_log_mask(LOG_UNIMP,
+> +                      "gt64120: Unimplemented timer register write "
+> +                      "reg:0x03%x size:%u value:0x%0*" PRIx64 "\n",
+> +                      saddr << 2, size, size << 1, val);
+>          break;
+>
+>      /* PCI Internal */
+> @@ -610,6 +626,10 @@ static void gt64120_writel(void *opaque, hwaddr addr=
+,
+>      case GT_PCI1_CFGADDR:
+>      case GT_PCI1_CFGDATA:
+>          /* not implemented */
+> +        qemu_log_mask(LOG_UNIMP,
+> +                      "gt64120: Unimplemented timer register write "
+> +                      "reg:0x03%x size:%u value:0x%0*" PRIx64 "\n",
+> +                      saddr << 2, size, size << 1, val);
+>          break;
+>      case GT_PCI0_CFGADDR:
+>          phb->config_reg =3D val & 0x80fffffc;
+> @@ -666,7 +686,10 @@ static void gt64120_writel(void *opaque, hwaddr addr=
+,
+>          break;
+>
+>      default:
+> -        DPRINTF ("Bad register offset 0x%x\n", (int)addr);
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "gt64120: Illegal register write "
+> +                      "reg:0x03%x size:%u value:0x%0*" PRIx64 "\n",
+> +                      saddr << 2, size, size << 1, val);
+>          break;
+>      }
+>  }
+> @@ -940,7 +963,10 @@ static uint64_t gt64120_readl(void *opaque,
+>
+>      default:
+>          val =3D s->regs[saddr];
+> -        DPRINTF ("Bad register offset 0x%x\n", (int)addr);
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "gt64120: Illegal register read "
+> +                      "reg:0x03%x size:%u value:0x%0*x\n",
+> +                      saddr << 2, size, size << 1, val);
+>          break;
+>      }
+>
+> --
+> 2.19.1
+>
+>
