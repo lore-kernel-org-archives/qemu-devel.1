@@ -2,70 +2,72 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67ADDC48BD6
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 10:06:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD30FC48BD4
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 10:10:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39F77215EA
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 10:06:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b="M52xewo1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39F77215EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
+	by mail.kernel.org (Postfix) with ESMTPS id A23C120644
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 10:10:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A23C120644
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58254 helo=lists.gnu.org)
+Received: from localhost ([::1]:58294 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfiLX-0007SO-H4
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 06:06:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58407)
+	id 1hfiOs-0002z6-Jp
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 06:10:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60592)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kbastian@mail.uni-paderborn.de>) id 1hfiGK-0004PF-Sm
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:01:20 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1hfiNQ-0001Tz-Dd
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:08:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kbastian@mail.uni-paderborn.de>) id 1hfiGG-0000bs-QS
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:01:14 -0400
-Received: from telepax.uni-paderborn.de ([131.234.189.14]:56576)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
- id 1hfiGC-0000NB-Se
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:01:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=mail.uni-paderborn.de; s=20170601; h=Content-Transfer-Encoding:Content-Type
- :In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:
- Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
- Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
- List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
- bh=KmyxiAjadGekmOj3zZzbypkz7ZXT/QrWyxcd1C5JsWk=; b=M52xewo1f+te7XmqhxVaL2GPCO
- Lko3Mh5K9ulMjouHy1e17RQXTCYSbLbB4On24SI0zHkz9kHsjokmRn5kRCvDmH6SddMm+tIhUebIs
- uB0zxanZU/xnMWlMLYz9olVaNyfZah/qEkt/jFRPGZRDSSmU3/kHcgIf4UWuSi1HXejQ=;
-To: David Brenken <david.brenken@efs-auto.org>, qemu-devel@nongnu.org
-References: <20190624070339.4408-1-david.brenken@efs-auto.org>
- <20190624070339.4408-5-david.brenken@efs-auto.org>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <5ab305b9-a527-f91c-38b0-12167d63a0da@mail.uni-paderborn.de>
-Date: Tue, 25 Jun 2019 12:00:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+ (envelope-from <palmer@dabbelt.com>) id 1hfiNP-0007P9-2p
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:08:36 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:43035)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hfiNO-0007OB-Tb
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 06:08:35 -0400
+Received: by mail-pg1-f193.google.com with SMTP id f25so8716143pgv.10
+ for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 03:08:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:date:message-id:mime-version
+ :content-transfer-encoding:cc:from:to;
+ bh=don9t9xuSfJ9sumgvWd/xcF8icVMgBCMEjRj7CpLYOU=;
+ b=V/vRM1AtvLfCv9pWzBaucYEH76LjxDmyp3RUMI6pU+oWW/AmW2JETG1fhSSqa+0nGu
+ Lw39OMceTLwbuoYj4MQQCEk1AtbjVlkwu/5d8U0mh9Lm5x8oi9PjbXcxmvTZf343FfQh
+ 5/YRjjEQmUyZ3UZJyx3akTCbzVAl2el5eBT0x11rBcv1PYvWBH8L6nWyt8uVPQJ4zLFS
+ WWSw2+1xy4hpKjjTx2ftIv45v/sSuVhj1V1/V6Lu6+j1CyD6yeMSCMQX6hmD/Zcd/Lwh
+ BLf0/y4gTeyp7nSndb+oCFesZij4g7sSv53SVxacuYjefxz5SKIuuPSirhqv0nKt2e/h
+ oxKQ==
+X-Gm-Message-State: APjAAAWx1rhgeTs7xKraPVIdfxN9OpbqIxhsifrsIu/gri2bzTDmwsiN
+ xw3A3l40Xz06uYCrnrf2uB9+wk8ZtdMRPEjb
+X-Google-Smtp-Source: APXvYqz2AL+V0vWeUKy+cJxZebE84fpBI1O0K56nZ+Tr+BiUm28Ur7QnKpXtdjcjxuX0qP07qpBE4w==
+X-Received: by 2002:a17:90a:bf0e:: with SMTP id
+ c14mr7757671pjs.55.1561457313481; 
+ Tue, 25 Jun 2019 03:08:33 -0700 (PDT)
+Received: from localhost (220-132-236-182.HINET-IP.hinet.net.
+ [220.132.236.182])
+ by smtp.gmail.com with ESMTPSA id h1sm24806019pfg.55.2019.06.25.03.08.32
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 25 Jun 2019 03:08:33 -0700 (PDT)
+Date: Tue, 25 Jun 2019 03:07:43 -0700
+Message-Id: <20190625100742.12522-1-palmer@sifive.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <20190624070339.4408-5-david.brenken@efs-auto.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US-large
-X-IMT-Spam-Score: 0.0 ()
-X-PMX-Version: 6.4.6.2792898, Antispam-Engine: 2.7.2.2107409,
- Antispam-Data: 2019.6.25.95716, AntiVirus-Engine: 5.63.0,
- AntiVirus-Data: 2019.6.18.5630002
-X-IMT-Authenticated-Sender: kbastian@UNI-PADERBORN.DE
+Content-Transfer-Encoding: 8bit
+From: Palmer Dabbelt <palmer@sifive.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 131.234.189.14
-Subject: Re: [Qemu-devel] [PATCH v3 4/5] tricore: sync ctx.hflags with
- tb->flags
+ [fuzzy]
+X-Received-From: 209.85.215.193
+Subject: [Qemu-devel] [PATCH] RISC-V: Add support for the Zifencei extension
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,33 +79,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andreas Konopik <andreas.konopik@efs-auto.de>,
- David Brenken <david.brenken@efs-auto.de>,
- Robert Rasche <robert.rasche@efs-auto.de>,
- Georg Hofstetter <georg.hofstetter@efs-auto.de>,
- Lars Biermanski <lars.biermanski@efs-auto.de>
+Cc: Palmer Dabbelt <palmer@sifive.com>, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+fence.i has been split out of the base ISA as part of the ratification
+process.  This patch adds a Zifencei argument, which disables the
+fence.i instruction.
 
-On 6/24/19 9:03 AM, David Brenken wrote:
-> From: Georg Hofstetter <georg.hofstetter@efs-auto.de>
->
-> Signed-off-by: Andreas Konopik <andreas.konopik@efs-auto.de>
-> Signed-off-by: David Brenken <david.brenken@efs-auto.de>
-> Signed-off-by: Georg Hofstetter <georg.hofstetter@efs-auto.de>
-> Signed-off-by: Robert Rasche <robert.rasche@efs-auto.de>
-> Signed-off-by: Lars Biermanski <lars.biermanski@efs-auto.de>
-> ---
->   target/tricore/translate.c | 1 +
->   1 file changed, 1 insertion(+)
+Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+---
+ target/riscv/cpu.c                      | 1 +
+ target/riscv/cpu.h                      | 1 +
+ target/riscv/insn_trans/trans_rvi.inc.c | 4 ++++
+ target/riscv/translate.c                | 3 +++
+ 4 files changed, 9 insertions(+)
 
-Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-
-Cheers,
-
-Bastian
-
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index be90fa7d0808..bbad39a337b3 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -441,6 +441,7 @@ static Property riscv_cpu_properties[] = {
+     DEFINE_PROP_BOOL("s", RISCVCPU, cfg.ext_s, true),
+     DEFINE_PROP_BOOL("u", RISCVCPU, cfg.ext_u, true),
+     DEFINE_PROP_BOOL("Counters", RISCVCPU, cfg.ext_counters, true),
++    DEFINE_PROP_BOOL("Zifencei", RISCVCPU, cfg.ext_ifencei, true),
+     DEFINE_PROP_STRING("priv_spec", RISCVCPU, cfg.priv_spec),
+     DEFINE_PROP_BOOL("mmu", RISCVCPU, cfg.mmu, true),
+     DEFINE_PROP_BOOL("pmp", RISCVCPU, cfg.pmp, true),
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 4d4e0f89e206..ba551cd3082c 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -223,6 +223,7 @@ typedef struct RISCVCPU {
+         bool ext_s;
+         bool ext_u;
+         bool ext_counters;
++        bool ext_ifencei;
+ 
+         char *priv_spec;
+         char *user_spec;
+diff --git a/target/riscv/insn_trans/trans_rvi.inc.c b/target/riscv/insn_trans/trans_rvi.inc.c
+index 6cda078ed6ba..ea6473111ce8 100644
+--- a/target/riscv/insn_trans/trans_rvi.inc.c
++++ b/target/riscv/insn_trans/trans_rvi.inc.c
+@@ -484,6 +484,10 @@ static bool trans_fence(DisasContext *ctx, arg_fence *a)
+ 
+ static bool trans_fence_i(DisasContext *ctx, arg_fence_i *a)
+ {
++    if (!ctx->ext_ifencei) {
++        return false;
++    }
++
+     /*
+      * FENCE_I is a no-op in QEMU,
+      * however we need to end the translation block
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index 313c27b70073..8d6ab732588d 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -54,6 +54,7 @@ typedef struct DisasContext {
+        to any system register, which includes CSR_FRM, so we do not have
+        to reset this known value.  */
+     int frm;
++    bool ext_ifencei;
+ } DisasContext;
+ 
+ #ifdef TARGET_RISCV64
+@@ -752,6 +753,7 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+ {
+     DisasContext *ctx = container_of(dcbase, DisasContext, base);
+     CPURISCVState *env = cs->env_ptr;
++    RISCVCPU *cpu = RISCV_CPU(cs);
+ 
+     ctx->pc_succ_insn = ctx->base.pc_first;
+     ctx->mem_idx = ctx->base.tb->flags & TB_FLAGS_MMU_MASK;
+@@ -759,6 +761,7 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+     ctx->priv_ver = env->priv_ver;
+     ctx->misa = env->misa;
+     ctx->frm = -1;  /* unknown rounding mode */
++    ctx->ext_ifencei = cpu->cfg.ext_ifencei;
+ }
+ 
+ static void riscv_tr_tb_start(DisasContextBase *db, CPUState *cpu)
+-- 
+2.21.0
 
 
