@@ -4,54 +4,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDB3CC48BD5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 12:19:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF844C48BD5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 12:21:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5817204EC
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 12:19:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5817204EC
+	by mail.kernel.org (Postfix) with ESMTPS id A4C62213F2
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 12:21:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4C62213F2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59632 helo=lists.gnu.org)
+Received: from localhost ([::1]:59642 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfkPt-0000z0-Ua
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 08:19:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35753)
+	id 1hfkSA-00034U-OT
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 08:21:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35754)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hfkLF-00060a-1H
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 08:14:30 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hfkLF-00060b-14
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 08:14:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hfkLB-00031v-2v
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hfkLB-00031h-0a
  for qemu-devel@nongnu.org; Tue, 25 Jun 2019 08:14:28 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:50925 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:50972 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hfkL9-00025z-1J
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 08:14:24 -0400
+ id 1hfkL7-00026C-76
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 08:14:23 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 435BE1A46BE;
+ by mail.rt-rk.com (Postfix) with ESMTP id 887351A46F3;
  Tue, 25 Jun 2019 14:13:16 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 227C61A1D0D;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 4E4591A46D9;
  Tue, 25 Jun 2019 14:13:16 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 25 Jun 2019 14:12:51 +0200
-Message-Id: <1561464774-20548-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 25 Jun 2019 14:12:53 +0200
+Message-Id: <1561464774-20548-5-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1561464774-20548-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1561464774-20548-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v4 2/5] tests/tcg: target/mips: Add tests for
- MSA move instructions
+Subject: [Qemu-devel] [PATCH v4 4/5] tests/tcg: target/mips: Amend tests for
+ MSA int multiply instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,44 +70,23 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add tests for MSA move instructions.
+Amend tests for MSA int multiply instructions.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- tests/tcg/mips/include/wrappers_msa.h              |   8 ++
- tests/tcg/mips/user/ase/msa/move/test_msa_move_v.c | 149 +++++++++++++++++++++
- tests/tcg/mips/user/ase/msa/test_msa_compile.sh    |   7 +
- tests/tcg/mips/user/ase/msa/test_msa_run.sh        |   6 +
- 4 files changed, 170 insertions(+)
- create mode 100644 tests/tcg/mips/user/ase/msa/move/test_msa_move_v.c
+ .../user/ase/msa/int-multiply/test_msa_maddv_d.c   | 214 +++++++++++++++++++++
+ tests/tcg/mips/user/ase/msa/test_msa_compile.sh    |  16 ++
+ 2 files changed, 230 insertions(+)
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_d.c
 
-diff --git a/tests/tcg/mips/include/wrappers_msa.h b/tests/tcg/mips/include/wrappers_msa.h
-index 17fd277..2692394 100644
---- a/tests/tcg/mips/include/wrappers_msa.h
-+++ b/tests/tcg/mips/include/wrappers_msa.h
-@@ -574,6 +574,14 @@ DO_MSA__WD__WS_WT(XOR_V, xor.v)
- 
- 
- /*
-+ * Move
-+ * ----
-+ */
-+
-+DO_MSA__WD__WS(MOVE_V, move.v)
-+
-+
-+/*
-  * Pack
-  * ----
-  */
-diff --git a/tests/tcg/mips/user/ase/msa/move/test_msa_move_v.c b/tests/tcg/mips/user/ase/msa/move/test_msa_move_v.c
+diff --git a/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_d.c b/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_d.c
 new file mode 100644
-index 0000000..ef2aa6d
+index 0000000..7d7e16e
 --- /dev/null
-+++ b/tests/tcg/mips/user/ase/msa/move/test_msa_move_v.c
-@@ -0,0 +1,149 @@
++++ b/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_d.c
+@@ -0,0 +1,214 @@
 +/*
-+ *  Test program for MSA instruction MOVE.V
++ *  Test program for MSA instruction MADDV.D
 + *
 + *  Copyright (C) 2019  Wave Computing, Inc.
 + *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
@@ -116,7 +95,7 @@ index 0000000..ef2aa6d
 + *  it under the terms of the GNU General Public License as published by
 + *  the Free Software Foundation, either version 2 of the License, or
 + *  (at your option) any later version.
-+ *
++ *`
 + *  This program is distributed in the hope that it will be useful,
 + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
 + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -134,113 +113,178 @@ index 0000000..ef2aa6d
 +#include "../../../../include/test_inputs_128.h"
 +#include "../../../../include/test_utils_128.h"
 +
-+#define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
 +
 +
 +int32_t main(void)
 +{
 +    char *isa_ase_name = "MSA";
-+    char *group_name = "Move";
-+    char *instruction_name =  "MOVE.V";
++    char *group_name = "Int Multiply";
++    char *instruction_name =  "MADDV.D";
 +    int32_t ret;
-+    uint32_t i;
++    uint32_t i, j;
 +    struct timeval start, end;
 +    double elapsed_time;
 +
 +    uint64_t b128_result[TEST_COUNT_TOTAL][2];
 +    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
-+        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
-+        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
-+        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
-+        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
-+        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
-+        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
-+        { 0xf0f0f0f0f0f0f0f0ULL, 0xf0f0f0f0f0f0f0f0ULL, },    /*   8  */
-+        { 0x0f0f0f0f0f0f0f0fULL, 0x0f0f0f0f0f0f0f0fULL, },
-+        { 0xf83e0f83e0f83e0fULL, 0x83e0f83e0f83e0f8ULL, },
-+        { 0x07c1f07c1f07c1f0ULL, 0x7c1f07c1f07c1f07ULL, },
-+        { 0xfc0fc0fc0fc0fc0fULL, 0xc0fc0fc0fc0fc0fcULL, },
-+        { 0x03f03f03f03f03f0ULL, 0x3f03f03f03f03f03ULL, },
-+        { 0xfe03f80fe03f80feULL, 0x03f80fe03f80fe03ULL, },
-+        { 0x01fc07f01fc07f01ULL, 0xfc07f01fc07f01fcULL, },
-+        { 0xff00ff00ff00ff00ULL, 0xff00ff00ff00ff00ULL, },    /*  16  */
-+        { 0x00ff00ff00ff00ffULL, 0x00ff00ff00ff00ffULL, },
-+        { 0xff803fe00ff803feULL, 0x00ff803fe00ff803ULL, },
-+        { 0x007fc01ff007fc01ULL, 0xff007fc01ff007fcULL, },
-+        { 0xffc00ffc00ffc00fULL, 0xfc00ffc00ffc00ffULL, },
-+        { 0x003ff003ff003ff0ULL, 0x03ff003ff003ff00ULL, },
-+        { 0xffe003ff800ffe00ULL, 0x3ff800ffe003ff80ULL, },
-+        { 0x001ffc007ff001ffULL, 0xc007ff001ffc007fULL, },
-+        { 0xfff000fff000fff0ULL, 0x00fff000fff000ffULL, },    /*  24  */
-+        { 0x000fff000fff000fULL, 0xff000fff000fff00ULL, },
-+        { 0xfff8003ffe000fffULL, 0x8003ffe000fff800ULL, },
-+        { 0x0007ffc001fff000ULL, 0x7ffc001fff0007ffULL, },
-+        { 0xfffc000fffc000ffULL, 0xfc000fffc000fffcULL, },
-+        { 0x0003fff0003fff00ULL, 0x03fff0003fff0003ULL, },
-+        { 0xfffe0003fff8000fULL, 0xffe0003fff8000ffULL, },
-+        { 0x0001fffc0007fff0ULL, 0x001fffc0007fff00ULL, },
-+        { 0xffff0000ffff0000ULL, 0xffff0000ffff0000ULL, },    /*  32  */
-+        { 0x0000ffff0000ffffULL, 0x0000ffff0000ffffULL, },
-+        { 0xffff80003fffe000ULL, 0x0ffff80003fffe00ULL, },
-+        { 0x00007fffc0001fffULL, 0xf00007fffc0001ffULL, },
-+        { 0xffffc0000ffffc00ULL, 0x00ffffc0000ffffcULL, },
-+        { 0x00003ffff00003ffULL, 0xff00003ffff00003ULL, },
-+        { 0xffffe00003ffff80ULL, 0x000ffffe00003fffULL, },
-+        { 0x00001ffffc00007fULL, 0xfff00001ffffc000ULL, },
-+        { 0xfffff00000fffff0ULL, 0x0000fffff00000ffULL, },    /*  40  */
-+        { 0x00000fffff00000fULL, 0xffff00000fffff00ULL, },
-+        { 0xfffff800003ffffeULL, 0x00000fffff800003ULL, },
-+        { 0x000007ffffc00001ULL, 0xfffff000007ffffcULL, },
-+        { 0xfffffc00000fffffULL, 0xc00000fffffc0000ULL, },
-+        { 0x000003fffff00000ULL, 0x3fffff000003ffffULL, },
-+        { 0xfffffe000003ffffULL, 0xf800000fffffe000ULL, },
-+        { 0x000001fffffc0000ULL, 0x07fffff000001fffULL, },
-+        { 0xffffff000000ffffULL, 0xff000000ffffff00ULL, },    /*  48  */
-+        { 0x000000ffffff0000ULL, 0x00ffffff000000ffULL, },
-+        { 0xffffff8000003fffULL, 0xffe000000ffffff8ULL, },
-+        { 0x0000007fffffc000ULL, 0x001ffffff0000007ULL, },
-+        { 0xffffffc000000fffULL, 0xfffc000000ffffffULL, },
-+        { 0x0000003ffffff000ULL, 0x0003ffffff000000ULL, },
-+        { 0xffffffe0000003ffULL, 0xffff8000000fffffULL, },
-+        { 0x0000001ffffffc00ULL, 0x00007ffffff00000ULL, },
-+        { 0xfffffff0000000ffULL, 0xfffff0000000ffffULL, },    /*  56  */
-+        { 0x0000000fffffff00ULL, 0x00000fffffff0000ULL, },
-+        { 0xfffffff80000003fULL, 0xfffffe0000000fffULL, },
-+        { 0x00000007ffffffc0ULL, 0x000001fffffff000ULL, },
-+        { 0xfffffffc0000000fULL, 0xffffffc0000000ffULL, },
-+        { 0x00000003fffffff0ULL, 0x0000003fffffff00ULL, },
-+        { 0xfffffffe00000003ULL, 0xfffffff80000000fULL, },
-+        { 0x00000001fffffffcULL, 0x00000007fffffff0ULL, },
-+        { 0x886ae6cc28625540ULL, 0x4b670b5efe7bb00cULL, },    /*  64  */
-+        { 0xfbbe00634d93c708ULL, 0x12f7bb1a153f52fcULL, },
-+        { 0xac5aaeaab9cf8b80ULL, 0x27d8c6ffab2b2514ULL, },
-+        { 0x704f164d5e31e24eULL, 0x8df188d8a942e2a0ULL, },
-+        { 0xb9926b7c7daf4258ULL, 0xa1227caddcce65b6ULL, },
-+        { 0xd027be89ff0a2ef9ULL, 0x170b5050fea53078ULL, },
-+        { 0xb83b580665cabc4aULL, 0x91230822bff0ba62ULL, },
-+        { 0xfc8f23f09aa6b782ULL, 0x93fd6637124275aeULL, },
-+        { 0x201e09cd56aee649ULL, 0xef5de039a6a52758ULL, },    /*  72  */
-+        { 0xa57cd91365d9e5d7ULL, 0x9321bc9881ecba5cULL, },
-+        { 0xa2e8f6f5c9cbc61bULL, 0xb2c471545e0d7a12ULL, },
-+        { 0xa89cf2f131a864aeULL, 0xd2a3e87a5db986e7ULL, },
-+        { 0xe61438e9a652ea0aULL, 0xa85483d97879d41cULL, },
-+        { 0x944a35fd192361a8ULL, 0xf3912da36a0b2d6bULL, },
-+        { 0x4630426322bef79cULL, 0xeb5686f7cb19304eULL, },
-+        { 0x8b5aa7a2f259deadULL, 0xd278cbcd696417e3ULL, },
++         { 0x0000000000000002ULL, 0x0000000000000002ULL, },    /*   0  */
++        { 0x0000000000000002ULL, 0x0000000000000002ULL, },
++        { 0x00000000aaaaaaaeULL, 0x00000000aaaaaaaeULL, },
++        { 0x0000000000000004ULL, 0x0000000000000004ULL, },
++        { 0x000000006666666cULL, 0x000000006666666cULL, },
++        { 0x0000000000000006ULL, 0x0000000000000006ULL, },
++        { 0x000000008e38e395ULL, 0xffffffffe38e38ebULL, },
++        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
++        { 0x0000000000000008ULL, 0x0000000000000008ULL, },    /*   8  */
++        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
++        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
++        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
++        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
++        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
++        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
++        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
++        { 0x00000000aaaaaab4ULL, 0x00000000aaaaaab4ULL, },    /*  16  */
++        { 0x00000000aaaaaab4ULL, 0x00000000aaaaaab4ULL, },
++        { 0x38e38e3a71c71c7cULL, 0x38e38e3a71c71c7cULL, },
++        { 0x0000000155555560ULL, 0x0000000155555560ULL, },
++        { 0x2222222444444450ULL, 0x2222222444444450ULL, },
++        { 0x000000020000000cULL, 0x000000020000000cULL, },
++        { 0x2f684bdcb425ed16ULL, 0xf684bda397b425faULL, },
++        { 0x00000002aaaaaab8ULL, 0x00000002aaaaaab8ULL, },
++        { 0x000000020000000eULL, 0x000000020000000eULL, },    /*  24  */
++        { 0x000000020000000eULL, 0x000000020000000eULL, },
++        { 0xc71c71c8e38e38f2ULL, 0xc71c71c8e38e38f2ULL, },
++        { 0x0000000155555564ULL, 0x0000000155555564ULL, },
++        { 0xdddddddeccccccdcULL, 0xdddddddeccccccdcULL, },
++        { 0x00000000aaaaaabaULL, 0x00000000aaaaaabaULL, },
++        { 0xd097b42684bda13fULL, 0x097b425ef684bdb1ULL, },
++        { 0x0000000000000010ULL, 0x0000000000000010ULL, },
++        { 0x0000000066666678ULL, 0x0000000066666678ULL, },    /*  32  */
++        { 0x0000000066666678ULL, 0x0000000066666678ULL, },
++        { 0x2222222355555568ULL, 0x2222222355555568ULL, },
++        { 0x00000000cccccce0ULL, 0x00000000cccccce0ULL, },
++        { 0x147ae1491eb85200ULL, 0x147ae1491eb85200ULL, },
++        { 0x0000000133333348ULL, 0x0000000133333348ULL, },
++        { 0x1c71c71e3e93e954ULL, 0xfa4fa4fbb60b60ccULL, },
++        { 0x00000001999999b0ULL, 0x00000001999999b0ULL, },
++        { 0x000000013333334aULL, 0x000000013333334aULL, },    /*  40  */
++        { 0x000000013333334aULL, 0x000000013333334aULL, },
++        { 0xdddddddeeeeeef06ULL, 0xdddddddeeeeeef06ULL, },
++        { 0x00000000cccccce4ULL, 0x00000000cccccce4ULL, },
++        { 0xeb851eb8e147ae2cULL, 0xeb851eb8e147ae2cULL, },
++        { 0x000000006666667eULL, 0x000000006666667eULL, },
++        { 0xe38e38e3e93e9401ULL, 0x05b05b05c71c71dfULL, },
++        { 0x0000000000000018ULL, 0x0000000000000018ULL, },
++        { 0x000000008e38e3a7ULL, 0xffffffffe38e38fdULL, },    /*  48  */
++        { 0x000000008e38e3a7ULL, 0xffffffffe38e38fdULL, },
++        { 0x2f684bdb425ed0b1ULL, 0xf684bda17b425eebULL, },
++        { 0x000000011c71c736ULL, 0xffffffffc71c71e2ULL, },
++        { 0x1c71c71e27d27d42ULL, 0xfa4fa4fa49f49f66ULL, },
++        { 0x00000001aaaaaac5ULL, 0xffffffffaaaaaac7ULL, },
++        { 0x35ba781b4587e6d2ULL, 0x0fcd6e9d6b74f050ULL, },
++        { 0x0000000238e38e54ULL, 0xffffffff8e38e3acULL, },
++        { 0x00000001aaaaaac7ULL, 0xffffffffaaaaaac9ULL, },    /*  56  */
++        { 0x00000001aaaaaac7ULL, 0xffffffffaaaaaac9ULL, },
++        { 0xd097b427a12f6869ULL, 0x097b425ebda12f87ULL, },
++        { 0x000000011c71c73aULL, 0xffffffffc71c71e6ULL, },
++        { 0xe38e38e477777796ULL, 0x05b05b05aaaaaacaULL, },
++        { 0x000000008e38e3adULL, 0xffffffffe38e3903ULL, },
++        { 0xca4587e781948b2fULL, 0xf032916206522c5fULL, },
++        { 0x0000000000000020ULL, 0x0000000000000020ULL, },
++        { 0x3e3ad4ae1266c2b0ULL, 0x1637d725aebdb734ULL, },    /*  64  */
++        { 0x4c74e0d60a3d6d94ULL, 0x1badd2dd9f4dac90ULL, },
++        { 0x6874e8f94205b90cULL, 0x27eb0c41af2c3022ULL, },
++        { 0x42dab657e16f25e8ULL, 0x06d6782e137656f2ULL, },
++        { 0x5114c27fd945d0ccULL, 0x0c4c73e604064c4eULL, },
++        { 0x68a91e898c276755ULL, 0x0f77ad378bdfb302ULL, },
++        { 0x54c82cde41d1cf13ULL, 0x0b6108a5f38e1598ULL, },
++        { 0x6f755d3eddd1234aULL, 0xfbbaace2f5421908ULL, },
++        { 0x8b75656215996ec2ULL, 0x07f7e64705209c9aULL, },    /*  72  */
++        { 0x779473b6cb43d680ULL, 0x03e141b56cceff30ULL, },
++        { 0xa6279a1866fb9f64ULL, 0x2631668db9e53ac1ULL, },
++        { 0x67a1f71bd99e4586ULL, 0x312ec9f6206e6e69ULL, },
++        { 0x4207c47a7907b262ULL, 0x101a35e284b89539ULL, },
++        { 0x5cb4f4db15070699ULL, 0x0073da1f866c98a9ULL, },
++        { 0x1e2f51de87a9acbbULL, 0x0b713d87ecf5cc51ULL, },
++        { 0x721d49ba5f0acfa8ULL, 0x5ba5bbe9afeae691ULL, },
++        { 0x4bcd68690d995de0ULL, 0x771da6b4b6c967ebULL, },    /*  80  */
++        { 0x4ea9a2cfbb5acd7bULL, 0x79dd6a73439e6387ULL, },
++        { 0x47c800b999dd2371ULL, 0x766d25914ef7a7a0ULL, },
++        { 0x41b0fa10eb77cf84ULL, 0x26e85189458965f8ULL, },
++        { 0x1fc448ce062c2944ULL, 0x31f490a9422a80e6ULL, },
++        { 0x211bdfadfd79770eULL, 0x3b25f4cac5763378ULL, },
++        { 0x16fbb87edd87b6f0ULL, 0x57c0b65fabdda20eULL, },
++        { 0x14621091eac4a5f6ULL, 0x4d29a25d32fa9ef6ULL, },
++        { 0x07832ded1c464b02ULL, 0x6396905709e3cfa4ULL, },    /*  88  */
++        { 0x0ff4a84eab8df3b9ULL, 0x6bc9a7d8c6adf2eaULL, },
++        { 0x21e53326bfbd0b05ULL, 0x8f8f3b9c679dff5aULL, },
++        { 0x191ed6a24e1576f9ULL, 0x9e8c2e402760373aULL, },
++        { 0x19b438400fc27751ULL, 0x819c4bbfd3ee6972ULL, },
++        { 0x1e0d5dc1094ae999ULL, 0x7496a289f5eff010ULL, },
++        { 0x11af620b7bc03943ULL, 0x8a11f229836addc7ULL, },
++        { 0x46fa45d0e84440fcULL, 0xe8d2c0211fb042bfULL, },
++        { 0x22142516b5a8adbcULL, 0xe1cf1923e186aad1ULL, },    /*  96  */
++        { 0x066ebbbb4ff6da44ULL, 0xd918d7e6a7e61877ULL, },
++        { 0x100acc9d22839a48ULL, 0xce291932929e367fULL, },
++        { 0x0dfe419d62a62f64ULL, 0xc020fe45a8cf7acfULL, },
++        { 0x2ba79b6ffbf3c63bULL, 0xb428f52c49fce695ULL, },
++        { 0x29b3b85200bdf100ULL, 0xb4ae7ea2f52aa5b9ULL, },
++        { 0x293bb84d6360c0b6ULL, 0xae33b26e4c493c49ULL, },
++        { 0x46a99fdf54f4862dULL, 0xae790dc5055f6f51ULL, },
++        { 0x18480e0fd728c7c3ULL, 0xa000ad7b15f8ebe0ULL, },    /* 104  */
++        { 0x1b8b97aa205e1239ULL, 0x89c78b8909c4a8e5ULL, },
++        { 0x09abb26b05ef649dULL, 0x74242fa1bd49e740ULL, },
++        { 0x04e233bc861d272bULL, 0x9c5343ab30f62f9fULL, },
++        { 0xda2da0d0884dc3d1ULL, 0xb824f201640b4147ULL, },
++        { 0x9d8b22ee1b9a2e0fULL, 0xb642ddf1edb0747fULL, },
++        { 0x7c81956533686a37ULL, 0xdd5181781dc3ad37ULL, },
++        { 0xc60b1905717ff25aULL, 0xe2af726e71ad7ad7ULL, },
 +    };
 +
 +    reset_msa_registers();
 +
 +    gettimeofday(&start, NULL);
 +
-+    for (i = 0; i < TEST_COUNT_TOTAL; i++) {
-+        if (i < PATTERN_INPUTS_COUNT) {
-+            do_msa_MOVE_V(b128_pattern[i], b128_result[i]);
-+        } else {
-+            do_msa_MOVE_V(b128_random[i - PATTERN_INPUTS_COUNT],
-+                          b128_result[i]);
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADDV_D(b128_pattern[i], b128_pattern[j],
++                           b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADDV_D(b128_random[i], b128_random[j],
++                           b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                        (PATTERN_INPUTS_SHORT_COUNT)) +
++                                       RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADDV_D__DDT(b128_random[i], b128_random[j],
++                                b128_result[
++                                    ((PATTERN_INPUTS_SHORT_COUNT) *
++                                     (PATTERN_INPUTS_SHORT_COUNT)) +
++                                    ((RANDOM_INPUTS_SHORT_COUNT) *
++                                     (RANDOM_INPUTS_SHORT_COUNT)) +
++                                    RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADDV_D__DSD(b128_random[i], b128_random[j],
++                                b128_result[
++                                    ((PATTERN_INPUTS_SHORT_COUNT) *
++                                     (PATTERN_INPUTS_SHORT_COUNT)) +
++                                    (2 * (RANDOM_INPUTS_SHORT_COUNT) *
++                                     (RANDOM_INPUTS_SHORT_COUNT)) +
++                                    RANDOM_INPUTS_SHORT_COUNT * i + j]);
 +        }
 +    }
 +
@@ -256,40 +300,32 @@ index 0000000..ef2aa6d
 +    return ret;
 +}
 diff --git a/tests/tcg/mips/user/ase/msa/test_msa_compile.sh b/tests/tcg/mips/user/ase/msa/test_msa_compile.sh
-index 37a4fdc..8ef836d 100755
+index 16920e8..d45ee4b 100755
 --- a/tests/tcg/mips/user/ase/msa/test_msa_compile.sh
 +++ b/tests/tcg/mips/user/ase/msa/test_msa_compile.sh
-@@ -506,6 +506,13 @@
- -EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_xor_v
- 
+@@ -397,6 +397,22 @@
+ # Int Multiply
+ # ------------
  #
-+# Move
-+# ----
-+#
-+/opt/img/bin/mips-img-linux-gnu-gcc            move/test_msa_move_v.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_move_v
-+
-+#
- # Pack
- # ----
- #
-diff --git a/tests/tcg/mips/user/ase/msa/test_msa_run.sh b/tests/tcg/mips/user/ase/msa/test_msa_run.sh
-index 6c244a2..b6785e3 100755
---- a/tests/tcg/mips/user/ase/msa/test_msa_run.sh
-+++ b/tests/tcg/mips/user/ase/msa/test_msa_run.sh
-@@ -295,6 +295,12 @@ $PATH_TO_QEMU -cpu I6400  /tmp/test_msa_or_v
- $PATH_TO_QEMU -cpu I6400  /tmp/test_msa_xor_v
- 
- #
-+# Move
-+# ----
-+#
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_move_v
-+
-+#
- # Pack
- # ----
- #
++/opt/img/bin/mips-img-linux-gnu-gcc    int-multiply/test_msa_maddv_b.c         \
++-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_maddv_b
++/opt/img/bin/mips-img-linux-gnu-gcc    int-multiply/test_msa_maddv_h.c         \
++-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_maddv_h
++/opt/img/bin/mips-img-linux-gnu-gcc    int-multiply/test_msa_maddv_w.c         \
++-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_maddv_w
++/opt/img/bin/mips-img-linux-gnu-gcc    int-multiply/test_msa_maddv_d.c         \
++-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_maddv_d
++/opt/img/bin/mips-img-linux-gnu-gcc    int-multiply/test_msa_msubv_b.c         \
++-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_msubv_b
++/opt/img/bin/mips-img-linux-gnu-gcc    int-multiply/test_msa_msubv_h.c         \
++-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_msubv_h
++/opt/img/bin/mips-img-linux-gnu-gcc    int-multiply/test_msa_msubv_w.c         \
++-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_msubv_w
++/opt/img/bin/mips-img-linux-gnu-gcc    int-multiply/test_msa_msubv_d.c         \
++-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_msubv_d
+ /opt/img/bin/mips-img-linux-gnu-gcc    int-multiply/test_msa_mulv_b.c          \
+ -EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_mulv_b
+ /opt/img/bin/mips-img-linux-gnu-gcc    int-multiply/test_msa_mulv_h.c          \
 -- 
 2.7.4
 
