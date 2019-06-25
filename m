@@ -2,64 +2,92 @@ Return-Path: <SRS0=PhvJ=UY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66C9BC48BD5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 15:18:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90017C48BD4
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 15:19:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37BEB2133F
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 15:18:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37BEB2133F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5D1D42133F
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 15:19:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TuEwxq2Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D1D42133F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32984 helo=lists.gnu.org)
+Received: from localhost ([::1]:32992 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfnDM-0003TF-Cn
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 11:18:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52138)
+	id 1hfnEE-0004Nw-H8
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 11:19:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56500)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hfmp4-0000iG-Vk
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 10:53:28 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hfn7Z-0002FA-L9
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 11:12:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hfmp2-0005UK-DZ
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 10:53:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54504)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hfmp2-0005P2-7S
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 10:53:24 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 35272C0B2E2D;
- Tue, 25 Jun 2019 14:53:12 +0000 (UTC)
-Received: from localhost (ovpn-116-76.gru2.redhat.com [10.97.116.76])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A0B7F5C231;
- Tue, 25 Jun 2019 14:53:11 +0000 (UTC)
-Date: Tue, 25 Jun 2019 11:53:09 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190625145309.GQ1862@habkost.net>
-References: <20190625050008.12789-1-ehabkost@redhat.com>
- <20190625050008.12789-5-ehabkost@redhat.com>
- <20190625093201.GF3226@work-vm> <20190625134029.GP1862@habkost.net>
- <20190625143216.GL3226@work-vm>
+ (envelope-from <richard.henderson@linaro.org>) id 1hfn7Y-0002uc-Hy
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 11:12:33 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45734)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hfn7Y-0002iR-4C
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 11:12:32 -0400
+Received: by mail-wr1-x443.google.com with SMTP id f9so18285848wre.12
+ for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 08:12:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Z74vgaw59eEylXze3EjYHN602U16U7SY7oGfBB0aiHs=;
+ b=TuEwxq2ZrxnrczTh97KLembddX7IKEXar12Vrpdq8Ckx/vBY8YXEEGiJauFmAXq7ro
+ 3wgE1NY9iB8wPh3S900+DJzkzellgYa5ME21dFYB9MjGPAX0gppDml+iUEzNIbLkvoyh
+ 18aTsBHB9ikc7G9bC4bBhk7fuecTuy5vOgnZRNoXwMQFE7TGeD6gZaywyx2w6En4p4mM
+ qpTUghdyg9xDCvD7IlYHKq+F08+Zni7ydw6Z19J7j2CK+z0W6eiooYjhMruer0UzS6Hy
+ 939P2ckDVG151jwSy/FSkThspIKuTbECFQJC4eSHpbSDLhXWo0drOsfAU+BVKzQZa8aP
+ jw+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Z74vgaw59eEylXze3EjYHN602U16U7SY7oGfBB0aiHs=;
+ b=TnzGkzJPLZLhWtiuVFuiJT6BDJh9XCYMWcbrxOQWu/y/XwqUoKsuPNOyc8caZDE8hw
+ XN2+BJNIjiDq75ylDX4Cm2xP8VE3iMbuDGC/k4RuNoUaZ0XZMRd4dHdeKON1GiDW5OTX
+ eHRU8+Q6vOK9xcWq+G1ca9i38TsTVIa78nDXwgakZDHMyy/I8wBpVL0eBPQY+U13wx9m
+ 1+Ev5+mjNzdtWJoS4POHI8ZpCDTlIfFQ1qHxhZh2Z8mEAyKbAC+JTQCaGPblMR/1qpAI
+ 4gG5WrxQHLLu65AuY0FrnmJcqgvdBoi71ys7j2shRrfe7M7+Fb7xb4RedgvPPQm5A1/g
+ Wf7A==
+X-Gm-Message-State: APjAAAXo8s67dVZTEynqIwnhb+WMWQt9B600jQoSQ14XRVA+SlzHeYuy
+ DHX1yygGDqJ4JqT77D/+0Quf+g==
+X-Google-Smtp-Source: APXvYqwjTPp4aoeX14e4LQcT0giwQyjQYmQVjiKwrfdQAkPLau3p3XM6i+ahhYyFDnVrfAZpBZPdrA==
+X-Received: by 2002:a5d:6449:: with SMTP id d9mr58704070wrw.192.1561475535487; 
+ Tue, 25 Jun 2019 08:12:15 -0700 (PDT)
+Received: from [192.168.2.137] (93-34-153-63.ip50.fastwebnet.it.
+ [93.34.153.63])
+ by smtp.gmail.com with ESMTPSA id a7sm14997071wrs.94.2019.06.25.08.12.14
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 25 Jun 2019 08:12:14 -0700 (PDT)
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <1561116534-21814-1-git-send-email-pbonzini@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <c7affa1f-2945-765c-6c54-ed1a26ab8798@linaro.org>
+Date: Tue, 25 Jun 2019 17:12:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190625143216.GL3226@work-vm>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Tue, 25 Jun 2019 14:53:12 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 4/6] i386: Infrastructure for versioned CPU
- models
+In-Reply-To: <1561116534-21814-1-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
+Subject: Re: [Qemu-devel] [PATCH RFC] checkpatch: do not warn for multiline
+ parenthesized returned value
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,63 +99,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 25, 2019 at 03:32:16PM +0100, Dr. David Alan Gilbert wrote:
-> * Eduardo Habkost (ehabkost@redhat.com) wrote:
-> > On Tue, Jun 25, 2019 at 10:32:01AM +0100, Dr. David Alan Gilbert wrote:
-> > > * Eduardo Habkost (ehabkost@redhat.com) wrote:
-> > > > Base code for versioned CPU models.  This will register a "-4.1"
-> > > > version of all existing CPU models, and make the unversioned CPU
-> > > > models be an alias for the -4.1 versions on the pc-*-4.1 machine
-> > > > types.
-> > > > 
-> > > > On older machine types, the unversioned CPU models will keep the
-> > > > old behavior.  This way, management software can use old machine
-> > > > types while resolving aliases if compatibility with older QEMU
-> > > > versions is required.
-> > > > 
-> > > > Using "-machine none", the unversioned CPU models will be aliases
-> > > > to the latest CPU model version.
-> > > > 
-> > > > Includes a test case to ensure that:
-> > > > old machine types won't report any alias to versioned CPU models;
-> > > > "pc-*-4.1" will return aliases to -4.1 CPU models;
-> > > > and "-machine none" will report aliases to some versioned CPU model.
-> > > > 
-> > > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > > 
-> > > What happens when we add the next new CPU model?  So say in 4.2 we add
-> > > a new CPU, does that default to being newcpu-4.2 ?
-> > 
-> > We can choose between providing old versions of the CPU model
-> > retroactively ("NewModel-4.1" and "NewModel-4.2"), or providing
-> > only "NewModel-4.2".
-> > 
-> > The question is: if we provide only "NewModel-4.2", what should
-> > be the behavior of "-machine pc-i440fx-4.1 -cpu NewModel"?
+On 6/21/19 1:28 PM, Paolo Bonzini wrote:
+> While indeed we do not want to have
 > 
-> Perhaps the existing CPUs and the first instance of a new CPU
-> we should use something non-numeric, e.g. 'orig' rather than 4.1;
-> we only go numeric when we cause a divergence.
+>     return (a);
+> 
+> it is less clear that this applies to
+> 
+>     return (a &&
+>             b);
+> 
+> Some editors indent more nicely if you have parentheses, and some people's
+> eyes may appreciate that as well.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  scripts/checkpatch.pl | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-What would be the advantage of a non-numeric version identifier?
-I believe it would be more confusing to have (e.g.)
-["NewModel-orig", "NewModel-4.3"] in QEMU 4.3 instead of
-["NewModel-4.2", "NewModel-4.3"].
+Thanks, I do this semi-regularly.
 
-However, you have another interesting point: should we introduce
--4.2 versions of all CPU models in QEMU 4.2, or only for the ones
-that actually changed?  I think I prefer consistency, even if it
-means making the list of CPU models larger.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-What do others think?
 
--- 
-Eduardo
+r~
+
 
