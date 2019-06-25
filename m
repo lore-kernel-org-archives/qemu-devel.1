@@ -3,61 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93C57C48BD5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 12:51:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36265C48BD5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 12:53:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64275208CA
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 12:51:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64275208CA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0E5D62085A
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Jun 2019 12:53:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E5D62085A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59898 helo=lists.gnu.org)
+Received: from localhost ([::1]:59924 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfkuq-0007gj-Fy
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 08:51:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40822)
+	id 1hfkwZ-00017L-Bi
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 08:53:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45510)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <gengdongjiu@huawei.com>) id 1hfkZU-0007u7-I3
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 08:29:14 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hfkpE-0004Ky-UQ
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 08:45:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gengdongjiu@huawei.com>) id 1hfkZS-0000Js-DX
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 08:29:12 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2181 helo=huawei.com)
+ (envelope-from <imammedo@redhat.com>) id 1hfkpC-00088S-Un
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 08:45:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59930)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
- id 1hfkZA-0008Mw-7c; Tue, 25 Jun 2019 08:29:01 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 3820CEB960A9AD7D3429;
- Tue, 25 Jun 2019 20:28:45 +0800 (CST)
-Received: from [127.0.0.1] (10.142.68.147) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.439.0; Tue, 25 Jun 2019
- 20:28:38 +0800
-To: Igor Mammedov <imammedo@redhat.com>, <pbonzini@redhat.com>
-References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
- <1557832703-42620-9-git-send-email-gengdongjiu@huawei.com>
- <20190624143249.37a5e6d5@redhat.com>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <d7edd19e-340f-98ff-6613-34a5e85c05e2@huawei.com>
-Date: Tue, 25 Jun 2019 20:28:36 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.3.0
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hfkpB-0007wX-Aj
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 08:45:26 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 213927EBBD
+ for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 12:45:19 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 71F9719728;
+ Tue, 25 Jun 2019 12:45:15 +0000 (UTC)
+Date: Tue, 25 Jun 2019 14:45:11 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190625144511.239e112a@redhat.com>
+In-Reply-To: <20190621064615.20099-3-mst@redhat.com>
+References: <20190621064615.20099-1-mst@redhat.com>
+ <20190621064615.20099-3-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190624143249.37a5e6d5@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.142.68.147]
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Tue, 25 Jun 2019 12:45:19 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.190
-Subject: Re: [Qemu-devel] [PATCH v17 08/10] KVM: Move related hwpoison page
- functions to accel/kvm/ folder
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 2/3] pcie: check that slt ctrl changed
+ before deleting
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,195 +69,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, kvm@vger.kernel.org,
- mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org,
- linuxarm@huawei.com, shannon.zhaosl@gmail.com, zhengxiang9@huawei.com,
- qemu-arm@nongnu.org, james.morse@arm.com, xuwei5@huawei.com,
- jonathan.cameron@huawei.com, lersek@redhat.com, rth@twiddle.net
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, 21 Jun 2019 02:46:48 -0400
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
+> During boot, linux would sometimes overwrites control of a powered off
+> slot before powering it on. Unfortunately QEMU interprets that as a
+> power off request and ejects the device.
+> 
+> For example:
+> 
+> /x86_64-softmmu/qemu-system-x86_64 -enable-kvm -S -machine q35  \
+>     -device pcie-root-port,id=pcie_root_port_0,slot=2,chassis=2,addr=0x2,bus=pcie.0 \
+>     -monitor stdio disk.qcow2
+> (qemu)device_add virtio-balloon-pci,id=balloon,bus=pcie_root_port_0
+> (qemu)cont
+> 
+> Balloon is deleted during guest boot.
+> 
+> To fix, save control beforehand and check that power
+> or led state actually change before ejecting.
+> 
+> Note: this is more a hack than a solution, ideally we'd
+> find a better way to detect ejects, or move away
+> from ejects completely and instead monitor whether
+> it's safe to delete device due to e.g. its power state.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  include/hw/pci/pcie.h              |  3 ++-
+>  hw/pci-bridge/pcie_root_port.c     |  5 ++++-
+>  hw/pci-bridge/xio3130_downstream.c |  5 ++++-
+>  hw/pci/pcie.c                      | 14 ++++++++++++--
+>  4 files changed, 22 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+> index e30334d74d..8d90c0e193 100644
+> --- a/include/hw/pci/pcie.h
+> +++ b/include/hw/pci/pcie.h
+> @@ -107,7 +107,8 @@ void pcie_cap_lnkctl_reset(PCIDevice *dev);
+>  
+>  void pcie_cap_slot_init(PCIDevice *dev, uint16_t slot);
+>  void pcie_cap_slot_reset(PCIDevice *dev);
+> -void pcie_cap_slot_write_config(PCIDevice *dev,
+> +void pcie_cap_slot_get(PCIDevice *dev, uint16_t *slot_ctl, uint16_t *slt_sta);
+> +void pcie_cap_slot_write_config(PCIDevice *dev, uint16_t slot_ctl, uint16_t slt_sta,
+>                                  uint32_t addr, uint32_t val, int len);
+>  int pcie_cap_slot_post_load(void *opaque, int version_id);
+>  void pcie_cap_slot_push_attention_button(PCIDevice *dev);
+> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+> index 92f253c924..09019ca05d 100644
+> --- a/hw/pci-bridge/pcie_root_port.c
+> +++ b/hw/pci-bridge/pcie_root_port.c
+> @@ -31,10 +31,13 @@ static void rp_write_config(PCIDevice *d, uint32_t address,
+>  {
+>      uint32_t root_cmd =
+>          pci_get_long(d->config + d->exp.aer_cap + PCI_ERR_ROOT_COMMAND);
+> +    uint16_t slt_ctl, slt_sta;
+> +
+> +    pcie_cap_slot_get(d, &slt_ctl, &slt_sta);
+>  
+>      pci_bridge_write_config(d, address, val, len);
+>      rp_aer_vector_update(d);
+> -    pcie_cap_slot_write_config(d, address, val, len);
+> +    pcie_cap_slot_write_config(d, slt_ctl, slt_sta, address, val, len);
+>      pcie_aer_write_config(d, address, val, len);
+>      pcie_aer_root_write_config(d, address, val, len, root_cmd);
+>  }
+> diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
+> index 264e37d6a6..899b0fd6c9 100644
+> --- a/hw/pci-bridge/xio3130_downstream.c
+> +++ b/hw/pci-bridge/xio3130_downstream.c
+> @@ -41,9 +41,12 @@
+>  static void xio3130_downstream_write_config(PCIDevice *d, uint32_t address,
+>                                           uint32_t val, int len)
+>  {
+> +    uint16_t slt_ctl, slt_sta;
+> +
+> +    pcie_cap_slot_get(d, &slt_sta, &slt_ctl);
+>      pci_bridge_write_config(d, address, val, len);
+>      pcie_cap_flr_write_config(d, address, val, len);
+> -    pcie_cap_slot_write_config(d, address, val, len);
+> +    pcie_cap_slot_write_config(d, slt_ctl, slt_sta, address, val, len);
+>      pcie_aer_write_config(d, address, val, len);
+>  }
+>  
+> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+> index b22527000d..f8490a00de 100644
+> --- a/hw/pci/pcie.c
+> +++ b/hw/pci/pcie.c
+> @@ -594,7 +594,15 @@ void pcie_cap_slot_reset(PCIDevice *dev)
+>      hotplug_event_update_event_status(dev);
+>  }
+>  
+> -void pcie_cap_slot_write_config(PCIDevice *dev,
+> +void pcie_cap_slot_get(PCIDevice *dev, uint16_t *slt_ctl, uint16_t *slt_sta)
+> +{
+> +    uint32_t pos = dev->exp.exp_cap;
+> +    uint8_t *exp_cap = dev->config + pos;
+> +    *slt_ctl = pci_get_word(exp_cap + PCI_EXP_SLTCTL);
+> +    *slt_sta = pci_get_word(exp_cap + PCI_EXP_SLTSTA);
+> +}
+> +
+> +void pcie_cap_slot_write_config(PCIDevice *dev, uint16_t slt_ctl, uint16_t slt_sta,
+>                                  uint32_t addr, uint32_t val, int len)
+>  {
+>      uint32_t pos = dev->exp.exp_cap;
+> @@ -623,7 +631,9 @@ void pcie_cap_slot_write_config(PCIDevice *dev,
+>       * controller is off, it is safe to detach the devices.
+>       */
+comment above probably should be updated to account for new conditions 
 
-On 2019/6/24 20:32, Igor Mammedov wrote:
-> On Tue, 14 May 2019 04:18:21 -0700
-> Dongjiu Geng <gengdongjiu@huawei.com> wrote:
-> 
->> kvm_hwpoison_page_add() and kvm_unpoison_all() will be used both
->> by X86 and ARM platforms, so move these functions to a common
->> accel/kvm/ folder to avoid duplicate code.
->>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->> ---
->>  accel/kvm/kvm-all.c     | 33 +++++++++++++++++++++++++++++++++
->>  include/exec/ram_addr.h | 24 ++++++++++++++++++++++++
->>  target/arm/kvm.c        |  3 +++
->>  target/i386/kvm.c       | 34 +---------------------------------
->>  4 files changed, 61 insertions(+), 33 deletions(-)
->>
->> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
->> index 524c4dd..b9f9f29 100644
->> --- a/accel/kvm/kvm-all.c
->> +++ b/accel/kvm/kvm-all.c
->> @@ -625,6 +625,39 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension)
->>      return ret;
->>  }
->>  
->> +typedef struct HWPoisonPage {
->> +    ram_addr_t ram_addr;
->> +    QLIST_ENTRY(HWPoisonPage) list;
->> +} HWPoisonPage;
->> +
->> +static QLIST_HEAD(, HWPoisonPage) hwpoison_page_list =
->> +    QLIST_HEAD_INITIALIZER(hwpoison_page_list);
->> +
->> +void kvm_unpoison_all(void *param)
->> +{
->> +    HWPoisonPage *page, *next_page;
->> +
->> +    QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
->> +        QLIST_REMOVE(page, list);
->> +        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
->> +        g_free(page);
->> +    }
->> +}
->> +
->> +void kvm_hwpoison_page_add(ram_addr_t ram_addr)
->> +{
->> +    HWPoisonPage *page;
->> +
->> +    QLIST_FOREACH(page, &hwpoison_page_list, list) {
->> +        if (page->ram_addr == ram_addr) {
->> +            return;
->> +        }
->> +    }
->> +    page = g_new(HWPoisonPage, 1);
->> +    page->ram_addr = ram_addr;
->> +    QLIST_INSERT_HEAD(&hwpoison_page_list, page, list);
->> +}
->> +
->>  static uint32_t adjust_ioeventfd_endianness(uint32_t val, uint32_t size)
->>  {
->>  #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
->> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
->> index 139ad79..193b0a7 100644
->> --- a/include/exec/ram_addr.h
->> +++ b/include/exec/ram_addr.h
-> 
-> it's not file for KVM specific code,
-> maybe Paolo could suggest a bettor place ...
-I remember some people suggests me to move the code to KVM before, may be he is Peter.
-Paolo, can you give a better place?
-
-> 
-> 
->> @@ -116,6 +116,30 @@ void qemu_ram_free(RAMBlock *block);
->>  
->>  int qemu_ram_resize(RAMBlock *block, ram_addr_t newsize, Error **errp);
->>  
->> +/**
->> + * kvm_hwpoison_page_add:
->> + *
->> + * Parameters:
->> + *  @ram_addr: the address in the RAM for the poisoned page
->> + *
->> + * Add a poisoned page to the list
->> + *
->> + * Return: None.
->> + */
->> +void kvm_hwpoison_page_add(ram_addr_t ram_addr);
->> +
->> +/**
->> + * kvm_unpoison_all:
->> + *
->> + * Parameters:
->> + *  @param: some data may be passed to this function
->> + *
->> + * Free and remove all the poisoned pages in the list
->> + *
->> + * Return: None.
->> + */
->> +void kvm_unpoison_all(void *param);
->> +
->>  #define DIRTY_CLIENTS_ALL     ((1 << DIRTY_MEMORY_NUM) - 1)
->>  #define DIRTY_CLIENTS_NOCODE  (DIRTY_CLIENTS_ALL & ~(1 << DIRTY_MEMORY_CODE))
->>  
->> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
->> index 5995634..6d3b25b 100644
->> --- a/target/arm/kvm.c
->> +++ b/target/arm/kvm.c
->> @@ -29,6 +29,7 @@
->>  #include "exec/address-spaces.h"
->>  #include "hw/boards.h"
->>  #include "qemu/log.h"
->> +#include "exec/ram_addr.h"
->>  
->>  const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
->>      KVM_CAP_LAST_INFO
->> @@ -187,6 +188,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->>  
->>      cap_has_mp_state = kvm_check_extension(s, KVM_CAP_MP_STATE);
->>  
->> +    qemu_register_reset(kvm_unpoison_all, NULL);
->> +
->>      return 0;
->>  }
->>  
->> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->> index 3b29ce5..9bdb879 100644
->> --- a/target/i386/kvm.c
->> +++ b/target/i386/kvm.c
->> @@ -46,6 +46,7 @@
->>  #include "migration/blocker.h"
->>  #include "exec/memattrs.h"
->>  #include "trace.h"
->> +#include "exec/ram_addr.h"
->>  
->>  //#define DEBUG_KVM
->>  
->> @@ -467,39 +468,6 @@ uint32_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
->>  }
->>  
->>  
->> -typedef struct HWPoisonPage {
->> -    ram_addr_t ram_addr;
->> -    QLIST_ENTRY(HWPoisonPage) list;
->> -} HWPoisonPage;
->> -
->> -static QLIST_HEAD(, HWPoisonPage) hwpoison_page_list =
->> -    QLIST_HEAD_INITIALIZER(hwpoison_page_list);
->> -
->> -static void kvm_unpoison_all(void *param)
->> -{
->> -    HWPoisonPage *page, *next_page;
->> -
->> -    QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
->> -        QLIST_REMOVE(page, list);
->> -        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
->> -        g_free(page);
->> -    }
->> -}
->> -
->> -static void kvm_hwpoison_page_add(ram_addr_t ram_addr)
->> -{
->> -    HWPoisonPage *page;
->> -
->> -    QLIST_FOREACH(page, &hwpoison_page_list, list) {
->> -        if (page->ram_addr == ram_addr) {
->> -            return;
->> -        }
->> -    }
->> -    page = g_new(HWPoisonPage, 1);
->> -    page->ram_addr = ram_addr;
->> -    QLIST_INSERT_HEAD(&hwpoison_page_list, page, list);
->> -}
->> -
->>  static int kvm_get_mce_cap_supported(KVMState *s, uint64_t *mce_cap,
->>                                       int *max_banks)
->>  {
-> 
-> .
-> 
+>      if ((sltsta & PCI_EXP_SLTSTA_PDS) && (val & PCI_EXP_SLTCTL_PCC) &&
+> -        ((val & PCI_EXP_SLTCTL_PIC_OFF) == PCI_EXP_SLTCTL_PIC_OFF)) {
+> +        (val & PCI_EXP_SLTCTL_PIC_OFF) == PCI_EXP_SLTCTL_PIC_OFF &&
+> +        (!(slt_ctl & PCI_EXP_SLTCTL_PCC) ||
+> +        (slt_ctl & PCI_EXP_SLTCTL_PIC_OFF) != PCI_EXP_SLTCTL_PIC_OFF)) {
+>          PCIBus *sec_bus = pci_bridge_get_sec_bus(PCI_BRIDGE(dev));
+>          pci_for_each_device(sec_bus, pci_bus_num(sec_bus),
+>                              pcie_unplug_device, NULL);
 
 
