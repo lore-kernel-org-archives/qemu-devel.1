@@ -2,69 +2,89 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 451EBC48BD3
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 12:19:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B7C8C48BD3
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 12:19:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F66C20663
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 12:19:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F66C20663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id CE0F220663
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 12:19:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JPjWgPc/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE0F220663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hg6tE-0002tg-Ab
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 08:19:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49932)
+	id 1hg6ta-00034Y-4G
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 08:19:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51081)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hg6mX-0005cy-FM
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 08:12:11 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hg6r7-0001cT-Vt
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 08:16:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hg6mV-0000uS-H3
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 08:12:09 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:60285)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hg6mU-0000nN-8M
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 08:12:07 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MRCFu-1huMPQ1xUi-00NCN6; Wed, 26 Jun 2019 14:11:48 +0200
-From: Laurent Vivier <laurent@vivier.eu>
+ (envelope-from <alex.bennee@linaro.org>) id 1hg6r6-0003cY-OA
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 08:16:53 -0400
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:46436)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hg6r6-0003ZG-Dg
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 08:16:52 -0400
+Received: by mail-wr1-x42f.google.com with SMTP id n4so2436872wrw.13
+ for <qemu-devel@nongnu.org>; Wed, 26 Jun 2019 05:16:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=HYE0wJ2rSvsKHKxBmrzmiKhOTPWzCI5w+tM2tkyF6lU=;
+ b=JPjWgPc/n1gZQQYfso8iaFfEW4U7qD4Q/zwyTb5GfLuH/Rp2iWftPzdF55BfhJ/6JN
+ BjvSpfUSSZflZUpvytllP/IYnV2L6Suvs509zT4mxAkrUqfApFuwTv+3EmEoZGnds0qY
+ 3ECwkIRc5RriNxQU1Kew61ABxRPw6/f9FZjonMeDEB6fub7BuDMtVL/0PFFiCNX+uePG
+ WjrhJqxZQoQEi7Jg6Hpc5eauVIck76Ea4uepLUPyI4VAmMHFV/YESXnYk1Rs2SE8M+tL
+ CQqaALEUMC+EsshlLeXKIQe3WL0+1V9oKO0F4pdyQGZlTHjq1ZtCtiunOCKeGVBhLwuU
+ HpUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=HYE0wJ2rSvsKHKxBmrzmiKhOTPWzCI5w+tM2tkyF6lU=;
+ b=o2vw7tCFBVBlYhGScVxwex41hIDo+046O8duEHEesVNdaAQYI5Ls1b8OqvkGqmi6Cr
+ uVL0B6NVrrAXKKIBkrnqCCmqRmUp7w+zqhXjxxJLj/ntNZ2Z1DQ8G/aq7bBqOJDzOAbW
+ 5UX+BL8VAUx0NKbEA3tw98ooIaepxeAuEmdBDrV0aRg2wl7KFNhFTUEgskISTCcSGpPd
+ Oghj8449ztAub13IJvaHqFUeyL16VIpyc1Fj9ENAWH/gR0RzJxoP9idnnJRrhod6KW0d
+ IK5OPjVesbdZc9HqQFHbFo0cCtaGGQB71g68Tve9IvCfKKDsQdJN5TgOsQa7tRB3PIve
+ dB1A==
+X-Gm-Message-State: APjAAAVr0MV6jW9DI34c/hhrernt6efkRNc50JU9k4OWKHiBv1YOAhJI
+ H/vsRpgKkKWlVrAbLv/OqHVaqQ==
+X-Google-Smtp-Source: APXvYqyqWb04wNgFRlbcdv5QWnDlwup3AHmECVTZdMRrFWb6UpwJCGVVaTavqeqinzjVRTXWfyqMtg==
+X-Received: by 2002:adf:ea88:: with SMTP id s8mr3354754wrm.68.1561551410900;
+ Wed, 26 Jun 2019 05:16:50 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id f7sm12136155wrv.38.2019.06.26.05.16.50
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 26 Jun 2019 05:16:50 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id E01FE1FF87;
+ Wed, 26 Jun 2019 13:16:49 +0100 (BST)
+References: <f8f439b4-3835-686c-2c1e-20fe78d6bbf1@redhat.com>
+ <d75c0641-01a3-ac5c-2f4d-b41505747815@redhat.com>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 26 Jun 2019 14:11:36 +0200
-Message-Id: <20190626121139.19114-4-laurent@vivier.eu>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190626121139.19114-1-laurent@vivier.eu>
-References: <20190626121139.19114-1-laurent@vivier.eu>
+In-reply-to: <d75c0641-01a3-ac5c-2f4d-b41505747815@redhat.com>
+Date: Wed, 26 Jun 2019 13:16:49 +0100
+Message-ID: <878sto1qz2.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:8LioHe/lMony4uDwZrVGQsbC9Th7eTsFeIHzFVAi45zJBUTzqFn
- pmWkYTXEeaUiG7xgg+4Qu5yTkXBJh3S/MofESJvCl2VhtsI5ciHHZ/XlkUHR2P+cbWZUALK
- XEXAEphkossUkRRKCBTPeb6+U2YcdBdg4voFEDuHBjbewitNULW8KBOHFZ2Xhw2dtbswaiA
- D9AW8FlNAj1ObofY0+Kug==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:b35BU5mdNIY=:/nxkDKTFZgl5CieTikNQrG
- atnCnsGWjDJ0euJeWIMR+dfQZUgjlj+xtruAnuox39/kBXSDE/AVnSG3g0U8gXx9jz8C6Y6PA
- ujq2IR9S904d4yvaiT0iNq6foKRpVNWeLSAcM5U1BFBHAK0qi15gzcbQbvf7wtAsN40yGN1c9
- B9FpD75rj/D2BNn9qbgEF1IbUQL/1yMF0PtILZoqdjBf7ukeolRrVoEEQygHh0UAW0bkDtb/9
- BHdusuci2Foo3XSwo3uQaxnsKWlyjjXQL5qTSXuG5LHK++x6PzzzlQ28uVrn43lCGD/bVG1XQ
- nw1z16IH3FIArKD9asTd0LwnmKD9faLMt3Ule2Cs9dIrYMpM7IAiTcG2VLpUMv7O2KpfHxUG0
- 504t4MNSqyee7ws0vY0olJ7uLcCYSWnhjitZVLM51/NafrKzA4w/8sDIRc/SblxLqM9yzTJmD
- a7SnMp+RVC7OSllveVxr9DW3S+teJ72WeF8rcsvnk3Me4oTxpli1cx0QFv/3uXGYmiQEp1Qc1
- pSaRokXlxYxXP7sr2YEREMx41/nDVc2P+Za1GWhMhLk8fpobZzh5+1GHaNYlxZML+/OJ8pIf5
- phmHACncH09wZtwQ5gk6z/RnTQ2GcjKGqfLUqbSAjG3Hitws5wxZHmsM1TcFQEKh5bnV1k8jd
- xE5iYz2YGnzvA42mXDYJkJIDTwIp/z+Oxe3DWFcz9CENTw5FApxkbn8bCX5xkZpeoUyR9UX2K
- XTJQ46P4/puKetu8dkErl/34X9OgdzM8PFi4aU+kvgDwb6iX5hsYUog6drQ=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.75
-Subject: [Qemu-devel] [PULL 3/6] linux-user: Add support for setsockopt()
- option SOL_ALG
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42f
+Subject: Re: [Qemu-devel] trace: floating-point values blacklisted
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,89 +96,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Yunqiang Su <ysu@wavecomp.com>,
- Laurent Vivier <laurent@vivier.eu>,
- Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: =?utf-8?Q?Llu=C3=ADs?= Vilanova <vilanova@ac.upc.edu>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yunqiang Su <ysu@wavecomp.com>
 
-Add support for options SOL_ALG of the syscall setsockopt(). This
-option is used in relation to Linux kernel Crypto API, and allows
-a user to set additional information for the cipher operation via
-syscall setsockopt(). The field "optname" must be one of the
-following:
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-  - ALG_SET_KEY – seting the key
-  - ALG_SET_AEAD_AUTHSIZE – set the authentication tag size
+> [I forgot to Cc the list, resending]
+>
+> Hi Stefan, Llu=C3=ADs,
+>
+> When trying to add a trace event to report a float value, I get:
+>
+> trace-events:11: Argument type 'float' is not in whitelist. Only
+> standard C types and fixed size integer types should be used. struct,
+> union, and other complex pointer types should be declared as 'void *'
+> Traceback (most recent call last):
+>   File "./scripts/tracetool.py", line 152, in <module>
+>     main(sys.argv)
+>   File "./scripts/tracetool.py", line 143, in main
+>     events.extend(tracetool.read_events(fh, arg))
+>   File "./scripts/tracetool/__init__.py", line 365, in read_events
+>     event =3D Event.build(line)
+>   File "./scripts/tracetool/__init__.py", line 283, in build
+>     args =3D Arguments.build(groups["args"])
+>   File "./scripts/tracetool/__init__.py", line 133, in build
+>     validate_type(arg_type)
+>   File "./scripts/tracetool/__init__.py", line 86, in validate_type
+>     "declared as 'void *'" % name)
+>
+> Floating-point types are specified in the optional Annex F of the
+> standard ("IEC 60559 floating-point arithmetic").
+>
+> Is there a specific reason to not trace them, or simply nobody ever had
+> to trace them?
 
-SOL_ALG is relatively newer setsockopt() option. Therefore, the
-code that handles SOL_ALG is enclosed in "ifdef" so that the build
-does not fail for older kernels that do not contain support for
-SOL_ALG. "ifdef" also contains check if ALG_SET_KEY and
-ALG_SET_AEAD_AUTHSIZE are defined.
+I suspect that latter. I can't see any reason not to have floats (and
+doubles) in the allowed list although I wonder what happens with x86's
+weird-ass 80bit values. Do floats in x86 accommodate that?
 
-Signed-off-by: Yunqiang Su <ysu@wavecomp.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <1560953834-29584-3-git-send-email-aleksandar.markovic@rt-rk.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/syscall.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+>
+> Thanks,
+>
+> Phil.
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index e942049cb0da..ed1c9b0033be 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -102,6 +102,7 @@
- #include <linux/blkpg.h>
- #include <netpacket/packet.h>
- #include <linux/netlink.h>
-+#include <linux/if_alg.h>
- #include "linux_loop.h"
- #include "uname.h"
- 
-@@ -1941,6 +1942,36 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
-             goto unimplemented;
-         }
-         break;
-+#if defined(SOL_ALG) && defined(ALG_SET_KEY) && defined(ALG_SET_AEAD_AUTHSIZE)
-+    case SOL_ALG:
-+        switch (optname) {
-+        case ALG_SET_KEY:
-+        {
-+            char *alg_key = g_malloc(optlen);
-+
-+            if (!alg_key) {
-+                return -TARGET_ENOMEM;
-+            }
-+            if (copy_from_user(alg_key, optval_addr, optlen)) {
-+                g_free(alg_key);
-+                return -TARGET_EFAULT;
-+            }
-+            ret = get_errno(setsockopt(sockfd, level, optname,
-+                                       alg_key, optlen));
-+            g_free(alg_key);
-+            break;
-+        }
-+        case ALG_SET_AEAD_AUTHSIZE:
-+        {
-+            ret = get_errno(setsockopt(sockfd, level, optname,
-+                                       NULL, optlen));
-+            break;
-+        }
-+        default:
-+            goto unimplemented;
-+        }
-+        break;
-+#endif
-     case TARGET_SOL_SOCKET:
-         switch (optname) {
-         case TARGET_SO_RCVTIMEO:
--- 
-2.21.0
 
+--
+Alex Benn=C3=A9e
 
