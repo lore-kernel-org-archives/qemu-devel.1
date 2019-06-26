@@ -2,89 +2,91 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99332C48BD3
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 18:06:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3987C48BD3
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 18:07:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 719E5208E3
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 18:06:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 719E5208E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 91BF52080C
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 18:07:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jvW0WKPu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91BF52080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgCIz-00072k-NX
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 14:06:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38001)
+	id 1hgCKP-0000Il-P5
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 14:07:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38207)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hgCGk-00063X-2Z
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 14:03:43 -0400
+ (envelope-from <chmeeedalf@gmail.com>) id 1hgCHP-0006yR-1v
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 14:04:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hgCGj-0007OE-1s
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 14:03:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44366)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hgCGg-0007Ia-O5; Wed, 26 Jun 2019 14:03:39 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5C07C3082E63;
- Wed, 26 Jun 2019 18:03:37 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.153])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AA79560BF3;
- Wed, 26 Jun 2019 18:03:30 +0000 (UTC)
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <20190410012413.31569-1-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <fd29e0f9-4e60-29e5-9607-3dc624204c2d@redhat.com>
-Date: Wed, 26 Jun 2019 20:03:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <chmeeedalf@gmail.com>) id 1hgCHL-00083s-Kb
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 14:04:21 -0400
+Received: from mail-io1-xd36.google.com ([2607:f8b0:4864:20::d36]:45071)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <chmeeedalf@gmail.com>)
+ id 1hgCHK-0007zt-A2; Wed, 26 Jun 2019 14:04:19 -0400
+Received: by mail-io1-xd36.google.com with SMTP id e3so6988552ioc.12;
+ Wed, 26 Jun 2019 11:04:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=ov4PdTxMGoTpFE3f8bXEYa2hKdkYMV2/jyq6nZ6Ckqw=;
+ b=jvW0WKPujqrD+o6NhWZKsCd7elc1KJB6RwxQTTj7NuqIjJC1c4cy+LZzuVKLWW5qqt
+ AMxe5R23v9Jr7nca//RyAPfUegzi3ZQKwFhMd50DRQIDRqWTFg1SnIyO99M7xmzBhSNY
+ LVK9GCOcWBX1LgcxUY4O5rF0i0jbxzB1ZoLvPqEtLbNLE2iS98R48+1uC76vL7oTHUDF
+ i9cie6Nfc/GDAmUOhJNy9C/T98QmoN+8dmbRHBzE+xZg/0FpXlnd5gnS4yFZFnCCwnCX
+ fbN5KFzUYLfGlVLXsY4psDlh56FAXvJxAy0K+SEqC8rkU0rpbu6mOZS3IRhiZUk+0V/U
+ 3vBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ov4PdTxMGoTpFE3f8bXEYa2hKdkYMV2/jyq6nZ6Ckqw=;
+ b=FiMHOJDoh0kKxk+PDC2dNS0vBvkxwrKHbEcpqcGmi7cVjyHWjX4NCT+XPobAT2DJr1
+ PCBBLEbkWEtSqJkXG3Oz4krfDMx7hc4boVh5AKASHztucabeoHLJ/VyQmUEkdnKzzjFw
+ wNy9C4Pu0gg/Gbefn6yryrc5U5Y/vNtpHDy7q7ded4iiQzLpslk4ScD1pdi0OYqSyaz8
+ hucqcM0Uv8Ks1wPEgepNgLmY4j26TH4F+MkmxQH2JUQB8r2JmGOVtNGbgREM1wBT+7hU
+ 57U8VTspepXZK6VLwcLz0+vPT1N1tLxmQgpQbvO8iFWiarXQLcY7c6Cb//7omgcIM/du
+ cbGg==
+X-Gm-Message-State: APjAAAUo6reGcA3MkC4/zvPqWnTONaIvJch1GQkd4Kpo6TxSRT11ebg3
+ nJyQq7USiE9TZN69QCwyux0=
+X-Google-Smtp-Source: APXvYqwgGcf8U+g55sQnmvLoZZ/hHWGf/A8QuSsyRAFtfoCFbwXviLvKn1W7Xp8D5ywKae+VGtk8JA==
+X-Received: by 2002:a5e:9b05:: with SMTP id j5mr6585842iok.75.1561572257169;
+ Wed, 26 Jun 2019 11:04:17 -0700 (PDT)
+Received: from titan.knownspace (173-25-245-129.client.mchsi.com.
+ [173.25.245.129])
+ by smtp.gmail.com with ESMTPSA id x22sm16184720ioh.87.2019.06.26.11.04.16
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 26 Jun 2019 11:04:16 -0700 (PDT)
+Date: Wed, 26 Jun 2019 13:04:14 -0500
+From: Justin Hibbits <chmeeedalf@gmail.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <20190626130414.08940342@titan.knownspace>
+In-Reply-To: <d60f142d-27ef-bfe5-1eb6-cefb22640625@vivier.eu>
+References: <20190607135653.6ece685d@titan.knownspace>
+ <8676232e-917d-44e2-1149-b25f26698a73@vivier.eu>
+ <92053c9c-e7bf-76cb-9399-987f4ab31bfb@vivier.eu>
+ <20190626113742.6bcd8a26@titan.knownspace>
+ <d60f142d-27ef-bfe5-1eb6-cefb22640625@vivier.eu>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; powerpc64-portbld-freebsd13.0)
 MIME-Version: 1.0
-In-Reply-To: <20190410012413.31569-1-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="N1jid9KxThJK5EpA7ctdd2c1MdkXth1xS"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Wed, 26 Jun 2019 18:03:37 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH RFC 0/3] qemu-img: remove command
- documentation duplication
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d36
+Subject: Re: [Qemu-devel] [Qemu-trivial] Fix cacheline size retrieval on
+ FreeBSD/PowerPC(64)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,77 +98,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- armbru@redhat.com, Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-trivial@nongnu.org, "Emilio G. Cota" <cota@braap.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---N1jid9KxThJK5EpA7ctdd2c1MdkXth1xS
-Content-Type: multipart/mixed; boundary="5bWNoA7Lh4njmHTkXeUtemHsyz1vpGws9";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, eblake@redhat.com,
- Eduardo Habkost <ehabkost@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
-Message-ID: <fd29e0f9-4e60-29e5-9607-3dc624204c2d@redhat.com>
-Subject: Re: [PATCH RFC 0/3] qemu-img: remove command documentation
- duplication
-References: <20190410012413.31569-1-jsnow@redhat.com>
-In-Reply-To: <20190410012413.31569-1-jsnow@redhat.com>
+On Wed, 26 Jun 2019 18:47:42 +0200
+Laurent Vivier <laurent@vivier.eu> wrote:
 
---5bWNoA7Lh4njmHTkXeUtemHsyz1vpGws9
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 10.04.19 03:24, John Snow wrote:
-> This might hopefully cut down on the doc duplication/mismatching
-> until I can devise something more comprehensive.
+> Le 26/06/2019 =C3=A0 18:37, Justin Hibbits a =C3=A9crit=C2=A0:
+> > On Wed, 26 Jun 2019 18:16:36 +0200
+> > Laurent Vivier <laurent@vivier.eu> wrote:
+> >  =20
+> >> Le 26/06/2019 =C3=A0 18:14, Laurent Vivier a =C3=A9crit=C2=A0: =20
+> >>> Le 07/06/2019 =C3=A0 20:56, Justin Hibbits a =C3=A9crit=C2=A0:   =20
+> >>>> The attached very trivial patch fixes a startup bug that prevents
+> >>>> at least Qemu 3.1 and later from working on FreeBSD/powerpc64.
+> >>>>
+> >>>> - Justin
+> >>>>   =20
+> >>>
+> >>> Please don't send a patch in attachment but inlined in the message
+> >>> (you may use "git send-email" for that).
+> >>>
+> >>> This patch fixes "util: add cacheinfo" that has changed the type
+> >>> from unsigned to long.
+> >>>
+> >>> You can add the following line in the commit message:
+> >>>
+> >>> Fixes: b255b2c8a548 ("util: add cacheinfo")
+> >>>
+> >>> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+> >>>    =20
+> >>
+> >> CC: author of b255b2c8a548 ("util: add cacheinfo")
+> >>
+> >> Thanks,
+> >> Laurent =20
+> >=20
+> > Hi Laurent,
+> >=20
+> > Sorry.  I had never used git send-email before, so wasn't
+> > comfortable with it.  I just updated the commit message with your
+> > feedback and used git send-email to submit the patch.  I hope
+> > everything went well. =20
 >=20
-> Ideally, I'd like to redo all of the documentation for qemu-img
-> nearly from scratch; with a parser generator that helps generate
-> the documentation as well so they'll never get out of date.
+> It seems not. I didn't receive it.
 >=20
-> That's probably quite a ways off, and maybe there are other
-> structural changes we want to make with respect to sphinx and
-> other build tools, so I am sending something very minimal instead.
+> Did you configure the SMTP server. See git-send-email(1):
 >=20
-> This ought to be functionally identical down to the last char.
+>    Use gmail as the smtp server
 >=20
-> (I've re-included patch one which I have sent to the list separately,
-> purely as a dependency if you want to apply these patches.)
+>        To use git send-email to send your patches through the GMail
+> SMTP server, edit ~/.gitconfig to specify your account settings:
 >=20
-> John Snow (3):
->   qemu-img: fix .hx and .texi disparity
->   pxtool: Add new qemu-img command info generation tool
->   qemu-img.texi: use macros for command summaries
+>            [sendemail]
+>                    smtpEncryption =3D tls
+>                    smtpServer =3D smtp.gmail.com
+>                    smtpUser =3D yourname@gmail.com
+>                    smtpServerPort =3D 587
+>=20
+>        If you have multifactor authentication setup on your gmail
+> account, you will need to generate an app-specific password for use
+> with git send-email. Visit
+>        https://security.google.com/settings/security/apppasswords to
+> create it.
+>=20
+>        Once your commits are ready to be sent to the mailing list,
+> run the following commands:
+>=20
+>            $ git format-patch --cover-letter -M origin/master -o
+> outgoing/ $ edit outgoing/0000-*
+>            $ git send-email outgoing/*
+>=20
+>        The first time you run it, you will be prompted for your
+> credentials. Enter the app-specific or your regular password as
+> appropriate. If you have credential helper configured (see
+> git-credential(1)), the password will be saved in the credential
+> store so you won=E2=80=99t have to type it the next time.
+>=20
+>        Note: the following perl modules are required Net::SMTP::SSL,
+>        MIME::Base64 and Authen::SASL
+>=20
+> Thanks,
+> Laurent
+>=20
+> =20
 
-Hm.  Non-RFC ping?
+Hm, you're right.  Even after making the config changes and installing
+the necessary packages, I still have no luck with git send-email.  Might
+take a bit to debug this.
 
-Max
-
-
---5bWNoA7Lh4njmHTkXeUtemHsyz1vpGws9--
-
---N1jid9KxThJK5EpA7ctdd2c1MdkXth1xS
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0Ts3EACgkQ9AfbAGHV
-z0DN4ggAodwJohWHAeyC5skJTghGlFlvmGUnDmhKlopAYDvO3envE+hgpSw8wbz5
-APllyskxurUtXYqcMOo7RhigdtJiTukSm8/OjoeHcEWanSxWcUHyAfes9EcNYunl
-H6JrvSPeW4Jdzus6UFkV8fdMiqi5xGHyOQ/Vr1M8rehXl+A5OQ5Lu5kfGMX/7aQb
-ckfZBF/Hid9frEUcitXI+18eKa2KoGClLnOsCfG6taoimNOFtxEi3ne8bsMwuUM2
-Gj+dsF7hQBB6G1irlJHtFg7JJ4mwjih/es5Bmwpr/fsR84RGt7us+Ny6rPHgRkul
-TIlnOWzLyf94QdazjR0hkpSTDnyLhw==
-=RFY8
------END PGP SIGNATURE-----
-
---N1jid9KxThJK5EpA7ctdd2c1MdkXth1xS--
+- Justin
 
