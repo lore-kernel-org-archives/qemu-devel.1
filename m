@@ -2,66 +2,53 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-2.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09153C48BD3
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 10:05:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D422C48BD6
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 10:08:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D89C1205F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 10:05:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D89C1205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6240320663
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 10:08:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6240320663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hg4ne-0004L2-49
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 06:05:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43112)
+	id 1hg4rK-0007Sa-L2
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 06:08:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44764)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1hg4k8-0002yh-4B
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 06:01:42 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hg4pm-00063k-3r
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 06:07:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1hg4k3-0005Lr-LO
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 06:01:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34098)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hg4pk-0003Jt-Av
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 06:07:22 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:38529 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1hg4jx-0005Fv-Ks; Wed, 26 Jun 2019 06:01:23 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AA1C9307CDD5;
- Wed, 26 Jun 2019 10:01:15 +0000 (UTC)
-Received: from [10.36.116.89] (ovpn-116-89.ams2.redhat.com [10.36.116.89])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7AE8A5D70D;
- Wed, 26 Jun 2019 10:01:12 +0000 (UTC)
-To: Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org
-References: <20190621163422.6127-1-drjones@redhat.com>
- <20190621163422.6127-6-drjones@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <3c24d706-4ee5-336d-8f74-adae672c450d@redhat.com>
-Date: Wed, 26 Jun 2019 12:01:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <20190621163422.6127-6-drjones@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Wed, 26 Jun 2019 10:01:15 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 05/14] target/arm/helper: zcr: Add build
- bug next to value range assumption
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1hg4pj-0003H8-Uh
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 06:07:20 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id D2C431A1E5A;
+ Wed, 26 Jun 2019 12:07:16 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.13.43])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 9F6CA1A1E3A;
+ Wed, 26 Jun 2019 12:07:16 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 26 Jun 2019 12:07:01 +0200
+Message-Id: <1561543629-20327-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PATCH v6 0/8] target/mips: Improve MSA TCG tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,37 +60,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, armbru@redhat.com,
- imammedo@redhat.com, alex.bennee@linaro.org, Dave.Martin@arm.com
+Cc: arikalo@wavecomp.com, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Drew,
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-On 6/21/19 6:34 PM, Andrew Jones wrote:
-> Suggested-by: Dave Martin <Dave.Martin@arm.com>
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  target/arm/helper.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index df4276f5f6ca..edba94004e0b 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -5319,6 +5319,7 @@ static void zcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
->      int new_len;
->  
->      /* Bits other than [3:0] are RAZ/WI.  */
-> +    QEMU_BUILD_BUG_ON(ARM_MAX_VQ > 16);
-Can you document in the commit message why this check is critical?
+This series contains various improvements and additions of MSA ASE
+TCG tests.
 
-Thanks
+v5->v6:
 
-Eric
->      raw_write(env, ri, value & 0xf);
->  
->      /*
-> 
+  - fixed bad values for some test cases of pack instructions
+  - fixex big endian host behavior for interleave instructions
+
+v4->v5:
+
+  - added patch on MIPS32R6 support
+  - amended other patches
+
+v3->v4:
+
+  - patches 1 and 2 from v3 got reviewed and integrated into upstream,
+    so they are now removed in v4
+  - added tests for MSA int multiply instructions
+  - added support for MSA big-endian target testings
+  - amend4ed remainign patches
+  - rebased to the latest code
+
+v2->v3:
+
+  - added some tests from move group
+  - added some tests from int dot product group
+  - completed tests from bit move group
+
+v1->v2:
+
+  - added some tests from bit move group
+  - improved and updated commit messages
+
+
+Aleksandar Markovic (8):
+  tests/tcg: target/mips: Add tests for MSA bit move instructions
+  tests/tcg: target/mips: Add tests for MSA move instructions
+  tests/tcg: target/mips: Amend tests for MSA int dot product
+    instructions
+  tests/tcg: target/mips: Amend tests for MSA int multiply instructions
+  tests/tcg: target/mips: Add support for MSA big-endian target testings
+  tests/tcg: target/mips: Add support for MSA MIPS32R6 testings
+  tests/tcg: target/mips: Fix some test cases for pack MSA instructions
+  target/mips: Fix big endian host behavior for interleave MSA
+    instructions
+
+ target/mips/msa_helper.c                           |  24 +-
+ tests/tcg/mips/include/wrappers_msa.h              |  96 +++-
+ .../mips/user/ase/msa/bit-move/test_msa_binsl_b.c  | 214 +++++++
+ .../mips/user/ase/msa/bit-move/test_msa_binsl_d.c  | 214 +++++++
+ .../mips/user/ase/msa/bit-move/test_msa_binsl_h.c  | 214 +++++++
+ .../mips/user/ase/msa/bit-move/test_msa_binsl_w.c  | 214 +++++++
+ .../mips/user/ase/msa/bit-move/test_msa_binsr_b.c  | 214 +++++++
+ .../mips/user/ase/msa/bit-move/test_msa_binsr_d.c  | 214 +++++++
+ .../mips/user/ase/msa/bit-move/test_msa_binsr_h.c  | 214 +++++++
+ .../mips/user/ase/msa/bit-move/test_msa_binsr_w.c  | 214 +++++++
+ .../mips/user/ase/msa/bit-move/test_msa_bmnz_v.c   | 214 +++++++
+ .../mips/user/ase/msa/bit-move/test_msa_bmz_v.c    | 214 +++++++
+ .../mips/user/ase/msa/bit-move/test_msa_bsel_v.c   | 214 +++++++
+ .../ase/msa/int-dot-product/test_msa_dpadd_s_d.c   | 214 +++++++
+ .../ase/msa/int-dot-product/test_msa_dpadd_s_h.c   | 214 +++++++
+ .../ase/msa/int-dot-product/test_msa_dpadd_s_w.c   | 214 +++++++
+ .../ase/msa/int-dot-product/test_msa_dpadd_u_d.c   | 214 +++++++
+ .../ase/msa/int-dot-product/test_msa_dpadd_u_h.c   | 214 +++++++
+ .../ase/msa/int-dot-product/test_msa_dpadd_u_w.c   | 214 +++++++
+ .../ase/msa/int-dot-product/test_msa_dpsub_s_d.c   | 214 +++++++
+ .../ase/msa/int-dot-product/test_msa_dpsub_s_h.c   | 214 +++++++
+ .../ase/msa/int-dot-product/test_msa_dpsub_s_w.c   | 214 +++++++
+ .../ase/msa/int-dot-product/test_msa_dpsub_u_d.c   | 214 +++++++
+ .../ase/msa/int-dot-product/test_msa_dpsub_u_h.c   | 214 +++++++
+ .../ase/msa/int-dot-product/test_msa_dpsub_u_w.c   | 214 +++++++
+ .../user/ase/msa/int-multiply/test_msa_maddv_b.c   | 214 +++++++
+ .../user/ase/msa/int-multiply/test_msa_maddv_d.c   | 214 +++++++
+ .../user/ase/msa/int-multiply/test_msa_maddv_h.c   | 214 +++++++
+ .../user/ase/msa/int-multiply/test_msa_maddv_w.c   | 214 +++++++
+ .../user/ase/msa/int-multiply/test_msa_msubv_b.c   | 214 +++++++
+ .../user/ase/msa/int-multiply/test_msa_msubv_d.c   | 214 +++++++
+ .../user/ase/msa/int-multiply/test_msa_msubv_h.c   | 214 +++++++
+ .../user/ase/msa/int-multiply/test_msa_msubv_w.c   | 214 +++++++
+ tests/tcg/mips/user/ase/msa/move/test_msa_move_v.c | 149 +++++
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c  |  64 +--
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c  |  64 +--
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c  |  64 +--
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c  |  64 +--
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c  |  64 +--
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c  |  64 +--
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c  |  64 +--
+ .../tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c  |  64 +--
+ tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c |  64 +--
+ tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c |  64 +--
+ tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c |  64 +--
+ tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c |  64 +--
+ .../mips/user/ase/msa/test_msa_compile_32r6eb.sh   | 627 +++++++++++++++++++++
+ .../mips/user/ase/msa/test_msa_compile_32r6el.sh   | 627 +++++++++++++++++++++
+ .../mips/user/ase/msa/test_msa_compile_64r6eb.sh   | 627 +++++++++++++++++++++
+ ...t_msa_compile.sh => test_msa_compile_64r6el.sh} | 561 ++++++++++--------
+ tests/tcg/mips/user/ase/msa/test_msa_run.sh        | 326 -----------
+ tests/tcg/mips/user/ase/msa/test_msa_run_32r6eb.sh | 363 ++++++++++++
+ tests/tcg/mips/user/ase/msa/test_msa_run_32r6el.sh | 363 ++++++++++++
+ tests/tcg/mips/user/ase/msa/test_msa_run_64r6eb.sh | 363 ++++++++++++
+ tests/tcg/mips/user/ase/msa/test_msa_run_64r6el.sh | 363 ++++++++++++
+ 55 files changed, 10919 insertions(+), 972 deletions(-)
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-move/test_msa_binsl_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-move/test_msa_binsl_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-move/test_msa_binsl_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-move/test_msa_binsl_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-move/test_msa_binsr_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-move/test_msa_binsr_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-move/test_msa_binsr_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-move/test_msa_binsr_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-move/test_msa_bmnz_v.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-move/test_msa_bmz_v.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-move/test_msa_bsel_v.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-dot-product/test_msa_dpadd_s_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-dot-product/test_msa_dpadd_s_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-dot-product/test_msa_dpadd_s_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-dot-product/test_msa_dpadd_u_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-dot-product/test_msa_dpadd_u_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-dot-product/test_msa_dpadd_u_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-dot-product/test_msa_dpsub_s_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-dot-product/test_msa_dpsub_s_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-dot-product/test_msa_dpsub_s_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-dot-product/test_msa_dpsub_u_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-dot-product/test_msa_dpsub_u_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-dot-product/test_msa_dpsub_u_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-multiply/test_msa_msubv_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-multiply/test_msa_msubv_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-multiply/test_msa_msubv_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-multiply/test_msa_msubv_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/move/test_msa_move_v.c
+ create mode 100755 tests/tcg/mips/user/ase/msa/test_msa_compile_32r6eb.sh
+ create mode 100755 tests/tcg/mips/user/ase/msa/test_msa_compile_32r6el.sh
+ create mode 100755 tests/tcg/mips/user/ase/msa/test_msa_compile_64r6eb.sh
+ rename tests/tcg/mips/user/ase/msa/{test_msa_compile.sh => test_msa_compile_64r6el.sh} (77%)
+ delete mode 100755 tests/tcg/mips/user/ase/msa/test_msa_run.sh
+ create mode 100644 tests/tcg/mips/user/ase/msa/test_msa_run_32r6eb.sh
+ create mode 100755 tests/tcg/mips/user/ase/msa/test_msa_run_32r6el.sh
+ create mode 100755 tests/tcg/mips/user/ase/msa/test_msa_run_64r6eb.sh
+ create mode 100755 tests/tcg/mips/user/ase/msa/test_msa_run_64r6el.sh
+
+-- 
+2.7.4
+
 
