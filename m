@@ -2,70 +2,66 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-12.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E0BEC48BD6
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 16:41:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 018B8C48BD6
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 16:42:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3589820644
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 16:41:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3589820644
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id CB7C020644
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 16:42:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB7C020644
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgAzT-0005Zi-GN
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 12:41:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59150)
+	id 1hgB0N-0006a6-VP
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 12:42:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58918)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <groug@kaod.org>) id 1hgAt7-0006v9-VS
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 12:35:15 -0400
+ (envelope-from <laurent@vivier.eu>) id 1hgAsL-0006MZ-5w
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 12:34:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1hgAt5-0002Z5-PH
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 12:35:13 -0400
-Received: from 10.mo178.mail-out.ovh.net ([46.105.76.150]:59306)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1hgAt0-00027J-CX
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 12:35:07 -0400
-Received: from player792.ha.ovh.net (unknown [10.108.35.103])
- by mo178.mail-out.ovh.net (Postfix) with ESMTP id 2F2266E97A
- for <qemu-devel@nongnu.org>; Wed, 26 Jun 2019 18:34:56 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player792.ha.ovh.net (Postfix) with ESMTPSA id CF6DE75CB61F;
- Wed, 26 Jun 2019 16:34:48 +0000 (UTC)
-Date: Wed, 26 Jun 2019 18:34:47 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <20190626183447.1c4cb4c3@bahia.lan>
-In-Reply-To: <ca73d533-644b-a366-2927-4163f9aa2ce9@vivier.eu>
-References: <155912548463.2019004.3515830305299809902.stgit@bahia.lan>
- <20190529125926.GD2126@perard.uk.xensource.com>
- <20190605121056.0e784daf@bahia.lab.toulouse-stg.fr.ibm.com>
- <c85d973ca2d444678e8fdc86a4cd6f4f@AMSPEX02CL03.citrite.net>
- <20190614101621.098742e2@bahia.lan>
- <c2c63dd46c684b1bb0f2e342a085d93d@AMSPEX02CL03.citrite.net>
- <alpine.DEB.2.21.1906140844150.2072@sstabellini-ThinkPad-T480s>
- <20190614185054.6f12ab30@bahia.lan>
- <b40f16eb-5ae5-4b36-e0a8-02b10c3b7769@redhat.com>
- <ca73d533-644b-a366-2927-4163f9aa2ce9@vivier.eu>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <laurent@vivier.eu>) id 1hgAsK-0001R1-4W
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 12:34:25 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:51123)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hgAsJ-0001HA-RS
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 12:34:24 -0400
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
+ id 1MjjGX-1iPQdj2wmp-00lCGs; Wed, 26 Jun 2019 18:21:08 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Date: Wed, 26 Jun 2019 18:20:57 +0200
+Message-Id: <20190626162100.24774-1-laurent@vivier.eu>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 11434639454646016472
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrudeigddutdegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:vY8bPVBxri4FZS7L7dVW7hjI91XFPsMeDZ4jOM9qxD+st9JGaij
+ G/AkRLIK8JIloinotAjLbRhmQQ989Mo1C5IcB0huLxRk9SLVo9PCgvIS/aQui8irhV7p818
+ 8s8Npd0T8RqaXuFbgmpDcfgroaQ34rWW8k9oYpXtFUxLdU082IkIyvnr9DdS8wokxWz+6Zi
+ Kuu8Jo8bQtrlq5crzXZ2A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:NsQp4/UU/Go=:1Kyd1iDgd3HvfRbOT2Vg2Q
+ YRMGRMthseo1sAkrgtLy9o1RUD/V+9tdV5MeNkDzhC7RtKsZ6k/iY7y4Dc5BvjjTXk3Qr7Rw8
+ Rb/ux4cjigKj15TmgvzVzUfkYJn5L8saUaq2u5bseWnhaSwshRlfMY2jO7B2dBZthmF1ampZN
+ gs8MnfS9O8aGoOCQJPZEA/aeCrIawJ/90pIXj9wcfrp27qk3QP+U2UpAKdWJbg4SNSCYxUQ8r
+ ncrCOvDwb6/pEkEaFR1jdbjSPL89pbpDuDbrSY4CjHyQVpwkb+qErblTZ/xTqvIsuBntEpLVp
+ W+Ih415L0up3Q2xCBhP+lQj+GZ74qfZvdPzmEVxYYwEmFM/EJVVX4jYpUbOgSNnBfYWohf756
+ WDG5wemk5YB1yOu/5RuYX1RwVk6GR34VXaHxge7bv7xDkDJFCD3pDpZYVh8T+pf4wu7tVyGjP
+ oOhvAVFbJfz4ae6FreHb7E2UcZFG4aBraF7NldX0DT4tjHUGJvj9FTn9ll6/ifpQJVyHfXg8p
+ J4OaT+lX4N2Vlp2eCwc/oQmZ8kA0JL1czL0GKXssDjDm5/HBvDb/Y+9Gmt8lzOUlJUgzGGAwr
+ rTB/mMHegHQW6nzh35cwiq0DzGhLo6zzfHe21oZoXzirRnxLBINAfrZE1IYG0KGnHqxy0JX3C
+ KAVO/dlKQ6CtQR1kkMoGkXMsTBbtr79yC0mhXyNpcYX90u8yFzBbHk/Sw5qDDqDGruz/TgUiI
+ o3bcELENmrltqdoKsZXQJtLG4gWGt5TkxLVbYw==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.76.150
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] MAINTAINERS: Change
- maintership of Xen code under hw/9pfs
+X-Received-From: 217.72.192.75
+Subject: [Qemu-devel] [PULL 0/3] M68k next patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,46 +73,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefano Stabellini <sstabellini@kernel.org>,
- QEMU Trivial <qemu-trivial@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>, Paul Durrant <Paul.Durrant@citrix.com>,
- Anthony Perard <anthony.perard@citrix.com>,
- Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 26 Jun 2019 18:30:47 +0200
-Laurent Vivier <laurent@vivier.eu> wrote:
+The following changes since commit 474f3938d79ab36b9231c9ad3b5a9314c2aeacde:
 
-> Le 15/06/2019 =C3=A0 07:43, Philippe Mathieu-Daud=C3=A9 a =C3=A9crit=C2=
-=A0:
-> > Cc'ing qemu-trivial@
-> >=20
-> > On 6/14/19 6:50 PM, Greg Kurz wrote:
-> > [...] =20
-> >> Markus, Xen maintainers,
-> >>
-> >> All needed Acked-by have been provided. I don't plan to send a 9pfs PR
-> >> anytime soon. Can this go through someone else's tree please ?
-> >>
-> >> Cheers,
-> >>
-> >> --
-> >> Greg
-> >> =20
-> >  =20
->=20
-> Applied to my trivial-patches branch.
->=20
-> Thanks,
-> Laurent
+  Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-jun-21-2019' into staging (2019-06-21 15:40:50 +0100)
 
-Merci Laurent ! :)
+are available in the Git repository at:
 
-Cheers,
+  git://github.com/vivier/qemu-m68k.git tags/m68k-next-pull-request
 
---
-Greg
+for you to fetch changes up to c6d0700f57b2c50229a27e31b9f99056a011215f:
+
+  linux-user/m68k: remove simulator syscall interface (2019-06-26 17:14:41 +0200)
+
+----------------------------------------------------------------
+remove m68k simulator syscall interface
+Fix comments format
+Fix gdbstub
+
+----------------------------------------------------------------
+
+Laurent Vivier (1):
+  linux-user/m68k: remove simulator syscall interface
+
+Lucien Murray-Pitts (2):
+  The m68k gdbstub SR reg request doesnt include Condition-Codes
+  m68k comments break patch submission due to being incorrectly
+    formatted
+
+ linux-user/Makefile.objs            |   1 -
+ linux-user/m68k-sim.c               | 163 ------------------
+ linux-user/m68k/cpu_loop.c          |  17 +-
+ linux-user/m68k/target_syscall.h    |   2 -
+ linux-user/qemu.h                   |   1 -
+ target/m68k/cpu-qom.h               |   2 +-
+ target/m68k/cpu.c                   |   6 +-
+ target/m68k/cpu.h                   |  29 ++--
+ target/m68k/fpu_helper.c            |   6 +-
+ target/m68k/gdbstub.c               |   9 +-
+ target/m68k/helper.c                |  16 +-
+ target/m68k/m68k-semi.c             |  24 ++-
+ target/m68k/op_helper.c             |  58 ++++---
+ target/m68k/softfloat.c             | 181 ++++++++++----------
+ target/m68k/softfloat.h             |   3 +-
+ target/m68k/softfloat_fpsp_tables.h |   3 +-
+ target/m68k/translate.c             | 246 ++++++++++++++++++----------
+ 17 files changed, 356 insertions(+), 411 deletions(-)
+ delete mode 100644 linux-user/m68k-sim.c
+
+-- 
+2.21.0
+
 
