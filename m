@@ -2,94 +2,56 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A808C48BD3
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 10:10:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 954F4C48BD3
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 10:12:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A8CC20663
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 10:10:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fUlQR/yC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A8CC20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6900B205ED
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 10:12:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6900B205ED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hg4t9-0001U4-MF
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 06:10:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44941)
+	id 1hg4uv-00031k-MB
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 06:12:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44795)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hg4q4-0006RH-U2
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 06:07:43 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hg4po-00063s-50
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 06:07:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hg4q3-0003ga-QZ
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 06:07:40 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37885)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hg4q3-0003fX-Hn
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 06:07:39 -0400
-Received: by mail-wm1-x341.google.com with SMTP id f17so1458780wme.2
- for <qemu-devel@nongnu.org>; Wed, 26 Jun 2019 03:07:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=d13CFAs8heXrNe1lEMEAnywPJmbZC2RHpfH/z4Bp+Cg=;
- b=fUlQR/yCzjv9zpDX99mCZl0qkKJ14ozQMrthed/R+cIHiRmZgf6U+5u15BjHwxsd27
- HeqiYLRSPWxK/modB1CoGSfmJoKwsTpc0hJJlBMkvmuqM0wv7J7XTe1W9PaS62odX1Su
- dKkipVqymtpCNHr1Yl5pZFX2lx4V1J6RfAKY4BNJt9hrltOlVPcC4UMw4QoKtwim/UqV
- sU/sNRIWWfVJe2dP76COWlmq/BbSLRI9wRVWJCZEi3qhHnpalfWa6XdsxlR868YUibzU
- n2G8Hee2VG7sbYI3dss7f/XJo7JrCO9EUh/hNV+r1dU5HjhfRzLoZWeU2PsqVd2+qplF
- oqKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=d13CFAs8heXrNe1lEMEAnywPJmbZC2RHpfH/z4Bp+Cg=;
- b=uJf3CcnwD9vdy8UaNDA7wJlTQ0xlp+18ZRRZ/8CQRWjWhq/VHCeHQLpRtUu4z6uPrN
- 1xmRTwjpHVRVP/QHiVda6Kw72ytPlESW8BlQ6vzqp17PLKN6+PeHawjw8sGKLMhEFxsN
- kotQUF1KYq9LT0Kro1Fo0D79Wb/nGTf7XI3RrbErYsshbZQOvLxi/n03i2wG4VW3udyn
- 38x0O5bmoB+6PLYQOY1eMLPlLvPhALYczg39Sh+NL8EmDWSu2Y2It5ibHYlAJBn6uev7
- KcSYglF35yY+m3M6sV2inHDcKpH4MfhGghtI0lZQWt2zFYnYp4vgXB8m5rYyJ7QQ2PK0
- MPNw==
-X-Gm-Message-State: APjAAAUFAeFcc1CufKJ+NW+f7lro8xqgK8pT1zawixzzYql+e5eB6sAu
- sYPRkXApD0coJ1CuqZN6gMsYNA==
-X-Google-Smtp-Source: APXvYqyLaAs5XqQSGQhJNLMdFFpYV107oBZt5JWJ52BPC+hkq8GO8dOFUmtP8BSoIyjhGTh+jx8DQw==
-X-Received: by 2002:a7b:c766:: with SMTP id x6mr2239722wmk.40.1561543658321;
- Wed, 26 Jun 2019 03:07:38 -0700 (PDT)
-Received: from [192.168.2.137] (93-34-153-63.ip50.fastwebnet.it.
- [93.34.153.63])
- by smtp.gmail.com with ESMTPSA id 32sm32360886wra.35.2019.06.26.03.07.37
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 26 Jun 2019 03:07:37 -0700 (PDT)
-To: Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org
-References: <20190621163422.6127-1-drjones@redhat.com>
- <20190621163422.6127-6-drjones@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <07f6fb25-daf2-4429-49c8-7aefb2cde7ae@linaro.org>
-Date: Wed, 26 Jun 2019 12:07:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <20190621163422.6127-6-drjones@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH v2 05/14] target/arm/helper: zcr: Add build
- bug next to value range assumption
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hg4pm-0003MY-8l
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 06:07:24 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:39154 helo=mail.rt-rk.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1hg4pl-0003L1-Tq
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 06:07:22 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 9BC271A1CCA;
+ Wed, 26 Jun 2019 12:07:19 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.13.43])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 630241A1E3A;
+ Wed, 26 Jun 2019 12:07:19 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 26 Jun 2019 12:07:03 +0200
+Message-Id: <1561543629-20327-3-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1561543629-20327-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1561543629-20327-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PATCH v6 2/8] tests/tcg: target/mips: Add tests for
+ MSA move instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,41 +63,235 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, armbru@redhat.com, eric.auger@redhat.com,
- imammedo@redhat.com, alex.bennee@linaro.org, Dave.Martin@arm.com
+Cc: arikalo@wavecomp.com, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/21/19 6:34 PM, Andrew Jones wrote:
-> Suggested-by: Dave Martin <Dave.Martin@arm.com>
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  target/arm/helper.c | 1 +
->  1 file changed, 1 insertion(+)
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Add tests for MSA move instructions.
 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index df4276f5f6ca..edba94004e0b 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -5319,6 +5319,7 @@ static void zcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
->      int new_len;
->  
->      /* Bits other than [3:0] are RAZ/WI.  */
-> +    QEMU_BUILD_BUG_ON(ARM_MAX_VQ > 16);
->      raw_write(env, ri, value & 0xf);
->  
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+---
+ tests/tcg/mips/include/wrappers_msa.h              |   8 ++
+ tests/tcg/mips/user/ase/msa/move/test_msa_move_v.c | 149 +++++++++++++++++++++
+ tests/tcg/mips/user/ase/msa/test_msa_compile.sh    |   7 +
+ tests/tcg/mips/user/ase/msa/test_msa_run.sh        |   6 +
+ 4 files changed, 170 insertions(+)
+ create mode 100644 tests/tcg/mips/user/ase/msa/move/test_msa_move_v.c
 
-Re down-thread conversation, I think this is the nice easy way to make sure
-that the 0xf is modified if we ever decide to support larger vectors.
+diff --git a/tests/tcg/mips/include/wrappers_msa.h b/tests/tcg/mips/include/wrappers_msa.h
+index 17fd277..2692394 100644
+--- a/tests/tcg/mips/include/wrappers_msa.h
++++ b/tests/tcg/mips/include/wrappers_msa.h
+@@ -574,6 +574,14 @@ DO_MSA__WD__WS_WT(XOR_V, xor.v)
+ 
+ 
+ /*
++ * Move
++ * ----
++ */
++
++DO_MSA__WD__WS(MOVE_V, move.v)
++
++
++/*
+  * Pack
+  * ----
+  */
+diff --git a/tests/tcg/mips/user/ase/msa/move/test_msa_move_v.c b/tests/tcg/mips/user/ase/msa/move/test_msa_move_v.c
+new file mode 100644
+index 0000000..ef2aa6d
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/move/test_msa_move_v.c
+@@ -0,0 +1,149 @@
++/*
++ *  Test program for MSA instruction MOVE.V
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs_128.h"
++#include "../../../../include/test_utils_128.h"
++
++#define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
++
++
++int32_t main(void)
++{
++    char *isa_ase_name = "MSA";
++    char *group_name = "Move";
++    char *instruction_name =  "MOVE.V";
++    int32_t ret;
++    uint32_t i;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0xf0f0f0f0f0f0f0f0ULL, 0xf0f0f0f0f0f0f0f0ULL, },    /*   8  */
++        { 0x0f0f0f0f0f0f0f0fULL, 0x0f0f0f0f0f0f0f0fULL, },
++        { 0xf83e0f83e0f83e0fULL, 0x83e0f83e0f83e0f8ULL, },
++        { 0x07c1f07c1f07c1f0ULL, 0x7c1f07c1f07c1f07ULL, },
++        { 0xfc0fc0fc0fc0fc0fULL, 0xc0fc0fc0fc0fc0fcULL, },
++        { 0x03f03f03f03f03f0ULL, 0x3f03f03f03f03f03ULL, },
++        { 0xfe03f80fe03f80feULL, 0x03f80fe03f80fe03ULL, },
++        { 0x01fc07f01fc07f01ULL, 0xfc07f01fc07f01fcULL, },
++        { 0xff00ff00ff00ff00ULL, 0xff00ff00ff00ff00ULL, },    /*  16  */
++        { 0x00ff00ff00ff00ffULL, 0x00ff00ff00ff00ffULL, },
++        { 0xff803fe00ff803feULL, 0x00ff803fe00ff803ULL, },
++        { 0x007fc01ff007fc01ULL, 0xff007fc01ff007fcULL, },
++        { 0xffc00ffc00ffc00fULL, 0xfc00ffc00ffc00ffULL, },
++        { 0x003ff003ff003ff0ULL, 0x03ff003ff003ff00ULL, },
++        { 0xffe003ff800ffe00ULL, 0x3ff800ffe003ff80ULL, },
++        { 0x001ffc007ff001ffULL, 0xc007ff001ffc007fULL, },
++        { 0xfff000fff000fff0ULL, 0x00fff000fff000ffULL, },    /*  24  */
++        { 0x000fff000fff000fULL, 0xff000fff000fff00ULL, },
++        { 0xfff8003ffe000fffULL, 0x8003ffe000fff800ULL, },
++        { 0x0007ffc001fff000ULL, 0x7ffc001fff0007ffULL, },
++        { 0xfffc000fffc000ffULL, 0xfc000fffc000fffcULL, },
++        { 0x0003fff0003fff00ULL, 0x03fff0003fff0003ULL, },
++        { 0xfffe0003fff8000fULL, 0xffe0003fff8000ffULL, },
++        { 0x0001fffc0007fff0ULL, 0x001fffc0007fff00ULL, },
++        { 0xffff0000ffff0000ULL, 0xffff0000ffff0000ULL, },    /*  32  */
++        { 0x0000ffff0000ffffULL, 0x0000ffff0000ffffULL, },
++        { 0xffff80003fffe000ULL, 0x0ffff80003fffe00ULL, },
++        { 0x00007fffc0001fffULL, 0xf00007fffc0001ffULL, },
++        { 0xffffc0000ffffc00ULL, 0x00ffffc0000ffffcULL, },
++        { 0x00003ffff00003ffULL, 0xff00003ffff00003ULL, },
++        { 0xffffe00003ffff80ULL, 0x000ffffe00003fffULL, },
++        { 0x00001ffffc00007fULL, 0xfff00001ffffc000ULL, },
++        { 0xfffff00000fffff0ULL, 0x0000fffff00000ffULL, },    /*  40  */
++        { 0x00000fffff00000fULL, 0xffff00000fffff00ULL, },
++        { 0xfffff800003ffffeULL, 0x00000fffff800003ULL, },
++        { 0x000007ffffc00001ULL, 0xfffff000007ffffcULL, },
++        { 0xfffffc00000fffffULL, 0xc00000fffffc0000ULL, },
++        { 0x000003fffff00000ULL, 0x3fffff000003ffffULL, },
++        { 0xfffffe000003ffffULL, 0xf800000fffffe000ULL, },
++        { 0x000001fffffc0000ULL, 0x07fffff000001fffULL, },
++        { 0xffffff000000ffffULL, 0xff000000ffffff00ULL, },    /*  48  */
++        { 0x000000ffffff0000ULL, 0x00ffffff000000ffULL, },
++        { 0xffffff8000003fffULL, 0xffe000000ffffff8ULL, },
++        { 0x0000007fffffc000ULL, 0x001ffffff0000007ULL, },
++        { 0xffffffc000000fffULL, 0xfffc000000ffffffULL, },
++        { 0x0000003ffffff000ULL, 0x0003ffffff000000ULL, },
++        { 0xffffffe0000003ffULL, 0xffff8000000fffffULL, },
++        { 0x0000001ffffffc00ULL, 0x00007ffffff00000ULL, },
++        { 0xfffffff0000000ffULL, 0xfffff0000000ffffULL, },    /*  56  */
++        { 0x0000000fffffff00ULL, 0x00000fffffff0000ULL, },
++        { 0xfffffff80000003fULL, 0xfffffe0000000fffULL, },
++        { 0x00000007ffffffc0ULL, 0x000001fffffff000ULL, },
++        { 0xfffffffc0000000fULL, 0xffffffc0000000ffULL, },
++        { 0x00000003fffffff0ULL, 0x0000003fffffff00ULL, },
++        { 0xfffffffe00000003ULL, 0xfffffff80000000fULL, },
++        { 0x00000001fffffffcULL, 0x00000007fffffff0ULL, },
++        { 0x886ae6cc28625540ULL, 0x4b670b5efe7bb00cULL, },    /*  64  */
++        { 0xfbbe00634d93c708ULL, 0x12f7bb1a153f52fcULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x27d8c6ffab2b2514ULL, },
++        { 0x704f164d5e31e24eULL, 0x8df188d8a942e2a0ULL, },
++        { 0xb9926b7c7daf4258ULL, 0xa1227caddcce65b6ULL, },
++        { 0xd027be89ff0a2ef9ULL, 0x170b5050fea53078ULL, },
++        { 0xb83b580665cabc4aULL, 0x91230822bff0ba62ULL, },
++        { 0xfc8f23f09aa6b782ULL, 0x93fd6637124275aeULL, },
++        { 0x201e09cd56aee649ULL, 0xef5de039a6a52758ULL, },    /*  72  */
++        { 0xa57cd91365d9e5d7ULL, 0x9321bc9881ecba5cULL, },
++        { 0xa2e8f6f5c9cbc61bULL, 0xb2c471545e0d7a12ULL, },
++        { 0xa89cf2f131a864aeULL, 0xd2a3e87a5db986e7ULL, },
++        { 0xe61438e9a652ea0aULL, 0xa85483d97879d41cULL, },
++        { 0x944a35fd192361a8ULL, 0xf3912da36a0b2d6bULL, },
++        { 0x4630426322bef79cULL, 0xeb5686f7cb19304eULL, },
++        { 0x8b5aa7a2f259deadULL, 0xd278cbcd696417e3ULL, },
++    };
++
++    reset_msa_registers();
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < TEST_COUNT_TOTAL; i++) {
++        if (i < PATTERN_INPUTS_COUNT) {
++            do_msa_MOVE_V(b128_pattern[i], b128_result[i]);
++        } else {
++            do_msa_MOVE_V(b128_random[i - PATTERN_INPUTS_COUNT],
++                          b128_result[i]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results_128(isa_ase_name, group_name, instruction_name,
++                            TEST_COUNT_TOTAL, elapsed_time,
++                            &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/test_msa_compile.sh b/tests/tcg/mips/user/ase/msa/test_msa_compile.sh
+index 37a4fdc..8ef836d 100755
+--- a/tests/tcg/mips/user/ase/msa/test_msa_compile.sh
++++ b/tests/tcg/mips/user/ase/msa/test_msa_compile.sh
+@@ -506,6 +506,13 @@
+ -EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_xor_v
+ 
+ #
++# Move
++# ----
++#
++/opt/img/bin/mips-img-linux-gnu-gcc            move/test_msa_move_v.c          \
++-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_move_v
++
++#
+ # Pack
+ # ----
+ #
+diff --git a/tests/tcg/mips/user/ase/msa/test_msa_run.sh b/tests/tcg/mips/user/ase/msa/test_msa_run.sh
+index 6c244a2..b6785e3 100755
+--- a/tests/tcg/mips/user/ase/msa/test_msa_run.sh
++++ b/tests/tcg/mips/user/ase/msa/test_msa_run.sh
+@@ -295,6 +295,12 @@ $PATH_TO_QEMU -cpu I6400  /tmp/test_msa_or_v
+ $PATH_TO_QEMU -cpu I6400  /tmp/test_msa_xor_v
+ 
+ #
++# Move
++# ----
++#
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_move_v
++
++#
+ # Pack
+ # ----
+ #
+-- 
+2.7.4
 
-I *think* that we could write ARM_MAX_VQ - 1 here, but I'm pretty sure there
-are a few other places where we assume that we only need 4 bits to store this
-value.  Anyway, we'd definitely need to audit the code to allow ARM_MAX_VQ to
-change.
-
-
-r~
 
