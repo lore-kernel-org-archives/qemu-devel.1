@@ -6,46 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1893C48BD3
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 21:11:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 838C4C48BD6
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 21:20:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 822D32085A
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 21:11:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 822D32085A
+	by mail.kernel.org (Postfix) with ESMTPS id 5875D214DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 21:20:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5875D214DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgFCT-00050J-O9
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 17:11:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48490)
+	id 1hgFLA-0007Z7-KE
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 17:20:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50505)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hgFAH-00038J-H4
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 17:09:14 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hgFJk-00073u-Bj
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 17:19:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hgFAG-00019v-Ho
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 17:09:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38826)
+ (envelope-from <jsnow@redhat.com>) id 1hgFJi-0004QU-PN
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 17:19:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42730)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hgFAE-00017q-3b; Wed, 26 Jun 2019 17:09:10 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1hgFJd-0004Li-JT; Wed, 26 Jun 2019 17:18:55 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DB87330820EA;
- Wed, 26 Jun 2019 21:09:08 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2E3B33081252;
+ Wed, 26 Jun 2019 21:18:34 +0000 (UTC)
 Received: from [10.18.17.47] (dhcp-17-47.bos.redhat.com [10.18.17.47])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 266F619C5B;
- Wed, 26 Jun 2019 21:09:01 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Stephen Checkoway <stephen.checkoway@oberlin.edu>
-References: <20190505221544.31568-1-philmd@redhat.com>
- <10a0c45b-f58f-cb04-0404-0f5c2f3c4568@redhat.com>
- <7c05edec-b323-c91f-ab7f-bd2189337726@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B82C0600CC;
+ Wed, 26 Jun 2019 21:18:31 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20190605161804.118956-1-vsementsov@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -122,22 +120,21 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <891d5780-a23b-f78a-37b8-7b02c07545ab@redhat.com>
-Date: Wed, 26 Jun 2019 17:09:00 -0400
+Message-ID: <ebef5b9b-d2e9-7097-de61-9213fcb3f4e1@redhat.com>
+Date: Wed, 26 Jun 2019 17:18:31 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <7c05edec-b323-c91f-ab7f-bd2189337726@redhat.com>
+In-Reply-To: <20190605161804.118956-1-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Wed, 26 Jun 2019 21:09:09 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.49]); Wed, 26 Jun 2019 21:18:47 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 00/13] hw/block/pflash_cfi02:
- Clean-up and fixes
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 0/2] nbd: enable keepalive
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -149,38 +146,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
- Peter Maydell <peter.maydell@linaro.org>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: kwolf@redhat.com, den@openvz.org, berrange@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 6/26/19 5:06 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi John,
->=20
-> On 6/26/19 10:33 PM, John Snow wrote:
->> I don't think this series ever made it upstream, and it's now well pas=
-t
->> 30 days, so I might encourage a resend when you can if this is still
->> important to pursue.
->=20
-> I should have sent a 'ping' indeed.
-> I keep rebasing because I have it in my pflash-next queue, and I added
-> more patches from Stephen. I am still running tests, and it is a pain t=
-o
-> test things that have never been tested.
-> Anyway, my plan is to send a "current status of pflash-next" series.
->=20
-> Thanks for worrying :)
->=20
-> Phil.
->=20
+On 6/5/19 12:18 PM, Vladimir Sementsov-Ogievskiy wrote:
+> Hi all!
+> 
+> Here is a suggestion to enable keepalive option to track server availablity.
+> We suggest to enable it by default. If we need, we'll be able to add option
+> to specify timeout by hand later.
+> 
+> v2: 01 - Fix io channel returned errors to be -1 [Daniel]
+>     02 - Fix typo in commit message [Eric]
+> 
+> Vladimir Sementsov-Ogievskiy (2):
+>   io/channel: add qio_channel_set_keepalive
+>   nbd-client: enable TCP keepalive
+> 
+>  include/io/channel.h | 15 +++++++++++++++
+>  block/nbd-client.c   |  1 +
+>  io/channel-socket.c  | 20 ++++++++++++++++++++
+>  io/channel.c         | 14 ++++++++++++++
+>  4 files changed, 50 insertions(+)
+> 
 
-Great, thanks!
+Ping -- I think this was good to go with Dan's ACK, based on the
+discussion from v1.
 
