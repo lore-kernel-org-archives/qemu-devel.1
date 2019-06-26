@@ -2,58 +2,62 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0
+X-Spam-Status: No, score=-13.2 required=3.0
 	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A29CC48BD6
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 08:50:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D552C48BD6
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 08:53:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34C3920663
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 08:50:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34C3920663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 55099204EC
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 08:53:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55099204EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hg3dG-0004nz-GA
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 04:50:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42488)
+	id 1hg3gf-0006dY-LL
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 04:53:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52811)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <hang.yuan@linux.intel.com>) id 1hg18U-0002Wi-Hb
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 02:10:27 -0400
+ (envelope-from <rjones@redhat.com>) id 1hg3fT-0005nv-6R
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 04:52:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <hang.yuan@linux.intel.com>) id 1hg18Q-0005LD-18
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 02:10:24 -0400
-Received: from mga07.intel.com ([134.134.136.100]:34941)
+ (envelope-from <rjones@redhat.com>) id 1hg3fS-0001va-0z
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 04:52:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32991)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <hang.yuan@linux.intel.com>)
- id 1hg18M-0004wF-1z
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 02:10:20 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
- by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 25 Jun 2019 23:10:03 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,418,1557212400"; d="scan'208";a="337098619"
-Received: from henry-optiplex-7050.bj.intel.com ([10.238.156.132])
- by orsmga005.jf.intel.com with ESMTP; 25 Jun 2019 23:10:02 -0700
-From: hang.yuan@linux.intel.com
-To: qemu-devel@nongnu.org
-Date: Wed, 26 Jun 2019 14:00:15 +0800
-Message-Id: <1561528815-4912-1-git-send-email-hang.yuan@linux.intel.com>
-X-Mailer: git-send-email 2.7.4
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.100
-X-Mailman-Approved-At: Wed, 26 Jun 2019 04:46:31 -0400
-Subject: [Qemu-devel] [PATCH] target/i386: HAX: Enable ROM/ROM device memory
- region support
+ (Exim 4.71) (envelope-from <rjones@redhat.com>)
+ id 1hg3fP-0001Xn-DI; Wed, 26 Jun 2019 04:52:35 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id EEC2D64DA8;
+ Wed, 26 Jun 2019 08:52:12 +0000 (UTC)
+Received: from localhost (ovpn-116-19.ams2.redhat.com [10.36.116.19])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8A1DC608A4;
+ Wed, 26 Jun 2019 08:52:12 +0000 (UTC)
+Date: Wed, 26 Jun 2019 09:52:11 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Message-ID: <20190626085211.GZ3888@redhat.com>
+References: <20190626024942.29758-1-eblake@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190626024942.29758-1-eblake@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Wed, 26 Jun 2019 08:52:13 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] qemu-nbd: Permit TLS with Unix sockets
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,49 +69,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Hang Yuan <hang.yuan@linux.intel.com>
+Cc: berrange@redhat.com, qemu-devel@nongnu.org,
+ "open list:Network Block Dev..." <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Hang Yuan <hang.yuan@linux.intel.com>
+On Tue, Jun 25, 2019 at 09:49:42PM -0500, Eric Blake wrote:
+> Although you generally won't use encryption with a Unix socket (after
+> all, everything is local, so why waste the CPU power), there are
+> situations in testsuites where Unix sockets are much nicer than TCP
+> sockets.  Since nbdkit allows encryption over both types of sockets,
+> it makes sense for qemu-nbd to do likewise.
 
-Add ROM and ROM device memory region support in HAX. Their memory region is
-read only and write access will generate EPT violation. The violation will
-be handled in the HAX kernel with the following patch.
+Also it's somewhat useful if using a separate tunnel process (openssh
+for one can do this now).
 
-https://github.com/intel/haxm/commit/33ceea09a1655fca12c47f1e112b1d269357ff28
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  qemu-nbd.c | 4 ----
+>  1 file changed, 4 deletions(-)
+> 
+> diff --git a/qemu-nbd.c b/qemu-nbd.c
+> index a8cb39e51043..ddfb6815fb69 100644
+> --- a/qemu-nbd.c
+> +++ b/qemu-nbd.c
+> @@ -931,10 +931,6 @@ int main(int argc, char **argv)
+>      }
+> 
+>      if (tlscredsid) {
+> -        if (sockpath) {
+> -            error_report("TLS is only supported with IPv4/IPv6");
+> -            exit(EXIT_FAILURE);
+> -        }
+>          if (device) {
+>              error_report("TLS is not supported with a host device");
+>              exit(EXIT_FAILURE);
+> -- 
+> 2.20.1
 
-Signed-off-by: Hang Yuan <hang.yuan@linux.intel.com>
----
- target/i386/hax-mem.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+The patch looks very simple, just removing an unnecessary restriction,
+so:
 
-diff --git a/target/i386/hax-mem.c b/target/i386/hax-mem.c
-index 6bb5a24917..685e88cb45 100644
---- a/target/i386/hax-mem.c
-+++ b/target/i386/hax-mem.c
-@@ -175,15 +175,11 @@ static void hax_process_section(MemoryRegionSection *section, uint8_t flags)
-     uint64_t host_va;
-     uint32_t max_mapping_size;
- 
--    /* We only care about RAM and ROM regions */
--    if (!memory_region_is_ram(mr)) {
--        if (memory_region_is_romd(mr)) {
--            /* HAXM kernel module does not support ROMD yet  */
--            warn_report("Ignoring ROMD region 0x%016" PRIx64 "->0x%016" PRIx64,
--                        start_pa, start_pa + size);
--        }
-+    /* We only care about RAM/ROM regions and ROM device */
-+    if (memory_region_is_rom(mr) || (memory_region_is_romd(mr)))
-+	flags |= HAX_RAM_INFO_ROM;
-+    else if (!memory_region_is_ram(mr))
-         return;
--    }
- 
-     /* Adjust start_pa and size so that they are page-aligned. (Cf
-      * kvm_set_phys_mem() in kvm-all.c).
+Acked-by: Richard W.M. Jones <rjones@redhat.com>
+
+If we could have the same change on the qemu client side that would
+be great because we could use it here:
+
+https://github.com/libguestfs/nbdkit/blob/e0d324683c86455a2fe62e97d57f1313cad9c9f3/tests/functions.sh.in#L133
+
+Rich.
+
 -- 
-2.21.0
-
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+libguestfs lets you edit virtual machines.  Supports shell scripting,
+bindings from many languages.  http://libguestfs.org
 
