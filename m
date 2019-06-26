@@ -2,89 +2,80 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7E06C48BD6
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 23:26:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 592F0C48BD6
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 23:34:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98FFC214DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 23:26:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98FFC214DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 257B421726
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 23:34:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O6Jen0mF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 257B421726
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgHJ9-0002uH-8b
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 19:26:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51025)
+	id 1hgHQv-0005YG-QK
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 19:34:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52859)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hgHI6-0001zU-Dx
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 19:25:27 -0400
+ (envelope-from <skrtbhtngr@gmail.com>) id 1hgHPE-0004ym-0p
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 19:32:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hgHI5-000774-An
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 19:25:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46484)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hgHI2-00075O-OV; Wed, 26 Jun 2019 19:25:22 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 04F68C058CBD;
- Wed, 26 Jun 2019 23:25:22 +0000 (UTC)
-Received: from [10.3.116.44] (ovpn-116-44.phx2.redhat.com [10.3.116.44])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D2B021001B0E;
- Wed, 26 Jun 2019 23:25:18 +0000 (UTC)
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-References: <20190626215301.30733-1-jsnow@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <83019545-dd96-2618-a028-9c885e904591@redhat.com>
-Date: Wed, 26 Jun 2019 18:25:17 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <skrtbhtngr@gmail.com>) id 1hgHPC-0002m5-Uw
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 19:32:47 -0400
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:51854)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <skrtbhtngr@gmail.com>)
+ id 1hgHPC-0002kb-Lv
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 19:32:46 -0400
+Received: by mail-wm1-x336.google.com with SMTP id 207so3804787wma.1
+ for <qemu-devel@nongnu.org>; Wed, 26 Jun 2019 16:32:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+ bh=bekfvSix3AZ0zzIJ8X6iO1Zy6my+G81nYMwzB3oYyBM=;
+ b=O6Jen0mF1RRihptbEer4bZp6Wb1zVZ3wck9t5Feeiv8JaiYCbl2NLfG4lCxuM9kjrl
+ VPd21IMD9OjVI8ie+4cTx49bXCL+ZI6P0THz4hEcgHftBQS5aOraLRTQJDn9LE4AyVl8
+ W7bzkRUrXbH0ZbTT2nuvbJMCOE3L9yXO7r7PIyTErQ68C0McrimI4TdYMtIh82rSrr5k
+ yXWF47ftNE+GtUgzcGlMFOtEdb/Xg934z6vVxxQA8Rlg14Q9NwBWcuzlQYKflp9/ifl9
+ JNdhN2qQOJi3cZCIcKx1hCxGjMOM5Y4keYMEBZlH4dv6lepXHOuDYFAaqeuvXwOftdQS
+ uIKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to;
+ bh=bekfvSix3AZ0zzIJ8X6iO1Zy6my+G81nYMwzB3oYyBM=;
+ b=gubmaXXDQ2YFBdnGiUMdaYuOYmPVOLmmgSLqZgVy4MItrQtuWIEdQfMjqJZ9YjDFvW
+ aq1bIn68TtRaXKXAyklS9fgLQHQb8bTf/4LnJePwnpK37OA5ZDK/NcGYKiV/aRU1LGaV
+ 9OCYhf0il/psbaaUL2/wie6MicvFY4YusB0x2UCPKdX2zItUzgTTLac4EDxyfk57kYSX
+ kgTrwaa3QpQUTthsZgN8vDMjxmmfOcO81CUd8GGQJ74X+y/WEz9KeT/fQ9nUUeF1zW4u
+ FEQAli+putwvZsFHN1uzQwwzVli6ptSgG4264QUOW/hEbXuQdniZbW54WWII8w18XMeE
+ L5Uw==
+X-Gm-Message-State: APjAAAXeopgYKEFewY9gcfwWK6tvNzdqyYtlp46oKNPMD9Z7YXsFdygW
+ AgXlDZnZajzNx3He/yo0SxV7Z4fAbnMpiZCJlmQ=
+X-Google-Smtp-Source: APXvYqyPT0PG/sKVxgM5DMqLTMqU8nqBZSqf4vIG85QVYeuK9HC0G36XxcfiINcsul9XMDn2rlwF7z0gU2Mmguh7txM=
+X-Received: by 2002:a1c:d10c:: with SMTP id i12mr811506wmg.152.1561591964178; 
+ Wed, 26 Jun 2019 16:32:44 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190626215301.30733-1-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="rke12gxMLVgPd7aEKDV69g22n3xOrVqgn"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Wed, 26 Jun 2019 23:25:22 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] block/qcow: Improve error when opening
- qcow2 files as qcow
+References: <CAMzgYoMG1ic-5yiS2ehnDLna+UKgCtMBcSVNmKQx1oxRZqT=yQ@mail.gmail.com>
+ <20190624184133.GW2726@work-vm>
+In-Reply-To: <20190624184133.GW2726@work-vm>
+From: Sukrit Bhatnagar <skrtbhtngr@gmail.com>
+Date: Thu, 27 Jun 2019 05:02:33 +0530
+Message-ID: <CAMzgYoOjCNYvadBT0PPorG0wOX3Ymvd5x_1NzW1SH2te1JfN-Q@mail.gmail.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::336
+Subject: Re: [Qemu-devel] [GSoC] Help needed in implementing live migration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,97 +87,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Qemu-Trivial <qemu-trivial@nongnu.org>, Kevin Wolf <kwolf@redhat.com>,
- radmehrsaeed7@gmail.com, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rke12gxMLVgPd7aEKDV69g22n3xOrVqgn
-Content-Type: multipart/mixed; boundary="YLC3OetuhHmXnso4Gsg16MJ994RF3yQHA";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Qemu-Trivial <qemu-trivial@nongnu.org>, Kevin Wolf <kwolf@redhat.com>,
- radmehrsaeed7@gmail.com, Max Reitz <mreitz@redhat.com>
-Message-ID: <83019545-dd96-2618-a028-9c885e904591@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] block/qcow: Improve error when opening qcow2
- files as qcow
-References: <20190626215301.30733-1-jsnow@redhat.com>
-In-Reply-To: <20190626215301.30733-1-jsnow@redhat.com>
+On Tue, 25 Jun 2019 at 00:11, Dr. David Alan Gilbert
+<dgilbert@redhat.com> wrote:
+>
+> * Sukrit Bhatnagar (skrtbhtngr@gmail.com) wrote:
+> > Hi David,
+> >
+> > I am Sukrit, GSoC participant working on PVRDMA live migration.
+> > We had a short chat about vmxnet3 migration about a week ago
+> > on the IRC channel.
+> >
+> > I am facing an issue while doing migration of the pvrdma device.
+> > While loading the device state, we need to perform a few dma
+> > mappings on the destination. But on the destination, the migration
+> > fails due a BounceBuffer being locked (in_use). This global
+> > BounceBuffer is used in address_space_map/unmap functions
+> > which the rdma_pci_dma_map/unmap calls.
+> > Essentially, we need a way to remap guest physical address on
+> > the destination after migration.
+> >
+> > I had posted an RFC a while ago on the list:
+> > https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg04924.html
+> > https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg04923.html
+> >
+> > My mentors (Marcel and Yuval) told me to ask you for help
+> > regarding this. It would be really great if you can guide me in
+> > finding a workaround for this.
+>
+> Hi,
+>   I'll have a look; I need to get some other things finished first.
 
---YLC3OetuhHmXnso4Gsg16MJ994RF3yQHA
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Adding cc: qemu-devel, sorry for the private email.
 
-On 6/26/19 4:53 PM, John Snow wrote:
-> Reported-by: radmehrsaeed7@gmail.com
-> Fixes: https://bugs.launchpad.net/bugs/1832914
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  block/qcow.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-
-Yes, this is useful.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Reminds me of when I helped convince the file(1) database maintainers
-that 'qcow2 (v3)' was better than 'qcow (v3)'.
-(https://bugzilla.redhat.com/show_bug.cgi?id=3D1654349, file.git 60b896d4=
-)
-
->=20
-> diff --git a/block/qcow.c b/block/qcow.c
-> index 6dee5bb792..a9cb6ae0bd 100644
-> --- a/block/qcow.c
-> +++ b/block/qcow.c
-> @@ -156,7 +156,12 @@ static int qcow_open(BlockDriverState *bs, QDict *=
-options, int flags,
->          goto fail;
->      }
->      if (header.version !=3D QCOW_VERSION) {
-> -        error_setg(errp, "Unsupported qcow version %" PRIu32, header.v=
-ersion);
-> +        error_setg(errp, "qcow (v%d) does not support qcow version %" =
-PRIu32,
-> +                   QCOW_VERSION, header.version);
-> +        if (header.version =3D=3D 2 || header.version =3D=3D 3) {
-> +            error_append_hint(errp, "Try the 'qcow2' driver instead.")=
-;
-> +        }
-> +
->          ret =3D -ENOTSUP;
->          goto fail;
->      }
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---YLC3OetuhHmXnso4Gsg16MJ994RF3yQHA--
-
---rke12gxMLVgPd7aEKDV69g22n3xOrVqgn
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0T/t0ACgkQp6FrSiUn
-Q2pWPQgAq0jRTp61n/HEaHqFLEOY/NTjYJ8DBYWdP4gNIGHFUVyCYvccSBEZptRJ
-JXDWYtDI6ArPSH8/gSzhp1slCDl94OvYmy++Ggq8KL1yYkeh8mdpO0tt3IYqAI7A
-rYYUiVsl3nrbZiw1MdKxKddQTeKfZit71UyWUE/7EcJMT+FhenX3no4FcXgyf+vs
-e+j6n0Aj8fiSrCEwSG4BfUjYK1kfky8/5oTvFDNWnDbwdAHvWzkNNIPupSUcLwDs
-eC3DToeWMiGy5UEvD8CpK0p6xlWphZ68uhrt5/2SZiK0k/9CG+0xcHnZyX5kGlPh
-hCq3mEsJxSFcykerd61OjW9LK+hEEA==
-=dHcv
------END PGP SIGNATURE-----
-
---rke12gxMLVgPd7aEKDV69g22n3xOrVqgn--
+> Dave
+> > Thanks,
+> > Sukrit
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
