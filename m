@@ -2,67 +2,72 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9F83C4646B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 05:40:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C7AFC4646B
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 06:09:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87DAF2133F
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 05:40:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87DAF2133F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 05B6A2085A
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 06:09:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05B6A2085A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hg0ff-0003m9-I9
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 01:40:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36450)
+	id 1hg17H-0000ve-51
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 02:09:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41766)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hg0eQ-0003E4-Ss
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 01:39:24 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1hg160-000052-A9
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 02:07:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hg0eP-0002UB-NO
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 01:39:22 -0400
-Resent-Date: Wed, 26 Jun 2019 01:39:22 -0400
-Resent-Message-Id: <E1hg0eP-0002UB-NO@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21450)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hg0eP-0002TN-Fx
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 01:39:21 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1561527505; cv=none; d=zoho.com; s=zohoarc; 
- b=Gj5aKEw8AMKwIjzXJwlwfo78RpyPjDyifea9tMSuY+N4mab/H8flLodxRgA1bgTdCXHQgesvuywS9u1G0N+f8axsR5UzpnSSR+JNd+cCAA5E21hYP4W4fZKPEkKPOCHP+a55xwh64M5LzWxKMvAipGj2c+p1jJ9zSv8icy/TUf8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1561527505;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=2Pp2Fik+JNy8L0F4BFT8mgLxFrqAdLG3BK7EyR0//D0=; 
- b=DqI/63V+TlL/sCZpop7yuoUNYCUI7yzEKhthyzijigIBYpKcE7qg9EaGbUo9CvrjPei3JilmduYMbHALhf7bHIJ/9kazKchdjJu+YQCnCNyON3ciqOrEfZlZBeayPBMx1VC3cZK8Ltk+KuxHRiDtein9D7odmkxBeIBCZM2t66o=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1561527504375137.51994354852354;
- Tue, 25 Jun 2019 22:38:24 -0700 (PDT)
-Message-ID: <156152750324.6332.18067610008811555832@c4a48874b076>
-In-Reply-To: <20190626051903.26829-1-sjitindarsingh@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: sjitindarsingh@gmail.com
-Date: Tue, 25 Jun 2019 22:38:24 -0700 (PDT)
-X-ZohoMailClient: External
+ (envelope-from <palmer@dabbelt.com>) id 1hg15z-0002ix-6c
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 02:07:52 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:46715)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hg15z-0002hq-1U
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 02:07:51 -0400
+Received: by mail-pf1-f193.google.com with SMTP id 81so724549pfy.13
+ for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 23:07:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=EmGZqkWZXz+TznH7WqJXu6yj6AO4KHO44rr6hePQgrs=;
+ b=GeA2dCZYouHplGQr+FjWRDZj00tRKV7tKZzP6sT9+gACgOVMyv8TstqPMaPNk1/W96
+ ZKvoHoMMK4wCc1UjnftGaRFHyKnIu4gavVGBuqYdCUU4XwcoACK5JwuSJItdG/sK/Oyp
+ GjBUbx9LdVZOidJTZGnyX3DlSzB3hHdfMbuxKIXVB1THGoUxCOONbtYgRUyGl0vMjPju
+ R/d9sRhPDV6/qK1ONPwoCmD7fwRS0eB7DZuVAhFPY9XJ8g/zAf5uBxSaQ41AJmy6UbAx
+ pPpzNW+MvBl3m92Vmxvipz/ArGrAaQ7QwAs8qSX+uI0M2lWSo7dMpN2dUhz8kclMCecl
+ Ypqg==
+X-Gm-Message-State: APjAAAUIysbtvCHLVkpPxluLV82F3nUcI2p4NhNqvovKbIiXquQkypxI
+ T8/GvQdzIhk/BIsoI2lv/7Z4IQ==
+X-Google-Smtp-Source: APXvYqzXFdyOlcRsq0ehCife6IjFondFhfG8Gxh0s/+OgauV14yDlln/7qLxLGHJP4njXHScufagBg==
+X-Received: by 2002:a63:2323:: with SMTP id j35mr1215735pgj.166.1561529269373; 
+ Tue, 25 Jun 2019 23:07:49 -0700 (PDT)
+Received: from localhost (220-132-236-182.HINET-IP.hinet.net.
+ [220.132.236.182])
+ by smtp.gmail.com with ESMTPSA id x65sm20879927pfd.139.2019.06.25.23.07.48
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 25 Jun 2019 23:07:48 -0700 (PDT)
+Date: Tue, 25 Jun 2019 23:07:48 -0700 (PDT)
+X-Google-Original-Date: Tue, 25 Jun 2019 22:32:56 PDT (-0700)
+In-Reply-To: <CAKmqyKOGKuMJXSPJJEWn7s6OkUZ4ZRL7KFOqtaBWTErrbi6+aQ@mail.gmail.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: alistair23@gmail.com
+Message-ID: <mhng-9ce79f43-2d09-489c-a089-be1ad81057ee@palmer-si-x1e>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH v2] powerpc/spapr: Add host
- threads parameter to ibm, get_system_parameter
+ [fuzzy]
+X-Received-From: 209.85.210.193
+Subject: Re: [Qemu-devel] [PATCH] RISC-V: Add support for the Zicsr extension
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,43 +79,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: david@gibson.dropbear.id.au, qemu-ppc@nongnu.org, groug@kaod.org,
- sjitindarsingh@gmail.com, qemu-devel@nongnu.org
+Cc: qemu-riscv@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYyNjA1MTkwMy4yNjgy
-OS0xLXNqaXRpbmRhcnNpbmdoQGdtYWlsLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTA2MjYwNTE5MDMuMjY4MjktMS1zaml0
-aW5kYXJzaW5naEBnbWFpbC5jb20KVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBb
-UUVNVS1QUENdIFtQQVRDSCB2Ml0gcG93ZXJwYy9zcGFwcjogQWRkIGhvc3QgdGhyZWFkcyBwYXJh
-bWV0ZXIgdG8gaWJtLCBnZXRfc3lzdGVtX3BhcmFtZXRlcgoKPT09IFRFU1QgU0NSSVBUIEJFR0lO
-ID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAw
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0
-b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1Qg
-U0NSSVBUIEVORCA9PT0KClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKODMzNTBhOCBw
-b3dlcnBjL3NwYXByOiBBZGQgaG9zdCB0aHJlYWRzIHBhcmFtZXRlciB0byBpYm0sIGdldF9zeXN0
-ZW1fcGFyYW1ldGVyCgo9PT0gT1VUUFVUIEJFR0lOID09PQpFUlJPUjogYnJhY2VzIHt9IGFyZSBu
-ZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM0MjogRklMRTogaHcvcHBj
-L3NwYXByX3J0YXMuYzoyNDM6CisgICAgaWYgKCFrdm1fZW5hYmxlZCgpKQpbLi4uXQoKRVJST1I6
-IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAoj
-NDc6IEZJTEU6IGh3L3BwYy9zcGFwcl9ydGFzLmM6MjQ4OgorICAgIGlmICghZGlyKQpbLi4uXQoK
-RVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRl
-bWVudAojNzI6IEZJTEU6IGh3L3BwYy9zcGFwcl9ydGFzLmM6MjczOgorICAgICAgICBpZiAoc3Vi
-Y29yZXMpClsuLi5dCgp0b3RhbDogMyBlcnJvcnMsIDAgd2FybmluZ3MsIDcxIGxpbmVzIGNoZWNr
-ZWQKCkNvbW1pdCA4MzM1MGE4ZmYwYzggKHBvd2VycGMvc3BhcHI6IEFkZCBob3N0IHRocmVhZHMg
-cGFyYW1ldGVyIHRvIGlibSwgZ2V0X3N5c3RlbV9wYXJhbWV0ZXIpIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNv
-ZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9s
-b2dzLzIwMTkwNjI2MDUxOTAzLjI2ODI5LTEtc2ppdGluZGFyc2luZ2hAZ21haWwuY29tL3Rlc3Rp
-bmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
-IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Tue, 25 Jun 2019 08:20:55 PDT (-0700), alistair23@gmail.com wrote:
+> On Tue, Jun 25, 2019 at 3:09 AM Palmer Dabbelt <palmer@sifive.com> wrote:
+>>
+>> The various CSR instructions have been split out of the base ISA as part
+>> of the ratification process.  This patch adds a Zicsr argument, which
+>> disables all the CSR instructions.
+>>
+>> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+>> ---
+>>  target/riscv/cpu.c | 1 +
+>>  target/riscv/cpu.h | 1 +
+>>  target/riscv/csr.c | 5 +++++
+>>  3 files changed, 7 insertions(+)
+>>
+>> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+>> index bbad39a337b3..915b9e77df33 100644
+>> --- a/target/riscv/cpu.c
+>> +++ b/target/riscv/cpu.c
+>> @@ -442,6 +442,7 @@ static Property riscv_cpu_properties[] = {
+>>      DEFINE_PROP_BOOL("u", RISCVCPU, cfg.ext_u, true),
+>>      DEFINE_PROP_BOOL("Counters", RISCVCPU, cfg.ext_counters, true),
+>>      DEFINE_PROP_BOOL("Zifencei", RISCVCPU, cfg.ext_ifencei, true),
+>> +    DEFINE_PROP_BOOL("Zicsr", RISCVCPU, cfg.ext_icsr, true),
+>>      DEFINE_PROP_STRING("priv_spec", RISCVCPU, cfg.priv_spec),
+>>      DEFINE_PROP_BOOL("mmu", RISCVCPU, cfg.mmu, true),
+>>      DEFINE_PROP_BOOL("pmp", RISCVCPU, cfg.pmp, true),
+>> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+>> index ba551cd3082c..0adb307f3298 100644
+>> --- a/target/riscv/cpu.h
+>> +++ b/target/riscv/cpu.h
+>> @@ -224,6 +224,7 @@ typedef struct RISCVCPU {
+>>          bool ext_u;
+>>          bool ext_counters;
+>>          bool ext_ifencei;
+>> +        bool ext_icsr;
+>>
+>>          char *priv_spec;
+>>          char *user_spec;
+>> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+>> index de67741f3648..ff988917b995 100644
+>> --- a/target/riscv/csr.c
+>> +++ b/target/riscv/csr.c
+>> @@ -793,6 +793,7 @@ int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
+>>  {
+>>      int ret;
+>>      target_ulong old_value;
+>> +    RISCVCPU *cpu = env_archcpu(env);
+>>
+>>      /* check privileges and return -1 if check fails */
+>>  #if !defined(CONFIG_USER_ONLY)
+>> @@ -803,6 +804,10 @@ int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
+>>      }
+>>  #endif
+>>
+>> +    /* ensure the CSR extension is enabled. */
+>> +    if (!cpu->cfg.ext_icsr)
+>> +        return -1;
+>
+> QEMU style include curly braces around a single line if. Plus I think
+> it makes it less error prone. Can you add braces?
+>
+> After that:
+>
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
+Thanks.
+
+>
+> Alistair
+>
+>> +
+>>      /* check predicate */
+>>      if (!csr_ops[csrno].predicate || csr_ops[csrno].predicate(env, csrno) < 0) {
+>>          return -1;
+>> --
+>> 2.21.0
+>>
+>>
 
