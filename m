@@ -2,90 +2,61 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04BD6C4646B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 07:50:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D27F1C4646B
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 07:50:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8D512133F
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 07:50:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kocD5iBu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8D512133F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id ACA842086D
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 07:50:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACA842086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hg2h8-0001k0-2c
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 03:50:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36736)
+	id 1hg2hb-00022T-UC
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 03:50:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36832)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hg2fo-0008Et-F2
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 03:48:57 -0400
+ (envelope-from <stefanha@redhat.com>) id 1hg2fw-0008Uj-TA
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 03:49:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hg2fn-0004xC-8O
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 03:48:56 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44550)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hg2fm-0004uq-Tk
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 03:48:55 -0400
-Received: by mail-wr1-x444.google.com with SMTP id r16so1464473wrl.11
- for <qemu-devel@nongnu.org>; Wed, 26 Jun 2019 00:48:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=clJr5Kgf8rNpIsygI48thRCVYe5Ho9N/9bfnCdo91XY=;
- b=kocD5iBu0ayOwrH6NymlCWnj5Yt+kvrT+rH78zlllk/3cMxpgwpwWOaK5xrZDvXXuw
- GB84iYvSM6/juY602OEsLjBwcyeug+aeAxEL3BIo1K1a6SJUo+J7uf3JzvcN/PFRWOuW
- HMuodVuW+TmczmaP+lHO2Kvkl3jdDotPOH1mefuuDjuZRaKzYvI+QeCCWa7GPUfrtJ59
- cyhr2skc9KX621Ay37xLKpKxGDI8YeQ9vaTA9J5HlqqC9XHovcQDK9eRBqYjIFZimXg/
- lyEC7Sb68PGfrcQKLsS5IfeYhsewhek0FBuIPc6zRckusV244m6ZpnwaBlkyfDRnwTtJ
- PXDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=clJr5Kgf8rNpIsygI48thRCVYe5Ho9N/9bfnCdo91XY=;
- b=OUSOV0Xva8UKzu2s91fGfkxo0ima9Q0J44WK7sxWygu0MYjUCbSj7WzOrF9olDVo5w
- QaYmdtWbrIGefDSpey3iSDfmjr8hdLRrpONfJ+FaZHXXKTzQ10W53mydvDFx4lyla3eO
- K/MRQ5HocV7aiHceeqzatWNy4N0Kan8/DMLfsznlsGohMLfZe8feAiA/ij4gW9pvk5DK
- 8S7qpIxxAyt4lE/mCBb4F0EHgKu59iy2FPVUh+jQWEqJ31KxEOfNULIBpsvByVIcE8bw
- L2dXkhKT7i5VFlrt0gdp0IIV5bOGpuQSD69+0fKzBpVGwlLh8yDVbRXv/U82jcnVYX/P
- iYzw==
-X-Gm-Message-State: APjAAAXIYhy7SR4eSATbQEhElfOzxpAGbR7T4vTfKjxeVDVTrJC9kOK1
- Ngp+UlkeIcT4AOBZEXtilQ9aqw==
-X-Google-Smtp-Source: APXvYqw27uDt9M1G3TwySWhPauhK6/69sNU/MKlecfmFNMIMY+XsRR3u21blVfVFN5/cAm5q/1+Q7w==
-X-Received: by 2002:a5d:5283:: with SMTP id c3mr2265274wrv.268.1561535333005; 
- Wed, 26 Jun 2019 00:48:53 -0700 (PDT)
-Received: from [192.168.2.137] (93-34-153-63.ip50.fastwebnet.it.
- [93.34.153.63])
- by smtp.gmail.com with ESMTPSA id s10sm1411600wmf.8.2019.06.26.00.48.52
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 26 Jun 2019 00:48:52 -0700 (PDT)
-To: Palmer Dabbelt <palmer@sifive.com>
-References: <mhng-3b5978c4-bfb8-4757-ae5b-0731f2851d30@palmer-si-x1e>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <5711ab6f-610c-b05a-c728-4a35a0963a2b@linaro.org>
-Date: Wed, 26 Jun 2019 09:48:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <stefanha@redhat.com>) id 1hg2fv-00055n-Ra
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 03:49:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46962)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hg2fv-00055H-Le
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 03:49:03 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C236E81DF6;
+ Wed, 26 Jun 2019 07:49:02 +0000 (UTC)
+Received: from localhost (ovpn-116-164.ams2.redhat.com [10.36.116.164])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 11A5D1001959;
+ Wed, 26 Jun 2019 07:48:52 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 26 Jun 2019 08:48:14 +0100
+Message-Id: <20190626074815.19994-4-stefanha@redhat.com>
+In-Reply-To: <20190626074815.19994-1-stefanha@redhat.com>
+References: <20190626074815.19994-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <mhng-3b5978c4-bfb8-4757-ae5b-0731f2851d30@palmer-si-x1e>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH] atomic failures on qemu-system-riscv64
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Wed, 26 Jun 2019 07:49:02 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2 3/4] libvhost-user: implement
+ VHOST_USER_PROTOCOL_F_MQ
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,42 +68,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: me@carlosedp.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- joel@sing.id.au, Alistair Francis <Alistair.Francis@wdc.com>, marco@decred.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Sebastien Boeuf <sebastien.boeuf@intel.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/26/19 8:07 AM, Palmer Dabbelt wrote:
-> On Tue, 25 Jun 2019 08:36:28 PDT (-0700), richard.henderson@linaro.org wrote:
->> On 6/24/19 8:08 PM, Joel Sing wrote:
->>> Regarding the alignment for reservations, the
->>> specification does require this, although I do not recall seeing any
->>> enforcement
->>> of this by qemu itself.
->>
->> Ah, I see it now.  Enforcement begins here:
->>
->> static bool trans_lr_w(DisasContext *ctx, arg_lr_w *a)
->> {
->>     REQUIRE_EXT(ctx, RVA);
->>     return gen_lr(ctx, a, (MO_ALIGN | MO_TESL));
->>                            ^^^^^^^^
->>
->> This will force softmmu (but notably not linux-user; a design limitation) to
->> generate an alignment fault for an unaligned address.
-> 
-> That was probably correct at the time the code went in, as the ISA used to
-> allow these to succeed but not be atomic.  No implementations did this, so as
-> part of the ratification process we just mandated that unaligned atomics always
-> trap.
-> 
-> Is there a better way to fix this than just doing the alignment check
-> explicitly?
+Existing vhost-user device backends, including vhost-user-scsi and
+vhost-user-blk, support multiqueue but libvhost-user currently does not
+advertise this.
 
-You misunderstand.  The code is exactly correct as-is.  The alignment check
-happens implicitly as a part of the softmmu tlb resolution.
+VHOST_USER_PROTOCOL_F_MQ enables the VHOST_USER_GET_QUEUE_NUM request
+needed for a vhost-user master to query the number of queues.  For
+example, QEMU's vhost-user-net master depends on
+VHOST_USER_PROTOCOL_F_MQ for multiqueue.
 
+If you're wondering how any device backend with more than one virtqueue
+functions today, it's because device types with a fixed number of
+virtqueues do not require querying the number of queues.  Therefore the
+vhost-user master for vhost-user-input with 2 virtqueues, for example,
+doesn't actually depend on VHOST_USER_PROTOCOL_F_MQ.  It just enables
+virtqueues 0 and 1 without asking.
 
-r~
+Let there be multiqueue!
+
+Suggested-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ contrib/libvhost-user/libvhost-user.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
+r/libvhost-user.c
+index 90bea856dd..4b36e35a82 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -1160,7 +1160,8 @@ vu_set_vring_err_exec(VuDev *dev, VhostUserMsg *vms=
+g)
+ static bool
+ vu_get_protocol_features_exec(VuDev *dev, VhostUserMsg *vmsg)
+ {
+-    uint64_t features =3D 1ULL << VHOST_USER_PROTOCOL_F_LOG_SHMFD |
++    uint64_t features =3D 1ULL << VHOST_USER_PROTOCOL_F_MQ |
++                        1ULL << VHOST_USER_PROTOCOL_F_LOG_SHMFD |
+                         1ULL << VHOST_USER_PROTOCOL_F_SLAVE_REQ |
+                         1ULL << VHOST_USER_PROTOCOL_F_HOST_NOTIFIER |
+                         1ULL << VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD;
+@@ -1200,8 +1201,8 @@ vu_set_protocol_features_exec(VuDev *dev, VhostUser=
+Msg *vmsg)
+ static bool
+ vu_get_queue_num_exec(VuDev *dev, VhostUserMsg *vmsg)
+ {
+-    DPRINT("Function %s() not implemented yet.\n", __func__);
+-    return false;
++    vmsg_set_reply_u64(vmsg, dev->max_queues);
++    return true;
+ }
+=20
+ static bool
+--=20
+2.21.0
+
 
