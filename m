@@ -2,42 +2,42 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58106C48BD3
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 15:57:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7534C48BD3
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 15:59:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 307C721743
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 15:57:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 307C721743
+	by mail.kernel.org (Postfix) with ESMTPS id B9A6221670
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 15:59:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9A6221670
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgAJ0-00009L-FZ
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 11:57:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50547)
+	id 1hgAKu-0001Yh-GI
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 11:59:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50666)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hgAIG-0007qd-J0
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:57:09 -0400
+ (envelope-from <laurent@vivier.eu>) id 1hgAIf-0008Gt-W5
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:57:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hgAIF-0006wD-IP
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:57:08 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:33707)
+ (envelope-from <laurent@vivier.eu>) id 1hgAIe-0007cq-L7
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:57:33 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:43979)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1hgAID-0006ox-6Y; Wed, 26 Jun 2019 11:57:05 -0400
+ id 1hgAIY-0007Y9-Qw; Wed, 26 Jun 2019 11:57:27 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MlfL0-1iNViA3Jcw-00ijJb; Wed, 26 Jun 2019 17:56:36 +0200
+ (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1N2V8Z-1iiCqQ1gYJ-013xxs; Wed, 26 Jun 2019 17:57:01 +0200
 To: Antonio Ospite <ao2@ao2.it>, qemu-devel@nongnu.org
 References: <20190526144747.30019-1-ao2@ao2.it>
- <20190526144747.30019-2-ao2@ao2.it>
+ <20190526144747.30019-3-ao2@ao2.it>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -82,35 +82,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <180dd63a-fdce-419a-8b55-e2918f5e189d@vivier.eu>
-Date: Wed, 26 Jun 2019 17:56:35 +0200
+Message-ID: <9723b8df-f1dc-4f0f-157e-8a48408e2cf7@vivier.eu>
+Date: Wed, 26 Jun 2019 17:56:59 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190526144747.30019-2-ao2@ao2.it>
+In-Reply-To: <20190526144747.30019-3-ao2@ao2.it>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:4xLIkUFOj9xbBN0We6EksbK7D80ZPYT7lOF7tbIqa3DP+CwwdPO
- uEiKLNKUxazBmIf9DVxf6EY7JjPDQi+bB2h68jTjIfcuWecDlCCpU60P7fHgVrS/HsidjO6
- PF62KdLQgFxN7HuZK2RRgpnEQNs1Z6knsuYo8TKzPfHpSEc1Dmtx8thZmRNdkzj6Cem5Olf
- C5H1aj4cM3CXAvxHPb/6A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:4OmvNQyiZ+E=:z5ZV5pPnOC+LlZLG5D9oyL
- 56KydDklw34UOiKQgMyDPltt0KJHz+YxnOf95E1AOflsg8sKpBSSc06z1swDc/aAOCpLrd52r
- 2BzWhlFqy2EtT27wInZTmrkrkEY24igwr97sr7mWxmdaTI8o0lVzRLxut0e055goBuNjsbhbq
- K0dg5+8izgLD621/FhGtFdRkJzvr6SL7YJYuXUbBzMlnd86poC8DDvOrMQ8vdIwfjU9I8kTYe
- /Cn+7S8Ph0RxPJp1EfcEMxr0Febax+F0pNsfUJFIAtuKvobKcxKoJu6GHVWDmYrKeAFoDOETZ
- lSzn+Nwmr4SZFxqRhdKp9ldUK0PhAURRYbuWrIu7PEoi1KWIzPBfGrsquARb9/Zchk36NEzhr
- igcoqjhpga8vwAvRxcNQKkwyJBof9LtMrhkCJQnKvNhFGJKtkB1hrwgeUVeckfZa02IUeFjG+
- EBiZXEugLaIc6muagQ1MRufZM7xVcBso3Fx8he9NrRyBxp9nQWwwld0wvCzV8aR4AnTSTxDFn
- KfJSs3NCwsIe82HO19K2L+JOUFUUjfVoR/3ajvinITkupRSuD7kNvc7i/b1lJ+T+pdzI0oAAZ
- Hq8nxZq2tpvjTX9d27IJM5pE9ynRFHemR6bkdb539xvkbPZCQPExAKkaDYIaaYLWeYvVfoe7J
- cQKriXqdVYUCZfNsxmRvZnfW/DGAU6vscEigjGUX78qBaCV2kZS9HI60TjlCEsMUXWb7i1wH5
- VVxXKWnllymAYsZ1WemriBKCnI1Lro+VubyeRyxSsDJqkMheA//pNaOssIM=
+X-Provags-ID: V03:K1:/z4xanTY8MzrbbZqixzSMacltJWFqM93wrhutpc74s6wkz4dfYz
+ rkM6fTIlya40YE2YfJL8Ut6RHZQ9kQ7qDwgcbMAUFPGXj7DQi9fGSggH97edpqpHdxWNTY+
+ Y6V0pmH7F8jqC6VTnUAmLd6j/Uyx8SI/wXgMwH2yBwD7yXNB9nBq6NiYVwCtU88die4QhRG
+ FNEC5FszKOZwXFni7jwjA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:e1ICqpNGqAs=:8u6kkf3BJkeauCRJOpAOv1
+ Jzsv+y0EV5fnjb/bJ3wZnOZmwvvuY+u+p++une3jGx2XFIeo645XCWgxUsxVhzH/0vY313dgq
+ zI3CfGtUeFkZoq8l7QNsi9CzZqTjTa0Xqz8wMgX9j0Bum6FR1ufTCiJMbvTZOsFcr+6TIpTWz
+ 8P8ZOLe0VU5Tr34gjLOB8rOI+tlt4b5mts6E09nIsYX2gYgZsFb6+vOrLJBXwnylJeDCX+Rq9
+ SRToFKZJG6EQjS44UFQkGupPyIQUz8WREA2e+UPXl6n9sAWAiCd+dj1gDc1OPUdQiuakhKh23
+ +W/eVTxevXayodb3yg9LuY3Jt6Cf4yUFlfOjYHAIlwPCBNMj8y0dviWsI+nWhTbWomD8jNuuR
+ xgbp2096oIBkACPxjEsNLBQN3QCSz/pkWuV6gdOeZHnId0Lfpvpz3wEmtbkixzfO8D/viGZJC
+ pGm3D9ZsJw7w/8lo8+MfcZwvlINJhQyUHO+nj3VhjG+4iazyFoiraOg+NlDoj+AEPznHAcEij
+ vvrL1cPMcBl3YfpYixyxQ35rPV7vy76fNvGYS9R3WZ82GLu/YE7Mbd96OANPGs+3CEF3gEtOf
+ wbvh5mFjCAhsF1waqxvijFXZx3O5DM31Rtyh6xTmYGpfclLkFRtonts1WY5ngEW9gEu+e3N31
+ J6S+ylbDKqpeN82XnXMwajktVHhvB8l4WIfBAVo5t34rSYQM+aj6UohaprMPVzEI8OW4runLo
+ h3Agxl70HisAJ4Et/IDsPvIO+BqrfQoLeTl3/phyzwY961tse11pFtErQKc=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 212.227.126.130
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] configure: set source_path only
- once and make its definition more robust
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] configure: disallow spaces and
+ colons in source path and build path
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,6 +123,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ Peter Maydell <peter.maydell@linaro.org>,
  Antonio Ospite <antonio.ospite@collabora.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -131,39 +132,59 @@ Sender: "Qemu-devel"
 Le 26/05/2019 à 16:47, Antonio Ospite a écrit :
 > From: Antonio Ospite <antonio.ospite@collabora.com>
 > 
-> Since commit 79d77bcd36 (configure: Remove --source-path option,
-> 2019-04-29) source_path cannot be overridden anymore, move it out of the
-> "default parameters" block since the word "default" may suggest that the
-> value can change, while in fact it does not.
+> The configure script breaks when the qemu source directory is in a path
+> containing white spaces, in particular the list of targets is not
+> correctly generated when calling "./configure --help" because of how the
+> default_target_list variable is built.
 > 
-> While at it, only set source_path once and separate the positional
-> argument of basename with "--" to more robustly cover the case of path
-> names starting with a dash.
+> In addition to that, *building* qemu from a directory with spaces breaks
+> some assumptions in the Makefiles, even if the original source path does
+> not contain spaces like in the case of an out-of-tree build, or when
+> symlinks are involved.
+> 
+> To avoid these issues, refuse to run the configure script and the
+> Makefile if there are spaces or colons in the source path or the build
+> path, taking as inspiration what the kbuild system in linux does.
+> 
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1817345
 > 
 > Reviewed-by: Eric Blake <eblake@redhat.com>
 > Signed-off-by: Antonio Ospite <antonio.ospite@collabora.com>
 > ---
->  configure | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  Makefile  | 4 ++++
+>  configure | 5 +++++
+>  2 files changed, 9 insertions(+)
 > 
+> diff --git a/Makefile b/Makefile
+> index e02b88bcb1..bed1323a45 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1,5 +1,9 @@
+>  # Makefile for QEMU.
+>  
+> +ifneq ($(words $(subst :, ,$(CURDIR))), 1)
+> +  $(error main directory cannot contain spaces nor colons)
+> +endif
+> +
+>  # Always point to the root of the build tree (needs GNU make).
+>  BUILD_DIR=$(CURDIR)
+>  
 > diff --git a/configure b/configure
-> index 528b9ff705..9f12120ad9 100755
+> index 9f12120ad9..2833d73ccc 100755
 > --- a/configure
 > +++ b/configure
-> @@ -276,10 +276,10 @@ ld_has() {
->      $ld --help 2>/dev/null | grep ".$1" >/dev/null 2>&1
->  }
->  
-> -# default parameters
-> -source_path=$(dirname "$0")
+> @@ -279,6 +279,11 @@ ld_has() {
 >  # make source path absolute
-> -source_path=$(cd "$source_path"; pwd)
-> +source_path=$(cd "$(dirname -- "$0")"; pwd)
+>  source_path=$(cd "$(dirname -- "$0")"; pwd)
+>  
+> +if printf %s\\n "$source_path" "$PWD" | grep -q "[[:space:]:]";
+> +then
+> +  error_exit "main directory cannot contain spaces nor colons"
+> +fi
 > +
-> +# default parameters
+>  # default parameters
 >  cpu=""
 >  iasl="iasl"
->  interp_prefix="/usr/gnemul/qemu-%M"
 > 
 
 Applied to my trivial-patches branch.
