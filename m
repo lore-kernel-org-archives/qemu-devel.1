@@ -2,81 +2,60 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0157DC4646B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 07:00:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70612C4646B
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 07:43:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 851CC2086D
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 07:00:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dErTe2Jg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 851CC2086D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 483A82086D
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 07:43:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 483A82086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hg1us-0005IC-Rd
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 03:00:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53182)
+	id 1hg2aT-00052O-71
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 03:43:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34933)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bmeng.cn@gmail.com>) id 1hg1tH-0004lZ-MG
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 02:58:48 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hg2Zm-0004bU-P7
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 03:42:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1hg1tG-00056J-Az
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 02:58:47 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:37285)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1hg1tG-00055P-4V; Wed, 26 Jun 2019 02:58:46 -0400
-Received: by mail-ed1-x542.google.com with SMTP id w13so1710501eds.4;
- Tue, 25 Jun 2019 23:58:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Vrr7b/zXwP4IqY1cQUW2IQ5IAQcDF1OFR1nWAzAybNE=;
- b=dErTe2JgbEKiwNsIVauDAHm5Ts+bY9kEocjQ7JrA1EjIMOD+O3S6bqT+kmGmUEKKSW
- ikQ+vddde6yEpiQAqr0kVKck5JTAAKZQSA9AV4jkf1QAaoAk8fiVZWoBdXQl59tI6xhB
- REcSX/UtzOtTKekn1iLzxulpWXIn5DxJVkPxDrSMFMzwqg5r2CkNeXztKY5QCk/reSPr
- dFc6Cc80vj8MKasSxAd5OLOpuhgU8tO7tzxw2qjPxecKoffDtJEkR2UMM2gkezY6yro3
- JOczvUIBMkM6IPessaIimJwxjBMNILxgWq835D6Q/g3sRyVEIKsPyhQZekV9aW/xGuO/
- 6jjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Vrr7b/zXwP4IqY1cQUW2IQ5IAQcDF1OFR1nWAzAybNE=;
- b=FiaZAn3qINgcLVWKoQMvJ963t/cHxOPCqjVKmvXVHrdLG6dQSQ8cEjAtFoOhY0XFW4
- yOrQCU3OgVtpHXNKIfToHz78hBBbz6lDOp8yeyOsRMHlGEsxxEC1iBNE+djCa6p925hW
- c0Jy5wx5q6Or/4+BJJVOIvTq+Ajz67XnMIEljTrj+zqoq4ZD5qI6TPdOupFCn/SwVbYB
- x+67B3yCMf+75Vg4WlII8ZYOi58E38zpsw/t3in5EEBEOhwckfqwDgDEmF1Z+5AWogDl
- eDNd9/+cG3QvzztLzT35aPaLhharjGnCkLpsRFUyUqihBQ7DNfiwKSazNjpkQjMbMdkt
- 4AxQ==
-X-Gm-Message-State: APjAAAWhY/5CfhuzMzJj4kFUvzxQLpLKw+ZVoOk0MDinuNK9LY01bBl5
- CcT8gmafBuCUr/GpHbTRIO2pS4I/+16wP74Xmcs=
-X-Google-Smtp-Source: APXvYqy1s9iIZnuTThkarGGqyXW6NXLF2Ss/o4beAUKX+a8IAHuLN1J5s7WUiJPiVieYr1/efi6owkO0Y/J/k7scuos=
-X-Received: by 2002:a50:c28a:: with SMTP id o10mr3168671edf.182.1561532325055; 
- Tue, 25 Jun 2019 23:58:45 -0700 (PDT)
+ (envelope-from <imammedo@redhat.com>) id 1hg2Zl-0007mP-EL
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 03:42:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39742)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hg2Zl-0007ks-8L
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 03:42:41 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B129E3082263
+ for <qemu-devel@nongnu.org>; Wed, 26 Jun 2019 07:42:34 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8FBFB5D717;
+ Wed, 26 Jun 2019 07:42:33 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 26 Jun 2019 03:42:28 -0400
+Message-Id: <20190626074228.11558-1-imammedo@redhat.com>
 MIME-Version: 1.0
-References: <CANnJOVF7DUabc6ut92dQQUjxWud7zfdgBEkj=GPn1P+2tKw-ag@mail.gmail.com>
- <mhng-94c196fb-ebb6-4075-afa9-96989bbc037c@palmer-si-x1e>
- <CANnJOVE3m9nxkbLW95nY2rCViBj1HG5HxVTKAWU+NS5ETsgsuQ@mail.gmail.com>
-In-Reply-To: <CANnJOVE3m9nxkbLW95nY2rCViBj1HG5HxVTKAWU+NS5ETsgsuQ@mail.gmail.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Wed, 26 Jun 2019 14:58:34 +0800
-Message-ID: <CAEUhbmVZm-dhvT40Ck4d159SHin_D-U47+CHShjajzM1f-P9Gw@mail.gmail.com>
-To: Jonathan Behrens <fintelia@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::542
-Subject: Re: [Qemu-devel] [PATCH for 4.1 v3] target/riscv: Expose time CSRs
- when allowed by [m|s]counteren
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Wed, 26 Jun 2019 07:42:34 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v3] deprecate -mem-path fallback to anonymous
+ RAM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,44 +67,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: berrange@redhat.com, ehabkost@redhat.com, dgilbert@redhat.com,
+ armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 26, 2019 at 4:23 AM Jonathan Behrens <fintelia@gmail.com> wrote:
->
-> I just did some testing on a HiFive Unleashed board and can confirm what
-> you are saying. The low 5 bits of both mcounteren and scounteren are
-> writable (if you try to write 0xFFFFFFFF to them, they'll take on the value
-> 0x1F) but even with the TM bit set in both mcounteren and scounteren the
-> rdtime instruction always generates an illegal instruction exception.
->
+Fallback might affect guest or worse whole host performance
+or functionality if backing file were used to share guest RAM
+with another process.
 
-Then I would think the FU540 is not spec complaint :)
+Patch deprecates fallback so that we could remove it in future
+and ensure that QEMU will provide expected behavior and fail if
+it can't use user provided backing file.
 
-> Reading through the relevant chapter of the spec, I still think that having
-> mcounteren.TM be writable but making rdtime unconditionally trap is
-> non-conformant. If other people feel strongly that rdtime should always
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+---
+v2:
+ * improve text language
+    (Markus Armbruster <armbru@redhat.com>)
+v3:
+ * drop confusing 'or QEMU will fail to start' in error message
+ * fix up grammar error
+     (Markus Armbruster <armbru@redhat.com>)
 
-Agree. To test hardware (FU540) compatibility in QEMU, maybe we can
-add a cpu property to allow hard-wiring mcounteren.TM to zero?
+ numa.c               | 6 ++++--
+ qemu-deprecated.texi | 9 +++++++++
+ 2 files changed, 13 insertions(+), 2 deletions(-)
 
-> require trapping into firmware then the natural change would be to simply
-> hardwire mcounteren.TM to zero (the value in scounteren wouldn't matter in
-> that case so it could be left writable). My own (biased) personal feeling
-> is that this full implementation makes sense at least for the `virt`
-> machine type because it represents a clear case where deviating from
-> current hardware enables a performance boost, and would not break
-> compatibility with any current software: both OpenSBI and BBL try to enable
-> hardware handling of rdtime when the platform claims to support it.
->
+diff --git a/numa.c b/numa.c
+index 91a29138a2..1994ab0655 100644
+--- a/numa.c
++++ b/numa.c
+@@ -494,8 +494,10 @@ static void allocate_system_memory_nonnuma(MemoryReg=
+ion *mr, Object *owner,
+             if (mem_prealloc) {
+                 exit(1);
+             }
+-            error_report("falling back to regular RAM allocation.");
+-
++            warn_report("falling back to regular RAM allocation");
++            error_printf("This is deprecated. Make sure that -mem-path "
++                         " specified path has sufficient resources to al=
+locate"
++                         " -m specified RAM amount");
+             /* Legacy behavior: if allocation failed, fall back to
+              * regular RAM allocation.
+              */
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 2fe9b72121..9cba82d5ec 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -112,6 +112,15 @@ QEMU using implicit generic or board specific splitt=
+ing rule.
+ Use @option{memdev} with @var{memory-backend-ram} backend or @option{mem=
+} (if
+ it's supported by used machine type) to define mapping explictly instead=
+.
+=20
++@subsection -mem-path fallback to RAM (since 4.1)
++Currently if guest RAM allocation from file pointed by @option{mem-path}
++fails, QEMU falls back to allocating from RAM, which might result
++in unpredictable behavior since the backing file specified by the user
++is ignored. In the future, users will be responsible for making sure
++the backing storage specified with @option{-mem-path} can actually provi=
+de
++the guest RAM configured with @option{-m} and QEMU will fail to start up=
+ if
++RAM allocation is unsuccessful.
++
+ @section QEMU Machine Protocol (QMP) commands
+=20
+ @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
+--=20
+2.18.1
 
-Regards,
-Bin
 
