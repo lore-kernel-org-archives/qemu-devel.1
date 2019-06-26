@@ -2,119 +2,105 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88581C48BD6
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 10:23:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFC5DC48BD3
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 10:23:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6348B20663
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 10:23:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6348B20663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 90A7F20663
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 10:23:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=wavesemi.onmicrosoft.com header.i=@wavesemi.onmicrosoft.com header.b="qgnGBhVQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90A7F20663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38575 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hg54u-00037w-B0
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 06:23:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46800)
+	id 1hg54t-00034F-Qq
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 06:22:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46381)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hg4w7-0004hx-2c
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 06:13:57 -0400
+ (envelope-from <arikalo@wavecomp.com>) id 1hg4uZ-0003Qz-9H
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 06:12:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hg4w4-0003Bl-Bz
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 06:13:54 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:41411)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1hg4w2-00036q-Jd; Wed, 26 Jun 2019 06:13:51 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MKsSj-1i0dco0cVp-00LFl2; Wed, 26 Jun 2019 12:11:59 +0200
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Jason Wang <jasowang@redhat.com>
-References: <20190619221933.1981-1-laurent@vivier.eu>
- <20190619221933.1981-4-laurent@vivier.eu>
- <f302ca04-e517-f72a-0067-2ab85ef238f0@vivier.eu>
- <e9ccdbf4-3703-b6a2-7f58-0739a4cfe7bd@redhat.com>
- <81f9a447-8305-9de5-8a81-3e29299dfa2a@vivier.eu>
- <95e2e7c1-962d-3ac7-baba-467f0f6c4041@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Openpgp: preference=signencrypt
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <b2e3db53-7948-62f7-88c8-8fb87ac68db8@vivier.eu>
-Date: Wed, 26 Jun 2019 12:11:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <95e2e7c1-962d-3ac7-baba-467f0f6c4041@redhat.com>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <arikalo@wavecomp.com>) id 1hg4uQ-0000tJ-QI
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 06:12:19 -0400
+Received: from mail-eopbgr750090.outbound.protection.outlook.com
+ ([40.107.75.90]:30436 helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <arikalo@wavecomp.com>)
+ id 1hg4uP-0000po-0g
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 06:12:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=wavesemi.onmicrosoft.com; s=selector1-wavesemi-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MX3ej4Q1TeABOzPouS4tUU2r01UQxVc2pZLWkql8eGg=;
+ b=qgnGBhVQiwTilyb7Cr/6UnHwCBlq6cnhuUgZev0oPxCveUUJlOIJRg2zt4Yf9PPfOBLdPFu4mquy57+cbq3oCjbjAIy7tcHq2d49rr2vM4KSKAJgwg7z6l6Uxcl63kryFQRVeq8TLrPQXrQ67tygrVXZjXClp5bTbSxxnbkkaEU=
+Received: from DM5PR22MB1658.namprd22.prod.outlook.com (10.164.152.163) by
+ DM5PR22MB0028.namprd22.prod.outlook.com (10.168.174.135) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2008.13; Wed, 26 Jun 2019 10:12:06 +0000
+Received: from DM5PR22MB1658.namprd22.prod.outlook.com
+ ([fe80::3579:1b6c:1f31:c6b9]) by DM5PR22MB1658.namprd22.prod.outlook.com
+ ([fe80::3579:1b6c:1f31:c6b9%7]) with mapi id 15.20.2008.018; Wed, 26 Jun 2019
+ 10:12:06 +0000
+From: Aleksandar Rikalo <arikalo@wavecomp.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Thread-Topic: [PATCH v6 7/8] tests/tcg: target/mips: Fix some test cases for
+ pack MSA instructions
+Thread-Index: AQHVLAb1f5hwYW/sSkWa77DXuMEs1KattlI8
+Date: Wed, 26 Jun 2019 10:12:06 +0000
+Message-ID: <DM5PR22MB1658ECB96B23D5C9DB2ABB6ED2E20@DM5PR22MB1658.namprd22.prod.outlook.com>
+References: <1561543629-20327-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+ <1561543629-20327-8-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1561543629-20327-8-git-send-email-aleksandar.markovic@rt-rk.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:BM/W9SyHloe3sLkGx5U9luB04BNKZXUkF8LdmV++asADMDnYWxt
- zazwyPnQ5L+kcc14WEearJw+xT/01tyjhgSK0641oK7JE6Rk8PR/3+Ndr+07itJUs4nPWW5
- UWWSmmeNS/tDcppDkeaau9wyiElYuGJxZ0HlXTeLcsCdOZoPHxv0C+PlKbPHZRLYXlwy1sP
- b+7d/Ld92ah2XLeCBIhbg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:lA30ERDqx68=:BZGGw0Hiy/IMB7PmzElUP5
- ClPOzlwQ06GjZyaTq+Z6m3YdlD31bV+j+Ruvyu6X+OqVFEIR8151+1Iah/8sBCDuYSWTS5jF+
- RwsWQyvoTiECUy20oLhS+uVRwk71HoBthNyMUQUJ2GI9UnBdLUA5siGJ777f95y5lFerocqLE
- itXnK5CyCTIOxcylPD3RUQ3AjBe+L4+GcCp+AOsF7Qx7wf9dFgIoxICTX6pC/U1ABoXzHbIB9
- PXom7NURkMCwfTNhwue8u08GzGQsx0u7FDyKxK9bfmr8k1GINw62gI3iCwjvpt/JLgc4GvZUU
- pNZrHzZx6U/wa8+8AZBxkdLCalR0Hu3L/9wDE8uskeQrWFCl1vVHT21uao8miNjD3foEjgWm6
- JqcUn/j0N61OJV361yrsuD61BNxKw+Z5VdxAKqToy1QiteZr1yWOPL7zu/JE3IURwz3csYQC+
- 4OYbNLFIAakJvrdd9lkoBQXQZib+G6xLjJKuVJOYaQQ01EvWfsRZ6BtHhxK8WIIwg0NlB4U01
- XYjTpTJJRf7GEYSIalhz4jLc9jh9vFxEfCCIhrPkEwhvOSGwyHVBPex8B0syZypgTqZioCnXS
- lff9TUUpuKhB3Sp2saZzYq5TL4rsTF34pD3u6pFONtwPeKDF7thPX6NKGNBou8ZSAsDBvbn89
- VsJ5neVcbEmVhJ1zSoq4RMmT+7NZcKgFgCykSUFpIHnhBNg17gheZkTstfmnwXUBe060saDIk
- 9sUCjkVAsJMU0FhAdomVmNbxrhG5/pbqpUQyu6zUq+Gkpr0l3cAQxHlr0ro=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.134
-Subject: Re: [Qemu-devel] [PATCH v8 03/10] dp8393x: manage big endian bus
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=arikalo@wavecomp.com; 
+x-originating-ip: [82.117.201.26]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: e11a79ce-ef69-4c20-4f17-08d6fa1ebdff
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:DM5PR22MB0028; 
+x-ms-traffictypediagnostic: DM5PR22MB0028:
+x-microsoft-antispam-prvs: <DM5PR22MB00285DA1872145FB9D286FC1D2E20@DM5PR22MB0028.namprd22.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:130;
+x-forefront-prvs: 00808B16F3
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(346002)(136003)(376002)(366004)(39850400004)(396003)(189003)(199004)(81156014)(73956011)(66446008)(446003)(68736007)(71200400001)(71190400001)(476003)(6436002)(11346002)(229853002)(30864003)(52536014)(81166006)(8676002)(7736002)(2906002)(486006)(4326008)(478600001)(25786009)(19627405001)(74316002)(33656002)(99286004)(186003)(53546011)(6116002)(2501003)(9686003)(6506007)(76176011)(53946003)(6246003)(110136005)(102836004)(76116006)(7696005)(256004)(54896002)(3846002)(26005)(55236004)(14454004)(66556008)(6606003)(55016002)(66066001)(8936002)(53936002)(5660300002)(66946007)(66476007)(86362001)(64756008)(91956017)(107886003)(316002)(579004)(559001)(569006);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DM5PR22MB0028;
+ H:DM5PR22MB1658.namprd22.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: wavecomp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: /Yu9I1eN7MASnWHVB3fZ1ZEK8SekO0VBf06APaeommSUO6frwCbKfQxZgv7coD+47fZSS8jmO8b73pF9ZQbQEhs0eL4d7T3BrQmrkto4rYwfLGWf91p1V6acGIhOwHrB3teEcou0UwQe9RWqrc/1ee2Dfe+XKUOHwAPk02qywBRSJI1s1b/6ZWy7WXbd5O3E6XZ/VRC2xLt3VNLrkNNnLjW1WgJfMtKpQ79esyCQES+wEsRZ7FLIbHfC34GAz4PLpXVycdiVM59on9oYOwnjs2XKW3EJdOMKp+ZKtpQRJRhpqgE1H27lqHDTxQmh1AnE6A+s1fdt0ozX3yK42jxRbT4S0YEneaXJF3ZLalbG+eJFj3+XeX48gIIU36dxGHfvtgNtmoplBefjmf1TxeMA6xWPvGSaiPFszK7l49GYnnk=
+MIME-Version: 1.0
+X-OriginatorOrg: wavecomp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e11a79ce-ef69-4c20-4f17-08d6fa1ebdff
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jun 2019 10:12:06.0344 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: arikalo@wavecomp.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR22MB0028
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.75.90
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH v6 7/8] tests/tcg: target/mips: Fix some
+ test cases for pack MSA instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,128 +112,964 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Thomas Huth <huth@tuxfamily.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Gerd Hoffmann <kraxel@redhat.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 26/06/2019 à 10:57, Philippe Mathieu-Daudé a écrit :
-> On 6/25/19 7:09 PM, Laurent Vivier wrote:
->> Le 25/06/2019 à 17:57, Philippe Mathieu-Daudé a écrit :
->>> On 6/24/19 10:07 PM, Laurent Vivier wrote:
->>>> Hi,
->>>>
->>>> Jason, Can I have an Acked-by from you (as network devices maintainer)?
->>>
->>> Hmm something seems odd here indeed...
->>>
->>> What a stable model! This file has no logical modification since its
->>> introduction, a65f56eeba "Implement sonic netcard (MIPS Jazz)"
->>>
->>> Here we had:
->>>
->>> static void dp8393x_writeb(void *opaque, hwaddr addr, uint32_t val)
->>> {
->>>     uint16_t old_val = dp8393x_readw(opaque, addr & ~0x1);
->>>
->>>     switch (addr & 3) {
->>>     case 0:
->>>         val = val | (old_val & 0xff00);
->>>         break;
->>>     case 1:
->>>         val = (val << 8) | (old_val & 0x00ff);
->>>         break;
->>>     }
->>>     dp8393x_writew(opaque, addr & ~0x1, val);
->>> }
->>>
->>> So we had 16-bit endian shifting there.
->>>
->>> And few lines below:
->>>
->>>     /* XXX: Check byte ordering */
->>>     ...
->>>     /* Calculate the ethernet checksum */
->>>     #ifdef SONIC_CALCULATE_RXCRC
->>>         checksum = cpu_to_le32(crc32(0, buf, rx_len));
->>>     #else
->>>         checksum = 0;
->>>     #endif
->>>
->>> After various housekeeping, we get:
->>>
->>> 84689cbb97 "net/dp8393x: do not use old_mmio accesses"
->>>
->>> The MIPS Jazz is known to run in both endianess, but I haven't checked
->>> if at that time both were available.
->>>
->>> Have you tried this patch?
->>>
->>> -- >8 --
->>> diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
->>> index bdb0b3b2c2..646e11206f 100644
->>> @@ -651,7 +651,7 @@ static const MemoryRegionOps dp8393x_ops = {
->>>      .write = dp8393x_write,
->>>      .impl.min_access_size = 2,
->>>      .impl.max_access_size = 2,
->>> -    .endianness = DEVICE_NATIVE_ENDIAN,
->>> +    .endianness = DEVICE_LITTLE_ENDIAN,
->>>  };
->>> ---
->>>
->>> (but then mips64-softmmu Jazz would have networking broken).
->>>
->>
->> I doesn't help, the endianness is a MemoryRegion property (see
->> memory_region_wrong_endianness()) so it is used when the CPU writes to
->> the device MMIO, not when the device accesses the other memory.
->> In this case, it reads from system_memory. Perhaps we can create the
->> address_space with a system_memory in big endian mode?
-> 
-> Ah I missed that...
-> 
-> What about not using address_space_rw(data) but directly use
-> address_space_lduw_le() and address_space_stw_le() instead?
-> 
+> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+> Sent: Wednesday, June 26, 2019 12:07 PM
+> To: qemu-devel@nongnu.org
+> Cc: Aleksandar Markovic; Aleksandar Rikalo
+> Subject: [PATCH v6 7/8] tests/tcg: target/mips: Fix some test cases for p=
+ack MSA instructions
+>
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>
+> Fix certian test cases for MSA pack instructions.
+>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  .../tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c  | 64 +++++++++++-----=
+------
+>  .../tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c  | 64 +++++++++++-----=
+------
+>  .../tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c  | 64 +++++++++++-----=
+------
+>  .../tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c  | 64 +++++++++++-----=
+------
+>  .../tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c  | 64 +++++++++++-----=
+------
+>  .../tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c  | 64 +++++++++++-----=
+------
+>  .../tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c  | 64 +++++++++++-----=
+------
+>  .../tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c  | 64 +++++++++++-----=
+------
+>  tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c | 64 +++++++++++-----=
+------
+>  tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c | 64 +++++++++++-----=
+------
+>  tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c | 64 +++++++++++-----=
+------
+>  tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c | 64 +++++++++++-----=
+------
+>  12 files changed, 384 insertions(+), 384 deletions(-)
+>
+> diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c b/tests/=
+tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c
+> index 4a4c9d6..2f4ffd9 100644
+> --- a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c
+> +++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_b.c
+> @@ -123,38 +123,38 @@ int32_t main(void)
+>          { 0xf71a3ffcbe639308ULL, 0xf1d842a04f4d314eULL, },
+>          { 0xd8ff2b145aaacf80ULL, 0xf1d842a04f4d314eULL, },
+>          { 0xf1d842a04f4d314eULL, 0xf1d842a04f4d314eULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
+> -        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
+> -        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
+> -        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
+> -        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
+> -        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
+> -        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
+> -        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
+> -        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
+> -        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
+> -        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> +        { 0x675e7b0c6acc6240ULL, 0xd8a04d4ed8a04d4eULL, },    /*  80  */
+> +        { 0xf71a3ffcbe639308ULL, 0xa04ea04e5e0ccc40ULL, },
+> +        { 0xd8ff2b145aaacf80ULL, 0x4e4e0c401afc6308ULL, },
+> +        { 0xf1d842a04f4d314eULL, 0x4e40fc08ff14aa80ULL, },
+> +        { 0x675e7b0c6acc6240ULL, 0x40081480d8a04d4eULL, },
+> +        { 0xf71a3ffcbe639308ULL, 0x0880a04e5e0ccc40ULL, },
+> +        { 0xd8ff2b145aaacf80ULL, 0x804e0c401afc6308ULL, },
+> +        { 0xf1d842a04f4d314eULL, 0x4e40fc08ff14aa80ULL, },
+> +        { 0x675e7b0c6acc6240ULL, 0x40081480d8a04d4eULL, },    /*  88  */
+> +        { 0xf71a3ffcbe639308ULL, 0x0880a04e5e0ccc40ULL, },
+> +        { 0xd8ff2b145aaacf80ULL, 0x804e0c401afc6308ULL, },
+> +        { 0xf1d842a04f4d314eULL, 0x4e40fc08ff14aa80ULL, },
+> +        { 0x675e7b0c6acc6240ULL, 0x40081480d8a04d4eULL, },
+> +        { 0xf71a3ffcbe639308ULL, 0x0880a04e5e0ccc40ULL, },
+> +        { 0xd8ff2b145aaacf80ULL, 0x804e0c401afc6308ULL, },
+> +        { 0xf1d842a04f4d314eULL, 0x4e40fc08ff14aa80ULL, },
+> +        { 0x40081480d8a04d4eULL, 0x675e7b0c6acc6240ULL, },    /*  96  */
+> +        { 0x5e0ccc400880a04eULL, 0x675e7b0c6acc6240ULL, },
+> +        { 0x5e0ccc400c40804eULL, 0x675e7b0c6acc6240ULL, },
+> +        { 0x5e0ccc400c40404eULL, 0x675e7b0c6acc6240ULL, },
+> +        { 0x5e0ccc400c40404eULL, 0xf71a3ffcbe639308ULL, },
+> +        { 0x1afc63080c40404eULL, 0xf71a3ffcbe639308ULL, },
+> +        { 0x1afc6308fc08404eULL, 0xf71a3ffcbe639308ULL, },
+> +        { 0x1afc6308fc08084eULL, 0xf71a3ffcbe639308ULL, },
+> +        { 0x1afc6308fc08084eULL, 0xd8ff2b145aaacf80ULL, },    /* 104  */
+> +        { 0xff14aa80fc08084eULL, 0xd8ff2b145aaacf80ULL, },
+> +        { 0xff14aa801480084eULL, 0xd8ff2b145aaacf80ULL, },
+> +        { 0xff14aa801480804eULL, 0xd8ff2b145aaacf80ULL, },
+> +        { 0xff14aa801480804eULL, 0xf1d842a04f4d314eULL, },
+> +        { 0xd8a04d4e1480804eULL, 0xf1d842a04f4d314eULL, },
+> +        { 0xd8a04d4ea04e804eULL, 0xf1d842a04f4d314eULL, },
+> +        { 0xd8a04d4ea04e4e4eULL, 0xf1d842a04f4d314eULL, },
+>      };
+>
+>      reset_msa_registers();
+> diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c b/tests/=
+tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c
+> index 67df606..3f0bd47 100644
+> --- a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c
+> +++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_d.c
+> @@ -123,38 +123,38 @@ int32_t main(void)
+>          { 0xfbbe00634d93c708ULL, 0x704f164d5e31e24eULL, },
+>          { 0xac5aaeaab9cf8b80ULL, 0x704f164d5e31e24eULL, },
+>          { 0x704f164d5e31e24eULL, 0x704f164d5e31e24eULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
+> -        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
+> -        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
+> -        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
+> -        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
+> -        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
+> -        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
+> -        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
+> -        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
+> -        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
+> -        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> +        { 0x886ae6cc28625540ULL, 0x704f164d5e31e24eULL, },    /*  80  */
+> +        { 0xfbbe00634d93c708ULL, 0x886ae6cc28625540ULL, },
+> +        { 0xac5aaeaab9cf8b80ULL, 0xfbbe00634d93c708ULL, },
+> +        { 0x704f164d5e31e24eULL, 0xac5aaeaab9cf8b80ULL, },
+> +        { 0x886ae6cc28625540ULL, 0x704f164d5e31e24eULL, },
+> +        { 0xfbbe00634d93c708ULL, 0x886ae6cc28625540ULL, },
+> +        { 0xac5aaeaab9cf8b80ULL, 0xfbbe00634d93c708ULL, },
+> +        { 0x704f164d5e31e24eULL, 0xac5aaeaab9cf8b80ULL, },
+> +        { 0x886ae6cc28625540ULL, 0x704f164d5e31e24eULL, },    /*  88  */
+> +        { 0xfbbe00634d93c708ULL, 0x886ae6cc28625540ULL, },
+> +        { 0xac5aaeaab9cf8b80ULL, 0xfbbe00634d93c708ULL, },
+> +        { 0x704f164d5e31e24eULL, 0xac5aaeaab9cf8b80ULL, },
+> +        { 0x886ae6cc28625540ULL, 0x704f164d5e31e24eULL, },
+> +        { 0xfbbe00634d93c708ULL, 0x886ae6cc28625540ULL, },
+> +        { 0xac5aaeaab9cf8b80ULL, 0xfbbe00634d93c708ULL, },
+> +        { 0x704f164d5e31e24eULL, 0xac5aaeaab9cf8b80ULL, },
+> +        { 0x704f164d5e31e24eULL, 0x886ae6cc28625540ULL, },    /*  96  */
+> +        { 0x704f164d5e31e24eULL, 0x886ae6cc28625540ULL, },
+> +        { 0x704f164d5e31e24eULL, 0x886ae6cc28625540ULL, },
+> +        { 0x704f164d5e31e24eULL, 0x886ae6cc28625540ULL, },
+> +        { 0x704f164d5e31e24eULL, 0xfbbe00634d93c708ULL, },
+> +        { 0x704f164d5e31e24eULL, 0xfbbe00634d93c708ULL, },
+> +        { 0x704f164d5e31e24eULL, 0xfbbe00634d93c708ULL, },
+> +        { 0x704f164d5e31e24eULL, 0xfbbe00634d93c708ULL, },
+> +        { 0x704f164d5e31e24eULL, 0xac5aaeaab9cf8b80ULL, },    /* 104  */
+> +        { 0x704f164d5e31e24eULL, 0xac5aaeaab9cf8b80ULL, },
+> +        { 0x704f164d5e31e24eULL, 0xac5aaeaab9cf8b80ULL, },
+> +        { 0x704f164d5e31e24eULL, 0xac5aaeaab9cf8b80ULL, },
+> +        { 0x704f164d5e31e24eULL, 0x704f164d5e31e24eULL, },
+> +        { 0x704f164d5e31e24eULL, 0x704f164d5e31e24eULL, },
+> +        { 0x704f164d5e31e24eULL, 0x704f164d5e31e24eULL, },
+> +        { 0x704f164d5e31e24eULL, 0x704f164d5e31e24eULL, },
+>      };
+>
+>      reset_msa_registers();
+> diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c b/tests/=
+tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c
+> index 22d043c..2eae01f 100644
+> --- a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c
+> +++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_h.c
+> @@ -123,38 +123,38 @@ int32_t main(void)
+>          { 0xbb1a52fc0063c708ULL, 0x88d8e2a0164de24eULL, },
+>          { 0xc6ff2514aeaa8b80ULL, 0x88d8e2a0164de24eULL, },
+>          { 0x88d8e2a0164de24eULL, 0x88d8e2a0164de24eULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
+> -        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
+> -        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
+> -        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
+> -        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
+> -        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
+> -        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
+> -        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
+> -        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
+> -        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
+> -        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> +        { 0x0b5eb00ce6cc5540ULL, 0xe2a0e24ee2a0e24eULL, },    /*  80  */
+> +        { 0xbb1a52fc0063c708ULL, 0xe24ee24eb00c5540ULL, },
+> +        { 0xc6ff2514aeaa8b80ULL, 0xe24e554052fcc708ULL, },
+> +        { 0x88d8e2a0164de24eULL, 0x5540c70825148b80ULL, },
+> +        { 0x0b5eb00ce6cc5540ULL, 0xc7088b80e2a0e24eULL, },
+> +        { 0xbb1a52fc0063c708ULL, 0x8b80e24eb00c5540ULL, },
+> +        { 0xc6ff2514aeaa8b80ULL, 0xe24e554052fcc708ULL, },
+> +        { 0x88d8e2a0164de24eULL, 0x5540c70825148b80ULL, },
+> +        { 0x0b5eb00ce6cc5540ULL, 0xc7088b80e2a0e24eULL, },    /*  88  */
+> +        { 0xbb1a52fc0063c708ULL, 0x8b80e24eb00c5540ULL, },
+> +        { 0xc6ff2514aeaa8b80ULL, 0xe24e554052fcc708ULL, },
+> +        { 0x88d8e2a0164de24eULL, 0x5540c70825148b80ULL, },
+> +        { 0x0b5eb00ce6cc5540ULL, 0xc7088b80e2a0e24eULL, },
+> +        { 0xbb1a52fc0063c708ULL, 0x8b80e24eb00c5540ULL, },
+> +        { 0xc6ff2514aeaa8b80ULL, 0xe24e554052fcc708ULL, },
+> +        { 0x88d8e2a0164de24eULL, 0x5540c70825148b80ULL, },
+> +        { 0xc7088b80e2a0e24eULL, 0x0b5eb00ce6cc5540ULL, },    /*  96  */
+> +        { 0xb00c55408b80e24eULL, 0x0b5eb00ce6cc5540ULL, },
+> +        { 0xb00c55405540e24eULL, 0x0b5eb00ce6cc5540ULL, },
+> +        { 0xb00c55405540e24eULL, 0x0b5eb00ce6cc5540ULL, },
+> +        { 0xb00c55405540e24eULL, 0xbb1a52fc0063c708ULL, },
+> +        { 0x52fcc7085540e24eULL, 0xbb1a52fc0063c708ULL, },
+> +        { 0x52fcc708c708e24eULL, 0xbb1a52fc0063c708ULL, },
+> +        { 0x52fcc708c708e24eULL, 0xbb1a52fc0063c708ULL, },
+> +        { 0x52fcc708c708e24eULL, 0xc6ff2514aeaa8b80ULL, },    /* 104  */
+> +        { 0x25148b80c708e24eULL, 0xc6ff2514aeaa8b80ULL, },
+> +        { 0x25148b808b80e24eULL, 0xc6ff2514aeaa8b80ULL, },
+> +        { 0x25148b808b80e24eULL, 0xc6ff2514aeaa8b80ULL, },
+> +        { 0x25148b808b80e24eULL, 0x88d8e2a0164de24eULL, },
+> +        { 0xe2a0e24e8b80e24eULL, 0x88d8e2a0164de24eULL, },
+> +        { 0xe2a0e24ee24ee24eULL, 0x88d8e2a0164de24eULL, },
+> +        { 0xe2a0e24ee24ee24eULL, 0x88d8e2a0164de24eULL, },
+>      };
+>
+>      reset_msa_registers();
+> diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c b/tests/=
+tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c
+> index 1a9c2df..f7215d0 100644
+> --- a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c
+> +++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckev_w.c
+> @@ -123,38 +123,38 @@ int32_t main(void)
+>          { 0x153f52fc4d93c708ULL, 0xa942e2a05e31e24eULL, },
+>          { 0xab2b2514b9cf8b80ULL, 0xa942e2a05e31e24eULL, },
+>          { 0xa942e2a05e31e24eULL, 0xa942e2a05e31e24eULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
+> -        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
+> -        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
+> -        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
+> -        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
+> -        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
+> -        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
+> -        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
+> -        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
+> -        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
+> -        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> +        { 0xfe7bb00c28625540ULL, 0x5e31e24e5e31e24eULL, },    /*  80  */
+> +        { 0x153f52fc4d93c708ULL, 0x5e31e24e28625540ULL, },
+> +        { 0xab2b2514b9cf8b80ULL, 0x286255404d93c708ULL, },
+> +        { 0xa942e2a05e31e24eULL, 0x4d93c708b9cf8b80ULL, },
+> +        { 0xfe7bb00c28625540ULL, 0xb9cf8b805e31e24eULL, },
+> +        { 0x153f52fc4d93c708ULL, 0x5e31e24e28625540ULL, },
+> +        { 0xab2b2514b9cf8b80ULL, 0x286255404d93c708ULL, },
+> +        { 0xa942e2a05e31e24eULL, 0x4d93c708b9cf8b80ULL, },
+> +        { 0xfe7bb00c28625540ULL, 0xb9cf8b805e31e24eULL, },    /*  88  */
+> +        { 0x153f52fc4d93c708ULL, 0x5e31e24e28625540ULL, },
+> +        { 0xab2b2514b9cf8b80ULL, 0x286255404d93c708ULL, },
+> +        { 0xa942e2a05e31e24eULL, 0x4d93c708b9cf8b80ULL, },
+> +        { 0xfe7bb00c28625540ULL, 0xb9cf8b805e31e24eULL, },
+> +        { 0x153f52fc4d93c708ULL, 0x5e31e24e28625540ULL, },
+> +        { 0xab2b2514b9cf8b80ULL, 0x286255404d93c708ULL, },
+> +        { 0xa942e2a05e31e24eULL, 0x4d93c708b9cf8b80ULL, },
+> +        { 0xb9cf8b805e31e24eULL, 0xfe7bb00c28625540ULL, },    /*  96  */
+> +        { 0x286255405e31e24eULL, 0xfe7bb00c28625540ULL, },
+> +        { 0x286255405e31e24eULL, 0xfe7bb00c28625540ULL, },
+> +        { 0x286255405e31e24eULL, 0xfe7bb00c28625540ULL, },
+> +        { 0x286255405e31e24eULL, 0x153f52fc4d93c708ULL, },
+> +        { 0x4d93c7085e31e24eULL, 0x153f52fc4d93c708ULL, },
+> +        { 0x4d93c7085e31e24eULL, 0x153f52fc4d93c708ULL, },
+> +        { 0x4d93c7085e31e24eULL, 0x153f52fc4d93c708ULL, },
+> +        { 0x4d93c7085e31e24eULL, 0xab2b2514b9cf8b80ULL, },    /* 104  */
+> +        { 0xb9cf8b805e31e24eULL, 0xab2b2514b9cf8b80ULL, },
+> +        { 0xb9cf8b805e31e24eULL, 0xab2b2514b9cf8b80ULL, },
+> +        { 0xb9cf8b805e31e24eULL, 0xab2b2514b9cf8b80ULL, },
+> +        { 0xb9cf8b805e31e24eULL, 0xa942e2a05e31e24eULL, },
+> +        { 0x5e31e24e5e31e24eULL, 0xa942e2a05e31e24eULL, },
+> +        { 0x5e31e24e5e31e24eULL, 0xa942e2a05e31e24eULL, },
+> +        { 0x5e31e24e5e31e24eULL, 0xa942e2a05e31e24eULL, },
+>      };
+>
+>      reset_msa_registers();
+> diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c b/tests/=
+tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c
+> index 15ef377..6355338 100644
+> --- a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c
+> +++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_b.c
+> @@ -123,38 +123,38 @@ int32_t main(void)
+>          { 0x12bb1552fb004dc7ULL, 0x8d88a9e270165ee2ULL, },
+>          { 0x27c6ab25acaeb98bULL, 0x8d88a9e270165ee2ULL, },
+>          { 0x8d88a9e270165ee2ULL, 0x8d88a9e270165ee2ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
+> -        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
+> -        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
+> -        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
+> -        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
+> -        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
+> -        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
+> -        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
+> -        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
+> -        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
+> -        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> +        { 0x4b0bfeb088e62855ULL, 0x8da9705e8da9705eULL, },    /*  80  */
+> +        { 0x12bb1552fb004dc7ULL, 0x8d708d704bfe8828ULL, },
+> +        { 0x27c6ab25acaeb98bULL, 0x8d8d4b881215fb4dULL, },
+> +        { 0x8d88a9e270165ee2ULL, 0x8d4b12fb27abacb9ULL, },
+> +        { 0x4b0bfeb088e62855ULL, 0x8d1227ac8da9705eULL, },
+> +        { 0x12bb1552fb004dc7ULL, 0x8d278d704bfe8828ULL, },
+> +        { 0x27c6ab25acaeb98bULL, 0x8d8d4b881215fb4dULL, },
+> +        { 0x8d88a9e270165ee2ULL, 0x8d4b12fb27abacb9ULL, },
+> +        { 0x4b0bfeb088e62855ULL, 0x8d1227ac8da9705eULL, },    /*  88  */
+> +        { 0x12bb1552fb004dc7ULL, 0x8d278d704bfe8828ULL, },
+> +        { 0x27c6ab25acaeb98bULL, 0x8d8d4b881215fb4dULL, },
+> +        { 0x8d88a9e270165ee2ULL, 0x8d4b12fb27abacb9ULL, },
+> +        { 0x4b0bfeb088e62855ULL, 0x8d1227ac8da9705eULL, },
+> +        { 0x12bb1552fb004dc7ULL, 0x8d278d704bfe8828ULL, },
+> +        { 0x27c6ab25acaeb98bULL, 0x8d8d4b881215fb4dULL, },
+> +        { 0x8d88a9e270165ee2ULL, 0x8d4b12fb27abacb9ULL, },
+> +        { 0x8d1227ac8da9705eULL, 0x4b0bfeb088e62855ULL, },    /*  96  */
+> +        { 0x4bfe88288d278d70ULL, 0x4b0bfeb088e62855ULL, },
+> +        { 0x4bfe88284b888d8dULL, 0x4b0bfeb088e62855ULL, },
+> +        { 0x4bfe88284b884b8dULL, 0x4b0bfeb088e62855ULL, },
+> +        { 0x4bfe88284b884b4bULL, 0x12bb1552fb004dc7ULL, },
+> +        { 0x1215fb4d4b884b4bULL, 0x12bb1552fb004dc7ULL, },
+> +        { 0x1215fb4d12fb4b4bULL, 0x12bb1552fb004dc7ULL, },
+> +        { 0x1215fb4d12fb124bULL, 0x12bb1552fb004dc7ULL, },
+> +        { 0x1215fb4d12fb1212ULL, 0x27c6ab25acaeb98bULL, },    /* 104  */
+> +        { 0x27abacb912fb1212ULL, 0x27c6ab25acaeb98bULL, },
+> +        { 0x27abacb927ac1212ULL, 0x27c6ab25acaeb98bULL, },
+> +        { 0x27abacb927ac2712ULL, 0x27c6ab25acaeb98bULL, },
+> +        { 0x27abacb927ac2727ULL, 0x8d88a9e270165ee2ULL, },
+> +        { 0x8da9705e27ac2727ULL, 0x8d88a9e270165ee2ULL, },
+> +        { 0x8da9705e8d702727ULL, 0x8d88a9e270165ee2ULL, },
+> +        { 0x8da9705e8d708d27ULL, 0x8d88a9e270165ee2ULL, },
+>      };
+>
+>      reset_msa_registers();
+> diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c b/tests/=
+tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c
+> index e3997cd..ac75526 100644
+> --- a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c
+> +++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_d.c
+> @@ -123,38 +123,38 @@ int32_t main(void)
+>          { 0x12f7bb1a153f52fcULL, 0x8df188d8a942e2a0ULL, },
+>          { 0x27d8c6ffab2b2514ULL, 0x8df188d8a942e2a0ULL, },
+>          { 0x8df188d8a942e2a0ULL, 0x8df188d8a942e2a0ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
+> -        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
+> -        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
+> -        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
+> -        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
+> -        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
+> -        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
+> -        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
+> -        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
+> -        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
+> -        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> +        { 0x4b670b5efe7bb00cULL, 0x8df188d8a942e2a0ULL, },    /*  80  */
+> +        { 0x12f7bb1a153f52fcULL, 0x8df188d8a942e2a0ULL, },
+> +        { 0x27d8c6ffab2b2514ULL, 0x8df188d8a942e2a0ULL, },
+> +        { 0x8df188d8a942e2a0ULL, 0x8df188d8a942e2a0ULL, },
+> +        { 0x4b670b5efe7bb00cULL, 0x8df188d8a942e2a0ULL, },
+> +        { 0x12f7bb1a153f52fcULL, 0x8df188d8a942e2a0ULL, },
+> +        { 0x27d8c6ffab2b2514ULL, 0x8df188d8a942e2a0ULL, },
+> +        { 0x8df188d8a942e2a0ULL, 0x8df188d8a942e2a0ULL, },
+> +        { 0x4b670b5efe7bb00cULL, 0x8df188d8a942e2a0ULL, },    /*  88  */
+> +        { 0x12f7bb1a153f52fcULL, 0x8df188d8a942e2a0ULL, },
+> +        { 0x27d8c6ffab2b2514ULL, 0x8df188d8a942e2a0ULL, },
+> +        { 0x8df188d8a942e2a0ULL, 0x8df188d8a942e2a0ULL, },
+> +        { 0x4b670b5efe7bb00cULL, 0x8df188d8a942e2a0ULL, },
+> +        { 0x12f7bb1a153f52fcULL, 0x8df188d8a942e2a0ULL, },
+> +        { 0x27d8c6ffab2b2514ULL, 0x8df188d8a942e2a0ULL, },
+> +        { 0x8df188d8a942e2a0ULL, 0x8df188d8a942e2a0ULL, },
+> +        { 0x8df188d8a942e2a0ULL, 0x4b670b5efe7bb00cULL, },    /*  96  */
+> +        { 0x4b670b5efe7bb00cULL, 0x4b670b5efe7bb00cULL, },
+> +        { 0x4b670b5efe7bb00cULL, 0x4b670b5efe7bb00cULL, },
+> +        { 0x4b670b5efe7bb00cULL, 0x4b670b5efe7bb00cULL, },
+> +        { 0x4b670b5efe7bb00cULL, 0x12f7bb1a153f52fcULL, },
+> +        { 0x12f7bb1a153f52fcULL, 0x12f7bb1a153f52fcULL, },
+> +        { 0x12f7bb1a153f52fcULL, 0x12f7bb1a153f52fcULL, },
+> +        { 0x12f7bb1a153f52fcULL, 0x12f7bb1a153f52fcULL, },
+> +        { 0x12f7bb1a153f52fcULL, 0x27d8c6ffab2b2514ULL, },    /* 104  */
+> +        { 0x27d8c6ffab2b2514ULL, 0x27d8c6ffab2b2514ULL, },
+> +        { 0x27d8c6ffab2b2514ULL, 0x27d8c6ffab2b2514ULL, },
+> +        { 0x27d8c6ffab2b2514ULL, 0x27d8c6ffab2b2514ULL, },
+> +        { 0x27d8c6ffab2b2514ULL, 0x8df188d8a942e2a0ULL, },
+> +        { 0x8df188d8a942e2a0ULL, 0x8df188d8a942e2a0ULL, },
+> +        { 0x8df188d8a942e2a0ULL, 0x8df188d8a942e2a0ULL, },
+> +        { 0x8df188d8a942e2a0ULL, 0x8df188d8a942e2a0ULL, },
+>      };
+>
+>      reset_msa_registers();
+> diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c b/tests/=
+tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c
+> index 2a29ac0..12c1fa1 100644
+> --- a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c
+> +++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_h.c
+> @@ -123,38 +123,38 @@ int32_t main(void)
+>          { 0x12f7153ffbbe4d93ULL, 0x8df1a942704f5e31ULL, },
+>          { 0x27d8ab2bac5ab9cfULL, 0x8df1a942704f5e31ULL, },
+>          { 0x8df1a942704f5e31ULL, 0x8df1a942704f5e31ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
+> -        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
+> -        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
+> -        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
+> -        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
+> -        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
+> -        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
+> -        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
+> -        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
+> -        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
+> -        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> +        { 0x4b67fe7b886a2862ULL, 0x8df1704f8df1704fULL, },    /*  80  */
+> +        { 0x12f7153ffbbe4d93ULL, 0x8df18df14b67886aULL, },
+> +        { 0x27d8ab2bac5ab9cfULL, 0x8df14b6712f7fbbeULL, },
+> +        { 0x8df1a942704f5e31ULL, 0x8df112f727d8ac5aULL, },
+> +        { 0x4b67fe7b886a2862ULL, 0x8df127d88df1704fULL, },
+> +        { 0x12f7153ffbbe4d93ULL, 0x8df18df14b67886aULL, },
+> +        { 0x27d8ab2bac5ab9cfULL, 0x8df14b6712f7fbbeULL, },
+> +        { 0x8df1a942704f5e31ULL, 0x8df112f727d8ac5aULL, },
+> +        { 0x4b67fe7b886a2862ULL, 0x8df127d88df1704fULL, },    /*  88  */
+> +        { 0x12f7153ffbbe4d93ULL, 0x8df18df14b67886aULL, },
+> +        { 0x27d8ab2bac5ab9cfULL, 0x8df14b6712f7fbbeULL, },
+> +        { 0x8df1a942704f5e31ULL, 0x8df112f727d8ac5aULL, },
+> +        { 0x4b67fe7b886a2862ULL, 0x8df127d88df1704fULL, },
+> +        { 0x12f7153ffbbe4d93ULL, 0x8df18df14b67886aULL, },
+> +        { 0x27d8ab2bac5ab9cfULL, 0x8df14b6712f7fbbeULL, },
+> +        { 0x8df1a942704f5e31ULL, 0x8df112f727d8ac5aULL, },
+> +        { 0x8df127d88df1704fULL, 0x4b67fe7b886a2862ULL, },    /*  96  */
+> +        { 0x4b67886a8df18df1ULL, 0x4b67fe7b886a2862ULL, },
+> +        { 0x4b67886a4b678df1ULL, 0x4b67fe7b886a2862ULL, },
+> +        { 0x4b67886a4b674b67ULL, 0x4b67fe7b886a2862ULL, },
+> +        { 0x4b67886a4b674b67ULL, 0x12f7153ffbbe4d93ULL, },
+> +        { 0x12f7fbbe4b674b67ULL, 0x12f7153ffbbe4d93ULL, },
+> +        { 0x12f7fbbe12f74b67ULL, 0x12f7153ffbbe4d93ULL, },
+> +        { 0x12f7fbbe12f712f7ULL, 0x12f7153ffbbe4d93ULL, },
+> +        { 0x12f7fbbe12f712f7ULL, 0x27d8ab2bac5ab9cfULL, },    /* 104  */
+> +        { 0x27d8ac5a12f712f7ULL, 0x27d8ab2bac5ab9cfULL, },
+> +        { 0x27d8ac5a27d812f7ULL, 0x27d8ab2bac5ab9cfULL, },
+> +        { 0x27d8ac5a27d827d8ULL, 0x27d8ab2bac5ab9cfULL, },
+> +        { 0x27d8ac5a27d827d8ULL, 0x8df1a942704f5e31ULL, },
+> +        { 0x8df1704f27d827d8ULL, 0x8df1a942704f5e31ULL, },
+> +        { 0x8df1704f8df127d8ULL, 0x8df1a942704f5e31ULL, },
+> +        { 0x8df1704f8df18df1ULL, 0x8df1a942704f5e31ULL, },
+>      };
+>
+>      reset_msa_registers();
+> diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c b/tests/=
+tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c
+> index a3fbe25..b8979c3 100644
+> --- a/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c
+> +++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_pckod_w.c
+> @@ -123,38 +123,38 @@ int32_t main(void)
+>          { 0x12f7bb1afbbe0063ULL, 0x8df188d8704f164dULL, },
+>          { 0x27d8c6ffac5aaeaaULL, 0x8df188d8704f164dULL, },
+>          { 0x8df188d8704f164dULL, 0x8df188d8704f164dULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
+> -        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
+> -        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
+> -        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
+> -        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
+> -        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
+> -        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
+> -        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
+> -        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
+> -        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
+> -        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> +        { 0x4b670b5e886ae6ccULL, 0x8df188d88df188d8ULL, },    /*  80  */
+> +        { 0x12f7bb1afbbe0063ULL, 0x8df188d84b670b5eULL, },
+> +        { 0x27d8c6ffac5aaeaaULL, 0x8df188d812f7bb1aULL, },
+> +        { 0x8df188d8704f164dULL, 0x8df188d827d8c6ffULL, },
+> +        { 0x4b670b5e886ae6ccULL, 0x8df188d88df188d8ULL, },
+> +        { 0x12f7bb1afbbe0063ULL, 0x8df188d84b670b5eULL, },
+> +        { 0x27d8c6ffac5aaeaaULL, 0x8df188d812f7bb1aULL, },
+> +        { 0x8df188d8704f164dULL, 0x8df188d827d8c6ffULL, },
+> +        { 0x4b670b5e886ae6ccULL, 0x8df188d88df188d8ULL, },    /*  88  */
+> +        { 0x12f7bb1afbbe0063ULL, 0x8df188d84b670b5eULL, },
+> +        { 0x27d8c6ffac5aaeaaULL, 0x8df188d812f7bb1aULL, },
+> +        { 0x8df188d8704f164dULL, 0x8df188d827d8c6ffULL, },
+> +        { 0x4b670b5e886ae6ccULL, 0x8df188d88df188d8ULL, },
+> +        { 0x12f7bb1afbbe0063ULL, 0x8df188d84b670b5eULL, },
+> +        { 0x27d8c6ffac5aaeaaULL, 0x8df188d812f7bb1aULL, },
+> +        { 0x8df188d8704f164dULL, 0x8df188d827d8c6ffULL, },
+> +        { 0x8df188d88df188d8ULL, 0x4b670b5e886ae6ccULL, },    /*  96  */
+> +        { 0x4b670b5e8df188d8ULL, 0x4b670b5e886ae6ccULL, },
+> +        { 0x4b670b5e4b670b5eULL, 0x4b670b5e886ae6ccULL, },
+> +        { 0x4b670b5e4b670b5eULL, 0x4b670b5e886ae6ccULL, },
+> +        { 0x4b670b5e4b670b5eULL, 0x12f7bb1afbbe0063ULL, },
+> +        { 0x12f7bb1a4b670b5eULL, 0x12f7bb1afbbe0063ULL, },
+> +        { 0x12f7bb1a12f7bb1aULL, 0x12f7bb1afbbe0063ULL, },
+> +        { 0x12f7bb1a12f7bb1aULL, 0x12f7bb1afbbe0063ULL, },
+> +        { 0x12f7bb1a12f7bb1aULL, 0x27d8c6ffac5aaeaaULL, },    /* 104  */
+> +        { 0x27d8c6ff12f7bb1aULL, 0x27d8c6ffac5aaeaaULL, },
+> +        { 0x27d8c6ff27d8c6ffULL, 0x27d8c6ffac5aaeaaULL, },
+> +        { 0x27d8c6ff27d8c6ffULL, 0x27d8c6ffac5aaeaaULL, },
+> +        { 0x27d8c6ff27d8c6ffULL, 0x8df188d8704f164dULL, },
+> +        { 0x8df188d827d8c6ffULL, 0x8df188d8704f164dULL, },
+> +        { 0x8df188d88df188d8ULL, 0x8df188d8704f164dULL, },
+> +        { 0x8df188d88df188d8ULL, 0x8df188d8704f164dULL, },
+>      };
+>
+>      reset_msa_registers();
+> diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c b/tests/t=
+cg/mips/user/ase/msa/pack/test_msa_vshf_b.c
+> index eedb7d8..1839a26 100644
+> --- a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c
+> +++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_b.c
+> @@ -123,38 +123,38 @@ int32_t main(void)
+>          { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+>          { 0x8080808080808080ULL, 0x8080808080808080ULL, },
+>          { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
+> -        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
+> -        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
+> -        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
+> -        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
+> -        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
+> -        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
+> -        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
+> -        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
+> -        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
+> -        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> +        { 0x4040404040404040ULL, 0x4040404040404040ULL, },    /*  80  */
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x8080808080808080ULL, 0x8080808080808080ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x4040404040404040ULL, 0x4040404040404040ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x8080808080808080ULL, 0x8080808080808080ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x4040404040404040ULL, 0x4040404040404040ULL, },    /*  88  */
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x8080808080808080ULL, 0x8080808080808080ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x4040404040404040ULL, 0x4040404040404040ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x8080808080808080ULL, 0x8080808080808080ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*  96  */
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /* 104  */
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+>      };
+>
+>      reset_msa_registers();
+> diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c b/tests/t=
+cg/mips/user/ase/msa/pack/test_msa_vshf_d.c
+> index 85a8f0d..ebc198f 100644
+> --- a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c
+> +++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_d.c
+> @@ -123,38 +123,38 @@ int32_t main(void)
+>          { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+>          { 0xac5aaeaab9cf8b80ULL, 0xac5aaeaab9cf8b80ULL, },
+>          { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
+> -        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
+> -        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
+> -        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
+> -        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
+> -        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
+> -        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
+> -        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
+> -        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
+> -        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
+> -        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> +        { 0x886ae6cc28625540ULL, 0x886ae6cc28625540ULL, },    /*  80  */
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0xac5aaeaab9cf8b80ULL, 0xac5aaeaab9cf8b80ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x886ae6cc28625540ULL, 0x886ae6cc28625540ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0xac5aaeaab9cf8b80ULL, 0xac5aaeaab9cf8b80ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x886ae6cc28625540ULL, 0x886ae6cc28625540ULL, },    /*  88  */
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0xac5aaeaab9cf8b80ULL, 0xac5aaeaab9cf8b80ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x886ae6cc28625540ULL, 0x886ae6cc28625540ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0xac5aaeaab9cf8b80ULL, 0xac5aaeaab9cf8b80ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*  96  */
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /* 104  */
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+>      };
+>
+>      reset_msa_registers();
+> diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c b/tests/t=
+cg/mips/user/ase/msa/pack/test_msa_vshf_h.c
+> index 8d416bc..a724013 100644
+> --- a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c
+> +++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_h.c
+> @@ -123,38 +123,38 @@ int32_t main(void)
+>          { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+>          { 0x8b808b808b808b80ULL, 0x8b808b808b808b80ULL, },
+>          { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
+> -        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
+> -        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
+> -        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
+> -        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
+> -        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
+> -        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
+> -        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
+> -        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
+> -        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
+> -        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> +        { 0x5540554055405540ULL, 0x5540554055405540ULL, },    /*  80  */
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x8b808b808b808b80ULL, 0x8b808b808b808b80ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x5540554055405540ULL, 0x5540554055405540ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x8b808b808b808b80ULL, 0x8b808b808b808b80ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x5540554055405540ULL, 0x5540554055405540ULL, },    /*  88  */
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x8b808b808b808b80ULL, 0x8b808b808b808b80ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x5540554055405540ULL, 0x5540554055405540ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x8b808b808b808b80ULL, 0x8b808b808b808b80ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*  96  */
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /* 104  */
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+>      };
+>
+>      reset_msa_registers();
+> diff --git a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c b/tests/t=
+cg/mips/user/ase/msa/pack/test_msa_vshf_w.c
+> index fd8f02d..607ac4f 100644
+> --- a/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c
+> +++ b/tests/tcg/mips/user/ase/msa/pack/test_msa_vshf_w.c
+> @@ -123,38 +123,38 @@ int32_t main(void)
+>          { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+>          { 0xb9cf8b80b9cf8b80ULL, 0xb9cf8b80b9cf8b80ULL, },
+>          { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  80  */
+> -        { 0x00000000fc000000ULL, 0x000015000000001aULL, },
+> -        { 0x0000000014000000ULL, 0x0000ab00000000ffULL, },
+> -        { 0x00000000a0000000ULL, 0x0000a900000000d8ULL, },
+> -        { 0x000040000000000cULL, 0x9300003f00120000ULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000800000000014ULL, 0x9300003f00120000ULL, },
+> -        { 0x00004e00000000a0ULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0x8800000000fee6aaULL, },    /*  88  */
+> -        { 0x0000000000000000ULL, 0xfb000000001500aaULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x0000000000000000ULL, 0x7000000000a916aaULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /*  96  */
+> -        { 0x00000800000000fcULL, 0x6200007be64b0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeccULL, },
+> -        { 0x00006a0000550000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x9300003f00120000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae63ULL, },
+> -        { 0x0000be0000c70000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },    /* 104  */
+> -        { 0x00000800000000fcULL, 0xcf00002bae270000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abaeaaULL, },
+> -        { 0x00005a00008b0000ULL, 0x0000000000000000ULL, },
+> -        { 0x000000000c000000ULL, 0x0000fe000000005eULL, },
+> -        { 0x00000800000000fcULL, 0x31000042168d0000ULL, },
+> -        { 0x0000000000000000ULL, 0xac00000000abae4dULL, },
+> -        { 0x00004f0000e20000ULL, 0x0000000000000000ULL, },
+> +        { 0x2862554028625540ULL, 0x2862554028625540ULL, },    /*  80  */
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0xb9cf8b80b9cf8b80ULL, 0xb9cf8b80b9cf8b80ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x2862554028625540ULL, 0x2862554028625540ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0xb9cf8b80b9cf8b80ULL, 0xb9cf8b80b9cf8b80ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x2862554028625540ULL, 0x2862554028625540ULL, },    /*  88  */
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0xb9cf8b80b9cf8b80ULL, 0xb9cf8b80b9cf8b80ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x2862554028625540ULL, 0x2862554028625540ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0xb9cf8b80b9cf8b80ULL, 0xb9cf8b80b9cf8b80ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*  96  */
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /* 104  */
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+> +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
+>      };
+>
+>      reset_msa_registers();
+> --
+> 2.7.4
 
-It's more complicated than that, because access size depends on a
-register value:
-
-static uint16_t dp8393x_get(dp8393xState *s, int width, uint16_t *base,
-                            int offset)
-{
-    uint16_t val;
-
-    if (s->big_endian) {
-        val = be16_to_cpu(base[offset * width + width - 1]);
-    } else {
-        val = le16_to_cpu(base[offset * width]);
-    }
-    return val;
-}
-
-and width is:
-
-width = (s->regs[SONIC_DCR] & SONIC_DCR_DW) ? 2 : 1;
-
-So in the end we always need the big_endian flag to know how to read the
-memory. I think it's simpler to read/write the memory (like a real DMA
-access), and then to swap data internally.
-
-Moreover, the big-endian/little-endian is a real feature of the
-controller (see  1.3 DATA WIDTH AND BYTE ORDERING,
-http://pccomponents.com/datasheets/NSC83932.PDF )
-
-Thanks,
-Laurent
+Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 
