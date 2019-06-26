@@ -2,82 +2,105 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D872C48BD3
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 11:25:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D77EC48BD6
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 11:37:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF4292080C
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 11:25:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4C7D520656
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 11:37:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="Q54vkzkk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF4292080C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="qS1wwxUP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C7D520656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hg630-0001ja-Ts
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 07:25:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38309)
+	id 1hg6Ej-000629-Gf
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 07:37:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41429)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <lucienmp_antispam@yahoo.com>) id 1hg62I-0001I8-Cg
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 07:24:24 -0400
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hg6Dr-0005X6-1a
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 07:36:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lucienmp_antispam@yahoo.com>) id 1hg62G-0008S8-DE
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 07:24:22 -0400
-Received: from sonic315-20.consmr.mail.ne1.yahoo.com ([66.163.190.146]:45127)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <lucienmp_antispam@yahoo.com>)
- id 1hg62G-0008MM-3H
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 07:24:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048;
- t=1561548256; bh=poDkVUu+Rs1lFtFvRWTmdPmxyoeKy/1f2sNcgn9VuUE=;
- h=Date:From:To:Cc:In-Reply-To:References:Subject:From:Subject;
- b=Q54vkzkkxr9u+9flPh439oJ7UvR289q6YhclQ63/JjZKtbWQzqqrG2E6oleC9IidOZTYt+M771cZcQ0tBwvUaVbFr0eqAZQHJk6Y1q/GacibazSqXk43YYxpEWtfDjfK5NfIjO5t0jpRL0kDFytcrHGFUOqGtV4QWTlO66f0yJYgwsRUPXbmDHGrSEnAbzqxcFXvPPHUNHVf4++kcwNp0vor4G7AX3jBzh1LTc6kp6icXQ9ETZml9Z1iJ2QMf5Yd+sOF6Wtutl1AqZRF26FqgMcX+Kvd3l3kDi1IeMwiJEK4wnx7bwqhX6iZFwaaRzuCA+8waxJCn8CrMFxNcDYEXA==
-X-YMail-OSG: YuDelk8VM1k8jbOThaKvF7LAqAZXMlvKCaQ3_dm9fy2RdkCta.Ef12bx3CwkRWp
- cZZlzsnbPpjNMFGYdwVdH99h0VsQax2ieImABBeBHhllNOgi.jd4XXPTCw0PTNg3upT7OcUhZzKJ
- CbJV3gXMt_UpFpceB3ks0uJuV22D1V1CZhPU2w6.SsBmrcKEbGpvRZ8K7TJqFqd.DJRyQQqsQDkn
- juiKY_sHn61CiS10w8Qn2km27Y9jnw91TLcN8uLMEiLL26gpKOxsWzHB4z43aEs_qScOSRoBXaki
- Vbn7ZUOn5dt7z8JVrFj8ZCzx5LK_cC.c_xhmS5Y.15C3jNRBMnYBtZHuzS4KF.9i8X3400Xfimur
- cVuBtcjLK18FxjHf5QZq8Ajw42vPRE_W3IZolSZ7ieZQZdz1EBzU0.iWFNJOIpC3lWunOx9Ol5Nn
- sXx3QKJ3yzh8B3.HCKR2hzS9UdELLtdO1dtWJ5Q937R1aBGOX4v.91FU3gUns0vkDZ0Y44U8exK5
- nhiKo_ACbScU3.r3bopLPdexLci.hO0mZGC3gM3r9xYImBbK6qaKtbJEYzmaSVt0Lf6RX_2vEexC
- XMiNYz_YuQvS_CxG5IalZLASROjw9dYjEMX_fjyGfhOtsW3ZX5JTZveGeWDYrGDQT1.GJc0ToUKu
- 3T2xOAx5pMVzSHeE4ba1h30eU40VtWFaIbXibf5BxK0Bi1mSdAkohlhL3SplJ4ZjE6sYdFRpUKMm
- 8sDShEPyRz_cLm_cPTZiUkKwK_ROb1D4edkeYThk6mXTEZ54snTZ7FfTlGc5.3tSk0f_Vmgdz9Q0
- r8LG8WesdY0pMn35OW9NU7EikpPcqYcd0_0ASqOt9uTS3Ud1OoOtHT2fNlhlaSkxBLpnIrhZIrk4
- kfRrxjIv_cYl8iQt_AdLAeWjnyxyYKFw0fTjenQ6bDmys9SvQqAbfeGDd1zalTNvotStK0PMeExB
- EEkJnsfLwY8HVfiVIfj0wPsJMvJXuZ1ASuZIt3r5POwAKfEOJxYWN2zpmL_THwlNWfS8hWjDz5L8
- 6TjG73TXUl4PKH_PgeUZYIqkQLRqkvgC.tYk5qPyTVvmMU1nrKdcTIvk5zvR_XzIApEixdu6g5g7
- ySGOwsK0.FM28jBtFTm7vIh8bG5hvBxppGmIY8E02vgp0yzuLbHr5DLmYxxLasHqmn81x3TUdMTW
- Aild22f1T_t5xedl91z8YbD7DKhRyI_PX2njiqHjsAAljhTvsfrBF8J6q2I4J
-Received: from sonic.gate.mail.ne1.yahoo.com by
- sonic315.consmr.mail.ne1.yahoo.com with HTTP; Wed, 26 Jun 2019 11:24:16 +0000
-Date: Wed, 26 Jun 2019 11:24:05 +0000 (UTC)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, 
- Laurent Vivier <laurent@vivier.eu>
-Message-ID: <1277274524.199018.1561548245851@mail.yahoo.com>
-In-Reply-To: <2af0f156-d1d7-4957-547a-13dc24a9a8cd@vivier.eu>
-References: <20190526075056.33865-1-lucienmp_antispam@yahoo.com>
- <ab1edfe7-8498-eee6-096c-d66d6122d133@vivier.eu>
- <1c3d400a-7ea2-2bdd-8301-8f6c85075b24@linaro.org>
- <2af0f156-d1d7-4957-547a-13dc24a9a8cd@vivier.eu>
-MIME-Version: 1.0
-X-Mailer: WebService/1.1.13875 YMailNorrin Mozilla/5.0 (Windows NT 10.0; Win64;
- x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100
- Safari/537.36
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 66.163.190.146
-Content-Type: text/plain; charset=UTF-8
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hg6Dp-0007c8-Uc
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 07:36:18 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:59204)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
+ id 1hg6Dn-0007QP-Fn; Wed, 26 Jun 2019 07:36:15 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5QBYRTB144509;
+ Wed, 26 Jun 2019 11:36:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2018-07-02; bh=5ManQhj20iXcRJbk15PjvEVuM3rA+acuY046NdK54mw=;
+ b=qS1wwxUPBaEGsxm8F+48kpCqxnOX0o+nluVu5TRZjQqvba0zRfuP3xCw7H1D7eQwxrS+
+ dQ3fKAC5OdvMFI1SXP0amTnJm1qqqOUbJRPqrQ+h+NRszfqqhviWYF6kRGzbKRAGqIFn
+ TXxyp3N5H3k272JYA53oqswa1DNOfIkYZrX8+S3KfTu2viJFKgcAMXqeFCwlZ/jDURpt
+ /VlLORT0c/3yG8ODAghIb5zEHB0Nu/22HB9BTk+QeeGqYXxAeGKgA6VKrrkskBVk8kCb
+ pPnReOPqrSm2X4xhB1MJp38ns4K3hvWxXTPRnpRp1ebEJT3NDFBbX0gmWLEN2NEc55ao bA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2120.oracle.com with ESMTP id 2t9cyqhpj2-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 26 Jun 2019 11:36:11 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5QBXvQe018828;
+ Wed, 26 Jun 2019 11:34:11 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by userp3030.oracle.com with ESMTP id 2t99f4dp2d-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 26 Jun 2019 11:34:11 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5QBYAhK031888;
+ Wed, 26 Jun 2019 11:34:10 GMT
+Received: from [10.30.3.6] (/213.57.127.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Wed, 26 Jun 2019 04:34:09 -0700
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+From: Sam Eiderman <shmuel.eiderman@oracle.com>
+In-Reply-To: <4CD0FD44-FB0F-4D76-88FC-C853E874563B@oracle.com>
+Date: Wed, 26 Jun 2019 14:34:04 +0300
 Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH] Regression for m68k causing Single-Step
- via GDB/RSP to not single step
+Message-Id: <0A73A4B2-90AB-4290-B549-B64F19303D6E@oracle.com>
+References: <20190619092352.23583-1-shmuel.eiderman@oracle.com>
+ <20190619092352.23583-4-shmuel.eiderman@oracle.com>
+ <20190620143749.GC17015@morn.lan>
+ <62F1EBAB-C7E8-42D1-BB6F-22C4945E51B5@oracle.com>
+ <20190621185953.GA6620@morn.lan>
+ <78884F3A-DA66-43B0-B504-AD12BC7BDC3C@oracle.com>
+ <20190622152723.GA3357@morn.lan>
+ <4CD0FD44-FB0F-4D76-88FC-C853E874563B@oracle.com>
+To: "Kevin O'Connor" <kevin@koconnor.net>
+X-Mailer: Apple Mail (2.3445.104.11)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9299
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906260139
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9299
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906260139
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.85
+Subject: Re: [Qemu-devel] [SeaBIOS] [PATCH v3 3/4] geometry: Add
+ boot_lchs_find_*() utility functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,159 +112,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-From: Lucien Anti-Spam via Qemu-devel <qemu-devel@nongnu.org>
-Reply-To: Lucien Anti-Spam <lucienmp_antispam@yahoo.com>
-Cc: Thomas Huth <huth@tuxfamily.org>,
- =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- "Emilio G . Cota" <cota@braap.org>, Luc Michel <luc.michel@greensocs.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, arbel.moshe@oracle.com,
+ seabios@seabios.org, QEMU <qemu-devel@nongnu.org>, mreitz@redhat.com,
+ liran.alon@oracle.com, kraxel@redhat.com, karl.heubaum@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
- Hi Richard/Laurent,
-Great catch, I also just stumbled on this problem as well which I didnt see=
- with my other application code.
-But I have another problem after applying the changes from your email, "RTE=
-" and breakpoints around a MOV/BusException/RTE behave oddly.
-I would like to test with the same software you are using, could you tell m=
-e what M68K machine setup, and images you use as well as your debugger plea=
-se?
-Cheers,Luc
-    On Wednesday, June 19, 2019, 04:59:12 AM GMT+9, Laurent Vivier <laurent=
-@vivier.eu> wrote: =20
-=20
- Le 18/06/2019 =C3=A0 21:39, Richard Henderson a =C3=A9crit=C2=A0:
-> On 6/18/19 11:44 AM, Laurent Vivier wrote:
->> Le 26/05/2019 =C3=A0 09:50, Lucien Murray-Pitts a =C3=A9crit=C2=A0:
->>> A regression that was introduced, with the refactor to TranslatorOps,
->>> drops two lines that update the PC when single-stepping is being perfor=
-med.
->>> ( short commit 11ab74b )
->>>
->>> This patch resolves that issue.
->>
->> Fixes: 11ab74b01e0a ("target/m68k: Convert to TranslatorOps")
->>
->>> Signed-off-by: Lucien Murray-Pitts <lucienmp_antispam@yahoo.com>
->>> ---
->>>=C2=A0 target/m68k/translate.c | 2 ++
->>>=C2=A0 1 file changed, 2 insertions(+)
->>>
->>> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
->>> index f0534a4ba0..2922ea79c3 100644
->>> --- a/target/m68k/translate.c
->>> +++ b/target/m68k/translate.c
->>> @@ -6130,6 +6130,8 @@ static void m68k_tr_tb_stop(DisasContextBase *dcb=
-ase, CPUState *cpu)
->>>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return;
->>>=C2=A0 =C2=A0 =C2=A0 }
->>>=C2=A0 =C2=A0 =C2=A0 if (dc->base.singlestep_enabled) {
->>> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 update_cc_op(dc);
->>> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_movi_i32(QREG_PC, dc->pc);
->>>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 gen_helper_raise_exception(cpu_env, t=
-cg_const_i32(EXCP_DEBUG));
->>>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return;
->>>=C2=A0 =C2=A0 =C2=A0 }
->>>
->>
->> I've tested this fix single-stepping on a kernel, these two lines are=20
->> not enough to fix the problem. In fact four lines have been dropped and=
-=20
->> we must re-add them all:
->>
->> iff --git a/target/m68k/translate.c b/target/m68k/translate.c
->> index d0f6d1f5cc..6c78001501 100644
->> --- a/target/m68k/translate.c
->> +++ b/target/m68k/translate.c
->> @@ -6200,6 +6200,10 @@ static void m68k_tr_tb_stop(DisasContextBase *dcb=
-ase, CPUState *cpu)
->>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return;
->>=C2=A0 =C2=A0 =C2=A0 }
->>=C2=A0 =C2=A0 =C2=A0 if (dc->base.singlestep_enabled) {
->> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (dc->base.is_jmp !=3D DISAS_JUMP) {
->> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 update_cc_op(dc);
->> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_movi_i32(QREG_PC, dc-=
->pc);
->> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }
->>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 gen_helper_raise_exception(cpu_env, tc=
-g_const_i32(EXCP_DEBUG));
->>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return;
->>=C2=A0 =C2=A0 =C2=A0 }
->=20
-> Even this isn't quite right, according to the comments in the switch that
-> follows.=C2=A0 I think it'd be best written like so.
+Kevin,
+
+Rethinking this change (where we construct the device path from outside =
+and call boot_prio_find()),
+this is pretty tricky to implement since we need to take care of =
+csm_bootprio_ata() and
+csm_bootprio_pci() which do not work with device path.
+In addition,
+	bootprio_find_fdc_device
+	bootprio_find_pci_rom
+	bootprio_find_named_rom
+        bootprio_find_usb
+Will not require this change and this will just result in too much =
+refactoring.
+
+Maybe simply introduce build_scsi_path() and build_ata_path() functions =
+and then,
+for instance, make booprio_find_scsi_device() and =
+boot_lchs_find_scsi_device()
+call the same build_scsi_path() function, resulting in less code =
+duplication.
+
+Sam
+
+
+> On 22 Jun 2019, at 20:33, Sam Eiderman <shmuel.eiderman@oracle.com> =
+wrote:
 >=20
 >=20
-> r~
 >=20
+>> On 22 Jun 2019, at 18:27, Kevin O'Connor <kevin@koconnor.net> wrote:
+>>=20
+>> On Sat, Jun 22, 2019 at 11:51:48AM +0300, Sam Eiderman wrote:
+>>> But maybe someone wants bootorder but doesn=E2=80=99t want to =
+override legacy disk translations=E2=80=A6
+>>>=20
+>>> I=E2=80=99m thinking of maybe adding
+>>>=20
+>>> if (!CONFIG_BOOTORDER || !CONFIG_BIOS_GEOMETRY)
+>>>   return NULL;
+>>=20
+>> That's fine - though it's (!CONFIG_BOOTORDER && =
+!CONFIG_BIOS_GEOMETRY).
 >=20
-> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-> index 2ae537461f..b61c7ea0f1 100644
-> --- a/target/m68k/translate.c
-> +++ b/target/m68k/translate.c
-> @@ -6124,27 +6124,34 @@ static void m68k_tr_tb_stop(DisasContextBase *dcb=
-ase,
-> CPUState *cpu)
->=C2=A0 {
->=C2=A0 =C2=A0 =C2=A0 DisasContext *dc =3D container_of(dcbase, DisasContex=
-t, base);
+> Yes of course, my bad
 >=20
-> -=C2=A0 =C2=A0 if (dc->base.is_jmp =3D=3D DISAS_NORETURN) {
-> -=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;
-> -=C2=A0 =C2=A0 }
-> -=C2=A0 =C2=A0 if (dc->base.singlestep_enabled) {
-> -=C2=A0 =C2=A0 =C2=A0 =C2=A0 gen_helper_raise_exception(cpu_env, tcg_cons=
-t_i32(EXCP_DEBUG));
-> -=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;
-> -=C2=A0 =C2=A0 }
-> -
->=C2=A0 =C2=A0 =C2=A0 switch (dc->base.is_jmp) {
-> +=C2=A0 =C2=A0 case DISAS_NORETURN:
-> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;
->=C2=A0 =C2=A0 =C2=A0 case DISAS_TOO_MANY:
->=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 update_cc_op(dc);
-> -=C2=A0 =C2=A0 =C2=A0 =C2=A0 gen_jmp_tb(dc, 0, dc->pc);
-> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (dc->base.singlestep_enabled) {
-> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_movi_i32(QREG_PC, dc->=
-pc);
-> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 gen_helper_raise_exception(cpu=
-_env, tcg_const_i32(EXCP_DEBUG));
-> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {
-> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 gen_jmp_tb(dc, 0, dc->pc);
-> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }
->=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;
->=C2=A0 =C2=A0 =C2=A0 case DISAS_JUMP:
->=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* We updated CC_OP and PC in gen_jmp/g=
-en_jmp_im.=C2=A0 */
-> -=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_lookup_and_goto_ptr();
-> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (dc->base.singlestep_enabled) {
-> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 gen_helper_raise_exception(cpu=
-_env, tcg_const_i32(EXCP_DEBUG));
-> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {
-> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_lookup_and_goto_ptr();
-> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }
->=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;
->=C2=A0 =C2=A0 =C2=A0 case DISAS_EXIT:
->=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* We updated CC_OP and PC in gen_exit_=
-tb, but also modified
->=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 other state that may require ret=
-urning to the main loop.=C2=A0 */
-> -=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_exit_tb(NULL, 0);
-> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (dc->base.singlestep_enabled) {
-> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 gen_helper_raise_exception(cpu=
-_env, tcg_const_i32(EXCP_DEBUG));
-> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {
-> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_exit_tb(NULL, 0);
-> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }
->=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;
->=C2=A0 =C2=A0 =C2=A0 default:
->=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 g_assert_not_reached();
+>>=20
+>> FYI, I think BIOS_GEOMETRY is a little confusing - maybe
+>> CUSTOM_DISK_GEOMETRY.
+>=20
+> The thing is that disk geometry is actually (physical geometry, =
+reported by the disk controller) and here
+> bios geometry stands for the geometry reported from bios int13.
+> Also =E2=80=9Cbios geometry=E2=80=9D =3D=3D=3D =E2=80=9Clogical =
+geometry=E2=80=9D =3D=3D=3D =E2=80=9Clchs=E2=80=9D.
+> So following previous discussion with Gerd, maybe =
+CONFIG_HOST_BIOS_GEOMETRY is better?
+>=20
+> Sam
+>=20
+>>=20
+>> -Kevin
 >=20
 
-Yes, it works too.
 
-Could you formally send a patch?
-
-Thanks,
-Laurent
- =20
