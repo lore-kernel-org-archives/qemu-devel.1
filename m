@@ -2,84 +2,91 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	URI_NOVOWEL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB407C48BD3
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 17:52:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 110FAC48BD9
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 17:52:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3260216FD
+	by mail.kernel.org (Postfix) with ESMTPS id DF1C721743
 	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 17:52:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3260216FD
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF1C721743
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgC5U-0000S0-Op
+	id 1hgC5U-0000Sf-US
 	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 13:52:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34032)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33924)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hgC3S-0007UN-MV
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 13:50:01 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hgC3C-0007ON-KG
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 13:49:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hgC3P-0001VV-Hb
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 13:49:57 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:39306)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hgC3O-0001To-85
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 13:49:54 -0400
-Received: by mail-wr1-f65.google.com with SMTP id x4so3746916wrt.6
- for <qemu-devel@nongnu.org>; Wed, 26 Jun 2019 10:49:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=82CPrk0y6g1f6SLKvK0kJAtyycA8SgJYB+/HScrsXSw=;
- b=bzr9+HeZ/nwvRZoFtZEzv9IQw7BZLmaDpDppb2giFDMrxjtdL/yOMvWV4WUfgVzIDt
- kss9HfBs2k9yqIuG0kzW04fYaA7jVKJOwMix5nij46pcEgkHcrsRi9CsAQpSdej9Uqhv
- qee74BQHLALD8EB7ESzSkFlLM57qL/koJADhUk8h8xQyBzmDbTDiRuA0jkVdpP+fGU+Q
- g5KGzQNgjHVGhf+wVeSylb5zKO2hEWc8VzfDbvHk6Di61kdZT4cEygc3DU9k8lhRq4VF
- pe4vg/NlmFYzPA3vAMY5rm6k+A32oCeBoU1POr4kSRFFVOCgbu5ZUh1UFhi+rfm6Pm67
- wp7Q==
-X-Gm-Message-State: APjAAAU2lZex85JEtz/8tAlC8M/K7Iu3m+BGN88jo2qGGDguxjWdXjBr
- 5unA1zcDk7aE3acCdVG7Eag9iA==
-X-Google-Smtp-Source: APXvYqydFAntwGDtC9tl7l6FTt+oEep4E0fWgOsaFWNko6cXC+5ow37w6kf55lgbQqhOdViI2bZw3A==
-X-Received: by 2002:adf:fb84:: with SMTP id a4mr4902565wrr.41.1561571393113;
- Wed, 26 Jun 2019 10:49:53 -0700 (PDT)
-Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.183])
- by smtp.gmail.com with ESMTPSA id 11sm3210900wmb.26.2019.06.26.10.49.51
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 26 Jun 2019 10:49:52 -0700 (PDT)
-To: Laurent Vivier <laurent@vivier.eu>, Jason Wang <jasowang@redhat.com>
-References: <20190619221933.1981-1-laurent@vivier.eu>
- <20190619221933.1981-4-laurent@vivier.eu>
- <f302ca04-e517-f72a-0067-2ab85ef238f0@vivier.eu>
- <e9ccdbf4-3703-b6a2-7f58-0739a4cfe7bd@redhat.com>
- <81f9a447-8305-9de5-8a81-3e29299dfa2a@vivier.eu>
- <95e2e7c1-962d-3ac7-baba-467f0f6c4041@redhat.com>
- <b2e3db53-7948-62f7-88c8-8fb87ac68db8@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <263b81cd-5e8b-5b9e-f080-e44c23ee2e42@redhat.com>
-Date: Wed, 26 Jun 2019 19:49:51 +0200
+ (envelope-from <mreitz@redhat.com>) id 1hgC36-00019Y-C5
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 13:49:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36976)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hgC2t-0000oH-U9; Wed, 26 Jun 2019 13:49:24 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id BFBE1307D922;
+ Wed, 26 Jun 2019 17:49:05 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.153])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 485EB1001B05;
+ Wed, 26 Jun 2019 17:48:57 +0000 (UTC)
+To: Anthony PERARD <anthony.perard@citrix.com>
+References: <20190409164038.25484-1-paul.durrant@citrix.com>
+ <c9c1360d-cebc-5c2a-a019-eca2f8f7f461@redhat.com>
+ <20190626171947.GF13449@perard.uk.xensource.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <1518aab5-83d3-fb0e-cb33-7b9d2d996497@redhat.com>
+Date: Wed, 26 Jun 2019 19:48:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <b2e3db53-7948-62f7-88c8-8fb87ac68db8@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190626171947.GF13449@perard.uk.xensource.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="PxkiPkpTf9HppIvddhgSOmWKke5pHdjzR"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Wed, 26 Jun 2019 17:49:11 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PATCH v8 03/10] dp8393x: manage big endian bus
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] xen-block: support
+ feature-large-sector-size
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,135 +98,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Thomas Huth <huth@tuxfamily.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Gerd Hoffmann <kraxel@redhat.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Paul Durrant <paul.durrant@citrix.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ xen-devel@lists.xenproject.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/26/19 12:11 PM, Laurent Vivier wrote:
-> Le 26/06/2019 à 10:57, Philippe Mathieu-Daudé a écrit :
->> On 6/25/19 7:09 PM, Laurent Vivier wrote:
->>> Le 25/06/2019 à 17:57, Philippe Mathieu-Daudé a écrit :
->>>> On 6/24/19 10:07 PM, Laurent Vivier wrote:
->>>>> Hi,
->>>>>
->>>>> Jason, Can I have an Acked-by from you (as network devices maintainer)?
->>>>
->>>> Hmm something seems odd here indeed...
->>>>
->>>> What a stable model! This file has no logical modification since its
->>>> introduction, a65f56eeba "Implement sonic netcard (MIPS Jazz)"
->>>>
->>>> Here we had:
->>>>
->>>> static void dp8393x_writeb(void *opaque, hwaddr addr, uint32_t val)
->>>> {
->>>>     uint16_t old_val = dp8393x_readw(opaque, addr & ~0x1);
->>>>
->>>>     switch (addr & 3) {
->>>>     case 0:
->>>>         val = val | (old_val & 0xff00);
->>>>         break;
->>>>     case 1:
->>>>         val = (val << 8) | (old_val & 0x00ff);
->>>>         break;
->>>>     }
->>>>     dp8393x_writew(opaque, addr & ~0x1, val);
->>>> }
->>>>
->>>> So we had 16-bit endian shifting there.
->>>>
->>>> And few lines below:
->>>>
->>>>     /* XXX: Check byte ordering */
->>>>     ...
->>>>     /* Calculate the ethernet checksum */
->>>>     #ifdef SONIC_CALCULATE_RXCRC
->>>>         checksum = cpu_to_le32(crc32(0, buf, rx_len));
->>>>     #else
->>>>         checksum = 0;
->>>>     #endif
->>>>
->>>> After various housekeeping, we get:
->>>>
->>>> 84689cbb97 "net/dp8393x: do not use old_mmio accesses"
->>>>
->>>> The MIPS Jazz is known to run in both endianess, but I haven't checked
->>>> if at that time both were available.
->>>>
->>>> Have you tried this patch?
->>>>
->>>> -- >8 --
->>>> diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
->>>> index bdb0b3b2c2..646e11206f 100644
->>>> @@ -651,7 +651,7 @@ static const MemoryRegionOps dp8393x_ops = {
->>>>      .write = dp8393x_write,
->>>>      .impl.min_access_size = 2,
->>>>      .impl.max_access_size = 2,
->>>> -    .endianness = DEVICE_NATIVE_ENDIAN,
->>>> +    .endianness = DEVICE_LITTLE_ENDIAN,
->>>>  };
->>>> ---
->>>>
->>>> (but then mips64-softmmu Jazz would have networking broken).
->>>>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--PxkiPkpTf9HppIvddhgSOmWKke5pHdjzR
+Content-Type: multipart/mixed; boundary="LiTUtQe8dZ9voZ3bXKAItQQ4f5mf3jYce";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Anthony PERARD <anthony.perard@citrix.com>
+Cc: Paul Durrant <paul.durrant@citrix.com>, qemu-devel@nongnu.org,
+ xen-devel@lists.xenproject.org, qemu-block@nongnu.org,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <1518aab5-83d3-fb0e-cb33-7b9d2d996497@redhat.com>
+Subject: Re: [PATCH] xen-block: support feature-large-sector-size
+References: <20190409164038.25484-1-paul.durrant@citrix.com>
+ <c9c1360d-cebc-5c2a-a019-eca2f8f7f461@redhat.com>
+ <20190626171947.GF13449@perard.uk.xensource.com>
+In-Reply-To: <20190626171947.GF13449@perard.uk.xensource.com>
+
+--LiTUtQe8dZ9voZ3bXKAItQQ4f5mf3jYce
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 26.06.19 19:19, Anthony PERARD wrote:
+> On Wed, Jun 26, 2019 at 06:48:50PM +0200, Max Reitz wrote:
+>> On 09.04.19 18:40, Paul Durrant wrote:
+>>> A recent Xen commit [1] clarified the semantics of sector based quant=
+ities
+>>> used in the blkif protocol such that it is now safe to create a xen-b=
+lock
+>>> device with a logical_block_size !=3D 512, as long as the device only=
+
+>>> connects to a frontend advertizing 'feature-large-block-size'.
 >>>
->>> I doesn't help, the endianness is a MemoryRegion property (see
->>> memory_region_wrong_endianness()) so it is used when the CPU writes to
->>> the device MMIO, not when the device accesses the other memory.
->>> In this case, it reads from system_memory. Perhaps we can create the
->>> address_space with a system_memory in big endian mode?
+>>> This patch modifies xen-block accordingly. It also uses a stack varia=
+ble
+>>> for the BlockBackend in xen_block_realize() to avoid repeated derefer=
+encing
+>>> of the BlockConf pointer, and changes the parameters of
+>>> xen_block_dataplane_create() so that the BlockBackend pointer and sec=
+tor
+>>> size are passed expicitly rather than implicitly via the BlockConf.
+>>>
+>>> These modifications have been tested against a recent Windows PV XENV=
+BD
+>>> driver [2] using a xen-disk device with a 4kB logical block size.
+>>>
+>>> [1] http://xenbits.xen.org/gitweb/?p=3Dxen.git;a=3Dcommit;h=3D67e1c05=
+0e36b2c9900cca83618e56189effbad98
+>>> [2] https://winpvdrvbuild.xenproject.org:8080/job/XENVBD-master/126
+>>>
+>>> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+>>> ---
+>>> Cc: Stefano Stabellini <sstabellini@kernel.org>
+>>> Cc: Anthony Perard <anthony.perard@citrix.com>
+>>> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+>>> Cc: Kevin Wolf <kwolf@redhat.com>
+>>> Cc: Max Reitz <mreitz@redhat.com>
+>>> ---
+>>>  hw/block/dataplane/xen-block.c | 25 ++++++++++++----------
+>>>  hw/block/dataplane/xen-block.h |  3 ++-
+>>>  hw/block/xen-block.c           | 38 +++++++++++++++++++++-----------=
+--
+>>>  3 files changed, 40 insertions(+), 26 deletions(-)
 >>
->> Ah I missed that...
+>> Thanks, added =E2=80=9Cby frontend=E2=80=9D to the error message and a=
+pplied to my block
+>> branch:
 >>
->> What about not using address_space_rw(data) but directly use
->> address_space_lduw_le() and address_space_stw_le() instead?
->>
-> 
-> It's more complicated than that, because access size depends on a
-> register value:
-> 
-> static uint16_t dp8393x_get(dp8393xState *s, int width, uint16_t *base,
->                             int offset)
-> {
->     uint16_t val;
-> 
->     if (s->big_endian) {
->         val = be16_to_cpu(base[offset * width + width - 1]);
->     } else {
->         val = le16_to_cpu(base[offset * width]);
->     }
->     return val;
-> }
-> 
-> and width is:
-> 
-> width = (s->regs[SONIC_DCR] & SONIC_DCR_DW) ? 2 : 1;
-> 
-> So in the end we always need the big_endian flag to know how to read the
-> memory. I think it's simpler to read/write the memory (like a real DMA
-> access), and then to swap data internally.
+>> https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+>=20
+> :(, I've just sent a pull request with that patch:
+> https://patchew.org/QEMU/20190624153257.20163-1-anthony.perard@citrix.c=
+om/20190624153257.20163-2-anthony.perard@citrix.com/
 
-Fair enough. My R-b tag stands anyway :)
+That=E2=80=99s just as well, then. :-)
 
-> Moreover, the big-endian/little-endian is a real feature of the
-> controller (see  1.3 DATA WIDTH AND BYTE ORDERING,
-> http://pccomponents.com/datasheets/NSC83932.PDF )
+> I guess I need to start sending an email every time I've added a patch
+> to my queue.
 
-Can you (or the maintainer taking this series) amend this information to
-your commit?
+Well, it certainly won=E2=80=99t hurt.  Although in this cases it=E2=80=99=
+s just a bit
+of an unfortunate coincidence that I looked at this patch now when Peter
+seems to be away (otherwise I=E2=80=99d have seen it in master).
 
-Thanks for the info provided in this thread,
+Max
 
-Phil.
+
+--LiTUtQe8dZ9voZ3bXKAItQQ4f5mf3jYce--
+
+--PxkiPkpTf9HppIvddhgSOmWKke5pHdjzR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0TsAcACgkQ9AfbAGHV
+z0BcNwf/Ql4IZr5iOViyJxBWQxDKppLZ8rdF/Ht5i5JFJjmB3Ow4RHCqcxC6h60Q
+fee6fEWqhbqMWnSvxAs+/HWS0aTZAm2epWLipp3TBDH1aKpT+Zlno1OdJs91qd0D
+4rjkgwgk7fX1q0I+J7KoCqJFsgkAjS7sLCCAFXzUHEjybw9+2y66Ou9Nrlz8rcU+
+dJNko8PvJEoqoHEYPCEhjIyv9ueBXNv4xTFYE2AbxWgBY3jTk1NC1RmdTe/IA23N
+Ki10DEOB1RLQmua22+eT6H7Q4TgNT3BZo3Tr3qS6IEwbUjcsaysrd0zGuXNROtii
+qsSAjOO8K8Z0Zil4MpDmuUuzT9oCeQ==
+=HFZl
+-----END PGP SIGNATURE-----
+
+--PxkiPkpTf9HppIvddhgSOmWKke5pHdjzR--
 
