@@ -2,63 +2,96 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D24C48BD3
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 12:36:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5F6AC48BD6
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 12:41:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D1ED2086D
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 12:36:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D1ED2086D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 897712147A
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 12:41:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="o65pryBI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 897712147A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hg79g-0007Ie-KP
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 08:36:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54833)
+	id 1hg7Ea-0001wj-Hz
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 08:41:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55954)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <cohuck@redhat.com>) id 1hg77n-0006FR-7B
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 08:34:13 -0400
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hg7CJ-0000M5-7W
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 08:38:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1hg77k-0006xQ-F3
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 08:34:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57726)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>)
- id 1hg77k-0006vS-49; Wed, 26 Jun 2019 08:34:04 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BD27D31628EF;
- Wed, 26 Jun 2019 12:33:41 +0000 (UTC)
-Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 55D6D608C1;
- Wed, 26 Jun 2019 12:33:27 +0000 (UTC)
-Date: Wed, 26 Jun 2019 14:33:24 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Collin Walling <walling@linux.ibm.com>
-Message-ID: <20190626143324.6f359cd0.cohuck@redhat.com>
-In-Reply-To: <1561475829-19202-3-git-send-email-walling@linux.ibm.com>
-References: <1561475829-19202-1-git-send-email-walling@linux.ibm.com>
- <1561475829-19202-3-git-send-email-walling@linux.ibm.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Wed, 26 Jun 2019 12:33:55 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v5 2/2] s390: diagnose 318 info reset and
- migration support
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hg7CH-0006cN-VV
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 08:38:47 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:52266)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
+ id 1hg7CD-0006Ol-JO; Wed, 26 Jun 2019 08:38:41 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5QCY7kf187573;
+ Wed, 26 Jun 2019 12:38:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
+ bh=UW6sWZMVwR6L4QasUuYIjj/mBRcHWV2QZfAt+64nLos=;
+ b=o65pryBIhPsRKbcg+A50iL7ZHv7lWiCkGPhQsjlyStShBB3xDr/AAJsbNz4q5jJ8sv6n
+ RYEnSpiXIuQqTQDzmckF1nFCswqqpoa3KbBJ6cde28VhQwerhuwOfYJf6XndMwBM2uz2
+ R/VcoEJjBseNMrkqfehpkQeYMlTlhtSK1MWv/ziSaLqc+XxtnhYPvUtZAVYsev2Bt09z
+ l0Kdm0STF7xHFCvn9Ex0LDdJhD8YypCMWVT1XJaJIV9ww0neUfZHdZiGt3c98BAjiOIo
+ VBenagZkbQEd94A/woMkO1ESa9WG5FXvdDp3DdXU9ZIi7tFNtUOuFP9gLIcTcpVaw+xs bw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2130.oracle.com with ESMTP id 2t9brta44n-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 26 Jun 2019 12:38:37 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5QCbTmZ021745;
+ Wed, 26 Jun 2019 12:38:36 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by userp3020.oracle.com with ESMTP id 2tat7ct4w6-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 26 Jun 2019 12:38:36 +0000
+Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5QCcZIS019621;
+ Wed, 26 Jun 2019 12:38:35 GMT
+Received: from nexus.ravello.local (/213.57.127.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Wed, 26 Jun 2019 05:38:35 -0700
+From: Sam Eiderman <shmuel.eiderman@oracle.com>
+To: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ mreitz@redhat.com, seabios@seabios.org, kraxel@redhat.com,
+ kevin@koconnor.net
+Date: Wed, 26 Jun 2019 15:38:13 +0300
+Message-Id: <20190626123816.8907-3-shmuel.eiderman@oracle.com>
+X-Mailer: git-send-email 2.13.3
+In-Reply-To: <20190626123816.8907-1-shmuel.eiderman@oracle.com>
+References: <20190626123816.8907-1-shmuel.eiderman@oracle.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9299
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906260150
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9299
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906260150
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.86
+Subject: [Qemu-devel] [SeaBIOS] [PATCH v4 2/5] boot: Reorder functions in
+ boot.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,276 +103,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: david@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
- pbonzini@redhat.com, rth@twiddle.net
+Cc: liran.alon@oracle.com, shmuel.eiderman@oracle.com, karl.heubaum@oracle.com,
+ arbel.moshe@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 25 Jun 2019 11:17:09 -0400
-Collin Walling <walling@linux.ibm.com> wrote:
+Currently glob_prefix() and build_pci_path() are under the "Boot
+priority ordering" section.
+Move them to a new "Helper search functions" section since we will reuse
+them in the next commits.
 
-> DIAGNOSE 0x318 (diag318) is a privileged s390x instruction that must
-> be intercepted by SIE and handled via KVM. Let's introduce some
-> functions to communicate between QEMU and KVM via ioctls. These
-> will be used to get/set the diag318 information.
-> 
-> The availability of this instruction is determined by byte 134, bit 0
-> of the Read Info block. This coincidentally expands into the space used
-> for CPU entries, which means VMs running with the diag318 capability
-> will have a reduced maximum CPU count. Let's reduce the maximum CPU
-> count from 248 to 247.
-> 
-> In order to simplify the migration and system reset requirements of
-> the diag318 data, let's introduce it as a device class and include
-> a VMStateDescription.
-> 
-> Diag318 is set to 0 during modified clear and load normal resets.
-> 
-> Signed-off-by: Collin Walling <walling@linux.ibm.com>
-> ---
->  hw/s390x/Makefile.objs          |  1 +
->  hw/s390x/diag318.c              | 80 +++++++++++++++++++++++++++++++++++++++++
->  hw/s390x/diag318.h              | 38 ++++++++++++++++++++
->  hw/s390x/s390-virtio-ccw.c      | 17 +++++++++
->  hw/s390x/sclp.c                 |  3 ++
->  include/hw/s390x/sclp.h         |  2 ++
->  target/s390x/cpu.h              |  8 ++++-
->  target/s390x/cpu_features.c     |  3 ++
->  target/s390x/cpu_features.h     |  1 +
->  target/s390x/cpu_features_def.h |  3 ++
->  target/s390x/gen-features.c     |  1 +
->  target/s390x/kvm-stub.c         | 10 ++++++
->  target/s390x/kvm.c              | 29 +++++++++++++++
->  target/s390x/kvm_s390x.h        |  2 ++
->  14 files changed, 197 insertions(+), 1 deletion(-)
->  create mode 100644 hw/s390x/diag318.c
->  create mode 100644 hw/s390x/diag318.h
+Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
+Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
+---
+ src/boot.c | 94 ++++++++++++++++++++++++++++++++------------------------------
+ 1 file changed, 49 insertions(+), 45 deletions(-)
 
-(...)
+diff --git a/src/boot.c b/src/boot.c
+index a2cb167c..70f639f4 100644
+--- a/src/boot.c
++++ b/src/boot.c
+@@ -22,6 +22,55 @@
+ #include "util.h" // irqtimer_calc
+ #include "tcgbios.h" // tpm_*
+ 
++/****************************************************************
++ * Helper search functions
++ ****************************************************************/
++
++// See if 'str' starts with 'glob' - if glob contains an '*' character
++// it will match any number of characters in str that aren't a '/' or
++// the next glob character.
++static char *
++glob_prefix(const char *glob, const char *str)
++{
++    for (;;) {
++        if (!*glob && (!*str || *str == '/'))
++            return (char*)str;
++        if (*glob == '*') {
++            if (!*str || *str == '/' || *str == glob[1])
++                glob++;
++            else
++                str++;
++            continue;
++        }
++        if (*glob != *str)
++            return NULL;
++        glob++;
++        str++;
++    }
++}
++
++#define FW_PCI_DOMAIN "/pci@i0cf8"
++
++static char *
++build_pci_path(char *buf, int max, const char *devname, struct pci_device *pci)
++{
++    // Build the string path of a bdf - for example: /pci@i0cf8/isa@1,2
++    char *p = buf;
++    if (pci->parent) {
++        p = build_pci_path(p, max, "pci-bridge", pci->parent);
++    } else {
++        p += snprintf(p, buf+max-p, "%s", FW_PCI_DOMAIN);
++        if (pci->rootbus)
++            p += snprintf(p, buf+max-p, ",%x", pci->rootbus);
++    }
++
++    int dev = pci_bdf_to_dev(pci->bdf), fn = pci_bdf_to_fn(pci->bdf);
++    p += snprintf(p, buf+max-p, "/%s@%x", devname, dev);
++    if (fn)
++        p += snprintf(p, buf+max-p, ",%x", fn);
++    return p;
++}
++
+ 
+ /****************************************************************
+  * Boot device logical geometry
+@@ -141,29 +190,6 @@ loadBootOrder(void)
+     } while (f);
+ }
+ 
+-// See if 'str' starts with 'glob' - if glob contains an '*' character
+-// it will match any number of characters in str that aren't a '/' or
+-// the next glob character.
+-static char *
+-glob_prefix(const char *glob, const char *str)
+-{
+-    for (;;) {
+-        if (!*glob && (!*str || *str == '/'))
+-            return (char*)str;
+-        if (*glob == '*') {
+-            if (!*str || *str == '/' || *str == glob[1])
+-                glob++;
+-            else
+-                str++;
+-            continue;
+-        }
+-        if (*glob != *str)
+-            return NULL;
+-        glob++;
+-        str++;
+-    }
+-}
+-
+ // Search the bootorder list for the given glob pattern.
+ static int
+ find_prio(const char *glob)
+@@ -176,28 +202,6 @@ find_prio(const char *glob)
+     return -1;
+ }
+ 
+-#define FW_PCI_DOMAIN "/pci@i0cf8"
+-
+-static char *
+-build_pci_path(char *buf, int max, const char *devname, struct pci_device *pci)
+-{
+-    // Build the string path of a bdf - for example: /pci@i0cf8/isa@1,2
+-    char *p = buf;
+-    if (pci->parent) {
+-        p = build_pci_path(p, max, "pci-bridge", pci->parent);
+-    } else {
+-        p += snprintf(p, buf+max-p, "%s", FW_PCI_DOMAIN);
+-        if (pci->rootbus)
+-            p += snprintf(p, buf+max-p, ",%x", pci->rootbus);
+-    }
+-
+-    int dev = pci_bdf_to_dev(pci->bdf), fn = pci_bdf_to_fn(pci->bdf);
+-    p += snprintf(p, buf+max-p, "/%s@%x", devname, dev);
+-    if (fn)
+-        p += snprintf(p, buf+max-p, ",%x", fn);
+-    return p;
+-}
+-
+ int bootprio_find_pci_device(struct pci_device *pci)
+ {
+     if (CONFIG_CSM)
+-- 
+2.13.3
 
-> diff --git a/hw/s390x/diag318.c b/hw/s390x/diag318.c
-> new file mode 100644
-> index 0000000..0eb80fe
-> --- /dev/null
-> +++ b/hw/s390x/diag318.c
-> @@ -0,0 +1,80 @@
-> +/*
-> + * DIAGNOSE 0x318 functions for reset and migration
-> + *
-> + * Copyright IBM, Corp. 2019
-> + *
-> + * Authors:
-> + *  Collin Walling <walling@linux.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (at your
-> + * option) any later version. See the COPYING file in the top-level directory.
-> + */
-> +
-> +#include "hw/s390x/diag318.h"
-> +#include "qapi/error.h"
-> +#include "kvm_s390x.h"
-> +#include "sysemu/kvm.h"
-> +
-> +static int diag318_post_load(void *opaque, int version_id)
-> +{
-> +    DIAG318State *d = opaque;
-> +
-> +    kvm_s390_set_diag318_info(d->info);
-
-Shouldn't we at least moan if something goes wrong here?
-
-> +    return 0;
-> +}
-> +
-> +static int diag318_pre_save(void *opaque)
-> +{
-> +    DIAG318State *d = opaque;
-> +
-> +    kvm_s390_get_diag318_info(&d->info);
-> +    return 0;
-> +}
-> +
-> +static bool diag318_needed(void *opaque)
-> +{
-> +    return s390_has_feat(S390_FEAT_DIAG318);
-
-What happens if we emulate diag 318 in tcg and set this feature bit? We
-probably don't want to call kvm_ functions in that case.
-
-> +}
-> +
-> +const VMStateDescription vmstate_diag318 = {
-> +    .name = "vmstate_diag318",
-> +    .post_load = diag318_post_load,
-> +    .pre_save = diag318_pre_save,
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .needed = diag318_needed,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT64(info, DIAG318State),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static void s390_diag318_reset(DeviceState *dev)
-> +{
-> +    kvm_s390_set_diag318_info(0);
-
-Same here; we probably need a s390_set_diag318_info() function that
-either calls the kvm_ function or resets some internal state.
-
-> +}
-> +
-> +static void s390_diag318_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->reset = s390_diag318_reset;
-> +    dc->vmsd = &vmstate_diag318;
-> +    dc->hotpluggable = false;
-> +    /* Reason: Set automatically during IPL */
-
-"Created automatically during machine instantiation" ?
-
-> +    dc->user_creatable = false;
-> +}
-> +
-> +static const TypeInfo s390_diag318_info = {
-> +    .class_init = s390_diag318_class_init,
-> +    .parent = TYPE_DEVICE,
-> +    .name = TYPE_S390_DIAG318,
-> +    .instance_size = sizeof(DIAG318State),
-> +};
-> +
-> +static void s390_diag318_register_types(void)
-> +{
-> +    type_register_static(&s390_diag318_info);
-> +}
-> +
-> +type_init(s390_diag318_register_types)
-
-(..)
-
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 87b2039..54230c7 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -38,6 +38,7 @@
->  #include "cpu_models.h"
->  #include "hw/nmi.h"
->  #include "hw/s390x/tod.h"
-> +#include "hw/s390x/diag318.h"
->  
->  S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
->  {
-> @@ -94,6 +95,7 @@ static const char *const reset_dev_types[] = {
->      "s390-sclp-event-facility",
->      "s390-flic",
->      "diag288",
-> +    TYPE_S390_DIAG318,
-
-This looks a bit odd, although it is not wrong :)
-
->  };
->  
->  static void subsystem_reset(void)
-> @@ -258,6 +260,17 @@ static void s390_create_sclpconsole(const char *type, Chardev *chardev)
->      qdev_init_nofail(dev);
->  }
->  
-> +static void s390_init_diag318(void)
-> +{
-> +    Object *new = object_new(TYPE_S390_DIAG318);
-> +    DeviceState *dev = DEVICE(new);
-> +
-> +    object_property_add_child(qdev_get_machine(), TYPE_S390_DIAG318,
-> +                              new, NULL);
-> +    object_unref(new);
-> +    qdev_init_nofail(dev);
-> +}
-> +
->  static void ccw_init(MachineState *machine)
->  {
->      int ret;
-> @@ -315,6 +328,9 @@ static void ccw_init(MachineState *machine)
->  
->      /* init the TOD clock */
->      s390_init_tod();
-> +
-> +    /* init object used for migrating diag318 info */
-> +    s390_init_diag318();
->  }
->  
->  static void s390_cpu_plug(HotplugHandler *hotplug_dev,
-> @@ -583,6 +599,7 @@ static void machine_set_loadparm(Object *obj, const char *val, Error **errp)
->          ms->loadparm[i] = ' '; /* pad right with spaces */
->      }
->  }
-> +
-
-unrelated whitespace change :)
-
->  static inline void s390_machine_initfn(Object *obj)
->  {
->      object_property_add_bool(obj, "aes-key-wrap",
-
-(...)
-
-> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-> index f64f581..77a1df5 100644
-> --- a/target/s390x/cpu_features.c
-> +++ b/target/s390x/cpu_features.c
-> @@ -127,6 +127,9 @@ static const S390FeatDef s390_features[] = {
->      FEAT_INIT("pfmfi", S390_FEAT_TYPE_SCLP_CONF_CHAR_EXT, 9, "SIE: PFMF interpretation facility"),
->      FEAT_INIT("ibs", S390_FEAT_TYPE_SCLP_CONF_CHAR_EXT, 10, "SIE: Interlock-and-broadcast-suppression facility"),
->  
-> +    /* SCLP SCCB Byte 134 */
-> +    FEAT_INIT("diag318", S390_FEAT_TYPE_SCLP_BYTE_134, 0, "Control program name and version codes"),
-> +
->      FEAT_INIT("sief2", S390_FEAT_TYPE_SCLP_CPU, 4, "SIE: interception format 2 (Virtual SIE)"),
->      FEAT_INIT("skey", S390_FEAT_TYPE_SCLP_CPU, 5, "SIE: Storage-key facility"),
->      FEAT_INIT("gpereh", S390_FEAT_TYPE_SCLP_CPU, 10, "SIE: Guest-PER enhancement facility"),
-> diff --git a/target/s390x/cpu_features.h b/target/s390x/cpu_features.h
-> index da695a8..954544e 100644
-> --- a/target/s390x/cpu_features.h
-> +++ b/target/s390x/cpu_features.h
-> @@ -23,6 +23,7 @@ typedef enum {
->      S390_FEAT_TYPE_STFL,
->      S390_FEAT_TYPE_SCLP_CONF_CHAR,
->      S390_FEAT_TYPE_SCLP_CONF_CHAR_EXT,
-> +    S390_FEAT_TYPE_SCLP_BYTE_134,
->      S390_FEAT_TYPE_SCLP_CPU,
->      S390_FEAT_TYPE_MISC,
->      S390_FEAT_TYPE_PLO,
-> diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
-> index 292b17b..4f2c23e 100644
-> --- a/target/s390x/cpu_features_def.h
-> +++ b/target/s390x/cpu_features_def.h
-> @@ -115,6 +115,9 @@ typedef enum {
->      S390_FEAT_SIE_PFMFI,
->      S390_FEAT_SIE_IBS,
->  
-> +    /* Sclp Byte 134 */
-> +    S390_FEAT_DIAG318,
-> +
->      /* Sclp Cpu */
->      S390_FEAT_SIE_F2,
->      S390_FEAT_SIE_SKEY,
-> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-> index dc320a0..cdd1875 100644
-> --- a/target/s390x/gen-features.c
-> +++ b/target/s390x/gen-features.c
-> @@ -521,6 +521,7 @@ static uint16_t full_GEN12_GA1[] = {
->      S390_FEAT_AP_QUERY_CONFIG_INFO,
->      S390_FEAT_AP_FACILITIES_TEST,
->      S390_FEAT_AP,
-> +    S390_FEAT_DIAG318,
->  };
->  
->  static uint16_t full_GEN12_GA2[] = {
-
-The feature bit stuff probably needs some (easy) adaption on top of my
-s390-next branch.
 
