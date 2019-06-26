@@ -2,42 +2,41 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7534C48BD3
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 15:59:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42A86C48BD6
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 16:15:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9A6221670
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 15:59:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9A6221670
+	by mail.kernel.org (Postfix) with ESMTPS id 1934C2084B
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 16:15:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1934C2084B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgAKu-0001Yh-GI
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 11:59:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50666)
+	id 1hgAZY-00038x-EJ
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 12:15:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54383)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hgAIf-0008Gt-W5
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:57:35 -0400
+ (envelope-from <laurent@vivier.eu>) id 1hgAYr-0002am-3R
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 12:14:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hgAIe-0007cq-L7
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:57:33 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:43979)
+ (envelope-from <laurent@vivier.eu>) id 1hgAYq-0006ff-2z
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 12:14:17 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:57149)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1hgAIY-0007Y9-Qw; Wed, 26 Jun 2019 11:57:27 -0400
+ id 1hgAYp-0006d9-Pw; Wed, 26 Jun 2019 12:14:16 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1N2V8Z-1iiCqQ1gYJ-013xxs; Wed, 26 Jun 2019 17:57:01 +0200
-To: Antonio Ospite <ao2@ao2.it>, qemu-devel@nongnu.org
-References: <20190526144747.30019-1-ao2@ao2.it>
- <20190526144747.30019-3-ao2@ao2.it>
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1N1x6X-1ihe5V2n0r-012JP9; Wed, 26 Jun 2019 18:14:12 +0200
+To: Justin Hibbits <chmeeedalf@gmail.com>, qemu-devel@nongnu.org
+References: <20190607135653.6ece685d@titan.knownspace>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -82,35 +81,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <9723b8df-f1dc-4f0f-157e-8a48408e2cf7@vivier.eu>
-Date: Wed, 26 Jun 2019 17:56:59 +0200
+Message-ID: <8676232e-917d-44e2-1149-b25f26698a73@vivier.eu>
+Date: Wed, 26 Jun 2019 18:14:10 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190526144747.30019-3-ao2@ao2.it>
+In-Reply-To: <20190607135653.6ece685d@titan.knownspace>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:/z4xanTY8MzrbbZqixzSMacltJWFqM93wrhutpc74s6wkz4dfYz
- rkM6fTIlya40YE2YfJL8Ut6RHZQ9kQ7qDwgcbMAUFPGXj7DQi9fGSggH97edpqpHdxWNTY+
- Y6V0pmH7F8jqC6VTnUAmLd6j/Uyx8SI/wXgMwH2yBwD7yXNB9nBq6NiYVwCtU88die4QhRG
- FNEC5FszKOZwXFni7jwjA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:e1ICqpNGqAs=:8u6kkf3BJkeauCRJOpAOv1
- Jzsv+y0EV5fnjb/bJ3wZnOZmwvvuY+u+p++une3jGx2XFIeo645XCWgxUsxVhzH/0vY313dgq
- zI3CfGtUeFkZoq8l7QNsi9CzZqTjTa0Xqz8wMgX9j0Bum6FR1ufTCiJMbvTZOsFcr+6TIpTWz
- 8P8ZOLe0VU5Tr34gjLOB8rOI+tlt4b5mts6E09nIsYX2gYgZsFb6+vOrLJBXwnylJeDCX+Rq9
- SRToFKZJG6EQjS44UFQkGupPyIQUz8WREA2e+UPXl6n9sAWAiCd+dj1gDc1OPUdQiuakhKh23
- +W/eVTxevXayodb3yg9LuY3Jt6Cf4yUFlfOjYHAIlwPCBNMj8y0dviWsI+nWhTbWomD8jNuuR
- xgbp2096oIBkACPxjEsNLBQN3QCSz/pkWuV6gdOeZHnId0Lfpvpz3wEmtbkixzfO8D/viGZJC
- pGm3D9ZsJw7w/8lo8+MfcZwvlINJhQyUHO+nj3VhjG+4iazyFoiraOg+NlDoj+AEPznHAcEij
- vvrL1cPMcBl3YfpYixyxQ35rPV7vy76fNvGYS9R3WZ82GLu/YE7Mbd96OANPGs+3CEF3gEtOf
- wbvh5mFjCAhsF1waqxvijFXZx3O5DM31Rtyh6xTmYGpfclLkFRtonts1WY5ngEW9gEu+e3N31
- J6S+ylbDKqpeN82XnXMwajktVHhvB8l4WIfBAVo5t34rSYQM+aj6UohaprMPVzEI8OW4runLo
- h3Agxl70HisAJ4Et/IDsPvIO+BqrfQoLeTl3/phyzwY961tse11pFtErQKc=
+X-Provags-ID: V03:K1:E9YWjQshWGvzrLaZ2cZcFODWIc+Of1qEB56WYEIthulr1I48CdL
+ BtM4Uo+pyqhebIpOMBU0j+pEYjiZhlRam4tzy7uPJQeGQbNasy9BBI5MSLxKRUuBZYRzhF1
+ 3qGDrffVEwHYXTyAJTzUfK8kLIqCjtK3/IN4bywvY0XyjSujhiOeVGArZFxyW7ygqcaxzQL
+ XJRe3GucaXu7lF2NdBD8A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Z/9Jo/ip1x4=:6OfGfe8H1C9icMHh+dgdlq
+ g4ToFMkp/1dwidzKB90DXpdAc2jgreoU1FgdMvMuern77bKD4Yiv5ljj9R1nbD/33S1OGFnrG
+ sPT8FCFSQaHGKb+is57qqF/KtC7wX/rq3s83l3TOLyAfzcdn8W6HxVFxrvfsTGP3Gxs5ju1Wx
+ OQxvsYn5XwN5mCS29foYN+u27FAQB4Utvo2MzFP/EkgKIEE8m9aBK9EP2U5lb3BsUoghLkxiR
+ dsBVFLmkAcmqWtod5OJ/GSM2T2rLriGFpeV0D1MyUCVI+DUqdWXS4SfPDy8t0O8wBr2v6kHlF
+ Ce4JjtHCCo4DhhA10XTK2wu+yq8nVWf/jNZ6a43bPTWKKuha3k0HYx+e7tjduspBkZ5w8Flde
+ uztGn/GT+PetBI1r+O3GTMnrGS0JMmtboaNlQhs7W7OIltpAPzbSYviiLDkdszIt5aLNtivwo
+ 0c6VUb5rd2C7XhczwLuEG/+VP4PWxKPF2JvythcJsCiKqct3X0rrdEbYy8IHwi9suRaS8uOfa
+ EumzHIVyzloRWgVPWnkkDqkyYm2Q/m6i8kQ+5dW+lYJ23pNzTyEJL4Bsse9oqMrTWFTIgZNZC
+ 9E4AgScgW58hP2/CN1zAr8eBIKQ0WPb+Q7nf1az/yl/ObCmJE5grnln5xardAhbrxzSEKuriM
+ RGym8EatIBr+AjfLKSU/13GZwNtQSB2onrKlT1XMloVNCKo3wwvN+r3h+12YiZjj0HwcMopNA
+ 5VVk0chzSsROYNcR6QD3crxONJQRqTPjSNt1veg0CjBfLivIj8Cb7QR4HyA=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.130
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] configure: disallow spaces and
- colons in source path and build path
+X-Received-From: 212.227.126.135
+Subject: Re: [Qemu-devel] [Qemu-trivial] Fix cacheline size retrieval on
+ FreeBSD/PowerPC(64)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,74 +121,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
- Peter Maydell <peter.maydell@linaro.org>,
- Antonio Ospite <antonio.ospite@collabora.com>
+Cc: qemu-trivial@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 26/05/2019 à 16:47, Antonio Ospite a écrit :
-> From: Antonio Ospite <antonio.ospite@collabora.com>
+Le 07/06/2019 à 20:56, Justin Hibbits a écrit :
+> The attached very trivial patch fixes a startup bug that prevents at
+> least Qemu 3.1 and later from working on FreeBSD/powerpc64.
 > 
-> The configure script breaks when the qemu source directory is in a path
-> containing white spaces, in particular the list of targets is not
-> correctly generated when calling "./configure --help" because of how the
-> default_target_list variable is built.
-> 
-> In addition to that, *building* qemu from a directory with spaces breaks
-> some assumptions in the Makefiles, even if the original source path does
-> not contain spaces like in the case of an out-of-tree build, or when
-> symlinks are involved.
-> 
-> To avoid these issues, refuse to run the configure script and the
-> Makefile if there are spaces or colons in the source path or the build
-> path, taking as inspiration what the kbuild system in linux does.
-> 
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1817345
-> 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Antonio Ospite <antonio.ospite@collabora.com>
-> ---
->  Makefile  | 4 ++++
->  configure | 5 +++++
->  2 files changed, 9 insertions(+)
-> 
-> diff --git a/Makefile b/Makefile
-> index e02b88bcb1..bed1323a45 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1,5 +1,9 @@
->  # Makefile for QEMU.
->  
-> +ifneq ($(words $(subst :, ,$(CURDIR))), 1)
-> +  $(error main directory cannot contain spaces nor colons)
-> +endif
-> +
->  # Always point to the root of the build tree (needs GNU make).
->  BUILD_DIR=$(CURDIR)
->  
-> diff --git a/configure b/configure
-> index 9f12120ad9..2833d73ccc 100755
-> --- a/configure
-> +++ b/configure
-> @@ -279,6 +279,11 @@ ld_has() {
->  # make source path absolute
->  source_path=$(cd "$(dirname -- "$0")"; pwd)
->  
-> +if printf %s\\n "$source_path" "$PWD" | grep -q "[[:space:]:]";
-> +then
-> +  error_exit "main directory cannot contain spaces nor colons"
-> +fi
-> +
->  # default parameters
->  cpu=""
->  iasl="iasl"
+> - Justin
 > 
 
-Applied to my trivial-patches branch.
+Please don't send a patch in attachment but inlined in the message
+(you may use "git send-email" for that).
 
-Thanks,
-Laurent
+This patch fixes "util: add cacheinfo" that has changed the type from
+unsigned to long.
 
+You can add the following line in the commit message:
+
+Fixes: b255b2c8a548 ("util: add cacheinfo")
+
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
