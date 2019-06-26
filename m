@@ -2,75 +2,67 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32826C48BD3
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 15:33:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB2C0C48BD3
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 15:42:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFD672080C
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 15:33:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFD672080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C383A21783
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 15:42:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C383A21783
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hg9v9-00047X-RI
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 11:33:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44534)
+	id 1hgA4W-0001Bc-2b
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 11:42:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47269)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <cdupontd@redhat.com>) id 1hg9t3-0003My-79
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:31:06 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hgA3Z-0000NN-PA
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:41:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cdupontd@redhat.com>) id 1hg9t0-0000sa-G5
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:31:04 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:44589)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <cdupontd@redhat.com>) id 1hg9sv-0000di-Ev
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:31:00 -0400
-Received: by mail-wr1-f68.google.com with SMTP id r16so3214833wrl.11
- for <qemu-devel@nongnu.org>; Wed, 26 Jun 2019 08:30:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=4vmIoMBEfVwRj2ceMUu/PmBJOZVjdqsUgJURsn0H6GM=;
- b=toKxnNdiX2zMUfgP269XWZ54qXbPkpLloLaT/xWwivwSvtB3aDVFpPOWCxH0vwlrf/
- Eteixa41DH2KYx+8L93by0Y8w0+BQ7eiJQ9JfQn/hBc8aoQ8PKe2y7Zs5X2gHTDoeXfh
- hhaZ/ZaatyXoMPMLFDBYLZzz06NPyfaHatwhdPWCaeZle89PhirlX/1CUu53LKdsp03d
- j3rajsQ2N0APeT5RKTmF8z/tamdFUYBieVgAC2hy1WKHxuvEXQOMtw4sY8W1f85FfM04
- kbLfstUl4ZJh7ATxlT1034/IWYvF22VwZI3MwcVsqyfgDzmRguthfTLfYzy0q5n5j4Gs
- yFjA==
-X-Gm-Message-State: APjAAAW8rsuTr2Y3a9Pi2Hdyw9zNuJQIyRuXOKlr/vzODycTLEMTCvH4
- vvs/I3t5JRXmyIfTTQOfD+Vw1Q==
-X-Google-Smtp-Source: APXvYqw5oGypDtzGgNwvvWbslpU4EMb/BnrRDKBpEjy5N/diMrjDcitfFjkBoPWofM/KjPVv+WoNiw==
-X-Received: by 2002:adf:e283:: with SMTP id v3mr4153132wri.338.1561563044816; 
- Wed, 26 Jun 2019 08:30:44 -0700 (PDT)
-Received: from ?IPv6:2a01:e35:8b6a:1220:e080:14ab:15ae:4341?
- ([2a01:e35:8b6a:1220:e080:14ab:15ae:4341])
- by smtp.gmail.com with ESMTPSA id o6sm3511640wmc.15.2019.06.26.08.30.43
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 26 Jun 2019 08:30:43 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-From: Christophe de Dinechin <cdupontd@redhat.com>
-In-Reply-To: <20190624123835.28869-1-alex.bennee@linaro.org>
-Date: Wed, 26 Jun 2019 17:30:42 +0200
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <44600E39-15E9-4E1C-ACA1-B435F5EEB8FB@redhat.com>
-References: <20190624123835.28869-1-alex.bennee@linaro.org>
-To: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-X-Mailer: Apple Mail (2.3445.104.11)
+ (envelope-from <no-reply@patchew.org>) id 1hgA3Y-0002AZ-JB
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:41:57 -0400
+Resent-Date: Wed, 26 Jun 2019 11:41:57 -0400
+Resent-Message-Id: <E1hgA3Y-0002AZ-JB@eggs.gnu.org>
+Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21964)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hgA3Y-00028d-Db
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:41:56 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1561563667; cv=none; d=zoho.com; s=zohoarc; 
+ b=GLKgyKCZWS6S1/6yNcvzVjT936ri4D9S+vcqhDbT+yETj7qjEJBZ0BQXNqbG7w+2qRSWpj7SmCZ0L2IBe7jJSNv+D87IScFIF+RAuLwpiyla4WGmtsp38ubNyXUXVzPexdGOtl17sZM4+B6orQCNV1/WDLx1zsKDAlI3sRGggoI=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1561563667;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=o8NnjDmGIFlTCwvlW/mKh4NrkXGLHcyxXpZI3Of7Ujo=; 
+ b=TuFqPc6OEJ6IhIJ3YA9/xV7r6mnZq0v1uJxmIN9HHWF9ZvE6fDCJ8ZkGM+4gPwqW2FgEt/0P5EvUTopXnSKnyQbX5jde+PzfMjWoFhLSBlEE6OWdcv62ZS7QIItxC7hBa4scxValKZhBO1rNY8rSpwBJ3Eb8Xto+lHqoDp/fW40=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1561563664594618.6854988653449;
+ Wed, 26 Jun 2019 08:41:04 -0700 (PDT)
+Message-ID: <156156366354.6332.12395600972268443110@c4a48874b076>
+In-Reply-To: <20190626152703.4871-1-dinechin@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: dinechin@redhat.com
+Date: Wed, 26 Jun 2019 08:41:04 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH] target/i386: fix feature check in
- hyperv-stub.c
+X-Received-From: 136.143.188.59
+Subject: Re: [Qemu-devel] [PATCH] hyperv-stub: Remove invalid reference to
+ hyperv_synic
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,58 +74,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, Richard Henderson <rth@twiddle.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, vkuznets@redhat.com, rth@twiddle.net,
+ qemu-devel@nongnu.org, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-> On 24 Jun 2019, at 14:38, Alex Benn=C3=A9e <alex.bennee@linaro.org> =
-wrote:
->=20
-> Commit 2d384d7c8 broken the build when built with:
->=20
->  configure --without-default-devices --disable-user
->=20
-> The reason was the conversion of cpu->hyperv_synic to
-> cpu->hyperv_synic_kvm_only although the rest of the patch introduces a
-> feature checking mechanism. So I've fixed the KVM_EXIT_HYPERV_SYNIC in
-> hyperv-stub to do the same feature check as in the real hyperv.c
-
-Sorry, I failed to check on the mailing list before sending an exact
-duplicate of this patch=E2=80=A6
-
-
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Roman Kagan <rkagan@virtuozzo.com>
-> ---
-> target/i386/hyperv-stub.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/target/i386/hyperv-stub.c b/target/i386/hyperv-stub.c
-> index fe548cbae2..0028527e79 100644
-> --- a/target/i386/hyperv-stub.c
-> +++ b/target/i386/hyperv-stub.c
-> @@ -15,7 +15,7 @@ int kvm_hv_handle_exit(X86CPU *cpu, struct =
-kvm_hyperv_exit *exit)
-> {
->     switch (exit->type) {
->     case KVM_EXIT_HYPERV_SYNIC:
-> -        if (!cpu->hyperv_synic) {
-> +        if (!hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC)) {
->             return -1;
->         }
->=20
-> --=20
-> 2.20.1
->=20
->=20
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYyNjE1MjcwMy40ODcx
+LTEtZGluZWNoaW5AcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgYnVpbGQg
+dGVzdCBvbiBzMzkweCBob3N0LiBQbGVhc2UgZmluZCB0aGUgZGV0YWlscyBiZWxvdy4KCj09PSBU
+RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKIyBUZXN0aW5nIHNjcmlwdCB3aWxsIGJl
+IGludm9rZWQgdW5kZXIgdGhlIGdpdCBjaGVja291dCB3aXRoCiMgSEVBRCBwb2ludGluZyB0byBh
+IGNvbW1pdCB0aGF0IGhhcyB0aGUgcGF0Y2hlcyBhcHBsaWVkIG9uIHRvcCBvZiAiYmFzZSIKIyBi
+cmFuY2gKc2V0IC1lCkNDPSRIT01FL2Jpbi9jYwpJTlNUQUxMPSRQV0QvaW5zdGFsbApCVUlMRD0k
+UFdEL2J1aWxkCm1rZGlyIC1wICRCVUlMRCAkSU5TVEFMTApTUkM9JFBXRApjZCAkQlVJTEQKJFNS
+Qy9jb25maWd1cmUgLS1jYz0kQ0MgLS1wcmVmaXg9JElOU1RBTEwKbWFrZSAtajQKIyBYWFg6IHdl
+IG5lZWQgcmVsaWFibGUgY2xlYW4gdXAKIyBtYWtlIGNoZWNrIC1qNCBWPTEKbWFrZSBpbnN0YWxs
+CgplY2hvCmVjaG8gIj09PSBFTlYgPT09IgplbnYKCmVjaG8KZWNobyAiPT09IFBBQ0tBR0VTID09
+PSIKcnBtIC1xYQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKCgoKVGhlIGZ1bGwgbG9nIGlzIGF2
+YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDYyNjE1MjcwMy40ODcxLTEt
+ZGluZWNoaW5AcmVkaGF0LmNvbS90ZXN0aW5nLnMzOTB4Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3Jn
+L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
 
