@@ -2,66 +2,81 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 732ECC48BD3
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 17:36:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F89AC48BD6
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 17:46:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F4AB2177B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 17:36:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F4AB2177B
+	by mail.kernel.org (Postfix) with ESMTPS id 350E3214DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 17:46:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 350E3214DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgBqD-0001xA-Ts
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 13:36:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58254)
+	id 1hgBze-0005to-4R
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 13:46:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60906)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hgBpI-0001QC-4O
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 13:35:21 -0400
+ (envelope-from <philmd@redhat.com>) id 1hgBy8-0005G0-Gv
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 13:44:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hgBpG-0006H5-2D
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 13:35:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54302)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hgBpE-00061b-TR
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 13:35:17 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A6DCE223866
- for <qemu-devel@nongnu.org>; Wed, 26 Jun 2019 17:35:00 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-169.ams2.redhat.com
- [10.36.117.169])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4B17D5D717;
- Wed, 26 Jun 2019 17:35:00 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id BC1FC11386A0; Wed, 26 Jun 2019 19:34:58 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-References: <1560165301-39026-1-git-send-email-pbonzini@redhat.com>
- <1560165301-39026-4-git-send-email-pbonzini@redhat.com>
-Date: Wed, 26 Jun 2019 19:34:58 +0200
-In-Reply-To: <1560165301-39026-4-git-send-email-pbonzini@redhat.com> (Paolo
- Bonzini's message of "Mon, 10 Jun 2019 13:14:57 +0200")
-Message-ID: <87woh8i725.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <philmd@redhat.com>) id 1hgBy4-000580-6K
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 13:44:28 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:39863)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hgBy2-00054r-G2
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 13:44:24 -0400
+Received: by mail-wm1-f68.google.com with SMTP id z23so2950630wma.4
+ for <qemu-devel@nongnu.org>; Wed, 26 Jun 2019 10:44:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=zDGCPfWr/LJdpehnnuRDYEz90rfUeUQj6/NKawLKErg=;
+ b=lpB6VhMlUdO5FyG9oL/HfJ1jQ3M6/a3ljMehjNT28tfpZbq0ocjUMpZ550olR/9s0H
+ bVa73wi3pz0gWggB3Rybh4bf4nHBqDlPJp+zsHliqYWIrLKJH80H7dTYxtaUnM0F2nmj
+ J7MOITQSFpD6suQ7Xsoi1ni+D5RRjf1sSGliZbWQeubOpvHDafXMmOCxCkpI1M3FBnxV
+ jMyKAQE2DxJZZHgpwmwRbwN7ArwwTU+77ZCxZf9+DkGne/vP9FthjfHDYZWiarTJGytf
+ NxPdUGLCSXsJjqibmDwJLhgxkFnTP6+PlPIGgnkZUmb3mjAQbA+WCGu2TXA1Ql1hHdds
+ Nbmw==
+X-Gm-Message-State: APjAAAXvVWFopveBufQnzu1/ZMHLalIOmGM3dbFpqNFc2nGn/v5ukT41
+ +DgPcEQo7LIi1M3SbcPVtGQ+Ew==
+X-Google-Smtp-Source: APXvYqy75Lvm0rt4DWdL++JuE21YNiRCtGr+jlgD5X/nBytF/BXzWBWpAPwOpx7nFLMpqibEVm2gdg==
+X-Received: by 2002:a7b:cc86:: with SMTP id p6mr112228wma.123.1561571059654;
+ Wed, 26 Jun 2019 10:44:19 -0700 (PDT)
+Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.183])
+ by smtp.gmail.com with ESMTPSA id z17sm14938624wru.21.2019.06.26.10.44.18
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 26 Jun 2019 10:44:19 -0700 (PDT)
+To: Stefano Garzarella <sgarzare@redhat.com>,
+ Christophe de Dinechin <dinechin@redhat.com>
+References: <20190625123905.25434-1-dinechin@redhat.com>
+ <20190626164913.dn2vfv4rji7xsk5k@steredhat>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <0458fb96-33d8-05eb-cb41-cf19086f986b@redhat.com>
+Date: Wed, 26 Jun 2019 19:44:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Wed, 26 Jun 2019 17:35:00 +0000 (UTC)
+In-Reply-To: <20190626164913.dn2vfv4rji7xsk5k@steredhat>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/7] configure: integrate Meson in the
- build system
+ [fuzzy]
+X-Received-From: 209.85.128.68
+Subject: Re: [Qemu-devel] [PATCH v2] Fix build error when VNC is configured
+ out
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,174 +88,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On 6/26/19 6:49 PM, Stefano Garzarella wrote:
+> On Tue, Jun 25, 2019 at 02:39:05PM +0200, Christophe de Dinechin wrote:
+>> In hmp_change(), the variable hmp_mon is only used
+>> by code under #ifdef CONFIG_VNC. This results in a build
+>> error when VNC is configured out with the default of
+>> treating warnings as errors:
+>>
+>> monitor/hmp-cmds.c: In function ‘hmp_change’:
+>> monitor/hmp-cmds.c:1946:17: error: unused variable ‘hmp_mon’ [-Werror=unused-variable]
+>> 1946 |     MonitorHMP *hmp_mon = container_of(mon, MonitorHMP, common);
+>>      |                 ^~~~~~~
+>>
+>> v2: Move variable down as suggested by Philippe Mathieu-Daudé
+> 
+> Should we move out this line from the commit message?
+> (Maybe Dave can remove it when apply)
 
-> The Meson build system is integrated in the existing configure/make steps
-> by invoking Meson from the configure script and converting Meson's build.ninja
-> rules to an included Makefile.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  Makefile             |   9 +
->  configure            |  30 ++
->  meson.build          |   9 +
->  scripts/ninjatool.py | 964 +++++++++++++++++++++++++++++++++++++++++++++++++++
+Yes please :) It was meant to go after the '---' separator.
 
-Uff.
+>>
+>> Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
+>> ---
+>>  monitor/hmp-cmds.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> 
 
->  4 files changed, 1012 insertions(+)
->  create mode 100644 meson.build
->  create mode 100644 scripts/ninjatool.py
->
-> diff --git a/Makefile b/Makefile
-> index 8e2fc66..b8f802c 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -48,6 +48,15 @@ git-submodule-update:
->  endif
->  endif
->  
-> +export NINJA=./ninjatool
-> +Makefile.ninja: build.ninja ninjatool
-> +	./ninjatool -t ninja2make --omit dist uninstall < $< > $@
-> +-include Makefile.ninja
-> +
-> +ninjatool: $(SRC_PATH)/scripts/ninjatool.py
-> +	sed -e '1c\' -e '#! $(PYTHON)' $< > $@
-> +	chmod +x $@
-
-Why do we need this here, but not for other Python scripts?
-
-We have 39 Python scripts with #!/usr/bin/env python, one with
-#!/usr/bin/env python2, and 12 with #!/usr/bin/python.  The Makefiles
-generally use $(PYTHON) SCRIPT ARGS...
-
-> +
->  .git-submodule-status: git-submodule-update config-host.mak
->  
->  # Check that we're not trying to do an out-of-tree build from
-> diff --git a/configure b/configure
-> index 0814a5f..b8c3c58 100755
-> --- a/configure
-> +++ b/configure
-> @@ -493,6 +493,7 @@ docker="no"
->  debug_mutex="no"
->  libpmem=""
->  default_devices="yes"
-> +meson=meson
->  
->  # cross compilers defaults, can be overridden with --cross-cc-ARCH
->  cross_cc_aarch64="aarch64-linux-gnu-gcc"
-> @@ -983,6 +984,8 @@ for opt do
->    ;;
->    --python=*) python="$optarg"
->    ;;
-> +  --meson=*) meson="$optarg"
-> +  ;;
->    --gcov=*) gcov_tool="$optarg"
->    ;;
->    --smbd=*) smbd="$optarg"
-> @@ -1685,6 +1688,7 @@ Advanced options (experts only):
->    --make=MAKE              use specified make [$make]
->    --install=INSTALL        use specified install [$install]
->    --python=PYTHON          use specified python [$python]
-> +  --meson=PYTHON           use specified meson [$meson]
->    --smbd=SMBD              use specified smbd [$smbd]
->    --with-git=GIT           use specified git [$git]
->    --static                 enable static build [$static]
-> @@ -1850,6 +1854,11 @@ then
->      error_exit "Python not found. Use --python=/path/to/python"
->  fi
->  
-> +if ! has "$meson"
-> +then
-> +    error_exit "Meson not found. Use --meson=/path/to/meson"
-> +fi
-> +
->  # Note that if the Python conditional here evaluates True we will exit
->  # with status 1 which is a shell 'false' value.
->  if ! $python -c 'import sys; sys.exit(sys.version_info < (2,7))'; then
-> @@ -7983,6 +7992,27 @@ echo "# Automatically generated by configure - do not modify" > "$iotests_common
->  echo >> "$iotests_common_env"
->  echo "export PYTHON='$python'" >> "$iotests_common_env"
->  
-> +# bootstrap ninjatool, we need it before Make runs
-> +if ! test -x ninjatool; then
-> +  sed -e '1c\' -e "#! $python" ${source_path}/scripts/ninjatool.py > ninjatool
-> +  chmod +x ninjatool
-> +fi
-> +rm -rf meson-private meson-info meson-logs
-
-Ignorant question: why do we need configure remove this stuff?
-
-> +NINJA=$PWD/ninjatool $python $meson setup \
-
-This prints
-
-    /usr/bin/python3: can't open file 'meson': [Errno 2] No such file or directory
-
-for me, then goes on happily.
-
-For what it's worth:
-
-    $ type meson
-    meson is /usr/bin/meson
-
-Are you sure you want to override /usr/bin/meson's #! line?
-
-If I drop $python, I get
-
-    meson.build:1:0: ERROR: Meson version is 0.50.1 but project requires >=0.50.999.
-
-which is expected.
-
-It's too hot right for me now to figure out how to obtain a suitable
-version.
-
-> +	--prefix "$prefix" \
-> +	--libdir "$libdir" \
-> +	--libexecdir "$libexecdir" \
-> +	--bindir "$bindir" \
-> +	--includedir "$includedir" \
-> +	--datadir "$datadir" \
-> +	--mandir "$mandir" \
-> +	--sysconfdir "$sysconfdir" \
-> +	--localstatedir "$local_statedir" \
-> +	$(test "$strip_opt" = yes && echo --strip) \
-> +	--buildtype $(if test "$debug" = yes; then echo debug; else echo release; fi) \
-> +	"$PWD" "$source_path"
-> +
-> +
->  # Save the configure command line for later reuse.
->  cat <<EOD >config.status
->  #!/bin/sh
-> diff --git a/meson.build b/meson.build
-> new file mode 100644
-> index 0000000..b683d70
-> --- /dev/null
-> +++ b/meson.build
-> @@ -0,0 +1,9 @@
-> +project('qemu', 'c', meson_version: '>=0.50.999')
-> +
-> +kconfig = import('unstable-kconfig')
-> +config_host = kconfig.load(meson.current_build_dir() / 'config-host.mak')
-> +
-> +add_project_arguments(config_host['QEMU_CFLAGS'].split(),
-> +                      language: 'c')
-> +add_project_arguments(config_host['QEMU_INCLUDES'].split(),
-> +                      language: 'c')
-> diff --git a/scripts/ninjatool.py b/scripts/ninjatool.py
-> new file mode 100644
-> index 0000000..6d90919
-> --- /dev/null
-> +++ b/scripts/ninjatool.py
-[Lots of code...]
-
-Did you write ninjatool.py specifically for QEMU, or did you steal it
-(or parts) somewhere?
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
