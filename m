@@ -2,85 +2,89 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06710C48BD6
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 22:49:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7E06C48BD6
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 23:26:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C57A7214DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 22:49:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="VNlcrqrf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C57A7214DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	by mail.kernel.org (Postfix) with ESMTPS id 98FFC214DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 23:26:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98FFC214DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgGj7-0001Jm-PP
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 18:49:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44544)
+	id 1hgHJ9-0002uH-8b
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 19:26:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51025)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <prvs=073dc7726=alistair.francis@wdc.com>)
- id 1hgGia-0000so-UK
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 18:48:46 -0400
+ (envelope-from <eblake@redhat.com>) id 1hgHI6-0001zU-Dx
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 19:25:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=073dc7726=alistair.francis@wdc.com>)
- id 1hgGiZ-000421-PT
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 18:48:44 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:23526)
+ (envelope-from <eblake@redhat.com>) id 1hgHI5-000774-An
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 19:25:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46484)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <prvs=073dc7726=alistair.francis@wdc.com>)
- id 1hgGiZ-0003ys-4d
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 18:48:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1561589428; x=1593125428;
- h=from:to:cc:subject:date:message-id:mime-version:
- content-transfer-encoding;
- bh=fv+dBrw8Af1rOeCzCqUq1cX/iYawMdK17OWtjPNg5J4=;
- b=VNlcrqrflZewi86bJxzURE/9qPauZzgnHcB6pt3grAaaVL9P7Iu2PKUh
- qAs6RkI+dPtqQBbSMOwmrO106AQv3mafzCHra0Y9SpE2v8gRdiewvFNO8
- tExKES2jSOsCvmD6c4273oB1CZ3aDrCtFmmTc78ijW0PaCBEBHLLkfZ/o
- uu5f3sbtzqWFcaAaidbVny45yUEDdiqNPraIE+0WdqKOSjTwvkfrLk4yK
- gSsAFt/imC68eJLmN+4CizMej4O9e7skchcrP8RWjXghfxTb5yiFMR+hz
- A86Sd3TufDHIfQChvqC3l+kboSAS5t6DMcp2BmP8tyeMO5lM+twrDgxLc w==;
-X-IronPort-AV: E=Sophos;i="5.63,421,1557158400"; d="scan'208";a="211437468"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
- ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 27 Jun 2019 06:50:19 +0800
-IronPort-SDR: PxigtWkDvxovXuIDw208eSq3n8p7TrAeS9MxMDp3TUsF57381TK5O/uXVv0jV2gffjJXHLJ3es
- tvNNDjfJkdReEkDMnfuKy2VJ9xL+Bzo4OwhVbE6RmVicq4F3dERykGp7TSVH4Db63SwWGMtj/v
- DFckeAEFoG6Y+fZBW7AARa5m/d5l08M+/DUs6kbJHzz4uj/+iwzPnZ0UX1ct58LfoPPlo+Bn9x
- 7vXpUrUZLINob4FNBIhDaNRUeG7Lp78HuuNlIz579Xe75gFnYLDd1J0HGRyfXU8x0VxpulbKYo
- rzoNgc8Y5yRaeBfZluWIdVrk
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep01.wdc.com with ESMTP; 26 Jun 2019 15:47:45 -0700
-IronPort-SDR: 1doCjqKWvjQ+f1OVuss2HOEJo+iMk26G0QUEH38y3nuGbQK07Hje5mVA5BZD9sW0phRX6zDxpt
- FwJOrLShfu9mkAyU34QzGEdQu7QYTrfLd5PZQoe3RC1pY5YB8QFEQFd2VHv2KZugyM89x20Nsd
- QPSd2PrbB6/2GGgLFxFIiKP7rUSw03ujYdqALqFDHmi2gaxiTaIDMCoa0TeA+vJ7dLx9eRgZ4D
- rX08KLNrK1aBSFcNSCsMBz5JLpeO8i+HwB+3XA8VqmKQZTGbeWTke9VJfy3D8P88e+kPrMqNoQ
- yns=
-Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
- risc6-mainframe.int.fusionio.com) ([10.196.157.140])
- by uls-op-cesaip02.wdc.com with ESMTP; 26 Jun 2019 15:48:36 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 26 Jun 2019 15:46:05 -0700
-Message-Id: <97104495f5c945d25315aff1bd618e1a7bacf34c.1561589072.git.alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.22.0
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1hgHI2-00075O-OV; Wed, 26 Jun 2019 19:25:22 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 04F68C058CBD;
+ Wed, 26 Jun 2019 23:25:22 +0000 (UTC)
+Received: from [10.3.116.44] (ovpn-116-44.phx2.redhat.com [10.3.116.44])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D2B021001B0E;
+ Wed, 26 Jun 2019 23:25:18 +0000 (UTC)
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190626215301.30733-1-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <83019545-dd96-2618-a028-9c885e904591@redhat.com>
+Date: Wed, 26 Jun 2019 18:25:17 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 68.232.143.124
-Subject: [Qemu-devel] [PATCH v1 1/1] hw/scsi: Report errors and sense to
- guests through scsi-block
+In-Reply-To: <20190626215301.30733-1-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="rke12gxMLVgPd7aEKDV69g22n3xOrVqgn"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.32]); Wed, 26 Jun 2019 23:25:22 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] block/qcow: Improve error when opening
+ qcow2 files as qcow
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,98 +96,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, pbonzini@redhat.com, shinichiro.kawasaki@wdc.com,
- alistair.francis@wdc.com, alistair23@gmail.com
+Cc: Qemu-Trivial <qemu-trivial@nongnu.org>, Kevin Wolf <kwolf@redhat.com>,
+ radmehrsaeed7@gmail.com, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--rke12gxMLVgPd7aEKDV69g22n3xOrVqgn
+Content-Type: multipart/mixed; boundary="YLC3OetuhHmXnso4Gsg16MJ994RF3yQHA";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Qemu-Trivial <qemu-trivial@nongnu.org>, Kevin Wolf <kwolf@redhat.com>,
+ radmehrsaeed7@gmail.com, Max Reitz <mreitz@redhat.com>
+Message-ID: <83019545-dd96-2618-a028-9c885e904591@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] block/qcow: Improve error when opening qcow2
+ files as qcow
+References: <20190626215301.30733-1-jsnow@redhat.com>
+In-Reply-To: <20190626215301.30733-1-jsnow@redhat.com>
 
-When host block devices are bridged to a guest system through
-virtio-scsi-pci and scsi-block driver, scsi_handle_rw_error() in
-hw/scsi/scsi-disk.c checks the error number to judge which error to
-report to the guests. EIO and EINVAL are not reported and ignored. Once
-EIO or EINVAL happen, eternal wait of guest system happens. This problem
-was observed with zoned block devices on the host system attached to the
-guest via virtio-scsi-pci. To avoid the eternal wait, add EIO and EINVAL
-to the list of error numbers to report to the guest.
+--YLC3OetuhHmXnso4Gsg16MJ994RF3yQHA
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-On top of this, it is required to report SCSI sense data to the guest
-so that the guest can handle the error correctly. However,
-scsi_handle_rw_error() does not passthrough sense data that host
-scsi-block device reported. Instead, it newly generates fixed sense
-data only for certain error numbers. This is inflexible to support new
-error codes to report to guest. To avoid this inflexiblity, pass the SCSI
-sense data that the host scsi-block device reported as is. To be more
-precise, set valid sense_len in the SCSIDiskReq referring sb_len_wr that
-host SCSI device SG_IO ioctl reported. Add update_sense callback to
-SCSIDiskClass to refer the SG_IO ioctl result only when scsi-block device
-is targeted.
+On 6/26/19 4:53 PM, John Snow wrote:
+> Reported-by: radmehrsaeed7@gmail.com
+> Fixes: https://bugs.launchpad.net/bugs/1832914
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  block/qcow.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
 
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- hw/scsi/scsi-disk.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+Yes, this is useful.
 
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index ed7295bfd7..6801e3a0d0 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -62,6 +62,7 @@ typedef struct SCSIDiskClass {
-     DMAIOFunc       *dma_readv;
-     DMAIOFunc       *dma_writev;
-     bool            (*need_fua_emulation)(SCSICommand *cmd);
-+    void            (*update_sense)(SCSIRequest *r);
- } SCSIDiskClass;
- 
- typedef struct SCSIDiskReq {
-@@ -438,6 +439,7 @@ static bool scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed)
- {
-     bool is_read = (r->req.cmd.mode == SCSI_XFER_FROM_DEV);
-     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
-+    SCSIDiskClass *sdc = (SCSIDiskClass *) object_get_class(OBJECT(s));
-     BlockErrorAction action = blk_get_error_action(s->qdev.conf.blk,
-                                                    is_read, error);
- 
-@@ -452,9 +454,12 @@ static bool scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed)
-              * pause the host.
-              */
-             assert(r->status && *r->status);
-+            if (sdc->update_sense) {
-+                sdc->update_sense(&r->req);
-+            }
-             error = scsi_sense_buf_to_errno(r->req.sense, sizeof(r->req.sense));
-             if (error == ECANCELED || error == EAGAIN || error == ENOTCONN ||
--                error == 0)  {
-+                error == EIO || error == EINVAL || error == 0)  {
-                 /* These errors are handled by guest. */
-                 scsi_req_complete(&r->req, *r->status);
-                 return true;
-@@ -2894,6 +2899,13 @@ static int scsi_block_parse_cdb(SCSIDevice *d, SCSICommand *cmd,
-     }
- }
- 
-+static void scsi_block_update_sense(SCSIRequest *req)
-+{
-+    SCSIDiskReq *r = DO_UPCAST(SCSIDiskReq, req, req);
-+    SCSIBlockReq *br = DO_UPCAST(SCSIBlockReq, req, r);
-+    r->req.sense_len = MIN(br->io_header.sb_len_wr, sizeof(r->req.sense));
-+}
-+
- #endif
- 
- static
-@@ -3059,6 +3071,7 @@ static void scsi_block_class_initfn(ObjectClass *klass, void *data)
-     sc->parse_cdb    = scsi_block_parse_cdb;
-     sdc->dma_readv   = scsi_block_dma_readv;
-     sdc->dma_writev  = scsi_block_dma_writev;
-+    sdc->update_sense = scsi_block_update_sense;
-     sdc->need_fua_emulation = scsi_block_no_fua;
-     dc->desc = "SCSI block device passthrough";
-     dc->props = scsi_block_properties;
--- 
-2.22.0
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
+Reminds me of when I helped convince the file(1) database maintainers
+that 'qcow2 (v3)' was better than 'qcow (v3)'.
+(https://bugzilla.redhat.com/show_bug.cgi?id=3D1654349, file.git 60b896d4=
+)
+
+>=20
+> diff --git a/block/qcow.c b/block/qcow.c
+> index 6dee5bb792..a9cb6ae0bd 100644
+> --- a/block/qcow.c
+> +++ b/block/qcow.c
+> @@ -156,7 +156,12 @@ static int qcow_open(BlockDriverState *bs, QDict *=
+options, int flags,
+>          goto fail;
+>      }
+>      if (header.version !=3D QCOW_VERSION) {
+> -        error_setg(errp, "Unsupported qcow version %" PRIu32, header.v=
+ersion);
+> +        error_setg(errp, "qcow (v%d) does not support qcow version %" =
+PRIu32,
+> +                   QCOW_VERSION, header.version);
+> +        if (header.version =3D=3D 2 || header.version =3D=3D 3) {
+> +            error_append_hint(errp, "Try the 'qcow2' driver instead.")=
+;
+> +        }
+> +
+>          ret =3D -ENOTSUP;
+>          goto fail;
+>      }
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--YLC3OetuhHmXnso4Gsg16MJ994RF3yQHA--
+
+--rke12gxMLVgPd7aEKDV69g22n3xOrVqgn
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0T/t0ACgkQp6FrSiUn
+Q2pWPQgAq0jRTp61n/HEaHqFLEOY/NTjYJ8DBYWdP4gNIGHFUVyCYvccSBEZptRJ
+JXDWYtDI6ArPSH8/gSzhp1slCDl94OvYmy++Ggq8KL1yYkeh8mdpO0tt3IYqAI7A
+rYYUiVsl3nrbZiw1MdKxKddQTeKfZit71UyWUE/7EcJMT+FhenX3no4FcXgyf+vs
+e+j6n0Aj8fiSrCEwSG4BfUjYK1kfky8/5oTvFDNWnDbwdAHvWzkNNIPupSUcLwDs
+eC3DToeWMiGy5UEvD8CpK0p6xlWphZ68uhrt5/2SZiK0k/9CG+0xcHnZyX5kGlPh
+hCq3mEsJxSFcykerd61OjW9LK+hEEA==
+=dHcv
+-----END PGP SIGNATURE-----
+
+--rke12gxMLVgPd7aEKDV69g22n3xOrVqgn--
 
