@@ -2,93 +2,77 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9370EC48BD6
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 18:47:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58E80C48BD3
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 18:50:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F4F520663
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 18:47:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CndLwFoW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F4F520663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D9FDA20663
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 18:50:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9FDA20663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tuxfamily.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgCxJ-0001vS-Hb
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 14:47:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44352)
+	id 1hgCzv-0002jK-Ol
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 14:50:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44974)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hgCfn-0001iO-Mb
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 14:29:37 -0400
+ (envelope-from <th.huth@gmail.com>) id 1hgCiq-0003WZ-FN
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 14:32:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hgCfl-0008C3-NY
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 14:29:35 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51520)
+ (envelope-from <th.huth@gmail.com>) id 1hgCio-0002il-PW
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 14:32:44 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:54758)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hgCfj-00088j-LQ
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 14:29:31 -0400
-Received: by mail-wm1-x342.google.com with SMTP id 207so3119907wma.1
- for <qemu-devel@nongnu.org>; Wed, 26 Jun 2019 11:29:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=A46Hpmb0H66Rk2WS0TVzfFJH8LvfoXnQh8E86a/0j0U=;
- b=CndLwFoWxryuT+syMpNFHIaAUh1jPwSZSOpw5U7UhHIXU75LI5fEeLM0Dv6qjruVpN
- wn39OKnZVIIGIV7u8+V3SVDkDK+nl87N6nZAOuxum8/SNITf95o1cBHTpOjei6BAmqxm
- 4d+QqD97F4a/X5heJPdFYZ7/L1rCzaRYwgzUqRlg/7BDRUUsAvqM/NcdPLIcVdAFzjb4
- gOyGjOpm1Pzv/L2766nHH61fSGgkmMsEgwUAr7kHV1u0nYsnSefDS0bgoRIU27UG/cuV
- 1RWvuTCVFFOD9K7rkg9v5RffOLfZzwu56t8xCXiASG9gpYwqg6w2r4umwN7MLfINpBZz
- oqmg==
+ (Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1hgCim-0002ek-V0
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 14:32:41 -0400
+Received: by mail-wm1-f65.google.com with SMTP id g135so3124967wme.4
+ for <qemu-devel@nongnu.org>; Wed, 26 Jun 2019 11:32:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=A46Hpmb0H66Rk2WS0TVzfFJH8LvfoXnQh8E86a/0j0U=;
- b=Kg8rrJeNyksu8n79KEMDKUTEeCkHEi5XA8FXg1fkFptwn+9qjHPv+GpB41j/gnmZYQ
- 25GFk42sG8jq8xXsOxbGzm4pNtSUdHegyQ8p4g28MDS2aSWq2lPku7sRaf880rhVi8kP
- iwLz9rgpzKmhZu8josjDwdQC9rGuk82/RGwj9EWJTojnMmayG9Ns0I2faT0sJLGbWvBC
- aG5ma8/t76rn//MuNgKyABiXzn2xFQ90eWpTKLYVhtW84fkhcQvuxcPj2ofN0o5q4OkW
- 9LUP/5Hn1OZpgQEp3jddyzdFmzVb0D2L2EUs0fR2EE/SS5pykV+wqTQ1u1rYsqx/mdp0
- FhUQ==
-X-Gm-Message-State: APjAAAXXucZhc7bscYqpsHNTzGPnHg/NhsF/kjJnTQCPKl/ku0PCV6rG
- Ce+fA+AS8qGr8L7j8wX1L6o+6TyDSjt3tQ==
-X-Google-Smtp-Source: APXvYqzPhsB98Xghu+9qWcshSZcY16xNyA5mac45ebzqRpi/IgNtmpW6r5B3LhL2pus/2/VTiKhxPg==
-X-Received: by 2002:a7b:c8c3:: with SMTP id f3mr272529wml.124.1561573769177;
- Wed, 26 Jun 2019 11:29:29 -0700 (PDT)
-Received: from [192.168.2.137] (93-34-153-63.ip50.fastwebnet.it.
- [93.34.153.63])
- by smtp.gmail.com with ESMTPSA id v204sm3368331wma.20.2019.06.26.11.29.28
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 26 Jun 2019 11:29:28 -0700 (PDT)
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-References: <1561038349-17105-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1561038349-17105-2-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <31b602e7-bf33-ec29-d6e3-6a61abefa866@linaro.org>
-Date: Wed, 26 Jun 2019 18:02:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=1oHEDKYIMCYihBdWVJHGebM3VfCzoR7iu6iOOW0YV2g=;
+ b=SOG7GrTnKO5kYVA76OloZTOAuYxD3S33Slkr/Rz5Nmz2rGva7we/V2Bqd+LDLi994x
+ 3I9MTOFUeHQamf/snIlsLpolTHmwRrv+aYcOs38qLWAp8xTb3iNMBosrSKGjHxTV4R6X
+ v1km6WgJfegFrowmeF2OkdqvVDDbJyso3TpVdMOMvzwwk/ovzofKVE7ZBPyhFvsDJKmF
+ Yy6GLGV7yTCceopSEnTSq3+ikUI5f6Ss4dXyaZjP6VpJYcFHkR7V/gMNVdwn40of6FFp
+ 76q9X4uKqIpGfUgHeLWBMMSvNvuYY+oyJio2aGxfTPqytvRjVPWfdDy3VmsQ1jeZO/fr
+ TR8w==
+X-Gm-Message-State: APjAAAUoSKTo6k31BV2z/+pZ9Q4cROdIEukFie3+qINyvi9rHFw/80JC
+ 5sXb+QS2NZ9zbD4ImVCP1DE=
+X-Google-Smtp-Source: APXvYqw+YSDeBWCp1egrhcuDnMWgUaumOXSQYEYgk5xlc8ZBrQQxjeoL1SN6WTC3hjqA3zebawdsog==
+X-Received: by 2002:a1c:5f09:: with SMTP id t9mr280343wmb.112.1561573956393;
+ Wed, 26 Jun 2019 11:32:36 -0700 (PDT)
+Received: from thl530.multi.box (p5791D55B.dip0.t-ipconnect.de.
+ [87.145.213.91])
+ by smtp.gmail.com with ESMTPSA id x3sm20088452wrp.78.2019.06.26.11.32.34
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 26 Jun 2019 11:32:35 -0700 (PDT)
+Date: Wed, 26 Jun 2019 20:32:33 +0200
+From: Thomas Huth <huth@tuxfamily.org>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Message-ID: <20190626203233.085e15c6@thl530.multi.box>
+In-Reply-To: <a4e9bd43-6e5c-a893-d57f-2cff20df5589@redhat.com>
+References: <20190619221933.1981-1-laurent@vivier.eu>
+ <20190619221933.1981-11-laurent@vivier.eu>
+ <20190625183019.3cb231d2@thl530.multi.box>
+ <a4e9bd43-6e5c-a893-d57f-2cff20df5589@redhat.com>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <1561038349-17105-2-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] target/mips: Fix emulation of
- ILVEV.<B|H|W> on big endian host
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH v8 10/10] hw/m68k: define Macintosh Quadra
+ 800
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,72 +84,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arikalo@wavecomp.com, amarkovic@wavecomp.com
+Cc: =?UTF-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/20/19 3:45 PM, Aleksandar Markovic wrote:
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
-> 
-> Fix emulation of ILVEV.<B|H|W> on big endian host by applying
-> mapping of data element indexes from one endian to another.
-> 
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
-> ---
->  target/mips/msa_helper.c | 37 +++++++++++++++++++++++++++++++++++++
->  1 file changed, 37 insertions(+)
-> 
-> diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-> index be059a3..215d8af 100644
-> --- a/target/mips/msa_helper.c
-> +++ b/target/mips/msa_helper.c
-> @@ -1737,6 +1737,24 @@ void helper_msa_ilvev_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
->  
->      switch (df) {
->      case DF_BYTE:
-> +#if defined(TARGET_WORDS_BIGENDIAN)
+Am Wed, 26 Jun 2019 19:51:12 +0200
+schrieb Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>:
 
-The commit message talks about the endianness of the host, whereas this check
-is for the endianness of the target.
+> On 6/25/19 6:30 PM, Thomas Huth wrote:
+> > Am Thu, 20 Jun 2019 00:19:33 +0200
+> > schrieb Laurent Vivier <laurent@vivier.eu>:
+> >  =20
+> >> If you want to test the machine, it doesn't yet boot a MacROM, but
+> >> you can boot a linux kernel from the command line. =20
+> >=20
+> > I gave the patch series a quick try, and was indeed able to boot the
+> > Debian installer with the q800 machine, so:
+> >=20
+> > Tested-by: Thomas Huth <huth@tuxfamily.org> =20
+>=20
+> While this reply is valid for this patch, was it meant for the series'
+> cover?
 
+No, I haven't tested each and every part of this series, so this was
+indeed only meant for this patch here.
 
-> +        pwd->b[8]  = pws->b[9];
-> +        pwd->b[9]  = pwt->b[9];
-> +        pwd->b[10] = pws->b[11];
-> +        pwd->b[11] = pwt->b[11];
-> +        pwd->b[12] = pws->b[13];
-> +        pwd->b[13] = pwt->b[13];
-> +        pwd->b[14] = pws->b[15];
-> +        pwd->b[15] = pwt->b[15];
-> +        pwd->b[0]  = pws->b[1];
-> +        pwd->b[1]  = pwt->b[1];
-> +        pwd->b[2]  = pws->b[3];
-> +        pwd->b[3]  = pwt->b[3];
-> +        pwd->b[4]  = pws->b[5];
-> +        pwd->b[5]  = pwt->b[5];
-> +        pwd->b[6]  = pws->b[7];
-> +        pwd->b[7]  = pwt->b[7];
-> +#else
->          pwd->b[15] = pws->b[14];
->          pwd->b[14] = pwt->b[14];
->          pwd->b[13] = pws->b[12];
-
-FWIW, avoiding this sort of duplication is why other targets define helper
-macros like
-
-PPC:
-#define VsrB(i) u8[15 - (i)]
-etc
-
-ARM, S390:
-/* Note that vector data is stored in host-endian 64-bit chunks,
-   so addressing units smaller than that needs a host-endian fixup.  */
-#ifdef HOST_WORDS_BIGENDIAN
-#define H1(x)  ((x) ^ 7)
-etc
-
-
-r~
+ Thomas
 
