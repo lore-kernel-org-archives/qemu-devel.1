@@ -2,71 +2,71 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32FBAC4646B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 06:09:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65376C4646B
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 06:10:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 111CC2085A
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 06:09:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 111CC2085A
+	by mail.kernel.org (Postfix) with ESMTPS id 3BF9D2085A
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 06:10:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BF9D2085A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hg17J-0000xb-Cb
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 02:09:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41791)
+	id 1hg18n-0002ms-GH
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 02:10:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41819)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <palmer@dabbelt.com>) id 1hg162-000063-52
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 02:07:55 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1hg164-00009G-2q
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 02:07:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1hg161-0002l8-7Y
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 02:07:54 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:39911)
+ (envelope-from <palmer@dabbelt.com>) id 1hg163-0002nO-4y
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 02:07:56 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:36858)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hg161-0002kH-0i
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 02:07:53 -0400
-Received: by mail-pg1-f196.google.com with SMTP id 196so668600pgc.6
- for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 23:07:52 -0700 (PDT)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hg162-0002mX-W7
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 02:07:55 -0400
+Received: by mail-pf1-f194.google.com with SMTP id r7so750168pfl.3
+ for <qemu-devel@nongnu.org>; Tue, 25 Jun 2019 23:07:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
  :mime-version:content-transfer-encoding;
- bh=n6HUBcG1LsiatuoEvj91e7+QlXshNMsVznzz62ounWw=;
- b=QIF3SqvLW1Y/LxiGGeUZeUMFCAQxXLVfsMtlcb6rnGx2iW4icX659fpKTjOW3rDFCa
- DG/HVK7CkIq8bBXy6N0ZKpWHYpipHo6bmYiNz3YM0crZ/qfl4KGbwtTzelz3LGU25i6w
- KAXdkI0vZoK+AMeRYe0kDGGejz9Jod4N7NKX2YDS0aHNT+mC/owLbt5ZwMZma1EOi270
- 3+RUgN8rg5VIJDI5EtF3J+2011u0d4MMfjzm3Qg0Hxsb6Sw0yjdE5yLIWDhfQLtkCpKy
- PKfRRz/ImdoW9yBqI4M7EyBjU0aa8UHuciZveq3oqSaboLOLWnyuzpIj1F1vVQlORLvB
- 37kA==
-X-Gm-Message-State: APjAAAVKFKSL9Lh6D2XPhTlRTh0TWdeq8eBQ1YR7gxUFUtn2abXtCGeG
- Hata2p3gSKHF/xrqvBJd5OyCJw==
-X-Google-Smtp-Source: APXvYqyqNZf6mSoFYSsvDFaFcd2f2q/Cie5stp3wYTJlviVDnOBsRzc7GtLvbv7v+oX/3ZkPLkWArg==
-X-Received: by 2002:a63:1459:: with SMTP id 25mr1175001pgu.201.1561529271698; 
- Tue, 25 Jun 2019 23:07:51 -0700 (PDT)
+ bh=gMkqqZE5Gc5VDmbZ8EedR3Q0d0rIRldtlW1sU8A/ZSU=;
+ b=YBPCw7EBMF6aExhojv0zLlV6qxIt/yGWYXuUX+PvGNzDu/HpPt7IO7Rru8EDfMs7hE
+ fNF75cxybQKMk8Q0Ds597awTdQYGznlDF03ZFUj8IRx7it8woJ6MJpaUVBcKNo6ywCUl
+ 8e5FbwEigP49OJYnqDZMClxtlk697zxImU9n9M4JUi6mcIoSoV5U9Kz+BZL2jitWsEup
+ qvChJKjjloDJ7JjrDuD7tel8IbjqwV5/o5CZaH3jiGK9uJmwbe/6++nsJwtggTgiNzBn
+ hVX60hcgm7gCm5zs5WJg5ItuG0n4nY8w45BAjMhdk/EI18PS4RmfJgRvQJKjDYo705uA
+ ydsg==
+X-Gm-Message-State: APjAAAVXSyaV4iuP5Seg3aGqpEhFq2+/fo9PomMMckDjNrHLm8KlQ1uZ
+ 7PLydcuxAVl4AaqMg6Mzmoi/vQ==
+X-Google-Smtp-Source: APXvYqzyUEOF0KjqBeit16NPwVVDqK09I9VYSxQagN4SyN+WqLi+lMpjIJJxPshQLv7N8qc77DEKOg==
+X-Received: by 2002:a63:78c3:: with SMTP id t186mr1243506pgc.340.1561529273724; 
+ Tue, 25 Jun 2019 23:07:53 -0700 (PDT)
 Received: from localhost (220-132-236-182.HINET-IP.hinet.net.
  [220.132.236.182])
- by smtp.gmail.com with ESMTPSA id q1sm13278390pfg.84.2019.06.25.23.07.50
+ by smtp.gmail.com with ESMTPSA id t26sm14694754pgu.43.2019.06.25.23.07.53
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 25 Jun 2019 23:07:51 -0700 (PDT)
-Date: Tue, 25 Jun 2019 23:07:51 -0700 (PDT)
-X-Google-Original-Date: Tue, 25 Jun 2019 22:36:07 PDT (-0700)
-In-Reply-To: <2dec03cb-22af-4d0d-f182-3bee9db83d6f@linaro.org>
+ Tue, 25 Jun 2019 23:07:53 -0700 (PDT)
+Date: Tue, 25 Jun 2019 23:07:53 -0700 (PDT)
+X-Google-Original-Date: Tue, 25 Jun 2019 22:37:11 PDT (-0700)
+In-Reply-To: <8ec410f8-d2a0-69ef-e3b7-925ef09717df@linaro.org>
 From: Palmer Dabbelt <palmer@sifive.com>
 To: richard.henderson@linaro.org
-Message-ID: <mhng-3b5978c4-bfb8-4757-ae5b-0731f2851d30@palmer-si-x1e>
+Message-ID: <mhng-cc180208-aea2-48b3-b008-2adf3d59f150@palmer-si-x1e>
 Mime-Version: 1.0 (MHng)
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.215.196
+X-Received-From: 209.85.210.194
 Subject: Re: [Qemu-devel] [PATCH] atomic failures on qemu-system-riscv64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -85,28 +85,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 25 Jun 2019 08:36:28 PDT (-0700), richard.henderson@linaro.org wrote:
+On Tue, 25 Jun 2019 08:39:21 PDT (-0700), richard.henderson@linaro.org wrote:
 > On 6/24/19 8:08 PM, Joel Sing wrote:
->> Regarding the alignment for reservations, the
->> specification does require this, although I do not recall seeing any enforcement
->> of this by qemu itself.
+>> From 8ef31a2ce8ef1cbeee92995a0b2994f480e9bb6d Mon Sep 17 00:00:00 2001
+>> From: Joel Sing <joel@sing.id.au>
+>> Date: Tue, 25 Jun 2019 02:44:24 +1000
+>> Subject: [PATCH] Clear load reservations on qemu riscv target
+>>
+>> This prevents a load reservation from being placed in one context/process,
+>> then being used in another, resulting in an SC succeeding incorrectly and
+>> breaking atomics.
+>>
+>> Signed-off-by: Joel Sing <joel@sing.id.au>
 >
-> Ah, I see it now.  Enforcement begins here:
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 >
-> static bool trans_lr_w(DisasContext *ctx, arg_lr_w *a)
-> {
->     REQUIRE_EXT(ctx, RVA);
->     return gen_lr(ctx, a, (MO_ALIGN | MO_TESL));
->                            ^^^^^^^^
+>> +    /* Clear the load reservation - otherwise a reservation placed in one
 >
-> This will force softmmu (but notably not linux-user; a design limitation) to
-> generate an alignment fault for an unaligned address.
+> Excepting this line, which will fail checkpatch.pl.
+> Needs to be formatted as
+>
+>     /*
+>      * Clear the load...
 
-That was probably correct at the time the code went in, as the ISA used to
-allow these to succeed but not be atomic.  No implementations did this, so as
-part of the ratification process we just mandated that unaligned atomics always
-trap.
+Thanks.  I fixed that one up as I pulled the patch in.
 
-Is there a better way to fix this than just doing the alignment check
-explicitly?
+>
+>
+> r~
 
