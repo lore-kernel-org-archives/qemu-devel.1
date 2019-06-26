@@ -2,140 +2,67 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA85FC48BD6
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 18:09:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72B2FC48BD3
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 18:20:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EBA92080C
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 18:09:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EBA92080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3946121726
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 18:20:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3946121726
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgCLr-0001l1-Mp
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 14:08:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39176)
+	id 1hgCWV-0004gt-8u
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 14:19:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41492)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hgCLJ-0001Fv-T2
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 14:08:26 -0400
+ (envelope-from <balaton@eik.bme.hu>) id 1hgCUv-00042V-Ox
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 14:18:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hgCLI-0004ql-SE
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 14:08:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36858)
+ (envelope-from <balaton@eik.bme.hu>) id 1hgCUt-0000X5-GU
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 14:18:21 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:14230)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hgCLG-0004MS-I6; Wed, 26 Jun 2019 14:08:22 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 76EEC30833C2;
- Wed, 26 Jun 2019 18:07:54 +0000 (UTC)
-Received: from [10.18.17.47] (dhcp-17-47.bos.redhat.com [10.18.17.47])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9556F5D719;
- Wed, 26 Jun 2019 18:07:53 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <20190410012413.31569-1-jsnow@redhat.com>
- <fd29e0f9-4e60-29e5-9607-3dc624204c2d@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <e2a14212-7ecd-2137-f5d5-5b7d717cd46d@redhat.com>
-Date: Wed, 26 Jun 2019 14:07:53 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1hgCUt-0000Qu-53
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 14:18:19 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 942777461AA;
+ Wed, 26 Jun 2019 20:18:05 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 5510C7456B4; Wed, 26 Jun 2019 20:18:05 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 434B174569A;
+ Wed, 26 Jun 2019 20:18:05 +0200 (CEST)
+Date: Wed, 26 Jun 2019 20:18:05 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <0ceec012-fcdc-ccde-291a-121a4e475f86@ilande.co.uk>
+Message-ID: <alpine.BSF.2.21.9999.1906262010500.23988@zero.eik.bme.hu>
+References: <20190519041522.12327-1-richard.henderson@linaro.org>
+ <8f28d008-2608-a579-7505-4546b08deb41@linaro.org>
+ <085d6881-f518-9888-a13e-081cdc09de46@ilande.co.uk>
+ <0b9f4772-37f6-1453-e4ea-5ad9d0f52a5b@ilande.co.uk>
+ <acc57487-c8a0-9380-bc2a-4de22541eabf@ilande.co.uk>
+ <CAL1e-=iavFqEeFuNm2efVM7mu5OaABBVo90wqJEhmoWa4DQv=Q@mail.gmail.com>
+ <ffae3651-5daf-e008-6562-2de09d82ace9@linaro.org>
+ <b8aab3f4-e3eb-a137-62b4-ba5ac1a2ad8f@ilande.co.uk>
+ <68facefc-b801-4902-11c0-4542662bfc4e@linaro.org>
+ <d2c1f979-7ff2-946e-4863-c1be19c5f003@ilande.co.uk>
+ <16f26b7f-2435-aa05-66a3-073e8310d5c8@linaro.org>
+ <0ceec012-fcdc-ccde-291a-121a4e475f86@ilande.co.uk>
+User-Agent: Alpine 2.21.9999 (BSF 287 2018-06-16)
 MIME-Version: 1.0
-In-Reply-To: <fd29e0f9-4e60-29e5-9607-3dc624204c2d@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Wed, 26 Jun 2019 18:07:54 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH RFC 0/3] qemu-img: remove command
- documentation duplication
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 152.66.115.2
+Subject: Re: [Qemu-devel] [PATCH v4 0/7] tcg/ppc: Add vector opcodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,58 +74,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- armbru@redhat.com, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Howard Spoelstra <hsp.cat7@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 6/26/19 2:03 PM, Max Reitz wrote:
-> On 10.04.19 03:24, John Snow wrote:
->> This might hopefully cut down on the doc duplication/mismatching
->> until I can devise something more comprehensive.
+On Wed, 26 Jun 2019, Mark Cave-Ayland wrote:
+> On 26/06/2019 08:45, Richard Henderson wrote:
+>> On 6/25/19 7:55 PM, Mark Cave-Ayland wrote:
+>>> And here's where we are blowing up according to -d in_asm,op_out_asm:
+>>>
+>>> IN:
+>>> 0x00f22ca0:  101ffc84  vor      v0, v31, v31
+>>>
+>>> OP:
+>>>  ld_i32 tmp0,env,$0xfffffff8
+>>>  movi_i32 tmp1,$0x0
+>>>  brcond_i32 tmp0,tmp1,lt,$L0
+>>>
+>>>  ---- 00f22ca0
+>>>  ld_vec v128,e8,tmp2,env,$0xd6b0
+>>>  st_vec v128,e8,tmp2,env,$0xd4c0
 >>
->> Ideally, I'd like to redo all of the documentation for qemu-img
->> nearly from scratch; with a parser generator that helps generate
->> the documentation as well so they'll never get out of date.
+>> Yep, that looks right.
 >>
->> That's probably quite a ways off, and maybe there are other
->> structural changes we want to make with respect to sphinx and
->> other build tools, so I am sending something very minimal instead.
+>> As an aside, this does suggest to me that target/ppc might be well served in
+>> moving the ppc_vsr_t members of CPUPPCState earlier, so that this offset is
+>> smaller.
 >>
->> This ought to be functionally identical down to the last char.
+>>>  movi_i32 nip,$0xf22ca4
+>>>  movi_i32 nip,$0xf22ca4
+>>>  movi_i32 tmp0,$0x10002
+>>>  call raise_exception,$0x2,$0,env,tmp0
 >>
->> (I've re-included patch one which I have sent to the list separately,
->> purely as a dependency if you want to apply these patches.)
+>> And this, presumably is the single-step debug exception.
 >>
->> John Snow (3):
->>   qemu-img: fix .hx and .texi disparity
->>   pxtool: Add new qemu-img command info generation tool
->>   qemu-img.texi: use macros for command summaries
-> 
-> Hm.  Non-RFC ping?
-> 
-> Max
-> 
+>>> 0xa4e7f12c:  3c400000  lis      r2, 0
+>>> 0xa4e7f130:  6042d6b0  ori      r2, r2, 0xd6b0
+>>> 0xa4e7f134:  7c5b10ce  lvx      v2, r27, r2
+>>
+>>> 0xa4e7f138:  3c400000  lis      r2, 0
+>>> 0xa4e7f13c:  6042d4c0  ori      r2, r2, 0xd4c0
+>>> 0xa4e7f140:  7c5b11ce  stvx     v2, r27, r2
+>>
+>> These also look correct.  Form an offset into r2, load or store from env+r2.
+>>
+>> This also shows what I mention above re offset.  For a ppc host, the offset is
+>> large enough to require two instructions to form them.
+>>
+>>> Any ideas what might be going on here?
+>>
+>> What is the observed problem that makes you think that this is the incorrect
+>> instruction?
+>
+> What I've been doing is set a breakpoint a few instructions before and then issuing
+> "stepi" commands via the gdbstub. As I step over the "vor v0, v31, v31" instruction
+> then either the qemu-system-ppc process segfaults outside of gdb, or inside gdb it
+> goes to bg. Bringing it back to fg just causes gdb to get confused and in the end the
+> only thing I can do is kill the gdb process.
+>
+> On the plus side I've managed to work out where we are faulting by hacking the load
+> and store functions to inject trap opcodes in the ld_vec and st_vec and it appears
+> that we are segfaulting here:
+>
+> OUT: [size=96]
+> 0xa4e7f120:  81dbfff8  lwz      r14, -8(r27)
+> 0xa4e7f124:  2f8e0000  cmpwi    cr7, r14, 0
+> 0xa4e7f128:  419c004c  blt      cr7, 0xa4e7f174
+> 0xa4e7f12c:  3c400000  lis      r2, 0
+>                       ^^^^^^^^^^^^^^
+> 0xa4e7f130:  6042d6b0  ori      r2, r2, 0xd6b0
+> 0xa4e7f134:  7c5b10ce  lvx      v2, r27, r2
+> 0xa4e7f138:  3c400000  lis      r2, 0
+> 0xa4e7f13c:  6042d4c0  ori      r2, r2, 0xd4c0
+> 0xa4e7f140:  7c5b11ce  stvx     v2, r27, r2
+> 0xa4e7f144:  3dc000f2  lis      r14, 0xf2
+> 0xa4e7f148:  61ce2ca4  ori      r14, r14, 0x2ca4
+> 0xa4e7f14c:  91db016c  stw      r14, 0x16c(r27)
+> 0xa4e7f150:  7f63db78  mr       r3, r27
+> 0xa4e7f154:  3c800001  lis      r4, 1
+> 0xa4e7f158:  60840002  ori      r4, r4, 2
+> 0xa4e7f15c:  3c000087  lis      r0, 0x87
+> 0xa4e7f160:  6000b618  ori      r0, r0, 0xb618
+> 0xa4e7f164:  7c0903a6  mtctr    r0
+> 0xa4e7f168:  4e800421  bctrl
+> 0xa4e7f16c:  38600000  li       r3, 0
+> 0xa4e7f170:  4bfffef0  b        0xa4e7f060
+> 0xa4e7f174:  3c60a4e7  lis      r3, -0x5b19
+> 0xa4e7f178:  6063f0c3  ori      r3, r3, 0xf0c3
+> 0xa4e7f17c:  4bfffee4  b        0xa4e7f060
+>
+> Interestingly if I set a trap and then switch the opcode to "lis r4,0" (0x3c800000)
+> then we carry on as normal until the next "lis r2,0" instruction. Looking through the
+> whole output of -d out_asm this is the first mention of r2 which makes me wonder if
+> it is special somehow? At least a quick search indicates that for 32-bit PPC r2 is
+> supposed to be dedicated as a TOC pointer.
 
-This was mostly a quick hack; it didn't seek to eliminate ALL of the .hx
-files we have, and it's not a comprehensive solution.
+According to a PowerPC ABI doc: 
+http://refspecs.linux-foundation.org/elf/elfspec_ppc.pdf
+r2 is system reserved and should not be used by application code and 
+another one (probably the same you were referring to mentions TOC 
+https://refspecs.linuxfoundation.org/ELF/ppc64/PPC-elf64abi-1.9.html#REG. 
+I'm not sure if that's relevant for the above but it looks like clobbering 
+r2 might cause problems.
 
-It is a quick stopgap that should work well enough for now, but it's
-replacing one hack with another hack.
-
-...Well, this hack is SLIGHTLY nicer, but I think I did some silly
-things like using a zero-argument macro for texi instead of just
-defining a variable. I don't know what I'm doing with texi stuff.
-
-And then since I wrote it, there's been more buzz about reworking the
-Sphinx documentation, so maybe this is too lateral of a move. I don't know.
-
-I don't think it got review from the QAPI powers, though, and I think
-I'd like to hear what they have to say before I invest any more time in
-trying to fix this up.
-
---js
+Regards,
+BALATON Zoltan
 
