@@ -6,51 +6,64 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2304C48BD6
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 16:27:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3B27C48BD3
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 16:28:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A8CE20665
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 16:27:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A8CE20665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 80CE120665
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 16:28:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80CE120665
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgAlX-0000ks-3F
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 12:27:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56224)
+	id 1hgAn2-0001ra-Q6
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 12:28:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55806)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paul.c.lai@intel.com>) id 1hgAhl-0007KN-Pd
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 12:23:30 -0400
+ (envelope-from <laurent@vivier.eu>) id 1hgAfs-0005aa-4h
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 12:21:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paul.c.lai@intel.com>) id 1hgAhk-0000Uv-EM
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 12:23:29 -0400
-Received: from mga11.intel.com ([192.55.52.93]:52176)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <paul.c.lai@intel.com>)
- id 1hgAhk-0000Q4-63
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 12:23:28 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 26 Jun 2019 09:23:25 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,420,1557212400"; d="scan'208";a="313478004"
-Received: from pclaidev.sc.intel.com ([143.183.85.146])
- by orsmga004.jf.intel.com with ESMTP; 26 Jun 2019 09:23:23 -0700
-From: Paul Lai <paul.c.lai@intel.com>
+ (envelope-from <laurent@vivier.eu>) id 1hgAfp-0006nB-UJ
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 12:21:32 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:53557)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hgAfn-0006iJ-VR
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 12:21:29 -0400
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
+ id 1MYNW8-1i1heH0D58-00VThn; Wed, 26 Jun 2019 18:21:11 +0200
+From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Wed, 26 Jun 2019 09:21:29 -0700
-Message-Id: <20190626162129.25345-1-paul.c.lai@intel.com>
-X-Mailer: git-send-email 2.17.2
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.93
-Subject: [Qemu-devel] [Qemu-devel v4] Introduce SnowRidge CPU model
+Date: Wed, 26 Jun 2019 18:21:00 +0200
+Message-Id: <20190626162100.24774-4-laurent@vivier.eu>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190626162100.24774-1-laurent@vivier.eu>
+References: <20190626162100.24774-1-laurent@vivier.eu>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:Gz6fRpAfz80ZpkaSNxfArQc9X6io64GaUucP7W8uS8HoDgN9ASD
+ vqiHszx/CWmY81zr0MuYohzobKPTNKkpx+LPYHBKmmVhjAmFwh8meONcoXowLQHkvJk2UFL
+ 1c+utwLYQ3z0JVHVs8BUk9cXvqzHjx69vMOXlqTJJColwVqivHCAlbeV3U06UAh7gDaZyw9
+ uuNZjXubZlkmKN2UkhjHw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:eH1+gEM2wfM=:2AXjq61b4+aOA8JcIcmwW3
+ IU4VqCdwl1XU2dErzhiEQ56CfjYdmhFcskbUkTZsDjLrBipMFAA+CCuwi9kv6bGsXaYeuaT9Y
+ AoDimK+HMVHkzt/tT2hbD1jgdiz9wKFjePLYbQwMaoBWk46VraB5y9YZeq52Bd2JFW/rUdsv5
+ ZTDyk4Sjba+0ldt72Je5FgHC+9RdUcMboKCEwBwXVLvvSUTJzMWdO0mmQv8kKE86yxzoD1nB4
+ wQaO+plrU9bQryOCbzvUu/uZz9rZdqtCMzdkjHVGiNCdrozbv3bScNz7iK90H2qFvlwfn3X1F
+ hyTgBp68CbjG1OAtYgxacBGSa8yQx9IUTjILZrE+7mE6TcEmlrf6d5hUm4FRGXKjnzspOfEt1
+ nViXJdSz4+3N+eNUViydBGs2A8jQ5d0WKmtWUzPEzWl5Sh7EQDjlr1Yfhmdd9NvHZo1nnKfQE
+ qrkOQ0JyXK7rJnwmB8VfGcWIvXdMA3Jf+fJgevcgLJ2PH8g3JzryijCwIP8Jo7D8JPCB1s0mk
+ qm5l/i0QYwVq+fGHOwiSohYsIWpb/pdpQS/p+efWtnJLwqWkFRZ/7sabFhHcIRcaiD9ZWqt3B
+ uy8y9OqCiZN2o7fXKO95zoDEgA2g4a3f0CVB1QewnIQMfKwBKtnKfP7uxKjIfJUXfxJmgY6qJ
+ kU+mErk34RefoVkVg842lXGElnBVhvvKHpFIQpiAGu0+m3dfLybaLvXS70JSp1Xb5wIk/SnHA
+ 5s16yauqF5kAr6TX0mykhVKQ5FIGrFCoCxTKWA==
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 217.72.192.74
+Subject: [Qemu-devel] [PULL 3/3] linux-user/m68k: remove simulator syscall
+ interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,110 +75,291 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wei.w.wang@intel.com, luwei.kang@intel.com, tao3.xu@intel.com,
- paul.c.lai@intel.com
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SnowRidge CPU supports Accelerator Infrastrcture Architecture (MOVDIRI,
-MOVDIR64B), CLDEMOTE and SPLIT_LOCK_DISABLE.
+This interface has been introduced in 2005 with the
+coldfire implementation (e6e5906b6e ColdFire target.)
+and looks like to do what the linux-user interface already
+does with the TRAP exception rather than the ILLEGAL
+exception.
 
-MOVDIRI, MOVDIR64B, and CLDEMOTE are found via CPUID.
-The availability of SPLIT_LOCK_DISABLE is check via msr access
+This interface has not been maintained since that.
+The semi-hosting interface is not removed so coldfire kernel
+with semi-hosting is always supported.
 
-References can be found in either:
- https://software.intel.com/en-us/articles/intel-sdm
- https://software.intel.com/en-us/download/intel-architecture-instruction-set-extensions-and-future-features-programming-reference
-
-Signed-off-by: Paul Lai <paul.c.lai@intel.com>
-Tested-by: Tao3 Xu <tao3.xu@intel.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20190524162049.806-1-laurent@vivier.eu>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
-Somehow v3 didn't have the desired -Server on the model name ... 
----
- target/i386/cpu.c | 68 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 68 insertions(+)
+ linux-user/Makefile.objs         |   1 -
+ linux-user/m68k-sim.c            | 163 -------------------------------
+ linux-user/m68k/cpu_loop.c       |  17 +---
+ linux-user/m68k/target_syscall.h |   2 -
+ linux-user/qemu.h                |   1 -
+ 5 files changed, 1 insertion(+), 183 deletions(-)
+ delete mode 100644 linux-user/m68k-sim.c
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index da6eb67cfb..c96f032f03 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2687,6 +2687,74 @@ static X86CPUDefinition builtin_x86_defs[] = {
-         .xlevel = 0x80000008,
-         .model_id = "Intel Xeon Processor (Icelake)",
-     },
-+    {
-+        .name = "SnowRidge-Server",
-+        .level = 27,
-+        .vendor = CPUID_VENDOR_INTEL,
-+        .family = 6,
-+        .model = 134,
-+        .stepping = 1,
-+        .features[FEAT_1_EDX] =
-+            /* missing: CPUID_PN CPUID_IA64 */
-+            /* missing: CPUID_DTS, CPUID_HT, CPUID_TM, CPUID_PBE */
-+            CPUID_FP87 | CPUID_VME | CPUID_DE | CPUID_PSE |
-+            CPUID_TSC | CPUID_MSR | CPUID_PAE | CPUID_MCE |
-+            CPUID_CX8 | CPUID_APIC | CPUID_SEP |
-+            CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV |
-+            CPUID_PAT | CPUID_PSE36 | CPUID_CLFLUSH |
-+            CPUID_MMX |
-+            CPUID_FXSR | CPUID_SSE | CPUID_SSE2,
-+        .features[FEAT_1_ECX] =
-+            CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_MONITOR |
-+            CPUID_EXT_VMX |
-+            CPUID_EXT_SSSE3 |
-+            CPUID_EXT_CX16 |
-+            CPUID_EXT_SSE41 |
-+            CPUID_EXT_SSE42 | CPUID_EXT_X2APIC | CPUID_EXT_MOVBE |
-+            CPUID_EXT_POPCNT |
-+            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_AES | CPUID_EXT_XSAVE |
-+            CPUID_EXT_RDRAND,
-+        .features[FEAT_8000_0001_EDX] =
-+            CPUID_EXT2_SYSCALL |
-+            CPUID_EXT2_NX |
-+            CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
-+            CPUID_EXT2_LM,
-+        .features[FEAT_8000_0001_ECX] =
-+            CPUID_EXT3_LAHF_LM |
-+            CPUID_EXT3_3DNOWPREFETCH,
-+        .features[FEAT_7_0_EBX] =
-+            CPUID_7_0_EBX_FSGSBASE |
-+            CPUID_7_0_EBX_SMEP |
-+            CPUID_7_0_EBX_ERMS |
-+            CPUID_7_0_EBX_MPX |  /* missing bits 13, 15 */
-+            CPUID_7_0_EBX_RDSEED |
-+            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLFLUSHOPT |
-+            CPUID_7_0_EBX_CLWB |
-+            CPUID_7_0_EBX_SHA_NI,
-+        .features[FEAT_7_0_ECX] =
-+            CPUID_7_0_ECX_UMIP |
-+            /* missing bit 5 */
-+            CPUID_7_0_ECX_GFNI |
-+            CPUID_7_0_ECX_MOVDIRI | CPUID_7_0_ECX_CLDEMOTE |
-+            CPUID_7_0_ECX_MOVDIR64B,
-+        .features[FEAT_7_0_EDX] =
-+            CPUID_7_0_EDX_SPEC_CTRL |
-+            CPUID_7_0_EDX_ARCH_CAPABILITIES | CPUID_7_0_EDX_SPEC_CTRL_SSBD,
-+        /*
-+         * Missing: XSAVES (not supported by some Linux versions,
-+         * including v4.1 to v4.12).
-+         * KVM doesn't yet expose any XSAVES state save component,
-+         * and the only one defined in Skylake (processor tracing)
-+         * probably will block migration anyway.
-+         */
-+        .features[FEAT_XSAVE] =
-+            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-+            CPUID_XSAVE_XGETBV1,
-+        .features[FEAT_6_EAX] =
-+            CPUID_6_EAX_ARAT,
-+        .xlevel = 0x80000008,
-+        .model_id = "Intel Atom Processor (SnowRidge)",
-+    },
-     {
-         .name = "KnightsMill",
-         .level = 0xd,
+diff --git a/linux-user/Makefile.objs b/linux-user/Makefile.objs
+index 285c5dfa17..d2f33beb5e 100644
+--- a/linux-user/Makefile.objs
++++ b/linux-user/Makefile.objs
+@@ -8,4 +8,3 @@ obj-$(TARGET_I386) += vm86.o
+ obj-$(TARGET_ARM) += arm/nwfpe/
+ obj-$(TARGET_ARM) += arm/semihost.o
+ obj-$(TARGET_AARCH64) += arm/semihost.o
+-obj-$(TARGET_M68K) += m68k-sim.o
+diff --git a/linux-user/m68k-sim.c b/linux-user/m68k-sim.c
+deleted file mode 100644
+index 9bc6ff3d3a..0000000000
+--- a/linux-user/m68k-sim.c
++++ /dev/null
+@@ -1,163 +0,0 @@
+-/*
+- *  m68k simulator syscall interface
+- *
+- *  Copyright (c) 2005 CodeSourcery, LLC. Written by Paul Brook.
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+- */
+-
+-#include "qemu/osdep.h"
+-
+-#include "qemu.h"
+-
+-#define SYS_EXIT        1
+-#define SYS_READ        3
+-#define SYS_WRITE       4
+-#define SYS_OPEN        5
+-#define SYS_CLOSE       6
+-#define SYS_BRK         17
+-#define SYS_FSTAT       28
+-#define SYS_ISATTY      29
+-#define SYS_LSEEK       199
+-
+-struct m68k_sim_stat {
+-    uint16_t sim_st_dev;
+-    uint16_t sim_st_ino;
+-    uint32_t sim_st_mode;
+-    uint16_t sim_st_nlink;
+-    uint16_t sim_st_uid;
+-    uint16_t sim_st_gid;
+-    uint16_t sim_st_rdev;
+-    uint32_t sim_st_size;
+-    uint32_t sim_st_atime;
+-    uint32_t sim_st_mtime;
+-    uint32_t sim_st_ctime;
+-    uint32_t sim_st_blksize;
+-    uint32_t sim_st_blocks;
+-};
+-
+-static inline uint32_t check_err(CPUM68KState *env, uint32_t code)
+-{
+-  env->dregs[0] = code;
+-  if (code == (uint32_t)-1) {
+-      env->dregs[1] = errno;
+-  } else {
+-      env->dregs[1] = 0;
+-  }
+-  return code;
+-}
+-
+-#define SIM_O_APPEND    0x0008
+-#define SIM_O_CREAT     0x0200
+-#define SIM_O_TRUNC     0x0400
+-#define SIM_O_EXCL      0x0800
+-#define SIM_O_NONBLOCK  0x4000
+-#define SIM_O_NOCTTY    0x8000
+-#define SIM_O_SYNC      0x2000
+-
+-static int translate_openflags(int flags)
+-{
+-    int hf;
+-
+-    switch (flags & 3) {
+-    case 0: hf = O_RDONLY; break;
+-    case 1: hf = O_WRONLY; break;
+-    case 2: hf = O_RDWR; break;
+-    default: hf = O_RDWR; break;
+-    }
+-
+-    if (flags & SIM_O_APPEND) hf |= O_APPEND;
+-    if (flags & SIM_O_CREAT) hf |= O_CREAT;
+-    if (flags & SIM_O_TRUNC) hf |= O_TRUNC;
+-    if (flags & SIM_O_EXCL) hf |= O_EXCL;
+-    if (flags & SIM_O_NONBLOCK) hf |= O_NONBLOCK;
+-    if (flags & SIM_O_NOCTTY) hf |= O_NOCTTY;
+-    if (flags & SIM_O_SYNC) hf |= O_SYNC;
+-
+-    return hf;
+-}
+-
+-#define ARG(x) tswap32(args[x])
+-void do_m68k_simcall(CPUM68KState *env, int nr)
+-{
+-    uint32_t *args;
+-
+-    args = (uint32_t *)(unsigned long)(env->aregs[7] + 4);
+-    switch (nr) {
+-    case SYS_EXIT:
+-        exit(ARG(0));
+-    case SYS_READ:
+-        check_err(env, read(ARG(0), (void *)(unsigned long)ARG(1), ARG(2)));
+-        break;
+-    case SYS_WRITE:
+-        check_err(env, write(ARG(0), (void *)(unsigned long)ARG(1), ARG(2)));
+-        break;
+-    case SYS_OPEN:
+-        check_err(env, open((char *)(unsigned long)ARG(0),
+-                            translate_openflags(ARG(1)), ARG(2)));
+-        break;
+-    case SYS_CLOSE:
+-        {
+-            /* Ignore attempts to close stdin/out/err.  */
+-            int fd = ARG(0);
+-            if (fd > 2)
+-              check_err(env, close(fd));
+-            else
+-              check_err(env, 0);
+-            break;
+-        }
+-    case SYS_BRK:
+-        {
+-            int32_t ret;
+-
+-            ret = do_brk((abi_ulong)ARG(0));
+-            if (ret == -ENOMEM)
+-                ret = -1;
+-            check_err(env, ret);
+-        }
+-        break;
+-    case SYS_FSTAT:
+-        {
+-            struct stat s;
+-            int rc;
+-            struct m68k_sim_stat *p;
+-            rc = check_err(env, fstat(ARG(0), &s));
+-            if (rc == 0) {
+-                p = (struct m68k_sim_stat *)(unsigned long)ARG(1);
+-                p->sim_st_dev = tswap16(s.st_dev);
+-                p->sim_st_ino = tswap16(s.st_ino);
+-                p->sim_st_mode = tswap32(s.st_mode);
+-                p->sim_st_nlink = tswap16(s.st_nlink);
+-                p->sim_st_uid = tswap16(s.st_uid);
+-                p->sim_st_gid = tswap16(s.st_gid);
+-                p->sim_st_rdev = tswap16(s.st_rdev);
+-                p->sim_st_size = tswap32(s.st_size);
+-                p->sim_st_atime = tswap32(s.st_atime);
+-                p->sim_st_mtime = tswap32(s.st_mtime);
+-                p->sim_st_ctime = tswap32(s.st_ctime);
+-                p->sim_st_blksize = tswap32(s.st_blksize);
+-                p->sim_st_blocks = tswap32(s.st_blocks);
+-            }
+-        }
+-        break;
+-    case SYS_ISATTY:
+-        check_err(env, isatty(ARG(0)));
+-        break;
+-    case SYS_LSEEK:
+-        check_err(env, lseek(ARG(0), (int32_t)ARG(1), ARG(2)));
+-        break;
+-    default:
+-        cpu_abort(env_cpu(env), "Unsupported m68k sim syscall %d\n", nr);
+-    }
+-}
+diff --git a/linux-user/m68k/cpu_loop.c b/linux-user/m68k/cpu_loop.c
+index e8d39d15f3..c7a500b58c 100644
+--- a/linux-user/m68k/cpu_loop.c
++++ b/linux-user/m68k/cpu_loop.c
+@@ -28,7 +28,6 @@ void cpu_loop(CPUM68KState *env)
+     int trapnr;
+     unsigned int n;
+     target_siginfo_t info;
+-    TaskState *ts = cs->opaque;
+ 
+     for(;;) {
+         cpu_exec_start(cs);
+@@ -37,26 +36,14 @@ void cpu_loop(CPUM68KState *env)
+         process_queued_cpu_work(cs);
+ 
+         switch(trapnr) {
+-        case EXCP_ILLEGAL:
+-            {
+-                if (ts->sim_syscalls) {
+-                    uint16_t nr;
+-                    get_user_u16(nr, env->pc + 2);
+-                    env->pc += 4;
+-                    do_m68k_simcall(env, nr);
+-                } else {
+-                    goto do_sigill;
+-                }
+-            }
+-            break;
+         case EXCP_HALT_INSN:
+             /* Semihosing syscall.  */
+             env->pc += 4;
+             do_m68k_semihosting(env, env->dregs[0]);
+             break;
++        case EXCP_ILLEGAL:
+         case EXCP_LINEA:
+         case EXCP_LINEF:
+-        do_sigill:
+             info.si_signo = TARGET_SIGILL;
+             info.si_errno = 0;
+             info.si_code = TARGET_ILL_ILLOPN;
+@@ -80,7 +67,6 @@ void cpu_loop(CPUM68KState *env)
+         case EXCP_TRAP0:
+             {
+                 abi_long ret;
+-                ts->sim_syscalls = 0;
+                 n = env->dregs[0];
+                 env->pc += 2;
+                 ret = do_syscall(env,
+@@ -154,7 +140,6 @@ void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
+     env->aregs[7] = regs->usp;
+     env->sr = regs->sr;
+ 
+-    ts->sim_syscalls = 1;
+     ts->stack_base = info->start_stack;
+     ts->heap_base = info->brk;
+     /* This will be filled in on the first SYS_HEAPINFO call.  */
+diff --git a/linux-user/m68k/target_syscall.h b/linux-user/m68k/target_syscall.h
+index 632ee4fcf8..c0366b1c62 100644
+--- a/linux-user/m68k/target_syscall.h
++++ b/linux-user/m68k/target_syscall.h
+@@ -26,6 +26,4 @@ struct target_pt_regs {
+ 
+ #define TARGET_WANT_OLD_SYS_SELECT
+ 
+-void do_m68k_simcall(CPUM68KState *, int);
+-
+ #endif /* M68K_TARGET_SYSCALL_H */
+diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+index 82d33d7e93..fab287b7ec 100644
+--- a/linux-user/qemu.h
++++ b/linux-user/qemu.h
+@@ -116,7 +116,6 @@ typedef struct TaskState {
+ #endif
+     abi_ulong child_tidptr;
+ #ifdef TARGET_M68K
+-    int sim_syscalls;
+     abi_ulong tp_value;
+ #endif
+ #if defined(TARGET_ARM) || defined(TARGET_M68K)
 -- 
-2.17.2
+2.21.0
 
 
