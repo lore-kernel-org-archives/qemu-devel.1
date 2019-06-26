@@ -3,88 +3,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE3DBC48BD3
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 15:53:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA9E5C48BD6
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 15:56:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C5B992086D
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 15:53:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5B992086D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7B02221743
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 15:56:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B02221743
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=collabora.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgAF5-0005SK-1D
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 11:53:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49458)
+	id 1hgAHF-0007MU-9u
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 11:56:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50120)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hgADn-0004kT-58
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:52:32 -0400
+ (envelope-from <antonio.ospite@collabora.com>) id 1hgAG2-0006Tc-6Q
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:54:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hgADm-0002Ic-3I
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:52:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48324)
+ (envelope-from <antonio.ospite@collabora.com>) id 1hgAG0-0004Gi-8J
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:54:50 -0400
+Received: from bhuna.collabora.co.uk ([2a00:1098:0:82:1000:25:2eeb:e3e3]:33486)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hgADl-0002HJ-Pz; Wed, 26 Jun 2019 11:52:30 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7C97D308FBAC;
- Wed, 26 Jun 2019 15:52:23 +0000 (UTC)
-Received: from [10.3.116.44] (ovpn-116-44.phx2.redhat.com [10.3.116.44])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3D20A60C80;
- Wed, 26 Jun 2019 15:52:22 +0000 (UTC)
-To: Antonio Ospite <antonio.ospite@collabora.com>, Antonio Ospite
- <ao2@ao2.it>, qemu-devel@nongnu.org
+ (Exim 4.71) (envelope-from <antonio.ospite@collabora.com>)
+ id 1hgAFy-0004D0-JC
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:54:48 -0400
+Received: from [127.0.0.1] (localhost [127.0.0.1]) (Authenticated sender: ao2)
+ with ESMTPSA id DFD6B260A1E
+To: Laurent Vivier <laurent@vivier.eu>, Antonio Ospite <ao2@ao2.it>,
+ qemu-devel@nongnu.org
 References: <20190526144747.30019-1-ao2@ao2.it>
  <adce6062-9289-afe8-b26a-949144700656@collabora.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <974086f5-459f-5e8d-d206-735010445b12@redhat.com>
-Date: Wed, 26 Jun 2019 10:52:20 -0500
+ <4d4588e3-b804-7774-756a-3c8092fe732f@vivier.eu>
+From: Antonio Ospite <antonio.ospite@collabora.com>
+Message-ID: <c6d6da5a-215f-4279-fe6a-c46dab5b31c7@collabora.com>
+Date: Wed, 26 Jun 2019 17:54:39 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-In-Reply-To: <adce6062-9289-afe8-b26a-949144700656@collabora.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="w6793FgKvl4g0Ryu18PChqsQBFXyIynMa"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Wed, 26 Jun 2019 15:52:28 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+In-Reply-To: <4d4588e3-b804-7774-756a-3c8092fe732f@vivier.eu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1098:0:82:1000:25:2eeb:e3e3
 Subject: Re: [Qemu-devel] [PATCH v3 0/2] configure: disallow spaces and
  colons in source path and build path
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,92 +66,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
- Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <laurent@vivier.eu>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---w6793FgKvl4g0Ryu18PChqsQBFXyIynMa
-Content-Type: multipart/mixed; boundary="1xE4CMDIHno0ylVkc4XIq6S7OWPZvj7ks";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Antonio Ospite <antonio.ospite@collabora.com>, Antonio Ospite
- <ao2@ao2.it>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>,
- "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
-Message-ID: <974086f5-459f-5e8d-d206-735010445b12@redhat.com>
-Subject: Re: [PATCH v3 0/2] configure: disallow spaces and colons in source
- path and build path
-References: <20190526144747.30019-1-ao2@ao2.it>
- <adce6062-9289-afe8-b26a-949144700656@collabora.com>
-In-Reply-To: <adce6062-9289-afe8-b26a-949144700656@collabora.com>
-
---1xE4CMDIHno0ylVkc4XIq6S7OWPZvj7ks
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 6/26/19 10:16 AM, Antonio Ospite wrote:
-> On 26/05/19 16:47, Antonio Ospite wrote:
->> Hi,
+On 26/06/19 17:50, Laurent Vivier wrote:
+> Le 26/06/2019 =C3=A0 17:16, Antonio Ospite a =C3=A9crit=C2=A0:
+>> On 26/05/19 16:47, Antonio Ospite wrote:
+>>> Hi,
+>>>
+>>> Here is a v3 set to address
+>>> https://bugs.launchpad.net/qemu/+bug/1817345
+>>>
+>>> CCing Laurent Vivier as the patch is going through the trivial-patche=
+s
+>>> branch.
+>>>
 >>
->> Here is a v3 set to address
->> https://bugs.launchpad.net/qemu/+bug/1817345
+>> Ping.
 >>
->> CCing Laurent Vivier as the patch is going through the trivial-patches=
-
->> branch.
+>> I cannot see this in the trivial-patches repository nor in mainline qe=
+mu.
 >>
 >=20
-> Ping.
->=20
-> I cannot see this in the trivial-patches repository nor in mainline qem=
-u.
->=20
+> I missed it because you didn't cc: qemu-trivial ML (I use this list to
+> pick up the patches).
+>
 
-Explicitly adding qemu-trivial in cc may help (done now).
+Ah yes, I had read that on
+https://wiki.qemu.org/Contribute/TrivialPatches
+but then forgot about it.
 
->> Antonio Ospite (2):
->> =C2=A0=C2=A0 configure: set source_path only once and make its definit=
-ion more
->> =C2=A0=C2=A0=C2=A0=C2=A0 robust
->> =C2=A0=C2=A0 configure: disallow spaces and colons in source path and =
-build path
->>
->> =C2=A0 Makefile=C2=A0 |=C2=A0 4 ++++
->> =C2=A0 configure | 11 ++++++++---
->> =C2=A0 2 files changed, 12 insertions(+), 3 deletions(-)
->>
+> I'm going to add them to the next pull request.
 >=20
+> Thanks,
+> Laurent
 >=20
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---1xE4CMDIHno0ylVkc4XIq6S7OWPZvj7ks--
-
---w6793FgKvl4g0Ryu18PChqsQBFXyIynMa
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0TlLQACgkQp6FrSiUn
-Q2rAdggAksZM/CmyWFFE4eaiVmOmynokvRyzTZKj861BeAleP+/cSb4TqCaV4aQW
-1UpQGNAgHw4lSPftCsJZkk2TusqSvONoG22ATfEswAFyTv5a2zAxIk0Z9iGPty2v
-3LN9Jx0G9ETcdPVPRglm5uisc06TPIOUxMWP+VMJgauCYuQr8j9BUVUPCAjnO4to
-79/qRREFibMh0aMgCzcia1NORS3ubfomi4/9w9gJk+fXBo79xDdjpx25TPTHV//z
-4XBu4d9dKW58U3MJIaDH+JLjGH+WlITLbc2cXqwC/WUnKgKDYotoTrmtztMVcwnu
-V1AKc7DethHL0nAwaGSYidbfL9lKGg==
-=sp4B
------END PGP SIGNATURE-----
-
---w6793FgKvl4g0Ryu18PChqsQBFXyIynMa--
+Thank you,
+    Antonio
 
