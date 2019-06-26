@@ -2,83 +2,61 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE927C48BD5
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 01:53:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDD2EC48BD5
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 01:57:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8CB7208E3
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 01:53:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JBp0SL8V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8CB7208E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8B1292063F
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 01:57:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B1292063F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfx7S-0002Wb-SA
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 21:53:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40489)
+	id 1hfxBo-0007aa-8l
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 21:57:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46517)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bmeng.cn@gmail.com>) id 1hfx2L-0006Dq-C7
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 21:47:50 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hfx9a-0004gV-Gt
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 21:55:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1hfx2K-0003Xu-8F
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 21:47:49 -0400
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:36571)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1hfx2H-0003Ql-NC; Tue, 25 Jun 2019 21:47:45 -0400
-Received: by mail-ed1-x544.google.com with SMTP id k21so795124edq.3;
- Tue, 25 Jun 2019 18:47:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=aijH6h8Z+aHSNtZKIGH50atEy0CtUTuJRTMmgt215Rc=;
- b=JBp0SL8VU0hVJlwLg22CgU/qyaDPrOJ4QEOorwO+vOJoqdUvZ3gvxGtsRHzw1VfB5r
- SJLidp5fN7k5v0IUOX0bBdDdHp97VAjDrumff2v03jKUFVl5HrpzxTqVVLXh5YS+eIey
- q0ubuCJDb2u1hMw00g72qIGs84KGFG6PsNtvBUHW3FfG5koIddLW4bkcDaOXtN29qTmV
- PVnSCdMPnSgtSNZu8bNAj4ouF0RdvuJvHAFYn5etQE/Enb/5+GbULA8VjQ23LCia8SoN
- +B8D2vacyLI4FEFIFpIAZKfAlnouZmC4eXSfRmyho9ZQB2kxOm3xVa4WV5a9RhncSwZA
- 5XwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=aijH6h8Z+aHSNtZKIGH50atEy0CtUTuJRTMmgt215Rc=;
- b=h7f6WaZCpcfzJ3Xg+EQVPZVF1cIw1ma/mEmiUwFvQIvN0R4a0gp03ycqshsleJx5av
- h5q4YY3JSz2UdqSBiSAVMKgKtZcr2pKO6qLdXbYnTWN3FR2Z+FN5b3ugKBoKQx4HDde1
- v+wUwPtOtiuDtWEOEh0RUek7ev9Fv5lVzV+nocy0XdYoxH5fwpq6i0smKLYSsUfAijHD
- EuXiPfCvKiXi6JWKJpXEyWRrPOdWqhaL48WyStJ+6jFmf3Q/enMrmtPvm8MQsrrklGNM
- uCDrRRjPz9Hz5bZ+ZytCZQKWUs1aQGTa9PnTNrNmE9h+6k+dx4GeiqkHZ4XPjtsPpvY2
- Ej+w==
-X-Gm-Message-State: APjAAAVJeWh3mkNBgDASbic05NVbFecJNEOwqQlrqhuJrLFzFld0zGZe
- G7VpQN7Wxsa6f7hPyioTyiSx4slclos5tRhM2cwlyo3Q
-X-Google-Smtp-Source: APXvYqznkXPKAe3NnJTOjzzHsdOEUKvhSX2HpycfBdPckCav71KZVHnTXkSb1vDse76SbWpIPQrbe+9C4F76uO9ZPJo=
-X-Received: by 2002:a50:b388:: with SMTP id s8mr1795255edd.15.1561513664653;
- Tue, 25 Jun 2019 18:47:44 -0700 (PDT)
+ (envelope-from <ehabkost@redhat.com>) id 1hfx9Y-0006sg-Q2
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 21:55:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57886)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>)
+ id 1hfx9Y-0006jW-A0; Tue, 25 Jun 2019 21:55:16 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E567A308FC22;
+ Wed, 26 Jun 2019 01:55:10 +0000 (UTC)
+Received: from localhost (ovpn-116-101.gru2.redhat.com [10.97.116.101])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3DA195D719;
+ Wed, 26 Jun 2019 01:55:05 +0000 (UTC)
+Date: Tue, 25 Jun 2019 22:55:04 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <20190626015503.GX1862@habkost.net>
+References: <20190625232333.30752-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <1559119921-6098-1-git-send-email-bmeng.cn@gmail.com>
- <CAKmqyKNAL8KtVgfCx6yhaNYEL=_wnZ5Vf1eSjxwtg0x6_q+UHw@mail.gmail.com>
- <CAEUhbmXLr3zXhbphXRvqfyW1FH9qo3yoPwnFoRoYNtbwkrBBKw@mail.gmail.com>
- <CAEUhbmUAKoFPqBLVW4FHmiESaF8fqEtjqDb1LKf4ivG3g2z0ZQ@mail.gmail.com>
- <CAKmqyKPO8CERWMZQEfEM1Q7HBTysB8cG5LsR1wdc334YX5tmgg@mail.gmail.com>
-In-Reply-To: <CAKmqyKPO8CERWMZQEfEM1Q7HBTysB8cG5LsR1wdc334YX5tmgg@mail.gmail.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Wed, 26 Jun 2019 09:47:33 +0800
-Message-ID: <CAEUhbmVGdeX7j1ep1vJKhZ8a-4K2j-G40LjBJqDkXOi4WM-B9w@mail.gmail.com>
-To: Alistair Francis <alistair23@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::544
-Subject: Re: [Qemu-devel] [PATCH] riscv: virt: Correct pci "bus-range"
- encoding
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190625232333.30752-1-marcandre.lureau@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Wed, 26 Jun 2019 01:55:10 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] virtio-pci: fix missing device properties
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,47 +68,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@sifive.com>, "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: lvivier@redhat.com, qemu-stable@nongnu.org, qemu-devel@nongnu.org,
+ mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+On Wed, Jun 26, 2019 at 01:23:33AM +0200, Marc-Andr=E9 Lureau wrote:
+> Since commit a4ee4c8baa37154 ("virtio: Helper for registering virtio
+> device types"), virtio-gpu-pci, virtio-vga, and virtio-crypto-pci lost
+> some properties: "ioeventfd" and "vectors". This may cause various
+> issues, such as failing migration or invalid properties.
+>=20
+> Since those VirtioPCI devices do not have a base name, their class are
+> initialized with virtio_pci_generic_base_class_init(). However, if the
+> VirtioPCIDeviceTypeInfo provided a class_init which sets dc->props,
+> the properties were overwritten by virtio_pci_generic_class_init().
+>=20
+> Instead, introduce an intermediary base-type to register the generic
+> properties.
+>=20
+> Fixes: a4ee4c8baa37154f42b4dc6a13fee79268d15238
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  hw/virtio/virtio-pci.c | 28 ++++++++++++++--------------
+>  1 file changed, 14 insertions(+), 14 deletions(-)
+>=20
+> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> index e6d5467e54..62c4977332 100644
+> --- a/hw/virtio/virtio-pci.c
+> +++ b/hw/virtio/virtio-pci.c
+> @@ -1913,13 +1913,6 @@ static void virtio_pci_generic_class_init(Object=
+Class *klass, void *data)
+>      dc->props =3D virtio_pci_generic_properties;
+>  }
+> =20
+> -/* Used when the generic type and the base type is the same */
+> -static void virtio_pci_generic_base_class_init(ObjectClass *klass, voi=
+d *data)
+> -{
+> -    virtio_pci_base_class_init(klass, data);
+> -    virtio_pci_generic_class_init(klass, NULL);
+> -}
+> -
+>  static void virtio_pci_transitional_instance_init(Object *obj)
+>  {
+>      VirtIOPCIProxy *proxy =3D VIRTIO_PCI(obj);
+> @@ -1938,14 +1931,13 @@ static void virtio_pci_non_transitional_instanc=
+e_init(Object *obj)
+> =20
+>  void virtio_pci_types_register(const VirtioPCIDeviceTypeInfo *t)
+>  {
+> +    char *base_name =3D NULL;
+>      TypeInfo base_type_info =3D {
+>          .name          =3D t->base_name,
+>          .parent        =3D t->parent ? t->parent : TYPE_VIRTIO_PCI,
+>          .instance_size =3D t->instance_size,
+>          .instance_init =3D t->instance_init,
+>          .class_size    =3D t->class_size,
+> -        .class_init    =3D virtio_pci_base_class_init,
+> -        .class_data    =3D (void *)t,
+>          .abstract      =3D true,
+>      };
+>      TypeInfo generic_type_info =3D {
+> @@ -1961,13 +1953,20 @@ void virtio_pci_types_register(const VirtioPCID=
+eviceTypeInfo *t)
+> =20
+>      if (!base_type_info.name) {
+>          /* No base type -> register a single generic device type */
+> -        base_type_info.name =3D t->generic_name;
+> -        base_type_info.class_init =3D virtio_pci_generic_base_class_in=
+it;
+> -        base_type_info.interfaces =3D generic_type_info.interfaces;
+> -        base_type_info.abstract =3D false;
+> -        generic_type_info.name =3D NULL;
+> +        /* use intermediate %s-base-type to add generic device props *=
+/
+> +        base_name =3D g_strdup_printf("%s-base-type", t->generic_name)=
+;
+> +        base_type_info.name =3D base_name;
+> +        base_type_info.class_init =3D virtio_pci_generic_class_init;
+> +
+> +        generic_type_info.parent =3D base_name;
+> +        generic_type_info.class_init =3D virtio_pci_base_class_init;
+> +        generic_type_info.class_data =3D (void *)t;
 
-On Fri, Jun 7, 2019 at 2:46 AM Alistair Francis <alistair23@gmail.com> wrote:
->
-> On Thu, Jun 6, 2019 at 5:55 AM Bin Meng <bmeng.cn@gmail.com> wrote:
-> >
-> > On Thu, May 30, 2019 at 11:36 AM Bin Meng <bmeng.cn@gmail.com> wrote:
-> > >
-> > > Hi Alistair,
-> > >
-> > > On Thu, May 30, 2019 at 11:14 AM Alistair Francis <alistair23@gmail.com> wrote:
-> > > >
-> > > > On Wed, May 29, 2019 at 1:52 AM Bin Meng <bmeng.cn@gmail.com> wrote:
-> > > > >
-> > > > > The largest pci bus number should be calculated from ECAM size,
-> > > > > instead of its base address.
-> > > > >
-> > > > > Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
-> > > >
-> > > > This seems ok, can you maybe explain what this fixes?
-> > > >
-> > >
-> > > The logic is wrong, as the commit message said. With current wrong
-> > > logic, the largest pci bus number encoded in "bus-ranges" property was
-> > > wrongly set to 0x2ff in this case. Per pci spec, the bus number should
-> > > not exceed 0xff.
-> > >
-> >
-> > Ping?
->
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Why are you using virtio_pci_generic_class_init for the base
+class, and virtio_pci_base_class_init for the subclass, but doing
+exactly the opposite when t->base_name is set?
 
-Can this go in the 4.1 PR?
+Isn't it simpler to just initialize base_type_info.name and leave
+all the rest alone?  Patch below.
 
-Regards,
-Bin
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index e6d5467e54..3ee50a0783 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -1913,13 +1913,6 @@ static void virtio_pci_generic_class_init(ObjectCl=
+ass *klass, void *data)
+     dc->props =3D virtio_pci_generic_properties;
+ }
+=20
+-/* Used when the generic type and the base type is the same */
+-static void virtio_pci_generic_base_class_init(ObjectClass *klass, void =
+*data)
+-{
+-    virtio_pci_base_class_init(klass, data);
+-    virtio_pci_generic_class_init(klass, NULL);
+-}
+-
+ static void virtio_pci_transitional_instance_init(Object *obj)
+ {
+     VirtIOPCIProxy *proxy =3D VIRTIO_PCI(obj);
+@@ -1938,8 +1931,11 @@ static void virtio_pci_non_transitional_instance_i=
+nit(Object *obj)
+=20
+ void virtio_pci_types_register(const VirtioPCIDeviceTypeInfo *t)
+ {
++    char *base_name =3D t->base_name ?
++                      NULL :
++                      g_strdup_printf("%s-base-type", t->generic_name);
+     TypeInfo base_type_info =3D {
+-        .name          =3D t->base_name,
++        .name          =3D t->base_name ?: base_name,
+         .parent        =3D t->parent ? t->parent : TYPE_VIRTIO_PCI,
+         .instance_size =3D t->instance_size,
+         .instance_init =3D t->instance_init,
+@@ -1959,21 +1955,8 @@ void virtio_pci_types_register(const VirtioPCIDevi=
+ceTypeInfo *t)
+         },
+     };
+=20
+-    if (!base_type_info.name) {
+-        /* No base type -> register a single generic device type */
+-        base_type_info.name =3D t->generic_name;
+-        base_type_info.class_init =3D virtio_pci_generic_base_class_init=
+;
+-        base_type_info.interfaces =3D generic_type_info.interfaces;
+-        base_type_info.abstract =3D false;
+-        generic_type_info.name =3D NULL;
+-        assert(!t->non_transitional_name);
+-        assert(!t->transitional_name);
+-    }
+-
+     type_register(&base_type_info);
+-    if (generic_type_info.name) {
+-        type_register(&generic_type_info);
+-    }
++    type_register(&generic_type_info);
+=20
+     if (t->non_transitional_name) {
+         const TypeInfo non_transitional_type_info =3D {
+@@ -2005,6 +1988,7 @@ void virtio_pci_types_register(const VirtioPCIDevic=
+eTypeInfo *t)
+         };
+         type_register(&transitional_type_info);
+     }
++    g_free(base_name);
+ }
+=20
+ /* virtio-pci-bus */
+
+
+--=20
+Eduardo
 
