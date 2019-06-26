@@ -6,39 +6,40 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB697C48BD6
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 16:37:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5E98C48BD6
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 16:38:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C36A621726
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 16:37:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C36A621726
+	by mail.kernel.org (Postfix) with ESMTPS id 78B7F20644
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 16:38:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78B7F20644
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgAvE-0000RB-0u
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 12:37:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56535)
+	id 1hgAw4-0001Bc-PG
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 12:38:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57488)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hgAis-0008WQ-1h
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 12:24:39 -0400
+ (envelope-from <laurent@vivier.eu>) id 1hgAn3-0002L5-VW
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 12:28:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hgAiq-0001dc-Rw
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 12:24:37 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:37735)
+ (envelope-from <laurent@vivier.eu>) id 1hgAn3-0005hh-0Y
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 12:28:57 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:57007)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1hgAin-0001V9-Mu; Wed, 26 Jun 2019 12:24:33 -0400
+ id 1hgAn0-0005eb-IP; Wed, 26 Jun 2019 12:28:54 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MnJUy-1iPA6H2taW-00jHG3; Wed, 26 Jun 2019 18:24:01 +0200
+ (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MxUfh-1iUOr71fLd-00xtrV; Wed, 26 Jun 2019 18:28:36 +0200
+From: Laurent Vivier <laurent@vivier.eu>
 To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
  qemu-devel@nongnu.org
 References: <20190605131221.29432-1-marcandre.lureau@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
+ <b66f43e4-e176-67d7-388b-23e04cff0884@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -82,33 +83,33 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <b66f43e4-e176-67d7-388b-23e04cff0884@vivier.eu>
-Date: Wed, 26 Jun 2019 18:24:00 +0200
+Message-ID: <8212139b-80a7-3af8-6af1-0c004ec2fe82@vivier.eu>
+Date: Wed, 26 Jun 2019 18:28:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190605131221.29432-1-marcandre.lureau@redhat.com>
+In-Reply-To: <b66f43e4-e176-67d7-388b-23e04cff0884@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:sgToY25GgXX4cUidRLCh+ClACiu7oYUeje8shy0NIt/M32XI9t4
- OfhZ6gvQQDDW5H7BfR2Bgl+tZDoajLwt6N2bXT+YGFAZwzVOJYPL/Zv8tQXoPeDhucii/Ad
- zChPPf4ey9uvYvR1kHh3QDjchn8dfPQKThkrdlos1WHhcyk47ZYDSJg9j+6gz5vPL2nEr/E
- +lhIMr5WxtPxODbDEAjzw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:NRPpSu8hpUw=:+hf0B8ZDGpv9MXqoEaeU1Z
- sEglkWhQ15ZOYUiw38d5Nxg9JIHsmo3g46Q2WllL9nOyyZTUrWBwQFLoa3qaZGHrOk2yrmw9N
- XVi5yazhuOo4bCv5B9pZR3RLdXuytU6wBs1LfBHPPnULUXkvFmILh7qE1BGtJy5OuMgKI/C4m
- zvOZcsoKZUPVHCGgx0DO8ReZh1SLHf6nJ2v8ke1vLfsuqYvQpfhiopAMs2IcqRIdc0pIwpVrU
- 83O27lxPIPOnzvZEuwprwC6dmsiPtfAKvNuQtg98FaTdHOs1IdhVEWnBuvZ2FXVjt1T8Cyly0
- 0n+cpB3Gs6i6j5MIjCTfV0yvHoBNKTsPbr2+qNndF994C9/elb+hQ/GkqdgA/4B8Et2n3oCy0
- V3M2GB0W+zmSqOyee9KHxqiNNRfT4Bv+LXz4ANaNF0m/hrWYRgTJEHLqzPeW4orMRLeA7Ljpb
- rq0YIoMfCvM3cMaHTsczNWhKp3O8XSQ8nPMzjSoAu9zesKE4nLYw48Lq3ib2rVpm2yE4eOXk3
- gSfY4sYOYMIAHL0q6YR6LIzBSsC7jJ643kim2oW9IgD0P36adCpKwmp91iXOkTbWvek3VnQ9l
- gOGotmi9HYL5SbDh93nPFE+qvHCjI9jnmfODaOeoPVJAqpSOsqfkQYMtVcs0ZtrEJ89g922vZ
- EWRrOFQ+xTCpuSQpacHxQFjA4vXvxb3wbSlKWPWIPPU013MGjjjkr5D9vncMOPOAI21ozmD99
- xUNsfms/0DKtgs7ELy8bMXblFXbrLaag80ggOgid8/2iM96EnacNNFc30oI=
+X-Provags-ID: V03:K1:bj854EWvvWZ+CYMLSosg+n9yAbPLn+YCYEEpM6ZTH9uolkWAmjH
+ 25GkDZbwCF2aNl2KHARxl4IUzfVgBgYv9TiXwSabK1Afr4FNawn/CRTQZulT2exPkO7+8kG
+ 4yvqAd0uiLs5j5tCwD9LH23HB1iN3Jrg0frnJ6TA1sRLz1YuNUin/88TGy5ScWD6bERgLNO
+ M2ObohyR0OG+xjGsEo9kQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:h7QtK/8Ylpg=:+CBVo2X9UakLs43IxwqGWQ
+ 351EE+yjv75QjZnUZvoEKRjbqZj9oPjEm2OI2PdO1w0OxJyg8R6MV0zNGmhpZ6KH8rlKnTLpW
+ x17UZoPtS3V839c9y0UKQcR33h4uFuNHHHM0c5kbbqqH4P+qR6W/pIOG9jZBC1YENxi1tvE1w
+ QOFxgXI44v86S8CmYmK57tsovh9EY5x5s2QW2jDhy5RUXZRnLisYm64Lv0RbPijzUY+eF9COC
+ vVZT0c3LNsttgWtif+RV3U7g/cgZDx5snamEqO2BVMTN+kmhmDcC5PLTl8D/KRt1KQpdAMXgF
+ Ty7gDLvoXKasdJ00es6MtAtpof50QVe5akTADNZGJdpLgIxiakLT9mI9SVzQAJOGEx8b5IbVM
+ YVHeCOLsc2QHhKUtT0/vHUOAkG33GXzt478gfD7Gd8qopmborKsEO4HXo+CgGMgivgpaoaRcz
+ cUox14gVicz+Wvb2GJ2NV09huZP9E7c0o8RsXkiq/Yvo7cGfdVpwQg3UerNbGtzjhg42hrm4f
+ HL72fIbG4Qf+Ty6S8WeHQFq1qInYMIHN64Z6jdQw8/C2aBahQL3Yt6GPMMopLdqfADWOvGKKE
+ a9NPI8GNT+VP1lwg7vt8LQ00J4o5Fackqn2XEK+iyW4Ya7UOyWybgvv3X8DODt+hiCBWMLQOf
+ uMlu0nK9LKs13y9Yttyc6zgPiiZsh5KfiGSL8WfnFoFSIjWkBKoX2MEjT09DAdUN7yUafCh8G
+ tVZRArQnu6CNBsO6Nnhwe59g+mCcg0Ck5OYaSYk4cIxPa8FmaZWuuF+sf3U=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.133
+X-Received-From: 212.227.126.134
 Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] docs/vhost-user.json: some
  firmware.json copy leftovers
 X-BeenThere: qemu-devel@nongnu.org
@@ -127,42 +128,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 05/06/2019 à 15:12, Marc-André Lureau a écrit :
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-> ---
->  docs/interop/vhost-user.json | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+Le 26/06/2019 à 18:24, Laurent Vivier a écrit :
+> Le 05/06/2019 à 15:12, Marc-André Lureau a écrit :
+>> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+>> ---
+>>  docs/interop/vhost-user.json | 6 +++---
+>>  1 file changed, 3 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/docs/interop/vhost-user.json b/docs/interop/vhost-user.json
+>> index ae88c03117..da6aaf51c8 100644
+>> --- a/docs/interop/vhost-user.json
+>> +++ b/docs/interop/vhost-user.json
+>> @@ -178,11 +178,11 @@
+>>  #
+>>  #   - /usr/share/qemu/vhost-user/50-crosvm-gpu.json
+>>  #
+>> -# then the sysadmin can prevent the default QEMU being used at all with
+>> +# then the sysadmin can prevent the default QEMU GPU being used at all with
+>>  #
+>>  #   $ touch /etc/qemu/vhost-user/50-qemu-gpu.json
+>>  #
+>> -# The sysadmin can replace/alter the distro default OVMF with
+>> +# The sysadmin can replace/alter the distro default QEMU GPU with
+>>  #
+>>  #   $ vim /etc/qemu/vhost-user/50-qemu-gpu.json
+>>  #
+>> @@ -190,7 +190,7 @@
+>>  #
+>>  #   $ vim /etc/qemu/vhost-user/10-qemu-gpu.json
+>>  #
+>> -# or they can provide a parallel OVMF with lower priority
+>> +# or they can provide a parallel QEMU GPU with lower priority
+>>  #
+>>  #   $ vim /etc/qemu/vhost-user/99-qemu-gpu.json
+>>  #
+>>
 > 
-> diff --git a/docs/interop/vhost-user.json b/docs/interop/vhost-user.json
-> index ae88c03117..da6aaf51c8 100644
-> --- a/docs/interop/vhost-user.json
-> +++ b/docs/interop/vhost-user.json
-> @@ -178,11 +178,11 @@
->  #
->  #   - /usr/share/qemu/vhost-user/50-crosvm-gpu.json
->  #
-> -# then the sysadmin can prevent the default QEMU being used at all with
-> +# then the sysadmin can prevent the default QEMU GPU being used at all with
->  #
->  #   $ touch /etc/qemu/vhost-user/50-qemu-gpu.json
->  #
-> -# The sysadmin can replace/alter the distro default OVMF with
-> +# The sysadmin can replace/alter the distro default QEMU GPU with
->  #
->  #   $ vim /etc/qemu/vhost-user/50-qemu-gpu.json
->  #
-> @@ -190,7 +190,7 @@
->  #
->  #   $ vim /etc/qemu/vhost-user/10-qemu-gpu.json
->  #
-> -# or they can provide a parallel OVMF with lower priority
-> +# or they can provide a parallel QEMU GPU with lower priority
->  #
->  #   $ vim /etc/qemu/vhost-user/99-qemu-gpu.json
->  #
-> 
+> Applied to my trivial-patches branch.
 
-Applied to my trivial-patches branch.
+In fact, no, it has already been merged.
 
 Thanks,
 Laurent
