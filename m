@@ -7,75 +7,78 @@ X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA7DAC48BD6
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 01:51:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE927C48BD5
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 01:53:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 415982085A
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 01:51:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B8CB7208E3
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 01:53:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Znd3haHX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 415982085A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JBp0SL8V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8CB7208E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hfx5j-0007wY-4X
-	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 21:51:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40184)
+	id 1hfx7S-0002Wb-SA
+	for qemu-devel@archiver.kernel.org; Tue, 25 Jun 2019 21:53:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40489)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bmeng.cn@gmail.com>) id 1hfx24-0005v8-71
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 21:47:33 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1hfx2L-0006Dq-C7
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 21:47:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1hfx22-00031y-NA
- for qemu-devel@nongnu.org; Tue, 25 Jun 2019 21:47:31 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:41057)
+ (envelope-from <bmeng.cn@gmail.com>) id 1hfx2K-0003Xu-8F
+ for qemu-devel@nongnu.org; Tue, 25 Jun 2019 21:47:49 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:36571)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1hfx1z-0002so-Rh; Tue, 25 Jun 2019 21:47:28 -0400
-Received: by mail-ed1-x543.google.com with SMTP id p15so757317eds.8;
- Tue, 25 Jun 2019 18:47:26 -0700 (PDT)
+ id 1hfx2H-0003Ql-NC; Tue, 25 Jun 2019 21:47:45 -0400
+Received: by mail-ed1-x544.google.com with SMTP id k21so795124edq.3;
+ Tue, 25 Jun 2019 18:47:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ZpsEJNg6yZHKk6edmvTSPFaui+jfap7veYLi+NiMOus=;
- b=Znd3haHXla2PR/Ffl+g6X61ZnGemIdXhNwAgpmEw5refu2AAski97xz+IHmfbYfLqQ
- dlvrQllKcTRtGaniPEdael7JBxStXswOVyR5Eyu4QC/B3VyLrQ3eyVN8Was6xu6fnMge
- 9e5vH5txOWNA9+YeJrojEk+Dm5yYCRAWgZcfS+k2y3ATc1QG4T7/Vkj2uqqHDhrhjy47
- yyxh1fZXYQfOwMMv2WY8s0MS8OhhzQ6DccoQIyB34Gmku3J628MWqyHJIx9tCvtVrBuM
- NlgDimz1uIj2U2/swRJUKFThAjyK3Dh3EdEphVF4rLl41YSeR7LRh5o24dESbqCLwv3Q
- k9Ig==
+ :cc; bh=aijH6h8Z+aHSNtZKIGH50atEy0CtUTuJRTMmgt215Rc=;
+ b=JBp0SL8VU0hVJlwLg22CgU/qyaDPrOJ4QEOorwO+vOJoqdUvZ3gvxGtsRHzw1VfB5r
+ SJLidp5fN7k5v0IUOX0bBdDdHp97VAjDrumff2v03jKUFVl5HrpzxTqVVLXh5YS+eIey
+ q0ubuCJDb2u1hMw00g72qIGs84KGFG6PsNtvBUHW3FfG5koIddLW4bkcDaOXtN29qTmV
+ PVnSCdMPnSgtSNZu8bNAj4ouF0RdvuJvHAFYn5etQE/Enb/5+GbULA8VjQ23LCia8SoN
+ +B8D2vacyLI4FEFIFpIAZKfAlnouZmC4eXSfRmyho9ZQB2kxOm3xVa4WV5a9RhncSwZA
+ 5XwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=ZpsEJNg6yZHKk6edmvTSPFaui+jfap7veYLi+NiMOus=;
- b=dHMam5ygdnxu04zixDOmGTPVVXzAX9EuGdyP2N9NA38D8Mm+KvCxjk2MiUGtbBV1Fg
- PVn50cGRV2nZ8CtU02qR/VgKnBJUm3KIGHAfgfEQqTofAE+/jiNmB3wbS4VnpgXBlM29
- R49MG8nH8pPvLaqFdvhPD2vhKYuI8DTKCe1Ob3syehrOZT+804x7mYN/fpp4HE7+5KUg
- 2gP+UwjaRXdSxaR/rQZdXkxyMXIFyXE+JBOT6AsNCldQPp9qrxhEjLDt/cjRjCo0zaT5
- V/LykCmZGPmJksv4SXi7LcrEyITOrUpZaCDvLwopkDUIJbYenKIy8fRyUHtd1rR0bqFc
- ek9A==
-X-Gm-Message-State: APjAAAU4mWOLiPxQNQjlNeoTFZwCKaNEIQjEtgjr5SQYqrqwJMLxalZ4
- F2HVRC1qnPKsLHYuabPOloLj1eSjSQnF8aQjvmgg3s7/
-X-Google-Smtp-Source: APXvYqxzM7uErjl7y5wNZhPDI4gZ0yvCLudnrRIgg3l72q96Kr1JwvtErJSH5y+B5CeOPjO8+0+R6X/MLp5sXBZ0vmk=
-X-Received: by 2002:a50:ad0c:: with SMTP id y12mr1788105edc.25.1561513646064; 
- Tue, 25 Jun 2019 18:47:26 -0700 (PDT)
+ bh=aijH6h8Z+aHSNtZKIGH50atEy0CtUTuJRTMmgt215Rc=;
+ b=h7f6WaZCpcfzJ3Xg+EQVPZVF1cIw1ma/mEmiUwFvQIvN0R4a0gp03ycqshsleJx5av
+ h5q4YY3JSz2UdqSBiSAVMKgKtZcr2pKO6qLdXbYnTWN3FR2Z+FN5b3ugKBoKQx4HDde1
+ v+wUwPtOtiuDtWEOEh0RUek7ev9Fv5lVzV+nocy0XdYoxH5fwpq6i0smKLYSsUfAijHD
+ EuXiPfCvKiXi6JWKJpXEyWRrPOdWqhaL48WyStJ+6jFmf3Q/enMrmtPvm8MQsrrklGNM
+ uCDrRRjPz9Hz5bZ+ZytCZQKWUs1aQGTa9PnTNrNmE9h+6k+dx4GeiqkHZ4XPjtsPpvY2
+ Ej+w==
+X-Gm-Message-State: APjAAAVJeWh3mkNBgDASbic05NVbFecJNEOwqQlrqhuJrLFzFld0zGZe
+ G7VpQN7Wxsa6f7hPyioTyiSx4slclos5tRhM2cwlyo3Q
+X-Google-Smtp-Source: APXvYqznkXPKAe3NnJTOjzzHsdOEUKvhSX2HpycfBdPckCav71KZVHnTXkSb1vDse76SbWpIPQrbe+9C4F76uO9ZPJo=
+X-Received: by 2002:a50:b388:: with SMTP id s8mr1795255edd.15.1561513664653;
+ Tue, 25 Jun 2019 18:47:44 -0700 (PDT)
 MIME-Version: 1.0
-References: <1558108285-19571-1-git-send-email-bmeng.cn@gmail.com>
- <d5299afa569640c91c4206e38e7098320a4d00b2.camel@wdc.com>
-In-Reply-To: <d5299afa569640c91c4206e38e7098320a4d00b2.camel@wdc.com>
+References: <1559119921-6098-1-git-send-email-bmeng.cn@gmail.com>
+ <CAKmqyKNAL8KtVgfCx6yhaNYEL=_wnZ5Vf1eSjxwtg0x6_q+UHw@mail.gmail.com>
+ <CAEUhbmXLr3zXhbphXRvqfyW1FH9qo3yoPwnFoRoYNtbwkrBBKw@mail.gmail.com>
+ <CAEUhbmUAKoFPqBLVW4FHmiESaF8fqEtjqDb1LKf4ivG3g2z0ZQ@mail.gmail.com>
+ <CAKmqyKPO8CERWMZQEfEM1Q7HBTysB8cG5LsR1wdc334YX5tmgg@mail.gmail.com>
+In-Reply-To: <CAKmqyKPO8CERWMZQEfEM1Q7HBTysB8cG5LsR1wdc334YX5tmgg@mail.gmail.com>
 From: Bin Meng <bmeng.cn@gmail.com>
-Date: Wed, 26 Jun 2019 09:47:15 +0800
-Message-ID: <CAEUhbmVjExqi9dbq2yuKC7mw1GczxY36AeUAwkQz2+Cc5KWnKA@mail.gmail.com>
-To: Alistair Francis <Alistair.Francis@wdc.com>
+Date: Wed, 26 Jun 2019 09:47:33 +0800
+Message-ID: <CAEUhbmVGdeX7j1ep1vJKhZ8a-4K2j-G40LjBJqDkXOi4WM-B9w@mail.gmail.com>
+To: Alistair Francis <alistair23@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::543
-Subject: Re: [Qemu-devel] [PATCH 1/2] riscv: sifive_u: Do not create
- hard-coded phandles in DT
+X-Received-From: 2a00:1450:4864:20::544
+Subject: Re: [Qemu-devel] [PATCH] riscv: virt: Correct pci "bus-range"
+ encoding
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,28 +90,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "palmer@sifive.com" <palmer@sifive.com>,
- "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@sifive.com>, "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Hi,
 
-On Sat, May 18, 2019 at 5:34 AM Alistair Francis
-<Alistair.Francis@wdc.com> wrote:
+On Fri, Jun 7, 2019 at 2:46 AM Alistair Francis <alistair23@gmail.com> wrote:
 >
-> On Fri, 2019-05-17 at 08:51 -0700, Bin Meng wrote:
-> > At present the cpu, plic and ethclk nodes' phandles are hard-coded
-> > to 1/2/3 in DT. If we configure more than 1 cpu for the machine,
-> > all cpu nodes' phandles conflict with each other as they are all 1.
-> > Fix it by removing the hardcode.
+> On Thu, Jun 6, 2019 at 5:55 AM Bin Meng <bmeng.cn@gmail.com> wrote:
 > >
-> > Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+> > On Thu, May 30, 2019 at 11:36 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+> > >
+> > > Hi Alistair,
+> > >
+> > > On Thu, May 30, 2019 at 11:14 AM Alistair Francis <alistair23@gmail.com> wrote:
+> > > >
+> > > > On Wed, May 29, 2019 at 1:52 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+> > > > >
+> > > > > The largest pci bus number should be calculated from ECAM size,
+> > > > > instead of its base address.
+> > > > >
+> > > > > Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+> > > >
+> > > > This seems ok, can you maybe explain what this fixes?
+> > > >
+> > >
+> > > The logic is wrong, as the commit message said. With current wrong
+> > > logic, the largest pci bus number encoded in "bus-ranges" property was
+> > > wrongly set to 0x2ff in this case. Per pci spec, the bus number should
+> > > not exceed 0xff.
+> > >
+> >
+> > Ping?
 >
 > Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
->
 
 Can this go in the 4.1 PR?
 
