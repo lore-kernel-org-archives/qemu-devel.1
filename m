@@ -2,67 +2,55 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B39CC48BDA
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 15:18:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA6FC48BD6
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 15:20:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47D092080C
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 15:18:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47D092080C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 872F02086D
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 15:20:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 872F02086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=collabora.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hg9gd-0001xC-IQ
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 11:18:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40415)
+	id 1hg9jE-0004Bh-Qr
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 11:20:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40650)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hg9eN-0001EC-IX
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:15:59 -0400
+ (envelope-from <antonio.ospite@collabora.com>) id 1hg9fc-00021D-Ln
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:17:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hg9eK-0004gY-41
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:15:55 -0400
-Resent-Date: Wed, 26 Jun 2019 11:15:55 -0400
-Resent-Message-Id: <E1hg9eK-0004gY-41@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21857)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hg9eJ-0004T6-SB
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:15:52 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1561562113; cv=none; d=zoho.com; s=zohoarc; 
- b=kT4F7NuMM/SS0Sn1n5BtC/jlyIwucOCPqdu/cVJcopZP5U2uxQhJ0wwAEqdXgvEIpEIBcWyaX5sAaus74LLXHOD1pDD4961SHLlLGP2yI3EYhTqLEDK0NiiHE1/OpGL/5EWRBXnK/v6RrpnA35BwKNPM34BWST/Kk4gjW6NlDvg=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1561562113;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=EqG8LubwFKuAzbKCwz9z7Kd0IyME9mquLZ4k77WE63I=; 
- b=Jsw+tjZz2y1CZtNgHvETeFA+sJG+DoFciq1/s6RIINDySy7rkW7twtZlddnQiaekgvzmdRP1116sRDFSJ6IpMuQBj4wGqnH/aH73AQYB27N2hmIYpWymiVXhLagY7SybhSHnHJ1f0xQpCF2MLG9H4VYcyUWpy907TKOHJabJBhY=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1561562111588248.91895174243075;
- Wed, 26 Jun 2019 08:15:11 -0700 (PDT)
-Message-ID: <156156211053.6332.18156620782204988441@c4a48874b076>
-In-Reply-To: <20190626150855.27446-1-laurent@vivier.eu>
+ (envelope-from <antonio.ospite@collabora.com>) id 1hg9fX-0005cx-HC
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:17:09 -0400
+Received: from bhuna.collabora.co.uk ([46.235.227.227]:40396)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <antonio.ospite@collabora.com>)
+ id 1hg9fS-0005VY-IP
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 11:17:04 -0400
+Received: from [127.0.0.1] (localhost [127.0.0.1]) (Authenticated sender: ao2)
+ with ESMTPSA id B50D8286280
+To: Antonio Ospite <ao2@ao2.it>, qemu-devel@nongnu.org
+References: <20190526144747.30019-1-ao2@ao2.it>
+From: Antonio Ospite <antonio.ospite@collabora.com>
+Message-ID: <adce6062-9289-afe8-b26a-949144700656@collabora.com>
+Date: Wed, 26 Jun 2019 17:16:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: laurent@vivier.eu
-Date: Wed, 26 Jun 2019 08:15:11 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <20190526144747.30019-1-ao2@ao2.it>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.218
-Subject: Re: [Qemu-devel] [PATCH] linux-user: move
- QEMU_IFLA_BR_MULTI_BOOLOPT to the good function
+X-Received-From: 46.235.227.227
+Subject: Re: [Qemu-devel] [PATCH v3 0/2] configure: disallow spaces and
+ colons in source path and build path
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,19 +62,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: riku.voipio@iki.fi, qemu-devel@nongnu.org, laurent@vivier.eu
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYyNjE1MDg1NS4yNzQ0
-Ni0xLWxhdXJlbnRAdml2aWVyLmV1LwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCBidWlsZCB0
-ZXN0IG9uIHMzOTB4IGhvc3QuIFBsZWFzZSBmaW5kIHRoZSBkZXRhaWxzIGJlbG93LgoKCgoKCgpU
-aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkw
-NjI2MTUwODU1LjI3NDQ2LTEtbGF1cmVudEB2aXZpZXIuZXUvdGVzdGluZy5zMzkweC8/dHlwZT1t
-ZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
-cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
-ZGV2ZWxAcmVkaGF0LmNvbQ==
+On 26/05/19 16:47, Antonio Ospite wrote:
+> Hi,
+> 
+> Here is a v3 set to address
+> https://bugs.launchpad.net/qemu/+bug/1817345
+> 
+> CCing Laurent Vivier as the patch is going through the trivial-patches
+> branch.
+>
+
+Ping.
+
+I cannot see this in the trivial-patches repository nor in mainline qemu.
+
+Thanks,
+    Antonio
+
+> The series follows up to:
+> https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg00562.html
+> 
+> Changes since v2:
+>    - Shorten 'if' check as suggested by Eric Blake in
+>      https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01190.html
+> 
+>    - Added Reviewed-by tags by Eric Blake.
+> 
+> 
+> Changes since v1:
+>    - Add a preparatory patch to set source_path only once and in a more
+>      robust way.
+> 
+>    - Move the checks in configure after the source_path definition to
+>      avoid using realpath which is not available everywhere.
+> 
+>    - Cover also the build path in Makefile. An extensive explanation of
+>      why I think this is needed is here:
+>      https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg05398.html
+> 
+> Thank you,
+>     Antonio
+> 
+> 
+> Antonio Ospite (2):
+>    configure: set source_path only once and make its definition more
+>      robust
+>    configure: disallow spaces and colons in source path and build path
+> 
+>   Makefile  |  4 ++++
+>   configure | 11 ++++++++---
+>   2 files changed, 12 insertions(+), 3 deletions(-)
+> 
 
 
