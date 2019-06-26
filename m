@@ -6,67 +6,68 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 513C4C48BD3
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 08:26:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B39EC48BD8
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 08:26:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EBD020B7C
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 08:26:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EBD020B7C
+	by mail.kernel.org (Postfix) with ESMTPS id 097EA20663
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 08:26:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 097EA20663
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hg3GM-0002sE-3Z
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 04:26:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45545)
+	id 1hg3GN-0002yG-9I
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 04:26:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45567)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <palmer@dabbelt.com>) id 1hg3F9-0001S5-Ju
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 04:25:28 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1hg3FB-0001Tj-8Z
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 04:25:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1hg3F8-0002ru-6h
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 04:25:27 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:34652)
+ (envelope-from <palmer@dabbelt.com>) id 1hg3FA-0002tE-6W
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 04:25:29 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:45745)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hg3F7-0002rU-Vy
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 04:25:26 -0400
-Received: by mail-pg1-f193.google.com with SMTP id p10so874293pgn.1
- for <qemu-devel@nongnu.org>; Wed, 26 Jun 2019 01:25:25 -0700 (PDT)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hg3FA-0002sm-0E
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 04:25:28 -0400
+Received: by mail-pf1-f195.google.com with SMTP id r1so938479pfq.12
+ for <qemu-devel@nongnu.org>; Wed, 26 Jun 2019 01:25:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
  :mime-version:content-transfer-encoding;
- bh=h8oU2b5N/pf/gNarMwQOz8ETjwfR+tQx32syhVexM+k=;
- b=Dm5vGRTS6syoFgq9f5c67IWU/On2UEa9DSO9IAxojwEFQYZq6ZBagSeHv32KgyhB/e
- K7+npttFIYdk47Kw5gcNM4E+9kpSvUVrWzRn3zk5nvZjlAPUswTFh84T0bI6vSyzlmW8
- vgheO4a2xcmxgLOoZtaLAuevk1b/zFhQHT11fHlYc/wv8SzfyYlLBrkY2vU71uWjC4nO
- TdblsBqDmIUG/GQRZykBYF5ZdmxNWNi4iSQZicyokOWwpnXXa0w4wu37NAXqAACQT7Ye
- e7PEy+V4oYlUzojgSH4BX8J+8sZnsnty3zMZhz7xI/NJJ1mGaeTmCLe3S88nKvR2QMN0
- Rz3A==
-X-Gm-Message-State: APjAAAXQVvWGzf12wo0zERf900qnELOlM6a6Gf/yqu9++gKaI1tkdXiq
- vGAe+AMu5TcveMdH0JuW+9ySyA==
-X-Google-Smtp-Source: APXvYqzkJMiLNh9vqIy3aFQPO/lWLatci+1Bvxkz5o5ncbbsmFQggrxvkxVcAcyx89wxiJPITIv3gw==
-X-Received: by 2002:a63:2323:: with SMTP id j35mr1767083pgj.166.1561537524533; 
- Wed, 26 Jun 2019 01:25:24 -0700 (PDT)
+ bh=sA9yQJwjq/CErx0u41h2VNIfrOSmE7x6FZeiFsbfxIo=;
+ b=Ex9AJ5clWKVluNqLC9lMZYwcnQcf1lW0PAh1OABMinhqGlNY+Bgf8wyNQXeyRirDtg
+ 1WDlWmCQ7cTvrtsuzYIStw5y8Q5RAD4iqwUnaPhHMXinUyg7IHjuXVF3+ZBdhOrnu6il
+ n+mCiLW4pjrAcFE7/YFN7P7ifFbdQYd0o6Gu7UfiDiF+u//62iLPATo/hXY2NW29tNAE
+ nG8vRz/PjO9QgkZzSmLzZ9/I/96bSZAvwTTCZdou4Nzn9QirDHi82pWqz+cq1lzwv9E+
+ sXYiDiqRHbswKJ9yvI/1B7kxVxYTjEpJqRGKdsVyOnKE72zuIa16cLor9TeJnOar61I+
+ y6DA==
+X-Gm-Message-State: APjAAAVy90ajH82cXPhOup0nEmYK2Rqj292kILT2JD2GVaq+OKMRQHMS
+ 1NfjPmQREbUg692QwFqMaXiP3g==
+X-Google-Smtp-Source: APXvYqzihv0ls3BNF+A5rd/OgNeyYKG7Jlg6b2421NuPrO5Hc+nALw3owAyTGbiYTKtP+pKkZ68skg==
+X-Received: by 2002:a17:90a:1aa4:: with SMTP id
+ p33mr3302666pjp.27.1561537526850; 
+ Wed, 26 Jun 2019 01:25:26 -0700 (PDT)
 Received: from localhost (220-132-236-182.HINET-IP.hinet.net.
  [220.132.236.182])
- by smtp.gmail.com with ESMTPSA id d12sm16914631pfd.96.2019.06.26.01.25.23
+ by smtp.gmail.com with ESMTPSA id 14sm27064073pfj.36.2019.06.26.01.25.26
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 26 Jun 2019 01:25:23 -0700 (PDT)
-Date: Wed, 26 Jun 2019 01:25:23 -0700 (PDT)
-X-Google-Original-Date: Wed, 26 Jun 2019 01:03:33 PDT (-0700)
-In-Reply-To: <CAEUhbmVdVXaFhM2b1U2d5G0My5Gq3cMM1zhQKU3n051KuXu4HQ@mail.gmail.com>
+ Wed, 26 Jun 2019 01:25:26 -0700 (PDT)
+Date: Wed, 26 Jun 2019 01:25:26 -0700 (PDT)
+X-Google-Original-Date: Wed, 26 Jun 2019 01:05:18 PDT (-0700)
+In-Reply-To: <CAEUhbmVZm-dhvT40Ck4d159SHin_D-U47+CHShjajzM1f-P9Gw@mail.gmail.com>
 From: Palmer Dabbelt <palmer@sifive.com>
 To: bmeng.cn@gmail.com
-Message-ID: <mhng-667253d2-f664-40a4-8849-fc1a08ffeaf7@palmer-si-x1e>
+Message-ID: <mhng-4265f77a-c58a-4851-871a-093b4212df1d@palmer-si-x1e>
 Mime-Version: 1.0 (MHng)
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.215.193
+X-Received-From: 209.85.210.195
 Subject: Re: [Qemu-devel] [PATCH for 4.1 v3] target/riscv: Expose time CSRs
  when allowed by [m|s]counteren
 X-BeenThere: qemu-devel@nongnu.org
@@ -87,52 +88,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 25 Jun 2019 23:54:06 PDT (-0700), bmeng.cn@gmail.com wrote:
-> Hi Palmer,
->
-> On Tue, Jun 25, 2019 at 5:57 PM Palmer Dabbelt <palmer@sifive.com> wrote:
+On Tue, 25 Jun 2019 23:58:34 PDT (-0700), bmeng.cn@gmail.com wrote:
+> On Wed, Jun 26, 2019 at 4:23 AM Jonathan Behrens <fintelia@gmail.com> wrote:
 >>
->> On Mon, 24 Jun 2019 16:03:20 PDT (-0700), fintelia@gmail.com wrote:
->> > Apparently my previous message didn't make it out onto the list (sorry
->> > about all these email glitches!). I've included the message again below.
->> > Hopefully either a patch like this one or something simpler that just hard
->> > codes mcounteren.TM to zero (so QEMU is at least conformant) can be merged
->> > in time for 4.1.
->> >
->> > On Fri, Jun 14, 2019 at 8:55 AM Jonathan Behrens <jonathan@fintelia.io>
->> > wrote:
->> >
->> >> I'm not sure that is accurate. Based on the discussion here
->> >> <https://forums.sifive.com/t/possible-bug-in-counteren-csrs/2123> the
->> >> HiFive Unleashed actually does support reading the timer CSR from
->> >> unprivileged modes (from that discussion it does so a little too well...
->> >> but it should presumably be fixed in later iterations of the processor).
->> >> And even if no real hardware supported this capability, it still might make
->> >> sense to provide it in QEMU as an optimization.
+>> I just did some testing on a HiFive Unleashed board and can confirm what
+>> you are saying. The low 5 bits of both mcounteren and scounteren are
+>> writable (if you try to write 0xFFFFFFFF to them, they'll take on the value
+>> 0x1F) but even with the TM bit set in both mcounteren and scounteren the
+>> rdtime instruction always generates an illegal instruction exception.
 >>
->> time and cycle are different registers: rdtime should trap, but rdcycle should
->> work.  The hardware traps rdtime into machine mode and emulates it via a memory
->> mapped register.  The bug in the FU540-C000 appears to be related to the
->> counter enables, not the presence of the counters.
 >
-> I don't think rdtime is required to mandatorily trap.
->
-> Per privileged spec v1.10, chapter 3.1.17 Counter-Enable Registers
-> ([m|h|s]counteren), it says:
->
-> "When the CY, TM, IR, or HPMn bit in the mcounteren register is clear,
-> attempts to read the cycle, time, instret, or hpmcountern register
-> while executing in S-mode or U-mode will cause an illegal instruction
-> exception."
->
-> In the same chapter, it also says:
->
-> "Implementations can convert reads of the time CSR into loads to the
-> memory-mapped mtime register, or hard-wire the TM bits in mxcounteren
-> to 0 and emulate this functionality in M-mode software."
->
-> So per my understanding when mcounteren.TM is set, rdtime should NOT trap.
+> Then I would think the FU540 is not spec complaint :)
 
-Implementations are allowed to implement the instruction, but all the exsting
-implementations trap to M-mode.
+Ya, it's an errata.  There's a handful of them :)
+
+>> Reading through the relevant chapter of the spec, I still think that having
+>> mcounteren.TM be writable but making rdtime unconditionally trap is
+>> non-conformant. If other people feel strongly that rdtime should always
+>
+> Agree. To test hardware (FU540) compatibility in QEMU, maybe we can
+> add a cpu property to allow hard-wiring mcounteren.TM to zero?
+
+In theory we should have properties to control the behavior of all WARL fields,
+but it's a lot of work.  I'd be happy to take a patch for any of them.
+
+>> require trapping into firmware then the natural change would be to simply
+>> hardwire mcounteren.TM to zero (the value in scounteren wouldn't matter in
+>> that case so it could be left writable). My own (biased) personal feeling
+>> is that this full implementation makes sense at least for the `virt`
+>> machine type because it represents a clear case where deviating from
+>> current hardware enables a performance boost, and would not break
+>> compatibility with any current software: both OpenSBI and BBL try to enable
+>> hardware handling of rdtime when the platform claims to support it.
+>>
+>
+> Regards,
+> Bin
 
