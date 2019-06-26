@@ -2,63 +2,96 @@ Return-Path: <SRS0=5EQe=UZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E2A2C48BD8
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 12:43:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FBEAC48BD3
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 12:45:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFB5E214AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 12:43:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFB5E214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 91D062133F
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Jun 2019 12:45:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="KBmC0MtM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91D062133F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39824 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hg7Gy-00062U-9h
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 08:43:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56355)
+	id 1hg7IX-0007HC-GO
+	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 08:45:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56090)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hg7DJ-0001Kg-Hz
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 08:39:50 -0400
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hg7Cf-0000Rk-7x
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 08:39:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hg7DI-0000Gf-0c
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 08:39:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54012)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>)
- id 1hg7DH-0000ER-MC; Wed, 26 Jun 2019 08:39:47 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5384230C120E;
- Wed, 26 Jun 2019 12:39:40 +0000 (UTC)
-Received: from localhost (ovpn-116-101.gru2.redhat.com [10.97.116.101])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 52A3160BF3;
- Wed, 26 Jun 2019 12:39:36 +0000 (UTC)
-Date: Wed, 26 Jun 2019 09:39:34 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Message-ID: <20190626123934.GZ1862@habkost.net>
-References: <20190625232333.30752-1-marcandre.lureau@redhat.com>
- <20190626015503.GX1862@habkost.net>
- <CAJ+F1CKWRvuDxNuidWPE6+A7gKmbJ2h9G3DcDDVbd24y1XMYKw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CKWRvuDxNuidWPE6+A7gKmbJ2h9G3DcDDVbd24y1XMYKw@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Wed, 26 Jun 2019 12:39:46 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] virtio-pci: fix missing device properties
+ (envelope-from <shmuel.eiderman@oracle.com>) id 1hg7Cd-0007HU-U6
+ for qemu-devel@nongnu.org; Wed, 26 Jun 2019 08:39:09 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:41744)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
+ id 1hg7CO-0006lZ-DK; Wed, 26 Jun 2019 08:38:54 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5QCY7pi193508;
+ Wed, 26 Jun 2019 12:38:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
+ bh=PG6+5eBzxS2ZYCiKxYtu/H0lFyJx2xVRNgzQO9/BhSw=;
+ b=KBmC0MtM3ixSd1efL6S3f3iZPorgsoh+ullMr2TozhkO8l30XkfBK6jNkWZX/0LronS/
+ sZEbAXCtEp+vNom/emX0sUYkO9RT6ijR5dWLMz9sq4pqjYBNuO0qDL8K5ttqaGVSKpmL
+ xLS/Tq/Qv/9QJX6KfBE4/jFNdKs05+pAhtp3g+g8xZUrk4d/GRVhOfgVYFZXdC49MY1p
+ 36ZtKd46pCzE+vO3qhLPO3E3vgrWjmDhhkIYot9i5WkQAtQKM/W4tRWgrNsm/2lWF+LM
+ 9JMexenkN+u6A5+xmfYYUYwmtT/VOnAfeQM4tCUmZN5qmOzqDA6zU0i2GYWzc3Lk29y7 Uw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by userp2120.oracle.com with ESMTP id 2t9cyqj0hc-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 26 Jun 2019 12:38:48 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5QCclgN164723;
+ Wed, 26 Jun 2019 12:38:47 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by aserp3020.oracle.com with ESMTP id 2t9p6urjx8-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 26 Jun 2019 12:38:47 +0000
+Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5QCcgLx024043;
+ Wed, 26 Jun 2019 12:38:42 GMT
+Received: from nexus.ravello.local (/213.57.127.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Wed, 26 Jun 2019 05:38:41 -0700
+From: Sam Eiderman <shmuel.eiderman@oracle.com>
+To: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ mreitz@redhat.com, seabios@seabios.org, kraxel@redhat.com,
+ kevin@koconnor.net
+Date: Wed, 26 Jun 2019 15:38:15 +0300
+Message-Id: <20190626123816.8907-5-shmuel.eiderman@oracle.com>
+X-Mailer: git-send-email 2.13.3
+In-Reply-To: <20190626123816.8907-1-shmuel.eiderman@oracle.com>
+References: <20190626123816.8907-1-shmuel.eiderman@oracle.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9299
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906260150
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9299
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906260150
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.85
+Subject: [Qemu-devel] [SeaBIOS] [PATCH v4 4/5] geometry: Add
+ boot_lchs_find_*() utility functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,228 +103,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-stable <qemu-stable@nongnu.org>, QEMU <qemu-devel@nongnu.org>
+Cc: liran.alon@oracle.com, shmuel.eiderman@oracle.com, karl.heubaum@oracle.com,
+ arbel.moshe@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 26, 2019 at 11:48:20AM +0200, Marc-Andr=E9 Lureau wrote:
-> Hi
->=20
-> On Wed, Jun 26, 2019 at 3:56 AM Eduardo Habkost <ehabkost@redhat.com> w=
-rote:
-> >
-> > On Wed, Jun 26, 2019 at 01:23:33AM +0200, Marc-Andr=E9 Lureau wrote:
-> > > Since commit a4ee4c8baa37154 ("virtio: Helper for registering virti=
-o
-> > > device types"), virtio-gpu-pci, virtio-vga, and virtio-crypto-pci l=
-ost
-> > > some properties: "ioeventfd" and "vectors". This may cause various
-> > > issues, such as failing migration or invalid properties.
-> > >
-> > > Since those VirtioPCI devices do not have a base name, their class =
-are
-> > > initialized with virtio_pci_generic_base_class_init(). However, if =
-the
-> > > VirtioPCIDeviceTypeInfo provided a class_init which sets dc->props,
-> > > the properties were overwritten by virtio_pci_generic_class_init().
-> > >
-> > > Instead, introduce an intermediary base-type to register the generi=
-c
-> > > properties.
-> > >
-> > > Fixes: a4ee4c8baa37154f42b4dc6a13fee79268d15238
-> > > Cc: qemu-stable@nongnu.org
-> > > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> > > ---
-> > >  hw/virtio/virtio-pci.c | 28 ++++++++++++++--------------
-> > >  1 file changed, 14 insertions(+), 14 deletions(-)
-> > >
-> > > diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-> > > index e6d5467e54..62c4977332 100644
-> > > --- a/hw/virtio/virtio-pci.c
-> > > +++ b/hw/virtio/virtio-pci.c
-> > > @@ -1913,13 +1913,6 @@ static void virtio_pci_generic_class_init(Ob=
-jectClass *klass, void *data)
-> > >      dc->props =3D virtio_pci_generic_properties;
-> > >  }
-> > >
-> > > -/* Used when the generic type and the base type is the same */
-> > > -static void virtio_pci_generic_base_class_init(ObjectClass *klass,=
- void *data)
-> > > -{
-> > > -    virtio_pci_base_class_init(klass, data);
-> > > -    virtio_pci_generic_class_init(klass, NULL);
-> > > -}
-> > > -
-> > >  static void virtio_pci_transitional_instance_init(Object *obj)
-> > >  {
-> > >      VirtIOPCIProxy *proxy =3D VIRTIO_PCI(obj);
-> > > @@ -1938,14 +1931,13 @@ static void virtio_pci_non_transitional_ins=
-tance_init(Object *obj)
-> > >
-> > >  void virtio_pci_types_register(const VirtioPCIDeviceTypeInfo *t)
-> > >  {
-> > > +    char *base_name =3D NULL;
-> > >      TypeInfo base_type_info =3D {
-> > >          .name          =3D t->base_name,
-> > >          .parent        =3D t->parent ? t->parent : TYPE_VIRTIO_PCI=
-,
-> > >          .instance_size =3D t->instance_size,
-> > >          .instance_init =3D t->instance_init,
-> > >          .class_size    =3D t->class_size,
-> > > -        .class_init    =3D virtio_pci_base_class_init,
-> > > -        .class_data    =3D (void *)t,
-> > >          .abstract      =3D true,
-> > >      };
-> > >      TypeInfo generic_type_info =3D {
-> > > @@ -1961,13 +1953,20 @@ void virtio_pci_types_register(const Virtio=
-PCIDeviceTypeInfo *t)
-> > >
-> > >      if (!base_type_info.name) {
-> > >          /* No base type -> register a single generic device type *=
-/
-> > > -        base_type_info.name =3D t->generic_name;
-> > > -        base_type_info.class_init =3D virtio_pci_generic_base_clas=
-s_init;
-> > > -        base_type_info.interfaces =3D generic_type_info.interfaces=
-;
-> > > -        base_type_info.abstract =3D false;
-> > > -        generic_type_info.name =3D NULL;
-> > > +        /* use intermediate %s-base-type to add generic device pro=
-ps */
-> > > +        base_name =3D g_strdup_printf("%s-base-type", t->generic_n=
-ame);
-> > > +        base_type_info.name =3D base_name;
-> > > +        base_type_info.class_init =3D virtio_pci_generic_class_ini=
-t;
-> > > +
-> > > +        generic_type_info.parent =3D base_name;
-> > > +        generic_type_info.class_init =3D virtio_pci_base_class_ini=
-t;
-> > > +        generic_type_info.class_data =3D (void *)t;
-> >
-> > Why are you using virtio_pci_generic_class_init for the base
-> > class, and virtio_pci_base_class_init for the subclass, but doing
-> > exactly the opposite when t->base_name is set?
-> >
-> > Isn't it simpler to just initialize base_type_info.name and leave
-> > all the rest alone?  Patch below.
->=20
-> That was my initial approach. But then I tested the backport on v4.0.0,=
- you get:
->=20
-> hw/display/virtio-vga.c:200:virtio_vga_class_init: Object
-> 0x56247edbc0e0 is not an instance of type virtio-vga
->=20
-> The problem is that the introduced base class calls the t->class_init,
-> which expects the final class (virtio-vga, not virtio-vga-base-type).
+Adding the following utility functions:
 
-Ouch.  In this case:
+    * boot_lchs_find_pci_device
+    * boot_lchs_find_scsi_device
+    * boot_lchs_find_ata_device
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+These will be used to apply LCHS values received through fw_cfg.
 
-This would be much easier if we could append properties to
-dc->props.  But this would be too complex for a
-4.0-stable bug fix.
+Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
+Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
+---
+ src/Kconfig |  7 +++++++
+ src/boot.c  | 69 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/util.h  |  6 ++++++
+ 3 files changed, 82 insertions(+)
 
->=20
-> This seems to be limited to virtio-vga, and gone in upstream since the
-> registration changed. But I would rather have the same patch
-> reviewed/applied.
->=20
->=20
-> >
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> > diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-> > index e6d5467e54..3ee50a0783 100644
-> > --- a/hw/virtio/virtio-pci.c
-> > +++ b/hw/virtio/virtio-pci.c
-> > @@ -1913,13 +1913,6 @@ static void virtio_pci_generic_class_init(Obje=
-ctClass *klass, void *data)
-> >      dc->props =3D virtio_pci_generic_properties;
-> >  }
-> >
-> > -/* Used when the generic type and the base type is the same */
-> > -static void virtio_pci_generic_base_class_init(ObjectClass *klass, v=
-oid *data)
-> > -{
-> > -    virtio_pci_base_class_init(klass, data);
-> > -    virtio_pci_generic_class_init(klass, NULL);
-> > -}
-> > -
-> >  static void virtio_pci_transitional_instance_init(Object *obj)
-> >  {
-> >      VirtIOPCIProxy *proxy =3D VIRTIO_PCI(obj);
-> > @@ -1938,8 +1931,11 @@ static void virtio_pci_non_transitional_instan=
-ce_init(Object *obj)
-> >
-> >  void virtio_pci_types_register(const VirtioPCIDeviceTypeInfo *t)
-> >  {
-> > +    char *base_name =3D t->base_name ?
-> > +                      NULL :
-> > +                      g_strdup_printf("%s-base-type", t->generic_nam=
-e);
-> >      TypeInfo base_type_info =3D {
-> > -        .name          =3D t->base_name,
-> > +        .name          =3D t->base_name ?: base_name,
-> >          .parent        =3D t->parent ? t->parent : TYPE_VIRTIO_PCI,
-> >          .instance_size =3D t->instance_size,
-> >          .instance_init =3D t->instance_init,
-> > @@ -1959,21 +1955,8 @@ void virtio_pci_types_register(const VirtioPCI=
-DeviceTypeInfo *t)
-> >          },
-> >      };
-> >
-> > -    if (!base_type_info.name) {
-> > -        /* No base type -> register a single generic device type */
-> > -        base_type_info.name =3D t->generic_name;
-> > -        base_type_info.class_init =3D virtio_pci_generic_base_class_=
-init;
-> > -        base_type_info.interfaces =3D generic_type_info.interfaces;
-> > -        base_type_info.abstract =3D false;
-> > -        generic_type_info.name =3D NULL;
-> > -        assert(!t->non_transitional_name);
-> > -        assert(!t->transitional_name);
-> > -    }
-> > -
-> >      type_register(&base_type_info);
-> > -    if (generic_type_info.name) {
-> > -        type_register(&generic_type_info);
-> > -    }
-> > +    type_register(&generic_type_info);
->=20
-> t->generic_name can't be NULL anymore? I thought the condition was
-> done for a good reason.
+diff --git a/src/Kconfig b/src/Kconfig
+index 55a87cb7..6606ce4d 100644
+--- a/src/Kconfig
++++ b/src/Kconfig
+@@ -72,6 +72,13 @@ endchoice
+         help
+             Support controlling of the boot order via the fw_cfg/CBFS
+             "bootorder" file.
++    config HOST_BIOS_GEOMETRY
++        depends on BOOT
++        bool "Boot device bios geometry override"
++        default y
++        help
++            Support overriding bios (logical) geometry of boot devices via the
++            fw_cfg/CBFS "bios-geometry" file.
+ 
+     config COREBOOT_FLASH
+         depends on COREBOOT
+diff --git a/src/boot.c b/src/boot.c
+index 52e1c8e6..ea18194d 100644
+--- a/src/boot.c
++++ b/src/boot.c
+@@ -129,6 +129,8 @@ parse_u32(char *cur, u32 *n)
+ static void
+ loadBiosGeometry(void)
+ {
++    if (!CONFIG_HOST_BIOS_GEOMETRY)
++        return;
+     char *f = romfile_loadfile("bios-geometry", NULL);
+     if (!f)
+         return;
+@@ -168,6 +170,73 @@ loadBiosGeometry(void)
+     } while (f);
+ }
+ 
++// Search the bios-geometry list for the given glob pattern.
++static BootDeviceLCHS *
++boot_lchs_find(const char *glob)
++{
++    dprintf(1, "Searching bios-geometry for: %s\n", glob);
++    int i;
++    for (i = 0; i < BiosGeometryCount; i++)
++        if (glob_prefix(glob, BiosGeometry[i].name))
++            return &BiosGeometry[i];
++    return NULL;
++}
++
++int boot_lchs_find_pci_device(struct pci_device *pci, struct chs_s *chs)
++{
++    if (!CONFIG_HOST_BIOS_GEOMETRY)
++        return -1;
++    char desc[256];
++    build_pci_path(desc, sizeof(desc), "*", pci);
++    BootDeviceLCHS *b = boot_lchs_find(desc);
++    if (!b)
++        return -1;
++    chs->cylinder = (u16)b->lcyls;
++    chs->head = (u16)b->lheads;
++    chs->sector = (u16)b->lsecs;
++    return 0;
++}
++
++int boot_lchs_find_scsi_device(struct pci_device *pci, int target, int lun,
++                               struct chs_s *chs)
++{
++    if (!CONFIG_HOST_BIOS_GEOMETRY)
++        return -1;
++    if (!pci)
++        // support only pci machine for now
++        return -1;
++    // Find scsi drive - for example: /pci@i0cf8/scsi@5/channel@0/disk@1,0
++    char desc[256];
++    build_scsi_path(desc, sizeof(desc), pci, target, lun);
++    BootDeviceLCHS *b = boot_lchs_find(desc);
++    if (!b)
++        return -1;
++    chs->cylinder = (u16)b->lcyls;
++    chs->head = (u16)b->lheads;
++    chs->sector = (u16)b->lsecs;
++    return 0;
++}
++
++int boot_lchs_find_ata_device(struct pci_device *pci, int chanid, int slave,
++                              struct chs_s *chs)
++{
++    if (!CONFIG_HOST_BIOS_GEOMETRY)
++        return -1;
++    if (!pci)
++        // support only pci machine for now
++        return -1;
++    // Find ata drive - for example: /pci@i0cf8/ide@1,1/drive@1/disk@0
++    char desc[256];
++    build_ata_path(desc, sizeof(desc), pci, chanid, slave);
++    BootDeviceLCHS *b = boot_lchs_find(desc);
++    if (!b)
++        return -1;
++    chs->cylinder = (u16)b->lcyls;
++    chs->head = (u16)b->lheads;
++    chs->sector = (u16)b->lsecs;
++    return 0;
++}
++
+ 
+ /****************************************************************
+  * Boot priority ordering
+diff --git a/src/util.h b/src/util.h
+index e2afc80c..b173fa88 100644
+--- a/src/util.h
++++ b/src/util.h
+@@ -38,6 +38,12 @@ struct usbdevice_s;
+ int bootprio_find_usb(struct usbdevice_s *usbdev, int lun);
+ int get_keystroke_full(int msec);
+ int get_keystroke(int msec);
++struct chs_s;
++int boot_lchs_find_pci_device(struct pci_device *pci, struct chs_s *chs);
++int boot_lchs_find_scsi_device(struct pci_device *pci, int target, int lun,
++                               struct chs_s *chs);
++int boot_lchs_find_ata_device(struct pci_device *pci, int chanid, int slave,
++                              struct chs_s *chs);
+ 
+ // bootsplash.c
+ void enable_vga_console(void);
+-- 
+2.13.3
 
-My mistake.  I forgot generic_type_info.name could be NULL
-because of t->generic_name was already NULL.
-
->=20
-> >
-> >      if (t->non_transitional_name) {
-> >          const TypeInfo non_transitional_type_info =3D {
-> > @@ -2005,6 +1988,7 @@ void virtio_pci_types_register(const VirtioPCID=
-eviceTypeInfo *t)
-> >          };
-> >          type_register(&transitional_type_info);
-> >      }
-> > +    g_free(base_name);
-> >  }
-> >
-> >  /* virtio-pci-bus */
-> >
-> >
-> > --
-> > Eduardo
-> >
->=20
->=20
-> --=20
-> Marc-Andr=E9 Lureau
-
---=20
-Eduardo
 
