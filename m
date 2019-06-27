@@ -6,58 +6,57 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BFE9C48BD7
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 15:31:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69C15C48BD7
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 15:31:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7575020B1F
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 15:31:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7575020B1F
+	by mail.kernel.org (Postfix) with ESMTPS id 3108D2064A
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 15:31:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3108D2064A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgWMf-00008v-HB
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 11:31:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60748)
+	id 1hgWN1-0000Tu-7x
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 11:31:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60560)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <palmer@dabbelt.com>) id 1hgWGP-0001dX-4K
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:24:42 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1hgWFI-000190-HT
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:23:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1hgWGB-0007Fz-Lb
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:24:30 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:41956)
+ (envelope-from <palmer@dabbelt.com>) id 1hgWFG-0006Xj-C8
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:23:31 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:41819)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hgWG6-0006ui-Au
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:24:24 -0400
-Received: by mail-pf1-f193.google.com with SMTP id m30so1396910pff.8
- for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 08:24:00 -0700 (PDT)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hgWFE-0006Tc-M7
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:23:29 -0400
+Received: by mail-pg1-f193.google.com with SMTP id c70so1046782pga.8
+ for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 08:23:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=dUa00V6qaWWvVsCSIWO0c3PzQTzV7TrVR8O4HvR6bag=;
- b=RYz4i1QSA3J56ZzubxD+B9rEIng+WMQZ/G1HZptWncD//Zry5bk14saQPhtQaaZO+A
- PIwh5pj1I5b5t1seF5yWv4042nxUBrk0rrNHvAHCM4iWMdKC+UPrme7GHPIxQ1Ssf6BU
- gx/FyOu/k5zbD6EB28ATbAXQp97UButtp3Ko45GwMwHyz5xN80QuhIddEgShV3sPcHIX
- IQyBTKN5jQYpw3IMWGakMo4Z5ono3NgZfxjJAzGTSybuCyEwT1OyzTkzL6bZPuQsZOnk
- +o6kr0TxRjNlcFWjwpBTjnh3AgYS1F3U4TpmUhbPk6NHYhqWYw0rB9RCvue/DiCMrhSK
- c1nA==
-X-Gm-Message-State: APjAAAXFpxl7tvppCIf3zJ2Ef18T4Y3rcs2xtuzEyRCSjWlWHeD5M28S
- 5/LQmabOi1Jfy3xbiwVKv5GWav3lxUDDRQ==
-X-Google-Smtp-Source: APXvYqwQgN5/LmKjlIe2CqkG8AttvBcAU71oo+Phep6R727Cf8Wu7mi+ef3OwvECyNUt/tT9pKyRyg==
-X-Received: by 2002:a17:90a:fa07:: with SMTP id
- cm7mr6535545pjb.138.1561649039305; 
- Thu, 27 Jun 2019 08:23:59 -0700 (PDT)
+ bh=93jKVryLi5S9dNljnJoTk5o5gCPNFkrJiDJGBHe6zKM=;
+ b=fg9rBogmTO8d8mX0IqLCj4Uffchuca3xq6bTvvSIKJhvrz4z+znXZ7t1MSWEA/CePa
+ 3K+QHVERGykcohuVq6qlEaXoHDfTug/U4Ss5gPa9kbsL+6t6ogSM+6bkM0NVI+iI2JD7
+ EzBvzGdr8J+VqrTTfsIdrK67Kvs+ZhVZ7mvb3QbQ3OIsa+gIIiXzLYZnaAAaHxQOia9S
+ sfXqu9M3hYOFozGQPoPa8ziEvV9v09d6Rp0T8dTT2PFPv8STuO9a5u60g5vdEz3TuOpx
+ 9jNCFipWwSnXqpvIF+gfHdBMphzHANVVkmgQedib/IYco2UxNa/edTFllmpcY4pxFSdC
+ QFjw==
+X-Gm-Message-State: APjAAAVIJXvOnpB2AFg6R3uuMAkdFavS3yCVKiV1F2z9ttXI87WiBkBj
+ /sew3I3Nsi9eY1iM2FmeYcDvuw==
+X-Google-Smtp-Source: APXvYqyrKLI7p81HFT6sRxq+xeNUpt9hOoVsGXvZvMPW7IhLAiS3X5Bp2LOXJnZ+QPmNNU7E5hkifA==
+X-Received: by 2002:a63:dc50:: with SMTP id f16mr4318555pgj.447.1561649004254; 
+ Thu, 27 Jun 2019 08:23:24 -0700 (PDT)
 Received: from localhost (220-132-236-182.HINET-IP.hinet.net.
  [220.132.236.182])
- by smtp.gmail.com with ESMTPSA id v13sm3822822pfe.105.2019.06.27.08.23.58
+ by smtp.gmail.com with ESMTPSA id s12sm3367191pfe.143.2019.06.27.08.23.23
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 27 Jun 2019 08:23:58 -0700 (PDT)
-Date: Thu, 27 Jun 2019 08:19:52 -0700
-Message-Id: <20190627152011.18686-16-palmer@sifive.com>
+ Thu, 27 Jun 2019 08:23:23 -0700 (PDT)
+Date: Thu, 27 Jun 2019 08:19:38 -0700
+Message-Id: <20190627152011.18686-2-palmer@sifive.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190627152011.18686-1-palmer@sifive.com>
 References: <20190627152011.18686-1-palmer@sifive.com>
@@ -67,8 +66,9 @@ From: Palmer Dabbelt <palmer@sifive.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.210.193
-Subject: [Qemu-devel] [PULL 15/34] target/riscv: Add the mcountinhibit CSR
+X-Received-From: 209.85.215.193
+Subject: [Qemu-devel] [PULL 01/34] target/riscv: Allow setting ISA
+ extensions via CPU props
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,80 +87,158 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alistair Francis <alistair.francis@wdc.com>
+From: Alistair Francis <Alistair.Francis@wdc.com>
 
-1.11 defines mcountinhibit, which has the same numeric CSR value as
-mucounteren from 1.09.1 but has different semantics.  This patch enables
-the CSR for 1.11-based targets, which is trivial to implement because
-the counters in QEMU never tick (legal according to the spec).
+This patch allows us to enable/disable the RISC-V ISA extensions from
+the QEMU command line. This works with the rv32 and rv64 machines. The
+idea is that in the future we can now add extensions and leave them
+disabled by default until enabled by the user.
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-[Palmer: Fix counter access semantics, change commit message to indicate
-the behavior is fully emulated.]
-Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- target/riscv/cpu_bits.h |  1 +
- target/riscv/csr.c      | 17 +++++++++++++++--
- 2 files changed, 16 insertions(+), 2 deletions(-)
+ target/riscv/cpu.c | 70 ++++++++++++++++++++++++++++++++++++++++++++--
+ target/riscv/cpu.h | 11 ++++++++
+ 2 files changed, 79 insertions(+), 2 deletions(-)
 
-diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
-index 47450a3cdb75..11f971ad5df0 100644
---- a/target/riscv/cpu_bits.h
-+++ b/target/riscv/cpu_bits.h
-@@ -136,6 +136,7 @@
- #define CSR_MCOUNTEREN      0x306
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 6f2b64422086..0632ac08cf35 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -24,6 +24,7 @@
+ #include "cpu.h"
+ #include "exec/exec-all.h"
+ #include "qapi/error.h"
++#include "qemu/error-report.h"
+ #include "hw/qdev-properties.h"
+ #include "migration/vmstate.h"
  
- /* Legacy Counter Setup (priv v1.9.1) */
-+/* Update to #define CSR_MCOUNTINHIBIT 0x320 for 1.11.0 */
- #define CSR_MUCOUNTEREN     0x320
- #define CSR_MSCOUNTEREN     0x321
- #define CSR_MHCOUNTEREN     0x322
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index c67d29e20618..448162e484a3 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -56,6 +56,15 @@ static int fs(CPURISCVState *env, int csrno)
- static int ctr(CPURISCVState *env, int csrno)
+@@ -119,7 +120,8 @@ static void riscv_any_cpu_init(Object *obj)
+ static void riscv_base32_cpu_init(Object *obj)
  {
- #if !defined(CONFIG_USER_ONLY)
-+    /*
-+     * The counters are always enabled on newer priv specs, as the CSR has
-+     * changed from controlling that the counters can be read to controlling
-+     * that the counters increment.
-+     */
-+    if (env->priv_ver > PRIV_VERSION_1_09_1) {
-+        return 0;
+     CPURISCVState *env = &RISCV_CPU(obj)->env;
+-    set_misa(env, RV32 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
++    /* We set this in the realise function */
++    set_misa(env, 0);
+ }
+ 
+ static void rv32gcsu_priv1_09_1_cpu_init(Object *obj)
+@@ -156,7 +158,8 @@ static void rv32imacu_nommu_cpu_init(Object *obj)
+ static void riscv_base64_cpu_init(Object *obj)
+ {
+     CPURISCVState *env = &RISCV_CPU(obj)->env;
+-    set_misa(env, RV64 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
++    /* We set this in the realise function */
++    set_misa(env, 0);
+ }
+ 
+ static void rv64gcsu_priv1_09_1_cpu_init(Object *obj)
+@@ -315,6 +318,7 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+     RISCVCPUClass *mcc = RISCV_CPU_GET_CLASS(dev);
+     int priv_version = PRIV_VERSION_1_10_0;
+     int user_version = USER_VERSION_2_02_0;
++    target_ulong target_misa = 0;
+     Error *local_err = NULL;
+ 
+     cpu_exec_realizefn(cs, &local_err);
+@@ -358,6 +362,58 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+         set_feature(env, RISCV_FEATURE_PMP);
+     }
+ 
++    /* If misa isn't set (rv32 and rv64 machines) set it here */
++    if (!env->misa) {
++        /* Do some ISA extension error checking */
++        if (cpu->cfg.ext_i && cpu->cfg.ext_e) {
++            error_setg(errp,
++                       "I and E extensions are incompatible");
++                       return;
++       }
++
++       if (cpu->cfg.ext_g && !(cpu->cfg.ext_i & cpu->cfg.ext_m &
++                               cpu->cfg.ext_a & cpu->cfg.ext_f &
++                               cpu->cfg.ext_d)) {
++            warn_report("Setting G will also set IMAFD");
++            cpu->cfg.ext_i = true;
++            cpu->cfg.ext_m = true;
++            cpu->cfg.ext_a = true;
++            cpu->cfg.ext_f = true;
++            cpu->cfg.ext_d = true;
++        }
++
++        /* Set the ISA extensions, checks should have happened above */
++        if (cpu->cfg.ext_i) {
++            target_misa |= RVI;
++        }
++        if (cpu->cfg.ext_e) {
++            target_misa |= RVE;
++        }
++        if (cpu->cfg.ext_m) {
++            target_misa |= RVM;
++        }
++        if (cpu->cfg.ext_a) {
++            target_misa |= RVA;
++        }
++        if (cpu->cfg.ext_f) {
++            target_misa |= RVF;
++        }
++        if (cpu->cfg.ext_d) {
++            target_misa |= RVD;
++        }
++        if (cpu->cfg.ext_c) {
++            target_misa |= RVC;
++        }
++        if (cpu->cfg.ext_s) {
++            target_misa |= RVS;
++        }
++        if (cpu->cfg.ext_u) {
++            target_misa |= RVU;
++        }
++
++        set_misa(env, RVXLEN | target_misa);
 +    }
 +
-     uint32_t ctr_en = ~0u;
+     riscv_cpu_register_gdb_regs_for_features(cs);
  
-     if (env->priv < PRV_M) {
-@@ -461,18 +470,22 @@ static int write_mcounteren(CPURISCVState *env, int csrno, target_ulong val)
-     return 0;
- }
+     qemu_init_vcpu(cs);
+@@ -379,6 +435,16 @@ static const VMStateDescription vmstate_riscv_cpu = {
+ };
  
-+/* This regiser is replaced with CSR_MCOUNTINHIBIT in 1.11.0 */
- static int read_mscounteren(CPURISCVState *env, int csrno, target_ulong *val)
- {
--    if (env->priv_ver > PRIV_VERSION_1_09_1) {
-+    if (env->priv_ver > PRIV_VERSION_1_09_1
-+        && env->priv_ver < PRIV_VERSION_1_11_0) {
-         return -1;
-     }
-     *val = env->mcounteren;
-     return 0;
- }
+ static Property riscv_cpu_properties[] = {
++    DEFINE_PROP_BOOL("i", RISCVCPU, cfg.ext_i, true),
++    DEFINE_PROP_BOOL("e", RISCVCPU, cfg.ext_e, false),
++    DEFINE_PROP_BOOL("g", RISCVCPU, cfg.ext_g, true),
++    DEFINE_PROP_BOOL("m", RISCVCPU, cfg.ext_m, true),
++    DEFINE_PROP_BOOL("a", RISCVCPU, cfg.ext_a, true),
++    DEFINE_PROP_BOOL("f", RISCVCPU, cfg.ext_f, true),
++    DEFINE_PROP_BOOL("d", RISCVCPU, cfg.ext_d, true),
++    DEFINE_PROP_BOOL("c", RISCVCPU, cfg.ext_c, true),
++    DEFINE_PROP_BOOL("s", RISCVCPU, cfg.ext_s, true),
++    DEFINE_PROP_BOOL("u", RISCVCPU, cfg.ext_u, true),
+     DEFINE_PROP_STRING("priv_spec", RISCVCPU, cfg.priv_spec),
+     DEFINE_PROP_STRING("user_spec", RISCVCPU, cfg.user_spec),
+     DEFINE_PROP_BOOL("mmu", RISCVCPU, cfg.mmu, true),
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 6c5de37b2520..b47cde501766 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -211,6 +211,17 @@ typedef struct RISCVCPU {
  
-+/* This regiser is replaced with CSR_MCOUNTINHIBIT in 1.11.0 */
- static int write_mscounteren(CPURISCVState *env, int csrno, target_ulong val)
- {
--    if (env->priv_ver > PRIV_VERSION_1_09_1) {
-+    if (env->priv_ver > PRIV_VERSION_1_09_1
-+        && env->priv_ver < PRIV_VERSION_1_11_0) {
-         return -1;
-     }
-     env->mcounteren = val;
+     /* Configuration Settings */
+     struct {
++        bool ext_i;
++        bool ext_e;
++        bool ext_g;
++        bool ext_m;
++        bool ext_a;
++        bool ext_f;
++        bool ext_d;
++        bool ext_c;
++        bool ext_s;
++        bool ext_u;
++
+         char *priv_spec;
+         char *user_spec;
+         bool mmu;
 -- 
 2.21.0
 
