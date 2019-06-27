@@ -6,62 +6,62 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88C3CC48BD7
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 06:57:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D66C4C48BD6
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 07:32:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56C53205C9
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 06:57:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56C53205C9
+	by mail.kernel.org (Postfix) with ESMTPS id ABE432063F
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 07:32:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABE432063F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgOLY-0003jJ-Js
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 02:57:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47553)
+	id 1hgOtK-0005oC-1U
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 03:32:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60131)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1hgOKm-000348-2T
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 02:56:41 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1hgOsF-0005F4-TK
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 03:31:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1hgOKk-0004wK-Qk
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 02:56:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54212)
+ (envelope-from <eric.auger@redhat.com>) id 1hgOsE-00042Z-O8
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 03:31:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55076)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1hgOKf-0004qw-OO; Thu, 27 Jun 2019 02:56:34 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1hgOsB-0003yV-TL; Thu, 27 Jun 2019 03:31:12 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9089130C1AFC;
- Thu, 27 Jun 2019 06:56:31 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id CB4C73082E64;
+ Thu, 27 Jun 2019 07:31:03 +0000 (UTC)
 Received: from [10.36.116.89] (ovpn-116-89.ams2.redhat.com [10.36.116.89])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4A5A85D9C6;
- Thu, 27 Jun 2019 06:56:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2428319C68;
+ Thu, 27 Jun 2019 07:30:58 +0000 (UTC)
 To: Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org
 References: <20190621163422.6127-1-drjones@redhat.com>
- <20190621163422.6127-11-drjones@redhat.com>
+ <20190621163422.6127-13-drjones@redhat.com>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <0f1dfdc8-b786-d76e-1e5b-adf39a760ddb@redhat.com>
-Date: Thu, 27 Jun 2019 08:56:21 +0200
+Message-ID: <40326319-4f1a-019e-1cb7-840a011ed8b4@redhat.com>
+Date: Thu, 27 Jun 2019 09:30:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20190621163422.6127-11-drjones@redhat.com>
+In-Reply-To: <20190621163422.6127-13-drjones@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Thu, 27 Jun 2019 06:56:32 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Thu, 27 Jun 2019 07:31:10 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 10/14] target/arm/kvm64: Add
- kvm_arch_get/put_sve
+Subject: Re: [Qemu-devel] [PATCH v2 12/14] target/arm/kvm: scratch vcpu:
+ Preserve input kvm_vcpu_init features
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,209 +79,126 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+Hi Drew,
 
 On 6/21/19 6:34 PM, Andrew Jones wrote:
-> These are the SVE equivalents to kvm_arch_get/put_fpsimd. Note, the
-> swabbing is different than it is for fpsmid because the vector format
-> is a little-endian stream of words.
-
-some cosmetic changes besides Richard's comments
+> kvm_arm_create_scratch_host_vcpu() takes a struct kvm_vcpu_init
+> parameter. Rather than just using it as an output parameter to
+> pass back the preferred target, use it also as an input parameter,
+> allowing a caller to pass a selected target if they wish and to
+> also pass cpu features. If the caller doesn't want to select a
+> target they can pass -1 for the target which indicates they want
+> to use the preferred target and have it passed back like before.
 > 
 > Signed-off-by: Andrew Jones <drjones@redhat.com>
 > ---
->  target/arm/kvm64.c | 135 +++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 131 insertions(+), 4 deletions(-)
+>  target/arm/kvm.c   | 20 +++++++++++++++-----
+>  target/arm/kvm32.c |  6 +++++-
+>  target/arm/kvm64.c |  6 +++++-
+>  3 files changed, 25 insertions(+), 7 deletions(-)
 > 
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index 60645a196d3d..66c0c198604a 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -64,7 +64,7 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
+>                                        int *fdarray,
+>                                        struct kvm_vcpu_init *init)
+>  {
+> -    int ret, kvmfd = -1, vmfd = -1, cpufd = -1;
+> +    int ret = 0, kvmfd = -1, vmfd = -1, cpufd = -1;
+>  
+>      kvmfd = qemu_open("/dev/kvm", O_RDWR);
+>      if (kvmfd < 0) {
+> @@ -84,7 +84,14 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
+>          goto finish;
+>      }
+>  
+> -    ret = ioctl(vmfd, KVM_ARM_PREFERRED_TARGET, init);
+> +    if (init->target == -1) {
+> +        struct kvm_vcpu_init preferred;
+> +
+> +        ret = ioctl(vmfd, KVM_ARM_PREFERRED_TARGET, &preferred);
+> +        if (!ret) {
+> +            init->target = preferred.target;
+wouldn't it be safe to copy the whole struct. Kernel code says:
+        /*
+         * For now, we don't return any features.
+         * In future, we might use features to return target
+         * specific features available for the preferred
+         * target type.
+         */
+
+> +        }
+> +    }
+>      if (ret >= 0) {
+>          ret = ioctl(cpufd, KVM_ARM_VCPU_INIT, init);
+>          if (ret < 0) {
+> @@ -96,10 +103,12 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
+>           * creating one kind of guest CPU which is its preferred
+>           * CPU type.
+>           */
+> +        struct kvm_vcpu_init try;
+> +
+>          while (*cpus_to_try != QEMU_KVM_ARM_TARGET_NONE) {
+> -            init->target = *cpus_to_try++;
+> -            memset(init->features, 0, sizeof(init->features));
+> -            ret = ioctl(cpufd, KVM_ARM_VCPU_INIT, init);
+> +            try.target = *cpus_to_try++;
+> +            memcpy(try.features, init->features, sizeof(init->features));
+> +            ret = ioctl(cpufd, KVM_ARM_VCPU_INIT, &try);
+>              if (ret >= 0) {
+>                  break;
+>              }
+> @@ -107,6 +116,7 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
+>          if (ret < 0) {
+>              goto err;
+>          }
+> +        init->target = try.target;
+>      } else {
+>          /* Treat a NULL cpus_to_try argument the same as an empty
+>           * list, which means we will fail the call since this must
+> diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
+> index 51f78f722b18..d007f6bd34d7 100644
+> --- a/target/arm/kvm32.c
+> +++ b/target/arm/kvm32.c
+> @@ -54,7 +54,11 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+>          QEMU_KVM_ARM_TARGET_CORTEX_A15,
+>          QEMU_KVM_ARM_TARGET_NONE
+>      };
+> -    struct kvm_vcpu_init init;
+> +    /*
+> +     * target = -1 informs kvm_arm_create_scratch_host_vcpu()
+> +     * to use the preferred target
+> +     */
+> +    struct kvm_vcpu_init init = { .target = -1, };
+>  
+>      if (!kvm_arm_create_scratch_host_vcpu(cpus_to_try, fdarray, &init)) {
+>          return false;
 > diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index a2485d447e6a..706541327491 100644
+> index 9fc7f078cf68..2821135a4d0e 100644
 > --- a/target/arm/kvm64.c
 > +++ b/target/arm/kvm64.c
-> @@ -673,11 +673,12 @@ int kvm_arch_destroy_vcpu(CPUState *cs)
->  bool kvm_arm_reg_syncs_via_cpreg_list(uint64_t regidx)
->  {
->      /* Return true if the regidx is a register we should synchronize
-> -     * via the cpreg_tuples array (ie is not a core reg we sync by
-> -     * hand in kvm_arch_get/put_registers())
-> +     * via the cpreg_tuples array (ie is not a core or sve reg that
-> +     * we sync by hand in kvm_arch_get/put_registers())
->       */
->      switch (regidx & KVM_REG_ARM_COPROC_MASK) {
->      case KVM_REG_ARM_CORE:
-> +    case KVM_REG_ARM64_SVE:
+> @@ -502,7 +502,11 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+>          KVM_ARM_TARGET_CORTEX_A57,
+>          QEMU_KVM_ARM_TARGET_NONE
+>      };
+> -    struct kvm_vcpu_init init;
+> +    /*
+> +     * target = -1 informs kvm_arm_create_scratch_host_vcpu()
+> +     * to use the preferred target
+> +     */
+> +    struct kvm_vcpu_init init = { .target = -1, };
+>  
+>      if (!kvm_arm_create_scratch_host_vcpu(cpus_to_try, fdarray, &init)) {
 >          return false;
->      default:
->          return true;
-> @@ -763,6 +764,70 @@ static int kvm_arch_put_fpsimd(CPUState *cs)
->      return 0;
->  }
->  
-> +/*
-> + * If ARM_MAX_VQ is increased to be greater than 16, then we can no
-> + * longer hard code slices to 1 in kvm_arch_put/get_sve().
-> + */
-> +QEMU_BUILD_BUG_ON(ARM_MAX_VQ > 16);
-if the code is ready to support slices, I guess you could have a define
-and compute the slice number from ARM_MAX_VQ?
-> +
-> +static int kvm_arch_put_sve(CPUState *cs)
-> +{
-> +    ARMCPU *cpu = ARM_CPU(cs);
-> +    CPUARMState *env = &cpu->env;
-> +    struct kvm_one_reg reg;
-> +    int slices = 1;
-> +    int i, n, ret;
-> +
-> +    for (i = 0; i < slices; i++) {
-> +        for (n = 0; n < KVM_ARM64_SVE_NUM_ZREGS; n++) {
-> +            uint64_t *q = aa64_vfp_qreg(env, n);
-> +#ifdef HOST_WORDS_BIGENDIAN
-> +            uint64_t d[ARM_MAX_VQ * 2];
-> +            int j;
-line to be added
-> +            for (j = 0; j < cpu->sve_max_vq * 2; j++) {
-> +                d[j] = bswap64(q[j]);
-> +            }
-> +            reg.addr = (uintptr_t)d;
-> +#else
-> +            reg.addr = (uintptr_t)q;
-> +#endif
-> +            reg.id = KVM_REG_ARM64_SVE_ZREG(n, i);
-> +            ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
-> +            if (ret) {
-> +                return ret;
-> +            }
-> +        }
-> +
-> +        for (n = 0; n < KVM_ARM64_SVE_NUM_PREGS; n++) {
-> +            uint64_t *q = &env->vfp.pregs[n].p[0];
-> +#ifdef HOST_WORDS_BIGENDIAN
-> +            uint64_t d[ARM_MAX_VQ * 2 / 8];
-> +            int j;
-line
-> +            for (j = 0; j < cpu->sve_max_vq * 2 / 8; j++) {
-> +                d[j] = bswap64(q[j]);
-> +            }
-> +            reg.addr = (uintptr_t)d;
-> +#else
-> +            reg.addr = (uintptr_t)q;
-> +#endif
-> +            reg.id = KVM_REG_ARM64_SVE_PREG(n, i);
-> +            ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
-> +            if (ret) {
-> +                return ret;
-> +            }
-> +        }
-> +
-> +        reg.addr = (uintptr_t)&env->vfp.pregs[FFR_PRED_NUM].p[0];
-> +        reg.id = KVM_REG_ARM64_SVE_FFR(i);
-> +        ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
-> +        if (ret) {
-> +            return ret;
-> +        }
-> +    }
-> +
-> +    return 0;
-> +}
-> +
->  int kvm_arch_put_registers(CPUState *cs, int level)
->  {
->      struct kvm_one_reg reg;
-> @@ -857,7 +922,11 @@ int kvm_arch_put_registers(CPUState *cs, int level)
->          }
->      }
->  
-> -    ret = kvm_arch_put_fpsimd(cs);
-> +    if (!cpu->sve_max_vq) {
-> +        ret = kvm_arch_put_fpsimd(cs);
-> +    } else {
-> +        ret = kvm_arch_put_sve(cs);
-> +    }
->      if (ret) {
->          return ret;
->      }
-> @@ -920,6 +989,60 @@ static int kvm_arch_get_fpsimd(CPUState *cs)
->      return 0;
->  }
->  
-> +static int kvm_arch_get_sve(CPUState *cs)
-> +{
-> +    ARMCPU *cpu = ARM_CPU(cs);
-> +    CPUARMState *env = &cpu->env;
-> +    struct kvm_one_reg reg;
-> +    int slices = 1;
-> +    int i, n, ret;
-> +
-> +    for (i = 0; i < slices; i++) {
-> +        for (n = 0; n < KVM_ARM64_SVE_NUM_ZREGS; n++) {
-> +            uint64_t *q = aa64_vfp_qreg(env, n);
-extra line needed
-> +            reg.id = KVM_REG_ARM64_SVE_ZREG(n, i);
-> +            reg.addr = (uintptr_t)q;
-> +            ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
-> +            if (ret) {
-> +                return ret;
-> +            } else {> +#ifdef HOST_WORDS_BIGENDIAN
-> +                int j;
-line
-> +                for (j = 0; j < cpu->sve_max_vq * 2; j++) {
-> +                    q[j] = bswap64(q[j]);
-> +                }
-> +#endif
-> +            }
-> +        }
-> +
-> +        for (n = 0; n < KVM_ARM64_SVE_NUM_PREGS; n++) {
-> +            uint64_t *q = &env->vfp.pregs[n].p[0];
-extra line needed
-> +            reg.id = KVM_REG_ARM64_SVE_PREG(n, i);
-> +            reg.addr = (uintptr_t)q;
-> +            ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
-> +            if (ret) {
-> +                return ret;
-> +            } else {> +#ifdef HOST_WORDS_BIGENDIAN
-> +                int j;
-line
-> +                for (j = 0; j < cpu->sve_max_vq * 2 / 8; j++) {
-> +                    q[j] = bswap64(q[j]);
-> +                }
-> +#endif
-> +            }
-> +        }
-> +
-> +        reg.addr = (uintptr_t)&env->vfp.pregs[FFR_PRED_NUM].p[0];
-> +        reg.id = KVM_REG_ARM64_SVE_FFR(i);
-> +        ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
-> +        if (ret) {
-> +            return ret;
-> +        }
-> +    }
-> +
-> +    return 0;
-> +}
-> +
->  int kvm_arch_get_registers(CPUState *cs)
->  {
->      struct kvm_one_reg reg;
-> @@ -1014,7 +1137,11 @@ int kvm_arch_get_registers(CPUState *cs)
->          env->spsr = env->banked_spsr[i];
->      }
->  
-> -    ret = kvm_arch_get_fpsimd(cs);
-> +    if (!cpu->sve_max_vq) {
-> +        ret = kvm_arch_get_fpsimd(cs);
-> +    } else {
-> +        ret = kvm_arch_get_sve(cs);
-> +    }
->      if (ret) {
->          return ret;
->      }
 > 
 
+Besides
+
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Thanks
 
 Eric
-
-
 
