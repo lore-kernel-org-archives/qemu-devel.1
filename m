@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FC59C4321A
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:59:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C33BC4321A
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 21:01:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E684C2075E
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:59:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E684C2075E
+	by mail.kernel.org (Postfix) with ESMTPS id 2A1F82075E
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 21:01:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A1F82075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgbUB-0007j2-4i
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 16:59:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46216)
+	id 1hgbWI-0008Un-2T
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 17:01:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46889)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hgb1n-00037n-92
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:29:56 -0400
+ (envelope-from <philmd@redhat.com>) id 1hgb3D-0004RO-IC
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:31:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hgb1m-0001LA-9y
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:29:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47669)
+ (envelope-from <philmd@redhat.com>) id 1hgb34-0003HY-9o
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:31:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53196)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hgb1h-0001Aj-QL; Thu, 27 Jun 2019 16:29:49 -0400
+ id 1hgb2p-0002rm-UF; Thu, 27 Jun 2019 16:31:01 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 02E6F307D859;
- Thu, 27 Jun 2019 20:29:49 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8446830C5833;
+ Thu, 27 Jun 2019 20:30:57 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-69.brq.redhat.com [10.40.204.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D0E0C600CC;
- Thu, 27 Jun 2019 20:29:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F6DD600CC;
+ Thu, 27 Jun 2019 20:30:52 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: Stephen Checkoway <stephen.checkoway@oberlin.edu>,
 	qemu-devel@nongnu.org
-Date: Thu, 27 Jun 2019 22:27:08 +0200
-Message-Id: <20190627202719.17739-18-philmd@redhat.com>
+Date: Thu, 27 Jun 2019 22:27:17 +0200
+Message-Id: <20190627202719.17739-27-philmd@redhat.com>
 In-Reply-To: <20190627202719.17739-1-philmd@redhat.com>
 References: <20190627202719.17739-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Thu, 27 Jun 2019 20:29:49 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Thu, 27 Jun 2019 20:30:57 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v5 17/28] hw/block/pflash_cfi02: Document 'Page
- Mode' operations are not supported
+Subject: [Qemu-devel] [PATCH v5 26/28] hw/block/pflash_cfi02: Reduce single
+ byte/word write delay
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,34 +86,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The 'page mode' feature entry was implicitly set as zero
-(not supported). Document it exists, so we won't discard
-it if we squeeze the CFI table.
-
 Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-Message-Id: <20190426162624.55977-6-stephen.checkoway@oberlin.edu>
+Message-Id: <20190426162624.55977-5-stephen.checkoway@oberlin.edu>
 [PMD: Extracted from bigger patch]
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/block/pflash_cfi02.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+TODO: Why? To respect the datasheet? Which model is this?
+---
+ hw/block/pflash_cfi02.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index 23d05a6308..01d9c5d75a 100644
+index b2d37c33bb..e9519cbae8 100644
 --- a/hw/block/pflash_cfi02.c
 +++ b/hw/block/pflash_cfi02.c
-@@ -637,7 +637,9 @@ static void pflash_cfi02_realize(DeviceState *dev, Er=
+@@ -857,8 +857,8 @@ static void pflash_cfi02_realize(DeviceState *dev, Er=
 ror **errp)
-     pfl->cfi_table[0x0a + pri_ofs] =3D 0x00;
-     /* Burst mode not supported. */
-     pfl->cfi_table[0x0b + pri_ofs] =3D 0x00;
--    assert(0x0b + pri_ofs < ARRAY_SIZE(pfl->cfi_table));
-+    /* Page mode not supported. */
-+    pfl->cfi_table[0x0c + pri_ofs] =3D 0x00;
-+    assert(0x0c + pri_ofs < ARRAY_SIZE(pfl->cfi_table));
- }
-=20
- static Property pflash_cfi02_properties[] =3D {
+     pfl->cfi_table[0x1D] =3D 0x00;
+     /* Vpp max (no Vpp pin) */
+     pfl->cfi_table[0x1E] =3D 0x00;
+-    /* Timeout per single byte/word write (128 ms) */
+-    pfl->cfi_table[0x1F] =3D 0x07;
++    /* Timeout per single byte/word write (16 us) */
++    pfl->cfi_table[0x1F] =3D 0x04;
+     /* Timeout for min size buffer write (NA) */
+     pfl->cfi_table[0x20] =3D 0x00;
+     /* Typical timeout for block erase (512 ms) */
 --=20
 2.20.1
 
