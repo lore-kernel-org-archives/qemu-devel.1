@@ -2,60 +2,62 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D36B0C004E6
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:31:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9469EC004E6
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:33:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A51F920665
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:31:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A51F920665
+	by mail.kernel.org (Postfix) with ESMTPS id 6F5C92063F
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:33:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F5C92063F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgb3T-0003tZ-MQ
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 16:31:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45175)
+	id 1hgb50-0005Om-Vl
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 16:33:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45309)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hgazt-0000sU-Ty
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:28:01 -0400
+ (envelope-from <philmd@redhat.com>) id 1hgb0C-0001Ae-AG
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:28:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hgazk-0007EY-TZ
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:27:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:24195)
+ (envelope-from <philmd@redhat.com>) id 1hgb0A-0007dr-PV
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:28:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38766)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hgazf-00077s-Bn; Thu, 27 Jun 2019 16:27:43 -0400
+ id 1hgb03-0007VF-MX; Thu, 27 Jun 2019 16:28:07 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E1CED3082A9C;
- Thu, 27 Jun 2019 20:27:35 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id CAEFB3083391;
+ Thu, 27 Jun 2019 20:28:03 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-69.brq.redhat.com [10.40.204.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F18C7600CC;
- Thu, 27 Jun 2019 20:27:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 542C36012D;
+ Thu, 27 Jun 2019 20:27:56 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: Stephen Checkoway <stephen.checkoway@oberlin.edu>,
 	qemu-devel@nongnu.org
-Date: Thu, 27 Jun 2019 22:26:51 +0200
-Message-Id: <20190627202719.17739-1-philmd@redhat.com>
+Date: Thu, 27 Jun 2019 22:26:54 +0200
+Message-Id: <20190627202719.17739-4-philmd@redhat.com>
+In-Reply-To: <20190627202719.17739-1-philmd@redhat.com>
+References: <20190627202719.17739-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Thu, 27 Jun 2019 20:27:37 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Thu, 27 Jun 2019 20:28:04 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v5 00/28] block/pflash_cfi02: Implement missing
- AMD pflash functionality
+Subject: [Qemu-devel] [PATCH v5 03/28] hw/block/pflash: Simplify
+ trace_pflash_data_read/write()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,77 +86,135 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+Use a field width format to have a single function to log
+the different width accesses.
 
-This series is based on Stephen Checkoway work (v4):
-https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg04595.html
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/block/pflash_cfi01.c | 6 ++----
+ hw/block/pflash_cfi02.c | 6 ++----
+ hw/block/trace-events   | 6 ++----
+ 3 files changed, 6 insertions(+), 12 deletions(-)
 
-Stephen work is a great improvement of the actual code, however
-while reviewing his patches, I found them quite dense, so I started
-to split each logical change to be able to digest his series.
-
-Sfephen implemented the 'interleaving' feature in way I am not yet
-confident it is in the project best interest. The relevant thread
-started here:
-https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg05395.html
-
-However meanwhile we will discuss his interleaving implementation,
-I don't want to block the rest of his work, so I took that patch
-of (and rebased his work).
-
-I'm spamming all the maintainers of the boards using
-pflash_cfi02_register(). This series is not 'block' related, it is
-a classical 'device' model series.
-Help reviewing is appreciated :)
-
-I am still looking for real-world code stressing this flash model.
-
-Regards,
-
-Phil.
-
-Philippe Mathieu-Daud=C3=A9 (20):
-  hw/block/pflash: Simplify trace_pflash_io_read/write()
-  hw/block/pflash: Simplify trace_pflash_data_read/write()
-  hw/block/pflash_cfi02: Fix debug format string
-  hw/block/pflash_cfi02: Add an enum to define the write cycles
-  hw/block/pflash_cfi02: Add helpers to manipulate the status bits
-  hw/block/pflash_cfi02: Simplify a statement using fall through
-  hw/block/pflash_cfi02: Use the ldst API in pflash_write()
-  hw/block/pflash_cfi02: Use the ldst API in pflash_read()
-  hw/block/pflash_cfi02: Extract the pflash_data_read() function
-  hw/block/pflash_cfi02: Unify the MemoryRegionOps
-  tests/pflash-cfi02: Refactor to support testing multiple
-    configurations
-  hw/block/pflash_cfi02: Remove pointless local variable
-  hw/block/pflash_cfi02: Document the current CFI values
-  hw/block/pflash_cfi02: Hold the PRI table offset in a variable
-  hw/block/pflash_cfi02: Document 'Page Mode' operations are not
-    supported
-  hw/block/pflash_cfi02: Extract pflash_regions_count()
-  hw/block/pflash_cfi02: Split if() condition
-  hw/block/pflash_cfi02: Reduce single byte/word write delay
-  hw/block/pflash_cfi02: Document commands
-  hw/block/pflash_cfi02: Reduce I/O accesses to 16-bit
-
-Stephen Checkoway (8):
-  tests/pflash-cfi02: Add test for supported CFI commands
-  hw/block/pflash_cfi02: Fix command address comparison
-  hw/block/pflash_cfi02: Implement nonuniform sector sizes
-  hw/block/pflash_cfi02: Fix CFI in autoselect mode
-  hw/block/pflash_cfi02: Fix reset command not ignored during erase
-  hw/block/pflash_cfi02: Implement multi-sector erase
-  hw/block/pflash_cfi02: Implement erase suspend/resume
-  hw/block/pflash_cfi02: Use chip erase time specified in the CFI table
-
- hw/block/pflash_cfi01.c   |  11 +-
- hw/block/pflash_cfi02.c   | 703 ++++++++++++++++++++++++++------------
- hw/block/trace-events     |  10 +-
- tests/Makefile.include    |   2 +
- tests/pflash-cfi02-test.c | 681 ++++++++++++++++++++++++++++++++++++
- 5 files changed, 1173 insertions(+), 234 deletions(-)
- create mode 100644 tests/pflash-cfi02-test.c
-
+diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+index 74fc1bc2da..db4a246b22 100644
+--- a/hw/block/pflash_cfi01.c
++++ b/hw/block/pflash_cfi01.c
+@@ -248,7 +248,6 @@ static uint32_t pflash_data_read(PFlashCFI01 *pfl, hw=
+addr offset,
+     switch (width) {
+     case 1:
+         ret =3D p[offset];
+-        trace_pflash_data_read8(offset, ret);
+         break;
+     case 2:
+         if (be) {
+@@ -258,7 +257,6 @@ static uint32_t pflash_data_read(PFlashCFI01 *pfl, hw=
+addr offset,
+             ret =3D p[offset];
+             ret |=3D p[offset + 1] << 8;
+         }
+-        trace_pflash_data_read16(offset, ret);
+         break;
+     case 4:
+         if (be) {
+@@ -272,12 +270,12 @@ static uint32_t pflash_data_read(PFlashCFI01 *pfl, =
+hwaddr offset,
+             ret |=3D p[offset + 2] << 16;
+             ret |=3D p[offset + 3] << 24;
+         }
+-        trace_pflash_data_read32(offset, ret);
+         break;
+     default:
+         DPRINTF("BUG in %s\n", __func__);
+         abort();
+     }
++    trace_pflash_data_read(offset, width << 1, ret);
+     return ret;
+ }
+=20
+@@ -415,7 +413,7 @@ static inline void pflash_data_write(PFlashCFI01 *pfl=
+, hwaddr offset,
+ {
+     uint8_t *p =3D pfl->storage;
+=20
+-    trace_pflash_data_write(offset, value, width, pfl->counter);
++    trace_pflash_data_write(offset, width << 1, value, pfl->counter);
+     switch (width) {
+     case 1:
+         p[offset] =3D value;
+diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+index f05cd507b3..6cdfc85264 100644
+--- a/hw/block/pflash_cfi02.c
++++ b/hw/block/pflash_cfi02.c
+@@ -172,7 +172,6 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr =
+offset,
+         switch (width) {
+         case 1:
+             ret =3D p[offset];
+-            trace_pflash_data_read8(offset, ret);
+             break;
+         case 2:
+             if (be) {
+@@ -182,7 +181,6 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr =
+offset,
+                 ret =3D p[offset];
+                 ret |=3D p[offset + 1] << 8;
+             }
+-            trace_pflash_data_read16(offset, ret);
+             break;
+         case 4:
+             if (be) {
+@@ -196,9 +194,9 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr =
+offset,
+                 ret |=3D p[offset + 2] << 16;
+                 ret |=3D p[offset + 3] << 24;
+             }
+-            trace_pflash_data_read32(offset, ret);
+             break;
+         }
++        trace_pflash_data_read(offset, width << 1, ret);
+         break;
+     case 0x90:
+         /* flash ID read */
+@@ -343,7 +341,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr off=
+set,
+             /* We need another unlock sequence */
+             goto check_unlock0;
+         case 0xA0:
+-            trace_pflash_data_write(offset, value, width, 0);
++            trace_pflash_data_write(offset, width << 1, value, 0);
+             p =3D pfl->storage;
+             if (!pfl->ro) {
+                 switch (width) {
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index f637fe918e..13d1b21dd4 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -10,10 +10,8 @@ pflash_reset(void) "reset"
+ pflash_timer_expired(uint8_t cmd) "command 0x%02x done"
+ pflash_io_read(uint64_t offset, int width, int fmt_width, uint32_t value=
+, uint8_t cmd, uint8_t wcycle) "offset:0x%04"PRIx64" width:%d value:0x%0*=
+x cmd:0x%02x wcycle:%u"
+ pflash_io_write(uint64_t offset, int width, int fmt_width, uint32_t valu=
+e, uint8_t wcycle) "offset:0x%04"PRIx64" width:%d value:0x%0*x wcycle:%u"
+-pflash_data_read8(uint64_t offset, uint32_t value) "data offset:0x%04"PR=
+Ix64" value:0x%02x"
+-pflash_data_read16(uint64_t offset, uint32_t value) "data offset:0x%04"P=
+RIx64" value:0x%04x"
+-pflash_data_read32(uint64_t offset, uint32_t value) "data offset:0x%04"P=
+RIx64" value:0x%08x"
+-pflash_data_write(uint64_t offset, uint32_t value, int width, uint64_t c=
+ounter) "data offset:0x%04"PRIx64" value:0x%08x width:%d counter:0x%016"P=
+RIx64
++pflash_data_read(uint64_t offset, int width, uint32_t value) "data offse=
+t:0x%04"PRIx64" value:0x%0*x"
++pflash_data_write(uint64_t offset, int width, uint32_t value, uint64_t c=
+ounter) "data offset:0x%04"PRIx64" value:0x%0*x counter:0x%016"PRIx64
+ pflash_manufacturer_id(uint16_t id) "Read Manufacturer ID: 0x%04x"
+ pflash_device_id(uint16_t id) "Read Device ID: 0x%04x"
+ pflash_device_info(uint64_t offset) "Read Device Information offset:0x%0=
+4"PRIx64
 --=20
 2.20.1
 
