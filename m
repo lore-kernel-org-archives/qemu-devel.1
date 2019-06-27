@@ -2,83 +2,81 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B08CCC48BD6
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 13:23:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F468C48BD6
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 13:24:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84C7F2083B
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 13:23:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84C7F2083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 15A012083B
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 13:24:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="DWfkFGjU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15A012083B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgUNM-00035Q-Ss
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 09:23:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33217)
+	id 1hgUOV-000491-EG
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 09:24:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33712)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hgUKm-00082J-T4
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 09:21:05 -0400
+ (envelope-from <lucienmp_antispam@yahoo.com>) id 1hgUMs-0002UX-Ms
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 09:23:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hgUKl-0000PB-O1
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 09:21:04 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:35156)
+ (envelope-from <lucienmp_antispam@yahoo.com>) id 1hgUMq-0001zk-Mq
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 09:23:14 -0400
+Received: from sonic316-20.consmr.mail.ne1.yahoo.com ([66.163.187.146]:39617)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hgUKl-0000Lf-GK
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 09:21:03 -0400
-Received: by mail-wr1-f68.google.com with SMTP id f15so2569170wrp.2
- for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 06:21:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=CDrR9Nsm0oTfwqp9uwCqko7bBznBmlA7BVlJ4TwTXPc=;
- b=MQawbwQcrCCe+EGoHQ1/ngg28ABCynp1dKQqVBO8g/TXlbvwXxJg7iH6e9ypcw/7Ou
- S+AsYjiFQ/fWhgy8U2sbQ0tS9G0ujQMoqvMavKjA9j1x0TQjfLSmVj1vqNxZob3upda0
- UGw9F/DeEo+n5tm/D5tsTtegWSa3XcCkX45hn/QdPRkz9E+/uCdKyu8NM/FKbfjJip6b
- GGdvdUecBkc7MDalFYaEOcgJllygzi7+c+tWDISiWlLlO/KlOyRe3UEMofZKdb+B8XKR
- ejk+4/gnNyEfLgJxqmwSNMUTtpjRCTicxVLm0yb6d4UegIkLtYEFKxeWbQcgnq9/Zg9c
- ELjA==
-X-Gm-Message-State: APjAAAVLPmja9PqYOrwmndgxD70N/1caxOH1Yyl1ilYSYnN34N24VrxP
- 93Jco3eGuGUU7F64tDrGRRFeZX4qiVg=
-X-Google-Smtp-Source: APXvYqzdwvoEiwwL/XnwJJOw53JeC/EhsACFF3zqRz6dPVartCZXR1rEKyP4NyuVgf1hxZlDAunc4A==
-X-Received: by 2002:adf:e705:: with SMTP id c5mr3414446wrm.270.1561641659488; 
- Thu, 27 Jun 2019 06:20:59 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9fc:4658:37f8:2b9c?
- ([2001:b07:6468:f312:9fc:4658:37f8:2b9c])
- by smtp.gmail.com with ESMTPSA id v27sm1450171wrv.45.2019.06.27.06.20.58
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 27 Jun 2019 06:20:58 -0700 (PDT)
-To: Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <1560165301-39026-1-git-send-email-pbonzini@redhat.com>
- <1560165301-39026-4-git-send-email-pbonzini@redhat.com>
- <20190627090353.GA24929@redhat.com>
- <b8ae5bd6-2b52-99e0-993c-fe8f65d40da3@redhat.com>
- <20190627125505.GH12358@redhat.com>
- <20190627131601.3zln6ywzewm35qvn@sirius.home.kraxel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e05632d6-751e-393e-ee12-97501a881ed1@redhat.com>
-Date: Thu, 27 Jun 2019 15:20:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (Exim 4.71) (envelope-from <lucienmp_antispam@yahoo.com>)
+ id 1hgUMm-0001ww-U6
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 09:23:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048;
+ t=1561641786; bh=FlWjMn2oohVzyJn4e5F903zNVL1rrvv9cCbvXYezqho=;
+ h=Date:From:To:In-Reply-To:References:Subject:From:Subject;
+ b=DWfkFGjUGx0T60lViatRnXHsZqVm4eDgsL1afhXCavWdDHPIc6rCf3FDoKsVmufg6PYWcToL3Bxr9hpkczaV1oVUh21JqeoiEiwdNzzykD6LkRxRz8qaJiXFQCWpid6la+8S72L/2TRj6g8r16gtTBhj8rgfcuuN7xZkCeYwvBa+9zyuUIy5LcPPzsb1NOBTG54hSA9rm/cCyZ+pCvgZJ2sIjDw59ujYgQ2DKGtk3e0KKcFv6x58uA6Wua+8RlkZduqraRUifD4JovFf3GayeCiJkaBAlEP5EB3WqxWwwpr+8BPsfF3OISRhHq+ig2NdCf63dSr3TWFZRm+DxjjNHQ==
+X-YMail-OSG: OeS1x9sVM1mxRDHHmfBc8ho6qW8EZVfKqglF3P.Jnb.dku5xxXhQIPn_r1tlWxA
+ AXldOnSECWTgMZZUmasQ3G3UHa2khg3ph7e2oR52EEUL1CNc83nrpOF_elaZzQAtR5ls9uOmk5xb
+ wxyBs.dEWOjvNl_mCPsQ4Scu4D.fL2bT6Nx7FpCkbicXcETRK3lBNOaj5oV2h65D4DhT0WS5A2Af
+ UqunSk_SMReX8q6LldBkSuhK7m7IbSSzzT5kN4HUkN7GrPfYOoX2rwF30_ODtU_vnyjZXrzlPWsp
+ Hpv4KOkLdqPeaCjVQb8aOV8sMbU58c_7hSq0RZ64XUfH2c0IWJvYYbGUzyHsW0wcBZG6hWQuJyLR
+ Wz1aPHWFz7w8.fr46iuhZ4BuyJwkwoP5_rgEOC_WQQlmgPIioxRTa37upcdL3ALlUDYrGqKJYp77
+ QjC09YjMcJvW2Z1HCNufOnCIPN3eCBPbAnbVYgoTViZduWmlH7LdHU0t1qI24SI1ajg1KE2dzRLk
+ LqtLbFRmhNW_Vs1bFEqiABhAsFA2jj8DKbwEoGIclr4eU8Qj_W8El5HcdhpLlpb3rCTmbdW3UvOz
+ U_c27u4b8RP9oV8P_k7WJ8Hj5a0R9aEiBahUP3GijTHg5c9.zWf1fMGyIY2iOWdnGVKAif6AyPrt
+ j84tTcTBzvlsZIw6svVjjbgI0FPb70DWtWYoh.sxfWXzeA8IsiiMKiJQFN6bSWRnx3En_KLBYiKL
+ 6UkRGsf6zIcedYDT93i5HjEEg7xc86rYKAMtoi5zQbdALU5q6GGLhkCibwOLXUOPtAOPkffgCInu
+ ZV5oipU7lzYBN2K97NYswID_h6iCJ2Ke6B7wgB2AuVG.ftg1RZzNtBBQ4TDMUKWg9fHC_MgeO9VI
+ 6Z5DQutE4edgLdU8p1nQvIq1s6ztw1QAmk8GcdFEp1e1rwv.x0VKAwxOl9tMvsgiBRn2OFRr21dh
+ KeNs7KnB_f7uyueE6I1_ZIOkTBFn6.0EnFXVmW2N1sJID8rfEBoo_vHhMl5U5xNCBlfUV0MD4lst
+ __YJNaMTkFiTII7Vs3PwvE9Dwc1xks_cPnFSFca6sgDeu7acxRpaYPh.Qu1ON98VwgXO9XDCW5tV
+ a7BWoyO_tB5m12j9VE57lGHNLBOQkI95FljI1COozuHndOhqhgw44J2Adr.YyJkUQKaIaiY92czb
+ C0xQcFDDwU3Hv5MCiBQ9uIM5EOm0GsrVOdptlKLueitX0fxn1dWQEY1uv
+Received: from sonic.gate.mail.ne1.yahoo.com by
+ sonic316.consmr.mail.ne1.yahoo.com with HTTP; Thu, 27 Jun 2019 13:23:06 +0000
+Date: Thu, 27 Jun 2019 13:22:32 +0000 (UTC)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, 
+ Laurent Vivier <laurent@vivier.eu>, 
+ Lucien Murray-Pitts <lucienmp.qemu@gmail.com>
+Message-ID: <1079763171.281101.1561641752988@mail.yahoo.com>
+In-Reply-To: <2136180936.260219.1561641583358@mail.yahoo.com>
+References: <2136180936.260219.1561641583358.ref@mail.yahoo.com>
+ <2136180936.260219.1561641583358@mail.yahoo.com>
 MIME-Version: 1.0
-In-Reply-To: <20190627131601.3zln6ywzewm35qvn@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH 3/7] configure: integrate Meson in the
- build system
+X-Mailer: WebService/1.1.13913 YMailNorrin Mozilla/5.0 (Windows NT 10.0; Win64;
+ x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100
+ Safari/537.36
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 66.163.187.146
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] RFC: Why does target/m68k RTE insn. use
+ gen_exception
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,38 +88,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+From: Lucien Anti-Spam via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: Lucien Anti-Spam <lucienmp_antispam@yahoo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 27/06/19 15:16, Gerd Hoffmann wrote:
->  Hi,
-> 
->> Ok, I can understand that. I've been thinking about how we can switch
->> libvirt to use meson too, and trying to decide between meson being the
->> owner, calling out to make  vs keeping make as the owner and calling
->> out to meson. Ultimately to entirely banish make, autoconf, automake,
->> libtool, m4 & shell from our build system :-)
->>
->> Despite thinking about an incremental conversion though, I was still
->> hoping libvirt would just have a single (largish) patch series to
->> do a complete conversion at a specific point in time.
-> 
-> Another possible approach would be to have two build systems.
-> The traditional configure & make and the new meson & ninja.
-> 
-> Advantage is we don't have to worry about the transition and mixing &
-> make + meson at all.
-> 
-> Disadvantage is the duplication.  That wouldn't be forever though.
-> I'd expect we'll have one or maybe two releases with both build systems,
-> then delete the make & configure.
+ Hi Laurent / Richard,
+(resent email )
+Does anyone have any knowledge why=C2=A0 =C2=A0 gen_exception(s, s->base.pc=
+_next, EXCP_RTE);
 
-Yeah, I have seen other projects do this.  On the other hand I'm not
-sure how you avoid bitrot in one of the two, and having to convert the
-huge configure script from the beginning seems like a daunting task.
+is generated for "RTE" instruction, where as the "RTS" goes a gen_jmp?( not=
+e see=C2=A0target/m68k/translate.c in functions=C2=A0DISAS_INSN(rte) and=C2=
+=A0DISAS_INSN(rts)
 
-Paolo
-
-
+Cheers,Luc =20
