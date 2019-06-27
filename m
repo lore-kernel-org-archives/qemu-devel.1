@@ -2,71 +2,83 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA63FC48BD7
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 03:41:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F76CC48BD7
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 05:29:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A060A20989
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 03:41:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A060A20989
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0BC0D208E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 05:29:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RvBzYun1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BC0D208E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgLI6-00051w-AR
-	for qemu-devel@archiver.kernel.org; Wed, 26 Jun 2019 23:41:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39235)
+	id 1hgMyW-0007Pm-3O
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 01:29:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58863)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hgLHF-0004av-4K
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 23:40:50 -0400
+ (envelope-from <mrolnik@gmail.com>) id 1hgMx4-0005vT-6u
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 01:28:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hgLHD-0008B2-NV
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 23:40:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47728)
+ (envelope-from <mrolnik@gmail.com>) id 1hgMx0-0004Vk-Bb
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 01:28:04 -0400
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:46514)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hgLHD-0008A9-GH
- for qemu-devel@nongnu.org; Wed, 26 Jun 2019 23:40:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hgLHB-0004pb-GA
- for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 03:40:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6DADD2E80C7
- for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 03:40:45 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 27 Jun 2019 03:34:31 -0000
-From: Kai <1834399@bugs.launchpad.net>
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1hgMwy-0004Pm-Aw
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 01:28:01 -0400
+Received: by mail-wr1-x42f.google.com with SMTP id n4so873952wrw.13
+ for <qemu-devel@nongnu.org>; Wed, 26 Jun 2019 22:27:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id;
+ bh=M8HgWzyFTxr567hBfqLl+QeHcZGNvWty5hz/uP513lo=;
+ b=RvBzYun1b7b2su8dOm7MpJdo58+ko2Pq9KxdWyNWckx1kdXz171hL1VVhmGtQK8+w8
+ X9JB8Qh/jP/uSlUhhV+oVTv30mkrw0yIlzuEJw0zueaIZ2dEhPKsi6DlRg2tLiei0ENx
+ WmBW/Uv2l8+BbcMtLo9uTxH94XBCw2+fU5vJvFrd0abwNYFP/GxXVwvN0C1ovn2s+xlK
+ hnK6NiwNXUgiB+fYbrvZyJNmdca5To3e6nE8ivr9Z+3MrVKsZhpKpZ6rr/6r9oUiobdG
+ P8oksNqlM8nVczPuOMnaBzfH2HQKrQukV34t0r/ZF6fB3pHZvb92Abtu8K2jWQ8w/Awk
+ ih8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=M8HgWzyFTxr567hBfqLl+QeHcZGNvWty5hz/uP513lo=;
+ b=fD70PXsIMtT0y16H55IqgYOHdZh/QvB7D1wLX8OAhrJrjPmvuB1n/WKar6bmtYL+Zj
+ REk9shwwQL00UJLCXTOe3ocRE6KrOwVEWtg80PpO4hmQr1AZMnzVn4ZEm5nXBZ2novz4
+ O7Sv/Rs3mmG6LOufomUXNy5EwbdYAcnLrs8Soi1jsDQ+mT5Gyxr0yCQSHdwRjuIRnswk
+ wJlk4gdu6ggN9Sx2M9/479kib8pHnRX5ULXJ8T3MU5D1eSchia8yk/BVRaFvdwqEl1Uy
+ ru1Nf3AAq0MhUs45fieAsQfsddS7i+m3JQFP6SjuI7W6FWcY7X9wPeUsGlmYg3QCQDwE
+ 2z3Q==
+X-Gm-Message-State: APjAAAU7cTtvcCEhvoQ+EvL/aWf8M7pFCR/zL1cxsamBELWDOEKYS0WA
+ 7H/gSC+xldWZGw2fThpN0fzCHMmcQMlHZA==
+X-Google-Smtp-Source: APXvYqz8OBGF7Q3aGrs6V1IG/Blz6a92yUSBwKRTMYt7fk8yHypeof+esLq0xZ6y+qDIqy/sgaH6Ng==
+X-Received: by 2002:a05:6000:11c2:: with SMTP id
+ i2mr1346607wrx.199.1561613276235; 
+ Wed, 26 Jun 2019 22:27:56 -0700 (PDT)
+Received: from localhost.localdomain (bzq-79-182-104-87.red.bezeqint.net.
+ [79.182.104.87])
+ by smtp.gmail.com with ESMTPSA id v18sm916389wrd.51.2019.06.26.22.27.54
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 26 Jun 2019 22:27:55 -0700 (PDT)
+From: Michael Rolnik <mrolnik@gmail.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=capstone; status=New; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: neil007
-X-Launchpad-Bug-Reporter: Kai (neil007)
-X-Launchpad-Bug-Modifier: Kai (neil007)
-Message-Id: <156160647178.17582.14349839554314537194.malonedeb@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18991";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: ee00c8fbf963edf76daf07df84d5442111f83b78
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1834399] [NEW] AArch64: branch out of range
+Date: Thu, 27 Jun 2019 08:27:43 +0300
+Message-Id: <20190627052750.31856-1-mrolnik@gmail.com>
+X-Mailer: git-send-email 2.18.0
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42f
+Subject: [Qemu-devel] [PATCH v23 0/7] QEMU AVR 8 bit cores
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,146 +87,261 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1834399 <1834399@bugs.launchpad.net>
+Cc: Michael Rolnik <mrolnik@gmail.com>, richard.henderson@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+This series of patches adds 8bit AVR cores to QEMU.
+All instruction, except BREAK/DES/SPM/SPMX, are implemented. Not fully tested yet.
+However I was able to execute simple code with functions. e.g fibonacci calculation.
+This series of patches include a non real, sample board.
+No fuses support yet. PC is set to 0 at reset.
 
-I build lib32-qemu which is a multilib variant for mips o32 on project
-Yocto with qemumips64. It finally runs command and fails:
+the patches include the following
+1. just a basic 8bit AVR CPU, without instruction decoding or translation
+2. CPU features which allow define the following 8bit AVR cores
+     avr1
+     avr2 avr25
+     avr3 avr31 avr35
+     avr4
+     avr5 avr51
+     avr6
+     xmega2 xmega4 xmega5 xmega6 xmega7
+3. a definition of sample machine with SRAM, FLASH and CPU which allows to execute simple code
+4. encoding for all AVR instructions
+5. interrupt handling
+6. helpers for IN, OUT, SLEEP, WBR & unsupported instructions
+7. a decoder which given an opcode decides what istruction it is
+8. translation of AVR instruction into TCG
+9. all features together
 
+changes since v3
+1. rampD/X/Y/Z registers are encoded as 0x00ff0000 (instead of 0x000000ff) for faster address manipulaton
+2. ffs changed to ctz32
+3. duplicate code removed at avr_cpu_do_interrupt
+4. using andc instead of not + and
+5. fixing V flag calculation in varios instructions
+6. freeing local variables in PUSH
+7. tcg_const_local_i32 -> tcg_const_i32
+8. using sextract32 instead of my implementation
+9. fixing BLD instruction
+10.xor(r) instead of 0xff - r at COM
+11.fixing MULS/MULSU not to modify inputs' content
+12.using SUB for NEG
+13.fixing tcg_gen_qemu_ld/st call in XCH
 
-mips-wrsmllib32-linux-gcc  -meb -mabi=3D32 -mhard-float -fstack-protector-s=
-trong   -Wformat -Wformat-security -Werror=3Dformat-security --sysroot=3D/m=
-nt/docker/LIN1019-1459-ubuntu1604/tmp-glibc/work/mips-wrsmllib32-linux/lib3=
-2-qemu/4.0.0-r0/lib32-recipe-sysroot =
+changes since v4
+1. target is now defined as big endian in order to optimize push_ret/pop_ret
+2. all style warnings are fixed
+3. adding cpu_set/get_sreg functions
+4. simplifying gen_goto_tb as there is no real paging
+5. env->pc -> env->pc_w
+6. making flag dump more compact
+7. more spacing
+8. renaming CODE/DATA_INDEX -> MMU_CODE/DATA_IDX
+9. removing avr_set_feature
+10. SPL/SPH set bug fix
+11. switching stb_phys to cpu_stb_data
+12. cleaning up avr_decode
+13. saving sreg, rampD/X/Y/Z, eind in HW format (savevm)
+14. saving CPU features (savevm)
 
--I/mnt/docker/LIN1019-1459-ubuntu1604/tmp-glibc/work/mips-wrsmllib32-linux/=
-lib32-qemu/4.0.0-r0/lib32-recipe-sysroot/usr/include/pixman-1 -I/mnt/docker=
-/LIN1019-1459-ubuntu1604/tmp-glibc/work/mips-wrsmllib32-linux/lib32-qemu/4.=
-0.0-r0/qemu-4.0.0/dtc/libfdt -pthread -I/mnt/docker/LIN1019-1459-ubuntu1604=
-/tmp-glibc/work/mips-wrsmllib32-linux/lib32-qemu/4.0.0-r0/lib32-recipe-sysr=
-oot/usr/include/glib-2.0 -I/mnt/docker/LIN1019-1459-ubuntu1604/tmp-glibc/wo=
-rk/mips-wrsmllib32-linux/lib32-qemu/4.0.0-r0/lib32-recipe-sysroot/usr/lib/g=
-lib-2.0/include
--D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE -Og -g =
+changes since v5
+1. BLD bug fix
+2. decoder generator is added
 
--I/mnt/docker/LIN1019-1459-ubuntu1604/tmp-glibc/work/mips-wrsmllib32-linux/=
-lib32-qemu/4.0.0-r0/qemu-4.0.0/capstone/include -I/mnt/docker/LIN1019-1459-=
-ubuntu1604/tmp-glibc/work/mips-wrsmllib32-linux/lib32-qemu/4.0.0-r0/qemu-4.=
-0.0/tests =
+chages since v6
+1. using cpu_get_sreg/cpu_set_sreg in avr_cpu_gdb_read_register/avr_cpu_gdb_write_register
+2. configure the target as little endian because otherwise GDB does not work
+3. fixing and testing gen_push_ret/gen_pop_ret
 
--DCAPSTONE_USE_SYS_DYN_MEM -DCAPSTONE_HAS_ARM -DCAPSTONE_HAS_ARM64 -DCAPSTO=
-NE_HAS_POWERPC -DCAPSTONE_HAS_X86
--c arch/AArch64/AArch64InstPrinter.c -o /mnt/docker/LIN1019-1459-ubuntu1604=
-/tmp-glibc/work/mips-wrsmllib32-linux/lib32-qemu/4.0.0-r0/build/capstone/ob=
-j/arch/AArch64/AArch64InstPrinter.o
+changes since v7
+1. folding back v6 
+2. logging at helper_outb and helper_inb are done for non supported yet registers only
+3. MAINTAINERS updated
 
+changes since v8
+1. removing hw/avr from hw/Makefile.obj as it should not be built for all
+2. making linux compilable
+3. testing on
+    a. Mac, Apple LLVM version 7.0.0
+    b. Ubuntu 12.04, gcc 4.9.2
+    c. Fedora 23, gcc 5.3.1
+4. folding back some patches
+5. translation bug fixes for ORI, CPI, XOR instructions
+6. propper handling of cpu register writes though memory
 
-And error messages:
+changes since v9
+1. removing forward declarations of static functions
+2. disabling debug prints
+3. switching to case range instead of if else if ...
+4. LD/ST IN/OUT accessing CPU maintainder registers are not routed to any device
+5. commenst about sample board and sample IO device added
+6. sample board description is more descriptive now
+7. memory_region_allocate_system_memory is used to create RAM
+8. now there are helper_fullrd & helper_fullwr when LD/ST try to access registers
 
-{standard input}: Assembler messages:
-{standard input}:38045: Error: branch out of range
-{standard input}:38269: Error: branch out of range
-{standard input}:38493: Error: branch out of range
-{standard input}:38717: Error: branch out of range
-{standard input}:38941: Error: branch out of range
-{standard input}:39165: Error: branch out of range
-{standard input}:39389: Error: branch out of range
-{standard input}:39613: Error: branch out of range
-{standard input}:39728: Error: branch out of range
-{standard input}:39990: Error: branch out of range
-{standard input}:40252: Error: branch out of range
-{standard input}:40514: Error: branch out of range
-{standard input}:40776: Error: branch out of range
-{standard input}:41038: Error: branch out of range
+changes since v10
+1. movig back fullwr & fullrd into the commit where outb and inb were introduced
+2. changing tlb_fill function signature
+3. adding empty line between functions
+4. adding newline on the last line of the file
+5. using tb->flags to generae full access ST/LD instructions
+6. fixing SBRC bug
+7. folding back 10th commit
+8. whenever a new file is introduced it's added to Makefile.objs
 
+changes since v11
+1. updating to v2.7.0-rc
+2. removing assignment to env->fullacc from gen_intermediate_code
 
-The gcc version is 9.1. I have verified that gcc 8.3 works. And there is no=
- error when remove option '-Og' with gcc 9.1.
+changes since v12
+1. fixing spacing
+2. fixing get/put_segment functions
+3. removing target-avr/machine.h file
+4. VMSTATE_SINGLE_TEST -> VMSTATE_SINGLE
+5. comment spelling
+6. removing hw/avr/sample_io.c
+7. char const* -> const char*
+8. proper ram allocation
+9. fixing breakpoint functionality.
+10.env1 -> env
+11.fixing avr_cpu_gdb_write_register & avr_cpu_gdb_read_register functions
+12.any cpu is removed
+12.feature bits are not saved into vm state
 
-I am not sure whether it is a defect of gcc 9.1 or capstone. Should it
-be fixed in capstone? Thanks.
+changes since v13
+1. rebasing to v2.7.0-rc1
 
-** Affects: capstone
-     Importance: Undecided
-         Status: New
+changes since v14
+1. I made self review with git gui tool. (I did not know such a thing exists)
+2. removing all double/tripple spaces
+3. removing comment reference to SampleIO
+4. folding back some changes, so there is not deleted lines in my code
+5. moving avr configuration, within configure file, before chris
 
-** Project changed: qemu =3D> capstone
+changes since v15
+1. removing IO registers cache from CPU
+2. implementing CBI/SBI as read(helper_inb), modify, write(helper_outb)
+3. implementing CBIC/SBIC as read(helper_inb), check, branch
+4. adding missing tcg_temp_free_i32 for tcg_const_i32
 
--- =
+changes since v16
+1. removing EXT IO registers knoledge from CPU. These registers are accessible 
+   by LD/ST only. CPU has no interest in them
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1834399
+changes since v17 (by Richard Henderson)
+This is Michael's v17, with some adjustments of my own:
 
-Title:
-  AArch64: branch out of range
+1. Fix the whitespace errors reported by "git am",
+2. Replace the utf-8 characters with normal ascii,
+3. Ditch the separate compilation of translate.c.
 
-Status in Capstone:
-  New
+I retained the two separate files that could be regenerated
+from the included cpugen program, but merged in translate-insn.c.
+Not that it matters, but the code generated is about 3k smaller.
 
-Bug description:
-  I build lib32-qemu which is a multilib variant for mips o32 on project
-  Yocto with qemumips64. It finally runs command and fails:
+changes since v18
+1.  moving target-avr into target/avr
+2.  do not call cpu_exec_initfn function from avr_cpu_initfn
+3.  call cpu_exec_realizefn avr_cpu_realizefn
+4.  do not fail sample machine creation if no rom is suplied
+5.  add tcg_gen_exit_tb(0) for BS_BRANCH in gen_intermediate_code
+6.  fix a register getters/setters in machine.c
+7.  changing QEMU_ARCH_AVR from 1<<17 to 1<<18
 
-  =
+changes since v19
+1.  use decodetree.py tool to decode instructions
+2.  adding USART
+3.  adding 16 bit timer peripherals
+4.  changing QEMU_ARCH_AVR from 1<<18 to 1<<20
+5.  renaming tlb_fill to avr_cpu_tlb_fill
 
-  mips-wrsmllib32-linux-gcc  -meb -mabi=3D32 -mhard-float -fstack-protector=
--strong   -Wformat -Wformat-security -Werror=3Dformat-security --sysroot=3D=
-/mnt/docker/LIN1019-1459-ubuntu1604/tmp-glibc/work/mips-wrsmllib32-linux/li=
-b32-qemu/4.0.0-r0/lib32-recipe-sysroot =
+changes since v20
+1.  use one CPU naming convention
+2.  merging insn16.decode & insn32.decode files
+3.  modifying skip next instruction mechanizm
+4.  translate BREAK as NOP for now
 
-  -I/mnt/docker/LIN1019-1459-ubuntu1604/tmp-glibc/work/mips-wrsmllib32-linu=
-x/lib32-qemu/4.0.0-r0/lib32-recipe-sysroot/usr/include/pixman-1 -I/mnt/dock=
-er/LIN1019-1459-ubuntu1604/tmp-glibc/work/mips-wrsmllib32-linux/lib32-qemu/=
-4.0.0-r0/qemu-4.0.0/dtc/libfdt -pthread -I/mnt/docker/LIN1019-1459-ubuntu16=
-04/tmp-glibc/work/mips-wrsmllib32-linux/lib32-qemu/4.0.0-r0/lib32-recipe-sy=
-sroot/usr/include/glib-2.0 -I/mnt/docker/LIN1019-1459-ubuntu1604/tmp-glibc/=
-work/mips-wrsmllib32-linux/lib32-qemu/4.0.0-r0/lib32-recipe-sysroot/usr/lib=
-/glib-2.0/include
-  -D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE -Og -g =
+changes since v21
+1.  Reorganize bstate.
+    This will make transition to <exec/translator.h> easier, and fixes a couple of bugs wrt single stepping
+    by richard.henderson@linaro.org
+2.  Drop cpc and fix page cross condition.
+    by richard.henderson@linaro.org
+3.  Refactor checking supported/unsupported instructions
+4.  Add gdb-xml/avr-cpu.xml
 
-  -I/mnt/docker/LIN1019-1459-ubuntu1604/tmp-glibc/work/mips-wrsmllib32-linu=
-x/lib32-qemu/4.0.0-r0/qemu-4.0.0/capstone/include -I/mnt/docker/LIN1019-145=
-9-ubuntu1604/tmp-glibc/work/mips-wrsmllib32-linux/lib32-qemu/4.0.0-r0/qemu-=
-4.0.0/tests =
+changes since v22
+1.  Rebase
+2.  Split long comment
 
-  -DCAPSTONE_USE_SYS_DYN_MEM -DCAPSTONE_HAS_ARM -DCAPSTONE_HAS_ARM64 -DCAPS=
-TONE_HAS_POWERPC -DCAPSTONE_HAS_X86
-  -c arch/AArch64/AArch64InstPrinter.c -o /mnt/docker/LIN1019-1459-ubuntu16=
-04/tmp-glibc/work/mips-wrsmllib32-linux/lib32-qemu/4.0.0-r0/build/capstone/=
-obj/arch/AArch64/AArch64InstPrinter.o
+Michael Rolnik (2):
+  target/avr: Add instruction decoding
+  target/avr: Add instruction translation
 
+Sarah Harris (5):
+  target/avr: Add outward facing interfaces and core CPU logic
+  target/avr: Add instruction helpers
+  target/avr: Add limited support for USART and 16 bit timer peripherals
+  target/avr: Add example board configuration
+  target/avr: Register AVR support with the rest of QEMU, the build
+    system, and the MAINTAINERS file
 
-  And error messages:
+ MAINTAINERS                     |    6 +
+ arch_init.c                     |    2 +
+ configure                       |    7 +
+ default-configs/avr-softmmu.mak |    5 +
+ gdb-xml/avr-cpu.xml             |   49 +
+ hw/Kconfig                      |    1 +
+ hw/avr/Kconfig                  |    4 +
+ hw/avr/Makefile.objs            |    1 +
+ hw/avr/sample.c                 |  217 +++
+ hw/char/Kconfig                 |    3 +
+ hw/char/Makefile.objs           |    1 +
+ hw/char/avr_usart.c             |  316 ++++
+ hw/timer/Kconfig                |    3 +
+ hw/timer/Makefile.objs          |    1 +
+ hw/timer/avr_timer16.c          |  587 +++++++
+ include/disas/dis-asm.h         |    6 +
+ include/hw/char/avr_usart.h     |   99 ++
+ include/hw/timer/avr_timer16.h  |   99 ++
+ include/sysemu/arch_init.h      |    1 +
+ qapi/common.json                |    3 +-
+ target/avr/Makefile.objs        |   33 +
+ target/avr/cpu-param.h          |   37 +
+ target/avr/cpu.c                |  599 +++++++
+ target/avr/cpu.h                |  283 +++
+ target/avr/gdbstub.c            |   85 +
+ target/avr/helper.c             |  354 ++++
+ target/avr/helper.h             |   29 +
+ target/avr/insn.decode          |  175 ++
+ target/avr/machine.c            |  123 ++
+ target/avr/translate.c          | 2888 +++++++++++++++++++++++++++++++
+ tests/machine-none-test.c       |    1 +
+ 31 files changed, 6017 insertions(+), 1 deletion(-)
+ create mode 100644 default-configs/avr-softmmu.mak
+ create mode 100644 gdb-xml/avr-cpu.xml
+ create mode 100644 hw/avr/Kconfig
+ create mode 100644 hw/avr/Makefile.objs
+ create mode 100644 hw/avr/sample.c
+ create mode 100644 hw/char/avr_usart.c
+ create mode 100644 hw/timer/avr_timer16.c
+ create mode 100644 include/hw/char/avr_usart.h
+ create mode 100644 include/hw/timer/avr_timer16.h
+ create mode 100644 target/avr/Makefile.objs
+ create mode 100644 target/avr/cpu-param.h
+ create mode 100644 target/avr/cpu.c
+ create mode 100644 target/avr/cpu.h
+ create mode 100644 target/avr/gdbstub.c
+ create mode 100644 target/avr/helper.c
+ create mode 100644 target/avr/helper.h
+ create mode 100644 target/avr/insn.decode
+ create mode 100644 target/avr/machine.c
+ create mode 100644 target/avr/translate.c
 
-  {standard input}: Assembler messages:
-  {standard input}:38045: Error: branch out of range
-  {standard input}:38269: Error: branch out of range
-  {standard input}:38493: Error: branch out of range
-  {standard input}:38717: Error: branch out of range
-  {standard input}:38941: Error: branch out of range
-  {standard input}:39165: Error: branch out of range
-  {standard input}:39389: Error: branch out of range
-  {standard input}:39613: Error: branch out of range
-  {standard input}:39728: Error: branch out of range
-  {standard input}:39990: Error: branch out of range
-  {standard input}:40252: Error: branch out of range
-  {standard input}:40514: Error: branch out of range
-  {standard input}:40776: Error: branch out of range
-  {standard input}:41038: Error: branch out of range
+-- 
+2.18.0
 
-  =
-
-  The gcc version is 9.1. I have verified that gcc 8.3 works. And there is =
-no error when remove option '-Og' with gcc 9.1.
-
-  I am not sure whether it is a defect of gcc 9.1 or capstone. Should it
-  be fixed in capstone? Thanks.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/capstone/+bug/1834399/+subscriptions
 
