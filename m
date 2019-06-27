@@ -2,55 +2,73 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 649FCC48BD7
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:05:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D7AAC48BD7
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:07:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 393A6208E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:05:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 393A6208E3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id D8B24208E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:07:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8B24208E3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgWu6-0006GQ-AE
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 12:05:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34722)
+	id 1hgWvR-0000SX-5l
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 12:07:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33015)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hgWNo-0001cW-CI
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:32:26 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1hgWHW-0003A6-P4
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:25:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hgWNb-0005lK-5c
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:32:10 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:55077 helo=mail.rt-rk.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hgWNY-0005fX-TF
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:32:06 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 54B5B1A20BA;
- Thu, 27 Jun 2019 17:31:59 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 201211A23DE;
- Thu, 27 Jun 2019 17:31:59 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org,
-	laurent@vivier.eu
-Date: Thu, 27 Jun 2019 17:31:45 +0200
-Message-Id: <1561649510-21183-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v14 0/5] linux-user: A set of miscellaneous
- patches
+ (envelope-from <palmer@dabbelt.com>) id 1hgWHU-00004y-I2
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:25:50 -0400
+Received: from mail-pf1-f182.google.com ([209.85.210.182]:44341)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hgWHT-0006yB-Ij
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:25:47 -0400
+Received: by mail-pf1-f182.google.com with SMTP id t16so1392669pfe.11
+ for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 08:24:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding:cc:from:to;
+ bh=tqiS7O8nKvNing+E8WwiszCtPiLlK33kP79Ar4czLaU=;
+ b=oUYwonsvbtOehNAPCc68VsyeA2dwF6jwT+lb6sMmuWMp3RsYD9XbrgsgudmFazrTOM
+ ob7/TukO2BryuC7WYb11tDtN6Glc1a3l8fOllp+bz1Vvc4bVSQ+9XIeFt5FWLpNWlRwR
+ SuvIoKtU28XeVi/a2O/nEyUC35CNyALTC/24SBxolmw/kqiJ5jgaeQea756lx7Xz2xuv
+ +sK2MNIgA/4anvCFPxKWIrnur0LjT7myXu156JzqCj8KpvpPtau5YwTu82l34OTISd6l
+ TnxO6Z4qRE2WwKfFDaWOVAirb6FTxwEotioOY3VO5/ErEmPUZevHSpWWKpQFe7Y3v/ox
+ ZuCg==
+X-Gm-Message-State: APjAAAXplIesir/UCCuKjuzmQlN2qdURR3f4KBZIQr9AFZHQbR09t872
+ F/bKjpQ4DhbiP2uj/Rl/WgALygmsLACGsg==
+X-Google-Smtp-Source: APXvYqz4HgwfLHomu9GYtfbmHFaxeAkcApncvVLSSz0rgVyDrt/RXlulYvCVWYc0EhsHxAUulnhFYA==
+X-Received: by 2002:a63:1462:: with SMTP id 34mr4283972pgu.417.1561649044358; 
+ Thu, 27 Jun 2019 08:24:04 -0700 (PDT)
+Received: from localhost (220-132-236-182.HINET-IP.hinet.net.
+ [220.132.236.182])
+ by smtp.gmail.com with ESMTPSA id d123sm3437041pfc.144.2019.06.27.08.24.03
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 27 Jun 2019 08:24:03 -0700 (PDT)
+Date: Thu, 27 Jun 2019 08:19:54 -0700
+Message-Id: <20190627152011.18686-18-palmer@sifive.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190627152011.18686-1-palmer@sifive.com>
+References: <20190627152011.18686-1-palmer@sifive.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+From: Palmer Dabbelt <palmer@sifive.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.210.182
+Subject: [Qemu-devel] [PULL 17/34] qemu-deprecated.texi: Deprecate the
+ RISC-V privledge spec 1.09.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,116 +80,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: amarkovic@wavecomp.com
+Cc: Alistair Francis <alistair.francis@wdc.com>,
+ Palmer Dabbelt <palmer@sifive.com>, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Alistair Francis <alistair.francis@wdc.com>
 
-This is a collection of misc patches for Linux user that I recently
-accumulated from variuous sources. All of them originate from problems
-observed on mips target. However, most of these changes actually
-affect and fix linux-user problems on multiple targets.
+Deprecate the RISC-V privledge spec version 1.09.1 in favour of the new
+1.10.0 and the ratified 1.11.0.
 
-There are three checkpatch warninhs and two checkpatch errors that
-sould be ignored in the given circumstances.
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+---
+ qemu-deprecated.texi | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-NOTE: Two checkpatch errors and three warnings are false alarms.
-
-v13->v14:
-
-  - several minor corrections in commit messages
-
-v12->v13:
-
-  - removed two patches that got accepted
-  - simplified the patch on statx()
-  - added a patch on TARGET_HAVE_ARCH_STRUCT_FLOCK
-  - added a patch on fixing EXCP_FPE handling on MIPS
-
-v11->v12:
-
-  - used the preffered Laurent's email address for linux-user
-  - added a note on checkpetch warnings and errors in the commit letter
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index df04f2840bd9..97ea4ef3001a 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -144,6 +144,14 @@ The ``acl_show'', ``acl_reset'', ``acl_policy'', ``acl_add'', and
+ ``acl_remove'' commands are deprecated with no replacement. Authorization
+ for VNC should be performed using the pluggable QAuthZ objects.
  
-
-v10->v11:
-
-  - patch on <ADD|DROP>_MEMEBERSHIP basically reverted to its first
-    version
-  - corrected patch on statx()
-  - added patch on strace support for statx()
-  - added patch on fixing flock structure for MIPS O64 ABI
-
-v9->v10:
-
-  - improved commit messages for patches 2 and 3
-
-v8->v9:
-
-  - fixed build error on some systems related to SOL_ALG
-
-v7->v8:
-
-  - added a patch on setsockopt() option SOL_ALG
-
-v6->v7:
-
-  - fixed a build error for older kernels related to the patch on
-    setsockopt() options
-  - removed four patches that on the meantime got accepted into the
-    main source tree
-
-v5->v6:
-
-  - fixed a mistake in patch #4
-  - improved commit messages in patches #4 and #6
-
-v4->v5:
-
-  - added the patch on statx() support
-  - improved the patch on IPV6_<ADD|DROP>_MEMBERSHIP to take into
-    account the possibility of different names for a field
-  - minor corrections in commit messages
-
-v3->v4:
-
-  - improved commit messages (fixed some typos, improved relevance)
-
-v2->v3:
-
-  - updated and improved commit messages
-  - added IPV6_DROP_MEMBERSHIP support to the patch on setsockopt()'s
-    option
-
-v1->v2:
-
-  - added the patch on setsockopt()'s option IPV6_ADD_MEMBERSHIP
-  - improved the commit messages
-
-
-Aleksandar Markovic (3):
-  linux-user: Fix flock structure for MIPS O64 ABI
-  linux-user: Introduce TARGET_HAVE_ARCH_STRUCT_FLOCK
-  linux-user: Handle EXCP_FPE properly for MIPS
-
-Aleksandar Rikalo (1):
-  linux-user: Add support for translation of statx() syscall
-
-Jim Wilson (1):
-  linux-user: Add support for strace for statx() syscall
-
- linux-user/generic/fcntl.h     |   8 +--
- linux-user/mips/cpu_loop.c     |   6 +++
- linux-user/mips/target_fcntl.h |  17 +++++-
- linux-user/strace.c            |  86 ++++++++++++++++++++++++++++++
- linux-user/strace.list         |   3 ++
- linux-user/syscall.c           | 115 ++++++++++++++++++++++++++++++++++++++++-
- linux-user/syscall_defs.h      |  37 +++++++++++++
- 7 files changed, 266 insertions(+), 6 deletions(-)
-
++@section Guest Emulator ISAs
++
++@subsection RISC-V ISA privledge specification version 1.09.1 (since 4.1)
++
++The RISC-V ISA privledge specification version 1.09.1 has been deprecated.
++QEMU supports both the newer version 1.10.0 and the ratified version 1.11.0, these
++should be used instead of the 1.09.1 version.
++
+ @section System emulator CPUS
+ 
+ @subsection RISC-V ISA CPUs (since 4.1)
 -- 
-2.7.4
+2.21.0
 
 
