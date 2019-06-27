@@ -2,62 +2,62 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9159CC004E6
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:45:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A1B4C004E6
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:45:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F6922075E
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:45:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F6922075E
+	by mail.kernel.org (Postfix) with ESMTPS id 286C12075E
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:45:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 286C12075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgbGQ-0000Kg-OT
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 16:45:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45813)
+	id 1hgbH6-0000jd-E1
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 16:45:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46452)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hgb1E-0001x6-LM
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:29:22 -0400
+ (envelope-from <philmd@redhat.com>) id 1hgb2d-00040T-9g
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:30:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hgb1C-0000Qx-Je
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:29:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60962)
+ (envelope-from <philmd@redhat.com>) id 1hgb2b-0002Sm-UA
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:30:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35540)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hgb13-000859-Bp; Thu, 27 Jun 2019 16:29:10 -0400
+ id 1hgb29-0001sR-6e; Thu, 27 Jun 2019 16:30:18 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D05545277D;
- Thu, 27 Jun 2019 20:28:42 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 16F2183F45;
+ Thu, 27 Jun 2019 20:30:14 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-69.brq.redhat.com [10.40.204.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A980D600CC;
- Thu, 27 Jun 2019 20:28:37 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6BB4D6012D;
+ Thu, 27 Jun 2019 20:30:06 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: Stephen Checkoway <stephen.checkoway@oberlin.edu>,
 	qemu-devel@nongnu.org
-Date: Thu, 27 Jun 2019 22:26:59 +0200
-Message-Id: <20190627202719.17739-9-philmd@redhat.com>
+Date: Thu, 27 Jun 2019 22:27:11 +0200
+Message-Id: <20190627202719.17739-21-philmd@redhat.com>
 In-Reply-To: <20190627202719.17739-1-philmd@redhat.com>
 References: <20190627202719.17739-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Thu, 27 Jun 2019 20:28:43 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Thu, 27 Jun 2019 20:30:14 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v5 08/28] hw/block/pflash_cfi02: Use the ldst
- API in pflash_write()
+Subject: [Qemu-devel] [PATCH v5 20/28] hw/block/pflash_cfi02: Split if()
+ condition
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,71 +86,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The load/store API eases code review.
+Split the if() condition check and arrange the indentation to
+ease the review of the next patches. No logical change.
 
-Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-Message-Id: <20190426162624.55977-3-stephen.checkoway@oberlin.edu>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-[PMD: Extracted from bigger patch]
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/block/pflash_cfi02.c | 38 ++++++++------------------------------
- 1 file changed, 8 insertions(+), 30 deletions(-)
+ hw/block/pflash_cfi02.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index 9e8c28af8f..ae38ed0bae 100644
+index a0d3bd60dc..08b2bc83cb 100644
 --- a/hw/block/pflash_cfi02.c
 +++ b/hw/block/pflash_cfi02.c
-@@ -365,38 +365,16 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr o=
-ffset,
-             goto check_unlock0;
-         case 0xA0:
-             trace_pflash_data_write(offset, width << 1, value, 0);
--            p =3D pfl->storage;
-             if (!pfl->ro) {
--                switch (width) {
--                case 1:
--                    p[offset] &=3D value;
--                    pflash_update(pfl, offset, 1);
--                    break;
--                case 2:
--                    if (be) {
--                        p[offset] &=3D value >> 8;
--                        p[offset + 1] &=3D value;
--                    } else {
--                        p[offset] &=3D value;
--                        p[offset + 1] &=3D value >> 8;
--                    }
--                    pflash_update(pfl, offset, 2);
--                    break;
--                case 4:
--                    if (be) {
--                        p[offset] &=3D value >> 24;
--                        p[offset + 1] &=3D value >> 16;
--                        p[offset + 2] &=3D value >> 8;
--                        p[offset + 3] &=3D value;
--                    } else {
--                        p[offset] &=3D value;
--                        p[offset + 1] &=3D value >> 8;
--                        p[offset + 2] &=3D value >> 16;
--                        p[offset + 3] &=3D value >> 24;
--                    }
--                    pflash_update(pfl, offset, 4);
--                    break;
-+                p =3D (uint8_t *)pfl->storage + offset;
-+                if (pfl->be) {
-+                    uint64_t current =3D ldn_be_p(p, width);
-+                    stn_be_p(p, width, current & value);
-+                } else {
-+                    uint64_t current =3D ldn_le_p(p, width);
-+                    stn_le_p(p, width, current & value);
-                 }
-+                pflash_update(pfl, offset, width);
-             }
-             /*
-              * While programming, status bit DQ7 should hold the opposit=
-e
+@@ -309,8 +309,10 @@ static void pflash_write(void *opaque, hwaddr offset=
+, uint64_t value,
+=20
+     trace_pflash_io_write(offset, width, width << 1, value, pfl->wcycle)=
+;
+     cmd =3D value;
+-    if (pfl->cmd !=3D 0xA0 && cmd =3D=3D 0xF0) {
+-        goto reset_flash;
++    if (pfl->cmd !=3D 0xA0) {
++        if (cmd =3D=3D 0xF0) {
++            goto reset_flash;
++        }
+     }
+     offset &=3D pfl->chip_len - 1;
+=20
 --=20
 2.20.1
 
