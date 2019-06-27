@@ -2,67 +2,57 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77C10C48BD6
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:21:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B2B4C48BD6
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:23:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41A57208E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:21:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="mL35zFGO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41A57208E3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	by mail.kernel.org (Postfix) with ESMTPS id D58912133F
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:23:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D58912133F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgX92-00082g-H9
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 12:21:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37895)
+	id 1hgXBR-00026k-5L
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 12:23:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34751)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berto@igalia.com>) id 1hgWXa-0003Jy-BP
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:42:27 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hgWNw-0001ci-FD
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:32:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1hgWXZ-0007n0-Bd
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:42:26 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:58224)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1hgWXZ-0007jl-2A; Thu, 27 Jun 2019 11:42:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=9OM7ffAYtPQEUzMnCZjJN9TZQY0MwQ2qvgMVvlP6Cds=; 
- b=mL35zFGO+NPQ+4I08ys32KdkQ6vEvOVaui5yej0AbEXBFnudX7lBOuz3rWG8o74sbstQklU/of2d+3MzRMFttbyUI2C05niz5wRINpQepuOlK7WAFeUKguRnQy+hAdqw9DqOtQWTCxvOjCj5dcGCvOdqpvIcKvxjII6HOvhmocd+T3OqCDLF4MnON6XCLVPtlNLwjso1qZ6QfWfS96z2Br1lba0fQsRpXNrRJ4FAmLErHhakEKpY1wwxKZmuDLkejuR2zFWHDLF3McljUA1L3VijzcNirRltO8V+CF1+g1V75Zazcaz05A947VXQBH65nckl5AVLgwEQlu1ll8jHmw==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1hgWXX-0005sX-Kv; Thu, 27 Jun 2019 17:42:23 +0200
-Received: from berto by mail.igalia.com with local (Exim)
- id 1hgWXX-0004ZN-I9; Thu, 27 Jun 2019 17:42:23 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: Denis Lunev <den@virtuozzo.com>,
- "qemu-devel\@nongnu.org" <qemu-devel@nongnu.org>
-In-Reply-To: <w51a7e3domn.fsf@maestria.local.igalia.com>
-References: <20190627135914.xlzohrdwr6mz2aq3@perseus.local>
- <4453cfc4-cff7-c004-1f4c-7cab462e4661@virtuozzo.com>
- <w51a7e3domn.fsf@maestria.local.igalia.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Thu, 27 Jun 2019 17:42:23 +0200
-Message-ID: <w517e97dogw.fsf@maestria.local.igalia.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 91.117.99.155
-Subject: Re: [Qemu-devel] [RFC] Re-evaluating subcluster allocation for
- qcow2 images
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hgWNr-0005yG-69
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:32:24 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:56321 helo=mail.rt-rk.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1hgWNf-0005kq-8M
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:32:14 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 401611A4597;
+ Thu, 27 Jun 2019 17:32:05 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.13.43])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 103831A4595;
+ Thu, 27 Jun 2019 17:32:05 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+To: qemu-devel@nongnu.org,
+	laurent@vivier.eu
+Date: Thu, 27 Jun 2019 17:31:47 +0200
+Message-Id: <1561649510-21183-3-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1561649510-21183-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1561649510-21183-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PATCH v14 2/5] linux-user: Add support for strace for
+ statx() syscall
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,20 +64,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: amarkovic@wavecomp.com, Jim Wilson <jimw@sifive.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu 27 Jun 2019 05:38:56 PM CEST, Alberto Garcia wrote:
->> I would consider 64k cluster/8k subcluster as too extreme for me.
+From: Jim Wilson <jimw@sifive.com>
 
-I forgot to add: this 64k/8k ratio is only with my current prototype.
+All of the flags need to be conditional as old systems don't have
+statx support.  Otherwise it works the same as other stat family
+syscalls.  This requires the pending patch to add statx support.
 
-In practice if we go with the 128-bit L2 entries we would have 64
-subclusters per cluster, or 32 if we want to have a separate
-QCOW_OFLAG_ZERO for each subcluster (would we need this?).
+Tested on Ubuntu 16.04 (no host statx) and Ubuntu 19.04 (with host
+statx) using a riscv32-linux toolchain.
 
-Berto
+Signed-off-by: Jim Wilson <jimw@sifive.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/strace.c    | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ linux-user/strace.list |  3 ++
+ 2 files changed, 89 insertions(+)
+
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index 6f72a74..c80e93b 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -976,6 +976,76 @@ UNUSED static struct flags msg_flags[] = {
+     FLAG_END,
+ };
+ 
++UNUSED static struct flags statx_flags[] = {
++#ifdef AT_EMPTY_PATH
++    FLAG_GENERIC(AT_EMPTY_PATH),
++#endif
++#ifdef AT_NO_AUTOMOUNT
++    FLAG_GENERIC(AT_NO_AUTOMOUNT),
++#endif
++#ifdef AT_SYMLINK_NOFOLLOW
++    FLAG_GENERIC(AT_SYMLINK_NOFOLLOW),
++#endif
++#ifdef AT_STATX_SYNC_AS_STAT
++    FLAG_GENERIC(AT_STATX_SYNC_AS_STAT),
++#endif
++#ifdef AT_STATX_FORCE_SYNC
++    FLAG_GENERIC(AT_STATX_FORCE_SYNC),
++#endif
++#ifdef AT_STATX_DONT_SYNC
++    FLAG_GENERIC(AT_STATX_DONT_SYNC),
++#endif
++    FLAG_END,
++};
++
++UNUSED static struct flags statx_mask[] = {
++/* This must come first, because it includes everything.  */
++#ifdef STATX_ALL
++    FLAG_GENERIC(STATX_ALL),
++#endif
++/* This must come second; it includes everything except STATX_BTIME.  */
++#ifdef STATX_BASIC_STATS
++    FLAG_GENERIC(STATX_BASIC_STATS),
++#endif
++#ifdef STATX_TYPE
++    FLAG_GENERIC(STATX_TYPE),
++#endif
++#ifdef STATX_MODE
++    FLAG_GENERIC(STATX_MODE),
++#endif
++#ifdef STATX_NLINK
++    FLAG_GENERIC(STATX_NLINK),
++#endif
++#ifdef STATX_UID
++    FLAG_GENERIC(STATX_UID),
++#endif
++#ifdef STATX_GID
++    FLAG_GENERIC(STATX_GID),
++#endif
++#ifdef STATX_ATIME
++    FLAG_GENERIC(STATX_ATIME),
++#endif
++#ifdef STATX_MTIME
++    FLAG_GENERIC(STATX_MTIME),
++#endif
++#ifdef STATX_CTIME
++    FLAG_GENERIC(STATX_CTIME),
++#endif
++#ifdef STATX_INO
++    FLAG_GENERIC(STATX_INO),
++#endif
++#ifdef STATX_SIZE
++    FLAG_GENERIC(STATX_SIZE),
++#endif
++#ifdef STATX_BLOCKS
++    FLAG_GENERIC(STATX_BLOCKS),
++#endif
++#ifdef STATX_BTIME
++    FLAG_GENERIC(STATX_BTIME),
++#endif
++    FLAG_END,
++};
++
+ /*
+  * print_xxx utility functions.  These are used to print syscall
+  * parameters in certain format.  All of these have parameter
+@@ -2611,6 +2681,22 @@ print_tgkill(const struct syscallname *name,
+ }
+ #endif
+ 
++#ifdef TARGET_NR_statx
++static void
++print_statx(const struct syscallname *name,
++            abi_long arg0, abi_long arg1, abi_long arg2,
++            abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_at_dirfd(arg0, 0);
++    print_string(arg1, 0);
++    print_flags(statx_flags, arg2, 0);
++    print_flags(statx_mask, arg3, 0);
++    print_pointer(arg4, 1);
++    print_syscall_epilogue(name);
++}
++#endif
++
+ /*
+  * An array of all of the syscalls we know about
+  */
+diff --git a/linux-user/strace.list b/linux-user/strace.list
+index db21ce4..63a9466 100644
+--- a/linux-user/strace.list
++++ b/linux-user/strace.list
+@@ -1650,3 +1650,6 @@
+ #ifdef TARGET_NR_atomic_barrier
+ { TARGET_NR_atomic_barrier, "atomic_barrier", NULL, NULL, NULL },
+ #endif
++#ifdef TARGET_NR_statx
++{ TARGET_NR_statx, "statx", NULL, print_statx, NULL },
++#endif
+-- 
+2.7.4
+
 
