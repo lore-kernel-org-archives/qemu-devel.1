@@ -2,67 +2,105 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26702C48BD7
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 17:59:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9395C48BE4
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 18:23:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05DA3208E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 17:59:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05DA3208E3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9BAE4205F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 18:23:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BAE4205F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgYft-0005HI-UR
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 13:59:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40755)
+	id 1hgZ34-0007tU-OD
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 14:23:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45990)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hgYf4-0004q3-2c
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 13:58:19 -0400
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hgZ22-0007Un-RX
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 14:22:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hgYf2-00038q-4f
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 13:58:17 -0400
-Resent-Date: Thu, 27 Jun 2019 13:58:17 -0400
-Resent-Message-Id: <E1hgYf2-00038q-4f@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21445)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hgZ20-00008G-DI
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 14:22:01 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:36348
+ helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hgYf1-0002zI-2V
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 13:58:16 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1561658252; cv=none; d=zoho.com; s=zohoarc; 
- b=Kk9U8OIzylS70lqFQdjxBc9N4ZgXby35edNXuxIUEW3HIDko1XWXEiSODsENJ+0XAR53S/rsrLBdypBOoSjthghNKl9lun5NwpYZjx1envDbGKYa3fm1WbUeEzjS8XwsuaSvBD0LXNnfPGBj9ajyhgBv6Ai5pwQGeJ0SlbyYR5I=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1561658252;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=U+RWuUopwuFBFwir+1e8QokxxyT8I+vXXsDsLiKWhD0=; 
- b=B/GZ2t/5PVgRJVnIDmjXZTPssi5SKbAf4kxB9SAXW1MKFGoWHlyHKMzQip2CJumZhZyFGJ3nMQ4pLyq2Mltvde9svDHZOV2MkCY3sFWpNg09Uf+V+p5z1zKfcnrg95Led23/LT4Km2P2GkHP7y52wVJIy+K/obWLRKwohXw/0rA=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1561658244830326.01963618591674;
- Thu, 27 Jun 2019 10:57:24 -0700 (PDT)
-Message-ID: <156165824263.6332.8341680505632281487@c4a48874b076>
-In-Reply-To: <1561649510-21183-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1hgZ20-000077-6X
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 14:22:00 -0400
+Received: from host86-173-229-95.range86-173.btcentralplus.com
+ ([86.173.229.95] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1hgZ1P-0007Tc-OG; Thu, 27 Jun 2019 19:21:23 +0100
+To: Richard Henderson <richard.henderson@linaro.org>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+References: <20190519041522.12327-1-richard.henderson@linaro.org>
+ <8f28d008-2608-a579-7505-4546b08deb41@linaro.org>
+ <085d6881-f518-9888-a13e-081cdc09de46@ilande.co.uk>
+ <0b9f4772-37f6-1453-e4ea-5ad9d0f52a5b@ilande.co.uk>
+ <acc57487-c8a0-9380-bc2a-4de22541eabf@ilande.co.uk>
+ <CAL1e-=iavFqEeFuNm2efVM7mu5OaABBVo90wqJEhmoWa4DQv=Q@mail.gmail.com>
+ <ffae3651-5daf-e008-6562-2de09d82ace9@linaro.org>
+ <b8aab3f4-e3eb-a137-62b4-ba5ac1a2ad8f@ilande.co.uk>
+ <68facefc-b801-4902-11c0-4542662bfc4e@linaro.org>
+ <d2c1f979-7ff2-946e-4863-c1be19c5f003@ilande.co.uk>
+ <16f26b7f-2435-aa05-66a3-073e8310d5c8@linaro.org>
+ <0ceec012-fcdc-ccde-291a-121a4e475f86@ilande.co.uk>
+ <7b1699e1-28ca-a58f-787e-c0ca11666b90@linaro.org>
+ <9502af13-22b9-031e-2ba9-ec4ff75ccd0e@ilande.co.uk>
+ <cd1a0635-5b5d-3c2d-dec3-4ceda8c789f9@ilande.co.uk>
+ <0d6d9b35-4c4a-a04d-76b5-eca089ade29c@linaro.org>
+ <2903e103-bb1f-cc68-3a1f-cebef2590684@linaro.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <60fd051e-6aac-936d-7938-db392b69a0e1@ilande.co.uk>
+Date: Thu, 27 Jun 2019 19:21:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: aleksandar.markovic@rt-rk.com
-Date: Thu, 27 Jun 2019 10:57:24 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <2903e103-bb1f-cc68-3a1f-cebef2590684@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 86.173.229.95
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [PATCH v14 0/5] linux-user: A set of miscellaneous
- patches
+X-Received-From: 46.43.2.167
+Subject: Re: [Qemu-devel] [PATCH v4 0/7] tcg/ppc: Add vector opcodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,66 +112,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org, amarkovic@wavecomp.com, laurent@vivier.eu
+Cc: Howard Spoelstra <hsp.cat7@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTYxNjQ5NTEwLTIxMTgzLTEt
-Z2l0LXNlbmQtZW1haWwtYWxla3NhbmRhci5tYXJrb3ZpY0BydC1yay5jb20vCgoKCkhpLAoKVGhp
-cyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91
-dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDE1NjE2NDk1MTAt
-MjExODMtMS1naXQtc2VuZC1lbWFpbC1hbGVrc2FuZGFyLm1hcmtvdmljQHJ0LXJrLmNvbQpUeXBl
-OiBzZXJpZXMKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MTQgMC81XSBsaW51eC11c2Vy
-OiBBIHNldCBvZiBtaXNjZWxsYW5lb3VzIHBhdGNoZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
-PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9n
-cmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFND
-UklQVCBFTkQgPT09CgpGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVt
-dQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzE1NjE2NDk1MTAtMjExODMtMS1n
-aXQtc2VuZC1lbWFpbC1hbGVrc2FuZGFyLm1hcmtvdmljQHJ0LXJrLmNvbSAtPiBwYXRjaGV3LzE1
-NjE2NDk1MTAtMjExODMtMS1naXQtc2VuZC1lbWFpbC1hbGVrc2FuZGFyLm1hcmtvdmljQHJ0LXJr
-LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmY5YjJiM2M2ZjEgbGludXgtdXNl
-cjogSGFuZGxlIEVYQ1BfRlBFIHByb3Blcmx5IGZvciBNSVBTCjg5YjQyNzVjODkgbGludXgtdXNl
-cjogSW50cm9kdWNlIFRBUkdFVF9IQVZFX0FSQ0hfU1RSVUNUX0ZMT0NLCjY0NmEwOTZkMGYgbGlu
-dXgtdXNlcjogRml4IGZsb2NrIHN0cnVjdHVyZSBmb3IgTUlQUyBPNjQgQUJJCjFkZGQzMmI2N2Mg
-bGludXgtdXNlcjogQWRkIHN1cHBvcnQgZm9yIHN0cmFjZSBmb3Igc3RhdHgoKSBzeXNjYWxsCjg2
-OWUyYTRmNzUgbGludXgtdXNlcjogQWRkIHN1cHBvcnQgZm9yIHRyYW5zbGF0aW9uIG9mIHN0YXR4
-KCkgc3lzY2FsbAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS81IENoZWNraW5nIGNvbW1pdCA4Njll
-MmE0Zjc1YzAgKGxpbnV4LXVzZXI6IEFkZCBzdXBwb3J0IGZvciB0cmFuc2xhdGlvbiBvZiBzdGF0
-eCgpIHN5c2NhbGwpCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3Vs
-ZCBiZSBhdm9pZGVkCiM2MDogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6MzIyOgorI2lmIGRl
-ZmluZWQoVEFSR0VUX05SX3N0YXR4KSAmJiBkZWZpbmVkKF9fTlJfc3RhdHgpCgpXQVJOSU5HOiBh
-cmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojNzI6IEZJTEU6
-IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjY0Nzk6CisjaWYgZGVmaW5lZChUQVJHRVRfTlJfc3RhdHgp
-ICYmIGRlZmluZWQoX19OUl9zdGF0eCkKCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBk
-ZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiMxNDI6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5j
-OjEwMTg5OgorI2lmIGRlZmluZWQoX19OUl9zdGF0eCkKCnRvdGFsOiAwIGVycm9ycywgMyB3YXJu
-aW5ncywgMTg2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEvNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
-ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
-cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
-RVJTLgoyLzUgQ2hlY2tpbmcgY29tbWl0IDFkZGQzMmI2N2M4MCAobGludXgtdXNlcjogQWRkIHN1
-cHBvcnQgZm9yIHN0cmFjZSBmb3Igc3RhdHgoKSBzeXNjYWxsKQpFUlJPUjogc3RvcmFnZSBjbGFz
-cyBzaG91bGQgYmUgYXQgdGhlIGJlZ2lubmluZyBvZiB0aGUgZGVjbGFyYXRpb24KIzI3OiBGSUxF
-OiBsaW51eC11c2VyL3N0cmFjZS5jOjk3OToKK1VOVVNFRCBzdGF0aWMgc3RydWN0IGZsYWdzIHN0
-YXR4X2ZsYWdzW10gPSB7CgpFUlJPUjogc3RvcmFnZSBjbGFzcyBzaG91bGQgYmUgYXQgdGhlIGJl
-Z2lubmluZyBvZiB0aGUgZGVjbGFyYXRpb24KIzQ5OiBGSUxFOiBsaW51eC11c2VyL3N0cmFjZS5j
-OjEwMDE6CitVTlVTRUQgc3RhdGljIHN0cnVjdCBmbGFncyBzdGF0eF9tYXNrW10gPSB7Cgp0b3Rh
-bDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDEwNCBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzUgaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjMvNSBDaGVja2luZyBjb21taXQgNjQ2YTA5NmQwZjA2
-IChsaW51eC11c2VyOiBGaXggZmxvY2sgc3RydWN0dXJlIGZvciBNSVBTIE82NCBBQkkpCjQvNSBD
-aGVja2luZyBjb21taXQgODliNDI3NWM4OTNmIChsaW51eC11c2VyOiBJbnRyb2R1Y2UgVEFSR0VU
-X0hBVkVfQVJDSF9TVFJVQ1RfRkxPQ0spCjUvNSBDaGVja2luZyBjb21taXQgZjliMmIzYzZmMWYw
-IChsaW51eC11c2VyOiBIYW5kbGUgRVhDUF9GUEUgcHJvcGVybHkgZm9yIE1JUFMpCj09PSBPVVRQ
-VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBs
-b2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1NjE2NDk1MTAtMjEx
-ODMtMS1naXQtc2VuZC1lbWFpbC1hbGVrc2FuZGFyLm1hcmtvdmljQHJ0LXJrLmNvbS90ZXN0aW5n
-LmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
-bGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
-ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 27/06/2019 18:54, Richard Henderson wrote:
 
+> On 6/27/19 7:51 PM, Richard Henderson wrote:
+>> Please try the following patch on top and if it works I'll split it back into
+>> the patch set properly.
+> 
+> Dangit.  I generated the patch on the wrong machine.
+> Let's try that again.
+
+Yes it works! Or at least so far it has survived a boot into the MacOS 9 desktop
+which is fairly good at exercising all sorts of strange edge cases...
+
+If you're going to resend the patchset, don't forget to squash "tcg/ppc: Support
+vector dup2" into "tcg/ppc: Initial backend support for Altivec" to preserve
+bisectability on 32-bit PPC hosts when configuring with "--enable-debug-tcg".
+
+
+ATB,
+
+Mark.
 
