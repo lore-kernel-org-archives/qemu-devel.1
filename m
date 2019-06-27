@@ -6,58 +6,57 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2631C48BD6
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 15:52:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF154C48BD7
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 15:52:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9F2A20663
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 15:52:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9F2A20663
+	by mail.kernel.org (Postfix) with ESMTPS id BB98620663
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 15:52:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB98620663
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgWhc-0002E6-0e
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 11:52:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33149)
+	id 1hgWhd-0002IP-VD
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 11:52:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32825)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <palmer@dabbelt.com>) id 1hgWHb-0003Dp-Fk
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:25:57 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1hgWHJ-0002gX-01
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:25:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1hgWHX-00008t-4n
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:25:53 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:35083)
+ (envelope-from <palmer@dabbelt.com>) id 1hgWHE-0008Hj-Fp
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:25:35 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:36623)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hgWHW-00078D-O4
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:25:50 -0400
-Received: by mail-pf1-f193.google.com with SMTP id d126so1410540pfd.2
- for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 08:24:19 -0700 (PDT)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hgWH9-0006jD-2i
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:25:32 -0400
+Received: by mail-pg1-f193.google.com with SMTP id c13so1180633pgg.3
+ for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 08:23:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=/utRw/o8PW3YQm+ZhJWNBeL8gDnPNYLiS6dXiDJvvqI=;
- b=m72LBMRtuLmuX9CBY+jIZRk0OMroSCe4OmEM1N9pLL/13qL/PJbOXuZaCCyeI4XYK4
- zuBDmfJACxfdCOZXT5iFFAK9ptgJUwPz8jY+LIF+0un/tT7ugkgmI5+7Z9abqItE0e2w
- fucwJQ6y2kIpsNKT11yKK7j5qd+TmwMcaE2DR+BiIQa6RuR4BnH0k3o0BhXjuLUdzN5O
- i1kfgXnaBIv/BIRpdvvB6Kq5y2iXwkgyMcGleDYkz1GpxFf1Pv2Y14Gy1GkhEzsRyMGr
- /98+uyDkCE9iv1kFTrdizn5DC+bc+b2WqHYqZTEMUhiBi67mNSrqCfGvTub56R4w/buI
- 4N+A==
-X-Gm-Message-State: APjAAAVWQ4ZekoSuStZjR5jWJtkwZasvgFK1DxDRNbwCFmprJAejoD6T
- Kg7GwxjZqv1yYSjCcm9TjS0rzg==
-X-Google-Smtp-Source: APXvYqwqMNKPZN0oG/XToM+BO4sKOn/5VD2//Xh6ky/uOvwnVSrI8PIxKIsCGc8JOz/LwDQrOkeiGg==
-X-Received: by 2002:a17:90a:634a:: with SMTP id
- v10mr6872490pjs.16.1561649058777; 
- Thu, 27 Jun 2019 08:24:18 -0700 (PDT)
+ bh=nCqKF3oInYRXPwJWI7RpGGCzJlHRvb4E4bj4yY7JdO8=;
+ b=jrN0RRKRimVoU+wqDpnazVVPiMByEgVKyJSBcL9KjJVL7jGXMv2akmfoSPD/qRNFx1
+ JuRTS0gmEoj886lwjSxsya9+6RGGtFEr4OQk2vrXTq/ZmNutyj2psDgEqYzsRquHBEej
+ LkNgGlhPnlLOrv7Q//l6Niimrpa8cbqXoEiEFJRVh7ZAh6fd88bAZDWhjPeAdXWmQ6Z8
+ eZqM79KuEd9rjqP/DLzSo0c1QuwzWQ+mdF3Mu/dzXVPyU9K4CRKpyANE6X8VkRH4Jl6C
+ ncytNPi6CpVM/f6LBYpLhznQmciPznwjKzvpsUh3+MT4fkOxtmtrgAKk0ToEPpckOcyn
+ 3jwg==
+X-Gm-Message-State: APjAAAWtcrhzEQU/sLQmvz8lhFYN6ppqqbNdZ8vuWgziKbE8qnjR6xrM
+ CVyEixky/BOfIpos5ihCvGHKkA==
+X-Google-Smtp-Source: APXvYqxQicao0ppWeUilfhR+0a2GeGzhgPiD9dF6hP9iUcRv+KdNY+sceD6OEu6ncermiJcsuH5SEw==
+X-Received: by 2002:a63:2ad5:: with SMTP id q204mr4370120pgq.140.1561649024131; 
+ Thu, 27 Jun 2019 08:23:44 -0700 (PDT)
 Received: from localhost (220-132-236-182.HINET-IP.hinet.net.
  [220.132.236.182])
- by smtp.gmail.com with ESMTPSA id p2sm5388157pfb.118.2019.06.27.08.24.18
+ by smtp.gmail.com with ESMTPSA id y23sm5311422pfo.106.2019.06.27.08.23.43
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 27 Jun 2019 08:24:18 -0700 (PDT)
-Date: Thu, 27 Jun 2019 08:20:00 -0700
-Message-Id: <20190627152011.18686-24-palmer@sifive.com>
+ Thu, 27 Jun 2019 08:23:43 -0700 (PDT)
+Date: Thu, 27 Jun 2019 08:19:46 -0700
+Message-Id: <20190627152011.18686-10-palmer@sifive.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190627152011.18686-1-palmer@sifive.com>
 References: <20190627152011.18686-1-palmer@sifive.com>
@@ -67,9 +66,9 @@ From: Palmer Dabbelt <palmer@sifive.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.210.193
-Subject: [Qemu-devel] [PULL 23/34] RISC-V: Clear load reservations on
- context switch and SC
+X-Received-From: 209.85.215.193
+Subject: [Qemu-devel] [PULL 09/34] RISC-V: Fix a PMP bug where it succeeds
+ even if PMP entry is off
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,88 +80,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Joel Sing <joel@sing.id.au>, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- Palmer Dabbelt <palmer@sifive.com>
+Cc: Alistair Francis <alistair.francis@wdc.com>,
+ Palmer Dabbelt <palmer@sifive.com>, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org, Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Joel Sing <joel@sing.id.au>
+From: Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
 
-This prevents a load reservation from being placed in one context/process,
-then being used in another, resulting in an SC succeeding incorrectly and
-breaking atomics.
+The current implementation returns 1 (PMP check success) if the address is in
+range even if the PMP entry is off. This is a bug.
 
-Signed-off-by: Joel Sing <joel@sing.id.au>
-Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+For example, if there is a PMP check in S-Mode which is in range, but its PMP
+entry is off, this will succeed, which it should not.
+
+The patch fixes this bug by only checking the PMP permissions if the address is
+in range and its corresponding PMP entry it not off. Otherwise, it will keep
+the ret = -1 which will be checked and handled correctly at the end of the
+function.
+
+Signed-off-by: Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- target/riscv/cpu.c                      |  1 +
- target/riscv/cpu_helper.c               | 10 ++++++++++
- target/riscv/insn_trans/trans_rva.inc.c |  8 +++++++-
- 3 files changed, 18 insertions(+), 1 deletion(-)
+ target/riscv/pmp.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 915b9e77df33..f8d07bd20ad7 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -297,6 +297,7 @@ static void riscv_cpu_reset(CPUState *cs)
-     env->pc = env->resetvec;
- #endif
-     cs->exception_index = EXCP_NONE;
-+    env->load_res = -1;
-     set_default_nan_mode(1, &env->fp_status);
- }
+diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
+index 5944f4cb6607..958c7502a0e0 100644
+--- a/target/riscv/pmp.c
++++ b/target/riscv/pmp.c
+@@ -258,11 +258,12 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
+         /* fully inside */
+         const uint8_t a_field =
+             pmp_get_a_field(env->pmp_state.pmp[i].cfg_reg);
+-        if ((s + e) == 2) {
+-            if (PMP_AMATCH_OFF == a_field) {
+-                return 1;
+-            }
  
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index e1b079e69c60..e32b6126af05 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -132,6 +132,16 @@ void riscv_cpu_set_mode(CPURISCVState *env, target_ulong newpriv)
-     }
-     /* tlb_flush is unnecessary as mode is contained in mmu_idx */
-     env->priv = newpriv;
-+
-+    /*
-+     * Clear the load reservation - otherwise a reservation placed in one
-+     * context/process can be used by another, resulting in an SC succeeding
-+     * incorrectly. Version 2.2 of the ISA specification explicitly requires
-+     * this behaviour, while later revisions say that the kernel "should" use
-+     * an SC instruction to force the yielding of a load reservation on a
-+     * preemptive context switch. As a result, do both.
-+     */
-+    env->load_res = -1;
- }
- 
- /* get_physical_address - get the physical address for this virtual address
-diff --git a/target/riscv/insn_trans/trans_rva.inc.c b/target/riscv/insn_trans/trans_rva.inc.c
-index f6dbbc065e15..fadd88849e2b 100644
---- a/target/riscv/insn_trans/trans_rva.inc.c
-+++ b/target/riscv/insn_trans/trans_rva.inc.c
-@@ -61,7 +61,7 @@ static inline bool gen_sc(DisasContext *ctx, arg_atomic *a, TCGMemOp mop)
- 
-     gen_set_label(l1);
-     /*
--     * Address comparion failure.  However, we still need to
-+     * Address comparison failure.  However, we still need to
-      * provide the memory barrier implied by AQ/RL.
-      */
-     tcg_gen_mb(TCG_MO_ALL + a->aq * TCG_BAR_LDAQ + a->rl * TCG_BAR_STRL);
-@@ -69,6 +69,12 @@ static inline bool gen_sc(DisasContext *ctx, arg_atomic *a, TCGMemOp mop)
-     gen_set_gpr(a->rd, dat);
- 
-     gen_set_label(l2);
-+    /*
-+     * Clear the load reservation, since an SC must fail if there is
-+     * an SC to any address, in between an LR and SC pair.
-+     */
-+    tcg_gen_movi_tl(load_res, -1);
-+
-     tcg_temp_free(dat);
-     tcg_temp_free(src1);
-     tcg_temp_free(src2);
++        /*
++         * If the PMP entry is not off and the address is in range, do the priv
++         * check
++         */
++        if (((s + e) == 2) && (PMP_AMATCH_OFF != a_field)) {
+             allowed_privs = PMP_READ | PMP_WRITE | PMP_EXEC;
+             if ((mode != PRV_M) || pmp_is_locked(env, i)) {
+                 allowed_privs &= env->pmp_state.pmp[i].cfg_reg;
 -- 
 2.21.0
 
