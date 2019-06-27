@@ -2,66 +2,97 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A9D0C48BD7
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:40:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8F31C48BD9
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:43:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12036208E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:40:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12036208E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7A12B208E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:43:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vf9qtRCh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A12B208E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgXRQ-0000Ey-Bc
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 12:40:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50176)
+	id 1hgXUB-0004OF-My
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 12:42:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46650)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hgXNc-0006Ib-Jx
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 12:36:14 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hgX8D-0007C0-CI
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 12:20:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hgXNa-0003dn-B3
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 12:36:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38138)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>)
- id 1hgXNO-0003QW-2M; Thu, 27 Jun 2019 12:35:58 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0ADFB30860CD;
- Thu, 27 Jun 2019 16:35:57 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-169.ams2.redhat.com
- [10.36.117.169])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F2D71001B27;
- Thu, 27 Jun 2019 16:35:56 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 1BE4711386A0; Thu, 27 Jun 2019 18:35:55 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>
-References: <20190528143727.10529-1-dplotnikov@virtuozzo.com>
- <20190528143727.10529-2-dplotnikov@virtuozzo.com>
-Date: Thu, 27 Jun 2019 18:35:55 +0200
-In-Reply-To: <20190528143727.10529-2-dplotnikov@virtuozzo.com> (Denis
- Plotnikov's message of "Tue, 28 May 2019 17:37:25 +0300")
-Message-ID: <871rzfc7f8.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <richard.henderson@linaro.org>) id 1hgX89-0004KE-Ci
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 12:20:15 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33559)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hgX84-0003yq-Cl
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 12:20:12 -0400
+Received: by mail-wr1-x444.google.com with SMTP id n9so3295584wru.0
+ for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 09:20:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=FAwBUk3G5Bj2CQarLPtJt2WX0hbF8QWcnx2JtkNbuJw=;
+ b=vf9qtRChBWvudlQuif0zapRi6RV5OpzO+5w5V4NPZgvOb4ArNBOedHwGhWCQqE0szu
+ 2SOb9sMaG6xrMEGie7ZnQXXmGwduu87J1b0nEyJASl/b08F79EEhHncJp81U9W4C0EG4
+ r9DbVdK9xLHUVAhLLdrEPoYxTrZNF/VL/dDbwuIuL1mGFWES6Pz7V/mXg6B5mKPlr+T1
+ H6mDhuepd0rM1s9Iuzng8qbeuLG1LlNBYRbwnXt5nWg8cOgIU8+mLelUy0x1KG2/jNt8
+ LGB1EB/fFFN18snvi5moF2h52npxGTu1uFoAKDRh3Jh6yigG5He6ZfOYYPsPLFhXIbUe
+ +NvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=FAwBUk3G5Bj2CQarLPtJt2WX0hbF8QWcnx2JtkNbuJw=;
+ b=nyLWvcT0nlPJ/qV9nFS4u2nUYdaI4kCFViPW7EAtVA5UN6bTtw4GDl+cwxCPl3N0jy
+ TVCgemwbZVEfVQJDufGxI84wElV+vkheK5tHvOHz1j664dVDN+DIMVuYBlA2MSQ50NqJ
+ IaQaPl6anUtGlGGBZ9suWDKVtcUS90FGZH7ToQDRg+Z3EgW9OL81XaQ+J1IHQn0PiWAy
+ TmfoA+FNpqQKuFbjbpBNf4d8LxW4nQDmMhDA5Xt4qZgtfcJEtjlyJUwj97UXt9F6tKlM
+ uN14LHHWPGlBF2RDAQBu2Zbw5gqJOqTzDvf84ILG/nVa1ocUMwcocJnSO9PBohJBRptQ
+ nW4w==
+X-Gm-Message-State: APjAAAXaXKrdU4q/lMikGdCWc11/XUumcTFZqdBY9xLj2dLj/V/IECQZ
+ g3xs5tqUvjn31FJTKhxFdKaa1A==
+X-Google-Smtp-Source: APXvYqzRvmfcuD/TooS0//8nWZLBxVvzdp9XwvwyUlcH49bPmOKokAlqMl6xofm8+uW6Dag5Wc2Ztw==
+X-Received: by 2002:adf:9d81:: with SMTP id p1mr4080077wre.294.1561652400048; 
+ Thu, 27 Jun 2019 09:20:00 -0700 (PDT)
+Received: from [192.168.2.137] (93-34-153-63.ip50.fastwebnet.it.
+ [93.34.153.63])
+ by smtp.gmail.com with ESMTPSA id l8sm5098420wrg.40.2019.06.27.09.19.59
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 27 Jun 2019 09:19:59 -0700 (PDT)
+To: Dave Martin <Dave.Martin@arm.com>, Andrew Jones <drjones@redhat.com>
+References: <20190621163422.6127-1-drjones@redhat.com>
+ <20190621163422.6127-8-drjones@redhat.com>
+ <ee8ce4a6-09fd-47ab-ef7e-a231df1e9c1b@redhat.com>
+ <20190627104638.x4gxsmv7vpww3mra@kamzik.brq.redhat.com>
+ <ae98bf94-6826-1f2b-2f2e-a11a3f75cb92@redhat.com>
+ <20190627114701.n7tjgmljeribk7to@kamzik.brq.redhat.com>
+ <20190627151628.GI2790@e103592.cambridge.arm.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <d0f5ee56-1e10-6c27-40f1-69b87a43fdca@linaro.org>
+Date: Thu, 27 Jun 2019 18:19:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Thu, 27 Jun 2019 16:35:57 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v0 1/3] qcow2: introduce compression type
- feature
+In-Reply-To: <20190627151628.GI2790@e103592.cambridge.arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH v2 07/14] target/arm/cpu64: max cpu:
+ Introduce sve<vl-bits> properties
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,297 +104,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, den@virtuozzo.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "armbru@redhat.com" <armbru@redhat.com>, Auger Eric <eric.auger@redhat.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "imammedo@redhat.com" <imammedo@redhat.com>,
+ "alex.bennee@linaro.org" <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Doc & QAPI schema review only.
+On 6/27/19 5:16 PM, Dave Martin wrote:
+> The architecture says:
+> 
+> "For all purposes other than returning the result of a direct read of
+> ZCR_EL1 then this field behaves as if it is set to the minimum of the
+> stored value and the constrained length inherited from more privileged
+> Exception levels in the current Security state, rounded down to the
+> nearest implemented vector length."
+> 
+> I think the behaviour of a direct read is implied: the LEN bits yielded
+> by an MRS should contain exactly what was last written to them via MSR.
 
-Denis Plotnikov <dplotnikov@virtuozzo.com> writes:
+I agree.
 
-> The patch adds some preparation parts for incompatible compression type
-> feature to QCOW2 header that indicates that *all* compressed clusters
-> must be (de)compressed using a certain compression type.
->
-> It is implied that the compression type is set on the image creation and
-> can be changed only later by image conversion, thus compression type
-> defines the only compression algorithm used for the image.
->
-> The goal of the feature is to add support of other compression algorithms
-> to qcow2. For example, ZSTD which is more effective on compression than ZLIB.
-> It works roughly x2 faster than ZLIB providing a comparable compression ratio
-> and therefore provide a performance advantage in backup scenarios.
->
-> The default compression is ZLIB. Images created with ZLIB compression type
-> is backward compatible with older qemu versions.
->
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> ---
->  block/qcow2.c             | 61 +++++++++++++++++++++++++++++++++++++++
->  block/qcow2.h             | 29 ++++++++++++++-----
->  docs/interop/qcow2.txt    | 37 +++++++++++++++++++++++-
->  include/block/block_int.h |  1 +
->  qapi/block-core.json      | 34 ++++++++++++++++++++--
->  5 files changed, 151 insertions(+), 11 deletions(-)
-[...]
-> diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-> index af5711e533..cebcbc4f2f 100644
-> --- a/docs/interop/qcow2.txt
-> +++ b/docs/interop/qcow2.txt
-> @@ -109,7 +109,14 @@ in the description of a field.
-                       Bit 0:      Dirty bit.  If this bit is set then refcounts
-                                   may be inconsistent, make sure to scan L1/L2
-                                   tables to repair refcounts before accessing the
-                                   image.
+Moreover, the value written to ZCR_ELx.LEN should not be directly adjusted
+because the effective value also depends on ZCR_EL(x+1).LEN, and if the
+higher-level EL register changes, the lower-level EL must see the effect.
 
-                       Bit 1:      Corrupt bit.  If this bit is set then any data
-                                   structure may be corrupt and the image must not
-                                   be written to (unless for regaining
-                                   consistency).
+The function that should be modified instead is sve_zcr_len_for_el().
 
-                       Bit 2:      External data file bit.  If this bit is set, an
-                                   external data file is used. Guest clusters are
-                                   then stored in the external data file. For such
-                                   images, clusters in the external data file are
-                                   not refcounted. The offset field in the
-                                   Standard Cluster Descriptor must match the
-                                   guest offset and neither compressed clusters
-                                   nor internal snapshots are supported.
 
->                                  An External Data File Name header extension may
->                                  be present if this bit is set.
->  
-> -                    Bits 3-63:  Reserved (set to 0)
-> +                    Bit 3:      Compression type. If the bit is set, then the
-
-"Compression type bit", for consistency with the other three.
-
-> +                                type of compression the image uses is set in the
-> +                                header extension. When the bit is set the
-> +                                compression type extension header must be present.
-> +                                When the bit is not set the compression type
-> +                                header must absent.
-> +
-> +                    Bits 4-63:  Reserved (set to 0)
->  
->           80 -  87:  compatible_features
->                      Bitmask of compatible features. An implementation can
-> @@ -175,6 +182,7 @@ be stored. Each extension has a structure like the following:
->                          0x23852875 - Bitmaps extension
->                          0x0537be77 - Full disk encryption header pointer
->                          0x44415441 - External data file name string
-> +                        0x434D5052 - Compression type extension
->                          other      - Unknown header extension, can be safely
->                                       ignored
->  
-> @@ -771,3 +779,30 @@ In the image file the 'enabled' state is reflected by the 'auto' flag. If this
->  flag is set, the software must consider the bitmap as 'enabled' and start
->  tracking virtual disk changes to this bitmap from the first write to the
->  virtual disk. If this flag is not set then the bitmap is disabled.
-> +
-> +
-> +== Compression type extension ==
-> +
-> +The compression type extension is an optional header extension. It stores the
-> +compression type used for disk clusters (de)compression.
-
-s/clusters/cluster/
-
-> +A single compression type is applied to all compressed disk clusters,
-> +with no way to change compression types per cluster. Two clusters of the image
-> +couldn't be compressed with different compression types.
-
-Is the text after the first comma useful?
-
-> +
-> +The compression type is set on image creation. The only way to change
-> +the compression type is to convert the image explicitly.
-
-Suggest to scratch "explicitly".
-
-> +
-> +The compression type extension is present if and only if the incompatible
-> +compression type bit is set.
-
-Suggest "if the compression type bit (incompatible feature bit 3) is
-set", for consistency with existing references to incompatible feature
-bits.
-
->                               When the bit is not set the compression type
-> +header must be absent.
-
-This sentence is redundant with "if and only if".  Suggest to drop it.
-
-> +
-> +When the compression type bit is not set and the compression type header
-
-Suggest "not set, and".
-
-> +extension is absent, ZLIB compression is used for compressed clusters.
-> +This defines default image compression type: ZLIB.
-
-I find this sentence confusing.  Can we drop it?
-
-> +Qemu < 4.1 can use images created with compression type ZLIB without any
-> +additional preparations and cannot use images created with compression
-> +types != ZLIB.
-
-Suggest "QEMU versions older than 4.1 can only use images created with
-compression type ZLIB".
-
-> +
-> +Available compression types:
-> +    0: ZLIB
-> +    1: ZSTD
-
-Please add brief explanations with pointers to additional information
-for both.  Something like
-
-       0: zlib compression, see <http://zlib.net/>
-       1: zstd compression, see FIXME
-
-Mention RFC 1950, 1951 and 1952 for zlib if you like.
-
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index 01e855a066..814917baec 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -58,6 +58,7 @@
->  #define BLOCK_OPT_REFCOUNT_BITS     "refcount_bits"
->  #define BLOCK_OPT_DATA_FILE         "data_file"
->  #define BLOCK_OPT_DATA_FILE_RAW     "data_file_raw"
-> +#define BLOCK_OPT_COMPRESSION_TYPE  "compression_type"
->  
->  #define BLOCK_PROBE_BUF_SIZE        512
->  
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 7ccbfff9d0..59610153fd 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -78,6 +78,9 @@
->  #
->  # @bitmaps: A list of qcow2 bitmap details (since 4.0)
->  #
-> +# @compression-type: the compression method used for image clusters
-> +#                    compression (since 4.1)
-
-s/clusters/cluster/, I think.
-
-More laconic: the image cluster compression method.
-
-> +#
->  # Since: 1.7
->  ##
->  { 'struct': 'ImageInfoSpecificQCow2',
-> @@ -89,7 +92,8 @@
->        '*corrupt': 'bool',
->        'refcount-bits': 'int',
->        '*encrypt': 'ImageInfoSpecificQCow2Encryption',
-> -      '*bitmaps': ['Qcow2BitmapInfo']
-> +      '*bitmaps': ['Qcow2BitmapInfo'],
-> +      '*compression-type': 'Qcow2CompressionType'
->    } }
->  
->  ##
-> @@ -3119,6 +3123,10 @@
->  #                         an image, the data file name is loaded from the image
->  #                         file. (since 4.0)
->  #
-> +# @compression-type:      compression method to use for image clusters compression
-
-Likewise.
-
-> +#                         The comression method is set on image creation and can
-
-Typo: s/comression/compression/
-
-> +#                         be changed via image converting only. (since 4.1)
-
-I.e. it can't be changed.  Perhaps: "The compression method is fixed at
-image creation time.  To change it, you have to use qemu-img convert."
-
-Hmm.  BlockdevOptionsQcow2 has the qcow2-specific options for -blockdev.
-What does passing @compression-type to -blockdev mean?  The actual
-compression type is determined by the qcow2 image...  Am I confused?
-
-> +#
->  # Since: 2.9
->  ##
->  { 'struct': 'BlockdevOptionsQcow2',
-> @@ -3134,7 +3142,8 @@
->              '*refcount-cache-size': 'int',
->              '*cache-clean-interval': 'int',
->              '*encrypt': 'BlockdevQcow2Encryption',
-> -            '*data-file': 'BlockdevRef' } }
-> +            '*data-file': 'BlockdevRef',
-> +            '*compression-type': 'Qcow2CompressionType' } }
->  
->  ##
->  # @SshHostKeyCheckMode:
-> @@ -4206,6 +4215,19 @@
->    'data': [ 'v2', 'v3' ] }
->  
->  
-> +##
-> +# @Qcow2CompressionType:
-> +#
-> +# Compression type used in qcow2 image file
-> +#
-> +# @zlib     : gzip compressor
-> +# @zstd     : zstd compression
-
-Two nits.  One, we don't normally put spaces before the colon.  Two,
-compressor vs. compression.
-
-But I'd suggest something like
-
-    @zlib: zlib compression, see <http://zlib.net/>
-
-Mention RFC 1950, 1951 and 1952 if you like.
-
-Same for @zstd.
-
-> +#
-> +# Since: 4.1
-> +##
-> +{ 'enum': 'Qcow2CompressionType',
-> +  'data': [ 'zlib', 'zstd' ] }
-> +
->  ##
->  # @BlockdevCreateOptionsQcow2:
->  #
-> @@ -4228,6 +4250,11 @@
->  # @preallocation    Preallocation mode for the new image (default: off)
->  # @lazy-refcounts   True if refcounts may be updated lazily (default: off)
->  # @refcount-bits    Width of reference counts in bits (default: 16)
-> +# @compression-type Compression method used for image compressed clusters
-
-More laconic: the image cluster compression method.
-
-> +#                   (default: zlib(gzip), since 4.1).
-
-The default is "zlib", not "zlib(gzip)".  If you want to explain what
-zlib is, do it in Qcow2CompressionType's doc string.
-
-> +#                   Available types:
-> +#                       zlib
-> +#                       zstd
-
-Isn't this redundant?
-
->  #
->  # Since: 2.12
->  ##
-> @@ -4243,7 +4270,8 @@
->              '*cluster-size':    'size',
->              '*preallocation':   'PreallocMode',
->              '*lazy-refcounts':  'bool',
-> -            '*refcount-bits':   'int' } }
-> +            '*refcount-bits':   'int',
-> +            '*compression-type': 'Qcow2CompressionType' } }
->  
->  ##
->  # @BlockdevCreateOptionsQed:
+r~
 
