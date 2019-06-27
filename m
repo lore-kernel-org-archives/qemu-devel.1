@@ -2,57 +2,61 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0158DC48BD6
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:28:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E352C48BD7
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:29:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCF8E205ED
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:28:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCF8E205ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 063602133F
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:29:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 063602133F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgXG1-0006gU-2x
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 12:28:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34841)
+	id 1hgXHN-0000Ag-9D
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 12:29:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42485)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hgWOl-0001iC-Af
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:33:24 -0400
+ (envelope-from <berrange@redhat.com>) id 1hgWrS-0005Ps-Az
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 12:03:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hgWOe-0006fV-Hm
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:33:14 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:56542 helo=mail.rt-rk.com)
+ (envelope-from <berrange@redhat.com>) id 1hgWrP-0003Dg-Vh
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 12:02:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41378)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hgWOS-0005nV-AU
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:33:04 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 874D41A4566;
- Thu, 27 Jun 2019 17:32:08 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 5CB741A4562;
- Thu, 27 Jun 2019 17:32:08 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org,
-	laurent@vivier.eu
-Date: Thu, 27 Jun 2019 17:31:48 +0200
-Message-Id: <1561649510-21183-4-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1561649510-21183-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1561649510-21183-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v14 3/5] linux-user: Fix flock structure for
- MIPS O64 ABI
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hgWrP-0002zG-Ot
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 12:02:55 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B78423004425;
+ Thu, 27 Jun 2019 16:02:23 +0000 (UTC)
+Received: from redhat.com (ovpn-112-68.ams2.redhat.com [10.36.112.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 98A89600CC;
+ Thu, 27 Jun 2019 16:02:21 +0000 (UTC)
+Date: Thu, 27 Jun 2019 17:02:18 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190627160218.GO12358@redhat.com>
+References: <87tvcbc9ul.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87tvcbc9ul.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Thu, 27 Jun 2019 16:02:28 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] Should configure --enable-debug add -Og to CFLAGS?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,57 +68,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: amarkovic@wavecomp.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+On Thu, Jun 27, 2019 at 05:43:30PM +0200, Markus Armbruster wrote:
+> The fine manual advises:
+> 
+> '-O0'
+>      Reduce compilation time and make debugging produce the expected
+>      results.  This is the default.
+> [...]
+> '-Og'
+>      Optimize debugging experience.  '-Og' should be the optimization
+>      level of choice for the standard edit-compile-debug cycle, offering
+>      a reasonable level of optimization while maintaining fast
+>      compilation and a good debugging experience.  It is a better choice
+>      than '-O0' for producing debuggable code because some compiler
+>      passes that collect debug information are disabled at '-O0'.
+> 
+> Our configure --enable-debug effectively picks -O0.  Should it pick -Og
+> instead?
 
-Only MIPS O32 and N32 have special (different than other
-architectures) definition of structure flock in kernel.
+NB, it is the --enable-debug-info option to configure that actually
+adds the "-g" flag for debug info in objects, and turns off -O2.
 
-Bring flock definition for MIPS O64 ABI to the correct state,
-which is currently different than the most common definition,
-and it should be the same.
+--enable-debug turns on TCG and Mutex debugging & disables fortify
+source, but doesn't affect optimization level.
 
-Reported-by: Dragan Mladjenovic <dmladjenovic@wavecomp.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- linux-user/generic/fcntl.h     | 2 +-
- linux-user/mips/target_fcntl.h | 4 ++++
- 2 files changed, 5 insertions(+), 1 deletion(-)
+Adding -Og to --enable-debug-info would be problematic for Fedora/RHEL
+distro builds, as we want debugging symbols, but also still want -O2
+to be used.
 
-diff --git a/linux-user/generic/fcntl.h b/linux-user/generic/fcntl.h
-index a775a49..1b48dde 100644
---- a/linux-user/generic/fcntl.h
-+++ b/linux-user/generic/fcntl.h
-@@ -129,7 +129,7 @@ struct target_flock {
-     short l_whence;
-     abi_long l_start;
-     abi_long l_len;
--#if defined(TARGET_MIPS)
-+#if defined(TARGET_MIPS) && (TARGET_ABI_BITS == 32)
-     abi_long l_sysid;
- #endif
-     int l_pid;
-diff --git a/linux-user/mips/target_fcntl.h b/linux-user/mips/target_fcntl.h
-index 000527c..795bba7 100644
---- a/linux-user/mips/target_fcntl.h
-+++ b/linux-user/mips/target_fcntl.h
-@@ -27,7 +27,11 @@
- #define TARGET_F_SETOWN        24       /*  for sockets. */
- #define TARGET_F_GETOWN        23       /*  for sockets. */
- 
-+#if (TARGET_ABI_BITS == 32)
- #define TARGET_ARCH_FLOCK_PAD abi_long pad[4];
-+#else
-+#define TARGET_ARCH_FLOCK_PAD
-+#endif
- #define TARGET_ARCH_FLOCK64_PAD
- 
- #define TARGET_F_GETLK64       33      /*  using 'struct flock64' */
+Yes, the naming of these options is a trapdoor over a pit of crocodiles :-)
+
+Regards,
+Daniel
 -- 
-2.7.4
-
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
