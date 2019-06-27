@@ -2,102 +2,81 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4857C48BD9
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 17:29:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A9A8C48BD7
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 17:47:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE2142133F
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 17:29:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE2142133F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 6DA552086D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 17:47:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gKCkLQg/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DA552086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgYCq-0003zP-VX
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 13:29:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34280)
+	id 1hgYUq-0004KZ-F7
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 13:47:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37495)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hgYBQ-0002yb-RT
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 13:27:41 -0400
+ (envelope-from <fintelia@gmail.com>) id 1hgYS5-0002O6-Lp
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 13:44:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hgYBP-0007pA-OO
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 13:27:40 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:36274
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1hgYBN-0006Vz-W1
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 13:27:39 -0400
-Received: from host86-173-229-95.range86-173.btcentralplus.com
- ([86.173.229.95] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1hgY7m-0007HL-RW; Thu, 27 Jun 2019 18:23:55 +0100
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-To: Richard Henderson <richard.henderson@linaro.org>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-References: <20190519041522.12327-1-richard.henderson@linaro.org>
- <8f28d008-2608-a579-7505-4546b08deb41@linaro.org>
- <085d6881-f518-9888-a13e-081cdc09de46@ilande.co.uk>
- <0b9f4772-37f6-1453-e4ea-5ad9d0f52a5b@ilande.co.uk>
- <acc57487-c8a0-9380-bc2a-4de22541eabf@ilande.co.uk>
- <CAL1e-=iavFqEeFuNm2efVM7mu5OaABBVo90wqJEhmoWa4DQv=Q@mail.gmail.com>
- <ffae3651-5daf-e008-6562-2de09d82ace9@linaro.org>
- <b8aab3f4-e3eb-a137-62b4-ba5ac1a2ad8f@ilande.co.uk>
- <68facefc-b801-4902-11c0-4542662bfc4e@linaro.org>
- <d2c1f979-7ff2-946e-4863-c1be19c5f003@ilande.co.uk>
- <16f26b7f-2435-aa05-66a3-073e8310d5c8@linaro.org>
- <0ceec012-fcdc-ccde-291a-121a4e475f86@ilande.co.uk>
- <7b1699e1-28ca-a58f-787e-c0ca11666b90@linaro.org>
- <9502af13-22b9-031e-2ba9-ec4ff75ccd0e@ilande.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <cd1a0635-5b5d-3c2d-dec3-4ceda8c789f9@ilande.co.uk>
-Date: Thu, 27 Jun 2019 18:24:21 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <fintelia@gmail.com>) id 1hgYS3-0003J2-OP
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 13:44:53 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:39891)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <fintelia@gmail.com>)
+ id 1hgYRt-00035Y-C2; Thu, 27 Jun 2019 13:44:42 -0400
+Received: by mail-lj1-x241.google.com with SMTP id v18so3239990ljh.6;
+ Thu, 27 Jun 2019 10:44:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=0qJOU4T9A+Rgo+KUWUOXYaNJYMQ+KH3leoUF1qgEo/8=;
+ b=gKCkLQg/+PShoplCFDLy0X9iaLC2OCi3K56QnXinjkOoLFoGJ7K+hptYhrHMLbd9UM
+ 3euNXo4ZLxzFzvDBZygC9PioJZzs1mBl9Giq+VUeidnYNg/1zaFbMt/JZKar5pqTI0E2
+ IH/0kwdU4BTiSZqUzRPexi+UtHOqwMW0bXd3e/L88wMyihPZoo+O51ewgqTkUCEiaFCh
+ G2n7Z2j8vzV8pNlIdQIagpCVm4i4VZMRVjuUenmozowig3ohZmrL77QYwy3Q4zqxb0Xb
+ ozcAOUejVZUOxFfkY3xAVpeh/c8o8w88kYDNl3WVuP/uJs0//0jJrn8OhOLxAOybwXVY
+ wwyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=0qJOU4T9A+Rgo+KUWUOXYaNJYMQ+KH3leoUF1qgEo/8=;
+ b=F1CtT1X2XZbuiPitx/fAYwKRXbG1bDYyXlvrdkFB02JyDSbEyOuCmpmi6P3pHFv8hy
+ xaij321zT2kRIHgwgWlnoHdp3ysVniUfDGgLgMa3dZj+CC8sLIQwSRIvAClS5e58aFX1
+ 3X/Ii2rzdcfJk19V4gID8ehJUKI6JHuxUr7pvny2VsHXnakbnxHTQpWRkPQKe1F8F0iZ
+ j4QRl06gNdizbS2jyKBW72IeSRD70wHoVM9NhgbL5cx5oJbKvmkM51aYaqtRVLOfvNcr
+ HbyMYr0Zoss6hFxvEG6rFVw+TExsnOjTmT/nlbLDrzaX1piEhqhiRthRAm5X0vBgLbKh
+ bJxw==
+X-Gm-Message-State: APjAAAUb7ZMX+2thmtCYstmT6mteijs/Peth82ykD1Wf6OEu8hFT/bLI
+ RLs93eg9t9YTSDqpjeLU9bj9O2/yAqgk3CGzJBc=
+X-Google-Smtp-Source: APXvYqzVhVvV7KdV7YJydYeWk9vSo1O5VS+ZDj/VodpS1pL3jdugrAefpf4Er2frOLWs5h0ZDsX356z//YDFuEGzMW4=
+X-Received: by 2002:a2e:9a82:: with SMTP id p2mr3510779lji.64.1561657477249;
+ Thu, 27 Jun 2019 10:44:37 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <9502af13-22b9-031e-2ba9-ec4ff75ccd0e@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.173.229.95
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH v4 0/7] tcg/ppc: Add vector opcodes
+References: <20190627152011.18686-1-palmer@sifive.com>
+ <20190627152011.18686-11-palmer@sifive.com>
+In-Reply-To: <20190627152011.18686-11-palmer@sifive.com>
+From: Jonathan Behrens <fintelia@gmail.com>
+Date: Thu, 27 Jun 2019 13:44:06 -0400
+Message-ID: <CANnJOVF3F_k1LpSYp8OdxSx6LtQR5p-XR5fMKCsXg_0pxySg+Q@mail.gmail.com>
+To: Palmer Dabbelt <palmer@sifive.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::241
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [Qemu-riscv] [PULL 10/34] RISC-V: Fix a PMP check
+ with the correct access size
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,94 +88,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Howard Spoelstra <hsp.cat7@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26/06/2019 20:38, Mark Cave-Ayland wrote:
+I think this patch is slightly incorrect. If the PMP region is valid for
+the size of the access, but not the rest of the page then a few lines down
+in this function the entire page should not be placed into the TLB. Instead
+only the portion of the page that passed the access check should be
+included. To give an example of where this goes wrong, in the code below
+access to address 0x90000008 should always fail due to PMP rules, but if
+the TLB has already been primed by loading the (allowed) address 0x90000000
+then no fault will be triggered. Notably, this code also executes
+improperly without the patch because the first `ld` instruction traps when
+it shouldn't.
 
->> But I thought that _CALL_AIX was only defined for ppc64 elf version 1.  I
->> thought that ppc32 used _CALL_SYSV instead.  Certainly that's what is used
->> elsewhere...
-> 
-> No, that didn't work either. I've confirmed using #ifdef _CALL_AIX #error ERROR
-> #endif that _CALL_AIX is *NOT* defined and _CALL_SYSV *is* defined.
-> 
-> I've also tried removing TCG_REG_R2 from tcg_target_reg_alloc_order[] and
-> tcg_regset_set_reg() for TCG_REG_R2 from tcg_target_init() and I'm still generating
-> bad code that writes to r2(!).
-> 
-> Since I can't find any other mentions of TCG_REG_TMP1 and TCG_REG_R2 that isn't
-> inside an #ifdef _CALL_AIX ... #endif section I'm starting to get stuck. Is there any
-> chance that the R_PPC_ADDR32 change could be causing this at all?
+  li t0, 0x0000000024000000 // region[0]: 0x90000000..0x90000007
+  csrw pmpaddr0, t0
 
-So after a lot more digging: the issue can be seen in tcg_out_ld() and tcg_out_st()
-for the vector registers. Taking tcg_out_ld() as an example:
+  li t0, 0x00000000240001FF // region[1]: 0x90000000..0x90000fff
+  csrw pmpaddr1, t0
 
-    case TCG_TYPE_V128:
-        tcg_debug_assert(ret >= 32);
-        assert((offset & 15) == 0);
-        tcg_out_mem_long(s, 0, LVX, ret & 31, base, offset);
-        break;
+  li t0, 0x1F0000000000989F // cfg[0] = LXRW, cfg[1] = L
+  csrw pmpcfg0, t0
 
-For the TCG_TYPE_V128 case we have ret = TCG_REG_V2 but (ret & 31) masks off the top
-bit which converts this to TCG_REG_R2 and that's why tcg_out_mem_long() starts using
-r2 to calculate offsets.
+  sfence.vma
 
-Assuming that rt is the temporary register used to calculate the address then the
-patch below tentatively appears to get things working again by passing in
-TCG_REG_TMP1 instead, but ultimately I still see a crash much later when trying to
-boot MacOS 9:
+  li t0, 0x90000000
+  ld s0, 0(t0)
+  ld s1, 8(t0) // NO TRAP: address is incorrectly in TLB!
 
-diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-index 61732c1f45..dd823447cc 100644
---- a/tcg/ppc/tcg-target.inc.c
-+++ b/tcg/ppc/tcg-target.inc.c
-@@ -1139,7 +1139,7 @@ static void tcg_out_ld(TCGContext *s, TCGType type, TCGReg ret,
-     case TCG_TYPE_V64:
-         tcg_debug_assert(ret >= 32);
-         assert((offset & 7) == 0);
--        tcg_out_mem_long(s, 0, LVX, ret & 31, base, offset & -16);
-+        tcg_out_mem_long(s, 0, LVX, TCG_REG_TMP1, base, offset & -16);
-         if (offset & 8) {
-             tcg_out_vsldoi(s, ret, ret, ret, 8);
-         }
-@@ -1147,7 +1147,7 @@ static void tcg_out_ld(TCGContext *s, TCGType type, TCGReg ret,
-     case TCG_TYPE_V128:
-         tcg_debug_assert(ret >= 32);
-         assert((offset & 15) == 0);
--        tcg_out_mem_long(s, 0, LVX, ret & 31, base, offset);
-+        tcg_out_mem_long(s, 0, LVX, TCG_REG_TMP1, base, offset);
-         break;
-     default:
-         g_assert_not_reached();
-@@ -1186,12 +1186,13 @@ static void tcg_out_st(TCGContext *s, TCGType type, TCGReg arg,
-             tcg_out_vsldoi(s, TCG_VEC_TMP1, arg, arg, 8);
-             arg = TCG_VEC_TMP1;
-         }
--        tcg_out_mem_long(s, 0, STVEWX, arg & 31, base, offset);
--        tcg_out_mem_long(s, 0, STVEWX, arg & 31, base, offset + 4);
-+        tcg_out_mem_long(s, 0, STVEWX, TCG_REG_TMP1, base, offset);
-+        tcg_out_mem_long(s, 0, STVEWX, TCG_REG_TMP1, base, offset + 4);
-         break;
-     case TCG_TYPE_V128:
-         tcg_debug_assert(arg >= 32);
--        tcg_out_mem_long(s, 0, STVX, arg & 31, base, offset);
-+        assert((offset & 15) == 0);
-+        tcg_out_mem_long(s, 0, STVX, TCG_REG_TMP1, base, offset);
-         break;
-     default:
-         g_assert_not_reached();
+  sfence.vma
+  ld s1, 8(t0) // TRAP: TLB has been flushed!
 
-Richard: even though it's still not perfect, does this look like it's fixing the
-right problem? Presumably the reason this didn't break on your Power 9 box is because
-the 64-bit ABI doesn't mark r2 as reserved?
+I think that the proper fix would be to first do a PMP check for the full
+PAGE_SIZE and execute normally if it passes. Then in the event the full
+page fails, there could be a more granular PMP check with only the accessed
+region inserted as an entry in the TLB.
 
+Unrelated question: should I be sending "Reviewed By" lines if I read
+through patches that seem reasonable? Or there some formal process I'd have
+to go through first to be approved?
 
-ATB,
+Jonathan
 
-Mark.
+On Thu, Jun 27, 2019 at 11:43 AM Palmer Dabbelt <palmer@sifive.com> wrote:
 
+> From: Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
+>
+> The PMP check should be of the memory access size rather
+> than TARGET_PAGE_SIZE.
+>
+> Signed-off-by: Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+> ---
+>  target/riscv/cpu_helper.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+> index 66be83210f11..e1b079e69c60 100644
+> --- a/target/riscv/cpu_helper.c
+> +++ b/target/riscv/cpu_helper.c
+> @@ -452,8 +452,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address,
+> int size,
+>
+>      if (riscv_feature(env, RISCV_FEATURE_PMP) &&
+>          (ret == TRANSLATE_SUCCESS) &&
+> -        !pmp_hart_has_privs(env, pa, TARGET_PAGE_SIZE, 1 << access_type,
+> -        mode)) {
+> +        !pmp_hart_has_privs(env, pa, size, 1 << access_type, mode)) {
+>          ret = TRANSLATE_PMP_FAIL;
+>      }
+>      if (ret == TRANSLATE_PMP_FAIL) {
+> --
+> 2.21.0
+>
+>
+>
