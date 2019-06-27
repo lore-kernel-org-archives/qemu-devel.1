@@ -2,55 +2,104 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0B03C48BE4
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 17:51:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44BA3C48BD7
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 17:53:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA4D520644
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 17:51:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA4D520644
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 12E6D20659
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 17:53:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tLcRjBED"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12E6D20659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53339 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgYYa-0007Tb-UL
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 13:51:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38678)
+	id 1hgYZv-00014h-7G
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 13:52:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39235)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dovgaluk@ispras.ru>) id 1hgYWd-00064H-QP
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 13:49:37 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hgYYa-0007rQ-CW
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 13:51:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1hgYWb-0005u6-W6
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 13:49:35 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:41820)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1hgYWb-0005qK-Hr
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 13:49:33 -0400
-Received: from mail.ispras.ru (localhost [127.0.0.1])
- by mail.ispras.ru (Postfix) with ESMTPSA id B126654006A;
- Thu, 27 Jun 2019 20:49:28 +0300 (MSK)
+ (envelope-from <richard.henderson@linaro.org>) id 1hgYYZ-00078u-C0
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 13:51:36 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55172)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hgYYZ-00078I-2b
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 13:51:35 -0400
+Received: by mail-wm1-x341.google.com with SMTP id g135so6568166wme.4
+ for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 10:51:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language;
+ bh=xcVh1s1jnu/fUvR+0oHKUa0YMsd4tC+l3KSzixq5NwY=;
+ b=tLcRjBEDegGzgRSvoJh3hgzjucPv7P38P7kI0tGEjSOdWl0GTu6STrSujArzoZefux
+ OCfpa0TPz5tESNMxeSEj5YCxKmysLoisf5V2JcMi+iznAk3vEOuK0QN6eirGvYSSkgaN
+ Z/2bLO7oNmbIVFJhLB+WiX5t18+JVfjtl76WCyEQtWRZNiVzdfJQ/rs86vZmqaRzNEKD
+ TOWOpkKAt7lmhXXLvut1bz0LCs8Or5Xaxtgbzea0VTo/lu3Njw+JG8ZR/cQ1WpicwBAk
+ e70vnhOnOyCBpXc0RCTsSDbDuPH3CwNtzyMS1zCaNziCQuf0106/H++sq748iTFbAoRw
+ 3r/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language;
+ bh=xcVh1s1jnu/fUvR+0oHKUa0YMsd4tC+l3KSzixq5NwY=;
+ b=ExbOrWClUMd3c/t4v0rNslXLd2NVep6PWRCSkOQEuh2Tv0BELZUUt+WCO50xJgv4/z
+ b3iZRyhskOTB2kjIfM7xNlPErK2G+keidMg814HpPQzz6Z8TKA3LEdDk8r4ZM6yCnYYf
+ FNWUsVch7huoN3mmCaazTSjfixdDwrMZkRIWxt9IwRoPD9DMDpWsOvYIPFRU3gHOcDUx
+ V1dNQBsc7JWhtJWAmCBeXJ6HJejed7DDaosplSna4FL5CF7D1s1jbO7M7ffkOLwMo2ww
+ 2ue71zS/KkcCxAsOV+mLzxliM6JnskOXmjmyLPYufNwYLqS4lBDN5qKIBZyd6ZLP7u2v
+ c6LA==
+X-Gm-Message-State: APjAAAVsaiE+out6HGCU10tpZNYeafIxEF9QF3yg8Unyzmk73zt6+4vj
+ DdC9URtNedmf/8lK+/m/FkGKDg==
+X-Google-Smtp-Source: APXvYqyuepjphURM0Zv3vDin/3PwFsQszCFWzwv5uNqZtFEXU/Pp1+vBxHOYpYpySl02BKESsh0S7w==
+X-Received: by 2002:a05:600c:20c3:: with SMTP id
+ y3mr4209388wmm.3.1561657893458; 
+ Thu, 27 Jun 2019 10:51:33 -0700 (PDT)
+Received: from [192.168.2.137] (93-34-153-63.ip50.fastwebnet.it.
+ [93.34.153.63])
+ by smtp.gmail.com with ESMTPSA id q12sm3936588wrp.50.2019.06.27.10.51.32
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 27 Jun 2019 10:51:32 -0700 (PDT)
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+References: <20190519041522.12327-1-richard.henderson@linaro.org>
+ <8f28d008-2608-a579-7505-4546b08deb41@linaro.org>
+ <085d6881-f518-9888-a13e-081cdc09de46@ilande.co.uk>
+ <0b9f4772-37f6-1453-e4ea-5ad9d0f52a5b@ilande.co.uk>
+ <acc57487-c8a0-9380-bc2a-4de22541eabf@ilande.co.uk>
+ <CAL1e-=iavFqEeFuNm2efVM7mu5OaABBVo90wqJEhmoWa4DQv=Q@mail.gmail.com>
+ <ffae3651-5daf-e008-6562-2de09d82ace9@linaro.org>
+ <b8aab3f4-e3eb-a137-62b4-ba5ac1a2ad8f@ilande.co.uk>
+ <68facefc-b801-4902-11c0-4542662bfc4e@linaro.org>
+ <d2c1f979-7ff2-946e-4863-c1be19c5f003@ilande.co.uk>
+ <16f26b7f-2435-aa05-66a3-073e8310d5c8@linaro.org>
+ <0ceec012-fcdc-ccde-291a-121a4e475f86@ilande.co.uk>
+ <7b1699e1-28ca-a58f-787e-c0ca11666b90@linaro.org>
+ <9502af13-22b9-031e-2ba9-ec4ff75ccd0e@ilande.co.uk>
+ <cd1a0635-5b5d-3c2d-dec3-4ceda8c789f9@ilande.co.uk>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <0d6d9b35-4c4a-a04d-76b5-eca089ade29c@linaro.org>
+Date: Thu, 27 Jun 2019 19:51:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Thu, 27 Jun 2019 20:49:28 +0300
-From: dovgaluk <dovgaluk@ispras.ru>
-To: pbonzini@redhat.com
-In-Reply-To: <156110523748.25431.9310430853468653085.stgit@pasha-Precision-3630-Tower>
-References: <156110523748.25431.9310430853468653085.stgit@pasha-Precision-3630-Tower>
-Message-ID: <b38abe2e1f134a2bc6ca1256d657c2a2@ispras.ru>
-X-Sender: dovgaluk@ispras.ru
-User-Agent: Roundcube Webmail/1.1.2
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 83.149.199.45
-Subject: Re: [Qemu-devel] [PATCH for-4.1 00/24] Fix record/replay and add
- reverse debugging
+In-Reply-To: <cd1a0635-5b5d-3c2d-dec3-4ceda8c789f9@ilande.co.uk>
+Content-Type: multipart/mixed; boundary="------------2E56C0DDCE526B966A76E76C"
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH v4 0/7] tcg/ppc: Add vector opcodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,228 +111,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru,
- crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com,
- quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com,
- kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com,
- pbonzini@redhat.com, mreitz@redhat.com, artem.k.pisarenko@gmail.com,
- dgilbert@redhat.com, rth@twiddle.net
+Cc: David Gibson <david@gibson.dropbear.id.au>,
+ QEMU Developers <qemu-devel@nongnu.org>, Howard Spoelstra <hsp.cat7@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo,
+This is a multi-part message in MIME format.
+--------------2E56C0DDCE526B966A76E76C
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-what about merging reviewed and acked patches before the soft freeze?
+On 6/27/19 7:24 PM, Mark Cave-Ayland wrote:
+> For the TCG_TYPE_V128 case we have ret = TCG_REG_V2 but (ret & 31) masks
+> off the top bit which converts this to TCG_REG_R2 and that's why
+> tcg_out_mem_long() starts using r2 to calculate offsets.
+
+Oh geez.  Ok, I see it now.
+
+>      case TCG_TYPE_V128:
+>          tcg_debug_assert(ret >= 32);
+>          assert((offset & 15) == 0);
+> -        tcg_out_mem_long(s, 0, LVX, ret & 31, base, offset);
+> +        tcg_out_mem_long(s, 0, LVX, TCG_REG_TMP1, base, offset);
+
+No, here ret is the register into which we are loading.
+Same for the rest.  The error is in tcg_out_mem_long in
+trying to reuse the output register as a scratch.
+
+> Presumably the reason this didn't break on your Power 9 box is because
+> the 64-bit ABI doesn't mark r2 as reserved?
+
+Correct.  That and the fact that V0 and V1 get reserved as temporaries, so I
+didn't attempt to use r1 (i.e. sp) as a temporary.
+
+Please try the following patch on top and if it works I'll split it back into
+the patch set properly.
 
 
+r~
 
-Pavel Dovgalyuk
+--------------2E56C0DDCE526B966A76E76C
+Content-Type: text/plain; charset=UTF-8;
+ name="z"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="z"
 
-Pavel Dovgalyuk =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2019-06-21 11:20:
-> GDB remote protocol supports reverse debugging of the targets.
-> It includes 'reverse step' and 'reverse continue' operations.
-> The first one finds the previous step of the execution,
-> and the second one is intended to stop at the last breakpoint that
-> would happen when the program is executed normally.
->=20
-> Reverse debugging is possible in the replay mode, when at least
-> one snapshot was created at the record or replay phase.
-> QEMU can use these snapshots for travelling back in time with GDB.
->=20
-> Running the execution in replay mode allows using GDB reverse debugging
-> commands:
->  - reverse-stepi (or rsi): Steps one instruction to the past.
->    QEMU loads on of the prior snapshots and proceeds to the desired
->    instruction forward. When that step is reaches, execution stops.
->  - reverse-continue (or rc): Runs execution "backwards".
->    QEMU tries to find breakpoint or watchpoint by loaded prior snapshot
->    and replaying the execution. Then QEMU loads snapshots again and
->    replays to the latest breakpoint. When there are no breakpoints in
->    the examined section of the execution, QEMU finds one more snapshot
->    and tries again. After the first snapshot is processed, execution
->    stops at this snapshot.
->=20
-> The set of patches include the following modifications:
->  - gdbstub update for reverse debugging support
->  - functions that automatically perform reverse step and reverse
->    continue operations
->  - hmp/qmp commands for manipulating the replay process
->  - improvement of the snapshotting for saving the execution step
->    in the snapshot parameters
->  - other record/replay fixes
->=20
-> The patches are available in the repository:
-> https://github.com/ispras/qemu/tree/rr-190419
->=20
-> v17 changes:
->  - updated gdbstub patches according to the latest changes
->=20
-> v16 changes:
->  - rebased to 4.0
->=20
-> v15 changes:
->  - rebased to the new master
->  - removed obsolete rtc patch
->  - fixed misprint in the test
->=20
-> v14 changes:
->  - rebased to the new master
->=20
-> v13 changes:
->  - rebased to make QAPI stuff applicable
->  - minor reverse step/reverse continue fix
->=20
-> v12 changes:
->  - style fixes
->=20
-> v11 changes:
->  - added can_do_io resetting before jumping to the next block in the=20
-> chain
->  - rebase to the latest master
->=20
-> v10 changes:
->  - added patch for correct deadline calculation with external timers
->  - updated icount-related documentation in json files
->    (suggested by Markus Armbruster)
->  - fixed replay shutdown
->  - renamed some functions and variables to make them consistent with
->    the documentation and displayed messages
->  - minor changes
->=20
-> v9 changes:
->  - moved rr qapi stuff to the separate file (suggested by Markus=20
-> Armbruster)
->  - minor coding style fixes
->=20
-> v8 changes:
->  - rebased to the new master
->  - added missing fix for prior rr patch
->  - updated 'since' version number in json-related patches
->=20
-> v7 changes:
->  - rebased to the new master with upstreamed patches from the series
->  - several improvements in hmp/qmp commands handling (suggested by
-> Markus Armbruster)
->  - fixed record/replay with '-rtc base' option enabled
->  - added document with virtual hardware requirements
->=20
-> v6 changes:
->  - rebased to the new version of master
->  - fixed build of linux-user configurations
->  - added new clock for slirp and vnc timers
->=20
-> v5 changes:
->  - multiple fixes of record/replay bugs appeared after QEMU core update
->  - changed reverse debugging to 'since 3.1'
->=20
-> v4 changes:
->  - changed 'since 2.13' to 'since 3.0' in json (as suggested by Eric=20
-> Blake)
->=20
-> v3 changes:
->  - Fixed PS/2 bug with save/load vm, which caused failures of the=20
-> replay.
->  - Rebased to the new code base.
->  - Minor fixes.
->=20
-> v2 changes:
->  - documented reverse debugging
->  - fixed start vmstate loading in record mode
->  - documented qcow2 changes (as suggested by Eric Blake)
->  - made icount SnapshotInfo field optional (as suggested by Eric Blake)
->  - renamed qmp commands (as suggested by Eric Blake)
->  - minor changes
->=20
-> ---
->=20
-> Pavel Dovgalyuk (23):
->       block: implement bdrv_snapshot_goto for blkreplay
->       replay: disable default snapshot for record/replay
->       replay: update docs for record/replay with block devices
->       replay: don't drain/flush bdrv queue while RR is working
->       replay: finish record/replay before closing the disks
->       qcow2: introduce icount field for snapshots
->       migration: introduce icount field for snapshots
->       replay: provide an accessor for rr filename
->       qapi: introduce replay.json for record/replay-related stuff
->       replay: introduce info hmp/qmp command
->       replay: introduce breakpoint at the specified step
->       replay: implement replay-seek command
->       replay: refine replay-time module
->       replay: flush rr queue before loading the vmstate
->       gdbstub: add reverse step support in replay mode
->       gdbstub: add reverse continue support in replay mode
->       replay: describe reverse debugging in docs/replay.txt
->       replay: add BH oneshot event for block layer
->       replay: document development rules
->       util/qemu-timer: refactor deadline calculation for external=20
-> timers
->       replay: fix replay shutdown
->       replay: rename step-related variables and functions
->       icount: clean up cpu_can_io before jumping to the next block
->=20
-> pbonzini@redhat.com (1):
->       replay: add missing fix for internal function
->=20
->=20
->  MAINTAINERS               |    1
->  accel/tcg/tcg-runtime.c   |    2
->  accel/tcg/translator.c    |    1
->  block/blkreplay.c         |    8 +
->  block/block-backend.c     |    8 +
->  block/io.c                |   32 ++++
->  block/iscsi.c             |    5 -
->  block/nfs.c               |    5 -
->  block/null.c              |    4 -
->  block/nvme.c              |    6 +
->  block/qapi.c              |   18 ++
->  block/qcow2-snapshot.c    |    9 +
->  block/qcow2.h             |    2
->  block/rbd.c               |    5 -
->  block/vxhs.c              |    5 -
->  blockdev.c                |   10 +
->  cpus.c                    |   30 +++-
->  docs/devel/replay.txt     |   46 ++++++
->  docs/interop/qcow2.txt    |    4 +
->  docs/replay.txt           |   45 ++++++
->  exec.c                    |    8 +
->  gdbstub.c                 |   63 ++++++++-
->  hmp-commands-info.hx      |   14 ++
->  hmp-commands.hx           |   53 +++++++
->  hmp.h                     |    4 +
->  include/block/snapshot.h  |    1
->  include/qemu/timer.h      |    7 -
->  include/sysemu/replay.h   |   30 ++++
->  migration/savevm.c        |   11 ++
->  qapi/Makefile.objs        |    2
->  qapi/block-core.json      |    8 +
->  qapi/block.json           |    3
->  qapi/misc.json            |   18 --
->  qapi/qapi-schema.json     |    1
->  qapi/replay.json          |  121 +++++++++++++++++
->  qtest.c                   |    2
->  replay/Makefile.objs      |    3
->  replay/replay-debugging.c |  327=20
-> +++++++++++++++++++++++++++++++++++++++++++++
->  replay/replay-events.c    |   18 ++
->  replay/replay-internal.c  |   10 +
->  replay/replay-internal.h  |   17 +-
->  replay/replay-snapshot.c  |    6 -
->  replay/replay-time.c      |   36 ++---
->  replay/replay.c           |   56 ++++++--
->  stubs/Makefile.objs       |    1
->  stubs/replay-user.c       |    9 +
->  stubs/replay.c            |   10 +
->  tests/ptimer-test-stubs.c |    4 -
->  tests/ptimer-test.c       |    4 -
->  util/qemu-timer.c         |   41 +++++-
->  vl.c                      |   11 +-
->  51 files changed, 1014 insertions(+), 131 deletions(-)
->  create mode 100644 docs/devel/replay.txt
->  create mode 100644 qapi/replay.json
->  create mode 100644 replay/replay-debugging.c
->  create mode 100644 stubs/replay-user.c
-
+ZGlmZiAtLWdpdCBhL3RhcmdldC9tNjhrL3RyYW5zbGF0ZS5jIGIvdGFyZ2V0L202OGsvdHJh
+bnNsYXRlLmMKaW5kZXggMmFlNTM3NDYxZi4uYjYxYzdlYTBmMSAxMDA2NDQKLS0tIGEvdGFy
+Z2V0L202OGsvdHJhbnNsYXRlLmMKKysrIGIvdGFyZ2V0L202OGsvdHJhbnNsYXRlLmMKQEAg
+LTYxMjQsMjcgKzYxMjQsMzQgQEAgc3RhdGljIHZvaWQgbTY4a190cl90Yl9zdG9wKERpc2Fz
+Q29udGV4dEJhc2UgKmRjYmFzZSwgQ1BVU3RhdGUgKmNwdSkKIHsKICAgICBEaXNhc0NvbnRl
+eHQgKmRjID0gY29udGFpbmVyX29mKGRjYmFzZSwgRGlzYXNDb250ZXh0LCBiYXNlKTsKIAot
+ICAgIGlmIChkYy0+YmFzZS5pc19qbXAgPT0gRElTQVNfTk9SRVRVUk4pIHsKLSAgICAgICAg
+cmV0dXJuOwotICAgIH0KLSAgICBpZiAoZGMtPmJhc2Uuc2luZ2xlc3RlcF9lbmFibGVkKSB7
+Ci0gICAgICAgIGdlbl9oZWxwZXJfcmFpc2VfZXhjZXB0aW9uKGNwdV9lbnYsIHRjZ19jb25z
+dF9pMzIoRVhDUF9ERUJVRykpOwotICAgICAgICByZXR1cm47Ci0gICAgfQotCiAgICAgc3dp
+dGNoIChkYy0+YmFzZS5pc19qbXApIHsKKyAgICBjYXNlIERJU0FTX05PUkVUVVJOOgorICAg
+ICAgICBicmVhazsKICAgICBjYXNlIERJU0FTX1RPT19NQU5ZOgogICAgICAgICB1cGRhdGVf
+Y2Nfb3AoZGMpOwotICAgICAgICBnZW5fam1wX3RiKGRjLCAwLCBkYy0+cGMpOworICAgICAg
+ICBpZiAoZGMtPmJhc2Uuc2luZ2xlc3RlcF9lbmFibGVkKSB7CisgICAgICAgICAgICB0Y2df
+Z2VuX21vdmlfaTMyKFFSRUdfUEMsIGRjLT5wYyk7CisgICAgICAgICAgICBnZW5faGVscGVy
+X3JhaXNlX2V4Y2VwdGlvbihjcHVfZW52LCB0Y2dfY29uc3RfaTMyKEVYQ1BfREVCVUcpKTsK
+KyAgICAgICAgfSBlbHNlIHsKKyAgICAgICAgICAgIGdlbl9qbXBfdGIoZGMsIDAsIGRjLT5w
+Yyk7CisgICAgICAgIH0KICAgICAgICAgYnJlYWs7CiAgICAgY2FzZSBESVNBU19KVU1QOgog
+ICAgICAgICAvKiBXZSB1cGRhdGVkIENDX09QIGFuZCBQQyBpbiBnZW5fam1wL2dlbl9qbXBf
+aW0uICAqLwotICAgICAgICB0Y2dfZ2VuX2xvb2t1cF9hbmRfZ290b19wdHIoKTsKKyAgICAg
+ICAgaWYgKGRjLT5iYXNlLnNpbmdsZXN0ZXBfZW5hYmxlZCkgeworICAgICAgICAgICAgZ2Vu
+X2hlbHBlcl9yYWlzZV9leGNlcHRpb24oY3B1X2VudiwgdGNnX2NvbnN0X2kzMihFWENQX0RF
+QlVHKSk7CisgICAgICAgIH0gZWxzZSB7CisgICAgICAgICAgICB0Y2dfZ2VuX2xvb2t1cF9h
+bmRfZ290b19wdHIoKTsKKyAgICAgICAgfQogICAgICAgICBicmVhazsKICAgICBjYXNlIERJ
+U0FTX0VYSVQ6CiAgICAgICAgIC8qIFdlIHVwZGF0ZWQgQ0NfT1AgYW5kIFBDIGluIGdlbl9l
+eGl0X3RiLCBidXQgYWxzbyBtb2RpZmllZAogICAgICAgICAgICBvdGhlciBzdGF0ZSB0aGF0
+IG1heSByZXF1aXJlIHJldHVybmluZyB0byB0aGUgbWFpbiBsb29wLiAgKi8KLSAgICAgICAg
+dGNnX2dlbl9leGl0X3RiKE5VTEwsIDApOworICAgICAgICBpZiAoZGMtPmJhc2Uuc2luZ2xl
+c3RlcF9lbmFibGVkKSB7CisgICAgICAgICAgICBnZW5faGVscGVyX3JhaXNlX2V4Y2VwdGlv
+bihjcHVfZW52LCB0Y2dfY29uc3RfaTMyKEVYQ1BfREVCVUcpKTsKKyAgICAgICAgfSBlbHNl
+IHsKKyAgICAgICAgICAgIHRjZ19nZW5fZXhpdF90YihOVUxMLCAwKTsKKyAgICAgICAgfQog
+ICAgICAgICBicmVhazsKICAgICBkZWZhdWx0OgogICAgICAgICBnX2Fzc2VydF9ub3RfcmVh
+Y2hlZCgpOwo=
+--------------2E56C0DDCE526B966A76E76C--
 
