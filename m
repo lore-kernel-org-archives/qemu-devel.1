@@ -2,105 +2,93 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9395C48BE4
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 18:23:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9694C48BD7
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 18:25:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BAE4205F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 18:23:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BAE4205F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 8DD08205F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 18:25:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PT5RJwEx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DD08205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgZ34-0007tU-OD
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 14:23:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45990)
+	id 1hgZ5a-0001Qk-IN
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 14:25:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46239)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hgZ22-0007Un-RX
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 14:22:03 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hgZ3R-00009z-8d
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 14:23:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hgZ20-00008G-DI
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 14:22:01 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:36348
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1hgZ20-000077-6X
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 14:22:00 -0400
-Received: from host86-173-229-95.range86-173.btcentralplus.com
- ([86.173.229.95] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1hgZ1P-0007Tc-OG; Thu, 27 Jun 2019 19:21:23 +0100
-To: Richard Henderson <richard.henderson@linaro.org>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-References: <20190519041522.12327-1-richard.henderson@linaro.org>
- <8f28d008-2608-a579-7505-4546b08deb41@linaro.org>
- <085d6881-f518-9888-a13e-081cdc09de46@ilande.co.uk>
- <0b9f4772-37f6-1453-e4ea-5ad9d0f52a5b@ilande.co.uk>
- <acc57487-c8a0-9380-bc2a-4de22541eabf@ilande.co.uk>
- <CAL1e-=iavFqEeFuNm2efVM7mu5OaABBVo90wqJEhmoWa4DQv=Q@mail.gmail.com>
- <ffae3651-5daf-e008-6562-2de09d82ace9@linaro.org>
- <b8aab3f4-e3eb-a137-62b4-ba5ac1a2ad8f@ilande.co.uk>
- <68facefc-b801-4902-11c0-4542662bfc4e@linaro.org>
- <d2c1f979-7ff2-946e-4863-c1be19c5f003@ilande.co.uk>
- <16f26b7f-2435-aa05-66a3-073e8310d5c8@linaro.org>
- <0ceec012-fcdc-ccde-291a-121a4e475f86@ilande.co.uk>
- <7b1699e1-28ca-a58f-787e-c0ca11666b90@linaro.org>
- <9502af13-22b9-031e-2ba9-ec4ff75ccd0e@ilande.co.uk>
- <cd1a0635-5b5d-3c2d-dec3-4ceda8c789f9@ilande.co.uk>
- <0d6d9b35-4c4a-a04d-76b5-eca089ade29c@linaro.org>
- <2903e103-bb1f-cc68-3a1f-cebef2590684@linaro.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+ (envelope-from <richard.henderson@linaro.org>) id 1hgZ3O-0000oJ-HX
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 14:23:29 -0400
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:34972)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hgZ3O-0000mu-6t
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 14:23:26 -0400
+Received: by mail-wr1-x42a.google.com with SMTP id f15so3651907wrp.2
+ for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 11:23:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=XHp8+tIwjJe2/rw2N5bKvIwg8l7AbHaMGD1fdKFN1To=;
+ b=PT5RJwExb2hmI8hTSpr3GMwgePtG4LfagySi2VEmyfn+h9UW1WRzZ2Bb5Xz8s4G8Nu
+ lHGU2lZzv+TEWLLvxwBWmMvgAoJz5R9aH61p4HhErADwsjRDak1pvmcK09sGk65/3/bD
+ 8gBxzi4lmDmFNQQrAzeA8uCqIQ4Ap9g7a6MMiiD4ukJS1riTVnUVFDrxF5MINbX3cSZK
+ kQbce57yiqyMh8mF5uc5sGCMRl8Gzzq80+G5/iB+wtM2xzfMqigv9KG+29XgRYEqyqBZ
+ TA42/PJeHZDXa5v8LDo1FBdmqmy3k9R4eF09YMTCtonX2s1QcaXJQEJ7rm9Y/teQadgz
+ LRNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=XHp8+tIwjJe2/rw2N5bKvIwg8l7AbHaMGD1fdKFN1To=;
+ b=JhNXFKxIgnbAgSjItAmLP8dwsxe+6t5olTVaYS5LJiX6cRpHdz52WTKCvgGN5eBWDt
+ Q8StoZo7MpQO39AA7Bm+bXz0cxZXjOIXsGkgZq5yIS+8t6mebh/5P+g7Er6IomgSzieR
+ +GGCncQ7l63eXtDMT/2kgVr2oIqHhsPJMr3uodcWk+dtWmYM5se/AqQg8oxyaB0UQUqp
+ Htk+lJw0WfsL57NPVmTrOox5C0QLVYapBV46k4wDvBT3l6S6EG7kyUg3KQtOY9OVnXUI
+ 2Yvz8SZqhBuAwrNDWxcqcIpzie/MyYiMsCJbvQpNK5c/k9SGCABG9KXkhy4FFNmlB8j6
+ AJLw==
+X-Gm-Message-State: APjAAAWmP2tBtdeZ5Lbp50Zlrw+Rr9fJwJd0n9BVELrZF/QGuaUxWjlr
+ 6ZhHO5X/+I13PXzTx0fiGc/z9r+AAflj4A==
+X-Google-Smtp-Source: APXvYqxrze6QECLRx0XiGOz9FifEdePGDqx7OdhULsAGe4wngSxq6jRF8Cxet7cVeN3Qfpka/pHB9A==
+X-Received: by 2002:adf:ce82:: with SMTP id r2mr4166449wrn.223.1561659803147; 
+ Thu, 27 Jun 2019 11:23:23 -0700 (PDT)
+Received: from [192.168.2.137] (93-34-153-63.ip50.fastwebnet.it.
+ [93.34.153.63])
+ by smtp.gmail.com with ESMTPSA id a2sm12152895wmj.9.2019.06.27.11.23.22
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 27 Jun 2019 11:23:22 -0700 (PDT)
+To: Jonathan Behrens <fintelia@gmail.com>, Palmer Dabbelt <palmer@sifive.com>
+References: <20190627152011.18686-1-palmer@sifive.com>
+ <20190627152011.18686-11-palmer@sifive.com>
+ <CANnJOVF3F_k1LpSYp8OdxSx6LtQR5p-XR5fMKCsXg_0pxySg+Q@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <60fd051e-6aac-936d-7938-db392b69a0e1@ilande.co.uk>
-Date: Thu, 27 Jun 2019 19:21:49 +0100
+Message-ID: <c64fa0e8-fd9c-8e86-418c-0553f56a0f34@linaro.org>
+Date: Thu, 27 Jun 2019 20:23:20 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <2903e103-bb1f-cc68-3a1f-cebef2590684@linaro.org>
+In-Reply-To: <CANnJOVF3F_k1LpSYp8OdxSx6LtQR5p-XR5fMKCsXg_0pxySg+Q@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 86.173.229.95
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH v4 0/7] tcg/ppc: Add vector opcodes
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42a
+Subject: Re: [Qemu-devel] [Qemu-riscv] [PULL 10/34] RISC-V: Fix a PMP check
+ with the correct access size
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,31 +100,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Howard Spoelstra <hsp.cat7@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 27/06/2019 18:54, Richard Henderson wrote:
-
-> On 6/27/19 7:51 PM, Richard Henderson wrote:
->> Please try the following patch on top and if it works I'll split it back into
->> the patch set properly.
+On 6/27/19 7:44 PM, Jonathan Behrens wrote:
+> I think this patch is slightly incorrect. If the PMP region is valid for
+> the size of the access, but not the rest of the page then a few lines down
+> in this function the entire page should not be placed into the TLB. Instead
+> only the portion of the page that passed the access check should be
+> included. To give an example of where this goes wrong, in the code below
+> access to address 0x90000008 should always fail due to PMP rules, but if
+> the TLB has already been primed by loading the (allowed) address 0x90000000
+> then no fault will be triggered. Notably, this code also executes
+> improperly without the patch because the first `ld` instruction traps when
+> it shouldn't.
 > 
-> Dangit.  I generated the patch on the wrong machine.
-> Let's try that again.
+>   li t0, 0x0000000024000000 // region[0]: 0x90000000..0x90000007
+>   csrw pmpaddr0, t0
+> 
+>   li t0, 0x00000000240001FF // region[1]: 0x90000000..0x90000fff
+>   csrw pmpaddr1, t0
+> 
+>   li t0, 0x1F0000000000989F // cfg[0] = LXRW, cfg[1] = L
+>   csrw pmpcfg0, t0
+> 
+>   sfence.vma
+> 
+>   li t0, 0x90000000
+>   ld s0, 0(t0)
+>   ld s1, 8(t0) // NO TRAP: address is incorrectly in TLB!
 
-Yes it works! Or at least so far it has survived a boot into the MacOS 9 desktop
-which is fairly good at exercising all sorts of strange edge cases...
+Nice test case.
 
-If you're going to resend the patchset, don't forget to squash "tcg/ppc: Support
-vector dup2" into "tcg/ppc: Initial backend support for Altivec" to preserve
-bisectability on 32-bit PPC hosts when configuring with "--enable-debug-tcg".
+> I think that the proper fix would be to first do a PMP check for the full
+> PAGE_SIZE and execute normally if it passes. Then in the event the full
+> page fails, there could be a more granular PMP check with only the accessed
+> region inserted as an entry in the TLB.
+
+This feature looks to be almost identical to the ARM m-profile MPU.
+
+The fix is:
+
+If the PMP check is valid for the entire page, then continue to call
+tlb_set_page with size=TARGET_PAGE_SIZE.
+
+If the PMP check is valid for the current access, but not for the entire page,
+then call tlb_set_page with any size < TARGET_PAGE_SIZE.  This change alone is
+sufficient, even though the full argument tuple (paddr, vaddr, size) no longer
+quite make perfect sense.  (For the arm mpu, we compute some 1 << rsize, but
+the actual value is never used; setting size=1 would be sufficient.)
+
+Any size < TARGET_PAGE_SIZE will cause TLB_RECHECK to be set for the page,
+which will force all accesses to the page to go back through riscv_cpu_tlb_fill
+for re-validation.
 
 
-ATB,
+> Unrelated question: should I be sending "Reviewed By" lines if I read
+> through patches that seem reasonable? Or there some formal process I'd have
+> to go through first to be approved?
 
-Mark.
+No formal process.  More eyes are always welcome.
+
+
+r~
 
