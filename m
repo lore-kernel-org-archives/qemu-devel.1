@@ -2,57 +2,76 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B2B4C48BD6
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:23:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B1C8C48BD6
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:27:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D58912133F
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:23:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D58912133F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1A5A62133F
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:27:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A5A62133F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgXBR-00026k-5L
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 12:23:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34751)
+	id 1hgXEh-0004x6-9E
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 12:26:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42159)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hgWNw-0001ci-FD
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:32:31 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hgWpt-00045X-An
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 12:01:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hgWNr-0005yG-69
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:32:24 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:56321 helo=mail.rt-rk.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hgWNf-0005kq-8M
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:32:14 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 401611A4597;
- Thu, 27 Jun 2019 17:32:05 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 103831A4595;
- Thu, 27 Jun 2019 17:32:05 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org,
-	laurent@vivier.eu
-Date: Thu, 27 Jun 2019 17:31:47 +0200
-Message-Id: <1561649510-21183-3-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1561649510-21183-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1561649510-21183-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v14 2/5] linux-user: Add support for strace for
- statx() syscall
+ (envelope-from <pbonzini@redhat.com>) id 1hgWps-0001xz-BT
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 12:01:21 -0400
+Received: from mail-wm1-f43.google.com ([209.85.128.43]:51602)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hgWpr-0001uE-PG
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 12:01:20 -0400
+Received: by mail-wm1-f43.google.com with SMTP id 207so6263115wma.1
+ for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 09:01:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=lzdWi605UX5uzoK2lZEBsspC7vCvsZ9u2EmgI+QRriI=;
+ b=O6jibhRZYl3TaDjEkD/WHuAowtzSf2x7QimnF7eAUOA+XPIChDv2oXvcBOWahbqCCW
+ 0VeXx1cSW0WBEpNehpOsg07pWjVNHltQj4NlCGfFC7VgCimPbY+zoWe9xIlgrZmdAiKe
+ tLOcsHsModWsfH13UiA+pmrs1O61VPxRoxLyHiHeznG8yRke+aOvjb9gO5KybiJK+8HS
+ Z8Eck/uFs4Bhtwzh0t4RC8NjawQMjG8SeSss7dRltJN3awzqgdpgzkxqONPUmOkS38h8
+ 5NkkfN+qEoOoTd5CxnHDlUXzjtLQ9+coaYWZW6KVo+P0UhleIhJSOSQCjI6NcrHy08wX
+ YF8w==
+X-Gm-Message-State: APjAAAUWJibzAVeg/QjLKhTE0VN2VS7L+oXlI2eWQ/rQvyovshR/CRoH
+ mj0+iaZssvfmJI4ATzPveAYiGQ==
+X-Google-Smtp-Source: APXvYqwYYio+44l1bSKnRTr7qUSJ7+xZpL3F99GgiokHmBqkn5/+Il7ueG3ucDpibmIBpKDPcr7gDA==
+X-Received: by 2002:a1c:1d83:: with SMTP id d125mr3700662wmd.63.1561651274748; 
+ Thu, 27 Jun 2019 09:01:14 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5d4d:4830:bcdf:9bf9?
+ ([2001:b07:6468:f312:5d4d:4830:bcdf:9bf9])
+ by smtp.gmail.com with ESMTPSA id j17sm1803018wrw.6.2019.06.27.09.01.13
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Thu, 27 Jun 2019 09:01:14 -0700 (PDT)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <87tvcbc9ul.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <655a1ac0-bbd9-9798-4e44-478f94afb86f@redhat.com>
+Date: Thu, 27 Jun 2019 18:01:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
+MIME-Version: 1.0
+In-Reply-To: <87tvcbc9ul.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.43
+Subject: Re: [Qemu-devel] Should configure --enable-debug add -Og to CFLAGS?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,144 +83,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: amarkovic@wavecomp.com, Jim Wilson <jimw@sifive.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jim Wilson <jimw@sifive.com>
+On 27/06/19 17:43, Markus Armbruster wrote:
+> The fine manual advises:
+> 
+> '-O0'
+>      Reduce compilation time and make debugging produce the expected
+>      results.  This is the default.
+> [...]
+> '-Og'
+>      Optimize debugging experience.  '-Og' should be the optimization
+>      level of choice for the standard edit-compile-debug cycle, offering
+>      a reasonable level of optimization while maintaining fast
+>      compilation and a good debugging experience.  It is a better choice
+>      than '-O0' for producing debuggable code because some compiler
+>      passes that collect debug information are disabled at '-O0'.
+> 
+> Our configure --enable-debug effectively picks -O0.  Should it pick -Og
+> instead?
+> 
 
-All of the flags need to be conditional as old systems don't have
-statx support.  Otherwise it works the same as other stat family
-syscalls.  This requires the pending patch to add statx support.
+    commit 48e56d503e18bd1e8a75463fd7cc1580bf7e7650
+    Author: Paolo Bonzini <pbonzini@redhat.com>
+    Date:   Tue Mar 6 11:32:44 2018 +0100
 
-Tested on Ubuntu 16.04 (no host statx) and Ubuntu 19.04 (with host
-statx) using a riscv32-linux toolchain.
+    Revert "build-sys: compile with -Og or -O1 when --enable-debug"
 
-Signed-off-by: Jim Wilson <jimw@sifive.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/strace.c    | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++
- linux-user/strace.list |  3 ++
- 2 files changed, 89 insertions(+)
+    This reverts commit 906548689e37ab6cca1e93b3f8d9327a4e17e8af.
+    Even with -Og, the debug experience is noticeably worse
+    because gdb shows a lot more "<optimised out>" variables and
+    function arguments.
 
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 6f72a74..c80e93b 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -976,6 +976,76 @@ UNUSED static struct flags msg_flags[] = {
-     FLAG_END,
- };
- 
-+UNUSED static struct flags statx_flags[] = {
-+#ifdef AT_EMPTY_PATH
-+    FLAG_GENERIC(AT_EMPTY_PATH),
-+#endif
-+#ifdef AT_NO_AUTOMOUNT
-+    FLAG_GENERIC(AT_NO_AUTOMOUNT),
-+#endif
-+#ifdef AT_SYMLINK_NOFOLLOW
-+    FLAG_GENERIC(AT_SYMLINK_NOFOLLOW),
-+#endif
-+#ifdef AT_STATX_SYNC_AS_STAT
-+    FLAG_GENERIC(AT_STATX_SYNC_AS_STAT),
-+#endif
-+#ifdef AT_STATX_FORCE_SYNC
-+    FLAG_GENERIC(AT_STATX_FORCE_SYNC),
-+#endif
-+#ifdef AT_STATX_DONT_SYNC
-+    FLAG_GENERIC(AT_STATX_DONT_SYNC),
-+#endif
-+    FLAG_END,
-+};
-+
-+UNUSED static struct flags statx_mask[] = {
-+/* This must come first, because it includes everything.  */
-+#ifdef STATX_ALL
-+    FLAG_GENERIC(STATX_ALL),
-+#endif
-+/* This must come second; it includes everything except STATX_BTIME.  */
-+#ifdef STATX_BASIC_STATS
-+    FLAG_GENERIC(STATX_BASIC_STATS),
-+#endif
-+#ifdef STATX_TYPE
-+    FLAG_GENERIC(STATX_TYPE),
-+#endif
-+#ifdef STATX_MODE
-+    FLAG_GENERIC(STATX_MODE),
-+#endif
-+#ifdef STATX_NLINK
-+    FLAG_GENERIC(STATX_NLINK),
-+#endif
-+#ifdef STATX_UID
-+    FLAG_GENERIC(STATX_UID),
-+#endif
-+#ifdef STATX_GID
-+    FLAG_GENERIC(STATX_GID),
-+#endif
-+#ifdef STATX_ATIME
-+    FLAG_GENERIC(STATX_ATIME),
-+#endif
-+#ifdef STATX_MTIME
-+    FLAG_GENERIC(STATX_MTIME),
-+#endif
-+#ifdef STATX_CTIME
-+    FLAG_GENERIC(STATX_CTIME),
-+#endif
-+#ifdef STATX_INO
-+    FLAG_GENERIC(STATX_INO),
-+#endif
-+#ifdef STATX_SIZE
-+    FLAG_GENERIC(STATX_SIZE),
-+#endif
-+#ifdef STATX_BLOCKS
-+    FLAG_GENERIC(STATX_BLOCKS),
-+#endif
-+#ifdef STATX_BTIME
-+    FLAG_GENERIC(STATX_BTIME),
-+#endif
-+    FLAG_END,
-+};
-+
- /*
-  * print_xxx utility functions.  These are used to print syscall
-  * parameters in certain format.  All of these have parameter
-@@ -2611,6 +2681,22 @@ print_tgkill(const struct syscallname *name,
- }
- #endif
- 
-+#ifdef TARGET_NR_statx
-+static void
-+print_statx(const struct syscallname *name,
-+            abi_long arg0, abi_long arg1, abi_long arg2,
-+            abi_long arg3, abi_long arg4, abi_long arg5)
-+{
-+    print_syscall_prologue(name);
-+    print_at_dirfd(arg0, 0);
-+    print_string(arg1, 0);
-+    print_flags(statx_flags, arg2, 0);
-+    print_flags(statx_mask, arg3, 0);
-+    print_pointer(arg4, 1);
-+    print_syscall_epilogue(name);
-+}
-+#endif
-+
- /*
-  * An array of all of the syscalls we know about
-  */
-diff --git a/linux-user/strace.list b/linux-user/strace.list
-index db21ce4..63a9466 100644
---- a/linux-user/strace.list
-+++ b/linux-user/strace.list
-@@ -1650,3 +1650,6 @@
- #ifdef TARGET_NR_atomic_barrier
- { TARGET_NR_atomic_barrier, "atomic_barrier", NULL, NULL, NULL },
- #endif
-+#ifdef TARGET_NR_statx
-+{ TARGET_NR_statx, "statx", NULL, print_statx, NULL },
-+#endif
--- 
-2.7.4
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
+:(
+
+Paolo
 
