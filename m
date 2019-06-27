@@ -2,143 +2,80 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95029C48BD7
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 19:47:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2FA4C48BD7
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:01:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DDFA20665
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 19:47:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DDFA20665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 71DFE20B7C
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:01:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AZNnRf5j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71DFE20B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53984 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgaMy-0003gT-MR
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 15:47:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36532)
+	id 1hgaaa-0000wt-86
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 16:01:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39310)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hgaLb-0003AT-6p
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 15:46:20 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hgaZ3-0000NT-BI
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:00:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hgaLa-00025y-8U
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 15:46:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55316)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hgaLV-0001n9-MW; Thu, 27 Jun 2019 15:46:14 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0DCEE356EC;
- Thu, 27 Jun 2019 19:45:52 +0000 (UTC)
-Received: from [10.18.17.47] (dhcp-17-47.bos.redhat.com [10.18.17.47])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1CAFC60856;
- Thu, 27 Jun 2019 19:45:49 +0000 (UTC)
-To: dillaman@redhat.com
-References: <20190510153346.238366-1-sgarzare@redhat.com>
- <96429d33-6514-33b5-3fe8-7bdf2eccc8d9@redhat.com>
- <20190627084816.u6fj556uen3iqa3r@steredhat.homenet.telecomitalia.it>
- <b7aaa681-12ae-e256-e295-06e953dc51ff@redhat.com>
- <CA+aFP1Btm6O5R0fiNZmBjHOO8t9ZDvvVgH0i1vFHsrQq85d+bA@mail.gmail.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <90149c68-0dee-4afd-f517-5f204879dd18@redhat.com>
-Date: Thu, 27 Jun 2019 15:45:48 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <alistair23@gmail.com>) id 1hgaYv-0005VL-2C
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:00:07 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:43476)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1hgaYq-0005Lc-SS; Thu, 27 Jun 2019 16:00:01 -0400
+Received: by mail-lf1-x141.google.com with SMTP id j29so2371255lfk.10;
+ Thu, 27 Jun 2019 12:59:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=rYjYxm+SVEDCvYa7FbIYeK0ER/2x8MIotQD4iyLmSrc=;
+ b=AZNnRf5j6kBncSj/JZP59ulTbj2IuyED9Oc11eg7T8B4HBZTwLIO00479CgcynuJRe
+ WcPZZS4ncOZ/8MC63UQcnLskBBE3agawkU9giTlUkmwDad2xGJ1nqwZuPThAMxLGsXav
+ JiF/0RsE7L6tpQTJjy9kmU9fUYCYonaudSMQqsGohT0w5l9JVKJMbSUnlGJMlKX1GPUt
+ y8Yxha6dChZpx9ibBLgc13SKnVOYeBSgEIXl6wISM/vtebmnRwGDka1RVh4dfbNs71sP
+ s9kkpJsfSgRggxGi5/5eQ+feGDeMjSjW81tPSwe6a4D36/yMjN6tehGf0EI8Q3OB15JO
+ ajCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=rYjYxm+SVEDCvYa7FbIYeK0ER/2x8MIotQD4iyLmSrc=;
+ b=GLCe70JDK8Cqsy7qM3+zsNs1YfhLFZdWrTY3uFZTybiwj33nIxYqa2z1K2/f1rC+xP
+ MPTz25GlAxXBGKH0ZuV/JV1zoHu4+/TeclOQYoHMIK5QCPNzmey3ICZzVmK8iTP+Ou5H
+ ShMhgtACw3IHpdXBmxKL5b0FGUWqcf69W/bix8q4k5IALhyJUhpO0u/f1M16ll8O42Hs
+ lBktIeI7Q6noQjaBCAlkq2w2S+WXfkle0u/3l7nHgpTg4OO++RpShuMB+1tX6EPpbU+a
+ TkzimfKRf1eoQiWhPDAWx6Bwn/pVieCsXBnXpl0GdNYVHvhWhFyBmIcVAWhA2D5fSYTE
+ Igog==
+X-Gm-Message-State: APjAAAULmi9OwhxNGwnQj+JLQtY7HIU1G+7WrtrVTYqJWG2X50FLYKzq
+ oeFfDxkwn7300/CV/3/8fKg6u7LcZCkcuwKM+kg=
+X-Google-Smtp-Source: APXvYqw34xBrTkX94WBDaG28yGsuQR3dFfFuhejcgn1ab8IUraX7s2LwNq3w/oBGRODyw1xZ7b5OhVTjmnlouWOkzR4=
+X-Received: by 2002:a19:6a01:: with SMTP id u1mr2970093lfu.141.1561665596272; 
+ Thu, 27 Jun 2019 12:59:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CA+aFP1Btm6O5R0fiNZmBjHOO8t9ZDvvVgH0i1vFHsrQq85d+bA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Thu, 27 Jun 2019 19:45:52 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] block/rbd: implement
- .bdrv_get_allocated_file_size callback
+References: <CAEUhbmVZm-dhvT40Ck4d159SHin_D-U47+CHShjajzM1f-P9Gw@mail.gmail.com>
+ <mhng-4265f77a-c58a-4851-871a-093b4212df1d@palmer-si-x1e>
+In-Reply-To: <mhng-4265f77a-c58a-4851-871a-093b4212df1d@palmer-si-x1e>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 27 Jun 2019 12:56:57 -0700
+Message-ID: <CAKmqyKMAGJFgJV1Y9W+ne_=jipqGMtZMKRHJmN5qpNVZrKUTeg@mail.gmail.com>
+To: Palmer Dabbelt <palmer@sifive.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::141
+Subject: Re: [Qemu-devel] [PATCH for 4.1 v3] target/riscv: Expose time CSRs
+ when allowed by [m|s]counteren
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -150,42 +87,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
- qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Jonathan Behrens <fintelia@gmail.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>, Bin Meng <bmeng.cn@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, Jun 26, 2019 at 1:25 AM Palmer Dabbelt <palmer@sifive.com> wrote:
+>
+> On Tue, 25 Jun 2019 23:58:34 PDT (-0700), bmeng.cn@gmail.com wrote:
+> > On Wed, Jun 26, 2019 at 4:23 AM Jonathan Behrens <fintelia@gmail.com> wrote:
+> >>
+> >> I just did some testing on a HiFive Unleashed board and can confirm what
+> >> you are saying. The low 5 bits of both mcounteren and scounteren are
+> >> writable (if you try to write 0xFFFFFFFF to them, they'll take on the value
+> >> 0x1F) but even with the TM bit set in both mcounteren and scounteren the
+> >> rdtime instruction always generates an illegal instruction exception.
+> >>
+> >
+> > Then I would think the FU540 is not spec complaint :)
+>
+> Ya, it's an errata.  There's a handful of them :)
+>
+> >> Reading through the relevant chapter of the spec, I still think that having
+> >> mcounteren.TM be writable but making rdtime unconditionally trap is
+> >> non-conformant. If other people feel strongly that rdtime should always
+> >
+> > Agree. To test hardware (FU540) compatibility in QEMU, maybe we can
+> > add a cpu property to allow hard-wiring mcounteren.TM to zero?
+>
+> In theory we should have properties to control the behavior of all WARL fields,
+> but it's a lot of work.  I'd be happy to take a patch for any of them.
 
+Hmmm... We should avoid taking patches that don't adhere to the spec
+just to match some hardware. In the case that core/popular software
+doesn't work it probably makes sense, but in general it's probably not
+the best move.
 
-On 6/27/19 3:43 PM, Jason Dillaman wrote:
-> On Thu, Jun 27, 2019 at 1:24 PM John Snow <jsnow@redhat.com> wrote:
->>
->>
->>
->> On 6/27/19 4:48 AM, Stefano Garzarella wrote:
->>> On Wed, Jun 26, 2019 at 05:04:25PM -0400, John Snow wrote:
->>>> It looks like this has hit a 30 day expiration without any reviews or
->>>> being merged; do we still want this? If so, can you please resend?
->>>
->>> Yes, I think we still want :)
->>>
->>> Is it okay if I send a v3 following your comments?
->>>
->>
->> Yes, but I don't know who is responsible for final approval; I guess
->> that's Josh Durgin?
-> 
-> I'm the new (for the past several years) upstream PTL for RBD, so feel
-> free to tag me.
-> 
+Alistair
 
-I got Josh's name out of MAINTAINERS, does it need an update?
-
-> RBD
-> M: Josh Durgin <jdurgin@redhat.com>
-> L: qemu-block@nongnu.org
-> S: Supported
-> F: block/rbd.c
+>
+> >> require trapping into firmware then the natural change would be to simply
+> >> hardwire mcounteren.TM to zero (the value in scounteren wouldn't matter in
+> >> that case so it could be left writable). My own (biased) personal feeling
+> >> is that this full implementation makes sense at least for the `virt`
+> >> machine type because it represents a clear case where deviating from
+> >> current hardware enables a performance boost, and would not break
+> >> compatibility with any current software: both OpenSBI and BBL try to enable
+> >> hardware handling of rdtime when the platform claims to support it.
+> >>
+> >
+> > Regards,
+> > Bin
+>
 
