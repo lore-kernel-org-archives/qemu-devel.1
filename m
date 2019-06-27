@@ -2,91 +2,108 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84857C48BD6
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:32:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C1D0C48BD9
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:37:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B0D22146E
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:32:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B0D22146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CB936208E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:37:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="fPPfNGdO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB936208E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgXK6-0003Lj-8d
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 12:32:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36599)
+	id 1hgXPD-0006CL-Je
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 12:37:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43521)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hgWTN-0006r3-6R
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:38:06 -0400
+ (envelope-from <den@virtuozzo.com>) id 1hgWuf-0008Cb-6b
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 12:06:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hgWTL-000366-ME
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:38:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:13783)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hgWTG-0002wD-AP; Thu, 27 Jun 2019 11:37:58 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A25A8285B4;
- Thu, 27 Jun 2019 15:37:53 +0000 (UTC)
-Received: from [10.3.116.142] (ovpn-116-142.phx2.redhat.com [10.3.116.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E5CA660126;
- Thu, 27 Jun 2019 15:37:52 +0000 (UTC)
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20190626024942.29758-1-eblake@redhat.com>
- <20190626082251.GA29008@redhat.com>
- <a3418db6-4bb4-029e-8a5d-d9e6b1185f22@redhat.com>
- <20190627145850.GN12358@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <fd45bfbe-f8a3-afd9-1230-798f4c647d30@redhat.com>
-Date: Thu, 27 Jun 2019 10:37:52 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <den@virtuozzo.com>) id 1hgWud-0006Fi-IP
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 12:06:17 -0400
+Received: from mail-eopbgr10108.outbound.protection.outlook.com
+ ([40.107.1.108]:42113 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <den@virtuozzo.com>)
+ id 1hgWuR-00060E-N2; Thu, 27 Jun 2019 12:06:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UxEcZeLqCoizA36BW0U1iHJ5SjBC1WZUM3r20a5ntw8=;
+ b=fPPfNGdOrI9UGUmnBuraWeBuu+oOq9iwEbowu9ybM/myQnNPpMFhQrauG+0mrSHkdL9CRciW7fTm0C54ucoHmA5UIPIfxsv3A4n5yL+r1Ox8KxyBIv/OD+Pyn5zTVMW5DMv8NwucS7rv5J1KhkyFnmjHM08+lge+cMf793/jysQ=
+Received: from DBBPR08MB4250.eurprd08.prod.outlook.com (20.179.40.149) by
+ DBBPR08MB4677.eurprd08.prod.outlook.com (10.255.78.150) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2032.18; Thu, 27 Jun 2019 16:05:55 +0000
+Received: from DBBPR08MB4250.eurprd08.prod.outlook.com
+ ([fe80::1d8b:7420:f966:e881]) by DBBPR08MB4250.eurprd08.prod.outlook.com
+ ([fe80::1d8b:7420:f966:e881%3]) with mapi id 15.20.2008.014; Thu, 27 Jun 2019
+ 16:05:55 +0000
+From: Denis Lunev <den@virtuozzo.com>
+To: Alberto Garcia <berto@igalia.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Thread-Topic: [RFC] Re-evaluating subcluster allocation for qcow2 images
+Thread-Index: AQHVLPCb4B1OTPiTIEWxN+ewhowOEKavjMGAgAAWOgCAAAeGAA==
+Date: Thu, 27 Jun 2019 16:05:55 +0000
+Message-ID: <434b102d-9d8e-ccc2-cb53-7f49a3fbd6fb@virtuozzo.com>
+References: <20190627135914.xlzohrdwr6mz2aq3@perseus.local>
+ <4453cfc4-cff7-c004-1f4c-7cab462e4661@virtuozzo.com>
+ <w51a7e3domn.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51a7e3domn.fsf@maestria.local.igalia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1P190CA0001.EURP190.PROD.OUTLOOK.COM (2603:10a6:3:bc::11)
+ To DBBPR08MB4250.eurprd08.prod.outlook.com
+ (2603:10a6:10:c2::21)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=den@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 7dfc1a4d-a198-4dfc-03b9-08d6fb1955b4
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:DBBPR08MB4677; 
+x-ms-traffictypediagnostic: DBBPR08MB4677:
+x-microsoft-antispam-prvs: <DBBPR08MB4677A2819E1A6471C709F091B6FD0@DBBPR08MB4677.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 008184426E
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(136003)(376002)(366004)(39850400004)(346002)(396003)(189003)(199004)(229853002)(186003)(14444005)(8676002)(486006)(11346002)(2616005)(476003)(256004)(4326008)(2501003)(68736007)(5660300002)(7736002)(6506007)(386003)(305945005)(99286004)(478600001)(8936002)(561944003)(2906002)(81166006)(81156014)(53936002)(53546011)(107886003)(76176011)(52116002)(66476007)(66446008)(64756008)(66556008)(6246003)(66946007)(73956011)(36756003)(6436002)(26005)(25786009)(316002)(6486002)(31686004)(6512007)(102836004)(446003)(3846002)(6116002)(86362001)(54906003)(110136005)(66066001)(31696002)(71190400001)(71200400001)(14454004);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DBBPR08MB4677;
+ H:DBBPR08MB4250.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: +CfsS2z/e8qoallCXxwYLet7DM+XXk5bGTi9INhoxtKsrYS4vADxVUC8SfO00EA+vSdUPGGdo5mVNiP0ksGYijgHNMCM/Rxl0/Y6U4h20djy3c67UhaIIr3vvlRHTh/g8N2yYM56FgYBMlbH/0p8KC1+DWg4CYCvnlIy5/eVDEmMZB7VNz1inYqJr/16j6yjUBfj8YH1DFNBgmfYW7gk4f353p8nieYtg/Ssg3WNvYMtOdBU01wCna9m/d+V1ZRaqNzzY2E3XTfrVVfxoUMm/WjQBKGk2qzR+8kpGa6JjitATe7LAqyBIko/QR0mkoYpnxGUywWcS/aBLbf1hfOp4nSyNOGiT1LsF+6/VcHeihwD70t147T5jEtmMH1Jo5/OpMZYef+H4LRKbjGKhydmeNzcGGnuhV0IbWUFNdH3L84=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <7A285D82C49DF544B09499A1072E5577@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20190627145850.GN12358@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="SSf8SMWCiJ474UWdKl8hmADN2xC7Ivz7s"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Thu, 27 Jun 2019 15:37:53 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] qemu-nbd: Permit TLS with Unix sockets
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7dfc1a4d-a198-4dfc-03b9-08d6fb1955b4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Jun 2019 16:05:55.3696 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: den@virtuozzo.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR08MB4677
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.1.108
+Subject: Re: [Qemu-devel] [RFC] Re-evaluating subcluster allocation for
+ qcow2 images
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,123 +115,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org,
- "open list:Network Block Dev..." <qemu-block@nongnu.org>, rjones@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SSf8SMWCiJ474UWdKl8hmADN2xC7Ivz7s
-Content-Type: multipart/mixed; boundary="892I7ZPAfaPTWrCcMyC1q7OZ3csgscr7l";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, rjones@redhat.com,
- "open list:Network Block Dev..." <qemu-block@nongnu.org>
-Message-ID: <fd45bfbe-f8a3-afd9-1230-798f4c647d30@redhat.com>
-Subject: Re: [PATCH] qemu-nbd: Permit TLS with Unix sockets
-References: <20190626024942.29758-1-eblake@redhat.com>
- <20190626082251.GA29008@redhat.com>
- <a3418db6-4bb4-029e-8a5d-d9e6b1185f22@redhat.com>
- <20190627145850.GN12358@redhat.com>
-In-Reply-To: <20190627145850.GN12358@redhat.com>
-
---892I7ZPAfaPTWrCcMyC1q7OZ3csgscr7l
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 6/27/19 9:58 AM, Daniel P. Berrang=C3=A9 wrote:
-
->>>
->>> Do you need something on the client side too ?
->>
->> The proposal that Rich is working on for standardized NBD URIs [1] say=
-s
->> that we need a patch to support nbds://host/export and
->> nbds+unix://export?socket=3D/path as ways to request an encrypted clie=
-nt
->> connection with default encryption parameters. For anything more
->> complex, we have to use --imageopts and request an encrypted connectio=
-n
->> by parts - but the QAPI schema already permits us to pass in an
->> 'tls-creds' parameter for both TCP and Unix sockets, so no, I don't
->> think we need any client side changes at this point.
-
-Okay, I just tested that pre-patch, qemu-nbd --list refuses to connect,
-but post-patch it works:
-
-$ ./qemu-nbd -r -k /tmp/nbdsock --object \
-  tls-creds-psk,id=3Dtls0,endpoint=3Dserver,dir=3D/home/eblake/libnbd/tes=
-ts \
-  --tls-creds tls0 -f raw -x / ./file
-$ qemu-nbd --list -k /tmp/nbdsock --object \
-
-tls-creds-psk,id=3Dtls0,endpoint=3Dclient,dir=3D/home/eblake/libnbd/tests=
-,username=3Deblake
-\
-  --tls-creds tls0
-qemu-nbd: TLS is only supported with IPv4/IPv6
-$ ./qemu-nbd --list -k /tmp/nbdsock --object \
-
-tls-creds-psk,id=3Dtls0,endpoint=3Dclient,dir=3D/home/eblake/libnbd/tests=
-,username=3Deblake
-\
-  --tls-creds tls0
-exports available: 1
-=2E..
-
->=20
-> The QAPI schema isn't what I was thinking about....  in block/nbd.c
-> we have the same restriction you lifted here
->=20
->         tlscreds =3D nbd_get_tls_creds(s->tlscredsid, errp);
->         if (!tlscreds) {
->             goto error;
->         }
->=20
->         /* TODO SOCKET_ADDRESS_KIND_FD where fd has AF_INET or AF_INET6=
- */
->         if (s->saddr->type !=3D SOCKET_ADDRESS_TYPE_INET) {
->             error_setg(errp, "TLS only supported over IP sockets");
->             goto error;
->         }
-
-Oh. Yeah, I'll have to fix that; it's different than qemu-nbd --list.
-
->=20
-> For client side we would also need to allow a 'tls-hostname' parameter
-> in BlockdevOptionsNbd, so that the client can pass a hostname to use
-> for validating the x509 certificate, the same way we allow for live
-> migration.
-
-Okay, v2 coming up later, once I've done more integration testing.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---892I7ZPAfaPTWrCcMyC1q7OZ3csgscr7l--
-
---SSf8SMWCiJ474UWdKl8hmADN2xC7Ivz7s
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0U4tAACgkQp6FrSiUn
-Q2pNuAf/WyiDmacuqI5lvvA9PwERxevsYEo0+8y8tzpafFjES0FYuw6Rg2t2ET6S
-OdIwKyOistECKwsX1XaM9AsKM+6L0tUeaQuO/zHPWfcyvDPLvGqBjkzGhoJdRQsY
-f33/arSqQe5StEvOALfMpCgOvcrqt7F7vO9vwIBzQ4JAHRcTGNe2KQXuax8JHtMn
-YNzHSUwP4+qsRJuzhH2JBrXTpyAyta7Aug+07ijCBy17JS9eZYt83xf0ZenWXYwd
-v3i/ngI+hU+5V45JU8uw+NEWMZyJpX95D+yqCP6Z04SiKEqzod5CvGoEEO30OKkc
-SqSKcix3qdutYFh+YWTuMRKf01IR9A==
-=l4fw
------END PGP SIGNATURE-----
-
---SSf8SMWCiJ474UWdKl8hmADN2xC7Ivz7s--
+T24gNi8yNy8xOSA2OjM4IFBNLCBBbGJlcnRvIEdhcmNpYSB3cm90ZToNCj4gT24gVGh1IDI3IEp1
+biAyMDE5IDA0OjE5OjI1IFBNIENFU1QsIERlbmlzIEx1bmV2IHdyb3RlOg0KPg0KPj4gUmlnaHQg
+bm93IFFDT1cyIGlzIG5vdCB2ZXJ5IGVmZmljaWVudCB3aXRoIGRlZmF1bHQgY2x1c3RlciBzaXpl
+ICg2NGspDQo+PiBmb3IgZmFzdCBwZXJmb3JtYW5jZSB3aXRoIGJpZyBkaXNrcy4gTm93YWRheXMg
+cHBsIHVzZXMgcmVhbGx5IEJJRw0KPj4gaW1hZ2VzIGFuZCAxLTItMy04IFRiIGRpc2tzIGFyZSBy
+ZWFsbHkgY29tbW9uLiBVbmZvcnR1bmF0ZWx5IHBwbCB3YW50DQo+PiB0byBnZXQgcmFuZG9tIElP
+IGZhc3QgdG9vLiAgVGh1cyBtZXRhZGF0YSBjYWNoZSBzaG91bGQgYmUgaW4gbWVtb3J5IGFzDQo+
+PiBpbiB0aGUgYW55IG90aGVyIGNhc2Ugd2Ugd2lsbCBnZXQgSU9QU2VzIGhhbHZlZCAoMSBvcGVy
+YXRpb24gZm9yDQo+PiBtZXRhZGF0YSBjYWNoZSByZWFkIGFuZCBvbmUgb3BlcmF0aW9uIGZvciBy
+ZWFsIHJlYWQpLiBGb3IgOCBUYiBpbWFnZQ0KPj4gdGhpcyByZXN1bHRzIGluIDEgR2IgUkFNIGZv
+ciB0aGF0LiBGb3IgMSBNYiBjbHVzdGVyIHdlIGdldCA2NCBNYiB3aGljaA0KPj4gaXMgbXVjaCBt
+b3JlIHJlYXNvbmFibGUuDQo+IENvcnJlY3QsIHRoZSBMMiBtZXRhZGF0YSBzaXplIGlzIGEgd2Vs
+bC1rbm93biBwcm9ibGVtIHRoYXQgaGFzIGJlZW4NCj4gZGlzY3Vzc2VkIGV4dGVuc2l2ZWx5LCBh
+bmQgdGhhdCBoYXMgcmVjZWl2ZWQgcGxlbnR5IG9mIGF0dGVudGlvbi4NCj4NCj4+IFRob3VnaCB3
+aXRoIDEgTWIgY2x1c3RlciB0aGUgcmVjbGFpbSBwcm9jZXNzIGJlY29tZXMgbXVjaC1tdWNoDQo+
+PiB3b3JzZS4gSSBjYW4gbm90IGdpdmUgZXhhY3QgbnVtYmVyLCB1bmZvcnR1bmF0ZWx5LiAgQUZB
+SVIgdGhlIGltYWdlDQo+PiBvY2N1cGllcyAzMC01MCUgbW9yZSBzcGFjZS4gR3V5cywgSSB3b3Vs
+ZCBhcHByZWNpYXRlIGlmIHlvdSB3aWxsDQo+PiBjb3JyZWN0IG1lIGhlcmUgd2l0aCByZWFsIG51
+bWJlcnMuDQo+IENvcnJlY3QsIGJlY2F1c2UgdGhlIGNsdXN0ZXIgc2l6ZSBpcyB0aGUgc21hbGxl
+c3QgdW5pdCBvZiBhbGxvY2F0aW9uLCBzbw0KPiBhIDE2S0Igd3JpdGUgb24gYW4gZW1wdHkgYXJl
+YSBvZiB0aGUgaW1hZ2Ugd2lsbCBhbHdheXMgYWxsb2NhdGUgYQ0KPiBjb21wbGV0ZSAxTUIgY2x1
+c3Rlci4NCg0KPj4gVGh1cyBpbiByZXNwZWN0IHRvIHRoaXMgcGF0dGVybnMgc3ViY2x1c3RlcnMg
+Y291bGQgZ2l2ZSB1cyBiZW5lZml0cyBvZg0KPj4gZmFzdCByYW5kb20gSU8gYW5kIGdvb2QgcmVj
+bGFpbSByYXRlLg0KPiBFeGFjdGx5LCBidXQgdGhhdCBmYXN0IHJhbmRvbSBJL08gd291bGQgb25s
+eSBoYXBwZW4gd2hlbiBhbGxvY2F0aW5nIG5ldw0KPiBjbHVzdGVycy4gT25jZSB0aGUgY2x1c3Rl
+cnMgYXJlIGFsbG9jYXRlZCBpdCBkb2Vzbid0IHByb3ZpZGUgYW55DQo+IGFkZGl0aW9uYWwgcGVy
+Zm9ybWFuY2UgYmVuZWZpdC4NCg0KTm8sIEkgYW0gdGFsa2luZyBhYm91dCB0aGUgc2l0dWF0aW9u
+IGFmdGVyIHRoZSBhbGxvY2F0aW9uLiBUaGF0IGlzIHRoZSBtYWluDQpwb2ludCB3aHkgSSBoYXZl
+IGEgZmVlbGluZyB0aGF0IHN1Yi1jbHVzdGVyIGNvdWxkIHByb3ZpZGUgYSBiZW5lZml0Lg0KDQpP
+Sy4gVGhlIHNpdHVhdGlvbiAoMSkgaXMgdGhlIGZvbGxvd2luZzoNCi0gdGhlIGRpc2sgaXMgY29t
+cGxldGVseSBhbGxvY2F0ZWQNCi0gUUNPVzIgaW1hZ2Ugc2l6ZSBpcyA4IFRiDQotIHdlIGhhdmUg
+aW1hZ2Ugd2l0aCAxIE1iIGNsdXN0ZXIvNjRrIHN1Yi1jbHVzdGVyIChmb3Igc2ltcGxpY2l0eSkN
+Ci0gTDIgbWV0YWRhdGEgY2FjaGUgc2l6ZSBpcyAxMjggTWIgKDY0IE1iIEwyIHRhYmxlcywgNjQg
+TWIgb3RoZXIgZGF0YSkNCi0gaG9sZXMgYXJlIG1hZGUgb24gYSBzdWItY2x1c3RlciBiYXNlcywg
+aS5lLiB3aXRoIDY0IEtiIGdyYW51bGFyaXR5DQoNCkluIHRoaXMgY2FzZSByYW5kb20gSU8gdGVz
+dCB3aWxsIGdpdmUgbmVhciBuYXRpdmUgSU9QUyByZXN1bHQuIE1ldGFkYXRhDQppcyBpbiBtZW1v
+cnksIG5vIGFkZGl0aW9uYWwgcmVhZHMgYXJlIHJlcXVpcmVkLiBXYXN0ZWQgaG9zdCBmaWxlc3lz
+dGVtDQpzcGFjZSAoZHVlIHRvIGNsdXN0ZXIgc2l6ZSkgaXMga2VwdCBhdCBtaW5pbXVtLCBpLmUu
+IG9uIHRoZSBsZXZlbCBvZg0KdGhlICJwcmUtc3ViY2x1c3RlciIgUUNPVzIuDQoNClNpdHVhdGlv
+biAoMik6DQotIDggVGIgUUNPVzIgaW1hZ2UgaXMgY29tcGxldGVseSBhbGxvY2F0ZWQNCi0gMSBN
+YiBjbHVzdGVyIHNpemUsIDEyOCBNYiBMMiBjYWNoZSBzaXplDQoNCk5lYXIgc2FtZSBwZXJmb3Jt
+YW5jZSBhcyAoMSksIGJ1dCBtdWNoIGxlc3MgZGlzayBzcGFjZSBzYXZpbmdzIGZvcg0KaG9sZXMu
+DQoNClNpdHVhdGlvbiAoMyk6DQotIDggVGIgUUNPVzIgaW1hZ2UsIGNvbXBsZXRlbHkgYWxsb2Nh
+dGVkDQotIDY0IEtiIGNsdXN0ZXIgc2l6ZSwgMTI4IE1CIEwyIGNhY2hlDQoNClJhbmRvbSBJTyBw
+ZXJmb3JtYW5jZSBoYWx2ZWQgZnJvbSAoMSkgYW5kICgyKSBkdWUgdG8gbWV0YWRhdGENCnJlLXJl
+YWQgZm9yIGVhY2ggc3Vic2VxdWVudCBvcGVyYXRpb24uIFNhbWUgZGlzayBzcGFjZSBzYXZpbmdz
+DQphcyBpbiBjYXNlICgxKS4NCg0KUGxlYXNlIG5vdGUsIEkgYW0gbm90IHRhbGtpbmcgbm93IGFi
+b3V0IHlvdXIgY2FzZSB3aXRoIENPVy4gSGVyZQ0KdGhlIGFsbG9jYXRpb24gaXMgcGVyZm9ybWVk
+IG9uIHRoZSBzdWItY2x1c3RlciBiYXNpcywgaS5lLiB0aGUgYWJzY2VuY2UNCm9mIHRoZSBzdWIt
+Y2x1c3RlciBpbiB0aGUgaW1hZ2UgbWVhbnMgaG9sZSBvbiB0aGF0IG9mZnNldC4gVGhpcyBpcw0K
+aW1wb3J0YW50IGRpZmZlcmVuY2UuDQoNCj4+IEkgd291bGQgY29uc2lkZXIgNjRrIGNsdXN0ZXIv
+OGsgc3ViY2x1c3RlciBhcyB0b28gZXh0cmVtZSBmb3IgbWUuICBJbg0KPj4gcmVhbGl0eSB3ZSB3
+b3VsZCBlbmQgdXAgd2l0aCBjb21wbGV0ZWx5IGZyYWdtZW50ZWQgaW1hZ2UgdmVyeSBzb29uLg0K
+PiBZb3UgbWVhbiBiZWNhdXNlIG9mIHRoZSA2NGsgY2x1c3RlciBzaXplLCBvciBiZWNhdXNlIG9m
+IHRoZSA4aw0KPiBzdWJjbHVzdGVyIHNpemU/IElmIGl0J3MgdGhlIGZvcm1lciwgeWVzLiBJZiBp
+dCdzIHRoZSBsYXR0ZXIsIGl0IGNhbiBiZQ0KPiBzb2x2ZWQgYnkgcHJlYWxsb2NhdGluZyB0aGUg
+Y2x1c3RlciB3aXRoIGZhbGxvY2F0ZSgpLiBCdXQgdGhlbiB5b3Ugd291bGQNCj4gbG9zZSB0aGUg
+YmVuZWZpdCBvZiB0aGUgZ29vZCByZWNsYWltIHJhdGUuDQoNCllvdSBhcmUgb3B0aW1pemluZyBD
+T1cgc3BlZWQgYW5kIHlvdXIgcHJvcG9zYWwgaXMgb24gdGhhdC4gVGh1cyB5b3UNCmdldHRpbmcg
+bWluaW1hbCBhbGxvY2F0aW9uIHVuaXQgYXMgYSBjbHVzdGVyLiBJIGFtIHRhbGtpbmcgYWJvdXQg
+YSBiaXQNCmRpZmZlcmVudCBwYXR0ZXJuIG9mIHN1YmNsdXN0ZXIgYmVuZWZpdHMgd2hlbiB0aGUg
+b2Zmc2V0IGFsbG9jYXRpb24gdW5pdA0KaXMgY2x1c3RlciB3aGlsZSB0aGUgc3BhY2UgYWxsb2Nh
+dGlvbiB1bml0IGlzIHN1Yi1jbHVzdGVyLg0KDQpUaGlzIGlzIGltcG9ydGFudCBkaWZmZXJlbmNl
+IGFuZCB0aGF0IGlzIHdoeSBJIGFtIHRhbGtpbmcgdGhhdCBmb3IgbXkNCmNhc2UgOCBLYiBzcGFj
+ZSBhbGxvY2F0aW9uIHVuaXQgaXMgdG9vIGV4dHJlbWUuIFRoZXNlIGNhc2Ugc2hvdWxkDQpiZSBz
+b21laG93IHNlcGFyYXRlZC4NCg0KRGVuDQo=
 
