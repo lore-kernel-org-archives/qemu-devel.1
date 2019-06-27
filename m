@@ -2,67 +2,71 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D1E2C48BD6
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 13:29:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B18DC48BD7
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 13:50:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13FDF2083B
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 13:29:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13FDF2083B
+	by mail.kernel.org (Postfix) with ESMTPS id 0B6B620828
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 13:50:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B6B620828
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgUSp-0005qU-At
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 09:29:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34987)
+	id 1hgUn8-0006a9-Ps
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 09:50:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39546)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1hgURh-0005KF-Oo
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 09:28:15 -0400
+ (envelope-from <abologna@redhat.com>) id 1hgUmb-000610-20
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 09:49:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hgURg-00062P-ET
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 09:28:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60100)
+ (envelope-from <abologna@redhat.com>) id 1hgUmZ-0003Hi-EF
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 09:49:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40300)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hgURg-000620-8p
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 09:28:12 -0400
+ (Exim 4.71) (envelope-from <abologna@redhat.com>)
+ id 1hgUmW-00032s-PK; Thu, 27 Jun 2019 09:49:46 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1D20C30842CE
- for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 13:28:06 +0000 (UTC)
-Received: from redhat.com (ovpn-112-68.ams2.redhat.com [10.36.112.68])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D296D5D707;
- Thu, 27 Jun 2019 13:28:01 +0000 (UTC)
-Date: Thu, 27 Jun 2019 14:27:58 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190627132758.GL12358@redhat.com>
-References: <1560165301-39026-1-git-send-email-pbonzini@redhat.com>
- <1560165301-39026-4-git-send-email-pbonzini@redhat.com>
- <20190627090353.GA24929@redhat.com>
- <b8ae5bd6-2b52-99e0-993c-fe8f65d40da3@redhat.com>
- <20190627125505.GH12358@redhat.com>
- <20190627131601.3zln6ywzewm35qvn@sirius.home.kraxel.org>
+ by mx1.redhat.com (Postfix) with ESMTPS id 65FC54DB10;
+ Thu, 27 Jun 2019 13:49:11 +0000 (UTC)
+Received: from kinshicho (unknown [10.43.2.73])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9A8775D71D;
+ Thu, 27 Jun 2019 13:49:05 +0000 (UTC)
+Message-ID: <7e2155a516d7c6eb432cd0aec12adc95a2cda1f4.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+To: David Abdurachmanov <david.abdurachmanov@gmail.com>, Alistair Francis
+ <alistair23@gmail.com>
+Date: Thu, 27 Jun 2019 15:49:04 +0200
+In-Reply-To: <4f52c3fff226a31963a5be52ddf0049475b6036c.camel@redhat.com>
+References: <cover.1560904640.git.alistair.francis@wdc.com>
+ <CAEUhbmViJpKtiNXm7CYdF7SPRkOPkvpXJ5+We2m9tZSK_BWi-g@mail.gmail.com>
+ <CAKmqyKM4UU+CPKu07AK65bNofbbxxaRkSACqoV_vfFEaH-195A@mail.gmail.com>
+ <CAEUhbmUwAVLXY9SSoryWBDeNL8gUfBCE+xweSSmuE9KwzWeX=w@mail.gmail.com>
+ <CAKmqyKMmm-38DijX_wL=pAbvxzLQ+KSOtd1xg_GrT4Az70GKsw@mail.gmail.com>
+ <11f4e4ff6037427f52824ba586f8a330c12d8dfd.camel@redhat.com>
+ <CAKmqyKOh3J07yg3dbaNcOaSzfbDZJJ-kjN3pBh+KqAKq05hzTA@mail.gmail.com>
+ <CAEn-LTo_e-Owk3hKGGsfSDkWLVEK2reO3ZU=y_hNDOtYVKgusw@mail.gmail.com>
+ <4f52c3fff226a31963a5be52ddf0049475b6036c.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.32.3 (3.32.3-1.fc30) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190627131601.3zln6ywzewm35qvn@sirius.home.kraxel.org>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Thu, 27 Jun 2019 13:28:06 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Thu, 27 Jun 2019 13:49:16 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/7] configure: integrate Meson in the
- build system
+Subject: Re: [Qemu-devel] [Qemu-riscv] [RFC v1 0/5] RISC-V: Add firmware
+ loading support and default
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,48 +78,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Alistair Francis <alistair.francis@wdc.com>, Bin Meng <bmeng.cn@gmail.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Palmer Dabbelt <palmer@sifive.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 27, 2019 at 03:16:01PM +0200, Gerd Hoffmann wrote:
->  Hi,
-> 
-> > Ok, I can understand that. I've been thinking about how we can switch
-> > libvirt to use meson too, and trying to decide between meson being the
-> > owner, calling out to make  vs keeping make as the owner and calling
-> > out to meson. Ultimately to entirely banish make, autoconf, automake,
-> > libtool, m4 & shell from our build system :-)
+On Fri, 2019-06-21 at 14:35 +0200, Andrea Bolognani wrote:
+> On Thu, 2019-06-20 at 21:43 +0300, David Abdurachmanov wrote:
+> > On Thu, Jun 20, 2019 at 9:18 PM Alistair Francis <alistair23@gmail.com> wrote:
+> > > OE-Core already packages OpenSBI by default, Fedora and Debian are
+> > > moving to OpenSBI for RISC-V targets as well.
+> > > 
+> > > Any distro that supports the RISC-V toolchain (which is all
+> > > upstreamed) can build OpenSBI.
 > > 
-> > Despite thinking about an incremental conversion though, I was still
-> > hoping libvirt would just have a single (largish) patch series to
-> > do a complete conversion at a specific point in time.
+> > Fedora uses OpenSBI for the last 2 or 3 months now. I don't plan to update
+> > BBL builds. OpenSBI packages in Fedora/RISCV isn't finalized, but it does
+> > ship *.elf and *.bin files.
 > 
-> Another possible approach would be to have two build systems.
-> The traditional configure & make and the new meson & ninja.
-> 
-> Advantage is we don't have to worry about the transition and mixing &
-> make + meson at all.
-> 
-> Disadvantage is the duplication.  That wouldn't be forever though.
-> I'd expect we'll have one or maybe two releases with both build systems,
-> then delete the make & configure.
+> Sounds good to me, thanks for confirming!
 
-Personally I strongly wish to avoid having two parallel build systems.
-In several projects I've encountered with that I've ended up hitting
-bugs where each build system produced different binary results  due to
-the developers not putting the same changes into both build systems.
+From further off-list discussion with David, I have learned that
+recent Fedora images include an OpenSBI build with embedded U-Boot
+payload, such that you only need to have that single file on the host
+and pass it to QEMU via -kernel[1] for RISC-V guest boot to work. I
+played with it over the past few days, and it works very nicely.
 
-Prefer to only merge a new build system once there is confidence that
-it is working, and then immediately delete the old one so as to avoid
-bitrot & concentrate any bug fixing on the modern stuff.
+I think this is the result that we want to ultimately reach: a single
+RISC-V "firmware" binary installed on the host through an appropriate
+distro package, shared among guests, with everything else that is
+guest-specific being contained in the corresponding disk image.
 
-Regards,
-Daniel
+This is what other architectures are already doing, with SeaBIOS and
+OVMF on x86_64, AAVMF on aarch64 and SLOF on ppc64 all being handled
+this way: RISC-V should, where it makes sense, follow suit.
+
+QEMU also recently introduced a JSON-based specification that can be
+used to advertise guest firmwares and libvirt already supports it,
+which makes firmware configuration either extremely convenient or
+entirely automatic for the user: the OpenSBI support should also be
+advertised this way.
+
+
+[1] I guess that'd be -bios after these patches?
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Andrea Bolognani / Red Hat / Virtualization
+
 
