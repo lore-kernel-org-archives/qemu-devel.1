@@ -6,57 +6,58 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 666A1C48BD6
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 15:28:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BFE9C48BD7
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 15:31:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38BB32064A
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 15:28:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38BB32064A
+	by mail.kernel.org (Postfix) with ESMTPS id 7575020B1F
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 15:31:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7575020B1F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgWJr-0004zS-FX
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 11:28:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60594)
+	id 1hgWMf-00008v-HB
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 11:31:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60748)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <palmer@dabbelt.com>) id 1hgWFM-0001B2-AM
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:23:39 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1hgWGP-0001dX-4K
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:24:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1hgWFJ-0006Zs-0B
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:23:34 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:36340)
+ (envelope-from <palmer@dabbelt.com>) id 1hgWGB-0007Fz-Lb
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:24:30 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:41956)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hgWFH-0006XT-RD
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:23:32 -0400
-Received: by mail-pf1-f196.google.com with SMTP id r7so1412375pfl.3
- for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 08:23:30 -0700 (PDT)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hgWG6-0006ui-Au
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:24:24 -0400
+Received: by mail-pf1-f193.google.com with SMTP id m30so1396910pff.8
+ for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 08:24:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=TZ7LklPK8UvVtDwbEWjV8Myyoa+ER/F09z/DtS5QZ9Q=;
- b=Oz1WG0Q3X8/WBIHR8sFa087hzuXV0s6tEAW6h7vvPzIxIgWC+YEgN7jU0fUeCc6agu
- 3XoKna0EUfKnzTqbOJeXyhND1S7dRGSEBFvqGkgNmoXhQFeWJvrmtmMDcwh4hcGjd0mZ
- PJqExRi8vdEDjlB76Corqg6d3dtxxUM33gtgJRfRUtEKWKgsSrDrHir8LRll2x78skkt
- pIgWwMF+rOztKHTNbru1rIphDxQIRDnSBlWOFlThOgi7My/91UsoH3v8lywnLpVgr5CU
- fDQlDjt+yqtRF0g5ffcZxBywuYFiW4fVtYRpyqaQtTBnfg6x6Ncj7DGRWj5gs0Zoa1mJ
- xROw==
-X-Gm-Message-State: APjAAAV9neuo+PIW3rtpVxuhXSQRc8XQFqatEhy0JphQaWiY/slJOpmn
- Ja0eJ4/2nncOq0eqq5oWM+LjWg==
-X-Google-Smtp-Source: APXvYqz96Z5D+cDoqKbBihFB+I4HnE63ScZ4XIrhinLF5xe1t36Ibe09/oWBTCkDhgvNQ92gzY61Fw==
-X-Received: by 2002:a65:45c1:: with SMTP id m1mr4496552pgr.260.1561649009389; 
- Thu, 27 Jun 2019 08:23:29 -0700 (PDT)
+ bh=dUa00V6qaWWvVsCSIWO0c3PzQTzV7TrVR8O4HvR6bag=;
+ b=RYz4i1QSA3J56ZzubxD+B9rEIng+WMQZ/G1HZptWncD//Zry5bk14saQPhtQaaZO+A
+ PIwh5pj1I5b5t1seF5yWv4042nxUBrk0rrNHvAHCM4iWMdKC+UPrme7GHPIxQ1Ssf6BU
+ gx/FyOu/k5zbD6EB28ATbAXQp97UButtp3Ko45GwMwHyz5xN80QuhIddEgShV3sPcHIX
+ IQyBTKN5jQYpw3IMWGakMo4Z5ono3NgZfxjJAzGTSybuCyEwT1OyzTkzL6bZPuQsZOnk
+ +o6kr0TxRjNlcFWjwpBTjnh3AgYS1F3U4TpmUhbPk6NHYhqWYw0rB9RCvue/DiCMrhSK
+ c1nA==
+X-Gm-Message-State: APjAAAXFpxl7tvppCIf3zJ2Ef18T4Y3rcs2xtuzEyRCSjWlWHeD5M28S
+ 5/LQmabOi1Jfy3xbiwVKv5GWav3lxUDDRQ==
+X-Google-Smtp-Source: APXvYqwQgN5/LmKjlIe2CqkG8AttvBcAU71oo+Phep6R727Cf8Wu7mi+ef3OwvECyNUt/tT9pKyRyg==
+X-Received: by 2002:a17:90a:fa07:: with SMTP id
+ cm7mr6535545pjb.138.1561649039305; 
+ Thu, 27 Jun 2019 08:23:59 -0700 (PDT)
 Received: from localhost (220-132-236-182.HINET-IP.hinet.net.
  [220.132.236.182])
- by smtp.gmail.com with ESMTPSA id h1sm4117306pfg.55.2019.06.27.08.23.28
+ by smtp.gmail.com with ESMTPSA id v13sm3822822pfe.105.2019.06.27.08.23.58
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 27 Jun 2019 08:23:28 -0700 (PDT)
-Date: Thu, 27 Jun 2019 08:19:40 -0700
-Message-Id: <20190627152011.18686-4-palmer@sifive.com>
+ Thu, 27 Jun 2019 08:23:58 -0700 (PDT)
+Date: Thu, 27 Jun 2019 08:19:52 -0700
+Message-Id: <20190627152011.18686-16-palmer@sifive.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190627152011.18686-1-palmer@sifive.com>
 References: <20190627152011.18686-1-palmer@sifive.com>
@@ -66,9 +67,8 @@ From: Palmer Dabbelt <palmer@sifive.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.210.196
-Subject: [Qemu-devel] [PULL 03/34] target/riscv: Fix PMP range boundary
- address bug
+X-Received-From: 209.85.210.193
+Subject: [Qemu-devel] [PULL 15/34] target/riscv: Add the mcountinhibit CSR
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,51 +80,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Dayeol Lee <dayeol@berkeley.edu>,
- Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org,
- Michael Clark <mjc@sifive.com>, Alistair Francis <alistair.francis@wdc.com>
+Cc: Alistair Francis <alistair.francis@wdc.com>,
+ Palmer Dabbelt <palmer@sifive.com>, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Dayeol Lee <dayeol@berkeley.edu>
+From: Alistair Francis <alistair.francis@wdc.com>
 
-A wrong address is passed to `pmp_is_in_range` while checking if a
-memory access is within a PMP range.
-Since the ending address of the pmp range (i.e., pmp_state.addr[i].ea)
-is set to the last address in the range (i.e., pmp base + pmp size - 1),
-memory accesses containg the last address in the range will always fail.
+1.11 defines mcountinhibit, which has the same numeric CSR value as
+mucounteren from 1.09.1 but has different semantics.  This patch enables
+the CSR for 1.11-based targets, which is trivial to implement because
+the counters in QEMU never tick (legal according to the spec).
 
-For example, assume that a PMP range is 4KB from 0x87654000 such that
-the last address within the range is 0x87654fff.
-1-byte access to 0x87654fff should be considered to be fully inside the
-PMP range.
-However the access now fails and complains partial inclusion because
-pmp_is_in_range(env, i, addr + size) returns 0 whereas
-pmp_is_in_range(env, i, addr) returns 1.
-
-Signed-off-by: Dayeol Lee <dayeol@berkeley.edu>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+[Palmer: Fix counter access semantics, change commit message to indicate
+the behavior is fully emulated.]
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- target/riscv/pmp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/riscv/cpu_bits.h |  1 +
+ target/riscv/csr.c      | 17 +++++++++++++++--
+ 2 files changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
-index fed1c3c0301b..e0fe2064074a 100644
---- a/target/riscv/pmp.c
-+++ b/target/riscv/pmp.c
-@@ -245,7 +245,7 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
-          from low to high */
-     for (i = 0; i < MAX_RISCV_PMPS; i++) {
-         s = pmp_is_in_range(env, i, addr);
--        e = pmp_is_in_range(env, i, addr + size);
-+        e = pmp_is_in_range(env, i, addr + size - 1);
+diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+index 47450a3cdb75..11f971ad5df0 100644
+--- a/target/riscv/cpu_bits.h
++++ b/target/riscv/cpu_bits.h
+@@ -136,6 +136,7 @@
+ #define CSR_MCOUNTEREN      0x306
  
-         /* partially inside */
-         if ((s + e) == 1) {
+ /* Legacy Counter Setup (priv v1.9.1) */
++/* Update to #define CSR_MCOUNTINHIBIT 0x320 for 1.11.0 */
+ #define CSR_MUCOUNTEREN     0x320
+ #define CSR_MSCOUNTEREN     0x321
+ #define CSR_MHCOUNTEREN     0x322
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index c67d29e20618..448162e484a3 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -56,6 +56,15 @@ static int fs(CPURISCVState *env, int csrno)
+ static int ctr(CPURISCVState *env, int csrno)
+ {
+ #if !defined(CONFIG_USER_ONLY)
++    /*
++     * The counters are always enabled on newer priv specs, as the CSR has
++     * changed from controlling that the counters can be read to controlling
++     * that the counters increment.
++     */
++    if (env->priv_ver > PRIV_VERSION_1_09_1) {
++        return 0;
++    }
++
+     uint32_t ctr_en = ~0u;
+ 
+     if (env->priv < PRV_M) {
+@@ -461,18 +470,22 @@ static int write_mcounteren(CPURISCVState *env, int csrno, target_ulong val)
+     return 0;
+ }
+ 
++/* This regiser is replaced with CSR_MCOUNTINHIBIT in 1.11.0 */
+ static int read_mscounteren(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+-    if (env->priv_ver > PRIV_VERSION_1_09_1) {
++    if (env->priv_ver > PRIV_VERSION_1_09_1
++        && env->priv_ver < PRIV_VERSION_1_11_0) {
+         return -1;
+     }
+     *val = env->mcounteren;
+     return 0;
+ }
+ 
++/* This regiser is replaced with CSR_MCOUNTINHIBIT in 1.11.0 */
+ static int write_mscounteren(CPURISCVState *env, int csrno, target_ulong val)
+ {
+-    if (env->priv_ver > PRIV_VERSION_1_09_1) {
++    if (env->priv_ver > PRIV_VERSION_1_09_1
++        && env->priv_ver < PRIV_VERSION_1_11_0) {
+         return -1;
+     }
+     env->mcounteren = val;
 -- 
 2.21.0
 
