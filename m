@@ -2,74 +2,55 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62EE2C48BD7
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:01:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 649FCC48BD7
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:05:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39C93208E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:01:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39C93208E3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 393A6208E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 16:05:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 393A6208E3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgWqM-0003qS-4t
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 12:01:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33261)
+	id 1hgWu6-0006GQ-AE
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 12:05:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34722)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <palmer@dabbelt.com>) id 1hgWHh-0003JC-SX
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:26:04 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hgWNo-0001cW-CI
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:32:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1hgWHe-0000IX-3T
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:26:00 -0400
-Received: from mail-pf1-f177.google.com ([209.85.210.177]:33193)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hgWHd-000771-GU
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:25:57 -0400
-Received: by mail-pf1-f177.google.com with SMTP id x15so1416223pfq.0
- for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 08:24:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding:cc:from:to;
- bh=/3ducq0eP8I5aPrZO6qPfK+y5RApmcrkJq95TSYVf1E=;
- b=Ak1uXmAMbiOb9d/hkpvelBrlznx65+t9ZlC9QxGE7ZBX1D00hTvyJnFfXCUasrmlLJ
- HfH9TQSySsHGkV/UCdaoErEi32W4VnnsTcPwbCKVZG80Tj+vSxO9jUodVmZHC2f96pY1
- i/2grrcT2jl12BBg0WvRbto8Qxq8lvDw14KDd1s710Ig4Ig0DzuzdMja+fduwEdys4SG
- gvSXukbzkVGtSxM4OIBPNMaNpQTD7WO56VPhwqgvKhKNX1FRSdi5Z4rhaDe5DNVWO7c/
- fBS8PjxBj7sykRita8RK6VKe7OkvCXiLlHXQYmBW8KqadHasmeS9rTQzydUU9qSaMfIM
- VbwQ==
-X-Gm-Message-State: APjAAAUuNRxYJvUoBFj4e4cyURGnJyVKalFI/Y4ZhvE9Xl9P6G8TzCDV
- 3bsavWrzZi+tunNeii3q7Wl4mVQb+9tE1A==
-X-Google-Smtp-Source: APXvYqyzSWpZmeQqjyNaf9sQtW2gOTiGjQXZ6JD0rDImUIMDHjKTqErZQM9YX2QK3e+aokXG04oBsA==
-X-Received: by 2002:a17:90a:b908:: with SMTP id
- p8mr6742351pjr.94.1561649056598; 
- Thu, 27 Jun 2019 08:24:16 -0700 (PDT)
-Received: from localhost (220-132-236-182.HINET-IP.hinet.net.
- [220.132.236.182])
- by smtp.gmail.com with ESMTPSA id e188sm4126519pfh.99.2019.06.27.08.24.15
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 27 Jun 2019 08:24:15 -0700 (PDT)
-Date: Thu, 27 Jun 2019 08:19:59 -0700
-Message-Id: <20190627152011.18686-23-palmer@sifive.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190627152011.18686-1-palmer@sifive.com>
-References: <20190627152011.18686-1-palmer@sifive.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-From: Palmer Dabbelt <palmer@sifive.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.210.177
-Subject: [Qemu-devel] [PULL 22/34] RISC-V: Add support for the Zicsr
- extension
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hgWNb-0005lK-5c
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:32:10 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:55077 helo=mail.rt-rk.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1hgWNY-0005fX-TF
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:32:06 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 54B5B1A20BA;
+ Thu, 27 Jun 2019 17:31:59 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.13.43])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 201211A23DE;
+ Thu, 27 Jun 2019 17:31:59 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+To: qemu-devel@nongnu.org,
+	laurent@vivier.eu
+Date: Thu, 27 Jun 2019 17:31:45 +0200
+Message-Id: <1561649510-21183-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PATCH v14 0/5] linux-user: A set of miscellaneous
+ patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,74 +62,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>,
- Palmer Dabbelt <palmer@sifive.com>, qemu-riscv@nongnu.org,
- qemu-devel@nongnu.org
+Cc: amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The various CSR instructions have been split out of the base ISA as part
-of the ratification process.  This patch adds a Zicsr argument, which
-disables all the CSR instructions.
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/cpu.c | 1 +
- target/riscv/cpu.h | 1 +
- target/riscv/csr.c | 6 ++++++
- 3 files changed, 8 insertions(+)
+This is a collection of misc patches for Linux user that I recently
+accumulated from variuous sources. All of them originate from problems
+observed on mips target. However, most of these changes actually
+affect and fix linux-user problems on multiple targets.
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index bbad39a337b3..915b9e77df33 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -442,6 +442,7 @@ static Property riscv_cpu_properties[] = {
-     DEFINE_PROP_BOOL("u", RISCVCPU, cfg.ext_u, true),
-     DEFINE_PROP_BOOL("Counters", RISCVCPU, cfg.ext_counters, true),
-     DEFINE_PROP_BOOL("Zifencei", RISCVCPU, cfg.ext_ifencei, true),
-+    DEFINE_PROP_BOOL("Zicsr", RISCVCPU, cfg.ext_icsr, true),
-     DEFINE_PROP_STRING("priv_spec", RISCVCPU, cfg.priv_spec),
-     DEFINE_PROP_BOOL("mmu", RISCVCPU, cfg.mmu, true),
-     DEFINE_PROP_BOOL("pmp", RISCVCPU, cfg.pmp, true),
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index ba551cd3082c..0adb307f3298 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -224,6 +224,7 @@ typedef struct RISCVCPU {
-         bool ext_u;
-         bool ext_counters;
-         bool ext_ifencei;
-+        bool ext_icsr;
+There are three checkpatch warninhs and two checkpatch errors that
+sould be ignored in the given circumstances.
+
+NOTE: Two checkpatch errors and three warnings are false alarms.
+
+v13->v14:
+
+  - several minor corrections in commit messages
+
+v12->v13:
+
+  - removed two patches that got accepted
+  - simplified the patch on statx()
+  - added a patch on TARGET_HAVE_ARCH_STRUCT_FLOCK
+  - added a patch on fixing EXCP_FPE handling on MIPS
+
+v11->v12:
+
+  - used the preffered Laurent's email address for linux-user
+  - added a note on checkpetch warnings and errors in the commit letter
  
-         char *priv_spec;
-         char *user_spec;
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index de67741f3648..e0d45867607a 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -793,6 +793,7 @@ int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
- {
-     int ret;
-     target_ulong old_value;
-+    RISCVCPU *cpu = env_archcpu(env);
- 
-     /* check privileges and return -1 if check fails */
- #if !defined(CONFIG_USER_ONLY)
-@@ -803,6 +804,11 @@ int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
-     }
- #endif
- 
-+    /* ensure the CSR extension is enabled. */
-+    if (!cpu->cfg.ext_icsr) {
-+        return -1;
-+    }
-+
-     /* check predicate */
-     if (!csr_ops[csrno].predicate || csr_ops[csrno].predicate(env, csrno) < 0) {
-         return -1;
+
+v10->v11:
+
+  - patch on <ADD|DROP>_MEMEBERSHIP basically reverted to its first
+    version
+  - corrected patch on statx()
+  - added patch on strace support for statx()
+  - added patch on fixing flock structure for MIPS O64 ABI
+
+v9->v10:
+
+  - improved commit messages for patches 2 and 3
+
+v8->v9:
+
+  - fixed build error on some systems related to SOL_ALG
+
+v7->v8:
+
+  - added a patch on setsockopt() option SOL_ALG
+
+v6->v7:
+
+  - fixed a build error for older kernels related to the patch on
+    setsockopt() options
+  - removed four patches that on the meantime got accepted into the
+    main source tree
+
+v5->v6:
+
+  - fixed a mistake in patch #4
+  - improved commit messages in patches #4 and #6
+
+v4->v5:
+
+  - added the patch on statx() support
+  - improved the patch on IPV6_<ADD|DROP>_MEMBERSHIP to take into
+    account the possibility of different names for a field
+  - minor corrections in commit messages
+
+v3->v4:
+
+  - improved commit messages (fixed some typos, improved relevance)
+
+v2->v3:
+
+  - updated and improved commit messages
+  - added IPV6_DROP_MEMBERSHIP support to the patch on setsockopt()'s
+    option
+
+v1->v2:
+
+  - added the patch on setsockopt()'s option IPV6_ADD_MEMBERSHIP
+  - improved the commit messages
+
+
+Aleksandar Markovic (3):
+  linux-user: Fix flock structure for MIPS O64 ABI
+  linux-user: Introduce TARGET_HAVE_ARCH_STRUCT_FLOCK
+  linux-user: Handle EXCP_FPE properly for MIPS
+
+Aleksandar Rikalo (1):
+  linux-user: Add support for translation of statx() syscall
+
+Jim Wilson (1):
+  linux-user: Add support for strace for statx() syscall
+
+ linux-user/generic/fcntl.h     |   8 +--
+ linux-user/mips/cpu_loop.c     |   6 +++
+ linux-user/mips/target_fcntl.h |  17 +++++-
+ linux-user/strace.c            |  86 ++++++++++++++++++++++++++++++
+ linux-user/strace.list         |   3 ++
+ linux-user/syscall.c           | 115 ++++++++++++++++++++++++++++++++++++++++-
+ linux-user/syscall_defs.h      |  37 +++++++++++++
+ 7 files changed, 266 insertions(+), 6 deletions(-)
+
 -- 
-2.21.0
+2.7.4
 
 
