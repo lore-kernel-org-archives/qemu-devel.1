@@ -2,52 +2,83 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBE78C48BD6
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 13:23:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B08CCC48BD6
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 13:23:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2C5A2080C
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 13:23:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2C5A2080C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+	by mail.kernel.org (Postfix) with ESMTPS id 84C7F2083B
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 13:23:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84C7F2083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgUMw-000282-SR
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 09:23:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33240)
+	id 1hgUNM-00035Q-Ss
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 09:23:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33217)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <w.bumiller@proxmox.com>) id 1hgUKn-00083n-JX
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 09:21:07 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <w.bumiller@proxmox.com>) id 1hgUKl-0000PK-Sc
+ (envelope-from <pbonzini@redhat.com>) id 1hgUKm-00082J-T4
  for qemu-devel@nongnu.org; Thu, 27 Jun 2019 09:21:05 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:31868)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <w.bumiller@proxmox.com>)
- id 1hgUKl-0000DW-GJ
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <pbonzini@redhat.com>) id 1hgUKl-0000PB-O1
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 09:21:04 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:35156)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hgUKl-0000Lf-GK
  for qemu-devel@nongnu.org; Thu, 27 Jun 2019 09:21:03 -0400
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 2839C43019;
- Thu, 27 Jun 2019 15:12:54 +0200 (CEST)
-Date: Thu, 27 Jun 2019 15:12:52 +0200
-From: Wolfgang Bumiller <w.bumiller@proxmox.com>
-To: qemu-devel@nongnu.org
-Message-ID: <20190627131252.GA14795@olga.proxmox.com>
+Received: by mail-wr1-f68.google.com with SMTP id f15so2569170wrp.2
+ for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 06:21:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=CDrR9Nsm0oTfwqp9uwCqko7bBznBmlA7BVlJ4TwTXPc=;
+ b=MQawbwQcrCCe+EGoHQ1/ngg28ABCynp1dKQqVBO8g/TXlbvwXxJg7iH6e9ypcw/7Ou
+ S+AsYjiFQ/fWhgy8U2sbQ0tS9G0ujQMoqvMavKjA9j1x0TQjfLSmVj1vqNxZob3upda0
+ UGw9F/DeEo+n5tm/D5tsTtegWSa3XcCkX45hn/QdPRkz9E+/uCdKyu8NM/FKbfjJip6b
+ GGdvdUecBkc7MDalFYaEOcgJllygzi7+c+tWDISiWlLlO/KlOyRe3UEMofZKdb+B8XKR
+ ejk+4/gnNyEfLgJxqmwSNMUTtpjRCTicxVLm0yb6d4UegIkLtYEFKxeWbQcgnq9/Zg9c
+ ELjA==
+X-Gm-Message-State: APjAAAVLPmja9PqYOrwmndgxD70N/1caxOH1Yyl1ilYSYnN34N24VrxP
+ 93Jco3eGuGUU7F64tDrGRRFeZX4qiVg=
+X-Google-Smtp-Source: APXvYqzdwvoEiwwL/XnwJJOw53JeC/EhsACFF3zqRz6dPVartCZXR1rEKyP4NyuVgf1hxZlDAunc4A==
+X-Received: by 2002:adf:e705:: with SMTP id c5mr3414446wrm.270.1561641659488; 
+ Thu, 27 Jun 2019 06:20:59 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9fc:4658:37f8:2b9c?
+ ([2001:b07:6468:f312:9fc:4658:37f8:2b9c])
+ by smtp.gmail.com with ESMTPSA id v27sm1450171wrv.45.2019.06.27.06.20.58
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Thu, 27 Jun 2019 06:20:58 -0700 (PDT)
+To: Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <1560165301-39026-1-git-send-email-pbonzini@redhat.com>
+ <1560165301-39026-4-git-send-email-pbonzini@redhat.com>
+ <20190627090353.GA24929@redhat.com>
+ <b8ae5bd6-2b52-99e0-993c-fe8f65d40da3@redhat.com>
+ <20190627125505.GH12358@redhat.com>
+ <20190627131601.3zln6ywzewm35qvn@sirius.home.kraxel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e05632d6-751e-393e-ee12-97501a881ed1@redhat.com>
+Date: Thu, 27 Jun 2019 15:20:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190627131601.3zln6ywzewm35qvn@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.186.127.180
-Subject: [Qemu-devel] balloon config change seems to break live migration
- from 3.0.1 to 4.0
+ [fuzzy]
+X-Received-From: 209.85.221.68
+Subject: Re: [Qemu-devel] [PATCH 3/7] configure: integrate Meson in the
+ build system
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,159 +90,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-While testing with 4.0 we've run into issues with live migration from
-3.0.1 to 4.0 when a balloon device was involved.
+On 27/06/19 15:16, Gerd Hoffmann wrote:
+>  Hi,
+> 
+>> Ok, I can understand that. I've been thinking about how we can switch
+>> libvirt to use meson too, and trying to decide between meson being the
+>> owner, calling out to make  vs keeping make as the owner and calling
+>> out to meson. Ultimately to entirely banish make, autoconf, automake,
+>> libtool, m4 & shell from our build system :-)
+>>
+>> Despite thinking about an incremental conversion though, I was still
+>> hoping libvirt would just have a single (largish) patch series to
+>> do a complete conversion at a specific point in time.
+> 
+> Another possible approach would be to have two build systems.
+> The traditional configure & make and the new meson & ninja.
+> 
+> Advantage is we don't have to worry about the transition and mixing &
+> make + meson at all.
+> 
+> Disadvantage is the duplication.  That wouldn't be forever though.
+> I'd expect we'll have one or maybe two releases with both build systems,
+> then delete the make & configure.
 
-We'd see the following error on the destination:
-  qemu-system-x86_64: get_pci_config_device: Bad config data: i=0x10 read: a1 device: 1 cmask: ff wmask: c0 w1cmask:0 
-  qemu-system-x86_64: Failed to load PCIDevice:config 
-  qemu-system-x86_64: Failed to load virtio-balloon:virtio 
-  qemu-system-x86_64: error while loading state for instance 0x0 of device '0000:00:03.0/virtio-balloon' 
-  qemu-system-x86_64: load of migration failed: Invalid argument
+Yeah, I have seen other projects do this.  On the other hand I'm not
+sure how you avoid bitrot in one of the two, and having to convert the
+huge configure script from the beginning seems like a daunting task.
 
-After looking through the commits I noticed that the pci config sent for
-the balloon device comes from
-include/standard-headers/linux/virtio_balloon.h and changed size between
-3.1 and 4.0.
-As a "guess" I tried reverting that change (commented out the two last
-fields (and access to it in hw/virtio/virtio-balloon.c's
-virtio_balloon_get_config()), and then the migration seems to go through
-successfully.
-
-I've since also rebuilt qemu without our patches (tags v3.0.1 and v4.0.0)
-and also tried with master (since dgilbert mentioned on irc remembering
-the issue and that there may have been a fix around), but got the same
-result.
-
-Posting here now as dgilbert requested on irc.
-
-Here are the commands used to start qemu:
-  Source:
-    /usr/bin/kvm \
-      -name randomclone \
-      -chardev 'socket,id=qmp,path=/var/run/qemu-server/101.qmp,server,nowait' \
-      -mon 'chardev=qmp,mode=control' \
-      -chardev 'socket,id=qmp-event,path=/var/run/qmeventd.sock,reconnect=5' \
-      -mon 'chardev=qmp-event,mode=control' \
-      -pidfile /var/run/qemu-server/101.pid \
-      -daemonize \
-      -smbios 'type=1,uuid=f3ab31f6-ca7d-469c-bf51-547fd9bbd2d9' \
-      -smp '4,sockets=1,cores=4,maxcpus=4' \
-      -nodefaults \
-      -boot 'menu=on,strict=on,reboot-timeout=1000,splash=/usr/share/qemu-server/bootsplash.jpg' \
-      -vnc unix:/var/run/qemu-server/101.vnc,password \
-      -cpu host,+pcid,+spec-ctrl,+ssbd,+pdpe1gb,+kvm_pv_unhalt,+kvm_pv_eoi \
-      -m 4096 \
-      -device 'pci-bridge,id=pci.2,chassis_nr=2,bus=pci.0,addr=0x1f' \
-      -device 'pci-bridge,id=pci.1,chassis_nr=1,bus=pci.0,addr=0x1e' \
-      -device 'vmgenid,guid=fb282779-7056-4f1d-96bb-70f578294e45' \
-      -device 'piix3-usb-uhci,id=uhci,bus=pci.0,addr=0x1.0x2' \
-      -device 'usb-tablet,id=tablet,bus=uhci.0,port=1' \
-      -device 'VGA,id=vga,bus=pci.0,addr=0x2' \
-      -device 'virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x3' \
-      -iscsi 'initiator-name=iqn.1993-08.org.debian:01:856d32b504d' \
-      -drive 'if=none,id=drive-ide2,media=cdrom,aio=threads' \
-      -device 'ide-cd,bus=ide.1,unit=0,drive=drive-ide2,id=ide2,bootindex=200' \
-      -device 'virtio-scsi-pci,id=scsihw0,bus=pci.0,addr=0x5' \
-      -drive 'file=rbd:rbd/vm-101-disk-0:conf=/etc/pve/ceph.conf:id=admin:keyring=/etc/pve/priv/ceph/rbd.keyring,if=none,id=drive-scsi0,discard=on,format=raw,cache=none,aio=native,detect-zeroes=unmap' \
-      -device 'scsi-hd,bus=scsihw0.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi0,id=scsi0,rotation_rate=1,bootindex=100' \
-      -netdev 'type=tap,id=net0,ifname=tap101i0,script=/var/lib/qemu-server/pve-bridge,downscript=/var/lib/qemu-server/pve-bridgedown,vhost=on' \
-      -device 'virtio-net-pci,mac=4E:5D:50:75:4D:ED,netdev=net0,bus=pci.0,addr=0x12,id=net0,bootindex=300' \
-      -machine 'type=pc' \
-      -enable-kvm
-
-  Destination:
-    /usr/bin/kvm \
-      -name randomclone \
-      -chardev socket,id=qmp,path=/var/run/qemu-server/101.qmp,server,nowait \
-      -mon chardev=qmp,mode=control \
-      -chardev socket,id=qmp-event,path=/var/run/qmeventd.sock,reconnect=5 \
-      -mon chardev=qmp-event,mode=control \
-      -pidfile /var/run/qemu-server/101.pid \
-      -smbios type=1,uuid=f3ab31f6-ca7d-469c-bf51-547fd9bbd2d9 \
-      -smp 4,sockets=1,cores=4,maxcpus=4 \
-      -nodefaults \
-      -boot menu=on,strict=on,reboot-timeout=1000,splash=/usr/share/qemu-server/bootsplash.jpg \
-      -vnc unix:/var/run/qemu-server/101.vnc,password \
-      -cpu host,+pcid,+spec-ctrl,+ssbd,+pdpe1gb,+kvm_pv_unhalt,+kvm_pv_eoi \
-      -m 4096 \
-      -device pci-bridge,id=pci.1,chassis_nr=1,bus=pci.0,addr=0x1e \
-      -device pci-bridge,id=pci.2,chassis_nr=2,bus=pci.0,addr=0x1f \
-      -device vmgenid,guid=fb282779-7056-4f1d-96bb-70f578294e45 \
-      -device piix3-usb-uhci,id=uhci,bus=pci.0,addr=0x1.0x2 \
-      -device usb-tablet,id=tablet,bus=uhci.0,port=1 \
-      -device VGA,id=vga,bus=pci.0,addr=0x2 \
-      -device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x3 \
-      -iscsi initiator-name=iqn.1993-08.org.debian:01:ee4e4a566b \
-      -drive if=none,id=drive-ide2,media=cdrom,aio=threads \
-      -device ide-cd,bus=ide.1,unit=0,drive=drive-ide2,id=ide2,bootindex=200 \
-      -device virtio-scsi-pci,id=scsihw0,bus=pci.0,addr=0x5 \
-      -drive file=rbd:rbd/vm-101-disk-0:conf=/etc/pve/ceph.conf:id=admin:keyring=/etc/pve/priv/ceph/rbd.keyring,if=none,id=drive-scsi0,discard=on,format=raw,cache=none,aio=native,detect-zeroes=unmap \
-      -device scsi-hd,bus=scsihw0.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi0,id=scsi0,rotation_rate=1,bootindex=100 \
-      -netdev type=tap,id=net0,ifname=tap101i0,script=/var/lib/qemu-server/pve-bridge,downscript=/var/lib/qemu-server/pve-bridgedown,vhost=on \
-      -device virtio-net-pci,mac=4E:5D:50:75:4D:ED,netdev=net0,bus=pci.0,addr=0x12,id=net0,bootindex=300 \
-      -machine type=pc-i440fx-3.0 \
-      -enable-kvm \
-      -incoming tcp:10.9.2.106:9989 \
-      -S
-
-This is the exact test-change I made which seems to work around it, but
-a proper fix would be nicer. Not sure how, though.
-
----8<---
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index d96e4aa96f..8d631d67a8 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -623,16 +623,16 @@ static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
-     config.num_pages = cpu_to_le32(dev->num_pages);
-     config.actual = cpu_to_le32(dev->actual);
- 
--    if (dev->free_page_report_status == FREE_PAGE_REPORT_S_REQUESTED) {
--        config.free_page_report_cmd_id =
--                       cpu_to_le32(dev->free_page_report_cmd_id);
--    } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_STOP) {
--        config.free_page_report_cmd_id =
--                       cpu_to_le32(VIRTIO_BALLOON_CMD_ID_STOP);
--    } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_DONE) {
--        config.free_page_report_cmd_id =
--                       cpu_to_le32(VIRTIO_BALLOON_CMD_ID_DONE);
--    }
-+    //if (dev->free_page_report_status == FREE_PAGE_REPORT_S_REQUESTED) {
-+    //    config.free_page_report_cmd_id =
-+    //                   cpu_to_le32(dev->free_page_report_cmd_id);
-+    //} else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_STOP) {
-+    //    config.free_page_report_cmd_id =
-+    //                   cpu_to_le32(VIRTIO_BALLOON_CMD_ID_STOP);
-+    //} else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_DONE) {
-+    //    config.free_page_report_cmd_id =
-+    //                   cpu_to_le32(VIRTIO_BALLOON_CMD_ID_DONE);
-+    //}
- 
-     trace_virtio_balloon_get_config(config.num_pages, config.actual);
-     memcpy(config_data, &config, sizeof(struct virtio_balloon_config));
-diff --git a/include/standard-headers/linux/virtio_balloon.h b/include/standard-headers/linux/virtio_balloon.h
-index 9375ca2a70..86aca75972 100644
---- a/include/standard-headers/linux/virtio_balloon.h
-+++ b/include/standard-headers/linux/virtio_balloon.h
-@@ -48,9 +48,9 @@ struct virtio_balloon_config {
- 	/* Number of pages we've actually got in balloon. */
- 	uint32_t actual;
- 	/* Free page report command id, readonly by guest */
--	uint32_t free_page_report_cmd_id;
--	/* Stores PAGE_POISON if page poisoning is in use */
--	uint32_t poison_val;
-+	//uint32_t free_page_report_cmd_id;
-+	///* Stores PAGE_POISON if page poisoning is in use */
-+	//uint32_t poison_val;
- };
- 
- #define VIRTIO_BALLOON_S_SWAP_IN  0   /* Amount of memory swapped in */
+Paolo
 
 
