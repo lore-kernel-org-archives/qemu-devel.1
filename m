@@ -2,93 +2,67 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9694C48BD7
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 18:25:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FF33C48BE4
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 18:33:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DD08205F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 18:25:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PT5RJwEx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DD08205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7FE0C205F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 18:33:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FE0C205F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53536 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgZ5a-0001Qk-IN
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 14:25:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46239)
+	id 1hgZCd-0004wG-Mp
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 14:32:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47536)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hgZ3R-00009z-8d
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 14:23:31 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hgZAu-0004T0-SN
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 14:31:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hgZ3O-0000oJ-HX
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 14:23:29 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:34972)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hgZ3O-0000mu-6t
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 14:23:26 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id f15so3651907wrp.2
- for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 11:23:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=XHp8+tIwjJe2/rw2N5bKvIwg8l7AbHaMGD1fdKFN1To=;
- b=PT5RJwExb2hmI8hTSpr3GMwgePtG4LfagySi2VEmyfn+h9UW1WRzZ2Bb5Xz8s4G8Nu
- lHGU2lZzv+TEWLLvxwBWmMvgAoJz5R9aH61p4HhErADwsjRDak1pvmcK09sGk65/3/bD
- 8gBxzi4lmDmFNQQrAzeA8uCqIQ4Ap9g7a6MMiiD4ukJS1riTVnUVFDrxF5MINbX3cSZK
- kQbce57yiqyMh8mF5uc5sGCMRl8Gzzq80+G5/iB+wtM2xzfMqigv9KG+29XgRYEqyqBZ
- TA42/PJeHZDXa5v8LDo1FBdmqmy3k9R4eF09YMTCtonX2s1QcaXJQEJ7rm9Y/teQadgz
- LRNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=XHp8+tIwjJe2/rw2N5bKvIwg8l7AbHaMGD1fdKFN1To=;
- b=JhNXFKxIgnbAgSjItAmLP8dwsxe+6t5olTVaYS5LJiX6cRpHdz52WTKCvgGN5eBWDt
- Q8StoZo7MpQO39AA7Bm+bXz0cxZXjOIXsGkgZq5yIS+8t6mebh/5P+g7Er6IomgSzieR
- +GGCncQ7l63eXtDMT/2kgVr2oIqHhsPJMr3uodcWk+dtWmYM5se/AqQg8oxyaB0UQUqp
- Htk+lJw0WfsL57NPVmTrOox5C0QLVYapBV46k4wDvBT3l6S6EG7kyUg3KQtOY9OVnXUI
- 2Yvz8SZqhBuAwrNDWxcqcIpzie/MyYiMsCJbvQpNK5c/k9SGCABG9KXkhy4FFNmlB8j6
- AJLw==
-X-Gm-Message-State: APjAAAWmP2tBtdeZ5Lbp50Zlrw+Rr9fJwJd0n9BVELrZF/QGuaUxWjlr
- 6ZhHO5X/+I13PXzTx0fiGc/z9r+AAflj4A==
-X-Google-Smtp-Source: APXvYqxrze6QECLRx0XiGOz9FifEdePGDqx7OdhULsAGe4wngSxq6jRF8Cxet7cVeN3Qfpka/pHB9A==
-X-Received: by 2002:adf:ce82:: with SMTP id r2mr4166449wrn.223.1561659803147; 
- Thu, 27 Jun 2019 11:23:23 -0700 (PDT)
-Received: from [192.168.2.137] (93-34-153-63.ip50.fastwebnet.it.
- [93.34.153.63])
- by smtp.gmail.com with ESMTPSA id a2sm12152895wmj.9.2019.06.27.11.23.22
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 27 Jun 2019 11:23:22 -0700 (PDT)
-To: Jonathan Behrens <fintelia@gmail.com>, Palmer Dabbelt <palmer@sifive.com>
-References: <20190627152011.18686-1-palmer@sifive.com>
- <20190627152011.18686-11-palmer@sifive.com>
- <CANnJOVF3F_k1LpSYp8OdxSx6LtQR5p-XR5fMKCsXg_0pxySg+Q@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <c64fa0e8-fd9c-8e86-418c-0553f56a0f34@linaro.org>
-Date: Thu, 27 Jun 2019 20:23:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <no-reply@patchew.org>) id 1hgZAs-0007RM-SU
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 14:31:12 -0400
+Resent-Date: Thu, 27 Jun 2019 14:31:12 -0400
+Resent-Message-Id: <E1hgZAs-0007RM-SU@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21573)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hgZAr-00074N-AM
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 14:31:10 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1561660234; cv=none; d=zoho.com; s=zohoarc; 
+ b=egH4UnW3RYs+YhFYj9PrFvvIa/8T/P3kLi9Nkz5JPuga0dnQHNkW4UleO3CfJpjpeHrA4IN1Y/EmXuCbYiWzVoQc+IIeHcSE5MyGfpVBYpaiLOhvXDbsEyk8ygBIHmeZdnxjm1WCgH/bcAiOSJbAffKV9Ggpa+HgAWUKEL/TvpA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1561660234;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=BGATH2xt74+Hss+VYxqpZlLS1AvnXd9Tkc9d1oa0EZg=; 
+ b=hT75wRxKSZig3alkdsnmbWVQmWrV9qa0pDXRTtyCTlh77/zUOk3EtQ2CEG81F4oEPrid12aJ8aKETSgksReZVYG7fH4OqKDkDwFC3Nceqv6AF7q39nIg1S4aTPu5Pj5A3HDkiBW3SCYIt93+p3PNNt1azW/n41LsCbF0a/2EPgY=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1561660227592607.8397703082163;
+ Thu, 27 Jun 2019 11:30:27 -0700 (PDT)
+Message-ID: <156166022640.6332.17115757325327321505@c4a48874b076>
+In-Reply-To: <1561648298-18100-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
-In-Reply-To: <CANnJOVF3F_k1LpSYp8OdxSx6LtQR5p-XR5fMKCsXg_0pxySg+Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42a
-Subject: Re: [Qemu-devel] [Qemu-riscv] [PULL 10/34] RISC-V: Fix a PMP check
- with the correct access size
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: aleksandar.markovic@rt-rk.com
+Date: Thu, 27 Jun 2019 11:30:27 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH v13 0/5] linux-user: A set of miscellaneous
+ patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,73 +74,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Peter Maydell <peter.maydell@linaro.org>,
- Alistair Francis <alistair.francis@wdc.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, amarkovic@wavecomp.com, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/27/19 7:44 PM, Jonathan Behrens wrote:
-> I think this patch is slightly incorrect. If the PMP region is valid for
-> the size of the access, but not the rest of the page then a few lines down
-> in this function the entire page should not be placed into the TLB. Instead
-> only the portion of the page that passed the access check should be
-> included. To give an example of where this goes wrong, in the code below
-> access to address 0x90000008 should always fail due to PMP rules, but if
-> the TLB has already been primed by loading the (allowed) address 0x90000000
-> then no fault will be triggered. Notably, this code also executes
-> improperly without the patch because the first `ld` instruction traps when
-> it shouldn't.
-> 
->   li t0, 0x0000000024000000 // region[0]: 0x90000000..0x90000007
->   csrw pmpaddr0, t0
-> 
->   li t0, 0x00000000240001FF // region[1]: 0x90000000..0x90000fff
->   csrw pmpaddr1, t0
-> 
->   li t0, 0x1F0000000000989F // cfg[0] = LXRW, cfg[1] = L
->   csrw pmpcfg0, t0
-> 
->   sfence.vma
-> 
->   li t0, 0x90000000
->   ld s0, 0(t0)
->   ld s1, 8(t0) // NO TRAP: address is incorrectly in TLB!
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTYxNjQ4Mjk4LTE4MTAwLTEt
+Z2l0LXNlbmQtZW1haWwtYWxla3NhbmRhci5tYXJrb3ZpY0BydC1yay5jb20vCgoKCkhpLAoKVGhp
+cyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91
+dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtRZW11LWRldmVsXSBb
+UEFUQ0ggdjEzIDAvNV0gbGludXgtdXNlcjogQSBzZXQgb2YgbWlzY2VsbGFuZW91cyBwYXRjaGVz
+Ck1lc3NhZ2UtaWQ6IDE1NjE2NDgyOTgtMTgxMDAtMS1naXQtc2VuZC1lbWFpbC1hbGVrc2FuZGFy
+Lm1hcmtvdmljQHJ0LXJrLmNvbQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
+PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9n
+cmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFND
+UklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4
+NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZjA5MmUxZCBsaW51eC11c2Vy
+OiBIYW5kbGUgRVhDUF9GUEUgcHJvcGVybHkgZm9yIE1JUFMKMjdlOWJkZCBsaW51eC11c2VyOiBJ
+bnRyb2R1Y2UgVEFSR0VUX0hBVkVfQVJDSF9TVFJVQ1RfRkxPQ0sKNDc1ZDYxYyBsaW51eC11c2Vy
+OiBGaXggZmxvY2sgc3RydWN0dXJlIGZvciBNSVBTIE82NCBBQkkKYWU3ZGJiNCBsaW51eC11c2Vy
+OiBBZGQgc3VwcG9ydCBmb3Igc3RyYWNlIGZvciBzdGF0eCgpIHN5c2NhbGwKMzk1NjMzOSBsaW51
+eC11c2VyOiBBZGQgc3VwcG9ydCBmb3IgdHJhbnNsYXRpb24gb2Ygc3RhdHgoKSBzeXNjYWxsCgo9
+PT0gT1VUUFVUIEJFR0lOID09PQoxLzUgQ2hlY2tpbmcgY29tbWl0IDM5NTYzMzkwZDJkOSAobGlu
+dXgtdXNlcjogQWRkIHN1cHBvcnQgZm9yIHRyYW5zbGF0aW9uIG9mIHN0YXR4KCkgc3lzY2FsbCkK
+V0FSTklORzogYXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQK
+IzYwOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzozMjI6CisjaWYgZGVmaW5lZChUQVJHRVRf
+TlJfc3RhdHgpICYmIGRlZmluZWQoX19OUl9zdGF0eCkKCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBz
+cGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiM3MjogRklMRTogbGludXgtdXNlci9z
+eXNjYWxsLmM6NjQ3OToKKyNpZiBkZWZpbmVkKFRBUkdFVF9OUl9zdGF0eCkgJiYgZGVmaW5lZChf
+X05SX3N0YXR4KQoKV0FSTklORzogYXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxk
+IGJlIGF2b2lkZWQKIzE0MjogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6MTAxODk6CisjaWYg
+ZGVmaW5lZChfX05SX3N0YXR4KQoKdG90YWw6IDAgZXJyb3JzLCAzIHdhcm5pbmdzLCAxODYgbGlu
+ZXMgY2hlY2tlZAoKUGF0Y2ggMS81IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
+IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
+byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjIvNSBDaGVj
+a2luZyBjb21taXQgYWU3ZGJiNGMyMWJmIChsaW51eC11c2VyOiBBZGQgc3VwcG9ydCBmb3Igc3Ry
+YWNlIGZvciBzdGF0eCgpIHN5c2NhbGwpCkVSUk9SOiBzdG9yYWdlIGNsYXNzIHNob3VsZCBiZSBh
+dCB0aGUgYmVnaW5uaW5nIG9mIHRoZSBkZWNsYXJhdGlvbgojMjc6IEZJTEU6IGxpbnV4LXVzZXIv
+c3RyYWNlLmM6OTc5OgorVU5VU0VEIHN0YXRpYyBzdHJ1Y3QgZmxhZ3Mgc3RhdHhfZmxhZ3NbXSA9
+IHsKCkVSUk9SOiBzdG9yYWdlIGNsYXNzIHNob3VsZCBiZSBhdCB0aGUgYmVnaW5uaW5nIG9mIHRo
+ZSBkZWNsYXJhdGlvbgojNDk6IEZJTEU6IGxpbnV4LXVzZXIvc3RyYWNlLmM6MTAwMToKK1VOVVNF
+RCBzdGF0aWMgc3RydWN0IGZsYWdzIHN0YXR4X21hc2tbXSA9IHsKCnRvdGFsOiAyIGVycm9ycywg
+MCB3YXJuaW5ncywgMTA0IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvNSBoYXMgc3R5bGUgcHJvYmxl
+bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
+dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgoKMy81IENoZWNraW5nIGNvbW1pdCA0NzVkNjFjYmRiODkgKGxpbnV4LXVzZXI6
+IEZpeCBmbG9jayBzdHJ1Y3R1cmUgZm9yIE1JUFMgTzY0IEFCSSkKNC81IENoZWNraW5nIGNvbW1p
+dCAyN2U5YmRkMWU5NDkgKGxpbnV4LXVzZXI6IEludHJvZHVjZSBUQVJHRVRfSEFWRV9BUkNIX1NU
+UlVDVF9GTE9DSykKNS81IENoZWNraW5nIGNvbW1pdCBmMDkyZTFkOTAzMjIgKGxpbnV4LXVzZXI6
+IEhhbmRsZSBFWENQX0ZQRSBwcm9wZXJseSBmb3IgTUlQUykKPT09IE9VVFBVVCBFTkQgPT09CgpU
+ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFi
+bGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU2MTY0ODI5OC0xODEwMC0xLWdpdC1zZW5k
+LWVtYWlsLWFsZWtzYW5kYXIubWFya292aWNAcnQtcmsuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/
+dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
+dyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
+dGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
-Nice test case.
-
-> I think that the proper fix would be to first do a PMP check for the full
-> PAGE_SIZE and execute normally if it passes. Then in the event the full
-> page fails, there could be a more granular PMP check with only the accessed
-> region inserted as an entry in the TLB.
-
-This feature looks to be almost identical to the ARM m-profile MPU.
-
-The fix is:
-
-If the PMP check is valid for the entire page, then continue to call
-tlb_set_page with size=TARGET_PAGE_SIZE.
-
-If the PMP check is valid for the current access, but not for the entire page,
-then call tlb_set_page with any size < TARGET_PAGE_SIZE.  This change alone is
-sufficient, even though the full argument tuple (paddr, vaddr, size) no longer
-quite make perfect sense.  (For the arm mpu, we compute some 1 << rsize, but
-the actual value is never used; setting size=1 would be sufficient.)
-
-Any size < TARGET_PAGE_SIZE will cause TLB_RECHECK to be set for the page,
-which will force all accesses to the page to go back through riscv_cpu_tlb_fill
-for re-validation.
-
-
-> Unrelated question: should I be sending "Reviewed By" lines if I read
-> through patches that seem reasonable? Or there some formal process I'd have
-> to go through first to be approved?
-
-No formal process.  More eyes are always welcome.
-
-
-r~
 
