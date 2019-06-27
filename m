@@ -2,63 +2,74 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF0FCC48BD6
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 10:05:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E7E3C48BD6
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 10:16:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2DE02083B
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 10:05:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2DE02083B
+	by mail.kernel.org (Postfix) with ESMTPS id 65E742085A
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 10:16:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65E742085A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgRHA-0003bE-8j
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 06:05:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43778)
+	id 1hgRS9-0007o8-Mm
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 06:16:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46494)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hgREs-00036w-Pu
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 06:02:48 -0400
+ (envelope-from <cdupontd@redhat.com>) id 1hgRQw-0007F6-9J
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 06:15:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hgREr-0002oj-Dn
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 06:02:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46708)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hgREr-0002gQ-4O
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 06:02:45 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C360213AAE;
- Thu, 27 Jun 2019 10:02:14 +0000 (UTC)
-Received: from work-vm (ovpn-117-111.ams2.redhat.com [10.36.117.111])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 77D175C237;
- Thu, 27 Jun 2019 10:01:59 +0000 (UTC)
-Date: Thu, 27 Jun 2019 11:01:57 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <20190627100157.GC2751@work-vm>
-References: <1561041461-22326-1-git-send-email-kwankhede@nvidia.com>
- <1561041461-22326-8-git-send-email-kwankhede@nvidia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1561041461-22326-8-git-send-email-kwankhede@nvidia.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Thu, 27 Jun 2019 10:02:34 +0000 (UTC)
+ (envelope-from <cdupontd@redhat.com>) id 1hgRQr-0006Op-7y
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 06:15:14 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:54728)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <cdupontd@redhat.com>) id 1hgRQr-0006O5-1U
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 06:15:09 -0400
+Received: by mail-wm1-f68.google.com with SMTP id g135so5141077wme.4
+ for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 03:15:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+ :content-transfer-encoding:message-id:references:to;
+ bh=J/9DlseNGPZvGO/oMpYQCy9sX4DFzapfgPoBJ1IagJ4=;
+ b=N9IRrzO8kU/wjrSbryiFx2Zu623QGnEXWBbcEgF1dhfhi0yLxRxbTVv7CF8swsMfb5
+ QFQr1/QGc4ftwZTj3GkaEL5uEmz1JpIWtxW+5qr6sEBPAQHAfRON7n915SlD7kD+WiWI
+ Qnt/UwsvJsSbqzsdF2SB3D9kut7rlaFrEE44JatYFt0q6Q4tc7/Gpm1lZWOKVKAm6nEV
+ 2IE0xjF5lf8up8hQrhLwxALjgU5w66eqX4Kb7yb+Yb59YU4aJVRqGxpNzRvIorpcWFJ7
+ uarCbDGKBWUEneWQz8lXKQ5Kdjnpb/oCkOif3pexNnOQeIulsysWC5WJDZO3lPMfvzHd
+ KZAA==
+X-Gm-Message-State: APjAAAVh1i6sKi0EjpJhnx6SftCrSziSfw+ynPiZ2/5lsx+PKm8c5PV4
+ xATO89CfoT7vrs41aF+rW/ttVg==
+X-Google-Smtp-Source: APXvYqynR/PZ1lSqdQcqMmjJ8Q/mhYwokx9/58uAo7owQsXoPC8waRB2VWhcYBVGMiCUxMYMIGbLaw==
+X-Received: by 2002:a1c:df46:: with SMTP id w67mr2566346wmg.69.1561630507778; 
+ Thu, 27 Jun 2019 03:15:07 -0700 (PDT)
+Received: from ?IPv6:2a01:e35:8b6a:1220:b9aa:75f2:4e31:7532?
+ ([2a01:e35:8b6a:1220:b9aa:75f2:4e31:7532])
+ by smtp.gmail.com with ESMTPSA id q10sm1795260wrf.32.2019.06.27.03.15.05
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 27 Jun 2019 03:15:06 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+From: Christophe de Dinechin <cdupontd@redhat.com>
+In-Reply-To: <20190627053523.25541-1-kraxel@redhat.com>
+Date: Thu, 27 Jun 2019 12:14:10 +0200
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <7621E57A-E22F-43F4-A96A-5C3982059107@redhat.com>
+References: <20190627053523.25541-1-kraxel@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 07/13] vfio: Register SaveVMHandlers for
- VFIO device
+ [fuzzy]
+X-Received-From: 209.85.128.68
+Subject: Re: [Qemu-devel] [PATCH] console: fix cell overflow
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,145 +81,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, eskultet@redhat.com, ziye.yang@intel.com,
- yulei.zhang@intel.com, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
- qemu-devel@nongnu.org, zhi.a.wang@intel.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, aik@ozlabs.ru, alex.williamson@redhat.com,
- eauger@redhat.com, felipe@nutanix.com, jonathan.davies@nutanix.com,
- yan.y.zhao@intel.com, changpeng.liu@intel.com, Ken.Xue@amd.com
+Cc: alxndr@bu.edu, qemu-devel@nongnu.org, P J P <ppandit@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Kirti Wankhede (kwankhede@nvidia.com) wrote:
-> Define flags to be used as delimeter in migration file stream.
-> Added .save_setup and .save_cleanup functions. Mapped & unmapped migration
-> region from these functions at source during saving or pre-copy phase.
-> Set VFIO device state depending on VM's state. During live migration, VM is
-> running when .save_setup is called, _SAVING | _RUNNING state is set for VFIO
-> device. During save-restore, VM is paused, _SAVING state is set for VFIO device.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
+
+
+> On 27 Jun 2019, at 07:35, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>=20
+> Linux terminal behavior (coming from vt100 I think) is somewhat =
+strange
+> when it comes to line wraps:  When a character is printed to the last
+> char cell of a line the cursor does NOT jump to the next line but =
+stays
+> where it is.  The line feed happens when the next character is =
+printed.
+>=20
+> So the valid range for the cursor position is not 0 .. width-1 but
+> 0 .. width, where x =3D=3D width represents the state where the line =
+is
+> full but the cursor didn't jump to the next line yet.
+>=20
+> The code for the 'clear from start of line' control sequence (ESC[1K)
+> fails to handle this corner case correctly and may call
+> console_clear_xy() with x =3D=3D width.  That will incorrectly clear =
+the
+> first char cell of the next line, or in case the cursor happens to be =
+on
+> the last line overflow the cell buffer by one character (three bytes).
+>=20
+> Add a check to the loop to fix that.
+>=20
+> Didn't spot any other places with the same problem.  But it's easy to
+> miss that corner case, so also allocate one extra cell as precaution, =
+so
+> in case we have simliar issues lurking elsewhere it at least wouldn't =
+be
+> a buffer overflow.
+>=20
+> Reported-by: Alexander Oleinik <alxndr@bu.edu>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 > ---
->  hw/vfio/migration.c | 76 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 75 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> index 7f9858e6c995..fe0887c27664 100644
-> --- a/hw/vfio/migration.c
-> +++ b/hw/vfio/migration.c
-> @@ -22,6 +22,17 @@
->  #include "exec/ram_addr.h"
->  #include "pci.h"
->  
-> +/*
-> + * Flags used as delimiter:
-> + * 0xffffffff => MSB 32-bit all 1s
-> + * 0xef10     => emulated (virtual) function IO
-> + * 0x0000     => 16-bits reserved for flags
-> + */
-> +#define VFIO_MIG_FLAG_END_OF_STATE      (0xffffffffef100001ULL)
-> +#define VFIO_MIG_FLAG_DEV_CONFIG_STATE  (0xffffffffef100002ULL)
-> +#define VFIO_MIG_FLAG_DEV_SETUP_STATE   (0xffffffffef100003ULL)
-> +#define VFIO_MIG_FLAG_DEV_DATA_STATE    (0xffffffffef100004ULL)
-> +
->  static void vfio_migration_region_exit(VFIODevice *vbasedev)
->  {
->      VFIOMigration *migration = vbasedev->migration;
-> @@ -96,6 +107,69 @@ static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t state)
->      return 0;
->  }
->  
-> +/* ---------------------------------------------------------------------- */
-> +
-> +static int vfio_save_setup(QEMUFile *f, void *opaque)
-> +{
-> +    VFIODevice *vbasedev = opaque;
-> +    VFIOMigration *migration = vbasedev->migration;
-> +    int ret;
-> +
-> +    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_SETUP_STATE);
-> +
-> +    if (migration->region.buffer.mmaps) {
-> +        qemu_mutex_lock_iothread();
-> +        ret = vfio_region_mmap(&migration->region.buffer);
-> +        qemu_mutex_unlock_iothread();
-> +        if (ret) {
-> +            error_report("Failed to mmap VFIO migration region %d: %s",
-> +                         migration->region.index, strerror(-ret));
-> +            return ret;
-> +        }
-> +    }
-> +
-> +    if (vbasedev->vm_running) {
-> +        ret = vfio_migration_set_state(vbasedev,
-> +                         VFIO_DEVICE_STATE_RUNNING | VFIO_DEVICE_STATE_SAVING);
-> +        if (ret) {
-> +            error_report("Failed to set state RUNNING and SAVING");
-> +            return ret;
-> +        }
-> +    } else {
-> +        ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_SAVING);
-> +        if (ret) {
-> +            error_report("Failed to set state STOP and SAVING");
-> +            return ret;
-> +        }
-> +    }
-> +
-> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
-> +
-> +    ret = qemu_file_get_error(f);
-> +    if (ret) {
-> +        return ret;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static void vfio_save_cleanup(void *opaque)
-> +{
-> +    VFIODevice *vbasedev = opaque;
-> +    VFIOMigration *migration = vbasedev->migration;
-> +
-> +    if (migration->region.buffer.mmaps) {
-> +        vfio_region_unmap(&migration->region.buffer);
-> +    }
-> +}
-> +
-> +static SaveVMHandlers savevm_vfio_handlers = {
-> +    .save_setup = vfio_save_setup,
-> +    .save_cleanup = vfio_save_cleanup,
-> +};
-> +
-> +/* ---------------------------------------------------------------------- */
-> +
->  static void vfio_vmstate_change(void *opaque, int running, RunState state)
->  {
->      VFIODevice *vbasedev = opaque;
-> @@ -169,7 +243,7 @@ static int vfio_migration_init(VFIODevice *vbasedev,
->      }
->  
->      qemu_mutex_init(&vbasedev->migration->lock);
-> -
-> +    register_savevm_live(NULL, "vfio", -1, 1, &savevm_vfio_handlers, vbasedev);
+> ui/console.c | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/ui/console.c b/ui/console.c
+> index eb7e7e0c517a..13d933510cdb 100644
+> --- a/ui/console.c
+> +++ b/ui/console.c
+> @@ -484,7 +484,7 @@ static void text_console_resize(QemuConsole *s)
+>     if (s->width < w1)
+>         w1 =3D s->width;
+>=20
+> -    cells =3D g_new(TextCell, s->width * s->total_height);
+> +    cells =3D g_new(TextCell, s->width * s->total_height + 1);
 
-Does this work OK with multiple devices?
-I think I'd expected you to pass a DeviceState as the first parameter
-for a real device like vfio.
-'ram' and 'block' don't need to because they iterate over all RAM
-devices inside their save_setup's and similar handlers;  for vfio I'd
-expect it to be per-device.
+I don=E2=80=99t like allocating just in case. At least put a comment =
+explaining why ;-)
+This extra byte only catches a single case (arguably an existing one).
 
-Dave
+What about adding a couple of extra tests where cell[=E2=80=A6 + x] is =
+used?
+(there is a third location I did not protect, because it already had
+exactly that test)
 
->      vbasedev->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
->                                                            vbasedev);
->  
-> -- 
-> 2.7.0
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/ui/console.c b/ui/console.c
+index eb7e7e0c51..00d27f6384 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -541,6 +541,9 @@ static void update_xy(QemuConsole *s, int x, int y)
+         y2 +=3D s->total_height;
+     }
+     if (y2 < s->height) {
++        if (x >=3D s->width) {
++            x =3D s->width - 1;
++        }
+         c =3D &s->cells[y1 * s->width + x];
+         vga_putcharxy(s, x, y2, c->ch,
+                       &(c->t_attrib));
+@@ -787,6 +790,9 @@ static void console_handle_escape(QemuConsole *s)
+ static void console_clear_xy(QemuConsole *s, int x, int y)
+ {
+     int y1 =3D (s->y_base + y) % s->total_height;
++    if (x >=3D s->width) {
++        x =3D s->width - 1;
++    }
+     TextCell *c =3D &s->cells[y1 * s->width + x];
+     c->ch =3D ' ';
+     c->t_attrib =3D s->t_attrib_default;
+
+
+Reviewed-by: Christophe de Dinechin <dinechin@redhat.com>
+
+>     for(y =3D 0; y < s->total_height; y++) {
+>         c =3D &cells[y * s->width];
+>         if (w1 > 0) {
+> @@ -992,7 +992,7 @@ static void console_putchar(QemuConsole *s, int =
+ch)
+>                     break;
+>                 case 1:
+>                     /* clear from beginning of line */
+> -                    for (x =3D 0; x <=3D s->x; x++) {
+> +                    for (x =3D 0; x <=3D s->x && x < s->width; x++) {
+>                         console_clear_xy(s, x, s->y);
+>                     }
+>                     break;
+> --=20
+> 2.18.1
+>=20
+>=20
+
 
