@@ -2,62 +2,62 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB098C004E6
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:36:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E92AEC004E6
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:38:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C29F820665
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:36:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C29F820665
+	by mail.kernel.org (Postfix) with ESMTPS id C131A20B7C
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:38:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C131A20B7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgb8K-0000UA-1r
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 16:36:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46148)
+	id 1hgb9l-0001th-SB
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 16:38:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45439)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hgb1i-0002n5-Cd
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:29:51 -0400
+ (envelope-from <philmd@redhat.com>) id 1hgb0O-0001RS-4N
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:28:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hgb1h-0001Ad-6l
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:29:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60838)
+ (envelope-from <philmd@redhat.com>) id 1hgb0L-0007os-M0
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:28:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34806)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hgb1c-00012L-96; Thu, 27 Jun 2019 16:29:44 -0400
+ id 1hgb0C-0007eJ-9T; Thu, 27 Jun 2019 16:28:16 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5FE2488305;
- Thu, 27 Jun 2019 20:29:43 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id DC7FF81F0E;
+ Thu, 27 Jun 2019 20:28:14 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-69.brq.redhat.com [10.40.204.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9685E600CC;
- Thu, 27 Jun 2019 20:29:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 424E8600CC;
+ Thu, 27 Jun 2019 20:28:04 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: Stephen Checkoway <stephen.checkoway@oberlin.edu>,
 	qemu-devel@nongnu.org
-Date: Thu, 27 Jun 2019 22:27:07 +0200
-Message-Id: <20190627202719.17739-17-philmd@redhat.com>
+Date: Thu, 27 Jun 2019 22:26:55 +0200
+Message-Id: <20190627202719.17739-5-philmd@redhat.com>
 In-Reply-To: <20190627202719.17739-1-philmd@redhat.com>
 References: <20190627202719.17739-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Thu, 27 Jun 2019 20:29:43 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Thu, 27 Jun 2019 20:28:15 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v5 16/28] hw/block/pflash_cfi02: Hold the PRI
- table offset in a variable
+Subject: [Qemu-devel] [PATCH v5 04/28] hw/block/pflash_cfi02: Fix debug
+ format string
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,89 +86,75 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Manufacturers are allowed to move the PRI table, this is why the
-offset is queryable via fixed offsets 0x15/0x16.
-Add a variable to hold the offset, so it will be easier to later
-move the PRI table.
+Always compile the debug code to prevent format string to bitrot.
+Delete dead code.
 
+Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+Message-Id: <20190426162624.55977-3-stephen.checkoway@oberlin.edu>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+[PMD: Extracted from bigger patch, use PRIx32]
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/block/pflash_cfi02.c | 31 +++++++++++++++++--------------
- 1 file changed, 17 insertions(+), 14 deletions(-)
+ hw/block/pflash_cfi02.c | 18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
 
 diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index f1bac480f5..23d05a6308 100644
+index 6cdfc85264..43796e551a 100644
 --- a/hw/block/pflash_cfi02.c
 +++ b/hw/block/pflash_cfi02.c
-@@ -552,6 +552,7 @@ static void pflash_cfi02_realize(DeviceState *dev, Er=
-ror **errp)
-     pfl->status =3D 0;
+@@ -47,15 +47,13 @@
+ #include "hw/sysbus.h"
+ #include "trace.h"
 =20
-     /* Hardcoded CFI table (mostly from SG29 Spansion flash) */
-+    const uint16_t pri_ofs =3D 0x31;
-     /* Standard "QRY" string */
-     pfl->cfi_table[0x10] =3D 'Q';
-     pfl->cfi_table[0x11] =3D 'R';
-@@ -560,8 +561,8 @@ static void pflash_cfi02_realize(DeviceState *dev, Er=
-ror **errp)
-     pfl->cfi_table[0x13] =3D 0x02;
-     pfl->cfi_table[0x14] =3D 0x00;
-     /* Primary extended table address */
--    pfl->cfi_table[0x15] =3D 0x31;
--    pfl->cfi_table[0x16] =3D 0x00;
-+    pfl->cfi_table[0x15] =3D pri_ofs;
-+    pfl->cfi_table[0x16] =3D pri_ofs >> 8;
-     /* Alternate command set (none) */
-     pfl->cfi_table[0x17] =3D 0x00;
-     pfl->cfi_table[0x18] =3D 0x00;
-@@ -609,32 +610,34 @@ static void pflash_cfi02_realize(DeviceState *dev, =
-Error **errp)
-     pfl->cfi_table[0x2E] =3D (pfl->nb_blocs - 1) >> 8;
-     pfl->cfi_table[0x2F] =3D pfl->sector_len >> 8;
-     pfl->cfi_table[0x30] =3D pfl->sector_len >> 16;
-+    assert(0x30 < pri_ofs);
+-//#define PFLASH_DEBUG
+-#ifdef PFLASH_DEBUG
++#define PFLASH_DEBUG false
+ #define DPRINTF(fmt, ...)                                  \
+ do {                                                       \
+-    fprintf(stderr, "PFLASH: " fmt , ## __VA_ARGS__);       \
++    if (PFLASH_DEBUG) {                                    \
++        fprintf(stderr, "PFLASH: " fmt, ## __VA_ARGS__);   \
++    }                                                      \
+ } while (0)
+-#else
+-#define DPRINTF(fmt, ...) do { } while (0)
+-#endif
 =20
-     /* Extended */
--    pfl->cfi_table[0x31] =3D 'P';
--    pfl->cfi_table[0x32] =3D 'R';
--    pfl->cfi_table[0x33] =3D 'I';
-+    pfl->cfi_table[0x00 + pri_ofs] =3D 'P';
-+    pfl->cfi_table[0x01 + pri_ofs] =3D 'R';
-+    pfl->cfi_table[0x02 + pri_ofs] =3D 'I';
+ #define PFLASH_LAZY_ROMD_THRESHOLD 42
 =20
-     /* Extended version 1.0 */
--    pfl->cfi_table[0x34] =3D '1';
--    pfl->cfi_table[0x35] =3D '0';
-+    pfl->cfi_table[0x03 + pri_ofs] =3D '1';
-+    pfl->cfi_table[0x04 + pri_ofs] =3D '0';
-=20
-     /* Address sensitive unlock required. */
--    pfl->cfi_table[0x36] =3D 0x00;
-+    pfl->cfi_table[0x05 + pri_ofs] =3D 0x00;
-     /* Erase suspend not supported. */
--    pfl->cfi_table[0x37] =3D 0x00;
-+    pfl->cfi_table[0x06 + pri_ofs] =3D 0x00;
-     /* Sector protect not supported. */
--    pfl->cfi_table[0x38] =3D 0x00;
-+    pfl->cfi_table[0x07 + pri_ofs] =3D 0x00;
-     /* Temporary sector unprotect not supported. */
--    pfl->cfi_table[0x39] =3D 0x00;
-+    pfl->cfi_table[0x08 + pri_ofs] =3D 0x00;
-=20
-     /* Sector protect/unprotect scheme. */
--    pfl->cfi_table[0x3a] =3D 0x00;
-+    pfl->cfi_table[0x09 + pri_ofs] =3D 0x00;
-=20
-     /* Simultaneous operation not supported. */
--    pfl->cfi_table[0x3b] =3D 0x00;
-+    pfl->cfi_table[0x0a + pri_ofs] =3D 0x00;
-     /* Burst mode not supported. */
--    pfl->cfi_table[0x3c] =3D 0x00;
-+    pfl->cfi_table[0x0b + pri_ofs] =3D 0x00;
-+    assert(0x0b + pri_ofs < ARRAY_SIZE(pfl->cfi_table));
- }
-=20
- static Property pflash_cfi02_properties[] =3D {
+@@ -218,14 +216,14 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwadd=
+r offset,
+         default:
+             goto flash_read;
+         }
+-        DPRINTF("%s: ID " TARGET_FMT_plx " %x\n", __func__, boff, ret);
++        DPRINTF("%s: ID " TARGET_FMT_plx " %" PRIx32 "\n", __func__, bof=
+f, ret);
+         break;
+     case 0xA0:
+     case 0x10:
+     case 0x30:
+         /* Status register read */
+         ret =3D pfl->status;
+-        DPRINTF("%s: status %x\n", __func__, ret);
++        DPRINTF("%s: status %" PRIx32 "\n", __func__, ret);
+         /* Toggle bit 6 */
+         pfl->status ^=3D 0x40;
+         break;
+@@ -268,10 +266,6 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr of=
+fset,
+     trace_pflash_io_write(offset, width, width << 1, value, pfl->wcycle)=
+;
+     cmd =3D value;
+     if (pfl->cmd !=3D 0xA0 && cmd =3D=3D 0xF0) {
+-#if 0
+-        DPRINTF("%s: flash reset asked (%02x %02x)\n",
+-                __func__, pfl->cmd, cmd);
+-#endif
+         goto reset_flash;
+     }
+     offset &=3D pfl->chip_len - 1;
 --=20
 2.20.1
 
