@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81154C48BD6
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 15:31:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1003C48BD6
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 15:35:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5CF5320B1F
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 15:31:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CF5320B1F
+	by mail.kernel.org (Postfix) with ESMTPS id B931B20659
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 15:35:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B931B20659
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgWN2-0000Xx-IQ
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 11:31:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60696)
+	id 1hgWQx-0003jU-Vk
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 11:35:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60817)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <palmer@dabbelt.com>) id 1hgWFk-0001V4-MT
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:24:02 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1hgWGc-0001kz-K5
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:24:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1hgWFW-0006kb-Tz
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:23:51 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:34237)
+ (envelope-from <palmer@dabbelt.com>) id 1hgWGZ-0007cG-Ul
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:24:54 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:39638)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hgWFQ-0006Zy-F1
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:23:40 -0400
-Received: by mail-pg1-f194.google.com with SMTP id p10so1186875pgn.1
- for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 08:23:33 -0700 (PDT)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hgWGY-0007Bn-Ly
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 11:24:50 -0400
+Received: by mail-pg1-f193.google.com with SMTP id 196so1176193pgc.6
+ for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 08:24:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=jUXXdmFSNX/hvuM0z5WGc23QfyAO7JYoqYw1PuN09oU=;
- b=BLM8pCzK6d9Q1AVjjUTg1UlZBj8ZhkTH43PBlj3dFQd+DImph5XzamjucMLmwCTCdY
- /FJFgUSyD6iPbgAv3WDDIIwcgx0BZQvuWvnlNn1vNt6KgKDIDNpL3RGX4NS1i84k1h8o
- 7Bxk5Dq5xHx8JHqdM4tLlFUqQZBi3yxHorIDVaGWN1Wx/QGGUuXumcsth1IlNS0SC6Mb
- NC+9aNIuuTaZjObX114860b9TgnIfEOrXSo+O4B+meVlyP594BY+lkzuFQb7XiJGe6p/
- 4Fdr00K4pT8bhI4K5EJxQbHIeDjOwfo13fpnoYpxqwTkeSiI5aKL7w92ditBSOkqHULd
- vWIw==
-X-Gm-Message-State: APjAAAXnI+AV62tovRL/nmkqWYyUz1rHboyTLWCuNincxXnEKwxpCft0
- xu9tLFe15EzuzZpjLVruOv7t5nm+W9fcTw==
-X-Google-Smtp-Source: APXvYqwQHGWSi5dQ3ZNIi59TpZXIwgAa73Mgr6WM9PldSQ9IL3PqR2z+jBZxZz56eoNToDxxzmV1Rg==
-X-Received: by 2002:a63:88c1:: with SMTP id l184mr4300973pgd.376.1561649012380; 
- Thu, 27 Jun 2019 08:23:32 -0700 (PDT)
+ bh=8AbRazPuGbBA4/wcOJ0NXPkCs6Kyha3rsVtogdXoPZc=;
+ b=T1Fec8Wcme9ueq082nIQxWHahovbYLh1URkJuOG3K4ekH4bbBMduvGh5WKTgKdXK3N
+ B5407q+QzYNX17Illxe0lRZRfD8rXV63x39Y8kADcBZRQ4AfqLG9Ilb3TcfkYxFK6TkL
+ U9Ab5ShExXf+2WW0oVD0pXmdi7T6ncgH6/OKuFDE2DDZpwkFRIN9NERBYUerHYLMgKxY
+ 3ZzadHnQsBWu04xxhRkTBq3xd+arQDmZvONQz9kpR52NnIeQW0Ov+4WfRBHAnXxClY3D
+ iOkVmvXswB4fnTp9wO4Wuu9GDaCvzGxqO24oty8ATNJviXizqn/eMiOei6COdJ3KhFW1
+ DsZQ==
+X-Gm-Message-State: APjAAAXZYHc/I57GD1cJ5DROCbnBChhVcsDaABfHYObvnLT5DY2tV8yI
+ /LgNSYZ/OScaSmidbfIX097euw==
+X-Google-Smtp-Source: APXvYqzmdMaz0BLAinf0AXmX0ZIlx452q1OeoLFnWvHmGVotYU/yHg4yZbyX8mN3LRVilS39kkGv6A==
+X-Received: by 2002:a63:3f48:: with SMTP id m69mr4214170pga.17.1561649063184; 
+ Thu, 27 Jun 2019 08:24:23 -0700 (PDT)
 Received: from localhost (220-132-236-182.HINET-IP.hinet.net.
  [220.132.236.182])
- by smtp.gmail.com with ESMTPSA id v13sm3821903pfe.105.2019.06.27.08.23.31
+ by smtp.gmail.com with ESMTPSA id t29sm4262679pfq.156.2019.06.27.08.24.22
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 27 Jun 2019 08:23:31 -0700 (PDT)
-Date: Thu, 27 Jun 2019 08:19:41 -0700
-Message-Id: <20190627152011.18686-5-palmer@sifive.com>
+ Thu, 27 Jun 2019 08:24:22 -0700 (PDT)
+Date: Thu, 27 Jun 2019 08:20:02 -0700
+Message-Id: <20190627152011.18686-26-palmer@sifive.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190627152011.18686-1-palmer@sifive.com>
 References: <20190627152011.18686-1-palmer@sifive.com>
@@ -66,9 +66,8 @@ From: Palmer Dabbelt <palmer@sifive.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.215.194
-Subject: [Qemu-devel] [PULL 04/34] target/riscv: Implement
- riscv_cpu_unassigned_access
+X-Received-From: 209.85.215.193
+Subject: [Qemu-devel] [PULL 25/34] riscv: virt: Add cpu-topology DT node.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,84 +79,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>, Michael Clark <mjc@sifive.com>,
- qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- Palmer Dabbelt <palmer@sifive.com>
+Cc: Atish Patra <atish.patra@wdc.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Palmer Dabbelt <palmer@sifive.com>, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Michael Clark <mjc@sifive.com>
+From: Atish Patra <atish.patra@wdc.com>
 
-This patch adds support for the riscv_cpu_unassigned_access call
-and will raise a load or store access fault.
+Currently, there is no cpu topology defined in RISC-V.
+Define a device tree node that clearly describes the
+entire topology. This saves the trouble of scanning individual
+cache to figure out the topology.
 
-Signed-off-by: Michael Clark <mjc@sifive.com>
-[Changes by AF:
- - Squash two patches and rewrite commit message
- - Set baddr to the access address
-]
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+Here is the linux kernel patch series that enables topology
+for RISC-V.
+
+http://lists.infradead.org/pipermail/linux-riscv/2019-June/005072.html
+
+CPU topology after applying this patch in QEMU & above series in kernel
+
+/ # cat /sys/devices/system/cpu/cpu2/topology/thread_siblings_list
+2
+/ # cat /sys/devices/system/cpu/cpu2/topology/physical_package_id
+0
+/ # cat /sys/devices/system/cpu/cpu2/topology/core_siblings_list
+0-7
+
+Signed-off-by: Atish Patra <atish.patra@wdc.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- target/riscv/cpu.c        |  1 +
- target/riscv/cpu.h        |  2 ++
- target/riscv/cpu_helper.c | 16 ++++++++++++++++
- 3 files changed, 19 insertions(+)
+ hw/riscv/virt.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 0632ac08cf35..5b9fae608cca 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -482,6 +482,7 @@ static void riscv_cpu_class_init(ObjectClass *c, void *data)
-     cc->gdb_stop_before_watchpoint = true;
-     cc->disas_set_info = riscv_cpu_disas_set_info;
- #ifndef CONFIG_USER_ONLY
-+    cc->do_unassigned_access = riscv_cpu_unassigned_access;
-     cc->do_unaligned_access = riscv_cpu_do_unaligned_access;
-     cc->get_phys_page_debug = riscv_cpu_get_phys_page_debug;
- #endif
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index b47cde501766..2e743312536b 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -259,6 +259,8 @@ void  riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
- bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                         MMUAccessType access_type, int mmu_idx,
-                         bool probe, uintptr_t retaddr);
-+void riscv_cpu_unassigned_access(CPUState *cpu, hwaddr addr, bool is_write,
-+                                 bool is_exec, int unused, unsigned size);
- char *riscv_isa_string(RISCVCPU *cpu);
- void riscv_cpu_list(void);
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index 487f61404b21..28d96daf8c5b 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -191,6 +191,7 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
  
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 8b6754b91798..0bbfb7f48b79 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -375,6 +375,22 @@ hwaddr riscv_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-     return phys_addr;
- }
+     for (cpu = s->soc.num_harts - 1; cpu >= 0; cpu--) {
+         int cpu_phandle = phandle++;
++        int intc_phandle;
+         nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
+         char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+         char *isa = riscv_isa_string(&s->soc.harts[cpu]);
+@@ -203,9 +204,12 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+         qemu_fdt_setprop_string(fdt, nodename, "status", "okay");
+         qemu_fdt_setprop_cell(fdt, nodename, "reg", cpu);
+         qemu_fdt_setprop_string(fdt, nodename, "device_type", "cpu");
++        qemu_fdt_setprop_cell(fdt, nodename, "phandle", cpu_phandle);
++        qemu_fdt_setprop_cell(fdt, nodename, "linux,phandle", cpu_phandle);
++        intc_phandle = phandle++;
+         qemu_fdt_add_subnode(fdt, intc);
+-        qemu_fdt_setprop_cell(fdt, intc, "phandle", cpu_phandle);
+-        qemu_fdt_setprop_cell(fdt, intc, "linux,phandle", cpu_phandle);
++        qemu_fdt_setprop_cell(fdt, intc, "phandle", intc_phandle);
++        qemu_fdt_setprop_cell(fdt, intc, "linux,phandle", intc_phandle);
+         qemu_fdt_setprop_string(fdt, intc, "compatible", "riscv,cpu-intc");
+         qemu_fdt_setprop(fdt, intc, "interrupt-controller", NULL, 0);
+         qemu_fdt_setprop_cell(fdt, intc, "#interrupt-cells", 1);
+@@ -214,6 +218,20 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+         g_free(nodename);
+     }
  
-+void riscv_cpu_unassigned_access(CPUState *cs, hwaddr addr, bool is_write,
-+                                 bool is_exec, int unused, unsigned size)
-+{
-+    RISCVCPU *cpu = RISCV_CPU(cs);
-+    CPURISCVState *env = &cpu->env;
-+
-+    if (is_write) {
-+        cs->exception_index = RISCV_EXCP_STORE_AMO_ACCESS_FAULT;
-+    } else {
-+        cs->exception_index = RISCV_EXCP_LOAD_ACCESS_FAULT;
++    /* Add cpu-topology node */
++    qemu_fdt_add_subnode(fdt, "/cpus/cpu-map");
++    qemu_fdt_add_subnode(fdt, "/cpus/cpu-map/cluster0");
++    for (cpu = s->soc.num_harts - 1; cpu >= 0; cpu--) {
++        char *core_nodename = g_strdup_printf("/cpus/cpu-map/cluster0/core%d",
++                                              cpu);
++        char *cpu_nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
++        uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, cpu_nodename);
++        qemu_fdt_add_subnode(fdt, core_nodename);
++        qemu_fdt_setprop_cell(fdt, core_nodename, "cpu", intc_phandle);
++        g_free(core_nodename);
++        g_free(cpu_nodename);
 +    }
 +
-+    env->badaddr = addr;
-+    riscv_raise_exception(&cpu->env, cs->exception_index, GETPC());
-+}
-+
- void riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-                                    MMUAccessType access_type, int mmu_idx,
-                                    uintptr_t retaddr)
+     cells =  g_new0(uint32_t, s->soc.num_harts * 4);
+     for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
+         nodename =
 -- 
 2.21.0
 
