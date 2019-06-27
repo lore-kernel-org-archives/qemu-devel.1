@@ -2,62 +2,62 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7B96C4321A
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:56:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD29DC4321A
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:57:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 89F632075E
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:56:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89F632075E
+	by mail.kernel.org (Postfix) with ESMTPS id 9929B20B7C
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:57:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9929B20B7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54412 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgbRZ-0003xW-T8
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 16:56:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45816)
+	id 1hgbS9-0004V2-Sb
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 16:57:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47024)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hgb1E-0001x9-Li
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:29:22 -0400
+ (envelope-from <philmd@redhat.com>) id 1hgb3P-0004Vb-HH
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:31:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hgb1C-0000Qp-Iv
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:29:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50450)
+ (envelope-from <philmd@redhat.com>) id 1hgb3O-0003jr-HV
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:31:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45200)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hgb10-0008Ai-NK; Thu, 27 Jun 2019 16:29:06 -0400
+ id 1hgb34-0003GA-Ai; Thu, 27 Jun 2019 16:31:16 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 722303082231;
- Thu, 27 Jun 2019 20:28:48 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 138FB301D217;
+ Thu, 27 Jun 2019 20:31:13 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-69.brq.redhat.com [10.40.204.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C6BC600CC;
- Thu, 27 Jun 2019 20:28:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E056C600CC;
+ Thu, 27 Jun 2019 20:31:07 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: Stephen Checkoway <stephen.checkoway@oberlin.edu>,
 	qemu-devel@nongnu.org
-Date: Thu, 27 Jun 2019 22:27:00 +0200
-Message-Id: <20190627202719.17739-10-philmd@redhat.com>
+Date: Thu, 27 Jun 2019 22:27:19 +0200
+Message-Id: <20190627202719.17739-29-philmd@redhat.com>
 In-Reply-To: <20190627202719.17739-1-philmd@redhat.com>
 References: <20190627202719.17739-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Thu, 27 Jun 2019 20:28:48 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.41]); Thu, 27 Jun 2019 20:31:13 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v5 09/28] hw/block/pflash_cfi02: Use the ldst
- API in pflash_read()
+Subject: [Qemu-devel] [PATCH v5 28/28] hw/block/pflash_cfi02: Reduce I/O
+ accesses to 16-bit
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,62 +86,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The load/store API eases code review.
+Parallel NOR flashes are limited to 16-bit bus accesses.
+Remove the 32-bit dead code.
 
-Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-Message-Id: <20190426162624.55977-3-stephen.checkoway@oberlin.edu>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-[PMD: Extracted from bigger patch, simplified tracing]
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/block/pflash_cfi02.c | 32 +++++---------------------------
- 1 file changed, 5 insertions(+), 27 deletions(-)
+ hw/block/pflash_cfi02.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index ae38ed0bae..49afecb921 100644
+index db9dc7d8fb..d1f28b02b9 100644
 --- a/hw/block/pflash_cfi02.c
 +++ b/hw/block/pflash_cfi02.c
-@@ -196,33 +196,11 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwadd=
-r offset,
-     case 0x00:
-     flash_read:
-         /* Flash area read */
--        p =3D pfl->storage;
--        switch (width) {
--        case 1:
--            ret =3D p[offset];
--            break;
--        case 2:
--            if (be) {
--                ret =3D p[offset] << 8;
--                ret |=3D p[offset + 1];
--            } else {
--                ret =3D p[offset];
--                ret |=3D p[offset + 1] << 8;
--            }
--            break;
--        case 4:
--            if (be) {
--                ret =3D p[offset] << 24;
--                ret |=3D p[offset + 1] << 16;
--                ret |=3D p[offset + 2] << 8;
--                ret |=3D p[offset + 3];
--            } else {
--                ret =3D p[offset];
--                ret |=3D p[offset + 1] << 8;
--                ret |=3D p[offset + 2] << 16;
--                ret |=3D p[offset + 3] << 24;
--            }
--            break;
-+        p =3D (uint8_t *)pfl->storage + offset;
-+        if (pfl->be) {
-+            ret =3D ldn_be_p(p, width);
-+        } else {
-+            ret =3D ldn_le_p(p, width);
-         }
-         trace_pflash_data_read(offset, width << 1, ret);
-         break;
+@@ -317,8 +317,6 @@ static uint64_t pflash_read(void *opaque, hwaddr offs=
+et, unsigned int width)
+     boff =3D offset & 0xFF;
+     if (pfl->width =3D=3D 2) {
+         boff =3D boff >> 1;
+-    } else if (pfl->width =3D=3D 4) {
+-        boff =3D boff >> 2;
+     }
+     switch (pfl->cmd) {
+     default:
+@@ -449,8 +447,6 @@ static void pflash_write(void *opaque, hwaddr offset,=
+ uint64_t value,
+     boff =3D offset;
+     if (pfl->width =3D=3D 2) {
+         boff =3D boff >> 1;
+-    } else if (pfl->width =3D=3D 4) {
+-        boff =3D boff >> 2;
+     }
+     /* Only the least-significant 11 bits are used in most cases. */
+     boff &=3D 0x7FF;
+@@ -710,6 +706,7 @@ static void pflash_write(void *opaque, hwaddr offset,=
+ uint64_t value,
+ static const MemoryRegionOps pflash_cfi02_ops =3D {
+     .read =3D pflash_read,
+     .write =3D pflash_write,
++    .impl.max_access_size =3D 2,
+     .valid.min_access_size =3D 1,
+     .valid.max_access_size =3D 4,
+     .endianness =3D DEVICE_NATIVE_ENDIAN,
 --=20
 2.20.1
 
