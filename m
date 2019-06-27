@@ -2,74 +2,79 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E7E3C48BD6
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 10:16:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A262C48BD7
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 10:18:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65E742085A
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 10:16:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65E742085A
+	by mail.kernel.org (Postfix) with ESMTPS id 4D6C02085A
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 10:18:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D6C02085A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgRS9-0007o8-Mm
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 06:16:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46494)
+	id 1hgRUG-0000mb-IM
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 06:18:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46655)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <cdupontd@redhat.com>) id 1hgRQw-0007F6-9J
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 06:15:15 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hgRRu-0007hA-A2
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 06:16:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cdupontd@redhat.com>) id 1hgRQr-0006Op-7y
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 06:15:14 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:54728)
+ (envelope-from <pbonzini@redhat.com>) id 1hgRRt-0007Ih-38
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 06:16:14 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:53103)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <cdupontd@redhat.com>) id 1hgRQr-0006O5-1U
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 06:15:09 -0400
-Received: by mail-wm1-f68.google.com with SMTP id g135so5141077wme.4
- for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 03:15:08 -0700 (PDT)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hgRRs-0007Ea-Se
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 06:16:13 -0400
+Received: by mail-wm1-f68.google.com with SMTP id s3so5152393wms.2
+ for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 03:16:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=J/9DlseNGPZvGO/oMpYQCy9sX4DFzapfgPoBJ1IagJ4=;
- b=N9IRrzO8kU/wjrSbryiFx2Zu623QGnEXWBbcEgF1dhfhi0yLxRxbTVv7CF8swsMfb5
- QFQr1/QGc4ftwZTj3GkaEL5uEmz1JpIWtxW+5qr6sEBPAQHAfRON7n915SlD7kD+WiWI
- Qnt/UwsvJsSbqzsdF2SB3D9kut7rlaFrEE44JatYFt0q6Q4tc7/Gpm1lZWOKVKAm6nEV
- 2IE0xjF5lf8up8hQrhLwxALjgU5w66eqX4Kb7yb+Yb59YU4aJVRqGxpNzRvIorpcWFJ7
- uarCbDGKBWUEneWQz8lXKQ5Kdjnpb/oCkOif3pexNnOQeIulsysWC5WJDZO3lPMfvzHd
- KZAA==
-X-Gm-Message-State: APjAAAVh1i6sKi0EjpJhnx6SftCrSziSfw+ynPiZ2/5lsx+PKm8c5PV4
- xATO89CfoT7vrs41aF+rW/ttVg==
-X-Google-Smtp-Source: APXvYqynR/PZ1lSqdQcqMmjJ8Q/mhYwokx9/58uAo7owQsXoPC8waRB2VWhcYBVGMiCUxMYMIGbLaw==
-X-Received: by 2002:a1c:df46:: with SMTP id w67mr2566346wmg.69.1561630507778; 
- Thu, 27 Jun 2019 03:15:07 -0700 (PDT)
-Received: from ?IPv6:2a01:e35:8b6a:1220:b9aa:75f2:4e31:7532?
- ([2a01:e35:8b6a:1220:b9aa:75f2:4e31:7532])
- by smtp.gmail.com with ESMTPSA id q10sm1795260wrf.32.2019.06.27.03.15.05
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 27 Jun 2019 03:15:06 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-From: Christophe de Dinechin <cdupontd@redhat.com>
-In-Reply-To: <20190627053523.25541-1-kraxel@redhat.com>
-Date: Thu, 27 Jun 2019 12:14:10 +0200
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <7621E57A-E22F-43F4-A96A-5C3982059107@redhat.com>
-References: <20190627053523.25541-1-kraxel@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=GQnycGQAUslwSC0Yblf4RS8efXdMfWm90KEG77Wbd+o=;
+ b=sF2i7tTtKPsuo670d3nOSvtus4Dh2RGehJ5f/renTVaMFONZRbuWbBBgFTHQvB6GLE
+ XjJNMz1bq6TOJKuU3FkxoFMxq/GZ+JW2UJdltZazbHwe9l2UiGsW0kWUIQsht1LDHcnU
+ YB73gN64Yy57xdw6LTIfRgTrLKwf+XEAqdyMJPfI+4+ZxGTd83sMdPddaDCUZ2H22CfC
+ 0cLuZd+PRrHXuizEwY7349lEPbGvSzPAH80SfNJfL1Ojl2JBdgau3DpRNGOEKRuBM7Cy
+ i7yHm6SiF9SH8cZHZpyD6FvIRLqAuiRNASyqhjJ4T5gd0CFb/G/sh4YVX3qvjkWOiBJN
+ Ro/g==
+X-Gm-Message-State: APjAAAXAJ/wtv0F2G4ZUn46z4pecOvZjealdkzuBT0xSUbYC9cHWiNx1
+ 73yiaA2V401IQUWyNSSh3so8QTbpQEI=
+X-Google-Smtp-Source: APXvYqwC+RTAAvcx5KebV9W8BNycy8VZ4np7Z+NR3i1Laktuu5ItvuQZeQMh/RwNaWQJ/7CDnZyTrw==
+X-Received: by 2002:a1c:cb4d:: with SMTP id b74mr2790638wmg.43.1561630567769; 
+ Thu, 27 Jun 2019 03:16:07 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:41bc:c7e6:75c9:c69f?
+ ([2001:b07:6468:f312:41bc:c7e6:75c9:c69f])
+ by smtp.gmail.com with ESMTPSA id o126sm5814629wmo.1.2019.06.27.03.16.06
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Thu, 27 Jun 2019 03:16:06 -0700 (PDT)
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <1560165301-39026-1-git-send-email-pbonzini@redhat.com>
+ <1560165301-39026-4-git-send-email-pbonzini@redhat.com>
+ <20190627090353.GA24929@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b8ae5bd6-2b52-99e0-993c-fe8f65d40da3@redhat.com>
+Date: Thu, 27 Jun 2019 12:16:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
+MIME-Version: 1.0
+In-Reply-To: <20190627090353.GA24929@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PATCH] console: fix cell overflow
+Subject: Re: [Qemu-devel] [PATCH 3/7] configure: integrate Meson in the
+ build system
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,115 +86,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alxndr@bu.edu, qemu-devel@nongnu.org, P J P <ppandit@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 27/06/19 11:03, Daniel P. Berrangé wrote:
+> On Mon, Jun 10, 2019 at 01:14:57PM +0200, Paolo Bonzini wrote:
+>> The Meson build system is integrated in the existing configure/make steps
+>> by invoking Meson from the configure script and converting Meson's build.ninja
+>> rules to an included Makefile.
+> 
+> Why did you take the route of converting ninja rules into makefile
+> rules, as opposed to just having some stub makefile rules which
+> directly invoke ninja where needed ?
 
+There are two parts of this.  One is practical and has to do with
+supporting a step-by-step transition.  Using ninja2make makes it trivial
+to have make build products that depend on meson build products, and
+this way bottom up is a natural direction to do the conversion, which is
+bottom up.  You'd start from libqemuutil.a and code generators (tracing
++ QAPI), then go to the tools and the emulators.
 
-> On 27 Jun 2019, at 07:35, Gerd Hoffmann <kraxel@redhat.com> wrote:
->=20
-> Linux terminal behavior (coming from vt100 I think) is somewhat =
-strange
-> when it comes to line wraps:  When a character is printed to the last
-> char cell of a line the cursor does NOT jump to the next line but =
-stays
-> where it is.  The line feed happens when the next character is =
-printed.
->=20
-> So the valid range for the cursor position is not 0 .. width-1 but
-> 0 .. width, where x =3D=3D width represents the state where the line =
-is
-> full but the cursor didn't jump to the next line yet.
->=20
-> The code for the 'clear from start of line' control sequence (ESC[1K)
-> fails to handle this corner case correctly and may call
-> console_clear_xy() with x =3D=3D width.  That will incorrectly clear =
-the
-> first char cell of the next line, or in case the cursor happens to be =
-on
-> the last line overflow the cell buffer by one character (three bytes).
->=20
-> Add a check to the loop to fix that.
->=20
-> Didn't spot any other places with the same problem.  But it's easy to
-> miss that corner case, so also allocate one extra cell as precaution, =
-so
-> in case we have simliar issues lurking elsewhere it at least wouldn't =
-be
-> a buffer overflow.
->=20
-> Reported-by: Alexander Oleinik <alxndr@bu.edu>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
-> ui/console.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/ui/console.c b/ui/console.c
-> index eb7e7e0c517a..13d933510cdb 100644
-> --- a/ui/console.c
-> +++ b/ui/console.c
-> @@ -484,7 +484,7 @@ static void text_console_resize(QemuConsole *s)
->     if (s->width < w1)
->         w1 =3D s->width;
->=20
-> -    cells =3D g_new(TextCell, s->width * s->total_height);
-> +    cells =3D g_new(TextCell, s->width * s->total_height + 1);
+The second is a design decision that simplifying the Make/meson
+integration is *not* a goal.  Rather the goals are: 1) making the
+transition easier on developers; 2) avoiding magic in meson.build at all
+costs.  More specifically:
 
-I don=E2=80=99t like allocating just in case. At least put a comment =
-explaining why ;-)
-This extra byte only catches a single case (arguably an existing one).
+- it should remain trivial to do things that used to be trivial, and
+most "make" invocations should be kept the same at least until
+everything is converted and we can perhaps declare a flag day.  People
+are used to "make check" or "make subdir-x86_64-softmmu", those should
+continue to work while the transition is in progress.
 
-What about adding a couple of extra tests where cell[=E2=80=A6 + x] is =
-used?
-(there is a third location I did not protect, because it already had
-exactly that test)
+- it should be possible to modify meson.build without knowing QEMU
+specific details, and that should be _already_ possible now at the
+beginning of the transition (to avoid creating technical debt).  This
+means keeping the magic confined in Makefile rules and external scripts,
+while having a pretty plain meson.build.
 
-diff --git a/ui/console.c b/ui/console.c
-index eb7e7e0c51..00d27f6384 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -541,6 +541,9 @@ static void update_xy(QemuConsole *s, int x, int y)
-         y2 +=3D s->total_height;
-     }
-     if (y2 < s->height) {
-+        if (x >=3D s->width) {
-+            x =3D s->width - 1;
-+        }
-         c =3D &s->cells[y1 * s->width + x];
-         vga_putcharxy(s, x, y2, c->ch,
-                       &(c->t_attrib));
-@@ -787,6 +790,9 @@ static void console_handle_escape(QemuConsole *s)
- static void console_clear_xy(QemuConsole *s, int x, int y)
- {
-     int y1 =3D (s->y_base + y) % s->total_height;
-+    if (x >=3D s->width) {
-+        x =3D s->width - 1;
-+    }
-     TextCell *c =3D &s->cells[y1 * s->width + x];
-     c->ch =3D ' ';
-     c->t_attrib =3D s->t_attrib_default;
+I expect testing might also require some hand-holding, because "meson
+test" does not integrate with "make -j" and to keep supporting our "make
+check-*" targets.  However, until the make->ninja flag day we could
+generate tap-driver Makefile rules from "meson introspect --tests"
+output.  Basically I'm dropping Makefile magic in favor of build rule
+generators are written in high-level languages.
 
+> Obviously this series is just some initial integration, but eventually
+> when we get a complete conversion, I think it will look pretty wierd
+> if we're still converting ninja to make.
 
-Reviewed-by: Christophe de Dinechin <dinechin@redhat.com>
+I agree; once all the build rules are converted the Makefile could be as
+simple as
 
->     for(y =3D 0; y < s->total_height; y++) {
->         c =3D &cells[y * s->width];
->         if (w1 > 0) {
-> @@ -992,7 +992,7 @@ static void console_putchar(QemuConsole *s, int =
-ch)
->                     break;
->                 case 1:
->                     /* clear from beginning of line */
-> -                    for (x =3D 0; x <=3D s->x; x++) {
-> +                    for (x =3D 0; x <=3D s->x && x < s->width; x++) {
->                         console_clear_xy(s, x, s->y);
->                     }
->                     break;
-> --=20
-> 2.18.1
->=20
->=20
+	all:
+	include config.mak
+	include tests/docker/Makefile.include
+	include tests/vm/Makefile.include
+	.NOTPARALLEL:
+	%:
+		ninja $@
 
+	subdir-%-softmmu:
+		ninja qemu-system-$*
+
+	subdir-%-linux-user:
+		ninja qemu-$*
+
+	check:
+		$(MESON) test
+
+	check-%:
+		$(MESON) test --suite $*
+
+etc. (and likewise the configure script could just translate the command
+line options before invoking meson).  But for now, since rules are
+written half in meson and half in make, ninja2make seems the most
+transparent way to integrate the two.
+
+> Part of the downside of our current build system is that although it
+> uses make, the usage is wierd and QEMU specific structure. It would
+> be a shame to pick meson and then again use it is a way that is wierd
+> and QEMU specific.
+
+I agree, this is why it's important to have at least a standard meson.build.
+
+Some knowledge of config-host.mak is needed, because meson.build uses
+declare_dependency() instead of dependency() to link with libraries that
+were already found by configure, but that's it.
+
+Paolo
 
