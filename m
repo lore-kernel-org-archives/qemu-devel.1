@@ -2,62 +2,62 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22D6EC48BE3
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:40:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E2DAC004E6
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:40:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECF432075E
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:40:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECF432075E
+	by mail.kernel.org (Postfix) with ESMTPS id 0A2C92075E
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 20:40:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A2C92075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgbBf-0003Ls-7J
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 16:40:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45815)
+	id 1hgbCK-0003mb-C9
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 16:40:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45307)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hgb1E-0001x8-Lh
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:29:22 -0400
+ (envelope-from <philmd@redhat.com>) id 1hgb0C-0001AW-9V
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:28:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hgb1C-0000RJ-PC
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:29:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56592)
+ (envelope-from <philmd@redhat.com>) id 1hgb0A-0007dT-D0
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 16:28:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56224)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hgb12-00006W-Lk; Thu, 27 Jun 2019 16:29:09 -0400
+ id 1hgb03-0007ML-Ld; Thu, 27 Jun 2019 16:28:07 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0F7F13058F5B;
- Thu, 27 Jun 2019 20:29:06 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id D877E3082A28;
+ Thu, 27 Jun 2019 20:27:55 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-69.brq.redhat.com [10.40.204.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DA31B600CC;
- Thu, 27 Jun 2019 20:29:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D735600CC;
+ Thu, 27 Jun 2019 20:27:41 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: Stephen Checkoway <stephen.checkoway@oberlin.edu>,
 	qemu-devel@nongnu.org
-Date: Thu, 27 Jun 2019 22:27:02 +0200
-Message-Id: <20190627202719.17739-12-philmd@redhat.com>
+Date: Thu, 27 Jun 2019 22:26:53 +0200
+Message-Id: <20190627202719.17739-3-philmd@redhat.com>
 In-Reply-To: <20190627202719.17739-1-philmd@redhat.com>
 References: <20190627202719.17739-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Thu, 27 Jun 2019 20:29:06 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Thu, 27 Jun 2019 20:27:57 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v5 11/28] hw/block/pflash_cfi02: Unify the
- MemoryRegionOps
+Subject: [Qemu-devel] [PATCH v5 02/28] hw/block/pflash: Simplify
+ trace_pflash_io_read/write()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,150 +86,125 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The pflash_read()/pflash_write() can check the device endianess
-via the pfl->be variable, so remove the 'int be' argument.
+Call the read() trace function after the value is set, so we can
+log the returned value.
+Rename the I/O trace functions with '_io_' in their name.
 
-Since the big/little MemoryRegionOps are now identical, it is
-pointless to declare them both. Unify them.
-
-Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-Message-Id: <20190426162624.55977-3-stephen.checkoway@oberlin.edu>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-[PMD: Extracted from bigger patch to ease review]
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/block/pflash_cfi02.c | 60 +++++++++++------------------------------
- 1 file changed, 15 insertions(+), 45 deletions(-)
+ hw/block/pflash_cfi01.c | 5 +++--
+ hw/block/pflash_cfi02.c | 6 ++----
+ hw/block/trace-events   | 4 ++--
+ 3 files changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index c079a63880..e64dc69c6c 100644
---- a/hw/block/pflash_cfi02.c
-+++ b/hw/block/pflash_cfi02.c
-@@ -177,11 +177,11 @@ static uint64_t pflash_data_read(PFlashCFI02 *pfl, =
-hwaddr offset,
+diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+index 35080d915f..74fc1bc2da 100644
+--- a/hw/block/pflash_cfi01.c
++++ b/hw/block/pflash_cfi01.c
+@@ -288,7 +288,6 @@ static uint32_t pflash_read(PFlashCFI01 *pfl, hwaddr =
+offset,
+     uint32_t ret;
+=20
+     ret =3D -1;
+-    trace_pflash_read(offset, pfl->cmd, width, pfl->wcycle);
+     switch (pfl->cmd) {
+     default:
+         /* This should never happen : reset state & treat it as a read *=
+/
+@@ -391,6 +390,8 @@ static uint32_t pflash_read(PFlashCFI01 *pfl, hwaddr =
+offset,
+=20
+         break;
+     }
++    trace_pflash_io_read(offset, width, width << 1, ret, pfl->cmd, pfl->=
+wcycle);
++
      return ret;
  }
 =20
--static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr offset,
--                            int width, int be)
-+static uint64_t pflash_read(void *opaque, hwaddr offset, unsigned int wi=
-dth)
- {
-+    PFlashCFI02 *pfl =3D opaque;
-     hwaddr boff;
--    uint32_t ret;
-+    uint64_t ret;
+@@ -453,7 +454,7 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr off=
+set,
+=20
+     cmd =3D value;
+=20
+-    trace_pflash_write(offset, value, width, pfl->wcycle);
++    trace_pflash_io_write(offset, width, width << 1, value, pfl->wcycle)=
+;
+     if (!pfl->wcycle) {
+         /* Set the device in I/O access mode */
+         memory_region_rom_device_set_romd(&pfl->mem, false);
+diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+index eb106f4996..f05cd507b3 100644
+--- a/hw/block/pflash_cfi02.c
++++ b/hw/block/pflash_cfi02.c
+@@ -145,7 +145,6 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr =
+offset,
+     uint8_t *p;
 =20
      ret =3D -1;
+-    trace_pflash_read(offset, pfl->cmd, width, pfl->wcycle);
      /* Lazy reset to ROMD mode after a certain amount of read accesses *=
 /
-@@ -228,14 +228,14 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwadd=
-r offset,
-         default:
-             ret =3D pflash_data_read(pfl, offset, width);
-         }
--        DPRINTF("%s: ID " TARGET_FMT_plx " %" PRIx32 "\n", __func__, bof=
-f, ret);
-+        DPRINTF("%s: ID " TARGET_FMT_plx " %" PRIx64 "\n", __func__, bof=
-f, ret);
-         break;
-     case 0xA0:
-     case 0x10:
-     case 0x30:
-         /* Status register read */
-         ret =3D pfl->status;
--        DPRINTF("%s: status %" PRIx32 "\n", __func__, ret);
-+        DPRINTF("%s: status %" PRIx64 "\n", __func__, ret);
-         toggle_dq6(pfl);
-         break;
-     case 0x98:
-@@ -253,8 +253,7 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr =
+     if (!pfl->rom_mode && pfl->wcycle =3D=3D 0 &&
+         ++pfl->read_counter > PFLASH_LAZY_ROMD_THRESHOLD) {
+@@ -241,6 +240,7 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr =
 offset,
- }
-=20
- /* update flash content on disk */
--static void pflash_update(PFlashCFI02 *pfl, int offset,
--                          int size)
-+static void pflash_update(PFlashCFI02 *pfl, int offset, int size)
- {
-     int offset_end;
-     if (pfl->blk) {
-@@ -267,9 +266,10 @@ static void pflash_update(PFlashCFI02 *pfl, int offs=
-et,
+         }
+         break;
      }
- }
++    trace_pflash_io_read(offset, width, width << 1, ret, pfl->cmd, pfl->=
+wcycle);
 =20
--static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
--                         uint32_t value, int width, int be)
-+static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
-+                         unsigned int width)
- {
-+    PFlashCFI02 *pfl =3D opaque;
-     hwaddr boff;
+     return ret;
+ }
+@@ -267,6 +267,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr off=
+set,
      uint8_t *p;
      uint8_t cmd;
-@@ -477,39 +477,9 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr of=
+=20
++    trace_pflash_io_write(offset, width, width << 1, value, pfl->wcycle)=
+;
+     cmd =3D value;
+     if (pfl->cmd !=3D 0xA0 && cmd =3D=3D 0xF0) {
+ #if 0
+@@ -275,11 +276,8 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr of=
 fset,
-     pfl->cmd =3D 0;
- }
+ #endif
+         goto reset_flash;
+     }
+-    trace_pflash_write(offset, value, width, pfl->wcycle);
+     offset &=3D pfl->chip_len - 1;
 =20
--static uint64_t pflash_be_readfn(void *opaque, hwaddr addr, unsigned siz=
-e)
--{
--    return pflash_read(opaque, addr, size, 1);
--}
--
--static void pflash_be_writefn(void *opaque, hwaddr addr,
--                              uint64_t value, unsigned size)
--{
--    pflash_write(opaque, addr, value, size, 1);
--}
--
--static uint64_t pflash_le_readfn(void *opaque, hwaddr addr, unsigned siz=
-e)
--{
--    return pflash_read(opaque, addr, size, 0);
--}
--
--static void pflash_le_writefn(void *opaque, hwaddr addr,
--                              uint64_t value, unsigned size)
--{
--    pflash_write(opaque, addr, value, size, 0);
--}
--
--static const MemoryRegionOps pflash_cfi02_ops_be =3D {
--    .read =3D pflash_be_readfn,
--    .write =3D pflash_be_writefn,
--    .valid.min_access_size =3D 1,
--    .valid.max_access_size =3D 4,
--    .endianness =3D DEVICE_NATIVE_ENDIAN,
--};
--
--static const MemoryRegionOps pflash_cfi02_ops_le =3D {
--    .read =3D pflash_le_readfn,
--    .write =3D pflash_le_writefn,
-+static const MemoryRegionOps pflash_cfi02_ops =3D {
-+    .read =3D pflash_read,
-+    .write =3D pflash_write,
-     .valid.min_access_size =3D 1,
-     .valid.max_access_size =3D 4,
-     .endianness =3D DEVICE_NATIVE_ENDIAN,
-@@ -537,9 +507,9 @@ static void pflash_cfi02_realize(DeviceState *dev, Er=
-ror **errp)
-=20
-     chip_len =3D pfl->sector_len * pfl->nb_blocs;
-=20
--    memory_region_init_rom_device(&pfl->orig_mem, OBJECT(pfl), pfl->be ?
--                                  &pflash_cfi02_ops_be : &pflash_cfi02_o=
-ps_le,
--                                  pfl, pfl->name, chip_len, &local_err);
-+    memory_region_init_rom_device(&pfl->orig_mem, OBJECT(pfl),
-+                                  &pflash_cfi02_ops, pfl, pfl->name,
-+                                  chip_len, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
+-    DPRINTF("%s: offset " TARGET_FMT_plx " %08x %d\n", __func__,
+-            offset, value, width);
+     boff =3D offset & (pfl->sector_len - 1);
+     if (pfl->width =3D=3D 2)
+         boff =3D boff >> 1;
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index 97a17838ed..f637fe918e 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -7,9 +7,9 @@ fdc_ioport_write(uint8_t reg, uint8_t value) "write reg 0=
+x%02x val 0x%02x"
+ # pflash_cfi02.c
+ # pflash_cfi01.c
+ pflash_reset(void) "reset"
+-pflash_read(uint64_t offset, uint8_t cmd, int width, uint8_t wcycle) "of=
+fset:0x%04"PRIx64" cmd:0x%02x width:%d wcycle:%u"
+-pflash_write(uint64_t offset, uint32_t value, int width, uint8_t wcycle)=
+ "offset:0x%04"PRIx64" value:0x%03x width:%d wcycle:%u"
+ pflash_timer_expired(uint8_t cmd) "command 0x%02x done"
++pflash_io_read(uint64_t offset, int width, int fmt_width, uint32_t value=
+, uint8_t cmd, uint8_t wcycle) "offset:0x%04"PRIx64" width:%d value:0x%0*=
+x cmd:0x%02x wcycle:%u"
++pflash_io_write(uint64_t offset, int width, int fmt_width, uint32_t valu=
+e, uint8_t wcycle) "offset:0x%04"PRIx64" width:%d value:0x%0*x wcycle:%u"
+ pflash_data_read8(uint64_t offset, uint32_t value) "data offset:0x%04"PR=
+Ix64" value:0x%02x"
+ pflash_data_read16(uint64_t offset, uint32_t value) "data offset:0x%04"P=
+RIx64" value:0x%04x"
+ pflash_data_read32(uint64_t offset, uint32_t value) "data offset:0x%04"P=
+RIx64" value:0x%08x"
 --=20
 2.20.1
 
