@@ -2,56 +2,90 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A043C48BD6
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 11:18:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D6C4C48BD7
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 11:18:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03B4D205F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 11:18:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03B4D205F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0AA3F20656
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 11:18:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GKyOY0DJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AA3F20656
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgSQ4-0002US-UF
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 07:18:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55845)
+	id 1hgSQU-0002f2-67
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 07:18:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56554)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefan.brankovic@rt-rk.com>) id 1hgS5x-0001yv-Iq
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 06:57:47 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1hgSBz-0008JJ-7u
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 07:04:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefan.brankovic@rt-rk.com>) id 1hgS5v-0001hW-Jx
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 06:57:37 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:36494 helo=mail.rt-rk.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefan.brankovic@rt-rk.com>)
- id 1hgS5v-0001fm-6T
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 06:57:35 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 1533E1A4548;
- Thu, 27 Jun 2019 12:56:30 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw870-lin.domain.local (rtrkw870-lin.domain.local
- [10.10.13.132])
- by mail.rt-rk.com (Postfix) with ESMTPSA id D61181A4567;
- Thu, 27 Jun 2019 12:56:29 +0200 (CEST)
-From: Stefan Brankovic <stefan.brankovic@rt-rk.com>
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1hgSBZ-0007zw-IX
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 07:03:48 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41497)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1hgSBZ-0007zD-68
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 07:03:25 -0400
+Received: by mail-wr1-x444.google.com with SMTP id c2so2027669wrm.8
+ for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 04:03:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=Y/CPp9JInA7ANrmnXt8PbvRHB7xkvV1DBO+/ASdQwCo=;
+ b=GKyOY0DJ9xDNbo5MIaV5vJVkLpheK6nzbOCDnGqsi/CQmSLir8KI14kGFa3K1huASC
+ LUZyOFdksrAM9NPwc24xDLf3JfJJ9WGrRe/E7WFStwsRfWZheFlFiMfquaAZE5kiRDNh
+ Ho6RGJ/5XrplGs/X0CbPoqvitoJUttzadq2pGQ8RmQShjDVoedyXXbdSW8fKkLJ9mAh+
+ 7OE/Eeaa+hT7TCKy/1xjD24uTL5geFBTVrR/ey4R/rhhQWQNYgd2xcFtJAQkRCRrXNQW
+ 3tP1qa5oasEG0KC7cW+RWdk5LwQUmVtXoJC0iNoXVg1ou3j4opmoyra0T303LTiC+3OX
+ Plqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=Y/CPp9JInA7ANrmnXt8PbvRHB7xkvV1DBO+/ASdQwCo=;
+ b=b5U/VPmle+v1295R7fCsUvixe8R3sXx0MavHF59+Zm7YeN/5jktrKEtGDRRRq4tFll
+ wH1GB1Z5YxspDHNlnUhGbA0Fl42mmwLO4JZV0Y3ww8QtCIyMGkGcJisPdlbKrvKj7+F5
+ klbssFIrAmQVB26mddIkRePXzvjP/aIRMNWGX9aM3OGbexv1wMbOQC83pNAhd6IwgD0t
+ nrJQ9eOG9D0yc3xEtSr6g8s2ifcsZfYGlmp6//D4ah5woNrm7F6Jh7MV12Nt8MKMi5cW
+ 7JpYew75klnzb3wlMDUKmLSVpnmKanbQCzQTQy9Ps65r0IdR6vJwhFESnfMIxeN2a/8/
+ nGqA==
+X-Gm-Message-State: APjAAAUI7NO4rxM2JxmV3Wkido1vt2irr+jImVNE3D/aOJKvNaZf+l+c
+ tJJai4X1GeR7QLl7ULg2jnScp2+P
+X-Google-Smtp-Source: APXvYqwV10Vgdf0DKbe8m6Ji1B5JT+Olm2Ei1ugyjJqX+CwD/ZIpqPOMYfwnMMoZ/Du6mMUXT0gUWQ==
+X-Received: by 2002:adf:b64e:: with SMTP id i14mr2876781wre.248.1561633403981; 
+ Thu, 27 Jun 2019 04:03:23 -0700 (PDT)
+Received: from x1.local (183.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.183])
+ by smtp.gmail.com with ESMTPSA id y18sm6368968wmi.23.2019.06.27.04.03.22
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 27 Jun 2019 04:03:23 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Date: Thu, 27 Jun 2019 12:56:19 +0200
-Message-Id: <1561632985-24866-8-git-send-email-stefan.brankovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1561632985-24866-1-git-send-email-stefan.brankovic@rt-rk.com>
-References: <1561632985-24866-1-git-send-email-stefan.brankovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v4 07/13] target/ppc: Refactor emulation of
- vmrgew and vmrgow instructions
+Date: Thu, 27 Jun 2019 13:02:01 +0200
+Message-Id: <20190627110201.1999-6-f4bug@amsat.org>
+X-Mailer: git-send-email 2.19.1
+In-Reply-To: <20190627110201.1999-1-f4bug@amsat.org>
+References: <20190627110201.1999-1-f4bug@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PATCH 5/5] .travis.yml: Let the avocado job run the
+ 40p tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,132 +97,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: stefan.brankovic@rt-rk.com, hsp.cat7@gmail.com,
- richard.henderson@linaro.org, david@gibson.dropbear.id.au
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ Thomas Huth <huth@tuxfamily.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Kamil Rytarowski <kamil@netbsd.org>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since I found this two instructions implemented with tcg, I refactored
-them so they are consistent with other similar implementations that
-I introduced in this patch.
-
-Also, a new dual macro GEN_VXFORM_TRANS_DUAL is added. This macro is
-used if one instruction is realized with direct translation, and second
-one with a helper.
-
-Signed-off-by: Stefan Brankovic <stefan.brankovic@rt-rk.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- target/ppc/translate/vmx-impl.inc.c | 66 +++++++++++++++++++++----------------
- 1 file changed, 37 insertions(+), 29 deletions(-)
+If this list continues to grow we can
+- split it (as other jobs)
+- move them to GitLab where we can have multi-stage jobs,
+  avocado tests run on top of build jobs.
+---
+ .travis.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index fd25b7c..39fb26d 100644
---- a/target/ppc/translate/vmx-impl.inc.c
-+++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -350,6 +350,28 @@ static void glue(gen_, name0##_##name1)(DisasContext *ctx)             \
-     }                                                                  \
- }
+diff --git a/.travis.yml b/.travis.yml
+index aeb9b211cd..acebf0af1f 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -231,7 +231,7 @@ matrix:
  
-+/*
-+ * We use this macro if one instruction is realized with direct
-+ * translation, and second one with helper.
-+ */
-+#define GEN_VXFORM_TRANS_DUAL(name0, flg0, flg2_0, name1, flg1, flg2_1)\
-+static void glue(gen_, name0##_##name1)(DisasContext *ctx)             \
-+{                                                                      \
-+    if ((Rc(ctx->opcode) == 0) &&                                      \
-+        ((ctx->insns_flags & flg0) || (ctx->insns_flags2 & flg2_0))) { \
-+        if (unlikely(!ctx->altivec_enabled)) {                         \
-+            gen_exception(ctx, POWERPC_EXCP_VPU);                      \
-+            return;                                                    \
-+        }                                                              \
-+        trans_##name0(ctx);                                            \
-+    } else if ((Rc(ctx->opcode) == 1) &&                               \
-+        ((ctx->insns_flags & flg1) || (ctx->insns_flags2 & flg2_1))) { \
-+        gen_##name1(ctx);                                              \
-+    } else {                                                           \
-+        gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);            \
-+    }                                                                  \
-+}
-+
- /* Adds support to provide invalid mask */
- #define GEN_VXFORM_DUAL_EXT(name0, flg0, flg2_0, inval0,                \
-                             name1, flg1, flg2_1, inval1)                \
-@@ -431,20 +453,13 @@ GEN_VXFORM(vmrglb, 6, 4);
- GEN_VXFORM(vmrglh, 6, 5);
- GEN_VXFORM(vmrglw, 6, 6);
- 
--static void gen_vmrgew(DisasContext *ctx)
-+static void trans_vmrgew(DisasContext *ctx)
- {
--    TCGv_i64 tmp;
--    TCGv_i64 avr;
--    int VT, VA, VB;
--    if (unlikely(!ctx->altivec_enabled)) {
--        gen_exception(ctx, POWERPC_EXCP_VPU);
--        return;
--    }
--    VT = rD(ctx->opcode);
--    VA = rA(ctx->opcode);
--    VB = rB(ctx->opcode);
--    tmp = tcg_temp_new_i64();
--    avr = tcg_temp_new_i64();
-+    int VT = rD(ctx->opcode);
-+    int VA = rA(ctx->opcode);
-+    int VB = rB(ctx->opcode);
-+    TCGv_i64 tmp = tcg_temp_new_i64();
-+    TCGv_i64 avr = tcg_temp_new_i64();
- 
-     get_avr64(avr, VB, true);
-     tcg_gen_shri_i64(tmp, avr, 32);
-@@ -462,21 +477,14 @@ static void gen_vmrgew(DisasContext *ctx)
-     tcg_temp_free_i64(avr);
- }
- 
--static void gen_vmrgow(DisasContext *ctx)
-+static void trans_vmrgow(DisasContext *ctx)
- {
--    TCGv_i64 t0, t1;
--    TCGv_i64 avr;
--    int VT, VA, VB;
--    if (unlikely(!ctx->altivec_enabled)) {
--        gen_exception(ctx, POWERPC_EXCP_VPU);
--        return;
--    }
--    VT = rD(ctx->opcode);
--    VA = rA(ctx->opcode);
--    VB = rB(ctx->opcode);
--    t0 = tcg_temp_new_i64();
--    t1 = tcg_temp_new_i64();
--    avr = tcg_temp_new_i64();
-+    int VT = rD(ctx->opcode);
-+    int VA = rA(ctx->opcode);
-+    int VB = rB(ctx->opcode);
-+    TCGv_i64 t0 = tcg_temp_new_i64();
-+    TCGv_i64 t1 = tcg_temp_new_i64();
-+    TCGv_i64 avr = tcg_temp_new_i64();
- 
-     get_avr64(t0, VB, true);
-     get_avr64(t1, VA, true);
-@@ -1052,14 +1060,14 @@ GEN_VXFORM_ENV(vminfp, 5, 17);
- GEN_VXFORM_HETRO(vextublx, 6, 24)
- GEN_VXFORM_HETRO(vextuhlx, 6, 25)
- GEN_VXFORM_HETRO(vextuwlx, 6, 26)
--GEN_VXFORM_DUAL(vmrgow, PPC_NONE, PPC2_ALTIVEC_207,
-+GEN_VXFORM_TRANS_DUAL(vmrgow, PPC_NONE, PPC2_ALTIVEC_207,
-                 vextuwlx, PPC_NONE, PPC2_ISA300)
- GEN_VXFORM_HETRO(vextubrx, 6, 28)
- GEN_VXFORM_HETRO(vextuhrx, 6, 29)
- GEN_VXFORM_HETRO(vextuwrx, 6, 30)
- GEN_VXFORM_TRANS(lvsl, 6, 31)
- GEN_VXFORM_TRANS(lvsr, 6, 32)
--GEN_VXFORM_DUAL(vmrgew, PPC_NONE, PPC2_ALTIVEC_207, \
-+GEN_VXFORM_TRANS_DUAL(vmrgew, PPC_NONE, PPC2_ALTIVEC_207,
-                 vextuwrx, PPC_NONE, PPC2_ISA300)
- 
- #define GEN_VXRFORM1(opname, name, str, opc2, opc3)                     \
+     # Acceptance (Functional) tests
+     - env:
+-        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu"
++        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu,ppc-softmmu"
+         - TEST_CMD="make check-acceptance"
+       after_failure:
+         - cat tests/results/latest/job.log
 -- 
-2.7.4
+2.19.1
 
 
