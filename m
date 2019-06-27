@@ -2,48 +2,48 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6CE2C48BD7
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 14:50:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A9AFC48BD6
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 14:52:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DD3F20644
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 14:50:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DD3F20644
+	by mail.kernel.org (Postfix) with ESMTPS id E5B6720663
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 14:52:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5B6720663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgVjM-0004XI-7m
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 10:50:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53200)
+	id 1hgVlg-0006Od-4P
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 10:52:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53683)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hgViN-0003qq-NG
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 10:49:32 -0400
+ (envelope-from <eblake@redhat.com>) id 1hgVkN-0005jr-DG
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 10:51:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hgViM-0005bY-J9
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 10:49:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39274)
+ (envelope-from <eblake@redhat.com>) id 1hgVkL-0007XJ-Di
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 10:51:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37998)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hgViJ-0005Xe-T8; Thu, 27 Jun 2019 10:49:28 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1hgVkF-0007RD-Ht; Thu, 27 Jun 2019 10:51:29 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AD9A7308792C;
- Thu, 27 Jun 2019 14:49:16 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3CA4281F01;
+ Thu, 27 Jun 2019 14:51:16 +0000 (UTC)
 Received: from [10.3.116.142] (ovpn-116-142.phx2.redhat.com [10.3.116.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0B13B5D9E2;
- Thu, 27 Jun 2019 14:49:14 +0000 (UTC)
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20190626024942.29758-1-eblake@redhat.com>
- <20190626082251.GA29008@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2168E19C59;
+ Thu, 27 Jun 2019 14:51:11 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
+References: <20190626215301.30733-1-jsnow@redhat.com>
+ <20190627083453.GC5618@localhost.localdomain>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,21 +70,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <a3418db6-4bb4-029e-8a5d-d9e6b1185f22@redhat.com>
-Date: Thu, 27 Jun 2019 09:49:13 -0500
+Message-ID: <13d0a05e-a445-39e1-841b-d84c5e5352b2@redhat.com>
+Date: Thu, 27 Jun 2019 09:51:10 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190626082251.GA29008@redhat.com>
+In-Reply-To: <20190627083453.GC5618@localhost.localdomain>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="81nyKszan7JznHVnDF0oukyREiD8CX17T"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ boundary="chbRJbj9PxXYEIZv07mxyGxiHNC4JzD2C"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Thu, 27 Jun 2019 14:49:26 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.25]); Thu, 27 Jun 2019 14:51:20 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] qemu-nbd: Permit TLS with Unix sockets
+Subject: Re: [Qemu-devel] [PATCH] block/qcow: Improve error when opening
+ qcow2 files as qcow
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,69 +97,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org,
- "open list:Network Block Dev..." <qemu-block@nongnu.org>, rjones@redhat.com
+Cc: Qemu-Trivial <qemu-trivial@nongnu.org>, radmehrsaeed7@gmail.com,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---81nyKszan7JznHVnDF0oukyREiD8CX17T
-Content-Type: multipart/mixed; boundary="2lt1Gz2OEMriVusTW0rAwfBqJrtegOaZj";
+--chbRJbj9PxXYEIZv07mxyGxiHNC4JzD2C
+Content-Type: multipart/mixed; boundary="ZdcMIC0mldM7erXSWOfpOBTXfJwXbkGnZ";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, rjones@redhat.com,
- "open list:Network Block Dev..." <qemu-block@nongnu.org>
-Message-ID: <a3418db6-4bb4-029e-8a5d-d9e6b1185f22@redhat.com>
-Subject: Re: [PATCH] qemu-nbd: Permit TLS with Unix sockets
-References: <20190626024942.29758-1-eblake@redhat.com>
- <20190626082251.GA29008@redhat.com>
-In-Reply-To: <20190626082251.GA29008@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: Qemu-Trivial <qemu-trivial@nongnu.org>, radmehrsaeed7@gmail.com,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Message-ID: <13d0a05e-a445-39e1-841b-d84c5e5352b2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] block/qcow: Improve error when opening qcow2
+ files as qcow
+References: <20190626215301.30733-1-jsnow@redhat.com>
+ <20190627083453.GC5618@localhost.localdomain>
+In-Reply-To: <20190627083453.GC5618@localhost.localdomain>
 
---2lt1Gz2OEMriVusTW0rAwfBqJrtegOaZj
+--ZdcMIC0mldM7erXSWOfpOBTXfJwXbkGnZ
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 6/26/19 3:22 AM, Daniel P. Berrang=C3=A9 wrote:
-> On Tue, Jun 25, 2019 at 09:49:42PM -0500, Eric Blake wrote:
->> Although you generally won't use encryption with a Unix socket (after
->> all, everything is local, so why waste the CPU power), there are
->> situations in testsuites where Unix sockets are much nicer than TCP
->> sockets.  Since nbdkit allows encryption over both types of sockets,
->> it makes sense for qemu-nbd to do likewise.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
+On 6/27/19 3:34 AM, Kevin Wolf wrote:
+> Am 26.06.2019 um 23:53 hat John Snow geschrieben:
+>> Reported-by: radmehrsaeed7@gmail.com
+>> Fixes: https://bugs.launchpad.net/bugs/1832914
+>> Signed-off-by: John Snow <jsnow@redhat.com>
 >> ---
->>  qemu-nbd.c | 4 ----
->>  1 file changed, 4 deletions(-)
+>>  block/qcow.c | 7 ++++++-
+>>  1 file changed, 6 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/block/qcow.c b/block/qcow.c
+>> index 6dee5bb792..a9cb6ae0bd 100644
+>> --- a/block/qcow.c
+>> +++ b/block/qcow.c
+>> @@ -156,7 +156,12 @@ static int qcow_open(BlockDriverState *bs, QDict =
+*options, int flags,
+>>          goto fail;
+>>      }
+>>      if (header.version !=3D QCOW_VERSION) {
+>> -        error_setg(errp, "Unsupported qcow version %" PRIu32, header.=
+version);
+>> +        error_setg(errp, "qcow (v%d) does not support qcow version %"=
+ PRIu32,
+>> +                   QCOW_VERSION, header.version);
+>> +        if (header.version =3D=3D 2 || header.version =3D=3D 3) {
+>> +            error_append_hint(errp, "Try the 'qcow2' driver instead."=
+);
 >=20
-> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> I think we want a \n at the end here.
 >=20
->=20
-> Do you need something on the client side too ?
 
-The proposal that Rich is working on for standardized NBD URIs [1] says
-that we need a patch to support nbds://host/export and
-nbds+unix://export?socket=3D/path as ways to request an encrypted client
-connection with default encryption parameters. For anything more
-complex, we have to use --imageopts and request an encrypted connection
-by parts - but the QAPI schema already permits us to pass in an
-'tls-creds' parameter for both TCP and Unix sockets, so no, I don't
-think we need any client side changes at this point.
+Yes, we do. Good spot.
 
-I do, however, plan to test that 'qemu-nbd --list -k socket --tls...'
-works (I think it does, and it can be used even without this patch
-against nbdkit as server...), prior to taking this patch through my NBD
-tree.
-
-[1] https://lists.debian.org/nbd/2019/06/msg00011.html
-
+> Kevin
 >=20
->=20
-> Regards,
-> Daniel
 >=20
 
 --=20
@@ -167,24 +165,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---2lt1Gz2OEMriVusTW0rAwfBqJrtegOaZj--
+--ZdcMIC0mldM7erXSWOfpOBTXfJwXbkGnZ--
 
---81nyKszan7JznHVnDF0oukyREiD8CX17T
+--chbRJbj9PxXYEIZv07mxyGxiHNC4JzD2C
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0U12oACgkQp6FrSiUn
-Q2oZYwf9FJ6+kzLkI5892MoelngDpnLj2YvH0LGx0ZaW9lvXuTXqJ0KIZvOY3pSw
-3KDsUEH0HqQwiemTVNzxlR+e+QQ2YT5g6ica6yoMkqQXSDRlntdVpxUhkgC9f3b1
-6JLZ4F7CHG0Ej6cPqs4OCLmWFUhAPEnAe1NWIYypxifWW30DGBY4RSZYR/sua+HN
-HLwAUCgDfHUXpXMurQ7rkvltJA93AnP1L5QIZM8graNThXnjvUX6jcCiZ+b4O2tY
-iuAGnYo2gajrgU3EqeeM8fD83/FQIRCYx9yypgZcXDcMCo4sJyN5T3JhByntOjO/
-/Gf5YcshyJWwDzxWqb8dZzItREzWQQ==
-=n5Lm
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0U194ACgkQp6FrSiUn
+Q2qXMQgAqJhuAfXHl7msQ+TrN6jRNOMQFybOG+7J0dekRdWJCmxSkLJDHuTLbF8K
+pSe/RTEcuDAb6iaUFY5blZSVKGX2zx1KV0DnU4vM7xAG9Ml3uaVzvJbnTrZSVhD/
+akrx0aCVX/sfqolmEm/RctlrhjPoVHzqU0TQGkC7ewpYzWBuMKqWCqpuWBLehmJm
+cD66Y5R1hLQSeFsKeJn0n8LN/CUu2s5zzFcxNknX5fbKn8gGrYO8vPshJk7pcRJ+
+O+FVfaGegjOl6bsdSEgV2VH2J4mY2mGhAK/VR0JPBnEWnC61Nbj6au7oPehmiCIT
+o54Mp1UawjRLXrc19/15XYIadOwmVQ==
+=jYst
 -----END PGP SIGNATURE-----
 
---81nyKszan7JznHVnDF0oukyREiD8CX17T--
+--chbRJbj9PxXYEIZv07mxyGxiHNC4JzD2C--
 
