@@ -2,62 +2,102 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A8B3C48BD9
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 17:28:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4857C48BD9
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 17:29:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63CB02064A
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 17:28:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63CB02064A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id AE2142133F
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 17:29:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE2142133F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgYBk-0003Bc-NW
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 13:28:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34003)
+	id 1hgYCq-0003zP-VX
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 13:29:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34280)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <groug@kaod.org>) id 1hgYAL-0001v7-14
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 13:26:34 -0400
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hgYBQ-0002yb-RT
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 13:27:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1hgYAJ-0006UR-GT
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 13:26:32 -0400
-Received: from 18.mo5.mail-out.ovh.net ([178.33.45.10]:38673)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1hgYAJ-0006ST-6D
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 13:26:31 -0400
-Received: from player756.ha.ovh.net (unknown [10.108.35.74])
- by mo5.mail-out.ovh.net (Postfix) with ESMTP id C20B224078E
- for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 19:26:27 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player756.ha.ovh.net (Postfix) with ESMTPSA id E1E5D68335FD;
- Thu, 27 Jun 2019 17:26:23 +0000 (UTC)
-Date: Thu, 27 Jun 2019 19:26:22 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org>
-Message-ID: <20190627192622.6f49dc0a@bahia.lan>
-In-Reply-To: <26b626706b5fa0c492413a3279512c17952be5de.1561575449.git.qemu_oss@crudebyte.com>
-References: <cover.1561575449.git.qemu_oss@crudebyte.com>
- <26b626706b5fa0c492413a3279512c17952be5de.1561575449.git.qemu_oss@crudebyte.com>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hgYBP-0007pA-OO
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 13:27:40 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:36274
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1hgYBN-0006Vz-W1
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 13:27:39 -0400
+Received: from host86-173-229-95.range86-173.btcentralplus.com
+ ([86.173.229.95] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1hgY7m-0007HL-RW; Thu, 27 Jun 2019 18:23:55 +0100
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Richard Henderson <richard.henderson@linaro.org>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+References: <20190519041522.12327-1-richard.henderson@linaro.org>
+ <8f28d008-2608-a579-7505-4546b08deb41@linaro.org>
+ <085d6881-f518-9888-a13e-081cdc09de46@ilande.co.uk>
+ <0b9f4772-37f6-1453-e4ea-5ad9d0f52a5b@ilande.co.uk>
+ <acc57487-c8a0-9380-bc2a-4de22541eabf@ilande.co.uk>
+ <CAL1e-=iavFqEeFuNm2efVM7mu5OaABBVo90wqJEhmoWa4DQv=Q@mail.gmail.com>
+ <ffae3651-5daf-e008-6562-2de09d82ace9@linaro.org>
+ <b8aab3f4-e3eb-a137-62b4-ba5ac1a2ad8f@ilande.co.uk>
+ <68facefc-b801-4902-11c0-4542662bfc4e@linaro.org>
+ <d2c1f979-7ff2-946e-4863-c1be19c5f003@ilande.co.uk>
+ <16f26b7f-2435-aa05-66a3-073e8310d5c8@linaro.org>
+ <0ceec012-fcdc-ccde-291a-121a4e475f86@ilande.co.uk>
+ <7b1699e1-28ca-a58f-787e-c0ca11666b90@linaro.org>
+ <9502af13-22b9-031e-2ba9-ec4ff75ccd0e@ilande.co.uk>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <cd1a0635-5b5d-3c2d-dec3-4ceda8c789f9@ilande.co.uk>
+Date: Thu, 27 Jun 2019 18:24:21 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 18177372523683092800
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrudekgdduudehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+In-Reply-To: <9502af13-22b9-031e-2ba9-ec4ff75ccd0e@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.173.229.95
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.45.10
-Subject: Re: [Qemu-devel] [PATCH v4 2/5] 9p: Treat multiple devices on one
- export as an error
+X-Received-From: 46.43.2.167
+Subject: Re: [Qemu-devel] [PATCH v4 0/7] tcg/ppc: Add vector opcodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,250 +109,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>,
- Antonios Motakis <antonios.motakis@huawei.com>
+Cc: Howard Spoelstra <hsp.cat7@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 26 Jun 2019 20:30:41 +0200
-Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org> wrote:
+On 26/06/2019 20:38, Mark Cave-Ayland wrote:
 
-> The QID path should uniquely identify a file. However, the
-> inode of a file is currently used as the QID path, which
-> on its own only uniquely identifies wiles within a device.
-
-s/wile/files
-
-> Here we track the device hosting the 9pfs share, in order
-> to prevent security issues with QID path collisions from
-> other devices.
+>> But I thought that _CALL_AIX was only defined for ppc64 elf version 1.  I
+>> thought that ppc32 used _CALL_SYSV instead.  Certainly that's what is used
+>> elsewhere...
 > 
-> Signed-off-by: Antonios Motakis <antonios.motakis@huawei.com>
-
-You should mention here the changes you made to the original patch.
-
-> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> ---
->  hw/9pfs/9p.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++++------------
->  hw/9pfs/9p.h |  1 +
->  2 files changed, 58 insertions(+), 14 deletions(-)
+> No, that didn't work either. I've confirmed using #ifdef _CALL_AIX #error ERROR
+> #endif that _CALL_AIX is *NOT* defined and _CALL_SYSV *is* defined.
 > 
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index 586a6dccba..cbaa212625 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -572,10 +572,20 @@ static void coroutine_fn virtfs_reset(V9fsPDU *pdu)
->                                  P9_STAT_MODE_SOCKET)
->  
->  /* This is the algorithm from ufs in spfs */
-> -static void stat_to_qid(const struct stat *stbuf, V9fsQID *qidp)
-> +static int stat_to_qid(V9fsPDU *pdu, const struct stat *stbuf, V9fsQID *qidp)
->  {
->      size_t size;
->  
-> +    if (pdu->s->dev_id == 0) {
-> +        pdu->s->dev_id = stbuf->st_dev;
+> I've also tried removing TCG_REG_R2 from tcg_target_reg_alloc_order[] and
+> tcg_regset_set_reg() for TCG_REG_R2 from tcg_target_init() and I'm still generating
+> bad code that writes to r2(!).
+> 
+> Since I can't find any other mentions of TCG_REG_TMP1 and TCG_REG_R2 that isn't
+> inside an #ifdef _CALL_AIX ... #endif section I'm starting to get stuck. Is there any
+> chance that the R_PPC_ADDR32 change could be causing this at all?
 
-st_dev should be captured in v9fs_device_realize_common() since we
-lstat() the root there, instead of every request doing the check.
+So after a lot more digging: the issue can be seen in tcg_out_ld() and tcg_out_st()
+for the vector registers. Taking tcg_out_ld() as an example:
 
-> +    } else if (pdu->s->dev_id != stbuf->st_dev) {
-> +        error_report_once(
-> +            "9p: Multiple devices detected in same VirtFS export. "
-> +            "You must use a separate export for each device."
-> +        );
-> +        return -ENOSYS;
+    case TCG_TYPE_V128:
+        tcg_debug_assert(ret >= 32);
+        assert((offset & 15) == 0);
+        tcg_out_mem_long(s, 0, LVX, ret & 31, base, offset);
+        break;
 
-This error is likely to end up as the return value of a
-syscall in the guest and -ENOSYS usually means the syscall
-isn't implemented, which is obviously not the case. Maybe
-return -EPERM instead ?
+For the TCG_TYPE_V128 case we have ret = TCG_REG_V2 but (ret & 31) masks off the top
+bit which converts this to TCG_REG_R2 and that's why tcg_out_mem_long() starts using
+r2 to calculate offsets.
 
-> +    }
-> +
->      memset(&qidp->path, 0, sizeof(qidp->path));
->      size = MIN(sizeof(stbuf->st_ino), sizeof(qidp->path));
->      memcpy(&qidp->path, &stbuf->st_ino, size);
-> @@ -587,6 +597,8 @@ static void stat_to_qid(const struct stat *stbuf, V9fsQID *qidp)
->      if (S_ISLNK(stbuf->st_mode)) {
->          qidp->type |= P9_QID_TYPE_SYMLINK;
->      }
-> +
-> +    return 0;
->  }
->  
->  static int coroutine_fn fid_to_qid(V9fsPDU *pdu, V9fsFidState *fidp,
-> @@ -599,7 +611,10 @@ static int coroutine_fn fid_to_qid(V9fsPDU *pdu, V9fsFidState *fidp,
->      if (err < 0) {
->          return err;
->      }
-> -    stat_to_qid(&stbuf, qidp);
-> +    err = stat_to_qid(pdu, &stbuf, qidp);
-> +    if (err < 0) {
-> +        return err;
-> +    }
->      return 0;
->  }
->  
-> @@ -830,7 +845,10 @@ static int coroutine_fn stat_to_v9stat(V9fsPDU *pdu, V9fsPath *path,
->  
->      memset(v9stat, 0, sizeof(*v9stat));
->  
-> -    stat_to_qid(stbuf, &v9stat->qid);
-> +    err = stat_to_qid(pdu, stbuf, &v9stat->qid);
-> +    if (err < 0) {
-> +        return err;
-> +    }
->      v9stat->mode = stat_to_v9mode(stbuf);
->      v9stat->atime = stbuf->st_atime;
->      v9stat->mtime = stbuf->st_mtime;
-> @@ -891,7 +909,7 @@ static int coroutine_fn stat_to_v9stat(V9fsPDU *pdu, V9fsPath *path,
->  #define P9_STATS_ALL           0x00003fffULL /* Mask for All fields above */
->  
->  
-> -static void stat_to_v9stat_dotl(V9fsState *s, const struct stat *stbuf,
-> +static int stat_to_v9stat_dotl(V9fsPDU *pdu, const struct stat *stbuf,
->                                  V9fsStatDotl *v9lstat)
->  {
->      memset(v9lstat, 0, sizeof(*v9lstat));
-> @@ -913,7 +931,7 @@ static void stat_to_v9stat_dotl(V9fsState *s, const struct stat *stbuf,
->      /* Currently we only support BASIC fields in stat */
->      v9lstat->st_result_mask = P9_STATS_BASIC;
->  
-> -    stat_to_qid(stbuf, &v9lstat->qid);
-> +    return stat_to_qid(pdu, stbuf, &v9lstat->qid);
->  }
->  
->  static void print_sg(struct iovec *sg, int cnt)
-> @@ -1115,7 +1133,6 @@ static void coroutine_fn v9fs_getattr(void *opaque)
->      uint64_t request_mask;
->      V9fsStatDotl v9stat_dotl;
->      V9fsPDU *pdu = opaque;
-> -    V9fsState *s = pdu->s;
->  
->      retval = pdu_unmarshal(pdu, offset, "dq", &fid, &request_mask);
->      if (retval < 0) {
-> @@ -1136,7 +1153,10 @@ static void coroutine_fn v9fs_getattr(void *opaque)
->      if (retval < 0) {
->          goto out;
->      }
-> -    stat_to_v9stat_dotl(s, &stbuf, &v9stat_dotl);
-> +    retval = stat_to_v9stat_dotl(pdu, &stbuf, &v9stat_dotl);
-> +    if (retval < 0) {
-> +        goto out;
-> +    }
->  
->      /*  fill st_gen if requested and supported by underlying fs */
->      if (request_mask & P9_STATS_GEN) {
-> @@ -1381,7 +1401,10 @@ static void coroutine_fn v9fs_walk(void *opaque)
->              if (err < 0) {
->                  goto out;
->              }
-> -            stat_to_qid(&stbuf, &qid);
-> +            err = stat_to_qid(pdu, &stbuf, &qid);
-> +            if (err < 0) {
-> +                goto out;
-> +            }
->              v9fs_path_copy(&dpath, &path);
->          }
->          memcpy(&qids[name_idx], &qid, sizeof(qid));
-> @@ -1483,7 +1506,10 @@ static void coroutine_fn v9fs_open(void *opaque)
->      if (err < 0) {
->          goto out;
->      }
-> -    stat_to_qid(&stbuf, &qid);
-> +    err = stat_to_qid(pdu, &stbuf, &qid);
-> +    if (err < 0) {
-> +        goto out;
-> +    }
->      if (S_ISDIR(stbuf.st_mode)) {
->          err = v9fs_co_opendir(pdu, fidp);
->          if (err < 0) {
-> @@ -1593,7 +1619,10 @@ static void coroutine_fn v9fs_lcreate(void *opaque)
->          fidp->flags |= FID_NON_RECLAIMABLE;
->      }
->      iounit =  get_iounit(pdu, &fidp->path);
-> -    stat_to_qid(&stbuf, &qid);
-> +    err = stat_to_qid(pdu, &stbuf, &qid);
-> +    if (err < 0) {
-> +        goto out;
-> +    }
->      err = pdu_marshal(pdu, offset, "Qd", &qid, iounit);
->      if (err < 0) {
->          goto out;
-> @@ -2327,7 +2356,10 @@ static void coroutine_fn v9fs_create(void *opaque)
->          }
->      }
->      iounit = get_iounit(pdu, &fidp->path);
-> -    stat_to_qid(&stbuf, &qid);
-> +    err = stat_to_qid(pdu, &stbuf, &qid);
-> +    if (err < 0) {
-> +        goto out;
-> +    }
->      err = pdu_marshal(pdu, offset, "Qd", &qid, iounit);
->      if (err < 0) {
->          goto out;
-> @@ -2384,7 +2416,10 @@ static void coroutine_fn v9fs_symlink(void *opaque)
->      if (err < 0) {
->          goto out;
->      }
-> -    stat_to_qid(&stbuf, &qid);
-> +    err = stat_to_qid(pdu, &stbuf, &qid);
-> +    if (err < 0) {
-> +        goto out;
-> +    }
->      err =  pdu_marshal(pdu, offset, "Q", &qid);
->      if (err < 0) {
->          goto out;
-> @@ -3064,7 +3099,10 @@ static void coroutine_fn v9fs_mknod(void *opaque)
->      if (err < 0) {
->          goto out;
->      }
-> -    stat_to_qid(&stbuf, &qid);
-> +    err = stat_to_qid(pdu, &stbuf, &qid);
-> +    if (err < 0) {
-> +        goto out;
-> +    }
->      err = pdu_marshal(pdu, offset, "Q", &qid);
->      if (err < 0) {
->          goto out;
-> @@ -3222,7 +3260,10 @@ static void coroutine_fn v9fs_mkdir(void *opaque)
->      if (err < 0) {
->          goto out;
->      }
-> -    stat_to_qid(&stbuf, &qid);
-> +    err = stat_to_qid(pdu, &stbuf, &qid);
-> +    if (err < 0) {
-> +        goto out;
-> +    }
->      err = pdu_marshal(pdu, offset, "Q", &qid);
->      if (err < 0) {
->          goto out;
-> @@ -3633,6 +3674,8 @@ int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
->          goto out;
->      }
->  
-> +    s->dev_id = 0;
-> +
+Assuming that rt is the temporary register used to calculate the address then the
+patch below tentatively appears to get things working again by passing in
+TCG_REG_TMP1 instead, but ultimately I still see a crash much later when trying to
+boot MacOS 9:
 
-Set it to stat->st_dev after lstat() was called later in this function.
+diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
+index 61732c1f45..dd823447cc 100644
+--- a/tcg/ppc/tcg-target.inc.c
++++ b/tcg/ppc/tcg-target.inc.c
+@@ -1139,7 +1139,7 @@ static void tcg_out_ld(TCGContext *s, TCGType type, TCGReg ret,
+     case TCG_TYPE_V64:
+         tcg_debug_assert(ret >= 32);
+         assert((offset & 7) == 0);
+-        tcg_out_mem_long(s, 0, LVX, ret & 31, base, offset & -16);
++        tcg_out_mem_long(s, 0, LVX, TCG_REG_TMP1, base, offset & -16);
+         if (offset & 8) {
+             tcg_out_vsldoi(s, ret, ret, ret, 8);
+         }
+@@ -1147,7 +1147,7 @@ static void tcg_out_ld(TCGContext *s, TCGType type, TCGReg ret,
+     case TCG_TYPE_V128:
+         tcg_debug_assert(ret >= 32);
+         assert((offset & 15) == 0);
+-        tcg_out_mem_long(s, 0, LVX, ret & 31, base, offset);
++        tcg_out_mem_long(s, 0, LVX, TCG_REG_TMP1, base, offset);
+         break;
+     default:
+         g_assert_not_reached();
+@@ -1186,12 +1186,13 @@ static void tcg_out_st(TCGContext *s, TCGType type, TCGReg arg,
+             tcg_out_vsldoi(s, TCG_VEC_TMP1, arg, arg, 8);
+             arg = TCG_VEC_TMP1;
+         }
+-        tcg_out_mem_long(s, 0, STVEWX, arg & 31, base, offset);
+-        tcg_out_mem_long(s, 0, STVEWX, arg & 31, base, offset + 4);
++        tcg_out_mem_long(s, 0, STVEWX, TCG_REG_TMP1, base, offset);
++        tcg_out_mem_long(s, 0, STVEWX, TCG_REG_TMP1, base, offset + 4);
+         break;
+     case TCG_TYPE_V128:
+         tcg_debug_assert(arg >= 32);
+-        tcg_out_mem_long(s, 0, STVX, arg & 31, base, offset);
++        assert((offset & 15) == 0);
++        tcg_out_mem_long(s, 0, STVX, TCG_REG_TMP1, base, offset);
+         break;
+     default:
+         g_assert_not_reached();
 
->      s->ctx.fst = &fse->fst;
->      fsdev_throttle_init(s->ctx.fst);
->  
-> diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-> index 8883761b2c..5e316178d5 100644
-> --- a/hw/9pfs/9p.h
-> +++ b/hw/9pfs/9p.h
-> @@ -256,6 +256,7 @@ struct V9fsState
->      Error *migration_blocker;
->      V9fsConf fsconf;
->      V9fsQID root_qid;
-> +    dev_t dev_id;
->  };
->  
->  /* 9p2000.L open flags */
+Richard: even though it's still not perfect, does this look like it's fixing the
+right problem? Presumably the reason this didn't break on your Power 9 box is because
+the 64-bit ABI doesn't mark r2 as reserved?
 
+
+ATB,
+
+Mark.
 
