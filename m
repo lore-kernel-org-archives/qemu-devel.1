@@ -2,70 +2,71 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7EE1C48BE4
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 19:44:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3A76C48BD7
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 19:44:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C866F20665
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 19:44:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C866F20665
+	by mail.kernel.org (Postfix) with ESMTPS id 92BCB20665
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 19:44:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92BCB20665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgaJs-0001UW-Up
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 15:44:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35595)
+	id 1hgaK5-0001xc-SI
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 15:44:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35838)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <wainersm@redhat.com>) id 1hgaHd-0000Nq-6b
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 15:42:14 -0400
+ (envelope-from <jdillama@redhat.com>) id 1hgaIy-0000lk-On
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 15:43:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wainersm@redhat.com>) id 1hgaHY-0006zZ-Qr
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 15:42:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40158)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wainersm@redhat.com>)
- id 1hgaHR-0006FS-Od; Thu, 27 Jun 2019 15:42:01 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B13843091782;
- Thu, 27 Jun 2019 19:41:12 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-123-99.rdu2.redhat.com
- [10.10.123.99])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ECC5619C4F;
- Thu, 27 Jun 2019 19:41:07 +0000 (UTC)
-To: Andrea Bolognani <abologna@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Cleber Rosa <crosa@redhat.com>
-References: <20190620222314.2670-1-wainersm@redhat.com>
- <CAFEAcA92m9n7FR2a6=ecnr5bn-Sq97LZRxHRuzWO-OcbdgA4fw@mail.gmail.com>
- <20190621190421.GA679@localhost.localdomain>
- <CAFEAcA-x_GSxiULrxvRj7dtCLM-r4YvRpwkVosW+1SutAUJMoA@mail.gmail.com>
- <7745c47186278c1b7f1781c9173ef0e2e8a55910.camel@redhat.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <edd405bc-c2cd-da6f-ed8b-5ec7e6873a0e@redhat.com>
-Date: Thu, 27 Jun 2019 16:41:05 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.5.2
+ (envelope-from <jdillama@redhat.com>) id 1hgaIx-000898-3f
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 15:43:36 -0400
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:41034)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <jdillama@redhat.com>) id 1hgaIw-0007tV-Ra
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 15:43:35 -0400
+Received: by mail-ed1-f68.google.com with SMTP id p15so8216962eds.8
+ for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 12:43:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=m+d0tuHeVHIMXnv4fsPW+FtogfiC4MyqLxUp/LqOTd0=;
+ b=aYtUuL3mmZsk1nuAAIPVN6eg6/ODbpSzyRV6hGdgeOemiMcNquhWwYyUYV00HA94SI
+ tez+0i3OaMSub9NTmmLbcuxrLp4ZtSXF97seKJqsaSIySTlsnWNjrFJnjTEhvg7+294s
+ eU4M4+4M89c6g0T4l1KcNgHjDE693kbyqrzaH0UeL1DlqDzsrQtpqDEeVyOYPP+mRxCX
+ /g/OlslUPgBh8CvkS+nCJR2sUPd+mzQgj0N57ASXSFGnEuEfJzIiTFFcue4fxLedoy9Q
+ aADEU+FwAIhvULrfetMauVAb0IVD6WQHxwRMKbw5VoTzAJXeAFvajNAv+Bnrqk0d8rmQ
+ LgKg==
+X-Gm-Message-State: APjAAAW1PlUJtSFMe575R3DG2IhK+NtnOYQMiDs0E1BH7eoZrjt3HZ5m
+ 3Na6c4gUVrrU7tFxziPPBPaUDlLNLDH8uBpkNBflJA==
+X-Google-Smtp-Source: APXvYqyB184lGGjgErVP88OtKM5py+ZQ4erDAvtJkr3MVwlRQ51xbPAKPjWDQIymJ49nZbW5a0dbrLBUEj+0ABrPqak=
+X-Received: by 2002:a05:6402:12d2:: with SMTP id
+ k18mr6383611edx.197.1561664595564; 
+ Thu, 27 Jun 2019 12:43:15 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <7745c47186278c1b7f1781c9173ef0e2e8a55910.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Thu, 27 Jun 2019 19:41:17 +0000 (UTC)
+References: <20190510153346.238366-1-sgarzare@redhat.com>
+ <96429d33-6514-33b5-3fe8-7bdf2eccc8d9@redhat.com>
+ <20190627084816.u6fj556uen3iqa3r@steredhat.homenet.telecomitalia.it>
+ <b7aaa681-12ae-e256-e295-06e953dc51ff@redhat.com>
+In-Reply-To: <b7aaa681-12ae-e256-e295-06e953dc51ff@redhat.com>
+From: Jason Dillaman <jdillama@redhat.com>
+Date: Thu, 27 Jun 2019 15:43:04 -0400
+Message-ID: <CA+aFP1Btm6O5R0fiNZmBjHOO8t9ZDvvVgH0i1vFHsrQq85d+bA@mail.gmail.com>
+To: John Snow <jsnow@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-arm] [RFC v2 PATCH] hw/arm/virt: makes virt
- a default machine type
+ [fuzzy]
+X-Received-From: 209.85.208.68
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] block/rbd: implement
+ .bdrv_get_allocated_file_size callback
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,62 +78,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: dillaman@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
+ qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 06/24/2019 05:37 AM, Andrea Bolognani wrote:
-> On Sat, 2019-06-22 at 16:58 +0100, Peter Maydell wrote:
->> On Fri, 21 Jun 2019 at 20:04, Cleber Rosa <crosa@redhat.com> wrote:
->>> You can consider me biased (I do consider myself), but trying to wear
->>> the hat of a user first interacting with QEMU, I would expect a (any)
->>> reasonably capable environment that can represent the given target.
->>> That will probably be a different environment than the one I may need,
->>> and I think that's fine.
->> I'm really not sure what you're trying to suggest here; maybe
->> you could clarify? If you specify a target (ie a machine type),
->> you get that machine type. If you don't specify a target, then
->> we can't really guess what you were hoping to run and
->> magically pick something that works.
->>
->> The main problem here is that users expect "all the world is a PC"
->> type behaviour, ie they can just provide qemu-system-arm or
->> qemu-system-aarch64 with no command line arguments except
->> a guest kernel (which is half the time something they found under
->> a rock or extracted from some firmware image) or a guest CDROM
->> image and have it boot, because that generally works for x86. It
->> doesn't and can't work for Arm, because of the much greater
->> diversity of machine types and the way that kernels are often
->> only compiled to work on a specific subset of machines.
->> Making the user specify a machine type means they do at least
->> get prompted that the world is more complicated than they
->> think it is and there are decisions that have to be made.
->>
->> In any case even if we did default to "virt" the user still
->> has to specify a CPU type, may well also want to provide
->> a GIC version (gicv3 being better than the default v2),
->> likely more RAM than the very small default, they need to provide
->> all the virtio devices, and so on and so on. So giving
->> them one option they no longer need to specify doesn't
->> really make it any easier IMHO.
-> Additional note on GIC: most server-grade machines you can buy today
-> do *not* support GICv2, so you will need to opt-in to GICv3 if you
-> want your guest to even start.
+On Thu, Jun 27, 2019 at 1:24 PM John Snow <jsnow@redhat.com> wrote:
 >
-> More generally, as someone who has worked on supporting non-x86
-> guests in libvirt for the past few years, I can tell you from
-> experience that you're always going to need some arch-specific logic
-> to deal with the small (and not so small :) differences in behavior
-> between QEMU targets: as Peter correctly says, machine type is just
-> a single example among many.
 >
+>
+> On 6/27/19 4:48 AM, Stefano Garzarella wrote:
+> > On Wed, Jun 26, 2019 at 05:04:25PM -0400, John Snow wrote:
+> >> It looks like this has hit a 30 day expiration without any reviews or
+> >> being merged; do we still want this? If so, can you please resend?
+> >
+> > Yes, I think we still want :)
+> >
+> > Is it okay if I send a v3 following your comments?
+> >
+>
+> Yes, but I don't know who is responsible for final approval; I guess
+> that's Josh Durgin?
 
-So NACK this patch. I will attempt to address the problem of broken 
-acceptance tests on avocado_qemu side.
+I'm the new (for the past several years) upstream PTL for RBD, so feel
+free to tag me.
 
-Thanks Peter, Cleber and Andrea for sharing your opinion.
+> >>
+> >> On 5/10/19 11:33 AM, Stefano Garzarella wrote:
+> >>> This patch allows 'qemu-img info' to show the 'disk size' for
+> >>> the RBD images that have the fast-diff feature enabled.
+> >>>
+> >>> If this feature is enabled, we use the rbd_diff_iterate2() API
+> >>> to calculate the allocated size for the image.
+> >>>
+> >>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> >>> ---
+> >>> v2:
+> >>>   - calculate the actual usage only if the fast-diff feature is
+> >>>     enabled [Jason]
+> >>> ---
+> >>>  block/rbd.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >>>  1 file changed, 54 insertions(+)
+> >>>
+> >>> diff --git a/block/rbd.c b/block/rbd.c
+> >>> index 0c549c9935..f1bc76ab80 100644
+> >>> --- a/block/rbd.c
+> >>> +++ b/block/rbd.c
+> >>> @@ -1046,6 +1046,59 @@ static int64_t qemu_rbd_getlength(BlockDriverState *bs)
+> >>>      return info.size;
+> >>>  }
+> >>>
+> >>> +static int rbd_allocated_size_cb(uint64_t offset, size_t len, int exists,
+> >>> +                                 void *arg)
+> >>> +{
+> >>> +    int64_t *alloc_size = (int64_t *) arg;
+> >>> +
+> >>> +    if (exists) {
+> >>> +        (*alloc_size) += len;
+> >>> +    }
+> >>> +
+> >>> +    return 0;
+> >>> +}
+> >>> +
+> >>> +static int64_t qemu_rbd_get_allocated_file_size(BlockDriverState *bs)
+> >>> +{
+> >>> +    BDRVRBDState *s = bs->opaque;
+> >>> +    uint64_t flags, features;
+> >>> +    int64_t alloc_size = 0;
+> >>> +    int r;
+> >>> +
+> >>> +    r = rbd_get_flags(s->image, &flags);
+> >>> +    if (r < 0) {
+> >>> +        return r;
+> >>> +    }
+> >>> +
+> >>
+> >> Do you know where rbd_get_flags is documented? I can't seem to quickly
+> >> find a reference that tells me what to expect from calling it. It
+> >> returns an int, I guess an error code, but how can I confirm this?
+> >>
+> >> *clones the ceph repository*
+> >>
+> >> src/librbd/internal.cc get_flags convinces me it probably works like I
+> >> think, but is there not a reference here?
+> >>
+> >
+> > Good question!
+> > I didn't find any docs, but looking in the ceph tests test/librbd/fsx.cc,
+> > they print an error message if the return value is less than 0.
+> >
+> > A 'get_flags' implemented in cls/rbd/cls_rbd.cc for example returns 0 at the
+> > end and -EINVAL in a try/catch. It also uses 'read_key()' that in some cases
+> > returns -EIO, so I hope that the error returned by rbd_get_flags() is one of
+> > the errors defined in errno.h
+> >
+> >>> +    r = rbd_get_features(s->image, &features);
+> >>> +    if (r < 0) {
+> >>> +        return r;
+> >>> +    }
+> >>> +
+> >>> +    /*
+> >>> +     * We use rbd_diff_iterate2() only if the RBD image have fast-diff
+> >>> +     * feature enabled. If it is disabled, rbd_diff_iterate2() could be
+> >>> +     * very slow on a big image.
+> >>> +     */
+> >>> +    if (!(features & RBD_FEATURE_FAST_DIFF) ||
+> >>> +        (flags & RBD_FLAG_FAST_DIFF_INVALID)) {
+> >>> +        return -1;
+> >>> +    }
+> >>> +
+> >>
+> >> (Is there a reference for the list of flags to make sure there aren't
+> >> other cases we might want to skip this?)
+> >
+> > Unfortunately no :(
+> > As Jason suggested, I followed what libvirt did in the
+> > volStorageBackendRBDUseFastDiff() [src/storage/storage_backend_rbd.c]
 
-- Wainer
+These are the only ones.
+
+> >>
+> >> It looks reasonable at a glance, but maybe let's return -ENOTSUP instead
+> >> of -1, based on the idea that bdrv_get_allocated_file_size returns
+> >> -ENOMEDIUM in a prominent error case -- let's match that error convention.
+> >
+> > Sure, -ENOTSUP is absolutely better!
+> >
+> >>
+> >> (Well, I wonder what the librbd calls are returning and if THOSE mean
+> >> anything.)
+> >
+> > I hope they return an errno.h errors, but I'm not sure if the meaning
+> > make sense for us.
+> >
+> > Do you think is better to return -ENOTSUP or -EIO when librbd calls
+> > fail?
+> >
+>
+> I'll be honest, I have no idea because I don't know what failure of
+> these calls means _at all_, so I don't know if it should be something
+> severe like EIO or something more mundane.
+>
+> I guess just leave them alone in absence of better information, honestly.
+
+It looks like QEMU treats any negative error code like the actual size
+isn't available. However, for clarity I would vote for -ENOTSUPP since
+that's what would be returned if the driver doesn't support it.
+
+> >
+> > Thanks for your comments,
+> > Stefano
+> >
+>
+> Thank you for trying to patch rbd :)
+
+
+-- 
+Jason
 
