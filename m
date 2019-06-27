@@ -2,56 +2,87 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C2E4C48BD7
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 11:11:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8123FC48BD6
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 11:12:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C877320828
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 11:11:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C877320828
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4D27320828
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 11:12:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OHCrmngU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D27320828
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgSJ3-0003zS-2C
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 07:11:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55830)
+	id 1hgSK9-0004r1-HQ
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 07:12:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56437)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefan.brankovic@rt-rk.com>) id 1hgS5x-0001ym-8c
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 06:57:47 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1hgSB6-0007xT-JL
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 07:03:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefan.brankovic@rt-rk.com>) id 1hgS5v-0001hJ-Hc
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 06:57:37 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:36504 helo=mail.rt-rk.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefan.brankovic@rt-rk.com>)
- id 1hgS5v-0001fw-7d
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 06:57:35 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 3EC001A4539;
- Thu, 27 Jun 2019 12:56:30 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw870-lin.domain.local (rtrkw870-lin.domain.local
- [10.10.13.132])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 034331A457F;
- Thu, 27 Jun 2019 12:56:30 +0200 (CEST)
-From: Stefan Brankovic <stefan.brankovic@rt-rk.com>
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1hgSAg-0007FN-Fg
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 07:02:53 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45451)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1hgSAg-0006yL-9V
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 07:02:30 -0400
+Received: by mail-wr1-x441.google.com with SMTP id f9so2006743wre.12
+ for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 04:02:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=dcB8BYSGUn66tEC53pOClW1bq1/Id357LOxsMrnpnLQ=;
+ b=OHCrmngUrDmHQWiYFbVqrFKNiHsYjdujrS2wHa7KSVe/2gIvtwpy5zaUoxH9yvvz2P
+ uksYH4rR30w1+9rouvED0GLtM0xy4Qp5g432ZmIfBPQtN0+wlEHAq7A2ZP8wEXcREiJK
+ mI0gpjUlmGTF3ehaGWdJ9LATAL8wdSogpD+GZ4GJk2yRKcOJ0g+B8EWhf0gxRj55uonw
+ Jz08gJZ1n0zbwEPFwyIArzFSg92y3Dp8aMz1eAhwleTU+EKPY8+Hg4l+PODjayss3NIz
+ iCCrCKdWHxwxOBY28dM4Q2a63pnnAHvWeXNdYGnS1btlm5KrS38dZkOG4Ia4YiCqYnAU
+ gBSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=dcB8BYSGUn66tEC53pOClW1bq1/Id357LOxsMrnpnLQ=;
+ b=URDooDmDZOKAE2HI7H68pNEwIripJ3BJBnLic8IP0uBKWV10/ulKI9IaxD6KHTmBi6
+ 5g+srVN8WGXBWnC04NAkEr7y/MfE/DB9qc/g61Zjg3wVMYy/bQBOInahqujQ5O2ymvGP
+ Y1pqzMGzDe7co1VUcwh8VusXC7AVM8qbDgD4rBi+C133k/OJsA+NANqBX6y8I9dWdTS1
+ Iy4mhJK2i6SIWrCTQqnlrWkRBBie6n/JO2iK8fk4bLFYPrnUiPYdHTiVR/vUt3Cs4MII
+ ZKZ2zxgCJmMWI5h0EFQQML3OuaktsATJWm5KtZ1DhCwqhxGDXM8YQIW64Us700w1e55M
+ 4EoQ==
+X-Gm-Message-State: APjAAAWRQAupEjEmI8212PZvSWvoRydu28Q1UUqXTY8/H4FS160G/Wek
+ NhpgnWWjX69gKCJwbP17FK+WJ3h9
+X-Google-Smtp-Source: APXvYqybPPHqISj7zAmkseKkbPFxV7g1zRre1Jelb9RsYM60103tuAvRsZq7qspIz++8aEuq8FY25w==
+X-Received: by 2002:a5d:4908:: with SMTP id x8mr2717845wrq.290.1561633330669; 
+ Thu, 27 Jun 2019 04:02:10 -0700 (PDT)
+Received: from x1.local (183.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.183])
+ by smtp.gmail.com with ESMTPSA id y18sm6368968wmi.23.2019.06.27.04.02.03
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 27 Jun 2019 04:02:05 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Date: Thu, 27 Jun 2019 12:56:22 +0200
-Message-Id: <1561632985-24866-11-git-send-email-stefan.brankovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1561632985-24866-1-git-send-email-stefan.brankovic@rt-rk.com>
-References: <1561632985-24866-1-git-send-email-stefan.brankovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v4 10/13] target/ppc: convert vmrgh
- instructions to vector operations
+Date: Thu, 27 Jun 2019 13:01:56 +0200
+Message-Id: <20190627110201.1999-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.19.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
+Subject: [Qemu-devel] [PATCH 0/5] tests/acceptance: Add tests for the
+ PReP/40p machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,64 +94,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: stefan.brankovic@rt-rk.com, hsp.cat7@gmail.com,
- richard.henderson@linaro.org, david@gibson.dropbear.id.au
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ Thomas Huth <huth@tuxfamily.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Kamil Rytarowski <kamil@netbsd.org>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Stefan Brankovic <stefan.brankovic@rt-rk.com>
----
- target/ppc/helper.h                 | 3 ---
- target/ppc/int_helper.c             | 2 +-
- target/ppc/translate/vmx-impl.inc.c | 6 +++---
- 3 files changed, 4 insertions(+), 7 deletions(-)
+Collection of various user cases from different mailing lists.
 
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index ac1a5bd..9a7721f 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -164,9 +164,6 @@ DEF_HELPER_4(vcmpbfp_dot, void, env, avr, avr, avr)
- DEF_HELPER_3(vmrglb, void, avr, avr, avr)
- DEF_HELPER_3(vmrglh, void, avr, avr, avr)
- DEF_HELPER_3(vmrglw, void, avr, avr, avr)
--DEF_HELPER_3(vmrghb, void, avr, avr, avr)
--DEF_HELPER_3(vmrghh, void, avr, avr, avr)
--DEF_HELPER_3(vmrghw, void, avr, avr, avr)
- DEF_HELPER_3(vmulesb, void, avr, avr, avr)
- DEF_HELPER_3(vmulesh, void, avr, avr, avr)
- DEF_HELPER_3(vmulesw, void, avr, avr, avr)
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 3edf334..00e6e02 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -948,7 +948,7 @@ void helper_vmladduhm(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
- 
- #define VMRG(suffix, element, access)          \
-     VMRG_DO(mrgl##suffix, element, access, half)   \
--    VMRG_DO(mrgh##suffix, element, access, 0)
-+
- VMRG(b, u8, VsrB)
- VMRG(h, u16, VsrH)
- VMRG(w, u32, VsrW)
-diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index 39fb26d..e02390f 100644
---- a/target/ppc/translate/vmx-impl.inc.c
-+++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -446,9 +446,9 @@ GEN_VXFORM_DUAL(vavguw, PPC_ALTIVEC, PPC_NONE, \
- GEN_VXFORM(vavgsb, 1, 20);
- GEN_VXFORM(vavgsh, 1, 21);
- GEN_VXFORM(vavgsw, 1, 22);
--GEN_VXFORM(vmrghb, 6, 0);
--GEN_VXFORM(vmrghh, 6, 1);
--GEN_VXFORM(vmrghw, 6, 2);
-+GEN_VXFORM_V(vmrghb, MO_8, tcg_gen_gvec_vmrgh, 6, 0);
-+GEN_VXFORM_V(vmrghh, MO_16, tcg_gen_gvec_vmrgh, 6, 1);
-+GEN_VXFORM_V(vmrghw, MO_32, tcg_gen_gvec_vmrgh, 6, 2);
- GEN_VXFORM(vmrglb, 6, 4);
- GEN_VXFORM(vmrglh, 6, 5);
- GEN_VXFORM(vmrglw, 6, 6);
+Quick tests worth to avoid regressions, idea from
+https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg04177.html
+"Maintainers, please tell us how to boot your machines"
+
+Regards,
+
+Phil.
+
+Philippe Mathieu-Daudé (5):
+  tests/acceptance: Add test that runs NetBSD installer on PRep/40p
+  tests/acceptance: Test Open Firmware on the PReP/40p
+  tests/acceptance: Test OpenBIOS on the PReP/40p
+  tests/acceptance: Test Sandalfoot initrd on the PReP/40p
+  .travis.yml: Let the avocado job run the 40p tests
+
+ .travis.yml                      |   2 +-
+ tests/acceptance/ppc_prep_40p.py | 150 +++++++++++++++++++++++++++++++
+ 2 files changed, 151 insertions(+), 1 deletion(-)
+ create mode 100644 tests/acceptance/ppc_prep_40p.py
+
 -- 
-2.7.4
+2.19.1
 
 
