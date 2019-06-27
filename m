@@ -2,55 +2,69 @@ Return-Path: <SRS0=nUPg=U2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98BB5C48BD6
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 12:24:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56D3EC48BD7
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 12:26:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74B1420989
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 12:24:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74B1420989
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cl.cam.ac.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 2CAAC20828
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Jun 2019 12:26:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CAAC20828
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50297 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgTRt-0001Bz-PK
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 08:24:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46667)
+	id 1hgTU4-0004Er-G9
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 08:26:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47737)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <hmka2@cl.cam.ac.uk>) id 1hgTMv-0002kA-Cv
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 08:19:14 -0400
+ (envelope-from <armbru@redhat.com>) id 1hgTRa-0001Y7-AM
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 08:24:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <hmka2@cl.cam.ac.uk>) id 1hgTMu-0000Hv-3h
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 08:19:13 -0400
-Received: from mta2.cl.cam.ac.uk ([2001:630:212:200::25:2]:47818)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <hmka2@cl.cam.ac.uk>)
- id 1hgTMk-0008WA-L5; Thu, 27 Jun 2019 08:19:04 -0400
-Received: from cassia.cl.cam.ac.uk ([2001:630:212:238:b26e:bfff:fe2f:c7d9])
- by mta2.cl.cam.ac.uk with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.86_2) (envelope-from <hmka2@cl.cam.ac.uk>)
- id 1hgTMY-000Sdt-ML; Thu, 27 Jun 2019 13:18:50 +0100
-Received: from hmka2 by cassia.cl.cam.ac.uk with local (Exim 4.90_1)
- (envelope-from <hmka2@cl.cam.ac.uk>)
- id 1hgTMY-0002Lf-Kk; Thu, 27 Jun 2019 13:18:50 +0100
-From: Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
-To: qemu-riscv@nongnu.org
-Date: Thu, 27 Jun 2019 13:18:25 +0100
-Message-Id: <20190627121828.8376-3-Hesham.Almatary@cl.cam.ac.uk>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190627121828.8376-1-Hesham.Almatary@cl.cam.ac.uk>
-References: <20190627121828.8376-1-Hesham.Almatary@cl.cam.ac.uk>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:630:212:200::25:2
-Subject: [Qemu-devel] [PATCHv4 3/6] RISC-V: Check for the effective memory
- privilege mode during PMP checks
+ (envelope-from <armbru@redhat.com>) id 1hgTRY-0004Pc-To
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 08:24:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35398)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hgTRY-0004Of-M6
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 08:24:00 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9B99630811C7
+ for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 12:23:54 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-169.ams2.redhat.com
+ [10.36.117.169])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C96760856;
+ Thu, 27 Jun 2019 12:23:54 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id AF8B211386A0; Thu, 27 Jun 2019 14:23:52 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+References: <1560165301-39026-1-git-send-email-pbonzini@redhat.com>
+ <1560165301-39026-4-git-send-email-pbonzini@redhat.com>
+ <20190627090353.GA24929@redhat.com>
+ <b8ae5bd6-2b52-99e0-993c-fe8f65d40da3@redhat.com>
+Date: Thu, 27 Jun 2019 14:23:52 +0200
+In-Reply-To: <b8ae5bd6-2b52-99e0-993c-fe8f65d40da3@redhat.com> (Paolo
+ Bonzini's message of "Thu, 27 Jun 2019 12:16:05 +0200")
+Message-ID: <87blyjfc87.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Thu, 27 Jun 2019 12:23:54 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 3/7] configure: integrate Meson in the
+ build system
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,111 +76,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
+Cc: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The current PMP check function checks for env->priv which is not the effective
-memory privilege mode.
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-For example, mstatus.MPRV could be set while executing in M-Mode, and in that
-case the privilege mode for the PMP check should be S-Mode rather than M-Mode
-(in env->priv) if mstatus.MPP == PRV_S.
+> On 27/06/19 11:03, Daniel P. Berrang=C3=A9 wrote:
+>> On Mon, Jun 10, 2019 at 01:14:57PM +0200, Paolo Bonzini wrote:
+>>> The Meson build system is integrated in the existing configure/make ste=
+ps
+>>> by invoking Meson from the configure script and converting Meson's buil=
+d.ninja
+>>> rules to an included Makefile.
+>>=20
+>> Why did you take the route of converting ninja rules into makefile
+>> rules, as opposed to just having some stub makefile rules which
+>> directly invoke ninja where needed ?
+>
+> There are two parts of this.  One is practical and has to do with
+> supporting a step-by-step transition.  Using ninja2make makes it trivial
+> to have make build products that depend on meson build products, and
+> this way bottom up is a natural direction to do the conversion, which is
+> bottom up.  You'd start from libqemuutil.a and code generators (tracing
+> + QAPI), then go to the tools and the emulators.
 
-This patch passes the effective memory privilege mode to the PMP check.
-Functions that call the PMP check should pass the correct memory privilege mode
-after reading mstatus' MPRV/MPP or hstatus.SPRV (if Hypervisor mode exists).
+*If* the conversion is too big a task to permit doing it all at once,
+then the step by step strategy you describe makes sense to me.
 
-Suggested-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
----
- target/riscv/cpu_helper.c | 10 +++++++++-
- target/riscv/pmp.c        |  6 +++---
- target/riscv/pmp.h        |  2 +-
- 3 files changed, 13 insertions(+), 5 deletions(-)
+The trouble with step by step is running out of steam before the final
+step.  That would leave us worse off.  Even an overly protracted
+conversion would be bad.
 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 7c7282c680..5a1cd7cf96 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -392,19 +392,27 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-     int prot;
-     bool pmp_violation = false;
-     int ret = TRANSLATE_FAIL;
-+    int mode = mmu_idx;
+Thus, my standard question on any proposed step-by-step conversion:
+commitment to finishing it?  I'd be quite happy to take your word for
+it.
 
-     qemu_log_mask(CPU_LOG_MMU, "%s ad %" VADDR_PRIx " rw %d mmu_idx %d\n",
-                   __func__, address, access_type, mmu_idx);
+> The second is a design decision that simplifying the Make/meson
+> integration is *not* a goal.  Rather the goals are: 1) making the
+> transition easier on developers; 2) avoiding magic in meson.build at all
+> costs.  More specifically:
+>
+> - it should remain trivial to do things that used to be trivial, and
+> most "make" invocations should be kept the same at least until
+> everything is converted and we can perhaps declare a flag day.  People
+> are used to "make check" or "make subdir-x86_64-softmmu", those should
+> continue to work while the transition is in progress.
+>
+> - it should be possible to modify meson.build without knowing QEMU
+> specific details, and that should be _already_ possible now at the
+> beginning of the transition (to avoid creating technical debt).  This
+> means keeping the magic confined in Makefile rules and external scripts,
+> while having a pretty plain meson.build.
 
-     ret = get_physical_address(env, &pa, &prot, address, access_type, mmu_idx);
+I wholeheartedly agree with (2).  Reducing magic is the whole point.
 
-+    if (mode == PRV_M && access_type != MMU_INST_FETCH) {
-+        if (get_field(env->mstatus, MSTATUS_MPRV)) {
-+            mode = get_field(env->mstatus, MSTATUS_MPP);
-+        }
-+    }
-+
-     qemu_log_mask(CPU_LOG_MMU,
-                   "%s address=%" VADDR_PRIx " ret %d physical " TARGET_FMT_plx
-                   " prot %d\n", __func__, address, ret, pa, prot);
+Your plan confines new magic to "Makefile rules and external scripts".
+We'll get actual reduction only if we can retire or at least radically
+simplify them at some point.
 
-     if (riscv_feature(env, RISCV_FEATURE_PMP) &&
-         (ret == TRANSLATE_SUCCESS) &&
--        !pmp_hart_has_privs(env, pa, TARGET_PAGE_SIZE, 1 << access_type)) {
-+        !pmp_hart_has_privs(env, pa, TARGET_PAGE_SIZE, 1 << access_type,
-+        mode)) {
-         pmp_violation = true;
-         ret = TRANSLATE_FAIL;
-     }
-diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
-index b11c4ae22f..89170bc11d 100644
---- a/target/riscv/pmp.c
-+++ b/target/riscv/pmp.c
-@@ -229,7 +229,7 @@ static int pmp_is_in_range(CPURISCVState *env, int pmp_index, target_ulong addr)
-  * Check if the address has required RWX privs to complete desired operation
-  */
- bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
--    target_ulong size, pmp_priv_t privs)
-+    target_ulong size, pmp_priv_t privs, target_ulong mode)
- {
-     int i = 0;
-     int ret = -1;
-@@ -265,7 +265,7 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
-             }
+I'm more ambivalent on (1).  Yes, making the transition easier for
+developers is worth hiding a certain amount of magic out of their way.
+But not any amount.  We should try to preserve the targets printed by
+"make help".
 
-             allowed_privs = PMP_READ | PMP_WRITE | PMP_EXEC;
--            if ((env->priv != PRV_M) || pmp_is_locked(env, i)) {
-+            if ((mode != PRV_M) || pmp_is_locked(env, i)) {
-                 allowed_privs &= env->pmp_state.pmp[i].cfg_reg;
-             }
+> I expect testing might also require some hand-holding, because "meson
+> test" does not integrate with "make -j" and to keep supporting our "make
+> check-*" targets.  However, until the make->ninja flag day we could
+> generate tap-driver Makefile rules from "meson introspect --tests"
+> output.  Basically I'm dropping Makefile magic in favor of build rule
+> generators are written in high-level languages.
 
-@@ -281,7 +281,7 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
+A PoC for selected tests would be nice.
 
-     /* No rule matched */
-     if (ret == -1) {
--        if (env->priv == PRV_M) {
-+        if (mode == PRV_M) {
-             ret = 1; /* Privileged spec v1.10 states if no PMP entry matches an
-                       * M-Mode access, the access succeeds */
-         } else {
-diff --git a/target/riscv/pmp.h b/target/riscv/pmp.h
-index 66790950eb..8e19793132 100644
---- a/target/riscv/pmp.h
-+++ b/target/riscv/pmp.h
-@@ -59,6 +59,6 @@ void pmpaddr_csr_write(CPURISCVState *env, uint32_t addr_index,
-     target_ulong val);
- target_ulong pmpaddr_csr_read(CPURISCVState *env, uint32_t addr_index);
- bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
--    target_ulong size, pmp_priv_t priv);
-+    target_ulong size, pmp_priv_t priv, target_ulong mode);
+>> Obviously this series is just some initial integration, but eventually
+>> when we get a complete conversion, I think it will look pretty wierd
+>> if we're still converting ninja to make.
+>
+> I agree; once all the build rules are converted the Makefile could be as
+> simple as
+>
+> 	all:
+> 	include config.mak
+> 	include tests/docker/Makefile.include
+> 	include tests/vm/Makefile.include
+> 	.NOTPARALLEL:
+> 	%:
+> 		ninja $@
+>
+> 	subdir-%-softmmu:
+> 		ninja qemu-system-$*
+>
+> 	subdir-%-linux-user:
+> 		ninja qemu-$*
+>
+> 	check:
+> 		$(MESON) test
+>
+> 	check-%:
+> 		$(MESON) test --suite $*
+>
+> etc. (and likewise the configure script could just translate the command
+> line options before invoking meson).
 
- #endif
---
-2.17.1
+I wouldn't bother keeping around such an empty shell of a Makefile.
 
+Keeping configure as a wrapper could be marginally more useful, mostly
+for people trying to build QEMU for the first time.
+
+>                                       But for now, since rules are
+> written half in meson and half in make, ninja2make seems the most
+> transparent way to integrate the two.
+>
+>> Part of the downside of our current build system is that although it
+>> uses make, the usage is wierd and QEMU specific structure. It would
+>> be a shame to pick meson and then again use it is a way that is wierd
+>> and QEMU specific.
+>
+> I agree, this is why it's important to have at least a standard meson.bui=
+ld.
+>
+> Some knowledge of config-host.mak is needed, because meson.build uses
+> declare_dependency() instead of dependency() to link with libraries that
+> were already found by configure, but that's it.
+
+Ignorant question: could the switch to Meson enable doing less in
+configure?  It's big and sloooow.
 
