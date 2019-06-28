@@ -2,59 +2,66 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A83CCC4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 02:28:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25657C5B577
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 02:30:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DDB3206A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 02:28:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DDB3206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E0CFC2086D
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 02:30:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0CFC2086D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hggcw-0001iH-IU
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 22:28:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50220)
+	id 1hggeV-0002ta-7Q
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 22:30:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53248)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hgg8p-00011W-QE
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:57:33 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hggRz-00064u-Mo
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 22:17:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hgg8m-0001in-4E
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:57:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41216)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgg8l-0001Yw-Pm
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:57:28 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 069C33082AFF;
- Fri, 28 Jun 2019 01:57:24 +0000 (UTC)
-Received: from localhost (ovpn-116-7.gru2.redhat.com [10.97.116.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3BA8E19C70;
- Fri, 28 Jun 2019 01:57:23 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Thu, 27 Jun 2019 22:56:05 -0300
-Message-Id: <20190628015606.32107-29-ehabkost@redhat.com>
-In-Reply-To: <20190628015606.32107-1-ehabkost@redhat.com>
-References: <20190628015606.32107-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Fri, 28 Jun 2019 01:57:24 +0000 (UTC)
+ (envelope-from <no-reply@patchew.org>) id 1hggRv-0007Gm-P2
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 22:17:19 -0400
+Resent-Date: Thu, 27 Jun 2019 22:17:18 -0400
+Resent-Message-Id: <E1hggRv-0007Gm-P2@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21479)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hggRt-000791-V9
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 22:17:15 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1561685478; cv=none; d=zoho.com; s=zohoarc; 
+ b=mZvnz1hwwPFCZDVK/VkOpJESqWHt51+cngr7fGSf/33GF/qg8tcnmUwBg9TpO96rWOl1Up7pa6NB/EbbS0yWyGiRyewmKcSoPu/+3JZemqjhA4Y8q4YaRcSPx7R6tFVaAxCXrb0nx6Xvwmm2OKVMCSVsgr3fpzvvFLEHY8GpVCQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1561685478;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=4fTqs0idEMOY4w/MSsnnOsz0uLySTAI4VFmmqHsUsgQ=; 
+ b=EMTEtP/Hc7Suewga4A2DcJhEv1hFQEPt7qQPX8oHKCloTjvAecHGhyuUKJFst3YX0Xva18Jhc6lFcE7PUscR3fwJlGTvk6A1HXELgpwpLWlbk+a2SmPYIdF9VHvq6ukvch1BOLyRVp8k/HXuN4EyGh1HeuQdY4NfisQUdfuOHhc=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1561684562623335.68121367252934;
+ Thu, 27 Jun 2019 18:16:02 -0700 (PDT)
+Message-ID: <156168456084.6332.8355203188584734794@c4a48874b076>
+In-Reply-To: <20190628002844.24894-1-ehabkost@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: ehabkost@redhat.com
+Date: Thu, 27 Jun 2019 18:16:02 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 28/29] machine: Refactor smp_parse() in vl.c as
- MachineClass::smp_parse()
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH v2 0/9] x86 CPU model versioning
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,369 +73,276 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Like Xu <like.xu@linux.intel.com>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: phrdina@redhat.com, berrange@redhat.com, imammedo@redhat.com,
+ tao3.xu@intel.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
+ pbonzini@redhat.com, robert.hu@intel.com, jdenemar@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Like Xu <like.xu@linux.intel.com>
-
-To make smp_parse() more flexible and expansive, a smp_parse function
-pointer is added to MachineClass that machine types could override.
-
-The generic smp_parse() code in vl.c is moved to hw/core/machine.c, and
-become the default implementation of MachineClass::smp_parse. A PC-specific
-function called pc_smp_parse() has been added to hw/i386/pc.c, which in
-this patch changes nothing against the default one .
-
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20190620054525.37188-3-like.xu@linux.intel.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- include/hw/boards.h  |  5 +++
- include/hw/i386/pc.h |  1 +
- hw/core/machine.c    | 76 ++++++++++++++++++++++++++++++++++++++++++
- hw/i386/pc.c         | 79 ++++++++++++++++++++++++++++++++++++++++++++
- vl.c                 | 75 ++---------------------------------------
- 5 files changed, 163 insertions(+), 73 deletions(-)
-
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 47cba6ce6c..72b0e60176 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -161,6 +161,10 @@ typedef struct {
-  *    computed based on other criteria such as the host kernel capabilities.
-  * @numa_mem_supported:
-  *    true if '--numa node.mem' option is supported and false otherwise
-+ * @smp_parse:
-+ *    The function pointer to hook different machine specific functions for
-+ *    parsing "smp-opts" from QemuOpts to MachineState::CpuTopology and more
-+ *    machine specific topology fields, such as smp_dies for PCMachine.
-  */
- struct MachineClass {
-     /*< private >*/
-@@ -177,6 +181,7 @@ struct MachineClass {
-     void (*reset)(MachineState *state);
-     void (*hot_add_cpu)(MachineState *state, const int64_t id, Error **errp);
-     int (*kvm_type)(MachineState *machine, const char *arg);
-+    void (*smp_parse)(MachineState *ms, QemuOpts *opts);
- 
-     BlockInterfaceType block_default_type;
-     int units_per_default_bus;
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 764996e6b4..ee79d71ccc 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -189,6 +189,7 @@ void pc_acpi_smi_interrupt(void *opaque, int irq, int level);
- 
- void pc_cpus_init(PCMachineState *pcms);
- void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp);
-+void pc_smp_parse(MachineState *ms, QemuOpts *opts);
- 
- void pc_guest_info_init(PCMachineState *pcms);
- 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 7a44adab39..4be0599e82 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -11,6 +11,9 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/option.h"
-+#include "qapi/qmp/qerror.h"
-+#include "sysemu/replay.h"
- #include "qemu/units.h"
- #include "hw/boards.h"
- #include "qapi/error.h"
-@@ -725,6 +728,78 @@ void machine_set_cpu_numa_node(MachineState *machine,
-     }
- }
- 
-+static void smp_parse(MachineState *ms, QemuOpts *opts)
-+{
-+    if (opts) {
-+        unsigned cpus    = qemu_opt_get_number(opts, "cpus", 0);
-+        unsigned sockets = qemu_opt_get_number(opts, "sockets", 0);
-+        unsigned cores   = qemu_opt_get_number(opts, "cores", 0);
-+        unsigned threads = qemu_opt_get_number(opts, "threads", 0);
-+
-+        /* compute missing values, prefer sockets over cores over threads */
-+        if (cpus == 0 || sockets == 0) {
-+            cores = cores > 0 ? cores : 1;
-+            threads = threads > 0 ? threads : 1;
-+            if (cpus == 0) {
-+                sockets = sockets > 0 ? sockets : 1;
-+                cpus = cores * threads * sockets;
-+            } else {
-+                ms->smp.max_cpus =
-+                        qemu_opt_get_number(opts, "maxcpus", cpus);
-+                sockets = ms->smp.max_cpus / (cores * threads);
-+            }
-+        } else if (cores == 0) {
-+            threads = threads > 0 ? threads : 1;
-+            cores = cpus / (sockets * threads);
-+            cores = cores > 0 ? cores : 1;
-+        } else if (threads == 0) {
-+            threads = cpus / (cores * sockets);
-+            threads = threads > 0 ? threads : 1;
-+        } else if (sockets * cores * threads < cpus) {
-+            error_report("cpu topology: "
-+                         "sockets (%u) * cores (%u) * threads (%u) < "
-+                         "smp_cpus (%u)",
-+                         sockets, cores, threads, cpus);
-+            exit(1);
-+        }
-+
-+        ms->smp.max_cpus =
-+                qemu_opt_get_number(opts, "maxcpus", cpus);
-+
-+        if (ms->smp.max_cpus < cpus) {
-+            error_report("maxcpus must be equal to or greater than smp");
-+            exit(1);
-+        }
-+
-+        if (sockets * cores * threads > ms->smp.max_cpus) {
-+            error_report("cpu topology: "
-+                         "sockets (%u) * cores (%u) * threads (%u) > "
-+                         "maxcpus (%u)",
-+                         sockets, cores, threads,
-+                         ms->smp.max_cpus);
-+            exit(1);
-+        }
-+
-+        if (sockets * cores * threads != ms->smp.max_cpus) {
-+            warn_report("Invalid CPU topology deprecated: "
-+                        "sockets (%u) * cores (%u) * threads (%u) "
-+                        "!= maxcpus (%u)",
-+                        sockets, cores, threads,
-+                        ms->smp.max_cpus);
-+        }
-+
-+        ms->smp.cpus = cpus;
-+        ms->smp.cores = cores;
-+        ms->smp.threads = threads;
-+    }
-+
-+    if (ms->smp.cpus > 1) {
-+        Error *blocker = NULL;
-+        error_setg(&blocker, QERR_REPLAY_NOT_SUPPORTED, "smp");
-+        replay_add_blocker(blocker);
-+    }
-+}
-+
- static void machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc = MACHINE_CLASS(oc);
-@@ -732,6 +807,7 @@ static void machine_class_init(ObjectClass *oc, void *data)
-     /* Default 128 MB as guest ram size */
-     mc->default_ram_size = 128 * MiB;
-     mc->rom_file_has_mr = true;
-+    mc->smp_parse = smp_parse;
- 
-     /* numa node memory size aligned on 8MB by default.
-      * On Linux, each node's border has to be 8MB aligned
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 114fd5f8d4..b9c25bed35 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -79,6 +79,8 @@
- #include "hw/i386/intel_iommu.h"
- #include "hw/net/ne2000-isa.h"
- #include "standard-headers/asm-x86/bootparam.h"
-+#include "sysemu/replay.h"
-+#include "qapi/qmp/qerror.h"
- 
- /* debug PC/ISA interrupts */
- //#define DEBUG_IRQ
-@@ -1537,6 +1539,82 @@ static void pc_new_cpu(PCMachineState *pcms, int64_t apic_id, Error **errp)
-     error_propagate(errp, local_err);
- }
- 
-+/*
-+ * This function is very similar to smp_parse()
-+ * in hw/core/machine.c but includes CPU die support.
-+ */
-+void pc_smp_parse(MachineState *ms, QemuOpts *opts)
-+{
-+    if (opts) {
-+        unsigned cpus    = qemu_opt_get_number(opts, "cpus", 0);
-+        unsigned sockets = qemu_opt_get_number(opts, "sockets", 0);
-+        unsigned cores   = qemu_opt_get_number(opts, "cores", 0);
-+        unsigned threads = qemu_opt_get_number(opts, "threads", 0);
-+
-+        /* compute missing values, prefer sockets over cores over threads */
-+        if (cpus == 0 || sockets == 0) {
-+            cores = cores > 0 ? cores : 1;
-+            threads = threads > 0 ? threads : 1;
-+            if (cpus == 0) {
-+                sockets = sockets > 0 ? sockets : 1;
-+                cpus = cores * threads * sockets;
-+            } else {
-+                ms->smp.max_cpus =
-+                        qemu_opt_get_number(opts, "maxcpus", cpus);
-+                sockets = ms->smp.max_cpus / (cores * threads);
-+            }
-+        } else if (cores == 0) {
-+            threads = threads > 0 ? threads : 1;
-+            cores = cpus / (sockets * threads);
-+            cores = cores > 0 ? cores : 1;
-+        } else if (threads == 0) {
-+            threads = cpus / (cores * sockets);
-+            threads = threads > 0 ? threads : 1;
-+        } else if (sockets * cores * threads < cpus) {
-+            error_report("cpu topology: "
-+                         "sockets (%u) * cores (%u) * threads (%u) < "
-+                         "smp_cpus (%u)",
-+                         sockets, cores, threads, cpus);
-+            exit(1);
-+        }
-+
-+        ms->smp.max_cpus =
-+                qemu_opt_get_number(opts, "maxcpus", cpus);
-+
-+        if (ms->smp.max_cpus < cpus) {
-+            error_report("maxcpus must be equal to or greater than smp");
-+            exit(1);
-+        }
-+
-+        if (sockets * cores * threads > ms->smp.max_cpus) {
-+            error_report("cpu topology: "
-+                         "sockets (%u) * cores (%u) * threads (%u) > "
-+                         "maxcpus (%u)",
-+                         sockets, cores, threads,
-+                         ms->smp.max_cpus);
-+            exit(1);
-+        }
-+
-+        if (sockets * cores * threads != ms->smp.max_cpus) {
-+            warn_report("Invalid CPU topology deprecated: "
-+                        "sockets (%u) * cores (%u) * threads (%u) "
-+                        "!= maxcpus (%u)",
-+                        sockets, cores, threads,
-+                        ms->smp.max_cpus);
-+        }
-+
-+        ms->smp.cpus = cpus;
-+        ms->smp.cores = cores;
-+        ms->smp.threads = threads;
-+    }
-+
-+    if (ms->smp.cpus > 1) {
-+        Error *blocker = NULL;
-+        error_setg(&blocker, QERR_REPLAY_NOT_SUPPORTED, "smp");
-+        replay_add_blocker(blocker);
-+    }
-+}
-+
- void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp)
- {
-     int64_t apic_id = x86_cpu_apic_id_from_index(ms, id);
-@@ -2782,6 +2860,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     mc->has_hotpluggable_cpus = true;
-     mc->default_boot_order = "cad";
-     mc->hot_add_cpu = pc_hot_add_cpu;
-+    mc->smp_parse = pc_smp_parse;
-     mc->block_default_type = IF_IDE;
-     mc->max_cpus = 255;
-     mc->reset = pc_machine_reset;
-diff --git a/vl.c b/vl.c
-index 1729410e92..f6e591b80c 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1247,78 +1247,6 @@ static QemuOptsList qemu_smp_opts = {
-     },
- };
- 
--static void smp_parse(QemuOpts *opts)
--{
--    if (opts) {
--        unsigned cpus    = qemu_opt_get_number(opts, "cpus", 0);
--        unsigned sockets = qemu_opt_get_number(opts, "sockets", 0);
--        unsigned cores   = qemu_opt_get_number(opts, "cores", 0);
--        unsigned threads = qemu_opt_get_number(opts, "threads", 0);
--
--        /* compute missing values, prefer sockets over cores over threads */
--        if (cpus == 0 || sockets == 0) {
--            cores = cores > 0 ? cores : 1;
--            threads = threads > 0 ? threads : 1;
--            if (cpus == 0) {
--                sockets = sockets > 0 ? sockets : 1;
--                cpus = cores * threads * sockets;
--            } else {
--                current_machine->smp.max_cpus =
--                        qemu_opt_get_number(opts, "maxcpus", cpus);
--                sockets = current_machine->smp.max_cpus / (cores * threads);
--            }
--        } else if (cores == 0) {
--            threads = threads > 0 ? threads : 1;
--            cores = cpus / (sockets * threads);
--            cores = cores > 0 ? cores : 1;
--        } else if (threads == 0) {
--            threads = cpus / (cores * sockets);
--            threads = threads > 0 ? threads : 1;
--        } else if (sockets * cores * threads < cpus) {
--            error_report("cpu topology: "
--                         "sockets (%u) * cores (%u) * threads (%u) < "
--                         "smp_cpus (%u)",
--                         sockets, cores, threads, cpus);
--            exit(1);
--        }
--
--        current_machine->smp.max_cpus =
--                qemu_opt_get_number(opts, "maxcpus", cpus);
--
--        if (current_machine->smp.max_cpus < cpus) {
--            error_report("maxcpus must be equal to or greater than smp");
--            exit(1);
--        }
--
--        if (sockets * cores * threads > current_machine->smp.max_cpus) {
--            error_report("cpu topology: "
--                         "sockets (%u) * cores (%u) * threads (%u) > "
--                         "maxcpus (%u)",
--                         sockets, cores, threads,
--                         current_machine->smp.max_cpus);
--            exit(1);
--        }
--
--        if (sockets * cores * threads != current_machine->smp.max_cpus) {
--            warn_report("Invalid CPU topology deprecated: "
--                        "sockets (%u) * cores (%u) * threads (%u) "
--                        "!= maxcpus (%u)",
--                        sockets, cores, threads,
--                        current_machine->smp.max_cpus);
--        }
--
--        current_machine->smp.cpus = cpus;
--        current_machine->smp.cores = cores;
--        current_machine->smp.threads = threads;
--    }
--
--    if (current_machine->smp.cpus > 1) {
--        Error *blocker = NULL;
--        error_setg(&blocker, QERR_REPLAY_NOT_SUPPORTED, "smp");
--        replay_add_blocker(blocker);
--    }
--}
--
- static void realtime_init(void)
- {
-     if (enable_mlock) {
-@@ -4060,7 +3988,8 @@ int main(int argc, char **argv, char **envp)
-     current_machine->smp.cores = 1;
-     current_machine->smp.threads = 1;
- 
--    smp_parse(qemu_opts_find(qemu_find_opts("smp-opts"), NULL));
-+    machine_class->smp_parse(current_machine,
-+        qemu_opts_find(qemu_find_opts("smp-opts"), NULL));
- 
-     /* sanity-check smp_cpus and max_cpus against machine_class */
-     if (current_machine->smp.cpus < machine_class->min_cpus) {
--- 
-2.18.0.rc1.1.g3f1ff2140
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYyODAwMjg0NC4yNDg5
+NC0xLWVoYWJrb3N0QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
+ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
+bmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwNjI4MDAyODQ0LjI0ODk0LTEtZWhhYmtvc3RA
+cmVkaGF0LmNvbQpUeXBlOiBzZXJpZXMKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAw
+LzldIHg4NiBDUFUgbW9kZWwgdmVyc2lvbmluZwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
+IS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0K
+Li9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBU
+IEVORCA9PT0KClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNmIyNzQxNyBpMzg2OiBB
+ZGQgQ2FzY2FkZWxha2UtU2VydmVyLXYyIENQVSBtb2RlbAo4N2M1NjIzIGRvY3M6IERlcHJlY2F0
+ZSBDUFUgbW9kZWwgcnVubmFiaWxpdHkgZ3VhcmFudGVlcwpjNjJlYzVjIGkzODY6IE1ha2UgdW52
+ZXJzaW9uZWQgQ1BVIG1vZGVscyBiZSBhbGlhc2VzCmMzZDZhZjkgaTM4NjogUmVwbGFjZSAtbm9U
+U1gsIC1JQlJTLCAtSUJQQiBDUFUgbW9kZWxzIHdpdGggYWxpYXNlcwowZjhjMDc4IGkzODY6IERl
+ZmluZSAtSUJSUywgLW5vVFNYLCAtSUJSUyB2ZXJzaW9ucyBvZiBDUFUgbW9kZWxzCjA3ZmExMTMg
+aTM4NjogUmVnaXN0ZXIgdmVyc2lvbmVkIENQVSBtb2RlbHMKMGNjYmYzZCBpMzg2OiBHZXQgbW9k
+ZWwtaWQgZnJvbSBDUFUgb2JqZWN0IG9uICItY3B1IGhlbHAiCjRkODFmYzUgaTM4NjogQWRkIHgt
+Zm9yY2UtZmVhdHVyZXMgb3B0aW9uIGZvciB0ZXN0aW5nCjJkNjEyYjEgcW1wOiBBZGQgImFsaWFz
+LW9mIiBmaWVsZCB0byBxdWVyeS1jcHUtZGVmaW5pdGlvbnMKCj09PSBPVVRQVVQgQkVHSU4gPT09
+CjEvOSBDaGVja2luZyBjb21taXQgMmQ2MTJiMTkzYzRiIChxbXA6IEFkZCAiYWxpYXMtb2YiIGZp
+ZWxkIHRvIHF1ZXJ5LWNwdS1kZWZpbml0aW9ucykKMi85IENoZWNraW5nIGNvbW1pdCA0ZDgxZmM1
+NWQzZGQgKGkzODY6IEFkZCB4LWZvcmNlLWZlYXR1cmVzIG9wdGlvbiBmb3IgdGVzdGluZykKMy85
+IENoZWNraW5nIGNvbW1pdCAwY2NiZjNkY2QwYTAgKGkzODY6IEdldCBtb2RlbC1pZCBmcm9tIENQ
+VSBvYmplY3Qgb24gIi1jcHUgaGVscCIpCjQvOSBDaGVja2luZyBjb21taXQgMDdmYTExMzMyMmY4
+IChpMzg2OiBSZWdpc3RlciB2ZXJzaW9uZWQgQ1BVIG1vZGVscykKV0FSTklORzogbGluZSBvdmVy
+IDgwIGNoYXJhY3RlcnMKIzk3OiBGSUxFOiB0YXJnZXQvaTM4Ni9jcHUuYzoxNDgxOgorc3RhdGlj
+IGNvbnN0IFg4NkNQVVZlcnNpb25EZWZpbml0aW9uICp4ODZfY3B1X2RlZl9nZXRfdmVyc2lvbnMo
+WDg2Q1BVRGVmaW5pdGlvbiAqZGVmKQoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVh
+ZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzEwMjogRklMRTogdGFyZ2V0L2kzODYvY3B1LmM6
+MTQ4NjoKKyAgICAgICAgeyAvKiBlbmQgb2YgbGlzdCAqLyB9CgpXQVJOSU5HOiBCbG9jayBjb21t
+ZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMTE5OiBGSUxFOiB0YXJn
+ZXQvaTM4Ni9jcHUuYzoxODgyOgorICAgICAgICAudmVyc2lvbnMgPSAoWDg2Q1BVVmVyc2lvbkRl
+ZmluaXRpb25bXSkgeyB7IC8qIGVuZCBvZiBsaXN0ICovIH0gfSwKCldBUk5JTkc6IEJsb2NrIGNv
+bW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMxMzE6IEZJTEU6IHRh
+cmdldC9pMzg2L2NwdS5jOjE5NDE6CisgICAgICAgIC52ZXJzaW9ucyA9IChYODZDUFVWZXJzaW9u
+RGVmaW5pdGlvbltdKSB7IHsgLyogZW5kIG9mIGxpc3QgKi8gfSB9LAoKV0FSTklORzogQmxvY2sg
+Y29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzE0MzogRklMRTog
+dGFyZ2V0L2kzODYvY3B1LmM6MjAxMDoKKyAgICAgICAgLnZlcnNpb25zID0gKFg4NkNQVVZlcnNp
+b25EZWZpbml0aW9uW10pIHsgeyAvKiBlbmQgb2YgbGlzdCAqLyB9IH0sCgpXQVJOSU5HOiBCbG9j
+ayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMTU1OiBGSUxF
+OiB0YXJnZXQvaTM4Ni9jcHUuYzoyMDg1OgorICAgICAgICAudmVyc2lvbnMgPSAoWDg2Q1BVVmVy
+c2lvbkRlZmluaXRpb25bXSkgeyB7IC8qIGVuZCBvZiBsaXN0ICovIH0gfSwKCldBUk5JTkc6IEJs
+b2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMxNjc6IEZJ
+TEU6IHRhcmdldC9pMzg2L2NwdS5jOjIxMjY6CisgICAgICAgIC52ZXJzaW9ucyA9IChYODZDUFVW
+ZXJzaW9uRGVmaW5pdGlvbltdKSB7IHsgLyogZW5kIG9mIGxpc3QgKi8gfSB9LAoKV0FSTklORzog
+QmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzE3OTog
+RklMRTogdGFyZ2V0L2kzODYvY3B1LmM6MjE2OToKKyAgICAgICAgLnZlcnNpb25zID0gKFg4NkNQ
+VVZlcnNpb25EZWZpbml0aW9uW10pIHsgeyAvKiBlbmQgb2YgbGlzdCAqLyB9IH0sCgpXQVJOSU5H
+OiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMTkx
+OiBGSUxFOiB0YXJnZXQvaTM4Ni9jcHUuYzoyMjUwOgorICAgICAgICAudmVyc2lvbnMgPSAoWDg2
+Q1BVVmVyc2lvbkRlZmluaXRpb25bXSkgeyB7IC8qIGVuZCBvZiBsaXN0ICovIH0gfSwKCldBUk5J
+Tkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMy
+MDM6IEZJTEU6IHRhcmdldC9pMzg2L2NwdS5jOjIyOTM6CisgICAgICAgIC52ZXJzaW9ucyA9IChY
+ODZDUFVWZXJzaW9uRGVmaW5pdGlvbltdKSB7IHsgLyogZW5kIG9mIGxpc3QgKi8gfSB9LAoKV0FS
+TklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUK
+IzIxNTogRklMRTogdGFyZ2V0L2kzODYvY3B1LmM6MjMzODoKKyAgICAgICAgLnZlcnNpb25zID0g
+KFg4NkNQVVZlcnNpb25EZWZpbml0aW9uW10pIHsgeyAvKiBlbmQgb2YgbGlzdCAqLyB9IH0sCgpX
+QVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGlu
+ZQojMjI3OiBGSUxFOiB0YXJnZXQvaTM4Ni9jcHUuYzoyNDIxOgorICAgICAgICAudmVyc2lvbnMg
+PSAoWDg2Q1BVVmVyc2lvbkRlZmluaXRpb25bXSkgeyB7IC8qIGVuZCBvZiBsaXN0ICovIH0gfSwK
+CldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBs
+aW5lCiMyMzk6IEZJTEU6IHRhcmdldC9pMzg2L2NwdS5jOjI1MTg6CisgICAgICAgIC52ZXJzaW9u
+cyA9IChYODZDUFVWZXJzaW9uRGVmaW5pdGlvbltdKSB7IHsgLyogZW5kIG9mIGxpc3QgKi8gfSB9
+LAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRl
+IGxpbmUKIzI1MTogRklMRTogdGFyZ2V0L2kzODYvY3B1LmM6MjYyNToKKyAgICAgICAgLnZlcnNp
+b25zID0gKFg4NkNQVVZlcnNpb25EZWZpbml0aW9uW10pIHsgeyAvKiBlbmQgb2YgbGlzdCAqLyB9
+IH0sCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJh
+dGUgbGluZQojMjYzOiBGSUxFOiB0YXJnZXQvaTM4Ni9jcHUuYzozMDY3OgorICAgICAgICAudmVy
+c2lvbnMgPSAoWDg2Q1BVVmVyc2lvbkRlZmluaXRpb25bXSkgeyB7IC8qIGVuZCBvZiBsaXN0ICov
+IH0gfSwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMzA6IEZJTEU6IHRhcmdl
+dC9pMzg2L2NwdS5jOjQwOTE6CisgICAgZm9yICh2ZGVmID0geDg2X2NwdV9kZWZfZ2V0X3ZlcnNp
+b25zKG1vZGVsLT5jcHVkZWYpOyB2ZGVmLT52ZXJzaW9uOyB2ZGVmKyspIHsKCldBUk5JTkc6IGFk
+ZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRh
+dGluZz8KIzUwNjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogbGluZSBvdmVyIDkwIGNo
+YXJhY3RlcnMKIzU0OTogRklMRTogdGVzdHMvYWNjZXB0YW5jZS94ODZfY3B1X21vZGVsX3ZlcnNp
+b25zLnB5OjM5OgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJyVzLmFsaWFzLW9mICgl
+cykgaXMgbm90IGEgdmFsaWQgQ1BVIG1vZGVsIG5hbWUnICUgKGNbJ25hbWUnXSwgY1snYWxpYXMt
+b2YnXSkpCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzU1MjogRklMRTogdGVzdHMv
+YWNjZXB0YW5jZS94ODZfY3B1X21vZGVsX3ZlcnNpb25zLnB5OjQyOgorICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgJyVzLmFsaWFzLW9mICglcykgcG9pbnRzIHRvIGFub3RoZXIgYWxp
+YXMnICUgKGNbJ25hbWUnXSwgY1snYWxpYXMtb2YnXSkpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
+Y2hhcmFjdGVycwojNTg4OiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNlL3g4Nl9jcHVfbW9kZWxfdmVy
+c2lvbnMucHk6Nzg6CisgICAgICAgICIiIkNoZWNrIGlmIHBjLSotNC4wIHVudmVyc2lvbmVkIENQ
+VSBtb2RlbCB3b24ndCBiZSByZXBvcnRlZCBhcyBhbGlhc2VzIiIiCgpXQVJOSU5HOiBsaW5lIG92
+ZXIgODAgY2hhcmFjdGVycwojNTk1OiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNlL3g4Nl9jcHVfbW9k
+ZWxfdmVyc2lvbnMucHk6ODU6CisgICAgICAgIGNwdXMgPSBkaWN0KChtWyduYW1lJ10sIG0pIGZv
+ciBtIGluIHNlbGYudm0uY29tbWFuZCgncXVlcnktY3B1LWRlZmluaXRpb25zJykpCgpXQVJOSU5H
+OiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNTk4OiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNlL3g4
+Nl9jcHVfbW9kZWxfdmVyc2lvbnMucHk6ODg6CisgICAgICAgICAgICAgICAgICAgICAgICAgJ3Vu
+dmVyc2lvbmVkIENhc2NhZGVsYWtlLVNlcnZlciBDUFUgbW9kZWwgbXVzdCBub3QgYmUgc3RhdGlj
+JykKCnRvdGFsOiAyIGVycm9ycywgMjAgd2FybmluZ3MsIDU1MCBsaW5lcyBjaGVja2VkCgpQYXRj
+aCA0LzkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjUvOSBDaGVja2luZyBjb21taXQgMGY4
+YzA3ODM1ZGFmIChpMzg2OiBEZWZpbmUgLUlCUlMsIC1ub1RTWCwgLUlCUlMgdmVyc2lvbnMgb2Yg
+Q1BVIG1vZGVscykKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBh
+IHNlcGFyYXRlIGxpbmUKIzMzOiBGSUxFOiB0YXJnZXQvaTM4Ni9jcHUuYzoxODYyOgorICAgICAg
+ICAgICAgICAgICAgICB7IC8qIGVuZCBvZiBsaXN0ICovIH0KCldBUk5JTkc6IEJsb2NrIGNvbW1l
+bnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMzNjogRklMRTogdGFyZ2V0
+L2kzODYvY3B1LmM6MTg2NToKKyAgICAgICAgICAgIHsgLyogZW5kIG9mIGxpc3QgKi8gfQoKV0FS
+TklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUK
+IzU0OiBGSUxFOiB0YXJnZXQvaTM4Ni9jcHUuYzoxOTMyOgorICAgICAgICAgICAgICAgICAgICB7
+IC8qIGVuZCBvZiBsaXN0ICovIH0KCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRp
+bmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiM1NzogRklMRTogdGFyZ2V0L2kzODYvY3B1LmM6MTkz
+NToKKyAgICAgICAgICAgIHsgLyogZW5kIG9mIGxpc3QgKi8gfQoKV0FSTklORzogQmxvY2sgY29t
+bWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzc1OiBGSUxFOiB0YXJn
+ZXQvaTM4Ni9jcHUuYzoyMDEwOgorICAgICAgICAgICAgICAgICAgICB7IC8qIGVuZCBvZiBsaXN0
+ICovIH0KCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBh
+cmF0ZSBsaW5lCiM3ODogRklMRTogdGFyZ2V0L2kzODYvY3B1LmM6MjAxMzoKKyAgICAgICAgICAg
+IHsgLyogZW5kIG9mIGxpc3QgKi8gfQoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVh
+ZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzk2OiBGSUxFOiB0YXJnZXQvaTM4Ni9jcHUuYzoy
+MDk2OgorICAgICAgICAgICAgICAgICAgICB7IC8qIGVuZCBvZiBsaXN0ICovIH0KCldBUk5JTkc6
+IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiM5OTog
+RklMRTogdGFyZ2V0L2kzODYvY3B1LmM6MjA5OToKKyAgICAgICAgICAgIHsgLyogZW5kIG9mIGxp
+c3QgKi8gfQoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNl
+cGFyYXRlIGxpbmUKIzExODogRklMRTogdGFyZ2V0L2kzODYvY3B1LmM6MjI3MzoKKyAgICAgICAg
+ICAgICAgICAgICAgeyAvKiBlbmQgb2YgbGlzdCAqLyB9CgpXQVJOSU5HOiBCbG9jayBjb21tZW50
+cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMTM2OiBGSUxFOiB0YXJnZXQv
+aTM4Ni9jcHUuYzoyMjkxOgorICAgICAgICAgICAgICAgICAgICB7IC8qIGVuZCBvZiBsaXN0ICov
+IH0KCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0
+ZSBsaW5lCiMxNDk6IEZJTEU6IHRhcmdldC9pMzg2L2NwdS5jOjIzMDQ6CisgICAgICAgICAgICAg
+ICAgICAgIHsgLyogZW5kIG9mIGxpc3QgKi8gfQoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNl
+IGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzE1MjogRklMRTogdGFyZ2V0L2kzODYv
+Y3B1LmM6MjMwNzoKKyAgICAgICAgICAgIHsgLyogZW5kIG9mIGxpc3QgKi8gfQoKV0FSTklORzog
+QmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzE3MDog
+RklMRTogdGFyZ2V0L2kzODYvY3B1LmM6MjQ4ODoKKyAgICAgICAgICAgICAgICAgICAgeyAvKiBl
+bmQgb2YgbGlzdCAqLyB9CgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8q
+IG9uIGEgc2VwYXJhdGUgbGluZQojMTgzOiBGSUxFOiB0YXJnZXQvaTM4Ni9jcHUuYzoyNTAxOgor
+ICAgICAgICAgICAgICAgICAgICB7IC8qIGVuZCBvZiBsaXN0ICovIH0KCldBUk5JTkc6IEJsb2Nr
+IGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMxOTU6IEZJTEU6
+IHRhcmdldC9pMzg2L2NwdS5jOjI1MTM6CisgICAgICAgICAgICAgICAgICAgIHsgLyogZW5kIG9m
+IGxpc3QgKi8gfQoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBh
+IHNlcGFyYXRlIGxpbmUKIzE5ODogRklMRTogdGFyZ2V0L2kzODYvY3B1LmM6MjUxNjoKKyAgICAg
+ICAgICAgIHsgLyogZW5kIG9mIGxpc3QgKi8gfQoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNl
+IGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzIxNjogRklMRTogdGFyZ2V0L2kzODYv
+Y3B1LmM6MjYxNzoKKyAgICAgICAgICAgICAgICAgICAgeyAvKiBlbmQgb2YgbGlzdCAqLyB9CgpX
+QVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGlu
+ZQojMjE5OiBGSUxFOiB0YXJnZXQvaTM4Ni9jcHUuYzoyNjIwOgorICAgICAgICAgICAgeyAvKiBl
+bmQgb2YgbGlzdCAqLyB9CgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8q
+IG9uIGEgc2VwYXJhdGUgbGluZQojMjQwOiBGSUxFOiB0YXJnZXQvaTM4Ni9jcHUuYzoyNzM2Ogor
+ICAgICAgICAgICAgICAgICAgICB7IC8qIGVuZCBvZiBsaXN0ICovIH0KCldBUk5JTkc6IEJsb2Nr
+IGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMyNDM6IEZJTEU6
+IHRhcmdldC9pMzg2L2NwdS5jOjI3Mzk6CisgICAgICAgICAgICB7IC8qIGVuZCBvZiBsaXN0ICov
+IH0KCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0
+ZSBsaW5lCiMyNjE6IEZJTEU6IHRhcmdldC9pMzg2L2NwdS5jOjMxOTQ6CisgICAgICAgICAgICAg
+ICAgICAgIHsgLyogZW5kIG9mIGxpc3QgKi8gfQoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNl
+IGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzI2NDogRklMRTogdGFyZ2V0L2kzODYv
+Y3B1LmM6MzE5NzoKKyAgICAgICAgICAgIHsgLyogZW5kIG9mIGxpc3QgKi8gfQoKdG90YWw6IDAg
+ZXJyb3JzLCAyMiB3YXJuaW5ncywgMjQwIGxpbmVzIGNoZWNrZWQKClBhdGNoIDUvOSBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgo2LzkgQ2hlY2tpbmcgY29tbWl0IGMzZDZhZjk4ZDQxNyAoaTM4
+NjogUmVwbGFjZSAtbm9UU1gsIC1JQlJTLCAtSUJQQiBDUFUgbW9kZWxzIHdpdGggYWxpYXNlcykK
+Ny85IENoZWNraW5nIGNvbW1pdCBjNjJlYzVjMzM4ZmMgKGkzODY6IE1ha2UgdW52ZXJzaW9uZWQg
+Q1BVIG1vZGVscyBiZSBhbGlhc2VzKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
+MjY0OiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNlL3g4Nl9jcHVfbW9kZWxfdmVyc2lvbnMucHk6MTA4
+OgorICAgICAgICAiIiJDaGVjayBpZiB1bnZlcnNpb25lZCBDUFUgbW9kZWwgaXMgYW4gYWxpYXMg
+cG9pbnRpbmcgdG8gcmlnaHQgdmVyc2lvbiIiIgoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJh
+Y3RlcnMKIzI2OTogRklMRTogdGVzdHMvYWNjZXB0YW5jZS94ODZfY3B1X21vZGVsX3ZlcnNpb25z
+LnB5OjExMzoKKyAgICAgICAgY3B1cyA9IGRpY3QoKG1bJ25hbWUnXSwgbSkgZm9yIG0gaW4gc2Vs
+Zi52bS5jb21tYW5kKCdxdWVyeS1jcHUtZGVmaW5pdGlvbnMnKSkKCldBUk5JTkc6IGxpbmUgb3Zl
+ciA4MCBjaGFyYWN0ZXJzCiMyNzI6IEZJTEU6IHRlc3RzL2FjY2VwdGFuY2UveDg2X2NwdV9tb2Rl
+bF92ZXJzaW9ucy5weToxMTY6CisgICAgICAgICAgICAgICAgICAgICAgICAgJ3VudmVyc2lvbmVk
+IENhc2NhZGVsYWtlLVNlcnZlciBDUFUgbW9kZWwgbXVzdCBub3QgYmUgc3RhdGljJykKCkVSUk9S
+OiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMjczOiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNlL3g4
+Nl9jcHVfbW9kZWxfdmVyc2lvbnMucHk6MTE3OgorICAgICAgICBzZWxmLmFzc2VydEVxdWFscyhj
+cHVzWydDYXNjYWRlbGFrZS1TZXJ2ZXInXS5nZXQoJ2FsaWFzLW9mJyksICdDYXNjYWRlbGFrZS1T
+ZXJ2ZXItdjEnLAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI3NDogRklMRTog
+dGVzdHMvYWNjZXB0YW5jZS94ODZfY3B1X21vZGVsX3ZlcnNpb25zLnB5OjExODoKKyAgICAgICAg
+ICAgICAgICAgICAgICAgICAgJ0Nhc2NhZGVsYWtlLVNlcnZlciBtdXN0IGJlIGFuIGFsaWFzIG9m
+IENhc2NhZGVsYWtlLVNlcnZlci12MScpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
+cwojMzY2OiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNlL3g4Nl9jcHVfbW9kZWxfdmVyc2lvbnMucHk6
+MjEwOgorICAgICAgICAiIiJDaGVjayBpZiB1bnZlcnNpb25lZCBDUFUgbW9kZWwgaXMgYW4gYWxp
+YXMgcG9pbnRpbmcgdG8gc29tZSB2ZXJzaW9uIiIiCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
+cmFjdGVycwojMzcxOiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNlL3g4Nl9jcHVfbW9kZWxfdmVyc2lv
+bnMucHk6MjE1OgorICAgICAgICBjcHVzID0gZGljdCgobVsnbmFtZSddLCBtKSBmb3IgbSBpbiBz
+ZWxmLnZtLmNvbW1hbmQoJ3F1ZXJ5LWNwdS1kZWZpbml0aW9ucycpKQoKV0FSTklORzogbGluZSBv
+dmVyIDgwIGNoYXJhY3RlcnMKIzM3NDogRklMRTogdGVzdHMvYWNjZXB0YW5jZS94ODZfY3B1X21v
+ZGVsX3ZlcnNpb25zLnB5OjIxODoKKyAgICAgICAgICAgICAgICAgICAgICAgICAndW52ZXJzaW9u
+ZWQgQ2FzY2FkZWxha2UtU2VydmVyIENQVSBtb2RlbCBtdXN0IG5vdCBiZSBzdGF0aWMnKQoKRVJS
+T1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzNzU6IEZJTEU6IHRlc3RzL2FjY2VwdGFuY2Uv
+eDg2X2NwdV9tb2RlbF92ZXJzaW9ucy5weToyMTk6CisgICAgICAgIHNlbGYuYXNzZXJ0VHJ1ZShy
+ZS5tYXRjaCgnQ2FzY2FkZWxha2UtU2VydmVyLXZbMC05XSsnLCBjcHVzWydDYXNjYWRlbGFrZS1T
+ZXJ2ZXInXVsnYWxpYXMtb2YnXSksCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
+Mzc2OiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNlL3g4Nl9jcHVfbW9kZWxfdmVyc2lvbnMucHk6MjIw
+OgorICAgICAgICAgICAgICAgICAgICAgICAgJ0Nhc2NhZGVsYWtlLVNlcnZlciBtdXN0IGJlIGFu
+IGFsaWFzIG9mIHZlcnNpb25lZCBDUFUgbW9kZWwnKQoKdG90YWw6IDIgZXJyb3JzLCA4IHdhcm5p
+bmdzLCAzMTkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNy85IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
+ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
+UlMuCgo4LzkgQ2hlY2tpbmcgY29tbWl0IDg3YzU2MjNjMzk3ZCAoZG9jczogRGVwcmVjYXRlIENQ
+VSBtb2RlbCBydW5uYWJpbGl0eSBndWFyYW50ZWVzKQo5LzkgQ2hlY2tpbmcgY29tbWl0IDZiMjc0
+MTc5ZWUzZiAoaTM4NjogQWRkIENhc2NhZGVsYWtlLVNlcnZlci12MiBDUFUgbW9kZWwpCldBUk5J
+Tkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiM0
+MjogRklMRTogdGFyZ2V0L2kzODYvY3B1LmM6MjM1NDoKKyAgICAgICAgICAgICAgICAgIHsgLyog
+ZW5kIG9mIGxpc3QgKi8gfQoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAv
+KiBvbiBhIHNlcGFyYXRlIGxpbmUKIzQ1OiBGSUxFOiB0YXJnZXQvaTM4Ni9jcHUuYzoyMzU3Ogor
+ICAgICAgICAgICAgeyAvKiBlbmQgb2YgbGlzdCAqLyB9CgpFUlJPUjogbGluZSBvdmVyIDkwIGNo
+YXJhY3RlcnMKIzc1OiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNlL3g4Nl9jcHVfbW9kZWxfdmVyc2lv
+bnMucHk6MjQyOgorICAgICAgICB2bS5hZGRfYXJncygnLWNwdScsICdDYXNjYWRlbGFrZS1TZXJ2
+ZXIseC1mb3JjZS1mZWF0dXJlcz1vbixjaGVjaz1vZmYsZW5mb3JjZT1vZmYnKQoKRVJST1I6IGxp
+bmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM3ODogRklMRTogdGVzdHMvYWNjZXB0YW5jZS94ODZfY3B1
+X21vZGVsX3ZlcnNpb25zLnB5OjI0NToKKyAgICAgICAgICAgICAgICAgICAgICAgICAncGMtaTQ0
+MGZ4LTQuMSArIENhc2NhZGVsYWtlLVNlcnZlciBzaG91bGQgbm90IGhhdmUgYXJjaC1jYXBhYmls
+aXRpZXMnKQoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM4MzogRklMRTogdGVzdHMv
+YWNjZXB0YW5jZS94ODZfY3B1X21vZGVsX3ZlcnNpb25zLnB5OjI1MDoKKyAgICAgICAgdm0uYWRk
+X2FyZ3MoJy1jcHUnLCAnQ2FzY2FkZWxha2UtU2VydmVyLHgtZm9yY2UtZmVhdHVyZXM9b24sY2hl
+Y2s9b2ZmLGVuZm9yY2U9b2ZmJykKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojODY6
+IEZJTEU6IHRlc3RzL2FjY2VwdGFuY2UveDg2X2NwdV9tb2RlbF92ZXJzaW9ucy5weToyNTM6Cisg
+ICAgICAgICAgICAgICAgICAgICAgICAgJ3BjLWk0NDBmeC00LjAgKyBDYXNjYWRlbGFrZS1TZXJ2
+ZXIgc2hvdWxkIG5vdCBoYXZlIGFyY2gtY2FwYWJpbGl0aWVzJykKCkVSUk9SOiBsaW5lIG92ZXIg
+OTAgY2hhcmFjdGVycwojOTI6IEZJTEU6IHRlc3RzL2FjY2VwdGFuY2UveDg2X2NwdV9tb2RlbF92
+ZXJzaW9ucy5weToyNTk6CisgICAgICAgIHZtLmFkZF9hcmdzKCctY3B1JywgJ0Nhc2NhZGVsYWtl
+LVNlcnZlcix4LWZvcmNlLWZlYXR1cmVzPW9uLGNoZWNrPW9mZixlbmZvcmNlPW9mZiwrYXJjaC1j
+YXBhYmlsaXRpZXMnKQoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM5NTogRklMRTog
+dGVzdHMvYWNjZXB0YW5jZS94ODZfY3B1X21vZGVsX3ZlcnNpb25zLnB5OjI2MjoKKyAgICAgICAg
+ICAgICAgICAgICAgICAgICdwYy1pNDQwZngtNC4wICsgQ2FzY2FkZWxha2UtU2VydmVyLCthcmNo
+LWNhcGFiaWxpdGllcyBzaG91bGQgaGF2ZSBhcmNoLWNhcGFiaWxpdGllcycpCgpFUlJPUjogbGlu
+ZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzEwMDogRklMRTogdGVzdHMvYWNjZXB0YW5jZS94ODZfY3B1
+X21vZGVsX3ZlcnNpb25zLnB5OjI2NzoKKyAgICAgICAgdm0uYWRkX2FyZ3MoJy1jcHUnLCAnQ2Fz
+Y2FkZWxha2UtU2VydmVyLHgtZm9yY2UtZmVhdHVyZXM9b24sY2hlY2s9b2ZmLGVuZm9yY2U9b2Zm
+LC1hcmNoLWNhcGFiaWxpdGllcycpCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzEw
+MzogRklMRTogdGVzdHMvYWNjZXB0YW5jZS94ODZfY3B1X21vZGVsX3ZlcnNpb25zLnB5OjI3MDoK
+KyAgICAgICAgICAgICAgICAgICAgICAgICAncGMtaTQ0MGZ4LTQuMSArIENhc2NhZGVsYWtlLVNl
+cnZlciwtYXJjaC1jYXBhYmlsaXRpZXMgc2hvdWxkIG5vdCBoYXZlIGFyY2gtY2FwYWJpbGl0aWVz
+JykKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTA5OiBGSUxFOiB0ZXN0cy9hY2Nl
+cHRhbmNlL3g4Nl9jcHVfbW9kZWxfdmVyc2lvbnMucHk6Mjc2OgorICAgICAgICB2bS5hZGRfYXJn
+cygnLWNwdScsICdDYXNjYWRlbGFrZS1TZXJ2ZXItdjEseC1mb3JjZS1mZWF0dXJlcz1vbixjaGVj
+az1vZmYsZW5mb3JjZT1vZmYnKQoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxMTI6
+IEZJTEU6IHRlc3RzL2FjY2VwdGFuY2UveDg2X2NwdV9tb2RlbF92ZXJzaW9ucy5weToyNzk6Cisg
+ICAgICAgICAgICAgICAgICAgICAgICAgJ3BjLWk0NDBmeC00LjEgKyBDYXNjYWRlbGFrZS1TZXJ2
+ZXItdjEgc2hvdWxkIG5vdCBoYXZlIGFyY2gtY2FwYWJpbGl0aWVzJykKCkVSUk9SOiBsaW5lIG92
+ZXIgOTAgY2hhcmFjdGVycwojMTE3OiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNlL3g4Nl9jcHVfbW9k
+ZWxfdmVyc2lvbnMucHk6Mjg0OgorICAgICAgICB2bS5hZGRfYXJncygnLWNwdScsICdDYXNjYWRl
+bGFrZS1TZXJ2ZXItdjIseC1mb3JjZS1mZWF0dXJlcz1vbixjaGVjaz1vZmYsZW5mb3JjZT1vZmYn
+KQoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxMjA6IEZJTEU6IHRlc3RzL2FjY2Vw
+dGFuY2UveDg2X2NwdV9tb2RlbF92ZXJzaW9ucy5weToyODc6CisgICAgICAgICAgICAgICAgICAg
+ICAgICAgJ3BjLWk0NDBmeC00LjEgKyBDYXNjYWRlbGFrZS1TZXJ2ZXItdjEgc2hvdWxkIGhhdmUg
+YXJjaC1jYXBhYmlsaXRpZXMnKQoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxMjY6
+IEZJTEU6IHRlc3RzL2FjY2VwdGFuY2UveDg2X2NwdV9tb2RlbF92ZXJzaW9ucy5weToyOTM6Cisg
+ICAgICAgIHZtLmFkZF9hcmdzKCctY3B1JywgJ0Nhc2NhZGVsYWtlLVNlcnZlcix4LWZvcmNlLWZl
+YXR1cmVzPW9uLGNoZWNrPW9mZixlbmZvcmNlPW9mZiwrYXJjaC1jYXBhYmlsaXRpZXMnKQoKRVJS
+T1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxMjk6IEZJTEU6IHRlc3RzL2FjY2VwdGFuY2Uv
+eDg2X2NwdV9tb2RlbF92ZXJzaW9ucy5weToyOTY6CisgICAgICAgICAgICAgICAgICAgICAgICAg
+J3BjLWk0NDBmeC00LjAgKyBDYXNjYWRlbGFrZS1TZXJ2ZXItdjEsK2FyY2gtY2FwYWJpbGl0aWVz
+IHNob3VsZCBoYXZlIGFyY2gtY2FwYWJpbGl0aWVzJykKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hh
+cmFjdGVycwojMTM0OiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNlL3g4Nl9jcHVfbW9kZWxfdmVyc2lv
+bnMucHk6MzAxOgorICAgICAgICB2bS5hZGRfYXJncygnLWNwdScsICdDYXNjYWRlbGFrZS1TZXJ2
+ZXItdjIseC1mb3JjZS1mZWF0dXJlcz1vbixjaGVjaz1vZmYsZW5mb3JjZT1vZmYsLWFyY2gtY2Fw
+YWJpbGl0aWVzJykKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTM3OiBGSUxFOiB0
+ZXN0cy9hY2NlcHRhbmNlL3g4Nl9jcHVfbW9kZWxfdmVyc2lvbnMucHk6MzA0OgorICAgICAgICAg
+ICAgICAgICAgICAgICAgICdwYy1pNDQwZngtNC4xICsgQ2FzY2FkZWxha2UtU2VydmVyLXYyLC1h
+cmNoLWNhcGFiaWxpdGllcyBzaG91bGQgbm90IGhhdmUgYXJjaC1jYXBhYmlsaXRpZXMnKQoKdG90
+YWw6IDE2IGVycm9ycywgMiB3YXJuaW5ncywgMTAyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDkvOSBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
+bmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0
+cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA2MjgwMDI4NDQuMjQ4OTQtMS1laGFia29zdEByZWRo
+YXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJh
+dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
+c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
 
