@@ -2,65 +2,74 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 560BCC4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 17:37:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99243C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 17:39:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FD14205F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 17:37:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FD14205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 773C420828
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 17:39:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 773C420828
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hguo1-00032k-EP
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 13:37:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46665)
+	id 1hguqi-0005dD-7t
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 13:39:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54425)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1hguB2-0007hv-Md
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 12:56:47 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1hgukA-00087M-Q8
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:33:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1hguB0-0003eu-0J
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 12:56:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55372)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1hguAu-0003bc-6s; Fri, 28 Jun 2019 12:56:36 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0D6CA30832D3;
- Fri, 28 Jun 2019 16:56:35 +0000 (UTC)
-Received: from [10.36.116.89] (ovpn-116-89.ams2.redhat.com [10.36.116.89])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C7955C888;
- Fri, 28 Jun 2019 16:56:28 +0000 (UTC)
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, imammedo@redhat.com
-References: <20190625121421.22280-1-shameerali.kolothum.thodi@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <86a13b18-f339-0436-6301-72afb000ed45@redhat.com>
-Date: Fri, 28 Jun 2019 18:56:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (envelope-from <palmer@dabbelt.com>) id 1hguk1-0008NW-Gb
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:32:57 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:39157)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hguk1-0008M4-A1
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:32:53 -0400
+Received: by mail-pl1-f195.google.com with SMTP id b7so3614742pls.6
+ for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 10:32:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding:cc:from:to;
+ bh=jUXXdmFSNX/hvuM0z5WGc23QfyAO7JYoqYw1PuN09oU=;
+ b=CS6CITyr4NCa5ATljrwG0jwYGQsvgluvjaDJCplf4LMqgOf8CcXPxTWZl28L4h3iRY
+ wuExRZ2r9AeyKAygCHOoEgBDtTuv1BluJi+0aDqJ5PqbNOh0SAbDiFFh7y8q/DPuwdSb
+ GLj66252RWeVRg9iL8FwCKSCrZrGWEUS0DGa514CIercRwj7xYqVboaEzsHIOd6B7yAa
+ DXYIq64KUMoSxNjYH3q2o62xbm5371efVxyoX83YhAkdcC2DkqgAMDNRHyWRZSj4+Hnd
+ q6yvTQPaaAEp0HldWJkf8CZLF2G2hsQFlLX8HpiuPsZYeh9FXTk38lDUm+g0Dr6r6aEi
+ Y7+A==
+X-Gm-Message-State: APjAAAUbKONJktxLzyvM1xUSTHuwmptAIrb5PfGMRQEoVEdVqIz2PJo2
+ ffBJZXpih1m6kMKNZkJyQuIrp2Kls9G1D6dW
+X-Google-Smtp-Source: APXvYqzgC/GFhb6Tpuj/u76wZdqJDjL7iI90DVTmxqYKIRo7wOu2+kUINldlxS5xSYRk1xLgzx4+GQ==
+X-Received: by 2002:a17:902:2aab:: with SMTP id
+ j40mr12427592plb.76.1561743171661; 
+ Fri, 28 Jun 2019 10:32:51 -0700 (PDT)
+Received: from localhost (220-132-236-182.HINET-IP.hinet.net.
+ [220.132.236.182])
+ by smtp.gmail.com with ESMTPSA id e63sm4299313pgc.62.2019.06.28.10.32.50
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 28 Jun 2019 10:32:50 -0700 (PDT)
+Date: Fri, 28 Jun 2019 10:31:57 -0700
+Message-Id: <20190628173227.31925-5-palmer@sifive.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190628173227.31925-1-palmer@sifive.com>
+References: <20190628173227.31925-1-palmer@sifive.com>
 MIME-Version: 1.0
-In-Reply-To: <20190625121421.22280-1-shameerali.kolothum.thodi@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Fri, 28 Jun 2019 16:56:35 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
+From: Palmer Dabbelt <palmer@sifive.com>
+To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 0/8] ARM virt: ACPI memory hotplug
- support
+ [fuzzy]
+X-Received-From: 209.85.214.195
+Subject: [Qemu-devel] [PULL 04/34] target/riscv: Implement
+ riscv_cpu_unassigned_access
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,115 +81,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, sameo@linux.intel.com, ard.biesheuvel@linaro.org,
- linuxarm@huawei.com, xuwei5@hisilicon.com, shannon.zhaosl@gmail.com,
- sebastien.boeuf@intel.com, lersek@redhat.com
+Cc: Alistair Francis <alistair.francis@wdc.com>, Michael Clark <mjc@sifive.com>,
+ qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ Palmer Dabbelt <palmer@sifive.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Shameer,
+From: Michael Clark <mjc@sifive.com>
 
-On 6/25/19 2:14 PM, Shameer Kolothum wrote:
-> This series is an attempt to provide device memory hotplug support 
-> on ARM virt platform. This is based on Eric's recent works here[1]
-> and carries some of the pc-dimm related patches dropped from his
-> series.
-> 
-> The kernel support for arm64 memory hot add was added recently by
-> Robin and hence the guest kernel should be => 5.0-rc1.
-> 
-> NVDIM support is not included currently as we still have an unresolved
-> issue while hot adding NVDIMM[2]. However NVDIMM cold plug patches
-> can be included, but not done for now, for keeping it simple.
-> 
-> This makes use of GED device to sent hotplug ACPI events to the
-> Guest. GED code is based on Nemu. Thanks to the efforts of Samuel and
-> Sebastien to add the hardware-reduced support to Nemu using GED
-> device[3]. (Please shout if I got the author/signed-off wrong for
-> those patches or missed any names).
-> 
-> This is sanity tested on a HiSilicon ARM64 platform and appreciate
-> any further testing.
+This patch adds support for the riscv_cpu_unassigned_access call
+and will raise a load or store access fault.
 
-Tested-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Michael Clark <mjc@sifive.com>
+[Changes by AF:
+ - Squash two patches and rewrite commit message
+ - Set baddr to the access address
+]
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+---
+ target/riscv/cpu.c        |  1 +
+ target/riscv/cpu.h        |  2 ++
+ target/riscv/cpu_helper.c | 16 ++++++++++++++++
+ 3 files changed, 19 insertions(+)
 
-Thanks
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 0632ac08cf35..5b9fae608cca 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -482,6 +482,7 @@ static void riscv_cpu_class_init(ObjectClass *c, void *data)
+     cc->gdb_stop_before_watchpoint = true;
+     cc->disas_set_info = riscv_cpu_disas_set_info;
+ #ifndef CONFIG_USER_ONLY
++    cc->do_unassigned_access = riscv_cpu_unassigned_access;
+     cc->do_unaligned_access = riscv_cpu_do_unaligned_access;
+     cc->get_phys_page_debug = riscv_cpu_get_phys_page_debug;
+ #endif
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index b47cde501766..2e743312536b 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -259,6 +259,8 @@ void  riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
+ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+                         MMUAccessType access_type, int mmu_idx,
+                         bool probe, uintptr_t retaddr);
++void riscv_cpu_unassigned_access(CPUState *cpu, hwaddr addr, bool is_write,
++                                 bool is_exec, int unused, unsigned size);
+ char *riscv_isa_string(RISCVCPU *cpu);
+ void riscv_cpu_list(void);
+ 
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index 8b6754b91798..0bbfb7f48b79 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -375,6 +375,22 @@ hwaddr riscv_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+     return phys_addr;
+ }
+ 
++void riscv_cpu_unassigned_access(CPUState *cs, hwaddr addr, bool is_write,
++                                 bool is_exec, int unused, unsigned size)
++{
++    RISCVCPU *cpu = RISCV_CPU(cs);
++    CPURISCVState *env = &cpu->env;
++
++    if (is_write) {
++        cs->exception_index = RISCV_EXCP_STORE_AMO_ACCESS_FAULT;
++    } else {
++        cs->exception_index = RISCV_EXCP_LOAD_ACCESS_FAULT;
++    }
++
++    env->badaddr = addr;
++    riscv_raise_exception(&cpu->env, cs->exception_index, GETPC());
++}
++
+ void riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
+                                    MMUAccessType access_type, int mmu_idx,
+                                    uintptr_t retaddr)
+-- 
+2.21.0
 
-Eric
-> 
-> Thanks,
-> Shameer
-> 
-> [1] https://patchwork.kernel.org/cover/10837565/
-> [2] https://patchwork.kernel.org/cover/10783589/
-> [3] https://github.com/intel/nemu/blob/topic/virt-x86/hw/acpi/ged.c
-> [4] http://lists.infradead.org/pipermail/linux-arm-kernel/2019-May/651763.html
-> 
-> v5 --> v6
-> 
-> -Addressed comments from Eric.
-> -Added R-by from Eric and Igor.
-> 
-> v4 --> v5
-> -Removed gsi/ged-irq routing in virt.
-> -Added Migration support.
-> -Dropped support for DT coldplug case based on the discussions
->  here[4]
-> -Added system_powerdown support through GED.
-> 
-> v3 --> v4
-> Addressed comments from Igor and Eric,
-> -Renamed "virt-acpi" to "acpi-ged".
-> -Changed ged device parent to TYPE_DEVICE.
-> -Introduced DT memory node property "hotpluggable" to resolve device
->  memory being treated as early boot memory issue(patch #7).
-> -Combined patches #3 and #9 from v3 into #3.
-> 
-> v2 --> v3
-> 
-> Addressed comments from Igor and Eric,
-> -Made virt acpi device platform independent and moved
->  to hw/acpi/generic_event_device.c
-> -Moved ged specific code into hw/acpi/generic_event_device.c
-> -Introduced an opt-in feature "fdt" to resolve device-memory being
->  treated as early boot memory.
-> -Dropped patch #1 from v2.
-> 
-> RFC --> v2
-> 
-> -Use GED device instead of GPIO for ACPI hotplug events.
-> -Removed NVDIMM support for now.
-> -Includes dropped patches from Eric's v9 series.
-> 
-> Eric Auger (1):
->   hw/arm/virt: Add memory hotplug framework
-> 
-> Samuel Ortiz (2):
->   hw/acpi: Do not create memory hotplug method when handler is not
->     defined
->   hw/acpi: Add ACPI Generic Event Device Support
-> 
-> Shameer Kolothum (5):
->   hw/acpi: Make ACPI IO address space configurable
->   hw/arm/virt: Enable device memory cold/hot plug with ACPI boot
->   hw/arm/virt-acpi-build: Add PC-DIMM in SRAT
->   hw/acpi: Add system power down support to GED
->   hw/arm: Use GED for system_powerdown event
-> 
->  hw/acpi/Kconfig                        |   4 +
->  hw/acpi/Makefile.objs                  |   1 +
->  hw/acpi/generic_event_device.c         | 352 +++++++++++++++++++++++++
->  hw/acpi/memory_hotplug.c               |  35 +--
->  hw/arm/Kconfig                         |   4 +
->  hw/arm/virt-acpi-build.c               |  58 ++--
->  hw/arm/virt.c                          |  88 ++++++-
->  hw/i386/acpi-build.c                   |   3 +-
->  include/hw/acpi/generic_event_device.h | 106 ++++++++
->  include/hw/acpi/memory_hotplug.h       |   9 +-
->  include/hw/arm/virt.h                  |   3 +
->  11 files changed, 607 insertions(+), 56 deletions(-)
->  create mode 100644 hw/acpi/generic_event_device.c
->  create mode 100644 include/hw/acpi/generic_event_device.h
-> 
 
