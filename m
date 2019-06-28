@@ -2,60 +2,87 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	URIBL_SBL,URIBL_SBL_A,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E01ECC4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 14:17:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D738C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 14:18:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABD06208E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 14:17:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABD06208E3
+	by mail.kernel.org (Postfix) with ESMTPS id 6BBA6208E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 14:18:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BBA6208E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgrgd-0003IZ-V8
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 10:17:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49843)
+	id 1hgrhr-0003n0-Mt
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 10:18:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52469)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <slp@redhat.com>) id 1hgqez-0003KX-UK
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:11:27 -0400
+ (envelope-from <philmd@redhat.com>) id 1hgqny-0006A5-Ar
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:20:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1hgqey-00019O-30
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:11:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55772)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1hgqex-00018s-Pk
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:11:24 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5776730832D8;
- Fri, 28 Jun 2019 11:54:13 +0000 (UTC)
-Received: from dritchie.redhat.com (unknown [10.33.36.16])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D621A1A92D;
- Fri, 28 Jun 2019 11:54:10 +0000 (UTC)
-From: Sergio Lopez <slp@redhat.com>
-To: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com,
- rth@twiddle.net, ehabkost@redhat.com
-Date: Fri, 28 Jun 2019 13:53:48 +0200
-Message-Id: <20190628115349.60293-4-slp@redhat.com>
-In-Reply-To: <20190628115349.60293-1-slp@redhat.com>
-References: <20190628115349.60293-1-slp@redhat.com>
+ (envelope-from <philmd@redhat.com>) id 1hgqnw-0007wA-Rs
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:20:42 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:50824)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hgqnw-0007sl-Lf
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:20:40 -0400
+Received: by mail-wm1-f67.google.com with SMTP id c66so9113003wmf.0
+ for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 06:20:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=rz1wEKAqnaxpJPc5M7DlISFUk671y+XHVbTHo1RhsJo=;
+ b=YpPOW5YLHh27BKh1sP2T9+PvDTsvgN8fCCa6KyPakgbFvOEOqSLvBCe6lcF6J/HJTb
+ OTt4vK6a830vuFPfYSQgwnipwu+juA2shXFmr3zpRcgWDMwdYsq1/sCs5Y49ZxEfOsJa
+ Enb/s1inx+Mld/wSs52sJf+itW4lVvgGc5+k7mH0JOidhrimGX7GTJhOIedaJiJERYhb
+ gyS3yVZ+xJSZyI+H7qH+ZMs5/78rb+HUWcrUEge7EZ0gKOSqVSxbNIHAhPacPwnqIqnZ
+ NoaexzyOduDlyB4cuom6BciFkIrxlaGlBhQNAbe/6PrXPuSr0mkEKXgPpCQ0WRiB/Ye7
+ RSjg==
+X-Gm-Message-State: APjAAAXZzabDul4J1vg31k9GG9Bq3A3A2oAE078B23iScKZRdLEMO7jn
+ QwhSWnSTRkTiV8s6Zgtqda/2Pw==
+X-Google-Smtp-Source: APXvYqxcEN0rXfXMJ/5ictSQ/7Xv8463CzVKDug12talOf+fjUBkBPdZfjVSyiQMpZ7EuuRIH/hOAg==
+X-Received: by 2002:a7b:ce88:: with SMTP id q8mr7458896wmj.89.1561728039072;
+ Fri, 28 Jun 2019 06:20:39 -0700 (PDT)
+Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.183])
+ by smtp.gmail.com with ESMTPSA id v27sm4368549wrv.45.2019.06.28.06.20.38
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 28 Jun 2019 06:20:38 -0700 (PDT)
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ Cleber Rosa <crosa@redhat.com>, lvivier@redhat.com
+References: <20190310082703.1245-1-david@gibson.dropbear.id.au>
+ <20190310082703.1245-58-david@gibson.dropbear.id.au>
+ <20190312150115.6zuaid43gr7hklt5@unused>
+ <58de43c6-31d5-a0a3-b443-54a33f11d75a@kaod.org>
+ <20190312191409.vxnpscrephtk6otv@dhcp-17-165.bos.redhat.com>
+ <1746025955.7399905.1552419034356.JavaMail.zimbra@redhat.com>
+ <154364d7-fe5b-4f40-b976-b85ff9060ee0@kaod.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <dc6578eb-569b-477e-9a74-2925de8ac204@redhat.com>
+Date: Fri, 28 Jun 2019 15:20:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Fri, 28 Jun 2019 11:54:13 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <154364d7-fe5b-4f40-b976-b85ff9060ee0@kaod.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 3/4] hw/i386: Add an Intel MPTable generator
+ [fuzzy]
+X-Received-From: 209.85.128.67
+Subject: Re: [Qemu-devel] [PULL 57/60] target/ppc: add HV support for POWER9
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,427 +94,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Sergio Lopez <slp@redhat.com>
+Cc: peter maydell <peter.maydell@linaro.org>,
+ David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, groug@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a helper function (mptable_generate) for generating an Intel
-MPTable according to version 1.4 of the specification.
+Hi,
 
-This is needed for the microvm machine type implementation.
+On 3/12/19 8:58 PM, Cédric Le Goater wrote:
+> On 3/12/19 8:30 PM, Cleber Rosa wrote:
+>>> From: "Cleber Rosa" <crosa@redhat.com>
+>>> Sent: Tuesday, March 12, 2019 3:14:09 PM
+>>> Subject: Re: [Qemu-devel] [PULL 57/60] target/ppc: add HV support for POWER9
+>>>
+>>> On Tue, Mar 12, 2019 at 07:34:04PM +0100, Cédric Le Goater wrote:
+>>>> On 3/12/19 4:01 PM, Cleber Rosa wrote:
+>>>>> On Sun, Mar 10, 2019 at 07:27:00PM +1100, David Gibson wrote:
+>>>>>> From: Cédric Le Goater <clg@kaod.org>
+>>>>>>
+>>>>>> We now have enough support to boot a PowerNV machine with a POWER9
+>>>>>> processor. Allow HV mode on POWER9.
+>>>>>>
+>>>>>> Signed-off-by: Cédric Le Goater <clg@kaod.org>
+>>>>>> Message-Id: <20190307223548.20516-16-clg@kaod.org>
+>>>>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>>>>>> ---
+>>>>>>  target/ppc/translate_init.inc.c | 3 ++-
+>>>>>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>>>>>
+>>>>>> diff --git a/target/ppc/translate_init.inc.c
+>>>>>> b/target/ppc/translate_init.inc.c
+>>>>>> index af70a3b78c..0bd555eb19 100644
+>>>>>> --- a/target/ppc/translate_init.inc.c
+>>>>>> +++ b/target/ppc/translate_init.inc.c
+>>>>>> @@ -8895,7 +8895,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void
+>>>>>> *data)
+>>>>>>                         PPC_CACHE | PPC_CACHE_ICBI | PPC_CACHE_DCBZ |
+>>>>>>                         PPC_MEM_SYNC | PPC_MEM_EIEIO |
+>>>>>>                         PPC_MEM_TLBSYNC |
+>>>>>> -                       PPC_64B | PPC_64BX | PPC_ALTIVEC |
+>>>>>> +                       PPC_64B | PPC_64H | PPC_64BX | PPC_ALTIVEC |
+>>>>>>                         PPC_SEGMENT_64B | PPC_SLBI |
+>>>>>>                         PPC_POPCNTB | PPC_POPCNTWD |
+>>>>>>                         PPC_CILDST;
+>>>>>> @@ -8907,6 +8907,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void
+>>>>>> *data)
+>>>>>>                          PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
+>>>>>>                          PPC2_TM | PPC2_ISA300 | PPC2_PRCNTL;
+>>>>>>      pcc->msr_mask = (1ull << MSR_SF) |
+>>>>>> +                    (1ull << MSR_SHV) |
+>>>>>>                      (1ull << MSR_TM) |
+>>>>>>                      (1ull << MSR_VR) |
+>>>>>>                      (1ull << MSR_VSX) |
+>>>>>> --
+>>>>>> 2.20.1
+>>>>>>
+>>>>>>
+>>>>>
+>>>>> This change prevents a Fedora 29 kernel[1] from booting... is this
+>>>>> intended or a known limitation of the Fedora 29 kernel?
+>>>>
+>>>> The default CPU is still power8_v2.0. This is curious.
+>>>>
+>>>
+>>> Are you sure?  I'm getting:
+>>>
+>>>  $ git rev-parse HEAD
+>>>  cfc3fef6b4e493bf1a7ee16790ad584e20dfbbd1
+>>>  $ ./ppc64-softmmu/qemu-system-ppc64 -qmp unix:/tmp/qmp-sock,server
+>>>  $ ./scripts/qmp/qom-get -s /tmp/qmp-sock /machine/unattached/device[0].type
+>>>  power9_v2.0-spapr-cpu-core
+> 
+> That's a pseries machine, not a powernv machine. pseries should use P9
+> processor by default but the patch above should not impact f29 on pseries. 
+> If it does, then we have a bug. 
+>  
+>> Looks like the overall default is "power9_v2.0", and then on pseries-3.1 and
+>> lower, it's "power8_v2.0", as per 34a6b015a98.
+> 
+> I was looking at pnv_machine_class_init() which sets the default CPU :
+> 
+>     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power8_v2.0");
 
-Signed-off-by: Sergio Lopez <slp@redhat.com>
----
- hw/i386/mptable.c                           | 157 +++++++++++++++++
- include/hw/i386/mptable.h                   |  37 ++++
- include/standard-headers/linux/mpspec_def.h | 182 ++++++++++++++++++++
- 3 files changed, 376 insertions(+)
- create mode 100644 hw/i386/mptable.c
- create mode 100644 include/hw/i386/mptable.h
- create mode 100644 include/standard-headers/linux/mpspec_def.h
+I found this thread while trying auto-bisection for LP#1834613:
+https://bugs.launchpad.net/bugs/1834613
 
-diff --git a/hw/i386/mptable.c b/hw/i386/mptable.c
-new file mode 100644
-index 0000000000..c5cb57dd18
---- /dev/null
-+++ b/hw/i386/mptable.c
-@@ -0,0 +1,157 @@
-+/*
-+ * Intel MPTable generator
-+ *
-+ * Copyright (C) 2019 Red Hat, Inc.
-+ *
-+ * Authors:
-+ *   Sergio Lopez <slp@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/i386/mptable.h"
-+#include "standard-headers/linux/mpspec_def.h"
-+
-+static int mptable_checksum(char *buf, int size)
-+{
-+    int i;
-+    int checksum =3D 0;
-+
-+    for (i =3D 0; i < size; i++) {
-+        checksum +=3D buf[i];
-+    }
-+
-+    return checksum;
-+}
-+
-+/*
-+ * Generate an MPTable for "ncpus". "apic_id" must be the next available
-+ * APIC ID (last CPU apic_id + 1). "table_base" is the physical location
-+ * in the Guest where the caller intends to write the table, needed to
-+ * fill the "physptr" field from the "mpf_intel" structure.
-+ *
-+ * On success, return a newly allocated buffer, that must be freed by th=
-e
-+ * caller using "g_free" when it's no longer needed, and update
-+ * "mptable_size" with the size of the buffer.
-+ */
-+char *mptable_generate(int ncpus, int apic_id,
-+                        int table_base, int *mptable_size)
-+{
-+    struct mpf_intel *mpf;
-+    struct mpc_table *table;
-+    struct mpc_cpu *cpu;
-+    struct mpc_bus *bus;
-+    struct mpc_ioapic *ioapic;
-+    struct mpc_intsrc *intsrc;
-+    struct mpc_lintsrc *lintsrc;
-+    const char mpc_signature[] =3D MPC_SIGNATURE;
-+    const char smp_magic_ident[] =3D "_MP_";
-+    char *mptable;
-+    int checksum =3D 0;
-+    int offset =3D 0;
-+    int ssize;
-+    int i;
-+
-+    ssize =3D sizeof(struct mpf_intel);
-+    mptable =3D g_malloc0(ssize);
-+
-+    mpf =3D (struct mpf_intel *) mptable;
-+    memcpy(mpf->signature, smp_magic_ident, sizeof(smp_magic_ident) - 1)=
-;
-+    mpf->length =3D 1;
-+    mpf->specification =3D 4;
-+    mpf->physptr =3D table_base + ssize;
-+    mpf->checksum -=3D mptable_checksum((char *) mpf, ssize);
-+    offset =3D ssize + sizeof(struct mpc_table);
-+
-+    ssize =3D sizeof(struct mpc_cpu);
-+    for (i =3D 0; i < ncpus; i++) {
-+        mptable =3D g_realloc(mptable, offset + ssize);
-+        cpu =3D (struct mpc_cpu *) (mptable + offset);
-+        cpu->type =3D MP_PROCESSOR;
-+        cpu->apicid =3D i;
-+        cpu->apicver =3D APIC_VERSION;
-+        cpu->cpuflag =3D CPU_ENABLED;
-+        if (i =3D=3D 0) {
-+            cpu->cpuflag |=3D CPU_BOOTPROCESSOR;
-+        }
-+        cpu->cpufeature =3D CPU_STEPPING;
-+        cpu->featureflag =3D CPU_FEATURE_APIC | CPU_FEATURE_FPU;
-+        checksum +=3D mptable_checksum((char *) cpu, ssize);
-+        offset +=3D ssize;
-+    }
-+
-+    ssize =3D sizeof(struct mpc_bus);
-+    mptable =3D g_realloc(mptable, offset + ssize);
-+    bus =3D (struct mpc_bus *) (mptable + offset);
-+    bus->type =3D MP_BUS;
-+    bus->busid =3D 0;
-+    memcpy(bus->bustype, BUS_TYPE_ISA, sizeof(BUS_TYPE_ISA) - 1);
-+    checksum +=3D mptable_checksum((char *) bus, ssize);
-+    offset +=3D ssize;
-+
-+    ssize =3D sizeof(struct mpc_ioapic);
-+    mptable =3D g_realloc(mptable, offset + ssize);
-+    ioapic =3D (struct mpc_ioapic *) (mptable + offset);
-+    ioapic->type =3D MP_IOAPIC;
-+    ioapic->apicid =3D ncpus + 1;
-+    ioapic->apicver =3D APIC_VERSION;
-+    ioapic->flags =3D MPC_APIC_USABLE;
-+    ioapic->apicaddr =3D IO_APIC_DEFAULT_PHYS_BASE;
-+    checksum +=3D mptable_checksum((char *) ioapic, ssize);
-+    offset +=3D ssize;
-+
-+    ssize =3D sizeof(struct mpc_intsrc);
-+    for (i =3D 0; i < 16; i++) {
-+        mptable =3D g_realloc(mptable, offset + ssize);
-+        intsrc =3D (struct mpc_intsrc *) (mptable + offset);
-+        intsrc->type =3D MP_INTSRC;
-+        intsrc->irqtype =3D mp_INT;
-+        intsrc->irqflag =3D MP_IRQDIR_DEFAULT;
-+        intsrc->srcbus =3D 0;
-+        intsrc->srcbusirq =3D i;
-+        intsrc->dstapic =3D ncpus + 1;
-+        intsrc->dstirq =3D i;
-+        checksum +=3D mptable_checksum((char *) intsrc, ssize);
-+        offset +=3D ssize;
-+    }
-+
-+    ssize =3D sizeof(struct mpc_lintsrc);
-+    mptable =3D g_realloc(mptable, offset + (ssize * 2));
-+    lintsrc =3D (struct mpc_lintsrc *) (mptable + offset);
-+    lintsrc->type =3D MP_LINTSRC;
-+    lintsrc->irqtype =3D mp_ExtINT;
-+    lintsrc->irqflag =3D MP_IRQDIR_DEFAULT;
-+    lintsrc->srcbusid =3D 0;
-+    lintsrc->srcbusirq =3D 0;
-+    lintsrc->destapic =3D 0;
-+    lintsrc->destapiclint =3D 0;
-+    checksum +=3D mptable_checksum((char *) lintsrc, ssize);
-+    offset +=3D ssize;
-+
-+    lintsrc =3D (struct mpc_lintsrc *) (mptable + offset);
-+    lintsrc->type =3D MP_LINTSRC;
-+    lintsrc->irqtype =3D mp_NMI;
-+    lintsrc->irqflag =3D MP_IRQDIR_DEFAULT;
-+    lintsrc->srcbusid =3D 0;
-+    lintsrc->srcbusirq =3D 0;
-+    lintsrc->destapic =3D 0xFF;
-+    lintsrc->destapiclint =3D 1;
-+    checksum +=3D mptable_checksum((char *) lintsrc, ssize);
-+    offset +=3D ssize;
-+
-+    ssize =3D sizeof(struct mpc_table);
-+    table =3D (struct mpc_table *) (mptable + sizeof(struct mpf_intel));
-+    memcpy(table->signature, mpc_signature, sizeof(mpc_signature) - 1);
-+    table->length =3D offset - sizeof(struct mpf_intel);
-+    table->spec =3D MPC_SPEC;
-+    memcpy(table->oem, MPC_OEM, sizeof(MPC_OEM) - 1);
-+    memcpy(table->productid, MPC_PRODUCT_ID, sizeof(MPC_PRODUCT_ID) - 1)=
-;
-+    table->lapic =3D APIC_DEFAULT_PHYS_BASE;
-+    checksum +=3D mptable_checksum((char *) table, ssize);
-+    table->checksum -=3D checksum;
-+
-+    *mptable_size =3D offset;
-+    return mptable;
-+}
-diff --git a/include/hw/i386/mptable.h b/include/hw/i386/mptable.h
-new file mode 100644
-index 0000000000..9f9eb82618
---- /dev/null
-+++ b/include/hw/i386/mptable.h
-@@ -0,0 +1,37 @@
-+/*
-+ * Intel MPTable generator
-+ *
-+ * Copyright (C) 2019 Red Hat, Inc.
-+ *
-+ * Authors:
-+ *   Sergio Lopez <slp@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef HW_I386_MPTABLE_H
-+#define HW_I386_MPTABLE_H
-+
-+#define APIC_VERSION     0x14
-+#define CPU_STEPPING     0x600
-+#define CPU_FEATURE_APIC 0x200
-+#define CPU_FEATURE_FPU  0x001
-+#define MPC_SPEC         0x4
-+
-+#define MP_IRQDIR_DEFAULT 0
-+#define MP_IRQDIR_HIGH    1
-+#define MP_IRQDIR_LOW     3
-+
-+static const char MPC_OEM[]        =3D "QEMU    ";
-+static const char MPC_PRODUCT_ID[] =3D "000000000000";
-+static const char BUS_TYPE_ISA[]   =3D "ISA   ";
-+
-+#define IO_APIC_DEFAULT_PHYS_BASE 0xfec00000
-+#define APIC_DEFAULT_PHYS_BASE    0xfee00000
-+#define APIC_VERSION              0x14
-+
-+char *mptable_generate(int ncpus, int apic_id,
-+                       int table_base, int *mptable_size);
-+
-+#endif
-diff --git a/include/standard-headers/linux/mpspec_def.h b/include/standa=
-rd-headers/linux/mpspec_def.h
-new file mode 100644
-index 0000000000..6fb923a343
---- /dev/null
-+++ b/include/standard-headers/linux/mpspec_def.h
-@@ -0,0 +1,182 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _ASM_X86_MPSPEC_DEF_H
-+#define _ASM_X86_MPSPEC_DEF_H
-+
-+/*
-+ * Structure definitions for SMP machines following the
-+ * Intel Multiprocessing Specification 1.1 and 1.4.
-+ */
-+
-+/*
-+ * This tag identifies where the SMP configuration
-+ * information is.
-+ */
-+
-+#define SMP_MAGIC_IDENT	(('_'<<24) | ('P'<<16) | ('M'<<8) | '_')
-+
-+#ifdef CONFIG_X86_32
-+# define MAX_MPC_ENTRY 1024
-+#endif
-+
-+/* Intel MP Floating Pointer Structure */
-+struct mpf_intel {
-+	char signature[4];		/* "_MP_"			*/
-+	unsigned int physptr;		/* Configuration table address	*/
-+	unsigned char length;		/* Our length (paragraphs)	*/
-+	unsigned char specification;	/* Specification version	*/
-+	unsigned char checksum;		/* Checksum (makes sum 0)	*/
-+	unsigned char feature1;		/* Standard or configuration ?	*/
-+	unsigned char feature2;		/* Bit7 set for IMCR|PIC	*/
-+	unsigned char feature3;		/* Unused (0)			*/
-+	unsigned char feature4;		/* Unused (0)			*/
-+	unsigned char feature5;		/* Unused (0)			*/
-+};
-+
-+#define MPC_SIGNATURE "PCMP"
-+
-+struct mpc_table {
-+	char signature[4];
-+	unsigned short length;		/* Size of table */
-+	char spec;			/* 0x01 */
-+	char checksum;
-+	char oem[8];
-+	char productid[12];
-+	unsigned int oemptr;		/* 0 if not present */
-+	unsigned short oemsize;		/* 0 if not present */
-+	unsigned short oemcount;
-+	unsigned int lapic;		/* APIC address */
-+	unsigned int reserved;
-+};
-+
-+/* Followed by entries */
-+
-+#define	MP_PROCESSOR		0
-+#define	MP_BUS			1
-+#define	MP_IOAPIC		2
-+#define	MP_INTSRC		3
-+#define	MP_LINTSRC		4
-+/* Used by IBM NUMA-Q to describe node locality */
-+#define	MP_TRANSLATION		192
-+
-+#define CPU_ENABLED		1	/* Processor is available */
-+#define CPU_BOOTPROCESSOR	2	/* Processor is the boot CPU */
-+
-+#define CPU_STEPPING_MASK	0x000F
-+#define CPU_MODEL_MASK		0x00F0
-+#define CPU_FAMILY_MASK		0x0F00
-+
-+struct mpc_cpu {
-+	unsigned char type;
-+	unsigned char apicid;		/* Local APIC number */
-+	unsigned char apicver;		/* Its versions */
-+	unsigned char cpuflag;
-+	unsigned int cpufeature;
-+	unsigned int featureflag;	/* CPUID feature value */
-+	unsigned int reserved[2];
-+};
-+
-+struct mpc_bus {
-+	unsigned char type;
-+	unsigned char busid;
-+	unsigned char bustype[6];
-+};
-+
-+/* List of Bus Type string values, Intel MP Spec. */
-+#define BUSTYPE_EISA	"EISA"
-+#define BUSTYPE_ISA	"ISA"
-+#define BUSTYPE_INTERN	"INTERN"	/* Internal BUS */
-+#define BUSTYPE_MCA	"MCA"		/* Obsolete */
-+#define BUSTYPE_VL	"VL"		/* Local bus */
-+#define BUSTYPE_PCI	"PCI"
-+#define BUSTYPE_PCMCIA	"PCMCIA"
-+#define BUSTYPE_CBUS	"CBUS"
-+#define BUSTYPE_CBUSII	"CBUSII"
-+#define BUSTYPE_FUTURE	"FUTURE"
-+#define BUSTYPE_MBI	"MBI"
-+#define BUSTYPE_MBII	"MBII"
-+#define BUSTYPE_MPI	"MPI"
-+#define BUSTYPE_MPSA	"MPSA"
-+#define BUSTYPE_NUBUS	"NUBUS"
-+#define BUSTYPE_TC	"TC"
-+#define BUSTYPE_VME	"VME"
-+#define BUSTYPE_XPRESS	"XPRESS"
-+
-+#define MPC_APIC_USABLE		0x01
-+
-+struct mpc_ioapic {
-+	unsigned char type;
-+	unsigned char apicid;
-+	unsigned char apicver;
-+	unsigned char flags;
-+	unsigned int apicaddr;
-+};
-+
-+struct mpc_intsrc {
-+	unsigned char type;
-+	unsigned char irqtype;
-+	unsigned short irqflag;
-+	unsigned char srcbus;
-+	unsigned char srcbusirq;
-+	unsigned char dstapic;
-+	unsigned char dstirq;
-+};
-+
-+enum mp_irq_source_types {
-+	mp_INT =3D 0,
-+	mp_NMI =3D 1,
-+	mp_SMI =3D 2,
-+	mp_ExtINT =3D 3
-+};
-+
-+#define MP_IRQPOL_DEFAULT	0x0
-+#define MP_IRQPOL_ACTIVE_HIGH	0x1
-+#define MP_IRQPOL_RESERVED	0x2
-+#define MP_IRQPOL_ACTIVE_LOW	0x3
-+#define MP_IRQPOL_MASK		0x3
-+
-+#define MP_IRQTRIG_DEFAULT	0x0
-+#define MP_IRQTRIG_EDGE		0x4
-+#define MP_IRQTRIG_RESERVED	0x8
-+#define MP_IRQTRIG_LEVEL	0xc
-+#define MP_IRQTRIG_MASK		0xc
-+
-+#define MP_APIC_ALL	0xFF
-+
-+struct mpc_lintsrc {
-+	unsigned char type;
-+	unsigned char irqtype;
-+	unsigned short irqflag;
-+	unsigned char srcbusid;
-+	unsigned char srcbusirq;
-+	unsigned char destapic;
-+	unsigned char destapiclint;
-+};
-+
-+#define MPC_OEM_SIGNATURE "_OEM"
-+
-+struct mpc_oemtable {
-+	char signature[4];
-+	unsigned short length;		/* Size of table */
-+	char  rev;			/* 0x01 */
-+	char  checksum;
-+	char  mpc[8];
-+};
-+
-+/*
-+ *	Default configurations
-+ *
-+ *	1	2 CPU ISA 82489DX
-+ *	2	2 CPU EISA 82489DX neither IRQ 0 timer nor IRQ 13 DMA chaining
-+ *	3	2 CPU EISA 82489DX
-+ *	4	2 CPU MCA 82489DX
-+ *	5	2 CPU ISA+PCI
-+ *	6	2 CPU EISA+PCI
-+ *	7	2 CPU MCA+PCI
-+ */
-+
-+enum mp_bustype {
-+	MP_BUS_ISA =3D 1,
-+	MP_BUS_EISA,
-+	MP_BUS_PCI,
-+};
-+#endif /* _ASM_X86_MPSPEC_DEF_H */
---=20
-2.21.0
+When trying the options suggested by Laurent here:
+https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg06209.html
 
+this one hangs:
+
+$ qemu-system-ppc64 \
+ -kernel vmlinuz-vanilla \
+ -nographic -append "console=hvc0" \
+ -M cap-cfpc=broken,cap-sbbc=broken,cap-ibs=broken
+
+but this one works:
+
+$ qemu-system-ppc64 \
+ -kernel vmlinuz-vanilla \
+ -nographic -append "console=hvc0" \
+ -M pseries-3.1
+
+> 
+> C.
+> 
+>>
+>> - Cleber.
+>>
+>>> Thanks,
+>>> - Cleber.
+>>>
+>>>>> FIY, by using a "power8" CPU the Fedora 29 kernel boots successfully.
+>>>>> For a reproducer, please refer to [2].
+>>>>
+>>>>
+>>>> Thanks,
+>>>>
+>>>> C.
+>>>>
+>>>>
+>>>>> Thanks,
+>>>>> - Cleber.
+>>>>>
+>>>>> [1] -
+>>>>> https://download.fedoraproject.org/pub/fedora-secondary/releases/29/Everything/ppc64le/os/ppc/ppc64/vmlinuz
+>>>>>
+>>>>> [2] -
+>>>>> https://github.com/clebergnu/qemu/blob/sent/target_arch_v4/tests/acceptance/boot_linux_console.py#L138
+>>>>>
+>>>>
+>>>
 
