@@ -2,52 +2,59 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D486C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 14:09:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37CF9C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 14:09:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 758D5208E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 14:09:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 758D5208E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 10803208E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 14:09:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10803208E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgrYt-0004PG-PI
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 10:09:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59605)
+	id 1hgrZ0-0004aU-2e
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 10:09:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50776)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hgrCn-0002Pp-Kr
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:46:22 -0400
+ (envelope-from <stefanha@redhat.com>) id 1hgqhh-0007d9-Ra
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:14:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hgrCm-0004l2-J5
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:46:21 -0400
-Received: from relay.sw.ru ([185.231.240.75]:41280)
+ (envelope-from <stefanha@redhat.com>) id 1hgqhg-0003Fx-Q4
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:14:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35815)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1hgrCm-0004i5-9i; Fri, 28 Jun 2019 09:46:20 -0400
-Received: from [172.16.25.136] (helo=localhost.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92)
- (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1hgrCi-0008NT-M3; Fri, 28 Jun 2019 16:46:16 +0300
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Date: Fri, 28 Jun 2019 16:46:11 +0300
-Message-Id: <1561729574-530879-5-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1561729574-530879-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1561729574-530879-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v3 4/7] iotests: Valgrind fails with
- nonexistent directory
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>)
+ id 1hgqhe-0002uk-7u; Fri, 28 Jun 2019 09:14:10 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D5A712F8BC4;
+ Fri, 28 Jun 2019 13:13:52 +0000 (UTC)
+Received: from localhost (ovpn-116-156.ams2.redhat.com [10.36.116.156])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5FE816092D;
+ Fri, 28 Jun 2019 13:13:49 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 28 Jun 2019 14:13:46 +0100
+Message-Id: <20190628131347.8679-1-stefanha@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Fri, 28 Jun 2019 13:13:52 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 0/1] Block patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,38 +66,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, mreitz@redhat.com,
- andrey.shinkevich@virtuozzo.com, den@openvz.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Valgrind uses the exported variable TMPDIR and fails if the
-directory does not exist. Let us exclude such a test case from
-being run under the Valgrind and notify the user of it.
+The following changes since commit 474f3938d79ab36b9231c9ad3b5a9314c2aeac=
+de:
 
-Suggested-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
- tests/qemu-iotests/051 | 4 ++++
- 1 file changed, 4 insertions(+)
+  Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-jun-21-=
+2019' into staging (2019-06-21 15:40:50 +0100)
 
-diff --git a/tests/qemu-iotests/051 b/tests/qemu-iotests/051
-index 200660f..2465e48 100755
---- a/tests/qemu-iotests/051
-+++ b/tests/qemu-iotests/051
-@@ -377,6 +377,10 @@ printf %b "qemu-io $device_id \"write -P 0x33 0 4k\"\ncommit $device_id\n" |
- $QEMU_IO -c "read -P 0x33 0 4k" "$TEST_IMG" | _filter_qemu_io
- 
- # Using snapshot=on with a non-existent TMPDIR
-+if [ "${VALGRIND_QEMU}" == "y" ]; then
-+    _casenotrun "Valgrind needs a valid TMPDIR for itself"
-+fi
-+VALGRIND_QEMU="" \
- TMPDIR=/nonexistent run_qemu -drive driver=null-co,snapshot=on
- 
- # Using snapshot=on together with read-only=on
--- 
-1.8.3.1
+are available in the Git repository at:
+
+  https://github.com/stefanha/qemu.git tags/block-pull-request
+
+for you to fetch changes up to 6c11dda922915aaaa032db4462294e8df45f7441:
+
+  build: use $(DESTDIR)x instead of $(DESTDIR)/x (2019-06-28 14:12:14 +01=
+00)
+
+----------------------------------------------------------------
+Pull request
+
+No user-visible changes.
+
+----------------------------------------------------------------
+
+Stefan Hajnoczi (1):
+  build: use $(DESTDIR)x instead of $(DESTDIR)/x
+
+ Makefile | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+--=20
+2.21.0
 
 
