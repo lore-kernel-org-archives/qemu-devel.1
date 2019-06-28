@@ -2,80 +2,83 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 758F2C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 14:03:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38142C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 14:08:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CC232083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 14:03:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CC232083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id F3882208E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 14:08:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YIx1YCUA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3882208E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgrT6-00004t-HH
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 10:03:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47945)
+	id 1hgrYg-0003vD-42
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 10:08:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48240)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hgqYe-0004UI-CW
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:04:55 -0400
+ (envelope-from <mrolnik@gmail.com>) id 1hgqZU-0005gJ-T6
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:05:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hgqYb-0005JW-Jv
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:04:52 -0400
-Received: from mail-wm1-f48.google.com ([209.85.128.48]:34813)
+ (envelope-from <mrolnik@gmail.com>) id 1hgqZQ-00060b-Qi
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:05:42 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38014)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hgqYa-00055u-BQ
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:04:48 -0400
-Received: by mail-wm1-f48.google.com with SMTP id w9so9311336wmd.1
- for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 06:04:31 -0700 (PDT)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1hgqZQ-0005wh-Ji
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:05:40 -0400
+Received: by mail-wr1-x442.google.com with SMTP id d18so6232372wrs.5
+ for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 06:05:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=4ZFZMsmQe254in4ul0D3ojbiZelqUBf277QY25Y6XAA=;
+ b=YIx1YCUAxnibZberCI4f9PSoC3B0trFAOhdR58xdZ4qaxb9hhU673Q7KazBWjPW32k
+ aqFX6xWEfVRgP9+DoieGY8MeQm6nzyb/4PSs6ghlEarbsPiVW2QCs6EgALEX9brmJcWA
+ snlo+pIWwMD/7QcgyPtEotIakAYnHHx7d2PVrKFT5aVGFUAklh7f1fxhaUe+wD7q729B
+ kMVR0BX/LinAB0ONsdz527aPgFnwvUnogxSER5eLzotKFjCAYjXA5sUjoZjxBMMf+c9v
+ DcNlOzDL8IfxI7GQ6EzAQJeWxonq83WvhAAfXr6iBs317qqa6mElosj32lZoAD2no2Pk
+ pyvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=w5Vg3tkkDkjY6PttiNQHOlE9rWBYlL6Po6SAMi7cmCc=;
- b=gDYTwT2lW/RUI6/u4O7y/KSaxm3QtM0ku2ta/myE9vY+4loB/VYAxDEP37/OdfgmEJ
- +U5BaeUySf7mlY4uqmeZLifsn546gm+5fDKP0unMAmVOgYSjkZJByLLTgDCC9mEtUwR9
- L6hiz4J3uKMi0o+5eY+0ZDBhut0jM/jEp5uhRAbx0U3PRpF9DCQ1UQb8WsqSenENdid+
- Wr/HMdUJ/Q/u2UeAileche8woyQaKJXzEy3e0cvIoFiek6Bs1STKaV9sPHcCk34DyMO1
- eeiaw9a9HYsH2r04Cs2kge6tU2xHSp8AR/YgFLtMkVX7YFmarGUqeuPXD//oapNU9QRU
- 1d5g==
-X-Gm-Message-State: APjAAAUpSwnZ4/UAc5MlIH3hpeFe+rDwkOhfdAFcKJ0uoUBtI/GjRYpa
- xqvaSUpF9EhK/7yflyOws6s8eJV+yV0=
-X-Google-Smtp-Source: APXvYqxrWc4WQ5p9X8QndTonadVAisUizKKLladAyzcPUGJuL3TMTNK87jU4ZMvmE6x/ASx23WVF0w==
-X-Received: by 2002:a7b:c8d4:: with SMTP id f20mr7343204wml.90.1561721236403; 
- Fri, 28 Jun 2019 04:27:16 -0700 (PDT)
-Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.183])
- by smtp.gmail.com with ESMTPSA id g8sm3247803wme.20.2019.06.28.04.27.15
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 28 Jun 2019 04:27:15 -0700 (PDT)
-To: David Gibson <david@gibson.dropbear.id.au>, peter.maydell@linaro.org
-References: <20190312085502.8203-1-david@gibson.dropbear.id.au>
- <20190312085502.8203-13-david@gibson.dropbear.id.au>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <b693da29-0d2a-e739-17fb-9fd78894fd9e@redhat.com>
-Date: Fri, 28 Jun 2019 13:27:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <20190312085502.8203-13-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.48
-Subject: Re: [Qemu-devel] [PULL 12/62] target/ppc/spapr: Enable mitigations
- by default for pseries-4.0 machine type
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=4ZFZMsmQe254in4ul0D3ojbiZelqUBf277QY25Y6XAA=;
+ b=BoqyJYevs/j+lSh58MxrKqdfyNdJXjLOmJuRkHNAPvvkQR3MnpBsuvNq0kZLZHv7bA
+ WepSxChHOFiWT1Fsza8S88ZyZcd22rdTir26moCjCFSIP+g17GxysWQ0jLQFxfmWwJ1w
+ DUS/W2fEUq6FXaijx32f6AHsQoe1Goi2TPI2w7QYl0sccPJpJ7QQnxSFs2PndYfh5tOE
+ CEz68ZvmpgCNU8mnTI68hXBgi3yYAu6IVtAdf5Ws8lHxmWNkalXAMLLUY0Srale2m4A4
+ rKRuxd8XoCz0rtNlrFYwKfmld+q6lOfYXVuDMwwwP6Xz2uFcYRAtumq6d1lvEtPkgzBR
+ kWyQ==
+X-Gm-Message-State: APjAAAXpvIF4ItnYeFDEbnoTq/xy3ix8mDT+cvjZnu4VF5pC4HUSxVjg
+ PxZjN0j0FgQF1CMaUImXbMohsHa/rHGBUg==
+X-Google-Smtp-Source: APXvYqw1iryP/V4kMKxQN5l+hiK+0Pqk6eBwvihoaZa42bVd0+0iksuOO5tlYIn16X31+dXknJ6yrg==
+X-Received: by 2002:a5d:4111:: with SMTP id l17mr1759549wrp.129.1561723294262; 
+ Fri, 28 Jun 2019 05:01:34 -0700 (PDT)
+Received: from localhost.localdomain (bzq-79-182-104-87.red.bezeqint.net.
+ [79.182.104.87])
+ by smtp.gmail.com with ESMTPSA id v18sm2281229wrd.51.2019.06.28.05.01.31
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 28 Jun 2019 05:01:33 -0700 (PDT)
+From: Michael Rolnik <mrolnik@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 28 Jun 2019 15:01:14 +0300
+Message-Id: <20190628120118.78920-4-mrolnik@gmail.com>
+X-Mailer: git-send-email 2.18.0
+In-Reply-To: <20190628120118.78920-1-mrolnik@gmail.com>
+References: <20190628120118.78920-1-mrolnik@gmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PATCH v24 3/7] target/avr: Add instruction decoding
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,565 +90,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, clg@kaod.org,
- Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: imammedo@redhat.com, richard.henderson@linaro.org,
+ Michael Rolnik <mrolnik@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
-
-On 3/12/19 9:54 AM, David Gibson wrote:
-> From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> 
-> There are currently 3 mitigations the availability of which is controlled
-> by the spapr-caps mechanism, cap-cfpc, cap-sbbc, and cap-ibs. Enable these
-> mitigations by default for the pseries-4.0 machine type.
-> 
-> By now machine firmware should have been upgraded to allow these
-> settings.
-> 
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> Message-Id: <20190301044609.9626-3-sjitindarsingh@gmail.com>
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/ppc/spapr.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 37fd7a1411..946bbcf9ee 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -4307,9 +4307,9 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
->      smc->default_caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
->      smc->default_caps.caps[SPAPR_CAP_VSX] = SPAPR_CAP_ON;
->      smc->default_caps.caps[SPAPR_CAP_DFP] = SPAPR_CAP_ON;
-> -    smc->default_caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_BROKEN;
-> -    smc->default_caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_BROKEN;
-> -    smc->default_caps.caps[SPAPR_CAP_IBS] = SPAPR_CAP_BROKEN;
-> +    smc->default_caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_WORKAROUND;
-> +    smc->default_caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_WORKAROUND;
-> +    smc->default_caps.caps[SPAPR_CAP_IBS] = SPAPR_CAP_WORKAROUND;
->      smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] = 16; /* 64kiB */
->      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] = SPAPR_CAP_OFF;
->      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_ON;
-> @@ -4389,6 +4389,9 @@ static void spapr_machine_3_1_class_options(MachineClass *mc)
->      mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power8_v2.0");
->      smc->update_dt_enabled = false;
->      smc->dr_phb_enabled = false;
-> +    smc->default_caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_BROKEN;
-> +    smc->default_caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_BROKEN;
-> +    smc->default_caps.caps[SPAPR_CAP_IBS] = SPAPR_CAP_BROKEN;
->      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_OFF;
->  }
-
-While trying auto-bisection for LP#1834613 [*] I found this commit break
-clean bisection.
-
-./configure --enable-debug
-
-$ qemu-system-ppc64 \
- -kernel vmlinuz-vanilla \
- -nographic -serial null
-qemu-system-ppc64: warning: TCG doesn't support requested feature,
-cap-cfpc=workaround
-qemu-system-ppc64: warning: TCG doesn't support requested feature,
-cap-sbbc=workaround
-qemu-system-ppc64: warning: TCG doesn't support requested feature,
-cap-ibs=workaround
-Opcode 13 10 10 00 (4c400420) leaked temporaries
-
-More verbose log:
-
-$ qemu-system-ppc64 \
- -kernel vmlinuz-vanilla \
- -nographic -append "console=hvc0" \
- -d guest_errors,in_asm
-qemu-system-ppc64: warning: TCG doesn't support requested feature,
-cap-cfpc=workaround
-qemu-system-ppc64: warning: TCG doesn't support requested feature,
-cap-sbbc=workaround
-qemu-system-ppc64: warning: TCG doesn't support requested feature,
-cap-ibs=workaround
-
-
-SLOF **********************************************************************
-QEMU Starting
- Build Date = Jan 14 2019 18:00:39
- FW Version = git-a5b428e1c1eae703
- Press "s" to enter Open Firmware.
-[...]
---------------
-IN: __switch_to
-0xc00000000001aac0:  60000000  nop
-0xc00000000001aac4:  7f44d378  mr       r4, r26
-0xc00000000001aac8:  7f23cb78  mr       r3, r25
-0xc00000000001aacc:  4bff3235  bl       0xdd00
-
-----------------
-IN: _switch
-0xc00000000000dd00:  7c0802a6  mflr     r0
-0xc00000000000dd04:  f8010010  std      r0, 0x10(r1)
-0xc00000000000dd08:  f821fe31  stdu     r1, -0x1d0(r1)
-0xc00000000000dd0c:  f9c100e0  std      r14, 0xe0(r1)
-0xc00000000000dd10:  f9e100e8  std      r15, 0xe8(r1)
-0xc00000000000dd14:  fa0100f0  std      r16, 0xf0(r1)
-0xc00000000000dd18:  fa2100f8  std      r17, 0xf8(r1)
-0xc00000000000dd1c:  fa410100  std      r18, 0x100(r1)
-0xc00000000000dd20:  fa610108  std      r19, 0x108(r1)
-0xc00000000000dd24:  fa810110  std      r20, 0x110(r1)
-0xc00000000000dd28:  faa10118  std      r21, 0x118(r1)
-0xc00000000000dd2c:  fac10120  std      r22, 0x120(r1)
-0xc00000000000dd30:  fae10128  std      r23, 0x128(r1)
-0xc00000000000dd34:  fb010130  std      r24, 0x130(r1)
-0xc00000000000dd38:  fb210138  std      r25, 0x138(r1)
-0xc00000000000dd3c:  fb410140  std      r26, 0x140(r1)
-0xc00000000000dd40:  fb610148  std      r27, 0x148(r1)
-0xc00000000000dd44:  fb810150  std      r28, 0x150(r1)
-0xc00000000000dd48:  fba10158  std      r29, 0x158(r1)
-0xc00000000000dd4c:  fbc10160  std      r30, 0x160(r1)
-0xc00000000000dd50:  fbe10168  std      r31, 0x168(r1)
-0xc00000000000dd54:  f8010170  std      r0, 0x170(r1)
-0xc00000000000dd58:  7ee00026  mfcr     r23
-0xc00000000000dd5c:  fae101a0  std      r23, 0x1a0(r1)
-0xc00000000000dd60:  f8230000  std      r1, 0(r3)
-0xc00000000000dd64:  4bffdb3d  bl       0xb8a0
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8a0:  7d2802a6  mflr     r9
-0xc00000000000b8a4:  48000005  bl       0xb8a8
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8a8:  48000005  bl       0xb8ac
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8ac:  48000005  bl       0xb8b0
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8b0:  48000005  bl       0xb8b4
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8b4:  48000005  bl       0xb8b8
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8b8:  48000005  bl       0xb8bc
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8bc:  48000005  bl       0xb8c0
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8c0:  48000005  bl       0xb8c4
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8c4:  48000005  bl       0xb8c8
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8c8:  48000005  bl       0xb8cc
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8cc:  48000005  bl       0xb8d0
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8d0:  48000005  bl       0xb8d4
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8d4:  48000005  bl       0xb8d8
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8d8:  48000005  bl       0xb8dc
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8dc:  48000005  bl       0xb8e0
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8e0:  48000005  bl       0xb8e4
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8e4:  48000005  bl       0xb8e8
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8e8:  48000005  bl       0xb8ec
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8ec:  48000005  bl       0xb8f0
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8f0:  48000005  bl       0xb8f4
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8f4:  48000005  bl       0xb8f8
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8f8:  48000005  bl       0xb8fc
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b8fc:  48000005  bl       0xb900
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b900:  48000005  bl       0xb904
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b904:  48000005  bl       0xb908
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b908:  48000005  bl       0xb90c
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b90c:  48000005  bl       0xb910
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b910:  48000005  bl       0xb914
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b914:  48000005  bl       0xb918
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b918:  48000005  bl       0xb91c
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b91c:  48000005  bl       0xb920
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b920:  48000005  bl       0xb924
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b924:  48000005  bl       0xb928
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b928:  48000005  bl       0xb92c
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b92c:  48000005  bl       0xb930
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b930:  48000005  bl       0xb934
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b934:  48000005  bl       0xb938
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b938:  48000005  bl       0xb93c
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b93c:  48000005  bl       0xb940
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b940:  48000005  bl       0xb944
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b944:  48000005  bl       0xb948
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b948:  48000005  bl       0xb94c
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b94c:  48000005  bl       0xb950
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b950:  48000005  bl       0xb954
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b954:  48000005  bl       0xb958
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b958:  48000005  bl       0xb95c
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b95c:  48000005  bl       0xb960
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b960:  48000005  bl       0xb964
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b964:  48000005  bl       0xb968
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b968:  48000005  bl       0xb96c
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b96c:  48000005  bl       0xb970
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b970:  48000005  bl       0xb974
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b974:  48000005  bl       0xb978
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b978:  48000005  bl       0xb97c
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b97c:  48000005  bl       0xb980
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b980:  48000005  bl       0xb984
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b984:  48000005  bl       0xb988
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b988:  48000005  bl       0xb98c
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b98c:  48000005  bl       0xb990
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b990:  48000005  bl       0xb994
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b994:  48000005  bl       0xb998
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b998:  48000005  bl       0xb99c
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b99c:  48000005  bl       0xb9a0
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b9a0:  48000005  bl       0xb9a4
-
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b9a4:  4800001c  b        0xb9c0
-
-Opcode 13 10 10 00 (4c400420) leaked temporaries
-----------------
-IN: ret_from_kernel_thread
-0xc00000000000b9c0:  7d2803a6  mtlr     r9
-0xc00000000000b9c4:  39207fff  li       r9, 0x7fff
-0xc00000000000b9c8:  7d2903a6  mtctr    r9
-0xc00000000000b9cc:  4c400420  bdzfctr  lt
-
-----------------
-IN: __start
-0xc000000000004700:  7db243a6  mtspr    0x112, r13
-0xc000000000004704:  7db142a6  mfspr    r13, 0x111
-0xc000000000004708:  f92d0080  std      r9, 0x80(r13)
-0xc00000000000470c:  7d20e2a6  mfspr    r9, 0x380
-0xc000000000004710:  7c421378  mr       r2, r2
-[...]
-----------------
-IN: __start
-0xc000000000008efc:  894d097b  lbz      r10, 0x97b(r13)
-0xc000000000008f00:  39600001  li       r11, 1
-0xc000000000008f04:  614a0001  ori      r10, r10, 1
-0xc000000000008f08:  996d097a  stb      r11, 0x97a(r13)
-0xc000000000008f0c:  994d097b  stb      r10, 0x97b(r13)
-0xc000000000008f10:  38610070  addi     r3, r1, 0x70
-0xc000000000008f14:  48019585  bl       0x22498
-
-----------------
-IN: program_check_exception
-0xc000000000022498:  7c0802a6  mflr     r0
-0xc00000000002249c:  fbc1fff0  std      r30, -0x10(r1)
-0xc0000000000224a0:  fbe1fff8  std      r31, -8(r1)
-0xc0000000000224a4:  7c7f1b78  mr       r31, r3
-0xc0000000000224a8:  f8010010  std      r0, 0x10(r1)
-0xc0000000000224ac:  f821ff91  stdu     r1, -0x70(r1)
-0xc0000000000224b0:  e9230108  ld       r9, 0x108(r3)
-0xc0000000000224b4:  793e0020  clrldi   r30, r9, 0x20
-0xc0000000000224b8:  77ca0010  andis.   r10, r30, 0x10
-0xc0000000000224bc:  418200a4  beq      0x22560
-
-----------------
-IN: program_check_exception
-0xc000000000022560:  77ca0002  andis.   r10, r30, 2
-0xc000000000022564:  418200f4  beq      0x22658
-
-----------------
-IN: program_check_exception
-0xc000000000022658:  77ca0020  andis.   r10, r30, 0x20
-0xc00000000002265c:  4182004c  beq      0x226a8
-
-----------------
-IN: program_check_exception
-0xc0000000000226a8:  e93f0108  ld       r9, 0x108(r31)
-0xc0000000000226ac:  71294000  andi.    r9, r9, 0x4000
-0xc0000000000226b0:  41820074  beq      0x22724
-
-----------------
-IN: program_check_exception
-0xc000000000022724:  77c90004  andis.   r9, r30, 4
-0xc000000000022728:  e8df0100  ld       r6, 0x100(r31)
-0xc00000000002272c:  38a00005  li       r5, 5
-0xc000000000022730:  4082ff40  bne      0x22670
-
-----------------
-IN: program_check_exception
-0xc000000000022734:  38a00001  li       r5, 1
-0xc000000000022738:  4bffff38  b        0x22670
-
-----------------
-IN: program_check_exception
-0xc000000000022670:  7fe4fb78  mr       r4, r31
-0xc000000000022674:  38600004  li       r3, 4
-0xc000000000022678:  4bfffed0  b        0x22548
-
-----------------
-IN: program_check_exception
-0xc000000000022548:  38210070  addi     r1, r1, 0x70
-0xc00000000002254c:  e8010010  ld       r0, 0x10(r1)
-0xc000000000022550:  ebc1fff0  ld       r30, -0x10(r1)
-0xc000000000022554:  ebe1fff8  ld       r31, -8(r1)
-0xc000000000022558:  7c0803a6  mtlr     r0
-0xc00000000002255c:  4bfffe4c  b        0x223a8
-
-----------------
-IN: _exception
-0xc0000000000223a8:  38e00000  li       r7, 0
-0xc0000000000223ac:  4bffffd4  b        0x22380
-
-----------------
-IN: _exception_pkey
-0xc000000000022380:  e9240108  ld       r9, 0x108(r4)
-0xc000000000022384:  71294000  andi.    r9, r9, 0x4000
-0xc000000000022388:  40820014  bne      0x2239c
-
-----------------
-IN: _exception_pkey
-0xc00000000002238c:  7c651b78  mr       r5, r3
-0xc000000000022390:  3c62ffd4  addis    r3, r2, -0x2c
-0xc000000000022394:  3863467e  addi     r3, r3, 0x467e
-0xc000000000022398:  4bfffc6c  b        0x22004
-
-----------------
-IN: die
-0xc000000000022004:  7c0802a6  mflr     r0
-0xc000000000022008:  48732b19  bl       0x754b20
-
-----------------
-IN: die
-0xc00000000002200c:  f821ffc1  stdu     r1, -0x40(r1)
-0xc000000000022010:  7c7c1b78  mr       r28, r3
-0xc000000000022014:  7c9f2378  mr       r31, r4
-0xc000000000022018:  7cbe2b78  mr       r30, r5
-0xc00000000002201c:  e9240140  ld       r9, 0x140(r4)
-0xc000000000022020:  792906e4  rldicr   r9, r9, 0, 0x3b
-0xc000000000022024:  2fa90100  cmpdi    cr7, r9, 0x100
-0xc000000000022028:  409e0058  bne      cr7, 0x22080
-
-----------------
-IN: die
-0xc000000000022080:  3d220003  addis    r9, r2, 3
-0xc000000000022084:  e9291d38  ld       r9, 0x1d38(r9)
-0xc000000000022088:  2fa90000  cmpdi    cr7, r9, 0
-0xc00000000002208c:  419effa0  beq      cr7, 0x2202c
-
-----------------
-IN: die
-0xc00000000002202c:  7fe3fb78  mr       r3, r31
-0xc000000000022030:  4bfff74d  bl       0x2177c
-
-----------------
-IN: oops_begin
-0xc00000000002177c:  7c0802a6  mflr     r0
-0xc000000000021780:  fbe1fff8  std      r31, -8(r1)
-0xc000000000021784:  f8010010  std      r0, 0x10(r1)
-0xc000000000021788:  f821ffd1  stdu     r1, -0x30(r1)
-0xc00000000002178c:  480a42bd  bl       0xc5a48
-[...]
-----------------
-IN: console_flush_on_panic
-0xc000000000121d98:  38210020  addi     r1, r1, 0x20
-0xc000000000121d9c:  39200000  li       r9, 0
-0xc000000000121da0:  3d42000c  addis    r10, r2, 0xc
-0xc000000000121da4:  e8010010  ld       r0, 0x10(r1)
-0xc000000000121da8:  912a282c  stw      r9, 0x282c(r10)
-0xc000000000121dac:  7c0803a6  mtlr     r0
-0xc000000000121db0:  4bffe5d0  b        0x120380
-
-----------------
-IN: panic_flush_kmsg_end
-0xc000000000022348:  60000000  nop
-0xc00000000002234c:  38210020  addi     r1, r1, 0x20
-0xc000000000022350:  e8010010  ld       r0, 0x10(r1)
-0xc000000000022354:  7c0803a6  mtlr     r0
-0xc000000000022358:  4e800020  blr
-
-----------------
-IN: pseries_panic
-0xc000000000096e9c:  60000000  nop
-0xc000000000096ea0:  e8610020  ld       r3, 0x20(r1)
-0xc000000000096ea4:  4bf97025  bl       0x2dec8
-
-----------------
-IN: rtas_os_term
-0xc00000000002dec8:  7c0802a6  mflr     r0
-0xc00000000002decc:  48726c59  bl       0x754b24
-[...]
-Guest crashed
-
-Am I supposed to use different command line options to run this image?
-
-Thanks,
-
-Phil.
-
-[*] https://bugs.launchpad.net/bugs/1834613
+This includes:
+- encoding of all 16 bit instructions
+- encoding of all 32 bit instructions
+
+Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+---
+ target/avr/insn.decode | 175 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 175 insertions(+)
+ create mode 100644 target/avr/insn.decode
+
+diff --git a/target/avr/insn.decode b/target/avr/insn.decode
+new file mode 100644
+index 0000000000..6b387762c6
+--- /dev/null
++++ b/target/avr/insn.decode
+@@ -0,0 +1,175 @@
++#
++#   A = [16 .. 31]
++#   B = [16 .. 23]
++#   C = [24, 26, 28, 30]
++#   D = [0, 2, 4, 6, 8, .. 30]
++
++%rd             4:5
++%rr             9:1 0:4
++
++&rd_rr          rd rr
++&rd_imm         rd imm
++
++@op_rd_rr       .... .. . ..... ....        &rd_rr      rd=%rd rr=%rr
++ADD             0000 11 . ..... ....        @op_rd_rr
++ADC             0001 11 . ..... ....        @op_rd_rr
++AND             0010 00 . ..... ....        @op_rd_rr
++CP              0001 01 . ..... ....        @op_rd_rr
++CPC             0000 01 . ..... ....        @op_rd_rr
++CPSE            0001 00 . ..... ....        @op_rd_rr
++EOR             0010 01 . ..... ....        @op_rd_rr
++MOV             0010 11 . ..... ....        @op_rd_rr
++MUL             1001 11 . ..... ....        @op_rd_rr
++OR              0010 10 . ..... ....        @op_rd_rr
++SBC             0000 10 . ..... ....        @op_rd_rr
++SUB             0001 10 . ..... ....        @op_rd_rr
++
++
++%rd_c           4:2                         !function=to_C
++%imm6           6:2 0:4
++
++@op_rd_imm6     .... .... .. .. ....        &rd_imm     rd=%rd_c imm=%imm6
++ADIW            1001 0110 .. .. ....        @op_rd_imm6
++SBIW            1001 0111 .. .. ....        @op_rd_imm6
++
++
++%rd_a           4:4                         !function=to_A
++%rr_a           0:4                         !function=to_A
++%rd_d           4:4                         !function=to_D
++%rr_d           0:4                         !function=to_D
++%imm8           8:4 0:4
++
++@op_rd_imm8     .... .... .... ....         &rd_imm     rd=%rd_a imm=%imm8
++ANDI            0111 .... .... ....         @op_rd_imm8
++CPI             0011 .... .... ....         @op_rd_imm8
++LDI             1110 .... .... ....         @op_rd_imm8
++ORI             0110 .... .... ....         @op_rd_imm8
++SBCI            0100 .... .... ....         @op_rd_imm8
++SUBI            0101 .... .... ....         @op_rd_imm8
++
++
++@op_rd          .... ... rd:5 ....
++ASR             1001 010 ..... 0101         @op_rd
++COM             1001 010 ..... 0000         @op_rd
++DEC             1001 010 ..... 1010         @op_rd
++ELPM2           1001 000 ..... 0110         @op_rd
++ELPMX           1001 000 ..... 0111         @op_rd
++INC             1001 010 ..... 0011         @op_rd
++LDX1            1001 000 ..... 1100         @op_rd
++LDX2            1001 000 ..... 1101         @op_rd
++LDX3            1001 000 ..... 1110         @op_rd
++LDY2            1001 000 ..... 1001         @op_rd
++LDY3            1001 000 ..... 1010         @op_rd
++LDZ2            1001 000 ..... 0001         @op_rd
++LDZ3            1001 000 ..... 0010         @op_rd
++LPM2            1001 000 ..... 0100         @op_rd
++LPMX            1001 000 ..... 0101         @op_rd
++LSR             1001 010 ..... 0110         @op_rd
++NEG             1001 010 ..... 0001         @op_rd
++POP             1001 000 ..... 1111         @op_rd
++PUSH            1001 001 ..... 1111         @op_rd
++ROR             1001 010 ..... 0111         @op_rd
++STY2            1001 001 ..... 1001         @op_rd
++STY3            1001 001 ..... 1010         @op_rd
++STZ2            1001 001 ..... 0001         @op_rd
++STZ3            1001 001 ..... 0010         @op_rd
++SWAP            1001 010 ..... 0010         @op_rd
++
++
++@op_bit         .... .... . bit:3 ....
++BCLR            1001 0100 1 ... 1000        @op_bit
++BSET            1001 0100 0 ... 1000        @op_bit
++
++
++@op_rd_bit      .... ... rd:5 . bit:3
++BLD             1111 100 ..... 0 ...        @op_rd_bit
++BST             1111 101 ..... 0 ...        @op_rd_bit
++
++
++@op_bit_imm     .... .. imm:s7 bit:3
++BRBC            1111 01 ....... ...         @op_bit_imm
++BRBS            1111 00 ....... ...         @op_bit_imm
++
++
++BREAK           1001 0101 1001 1000
++EICALL          1001 0101 0001 1001
++EIJMP           1001 0100 0001 1001
++ELPM1           1001 0101 1101 1000
++ICALL           1001 0101 0000 1001
++IJMP            1001 0100 0000 1001
++LPM1            1001 0101 1100 1000
++NOP             0000 0000 0000 0000
++RET             1001 0101 0000 1000
++RETI            1001 0101 0001 1000
++SLEEP           1001 0101 1000 1000
++SPM             1001 0101 1110 1000
++SPMX            1001 0101 1111 1000
++WDR             1001 0101 1010 1000
++
++
++@op_reg_bit     .... .... reg:5 bit:3
++CBI             1001 1000 ..... ...         @op_reg_bit
++SBI             1001 1010 ..... ...         @op_reg_bit
++SBIC            1001 1001 ..... ...         @op_reg_bit
++SBIS            1001 1011 ..... ...         @op_reg_bit
++
++
++DES             1001 0100 imm:4 1011
++
++
++%rd_b           4:3                         !function=to_B
++%rr_b           0:3                         !function=to_B
++@fmul           .... .... . ... . ...       &rd_rr      rd=%rd_b rr=%rr_b
++FMUL            0000 0011 0 ... 1 ...       @fmul
++FMULS           0000 0011 1 ... 0 ...       @fmul
++FMULSU          0000 0011 1 ... 1 ...       @fmul
++MULSU           0000 0011 0 ... 0 ...       @fmul
++
++
++%io_imm         9:2 0:4
++@io_rd_imm      .... . .. ..... ....        &rd_imm     rd=%rd imm=%io_imm
++IN              1011 0 .. ..... ....        @io_rd_imm
++OUT             1011 1 .. ..... ....        @io_rd_imm
++
++
++XCH             1001 001 rd:5 0100
++LAC             1001 001 rd:5 0110
++LAS             1001 001 rd:5 0101
++LAT             1001 001 rd:5 0111
++STX1            1001 001 rr:5 1100
++STX2            1001 001 rr:5 1101
++STX3            1001 001 rr:5 1110
++
++
++%ldst_d_imm     13:1 10:2 0:3
++@ldst_d         .. . . .. . rd:5  . ...     &rd_imm     imm=%ldst_d_imm
++LDDY            10 . 0 .. 0 ..... 1 ...     @ldst_d
++LDDZ            10 . 0 .. 0 ..... 0 ...     @ldst_d
++STDY            10 . 0 .. 1 ..... 1 ...     @ldst_d
++STDZ            10 . 0 .. 1 ..... 0 ...     @ldst_d
++
++
++MOVW            0000 0001 .... ....         &rd_rr      rd=%rd_d rr=%rr_d
++MULS            0000 0010 .... ....         &rd_rr      rd=%rd_a rr=%rr_a
++
++RCALL           1101 imm:s12
++RJMP            1100 imm:s12
++
++SBRC            1111 110 rr:5 0 bit:3
++SBRS            1111 111 rr:5 0 bit:3
++
++# The 22-bit immediate is partially in the opcode word,
++# and partially in the next.  Use append_16 to build the
++# complete 22-bit value.
++%imm_call       4:5 0:1                     !function=append_16
++CALL            1001 010 ..... 111 .        imm=%imm_call
++JMP             1001 010 ..... 110 .        imm=%imm_call
++
++
++# The 16-bit immediate is completely in the next word.
++# Fields cannot be defined with no bits, so we cannot play
++# the same trick and append to a zero-bit value.
++# Defer reading the immediate until trans_{LDS,STS}.
++@ldst_s         .... ... rd:5 ....          imm=0
++LDS             1001 000 ..... 0000         @ldst_s
++STS             1001 001 ..... 0000         @ldst_s
+-- 
+2.18.0
 
 
