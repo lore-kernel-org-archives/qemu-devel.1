@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F697C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 18:55:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 813E0C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 18:55:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C3F9205F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 18:55:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C3F9205F4
+	by mail.kernel.org (Postfix) with ESMTPS id 5D213205F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 18:55:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D213205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgw23-0007nY-VL
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 14:55:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40145)
+	id 1hgw2L-0007tF-MO
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 14:55:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40200)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hgvv3-0001zq-TO
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:48:25 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hgvv9-00025c-HD
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:48:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hgvv0-00010m-8M
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:48:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44128)
+ (envelope-from <ehabkost@redhat.com>) id 1hgvv6-00018Q-Na
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:48:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46754)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgvuz-0000pj-TT
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:48:18 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgvv6-00017U-E1
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:48:24 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2643F2F8BE7;
- Fri, 28 Jun 2019 18:48:08 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B7CAD2F8BCC;
+ Fri, 28 Jun 2019 18:48:23 +0000 (UTC)
 Received: from localhost (ovpn-116-7.gru2.redhat.com [10.97.116.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7CE7F5C882;
- Fri, 28 Jun 2019 18:48:06 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 12CF5608CA;
+ Fri, 28 Jun 2019 18:48:22 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Fri, 28 Jun 2019 15:47:16 -0300
-Message-Id: <20190628184742.5961-4-ehabkost@redhat.com>
+Date: Fri, 28 Jun 2019 15:47:18 -0300
+Message-Id: <20190628184742.5961-6-ehabkost@redhat.com>
 In-Reply-To: <20190628184742.5961-1-ehabkost@redhat.com>
 References: <20190628184742.5961-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Fri, 28 Jun 2019 18:48:08 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.38]); Fri, 28 Jun 2019 18:48:23 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v2 03/29] general: Replace global smp variables
- with smp machine properties
+Subject: [Qemu-devel] [PULL v2 05/29] hw/riscv: Replace global smp variables
+ with machine smp properties
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,309 +74,161 @@ Sender: "Qemu-devel"
 
 From: Like Xu <like.xu@linux.intel.com>
 
-Basically, the context could get the MachineState reference via call
-chains or unrecommended qdev_get_machine() in !CONFIG_USER_ONLY mode.
+The global smp variables in riscv are replaced with smp machine properties.
 
 A local variable of the same name would be introduced in the declaration
-phase out of less effort OR replace it on the spot if it's only used
-once in the context. No semantic changes.
+phase if it's used widely in the context OR replace it on the spot if it's
+only used once. No semantic changes.
 
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
+Message-Id: <20190518205428.90532-6-like.xu@linux.intel.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-Id: <20190518205428.90532-4-like.xu@linux.intel.com>
+[ehabkost: fix spike_board_init()]
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- accel/kvm/kvm-all.c          |  4 ++--
- backends/hostmem.c           |  6 ++++--
- cpus.c                       |  6 ++++--
- exec.c                       |  3 ++-
- gdbstub.c                    |  4 ++++
- hw/cpu/core.c                |  4 +++-
- migration/postcopy-ram.c     |  8 +++++++-
- numa.c                       |  1 +
- target/openrisc/sys_helper.c |  6 +++++-
- tcg/tcg.c                    | 13 ++++++++++++-
- 10 files changed, 44 insertions(+), 11 deletions(-)
+ hw/riscv/sifive_e.c    | 6 ++++--
+ hw/riscv/sifive_plic.c | 3 +++
+ hw/riscv/sifive_u.c    | 6 ++++--
+ hw/riscv/spike.c       | 3 +++
+ hw/riscv/virt.c        | 1 +
+ 5 files changed, 15 insertions(+), 4 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index e3cf72883b..3d86ae5052 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -1542,8 +1542,8 @@ static int kvm_init(MachineState *ms)
-         const char *name;
-         int num;
-     } num_cpus[] = {
--        { "SMP",          smp_cpus },
--        { "hotpluggable", max_cpus },
-+        { "SMP",          ms->smp.cpus },
-+        { "hotpluggable", ms->smp.max_cpus },
-         { NULL, }
-     }, *nc = num_cpus;
-     int soft_vcpus_limit, hard_vcpus_limit;
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index 04baf479a1..463102aa15 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -222,6 +222,7 @@ static void host_memory_backend_set_prealloc(Object *obj, bool value,
- {
-     Error *local_err = NULL;
-     HostMemoryBackend *backend = MEMORY_BACKEND(obj);
-+    MachineState *ms = MACHINE(qdev_get_machine());
+diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+index 80ac56fa7d..bd25e11a87 100644
+--- a/hw/riscv/sifive_e.c
++++ b/hw/riscv/sifive_e.c
+@@ -137,6 +137,7 @@ static void riscv_sifive_e_init(MachineState *machine)
  
-     if (backend->force_prealloc) {
-         if (value) {
-@@ -241,7 +242,7 @@ static void host_memory_backend_set_prealloc(Object *obj, bool value,
-         void *ptr = memory_region_get_ram_ptr(&backend->mr);
-         uint64_t sz = memory_region_size(&backend->mr);
- 
--        os_mem_prealloc(fd, ptr, sz, smp_cpus, &local_err);
-+        os_mem_prealloc(fd, ptr, sz, ms->smp.cpus, &local_err);
-         if (local_err) {
-             error_propagate(errp, local_err);
-             return;
-@@ -311,6 +312,7 @@ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
- {
-     HostMemoryBackend *backend = MEMORY_BACKEND(uc);
-     HostMemoryBackendClass *bc = MEMORY_BACKEND_GET_CLASS(uc);
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     Error *local_err = NULL;
-     void *ptr;
-     uint64_t sz;
-@@ -375,7 +377,7 @@ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
-          */
-         if (backend->prealloc) {
-             os_mem_prealloc(memory_region_get_fd(&backend->mr), ptr, sz,
--                            smp_cpus, &local_err);
-+                            ms->smp.cpus, &local_err);
-             if (local_err) {
-                 goto out;
-             }
-diff --git a/cpus.c b/cpus.c
-index 1af51b73dd..86b91fcd56 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -2078,8 +2078,10 @@ static void qemu_dummy_start_vcpu(CPUState *cpu)
- 
- void qemu_init_vcpu(CPUState *cpu)
- {
--    cpu->nr_cores = smp_cores;
--    cpu->nr_threads = smp_threads;
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+
-+    cpu->nr_cores = ms->smp.cores;
-+    cpu->nr_threads =  ms->smp.threads;
-     cpu->stopped = true;
-     cpu->random_seed = qemu_guest_random_seed_thread_part1();
- 
-diff --git a/exec.c b/exec.c
-index e7622d1956..50ea9c5aaa 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1874,6 +1874,7 @@ static void *file_ram_alloc(RAMBlock *block,
-                             bool truncate,
-                             Error **errp)
+ static void riscv_sifive_e_soc_init(Object *obj)
  {
 +    MachineState *ms = MACHINE(qdev_get_machine());
-     void *area;
+     SiFiveESoCState *s = RISCV_E_SOC(obj);
  
-     block->page_size = qemu_fd_getpagesize(fd);
-@@ -1930,7 +1931,7 @@ static void *file_ram_alloc(RAMBlock *block,
-     }
+     object_initialize_child(obj, "cpus", &s->cpus,
+@@ -144,7 +145,7 @@ static void riscv_sifive_e_soc_init(Object *obj)
+                             &error_abort, NULL);
+     object_property_set_str(OBJECT(&s->cpus), SIFIVE_E_CPU, "cpu-type",
+                             &error_abort);
+-    object_property_set_int(OBJECT(&s->cpus), smp_cpus, "num-harts",
++    object_property_set_int(OBJECT(&s->cpus), ms->smp.cpus, "num-harts",
+                             &error_abort);
+     sysbus_init_child_obj(obj, "riscv.sifive.e.gpio0",
+                           &s->gpio, sizeof(s->gpio),
+@@ -153,6 +154,7 @@ static void riscv_sifive_e_soc_init(Object *obj)
  
-     if (mem_prealloc) {
--        os_mem_prealloc(fd, area, memory, smp_cpus, errp);
-+        os_mem_prealloc(fd, area, memory, ms->smp.cpus, errp);
-         if (errp && *errp) {
-             qemu_ram_munmap(fd, area, memory);
-             return NULL;
-diff --git a/gdbstub.c b/gdbstub.c
-index 8618e34311..687c02e598 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -34,6 +34,7 @@
- #include "sysemu/sysemu.h"
- #include "exec/gdbstub.h"
- #include "hw/cpu/cluster.h"
-+#include "hw/boards.h"
- #endif
- 
- #define MAX_PACKET_LENGTH 4096
-@@ -1171,6 +1172,9 @@ static int gdb_handle_vcont(GDBState *s, const char *p)
-     CPU_FOREACH(cpu) {
-         max_cpus = max_cpus <= cpu->cpu_index ? cpu->cpu_index + 1 : max_cpus;
-     }
-+#else
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    unsigned int max_cpus = ms->smp.max_cpus;
- #endif
-     /* uninitialised CPUs stay 0 */
-     newstates = g_new0(char, max_cpus);
-diff --git a/hw/cpu/core.c b/hw/cpu/core.c
-index e57c73f0ce..9874c5c870 100644
---- a/hw/cpu/core.c
-+++ b/hw/cpu/core.c
-@@ -13,6 +13,7 @@
- #include "qemu/module.h"
- #include "qapi/error.h"
- #include "sysemu/cpus.h"
-+#include "hw/boards.h"
- 
- static void core_prop_get_core_id(Object *obj, Visitor *v, const char *name,
-                                   void *opaque, Error **errp)
-@@ -71,13 +72,14 @@ static void core_prop_set_nr_threads(Object *obj, Visitor *v, const char *name,
- 
- static void cpu_core_instance_init(Object *obj)
+ static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
  {
 +    MachineState *ms = MACHINE(qdev_get_machine());
-     CPUCore *core = CPU_CORE(obj);
+     const struct MemmapEntry *memmap = sifive_e_memmap;
+     Error *err = NULL;
  
-     object_property_add(obj, "core-id", "int", core_prop_get_core_id,
-                         core_prop_set_core_id, NULL, NULL, NULL);
-     object_property_add(obj, "nr-threads", "int", core_prop_get_nr_threads,
-                         core_prop_set_nr_threads, NULL, NULL, NULL);
--    core->nr_threads = smp_threads;
-+    core->nr_threads = ms->smp.threads;
- }
- 
- static void cpu_core_class_init(ObjectClass *oc, void *data)
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index e2aa57a701..9faacacc9e 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -29,6 +29,7 @@
- #include "sysemu/balloon.h"
+@@ -183,7 +185,7 @@ static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
+         SIFIVE_E_PLIC_CONTEXT_STRIDE,
+         memmap[SIFIVE_E_PLIC].size);
+     sifive_clint_create(memmap[SIFIVE_E_CLINT].base,
+-        memmap[SIFIVE_E_CLINT].size, smp_cpus,
++        memmap[SIFIVE_E_CLINT].size, ms->smp.cpus,
+         SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
+     sifive_mmio_emulate(sys_mem, "riscv.sifive.e.aon",
+         memmap[SIFIVE_E_AON].base, memmap[SIFIVE_E_AON].size);
+diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
+index 70a4413599..0950e89e15 100644
+--- a/hw/riscv/sifive_plic.c
++++ b/hw/riscv/sifive_plic.c
+@@ -24,6 +24,7 @@
  #include "qemu/error-report.h"
- #include "trace.h"
+ #include "hw/sysbus.h"
+ #include "hw/pci/msi.h"
 +#include "hw/boards.h"
+ #include "target/riscv/cpu.h"
+ #include "sysemu/sysemu.h"
+ #include "hw/riscv/sifive_plic.h"
+@@ -439,6 +440,8 @@ static void sifive_plic_irq_request(void *opaque, int irq, int level)
  
- /* Arbitrary limit on size of each discard command,
-  * keeps them around ~200 bytes
-@@ -128,6 +129,8 @@ static void migration_exit_cb(Notifier *n, void *data)
- 
- static struct PostcopyBlocktimeContext *blocktime_context_new(void)
+ static void sifive_plic_realize(DeviceState *dev, Error **errp)
  {
 +    MachineState *ms = MACHINE(qdev_get_machine());
 +    unsigned int smp_cpus = ms->smp.cpus;
-     PostcopyBlocktimeContext *ctx = g_new0(PostcopyBlocktimeContext, 1);
-     ctx->page_fault_vcpu_time = g_new0(uint32_t, smp_cpus);
-     ctx->vcpu_addr = g_new0(uintptr_t, smp_cpus);
-@@ -141,10 +144,11 @@ static struct PostcopyBlocktimeContext *blocktime_context_new(void)
- 
- static uint32List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     uint32List *list = NULL, *entry = NULL;
+     SiFivePLICState *plic = SIFIVE_PLIC(dev);
      int i;
  
--    for (i = smp_cpus - 1; i >= 0; i--) {
-+    for (i = ms->smp.cpus - 1; i >= 0; i--) {
-         entry = g_new0(uint32List, 1);
-         entry->value = ctx->vcpu_blocktime[i];
-         entry->next = list;
-@@ -807,6 +811,8 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
- {
-     MigrationIncomingState *mis = migration_incoming_get_current();
-     PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    unsigned int smp_cpus = ms->smp.cpus;
-     int i, affected_cpu = 0;
-     bool vcpu_total_blocktime = false;
-     uint32_t read_vcpu_time, low_time_offset;
-diff --git a/numa.c b/numa.c
-index 955ec0c830..7594eb5a7e 100644
---- a/numa.c
-+++ b/numa.c
-@@ -64,6 +64,7 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
-     uint16_t nodenr;
-     uint16List *cpus = NULL;
-     MachineClass *mc = MACHINE_GET_CLASS(ms);
-+    unsigned int max_cpus = ms->smp.max_cpus;
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 5ecc47cea3..43bf256946 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -321,13 +321,14 @@ static void riscv_sifive_u_init(MachineState *machine)
  
-     if (node->has_nodeid) {
-         nodenr = node->nodeid;
-diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
-index 8f11cb8202..1053409a04 100644
---- a/target/openrisc/sys_helper.c
-+++ b/target/openrisc/sys_helper.c
-@@ -24,6 +24,9 @@
- #include "exec/helper-proto.h"
- #include "exception.h"
- #include "sysemu/sysemu.h"
-+#ifndef CONFIG_USER_ONLY
-+#include "hw/boards.h"
-+#endif
- 
- #define TO_SPR(group, number) (((group) << 11) + (number))
- 
-@@ -194,6 +197,7 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env, target_ulong rd,
-                            target_ulong spr)
- {
- #ifndef CONFIG_USER_ONLY
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     OpenRISCCPU *cpu = env_archcpu(env);
-     CPUState *cs = env_cpu(env);
-     int idx;
-@@ -241,7 +245,7 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env, target_ulong rd,
-         return cpu->parent_obj.cpu_index;
- 
-     case TO_SPR(0, 129): /* NUMCORES */
--        return max_cpus;
-+        return ms->smp.max_cpus;
- 
-     case TO_SPR(0, 1024) ... TO_SPR(0, 1024 + (16 * 32)): /* Shadow GPRs */
-         idx = (spr - 1024);
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 02a2680169..be2c33c400 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -45,6 +45,10 @@
- #include "exec/cpu-common.h"
- #include "exec/exec-all.h"
- 
-+#if !defined(CONFIG_USER_ONLY)
-+#include "hw/boards.h"
-+#endif
-+
- #include "tcg-op.h"
- 
- #if UINTPTR_MAX == UINT32_MAX
-@@ -620,6 +624,10 @@ static size_t tcg_n_regions(void)
-     size_t i;
- 
-     /* Use a single region if all we have is one vCPU thread */
-+#if !defined(CONFIG_USER_ONLY)
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    unsigned int max_cpus = ms->smp.max_cpus;
-+#endif
-     if (max_cpus == 1 || !qemu_tcg_mttcg_enabled()) {
-         return 1;
-     }
-@@ -752,6 +760,7 @@ void tcg_register_thread(void)
- #else
- void tcg_register_thread(void)
+ static void riscv_sifive_u_soc_init(Object *obj)
  {
 +    MachineState *ms = MACHINE(qdev_get_machine());
-     TCGContext *s = g_malloc(sizeof(*s));
-     unsigned int i, n;
-     bool err;
-@@ -769,7 +778,7 @@ void tcg_register_thread(void)
+     SiFiveUSoCState *s = RISCV_U_SOC(obj);
  
-     /* Claim an entry in tcg_ctxs */
-     n = atomic_fetch_inc(&n_tcg_ctxs);
--    g_assert(n < max_cpus);
-+    g_assert(n < ms->smp.max_cpus);
-     atomic_set(&tcg_ctxs[n], s);
+     object_initialize_child(obj, "cpus", &s->cpus, sizeof(s->cpus),
+                             TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
+     object_property_set_str(OBJECT(&s->cpus), SIFIVE_U_CPU, "cpu-type",
+                             &error_abort);
+-    object_property_set_int(OBJECT(&s->cpus), smp_cpus, "num-harts",
++    object_property_set_int(OBJECT(&s->cpus), ms->smp.cpus, "num-harts",
+                             &error_abort);
  
-     tcg_ctx = s;
-@@ -979,6 +988,8 @@ void tcg_context_init(TCGContext *s)
-     tcg_ctxs = &tcg_ctx;
-     n_tcg_ctxs = 1;
- #else
+     sysbus_init_child_obj(obj, "gem", &s->gem, sizeof(s->gem),
+@@ -336,6 +337,7 @@ static void riscv_sifive_u_soc_init(Object *obj)
+ 
+ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+ {
 +    MachineState *ms = MACHINE(qdev_get_machine());
-+    unsigned int max_cpus = ms->smp.max_cpus;
-     tcg_ctxs = g_new(TCGContext *, max_cpus);
- #endif
+     SiFiveUSoCState *s = RISCV_U_SOC(dev);
+     const struct MemmapEntry *memmap = sifive_u_memmap;
+     MemoryRegion *system_memory = get_system_memory();
+@@ -371,7 +373,7 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+     sifive_uart_create(system_memory, memmap[SIFIVE_U_UART1].base,
+         serial_hd(1), qdev_get_gpio_in(DEVICE(s->plic), SIFIVE_U_UART1_IRQ));
+     sifive_clint_create(memmap[SIFIVE_U_CLINT].base,
+-        memmap[SIFIVE_U_CLINT].size, smp_cpus,
++        memmap[SIFIVE_U_CLINT].size, ms->smp.cpus,
+         SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
  
+     for (i = 0; i < SIFIVE_U_PLIC_NUM_SOURCES; i++) {
+diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+index 5b33d4be3b..d91d49dcae 100644
+--- a/hw/riscv/spike.c
++++ b/hw/riscv/spike.c
+@@ -172,6 +172,7 @@ static void spike_board_init(MachineState *machine)
+     MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+     MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+     int i;
++    unsigned int smp_cpus = machine->smp.cpus;
+ 
+     /* Initialize SOC */
+     object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
+@@ -254,6 +255,7 @@ static void spike_v1_10_0_board_init(MachineState *machine)
+     MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+     MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+     int i;
++    unsigned int smp_cpus = machine->smp.cpus;
+ 
+     if (!qtest_enabled()) {
+         info_report("The Spike v1.10.0 machine has been deprecated. "
+@@ -342,6 +344,7 @@ static void spike_v1_09_1_board_init(MachineState *machine)
+     MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+     MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+     int i;
++    unsigned int smp_cpus = machine->smp.cpus;
+ 
+     if (!qtest_enabled()) {
+         info_report("The Spike v1.09.1 machine has been deprecated. "
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index 84d94d0c42..8e11fe5f2f 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -394,6 +394,7 @@ static void riscv_virt_board_init(MachineState *machine)
+     char *plic_hart_config;
+     size_t plic_hart_config_len;
+     int i;
++    unsigned int smp_cpus = machine->smp.cpus;
+     void *fdt;
+ 
+     /* Initialize SOC */
 -- 
 2.18.0.rc1.1.g3f1ff2140
 
