@@ -2,59 +2,59 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92FD3C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 02:11:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D71DC5B577
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 02:13:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 687E72086D
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 02:11:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 687E72086D
+	by mail.kernel.org (Postfix) with ESMTPS id 06EDA20656
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 02:13:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06EDA20656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55698 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hggMZ-0001HM-4T
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 22:11:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49817)
+	id 1hggOe-0003Q6-VW
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 22:13:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49982)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hgg7u-0000Iv-1Z
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:56:35 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hgg8D-0000jC-V7
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:56:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hgg7s-0007sf-5W
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:56:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36706)
+ (envelope-from <ehabkost@redhat.com>) id 1hgg8C-0000Ie-Lq
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:56:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34398)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgg7r-0007qo-Sz
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:56:32 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgg8C-0000Fo-CA
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:56:52 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2B1A1307C941;
- Fri, 28 Jun 2019 01:56:31 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A16A4356DA;
+ Fri, 28 Jun 2019 01:56:51 +0000 (UTC)
 Received: from localhost (ovpn-116-7.gru2.redhat.com [10.97.116.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 96EC05D71C;
- Fri, 28 Jun 2019 01:56:30 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2079A5C21A;
+ Fri, 28 Jun 2019 01:56:50 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Thu, 27 Jun 2019 22:55:44 -0300
-Message-Id: <20190628015606.32107-8-ehabkost@redhat.com>
+Date: Thu, 27 Jun 2019 22:55:53 -0300
+Message-Id: <20190628015606.32107-17-ehabkost@redhat.com>
 In-Reply-To: <20190628015606.32107-1-ehabkost@redhat.com>
 References: <20190628015606.32107-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Fri, 28 Jun 2019 01:56:31 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Fri, 28 Jun 2019 01:56:51 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 07/29] hw/i386: Replace global smp variables
- with machine smp properties
+Subject: [Qemu-devel] [PULL 16/29] machine: show if CLI option '-numa node,
+ mem' is supported in QAPI schema
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,262 +66,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Like Xu <like.xu@linux.intel.com>,
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Like Xu <like.xu@linux.intel.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-The global smp variables in i386 are replaced with smp machine properties.
-To avoid calling qdev_get_machine() as much as possible, some related funtions
-for acpi data generations are refactored. No semantic changes.
+Legacy '-numa node,mem' option has a number of issues and mgmt often
+defaults to it. Unfortunately it's no possible to replace it with
+an alternative '-numa memdev' without breaking migration compatibility.
+What's possible though is to deprecate it, keeping option working with
+old machine types only.
 
-A local variable of the same name would be introduced in the declaration
-phase if it's used widely in the context OR replace it on the spot if it's
-only used once. No semantic changes.
+In order to help users to find out if being deprecated CLI option
+'-numa node,mem' is still supported by particular machine type, add new
+"numa-mem-supported" property to output of query-machines.
 
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Message-Id: <20190518205428.90532-8-like.xu@linux.intel.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+"numa-mem-supported" is set to 'true' for machines that currently support
+NUMA, but it will be flipped to 'false' later on, once deprecation period
+expires and kept 'true' only for old machine types that used to support
+the legacy option so it won't break existing configuration that are using
+it.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <1560172207-378962-1-git-send-email-imammedo@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/i386/acpi-build.c  | 11 +++++++----
- hw/i386/kvmvapic.c    |  7 +++++--
- hw/i386/pc.c          | 24 +++++++++++++++---------
- hw/i386/xen/xen-hvm.c |  4 ++++
- target/i386/cpu.c     |  4 +++-
- 5 files changed, 34 insertions(+), 16 deletions(-)
+ qapi/misc.json      | 5 ++++-
+ include/hw/boards.h | 3 +++
+ hw/arm/virt.c       | 1 +
+ hw/i386/pc.c        | 1 +
+ hw/ppc/spapr.c      | 1 +
+ vl.c                | 1 +
+ 6 files changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 8ae7d88b11..d281ffa89e 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -43,6 +43,7 @@
- #include "sysemu/tpm.h"
- #include "hw/acpi/tpm.h"
- #include "hw/acpi/vmgenid.h"
-+#include "hw/boards.h"
- #include "sysemu/tpm_backend.h"
- #include "hw/timer/mc146818rtc_regs.h"
- #include "hw/mem/memory-device.h"
-@@ -123,7 +124,8 @@ typedef struct FwCfgTPMConfig {
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 577f7166f4..ccd56c9191 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -2014,12 +2014,15 @@
+ #
+ # @hotpluggable-cpus: cpu hotplug via -device is supported (since 2.7.0)
+ #
++# @numa-mem-supported: true if '-numa node,mem' option is supported by
++#                      the machine type and false otherwise (since 4.1)
++#
+ # Since: 1.2.0
+ ##
+ { 'struct': 'MachineInfo',
+   'data': { 'name': 'str', '*alias': 'str',
+             '*is-default': 'bool', 'cpu-max': 'int',
+-            'hotpluggable-cpus': 'bool'} }
++            'hotpluggable-cpus': 'bool', 'numa-mem-supported': 'bool'} }
  
- static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg);
+ ##
+ # @query-machines:
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 843d82c77d..47cba6ce6c 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -159,6 +159,8 @@ typedef struct {
+  * @kvm_type:
+  *    Return the type of KVM corresponding to the kvm-type string option or
+  *    computed based on other criteria such as the host kernel capabilities.
++ * @numa_mem_supported:
++ *    true if '--numa node.mem' option is supported and false otherwise
+  */
+ struct MachineClass {
+     /*< private >*/
+@@ -211,6 +213,7 @@ struct MachineClass {
+     bool ignore_boot_device_suffixes;
+     bool smbus_no_migration_support;
+     bool nvdimm_supported;
++    bool numa_mem_supported;
  
--static void init_common_fadt_data(Object *o, AcpiFadtData *data)
-+static void init_common_fadt_data(MachineState *ms, Object *o,
-+                                  AcpiFadtData *data)
- {
-     uint32_t io = object_property_get_uint(o, ACPI_PM_PROP_PM_IO_BASE, NULL);
-     AmlAddressSpace as = AML_AS_SYSTEM_IO;
-@@ -139,7 +141,8 @@ static void init_common_fadt_data(Object *o, AcpiFadtData *data)
-              * CPUs for more than 8 CPUs, "Clustered Logical" mode has to be
-              * used
-              */
--            ((max_cpus > 8) ? (1 << ACPI_FADT_F_FORCE_APIC_CLUSTER_MODEL) : 0),
-+            ((ms->smp.max_cpus > 8) ?
-+                        (1 << ACPI_FADT_F_FORCE_APIC_CLUSTER_MODEL) : 0),
-         .int_model = 1 /* Multiple APIC */,
-         .rtc_century = RTC_CENTURY,
-         .plvl2_lat = 0xfff /* C2 state not supported */,
-@@ -173,7 +176,7 @@ static Object *object_resolve_type_unambiguous(const char *typename)
-     return o;
+     HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
+                                            DeviceState *dev);
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 026a5be18b..b0a29be099 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1951,6 +1951,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+     assert(!mc->get_hotplug_handler);
+     mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
+     hc->plug = virt_machine_device_plug_cb;
++    mc->numa_mem_supported = true;
  }
  
--static void acpi_get_pm_info(AcpiPmInfo *pm)
-+static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
- {
-     Object *piix = object_resolve_type_unambiguous(TYPE_PIIX4_PM);
-     Object *lpc = object_resolve_type_unambiguous(TYPE_ICH9_LPC_DEVICE);
-@@ -2612,7 +2615,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-     AcpiSlicOem slic_oem = { .id = NULL, .table_id = NULL };
-     Object *vmgenid_dev;
- 
--    acpi_get_pm_info(&pm);
-+    acpi_get_pm_info(machine, &pm);
-     acpi_get_misc_info(&misc);
-     acpi_get_pci_holes(&pci_hole, &pci_hole64);
-     acpi_get_slic_oem(&slic_oem);
-diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
-index ca8df462b6..9c2ab4aac5 100644
---- a/hw/i386/kvmvapic.c
-+++ b/hw/i386/kvmvapic.c
-@@ -18,6 +18,7 @@
- #include "sysemu/kvm.h"
- #include "hw/i386/apic_internal.h"
- #include "hw/sysbus.h"
-+#include "hw/boards.h"
- #include "tcg/tcg.h"
- 
- #define VAPIC_IO_PORT           0x7e
-@@ -442,11 +443,12 @@ static void do_patch_instruction(CPUState *cs, run_on_cpu_data data)
- 
- static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     CPUState *cs = CPU(cpu);
-     VAPICHandlers *handlers;
-     PatchInfo *info;
- 
--    if (smp_cpus == 1) {
-+    if (ms->smp.cpus == 1) {
-         handlers = &s->rom_state.up;
-     } else {
-         handlers = &s->rom_state.mp;
-@@ -747,6 +749,7 @@ static void do_vapic_enable(CPUState *cs, run_on_cpu_data data)
- static void kvmvapic_vm_state_change(void *opaque, int running,
-                                      RunState state)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     VAPICROMState *s = opaque;
-     uint8_t *zero;
- 
-@@ -755,7 +758,7 @@ static void kvmvapic_vm_state_change(void *opaque, int running,
-     }
- 
-     if (s->state == VAPIC_ACTIVE) {
--        if (smp_cpus == 1) {
-+        if (ms->smp.cpus == 1) {
-             run_on_cpu(first_cpu, do_vapic_enable, RUN_ON_CPU_HOST_PTR(s));
-         } else {
-             zero = g_malloc0(s->rom_state.vapic_size);
+ static void virt_instance_init(Object *obj)
 diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index da1cdd6853..73de30cc20 100644
+index 9b953eeeea..114fd5f8d4 100644
 --- a/hw/i386/pc.c
 +++ b/hw/i386/pc.c
-@@ -928,12 +928,14 @@ void enable_compat_apic_id_mode(void)
-  * no concept of "CPU index", and the NUMA tables on fw_cfg need the APIC ID of
-  * all CPUs up to max_cpus.
-  */
--static uint32_t x86_cpu_apic_id_from_index(unsigned int cpu_index)
-+static uint32_t x86_cpu_apic_id_from_index(MachineState *ms,
-+                                           unsigned int cpu_index)
- {
-     uint32_t correct_id;
-     static bool warned;
+@@ -2792,6 +2792,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+     nc->nmi_monitor_handler = x86_nmi;
+     mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
+     mc->nvdimm_supported = true;
++    mc->numa_mem_supported = true;
  
--    correct_id = x86_apicid_from_cpu_idx(smp_cores, smp_threads, cpu_index);
-+    correct_id = x86_apicid_from_cpu_idx(ms->smp.cores,
-+                                         ms->smp.threads, cpu_index);
-     if (compat_apic_id_mode) {
-         if (cpu_index != correct_id && !warned && !qtest_enabled()) {
-             error_report("APIC IDs set in compatibility mode, "
-@@ -1532,7 +1534,7 @@ static void pc_new_cpu(const char *typename, int64_t apic_id, Error **errp)
- 
- void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp)
- {
--    int64_t apic_id = x86_cpu_apic_id_from_index(id);
-+    int64_t apic_id = x86_cpu_apic_id_from_index(ms, id);
-     Error *local_err = NULL;
- 
-     if (id < 0) {
-@@ -1568,9 +1570,10 @@ void pc_cpus_init(PCMachineState *pcms)
-      *
-      * This is used for FW_CFG_MAX_CPUS. See comments on bochs_bios_init().
+     object_class_property_add(oc, PC_MACHINE_DEVMEM_REGION_SIZE, "int",
+         pc_machine_get_device_memory_region_size, NULL,
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 51256ac9ca..821f0d4a49 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -4367,6 +4367,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+      * in which LMBs are represented and hot-added
       */
--    pcms->apic_id_limit = x86_cpu_apic_id_from_index(max_cpus - 1) + 1;
-+    pcms->apic_id_limit = x86_cpu_apic_id_from_index(ms,
-+                                                     ms->smp.max_cpus - 1) + 1;
-     possible_cpus = mc->possible_cpu_arch_ids(ms);
--    for (i = 0; i < smp_cpus; i++) {
-+    for (i = 0; i < ms->smp.cpus; i++) {
-         pc_new_cpu(possible_cpus->cpus[i].type, possible_cpus->cpus[i].arch_id,
-                    &error_fatal);
-     }
-@@ -2294,6 +2297,8 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
-     X86CPU *cpu = X86_CPU(dev);
-     MachineState *ms = MACHINE(hotplug_dev);
-     PCMachineState *pcms = PC_MACHINE(hotplug_dev);
-+    unsigned int smp_cores = ms->smp.cores;
-+    unsigned int smp_threads = ms->smp.threads;
+     mc->numa_mem_align_shift = 28;
++    mc->numa_mem_supported = true;
  
-     if(!object_dynamic_cast(OBJECT(cpu), ms->cpu_type)) {
-         error_setg(errp, "Invalid CPU type, expected cpu type: '%s'",
-@@ -2303,7 +2308,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+     smc->default_caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
+     smc->default_caps.caps[SPAPR_CAP_VSX] = SPAPR_CAP_ON;
+diff --git a/vl.c b/vl.c
+index 96f4dd828b..1729410e92 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1430,6 +1430,7 @@ MachineInfoList *qmp_query_machines(Error **errp)
+         info->name = g_strdup(mc->name);
+         info->cpu_max = !mc->max_cpus ? 1 : mc->max_cpus;
+         info->hotpluggable_cpus = mc->has_hotpluggable_cpus;
++        info->numa_mem_supported = mc->numa_mem_supported;
  
-     /* if APIC ID is not set, set it based on socket/core/thread properties */
-     if (cpu->apic_id == UNASSIGNED_APIC_ID) {
--        int max_socket = (max_cpus - 1) / smp_threads / smp_cores;
-+        int max_socket = (ms->smp.max_cpus - 1) / smp_threads / smp_cores;
- 
-         if (cpu->socket_id < 0) {
-             error_setg(errp, "CPU socket-id is not set");
-@@ -2653,13 +2658,14 @@ static int64_t pc_get_default_cpu_node_id(const MachineState *ms, int idx)
- 
-    assert(idx < ms->possible_cpus->len);
-    x86_topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
--                            smp_cores, smp_threads, &topo);
-+                            ms->smp.cores, ms->smp.threads, &topo);
-    return topo.pkg_id % nb_numa_nodes;
- }
- 
- static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *ms)
- {
-     int i;
-+    unsigned int max_cpus = ms->smp.max_cpus;
- 
-     if (ms->possible_cpus) {
-         /*
-@@ -2678,9 +2684,9 @@ static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *ms)
- 
-         ms->possible_cpus->cpus[i].type = ms->cpu_type;
-         ms->possible_cpus->cpus[i].vcpus_count = 1;
--        ms->possible_cpus->cpus[i].arch_id = x86_cpu_apic_id_from_index(i);
-+        ms->possible_cpus->cpus[i].arch_id = x86_cpu_apic_id_from_index(ms, i);
-         x86_topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
--                                 smp_cores, smp_threads, &topo);
-+                                 ms->smp.cores, ms->smp.threads, &topo);
-         ms->possible_cpus->cpus[i].props.has_socket_id = true;
-         ms->possible_cpus->cpus[i].props.socket_id = topo.pkg_id;
-         ms->possible_cpus->cpus[i].props.has_core_id = true;
-diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index 2939122e7c..941bd25e66 100644
---- a/hw/i386/xen/xen-hvm.c
-+++ b/hw/i386/xen/xen-hvm.c
-@@ -750,6 +750,8 @@ static ioreq_t *cpu_get_ioreq_from_shared_memory(XenIOState *state, int vcpu)
- /* retval--the number of ioreq packet */
- static ioreq_t *cpu_get_ioreq(XenIOState *state)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    unsigned int max_cpus = ms->smp.max_cpus;
-     int i;
-     evtchn_port_t port;
- 
-@@ -1377,6 +1379,8 @@ static int xen_map_ioreq_server(XenIOState *state)
- 
- void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
- {
-+    MachineState *ms = MACHINE(pcms);
-+    unsigned int max_cpus = ms->smp.max_cpus;
-     int i, rc;
-     xen_pfn_t ioreq_pfn;
-     XenIOState *state;
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index da6eb67cfb..78830d403a 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -56,6 +56,7 @@
- #include "hw/hw.h"
- #include "hw/xen/xen.h"
- #include "hw/i386/apic_internal.h"
-+#include "hw/boards.h"
- #endif
- 
- #include "disas/capstone.h"
-@@ -5384,9 +5385,10 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-     }
- 
- #ifndef CONFIG_USER_ONLY
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     qemu_register_reset(x86_cpu_machine_reset_cb, cpu);
- 
--    if (cpu->env.features[FEAT_1_EDX] & CPUID_APIC || smp_cpus > 1) {
-+    if (cpu->env.features[FEAT_1_EDX] & CPUID_APIC || ms->smp.cpus > 1) {
-         x86_cpu_apic_create(cpu, &local_err);
-         if (local_err != NULL) {
-             goto out;
+         entry = g_malloc0(sizeof(*entry));
+         entry->value = info;
 -- 
 2.18.0.rc1.1.g3f1ff2140
 
