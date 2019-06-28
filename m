@@ -2,84 +2,114 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7971DC4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 13:34:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8A51C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 13:38:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43FEA208E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 13:34:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 60FC520645
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 13:38:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nlBqZbes"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43FEA208E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=wavesemi.onmicrosoft.com header.i=@wavesemi.onmicrosoft.com header.b="lFcXB41B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60FC520645
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgr16-00083m-Au
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 09:34:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44527)
+	id 1hgr53-0004KF-K0
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 09:38:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45516)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mrolnik@gmail.com>) id 1hgqMm-0003rk-Tp
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:52:38 -0400
+ (envelope-from <amarkovic@wavecomp.com>) id 1hgqPo-0006K2-Ih
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:55:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1hgqMh-0005cw-B9
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:52:35 -0400
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:41315)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1hgqMh-0005Yz-1F
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:52:31 -0400
-Received: by mail-wr1-x42d.google.com with SMTP id c2so6168332wrm.8
- for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 05:52:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=F1Q9dO1MJtBD4BuOPkl5FyT3pib0cGGJUVpBcSUVYeU=;
- b=nlBqZbesg60lSndbrnmS8BdC9Fcz0dT6NOb+iBsYHn0mPlNsz2EMHtGjjIxaUPj7ba
- skayDNiJYanAa7Bf1z8gRfmvzeKgCOPtv/MzWdN1ItOrCXdOXGLSJ8qJFQh/J4bGuId4
- LE+uxOs6ZgOzzf258JtW+rcwRWTGTpCVwE4267DbpwfHWXy1Ek9fsDEFcSo7/3Bw9sdm
- HouWOd0GfQQyuinbVK3+KjT27D6o4xMQCbutvp9Qvzvj7W3mAI1Djc9ltstyZBAB5bC7
- S/FgDnu2drRtQ/NZ6MPXWgh790w0hdKprHPZC6KUyK2rO8kJvZdSpuX/UkbM+aSF3c6I
- F91g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=F1Q9dO1MJtBD4BuOPkl5FyT3pib0cGGJUVpBcSUVYeU=;
- b=rF2WLNb/Hr3ynWmgPAFmWEnl/dh0GfkmsXhsveiRVeo86qOxiAFUvWfOsfUM7GOFGF
- NQZoQgQHprFb7FPG+1m87SI42aMpB40cPTZiA8cBbOVK9ll2/hIdwO56nhp+amhP/K02
- ykKRmbw5AZQ9xV+FM2He06edOpazXd4mwctpXCjZt61RnPIHMRSCPbox9MUyt5anHqQH
- hRMKO1uiMPZ7Fcu/RKBo8vXaZVdmtesEkYMeki3dATsz10EA3jYrUN9SDmEOahbCOB4v
- YQrx6EKlxOOGp6VhgZXjqJG1M9gwKA3sCUeR0N7WC6p5bAOBsnPrbHissPCdIeUpZ6lf
- fhNQ==
-X-Gm-Message-State: APjAAAXd+gYT5fxW3SaVfQeO0mwl1qxnjv+6IvIbS/0lGQ/9mwtP77Pz
- VGMzKn6nwhos2V6IydUw49NJM9eaCCyRnA==
-X-Google-Smtp-Source: APXvYqxC2rwKa7dlisw9h1FMdc96p9jReVkU1NVZTDAfxfag8JHS55MC12POEUJWegmSObXBCdK1/w==
-X-Received: by 2002:a5d:6190:: with SMTP id j16mr7992247wru.49.1561723306628; 
- Fri, 28 Jun 2019 05:01:46 -0700 (PDT)
-Received: from localhost.localdomain (bzq-79-182-104-87.red.bezeqint.net.
- [79.182.104.87])
- by smtp.gmail.com with ESMTPSA id v18sm2281229wrd.51.2019.06.28.05.01.43
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 28 Jun 2019 05:01:46 -0700 (PDT)
-From: Michael Rolnik <mrolnik@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 28 Jun 2019 15:01:18 +0300
-Message-Id: <20190628120118.78920-8-mrolnik@gmail.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20190628120118.78920-1-mrolnik@gmail.com>
-References: <20190628120118.78920-1-mrolnik@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42d
-Subject: [Qemu-devel] [PATCH v24 7/7] target/avr: Register AVR support with
- the rest of QEMU, the build system, and the MAINTAINERS file
+ (envelope-from <amarkovic@wavecomp.com>) id 1hgqPm-0007nq-I9
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:55:44 -0400
+Received: from mail-eopbgr770122.outbound.protection.outlook.com
+ ([40.107.77.122]:52965 helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+ id 1hgqPi-0007dT-KU
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:55:40 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=testarcselector01; d=microsoft.com; cv=none;
+ b=K+GKJP7E1nbgqacXdvLoONRqlGiLuTbGyPO1RgJymJ6PaWq3DRz8y84JL4eTQh5R4IRhY0DbTSXS+8pFPoB7sKz/j6PfwTUjXr5UYQ1NcOvVCy0UMAzMS2SOqjQ5s17hFwTI7jZj6HxTAkTK+w4pkoymoquD/u32cOVHmZZyXP0=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=testarcselector01;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ugX3G7NrQSU2i1OUMG8nXcaD+JG9naKJ/i7tI68B7cQ=;
+ b=wsl4Bbz6Rhn5dIgY1DO1ppSWE8gJyr6YInBBRcO6O9sR6lQ1A8u7jrv8TaCOZhGU+pw3lCCtN6i4XuMwbUbLo8o6ETfCdN/7bSHtwzxL9f40ADQb5uwLacOS3dGETd1A2qvodFhR2VmCjLUtTDTpo6qWHWkweqebaHghebCnbHA=
+ARC-Authentication-Results: i=1; test.office365.com
+ 1;spf=none;dmarc=none;dkim=none;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=wavesemi.onmicrosoft.com; s=selector1-wavesemi-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ugX3G7NrQSU2i1OUMG8nXcaD+JG9naKJ/i7tI68B7cQ=;
+ b=lFcXB41BPQC7dzcBBMgjpjgtkJnIYK053huEOGPzf3kwjczExV/BUtMlKG/UltmwhvY9JnKaak4th43qp1BPQR1mgmkbSb36ZcUu949DtL0mB0ngXV3flV5z6QmZyXJs6ekdI2okoH3WyRW4pP6YT8G15q0lID6Mjksn0hccotk=
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com (10.174.81.139) by
+ BN6PR2201MB1729.namprd22.prod.outlook.com (10.161.158.157) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2008.16; Fri, 28 Jun 2019 12:55:30 +0000
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com
+ ([fe80::b0c5:c059:f809:fc07]) by BN6PR2201MB1251.namprd22.prod.outlook.com
+ ([fe80::b0c5:c059:f809:fc07%2]) with mapi id 15.20.2008.018; Fri, 28 Jun 2019
+ 12:55:30 +0000
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Laurent Vivier <laurent@vivier.eu>, Fam Zheng <fam@euphon.net>
+Thread-Topic: [Patchew-devel] [Qemu-devel] [PATCH v15 0/5] linux-user: A set
+ of miscellaneous patches
+Thread-Index: AQHVLY8puA1jfdE0PE6ot7AC0RBAX6aw0o+AgAAozgCAAAcTgIAAAbuAgAABs6c=
+Date: Fri, 28 Jun 2019 12:55:29 +0000
+Message-ID: <BN6PR2201MB12512151463CD300D0EC1887C6FC0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <156171539473.6332.3788894025347542150@c4a48874b076>
+ <f1ff093c-cb64-a54e-778e-eb18a0fdddb2@vivier.eu>
+ <20190628124117.2lltlf7yiwlwy4j4@debian>,
+ <4d6b26bf-6f20-f809-9e9c-f706dfd21e35@vivier.eu>
+In-Reply-To: <4d6b26bf-6f20-f809-9e9c-f706dfd21e35@vivier.eu>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=amarkovic@wavecomp.com; 
+x-originating-ip: [82.117.201.26]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 1a08b850-b8b1-404b-b594-08d6fbc7e65e
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:BN6PR2201MB1729; 
+x-ms-traffictypediagnostic: BN6PR2201MB1729:
+x-microsoft-antispam-prvs: <BN6PR2201MB1729B5CD68C6FD8D00F3A236C6FC0@BN6PR2201MB1729.namprd22.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 00826B6158
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(346002)(396003)(366004)(39840400004)(376002)(136003)(199004)(189003)(53936002)(64756008)(66476007)(66446008)(73956011)(66556008)(66946007)(91956017)(4326008)(186003)(71190400001)(71200400001)(76116006)(4744005)(52536014)(8936002)(6506007)(110136005)(76176011)(68736007)(102836004)(229853002)(26005)(86362001)(5660300002)(6246003)(55236004)(256004)(54906003)(25786009)(2906002)(8676002)(476003)(6436002)(55016002)(11346002)(446003)(7696005)(99286004)(486006)(14454004)(81156014)(3846002)(74316002)(478600001)(6116002)(33656002)(9686003)(305945005)(7736002)(66066001)(81166006)(316002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:BN6PR2201MB1729;
+ H:BN6PR2201MB1251.namprd22.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: wavecomp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 8xhdOi55+oflsIvKzVHAM6/XxkRujVZn3CymsFMLz+TIdY1McpjoKq+0R7B4HVM0Igo6vYyf4Q6uj7rNeuosoS0slzTjNOpNNRzD/wLX4HD1epcw29QKgcZI6VyNGAasOP9DAsusKsyLasnzR55NmpBcearVF5UmwdI5TCV+lpTEAwtBDhvVoWzx33D0PNbjEIXxripOjRQtPDARBKY6VvTvytNpne0nm5gtVJzdC3mm/09cHofAgfiO3660jPE5NGFPC9eyMk3Zgrbir8BIqyv/6k0t2Eg85+kLnmmEIAg6Xgz+5m+JQnTFbLqhkv3odDQK5gcj3V8Xxy7L3DZ/xeQ2IJIPS4DeCP05n4AClQdyx5dXGaolN+38q8aEwJNRq0PG2T3M9J0SxMtADMkLx9EPO7W4zjDYhrShLG8dhZw=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wavecomp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1a08b850-b8b1-404b-b594-08d6fbc7e65e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jun 2019 12:55:29.9712 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: amarkovic@wavecomp.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR2201MB1729
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.77.122
+Subject: Re: [Qemu-devel] [Patchew-devel] [PATCH v15 0/5] linux-user: A set
+ of miscellaneous patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,211 +121,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: imammedo@redhat.com, Sarah Harris <S.E.Harris@kent.ac.uk>,
- richard.henderson@linaro.org, Michael Rolnik <mrolnik@gmail.com>
+Cc: "patchew-devel@redhat.com" <patchew-devel@redhat.com>,
+ "aleksandar.markovic@rt-rk.com" <aleksandar.markovic@rt-rk.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sarah Harris <S.E.Harris@kent.ac.uk>
+> I've moved the env/rpm/uname commands before the actual testing commands,=
+ so
+> the information can be collected even upon failures.
 
-Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
----
- MAINTAINERS                     |  6 ++++++
- arch_init.c                     |  2 ++
- configure                       |  7 +++++++
- default-configs/avr-softmmu.mak |  5 +++++
- include/disas/dis-asm.h         |  6 ++++++
- include/sysemu/arch_init.h      |  1 +
- qapi/common.json                |  3 ++-
- target/avr/Makefile.objs        | 33 +++++++++++++++++++++++++++++++++
- target/avr/cpu.c                |  5 -----
- tests/machine-none-test.c       |  1 +
- 10 files changed, 63 insertions(+), 6 deletions(-)
- create mode 100644 default-configs/avr-softmmu.mak
- create mode 100644 target/avr/Makefile.objs
+Would it be hard for you to capture output of the command "ldd --version" a=
+nd include it early in the log?
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index cad58b9487..c2ad82beb9 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -163,6 +163,12 @@ S: Maintained
- F: hw/arm/smmu*
- F: include/hw/arm/smmu*
- 
-+AVR TCG CPUs
-+M: Michael Rolnik <mrolnik@gmail.com>
-+S: Maintained
-+F: target/avr/
-+F: hw/avr/
-+
- CRIS TCG CPUs
- M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
- S: Maintained
-diff --git a/arch_init.c b/arch_init.c
-index 74b0708634..413ad7acfd 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -85,6 +85,8 @@ int graphic_depth = 32;
- #define QEMU_ARCH QEMU_ARCH_UNICORE32
- #elif defined(TARGET_XTENSA)
- #define QEMU_ARCH QEMU_ARCH_XTENSA
-+#elif defined(TARGET_AVR)
-+#define QEMU_ARCH QEMU_ARCH_AVR
- #endif
- 
- const uint32_t arch_type = QEMU_ARCH;
-diff --git a/configure b/configure
-index b091b82cb3..715050a743 100755
---- a/configure
-+++ b/configure
-@@ -7499,6 +7499,10 @@ case "$target_name" in
-     target_compiler=$cross_cc_aarch64
-     eval "target_compiler_cflags=\$cross_cc_cflags_${target_name}"
-   ;;
-+  avr)
-+	gdb_xml_files="avr-cpu.xml"
-+    target_compiler=$cross_cc_avr
-+  ;;
-   cris)
-     target_compiler=$cross_cc_cris
-   ;;
-@@ -7776,6 +7780,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
-       disas_config "ARM_A64"
-     fi
-   ;;
-+  avr)
-+    disas_config "AVR"
-+  ;;
-   cris)
-     disas_config "CRIS"
-   ;;
-diff --git a/default-configs/avr-softmmu.mak b/default-configs/avr-softmmu.mak
-new file mode 100644
-index 0000000000..d1e1c28118
---- /dev/null
-+++ b/default-configs/avr-softmmu.mak
-@@ -0,0 +1,5 @@
-+# Default configuration for avr-softmmu
-+
-+# Boards:
-+#
-+CONFIG_AVR_SAMPLE=y
-diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
-index e9c7dd8eb4..8bedce17ac 100644
---- a/include/disas/dis-asm.h
-+++ b/include/disas/dis-asm.h
-@@ -211,6 +211,12 @@ enum bfd_architecture
- #define bfd_mach_m32r          0  /* backwards compatibility */
-   bfd_arch_mn10200,    /* Matsushita MN10200 */
-   bfd_arch_mn10300,    /* Matsushita MN10300 */
-+  bfd_arch_avr,       /* Atmel AVR microcontrollers.  */
-+#define bfd_mach_avr1          1
-+#define bfd_mach_avr2          2
-+#define bfd_mach_avr3          3
-+#define bfd_mach_avr4          4
-+#define bfd_mach_avr5          5
-   bfd_arch_cris,       /* Axis CRIS */
- #define bfd_mach_cris_v0_v10   255
- #define bfd_mach_cris_v32      32
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-index 10cbafe970..aff57bfe61 100644
---- a/include/sysemu/arch_init.h
-+++ b/include/sysemu/arch_init.h
-@@ -25,6 +25,7 @@ enum {
-     QEMU_ARCH_NIOS2 = (1 << 17),
-     QEMU_ARCH_HPPA = (1 << 18),
-     QEMU_ARCH_RISCV = (1 << 19),
-+    QEMU_ARCH_AVR = (1 << 20),
- };
- 
- extern const uint32_t arch_type;
-diff --git a/qapi/common.json b/qapi/common.json
-index 99d313ef3b..6866c3e81d 100644
---- a/qapi/common.json
-+++ b/qapi/common.json
-@@ -183,11 +183,12 @@
- #        is true even for "qemu-system-x86_64".
- #
- # ppcemb: dropped in 3.1
-+# avr: added in 4.1
- #
- # Since: 3.0
- ##
- { 'enum' : 'SysEmuTarget',
--  'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386', 'lm32',
-+  'data' : [ 'aarch64', 'alpha', 'arm', 'avr', 'cris', 'hppa', 'i386', 'lm32',
-              'm68k', 'microblaze', 'microblazeel', 'mips', 'mips64',
-              'mips64el', 'mipsel', 'moxie', 'nios2', 'or1k', 'ppc',
-              'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
-diff --git a/target/avr/Makefile.objs b/target/avr/Makefile.objs
-new file mode 100644
-index 0000000000..1034d87525
---- /dev/null
-+++ b/target/avr/Makefile.objs
-@@ -0,0 +1,33 @@
-+#
-+#  QEMU AVR CPU
-+#
-+#  Copyright (c) 2016 Michael Rolnik
-+#
-+#  This library is free software; you can redistribute it and/or
-+#  modify it under the terms of the GNU Lesser General Public
-+#  License as published by the Free Software Foundation; either
-+#  version 2.1 of the License, or (at your option) any later version.
-+#
-+#  This library is distributed in the hope that it will be useful,
-+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+#  Lesser General Public License for more details.
-+#
-+#  You should have received a copy of the GNU Lesser General Public
-+#  License along with this library; if not, see
-+#  <http://www.gnu.org/licenses/lgpl-2.1.html>
-+#
-+
-+DECODETREE = $(SRC_PATH)/scripts/decodetree.py
-+decode-y = $(SRC_PATH)/target/avr/insn.decode
-+
-+target/avr/decode_insn.inc.c: $(decode-y) $(DECODETREE)
-+	$(call quiet-command, \
-+	  $(PYTHON) $(DECODETREE) -o $@ --decode decode_insn --insnwidth 16 $<, \
-+	  "GEN", $(TARGET_DIR)$@)
-+
-+target/avr/translate.o: target/avr/decode_insn.inc.c
-+
-+obj-y += translate.o cpu.o helper.o
-+obj-y += gdbstub.o
-+obj-$(CONFIG_SOFTMMU) += machine.o
-diff --git a/target/avr/cpu.c b/target/avr/cpu.c
-index ac85508156..5b926420ce 100644
---- a/target/avr/cpu.c
-+++ b/target/avr/cpu.c
-@@ -136,11 +136,6 @@ static void avr_cpu_initfn(Object *obj)
- #endif
- }
- 
--static char *avr_cpu_type_name(const char *cpu_model)
--{
--    return g_strdup_printf(AVR_CPU_TYPE_NAME("%s"), cpu_model);
--}
--
- static ObjectClass *avr_cpu_class_by_name(const char *cpu_model)
- {
-     ObjectClass *oc;
-diff --git a/tests/machine-none-test.c b/tests/machine-none-test.c
-index 4c6d470798..d0907e6bd4 100644
---- a/tests/machine-none-test.c
-+++ b/tests/machine-none-test.c
-@@ -27,6 +27,7 @@ static struct arch2cpu cpus_map[] = {
-     /* tested targets list */
-     { "arm", "cortex-a15" },
-     { "aarch64", "cortex-a57" },
-+    { "avr", "avr6-avr-cpu" },
-     { "x86_64", "qemu64,apic-id=0" },
-     { "i386", "qemu32,apic-id=0" },
-     { "alpha", "ev67" },
--- 
-2.18.0
+That would be sufficient for us to deduce "glibc version".
 
+Thanks,
+Aleksandar=
 
