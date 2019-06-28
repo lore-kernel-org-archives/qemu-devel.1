@@ -2,58 +2,60 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8057FC4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 00:41:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A092C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 01:58:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 553152086D
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 00:41:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 553152086D
+	by mail.kernel.org (Postfix) with ESMTPS id 6D8ED2064A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 01:58:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D8ED2064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55457 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgexf-0002zo-MT
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 20:41:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36352)
+	id 1hgg9a-0001y8-CG
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 21:58:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49708)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hgelN-0000dw-Ik
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 20:29:14 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hgg7d-0008Qb-VO
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:56:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hgelM-0006xF-5Y
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 20:29:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52552)
+ (envelope-from <ehabkost@redhat.com>) id 1hgg7c-0007CB-0z
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:56:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60600)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgelL-0006wo-Tn
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 20:29:12 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgg7a-000733-Dr
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:56:15 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3064B3084288;
- Fri, 28 Jun 2019 00:29:11 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E833A308FB82;
+ Fri, 28 Jun 2019 01:56:11 +0000 (UTC)
 Received: from localhost (ovpn-116-7.gru2.redhat.com [10.97.116.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A5828600CC;
- Fri, 28 Jun 2019 00:29:10 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9D42C5D71C;
+ Fri, 28 Jun 2019 01:56:08 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 27 Jun 2019 21:28:44 -0300
-Message-Id: <20190628002844.24894-10-ehabkost@redhat.com>
-In-Reply-To: <20190628002844.24894-1-ehabkost@redhat.com>
-References: <20190628002844.24894-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Date: Thu, 27 Jun 2019 22:55:37 -0300
+Message-Id: <20190628015606.32107-1-ehabkost@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Fri, 28 Jun 2019 00:29:11 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.43]); Fri, 28 Jun 2019 01:56:12 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 9/9] i386: Add Cascadelake-Server-v2 CPU
- model
+Subject: [Qemu-devel] [PULL 00/29] Machine next patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,158 +67,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, jingqi.liu@intel.com,
- Tao Xu <tao3.xu@intel.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- "Hu, Robert" <robert.hu@intel.com>, Igor Mammedov <imammedo@redhat.com>,
- Jiri Denemark <jdenemar@redhat.com>, "Lai, Paul C" <paul.c.lai@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add new version of Cascadelake-Server CPU model, setting
-stepping=5 and enabling the IA32_ARCH_CAPABILITIES MSR
-with some flags.
+The following changes since commit 474f3938d79ab36b9231c9ad3b5a9314c2aeac=
+de:
 
-The new feature will introduce a new host software requirement,
-breaking our CPU model runnability promises.  This means we can't
-enable the new CPU model version by default in QEMU 4.1, because
-management software isn't ready yet to resolve CPU model aliases.
-This is why "pc-*-4.1" will keep returning Cascadelake-Server-v1
-if "-cpu Cascadelake-Server" is specified.
+  Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-jun-21-=
+2019' into staging (2019-06-21 15:40:50 +0100)
 
-Includes a test case to ensure the right combinations of
-machine-type + CPU model + command-line feature flags will work
-as expected.
+are available in the Git repository at:
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
-Changes v1 -> v2:
-* Enable rdctl-no, ibrs-all, skip-l1dfl-vmentry
-  (Suggested by Tao Xu)
+  git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
 
-Cc: "Hu, Robert" <robert.hu@intel.com>
-Cc: Tao Xu <tao3.xu@intel.com>
-Cc: jingqi.liu@intel.com,
-Cc: "Lai, Paul C" <paul.c.lai@intel.com>
----
- target/i386/cpu.c                          | 14 +++++
- tests/acceptance/x86_cpu_model_versions.py | 73 ++++++++++++++++++++++
- 2 files changed, 87 insertions(+)
+for you to fetch changes up to 99e5945a1e7369737c2ad65dfafc86cb63df9e7a:
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 10a09c971a..570890a7dd 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2343,6 +2343,20 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_6_EAX_ARAT,
-         .xlevel = 0x80000008,
-         .model_id = "Intel Xeon Processor (Cascadelake)",
-+        .versions = (X86CPUVersionDefinition[]) {
-+            { .version = 1 },
-+            { .version = 2,
-+              .props = (PropValue[]) {
-+                  { "stepping", "5" },
-+                  { "arch-capabilities", "on" },
-+                  { "rdctl-no", "on" },
-+                  { "ibrs-all", "on" },
-+                  { "skip-l1dfl-vmentry", "on" },
-+                  { /* end of list */ }
-+              },
-+            },
-+            { /* end of list */ }
-+        }
-     },
-     {
-         .name = "Icelake-Client",
-diff --git a/tests/acceptance/x86_cpu_model_versions.py b/tests/acceptance/x86_cpu_model_versions.py
-index 165c0c7601..1c9fd6a56e 100644
---- a/tests/acceptance/x86_cpu_model_versions.py
-+++ b/tests/acceptance/x86_cpu_model_versions.py
-@@ -25,6 +25,10 @@
- import avocado_qemu
- import re
- 
-+def get_cpu_prop(vm, prop):
-+    cpu_path = vm.command('query-cpus')[0].get('qom_path')
-+    return vm.command('qom-get', path=cpu_path, property=prop)
-+
- class X86CPUModelAliases(avocado_qemu.Test):
-     """
-     Validation of PC CPU model versions and CPU model aliases
-@@ -229,3 +233,72 @@ class X86CPUModelAliases(avocado_qemu.Test):
-                          'qemu64-v1 must not be an alias')
- 
-         self.validate_aliases(cpus)
-+
-+    def test_Cascadelake_arch_capabilities_result(self):
-+        # machine-type only:
-+        vm = self.get_vm()
-+        vm.add_args('-S')
-+        vm.set_machine('pc-i440fx-4.1')
-+        vm.add_args('-cpu', 'Cascadelake-Server,x-force-features=on,check=off,enforce=off')
-+        vm.launch()
-+        self.assertFalse(get_cpu_prop(vm, 'arch-capabilities'),
-+                         'pc-i440fx-4.1 + Cascadelake-Server should not have arch-capabilities')
-+
-+        vm = self.get_vm()
-+        vm.add_args('-S')
-+        vm.set_machine('pc-i440fx-4.0')
-+        vm.add_args('-cpu', 'Cascadelake-Server,x-force-features=on,check=off,enforce=off')
-+        vm.launch()
-+        self.assertFalse(get_cpu_prop(vm, 'arch-capabilities'),
-+                         'pc-i440fx-4.0 + Cascadelake-Server should not have arch-capabilities')
-+
-+        # command line must override machine-type if CPU model is not versioned:
-+        vm = self.get_vm()
-+        vm.add_args('-S')
-+        vm.set_machine('pc-i440fx-4.0')
-+        vm.add_args('-cpu', 'Cascadelake-Server,x-force-features=on,check=off,enforce=off,+arch-capabilities')
-+        vm.launch()
-+        self.assertTrue(get_cpu_prop(vm, 'arch-capabilities'),
-+                        'pc-i440fx-4.0 + Cascadelake-Server,+arch-capabilities should have arch-capabilities')
-+
-+        vm = self.get_vm()
-+        vm.add_args('-S')
-+        vm.set_machine('pc-i440fx-4.1')
-+        vm.add_args('-cpu', 'Cascadelake-Server,x-force-features=on,check=off,enforce=off,-arch-capabilities')
-+        vm.launch()
-+        self.assertFalse(get_cpu_prop(vm, 'arch-capabilities'),
-+                         'pc-i440fx-4.1 + Cascadelake-Server,-arch-capabilities should not have arch-capabilities')
-+
-+        # versioned CPU model overrides machine-type:
-+        vm = self.get_vm()
-+        vm.add_args('-S')
-+        vm.set_machine('pc-i440fx-4.0')
-+        vm.add_args('-cpu', 'Cascadelake-Server-v1,x-force-features=on,check=off,enforce=off')
-+        vm.launch()
-+        self.assertFalse(get_cpu_prop(vm, 'arch-capabilities'),
-+                         'pc-i440fx-4.1 + Cascadelake-Server-v1 should not have arch-capabilities')
-+
-+        vm = self.get_vm()
-+        vm.add_args('-S')
-+        vm.set_machine('pc-i440fx-4.0')
-+        vm.add_args('-cpu', 'Cascadelake-Server-v2,x-force-features=on,check=off,enforce=off')
-+        vm.launch()
-+        self.assertTrue(get_cpu_prop(vm, 'arch-capabilities'),
-+                         'pc-i440fx-4.1 + Cascadelake-Server-v1 should have arch-capabilities')
-+
-+        # command line must override machine-type and versioned CPU model:
-+        vm = self.get_vm()
-+        vm.add_args('-S')
-+        vm.set_machine('pc-i440fx-4.0')
-+        vm.add_args('-cpu', 'Cascadelake-Server,x-force-features=on,check=off,enforce=off,+arch-capabilities')
-+        vm.launch()
-+        self.assertTrue(get_cpu_prop(vm, 'arch-capabilities'),
-+                         'pc-i440fx-4.0 + Cascadelake-Server-v1,+arch-capabilities should have arch-capabilities')
-+
-+        vm = self.get_vm()
-+        vm.add_args('-S')
-+        vm.set_machine('pc-i440fx-4.1')
-+        vm.add_args('-cpu', 'Cascadelake-Server-v2,x-force-features=on,check=off,enforce=off,-arch-capabilities')
-+        vm.launch()
-+        self.assertFalse(get_cpu_prop(vm, 'arch-capabilities'),
-+                         'pc-i440fx-4.1 + Cascadelake-Server-v2,-arch-capabilities should not have arch-capabilities')
--- 
+  vl.c: Add -smp, dies=3D* command line support and update doc (2019-06-2=
+6 14:38:13 -0300)
+
+----------------------------------------------------------------
+Machine and x86 queue, 2019-06-27
+
+* CPU die topology support (Like Xu)
+* Deprecation of features (Igor Mammedov):
+  * 'mem' parameter of '-numa node' option
+  * implict memory distribution between NUMA nodes
+  * deprecate -mem-path fallback to anonymous RAM
+* Other i386 fixes
+
+----------------------------------------------------------------
+
+Queue for Machine Core patches
+
+
+Alex Benn=C3=A9e (1):
+  target/i386: fix feature check in hyperv-stub.c
+
+Eduardo Habkost (4):
+  hppa: Delete unused hppa_cpu_list() function
+  i386: Don't print warning if phys-bits was set automatically
+  i386: Fix signedness of hyperv_spinlock_attempts
+  i386: Remove unused host_cpudef variable
+
+Igor Mammedov (5):
+  pc: fix possible NULL pointer dereference in
+    pc_machine_get_device_memory_region_size()
+  machine: show if CLI option '-numa node,mem' is supported in QAPI
+    schema
+  numa: deprecate 'mem' parameter of '-numa node' option
+  numa: deprecate implict memory distribution between nodes
+  deprecate -mem-path fallback to anonymous RAM
+
+Like Xu (17):
+  hw/boards: Add struct CpuTopology to MachineState
+  machine: Refactor smp-related call chains to pass MachineState
+  general: Replace global smp variables with smp machine properties
+  hw/ppc: Replace global smp variables with machine smp properties
+  hw/riscv: Replace global smp variables with machine smp properties
+  hw/s390x: Replace global smp variables with machine smp properties
+  hw/i386: Replace global smp variables with machine smp properties
+  hw/arm: Replace global smp variables with machine smp properties
+  hw: Replace global smp variables with MachineState for all remaining
+    archs
+  vl.c: Replace smp global variables with smp machine properties
+  i386: Add die-level cpu topology to x86CPU on PCMachine
+  hw/i386: Adjust nr_dies with configured smp_dies for PCMachine
+  i386/cpu: Consolidate die-id validity in smp context
+  i386: Update new x86_apicid parsing rules with die_offset support
+  target/i386: Add CPUID.1F generation support for multi-dies PCMachine
+  machine: Refactor smp_parse() in vl.c as MachineClass::smp_parse()
+  vl.c: Add -smp, dies=3D* command line support and update doc
+
+Roman Kagan (1):
+  i386: make 'hv-spinlocks' a regular uint32 property
+
+Wei Yang (1):
+  x86/cpu: use FeatureWordArray to define filtered_features
+
+ qapi/misc.json               |  11 ++-
+ include/hw/boards.h          |  27 +++++-
+ include/hw/firmware/smbios.h |   5 +-
+ include/hw/i386/pc.h         |   5 +-
+ include/hw/i386/topology.h   |  76 +++++++++++----
+ target/hppa/cpu.h            |   2 -
+ target/i386/cpu.h            |   8 +-
+ accel/kvm/kvm-all.c          |   4 +-
+ backends/hostmem.c           |   6 +-
+ cpus.c                       |   6 +-
+ exec.c                       |   3 +-
+ gdbstub.c                    |   4 +
+ hw/alpha/dp264.c             |   1 +
+ hw/arm/fsl-imx6.c            |   6 +-
+ hw/arm/fsl-imx6ul.c          |   6 +-
+ hw/arm/fsl-imx7.c            |   7 +-
+ hw/arm/highbank.c            |   1 +
+ hw/arm/mcimx6ul-evk.c        |   2 +-
+ hw/arm/mcimx7d-sabre.c       |   2 +-
+ hw/arm/raspi.c               |   4 +-
+ hw/arm/realview.c            |   1 +
+ hw/arm/sabrelite.c           |   2 +-
+ hw/arm/vexpress.c            |  16 +--
+ hw/arm/virt.c                |  11 ++-
+ hw/arm/xlnx-zynqmp.c         |  16 +--
+ hw/core/machine.c            |  88 +++++++++++++++++
+ hw/cpu/core.c                |   4 +-
+ hw/hppa/machine.c            |   4 +-
+ hw/i386/acpi-build.c         |  13 ++-
+ hw/i386/kvmvapic.c           |   7 +-
+ hw/i386/pc.c                 | 183 +++++++++++++++++++++++++++++------
+ hw/i386/xen/xen-hvm.c        |   4 +
+ hw/mips/boston.c             |   2 +-
+ hw/mips/mips_malta.c         |  24 ++---
+ hw/openrisc/openrisc_sim.c   |   1 +
+ hw/ppc/e500.c                |   3 +
+ hw/ppc/mac_newworld.c        |   3 +-
+ hw/ppc/mac_oldworld.c        |   3 +-
+ hw/ppc/pnv.c                 |   9 +-
+ hw/ppc/prep.c                |   4 +-
+ hw/ppc/spapr.c               |  38 ++++++--
+ hw/ppc/spapr_rtas.c          |   4 +-
+ hw/riscv/sifive_e.c          |   6 +-
+ hw/riscv/sifive_plic.c       |   3 +
+ hw/riscv/sifive_u.c          |   6 +-
+ hw/riscv/spike.c             |   3 +
+ hw/riscv/virt.c              |   1 +
+ hw/s390x/s390-virtio-ccw.c   |   9 +-
+ hw/s390x/sclp.c              |   2 +-
+ hw/smbios/smbios.c           |  26 ++---
+ hw/sparc/sun4m.c             |   2 +
+ hw/sparc64/sun4u.c           |   4 +-
+ hw/xtensa/sim.c              |   2 +-
+ hw/xtensa/xtfpga.c           |   1 +
+ migration/postcopy-ram.c     |   8 +-
+ monitor/hmp-cmds.c           |   3 +
+ monitor/qmp-cmds.c           |   2 +-
+ numa.c                       |  12 ++-
+ target/arm/cpu.c             |   8 +-
+ target/hppa/cpu.c            |  17 ----
+ target/i386/cpu.c            | 130 +++++++++++++------------
+ target/i386/hyperv-stub.c    |   2 +-
+ target/i386/kvm.c            |  12 +++
+ target/openrisc/sys_helper.c |   6 +-
+ target/s390x/cpu.c           |   3 +
+ target/s390x/excp_helper.c   |   5 +
+ tcg/tcg.c                    |  13 ++-
+ tests/test-x86-cpuid.c       |  84 ++++++++--------
+ vl.c                         |  97 ++++---------------
+ qemu-deprecated.texi         |  33 +++++++
+ qemu-options.hx              |  17 ++--
+ 71 files changed, 773 insertions(+), 370 deletions(-)
+
+--=20
 2.18.0.rc1.1.g3f1ff2140
 
 
