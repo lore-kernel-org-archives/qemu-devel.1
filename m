@@ -2,93 +2,55 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4E3AC4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 00:27:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51CB5C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 00:30:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B779208CB
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 00:27:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TzvSbxVG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B779208CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 270F5208CB
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 00:30:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 270F5208CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgek8-0007di-RD
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 20:27:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36000)
+	id 1hgemx-00020T-BQ
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 20:30:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36194)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <lucienmp.qemu@gmail.com>) id 1hgejd-00076e-48
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 20:27:26 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hgel2-0008L3-AM
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 20:28:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lucienmp.qemu@gmail.com>) id 1hgejb-00054x-39
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 20:27:25 -0400
-Received: from mail-pf1-x436.google.com ([2607:f8b0:4864:20::436]:38736)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <lucienmp.qemu@gmail.com>)
- id 1hgeja-00051n-BD
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 20:27:23 -0400
-Received: by mail-pf1-x436.google.com with SMTP id y15so2040282pfn.5
- for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 17:27:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:content-transfer-encoding:in-reply-to
- :user-agent; bh=pLHfPP7FjP/uE9RZSLQvD6XSge/jBsyE88XyGOQUBsI=;
- b=TzvSbxVGhzfkUs0XGCXC5hdvsVZLYIsnTow7aN4hUCP3Z2fc+DEzizVekZsq9g+R4D
- rYOkEUPrl5sKAkHg8wU2dXWCgglM0veudwks6Xjii0iOYOe/dbmNwGJ/ViM7ZNac1cEf
- MzbifbjQ9niVDPb+FTnCu1yhE2NnPH/nOwHDvF3eSNjdrn8EfT4+7v8UX/C48sY+nPe3
- UcvRgGnlyljN6Y1s6+i0FiOQjOTz7e4h1bNBTs6SezR58I3qSrG9Sh+Yj9W6RQB0BrQm
- SoYXOU7yd8Za+W+e5DXhpVDQqvzjZFd1a7LJEeX6URIPwdS9pKKCA/k6DSludm8izgHU
- c9kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=pLHfPP7FjP/uE9RZSLQvD6XSge/jBsyE88XyGOQUBsI=;
- b=dY40VO3g11BnYI92HLQnug+GMELZ+NJknD2/EKGNKkIlU3sgibERNEJ+NwoOutOPAZ
- Ci8NJeUbYQUPxBlkcAOM0qo1IGnO4p4rLKLQmqvQoH+w+/lIiDLmSfRZYMJ//MVuA2vr
- 6jOHXxdasD0nac5Zv0vD7R+rm4Xhfhg3ZRuqVGnJw6SR7p9g7sdZdY9i6Vlu3nOCjyT0
- h98hzIHHSTG/6MP1HaPik+ZXeazPIeD3uu6BQzv4FQrmyVpf1YY9NM+UL7G+TJnnBlQ2
- HX3cTj+DFhPKVSffpXaIy3UCVbmc0AbgcrDBs/StJyOUJxVglbj6Eg4zGC1yZWn6UTtA
- SRMQ==
-X-Gm-Message-State: APjAAAXOyZ7vf+HptoTlwMyOsCZMWEvgBQSe6ccMlBv+97+uYjSa+dcQ
- UZP3vkgPhq6LVDMMNrglE+w=
-X-Google-Smtp-Source: APXvYqzjOhsdXuf/YdXwQa1Z4Z8C51Ksqqw+espB1yVA+n4uyWThYsjnPwHepkB7bNYgorOhaucRmQ==
-X-Received: by 2002:a17:90a:898e:: with SMTP id
- v14mr9405298pjn.119.1561681638314; 
- Thu, 27 Jun 2019 17:27:18 -0700 (PDT)
-Received: from localhost.localdomain ([125.130.54.1])
- by smtp.gmail.com with ESMTPSA id f197sm240359pfa.161.2019.06.27.17.27.16
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 27 Jun 2019 17:27:17 -0700 (PDT)
-Date: Fri, 28 Jun 2019 09:27:13 +0900
-From: Lucien Murray-Pitts <lucienmp.qemu@gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <20190628002713.GA19257@localhost.localdomain>
-References: <2136180936.260219.1561641583358.ref@mail.yahoo.com>
- <2136180936.260219.1561641583358@mail.yahoo.com>
- <1079763171.281101.1561641752988@mail.yahoo.com>
- <e4c1fbc4-3e43-5df4-a17c-527d98d9763c@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <e4c1fbc4-3e43-5df4-a17c-527d98d9763c@linaro.org>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::436
-Subject: Re: [Qemu-devel] RFC: Why does target/m68k RTE insn. use
- gen_exception
+ (envelope-from <ehabkost@redhat.com>) id 1hgel0-0006jd-TC
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 20:28:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46894)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgeky-0006hw-Rf
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 20:28:49 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E53BF36807;
+ Fri, 28 Jun 2019 00:28:46 +0000 (UTC)
+Received: from localhost (ovpn-116-7.gru2.redhat.com [10.97.116.7])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5917610018FB;
+ Fri, 28 Jun 2019 00:28:46 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 27 Jun 2019 21:28:35 -0300
+Message-Id: <20190628002844.24894-1-ehabkost@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Fri, 28 Jun 2019 00:28:47 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2 0/9] x86 CPU model versioning
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,56 +62,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Lucien Anti-Spam <lucienmp_antispam@yahoo.com>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Pavel Hrdina <phrdina@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, Tao Xu <tao3.xu@intel.com>, "Hu,
+ Robert" <robert.hu@intel.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 27, 2019 at 07:09:39PM +0200, Richard Henderson wrote:
-> On 6/27/19 3:22 PM, Lucien Anti-Spam wrote:
-> > Hi Laurent / Richard,
-> > (resent email )
-> > 
-> > Does anyone have any knowledge why
-> >     gen_exception(s, s->base.pc_next, EXCP_RTE);
-> > 
-> > is generated for "RTE" instruction, where as the "RTS" goes a gen_jmp?
-> > ( note see target/m68k/translate.c in functions DISAS_INSN(rte) and DISAS_INSN(rts)
-> 
-> History, it would seem.  Paul Brook implemented it that way in 2007.
+Changes v1 -> v2:
 
-Ok, thank you I wanted to make sure RTE wasnt being one like this as a special case.
+* Patch "i386: Infrastructure for versioned CPU models" was
+  rewritten and split in two:
+  * i386: Register versioned CPU models
+  * i386: Make unversioned CPU models be aliases
+* -IBRS, -noTSX, -IBPB CPU models are now aliases
+* Enable rdctl-no, ibrs-all, skip-l1dfl-vmentry in
+  Cascadelake-Server-v2
+* New patch added:
+  * i386: Get model-id from CPU object on "-cpu help"
 
-> 
-> I think that it should not be implemented as an exception.  It should be a call
-> to one of two different helpers (cf and m68k), followed by either a normal exit
-> to main loop (to recognize the new interrupt state) or a debug exception.
-> 
-> This sort of modification should be fairly easy to perform, if you have the time.
-> 
+---
+Original description in v1:
 
-The original way of handling it was causing single step to malfunction, I dont
-rightly know why but the effect was that step would step twice and end up
-inside the ISR function again OR just stepping past the RTE as if it didnt
-exist.
+This series implements basic infrastructure for CPU model
+versioning, as discussed before[1][2][3].  This will finally
+allow us to update CPU models in ways that introduce new software
+or hardware requirements.
 
-I have made a quick hack to implement it the way you suggest and confirm that
-works better.
+My original plan was to use "query-cpu-model-expansion
+mode=static" to resolve aliases, but I dropped that plan because
+it would increase complexity for management software a lot.
+static CPU models are documented as not being affected by the
+machine type and accelerator at all, which would make the
+versioned CPU models very inconvenient to use in the command
+line.  e.g.: users would be forced to replace:
 
-HOWEVER, the "return" address is the instruction that causes the exception.
-So it immediately does return to the ISR.
+  -cpu Haswell
 
-This is a different issue, but I think interrelated to the original problem.
+with:
 
-Further single stepping INTO the failing instruction results in ending up
-at the ISR +1 instruction
+  -cpu Haswell-4.1,+2apic,+monitor,+kvmclock,+kvm-nopiodelay,+kvm-asyncpf,+kvm-steal-time,+kvm-pv-eoi,+kvmclock-stable-bit,+x2apic,-acpi,-monitor,-svm
 
-I will look at these but so far a little lost on the why for of them.
+In the end, making the versioned CPU models static is not a
+requirement at all: what we really need is to drop the
+runnability guarantees from unversioned CPU model names, and
+require management software to resolve the unversioned alias
+before saving the VM configuration.
 
-Cheers,
-Luc
+Guest ABI compatibility and live migration guarantees are going
+to be kept: unversioned CPU models will still be usable with live
+migration.  Only runnability guarantees when updating the machine
+type will be dropped.  This means unversioned CPU models are
+still reported as migration-safe in query-cpu-definitions.
 
-> 
-> r~
+The last patch in the series demonstrates how the new feature can
+be used to update a CPU model: it adds a Cascadelake-Server-4.1.1
+CPU model, including "arch-capabilities=on" and "stepping=5".
+Unfortunately we can't enable arch-capabilities in the -4.1
+version of Cascadelake-Server because it would break our existing
+runnability guarantees.
+
+[1] https://www.mail-archive.com/libvir-list@redhat.com/msg167342.html
+[2] https://www.mail-archive.com/qemu-devel@nongnu.org/msg590034.html
+[3] https://www.mail-archive.com/qemu-devel@nongnu.org/msg611244.html
+
+---
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Pavel Hrdina <phrdina@redhat.com>
+Cc: Jiri Denemark <jdenemar@redhat.com>
+Cc: "Hu, Robert" <robert.hu@intel.com>
+Cc: Tao Xu <tao3.xu@intel.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+
+Eduardo Habkost (9):
+  qmp: Add "alias-of" field to query-cpu-definitions
+  i386: Add x-force-features option for testing
+  i386: Get model-id from CPU object on "-cpu help"
+  i386: Register versioned CPU models
+  i386: Define -IBRS, -noTSX, -IBRS versions of CPU models
+  i386: Replace -noTSX, -IBRS, -IBPB CPU models with aliases
+  i386: Make unversioned CPU models be aliases
+  docs: Deprecate CPU model runnability guarantees
+  i386: Add Cascadelake-Server-v2 CPU model
+
+ qapi/target.json                           |    9 +-
+ include/hw/i386/pc.h                       |    3 +
+ target/i386/cpu-qom.h                      |   10 +-
+ target/i386/cpu.h                          |   28 +
+ hw/i386/pc.c                               |    3 +
+ hw/i386/pc_piix.c                          |    4 +
+ hw/i386/pc_q35.c                           |    4 +
+ target/i386/cpu.c                          | 1028 +++++++++-----------
+ qemu-deprecated.texi                       |   19 +
+ tests/acceptance/x86_cpu_model_versions.py |  304 ++++++
+ 10 files changed, 831 insertions(+), 581 deletions(-)
+ create mode 100644 tests/acceptance/x86_cpu_model_versions.py
+
+-- 
+2.18.0.rc1.1.g3f1ff2140
+
 
