@@ -6,75 +6,75 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B067C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 22:15:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 238C2C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 22:19:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2654F2086D
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 22:15:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2654F2086D
+	by mail.kernel.org (Postfix) with ESMTPS id EC7A82086D
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 22:19:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC7A82086D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgz9t-0002cU-7k
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 18:15:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39210)
+	id 1hgzDQ-0003yQ-Uk
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 18:19:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39732)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hgz8r-00025L-MW
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 18:14:50 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hgzBN-0003Mh-TW
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 18:17:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hgz8p-0001uq-QV
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 18:14:49 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:55015)
+ (envelope-from <pbonzini@redhat.com>) id 1hgzBN-0004Rc-23
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 18:17:25 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:34711)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hgz8o-0001sd-Pd
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 18:14:47 -0400
-Received: by mail-wm1-f68.google.com with SMTP id g135so10445652wme.4
- for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 15:14:46 -0700 (PDT)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hgzBM-0004R3-S9
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 18:17:25 -0400
+Received: by mail-wm1-f65.google.com with SMTP id w9so10213362wmd.1
+ for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 15:17:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=0wWbAEATxrgk2zjEO4zasGzG+X4TBMBhYxyvX1AFfNI=;
- b=PGTGXmDNgmjbD3q7rtA/POauOnD5ueqitzeZYIjOdMBV42PLRYeCPTwF9lZ9EM35vb
- oxU6RiU33qFcYCPBIajXai88M4yc0O2j7iTVgnC/oRnXz6DRhMY+DaEHWTbH0RzxC+hB
- 373nG7arFjXZfbsWBXniDqLViDy3lS6PXDSDbSRXSP+DbOhr+zvLATit/syoDJPpYGDn
- dsSwMXSDsdHRXsoeh0Mrs0iGuNnHej/1qd8VpnZM8IrtL7m58pQNhB3RGLLfV/I0Dcm1
- 3NrB4v5snFi/7Jp4xjYCf21fQLYpO72395s5ToU07nuBiJs3UuOyE+1xDFysPxj/0kxw
- UrfA==
-X-Gm-Message-State: APjAAAWWG/5xo0tGlAZzWVwr3RSezMG7Qi1wmEywBMW3Zam2bOcoZimI
- AA9MFttvpFa4gtpseSDMFpp4/g==
-X-Google-Smtp-Source: APXvYqyJXekAmMUlYEO70eJDx/e6SvTtuC4Mw+tA9kxDMeCG6TPMO15Y64D2tOZwkLe03VpwRmGP6g==
-X-Received: by 2002:a1c:9c4d:: with SMTP id f74mr8449055wme.156.1561760085146; 
- Fri, 28 Jun 2019 15:14:45 -0700 (PDT)
+ bh=1rlF7cCLxiyHA1UtVgDf96G5g5jR0Pmgu61bw9CTuyE=;
+ b=Sgt0qFDnpDaFV01fE9Hw8htSDmUNFHwRXeBuhSpa4jlEwVZQuJhvLdOWD72pw9PZ9Y
+ EzdBrfqfZs+nxMAsas6jFu1lTmVNuRHEvdB8mLYOVO08t5rhr9+PsiRgwvqHAQUYHuUB
+ KEdOP/5RaLqmd9Slvi2ypc3rUsbGKdE59wjnGe+bCar6Hik3emFOc7MSW7sXu3zizslZ
+ LoX6zZkYWWfwoS8HwnsOHsbUiO5K+2lzuG6/FD9Fl5qxjcKsgtw07FcJoTUC5INTRXUd
+ 8eVYPf8IPMJirlyHK9mgVB/di2cg1zJyrnJNw9kbP8DNSGg+/Ai5yIhc+6FcPiI4I3qi
+ fB8w==
+X-Gm-Message-State: APjAAAVxPxIfhMXy9J4dRnN/VkRKpoYo+vPzwIwY2csQaPr5Yt09s+LS
+ /HEb1lF15G7QmUCzTymmBthr8mbf/sQ=
+X-Google-Smtp-Source: APXvYqzIyu/asXvOxrvCAhouNgQZTg8bQ5PyU7V5yxPbuFvDbKOH7lDx7hWZi0wVqucLX1lOGWYe8w==
+X-Received: by 2002:a7b:c081:: with SMTP id r1mr9035095wmh.76.1561760243706;
+ Fri, 28 Jun 2019 15:17:23 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:a5c0:d60f:9764:1c58?
  ([2001:b07:6468:f312:a5c0:d60f:9764:1c58])
- by smtp.gmail.com with ESMTPSA id n14sm7788094wra.75.2019.06.28.15.14.44
+ by smtp.gmail.com with ESMTPSA id z6sm3205621wrw.2.2019.06.28.15.17.22
  (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 28 Jun 2019 15:14:44 -0700 (PDT)
-To: Alistair Francis <alistair23@gmail.com>
-References: <97104495f5c945d25315aff1bd618e1a7bacf34c.1561589072.git.alistair.francis@wdc.com>
- <1bd3ffcd-3f91-ecb9-2315-da7125f1dcdd@redhat.com>
- <CAKmqyKPeo4XXVy3onoM4W14N5Nj7CFWX=JpDT-JQQRUPw5CQ3Q@mail.gmail.com>
+ Fri, 28 Jun 2019 15:17:23 -0700 (PDT)
+To: "Michael S. Tsirkin" <mst@redhat.com>, Sergio Lopez <slp@redhat.com>
+References: <20190628115349.60293-1-slp@redhat.com>
+ <20190628115349.60293-5-slp@redhat.com>
+ <20190628100458-mutt-send-email-mst@kernel.org>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4428dc80-9ace-3bb0-a497-e3d416199bfd@redhat.com>
-Date: Sat, 29 Jun 2019 00:14:43 +0200
+Message-ID: <e2268d2c-6fcb-2567-1993-4b5b65c949dd@redhat.com>
+Date: Sat, 29 Jun 2019 00:17:22 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKPeo4XXVy3onoM4W14N5Nj7CFWX=JpDT-JQQRUPw5CQ3Q@mail.gmail.com>
+In-Reply-To: <20190628100458-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] hw/scsi: Report errors and sense to
- guests through scsi-block
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH 4/4] hw/i386: Introduce the microvm machine
+ type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,24 +86,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, shinichiro.kawasaki@wdc.com,
- Alistair Francis <alistair.francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 28/06/19 23:57, Alistair Francis wrote:
-> 
-> I tried to run my VM with option "-drive
-> ...,rerror=report,werror=report" as he noted, but the eternal loop
-> symptom still happens when host block-scsi device returns EIO. Then I
-> believe EIO should be added to the report target error list.
+On 28/06/19 16:06, Michael S. Tsirkin wrote:
+>> +    assert(kvm_irqchip_in_kernel());
+> Hmm - irqchip in kernel actually increases the attack surface,
+> does it not? Or at least, the severity of the attacks.
 
-What is the sense data he's seeing?  EIO is a catch-all return value
-for scsi_sense_buf_to_errno so I'd rather be more specific.
-
-Thanks,
+Yeah, we should at least support split irqchip.  But, irqchip completely
+in userspace is slow when it is not broken, and it does not support
+APICv.  So it's not really feasible.
 
 Paolo
 
