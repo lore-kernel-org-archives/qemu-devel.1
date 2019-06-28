@@ -2,59 +2,59 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BC5FC4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:13:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 170C1C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:17:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 375E8206A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:13:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 375E8206A2
+	by mail.kernel.org (Postfix) with ESMTPS id E4E05214AF
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:17:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4E05214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgwJb-0003MN-Ej
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 15:13:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40455)
+	id 1hgwNb-00065R-Gg
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 15:17:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40761)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hgvwP-0003SD-K4
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:49:48 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hgvxb-0004FZ-L6
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:51:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hgvwN-0002XI-0w
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:49:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60730)
+ (envelope-from <ehabkost@redhat.com>) id 1hgvxX-0003ZM-EP
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:50:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37900)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgvwM-0002We-Or
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:49:42 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgvxX-0003My-63
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:50:55 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 099F530872F4;
- Fri, 28 Jun 2019 18:49:42 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6F1D63001802;
+ Fri, 28 Jun 2019 18:50:40 +0000 (UTC)
 Received: from localhost (ovpn-116-7.gru2.redhat.com [10.97.116.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2763219C59;
- Fri, 28 Jun 2019 18:49:40 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 745455D705;
+ Fri, 28 Jun 2019 18:50:38 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Fri, 28 Jun 2019 15:47:23 -0300
-Message-Id: <20190628184742.5961-11-ehabkost@redhat.com>
+Date: Fri, 28 Jun 2019 15:47:31 -0300
+Message-Id: <20190628184742.5961-19-ehabkost@redhat.com>
 In-Reply-To: <20190628184742.5961-1-ehabkost@redhat.com>
 References: <20190628184742.5961-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Fri, 28 Jun 2019 18:49:42 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Fri, 28 Jun 2019 18:50:40 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v2 10/29] vl.c: Replace smp global variables
- with smp machine properties
+Subject: [Qemu-devel] [PULL v2 18/29] numa: deprecate implict memory
+ distribution between nodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,139 +67,63 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Like Xu <like.xu@linux.intel.com>, Richard Henderson <rth@twiddle.net>
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Like Xu <like.xu@linux.intel.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-The global smp variables in vl.c are completely replaced with machine properties.
+Implicit RAM distribution between nodes has exactly the same issues as:
+  "numa: deprecate 'mem' parameter of '-numa node' option"
+only with QEMU being the user that's 'adding' 'mem' parameter.
 
-Form this commit, the smp_cpus/smp_cores/smp_threads/max_cpus are deprecated
-and only machine properties within MachineState are fully applied and enabled.
+Deprecate it, to get it out of the way so that we could consolidate
+guest RAM allocation using memory backends making it consistent and
+possibly later on transition to using memory devices instead of
+adhoc memory mapping for the initial RAM.
 
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-Id: <20190518205428.90532-11-like.xu@linux.intel.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <1559205199-233510-4-git-send-email-imammedo@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- vl.c | 53 ++++++++++++++++++++++++++---------------------------
- 1 file changed, 26 insertions(+), 27 deletions(-)
+ numa.c               | 3 +++
+ qemu-deprecated.texi | 8 ++++++++
+ 2 files changed, 11 insertions(+)
 
-diff --git a/vl.c b/vl.c
-index 918e8413ef..96f4dd828b 100644
---- a/vl.c
-+++ b/vl.c
-@@ -165,10 +165,6 @@ static Chardev **serial_hds;
- Chardev *parallel_hds[MAX_PARALLEL_PORTS];
- int win2k_install_hack = 0;
- int singlestep = 0;
--int smp_cpus;
--unsigned int max_cpus;
--int smp_cores = 1;
--int smp_threads = 1;
- int acpi_enabled = 1;
- int no_hpet = 0;
- int fd_bootchk = 1;
-@@ -1267,8 +1263,9 @@ static void smp_parse(QemuOpts *opts)
-                 sockets = sockets > 0 ? sockets : 1;
-                 cpus = cores * threads * sockets;
-             } else {
--                max_cpus = qemu_opt_get_number(opts, "maxcpus", cpus);
--                sockets = max_cpus / (cores * threads);
-+                current_machine->smp.max_cpus =
-+                        qemu_opt_get_number(opts, "maxcpus", cpus);
-+                sockets = current_machine->smp.max_cpus / (cores * threads);
-             }
-         } else if (cores == 0) {
-             threads = threads > 0 ? threads : 1;
-@@ -1285,34 +1282,37 @@ static void smp_parse(QemuOpts *opts)
-             exit(1);
+diff --git a/numa.c b/numa.c
+index 7d449c7e95..c1f5e84fa5 100644
+--- a/numa.c
++++ b/numa.c
+@@ -410,6 +410,9 @@ void numa_complete_configuration(MachineState *ms)
+         if (i == nb_numa_nodes) {
+             assert(mc->numa_auto_assign_ram);
+             mc->numa_auto_assign_ram(mc, numa_info, nb_numa_nodes, ram_size);
++            warn_report("Default splitting of RAM between nodes is deprecated,"
++                        " Use '-numa node,memdev' to explictly define RAM"
++                        " allocation per node");
          }
  
--        max_cpus = qemu_opt_get_number(opts, "maxcpus", cpus);
-+        current_machine->smp.max_cpus =
-+                qemu_opt_get_number(opts, "maxcpus", cpus);
+         numa_total = 0;
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 44c9a95966..2fe9b72121 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -104,6 +104,14 @@ In future new machine versions will not accept the option but it will still
+ work with old machine types. User can check QAPI schema to see if the legacy
+ option is supported by looking at MachineInfo::numa-mem-supported property.
  
--        if (max_cpus < cpus) {
-+        if (current_machine->smp.max_cpus < cpus) {
-             error_report("maxcpus must be equal to or greater than smp");
-             exit(1);
-         }
++@subsection -numa node (without memory specified) (since 4.1)
++
++Splitting RAM by default between NUMA nodes has the same issues as @option{mem}
++parameter described above with the difference that the role of the user plays
++QEMU using implicit generic or board specific splitting rule.
++Use @option{memdev} with @var{memory-backend-ram} backend or @option{mem} (if
++it's supported by used machine type) to define mapping explictly instead.
++
+ @section QEMU Machine Protocol (QMP) commands
  
--        if (sockets * cores * threads > max_cpus) {
-+        if (sockets * cores * threads > current_machine->smp.max_cpus) {
-             error_report("cpu topology: "
-                          "sockets (%u) * cores (%u) * threads (%u) > "
-                          "maxcpus (%u)",
--                         sockets, cores, threads, max_cpus);
-+                         sockets, cores, threads,
-+                         current_machine->smp.max_cpus);
-             exit(1);
-         }
- 
--        if (sockets * cores * threads != max_cpus) {
-+        if (sockets * cores * threads != current_machine->smp.max_cpus) {
-             warn_report("Invalid CPU topology deprecated: "
-                         "sockets (%u) * cores (%u) * threads (%u) "
-                         "!= maxcpus (%u)",
--                        sockets, cores, threads, max_cpus);
-+                        sockets, cores, threads,
-+                        current_machine->smp.max_cpus);
-         }
- 
--        smp_cpus = cpus;
--        smp_cores = cores;
--        smp_threads = threads;
-+        current_machine->smp.cpus = cpus;
-+        current_machine->smp.cores = cores;
-+        current_machine->smp.threads = threads;
-     }
- 
--    if (smp_cpus > 1) {
-+    if (current_machine->smp.cpus > 1) {
-         Error *blocker = NULL;
-         error_setg(&blocker, QERR_REPLAY_NOT_SUPPORTED, "smp");
-         replay_add_blocker(blocker);
-@@ -4054,26 +4054,25 @@ int main(int argc, char **argv, char **envp)
-     machine_class->default_cpus = machine_class->default_cpus ?: 1;
- 
-     /* default to machine_class->default_cpus */
--    smp_cpus = machine_class->default_cpus;
--    max_cpus = machine_class->default_cpus;
-+    current_machine->smp.cpus = machine_class->default_cpus;
-+    current_machine->smp.max_cpus = machine_class->default_cpus;
-+    current_machine->smp.cores = 1;
-+    current_machine->smp.threads = 1;
- 
-     smp_parse(qemu_opts_find(qemu_find_opts("smp-opts"), NULL));
- 
--    current_machine->smp.cpus = smp_cpus;
--    current_machine->smp.max_cpus = max_cpus;
--    current_machine->smp.cores = smp_cores;
--    current_machine->smp.threads = smp_threads;
--
-     /* sanity-check smp_cpus and max_cpus against machine_class */
--    if (smp_cpus < machine_class->min_cpus) {
-+    if (current_machine->smp.cpus < machine_class->min_cpus) {
-         error_report("Invalid SMP CPUs %d. The min CPUs "
--                     "supported by machine '%s' is %d", smp_cpus,
-+                     "supported by machine '%s' is %d",
-+                     current_machine->smp.cpus,
-                      machine_class->name, machine_class->min_cpus);
-         exit(1);
-     }
--    if (max_cpus > machine_class->max_cpus) {
-+    if (current_machine->smp.max_cpus > machine_class->max_cpus) {
-         error_report("Invalid SMP CPUs %d. The max CPUs "
--                     "supported by machine '%s' is %d", max_cpus,
-+                     "supported by machine '%s' is %d",
-+                     current_machine->smp.max_cpus,
-                      machine_class->name, machine_class->max_cpus);
-         exit(1);
-     }
+ @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
 -- 
 2.18.0.rc1.1.g3f1ff2140
 
