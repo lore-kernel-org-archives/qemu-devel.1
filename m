@@ -6,58 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C03E6C5B576
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 02:21:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7148C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 02:24:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A21C20656
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 02:21:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A21C20656
+	by mail.kernel.org (Postfix) with ESMTPS id 8A243206A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 02:24:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A243206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55756 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hggVc-0002Bq-VM
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 22:21:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50060)
+	id 1hggYo-0005Fg-S4
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 22:24:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50146)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hgg8U-0000nZ-Qb
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:57:14 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hgg8n-0000wP-Kf
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:57:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hgg8O-0000o3-GM
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:57:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40492)
+ (envelope-from <ehabkost@redhat.com>) id 1hgg8l-0001hd-O2
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:57:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50686)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgg8O-0000l5-14
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:57:04 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgg8l-0001T7-DV
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:57:27 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2370F30842A0;
- Fri, 28 Jun 2019 01:57:03 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 828AA85540;
+ Fri, 28 Jun 2019 01:57:21 +0000 (UTC)
 Received: from localhost (ovpn-116-7.gru2.redhat.com [10.97.116.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 91408608A7;
- Fri, 28 Jun 2019 01:57:02 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E8E4D5D9D2;
+ Fri, 28 Jun 2019 01:57:20 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Thu, 27 Jun 2019 22:55:58 -0300
-Message-Id: <20190628015606.32107-22-ehabkost@redhat.com>
+Date: Thu, 27 Jun 2019 22:56:04 -0300
+Message-Id: <20190628015606.32107-28-ehabkost@redhat.com>
 In-Reply-To: <20190628015606.32107-1-ehabkost@redhat.com>
 References: <20190628015606.32107-1-ehabkost@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Fri, 28 Jun 2019 01:57:03 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.28]); Fri, 28 Jun 2019 01:57:21 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 21/29] deprecate -mem-path fallback to anonymous
- RAM
+Subject: [Qemu-devel] [PULL 27/29] target/i386: Add CPUID.1F generation
+ support for multi-dies PCMachine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,78 +66,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Like Xu <like.xu@linux.intel.com>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Igor Mammedov <imammedo@redhat.com>
+From: Like Xu <like.xu@linux.intel.com>
 
-Fallback might affect guest or worse whole host performance
-or functionality if backing file were used to share guest RAM
-with another process.
+The CPUID.1F as Intel V2 Extended Topology Enumeration Leaf would be
+exposed if guests want to emulate multiple software-visible die within
+each package. Per Intel's SDM, the 0x1f is a superset of 0xb, thus they
+can be generated by almost same code as 0xb except die_offset setting.
 
-Patch deprecates fallback so that we could remove it in future
-and ensure that QEMU will provide expected behavior and fail if
-it can't use user provided backing file.
+If the number of dies per package is greater than 1, the cpuid_min_level
+would be adjusted to 0x1f regardless of whether the host supports CPUID.1F.
+Likewise, the CPUID.1F wouldn't be exposed if env->nr_dies < 2.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20190626074228.11558-1-imammedo@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Like Xu <like.xu@linux.intel.com>
+Message-Id: <20190620054525.37188-2-like.xu@linux.intel.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- numa.c               | 6 ++++--
- qemu-deprecated.texi | 9 +++++++++
- 2 files changed, 13 insertions(+), 2 deletions(-)
+ target/i386/cpu.h |  1 +
+ target/i386/cpu.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ target/i386/kvm.c | 12 ++++++++++++
+ 3 files changed, 54 insertions(+)
 
-diff --git a/numa.c b/numa.c
-index c1f5e84fa5..48fd43ecc6 100644
---- a/numa.c
-+++ b/numa.c
-@@ -495,8 +495,10 @@ static void allocate_system_memory_nonnuma(MemoryReg=
-ion *mr, Object *owner,
-             if (mem_prealloc) {
-                 exit(1);
-             }
--            error_report("falling back to regular RAM allocation.");
--
-+            warn_report("falling back to regular RAM allocation");
-+            error_printf("This is deprecated. Make sure that -mem-path "
-+                         " specified path has sufficient resources to al=
-locate"
-+                         " -m specified RAM amount");
-             /* Legacy behavior: if allocation failed, fall back to
-              * regular RAM allocation.
-              */
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 2fe9b72121..9cba82d5ec 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -112,6 +112,15 @@ QEMU using implicit generic or board specific splitt=
-ing rule.
- Use @option{memdev} with @var{memory-backend-ram} backend or @option{mem=
-} (if
- it's supported by used machine type) to define mapping explictly instead=
-.
-=20
-+@subsection -mem-path fallback to RAM (since 4.1)
-+Currently if guest RAM allocation from file pointed by @option{mem-path}
-+fails, QEMU falls back to allocating from RAM, which might result
-+in unpredictable behavior since the backing file specified by the user
-+is ignored. In the future, users will be responsible for making sure
-+the backing storage specified with @option{-mem-path} can actually provi=
-de
-+the guest RAM configured with @option{-m} and QEMU will fail to start up=
- if
-+RAM allocation is unsuccessful.
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 85319f4ae1..0a96c78669 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -736,6 +736,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_TOPOLOGY_LEVEL_INVALID  (0U << 8)
+ #define CPUID_TOPOLOGY_LEVEL_SMT      (1U << 8)
+ #define CPUID_TOPOLOGY_LEVEL_CORE     (2U << 8)
++#define CPUID_TOPOLOGY_LEVEL_DIE      (5U << 8)
+ 
+ /* MSR Feature Bits */
+ #define MSR_ARCH_CAP_RDCL_NO    (1U << 0)
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 35ecb4113c..ea52db0600 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -4413,6 +4413,42 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+             *ecx |= CPUID_TOPOLOGY_LEVEL_INVALID;
+         }
+ 
++        assert(!(*eax & ~0x1f));
++        *ebx &= 0xffff; /* The count doesn't need to be reliable. */
++        break;
++    case 0x1F:
++        /* V2 Extended Topology Enumeration Leaf */
++        if (env->nr_dies < 2) {
++            *eax = *ebx = *ecx = *edx = 0;
++            break;
++        }
 +
- @section QEMU Machine Protocol (QMP) commands
-=20
- @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
---=20
++        *ecx = count & 0xff;
++        *edx = cpu->apic_id;
++        switch (count) {
++        case 0:
++            *eax = apicid_core_offset(env->nr_dies, cs->nr_cores,
++                                                    cs->nr_threads);
++            *ebx = cs->nr_threads;
++            *ecx |= CPUID_TOPOLOGY_LEVEL_SMT;
++            break;
++        case 1:
++            *eax = apicid_die_offset(env->nr_dies, cs->nr_cores,
++                                                   cs->nr_threads);
++            *ebx = cs->nr_cores * cs->nr_threads;
++            *ecx |= CPUID_TOPOLOGY_LEVEL_CORE;
++            break;
++        case 2:
++            *eax = apicid_pkg_offset(env->nr_dies, cs->nr_cores,
++                                                   cs->nr_threads);
++            *ebx = env->nr_dies * cs->nr_cores * cs->nr_threads;
++            *ecx |= CPUID_TOPOLOGY_LEVEL_DIE;
++            break;
++        default:
++            *eax = 0;
++            *ebx = 0;
++            *ecx |= CPUID_TOPOLOGY_LEVEL_INVALID;
++        }
+         assert(!(*eax & ~0x1f));
+         *ebx &= 0xffff; /* The count doesn't need to be reliable. */
+         break;
+@@ -5094,6 +5130,11 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+             x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
+         }
+ 
++        /* CPU topology with multi-dies support requires CPUID[0x1F] */
++        if (env->nr_dies > 1) {
++            x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x1F);
++        }
++
+         /* SVM requires CPUID[0x8000000A] */
+         if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
+             x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index e4b4f5756a..473a17e9a5 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1451,6 +1451,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
+             }
+             break;
+         }
++        case 0x1f:
++            if (env->nr_dies < 2) {
++                break;
++            }
+         case 4:
+         case 0xb:
+         case 0xd:
+@@ -1458,6 +1462,11 @@ int kvm_arch_init_vcpu(CPUState *cs)
+                 if (i == 0xd && j == 64) {
+                     break;
+                 }
++
++                if (i == 0x1f && j == 64) {
++                    break;
++                }
++
+                 c->function = i;
+                 c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+                 c->index = j;
+@@ -1469,6 +1478,9 @@ int kvm_arch_init_vcpu(CPUState *cs)
+                 if (i == 0xb && !(c->ecx & 0xff00)) {
+                     break;
+                 }
++                if (i == 0x1f && !(c->ecx & 0xff00)) {
++                    break;
++                }
+                 if (i == 0xd && c->eax == 0) {
+                     continue;
+                 }
+-- 
 2.18.0.rc1.1.g3f1ff2140
 
 
