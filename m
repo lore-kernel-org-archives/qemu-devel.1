@@ -2,61 +2,88 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2E31C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 12:43:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F9A1C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 12:43:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7241C20644
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 12:43:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7241C20644
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2809B20644
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 12:43:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j0z0L3cW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2809B20644
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgqDl-0004dL-Cn
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 08:43:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35999)
+	id 1hgqDu-0004xY-DS
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 08:43:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37480)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <slp@redhat.com>) id 1hgq4b-0002QP-Uq
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:33:52 -0400
+ (envelope-from <mrolnik@gmail.com>) id 1hgq7g-00068Q-Ru
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:37:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1hgq4X-0004Mj-F6
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:33:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44234)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1hgq4X-0004E1-6F
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:33:45 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5E8033082207;
- Fri, 28 Jun 2019 11:54:06 +0000 (UTC)
-Received: from dritchie.redhat.com (unknown [10.33.36.16])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 668131A92D;
- Fri, 28 Jun 2019 11:54:04 +0000 (UTC)
-From: Sergio Lopez <slp@redhat.com>
-To: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com,
- rth@twiddle.net, ehabkost@redhat.com
-Date: Fri, 28 Jun 2019 13:53:46 +0200
-Message-Id: <20190628115349.60293-2-slp@redhat.com>
-In-Reply-To: <20190628115349.60293-1-slp@redhat.com>
-References: <20190628115349.60293-1-slp@redhat.com>
+ (envelope-from <mrolnik@gmail.com>) id 1hgq7f-0005Yg-2R
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:37:00 -0400
+Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:37814)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1hgq7e-0005Xl-Oy
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:36:58 -0400
+Received: by mail-qt1-x844.google.com with SMTP id y57so6039765qtk.4
+ for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 05:36:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=oS3zRCRh24TudfHx4YCml/poKW51Z2mHnEQscHLxYTo=;
+ b=j0z0L3cWEnds+AACgH98jEavEop7gWu27QsP5cOJU4BcwT4dF4dOzSrS/YrPRjpsYj
+ yQMY/cy8GxlaRjHxXXrvKWm2O3dVLZTGrPKK0SdzdRTaOsX2pOxRJJf7Pbb4SMBdQcf1
+ N7jJQ36FVHoqelGzEgV+BF4ZzVKp77O6mrFN6vASpXr+1jTjYj/aJ+R7Smu606pMUuuQ
+ YeFYODjmwQYBD/mOd/2yv0UPcEKmZ0K8355EHCysY2HFWIdNhFQezIGagvcMbriBMi7t
+ 5N5HhV945QN2PNSNpTpe7P2ite2YUnQw79npVczs02MT9aZVTGb4imZfLhsUR+oeuTy0
+ 9Upw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=oS3zRCRh24TudfHx4YCml/poKW51Z2mHnEQscHLxYTo=;
+ b=cqN/2tjGkEImZmpsPI2/V45uMM4whg4/G5UlaOuHvtV635RwH5z4COBkCysl/WePMZ
+ gyTbE4f+uwayuAImMNZ3mTteKuAPfHaEW+Mu7YzJTF2mNv494AARhSgKVOFr0OzoJCFN
+ 94YPCAxg94sIYP9p8Hr/5hoK4XcEbVY8MUqpmjX0kUlSxLdUY1R42Hws3spYqYBjyD+j
+ iTQqTWrDuhoAlb2CkMEzE26YW0T03m58Oxlvvu1POO+X9z15vcv/Grgo3uH3syCiUXI1
+ 6gif33U2MpS5ouBMewqaEcVds6uwrCDFDHbaEE+erFPQIWCj1s3h5B1Px5QABN5ciKJv
+ U0QQ==
+X-Gm-Message-State: APjAAAV54jvihZVVF94SQgFNgSARgE0KZlaeEKTBpK9upK6IJGgaya9b
+ bq+07C/MSpjiAMoCb8kPH23fLCEm5d9/byU/OXvH6CxcT4s=
+X-Google-Smtp-Source: APXvYqy+z6DyJq62oMVwtMY7sbQL7nj+SEy2sThmd2EqxqRvJN/hRC/7DSyRjwyuB+SAWyntMP5ZKGMRO0pQzfH7sts=
+X-Received: by 2002:a0c:e6a2:: with SMTP id j2mr7452245qvn.190.1561723426259; 
+ Fri, 28 Jun 2019 05:03:46 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Fri, 28 Jun 2019 11:54:06 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 1/4] hw/i386: Factorize CPU routine
+References: <20190627052750.31856-1-mrolnik@gmail.com>
+ <20190627052750.31856-2-mrolnik@gmail.com>
+ <20190627132800.462655c5@redhat.com>
+ <CAK4993j0BP62dEM_X7dP_9zT5JjJ1F4_OwEuHTnVY+59RHgm0g@mail.gmail.com>
+ <CAK4993gq=Nz+r0H5jOfY7NqS2+rjM=vMRJSCtbXbxPwtwZYRSw@mail.gmail.com>
+ <20190628103626.2d10bcfa@redhat.com>
+ <CAK4993gOmQK71qNDyYe-f00Xqny+OXDH1O89gXmQVh8jdqmABQ@mail.gmail.com>
+ <20190628112253.275bdf7d@redhat.com>
+ <32aa0f8c-f779-4629-c3a6-9cad5357642a@linaro.org>
+In-Reply-To: <32aa0f8c-f779-4629-c3a6-9cad5357642a@linaro.org>
+From: Michael Rolnik <mrolnik@gmail.com>
+Date: Fri, 28 Jun 2019 15:03:09 +0300
+Message-ID: <CAK4993iv8HPj=QSH3B_1Dzkqh0GfRc0Lio+UWVfHOK0=MmeSDQ@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::844
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH v23 1/7] target/avr: Add outward facing
+ interfaces and core CPU logic
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,574 +95,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Sergio Lopez <slp@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Sarah Harris <S.E.Harris@kent.ac.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a combination of the following commits from
-NEMU (https://github.com/intel/nemu):
+thanks.
+new version is out.
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-commit b6472ce5ce5108c7aacb0dfa3d74b3eb8f98ae85
-Author: Samuel Ortiz <sameo@linux.intel.com>
-Date:   Fri Mar 22 10:28:31 2019 +0800
+Michael
 
-    hw: i386: Factorize CPU routines
+On Fri, Jun 28, 2019 at 1:01 PM Richard Henderson <
+richard.henderson@linaro.org> wrote:
 
-    A few routines are now shared between pc_* and virt, including the CP=
-U
-    init one.
-    We factorize those routines into an i386 specific file that is now us=
-ed
-    by all x86 machines.
-
-    Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-
-commit f29f3c294a889ad659dc8808728e8441e23a675c
-Author: Samuel Ortiz <sameo@linux.intel.com>
-Date:   Mon Oct 8 15:37:17 2018 +0200
-
-    hw: i386: Remove the pc header dependency from the cpu code
-
-    It's only a matter of moving the compat APIC boolean to the correct
-    header file (apic.h).
-
-    Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-Signed-off-by: Sergio Lopez <slp@redhat.com>
----
- hw/i386/Makefile.objs          |   1 +
- hw/i386/cpu.c                  | 174 +++++++++++++++++++++++++++++++++
- hw/i386/pc.c                   | 151 ++--------------------------
- hw/i386/pc_piix.c              |   3 +-
- hw/i386/pc_q35.c               |   3 +-
- include/hw/i386/apic.h         |   1 +
- include/hw/i386/cpu-internal.h |  32 ++++++
- 7 files changed, 218 insertions(+), 147 deletions(-)
- create mode 100644 hw/i386/cpu.c
- create mode 100644 include/hw/i386/cpu-internal.h
-
-diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
-index 5d9c9efd5f..102f2b35fc 100644
---- a/hw/i386/Makefile.objs
-+++ b/hw/i386/Makefile.objs
-@@ -1,5 +1,6 @@
- obj-$(CONFIG_KVM) +=3D kvm/
- obj-y +=3D multiboot.o
-+obj-y +=3D cpu.o
- obj-y +=3D pc.o
- obj-$(CONFIG_I440FX) +=3D pc_piix.o
- obj-$(CONFIG_Q35) +=3D pc_q35.o
-diff --git a/hw/i386/cpu.c b/hw/i386/cpu.c
-new file mode 100644
-index 0000000000..e13ae61535
---- /dev/null
-+++ b/hw/i386/cpu.c
-@@ -0,0 +1,174 @@
-+/*
-+ *
-+ * Copyright (c) 2018 Intel Corportation
-+ *
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
-+#include "qapi/error.h"
-+
-+#include "sysemu/cpus.h"
-+#include "sysemu/qtest.h"
-+#include "sysemu/numa.h"
-+#include "sysemu/sysemu.h"
-+
-+#include "hw/i386/cpu-internal.h"
-+#include "hw/i386/apic.h"
-+#include "hw/i386/topology.h"
-+
-+#include "hw/acpi/pc-hotplug.h"
-+
-+static void cpu_new(const char *typename, int64_t apic_id, Error **errp)
-+{
-+    Object *cpu =3D NULL;
-+    Error *local_err =3D NULL;
-+
-+    cpu =3D object_new(typename);
-+
-+    object_property_set_uint(cpu, apic_id, "apic-id", &local_err);
-+    object_property_set_bool(cpu, true, "realized", &local_err);
-+
-+    object_unref(cpu);
-+    error_propagate(errp, local_err);
-+}
-+
-+/* Calculates initial APIC ID for a specific CPU index
-+ *
-+ * Currently we need to be able to calculate the APIC ID from the CPU in=
-dex
-+ * alone (without requiring a CPU object), as the QEMU<->Seabios interfa=
-ces have
-+ * no concept of "CPU index", and the NUMA tables on fw_cfg need the API=
-C ID of
-+ * all CPUs up to max_cpus.
-+ */
-+uint32_t cpu_apicid_from_index(unsigned int cpu_index, bool compat)
-+{
-+    uint32_t correct_id;
-+    static bool warned;
-+
-+    correct_id =3D x86_apicid_from_cpu_idx(smp_cores, smp_threads, cpu_i=
-ndex);
-+    if (compat) {
-+        if (cpu_index !=3D correct_id && !warned && !qtest_enabled()) {
-+            error_report("APIC IDs set in compatibility mode, "
-+                         "CPU topology won't match the configuration");
-+            warned =3D true;
-+        }
-+        return cpu_index;
-+    } else {
-+        return correct_id;
-+    }
-+}
-+
-+CpuInstanceProperties cpu_index_to_props(MachineState *ms, unsigned cpu_=
-index)
-+{
-+    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
-+    const CPUArchIdList *possible_cpus =3D mc->possible_cpu_arch_ids(ms)=
-;
-+
-+    assert(cpu_index < possible_cpus->len);
-+    return possible_cpus->cpus[cpu_index].props;
-+}
-+
-+
-+int64_t cpu_get_default_cpu_node_id(const MachineState *ms, int idx)
-+{
-+   X86CPUTopoInfo topo;
-+
-+   assert(idx < ms->possible_cpus->len);
-+   x86_topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
-+                            smp_cores, smp_threads, &topo);
-+   return topo.pkg_id % nb_numa_nodes;
-+}
-+
-+const CPUArchIdList *cpu_possible_cpu_arch_ids(MachineState *ms)
-+{
-+    int i;
-+
-+    if (ms->possible_cpus) {
-+        /*
-+         * make sure that max_cpus hasn't changed since the first use, i=
-.e.
-+         * -smp hasn't been parsed after it
-+        */
-+        assert(ms->possible_cpus->len =3D=3D max_cpus);
-+        return ms->possible_cpus;
-+    }
-+
-+    ms->possible_cpus =3D g_malloc0(sizeof(CPUArchIdList) +
-+                                  sizeof(CPUArchId) * max_cpus);
-+    ms->possible_cpus->len =3D max_cpus;
-+    for (i =3D 0; i < ms->possible_cpus->len; i++) {
-+        X86CPUTopoInfo topo;
-+
-+        ms->possible_cpus->cpus[i].type =3D ms->cpu_type;
-+        ms->possible_cpus->cpus[i].vcpus_count =3D 1;
-+        ms->possible_cpus->cpus[i].arch_id =3D cpu_apicid_from_index(i, =
-compat_apic_id_mode);
-+        x86_topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
-+                                 smp_cores, smp_threads, &topo);
-+        ms->possible_cpus->cpus[i].props.has_socket_id =3D true;
-+        ms->possible_cpus->cpus[i].props.socket_id =3D topo.pkg_id;
-+        ms->possible_cpus->cpus[i].props.has_core_id =3D true;
-+        ms->possible_cpus->cpus[i].props.core_id =3D topo.core_id;
-+        ms->possible_cpus->cpus[i].props.has_thread_id =3D true;
-+        ms->possible_cpus->cpus[i].props.thread_id =3D topo.smt_id;
-+    }
-+    return ms->possible_cpus;
-+}
-+
-+
-+void cpu_hot_add(const int64_t id, Error **errp)
-+{
-+    MachineState *ms =3D MACHINE(qdev_get_machine());
-+    int64_t apic_id =3D cpu_apicid_from_index(id, compat_apic_id_mode);
-+    Error *local_err =3D NULL;
-+
-+    if (id < 0) {
-+        error_setg(errp, "Invalid CPU id: %" PRIi64, id);
-+        return;
-+    }
-+
-+    if (apic_id >=3D ACPI_CPU_HOTPLUG_ID_LIMIT) {
-+        error_setg(errp, "Unable to add CPU: %" PRIi64
-+                   ", resulting APIC ID (%" PRIi64 ") is too large",
-+                   id, apic_id);
-+        return;
-+    }
-+
-+    cpu_new(ms->cpu_type, apic_id, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+}
-+
-+uint32_t cpus_init(MachineState *ms, bool compat)
-+{
-+    int i;
-+    uint32_t apic_id_limit;
-+    const CPUArchIdList *possible_cpus;
-+    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
-+
-+    /* Calculates the limit to CPU APIC ID values
-+     *
-+     * Limit for the APIC ID value, so that all
-+     * CPU APIC IDs are < ms->apic_id_limit.
-+     *
-+     * This is used for FW_CFG_MAX_CPUS. See comments on bochs_bios_init=
-().
-+     */
-+    apic_id_limit =3D cpu_apicid_from_index(max_cpus - 1, compat) + 1;
-+    possible_cpus =3D mc->possible_cpu_arch_ids(ms);
-+    for (i =3D 0; i < smp_cpus; i++) {
-+        cpu_new(possible_cpus->cpus[i].type, possible_cpus->cpus[i].arch=
-_id,
-+                &error_fatal);
-+    }
-+
-+    return apic_id_limit;
-+}
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index e96360b47a..07d67a5031 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -26,6 +26,7 @@
- #include "qemu/units.h"
- #include "hw/hw.h"
- #include "hw/i386/pc.h"
-+#include "hw/i386/cpu-internal.h"
- #include "hw/char/serial.h"
- #include "hw/char/parallel.h"
- #include "hw/i386/apic.h"
-@@ -914,38 +915,13 @@ bool e820_get_entry(int idx, uint32_t type, uint64_=
-t *address, uint64_t *length)
- }
-=20
- /* Enables contiguous-apic-ID mode, for compatibility */
--static bool compat_apic_id_mode;
-+bool compat_apic_id_mode;
-=20
- void enable_compat_apic_id_mode(void)
- {
-     compat_apic_id_mode =3D true;
- }
-=20
--/* Calculates initial APIC ID for a specific CPU index
-- *
-- * Currently we need to be able to calculate the APIC ID from the CPU in=
-dex
-- * alone (without requiring a CPU object), as the QEMU<->Seabios interfa=
-ces have
-- * no concept of "CPU index", and the NUMA tables on fw_cfg need the API=
-C ID of
-- * all CPUs up to max_cpus.
-- */
--static uint32_t x86_cpu_apic_id_from_index(unsigned int cpu_index)
--{
--    uint32_t correct_id;
--    static bool warned;
--
--    correct_id =3D x86_apicid_from_cpu_idx(smp_cores, smp_threads, cpu_i=
-ndex);
--    if (compat_apic_id_mode) {
--        if (cpu_index !=3D correct_id && !warned && !qtest_enabled()) {
--            error_report("APIC IDs set in compatibility mode, "
--                         "CPU topology won't match the configuration");
--            warned =3D true;
--        }
--        return cpu_index;
--    } else {
--        return correct_id;
--    }
--}
--
- static void pc_build_smbios(PCMachineState *pcms)
- {
-     uint8_t *smbios_tables, *smbios_anchor;
-@@ -1516,67 +1492,6 @@ void pc_acpi_smi_interrupt(void *opaque, int irq, =
-int level)
-     }
- }
-=20
--static void pc_new_cpu(const char *typename, int64_t apic_id, Error **er=
-rp)
--{
--    Object *cpu =3D NULL;
--    Error *local_err =3D NULL;
--
--    cpu =3D object_new(typename);
--
--    object_property_set_uint(cpu, apic_id, "apic-id", &local_err);
--    object_property_set_bool(cpu, true, "realized", &local_err);
--
--    object_unref(cpu);
--    error_propagate(errp, local_err);
--}
--
--void pc_hot_add_cpu(const int64_t id, Error **errp)
--{
--    MachineState *ms =3D MACHINE(qdev_get_machine());
--    int64_t apic_id =3D x86_cpu_apic_id_from_index(id);
--    Error *local_err =3D NULL;
--
--    if (id < 0) {
--        error_setg(errp, "Invalid CPU id: %" PRIi64, id);
--        return;
--    }
--
--    if (apic_id >=3D ACPI_CPU_HOTPLUG_ID_LIMIT) {
--        error_setg(errp, "Unable to add CPU: %" PRIi64
--                   ", resulting APIC ID (%" PRIi64 ") is too large",
--                   id, apic_id);
--        return;
--    }
--
--    pc_new_cpu(ms->cpu_type, apic_id, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        return;
--    }
--}
--
--void pc_cpus_init(PCMachineState *pcms)
--{
--    int i;
--    const CPUArchIdList *possible_cpus;
--    MachineState *ms =3D MACHINE(pcms);
--    MachineClass *mc =3D MACHINE_GET_CLASS(pcms);
--
--    /* Calculates the limit to CPU APIC ID values
--     *
--     * Limit for the APIC ID value, so that all
--     * CPU APIC IDs are < pcms->apic_id_limit.
--     *
--     * This is used for FW_CFG_MAX_CPUS. See comments on bochs_bios_init=
-().
--     */
--    pcms->apic_id_limit =3D x86_cpu_apic_id_from_index(max_cpus - 1) + 1=
-;
--    possible_cpus =3D mc->possible_cpu_arch_ids(ms);
--    for (i =3D 0; i < smp_cpus; i++) {
--        pc_new_cpu(possible_cpus->cpus[i].type, possible_cpus->cpus[i].a=
-rch_id,
--                   &error_fatal);
--    }
--}
--
- static void pc_build_feature_control_file(PCMachineState *pcms)
- {
-     MachineState *ms =3D MACHINE(pcms);
-@@ -2638,60 +2553,6 @@ static void pc_machine_reset(void)
-     }
- }
-=20
--static CpuInstanceProperties
--pc_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
--{
--    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
--    const CPUArchIdList *possible_cpus =3D mc->possible_cpu_arch_ids(ms)=
-;
--
--    assert(cpu_index < possible_cpus->len);
--    return possible_cpus->cpus[cpu_index].props;
--}
--
--static int64_t pc_get_default_cpu_node_id(const MachineState *ms, int id=
-x)
--{
--   X86CPUTopoInfo topo;
--
--   assert(idx < ms->possible_cpus->len);
--   x86_topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
--                            smp_cores, smp_threads, &topo);
--   return topo.pkg_id % nb_numa_nodes;
--}
--
--static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *ms)
--{
--    int i;
--
--    if (ms->possible_cpus) {
--        /*
--         * make sure that max_cpus hasn't changed since the first use, i=
-.e.
--         * -smp hasn't been parsed after it
--        */
--        assert(ms->possible_cpus->len =3D=3D max_cpus);
--        return ms->possible_cpus;
--    }
--
--    ms->possible_cpus =3D g_malloc0(sizeof(CPUArchIdList) +
--                                  sizeof(CPUArchId) * max_cpus);
--    ms->possible_cpus->len =3D max_cpus;
--    for (i =3D 0; i < ms->possible_cpus->len; i++) {
--        X86CPUTopoInfo topo;
--
--        ms->possible_cpus->cpus[i].type =3D ms->cpu_type;
--        ms->possible_cpus->cpus[i].vcpus_count =3D 1;
--        ms->possible_cpus->cpus[i].arch_id =3D x86_cpu_apic_id_from_inde=
-x(i);
--        x86_topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
--                                 smp_cores, smp_threads, &topo);
--        ms->possible_cpus->cpus[i].props.has_socket_id =3D true;
--        ms->possible_cpus->cpus[i].props.socket_id =3D topo.pkg_id;
--        ms->possible_cpus->cpus[i].props.has_core_id =3D true;
--        ms->possible_cpus->cpus[i].props.core_id =3D topo.core_id;
--        ms->possible_cpus->cpus[i].props.has_thread_id =3D true;
--        ms->possible_cpus->cpus[i].props.thread_id =3D topo.smt_id;
--    }
--    return ms->possible_cpus;
--}
--
- static void x86_nmi(NMIState *n, int cpu_index, Error **errp)
- {
-     /* cpu index isn't used */
-@@ -2732,13 +2593,13 @@ static void pc_machine_class_init(ObjectClass *oc=
-, void *data)
-     pcmc->pvh_enabled =3D true;
-     assert(!mc->get_hotplug_handler);
-     mc->get_hotplug_handler =3D pc_get_hotplug_handler;
--    mc->cpu_index_to_instance_props =3D pc_cpu_index_to_props;
--    mc->get_default_cpu_node_id =3D pc_get_default_cpu_node_id;
--    mc->possible_cpu_arch_ids =3D pc_possible_cpu_arch_ids;
-+    mc->cpu_index_to_instance_props =3D cpu_index_to_props;
-+    mc->get_default_cpu_node_id =3D cpu_get_default_cpu_node_id;
-+    mc->possible_cpu_arch_ids =3D cpu_possible_cpu_arch_ids;
-     mc->auto_enable_numa_with_memhp =3D true;
-     mc->has_hotpluggable_cpus =3D true;
-     mc->default_boot_order =3D "cad";
--    mc->hot_add_cpu =3D pc_hot_add_cpu;
-+    mc->hot_add_cpu =3D cpu_hot_add;
-     mc->block_default_type =3D IF_IDE;
-     mc->max_cpus =3D 255;
-     mc->reset =3D pc_machine_reset;
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index c07c4a5b38..1e240004dd 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -28,6 +28,7 @@
- #include "hw/hw.h"
- #include "hw/loader.h"
- #include "hw/i386/pc.h"
-+#include "hw/i386/cpu-internal.h"
- #include "hw/i386/apic.h"
- #include "hw/display/ramfb.h"
- #include "hw/firmware/smbios.h"
-@@ -150,7 +151,7 @@ static void pc_init1(MachineState *machine,
-         }
-     }
-=20
--    pc_cpus_init(pcms);
-+    pcms->apic_id_limit =3D cpus_init(machine, compat_apic_id_mode);
-=20
-     if (kvm_enabled() && pcmc->kvmclock_enabled) {
-         kvmclock_create();
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 57232aed6b..308cd04a13 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -43,6 +43,7 @@
- #include "hw/pci-host/q35.h"
- #include "exec/address-spaces.h"
- #include "hw/i386/pc.h"
-+#include "hw/i386/cpu-internal.h"
- #include "hw/i386/ich9.h"
- #include "hw/i386/amd_iommu.h"
- #include "hw/i386/intel_iommu.h"
-@@ -180,7 +181,7 @@ static void pc_q35_init(MachineState *machine)
-         xen_hvm_init(pcms, &ram_memory);
-     }
-=20
--    pc_cpus_init(pcms);
-+    pcms->apic_id_limit =3D cpus_init(machine, compat_apic_id_mode);
-=20
-     kvmclock_create();
-=20
-diff --git a/include/hw/i386/apic.h b/include/hw/i386/apic.h
-index da1d2fe155..f72be753b8 100644
---- a/include/hw/i386/apic.h
-+++ b/include/hw/i386/apic.h
-@@ -23,5 +23,6 @@ int apic_get_highest_priority_irr(DeviceState *dev);
-=20
- /* pc.c */
- DeviceState *cpu_get_current_apic(void);
-+extern bool compat_apic_id_mode;
-=20
- #endif
-diff --git a/include/hw/i386/cpu-internal.h b/include/hw/i386/cpu-interna=
-l.h
-new file mode 100644
-index 0000000000..48a5253aa9
---- /dev/null
-+++ b/include/hw/i386/cpu-internal.h
-@@ -0,0 +1,32 @@
-+/*
-+ *
-+ * Copyright (c) 2018 Intel Corportation
-+ *
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef QEMU_I386_CPU_H
-+#define QEMU_I386_CPU_H
-+
-+#include "hw/boards.h"
-+
-+uint32_t cpu_apicid_from_index(unsigned int cpu_index, bool compat);
-+
-+CpuInstanceProperties cpu_index_to_props(MachineState *ms, unsigned cpu_=
-index);
-+int64_t cpu_get_default_cpu_node_id(const MachineState *ms, int idx);
-+const CPUArchIdList *cpu_possible_cpu_arch_ids(MachineState *ms);
-+
-+void cpu_hot_add(const int64_t id, Error **errp);
-+uint32_t cpus_init(MachineState *ms, bool compat);
-+
-+#endif
---=20
-2.21.0
+> On 6/28/19 11:22 AM, Igor Mammedov wrote:
+> > On Fri, 28 Jun 2019 11:43:22 +0300
+> > Michael Rolnik <mrolnik@gmail.com> wrote:
+> >
+> >> Nobody else does it.
+> > it doesn't mean that we should blindly copy pre-existing patterns
+> > which might/will exist for compatibility reasons.
+> >
+> > pls see the same argument on RX CPU for reasons not to support
+> > anything else beside typename there.
+> >   [Qemu-devel] [PATCH v16 13/23] target/rx: Fix cpu types and  names
+> >   [Qemu-devel] [PATCH v19 03/21] target/rx: CPU definition
+> >
+> >
+> >> Richard.
+> >> What do you think?
+>
+> We are going with Igor's advice for target/rx, yes.
+> You should do the same here in target/avr.
+>
+>
+> r~
+>
 
 
+-- 
+Best Regards,
+Michael Rolnik
