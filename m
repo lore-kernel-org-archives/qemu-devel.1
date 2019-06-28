@@ -2,71 +2,65 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77203C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 15:46:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C0A1C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 15:54:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4EC6A205C9
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 15:46:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EC6A205C9
+	by mail.kernel.org (Postfix) with ESMTPS id A6EEF20828
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 15:54:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6EEF20828
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgt5Q-0006iA-9P
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 11:46:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53042)
+	id 1hgtCY-0002WJ-My
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 11:54:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42714)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hgsbW-0003VN-4p
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 11:16:05 -0400
+ (envelope-from <jdurgin@redhat.com>) id 1hgryv-0000ae-9F
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 10:36:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hgsbL-0006Ik-3Y
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 11:15:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58246)
+ (envelope-from <jdurgin@redhat.com>) id 1hgryt-0003ci-67
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 10:36:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48754)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hgsbE-00068a-Cp; Fri, 28 Jun 2019 11:15:40 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <jdurgin@redhat.com>)
+ id 1hgryp-0003Ah-2p; Fri, 28 Jun 2019 10:35:59 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E52E83087921;
- Fri, 28 Jun 2019 15:15:18 +0000 (UTC)
-Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
- [10.33.200.226])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 870C16013D;
- Fri, 28 Jun 2019 15:15:15 +0000 (UTC)
-Date: Fri, 28 Jun 2019 17:15:14 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Alberto Garcia <berto@igalia.com>
-Message-ID: <20190628151514.GQ5179@dhcp-200-226.str.redhat.com>
-References: <20190627135914.xlzohrdwr6mz2aq3@perseus.local>
- <4453cfc4-cff7-c004-1f4c-7cab462e4661@virtuozzo.com>
- <w51a7e3domn.fsf@maestria.local.igalia.com>
- <434b102d-9d8e-ccc2-cb53-7f49a3fbd6fb@virtuozzo.com>
- <w51r27dixcm.fsf@maestria.local.igalia.com>
- <20190628145708.GN5179@dhcp-200-226.str.redhat.com>
- <w51o92hiwi2.fsf@maestria.local.igalia.com>
- <7452ca4a-c552-a912-a865-d99aaad99488@virtuozzo.com>
- <w51lfxliw3s.fsf@maestria.local.igalia.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id E7A0687642;
+ Fri, 28 Jun 2019 14:35:24 +0000 (UTC)
+Received: from [10.3.116.146] (ovpn-116-146.phx2.redhat.com [10.3.116.146])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 863BA60922;
+ Fri, 28 Jun 2019 14:35:22 +0000 (UTC)
+To: jdillama@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190628135508.8013-1-dillaman@redhat.com>
+From: Josh Durgin <jdurgin@redhat.com>
+Message-ID: <81ed4efb-856f-a65d-6ab7-a45e65dbd8bd@redhat.com>
+Date: Fri, 28 Jun 2019 07:35:21 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <w51lfxliw3s.fsf@maestria.local.igalia.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20190628135508.8013-1-dillaman@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Fri, 28 Jun 2019 15:15:24 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Fri, 28 Jun 2019 14:35:24 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC] Re-evaluating subcluster allocation for
- qcow2 images
+X-Mailman-Approved-At: Fri, 28 Jun 2019 11:48:45 -0400
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: update RBD block maintainer
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,42 +72,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>,
- Denis Lunev <den@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: Jason Dillaman <dillaman@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 28.06.2019 um 17:10 hat Alberto Garcia geschrieben:
-> On Fri 28 Jun 2019 05:03:13 PM CEST, Denis Lunev wrote:
-> > On 6/28/19 6:02 PM, Alberto Garcia wrote:
-> >>>>> Please note, I am not talking now about your case with COW. Here the
-> >>>>> allocation is performed on the sub-cluster basis, i.e. the abscence of
-> >>>>> the sub-cluster in the image means hole on that offset. This is
-> >>>>> important difference.
-> >>>> I mentioned the possibility that if you have a case like 2MB / 64KB
-> >>>> and you write to an empty cluster then you could allocate the
-> >>>> necessary subclusters, and additionally fallocate() the space of the
-> >>>> whole cluster (2MB) in order to try to keep it contiguous.
-> >>>>
-> >>>> With this we would lose the space saving advantage of having
-> >>>> subclusters. But perhaps that would work for smaller cluster sizes
-> >>>> (it would mitigate the fragmentation problem).
-> >>> There seem to be use cases for both ways. So does this need to be an
-> >>> option?
-> >> Probably a runtime option, or a heuristic that decides what to do
-> >> depending on the cluster size.
-> > no, I think that this should be on-disk option as this affects
-> > allocation strategy.
+On 6/28/19 6:55 AM, jdillama@redhat.com wrote:
+> From: Jason Dillaman <dillaman@redhat.com>
 > 
-> But why does it need to be stored on-disk? It should be theoretically
-> possible to switch between on strategy and the other at runtime (not
-> that it would make sense though).
+> Remove Josh as per his request since he is no longer the upstream RBD
+> tech lead. Add myself as the maintainer since I am the current RBD tech
+> lead.
+> 
+> Signed-off-by: Jason Dillaman <dillaman@redhat.com>
+> ---
+>   MAINTAINERS | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index cad58b9487..47694cd02f 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -2367,7 +2367,7 @@ S: Supported
+>   F: block/vmdk.c
+>   
+>   RBD
+> -M: Josh Durgin <jdurgin@redhat.com>
+> +M: Jason Dillaman <dillaman@redhat.com>
+>   L: qemu-block@nongnu.org
+>   S: Supported
+>   F: block/rbd.c
+> 
 
-I think it makes sense to store the default in the image and allow it to
-be overridden at runtime, similar to lazy_refcounts.
-
-Kevin
+Reviewed-by: Josh Durgin <jdurgin@redhat.com>
 
