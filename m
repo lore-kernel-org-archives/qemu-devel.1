@@ -2,52 +2,66 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C060C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 13:54:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34766C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 13:58:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63659208E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 13:54:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63659208E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0200A2083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 13:58:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="HC80KulB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0200A2083B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgrKz-0000zz-JX
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 09:54:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59638)
+	id 1hgrOD-0004MM-38
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 09:58:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47602)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hgrCo-0002RA-Kp
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:46:24 -0400
+ (envelope-from <berto@igalia.com>) id 1hgqXP-0004Ix-2T
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:03:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hgrCm-0004lD-JY
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:46:22 -0400
-Received: from relay.sw.ru ([185.231.240.75]:41294)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1hgrCm-0004i3-9s; Fri, 28 Jun 2019 09:46:20 -0400
-Received: from [172.16.25.136] (helo=localhost.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92)
- (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1hgrCi-0008NT-6Q; Fri, 28 Jun 2019 16:46:16 +0300
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Date: Fri, 28 Jun 2019 16:46:08 +0300
-Message-Id: <1561729574-530879-2-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1561729574-530879-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1561729574-530879-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v3 1/7] iotests: allow Valgrind checking all
- QEMU processes
+ (envelope-from <berto@igalia.com>) id 1hgqXN-0004UF-Ov
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:03:34 -0400
+Received: from fanzine.igalia.com ([91.117.99.155]:52386)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <berto@igalia.com>)
+ id 1hgqXN-0004Rr-38; Fri, 28 Jun 2019 09:03:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=Uzf0RtOypqe529VX+xBQ9zRRoyzlf6AH+FmaTGcdqxI=; 
+ b=HC80KulBh9OFM0KmV6l34STvyMHtEE9E2O6uNDw/97k++qCtxqfoGcCilGStGckucGlBMMd5FHYGDttsHzi7y+y8mLy521UJsCh1Bj8nFc2H9UihmYg9DH1N6xz6xp4qj1BNba0Jf0Q9lMdOMZhIe4QCJ4hziglI5AlBV/t0bxsZgdJi0YLnqmSyn82YrkQW0KrGgaKK/leQQIGYFqE4zct9zW3N8rW0JUyyBV+blNeCATqS+/eM/4XvnFh296wos/tsbOYZnsTZsKmDEK75MtbyeFfT8klwDJ0ov+ImsI9c6Ari0kkjbAuH2LS41nUPJ6tLuCcCtMVHZZLyuuyRcQ==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1hgqXK-0004VT-Bk; Fri, 28 Jun 2019 15:03:30 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1hgqXK-0001mm-94; Fri, 28 Jun 2019 15:03:30 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Kevin Wolf <kwolf@redhat.com>
+In-Reply-To: <w5136jtkgtn.fsf@maestria.local.igalia.com>
+References: <20190627135914.xlzohrdwr6mz2aq3@perseus.local>
+ <20190627165434.GE5618@localhost.localdomain>
+ <w5136jtkgtn.fsf@maestria.local.igalia.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Fri, 28 Jun 2019 15:03:30 +0200
+Message-ID: <w51y31lj1zx.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+ timestamps) [generic] [fuzzy]
+X-Received-From: 91.117.99.155
+Subject: Re: [Qemu-devel] [RFC] Re-evaluating subcluster allocation for
+ qcow2 images
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,262 +73,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, mreitz@redhat.com,
- andrey.shinkevich@virtuozzo.com, den@openvz.org
+Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-With the '-valgrind' option, let all the QEMU processes be run under
-the Valgrind tool. The Valgrind own parameters may be set with its
-environment variable VALGRIND_OPTS, e.g.
-VALGRIND_OPTS="--leak-check=yes" ./check -qcow2 -valgrind <test#>
-or they may be listed in the Valgrind checked file ./.valgrindrc or
-~/.valgrindrc like
---memcheck:leak-check=no
---memcheck:track-origins=yes
-When QEMU-IO process is being killed, the shell report refers to the
-text of the command in _qemu_io_wrapper(), which was modified with this
-patch. So, the benchmark output for the tests 039, 061 and 137 is to be
-changed also.
+I pressed "send" too early, here's the last part of my reply:
 
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
- tests/qemu-iotests/039.out   | 30 ++++---------------
- tests/qemu-iotests/061.out   | 12 ++------
- tests/qemu-iotests/137.out   |  6 +---
- tests/qemu-iotests/common.rc | 69 ++++++++++++++++++++++++++++++++------------
- 4 files changed, 59 insertions(+), 58 deletions(-)
+On Fri 28 Jun 2019 02:57:56 PM CEST, Alberto Garcia wrote:
+>> I also ran some tests on a rotating HDD drive. Here having
+>> subclusters doesn't make a big difference regardless of whether there
+>> is a backing image or not, so we can ignore this scenario.
 
-diff --git a/tests/qemu-iotests/039.out b/tests/qemu-iotests/039.out
-index 724d7b2..972c6c0 100644
---- a/tests/qemu-iotests/039.out
-+++ b/tests/qemu-iotests/039.out
-@@ -11,11 +11,7 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
--    exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--else
--    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--fi )
-+./common.rc: Killed                  ( _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@" )
- incompatible_features     0x1
- ERROR cluster 5 refcount=0 reference=1
- ERROR OFLAG_COPIED data cluster: l2_entry=8000000000050000 refcount=0
-@@ -50,11 +46,7 @@ read 512/512 bytes at offset 0
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
--    exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--else
--    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--fi )
-+./common.rc: Killed                  ( _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@" )
- incompatible_features     0x1
- ERROR cluster 5 refcount=0 reference=1
- Rebuilding refcount structure
-@@ -68,11 +60,7 @@ incompatible_features     0x0
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
--    exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--else
--    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--fi )
-+./common.rc: Killed                  ( _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@" )
- incompatible_features     0x0
- No errors were found on the image.
- 
-@@ -91,11 +79,7 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
--    exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--else
--    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--fi )
-+./common.rc: Killed                  ( _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@" )
- incompatible_features     0x1
- ERROR cluster 5 refcount=0 reference=1
- ERROR OFLAG_COPIED data cluster: l2_entry=8000000000050000 refcount=0
-@@ -105,11 +89,7 @@ Data may be corrupted, or further writes to the image may corrupt it.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
--    exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--else
--    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--fi )
-+./common.rc: Killed                  ( _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@" )
- incompatible_features     0x0
- No errors were found on the image.
- *** done
-diff --git a/tests/qemu-iotests/061.out b/tests/qemu-iotests/061.out
-index 1aa7d37..8cb57eb 100644
---- a/tests/qemu-iotests/061.out
-+++ b/tests/qemu-iotests/061.out
-@@ -118,11 +118,7 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- wrote 131072/131072 bytes at offset 0
- 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
--    exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--else
--    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--fi )
-+./common.rc: Killed                  ( _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@" )
- magic                     0x514649fb
- version                   3
- backing_file_offset       0x0
-@@ -280,11 +276,7 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- wrote 131072/131072 bytes at offset 0
- 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
--    exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--else
--    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--fi )
-+./common.rc: Killed                  ( _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@" )
- magic                     0x514649fb
- version                   3
- backing_file_offset       0x0
-diff --git a/tests/qemu-iotests/137.out b/tests/qemu-iotests/137.out
-index 22d59df..7fed5e6 100644
---- a/tests/qemu-iotests/137.out
-+++ b/tests/qemu-iotests/137.out
-@@ -35,11 +35,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- qemu-io: Unsupported value 'blubb' for qcow2 option 'overlap-check'. Allowed are any of the following: none, constant, cached, all
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
--    exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--else
--    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
--fi )
-+./common.rc: Killed                  ( _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@" )
- incompatible_features     0x0
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- wrote 65536/65536 bytes at offset 0
-diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-index 5502c3d..6e461a1 100644
---- a/tests/qemu-iotests/common.rc
-+++ b/tests/qemu-iotests/common.rc
-@@ -60,19 +60,52 @@ if ! . ./common.config
-     exit 1
- fi
- 
-+_qemu_proc_wrapper()
-+{
-+    local VALGRIND_LOGFILE="$1"
-+    shift
-+    if [ "${VALGRIND_QEMU}" == "y" ]; then
-+        exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$@"
-+    else
-+        exec "$@"
-+    fi
-+}
-+
-+_qemu_proc_valgrind_log()
-+{
-+    local VALGRIND_LOGFILE="$1"
-+    local RETVAL="$2"
-+    if [ "${VALGRIND_QEMU}" == "y" ]; then
-+        if [ $RETVAL == 99 ]; then
-+            cat "${VALGRIND_LOGFILE}"
-+        fi
-+        rm -f "${VALGRIND_LOGFILE}"
-+    fi
-+}
-+
- _qemu_wrapper()
- {
-+    local VALGRIND_LOGFILE="${TEST_DIR}"/$$.valgrind
-     (
-         if [ -n "${QEMU_NEED_PID}" ]; then
-             echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid"
-         fi
--        exec "$QEMU_PROG" $QEMU_OPTIONS "$@"
-+        _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_PROG" $QEMU_OPTIONS "$@"
-     )
-+    RETVAL=$?
-+    _qemu_proc_valgrind_log "${VALGRIND_LOGFILE}" $RETVAL
-+    return $RETVAL
- }
- 
- _qemu_img_wrapper()
- {
--    (exec "$QEMU_IMG_PROG" $QEMU_IMG_OPTIONS "$@")
-+    local VALGRIND_LOGFILE="${TEST_DIR}"/$$.valgrind
-+    (
-+        _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_IMG_PROG" $QEMU_IMG_OPTIONS "$@"
-+    )
-+    RETVAL=$?
-+    _qemu_proc_valgrind_log "${VALGRIND_LOGFILE}" $RETVAL
-+    return $RETVAL
- }
- 
- _qemu_io_wrapper()
-@@ -85,36 +118,36 @@ _qemu_io_wrapper()
-             QEMU_IO_ARGS="--object secret,id=keysec0,data=$IMGKEYSECRET $QEMU_IO_ARGS"
-         fi
-     fi
--    local RETVAL
-     (
--        if [ "${VALGRIND_QEMU}" == "y" ]; then
--            exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@"
--        else
--            exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@"
--        fi
-+        _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@"
-     )
-     RETVAL=$?
--    if [ "${VALGRIND_QEMU}" == "y" ]; then
--        if [ $RETVAL == 99 ]; then
--            cat "${VALGRIND_LOGFILE}"
--        fi
--        rm -f "${VALGRIND_LOGFILE}"
--    fi
--    (exit $RETVAL)
-+    _qemu_proc_valgrind_log "${VALGRIND_LOGFILE}" $RETVAL
-+    return $RETVAL
- }
- 
- _qemu_nbd_wrapper()
- {
--    "$QEMU_NBD_PROG" --pid-file="${QEMU_TEST_DIR}/qemu-nbd.pid" \
--                     $QEMU_NBD_OPTIONS "$@"
-+    local VALGRIND_LOGFILE="${TEST_DIR}"/$$.valgrind
-+    (
-+        _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_NBD_PROG" \
-+            --pid-file="${QEMU_TEST_DIR}/qemu-nbd.pid" $QEMU_NBD_OPTIONS "$@"
-+    )
-+    RETVAL=$?
-+    _qemu_proc_valgrind_log "${VALGRIND_LOGFILE}" $RETVAL
-+    return $RETVAL
- }
- 
- _qemu_vxhs_wrapper()
- {
-+    local VALGRIND_LOGFILE="${TEST_DIR}"/$$.valgrind
-     (
-         echo $BASHPID > "${TEST_DIR}/qemu-vxhs.pid"
--        exec "$QEMU_VXHS_PROG" $QEMU_VXHS_OPTIONS "$@"
-+        _qemu_proc_wrapper "${VALGRIND_LOGFILE}" "$QEMU_VXHS_PROG" $QEMU_VXHS_OPTIONS "$@"
-     )
-+    RETVAL=$?
-+    _qemu_proc_valgrind_log "${VALGRIND_LOGFILE}" $RETVAL
-+    return $RETVAL
- }
- 
- export QEMU=_qemu_wrapper
--- 
-1.8.3.1
+> Interesting, this is kind of unexpected. Why would avoided COW not
+> make a difference on rotating HDDs? (All of this is cache=none,
+> right?)
 
+The 32K/4K with no COW is obviously much faster (it's also faster with
+1MB and 2MB clusters), it's the rest of the scenarios that show no
+improvement.
+
+>> === Changes to the on-disk format ===
+>> 
+>> In my original proposal I described 3 different alternatives for
+>> storing the subcluster bitmaps. I'm naming them here, but refer to
+>> that message for more details.
+>> 
+>> (1) Storing the bitmap inside the 64-bit entry
+>> (2) Making L2 entries 128-bit wide.
+>> (3) Storing the bitmap somewhere else
+>> 
+>> I used (1) for this implementation for simplicity, but I think (2) is
+>> probably the best one.
+>
+> Which would give us 32 bits for the subclusters, so you'd get 128k/4k
+> or 2M/64k. Or would you intend to use some of these 32 bits for
+> something different?
+
+No, 32 bits for subclusters, or 64 if we don't have the 'all zeroes' bit
+(we discussed this in a separate message).
+
+> I think (3) is the worst because it adds another kind of metadata
+> table that we have to consider for ordering updates. So it might come
+> with more frequent cache flushes.
+
+Yes I agree.
+
+Berto
 
