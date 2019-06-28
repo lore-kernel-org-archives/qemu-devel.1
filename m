@@ -6,58 +6,55 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A357C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:19:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D1C4C5B579
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:19:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C38A2083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:19:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C38A2083B
+	by mail.kernel.org (Postfix) with ESMTPS id 4BC3A2083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:19:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BC3A2083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgwOm-0006Iv-MO
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 15:19:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40896)
+	id 1hgwOn-0006J2-GP
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 15:19:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40549)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hgvy0-0004b4-0Q
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:51:26 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hgvwl-0003wn-1S
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:50:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hgvxx-0003zq-6m
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:51:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58816)
+ (envelope-from <ehabkost@redhat.com>) id 1hgvwh-0002oq-Md
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:50:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35166)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgvxx-0003yz-18
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:51:21 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgvwh-0002nj-Eq
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:50:03 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 546DA3086215;
- Fri, 28 Jun 2019 18:51:20 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B84C88F915;
+ Fri, 28 Jun 2019 18:49:55 +0000 (UTC)
 Received: from localhost (ovpn-116-7.gru2.redhat.com [10.97.116.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CD4AC1001284;
- Fri, 28 Jun 2019 18:50:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E176760920;
+ Fri, 28 Jun 2019 18:49:54 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Fri, 28 Jun 2019 15:47:32 -0300
-Message-Id: <20190628184742.5961-20-ehabkost@redhat.com>
+Date: Fri, 28 Jun 2019 15:47:25 -0300
+Message-Id: <20190628184742.5961-13-ehabkost@redhat.com>
 In-Reply-To: <20190628184742.5961-1-ehabkost@redhat.com>
 References: <20190628184742.5961-1-ehabkost@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 28 Jun 2019 18:51:20 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.26]); Fri, 28 Jun 2019 18:50:00 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v2 19/29] hppa: Delete unused hppa_cpu_list()
- function
+Subject: [Qemu-devel] [PULL v2 12/29] hw/i386: Adjust nr_dies with
+ configured smp_dies for PCMachine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,70 +67,87 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+ Like Xu <like.xu@linux.intel.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-hppa_cpu_list() is dead code and is never called.  Delete it.
+From: Like Xu <like.xu@linux.intel.com>
 
-Cc: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20190517191332.23400-1-ehabkost@redhat.com>
-Acked-by: Richard Henderson <richard.henderson@linaro.org>
+To support multiple dies configuration on PCMachine, the best place to
+set CPUX86State->nr_dies with requested PCMachineState->smp_dies is in
+pc_new_cpu() and pc_cpu_pre_plug(). Refactoring pc_new_cpu() is applied
+and redundant parameter "const char *typename" would be removed.
+
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Like Xu <like.xu@linux.intel.com>
+Message-Id: <20190612084104.34984-3-like.xu@linux.intel.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/hppa/cpu.h |  2 --
- target/hppa/cpu.c | 17 -----------------
- 2 files changed, 19 deletions(-)
+ hw/i386/pc.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
-index 2e1f2ac67c..aab251bc4b 100644
---- a/target/hppa/cpu.h
-+++ b/target/hppa/cpu.h
-@@ -241,8 +241,6 @@ void hppa_translate_init(void);
-=20
- #define CPU_RESOLVING_TYPE TYPE_HPPA_CPU
-=20
--void hppa_cpu_list(void);
--
- static inline target_ulong hppa_form_gva_psw(target_ureg psw, uint64_t s=
-pc,
-                                              target_ureg off)
- {
-diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
-index 368cb71e6d..71b6aca45d 100644
---- a/target/hppa/cpu.c
-+++ b/target/hppa/cpu.c
-@@ -111,23 +111,6 @@ static void hppa_cpu_realizefn(DeviceState *dev, Err=
-or **errp)
- #endif
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index e18b1bade2..211015324a 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1518,12 +1518,16 @@ void pc_acpi_smi_interrupt(void *opaque, int irq, int level)
+     }
  }
-=20
--static void hppa_cpu_list_entry(gpointer data, gpointer user_data)
--{
--    ObjectClass *oc =3D data;
--
--    qemu_printf("  %s\n", object_class_get_name(oc));
--}
--
--void hppa_cpu_list(void)
--{
--    GSList *list;
--
--    list =3D object_class_get_list_sorted(TYPE_HPPA_CPU, false);
--    qemu_printf("Available CPUs:\n");
--    g_slist_foreach(list, hppa_cpu_list_entry, NULL);
--    g_slist_free(list);
--}
--
- static void hppa_cpu_initfn(Object *obj)
+ 
+-static void pc_new_cpu(const char *typename, int64_t apic_id, Error **errp)
++static void pc_new_cpu(PCMachineState *pcms, int64_t apic_id, Error **errp)
  {
-     CPUState *cs =3D CPU(obj);
---=20
+     Object *cpu = NULL;
+     Error *local_err = NULL;
++    CPUX86State *env = NULL;
+ 
+-    cpu = object_new(typename);
++    cpu = object_new(MACHINE(pcms)->cpu_type);
++
++    env = &X86_CPU(cpu)->env;
++    env->nr_dies = pcms->smp_dies;
+ 
+     object_property_set_uint(cpu, apic_id, "apic-id", &local_err);
+     object_property_set_bool(cpu, true, "realized", &local_err);
+@@ -1549,7 +1553,7 @@ void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp)
+         return;
+     }
+ 
+-    pc_new_cpu(ms->cpu_type, apic_id, &local_err);
++    pc_new_cpu(PC_MACHINE(ms), apic_id, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -1574,8 +1578,7 @@ void pc_cpus_init(PCMachineState *pcms)
+                                                      ms->smp.max_cpus - 1) + 1;
+     possible_cpus = mc->possible_cpu_arch_ids(ms);
+     for (i = 0; i < ms->smp.cpus; i++) {
+-        pc_new_cpu(possible_cpus->cpus[i].type, possible_cpus->cpus[i].arch_id,
+-                   &error_fatal);
++        pc_new_cpu(pcms, possible_cpus->cpus[i].arch_id, &error_fatal);
+     }
+ }
+ 
+@@ -2295,6 +2298,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+     CPUArchId *cpu_slot;
+     X86CPUTopoInfo topo;
+     X86CPU *cpu = X86_CPU(dev);
++    CPUX86State *env = &cpu->env;
+     MachineState *ms = MACHINE(hotplug_dev);
+     PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+     unsigned int smp_cores = ms->smp.cores;
+@@ -2306,6 +2310,8 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+         return;
+     }
+ 
++    env->nr_dies = pcms->smp_dies;
++
+     /*
+      * If APIC ID is not set,
+      * set it based on socket/die/core/thread properties.
+-- 
 2.18.0.rc1.1.g3f1ff2140
 
 
