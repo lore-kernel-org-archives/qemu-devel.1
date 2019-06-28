@@ -2,67 +2,79 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1680C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 15:01:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DEEDC4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 15:02:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8895020828
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 15:01:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8895020828
+	by mail.kernel.org (Postfix) with ESMTPS id 335DC20828
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 15:02:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 335DC20828
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgsNJ-0000Io-N0
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 11:01:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48424)
+	id 1hgsOG-0000k2-GH
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 11:02:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40864)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hgsJk-0006bl-Fm
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 10:57:37 -0400
+ (envelope-from <philmd@redhat.com>) id 1hgrsi-0004wO-Si
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 10:29:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hgsJj-0000xl-0M
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 10:57:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:8300)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hgsJd-0000nq-QV; Fri, 28 Jun 2019 10:57:31 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DF11085543;
- Fri, 28 Jun 2019 14:57:10 +0000 (UTC)
-Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
- [10.33.200.226])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8B08B1750D;
- Fri, 28 Jun 2019 14:57:09 +0000 (UTC)
-Date: Fri, 28 Jun 2019 16:57:08 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Alberto Garcia <berto@igalia.com>
-Message-ID: <20190628145708.GN5179@dhcp-200-226.str.redhat.com>
-References: <20190627135914.xlzohrdwr6mz2aq3@perseus.local>
- <4453cfc4-cff7-c004-1f4c-7cab462e4661@virtuozzo.com>
- <w51a7e3domn.fsf@maestria.local.igalia.com>
- <434b102d-9d8e-ccc2-cb53-7f49a3fbd6fb@virtuozzo.com>
- <w51r27dixcm.fsf@maestria.local.igalia.com>
+ (envelope-from <philmd@redhat.com>) id 1hgrsh-0007JT-N8
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 10:29:40 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:34869)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hgrsf-0007H8-W3
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 10:29:39 -0400
+Received: by mail-wm1-f66.google.com with SMTP id c6so9212973wml.0
+ for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 07:29:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=kzyDs37IHkXapkdFzVROwyva8sAh39D6I+iSdvtITHE=;
+ b=DSLmjV7xBvBiZcnNvl/3Xud591TOD+uieZLX4DLJ57+gVTdlr+7hqj3RP3XRcyaVVZ
+ LaH3TY3wySuZY7EXG5O2zwlsD07NeH19ybQZamSH0TVxu1yZXaNCKKeTS+e51Gki26Kj
+ +IDuIavtJO+uVB+R4KfHUQy8gC7sMici9Vos8ifaNWq4RNACLB1e9txms8YkPNpLeaAC
+ 8AWsj7UahVL69PAqxRiLpBnqUClqFhDu1odN+3DNyDfFTe0XldglS8WlPGXShrhBovr7
+ i24shLsnJzodsQSgm6XHbEaJh/fToHVAOQrrfhfrTkH+8OBeDi5Sg6eZ4TNrJzNwqrLQ
+ or4Q==
+X-Gm-Message-State: APjAAAU57Ke5fs2XaJPNe4Q9SzpvTviOFwH1x0YdzAC3w/LSddkMnnzd
+ zsFRP6J4eMMMC0kLB4kdaQfmMFoTv8Q=
+X-Google-Smtp-Source: APXvYqzy+X3cX8o+7lOJXg84BtnZfQ53sSdApCH7vMn1fxSCNSxZGa/et8u/SL4Y7RTfL5ItyVxA9g==
+X-Received: by 2002:a1c:f319:: with SMTP id q25mr7170520wmq.129.1561732176670; 
+ Fri, 28 Jun 2019 07:29:36 -0700 (PDT)
+Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.183])
+ by smtp.gmail.com with ESMTPSA id q12sm3935422wrp.50.2019.06.28.07.29.35
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 28 Jun 2019 07:29:36 -0700 (PDT)
+To: Liam Merwick <liam.merwick@oracle.com>, qemu-trivial@nongnu.org
+References: <1561727317-30655-1-git-send-email-liam.merwick@oracle.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <bc12ed80-a2d2-d03e-2cf0-f066a214a344@redhat.com>
+Date: Fri, 28 Jun 2019 16:29:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <w51r27dixcm.fsf@maestria.local.igalia.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Fri, 28 Jun 2019 14:57:10 +0000 (UTC)
+In-Reply-To: <1561727317-30655-1-git-send-email-liam.merwick@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC] Re-evaluating subcluster allocation for
- qcow2 images
+ [fuzzy]
+X-Received-From: 209.85.128.66
+Subject: Re: [Qemu-devel] [PATCH] docs/devel/testing: Fix typo in dockerfile
+ path
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,32 +86,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>,
- Denis Lunev <den@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 28.06.2019 um 16:43 hat Alberto Garcia geschrieben:
-> On Thu 27 Jun 2019 06:05:55 PM CEST, Denis Lunev wrote:
-> > Please note, I am not talking now about your case with COW. Here the
-> > allocation is performed on the sub-cluster basis, i.e. the abscence of
-> > the sub-cluster in the image means hole on that offset. This is
-> > important difference.
+On 6/28/19 3:08 PM, Liam Merwick wrote:
+> Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
+> ---
+>  docs/devel/testing.rst | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> I mentioned the possibility that if you have a case like 2MB / 64KB and
-> you write to an empty cluster then you could allocate the necessary
-> subclusters, and additionally fallocate() the space of the whole cluster
-> (2MB) in order to try to keep it contiguous.
+> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+> index da2d0fc9646f..3ef50a61db4d 100644
+> --- a/docs/devel/testing.rst
+> +++ b/docs/devel/testing.rst
+> @@ -327,7 +327,7 @@ Images
+>  ------
+>  
+>  Along with many other images, the ``min-glib`` image is defined in a Dockerfile
+> -in ``tests/docker/dockefiles/``, called ``min-glib.docker``. ``make docker``
+> +in ``tests/docker/dockerfiles/``, called ``min-glib.docker``. ``make docker``
+>  command will list all the available images.
+>  
+>  To add a new image, simply create a new ``.docker`` file under the
 > 
-> With this we would lose the space saving advantage of having
-> subclusters. But perhaps that would work for smaller cluster sizes (it
-> would mitigate the fragmentation problem).
 
-There seem to be use cases for both ways. So does this need to be an
-option?
-
-Kevin
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
