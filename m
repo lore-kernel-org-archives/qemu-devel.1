@@ -2,143 +2,93 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21998C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 00:26:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4E3AC4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 00:27:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2833208CB
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 00:26:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2833208CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8B779208CB
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 00:27:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TzvSbxVG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B779208CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgej4-0006dE-55
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 20:26:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35673)
+	id 1hgek8-0007di-RD
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 20:27:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36000)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hgei8-00069N-Qv
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 20:25:55 -0400
+ (envelope-from <lucienmp.qemu@gmail.com>) id 1hgejd-00076e-48
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 20:27:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hgei7-000472-F5
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 20:25:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60290)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hgei3-00044b-6B; Thu, 27 Jun 2019 20:25:47 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 407995AFD9;
- Fri, 28 Jun 2019 00:25:40 +0000 (UTC)
-Received: from [10.18.17.47] (dhcp-17-47.bos.redhat.com [10.18.17.47])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3F9161001B05;
- Fri, 28 Jun 2019 00:25:35 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190603120005.37394-1-vsementsov@virtuozzo.com>
- <54598cf4-a326-5385-2d86-d2dd43f26f47@redhat.com>
- <125166e6-2983-aaa8-2dad-14c5c7081fd8@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <36ad8ca2-5f30-fa88-dd17-7162ac6556df@redhat.com>
-Date: Thu, 27 Jun 2019 20:25:35 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <lucienmp.qemu@gmail.com>) id 1hgejb-00054x-39
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 20:27:25 -0400
+Received: from mail-pf1-x436.google.com ([2607:f8b0:4864:20::436]:38736)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <lucienmp.qemu@gmail.com>)
+ id 1hgeja-00051n-BD
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 20:27:23 -0400
+Received: by mail-pf1-x436.google.com with SMTP id y15so2040282pfn.5
+ for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 17:27:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to
+ :user-agent; bh=pLHfPP7FjP/uE9RZSLQvD6XSge/jBsyE88XyGOQUBsI=;
+ b=TzvSbxVGhzfkUs0XGCXC5hdvsVZLYIsnTow7aN4hUCP3Z2fc+DEzizVekZsq9g+R4D
+ rYOkEUPrl5sKAkHg8wU2dXWCgglM0veudwks6Xjii0iOYOe/dbmNwGJ/ViM7ZNac1cEf
+ MzbifbjQ9niVDPb+FTnCu1yhE2NnPH/nOwHDvF3eSNjdrn8EfT4+7v8UX/C48sY+nPe3
+ UcvRgGnlyljN6Y1s6+i0FiOQjOTz7e4h1bNBTs6SezR58I3qSrG9Sh+Yj9W6RQB0BrQm
+ SoYXOU7yd8Za+W+e5DXhpVDQqvzjZFd1a7LJEeX6URIPwdS9pKKCA/k6DSludm8izgHU
+ c9kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=pLHfPP7FjP/uE9RZSLQvD6XSge/jBsyE88XyGOQUBsI=;
+ b=dY40VO3g11BnYI92HLQnug+GMELZ+NJknD2/EKGNKkIlU3sgibERNEJ+NwoOutOPAZ
+ Ci8NJeUbYQUPxBlkcAOM0qo1IGnO4p4rLKLQmqvQoH+w+/lIiDLmSfRZYMJ//MVuA2vr
+ 6jOHXxdasD0nac5Zv0vD7R+rm4Xhfhg3ZRuqVGnJw6SR7p9g7sdZdY9i6Vlu3nOCjyT0
+ h98hzIHHSTG/6MP1HaPik+ZXeazPIeD3uu6BQzv4FQrmyVpf1YY9NM+UL7G+TJnnBlQ2
+ HX3cTj+DFhPKVSffpXaIy3UCVbmc0AbgcrDBs/StJyOUJxVglbj6Eg4zGC1yZWn6UTtA
+ SRMQ==
+X-Gm-Message-State: APjAAAXOyZ7vf+HptoTlwMyOsCZMWEvgBQSe6ccMlBv+97+uYjSa+dcQ
+ UZP3vkgPhq6LVDMMNrglE+w=
+X-Google-Smtp-Source: APXvYqzjOhsdXuf/YdXwQa1Z4Z8C51Ksqqw+espB1yVA+n4uyWThYsjnPwHepkB7bNYgorOhaucRmQ==
+X-Received: by 2002:a17:90a:898e:: with SMTP id
+ v14mr9405298pjn.119.1561681638314; 
+ Thu, 27 Jun 2019 17:27:18 -0700 (PDT)
+Received: from localhost.localdomain ([125.130.54.1])
+ by smtp.gmail.com with ESMTPSA id f197sm240359pfa.161.2019.06.27.17.27.16
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 27 Jun 2019 17:27:17 -0700 (PDT)
+Date: Fri, 28 Jun 2019 09:27:13 +0900
+From: Lucien Murray-Pitts <lucienmp.qemu@gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <20190628002713.GA19257@localhost.localdomain>
+References: <2136180936.260219.1561641583358.ref@mail.yahoo.com>
+ <2136180936.260219.1561641583358@mail.yahoo.com>
+ <1079763171.281101.1561641752988@mail.yahoo.com>
+ <e4c1fbc4-3e43-5df4-a17c-527d98d9763c@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <125166e6-2983-aaa8-2dad-14c5c7081fd8@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Fri, 28 Jun 2019 00:25:44 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/4] qapi: block-dirty-bitmap-remove
- transaction action
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e4c1fbc4-3e43-5df4-a17c-527d98d9763c@linaro.org>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::436
+Subject: Re: [Qemu-devel] RFC: Why does target/m68k RTE insn. use
+ gen_exception
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -150,129 +100,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
- Denis Lunev <den@virtuozzo.com>, "armbru@redhat.com" <armbru@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
+Cc: Lucien Anti-Spam <lucienmp_antispam@yahoo.com>, qemu-devel@nongnu.org,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, Jun 27, 2019 at 07:09:39PM +0200, Richard Henderson wrote:
+> On 6/27/19 3:22 PM, Lucien Anti-Spam wrote:
+> > Hi Laurent / Richard,
+> > (resent email )
+> > 
+> > Does anyone have any knowledge why
+> >     gen_exception(s, s->base.pc_next, EXCP_RTE);
+> > 
+> > is generated for "RTE" instruction, where as the "RTS" goes a gen_jmp?
+> > ( note see target/m68k/translate.c in functions DISAS_INSN(rte) and DISAS_INSN(rts)
+> 
+> History, it would seem.  Paul Brook implemented it that way in 2007.
 
+Ok, thank you I wanted to make sure RTE wasnt being one like this as a special case.
 
-On 6/17/19 7:37 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 08.06.2019 1:26, John Snow wrote:
->>
->>
->> On 6/3/19 8:00 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> Hi all!
->>>
->>> Here is block-dirty-bitmap-remove transaction action.
->>>
->>> It is used to do transactional movement of the bitmap (which is
->>> possible in conjunction with merge command). Transactional bitmap
->>> movement is needed in scenarios with external snapshot, when we don't
->>> want to leave copy of the bitmap in the base image.
->>>
->>
->> Oh, interesting. I see why you want this now. OK, let's do it.
->>
 > 
+> I think that it should not be implemented as an exception.  It should be a call
+> to one of two different helpers (cf and m68k), followed by either a normal exit
+> to main loop (to recognize the new interrupt state) or a debug exception.
 > 
-> Hi John!
-> 
-> Hmm, could you stage it, or should I fix something? Seems I've answered all questions.
-> We need this for our nearest release and wanting to avoid x-vz- prefixes in the API,
-> I'd be very grateful if we merge it soon.
-> 
+> This sort of modification should be fairly easy to perform, if you have the time.
 > 
 
-Hi Vladimir,
+The original way of handling it was causing single step to malfunction, I dont
+rightly know why but the effect was that step would step twice and end up
+inside the ISR function again OR just stepping past the RTE as if it didnt
+exist.
 
-Sorry, I lost track of this thread. (In the future, if you have
-something pressing like a release and I don't seem to have noticed an
-email, try sending me an email directly without the word "patch" in the
-subject it to get my attention, or come ping me on IRC.)
+I have made a quick hack to implement it the way you suggest and confirm that
+works better.
 
+HOWEVER, the "return" address is the instruction that causes the exception.
+So it immediately does return to the ISR.
 
-For this series:
+This is a different issue, but I think interrelated to the original problem.
 
-I think this is pretty confusing, as evidenced by how we both
-misunderstood what it did. So "block_dirty_bitmap_remove" now removes a
-bitmap from storage but might not actually release it. That's a little
-surprising, but I see why we want it.
+Further single stepping INTO the failing instruction results in ending up
+at the ISR +1 instruction
 
-So what really happens is:
+I will look at these but so far a little lost on the why for of them.
 
-1. Remove a bitmap from storage, but actually don't release it; then
-2. hide the bitmap we're holding onto (holding the persistence and name
-data aside)
-3. On success, we release the bitmap.
+Cheers,
+Luc
 
-During this process, taking the bitmap's name away and marking it as
-non-persistent helps keep it from getting rewritten to disk or from
-having anything else interact with it.
-
-On Failure:
-1. unhide:
-	- Restore the persistent bit
-	- Restore the name
-
-So we restore the persistent bit, but we don't actually go back through
-the trouble of making sure that there isn't a collision on the name. I
-suppose we are guaranteed this won't happen because if a bitmap got
-added, it MUST have been added AFTER this action, and if we are
-aborting, it MUST have been removed before we get here.
-
-.... phew, I think that this works, but isn't obvious that it does.
-
-
-However, if we ever use "hide" or "unhide" outside of the remove API,
-you might actually run into troubles where we collide on the name when
-you "unhide" it, and I don't like that very much.
-
-I feel like a "hidden" bitmap probably should still occupy namespace to
-avoid this problem. But then, it isn't truly hidden from API queries and
-such, and subsequent commands could interact with it... we could add a
-new permissions flag, but that starts to get kind of messy.
-
-Is this a problem of naming? do we need to "hide" bitmaps? Could we get
-away with something simpler?
-
-We could rename the "migration" bool to be something generic and then
-use that.
-
-This way, it keeps its persistence flag and name, but it won't get
-flushed back out to disk or anything at the conclusion of the
-transaction. This avoids the need for worrying about name collision on
-"unhide", and doesn't need any new fields.
-
-During this time, we can also mark the bitmap as BUSY which will prevent
-it from being used for any operations. The ones that we could use during
-this critical window are:
-
-- BACKUP
-- ADD
-- CLEAR
-- ENABLE
-- DISABLE
-- MERGE
-- REMOVE
-
-Backup, clear, enable, disable, and remove will all fail a BUSY check.
-Merge will fail for either the source or the destination being BUSY.
-
-So I think that it's possible to avoid the need for a hide() API right
-now, just by using the migration bool (renamed) and the busy status.
-
-I want to be very aware of your time constraints though, so I prepared a
-mock-up on top of your patches;
-
-https://github.com/jnsnow/qemu/commit/9b3434cc86bbd1cbd86f9fc845435d8d6883c205
-
-If this seems agreeable to you I'll re-send and stage right away
-tomorrow. If you really DO want hide() semantics we can work on those
-instead.
-
---js
+> 
+> r~
 
