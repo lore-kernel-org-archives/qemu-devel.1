@@ -2,62 +2,87 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D96BC4321A
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 974CEC4646D
 	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:53:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14B4F2083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:53:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14B4F2083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 688412083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:53:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FiQgE6kk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 688412083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35993 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgwvn-0005V1-3D
+	id 1hgwvn-0005VN-OE
 	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 15:53:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34864)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34396)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hgwqF-00029z-4j
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 15:47:29 -0400
+ (envelope-from <danielhb413@gmail.com>) id 1hgwoP-0000cJ-Go
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 15:45:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hgwq7-0002Ha-Oh
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 15:47:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57324)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgwq4-0002Du-EI
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 15:47:19 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7E506307D844;
- Fri, 28 Jun 2019 19:47:14 +0000 (UTC)
-Received: from localhost (ovpn-116-7.gru2.redhat.com [10.97.116.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EAD88600C6;
- Fri, 28 Jun 2019 19:47:05 +0000 (UTC)
-Date: Fri, 28 Jun 2019 16:47:03 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Sergio Lopez <slp@redhat.com>
-Message-ID: <20190628194703.GH1862@habkost.net>
-References: <20190628115349.60293-1-slp@redhat.com>
- <20190628115349.60293-5-slp@redhat.com>
+ (envelope-from <danielhb413@gmail.com>) id 1hgwoM-0000wS-Rr
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 15:45:33 -0400
+Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:44081)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+ id 1hgwoM-0000vW-M9
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 15:45:30 -0400
+Received: by mail-qk1-x742.google.com with SMTP id p144so5866508qke.11
+ for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 12:45:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=T3WLgtmuAu7cjJ7PRM9PUfqyVZbL0EGGzc5/L/cNNS4=;
+ b=FiQgE6kkvyQ1iisedNDHbfVyjkNH8GUJUVv4fLKJ6yF+46ENvyowm5talKxYTHRrNS
+ ywOBK0EFdbnLZqauu3Eu4IJFNo59yQzUVd+dI1K649/uCuUVlN2y/MzrcQp3O3ipWDDb
+ Kk1O+GQrNFfbwG0D4hw2KuJlh6c3MpwfujjC9132woagOqJHnF4gFrtKjZW/xdpXSpum
+ lf7yk60BbcTr2HYITZXfErTgjRN1eNFimKT6V73cWrrarAa7IqzysDtTfrrhXO1cfEtP
+ JEc5sZUpKXpL1kElGBGSpsMNHR65sGknpmgGKCdagk7K5hqBxz1kNJo3o2kpWoGjaow2
+ Tc4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=T3WLgtmuAu7cjJ7PRM9PUfqyVZbL0EGGzc5/L/cNNS4=;
+ b=j1LEE/fwoh+Ves6Ufy1Tz1QJrFw4UwosCOJ4JA1XW9z5CcI3pF0QD5W20pa21R6gRo
+ kSNqhXSqUpPyVB6eakD7rwwNPpmTD/1kP3TO2IqNMmpmEVL0eULovzJFdvy7W+Nu0HzN
+ nzuxosv/KgfGsDPUq24kfDW000ZpSFF2oFS3j51daTTOzw/9i1i5WLWJx6t5em/Rj9GC
+ RJtV01Rcq2F58mfQYWgt4VNTnbG9WzzSjBUrF0L8dFo7zHPp/x0zpZMwr+WGgO2en/Uq
+ gxbsXEM3vfsz/999DqCWS+1JTZe0VpWXCion8YO//z4yogP/r7sSs7cDO63N80vAzzxd
+ 8xNQ==
+X-Gm-Message-State: APjAAAWCBsrb+vUd4x/bhl9yZkmIs9P1bIdtowNVfuKsY+IK+I2gGgxq
+ +sVwNYfUcgMCbdWHsMd7BtB7zU21
+X-Google-Smtp-Source: APXvYqzcoPu9p59nvdDiMoYb9tIYVNEuAAwZ6U4GFCbbOsX6vUg3Wktx4BClMr7CQ6kNWJjIivYEcA==
+X-Received: by 2002:a37:a692:: with SMTP id p140mr9965384qke.432.1561751129802; 
+ Fri, 28 Jun 2019 12:45:29 -0700 (PDT)
+Received: from rekt.ibmuc.com ([2804:431:c7c6:927e:501b:7135:21ca:8a87])
+ by smtp.gmail.com with ESMTPSA id b69sm1602288qkg.105.2019.06.28.12.45.27
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 28 Jun 2019 12:45:29 -0700 (PDT)
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 28 Jun 2019 16:45:11 -0300
+Message-Id: <20190628194512.21311-4-danielhb413@gmail.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190628194512.21311-1-danielhb413@gmail.com>
+References: <20190628194512.21311-1-danielhb413@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190628115349.60293-5-slp@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Fri, 28 Jun 2019 19:47:14 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 4/4] hw/i386: Introduce the microvm machine
- type
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::742
+Subject: [Qemu-devel] [PATCH v4 3/4] crypto.c: cleanup created file when
+ block_crypto_co_create_opts_luks fails
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,140 +94,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, mst@redhat.com
+Cc: kwolf@redhat.com, berrange@redhat.com,
+ Daniel Henrique Barboza <danielhb413@gmail.com>, mreitz@redhat.com,
+ Srikanth Aithal <bssrikanth@in.ibm.com>, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+When using a non-UTF8 secret to create a volume using qemu-img, the
+following error happens:
 
-This looks good, overall, I'm just confused by the versioning
-system.  Comments below:
+$ qemu-img create -f luks --object secret,id=vol_1_encrypt0,file=vol_resize_pool.vol_1.secret.qzVQrI -o key-secret=vol_1_encrypt0 /var/tmp/pool_target/vol_1 10240K
 
+Formatting '/var/tmp/pool_target/vol_1', fmt=luks size=10485760 key-secret=vol_1_encrypt0
+qemu-img: /var/tmp/pool_target/vol_1: Data from secret vol_1_encrypt0 is not valid UTF-8
 
-On Fri, Jun 28, 2019 at 01:53:49PM +0200, Sergio Lopez wrote:
-> Microvm is a machine type inspired by both NEMU and Firecracker, and
-> constructed after the machine model implemented by the latter.
-> 
-> It's main purpose is providing users a KVM-only machine type with fast
-> boot times, minimal attack surface (measured as the number of IO ports
-> and MMIO regions exposed to the Guest) and small footprint (specially
-> when combined with the ongoing QEMU modularization effort).
-> 
-> Normally, other than the device support provided by KVM itself,
-> microvm only supports virtio-mmio devices. Microvm also includes a
-> legacy mode, which adds an ISA bus with a 16550A serial port, useful
-> for being able to see the early boot kernel messages.
-> 
-> Signed-off-by: Sergio Lopez <slp@redhat.com>
-[...]
-> +static const TypeInfo microvm_machine_info = {
-> +    .name          = TYPE_MICROVM_MACHINE,
-> +    .parent        = TYPE_MACHINE,
-> +    .abstract      = true,
-> +    .instance_size = sizeof(MicrovmMachineState),
-> +    .instance_init = microvm_machine_instance_init,
-> +    .class_size    = sizeof(MicrovmMachineClass),
-> +    .class_init    = microvm_class_init,
+However, the created file /var/tmp/pool_target/vol_1 is left behind in the
+file system after the failure. This behavior can be observed when creating
+the volume using Libvirt, via 'virsh vol-create', and then getting "volume
+target path already exist" errors when trying to re-create the volume.
 
-[1]
+The volume file is created inside block_crypto_co_create_opts_luks, in
+block/crypto.c. If the bdrv_create_file() call is successful but any
+succeeding step fails*, the existing 'fail' label does not take into
+account the created file, leaving it behind.
 
-> +    .interfaces = (InterfaceInfo[]) {
-> +         { TYPE_NMI },
-> +         { }
-> +    },
-> +};
-> +
-> +static void microvm_machine_init(void)
-> +{
-> +    type_register_static(&microvm_machine_info);
-> +}
-> +type_init(microvm_machine_init);
-> +
-> +static void microvm_1_0_instance_init(Object *obj)
-> +{
-> +}
+This patch changes block_crypto_co_create_opts_luks to check if @filename
+is an existing file before bdrv_create_file is called. In case of failure,
+if @filename didn't exist before, check again for its existence and,
+if affirmative, erase it by calling bdrv_delete_file.
 
-You shouldn't need a instance_init function if it's empty, I
-believe you can delete it.
+* in our case, block_crypto_co_create_generic calls qcrypto_block_create,
+which calls qcrypto_block_luks_create, and this function fails when
+calling qcrypto_secret_lookup_as_utf8.
 
-> +
-> +static void microvm_machine_class_init(MachineClass *mc)
+Reported-by: Srikanth Aithal <bssrikanth@in.ibm.com>
+Suggested-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+---
+ block/crypto.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
-Why do you need both microvm_machine_class_init() [1] and
-microvm_class_init()?
-
-> +{
-> +    mc->init = microvm_machine_state_init;
-> +
-> +    mc->family = "microvm_i386";
-> +    mc->desc = "Microvm (i386)";
-> +    mc->units_per_default_bus = 1;
-> +    mc->no_floppy = 1;
-> +    machine_class_allow_dynamic_sysbus_dev(mc, "sysbus-debugcon");
-> +    machine_class_allow_dynamic_sysbus_dev(mc, "sysbus-debugexit");
-> +    mc->max_cpus = 288;
-
-Where does this limit come from?
-
-> +    mc->has_hotpluggable_cpus = false;
-> +    mc->auto_enable_numa_with_memhp = false;
-> +    mc->default_cpu_type = X86_CPU_TYPE_NAME ("host");
-> +    mc->nvdimm_supported = false;
-> +    mc->default_machine_opts = "accel=kvm";
-> +
-> +    /* Machine class handlers */
-> +    mc->cpu_index_to_instance_props = cpu_index_to_props;
-> +    mc->get_default_cpu_node_id = cpu_get_default_cpu_node_id;
-> +    mc->possible_cpu_arch_ids = cpu_possible_cpu_arch_ids;;
-
-I don't think these methods should be mandatory if you don't
-support NUMA or CPU hotplug.  Do you really need them?
-
-(If the core machine code makes them mandatory, it's probably not
-intentional).
-
-
-> +    mc->reset = microvm_machine_reset;
-> +}
-> +
-> +static void microvm_1_0_machine_class_init(MachineClass *mc)
-> +{
-> +    microvm_machine_class_init(mc);
-> +}
-> +DEFINE_MICROVM_MACHINE_AS_LATEST(1, 0)
-
-
-We only have multiple versions of some machine types (pc-*,
-virt-*, pseries-*, s390-ccw-virtio-*) because of Guest ABI
-compatibility (which you are not implementing here).  What's the
-reason behind having multiple microvm machine versions?
-
-
-[...]
-> +#define TYPE_MICROVM_MACHINE   MACHINE_TYPE_NAME("microvm")
-
-Using MACHINE_TYPE_NAME("microvm") might eventually cause
-conflicts with the "microvm" alias you are registering.  I
-suggest using something like "microvm-machine-base".
-
-A separate base class will only be necessary if you are really
-planning to provide multiple versions of the machine type,
-though.
-
-
-> +#define MICROVM_MACHINE(obj) \
-> +    OBJECT_CHECK(MicrovmMachineState, (obj), TYPE_MICROVM_MACHINE)
-> +#define MICROVM_MACHINE_GET_CLASS(obj) \
-> +    OBJECT_GET_CLASS(MicrovmMachineClass, obj, TYPE_MICROVM_MACHINE)
-> +#define MICROVM_MACHINE_CLASS(class) \
-> +    OBJECT_CLASS_CHECK(MicrovmMachineClass, class, TYPE_MICROVM_MACHINE)
-> +
-> +#endif
-> -- 
-> 2.21.0
-> 
-
+diff --git a/block/crypto.c b/block/crypto.c
+index 8237424ae6..146f3eb721 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -30,6 +30,7 @@
+ #include "qapi/error.h"
+ #include "qemu/module.h"
+ #include "qemu/option.h"
++#include "qemu/cutils.h"
+ #include "crypto.h"
+ 
+ typedef struct BlockCrypto BlockCrypto;
+@@ -535,6 +536,8 @@ static int coroutine_fn block_crypto_co_create_opts_luks(const char *filename,
+     BlockDriverState *bs = NULL;
+     QDict *cryptoopts;
+     int64_t size;
++    const char *path;
++    bool file_already_existed = false;
+     int ret;
+ 
+     /* Parse options */
+@@ -551,6 +554,15 @@ static int coroutine_fn block_crypto_co_create_opts_luks(const char *filename,
+         goto fail;
+     }
+ 
++    /*
++     * Check if 'filename' represents a local file that already
++     * exists in the file system prior to bdrv_create_file. Strip
++     * the leading 'file:' from the filename if it exists.
++     */
++    path = filename;
++    strstart(path, "file:", &path);
++    file_already_existed = bdrv_path_is_regular_file(path);
++
+     /* Create protocol layer */
+     ret = bdrv_create_file(filename, opts, errp);
+     if (ret < 0) {
+@@ -575,6 +587,25 @@ fail:
+     bdrv_unref(bs);
+     qapi_free_QCryptoBlockCreateOptions(create_opts);
+     qobject_unref(cryptoopts);
++
++    /*
++     * If an error occurred and we ended up creating a bogus
++     * 'filename' file, delete it
++     */
++    if (ret && !file_already_existed && bdrv_path_is_regular_file(path)) {
++        Error *local_err;
++        int r_del = bdrv_delete_file(path, &local_err);
++        /*
++         * ENOTSUP will happen if the block driver doesn't support
++         * 'bdrv_co_delete_file'. ENOENT will happen if the file
++         * doesn't exist. Both are predictable and shouldn't be
++         * reported back to the user.
++         */
++        if ((r_del < 0) && (r_del != -ENOTSUP) && (r_del != -ENOENT)) {
++            error_reportf_err(local_err, "%s: ", path);
++        }
++    }
++
+     return ret;
+ }
+ 
 -- 
-Eduardo
+2.20.1
+
 
