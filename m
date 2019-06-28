@@ -2,82 +2,63 @@ Return-Path: <SRS0=rHaa=U4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=DATE_IN_PAST_12_24,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2A83C4321A
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 04:08:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14EB7C4321A
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 05:00:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7741A2063F
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 04:08:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C68EA214AF
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 05:00:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="EzhUmD0Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7741A2063F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="paAqc3wI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C68EA214AF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37508 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hh4ei-0004Hu-5g
-	for qemu-devel@archiver.kernel.org; Sat, 29 Jun 2019 00:08:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39721)
+	id 1hh5TF-0003tH-QC
+	for qemu-devel@archiver.kernel.org; Sat, 29 Jun 2019 01:00:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47764)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jimw@sifive.com>) id 1hh4db-0003sF-Sy
- for qemu-devel@nongnu.org; Sat, 29 Jun 2019 00:06:57 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hh5SF-0003Fg-6w
+ for qemu-devel@nongnu.org; Sat, 29 Jun 2019 00:59:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jimw@sifive.com>) id 1hh4da-0000NS-Hf
- for qemu-devel@nongnu.org; Sat, 29 Jun 2019 00:06:55 -0400
-Received: from mail-vs1-xe43.google.com ([2607:f8b0:4864:20::e43]:35863)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jimw@sifive.com>) id 1hh4da-0000Jm-Bd
- for qemu-devel@nongnu.org; Sat, 29 Jun 2019 00:06:54 -0400
-Received: by mail-vs1-xe43.google.com with SMTP id s141so2365024vsc.3
- for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 21:06:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Eli6SkdmsHgSlE2autiwPy6txd43VBuIUQ78qtR9Wlg=;
- b=EzhUmD0Qbwp+R51H1cSRbB1Pzh8Mc6daIVEBZQ/ebNH7tVypvjo/CYdcXuE7vX9PbL
- fYiYW5dF6dmlwML5bR5P3a78iW+6mvvJuK+kfupuXXwcAfmRI8+iDCtKd/bHcPrmVMS/
- crzp3BhQVJfiiFeSPPfWbGIZ6Wgga4PRXs3MVZ5LezRShs3wW+lCBQngP7UlhdQxJEkO
- VWjakz19a1XpFefHUUkDrl79dhiyf2H6Qzpdp5olo/9PaHJYNp9xW1KsPBj9K+iOWpCy
- D8FakDX+ItRqarXdFZ7NzJoRO4MQGbdC9mVgR+kkDWgDv8pd/NSTQSv02CcH6FFRY5Y8
- ybYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Eli6SkdmsHgSlE2autiwPy6txd43VBuIUQ78qtR9Wlg=;
- b=LnSZoXIGjP3tbTVmIOcVUUpl9zIz3FuQmUVrpAf0UaATtaSBkgxQ/5O1vfjrqJpkbD
- zZYvNpxLmLfmaRkJs0fEH929cuvEK3VuWTUj2l18wN1QRJtiboskaUe6C/zrfRyBfmXV
- pIhMKds26I0u7YqzT3iDMnOOzbJb02LZjLS0kqx+rONk025IphzKn6eZMhaELSD6BuAC
- 4T5y3AornVv7tza92g7PQj7wyhsHzccjmxbuAlJzCd3M4WEBQnP0MiRFJyk+SIyIFcjH
- LHpT7YrgpHEelt96E1BKiPlRa0gUVKSWa/615MUvYhZpz15aydN7WzG7yZ9bLRR6Idf0
- +Wvw==
-X-Gm-Message-State: APjAAAWI/aCw4burmPzeOFl62qlVk53pqp5tfHOPTsIIKYRd+R3VHIv1
- bkOnoq2IKfzkLqERfCpfMLM5skxamtWD2WXbXqOcJA==
-X-Google-Smtp-Source: APXvYqw4FAvgqZGD652zFkAnYUkJLPbxaz+IyynqnKsGjYXz4USQL15uu9AhkDdhDMMaty9PLjrxy6S/b3hVDlD3zrw=
-X-Received: by 2002:a67:ebcb:: with SMTP id y11mr8569050vso.138.1561781210843; 
- Fri, 28 Jun 2019 21:06:50 -0700 (PDT)
+ (envelope-from <dgibson@ozlabs.org>) id 1hh5SA-0007e5-Vv
+ for qemu-devel@nongnu.org; Sat, 29 Jun 2019 00:59:13 -0400
+Received: from ozlabs.org ([203.11.71.1]:35999)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1hh5Ru-00077k-RO; Sat, 29 Jun 2019 00:58:59 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 45bLxh1xKDz9s5c; Sat, 29 Jun 2019 14:58:32 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1561784312;
+ bh=4l0Fp/EIcDNfaA2+VekUKadMenAca0ad1S2kqEoSg+I=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=paAqc3wIXw76tF2Ir3njWf2yBF5tpsXIg8fRsZSmWaH1Ic1+mQGL5ptX3VtB+tN0Q
+ zBcL0LQj4Mx/ixvYWhqnER+Nfjsh88TgzCqISt+wAKa3KNiw0hppvC9I6RzXcYXrPI
+ txcmxvcIwJK+j25lP+cfpL5EWlmqhTu8wKiAbRVE=
+Date: Fri, 28 Jun 2019 19:29:52 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Message-ID: <20190628092952.GB29462@umbus.fritz.box>
+References: <20190624055812.3906-1-sjitindarsingh@gmail.com>
 MIME-Version: 1.0
-References: <1561718618-20218-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1561718618-20218-2-git-send-email-aleksandar.markovic@rt-rk.com>
- <CAL1e-=gMvPy9SEQicj1d=X0cSu84WuiNXbtacOS5zJoqyXQv+A@mail.gmail.com>
-In-Reply-To: <CAL1e-=gMvPy9SEQicj1d=X0cSu84WuiNXbtacOS5zJoqyXQv+A@mail.gmail.com>
-From: Jim Wilson <jimw@sifive.com>
-Date: Fri, 28 Jun 2019 21:06:40 -0700
-Message-ID: <CAFyWVaaQX4MG+76+vt-2qvGq7JeZcJFyXZp9Nw+xuwWLc=pHHA@mail.gmail.com>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::e43
-Subject: Re: [Qemu-devel] [PATCH v16 1/5] linux-user: Add support for
- translation of statx() syscall
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="3lcZGd9BuhuYXNfi"
+Content-Disposition: inline
+In-Reply-To: <20190624055812.3906-1-sjitindarsingh@gmail.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH 1/2] ppc/spapr: Add
+ implementation of hcall H_PURR
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,42 +70,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-devel@nongnu.org,
- amarkovic@wavecomp.com, Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 28, 2019 at 5:53 PM Aleksandar Markovic
-<aleksandar.m.mail@gmail.com> wrote:
-> This patch went trough several transformations in last few days, and I am=
- a little worried that we forgot the primary reasons/scenarios why want it =
-in the first place. In that light, may I ask you to recheck this latest ver=
-sion of the patch, v16, against your scenarios (you mentioned earlier you h=
-ave two significantly different flavors of your scenario, one with Ubuntu 1=
-6, and another with Ubuntu 19)?
 
-My use case is that I want 32-bit RISC-V user mode to work.  This
-requires a riscv syscall list patch that Palmer Dabbelt added to his
-patch set, and the statx patch that is part of your patch set.  The
-statx strace support is not required for this use case, but should be
-added for completeness as all of the other stat family functions have
-strace support, so statx should too.  Since the statx strace patch
-needs statx macros that old systems don't have, I test on Ubuntu 16
-(no host statx) and Ubuntu 19 (with host statx).  On Ubuntu 19, statx
-strace should be fully pretty printed.  On Ubuntu 16, qemu should
-still build despite the missing macros, and statx strace should be
-partially pretty printed because of the missing macros.
+--3lcZGd9BuhuYXNfi
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I removed the old patches, updated qemu, added the new patches,
-rebuilt qemu, and reran the gcc testsuite for rv32/rv64 Ubuntu 16/19
-and it still works as expected.  I also manually checked strace for
-rv32/rv64 Ubuntu 16/19 and that also still works as expected.  So this
-looks good to me.
+On Mon, Jun 24, 2019 at 03:58:11PM +1000, Suraj Jitindar Singh wrote:
+> The hcall H_PURR is used by a guest to read the PURR (processor
+> utilisation of resources register). A guest expects that this register
+> will count at a rate of timebase scaled by the number of guest vcpus
+> present in the vcore. That is the per vcpu purr will count at a rate of
+> timebase / # vcpus per vcore.
+>=20
+> Implement a handler for the H_PURR hcall and return the purr value
+> divided by smp_threads so that the sum of the purr deltas across the
+> vcpus of a vcore equals the timebase delta
+>=20
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-I'm leaving on a trip tomorrow, and only taking one laptop with me, so
-I won't have access to my Ubuntu 19 machine anymore.
+Does this need something new advertised in the hypertas DT entry?
 
-Jim
+> ---
+>  hw/ppc/spapr_hcall.c | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
+>=20
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index aae9fd2b3e..88b3343f04 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1819,6 +1819,27 @@ static target_ulong h_update_dt(PowerPCCPU *cpu, S=
+paprMachineState *spapr,
+>      return H_SUCCESS;
+>  }
+> =20
+> +static target_ulong h_purr(PowerPCCPU *cpu, SpaprMachineState *spapr,
+> +                           target_ulong opcode, target_ulong *args)
+> +{
+> +    CPUPPCState *env =3D &cpu->env;
+> +    target_ulong purr;
+> +
+> +    if (kvm_enabled()) {
+> +        cpu_synchronize_state(CPU(cpu));
+> +        /*
+> +         * Divide by smp_threads so that the sum of the purr deltas acro=
+ss the
+> +         * vcpus of a vcore equal the timebase delta.
+> +         */
+> +        purr =3D env->spr[SPR_PURR] / smp_threads;
+> +    } else {
+> +        purr =3D cpu_ppc_load_purr(env);
+> +    }
+> +    args[0] =3D purr;
+> +
+> +    return H_SUCCESS;
+> +}
+> +
+>  static spapr_hcall_fn papr_hypercall_table[(MAX_HCALL_OPCODE / 4) + 1];
+>  static spapr_hcall_fn kvmppc_hypercall_table[KVMPPC_HCALL_MAX - KVMPPC_H=
+CALL_BASE + 1];
+> =20
+> @@ -1915,6 +1936,9 @@ static void hypercall_register_types(void)
+>      spapr_register_hypercall(H_LOGICAL_DCBF, h_logical_dcbf);
+>      spapr_register_hypercall(KVMPPC_H_LOGICAL_MEMOP, h_logical_memop);
+> =20
+> +    /* hcall-purr */
+> +    spapr_register_hypercall(H_PURR, h_purr);
+> +
+>      /* qemu/KVM-PPC specific hcalls */
+>      spapr_register_hypercall(KVMPPC_H_RTAS, h_rtas);
+> =20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--3lcZGd9BuhuYXNfi
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0V3hAACgkQbDjKyiDZ
+s5Icuw//YwlGoPuU9cnEkHTk9VaQewSonhPNFBFq7sBEHNHfybAazeQpFiluHbhP
+AP2ZpD+ceClO28UQ+jmseOu0Raae65rLSIghM6u0QWYwRl+x9wJzKCpQdl2UPKMt
+e5xorC2o6cGxGBjW6yVMPAA/WU4PNtTz65ImffVT9l4QwxPLFpbkJGxB6spEZyFU
+2FThuVWgA2PbiSBmlb84OTOwfSUgevGpR7xgPwSO2pFORg+HDg7kmLizZXCEeSKR
+ASis/r6O/okgOkWlOZQjSkkz4paP9J92ahwJKfk+3JIDFioh9AhznaB3MFcMr0wb
+2fN6Ko3hYPdJWOt6iuNnHZgP+W8DoCXuGzk5Ghssm5AsR8ZfCMv2SZgirweGofHk
+HTo/woWGCJ2/ABqn690FVMYtDY/lJC3o/ECgKB1DYyE5k3X4S1e8Qd+l/bIHTJco
+c6HuHtDLAMHpJ/T9WU8SwbuYAHS6l1PdQq7e73PvhWrGmsnz+MRpSTXMPevtisWg
+Bj8PR13vImWlVGg/1g1mVk3YGidvtvsOVW35eK4Jv7RqQzBBnL+80crNjw8ZfIOr
+V7QhOUGtISinOEUo+kp6ExGDNvNLndgGfjNrb7ZgzEl8dWXG9gXXWWNQTC46NQkg
+KzzZmyEN9vl/iVrW4XNrWKn2Tvc/nZODiLrRxbSLiSxC2UCp7WI=
+=pLYQ
+-----END PGP SIGNATURE-----
+
+--3lcZGd9BuhuYXNfi--
 
