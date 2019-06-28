@@ -5,80 +5,79 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71066C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 23:15:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E935C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 23:18:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30D5A208CB
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 23:15:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2AA0D208CB
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 23:18:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g8u0D9Pf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30D5A208CB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GopEczGO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AA0D208CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hh05O-0003IY-G7
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 19:15:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50364)
+	id 1hh08r-0005JF-C4
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 19:18:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50525)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alistair23@gmail.com>) id 1hh04l-0002Zy-Jv
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 19:14:40 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hh05a-0003fr-VI
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 19:15:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1hh04g-0000Yf-KI
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 19:14:36 -0400
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:33031)
+ (envelope-from <alistair23@gmail.com>) id 1hh05Z-0001se-RG
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 19:15:30 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:33646)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1hh04e-0000On-6W; Fri, 28 Jun 2019 19:14:33 -0400
-Received: by mail-lf1-x142.google.com with SMTP id y17so5018087lfe.0;
- Fri, 28 Jun 2019 16:14:26 -0700 (PDT)
+ id 1hh05Z-0001qF-1d; Fri, 28 Jun 2019 19:15:29 -0400
+Received: by mail-lj1-x244.google.com with SMTP id h10so7535096ljg.0;
+ Fri, 28 Jun 2019 16:15:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=OFYiZGdEWpMn5mcWhx0/gj3Tt6NSfmRqYvudeRA7Dbg=;
- b=g8u0D9Pf/votEBl6PIgGQmLwHbCIWyAB1w1HNbf+nOESbsN8k24maugqj08p6sTa9o
- StN2bHomc0T+ZKPD8XHuPrprzOUjfdsONtuTSZe5YbnBcrh2Qjmqu8xLkKxeC9yia5Sv
- lvHNKgMMXRZZDYf5rKKQ0kaRXgBtVJezXDt843izojLdYQ1IffEizey9xNKpEi4Jwh3H
- bc9uvg1C5vy9eXLplT0J8IaLojpQOwpWe3AIkgcpgdjnriI9bN8UGVHhFdxpxPr1chQT
- hOKSbR/ZNF+gWUyDMqKFTSyzKgnm8NCdiJqi3TX8RNIu6vHytwkQpbYh9f1+J05LPGI3
- z/eQ==
+ bh=CvJ9SM/XPQnJs9PsEukEPdEpIalBIj+pe8+Z80hYcTo=;
+ b=GopEczGOPHU8PNLXw63uiLaNi+MWMf9MIUFbHxC7EfVVTXltkno8QYSvsYSjd3vbPA
+ 0zecR9YpyVRnkNwxWn81c86J3TfugbrVZk5GTV99AvDJraz0NQUW+fU95W1UqStT4lHn
+ s8sDuX/5bdKs0a04qj5aL4x+YJCF4YufmwBDnXEF8sIAJpZF8GLewXwNiEP6wS2hZMKj
+ C3IYblTDr7QppnsU2Hwd7Mf255bjFSp8whuIHNSp3DEnsIT4xNWRrqRNw+voNOTGY4Gv
+ 0ODQPhTqtbeMPGQ3lzta8q91+Uvz7ksC1a5XnEoAuT0KBwwfOkCzTFhF5yVVEhqxrU98
+ JGuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=OFYiZGdEWpMn5mcWhx0/gj3Tt6NSfmRqYvudeRA7Dbg=;
- b=F97S3wN5AYIesEf31AE0PvlhkB/EpJCNpVmQbP+4OJ/FC4oihToCsXb5P39JnkP4HE
- xdx+/v5ny+/1L3ddWh5D0uEiTu5gQ4bt8pi3REh7WgMozVhuy+OlR05SReXFjodSM77t
- 4U/z24SB0QIo18adVreOTWzMy95b2LEnxCxslO1kBkpawiHSRitqtT9mMV+80aZ8hAQ4
- snPyVu4MzB8JUg48zj0sPNsNaYD4YrVbjuvTJb3oRAAONmrA3jWBk+kDWVywEJXTiTme
- J1yz4IlrsX4UXb0BKQOSvdnpXubwBrQdz7CokMJv4K3Op3FBxSg5KW5UrADKIir6ZxSc
- +SGQ==
-X-Gm-Message-State: APjAAAUSiEGu1InYLy8IczZPLKOHoN5rYKd2p9IRkcOskoo/maaDd6nd
- QsSblGa4eIRlzIRQe8CwOWx1HakfxyyG1NtsB7k=
-X-Google-Smtp-Source: APXvYqxqWbN0MY0ABDwMsnfRzLTGM1E8JYsVSDPAZfcrKFagoywTt0t0UQnLdYCnqov+aqiTxMtW+ifG9mKb6hkVJMo=
-X-Received: by 2002:ac2:4990:: with SMTP id f16mr6018209lfl.93.1561763665453; 
- Fri, 28 Jun 2019 16:14:25 -0700 (PDT)
+ bh=CvJ9SM/XPQnJs9PsEukEPdEpIalBIj+pe8+Z80hYcTo=;
+ b=gbbnr4805K0QrCDA59IPDV1DqoM+rOebxkwQuYd4GN4zEZ5b/ZETXIF2Hkv0LBl0t9
+ 8nWzQzUNbajB9ECCHL73i2paZw2WaHsZuO7kPCRiXlaSWWrD16dSh0LTrlZZe0Se4Q02
+ pa/Er/69y22q0Kh6bywrYjIzrW7f58ip+gFq5+m23Rf5GzDbEsOFQ+BDVXJ3uttE3ZI6
+ jGuTIpbJBRS3ijcPM9QBymsA+grBcbnx/Tp/WquzUjKncqa7Vo1txcHo3jr1mXRTxOli
+ 3/izlgHwNnsYClYtrBdflXGkWsBRP5FekPJSU+r0ze1iLaAbUZjErMR1HuArp2bJ/06Y
+ gSAw==
+X-Gm-Message-State: APjAAAVwWCIQURfCDtKbLg8liqNssHiAFowe3BFK76sUL1rlZ92Egxy+
+ 4K1lNjk40e6UFT+gIbzDn8c0mluBwN7JuvPPJDI=
+X-Google-Smtp-Source: APXvYqyQgpqNpnRwHb1B/5G1f/qO71wvgeECAZ1KpLmZ2sbR0sA0kTP/m02C59BaeJ90N9hS1MdXS6KWRubAqqR6rxA=
+X-Received: by 2002:a2e:9188:: with SMTP id f8mr2061084ljg.33.1561763727703;
+ Fri, 28 Jun 2019 16:15:27 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190627202719.17739-1-philmd@redhat.com>
- <20190627202719.17739-23-philmd@redhat.com>
-In-Reply-To: <20190627202719.17739-23-philmd@redhat.com>
+ <20190627202719.17739-26-philmd@redhat.com>
+In-Reply-To: <20190627202719.17739-26-philmd@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 28 Jun 2019 16:11:24 -0700
-Message-ID: <CAKmqyKP0fp+M-L62EJcy4=rZaWAHsv_RHm-8gJWyqJZni=4hag@mail.gmail.com>
+Date: Fri, 28 Jun 2019 16:12:27 -0700
+Message-ID: <CAKmqyKMTa09ajWuxtDC9kh1Fi=EFw=CZWJk+8P+fATK89otUzg@mail.gmail.com>
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::142
-Subject: Re: [Qemu-devel] [PATCH v5 22/28] hw/block/pflash_cfi02: Fix reset
- command not ignored during erase
+X-Received-From: 2a00:1450:4864:20::244
+Subject: Re: [Qemu-devel] [PATCH v5 25/28] hw/block/pflash_cfi02: Use chip
+ erase time specified in the CFI table
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,20 +107,19 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 27, 2019 at 2:06 PM Philippe Mathieu-Daud=C3=A9
+On Thu, Jun 27, 2019 at 2:12 PM Philippe Mathieu-Daud=C3=A9
 <philmd@redhat.com> wrote:
 >
 > From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
 >
-> When the flash device is performing a chip erase, all commands are
-> ignored. When it is performing a sector erase, only the erase suspend
-> command is valid, which is currently not supported.
+> When erasing the chip, use the typical time specified in the CFI table
+> rather than arbitrarily selecting 5 seconds.
 >
-> In particular, the reset command should not cause the device to reset to
-> read array mode while programming is on going.
+> Since the currently unconfigurable value set in the table is 12, this
+> means a chip erase takes 4096 ms so this isn't a big change in behavior.
 >
 > Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-> Message-Id: <20190426162624.55977-8-stephen.checkoway@oberlin.edu>
+> Message-Id: <20190426162624.55977-11-stephen.checkoway@oberlin.edu>
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
@@ -129,26 +127,29 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/block/pflash_cfi02.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> TODO check not zero
+> ---
+>  hw/block/pflash_cfi02.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
 > diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-> index 13f76fa71d..39daa95833 100644
+> index a3665da3b8..b2d37c33bb 100644
 > --- a/hw/block/pflash_cfi02.c
 > +++ b/hw/block/pflash_cfi02.c
-> @@ -311,7 +311,8 @@ static void pflash_write(void *opaque, hwaddr offset,=
+> @@ -617,9 +617,9 @@ static void pflash_write(void *opaque, hwaddr offset,=
  uint64_t value,
->      trace_pflash_io_write(offset, width, width << 1, value, pfl->wcycle)=
-;
->      cmd =3D value;
->      if (pfl->cmd !=3D 0xA0) {
-> -        if (cmd =3D=3D 0xF0) {
-> +        /* Reset does nothing during chip erase and sector erase. */
-> +        if (cmd =3D=3D 0xF0 && pfl->cmd !=3D 0x10 && pfl->cmd !=3D 0x30)=
- {
->              if (pfl->wcycle =3D=3D WCYCLE_AUTOSELECT_CFI) {
->                  /* Return to autoselect mode. */
->                  pfl->wcycle =3D 3;
+>                  pflash_update(pfl, 0, pfl->chip_len);
+>              }
+>              set_dq7(pfl, 0x00);
+> -            /* Let's wait 5 seconds before chip erase is done */
+> +            /* Wait the time specified at CFI address 0x22. */
+>              timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)=
+ +
+> -                      (NANOSECONDS_PER_SECOND * 5));
+> +                      (1ULL << pfl->cfi_table[0x22]) * SCALE_MS);
+>              break;
+>          case 0x30:
+>              /* Sector erase */
 > --
 > 2.20.1
 >
