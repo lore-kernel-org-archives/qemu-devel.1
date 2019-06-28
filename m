@@ -2,59 +2,62 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 170C1C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:17:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A357C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:19:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4E05214AF
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:17:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4E05214AF
+	by mail.kernel.org (Postfix) with ESMTPS id 5C38A2083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:19:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C38A2083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgwNb-00065R-Gg
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 15:17:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40761)
+	id 1hgwOm-0006Iv-MO
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 15:19:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40896)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hgvxb-0004FZ-L6
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:51:02 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hgvy0-0004b4-0Q
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:51:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hgvxX-0003ZM-EP
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:50:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37900)
+ (envelope-from <ehabkost@redhat.com>) id 1hgvxx-0003zq-6m
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:51:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58816)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgvxX-0003My-63
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:50:55 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgvxx-0003yz-18
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:51:21 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6F1D63001802;
- Fri, 28 Jun 2019 18:50:40 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 546DA3086215;
+ Fri, 28 Jun 2019 18:51:20 +0000 (UTC)
 Received: from localhost (ovpn-116-7.gru2.redhat.com [10.97.116.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 745455D705;
- Fri, 28 Jun 2019 18:50:38 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CD4AC1001284;
+ Fri, 28 Jun 2019 18:50:55 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Fri, 28 Jun 2019 15:47:31 -0300
-Message-Id: <20190628184742.5961-19-ehabkost@redhat.com>
+Date: Fri, 28 Jun 2019 15:47:32 -0300
+Message-Id: <20190628184742.5961-20-ehabkost@redhat.com>
 In-Reply-To: <20190628184742.5961-1-ehabkost@redhat.com>
 References: <20190628184742.5961-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Fri, 28 Jun 2019 18:50:40 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.42]); Fri, 28 Jun 2019 18:51:20 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v2 18/29] numa: deprecate implict memory
- distribution between nodes
+Subject: [Qemu-devel] [PULL v2 19/29] hppa: Delete unused hppa_cpu_list()
+ function
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,59 +75,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Igor Mammedov <imammedo@redhat.com>
+hppa_cpu_list() is dead code and is never called.  Delete it.
 
-Implicit RAM distribution between nodes has exactly the same issues as:
-  "numa: deprecate 'mem' parameter of '-numa node' option"
-only with QEMU being the user that's 'adding' 'mem' parameter.
-
-Deprecate it, to get it out of the way so that we could consolidate
-guest RAM allocation using memory backends making it consistent and
-possibly later on transition to using memory devices instead of
-adhoc memory mapping for the initial RAM.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <1559205199-233510-4-git-send-email-imammedo@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20190517191332.23400-1-ehabkost@redhat.com>
+Acked-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- numa.c               | 3 +++
- qemu-deprecated.texi | 8 ++++++++
- 2 files changed, 11 insertions(+)
+ target/hppa/cpu.h |  2 --
+ target/hppa/cpu.c | 17 -----------------
+ 2 files changed, 19 deletions(-)
 
-diff --git a/numa.c b/numa.c
-index 7d449c7e95..c1f5e84fa5 100644
---- a/numa.c
-+++ b/numa.c
-@@ -410,6 +410,9 @@ void numa_complete_configuration(MachineState *ms)
-         if (i == nb_numa_nodes) {
-             assert(mc->numa_auto_assign_ram);
-             mc->numa_auto_assign_ram(mc, numa_info, nb_numa_nodes, ram_size);
-+            warn_report("Default splitting of RAM between nodes is deprecated,"
-+                        " Use '-numa node,memdev' to explictly define RAM"
-+                        " allocation per node");
-         }
- 
-         numa_total = 0;
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 44c9a95966..2fe9b72121 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -104,6 +104,14 @@ In future new machine versions will not accept the option but it will still
- work with old machine types. User can check QAPI schema to see if the legacy
- option is supported by looking at MachineInfo::numa-mem-supported property.
- 
-+@subsection -numa node (without memory specified) (since 4.1)
-+
-+Splitting RAM by default between NUMA nodes has the same issues as @option{mem}
-+parameter described above with the difference that the role of the user plays
-+QEMU using implicit generic or board specific splitting rule.
-+Use @option{memdev} with @var{memory-backend-ram} backend or @option{mem} (if
-+it's supported by used machine type) to define mapping explictly instead.
-+
- @section QEMU Machine Protocol (QMP) commands
- 
- @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
--- 
+diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
+index 2e1f2ac67c..aab251bc4b 100644
+--- a/target/hppa/cpu.h
++++ b/target/hppa/cpu.h
+@@ -241,8 +241,6 @@ void hppa_translate_init(void);
+=20
+ #define CPU_RESOLVING_TYPE TYPE_HPPA_CPU
+=20
+-void hppa_cpu_list(void);
+-
+ static inline target_ulong hppa_form_gva_psw(target_ureg psw, uint64_t s=
+pc,
+                                              target_ureg off)
+ {
+diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
+index 368cb71e6d..71b6aca45d 100644
+--- a/target/hppa/cpu.c
++++ b/target/hppa/cpu.c
+@@ -111,23 +111,6 @@ static void hppa_cpu_realizefn(DeviceState *dev, Err=
+or **errp)
+ #endif
+ }
+=20
+-static void hppa_cpu_list_entry(gpointer data, gpointer user_data)
+-{
+-    ObjectClass *oc =3D data;
+-
+-    qemu_printf("  %s\n", object_class_get_name(oc));
+-}
+-
+-void hppa_cpu_list(void)
+-{
+-    GSList *list;
+-
+-    list =3D object_class_get_list_sorted(TYPE_HPPA_CPU, false);
+-    qemu_printf("Available CPUs:\n");
+-    g_slist_foreach(list, hppa_cpu_list_entry, NULL);
+-    g_slist_free(list);
+-}
+-
+ static void hppa_cpu_initfn(Object *obj)
+ {
+     CPUState *cs =3D CPU(obj);
+--=20
 2.18.0.rc1.1.g3f1ff2140
 
 
