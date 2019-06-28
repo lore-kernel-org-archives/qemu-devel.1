@@ -2,73 +2,98 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D191C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 09:33:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18D02C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 09:36:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31FC720665
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 09:33:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31FC720665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9648F20665
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 09:36:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VRv6/kZv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9648F20665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgnFk-0001Pu-4R
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 05:33:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47099)
+	id 1hgnJI-0002zh-No
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 05:36:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47939)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hgnDb-0000ch-60
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 05:30:57 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hgnIQ-0002Zh-EB
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 05:35:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hgnDY-0001Rl-Qj
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 05:30:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41800)
+ (envelope-from <richard.henderson@linaro.org>) id 1hgnIP-0004h4-CV
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 05:35:54 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:38818)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hgnDY-0001PT-HV
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 05:30:52 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hgnDW-0001jt-SL
- for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 09:30:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D53342E8047
- for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 09:30:50 +0000 (UTC)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hgnIP-0004eE-47
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 05:35:53 -0400
+Received: by mail-wr1-x431.google.com with SMTP id d18so5546418wrs.5
+ for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 02:35:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=EYabABQgP8zIM6C4chUINaB01LzBD98XTQEtfc73hdk=;
+ b=VRv6/kZvB/CnS2iVIQeqotU9dsX1sscrIaFrxx+Fl187qU5tsiua5Ni17K/jCEjbXI
+ gIa0Fsb5uG+d0rCxySo74m9xZqRRCKPD0+ewD0Xs1JL1gQPG/y4Olq59Kauus7YrbzHx
+ mei3dp+uqp3lPT6zdMr7rrei1lnlyJKSoKCewLFuPigZpk7tuZjhcY1MHDWV75LL9YB2
+ vztmIVNwpP5JZXCq3p7324uj9Ldck3HhSswYf2roXsIfcQ2rfsDz69YM+AgDOrF51wjm
+ 4dXeyvbcqI2KNM38+uAhz+lfPLuW4ZvK0lSCJoOQ57jCZGQ0KQGlAeG5YaIO02rXNbt2
+ XB5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=EYabABQgP8zIM6C4chUINaB01LzBD98XTQEtfc73hdk=;
+ b=XaGtzg+W8FX8ukGRDkDb4Kc44A1diZUwpoXqVj8Q3v0ebwFX2FzgAdOQBGmz0iGnxq
+ M+o4ypss8COdF9/Gk0p4VCvauqFC8zrpwDrMQ6kVQyccCaqb+lOWQYvQPx099uI6rcl9
+ nKDQrL9tsB6Z/JQE9ax7DX0IF+8WCneIbyBkJfkXVQSPEFcXF7/yHUbE2lhvzYtR/img
+ diMmktH62qQb1C+syKespLdDfGwVByP5V/9PDYFVfYjwYt7D5MMEx/xRPPcVOSdMzOiW
+ yDxwn4JxCaWm8pxjIA52T0ta6UlQKmAoAVtzJwyHSoI3x2LacFDTZyrqCy16RUlvuczc
+ Ab0g==
+X-Gm-Message-State: APjAAAV9I13E7o+0dXW150y9EW3OWhbijnkierhYu+6pB1wRgrsrFtY0
+ /d2PtpCGTSRCVaz+LxLnxlOWKw==
+X-Google-Smtp-Source: APXvYqynPss+m/mLS06PraCkHqi5qMmgGxBUn5nDYH5/zGeX/f1hcxsUyGWUwmN+51aACFG9yDpTUg==
+X-Received: by 2002:a5d:5643:: with SMTP id j3mr6537659wrw.13.1561714550919;
+ Fri, 28 Jun 2019 02:35:50 -0700 (PDT)
+Received: from [192.168.2.137] (93-34-153-63.ip50.fastwebnet.it.
+ [93.34.153.63])
+ by smtp.gmail.com with ESMTPSA id c65sm1407295wma.44.2019.06.28.02.35.49
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 28 Jun 2019 02:35:50 -0700 (PDT)
+To: Lucien Murray-Pitts <lucienmp.qemu@gmail.com>
+References: <2136180936.260219.1561641583358.ref@mail.yahoo.com>
+ <2136180936.260219.1561641583358@mail.yahoo.com>
+ <1079763171.281101.1561641752988@mail.yahoo.com>
+ <e4c1fbc4-3e43-5df4-a17c-527d98d9763c@linaro.org>
+ <20190628002713.GA19257@localhost.localdomain>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <eadb57ae-256d-0bb7-5988-f493662a5caf@linaro.org>
+Date: Fri, 28 Jun 2019 11:35:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 28 Jun 2019 09:15:49 -0000
-From: DDoSolitary <DDoSolitary@gmail.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: ppc
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ddosolitary
-X-Launchpad-Bug-Reporter: DDoSolitary (ddosolitary)
-X-Launchpad-Bug-Modifier: DDoSolitary (ddosolitary)
-Message-Id: <156171334969.18290.6262209650807716029.malonedeb@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18991";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 015cf3acc267a9f35efce39b722bb0929096648f
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1834613] [NEW] Crypto related operations failing
- on Alpine Linux on QEMU 4.0
+In-Reply-To: <20190628002713.GA19257@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::431
+Subject: Re: [Qemu-devel] RFC: Why does target/m68k RTE insn. use
+ gen_exception
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,422 +102,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1834613 <1834613@bugs.launchpad.net>
+Cc: Lucien Anti-Spam <lucienmp_antispam@yahoo.com>, qemu-devel@nongnu.org,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On 6/28/19 2:27 AM, Lucien Murray-Pitts wrote:
+> The original way of handling it was causing single step to malfunction, I dont
+> rightly know why but the effect was that step would step twice and end up
+> inside the ISR function again OR just stepping past the RTE as if it didnt
+> exist.
+> 
+> I have made a quick hack to implement it the way you suggest and confirm that
+> works better.
+> 
+> HOWEVER, the "return" address is the instruction that causes the exception.
+> So it immediately does return to the ISR.
+> 
+> This is a different issue, but I think interrelated to the original problem.
 
-I'm unable to boot the netboot image of Alpine Linux using QEMU 4.0.
+Is this a synchronous exception, like a SIGSEGV, that the instruction is
+causing?  I have made attempts at fixing asynchronous interrupts, like the
+clock, in the presence of single-stepping.  I haven't tested that in a while
+and I hope it's still working...
 
-Steps to reproduce:
+> Further single stepping INTO the failing instruction results in ending up
+> at the ISR +1 instruction
 
-curl -O http://dl-cdn.alpinelinux.org/alpine/v3.10/releases/ppc64le/netboot=
-/vmlinuz-vanilla
-curl -O http://dl-cdn.alpinelinux.org/alpine/v3.10/releases/ppc64le/netboot=
-/initramfs-vanilla
-qemu-system-ppc64 -kernel vmlinuz-vanilla -initrd initramfs-vanilla -nograp=
-hic -append "console=3Dhvc0 ip=3Ddhcp alpine_repo=3Dhttp://dl-cdn.alpinelin=
-ux.org/alpine/v3.10/main"
+For a synchronous exception, that sounds like a real bug.
 
-The init script will automatically download and install an in-memory
-Alpine Linux environment. However, with QEMU 4.0, the installation
-process will fail with "BAD signature" errors:
+Probably within cpu_handle_exception,
 
-(1/20) Installing musl (1.1.22-r2)
-ERROR: musl-1.1.22-r2: BAD signature
-(2/20) Installing busybox (1.30.1-r2)
-ERROR: busybox-1.30.1-r2: BAD signature
-(3/20) Installing alpine-baselayout (3.1.2-r0)
-Executing alpine-baselayout-3.1.2-r0.pre-install
-ERROR: alpine-baselayout-3.1.2-r0.pre-install: script exited with error 127
-ERROR: alpine-baselayout-3.1.2-r0: BAD signature
-(4/20) Installing openrc (0.41.2-r1)
-ERROR: openrc-0.41.2-r1: BAD signature
-(5/20) Installing alpine-conf (3.8.3-r0)
-ERROR: alpine-conf-3.8.3-r0: BAD signature
-(6/20) Installing libcrypto1.1 (1.1.1c-r0)
-ERROR: libcrypto1.1-1.1.1c-r0: BAD signature
-(7/20) Installing libssl1.1 (1.1.1c-r0)
-ERROR: libssl1.1-1.1.1c-r0: BAD signature
-(8/20) Installing ca-certificates-cacert (20190108-r0)
-ERROR: ca-certificates-cacert-20190108-r0: BAD signature
-(9/20) Installing libtls-standalone (2.9.1-r0)
-ERROR: libtls-standalone-2.9.1-r0: BAD signature
-(10/20) Installing ssl_client (1.30.1-r2)
-ERROR: ssl_client-1.30.1-r2: BAD signature
-(11/20) Installing zlib (1.2.11-r1)
-ERROR: zlib-1.2.11-r1: BAD signature
-(12/20) Installing apk-tools (2.10.4-r1)
-ERROR: apk-tools-2.10.4-r1: BAD signature
-(13/20) Installing busybox-suid (1.30.1-r2)
-ERROR: busybox-suid-1.30.1-r2: BAD signature
-(14/20) Installing busybox-initscripts (3.1-r7)
-ERROR: busybox-initscripts-3.1-r7: BAD signature
-(15/20) Installing scanelf (1.2.3-r0)
-ERROR: scanelf-1.2.3-r0: BAD signature
-(16/20) Installing musl-utils (1.1.22-r2)
-ERROR: musl-utils-1.1.22-r2: BAD signature
-(17/20) Installing libc-utils (0.7.1-r0)
-ERROR: libc-utils-0.7.1-r0: BAD signature
-(18/20) Installing alpine-keys (2.1-r2)
-ERROR: alpine-keys-2.1-r2: BAD signature
-(19/20) Installing alpine-base (3.10.0-r0)
-ERROR: alpine-base-3.10.0-r0: BAD signature
-(20/20) Installing openssl (1.1.1c-r0)
-ERROR: openssl-1.1.1c-r0: BAD signature
-20 errors; 0 MiB in 0 packages
-ok.
-grep: /sysroot/etc/inittab: No such file or directory
-/sbin/init not found in new root. Launching emergency recovery shell
-Type exit to continue boot.
-sh: can't access tty; job control turned off
-/ #
-
-If I boot up a disk image created by a previous version of QEMU, crypto
-related operations like verifying a RSA signature using the "openssl"
-command will also fail.
-
-I didn't see these errors on previous QEMU versions or other
-architectures on QEMU 4.0
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+  #else
+          if (replay_exception()) {
+              CPUClass *cc = CPU_GET_CLASS(cpu);
+              qemu_mutex_lock_iothread();
+              cc->do_interrupt(cpu);
+              qemu_mutex_unlock_iothread();
++             /* Single-step into the exception handler.  */
++             if (cpu->singlestep_enabled) {
++                 cpu_handle_debug_exception(cpu);
++             }
+              cpu->exception_index = -1;
+          } else if (!replay_has_interrupt()) {
 
 
-** Tags: ppc
-
-** Description changed:
-
-  I'm unable to boot the netboot image of Alpine Linux using QEMU 4.0.
-  =
-
-  Steps to reproduce:
-  =
-
-  curl -O http://dl-cdn.alpinelinux.org/alpine/v3.10/releases/ppc64le/netbo=
-ot/vmlinuz-vanilla
-  curl -O http://dl-cdn.alpinelinux.org/alpine/v3.10/releases/ppc64le/netbo=
-ot/initramfs-vanilla
-  qemu-system-ppc64 -kernel vmlinuz-vanilla -initrd initramfs-vanilla -nogr=
-aphic -append "console=3Dhvc0 ip=3Ddhcp alpine_repo=3Dhttp://dl-cdn.alpinel=
-inux.org/alpine/v3.10/main"
-  =
-
-  The init script will automatically download and install an in-memory
-  Alpine Linux environment. However, with QEMU 4.0, the installation
-- process will fail with "BAD SIGNATURE" errors:
-+ process will fail with "BAD signature" errors:
-  =
-
-  =
-
--  * Installing packages to root filesystem: fetch http://dl-cdn.alpinelinu=
-x.org/alpine/edge/main/ppc64le/APKINDEX.tar.gz
-  (1/20) Installing musl (1.1.22-r2)
-- ERROR: musl-1.1.22-r2: BAD signature                                     =
-                                               (2/20) Installing busybox (1=
-.30.1-r2)
-- ERROR: busybox-1.30.1-r2: BAD signature                                  =
-                                               (3/20) Installing alpine-bas=
-elayout (3.1.2-r0)
-- Executing alpine-baselayout-3.1.2-r0.pre-install                         =
-                                               ERROR: alpine-baselayout-3.1=
-.2-r0.pre-install: script exited with error 127
-- ERROR: alpine-baselayout-3.1.2-r0: BAD signature                         =
-                                               (4/20) Installing openrc (0.=
-41.2-r1)
-- ERROR: openrc-0.41.2-r1: BAD signature                                   =
-                                               (5/20) Installing alpine-con=
-f (3.8.3-r0)
-- ERROR: alpine-conf-3.8.3-r0: BAD signature                               =
-                                               (6/20) Installing libcrypto1=
-.1 (1.1.1c-r0)
-- ERROR: libcrypto1.1-1.1.1c-r0: BAD signature                             =
-                                               (7/20) Installing libssl1.1 =
-(1.1.1c-r0)
-- ERROR: libssl1.1-1.1.1c-r0: BAD signature                                =
-                                               (8/20) Installing ca-certifi=
-cates-cacert (20190108-r0)
-- ERROR: ca-certificates-cacert-20190108-r0: BAD signature                 =
-                                               (9/20) Installing libtls-sta=
-ndalone (2.9.1-r0)
-- ERROR: libtls-standalone-2.9.1-r0: BAD signature                         =
-                                               (10/20) Installing ssl_clien=
-t (1.30.1-r2)
-- ERROR: ssl_client-1.30.1-r2: BAD signature                               =
-                                               (11/20) Installing zlib (1.2=
-.11-r1)
-- ERROR: zlib-1.2.11-r1: BAD signature                                     =
-                                               (12/20) Installing apk-tools=
- (2.10.4-r1)
-- ERROR: apk-tools-2.10.4-r1: BAD signature                                =
-                                               (13/20) Installing busybox-s=
-uid (1.30.1-r2)
-- ERROR: busybox-suid-1.30.1-r2: BAD signature                             =
-                                               (14/20) Installing busybox-i=
-nitscripts (3.1-r7)
-- ERROR: busybox-initscripts-3.1-r7: BAD signature                         =
-                                               (15/20) Installing scanelf (=
-1.2.3-r0)
-- ERROR: scanelf-1.2.3-r0: BAD signature                                   =
-                                               (16/20) Installing musl-util=
-s (1.1.22-r2)
-- ERROR: musl-utils-1.1.22-r2: BAD signature                               =
-                                               (17/20) Installing libc-util=
-s (0.7.1-r0)
-- ERROR: libc-utils-0.7.1-r0: BAD signature                                =
-                                               (18/20) Installing alpine-ke=
-ys (2.1-r2)
-- ERROR: alpine-keys-2.1-r2: BAD signature                                 =
-                                               (19/20) Installing alpine-ba=
-se (3.10.0-r0)
-- ERROR: alpine-base-3.10.0-r0: BAD signature                              =
-                                               (20/20) Installing openssl (=
-1.1.1c-r0)
-- ERROR: openssl-1.1.1c-r0: BAD signature                                  =
-                                               20 errors; 0 MiB in 0 packag=
-es
-+ ERROR: musl-1.1.22-r2: BAD signature
-+ (2/20) Installing busybox (1.30.1-r2)
-+ ERROR: busybox-1.30.1-r2: BAD signature
-+ (3/20) Installing alpine-baselayout (3.1.2-r0)
-+ Executing alpine-baselayout-3.1.2-r0.pre-install
-+ ERROR: alpine-baselayout-3.1.2-r0.pre-install: script exited with error 1=
-27
-+ ERROR: alpine-baselayout-3.1.2-r0: BAD signature
-+ (4/20) Installing openrc (0.41.2-r1)
-+ ERROR: openrc-0.41.2-r1: BAD signature
-+ (5/20) Installing alpine-conf (3.8.3-r0)
-+ ERROR: alpine-conf-3.8.3-r0: BAD signature
-+ (6/20) Installing libcrypto1.1 (1.1.1c-r0)
-+ ERROR: libcrypto1.1-1.1.1c-r0: BAD signature
-+ (7/20) Installing libssl1.1 (1.1.1c-r0)
-+ ERROR: libssl1.1-1.1.1c-r0: BAD signature
-+ (8/20) Installing ca-certificates-cacert (20190108-r0)
-+ ERROR: ca-certificates-cacert-20190108-r0: BAD signature
-+ (9/20) Installing libtls-standalone (2.9.1-r0)
-+ ERROR: libtls-standalone-2.9.1-r0: BAD signature
-+ (10/20) Installing ssl_client (1.30.1-r2)
-+ ERROR: ssl_client-1.30.1-r2: BAD signature
-+ (11/20) Installing zlib (1.2.11-r1)
-+ ERROR: zlib-1.2.11-r1: BAD signature
-+ (12/20) Installing apk-tools (2.10.4-r1)
-+ ERROR: apk-tools-2.10.4-r1: BAD signature
-+ (13/20) Installing busybox-suid (1.30.1-r2)
-+ ERROR: busybox-suid-1.30.1-r2: BAD signature
-+ (14/20) Installing busybox-initscripts (3.1-r7)
-+ ERROR: busybox-initscripts-3.1-r7: BAD signature
-+ (15/20) Installing scanelf (1.2.3-r0)
-+ ERROR: scanelf-1.2.3-r0: BAD signature
-+ (16/20) Installing musl-utils (1.1.22-r2)
-+ ERROR: musl-utils-1.1.22-r2: BAD signature
-+ (17/20) Installing libc-utils (0.7.1-r0)
-+ ERROR: libc-utils-0.7.1-r0: BAD signature
-+ (18/20) Installing alpine-keys (2.1-r2)
-+ ERROR: alpine-keys-2.1-r2: BAD signature
-+ (19/20) Installing alpine-base (3.10.0-r0)
-+ ERROR: alpine-base-3.10.0-r0: BAD signature
-+ (20/20) Installing openssl (1.1.1c-r0)
-+ ERROR: openssl-1.1.1c-r0: BAD signature
-+ 20 errors; 0 MiB in 0 packages
-  ok.
-  grep: /sysroot/etc/inittab: No such file or directory
-  /sbin/init not found in new root. Launching emergency recovery shell
-  Type exit to continue boot.
-  sh: can't access tty; job control turned off
-  / #
-  =
-
-  =
-
-- If I boot up a disk image created by a previous version QEMU, crypto rela=
-ted operations like verifying a RSA signature using the "openssl" command w=
-ill also fail.
-+ If I boot up a disk image created by a previous version QEMU, crypto
-+ related operations like verifying a RSA signature using the "openssl"
-+ command will also fail.
-  =
-
-  I didn't see these errors on previous QEMU versions or other
-  architectures on QEMU 4.0
-
-** Description changed:
-
-  I'm unable to boot the netboot image of Alpine Linux using QEMU 4.0.
-  =
-
-  Steps to reproduce:
-  =
-
-  curl -O http://dl-cdn.alpinelinux.org/alpine/v3.10/releases/ppc64le/netbo=
-ot/vmlinuz-vanilla
-  curl -O http://dl-cdn.alpinelinux.org/alpine/v3.10/releases/ppc64le/netbo=
-ot/initramfs-vanilla
-  qemu-system-ppc64 -kernel vmlinuz-vanilla -initrd initramfs-vanilla -nogr=
-aphic -append "console=3Dhvc0 ip=3Ddhcp alpine_repo=3Dhttp://dl-cdn.alpinel=
-inux.org/alpine/v3.10/main"
-  =
-
-  The init script will automatically download and install an in-memory
-  Alpine Linux environment. However, with QEMU 4.0, the installation
-  process will fail with "BAD signature" errors:
-- =
-
-  =
-
-  (1/20) Installing musl (1.1.22-r2)
-  ERROR: musl-1.1.22-r2: BAD signature
-  (2/20) Installing busybox (1.30.1-r2)
-  ERROR: busybox-1.30.1-r2: BAD signature
-  (3/20) Installing alpine-baselayout (3.1.2-r0)
-  Executing alpine-baselayout-3.1.2-r0.pre-install
-  ERROR: alpine-baselayout-3.1.2-r0.pre-install: script exited with error 1=
-27
-  ERROR: alpine-baselayout-3.1.2-r0: BAD signature
-  (4/20) Installing openrc (0.41.2-r1)
-  ERROR: openrc-0.41.2-r1: BAD signature
-  (5/20) Installing alpine-conf (3.8.3-r0)
-  ERROR: alpine-conf-3.8.3-r0: BAD signature
-  (6/20) Installing libcrypto1.1 (1.1.1c-r0)
-  ERROR: libcrypto1.1-1.1.1c-r0: BAD signature
-  (7/20) Installing libssl1.1 (1.1.1c-r0)
-  ERROR: libssl1.1-1.1.1c-r0: BAD signature
-  (8/20) Installing ca-certificates-cacert (20190108-r0)
-  ERROR: ca-certificates-cacert-20190108-r0: BAD signature
-  (9/20) Installing libtls-standalone (2.9.1-r0)
-  ERROR: libtls-standalone-2.9.1-r0: BAD signature
-  (10/20) Installing ssl_client (1.30.1-r2)
-  ERROR: ssl_client-1.30.1-r2: BAD signature
-  (11/20) Installing zlib (1.2.11-r1)
-  ERROR: zlib-1.2.11-r1: BAD signature
-  (12/20) Installing apk-tools (2.10.4-r1)
-  ERROR: apk-tools-2.10.4-r1: BAD signature
-  (13/20) Installing busybox-suid (1.30.1-r2)
-  ERROR: busybox-suid-1.30.1-r2: BAD signature
-  (14/20) Installing busybox-initscripts (3.1-r7)
-  ERROR: busybox-initscripts-3.1-r7: BAD signature
-  (15/20) Installing scanelf (1.2.3-r0)
-  ERROR: scanelf-1.2.3-r0: BAD signature
-  (16/20) Installing musl-utils (1.1.22-r2)
-  ERROR: musl-utils-1.1.22-r2: BAD signature
-  (17/20) Installing libc-utils (0.7.1-r0)
-  ERROR: libc-utils-0.7.1-r0: BAD signature
-  (18/20) Installing alpine-keys (2.1-r2)
-  ERROR: alpine-keys-2.1-r2: BAD signature
-  (19/20) Installing alpine-base (3.10.0-r0)
-  ERROR: alpine-base-3.10.0-r0: BAD signature
-  (20/20) Installing openssl (1.1.1c-r0)
-  ERROR: openssl-1.1.1c-r0: BAD signature
-  20 errors; 0 MiB in 0 packages
-  ok.
-  grep: /sysroot/etc/inittab: No such file or directory
-  /sbin/init not found in new root. Launching emergency recovery shell
-  Type exit to continue boot.
-  sh: can't access tty; job control turned off
-  / #
-  =
-
-- =
-
-- If I boot up a disk image created by a previous version QEMU, crypto
-+ If I boot up a disk image created by a previous version of QEMU, crypto
-  related operations like verifying a RSA signature using the "openssl"
-  command will also fail.
-  =
-
-  I didn't see these errors on previous QEMU versions or other
-  architectures on QEMU 4.0
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1834613
-
-Title:
-  Crypto related operations failing on Alpine Linux on QEMU 4.0
-
-Status in QEMU:
-  New
-
-Bug description:
-  I'm unable to boot the netboot image of Alpine Linux using QEMU 4.0.
-
-  Steps to reproduce:
-
-  curl -O http://dl-cdn.alpinelinux.org/alpine/v3.10/releases/ppc64le/netbo=
-ot/vmlinuz-vanilla
-  curl -O http://dl-cdn.alpinelinux.org/alpine/v3.10/releases/ppc64le/netbo=
-ot/initramfs-vanilla
-  qemu-system-ppc64 -kernel vmlinuz-vanilla -initrd initramfs-vanilla -nogr=
-aphic -append "console=3Dhvc0 ip=3Ddhcp alpine_repo=3Dhttp://dl-cdn.alpinel=
-inux.org/alpine/v3.10/main"
-
-  The init script will automatically download and install an in-memory
-  Alpine Linux environment. However, with QEMU 4.0, the installation
-  process will fail with "BAD signature" errors:
-
-  (1/20) Installing musl (1.1.22-r2)
-  ERROR: musl-1.1.22-r2: BAD signature
-  (2/20) Installing busybox (1.30.1-r2)
-  ERROR: busybox-1.30.1-r2: BAD signature
-  (3/20) Installing alpine-baselayout (3.1.2-r0)
-  Executing alpine-baselayout-3.1.2-r0.pre-install
-  ERROR: alpine-baselayout-3.1.2-r0.pre-install: script exited with error 1=
-27
-  ERROR: alpine-baselayout-3.1.2-r0: BAD signature
-  (4/20) Installing openrc (0.41.2-r1)
-  ERROR: openrc-0.41.2-r1: BAD signature
-  (5/20) Installing alpine-conf (3.8.3-r0)
-  ERROR: alpine-conf-3.8.3-r0: BAD signature
-  (6/20) Installing libcrypto1.1 (1.1.1c-r0)
-  ERROR: libcrypto1.1-1.1.1c-r0: BAD signature
-  (7/20) Installing libssl1.1 (1.1.1c-r0)
-  ERROR: libssl1.1-1.1.1c-r0: BAD signature
-  (8/20) Installing ca-certificates-cacert (20190108-r0)
-  ERROR: ca-certificates-cacert-20190108-r0: BAD signature
-  (9/20) Installing libtls-standalone (2.9.1-r0)
-  ERROR: libtls-standalone-2.9.1-r0: BAD signature
-  (10/20) Installing ssl_client (1.30.1-r2)
-  ERROR: ssl_client-1.30.1-r2: BAD signature
-  (11/20) Installing zlib (1.2.11-r1)
-  ERROR: zlib-1.2.11-r1: BAD signature
-  (12/20) Installing apk-tools (2.10.4-r1)
-  ERROR: apk-tools-2.10.4-r1: BAD signature
-  (13/20) Installing busybox-suid (1.30.1-r2)
-  ERROR: busybox-suid-1.30.1-r2: BAD signature
-  (14/20) Installing busybox-initscripts (3.1-r7)
-  ERROR: busybox-initscripts-3.1-r7: BAD signature
-  (15/20) Installing scanelf (1.2.3-r0)
-  ERROR: scanelf-1.2.3-r0: BAD signature
-  (16/20) Installing musl-utils (1.1.22-r2)
-  ERROR: musl-utils-1.1.22-r2: BAD signature
-  (17/20) Installing libc-utils (0.7.1-r0)
-  ERROR: libc-utils-0.7.1-r0: BAD signature
-  (18/20) Installing alpine-keys (2.1-r2)
-  ERROR: alpine-keys-2.1-r2: BAD signature
-  (19/20) Installing alpine-base (3.10.0-r0)
-  ERROR: alpine-base-3.10.0-r0: BAD signature
-  (20/20) Installing openssl (1.1.1c-r0)
-  ERROR: openssl-1.1.1c-r0: BAD signature
-  20 errors; 0 MiB in 0 packages
-  ok.
-  grep: /sysroot/etc/inittab: No such file or directory
-  /sbin/init not found in new root. Launching emergency recovery shell
-  Type exit to continue boot.
-  sh: can't access tty; job control turned off
-  / #
-
-  If I boot up a disk image created by a previous version of QEMU,
-  crypto related operations like verifying a RSA signature using the
-  "openssl" command will also fail.
-
-  I didn't see these errors on previous QEMU versions or other
-  architectures on QEMU 4.0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1834613/+subscriptions
+r~
 
