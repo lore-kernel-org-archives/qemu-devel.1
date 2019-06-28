@@ -2,107 +2,142 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E324C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 17:20:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 612EAC4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 17:21:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4573C2083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 17:20:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4573C2083B
+	by mail.kernel.org (Postfix) with ESMTPS id 394D62083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 17:21:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 394D62083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hguYK-0005aw-Au
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 13:20:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34852)
+	id 1hguYV-0005vx-FQ
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 13:20:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45357)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <lvivier@redhat.com>) id 1hgtMX-0002mo-6V
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 12:04:36 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hgu5V-00020q-CN
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 12:51:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1hgtMU-0000qf-Vk
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 12:04:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53286)
+ (envelope-from <jsnow@redhat.com>) id 1hgu5S-0006xU-PS
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 12:51:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44862)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hgtMU-0000mU-KT
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 12:04:30 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hgu5J-0006qK-Sh; Fri, 28 Jun 2019 12:50:50 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 191D1C18B2CC;
- Fri, 28 Jun 2019 16:04:19 +0000 (UTC)
-Received: from [10.36.117.11] (ovpn-117-11.ams2.redhat.com [10.36.117.11])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3F39F5DD73;
- Fri, 28 Jun 2019 16:04:17 +0000 (UTC)
-To: Bug 1834613 <1834613@bugs.launchpad.net>, qemu-devel@nongnu.org
-References: <156171334969.18290.6262209650807716029.malonedeb@gac.canonical.com>
-From: Laurent Vivier <lvivier@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 3BC6F307D962;
+ Fri, 28 Jun 2019 16:50:48 +0000 (UTC)
+Received: from [10.10.120.196] (ovpn-120-196.rdu2.redhat.com [10.10.120.196])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 454291001B17;
+ Fri, 28 Jun 2019 16:50:47 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20190626215301.30733-1-jsnow@redhat.com>
+ <20190627083453.GC5618@localhost.localdomain>
+ <5a374041-10a2-5ae3-6db1-966c7589b1cd@redhat.com>
+ <20190628092429.GB5179@dhcp-200-226.str.redhat.com>
+From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <036e831a-814c-6ad2-30c4-332849dbde38@redhat.com>
-Date: Fri, 28 Jun 2019 18:04:16 +0200
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <fb955d47-e829-e180-9dcb-5b02b8973427@redhat.com>
+Date: Fri, 28 Jun 2019 12:50:45 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <156171334969.18290.6262209650807716029.malonedeb@gac.canonical.com>
+In-Reply-To: <20190628092429.GB5179@dhcp-200-226.str.redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Fri, 28 Jun 2019 16:04:24 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Fri, 28 Jun 2019 16:50:48 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Bug 1834613] [NEW] Crypto related operations
- failing on Alpine Linux on QEMU 4.0
+Subject: Re: [Qemu-devel] [PATCH] block/qcow: Improve error when opening
+ qcow2 files as qcow
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,93 +149,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Qemu-Trivial <qemu-trivial@nongnu.org>, radmehrsaeed7@gmail.com,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 28/06/2019 11:15, DDoSolitary wrote:
-> Public bug reported:
+
+
+On 6/28/19 5:24 AM, Kevin Wolf wrote:
+> Am 27.06.2019 um 19:17 hat John Snow geschrieben:
+>>
+>>
+>> On 6/27/19 4:34 AM, Kevin Wolf wrote:
+>>> Am 26.06.2019 um 23:53 hat John Snow geschrieben:
+>>>> Reported-by: radmehrsaeed7@gmail.com
+>>>> Fixes: https://bugs.launchpad.net/bugs/1832914
+>>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>>> ---
+>>>>  block/qcow.c | 7 ++++++-
+>>>>  1 file changed, 6 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/block/qcow.c b/block/qcow.c
+>>>> index 6dee5bb792..a9cb6ae0bd 100644
+>>>> --- a/block/qcow.c
+>>>> +++ b/block/qcow.c
+>>>> @@ -156,7 +156,12 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
+>>>>          goto fail;
+>>>>      }
+>>>>      if (header.version != QCOW_VERSION) {
+>>>> -        error_setg(errp, "Unsupported qcow version %" PRIu32, header.version);
+>>>> +        error_setg(errp, "qcow (v%d) does not support qcow version %" PRIu32,
+>>>> +                   QCOW_VERSION, header.version);
+>>>> +        if (header.version == 2 || header.version == 3) {
+>>>> +            error_append_hint(errp, "Try the 'qcow2' driver instead.");
+>>>
+>>> I think we want a \n at the end here.
+>>>
+>>
+>> D'oh.
+>>
+>>> Kevin
+>>
+>> Can a maintainer pretty-please make the edit?
 > 
-> I'm unable to boot the netboot image of Alpine Linux using QEMU 4.0.
+> A maintainer did that now. (read: thanks, applied)
 > 
-> Steps to reproduce:
-> 
-> curl -O http://dl-cdn.alpinelinux.org/alpine/v3.10/releases/ppc64le/netboot/vmlinuz-vanilla
-> curl -O http://dl-cdn.alpinelinux.org/alpine/v3.10/releases/ppc64le/netboot/initramfs-vanilla
-> qemu-system-ppc64 -kernel vmlinuz-vanilla -initrd initramfs-vanilla -nographic -append "console=hvc0 ip=dhcp alpine_repo=http://dl-cdn.alpinelinux.org/alpine/v3.10/main"
-> 
-> The init script will automatically download and install an in-memory
-> Alpine Linux environment. However, with QEMU 4.0, the installation
-> process will fail with "BAD signature" errors:
-> 
-> (1/20) Installing musl (1.1.22-r2)
-> ERROR: musl-1.1.22-r2: BAD signature
-> (2/20) Installing busybox (1.30.1-r2)
-> ERROR: busybox-1.30.1-r2: BAD signature
-> (3/20) Installing alpine-baselayout (3.1.2-r0)
-> Executing alpine-baselayout-3.1.2-r0.pre-install
-> ERROR: alpine-baselayout-3.1.2-r0.pre-install: script exited with error 127
-> ERROR: alpine-baselayout-3.1.2-r0: BAD signature
-> (4/20) Installing openrc (0.41.2-r1)
-> ERROR: openrc-0.41.2-r1: BAD signature
-> (5/20) Installing alpine-conf (3.8.3-r0)
-> ERROR: alpine-conf-3.8.3-r0: BAD signature
-> (6/20) Installing libcrypto1.1 (1.1.1c-r0)
-> ERROR: libcrypto1.1-1.1.1c-r0: BAD signature
-> (7/20) Installing libssl1.1 (1.1.1c-r0)
-> ERROR: libssl1.1-1.1.1c-r0: BAD signature
-> (8/20) Installing ca-certificates-cacert (20190108-r0)
-> ERROR: ca-certificates-cacert-20190108-r0: BAD signature
-> (9/20) Installing libtls-standalone (2.9.1-r0)
-> ERROR: libtls-standalone-2.9.1-r0: BAD signature
-> (10/20) Installing ssl_client (1.30.1-r2)
-> ERROR: ssl_client-1.30.1-r2: BAD signature
-> (11/20) Installing zlib (1.2.11-r1)
-> ERROR: zlib-1.2.11-r1: BAD signature
-> (12/20) Installing apk-tools (2.10.4-r1)
-> ERROR: apk-tools-2.10.4-r1: BAD signature
-> (13/20) Installing busybox-suid (1.30.1-r2)
-> ERROR: busybox-suid-1.30.1-r2: BAD signature
-> (14/20) Installing busybox-initscripts (3.1-r7)
-> ERROR: busybox-initscripts-3.1-r7: BAD signature
-> (15/20) Installing scanelf (1.2.3-r0)
-> ERROR: scanelf-1.2.3-r0: BAD signature
-> (16/20) Installing musl-utils (1.1.22-r2)
-> ERROR: musl-utils-1.1.22-r2: BAD signature
-> (17/20) Installing libc-utils (0.7.1-r0)
-> ERROR: libc-utils-0.7.1-r0: BAD signature
-> (18/20) Installing alpine-keys (2.1-r2)
-> ERROR: alpine-keys-2.1-r2: BAD signature
-> (19/20) Installing alpine-base (3.10.0-r0)
-> ERROR: alpine-base-3.10.0-r0: BAD signature
-> (20/20) Installing openssl (1.1.1c-r0)
-> ERROR: openssl-1.1.1c-r0: BAD signature
-> 20 errors; 0 MiB in 0 packages
-> ok.
-> grep: /sysroot/etc/inittab: No such file or directory
-> /sbin/init not found in new root. Launching emergency recovery shell
-> Type exit to continue boot.
-> sh: can't access tty; job control turned off
-> / #
+> Kevin
 > 
 
-Fix for that is already included in git master:
+Thankyouthankyou!
 
-2a1224359008 target/ppc: Fix lxvw4x, lxvh8x and lxvb16x
-
-More fix for
-8b3b2d75c7c0 ("introduce get_cpu_vsr{l,h}() and set_cpu_vsr{l,h}() helpers for VSR register access") 
-are availabe:
-
-77bd8937c03d target/ppc: Fix xvabs[sd]p, xvnabs[sd]p, xvneg[sd]p, xvcpsgn[sd]p
-d47a751adab7 target/ppc: Fix xxbrq, xxbrw
-
-And you can also need:
-
-899f08ad1d12 tcg: Fix typos in helper_gvec_sar{8,32,64}v
-
-depending on you host CPU
-
-Thanks,
-Laurent
+--js
 
