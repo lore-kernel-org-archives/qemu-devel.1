@@ -2,83 +2,61 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CDEBC4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 16:17:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90239C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 16:22:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09CAE20645
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 16:17:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cc1KhUaL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09CAE20645
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6476F205F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 16:22:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6476F205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgtYf-0002fk-7U
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 12:17:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35521)
+	id 1hgteK-00067d-F8
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 12:22:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49787)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alistair23@gmail.com>) id 1hgtOL-0003sK-T7
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 12:06:27 -0400
+ (envelope-from <wainersm@redhat.com>) id 1hgsOp-0002I0-V0
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 11:02:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1hgtOK-0002nb-B5
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 12:06:25 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:36025)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1hgtOJ-0002W1-FD; Fri, 28 Jun 2019 12:06:23 -0400
-Received: by mail-lj1-x243.google.com with SMTP id i21so6532647ljj.3;
- Fri, 28 Jun 2019 09:06:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=8jFMOYmI7QdV5FMGFGU2VKnMJYWvON7mqPy5EHHdbJE=;
- b=Cc1KhUaLoNoVpgt7g2iuKt73ZsttB5Dia/qu1367RgQJueuzOY5irn3WKcs+uA1urh
- jECJkxPwgOARgF6VRe1xY0bgbjRTFp2Q4QzkDo+fbnW8sl2EptrR7hSIqRGibhhbAQuP
- /7u66ysgodKudbqa49oBm+Owf63/Nulq15o92hsOwBzrhhF3UbF7EUlhTQfMyFebmoO3
- 7o3OGnI1aXdLY7bqkFuFQB/upGdgybnIICFO5dED68tAz7Qaap3un71b6z5RwGUi7/N8
- ZzuvUQANkEGD4mQ2I18d1JVMjGH1SQRyzyIR4LKIDDWNRw4yJx58zNahD5ROa2e/8Nof
- NqKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=8jFMOYmI7QdV5FMGFGU2VKnMJYWvON7mqPy5EHHdbJE=;
- b=s6ZM0DnwFibCzjrpPdrmlbgHhqdCqTxpEd6CBAwfOX512I8wqW/Uvt2EcVD4zyEOK7
- KX3BmZhi2TUF17bqFp08WipLMwCv9fenr5jLelcn2IDWdItuA5UV8znWwhkvp7cze8hy
- jlX0X1DyAml96KiczRa+NlCD/sbNWTxMeTid1Bnuo3rZxqhq31rpMYiPIC6PeZGjGOYL
- GGV3RpZPi2go/LLjS5HLhqXlr+/DqesgNynqDrNOEEk8aO5p0jrcs6u+ej2vyoru5z2V
- L5c02eDudpI111423mDn0OFsHQe/NAZLg7rYEM4XFUNXZMD5NBWZC54uJmRXn940loiY
- a74g==
-X-Gm-Message-State: APjAAAW3MGT4qzgtXaY4cq65HWt1dRp6qcZaOr6fyScTYQpPFV5DLZqu
- WrHT9Q+hZ7CoY+tPB6N0U2USkutr76Jfa010BFw=
-X-Google-Smtp-Source: APXvYqx1Iiilr8yceqrgt4XreuMDOrGt35G0cRJTrwJ7Rs3vDLx/PiSdgpm5cXOA+gaUw1gJNXb5KCDk2g9Mo+yqmHY=
-X-Received: by 2002:a2e:480a:: with SMTP id v10mr6411709lja.94.1561737967423; 
- Fri, 28 Jun 2019 09:06:07 -0700 (PDT)
+ (envelope-from <wainersm@redhat.com>) id 1hgsOg-0004mX-JB
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 11:02:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39792)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1hgsOX-0004i1-5g
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 11:02:36 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7099E811A9
+ for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 15:02:32 +0000 (UTC)
+Received: from virtlab501.virt.lab.eng.bos.redhat.com
+ (virtlab501.virt.lab.eng.bos.redhat.com [10.19.152.162])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 959995D704;
+ Fri, 28 Jun 2019 15:02:25 +0000 (UTC)
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 28 Jun 2019 11:02:15 -0400
+Message-Id: <20190628150217.32659-2-wainersm@redhat.com>
+In-Reply-To: <20190628150217.32659-1-wainersm@redhat.com>
+References: <20190628150217.32659-1-wainersm@redhat.com>
 MIME-Version: 1.0
-References: <20190627202719.17739-1-philmd@redhat.com>
- <20190627202719.17739-9-philmd@redhat.com>
-In-Reply-To: <20190627202719.17739-9-philmd@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 28 Jun 2019 09:03:07 -0700
-Message-ID: <CAKmqyKPBSZhKw1D83omSi95vXf1YK=jRTFCycYayXwDU12SLjg@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Fri, 28 Jun 2019 15:02:32 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::243
-Subject: Re: [Qemu-devel] [PATCH v5 08/28] hw/block/pflash_cfi02: Use the
- ldst API in pflash_write()
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH 1/3] python/qemu: Allow to launch the VM
+ without qmp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,99 +68,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Stephen Checkoway <stephen.checkoway@oberlin.edu>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Qemu-block <qemu-block@nongnu.org>, John Snow <jsnow@redhat.com>,
- Magnus Damm <magnus.damm@gmail.com>, Markus Armbruster <armbru@redhat.com>,
- Antony Pavlov <antonynpavlov@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Alistair Francis <alistair@alistair23.me>,
- qemu-arm <qemu-arm@nongnu.org>, Jan Kiszka <jan.kiszka@web.de>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Michael Walle <michael@walle.cc>,
- "open list:New World" <qemu-ppc@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: philmd@redhat.com, jsnow@redhat.com, ehabkost@redhat.com, crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 27, 2019 at 1:43 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> The load/store API eases code review.
->
-> Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-> Message-Id: <20190426162624.55977-3-stephen.checkoway@oberlin.edu>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> [PMD: Extracted from bigger patch]
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+QEMUMachine launches the VM with a monitor enabled, afterwards
+a qmp connection is attempted on _post_launch(). In case
+the QEMU process exits with an error, qmp.accept() reaches
+timeout and raises an exception.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+But sometimes you don't need that monitor. As an example,
+when a test launches the VM expecting its immediate crash,
+and only intend to check the process's return code. In this
+case the fact that launch() tries to establish the qmp
+connection (ending up in an exception) is troublesome.
 
-Alistair
+So this patch adds the set_qmp_monitor() that allow to
+launch the VM without creating the monitor machinery.
 
-> ---
->  hw/block/pflash_cfi02.c | 38 ++++++++------------------------------
->  1 file changed, 8 insertions(+), 30 deletions(-)
->
-> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-> index 9e8c28af8f..ae38ed0bae 100644
-> --- a/hw/block/pflash_cfi02.c
-> +++ b/hw/block/pflash_cfi02.c
-> @@ -365,38 +365,16 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr o=
-ffset,
->              goto check_unlock0;
->          case 0xA0:
->              trace_pflash_data_write(offset, width << 1, value, 0);
-> -            p =3D pfl->storage;
->              if (!pfl->ro) {
-> -                switch (width) {
-> -                case 1:
-> -                    p[offset] &=3D value;
-> -                    pflash_update(pfl, offset, 1);
-> -                    break;
-> -                case 2:
-> -                    if (be) {
-> -                        p[offset] &=3D value >> 8;
-> -                        p[offset + 1] &=3D value;
-> -                    } else {
-> -                        p[offset] &=3D value;
-> -                        p[offset + 1] &=3D value >> 8;
-> -                    }
-> -                    pflash_update(pfl, offset, 2);
-> -                    break;
-> -                case 4:
-> -                    if (be) {
-> -                        p[offset] &=3D value >> 24;
-> -                        p[offset + 1] &=3D value >> 16;
-> -                        p[offset + 2] &=3D value >> 8;
-> -                        p[offset + 3] &=3D value;
-> -                    } else {
-> -                        p[offset] &=3D value;
-> -                        p[offset + 1] &=3D value >> 8;
-> -                        p[offset + 2] &=3D value >> 16;
-> -                        p[offset + 3] &=3D value >> 24;
-> -                    }
-> -                    pflash_update(pfl, offset, 4);
-> -                    break;
-> +                p =3D (uint8_t *)pfl->storage + offset;
-> +                if (pfl->be) {
-> +                    uint64_t current =3D ldn_be_p(p, width);
-> +                    stn_be_p(p, width, current & value);
-> +                } else {
-> +                    uint64_t current =3D ldn_le_p(p, width);
-> +                    stn_le_p(p, width, current & value);
->                  }
-> +                pflash_update(pfl, offset, width);
->              }
->              /*
->               * While programming, status bit DQ7 should hold the opposit=
-e
-> --
-> 2.20.1
->
->
+Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+---
+ python/qemu/__init__.py | 72 +++++++++++++++++++++++++++--------------
+ 1 file changed, 48 insertions(+), 24 deletions(-)
+
+diff --git a/python/qemu/__init__.py b/python/qemu/__init__.py
+index dbaf8a5311..dd577e9446 100644
+--- a/python/qemu/__init__.py
++++ b/python/qemu/__init__.py
+@@ -113,6 +113,7 @@ class QEMUMachine(object):
+         self._events =3D []
+         self._iolog =3D None
+         self._socket_scm_helper =3D socket_scm_helper
++        self._qmp_set =3D True   # Enable QMP monitor by default.
+         self._qmp =3D None
+         self._qemu_full_args =3D None
+         self._test_dir =3D test_dir
+@@ -227,15 +228,7 @@ class QEMUMachine(object):
+                 self._iolog =3D iolog.read()
+=20
+     def _base_args(self):
+-        if isinstance(self._monitor_address, tuple):
+-            moncdev =3D "socket,id=3Dmon,host=3D%s,port=3D%s" % (
+-                self._monitor_address[0],
+-                self._monitor_address[1])
+-        else:
+-            moncdev =3D 'socket,id=3Dmon,path=3D%s' % self._vm_monitor
+-        args =3D ['-chardev', moncdev,
+-                '-mon', 'chardev=3Dmon,mode=3Dcontrol',
+-                '-display', 'none', '-vga', 'none']
++        args =3D ['-display', 'none', '-vga', 'none']
+         if self._machine is not None:
+             args.extend(['-machine', self._machine])
+         if self._console_set:
+@@ -249,23 +242,33 @@ class QEMUMachine(object):
+             else:
+                 device =3D '%s,chardev=3Dconsole' % self._console_device=
+_type
+                 args.extend(['-device', device])
++        if self._qmp_set:
++            if isinstance(self._monitor_address, tuple):
++                moncdev =3D "socket,id=3Dmon,host=3D%s,port=3D%s" % (
++                    self._monitor_address[0],
++                    self._monitor_address[1])
++            else:
++                moncdev =3D 'socket,id=3Dmon,path=3D%s' % self._vm_monit=
+or
++            args.extend(['-chardev', moncdev, '-mon', 'chardev=3Dmon,mod=
+e=3Dcontrol'])
++
+         return args
+=20
+     def _pre_launch(self):
+         self._temp_dir =3D tempfile.mkdtemp(dir=3Dself._test_dir)
+-        if self._monitor_address is not None:
+-            self._vm_monitor =3D self._monitor_address
+-        else:
+-            self._vm_monitor =3D os.path.join(self._temp_dir,
+-                                            self._name + "-monitor.sock"=
+)
+         self._qemu_log_path =3D os.path.join(self._temp_dir, self._name =
++ ".log")
+         self._qemu_log_file =3D open(self._qemu_log_path, 'wb')
+=20
+-        self._qmp =3D qmp.QEMUMonitorProtocol(self._vm_monitor,
+-                                            server=3DTrue)
+-
++        if self._qmp_set:
++            if self._monitor_address is not None:
++                self._vm_monitor =3D self._monitor_address
++            else:
++                self._vm_monitor =3D os.path.join(self._temp_dir,
++                                            self._name + "-monitor.sock"=
+)
++            self._qmp =3D qmp.QEMUMonitorProtocol(self._vm_monitor,
++                                                    server=3DTrue)
+     def _post_launch(self):
+-        self._qmp.accept()
++        if self._qmp:
++            self._qmp.accept()
+=20
+     def _post_shutdown(self):
+         if self._qemu_log_file is not None:
+@@ -328,7 +331,8 @@ class QEMUMachine(object):
+         Wait for the VM to power off
+         """
+         self._popen.wait()
+-        self._qmp.close()
++        if self._qmp:
++            self._qmp.close()
+         self._load_io_log()
+         self._post_shutdown()
+=20
+@@ -337,11 +341,14 @@ class QEMUMachine(object):
+         Terminate the VM and clean up
+         """
+         if self.is_running():
+-            try:
+-                self._qmp.cmd('quit')
+-                self._qmp.close()
+-            except:
+-                self._popen.kill()
++            if self._qmp:
++                try:
++                    self._qmp.cmd('quit')
++                    self._qmp.close()
++                except:
++                    self._popen.kill()
++            else:
++                self._popen.terminate()
+             self._popen.wait()
+=20
+         self._load_io_log()
+@@ -358,6 +365,23 @@ class QEMUMachine(object):
+=20
+         self._launched =3D False
+=20
++    def set_qmp_monitor(self, disabled=3DFalse, monitor_address=3DNone):
++        """
++        Set the QMP monitor.
++
++        @param disabled: if True, qmp monitor options will be removed fr=
+om the
++                         base arguments of the resulting QEMU command li=
+ne.
++        @param monitor_address: address for the QMP monitor.
++        @note: call this function before launch().
++        """
++        if disabled:
++            self._qmp_set =3D False
++            self._qmp =3D None
++        else:
++            self._qmp_set =3D True
++            if monitor_address:
++                self._monitor_address =3D monitor_address
++
+     def qmp(self, cmd, conv_keys=3DTrue, **args):
+         """
+         Invoke a QMP command and return the response dict
+--=20
+2.21.0
+
 
