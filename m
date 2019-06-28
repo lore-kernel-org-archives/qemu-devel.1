@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 227A8C5B579
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 17:59:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE2E1C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 18:00:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02873208C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 17:59:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02873208C4
+	by mail.kernel.org (Postfix) with ESMTPS id CD6212083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 18:00:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD6212083B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgv9K-0001d2-AS
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 13:59:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54930)
+	id 1hgvAe-0003aS-3M
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 14:00:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54792)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <palmer@dabbelt.com>) id 1hgul0-0008Vl-9C
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:33:56 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1hguko-0008NC-AU
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:33:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1hguku-0000e8-PR
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:33:52 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:40816)
+ (envelope-from <palmer@dabbelt.com>) id 1hgukh-0000Rs-Hr
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:33:38 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:44183)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hguku-0000bN-I6
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:33:48 -0400
-Received: by mail-pf1-f196.google.com with SMTP id p184so3324599pfp.7
- for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 10:33:46 -0700 (PDT)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hguke-0000OS-C7
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:33:34 -0400
+Received: by mail-pg1-f196.google.com with SMTP id n2so2876782pgp.11
+ for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 10:33:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=/utRw/o8PW3YQm+ZhJWNBeL8gDnPNYLiS6dXiDJvvqI=;
- b=WYgCRXdpGu4QTrQp5q2X8BrnwwXdbkM16Mzjq+CcRdp81LIp5p5uXYO0TYGSUNpa6R
- Gn1j9ThQxJDh4aYt6O87KG22PI3nod/+HtP/uca/y+xeIjteIFr90Gsua4UZjPpYbKWe
- bhDLsuR/RkEjU04o4CelQNllH7NS544cNUt+0E1ciXQSLkaUJeFSr0Qwr+xyicL7cueb
- UT44KwqTGtN3zcG4a7kEZQtNUIoZSzS67oI6lEUVf43c/x6gQei1YqS2VH4umPbHfeJx
- 5lvlQ9vFwRedahQW00eZdDhbj3SKXzt1YqDxQ3X0+lm0HmUGaf2ZNJfivpN7pjMY2MF6
- Yq3A==
-X-Gm-Message-State: APjAAAVfBhjdMzHbzKQOQYhTWsyf0htRzRq9wEZHj6WhmZ458cjMb6OW
- lg6N2F8pdkptq7luLfZWFBFVHHdH2cSFm/t4
-X-Google-Smtp-Source: APXvYqzfaMjMMQgI9TpXaxgnob1w6PAJnW8K2KqVZ/8sgcG0/Eu6o+E6g/YEij18vRQZmXP7iS3eng==
-X-Received: by 2002:a63:4c46:: with SMTP id m6mr10688357pgl.59.1561743224665; 
- Fri, 28 Jun 2019 10:33:44 -0700 (PDT)
+ bh=WFOcqA5bhC2gv8hijUonjP/cUpFUXz32Bb/6MGXuT1U=;
+ b=bP19ZOjdgjDpgX1DwcLAJqp5eJnJ5ZFkvQ4VqSI3aUJlP1JOjjfGeUrybVoqMwJAYW
+ /LJXZIuuDPSxB951PTb+qv2MqgL85FaA7BynSJV9PRAzmo0+Qgo0sfMWkR6HTJdb9ItF
+ yzSTI/QL66D0h9xB4q4MH7P3oRWyw5G+wGa3Ylni2fik3/rgLfqkyTXRrzJ4012L5RXs
+ NA+Ur05ltSlFrBBPr333niefj5nCjH66fuyhzK0QjszmOsqFLbHTzBAEnCCk3k5oFigq
+ TnUHiJl+OMDXEqZJtHocUCNa6Da8+O7+JGWORtF74KhST+1F4MT4UknNgl/ZFNvAkYHg
+ pr/g==
+X-Gm-Message-State: APjAAAVxMlbXNZ3DXC16uOFR+M/AladUEyAorBS4Y7RWgpwRQuApLTkB
+ LJd0rdl0zIn9YsSKUI1S/IeV84a+fDO4O6J1
+X-Google-Smtp-Source: APXvYqxZXcgQvYEmTU1tDWqSLAtLWxpU3JuDD0WS3iMyaSz63FTWLhL2MjZCmoruXx8hy7bbNJTCZQ==
+X-Received: by 2002:a63:1316:: with SMTP id i22mr10815249pgl.274.1561743210410; 
+ Fri, 28 Jun 2019 10:33:30 -0700 (PDT)
 Received: from localhost (220-132-236-182.HINET-IP.hinet.net.
  [220.132.236.182])
- by smtp.gmail.com with ESMTPSA id x25sm3202020pfm.48.2019.06.28.10.33.43
+ by smtp.gmail.com with ESMTPSA id y10sm3105961pfm.66.2019.06.28.10.33.29
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 28 Jun 2019 10:33:43 -0700 (PDT)
-Date: Fri, 28 Jun 2019 10:32:16 -0700
-Message-Id: <20190628173227.31925-24-palmer@sifive.com>
+ Fri, 28 Jun 2019 10:33:29 -0700 (PDT)
+Date: Fri, 28 Jun 2019 10:32:11 -0700
+Message-Id: <20190628173227.31925-19-palmer@sifive.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190628173227.31925-1-palmer@sifive.com>
 References: <20190628173227.31925-1-palmer@sifive.com>
@@ -66,9 +66,9 @@ From: Palmer Dabbelt <palmer@sifive.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.210.196
-Subject: [Qemu-devel] [PULL 23/34] RISC-V: Clear load reservations on
- context switch and SC
+X-Received-From: 209.85.215.196
+Subject: [Qemu-devel] [PULL 18/34] target/riscv: Require either I or E base
+ extension
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,88 +80,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Joel Sing <joel@sing.id.au>, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- Palmer Dabbelt <palmer@sifive.com>
+Cc: Alistair Francis <alistair.francis@wdc.com>,
+ Palmer Dabbelt <palmer@sifive.com>, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Joel Sing <joel@sing.id.au>
+From: Alistair Francis <alistair.francis@wdc.com>
 
-This prevents a load reservation from being placed in one context/process,
-then being used in another, resulting in an SC succeeding incorrectly and
-breaking atomics.
-
-Signed-off-by: Joel Sing <joel@sing.id.au>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- target/riscv/cpu.c                      |  1 +
- target/riscv/cpu_helper.c               | 10 ++++++++++
- target/riscv/insn_trans/trans_rva.inc.c |  8 +++++++-
- 3 files changed, 18 insertions(+), 1 deletion(-)
+ target/riscv/cpu.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 915b9e77df33..f8d07bd20ad7 100644
+index ba1325f43533..1689ffecf85f 100644
 --- a/target/riscv/cpu.c
 +++ b/target/riscv/cpu.c
-@@ -297,6 +297,7 @@ static void riscv_cpu_reset(CPUState *cs)
-     env->pc = env->resetvec;
- #endif
-     cs->exception_index = EXCP_NONE;
-+    env->load_res = -1;
-     set_default_nan_mode(1, &env->fp_status);
- }
+@@ -373,6 +373,12 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+                        return;
+        }
  
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index e1b079e69c60..e32b6126af05 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -132,6 +132,16 @@ void riscv_cpu_set_mode(CPURISCVState *env, target_ulong newpriv)
-     }
-     /* tlb_flush is unnecessary as mode is contained in mmu_idx */
-     env->priv = newpriv;
++        if (!cpu->cfg.ext_i && !cpu->cfg.ext_e) {
++            error_setg(errp,
++                       "Either I or E extension must be set");
++                       return;
++       }
 +
-+    /*
-+     * Clear the load reservation - otherwise a reservation placed in one
-+     * context/process can be used by another, resulting in an SC succeeding
-+     * incorrectly. Version 2.2 of the ISA specification explicitly requires
-+     * this behaviour, while later revisions say that the kernel "should" use
-+     * an SC instruction to force the yielding of a load reservation on a
-+     * preemptive context switch. As a result, do both.
-+     */
-+    env->load_res = -1;
- }
- 
- /* get_physical_address - get the physical address for this virtual address
-diff --git a/target/riscv/insn_trans/trans_rva.inc.c b/target/riscv/insn_trans/trans_rva.inc.c
-index f6dbbc065e15..fadd88849e2b 100644
---- a/target/riscv/insn_trans/trans_rva.inc.c
-+++ b/target/riscv/insn_trans/trans_rva.inc.c
-@@ -61,7 +61,7 @@ static inline bool gen_sc(DisasContext *ctx, arg_atomic *a, TCGMemOp mop)
- 
-     gen_set_label(l1);
-     /*
--     * Address comparion failure.  However, we still need to
-+     * Address comparison failure.  However, we still need to
-      * provide the memory barrier implied by AQ/RL.
-      */
-     tcg_gen_mb(TCG_MO_ALL + a->aq * TCG_BAR_LDAQ + a->rl * TCG_BAR_STRL);
-@@ -69,6 +69,12 @@ static inline bool gen_sc(DisasContext *ctx, arg_atomic *a, TCGMemOp mop)
-     gen_set_gpr(a->rd, dat);
- 
-     gen_set_label(l2);
-+    /*
-+     * Clear the load reservation, since an SC must fail if there is
-+     * an SC to any address, in between an LR and SC pair.
-+     */
-+    tcg_gen_movi_tl(load_res, -1);
-+
-     tcg_temp_free(dat);
-     tcg_temp_free(src1);
-     tcg_temp_free(src2);
+        if (cpu->cfg.ext_g && !(cpu->cfg.ext_i & cpu->cfg.ext_m &
+                                cpu->cfg.ext_a & cpu->cfg.ext_f &
+                                cpu->cfg.ext_d)) {
 -- 
 2.21.0
 
