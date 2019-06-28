@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD8D5C5B579
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 18:14:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 440A6C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 18:15:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BB9F2063F
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 18:14:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BB9F2063F
+	by mail.kernel.org (Postfix) with ESMTPS id 24199205F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 18:15:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24199205F4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgvNz-00065D-RA
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 14:14:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54862)
+	id 1hgvPP-00079I-Tk
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 14:15:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55058)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <palmer@dabbelt.com>) id 1hgukt-0008Q4-9d
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:33:51 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1hgul7-0000K5-Kq
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:34:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1hguko-0000Ws-Gr
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:33:46 -0400
-Received: from mail-pg1-f171.google.com ([209.85.215.171]:36601)
+ (envelope-from <palmer@dabbelt.com>) id 1hgul4-0000oq-Ab
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:34:01 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:41719)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hguko-0000Qr-9V
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:33:42 -0400
-Received: by mail-pg1-f171.google.com with SMTP id c13so2890816pgg.3
- for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 10:33:34 -0700 (PDT)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hgul4-0000o4-4i
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:33:58 -0400
+Received: by mail-pf1-f194.google.com with SMTP id m30so3320102pff.8
+ for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 10:33:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=f47wk3zk+NrAkxWNULcRjGx8TZzZ5xzH7RJlcRZY1+U=;
- b=POH6HrNsrBQSlFXin/nuH1Xy6sL5pJZUs4Mf32IsVOMpqT2t2GUmjQp52tOnMZQji8
- +NERI2mOSPXjALMUYzFhYSHk547FOBHrlIUQOS/nPJ9+KXBkYClTf9IhXeSV0SyMUxQG
- YrVgqUEQ4JbW8+TPvFpCkGauBFkcjG6EXsYp02xuwRV2nmnDmrxK5FlYytAB7UDOr79o
- VqFMRpVzphcbC1HDQm5jmp8VWQRkF4IhPnKjHPyu8m29H+Yg7I2xt7rwPErpFIeHqGq/
- 7IkTmrd2PZRDVR63hKI7JQYHkZGns7+ttL+tJSIVTe18uTYtiY995DyBdwrINZyAozc8
- kegQ==
-X-Gm-Message-State: APjAAAULb2N1wa7WtO0M/9KoQlRBQDzhM5dI9O8JaAEOIVw07S5f1srs
- l+y9MkljT/2GfbZ0w4uw9P13KiZkDD1PS0HR
-X-Google-Smtp-Source: APXvYqz2nNQnx9TEGKO92Iy19kw4wtVvzuAMSWzPiew6BF9TZJFDPzHRmAK+7hpS0PbjJ0FTdfCtaQ==
-X-Received: by 2002:a63:1365:: with SMTP id 37mr10207628pgt.266.1561743213035; 
- Fri, 28 Jun 2019 10:33:33 -0700 (PDT)
+ bh=jNAXnuen/EqceGboq9jqUh/HLce5kvK8361K7LpbToc=;
+ b=ZaesYLaFQX2sPJwRbH56qeVNW8Ngyz9uyBTzQNRuuMGvZEE97178R6XAN/3RoqCKJB
+ UIHh/QUlDdqRYGdfXtcxT6rhiZjNUb/0qLV47CMJWmXjd7EL07DKQeDiTulOt77PcA+P
+ LJBNV84CusUMTHag1kNRlJlK32MPV3mWRgJNVnypL3pvpMA1xFPUdx/zAdH2j/G5sZw7
+ hvCrF2sSKGG2YiuOrhDPsS5e67eMrKfEurMKFIxDsYrbPwUa+aCl5arEaCvOCxdSGEPv
+ 90aUkKaIbsJEz031+XLHiYl+OFfIRsHjhD5dK5vVuciKsJqmnUANC5p2Ncu44q9CnL8z
+ MjAQ==
+X-Gm-Message-State: APjAAAXypcMWlD9VwXA+5dHz2NKemi51KWuYMj1xvCFclcTC0cEREJIY
+ Ao+7F7aWIAcCfeTbsXZRq+rQu59sKmVxO5uY
+X-Google-Smtp-Source: APXvYqwnP2hFW/AtATyhQwBOpKJnrqrl4lTyuacxW6X//VtVHbcz2SjozV4/ZtCOlODuDTzATX7Ktg==
+X-Received: by 2002:a63:fa0d:: with SMTP id y13mr10325843pgh.258.1561743236575; 
+ Fri, 28 Jun 2019 10:33:56 -0700 (PDT)
 Received: from localhost (220-132-236-182.HINET-IP.hinet.net.
  [220.132.236.182])
- by smtp.gmail.com with ESMTPSA id 196sm4008300pfy.167.2019.06.28.10.33.31
+ by smtp.gmail.com with ESMTPSA id l68sm4845500pjb.8.2019.06.28.10.33.55
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 28 Jun 2019 10:33:32 -0700 (PDT)
-Date: Fri, 28 Jun 2019 10:32:12 -0700
-Message-Id: <20190628173227.31925-20-palmer@sifive.com>
+ Fri, 28 Jun 2019 10:33:55 -0700 (PDT)
+Date: Fri, 28 Jun 2019 10:32:20 -0700
+Message-Id: <20190628173227.31925-28-palmer@sifive.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190628173227.31925-1-palmer@sifive.com>
 References: <20190628173227.31925-1-palmer@sifive.com>
@@ -66,9 +66,8 @@ From: Palmer Dabbelt <palmer@sifive.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.215.171
-Subject: [Qemu-devel] [PULL 19/34] target/riscv: Remove user version
- information
+X-Received-From: 209.85.210.194
+Subject: [Qemu-devel] [PULL 27/34] disas/riscv: Fix `rdinstreth` constraint
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,162 +79,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>,
- Palmer Dabbelt <palmer@sifive.com>, qemu-riscv@nongnu.org,
- qemu-devel@nongnu.org
+Cc: "Wladimir J. van der Laan" <laanwj@gmail.com>,
+ Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org,
+ Michael Clark <mjc@sifive.com>, Alistair Francis <alistair.francis@wdc.com>,
+ qemu-riscv@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alistair Francis <alistair.francis@wdc.com>
+From: "Wladimir J. van der Laan" <laanwj@gmail.com>
 
-Remove the user version information. This was never used and never
-publically exposed in a release of QEMU, so let's just remove it. In
-future to manage versions we can extend the extension properties to
-specify version.
+The constraint for `rdinstreth` was comparing the csr number to 0xc80,
+which is `cycleh` instead. Fix this.
 
+Signed-off-by: Wladimir J. van der Laan <laanwj@gmail.com>
+Signed-off-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- target/riscv/cpu.c | 32 +++++++++-----------------------
- target/riscv/cpu.h |  2 --
- 2 files changed, 9 insertions(+), 25 deletions(-)
+ disas/riscv.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 1689ffecf85f..6a54ebf10c62 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -89,9 +89,8 @@ static void set_misa(CPURISCVState *env, target_ulong misa)
-     env->misa_mask = env->misa = misa;
- }
- 
--static void set_versions(CPURISCVState *env, int user_ver, int priv_ver)
-+static void set_priv_version(CPURISCVState *env, int priv_ver)
- {
--    env->user_ver = user_ver;
-     env->priv_ver = priv_ver;
- }
- 
-@@ -111,7 +110,7 @@ static void riscv_any_cpu_init(Object *obj)
- {
-     CPURISCVState *env = &RISCV_CPU(obj)->env;
-     set_misa(env, RVXLEN | RVI | RVM | RVA | RVF | RVD | RVC | RVU);
--    set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_11_0);
-+    set_priv_version(env, PRIV_VERSION_1_11_0);
-     set_resetvec(env, DEFAULT_RSTVEC);
- }
- 
-@@ -128,7 +127,7 @@ static void rv32gcsu_priv1_09_1_cpu_init(Object *obj)
- {
-     CPURISCVState *env = &RISCV_CPU(obj)->env;
-     set_misa(env, RV32 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
--    set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_09_1);
-+    set_priv_version(env, PRIV_VERSION_1_09_1);
-     set_resetvec(env, DEFAULT_RSTVEC);
-     set_feature(env, RISCV_FEATURE_MMU);
-     set_feature(env, RISCV_FEATURE_PMP);
-@@ -138,7 +137,7 @@ static void rv32gcsu_priv1_10_0_cpu_init(Object *obj)
- {
-     CPURISCVState *env = &RISCV_CPU(obj)->env;
-     set_misa(env, RV32 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
--    set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
-+    set_priv_version(env, PRIV_VERSION_1_10_0);
-     set_resetvec(env, DEFAULT_RSTVEC);
-     set_feature(env, RISCV_FEATURE_MMU);
-     set_feature(env, RISCV_FEATURE_PMP);
-@@ -148,7 +147,7 @@ static void rv32imacu_nommu_cpu_init(Object *obj)
- {
-     CPURISCVState *env = &RISCV_CPU(obj)->env;
-     set_misa(env, RV32 | RVI | RVM | RVA | RVC | RVU);
--    set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
-+    set_priv_version(env, PRIV_VERSION_1_10_0);
-     set_resetvec(env, DEFAULT_RSTVEC);
-     set_feature(env, RISCV_FEATURE_PMP);
- }
-@@ -166,7 +165,7 @@ static void rv64gcsu_priv1_09_1_cpu_init(Object *obj)
- {
-     CPURISCVState *env = &RISCV_CPU(obj)->env;
-     set_misa(env, RV64 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
--    set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_09_1);
-+    set_priv_version(env, PRIV_VERSION_1_09_1);
-     set_resetvec(env, DEFAULT_RSTVEC);
-     set_feature(env, RISCV_FEATURE_MMU);
-     set_feature(env, RISCV_FEATURE_PMP);
-@@ -176,7 +175,7 @@ static void rv64gcsu_priv1_10_0_cpu_init(Object *obj)
- {
-     CPURISCVState *env = &RISCV_CPU(obj)->env;
-     set_misa(env, RV64 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
--    set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
-+    set_priv_version(env, PRIV_VERSION_1_10_0);
-     set_resetvec(env, DEFAULT_RSTVEC);
-     set_feature(env, RISCV_FEATURE_MMU);
-     set_feature(env, RISCV_FEATURE_PMP);
-@@ -186,7 +185,7 @@ static void rv64imacu_nommu_cpu_init(Object *obj)
- {
-     CPURISCVState *env = &RISCV_CPU(obj)->env;
-     set_misa(env, RV64 | RVI | RVM | RVA | RVC | RVU);
--    set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
-+    set_priv_version(env, PRIV_VERSION_1_10_0);
-     set_resetvec(env, DEFAULT_RSTVEC);
-     set_feature(env, RISCV_FEATURE_PMP);
- }
-@@ -317,7 +316,6 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
-     CPURISCVState *env = &cpu->env;
-     RISCVCPUClass *mcc = RISCV_CPU_GET_CLASS(dev);
-     int priv_version = PRIV_VERSION_1_11_0;
--    int user_version = USER_VERSION_2_02_0;
-     target_ulong target_misa = 0;
-     Error *local_err = NULL;
- 
-@@ -342,18 +340,7 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
-         }
-     }
- 
--    if (cpu->cfg.user_spec) {
--        if (!g_strcmp0(cpu->cfg.user_spec, "v2.02.0")) {
--            user_version = USER_VERSION_2_02_0;
--        } else {
--            error_setg(errp,
--                       "Unsupported user spec version '%s'",
--                       cpu->cfg.user_spec);
--            return;
--        }
--    }
--
--    set_versions(env, user_version, priv_version);
-+    set_priv_version(env, priv_version);
-     set_resetvec(env, DEFAULT_RSTVEC);
- 
-     if (cpu->cfg.mmu) {
-@@ -454,7 +441,6 @@ static Property riscv_cpu_properties[] = {
-     DEFINE_PROP_BOOL("s", RISCVCPU, cfg.ext_s, true),
-     DEFINE_PROP_BOOL("u", RISCVCPU, cfg.ext_u, true),
-     DEFINE_PROP_STRING("priv_spec", RISCVCPU, cfg.priv_spec),
--    DEFINE_PROP_STRING("user_spec", RISCVCPU, cfg.user_spec),
-     DEFINE_PROP_BOOL("mmu", RISCVCPU, cfg.mmu, true),
-     DEFINE_PROP_BOOL("pmp", RISCVCPU, cfg.pmp, true),
-     DEFINE_PROP_END_OF_LIST(),
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index d559d28bcda8..0855277b92d4 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -78,7 +78,6 @@ enum {
-     RISCV_FEATURE_MISA
- };
- 
--#define USER_VERSION_2_02_0 0x00020200
- #define PRIV_VERSION_1_09_1 0x00010901
- #define PRIV_VERSION_1_10_0 0x00011000
- #define PRIV_VERSION_1_11_0 0x00011100
-@@ -105,7 +104,6 @@ struct CPURISCVState {
- 
-     target_ulong badaddr;
- 
--    target_ulong user_ver;
-     target_ulong priv_ver;
-     target_ulong misa;
-     target_ulong misa_mask;
+diff --git a/disas/riscv.c b/disas/riscv.c
+index d37312705516..278d9be9247e 100644
+--- a/disas/riscv.c
++++ b/disas/riscv.c
+@@ -614,7 +614,8 @@ static const rvc_constraint rvcc_rdtime[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc01, r
+ static const rvc_constraint rvcc_rdinstret[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc02, rvc_end };
+ static const rvc_constraint rvcc_rdcycleh[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc80, rvc_end };
+ static const rvc_constraint rvcc_rdtimeh[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc81, rvc_end };
+-static const rvc_constraint rvcc_rdinstreth[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc80, rvc_end };
++static const rvc_constraint rvcc_rdinstreth[] = { rvc_rs1_eq_x0,
++                                                  rvc_csr_eq_0xc82, rvc_end };
+ static const rvc_constraint rvcc_frcsr[] = { rvc_rs1_eq_x0, rvc_csr_eq_0x003, rvc_end };
+ static const rvc_constraint rvcc_frrm[] = { rvc_rs1_eq_x0, rvc_csr_eq_0x002, rvc_end };
+ static const rvc_constraint rvcc_frflags[] = { rvc_rs1_eq_x0, rvc_csr_eq_0x001, rvc_end };
+@@ -1038,7 +1039,7 @@ const rv_opcode_data opcode_data[] = {
+     { "c.srai", rv_codec_cb_sh6, rv_fmt_rd_rs1_imm, NULL, rv_op_srai,
+       rv_op_srai, rv_op_srai, rvcd_imm_nz },
+     { "c.andi", rv_codec_cb_imm, rv_fmt_rd_rs1_imm, NULL, rv_op_andi,
+-      rv_op_andi, rv_op_andi, rvcd_imm_nz },
++      rv_op_andi, rv_op_andi },
+     { "c.sub", rv_codec_cs, rv_fmt_rd_rs1_rs2, NULL, rv_op_sub, rv_op_sub, rv_op_sub },
+     { "c.xor", rv_codec_cs, rv_fmt_rd_rs1_rs2, NULL, rv_op_xor, rv_op_xor, rv_op_xor },
+     { "c.or", rv_codec_cs, rv_fmt_rd_rs1_rs2, NULL, rv_op_or, rv_op_or, rv_op_or },
 -- 
 2.21.0
 
