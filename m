@@ -2,65 +2,55 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CF2BC5B579
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 08:51:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF521C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 08:57:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18758208C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 08:51:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18758208C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 95257205ED
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 08:57:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95257205ED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgmbm-0008V2-C2
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 04:51:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37742)
+	id 1hgmhC-0002fM-UL
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 04:57:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38499)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hgmao-00083b-Lj
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 04:50:52 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hgmel-0000oC-4T
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 04:54:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hgmam-0006Oe-RQ
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 04:50:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33146)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hgmek-0000oS-0c
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 04:54:55 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:46901 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hgmam-0006O6-Gq
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 04:50:48 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 95444307D90F;
- Fri, 28 Jun 2019 08:50:46 +0000 (UTC)
-Received: from work-vm (ovpn-116-169.ams2.redhat.com [10.36.116.169])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9DCAE5D71B;
- Fri, 28 Jun 2019 08:50:32 +0000 (UTC)
-Date: Fri, 28 Jun 2019 09:50:30 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Message-ID: <20190628085030.GA2922@work-vm>
-References: <1561041461-22326-1-git-send-email-kwankhede@nvidia.com>
- <1561041461-22326-9-git-send-email-kwankhede@nvidia.com>
- <20190621003153.GG9303@joy-OptiPlex-7040>
- <20190625033029.GC6971@joy-OptiPlex-7040>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190625033029.GC6971@joy-OptiPlex-7040>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Fri, 28 Jun 2019 08:50:47 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 08/13] vfio: Add save state functions to
- SaveVMHandlers
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1hgmej-0000is-Pj
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 04:54:53 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 697741A2203;
+ Fri, 28 Jun 2019 10:54:50 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.13.43])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 4F8F51A1D9C;
+ Fri, 28 Jun 2019 10:54:50 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+To: qemu-devel@nongnu.org,
+	laurent@vivier.eu
+Date: Fri, 28 Jun 2019 10:54:37 +0200
+Message-Id: <1561712082-31441-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PATCH v15 0/5] linux-user: A set of miscellaneous
+ patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,332 +62,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "cjia@nvidia.com" <cjia@nvidia.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "yulei.zhang@intel.com" <yulei.zhang@intel.com>,
- "aik@ozlabs.ru" <aik@ozlabs.ru>, Kirti Wankhede <kwankhede@nvidia.com>,
- "eauger@redhat.com" <eauger@redhat.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>
+Cc: amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Yan Zhao (yan.y.zhao@intel.com) wrote:
-> On Fri, Jun 21, 2019 at 08:31:53AM +0800, Yan Zhao wrote:
-> > On Thu, Jun 20, 2019 at 10:37:36PM +0800, Kirti Wankhede wrote:
-> > > Added .save_live_pending, .save_live_iterate and .save_live_complete_precopy
-> > > functions. These functions handles pre-copy and stop-and-copy phase.
-> > > 
-> > > In _SAVING|_RUNNING device state or pre-copy phase:
-> > > - read pending_bytes
-> > > - read data_offset - indicates kernel driver to write data to staging
-> > >   buffer which is mmapped.
-> > > - read data_size - amount of data in bytes written by vendor driver in migration
-> > >   region.
-> > > - if data section is trapped, pread() number of bytes in data_size, from
-> > >   data_offset.
-> > > - if data section is mmaped, read mmaped buffer of size data_size.
-> > > - Write data packet to file stream as below:
-> > > {VFIO_MIG_FLAG_DEV_DATA_STATE, data_size, actual data,
-> > > VFIO_MIG_FLAG_END_OF_STATE }
-> > > 
-> > > In _SAVING device state or stop-and-copy phase
-> > > a. read config space of device and save to migration file stream. This
-> > >    doesn't need to be from vendor driver. Any other special config state
-> > >    from driver can be saved as data in following iteration.
-> > > b. read pending_bytes - indicates kernel driver to write data to staging
-> > >    buffer which is mmapped.
-> > > c. read data_size - amount of data in bytes written by vendor driver in
-> > >    migration region.
-> > > d. if data section is trapped, pread() from data_offset of size data_size.
-> > > e. if data section is mmaped, read mmaped buffer of size data_size.
-> > > f. Write data packet as below:
-> > >    {VFIO_MIG_FLAG_DEV_DATA_STATE, data_size, actual data}
-> > > g. iterate through steps b to f until (pending_bytes > 0)
-> > > h. Write {VFIO_MIG_FLAG_END_OF_STATE}
-> > > 
-> > > .save_live_iterate runs outside the iothread lock in the migration case, which
-> > > could race with asynchronous call to get dirty page list causing data corruption
-> > > in mapped migration region. Mutex added here to serial migration buffer read
-> > > operation.
-> > > 
-> > > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> > > Reviewed-by: Neo Jia <cjia@nvidia.com>
-> > > ---
-> > >  hw/vfio/migration.c | 212 ++++++++++++++++++++++++++++++++++++++++++++++++++++
-> > >  1 file changed, 212 insertions(+)
-> > > 
-> > > diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> > > index fe0887c27664..0a2f30872316 100644
-> > > --- a/hw/vfio/migration.c
-> > > +++ b/hw/vfio/migration.c
-> > > @@ -107,6 +107,111 @@ static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t state)
-> > >      return 0;
-> > >  }
-> > >  
-> > > +static int vfio_save_buffer(QEMUFile *f, VFIODevice *vbasedev)
-> > > +{
-> > > +    VFIOMigration *migration = vbasedev->migration;
-> > > +    VFIORegion *region = &migration->region.buffer;
-> > > +    uint64_t data_offset = 0, data_size = 0;
-> > > +    int ret;
-> > > +
-> > > +    ret = pread(vbasedev->fd, &data_offset, sizeof(data_offset),
-> > > +                region->fd_offset + offsetof(struct vfio_device_migration_info,
-> > > +                                             data_offset));
-> > > +    if (ret != sizeof(data_offset)) {
-> > > +        error_report("Failed to get migration buffer data offset %d",
-> > > +                     ret);
-> > > +        return -EINVAL;
-> > > +    }
-> > > +
-> > > +    ret = pread(vbasedev->fd, &data_size, sizeof(data_size),
-> > > +                region->fd_offset + offsetof(struct vfio_device_migration_info,
-> > > +                                             data_size));
-> > > +    if (ret != sizeof(data_size)) {
-> > > +        error_report("Failed to get migration buffer data size %d",
-> > > +                     ret);
-> > > +        return -EINVAL;
-> > > +    }
-> > > +
-> > how big is the data_size ? 
-> > if this size is too big, it may take too much time and block others.
-> > 
-> > > +    if (data_size > 0) {
-> > > +        void *buf = NULL;
-> > > +        bool buffer_mmaped = false;
-> > > +
-> > > +        if (region->mmaps) {
-> > > +            int i;
-> > > +
-> > > +            for (i = 0; i < region->nr_mmaps; i++) {
-> > > +                if ((data_offset >= region->mmaps[i].offset) &&
-> > > +                    (data_offset < region->mmaps[i].offset +
-> > > +                                   region->mmaps[i].size)) {
-> > > +                    buf = region->mmaps[i].mmap + (data_offset -
-> > > +                                                   region->mmaps[i].offset);
-> > > +                    buffer_mmaped = true;
-> > > +                    break;
-> > > +                }
-> > > +            }
-> > > +        }
-> > > +
-> > > +        if (!buffer_mmaped) {
-> > > +            buf = g_malloc0(data_size);
-> > > +            ret = pread(vbasedev->fd, buf, data_size,
-> > > +                        region->fd_offset + data_offset);
-> > > +            if (ret != data_size) {
-> > > +                error_report("Failed to get migration data %d", ret);
-> > > +                g_free(buf);
-> > > +                return -EINVAL;
-> > > +            }
-> > > +        }
-> > > +
-> > > +        qemu_put_be64(f, data_size);
-> > > +        qemu_put_buffer(f, buf, data_size);
-> > > +
-> > > +        if (!buffer_mmaped) {
-> > > +            g_free(buf);
-> > > +        }
-> > > +        migration->pending_bytes -= data_size;
-> > > +    } else {
-> > > +        qemu_put_be64(f, data_size);
-> > > +    }
-> > > +
-> > > +    ret = qemu_file_get_error(f);
-> > > +
-> > > +    return data_size;
-> > > +}
-> > > +
-> > > +static int vfio_update_pending(VFIODevice *vbasedev)
-> > > +{
-> > > +    VFIOMigration *migration = vbasedev->migration;
-> > > +    VFIORegion *region = &migration->region.buffer;
-> > > +    uint64_t pending_bytes = 0;
-> > > +    int ret;
-> > > +
-> > > +    ret = pread(vbasedev->fd, &pending_bytes, sizeof(pending_bytes),
-> > > +                region->fd_offset + offsetof(struct vfio_device_migration_info,
-> > > +                                             pending_bytes));
-> > > +    if ((ret < 0) || (ret != sizeof(pending_bytes))) {
-> > > +        error_report("Failed to get pending bytes %d", ret);
-> > > +        migration->pending_bytes = 0;
-> > > +        return (ret < 0) ? ret : -EINVAL;
-> > > +    }
-> > > +
-> > > +    migration->pending_bytes = pending_bytes;
-> > > +    return 0;
-> > > +}
-> > > +
-> > > +static int vfio_save_device_config_state(QEMUFile *f, void *opaque)
-> > > +{
-> > > +    VFIODevice *vbasedev = opaque;
-> > > +
-> > > +    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_CONFIG_STATE);
-> > > +
-> > > +    if (vbasedev->type == VFIO_DEVICE_TYPE_PCI) {
-> > > +        vfio_pci_save_config(vbasedev, f);
-> > > +    }
-> > > +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
-> > > +
-> > > +    return qemu_file_get_error(f);
-> > > +}
-> > > +
-> > >  /* ---------------------------------------------------------------------- */
-> > >  
-> > >  static int vfio_save_setup(QEMUFile *f, void *opaque)
-> > > @@ -163,9 +268,116 @@ static void vfio_save_cleanup(void *opaque)
-> > >      }
-> > >  }
-> > >  
-> > > +static void vfio_save_pending(QEMUFile *f, void *opaque,
-> > > +                              uint64_t threshold_size,
-> > > +                              uint64_t *res_precopy_only,
-> > > +                              uint64_t *res_compatible,
-> > > +                              uint64_t *res_postcopy_only)
-> > > +{
-> > > +    VFIODevice *vbasedev = opaque;
-> > > +    VFIOMigration *migration = vbasedev->migration;
-> > > +    int ret;
-> > > +
-> > > +    ret = vfio_update_pending(vbasedev);
-> > > +    if (ret) {
-> > > +        return;
-> > > +    }
-> > > +
-> > > +    if (vbasedev->device_state & VFIO_DEVICE_STATE_RUNNING) {
-> > > +        *res_precopy_only += migration->pending_bytes;
-> > > +    } else {
-> > > +        *res_postcopy_only += migration->pending_bytes;
-> > > +    }
-> by definition,
-> - res_precopy_only is for data which must be migrated in precopy phase
->    or in stopped state, in other words - before target vm start
-> - res_postcopy_only is for data which must be migrated in postcopy phase
->   or in stopped state, in other words - after source vm stop
-> So, we can only determining data type by the nature of the data. i.e.
-> if it is device state data which must be copied after source vm stop and
-> before target vm start, it belongs to res_precopy_only.
-> 
-> It is not right to determining data type by current device state.
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Right; you can determine it by whether postcopy is *enabled* or not.
-However, since this isn't ready for postcopy yet anyway, just add it to
-res_postcopy_only all the time;  then you can come back to postcopy
-later.
+This is a collection of misc patches for Linux user that I recently
+accumulated from variuous sources. All of them originate from problems
+observed on mips target. However, most of these changes actually
+affect and fix linux-user problems on multiple targets.
 
-Dave
+There are three checkpatch warninhs and two checkpatch errors that
+sould be ignored in the given circumstances.
 
-> Thanks
-> Yan
-> 
-> > > +    *res_compatible += 0;
-> > > +}
-> > > +
-> > > +static int vfio_save_iterate(QEMUFile *f, void *opaque)
-> > > +{
-> > > +    VFIODevice *vbasedev = opaque;
-> > > +    VFIOMigration *migration = vbasedev->migration;
-> > > +    int ret;
-> > > +
-> > > +    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_DATA_STATE);
-> > > +
-> > > +    qemu_mutex_lock(&migration->lock);
-> > > +    ret = vfio_save_buffer(f, vbasedev);
-> > > +    qemu_mutex_unlock(&migration->lock);
-> > > +
-> > > +    if (ret < 0) {
-> > > +        error_report("vfio_save_buffer failed %s",
-> > > +                     strerror(errno));
-> > > +        return ret;
-> > > +    }
-> > > +
-> > > +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
-> > > +
-> > > +    ret = qemu_file_get_error(f);
-> > > +    if (ret) {
-> > > +        return ret;
-> > > +    }
-> > > +
-> > > +    return ret;
-> > > +}
-> > > +
-> > > +static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
-> > > +{
-> > > +    VFIODevice *vbasedev = opaque;
-> > > +    VFIOMigration *migration = vbasedev->migration;
-> > > +    int ret;
-> > > +
-> > > +    ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_SAVING);
-> > > +    if (ret) {
-> > > +        error_report("Failed to set state STOP and SAVING");
-> > > +        return ret;
-> > > +    }
-> > > +
-> > > +    ret = vfio_save_device_config_state(f, opaque);
-> > > +    if (ret) {
-> > > +        return ret;
-> > > +    }
-> > > +
-> > > +    ret = vfio_update_pending(vbasedev);
-> > > +    if (ret) {
-> > > +        return ret;
-> > > +    }
-> > > +
-> > > +    while (migration->pending_bytes > 0) {
-> > > +        qemu_put_be64(f, VFIO_MIG_FLAG_DEV_DATA_STATE);
-> > > +        ret = vfio_save_buffer(f, vbasedev);
-> > > +        if (ret < 0) {
-> > > +            error_report("Failed to save buffer");
-> > > +            return ret;
-> > > +        } else if (ret == 0) {
-> > > +            break;
-> > > +        }
-> > > +
-> > > +        ret = vfio_update_pending(vbasedev);
-> > > +        if (ret) {
-> > > +            return ret;
-> > > +        }
-> > > +    }
-> > > +
-> > > +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
-> > > +
-> > > +    ret = qemu_file_get_error(f);
-> > > +    if (ret) {
-> > > +        return ret;
-> > > +    }
-> > > +
-> > > +    ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_STOPPED);
-> > > +    if (ret) {
-> > > +        error_report("Failed to set state STOPPED");
-> > > +        return ret;
-> > > +    }
-> > > +    return ret;
-> > > +}
-> > > +
-> > >  static SaveVMHandlers savevm_vfio_handlers = {
-> > >      .save_setup = vfio_save_setup,
-> > >      .save_cleanup = vfio_save_cleanup,
-> > > +    .save_live_pending = vfio_save_pending,
-> > > +    .save_live_iterate = vfio_save_iterate,
-> > > +    .save_live_complete_precopy = vfio_save_complete_precopy,
-> > >  };
-> > >  
-> > >  /* ---------------------------------------------------------------------- */
-> > > -- 
-> > > 2.7.0
-> > > 
-> > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+NOTE: Two checkpatch errors and three warnings are false alarms.
+
+v14->v15:
+
+  - removed inclusion of sys/stat.h from patch #1
+  - a minor correction in the commit message for patch #3
+  - amended patch #5 to reflect the kernel behavior wrt FPE
+
+v13->v14:
+
+  - several minor corrections in commit messages
+
+v12->v13:
+
+  - removed two patches that got accepted
+  - simplified the patch on statx()
+  - added a patch on TARGET_HAVE_ARCH_STRUCT_FLOCK
+  - added a patch on fixing EXCP_FPE handling on MIPS
+
+v11->v12:
+
+  - used the preffered Laurent's email address for linux-user
+  - added a note on checkpetch warnings and errors in the commit letter
+ 
+
+v10->v11:
+
+  - patch on <ADD|DROP>_MEMEBERSHIP basically reverted to its first
+    version
+  - corrected patch on statx()
+  - added patch on strace support for statx()
+  - added patch on fixing flock structure for MIPS O64 ABI
+
+v9->v10:
+
+  - improved commit messages for patches 2 and 3
+
+v8->v9:
+
+  - fixed build error on some systems related to SOL_ALG
+
+v7->v8:
+
+  - added a patch on setsockopt() option SOL_ALG
+
+v6->v7:
+
+  - fixed a build error for older kernels related to the patch on
+    setsockopt() options
+  - removed four patches that on the meantime got accepted into the
+    main source tree
+
+v5->v6:
+
+  - fixed a mistake in patch #4
+  - improved commit messages in patches #4 and #6
+
+v4->v5:
+
+  - added the patch on statx() support
+  - improved the patch on IPV6_<ADD|DROP>_MEMBERSHIP to take into
+    account the possibility of different names for a field
+  - minor corrections in commit messages
+
+v3->v4:
+
+  - improved commit messages (fixed some typos, improved relevance)
+
+v2->v3:
+
+  - updated and improved commit messages
+  - added IPV6_DROP_MEMBERSHIP support to the patch on setsockopt()'s
+    option
+
+v1->v2:
+
+  - added the patch on setsockopt()'s option IPV6_ADD_MEMBERSHIP
+  - improved the commit messages
+
+
+Aleksandar Markovic (3):
+  linux-user: Fix target_flock structure for MIPS O64 ABI
+  linux-user: Introduce TARGET_HAVE_ARCH_STRUCT_FLOCK
+  linux-user: Handle EXCP_FPE properly for MIPS
+
+Aleksandar Rikalo (1):
+  linux-user: Add support for translation of statx() syscall
+
+Jim Wilson (1):
+  linux-user: Add support for strace for statx() syscall
+
+ linux-user/generic/fcntl.h     |   8 +--
+ linux-user/mips/cpu_loop.c     |  17 ++++++
+ linux-user/mips/target_fcntl.h |  17 +++++-
+ linux-user/strace.c            |  86 +++++++++++++++++++++++++++++++
+ linux-user/strace.list         |   3 ++
+ linux-user/syscall.c           | 114 ++++++++++++++++++++++++++++++++++++++++-
+ linux-user/syscall_defs.h      |  37 +++++++++++++
+ 7 files changed, 276 insertions(+), 6 deletions(-)
+
+-- 
+2.7.4
+
 
