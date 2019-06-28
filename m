@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9813FC4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:28:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD50FC4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:30:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76397214AF
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:28:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76397214AF
+	by mail.kernel.org (Postfix) with ESMTPS id 96203208C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:30:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96203208C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgwXX-0004OM-Pg
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 15:28:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40763)
+	id 1hgwZY-0006hq-SA
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 15:30:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41345)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hgvxb-0004Fu-Pg
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:51:04 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hgvz9-0005b9-9p
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:52:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hgvxX-0003ZE-BJ
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:50:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58660)
+ (envelope-from <ehabkost@redhat.com>) id 1hgvz2-0005X1-TJ
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:52:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38192)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgvxW-0003IP-UW
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:50:55 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgvz2-0005Vc-HF
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:52:28 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 672B73082131;
- Fri, 28 Jun 2019 18:50:34 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id AB22B307D844;
+ Fri, 28 Jun 2019 18:52:27 +0000 (UTC)
 Received: from localhost (ovpn-116-7.gru2.redhat.com [10.97.116.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B63CF5D705;
- Fri, 28 Jun 2019 18:50:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 38CC7600C6;
+ Fri, 28 Jun 2019 18:52:27 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Fri, 28 Jun 2019 15:47:30 -0300
-Message-Id: <20190628184742.5961-18-ehabkost@redhat.com>
+Date: Fri, 28 Jun 2019 15:47:42 -0300
+Message-Id: <20190628184742.5961-30-ehabkost@redhat.com>
 In-Reply-To: <20190628184742.5961-1-ehabkost@redhat.com>
 References: <20190628184742.5961-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 28 Jun 2019 18:50:34 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Fri, 28 Jun 2019 18:52:27 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v2 17/29] numa: deprecate 'mem' parameter of
- '-numa node' option
+Subject: [Qemu-devel] [PULL v2 29/29] vl.c: Add -smp,
+ dies=* command line support and update doc
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,91 +67,164 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+ Like Xu <like.xu@linux.intel.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Igor Mammedov <imammedo@redhat.com>
+From: Like Xu <like.xu@linux.intel.com>
 
-The parameter allows to configure fake NUMA topology where guest
-VM simulates NUMA topology but not actually getting performance
-benefits from it. The same or better results could be achieved
-using 'memdev' parameter.
-Beside of unpredictable performance, '-numa node.mem' option has
-other issues when it's used with combination of -mem-path +
-+ -mem-prealloc + memdev backends (pc-dimm), breaking binding of
-memdev backends since mem-path/mem-prealloc are global and affect
-the most of RAM allocations.
+For PC target, users could configure the number of dies per one package
+via command line with this patch, such as "-smp dies=2,cores=4".
 
-It's possible to make memdevs and global -mem-path/mem-prealloc
-to play nicely together but that will just complicate already
-complicated code and add unobious ways it could break on 2
-different memmory allocation pathes and their combinations.
+The parsing rules of new cpu-topology model obey the same restrictions/logic
+as the legacy socket/core/thread model especially on missing values computing.
 
-Instead of it, consolidate all guest RAM allocation over memdev
-which still allows to create fake NUMA configurations if desired
-and leaves one simplifyed code path to consider when it comes
-to guest RAM allocation.
-
-To achieve desired simplification deprecate 'mem' parameter as its
-ad-hoc partitioning of initial RAM MemoryRegion can't be translated
-to memdev based backend transparently to users and in compatible
-manner (migration wise).
-
-Later down the road that will allow to consolidate means of how
-guest RAM is allocated and would permit us to clean up quite
-a bit memory allocations and numa code, leaving only 'memdev'
-implementation in place.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <1559205199-233510-3-git-send-email-imammedo@redhat.com>
+Signed-off-by: Like Xu <like.xu@linux.intel.com>
+Message-Id: <20190620054525.37188-4-like.xu@linux.intel.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- numa.c               |  2 ++
- qemu-deprecated.texi | 16 ++++++++++++++++
- 2 files changed, 18 insertions(+)
+ hw/i386/pc.c    | 30 +++++++++++++++++-------------
+ vl.c            |  3 +++
+ qemu-options.hx | 17 +++++++++--------
+ 3 files changed, 29 insertions(+), 21 deletions(-)
 
-diff --git a/numa.c b/numa.c
-index 7594eb5a7e..7d449c7e95 100644
---- a/numa.c
-+++ b/numa.c
-@@ -122,6 +122,8 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index b9c25bed35..3f0f221a5b 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1545,9 +1545,12 @@ static void pc_new_cpu(PCMachineState *pcms, int64_t apic_id, Error **errp)
+  */
+ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
+ {
++    PCMachineState *pcms = PC_MACHINE(ms);
++
+     if (opts) {
+         unsigned cpus    = qemu_opt_get_number(opts, "cpus", 0);
+         unsigned sockets = qemu_opt_get_number(opts, "sockets", 0);
++        unsigned dies = qemu_opt_get_number(opts, "dies", 1);
+         unsigned cores   = qemu_opt_get_number(opts, "cores", 0);
+         unsigned threads = qemu_opt_get_number(opts, "threads", 0);
  
-     if (node->has_mem) {
-         numa_info[nodenr].node_mem = node->mem;
-+        warn_report("Parameter -numa node,mem is deprecated,"
-+                    " use -numa node,memdev instead");
+@@ -1557,24 +1560,24 @@ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
+             threads = threads > 0 ? threads : 1;
+             if (cpus == 0) {
+                 sockets = sockets > 0 ? sockets : 1;
+-                cpus = cores * threads * sockets;
++                cpus = cores * threads * dies * sockets;
+             } else {
+                 ms->smp.max_cpus =
+                         qemu_opt_get_number(opts, "maxcpus", cpus);
+-                sockets = ms->smp.max_cpus / (cores * threads);
++                sockets = ms->smp.max_cpus / (cores * threads * dies);
+             }
+         } else if (cores == 0) {
+             threads = threads > 0 ? threads : 1;
+-            cores = cpus / (sockets * threads);
++            cores = cpus / (sockets * dies * threads);
+             cores = cores > 0 ? cores : 1;
+         } else if (threads == 0) {
+-            threads = cpus / (cores * sockets);
++            threads = cpus / (cores * dies * sockets);
+             threads = threads > 0 ? threads : 1;
+-        } else if (sockets * cores * threads < cpus) {
++        } else if (sockets * dies * cores * threads < cpus) {
+             error_report("cpu topology: "
+-                         "sockets (%u) * cores (%u) * threads (%u) < "
++                         "sockets (%u) * dies (%u) * cores (%u) * threads (%u) < "
+                          "smp_cpus (%u)",
+-                         sockets, cores, threads, cpus);
++                         sockets, dies, cores, threads, cpus);
+             exit(1);
+         }
+ 
+@@ -1586,26 +1589,27 @@ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
+             exit(1);
+         }
+ 
+-        if (sockets * cores * threads > ms->smp.max_cpus) {
++        if (sockets * dies * cores * threads > ms->smp.max_cpus) {
+             error_report("cpu topology: "
+-                         "sockets (%u) * cores (%u) * threads (%u) > "
++                         "sockets (%u) * dies (%u) * cores (%u) * threads (%u) > "
+                          "maxcpus (%u)",
+-                         sockets, cores, threads,
++                         sockets, dies, cores, threads,
+                          ms->smp.max_cpus);
+             exit(1);
+         }
+ 
+-        if (sockets * cores * threads != ms->smp.max_cpus) {
++        if (sockets * dies * cores * threads != ms->smp.max_cpus) {
+             warn_report("Invalid CPU topology deprecated: "
+-                        "sockets (%u) * cores (%u) * threads (%u) "
++                        "sockets (%u) * dies (%u) * cores (%u) * threads (%u) "
+                         "!= maxcpus (%u)",
+-                        sockets, cores, threads,
++                        sockets, dies, cores, threads,
+                         ms->smp.max_cpus);
+         }
+ 
+         ms->smp.cpus = cpus;
+         ms->smp.cores = cores;
+         ms->smp.threads = threads;
++        pcms->smp_dies = dies;
      }
-     if (node->has_memdev) {
-         Object *o;
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index df04f2840b..44c9a95966 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -88,6 +88,22 @@ The @code{-realtime mlock=on|off} argument has been replaced by the
- The ``-virtfs_synth'' argument is now deprecated. Please use ``-fsdev synth''
- and ``-device virtio-9p-...'' instead.
  
-+@subsection -numa node,mem=@var{size} (since 4.1)
-+
-+The parameter @option{mem} of @option{-numa node} is used to assign a part of
-+guest RAM to a NUMA node. But when using it, it's impossible to manage specified
-+RAM chunk on the host side (like bind it to a host node, setting bind policy, ...),
-+so guest end-ups with the fake NUMA configuration with suboptiomal performance.
-+However since 2014 there is an alternative way to assign RAM to a NUMA node
-+using parameter @option{memdev}, which does the same as @option{mem} and adds
-+means to actualy manage node RAM on the host side. Use parameter @option{memdev}
-+with @var{memory-backend-ram} backend as an replacement for parameter @option{mem}
-+to achieve the same fake NUMA effect or a properly configured
-+@var{memory-backend-file} backend to actually benefit from NUMA configuration.
-+In future new machine versions will not accept the option but it will still
-+work with old machine types. User can check QAPI schema to see if the legacy
-+option is supported by looking at MachineInfo::numa-mem-supported property.
-+
- @section QEMU Machine Protocol (QMP) commands
+     if (ms->smp.cpus > 1) {
+diff --git a/vl.c b/vl.c
+index f6e591b80c..23fe3e753b 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1233,6 +1233,9 @@ static QemuOptsList qemu_smp_opts = {
+         }, {
+             .name = "sockets",
+             .type = QEMU_OPT_NUMBER,
++        }, {
++            .name = "dies",
++            .type = QEMU_OPT_NUMBER,
+         }, {
+             .name = "cores",
+             .type = QEMU_OPT_NUMBER,
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 0d8beb4afd..a5b314a448 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -138,25 +138,26 @@ no incompatible TCG features have been enabled (e.g. icount/replay).
+ ETEXI
  
- @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
+ DEF("smp", HAS_ARG, QEMU_OPTION_smp,
+-    "-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,sockets=sockets]\n"
++    "-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,dies=dies][,sockets=sockets]\n"
+     "                set the number of CPUs to 'n' [default=1]\n"
+     "                maxcpus= maximum number of total cpus, including\n"
+     "                offline CPUs for hotplug, etc\n"
+-    "                cores= number of CPU cores on one socket\n"
++    "                cores= number of CPU cores on one socket (for PC, it's on one die)\n"
+     "                threads= number of threads on one CPU core\n"
++    "                dies= number of CPU dies on one socket (for PC only)\n"
+     "                sockets= number of discrete sockets in the system\n",
+         QEMU_ARCH_ALL)
+ STEXI
+-@item -smp [cpus=]@var{n}[,cores=@var{cores}][,threads=@var{threads}][,sockets=@var{sockets}][,maxcpus=@var{maxcpus}]
++@item -smp [cpus=]@var{n}[,cores=@var{cores}][,threads=@var{threads}][,dies=dies][,sockets=@var{sockets}][,maxcpus=@var{maxcpus}]
+ @findex -smp
+ Simulate an SMP system with @var{n} CPUs. On the PC target, up to 255
+ CPUs are supported. On Sparc32 target, Linux limits the number of usable CPUs
+ to 4.
+-For the PC target, the number of @var{cores} per socket, the number
+-of @var{threads} per cores and the total number of @var{sockets} can be
+-specified. Missing values will be computed. If any on the three values is
+-given, the total number of CPUs @var{n} can be omitted. @var{maxcpus}
+-specifies the maximum number of hotpluggable CPUs.
++For the PC target, the number of @var{cores} per die, the number of @var{threads}
++per cores, the number of @var{dies} per packages and the total number of
++@var{sockets} can be specified. Missing values will be computed.
++If any on the three values is given, the total number of CPUs @var{n} can be omitted.
++@var{maxcpus} specifies the maximum number of hotpluggable CPUs.
+ ETEXI
+ 
+ DEF("numa", HAS_ARG, QEMU_OPTION_numa,
 -- 
 2.18.0.rc1.1.g3f1ff2140
 
