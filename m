@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0446BC4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 10:41:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC3E6C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 10:42:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C86FF20656
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 10:41:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C86FF20656
+	by mail.kernel.org (Postfix) with ESMTPS id C125020656
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 10:42:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C125020656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58665 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgoK9-0003xG-VF
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 06:41:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60518)
+	id 1hgoL1-0004er-2E
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 06:42:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60582)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kraxel@redhat.com>) id 1hgoIn-0002G8-Os
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 06:40:22 -0400
+ (envelope-from <kraxel@redhat.com>) id 1hgoIq-0002MK-Gl
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 06:40:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1hgoIm-00066o-Os
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 06:40:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50644)
+ (envelope-from <kraxel@redhat.com>) id 1hgoIp-00069w-1M
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 06:40:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43324)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <kraxel@redhat.com>)
- id 1hgoIg-0005yF-Ua; Fri, 28 Jun 2019 06:40:15 -0400
+ id 1hgoIk-000628-Q2; Fri, 28 Jun 2019 06:40:19 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7403059473;
- Fri, 28 Jun 2019 10:40:07 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 321D044BD1;
+ Fri, 28 Jun 2019 10:40:10 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-116-96.ams2.redhat.com
  [10.36.116.96])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6F6A860BEC;
- Fri, 28 Jun 2019 10:39:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C4CAD60C6A;
+ Fri, 28 Jun 2019 10:40:08 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 20AF81747D; Fri, 28 Jun 2019 12:39:58 +0200 (CEST)
+ id 302EC17536; Fri, 28 Jun 2019 12:39:58 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 28 Jun 2019 12:39:55 +0200
-Message-Id: <20190628103957.9504-5-kraxel@redhat.com>
+Date: Fri, 28 Jun 2019 12:39:57 +0200
+Message-Id: <20190628103957.9504-7-kraxel@redhat.com>
 In-Reply-To: <20190628103957.9504-1-kraxel@redhat.com>
 References: <20190628103957.9504-1-kraxel@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Fri, 28 Jun 2019 10:40:08 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Fri, 28 Jun 2019 10:40:14 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 4/6] seabios: add config for ati vgabios
+Subject: [Qemu-devel] [PULL 6/6] ati-vga: switch to vgabios-ati.bin
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,23 +77,25 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 Tested-by: BALATON Zoltan <balaton@eik.bme.hu>
-Message-id: 20190620151104.2678-2-kraxel@redhat.com
+Message-id: 20190620151104.2678-4-kraxel@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- roms/config.vga-ati | 4 ++++
- 1 file changed, 4 insertions(+)
- create mode 100644 roms/config.vga-ati
+ hw/display/ati.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/roms/config.vga-ati b/roms/config.vga-ati
-new file mode 100644
-index 000000000000..12506b664442
---- /dev/null
-+++ b/roms/config.vga-ati
-@@ -0,0 +1,4 @@
-+CONFIG_QEMU=y
-+CONFIG_BUILD_VGABIOS=y
-+CONFIG_VGA_ATI=y
-+CONFIG_VGA_PCI=y
+diff --git a/hw/display/ati.c b/hw/display/ati.c
+index e1bde5e0b1e3..0cb117384839 100644
+--- a/hw/display/ati.c
++++ b/hw/display/ati.c
+@@ -910,7 +910,7 @@ static void ati_vga_class_init(ObjectClass *klass, void *data)
+     k->class_id = PCI_CLASS_DISPLAY_VGA;
+     k->vendor_id = PCI_VENDOR_ID_ATI;
+     k->device_id = PCI_DEVICE_ID_ATI_RAGE128_PF;
+-    k->romfile = "vgabios-stdvga.bin";
++    k->romfile = "vgabios-ati.bin";
+     k->realize = ati_vga_realize;
+     k->exit = ati_vga_exit;
+ }
 -- 
 2.18.1
 
