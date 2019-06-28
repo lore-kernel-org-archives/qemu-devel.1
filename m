@@ -6,57 +6,58 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C3D2C5B579
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 17:36:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3059C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 17:36:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C718205F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 17:36:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C718205F4
+	by mail.kernel.org (Postfix) with ESMTPS id C0CC7205F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 17:36:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0CC7205F4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgunb-00020L-E4
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 13:36:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54373)
+	id 1hguni-0002It-0D
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 13:36:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54542)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <palmer@dabbelt.com>) id 1hgujz-00083N-SJ
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:32:55 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1hgukY-0008Gc-Lc
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:33:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1hgujw-0008Hx-AW
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:32:51 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:41185)
+ (envelope-from <palmer@dabbelt.com>) id 1hgukV-0000Ex-F5
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:33:26 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:35229)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hgujw-0008Ft-4y
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:32:48 -0400
-Received: by mail-pg1-f195.google.com with SMTP id q4so1406553pgj.8
- for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 10:32:46 -0700 (PDT)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hgukV-0008QV-53
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:33:23 -0400
+Received: by mail-pl1-f196.google.com with SMTP id w24so3612296plp.2
+ for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 10:32:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=skpCsY6OAelSjirFF1wZzpzLaY2+CMd8k4r3QNyFPh4=;
- b=T6I+toM2PV93D1Cw1T1845bGcjC+dqhjusq+XNhNkazLxxHGIbgM/oWsEoY46K2YAE
- MmwF9Tp6/CEFRYsXJYYc4V1JLxu5l3ym6SFqjouxc6NdIhKGqvQpjOpZXKrv4GbsCXeC
- vVb5QRYAlBF+yT6MNqxg6q+rab1CmxSipLpOtZrJS5wFDuztzdiv0BCvC+oiOc7D8iCT
- 52AXN+8YmNB7PebxvheGTMpNnXTEhA61feeH0cH4I2HWkZ+q5XdWvDd9uMzmC7AuF4vC
- SpA1kbD51Ch08x78TcG3SLvIUCdHNi9FUaYdfFdFNKyWkly4+MlIIKrFr/G2GFo1zR5b
- IHLg==
-X-Gm-Message-State: APjAAAUi3LuQtOCJVnjptZNyPxiXFcSz/CmFfzKwEAyFLH0hA0vF3V1Z
- Md2d3x8yYXfei8wp436ZerFOYwofTCFsKTRZ
-X-Google-Smtp-Source: APXvYqxI+aNpPXccr3z4WvuSCLEVcgWxMDCBxvRF+WloAzPZChPklHOGWTUMyC0Cpcp9l8wwBcYXXg==
-X-Received: by 2002:a63:480a:: with SMTP id v10mr10470045pga.60.1561743164768; 
- Fri, 28 Jun 2019 10:32:44 -0700 (PDT)
+ bh=D1HIL5SBmBBlqGmn3DV7OFXg5gWo+HXWOwuA3mR3IqE=;
+ b=f1LIo67fY4kdhyuFLKPpv/yCk+tYGEBitm7GGoJW82x3vmMly/YAcze9LX+gCBHgam
+ mczqeFuDh92PYfKQOTBRwIEfvCZp11TSM8JEK+4C5MPTAisnycYZK+bkmGRcB/xM0MFy
+ W4wuP+YiVFq1GE3cLmCwrmqx5IOpcABAJWXEzK8kvZ0o0TBrvNRACz+4W97IzVXFuF9i
+ vm5xDgvnBwKIv3Rs/CrIYcEsyZKrOX63nKAXOM2MSxrfr67bWNCP43awUWhIucPsYKZL
+ 6nHbMb3RQGn2eDm3w/m3NnO6i3yDMzMW2AD5cMqeyQNvmo1NNzPJQBgj9tC9sX5H+zAd
+ 3zIQ==
+X-Gm-Message-State: APjAAAVbnJWwaEQ07ZsPPRhedcpWKfTWoioReb9jnxQ1ep3rucncl2q/
+ v/cvyhoe2w94P5yiyH8OEwnaFDvqsB2qA9hk
+X-Google-Smtp-Source: APXvYqyIdwN6WPgYTdxwlX2tmPCQj8Sp/A3Ofopw769XUdpWuIt+DyabcFtLOIeqzKGEWCRJjEsWxQ==
+X-Received: by 2002:a17:902:722:: with SMTP id
+ 31mr12767821pli.163.1561743177167; 
+ Fri, 28 Jun 2019 10:32:57 -0700 (PDT)
 Received: from localhost (220-132-236-182.HINET-IP.hinet.net.
  [220.132.236.182])
- by smtp.gmail.com with ESMTPSA id v9sm2547121pgj.69.2019.06.28.10.32.43
+ by smtp.gmail.com with ESMTPSA id q1sm4411297pfn.178.2019.06.28.10.32.56
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 28 Jun 2019 10:32:43 -0700 (PDT)
-Date: Fri, 28 Jun 2019 10:31:55 -0700
-Message-Id: <20190628173227.31925-3-palmer@sifive.com>
+ Fri, 28 Jun 2019 10:32:56 -0700 (PDT)
+Date: Fri, 28 Jun 2019 10:31:59 -0700
+Message-Id: <20190628173227.31925-7-palmer@sifive.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190628173227.31925-1-palmer@sifive.com>
 References: <20190628173227.31925-1-palmer@sifive.com>
@@ -66,8 +67,9 @@ From: Palmer Dabbelt <palmer@sifive.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.215.195
-Subject: [Qemu-devel] [PULL 02/34] sifive_prci: Read and write PRCI registers
+X-Received-From: 209.85.214.196
+Subject: [Qemu-devel] [PULL 06/34] RISC-V: Raise access fault exceptions on
+ PMP violations
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,153 +81,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Nathaniel Graff <nathaniel.graff@sifive.com>,
- Michael Clark <mjc@sifive.com>, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- Palmer Dabbelt <palmer@sifive.com>
+Cc: Alistair Francis <alistair.francis@wdc.com>,
+ Palmer Dabbelt <palmer@sifive.com>, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org, Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Nathaniel Graff <nathaniel.graff@sifive.com>
+From: Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
 
-Writes to the SiFive PRCI registers are preserved while leaving the
-ready bits set for the HFX/HFR oscillators and the lock bit set for the
-PLL.
+Section 3.6 in RISC-V v1.10 privilege specification states that PMP violations
+report "access exceptions." The current PMP implementation has
+a bug which wrongly reports "page exceptions" on PMP violations.
 
-Signed-off-by: Nathaniel Graff <nathaniel.graff@sifive.com>
-Reviewed-by: Michael Clark <mjc@sifive.com>
+This patch fixes this bug by reporting the correct PMP access exceptions
+trap values.
+
+Signed-off-by: Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- hw/riscv/sifive_prci.c         | 49 ++++++++++++++++++++++++++++------
- include/hw/riscv/sifive_prci.h | 32 ++++++++++++++++++++++
- 2 files changed, 73 insertions(+), 8 deletions(-)
+ target/riscv/cpu_helper.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/hw/riscv/sifive_prci.c b/hw/riscv/sifive_prci.c
-index fa136b5a9fe9..f406682c91f1 100644
---- a/hw/riscv/sifive_prci.c
-+++ b/hw/riscv/sifive_prci.c
-@@ -24,15 +24,18 @@
- #include "target/riscv/cpu.h"
- #include "hw/riscv/sifive_prci.h"
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index a45b05ef8395..ffbfaf433268 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -337,12 +337,13 @@ restart:
+ }
  
--/* currently implements enough to mock freedom-e-sdk BSP clock programming */
--
- static uint64_t sifive_prci_read(void *opaque, hwaddr addr, unsigned int size)
+ static void raise_mmu_exception(CPURISCVState *env, target_ulong address,
+-                                MMUAccessType access_type)
++                                MMUAccessType access_type, bool pmp_violation)
  {
--    if (addr == 0 /* PRCI_HFROSCCFG */) {
--        return 1 << 31; /* ROSC_RDY */
--    }
--    if (addr == 8 /* PRCI_PLLCFG    */) {
--        return 1 << 31; /* PLL_LOCK */
-+    SiFivePRCIState *s = opaque;
-+    switch (addr) {
-+    case SIFIVE_PRCI_HFROSCCFG:
-+        return s->hfrosccfg;
-+    case SIFIVE_PRCI_HFXOSCCFG:
-+        return s->hfxosccfg;
-+    case SIFIVE_PRCI_PLLCFG:
-+        return s->pllcfg;
-+    case SIFIVE_PRCI_PLLOUTDIV:
-+        return s->plloutdiv;
+     CPUState *cs = env_cpu(env);
+     int page_fault_exceptions =
+         (env->priv_ver >= PRIV_VERSION_1_10_0) &&
+-        get_field(env->satp, SATP_MODE) != VM_1_10_MBARE;
++        get_field(env->satp, SATP_MODE) != VM_1_10_MBARE &&
++        !pmp_violation;
+     switch (access_type) {
+     case MMU_INST_FETCH:
+         cs->exception_index = page_fault_exceptions ?
+@@ -424,6 +425,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+     CPURISCVState *env = &cpu->env;
+     hwaddr pa = 0;
+     int prot;
++    bool pmp_violation = false;
+     int ret = TRANSLATE_FAIL;
+ 
+     qemu_log_mask(CPU_LOG_MMU, "%s ad %" VADDR_PRIx " rw %d mmu_idx %d\n",
+@@ -438,6 +440,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+     if (riscv_feature(env, RISCV_FEATURE_PMP) &&
+         (ret == TRANSLATE_SUCCESS) &&
+         !pmp_hart_has_privs(env, pa, TARGET_PAGE_SIZE, 1 << access_type)) {
++        pmp_violation = true;
+         ret = TRANSLATE_FAIL;
      }
-     hw_error("%s: read: addr=0x%x\n", __func__, (int)addr);
-     return 0;
-@@ -41,7 +44,30 @@ static uint64_t sifive_prci_read(void *opaque, hwaddr addr, unsigned int size)
- static void sifive_prci_write(void *opaque, hwaddr addr,
-            uint64_t val64, unsigned int size)
- {
--    /* discard writes */
-+    SiFivePRCIState *s = opaque;
-+    switch (addr) {
-+    case SIFIVE_PRCI_HFROSCCFG:
-+        s->hfrosccfg = (uint32_t) val64;
-+        /* OSC stays ready */
-+        s->hfrosccfg |= SIFIVE_PRCI_HFROSCCFG_RDY;
-+        break;
-+    case SIFIVE_PRCI_HFXOSCCFG:
-+        s->hfxosccfg = (uint32_t) val64;
-+        /* OSC stays ready */
-+        s->hfxosccfg |= SIFIVE_PRCI_HFXOSCCFG_RDY;
-+        break;
-+    case SIFIVE_PRCI_PLLCFG:
-+        s->pllcfg = (uint32_t) val64;
-+        /* PLL stays locked */
-+        s->pllcfg |= SIFIVE_PRCI_PLLCFG_LOCK;
-+        break;
-+    case SIFIVE_PRCI_PLLOUTDIV:
-+        s->plloutdiv = (uint32_t) val64;
-+        break;
-+    default:
-+        hw_error("%s: bad write: addr=0x%x v=0x%x\n",
-+                 __func__, (int)addr, (int)val64);
-+    }
- }
- 
- static const MemoryRegionOps sifive_prci_ops = {
-@@ -61,6 +87,13 @@ static void sifive_prci_init(Object *obj)
-     memory_region_init_io(&s->mmio, obj, &sifive_prci_ops, s,
-                           TYPE_SIFIVE_PRCI, 0x8000);
-     sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
-+
-+    s->hfrosccfg = (SIFIVE_PRCI_HFROSCCFG_RDY | SIFIVE_PRCI_HFROSCCFG_EN);
-+    s->hfxosccfg = (SIFIVE_PRCI_HFROSCCFG_RDY | SIFIVE_PRCI_HFROSCCFG_EN);
-+    s->pllcfg = (SIFIVE_PRCI_PLLCFG_REFSEL | SIFIVE_PRCI_PLLCFG_BYPASS |
-+                SIFIVE_PRCI_PLLCFG_LOCK);
-+    s->plloutdiv = SIFIVE_PRCI_PLLOUTDIV_DIV1;
-+
- }
- 
- static const TypeInfo sifive_prci_info = {
-diff --git a/include/hw/riscv/sifive_prci.h b/include/hw/riscv/sifive_prci.h
-index b6f4c486cc1e..bd51c4af3c1c 100644
---- a/include/hw/riscv/sifive_prci.h
-+++ b/include/hw/riscv/sifive_prci.h
-@@ -19,6 +19,34 @@
- #ifndef HW_SIFIVE_PRCI_H
- #define HW_SIFIVE_PRCI_H
- 
-+enum {
-+    SIFIVE_PRCI_HFROSCCFG   = 0x0,
-+    SIFIVE_PRCI_HFXOSCCFG   = 0x4,
-+    SIFIVE_PRCI_PLLCFG      = 0x8,
-+    SIFIVE_PRCI_PLLOUTDIV   = 0xC
-+};
-+
-+enum {
-+    SIFIVE_PRCI_HFROSCCFG_RDY   = (1 << 31),
-+    SIFIVE_PRCI_HFROSCCFG_EN    = (1 << 30)
-+};
-+
-+enum {
-+    SIFIVE_PRCI_HFXOSCCFG_RDY   = (1 << 31),
-+    SIFIVE_PRCI_HFXOSCCFG_EN    = (1 << 30)
-+};
-+
-+enum {
-+    SIFIVE_PRCI_PLLCFG_PLLSEL   = (1 << 16),
-+    SIFIVE_PRCI_PLLCFG_REFSEL   = (1 << 17),
-+    SIFIVE_PRCI_PLLCFG_BYPASS   = (1 << 18),
-+    SIFIVE_PRCI_PLLCFG_LOCK     = (1 << 31)
-+};
-+
-+enum {
-+    SIFIVE_PRCI_PLLOUTDIV_DIV1  = (1 << 8)
-+};
-+
- #define TYPE_SIFIVE_PRCI "riscv.sifive.prci"
- 
- #define SIFIVE_PRCI(obj) \
-@@ -30,6 +58,10 @@ typedef struct SiFivePRCIState {
- 
-     /*< public >*/
-     MemoryRegion mmio;
-+    uint32_t hfrosccfg;
-+    uint32_t hfxosccfg;
-+    uint32_t pllcfg;
-+    uint32_t plloutdiv;
- } SiFivePRCIState;
- 
- DeviceState *sifive_prci_create(hwaddr addr);
+     if (ret == TRANSLATE_SUCCESS) {
+@@ -447,7 +450,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+     } else if (probe) {
+         return false;
+     } else {
+-        raise_mmu_exception(env, address, access_type);
++        raise_mmu_exception(env, address, access_type, pmp_violation);
+         riscv_raise_exception(env, cs->exception_index, retaddr);
+     }
+ #else
 -- 
 2.21.0
 
