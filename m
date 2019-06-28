@@ -2,82 +2,92 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43680C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 13:15:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00105C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 13:16:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 057A12083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 13:15:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BE8922083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 13:16:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="Qv6OJOL1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 057A12083B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kncUDNkY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE8922083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgqjE-0000n6-7Y
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 09:15:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41569)
+	id 1hgqjk-0001gT-1l
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 09:16:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42936)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <damien.hedde@greensocs.com>) id 1hgqGP-0008U4-Ln
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:46:07 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hgqIp-0001bn-7A
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:48:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1hgqGM-0001b9-2o
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:46:01 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:36948)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1hgqGL-0001RD-7U
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:45:57 -0400
-Received: from kouign-amann.bar.greensocs.com (unknown [172.16.11.117])
- by beetle.greensocs.com (Postfix) with ESMTPS id 3A1BC96F54;
- Fri, 28 Jun 2019 12:45:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1561725939;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=DjS6MgiRGaWDm6aO6owVkrbeZw4PYZfjBhtjtiuXYAo=;
- b=Qv6OJOL1ZmQuhg6sxOZ4Cs8tJ5FTvI9Ji/IptnJsj0wAfn6fbiE7pDIMcPXWTcA4nrSgA0
- WfjBG6S/xJw6gGv2gFc+UOzKl1shAFpaLWVmWIn/zznRSus5AglUw1TUKQN9T7+RQlYhKr
- QmQuSgYFuBCZ8o4ik95Ac5AEz+UoQL4=
-From: Damien Hedde <damien.hedde@greensocs.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 28 Jun 2019 14:45:31 +0200
-Message-Id: <20190628124534.10679-3-damien.hedde@greensocs.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190628124534.10679-1-damien.hedde@greensocs.com>
-References: <20190628124534.10679-1-damien.hedde@greensocs.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1hgqIn-00039f-QD
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:48:31 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55110)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hgqIl-000316-Ea
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:48:29 -0400
+Received: by mail-wm1-x342.google.com with SMTP id g135so8995229wme.4
+ for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 05:48:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=b652vpUXjXaZQC/pKdEKHyL4/H09hz7Dq7+8riyYOuY=;
+ b=kncUDNkYPru8Psr1FBEAq05pnxUc4aowM+P4g2WCF2RTLUv/VJbGG+pe6Ua/rdE7SQ
+ 6cEZUyqkxZvTe3H46DPHo+IdgQb64+DSegJt9tM1mzwI1LkObl6rupV32J2pry4zKRAw
+ 5bBo9oWtSq33QVOxj/mA4VodCGL/h0406g+nOGCadoFAYZ4EvNa1WqG5iFia9zbczoeZ
+ +E3u+0pfYJzpLjubO91fZ77rlTjX9qOMzbtfi/q6WIXkZme/rSiuyvir7+guYhp/2AGJ
+ 6d8r0aYQ8yrL/6NPeZNwe8FPyLKe697WS6fBnC/8Ocf7bHok30C8pM0n5t898RMM7Xfm
+ ugRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=b652vpUXjXaZQC/pKdEKHyL4/H09hz7Dq7+8riyYOuY=;
+ b=ipPBxtvr3xLxVOucDJshFwS/ias1svU2OYc0A3xThFqk434FjoOYYHebgZ8+ZFfzeV
+ OJ2tt4wmZPs4tD3ZPybL4nm3NLTS0t4YR7Zd7rawtidSIvZIQH8Qb6By7qDbtf5yozRI
+ ug2DihWq7iirCEKfYmJRGtvssjbbxKlSP8V8mVxkSQzfJsdPfWSBRcnXT+zYEMn2hd5g
+ QHdtXDbrlmoC0yoPE3AZkK9MmlHx1HT2H1e74S+m40yfkt1fs1C9y5KE/ZqiFrT88CN8
+ MUy7rT9EmStz3EXqvlLWJNN0oLLkjT9xn8Mbyc2Ux7uH9XUaR41056ak7FTqDw41iK3P
+ mqqQ==
+X-Gm-Message-State: APjAAAW1jYS1cGBGJ2bjc8VebdHxxl7xEe0sOY2TV7imjlW+B4kjjta/
+ LAxVFSxs9vjpJRZ9pr9hWeXCOrtEO4toaQ==
+X-Google-Smtp-Source: APXvYqyoqlQoUXlj7F1wPzUxrimQkNmDLEbcwcvn/eEqzupDA46MIm+D4vR5yVkVPwMX574tkxQeJw==
+X-Received: by 2002:a1c:99ca:: with SMTP id b193mr6915536wme.31.1561724204523; 
+ Fri, 28 Jun 2019 05:16:44 -0700 (PDT)
+Received: from [192.168.2.137] (93-34-153-63.ip50.fastwebnet.it.
+ [93.34.153.63])
+ by smtp.gmail.com with ESMTPSA id r5sm3818519wrg.10.2019.06.28.05.16.43
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 28 Jun 2019 05:16:43 -0700 (PDT)
+To: Luc Michel <luc.michel@greensocs.com>, qemu-devel@nongnu.org
+References: <20190628113917.15869-1-luc.michel@greensocs.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <f9c429e1-4a1d-959a-04c4-e9b7e94637cf@linaro.org>
+Date: Fri, 28 Jun 2019 14:16:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1561725939;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=DjS6MgiRGaWDm6aO6owVkrbeZw4PYZfjBhtjtiuXYAo=;
- b=Zx5pyHhttz+CESwoTP2Lh/gJmkVr00bA25Tc568k4Ymcah3p+V3k9UAxkY997tXSPBke27
- uGSz9cHKdf0NeDn+FF/80dxv6DV5ogzVniPXsiM8lHli9/A/rqonqEZm+cyAYyQnTtj51l
- b4p9SMGoOUI5bxA58R+NfW8dW/OrO3Y=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1561725939; a=rsa-sha256; cv=none;
- b=3zlVFfDvjF+mdOoWoT9p1DdR/pgONbMiTE8aP+ROUV+TwEsG5w4gWdZNhtfYZTXJJhr1M5
- FEUq0FgmClIXPcpSoHxoB+PQ43F0OrvZRjERWlTbQ5g/H/naraURcA+5MRTcmZ53lGMIIm
- LK3x/VPGEkZHChXRxjx2Fj0q1dtuIuU=
-ARC-Authentication-Results: i=1;
-	beetle.greensocs.com;
-	none
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.135.226.135
-Subject: [Qemu-devel] [RFC PATCH 2/5] introduce a qmp command to set gpios
+In-Reply-To: <20190628113917.15869-1-luc.michel@greensocs.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
+Subject: Re: [Qemu-devel] [RFC PATCH] accel/tcg/translator: add tb_enter TCG
+ trace
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,128 +99,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>, ehabkost@redhat.com,
- mark.burton@greensocs.com, armbru@redhat.com, sakisp@xilinx.com,
- edgari@xilinx.com, crosa@redhat.com, pbonzini@redhat.com,
- luc.michel@greensocs.com, rth@twiddle.net
+Cc: damien.hedde@greensocs.com, Paolo Bonzini <pbonzini@redhat.com>,
+ edgari@xilinx.com, mark.burton@greensocs.com, sakisp@xilinx.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adds the "gpio-set" qmp command.
+On 6/28/19 1:39 PM, Luc Michel wrote:
+> Add a TCG trace at the begining of a translation block recording the
+> first and last (past-the-end) PC values.
+> 
+> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+> ---
+> This can be used to trace the execution of the guest quite efficiently.
+> It will report each time a TB is entered (using the tb_enter_exec
+> trace). The traces arguments give the PC start and past-the-end values.
+> It has very little to no performance impact since the trace is actually
+> emitted in the generated code only when it is enabled at run time.
+> 
+> It works already quite well on its own to trace guest execution. However
+> it does not handle the case where a TB is exited in the middle of
+> execution. I'm not sure how to properly trace that. A trace could be
+> added when `cpu_loop_exit()' is called to report the current PC, but in
+> most cases the interesting value (the PC of the instruction that
+> caused the exit) is already lost at this stage.
+> 
+> I'm not sure there is a generic (i.e. not target specific) way of
+> recovering the last PC executed when cpu_loop_exit() is called. Do you
+> think of a better way?
+> 
+> Thanks to the Xilinx's QEMU team who sponsored this work.
+> ---
+>  accel/tcg/translator.c | 24 ++++++++++++++++++++++++
+>  trace-events           |  3 +++
+>  2 files changed, 27 insertions(+)
+> 
+> diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
+> index 9226a348a3..c55377aa18 100644
+> --- a/accel/tcg/translator.c
+> +++ b/accel/tcg/translator.c
+> @@ -14,10 +14,11 @@
+>  #include "tcg/tcg-op.h"
+>  #include "exec/exec-all.h"
+>  #include "exec/gen-icount.h"
+>  #include "exec/log.h"
+>  #include "exec/translator.h"
+> +#include "trace-tcg.h"
+>  
+>  /* Pairs with tcg_clear_temp_count.
+>     To be called by #TranslatorOps.{translate_insn,tb_stop} if
+>     (1) the target is sufficiently clean to support reporting,
+>     (2) as and when all temporaries are known to be consumed.
+> @@ -28,14 +29,31 @@ void translator_loop_temp_check(DisasContextBase *db)
+>          qemu_log("warning: TCG temporary leaks before "
+>                   TARGET_FMT_lx "\n", db->pc_next);
+>      }
+>  }
+>  
+> +static TCGOp *gen_trace_tb_enter(TranslationBlock *tb)
+> +{
+> +    TCGOp *last_pc_op;
+> +
+> +    TCGv pc_end = tcg_temp_new();
+> +
+> +    /* The last PC value is not known yet */
+> +    tcg_gen_movi_tl(pc_end, 0xdeadbeef);
+> +    last_pc_op = tcg_last_op();
 
-Taking the device path, the gpio name and number, the command set the
-value (true or false) of the gpio.
-It works only on gpio input line.
+TL is a target-specific type that does not necessarily correspond to uint64_t,
+as you assume in the print message.  More importantly, on a 32-bit host with a
+64-bit guest, this movi will generate *two* ops...
 
-This is based on Frederic Konrad's work.
+> +    /* Fixup the last PC value in the tb_enter trace now that we know it */
+> +    tcg_set_insn_param(trace_pc_end, 1, db->pc_next);
 
-Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
----
- cpus.c             |  4 ++--
- monitor/qmp-cmds.c | 30 ++++++++++++++++++++++++++++++
- qapi/misc.json     | 29 +++++++++++++++++++++++++++++
- 3 files changed, 61 insertions(+), 2 deletions(-)
+... which means that this operation does not do what you think it does.  It
+will only set one (unknown) half of the _i64 temporary.
 
-diff --git a/cpus.c b/cpus.c
-index 7aae35c098..3688550c55 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -2580,8 +2580,8 @@ static void memwrite(int64_t addr, uint8List *bytes=
-, CPUState *cpu,
-         MemTxResult r =3D address_space_write(&address_space_memory, add=
-r,
-                                             MEMTXATTRS_UNSPECIFIED, buf,=
- l);
-         if (r !=3D MEMTX_OK) {
--            error_setg(errp, "Invalid addr 0x%016" PRIx64 "/size %" PRId=
-64
--                             " specified", addr, size);
-+            error_setg(errp, "Invalid addr 0x%016" PRIx64 "/size %" PRIu=
-32
-+                             " specified", addr, l);
-             return;
-         }
-     }
-diff --git a/monitor/qmp-cmds.c b/monitor/qmp-cmds.c
-index 01ce77e129..6bf0204edd 100644
---- a/monitor/qmp-cmds.c
-+++ b/monitor/qmp-cmds.c
-@@ -726,3 +726,33 @@ MemoryInfo *qmp_query_memory_size_summary(Error **er=
-rp)
-=20
-     return mem_info;
- }
-+
-+void qmp_gpio_set(const char *path, bool has_gpio, const char *gpio,
-+                  bool has_number, int64_t number, bool value, Error **e=
-rrp)
-+{
-+    DeviceState *dev;
-+    qemu_irq irq;
-+
-+    dev =3D DEVICE(object_resolve_path(path, NULL));
-+    if (!dev) {
-+        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
-+                  "Cannot find device '%s'", path);
-+        return;
-+    }
-+
-+    if (!has_gpio) {
-+        gpio =3D NULL;
-+    }
-+    if (!has_number) {
-+        number =3D 0;
-+    }
-+    irq =3D qdev_get_gpio_in_named(dev, gpio, number);
-+    if (!irq) {
-+        error_set(errp, ERROR_CLASS_GENERIC_ERROR,
-+                  "GPIO input '%s[%"PRId64"]' does not exists",
-+                  has_gpio ? gpio : "unnamed", number);
-+        return;
-+    }
-+
-+    qemu_set_irq(irq, value);
-+}
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 3aca91b4ac..255236b96f 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -3166,3 +3166,32 @@
- { 'command': 'pmemwrite',
-   'data': {'addr': 'int', 'bytes': ['uint8']}
- }
-+
-+##
-+# @gpio-set:
-+#
-+# @path: Path to the device.
-+#
-+# @gpio: Name of the GPIO will be unnamed-gpio if omitted.
-+#
-+# @number: Number of the GPIO line, 0 if omitted.
-+#
-+# @value: Value (boolean) to be set for the GPIO.
-+#
-+# Returns: nothing in case of success
-+#
-+# Since 4.1
-+#
-+# Example:
-+#
-+# -> { "execute": "gpio-set",
-+#      "arguments": { "path": "/machine/unattached/device[5]",
-+#                     "gpio": "ssi-gpio-cs",
-+#                     "number": 0,
-+#                     "value": true } }
-+# <- { "return": {} }
-+#
-+##
-+{ 'command': 'gpio-set',
-+  'data': { 'path': 'str', '*gpio': 'str', '*number': 'int', 'value': 'b=
-ool' }
-+}
---=20
-2.22.0
+Moreover, this isn't quite as zero overhead as I would like, because the pc_end
+temporary is always created, even if the trace_tb condition is not satisfied
+and so it (eventually) gets removed as unused.
 
+I'm not quite sure what you're after with pc_end anyway.  As you note within
+the cover, you can't reliably use it for anything.  If you remove that, then
+you've also removed all of the other problems with this patch.
+
+
+r~
 
