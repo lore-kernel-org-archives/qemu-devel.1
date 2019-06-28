@@ -6,70 +6,70 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E69AFC4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 17:51:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED043C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 17:52:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C648D20828
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 17:51:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C648D20828
+	by mail.kernel.org (Postfix) with ESMTPS id CBE3C2083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 17:52:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBE3C2083B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgv1z-0002ai-VO
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 13:51:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54779)
+	id 1hgv3O-0004QS-3w
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 13:52:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54680)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <palmer@dabbelt.com>) id 1hgukk-0008MS-TM
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:33:41 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1hgukd-0008JN-6K
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:33:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1hgukf-0000QE-FT
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:33:36 -0400
-Received: from mail-pl1-f172.google.com ([209.85.214.172]:45444)
+ (envelope-from <palmer@dabbelt.com>) id 1hgukW-0000G1-5M
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:33:30 -0400
+Received: from mail-pg1-f177.google.com ([209.85.215.177]:33984)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hgukd-0000MT-5t
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:33:32 -0400
-Received: by mail-pl1-f172.google.com with SMTP id bi6so3601042plb.12
- for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 10:33:29 -0700 (PDT)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hgukV-00008u-QB
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 13:33:24 -0400
+Received: by mail-pg1-f177.google.com with SMTP id p10so2900832pgn.1
+ for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 10:33:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=tqiS7O8nKvNing+E8WwiszCtPiLlK33kP79Ar4czLaU=;
- b=hgBG4q1/KECZH1obbKJDaNAywICFy7AT/IOgpXUP98m0n3rFYfxu0bLklhRoaVRJd7
- HzfgbC6fNYSsjJHkCtC2UzCvl9LtX+Xa4TN8NTp2BFdY32/0yKdMz9W3qjd/92BzVc95
- VZMJey00aAAAAt3gOTjOD/AvUWeRvzqLC/42lsRMOYYlamVl/z1y9/nqwGAb8VnwH+hF
- p4Nex0238MbqfL4e6paz3I8gV5ENOTKgPuEPMlmwpl55YPjVf93x9iVDFBauTy7HPKEl
- /KV9rdzUPiZw8fQU7FutDjjpUCBgKRw3ydZEKq2H+7NxObo2ijlUfPElvWVC23WblwEe
- JK2Q==
-X-Gm-Message-State: APjAAAWOev80ZOsKqoRcDEs2BLTEql6GV3WOP7XR1w08UR+fwrlUfTEw
- u0AnpmluOLrvMr5Zn9WBZi83n1yd2qU7Aqqg
-X-Google-Smtp-Source: APXvYqz2Phe9wsb6jVXHH5nAKntUl6lV5AglKx3d8FPwbmkuG9lg9avengcgdLrFQq+vGm1K2MCmsA==
-X-Received: by 2002:a17:902:e490:: with SMTP id
- cj16mr12760904plb.136.1561743208023; 
- Fri, 28 Jun 2019 10:33:28 -0700 (PDT)
+ bh=4yIbg4wQD3g4mppuKoX6VmO7ZtWwJtsrHDtVUEb9gdk=;
+ b=Qc4HR0RsLds9WM/CKHRLVApAkIQS+9Et6AoUemsL7qOzPAk+EP7WjACXN/3n218H7k
+ UdGh7Ix1u/P9tY0UDf5+3EHkfQQ1eza4vfnHf8Z4pmGZY15vUOd2ywwd0o7gg7o9iiMt
+ ZiAnm8tkurif8mgkRzZVC+XO9hNm3JfKtLeDR5WkNe038paZH1wmV1dodteNUfdQC4O4
+ oaoRVSV26oNa7w6Y6ZYVRqBEQmzpc3oYMxyGq1puwMdu/gzdY0GE27fEnCYSSkXaFp0i
+ Ozu2qHek0ib3Ghy84jltNgOjSn0PlY8EWzEcH4wgM5p9xtZn86xDQK3DK3b7In50dE1M
+ ZquQ==
+X-Gm-Message-State: APjAAAVJg2V16ik5q+bzpyAUuPkHye+AmDs019ZqgI8CPm7Cu9Fb2lG5
+ YTx8Yn8EHRv7oR/X5UWVsni1JYR+FbFfvPlq
+X-Google-Smtp-Source: APXvYqxA8/z0IpvNKpf9HWuQYwq0RmZ7TSt9GpOdcGHkr87aJ9PsBShQvIPGIKnWahg+3T4QjI6IOg==
+X-Received: by 2002:a63:7c0e:: with SMTP id x14mr10210364pgc.65.1561743193885; 
+ Fri, 28 Jun 2019 10:33:13 -0700 (PDT)
 Received: from localhost (220-132-236-182.HINET-IP.hinet.net.
  [220.132.236.182])
- by smtp.gmail.com with ESMTPSA id q144sm4125528pfc.103.2019.06.28.10.33.26
+ by smtp.gmail.com with ESMTPSA id w18sm5334319pfj.37.2019.06.28.10.33.12
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 28 Jun 2019 10:33:27 -0700 (PDT)
-Date: Fri, 28 Jun 2019 10:32:10 -0700
-Message-Id: <20190628173227.31925-18-palmer@sifive.com>
+ Fri, 28 Jun 2019 10:33:13 -0700 (PDT)
+Date: Fri, 28 Jun 2019 10:32:05 -0700
+Message-Id: <20190628173227.31925-13-palmer@sifive.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190628173227.31925-1-palmer@sifive.com>
 References: <20190628173227.31925-1-palmer@sifive.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 From: Palmer Dabbelt <palmer@sifive.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.214.172
-Subject: [Qemu-devel] [PULL 17/34] qemu-deprecated.texi: Deprecate the
- RISC-V privledge spec 1.09.1
+X-Received-From: 209.85.215.177
+Subject: [Qemu-devel] [PULL 12/34] RISC-V: Fix a memory leak when realizing
+ a sifive_e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,43 +81,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>,
- Palmer Dabbelt <palmer@sifive.com>, qemu-riscv@nongnu.org,
- qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-riscv@nongnu.org,
+ Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>,
+ ilippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alistair Francis <alistair.francis@wdc.com>
+Coverity pointed out a memory leak in riscv_sifive_e_soc_realize(),
+where a pair of recently added MemoryRegion instances would not be freed
+if there were errors elsewhere in the function.  The fix here is to
+simply not use dynamic allocation for these instances: there's always
+one of each in SiFiveESoCState, so instead we just include them within
+the struct.
 
-Deprecate the RISC-V privledge spec version 1.09.1 in favour of the new
-1.10.0 and the ratified 1.11.0.
-
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Fixes: 30efbf330a45 ("SiFive RISC-V GPIO Device")
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- qemu-deprecated.texi | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ hw/riscv/sifive_e.c         | 13 ++++++-------
+ include/hw/riscv/sifive_e.h |  2 ++
+ 2 files changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index df04f2840bd9..97ea4ef3001a 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -144,6 +144,14 @@ The ``acl_show'', ``acl_reset'', ``acl_policy'', ``acl_add'', and
- ``acl_remove'' commands are deprecated with no replacement. Authorization
- for VNC should be performed using the pluggable QAuthZ objects.
+diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+index 80ac56fa7d5e..a5b4086da36d 100644
+--- a/hw/riscv/sifive_e.c
++++ b/hw/riscv/sifive_e.c
+@@ -158,17 +158,15 @@ static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
  
-+@section Guest Emulator ISAs
-+
-+@subsection RISC-V ISA privledge specification version 1.09.1 (since 4.1)
-+
-+The RISC-V ISA privledge specification version 1.09.1 has been deprecated.
-+QEMU supports both the newer version 1.10.0 and the ratified version 1.11.0, these
-+should be used instead of the 1.09.1 version.
-+
- @section System emulator CPUS
+     SiFiveESoCState *s = RISCV_E_SOC(dev);
+     MemoryRegion *sys_mem = get_system_memory();
+-    MemoryRegion *xip_mem = g_new(MemoryRegion, 1);
+-    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
  
- @subsection RISC-V ISA CPUs (since 4.1)
+     object_property_set_bool(OBJECT(&s->cpus), true, "realized",
+                             &error_abort);
+ 
+     /* Mask ROM */
+-    memory_region_init_rom(mask_rom, NULL, "riscv.sifive.e.mrom",
++    memory_region_init_rom(&s->mask_rom, NULL, "riscv.sifive.e.mrom",
+         memmap[SIFIVE_E_MROM].size, &error_fatal);
+     memory_region_add_subregion(sys_mem,
+-        memmap[SIFIVE_E_MROM].base, mask_rom);
++        memmap[SIFIVE_E_MROM].base, &s->mask_rom);
+ 
+     /* MMIO */
+     s->plic = sifive_plic_create(memmap[SIFIVE_E_PLIC].base,
+@@ -228,10 +226,11 @@ static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
+         memmap[SIFIVE_E_PWM2].base, memmap[SIFIVE_E_PWM2].size);
+ 
+     /* Flash memory */
+-    memory_region_init_ram(xip_mem, NULL, "riscv.sifive.e.xip",
++    memory_region_init_ram(&s->xip_mem, NULL, "riscv.sifive.e.xip",
+         memmap[SIFIVE_E_XIP].size, &error_fatal);
+-    memory_region_set_readonly(xip_mem, true);
+-    memory_region_add_subregion(sys_mem, memmap[SIFIVE_E_XIP].base, xip_mem);
++    memory_region_set_readonly(&s->xip_mem, true);
++    memory_region_add_subregion(sys_mem, memmap[SIFIVE_E_XIP].base,
++        &s->xip_mem);
+ }
+ 
+ static void riscv_sifive_e_machine_init(MachineClass *mc)
+diff --git a/include/hw/riscv/sifive_e.h b/include/hw/riscv/sifive_e.h
+index 3b14eb74621f..d175b24cb209 100644
+--- a/include/hw/riscv/sifive_e.h
++++ b/include/hw/riscv/sifive_e.h
+@@ -33,6 +33,8 @@ typedef struct SiFiveESoCState {
+     RISCVHartArrayState cpus;
+     DeviceState *plic;
+     SIFIVEGPIOState gpio;
++    MemoryRegion xip_mem;
++    MemoryRegion mask_rom;
+ } SiFiveESoCState;
+ 
+ typedef struct SiFiveEState {
 -- 
 2.21.0
 
