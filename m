@@ -2,66 +2,114 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C05BBC5B57A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 13:05:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31073C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 13:06:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9915A20645
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 13:05:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9915A20645
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 06DAF20645
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 13:06:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06DAF20645
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgqYs-00044z-9t
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 09:05:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40508)
+	id 1hgqad-00051v-F0
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 09:06:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39726)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hgqEU-0006SO-Ba
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:44:03 -0400
+ (envelope-from <laurent@vivier.eu>) id 1hgqCQ-0003nj-0S
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:41:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hgqET-0000Mp-0s
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:44:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48506)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hgqEP-0000KS-DN; Fri, 28 Jun 2019 08:43:58 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3FC2EC049E23;
- Fri, 28 Jun 2019 12:06:26 +0000 (UTC)
-Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
- [10.33.200.226])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 79E986012D;
- Fri, 28 Jun 2019 12:06:23 +0000 (UTC)
-Date: Fri, 28 Jun 2019 14:06:22 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Message-ID: <20190628120622.GI5179@dhcp-200-226.str.redhat.com>
-References: <20190528143727.10529-1-dplotnikov@virtuozzo.com>
- <20190528143727.10529-3-dplotnikov@virtuozzo.com>
- <20190628102333.GG5179@dhcp-200-226.str.redhat.com>
- <08da0859-10da-5d4b-3203-72341a166255@virtuozzo.com>
+ (envelope-from <laurent@vivier.eu>) id 1hgqCN-0007ku-GI
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:41:53 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:35095)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hgqCN-0007jP-7J
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:41:51 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1M1q4e-1hj2in11bM-002DN8; Fri, 28 Jun 2019 14:16:01 +0200
+References: <156171539473.6332.3788894025347542150@c4a48874b076>
+To: "patchew-devel@redhat.com" <patchew-devel@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Openpgp: preference=signencrypt
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <f1ff093c-cb64-a54e-778e-eb18a0fdddb2@vivier.eu>
+Date: Fri, 28 Jun 2019 14:15:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <08da0859-10da-5d4b-3203-72341a166255@virtuozzo.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Fri, 28 Jun 2019 12:06:31 +0000 (UTC)
+In-Reply-To: <156171539473.6332.3788894025347542150@c4a48874b076>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:PSiu3k41O8HZWeMJEOx/LdAfQt330v3TF0wEamsNg0H5T9A9zIu
+ CyJ0/ujDgYdf1G1Wva3I8Vx0DU2rZ0ZxwBhjKRhH8VC+VpWEErumJwb1BkYNaOPW8VgfYln
+ Y5DBHP8IEOvqkXEw/gh1o6jRqBxqUS9hwGltSD8Furo7p67f3EZ3glLY3NurhjNotHEOFV3
+ uo8ZkyJJL6WmSlBa8/hFw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:1iztnxXcRh4=:SyPrmFzOTwtAdGOp3nZxBp
+ WOGk0GMcxRLmktZzydQRYMU6yl6GqVCyBHeK1aYFRxV/ciB62WcmibRbcETbJym4epbtZoWQh
+ uco/BiyZZ5uuGKGaNzw+wMvrBoj365vok35W656c6CwO6tp5eXGaggJhiYlnf3Na26L99yTvN
+ ODFqZaeuHEYT3SgVp5CnHoPUrhhFlrnpYPQll8htkmelylWHsNkJyPDjcBGqqirdbzXamcKQb
+ aj7sd66BI9qBIzAn+GTpuwHoEepFamK1yvfMy+Rgy2MKCuVSCbd7g9p8pBa9KZhaiCABQwxFW
+ YriPDgQdh5d0xJHE4VID8Fn0CR+3BVK/sEovx2L7VzonISM+YpM2CghYAJVzwz7uM+NCr+3HC
+ XSVZBgctp5tcKGP5bhSDQph9Fw9jP8pydw6W/I8n0mMUbBc2541xRRckeFUM6eCwqitUDlFiJ
+ Tk6KNAky7by99GfiZ6uKgPH6kczonqnnz84s3VIpoqYkKNZSyrWENVJSv87/FOiSjAxW+vvQQ
+ 4U7L+xD07CBoFaf+MuurkUTa9v4d5JHWO8w2IuTl0q+wJOOmosW1htPtfY3c5WmX/oxl+U5Zl
+ AZ/VnJngLlSQxQLsBZE1G0xtI5y21V8nnoO7fXROws9ZRBExf57NcHFwZyFv80GtWIeW2YfLw
+ DgK5gi2ShPcbzf4Ca1oAmvzIBYQA6yWXHRIgyiYfs9ArWohbVtBqUzERbJsYTF2Po775EFLCw
+ Dg8x1HLd5DXV52ZzO7E/+3X994g4Es7J5xtA/8FXvwnuZTwfSUziEBXtYIM=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v0 2/3] qcow2: add compression type
- processing
+X-Received-From: 212.227.126.130
+Subject: Re: [Qemu-devel] [PATCH v15 0/5] linux-user: A set of miscellaneous
+ patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,137 +121,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Denis Lunev <den@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: aleksandar.markovic@rt-rk.com, qemu-devel@nongnu.org,
+ amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 28.06.2019 um 13:24 hat Denis Plotnikov geschrieben:
-> 
-> 
-> On 28.06.2019 13:23, Kevin Wolf wrote:
-> > Am 28.05.2019 um 16:37 hat Denis Plotnikov geschrieben:
-> >> With the patch, qcow2 is able to process image compression type
-> >> defined in the image header and choose the corresponding method
-> >> for clusters compressing.
-> >>
-> >> Also, it rework the cluster compression code for adding more
-> >> compression types.
-> >>
-> >> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> >> ---
-> >>   block/qcow2.c | 103 ++++++++++++++++++++++++++++++++++++++++++++------
-> >>   1 file changed, 92 insertions(+), 11 deletions(-)
-> >>
-> >> diff --git a/block/qcow2.c b/block/qcow2.c
-> >> index c4b5b93408..90f15cc3c9 100644
-> >> --- a/block/qcow2.c
-> >> +++ b/block/qcow2.c
-> >> @@ -400,11 +400,39 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
-> >>               break;
-> >>   
-> >>           case QCOW2_EXT_MAGIC_COMPRESSION_TYPE:
-> >> +            /* Compression type always goes with the compression type bit set */
-> >> +            if (!(s->incompatible_features & QCOW2_INCOMPAT_COMPRESSION_TYPE)) {
-> >> +                error_setg(errp,
-> >> +                           "compression_type_ext: "
-> >> +                           "expect compression type bit set");
-> >> +                return -EINVAL;
-> >> +            }
-> >> +
-> >> +            ret = bdrv_pread(bs->file, offset, &s->compression_type, ext.len);
-> >> +            s->compression_type = be32_to_cpu(s->compression_type);
-> >> +
-> >> +            if (ret < 0) {
-> >> +                error_setg_errno(errp, -ret,
-> >> +                                 "ERROR: Could not read compression type");
-> >> +                return ret;
-> >> +            }
-> >> +
-> >>               /*
-> >> -             * Setting compression type to BDRVQcow2State->compression_type
-> >> -             * from the image header is going to be here
-> >> +             * The default compression type is not allowed when the extension
-> >> +             * is present. ZLIB is used as the default compression type.
-> >> +             * When compression type extension header is present then
-> >> +             * compression_type should have a value different from the default.
-> >>                */
-> >> -             break;
-> >> +            if (s->compression_type == QCOW2_COMPRESSION_TYPE_ZLIB) {
-> >> +                error_setg(errp,
-> >> +                           "compression_type_ext:"
-> >> +                           "invalid compression type %d",
-> >> +                           QCOW2_COMPRESSION_TYPE_ZLIB);
-> >> +            }
-> > 
-> > This is a restriction that the spec doesn't make, so strictly speaking
-> > this implementation wouldn't be compliant to the spec.
-> The idea is that ZLIB shouldn't appear in the compression type 
-> extension. This allows image backward compatibility with an older qemu 
-> if zlib is used.
-> 
-> There is no reason to set ZLIB in the extension because an older qemu 
-> knows how to tread ZLIB compressed clusters.
-> 
-> The restriction aims to guarantee that.
-> 
-> I tried to describe this case in the specification:
-> ...
-> When the compression type bit is not set, and the compression type 
-> header extension is absent, ZLIB compression is used for compressed 
-> clusters.
-> 
-> Qemu versions older than 4.1 can use images created with compression 
-> type ZLIB without any additional preparations and cannot use images 
-> created with compression types != ZLIB.
-> ...
-> 
-> Does it makes sense?
+Dear Patchew developers,
 
-This text says that using zlib in the extension is not necessary because
-it's the default. But it doesn't say that using zlib in the extension is
-illegal.
-
-I agree that there is no good reason to create a compression type
-extension if you have zlib. But is there a good reason to forbid it? It
-only requires us to add artificial restrictions to code that would work
-fine without them.
-
-Either way, if we want to reject such extensions, the spec needs to say
-that it's illegal. And if the spec allows such images, we must accept
-them.
-
-> > We can discuss whether the code or the spec should be changed. At the
-> > moment, I don't see a good reason to make the restriction
-> > 
-> >> +#ifdef DEBUG_EXT
-> >> +            printf("Qcow2: image compression type %s\n", s->compression_type);
-> >> +#endif
-> >> +            break;
-> >>   
-> >>           case QCOW2_EXT_MAGIC_DATA_FILE:
-> >>           {
-> > 
-> > We would save most of this code if we added a new field to the header
-> > instead of adding a header extension. Not saying that we should
-> > definitely do this, but let's discuss it at least.
+Le 28/06/2019 à 11:49, no-reply@patchew.org a écrit :
+> Patchew URL: https://patchew.org/QEMU/1561712082-31441-1-git-send-email-aleksandar.markovic@rt-rk.com/
 > 
-> If we add the new field to the header will the older qemu be able to use 
-> it. Or we will add the header only if needed, i.e. if compression_type 
-> != zlib
+> 
+> 
+> Hi,
+> 
+> This series failed build test on s390x host. Please find the details below.
 
-Increasing the header size is backwards compatible. Older qemu versions
-should handle such images correctly. They would store the unknown part
-of the header in s->unknown_header_fields and keep it unmodified when
-updating the image header.
+To debug this kind of problem (at least to reproduce it), it may be
+interesting to know the OS release of the target build environment
+(glibc version, gcc version, ...) on which the build fails.
 
-We would still add the incompatible feature flag for non-zlib, of
-course.
+Is this possible to add this in the mail (or in the logs)?
 
-Kevin
+...
+>   CC      microblaze-linux-user/linux-user/strace.o
+>   CC      mips64el-linux-user/linux-user/syscall.o
+>   LINK    microblazeel-linux-user/qemu-microblazeel
+> /var/tmp/patchew-tester-tmp-tr0wvoyz/src/linux-user/syscall.c:322:16: error: conflicting types for ‘statx’
+>   322 | _syscall5(int, statx, int, dirfd, const char *, pathname, int, flags,
+>       |                ^~~~~
+> /var/tmp/patchew-tester-tmp-tr0wvoyz/src/linux-user/syscall.c:213:13: note: in definition of macro ‘_syscall5’
+
+Thanks,
+Laurent
 
