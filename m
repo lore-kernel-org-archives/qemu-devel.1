@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8D97C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 08:58:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B66AC5B579
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 08:58:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4424205ED
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 08:58:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4424205ED
+	by mail.kernel.org (Postfix) with ESMTPS id 03DC6205ED
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 08:58:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03DC6205ED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgmhq-0003Kz-5p
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 04:58:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38713)
+	id 1hgmht-0003PQ-AV
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 04:58:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38683)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hgmff-00017H-FB
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 04:55:53 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hgmfd-0001Z8-9T
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hgmfd-00015d-8k
  for qemu-devel@nongnu.org; Fri, 28 Jun 2019 04:55:51 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:48355 helo=mail.rt-rk.com)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hgmfb-0001Wv-RL
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 04:55:49 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:48343 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hgmfb-0001Lz-Rx
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 04:55:49 -0400
+ id 1hgmfY-0001Ll-6x
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 04:55:46 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id D70811A1D9C;
+ by mail.rt-rk.com (Postfix) with ESMTP id B810B1A23DA;
  Fri, 28 Jun 2019 10:55:33 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id B7AA91A221C;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 9BE1E1A0563;
  Fri, 28 Jun 2019 10:55:33 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org,
 	laurent@vivier.eu
-Date: Fri, 28 Jun 2019 10:54:42 +0200
-Message-Id: <1561712082-31441-6-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 28 Jun 2019 10:54:39 +0200
+Message-Id: <1561712082-31441-3-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1561712082-31441-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1561712082-31441-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v15 5/5] linux-user: Handle EXCP_FPE properly
- for MIPS
+Subject: [Qemu-devel] [PATCH v15 2/5] linux-user: Add support for strace for
+ statx() syscall
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,61 +64,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: amarkovic@wavecomp.com
+Cc: amarkovic@wavecomp.com, Jim Wilson <jimw@sifive.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Jim Wilson <jimw@sifive.com>
 
-Handle EXCP_FPE properly for MIPS in cpu loop.
+All of the flags need to be conditional as old systems don't have
+statx support.  Otherwise it works the same as other stat family
+syscalls.  This requires the pending patch to add statx support.
 
-Note that a vast majority of FP instructions are not affected by
-the absence of the code in this patch, as they use alternative code
-paths for handling floating point exceptions (see, for example,
-invocations of update_fcr31()) - they rely on softfloat library for
-keeping track on exceptions that needs to be raised. However, there
-are few MIPS FP instructions (an example is CTC1) that use function
-do_raise_exception() directly, and they need the case that is added
-in this patch to propagate the FPE exception as designed.
+Tested on Ubuntu 16.04 (no host statx) and Ubuntu 19.04 (with host
+statx) using a riscv32-linux toolchain.
 
-The code is based on kernel's function force_fcr31_sig() in
-arch/mips/kernel.traps.c.
-
-Reported-by: Yunqiang Su <ysu@wavecomp.com>
+Signed-off-by: Jim Wilson <jimw@sifive.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/mips/cpu_loop.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ linux-user/strace.c    | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ linux-user/strace.list |  3 ++
+ 2 files changed, 89 insertions(+)
 
-diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
-index 43ba267..0ba894f 100644
---- a/linux-user/mips/cpu_loop.c
-+++ b/linux-user/mips/cpu_loop.c
-@@ -540,6 +540,23 @@ done_syscall:
-             info.si_code = TARGET_ILL_ILLOPC;
-             queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
-+        case EXCP_FPE:
-+            info.si_signo = TARGET_SIGFPE;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_FPE_FLTUNK;
-+            if (GET_FP_CAUSE(env->active_fpu.fcr31) & FP_INVALID) {
-+                info.si_code = TARGET_FPE_FLTINV;
-+            } else if (GET_FP_CAUSE(env->active_fpu.fcr31) & FP_DIV0) {
-+                info.si_code = TARGET_FPE_FLTDIV;
-+            } else if (GET_FP_CAUSE(env->active_fpu.fcr31) & FP_OVERFLOW) {
-+                info.si_code = TARGET_FPE_FLTOVF;
-+            } else if (GET_FP_CAUSE(env->active_fpu.fcr31) & FP_UNDERFLOW) {
-+                info.si_code = TARGET_FPE_FLTUND;
-+            } else if (GET_FP_CAUSE(env->active_fpu.fcr31) & FP_INEXACT) {
-+                info.si_code = TARGET_FPE_FLTRES;
-+            }
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-         /* The code below was inspired by the MIPS Linux kernel trap
-          * handling code in arch/mips/kernel/traps.c.
-          */
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index 6f72a74..c80e93b 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -976,6 +976,76 @@ UNUSED static struct flags msg_flags[] = {
+     FLAG_END,
+ };
+ 
++UNUSED static struct flags statx_flags[] = {
++#ifdef AT_EMPTY_PATH
++    FLAG_GENERIC(AT_EMPTY_PATH),
++#endif
++#ifdef AT_NO_AUTOMOUNT
++    FLAG_GENERIC(AT_NO_AUTOMOUNT),
++#endif
++#ifdef AT_SYMLINK_NOFOLLOW
++    FLAG_GENERIC(AT_SYMLINK_NOFOLLOW),
++#endif
++#ifdef AT_STATX_SYNC_AS_STAT
++    FLAG_GENERIC(AT_STATX_SYNC_AS_STAT),
++#endif
++#ifdef AT_STATX_FORCE_SYNC
++    FLAG_GENERIC(AT_STATX_FORCE_SYNC),
++#endif
++#ifdef AT_STATX_DONT_SYNC
++    FLAG_GENERIC(AT_STATX_DONT_SYNC),
++#endif
++    FLAG_END,
++};
++
++UNUSED static struct flags statx_mask[] = {
++/* This must come first, because it includes everything.  */
++#ifdef STATX_ALL
++    FLAG_GENERIC(STATX_ALL),
++#endif
++/* This must come second; it includes everything except STATX_BTIME.  */
++#ifdef STATX_BASIC_STATS
++    FLAG_GENERIC(STATX_BASIC_STATS),
++#endif
++#ifdef STATX_TYPE
++    FLAG_GENERIC(STATX_TYPE),
++#endif
++#ifdef STATX_MODE
++    FLAG_GENERIC(STATX_MODE),
++#endif
++#ifdef STATX_NLINK
++    FLAG_GENERIC(STATX_NLINK),
++#endif
++#ifdef STATX_UID
++    FLAG_GENERIC(STATX_UID),
++#endif
++#ifdef STATX_GID
++    FLAG_GENERIC(STATX_GID),
++#endif
++#ifdef STATX_ATIME
++    FLAG_GENERIC(STATX_ATIME),
++#endif
++#ifdef STATX_MTIME
++    FLAG_GENERIC(STATX_MTIME),
++#endif
++#ifdef STATX_CTIME
++    FLAG_GENERIC(STATX_CTIME),
++#endif
++#ifdef STATX_INO
++    FLAG_GENERIC(STATX_INO),
++#endif
++#ifdef STATX_SIZE
++    FLAG_GENERIC(STATX_SIZE),
++#endif
++#ifdef STATX_BLOCKS
++    FLAG_GENERIC(STATX_BLOCKS),
++#endif
++#ifdef STATX_BTIME
++    FLAG_GENERIC(STATX_BTIME),
++#endif
++    FLAG_END,
++};
++
+ /*
+  * print_xxx utility functions.  These are used to print syscall
+  * parameters in certain format.  All of these have parameter
+@@ -2611,6 +2681,22 @@ print_tgkill(const struct syscallname *name,
+ }
+ #endif
+ 
++#ifdef TARGET_NR_statx
++static void
++print_statx(const struct syscallname *name,
++            abi_long arg0, abi_long arg1, abi_long arg2,
++            abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_at_dirfd(arg0, 0);
++    print_string(arg1, 0);
++    print_flags(statx_flags, arg2, 0);
++    print_flags(statx_mask, arg3, 0);
++    print_pointer(arg4, 1);
++    print_syscall_epilogue(name);
++}
++#endif
++
+ /*
+  * An array of all of the syscalls we know about
+  */
+diff --git a/linux-user/strace.list b/linux-user/strace.list
+index db21ce4..63a9466 100644
+--- a/linux-user/strace.list
++++ b/linux-user/strace.list
+@@ -1650,3 +1650,6 @@
+ #ifdef TARGET_NR_atomic_barrier
+ { TARGET_NR_atomic_barrier, "atomic_barrier", NULL, NULL, NULL },
+ #endif
++#ifdef TARGET_NR_statx
++{ TARGET_NR_statx, "statx", NULL, print_statx, NULL },
++#endif
 -- 
 2.7.4
 
