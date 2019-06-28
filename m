@@ -2,70 +2,60 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75D44C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 12:38:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA98BC4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 12:39:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EF1E20644
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 12:38:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="ew6DgG4t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EF1E20644
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id C5C7820644
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 12:39:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5C7820644
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgq9W-0007wT-T9
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 08:38:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37445)
+	id 1hgqA9-0008Ox-2z
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 08:39:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36152)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <qemu_oss@crudebyte.com>) id 1hgq7e-00067H-MD
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:37:00 -0400
+ (envelope-from <slp@redhat.com>) id 1hgq4o-0002Yk-VB
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:34:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <qemu_oss@crudebyte.com>) id 1hgq7b-0005We-3d
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:36:56 -0400
-Received: from kylie.crudebyte.com ([5.189.157.229]:50737)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
- id 1hgq7V-0005Pi-Fc
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:36:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
- :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
- Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
- List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
- bh=DGhPttdw73qL6OGRySEE0zOgjLIhXsWykFugGyy63kY=; b=ew6DgG4tZltP73Dd3CEY6hqO8h
- Gza5IToGMwDWsYeOqZ4ggDohN8mMk7NpbaEmbVO1B0jZo3d/AUKNRK5tqF2ffcpIiDSGUpL+KLVXd
- Gp+g9o0biZY6CMmOqQl1MdXkIy5Uo3RUG42LNyu+eSY4QnVnfdjNIhqe99kCOrgxoPOipqukAUODU
- pcE8YNhQUAmfG2zbMgw/SkXC1VvX6mduFsSPim1CV4oUVLsyZHmN0/6C0hQwfPIcv8vHGdTiI1BNm
- hfuZb/XSQGZa92vnZf73yZ4yylewSCGcVNNAlQsTp/pDrXfVrsmp0G/VW+W8aPjgKpw/6ZMQDg4US
- XIgun8CTnzPvuZZYjKu/tjD8GaNy0/kaUIHCZZjjUKflS6uZ7z0ipyqBaCTu3tC9se43DHNE1ldHP
- taoYL2xktYGP5LG+k2eq6zbXqzFbYY+OjSeENZK+ExpXIbM0qjvSdkcTp4STojG/gtOGohzYD8vw/
- ZUADXPUmTr6JnUxdxO/xPshpXbrPlojhhU7ddHceIsXMbKsmxliaJ1DVBjqYytaGl5TrMR1njeU7i
- vtZLmDsP9Imtl0WbvtIea3LNSWkPuuAzvpWorfgcqKQ9YoKzj11chy5CgJD+MnZ3cT036Sc1ehwh5
- zdUunrDDBp5P4I1/c21LW4rRF7IEyfbR6SoIM+BzA=;
-To: qemu-devel@nongnu.org
-Date: Fri, 28 Jun 2019 13:42:43 +0200
-Message-ID: <3608455.qB9dszzTOH@silver>
-In-Reply-To: <20190627181203.59c956d9@bahia.lan>
-References: <cover.1561575449.git.qemu_oss@crudebyte.com>
- <9e026ca5f087d6ef741e0d82a0067ed7cdaf129f.1561575449.git.qemu_oss@crudebyte.com>
- <20190627181203.59c956d9@bahia.lan>
+ (envelope-from <slp@redhat.com>) id 1hgq4m-0004Sp-Ss
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:34:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52387)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1hgq4m-0004E0-IG
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:34:00 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8183E308220B;
+ Fri, 28 Jun 2019 11:54:10 +0000 (UTC)
+Received: from dritchie.redhat.com (unknown [10.33.36.16])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B552926548;
+ Fri, 28 Jun 2019 11:54:06 +0000 (UTC)
+From: Sergio Lopez <slp@redhat.com>
+To: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com,
+ rth@twiddle.net, ehabkost@redhat.com
+Date: Fri, 28 Jun 2019 13:53:47 +0200
+Message-Id: <20190628115349.60293-3-slp@redhat.com>
+In-Reply-To: <20190628115349.60293-1-slp@redhat.com>
+References: <20190628115349.60293-1-slp@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Fri, 28 Jun 2019 11:54:10 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.189.157.229
-Subject: Re: [Qemu-devel] [PATCH v4 1/5] 9p: unsigned type for type, version,
- path
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH 2/4] hw/virtio: Factorize virtio-mmio headers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,58 +67,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-From: Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org>
-Reply-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Cc: Christian Schoenebeck <qemu_oss@crudebyte.com>,
- Daniel =?ISO-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Greg Kurz <groug@kaod.org>, Antonios Motakis <antonios.motakis@huawei.com>
+Cc: qemu-devel@nongnu.org, Sergio Lopez <slp@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Donnerstag, 27. Juni 2019 18:12:03 CEST Greg Kurz wrote:
-> On Wed, 26 Jun 2019 20:25:55 +0200
-> Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org> wrote:
-> > There is no need for signedness on these QID fields for 9p.
-> > 
-> > Signed-off-by: Antonios Motakis <antonios.motakis@huawei.com>
-> 
-> You should mention here the changes you made on top of Antonios
-> original patch. Something like:
-> 
-> [CS: - also convert path
->      - adapted trace-events and donttouch_stat()]
+Put QOM and main struct definition in a separate header file, so it
+can be accesed from other components.
 
-Haven't seen that comment style in the git logs. Any example hash for that?
+This is needed for the microvm machine type implementation.
 
-> > diff --git a/hw/9pfs/trace-events b/hw/9pfs/trace-events
-> > index c0a0a4ab5d..6964756922 100644
-> > --- a/hw/9pfs/trace-events
-> > +++ b/hw/9pfs/trace-events
-> > @@ -6,7 +6,7 @@ v9fs_rerror(uint16_t tag, uint8_t id, int err) "tag %d id
-> > %d err %d"> 
-> >  v9fs_version(uint16_t tag, uint8_t id, int32_t msize, char* version) "tag
-> >  %d id %d msize %d version %s" v9fs_version_return(uint16_t tag, uint8_t
-> >  id, int32_t msize, char* version) "tag %d id %d msize %d version %s"
-> >  v9fs_attach(uint16_t tag, uint8_t id, int32_t fid, int32_t afid, char*
-> >  uname, char* aname) "tag %u id %u fid %d afid %d uname %s aname %s"> 
-> > -v9fs_attach_return(uint16_t tag, uint8_t id, int8_t type, int32_t
-> > version, int64_t path) "tag %d id %d type %d version %d path %"PRId64
-> > +v9fs_attach_return(uint16_t tag, uint8_t id, uint8_t type, uint32_t
-> > version, uint64_t path) "tag %d id %d type %d version %d path %"PRId64
-> I was expecting to see PRIu64 for an uint64_t but I now realize that %d
-> seems to be used all over the place for unsigned types... :-\
-> 
-> At least, please fix the masks of the lines you're changing in this
-> patch so that unsigned are passed to "u" or PRIu64. The rest of the
-> mess can be fixed later in a followup.
+Signed-off-by: Sergio Lopez <slp@redhat.com>
+---
+ hw/virtio/virtio-mmio.c | 35 +-----------------------
+ hw/virtio/virtio-mmio.h | 60 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 61 insertions(+), 34 deletions(-)
+ create mode 100644 hw/virtio/virtio-mmio.h
 
-If you don't mind I will restrict it to your latter suggestion for now, that 
-is adjusting it using the short format specifiers e.g. "u", the rest would IMO 
-be out of the scope of this patch series.
+diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
+index 97b7f35496..87c7fe4d8d 100644
+--- a/hw/virtio/virtio-mmio.c
++++ b/hw/virtio/virtio-mmio.c
+@@ -26,44 +26,11 @@
+ #include "qemu/host-utils.h"
+ #include "qemu/module.h"
+ #include "sysemu/kvm.h"
+-#include "hw/virtio/virtio-bus.h"
++#include "virtio-mmio.h"
+ #include "qemu/error-report.h"
+ #include "qemu/log.h"
+ #include "trace.h"
+=20
+-/* QOM macros */
+-/* virtio-mmio-bus */
+-#define TYPE_VIRTIO_MMIO_BUS "virtio-mmio-bus"
+-#define VIRTIO_MMIO_BUS(obj) \
+-        OBJECT_CHECK(VirtioBusState, (obj), TYPE_VIRTIO_MMIO_BUS)
+-#define VIRTIO_MMIO_BUS_GET_CLASS(obj) \
+-        OBJECT_GET_CLASS(VirtioBusClass, (obj), TYPE_VIRTIO_MMIO_BUS)
+-#define VIRTIO_MMIO_BUS_CLASS(klass) \
+-        OBJECT_CLASS_CHECK(VirtioBusClass, (klass), TYPE_VIRTIO_MMIO_BUS=
+)
+-
+-/* virtio-mmio */
+-#define TYPE_VIRTIO_MMIO "virtio-mmio"
+-#define VIRTIO_MMIO(obj) \
+-        OBJECT_CHECK(VirtIOMMIOProxy, (obj), TYPE_VIRTIO_MMIO)
+-
+-#define VIRT_MAGIC 0x74726976 /* 'virt' */
+-#define VIRT_VERSION 1
+-#define VIRT_VENDOR 0x554D4551 /* 'QEMU' */
+-
+-typedef struct {
+-    /* Generic */
+-    SysBusDevice parent_obj;
+-    MemoryRegion iomem;
+-    qemu_irq irq;
+-    /* Guest accessible state needing migration and reset */
+-    uint32_t host_features_sel;
+-    uint32_t guest_features_sel;
+-    uint32_t guest_page_shift;
+-    /* virtio-bus */
+-    VirtioBusState bus;
+-    bool format_transport_address;
+-} VirtIOMMIOProxy;
+-
+ static bool virtio_mmio_ioeventfd_enabled(DeviceState *d)
+ {
+     return kvm_eventfds_enabled();
+diff --git a/hw/virtio/virtio-mmio.h b/hw/virtio/virtio-mmio.h
+new file mode 100644
+index 0000000000..2f3973f8c7
+--- /dev/null
++++ b/hw/virtio/virtio-mmio.h
+@@ -0,0 +1,60 @@
++/*
++ * Virtio MMIO bindings
++ *
++ * Copyright (c) 2011 Linaro Limited
++ *
++ * Author:
++ *  Peter Maydell <peter.maydell@linaro.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License; either version =
+2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License alo=
+ng
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef QEMU_VIRTIO_MMIO_H
++#define QEMU_VIRTIO_MMIO_H
++
++#include "hw/virtio/virtio-bus.h"
++
++/* QOM macros */
++/* virtio-mmio-bus */
++#define TYPE_VIRTIO_MMIO_BUS "virtio-mmio-bus"
++#define VIRTIO_MMIO_BUS(obj) \
++        OBJECT_CHECK(VirtioBusState, (obj), TYPE_VIRTIO_MMIO_BUS)
++#define VIRTIO_MMIO_BUS_GET_CLASS(obj) \
++        OBJECT_GET_CLASS(VirtioBusClass, (obj), TYPE_VIRTIO_MMIO_BUS)
++#define VIRTIO_MMIO_BUS_CLASS(klass) \
++        OBJECT_CLASS_CHECK(VirtioBusClass, (klass), TYPE_VIRTIO_MMIO_BUS=
+)
++
++/* virtio-mmio */
++#define TYPE_VIRTIO_MMIO "virtio-mmio"
++#define VIRTIO_MMIO(obj) \
++        OBJECT_CHECK(VirtIOMMIOProxy, (obj), TYPE_VIRTIO_MMIO)
++
++#define VIRT_MAGIC 0x74726976 /* 'virt' */
++#define VIRT_VERSION 1
++#define VIRT_VENDOR 0x554D4551 /* 'QEMU' */
++
++typedef struct {
++    /* Generic */
++    SysBusDevice parent_obj;
++    MemoryRegion iomem;
++    qemu_irq irq;
++    /* Guest accessible state needing migration and reset */
++    uint32_t host_features_sel;
++    uint32_t guest_features_sel;
++    uint32_t guest_page_shift;
++    /* virtio-bus */
++    VirtioBusState bus;
++    bool format_transport_address;
++} VirtIOMMIOProxy;
++
++#endif
+--=20
+2.21.0
 
-Too bad that no format specifier warnings are thrown on these.
-
-Best regards,
-Christian Schoenebeck
 
