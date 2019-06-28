@@ -2,81 +2,59 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66153C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 02:24:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E1E2C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 02:26:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 311FC206A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 02:24:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ngkatILq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 311FC206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 72F29206A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 02:26:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72F29206A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hggZ0-0005c3-Aq
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 22:24:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53983)
+	id 1hggb5-0008KE-Mu
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 22:26:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50160)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <liq3ea@gmail.com>) id 1hggXG-000405-54
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 22:22:48 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hgg8n-0000xC-U0
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:57:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liq3ea@gmail.com>) id 1hggXD-0001dY-Jd
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 22:22:45 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:45246)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hggXC-0001Ro-6C
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 22:22:43 -0400
-Received: by mail-oi1-x241.google.com with SMTP id m206so3114182oib.12
- for <qemu-devel@nongnu.org>; Thu, 27 Jun 2019 19:22:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=LYvLjPL/B7wrk8yUY0h9s4MAWEaGBNQcPV+Hmqz4kUg=;
- b=ngkatILqNWNalgIUTms/4TaCdGMwS5/3qx9IM75raMINkFL1xPTahI8aAJ9tpIY94z
- qbN+Zl4Mzh6Y/JucAKXb2EfQo2vUkGrY0bByiXrEbXuZgDGtIiLjf6rBdAPu2of2UsU8
- OLcjUus+mvusokq4Mg43NHzMPtUhduE2zJNefD2i4nGxt4mlU3ptk18WJmEgCCCcQN8E
- o+WmbVYibzhfkDosLXvXaJAUxDYd0yYt/78ms68AumfKpGLIk4zuSgL9vh05etYRmmFE
- 8yU57B5PphMc0QI8Ivhp3J1C9iSSCo/CW2FnYg8InkaR8oGSxU6dB2F+cbXtcjEQBSxA
- gkcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=LYvLjPL/B7wrk8yUY0h9s4MAWEaGBNQcPV+Hmqz4kUg=;
- b=eXFjvYqz3HzYzs8ZCx2N7MhRrNyj00+VQfP10WvBYgCi3uIFMgW6EJxkkeAeLrfDqZ
- C7dnFG1G1J190s3uWjg5b86HFyF3TPXZ+4KADd2NXjOqpofZ59JAcCQ08F6HxVNCha21
- Xdq7VYpSXA29Jyek9y4YwDEYcbiNZec33mbPLvUsC6DIPDm8y7fMZxOYGIe8xu5BBZel
- lS3YbQA/S4ZXmhwDIMQ9WVrZPGMaA8f0T6AQFjP+eam0aMnyXNgeYTwgEJJcMuDjFlkb
- Onj3TV1zNFP/DHHpfFU4SiqgQqMp6Xow1EDxVaGXodU5Th5Lxp8AePWZMDE+L+dmYdLg
- GqBg==
-X-Gm-Message-State: APjAAAUhRD+1jYzd5adnt10Nzmfqx0iQ6Bzdajd63sKxXgvJyMyWkY3K
- nNunfGHc1YJ8bhGp8Fuosia0SqGZdv/8l91mXyo=
-X-Google-Smtp-Source: APXvYqxXCNJFe9Gwr83sP+ij3w8r1HkSu4eIM7/MTNJODmVQ83QgHW/1IzvldgeNbngngVDJ2IoNtamMdZ06RHEkvwo=
-X-Received: by 2002:a54:4f97:: with SMTP id g23mr339370oiy.97.1561688557387;
- Thu, 27 Jun 2019 19:22:37 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190622002119.126834-1-liq3ea@163.com>
-In-Reply-To: <20190622002119.126834-1-liq3ea@163.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Fri, 28 Jun 2019 10:22:00 +0800
-Message-ID: <CAKXe6SJOYQ38fADJRHxw4HdXC9hqoMPdxgTtLJt49LDxYFCSvw@mail.gmail.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v2] ioapic: use irq number instead of
- vector in ioapic_eoi_broadcast
+ (envelope-from <ehabkost@redhat.com>) id 1hgg8l-0001i3-Sy
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:57:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49666)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgg8l-00010x-Gh
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:57:27 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id CA568308212A;
+ Fri, 28 Jun 2019 01:57:09 +0000 (UTC)
+Received: from localhost (ovpn-116-7.gru2.redhat.com [10.97.116.7])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 223261001B06;
+ Fri, 28 Jun 2019 01:57:08 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Date: Thu, 27 Jun 2019 22:56:01 -0300
+Message-Id: <20190628015606.32107-25-ehabkost@redhat.com>
+In-Reply-To: <20190628015606.32107-1-ehabkost@redhat.com>
+References: <20190628015606.32107-1-ehabkost@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Fri, 28 Jun 2019 01:57:09 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 24/29] i386: make 'hv-spinlocks' a regular
+ uint32 property
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,118 +66,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Qiang <liq3ea@163.com>, Qemu Developers <qemu-devel@nongnu.org>,
- Peter Xu <peterx@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping, what's the status of this patch.
+From: Roman Kagan <rkagan@virtuozzo.com>
+
+X86CPU.hv-spinlocks is a uint32 property that has a special setter
+validating the value to be no less than 0xFFF and no bigger than
+UINT_MAX.  The latter check is redundant; as for the former, there
+appears to be no reason to prohibit the user from setting it to a lower
+value.
+
+So nuke the dedicated getter/setter pair and convert 'hv-spinlocks' to a
+regular uint32 property.
+
+Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+Message-Id: <20190618110659.14744-1-rkagan@virtuozzo.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ target/i386/cpu.c | 45 ++-------------------------------------------
+ 1 file changed, 2 insertions(+), 43 deletions(-)
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 390f47adc5..8d5d34849c 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -3518,46 +3518,6 @@ static void x86_cpu_get_feature_words(Object *obj, Visitor *v,
+     visit_type_X86CPUFeatureWordInfoList(v, "feature-words", &list, errp);
+ }
+ 
+-static void x86_get_hv_spinlocks(Object *obj, Visitor *v, const char *name,
+-                                 void *opaque, Error **errp)
+-{
+-    X86CPU *cpu = X86_CPU(obj);
+-    int64_t value = cpu->hyperv_spinlock_attempts;
+-
+-    visit_type_int(v, name, &value, errp);
+-}
+-
+-static void x86_set_hv_spinlocks(Object *obj, Visitor *v, const char *name,
+-                                 void *opaque, Error **errp)
+-{
+-    const int64_t min = 0xFFF;
+-    const int64_t max = UINT_MAX;
+-    X86CPU *cpu = X86_CPU(obj);
+-    Error *err = NULL;
+-    int64_t value;
+-
+-    visit_type_int(v, name, &value, &err);
+-    if (err) {
+-        error_propagate(errp, err);
+-        return;
+-    }
+-
+-    if (value < min || value > max) {
+-        error_setg(errp, "Property %s.%s doesn't take value %" PRId64
+-                   " (minimum: %" PRId64 ", maximum: %" PRId64 ")",
+-                   object_get_typename(obj), name ? name : "null",
+-                   value, min, max);
+-        return;
+-    }
+-    cpu->hyperv_spinlock_attempts = value;
+-}
+-
+-static const PropertyInfo qdev_prop_spinlocks = {
+-    .name  = "int",
+-    .get   = x86_get_hv_spinlocks,
+-    .set   = x86_set_hv_spinlocks,
+-};
+-
+ /* Convert all '_' in a feature string option name to '-', to make feature
+  * name conform to QOM property naming rule, which uses '-' instead of '_'.
+  */
+@@ -5682,8 +5642,6 @@ static void x86_cpu_initfn(Object *obj)
+     object_property_add(obj, "crash-information", "GuestPanicInformation",
+                         x86_cpu_get_crash_info_qom, NULL, NULL, NULL, NULL);
+ 
+-    cpu->hyperv_spinlock_attempts = HYPERV_SPINLOCK_NEVER_RETRY;
+-
+     for (w = 0; w < FEATURE_WORDS; w++) {
+         int bitnr;
+ 
+@@ -5880,7 +5838,8 @@ static Property x86_cpu_properties[] = {
+     DEFINE_PROP_INT32("node-id", X86CPU, node_id, CPU_UNSET_NUMA_NODE_ID),
+     DEFINE_PROP_BOOL("pmu", X86CPU, enable_pmu, false),
+ 
+-    { .name  = "hv-spinlocks", .info  = &qdev_prop_spinlocks },
++    DEFINE_PROP_UINT32("hv-spinlocks", X86CPU, hyperv_spinlock_attempts,
++                       HYPERV_SPINLOCK_NEVER_RETRY),
+     DEFINE_PROP_BIT64("hv-relaxed", X86CPU, hyperv_features,
+                       HYPERV_FEAT_RELAXED, 0),
+     DEFINE_PROP_BIT64("hv-vapic", X86CPU, hyperv_features,
+-- 
+2.18.0.rc1.1.g3f1ff2140
 
 
-Li Qiang <liq3ea@163.com> =E4=BA=8E2019=E5=B9=B46=E6=9C=8822=E6=97=A5=E5=91=
-=A8=E5=85=AD =E4=B8=8A=E5=8D=888:21=E5=86=99=E9=81=93=EF=BC=9A
-
-> When emulating irqchip in qemu, such as following command:
->
-> x86_64-softmmu/qemu-system-x86_64 -m 1024 -smp 4 -hda /home/test/test.img
-> -machine kernel-irqchip=3Doff --enable-kvm -vnc :0 -device edu -monitor s=
-tdio
->
-> We will get a crash with following asan output:
->
-> (qemu) /home/test/qemu5/qemu/hw/intc/ioapic.c:266:27: runtime error: inde=
-x
-> 35 out of bounds for type 'int [24]'
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> =3D=3D113504=3D=3DERROR: AddressSanitizer: heap-buffer-overflow on addres=
-s
-> 0x61b000003114 at pc 0x5579e3c7a80f bp 0x7fd004bf8c10 sp 0x7fd004bf8c00
-> WRITE of size 4 at 0x61b000003114 thread T4
->     #0 0x5579e3c7a80e in ioapic_eoi_broadcast
-> /home/test/qemu5/qemu/hw/intc/ioapic.c:266
->     #1 0x5579e3c6f480 in apic_eoi /home/test/qemu5/qemu/hw/intc/apic.c:42=
-8
->     #2 0x5579e3c720a7 in apic_mem_write
-> /home/test/qemu5/qemu/hw/intc/apic.c:802
->     #3 0x5579e3b1e31a in memory_region_write_accessor
-> /home/test/qemu5/qemu/memory.c:503
->     #4 0x5579e3b1e6a2 in access_with_adjusted_size
-> /home/test/qemu5/qemu/memory.c:569
->     #5 0x5579e3b28d77 in memory_region_dispatch_write
-> /home/test/qemu5/qemu/memory.c:1497
->     #6 0x5579e3a1b36b in flatview_write_continue
-> /home/test/qemu5/qemu/exec.c:3323
->     #7 0x5579e3a1b633 in flatview_write /home/test/qemu5/qemu/exec.c:3362
->     #8 0x5579e3a1bcb1 in address_space_write
-> /home/test/qemu5/qemu/exec.c:3452
->     #9 0x5579e3a1bd03 in address_space_rw /home/test/qemu5/qemu/exec.c:34=
-63
->     #10 0x5579e3b8b979 in kvm_cpu_exec
-> /home/test/qemu5/qemu/accel/kvm/kvm-all.c:2045
->     #11 0x5579e3ae4499 in qemu_kvm_cpu_thread_fn
-> /home/test/qemu5/qemu/cpus.c:1287
->     #12 0x5579e4cbdb9f in qemu_thread_start util/qemu-thread-posix.c:502
->     #13 0x7fd0146376da in start_thread
-> (/lib/x86_64-linux-gnu/libpthread.so.0+0x76da)
->     #14 0x7fd01436088e in __clone (/lib/x86_64-linux-gnu/libc.so.6+0x1218=
-8e
->
-> This is because in ioapic_eoi_broadcast function, we uses 'vector' to
-> index the 's->irq_eoi'. To fix this, we should uses the irq number.
->
-> Signed-off-by: Li Qiang <liq3ea@163.com>
-> ---
-> Change since v1:
-> remove auto-generated unnecessary message
->
->  hw/intc/ioapic.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
-> index 7074489fdf..711775cc6f 100644
-> --- a/hw/intc/ioapic.c
-> +++ b/hw/intc/ioapic.c
-> @@ -245,8 +245,8 @@ void ioapic_eoi_broadcast(int vector)
->              s->ioredtbl[n] =3D entry & ~IOAPIC_LVT_REMOTE_IRR;
->
->              if (!(entry & IOAPIC_LVT_MASKED) && (s->irr & (1 << n))) {
-> -                ++s->irq_eoi[vector];
-> -                if (s->irq_eoi[vector] >=3D SUCCESSIVE_IRQ_MAX_COUNT) {
-> +                ++s->irq_eoi[n];
-> +                if (s->irq_eoi[n] >=3D SUCCESSIVE_IRQ_MAX_COUNT) {
->                      /*
->                       * Real hardware does not deliver the interrupt
-> immediately
->                       * during eoi broadcast, and this lets a buggy guest
-> make
-> @@ -254,16 +254,16 @@ void ioapic_eoi_broadcast(int vector)
->                       * level-triggered interrupt. Emulate this behavior
-> if we
->                       * detect an interrupt storm.
->                       */
-> -                    s->irq_eoi[vector] =3D 0;
-> +                    s->irq_eoi[n] =3D 0;
->                      timer_mod_anticipate(s->delayed_ioapic_service_timer=
-,
->
-> qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
->                                           NANOSECONDS_PER_SECOND / 100);
-> -                    trace_ioapic_eoi_delayed_reassert(vector);
-> +                    trace_ioapic_eoi_delayed_reassert(n);
->                  } else {
->                      ioapic_service(s);
->                  }
->              } else {
-> -                s->irq_eoi[vector] =3D 0;
-> +                s->irq_eoi[n] =3D 0;
->              }
->          }
->      }
-> --
-> 2.17.1
->
->
->
