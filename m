@@ -2,59 +2,59 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F4045C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 18:59:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92A6EC4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:03:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D08F8206A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 18:59:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D08F8206A2
+	by mail.kernel.org (Postfix) with ESMTPS id 6DFC9206A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:03:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DFC9206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35575 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgw6I-0003Om-5N
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 14:59:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40237)
+	id 1hgw9f-0004lS-OV
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 15:03:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41226)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hgvvN-0002Bp-Cp
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:48:43 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hgvyy-0005Pq-8A
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:52:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hgvvJ-0001Xb-MN
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:48:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34490)
+ (envelope-from <ehabkost@redhat.com>) id 1hgvyv-0005KH-Gi
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:52:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33160)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgvvJ-0001VA-EB
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:48:37 -0400
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgvyr-00050I-JW
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:52:19 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 35679B2DC5;
- Fri, 28 Jun 2019 18:48:31 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 49F1130872F7;
+ Fri, 28 Jun 2019 18:52:11 +0000 (UTC)
 Received: from localhost (ovpn-116-7.gru2.redhat.com [10.97.116.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D98485C730;
- Fri, 28 Jun 2019 18:48:25 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A089B5C730;
+ Fri, 28 Jun 2019 18:52:10 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Fri, 28 Jun 2019 15:47:19 -0300
-Message-Id: <20190628184742.5961-7-ehabkost@redhat.com>
+Date: Fri, 28 Jun 2019 15:47:37 -0300
+Message-Id: <20190628184742.5961-25-ehabkost@redhat.com>
 In-Reply-To: <20190628184742.5961-1-ehabkost@redhat.com>
 References: <20190628184742.5961-1-ehabkost@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Fri, 28 Jun 2019 18:48:36 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Fri, 28 Jun 2019 18:52:11 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v2 06/29] hw/s390x: Replace global smp variables
- with machine smp properties
+Subject: [Qemu-devel] [PULL v2 24/29] i386: make 'hv-spinlocks' a regular
+ uint32 property
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,154 +67,100 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Like Xu <like.xu@linux.intel.com>, Richard Henderson <rth@twiddle.net>
+ Roman Kagan <rkagan@virtuozzo.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Like Xu <like.xu@linux.intel.com>
+From: Roman Kagan <rkagan@virtuozzo.com>
 
-The global smp variables in s390x are replaced with smp machine properties.
+X86CPU.hv-spinlocks is a uint32 property that has a special setter
+validating the value to be no less than 0xFFF and no bigger than
+UINT_MAX.  The latter check is redundant; as for the former, there
+appears to be no reason to prohibit the user from setting it to a lower
+value.
 
-A local variable of the same name would be introduced in the declaration
-phase if it's used widely in the context OR replace it on the spot if it's
-only used once. No semantic changes.
+So nuke the dedicated getter/setter pair and convert 'hv-spinlocks' to a
+regular uint32 property.
 
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Message-Id: <20190518205428.90532-7-like.xu@linux.intel.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-[ehabkost: fix build failure at VCPU_IRQ_BUF_SIZE]
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-
-fixup! hw/s390x: Replace global smp variables with machine smp properties
-
+Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+Message-Id: <20190618110659.14744-1-rkagan@virtuozzo.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/s390x/s390-virtio-ccw.c |  3 ++-
- hw/s390x/sclp.c            |  2 +-
- target/s390x/cpu.c         |  3 +++
- target/s390x/excp_helper.c |  5 +++++
- target/s390x/kvm.c         | 10 ++++++----
- 5 files changed, 17 insertions(+), 6 deletions(-)
+ target/i386/cpu.c | 45 ++-------------------------------------------
+ 1 file changed, 2 insertions(+), 43 deletions(-)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index e09bf8f1b6..5b6a9a4e55 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -84,7 +84,7 @@ static void s390_init_cpus(MachineState *machine)
-     /* initialize possible_cpus */
-     mc->possible_cpu_arch_ids(machine);
- 
--    for (i = 0; i < smp_cpus; i++) {
-+    for (i = 0; i < machine->smp.cpus; i++) {
-         s390x_new_cpu(machine->cpu_type, i, &error_fatal);
-     }
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 390f47adc5..8d5d34849c 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -3518,46 +3518,6 @@ static void x86_cpu_get_feature_words(Object *obj, Visitor *v,
+     visit_type_X86CPUFeatureWordInfoList(v, "feature-words", &list, errp);
  }
-@@ -411,6 +411,7 @@ static CpuInstanceProperties s390_cpu_index_to_props(MachineState *ms,
- static const CPUArchIdList *s390_possible_cpu_arch_ids(MachineState *ms)
- {
-     int i;
-+    unsigned int max_cpus = ms->smp.max_cpus;
  
-     if (ms->possible_cpus) {
-         g_assert(ms->possible_cpus && ms->possible_cpus->len == max_cpus);
-diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-index 4510a800cb..fac7c3bb6c 100644
---- a/hw/s390x/sclp.c
-+++ b/hw/s390x/sclp.c
-@@ -64,7 +64,7 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
-     prepare_cpu_entries(sclp, read_info->entries, &cpu_count);
-     read_info->entries_cpu = cpu_to_be16(cpu_count);
-     read_info->offset_cpu = cpu_to_be16(offsetof(ReadInfo, entries));
--    read_info->highest_cpu = cpu_to_be16(max_cpus - 1);
-+    read_info->highest_cpu = cpu_to_be16(machine->smp.max_cpus - 1);
- 
-     read_info->ibc_val = cpu_to_be32(s390_get_ibc_val());
- 
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index f2d93644d5..cafb8fe3f0 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -37,6 +37,7 @@
- #include "hw/qdev-properties.h"
- #ifndef CONFIG_USER_ONLY
- #include "hw/hw.h"
-+#include "hw/boards.h"
- #include "sysemu/arch_init.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/tcg.h"
-@@ -197,6 +198,8 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
-     }
- 
- #if !defined(CONFIG_USER_ONLY)
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    unsigned int max_cpus = ms->smp.max_cpus;
-     if (cpu->env.core_id >= max_cpus) {
-         error_setg(&err, "Unable to add CPU with core-id: %" PRIu32
-                    ", maximum core-id: %d", cpu->env.core_id,
-diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-index 202456cdc5..892f659d5a 100644
---- a/target/s390x/excp_helper.c
-+++ b/target/s390x/excp_helper.c
-@@ -31,6 +31,7 @@
- #ifndef CONFIG_USER_ONLY
- #include "sysemu/sysemu.h"
- #include "hw/s390x/s390_flic.h"
-+#include "hw/boards.h"
- #endif
- 
- void QEMU_NORETURN tcg_s390_program_interrupt(CPUS390XState *env, uint32_t code,
-@@ -315,6 +316,10 @@ static void do_ext_interrupt(CPUS390XState *env)
-         g_assert(cpu_addr < S390_MAX_CPUS);
-         lowcore->cpu_addr = cpu_to_be16(cpu_addr);
-         clear_bit(cpu_addr, env->emergency_signals);
-+#ifndef CONFIG_USER_ONLY
-+        MachineState *ms = MACHINE(qdev_get_machine());
-+        unsigned int max_cpus = ms->smp.max_cpus;
-+#endif
-         if (bitmap_empty(env->emergency_signals, max_cpus)) {
-             env->pending_int &= ~INTERRUPT_EMERGENCY_SIGNAL;
-         }
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 0267c6c2f6..6e814c230b 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -119,8 +119,8 @@
-  * Needs to be big enough to contain max_cpus emergency signals
-  * and in addition NR_LOCAL_IRQS interrupts
+-static void x86_get_hv_spinlocks(Object *obj, Visitor *v, const char *name,
+-                                 void *opaque, Error **errp)
+-{
+-    X86CPU *cpu = X86_CPU(obj);
+-    int64_t value = cpu->hyperv_spinlock_attempts;
+-
+-    visit_type_int(v, name, &value, errp);
+-}
+-
+-static void x86_set_hv_spinlocks(Object *obj, Visitor *v, const char *name,
+-                                 void *opaque, Error **errp)
+-{
+-    const int64_t min = 0xFFF;
+-    const int64_t max = UINT_MAX;
+-    X86CPU *cpu = X86_CPU(obj);
+-    Error *err = NULL;
+-    int64_t value;
+-
+-    visit_type_int(v, name, &value, &err);
+-    if (err) {
+-        error_propagate(errp, err);
+-        return;
+-    }
+-
+-    if (value < min || value > max) {
+-        error_setg(errp, "Property %s.%s doesn't take value %" PRId64
+-                   " (minimum: %" PRId64 ", maximum: %" PRId64 ")",
+-                   object_get_typename(obj), name ? name : "null",
+-                   value, min, max);
+-        return;
+-    }
+-    cpu->hyperv_spinlock_attempts = value;
+-}
+-
+-static const PropertyInfo qdev_prop_spinlocks = {
+-    .name  = "int",
+-    .get   = x86_get_hv_spinlocks,
+-    .set   = x86_set_hv_spinlocks,
+-};
+-
+ /* Convert all '_' in a feature string option name to '-', to make feature
+  * name conform to QOM property naming rule, which uses '-' instead of '_'.
   */
--#define VCPU_IRQ_BUF_SIZE (sizeof(struct kvm_s390_irq) * \
--                           (max_cpus + NR_LOCAL_IRQS))
-+#define VCPU_IRQ_BUF_SIZE(max_cpus) (sizeof(struct kvm_s390_irq) * \
-+                                     (max_cpus + NR_LOCAL_IRQS))
+@@ -5682,8 +5642,6 @@ static void x86_cpu_initfn(Object *obj)
+     object_property_add(obj, "crash-information", "GuestPanicInformation",
+                         x86_cpu_get_crash_info_qom, NULL, NULL, NULL, NULL);
  
- static CPUWatchpoint hw_watchpoint;
- /*
-@@ -362,9 +362,10 @@ unsigned long kvm_arch_vcpu_id(CPUState *cpu)
+-    cpu->hyperv_spinlock_attempts = HYPERV_SPINLOCK_NEVER_RETRY;
+-
+     for (w = 0; w < FEATURE_WORDS; w++) {
+         int bitnr;
  
- int kvm_arch_init_vcpu(CPUState *cs)
- {
-+    unsigned int max_cpus = MACHINE(qdev_get_machine())->smp.max_cpus;
-     S390CPU *cpu = S390_CPU(cs);
-     kvm_s390_set_cpu_state(cpu, cpu->env.cpu_state);
--    cpu->irqstate = g_malloc0(VCPU_IRQ_BUF_SIZE);
-+    cpu->irqstate = g_malloc0(VCPU_IRQ_BUF_SIZE(max_cpus));
-     return 0;
- }
+@@ -5880,7 +5838,8 @@ static Property x86_cpu_properties[] = {
+     DEFINE_PROP_INT32("node-id", X86CPU, node_id, CPU_UNSET_NUMA_NODE_ID),
+     DEFINE_PROP_BOOL("pmu", X86CPU, enable_pmu, false),
  
-@@ -1950,9 +1951,10 @@ int kvm_s390_set_cpu_state(S390CPU *cpu, uint8_t cpu_state)
- 
- void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu)
- {
-+    unsigned int max_cpus = MACHINE(qdev_get_machine())->smp.max_cpus;
-     struct kvm_s390_irq_state irq_state = {
-         .buf = (uint64_t) cpu->irqstate,
--        .len = VCPU_IRQ_BUF_SIZE,
-+        .len = VCPU_IRQ_BUF_SIZE(max_cpus),
-     };
-     CPUState *cs = CPU(cpu);
-     int32_t bytes;
+-    { .name  = "hv-spinlocks", .info  = &qdev_prop_spinlocks },
++    DEFINE_PROP_UINT32("hv-spinlocks", X86CPU, hyperv_spinlock_attempts,
++                       HYPERV_SPINLOCK_NEVER_RETRY),
+     DEFINE_PROP_BIT64("hv-relaxed", X86CPU, hyperv_features,
+                       HYPERV_FEAT_RELAXED, 0),
+     DEFINE_PROP_BIT64("hv-vapic", X86CPU, hyperv_features,
 -- 
 2.18.0.rc1.1.g3f1ff2140
 
