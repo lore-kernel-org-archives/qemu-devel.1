@@ -2,114 +2,91 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8A51C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 13:38:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E58FC4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 13:40:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60FC520645
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 13:38:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 38D1A20645
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 13:40:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=wavesemi.onmicrosoft.com header.i=@wavesemi.onmicrosoft.com header.b="lFcXB41B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60FC520645
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="pB+Lewpu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38D1A20645
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgr53-0004KF-K0
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 09:38:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45516)
+	id 1hgr6r-0005Jd-ES
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 09:40:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49166)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <amarkovic@wavecomp.com>) id 1hgqPo-0006K2-Ih
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:55:46 -0400
+ (envelope-from <liam.merwick@oracle.com>) id 1hgqce-0008Uj-RO
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:09:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <amarkovic@wavecomp.com>) id 1hgqPm-0007nq-I9
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:55:44 -0400
-Received: from mail-eopbgr770122.outbound.protection.outlook.com
- ([40.107.77.122]:52965 helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+ (envelope-from <liam.merwick@oracle.com>) id 1hgqcd-00081b-Sw
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:09:00 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:49842)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
- id 1hgqPi-0007dT-KU
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:55:40 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=testarcselector01; d=microsoft.com; cv=none;
- b=K+GKJP7E1nbgqacXdvLoONRqlGiLuTbGyPO1RgJymJ6PaWq3DRz8y84JL4eTQh5R4IRhY0DbTSXS+8pFPoB7sKz/j6PfwTUjXr5UYQ1NcOvVCy0UMAzMS2SOqjQ5s17hFwTI7jZj6HxTAkTK+w4pkoymoquD/u32cOVHmZZyXP0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=testarcselector01;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ugX3G7NrQSU2i1OUMG8nXcaD+JG9naKJ/i7tI68B7cQ=;
- b=wsl4Bbz6Rhn5dIgY1DO1ppSWE8gJyr6YInBBRcO6O9sR6lQ1A8u7jrv8TaCOZhGU+pw3lCCtN6i4XuMwbUbLo8o6ETfCdN/7bSHtwzxL9f40ADQb5uwLacOS3dGETd1A2qvodFhR2VmCjLUtTDTpo6qWHWkweqebaHghebCnbHA=
-ARC-Authentication-Results: i=1; test.office365.com
- 1;spf=none;dmarc=none;dkim=none;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=wavesemi.onmicrosoft.com; s=selector1-wavesemi-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ugX3G7NrQSU2i1OUMG8nXcaD+JG9naKJ/i7tI68B7cQ=;
- b=lFcXB41BPQC7dzcBBMgjpjgtkJnIYK053huEOGPzf3kwjczExV/BUtMlKG/UltmwhvY9JnKaak4th43qp1BPQR1mgmkbSb36ZcUu949DtL0mB0ngXV3flV5z6QmZyXJs6ekdI2okoH3WyRW4pP6YT8G15q0lID6Mjksn0hccotk=
-Received: from BN6PR2201MB1251.namprd22.prod.outlook.com (10.174.81.139) by
- BN6PR2201MB1729.namprd22.prod.outlook.com (10.161.158.157) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2008.16; Fri, 28 Jun 2019 12:55:30 +0000
-Received: from BN6PR2201MB1251.namprd22.prod.outlook.com
- ([fe80::b0c5:c059:f809:fc07]) by BN6PR2201MB1251.namprd22.prod.outlook.com
- ([fe80::b0c5:c059:f809:fc07%2]) with mapi id 15.20.2008.018; Fri, 28 Jun 2019
- 12:55:30 +0000
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-To: Laurent Vivier <laurent@vivier.eu>, Fam Zheng <fam@euphon.net>
-Thread-Topic: [Patchew-devel] [Qemu-devel] [PATCH v15 0/5] linux-user: A set
- of miscellaneous patches
-Thread-Index: AQHVLY8puA1jfdE0PE6ot7AC0RBAX6aw0o+AgAAozgCAAAcTgIAAAbuAgAABs6c=
-Date: Fri, 28 Jun 2019 12:55:29 +0000
-Message-ID: <BN6PR2201MB12512151463CD300D0EC1887C6FC0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <156171539473.6332.3788894025347542150@c4a48874b076>
- <f1ff093c-cb64-a54e-778e-eb18a0fdddb2@vivier.eu>
- <20190628124117.2lltlf7yiwlwy4j4@debian>,
- <4d6b26bf-6f20-f809-9e9c-f706dfd21e35@vivier.eu>
-In-Reply-To: <4d6b26bf-6f20-f809-9e9c-f706dfd21e35@vivier.eu>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=amarkovic@wavecomp.com; 
-x-originating-ip: [82.117.201.26]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 1a08b850-b8b1-404b-b594-08d6fbc7e65e
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:BN6PR2201MB1729; 
-x-ms-traffictypediagnostic: BN6PR2201MB1729:
-x-microsoft-antispam-prvs: <BN6PR2201MB1729B5CD68C6FD8D00F3A236C6FC0@BN6PR2201MB1729.namprd22.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-forefront-prvs: 00826B6158
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(346002)(396003)(366004)(39840400004)(376002)(136003)(199004)(189003)(53936002)(64756008)(66476007)(66446008)(73956011)(66556008)(66946007)(91956017)(4326008)(186003)(71190400001)(71200400001)(76116006)(4744005)(52536014)(8936002)(6506007)(110136005)(76176011)(68736007)(102836004)(229853002)(26005)(86362001)(5660300002)(6246003)(55236004)(256004)(54906003)(25786009)(2906002)(8676002)(476003)(6436002)(55016002)(11346002)(446003)(7696005)(99286004)(486006)(14454004)(81156014)(3846002)(74316002)(478600001)(6116002)(33656002)(9686003)(305945005)(7736002)(66066001)(81166006)(316002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:BN6PR2201MB1729;
- H:BN6PR2201MB1251.namprd22.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: wavecomp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 8xhdOi55+oflsIvKzVHAM6/XxkRujVZn3CymsFMLz+TIdY1McpjoKq+0R7B4HVM0Igo6vYyf4Q6uj7rNeuosoS0slzTjNOpNNRzD/wLX4HD1epcw29QKgcZI6VyNGAasOP9DAsusKsyLasnzR55NmpBcearVF5UmwdI5TCV+lpTEAwtBDhvVoWzx33D0PNbjEIXxripOjRQtPDARBKY6VvTvytNpne0nm5gtVJzdC3mm/09cHofAgfiO3660jPE5NGFPC9eyMk3Zgrbir8BIqyv/6k0t2Eg85+kLnmmEIAg6Xgz+5m+JQnTFbLqhkv3odDQK5gcj3V8Xxy7L3DZ/xeQ2IJIPS4DeCP05n4AClQdyx5dXGaolN+38q8aEwJNRq0PG2T3M9J0SxMtADMkLx9EPO7W4zjDYhrShLG8dhZw=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: wavecomp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1a08b850-b8b1-404b-b594-08d6fbc7e65e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jun 2019 12:55:29.9712 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: amarkovic@wavecomp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR2201MB1729
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.77.122
-Subject: Re: [Qemu-devel] [Patchew-devel] [PATCH v15 0/5] linux-user: A set
- of miscellaneous patches
+ (Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
+ id 1hgqcb-0007yA-Lo; Fri, 28 Jun 2019 09:08:57 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5SD3rv4156645;
+ Fri, 28 Jun 2019 13:08:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id; s=corp-2018-07-02;
+ bh=0C8PA+eTTuhq384WLM/bZtQrEJRTuSkPTMxjc8gHyQ4=;
+ b=pB+Lewpujjup7igrBL8lUwjCIMqIDs/MJaaW/IYMP9bPe58CIs51KnXRe/Qe6ujYF1Ma
+ VnXlFKJCTKmjynZiZmZMR2hPUq0dd2CFc7iS5+JQkVKyA267xAGnkeaQXmOVoqFoJLxy
+ wi4mojLvBv2A57Cze/qGkJNE5XLZgpzeBF27d131UF3mlCt8WXG/hZJSlCoNgUPi085d
+ uxvHIIZ7QeJzXUVGm6iGBe6KgWz8qCF2f4kNzUX3/iX29ukp/aYgo/tJfi+zKX/abMaE
+ XbcUJJw+ZFXW98Au+9B1MvyS2EzU46D5tnCh8C52KzS0HkJ8g0WjhmPzztqD8IBH+Lsx sg== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by aserp2120.oracle.com with ESMTP id 2t9c9q5kfa-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 28 Jun 2019 13:08:53 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5SD8185106726;
+ Fri, 28 Jun 2019 13:08:52 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by userp3030.oracle.com with ESMTP id 2t99f5jxch-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 28 Jun 2019 13:08:52 +0000
+Received: from abhmp0022.oracle.com (abhmp0022.oracle.com [141.146.116.28])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5SD8pHq009018;
+ Fri, 28 Jun 2019 13:08:51 GMT
+Received: from ol7.uk.oracle.com (/10.175.202.14)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Fri, 28 Jun 2019 06:08:50 -0700
+From: Liam Merwick <liam.merwick@oracle.com>
+To: qemu-trivial@nongnu.org
+Date: Fri, 28 Jun 2019 14:08:37 +0100
+Message-Id: <1561727317-30655-1-git-send-email-liam.merwick@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9301
+ signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=993
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906280157
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9301
+ signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906280156
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 141.146.126.78
+Subject: [Qemu-devel] [PATCH] docs/devel/testing: Fix typo in dockerfile path
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,22 +98,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "patchew-devel@redhat.com" <patchew-devel@redhat.com>,
- "aleksandar.markovic@rt-rk.com" <aleksandar.markovic@rt-rk.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> I've moved the env/rpm/uname commands before the actual testing commands,=
- so
-> the information can be collected even upon failures.
+Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
+---
+ docs/devel/testing.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Would it be hard for you to capture output of the command "ldd --version" a=
-nd include it early in the log?
+diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+index da2d0fc9646f..3ef50a61db4d 100644
+--- a/docs/devel/testing.rst
++++ b/docs/devel/testing.rst
+@@ -327,7 +327,7 @@ Images
+ ------
+ 
+ Along with many other images, the ``min-glib`` image is defined in a Dockerfile
+-in ``tests/docker/dockefiles/``, called ``min-glib.docker``. ``make docker``
++in ``tests/docker/dockerfiles/``, called ``min-glib.docker``. ``make docker``
+ command will list all the available images.
+ 
+ To add a new image, simply create a new ``.docker`` file under the
+-- 
+1.8.3.1
 
-That would be sufficient for us to deduce "glibc version".
-
-Thanks,
-Aleksandar=
 
