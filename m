@@ -2,85 +2,62 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 185FBC4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:49:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D96BC4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:53:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE4D920828
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:49:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XtH45xt3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE4D920828
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 14B4F2083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:53:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14B4F2083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgwrs-0002Vh-2a
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 15:49:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34392)
+	id 1hgwvn-0005V1-3D
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 15:53:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34864)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <danielhb413@gmail.com>) id 1hgwoP-0000cG-Gb
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 15:45:36 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hgwqF-00029z-4j
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 15:47:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <danielhb413@gmail.com>) id 1hgwoM-0000vy-Nf
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 15:45:33 -0400
-Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:36858)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <danielhb413@gmail.com>)
- id 1hgwoK-0000sC-EI
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 15:45:28 -0400
-Received: by mail-qt1-x843.google.com with SMTP id p15so7681995qtl.3
- for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 12:45:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=1SwVU18ARN5GY7vLoHwvz2yEvR6Sr/nDSSFaZ3x64xA=;
- b=XtH45xt3dhrCnGi1TJNjh68R29f6n8RjPT76fxfhnLMaVIAUc+bsI4XXg8VLoghy84
- DV6VID6TCbPk4lVz+Y9tFW1oJzcj55qjJaAs3v1iG50O3GX/Dn28Y/NlXLmyqA74LpbG
- caecqa5GD07eaSUTGo96DUuCYqHjm9jpSOnwKra0jTCITkcjOIb6dUszcAeoIjytqGd8
- DHoCDwcIBcSUW1fwSf98ta5viCRbAMuzd4rJNon/Eh7DlTomNZeF0EDcCv+hetZJda6b
- 8X4qjUTy5oxFHptG9uYO3zn89B//tHiwL6Vz3rotRR6W3Bz9pXVEn2/zxEFQEnN8KTr9
- 3mcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=1SwVU18ARN5GY7vLoHwvz2yEvR6Sr/nDSSFaZ3x64xA=;
- b=DllfyTZgrcp0k7i0LkNFROPUfcmjapTxbTFsxEWkPY8yj8NXezsY6CJ0+pUxC5KVOs
- P9jVy8SUhk5qAVPasXGHN0LSnoRiyk6vbOSSK7oGm6w0DtmntkQ1YZnifoMkU7xGCynM
- HlqL6j2wG8EOwugwo0DstN5CDicfbHn/EGcutzxtwB7x6YZW1pc3t1LPnOM6G2xD9+rY
- tmRZPDlklmk+o2uOFfMjbdRj3LKDU2NLjdyOj3Wl1d92VFRxWHWRGVghIb3xb6jBynEM
- wSPcaFtABSeZwiyG5uDffHheyiKhAJZqpoNOrlD6OfMhOENpi7ePa2yRo6ofZnlY2CcH
- 4kJA==
-X-Gm-Message-State: APjAAAUyxloNV7BkgQo3r5+yBwr2OhowgR4tKRSNjSca3z0tCooUiypx
- jUJNTQ5d8DRXLj+u1ZNZoLVQ6xeP
-X-Google-Smtp-Source: APXvYqxH566JMWkaqkqCaJvTqMxpJdSbXdKEKHYd0A7r0icxp1GTUsvxEdAXHw/JEzHf1UbZstS95A==
-X-Received: by 2002:ac8:32ec:: with SMTP id a41mr9776030qtb.375.1561751123768; 
- Fri, 28 Jun 2019 12:45:23 -0700 (PDT)
-Received: from rekt.ibmuc.com ([2804:431:c7c6:927e:501b:7135:21ca:8a87])
- by smtp.gmail.com with ESMTPSA id b69sm1602288qkg.105.2019.06.28.12.45.21
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 28 Jun 2019 12:45:23 -0700 (PDT)
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 28 Jun 2019 16:45:08 -0300
-Message-Id: <20190628194512.21311-1-danielhb413@gmail.com>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <ehabkost@redhat.com>) id 1hgwq7-0002Ha-Oh
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 15:47:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57324)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgwq4-0002Du-EI
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 15:47:19 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7E506307D844;
+ Fri, 28 Jun 2019 19:47:14 +0000 (UTC)
+Received: from localhost (ovpn-116-7.gru2.redhat.com [10.97.116.7])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EAD88600C6;
+ Fri, 28 Jun 2019 19:47:05 +0000 (UTC)
+Date: Fri, 28 Jun 2019 16:47:03 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Sergio Lopez <slp@redhat.com>
+Message-ID: <20190628194703.GH1862@habkost.net>
+References: <20190628115349.60293-1-slp@redhat.com>
+ <20190628115349.60293-5-slp@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::843
-Subject: [Qemu-devel] [PATCH v4 0/4] delete created files when
- block_crypto_co_create_opts_luks fails
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190628115349.60293-5-slp@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Fri, 28 Jun 2019 19:47:14 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 4/4] hw/i386: Introduce the microvm machine
+ type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,39 +69,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, jsnow@redhat.com,
- Daniel Henrique Barboza <danielhb413@gmail.com>, berrange@redhat.com,
- mreitz@redhat.com
+Cc: pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Changes from previous version [1]:
-- added an extra patch including a new qemu-iotest to exercise the fix
+Hi,
+
+This looks good, overall, I'm just confused by the versioning
+system.  Comments below:
 
 
-[1] https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg07159.html
+On Fri, Jun 28, 2019 at 01:53:49PM +0200, Sergio Lopez wrote:
+> Microvm is a machine type inspired by both NEMU and Firecracker, and
+> constructed after the machine model implemented by the latter.
+> 
+> It's main purpose is providing users a KVM-only machine type with fast
+> boot times, minimal attack surface (measured as the number of IO ports
+> and MMIO regions exposed to the Guest) and small footprint (specially
+> when combined with the ongoing QEMU modularization effort).
+> 
+> Normally, other than the device support provided by KVM itself,
+> microvm only supports virtio-mmio devices. Microvm also includes a
+> legacy mode, which adds an ISA bus with a 16550A serial port, useful
+> for being able to see the early boot kernel messages.
+> 
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
+[...]
+> +static const TypeInfo microvm_machine_info = {
+> +    .name          = TYPE_MICROVM_MACHINE,
+> +    .parent        = TYPE_MACHINE,
+> +    .abstract      = true,
+> +    .instance_size = sizeof(MicrovmMachineState),
+> +    .instance_init = microvm_machine_instance_init,
+> +    .class_size    = sizeof(MicrovmMachineClass),
+> +    .class_init    = microvm_class_init,
 
-Daniel Henrique Barboza (4):
-  block: introducing 'bdrv_co_delete_file' interface
-  block.c: adding bdrv_delete_file
-  crypto.c: cleanup created file when block_crypto_co_create_opts_luks
-    fails
-  qemu-iotests: adding LUKS cleanup for non-UTF8 secret error
+[1]
 
- block.c                    | 82 ++++++++++++++++++++++++++++++++++++++
- block/crypto.c             | 31 ++++++++++++++
- block/file-posix.c         | 28 +++++++++++++
- include/block/block.h      |  3 ++
- include/block/block_int.h  |  6 +++
- tests/qemu-iotests/257     | 67 +++++++++++++++++++++++++++++++
- tests/qemu-iotests/257.out | 11 +++++
- tests/qemu-iotests/group   |  1 +
- 8 files changed, 229 insertions(+)
- create mode 100755 tests/qemu-iotests/257
- create mode 100644 tests/qemu-iotests/257.out
+> +    .interfaces = (InterfaceInfo[]) {
+> +         { TYPE_NMI },
+> +         { }
+> +    },
+> +};
+> +
+> +static void microvm_machine_init(void)
+> +{
+> +    type_register_static(&microvm_machine_info);
+> +}
+> +type_init(microvm_machine_init);
+> +
+> +static void microvm_1_0_instance_init(Object *obj)
+> +{
+> +}
+
+You shouldn't need a instance_init function if it's empty, I
+believe you can delete it.
+
+> +
+> +static void microvm_machine_class_init(MachineClass *mc)
+
+Why do you need both microvm_machine_class_init() [1] and
+microvm_class_init()?
+
+> +{
+> +    mc->init = microvm_machine_state_init;
+> +
+> +    mc->family = "microvm_i386";
+> +    mc->desc = "Microvm (i386)";
+> +    mc->units_per_default_bus = 1;
+> +    mc->no_floppy = 1;
+> +    machine_class_allow_dynamic_sysbus_dev(mc, "sysbus-debugcon");
+> +    machine_class_allow_dynamic_sysbus_dev(mc, "sysbus-debugexit");
+> +    mc->max_cpus = 288;
+
+Where does this limit come from?
+
+> +    mc->has_hotpluggable_cpus = false;
+> +    mc->auto_enable_numa_with_memhp = false;
+> +    mc->default_cpu_type = X86_CPU_TYPE_NAME ("host");
+> +    mc->nvdimm_supported = false;
+> +    mc->default_machine_opts = "accel=kvm";
+> +
+> +    /* Machine class handlers */
+> +    mc->cpu_index_to_instance_props = cpu_index_to_props;
+> +    mc->get_default_cpu_node_id = cpu_get_default_cpu_node_id;
+> +    mc->possible_cpu_arch_ids = cpu_possible_cpu_arch_ids;;
+
+I don't think these methods should be mandatory if you don't
+support NUMA or CPU hotplug.  Do you really need them?
+
+(If the core machine code makes them mandatory, it's probably not
+intentional).
+
+
+> +    mc->reset = microvm_machine_reset;
+> +}
+> +
+> +static void microvm_1_0_machine_class_init(MachineClass *mc)
+> +{
+> +    microvm_machine_class_init(mc);
+> +}
+> +DEFINE_MICROVM_MACHINE_AS_LATEST(1, 0)
+
+
+We only have multiple versions of some machine types (pc-*,
+virt-*, pseries-*, s390-ccw-virtio-*) because of Guest ABI
+compatibility (which you are not implementing here).  What's the
+reason behind having multiple microvm machine versions?
+
+
+[...]
+> +#define TYPE_MICROVM_MACHINE   MACHINE_TYPE_NAME("microvm")
+
+Using MACHINE_TYPE_NAME("microvm") might eventually cause
+conflicts with the "microvm" alias you are registering.  I
+suggest using something like "microvm-machine-base".
+
+A separate base class will only be necessary if you are really
+planning to provide multiple versions of the machine type,
+though.
+
+
+> +#define MICROVM_MACHINE(obj) \
+> +    OBJECT_CHECK(MicrovmMachineState, (obj), TYPE_MICROVM_MACHINE)
+> +#define MICROVM_MACHINE_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(MicrovmMachineClass, obj, TYPE_MICROVM_MACHINE)
+> +#define MICROVM_MACHINE_CLASS(class) \
+> +    OBJECT_CLASS_CHECK(MicrovmMachineClass, class, TYPE_MICROVM_MACHINE)
+> +
+> +#endif
+> -- 
+> 2.21.0
+> 
 
 -- 
-2.20.1
-
+Eduardo
 
