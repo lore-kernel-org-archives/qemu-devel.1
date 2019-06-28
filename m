@@ -2,58 +2,62 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B7C2C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 12:47:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E91F5C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 12:48:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31D4A20644
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 12:47:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31D4A20644
+	by mail.kernel.org (Postfix) with ESMTPS id 6E79520644
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 12:48:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E79520644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgqI9-0000gd-Dj
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 08:47:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36142)
+	id 1hgqIp-00011H-G3
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 08:48:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37597)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <slp@redhat.com>) id 1hgq4o-0002YE-74
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:34:04 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hgq7z-0006ZD-Sf
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:37:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1hgq4m-0004SZ-Pb
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:34:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43400)
+ (envelope-from <imammedo@redhat.com>) id 1hgq7y-0005hZ-2d
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:37:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38504)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1hgq4k-0004QO-KR
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:34:00 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hgq7x-0005hF-QC
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:37:18 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 107A6C18B2D3;
- Fri, 28 Jun 2019 11:54:04 +0000 (UTC)
-Received: from dritchie.redhat.com (unknown [10.33.36.16])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E260D1A927;
- Fri, 28 Jun 2019 11:53:55 +0000 (UTC)
-From: Sergio Lopez <slp@redhat.com>
-To: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com,
- rth@twiddle.net, ehabkost@redhat.com
-Date: Fri, 28 Jun 2019 13:53:45 +0200
-Message-Id: <20190628115349.60293-1-slp@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 365F7308A963;
+ Fri, 28 Jun 2019 11:20:40 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C41B66013A;
+ Fri, 28 Jun 2019 11:20:36 +0000 (UTC)
+Date: Fri, 28 Jun 2019 13:20:32 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Tao Xu <tao3.xu@intel.com>
+Message-ID: <20190628132032.49c3ddb8@redhat.com>
+In-Reply-To: <20190614155626.27932-5-tao3.xu@intel.com>
+References: <20190614155626.27932-1-tao3.xu@intel.com>
+ <20190614155626.27932-5-tao3.xu@intel.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Fri, 28 Jun 2019 11:54:11 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.41]); Fri, 28 Jun 2019 11:20:40 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 0/4] Introduce the microvm machine type
+Subject: Re: [Qemu-devel] [PATCH v5 4/8] numa: move numa global variable
+ numa_info into MachineState
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,106 +69,283 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Sergio Lopez <slp@redhat.com>
+Cc: jingqi.liu@intel.com, fan.du@intel.com, ehabkost@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Microvm is a machine type inspired by both NEMU and Firecracker, and
-constructed after the machine model implemented by the latter.
+On Fri, 14 Jun 2019 23:56:22 +0800
+Tao Xu <tao3.xu@intel.com> wrote:
 
-It's main purpose is providing users a KVM-only machine type with fast
-boot times, minimal attack surface (measured as the number of IO ports
-and MMIO regions exposed to the Guest) and small footprint (specially
-when combined with the ongoing QEMU modularization effort).
+> Move existing numa global numa_info (renamed as "nodes") into NumaState.
+> 
+> Reviewed-by: Liu Jingqi <jingqi.liu@intel.com>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> ---
+> 
+> Changes in v5 -> v4:
+>     - Directly use ms->numa_state->nodes and not dereferencing
+>     ms->numa_state in the first place when ms->numa_state is possible
+>     NULL (Igor)
 
-Normally, other than the device support provided by KVM itself,
-microvm only supports virtio-mmio devices. Microvm also includes a
-legacy mode, which adds an ISA bus with a 16550A serial port, useful
-for being able to see the early boot kernel messages.
+the sa,e like in previous patch,
+use ms->numa_state->nodes directly whenever possible without using
+intermediate local variable
 
-This is the list of the exposed IO ports and MMIO regions when running
-in non-legacy mode:
+> ---
+>  exec.c                   |  2 +-
+>  hw/acpi/aml-build.c      |  6 ++++--
+>  hw/arm/boot.c            |  2 +-
+>  hw/arm/virt-acpi-build.c |  7 ++++---
+>  hw/arm/virt.c            |  1 +
+>  hw/i386/pc.c             |  4 ++--
+>  hw/ppc/spapr.c           |  4 +++-
+>  hw/ppc/spapr_pci.c       |  1 +
+>  include/sysemu/numa.h    |  3 +++
+>  numa.c                   | 15 +++++++++------
+>  10 files changed, 29 insertions(+), 16 deletions(-)
+> 
+> diff --git a/exec.c b/exec.c
+> index c7eb4af42d..0e30926588 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1763,7 +1763,7 @@ long qemu_minrampagesize(void)
+>      if (hpsize > mainrampagesize &&
+>          (ms->numa_state == NULL ||
+>           ms->numa_state->num_nodes == 0 ||
+> -         numa_info[0].node_memdev == NULL)) {
+> +         ms->numa_state->nodes[0].node_memdev == NULL)) {
+>          static bool warned;
+>          if (!warned) {
+>              error_report("Huge page support disabled (n/a for main memory).");
+> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+> index 63c1cae8c9..26ccc1a3e2 100644
+> --- a/hw/acpi/aml-build.c
+> +++ b/hw/acpi/aml-build.c
+> @@ -1737,8 +1737,10 @@ void build_slit(GArray *table_data, BIOSLinker *linker, MachineState *ms)
+>      build_append_int_noprefix(table_data, nb_numa_nodes, 8);
+>      for (i = 0; i < nb_numa_nodes; i++) {
+>          for (j = 0; j < nb_numa_nodes; j++) {
+> -            assert(numa_info[i].distance[j]);
+> -            build_append_int_noprefix(table_data, numa_info[i].distance[j], 1);
+> +            assert(ms->numa_state->nodes[i].distance[j]);
+> +            build_append_int_noprefix(table_data,
+> +                                      ms->numa_state->nodes[i].distance[j],
+> +                                      1);
+>          }
+>      }
+>  
+> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+> index 2af881e0f4..0c1572d118 100644
+> --- a/hw/arm/boot.c
+> +++ b/hw/arm/boot.c
+> @@ -600,7 +600,7 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+>      if (ms->numa_state != NULL && ms->numa_state->num_nodes > 0) {
+>          mem_base = binfo->loader_start;
+>          for (i = 0; i < ms->numa_state->num_nodes; i++) {
+> -            mem_len = numa_info[i].node_mem;
+> +            mem_len = ms->numa_state->nodes[i].node_mem;
+>              rc = fdt_add_memory_node(fdt, acells, mem_base,
+>                                       scells, mem_len, i);
+>              if (rc < 0) {
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 9d2edd8023..422bbed2d3 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -536,11 +536,12 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>  
+>      mem_base = vms->memmap[VIRT_MEM].base;
+>      for (i = 0; i < nb_numa_nodes; ++i) {
+> -        if (numa_info[i].node_mem > 0) {
+> +        if (ms->numa_state->nodes[i].node_mem > 0) {
+>              numamem = acpi_data_push(table_data, sizeof(*numamem));
+> -            build_srat_memory(numamem, mem_base, numa_info[i].node_mem, i,
+> +            build_srat_memory(numamem, mem_base,
+> +                              ms->numa_state->nodes[i].node_mem, i,
+>                                MEM_AFFINITY_ENABLED);
+> -            mem_base += numa_info[i].node_mem;
+> +            mem_base += ms->numa_state->nodes[i].node_mem;
+>          }
+>      }
+>  
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index d147cceab6..d3904d74dc 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -233,6 +233,7 @@ static void create_fdt(VirtMachineState *vms)
+>          int size = nb_numa_nodes * nb_numa_nodes * 3 * sizeof(uint32_t);
+>          uint32_t *matrix = g_malloc0(size);
+>          int idx, i, j;
+> +        NodeInfo *numa_info = ms->numa_state->nodes;
+>
+>          for (i = 0; i < nb_numa_nodes; i++) {
+>              for (j = 0; j < nb_numa_nodes; j++) {
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 5bab78e137..4cc84c5050 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1041,7 +1041,7 @@ static FWCfgState *bochs_bios_init(AddressSpace *as, PCMachineState *pcms)
+>      }
+>      for (i = 0; i < nb_numa_nodes; i++) {
+>          numa_fw_cfg[pcms->apic_id_limit + 1 + i] =
+> -            cpu_to_le64(numa_info[i].node_mem);
+> +            cpu_to_le64(ms->numa_state->nodes[i].node_mem);
+>      }
+>      fw_cfg_add_bytes(fw_cfg, FW_CFG_NUMA, numa_fw_cfg,
+>                       (1 + pcms->apic_id_limit + nb_numa_nodes) *
+> @@ -1683,7 +1683,7 @@ void pc_guest_info_init(PCMachineState *pcms)
+>      pcms->node_mem = g_malloc0(pcms->numa_nodes *
+>                                      sizeof *pcms->node_mem);
+>      for (i = 0; i < nb_numa_nodes; i++) {
+> -        pcms->node_mem[i] = numa_info[i].node_mem;
+> +        pcms->node_mem[i] = ms->numa_state->nodes[i].node_mem;
+>      }
+>  
+>      pcms->machine_done.notify = pc_machine_done;
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 07a02db99e..3f2e6e0f5f 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -349,6 +349,7 @@ static hwaddr spapr_node0_size(MachineState *machine)
+>      int nb_numa_nodes = machine->numa_state->num_nodes;
+>      if (nb_numa_nodes) {
+>          int i;
+> +        NodeInfo *numa_info = machine->numa_state->nodes;
+>          for (i = 0; i < nb_numa_nodes; ++i) {
+>              if (numa_info[i].node_mem) {
+>                  return MIN(pow2floor(numa_info[i].node_mem),
+> @@ -395,7 +396,7 @@ static int spapr_populate_memory(SpaprMachineState *spapr, void *fdt)
+>      MachineState *machine = MACHINE(spapr);
+>      hwaddr mem_start, node_size;
+>      int i;
+> -    NodeInfo *nodes = numa_info;
+> +    NodeInfo *nodes = machine->numa_state->nodes;
+>      NodeInfo ramnode;
+>  
+>      /* No NUMA nodes, assume there is just one node with whole RAM */
+> @@ -2521,6 +2522,7 @@ static void spapr_validate_node_memory(MachineState *machine, Error **errp)
+>  {
+>      int i;
+>      int nb_numa_nodes = machine->numa_state->num_nodes;
+> +    NodeInfo *numa_info = machine->numa_state->nodes;
+>  
+>      if (machine->ram_size % SPAPR_MEMORY_BLOCK_SIZE) {
+>          error_setg(errp, "Memory size 0x" RAM_ADDR_FMT
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index d6fd018dd4..9d4ebd60de 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -1639,6 +1639,7 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+>      SpaprPhbState *sphb = SPAPR_PCI_HOST_BRIDGE(s);
+>      PCIHostState *phb = PCI_HOST_BRIDGE(s);
+>      MachineState *ms = MACHINE(spapr);
+> +    NodeInfo *numa_info = ms->numa_state->nodes;
+>      char *namebuf;
+>      int i;
+>      PCIBus *bus;
+> diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+> index 08a86080c4..437eb21fef 100644
+> --- a/include/sysemu/numa.h
+> +++ b/include/sysemu/numa.h
+> @@ -26,6 +26,9 @@ struct NumaState {
+>  
+>      /* Allow setting NUMA distance for different NUMA nodes */
+>      bool have_numa_distance;
+> +
+> +    /* NUMA nodes information */
+> +    NodeInfo nodes[MAX_NODES];
+>  };
+>  typedef struct NumaState NumaState;
 
-address-space: memory
-    00000000d0000000-00000000d00001ff (prio 0, i/o): virtio-mmio
-    00000000d0000200-00000000d00003ff (prio 0, i/o): virtio-mmio
-    00000000d0000400-00000000d00005ff (prio 0, i/o): virtio-mmio
-    00000000d0000600-00000000d00007ff (prio 0, i/o): virtio-mmio
-    00000000d0000800-00000000d00009ff (prio 0, i/o): virtio-mmio
-    00000000d0000a00-00000000d0000bff (prio 0, i/o): virtio-mmio
-    00000000d0000c00-00000000d0000dff (prio 0, i/o): virtio-mmio
-    00000000d0000e00-00000000d0000fff (prio 0, i/o): virtio-mmio
-    00000000fee00000-00000000feefffff (prio 4096, i/o): kvm-apic-msi
+Shouldn't you remove global numa_info var from header as well? 
 
-address-space: I/O
-  0000000000000000-000000000000ffff (prio 0, i/o): io
-    0000000000000020-0000000000000021 (prio 0, i/o): kvm-pic
-    0000000000000040-0000000000000043 (prio 0, i/o): kvm-pit
-    000000000000007e-000000000000007f (prio 0, i/o): kvmvapic
-    00000000000000a0-00000000000000a1 (prio 0, i/o): kvm-pic
-    00000000000004d0-00000000000004d0 (prio 0, i/o): kvm-elcr
-    00000000000004d1-00000000000004d1 (prio 0, i/o): kvm-elcr
+> diff --git a/numa.c b/numa.c
+> index 9432d42ad0..d23e130bce 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -52,9 +52,6 @@ static int have_memdevs = -1;
+>  static int max_numa_nodeid; /* Highest specified NUMA node ID, plus one.
+>                               * For all nodes, nodeid < max_numa_nodeid
+>                               */
+> -bool have_numa_distance;
+> -NodeInfo numa_info[MAX_NODES];
+> -
+>  
+>  static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+>                              Error **errp)
+> @@ -63,6 +60,7 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+>      uint16_t nodenr;
+>      uint16List *cpus = NULL;
+>      MachineClass *mc = MACHINE_GET_CLASS(ms);
+> +    NodeInfo *numa_info = ms->numa_state->nodes;
+>  
+>      if (node->has_nodeid) {
+>          nodenr = node->nodeid;
+> @@ -144,6 +142,7 @@ void parse_numa_distance(MachineState *ms, NumaDistOptions *dist, Error **errp)
+>      uint16_t src = dist->src;
+>      uint16_t dst = dist->dst;
+>      uint8_t val = dist->val;
+> +    NodeInfo *numa_info = ms->numa_state->nodes;
+>  
+>      if (src >= MAX_NODES || dst >= MAX_NODES) {
+>          error_setg(errp, "Parameter '%s' expects an integer between 0 and %d",
+> @@ -203,7 +202,7 @@ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
+>              error_setg(&err, "Missing mandatory node-id property");
+>              goto end;
+>          }
+> -        if (!numa_info[object->u.cpu.node_id].present) {
+> +        if (!ms->numa_state->nodes[object->u.cpu.node_id].present) {
+>              error_setg(&err, "Invalid node-id=%" PRId64 ", NUMA node must be "
+>                  "defined with -numa node,nodeid=ID before it's used with "
+>                  "-numa cpu,node-id=ID", object->u.cpu.node_id);
+> @@ -263,6 +262,7 @@ static void validate_numa_distance(MachineState *ms)
+>      int src, dst;
+>      bool is_asymmetrical = false;
+>      int nb_numa_nodes = ms->numa_state->num_nodes;
+> +    NodeInfo *numa_info = ms->numa_state->nodes;
+>  
+>      for (src = 0; src < nb_numa_nodes; src++) {
+>          for (dst = src; dst < nb_numa_nodes; dst++) {
+> @@ -304,6 +304,7 @@ static void complete_init_numa_distance(MachineState *ms)
+>  {
+>      int src, dst;
+>      int nb_numa_nodes = ms->numa_state->num_nodes;
+> +    NodeInfo *numa_info = ms->numa_state->nodes;
+>  
+>      /* Fixup NUMA distance by symmetric policy because if it is an
+>       * asymmetric distance table, it should be a complete table and
+> @@ -363,6 +364,7 @@ void numa_complete_configuration(MachineState *ms)
+>  {
+>      int i;
+>      MachineClass *mc = MACHINE_GET_CLASS(ms);
+> +    NodeInfo *numa_info = ms->numa_state->nodes;
+>  
+>      /*
+>       * If memory hotplug is enabled (slots > 0) but without '-numa'
+> @@ -534,8 +536,8 @@ void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
+>  
+>      memory_region_init(mr, owner, name, ram_size);
+>      for (i = 0; i < ms->numa_state->num_nodes; i++) {
+> -        uint64_t size = numa_info[i].node_mem;
+> -        HostMemoryBackend *backend = numa_info[i].node_memdev;
+> +        uint64_t size = ms->numa_state->nodes[i].node_mem;
+> +        HostMemoryBackend *backend = ms->numa_state->nodes[i].node_memdev;
+>          if (!backend) {
+>              continue;
+>          }
+> @@ -594,6 +596,7 @@ static void numa_stat_memory_devices(NumaNodeMem node_mem[])
+>  void query_numa_node_mem(NumaNodeMem node_mem[], MachineState *ms)
+>  {
+>      int i;
+> +    NodeInfo *numa_info = ms->numa_state->nodes;
+well, look line below where you care about NULL check and suddenly
+you don't care about it being NULL right above that check.
 
-A QEMU instance with the microvm machine type can be invoked this way:
+>  
+>      if (ms->numa_state == NULL || ms->numa_state->num_nodes <= 0) {
+>          return;
 
- - Normal mode:
-
-qemu-system-x86_64 -M microvm -m 512m -smp 2 \
- -kernel vmlinux -append "console=3Dhvc0 root=3D/dev/vda" \
- -nodefaults -no-user-config \
- -chardev pty,id=3Dvirtiocon0,server \
- -device virtio-serial-device \
- -device virtconsole,chardev=3Dvirtiocon0 \
- -drive id=3Dtest,file=3Dtest.img,format=3Draw,if=3Dnone \
- -device virtio-blk-device,drive=3Dtest \
- -netdev tap,id=3Dtap0,script=3Dno,downscript=3Dno \
- -device virtio-net-device,netdev=3Dtap0
-
- - Legacy mode:
-
-qemu-system-x86_64 -M microvm,legacy -m 512m -smp 2 \
- -kernel vmlinux -append "console=3DttyS0 root=3D/dev/vda" \
- -nodefaults -no-user-config \
- -drive id=3Dtest,file=3Dtest.img,format=3Draw,if=3Dnone \
- -device virtio-blk-device,drive=3Dtest \
- -netdev tap,id=3Dtap0,script=3Dno,downscript=3Dno \
- -device virtio-net-device,netdev=3Dtap0 \
- -serial stdio
-
-
-Sergio Lopez (4):
-  hw/i386: Factorize CPU routine
-  hw/virtio: Factorize virtio-mmio headers
-  hw/i386: Add an Intel MPTable generator
-  hw/i386: Introduce the microvm machine type
-
- default-configs/i386-softmmu.mak            |   1 +
- hw/i386/Kconfig                             |   4 +
- hw/i386/Makefile.objs                       |   2 +
- hw/i386/cpu.c                               | 174 +++++++
- hw/i386/microvm.c                           | 518 ++++++++++++++++++++
- hw/i386/mptable.c                           | 157 ++++++
- hw/i386/pc.c                                | 151 +-----
- hw/i386/pc_piix.c                           |   3 +-
- hw/i386/pc_q35.c                            |   3 +-
- hw/virtio/virtio-mmio.c                     |  35 +-
- hw/virtio/virtio-mmio.h                     |  60 +++
- include/hw/i386/apic.h                      |   1 +
- include/hw/i386/cpu-internal.h              |  32 ++
- include/hw/i386/microvm.h                   |  85 ++++
- include/hw/i386/mptable.h                   |  37 ++
- include/standard-headers/linux/mpspec_def.h | 182 +++++++
- 16 files changed, 1264 insertions(+), 181 deletions(-)
- create mode 100644 hw/i386/cpu.c
- create mode 100644 hw/i386/microvm.c
- create mode 100644 hw/i386/mptable.c
- create mode 100644 hw/virtio/virtio-mmio.h
- create mode 100644 include/hw/i386/cpu-internal.h
- create mode 100644 include/hw/i386/microvm.h
- create mode 100644 include/hw/i386/mptable.h
- create mode 100644 include/standard-headers/linux/mpspec_def.h
-
---
-2.21.0
 
