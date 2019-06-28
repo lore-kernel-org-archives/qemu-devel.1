@@ -2,80 +2,62 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 755A7C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 18:29:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 153A1C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 18:36:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A23620828
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 18:29:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kX25EMlD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A23620828
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id E8C4020828
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 18:36:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8C4020828
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgvcq-0007RA-I1
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 14:29:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36203)
+	id 1hgvjj-0002UQ-N3
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 14:36:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37361)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alistair23@gmail.com>) id 1hgvZv-0005oq-Ix
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:26:33 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hgvgs-0000nv-0r
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:33:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1hgvZt-0007i8-IZ
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:26:31 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:44368)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1hgvZm-0007ct-S8; Fri, 28 Jun 2019 14:26:23 -0400
-Received: by mail-lj1-x242.google.com with SMTP id k18so6883306ljc.11;
- Fri, 28 Jun 2019 11:26:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=uD2MQOPp4yIo0Q7aUKtJd7ZiJNAt2RAb/dO8AfPehd8=;
- b=kX25EMlDg3vy/Uyfxu0LzEh0MjWxTP1UGNPe54vZmf2aElYQoiNAUFf+AHKqCac23E
- OYhtDu063jI2ug2+k0xH7wRjulPrIFe0Xo9DZZhryLG5ceby4I27GNk23O9sY9tGDF6H
- NrvEZQ493jaltuj2uFRdmtaTnXKjZZrMSR4KKwM7cY0XCuEzkpOZpMh7aD/jS9xLwpTL
- Q8YH+tz3WpsAHJhBn7Ozun7w3AuQ7CFojvO4pWPeY8hDVHasxVEOJpES27JyzktbipOJ
- nNPXbNANfTA4pBW3lKIiyCQkwtIaA2QlTf4KnPuxp+lAFbnfx0M7nW92f2nSZFmg+7VR
- 4Gmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=uD2MQOPp4yIo0Q7aUKtJd7ZiJNAt2RAb/dO8AfPehd8=;
- b=Fqiuw7TOEmGIjxHWXe9BAeaT+0mPtXMaRlFZqKtV2/MhIVeYMq3ZxFUR4qRm7cgsp+
- cD4D0DCR4pW489YW6e5fFMY2fRFtHu7Ynxo/+Rnq8+u+FFrRKgthj79V3MJj9OGlMBqh
- AmBI+UP5rUVyz1NGbpR3UB5YOcBBaiPZVTxK9Vb/Es2spHV2xprnsaMHi2QItXfFJ7H9
- ZRbsZgJIL8u+GYD6eji+fpYAkrFaHYRixQ73nBxYmPqSxTSdrmdOBGpv5Nh9K5/hob5T
- lDAHYe9r1ow71HNpHSa9ltje0RDcWS8nrLwxXWP+967wuiNI1YHOzQqCCs/wGkbkostx
- SgNw==
-X-Gm-Message-State: APjAAAVg0/hOBHqjDr0H5L2jrwYAL9WAyxRkQ60+rB5wDhxY3QaxjuuB
- ETMA1dPs5IUIMS3nLeusMWqq8ZFr7J8vJnb4SfE=
-X-Google-Smtp-Source: APXvYqxC7nzFm3U8Ay70Vc0zdy1Z4rUqweoClfCAFF/7ciKmtzTWsE76RsjiKUrgyuhK6UWubZmhW+EJJ8d7dZwhaPQ=
-X-Received: by 2002:a2e:86cc:: with SMTP id n12mr6947159ljj.146.1561746380790; 
- Fri, 28 Jun 2019 11:26:20 -0700 (PDT)
+ (envelope-from <ehabkost@redhat.com>) id 1hgvgp-0005ZV-Ja
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:33:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35814)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>)
+ id 1hgvgp-0005X2-7o; Fri, 28 Jun 2019 14:33:39 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6CEA83007E6A;
+ Fri, 28 Jun 2019 18:33:28 +0000 (UTC)
+Received: from localhost (ovpn-116-7.gru2.redhat.com [10.97.116.7])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9441760920;
+ Fri, 28 Jun 2019 18:33:23 +0000 (UTC)
+Date: Fri, 28 Jun 2019 15:33:21 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Like Xu <like.xu@linux.intel.com>
+Message-ID: <20190628183321.GE1862@habkost.net>
+References: <20190518205428.90532-1-like.xu@linux.intel.com>
+ <20190518205428.90532-7-like.xu@linux.intel.com>
 MIME-Version: 1.0
-References: <CAKmqyKMAGJFgJV1Y9W+ne_=jipqGMtZMKRHJmN5qpNVZrKUTeg@mail.gmail.com>
- <mhng-89e59e27-71b5-4452-93af-a889983f711c@palmer-si-x1e>
-In-Reply-To: <mhng-89e59e27-71b5-4452-93af-a889983f711c@palmer-si-x1e>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 28 Jun 2019 11:23:20 -0700
-Message-ID: <CAKmqyKNiZheaqC5UHkOMY+s54vgR8ho1gequAM4Sts3=25DzkA@mail.gmail.com>
-To: Palmer Dabbelt <palmer@sifive.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::242
-Subject: Re: [Qemu-devel] [PATCH for 4.1 v3] target/riscv: Expose time CSRs
- when allowed by [m|s]counteren
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190518205428.90532-7-like.xu@linux.intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Fri, 28 Jun 2019 18:33:28 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH] fixup! hw/s390x: Replace global smp variables
+ with machine smp properties
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,83 +69,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Jonathan Behrens <fintelia@gmail.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>, Bin Meng <bmeng.cn@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ David Hildenbrand <david@redhat.com>, qemu-trivial@nongnu.org,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Alistair Francis <alistair23@gmail.com>, Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 27, 2019 at 11:12 PM Palmer Dabbelt <palmer@sifive.com> wrote:
->
-> On Thu, 27 Jun 2019 12:56:57 PDT (-0700), alistair23@gmail.com wrote:
-> > On Wed, Jun 26, 2019 at 1:25 AM Palmer Dabbelt <palmer@sifive.com> wrote:
-> >>
-> >> On Tue, 25 Jun 2019 23:58:34 PDT (-0700), bmeng.cn@gmail.com wrote:
-> >> > On Wed, Jun 26, 2019 at 4:23 AM Jonathan Behrens <fintelia@gmail.com> wrote:
-> >> >>
-> >> >> I just did some testing on a HiFive Unleashed board and can confirm what
-> >> >> you are saying. The low 5 bits of both mcounteren and scounteren are
-> >> >> writable (if you try to write 0xFFFFFFFF to them, they'll take on the value
-> >> >> 0x1F) but even with the TM bit set in both mcounteren and scounteren the
-> >> >> rdtime instruction always generates an illegal instruction exception.
-> >> >>
-> >> >
-> >> > Then I would think the FU540 is not spec complaint :)
-> >>
-> >> Ya, it's an errata.  There's a handful of them :)
-> >>
-> >> >> Reading through the relevant chapter of the spec, I still think that having
-> >> >> mcounteren.TM be writable but making rdtime unconditionally trap is
-> >> >> non-conformant. If other people feel strongly that rdtime should always
-> >> >
-> >> > Agree. To test hardware (FU540) compatibility in QEMU, maybe we can
-> >> > add a cpu property to allow hard-wiring mcounteren.TM to zero?
-> >>
-> >> In theory we should have properties to control the behavior of all WARL fields,
-> >> but it's a lot of work.  I'd be happy to take a patch for any of them.
-> >
-> > Hmmm... We should avoid taking patches that don't adhere to the spec
-> > just to match some hardware. In the case that core/popular software
-> > doesn't work it probably makes sense, but in general it's probably not
-> > the best move.
->
-> WARL is Write Any Read Legal.  Essentially it means that the hardware gets to
-> decide what sort of behavior that field has, and is the mechanism for optional
-> features in the ISA.  In this case it'd be entirely within spec, specifically:
->
->     Registers mcounteren and scounteren are WARL registers that must be
->     implemented if U-mode and S-mode are implemented. Any of the bits may
->     contain a hardwired value of zero, indicating reads to the corresponding
->     counter will cause an illegal instruction exception when executing in a
->     less-privileged mode.
->
-> Taking a patch that matches the out-of-spec FU540 behavior doesn't make any
-> sense, I don't want to implement errata in QEMU :)
+On Sun, May 19, 2019 at 04:54:24AM +0800, Like Xu wrote:
+> The global smp variables in s390x are replaced with smp machine properties.
+> 
+> A local variable of the same name would be introduced in the declaration
+> phase if it's used widely in the context OR replace it on the spot if it's
+> only used once. No semantic changes.
+> 
+> Signed-off-by: Like Xu <like.xu@linux.intel.com>
 
-Ah, I misread your email. That is fine then :)
+I'm applying the following fixup to address s390x build failures
+on machine-next.
 
-Alistair
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ target/s390x/kvm.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
->
-> >
-> > Alistair
-> >
-> >>
-> >> >> require trapping into firmware then the natural change would be to simply
-> >> >> hardwire mcounteren.TM to zero (the value in scounteren wouldn't matter in
-> >> >> that case so it could be left writable). My own (biased) personal feeling
-> >> >> is that this full implementation makes sense at least for the `virt`
-> >> >> machine type because it represents a clear case where deviating from
-> >> >> current hardware enables a performance boost, and would not break
-> >> >> compatibility with any current software: both OpenSBI and BBL try to enable
-> >> >> hardware handling of rdtime when the platform claims to support it.
-> >> >>
-> >> >
-> >> > Regards,
-> >> > Bin
-> >>
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 0267c6c2f6..6e814c230b 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -119,8 +119,8 @@
+  * Needs to be big enough to contain max_cpus emergency signals
+  * and in addition NR_LOCAL_IRQS interrupts
+  */
+-#define VCPU_IRQ_BUF_SIZE (sizeof(struct kvm_s390_irq) * \
+-                           (max_cpus + NR_LOCAL_IRQS))
++#define VCPU_IRQ_BUF_SIZE(max_cpus) (sizeof(struct kvm_s390_irq) * \
++                                     (max_cpus + NR_LOCAL_IRQS))
+ 
+ static CPUWatchpoint hw_watchpoint;
+ /*
+@@ -362,9 +362,10 @@ unsigned long kvm_arch_vcpu_id(CPUState *cpu)
+ 
+ int kvm_arch_init_vcpu(CPUState *cs)
+ {
++    unsigned int max_cpus = MACHINE(qdev_get_machine())->smp.max_cpus;
+     S390CPU *cpu = S390_CPU(cs);
+     kvm_s390_set_cpu_state(cpu, cpu->env.cpu_state);
+-    cpu->irqstate = g_malloc0(VCPU_IRQ_BUF_SIZE);
++    cpu->irqstate = g_malloc0(VCPU_IRQ_BUF_SIZE(max_cpus));
+     return 0;
+ }
+ 
+@@ -1950,9 +1951,10 @@ int kvm_s390_set_cpu_state(S390CPU *cpu, uint8_t cpu_state)
+ 
+ void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu)
+ {
++    unsigned int max_cpus = MACHINE(qdev_get_machine())->smp.max_cpus;
+     struct kvm_s390_irq_state irq_state = {
+         .buf = (uint64_t) cpu->irqstate,
+-        .len = VCPU_IRQ_BUF_SIZE,
++        .len = VCPU_IRQ_BUF_SIZE(max_cpus),
+     };
+     CPUState *cs = CPU(cpu);
+     int32_t bytes;
+-- 
+2.18.0.rc1.1.g3f1ff2140
+
+-- 
+Eduardo
 
