@@ -2,83 +2,67 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C4E0C4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 23:20:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BBC6C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 23:21:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3357208CB
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 23:20:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IE1R1h4o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3357208CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 062F7208CB
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 23:21:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 062F7208CB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hh0Ag-0007PX-3m
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 19:20:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50801)
+	id 1hh0Ba-0008QS-Bq
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 19:21:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51417)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alistair23@gmail.com>) id 1hh074-0004Nw-VM
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 19:17:04 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hh0AP-0007Hw-Bx
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 19:20:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1hh072-0003jg-Dg
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 19:17:02 -0400
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:39147)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1hh072-0003hA-3l; Fri, 28 Jun 2019 19:17:00 -0400
-Received: by mail-lf1-x144.google.com with SMTP id p24so4984282lfo.6;
- Fri, 28 Jun 2019 16:16:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=JpK8Lwt8b8p9UFL6KUVXrJWkSJM2HNjtFLirM0QdfV4=;
- b=IE1R1h4ol6xl3o0MBXm4vhc1RwrqHqQCVpSGM1RiJwDhAkNd5ZrHyA98qkHG3ylo6y
- 3GHF5F+/QBVDOUNFmEdVebZtz+xoTxugo9gsInGuzbRzFplq406AtTuRXzAltE8M4VYu
- nngVq0AEjUZnFTnn8ZAgbZMfgnwsHFExc57/5oYhhmFf0DtUZUVWZQeOuyu1Mp521gpe
- 8v2l3H8svNJ15yF9LOQ1aszx4CHjeUCzp9EjgDcAuNiZSN54swENoXZ6FhPJRSKj+3TH
- 5DUeghvLYRoTqFNXSmSRaAZoTTBHbiqg/7pfQwHOT/YwSZr8ReZvderK7QOha/TuH+nK
- 4++A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=JpK8Lwt8b8p9UFL6KUVXrJWkSJM2HNjtFLirM0QdfV4=;
- b=g15ctS18RnvDxrict+dkBO+p0W4J+SLJFdbvCjeOdlnL9w7Wpqujiy1CnEmTLXG/Cu
- /IRrArHK7EwkbB5G3udhxS06Fk01a5rVHZyUf8gglOHzfU42sF69dIs6143ql7FjB3Ie
- YRtE4O6AWBzU0PXtl9879488Cd/wLtehjmd06nTphRfjinUzvwosrePgde98c+NuBsu9
- lqA2wQLMYivPZN7CVelsdFHnI3LFchUsVvJnOzWqvjKmtMM5OFnjHdrIpF+PRgyr3z/9
- FwFN3nBIyntWLS5t8ZyJYAZnZKxVhIG0ktgF5X2I8zkTz+cFW86iCal5fqlSKXeRSdyk
- Tt4w==
-X-Gm-Message-State: APjAAAVhotf5v3KrQy4o+rOi5QjN3arcorHR0/HkvhRDUy/oEt7RWLU2
- 1q3uT2JJGQM3apN65LoAph//FplEbUKOq59Fwv4=
-X-Google-Smtp-Source: APXvYqxAhIKzzT8/TuPuBmOTKuIQj93pneUu/kxL6iTqlogSyIH2AY5iITRYzSltnjfz6RaOtj3fnfZt5WujXw8fZys=
-X-Received: by 2002:a19:710b:: with SMTP id m11mr6288717lfc.135.1561763817934; 
- Fri, 28 Jun 2019 16:16:57 -0700 (PDT)
+ (envelope-from <no-reply@patchew.org>) id 1hh0AN-0007nE-V2
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 19:20:29 -0400
+Resent-Date: Fri, 28 Jun 2019 19:20:29 -0400
+Resent-Message-Id: <E1hh0AN-0007nE-V2@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21485)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hh0AN-0007da-O7
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 19:20:27 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1561763068; cv=none; d=zoho.com; s=zohoarc; 
+ b=Azn7XsIrXwZaN7mdSRKi95h1TEe+QCo+S7CflvcUcOLJAbVb+iJM86l3LfYB7E9H9xuwJVphD1GjUt2n845EOyN+bxpU7VTbjwwdqUOydrPucWYPWaP3CpVth7GUqipJ4ZRQCDVK53hsrQ2EdME36XX/CXqxe1y6Ch9et9ZQgR4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1561763068;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=fgy8QMHDkmRsllaOGmCAnGRBuoUDyxi12RhgKuCwyN4=; 
+ b=YhwcvU5pUNWd++LEUw3YVzubJskqGE83kkr1nrsrRT2MGGj4ea7pnTGdb3gzYZfLrP0tO3QbqqGl0TtCy754SWaP068BIGSsl26Qc+Kt0XDyAvQhYfCxQy9G2IIyRqYTXH3zVI0B7PFi/I1Ae8/cejytvGI3zGzkZsBY0H/y2N0=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1561763054508239.17882317198814;
+ Fri, 28 Jun 2019 16:04:14 -0700 (PDT)
+Message-ID: <156176305246.16285.15387842115700265166@c4a48874b076>
+In-Reply-To: <20190628183321.GE1862@habkost.net>
 MIME-Version: 1.0
-References: <20190627202719.17739-1-philmd@redhat.com>
- <20190627202719.17739-29-philmd@redhat.com>
-In-Reply-To: <20190627202719.17739-29-philmd@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 28 Jun 2019 16:13:57 -0700
-Message-ID: <CAKmqyKNTq3Sj_Fr3rvOccU2DeuZryvJL1=HhjmVWJMGWKz7OHg@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::144
-Subject: Re: [Qemu-devel] [PATCH v5 28/28] hw/block/pflash_cfi02: Reduce I/O
- accesses to 16-bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: ehabkost@redhat.com
+Date: Fri, 28 Jun 2019 16:04:14 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH] fixup! hw/s390x: Replace global smp
+ variables with machine smp properties
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,75 +74,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Stephen Checkoway <stephen.checkoway@oberlin.edu>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Qemu-block <qemu-block@nongnu.org>, John Snow <jsnow@redhat.com>,
- Magnus Damm <magnus.damm@gmail.com>, Markus Armbruster <armbru@redhat.com>,
- Antony Pavlov <antonynpavlov@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Alistair Francis <alistair@alistair23.me>,
- qemu-arm <qemu-arm@nongnu.org>, Jan Kiszka <jan.kiszka@web.de>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Michael Walle <michael@walle.cc>,
- "open list:New World" <qemu-ppc@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, like.xu@linux.intel.com, david@redhat.com,
+ qemu-trivial@nongnu.org, cohuck@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ qemu-s390x@nongnu.org, imammedo@redhat.com, alistair23@gmail.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 27, 2019 at 1:55 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> Parallel NOR flashes are limited to 16-bit bus accesses.
-> Remove the 32-bit dead code.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYyODE4MzMyMS5HRTE4
+NjJAaGFia29zdC5uZXQvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIGJ1aWxkIHRlc3Qgb24g
+czM5MHggaG9zdC4gUGxlYXNlIGZpbmQgdGhlIGRldGFpbHMgYmVsb3cuCgo9PT0gVEVTVCBTQ1JJ
+UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCiMgVGVzdGluZyBzY3JpcHQgd2lsbCBiZSBpbnZva2Vk
+IHVuZGVyIHRoZSBnaXQgY2hlY2tvdXQgd2l0aAojIEhFQUQgcG9pbnRpbmcgdG8gYSBjb21taXQg
+dGhhdCBoYXMgdGhlIHBhdGNoZXMgYXBwbGllZCBvbiB0b3Agb2YgImJhc2UiCiMgYnJhbmNoCnNl
+dCAtZQoKZWNobwplY2hvICI9PT0gRU5WID09PSIKZW52CgplY2hvCmVjaG8gIj09PSBQQUNLQUdF
+UyA9PT0iCnJwbSAtcWEKCmVjaG8KZWNobyAiPT09IFVOQU1FID09PSIKdW5hbWUgLWEKCkNDPSRI
+T01FL2Jpbi9jYwpJTlNUQUxMPSRQV0QvaW5zdGFsbApCVUlMRD0kUFdEL2J1aWxkCm1rZGlyIC1w
+ICRCVUlMRCAkSU5TVEFMTApTUkM9JFBXRApjZCAkQlVJTEQKJFNSQy9jb25maWd1cmUgLS1jYz0k
+Q0MgLS1wcmVmaXg9JElOU1RBTEwKbWFrZSAtajQKIyBYWFg6IHdlIG5lZWQgcmVsaWFibGUgY2xl
+YW4gdXAKIyBtYWtlIGNoZWNrIC1qNCBWPTEKbWFrZSBpbnN0YWxsCj09PSBURVNUIFNDUklQVCBF
+TkQgPT09CgogIENDICAgICAgczM5MHgtc29mdG1tdS90YXJnZXQvczM5MHgvc2lncC5vCiAgQ0Mg
+ICAgICBzMzkweC1zb2Z0bW11L3RhcmdldC9zMzkweC9rdm0ubwovdmFyL3RtcC9wYXRjaGV3LXRl
+c3Rlci10bXAtM2RlM2Jvd2Ivc3JjL3RhcmdldC9zMzkweC9rdm0uYzogSW4gZnVuY3Rpb24g4oCY
+a3ZtX2FyY2hfaW5pdF92Y3B14oCZOgovdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtM2RlM2Jv
+d2Ivc3JjL3RhcmdldC9zMzkweC9rdm0uYzozNjU6NTY6IGVycm9yOiDigJhNYWNoaW5lU3RhdGXi
+gJkge2FrYSDigJhzdHJ1Y3QgTWFjaGluZVN0YXRl4oCZfSBoYXMgbm8gbWVtYmVyIG5hbWVkIOKA
+mHNtcOKAmQogIDM2NSB8ICAgICB1bnNpZ25lZCBpbnQgbWF4X2NwdXMgPSBNQUNISU5FKHFkZXZf
+Z2V0X21hY2hpbmUoKSktPnNtcC5tYXhfY3B1czsKICAgICAgfCAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn4KL3Zhci90bXAvcGF0Y2hldy10
+ZXN0ZXItdG1wLTNkZTNib3diL3NyYy90YXJnZXQvczM5MHgva3ZtLmM6IEluIGZ1bmN0aW9uIOKA
+mGt2bV9zMzkwX3ZjcHVfaW50ZXJydXB0X3ByZV9zYXZl4oCZOgovdmFyL3RtcC9wYXRjaGV3LXRl
+c3Rlci10bXAtM2RlM2Jvd2Ivc3JjL3RhcmdldC9zMzkweC9rdm0uYzoxOTU0OjU2OiBlcnJvcjog
+4oCYTWFjaGluZVN0YXRl4oCZIHtha2Eg4oCYc3RydWN0IE1hY2hpbmVTdGF0ZeKAmX0gaGFzIG5v
+IG1lbWJlciBuYW1lZCDigJhzbXDigJkKIDE5NTQgfCAgICAgdW5zaWduZWQgaW50IG1heF9jcHVz
+ID0gTUFDSElORShxZGV2X2dldF9tYWNoaW5lKCkpLT5zbXAubWF4X2NwdXM7CiAgICAgIHwgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+Cm1h
+a2VbMV06ICoqKiBbL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTNkZTNib3diL3NyYy9ydWxl
+cy5tYWs6Njk6IHRhcmdldC9zMzkweC9rdm0ub10gRXJyb3IgMQoKClRoZSBmdWxsIGxvZyBpcyBh
+dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA2MjgxODMzMjEuR0UxODYy
+QGhhYmtvc3QubmV0L3Rlc3RpbmcuczM5MHgvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVy
+YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxl
+YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-
-Alistair
-
-> ---
->  hw/block/pflash_cfi02.c | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
->
-> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-> index db9dc7d8fb..d1f28b02b9 100644
-> --- a/hw/block/pflash_cfi02.c
-> +++ b/hw/block/pflash_cfi02.c
-> @@ -317,8 +317,6 @@ static uint64_t pflash_read(void *opaque, hwaddr offs=
-et, unsigned int width)
->      boff =3D offset & 0xFF;
->      if (pfl->width =3D=3D 2) {
->          boff =3D boff >> 1;
-> -    } else if (pfl->width =3D=3D 4) {
-> -        boff =3D boff >> 2;
->      }
->      switch (pfl->cmd) {
->      default:
-> @@ -449,8 +447,6 @@ static void pflash_write(void *opaque, hwaddr offset,=
- uint64_t value,
->      boff =3D offset;
->      if (pfl->width =3D=3D 2) {
->          boff =3D boff >> 1;
-> -    } else if (pfl->width =3D=3D 4) {
-> -        boff =3D boff >> 2;
->      }
->      /* Only the least-significant 11 bits are used in most cases. */
->      boff &=3D 0x7FF;
-> @@ -710,6 +706,7 @@ static void pflash_write(void *opaque, hwaddr offset,=
- uint64_t value,
->  static const MemoryRegionOps pflash_cfi02_ops =3D {
->      .read =3D pflash_read,
->      .write =3D pflash_write,
-> +    .impl.max_access_size =3D 2,
->      .valid.min_access_size =3D 1,
->      .valid.max_access_size =3D 4,
->      .endianness =3D DEVICE_NATIVE_ENDIAN,
-> --
-> 2.20.1
->
->
 
