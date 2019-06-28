@@ -2,59 +2,59 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84345C5B576
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 02:02:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3A6BC4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 02:04:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D8A12064A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 02:02:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D8A12064A
+	by mail.kernel.org (Postfix) with ESMTPS id 997412064A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 02:04:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 997412064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hggDq-0006nW-J7
-	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 22:02:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49757)
+	id 1hggFT-0000IV-D9
+	for qemu-devel@archiver.kernel.org; Thu, 27 Jun 2019 22:04:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50004)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hgg7l-0008Sb-Q0
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:56:27 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hgg8J-0000kR-8j
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:57:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hgg7j-0007WS-SI
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:56:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50030)
+ (envelope-from <ehabkost@redhat.com>) id 1hgg8H-0000Wv-VV
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:56:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34990)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgg7h-0007MW-RR
- for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:56:23 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgg8G-0000Nv-FJ
+ for qemu-devel@nongnu.org; Thu, 27 Jun 2019 21:56:57 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C223383F3C;
- Fri, 28 Jun 2019 01:56:19 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 04CD630820E6;
+ Fri, 28 Jun 2019 01:56:54 +0000 (UTC)
 Received: from localhost (ovpn-116-7.gru2.redhat.com [10.97.116.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4A9D519C70;
- Fri, 28 Jun 2019 01:56:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7754610013D9;
+ Fri, 28 Jun 2019 01:56:53 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Thu, 27 Jun 2019 22:55:40 -0300
-Message-Id: <20190628015606.32107-4-ehabkost@redhat.com>
+Date: Thu, 27 Jun 2019 22:55:54 -0300
+Message-Id: <20190628015606.32107-18-ehabkost@redhat.com>
 In-Reply-To: <20190628015606.32107-1-ehabkost@redhat.com>
 References: <20190628015606.32107-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Fri, 28 Jun 2019 01:56:19 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Fri, 28 Jun 2019 01:56:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 03/29] general: Replace global smp variables
- with smp machine properties
+Subject: [Qemu-devel] [PULL 17/29] numa: deprecate 'mem' parameter of '-numa
+ node' option
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,317 +66,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Like Xu <like.xu@linux.intel.com>,
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Like Xu <like.xu@linux.intel.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-Basically, the context could get the MachineState reference via call
-chains or unrecommended qdev_get_machine() in !CONFIG_USER_ONLY mode.
+The parameter allows to configure fake NUMA topology where guest
+VM simulates NUMA topology but not actually getting performance
+benefits from it. The same or better results could be achieved
+using 'memdev' parameter.
+Beside of unpredictable performance, '-numa node.mem' option has
+other issues when it's used with combination of -mem-path +
++ -mem-prealloc + memdev backends (pc-dimm), breaking binding of
+memdev backends since mem-path/mem-prealloc are global and affect
+the most of RAM allocations.
 
-A local variable of the same name would be introduced in the declaration
-phase out of less effort OR replace it on the spot if it's only used
-once in the context. No semantic changes.
+It's possible to make memdevs and global -mem-path/mem-prealloc
+to play nicely together but that will just complicate already
+complicated code and add unobious ways it could break on 2
+different memmory allocation pathes and their combinations.
 
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-Id: <20190518205428.90532-4-like.xu@linux.intel.com>
+Instead of it, consolidate all guest RAM allocation over memdev
+which still allows to create fake NUMA configurations if desired
+and leaves one simplifyed code path to consider when it comes
+to guest RAM allocation.
+
+To achieve desired simplification deprecate 'mem' parameter as its
+ad-hoc partitioning of initial RAM MemoryRegion can't be translated
+to memdev based backend transparently to users and in compatible
+manner (migration wise).
+
+Later down the road that will allow to consolidate means of how
+guest RAM is allocated and would permit us to clean up quite
+a bit memory allocations and numa code, leaving only 'memdev'
+implementation in place.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <1559205199-233510-3-git-send-email-imammedo@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- accel/kvm/kvm-all.c          |  4 ++--
- backends/hostmem.c           |  6 ++++--
- cpus.c                       |  6 ++++--
- exec.c                       |  3 ++-
- gdbstub.c                    |  4 ++++
- hw/cpu/core.c                |  4 +++-
- migration/postcopy-ram.c     |  8 +++++++-
- numa.c                       |  1 +
- target/openrisc/sys_helper.c |  6 +++++-
- tcg/tcg.c                    | 13 ++++++++++++-
- 10 files changed, 44 insertions(+), 11 deletions(-)
+ numa.c               |  2 ++
+ qemu-deprecated.texi | 16 ++++++++++++++++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index e3cf72883b..3d86ae5052 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -1542,8 +1542,8 @@ static int kvm_init(MachineState *ms)
-         const char *name;
-         int num;
-     } num_cpus[] = {
--        { "SMP",          smp_cpus },
--        { "hotpluggable", max_cpus },
-+        { "SMP",          ms->smp.cpus },
-+        { "hotpluggable", ms->smp.max_cpus },
-         { NULL, }
-     }, *nc = num_cpus;
-     int soft_vcpus_limit, hard_vcpus_limit;
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index 04baf479a1..463102aa15 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -222,6 +222,7 @@ static void host_memory_backend_set_prealloc(Object *obj, bool value,
- {
-     Error *local_err = NULL;
-     HostMemoryBackend *backend = MEMORY_BACKEND(obj);
-+    MachineState *ms = MACHINE(qdev_get_machine());
- 
-     if (backend->force_prealloc) {
-         if (value) {
-@@ -241,7 +242,7 @@ static void host_memory_backend_set_prealloc(Object *obj, bool value,
-         void *ptr = memory_region_get_ram_ptr(&backend->mr);
-         uint64_t sz = memory_region_size(&backend->mr);
- 
--        os_mem_prealloc(fd, ptr, sz, smp_cpus, &local_err);
-+        os_mem_prealloc(fd, ptr, sz, ms->smp.cpus, &local_err);
-         if (local_err) {
-             error_propagate(errp, local_err);
-             return;
-@@ -311,6 +312,7 @@ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
- {
-     HostMemoryBackend *backend = MEMORY_BACKEND(uc);
-     HostMemoryBackendClass *bc = MEMORY_BACKEND_GET_CLASS(uc);
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     Error *local_err = NULL;
-     void *ptr;
-     uint64_t sz;
-@@ -375,7 +377,7 @@ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
-          */
-         if (backend->prealloc) {
-             os_mem_prealloc(memory_region_get_fd(&backend->mr), ptr, sz,
--                            smp_cpus, &local_err);
-+                            ms->smp.cpus, &local_err);
-             if (local_err) {
-                 goto out;
-             }
-diff --git a/cpus.c b/cpus.c
-index 1af51b73dd..86b91fcd56 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -2078,8 +2078,10 @@ static void qemu_dummy_start_vcpu(CPUState *cpu)
- 
- void qemu_init_vcpu(CPUState *cpu)
- {
--    cpu->nr_cores = smp_cores;
--    cpu->nr_threads = smp_threads;
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+
-+    cpu->nr_cores = ms->smp.cores;
-+    cpu->nr_threads =  ms->smp.threads;
-     cpu->stopped = true;
-     cpu->random_seed = qemu_guest_random_seed_thread_part1();
- 
-diff --git a/exec.c b/exec.c
-index e7622d1956..50ea9c5aaa 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1874,6 +1874,7 @@ static void *file_ram_alloc(RAMBlock *block,
-                             bool truncate,
-                             Error **errp)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     void *area;
- 
-     block->page_size = qemu_fd_getpagesize(fd);
-@@ -1930,7 +1931,7 @@ static void *file_ram_alloc(RAMBlock *block,
-     }
- 
-     if (mem_prealloc) {
--        os_mem_prealloc(fd, area, memory, smp_cpus, errp);
-+        os_mem_prealloc(fd, area, memory, ms->smp.cpus, errp);
-         if (errp && *errp) {
-             qemu_ram_munmap(fd, area, memory);
-             return NULL;
-diff --git a/gdbstub.c b/gdbstub.c
-index 8618e34311..687c02e598 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -34,6 +34,7 @@
- #include "sysemu/sysemu.h"
- #include "exec/gdbstub.h"
- #include "hw/cpu/cluster.h"
-+#include "hw/boards.h"
- #endif
- 
- #define MAX_PACKET_LENGTH 4096
-@@ -1171,6 +1172,9 @@ static int gdb_handle_vcont(GDBState *s, const char *p)
-     CPU_FOREACH(cpu) {
-         max_cpus = max_cpus <= cpu->cpu_index ? cpu->cpu_index + 1 : max_cpus;
-     }
-+#else
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    unsigned int max_cpus = ms->smp.max_cpus;
- #endif
-     /* uninitialised CPUs stay 0 */
-     newstates = g_new0(char, max_cpus);
-diff --git a/hw/cpu/core.c b/hw/cpu/core.c
-index e57c73f0ce..9874c5c870 100644
---- a/hw/cpu/core.c
-+++ b/hw/cpu/core.c
-@@ -13,6 +13,7 @@
- #include "qemu/module.h"
- #include "qapi/error.h"
- #include "sysemu/cpus.h"
-+#include "hw/boards.h"
- 
- static void core_prop_get_core_id(Object *obj, Visitor *v, const char *name,
-                                   void *opaque, Error **errp)
-@@ -71,13 +72,14 @@ static void core_prop_set_nr_threads(Object *obj, Visitor *v, const char *name,
- 
- static void cpu_core_instance_init(Object *obj)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     CPUCore *core = CPU_CORE(obj);
- 
-     object_property_add(obj, "core-id", "int", core_prop_get_core_id,
-                         core_prop_set_core_id, NULL, NULL, NULL);
-     object_property_add(obj, "nr-threads", "int", core_prop_get_nr_threads,
-                         core_prop_set_nr_threads, NULL, NULL, NULL);
--    core->nr_threads = smp_threads;
-+    core->nr_threads = ms->smp.threads;
- }
- 
- static void cpu_core_class_init(ObjectClass *oc, void *data)
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index e2aa57a701..9faacacc9e 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -29,6 +29,7 @@
- #include "sysemu/balloon.h"
- #include "qemu/error-report.h"
- #include "trace.h"
-+#include "hw/boards.h"
- 
- /* Arbitrary limit on size of each discard command,
-  * keeps them around ~200 bytes
-@@ -128,6 +129,8 @@ static void migration_exit_cb(Notifier *n, void *data)
- 
- static struct PostcopyBlocktimeContext *blocktime_context_new(void)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    unsigned int smp_cpus = ms->smp.cpus;
-     PostcopyBlocktimeContext *ctx = g_new0(PostcopyBlocktimeContext, 1);
-     ctx->page_fault_vcpu_time = g_new0(uint32_t, smp_cpus);
-     ctx->vcpu_addr = g_new0(uintptr_t, smp_cpus);
-@@ -141,10 +144,11 @@ static struct PostcopyBlocktimeContext *blocktime_context_new(void)
- 
- static uint32List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     uint32List *list = NULL, *entry = NULL;
-     int i;
- 
--    for (i = smp_cpus - 1; i >= 0; i--) {
-+    for (i = ms->smp.cpus - 1; i >= 0; i--) {
-         entry = g_new0(uint32List, 1);
-         entry->value = ctx->vcpu_blocktime[i];
-         entry->next = list;
-@@ -807,6 +811,8 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
- {
-     MigrationIncomingState *mis = migration_incoming_get_current();
-     PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    unsigned int smp_cpus = ms->smp.cpus;
-     int i, affected_cpu = 0;
-     bool vcpu_total_blocktime = false;
-     uint32_t read_vcpu_time, low_time_offset;
 diff --git a/numa.c b/numa.c
-index 955ec0c830..7594eb5a7e 100644
+index 7594eb5a7e..7d449c7e95 100644
 --- a/numa.c
 +++ b/numa.c
-@@ -64,6 +64,7 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
-     uint16_t nodenr;
-     uint16List *cpus = NULL;
-     MachineClass *mc = MACHINE_GET_CLASS(ms);
-+    unsigned int max_cpus = ms->smp.max_cpus;
+@@ -122,6 +122,8 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
  
-     if (node->has_nodeid) {
-         nodenr = node->nodeid;
-diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
-index 8f11cb8202..1053409a04 100644
---- a/target/openrisc/sys_helper.c
-+++ b/target/openrisc/sys_helper.c
-@@ -24,6 +24,9 @@
- #include "exec/helper-proto.h"
- #include "exception.h"
- #include "sysemu/sysemu.h"
-+#ifndef CONFIG_USER_ONLY
-+#include "hw/boards.h"
-+#endif
- 
- #define TO_SPR(group, number) (((group) << 11) + (number))
- 
-@@ -194,6 +197,7 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env, target_ulong rd,
-                            target_ulong spr)
- {
- #ifndef CONFIG_USER_ONLY
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     OpenRISCCPU *cpu = env_archcpu(env);
-     CPUState *cs = env_cpu(env);
-     int idx;
-@@ -241,7 +245,7 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env, target_ulong rd,
-         return cpu->parent_obj.cpu_index;
- 
-     case TO_SPR(0, 129): /* NUMCORES */
--        return max_cpus;
-+        return ms->smp.max_cpus;
- 
-     case TO_SPR(0, 1024) ... TO_SPR(0, 1024 + (16 * 32)): /* Shadow GPRs */
-         idx = (spr - 1024);
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 02a2680169..be2c33c400 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -45,6 +45,10 @@
- #include "exec/cpu-common.h"
- #include "exec/exec-all.h"
- 
-+#if !defined(CONFIG_USER_ONLY)
-+#include "hw/boards.h"
-+#endif
-+
- #include "tcg-op.h"
- 
- #if UINTPTR_MAX == UINT32_MAX
-@@ -620,6 +624,10 @@ static size_t tcg_n_regions(void)
-     size_t i;
- 
-     /* Use a single region if all we have is one vCPU thread */
-+#if !defined(CONFIG_USER_ONLY)
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    unsigned int max_cpus = ms->smp.max_cpus;
-+#endif
-     if (max_cpus == 1 || !qemu_tcg_mttcg_enabled()) {
-         return 1;
+     if (node->has_mem) {
+         numa_info[nodenr].node_mem = node->mem;
++        warn_report("Parameter -numa node,mem is deprecated,"
++                    " use -numa node,memdev instead");
      }
-@@ -752,6 +760,7 @@ void tcg_register_thread(void)
- #else
- void tcg_register_thread(void)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     TCGContext *s = g_malloc(sizeof(*s));
-     unsigned int i, n;
-     bool err;
-@@ -769,7 +778,7 @@ void tcg_register_thread(void)
+     if (node->has_memdev) {
+         Object *o;
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index df04f2840b..44c9a95966 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -88,6 +88,22 @@ The @code{-realtime mlock=on|off} argument has been replaced by the
+ The ``-virtfs_synth'' argument is now deprecated. Please use ``-fsdev synth''
+ and ``-device virtio-9p-...'' instead.
  
-     /* Claim an entry in tcg_ctxs */
-     n = atomic_fetch_inc(&n_tcg_ctxs);
--    g_assert(n < max_cpus);
-+    g_assert(n < ms->smp.max_cpus);
-     atomic_set(&tcg_ctxs[n], s);
++@subsection -numa node,mem=@var{size} (since 4.1)
++
++The parameter @option{mem} of @option{-numa node} is used to assign a part of
++guest RAM to a NUMA node. But when using it, it's impossible to manage specified
++RAM chunk on the host side (like bind it to a host node, setting bind policy, ...),
++so guest end-ups with the fake NUMA configuration with suboptiomal performance.
++However since 2014 there is an alternative way to assign RAM to a NUMA node
++using parameter @option{memdev}, which does the same as @option{mem} and adds
++means to actualy manage node RAM on the host side. Use parameter @option{memdev}
++with @var{memory-backend-ram} backend as an replacement for parameter @option{mem}
++to achieve the same fake NUMA effect or a properly configured
++@var{memory-backend-file} backend to actually benefit from NUMA configuration.
++In future new machine versions will not accept the option but it will still
++work with old machine types. User can check QAPI schema to see if the legacy
++option is supported by looking at MachineInfo::numa-mem-supported property.
++
+ @section QEMU Machine Protocol (QMP) commands
  
-     tcg_ctx = s;
-@@ -979,6 +988,8 @@ void tcg_context_init(TCGContext *s)
-     tcg_ctxs = &tcg_ctx;
-     n_tcg_ctxs = 1;
- #else
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    unsigned int max_cpus = ms->smp.max_cpus;
-     tcg_ctxs = g_new(TCGContext *, max_cpus);
- #endif
- 
+ @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
 -- 
 2.18.0.rc1.1.g3f1ff2140
 
