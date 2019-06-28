@@ -2,66 +2,63 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_SBL,URIBL_SBL_A,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D36DC4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 14:40:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 720E0C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 14:41:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 252FD2086D
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 14:40:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 252FD2086D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 48B782086D
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 14:41:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48B782086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgs3Q-0004IF-3J
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 10:40:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43781)
+	id 1hgs3h-0004ZP-Hq
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 10:41:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56153)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hgs1Z-0002sB-51
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 10:38:51 -0400
+ (envelope-from <berrange@redhat.com>) id 1hgqzZ-0007Np-1Q
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:32:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hgs1W-0005Yv-Qy
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 10:38:49 -0400
-Resent-Date: Fri, 28 Jun 2019 10:38:48 -0400
-Resent-Message-Id: <E1hgs1W-0005Yv-Qy@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21440)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hgs1V-0005XG-6r
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 10:38:46 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1561690279; cv=none; d=zoho.com; s=zohoarc; 
- b=R1pDy+AermS7qgs+NWlvfNQ02Jnz+GhvL/ysKWpvnFiVinlLrnH5y0iGhg/tXBFKcRj48x7M0Pf9HcXIga5mOyfGXDvYFheD1bfOH0wKvWj1rc8RPoBYVQxMqnTOORzFrhGBlW98C0XTTQ7LxqFI6Wgm4AEW+BZ+Bkg1ew2182Y=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1561690279;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=6UaHKpQ7r9uAgTZDcy2vO7YJN25gFqtkfnhj2H2bWv4=; 
- b=nPAa8Lhz/VUyluLzc9WFoaqCcXjbN3y+f0DYQmPpklOnMYA02sg//rV3amxvFC4r7zwBC1MK1KZxopI4tfLJ5SD6SH+wZXIk0ENfg/MTU+37JsF6HAxOeMkrVx+8wM1HilhvQ34vD69IeY18MUmhamDQ2l/wWRNqzclUEzSi9sM=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1561690187125936.8270204339346;
- Thu, 27 Jun 2019 19:49:47 -0700 (PDT)
-Message-ID: <156169018571.6332.9317225427076483475@c4a48874b076>
-In-Reply-To: <20190628015606.32107-1-ehabkost@redhat.com>
+ (envelope-from <berrange@redhat.com>) id 1hgqzX-0002Rv-Lc
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:32:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:25195)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hgqzX-0001ir-Ev
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 09:32:39 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9C57530C0DC4;
+ Fri, 28 Jun 2019 11:05:00 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.17.95])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C5ACA5D962;
+ Fri, 28 Jun 2019 11:04:59 +0000 (UTC)
+Date: Fri, 28 Jun 2019 12:04:57 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: P J P <ppandit@redhat.com>
+Message-ID: <20190628110457.GA23344@redhat.com>
+References: <20190628094901.13347-1-ppandit@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: ehabkost@redhat.com
-Date: Thu, 27 Jun 2019 19:49:47 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190628094901.13347-1-ppandit@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Fri, 28 Jun 2019 11:05:00 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [PULL 00/29] Machine next patches
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] qemu-bridge-helper: restrict bridge name
+ to IFNAMSIZ
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,37 +70,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, rth@twiddle.net, qemu-devel@nongnu.org,
- pbonzini@redhat.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Riccardo Schirone <rschiron@redhat.com>,
+ Qemu Developers <qemu-devel@nongnu.org>,
+ Prasad J Pandit <pjp@fedoraproject.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYyODAxNTYwNi4zMjEw
-Ny0xLWVoYWJrb3N0QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIGJ1aWxk
-IHRlc3Qgb24gczM5MHggaG9zdC4gUGxlYXNlIGZpbmQgdGhlIGRldGFpbHMgYmVsb3cuCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCiMgVGVzdGluZyBzY3JpcHQgd2lsbCBi
-ZSBpbnZva2VkIHVuZGVyIHRoZSBnaXQgY2hlY2tvdXQgd2l0aAojIEhFQUQgcG9pbnRpbmcgdG8g
-YSBjb21taXQgdGhhdCBoYXMgdGhlIHBhdGNoZXMgYXBwbGllZCBvbiB0b3Agb2YgImJhc2UiCiMg
-YnJhbmNoCnNldCAtZQpDQz0kSE9NRS9iaW4vY2MKSU5TVEFMTD0kUFdEL2luc3RhbGwKQlVJTEQ9
-JFBXRC9idWlsZApta2RpciAtcCAkQlVJTEQgJElOU1RBTEwKU1JDPSRQV0QKY2QgJEJVSUxECiRT
-UkMvY29uZmlndXJlIC0tY2M9JENDIC0tcHJlZml4PSRJTlNUQUxMCm1ha2UgLWo0CiMgWFhYOiB3
-ZSBuZWVkIHJlbGlhYmxlIGNsZWFuIHVwCiMgbWFrZSBjaGVjayAtajQgVj0xCm1ha2UgaW5zdGFs
-bAoKZWNobwplY2hvICI9PT0gRU5WID09PSIKZW52CgplY2hvCmVjaG8gIj09PSBQQUNLQUdFUyA9
-PT0iCnJwbSAtcWEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCi92YXIvdG1wL3BhdGNoZXctdGVz
-dGVyLXRtcC12Znc0c2E3OC9zcmMvdGFyZ2V0L3MzOTB4L2t2bS5jOjM2NzogdW5kZWZpbmVkIHJl
-ZmVyZW5jZSB0byBgbWF4X2NwdXMnCi91c3IvYmluL2xkOiB0YXJnZXQvczM5MHgva3ZtLm86IGlu
-IGZ1bmN0aW9uIGBrdm1fczM5MF92Y3B1X2ludGVycnVwdF9wcmVfc2F2ZSc6Ci92YXIvdG1wL3Bh
-dGNoZXctdGVzdGVyLXRtcC12Znc0c2E3OC9zcmMvdGFyZ2V0L3MzOTB4L2t2bS5jOjE5NTM6IHVu
-ZGVmaW5lZCByZWZlcmVuY2UgdG8gYG1heF9jcHVzJwpjb2xsZWN0MjogZXJyb3I6IGxkIHJldHVy
-bmVkIDEgZXhpdCBzdGF0dXMKbWFrZVsxXTogKioqIFtNYWtlZmlsZToyMDU6IHFlbXUtc3lzdGVt
-LXMzOTB4XSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDcyOiBzdWJkaXItczM5MHgtc29m
-dG1tdV0gRXJyb3IgMgptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgoK
-ClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAx
-OTA2MjgwMTU2MDYuMzIxMDctMS1laGFia29zdEByZWRoYXQuY29tL3Rlc3RpbmcuczM5MHgvP3R5
-cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
-W2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
-aGV3LWRldmVsQHJlZGhhdC5jb20=
+On Fri, Jun 28, 2019 at 03:19:01PM +0530, P J P wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+> 
+> The interface names in qemu-bridge-helper are defined to be
+> of size IFNAMSIZ(=16), including the terminating null('\0') byte.
+> The same is applied to interface names read from 'bridge.conf'
+> file to form ACLs rules. If user supplied '--br=bridge' name
+> is not restricted to the same length, it could lead to ACL bypass
+> issue. Restrict bridge name to IFNAMSIZ, including null byte.
 
+Can you elaborate on the way to exploit this as I'm not seeing
+any way that doesn't involve mis-configuration of the ACL
+config file data.
+
+Currently the code has:
+
+    const char *bridge = NULL;
+    ...
+    bridge = &argv[index][5];
+    ...
+    if (strcmp(bridge, acl_rule->iface) == 0) {
+
+So the user suplied "--br=bridge" name will never be
+truncated.
+
+The ACLRule struct has iface[IFNAMSIZ] so it is possible
+that we truncate the bridge name that's in the bridge.conf
+file if the admin put in a name that was too long.
+
+This is simply an admin mis-configuration, since it is
+impossible for a bridge to actually exist that has a
+name longer than IFNAMSIZ.
+
+I think we simply need to report a hard error when
+reading the bridge.conf file if the name we find does
+not fit into IFNAMSIZ.
+
+
+> 
+> Reported-by: Riccardo Schirone <rschiron@redhat.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> ---
+>  qemu-bridge-helper.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/qemu-bridge-helper.c b/qemu-bridge-helper.c
+> index f9940deefd..2eca8c5cc4 100644
+> --- a/qemu-bridge-helper.c
+> +++ b/qemu-bridge-helper.c
+> @@ -246,7 +246,7 @@ int main(int argc, char **argv)
+>          if (strcmp(argv[index], "--use-vnet") == 0) {
+>              use_vnet = 1;
+>          } else if (strncmp(argv[index], "--br=", 5) == 0) {
+> -            bridge = &argv[index][5];
+> +            bridge = strndup(&argv[index][5], IFNAMSIZ - 1);
+
+This is not fixing the real problem imho
+
+>          } else if (strncmp(argv[index], "--fd=", 5) == 0) {
+>              unixfd = atoi(&argv[index][5]);
+>          } else {
+> -- 
+> 2.21.0
+> 
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
