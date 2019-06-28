@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD50FC4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:30:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B14A2C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:31:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96203208C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:30:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96203208C4
+	by mail.kernel.org (Postfix) with ESMTPS id 8A7E5208C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 19:31:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A7E5208C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgwZY-0006hq-SA
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 15:30:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41345)
+	id 1hgwbA-0006tZ-PA
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 15:31:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41291)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hgvz9-0005b9-9p
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:52:40 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hgvz1-0005W4-Iq
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:52:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hgvz2-0005X1-TJ
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:52:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38192)
+ (envelope-from <ehabkost@redhat.com>) id 1hgvyy-0005Qk-M7
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:52:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59190)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgvz2-0005Vc-HF
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:52:28 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hgvyy-0005P2-9W
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 14:52:24 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AB22B307D844;
- Fri, 28 Jun 2019 18:52:27 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 626583082131;
+ Fri, 28 Jun 2019 18:52:23 +0000 (UTC)
 Received: from localhost (ovpn-116-7.gru2.redhat.com [10.97.116.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 38CC7600C6;
- Fri, 28 Jun 2019 18:52:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E344260BE0;
+ Fri, 28 Jun 2019 18:52:22 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Fri, 28 Jun 2019 15:47:42 -0300
-Message-Id: <20190628184742.5961-30-ehabkost@redhat.com>
+Date: Fri, 28 Jun 2019 15:47:40 -0300
+Message-Id: <20190628184742.5961-28-ehabkost@redhat.com>
 In-Reply-To: <20190628184742.5961-1-ehabkost@redhat.com>
 References: <20190628184742.5961-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Fri, 28 Jun 2019 18:52:27 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.42]); Fri, 28 Jun 2019 18:52:23 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v2 29/29] vl.c: Add -smp,
- dies=* command line support and update doc
+Subject: [Qemu-devel] [PULL v2 27/29] target/i386: Add CPUID.1F generation
+ support for multi-dies PCMachine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,157 +74,133 @@ Sender: "Qemu-devel"
 
 From: Like Xu <like.xu@linux.intel.com>
 
-For PC target, users could configure the number of dies per one package
-via command line with this patch, such as "-smp dies=2,cores=4".
+The CPUID.1F as Intel V2 Extended Topology Enumeration Leaf would be
+exposed if guests want to emulate multiple software-visible die within
+each package. Per Intel's SDM, the 0x1f is a superset of 0xb, thus they
+can be generated by almost same code as 0xb except die_offset setting.
 
-The parsing rules of new cpu-topology model obey the same restrictions/logic
-as the legacy socket/core/thread model especially on missing values computing.
+If the number of dies per package is greater than 1, the cpuid_min_level
+would be adjusted to 0x1f regardless of whether the host supports CPUID.1F.
+Likewise, the CPUID.1F wouldn't be exposed if env->nr_dies < 2.
 
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Message-Id: <20190620054525.37188-4-like.xu@linux.intel.com>
+Message-Id: <20190620054525.37188-2-like.xu@linux.intel.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/i386/pc.c    | 30 +++++++++++++++++-------------
- vl.c            |  3 +++
- qemu-options.hx | 17 +++++++++--------
- 3 files changed, 29 insertions(+), 21 deletions(-)
+ target/i386/cpu.h |  1 +
+ target/i386/cpu.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ target/i386/kvm.c | 12 ++++++++++++
+ 3 files changed, 54 insertions(+)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index b9c25bed35..3f0f221a5b 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1545,9 +1545,12 @@ static void pc_new_cpu(PCMachineState *pcms, int64_t apic_id, Error **errp)
-  */
- void pc_smp_parse(MachineState *ms, QemuOpts *opts)
- {
-+    PCMachineState *pcms = PC_MACHINE(ms);
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 85319f4ae1..0a96c78669 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -736,6 +736,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_TOPOLOGY_LEVEL_INVALID  (0U << 8)
+ #define CPUID_TOPOLOGY_LEVEL_SMT      (1U << 8)
+ #define CPUID_TOPOLOGY_LEVEL_CORE     (2U << 8)
++#define CPUID_TOPOLOGY_LEVEL_DIE      (5U << 8)
+ 
+ /* MSR Feature Bits */
+ #define MSR_ARCH_CAP_RDCL_NO    (1U << 0)
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 35ecb4113c..ea52db0600 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -4413,6 +4413,42 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+             *ecx |= CPUID_TOPOLOGY_LEVEL_INVALID;
+         }
+ 
++        assert(!(*eax & ~0x1f));
++        *ebx &= 0xffff; /* The count doesn't need to be reliable. */
++        break;
++    case 0x1F:
++        /* V2 Extended Topology Enumeration Leaf */
++        if (env->nr_dies < 2) {
++            *eax = *ebx = *ecx = *edx = 0;
++            break;
++        }
 +
-     if (opts) {
-         unsigned cpus    = qemu_opt_get_number(opts, "cpus", 0);
-         unsigned sockets = qemu_opt_get_number(opts, "sockets", 0);
-+        unsigned dies = qemu_opt_get_number(opts, "dies", 1);
-         unsigned cores   = qemu_opt_get_number(opts, "cores", 0);
-         unsigned threads = qemu_opt_get_number(opts, "threads", 0);
++        *ecx = count & 0xff;
++        *edx = cpu->apic_id;
++        switch (count) {
++        case 0:
++            *eax = apicid_core_offset(env->nr_dies, cs->nr_cores,
++                                                    cs->nr_threads);
++            *ebx = cs->nr_threads;
++            *ecx |= CPUID_TOPOLOGY_LEVEL_SMT;
++            break;
++        case 1:
++            *eax = apicid_die_offset(env->nr_dies, cs->nr_cores,
++                                                   cs->nr_threads);
++            *ebx = cs->nr_cores * cs->nr_threads;
++            *ecx |= CPUID_TOPOLOGY_LEVEL_CORE;
++            break;
++        case 2:
++            *eax = apicid_pkg_offset(env->nr_dies, cs->nr_cores,
++                                                   cs->nr_threads);
++            *ebx = env->nr_dies * cs->nr_cores * cs->nr_threads;
++            *ecx |= CPUID_TOPOLOGY_LEVEL_DIE;
++            break;
++        default:
++            *eax = 0;
++            *ebx = 0;
++            *ecx |= CPUID_TOPOLOGY_LEVEL_INVALID;
++        }
+         assert(!(*eax & ~0x1f));
+         *ebx &= 0xffff; /* The count doesn't need to be reliable. */
+         break;
+@@ -5094,6 +5130,11 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+             x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
+         }
  
-@@ -1557,24 +1560,24 @@ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
-             threads = threads > 0 ? threads : 1;
-             if (cpus == 0) {
-                 sockets = sockets > 0 ? sockets : 1;
--                cpus = cores * threads * sockets;
-+                cpus = cores * threads * dies * sockets;
-             } else {
-                 ms->smp.max_cpus =
-                         qemu_opt_get_number(opts, "maxcpus", cpus);
--                sockets = ms->smp.max_cpus / (cores * threads);
-+                sockets = ms->smp.max_cpus / (cores * threads * dies);
++        /* CPU topology with multi-dies support requires CPUID[0x1F] */
++        if (env->nr_dies > 1) {
++            x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x1F);
++        }
++
+         /* SVM requires CPUID[0x8000000A] */
+         if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
+             x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index e4b4f5756a..473a17e9a5 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1451,6 +1451,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
              }
-         } else if (cores == 0) {
-             threads = threads > 0 ? threads : 1;
--            cores = cpus / (sockets * threads);
-+            cores = cpus / (sockets * dies * threads);
-             cores = cores > 0 ? cores : 1;
-         } else if (threads == 0) {
--            threads = cpus / (cores * sockets);
-+            threads = cpus / (cores * dies * sockets);
-             threads = threads > 0 ? threads : 1;
--        } else if (sockets * cores * threads < cpus) {
-+        } else if (sockets * dies * cores * threads < cpus) {
-             error_report("cpu topology: "
--                         "sockets (%u) * cores (%u) * threads (%u) < "
-+                         "sockets (%u) * dies (%u) * cores (%u) * threads (%u) < "
-                          "smp_cpus (%u)",
--                         sockets, cores, threads, cpus);
-+                         sockets, dies, cores, threads, cpus);
-             exit(1);
+             break;
          }
- 
-@@ -1586,26 +1589,27 @@ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
-             exit(1);
-         }
- 
--        if (sockets * cores * threads > ms->smp.max_cpus) {
-+        if (sockets * dies * cores * threads > ms->smp.max_cpus) {
-             error_report("cpu topology: "
--                         "sockets (%u) * cores (%u) * threads (%u) > "
-+                         "sockets (%u) * dies (%u) * cores (%u) * threads (%u) > "
-                          "maxcpus (%u)",
--                         sockets, cores, threads,
-+                         sockets, dies, cores, threads,
-                          ms->smp.max_cpus);
-             exit(1);
-         }
- 
--        if (sockets * cores * threads != ms->smp.max_cpus) {
-+        if (sockets * dies * cores * threads != ms->smp.max_cpus) {
-             warn_report("Invalid CPU topology deprecated: "
--                        "sockets (%u) * cores (%u) * threads (%u) "
-+                        "sockets (%u) * dies (%u) * cores (%u) * threads (%u) "
-                         "!= maxcpus (%u)",
--                        sockets, cores, threads,
-+                        sockets, dies, cores, threads,
-                         ms->smp.max_cpus);
-         }
- 
-         ms->smp.cpus = cpus;
-         ms->smp.cores = cores;
-         ms->smp.threads = threads;
-+        pcms->smp_dies = dies;
-     }
- 
-     if (ms->smp.cpus > 1) {
-diff --git a/vl.c b/vl.c
-index f6e591b80c..23fe3e753b 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1233,6 +1233,9 @@ static QemuOptsList qemu_smp_opts = {
-         }, {
-             .name = "sockets",
-             .type = QEMU_OPT_NUMBER,
-+        }, {
-+            .name = "dies",
-+            .type = QEMU_OPT_NUMBER,
-         }, {
-             .name = "cores",
-             .type = QEMU_OPT_NUMBER,
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 0d8beb4afd..a5b314a448 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -138,25 +138,26 @@ no incompatible TCG features have been enabled (e.g. icount/replay).
- ETEXI
- 
- DEF("smp", HAS_ARG, QEMU_OPTION_smp,
--    "-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,sockets=sockets]\n"
-+    "-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,dies=dies][,sockets=sockets]\n"
-     "                set the number of CPUs to 'n' [default=1]\n"
-     "                maxcpus= maximum number of total cpus, including\n"
-     "                offline CPUs for hotplug, etc\n"
--    "                cores= number of CPU cores on one socket\n"
-+    "                cores= number of CPU cores on one socket (for PC, it's on one die)\n"
-     "                threads= number of threads on one CPU core\n"
-+    "                dies= number of CPU dies on one socket (for PC only)\n"
-     "                sockets= number of discrete sockets in the system\n",
-         QEMU_ARCH_ALL)
- STEXI
--@item -smp [cpus=]@var{n}[,cores=@var{cores}][,threads=@var{threads}][,sockets=@var{sockets}][,maxcpus=@var{maxcpus}]
-+@item -smp [cpus=]@var{n}[,cores=@var{cores}][,threads=@var{threads}][,dies=dies][,sockets=@var{sockets}][,maxcpus=@var{maxcpus}]
- @findex -smp
- Simulate an SMP system with @var{n} CPUs. On the PC target, up to 255
- CPUs are supported. On Sparc32 target, Linux limits the number of usable CPUs
- to 4.
--For the PC target, the number of @var{cores} per socket, the number
--of @var{threads} per cores and the total number of @var{sockets} can be
--specified. Missing values will be computed. If any on the three values is
--given, the total number of CPUs @var{n} can be omitted. @var{maxcpus}
--specifies the maximum number of hotpluggable CPUs.
-+For the PC target, the number of @var{cores} per die, the number of @var{threads}
-+per cores, the number of @var{dies} per packages and the total number of
-+@var{sockets} can be specified. Missing values will be computed.
-+If any on the three values is given, the total number of CPUs @var{n} can be omitted.
-+@var{maxcpus} specifies the maximum number of hotpluggable CPUs.
- ETEXI
- 
- DEF("numa", HAS_ARG, QEMU_OPTION_numa,
++        case 0x1f:
++            if (env->nr_dies < 2) {
++                break;
++            }
+         case 4:
+         case 0xb:
+         case 0xd:
+@@ -1458,6 +1462,11 @@ int kvm_arch_init_vcpu(CPUState *cs)
+                 if (i == 0xd && j == 64) {
+                     break;
+                 }
++
++                if (i == 0x1f && j == 64) {
++                    break;
++                }
++
+                 c->function = i;
+                 c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+                 c->index = j;
+@@ -1469,6 +1478,9 @@ int kvm_arch_init_vcpu(CPUState *cs)
+                 if (i == 0xb && !(c->ecx & 0xff00)) {
+                     break;
+                 }
++                if (i == 0x1f && !(c->ecx & 0xff00)) {
++                    break;
++                }
+                 if (i == 0xd && c->eax == 0) {
+                     continue;
+                 }
 -- 
 2.18.0.rc1.1.g3f1ff2140
 
