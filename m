@@ -2,63 +2,79 @@ Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9F6EC4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 12:36:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38440C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 12:37:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC53C2083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 12:36:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC53C2083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id F264D2086D
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 12:37:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hKSMQmdK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F264D2086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hgq7O-0005YC-LC
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 08:36:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35393)
+	id 1hgq7x-0005uX-8s
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 08:37:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35362)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hgq3r-000146-Lb
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:33:05 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hgq3p-0003y9-M3
+ (envelope-from <mrolnik@gmail.com>) id 1hgq3p-00013h-LD
  for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:33:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38562)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hgq3l-0003wk-RR; Fri, 28 Jun 2019 08:32:58 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0421083F3C;
- Fri, 28 Jun 2019 11:57:24 +0000 (UTC)
-Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
- [10.33.200.226])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 58F99608CA;
- Fri, 28 Jun 2019 11:57:22 +0000 (UTC)
-Date: Fri, 28 Jun 2019 13:57:20 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Message-ID: <20190628115720.GH5179@dhcp-200-226.str.redhat.com>
-References: <20190528143727.10529-1-dplotnikov@virtuozzo.com>
- <20190528143727.10529-4-dplotnikov@virtuozzo.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190528143727.10529-4-dplotnikov@virtuozzo.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Fri, 28 Jun 2019 11:57:24 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v0 3/3] qcow2: add zstd cluster compression
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <mrolnik@gmail.com>) id 1hgq3n-0003xY-85
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:33:01 -0400
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:37163)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1hgq3m-0003we-9E
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 08:32:58 -0400
+Received: by mail-wr1-x42e.google.com with SMTP id v14so6119598wrr.4
+ for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 05:32:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id;
+ bh=3kxYobwR4k0fe0LIxLC9F6Uo9bmjegAfbHTscEUzoDQ=;
+ b=hKSMQmdKuXf/a+DNW3S00+kuLP17FqI1eDmal7eadExBTNy8e3rfpbf6Ozj0LRXvvi
+ 3SrXEGXjguRt/W/xbtutI6aciEAK4xyLV29VG5/ZGEQan7xlWF+8B9nOt+eUvSDmY/Fz
+ RMc0XsPNpFHNCZ5C4WocH24bcTrxYcSLbQyPvCVaoHSkIfU+m0thulPCcmUuOOIx9Srv
+ 4O40p4UofHemt+R8KC3a3Dz+Zrl/ywaNpryMjlCPxWwhZ8K0RSZ6ZFng5PP62PTqB4r+
+ w0evr/kp00k90w17VbJuXRJhva40FXyLswoLQL5LxImx3d25mxHlpi3mmv5AAX32dnGb
+ tz7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=3kxYobwR4k0fe0LIxLC9F6Uo9bmjegAfbHTscEUzoDQ=;
+ b=ZwstgCwdvpK0Hv4VHPqxkHXquwe1a5AA7mglnb4AUSCy6EuL4T7o29+MA9VHx5RB8R
+ kT6AEGpkBuCj3E4i9a5f10icCwsKv2parBziU4qseqymkOo7we06JdaYeVFJYhDJAiv6
+ RJsMkImrslpGPpdrpuC1BmqlvVM/j0Hcn0qFEALbtL8DnAShH1QTmI015cDFTQIH2Hdf
+ wSrABBGxpsYEC3T2rSHnN7iOkkZ/SA7mbTHdmwZ9PX/lkgsmwekkAmBImAGP37omMMD4
+ g6SP7IKo/30WHbwfP3Dkoz5NWT4XnIGPgf5o5F0bDpi4n2Un+4S4eZOiF9UxZAh4f9s5
+ cemw==
+X-Gm-Message-State: APjAAAUQ5ZSeJYoL75sPaEDam/kuYVCcrKbwYzFpo3KbI1HShn0mbePL
+ +O9T/8+msmHeSyiKjx1iGBi9UWHiEunQNw==
+X-Google-Smtp-Source: APXvYqygjX6SFZ1Xn1KdeH2BbytPwVO+FEWEiF6ADfz+G6Q+ROQKIa7IdgRI6PpMOoyY0DtitK95fA==
+X-Received: by 2002:a5d:4111:: with SMTP id l17mr1758987wrp.129.1561723285846; 
+ Fri, 28 Jun 2019 05:01:25 -0700 (PDT)
+Received: from localhost.localdomain (bzq-79-182-104-87.red.bezeqint.net.
+ [79.182.104.87])
+ by smtp.gmail.com with ESMTPSA id v18sm2281229wrd.51.2019.06.28.05.01.22
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 28 Jun 2019 05:01:24 -0700 (PDT)
+From: Michael Rolnik <mrolnik@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 28 Jun 2019 15:01:11 +0300
+Message-Id: <20190628120118.78920-1-mrolnik@gmail.com>
+X-Mailer: git-send-email 2.18.0
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42e
+Subject: [Qemu-devel] [PATCH v24 0/7] QEMU AVR 8 bit cores
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,294 +86,268 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, den@virtuozzo.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, armbru@redhat.com, mreitz@redhat.com
+Cc: imammedo@redhat.com, richard.henderson@linaro.org,
+ Michael Rolnik <mrolnik@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 28.05.2019 um 16:37 hat Denis Plotnikov geschrieben:
-> zstd significantly reduces cluster compression time.
-> It provides better compression performance maintaining
-> the same level of compression ratio in comparison with
-> zlib, which, by the moment, has been the only compression
-> method available.
-> 
-> The performance test results:
-> Test compresses and decompresses qemu qcow2 image with just
-> installed rhel-7.6 guest.
-> Image cluster size: 64K. Image on disk size: 2.2G
-> 
-> The test was conducted with brd disk to reduce the influence
-> of disk subsystem to the test results.
-> The results is given in seconds.
-> 
-> compress cmd:
->   time ./qemu-img convert -O qcow2 -c -o compression_type=[zlib|zstd]
->                   src.img [zlib|zstd]_compressed.img
-> decompress cmd
->   time ./qemu-img convert -O qcow2
->                   [zlib|zstd]_compressed.img uncompressed.img
-> 
->            compression               decompression
->          zlib       zstd           zlib         zstd
-> ------------------------------------------------------------
-> real     65.5       16.3 (-75 %)    1.9          1.6 (-16 %)
-> user     65.0       15.8            5.3          2.5
-> sys       3.3        0.2            2.0          2.0
-> 
-> Both ZLIB and ZSTD gave the same compression ratio: 1.57
-> compressed image size in both cases: 1.4G
-> 
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> ---
->  block/qcow2.c | 82 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  configure     | 26 ++++++++++++++++
->  2 files changed, 108 insertions(+)
-> 
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 90f15cc3c9..58901f9f79 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -26,6 +26,7 @@
->  
->  #define ZLIB_CONST
->  #include <zlib.h>
-> +#include <zstd.h>
->  
->  #include "block/block_int.h"
->  #include "block/qdict.h"
-> @@ -1553,6 +1554,9 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
->      case QCOW2_COMPRESSION_TYPE_ZLIB:
->          break;
->  
-> +    case QCOW2_COMPRESSION_TYPE_ZSTD:
-> +        break;
+This series of patches adds 8bit AVR cores to QEMU.
+All instruction, except BREAK/DES/SPM/SPMX, are implemented. Not fully tested yet.
+However I was able to execute simple code with functions. e.g fibonacci calculation.
+This series of patches include a non real, sample board.
+No fuses support yet. PC is set to 0 at reset.
 
-If we don't intend to add any code here, why not just add another case
-label to the existing break?
+the patches include the following
+1. just a basic 8bit AVR CPU, without instruction decoding or translation
+2. CPU features which allow define the following 8bit AVR cores
+     avr1
+     avr2 avr25
+     avr3 avr31 avr35
+     avr4
+     avr5 avr51
+     avr6
+     xmega2 xmega4 xmega5 xmega6 xmega7
+3. a definition of sample machine with SRAM, FLASH and CPU which allows to execute simple code
+4. encoding for all AVR instructions
+5. interrupt handling
+6. helpers for IN, OUT, SLEEP, WBR & unsupported instructions
+7. a decoder which given an opcode decides what istruction it is
+8. translation of AVR instruction into TCG
+9. all features together
 
->      default:
->          error_setg(errp, "Unknown compression type");
->          ret = -EINVAL;
-> @@ -3286,6 +3290,9 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
->           *  ZLIB shouldn't be here since it's the default
->           */
->          switch (qcow2_opts->compression_type) {
-> +        case QCOW2_COMPRESSION_TYPE_ZSTD:
-> +            break;
-> +
->          default:
->              error_setg_errno(errp, -EINVAL, "Unknown compression type");
->              goto out;
-> @@ -4113,6 +4120,73 @@ static ssize_t zlib_decompress(void *dest, size_t dest_size,
->      return ret;
->  }
->  
-> +/*
-> + * zstd_compress()
-> + *
-> + * @dest - destination buffer, @dest_size bytes
-> + * @src - source buffer, @src_size bytes
-> + *
-> + * Returns: compressed size on success
-> + *          -1 on any error
-> + */
-> +
-> +static ssize_t zstd_compress(void *dest, size_t dest_size,
-> +                             const void *src, size_t src_size)
-> +{
-> +    /* steal some bytes to store compressed chunk size */
-> +    size_t ret;
+changes since v3
+1. rampD/X/Y/Z registers are encoded as 0x00ff0000 (instead of 0x000000ff) for faster address manipulaton
+2. ffs changed to ctz32
+3. duplicate code removed at avr_cpu_do_interrupt
+4. using andc instead of not + and
+5. fixing V flag calculation in varios instructions
+6. freeing local variables in PUSH
+7. tcg_const_local_i32 -> tcg_const_i32
+8. using sextract32 instead of my implementation
+9. fixing BLD instruction
+10.xor(r) instead of 0xff - r at COM
+11.fixing MULS/MULSU not to modify inputs' content
+12.using SUB for NEG
+13.fixing tcg_gen_qemu_ld/st call in XCH
 
-This ends up in a file, so this needs to be a fixed number of bytes.
-size_t varies between different platforms, so it is not acceptable.
+changes since v4
+1. target is now defined as big endian in order to optimize push_ret/pop_ret
+2. all style warnings are fixed
+3. adding cpu_set/get_sreg functions
+4. simplifying gen_goto_tb as there is no real paging
+5. env->pc -> env->pc_w
+6. making flag dump more compact
+7. more spacing
+8. renaming CODE/DATA_INDEX -> MMU_CODE/DATA_IDX
+9. removing avr_set_feature
+10. SPL/SPH set bug fix
+11. switching stb_phys to cpu_stb_data
+12. cleaning up avr_decode
+13. saving sreg, rampD/X/Y/Z, eind in HW format (savevm)
+14. saving CPU features (savevm)
 
-If I understand correctly, the maximum for this is the cluster size, so
-uint32_t should be right.
+changes since v5
+1. BLD bug fix
+2. decoder generator is added
 
-This isn't plain the zstd compression format any more, so it needs to be
-described in the qcow2 spec.
+chages since v6
+1. using cpu_get_sreg/cpu_set_sreg in avr_cpu_gdb_read_register/avr_cpu_gdb_write_register
+2. configure the target as little endian because otherwise GDB does not work
+3. fixing and testing gen_push_ret/gen_pop_ret
 
-> +    size_t *c_size = dest;
-> +    char *d_buf = dest;
-> +    d_buf += sizeof(ret);
+changes since v7
+1. folding back v6 
+2. logging at helper_outb and helper_inb are done for non supported yet registers only
+3. MAINTAINERS updated
 
-char *d_bug = dest + sizeof(ret);
+changes since v8
+1. removing hw/avr from hw/Makefile.obj as it should not be built for all
+2. making linux compilable
+3. testing on
+    a. Mac, Apple LLVM version 7.0.0
+    b. Ubuntu 12.04, gcc 4.9.2
+    c. Fedora 23, gcc 5.3.1
+4. folding back some patches
+5. translation bug fixes for ORI, CPI, XOR instructions
+6. propper handling of cpu register writes though memory
 
-> +    dest_size -= sizeof(ret);
+changes since v9
+1. removing forward declarations of static functions
+2. disabling debug prints
+3. switching to case range instead of if else if ...
+4. LD/ST IN/OUT accessing CPU maintainder registers are not routed to any device
+5. commenst about sample board and sample IO device added
+6. sample board description is more descriptive now
+7. memory_region_allocate_system_memory is used to create RAM
+8. now there are helper_fullrd & helper_fullwr when LD/ST try to access registers
 
-We don't want to end up with an integer overflow, so before this:
+changes since v10
+1. movig back fullwr & fullrd into the commit where outb and inb were introduced
+2. changing tlb_fill function signature
+3. adding empty line between functions
+4. adding newline on the last line of the file
+5. using tb->flags to generae full access ST/LD instructions
+6. fixing SBRC bug
+7. folding back 10th commit
+8. whenever a new file is introduced it's added to Makefile.objs
 
-    if (dest_size < sizeof(ret)) {
-        return -ENOMEM;
-    }
+changes since v11
+1. updating to v2.7.0-rc
+2. removing assignment to env->fullacc from gen_intermediate_code
 
-> +    ret = ZSTD_compress(d_buf, dest_size, src, src_size, 5);
-> +
-> +    if (ZSTD_isError(ret)) {
-> +        return -1;
-> +    }
+changes since v12
+1. fixing spacing
+2. fixing get/put_segment functions
+3. removing target-avr/machine.h file
+4. VMSTATE_SINGLE_TEST -> VMSTATE_SINGLE
+5. comment spelling
+6. removing hw/avr/sample_io.c
+7. char const* -> const char*
+8. proper ram allocation
+9. fixing breakpoint functionality.
+10.env1 -> env
+11.fixing avr_cpu_gdb_write_register & avr_cpu_gdb_read_register functions
+12.any cpu is removed
+12.feature bits are not saved into vm state
 
-Need an error code here, not just -1. In particular, we need to
-distinguish cases where the buffer was too small and uncompressed data
-should be written instead (ENOMEM) from real errors that should be
-returned to the caller (EIO).
+changes since v13
+1. rebasing to v2.7.0-rc1
 
-> +
-> +    /* store the compressed chunk size in the very beginning of the buffer */
-> +    *c_size = ret;
-> +
-> +    return ret + sizeof(ret);
-> +}
-> +
-> +/*
-> + * zstd_decompress()
-> + *
-> + * Decompress some data (not more than @src_size bytes) to produce exactly
-> + * @dest_size bytes.
-> + *
-> + * @dest - destination buffer, @dest_size bytes
-> + * @src - source buffer, @src_size bytes
-> + *
-> + * Returns: 0 on success
-> + *          -1 on fail
-> + */
-> +
-> +static ssize_t zstd_decompress(void *dest, size_t dest_size,
-> +                             const void *src, size_t src_size)
+changes since v14
+1. I made self review with git gui tool. (I did not know such a thing exists)
+2. removing all double/tripple spaces
+3. removing comment reference to SampleIO
+4. folding back some changes, so there is not deleted lines in my code
+5. moving avr configuration, within configure file, before chris
 
-Indentation is off.
+changes since v15
+1. removing IO registers cache from CPU
+2. implementing CBI/SBI as read(helper_inb), modify, write(helper_outb)
+3. implementing CBIC/SBIC as read(helper_inb), check, branch
+4. adding missing tcg_temp_free_i32 for tcg_const_i32
 
-> +{
-> +    size_t ret;
-> +    /*
-> +     * zstd decompress wants to know the exact lenght of the data
-> +     * for that purpose, zstd_compress stores the length in the
-> +     * very beginning of the compressed buffer
-> +     */
-> +    const size_t *s_size = src;
-> +    const char *s_buf = src;
-> +    s_buf += sizeof(size_t);
+changes since v16
+1. removing EXT IO registers knoledge from CPU. These registers are accessible 
+   by LD/ST only. CPU has no interest in them
 
-Single line: const char *s_buf = src + sizeof(size_t);
+changes since v17 (by Richard Henderson)
+This is Michael's v17, with some adjustments of my own:
 
-Of course, size_t is wrong here, too. And above you used sizeof() on a
-variable and here it's on the type. I think we should stay consistent.
+1. Fix the whitespace errors reported by "git am",
+2. Replace the utf-8 characters with normal ascii,
+3. Ditch the separate compilation of translate.c.
 
-You're lacking a check against src_size. A malicious image could make
-use read beyond the end of the buffer. (Also consider that src_size
-could be smaller than sizeof(size_t).)
+I retained the two separate files that could be regenerated
+from the included cpugen program, but merged in translate-insn.c.
+Not that it matters, but the code generated is about 3k smaller.
 
-> +    ret = ZSTD_decompress(dest, dest_size, s_buf, *s_size);
-> +
-> +    if (ZSTD_isError(ret)) {
-> +        return -1;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
->  #define MAX_COMPRESS_THREADS 4
->  
->  typedef ssize_t (*Qcow2CompressFunc)(void *dest, size_t dest_size,
-> @@ -4189,6 +4263,10 @@ qcow2_co_compress(BlockDriverState *bs, void *dest, size_t dest_size,
->          fn = zlib_compress;
->          break;
->  
-> +    case QCOW2_COMPRESSION_TYPE_ZSTD:
-> +        fn = zstd_compress;
-> +        break;
-> +
->      default:
->          return -ENOTSUP;
->      }
-> @@ -4208,6 +4286,10 @@ qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
->          fn = zlib_decompress;
->          break;
->  
-> +    case QCOW2_COMPRESSION_TYPE_ZSTD:
-> +        fn = zstd_decompress;
-> +        break;
-> +
->      default:
->          return -ENOTSUP;
->      }
-> diff --git a/configure b/configure
-> index 1c563a7027..c90716189c 100755
-> --- a/configure
-> +++ b/configure
-> @@ -433,6 +433,7 @@ opengl_dmabuf="no"
->  cpuid_h="no"
->  avx2_opt=""
->  zlib="yes"
-> +zstd="yes"
+changes since v18
+1.  moving target-avr into target/avr
+2.  do not call cpu_exec_initfn function from avr_cpu_initfn
+3.  call cpu_exec_realizefn avr_cpu_realizefn
+4.  do not fail sample machine creation if no rom is suplied
+5.  add tcg_gen_exit_tb(0) for BS_BRANCH in gen_intermediate_code
+6.  fix a register getters/setters in machine.c
+7.  changing QEMU_ARCH_AVR from 1<<17 to 1<<18
 
-This should be zstd="" so that a missing library will automatically
-disable it instead of producing an error. (Building QEMU without zlib is
-impossible, but building it without ZSTD should work.)
+changes since v19
+1.  use decodetree.py tool to decode instructions
+2.  adding USART
+3.  adding 16 bit timer peripherals
+4.  changing QEMU_ARCH_AVR from 1<<18 to 1<<20
+5.  renaming tlb_fill to avr_cpu_tlb_fill
 
->  capstone=""
->  lzo=""
->  snappy=""
-> @@ -1317,6 +1318,8 @@ for opt do
->    ;;
->    --disable-zlib-test) zlib="no"
->    ;;
-> +  --disable-zstd-test) zstd="no"
-> +  ;;
+changes since v20
+1.  use one CPU naming convention
+2.  merging insn16.decode & insn32.decode files
+3.  modifying skip next instruction mechanizm
+4.  translate BREAK as NOP for now
 
-Instead of this one, after making the above change, options
---disable-zstd and --enable-zstd should be introduced that set
-zstd="yes" (that actually does produce an error if it's not available)
-or zstd="no".
+changes since v21
+1.  Reorganize bstate.
+    This will make transition to <exec/translator.h> easier, and fixes a couple of bugs wrt single stepping
+    by richard.henderson@linaro.org
+2.  Drop cpc and fix page cross condition.
+    by richard.henderson@linaro.org
+3.  Refactor checking supported/unsupported instructions
+4.  Add gdb-xml/avr-cpu.xml
 
->    --disable-lzo) lzo="no"
->    ;;
->    --enable-lzo) lzo="yes"
-> @@ -3702,6 +3705,29 @@ EOF
->      fi
->  fi
->  
-> +#########################################
-> +# zstd check
-> +
-> +if test "$zstd" != "no" ; then
-> +    if $pkg_config --exists libzstd; then
-> +        zstd_cflags=$($pkg_config --cflags libzstd)
-> +        zstd_libs=$($pkg_config --libs libzstd)
-> +        QEMU_CFLAGS="$zstd_cflags $QEMU_CFLAGS"
-> +        LIBS="$zstd_libs $LIBS"
-> +    else
-> +        cat > $TMPC << EOF
-> +#include <zstd.h>
-> +int main(void) { ZSTD_versionNumber(); return 0; }
-> +EOF
-> +        if compile_prog "" "-lzstd" ; then
-> +            LIBS="$LIBS -lzstd"
-> +        else
-> +            error_exit "zstd check failed" \
-> +                "Make sure to have the zstd libs and headers installed."
-> +        fi
+changes since v22
+1.  Rebase
+2.  Split long comment
 
-This needs to be changed, too, to get the desired behaviour. Model it
-after bzip2 or lzo support checks:
+changes since v23
+1.  remove avr_cpu_list_compare function
+2.  modify avr_cpu_class_by_name function
+3.  modify avr_cpu_list_entry function
+4.  modify avr_cpu_list function
 
-    if compile_prog "" "-lbz2" ; then
-        bzip2="yes"
-    else
-        if test "$bzip2" = "yes"; then
-            feature_not_found "libbzip2" "Install libbzip2 devel"
-        fi
-        bzip2="no"
-    fi
+Michael Rolnik (2):
+  target/avr: Add instruction decoding
+  target/avr: Add instruction translation
 
-> +    fi
-> +fi
-> +
->  ##########################################
->  # SHA command probe for modules
->  if test "$modules" = yes; then
+Sarah Harris (5):
+  target/avr: Add outward facing interfaces and core CPU logic
+  target/avr: Add instruction helpers
+  target/avr: Add limited support for USART and 16 bit timer peripherals
+  target/avr: Add example board configuration
+  target/avr: Register AVR support with the rest of QEMU, the build
+    system, and the MAINTAINERS file
 
-Kevin
+ MAINTAINERS                     |    6 +
+ arch_init.c                     |    2 +
+ configure                       |    7 +
+ default-configs/avr-softmmu.mak |    5 +
+ gdb-xml/avr-cpu.xml             |   49 +
+ hw/Kconfig                      |    1 +
+ hw/avr/Kconfig                  |    4 +
+ hw/avr/Makefile.objs            |    1 +
+ hw/avr/sample.c                 |  217 +++
+ hw/char/Kconfig                 |    3 +
+ hw/char/Makefile.objs           |    1 +
+ hw/char/avr_usart.c             |  316 ++++
+ hw/timer/Kconfig                |    3 +
+ hw/timer/Makefile.objs          |    1 +
+ hw/timer/avr_timer16.c          |  587 +++++++
+ include/disas/dis-asm.h         |    6 +
+ include/hw/char/avr_usart.h     |   99 ++
+ include/hw/timer/avr_timer16.h  |   99 ++
+ include/sysemu/arch_init.h      |    1 +
+ qapi/common.json                |    3 +-
+ target/avr/Makefile.objs        |   33 +
+ target/avr/cpu-param.h          |   37 +
+ target/avr/cpu.c                |  579 +++++++
+ target/avr/cpu.h                |  283 +++
+ target/avr/gdbstub.c            |   85 +
+ target/avr/helper.c             |  354 ++++
+ target/avr/helper.h             |   29 +
+ target/avr/insn.decode          |  175 ++
+ target/avr/machine.c            |  123 ++
+ target/avr/translate.c          | 2888 +++++++++++++++++++++++++++++++
+ tests/machine-none-test.c       |    1 +
+ 31 files changed, 5997 insertions(+), 1 deletion(-)
+ create mode 100644 default-configs/avr-softmmu.mak
+ create mode 100644 gdb-xml/avr-cpu.xml
+ create mode 100644 hw/avr/Kconfig
+ create mode 100644 hw/avr/Makefile.objs
+ create mode 100644 hw/avr/sample.c
+ create mode 100644 hw/char/avr_usart.c
+ create mode 100644 hw/timer/avr_timer16.c
+ create mode 100644 include/hw/char/avr_usart.h
+ create mode 100644 include/hw/timer/avr_timer16.h
+ create mode 100644 target/avr/Makefile.objs
+ create mode 100644 target/avr/cpu-param.h
+ create mode 100644 target/avr/cpu.c
+ create mode 100644 target/avr/cpu.h
+ create mode 100644 target/avr/gdbstub.c
+ create mode 100644 target/avr/helper.c
+ create mode 100644 target/avr/helper.h
+ create mode 100644 target/avr/insn.decode
+ create mode 100644 target/avr/machine.c
+ create mode 100644 target/avr/translate.c
+
+-- 
+2.18.0
+
 
