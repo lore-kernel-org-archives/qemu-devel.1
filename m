@@ -1,81 +1,95 @@
-Return-Path: <SRS0=Ouwy=U3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=rHaa=U4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46E8EC4321A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 23:27:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78DBFC4321A
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 00:11:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 128F22083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Jun 2019 23:27:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 394932083B
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 00:11:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JnE4oFX0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 128F22083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="D7DO1Zx4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 394932083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hh0HF-0001a4-V3
-	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 19:27:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52432)
+	id 1hh0xl-0000sW-FX
+	for qemu-devel@archiver.kernel.org; Fri, 28 Jun 2019 20:11:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60033)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <marlies.ruck@gmail.com>) id 1hh0GA-00018x-1P
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 19:26:27 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hh0ws-0000Li-9k
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 20:10:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marlies.ruck@gmail.com>) id 1hh0G7-0006hv-Jh
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 19:26:25 -0400
-Received: from mail-io1-xd29.google.com ([2607:f8b0:4864:20::d29]:34815)
+ (envelope-from <richard.henderson@linaro.org>) id 1hh0wr-0002xw-Dj
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 20:10:34 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36060)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marlies.ruck@gmail.com>)
- id 1hh0G7-0006fw-9e
- for qemu-devel@nongnu.org; Fri, 28 Jun 2019 19:26:23 -0400
-Received: by mail-io1-xd29.google.com with SMTP id k8so16050936iot.1
- for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 16:26:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=imEa4zBbfpb3JvR5Et11p6DtFQJbKbq8llXxmzPWmPg=;
- b=JnE4oFX066q48b++4ewKACn+n80qsgphMjTUP+NXj8eCvQQZ7f5ad/f1a8Zcu8U7ay
- QD8HiB5iaDJv4cPrT2tHNDPO/A0qTJSxRbQVsNC5TFtIa3JvIsUIgiVfr/i8vRM98K5A
- LZeSvVG280nwJbVhpIrLBAdR2HPAxXfH2OSKPYIdAltxW+N83+PhoOEjo/o2xbai970N
- h4lf4E4WCs27+ETY1WqYwE78g/3bdD6TfYNnhWICTl/PHzPx/TA2Dtpxv1faA+J6ToP9
- liZAPoAjc8suTH3mQw1FWfTPFcvHB71vcl02z7jQp7FFMR+XQCgKC8tPNBSHobcEWtg0
- JSEA==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hh0wr-0002wz-5p
+ for qemu-devel@nongnu.org; Fri, 28 Jun 2019 20:10:33 -0400
+Received: by mail-wr1-x442.google.com with SMTP id n4so7902193wrs.3
+ for <qemu-devel@nongnu.org>; Fri, 28 Jun 2019 17:10:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=W+njdGYXMwVUlALGNOEmZlA+AIB17I1tvTOGcXyYBh8=;
+ b=D7DO1Zx4LFlZv82Ve8Ko0ckgqU+QXNdsUmp8uS7zRoQw6dANh88Y1fNuhyWq+wezYU
+ 135DGD1jyq9AI9G9iFlx92vbF+Osuz4uMWg1vgeH6EROGOHGeP+cSQ0F0868rdQrrML8
+ CBxt/GBos0abrAEsuS5F/AHv7exN4QoRsrbHuqOF2uXhXhpmQJaZN7TC/1m9TS6gcisI
+ BOnRz2awErC1feNxG/HIu+OkUAht06YQ/uF3VXqqfPaXSBk1XybkYebirJFpx8gI8ezK
+ d0P2ZI1T2gFVDiCeRtFQaEHg3TqNM5XfHGf+y71a1DBd9fjAKGM5sWEwhoD8KT8HLzlj
+ AIEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=imEa4zBbfpb3JvR5Et11p6DtFQJbKbq8llXxmzPWmPg=;
- b=Ik9Nq3Y0N//Oz/BbzdWIMF3PniTtRXUhGCUV6IC/QPobK4jPdXrIIiSekBtPselsc1
- p4Xkqkd9znKNev5Gfcdc6KZgn4v8OUyHyLXISz3kPIap5ajZlNZ4jJg68xfJaoy7dj4t
- lf12p9yVXbwiR2vzeAq8uDJzqab0vnnT4mqVbWbxdhzCKU/m+kuze0ComiDEt67lcEdd
- 0Mdy+NONYnwvVPR2goHKau7OPbDVVdCed4VrX+Y1eGGCMcfvhy9j6VYScMmxKmGT0tE0
- UdYbu6WUcJEQwBlfEU2Y8Yuay2y66iu71M53RvPCZXlBNjHiKouIxqC+VXdSe5+TMCqa
- d0oA==
-X-Gm-Message-State: APjAAAUM0fQ4+8KRqOIEeu/1UyAgZMKPlbkTT29asgIAjTtLdU+LVfSE
- kAue7HONaqALfunYjNABc8JNuiXwkhpEAFYQ6fpBnA==
-X-Google-Smtp-Source: APXvYqwP+yn16jkHoPIZKrOMkOdQ1cEA2MMsa0I/L6i3nq7TBpc7bH3eOEl17hP4IE9UG9Hi8+/xKwaBMY1poQycvLw=
-X-Received: by 2002:a5e:940b:: with SMTP id q11mr13630095ioj.251.1561764381282; 
- Fri, 28 Jun 2019 16:26:21 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=W+njdGYXMwVUlALGNOEmZlA+AIB17I1tvTOGcXyYBh8=;
+ b=PXW6j7OfwsDs+LxYX3N9gdTzIdgxaENpthgGE1Et+E1xpg2Duw2awFnx6a4M3S69Wk
+ P4Mfc70sLemCm4J/kUEDgL1Y/oLNprddNwQckiDJivzRtFiNdsfTzQ5U9aHY0vlIVUHz
+ 6cqBM0P++C2fETQxTg4cixCThDs7tpI3sh5a100Tlk7eaxQewRTV4LwoRK9mJaF93aO0
+ 0W7Hh+KmAVOmK2eUdMoo5cT0RJ3RqrDJ4rbXgiZpgb1HJdHY1FWZx2I2o6mDZeQwPjdS
+ MG4JBquKC3nTkX37DoGKvEzz41Hd/VF1tW+esvjIi6yoN14QvLro6z+AQpu6qRY+bNqk
+ t5tA==
+X-Gm-Message-State: APjAAAWIrt3zen2ocy1sKPySlrp0jfuVLT5gch/OXgyFXqrcCpX0WTyR
+ iUMt2LAiSiPmyemlXZZeeWb+Nw==
+X-Google-Smtp-Source: APXvYqzXU4YGekZflP4unR6sVeEcOT5iZjp1JU2syJ42wVg/T4f3tOjW9MnQGTWXP6aSfqv7DZ+puA==
+X-Received: by 2002:adf:efc8:: with SMTP id i8mr9694825wrp.220.1561767031306; 
+ Fri, 28 Jun 2019 17:10:31 -0700 (PDT)
+Received: from [192.168.2.137] (93-34-153-63.ip50.fastwebnet.it.
+ [93.34.153.63])
+ by smtp.gmail.com with ESMTPSA id z5sm3470476wmf.48.2019.06.28.17.10.29
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 28 Jun 2019 17:10:30 -0700 (PDT)
+To: Andrew Jones <drjones@redhat.com>
+References: <20190621163422.6127-1-drjones@redhat.com>
+ <20190621163422.6127-8-drjones@redhat.com>
+ <be805987-250d-93a7-7d11-5204f0e16e7b@linaro.org>
+ <20190628072739.5t2o2yqaejn6pyd5@kamzik.brq.redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <4e7e78a6-1e6f-4190-4b15-12f443d9be78@linaro.org>
+Date: Sat, 29 Jun 2019 02:10:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <CALw29ZZZ08Lt13oZsbZCwV+uP0roLuT6t+8m16y+8YT-KH4t7A@mail.gmail.com>
-In-Reply-To: <CALw29ZZZ08Lt13oZsbZCwV+uP0roLuT6t+8m16y+8YT-KH4t7A@mail.gmail.com>
-From: Marlies Ruck <marlies.ruck@gmail.com>
-Date: Fri, 28 Jun 2019 16:26:10 -0700
-Message-ID: <CALw29ZbiqpGFOGHOP_7K2DvAfap_xE+PWAfXvvr35eK7aKn-dA@mail.gmail.com>
-To: qemu-devel@nongnu.org
+In-Reply-To: <20190628072739.5t2o2yqaejn6pyd5@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::d29
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] patch to swap SIGRTMIN + 1 and SIGRTMAX - 1
+X-Received-From: 2a00:1450:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH v2 07/14] target/arm/cpu64: max cpu:
+ Introduce sve<vl-bits> properties
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,28 +101,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, armbru@redhat.com,
+ eric.auger@redhat.com, qemu-arm@nongnu.org, imammedo@redhat.com,
+ alex.bennee@linaro.org, Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+On 6/28/19 9:27 AM, Andrew Jones wrote:
+> Also, while it's true we can always
+> get the max vq with next-smaller(ARM_MAX_VQ + 1), having it cached in
+> cpu->sve_max_vq is convenient. That said, I think we'd rather keep it.
 
-I just wanted to follow up since I sent this patch a week ago to make sure
-it was a received.  An ack would be appreciated.
+When is it convenient, and for what?
 
-Thanks,
-Marli
+Certainly the only thing that we check after boot is the largest enabled vq not
+larger than x.  And for that I don't see that sve_max_vq is relevant at all.
 
-On Fri, Jun 21, 2019 at 3:58 PM Marlies Ruck <marlies.ruck@gmail.com> wrote:
+Oh, something that we should also think about is -cpu foo, where foo is one of
+the Fujitsu thingumies.  We should be able to default sve_vq_map to that which
+a real bit of hw actually supports.  I, for one, welcome our typedef long
+overlords.  ;-)
 
-> Hi,
->
-> Attached is a patch to let guest programs use SIGRTMIN + 1 by swapping
-> with SIGRTMAX - 1. Since QEMU links against glibc, it reserves the signal
-> for itself and returns EINVAL (as noted in the commit message). This means
-> various applications that use SIGRTMIN + 1 cannot run on QEMU, including
-> G-WAN web server and Open TFTP.
->
-> Thanks,
-> Marli
->
+
+r~
+
