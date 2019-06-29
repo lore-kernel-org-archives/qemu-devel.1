@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44C3EC4321A
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 13:05:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7CDDC4321A
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 13:06:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16BDA21773
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 13:05:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B626A21773
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 13:06:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BZpraDfy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16BDA21773
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xolziRgk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B626A21773
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhD39-0001P3-7x
-	for qemu-devel@archiver.kernel.org; Sat, 29 Jun 2019 09:05:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41175)
+	id 1hhD3G-0001SX-SR
+	for qemu-devel@archiver.kernel.org; Sat, 29 Jun 2019 09:05:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41207)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hhCy9-0007yq-Cy
- for qemu-devel@nongnu.org; Sat, 29 Jun 2019 09:00:43 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hhCyA-0007zA-5p
+ for qemu-devel@nongnu.org; Sat, 29 Jun 2019 09:00:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hhCy8-0003b3-0r
- for qemu-devel@nongnu.org; Sat, 29 Jun 2019 09:00:41 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52319)
+ (envelope-from <richard.henderson@linaro.org>) id 1hhCy8-0003bx-KG
+ for qemu-devel@nongnu.org; Sat, 29 Jun 2019 09:00:42 -0400
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:34958)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hhCy7-0003TW-Ji
- for qemu-devel@nongnu.org; Sat, 29 Jun 2019 09:00:39 -0400
-Received: by mail-wm1-x344.google.com with SMTP id s3so11579319wms.2
- for <qemu-devel@nongnu.org>; Sat, 29 Jun 2019 06:00:32 -0700 (PDT)
+ id 1hhCy8-0003Jr-1w
+ for qemu-devel@nongnu.org; Sat, 29 Jun 2019 09:00:40 -0400
+Received: by mail-wr1-x42f.google.com with SMTP id c27so1283323wrb.2
+ for <qemu-devel@nongnu.org>; Sat, 29 Jun 2019 06:00:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=RrItPPBS9UjBeZEukcKAp5+okx0Y0meWpGahN0dzJrg=;
- b=BZpraDfyotkXrnQsOzsqHGnRGibzTzGiwTZUJQPr3N6dfn6XDsNEJaJaZ/4yDaXFnx
- VDThGNipvmL5f9Wfg0ZYGHqzeUg2gSqXBfS2qSDa8d93t7K4DMg70aWi9CJcpColcyZo
- DnJrY5/QGMNWWilKkakSMy+S9JwmPhNyuhEbQXwC+EwuluzZRtrpNuSIWfld+YIl/F/Q
- wySzSmNmqTjFYxItk7wcjN9cdvT7frLpaRiTvROwBZWd2dBVERee0xZpuqXX0Yh9CLzQ
- xmX+tB3j9t80I3aULxUm4p94RgfFxzxSGrrQ9+VX66+6Okvs5iThM0mlASZG691htRlh
- 2APg==
+ bh=WY4Omz8Ex3i46XNqwNpqR1lB6EPhNajmxe4fSGYDIiY=;
+ b=xolziRgkwLjU5eO/hYooBcYrePyLuD63CCIA/oVQJZY0sdf2SnifrT1BcFtVkci1p0
+ dEB3SMY8AHt/if8An24O6O1quolRKLUbpeWmAXoLnbCOc1WNUCtO+6AJ3d/ssgc6lpY2
+ noH1oOc+G8nZ5tU+w3mYDfdX3OiNp6ySWwp5P8GT0OlNI/FptO1T90ZeMyKIqGKXO/Rk
+ MGy05sO7eMF33/xaA3ypmawibHl7H3Am2VgLAHfDvCVjLKOoMpJ91ta/scNWi+/vIuuw
+ T42ZRlXhwCwfPiMRxMcBptk7oZIwtTuVZlZ/nbyD687EYccSmyzG+HHRrfa0wTLYZ5XF
+ eqAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=RrItPPBS9UjBeZEukcKAp5+okx0Y0meWpGahN0dzJrg=;
- b=Tt6uu5j999cs7fN9QlqZ1izeBEKl8Un1HE4FXuOZkFH//hwgKIeaq27a/8QO2Me0ts
- CD8S/WdW4/pjfidMPG+eBpNkkDKK0N6Yz+Mboo653BzHK7v+5hOl9YSMXZPyk1KqmhxL
- yvGmDxO62N9ONGDIQXiPwwBEiGnsMhpnXN/Y1WKKhpG3tz/nLMcx7QYmyPCWVfMKm2Tj
- SdaEnL4oDJTzfaNk4bQs+4IzUS/cQTPR2EtvFAnTEmzXXngymiIrMiFJ77TLSP99nRyC
- I1bxyQmLaD0y1SzacYjHAVcI8iMX8DQe19lM9beMoJA7ikrF9HSXCw99ckloWwlHI0gr
- 7q8g==
-X-Gm-Message-State: APjAAAUM4YxyaUtzVpcctu51SdKqHQM3e7lk/EbFT0Pf1HRERjO7ETNr
- k4Twzl+691soLKdNCsoPYiDxb9kq8pOMpQ==
-X-Google-Smtp-Source: APXvYqyWrI58i1DcwVQdPhQJIrNN5lHQanaZMdVLHoFDzf3inUGBVadv1eqnqXfATSPu9bHfWbxp0A==
-X-Received: by 2002:a1c:7c11:: with SMTP id x17mr9967351wmc.22.1561813231248; 
- Sat, 29 Jun 2019 06:00:31 -0700 (PDT)
+ bh=WY4Omz8Ex3i46XNqwNpqR1lB6EPhNajmxe4fSGYDIiY=;
+ b=JxeZQQEBa2ZW/RRmi6SL3ALvQUMDp351EFh07uCVGZ74DffTLlmBA4k07jMDVbSqYJ
+ noEKfm6y1PAQDHMtwSzRNavFj5BSFEFDCbREUbX/fehI+Dne883CqL/li7MUiwgGcLCy
+ aTUNsdrJZszomXAaDXeCMU1WwaGq00e/z8GBcnTB3GaQ219dLjs0VcYDkZjL+Ui+bbiT
+ gl+AP92TBWKoMTQHHWMA9NGflDUe6+lMClvQnT/NigM8pzJw0icmhpRxOXQt5Da5oeJ5
+ 8iJwo1II9KqC/8/Ia/PWIm3b0uLl9zuZ6EXzB2SK4JhDyEh/xOWD941QxJaqkyWEOBMY
+ TyJA==
+X-Gm-Message-State: APjAAAUQqsjRRsPmuQ5xK9cGxsABXb1kmZNzDg37VtL44jT29TL1Xi6e
+ 2f+XiN+vB9xJ9krkjr54sxsrVw1WvzBZpg==
+X-Google-Smtp-Source: APXvYqwvFKx9xonn8BTitB4v320TCbn/uiYoAG6t9Wi0DCRITHt9OmrxUzO4yW/ruHVlpTB/oN2DkA==
+X-Received: by 2002:adf:dfc4:: with SMTP id q4mr11523581wrn.54.1561813222027; 
+ Sat, 29 Jun 2019 06:00:22 -0700 (PDT)
 Received: from localhost.localdomain (93-34-153-63.ip50.fastwebnet.it.
  [93.34.153.63])
- by smtp.gmail.com with ESMTPSA id d10sm4937676wro.18.2019.06.29.06.00.30
+ by smtp.gmail.com with ESMTPSA id d10sm4937676wro.18.2019.06.29.06.00.21
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sat, 29 Jun 2019 06:00:30 -0700 (PDT)
+ Sat, 29 Jun 2019 06:00:21 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sat, 29 Jun 2019 15:00:13 +0200
-Message-Id: <20190629130017.2973-13-richard.henderson@linaro.org>
+Date: Sat, 29 Jun 2019 15:00:04 +0200
+Message-Id: <20190629130017.2973-4-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190629130017.2973-1-richard.henderson@linaro.org>
 References: <20190629130017.2973-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: [Qemu-devel] [PATCH v6 12/16] tcg/ppc: Support vector dup2
+X-Received-From: 2a00:1450:4864:20::42f
+Subject: [Qemu-devel] [PATCH v6 03/16] tcg/ppc: Introduce macros VRT(), VRA(),
+ VRB(), VRC()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,41 +96,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is only used for 32-bit hosts.
+Introduce macros VRT(), VRA(), VRB(), VRC() used for encoding
+elements of Altivec instructions.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- tcg/ppc/tcg-target.inc.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ tcg/ppc/tcg-target.inc.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-index cb604b76a3..9a44670180 100644
+index 9e560db993..cfbd7ff12c 100644
 --- a/tcg/ppc/tcg-target.inc.c
 +++ b/tcg/ppc/tcg-target.inc.c
-@@ -3105,6 +3105,14 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
-         }
-         break;
+@@ -473,6 +473,11 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+ #define MB64(b) ((b)<<5)
+ #define FXM(b) (1 << (19 - (b)))
  
-+    case INDEX_op_dup2_vec:
-+        assert(TCG_TARGET_REG_BITS == 32);
-+        /* With inputs a1 = xLxx, a2 = xHxx  */
-+        tcg_out32(s, VMRGHW | VRT(a0) | VRA(a2) | VRB(a1));  /* a0  = xxHL */
-+        tcg_out_vsldoi(s, TCG_VEC_TMP1, a0, a0, 8);          /* tmp = HLxx */
-+        tcg_out_vsldoi(s, a0, a0, TCG_VEC_TMP1, 8);          /* a0  = HLHL */
-+        return;
++#define VRT(r)  (((r) & 31) << 21)
++#define VRA(r)  (((r) & 31) << 16)
++#define VRB(r)  (((r) & 31) << 11)
++#define VRC(r)  (((r) & 31) <<  6)
 +
-     case INDEX_op_ppc_mrgh_vec:
-         insn = mrgh_op[vece];
-         break;
-@@ -3483,6 +3491,7 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     case INDEX_op_ppc_mulou_vec:
-     case INDEX_op_ppc_pkum_vec:
-     case INDEX_op_ppc_rotl_vec:
-+    case INDEX_op_dup2_vec:
-         return &v_v_v;
-     case INDEX_op_not_vec:
-     case INDEX_op_dup_vec:
+ #define LK    1
+ 
+ #define TAB(t, a, b) (RT(t) | RA(a) | RB(b))
 -- 
 2.17.1
 
