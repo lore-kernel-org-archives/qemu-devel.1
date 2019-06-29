@@ -2,90 +2,98 @@ Return-Path: <SRS0=rHaa=U4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DC7EC4321A
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 15:03:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6833CC4321A
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 16:37:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE0E2208E3
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 15:03:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3199F20665
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 16:37:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uPkDFMNn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE0E2208E3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e6ODvPkj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3199F20665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhEsu-0004np-Tl
-	for qemu-devel@archiver.kernel.org; Sat, 29 Jun 2019 11:03:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37897)
+	id 1hhGLl-0001Ml-3G
+	for qemu-devel@archiver.kernel.org; Sat, 29 Jun 2019 12:37:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52831)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1hhEqj-00037C-0B
- for qemu-devel@nongnu.org; Sat, 29 Jun 2019 11:01:11 -0400
+ (envelope-from <lucienmp.qemu@gmail.com>) id 1hhGL1-0000vF-8z
+ for qemu-devel@nongnu.org; Sat, 29 Jun 2019 12:36:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1hhEqh-0007G4-BO
- for qemu-devel@nongnu.org; Sat, 29 Jun 2019 11:01:08 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52719)
+ (envelope-from <lucienmp.qemu@gmail.com>) id 1hhGKz-0004Hb-4g
+ for qemu-devel@nongnu.org; Sat, 29 Jun 2019 12:36:30 -0400
+Received: from mail-pf1-x42b.google.com ([2607:f8b0:4864:20::42b]:39004)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1hhEqf-0007Bd-Ai
- for qemu-devel@nongnu.org; Sat, 29 Jun 2019 11:01:06 -0400
-Received: by mail-wm1-x342.google.com with SMTP id s3so11744905wms.2
- for <qemu-devel@nongnu.org>; Sat, 29 Jun 2019 08:01:02 -0700 (PDT)
+ (Exim 4.71) (envelope-from <lucienmp.qemu@gmail.com>)
+ id 1hhGKy-0004G1-RN
+ for qemu-devel@nongnu.org; Sat, 29 Jun 2019 12:36:29 -0400
+Received: by mail-pf1-x42b.google.com with SMTP id j2so4463932pfe.6
+ for <qemu-devel@nongnu.org>; Sat, 29 Jun 2019 09:36:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=gpp9Udz/jFQYQuXUbwF4OjuIMxDQuVUIk0bf5J+Kovs=;
- b=uPkDFMNnvQ0vTqQ1RZRMBzvZ5kKa1wW8Mn3zLS4odmbsJaRJ9mXweXTNQ1eK01dP8q
- s9atfzAe8hrA9odLutk8w5YcSrBeOzZQyXJFS0vaW3h+A5kqT5LMQGEWBo2HSHD6cUR9
- GrYDrW2SUBFM8tcZ2EldgWEw5gK717Wd1BYGXASNS7lQR1fTWzMvecxaXWDa173AKBcb
- dnX0D+SsEy4cFORSh8iRe7VvHrsw+snPbVe2ZzVSHbG7iKU05hqQpQlMKjIM7PwgTrIF
- oCDm2R0Uuv2E1f+C9uOJhP0QAOzsMBTteAJoP9FsC00C0RnkswTstD492WiOxME0UhWs
- +XKA==
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to
+ :user-agent; bh=l46NW/2PaHvKYOc+SYT1Ll5+7fjrY7Y4twLIQqXTMsc=;
+ b=e6ODvPkjLd8x8vISm3KNKqhYlh4xHmP3sxtX14Td9HMa7hm1kRrprmUam/pyWeunKU
+ VIP/XGUm5+bJFOzY0IAAIknuNHtGwTDU3ZpemUS1EZmHznFBMGMgVTtH+qf5yjNwB1gn
+ zfJSXw0X65Qz8+VBlb0Ojg2BdMVtQwbplrmhYmlRCBue49XopoXD73gTuxIAj/3Tt5Dh
+ 6W0BejKPWezCdTWOer6fhKTNSACIF5MpH+HFsmvlVhuHsHfyi3zOj8v6qPOYL7vHkeNz
+ MJYFvuknTaix1xwfItVywOVlhSLe95bn1upS8GZ7r7q/0pD8C62hTk+WjcP1ftWcyd0w
+ Webg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=gpp9Udz/jFQYQuXUbwF4OjuIMxDQuVUIk0bf5J+Kovs=;
- b=cE9uEgXhOUUn2nnop7vB9fbQyyJEvcvRQKx2OMnjC/73JplyKCiohIurjV5/2FJdt6
- beqgl8b7TZ+74vVJESGhGvH92FRzP7lweTB9+EHIVGTEUCT+ePSVLYGXGTsUoKEbXU7c
- XDTY9ZUXJU07Z5oLSzcCuezJ8bvQ2ONVPBU70fGWW/LGRmtESK2BvR2QgDYLwwHo5ZYU
- OHQq9awpO9CFRn1dkm17L6VVPuiF4PrGbCAimDEMYOGcOxFzaCEhljMdw7IHL8AUykuE
- NQI6WMWHd+X/IRDz9Yqrdg2d4/GD5aLT1GQb4hfMo2/V+Ksk98XAFO6/dS25pVp4+hVo
- k0+Q==
-X-Gm-Message-State: APjAAAWEdpL5WKuisD0GhM0xxXdkWuMZtsWGuzVSel005n1/OWgWvd4H
- Gptrb1WUIN4nOgINDnrO2WZWr5DU
-X-Google-Smtp-Source: APXvYqypS6qIcngmcEQnpZSo5b0wbCVexxm1XyKXUQVqbAlGsZFXijy3GzVf+Jjcj3SUjVfg2c4lvw==
-X-Received: by 2002:a1c:b6d4:: with SMTP id g203mr10892189wmf.19.1561820460058; 
- Sat, 29 Jun 2019 08:01:00 -0700 (PDT)
-Received: from x1.local (183.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.183])
- by smtp.gmail.com with ESMTPSA id h19sm5146231wrb.81.2019.06.29.08.00.58
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=l46NW/2PaHvKYOc+SYT1Ll5+7fjrY7Y4twLIQqXTMsc=;
+ b=D+h/kUuGdmLQad7pPTdH/AuELpL3dLJT9Iz3+xdHolRINlaaRyaJLR8HzDmgkFHbSi
+ szqtf6Mq897zrPWq7yyVCr41LX9govhOu+Ax0td9anE5PuGZLmOeyXtq282qUuZQDIAw
+ DpXYA8h8v8g7WQqBmKXybA1DPCQvpk2YxsQktMcDM0zj6GcQ6KaLZQ1XOsfo2Qg6KCvr
+ xDFReFipAfsl8tHNkBYa5nPSlGN9aQbRGxksv2lt17lwLzU1vtkdfF3dhaYulrtKBU1z
+ p2lGMHqlza9OP+4xLG4ZSEW6s5mFnldc+aqaXLw4Zapnx91UnIRjFQ/+dUbHV2FeCqP9
+ vo0A==
+X-Gm-Message-State: APjAAAVmsO4OZCmjUrcdVw0jI/HsiwcUnNS/6fWBNiFZQNSJ+A2uS4Lv
+ aaMmY583qU3dnoFUOENFVmg=
+X-Google-Smtp-Source: APXvYqxxfwhMCgb8e96yRd7sO6iW1CFE+hrMx2ub3WCNx9AXakz1nlQiCvLAyhGJT4vZ7GxMLIqf7Q==
+X-Received: by 2002:a17:90a:bf08:: with SMTP id
+ c8mr20222010pjs.75.1561826186707; 
+ Sat, 29 Jun 2019 09:36:26 -0700 (PDT)
+Received: from localhost.localdomain (i60-43-49-30.s30.a048.ap.plala.or.jp.
+ [60.43.49.30])
+ by smtp.gmail.com with ESMTPSA id i3sm4502536pgq.40.2019.06.29.09.36.24
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sat, 29 Jun 2019 08:00:59 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Date: Sat, 29 Jun 2019 17:00:55 +0200
-Message-Id: <20190629150056.9071-2-f4bug@amsat.org>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190629150056.9071-1-f4bug@amsat.org>
-References: <20190629150056.9071-1-f4bug@amsat.org>
+ Sat, 29 Jun 2019 09:36:25 -0700 (PDT)
+Date: Sun, 30 Jun 2019 01:36:21 +0900
+From: Lucien Murray-Pitts <lucienmp.qemu@gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <20190629163621.GA111724@localhost.localdomain>
+References: <2136180936.260219.1561641583358.ref@mail.yahoo.com>
+ <2136180936.260219.1561641583358@mail.yahoo.com>
+ <1079763171.281101.1561641752988@mail.yahoo.com>
+ <e4c1fbc4-3e43-5df4-a17c-527d98d9763c@linaro.org>
+ <20190628002713.GA19257@localhost.localdomain>
+ <eadb57ae-256d-0bb7-5988-f493662a5caf@linaro.org>
+ <20190628155030.GA34320@localhost.localdomain>
+ <ea16a81c-5b94-8dd0-8339-2bd82733aed2@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <ea16a81c-5b94-8dd0-8339-2bd82733aed2@linaro.org>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: [Qemu-devel] [PATCH 1/2] tests/acceptance: Add test of NeXTcube
- framebuffer using OCR
+X-Received-From: 2607:f8b0:4864:20::42b
+Subject: Re: [Qemu-devel] RFC: Why does target/m68k RTE insn. use
+ gen_exception
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,108 +105,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Thomas Huth <huth@tuxfamily.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Lucien Anti-Spam <lucienmp_antispam@yahoo.com>, qemu-devel@nongnu.org,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a test of the NeXTcube framebuffer using the Tesseract OCR
-engine on a screenshot of the framebuffer device.
+On Sat, Jun 29, 2019 at 12:15:44PM +0200, Richard Henderson wrote:
+> On 6/28/19 5:50 PM, Lucien Murray-Pitts wrote:
+> >  op_helper.c
+> >    static void m68k_interrupt_all(CPUM68KState *env, int is_hw)
+> >    ...
+> >      if (cs->exception_index == EXCP_ACCESS) {
+> >       ...
+> >       do_stack_frame(env, &sp, 7, oldsr, 0, retaddr /*LMP: BROKEN - needs PC NEXT*/);
+> > 
+> > Actually according to the MC68000 manuals the "return address" (the PC saved on
+> > the stack) can be upto 5 instructions later due to prefetch. So some pc_next
+> > would best be used here.
+> 
+> The way I read it from the 68040 manual, it's "the pc of the instruction
+> executing at the time the fault was detected".  Well, we did in fact detect the
+> fault at "retaddr", so that seems to be the right answer.  The fact that real
+> hardware has a different pipeline and detects the fault later seems immaterial,
+> and largely irrelevant, since the programmer wasn't given any guarantees for
+> what sort of value appears in that slot.
+> 
 
-The test is very quick:
+I was reading the 68000/68020, and based on your suggestion now the 68060 manual
+The 68000 is pretty rough, but I agree you could expect it to more likely be the
+next or even upto 5 or so instructions away.
 
-  $ avocado --show=app,ocr run tests/acceptance/machine_m68k_nextcube.py
-  JOB ID     : f7d3c27976047036dc568183baf64c04863d9985
-  JOB LOG    : ~/avocado/job-results/job-2019-06-29T16.18-f7d3c27/job.log
-  (1/1) tests/acceptance/machine_m68k_nextcube.py:NextCubeMachine.test_bootrom_framebuffer: |ocr:
-  ue r pun Honl'ﬂx ; 5‘ 55‘
-  avg ncaaaaa 25 MHZ, memary jag m
-  Backplane slat «a
-  Ethernet address a a r a r3 2
-  Memgry sackets aea canflqured far 16MB Darlly page made stMs but have 16MB page made stMs )nstalled
-  Memgry sackets a and 1 canflqured far 16MB Darlly page made stMs but have 16MB page made stMs )nstalled
-  [...]
-  Yestlnq the rpu, 5::
-  system test raneg Errar egge 51
-  Egg: cammand
-  Default pggc devlce nut fauna
-  NEXY>I
-  PASS (3.59 s)
-  RESULTS    : PASS 1 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 0
-  JOB TIME   : 3.97 s
+MC68000UM.pdf, 5.4.1 Bus Error Operation
+  ....the following information is placed on the supervisor stack:
+    1. Status register
+    2. Program counter (two words, which may be up to five words past the
+       instruction being executed)
+....
+MC68000UM.pdf, 6.3.9.1 BUS ERROR.
+  ...value saved for the program counter is advanced 2–10 bytes beyond the
+  address of the first word of the instruction that made the reference causing
+  the bus error. If the bus error occurred during the fetch of the next
+  instruction, the saved program counter has a value in the vicinity of the
+  current instruction, even if the current instruction is a branch, a jump, or
+  a return instruction ...
 
-Documentation on how to install tesseract:
-  https://github.com/tesseract-ocr/tesseract/wiki#installation
+MC68020UM.pdf, 6.1.2 Bus Error Exception
+  The saved PC value is the logical address of the instruction that was
+  executing at the time the fault was detected. This is not necessarily the
+  instruction that initiated the bus cycle since the processor overlaps
+  execution of instructions
+  (See 6.4 Bus Fault REcovery and 6.3.11 Return From Exception)
+  
+MC68060UM.pdf, 8.4.4.1 Program Counter (PC).
+On read access faults, the PC points to the instruction that caused the
+access error. This instruction is restarted when an RTE is executed, hence,
+the read cycle is re-executed. On read access errors on the second or later
+of misaligned reads, the read cycles that are successful prior to the access
+error are re-executed since the processor uses a restart model for recovery
+from exceptions.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- tests/acceptance/machine_m68k_nextcube.py | 50 +++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
- create mode 100644 tests/acceptance/machine_m68k_nextcube.py
+So it would seem the m68k was rather rough, but with the introduction
+of MMUs the 68010 and beyond handle it differently.  68010/20 have
+pipeline stage retries, and 68060 just returns to retry the instruction.
 
-diff --git a/tests/acceptance/machine_m68k_nextcube.py b/tests/acceptance/machine_m68k_nextcube.py
-new file mode 100644
-index 0000000000..cf061292a7
---- /dev/null
-+++ b/tests/acceptance/machine_m68k_nextcube.py
-@@ -0,0 +1,50 @@
-+# Functional test that boots a VM and run OCR on the framebuffer
-+#
-+# Copyright (c) Philippe Mathieu-Daudé <f4bug@amsat.org>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or
-+# later.  See the COPYING file in the top-level directory.
-+
-+import logging
-+import time
-+import distutils.spawn
-+
-+from avocado import skipUnless
-+from avocado_qemu import Test
-+from avocado.utils import process
-+
-+
-+class NextCubeMachine(Test):
-+
-+    timeout = 15
-+
-+    @skipUnless(distutils.spawn.find_executable('tesseract'),
-+                'tesseract OCR tool not installed')
-+    def test_bootrom_framebuffer(self):
-+        """
-+        :avocado: tags=arch:m68k
-+        :avocado: tags=machine:next-cube
-+        :avocado: tags=device:framebuffer
-+        """
-+        rom_url = ('http://www.nextcomputers.org/NeXTfiles/Software/ROM_Files/'
-+                   '68040_Non-Turbo_Chipset/Rev_2.5_v66.BIN')
-+        rom_hash = 'b3534796abae238a0111299fc406a9349f7fee24'
-+        rom_path = self.fetch_asset(rom_url, asset_hash=rom_hash)
-+
-+        self.vm.set_machine('next-cube')
-+        self.vm.add_args('-bios', rom_path)
-+        self.vm.launch()
-+
-+        self.log.info('VM launched, waiting for display')
-+        # FIXME how to catch the 'displaysurface_create 1120x832' trace-event?
-+        time.sleep(2)
-+
-+        screenshot_path = self.workdir + "dump"
-+        self.vm.command('human-monitor-command',
-+                        command_line='screendump %s' % screenshot_path)
-+
-+        console_logger = logging.getLogger('ocr')
-+        proc = process.run("tesseract %s stdout" % screenshot_path)
-+        console_logger.debug(proc.stdout_text)
-+        self.assertIn('Backplane', proc.stdout_text)
-+        self.assertIn('Ethernet address', proc.stdout_text)
--- 
-2.19.1
+In my case I think the original firmware expects to return after the
+faulting instruction, and the retry of the bus io is to be ignored
+(this is a memory map probe routine).
+
+So I think it would take significant work to fake the pipeline retry
+in the RTE instruction - so I will hack somethign into the memory region
+so it passes the second time the instruciton is exected.
+
+What are your thoughts?
+
+
+> > I am triggering this from inside my device by doing the following, since that memory address
+> > should dynamically cause a bus error (I hope this is the right way to do it)
+> >    cpuclass->do_unassigned_access( s->cpu, /*addr*/0x0, /*is_write*/1, /*is_exec*/0, opaque, /*size*/4);
+> 
+> 
+> For a device to raise a bus error, it should return MEMTX_ERROR (or something).
+>  This eventually reaches cpu_transaction_failed, which has all of the data that
+> you seem to be missing above.
+> 
+
+I was originally using this but it wasnt doing anything, now that you recommend it I see why -
+thank you for your help.
+
+qemu/accel/tcg/cputlb.c
+   ...
+   r = memory_region_dispatch_read(mr, mr_offset,
+                                    &val, size, iotlbentry->attrs);
+    if (r != MEMTX_OK) {
+        hwaddr physaddr = mr_offset +
+            section->offset_within_address_space -
+            section->offset_within_region;
+
+        cpu_transaction_failed(cpu, physaddr, addr, size, access_type,
+                               mmu_idx, iotlbentry->attrs, r, retaddr);
+    }
+    ...
+
+As you say this call directly flows through to CPUClass->transaction_failed
+( as found in the struct for CPUClass in qemu/include/qom/cpu.h )
+
+However for the m68k the do_transaction_failed function pointer field
+has not been implemented.
+
+I implemented it in a rudamentary fashion copying from already existing
+m68k_cpu_unassigned_access.  I really dont know if this is the right way.
+
+  void m68k_cpu_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
+                                  unsigned size, MMUAccessType access_type,
+                                  int mmu_idx, MemTxAttrs attrs,
+                                  MemTxResult response, uintptr_t retaddr)
+  {
+      cs->exception_index = EXCP_ACCESS;
+      cpu_loop_exit(cs);
+  }
+
+Then I reverted my device to the "mem with attributes" io with a return of
+MEMTX_ERROR and found that the behavior during single-step were the same as
+before.
+
+I end up ISR+1 instruction stepped in.
+
+I will have to dig more.  See some other peoples implementation and methods.
+
+If you have time I would appreciate your input, I am still very hazy on how
+the complete interaction, sepcially with gdb happens.
+
+Cheers,
+Luc
+
+
+
+
 
 
