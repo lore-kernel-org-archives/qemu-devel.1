@@ -2,98 +2,81 @@ Return-Path: <SRS0=rHaa=U4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6833CC4321A
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 16:37:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDE89C4321A
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 17:47:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3199F20665
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 16:37:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e6ODvPkj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3199F20665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id A750B214DA
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 17:47:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A750B214DA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tuxfamily.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhGLl-0001Ml-3G
-	for qemu-devel@archiver.kernel.org; Sat, 29 Jun 2019 12:37:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52831)
+	id 1hhHRg-0003ow-OV
+	for qemu-devel@archiver.kernel.org; Sat, 29 Jun 2019 13:47:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36698)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <lucienmp.qemu@gmail.com>) id 1hhGL1-0000vF-8z
- for qemu-devel@nongnu.org; Sat, 29 Jun 2019 12:36:32 -0400
+ (envelope-from <th.huth@gmail.com>) id 1hhHQ6-0003NX-OI
+ for qemu-devel@nongnu.org; Sat, 29 Jun 2019 13:45:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lucienmp.qemu@gmail.com>) id 1hhGKz-0004Hb-4g
- for qemu-devel@nongnu.org; Sat, 29 Jun 2019 12:36:30 -0400
-Received: from mail-pf1-x42b.google.com ([2607:f8b0:4864:20::42b]:39004)
+ (envelope-from <th.huth@gmail.com>) id 1hhHQ5-0004Mk-1j
+ for qemu-devel@nongnu.org; Sat, 29 Jun 2019 13:45:50 -0400
+Received: from mail-wm1-f53.google.com ([209.85.128.53]:36840)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <lucienmp.qemu@gmail.com>)
- id 1hhGKy-0004G1-RN
- for qemu-devel@nongnu.org; Sat, 29 Jun 2019 12:36:29 -0400
-Received: by mail-pf1-x42b.google.com with SMTP id j2so4463932pfe.6
- for <qemu-devel@nongnu.org>; Sat, 29 Jun 2019 09:36:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:content-transfer-encoding:in-reply-to
- :user-agent; bh=l46NW/2PaHvKYOc+SYT1Ll5+7fjrY7Y4twLIQqXTMsc=;
- b=e6ODvPkjLd8x8vISm3KNKqhYlh4xHmP3sxtX14Td9HMa7hm1kRrprmUam/pyWeunKU
- VIP/XGUm5+bJFOzY0IAAIknuNHtGwTDU3ZpemUS1EZmHznFBMGMgVTtH+qf5yjNwB1gn
- zfJSXw0X65Qz8+VBlb0Ojg2BdMVtQwbplrmhYmlRCBue49XopoXD73gTuxIAj/3Tt5Dh
- 6W0BejKPWezCdTWOer6fhKTNSACIF5MpH+HFsmvlVhuHsHfyi3zOj8v6qPOYL7vHkeNz
- MJYFvuknTaix1xwfItVywOVlhSLe95bn1upS8GZ7r7q/0pD8C62hTk+WjcP1ftWcyd0w
- Webg==
+ (Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1hhHQ4-0004Lu-RI
+ for qemu-devel@nongnu.org; Sat, 29 Jun 2019 13:45:48 -0400
+Received: by mail-wm1-f53.google.com with SMTP id u8so11859888wmm.1
+ for <qemu-devel@nongnu.org>; Sat, 29 Jun 2019 10:45:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=l46NW/2PaHvKYOc+SYT1Ll5+7fjrY7Y4twLIQqXTMsc=;
- b=D+h/kUuGdmLQad7pPTdH/AuELpL3dLJT9Iz3+xdHolRINlaaRyaJLR8HzDmgkFHbSi
- szqtf6Mq897zrPWq7yyVCr41LX9govhOu+Ax0td9anE5PuGZLmOeyXtq282qUuZQDIAw
- DpXYA8h8v8g7WQqBmKXybA1DPCQvpk2YxsQktMcDM0zj6GcQ6KaLZQ1XOsfo2Qg6KCvr
- xDFReFipAfsl8tHNkBYa5nPSlGN9aQbRGxksv2lt17lwLzU1vtkdfF3dhaYulrtKBU1z
- p2lGMHqlza9OP+4xLG4ZSEW6s5mFnldc+aqaXLw4Zapnx91UnIRjFQ/+dUbHV2FeCqP9
- vo0A==
-X-Gm-Message-State: APjAAAVmsO4OZCmjUrcdVw0jI/HsiwcUnNS/6fWBNiFZQNSJ+A2uS4Lv
- aaMmY583qU3dnoFUOENFVmg=
-X-Google-Smtp-Source: APXvYqxxfwhMCgb8e96yRd7sO6iW1CFE+hrMx2ub3WCNx9AXakz1nlQiCvLAyhGJT4vZ7GxMLIqf7Q==
-X-Received: by 2002:a17:90a:bf08:: with SMTP id
- c8mr20222010pjs.75.1561826186707; 
- Sat, 29 Jun 2019 09:36:26 -0700 (PDT)
-Received: from localhost.localdomain (i60-43-49-30.s30.a048.ap.plala.or.jp.
- [60.43.49.30])
- by smtp.gmail.com with ESMTPSA id i3sm4502536pgq.40.2019.06.29.09.36.24
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sat, 29 Jun 2019 09:36:25 -0700 (PDT)
-Date: Sun, 30 Jun 2019 01:36:21 +0900
-From: Lucien Murray-Pitts <lucienmp.qemu@gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <20190629163621.GA111724@localhost.localdomain>
-References: <2136180936.260219.1561641583358.ref@mail.yahoo.com>
- <2136180936.260219.1561641583358@mail.yahoo.com>
- <1079763171.281101.1561641752988@mail.yahoo.com>
- <e4c1fbc4-3e43-5df4-a17c-527d98d9763c@linaro.org>
- <20190628002713.GA19257@localhost.localdomain>
- <eadb57ae-256d-0bb7-5988-f493662a5caf@linaro.org>
- <20190628155030.GA34320@localhost.localdomain>
- <ea16a81c-5b94-8dd0-8339-2bd82733aed2@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=itNaMeRc/pP9VyirDVgdOPtQvWPuF9JJ6Iuog5YjXvE=;
+ b=N3E5S44VjcMoLJeWL5ThVLTNSkZnjWDxQYZ8FswvnXpPyKNMgbDxvb2ZFO2IdfUW/q
+ yWKNsVjgUZ80msLNMNJZWB2IUkOfo+13VfvRzlt9k2BifY4eao6gNSUVO0WqRoPhIPsP
+ Ya1DIjm9QRIJJui+AdDC3bMHAmFoXXtGVFnSVorkGhYWe+hFWz1WpB75wKNYl22u//9d
+ agTFxoAE/EoZLftAbgXL8mkBspbb9ue9te9ALSsPQCquSk3y99Hs/NHmg5CDZ8/RcGzK
+ lXa/1143SRFKj9HTIDc90x3rWCgwc4XnNlV/4PmR3sUIUw4LwV56+nNMbh5IqdBXcaJQ
+ ctWw==
+X-Gm-Message-State: APjAAAWMoICSUEHsjm8sCnQxIVvCg50jYfIf9tL7CIDmMP2FDi7Wy2nH
+ gjznJfFMGT3Gf/oxYTDN6Qk=
+X-Google-Smtp-Source: APXvYqzYDyEKCykTQ0JGDG35MTL7kuqmf9aUkTT39hajesK50odnQOVkeB2umf70k67/VPoiO+XBPg==
+X-Received: by 2002:a1c:ddd6:: with SMTP id u205mr10748726wmg.54.1561830347662; 
+ Sat, 29 Jun 2019 10:45:47 -0700 (PDT)
+Received: from thuth.remote.csb (p5791D7DD.dip0.t-ipconnect.de.
+ [87.145.215.221])
+ by smtp.gmail.com with ESMTPSA id w24sm4186481wmc.30.2019.06.29.10.45.44
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Sat, 29 Jun 2019 10:45:45 -0700 (PDT)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190628181536.13729-1-huth@tuxfamily.org>
+ <20190628181536.13729-2-huth@tuxfamily.org>
+ <994e8c6a-2137-9369-e9bb-05b017787b7b@redhat.com>
+From: Thomas Huth <huth@tuxfamily.org>
+Message-ID: <169e1d10-94c9-9f1a-8799-7483ba815538@tuxfamily.org>
+Date: Sat, 29 Jun 2019 19:45:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
+In-Reply-To: <994e8c6a-2137-9369-e9bb-05b017787b7b@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <ea16a81c-5b94-8dd0-8339-2bd82733aed2@linaro.org>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::42b
-Subject: Re: [Qemu-devel] RFC: Why does target/m68k RTE insn. use
- gen_exception
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.53
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] m68k: Add NeXTcube framebuffer
+ device emulation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,142 +88,252 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Lucien Anti-Spam <lucienmp_antispam@yahoo.com>, qemu-devel@nongnu.org,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Jun 29, 2019 at 12:15:44PM +0200, Richard Henderson wrote:
-> On 6/28/19 5:50 PM, Lucien Murray-Pitts wrote:
-> >  op_helper.c
-> >    static void m68k_interrupt_all(CPUM68KState *env, int is_hw)
-> >    ...
-> >      if (cs->exception_index == EXCP_ACCESS) {
-> >       ...
-> >       do_stack_frame(env, &sp, 7, oldsr, 0, retaddr /*LMP: BROKEN - needs PC NEXT*/);
-> > 
-> > Actually according to the MC68000 manuals the "return address" (the PC saved on
-> > the stack) can be upto 5 instructions later due to prefetch. So some pc_next
-> > would best be used here.
+On 29/06/2019 13.53, Philippe Mathieu-Daudé wrote:
+> Hi Thomas,
 > 
-> The way I read it from the 68040 manual, it's "the pc of the instruction
-> executing at the time the fault was detected".  Well, we did in fact detect the
-> fault at "retaddr", so that seems to be the right answer.  The fact that real
-> hardware has a different pipeline and detects the fault later seems immaterial,
-> and largely irrelevant, since the programmer wasn't given any guarantees for
-> what sort of value appears in that slot.
+> On 6/28/19 8:15 PM, Thomas Huth wrote:
+>> The NeXTcube uses a linear framebuffer with 4 greyscale colors and
+>> a fixed resolution of 1120 * 832.
+>> This code has been taken from Bryce Lanham's GSoC 2011 NeXT branch at
+>>
+>>  https://github.com/blanham/qemu-NeXT/blob/next-cube/hw/next-fb.c
 > 
-
-I was reading the 68000/68020, and based on your suggestion now the 68060 manual
-The 68000 is pretty rough, but I agree you could expect it to more likely be the
-next or even upto 5 or so instructions away.
-
-MC68000UM.pdf, 5.4.1 Bus Error Operation
-  ....the following information is placed on the supervisor stack:
-    1. Status register
-    2. Program counter (two words, which may be up to five words past the
-       instruction being executed)
-....
-MC68000UM.pdf, 6.3.9.1 BUS ERROR.
-  ...value saved for the program counter is advanced 2–10 bytes beyond the
-  address of the first word of the instruction that made the reference causing
-  the bus error. If the bus error occurred during the fetch of the next
-  instruction, the saved program counter has a value in the vicinity of the
-  current instruction, even if the current instruction is a branch, a jump, or
-  a return instruction ...
-
-MC68020UM.pdf, 6.1.2 Bus Error Exception
-  The saved PC value is the logical address of the instruction that was
-  executing at the time the fault was detected. This is not necessarily the
-  instruction that initiated the bus cycle since the processor overlaps
-  execution of instructions
-  (See 6.4 Bus Fault REcovery and 6.3.11 Return From Exception)
-  
-MC68060UM.pdf, 8.4.4.1 Program Counter (PC).
-On read access faults, the PC points to the instruction that caused the
-access error. This instruction is restarted when an RTE is executed, hence,
-the read cycle is re-executed. On read access errors on the second or later
-of misaligned reads, the read cycles that are successful prior to the access
-error are re-executed since the processor uses a restart model for recovery
-from exceptions.
-
-So it would seem the m68k was rather rough, but with the introduction
-of MMUs the 68010 and beyond handle it differently.  68010/20 have
-pipeline stage retries, and 68060 just returns to retry the instruction.
-
-In my case I think the original firmware expects to return after the
-faulting instruction, and the retry of the bus io is to be ignored
-(this is a memory map probe routine).
-
-So I think it would take significant work to fake the pipeline retry
-in the RTE instruction - so I will hack somethign into the memory region
-so it passes the second time the instruciton is exected.
-
-What are your thoughts?
-
-
-> > I am triggering this from inside my device by doing the following, since that memory address
-> > should dynamically cause a bus error (I hope this is the right way to do it)
-> >    cpuclass->do_unassigned_access( s->cpu, /*addr*/0x0, /*is_write*/1, /*is_exec*/0, opaque, /*size*/4);
+> Please use SHA1 for reference (unlikely case of Bryce pushing a new
+> version to his repo):
 > 
+> https://github.com/blanham/qemu-NeXT/blob/34f4323/hw/next-fb.c
+
+But if Bryce ever pushes a new version to his branch, the old SHA IDs
+won't be part of a branch anymore, so they will be garbage collected
+after a while and the links will become invalid. I think it's better to
+refer to the "next-cube" branch.
+
+>> and altered to fit the latest interface of the current QEMU (e.g.
+>> the device has been "qdev"-ified etc.).
+>>
+>> Signed-off-by: Thomas Huth <huth@tuxfamily.org>
+>> ---
+[...]
+>> diff --git a/hw/display/next-fb.c b/hw/display/next-fb.c
+>> new file mode 100644
+>> index 0000000000..740102d7e9
+>> --- /dev/null
+>> +++ b/hw/display/next-fb.c
+>> @@ -0,0 +1,157 @@
+>> +/*
+>> + * NeXT Cube/Station Framebuffer Emulation
+>> + *
+>> + * Copyright (c) 2011 Bryce Lanham
+>> + *
+>> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+>> + * of this software and associated documentation files (the "Software"), to deal
+>> + * in the Software without restriction, including without limitation the rights
+>> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+>> + * copies of the Software, and to permit persons to whom the Software is
+>> + * furnished to do so, subject to the following conditions:
+>> + *
+>> + * The above copyright notice and this permission notice shall be included in
+>> + * all copies or substantial portions of the Software.
+>> + *
+>> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+>> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+>> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+>> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+>> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+>> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+>> + * THE SOFTWARE.
+>> + */
+>> +#include "qemu/osdep.h"
+>> +#include "qapi/error.h"
+>> +#include "ui/console.h"
+>> +#include "hw/hw.h"
+>> +#include "hw/boards.h"
+>> +#include "hw/loader.h"
+>> +#include "hw/display/framebuffer.h"
+>> +#define BITS 8
 > 
-> For a device to raise a bus error, it should return MEMTX_ERROR (or something).
->  This eventually reaches cpu_transaction_failed, which has all of the data that
-> you seem to be missing above.
+> 'BITS' is not used, remove?
+
+Seems unused, indeed. I'll remove it.
+
+>> +static void nextfb_draw_line(void *opaque, uint8_t *d, const uint8_t *s,
+>> +                             int width, int pitch)
+>> +{
+>> +    NeXTFbState *nfbstate = NEXTFB(opaque);
+>> +    static const uint32_t pal[4] = {
+>> +        0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000
+>> +    };
+>> +    uint32_t *buf = (uint32_t *)d;
+>> +    int i = 0;
+>> +
+>> +    for (i = 0; i < nfbstate->cols / 4; i++) {
+>> +        int j = i * 4;
+>> +        uint8_t src = s[i];
+>> +        buf[j + 3] = pal[src & 0x3];
 > 
+> 0x3 -> 3?
 
-I was originally using this but it wasnt doing anything, now that you recommend it I see why -
-thank you for your help.
+I prefer the "0x" for bit-wise logical operations.
 
-qemu/accel/tcg/cputlb.c
-   ...
-   r = memory_region_dispatch_read(mr, mr_offset,
-                                    &val, size, iotlbentry->attrs);
-    if (r != MEMTX_OK) {
-        hwaddr physaddr = mr_offset +
-            section->offset_within_address_space -
-            section->offset_within_region;
+> or 0b11 :)
 
-        cpu_transaction_failed(cpu, physaddr, addr, size, access_type,
-                               mmu_idx, iotlbentry->attrs, r, retaddr);
-    }
-    ...
+Hmm, does that work with all compiler versions that we currently
+support? I remember it was not working with older versions of GCC...
 
-As you say this call directly flows through to CPUClass->transaction_failed
-( as found in the struct for CPUClass in qemu/include/qom/cpu.h )
+Anyway, Bryce used 0x3 in his original code, so I'd like to keep it
+close to his original code for the first commit. We can rework stuff
+like this in later patches if we like, but for the initial commit, it
+would be adequate that you can still recognize the original code, I think.
 
-However for the m68k the do_transaction_failed function pointer field
-has not been implemented.
+>> +        src >>= 2;
+>> +        buf[j + 2] = pal[src & 0x3];
+>> +        src >>= 2;
+>> +        buf[j + 1] = pal[src & 0x3];
+>> +        src >>= 2;
+>> +        buf[j + 0] = pal[src & 0x3];
+>> +    }
+>> +}
+>> +
+>> +static void nextfb_update(void *opaque)
+>> +{
+>> +    NeXTFbState *s = NEXTFB(opaque);
+>> +    int dest_width = 4;
+>> +    int src_width;
+>> +    int first = 0;
+>> +    int last  = 0;
+>> +    DisplaySurface *surface = qemu_console_surface(s->con);
+>> +
+>> +    src_width = s->cols / 4 + 8;
+>> +    dest_width = s->cols * 4;
+> 
+> Since those are currently const, should we move them to NeXTFbState
+> and initialize them in nextfb_realize()?
 
-I implemented it in a rudamentary fashion copying from already existing
-m68k_cpu_unassigned_access.  I really dont know if this is the right way.
+Should not matter much ... I think I'll also keep the original code here
+for now.
 
-  void m68k_cpu_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
-                                  unsigned size, MMUAccessType access_type,
-                                  int mmu_idx, MemTxAttrs attrs,
-                                  MemTxResult response, uintptr_t retaddr)
-  {
-      cs->exception_index = EXCP_ACCESS;
-      cpu_loop_exit(cs);
-  }
+>> +
+>> +    if (s->invalidate) {
+>> +        framebuffer_update_memory_section(&s->fbsection, &s->fb_mr, 0,
+>> +                                          s->cols, src_width);
+>> +        s->invalidate = 0;
+>> +    }
+>> +
+>> +    framebuffer_update_display(surface, &s->fbsection, 1120, 832,
+> 
+> 1120 -> s->cols?
+> 832 -> s->rows?
+> 
+>> +                               src_width, dest_width, 0, 1, nextfb_draw_line,
+>> +                               s, &first, &last);
+>> +
+>> +    dpy_gfx_update(s->con, 0, 0, 1120, 832);
+> 
+> Ditto.
 
-Then I reverted my device to the "mem with attributes" io with a return of
-MEMTX_ERROR and found that the behavior during single-step were the same as
-before.
+Ok.
 
-I end up ISR+1 instruction stepped in.
+>> +}
+>> +
+>> +static void nextfb_invalidate(void *opaque)
+>> +{
+>> +    NeXTFbState *s = NEXTFB(opaque);
+>> +    s->invalidate = 1;
+>> +}
+>> +
+>> +static const GraphicHwOps nextfb_ops = {
+>> +    .invalidate  = nextfb_invalidate,
+>> +    .gfx_update  = nextfb_update,
+>> +};
+>> +
+>> +static void nextfb_realize(DeviceState *dev, Error **errp)
+>> +{
+>> +    NeXTFbState *s = NEXTFB(dev);
+>> +
+>> +    memory_region_init_ram(&s->fb_mr, OBJECT(dev), "next-video", 0x1CB100,
+>> +                           &error_fatal);
+> 
+> 2 bits * cols * rows = 2 * 832 * 1120 = 0x1c7000
+> 
+> 0x1cb100 - 0x1c7000 = 0x4100
+> 
+> Any idea what are these 16K + 256 extra bytes for?
 
-I will have to dig more.  See some other peoples implementation and methods.
+No clue. But as you can see in nextfb_update() ("src_width = s->cols / 4
++ 8"), a line is a little bit wider than the visible 1120 pixels.
 
-If you have time I would appreciate your input, I am still very hazy on how
-the complete interaction, sepcially with gdb happens.
+> Anyway we have 2MB of VRAM on the hardware here, right?
+> If so you should replace 0x1CB100 -> 2 * MiB.
 
-Cheers,
-Luc
+I don't know the Cube hardware that well ... so let's keep the original
+values for now, we can still tune it later if necessary.
 
+>> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->fb_mr);
+>> +
+>> +    s->invalidate = 1;
+>> +    s->cols = 1120;
+>> +    s->rows = 832;
+>> +
+>> +    s->con = graphic_console_init(dev, 0, &nextfb_ops, s);
+>> +    qemu_console_resize(s->con, s->cols, s->rows);
+>> +}
+>> +
+>> +static void nextfb_class_init(ObjectClass *oc, void *data)
+>> +{
+>> +    DeviceClass *dc = DEVICE_CLASS(oc);
+>> +
+>> +    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
+>> +    dc->realize = nextfb_realize;
+>> +}
+>> +
+>> +static const TypeInfo nextfb_info = {
+>> +    .name          = TYPE_NEXTFB,
+>> +    .parent        = TYPE_SYS_BUS_DEVICE,
+>> +    .instance_size = sizeof(NeXTFbState),
+>> +    .class_init    = nextfb_class_init,
+>> +};
+>> +
+>> +static void nextfb_register_types(void)
+>> +{
+>> +    type_register_static(&nextfb_info);
+>> +}
+>> +
+>> +type_init(nextfb_register_types)
+>> +
+>> +void nextfb_init(void)
+>> +{
+>> +    DeviceState *dev;
+>> +
+>> +    dev = qdev_create(NULL, TYPE_NEXTFB);
+>> +    qdev_init_nofail(dev);
+>> +
+>> +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xB000000);
+> 
+> I'd appreciate this written as 0x0B000000 (32-bit address range).
+> 
+> Should you map the aliased VRAM regions here too?
+> 
+>     for (int i = 0; i <= 4; i++) {
+>        sysbus_mmio_map(SYS_BUS_DEVICE(dev), i,
+>                        0x0b000000 + 0x01000000 * i);
+>     }
 
+Where do you've got the information from that the VRAM region is aliased
+a couple of times?
 
+> Anyway nextfb_init() content is this is board-specific code, not
+> related to the device. Can you move it there?
 
+Ok, will do.
 
+Thanks for the review!
+
+ Thomas
 
