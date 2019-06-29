@@ -2,66 +2,81 @@ Return-Path: <SRS0=rHaa=U4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 800E7C4321A
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 13:39:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DAFFC4321A
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 13:49:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F280208E3
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 13:39:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F280208E3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id DE55C214AF
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 13:49:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h9HiZzCT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE55C214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39698 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhDZr-0003uY-Fx
-	for qemu-devel@archiver.kernel.org; Sat, 29 Jun 2019 09:39:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47736)
+	id 1hhDjn-0006N3-3R
+	for qemu-devel@archiver.kernel.org; Sat, 29 Jun 2019 09:49:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49494)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hhDYU-0003CG-Ix
- for qemu-devel@nongnu.org; Sat, 29 Jun 2019 09:38:15 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hhDih-0005fj-JS
+ for qemu-devel@nongnu.org; Sat, 29 Jun 2019 09:48:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hhDYT-0005HA-3q
- for qemu-devel@nongnu.org; Sat, 29 Jun 2019 09:38:14 -0400
-Resent-Date: Sat, 29 Jun 2019 09:38:14 -0400
-Resent-Message-Id: <E1hhDYT-0005HA-3q@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21467)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hhDYS-0005EW-RO
- for qemu-devel@nongnu.org; Sat, 29 Jun 2019 09:38:13 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1561815474; cv=none; d=zoho.com; s=zohoarc; 
- b=I7bj8c9xnHPd6q78Z2QSdhiO0v++zg9pIZhOgR6nH54+5W5tdzuZAPIdD+nI/bSJ1kRejVbfcFusPGkL3eNVyqPrqg10I5t0JNUet9scAw2DJwQS4fwKHi84BZhFHsh6xJg6LEX+LDAQu8CxtxL6mIyBH12UHVA3JMgrWTgJwUA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1561815474;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=ah47dNo/Vk/3ORGPyKthRqATuDrAC42cgDKRN3hupHY=; 
- b=Z5rdhcIZQuCfuCOS8cQbDxu6cxIfsjCyljJJw+VliirC3NN9bQVzZEzAL0zF8mdvdKNtGdiPCqvpF+yaO3kK/R862eQBKNlDf3iNPQ28yL+zidCbbgGGVHcWCG9btSd2URlpx61eev7AAOT1j78tYvRGcvNP35iYpNL8SUqdEBg=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 156181547149485.54275108764568;
- Sat, 29 Jun 2019 06:37:51 -0700 (PDT)
-Message-ID: <156181547046.16285.8706013476764581614@c4a48874b076>
-In-Reply-To: <20190629130017.2973-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: richard.henderson@linaro.org
-Date: Sat, 29 Jun 2019 06:37:51 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [PATCH v6 00/16] tcg/ppc: Add vector opcodes
+ (envelope-from <richard.henderson@linaro.org>) id 1hhDif-0000x3-JS
+ for qemu-devel@nongnu.org; Sat, 29 Jun 2019 09:48:47 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33424)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hhDic-0000iO-3O
+ for qemu-devel@nongnu.org; Sat, 29 Jun 2019 09:48:45 -0400
+Received: by mail-wr1-x442.google.com with SMTP id n9so9110235wru.0
+ for <qemu-devel@nongnu.org>; Sat, 29 Jun 2019 06:48:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id;
+ bh=uJnhNMoGL8yFyTGzU7fmju13WdcLl6dc7pthg5EJAo8=;
+ b=h9HiZzCTr3WRg3uUU1pdE16zH9zq7/JxKsSRldOByR1j/6CuvuA5sA6hxeFH3zAoPG
+ D8nrE+x+XxcbJD41CQ/AvAsLStJ3KSIHQ8Q4yglEtLJ5/hc0m/Tv3R7GzQRxhlDZ9uqL
+ js6GFG+52y2wxBTBAmI5wDZnAYIcxy2PE3cWxXn8Nb1R9ZwHcW7WuhkfmPka2bKfu7aS
+ jOxENb20/PSm3h6wUIPVa9uKuLZBv99cVo68TGEuwUW6WkmTMYC8aSWTl0fX4rJTHHmT
+ Fs1JDA/8tG9eoJ4YKpO7zCUQ6gPJaZk306MBFF3CoACvF+1LAtoLkMA8lAgaEeCeFptw
+ kn5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id;
+ bh=uJnhNMoGL8yFyTGzU7fmju13WdcLl6dc7pthg5EJAo8=;
+ b=fhJDBtXvT2nyzX8GaRJQoxZcJuJ2rI5AWA47kKfAB5gc6HlJiqBuSzW/ULoAJ3PeDn
+ Wda8W+mn0szPcIXSMaLve6gNamvgJx0P9drnrO6Un+brLQnB01/n0uyMU2s6CqvLs22n
+ NZge5PyjXg8gcpz6j6JDli5W2Z1P1Ywjpmd7D94KLlW/cHPJX1RE3j30Fj31AiauAGlz
+ /aPBUx9FjGWhh3zFhU7WkxP8NvCqG2NxhTWSt3JsB4ihTDpskZcQmaxWMaCWgPPhI46/
+ QLAy3kQ/jePh9U2y7JmCwkvTTkVLxpf2cvtOen4mUnz8jkSZjcBErX8xbYPeZJDDA0ZT
+ u28w==
+X-Gm-Message-State: APjAAAXvMqGsUNHof0yLkfXRJ7aX1UiS9/IlK2Ek2ySkkWR1klEcF1OF
+ HpEpWDURXqKoA4BPpQXg4kyskZhQIHJpfQ==
+X-Google-Smtp-Source: APXvYqwtA4mqTadK4Mno3T8QliuEwxAKcMSCJGQugO1h0Iin2iWK+w2VHmbSwYTPAQUBTUjdRP/P3A==
+X-Received: by 2002:adf:b605:: with SMTP id f5mr12534454wre.305.1561816119938; 
+ Sat, 29 Jun 2019 06:48:39 -0700 (PDT)
+Received: from localhost.localdomain (93-34-153-63.ip50.fastwebnet.it.
+ [93.34.153.63])
+ by smtp.gmail.com with ESMTPSA id c1sm10435114wrh.1.2019.06.29.06.48.39
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Sat, 29 Jun 2019 06:48:39 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Sat, 29 Jun 2019 15:48:38 +0200
+Message-Id: <20190629134838.5490-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PATCH] tcg: Fix expansion of INDEX_op_not_vec
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,85 +88,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
- amarkovic@wavecomp.com, hsp.cat7@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYyOTEzMDAxNy4yOTcz
-LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
-cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
-cgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NiAwMC8x
-Nl0gdGNnL3BwYzogQWRkIHZlY3RvciBvcGNvZGVzCk1lc3NhZ2UtaWQ6IDIwMTkwNjI5MTMwMDE3
-LjI5NzMtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnClR5cGU6IHNlcmllcwoKPT09IFRF
-U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2
-L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
-LmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBi
-YXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
-dGVzdCcKNzM1ZTQyOCB0Y2cvcHBjOiBVcGRhdGUgdmVjdG9yIHN1cHBvcnQgdG8gdjMuMDAKZDVk
-ZjhjZSB0Y2cvcHBjOiBVcGRhdGUgdmVjdG9yIHN1cHBvcnQgdG8gdjIuMDcKNzBiYWU4YyB0Y2cv
-cHBjOiBVcGRhdGUgdmVjdG9yIHN1cHBvcnQgdG8gdjIuMDYKY2RjYjZmZCB0Y2cvcHBjOiBFbmFi
-bGUgQWx0aXZlYyBkZXRlY3Rpb24KNWVjYTA0YSB0Y2cvcHBjOiBTdXBwb3J0IHZlY3RvciBkdXAy
-CjlhOTJhNWIgdGNnL3BwYzogU3VwcG9ydCB2ZWN0b3IgbXVsdGlwbHkKOWRjYmJiNSB0Y2cvcHBj
-OiBTdXBwb3J0IHZlY3RvciBzaGlmdCBieSBpbW1lZGlhdGUKNTcwN2NmZiB0Y2cvcHBjOiBQcmVw
-YXJlIGNhc2UgZm9yIHZlY3RvciBtdWx0aXBseQo0ZThjODU2IHRjZy9wcGM6IEFkZCBzdXBwb3J0
-IGZvciB2ZWN0b3Igc2F0dXJhdGVkIGFkZC9zdWJ0cmFjdAo4NTQyMzQ5IHRjZy9wcGM6IEFkZCBz
-dXBwb3J0IGZvciB2ZWN0b3IgYWRkL3N1YnRyYWN0CjA5ZGNjYTMgdGNnL3BwYzogQWRkIHN1cHBv
-cnQgZm9yIHZlY3RvciBtYXhpbXVtL21pbmltdW0KOTQwZDgwMiB0Y2cvcHBjOiBBZGQgc3VwcG9y
-dCBmb3IgbG9hZC9zdG9yZS9sb2dpYy9jb21wYXJpc29uCjEzNTRiNDggdGNnL3BwYzogRW5hYmxl
-IHRjZyBiYWNrZW5kIHZlY3RvciBjb21waWxhdGlvbgpjZTY1ZGM3IHRjZy9wcGM6IEludHJvZHVj
-ZSBtYWNyb3MgVlJUKCksIFZSQSgpLCBWUkIoKSwgVlJDKCkKYzE1ZTA3NiB0Y2cvcHBjOiBJbnRy
-b2R1Y2UgbWFjcm8gVlg0KCkKYTM1MTc5NiB0Y2cvcHBjOiBJbnRyb2R1Y2UgQWx0aXZlYyByZWdp
-c3RlcnMKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTYgQ2hlY2tpbmcgY29tbWl0IGEzNTE3OTY3
-NGNmMiAodGNnL3BwYzogSW50cm9kdWNlIEFsdGl2ZWMgcmVnaXN0ZXJzKQoyLzE2IENoZWNraW5n
-IGNvbW1pdCBjMTVlMDc2YzdkMGYgKHRjZy9wcGM6IEludHJvZHVjZSBtYWNybyBWWDQoKSkKRVJS
-T1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnfCcgKGN0eDpWeFYpCiMyMTogRklMRTog
-dGNnL3BwYy90Y2ctdGFyZ2V0LmluYy5jOjMyMjoKKyNkZWZpbmUgVlg0KG9wYykgIChPUENEKDQp
-fChvcGMpKQogICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBlcnJvcnMsIDAg
-d2FybmluZ3MsIDcgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8xNiBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoKMy8xNiBDaGVja2luZyBjb21taXQgY2U2NWRjNzZmNzQzICh0Y2cvcHBjOiBJbnRy
-b2R1Y2UgbWFjcm9zIFZSVCgpLCBWUkEoKSwgVlJCKCksIFZSQygpKQo0LzE2IENoZWNraW5nIGNv
-bW1pdCAxMzU0YjQ4YTRkY2UgKHRjZy9wcGM6IEVuYWJsZSB0Y2cgYmFja2VuZCB2ZWN0b3IgY29t
-cGlsYXRpb24pCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBz
-ZXBhcmF0ZSBsaW5lCiMxNTU6IEZJTEU6IHRjZy9wcGMvdGNnLXRhcmdldC5pbmMuYzoyODQyOgor
-ICAgIGlmIChod2NhcCAmIC8qIFBQQ19GRUFUVVJFX0hBU19BTFRJVkVDIC0tIE5PVCBZRVQgKi8g
-MCkgewoKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlO
-VEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTczOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFs
-OiAwIGVycm9ycywgMiB3YXJuaW5ncywgMTM4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDQvMTYgaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNS8xNiBDaGVja2luZyBjb21taXQgOTQwZDgwMjc5OTRk
-ICh0Y2cvcHBjOiBBZGQgc3VwcG9ydCBmb3IgbG9hZC9zdG9yZS9sb2dpYy9jb21wYXJpc29uKQo2
-LzE2IENoZWNraW5nIGNvbW1pdCAwOWRjY2EzYzlmODcgKHRjZy9wcGM6IEFkZCBzdXBwb3J0IGZv
-ciB2ZWN0b3IgbWF4aW11bS9taW5pbXVtKQo3LzE2IENoZWNraW5nIGNvbW1pdCA4NTQyMzQ5YTQ1
-ZjQgKHRjZy9wcGM6IEFkZCBzdXBwb3J0IGZvciB2ZWN0b3IgYWRkL3N1YnRyYWN0KQo4LzE2IENo
-ZWNraW5nIGNvbW1pdCA0ZThjODU2NTE4NmQgKHRjZy9wcGM6IEFkZCBzdXBwb3J0IGZvciB2ZWN0
-b3Igc2F0dXJhdGVkIGFkZC9zdWJ0cmFjdCkKOS8xNiBDaGVja2luZyBjb21taXQgNTcwN2NmZjYw
-ZmFmICh0Y2cvcHBjOiBQcmVwYXJlIGNhc2UgZm9yIHZlY3RvciBtdWx0aXBseSkKMTAvMTYgQ2hl
-Y2tpbmcgY29tbWl0IDlkY2JiYjU2MTA0NiAodGNnL3BwYzogU3VwcG9ydCB2ZWN0b3Igc2hpZnQg
-YnkgaW1tZWRpYXRlKQoxMS8xNiBDaGVja2luZyBjb21taXQgOWE5MmE1YmZmZWJkICh0Y2cvcHBj
-OiBTdXBwb3J0IHZlY3RvciBtdWx0aXBseSkKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZl
-ciB1c2UgdGFicwojMTMzOiBGSUxFOiB0Y2cvcHBjL3RjZy10YXJnZXQuaW5jLmM6MzIyMDoKK15J
-YnJlYWs7JAoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxODUgbGluZXMgY2hlY2tlZAoK
-UGF0Y2ggMTEvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjEyLzE2IENoZWNraW5nIGNv
-bW1pdCA1ZWNhMDRhODZhZWEgKHRjZy9wcGM6IFN1cHBvcnQgdmVjdG9yIGR1cDIpCjEzLzE2IENo
-ZWNraW5nIGNvbW1pdCBjZGNiNmZkYmUxOTAgKHRjZy9wcGM6IEVuYWJsZSBBbHRpdmVjIGRldGVj
-dGlvbikKMTQvMTYgQ2hlY2tpbmcgY29tbWl0IDcwYmFlOGM2YjNkZiAodGNnL3BwYzogVXBkYXRl
-IHZlY3RvciBzdXBwb3J0IHRvIHYyLjA2KQoxNS8xNiBDaGVja2luZyBjb21taXQgZDVkZjhjZWMz
-NzE4ICh0Y2cvcHBjOiBVcGRhdGUgdmVjdG9yIHN1cHBvcnQgdG8gdjIuMDcpCjE2LzE2IENoZWNr
-aW5nIGNvbW1pdCA3MzVlNDI4ZjVmMmEgKHRjZy9wcGM6IFVwZGF0ZSB2ZWN0b3Igc3VwcG9ydCB0
-byB2My4wMCkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29k
-ZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xv
-Z3MvMjAxOTA2MjkxMzAwMTcuMjk3My0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvdGVz
-dGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+This operation can always be emitted, even if we need to
+fall back to xor.  Adjust the assertions to match.
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+
+While expanding the AA64 vector ORC, Altivec needs a bare NOT operation.
+
+This failure does not appear for aa64 or power8 hosts because we have a
+native vector orc and so do not go down this path.  It also does not
+appear for x86_64 because we don't have a native vector not, and so go
+down a different path to expand not via xor with -1.
+
+
+r~
+
+---
+ tcg/tcg-op-vec.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/tcg/tcg-op-vec.c b/tcg/tcg-op-vec.c
+index c8fdc24f56..6714991bf4 100644
+--- a/tcg/tcg-op-vec.c
++++ b/tcg/tcg-op-vec.c
+@@ -90,6 +90,9 @@ bool tcg_can_emit_vecop_list(const TCGOpcode *list,
+         case INDEX_op_bitsel_vec:
+             /* These opcodes are mandatory and should not be listed.  */
+             g_assert_not_reached();
++        case INDEX_op_not_vec:
++            /* These opcodes have generic expansions using the above.  */
++            g_assert_not_reached();
+         default:
+             break;
+         }
+@@ -438,11 +441,14 @@ static bool do_op2(unsigned vece, TCGv_vec r, TCGv_vec a, TCGOpcode opc)
+ 
+ void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a)
+ {
++    const TCGOpcode *hold_list = tcg_swap_vecop_list(NULL);
++
+     if (!TCG_TARGET_HAS_not_vec || !do_op2(vece, r, a, INDEX_op_not_vec)) {
+         TCGv_vec t = tcg_const_ones_vec_matching(r);
+         tcg_gen_xor_vec(0, r, a, t);
+         tcg_temp_free_vec(t);
+     }
++    tcg_swap_vecop_list(hold_list);
+ }
+ 
+ void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a)
+-- 
+2.17.1
 
 
