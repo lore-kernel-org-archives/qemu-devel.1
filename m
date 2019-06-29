@@ -2,81 +2,95 @@ Return-Path: <SRS0=rHaa=U4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DAFFC4321A
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 13:49:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0011CC4321A
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 14:41:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE55C214AF
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 13:49:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B56422075B
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Jun 2019 14:41:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h9HiZzCT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE55C214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="steS/+cr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B56422075B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39756 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhDjn-0006N3-3R
-	for qemu-devel@archiver.kernel.org; Sat, 29 Jun 2019 09:49:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49494)
+	id 1hhEXw-0007Cg-GZ
+	for qemu-devel@archiver.kernel.org; Sat, 29 Jun 2019 10:41:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60596)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hhDih-0005fj-JS
- for qemu-devel@nongnu.org; Sat, 29 Jun 2019 09:48:48 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1hhEWn-0006hy-2P
+ for qemu-devel@nongnu.org; Sat, 29 Jun 2019 10:40:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hhDif-0000x3-JS
- for qemu-devel@nongnu.org; Sat, 29 Jun 2019 09:48:47 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33424)
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1hhEWl-0005sN-50
+ for qemu-devel@nongnu.org; Sat, 29 Jun 2019 10:40:33 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33634)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hhDic-0000iO-3O
- for qemu-devel@nongnu.org; Sat, 29 Jun 2019 09:48:45 -0400
-Received: by mail-wr1-x442.google.com with SMTP id n9so9110235wru.0
- for <qemu-devel@nongnu.org>; Sat, 29 Jun 2019 06:48:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id;
- bh=uJnhNMoGL8yFyTGzU7fmju13WdcLl6dc7pthg5EJAo8=;
- b=h9HiZzCTr3WRg3uUU1pdE16zH9zq7/JxKsSRldOByR1j/6CuvuA5sA6hxeFH3zAoPG
- D8nrE+x+XxcbJD41CQ/AvAsLStJ3KSIHQ8Q4yglEtLJ5/hc0m/Tv3R7GzQRxhlDZ9uqL
- js6GFG+52y2wxBTBAmI5wDZnAYIcxy2PE3cWxXn8Nb1R9ZwHcW7WuhkfmPka2bKfu7aS
- jOxENb20/PSm3h6wUIPVa9uKuLZBv99cVo68TGEuwUW6WkmTMYC8aSWTl0fX4rJTHHmT
- Fs1JDA/8tG9eoJ4YKpO7zCUQ6gPJaZk306MBFF3CoACvF+1LAtoLkMA8lAgaEeCeFptw
- kn5w==
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1hhEWk-0005r5-UC
+ for qemu-devel@nongnu.org; Sat, 29 Jun 2019 10:40:31 -0400
+Received: by mail-wr1-x444.google.com with SMTP id n9so9194942wru.0
+ for <qemu-devel@nongnu.org>; Sat, 29 Jun 2019 07:40:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:openpgp:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=iMHIumVRvoVn7VJYnBzlz0yuwsNk+c26EI4iSaOI2o0=;
+ b=steS/+crJhZRKaCP21btdKOq4nyEwlItMqxr8cvUXRVQUPQyegdpI8SDlrxiVL631W
+ ZGKR4wbD1qvun5HjFBGwkdovgmEvtR0UobvPlMLFT/vCh4dIZHaTKmdJBlhmbBStco/V
+ LDF70V+q+cWHRSueKwGwah9v9/9232dIbG00FGRobQYlryuwhSPGxv71o6Bvigtd7hZ2
+ kLLPG6yoEK51HX8QMpyBczZWmD/6yR1lZk8IzExJZVZuOuvTYBCQUUCeDGPA4XpYA+1/
+ 0A/zDvNyAup00i+vCaYwvFrENFMzLpsJbkUExXglXpfUZJPxvDIK3G7Glk36jfumsHEJ
+ DU9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id;
- bh=uJnhNMoGL8yFyTGzU7fmju13WdcLl6dc7pthg5EJAo8=;
- b=fhJDBtXvT2nyzX8GaRJQoxZcJuJ2rI5AWA47kKfAB5gc6HlJiqBuSzW/ULoAJ3PeDn
- Wda8W+mn0szPcIXSMaLve6gNamvgJx0P9drnrO6Un+brLQnB01/n0uyMU2s6CqvLs22n
- NZge5PyjXg8gcpz6j6JDli5W2Z1P1Ywjpmd7D94KLlW/cHPJX1RE3j30Fj31AiauAGlz
- /aPBUx9FjGWhh3zFhU7WkxP8NvCqG2NxhTWSt3JsB4ihTDpskZcQmaxWMaCWgPPhI46/
- QLAy3kQ/jePh9U2y7JmCwkvTTkVLxpf2cvtOen4mUnz8jkSZjcBErX8xbYPeZJDDA0ZT
- u28w==
-X-Gm-Message-State: APjAAAXvMqGsUNHof0yLkfXRJ7aX1UiS9/IlK2Ek2ySkkWR1klEcF1OF
- HpEpWDURXqKoA4BPpQXg4kyskZhQIHJpfQ==
-X-Google-Smtp-Source: APXvYqwtA4mqTadK4Mno3T8QliuEwxAKcMSCJGQugO1h0Iin2iWK+w2VHmbSwYTPAQUBTUjdRP/P3A==
-X-Received: by 2002:adf:b605:: with SMTP id f5mr12534454wre.305.1561816119938; 
- Sat, 29 Jun 2019 06:48:39 -0700 (PDT)
-Received: from localhost.localdomain (93-34-153-63.ip50.fastwebnet.it.
- [93.34.153.63])
- by smtp.gmail.com with ESMTPSA id c1sm10435114wrh.1.2019.06.29.06.48.39
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sat, 29 Jun 2019 06:48:39 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Sat, 29 Jun 2019 15:48:38 +0200
-Message-Id: <20190629134838.5490-1-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
+ h=x-gm-message-state:sender:subject:to:cc:references:from:openpgp
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=iMHIumVRvoVn7VJYnBzlz0yuwsNk+c26EI4iSaOI2o0=;
+ b=trKDpe6o75HtCZB6udABYxBhWwxydslGtXLPcRKWY3bHWZohvYT8KGr/a2j0U19fKx
+ PyKlQjaByML/8gYBYQpJwWP/R9iBFhqp5wrrFrHp6me4nVzKo8dkGaz6KwohmQbNyWLS
+ Ukq437hMNL8u5QuSEc84M+roh0SB0H/e/1Q7ga7Z/CqFjj2RW/rc2wnuuLH3KlRroGJg
+ wYIB6psudcaoSLShWRIOVj7o0lJ9QqCFOY8tv5eHIl5a9LPpAtkKwjD67ttDrr0GRsIE
+ siLh3MSQzimAf/KAf4NvUSWY5EXGKJuKDN+8jgN44ZOf/BoHMZo80WciCeeq1WoKHffC
+ k7IA==
+X-Gm-Message-State: APjAAAV4teaOIwjL+YMm1ydYEbrtzHeRi4KRb4Fym/BwX34MZ3ClbYhC
+ EbpV3dcMlVSo0y9QPjkI8uY=
+X-Google-Smtp-Source: APXvYqwyne8jSztdWPRiflydOShGTqpq54BMq4ctxlpHPUj/NJAtjhOT2HcVESZ3bdoEv1AgI5JXDw==
+X-Received: by 2002:a5d:528d:: with SMTP id c13mr11853940wrv.247.1561819228663; 
+ Sat, 29 Jun 2019 07:40:28 -0700 (PDT)
+Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.183])
+ by smtp.gmail.com with ESMTPSA id v4sm5096511wmg.22.2019.06.29.07.40.27
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Sat, 29 Jun 2019 07:40:27 -0700 (PDT)
+To: Thomas Huth <huth@tuxfamily.org>, qemu-devel@nongnu.org
+References: <20190628181536.13729-1-huth@tuxfamily.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Openpgp: url=http://pgp.mit.edu/pks/lookup?op=get&search=0xE3E32C2CDEADC0DE
+Message-ID: <f5c2d6f7-c6a7-3c90-1043-14353bfe57dd@amsat.org>
+Date: Sat, 29 Jun 2019 16:40:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <20190628181536.13729-1-huth@tuxfamily.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: [Qemu-devel] [PATCH] tcg: Fix expansion of INDEX_op_not_vec
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] m68k: Add basic support for the
+ NeXTcube machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,60 +102,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This operation can always be emitted, even if we need to
-fall back to xor.  Adjust the assertions to match.
+On 6/28/19 8:15 PM, Thomas Huth wrote:
+> Bryce apparently never got around to work on this again, so I'll have
+> another try now ...
+> 
+> During Google Summer of Code 2011, Bryce Lanham added the possibility to
+> emulate the NeXTcube machine in QEMU, e.g. see this URL for some details:
+> 
+> https://wiki.qemu.org/Google_Summer_of_Code_2011#NeXT_machines_system_emulation
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
+I'm not sure you used the correct URL, the GSoC entry is not very
+useful. I found this one more helpful (v1):
+https://lists.gnu.org/archive/html/qemu-devel/2011-08/msg02158.html
 
-While expanding the AA64 vector ORC, Altivec needs a bare NOT operation.
-
-This failure does not appear for aa64 or power8 hosts because we have a
-native vector orc and so do not go down this path.  It also does not
-appear for x86_64 because we don't have a native vector not, and so go
-down a different path to expand not via xor with -1.
-
-
-r~
-
----
- tcg/tcg-op-vec.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/tcg/tcg-op-vec.c b/tcg/tcg-op-vec.c
-index c8fdc24f56..6714991bf4 100644
---- a/tcg/tcg-op-vec.c
-+++ b/tcg/tcg-op-vec.c
-@@ -90,6 +90,9 @@ bool tcg_can_emit_vecop_list(const TCGOpcode *list,
-         case INDEX_op_bitsel_vec:
-             /* These opcodes are mandatory and should not be listed.  */
-             g_assert_not_reached();
-+        case INDEX_op_not_vec:
-+            /* These opcodes have generic expansions using the above.  */
-+            g_assert_not_reached();
-         default:
-             break;
-         }
-@@ -438,11 +441,14 @@ static bool do_op2(unsigned vece, TCGv_vec r, TCGv_vec a, TCGOpcode opc)
- 
- void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a)
- {
-+    const TCGOpcode *hold_list = tcg_swap_vecop_list(NULL);
-+
-     if (!TCG_TARGET_HAS_not_vec || !do_op2(vece, r, a, INDEX_op_not_vec)) {
-         TCGv_vec t = tcg_const_ones_vec_matching(r);
-         tcg_gen_xor_vec(0, r, a, t);
-         tcg_temp_free_vec(t);
-     }
-+    tcg_swap_vecop_list(hold_list);
- }
- 
- void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a)
--- 
-2.17.1
-
+> But since the machine requires a 68040 CPU and this was not included in
+> upstream QEMU in 2011 yet, the patches have never been merged to upstream.
+> 
+> Then, during the last years, Laurent completed the full 680x0 support in
+> upstream QEMU, so we could finally merge the NeXTcube support, too.
+> 
+> The QEMU interfaces changed a lot since 2011, so I had to modify the
+> sources quite a bit, but with the attached patches, it is now possible
+> to boot up to the firmware monitor again.
+> 
+> Note that boot device emulation is either still missing (network and SCSI),
+> so you can not boot any operating systems with this machine yet. I have
+> the patches for these devices in my brach here:
+> 
+>  https://gitlab.com/huth/qemu/commits/next-cube
+> 
+> ... but they are not quite working yet, so I'll submit them later once
+> they have been fixed and the basic support patches of this series have
+> been merged.
+> 
+> v2:
+>  - Don't use memory_region_allocate_system_memory() for the framebuffer
+>    device anymore
+>  - Turn the keyboard device into a proper QOM device
+>  - Put the global variables in the third patch into the machine state
+>    structure
+>  - Got rid of the "//" C++ comments
 
