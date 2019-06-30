@@ -5,82 +5,81 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79D56C5B57E
-	for <qemu-devel@archiver.kernel.org>; Sun, 30 Jun 2019 11:51:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EC1FC5B57E
+	for <qemu-devel@archiver.kernel.org>; Sun, 30 Jun 2019 13:39:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E272320659
-	for <qemu-devel@archiver.kernel.org>; Sun, 30 Jun 2019 11:51:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7DBE20665
+	for <qemu-devel@archiver.kernel.org>; Sun, 30 Jun 2019 13:39:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Smq4F8Bz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E272320659
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J3W5Ufzh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7DBE20665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhYN9-00076O-PA
-	for qemu-devel@archiver.kernel.org; Sun, 30 Jun 2019 07:51:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60089)
+	id 1hha2n-0002dj-UE
+	for qemu-devel@archiver.kernel.org; Sun, 30 Jun 2019 09:39:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47255)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hhYMH-0006eb-PU
- for qemu-devel@nongnu.org; Sun, 30 Jun 2019 07:51:05 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hha1p-0002CX-My
+ for qemu-devel@nongnu.org; Sun, 30 Jun 2019 09:38:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hhYME-0004oG-Lp
- for qemu-devel@nongnu.org; Sun, 30 Jun 2019 07:51:01 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:39107)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hha1l-0002RQ-Pi
+ for qemu-devel@nongnu.org; Sun, 30 Jun 2019 09:38:01 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:47079)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1hhYME-0004ne-D7
- for qemu-devel@nongnu.org; Sun, 30 Jun 2019 07:50:58 -0400
-Received: by mail-ot1-x343.google.com with SMTP id r21so9953569otq.6
- for <qemu-devel@nongnu.org>; Sun, 30 Jun 2019 04:50:58 -0700 (PDT)
+ id 1hha1j-0002OQ-RT
+ for qemu-devel@nongnu.org; Sun, 30 Jun 2019 09:37:57 -0400
+Received: by mail-oi1-x244.google.com with SMTP id 65so7810040oid.13
+ for <qemu-devel@nongnu.org>; Sun, 30 Jun 2019 06:37:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=cbHphO6zlIHfdLeKG+NcKltPd3nMVjIZM3Q0u8tKAxU=;
- b=Smq4F8BzF9OOGFOFoChxr2qOij9mdryVQdZsLxd7yK5GQ+jO5maTcSyhnnwtBPwleB
- IsuXhPZiwVbmR0zc+KJBwnbuxIuXNfA+zKoNFwZBgm18v/g7lmbotDjA9jgb2A/Us5Ia
- I1dz7CDY3aMOcyE0xXJF6wA6zgx7Bost4Ut9UiADypqD0kA+nlt2lT0yMUMkauEj0JTX
- cVlhqQ009/f33fOZ8A4xgOk/Fx9Z7U2dCCvY2ahi8SVTSb6OBAy3XX9UZ6kHB4k6KY/J
- HZ9A79ODIwvUltgiF2Kp6U36/cIAXX02yyESd0Y76fhxqf8KmUJ6hHcuUEZ9hydzH7HJ
- BBoQ==
+ :cc; bh=gm1WQ1n7WexGK2fTG7M6zWYTVuyjfAw8H9M6qAhKb+E=;
+ b=J3W5UfzhN96b7W5s6J7lnopgxHMZ/MabvnG0tanbGPgPgNb8xvgT4YfdJpWsDIUa9g
+ KuAmi4ibCes49CBmdsNnbRfPmHA8u+b6GovEcDJb6XaitVBuUFfF7PceL64BqXDLwAqB
+ QFoSOFrkjgMp/UTk5vMZPA3TknybBCx7HGRL3BB26AWnhHAZPlT3sdwz2osmN9dI1oXg
+ C2BsSObRu7LKtNX9dlwt4HIo9B/Ry0XkmGrrLtq5wXfHbpAM8cDop+QV5QX49YDHjqr+
+ tPqE2Xe9HtIrDwYY70+6+9dum7ANpJxBOYFwzIVH0DOWy8JwL1iiyKRpE3aX1IvdV6aL
+ U76w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:in-reply-to:references:from:date
  :message-id:subject:to:cc;
- bh=cbHphO6zlIHfdLeKG+NcKltPd3nMVjIZM3Q0u8tKAxU=;
- b=aMKcXkK2QkLYxk7XFtH1YiKbVh9ZWFaxfcOp7PnODsg+fGNC38vMTj8Ri51laKT3p6
- 4ssO6zLMqRzmbWaeCM8F2AQZftAyN1qPUA8oWQn2Qx6xJOEGUFOtHA44RjdtX6NCJ4kP
- lgwvgqmG1vxmVmIL5G+P7uEAfdMqrENMOGTdC/o0ZvKqetGQEtzpzYyd6TFoRGbDL5VN
- M1qOt9YnvBpK2/XJDmY3pfEPzKHCQ3IsVkwISCMd+g0s+C0vJz3Kg0ZMtBbzlBLYk+2s
- lLPgr/CsB/2kI8v0jCRRrWwXQbfsM8kbNr4lqoKZfgI0HBwBX8VqWE9Xu+n2ux2u0yb+
- O7mw==
-X-Gm-Message-State: APjAAAXptDL7OyJyWhSFtogsW3A8AL84bve/7vMs/toNKghefTVExVNE
- 1hWGA2EbvD3kqtrILpy4t7G83+je7q5fuoaDNN8=
-X-Google-Smtp-Source: APXvYqwwzfJnyfjI5HwYxzEAHp0jEc1y3WrS3ahYlcupcHHJn0fey2HGV2uXS4hvPdKw3YtqqtBVuCOfRCn2rYXiWzo=
-X-Received: by 2002:a05:6830:11d4:: with SMTP id
- v20mr14879440otq.121.1561895457456; 
- Sun, 30 Jun 2019 04:50:57 -0700 (PDT)
+ bh=gm1WQ1n7WexGK2fTG7M6zWYTVuyjfAw8H9M6qAhKb+E=;
+ b=ViFRTsojcOFVNjwS0p8vUQVoB4wFPB3XqfWQsM5Z0HkmKXeQ9SWdcjpxj0cswAAvJk
+ cpD9bUInq+G5CCJsPbINw/vJI1MWbcSQR3iJopLzpfb4MTbgxIXhhxU3G7Q5W1S7Rqg2
+ yZqsEoGY9rvNEGS3XPaE63hWSJy55kxPzvcUNGeaM0dqpUAuvcdrU5XDUIcLttBSKg40
+ eX4zt41T1N2yCr1N/daPee908pEY5vmCx+U163nQJzw/dF1/tQf9r+THO2T1s4QqFxJ8
+ Dm7jKRN1ChMiknG9eDhYo/V4lOGTfTmBvpIBGYtRIaX9z21+m/szYxua0IDeBoW7xzVu
+ RHVA==
+X-Gm-Message-State: APjAAAXiWz5aXt8eeb/YbACSTLGUIwDPwiPDKkCEhqJFJiswq53jyuwz
+ Ugl/OtBT8RZLsqiLMkEZSSk3vT+PmoQM75Em4Nk=
+X-Google-Smtp-Source: APXvYqzjPSVKLOkPJ6Ac+QyZvhQOWnim3xxlnNFdj50pCV+H3oqfolvQHOmnf+w+/pVBeik9GwvcHzPsdxJUa2ZQLv4=
+X-Received: by 2002:aca:310a:: with SMTP id x10mr4087740oix.62.1561901874147; 
+ Sun, 30 Jun 2019 06:37:54 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP; Sun, 30 Jun 2019 04:50:57
+Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP; Sun, 30 Jun 2019 06:37:53
  -0700 (PDT)
-Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP; Sun, 30 Jun 2019 04:50:57
+Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP; Sun, 30 Jun 2019 06:37:53
  -0700 (PDT)
 In-Reply-To: <20190629130017.2973-16-richard.henderson@linaro.org>
 References: <20190629130017.2973-1-richard.henderson@linaro.org>
  <20190629130017.2973-16-richard.henderson@linaro.org>
 From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Sun, 30 Jun 2019 13:50:57 +0200
-Message-ID: <CAL1e-=gCAeCBWL8VkZr9Hy9VE4VTBTv5=4L=8PFfxv1N3Pq3RA@mail.gmail.com>
+Date: Sun, 30 Jun 2019 15:37:53 +0200
+Message-ID: <CAL1e-=ghMjUtEyqKX+s15RcyQp6uQO_hJ_u4RTSJ5ZyPvFnymw@mail.gmail.com>
 To: Richard Henderson <richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+X-Received-From: 2607:f8b0:4864:20::244
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
 Subject: Re: [Qemu-devel] [PATCH v6 15/16] tcg/ppc: Update vector support to
  v2.07
@@ -107,12 +106,6 @@ wrote:
 > This includes single-word loads and stores, lots of double-word
 > arithmetic, and a few extra logical operations.
 >
-
-This patch should be split into several units (so, treat shift, compare,
-etc. separately).
-
-The same for other similar patches from this series.
-
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 > ---
@@ -150,6 +143,15 @@ The same for other similar patches from this series.
 >  bool have_isa_2_06;
 >  bool have_isa_2_06_vsx;
 > +bool have_isa_2_07_vsx;
+
+Does this flag indicate support for PowerISA 2.07 or VSX?
+
+If VSX support is implied by PowerISA 2.07, then =E2=80=9C_vsx=E2=80=9D suf=
+fix is really
+not needed. If not, why are there two flavors of =E2=80=9C2_06=E2=80=9D fla=
+gs (with and
+without _vsx), and only one flavor if 2.07 (with _vsx) flg variables?
+
 >  bool have_isa_3_00;
 >
 >  #define HAVE_ISA_2_06  have_isa_2_06
@@ -266,7 +268,7 @@ val, TCGType type,
 >  #define RA(r) ((r)<<16)
 > @@ -697,12 +724,27 @@ static bool tcg_out_mov(TCGContext *s, TCGType
 type, TCGReg ret, TCGReg arg)
->          tcg_debug_assert(TCG_TARGET_REG_BITS == 64);
+>          tcg_debug_assert(TCG_TARGET_REG_BITS =3D=3D 64);
 >          /* fallthru */
 >      case TCG_TYPE_I32:
 > -        if (ret < TCG_REG_V0 && arg < TCG_REG_V0) {
@@ -280,7 +282,8 @@ type, TCGReg ret, TCGReg arg)
 > +                tcg_out32(s, OR | SAB(arg, ret, arg));
 > +                break;
 > +            } else if (have_isa_2_07_vsx) {
-> +                tcg_out32(s, (type == TCG_TYPE_I32 ? MFVSRWZ : MFVSRD)
+> +                tcg_out32(s, (type =3D=3D TCG_TYPE_I32 ? MFVSRWZ : MFVSR=
+D)
 > +                          | VRT(arg) | RA(ret) | 1);
 > +                break;
 > +            } else {
@@ -289,7 +292,8 @@ type, TCGReg ret, TCGReg arg)
 > +            }
 > +        } else if (arg < TCG_REG_V0) {
 > +            if (have_isa_2_07_vsx) {
-> +                tcg_out32(s, (type == TCG_TYPE_I32 ? MTVSRWZ : MTVSRD)
+> +                tcg_out32(s, (type =3D=3D TCG_TYPE_I32 ? MTVSRWZ : MTVSR=
+D)
 > +                          | VRT(ret) | RA(arg) | 1);
 > +                break;
 > +            } else {
@@ -308,9 +312,9 @@ type, TCGReg ret,
 > +            tcg_out_mem_long(s, 0, LXSIWZX | 1, ret, base, offset);
 > +            break;
 > +        }
->          assert((offset & 3) == 0);
+>          assert((offset & 3) =3D=3D 0);
 >          tcg_out_mem_long(s, 0, LVEWX, ret, base, offset);
->          shift = (offset - 4) & 0xc;
+>          shift =3D (offset - 4) & 0xc;
 > @@ -1187,6 +1233,10 @@ static void tcg_out_st(TCGContext *s, TCGType
 type, TCGReg arg,
 >              tcg_out_mem_long(s, STW, STWX, arg, base, offset);
@@ -320,8 +324,8 @@ type, TCGReg arg,
 > +            tcg_out_mem_long(s, 0, STXSIWX | 1, arg, base, offset);
 > +            break;
 > +        }
->          assert((offset & 3) == 0);
->          shift = (offset - 4) & 0xc;
+>          assert((offset & 3) =3D=3D 0);
+>          shift =3D (offset - 4) & 0xc;
 >          if (shift) {
 > @@ -2907,26 +2957,37 @@ int tcg_can_emit_vec_op(TCGOpcode opc, TCGType
 type, unsigned vece)
@@ -339,7 +343,7 @@ type, unsigned vece)
 > +    case INDEX_op_shlv_vec:
 > +    case INDEX_op_shrv_vec:
 > +    case INDEX_op_sarv_vec:
-> +        return vece <= MO_32 || have_isa_2_07_vsx;
+> +        return vece <=3D MO_32 || have_isa_2_07_vsx;
 >      case INDEX_op_ssadd_vec:
 >      case INDEX_op_sssub_vec:
 >      case INDEX_op_usadd_vec:
@@ -347,14 +351,14 @@ type, unsigned vece)
 > -    case INDEX_op_shlv_vec:
 > -    case INDEX_op_shrv_vec:
 > -    case INDEX_op_sarv_vec:
->          return vece <= MO_32;
+>          return vece <=3D MO_32;
 >      case INDEX_op_cmp_vec:
 > -    case INDEX_op_mul_vec:
 >      case INDEX_op_shli_vec:
 >      case INDEX_op_shri_vec:
 >      case INDEX_op_sari_vec:
-> -        return vece <= MO_32 ? -1 : 0;
-> +        return vece <= MO_32 || have_isa_2_07_vsx ? -1 : 0;
+> -        return vece <=3D MO_32 ? -1 : 0;
+> +        return vece <=3D MO_32 || have_isa_2_07_vsx ? -1 : 0;
 > +    case INDEX_op_mul_vec:
 > +        switch (vece) {
 > +        case MO_8:
@@ -372,65 +376,65 @@ TCGOpcode opc,
 >                             const TCGArg *args, const int *const_args)
 >  {
 >      static const uint32_t
-> -        add_op[4] = { VADDUBM, VADDUHM, VADDUWM, 0 },
-> -        sub_op[4] = { VSUBUBM, VSUBUHM, VSUBUWM, 0 },
-> -        eq_op[4]  = { VCMPEQUB, VCMPEQUH, VCMPEQUW, 0 },
-> -        gts_op[4] = { VCMPGTSB, VCMPGTSH, VCMPGTSW, 0 },
-> -        gtu_op[4] = { VCMPGTUB, VCMPGTUH, VCMPGTUW, 0 },
-> +        add_op[4] = { VADDUBM, VADDUHM, VADDUWM, VADDUDM },
-> +        sub_op[4] = { VSUBUBM, VSUBUHM, VSUBUWM, VSUBUDM },
-> +        eq_op[4]  = { VCMPEQUB, VCMPEQUH, VCMPEQUW, VCMPEQUD },
-> +        gts_op[4] = { VCMPGTSB, VCMPGTSH, VCMPGTSW, VCMPGTSD },
-> +        gtu_op[4] = { VCMPGTUB, VCMPGTUH, VCMPGTUW, VCMPGTUD },
->          ssadd_op[4] = { VADDSBS, VADDSHS, VADDSWS, 0 },
->          usadd_op[4] = { VADDUBS, VADDUHS, VADDUWS, 0 },
->          sssub_op[4] = { VSUBSBS, VSUBSHS, VSUBSWS, 0 },
->          ussub_op[4] = { VSUBUBS, VSUBUHS, VSUBUWS, 0 },
-> -        umin_op[4] = { VMINUB, VMINUH, VMINUW, 0 },
-> -        smin_op[4] = { VMINSB, VMINSH, VMINSW, 0 },
-> -        umax_op[4] = { VMAXUB, VMAXUH, VMAXUW, 0 },
-> -        smax_op[4] = { VMAXSB, VMAXSH, VMAXSW, 0 },
-> -        shlv_op[4] = { VSLB, VSLH, VSLW, 0 },
-> -        shrv_op[4] = { VSRB, VSRH, VSRW, 0 },
-> -        sarv_op[4] = { VSRAB, VSRAH, VSRAW, 0 },
-> +        umin_op[4] = { VMINUB, VMINUH, VMINUW, VMINUD },
-> +        smin_op[4] = { VMINSB, VMINSH, VMINSW, VMINSD },
-> +        umax_op[4] = { VMAXUB, VMAXUH, VMAXUW, VMAXUD },
-> +        smax_op[4] = { VMAXSB, VMAXSH, VMAXSW, VMAXSD },
-> +        shlv_op[4] = { VSLB, VSLH, VSLW, VSLD },
-> +        shrv_op[4] = { VSRB, VSRH, VSRW, VSRD },
-> +        sarv_op[4] = { VSRAB, VSRAH, VSRAW, VSRAD },
->          mrgh_op[4] = { VMRGHB, VMRGHH, VMRGHW, 0 },
->          mrgl_op[4] = { VMRGLB, VMRGLH, VMRGLW, 0 },
-> -        muleu_op[4] = { VMULEUB, VMULEUH, 0, 0 },
-> -        mulou_op[4] = { VMULOUB, VMULOUH, 0, 0 },
-> +        muleu_op[4] = { VMULEUB, VMULEUH, VMULEUW, 0 },
-> +        mulou_op[4] = { VMULOUB, VMULOUH, VMULOUW, 0 },
->          pkum_op[4] = { VPKUHUM, VPKUWUM, 0, 0 },
-> -        rotl_op[4] = { VRLB, VRLH, VRLW, 0 };
-> +        rotl_op[4] = { VRLB, VRLH, VRLW, VRLD };
+> -        add_op[4] =3D { VADDUBM, VADDUHM, VADDUWM, 0 },
+> -        sub_op[4] =3D { VSUBUBM, VSUBUHM, VSUBUWM, 0 },
+> -        eq_op[4]  =3D { VCMPEQUB, VCMPEQUH, VCMPEQUW, 0 },
+> -        gts_op[4] =3D { VCMPGTSB, VCMPGTSH, VCMPGTSW, 0 },
+> -        gtu_op[4] =3D { VCMPGTUB, VCMPGTUH, VCMPGTUW, 0 },
+> +        add_op[4] =3D { VADDUBM, VADDUHM, VADDUWM, VADDUDM },
+> +        sub_op[4] =3D { VSUBUBM, VSUBUHM, VSUBUWM, VSUBUDM },
+> +        eq_op[4]  =3D { VCMPEQUB, VCMPEQUH, VCMPEQUW, VCMPEQUD },
+> +        gts_op[4] =3D { VCMPGTSB, VCMPGTSH, VCMPGTSW, VCMPGTSD },
+> +        gtu_op[4] =3D { VCMPGTUB, VCMPGTUH, VCMPGTUW, VCMPGTUD },
+>          ssadd_op[4] =3D { VADDSBS, VADDSHS, VADDSWS, 0 },
+>          usadd_op[4] =3D { VADDUBS, VADDUHS, VADDUWS, 0 },
+>          sssub_op[4] =3D { VSUBSBS, VSUBSHS, VSUBSWS, 0 },
+>          ussub_op[4] =3D { VSUBUBS, VSUBUHS, VSUBUWS, 0 },
+> -        umin_op[4] =3D { VMINUB, VMINUH, VMINUW, 0 },
+> -        smin_op[4] =3D { VMINSB, VMINSH, VMINSW, 0 },
+> -        umax_op[4] =3D { VMAXUB, VMAXUH, VMAXUW, 0 },
+> -        smax_op[4] =3D { VMAXSB, VMAXSH, VMAXSW, 0 },
+> -        shlv_op[4] =3D { VSLB, VSLH, VSLW, 0 },
+> -        shrv_op[4] =3D { VSRB, VSRH, VSRW, 0 },
+> -        sarv_op[4] =3D { VSRAB, VSRAH, VSRAW, 0 },
+> +        umin_op[4] =3D { VMINUB, VMINUH, VMINUW, VMINUD },
+> +        smin_op[4] =3D { VMINSB, VMINSH, VMINSW, VMINSD },
+> +        umax_op[4] =3D { VMAXUB, VMAXUH, VMAXUW, VMAXUD },
+> +        smax_op[4] =3D { VMAXSB, VMAXSH, VMAXSW, VMAXSD },
+> +        shlv_op[4] =3D { VSLB, VSLH, VSLW, VSLD },
+> +        shrv_op[4] =3D { VSRB, VSRH, VSRW, VSRD },
+> +        sarv_op[4] =3D { VSRAB, VSRAH, VSRAW, VSRAD },
+>          mrgh_op[4] =3D { VMRGHB, VMRGHH, VMRGHW, 0 },
+>          mrgl_op[4] =3D { VMRGLB, VMRGLH, VMRGLW, 0 },
+> -        muleu_op[4] =3D { VMULEUB, VMULEUH, 0, 0 },
+> -        mulou_op[4] =3D { VMULOUB, VMULOUH, 0, 0 },
+> +        muleu_op[4] =3D { VMULEUB, VMULEUH, VMULEUW, 0 },
+> +        mulou_op[4] =3D { VMULOUB, VMULOUH, VMULOUW, 0 },
+>          pkum_op[4] =3D { VPKUHUM, VPKUWUM, 0, 0 },
+> -        rotl_op[4] =3D { VRLB, VRLH, VRLW, 0 };
+> +        rotl_op[4] =3D { VRLB, VRLH, VRLW, VRLD };
 >
->      TCGType type = vecl + TCG_TYPE_V64;
->      TCGArg a0 = args[0], a1 = args[1], a2 = args[2];
+>      TCGType type =3D vecl + TCG_TYPE_V64;
+>      TCGArg a0 =3D args[0], a1 =3D args[1], a2 =3D args[2];
 > @@ -3074,6 +3135,10 @@ static void tcg_out_vec_op(TCGContext *s,
 TCGOpcode opc,
 >      case INDEX_op_sub_vec:
->          insn = sub_op[vece];
+>          insn =3D sub_op[vece];
 >          break;
 > +    case INDEX_op_mul_vec:
-> +        tcg_debug_assert(vece == MO_32 && have_isa_2_07_vsx);
-> +        insn = VMULUWM;
+> +        tcg_debug_assert(vece =3D=3D MO_32 && have_isa_2_07_vsx);
+> +        insn =3D VMULUWM;
 > +        break;
 >      case INDEX_op_ssadd_vec:
->          insn = ssadd_op[vece];
+>          insn =3D ssadd_op[vece];
 >          break;
 > @@ -3123,6 +3188,9 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode
 opc,
->          insn = VNOR;
->          a2 = a1;
+>          insn =3D VNOR;
+>          a2 =3D a1;
 >          break;
 > +    case INDEX_op_orc_vec:
-> +        insn = VORC;
+> +        insn =3D VORC;
 > +        break;
 >
 >      case INDEX_op_cmp_vec:
@@ -438,10 +442,10 @@ opc,
 > @@ -3203,7 +3271,7 @@ static void expand_vec_cmp(TCGType type, unsigned
 vece, TCGv_vec v0,
 >  {
->      bool need_swap = false, need_inv = false;
+>      bool need_swap =3D false, need_inv =3D false;
 >
-> -    tcg_debug_assert(vece <= MO_32);
-> +    tcg_debug_assert(vece <= MO_32 || have_isa_2_07_vsx);
+> -    tcg_debug_assert(vece <=3D MO_32);
+> +    tcg_debug_assert(vece <=3D MO_32 || have_isa_2_07_vsx);
 >
 >      switch (cond) {
 >      case TCG_COND_EQ:
@@ -451,21 +455,21 @@ vece, TCGv_vec v0,
 >
 >      case MO_32:
 > +        tcg_debug_assert(!have_isa_2_07_vsx);
->          t3 = tcg_temp_new_vec(type);
->          t4 = tcg_temp_new_vec(type);
+>          t3 =3D tcg_temp_new_vec(type);
+>          t4 =3D tcg_temp_new_vec(type);
 >          tcg_gen_dupi_vec(MO_8, t4, -16);
 > @@ -3562,6 +3631,11 @@ static void tcg_target_init(TCGContext *s)
->              have_isa_2_06_vsx = true;
+>              have_isa_2_06_vsx =3D true;
 >          }
 >      }
 > +    if (hwcap2 & PPC_FEATURE2_ARCH_2_07) {
 > +        if (hwcap & PPC_FEATURE_HAS_VSX) {
-> +            have_isa_2_07_vsx = true;
+> +            have_isa_2_07_vsx =3D true;
 > +        }
 > +    }
 >  #ifdef PPC_FEATURE2_ARCH_3_00
 >      if (hwcap2 & PPC_FEATURE2_ARCH_3_00) {
->          have_isa_3_00 = true;
+>          have_isa_3_00 =3D true;
 > --
 > 2.17.1
 >
