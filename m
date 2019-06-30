@@ -2,68 +2,88 @@ Return-Path: <SRS0=1g4J=U5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E86EC5B57E
-	for <qemu-devel@archiver.kernel.org>; Sun, 30 Jun 2019 17:53:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFF0BC5B57E
+	for <qemu-devel@archiver.kernel.org>; Sun, 30 Jun 2019 17:59:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D9C620665
-	for <qemu-devel@archiver.kernel.org>; Sun, 30 Jun 2019 17:53:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D9C620665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AC4E520665
+	for <qemu-devel@archiver.kernel.org>; Sun, 30 Jun 2019 17:59:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC4E520665
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhe0f-0000mr-8J
-	for qemu-devel@archiver.kernel.org; Sun, 30 Jun 2019 13:53:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33285)
+	id 1hhe6m-0002ya-QG
+	for qemu-devel@archiver.kernel.org; Sun, 30 Jun 2019 13:59:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34322)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <crosa@redhat.com>) id 1hhdzF-0000K4-HU
- for qemu-devel@nongnu.org; Sun, 30 Jun 2019 13:51:39 -0400
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hhe65-0002Zf-Q9
+ for qemu-devel@nongnu.org; Sun, 30 Jun 2019 13:58:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1hhdzD-0005fv-GE
- for qemu-devel@nongnu.org; Sun, 30 Jun 2019 13:51:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54256)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1hhdzD-0005fW-7f
- for qemu-devel@nongnu.org; Sun, 30 Jun 2019 13:51:35 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3C427309175E;
- Sun, 30 Jun 2019 17:51:33 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-120-238.rdu2.redhat.com
- [10.10.120.238])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D03DC1001B21;
- Sun, 30 Jun 2019 17:51:27 +0000 (UTC)
-Date: Sun, 30 Jun 2019 13:51:26 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <20190630175126.GC2820@localhost.localdomain>
-References: <20190621060925.16214-1-crosa@redhat.com>
- <20190621060925.16214-2-crosa@redhat.com>
- <f18a5df8-201e-b8a1-1a3e-3e2254ce8b1e@redhat.com>
- <20190621143816.GA24282@localhost.localdomain>
- <785c89ed-a7a4-78f6-972a-e36615017268@redhat.com>
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hhe64-0003EU-Lh
+ for qemu-devel@nongnu.org; Sun, 30 Jun 2019 13:58:41 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:40230
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1hhe64-0003Bn-E4
+ for qemu-devel@nongnu.org; Sun, 30 Jun 2019 13:58:40 -0400
+Received: from host109-146-132-17.range109-146.btcentralplus.com
+ ([109.146.132.17] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1hhe5Q-00025S-Aq; Sun, 30 Jun 2019 18:58:00 +0100
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190629130017.2973-1-richard.henderson@linaro.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <5746cc58-c132-ef29-6ff4-da07c6086dac@ilande.co.uk>
+Date: Sun, 30 Jun 2019 18:58:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <785c89ed-a7a4-78f6-972a-e36615017268@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Sun, 30 Jun 2019 17:51:34 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190629130017.2973-1-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 109.146.132.17
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] Acceptance tests: exclude "flaky" tests
+X-Received-From: 46.43.2.167
+Subject: Re: [Qemu-devel] [PATCH v6 00/16] tcg/ppc: Add vector opcodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,275 +95,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: amarkovic@wavecomp.com, hsp.cat7@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 28, 2019 at 05:43:09PM -0300, Wainer dos Santos Moschetta wro=
-te:
->=20
-> On 06/21/2019 11:38 AM, Cleber Rosa wrote:
-> > On Fri, Jun 21, 2019 at 09:03:33AM +0200, Philippe Mathieu-Daud=E9 wr=
-ote:
-> > > On 6/21/19 8:09 AM, Cleber Rosa wrote:
-> > > > It's a fact that some tests may not be 100% reliable in all
-> > > > environments.  While it's a tough call to remove a useful test th=
-at
-> > > > from the tree because it may fail every 1/100th time (or so), hav=
-ing
-> > > > human attention drawn to known issues is very bad for humans and =
-for
-> > > > the projects they manage.
-> > > >=20
-> > > > As a compromise solution, this marks tests that are known to have
-> > > > issues, or that exercises known issues in QEMU or other component=
-s,
-> > > > and excludes them from the entry point.  As a consequence, tests
-> > > > marked as "flaky" will not be executed as part of "make
-> > > > check-acceptance".
-> > > >=20
-> > > > Because such tests should be forgiven but never be forgotten, it'=
-s
-> > > > possible to list them with (assuming "make check-venv" or "make
-> > > > check-acceptance" has already initiatilized the venv):
-> > > >=20
-> > > >    $ ./tests/venv/bin/avocado list -t flaky tests/acceptance
->=20
-> It needs a Make target to run those flaky tests (If we ever agree on th=
-is
-> idea of flaky tests). Other Avocado flags are passed (e.g. -t for tags)=
- that
-> can happen to fail tests on their absent. One clear example is the spic=
-e
-> test on patch 02 of this series...
->
+On 29/06/2019 14:00, Richard Henderson wrote:
 
-I was trying to avoid having so make "check-acceptance-*" rules that just
-choosing one would be harder than writing an Avocado command line from
-scratch... but I think you have a point here.  For once, this can be
-used in a Travis job with an special "allow_failures" option set.
+> Changes since v5:
+>   * Disable runtime altivec detection until all of the required
+>     opcodes are implemented.
+>     Because dup2 was last, that really means all of the pure altivec
+>     bits, so the initial patches are not bisectable in any meaningful
+>     sense.  I thought about reshuffling dup2 earlier, but that created
+>     too many conflicts and I was too lazy.
+>   * Rearranged the patches a little bit to make sure that each
+>     one actually builds, which was not the case before.
+>   * Folded in the fix to tcg_out_mem_long, as discussed in the
+>     followup within the v4 thread.
+> 
+> Changes since v4:
+>   * Patch 1, "tcg/ppc: Introduce Altivec registers", is divided into
+>     ten smaller patches.
+>   * The net result (code-wise) is not changed between former patch 1
+>     and ten new patches.
+>   * Remaining (2-7) patches from v4 are applied verbatim.
+>   * This means that code-wise v5 and v4 do not differ.
+>   * v5 is devised to help debugging, and to better organize the code.
+> 
+> Changes since v3:
+>   * Add support for bitsel, with the vsx xxsel insn.
+>   * Rely on the new relocation overflow handling, so
+>     we don't require 3 insns for a vector load.
+> 
+> Changes since v2:
+>   * Several generic tcg patches to improve dup vs dupi vs dupm.
+>     In particular, if a global temp (like guest r10) is not in
+>     a host register, we should duplicate from memory instead of
+>     loading to an integer register, spilling to stack, loading
+>     to a vector register, and then duplicating.
+>   * I have more confidence that 32-bit ppc host should work
+>     this time around.  No testing on that front yet, but I've
+>     unified some code sequences with 64-bit ppc host.
+>   * Base altivec now supports V128 only.  Moved V64 support to
+>     Power7 (v2.06), which has 64-bit load/store.
+>   * Dropped support for 64-bit vector multiply using Power8.
+>     The expansion was too large compared to using integer regs.
+> 
+> Richard Henderson (16):
+>   tcg/ppc: Introduce Altivec registers
+>   tcg/ppc: Introduce macro VX4()
+>   tcg/ppc: Introduce macros VRT(), VRA(), VRB(), VRC()
+>   tcg/ppc: Enable tcg backend vector compilation
+>   tcg/ppc: Add support for load/store/logic/comparison
+>   tcg/ppc: Add support for vector maximum/minimum
+>   tcg/ppc: Add support for vector add/subtract
+>   tcg/ppc: Add support for vector saturated add/subtract
+>   tcg/ppc: Prepare case for vector multiply
+>   tcg/ppc: Support vector shift by immediate
+>   tcg/ppc: Support vector multiply
+>   tcg/ppc: Support vector dup2
+>   tcg/ppc: Enable Altivec detection
+>   tcg/ppc: Update vector support to v2.06
+>   tcg/ppc: Update vector support to v2.07
+>   tcg/ppc: Update vector support to v3.00
+> 
+>  tcg/ppc/tcg-target.h     |   39 +-
+>  tcg/ppc/tcg-target.opc.h |   13 +
+>  tcg/ppc/tcg-target.inc.c | 1091 +++++++++++++++++++++++++++++++++++---
+>  3 files changed, 1076 insertions(+), 67 deletions(-)
+>  create mode 100644 tcg/ppc/tcg-target.opc.h
 
-> Side note: check-acceptance seems to get growing in complexity that I w=
-orry
-> will end up in pitfalls. is a Make target the proper way to implement
-> complex test runs (I don't think so). Perhaps Avocado runner concept co=
-uld
-> help somehow?
->
+I don't have space for a full set of images on the G4, however I've tried boot tests
+on installer CDs for MacOS 9, OS X 10.2, Linux and HelenOS and it looks good here.
 
-I guess you mean the Avocado Job concept, and writing your own runner
-based on those APIs.  If so, then absolutely yes.  I've shared with
-Eduardo some of the use cases that we can solve much easily.  But, we
-need to finish the last bits on the Avocado side, properly document
-and support the API before attempting to use it here on QEMU.
+Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> [PPC32]
 
-> > > >=20
-> > > > The current list of tests marked as flaky are a result of running
-> > > > the entire set of acceptance tests around 20 times.  The results
-> > > > were then processed with a helper script[1].  That either confirm=
-ed
-> > > > known issues (in the case of aarch64 and arm)[2] or revealed new
-> > > > ones (mips).
-> > > >=20
-> > > > This also bumps the Avocado version to one that includes a fix to=
- the
-> > > > parsing of multiple and mix "key:val" and simple tag values.
-> > > >=20
-> > > > [1] https://raw.githubusercontent.com/avocado-framework/avocado/m=
-aster/contrib/scripts/summarize-job-failures.py
-> > > > [2] https://bugs.launchpad.net/qemu/+bug/1829779
-> > > >=20
-> > > > Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> > > > ---
-> > > >   docs/devel/testing.rst                   | 17 +++++++++++++++++
-> > > >   tests/Makefile.include                   |  6 +++++-
-> > > >   tests/acceptance/boot_linux_console.py   |  2 ++
-> > > >   tests/acceptance/linux_ssh_mips_malta.py |  2 ++
-> > > >   tests/requirements.txt                   |  2 +-
-> > > >   5 files changed, 27 insertions(+), 2 deletions(-)
-> > > >=20
-> > > > diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-> > > > index da2d0fc964..ff4d8e2e1c 100644
-> > > > --- a/docs/devel/testing.rst
-> > > > +++ b/docs/devel/testing.rst
-> > > > @@ -574,6 +574,23 @@ may be invoked by running:
-> > > >     tests/venv/bin/avocado run $OPTION1 $OPTION2 tests/acceptance=
-/
-> > > > +Tagging tests
-> > > > +-------------
-> > > > +
-> > > > +flaky
-> > > > +~~~~~
-> > > > +
-> > > > +If a test is known to fail intermittently, even if only every on=
-e
-> > > > +hundredth time, it's highly advisable to mark it as a flaky test=
-.
-> > > > +This will prevent these individual tests from failing much large=
-r
-> > > > +jobs, will avoid human interaction and time wasted to verify a k=
-nown
-> > > > +issue, and worse of all, can lead to the discredit of automated
-> > > > +testing.
-> > > > +
-> > > > +To mark a test as flaky, add to its docstring.::
-> > > > +
-> > > > +  :avocado: tags=3Dflaky
-> > > I certainly disagree with this patch, failing tests have to be fixe=
-d.
-> > > Why not tag all the codebase flaky and sing "happy coding"?
-> > >=20
-> > That's a great idea! :)
-> >=20
-> > Now, seriously, I also resisted this for quite a long time.  The
-> > reality, though, is that intermittent failures will continue to
-> > appear, and letting tests (and jobs, and CI pipelines, and whatnot)
-> > fail is a very bad idea.  We all agree that real fixes are better tha=
-n
-> > this, but many times they don't come quickly.
->=20
-> It seems to me that flaky test is just a case in a broaden scenario: ru=
-n (or
-> not) grouped tests. You may have tests indeed broken or that takes
-> considerable time (those tagged "slow") which one may fairly want to ex=
-clude
-> from `make check-acceptance` as well. Thus some way to group tests plus
-> define run inclusion/exclusion patterns seems the ultimate goal here.
->
 
-Yes, you have a point about "yet another set of tests".  I think that,
-whenever we break the limit of expressiveness with something like the
-current incarnation of tags (which shouldn't need much explanation)
-then it's time to rely on something that has all the expressiveness
-and doesn't impose any other restrictions.
+ATB,
 
-I'm refering to the previous idea about using the Job API, and
-creating customized runner that, with the expressiveness of Python
-code, can choose tests for different scenarios.  What I don't think
-we should try to do, is to come up with yet another language, or YAML
-parser, or anything along those lines.
-
-> >=20
-> > > Anyway if this get accepted, 'flaky' tags must have the intermitten=
-t
-> > > failure well described, and a Launchpad/Bugzilla tracking ticket re=
-ferenced.
-> > >=20
-> > And here you have a key point that I absolutely agree with.  The
-> > "flaky" approach can either poison a lot of tests, and be seen as
-> > quick way out of a difficult issue revealed by a test.  Or, it can
-> > serve as an effective tool to keep track of these very important
-> > issues.
-> >=20
-> > If we add:
-> >=20
-> >     # https://bugs.launchpad.net/qemu/+bug/1829779
-> >     :avocado: flaky
-> >=20
-> > Topped with some human, I believe this can be very effective.  This g=
-oes
-> > without saying, but comments here are very much welcome.
->=20
-> I agree that all flaky test should have a tracking bug. In the end it
-> represents a technical debit that we should address.
->=20
-> - Wainer
->
-
-Yep, that I also agree 100%.
-- Cleber.
-
-> >=20
-> > - Cleber.
-> >=20
-> > > > +
-> > > >   Manual Installation
-> > > >   -------------------
-> > > > diff --git a/tests/Makefile.include b/tests/Makefile.include
-> > > > index db750dd6d0..4c97da2878 100644
-> > > > --- a/tests/Makefile.include
-> > > > +++ b/tests/Makefile.include
-> > > > @@ -1125,7 +1125,11 @@ TESTS_RESULTS_DIR=3D$(BUILD_DIR)/tests/res=
-ults
-> > > >   # Any number of command separated loggers are accepted.  For mo=
-re
-> > > >   # information please refer to "avocado --help".
-> > > >   AVOCADO_SHOW=3Dapp
-> > > > -AVOCADO_TAGS=3D$(patsubst %-softmmu,-t arch:%, $(filter %-softmm=
-u,$(TARGET_DIRS)))
-> > > > +
-> > > > +# Additional tags that are added to each occurence of "--filter-=
-by-tags"
-> > > > +AVOCADO_EXTRA_TAGS :=3D ,-flaky
-> > > > +
-> > > > +AVOCADO_TAGS=3D$(patsubst %-softmmu,--filter-by-tags=3Darch:%$(A=
-VOCADO_EXTRA_TAGS), $(filter %-softmmu,$(TARGET_DIRS)))
-> > > >   ifneq ($(findstring v2,"v$(PYTHON_VERSION)"),v2)
-> > > >   $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
-> > > > diff --git a/tests/acceptance/boot_linux_console.py b/tests/accep=
-tance/boot_linux_console.py
-> > > > index 32159503e9..6bd5c1ab53 100644
-> > > > --- a/tests/acceptance/boot_linux_console.py
-> > > > +++ b/tests/acceptance/boot_linux_console.py
-> > > > @@ -249,6 +249,7 @@ class BootLinuxConsole(Test):
-> > > >           """
-> > > >           :avocado: tags=3Darch:aarch64
-> > > >           :avocado: tags=3Dmachine:virt
-> > > > +        :avocado: tags=3Dflaky
-> > > >           """
-> > > >           kernel_url =3D ('https://download.fedoraproject.org/pub=
-/fedora/linux/'
-> > > >                         'releases/29/Everything/aarch64/os/images=
-/pxeboot/vmlinuz')
-> > > > @@ -270,6 +271,7 @@ class BootLinuxConsole(Test):
-> > > >           """
-> > > >           :avocado: tags=3Darch:arm
-> > > >           :avocado: tags=3Dmachine:virt
-> > > > +        :avocado: tags=3Dflaky
-> > > >           """
-> > > >           kernel_url =3D ('https://download.fedoraproject.org/pub=
-/fedora/linux/'
-> > > >                         'releases/29/Everything/armhfp/os/images/=
-pxeboot/vmlinuz')
-> > > > diff --git a/tests/acceptance/linux_ssh_mips_malta.py b/tests/acc=
-eptance/linux_ssh_mips_malta.py
-> > > > index aafb0c39f6..ae70b658e0 100644
-> > > > --- a/tests/acceptance/linux_ssh_mips_malta.py
-> > > > +++ b/tests/acceptance/linux_ssh_mips_malta.py
-> > > > @@ -208,6 +208,7 @@ class LinuxSSH(Test):
-> > > >           :avocado: tags=3Dmachine:malta
-> > > >           :avocado: tags=3Dendian:big
-> > > >           :avocado: tags=3Ddevice:pcnet32
-> > > > +        :avocado: tags=3Dflaky
-> > > >           """
-> > > >           kernel_url =3D ('https://people.debian.org/~aurel32/qem=
-u/mips/'
-> > > >                         'vmlinux-3.2.0-4-5kc-malta')
-> > > > @@ -222,6 +223,7 @@ class LinuxSSH(Test):
-> > > >           :avocado: tags=3Dmachine:malta
-> > > >           :avocado: tags=3Dendian:little
-> > > >           :avocado: tags=3Ddevice:pcnet32
-> > > > +        :avocado: tags=3Dflaky
-> > > >           """
-> > > >           kernel_url =3D ('https://people.debian.org/~aurel32/qem=
-u/mipsel/'
-> > > >                         'vmlinux-3.2.0-4-5kc-malta')
-> > > > diff --git a/tests/requirements.txt b/tests/requirements.txt
-> > > > index 3ae0e29ad7..58d63d171f 100644
-> > > > --- a/tests/requirements.txt
-> > > > +++ b/tests/requirements.txt
-> > > > @@ -1,5 +1,5 @@
-> > > >   # Add Python module requirements, one per line, to be installed
-> > > >   # in the tests/venv Python virtual environment. For more info,
-> > > >   # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
-> > > > -avocado-framework=3D=3D68.0
-> > > > +avocado-framework=3D=3D69.1
-> > > >   paramiko
-> > > >=20
->=20
+Mark.
 
