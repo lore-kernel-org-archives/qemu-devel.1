@@ -2,85 +2,88 @@ Return-Path: <SRS0=1g4J=U5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 362D8C5B57E
-	for <qemu-devel@archiver.kernel.org>; Sun, 30 Jun 2019 15:15:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51BC9C5B57E
+	for <qemu-devel@archiver.kernel.org>; Sun, 30 Jun 2019 15:48:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF65320665
-	for <qemu-devel@archiver.kernel.org>; Sun, 30 Jun 2019 15:15:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 13B8720673
+	for <qemu-devel@archiver.kernel.org>; Sun, 30 Jun 2019 15:48:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="GmjezbLz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF65320665
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZZA2GWzt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13B8720673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhbYJ-0001xj-9F
-	for qemu-devel@archiver.kernel.org; Sun, 30 Jun 2019 11:15:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33708)
+	id 1hhc4O-0002Z8-L3
+	for qemu-devel@archiver.kernel.org; Sun, 30 Jun 2019 11:48:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39794)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jan.kiszka@web.de>) id 1hhbWi-0000WM-SR
- for qemu-devel@nongnu.org; Sun, 30 Jun 2019 11:14:02 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hhc01-00024h-IQ
+ for qemu-devel@nongnu.org; Sun, 30 Jun 2019 11:44:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.kiszka@web.de>) id 1hhbWg-00046N-B6
- for qemu-devel@nongnu.org; Sun, 30 Jun 2019 11:14:00 -0400
-Received: from mout.web.de ([212.227.15.4]:45597)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.kiszka@web.de>)
- id 1hhbWf-00043I-Rh; Sun, 30 Jun 2019 11:13:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1561907629;
- bh=alf1ZB0GMEYVJjvAyTZXbZPl5lNaMI8bb6k1cgD7oac=;
- h=X-UI-Sender-Class:To:From:Subject:Date;
- b=GmjezbLzfekGlartjG9xfhq9XsZIdaNqSpN0Juox/zvtC+hXmqsLXOgk236lLX4wZ
- GWPC5FCSiS6EajOIZU2B2ceb3WnoWSD/EsMqFhNI0Oztnpa9g9rBU/JqmX/OkWw++d
- ds+P0KqOuNK9iAyLAmh/3u/Mco8+ziCt1kDA/644=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.10] ([95.157.54.22]) by smtp.web.de (mrweb002
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0Mare6-1hxUmN2jhy-00KOFq; Sun, 30
- Jun 2019 17:13:49 +0200
-To: Peter Maydell <peter.maydell@linaro.org>,
- qemu-devel <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
-From: Jan Kiszka <jan.kiszka@web.de>
-Message-ID: <fc5404f7-4d1d-c28f-6e48-d8799c82acc0@web.de>
-Date: Sun, 30 Jun 2019 17:13:45 +0200
-User-Agent: Mozilla/5.0 (X11; U; Linux i686 (x86_64); de; rv:1.8.1.12)
- Gecko/20080226 SUSE/2.0.0.12-1.1 Thunderbird/2.0.0.12 Mnenhy/0.7.5.666
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hhc00-0003Zl-90
+ for qemu-devel@nongnu.org; Sun, 30 Jun 2019 11:44:17 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:33180)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1hhc00-0003ZL-2q
+ for qemu-devel@nongnu.org; Sun, 30 Jun 2019 11:44:16 -0400
+Received: by mail-oi1-x243.google.com with SMTP id u15so7850173oiv.0
+ for <qemu-devel@nongnu.org>; Sun, 30 Jun 2019 08:44:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=HrUXhP//J1oXi+bN9l9j8VqJqdQhS3u3IPqqNTJ3CII=;
+ b=ZZA2GWztz1medE6UYRVHnzKfVt+qetzLneDg5OgGO/F6FLIO1Q4s0sG6SFxbt3WZNf
+ CUtYYlVD6SPQi3DD69aZQNnoLoEM6BqEuP8d8Q6X4Caj+AXCQw2/Hsv670nI9WPN/mQy
+ lMTCMFa7fGsj0NFNO/AJixrw8i32I09WIsEyo4+fOuaY2jqJHTuKPpOjBKUtolZsWkrv
+ MFyVIcmkcdMOLYoV45YpFEcj/urYtfWMfr1XnqK+t4E+GjBFq1OLnfdad0LYvWbnOZ2k
+ 7wKkMFfiJwYve7YHsMfrVCu7ZDjuJf/v+OtIsgzm9Xi9hQmjF43SRuLHCPxLjATUraZ3
+ O68A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=HrUXhP//J1oXi+bN9l9j8VqJqdQhS3u3IPqqNTJ3CII=;
+ b=Pte98FGOIhYNw/duhRCOJnhvLj6weoYLGooVDCjx+zUC19XL8wVKJVtVhkB/WY1+bV
+ dTWUUpnk70CPBCcHt25P2Mws0haKSkW3NF33Ntk7VkMR5r+HElwQtsdNcEsrhoNDVJVA
+ 3E+Ev7YykLhDdCwQSxfJphkMina1v5j46oAykZf5wbdN195TdHkEumwswQ007v2LLu3b
+ +WKRZXBcmxV4lrjvyEUTr0/B6kcrUj3fcfn5uJnU8inPvozCfCDWCQxVdYlkznm+2gfx
+ xDIwOeBFLwtaYjWiKA9I37DS3fkSaOwYnRDMoFwjrYjyOalepA982XSaL6I1QPG8gQ20
+ 2pug==
+X-Gm-Message-State: APjAAAWH5w9cwKiotRALdYHjstbuJxg0o/0XCNmxILKHcqkINHbHipDV
+ xqfBltmdykv0IPu89UL/sJVG+Z1t/evketzO0ik=
+X-Google-Smtp-Source: APXvYqyxC8hu9/El0tP07dYkfgDEPDYhFcPxGIUoZ4PmfQEJXev7YklOW4RmHlA1/3y4Qu/A9p/VfqWHpn1EC8h9eNY=
+X-Received: by 2002:aca:abd8:: with SMTP id u207mr4112106oie.136.1561909455091; 
+ Sun, 30 Jun 2019 08:44:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:UpL+pBZwu7CpeucXmLNWuM44Bz03JywYZc9St6YcBFiqFA+M4Nx
- csR51t1D9OWvjRHIY7VyJA2gWn5AN5yTvTbJZtFoI/T4m3JWrKv7icSIZY5dBTP24QgXj9G
- xE1phOh/5pS5ztzBNzxBWpv2J5lxYiN+AW1zLT36DMh9nULHHMzVepiNeHYHf2D8IKc9q5A
- PBwWTf+3oMVIc9ztnU9aQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:H4r+a8+HF0w=:2MpzlHQHXtKzs7/mN0uQf2
- ozA4oCBmu+7uSdaTQpbiZkAIp+Qn6KmkaDaxCB2FL2U5512zYg5bv4ZvVMrelwvuOFowTU0FE
- vtxbSXVjI59NwG1j0y82V6LzYee2yRdQHBCZsz8U/JaNXaoAWYlBLWYvHB1DhcxEY26Aihh7B
- 34skhlRBbdzc9gdWdFIcdT/BdikDxiAZkjl4fAsFoEyXeWIUexJQTe9GPVeGuuuFkd3rvZ9L6
- 6knoDDamwWRaeVHK1TK36mQmjRPSCvn7Plk+ptepIkfFPcntTmN7pW+7Mc7HiSczJUTTP1Cmp
- yXNApHkxDeFhUV/VUw7hDymQxd5GGuZ6DGmbmZ0mWheXhZj6s1XGIaloRcx3krNYp7zSFRCni
- iVGJ44LWFGE54ONwSpXI+CQc9q+XCaNJA7aLcD00JY6Ot4RZDmwkxR+Pt2tfpm/JpGvvOVwbc
- 6gXrAiafpz0ydrQ3DDHzxHVeIVOTV9RuCDUlQ8nXb/BeD7fFpm9HU0es3LgmrWWb9Z+dLZiPa
- 3uWsoxl1ECaPwQBMKAchPp+7dd8oomN0y6BgSvUL7tChdFW07J0BmHWqEm+V1e6hK8xk5rT/X
- dfxmffhLRoKkjoI3bu62TPyuEhLVEqQhHLfeKEr9E8FVxvbqn7g4po1WKUnQvwN1cMfxxgJUi
- /pom3tYlkn5i4LRiVN7rI+LcfLfGQgafo9FW9tIxz9Vxl6tfsMzfxZY6mPthwjxObbaXnKRPB
- rrgN/Mv6WKZicFol97QLBEHl+HbxCp4kPB5SWwYFWSA5dK61nmv/7o8AH3wS1LAD398jYMdQL
- KpGFcg9wpKJ19LneTzHUMSs6bhNy6Sqd3PTMfqHNBV71mKzg74Et7kOhHHS6LesC+l7zMupWA
- EbHdVvl+zUpTWV835SRk1wooRzcix1oOONi8u3UBvxLFFh8GWkNIxFTMd8ZIluwPJ91G5lI9L
- niaJixIDxMBXjN1Qc3WyXd6YUkhHJD5HVR6mKF3iNTh8Hw66738v6fcM64IoO4dr0VtqeS4Sx
- sIuaQWI0N2QbEmPirUtJnokRQe6lpFHxMTNYwrWVhzYWPNG6M9ma6uo1Y+nWeZww/Gv43Ww6P
- Qc9GgpnIu0r3H3zamioxcDByKs94zAMqctw
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.15.4
-Subject: [Qemu-devel] [PATCH] hw/arm/virt: Add support for Cortex-A7
+Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP; Sun, 30 Jun 2019 08:44:14
+ -0700 (PDT)
+Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP; Sun, 30 Jun 2019 08:44:14
+ -0700 (PDT)
+In-Reply-To: <CAFyWVaaQX4MG+76+vt-2qvGq7JeZcJFyXZp9Nw+xuwWLc=pHHA@mail.gmail.com>
+References: <1561718618-20218-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1561718618-20218-2-git-send-email-aleksandar.markovic@rt-rk.com>
+ <CAL1e-=gMvPy9SEQicj1d=X0cSu84WuiNXbtacOS5zJoqyXQv+A@mail.gmail.com>
+ <CAFyWVaaQX4MG+76+vt-2qvGq7JeZcJFyXZp9Nw+xuwWLc=pHHA@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Sun, 30 Jun 2019 17:44:14 +0200
+Message-ID: <CAL1e-=h4Xa9etY=-MGXUT-v=TK8LyNL542RmDezt3pHmPeDs=A@mail.gmail.com>
+To: Jim Wilson <jimw@sifive.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH v16 1/5] linux-user: Add support for
+ translation of statx() syscall
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,31 +95,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
+ Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org,
+ amarkovic@wavecomp.com, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jan Kiszka <jan.kiszka@siemens.com>
+On Jun 29, 2019 6:06 AM, "Jim Wilson" <jimw@sifive.com> wrote:
+>
+> On Fri, Jun 28, 2019 at 5:53 PM Aleksandar Markovic
+> <aleksandar.m.mail@gmail.com> wrote:
+> > This patch went trough several transformations in last few days, and I
+am a little worried that we forgot the primary reasons/scenarios why want
+it in the first place. In that light, may I ask you to recheck this latest
+version of the patch, v16, against your scenarios (you mentioned earlier
+you have two significantly different flavors of your scenario, one with
+Ubuntu 16, and another with Ubuntu 19)?
+>
+> My use case is that I want 32-bit RISC-V user mode to work.  This
+> requires a riscv syscall list patch that Palmer Dabbelt added to his
+> patch set, and the statx patch that is part of your patch set.  The
+> statx strace support is not required for this use case, but should be
+> added for completeness as all of the other stat family functions have
+> strace support, so statx should too.  Since the statx strace patch
+> needs statx macros that old systems don't have, I test on Ubuntu 16
+> (no host statx) and Ubuntu 19 (with host statx).  On Ubuntu 19, statx
+> strace should be fully pretty printed.  On Ubuntu 16, qemu should
+> still build despite the missing macros, and statx strace should be
+> partially pretty printed because of the missing macros.
+>
+> I removed the old patches, updated qemu, added the new patches,
+> rebuilt qemu, and reran the gcc testsuite for rv32/rv64 Ubuntu 16/19
+> and it still works as expected.  I also manually checked strace for
+> rv32/rv64 Ubuntu 16/19 and that also still works as expected.  So this
+> looks good to me.
+>
 
-No reason to deny this type.
+Thanks a bunch, Jim! Laurent, based on all the info, it looks to me v16 is
+the way to go. Aleksandar R. can test his nanoMips scenarios later on,
+since nanoMips user mode is not integrated yet anyway, but I hope
+everything is fine there too.
 
-Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
-=2D--
- hw/arm/virt.c | 1 +
- 1 file changed, 1 insertion(+)
+Thanks again to all involved!
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 431e2900fd..ed009fa447 100644
-=2D-- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -176,6 +176,7 @@ static const int a15irqmap[] =3D {
- };
+Aleksandar
 
- static const char *valid_cpus[] =3D {
-+    ARM_CPU_TYPE_NAME("cortex-a7"),
-     ARM_CPU_TYPE_NAME("cortex-a15"),
-     ARM_CPU_TYPE_NAME("cortex-a53"),
-     ARM_CPU_TYPE_NAME("cortex-a57"),
-=2D-
-2.16.4
-
+> I'm leaving on a trip tomorrow, and only taking one laptop with me, so
+> I won't have access to my Ubuntu 19 machine anymore.
+>
+> Jim
