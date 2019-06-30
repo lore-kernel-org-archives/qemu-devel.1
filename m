@@ -4,60 +4,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0
 	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC3A5C5B57F
-	for <qemu-devel@archiver.kernel.org>; Sun, 30 Jun 2019 20:48:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD848C5B576
+	for <qemu-devel@archiver.kernel.org>; Sun, 30 Jun 2019 20:48:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB0342089F
-	for <qemu-devel@archiver.kernel.org>; Sun, 30 Jun 2019 20:48:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB0342089F
+	by mail.kernel.org (Postfix) with ESMTPS id 7D9722089F
+	for <qemu-devel@archiver.kernel.org>; Sun, 30 Jun 2019 20:48:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D9722089F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhgka-0001X5-4p
-	for qemu-devel@archiver.kernel.org; Sun, 30 Jun 2019 16:48:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35882)
+	id 1hhgkl-0001hw-QN
+	for qemu-devel@archiver.kernel.org; Sun, 30 Jun 2019 16:48:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35955)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <clg@kaod.org>) id 1hhgiS-0008Eh-LY
- for qemu-devel@nongnu.org; Sun, 30 Jun 2019 16:46:29 -0400
+ (envelope-from <clg@kaod.org>) id 1hhgig-0008OG-UD
+ for qemu-devel@nongnu.org; Sun, 30 Jun 2019 16:46:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1hhgiR-0001sj-IA
- for qemu-devel@nongnu.org; Sun, 30 Jun 2019 16:46:28 -0400
-Received: from 5.mo68.mail-out.ovh.net ([46.105.62.179]:49846)
+ (envelope-from <clg@kaod.org>) id 1hhgie-00024y-KZ
+ for qemu-devel@nongnu.org; Sun, 30 Jun 2019 16:46:42 -0400
+Received: from 1.mo4.mail-out.ovh.net ([178.33.248.196]:44036)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hhgiR-0001ns-BF
- for qemu-devel@nongnu.org; Sun, 30 Jun 2019 16:46:27 -0400
-Received: from player157.ha.ovh.net (unknown [10.108.57.153])
- by mo68.mail-out.ovh.net (Postfix) with ESMTP id 7B6161358FE
- for <qemu-devel@nongnu.org>; Sun, 30 Jun 2019 22:46:21 +0200 (CEST)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hhgic-000201-7Q
+ for qemu-devel@nongnu.org; Sun, 30 Jun 2019 16:46:38 -0400
+Received: from player157.ha.ovh.net (unknown [10.109.143.220])
+ by mo4.mail-out.ovh.net (Postfix) with ESMTP id E23D31F9869
+ for <qemu-devel@nongnu.org>; Sun, 30 Jun 2019 22:46:34 +0200 (CEST)
 Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
  (Authenticated sender: clg@kaod.org)
- by player157.ha.ovh.net (Postfix) with ESMTPSA id 38D7E7575A22;
- Sun, 30 Jun 2019 20:46:14 +0000 (UTC)
+ by player157.ha.ovh.net (Postfix) with ESMTPSA id 5C3BE7575A71;
+ Sun, 30 Jun 2019 20:46:28 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Date: Sun, 30 Jun 2019 22:45:52 +0200
-Message-Id: <20190630204601.30574-2-clg@kaod.org>
+Date: Sun, 30 Jun 2019 22:45:54 +0200
+Message-Id: <20190630204601.30574-4-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190630204601.30574-1-clg@kaod.org>
 References: <20190630204601.30574-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 2277976986789776358
+X-Ovh-Tracer-Id: 2281636163921611750
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
 X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrvdeggdduheegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.62.179
-Subject: [Qemu-devel] [PATCH 01/10] ppc/xive: Force the Physical CAM line
- value to group mode
+X-Received-From: 178.33.248.196
+Subject: [Qemu-devel] [PATCH 03/10] ppc/pnv: Rework cache watch model of
+ PnvXIVE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,78 +76,287 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When an interrupt needs to be delivered, the XIVE interrupt controller
-presenter scans the CAM lines of the thread interrupt contexts of the
-HW threads of the chip to find a matching vCPU. The interrupt context
-is composed of 4 different sets of registers: Physical, HV, OS and
-User.
+When the software modifies the XIVE internal structures, ESB, EAS,
+END, NVT, it also must update the caches of the different XIVE
+sub-engines. HW offers a set of common interface for such purpose.
 
-The encoding of the Physical CAM line depends on the mode in which the
-interrupt controller is operating: CAM mode or block group mode.
-Block group mode being the default configuration today on POWER9 and
-the only one available on the next POWER10 generation, enforce this
-encoding in the Physical CAM line :
+The CWATCH_SPEC register defines the block/index of the target and a
+set of flags to perform a full update and to watch for update
+conflicts.
 
-    chip << 19 | 0000000 0 0001 thread (7Bit)
+The cache watch CWATCH_DATAX registers are then loaded with the target
+data with a first read on CWATCH_DATA0. Writing back is done in the
+opposit order, CWATCH_DATA0 triggering the update.
 
-It fits the overall encoding of the NVT ids and simplifies the matching
-algorithm in the presenter.
+The SCRUB_TRIG registers are used to flush the cache in RAM, and to
+possibly invalidate it. Cache disablement is also an option but as we
+do not model the cache, these registers are no-ops
 
-Fixes: d514c48d41fb ("ppc/xive: hardwire the Physical CAM line of the thr=
-ead context")
+Today, the modeling of these registers is incorrect but it did not
+impact the set up of a baremetal system. However, running KVM requires
+a rework.
+
+Fixes: 2dfa91a2aa5a ("ppc/pnv: add a XIVE interrupt controller model for =
+POWER9")
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/intc/xive.c | 21 +++++----------------
- 1 file changed, 5 insertions(+), 16 deletions(-)
+ hw/intc/pnv_xive.c | 142 +++++++++++++++++++++++++++++++++------------
+ 1 file changed, 106 insertions(+), 36 deletions(-)
 
-diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index 6250c0414de8..3b1f9520ae9f 100644
---- a/hw/intc/xive.c
-+++ b/hw/intc/xive.c
-@@ -1229,27 +1229,16 @@ XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, =
-CPUState *cs)
- }
+diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+index 9ab77feee9d8..4dc92ef1e372 100644
+--- a/hw/intc/pnv_xive.c
++++ b/hw/intc/pnv_xive.c
+@@ -169,7 +169,7 @@ static uint64_t pnv_xive_vst_addr_indirect(PnvXive *x=
+ive, uint32_t type,
+     vsd =3D ldq_be_dma(&address_space_memory, vsd_addr);
 =20
- /*
-- * By default on P9, the HW CAM line (23bits) is hardwired to :
-+ * Encode the HW CAM line in the block group mode format :
-  *
-- *   0x000||0b1||4Bit chip number||7Bit Thread number.
-- *
-- * When the block grouping is enabled, the CAM line is changed to :
-- *
-- *   4Bit chip number||0x001||7Bit Thread number.
-+ *   chip << 19 | 0000000 0 0001 thread (7Bit)
-  */
--static uint32_t hw_cam_line(uint8_t chip_id, uint8_t tid)
--{
--    return 1 << 11 | (chip_id & 0xf) << 7 | (tid & 0x7f);
--}
--
--static bool xive_presenter_tctx_match_hw(XiveTCTX *tctx,
--                                         uint8_t nvt_blk, uint32_t nvt_i=
-dx)
-+static uint32_t xive_tctx_hw_cam_line(XiveTCTX *tctx)
- {
-     CPUPPCState *env =3D &POWERPC_CPU(tctx->cs)->env;
-     uint32_t pir =3D env->spr_cb[SPR_PIR].default_value;
+     if (!(vsd & VSD_ADDRESS_MASK)) {
+-        xive_error(xive, "VST: invalid %s entry %x !?", info->name, 0);
++        xive_error(xive, "VST: invalid %s entry %x !?", info->name, idx)=
+;
+         return 0;
+     }
 =20
--    return hw_cam_line((pir >> 8) & 0xf, pir & 0x7f) =3D=3D
--        hw_cam_line(nvt_blk, nvt_idx);
-+    return xive_nvt_cam_line((pir >> 8) & 0xf, 1 << 7 | (pir & 0x7f));
- }
+@@ -190,7 +190,7 @@ static uint64_t pnv_xive_vst_addr_indirect(PnvXive *x=
+ive, uint32_t type,
+         vsd =3D ldq_be_dma(&address_space_memory, vsd_addr);
 =20
- /*
-@@ -1285,7 +1274,7 @@ static int xive_presenter_tctx_match(XiveTCTX *tctx=
-, uint8_t format,
-=20
-         /* PHYS ring */
-         if ((be32_to_cpu(qw3w2) & TM_QW3W2_VT) &&
--            xive_presenter_tctx_match_hw(tctx, nvt_blk, nvt_idx)) {
-+            cam =3D=3D xive_tctx_hw_cam_line(tctx)) {
-             return TM_QW3_HV_PHYS;
+         if (!(vsd & VSD_ADDRESS_MASK)) {
+-            xive_error(xive, "VST: invalid %s entry %x !?", info->name, =
+0);
++            xive_error(xive, "VST: invalid %s entry %x !?", info->name, =
+idx);
+             return 0;
          }
 =20
+@@ -294,8 +294,12 @@ static int pnv_xive_write_end(XiveRouter *xrtr, uint=
+8_t blk, uint32_t idx,
+                               word_number);
+ }
+=20
+-static int pnv_xive_end_update(PnvXive *xive, uint8_t blk, uint32_t idx)
++static int pnv_xive_end_update(PnvXive *xive)
+ {
++    uint8_t  blk =3D GETFIELD(VC_EQC_CWATCH_BLOCKID,
++                           xive->regs[(VC_EQC_CWATCH_SPEC >> 3)]);
++    uint32_t idx =3D GETFIELD(VC_EQC_CWATCH_OFFSET,
++                           xive->regs[(VC_EQC_CWATCH_SPEC >> 3)]);
+     int i;
+     uint64_t eqc_watch[4];
+=20
+@@ -307,6 +311,24 @@ static int pnv_xive_end_update(PnvXive *xive, uint8_=
+t blk, uint32_t idx)
+                               XIVE_VST_WORD_ALL);
+ }
+=20
++static void pnv_xive_end_cache_load(PnvXive *xive)
++{
++    uint8_t  blk =3D GETFIELD(VC_EQC_CWATCH_BLOCKID,
++                           xive->regs[(VC_EQC_CWATCH_SPEC >> 3)]);
++    uint32_t idx =3D GETFIELD(VC_EQC_CWATCH_OFFSET,
++                           xive->regs[(VC_EQC_CWATCH_SPEC >> 3)]);
++    uint64_t eqc_watch[4] =3D { 0 };
++    int i;
++
++    if (pnv_xive_vst_read(xive, VST_TSEL_EQDT, blk, idx, eqc_watch)) {
++        xive_error(xive, "VST: no END entry %x/%x !?", blk, idx);
++    }
++
++    for (i =3D 0; i < ARRAY_SIZE(eqc_watch); i++) {
++        xive->regs[(VC_EQC_CWATCH_DAT0 >> 3) + i] =3D be64_to_cpu(eqc_wa=
+tch[i]);
++    }
++}
++
+ static int pnv_xive_get_nvt(XiveRouter *xrtr, uint8_t blk, uint32_t idx,
+                             XiveNVT *nvt)
+ {
+@@ -320,8 +342,12 @@ static int pnv_xive_write_nvt(XiveRouter *xrtr, uint=
+8_t blk, uint32_t idx,
+                               word_number);
+ }
+=20
+-static int pnv_xive_nvt_update(PnvXive *xive, uint8_t blk, uint32_t idx)
++static int pnv_xive_nvt_update(PnvXive *xive)
+ {
++    uint8_t  blk =3D GETFIELD(PC_VPC_CWATCH_BLOCKID,
++                           xive->regs[(PC_VPC_CWATCH_SPEC >> 3)]);
++    uint32_t idx =3D GETFIELD(PC_VPC_CWATCH_OFFSET,
++                           xive->regs[(PC_VPC_CWATCH_SPEC >> 3)]);
+     int i;
+     uint64_t vpc_watch[8];
+=20
+@@ -333,6 +359,24 @@ static int pnv_xive_nvt_update(PnvXive *xive, uint8_=
+t blk, uint32_t idx)
+                               XIVE_VST_WORD_ALL);
+ }
+=20
++static void pnv_xive_nvt_cache_load(PnvXive *xive)
++{
++    uint8_t  blk =3D GETFIELD(PC_VPC_CWATCH_BLOCKID,
++                           xive->regs[(PC_VPC_CWATCH_SPEC >> 3)]);
++    uint32_t idx =3D GETFIELD(PC_VPC_CWATCH_OFFSET,
++                           xive->regs[(PC_VPC_CWATCH_SPEC >> 3)]);
++    uint64_t vpc_watch[8] =3D { 0 };
++    int i;
++
++    if (pnv_xive_vst_read(xive, VST_TSEL_VPDT, blk, idx, vpc_watch)) {
++        xive_error(xive, "VST: no NVT entry %x/%x !?", blk, idx);
++    }
++
++    for (i =3D 0; i < ARRAY_SIZE(vpc_watch); i++) {
++        xive->regs[(PC_VPC_CWATCH_DAT0 >> 3) + i] =3D be64_to_cpu(vpc_wa=
+tch[i]);
++    }
++}
++
+ static int pnv_xive_get_eas(XiveRouter *xrtr, uint8_t blk, uint32_t idx,
+                             XiveEAS *eas)
+ {
+@@ -346,12 +390,6 @@ static int pnv_xive_get_eas(XiveRouter *xrtr, uint8_=
+t blk, uint32_t idx,
+     return pnv_xive_vst_read(xive, VST_TSEL_IVT, blk, idx, eas);
+ }
+=20
+-static int pnv_xive_eas_update(PnvXive *xive, uint8_t blk, uint32_t idx)
+-{
+-    /* All done. */
+-    return 0;
+-}
+-
+ static XiveTCTX *pnv_xive_get_tctx(XiveRouter *xrtr, CPUState *cs)
+ {
+     PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+@@ -950,28 +988,43 @@ static void pnv_xive_ic_reg_write(void *opaque, hwa=
+ddr offset,
+      * XIVE PC & VC cache updates for EAS, NVT and END
+      */
+     case VC_IVC_SCRUB_MASK:
+-        break;
+     case VC_IVC_SCRUB_TRIG:
+-        pnv_xive_eas_update(xive, GETFIELD(PC_SCRUB_BLOCK_ID, val),
+-                            GETFIELD(VC_SCRUB_OFFSET, val));
+         break;
+=20
+-    case VC_EQC_SCRUB_MASK:
+     case VC_EQC_CWATCH_SPEC:
+-    case VC_EQC_CWATCH_DAT0 ... VC_EQC_CWATCH_DAT3:
++        val &=3D ~VC_EQC_CWATCH_CONFLICT; /* HW resets this bit */
++        break;
++    case VC_EQC_CWATCH_DAT1 ... VC_EQC_CWATCH_DAT3:
+         break;
++    case VC_EQC_CWATCH_DAT0:
++        /* writing to DATA0 triggers the cache write */
++        xive->regs[reg] =3D val;
++        pnv_xive_end_update(xive);
++        break;
++    case VC_EQC_SCRUB_MASK:
+     case VC_EQC_SCRUB_TRIG:
+-        pnv_xive_end_update(xive, GETFIELD(VC_SCRUB_BLOCK_ID, val),
+-                            GETFIELD(VC_SCRUB_OFFSET, val));
++        /*
++         * The scrubbing registers flush the cache in RAM and can also
++         * invalidate.
++         */
+         break;
+=20
+-    case PC_VPC_SCRUB_MASK:
+     case PC_VPC_CWATCH_SPEC:
+-    case PC_VPC_CWATCH_DAT0 ... PC_VPC_CWATCH_DAT7:
++        val &=3D ~PC_VPC_CWATCH_CONFLICT; /* HW resets this bit */
++        break;
++    case PC_VPC_CWATCH_DAT1 ... PC_VPC_CWATCH_DAT7:
+         break;
++    case PC_VPC_CWATCH_DAT0:
++        /* writing to DATA0 triggers the cache write */
++        xive->regs[reg] =3D val;
++        pnv_xive_nvt_update(xive);
++        break;
++    case PC_VPC_SCRUB_MASK:
+     case PC_VPC_SCRUB_TRIG:
+-        pnv_xive_nvt_update(xive, GETFIELD(PC_SCRUB_BLOCK_ID, val),
+-                           GETFIELD(PC_SCRUB_OFFSET, val));
++        /*
++         * The scrubbing registers flush the cache in RAM and can also
++         * invalidate.
++         */
+         break;
+=20
+=20
+@@ -1022,15 +1075,6 @@ static uint64_t pnv_xive_ic_reg_read(void *opaque,=
+ hwaddr offset, unsigned size)
+     case PC_GLOBAL_CONFIG:
+=20
+     case PC_VPC_SCRUB_MASK:
+-    case PC_VPC_CWATCH_SPEC:
+-    case PC_VPC_CWATCH_DAT0:
+-    case PC_VPC_CWATCH_DAT1:
+-    case PC_VPC_CWATCH_DAT2:
+-    case PC_VPC_CWATCH_DAT3:
+-    case PC_VPC_CWATCH_DAT4:
+-    case PC_VPC_CWATCH_DAT5:
+-    case PC_VPC_CWATCH_DAT6:
+-    case PC_VPC_CWATCH_DAT7:
+=20
+     case VC_GLOBAL_CONFIG:
+     case VC_AIB_TX_ORDER_TAG2:
+@@ -1043,12 +1087,6 @@ static uint64_t pnv_xive_ic_reg_read(void *opaque,=
+ hwaddr offset, unsigned size)
+     case VC_IRQ_CONFIG_IPI_CASC:
+=20
+     case VC_EQC_SCRUB_MASK:
+-    case VC_EQC_CWATCH_DAT0:
+-    case VC_EQC_CWATCH_DAT1:
+-    case VC_EQC_CWATCH_DAT2:
+-    case VC_EQC_CWATCH_DAT3:
+-
+-    case VC_EQC_CWATCH_SPEC:
+     case VC_IVC_SCRUB_MASK:
+     case VC_SBC_CONFIG:
+     case VC_AT_MACRO_KILL_MASK:
+@@ -1080,6 +1118,38 @@ static uint64_t pnv_xive_ic_reg_read(void *opaque,=
+ hwaddr offset, unsigned size)
+     /*
+      * XIVE PC & VC cache updates for EAS, NVT and END
+      */
++    case VC_EQC_CWATCH_SPEC:
++        xive->regs[reg] =3D ~(VC_EQC_CWATCH_FULL | VC_EQC_CWATCH_CONFLIC=
+T);
++        val =3D xive->regs[reg];
++        break;
++    case VC_EQC_CWATCH_DAT0:
++        /*
++         * Load DATA registers from cache with data requested by the
++         * SPEC register
++         */
++        pnv_xive_end_cache_load(xive);
++        val =3D xive->regs[reg];
++        break;
++    case VC_EQC_CWATCH_DAT1 ... VC_EQC_CWATCH_DAT3:
++        val =3D xive->regs[reg];
++        break;
++
++    case PC_VPC_CWATCH_SPEC:
++        xive->regs[reg] =3D ~(PC_VPC_CWATCH_FULL | PC_VPC_CWATCH_CONFLIC=
+T);
++        val =3D xive->regs[reg];
++        break;
++    case PC_VPC_CWATCH_DAT0:
++        /*
++         * Load DATA registers from cache with data requested by the
++         * SPEC register
++         */
++        pnv_xive_nvt_cache_load(xive);
++        val =3D xive->regs[reg];
++        break;
++    case PC_VPC_CWATCH_DAT1 ... PC_VPC_CWATCH_DAT7:
++        val =3D xive->regs[reg];
++        break;
++
+     case PC_VPC_SCRUB_TRIG:
+     case VC_IVC_SCRUB_TRIG:
+     case VC_EQC_SCRUB_TRIG:
 --=20
 2.21.0
 
