@@ -2,58 +2,62 @@ Return-Path: <SRS0=1g4J=U5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40594C5B576
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC3A5C5B57F
 	for <qemu-devel@archiver.kernel.org>; Sun, 30 Jun 2019 20:48:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F5862089F
+	by mail.kernel.org (Postfix) with ESMTPS id CB0342089F
 	for <qemu-devel@archiver.kernel.org>; Sun, 30 Jun 2019 20:48:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F5862089F
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB0342089F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46450 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhgkZ-0001Va-BH
-	for qemu-devel@archiver.kernel.org; Sun, 30 Jun 2019 16:48:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35878)
+	id 1hhgka-0001X5-4p
+	for qemu-devel@archiver.kernel.org; Sun, 30 Jun 2019 16:48:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35882)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <clg@kaod.org>) id 1hhgiS-0008Ef-IB
+ (envelope-from <clg@kaod.org>) id 1hhgiS-0008Eh-LY
  for qemu-devel@nongnu.org; Sun, 30 Jun 2019 16:46:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1hhgiR-0001sJ-Av
+ (envelope-from <clg@kaod.org>) id 1hhgiR-0001sj-IA
  for qemu-devel@nongnu.org; Sun, 30 Jun 2019 16:46:28 -0400
-Received: from 9.mo68.mail-out.ovh.net ([46.105.78.111]:33590)
+Received: from 5.mo68.mail-out.ovh.net ([46.105.62.179]:49846)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hhgiN-0001hm-Fy
- for qemu-devel@nongnu.org; Sun, 30 Jun 2019 16:46:25 -0400
-Received: from player157.ha.ovh.net (unknown [10.108.42.192])
- by mo68.mail-out.ovh.net (Postfix) with ESMTP id 719CC1358FC
- for <qemu-devel@nongnu.org>; Sun, 30 Jun 2019 22:46:13 +0200 (CEST)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hhgiR-0001ns-BF
+ for qemu-devel@nongnu.org; Sun, 30 Jun 2019 16:46:27 -0400
+Received: from player157.ha.ovh.net (unknown [10.108.57.153])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id 7B6161358FE
+ for <qemu-devel@nongnu.org>; Sun, 30 Jun 2019 22:46:21 +0200 (CEST)
 Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
  (Authenticated sender: clg@kaod.org)
- by player157.ha.ovh.net (Postfix) with ESMTPSA id 761377575A12;
- Sun, 30 Jun 2019 20:46:06 +0000 (UTC)
+ by player157.ha.ovh.net (Postfix) with ESMTPSA id 38D7E7575A22;
+ Sun, 30 Jun 2019 20:46:14 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Date: Sun, 30 Jun 2019 22:45:51 +0200
-Message-Id: <20190630204601.30574-1-clg@kaod.org>
+Date: Sun, 30 Jun 2019 22:45:52 +0200
+Message-Id: <20190630204601.30574-2-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190630204601.30574-1-clg@kaod.org>
+References: <20190630204601.30574-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 2275443714157612006
+X-Ovh-Tracer-Id: 2277976986789776358
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
 X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrvdeggdduheegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.78.111
-Subject: [Qemu-devel] [PATCH 00/10] ppc/pnv: add XIVE support for KVM guests
+X-Received-From: 46.105.62.179
+Subject: [Qemu-devel] [PATCH 01/10] ppc/xive: Force the Physical CAM line
+ value to group mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,48 +76,78 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
+When an interrupt needs to be delivered, the XIVE interrupt controller
+presenter scans the CAM lines of the thread interrupt contexts of the
+HW threads of the chip to find a matching vCPU. The interrupt context
+is composed of 4 different sets of registers: Physical, HV, OS and
+User.
 
-The QEMU PowerNV machine emulates a baremetal OpenPOWER system and
-acts as an hypervisor (L0). Supporting emulation of KVM to run guests
-(L1) requires a few more extensions, among which support for the XIVE
-interrupt controller on POWER9 processor.=20
+The encoding of the Physical CAM line depends on the mode in which the
+interrupt controller is operating: CAM mode or block group mode.
+Block group mode being the default configuration today on POWER9 and
+the only one available on the next POWER10 generation, enforce this
+encoding in the Physical CAM line :
 
-The following changes fix some parts of the XIVE model and provide
-support for escalations and resend. This mechanism is used by KVM to
-kick a vCPU when it is not dispatched on a HW thread.
+    chip << 19 | 0000000 0 0001 thread (7Bit)
 
-A series from Suraj adding guest support in the Radix MMU model of the
-QEMU PowerNV machine is still required and will be send later. The
-whole patchset can be found under :
+It fits the overall encoding of the NVT ids and simplifies the matching
+algorithm in the presenter.
 
-  https://github.com/legoater/qemu/tree/powernv-4.1
+Fixes: d514c48d41fb ("ppc/xive: hardwire the Physical CAM line of the thr=
+ead context")
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ hw/intc/xive.c | 21 +++++----------------
+ 1 file changed, 5 insertions(+), 16 deletions(-)
 
-Thanks,
-
-C.
-
-C=C3=A9dric Le Goater (10):
-  ppc/xive: Force the Physical CAM line value to group mode
-  ppc/xive: Make the PIPR register readonly
-  ppc/pnv: Rework cache watch model of PnvXIVE
-  ppc/xive: Fix TM_PULL_POOL_CTX special operation
-  ppc/xive: Implement TM_PULL_OS_CTX special command
-  ppc/xive: Provide escalation support
-  ppc/xive: Improve 'info pic' support
-  ppc/xive: Extend XiveTCTX with an router object pointer
-  ppc/xive: Synthesize interrupt from the saved IPB in the NVT
-  ppc/pnv: Dump the XIVE NVT table
-
- include/hw/ppc/xive.h      |  23 ++-
- include/hw/ppc/xive_regs.h |  13 ++
- hw/intc/pnv_xive.c         | 211 +++++++++++++++++++----
- hw/intc/spapr_xive.c       |   1 -
- hw/intc/xive.c             | 341 +++++++++++++++++++++++++++++--------
- hw/ppc/pnv.c               |   2 +-
- hw/ppc/spapr_irq.c         |   2 +-
- 7 files changed, 479 insertions(+), 114 deletions(-)
-
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 6250c0414de8..3b1f9520ae9f 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -1229,27 +1229,16 @@ XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, =
+CPUState *cs)
+ }
+=20
+ /*
+- * By default on P9, the HW CAM line (23bits) is hardwired to :
++ * Encode the HW CAM line in the block group mode format :
+  *
+- *   0x000||0b1||4Bit chip number||7Bit Thread number.
+- *
+- * When the block grouping is enabled, the CAM line is changed to :
+- *
+- *   4Bit chip number||0x001||7Bit Thread number.
++ *   chip << 19 | 0000000 0 0001 thread (7Bit)
+  */
+-static uint32_t hw_cam_line(uint8_t chip_id, uint8_t tid)
+-{
+-    return 1 << 11 | (chip_id & 0xf) << 7 | (tid & 0x7f);
+-}
+-
+-static bool xive_presenter_tctx_match_hw(XiveTCTX *tctx,
+-                                         uint8_t nvt_blk, uint32_t nvt_i=
+dx)
++static uint32_t xive_tctx_hw_cam_line(XiveTCTX *tctx)
+ {
+     CPUPPCState *env =3D &POWERPC_CPU(tctx->cs)->env;
+     uint32_t pir =3D env->spr_cb[SPR_PIR].default_value;
+=20
+-    return hw_cam_line((pir >> 8) & 0xf, pir & 0x7f) =3D=3D
+-        hw_cam_line(nvt_blk, nvt_idx);
++    return xive_nvt_cam_line((pir >> 8) & 0xf, 1 << 7 | (pir & 0x7f));
+ }
+=20
+ /*
+@@ -1285,7 +1274,7 @@ static int xive_presenter_tctx_match(XiveTCTX *tctx=
+, uint8_t format,
+=20
+         /* PHYS ring */
+         if ((be32_to_cpu(qw3w2) & TM_QW3W2_VT) &&
+-            xive_presenter_tctx_match_hw(tctx, nvt_blk, nvt_idx)) {
++            cam =3D=3D xive_tctx_hw_cam_line(tctx)) {
+             return TM_QW3_HV_PHYS;
+         }
+=20
 --=20
 2.21.0
 
