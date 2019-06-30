@@ -2,88 +2,65 @@ Return-Path: <SRS0=1g4J=U5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFF0BC5B57E
-	for <qemu-devel@archiver.kernel.org>; Sun, 30 Jun 2019 17:59:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1B52C5B57E
+	for <qemu-devel@archiver.kernel.org>; Sun, 30 Jun 2019 18:02:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC4E520665
-	for <qemu-devel@archiver.kernel.org>; Sun, 30 Jun 2019 17:59:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC4E520665
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id C516520665
+	for <qemu-devel@archiver.kernel.org>; Sun, 30 Jun 2019 18:02:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C516520665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhe6m-0002ya-QG
-	for qemu-devel@archiver.kernel.org; Sun, 30 Jun 2019 13:59:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34322)
+	id 1hheAA-0004R0-UI
+	for qemu-devel@archiver.kernel.org; Sun, 30 Jun 2019 14:02:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34931)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hhe65-0002Zf-Q9
- for qemu-devel@nongnu.org; Sun, 30 Jun 2019 13:58:43 -0400
+ (envelope-from <crosa@redhat.com>) id 1hhe8j-0003n2-BH
+ for qemu-devel@nongnu.org; Sun, 30 Jun 2019 14:01:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hhe64-0003EU-Lh
- for qemu-devel@nongnu.org; Sun, 30 Jun 2019 13:58:41 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:40230
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1hhe64-0003Bn-E4
- for qemu-devel@nongnu.org; Sun, 30 Jun 2019 13:58:40 -0400
-Received: from host109-146-132-17.range109-146.btcentralplus.com
- ([109.146.132.17] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1hhe5Q-00025S-Aq; Sun, 30 Jun 2019 18:58:00 +0100
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190629130017.2973-1-richard.henderson@linaro.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <5746cc58-c132-ef29-6ff4-da07c6086dac@ilande.co.uk>
-Date: Sun, 30 Jun 2019 18:58:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <crosa@redhat.com>) id 1hhe8h-0006Ne-OE
+ for qemu-devel@nongnu.org; Sun, 30 Jun 2019 14:01:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49108)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1hhe8h-0006MJ-EN
+ for qemu-devel@nongnu.org; Sun, 30 Jun 2019 14:01:23 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 56C06C049589;
+ Sun, 30 Jun 2019 18:01:22 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-120-238.rdu2.redhat.com
+ [10.10.120.238])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6082F60E37;
+ Sun, 30 Jun 2019 18:01:17 +0000 (UTC)
+Date: Sun, 30 Jun 2019 14:01:15 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <20190630180115.GD2820@localhost.localdomain>
+References: <20190621060925.16214-1-crosa@redhat.com>
+ <20190621060925.16214-3-crosa@redhat.com>
+ <ef7f2bce-f02f-1f40-f8cf-70e129c22c28@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190629130017.2973-1-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 109.146.132.17
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ef7f2bce-f02f-1f40-f8cf-70e129c22c28@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Sun, 30 Jun 2019 18:01:22 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH v6 00/16] tcg/ppc: Add vector opcodes
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 2/2] Acceptance tests: add SPICE protocol
+ check
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,84 +72,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: amarkovic@wavecomp.com, hsp.cat7@gmail.com
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29/06/2019 14:00, Richard Henderson wrote:
-
-> Changes since v5:
->   * Disable runtime altivec detection until all of the required
->     opcodes are implemented.
->     Because dup2 was last, that really means all of the pure altivec
->     bits, so the initial patches are not bisectable in any meaningful
->     sense.  I thought about reshuffling dup2 earlier, but that created
->     too many conflicts and I was too lazy.
->   * Rearranged the patches a little bit to make sure that each
->     one actually builds, which was not the case before.
->   * Folded in the fix to tcg_out_mem_long, as discussed in the
->     followup within the v4 thread.
+On Fri, Jun 28, 2019 at 05:54:37PM -0300, Wainer dos Santos Moschetta wrote:
 > 
-> Changes since v4:
->   * Patch 1, "tcg/ppc: Introduce Altivec registers", is divided into
->     ten smaller patches.
->   * The net result (code-wise) is not changed between former patch 1
->     and ten new patches.
->   * Remaining (2-7) patches from v4 are applied verbatim.
->   * This means that code-wise v5 and v4 do not differ.
->   * v5 is devised to help debugging, and to better organize the code.
+> On 06/21/2019 03:09 AM, Cleber Rosa wrote:
+> > This fires a QEMU binary with SPICE enabled, and does a basic
+> > handshake, doing a basic client/server interaction and protocol
+> > validation.
+> > 
+> > Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> > ---
+> >   .travis.yml               |  5 +++-
+> >   tests/Makefile.include    |  6 +++++
+> >   tests/acceptance/spice.py | 54 +++++++++++++++++++++++++++++++++++++++
+> >   3 files changed, 64 insertions(+), 1 deletion(-)
+> >   create mode 100644 tests/acceptance/spice.py
+> > 
+> > diff --git a/.travis.yml b/.travis.yml
+> > index aeb9b211cd..6c9257a459 100644
+> > --- a/.travis.yml
+> > +++ b/.travis.yml
+> > @@ -231,7 +231,7 @@ matrix:
+> >       # Acceptance (Functional) tests
+> >       - env:
+> > -        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu"
+> > +        - CONFIG="--python=/usr/bin/python3 --enable-spice --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu"
+> >           - TEST_CMD="make check-acceptance"
+> >         after_failure:
+> >           - cat tests/results/latest/job.log
+> > @@ -240,6 +240,9 @@ matrix:
+> >             packages:
+> >               - python3-pip
+> >               - python3.5-venv
+> > +            - libspice-protocol-dev
+> > +            - libspice-server-dev
+> > +
+> >       # Using newer GCC with sanitizers
+> >       - addons:
+> >           apt:
+> > diff --git a/tests/Makefile.include b/tests/Makefile.include
+> > index 4c97da2878..7fc2d28099 100644
+> > --- a/tests/Makefile.include
+> > +++ b/tests/Makefile.include
+> > @@ -1129,6 +1129,12 @@ AVOCADO_SHOW=app
+> >   # Additional tags that are added to each occurence of "--filter-by-tags"
+> >   AVOCADO_EXTRA_TAGS := ,-flaky
+> > +# At last one test require spice to be enabled, allow it to be excluded
+> > +# if it's not enabled
+> > +ifneq ($(findstring y,"$(CONFIG_SPICE)"),y)
+> > +AVOCADO_EXTRA_TAGS := $(AVOCADO_EXTRA_TAGS),-spice
+> > +endif
+> > +
 > 
-> Changes since v3:
->   * Add support for bitsel, with the vsx xxsel insn.
->   * Rely on the new relocation overflow handling, so
->     we don't require 3 insns for a vector load.
+> Cleber, what about that improvement to avocado_qemu you were developing to
+> parse the configure files then expose the enabled/disabled features to test
+> code? Do you still plan to push it and so this proposal is just temporary?
+>
+
+That was actually a prototype that was done *before* the days of
+"avocado_qemu"[1].  While the main reason for it to not have moved forward
+back then was the requirement of a build environment, I believe we can
+adapt some of the lessons learned there into a generic set of features
+for the test runner.
+
+Basically:
+
+ * a generic capability mechanism should be present, with possibly many
+   implementations (looking at the build environment is clearly one)
+
+ * Jobs should be able to include/exlude tests based on capabilities
+   (akin to how we're using tags)
+
+ * for some other cases, tests should also be given a chance to loop at
+   capabilities and decided to abort (cancel) at run time.
+
+Having said that, I think we can start with the tools that we have,
+which should serve to make the scope of those future enhancements and
+features even clearer and better defined.
+
+Regards,
+- Cleber.
+
+[1] - https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg06757.html
+
+> >   AVOCADO_TAGS=$(patsubst %-softmmu,--filter-by-tags=arch:%$(AVOCADO_EXTRA_TAGS), $(filter %-softmmu,$(TARGET_DIRS)))
+> >   ifneq ($(findstring v2,"v$(PYTHON_VERSION)"),v2)
+> > diff --git a/tests/acceptance/spice.py b/tests/acceptance/spice.py
+> > new file mode 100644
+> > index 0000000000..aa22b1992d
+> > --- /dev/null
+> > +++ b/tests/acceptance/spice.py
+> > @@ -0,0 +1,54 @@
+> > +# Simple functional tests for SPICE functionality
+> > +#
+> > +# Copyright (c) 2019 Red Hat, Inc.
+> > +#
+> > +# Author:
+> > +#  Cleber Rosa <crosa@redhat.com>
+> > +#
+> > +# This work is licensed under the terms of the GNU GPL, version 2 or
+> > +# later.  See the COPYING file in the top-level directory.
+> > +
+> > +import socket
+> > +import struct
+> > +
+> > +from avocado_qemu import Test
+> > +from avocado.utils.network import find_free_port
+> > +
+> > +
+> > +class Spice(Test):
+> > +
+> > +    def test_protocol(self):
+> > +        """
+> > +        :avocado: tags=quick
+> > +        :avocado: tags=spice
+> > +        """
+> > +        port = find_free_port(5001, 5500, sequent=False)
+> > +        self.vm.add_args('-nodefaults', '-S',
+> > +                         '-spice', 'port=%d,disable-ticketing' % port)
+> > +        self.vm.launch()
+> > +
+> > +        RED_MAGIC = 0x51444552
+> > +        MAJOR_VERSION = 0x2
+> > +
+> > +        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+> > +        client.connect(('127.0.0.1', port))
+> > +        red_link_mess = struct.pack('<10I',
+> > +                                    RED_MAGIC,      # magic
+> > +                                    MAJOR_VERSION,  # major version
+> > +                                    0x0,            # minor version
+> > +                                    0x18,           # size in bytes from here
+> > +                                    0x0,            # connection id
+> > +                                    0x1,            # channel type RED_CHANNEL_MAIN
+> > +                                    0x0,            # channel id
+> > +                                    0x0,            # number of common caps
+> > +                                    0x0,            # number of channel caps
+> > +                                    0x14)           # caps offset from size
+> > +        client.send(red_link_mess)
+> > +
+> > +        RED_LINK_REPLY_BASE_FMT = '<5I'  # magic, major, minor, size, error
+> > +        red_link_reply = client.recv(struct.calcsize(RED_LINK_REPLY_BASE_FMT))
+> > +        (magic, major, minor, size, error) = struct.unpack_from(RED_LINK_REPLY_BASE_FMT,
+> > +                                                                red_link_reply)
+> > +        self.assertEqual(magic, RED_MAGIC, "Mismatch of MAGIC number")
+> > +        self.assertEqual(major, MAJOR_VERSION, "Mismatch of major protocol version")
+> > +        self.assertEqual(error, 0x0, "Unexpected error reported by server")
 > 
-> Changes since v2:
->   * Several generic tcg patches to improve dup vs dupi vs dupm.
->     In particular, if a global temp (like guest r10) is not in
->     a host register, we should duplicate from memory instead of
->     loading to an integer register, spilling to stack, loading
->     to a vector register, and then duplicating.
->   * I have more confidence that 32-bit ppc host should work
->     this time around.  No testing on that front yet, but I've
->     unified some code sequences with 64-bit ppc host.
->   * Base altivec now supports V128 only.  Moved V64 support to
->     Power7 (v2.06), which has 64-bit load/store.
->   * Dropped support for 64-bit vector multiply using Power8.
->     The expansion was too large compared to using integer regs.
+> That test case looks good to me.
 > 
-> Richard Henderson (16):
->   tcg/ppc: Introduce Altivec registers
->   tcg/ppc: Introduce macro VX4()
->   tcg/ppc: Introduce macros VRT(), VRA(), VRB(), VRC()
->   tcg/ppc: Enable tcg backend vector compilation
->   tcg/ppc: Add support for load/store/logic/comparison
->   tcg/ppc: Add support for vector maximum/minimum
->   tcg/ppc: Add support for vector add/subtract
->   tcg/ppc: Add support for vector saturated add/subtract
->   tcg/ppc: Prepare case for vector multiply
->   tcg/ppc: Support vector shift by immediate
->   tcg/ppc: Support vector multiply
->   tcg/ppc: Support vector dup2
->   tcg/ppc: Enable Altivec detection
->   tcg/ppc: Update vector support to v2.06
->   tcg/ppc: Update vector support to v2.07
->   tcg/ppc: Update vector support to v3.00
-> 
->  tcg/ppc/tcg-target.h     |   39 +-
->  tcg/ppc/tcg-target.opc.h |   13 +
->  tcg/ppc/tcg-target.inc.c | 1091 +++++++++++++++++++++++++++++++++++---
->  3 files changed, 1076 insertions(+), 67 deletions(-)
->  create mode 100644 tcg/ppc/tcg-target.opc.h
-
-I don't have space for a full set of images on the G4, however I've tried boot tests
-on installer CDs for MacOS 9, OS X 10.2, Linux and HelenOS and it looks good here.
-
-Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> [PPC32]
-
-
-ATB,
-
-Mark.
+> - Wainer
 
