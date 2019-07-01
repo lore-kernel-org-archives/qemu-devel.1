@@ -2,88 +2,60 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28798C5B578
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 01:43:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F9FC5B578
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 01:44:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0E8A206A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 01:43:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rrC9IS53"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0E8A206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id B8BF6206A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 01:44:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8BF6206A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi7pk-0006PF-E7
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 21:43:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55574)
+	id 1hi7qC-0006sO-0y
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 21:44:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47082)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hi4Md-00053I-9r
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:01:33 -0400
+ (envelope-from <philmd@redhat.com>) id 1hi3xH-0000WT-AE
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:35:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hi4Mb-0000HU-Li
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:01:31 -0400
-Received: from mail-wr1-f52.google.com ([209.85.221.52]:43829)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hi4Mb-0000HI-EW
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:01:29 -0400
-Received: by mail-wr1-f52.google.com with SMTP id p13so15406507wru.10
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 15:01:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=1E06iM3g2rGIpvDkSZRxcV4cH98QgZLgZ77VISOvPlc=;
- b=rrC9IS53HJ9tl6cCe3/PhPlonva0bhClgGXrn4M88ljUCJkYgfpUmgKOFbYAFP1UO3
- JtwowsCbRmFCnU4TOU4QsFLVVm1QZdj5YKRVhc8v3x/6yb87zABKu3FecdoV/gLiFRUI
- /oQAeRbDI0CzITZuZnC+FVrl4+iCuhZ9shzBj/6NSBcVWntiXq9mtdcOHamZZlaZm1MF
- FodNHQEirXGsDtdNibMeYVWvUvspMZ5xYXsEsUbe8oZCgAl9bCbI6FFS+1BQ1TJ8/l/t
- Z4QDl1bn+jLWFcm6PSXdOuDSygXo4RND5+iZe8CuxjFrnGFQS2b6d4ZYqyzqIy8/xnft
- wJvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=1E06iM3g2rGIpvDkSZRxcV4cH98QgZLgZ77VISOvPlc=;
- b=JHNQ2yMt6EwaW2umRQXxu48mczVA63MfdYy49rzN5/5ZbE9x/sCcwWRzax6+T5TZpm
- 8fIt5Zz8G6Nhp/M4PyPBi+7oALE/Pje55JGpL2TvhftKpSQnFokToVu6kvLLlBanA5cD
- 0Ch4gZXGUuck/1pKj94cAMxBdPMq2qPuRRLR2i2mGbM5SLu+s94mOlyhqO5RLoZtX29D
- kHPsCfKDEMsOLnn/PzNKGmwrjcZIbsMwXyiTswWfWxiiaJPXuzmvfogixuDNub0t2ZcD
- +4BhHAjdiM17/55ZG7oI2dTYuADsiYCKLdHSgZJtQfRzdoPVETsAp4GPtNod4M5KzdcG
- 9kWw==
-X-Gm-Message-State: APjAAAU7/qkpR/ioVCYBqBqxhCI+sUrcq8JhBr8eUGmG0DZeBCUiioDW
- SJVz//3SHsz0zTSqJdvLyZG/AErzHXi9ng==
-X-Google-Smtp-Source: APXvYqw5SRtS0ySqCxCgThkkGdeBtzB/0lcnmjHJLS6wniI76wAY2PLjxDFWdU/5nGnJkOxSNjiP+A==
-X-Received: by 2002:adf:e84d:: with SMTP id d13mr15984958wrn.88.1561999199485; 
- Mon, 01 Jul 2019 09:39:59 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id o6sm26573508wra.27.2019.07.01.09.39.58
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 01 Jul 2019 09:39:59 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
+ (envelope-from <philmd@redhat.com>) id 1hi3xF-0002Ec-4o
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:35:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50126)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>)
+ id 1hi3xB-00021g-GE; Mon, 01 Jul 2019 17:35:13 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E399630C3192;
+ Mon,  1 Jul 2019 19:49:59 +0000 (UTC)
+Received: from x1w.redhat.com (unknown [10.40.205.170])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F2ABC87A0;
+ Mon,  1 Jul 2019 19:49:55 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon,  1 Jul 2019 17:39:10 +0100
-Message-Id: <20190701163943.22313-14-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190701163943.22313-1-peter.maydell@linaro.org>
-References: <20190701163943.22313-1-peter.maydell@linaro.org>
+Date: Mon,  1 Jul 2019 21:49:36 +0200
+Message-Id: <20190701194942.10092-3-philmd@redhat.com>
+In-Reply-To: <20190701194942.10092-1-philmd@redhat.com>
+References: <20190701194942.10092-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Mon, 01 Jul 2019 19:50:00 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.52
-Subject: [Qemu-devel] [PULL 13/46] aspeed: introduce a configurable number
- of CPU per machine
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v4 2/8] target/arm: Restrict semi-hosting to TCG
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,211 +67,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Yang Zhong <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Andrew Jones <drjones@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>,
+ Rob Bradford <robert.bradford@intel.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cédric Le Goater <clg@kaod.org>
+Per Peter Maydell:
 
-The current models of the Aspeed SoCs only have one CPU but future
-ones will support SMP. Introduce a new num_cpus field at the SoC class
-level to define the number of available CPUs per SoC and also
-introduce a 'num-cpus' property to activate the CPUs configured for
-the machine.
+  Semihosting hooks either SVC or HLT instructions, and inside KVM
+  both of those go to EL1, ie to the guest, and can't be trapped to
+  KVM.
 
-The max_cpus limit of the machine should depend on the SoC definition
-but, unfortunately, these values are not available when the machine
-class is initialized. This is the reason why we add a check on
-num_cpus in the AspeedSoC realize handler.
+Let check_for_semihosting() return False when not running on TCG.
 
-SMP support will be activated when models for such SoCs are implemented.
-
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Reviewed-by: Joel Stanley <joel@jms.id.au>
-Message-id: 20190618165311.27066-6-clg@kaod.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- include/hw/arm/aspeed_soc.h |  5 ++++-
- hw/arm/aspeed.c             |  7 +++++--
- hw/arm/aspeed_soc.c         | 33 +++++++++++++++++++++++++++------
- 3 files changed, 36 insertions(+), 9 deletions(-)
+v3: inline call to g_assert_not_reached if !TCG
+v4: fixed some ifdef that had moved in the next patch (Peter)
+---
+ target/arm/Makefile.objs | 2 +-
+ target/arm/cpu.h         | 7 +++++++
+ target/arm/helper.c      | 8 +++++++-
+ 3 files changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
-index fa0ba957a61..b613b00600f 100644
---- a/include/hw/arm/aspeed_soc.h
-+++ b/include/hw/arm/aspeed_soc.h
-@@ -24,13 +24,15 @@
- 
- #define ASPEED_SPIS_NUM  2
- #define ASPEED_WDTS_NUM  3
-+#define ASPEED_CPUS_NUM  2
- 
- typedef struct AspeedSoCState {
-     /*< private >*/
-     DeviceState parent;
- 
-     /*< public >*/
--    ARMCPU cpu;
-+    ARMCPU cpu[ASPEED_CPUS_NUM];
-+    uint32_t num_cpus;
-     MemoryRegion sram;
-     AspeedVICState vic;
-     AspeedRtcState rtc;
-@@ -58,6 +60,7 @@ typedef struct AspeedSoCInfo {
-     int wdts_num;
-     const int *irqmap;
-     const hwaddr *memmap;
-+    uint32_t num_cpus;
- } AspeedSoCInfo;
- 
- typedef struct AspeedSoCClass {
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index c692ca1dba9..96de4f5c2a8 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -22,13 +22,13 @@
- #include "hw/misc/tmp105.h"
- #include "qemu/log.h"
- #include "sysemu/block-backend.h"
-+#include "sysemu/sysemu.h"
- #include "hw/loader.h"
- #include "qemu/error-report.h"
- #include "qemu/units.h"
- 
- static struct arm_boot_info aspeed_board_binfo = {
-     .board_id = -1, /* device-tree-only board */
--    .nb_cpus = 1,
- };
- 
- struct AspeedBoardState {
-@@ -171,6 +171,8 @@ static void aspeed_board_init(MachineState *machine,
-                             &error_abort);
-     object_property_set_int(OBJECT(&bmc->soc), cfg->num_cs, "num-cs",
-                             &error_abort);
-+    object_property_set_int(OBJECT(&bmc->soc), smp_cpus, "num-cpus",
-+                            &error_abort);
-     if (machine->kernel_filename) {
-         /*
-          * When booting with a -kernel command line there is no u-boot
-@@ -230,6 +232,7 @@ static void aspeed_board_init(MachineState *machine,
-     aspeed_board_binfo.kernel_cmdline = machine->kernel_cmdline;
-     aspeed_board_binfo.ram_size = ram_size;
-     aspeed_board_binfo.loader_start = sc->info->memmap[ASPEED_SDRAM];
-+    aspeed_board_binfo.nb_cpus = bmc->soc.num_cpus;
- 
-     if (cfg->i2c_init) {
-         cfg->i2c_init(bmc);
-@@ -326,7 +329,7 @@ static void aspeed_machine_class_init(ObjectClass *oc, void *data)
- 
-     mc->desc = board->desc;
-     mc->init = aspeed_machine_init;
--    mc->max_cpus = 1;
-+    mc->max_cpus = ASPEED_CPUS_NUM;
-     mc->no_sdcard = 1;
-     mc->no_floppy = 1;
-     mc->no_cdrom = 1;
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index 5faa78d81fd..d38fb0aaa0f 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -19,6 +19,7 @@
- #include "hw/char/serial.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
-+#include "qemu/error-report.h"
- #include "hw/i2c/aspeed_i2c.h"
- #include "net/net.h"
- 
-@@ -123,6 +124,7 @@ static const AspeedSoCInfo aspeed_socs[] = {
-         .wdts_num     = 2,
-         .irqmap       = aspeed_soc_ast2400_irqmap,
-         .memmap       = aspeed_soc_ast2400_memmap,
-+        .num_cpus     = 1,
-     }, {
-         .name         = "ast2400-a1",
-         .cpu_type     = ARM_CPU_TYPE_NAME("arm926"),
-@@ -134,6 +136,7 @@ static const AspeedSoCInfo aspeed_socs[] = {
-         .wdts_num     = 2,
-         .irqmap       = aspeed_soc_ast2400_irqmap,
-         .memmap       = aspeed_soc_ast2400_memmap,
-+        .num_cpus     = 1,
-     }, {
-         .name         = "ast2400",
-         .cpu_type     = ARM_CPU_TYPE_NAME("arm926"),
-@@ -145,6 +148,7 @@ static const AspeedSoCInfo aspeed_socs[] = {
-         .wdts_num     = 2,
-         .irqmap       = aspeed_soc_ast2400_irqmap,
-         .memmap       = aspeed_soc_ast2400_memmap,
-+        .num_cpus     = 1,
-     }, {
-         .name         = "ast2500-a1",
-         .cpu_type     = ARM_CPU_TYPE_NAME("arm1176"),
-@@ -156,6 +160,7 @@ static const AspeedSoCInfo aspeed_socs[] = {
-         .wdts_num     = 3,
-         .irqmap       = aspeed_soc_ast2500_irqmap,
-         .memmap       = aspeed_soc_ast2500_memmap,
-+        .num_cpus     = 1,
-     },
- };
- 
-@@ -172,8 +177,11 @@ static void aspeed_soc_init(Object *obj)
-     AspeedSoCClass *sc = ASPEED_SOC_GET_CLASS(s);
-     int i;
- 
--    object_initialize_child(obj, "cpu", OBJECT(&s->cpu), sizeof(s->cpu),
--                            sc->info->cpu_type, &error_abort, NULL);
-+    for (i = 0; i < sc->info->num_cpus; i++) {
-+        object_initialize_child(obj, "cpu[*]", OBJECT(&s->cpu[i]),
-+                                sizeof(s->cpu[i]), sc->info->cpu_type,
-+                                &error_abort, NULL);
-+    }
- 
-     sysbus_init_child_obj(obj, "scu", OBJECT(&s->scu), sizeof(s->scu),
-                           TYPE_ASPEED_SCU);
-@@ -241,11 +249,19 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-     create_unimplemented_device("aspeed_soc.io", sc->info->memmap[ASPEED_IOMEM],
-                                 ASPEED_SOC_IOMEM_SIZE);
- 
-+    if (s->num_cpus > sc->info->num_cpus) {
-+        warn_report("%s: invalid number of CPUs %d, using default %d",
-+                    sc->info->name, s->num_cpus, sc->info->num_cpus);
-+        s->num_cpus = sc->info->num_cpus;
-+    }
-+
-     /* CPU */
--    object_property_set_bool(OBJECT(&s->cpu), true, "realized", &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
-+    for (i = 0; i < s->num_cpus; i++) {
-+        object_property_set_bool(OBJECT(&s->cpu[i]), true, "realized", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-     }
- 
-     /* SRAM */
-@@ -380,6 +396,10 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->ftgmac100), 0,
-                        aspeed_soc_get_irq(s, ASPEED_ETH1));
- }
-+static Property aspeed_soc_properties[] = {
-+    DEFINE_PROP_UINT32("num-cpus", AspeedSoCState, num_cpus, 0),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
- 
- static void aspeed_soc_class_init(ObjectClass *oc, void *data)
+diff --git a/target/arm/Makefile.objs b/target/arm/Makefile.objs
+index 294433da88..82bedefc3d 100644
+--- a/target/arm/Makefile.objs
++++ b/target/arm/Makefile.objs
+@@ -1,4 +1,4 @@
+-obj-y +=3D arm-semi.o
++obj-$(CONFIG_TCG) +=3D arm-semi.o
+ obj-y +=3D helper.o vfp_helper.o
+ obj-y +=3D cpu.o gdbstub.o
+ obj-$(TARGET_AARCH64) +=3D cpu64.o gdbstub64.o
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index a9be18660f..94c990cddb 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -964,7 +964,14 @@ static inline void aarch64_sve_change_el(CPUARMState=
+ *env, int o,
+ { }
+ #endif
+=20
++#if !defined(CONFIG_TCG)
++static inline target_ulong do_arm_semihosting(CPUARMState *env)
++{
++    g_assert_not_reached();
++}
++#else
+ target_ulong do_arm_semihosting(CPUARMState *env);
++#endif
+ void aarch64_sync_32_to_64(CPUARMState *env);
+ void aarch64_sync_64_to_32(CPUARMState *env);
+=20
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 38b73430cb..6d91e0a1f9 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -20,7 +20,6 @@
+ #include "qemu/qemu-print.h"
+ #include "exec/exec-all.h"
+ #include "exec/cpu_ldst.h"
+-#include "arm_ldst.h"
+ #include <zlib.h> /* For crc32 */
+ #include "hw/semihosting/semihost.h"
+ #include "sysemu/cpus.h"
+@@ -29,6 +28,9 @@
+ #include "qapi/qapi-commands-target.h"
+ #include "qapi/error.h"
+ #include "qemu/guest-random.h"
++#ifdef CONFIG_TCG
++#include "arm_ldst.h"
++#endif
+=20
+ #define ARM_CPU_FREQ 1000000000 /* FIXME: 1 GHz, should be configurable =
+*/
+=20
+@@ -10399,6 +10401,7 @@ static void arm_cpu_do_interrupt_aarch64(CPUState=
+ *cs)
+=20
+ static inline bool check_for_semihosting(CPUState *cs)
  {
-@@ -390,6 +410,7 @@ static void aspeed_soc_class_init(ObjectClass *oc, void *data)
-     dc->realize = aspeed_soc_realize;
-     /* Reason: Uses serial_hds and nd_table in realize() directly */
-     dc->user_creatable = false;
-+    dc->props = aspeed_soc_properties;
++#ifdef CONFIG_TCG
+     /* Check whether this exception is a semihosting call; if so
+      * then handle it and return true; otherwise return false.
+      */
+@@ -10474,6 +10477,9 @@ static inline bool check_for_semihosting(CPUState=
+ *cs)
+         env->regs[0] =3D do_arm_semihosting(env);
+         return true;
+     }
++#else
++    return false;
++#endif
  }
- 
- static const TypeInfo aspeed_soc_type_info = {
--- 
+=20
+ /* Handle a CPU exception for A and R profile CPUs.
+--=20
 2.20.1
 
 
