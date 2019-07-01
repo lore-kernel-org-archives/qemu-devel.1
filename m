@@ -6,38 +6,38 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E444C0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 08:45:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83B81C0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 08:46:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 220712089C
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 08:45:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 220712089C
+	by mail.kernel.org (Postfix) with ESMTPS id 5B8DF2089C
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 08:46:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B8DF2089C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhrwR-0006Vq-Cd
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 04:45:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39697)
+	id 1hhrwo-00078R-MI
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 04:46:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39967)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hhrur-0004nj-8a
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:44:02 -0400
+ (envelope-from <laurent@vivier.eu>) id 1hhrw3-00066x-GL
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:45:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hhruq-0003Gw-39
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:44:01 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:40185)
+ (envelope-from <laurent@vivier.eu>) id 1hhrw2-0004A4-8V
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:45:15 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:54039)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hhrup-0003Fl-QT
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:44:00 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hhrw1-00049G-VR
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:45:14 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MmlbE-1iRPC73Y98-00jpi2; Mon, 01 Jul 2019 10:43:42 +0200
+ (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MuDPf-1iX58k2TYj-00ua79; Mon, 01 Jul 2019 10:44:55 +0200
 To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
 References: <1561718618-20218-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1561718618-20218-5-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1561718618-20218-6-git-send-email-aleksandar.markovic@rt-rk.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -82,35 +82,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <30a8fd18-3a5b-b9c0-00b5-1e2996bcc87c@vivier.eu>
-Date: Mon, 1 Jul 2019 10:43:40 +0200
+Message-ID: <1a200c20-4b5c-a8ea-be3b-c2196dd7cd78@vivier.eu>
+Date: Mon, 1 Jul 2019 10:44:54 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <1561718618-20218-5-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1561718618-20218-6-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:soEfCGM7dOMHF9qxAb1Ed7E1fDr2J9L8rZnibVDq4l6penIZFMC
- Ivl1OlGfFGShICkP0YGX2H2qebRq6GDURkXLq1jygI2sdbnVoyaKP8bCNTx0zSE7u7BB2hK
- t9p3dJeTudKdYqbp2cSfAHeG4XaHU7ovwWEuY+MIulJPr/UYp98L9JF0f86aarWHJrfuKgL
- lIXSu9oEXy6PEm2maGDBQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:P+uWGQIUQdk=:hmW9tH3p8G3aWEaA71Q1eb
- b+WjBjz02+ZQSTRYVI2V5afx/FrKqWfQzTpTEtrD7LHAXl05aeY+nZvQEpK0rnEj9ZwBtNXAO
- 4cakoqSqP2HWsoEVS2f2ZSZ5X4B2rVNNDbAQxiEMQdqnPyDw3Kh1wD+H8e+9Keuwf+zHxptPF
- lbP1BMSOjozLxlZ22x0RC+jATKdE5lbwoESLX0x2/qISk0nz/loy0YNJIHLLBM7kwjkKqwfT5
- LPRP9i+jLdv9VptQizANOVyGRb90jOJ9IqJIHyJPLKM4nu332GuNLUaS1Ljd4LkQPLMezQdSm
- fJ8KHD/3aOOhUSEaE118jyQzKST+exEuMzKLr+KBN2P4BoqQJr2sJoTqJf1uNKoU8k9dhwDtL
- n55gpS02jhwnvXE1MPTy8DMs1a7jCgXYmbM5EtdgAHcZt15A1oOcE3ost4fg1ndRugPKz+aTG
- s+QVD3aIp0exg/t0iO+m+7OE2IfsHp6H4n3eZaZukl9ujq74ZqbrZqrzOV+ZVHc2y0EZJrM0z
- fNbukB5eC4MomA6g5hnz6C3ScghhOCJaChOu0O8YrAnhZzuaIN3wHLrqpg88UAhsPqCiqedU8
- NpBqwKztyQVl8coyqDb3QdOM6Z8Nb++I1YKQinnuupb6YbB2Tfl+Xbwwj90GLH7HxCQAnSHLo
- vcOhTtBWenLKHqwXm3eTv2IbWRex7FC41+DIaXe3boccRCZoBoJ+u6/1PlXehkJCv2XXT4XMT
- 7b2/9p0ziRMwa+55d26mKWii+eihfo7R6mH3mRFek54VuOt7yZ7dER4yt/w=
+X-Provags-ID: V03:K1:arUTH1veMEce3R0e75AKJV1YS3cVI0RH2oBL01fGM3Fa+w8Cw+p
+ Bb49MoAm9BhKKLdEzXYsd5939VFJG9z22bORfB4kYzsNOPAqXTVzgdHE2UxqRpgA/1JAHWb
+ 1r8nd0SF0YdvINPuC1TQWNkd4x0wfzs4t6Ezq12Il9s94HOFXdVjIeRpRRucuGaoX6EI2DO
+ WEf8kaKZQ5XGLwEAzY1cg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Q1262WvOrqE=:E2WxBUOU9AmeVAqqS3jeqv
+ snoIxyelVqflrpfTdy2eTWngHLBCmXnA6j1iSTsYlxgVVLEkPcpzWsUblOcbLXXARhm8eQ5k+
+ tq0M7YWzVg8k+2z6BTBJi4p5mH5Qa2GF9N4vgjyzRkHemYMLE/Wkc9p0lvEMOoB2NCFUWlnJC
+ MpBVTCd1JAshrPpuDGLjUpTv8gmujeECYnMFa+JXuMvzYN1R0kqdNyWse2vkwb7gkb1ypA94Q
+ xe9xPCm1Qt8ZwhZxuuqvoH6j+E/gwhlfRHoGsoujEmw88IrKEoglxUfe6gEq6N8vILQu9dSFA
+ 6wj0ib+YW5YRkNjpIY2oWOlXtQc1BM7z/bKVwIJZFyfhBY3s459OnREUOQx5vaFgbMmDIyI0P
+ KAzyV1+1gZhv7huH5+SMKpSoz4RtSnRQfEvE7AsSk/vnkiUN8OoUywhCI84RR9J+LnSOTR//z
+ B+2aEKgb11QF6zkjMJhpmdlSRCKghasqMLIXNcml3GYYx66NhlcOrl3lyUmWNWJdP3y6pu5n8
+ 3KC9tv4sZtgIOyPpCvoAUW4DP0XvSiBploHY/wN2p0aZnYnTz2gYRCv0cG04ZBARDNsYz3/j7
+ zuzyOS/caNd2Lk+FWVkFjwpChVWJM3yB1XN/ByrcetMRFq6ZRHdtHFVT7Ivru6JqMnPKofRA6
+ 4+p5g3yQGl7FSENaT9nj89vkQWlJ2/8ABwtXIuDDRZVd+IrbusFlkhEB8i9Mp3pveRTczSIOa
+ Qub6NJ+2rz5vAKWaPuymC5eeEFMbuAkd1hag1VAGXLD7ykbKkKkWGzSrGuc=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.73
-Subject: Re: [Qemu-devel] [PATCH v16 4/5] linux-user: Introduce
- TARGET_HAVE_ARCH_STRUCT_FLOCK
+X-Received-From: 212.227.17.24
+Subject: Re: [Qemu-devel] [PATCH v16 5/5] linux-user: Handle EXCP_FPE
+ properly for MIPS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -130,109 +130,55 @@ Sender: "Qemu-devel"
 Le 28/06/2019 à 12:43, Aleksandar Markovic a écrit :
 > From: Aleksandar Markovic <amarkovic@wavecomp.com>
 > 
-> Bring target_flock definitions to be more in sync with the way
-> flock is defined in kernel.
+> Handle EXCP_FPE properly for MIPS in cpu loop.
 > 
-> Basically, the rules from the kernel are:
+> Note that a vast majority of FP instructions are not affected by
+> the absence of the code in this patch, as they use alternative code
+> paths for handling floating point exceptions (see, for example,
+> invocations of update_fcr31()) - they rely on softfloat library for
+> keeping track on exceptions that needs to be raised. However, there
+> are few MIPS FP instructions (an example is CTC1) that use function
+> do_raise_exception() directly, and they need the case that is added
+> in this patch to propagate the FPE exception as designed.
 > 
-> 1. Majority of architectures have a common flock definition.
+> The code is based on kernel's function force_fcr31_sig() in
+> arch/mips/kernel.traps.c.
 > 
-> 2. Architectures with 32-bit MIPS ABIs have a sligtly different
-> flock definition; those architectures are the only arcitectures
-> that have HAVE_ARCH_STRUCT_FLOCK defined, and that preprocessor
-> constant is used in the common header as a flag for including or
-> not including common flock definition.
-> 
-> 3. Sparc architectures also have a sligtly different flock
-> definition, but the difference is only the padding at the end of
-> the structure. The presence of that padding is determined by
-> preprocessor constants __ARCH_FLOCK6_PAD and __ARCH_FLOCK64_PAD.
-> 
-> QEMU linux-user already implements rules 1. and 3. in a very
-> similar way as they are implemented in kernel. However, rule 2.
-> is implemented in a dissimilar way (for example, the constant
-> TARGET_HAVE_ARCH_STRUCT_FLOCK is missing), and this patch brings
-> QEMU implementation much closer to the kernel implementation.
-> TARGET_HAVE_ARCH_STRUCT_FLOCK64 constant is also introduced to
-> mimic HAVE_ARCH_STRUCT_FLOCK64 from kernel, but it is not defined
-> anywhere, however, this is the case with HAVE_ARCH_STRUCT_FLOCK64
-> in kernel as well.
-> 
+> Reported-by: Yunqiang Su <ysu@wavecomp.com>
 > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 > ---
->  linux-user/generic/fcntl.h     |  8 +++++---
->  linux-user/mips/target_fcntl.h | 17 +++++++++++++----
->  2 files changed, 18 insertions(+), 7 deletions(-)
+>  linux-user/mips/cpu_loop.c | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
 > 
-> diff --git a/linux-user/generic/fcntl.h b/linux-user/generic/fcntl.h
-> index 1b48dde..9f727d4 100644
-> --- a/linux-user/generic/fcntl.h
-> +++ b/linux-user/generic/fcntl.h
-> @@ -120,6 +120,7 @@ struct target_f_owner_ex {
->  #define TARGET_F_SHLCK         8
->  #endif
->  
-> +#ifndef TARGET_HAVE_ARCH_STRUCT_FLOCK
->  #ifndef TARGET_ARCH_FLOCK_PAD
->  #define TARGET_ARCH_FLOCK_PAD
->  #endif
-> @@ -129,13 +130,12 @@ struct target_flock {
->      short l_whence;
->      abi_long l_start;
->      abi_long l_len;
-> -#if defined(TARGET_MIPS) && (TARGET_ABI_BITS == 32)
-> -    abi_long l_sysid;
-> -#endif
->      int l_pid;
->      TARGET_ARCH_FLOCK_PAD
->  };
-> +#endif
->  
-> +#ifndef TARGET_HAVE_ARCH_STRUCT_FLOCK64
->  #ifndef TARGET_ARCH_FLOCK64_PAD
->  #define TARGET_ARCH_FLOCK64_PAD
->  #endif
-> @@ -149,3 +149,5 @@ struct target_flock64 {
->      TARGET_ARCH_FLOCK64_PAD
->  };
->  #endif
-> +
-> +#endif
-> diff --git a/linux-user/mips/target_fcntl.h b/linux-user/mips/target_fcntl.h
-> index 795bba7..6fc7b8a 100644
-> --- a/linux-user/mips/target_fcntl.h
-> +++ b/linux-user/mips/target_fcntl.h
-> @@ -28,11 +28,20 @@
->  #define TARGET_F_GETOWN        23       /*  for sockets. */
->  
->  #if (TARGET_ABI_BITS == 32)
-> -#define TARGET_ARCH_FLOCK_PAD abi_long pad[4];
-> -#else
-> -#define TARGET_ARCH_FLOCK_PAD
-> +
-> +struct target_flock {
-> +    short l_type;
-> +    short l_whence;
-> +    abi_long l_start;
-> +    abi_long l_len;
-> +    abi_long l_sysid;
-> +    int l_pid;
-> +    abi_long pad[4];
-> +};
-> +
-> +#define TARGET_HAVE_ARCH_STRUCT_FLOCK
-> +
->  #endif
-> -#define TARGET_ARCH_FLOCK64_PAD
->  
->  #define TARGET_F_GETLK64       33      /*  using 'struct flock64' */
->  #define TARGET_F_SETLK64       34
+> diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
+> index 43ba267..0ba894f 100644
+> --- a/linux-user/mips/cpu_loop.c
+> +++ b/linux-user/mips/cpu_loop.c
+> @@ -540,6 +540,23 @@ done_syscall:
+>              info.si_code = TARGET_ILL_ILLOPC;
+>              queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+>              break;
+> +        case EXCP_FPE:
+> +            info.si_signo = TARGET_SIGFPE;
+> +            info.si_errno = 0;
+> +            info.si_code = TARGET_FPE_FLTUNK;
+> +            if (GET_FP_CAUSE(env->active_fpu.fcr31) & FP_INVALID) {
+> +                info.si_code = TARGET_FPE_FLTINV;
+> +            } else if (GET_FP_CAUSE(env->active_fpu.fcr31) & FP_DIV0) {
+> +                info.si_code = TARGET_FPE_FLTDIV;
+> +            } else if (GET_FP_CAUSE(env->active_fpu.fcr31) & FP_OVERFLOW) {
+> +                info.si_code = TARGET_FPE_FLTOVF;
+> +            } else if (GET_FP_CAUSE(env->active_fpu.fcr31) & FP_UNDERFLOW) {
+> +                info.si_code = TARGET_FPE_FLTUND;
+> +            } else if (GET_FP_CAUSE(env->active_fpu.fcr31) & FP_INEXACT) {
+> +                info.si_code = TARGET_FPE_FLTRES;
+> +            }
+> +            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+> +            break;
+>          /* The code below was inspired by the MIPS Linux kernel trap
+>           * handling code in arch/mips/kernel/traps.c.
+>           */
 > 
 
-Applied to my linux-user branch.
-
-Thanks,
-Laurent
-
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
