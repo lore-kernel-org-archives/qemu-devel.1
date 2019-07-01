@@ -2,92 +2,67 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7294C5B578
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 01:32:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E790AC5B578
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 01:34:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C70521479
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 01:32:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tq/6aN5D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C70521479
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
+	by mail.kernel.org (Postfix) with ESMTPS id B9FA120663
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 01:34:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9FA120663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi7eq-0002h3-TE
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 21:32:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46459)
+	id 1hi7hC-0005NA-S7
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 21:34:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53972)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tcminyard@gmail.com>) id 1hi3vE-0007mx-7Y
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:33:28 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hi4Hx-0001IN-Cy
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:56:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tcminyard@gmail.com>) id 1hi3uy-0001cD-2m
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:33:02 -0400
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:46131)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1hi3ur-0001ZY-JI
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:32:52 -0400
-Received: by mail-ot1-f67.google.com with SMTP id z23so14988585ote.13
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 14:32:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=NO976jdjcFbYo6B4xUhDqG/yyhIQxVSBAlIMZVWwaus=;
- b=tq/6aN5DApde1qD0uiyz4tCJKoQdHyCm2ka4GFRo7Zdhy/CtMjJ7RRmrLsNY8c57Iv
- KEnqRmJCVoV9Jkxqe8jwZEFAx0H6Kck9+l37/pd7wJ8Xd59foClWR+X99WzVEtI3cpgm
- 7sbfRM4fyEt8PQzshIcR66iYrrETIYAPnN1LD+EG/ySEvW9gp9KTMegmBwuHSs+4iMKo
- jRIOMOVcNc3UUczMd7M/SytLCpEzuj6Ytq7H9SoMfIeZriS8BX9pUrXs54jm2or5ZcG0
- 5xiG5UM/ryLVFEf1Z8b4OFPEFB/B5PsXRbIIDo1wG2uoaPNn+pLiQ7pgjZyXZ1LoFd9Z
- d5GQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=NO976jdjcFbYo6B4xUhDqG/yyhIQxVSBAlIMZVWwaus=;
- b=p3kfrfNUb94JsVAyWx7O0JIqPXf3ksXhu1P0xEW/SG8mShhwyWvBJp7decaHppCRkL
- 14KPETtwmT9Z6l2j+vpUH1QNe8PG0tvhqCQo8k8uxOGRNUW2TVhAP5PddSLz8wASrb7h
- 4f2EECYdmeWTJ2qTze813QwyIl0yR+cRcvj1vZSMs8KpW3QO763I58lgWZifTK0XQpgW
- tl8g/ctyY5ngKqk3HVzqZ7RBNplvTHZ8XNXmcvbbxcTLZS9cXw26SGR5W+ktPbc8gsTK
- JLggk1qxEKsvHm7eDT9IktZawpD96QGk3pMlyVdbCtiXo6fcGpqoSy7sFdNGkOX115D+
- QvgA==
-X-Gm-Message-State: APjAAAU2/iToaI5QHzmAOmNlBTDP4j5a9tSpO0YSR5b9pQefZ+LDzRuo
- LnBhTRP/KFtIvmLAI1kQsI4y2Ns=
-X-Google-Smtp-Source: APXvYqxeYgzwvL3CtC7Kr5Gy0G8bIVrz8yCcgE1J9SJ5A7b9w/PMkHPgUJ5XjJC5FTFrSS+TKm/e8Q==
-X-Received: by 2002:a05:6830:14c:: with SMTP id
- j12mr20372450otp.181.1562005870918; 
- Mon, 01 Jul 2019 11:31:10 -0700 (PDT)
-Received: from serve.minyard.net ([47.184.134.43])
- by smtp.gmail.com with ESMTPSA id r25sm4088223otp.22.2019.07.01.11.31.08
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 01 Jul 2019 11:31:08 -0700 (PDT)
-Received: from t430.minyard.net (unknown
- [IPv6:2001:470:b8f6:1b:9997:a955:13ad:73b])
- by serve.minyard.net (Postfix) with ESMTPA id 9B7BC1805A7;
- Mon,  1 Jul 2019 18:31:07 +0000 (UTC)
-Received: by t430.minyard.net (Postfix, from userid 1000)
- id 69795302524; Mon,  1 Jul 2019 13:31:07 -0500 (CDT)
-From: minyard@acm.org
-To: QEMU Developers <qemu-devel@nongnu.org>
-Date: Mon,  1 Jul 2019 13:30:59 -0500
-Message-Id: <20190701183100.7849-2-minyard@acm.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190701183100.7849-1-minyard@acm.org>
-References: <20190701183100.7849-1-minyard@acm.org>
+ (envelope-from <no-reply@patchew.org>) id 1hi4Hv-0006rg-Sz
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:56:41 -0400
+Resent-Date: Mon, 01 Jul 2019 17:56:41 -0400
+Resent-Message-Id: <E1hi4Hv-0006rg-Sz@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21403)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hi4Ht-0006qP-U9
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:56:39 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1562004470; cv=none; d=zoho.com; s=zohoarc; 
+ b=OeDWas9EJVCv5M1vhlzng2cH7rac4PqaomvjeN4RVWSA9/c3tv6mVsdG7OE8EO3/YvUVbO+opCQXJk0mSmEjWq0ZLQ6Rs/jsPpW/HMyy42Omr0P2fX3P1Y+B41ts33zMTiTuWzraNdZBKxDsVpFtnv5c8+m7oTYfZP5p7tz3h3w=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1562004470;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=wZ5cGPi0l/SUOoQu51w367NN/6w37uXrv0/XL0UjZdM=; 
+ b=AdG48Mcw5i3x39h7p2FAyMe6Z7KOl8/ADC1/nz7dhuzYK3AbxVoLDGOZFdYuT7hsA92gssa/ycGKVnGqHsbRUwC+YIc9cRwDYQwhB+jM3nDgA4ksjDDHzUzCoVbrhRJf54DREMu9hK0ueX+L5kZoQ7gX0N2j1OOIjhASbmq58/0=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1562004468152822.5657690749669;
+ Mon, 1 Jul 2019 11:07:48 -0700 (PDT)
+Message-ID: <156200446699.9862.5828274180078359682@c4a48874b076>
+In-Reply-To: <20190701123441.13412-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: philmd@redhat.com
+Date: Mon, 1 Jul 2019 11:07:48 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.210.67
-Subject: [Qemu-devel] [PATCH v2 1/2] qdev: Add a no default uuid property
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH] hw/misc/macio: Add the nvram as child of
+ the MacIO south bridge
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,45 +74,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>, Fam Zheng <famz@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org, philmd@redhat.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Corey Minyard <cminyard@mvista.com>
-
-This is for IPMI, which will behave differently if the UUID is
-not set.
-
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Cc: Fam Zheng <famz@redhat.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Marc-André Lureau <marcandre.lureau@redhat.com>
----
- include/hw/qdev-properties.h | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-index 1eae5ab056..7fd887af84 100644
---- a/include/hw/qdev-properties.h
-+++ b/include/hw/qdev-properties.h
-@@ -237,6 +237,13 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
-         .set_default = true,                                       \
-         }
- 
-+#define DEFINE_PROP_UUID_NODEFAULT(_name, _state, _field) {        \
-+        .name      = (_name),                                      \
-+        .info      = &qdev_prop_uuid,                              \
-+        .offset    = offsetof(_state, _field)                      \
-+            + type_check(QemuUUID, typeof_field(_state, _field)),  \
-+        }
-+
- #define DEFINE_PROP_END_OF_LIST()               \
-     {}
- 
--- 
-2.17.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDcwMTEyMzQ0MS4xMzQx
+Mi0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCBidWlsZCB0
+ZXN0IG9uIHMzOTB4IGhvc3QuIFBsZWFzZSBmaW5kIHRoZSBkZXRhaWxzIGJlbG93LgoKPT09IFRF
+U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAojIFRlc3Rpbmcgc2NyaXB0IHdpbGwgYmUg
+aW52b2tlZCB1bmRlciB0aGUgZ2l0IGNoZWNrb3V0IHdpdGgKIyBIRUFEIHBvaW50aW5nIHRvIGEg
+Y29tbWl0IHRoYXQgaGFzIHRoZSBwYXRjaGVzIGFwcGxpZWQgb24gdG9wIG9mICJiYXNlIgojIGJy
+YW5jaApzZXQgLWUKCmVjaG8KZWNobyAiPT09IEVOViA9PT0iCmVudgoKZWNobwplY2hvICI9PT0g
+UEFDS0FHRVMgPT09IgpycG0gLXFhCgplY2hvCmVjaG8gIj09PSBVTkFNRSA9PT0iCnVuYW1lIC1h
+CgpDQz0kSE9NRS9iaW4vY2MKSU5TVEFMTD0kUFdEL2luc3RhbGwKQlVJTEQ9JFBXRC9idWlsZApt
+a2RpciAtcCAkQlVJTEQgJElOU1RBTEwKU1JDPSRQV0QKY2QgJEJVSUxECiRTUkMvY29uZmlndXJl
+IC0tY2M9JENDIC0tcHJlZml4PSRJTlNUQUxMCm1ha2UgLWo0CiMgWFhYOiB3ZSBuZWVkIHJlbGlh
+YmxlIGNsZWFuIHVwCiMgbWFrZSBjaGVjayAtajQgVj0xCm1ha2UgaW5zdGFsbAo9PT0gVEVTVCBT
+Q1JJUFQgRU5EID09PQoKICBDQyAgICAgIGh3L21pc2MvbWFjaW8vcG11Lm8KICBDQyAgICAgIGh3
+L21pc2MvbWFjaW8vbWFjX2RiZG1hLm8KL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTU4eHhu
+YWlmL3NyYy9ody9taXNjL21hY2lvL21hY2lvLmM6IEluIGZ1bmN0aW9uIOKAmG1hY2lvX29sZHdv
+cmxkX2luaXTigJk6Ci92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC01OHh4bmFpZi9zcmMvaHcv
+bWlzYy9tYWNpby9tYWNpby5jOjI0NjoyOTogZXJyb3I6IHBhc3NpbmcgYXJndW1lbnQgMSBvZiDi
+gJhvYmplY3RfaW5pdGlhbGl6ZV9jaGlsZOKAmSBmcm9tIGluY29tcGF0aWJsZSBwb2ludGVyIHR5
+cGUgWy1XZXJyb3I9aW5jb21wYXRpYmxlLXBvaW50ZXItdHlwZXNdCiAgMjQ2IHwgICAgIG9iamVj
+dF9pbml0aWFsaXplX2NoaWxkKHMsICJudnJhbSIsICAmb3MtPm52cmFtLCBzaXplb2Yob3MtPm52
+cmFtKSwKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgogICAgICB8ICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICB8CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApo
+dHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDcwMTEyMzQ0MS4xMzQxMi0xLXBoaWxtZEByZWRo
+YXQuY29tL3Rlc3RpbmcuczM5MHgvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBh
+dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
+bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
 
