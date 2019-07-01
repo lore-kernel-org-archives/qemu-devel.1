@@ -2,64 +2,78 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBCABC0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 14:42:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1CAAC0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 14:42:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B15BE2173E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 14:42:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B15BE2173E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6CEDF2173E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 14:42:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="S19RzFaH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CEDF2173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhxVJ-00035V-KN
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 10:42:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46647)
+	id 1hhxVu-0003ne-Ol
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 10:42:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51871)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <clg@kaod.org>) id 1hhwhf-0007je-QT
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:50:45 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hhx6L-0002nF-2L
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:16:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1hhwhe-0001SP-Fi
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:50:43 -0400
-Received: from 10.mo178.mail-out.ovh.net ([46.105.76.150]:58268)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hhwhe-0001OZ-76
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:50:42 -0400
-Received: from player693.ha.ovh.net (unknown [10.109.159.136])
- by mo178.mail-out.ovh.net (Postfix) with ESMTP id D3F276F2FC
- for <qemu-devel@nongnu.org>; Mon,  1 Jul 2019 15:50:34 +0200 (CEST)
-Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
- (Authenticated sender: clg@kaod.org)
- by player693.ha.ovh.net (Postfix) with ESMTPSA id 405EC769EFB6;
- Mon,  1 Jul 2019 13:50:29 +0000 (UTC)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190618165311.27066-1-clg@kaod.org>
- <20190618165311.27066-16-clg@kaod.org>
- <CAFEAcA-J+bS2-EtX6pTFYJ1XMaNLx0roYEoQMxV_=-mwMSPDgg@mail.gmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <6a826ad0-1830-a865-d267-80529ad27a84@kaod.org>
-Date: Mon, 1 Jul 2019 15:50:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <peter.maydell@linaro.org>) id 1hhx6J-0005cn-HZ
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:16:12 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:41850)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hhx6J-0005br-5G
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:16:11 -0400
+Received: by mail-ot1-x344.google.com with SMTP id o101so13322659ota.8
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 07:16:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=EY4Adx0OcbtAOPWeOiQ6foI2RYDNLt0gmr6T8P4rYnc=;
+ b=S19RzFaHFMPAsC8JggOBvrQ0XCcqqUvZaHS/xgr5bTJgOF1D32KN6NODKaUA6S4rpa
+ 5dbFGqRGu6eQVDS3Ju98o7q2T0uyMo6q+xDBGEgR+y6w9MNmDND4Ge4fvP2/JkT9ysku
+ voC0Hn/Sr/iR8MPDEn2J08NV5BkYZncBBgb1BlMOZ4RizZ/6eok/jFuppEUgr8jq9BqH
+ nnGZ+fOIX0A32Yuq2DI7Ln9jLSCJF8y0mMDsXMR8pg7K9eAsU/gTSFGX1FQFNjTAHQ7W
+ fMWXx/0EXMsOSe24u7ngsX1fIJutPF7YKjbpK4VD4sVpjggNdVNDRB1pJoXfuqTwW2FA
+ r9Og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=EY4Adx0OcbtAOPWeOiQ6foI2RYDNLt0gmr6T8P4rYnc=;
+ b=XUrePyHF4eZl1OVJj8q5UsUbdPxlDAm/68o1g67sSHKx1UQoxt6uBH5woP0qfUY/a6
+ zFW/ej/3lPKhw+Qp1gXtmShwGkeeRn4HfglGO5cHT+nWS6mE06uPencP3Y/+VsFJnLqG
+ MVdrzTRVL9MVryh4r2eKveghyKUaTE5MH6pt6H/S7EVmmT/oplVMCZsWtNnDKL0pTzvU
+ xw1wFPme9D70Y/2CHEkIefriGC/honQf5YqwSw2j+spZwRoZYUAijexLXh4sdEusloG0
+ eW16WYqAZIMUHwTM4t6BdYlOp6q4JKaPfsZAg26pPJMBVUW4WSinXRoWZwTbcGZzSb8E
+ rdzg==
+X-Gm-Message-State: APjAAAU+8zVtfh9YhePylcFQ+cWw0Jab0h2ZSxpOVlaJVneEetEY6bq+
+ zPeTP+/3cM7sP94WFXfP+j/HXoUcIT5v6nYhCbGuKw==
+X-Google-Smtp-Source: APXvYqzdGFS/f8xo5e9jpYynCQWW4r6cciJTzD5y5Zmjpb91hBQPXoaFxIIJJx8iub15B6j7PQCDSyaxMqyPf8rtw/c=
+X-Received: by 2002:a9d:5f1a:: with SMTP id f26mr20494605oti.91.1561990570216; 
+ Mon, 01 Jul 2019 07:16:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-J+bS2-EtX6pTFYJ1XMaNLx0roYEoQMxV_=-mwMSPDgg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 1128714660789586859
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrvdeigdeilecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.76.150
-Subject: Re: [Qemu-devel] [PATCH v2 15/21] aspeed/smc: add support for DMAs
+References: <1561890034-15921-1-git-send-email-hongbo.zhang@linaro.org>
+In-Reply-To: <1561890034-15921-1-git-send-email-hongbo.zhang@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 1 Jul 2019 15:15:59 +0100
+Message-ID: <CAFEAcA8cut67vuwsc++H2TWa8Aq0g1ss8Gda3QnoyyP_-6WgwQ@mail.gmail.com>
+To: Hongbo Zhang <hongbo.zhang@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH v9 0/2] Add Arm SBSA Reference Machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,137 +85,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>
+Cc: qemu-arm <qemu-arm@nongnu.org>,
+ Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Leif Lindholm <leif.lindholm@linaro.org>,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01/07/2019 15:06, Peter Maydell wrote:
-> On Tue, 18 Jun 2019 at 17:55, C=C3=A9dric Le Goater <clg@kaod.org> wrot=
-e:
->>
->> The FMC controller on the Aspeed SoCs support DMA to access the flash
->> modules. It can operate in a normal mode, to copy to or from the flash
->> module mapping window, or in a checksum calculation mode, to evaluate
->> the best clock settings for reads.
->>
->> The model introduces two custom address spaces for DMAs: one for the
->> AHB window of the FMC flash devices and one for the DRAM. The latter
->> is populated using a "dram" link set from the machine with the RAM
->> container region.
->>
->> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->> Acked-by: Joel Stanley <joel@jms.id.au>
->> +/*
->> + * Accumulate the result of the reads to provide a checksum that will
->> + * be used to validate the read timing settings.
->> + */
->> +static void aspeed_smc_dma_checksum(AspeedSMCState *s)
->> +{
->> +    MemTxResult result;
->> +    uint32_t data;
->> +
->> +    if (s->regs[R_DMA_CTRL] & DMA_CTRL_WRITE) {
->> +        qemu_log_mask(LOG_GUEST_ERROR,
->> +                      "%s: invalid direction for DMA checksum\n",  __=
-func__);
->> +        return;
->> +    }
->> +
->> +    while (s->regs[R_DMA_LEN]) {
->> +        result =3D address_space_read(&s->flash_as, s->regs[R_DMA_FLA=
-SH_ADDR],
->> +                                    MEMTXATTRS_UNSPECIFIED,
->> +                                    (uint8_t *)&data, 4);
->=20
-> This does a byte-by-byte read into a local uint32_t...
->=20
->> +        if (result !=3D MEMTX_OK) {
->> +            qemu_log_mask(LOG_GUEST_ERROR, "%s: Flash read failed @%0=
-8x\n",
->> +                          __func__, s->regs[R_DMA_FLASH_ADDR]);
->> +            return;
->> +        }
->> +
->> +        /*
->> +         * When the DMA is on-going, the DMA registers are updated
->> +         * with the current working addresses and length.
->> +         */
->> +        s->regs[R_DMA_CHECKSUM] +=3D data;
->=20
-> ...which we then use as a (host-endian) 32-bit value.
->=20
-> This will behave differently on big endian and little endian hosts.
-> If the h/w behaviour is to to load a 32-bit data type you probably
-> want address_space_ldl_le() (or _be() if it's doing a big-endian load).
->=20
->> +        s->regs[R_DMA_FLASH_ADDR] +=3D 4;
->> +        s->regs[R_DMA_LEN] -=3D 4;
->> +    }
->> +}
->> +
->> +static void aspeed_smc_dma_rw(AspeedSMCState *s)
->> +{
->> +    MemTxResult result;
->> +    uint32_t data;
->> +
->> +    while (s->regs[R_DMA_LEN]) {
->> +        if (s->regs[R_DMA_CTRL] & DMA_CTRL_WRITE) {
->> +            result =3D address_space_read(&s->dram_as, s->regs[R_DMA_=
-DRAM_ADDR],
->> +                                        MEMTXATTRS_UNSPECIFIED,
->> +                                        (uint8_t *)&data, 4);
->> +            if (result !=3D MEMTX_OK) {
->> +                qemu_log_mask(LOG_GUEST_ERROR, "%s: DRAM read failed =
-@%08x\n",
->> +                              __func__, s->regs[R_DMA_DRAM_ADDR]);
->> +                return;
->> +            }
->> +
->> +            result =3D address_space_write(&s->flash_as,
->> +                                         s->regs[R_DMA_FLASH_ADDR],
->> +                                         MEMTXATTRS_UNSPECIFIED,
->> +                                         (uint8_t *)&data, 4);
->> +            if (result !=3D MEMTX_OK) {
->> +                qemu_log_mask(LOG_GUEST_ERROR, "%s: Flash write faile=
-d @%08x\n",
->> +                              __func__, s->regs[R_DMA_FLASH_ADDR]);
->> +                return;
->> +            }
->> +        } else {
->> +            result =3D address_space_read(&s->flash_as, s->regs[R_DMA=
-_FLASH_ADDR],
->> +                                        MEMTXATTRS_UNSPECIFIED,
->> +                                        (uint8_t *)&data, 4);
->> +            if (result !=3D MEMTX_OK) {
->> +                qemu_log_mask(LOG_GUEST_ERROR, "%s: Flash read failed=
- @%08x\n",
->> +                              __func__, s->regs[R_DMA_FLASH_ADDR]);
->> +                return;
->> +            }
->> +
->> +            result =3D address_space_write(&s->dram_as, s->regs[R_DMA=
-_DRAM_ADDR],
->> +                                         MEMTXATTRS_UNSPECIFIED,
->> +                                         (uint8_t *)&data, 4);
->> +            if (result !=3D MEMTX_OK) {
->> +                qemu_log_mask(LOG_GUEST_ERROR, "%s: DRAM write failed=
- @%08x\n",
->> +                              __func__, s->regs[R_DMA_DRAM_ADDR]);
->> +                return;
->> +            }
->> +        }
->=20
-> Since the code here doesn't do anything with the data the
-> address_space_read/write here aren't wrong, but you might
-> prefer to use the ldl and stl functions to avoid the casts
-> to uint8_t* and need to specify the length.
+On Sun, 30 Jun 2019 at 11:21, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
+>
+> For the Aarch64, there is one machine 'virt', it is primarily meant to
+> run on KVM and execute virtualization workloads, but we need an
+> environment as faithful as possible to physical hardware,  to support
+> firmware and OS development for pysical Aarch64 machines.
+>
+> This machine comes with:
+>  - Re-designed memory map.
+>  - CPU cortex-a57.
+>  - EL2 and EL3 enabled.
+>  - GIC version 3.
+>  - System bus AHCI controller.
+>  - System bus XHCI controller.
+>  - CDROM and hard disc on AHCI bus.
+>  - E1000E ethernet card on PCIE bus.
+>  - VGA display adaptor on PCIE bus.
+>  - Only minimal device tree nodes.
+> And without:
+>  - virtio deivces.
+>  - fw_cfg device.
+>  - ACPI tables.
+>
+> Arm Trusted Firmware and UEFI porting to this are done accordingly, and
+> it should supply ACPI tables to load OS, the minimal device tree nodes
+> supplied from this platform are only to pass the dynamic info reflecting
+> command line input to firmware, not for loading OS.
 
-yes. I will check with the HW guys to know precisely how the values are
-read and accumulated.
+Hi; this fails "make check" for me. Running the relevant bit of the
+test suite standalone:
 
-Thanks,
+e104462:bionic:arm-clang$
+QTEST_QEMU_BINARY=arm-softmmu/qemu-system-arm QTEST_QEMU_IMG=qemu-img
+tests/qom-test
+/arm/qom/integratorcp: OK
+/arm/qom/nuri: OK
+/arm/qom/mps2-an511: OK
+/arm/qom/verdex: OK
+/arm/qom/mps2-an505: OK
+/arm/qom/ast2500-evb: OK
+/arm/qom/smdkc210: OK
+/arm/qom/collie: OK
+/arm/qom/imx25-pdk: OK
+/arm/qom/none: OK
+/arm/qom/spitz: OK
+/arm/qom/musca-b1: OK
+/arm/qom/realview-pbx-a9: OK
+/arm/qom/realview-eb: OK
+/arm/qom/realview-pb-a8: OK
+/arm/qom/versatilepb: OK
+/arm/qom/emcraft-sf2: OK
+/arm/qom/musicpal: OK
+/arm/qom/sbsa-ref: **
+ERROR:/home/petmay01/linaro/qemu-from-laptop/qemu/qom/object.c:628:object_new_with_type:
+assertion failed: (type != NULL)
+Broken pipe
+/home/petmay01/linaro/qemu-from-laptop/qemu/tests/libqtest.c:145:
+kill_qemu() detected QEMU death from signal 6 (Aborted) (core dumped)
+Aborted (core dumped)
 
-C.=20
+It looks like the new board model is being added to the
+32-bit qemu-system-arm as well as to qemu-system-aarch64.
+This seems wrong, since the board will only work with a
+64-bit CPU.
+
+thanks
+-- PMM
 
