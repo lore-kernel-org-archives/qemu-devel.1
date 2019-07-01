@@ -2,63 +2,62 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83C20C5B578
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 05:49:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21B7EC0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 05:49:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49173208E4
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 05:49:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E79B3208E4
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 05:49:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="fLYwCrxA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49173208E4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="oc7Vns9X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E79B3208E4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhpC7-0002FY-6J
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 01:49:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37323)
+	id 1hhpC9-0002No-7V
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 01:49:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37334)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hhpAe-0000dp-V6
+ (envelope-from <dgibson@ozlabs.org>) id 1hhpAf-0000ds-JM
  for qemu-devel@nongnu.org; Mon, 01 Jul 2019 01:48:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hhpAd-0005oh-Nu
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 01:48:08 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:50119 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1hhpAe-0005pH-E0
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 01:48:09 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:57395 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hhpAc-0005nL-Lf; Mon, 01 Jul 2019 01:48:07 -0400
+ id 1hhpAc-0005mh-Du; Mon, 01 Jul 2019 01:48:08 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 45cbxs0tlpz9s00; Mon,  1 Jul 2019 15:48:01 +1000 (AEST)
+ id 45cbxs288Bz9sPD; Mon,  1 Jul 2019 15:48:01 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1561960081;
- bh=KrhB6z9Zs1xh2H4BMfMMCL7pUqPksiRfH49AbZqrGvo=;
+ bh=Q2I2WlWbFxLUofXLepO0U9lhPFobX49MRLQJLLky3hA=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=fLYwCrxAe16jwePqEgMxuR/pg7r9Kw2+gg4kbHVzRxMdTkxTgtriptyZpoU4vKdJ1
- d124uuryHez3zmlo5oqmDFJEMKMRHd/CPDM+yJfMdXcNZglYENucvDpxWM2wWf7RSY
- sa8GU+BzN3jYVLrfZ0etfVSbR8neXMR2JMY3ludY=
-Date: Mon, 1 Jul 2019 15:07:15 +1000
+ b=oc7Vns9XNy21N8HnCE9BDi4JfbaW9A/D7+2Q0YW507olVxXaBMBHXCrR3xGOMgmsF
+ 2q/qCfrlH2Pd1tVcV/k4IZOdzJlE7rX/CDOPkHMj2dv9uSzTs8MGDF7hHG88a4fI8x
+ w16DzjTJ+gzXczoiqCZnu7U/vg4NlFRfPzKdVp38=
+Date: Mon, 1 Jul 2019 15:15:09 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Message-ID: <20190701050715.GJ2138@umbus.fritz.box>
-References: <156112873945.115975.15513090884722011930.stgit@bahia.lan>
- <dad9ca85-4849-bfb0-0e09-8082ed64ecbc@kaod.org>
+Message-ID: <20190701051509.GL2138@umbus.fritz.box>
+References: <20190614165920.12670-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="nywXBoy70X0GaB8B"
+ protocol="application/pgp-signature"; boundary="jtcAeju3WzRmRF+o"
 Content-Disposition: inline
-In-Reply-To: <dad9ca85-4849-bfb0-0e09-8082ed64ecbc@kaod.org>
+In-Reply-To: <20190614165920.12670-1-clg@kaod.org>
 User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [PATCH] spapr/xive: H_INT_ESB is used for LSIs only
+Subject: Re: [Qemu-devel] [PATCH 0/2] spapr/xive: rework the mapping the KVM
+ memory regions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,63 +75,37 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---nywXBoy70X0GaB8B
+--jtcAeju3WzRmRF+o
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 21, 2019 at 05:05:45PM +0200, C=E9dric Le Goater wrote:
-> On 21/06/2019 16:52, Greg Kurz wrote:
-> > As indicated in the function header, this "hcall is only supported for
-> > LISNs that have the ESB hcall flag set to 1 when returned from hcall()
-> > H_INT_GET_SOURCE_INFO". We only set that flag for LSIs actually.
-> >=20
-> > Check that in h_int_esb().
+On Fri, Jun 14, 2019 at 06:59:18PM +0200, C=E9dric Le Goater wrote:
+> Hello,
 >=20
-> Indeed. H_INT_ESB should work on any IRQ, but I think it's better=20
-> to check that the HCALL is only used with the IRQ requiring it.
+> Here is a small series simplifying the initialization sequence of the
+> interrupt device by using memory regions specific for KVM. These are
+> mapped as overlaps on top of the emulated device.
 
-I'm not so convinced.  It seems to me that specifically limiting this
-to certain things limits our options if we ever need future
-workarounds for problems with ESB mapping.
+Applied, thanks.
 
-In addition using H_INT_ESB for non-LSIs could be useful for minimal
-guests (e.g. kvm-unit-tests) where mapping memory might be awkward.
-
-So, I'm not really seeing a compelling reason to apply this.
-
->=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
->=20
-> Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
 >=20
 > Thanks,
 >=20
 > C.
 >=20
-> > ---
-> >  hw/intc/spapr_xive.c |    6 ++++++
-> >  1 file changed, 6 insertions(+)
-> >=20
-> > diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> > index 58c2e5d890bd..01dd47ad5b02 100644
-> > --- a/hw/intc/spapr_xive.c
-> > +++ b/hw/intc/spapr_xive.c
-> > @@ -1408,6 +1408,12 @@ static target_ulong h_int_esb(PowerPCCPU *cpu,
-> >          return H_P2;
-> >      }
-> > =20
-> > +    if (!xive_source_irq_is_lsi(xsrc, lisn)) {
-> > +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: LISN " TARGET_FMT_lx "is=
-n't LSI\n",
-> > +                      lisn);
-> > +        return H_P2;
-> > +    }
-> > +
-> >      if (offset > (1ull << xsrc->esb_shift)) {
-> >          return H_P3;
-> >      }
-> >=20
+> C=E9dric Le Goater (2):
+>   spapr/xive: rework the mapping the KVM memory regions
+>   spapr/xive: simplify spapr_irq_init_device() to remove the emulated
+>     init
+>=20
+>  include/hw/ppc/spapr_irq.h  |  1 -
+>  include/hw/ppc/spapr_xive.h |  2 +-
+>  include/hw/ppc/xive.h       |  1 +
+>  hw/intc/spapr_xive.c        | 38 ++++++++++---------------------------
+>  hw/intc/spapr_xive_kvm.c    | 21 +++++++++++---------
+>  hw/ppc/spapr_irq.c          | 21 +++-----------------
+>  6 files changed, 27 insertions(+), 57 deletions(-)
 >=20
 
 --=20
@@ -141,25 +114,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---nywXBoy70X0GaB8B
+--jtcAeju3WzRmRF+o
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0ZlQMACgkQbDjKyiDZ
-s5I+IxAAklrFK/1mvHKCteVu03DY7fL5ZWfgGifh3AOOrAspQ/yWMsAXdM1wgp5I
-m4DfZGwB1MvUvnJ6TiFrr/EOi4emrux4L1KTBZ4UlIpFHfl9uh6BiTgLvkRvB9X6
-tyPmlV37cJ6CEr4gE3gFvaDgVd2Mt6fjuxEKdaJTZV1c5OoTEU+JdJSAwGLHcWQu
-Pi4XsAr/PrRKXNMgfCYgpYJgvnhYTWMfMZ5qb08vvwqKA4phDMNLZmGpakkjk2aL
-U9Beqow8dhxCku5YzQ+Zgdq5llCd0Fyr0eLF02D49okpsn9YgkDALqoesZfmoTAR
-BVtrElN5pqX74nqYUkK0jdgrjhtjf9mjfQFbEmsBUIeqWYThiVjJnaTS5NDVnVSC
-1j5A33sz/RE1iiGdjZmTNkl2s2q7hvdohJGdLmHrpx2aMbMzLGOwYJoUoI6laGeI
-mbZOFnHY4tm7LT+OwGH8/4moz0rGIOlFmAbFbO4qeeJiqGxjV+GXXazWxee9khIZ
-8jAFYlzebrzEI8CNwQWQuddEgI8y10NSWAH3pM+nDhyipMMd7nCQweuKuwRZPd23
-huQTA7VNtg6hyaTvjuq9TeeLujF3Evu+rv80ORSaFiGsVCPrixqL3qZ5qkY8JamQ
-rL0hkmrHZcxDSSd+fC90KofUFERndAaymzkRVpHZuPXBSZfje1c=
-=JT4/
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0Zlt0ACgkQbDjKyiDZ
+s5JiVQ/+Ovg+4pGlzKWrsDx7kJ+L0hGPJeM2ptrg8BLg7kqVptnLUA5Lysg/r0Tj
+sYWwZ58FuZnbL/KCjJWV9ZJ7l+Hpd/BcZvdRN+xqmhKtrI1JN0tsC8yVYlxKjt8o
+8m81CiuegVcbvGcqlLco1qak3m4EVr3f+zqjX8Jy0IgcTH1X8vS52Z4ONnVZsGSr
+YYA/IEt9N4Rp8wF+0lIcVZginkLBp/E9QqvabsY1Vjg/85lKtgwTEI0uYqftbFtc
+lWJC423l+InXs8UHbZFuVoNbIn6GZ8C+rT2hLdye31meLO5mzxbnRhEN0eSKGn1I
+jX0eMm5L+f38swCO/hHbgCs9J9tV5IGVYZKqmPUv2oy+sSSkibT6XUftBaqqwwOt
+/Kjujpzw070qIj2sRw18wzTkvqnVpGMDvYGWqfIjZcTWqGbT1Htbekuc4IyU+48z
+UiauFvnNuefikKMtao/QgPoZczI6uFOVLRdVwlgTcG3VdIEhaK1Jl8oSUVxfiUHj
+tmwCKghmk4pTzUOo1r4OZ6BYWHZF3E5EcN/+2vM36ASgIp1sYGSNrlNUDAM2f373
+CfOIglzWSWD8ikiTZ3Dmqxvp97a7ld2rErKohn1AKjvCNFi+AA3y+BbS/J6uitBG
+AMxHRjs9lXI3qsbw5xgO4jwThKI0qrnReaGgr5/sZibFfGOo8ws=
+=zI7L
 -----END PGP SIGNATURE-----
 
---nywXBoy70X0GaB8B--
+--jtcAeju3WzRmRF+o--
 
