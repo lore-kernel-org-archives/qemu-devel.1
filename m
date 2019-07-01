@@ -2,79 +2,64 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96468C0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 09:43:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5291C0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 09:46:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A9C920B7C
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 09:43:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A9C920B7C
+	by mail.kernel.org (Postfix) with ESMTPS id 7C64320B7C
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 09:46:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C64320B7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhsqq-0003uK-P4
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 05:43:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50629)
+	id 1hhst8-0006LT-QF
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 05:46:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52484)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hhsji-0005a5-Er
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:36:35 -0400
+ (envelope-from <berrange@redhat.com>) id 1hhsr7-0004ST-I2
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:44:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hhsjh-0004i2-I6
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:36:34 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:36895)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hhsjh-0004O8-CJ
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:36:33 -0400
-Received: by mail-wr1-f68.google.com with SMTP id v14so12997507wrr.4
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 02:36:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Q+oHhSEDVk1V3F4XlEadg1hm9TLVHLm0W+JZwisqOns=;
- b=BMqki8lOFxeEG2KwsLgvrO6XJ/aJsd5QfXUr58aouznXckx744yrah8QtqkrYFdZmO
- nabkg6sRmKDILcrfsUYnWbFjapPynYeNqGcT+mhm/cdfO2ErlNMYqpbyPsFxF4dQ7A8t
- LVRcALtXICDQyv+ewPGqdqszAlY8C0jXLiIEB6cJBRH4qnkfaTpNIRIta144DOek+h4m
- GiMJJaQdQh1gLfNPuywNnzKuglAMf0+UsQhcKGbw416ptu0G2dSvoD59uRVmXQQO6LXF
- 9YbbVaFEX/a9zAOPjIQJu+7XSuauoOVUI4S6hKtVQzepOE3v+xkmIyRiWlg09TBH50AT
- w7Sg==
-X-Gm-Message-State: APjAAAWKyPTNkVjbHj65Cf4PmZgxcFdtJrIzi7MITzDymvH+VuLApt5c
- G/HnieAj/29fRl0MBDEr/naO8A==
-X-Google-Smtp-Source: APXvYqwbHlfkYHq20WzcJ+vbHfLlaZxs9OQYvgDCMCfV/fglvlx5IRL/wrwO4GuklFJ6fj+BrozByw==
-X-Received: by 2002:adf:f38b:: with SMTP id m11mr18241660wro.79.1561973767995; 
- Mon, 01 Jul 2019 02:36:07 -0700 (PDT)
-Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.183])
- by smtp.gmail.com with ESMTPSA id a84sm10609728wmf.29.2019.07.01.02.36.07
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Mon, 01 Jul 2019 02:36:07 -0700 (PDT)
-To: Jan Kiszka <jan.kiszka@web.de>, Peter Maydell <peter.maydell@linaro.org>, 
- qemu-devel <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
-References: <fc5404f7-4d1d-c28f-6e48-d8799c82acc0@web.de>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <098adaad-e787-3d5d-a145-5c4999aa32fe@redhat.com>
-Date: Mon, 1 Jul 2019 11:36:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <berrange@redhat.com>) id 1hhsr5-0003JU-1g
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:44:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53064)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hhsr3-0003Gy-1Z
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:44:10 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id F1304307D913;
+ Mon,  1 Jul 2019 09:43:58 +0000 (UTC)
+Received: from redhat.com (ovpn-112-60.ams2.redhat.com [10.36.112.60])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F221B5D71C;
+ Mon,  1 Jul 2019 09:43:56 +0000 (UTC)
+Date: Mon, 1 Jul 2019 10:43:53 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: P J P <ppandit@redhat.com>
+Message-ID: <20190701094353.GF3573@redhat.com>
+References: <20190701090904.31312-1-ppandit@redhat.com>
+ <20190701090904.31312-2-ppandit@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <fc5404f7-4d1d-c28f-6e48-d8799c82acc0@web.de>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+In-Reply-To: <20190701090904.31312-2-ppandit@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Mon, 01 Jul 2019 09:43:59 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: Add support for Cortex-A7
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] qemu-bridge-helper: restrict
+ interface name to IFNAMSIZ
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,41 +71,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Riccardo Schirone <rschiron@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Li Qiang <liq3ea@gmail.com>, Qemu Developers <qemu-devel@nongnu.org>,
+ Prasad J Pandit <pjp@fedoraproject.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/30/19 5:13 PM, Jan Kiszka wrote:
-> From: Jan Kiszka <jan.kiszka@siemens.com>
+On Mon, Jul 01, 2019 at 02:39:02PM +0530, P J P wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
 > 
-> No reason to deny this type.
-
-Maybe add "As the A15, it supports the EL2/V7VE features."?
-
+> The interface names in qemu-bridge-helper are defined to be
+> of size IFNAMSIZ(=16), including the terminating null('\0') byte.
+> The same is applied to interface names read from 'bridge.conf'
+> file to form ACLs rules. If user supplied '--br=bridge' name
+> is not restricted to the same length, it could lead to ACL bypass
+> issue. Restrict interface name to IFNAMSIZ, including null byte.
 > 
-> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+> Reported-by: Riccardo Schirone <rschiron@redhat.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 > ---
->  hw/arm/virt.c | 1 +
->  1 file changed, 1 insertion(+)
+>  qemu-bridge-helper.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 > 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 431e2900fd..ed009fa447 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -176,6 +176,7 @@ static const int a15irqmap[] = {
->  };
+> Update v2: report an error and exit
+>   -> https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg06239.html
 > 
->  static const char *valid_cpus[] = {
-> +    ARM_CPU_TYPE_NAME("cortex-a7"),
->      ARM_CPU_TYPE_NAME("cortex-a15"),
->      ARM_CPU_TYPE_NAME("cortex-a53"),
->      ARM_CPU_TYPE_NAME("cortex-a57"),
+> diff --git a/qemu-bridge-helper.c b/qemu-bridge-helper.c
+> index f9940deefd..8ec0a65174 100644
+> --- a/qemu-bridge-helper.c
+> +++ b/qemu-bridge-helper.c
+> @@ -109,6 +109,13 @@ static int parse_acl_file(const char *filename, ACLList *acl_list)
+>          }
+>          *argend = 0;
+>  
+> +        if (strcmp(cmd, "include") && strlen(arg) >= IFNAMSIZ) {
+> +            fprintf(stderr, "name `%s' too long: %lu\n", arg, strlen(arg));
 
-Should we list here all cpu with arm_feature(ARM_FEATURE_V7VE | V8)? or EL2?
+strlen returns size_t, which does not match %lu - it needs %zu - we can
+ignore the non-portability of %zu to windows, since this code is UNIX
+only.
 
-> --
-> 2.16.4
-> 
+I'd prefer also !g_str_equal(cmd, "include")  as to me it reads more
+easily.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> +            fclose(f);
+> +            errno = EINVAL;
+> +            return -1;
+> +        }
+
+
+> +
+>          if (strcmp(cmd, "deny") == 0) {
+>              acl_rule = g_malloc(sizeof(*acl_rule));
+>              if (strcmp(arg, "all") == 0) {
+> @@ -259,6 +266,10 @@ int main(int argc, char **argv)
+>          usage();
+>          return EXIT_FAILURE;
+>      }
+> +    if (strlen(bridge) >= IFNAMSIZ) {
+> +        fprintf(stderr, "name `%s' too long: %lu\n", bridge, strlen(bridge));
+> +        return EXIT_FAILURE;
+> +    }
+
+%zu too
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
