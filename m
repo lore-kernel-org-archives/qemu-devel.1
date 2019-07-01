@@ -2,58 +2,60 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C9BFC0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 15:12:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64698C0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 15:16:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6FFD20659
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 15:12:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6FFD20659
+	by mail.kernel.org (Postfix) with ESMTPS id 38D40208E4
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 15:16:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38D40208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhxz9-0002Ij-8H
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 11:12:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59526)
+	id 1hhy2C-0004Sy-76
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 11:16:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59525)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <slp@redhat.com>) id 1hhxar-0000vE-Qz
+ (envelope-from <slp@redhat.com>) id 1hhxar-0000vD-Qc
  for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:47:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1hhxap-000615-Ic
+ (envelope-from <slp@redhat.com>) id 1hhxap-000610-IN
  for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:47:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37188)
+Received: from mx1.redhat.com ([209.132.183.28]:34306)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1hhxao-0005Qx-Kv
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1hhxao-0005jq-Ke
  for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:47:43 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8FA66307CDF2;
- Mon,  1 Jul 2019 14:47:16 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B132AC1EB207;
+ Mon,  1 Jul 2019 14:47:22 +0000 (UTC)
 Received: from dritchie.redhat.com (unknown [10.33.36.165])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7ABB17DF69;
- Mon,  1 Jul 2019 14:47:10 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E6865BA4D;
+ Mon,  1 Jul 2019 14:47:16 +0000 (UTC)
 From: Sergio Lopez <slp@redhat.com>
 To: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com,
  rth@twiddle.net, ehabkost@redhat.com, maran.wilson@oracle.com
-Date: Mon,  1 Jul 2019 16:47:01 +0200
-Message-Id: <20190701144705.102615-1-slp@redhat.com>
+Date: Mon,  1 Jul 2019 16:47:02 +0200
+Message-Id: <20190701144705.102615-2-slp@redhat.com>
+In-Reply-To: <20190701144705.102615-1-slp@redhat.com>
+References: <20190701144705.102615-1-slp@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Mon, 01 Jul 2019 14:47:16 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Mon, 01 Jul 2019 14:47:26 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 0/4] Introduce the microvm machine type
+Subject: [Qemu-devel] [PATCH v2 1/4] hw/virtio: Factorize virtio-mmio headers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,114 +72,139 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Microvm is a machine type inspired by both NEMU and Firecracker, and
-constructed after the machine model implemented by the latter.
+Put QOM and main struct definition in a separate header file, so it
+can be accesed from other components.
 
-It's main purpose is providing users a KVM-only machine type with fast
-boot times, minimal attack surface (measured as the number of IO ports
-and MMIO regions exposed to the Guest) and small footprint (specially
-when combined with the ongoing QEMU modularization effort).
+This is needed for the microvm machine type implementation.
 
-Normally, other than the device support provided by KVM itself,
-microvm only supports virtio-mmio devices. Microvm also includes a
-legacy mode, which adds an ISA bus with a 16550A serial port, useful
-for being able to see the early boot kernel messages.
-
-Microvm only supports booting PVH-enabled Linux ELF images. Booting
-other PVH-enabled kernels may be possible, but due to the lack of ACPI
-and firmware, we're relying on the command line for specifying the
-location of the virtio-mmio transports. If there's an interest on
-using this machine type with other kernels, we'll try to find some
-kind of middle ground solution.
-
-This is the list of the exposed IO ports and MMIO regions when running
-in non-legacy mode:
-
-address-space: memory
-    00000000d0000000-00000000d00001ff (prio 0, i/o): virtio-mmio
-    00000000d0000200-00000000d00003ff (prio 0, i/o): virtio-mmio
-    00000000d0000400-00000000d00005ff (prio 0, i/o): virtio-mmio
-    00000000d0000600-00000000d00007ff (prio 0, i/o): virtio-mmio
-    00000000d0000800-00000000d00009ff (prio 0, i/o): virtio-mmio
-    00000000d0000a00-00000000d0000bff (prio 0, i/o): virtio-mmio
-    00000000d0000c00-00000000d0000dff (prio 0, i/o): virtio-mmio
-    00000000d0000e00-00000000d0000fff (prio 0, i/o): virtio-mmio
-    00000000fee00000-00000000feefffff (prio 4096, i/o): kvm-apic-msi
-
-address-space: I/O
-  0000000000000000-000000000000ffff (prio 0, i/o): io
-    0000000000000020-0000000000000021 (prio 0, i/o): kvm-pic
-    0000000000000040-0000000000000043 (prio 0, i/o): kvm-pit
-    000000000000007e-000000000000007f (prio 0, i/o): kvmvapic
-    00000000000000a0-00000000000000a1 (prio 0, i/o): kvm-pic
-    00000000000004d0-00000000000004d0 (prio 0, i/o): kvm-elcr
-    00000000000004d1-00000000000004d1 (prio 0, i/o): kvm-elcr
-
-A QEMU instance with the microvm machine type can be invoked this way:
-
- - Normal mode:
-
-qemu-system-x86_64 -M microvm -m 512m -smp 2 \
- -kernel vmlinux -append "console=3Dhvc0 root=3D/dev/vda" \
- -nodefaults -no-user-config \
- -chardev pty,id=3Dvirtiocon0,server \
- -device virtio-serial-device \
- -device virtconsole,chardev=3Dvirtiocon0 \
- -drive id=3Dtest,file=3Dtest.img,format=3Draw,if=3Dnone \
- -device virtio-blk-device,drive=3Dtest \
- -netdev tap,id=3Dtap0,script=3Dno,downscript=3Dno \
- -device virtio-net-device,netdev=3Dtap0
-
- - Legacy mode:
-
-qemu-system-x86_64 -M microvm,legacy -m 512m -smp 2 \
- -kernel vmlinux -append "console=3DttyS0 root=3D/dev/vda" \
- -nodefaults -no-user-config \
- -drive id=3Dtest,file=3Dtest.img,format=3Draw,if=3Dnone \
- -device virtio-blk-device,drive=3Dtest \
- -netdev tap,id=3Dtap0,script=3Dno,downscript=3Dno \
- -device virtio-net-device,netdev=3Dtap0 \
- -serial stdio
-
-
-Changelog:
-v2:
-  - Drop "[PATCH 1/4] hw/i386: Factorize CPU routine".
-  - Simplify machine definition (thanks Eduardo).
-  - Remove use of unneeded NUMA-related callbacks (thanks Eduardo).
-  - Add a patch to factorize PVH-related functions.
-  - Replace use of Linux's Zero Page with PVH (thanks Maran and Paolo).
-
-
-Sergio Lopez (4):
-  hw/virtio: Factorize virtio-mmio headers
-  hw/i386: Add an Intel MPTable generator
-  hw/i386: Factorize PVH related functions
-  hw/i386: Introduce the microvm machine type
-
- default-configs/i386-softmmu.mak            |   1 +
- hw/i386/Kconfig                             |   4 +
- hw/i386/Makefile.objs                       |   2 +
- hw/i386/microvm.c                           | 500 ++++++++++++++++++++
- hw/i386/mptable.c                           | 156 ++++++
- hw/i386/pc.c                                | 120 +----
- hw/i386/pvh.c                               | 113 +++++
- hw/i386/pvh.h                               |  10 +
- hw/virtio/virtio-mmio.c                     |  35 +-
- hw/virtio/virtio-mmio.h                     |  60 +++
- include/hw/i386/microvm.h                   |  77 +++
- include/hw/i386/mptable.h                   |  36 ++
- include/standard-headers/linux/mpspec_def.h | 182 +++++++
- 13 files changed, 1154 insertions(+), 142 deletions(-)
- create mode 100644 hw/i386/microvm.c
- create mode 100644 hw/i386/mptable.c
- create mode 100644 hw/i386/pvh.c
- create mode 100644 hw/i386/pvh.h
+Signed-off-by: Sergio Lopez <slp@redhat.com>
+---
+ hw/virtio/virtio-mmio.c | 35 +-----------------------
+ hw/virtio/virtio-mmio.h | 60 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 61 insertions(+), 34 deletions(-)
  create mode 100644 hw/virtio/virtio-mmio.h
- create mode 100644 include/hw/i386/microvm.h
- create mode 100644 include/hw/i386/mptable.h
- create mode 100644 include/standard-headers/linux/mpspec_def.h
 
---
+diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
+index 97b7f35496..87c7fe4d8d 100644
+--- a/hw/virtio/virtio-mmio.c
++++ b/hw/virtio/virtio-mmio.c
+@@ -26,44 +26,11 @@
+ #include "qemu/host-utils.h"
+ #include "qemu/module.h"
+ #include "sysemu/kvm.h"
+-#include "hw/virtio/virtio-bus.h"
++#include "virtio-mmio.h"
+ #include "qemu/error-report.h"
+ #include "qemu/log.h"
+ #include "trace.h"
+=20
+-/* QOM macros */
+-/* virtio-mmio-bus */
+-#define TYPE_VIRTIO_MMIO_BUS "virtio-mmio-bus"
+-#define VIRTIO_MMIO_BUS(obj) \
+-        OBJECT_CHECK(VirtioBusState, (obj), TYPE_VIRTIO_MMIO_BUS)
+-#define VIRTIO_MMIO_BUS_GET_CLASS(obj) \
+-        OBJECT_GET_CLASS(VirtioBusClass, (obj), TYPE_VIRTIO_MMIO_BUS)
+-#define VIRTIO_MMIO_BUS_CLASS(klass) \
+-        OBJECT_CLASS_CHECK(VirtioBusClass, (klass), TYPE_VIRTIO_MMIO_BUS=
+)
+-
+-/* virtio-mmio */
+-#define TYPE_VIRTIO_MMIO "virtio-mmio"
+-#define VIRTIO_MMIO(obj) \
+-        OBJECT_CHECK(VirtIOMMIOProxy, (obj), TYPE_VIRTIO_MMIO)
+-
+-#define VIRT_MAGIC 0x74726976 /* 'virt' */
+-#define VIRT_VERSION 1
+-#define VIRT_VENDOR 0x554D4551 /* 'QEMU' */
+-
+-typedef struct {
+-    /* Generic */
+-    SysBusDevice parent_obj;
+-    MemoryRegion iomem;
+-    qemu_irq irq;
+-    /* Guest accessible state needing migration and reset */
+-    uint32_t host_features_sel;
+-    uint32_t guest_features_sel;
+-    uint32_t guest_page_shift;
+-    /* virtio-bus */
+-    VirtioBusState bus;
+-    bool format_transport_address;
+-} VirtIOMMIOProxy;
+-
+ static bool virtio_mmio_ioeventfd_enabled(DeviceState *d)
+ {
+     return kvm_eventfds_enabled();
+diff --git a/hw/virtio/virtio-mmio.h b/hw/virtio/virtio-mmio.h
+new file mode 100644
+index 0000000000..2f3973f8c7
+--- /dev/null
++++ b/hw/virtio/virtio-mmio.h
+@@ -0,0 +1,60 @@
++/*
++ * Virtio MMIO bindings
++ *
++ * Copyright (c) 2011 Linaro Limited
++ *
++ * Author:
++ *  Peter Maydell <peter.maydell@linaro.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License; either version =
+2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License alo=
+ng
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef QEMU_VIRTIO_MMIO_H
++#define QEMU_VIRTIO_MMIO_H
++
++#include "hw/virtio/virtio-bus.h"
++
++/* QOM macros */
++/* virtio-mmio-bus */
++#define TYPE_VIRTIO_MMIO_BUS "virtio-mmio-bus"
++#define VIRTIO_MMIO_BUS(obj) \
++        OBJECT_CHECK(VirtioBusState, (obj), TYPE_VIRTIO_MMIO_BUS)
++#define VIRTIO_MMIO_BUS_GET_CLASS(obj) \
++        OBJECT_GET_CLASS(VirtioBusClass, (obj), TYPE_VIRTIO_MMIO_BUS)
++#define VIRTIO_MMIO_BUS_CLASS(klass) \
++        OBJECT_CLASS_CHECK(VirtioBusClass, (klass), TYPE_VIRTIO_MMIO_BUS=
+)
++
++/* virtio-mmio */
++#define TYPE_VIRTIO_MMIO "virtio-mmio"
++#define VIRTIO_MMIO(obj) \
++        OBJECT_CHECK(VirtIOMMIOProxy, (obj), TYPE_VIRTIO_MMIO)
++
++#define VIRT_MAGIC 0x74726976 /* 'virt' */
++#define VIRT_VERSION 1
++#define VIRT_VENDOR 0x554D4551 /* 'QEMU' */
++
++typedef struct {
++    /* Generic */
++    SysBusDevice parent_obj;
++    MemoryRegion iomem;
++    qemu_irq irq;
++    /* Guest accessible state needing migration and reset */
++    uint32_t host_features_sel;
++    uint32_t guest_features_sel;
++    uint32_t guest_page_shift;
++    /* virtio-bus */
++    VirtioBusState bus;
++    bool format_transport_address;
++} VirtIOMMIOProxy;
++
++#endif
+--=20
 2.21.0
+
 
