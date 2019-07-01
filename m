@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE8E1C06511
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2CD0C06510
 	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 11:08:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A3E9206A3
+	by mail.kernel.org (Postfix) with ESMTPS id 9EE0B214AE
 	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 11:08:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A3E9206A3
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EE0B214AE
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhuAW-0006Ws-On
+	id 1hhuAW-0006Wt-SN
 	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 07:08:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41134)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41152)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hhu8D-0004sz-TB
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hhu8F-0004t6-0A
  for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:05:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hhu8C-00076A-OQ
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:05:57 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:48943 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hhu8D-00077l-VZ
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:05:58 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:51202 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hhu8C-00067R-DT
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:05:56 -0400
+ id 1hhu8D-00076Y-OV
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:05:57 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 7B1DB1A2005;
+ by mail.rt-rk.com (Postfix) with ESMTP id A54D11A1FF4;
  Mon,  1 Jul 2019 13:04:51 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 53AA01A1FE3;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 7FF771A200E;
  Mon,  1 Jul 2019 13:04:51 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org,
 	arikalo@wavecomp.com
-Date: Mon,  1 Jul 2019 13:04:36 +0200
-Message-Id: <1561979080-26195-4-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon,  1 Jul 2019 13:04:40 +0200
+Message-Id: <1561979080-26195-8-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1561979080-26195-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1561979080-26195-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH 3/7] target/mips: Correct comments in
- msa_helper.c
+Subject: [Qemu-devel] [PATCH 7/7] target/mips: Correct helper for MSA
+ FCLASS.<W|D> instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,96 +72,30 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Fix some errors in comments for MSA helpers.
+Correct helper for MSA FCLASS.<W|D> instructions.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/msa_helper.c | 44 ++++++++++++++++++++++++++++++++++----------
- 1 file changed, 34 insertions(+), 10 deletions(-)
+ target/mips/msa_helper.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index 8bad636..880fc52 100644
+index 9db2ce7..2240363 100644
 --- a/target/mips/msa_helper.c
 +++ b/target/mips/msa_helper.c
-@@ -72,9 +72,6 @@
-  * --------
-  *
-  * +---------------+----------------------------------------------------------+
-- * | BMNZ.V        | Vector Bit Move If Not Zero                              |
-- * | BMZ.V         | Vector Bit Move If Zero                                  |
-- * | BSEL.V        | Vector Bit Select                                        |
-  * | BINSL.B       | Vector Bit Insert Left (byte)                            |
-  * | BINSL.H       | Vector Bit Insert Left (halfword)                        |
-  * | BINSL.W       | Vector Bit Insert Left (word)                            |
-@@ -83,6 +80,9 @@
-  * | BINSR.H       | Vector Bit Insert Right (halfword)                       |
-  * | BINSR.W       | Vector Bit Insert Right (word)                           |
-  * | BINSR.D       | Vector Bit Insert Right (doubleword)                     |
-+ * | BMNZ.V        | Vector Bit Move If Not Zero                              |
-+ * | BMZ.V         | Vector Bit Move If Zero                                  |
-+ * | BSEL.V        | Vector Bit Select                                        |
-  * +---------------+----------------------------------------------------------+
-  */
+@@ -4058,9 +4058,11 @@ void helper_msa_fclass_df(CPUMIPSState *env, uint32_t df,
+         pwd->w[1] = float_class_s(pws->w[1], status);
+         pwd->w[2] = float_class_s(pws->w[2], status);
+         pwd->w[3] = float_class_s(pws->w[3], status);
+-    } else {
++    } else if (df == DF_DOUBLE) {
+         pwd->d[0] = float_class_d(pws->d[0], status);
+         pwd->d[1] = float_class_d(pws->d[1], status);
++    } else {
++        assert(0);
+     }
+ }
  
-@@ -179,12 +179,12 @@
-  * | ADDV.H        | Vector Add (halfword)                                    |
-  * | ADDV.W        | Vector Add (word)                                        |
-  * | ADDV.D        | Vector Add (doubleword)                                  |
-- * | HSUB_S.H      | Vector Signed Horizontal Add (halfword)                  |
-- * | HSUB_S.W      | Vector Signed Horizontal Add (word)                      |
-- * | HSUB_S.D      | Vector Signed Horizontal Add (doubleword)                |
-- * | HSUB_U.H      | Vector Unigned Horizontal Add (halfword)                 |
-- * | HSUB_U.W      | Vector Unigned Horizontal Add (word)                     |
-- * | HSUB_U.D      | Vector Unigned Horizontal Add (doubleword)               |
-+ * | HADD_S.H      | Vector Signed Horizontal Add (halfword)                  |
-+ * | HADD_S.W      | Vector Signed Horizontal Add (word)                      |
-+ * | HADD_S.D      | Vector Signed Horizontal Add (doubleword)                |
-+ * | HADD_U.H      | Vector Unigned Horizontal Add (halfword)                 |
-+ * | HADD_U.W      | Vector Unigned Horizontal Add (word)                     |
-+ * | HADD_U.D      | Vector Unigned Horizontal Add (doubleword)               |
-  * +---------------+----------------------------------------------------------+
-  */
- 
-@@ -279,6 +279,18 @@
-  * | DOTP_U.H      | Vector Unsigned Dot Product (halfword)                   |
-  * | DOTP_U.W      | Vector Unsigned Dot Product (word)                       |
-  * | DOTP_U.D      | Vector Unsigned Dot Product (doubleword)                 |
-+ * | DPADD_S.H     | Vector Signed Dot Product (halfword)                     |
-+ * | DPADD_S.W     | Vector Signed Dot Product (word)                         |
-+ * | DPADD_S.D     | Vector Signed Dot Product (doubleword)                   |
-+ * | DPADD_U.H     | Vector Unsigned Dot Product (halfword)                   |
-+ * | DPADD_U.W     | Vector Unsigned Dot Product (word)                       |
-+ * | DPADD_U.D     | Vector Unsigned Dot Product (doubleword)                 |
-+ * | DPSUB_S.H     | Vector Signed Dot Product (halfword)                     |
-+ * | DPSUB_S.W     | Vector Signed Dot Product (word)                         |
-+ * | DPSUB_S.D     | Vector Signed Dot Product (doubleword)                   |
-+ * | DPSUB_U.H     | Vector Unsigned Dot Product (halfword)                   |
-+ * | DPSUB_U.W     | Vector Unsigned Dot Product (word)                       |
-+ * | DPSUB_U.D     | Vector Unsigned Dot Product (doubleword)                 |
-  * +---------------+----------------------------------------------------------+
-  */
- 
-@@ -446,7 +458,19 @@
-  * +---------------+----------------------------------------------------------+
-  */
- 
--/* TODO: insert Logic group helpers here */
-+/* TODO: insert Interleave group helpers here */
-+
-+
-+/*
-+ * Move
-+ * ----
-+ *
-+ * +---------------+----------------------------------------------------------+
-+ * | MOVE.V        | Vector Move                                              |
-+ * +---------------+----------------------------------------------------------+
-+ */
-+
-+/* TODO: insert Move group helpers here */
- 
- 
- /*
 -- 
 2.7.4
 
