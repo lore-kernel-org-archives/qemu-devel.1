@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 016A2C0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 05:50:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA73BC5B578
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 05:52:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C79D9213F2
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 05:50:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A20E22089F
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 05:52:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="OQIb3hcV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C79D9213F2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="k9ID7lLg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A20E22089F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhpCV-0002k7-4H
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 01:50:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37407)
+	id 1hhpEq-0005k6-Uz
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 01:52:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37327)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hhpAi-0000eJ-4o
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 01:48:13 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hhpAf-0000dq-39
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 01:48:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hhpAg-0005rg-OY
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 01:48:12 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:36433 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1hhpAd-0005oY-K3
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 01:48:09 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:54215 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hhpAg-0005pC-15; Mon, 01 Jul 2019 01:48:10 -0400
+ id 1hhpAc-0005mQ-VY; Mon, 01 Jul 2019 01:48:07 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 45cbxt0Yq4z9sPH; Mon,  1 Jul 2019 15:48:01 +1000 (AEST)
+ id 45cbxs60wgz9sPF; Mon,  1 Jul 2019 15:48:01 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1561960082;
- bh=7EdOJUg0Scbtbtdp85QSB/WgHParI/8unO+cqwv3FBs=;
+ d=gibson.dropbear.id.au; s=201602; t=1561960081;
+ bh=+D3DQbY9JdLaTwovq3kHy1Bw+Ug4vw9WR1eucUafKKM=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=OQIb3hcVeYRhFYi655LfDoHn6wXz7CPvcfK/EB1JEynHMXHhlsoJZ3c8QgprsmA54
- 9wp+yfBReCF05LQZBQoaI/svVerGkV6ktOapSBp2/daUidgJwMK4Q+2gYdKrLKGwvh
- zdEccwHfkL8WEr7jBLQEurw25RWDQ0OHa/mSVKvE=
-Date: Mon, 1 Jul 2019 15:32:34 +1000
+ b=k9ID7lLgWdTL/Povr/s9O53HzQynAAmH/aAS0YnEAbNHBbiwAD89KW5Q9VrteCTk8
+ j7fw/eZGlEGQSxN3UnIqeMeOEDy8aSbJZG3u1oHLXh5YfLfGF/kxmOrcPVxFNLbPtn
+ S2NMpYGu38di03M/ZNrlSJGZ6f4Qj0ChWQu02WFo=
+Date: Mon, 1 Jul 2019 15:27:25 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Message-ID: <20190701053234.GP2138@umbus.fritz.box>
+Message-ID: <20190701052725.GN2138@umbus.fritz.box>
 References: <20190630204601.30574-1-clg@kaod.org>
- <20190630204601.30574-5-clg@kaod.org>
+ <20190630204601.30574-3-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="R3SAtXwgGp429mN7"
+ protocol="application/pgp-signature"; boundary="K4LMwn8CgX2KMboP"
 Content-Disposition: inline
-In-Reply-To: <20190630204601.30574-5-clg@kaod.org>
+In-Reply-To: <20190630204601.30574-3-clg@kaod.org>
 User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [PATCH 04/10] ppc/xive: Fix TM_PULL_POOL_CTX
- special operation
+Subject: Re: [Qemu-devel] [PATCH 02/10] ppc/xive: Make the PIPR register
+ readonly
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,72 +79,96 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---R3SAtXwgGp429mN7
+--K4LMwn8CgX2KMboP
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jun 30, 2019 at 10:45:55PM +0200, C=E9dric Le Goater wrote:
-> When a CPU is reseted, the hypervisor (Linux or OPAL) invalidates the
-> POOL interrupt context of a CPU with this special command. It returns
-> the POOL CAM line value and resets the VP bit.
+On Sun, Jun 30, 2019 at 10:45:53PM +0200, C=E9dric Le Goater wrote:
+> When the hypervisor (KVM) dispatches a vCPU on a HW thread, it restores
+> its thread interrupt context. The Pending Interrupt Priority Register
+> (PIPR) is computed from the Interrupt Pending Buffer (IPB) and stores
+> should not be allowed to change its value.
 >=20
-> Fixes: 4836b45510aa ("ppc/xive: activate HV support")
+> Fixes: 207d9fe98510 ("ppc/xive: introduce the XIVE interrupt thread conte=
+xt")
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
 Applied to ppc-for-4.1.
 
 > ---
->  hw/intc/xive.c | 19 ++++++++++---------
->  1 file changed, 10 insertions(+), 9 deletions(-)
+>  hw/intc/xive.c | 32 ++++++++++++++++----------------
+>  1 file changed, 16 insertions(+), 16 deletions(-)
 >=20
 > diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index 534f56f86bd5..cf77bdb7d34a 100644
+> index 3b1f9520ae9f..534f56f86bd5 100644
 > --- a/hw/intc/xive.c
 > +++ b/hw/intc/xive.c
-> @@ -132,6 +132,11 @@ static void xive_tctx_set_cppr(XiveTCTX *tctx, uint8=
-_t ring, uint8_t cppr)
->      xive_tctx_notify(tctx, ring);
->  }
-> =20
-> +static inline uint32_t xive_tctx_word2(uint8_t *ring)
-> +{
-> +    return *((uint32_t *) &ring[TM_WORD2]);
-> +}
-> +
->  /*
->   * XIVE Thread Interrupt Management Area (TIMA)
+> @@ -182,31 +182,31 @@ static uint64_t xive_tm_vt_poll(XiveTCTX *tctx, hwa=
+ddr offset, unsigned size)
 >   */
-> @@ -150,11 +155,12 @@ static uint64_t xive_tm_ack_hv_reg(XiveTCTX *tctx, =
-hwaddr offset, unsigned size)
->  static uint64_t xive_tm_pull_pool_ctx(XiveTCTX *tctx, hwaddr offset,
->                                        unsigned size)
->  {
-> -    uint64_t ret;
-> +    uint32_t qw2w2_prev =3D xive_tctx_word2(&tctx->regs[TM_QW2_HV_POOL]);
-> +    uint32_t qw2w2;
 > =20
-> -    ret =3D tctx->regs[TM_QW2_HV_POOL + TM_WORD2] & TM_QW2W2_POOL_CAM;
-> -    tctx->regs[TM_QW2_HV_POOL + TM_WORD2] &=3D ~TM_QW2W2_POOL_CAM;
-> -    return ret;
-> +    qw2w2 =3D xive_set_field32(TM_QW2W2_VP, qw2w2_prev, 0);
-> +    memcpy(&tctx->regs[TM_QW2_HV_POOL + TM_WORD2], &qw2w2, 4);
-> +    return qw2w2;
->  }
-> =20
->  static void xive_tm_vt_push(XiveTCTX *tctx, hwaddr offset,
-> @@ -484,11 +490,6 @@ const MemoryRegionOps xive_tm_ops =3D {
->      },
+>  static const uint8_t xive_tm_hw_view[] =3D {
+> -    /* QW-0 User */   3, 0, 0, 0,   0, 0, 0, 0,   3, 3, 3, 3,   0, 0, 0,=
+ 0,
+> -    /* QW-1 OS   */   3, 3, 3, 3,   3, 3, 0, 3,   3, 3, 3, 3,   0, 0, 0,=
+ 0,
+> -    /* QW-2 POOL */   0, 0, 3, 3,   0, 0, 0, 0,   3, 3, 3, 3,   0, 0, 0,=
+ 0,
+> -    /* QW-3 PHYS */   3, 3, 3, 3,   0, 3, 0, 3,   3, 0, 0, 3,   3, 3, 3,=
+ 0,
+> +    3, 0, 0, 0,   0, 0, 0, 0,   3, 3, 3, 3,   0, 0, 0, 0, /* QW-0 User */
+> +    3, 3, 3, 3,   3, 3, 0, 2,   3, 3, 3, 3,   0, 0, 0, 0, /* QW-1 OS   */
+> +    0, 0, 3, 3,   0, 0, 0, 0,   3, 3, 3, 3,   0, 0, 0, 0, /* QW-2 POOL */
+> +    3, 3, 3, 3,   0, 3, 0, 2,   3, 0, 0, 3,   3, 3, 3, 0, /* QW-3 PHYS */
 >  };
 > =20
-> -static inline uint32_t xive_tctx_word2(uint8_t *ring)
-> -{
-> -    return *((uint32_t *) &ring[TM_WORD2]);
-> -}
-> -
->  static char *xive_tctx_ring_print(uint8_t *ring)
->  {
->      uint32_t w2 =3D xive_tctx_word2(ring);
+>  static const uint8_t xive_tm_hv_view[] =3D {
+> -    /* QW-0 User */   3, 0, 0, 0,   0, 0, 0, 0,   3, 3, 3, 3,   0, 0, 0,=
+ 0,
+> -    /* QW-1 OS   */   3, 3, 3, 3,   3, 3, 0, 3,   3, 3, 3, 3,   0, 0, 0,=
+ 0,
+> -    /* QW-2 POOL */   0, 0, 3, 3,   0, 0, 0, 0,   0, 3, 3, 3,   0, 0, 0,=
+ 0,
+> -    /* QW-3 PHYS */   3, 3, 3, 3,   0, 3, 0, 3,   3, 0, 0, 3,   0, 0, 0,=
+ 0,
+> +    3, 0, 0, 0,   0, 0, 0, 0,   3, 3, 3, 3,   0, 0, 0, 0, /* QW-0 User */
+> +    3, 3, 3, 3,   3, 3, 0, 2,   3, 3, 3, 3,   0, 0, 0, 0, /* QW-1 OS   */
+> +    0, 0, 3, 3,   0, 0, 0, 0,   0, 3, 3, 3,   0, 0, 0, 0, /* QW-2 POOL */
+> +    3, 3, 3, 3,   0, 3, 0, 2,   3, 0, 0, 3,   0, 0, 0, 0, /* QW-3 PHYS */
+>  };
+> =20
+>  static const uint8_t xive_tm_os_view[] =3D {
+> -    /* QW-0 User */   3, 0, 0, 0,   0, 0, 0, 0,   3, 3, 3, 3,   0, 0, 0,=
+ 0,
+> -    /* QW-1 OS   */   2, 3, 2, 2,   2, 2, 0, 2,   0, 0, 0, 0,   0, 0, 0,=
+ 0,
+> -    /* QW-2 POOL */   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0,=
+ 0,
+> -    /* QW-3 PHYS */   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0,=
+ 0,
+> +    3, 0, 0, 0,   0, 0, 0, 0,   3, 3, 3, 3,   0, 0, 0, 0, /* QW-0 User */
+> +    2, 3, 2, 2,   2, 2, 0, 2,   0, 0, 0, 0,   0, 0, 0, 0, /* QW-1 OS   */
+> +    0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, /* QW-2 POOL */
+> +    0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, /* QW-3 PHYS */
+>  };
+> =20
+>  static const uint8_t xive_tm_user_view[] =3D {
+> -    /* QW-0 User */   3, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0,=
+ 0,
+> -    /* QW-1 OS   */   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0,=
+ 0,
+> -    /* QW-2 POOL */   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0,=
+ 0,
+> -    /* QW-3 PHYS */   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0,=
+ 0,
+> +    3, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, /* QW-0 User */
+> +    0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, /* QW-1 OS   */
+> +    0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, /* QW-2 POOL */
+> +    0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, /* QW-3 PHYS */
+>  };
+> =20
+>  /*
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -152,25 +176,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---R3SAtXwgGp429mN7
+--K4LMwn8CgX2KMboP
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0ZmvIACgkQbDjKyiDZ
-s5Ib1RAAoZoYM26JgQAdunB3pBhtzDZKl7GGadn3Qtx4ilNSHYOSPje01e0r34SY
-nzvZf9OS/rvj97r8K5TIFyH48rItHs7d5jJe6nhvZytokZOCaEgoQIIvq1rtDbU5
-dHc93uBAq8fgTT9bCwiasgkkXCM8AStjaHmbgj3Xlk4A5e3ylJWUr9faTsbeeieJ
-0qLQvZigv3DisCffTk0civiaUDToTrlVCQdH6TPEAR9xIwbg3Ep/OrmHWKa4Jjpq
-JWOtB8Qt1NnFarOjwkr7L8cjdXwh2nG+fZ4odAhhwziWG3fSvakQMUvV4QCQx+Cd
-Wg7O9995x993IQptNHLInivaO43lVuwhIF7RRtZXhQYkBROpp5Qaun3yVMm9qiQv
-uM8gyQjihD3YDVYqctQ5Hz7hoNRu4Qq+jRVa3uSPdHrUggQA90MyOGJcUfkt4V6Z
-ruEM6ACuZvboWI4lkrImb73CvVQI8stxAe7pPFbr5K3xXVxARBDUZsqwqcBevq74
-nsRBvPeTufb8jThZiv1pGaUA+qYgwCQOW1S/z3T0end2N7gu0RTeDYW9MeWax+zo
-zHa399ibmkrRRMa5VperGgocihVHuJ6v38xJkZUyRprnxqck18BSkfA4edF3NsEE
-OUtUuzPTtl8kkxgM45+qGd54fWM/R6smAC9A4UNqnl6SIIsvPgA=
-=GhNG
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0ZmbwACgkQbDjKyiDZ
+s5KtBQ/+Npay9CaxC3kkZbFphazhyxL0NJbBC6WvoLlBa7f5zYhJKZkZgO+3k30L
+QlxVNST4BMTtveHlpBhMdQk4q+FmrpSOkh3QfJKm4tpwP5h//WoONbtNI6bMw3Ef
+MSvGXEjoTQHF7JtDCf6xCpO4om/yxSvoz++looXIzavt5d6a96+BSwjVcekIYH5D
+yUVAuNqXAX4h2gERDOSzmSpwZtKmpVRH6smqfqGoEdFqBfgQx/ruOicloq15IAH+
+b84ZBSJugCWQMJ8WJEp+1kJJy701zluiVYzneUgskF/BFiTBD4SdFcfd/bQm9tOq
+R7nsjGbKWzPEJHKcegZxaqmNZZGHbDFcX+GzzpFG3D+Vhf/n2Zcv9FErqDwTH2rH
+Z4wuOXdNSETnvIsAAS010MtQskfok9ZDQNtqvHmP8kQjEWZiJ661Gr4x8qNpuvOd
+DyhDHMghOfv58ZQfZ98QnRmA2IThT3jf2J67aJRTiW45kese70UJ8ziI89EvFs//
+IaOKBqGOXrqlGIEPNUGJJ5LftpxLIMkRTQeVkpzbAWPZFV8OcifwTylMZPfu4iPj
+hYG5lj5U7QHX1JMPcjAwrjiETJ4zvRh9nHpZWcXFMfKeU0MkAiXoSKaafrqnFY8q
+yVqhqF6tRgkIxAcvU/OxzrIRfw+e+iwGclKiQoGf3+ojl5GdZLc=
+=Z+MP
 -----END PGP SIGNATURE-----
 
---R3SAtXwgGp429mN7--
+--K4LMwn8CgX2KMboP--
 
