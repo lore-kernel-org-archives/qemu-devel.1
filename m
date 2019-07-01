@@ -6,56 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 515E7C0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 13:49:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 991BEC0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 13:50:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27A59214AE
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 13:49:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27A59214AE
+	by mail.kernel.org (Postfix) with ESMTPS id 65B47214AE
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 13:50:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65B47214AE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhwfz-0005gY-FC
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 09:48:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41148)
+	id 1hhwhi-00073S-JV
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 09:50:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41397)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hhwKi-0002LC-Jz
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:27:05 -0400
+ (envelope-from <philmd@redhat.com>) id 1hhwKz-0002gt-Vv
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:27:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hhwKh-0002S8-5t
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:27:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50308)
+ (envelope-from <philmd@redhat.com>) id 1hhwKx-0002ku-Uy
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:27:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48750)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hhwKd-0002Az-RP; Mon, 01 Jul 2019 09:26:55 -0400
+ id 1hhwKp-0002aB-SU; Mon, 01 Jul 2019 09:27:08 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3910D308FBAF;
- Mon,  1 Jul 2019 13:26:44 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id D4CC630C5827;
+ Mon,  1 Jul 2019 13:27:06 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.205.170])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7EBC06085B;
- Mon,  1 Jul 2019 13:26:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B1F46085B;
+ Mon,  1 Jul 2019 13:27:03 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon,  1 Jul 2019 15:25:08 +0200
-Message-Id: <20190701132516.26392-20-philmd@redhat.com>
+Date: Mon,  1 Jul 2019 15:25:14 +0200
+Message-Id: <20190701132516.26392-26-philmd@redhat.com>
 In-Reply-To: <20190701132516.26392-1-philmd@redhat.com>
 References: <20190701132516.26392-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Mon, 01 Jul 2019 13:26:44 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Mon, 01 Jul 2019 13:27:06 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 19/27] target/arm: Restrict PSCI to TCG
+Subject: [Qemu-devel] [RFC PATCH v3 25/27] target/arm: Restrict R and M
+ profiles to TCG
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,36 +78,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Under KVM, the kernel gets the HVC call and handle the PSCI requests.
+KVM is only able to run A profile cpus.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- target/arm/internals.h | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ target/arm/cpu.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 46a1313d69..57e0253ef4 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -529,11 +529,15 @@ vaddr arm_adjust_watchpoint_address(CPUState *cs, v=
-addr addr, int len);
- /* Callback function for when a watchpoint or breakpoint triggers. */
- void arm_debug_excp_handler(CPUState *cs);
-=20
--#ifdef CONFIG_USER_ONLY
-+#if defined(CONFIG_USER_ONLY) || !defined(CONFIG_TCG)
- static inline bool arm_is_psci_call(ARMCPU *cpu, int excp_type)
- {
-     return false;
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index d0376f46f7..b21d0fb891 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -453,7 +453,9 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interru=
+pt_request)
+     return ret;
  }
-+static inline void arm_handle_psci_call(ARMCPU *cpu)
-+{
-+    g_assert_not_reached();
-+}
- #else
- /* Return true if the r0/x0 value indicates that this SMC/HVC is a PSCI =
-call. */
- bool arm_is_psci_call(ARMCPU *cpu, int excp_type);
+=20
+-#if !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64)
++/* CPU models. These are not needed for the AArch64 linux-user build. */
++#if (!defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64)) \
++    && defined(CONFIG_TCG)
+ static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_reque=
+st)
+ {
+     CPUClass *cc =3D CPU_GET_CLASS(cs);
+@@ -1855,8 +1857,6 @@ static void cortex_m0_initfn(Object *obj)
+     cpu->midr =3D 0x410cc200;
+ }
+=20
+-#endif
+-
+ static void cortex_m3_initfn(Object *obj)
+ {
+     ARMCPU *cpu =3D ARM_CPU(obj);
+@@ -2010,6 +2010,8 @@ static void cortex_r5f_initfn(Object *obj)
+     cpu->isar.mvfr1 =3D 0x00000011;
+ }
+=20
++#endif
++
+ static const ARMCPRegInfo cortexa8_cp_reginfo[] =3D {
+     { .name =3D "L2LOCKDOWN", .cp =3D 15, .crn =3D 9, .crm =3D 0, .opc1 =
+=3D 1, .opc2 =3D 0,
+       .access =3D PL1_RW, .type =3D ARM_CP_CONST, .resetvalue =3D 0 },
+@@ -2491,7 +2493,6 @@ static const ARMCPUInfo arm_cpus[] =3D {
+     { .name =3D "arm1176",     .initfn =3D arm1176_initfn },
+     { .name =3D "arm11mpcore", .initfn =3D arm11mpcore_initfn },
+     { .name =3D "cortex-m0",   .initfn =3D cortex_m0_initfn,
+-#endif
+                              .class_init =3D arm_v7m_class_init },
+     { .name =3D "cortex-m3",   .initfn =3D cortex_m3_initfn,
+                              .class_init =3D arm_v7m_class_init },
+@@ -2501,6 +2502,7 @@ static const ARMCPUInfo arm_cpus[] =3D {
+                              .class_init =3D arm_v7m_class_init },
+     { .name =3D "cortex-r5",   .initfn =3D cortex_r5_initfn },
+     { .name =3D "cortex-r5f",  .initfn =3D cortex_r5f_initfn },
++#endif
+     { .name =3D "cortex-a7",   .initfn =3D cortex_a7_initfn },
+     { .name =3D "cortex-a8",   .initfn =3D cortex_a8_initfn },
+     { .name =3D "cortex-a9",   .initfn =3D cortex_a9_initfn },
 --=20
 2.20.1
 
