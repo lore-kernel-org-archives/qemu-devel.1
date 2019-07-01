@@ -2,61 +2,90 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AA7CC0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 13:11:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E73BAC0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 13:13:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 319BF20881
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 13:11:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 319BF20881
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B396A205F4
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 13:13:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RM4ml4tA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B396A205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhw5F-0006Fv-RZ
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 09:11:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35578)
+	id 1hhw7O-0000LL-AZ
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 09:13:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35928)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1hhvwr-0000BU-Fg
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:02:32 -0400
+ (envelope-from <chmeeedalf@gmail.com>) id 1hhvy0-0000YL-H7
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:03:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1hhvwo-0002gA-WE
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:02:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50268)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hhvwk-0002Qe-E6
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:02:17 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 692F630811C7
- for <qemu-devel@nongnu.org>; Mon,  1 Jul 2019 13:01:55 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BD31419C6F;
- Mon,  1 Jul 2019 13:01:54 +0000 (UTC)
-Date: Mon, 1 Jul 2019 15:01:50 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190701150150.4f58cdb7@redhat.com>
-In-Reply-To: <20190621064615.20099-4-mst@redhat.com>
-References: <20190621064615.20099-1-mst@redhat.com>
- <20190621064615.20099-4-mst@redhat.com>
+ (envelope-from <chmeeedalf@gmail.com>) id 1hhvxw-0003jQ-6a
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:03:32 -0400
+Received: from mail-lf1-x12d.google.com ([2a00:1450:4864:20::12d]:42766)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <chmeeedalf@gmail.com>)
+ id 1hhvxr-00035L-6k; Mon, 01 Jul 2019 09:03:23 -0400
+Received: by mail-lf1-x12d.google.com with SMTP id x144so8741269lfa.9;
+ Mon, 01 Jul 2019 06:02:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=gYGEWTf/SWiucXWkQ4hNUOwq3//Nu83USjjeDpKHhdI=;
+ b=RM4ml4tAIYaZlcZgE8Cbaj+GGfaW2HruV4wBOJZqvKUdpDur6IEnTIy0EoeubAO2q9
+ Gw3guxKbqqP7biH6vfA3owqW9McPsq39BgpbYJLMzx60bd8VgZjQsLp8naKLFuJsrdCm
+ gLv0DER4xjJSlE7Zl6Tq/gBsiadvwEg+KNDCEntYFMnZ2WMnlNG3RNQnenBeG9vRVUZe
+ PV3L8BtUofdu98CvbwxwUCwRoHInuTTWmoqLJQISA7xGVq3LgoAbCu6uuponTmAbZte7
+ YVolWqdA9jt89g7yb9GRtIpyLT988bLEsH01FkbU70zl8hBKnb+ZE9OWiifUOxqCuCwN
+ 2FHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=gYGEWTf/SWiucXWkQ4hNUOwq3//Nu83USjjeDpKHhdI=;
+ b=AYPu5WyGmDZOrXOfrZXgvApxZMBX1sFGGLGixriHs/tg3DJGcpAv70PZXPK8w2/UCE
+ o0JFsivNWzRtKrr+kwdHKCedzVRsQN+55m0WVYsF1UPsi7PcW1/4/Ly2rRfWP9F6RE4K
+ L2fJXkvC1Lov7Hh4feLtAXzoVuClFsN63LH+YbiUlTK7ANyyzXnRJXLpCGMWtZ+GGTuI
+ srRIKXVEh8BB27aYgQfG1SBYBw5Oo+rAcBewAeCfyNwAAn6sJJcnQW4ZF4g25+aVFcE/
+ x3qkv3mbQkMPMUX/t7K9Pzj41OYUbJf4kKrfZ7oCNwlGS4UddpMnhjVEHxvQN656Wpzn
+ H4mw==
+X-Gm-Message-State: APjAAAXmNj0Kz61qQLu1DdVhaa6xtHaG8pllJcPaOqkLmEY8Emwqgrvr
+ BxLnXiOuAOE8YpLgDKSwi91XZLG0uwHvUHRFcHY=
+X-Google-Smtp-Source: APXvYqwsGiKDafTLQUGTBEfeNEAtjkI6FhkirpNjYRB/KPxZ8HkSdCfUuFSniiBB/eE+THPIMJadgPEWAQeBK3Gv4sY=
+X-Received: by 2002:ac2:50c4:: with SMTP id h4mr11927970lfm.61.1561986165385; 
+ Mon, 01 Jul 2019 06:02:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Mon, 01 Jul 2019 13:01:55 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/3] pcie: work around for racy guest init
+References: <20190607135653.6ece685d@titan.knownspace>
+ <8676232e-917d-44e2-1149-b25f26698a73@vivier.eu>
+ <92053c9c-e7bf-76cb-9399-987f4ab31bfb@vivier.eu>
+ <20190626113742.6bcd8a26@titan.knownspace>
+ <d60f142d-27ef-bfe5-1eb6-cefb22640625@vivier.eu>
+ <20190626130414.08940342@titan.knownspace>
+ <CAHSQbTCxP09J9NtFiN4UpdXHJZHtTw_F66hfdAS2sM4=E5GHyQ@mail.gmail.com>
+ <477ebe22-eddb-41ba-5811-4a70e639a89a@vivier.eu>
+ <CAHSQbTCUzR5WiykWGZOH1bvBPWx15_ZA-=7b17c6AnRK4kn3yA@mail.gmail.com>
+ <cd0a35ce-1f8c-6718-13d9-7a481e1eeb31@vivier.eu>
+In-Reply-To: <cd0a35ce-1f8c-6718-13d9-7a481e1eeb31@vivier.eu>
+From: Justin Hibbits <chmeeedalf@gmail.com>
+Date: Mon, 1 Jul 2019 08:02:33 -0500
+Message-ID: <CAHSQbTDMWXX978oWBvYhh1Uz7CeA1KQGz6+11rqwYv+ZOWyVOw@mail.gmail.com>
+To: Laurent Vivier <laurent@vivier.eu>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::12d
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [Qemu-trivial] Fix cacheline size retrieval on
+ FreeBSD/PowerPC(64)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,82 +97,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, "Emilio G. Cota" <cota@braap.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 21 Jun 2019 02:46:50 -0400
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+On Mon, Jul 1, 2019, 03:54 Laurent Vivier <laurent@vivier.eu> wrote:
 
-> During boot, linux guests tend to clear all bits in pcie slot status
-> register which is used for hotplug.
-> If they clear bits that weren't set this is racy and will lose events:
-> not a big problem for manual hotplug on bare-metal, but a problem for us.
-> 
-> For example, the following is broken ATM:
-> 
-> /x86_64-softmmu/qemu-system-x86_64 -enable-kvm -S -machine q35  \
->     -device pcie-root-port,id=pcie_root_port_0,slot=2,chassis=2,addr=0x2,bus=pcie.0 \
->     -device virtio-balloon-pci,id=balloon,bus=pcie_root_port_0 \
->     -monitor stdio disk.qcow2
-> (qemu)device_del balloon
-> (qemu)cont
-> 
-> Balloon isn't deleted as it should.
-> 
-> As a work-around, detect this attempt to clear slot status and revert
-> status to what it was before the write.
-> 
-> Note: in theory this can be detected as a duplicate button press
-> which cancels the previous press. Does not seem to happen in
-> practice as guests seem to only have this bug during init.
-> 
-> Note2: the right thing to do is probably to fix Linux to
-> read status before clearing it, and act on the bits that are set.
-> 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> Le 27/06/2019 =C3=A0 02:15, Justin Hibbits a =C3=A9crit :
+> >
+> >
+> > On Wed, Jun 26, 2019, 19:08 Laurent Vivier <laurent@vivier.eu
+> > <mailto:laurent@vivier.eu>> wrote:
+> >
+> >     Le 27/06/2019 =C3=A0 02:02, Justin Hibbits a =C3=A9crit :
+> >     >
+> >     >
+> >     > On Wed, Jun 26, 2019, 13:04 Justin Hibbits <chmeeedalf@gmail.com
+> >     <mailto:chmeeedalf@gmail.com>
+> >     > <mailto:chmeeedalf@gmail.com <mailto:chmeeedalf@gmail.com>>>
+> wrote:
+> >     >
+> >     >     On Wed, 26 Jun 2019 18:47:42 +0200
+> >     >     Laurent Vivier <laurent@vivier.eu <mailto:laurent@vivier.eu>
+> >     <mailto:laurent@vivier.eu <mailto:laurent@vivier.eu>>> wrote:
+> >     >
+> >     >     > Le 26/06/2019 =C3=A0 18:37, Justin Hibbits a =C3=A9crit :
+> >     >     > > On Wed, 26 Jun 2019 18:16:36 +0200
+> >     >     > > Laurent Vivier <laurent@vivier.eu
+> >     <mailto:laurent@vivier.eu> <mailto:laurent@vivier.eu
+> >     <mailto:laurent@vivier.eu>>> wrote:
+> >     >     > >
+> >     >     > >> Le 26/06/2019 =C3=A0 18:14, Laurent Vivier a =C3=A9crit =
+:
+> >     >     > >>> Le 07/06/2019 =C3=A0 20:56, Justin Hibbits a =C3=A9crit=
+ :
+> >     >     > >>>> The attached very trivial patch fixes a startup bug
+> >     that prevents
+> >     >     > >>>> at least Qemu 3.1 and later from working on
+> >     FreeBSD/powerpc64.
+> >     >     > >>>>
+> >     >     > >>>> - Justin
+> >     >     > >>>>
+> >     >     > >>>
+> >     >     > >>> Please don't send a patch in attachment but inlined in
+> >     the message
+> >     >     > >>> (you may use "git send-email" for that).
+> >     >     > >>>
+> >     >     > >>> This patch fixes "util: add cacheinfo" that has changed
+> >     the type
+> >     >     > >>> from unsigned to long.
+> >     >     > >>>
+> >     >     > >>> You can add the following line in the commit message:
+> >     >     > >>>
+> >     >     > >>> Fixes: b255b2c8a548 ("util: add cacheinfo")
+> >     >     > >>>
+> >     >     > >>> Reviewed-by: Laurent Vivier <laurent@vivier.eu
+> >     <mailto:laurent@vivier.eu>
+> >     >     <mailto:laurent@vivier.eu <mailto:laurent@vivier.eu>>>
+> >     >     > >>>
+> >     >     > >>
+> >     >     > >> CC: author of b255b2c8a548 ("util: add cacheinfo")
+> >     >     > >>
+> >     >     > >> Thanks,
+> >     >     > >> Laurent
+> >     >     > >
+> >     >     > > Hi Laurent,
+> >     >     > >
+> >     >     > > Sorry.  I had never used git send-email before, so wasn't
+> >     >     > > comfortable with it.  I just updated the commit message
+> >     with your
+> >     >     > > feedback and used git send-email to submit the patch.  I
+> hope
+> >     >     > > everything went well.
+> >     >     >
+> >     >     > It seems not. I didn't receive it.
+> >     >     >
+> >     >     > Did you configure the SMTP server. See git-send-email(1):
+> >     >     >
+> >     >     >    Use gmail as the smtp server
+> >     >     >
+> >     >     >        To use git send-email to send your patches through
+> >     the GMail
+> >     >     > SMTP server, edit ~/.gitconfig to specify your account
+> settings:
+> >     >     >
+> >     >     >            [sendemail]
+> >     >     >                    smtpEncryption =3D tls
+> >     >     >                    smtpServer =3D smtp.gmail.com
+> >     <http://smtp.gmail.com> <http://smtp.gmail.com>
+> >     >     >                    smtpUser =3D yourname@gmail.com
+> >     <mailto:yourname@gmail.com>
+> >     >     <mailto:yourname@gmail.com <mailto:yourname@gmail.com>>
+> >     >     >                    smtpServerPort =3D 587
+> >     >     >
+> >     >     >        If you have multifactor authentication setup on your
+> >     gmail
+> >     >     > account, you will need to generate an app-specific password
+> >     for use
+> >     >     > with git send-email. Visit
+> >     >     >
+> >     https://security.google.com/settings/security/apppasswords to
+> >     >     > create it.
+> >     >     >
+> >     >     >        Once your commits are ready to be sent to the mailin=
+g
+> >     list,
+> >     >     > run the following commands:
+> >     >     >
+> >     >     >            $ git format-patch --cover-letter -M
+> origin/master -o
+> >     >     > outgoing/ $ edit outgoing/0000-*
+> >     >     >            $ git send-email outgoing/*
+> >     >     >
+> >     >     >        The first time you run it, you will be prompted for
+> your
+> >     >     > credentials. Enter the app-specific or your regular passwor=
+d
+> as
+> >     >     > appropriate. If you have credential helper configured (see
+> >     >     > git-credential(1)), the password will be saved in the
+> credential
+> >     >     > store so you won=E2=80=99t have to type it the next time.
+> >     >     >
+> >     >     >        Note: the following perl modules are required
+> >     Net::SMTP::SSL,
+> >     >     >        MIME::Base64 and Authen::SASL
+> >     >     >
+> >     >     > Thanks,
+> >     >     > Laurent
+> >     >     >
+> >     >     >
+> >     >
+> >     >     Hm, you're right.  Even after making the config changes and
+> >     installing
+> >     >     the necessary packages, I still have no luck with git
+> >     send-email.  Might
+> >     >     take a bit to debug this.
+> >     >
+> >     >     - Justin
+> >     >
+> >     >
+> >     > Sorry for the multiplicity, looks like Gmail forwarded it
+> eventually,
+> >     > but not until I tried several times debugging it.
+> >
+> >     Not sure, I didn't receive any of them.
+> >
+> >     Thanks,
+> >     Laurent
+> >
+> >
+> > Sigh, 4 copies ended up in my Gmail spam folder, so I thought it made i=
+t
+> > through.
+> >
+>
+> Any news? Freeze is coming.
+>
+> Thanks,
+> Laurent
+>
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Tested-by: Igor Mammedov <imammedo@redhat.com>
-
-
-had to change slot addr since #2 seems to be taken by default nic
-
-
-> ---
->  hw/pci/pcie.c | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
-> 
-> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-> index f8490a00de..c605d32dd4 100644
-> --- a/hw/pci/pcie.c
-> +++ b/hw/pci/pcie.c
-> @@ -610,6 +610,25 @@ void pcie_cap_slot_write_config(PCIDevice *dev, uint16_t slt_ctl, uint16_t slt_s
->      uint16_t sltsta = pci_get_word(exp_cap + PCI_EXP_SLTSTA);
->  
->      if (ranges_overlap(addr, len, pos + PCI_EXP_SLTSTA, 2)) {
-> +        /*
-> +         * Guests tend to clears all bits during init.
-> +         * If they clear bits that weren't set this is racy and will lose events:
-> +         * not a big problem for manual button presses, but a problem for us.
-> +         * As a work-around, detect this and revert status to what it was
-> +         * before the write.
-> +         *
-> +         * Note: in theory this can be detected as a duplicate button press
-> +         * which cancels the previous press. Does not seem to happen in
-> +         * practice as guests seem to only have this bug during init.
-> +         */
-> +#define PCIE_SLOT_EVENTS (PCI_EXP_SLTSTA_ABP | PCI_EXP_SLTSTA_PFD | \
-> +                          PCI_EXP_SLTSTA_MRLSC | PCI_EXP_SLTSTA_PDC | \
-> +                          PCI_EXP_SLTSTA_CC)
-> +
-> +        if (val & ~slt_sta & PCIE_SLOT_EVENTS) {
-> +            sltsta = (sltsta & ~PCIE_SLOT_EVENTS) | (slt_sta & PCIE_SLOT_EVENTS);
-> +            pci_set_word(exp_cap + PCI_EXP_SLTSTA, sltsta);
-> +        }
->          hotplug_event_clear(dev);
->      }
->  
-
-
+I'll manually do it when I get home tomorrow.  Fixing git send-email will
+have to wait.
