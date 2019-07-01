@@ -2,65 +2,58 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98822C0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 07:46:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AA85C0650F
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 07:53:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F951208E4
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 07:46:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F951208E4
+	by mail.kernel.org (Postfix) with ESMTPS id 46B4720652
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 07:53:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46B4720652
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhr0l-0007JZ-AR
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 03:46:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56084)
+	id 1hhr8I-0000Zl-7O
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 03:53:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57608)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kraxel@redhat.com>) id 1hhqzm-0006ZN-Ms
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 03:45:03 -0400
+ (envelope-from <kraxel@redhat.com>) id 1hhr7f-00005P-NH
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 03:53:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1hhqzl-000567-Ko
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 03:45:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56112)
+ (envelope-from <kraxel@redhat.com>) id 1hhr7e-0002H1-J0
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 03:53:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36258)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>)
- id 1hhqzh-00051V-4G; Mon, 01 Jul 2019 03:44:57 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hhr7e-0002GW-BG
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 03:53:10 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 31697308124D;
- Mon,  1 Jul 2019 07:44:52 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7198B307D915;
+ Mon,  1 Jul 2019 07:53:09 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-116-96.ams2.redhat.com
  [10.36.116.96])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DF5741001B20;
- Mon,  1 Jul 2019 07:44:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8A9C04DA2E;
+ Mon,  1 Jul 2019 07:53:02 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 2311611AA3; Mon,  1 Jul 2019 09:44:51 +0200 (CEST)
-Date: Mon, 1 Jul 2019 09:44:51 +0200
+ id C379711AA3; Mon,  1 Jul 2019 09:53:01 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
-To: Sam Eiderman <shmuel.eiderman@oracle.com>
-Message-ID: <20190701074451.apgschleugyxxbwr@sirius.home.kraxel.org>
-References: <20190626123816.8907-1-shmuel.eiderman@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190626123816.8907-1-shmuel.eiderman@oracle.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+To: qemu-devel@nongnu.org
+Date: Mon,  1 Jul 2019 09:53:01 +0200
+Message-Id: <20190701075301.14165-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Mon, 01 Jul 2019 07:44:54 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Mon, 01 Jul 2019 07:53:09 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [SeaBIOS] [PATCH v4 0/5] Add Qemu to SeaBIOS LCHS
- interface
+Subject: [Qemu-devel] [PATCH v2] console: fix cell overflow
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,59 +65,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, arbel.moshe@oracle.com,
- seabios@seabios.org, qemu-devel@nongnu.org, mreitz@redhat.com,
- kevin@koconnor.net, liran.alon@oracle.com, karl.heubaum@oracle.com
+Cc: dinechin@redhat.com, alxndr@bu.edu, Gerd Hoffmann <kraxel@redhat.com>,
+ P J P <ppandit@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 26, 2019 at 03:38:11PM +0300, Sam Eiderman wrote:
-> v1:
-> 
-> Non-standard logical geometries break under QEMU.
-> 
-> A virtual disk which contains an operating system which depends on
-> logical geometries (consistent values being reported from BIOS INT13
-> AH=08) will most likely break under QEMU/SeaBIOS if it has non-standard
-> logical geometries - for example 56 SPT (sectors per track).
-> No matter what QEMU will guess - SeaBIOS, for large enough disks - will
-> use LBA translation, which will report 63 SPT instead.
-> 
-> In addition we can not enforce SeaBIOS to rely on phyiscal geometries at
-> all. A virtio-blk-pci virtual disk with 255 phyiscal heads can not
-> report more than 16 physical heads when moved to an IDE controller, the
-> ATA spec allows a maximum of 16 heads - this is an artifact of
-> virtualization.
-> 
-> By supplying the logical geometies directly we are able to support such
-> "exotic" disks.
-> 
-> We will use fw_cfg to do just that.
-> 
-> v2:
-> 
-> Rename bootdevices fw_cfg key to bios-geoemtry
-> 
-> v3:
-> 
-> Change fw_cfg interface from mixed binary/textual to textual only
-> Squash commit "config: Add toggle for bootdevice information"
-> 
-> v4:
-> 
-> * Rename TRANSLATION_MACHINE to TRANSLATION_HOST
-> * Rename "overriden" translation name to "host-supplied"
-> * Rename overriden_lchs_supplied() to host_lchs_supplied()
-> * Move sectors and heads check to host_lchs_supplied()
-> * Reuse duplicate code in boot.c
+Linux terminal behavior (coming from vt100 I think) is somewhat strange
+when it comes to line wraps:  When a character is printed to the last
+char cell of a line the cursor does NOT jump to the next line but stays
+where it is.  The line feed happens when the next character is printed.
 
-Looks all sane to me.
+So the valid range for the cursor position is not 0 .. width-1 but
+0 .. width, where x == width represents the state where the line is
+full but the cursor didn't jump to the next line yet.
 
-Usual workflow is to have to qemu bits merged first, so we'll go wait
-for that.
+The code for the 'clear from start of line' control sequence (ESC[1K)
+fails to handle this corner case correctly and may call
+console_clear_xy() with x == width.  That will incorrectly clear the
+first char cell of the next line, or in case the cursor happens to be on
+the last line overflow the cell buffer by one character (three bytes).
 
-cheers,
-  Gerd
+Add a check to the loop to fix that.
+
+Didn't spot any other places with the same problem.  But it's easy to
+miss that corner case, so also allocate one extra cell as precaution, so
+in case we have simliar issues lurking elsewhere it at least wouldn't be
+a buffer overflow.
+
+v2: squashed in additional checks suggested by Christophe de Dinechin.
+
+Reported-by: Alexander Oleinik <alxndr@bu.edu>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Christophe de Dinechin <dinechin@redhat.com>
+---
+ ui/console.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/ui/console.c b/ui/console.c
+index eb7e7e0c517a..82d1ddac9cfd 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -484,7 +484,7 @@ static void text_console_resize(QemuConsole *s)
+     if (s->width < w1)
+         w1 = s->width;
+ 
+-    cells = g_new(TextCell, s->width * s->total_height);
++    cells = g_new(TextCell, s->width * s->total_height + 1);
+     for(y = 0; y < s->total_height; y++) {
+         c = &cells[y * s->width];
+         if (w1 > 0) {
+@@ -541,6 +541,9 @@ static void update_xy(QemuConsole *s, int x, int y)
+         y2 += s->total_height;
+     }
+     if (y2 < s->height) {
++        if (x >= s->width) {
++            x = s->width - 1;
++        }
+         c = &s->cells[y1 * s->width + x];
+         vga_putcharxy(s, x, y2, c->ch,
+                       &(c->t_attrib));
+@@ -787,6 +790,9 @@ static void console_handle_escape(QemuConsole *s)
+ static void console_clear_xy(QemuConsole *s, int x, int y)
+ {
+     int y1 = (s->y_base + y) % s->total_height;
++    if (x >= s->width) {
++        x = s->width - 1;
++    }
+     TextCell *c = &s->cells[y1 * s->width + x];
+     c->ch = ' ';
+     c->t_attrib = s->t_attrib_default;
+@@ -992,7 +998,7 @@ static void console_putchar(QemuConsole *s, int ch)
+                     break;
+                 case 1:
+                     /* clear from beginning of line */
+-                    for (x = 0; x <= s->x; x++) {
++                    for (x = 0; x <= s->x && x < s->width; x++) {
+                         console_clear_xy(s, x, s->y);
+                     }
+                     break;
+-- 
+2.18.1
 
 
