@@ -2,60 +2,94 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6966AC0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 15:03:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89C2BC0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 15:04:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3ABC9206E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 15:03:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ABC9206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4A8AD206E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 15:04:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OeN6imAy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A8AD206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59766 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhxqT-0003kf-DL
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 11:03:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59576)
+	id 1hhxqd-0004N5-DX
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 11:04:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34352)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <slp@redhat.com>) id 1hhxat-0000y9-TE
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:47:49 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hhxnA-0001hC-RJ
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 11:00:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1hhxar-00063t-SD
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:47:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:27338)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1hhxap-0005t0-LH
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:47:45 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E6F3F308621F;
- Mon,  1 Jul 2019 14:47:37 +0000 (UTC)
-Received: from dritchie.redhat.com (unknown [10.33.36.165])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 726CB7DF69;
- Mon,  1 Jul 2019 14:47:26 +0000 (UTC)
-From: Sergio Lopez <slp@redhat.com>
-To: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com,
- rth@twiddle.net, ehabkost@redhat.com, maran.wilson@oracle.com
-Date: Mon,  1 Jul 2019 16:47:04 +0200
-Message-Id: <20190701144705.102615-4-slp@redhat.com>
-In-Reply-To: <20190701144705.102615-1-slp@redhat.com>
-References: <20190701144705.102615-1-slp@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1hhxn5-0007vO-Ne
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 11:00:28 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55919)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hhxn1-0007n2-2x
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 11:00:20 -0400
+Received: by mail-wm1-x343.google.com with SMTP id a15so16219958wmj.5
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 08:00:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=qO0tw6/4CuHIqVaBgS7s0KxmHhX6bEPZ4Cj7kOvH6NU=;
+ b=OeN6imAykCxxAy8fjgas5PEvvvM4wSO5ffrXLtHqaTmZCGzEB13KzX0DV/BS9jhArr
+ M+oNwSPsyDOqRpsVvD35Jw1inbotJ+z2+LcDAwryCn2EZGuTWqspOmyF+Ub8f/n2HhDe
+ KUl7JU5T8lajKgFMGMcPTMOrAPLwzqwtWl0V2g2nOuqyZ/HzGA8aejFxz/P1+FwzR5RN
+ z685yj94eZQFABkFlykaxpvLvZmKk06wlqcdcPuGMBbKpMHMrFBRAEZfY3FZ5zcB48tk
+ mbfa0ur/6pcMnSMkpPCkA4j45ubbJovVpTUpT2l21L8h2o/u9XVJAYUFdFtL/TSUsfBl
+ PKMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=qO0tw6/4CuHIqVaBgS7s0KxmHhX6bEPZ4Cj7kOvH6NU=;
+ b=B0+hr1jLN/OVZK2jBMyJgbKC5cNkUienBWzF8BuKNR7ufSA+rSDT3GfHVbEFFS4uYz
+ g7inFYeWr0X9fOfOUbuKwtjIHBkhi0ZnB5+hCGvEhdDtd2CX6/AuPTVmNYcKKuHFOJMD
+ HVU5Kfvc0iBl8BBK2Tu0SNX0ip8HWCJTweJaeCpZHrbllt4kiesO2K8Zv8/td008OPXR
+ rl56H+sxnZC//czmn9QyIuj388Wzs1nHQhAPBURx12HFwKpJoDQ8DtR/EAP3BCJO1g5B
+ AXYrAYlDHFPJn0blb6jTiYOOFTqPGdse9KbZ1HYvl/cS4ebREjBWVdR0P9g44DTG2mC9
+ lFyw==
+X-Gm-Message-State: APjAAAX7mbRvFYdBePxzzROvGUjwJ+mQstbD/kbA0Rm0FtbnBHe1Bs9f
+ O0hRTAIDm/7m7DoCZ8/Oib35XA==
+X-Google-Smtp-Source: APXvYqxCSqBb7SU7xa9eMOHXu8+wHPVEoyvssAag/98UtHH6KaQoGhThl+R8IAzr75RTsWQwSMv6TQ==
+X-Received: by 2002:a1c:7a15:: with SMTP id v21mr17329286wmc.176.1561993210932; 
+ Mon, 01 Jul 2019 08:00:10 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id z25sm17874772wmf.38.2019.07.01.08.00.09
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 01 Jul 2019 08:00:10 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id BBC091FF87;
+ Mon,  1 Jul 2019 16:00:08 +0100 (BST)
+References: <20190614171200.21078-1-alex.bennee@linaro.org>
+ <20190614171200.21078-20-alex.bennee@linaro.org>
+ <20190628153044.GB26345@quinoa.localdomain>
+ <87mui1ab4j.fsf@zen.linaroharston>
+ <20190628175756.GC26345@quinoa.localdomain>
+ <87lfxla0vs.fsf@zen.linaroharston> <20190701144009.GA5002@quinoa.localdomain>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Aaron Lindsay OS <aaron@os.amperecomputing.com>
+In-reply-to: <20190701144009.GA5002@quinoa.localdomain>
+Date: Mon, 01 Jul 2019 16:00:08 +0100
+Message-ID: <877e91ssuf.fsf@zen.linaroharston>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Mon, 01 Jul 2019 14:47:38 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 3/4] hw/i386: Factorize PVH related functions
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH v3 19/50] tcg: let plugins instrument
+ memory accesses
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,338 +101,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Sergio Lopez <slp@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Emilio G. Cota" <cota@braap.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Extract PVH related functions from pc.c, and put them in pvh.c, so
-they can be shared with other components.
 
-Signed-off-by: Sergio Lopez <slp@redhat.com>
----
- hw/i386/Makefile.objs |   1 +
- hw/i386/pc.c          | 120 +++++-------------------------------------
- hw/i386/pvh.c         | 113 +++++++++++++++++++++++++++++++++++++++
- hw/i386/pvh.h         |  10 ++++
- 4 files changed, 136 insertions(+), 108 deletions(-)
- create mode 100644 hw/i386/pvh.c
- create mode 100644 hw/i386/pvh.h
+Aaron Lindsay OS <aaron@os.amperecomputing.com> writes:
 
-diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
-index 5d9c9efd5f..c5f20bbd72 100644
---- a/hw/i386/Makefile.objs
-+++ b/hw/i386/Makefile.objs
-@@ -1,5 +1,6 @@
- obj-$(CONFIG_KVM) +=3D kvm/
- obj-y +=3D multiboot.o
-+obj-y +=3D pvh.o
- obj-y +=3D pc.o
- obj-$(CONFIG_I440FX) +=3D pc_piix.o
- obj-$(CONFIG_Q35) +=3D pc_q35.o
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 3983621f1c..325ec2c1c8 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -42,6 +42,7 @@
- #include "hw/loader.h"
- #include "elf.h"
- #include "multiboot.h"
-+#include "pvh.h"
- #include "hw/timer/mc146818rtc.h"
- #include "hw/dma/i8257.h"
- #include "hw/timer/i8254.h"
-@@ -108,9 +109,6 @@ static struct e820_entry *e820_table;
- static unsigned e820_entries;
- struct hpet_fw_config hpet_cfg =3D {.count =3D UINT8_MAX};
-=20
--/* Physical Address of PVH entry point read from kernel ELF NOTE */
--static size_t pvh_start_addr;
--
- GlobalProperty pc_compat_4_0[] =3D {};
- const size_t pc_compat_4_0_len =3D G_N_ELEMENTS(pc_compat_4_0);
-=20
-@@ -1061,109 +1059,6 @@ struct setup_data {
-     uint8_t data[0];
- } __attribute__((packed));
-=20
--
--/*
-- * The entry point into the kernel for PVH boot is different from
-- * the native entry point.  The PVH entry is defined by the x86/HVM
-- * direct boot ABI and is available in an ELFNOTE in the kernel binary.
-- *
-- * This function is passed to load_elf() when it is called from
-- * load_elfboot() which then additionally checks for an ELF Note of
-- * type XEN_ELFNOTE_PHYS32_ENTRY and passes it to this function to
-- * parse the PVH entry address from the ELF Note.
-- *
-- * Due to trickery in elf_opts.h, load_elf() is actually available as
-- * load_elf32() or load_elf64() and this routine needs to be able
-- * to deal with being called as 32 or 64 bit.
-- *
-- * The address of the PVH entry point is saved to the 'pvh_start_addr'
-- * global variable.  (although the entry point is 32-bit, the kernel
-- * binary can be either 32-bit or 64-bit).
-- */
--static uint64_t read_pvh_start_addr(void *arg1, void *arg2, bool is64)
--{
--    size_t *elf_note_data_addr;
--
--    /* Check if ELF Note header passed in is valid */
--    if (arg1 =3D=3D NULL) {
--        return 0;
--    }
--
--    if (is64) {
--        struct elf64_note *nhdr64 =3D (struct elf64_note *)arg1;
--        uint64_t nhdr_size64 =3D sizeof(struct elf64_note);
--        uint64_t phdr_align =3D *(uint64_t *)arg2;
--        uint64_t nhdr_namesz =3D nhdr64->n_namesz;
--
--        elf_note_data_addr =3D
--            ((void *)nhdr64) + nhdr_size64 +
--            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
--    } else {
--        struct elf32_note *nhdr32 =3D (struct elf32_note *)arg1;
--        uint32_t nhdr_size32 =3D sizeof(struct elf32_note);
--        uint32_t phdr_align =3D *(uint32_t *)arg2;
--        uint32_t nhdr_namesz =3D nhdr32->n_namesz;
--
--        elf_note_data_addr =3D
--            ((void *)nhdr32) + nhdr_size32 +
--            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
--    }
--
--    pvh_start_addr =3D *elf_note_data_addr;
--
--    return pvh_start_addr;
--}
--
--static bool load_elfboot(const char *kernel_filename,
--                   int kernel_file_size,
--                   uint8_t *header,
--                   size_t pvh_xen_start_addr,
--                   FWCfgState *fw_cfg)
--{
--    uint32_t flags =3D 0;
--    uint32_t mh_load_addr =3D 0;
--    uint32_t elf_kernel_size =3D 0;
--    uint64_t elf_entry;
--    uint64_t elf_low, elf_high;
--    int kernel_size;
--
--    if (ldl_p(header) !=3D 0x464c457f) {
--        return false; /* no elfboot */
--    }
--
--    bool elf_is64 =3D header[EI_CLASS] =3D=3D ELFCLASS64;
--    flags =3D elf_is64 ?
--        ((Elf64_Ehdr *)header)->e_flags : ((Elf32_Ehdr *)header)->e_flag=
-s;
--
--    if (flags & 0x00010004) { /* LOAD_ELF_HEADER_HAS_ADDR */
--        error_report("elfboot unsupported flags =3D %x", flags);
--        exit(1);
--    }
--
--    uint64_t elf_note_type =3D XEN_ELFNOTE_PHYS32_ENTRY;
--    kernel_size =3D load_elf(kernel_filename, read_pvh_start_addr,
--                           NULL, &elf_note_type, &elf_entry,
--                           &elf_low, &elf_high, 0, I386_ELF_MACHINE,
--                           0, 0);
--
--    if (kernel_size < 0) {
--        error_report("Error while loading elf kernel");
--        exit(1);
--    }
--    mh_load_addr =3D elf_low;
--    elf_kernel_size =3D elf_high - elf_low;
--
--    if (pvh_start_addr =3D=3D 0) {
--        error_report("Error loading uncompressed kernel without PVH ELF =
-Note");
--        exit(1);
--    }
--    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_start_addr);
--    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
--    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
--
--    return true;
--}
--
- static void load_linux(PCMachineState *pcms,
-                        FWCfgState *fw_cfg)
- {
-@@ -1203,6 +1098,9 @@ static void load_linux(PCMachineState *pcms,
-     if (ldl_p(header+0x202) =3D=3D 0x53726448) {
-         protocol =3D lduw_p(header+0x206);
-     } else {
-+        size_t pvh_start_addr;
-+        uint32_t mh_load_addr =3D 0;
-+        uint32_t elf_kernel_size =3D 0;
-         /*
-          * This could be a multiboot kernel. If it is, let's stop treati=
-ng it
-          * like a Linux kernel.
-@@ -1220,10 +1118,16 @@ static void load_linux(PCMachineState *pcms,
-          * If load_elfboot() is successful, populate the fw_cfg info.
-          */
-         if (pcmc->pvh_enabled &&
--            load_elfboot(kernel_filename, kernel_size,
--                         header, pvh_start_addr, fw_cfg)) {
-+            pvh_load_elfboot(kernel_filename,
-+                             &mh_load_addr, &elf_kernel_size)) {
-             fclose(f);
-=20
-+            pvh_start_addr =3D pvh_get_start_addr();
-+
-+            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_start_addr);
-+            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
-+            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
-+
-             fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE,
-                 strlen(kernel_cmdline) + 1);
-             fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA, kernel_cmdlin=
-e);
-diff --git a/hw/i386/pvh.c b/hw/i386/pvh.c
-new file mode 100644
-index 0000000000..61623b4533
---- /dev/null
-+++ b/hw/i386/pvh.c
-@@ -0,0 +1,113 @@
-+/*
-+ * PVH Boot Helper
-+ *
-+ * Copyright (C) 2019 Oracle
-+ * Copyright (C) 2019 Red Hat, Inc
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/units.h"
-+#include "qemu/error-report.h"
-+#include "hw/loader.h"
-+#include "cpu.h"
-+#include "elf.h"
-+#include "pvh.h"
-+
-+static size_t pvh_start_addr =3D 0;
-+
-+size_t pvh_get_start_addr(void)
-+{
-+    return pvh_start_addr;
-+}
-+
-+/*
-+ * The entry point into the kernel for PVH boot is different from
-+ * the native entry point.  The PVH entry is defined by the x86/HVM
-+ * direct boot ABI and is available in an ELFNOTE in the kernel binary.
-+ *
-+ * This function is passed to load_elf() when it is called from
-+ * load_elfboot() which then additionally checks for an ELF Note of
-+ * type XEN_ELFNOTE_PHYS32_ENTRY and passes it to this function to
-+ * parse the PVH entry address from the ELF Note.
-+ *
-+ * Due to trickery in elf_opts.h, load_elf() is actually available as
-+ * load_elf32() or load_elf64() and this routine needs to be able
-+ * to deal with being called as 32 or 64 bit.
-+ *
-+ * The address of the PVH entry point is saved to the 'pvh_start_addr'
-+ * global variable.  (although the entry point is 32-bit, the kernel
-+ * binary can be either 32-bit or 64-bit).
-+ */
-+
-+static uint64_t read_pvh_start_addr(void *arg1, void *arg2, bool is64)
-+{
-+    size_t *elf_note_data_addr;
-+
-+    /* Check if ELF Note header passed in is valid */
-+    if (arg1 =3D=3D NULL) {
-+        return 0;
-+    }
-+
-+    if (is64) {
-+        struct elf64_note *nhdr64 =3D (struct elf64_note *)arg1;
-+        uint64_t nhdr_size64 =3D sizeof(struct elf64_note);
-+        uint64_t phdr_align =3D *(uint64_t *)arg2;
-+        uint64_t nhdr_namesz =3D nhdr64->n_namesz;
-+
-+        elf_note_data_addr =3D
-+            ((void *)nhdr64) + nhdr_size64 +
-+            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
-+    } else {
-+        struct elf32_note *nhdr32 =3D (struct elf32_note *)arg1;
-+        uint32_t nhdr_size32 =3D sizeof(struct elf32_note);
-+        uint32_t phdr_align =3D *(uint32_t *)arg2;
-+        uint32_t nhdr_namesz =3D nhdr32->n_namesz;
-+
-+        elf_note_data_addr =3D
-+            ((void *)nhdr32) + nhdr_size32 +
-+            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
-+    }
-+
-+    pvh_start_addr =3D *elf_note_data_addr;
-+
-+    return pvh_start_addr;
-+}
-+
-+bool pvh_load_elfboot(const char *kernel_filename,
-+                      uint32_t *mh_load_addr,
-+                      uint32_t *elf_kernel_size)
-+{
-+    uint64_t elf_entry;
-+    uint64_t elf_low, elf_high;
-+    int kernel_size;
-+    uint64_t elf_note_type =3D XEN_ELFNOTE_PHYS32_ENTRY;
-+
-+    kernel_size =3D load_elf(kernel_filename, read_pvh_start_addr,
-+                           NULL, &elf_note_type, &elf_entry,
-+                           &elf_low, &elf_high, 0, I386_ELF_MACHINE,
-+                           0, 0);
-+
-+    if (kernel_size < 0) {
-+        error_report("Error while loading elf kernel");
-+        return false;
-+    }
-+
-+    if (pvh_start_addr =3D=3D 0) {
-+        error_report("Error loading uncompressed kernel without PVH ELF =
-Note");
-+        return false;
-+    }
-+
-+    if (mh_load_addr) {
-+        *mh_load_addr =3D elf_low;
-+    }
-+
-+    if (elf_kernel_size) {
-+        *elf_kernel_size =3D elf_high - elf_low;
-+    }
-+
-+    return true;
-+}
-diff --git a/hw/i386/pvh.h b/hw/i386/pvh.h
-new file mode 100644
-index 0000000000..ada67ff6e8
---- /dev/null
-+++ b/hw/i386/pvh.h
-@@ -0,0 +1,10 @@
-+#ifndef HW_I386_PVH_H
-+#define HW_I386_PVH_H
-+
-+size_t pvh_get_start_addr(void);
-+
-+bool pvh_load_elfboot(const char *kernel_filename,
-+                      uint32_t *mh_load_addr,
-+                      uint32_t *elf_kernel_size);
-+
-+#endif
---=20
-2.21.0
+> On Jun 28 21:52, Alex Benn=C3=A9e wrote:
+>> Aaron Lindsay OS <aaron@os.amperecomputing.com> writes:
+>> > To make sure I understand - you're implying that one such query will
+>> > return the PA from the guest's perspective, right?
+>>
+>> Yes - although it will be two queries:
+>>
+>>   struct qemu_plugin_hwaddr *hw =3D qemu_plugin_get_hwaddr(info, vaddr);
+>>
+>> This does the actual lookup and stores enough information for the
+>> further queries.
+>>
+>>   uint64_t pa =3D qemu_plugin_hwaddr_to_raddr(hw);
+>>
+>> will return the physical address (assuming it's a RAM reference and not
+>> some IO location).
+>
+> Sounds good, as long as we have a good way to either prevent or cleanly
+> detect the failure mode for the IO accesses.
+>
+>> > In terms of our use case - we use QEMU to drive studies to help us
+>> > design the next generation of processors. As you can imagine, having t=
+he
+>> > right physical addresses is important for some aspects of that. We're
+>> > currently using a version of Pavel Dovgalyuk's earlier plugin patchset
+>> > with some of our own patches/fixes on top, but it would obviously make
+>> > our lives easier to work together to get this sort of infrastructure
+>> > upstream!
+>>
+>> Was this:
+>>
+>>  Date: Tue, 05 Jun 2018 13:39:15 +0300
+>>  Message-ID: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkP=
+ad-T60>
+>>  Subject: [Qemu-devel] [RFC PATCH v2 0/7] QEMU binary instrumentation pr=
+ototype
+>
+> Yes, that looks like the one.
+>
+>> What patches did you add on top?
+>
+> We added:
+> - plugin support for linux-user mode (I sent that one upstream, I think)
+> - memory tracing support and a VA->PA conversion helper
 
+check
+
+> - a way for a plugin to request getting a callback just before QEMU
+>   exits to clean up any internal state
+
+check - qemu_plugin_register_atexit_cb
+
+> - a way for a plugin to reset any instrumentation decisions made in the
+>   past (essentially calls `tb_flush(cpu);` under the covers). We found
+>   this critical for plugins which undergo state changes during the
+>   course of their execution (i.e. watch for event X, then go into a more
+>   detailed profiling mode until you see event Y)
+
+check:
+
+/**
+ * qemu_plugin_reset() - Reset a plugin
+ * @id: this plugin's opaque ID
+ * @cb: callback to be called once the plugin has been reset
+ *
+ * Unregisters all callbacks for the plugin given by @id.
+ *
+ * Do NOT assume that the plugin has been reset once this function returns.
+ * Plugins are reset asynchronously, and therefore the given plugin receives
+ * callbacks until @cb is called.
+ */
+void qemu_plugin_reset(qemu_plugin_id_t id, qemu_plugin_simple_cb_t cb);
+
+
+> - instrumentation at the TB granularity (in addition to the existing
+>   instruction-level support)
+
+check
+
+/**
+ * qemu_plugin_register_vcpu_tb_trans_cb() - register a translate cb
+ * @id: plugin ID
+ * @cb: callback function
+ *
+ * The @cb function is called every time a translation occurs. The @cb
+ * function is passed an opaque qemu_plugin_type which it can query
+ * for additional information including the list of translated
+ * instructions. At this point the plugin can register further
+ * callbacks to be triggered when the block or individual instruction
+ * executes.
+ */
+
+and then you can have instruction or TB level callbacks:
+
+/**
+ * qemu_plugin_register_vcpu_tb_trans_exec_cb() - register execution callba=
+ck
+ * @tb: the opaque qemu_plugin_tb handle for the translation
+ * @cb: callback function
+ * @flags: does the plugin read or write the CPU's registers?
+ * @userdata: any plugin data to pass to the @cb?
+ *
+ * The @cb function is called every time a translated unit executes.
+ */
+void qemu_plugin_register_vcpu_tb_exec_cb(struct qemu_plugin_tb *tb,
+                                          qemu_plugin_vcpu_udata_cb_t cb,
+                                          enum qemu_plugin_cb_flags flags,
+                                          void *userdata);
+
+Or the inline equivalent.
+
+
+> - the ability for a plugin to trigger a checkpoint to be taken
+
+We don't have this at the moment. Pranith also mentioned it in his
+review comments. I can see its use but I suspect it won't make the
+initial implementation given the broader requirements of QEMU to do
+checkpointing and how to cleanly expose that to plugins.
+
+>
+> -Aaron
+
+
+--
+Alex Benn=C3=A9e
 
