@@ -2,79 +2,67 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2397C5B578
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 21:38:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C5D2C5B578
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 21:38:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8EB7208C4
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 21:38:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Lf3toSQ5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8EB7208C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 20C7220B7C
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 21:38:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20C7220B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhyjT-0001FN-Uo
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 12:00:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51795)
+	id 1hi2zA-0003UK-B1
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 16:33:12 -0400
+Received: from [2001:470:142:3::10] (port=54052 helo=eggs.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hhyi3-0000Db-35
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 11:59:16 -0400
+ (envelope-from <crosa@redhat.com>) id 1hi2wy-0002bk-3L
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:31:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hhyhz-0005sz-RG
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 11:59:13 -0400
-Received: from mail-oi1-f176.google.com ([209.85.167.176]:45666)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hhyhz-0005s6-ME
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 11:59:11 -0400
-Received: by mail-oi1-f176.google.com with SMTP id m206so10354328oib.12
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 08:59:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=hOfILo+Out7yLuZlBq8jtp74qr2lfEuGoO95HYEcZ3M=;
- b=Lf3toSQ5pQrGNKF7WtUq0ZCNA9v96O/wvcYq3wZht60mJDFgt5Ef2h06RmqfD4f7HA
- SJH97xP2tSeNZvI9JHSoGy9B4wJd/kU8aaxe34FH6rP+LcrzofRlOm1p2xZ/atIm2M5Q
- UCv959hapspQTPBy5RoaXDScMg/u8cp5ip63ZVttE1aekUa73C6VoQVlS+P28M+8DANZ
- dh7nZRut5Ms/JSMMhRHSVMRFY6aD0kBmTrkKnjdViWrAGYmixIzKvjyNaaA/sbyxqWru
- B8KNSUlruE71Qrsfw7k+cJFyQK+GwgYPGXKC0EWabilrPj25QaIWTIkWRmaF94m5PzEF
- GZJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=hOfILo+Out7yLuZlBq8jtp74qr2lfEuGoO95HYEcZ3M=;
- b=FTKz0EElzicCWndpOohE5TJH0ODeYDwacPTsBxlgzxGlKjuQno81/0L1ivmdPHGPZr
- 4jEQgpxgm3G6A1Y3Z7s7TLvn9iWyj2EKsZRlm5ibARyIcTLLXR6cqxtiu+Mknhd5vpdw
- IuXo46hFARU60PLeFsvWzt5UTtxMFJ84e8Zw5qJds7chTkmSUJfoiQpCoy9xzGyYuVxb
- IYLvneGqmHiG525iUjdc27v8WR9NHhNuyWJRRwW20aO2BwXXwoqh/PgxgSQgNMyw59Zj
- iir5FhV15dFwznVM+4LxYYiXJ8s2V3bhqxI+eXhO2hKRPEyRJe4XD8bnZ5BRTfTduyB0
- bFdQ==
-X-Gm-Message-State: APjAAAW/WhOt2z5oB9SmkNJiWdDvjps/5hzAGUtmbzG7gDb0R7mIxce7
- v6dV7BtsdCYDP5Bn5oPvu05QPGSUCznlm1AnQb6AyA==
-X-Google-Smtp-Source: APXvYqxDIdq4ObNK9uKLZnXucR/PPntJ5SeV46d1qyBXM5rGvOBE9WeiPGz2xpbxhONfy0yo3j5vyFjZ4dxq0ml1Lmk=
-X-Received: by 2002:a05:6808:8c2:: with SMTP id k2mr15479oij.98.1561996750800; 
- Mon, 01 Jul 2019 08:59:10 -0700 (PDT)
+ (envelope-from <crosa@redhat.com>) id 1hi2wf-00022Q-Mg
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:30:47 -0400
+Received: from [209.132.183.28] (port=37542 helo=mx1.redhat.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1hi2wf-0001y2-GW
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:30:37 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6D8E85D5E6
+ for <qemu-devel@nongnu.org>; Mon,  1 Jul 2019 20:30:11 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-124-195.rdu2.redhat.com
+ [10.10.124.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A5F984250;
+ Mon,  1 Jul 2019 20:29:46 +0000 (UTC)
+Date: Mon, 1 Jul 2019 16:29:44 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190701202910.GA26789@localhost.localdomain>
+References: <20190628150217.32659-1-wainersm@redhat.com>
+ <20190628150217.32659-4-wainersm@redhat.com>
+ <20190628201846.GK1862@habkost.net>
+ <20190630173933.GB2820@localhost.localdomain>
+ <20190701183451.GF5198@habkost.net>
 MIME-Version: 1.0
-References: <20190626121139.19114-1-laurent@vivier.eu>
-In-Reply-To: <20190626121139.19114-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 1 Jul 2019 16:59:00 +0100
-Message-ID: <CAFEAcA8C5ZW6yCsNFXGwvDTjn2+2gXGt_ADK3wkKhEpE56xKYQ@mail.gmail.com>
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190701183451.GF5198@habkost.net>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.39]); Mon, 01 Jul 2019 20:30:18 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.167.176
-Subject: Re: [Qemu-devel] [PULL 0/6] Linux user for 4.1 patches
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 3/3] tests/acceptance: Add boot linux with
+ kvm test
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,37 +74,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: philmd@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 26 Jun 2019 at 13:18, Laurent Vivier <laurent@vivier.eu> wrote:
+On Mon, Jul 01, 2019 at 03:34:51PM -0300, Eduardo Habkost wrote:
+> 
+> Agreed that kvm:tcg fallback I suggested isn't a good idea.
+> However, do we really want to require a separate test method to
+> be written just because we want to use a different accelerator or
+> other QEMU option?
 >
-> The following changes since commit 474f3938d79ab36b9231c9ad3b5a9314c2aeacde:
->
->   Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-jun-21-2019' into staging (2019-06-21 15:40:50 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/vivier/qemu.git tags/linux-user-for-4.1-pull-request
->
-> for you to fetch changes up to b50d1e42a4a7dc746ecd42c34c386d81a997759c:
->
->   linux-user: set default PPC64 CPU (2019-06-24 23:10:36 +0200)
->
-> ----------------------------------------------------------------
-> Update ppc64 feature and default CPU
-> next setsockops() options
-> Improve "-L" option
-> Another fix for 5.2-rc1 headers
->
-> ----------------------------------------------------------------
 
-Applied, thanks.
+No, in the short term we want to have tests that can respond to a
+number of well known parameters, such as "accel".  But to actually
+have tests (names) that are meaningful enough, we need to:
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
+ 1) Add a varianter implementation (or usage)
+ 2) Drop the duplicate tests
 
--- PMM
+#1 is needed because:
+
+ a) it doesn't feel right to name tests based on simple command
+    line parameters (the ones given with -p, say, "-p accel=kvm"
+    will add to the test name "accel_kvm".
+
+ b) a variant *name* is added to the test ID, which then can be
+    kept consistent.
+
+Then we can proceed to #2, and drop the duplicate tests, say:
+
+ - test_x86_64_pc, test_x86_64_pc_kvm => test_x86_64_pc
+
+On a further iteration, it may even make sense to consolidate:
+
+ - test_x86_64_pc, test_x86_64_q35 => test_x86_64
+
+Time will tell.
+
+> This patch may be the simplest solution short term, but can we
+> have something that doesn't require so much code duplication and
+> boilerplate code in the future?
+
+Yes, the new implementation of the Varianter CIT is now generally
+available on Avocado 70.0, so I'm working on a file that hopefully
+will suite the acceptance tests.
+
+> 
+> -- 
+> Eduardo
+
+Best,
+- Cleber.
 
