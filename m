@@ -2,89 +2,89 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23C41C5B578
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 03:58:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90A4BC5B578
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 04:24:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2D5A20881
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 03:58:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5EC4E206A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 04:24:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="grS2NQte"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2D5A20881
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gr76AMl1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EC4E206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhnSU-0006zN-Tb
-	for qemu-devel@archiver.kernel.org; Sun, 30 Jun 2019 23:58:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52095)
+	id 1hhnrk-0002cd-J9
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 00:24:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55251)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hhnRH-0006S1-SV
- for qemu-devel@nongnu.org; Sun, 30 Jun 2019 23:57:13 -0400
+ (envelope-from <sjitindarsingh@gmail.com>) id 1hhnqo-0001qV-Tw
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 00:23:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hhnRF-0000V8-TO
- for qemu-devel@nongnu.org; Sun, 30 Jun 2019 23:57:11 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:46014)
+ (envelope-from <sjitindarsingh@gmail.com>) id 1hhnqn-0006rs-Pv
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 00:23:34 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:33466)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1hhnRD-0000TD-Uq
- for qemu-devel@nongnu.org; Sun, 30 Jun 2019 23:57:09 -0400
-Received: by mail-ot1-x344.google.com with SMTP id x21so12014216otq.12
- for <qemu-devel@nongnu.org>; Sun, 30 Jun 2019 20:57:07 -0700 (PDT)
+ (Exim 4.71) (envelope-from <sjitindarsingh@gmail.com>)
+ id 1hhnqi-0006oK-Ug; Mon, 01 Jul 2019 00:23:29 -0400
+Received: by mail-pf1-x444.google.com with SMTP id x15so5884684pfq.0;
+ Sun, 30 Jun 2019 21:23:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=dkfQeiXDLXUYX17x2rDqaUzaQBqjEjkxW7FN8vv7u9g=;
- b=grS2NQteYtXl3S1f/KFyr35z1O4CFvH76bb4fAMj2uXa3D/cUHqsxiFgzSO9gcJ3If
- 6EDMPo0mZdcMoosL+Bnc7I0+DZdTzUBnm78tbiN7uXaRk8Cua6ww91aMRW9WIR6dBGrf
- Ct8Wldxc5vn4++w/rwRLOyyajnpY08Be8DBBEtHtIyidJoxBZO/W+YDTgjPr/qk/uTq7
- Lw+U7XOTDdY9rMnkjvWBR2MGMyyONLjwZzlqP2qy5qa5Jd/X3Y6qY+WJQmEi5VFg3v5D
- 6AYHfYozHDseJ76vyn4n0sPcrzGrisUNzN5BxbRmcAWBB39sp5VtB9Pcrmy0t+zbsyYJ
- U99Q==
+ h=message-id:subject:from:to:cc:date:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=O91hD0CTKKdfv92y1KQoXhH2x/V2Gz3Rr3hVJ5Kk0LE=;
+ b=Gr76AMl1bwp7PzYhfOC86kiC5zXCBdwB+uM9g44WfugZI90sqY1ROcvLndtJoYXdMh
+ uVt1xoxjEYebznDjwNEW9voFIlDd+Qi2FqfXuKyk2fFWwJrweaVgTvE7bDZbynnyKLWU
+ CvSW2uMM3xWx4DIJ2PoTl0v69Tr/O5yLV/25T54czMqFS86sKYme2JHDaS8JNWA81DcC
+ DczXxIFj47rYht0nkHAfz1guwOuYTGIlGEZ34b/IBFANrkP2PlxGfVioNXqxsOILAlxQ
+ eh/LuP1VBXFO6G1RjaaVFXqPvfTyPbBJa9arI1h4hbTwOmc0pqTABLZsyXPSHR4y3UgK
+ 4vuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=dkfQeiXDLXUYX17x2rDqaUzaQBqjEjkxW7FN8vv7u9g=;
- b=qQ4Q8iv8FFLfag1CZ+85BdScZfv5vZHJ6zhOmvoV8BYfpTz7UHvxFy/512kgpkTwPD
- 4Go0qmx/jsXgOV3X74iKhiNuX9mFExoPSrvnUShLQOux2SMAK7mmpR9Z21BIXLfoVXzn
- vpMk+XJPnTu0ocyIkAhtSUVuMAvImaZ1zVj/CBeK56en+OmXAXcgisZLqM3c7c2We/Zw
- 3XzjH2Qcg5aSbIJWBXnAWhXjSXjdWJ2P/Grtag2FJbVY3U+93w2DWkqe0SBl4PSxzu6w
- 2w5wFlQrCRpFM76BglK4hmi3ki93YcfcTPS2ALCUx5N3+ccoqpTdyKrkUjjKO4X8twPW
- +RQQ==
-X-Gm-Message-State: APjAAAUiCFq8twchEXsAOtDkwpFnvtnVCpqEK/sodeECdjIKQQbJtS8f
- DTQFP4eKRQRjGopTvaybzLzwfaTkx4iwWzEezDCKiA==
-X-Google-Smtp-Source: APXvYqzL6r+EzEDFPxxKmhUjWSQWWRO02TlBNaPInGROyXYEcAMJsWF3vyqatbAZwFXW6eKdLw8hQv7/05QsL/pTu5M=
-X-Received: by 2002:a05:6830:c6:: with SMTP id
- x6mr17643890oto.64.1561953425932; 
- Sun, 30 Jun 2019 20:57:05 -0700 (PDT)
-MIME-Version: 1.0
-Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP; Sun, 30 Jun 2019 20:57:05
- -0700 (PDT)
-Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP; Sun, 30 Jun 2019 20:57:05
- -0700 (PDT)
-In-Reply-To: <b376dc86-6879-2a72-3261-7fdf06172456@linaro.org>
-References: <20190629130017.2973-1-richard.henderson@linaro.org>
- <20190629130017.2973-16-richard.henderson@linaro.org>
- <CAL1e-=ghMjUtEyqKX+s15RcyQp6uQO_hJ_u4RTSJ5ZyPvFnymw@mail.gmail.com>
- <b376dc86-6879-2a72-3261-7fdf06172456@linaro.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 1 Jul 2019 05:57:05 +0200
-Message-ID: <CAL1e-=hS_nQQYY39j-mx1QBFw+Xe3V5NgFW7ifrkMZRxFbB=OA@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
+ h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=O91hD0CTKKdfv92y1KQoXhH2x/V2Gz3Rr3hVJ5Kk0LE=;
+ b=b3yKBH5wIe5O0zy915Q2zcy+0IAakaTM+gWVnuu6jYJrCv6vv8fLYL9bqNrkKmHmBT
+ Ozeem54Y05OoyFQMrYvz6wwAatZLoyEnlq3xuVMExvJBaujDIcy0NLvqkhzfPijcWGwy
+ 1MAOgiG2JuDvkBe80Y3kMWTw7Ska0ZutumkHlmJ173OnpEUz0IrJOJKYw7JbXnUCQDJ2
+ X+YfoihQtSN5u5lkrFJDcbzRRzvWVnYzoY6vTnbC9I2wO3XlXEyT1Pr6HWggsr+wG/2y
+ PJDspg8LFo1p8dHIACMsRhfekF2Qsq0fQKoaUwFAdJWfSh7betZyqdYgUecWaHBIwKwq
+ L9pw==
+X-Gm-Message-State: APjAAAW2H/XgzD+M3USx4EvvgdyPqTnSMMXWTP1pDCU8FRe8OVxL5VVR
+ q6teU4eryCORdsKK/K5GMeJCXNvr
+X-Google-Smtp-Source: APXvYqwsxDcCDH68NlqOGgXdz+ajxwwqa6RiaXF1aP60B5MqCKvW36fJeBurFYOvvrqM1PQXw2QuTA==
+X-Received: by 2002:a17:90a:730b:: with SMTP id
+ m11mr28306987pjk.89.1561955006272; 
+ Sun, 30 Jun 2019 21:23:26 -0700 (PDT)
+Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
+ by smtp.googlemail.com with ESMTPSA id r27sm17658930pgn.25.2019.06.30.21.23.24
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Sun, 30 Jun 2019 21:23:25 -0700 (PDT)
+Message-ID: <1561955001.10832.2.camel@gmail.com>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Mon, 01 Jul 2019 14:23:21 +1000
+In-Reply-To: <20190628092952.GB29462@umbus.fritz.box>
+References: <20190624055812.3906-1-sjitindarsingh@gmail.com>
+ <20190628092952.GB29462@umbus.fritz.box>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.24.6 (3.24.6-1.fc26) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v6 15/16] tcg/ppc: Update vector support to
- v2.07
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH 1/2] ppc/spapr: Add
+ implementation of hcall H_PURR
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,41 +96,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
- amarkovic@wavecomp.com, hsp.cat7@gmail.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Jun 30, 2019 5:12 PM, "Richard Henderson" <richard.henderson@linaro.org>
-wrote:
->
-> On 6/30/19 3:37 PM, Aleksandar Markovic wrote:
-> >>  bool have_isa_2_06;
-> >>  bool have_isa_2_06_vsx;
-> >> +bool have_isa_2_07_vsx;
-> >
-> > Does this flag indicate support for PowerISA 2.07 or VSX?
->
-> VSX & 2.07,
->
-> >> +    if (hwcap2 & PPC_FEATURE2_ARCH_2_07) {
-> >> +        if (hwcap & PPC_FEATURE_HAS_VSX) {
-> >> +            have_isa_2_07_vsx = true;
-> >> +        }
-> >> +    }
->
-> Like so.
->
-> While it would have been possible to have one single have_isa_vsx, we
-would
-> then also have to check a second flag to see which revision.  Therefore I
-> created these composite flags so that we only have to check one.
->
+On Fri, 2019-06-28 at 19:29 +1000, David Gibson wrote:
+> On Mon, Jun 24, 2019 at 03:58:11PM +1000, Suraj Jitindar Singh wrote:
+> > The hcall H_PURR is used by a guest to read the PURR (processor
+> > utilisation of resources register). A guest expects that this
+> > register
+> > will count at a rate of timebase scaled by the number of guest
+> > vcpus
+> > present in the vcore. That is the per vcpu purr will count at a
+> > rate of
+> > timebase / # vcpus per vcore.
+> > 
+> > Implement a handler for the H_PURR hcall and return the purr value
+> > divided by smp_threads so that the sum of the purr deltas across
+> > the
+> > vcpus of a vcore equals the timebase delta
+> > 
+> > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> 
+> Does this need something new advertised in the hypertas DT entry?
 
-Yes, but, in this patch, for example, among other things, the support for
-doubleword integer max/min vector operation is implemented. Why is the
-existence of that support dependant on VSX (PPC_FEATURE_HAS_VSX)?
+Hi David,
 
->
-> r~
+There doesn't seem to be a concensus on what the return value from the
+H_PURR hcall should be, whether it just returns the hardware value or
+does some adjusting of the value based on guest smt mode as I've
+implemented in the patch below.
+
+As such please drop this patch series.
+
+The guest can just read the purr register directly anyway and then
+interpret the values as it pleases.
+
+Kind Regards,
+Suraj
+
+> 
+> > ---
+> >  hw/ppc/spapr_hcall.c | 24 ++++++++++++++++++++++++
+> >  1 file changed, 24 insertions(+)
+> > 
+> > diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> > index aae9fd2b3e..88b3343f04 100644
+> > --- a/hw/ppc/spapr_hcall.c
+> > +++ b/hw/ppc/spapr_hcall.c
+> > @@ -1819,6 +1819,27 @@ static target_ulong h_update_dt(PowerPCCPU
+> > *cpu, SpaprMachineState *spapr,
+> >      return H_SUCCESS;
+> >  }
+> >  
+> > +static target_ulong h_purr(PowerPCCPU *cpu, SpaprMachineState
+> > *spapr,
+> > +                           target_ulong opcode, target_ulong
+> > *args)
+> > +{
+> > +    CPUPPCState *env = &cpu->env;
+> > +    target_ulong purr;
+> > +
+> > +    if (kvm_enabled()) {
+> > +        cpu_synchronize_state(CPU(cpu));
+> > +        /*
+> > +         * Divide by smp_threads so that the sum of the purr
+> > deltas across the
+> > +         * vcpus of a vcore equal the timebase delta.
+> > +         */
+> > +        purr = env->spr[SPR_PURR] / smp_threads;
+> > +    } else {
+> > +        purr = cpu_ppc_load_purr(env);
+> > +    }
+> > +    args[0] = purr;
+> > +
+> > +    return H_SUCCESS;
+> > +}
+> > +
+> >  static spapr_hcall_fn papr_hypercall_table[(MAX_HCALL_OPCODE / 4)
+> > + 1];
+> >  static spapr_hcall_fn kvmppc_hypercall_table[KVMPPC_HCALL_MAX -
+> > KVMPPC_HCALL_BASE + 1];
+> >  
+> > @@ -1915,6 +1936,9 @@ static void hypercall_register_types(void)
+> >      spapr_register_hypercall(H_LOGICAL_DCBF, h_logical_dcbf);
+> >      spapr_register_hypercall(KVMPPC_H_LOGICAL_MEMOP,
+> > h_logical_memop);
+> >  
+> > +    /* hcall-purr */
+> > +    spapr_register_hypercall(H_PURR, h_purr);
+> > +
+> >      /* qemu/KVM-PPC specific hcalls */
+> >      spapr_register_hypercall(KVMPPC_H_RTAS, h_rtas);
+> >  
+> 
+> 
+
