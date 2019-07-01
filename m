@@ -2,64 +2,73 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83195C5B578
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 22:46:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BB5BC5B578
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 22:53:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FE3721479
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 22:46:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FE3721479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 177092146F
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 22:53:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 177092146F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi54M-00008Q-Gx
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 18:46:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56648)
+	id 1hi5Ac-0002CB-TQ
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 18:53:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60445)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hi3Xq-0008MF-9U
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:09:03 -0400
+ (envelope-from <bounces@canonical.com>) id 1hi3bD-0003Cp-OX
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:12:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hi3Xo-0006c5-JH
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:09:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34346)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hi3Xe-0006WZ-Av; Mon, 01 Jul 2019 17:08:52 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 086832D1CE;
- Mon,  1 Jul 2019 20:13:42 +0000 (UTC)
-Received: from probe.bos.redhat.com (dhcp-17-215.bos.redhat.com [10.18.17.215])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C43EA7A4B8;
- Mon,  1 Jul 2019 20:13:39 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-block@nongnu.org,
-	qemu-devel@nongnu.org
-Date: Mon,  1 Jul 2019 16:13:29 -0400
-Message-Id: <20190701201330.29718-3-jsnow@redhat.com>
-In-Reply-To: <20190701201330.29718-1-jsnow@redhat.com>
-References: <20190701201330.29718-1-jsnow@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1hi3b9-0000N6-AK
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:12:29 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33442)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hi3b8-0000Ih-B8
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:12:27 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hi2i9-0005R5-DJ
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 20:15:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 5E2022E80CC
+ for <qemu-devel@nongnu.org>; Mon,  1 Jul 2019 20:15:37 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Mon, 01 Jul 2019 20:13:47 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Mon, 01 Jul 2019 20:09:07 -0000
+From: Laurent Vivier <Laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: ppc
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ddosolitary laurent-vivier
+X-Launchpad-Bug-Reporter: DDoSolitary (ddosolitary)
+X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
+References: <156171334969.18290.6262209650807716029.malonedeb@gac.canonical.com>
+Message-Id: <156201174732.2370.11305258006914936444.malone@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18991";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 8c9051a43558ceff6962d1ce86bf6a8abc6d0d79
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 2/3] qapi: implement
- block-dirty-bitmap-remove transaction action
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1834613] Re: Crypto related operations failing on
+ Alpine Linux on QEMU 4.0
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -68,289 +77,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1834613 <1834613@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It is used to do transactional movement of the bitmap (which is
-possible in conjunction with merge command). Transactional bitmap
-movement is needed in scenarios with external snapshot, when we don't
-want to leave copy of the bitmap in the base image.
+Fix for that is already included in git master:
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- qapi/transaction.json          |  2 +
- include/block/dirty-bitmap.h   |  3 +-
- block.c                        |  2 +-
- block/dirty-bitmap.c           | 16 +++----
- blockdev.c                     | 79 +++++++++++++++++++++++++++++++---
- migration/block-dirty-bitmap.c |  2 +-
- 6 files changed, 87 insertions(+), 17 deletions(-)
+2a1224359008 target/ppc: Fix lxvw4x, lxvh8x and lxvb16x
 
-diff --git a/qapi/transaction.json b/qapi/transaction.json
-index 95edb78227..da95b804aa 100644
---- a/qapi/transaction.json
-+++ b/qapi/transaction.json
-@@ -45,6 +45,7 @@
- #
- # - @abort: since 1.6
- # - @block-dirty-bitmap-add: since 2.5
-+# - @block-dirty-bitmap-remove: since 4.1
- # - @block-dirty-bitmap-clear: since 2.5
- # - @block-dirty-bitmap-enable: since 4.0
- # - @block-dirty-bitmap-disable: since 4.0
-@@ -61,6 +62,7 @@
-   'data': {
-        'abort': 'Abort',
-        'block-dirty-bitmap-add': 'BlockDirtyBitmapAdd',
-+       'block-dirty-bitmap-remove': 'BlockDirtyBitmap',
-        'block-dirty-bitmap-clear': 'BlockDirtyBitmap',
-        'block-dirty-bitmap-enable': 'BlockDirtyBitmap',
-        'block-dirty-bitmap-disable': 'BlockDirtyBitmap',
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 62682eb865..aa2737f41e 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -83,7 +83,8 @@ void bdrv_dirty_bitmap_set_inconsistent(BdrvDirtyBitmap=
- *bitmap);
- void bdrv_dirty_bitmap_set_busy(BdrvDirtyBitmap *bitmap, bool busy);
- void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitma=
-p *src,
-                              HBitmap **backup, Error **errp);
--void bdrv_dirty_bitmap_set_migration(BdrvDirtyBitmap *bitmap, bool migra=
-tion);
-+void bdrv_dirty_bitmap_squelch_persistence(BdrvDirtyBitmap *bitmap,
-+                                           bool squelch);
-=20
- /* Functions that require manual locking.  */
- void bdrv_dirty_bitmap_lock(BdrvDirtyBitmap *bitmap);
-diff --git a/block.c b/block.c
-index c139540f2b..b934c522eb 100644
---- a/block.c
-+++ b/block.c
-@@ -5316,7 +5316,7 @@ static void coroutine_fn bdrv_co_invalidate_cache(B=
-lockDriverState *bs,
-     for (bm =3D bdrv_dirty_bitmap_next(bs, NULL); bm;
-          bm =3D bdrv_dirty_bitmap_next(bs, bm))
-     {
--        bdrv_dirty_bitmap_set_migration(bm, false);
-+        bdrv_dirty_bitmap_squelch_persistence(bm, false);
-     }
-=20
-     ret =3D refresh_total_sectors(bs, bs->total_sectors);
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 95a9c2a5d8..8551f8219e 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -48,10 +48,9 @@ struct BdrvDirtyBitmap {
-     bool inconsistent;          /* bitmap is persistent, but inconsisten=
-t.
-                                    It cannot be used at all in any way, =
-except
-                                    a QMP user can remove it. */
--    bool migration;             /* Bitmap is selected for migration, it =
-should
--                                   not be stored on the next inactivatio=
-n
--                                   (persistent flag doesn't matter until=
- next
--                                   invalidation).*/
-+    bool squelch_persistence;   /* We are either migrating or deleting t=
-his
-+                                 * bitmap; it should not be stored on th=
-e next
-+                                 * inactivation. */
-     QLIST_ENTRY(BdrvDirtyBitmap) list;
- };
-=20
-@@ -757,16 +756,17 @@ void bdrv_dirty_bitmap_set_inconsistent(BdrvDirtyBi=
-tmap *bitmap)
- }
-=20
- /* Called with BQL taken. */
--void bdrv_dirty_bitmap_set_migration(BdrvDirtyBitmap *bitmap, bool migra=
-tion)
-+void bdrv_dirty_bitmap_squelch_persistence(BdrvDirtyBitmap *bitmap,
-+                                           bool squelch)
- {
-     qemu_mutex_lock(bitmap->mutex);
--    bitmap->migration =3D migration;
-+    bitmap->squelch_persistence =3D squelch;
-     qemu_mutex_unlock(bitmap->mutex);
- }
-=20
- bool bdrv_dirty_bitmap_get_persistence(BdrvDirtyBitmap *bitmap)
- {
--    return bitmap->persistent && !bitmap->migration;
-+    return bitmap->persistent && !bitmap->squelch_persistence;
- }
-=20
- bool bdrv_dirty_bitmap_inconsistent(const BdrvDirtyBitmap *bitmap)
-@@ -778,7 +778,7 @@ bool bdrv_has_changed_persistent_bitmaps(BlockDriverS=
-tate *bs)
- {
-     BdrvDirtyBitmap *bm;
-     QLIST_FOREACH(bm, &bs->dirty_bitmaps, list) {
--        if (bm->persistent && !bm->readonly && !bm->migration) {
-+        if (bm->persistent && !bm->readonly && !bm->squelch_persistence)=
- {
-             return true;
-         }
-     }
-diff --git a/blockdev.c b/blockdev.c
-index 01248252ca..4143ab7bbb 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2134,6 +2134,51 @@ static void block_dirty_bitmap_merge_prepare(BlkAc=
-tionState *common,
-                                                 errp);
- }
-=20
-+static BdrvDirtyBitmap *do_block_dirty_bitmap_remove(
-+        const char *node, const char *name, bool release,
-+        BlockDriverState **bitmap_bs, Error **errp);
-+
-+static void block_dirty_bitmap_remove_prepare(BlkActionState *common,
-+                                              Error **errp)
-+{
-+    BlockDirtyBitmap *action;
-+    BlockDirtyBitmapState *state =3D DO_UPCAST(BlockDirtyBitmapState,
-+                                             common, common);
-+
-+    if (action_check_completion_mode(common, errp) < 0) {
-+        return;
-+    }
-+
-+    action =3D common->action->u.block_dirty_bitmap_remove.data;
-+
-+    state->bitmap =3D do_block_dirty_bitmap_remove(action->node, action-=
->name,
-+                                                 false, &state->bs, errp=
-);
-+    if (state->bitmap) {
-+        bdrv_dirty_bitmap_squelch_persistence(state->bitmap, true);
-+        bdrv_dirty_bitmap_set_busy(state->bitmap, true);
-+    }
-+}
-+
-+static void block_dirty_bitmap_remove_abort(BlkActionState *common)
-+{
-+    BlockDirtyBitmapState *state =3D DO_UPCAST(BlockDirtyBitmapState,
-+                                             common, common);
-+
-+    if (state->bitmap) {
-+        bdrv_dirty_bitmap_squelch_persistence(state->bitmap, false);
-+        bdrv_dirty_bitmap_set_busy(state->bitmap, false);
-+    }
-+}
-+
-+static void block_dirty_bitmap_remove_commit(BlkActionState *common)
-+{
-+    BlockDirtyBitmapState *state =3D DO_UPCAST(BlockDirtyBitmapState,
-+                                             common, common);
-+
-+    bdrv_dirty_bitmap_set_busy(state->bitmap, false);
-+    bdrv_release_dirty_bitmap(state->bs, state->bitmap);
-+}
-+
- static void abort_prepare(BlkActionState *common, Error **errp)
- {
-     error_setg(errp, "Transaction aborted using Abort action");
-@@ -2211,6 +2256,12 @@ static const BlkActionOps actions[] =3D {
-         .commit =3D block_dirty_bitmap_free_backup,
-         .abort =3D block_dirty_bitmap_restore,
-     },
-+    [TRANSACTION_ACTION_KIND_BLOCK_DIRTY_BITMAP_REMOVE] =3D {
-+        .instance_size =3D sizeof(BlockDirtyBitmapState),
-+        .prepare =3D block_dirty_bitmap_remove_prepare,
-+        .commit =3D block_dirty_bitmap_remove_commit,
-+        .abort =3D block_dirty_bitmap_remove_abort,
-+    },
-     /* Where are transactions for MIRROR, COMMIT and STREAM?
-      * Although these blockjobs use transaction callbacks like the backu=
-p job,
-      * these jobs do not necessarily adhere to transaction semantics.
-@@ -2869,20 +2920,21 @@ void qmp_block_dirty_bitmap_add(const char *node,=
- const char *name,
-     bdrv_dirty_bitmap_set_persistence(bitmap, persistent);
- }
-=20
--void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
--                                   Error **errp)
-+static BdrvDirtyBitmap *do_block_dirty_bitmap_remove(
-+        const char *node, const char *name, bool release,
-+        BlockDriverState **bitmap_bs, Error **errp)
- {
-     BlockDriverState *bs;
-     BdrvDirtyBitmap *bitmap;
-=20
-     bitmap =3D block_dirty_bitmap_lookup(node, name, &bs, errp);
-     if (!bitmap || !bs) {
--        return;
-+        return NULL;
-     }
-=20
-     if (bdrv_dirty_bitmap_check(bitmap, BDRV_BITMAP_BUSY | BDRV_BITMAP_R=
-O,
-                                 errp)) {
--        return;
-+        return NULL;
-     }
-=20
-     if (bdrv_dirty_bitmap_get_persistence(bitmap)) {
-@@ -2892,13 +2944,28 @@ void qmp_block_dirty_bitmap_remove(const char *no=
-de, const char *name,
-         aio_context_acquire(aio_context);
-         bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
-         aio_context_release(aio_context);
-+
-         if (local_err !=3D NULL) {
-             error_propagate(errp, local_err);
--            return;
-+            return NULL;
-         }
-     }
-=20
--    bdrv_release_dirty_bitmap(bs, bitmap);
-+    if (release) {
-+        bdrv_release_dirty_bitmap(bs, bitmap);
-+    }
-+
-+    if (bitmap_bs) {
-+        *bitmap_bs =3D bs;
-+    }
-+
-+    return bitmap;
-+}
-+
-+void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
-+                                   Error **errp)
-+{
-+    do_block_dirty_bitmap_remove(node, name, true, NULL, errp);
- }
-=20
- /**
-diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitma=
-p.c
-index 4a896a09eb..c742b706a9 100644
---- a/migration/block-dirty-bitmap.c
-+++ b/migration/block-dirty-bitmap.c
-@@ -326,7 +326,7 @@ static int init_dirty_bitmap_migration(void)
-=20
-     /* unset migration flags here, to not roll back it */
-     QSIMPLEQ_FOREACH(dbms, &dirty_bitmap_mig_state.dbms_list, entry) {
--        bdrv_dirty_bitmap_set_migration(dbms->bitmap, true);
-+        bdrv_dirty_bitmap_squelch_persistence(dbms->bitmap, true);
-     }
-=20
-     if (QSIMPLEQ_EMPTY(&dirty_bitmap_mig_state.dbms_list)) {
---=20
-2.21.0
+More fix for
+8b3b2d75c7c0 ("introduce get_cpu_vsr{l,h}() and set_cpu_vsr{l,h}() helpers =
+for VSR register access") =
 
+are availabe:
+
+77bd8937c03d target/ppc: Fix xvabs[sd]p, xvnabs[sd]p, xvneg[sd]p, xvcpsgn[s=
+d]p
+d47a751adab7 target/ppc: Fix xxbrq, xxbrw
+
+And you can also need:
+
+899f08ad1d12 tcg: Fix typos in helper_gvec_sar{8,32,64}v
+
+depending on you host CPU
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1834613
+
+Title:
+  Crypto related operations failing on Alpine Linux on QEMU 4.0
+
+Status in QEMU:
+  New
+
+Bug description:
+  I'm unable to boot the netboot image of Alpine Linux using QEMU 4.0.
+
+  Steps to reproduce:
+
+  curl -O http://dl-cdn.alpinelinux.org/alpine/v3.10/releases/ppc64le/netbo=
+ot/vmlinuz-vanilla
+  curl -O http://dl-cdn.alpinelinux.org/alpine/v3.10/releases/ppc64le/netbo=
+ot/initramfs-vanilla
+  qemu-system-ppc64 -kernel vmlinuz-vanilla -initrd initramfs-vanilla -nogr=
+aphic -append "console=3Dhvc0 ip=3Ddhcp alpine_repo=3Dhttp://dl-cdn.alpinel=
+inux.org/alpine/v3.10/main"
+
+  The init script will automatically download and install an in-memory
+  Alpine Linux environment. However, with QEMU 4.0, the installation
+  process will fail with "BAD signature" errors:
+
+  (1/20) Installing musl (1.1.22-r2)
+  ERROR: musl-1.1.22-r2: BAD signature
+  (2/20) Installing busybox (1.30.1-r2)
+  ERROR: busybox-1.30.1-r2: BAD signature
+  (3/20) Installing alpine-baselayout (3.1.2-r0)
+  Executing alpine-baselayout-3.1.2-r0.pre-install
+  ERROR: alpine-baselayout-3.1.2-r0.pre-install: script exited with error 1=
+27
+  ERROR: alpine-baselayout-3.1.2-r0: BAD signature
+  (4/20) Installing openrc (0.41.2-r1)
+  ERROR: openrc-0.41.2-r1: BAD signature
+  (5/20) Installing alpine-conf (3.8.3-r0)
+  ERROR: alpine-conf-3.8.3-r0: BAD signature
+  (6/20) Installing libcrypto1.1 (1.1.1c-r0)
+  ERROR: libcrypto1.1-1.1.1c-r0: BAD signature
+  (7/20) Installing libssl1.1 (1.1.1c-r0)
+  ERROR: libssl1.1-1.1.1c-r0: BAD signature
+  (8/20) Installing ca-certificates-cacert (20190108-r0)
+  ERROR: ca-certificates-cacert-20190108-r0: BAD signature
+  (9/20) Installing libtls-standalone (2.9.1-r0)
+  ERROR: libtls-standalone-2.9.1-r0: BAD signature
+  (10/20) Installing ssl_client (1.30.1-r2)
+  ERROR: ssl_client-1.30.1-r2: BAD signature
+  (11/20) Installing zlib (1.2.11-r1)
+  ERROR: zlib-1.2.11-r1: BAD signature
+  (12/20) Installing apk-tools (2.10.4-r1)
+  ERROR: apk-tools-2.10.4-r1: BAD signature
+  (13/20) Installing busybox-suid (1.30.1-r2)
+  ERROR: busybox-suid-1.30.1-r2: BAD signature
+  (14/20) Installing busybox-initscripts (3.1-r7)
+  ERROR: busybox-initscripts-3.1-r7: BAD signature
+  (15/20) Installing scanelf (1.2.3-r0)
+  ERROR: scanelf-1.2.3-r0: BAD signature
+  (16/20) Installing musl-utils (1.1.22-r2)
+  ERROR: musl-utils-1.1.22-r2: BAD signature
+  (17/20) Installing libc-utils (0.7.1-r0)
+  ERROR: libc-utils-0.7.1-r0: BAD signature
+  (18/20) Installing alpine-keys (2.1-r2)
+  ERROR: alpine-keys-2.1-r2: BAD signature
+  (19/20) Installing alpine-base (3.10.0-r0)
+  ERROR: alpine-base-3.10.0-r0: BAD signature
+  (20/20) Installing openssl (1.1.1c-r0)
+  ERROR: openssl-1.1.1c-r0: BAD signature
+  20 errors; 0 MiB in 0 packages
+  ok.
+  grep: /sysroot/etc/inittab: No such file or directory
+  /sbin/init not found in new root. Launching emergency recovery shell
+  Type exit to continue boot.
+  sh: can't access tty; job control turned off
+  / #
+
+  If I boot up a disk image created by a previous version of QEMU,
+  crypto related operations like verifying a RSA signature using the
+  "openssl" command will also fail.
+
+  I didn't see these errors on previous QEMU versions or other
+  architectures on QEMU 4.0
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1834613/+subscriptions
 
