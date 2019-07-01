@@ -2,72 +2,89 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 150D9C0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 08:22:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE786C0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 08:37:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB4B6208C4
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 08:22:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB4B6208C4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 8FB0120673
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 08:37:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FUZ3rd3d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FB0120673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhrZW-0006t4-IR
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 04:21:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35275)
+	id 1hhrp0-0001LL-Qz
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 04:37:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38303)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hhrYa-0006N3-K3
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:21:01 -0400
+ (envelope-from <stefanha@gmail.com>) id 1hhroJ-0000tJ-Gh
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:37:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hhrYZ-0003M7-8S
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:21:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49072)
+ (envelope-from <stefanha@gmail.com>) id 1hhroI-0006wN-L4
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:37:15 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39725)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hhrYZ-0003LJ-2Z
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:20:59 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hhrYX-0001VS-2v
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 08:20:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 0CEC22E80CC
- for <qemu-devel@nongnu.org>; Mon,  1 Jul 2019 08:20:57 +0000 (UTC)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hhroI-0006vQ-Bg
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:37:14 -0400
+Received: by mail-wr1-x441.google.com with SMTP id x4so12766067wrt.6
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 01:37:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=2TpYr2gT+GJ+Pj0IA9foDmp39dw5q/dpDkv118+ciUw=;
+ b=FUZ3rd3dOzWNHxG6D/m0pYxpXZBxynfkZ+bsIf69CS+FzjO9TU9R7dJirOP8aGBFvj
+ VcwPX+Eh2BNK42phlH3wgfsTY2cYaIIzdJqwKZv+2ep8b5f87ttly1xPG9yuV0t6NKw6
+ iM2A2EQwBveCVD6+rH0KF+rkUN2yfvSN/X3wKrEhz/4U1J+KuM1qTambw8qNtXy34xjI
+ Kl7kRfmXfjTYek/NdOGbew806d3R3nARWAavGTyyeIZsxj7lDN+pfvR6SIPRbA4+VA6h
+ Z7pqp/72TK5GDtzV9/dV7BUH1eeO3V3+aVJJne9gurEyG1yFay9ySU/+aqsyHgMjR3nU
+ 7ixg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=2TpYr2gT+GJ+Pj0IA9foDmp39dw5q/dpDkv118+ciUw=;
+ b=WnzrKaHtRZu1TT8tVzbSiCuLHkqhZ2pylrwmKA7y9dZZSh0SY/vt+PQ14rb7VsN+Rk
+ N1q8OtFKPXCDBuBTSfKwBpRdLJrx+WRd0K+DxftJyeDZJ1KSt5WuLdCcZZzs/ofIR1O5
+ CLXgON4Vn41yugRa+js2L9nnC50cLR2fKFQMU/RdTW5KYt7jSmz4q89hGU4+VM9Xk25E
+ 0SjVxsomfMZ0WXx8/eETTjQI2J5rkSp/ieG2tAXzjonoNpK1iBXYwxiUfnQgijxEtoDw
+ 3/9XuFaKJ9MB/Y3jb+FzbYwg2kKfiKFGCkwtkwf/m1J5/hpsEPkwKeWKN4/NhSSJK4Pb
+ mqlQ==
+X-Gm-Message-State: APjAAAW30Y5gCPsKS7mz35P0D6FQpsBoBP6SjXGCz2lBrZ39smhzlecI
+ MxCOQYFXbbxl+Yh0azSyyC4=
+X-Google-Smtp-Source: APXvYqxcNJAoUHkKO3Y4OsZ78yYltL/51GXQZ4MMF7jm6JgMtnCfjj0XpB291Oy/bYzq+VqC8ZA9lw==
+X-Received: by 2002:a5d:4251:: with SMTP id s17mr13055017wrr.95.1561970232423; 
+ Mon, 01 Jul 2019 01:37:12 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id n125sm14105733wmf.6.2019.07.01.01.37.11
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 01 Jul 2019 01:37:11 -0700 (PDT)
+Date: Mon, 1 Jul 2019 09:37:10 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <20190701083710.GA18173@stefanha-x1.localdomain>
+References: <20190628124534.10679-1-damien.hedde@greensocs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 01 Jul 2019 08:05:49 -0000
-From: Lukas Durfina <1774149@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: arnaudalies-py lukasdurfina
-X-Launchpad-Bug-Reporter: mou (arnaudalies-py)
-X-Launchpad-Bug-Modifier: Lukas Durfina (lukasdurfina)
-References: <152766936065.4012.2532535303592891582.malonedeb@chaenomeles.canonical.com>
-Message-Id: <156196834916.18147.11463146522291037635.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18991";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 3f8727bc0f1f346ae02404ffc76c32542f09e295
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1774149] Re: qemu-user x86_64 x86 gdb call
- function from gdb doesn't work
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="PNTmBPCT7hxwcZjr"
+Content-Disposition: inline
+In-Reply-To: <20190628124534.10679-1-damien.hedde@greensocs.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
+Subject: Re: [Qemu-devel] [RFC PATCH 0/5] FAULT INJECTION FRAMEWORK
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,128 +93,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1774149 <1774149@bugs.launchpad.net>
+Cc: ehabkost@redhat.com, sakisp@xilinx.com, mark.burton@greensocs.com,
+ armbru@redhat.com, qemu-devel@nongnu.org, edgari@xilinx.com, crosa@redhat.com,
+ pbonzini@redhat.com, luc.michel@greensocs.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It seems the issue is related to gdb code:
-set_gdbarch_call_dummy_location (gdbarch, ON_STACK);
 
-What is going on?
-The breakpoint is stored on stack and for the first time the address has a =
-flag PAGE_WRITE.
-After a call, the address does not have anymore the flag PAGE_WRITE. It is =
-changed in method tb_page_add() (file: accel/tcg/translate-all.c).
+--PNTmBPCT7hxwcZjr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I am thinking more about gdbstub.c.
-If there is handled packet M for writing data to memory, it should always w=
-rite data to given address.
-Reason: you are debugging and you want to verify various scenarios, so chan=
-ging different values on different places may be needed.
+On Fri, Jun 28, 2019 at 02:45:29PM +0200, Damien Hedde wrote:
+> This series adds a python framework aiming to provide some ways to do fau=
+lt
+> injection in a running vm. In its current state, it allows to easily inte=
+ract
+> with memory, change gpios and qom properties.
+>=20
+> The framework consists in a python script based on the qmp existing module
+> which allows to interact with the vm.
 
--- =
+How does this compare to qtest?  There seems to be a lot of overlap
+between them.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1774149
+Why is it called "fault injection"?  The commands seem to be
+general-purpose device testing functions (like qtest and libqos), not
+functions for testing error code paths as would be expected from a fault
+injection framework.
 
-Title:
-  qemu-user x86_64 x86 gdb call function from gdb doesn't work
+Stefan
 
-Status in QEMU:
-  New
+--PNTmBPCT7hxwcZjr
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Bug description:
-  While running qemu user x86_64 x86 with gdb server, calling functions
-  are not working.
+-----BEGIN PGP SIGNATURE-----
 
-  Here is how to reproduce it:
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0ZxjYACgkQnKSrs4Gr
+c8hcPggAr+86/TL2VgUhM/2fIMHnlHhrYiJZD9i14rliLqlbPail14DSLR6RFcWD
+5RFXk5XS8j6JI9L7qRMWY4LYBqZ77yG/w2Hyd+DH6z9J59o2bGymNIi+K6yjeKG3
++vMsXpn3Z2eXLBV7GMRJYui14tslqn5/b4pHLjNhahdL3EPcZ1dkKTtlryyfhvFG
++I6EFYowTmeM9lxSSDL4WDGjQwWkG1MRTbwjCDDuElmCLAp/UOK8PBV9ksqG1MVm
+c3D9xZJPJoNlQaIk2SXtSB3fkXYjNwReD+DflMn54k1jNPOj75XDpeRjtkE8zx4W
+O9LPHdDH6ySy+6xy4lb7f0oHhJt/WQ==
+=yx7K
+-----END PGP SIGNATURE-----
 
-  run in a terminal:
-  $ qemu-x86_64 -g 12345 -L / /bin/ls
-
-  In another terminal run gdb:
-  (gdb) file /bin/ls
-  (gdb) target remote :12345
-  (gdb) b _init
-  (gdb) c
-  (gdb) call malloc(1)
-  Could not fetch register "fs_base"; remote failure reply 'E14'
-
-  In other cases we also got the error:
-  Could not fetch register "orig_rax"; remote failure reply 'E14'
-
-  Here is how I patched it (it is only a workaround):
-
-  diff --git a/gdbstub.c b/gdbstub.c
-  index 2a94030..5749efe 100644
-  --- a/gdbstub.c
-  +++ b/gdbstub.c
-  @@ -668,6 +668,11 @@ static int gdb_read_register(CPUState *cpu, uint8_t =
-*mem_buf, int reg)
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0return r->get_reg(env, mem_buf, reg - r->base_reg);
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-  +#ifdef TARGET_X86_64
-  +    return 8;
-  +#elif TARGET_I386
-  +    return 4;
-  +#endif
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return 0;
-  =C2=A0}
-
-  (Our guess for this issue was, gdb is requesting for 'fake' registers
-  to know register size)
-
-  Once we patched that, we got another problem while calling functions
-  from gdb: We could call functions, but only once.
-
-  Here is how to reproduce it:
-  run in a terminal:
-  $ qemu-x86_64 -g 12345 -L / /bin/ls
-
-  In another terminal run gdb:
-  (gdb) file /bin/ls
-  (gdb) target remote :12345
-  (gdb) b _init
-  (gdb) c
-  (gdb) call malloc(1)
-  $1 =3D (void *) 0x620010
-  (gdb) call malloc(1)
-  Cannot access memory at address 0x40007ffb8f
-
-  Here is how we patched it to make it work:
-
-  diff --git a/exec.c b/exec.c
-  index 03238a3..d303922 100644
-  --- a/exec.c
-  +++ b/exec.c
-  @@ -2833,7 +2833,7 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulong=
- addr,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!(flags & PAGE_=
-VALID))
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0return -1;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (is_write) {
-  -            if (!(flags & PAGE_WRITE))
-  +            if (!(flags & (PAGE_WRITE | PAGE_WRITE_ORG)))
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return -1;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0/* XXX: this code should not depend on lock_user */
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0if (!(p =3D lock_user(VERIFY_WRITE, addr, l, 0)))
-
-  From what we saw, there is a page which is passed to read-only after
-  first execution, and gdb need to write on that page to put a
-  breakpoint. (on the stack to get function return)
-
-  We suspect this is linked to this:
-  https://qemu.weilnetz.de/w64/2012/2012-06-28/qemu-tech.html#Self_002dmodi=
-fying-code-and-translated-code-invalidation
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1774149/+subscriptions
+--PNTmBPCT7hxwcZjr--
 
