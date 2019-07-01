@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55F54C5B578
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 21:59:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 810A8C5B578
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 22:01:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 204D9206E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 21:59:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 40B50206E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 22:01:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ffnshPO8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 204D9206E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W8f+V00u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40B50206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi4KY-0002Y5-CB
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 17:59:22 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47997)
+	id 1hi4MI-0003e3-IR
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 18:01:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48023)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hi3Jo-0006RE-TW
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:54:33 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hi3Jr-0006WI-CC
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:54:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hi3Jl-00043u-PS
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:54:30 -0400
-Received: from mail-wm1-f47.google.com ([209.85.128.47]:51201)
+ (envelope-from <peter.maydell@linaro.org>) id 1hi3Jo-000458-Cl
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:54:33 -0400
+Received: from mail-wm1-f43.google.com ([209.85.128.43]:50291)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hi3Jl-00041L-Bn
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:54:29 -0400
-Received: by mail-wm1-f47.google.com with SMTP id 207so838509wma.1
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 13:54:23 -0700 (PDT)
+ id 1hi3Jo-00044h-5p
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:54:32 -0400
+Received: by mail-wm1-f43.google.com with SMTP id n9so848147wmi.0
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 13:54:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=0fHjbhgF7m8C4s1QBD+xWxolDP9qtqhdoa9wWejRTJA=;
- b=ffnshPO8F/gurxfmTl1kJFxAqyRnRzz3GJazOnwDBI3AmryIGS9I9yENWcLuF0nJc1
- no0AhXfjbx5JPDoVxUYm2BaBnQOkO9NEcD8HFn0u0IlUT4WlTfcQwhxjzj/trL55l20v
- wov3NW7eavYFMQH2GxvNUxvwP2UVTHZu5j+Zp+wQDDI9AukQ22ZwKWPXn0DiuWNmo1e3
- 6XrzAUMWBEFtuEjThWUOTR8u94djcRLwcDIJ80k2svEHLMX662QjH3tJKy49uyVryZ1a
- 23WnB2+xYDiqgr99H0JwvRsClJjNCTrf8ih37Vi9Mc7h2iUhwR1/DK1fG+iIP1+im+SE
- hxbA==
+ bh=vI8UZn5YgvLXUBbGW41e3aj469sfNMLp6oyJ3oBawnQ=;
+ b=W8f+V00unL4RCehArWvfE8qiiSJ+d4wqsZTiKW6cKnSUhOpXoqIsCJEJHulltqZA8n
+ o2aXkZDsY3W0g4sjFy0b+Q/oN+WcpcE5NDBSXTZeSGlbWVxAQi/Z4hsBUb8/PRLMMop/
+ 8fEoajmFUXJdomE3YZAKoiQCv94k9F0zsgaV2b58X1SQ2GaVN6+3Wx5zTEiI14yecrxU
+ O+fZ4OH8YzifrOd90QjHDNVSR0K+XvV0T4r2WWsGLowI3o/i5EuNzfoIsSewoT2HYbB4
+ T1QfGw0qT+jWKAuUpde1Tp5zJufL9n21cI3s/pfyMEkOpYNAGIaZEzyZKdt9bSFWg0ah
+ modw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=0fHjbhgF7m8C4s1QBD+xWxolDP9qtqhdoa9wWejRTJA=;
- b=C+c1jz5/a3jfGkj/K5xpr+akiWLD9LZ+j7IkT6aruuI1FHEtqhAniZTz3NExbiKsKB
- +RO9gYcyQz95fDNyB31NkOIpdtgZFn/BXw6jguCNsxKChseglS6CZ0G9RxmxoIlqVcLF
- 8+bt5vRsVgMAH0N4BJmdaLtYyxGA5Wr8hQ6jdxRyrXAK1FZjXL/3TXB6HEuLS9+prdAB
- 7S3osVUk04zpFHVqeTmB2grGUmtHYecpU2AL7A07cp+x27Uo7aHoz8abRcDx3a+cQJ8G
- qVe/kWdrQckpUYhyMwiTdcjgjuEsZ3fmraL5Nr6PQVKPxVHvzp6ksRvEWUkb0DoJm8Vv
- kwPw==
-X-Gm-Message-State: APjAAAUv8q6lNiHU5Zy19l0RiXCLFK/pTuerDNq+wb2rdy9G6MgYvAav
- pxuOxQhaGA14J/sm3DesWpe0XFGHawgRQw==
-X-Google-Smtp-Source: APXvYqzhSNB/XZzcsmHGl/Rjv0Gce7PDiOczjrTi/qq/3XA4KW3S2DX40+lV9DSp5XEAOoH5S6fE3g==
-X-Received: by 2002:a1c:9c8a:: with SMTP id f132mr119087wme.29.1561999208877; 
- Mon, 01 Jul 2019 09:40:08 -0700 (PDT)
+ bh=vI8UZn5YgvLXUBbGW41e3aj469sfNMLp6oyJ3oBawnQ=;
+ b=hEwXCxDw4+1JPV6chayJG45pXEDlzIdaaYdD6syGuQHD7KbAYh7SiEVwbPCTNtcPki
+ ryTd/hJyO6txIsOhVi5+gTiS9PYRWvdrSVeVk9p7073TRGCz64f36/f3IDbJ7pFLwmv9
+ 05ryJ77fskD55pkqK9Ob5reIFoXOQKVPDUuW486Z1Tx9ROVKGn/l8UAKc0az11QaszWn
+ tCC3uENOJi7k7kBVA6xiyjPGMb+/MOWHXUYYkHJzYpAsFRM+1fODa7afcZZphkzHCROM
+ KVDYVZHZ4AgWDSXndlIDU50aan6My3SqMUbXPR2DNdMNCQExPWPIg5qVDg+lYhW0fAya
+ 6AWg==
+X-Gm-Message-State: APjAAAX5iYvWmh99rjcykfHDhLsU/9VG9Clhqs4LT3ahvNvB8bvCUq19
+ LSCjJLfb2wUCxPGryKj0euCxR8nMGh/rsw==
+X-Google-Smtp-Source: APXvYqwYy2lZl+DwG0N4YokSPQ4JLYdcVzaf+iODcPG3PEj+vqoQQ750lmjGv5hfB8nxtTWZoLpy5Q==
+X-Received: by 2002:a1c:b707:: with SMTP id h7mr114963wmf.45.1561999216099;
+ Mon, 01 Jul 2019 09:40:16 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id o6sm26573508wra.27.2019.07.01.09.40.07
+ by smtp.gmail.com with ESMTPSA id o6sm26573508wra.27.2019.07.01.09.40.14
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 01 Jul 2019 09:40:08 -0700 (PDT)
+ Mon, 01 Jul 2019 09:40:15 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon,  1 Jul 2019 17:39:19 +0100
-Message-Id: <20190701163943.22313-23-peter.maydell@linaro.org>
+Date: Mon,  1 Jul 2019 17:39:25 +0100
+Message-Id: <20190701163943.22313-29-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190701163943.22313-1-peter.maydell@linaro.org>
 References: <20190701163943.22313-1-peter.maydell@linaro.org>
@@ -81,9 +81,8 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.128.47
-Subject: [Qemu-devel] [PULL 22/46] aspeed: Add support for the swift-bmc
- board
+X-Received-From: 209.85.128.43
+Subject: [Qemu-devel] [PULL 28/46] target/arm: Makefile cleanup (Aarch64)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,95 +98,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Adriana Kobylak <anoo@us.ibm.com>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-The Swift board is an OpenPOWER system hosting POWER processors.
-Add support for their BMC including the I2C devices as found on HW.
+Group Aarch64 rules together, TCG related ones at the bottom.
+This will help when restricting TCG-only objects.
 
-Signed-off-by: Adriana Kobylak <anoo@us.ibm.com>
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-Reviewed-by: Joel Stanley <joel@jms.id.au>
-Message-id: 20190618165311.27066-20-clg@kaod.org
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20190701132516.26392-2-philmd@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/aspeed.c | 50 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
+ target/arm/Makefile.objs | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 7f01df1b61d..8b6d304247c 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -73,6 +73,17 @@ struct AspeedBoardState {
-         SCU_AST2500_HW_STRAP_ACPI_ENABLE |                              \
-         SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER))
+diff --git a/target/arm/Makefile.objs b/target/arm/Makefile.objs
+index dfa736a3752..7c31fa01c1c 100644
+--- a/target/arm/Makefile.objs
++++ b/target/arm/Makefile.objs
+@@ -7,8 +7,7 @@ obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
+ obj-y += translate.o op_helper.o helper.o cpu.o
+ obj-y += neon_helper.o iwmmxt_helper.o vec_helper.o vfp_helper.o
+ obj-y += gdbstub.o
+-obj-$(TARGET_AARCH64) += cpu64.o translate-a64.o helper-a64.o gdbstub64.o
+-obj-$(TARGET_AARCH64) += pauth_helper.o
++obj-$(TARGET_AARCH64) += cpu64.o gdbstub64.o
+ obj-y += crypto_helper.o
+ obj-$(CONFIG_SOFTMMU) += arm-powerctl.o
  
-+/* Swift hardware value: 0xF11AD206 */
-+#define SWIFT_BMC_HW_STRAP1 (                                           \
-+        AST2500_HW_STRAP1_DEFAULTS |                                    \
-+        SCU_AST2500_HW_STRAP_SPI_AUTOFETCH_ENABLE |                     \
-+        SCU_AST2500_HW_STRAP_GPIO_STRAP_ENABLE |                        \
-+        SCU_AST2500_HW_STRAP_UART_DEBUG |                               \
-+        SCU_AST2500_HW_STRAP_DDR4_ENABLE |                              \
-+        SCU_H_PLL_BYPASS_EN |                                           \
-+        SCU_AST2500_HW_STRAP_ACPI_ENABLE |                              \
-+        SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER))
-+
- /* Witherspoon hardware value: 0xF10AD216 (but use romulus definition) */
- #define WITHERSPOON_BMC_HW_STRAP1 ROMULUS_BMC_HW_STRAP1
+@@ -33,4 +32,6 @@ target/arm/translate-sve.o: target/arm/decode-sve.inc.c
+ target/arm/translate.o: target/arm/decode-vfp.inc.c
+ target/arm/translate.o: target/arm/decode-vfp-uncond.inc.c
  
-@@ -292,6 +303,35 @@ static void romulus_bmc_i2c_init(AspeedBoardState *bmc)
-     i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11), "ds1338", 0x32);
- }
- 
-+static void swift_bmc_i2c_init(AspeedBoardState *bmc)
-+{
-+    AspeedSoCState *soc = &bmc->soc;
-+
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 3), "pca9552", 0x60);
-+
-+    /* The swift board expects a TMP275 but a TMP105 is compatible */
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 7), "tmp105", 0x48);
-+    /* The swift board expects a pca9551 but a pca9552 is compatible */
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 7), "pca9552", 0x60);
-+
-+    /* The swift board expects an Epson RX8900 RTC but a ds1338 is compatible */
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 8), "ds1338", 0x32);
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 8), "pca9552", 0x60);
-+
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 9), "tmp423", 0x4c);
-+    /* The swift board expects a pca9539 but a pca9552 is compatible */
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 9), "pca9552", 0x74);
-+
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 10), "tmp423", 0x4c);
-+    /* The swift board expects a pca9539 but a pca9552 is compatible */
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 10), "pca9552",
-+                     0x74);
-+
-+    /* The swift board expects a TMP275 but a TMP105 is compatible */
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 12), "tmp105", 0x48);
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 12), "tmp105", 0x4a);
-+}
-+
- static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
- {
-     AspeedSoCState *soc = &bmc->soc;
-@@ -382,6 +422,16 @@ static const AspeedBoardConfig aspeed_boards[] = {
-         .num_cs    = 2,
-         .i2c_init  = romulus_bmc_i2c_init,
-         .ram       = 512 * MiB,
-+    }, {
-+        .name      = MACHINE_TYPE_NAME("swift-bmc"),
-+        .desc      = "OpenPOWER Swift BMC (ARM1176)",
-+        .soc_name  = "ast2500-a1",
-+        .hw_strap1 = SWIFT_BMC_HW_STRAP1,
-+        .fmc_model = "mx66l1g45g",
-+        .spi_model = "mx66l1g45g",
-+        .num_cs    = 2,
-+        .i2c_init  = swift_bmc_i2c_init,
-+        .ram       = 512 * MiB,
-     }, {
-         .name      = MACHINE_TYPE_NAME("witherspoon-bmc"),
-         .desc      = "OpenPOWER Witherspoon BMC (ARM1176)",
++obj-$(TARGET_AARCH64) += translate-a64.o helper-a64.o
+ obj-$(TARGET_AARCH64) += translate-sve.o sve_helper.o
++obj-$(TARGET_AARCH64) += pauth_helper.o
 -- 
 2.20.1
 
