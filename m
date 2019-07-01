@@ -2,105 +2,62 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E9C0C0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 10:57:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E17CBC0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 11:03:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0DC5208C4
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 10:57:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=wavesemi.onmicrosoft.com header.i=@wavesemi.onmicrosoft.com header.b="AZfCa6Qn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0DC5208C4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6113620665
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 11:03:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6113620665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhtzz-0002iw-6f
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 06:57:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39077)
+	id 1hhu5S-00047G-Ee
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 07:03:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39862)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <amarkovic@wavecomp.com>) id 1hhtzT-0002KG-E6
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 06:56:56 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hhu2Z-0003Md-QT
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:00:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <amarkovic@wavecomp.com>) id 1hhtzS-0004sb-ER
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 06:56:55 -0400
-Received: from mail-eopbgr680100.outbound.protection.outlook.com
- ([40.107.68.100]:45417 helo=NAM04-BN3-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
- id 1hhtzS-0004ob-4F
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 06:56:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=wavesemi.onmicrosoft.com; s=selector1-wavesemi-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MDYgxB/Z83V3St1lRHMfNfBLZRHULmkCx0u7iBpHAfM=;
- b=AZfCa6QnLAhT8I4e4O0DzgaO3B5HTKUNkZa/6uRkw/OVuvkuoGTXHbf38lt3vlT1ZMN+lRuW/QOi4WPyit7G48ayz5e2jnqen2nCQsnDJ1Cr+aB4xQK1DekbHipWbeK/q+lG2L7YHAl6zcDHHjN/jRdjfGhpv1kxRkbt730tImw=
-Received: from BN6PR2201MB1251.namprd22.prod.outlook.com (10.174.81.139) by
- BN6PR2201MB1700.namprd22.prod.outlook.com (10.161.152.144) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2032.20; Mon, 1 Jul 2019 10:56:52 +0000
-Received: from BN6PR2201MB1251.namprd22.prod.outlook.com
- ([fe80::c4a7:ebf7:ad07:f5f7]) by BN6PR2201MB1251.namprd22.prod.outlook.com
- ([fe80::c4a7:ebf7:ad07:f5f7%10]) with mapi id 15.20.2032.019; Mon, 1 Jul 2019
- 10:56:52 +0000
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, Aleksandar
- Markovic <aleksandar.m.mail@gmail.com>
-Thread-Topic: [Qemu-devel] [PATCH v3 0/7] Kconfig dependencies for MIPS
- machines (but Malta)
-Thread-Index: AQHU16VG/MdBSy5wtkCBDghuaTXhiaa0dwuAgAHJqACAAAY2nw==
-Date: Mon, 1 Jul 2019 10:56:51 +0000
-Message-ID: <BN6PR2201MB1251B0D61EEE430BA44A3821C6F90@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <20190311005618.19007-1-philmd@redhat.com>
- <CAL1e-=gqqd4EogYQqb74zLkS+a=8yhfNS5tnFhG6GWSRw5vdkQ@mail.gmail.com>,
- <63fd1b6a-3e35-747f-0dca-c7f1c0f38aea@redhat.com>
-In-Reply-To: <63fd1b6a-3e35-747f-0dca-c7f1c0f38aea@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=amarkovic@wavecomp.com; 
-x-originating-ip: [82.117.201.26]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: cc8f60c8-1263-4708-de45-08d6fe12d2e5
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:BN6PR2201MB1700; 
-x-ms-traffictypediagnostic: BN6PR2201MB1700:
-x-microsoft-antispam-prvs: <BN6PR2201MB1700A0B03DEF8D38B584EF6EC6F90@BN6PR2201MB1700.namprd22.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3631;
-x-forefront-prvs: 00851CA28B
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(39840400004)(136003)(376002)(366004)(346002)(396003)(189003)(199004)(66066001)(33656002)(14454004)(6116002)(476003)(11346002)(446003)(486006)(2906002)(81166006)(81156014)(74316002)(305945005)(7736002)(4326008)(4744005)(8676002)(256004)(86362001)(71190400001)(186003)(14444005)(55016002)(53936002)(66574012)(8936002)(71200400001)(3846002)(6246003)(55236004)(9686003)(5660300002)(66476007)(316002)(478600001)(76176011)(110136005)(102836004)(99286004)(25786009)(26005)(54906003)(7696005)(6506007)(66946007)(6436002)(76116006)(66446008)(64756008)(91956017)(66556008)(68736007)(229853002)(52536014)(73956011);
- DIR:OUT; SFP:1102; SCL:1; SRVR:BN6PR2201MB1700;
- H:BN6PR2201MB1251.namprd22.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: wavecomp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: zTb6Cxko5+Zeta6mB5kh+VbPrqpb624Z/mDhzdMUoZt5lHq9ZhTaHaBj9kG39GfHUG2aFP9AdKI+USwemssQG9oC9w5lC5pVX4hbxaDDmwsH9Bi7Maw7mRIEWSIcY/syKFjHDKtgso5B2jFIljcZ6WsOw+eq8ORmQpCadaOxulm3L+Vaqt5Mwvk6abSewK+njq1CE9iDXwIF6jynN7jl47XJ9j0VI530+sAgVzwpATHQt8l6KKOXRnm90TUWAAnKCUq9/QGO7A5c2Ccxrvi8ayVJKokMM7ZlRNIEA41cBCk7TqR2GtYgLZt0WQHztpb9l5QTs0uUA9vEL+GDlyMoBVZE6m1nQPM6VolMK3edaghvB9FQ9w4Ovkl8PEvN8ZIqQ6CWDdUc02Ci+3cgldq74xnAMY+/kkyjGd2/OflyMiQ=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <imammedo@redhat.com>) id 1hhu2X-0000df-7z
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:00:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60466)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hhu2W-0000cY-VE
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:00:05 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 062363162916;
+ Mon,  1 Jul 2019 10:59:58 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5B09E19C77;
+ Mon,  1 Jul 2019 10:59:55 +0000 (UTC)
+Date: Mon, 1 Jul 2019 12:59:50 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Tao Xu <tao3.xu@intel.com>
+Message-ID: <20190701125950.76f8b553@redhat.com>
+In-Reply-To: <20190614155626.27932-6-tao3.xu@intel.com>
+References: <20190614155626.27932-1-tao3.xu@intel.com>
+ <20190614155626.27932-6-tao3.xu@intel.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wavecomp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cc8f60c8-1263-4708-de45-08d6fe12d2e5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Jul 2019 10:56:51.9499 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: amarkovic@wavecomp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR2201MB1700
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.68.100
-Subject: Re: [Qemu-devel] [PATCH v3 0/7] Kconfig dependencies for MIPS
- machines (but Malta)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Mon, 01 Jul 2019 11:00:04 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v5 5/8] acpi: introduce
+ AcpiDeviceIfClass.build_mem_ranges hook
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,29 +69,335 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yang Zhong <yang.zhong@intel.com>, Paul Burton <pburton@wavecomp.com>,
- Thomas Huth <thuth@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>,
- James Hogan <jhogan@kernel.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- =?iso-8859-1?Q?Herv=E9_Poussineau?= <hpoussin@reactos.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: jingqi.liu@intel.com, fan.du@intel.com, ehabkost@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> Since I doubt we can fix easily the design flow when (coproc)
-> instructions access optional device before 4.1, I'll also take out the
-> Boston patches, and see what's left I can respin.
+On Fri, 14 Jun 2019 23:56:23 +0800
+Tao Xu <tao3.xu@intel.com> wrote:
 
-No problem, what can we do.
+> Add build_mem_ranges callback to AcpiDeviceIfClass and use
+> it for generating SRAT and HMAT numa memory ranges.
+> 
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> Co-developed-by: Liu Jingqi <jingqi.liu@intel.com>
+> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
+> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> ---
+> 
+> Changes in v5 -> v4:
+>     - Add the missing if 'mem_len > 0' in pc_build_mem_ranges() (Igor)
+>     - Correct the descriptions of build_mem_ranges
+>     in AcpiDeviceIfClass (Igor)
+>     - Use GArray for NUMA memory ranges data (Igor)
+>     - Add the reason of using stub (Igor)
+> ---
+>  hw/acpi/piix4.c                      |   1 +
+>  hw/i386/acpi-build.c                 | 133 +++++++++++++++++----------
+>  hw/isa/lpc_ich9.c                    |   1 +
+>  include/hw/acpi/acpi_dev_interface.h |   4 +
+>  include/hw/i386/pc.h                 |   1 +
+>  include/sysemu/numa.h                |  12 +++
+>  stubs/Makefile.objs                  |   1 +
+>  stubs/pc_build_mem_ranges.c          |  14 +++
+>  8 files changed, 120 insertions(+), 47 deletions(-)
+>  create mode 100644 stubs/pc_build_mem_ranges.c
+> 
+> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> index ec4e186cec..bc078c1ad7 100644
+> --- a/hw/acpi/piix4.c
+> +++ b/hw/acpi/piix4.c
+> @@ -702,6 +702,7 @@ static void piix4_pm_class_init(ObjectClass *klass, void *data)
+>      adevc->ospm_status = piix4_ospm_status;
+>      adevc->send_event = piix4_send_gpe;
+>      adevc->madt_cpu = pc_madt_cpu_entry;
+> +    adevc->build_mem_ranges = pc_build_mem_ranges;
+>  }
+>  
+>  static const TypeInfo piix4_pm_info = {
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 055e677c30..44dd447fa5 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2279,18 +2279,89 @@ build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+>  #define HOLE_640K_START  (640 * KiB)
+>  #define HOLE_640K_END   (1 * MiB)
+>  
+> +void pc_build_mem_ranges(AcpiDeviceIf *adev, MachineState *ms)
+> +{
+> +    uint64_t mem_len, mem_base, next_base;
+> +    int i;
+> +    PCMachineState *pcms = PC_MACHINE(ms);
+> +    NumaState *nstat = ms->numa_state;
+> +    NumaMemRange *mem_range;
+> +    nstat->mem_ranges_num = 0;
+> +    next_base = 0;
+> +
+> +    /*
+> +     * the memory map is a bit tricky, it contains at least one hole
+> +     * from 640k-1M and possibly another one from 3.5G-4G.
+> +     */
+> +
+> +    for (i = 0; i < pcms->numa_nodes; ++i) {
+> +        mem_base = next_base;
+> +        mem_len = pcms->node_mem[i];
+> +        next_base = mem_base + mem_len;
+> +
+> +        /* Cut out the 640K hole */
+> +        if (mem_base <= HOLE_640K_START &&
+> +            next_base > HOLE_640K_START) {
+> +            mem_len -= next_base - HOLE_640K_START;
+> +            if (mem_len > 0) {
+> +                mem_range = acpi_data_push(nstat->mem_ranges,
+> +                                           sizeof *mem_range);
+> +                mem_range->base = mem_base;
+> +                mem_range->length = mem_len;
+> +                mem_range->node = i;
+> +                nstat->mem_ranges_num++;
+> +            }
+> +
+> +            /* Check for the rare case: 640K < RAM < 1M */
+> +            if (next_base <= HOLE_640K_END) {
+> +                next_base = HOLE_640K_END;
+> +                continue;
+> +            }
+> +            mem_base = HOLE_640K_END;
+> +            mem_len = next_base - HOLE_640K_END;
+> +        }
+> +
+> +        /* Cut out the ACPI_PCI hole */
+> +        if (mem_base <= pcms->below_4g_mem_size &&
+> +            next_base > pcms->below_4g_mem_size) {
+> +            mem_len -= next_base - pcms->below_4g_mem_size;
+> +            if (mem_len > 0) {
+> +                mem_range = acpi_data_push(nstat->mem_ranges,
+> +                                           sizeof *mem_range);
+> +                mem_range->base = mem_base;
+> +                mem_range->length = mem_len;
+> +                mem_range->node = i;
+> +                nstat->mem_ranges_num++;
+> +            }
+> +            mem_base = 1ULL << 32;
+> +            mem_len = next_base - pcms->below_4g_mem_size;
+> +            next_base = mem_base + mem_len;
+> +        }
+> +        if (mem_len > 0) {
+> +            mem_range = acpi_data_push(nstat->mem_ranges,
+> +                                       sizeof *mem_range);
+> +            mem_range->base = mem_base;
+> +            mem_range->length = mem_len;
+> +            mem_range->node = i;
+> +            nstat->mem_ranges_num++;
+> +        }
+> +    }
+> +}
+> +
+>  static void
+>  build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>  {
+>      AcpiSystemResourceAffinityTable *srat;
+>      AcpiSratMemoryAffinity *numamem;
+>  
+> -    int i;
+> -    int srat_start, numa_start, slots;
+> -    uint64_t mem_len, mem_base, next_base;
+> +    int i, srat_start, numa_start, slots;
+>      MachineClass *mc = MACHINE_GET_CLASS(machine);
+>      const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(machine);
+>      PCMachineState *pcms = PC_MACHINE(machine);
+> +    AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_GET_CLASS(pcms->acpi_dev);
+> +    AcpiDeviceIf *adev = ACPI_DEVICE_IF(pcms->acpi_dev);
+> +    NumaState *nstat = machine->numa_state;
+> +    NumaMemRange *mem_range;
+>      ram_addr_t hotplugabble_address_space_size =
+>          object_property_get_int(OBJECT(pcms), PC_MACHINE_DEVMEM_REGION_SIZE,
+>                                  NULL);
+> @@ -2327,57 +2398,25 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>          }
+>      }
+>  
+> +    if (pcms->numa_nodes && !nstat->mem_ranges_num) {
+suggest to drop nstat->mem_ranges_num field and use nstat->mem_ranges->len instead,
+also its probably better to initialize nstat->mem_ranges
+at the same place where ms->numa_state is initialized, so that
+a specific platform code won't need to duplicate it.
 
-Or you can tell me just what patches I should apply from this series now.
+> +        nstat->mem_ranges = g_array_new(false, true /* clear */,
+> +                                        sizeof *mem_range);
+> +        adevc->build_mem_ranges(adev, machine);
+> +    }
+>  
+> -    /* the memory map is a bit tricky, it contains at least one hole
+> -     * from 640k-1M and possibly another one from 3.5G-4G.
+> -     */
+> -    next_base = 0;
+>      numa_start = table_data->len;
+>  
+> -    for (i = 1; i < pcms->numa_nodes + 1; ++i) {
+> -        mem_base = next_base;
+> -        mem_len = pcms->node_mem[i - 1];
+> -        next_base = mem_base + mem_len;
+> -
+> -        /* Cut out the 640K hole */
+> -        if (mem_base <= HOLE_640K_START &&
+> -            next_base > HOLE_640K_START) {
+> -            mem_len -= next_base - HOLE_640K_START;
+> -            if (mem_len > 0) {
+> -                numamem = acpi_data_push(table_data, sizeof *numamem);
+> -                build_srat_memory(numamem, mem_base, mem_len, i - 1,
+> -                                  MEM_AFFINITY_ENABLED);
+> -            }
+> -
+> -            /* Check for the rare case: 640K < RAM < 1M */
+> -            if (next_base <= HOLE_640K_END) {
+> -                next_base = HOLE_640K_END;
+> -                continue;
+> -            }
+> -            mem_base = HOLE_640K_END;
+> -            mem_len = next_base - HOLE_640K_END;
+> -        }
+> -
+> -        /* Cut out the ACPI_PCI hole */
+> -        if (mem_base <= pcms->below_4g_mem_size &&
+> -            next_base > pcms->below_4g_mem_size) {
+> -            mem_len -= next_base - pcms->below_4g_mem_size;
+> -            if (mem_len > 0) {
+> -                numamem = acpi_data_push(table_data, sizeof *numamem);
+> -                build_srat_memory(numamem, mem_base, mem_len, i - 1,
+> -                                  MEM_AFFINITY_ENABLED);
+> -            }
+> -            mem_base = 1ULL << 32;
+> -            mem_len = next_base - pcms->below_4g_mem_size;
+> -            next_base = mem_base + mem_len;
+> -        }
+> -
+> -        if (mem_len > 0) {
+> +    for (i = 0; i < nstat->mem_ranges_num; i++) {
+> +        mem_range = &g_array_index(nstat->mem_ranges, NumaMemRange, i);
+> +        if (mem_range->length > 0) {
+why do we have this condition,
+I'd assume adevc->build_mem_ranges() shouldn't return empty ranges.
 
-I plan a MIPS pull request tomorrow evening.
+>              numamem = acpi_data_push(table_data, sizeof *numamem);
+> -            build_srat_memory(numamem, mem_base, mem_len, i - 1,
+> +            build_srat_memory(numamem, mem_range->base,
+> +                              mem_range->length,
+> +                              mem_range->node,
+>                                MEM_AFFINITY_ENABLED);
+>          }
+>      }
+> +
+>      slots = (table_data->len - numa_start) / sizeof *numamem;
+>      for (; slots < pcms->numa_nodes + 2; slots++) {
+>          numamem = acpi_data_push(table_data, sizeof *numamem);
+> diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
+> index 35d17246e9..20d919c63d 100644
+> --- a/hw/isa/lpc_ich9.c
+> +++ b/hw/isa/lpc_ich9.c
+> @@ -801,6 +801,7 @@ static void ich9_lpc_class_init(ObjectClass *klass, void *data)
+>      adevc->ospm_status = ich9_pm_ospm_status;
+>      adevc->send_event = ich9_send_gpe;
+>      adevc->madt_cpu = pc_madt_cpu_entry;
+> +    adevc->build_mem_ranges = pc_build_mem_ranges;
+>  }
+>  
+>  static const TypeInfo ich9_lpc_info = {
+> diff --git a/include/hw/acpi/acpi_dev_interface.h b/include/hw/acpi/acpi_dev_interface.h
+> index 43ff119179..5956b5ea33 100644
+> --- a/include/hw/acpi/acpi_dev_interface.h
+> +++ b/include/hw/acpi/acpi_dev_interface.h
+> @@ -39,6 +39,8 @@ void acpi_send_event(DeviceState *dev, AcpiEventStatusBits event);
+>   *           for CPU indexed by @uid in @apic_ids array,
+>   *           returned structure types are:
+>   *           0 - Local APIC, 9 - Local x2APIC, 0xB - GICC
+> + * build_mem_ranges: build memory ranges of ACPI SRAT (except misc
+> + * and hotplug SRAT ranges) and HMAT
+>   *
+>   * Interface is designed for providing unified interface
+>   * to generic ACPI functionality that could be used without
+> @@ -54,5 +56,7 @@ typedef struct AcpiDeviceIfClass {
+>      void (*send_event)(AcpiDeviceIf *adev, AcpiEventStatusBits ev);
+>      void (*madt_cpu)(AcpiDeviceIf *adev, int uid,
+>                       const CPUArchIdList *apic_ids, GArray *entry);
+> +    void (*build_mem_ranges)(AcpiDeviceIf *adev, MachineState *ms);
+> +
+>  } AcpiDeviceIfClass;
+>  #endif
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 5d5636241e..21b9ac3d11 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -281,6 +281,7 @@ void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion *rom_memory);
+>  /* acpi-build.c */
+>  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+>                         const CPUArchIdList *apic_ids, GArray *entry);
+> +void pc_build_mem_ranges(AcpiDeviceIf *adev, MachineState *ms);
+>  
+>  /* e820 types */
+>  #define E820_RAM        1
+> diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+> index 437eb21fef..e3c85b77bc 100644
+> --- a/include/sysemu/numa.h
+> +++ b/include/sysemu/numa.h
+> @@ -20,6 +20,12 @@ struct NumaNodeMem {
+>      uint64_t node_plugged_mem;
+>  };
+>  
+> +typedef struct NumaMemRange {
+> +    uint64_t base;
+> +    uint64_t length;
+> +    uint32_t node;
+> +} NumaMemRange;
+> +
+>  struct NumaState {
+>      /* Number of NUMA nodes */
+>      int num_nodes;
+> @@ -29,6 +35,12 @@ struct NumaState {
+>  
+>      /* NUMA nodes information */
+>      NodeInfo nodes[MAX_NODES];
+> +
+> +    /* Number of NUMA memory ranges */
+> +    uint32_t mem_ranges_num;
+> +
+> +    /* NUMA memory ranges */
+> +    GArray *mem_ranges;
+>  };
+>  typedef struct NumaState NumaState;
+>  
+> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+> index 9c7393b08c..4f0cdc1a45 100644
+> --- a/stubs/Makefile.objs
+> +++ b/stubs/Makefile.objs
+> @@ -33,6 +33,7 @@ stub-obj-y += qmp_memory_device.o
+>  stub-obj-y += target-monitor-defs.o
+>  stub-obj-y += target-get-monitor-def.o
+>  stub-obj-y += pc_madt_cpu_entry.o
+> +stub-obj-y += pc_build_mem_ranges.o
+>  stub-obj-y += vmgenid.o
+>  stub-obj-y += xen-common.o
+>  stub-obj-y += xen-hvm.o
+> diff --git a/stubs/pc_build_mem_ranges.c b/stubs/pc_build_mem_ranges.c
+> new file mode 100644
+> index 0000000000..997cdfe00b
+> --- /dev/null
+> +++ b/stubs/pc_build_mem_ranges.c
+> @@ -0,0 +1,14 @@
+> +/*
+> + * Stub for pc_build_mem_ranges().
+> + * piix4 is used not only pc, but also mips and etc. In order to add
+> + * build_mem_ranges callback to AcpiDeviceIfClass and use pc_build_mem_ranges
+> + * in hw/acpi/piix4.c, pc_build_mem_ranges() stub is added to make other arch
+> + * can compile successfully.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/i386/pc.h"
+> +
+> +void pc_build_mem_ranges(AcpiDeviceIf *adev, MachineState *ms)
+> +{
+> +}
 
-Bon apr=E9s midi,
-Aleksandar
-
-> Regards,
->Phil.
 
