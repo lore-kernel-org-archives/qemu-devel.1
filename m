@@ -6,38 +6,38 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5773CC0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 08:44:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B183C0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 08:44:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BAF82089C
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 08:44:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BAF82089C
+	by mail.kernel.org (Postfix) with ESMTPS id 52B7E2089C
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 08:44:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52B7E2089C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhrut-0004Zi-Ex
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 04:44:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39438)
+	id 1hhrv5-0004ur-L4
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 04:44:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39486)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hhrth-0003pi-TU
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:42:51 -0400
+ (envelope-from <laurent@vivier.eu>) id 1hhrtz-00042N-77
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:43:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hhrtg-0002VE-Kk
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:42:49 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:59205)
+ (envelope-from <laurent@vivier.eu>) id 1hhrtv-0002fh-5B
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:43:05 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:34691)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hhrtg-0002UK-BM
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:42:48 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hhrtu-0002eG-Qe
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:43:03 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1Mj8iJ-1iDMkv1mOD-00f83v; Mon, 01 Jul 2019 10:42:32 +0200
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1N2EHo-1igkDz21fC-013gs0; Mon, 01 Jul 2019 10:42:45 +0200
 To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
 References: <1561718618-20218-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1561718618-20218-3-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1561718618-20218-4-git-send-email-aleksandar.markovic@rt-rk.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -82,35 +82,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <9aaae9ca-39d8-39f8-9cb0-516c62eb1d25@vivier.eu>
-Date: Mon, 1 Jul 2019 10:42:31 +0200
+Message-ID: <b6b36d32-9c51-fbfb-fbde-7dddabe1b2b9@vivier.eu>
+Date: Mon, 1 Jul 2019 10:42:43 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <1561718618-20218-3-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1561718618-20218-4-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:YZ5HdQ9z/W5/kFdWXd4DoK0SrSrnYhBCOa0frNoZ5unxscDOpy6
- qzgWEwcaGjwNRmAx0S9Xgb6CX79UrMZiiCYi+ydI/n6QGW73JzFV+fdHGXRB9ftFJ2opzZb
- iDPJ3Zu6TqmVzudl1HDnm4Q2gJxq4nf6Jdp1JeizL2+HTm18vL0cgyKsyfXJp4+aWv3DTtW
- NZ9jmGChIBed9EuR4bRpQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:J8pJtvLfY7c=:Nj4tfwF+eHAH9IwiZv77jV
- XrbyB2iMOWdXSeg0yk4fC1LxWCYggJvmSXhPQx06AS5yaiY66UQfqLBuWUAazXOM7Gd+x9y5L
- nVFA4/jWsCImrF4Xk2OvwKC6oEY88dgU3O4DFGFfiNpVe1Qyv7a9oAAzESGcJQqr3k2Onhajd
- 4STsoFFGgyyM0m2dpq+2M8HE6PbcBZ2ql2cNc1jMYdvQjzNOCcxreXJYb3bGOVt10knSQGJqi
- 4sUofmHPBywCm4XSjH9i0TU40azqd86WIGgEOEVIp8vS9Xk4RMIUMZAmtVTYL0NZv8n/ylZGI
- v0ZGCf8Cw0A/u8jEBGV6shD6zUbSH3CyyZOBWdAoLysJdjOuWcENwl5SscjNUN3PEfG4TjqqG
- G8zqZ8BZ5oIjcPRtr2kEJL+/Pbm+PP2kc3SMrjcjE6QKIG59t5tM6gexMmYTrT2VDf/LXv199
- 1hK3WVVxQT2GRwoHLyuu7seDX7RAGDUqcyhdeLezw48AY09HsNYsdVF59BRyNXOnQvP056h/V
- v849KL7ZSi8BBUaXK7EFZPtkrtUpxp5T/3B3AzpBM1ZBvCAxqxskyY4ZsvuJvpp4PScV3bjm1
- Qb/Qo3Z0Z3pykCejp22eEjvEVkU3lAV05YxoIg0QRIgj9xXeCqumHrhk0TvYIeM9UgdLmKbbb
- 942dZtVcaRymJfhojuT7n0lRDDUVu2AL1Dy6zI/TwVXiPPvwzpPvrtIK38SRgu/7ErOpZcxyR
- wzhW9vR8BlrCJ5kFCFj+wUkDl1u+zUHQ/bgJ/phkZDtNPHbXIA6KnmNLH9o=
+X-Provags-ID: V03:K1:rIj14Qk2PY0RrdWO6a/qexVvc+KC5+aKL1/nduNB9wp2YoRyujz
+ CgwbvlDXYu+Rpht+abPNd567/O7RTQJdy5LiDNz47kDnt/UXLYuBZUnxX/DV0CRrprb18DO
+ gLcm7vhbVxevHyRYQpcUgFe3StWCxDU20CQkTRMF2w/WfwRZXSkbf5u/uvGO8iYWpGn2Z3D
+ BweR9Xe+0tJ7vlQ3kKEzg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Z70CCU5enqs=:wm41VBP8yim90ll4ZQLv3W
+ H5SqteUjJhFovqttG+6Iahr3X5E4nnxsE5LDIL9gQnxdHMB+myTNq3V5h4Cw15G4ocLkLckgQ
+ WI1d1QUH/YkoyNEh6Lf/t9kCx6KBpkYzg5RFL5/lNSLBVDMG1zoJTu6W2K/3c0tWQ1tjjot50
+ pLKMN4gf6lZXYUZBIxrgqamQlvpst6BZJ5loYUUsXCPgq5bFQNITG439Est7zOBhtP4+1B3Vd
+ c0MflAnEDCQnnXBZT6zLZiI/u2D2j/ugHXK5eGKQ/eZk+Fo0/BWaiHiiaCUBVdsWGfTRDQa14
+ EJS7DfswetN74NLhoHnFY21TF7xsfS/CWi1RsmMOt238A7GAMbe3tN2zHew5x1L916uBRHDMT
+ OTfEIeJ9OuPyH0eiXQeAv0blH/AfsqJLPNvBPIzgUzTea1u+kQsA5sqmS+ViZ4m/y1xbtFRzw
+ KHMRiIKd7Y1CWjHJO4YyYRYsPYLE8WgcZ54LJLLSEtMtpC06UgT9gBjx/+sFz7HlH+cnKLHWJ
+ oU5lb02iYqE0Uyf4aZNt7LdFMxzzDaNQ2GLxLAKBmpQdr2chfzHUYy0HO54MRGPZr6sE5DJ3/
+ i6leneOtDSGDr8dST/vIa52KYIcAXAlGvWHWxgu++2N7SyusQ1FXMCJVO4TD6gIRxuwN9dmdM
+ gH3P5CEqxERzmD0WXy8HEJjf9545wlmBSfZ4l9aMdE2kYeFe0WCZUHLtQVDerRzunvkXF12HR
+ jpugm3F+g455/pJrbf+VS8A5OFklMT38FhmSRXKeltDtuvUBlm4mtGYbw5I=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.24
-Subject: Re: [Qemu-devel] [PATCH v16 2/5] linux-user: Add support for strace
- for statx() syscall
+X-Received-From: 217.72.192.73
+Subject: Re: [Qemu-devel] [PATCH v16 3/5] linux-user: Fix target_flock
+ structure for MIPS O64 ABI
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,144 +122,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: amarkovic@wavecomp.com, Jim Wilson <jimw@sifive.com>
+Cc: amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 28/06/2019 à 12:43, Aleksandar Markovic a écrit :
-> From: Jim Wilson <jimw@sifive.com>
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
 > 
-> All of the flags need to be conditional as old systems don't have
-> statx support.  Otherwise it works the same as other stat family
-> syscalls.  This requires the pending patch to add statx support.
+> Among MIPS ABIs, only MIPS O32 and N32 have special (different
+> than other architectures) definition of structure flock in kernel.
 > 
-> Tested on Ubuntu 16.04 (no host statx) and Ubuntu 19.04 (with host
-> statx) using a riscv32-linux toolchain.
+> Bring target_flock definition in QEMU for MIPS O64 ABI to the
+> correct state, which is currently different than the most common
+> definition, and it should actually be the same.
 > 
-> Signed-off-by: Jim Wilson <jimw@sifive.com>
+> Reported-by: Dragan Mladjenovic <dmladjenovic@wavecomp.com>
 > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 > Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 > ---
->  linux-user/strace.c    | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  linux-user/strace.list |  3 ++
->  2 files changed, 89 insertions(+)
+>  linux-user/generic/fcntl.h     | 2 +-
+>  linux-user/mips/target_fcntl.h | 4 ++++
+>  2 files changed, 5 insertions(+), 1 deletion(-)
 > 
-> diff --git a/linux-user/strace.c b/linux-user/strace.c
-> index 6f72a74..c80e93b 100644
-> --- a/linux-user/strace.c
-> +++ b/linux-user/strace.c
-> @@ -976,6 +976,76 @@ UNUSED static struct flags msg_flags[] = {
->      FLAG_END,
->  };
->  
-> +UNUSED static struct flags statx_flags[] = {
-> +#ifdef AT_EMPTY_PATH
-> +    FLAG_GENERIC(AT_EMPTY_PATH),
-> +#endif
-> +#ifdef AT_NO_AUTOMOUNT
-> +    FLAG_GENERIC(AT_NO_AUTOMOUNT),
-> +#endif
-> +#ifdef AT_SYMLINK_NOFOLLOW
-> +    FLAG_GENERIC(AT_SYMLINK_NOFOLLOW),
-> +#endif
-> +#ifdef AT_STATX_SYNC_AS_STAT
-> +    FLAG_GENERIC(AT_STATX_SYNC_AS_STAT),
-> +#endif
-> +#ifdef AT_STATX_FORCE_SYNC
-> +    FLAG_GENERIC(AT_STATX_FORCE_SYNC),
-> +#endif
-> +#ifdef AT_STATX_DONT_SYNC
-> +    FLAG_GENERIC(AT_STATX_DONT_SYNC),
-> +#endif
-> +    FLAG_END,
-> +};
-> +
-> +UNUSED static struct flags statx_mask[] = {
-> +/* This must come first, because it includes everything.  */
-> +#ifdef STATX_ALL
-> +    FLAG_GENERIC(STATX_ALL),
-> +#endif
-> +/* This must come second; it includes everything except STATX_BTIME.  */
-> +#ifdef STATX_BASIC_STATS
-> +    FLAG_GENERIC(STATX_BASIC_STATS),
-> +#endif
-> +#ifdef STATX_TYPE
-> +    FLAG_GENERIC(STATX_TYPE),
-> +#endif
-> +#ifdef STATX_MODE
-> +    FLAG_GENERIC(STATX_MODE),
-> +#endif
-> +#ifdef STATX_NLINK
-> +    FLAG_GENERIC(STATX_NLINK),
-> +#endif
-> +#ifdef STATX_UID
-> +    FLAG_GENERIC(STATX_UID),
-> +#endif
-> +#ifdef STATX_GID
-> +    FLAG_GENERIC(STATX_GID),
-> +#endif
-> +#ifdef STATX_ATIME
-> +    FLAG_GENERIC(STATX_ATIME),
-> +#endif
-> +#ifdef STATX_MTIME
-> +    FLAG_GENERIC(STATX_MTIME),
-> +#endif
-> +#ifdef STATX_CTIME
-> +    FLAG_GENERIC(STATX_CTIME),
-> +#endif
-> +#ifdef STATX_INO
-> +    FLAG_GENERIC(STATX_INO),
-> +#endif
-> +#ifdef STATX_SIZE
-> +    FLAG_GENERIC(STATX_SIZE),
-> +#endif
-> +#ifdef STATX_BLOCKS
-> +    FLAG_GENERIC(STATX_BLOCKS),
-> +#endif
-> +#ifdef STATX_BTIME
-> +    FLAG_GENERIC(STATX_BTIME),
-> +#endif
-> +    FLAG_END,
-> +};
-> +
->  /*
->   * print_xxx utility functions.  These are used to print syscall
->   * parameters in certain format.  All of these have parameter
-> @@ -2611,6 +2681,22 @@ print_tgkill(const struct syscallname *name,
->  }
+> diff --git a/linux-user/generic/fcntl.h b/linux-user/generic/fcntl.h
+> index a775a49..1b48dde 100644
+> --- a/linux-user/generic/fcntl.h
+> +++ b/linux-user/generic/fcntl.h
+> @@ -129,7 +129,7 @@ struct target_flock {
+>      short l_whence;
+>      abi_long l_start;
+>      abi_long l_len;
+> -#if defined(TARGET_MIPS)
+> +#if defined(TARGET_MIPS) && (TARGET_ABI_BITS == 32)
+>      abi_long l_sysid;
 >  #endif
+>      int l_pid;
+> diff --git a/linux-user/mips/target_fcntl.h b/linux-user/mips/target_fcntl.h
+> index 000527c..795bba7 100644
+> --- a/linux-user/mips/target_fcntl.h
+> +++ b/linux-user/mips/target_fcntl.h
+> @@ -27,7 +27,11 @@
+>  #define TARGET_F_SETOWN        24       /*  for sockets. */
+>  #define TARGET_F_GETOWN        23       /*  for sockets. */
 >  
-> +#ifdef TARGET_NR_statx
-> +static void
-> +print_statx(const struct syscallname *name,
-> +            abi_long arg0, abi_long arg1, abi_long arg2,
-> +            abi_long arg3, abi_long arg4, abi_long arg5)
-> +{
-> +    print_syscall_prologue(name);
-> +    print_at_dirfd(arg0, 0);
-> +    print_string(arg1, 0);
-> +    print_flags(statx_flags, arg2, 0);
-> +    print_flags(statx_mask, arg3, 0);
-> +    print_pointer(arg4, 1);
-> +    print_syscall_epilogue(name);
-> +}
+> +#if (TARGET_ABI_BITS == 32)
+>  #define TARGET_ARCH_FLOCK_PAD abi_long pad[4];
+> +#else
+> +#define TARGET_ARCH_FLOCK_PAD
 > +#endif
-> +
->  /*
->   * An array of all of the syscalls we know about
->   */
-> diff --git a/linux-user/strace.list b/linux-user/strace.list
-> index db21ce4..63a9466 100644
-> --- a/linux-user/strace.list
-> +++ b/linux-user/strace.list
-> @@ -1650,3 +1650,6 @@
->  #ifdef TARGET_NR_atomic_barrier
->  { TARGET_NR_atomic_barrier, "atomic_barrier", NULL, NULL, NULL },
->  #endif
-> +#ifdef TARGET_NR_statx
-> +{ TARGET_NR_statx, "statx", NULL, print_statx, NULL },
-> +#endif
+>  #define TARGET_ARCH_FLOCK64_PAD
+>  
+>  #define TARGET_F_GETLK64       33      /*  using 'struct flock64' */
 > 
 
 Applied to my linux-user branch.
