@@ -2,79 +2,61 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 064C6C5B578
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 22:15:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2766FC5B578
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 22:16:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEFBB205C9
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 22:15:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEFBB205C9
+	by mail.kernel.org (Postfix) with ESMTPS id ED309205C9
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 22:16:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED309205C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi4aF-0005iK-4e
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 18:15:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48866)
+	id 1hi4bB-0006Nr-86
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 18:16:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54780)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hi3MI-0007UF-R0
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:57:08 -0400
+ (envelope-from <philmd@redhat.com>) id 1hi3WG-0006k1-Ph
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:07:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hi3MF-00052P-KR
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:57:04 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:50593)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hi3MF-0004x3-DQ
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:57:03 -0400
-Received: by mail-wm1-f66.google.com with SMTP id n9so854846wmi.0
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 13:56:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=dKB2Umh3Pp34bt2n2bl4TPAAqwbQYVzTk1oPuHSAwrc=;
- b=SqSkWPlJJ9usjKf/jAgwovc13sqoQih9YDpvt8K03qefQawLXky2P79K3X7T/Kve9Z
- WzfltkehUkL2cY1hIxPW9fDGWPTh3BtbkbX3pTksGXRZXQ9ANAHvkQNtX8yNmWkIyc62
- MDidskHmpgXtWT5QxwA8Fayo3isI/+tDVA3hpB61Bv+kxXeDNb6S77I9Xn4LxbOt5Ks5
- 85TEsC8IxYROiMvGu+cEibPpjNIOlM4rUOfyt8QlFoI7HCLd50+yl+jNcEkz6/OHyh32
- TBtpLslLQzIGpOtMrtOyQfT2HDRDcbdVY/tAUZ/H8jb7iX3RukPob6AM2fFfZK8rxAoI
- 83Tg==
-X-Gm-Message-State: APjAAAUTjelCPpSYdb1LBsm3IR/uvpztQ9hgCJv8+xOjXosWl+k08SVP
- NFubEDahOU8RF64WQ5+ndVoPkQ==
-X-Google-Smtp-Source: APXvYqxaCki1wpQ1Y15fVf3ui/iD14zg23UVmXEH0idZRlkHm7qlBHzosP0f/+r3iRD6sIGT/wJPvw==
-X-Received: by 2002:a1c:b68a:: with SMTP id g132mr370179wmf.66.1562004792286; 
- Mon, 01 Jul 2019 11:13:12 -0700 (PDT)
-Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.183])
- by smtp.gmail.com with ESMTPSA id v65sm402838wme.31.2019.07.01.11.13.11
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Mon, 01 Jul 2019 11:13:11 -0700 (PDT)
+ (envelope-from <philmd@redhat.com>) id 1hi3WF-0005bj-Mj
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:07:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33570)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>)
+ id 1hi3WC-0005Tx-7Y; Mon, 01 Jul 2019 17:07:20 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4BFAB3162916;
+ Mon,  1 Jul 2019 19:50:14 +0000 (UTC)
+Received: from x1w.redhat.com (unknown [10.40.205.170])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 344429089;
+ Mon,  1 Jul 2019 19:50:06 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-References: <156200378933.9862.9905804796969886990@c4a48874b076>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <81770e41-70a3-4e57-d7d7-501321843dd4@redhat.com>
-Date: Mon, 1 Jul 2019 20:13:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+Date: Mon,  1 Jul 2019 21:49:38 +0200
+Message-Id: <20190701194942.10092-5-philmd@redhat.com>
+In-Reply-To: <20190701194942.10092-1-philmd@redhat.com>
+References: <20190701194942.10092-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <156200378933.9862.9905804796969886990@c4a48874b076>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Mon, 01 Jul 2019 19:50:14 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [PATCH 0/6] hw/arm: Use ARM_CPU_TYPE_NAME() and
- object_initialize_child()
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v4 4/8] RFC target/arm: Restrict pre-ARMv7 cpus
+ to TCG
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,34 +68,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, andrew.smirnov@gmail.com, jasowang@redhat.com,
- alistair@alistair23.me, jcd@tribudubois.net, b.galvani@gmail.com,
- i.mitsyanko@gmail.com, qemu-arm@nongnu.org, peter.chubb@nicta.com.au,
- antonynpavlov@gmail.com, edgar.iglesias@gmail.com
+Cc: Yang Zhong <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Andrew Jones <drjones@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>,
+ Rob Bradford <robert.bradford@intel.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/1/19 7:56 PM, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20190701123108.12493-1-philmd@redhat.com/
-> 
-> Hi,
-> 
-> This series failed build test on s390x host. Please find the details below.
-> 
->   CC      hw/dma/i8257.o
->   CC      hw/dma/xilinx_axidma.o
-> /var/tmp/patchew-tester-tmp-6umc5eop/src/hw/dma/xilinx_axidma.c: In function ‘xilinx_axidma_init’:
-> /var/tmp/patchew-tester-tmp-6umc5eop/src/hw/dma/xilinx_axidma.c:568:29: error: ‘TYPE_XILINX_AXI_ENET_DATA_STREAM’ undeclared (first use in this function); did you mean ‘TYPE_XILINX_AXI_DMA_DATA_STREAM’?
->   568 |                             TYPE_XILINX_AXI_ENET_DATA_STREAM, &error_abort,
->       |                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->       |                             TYPE_XILINX_AXI_DMA_DATA_STREAM
-> /var/tmp/patchew-tester-tmp-6umc5eop/src/hw/dma/xilinx_axidma.c:568:29: note: each undeclared identifier is reported only once for each function it appears in
-> /var/tmp/patchew-tester-tmp-6umc5eop/src/hw/dma/xilinx_axidma.c:572:29: error: ‘TYPE_XILINX_AXI_ENET_CONTROL_STREAM’ undeclared (first use in this function); did you mean ‘TYPE_XILINX_AXI_DMA_CONTROL_STREAM’?
->   572 |                             TYPE_XILINX_AXI_ENET_CONTROL_STREAM, &error_abort,
->       |                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->       |                             TYPE_XILINX_AXI_DMA_CONTROL_STREAM
+KVM requires at least a ARMv7 cpu.
 
-It would be nice if GCC directly fix the patch instead of embarrassing
-the author for obvious copy/paste mistakes...
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ target/arm/cpu.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index ca718fb38f..290ef16e52 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1643,6 +1643,8 @@ static ObjectClass *arm_cpu_class_by_name(const cha=
+r *cpu_model)
+ /* CPU models. These are not needed for the AArch64 linux-user build. */
+ #if !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64)
+=20
++#ifdef CONFIG_TCG
++
+ static void arm926_initfn(Object *obj)
+ {
+     ARMCPU *cpu =3D ARM_CPU(obj);
+@@ -1853,6 +1855,8 @@ static void cortex_m0_initfn(Object *obj)
+     cpu->midr =3D 0x410cc200;
+ }
+=20
++#endif
++
+ static void cortex_m3_initfn(Object *obj)
+ {
+     ARMCPU *cpu =3D ARM_CPU(obj);
+@@ -2234,6 +2238,8 @@ static void cortex_a15_initfn(Object *obj)
+     define_arm_cp_regs(cpu, cortexa15_cp_reginfo);
+ }
+=20
++#ifdef CONFIG_TCG
++
+ static void ti925t_initfn(Object *obj)
+ {
+     ARMCPU *cpu =3D ARM_CPU(obj);
+@@ -2402,6 +2408,8 @@ static void pxa270c5_initfn(Object *obj)
+     cpu->reset_sctlr =3D 0x00000078;
+ }
+=20
++#endif
++
+ #ifndef TARGET_AARCH64
+ /* -cpu max: if KVM is enabled, like -cpu host (best possible with this =
+host);
+  * otherwise, a CPU with as many features enabled as our emulation suppo=
+rts.
+@@ -2470,6 +2478,7 @@ struct ARMCPUInfo {
+=20
+ static const ARMCPUInfo arm_cpus[] =3D {
+ #if !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64)
++#ifdef CONFIG_TCG
+     { .name =3D "arm926",      .initfn =3D arm926_initfn },
+     { .name =3D "arm946",      .initfn =3D arm946_initfn },
+     { .name =3D "arm1026",     .initfn =3D arm1026_initfn },
+@@ -2482,6 +2491,7 @@ static const ARMCPUInfo arm_cpus[] =3D {
+     { .name =3D "arm1176",     .initfn =3D arm1176_initfn },
+     { .name =3D "arm11mpcore", .initfn =3D arm11mpcore_initfn },
+     { .name =3D "cortex-m0",   .initfn =3D cortex_m0_initfn,
++#endif
+                              .class_init =3D arm_v7m_class_init },
+     { .name =3D "cortex-m3",   .initfn =3D cortex_m3_initfn,
+                              .class_init =3D arm_v7m_class_init },
+@@ -2495,6 +2505,7 @@ static const ARMCPUInfo arm_cpus[] =3D {
+     { .name =3D "cortex-a8",   .initfn =3D cortex_a8_initfn },
+     { .name =3D "cortex-a9",   .initfn =3D cortex_a9_initfn },
+     { .name =3D "cortex-a15",  .initfn =3D cortex_a15_initfn },
++#ifdef CONFIG_TCG
+     { .name =3D "ti925t",      .initfn =3D ti925t_initfn },
+     { .name =3D "sa1100",      .initfn =3D sa1100_initfn },
+     { .name =3D "sa1110",      .initfn =3D sa1110_initfn },
+@@ -2511,6 +2522,7 @@ static const ARMCPUInfo arm_cpus[] =3D {
+     { .name =3D "pxa270-b1",   .initfn =3D pxa270b1_initfn },
+     { .name =3D "pxa270-c0",   .initfn =3D pxa270c0_initfn },
+     { .name =3D "pxa270-c5",   .initfn =3D pxa270c5_initfn },
++#endif
+ #ifndef TARGET_AARCH64
+     { .name =3D "max",         .initfn =3D arm_max_initfn },
+ #endif
+--=20
+2.20.1
+
 
