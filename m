@@ -2,62 +2,64 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-7.8 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F33B4C0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 09:39:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2150CC0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 09:41:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB8F0208C4
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 09:39:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB8F0208C4
+	by mail.kernel.org (Postfix) with ESMTPS id E1F9F208C4
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 09:41:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1F9F208C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhsmS-0000Nu-41
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 05:39:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49760)
+	id 1hhso8-0002kd-PN
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 05:41:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51179)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1hhsex-0002ds-AJ
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:31:40 -0400
+ (envelope-from <berrange@redhat.com>) id 1hhsli-0008LC-8P
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:38:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1hhsev-0000ci-Cp
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:31:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40196)
+ (envelope-from <berrange@redhat.com>) id 1hhslg-0006hf-Qv
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:38:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37091)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1hhsen-0000Vd-6P; Mon, 01 Jul 2019 05:31:29 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hhslg-00068X-KU
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:38:36 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9A2143082A49;
- Mon,  1 Jul 2019 09:31:24 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-116-89.ams2.redhat.com [10.36.116.89])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 65C7E7DF6D;
- Mon,  1 Jul 2019 09:31:15 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, peter.maydell@linaro.org, peterx@redhat.com,
- pbonzini@redhat.com, alex.williamson@redhat.com
-Date: Mon,  1 Jul 2019 11:30:34 +0200
-Message-Id: <20190701093034.18873-7-eric.auger@redhat.com>
-In-Reply-To: <20190701093034.18873-1-eric.auger@redhat.com>
-References: <20190701093034.18873-1-eric.auger@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 4D3AB30872EE;
+ Mon,  1 Jul 2019 09:37:54 +0000 (UTC)
+Received: from redhat.com (ovpn-112-60.ams2.redhat.com [10.36.112.60])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 750CD19C77;
+ Mon,  1 Jul 2019 09:37:52 +0000 (UTC)
+Date: Mon, 1 Jul 2019 10:37:49 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: P J P <ppandit@redhat.com>
+Message-ID: <20190701093749.GE3573@redhat.com>
+References: <20190701090904.31312-1-ppandit@redhat.com>
+ <20190701090904.31312-4-ppandit@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190701090904.31312-4-ppandit@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Mon, 01 Jul 2019 09:31:28 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.47]); Mon, 01 Jul 2019 09:37:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 6/6] hw/arm/smmuv3: Remove spurious error
- messages on IOVA invalidations
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] net: tap: restrict bridge name to
+ IFNAMSIZ
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,115 +71,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Riccardo Schirone <rschiron@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Li Qiang <liq3ea@gmail.com>, Qemu Developers <qemu-devel@nongnu.org>,
+ Prasad J Pandit <pjp@fedoraproject.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-An IOVA/ASID invalidation is notified to all IOMMU Memory Regions
-through smmuv3_inv_notifiers_iova/smmuv3_notify_iova.
+On Mon, Jul 01, 2019 at 02:39:04PM +0530, P J P wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+> 
+> The interface name in Linux interface request struct 'ifreq'
+> OR in qemu-bridge-helper is defined to be of size IFNAMSIZ(=16),
+> including the terminating null('\0') byte.
+> 
+> QEMU tap device, while invoking qemu-bridge-helper, supplies bridge
+> name of 16 characters, restrict it to IFNAMESIZ-1 to accommodate
+> terminating null('\0') byte.
+> 
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> ---
+>  net/tap.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/tap.c b/net/tap.c
+> index e8aadd8d4b..ca8536624c 100644
+> --- a/net/tap.c
+> +++ b/net/tap.c
+> @@ -499,7 +499,7 @@ static int net_bridge_run_helper(const char *helper, const char *bridge,
+>      if (pid == 0) {
+>          int open_max = sysconf(_SC_OPEN_MAX), i;
+>          char fd_buf[6+10];
+> -        char br_buf[6+IFNAMSIZ] = {0};
+> +        char br_buf[5+IFNAMSIZ] = {0};
+>          char helper_cmd[PATH_MAX + sizeof(fd_buf) + sizeof(br_buf) + 15];
+>  
+>          for (i = 3; i < open_max; i++) {
 
-When the notification occurs it is possible that some of the
-PCIe devices associated to the notified regions do not have a
-valid stream table entry. In that case we output a LOG_GUEST_ERROR
-message, for example:
+Playing games with multiple "perfectly" sized static buffers & snprintf
+is madness. How about re-writing this method so that it just uses
+g_strdup_printf() to dynamically format the helper_cmd string.
 
-invalid sid=3D<SID> (L1STD span=3D0)
-"smmuv3_notify_iova error decoding the configuration for iommu mr=3D<MR>
+Alternatively we could get rid of the use of shell and directly exec
+the helper program. This would let us just pass argv[] and avoid the
+printf'ing entirely.
 
-This is unfortunate as the user gets the impression that there
-are some translation decoding errors whereas there are not.
-
-This patch adds a new field in SMMUEventInfo that tells whether
-the detection of an invalid STE must lead to an error report.
-invalid_ste_allowed is set before doing the invalidations and
-kept unset on actual translation.
-
-The other configuration decoding error messages are kept since if the
-STE is valid then the rest of the config must be correct.
-
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
----
-
-v1 -> v2:
-- explain why we keep the other config decoding errors
-- handle the new guest error log on STE invalid
----
- hw/arm/smmuv3-internal.h |  1 +
- hw/arm/smmuv3.c          | 15 ++++++++-------
- 2 files changed, 9 insertions(+), 7 deletions(-)
-
-diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
-index b160289cd1..d190181ef1 100644
---- a/hw/arm/smmuv3-internal.h
-+++ b/hw/arm/smmuv3-internal.h
-@@ -381,6 +381,7 @@ typedef struct SMMUEventInfo {
-     uint32_t sid;
-     bool recorded;
-     bool record_trans_faults;
-+    bool inval_ste_allowed;
-     union {
-         struct {
-             uint32_t ssid;
-diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-index 2e270a0f07..517755aed5 100644
---- a/hw/arm/smmuv3.c
-+++ b/hw/arm/smmuv3.c
-@@ -320,7 +320,9 @@ static int decode_ste(SMMUv3State *s, SMMUTransCfg *c=
-fg,
-     uint32_t config;
-=20
-     if (!STE_VALID(ste)) {
--        qemu_log_mask(LOG_GUEST_ERROR, "invalid STE\n");
-+        if (!event->inval_ste_allowed) {
-+            qemu_log_mask(LOG_GUEST_ERROR, "invalid STE\n");
-+        }
-         goto bad_ste;
-     }
-=20
-@@ -405,7 +407,7 @@ static int smmu_find_ste(SMMUv3State *s, uint32_t sid=
-, STE *ste,
-=20
-         span =3D L1STD_SPAN(&l1std);
-=20
--        if (!span) {
-+        if (!span && !event->inval_ste_allowed) {
-             /* l2ptr is not valid */
-             qemu_log_mask(LOG_GUEST_ERROR,
-                           "invalid sid=3D%d (L1STD span=3D0)\n", sid);
-@@ -603,7 +605,9 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegi=
-on *mr, hwaddr addr,
-     SMMUDevice *sdev =3D container_of(mr, SMMUDevice, iommu);
-     SMMUv3State *s =3D sdev->smmu;
-     uint32_t sid =3D smmu_get_sid(sdev);
--    SMMUEventInfo event =3D {.type =3D SMMU_EVT_NONE, .sid =3D sid};
-+    SMMUEventInfo event =3D {.type =3D SMMU_EVT_NONE,
-+                           .sid =3D sid,
-+                           .inval_ste_allowed =3D false};
-     SMMUPTWEventInfo ptw_info =3D {};
-     SMMUTranslationStatus status;
-     SMMUState *bs =3D ARM_SMMU(s);
-@@ -796,16 +800,13 @@ static void smmuv3_notify_iova(IOMMUMemoryRegion *m=
-r,
-                                dma_addr_t iova)
- {
-     SMMUDevice *sdev =3D container_of(mr, SMMUDevice, iommu);
--    SMMUEventInfo event =3D {};
-+    SMMUEventInfo event =3D {.inval_ste_allowed =3D true};
-     SMMUTransTableInfo *tt;
-     SMMUTransCfg *cfg;
-     IOMMUTLBEntry entry;
-=20
-     cfg =3D smmuv3_get_config(sdev, &event);
-     if (!cfg) {
--        qemu_log_mask(LOG_GUEST_ERROR,
--                      "%s error decoding the configuration for iommu mr=3D=
-%s\n",
--                      __func__, mr->parent_obj.name);
-         return;
-     }
-=20
---=20
-2.20.1
-
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
