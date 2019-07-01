@@ -2,86 +2,76 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C74A5C5B578
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 21:38:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DCF3C5B578
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 21:40:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97FE620B7C
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 21:38:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C985720B7C
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 21:40:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GkVf5v/s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97FE620B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="rCCuleW6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C985720B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi40g-000285-Qt
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 17:38:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46759)
+	id 1hi424-0002ps-PE
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 17:40:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48722)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hi3H6-0003xK-0g
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:51:45 -0400
+ (envelope-from <yury-kotov@yandex-team.ru>) id 1hi3Qh-0001j5-Pg
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:01:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hi3H1-0002y1-7g
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:51:40 -0400
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:42337)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1hi3H0-0002xD-OI
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:51:39 -0400
-Received: by mail-ot1-f67.google.com with SMTP id l15so14888165otn.9
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 13:51:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=WlFEqtUXt54b0aOCl4ubcuGedgwjm1qKVcTQcTcPvjQ=;
- b=GkVf5v/sKAm49oELw8DDyHVoTY3sFXzsLpPldRK7kgmbg8cI+4Pyq7iyslKIrX1IpW
- JHBNGyFGzt51uXFUXN6vZJJRlOJ92yS3KevNQz8PM/5FAynOCQuiGKI6U8qiMYdIK178
- TnGBDCQ6qZkk98teJE8C/lx9fhsW7dwdt+AG5Cyv7pV6jPAkHjzE7PRdcnXSjGTu+ixw
- +TqvNbqp52BHlAR1wijsuIcBBHOdR8sy8T0omBpak76aXXDUBlAST0qmB1X/aOQloE7i
- TNAOtfEk5qK0NGMmLayguTRZ77o8Gln6ZdxS+NM9JeCa89hxr5t6ksNboRNmCgbLRbgR
- 8xMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=WlFEqtUXt54b0aOCl4ubcuGedgwjm1qKVcTQcTcPvjQ=;
- b=t3iLKW8OqJ9I4gA3/Omlh00rNk9gVPm0EVuJahBtLaX0C42ojSehpXPJJVke9YKaja
- YH9hnaMkp32dG4r5FICvpOVwc8owIogdJMreHSxi1cH0bnzLJE5zYRVZokODbFwIMoaq
- OLdlkHoNz2NOkCSTWCPx/yTP2OuG+ETJp69FdVeWMzYtZ/UPYX+odRYCEmTIdVwQIVbc
- WN9S6ai2ZUKFqaFdu8Q6QSZGcUcZ4RbRlJrSGppuC7g6LnC6kACjKR3vdxT7quHNxKZm
- O/lOC6cT5FIVKy5gAcHfjPkVuVI2XKwy5IpVQVvqH8oaqToGpD7binTNsbPEopv6Uita
- pcOw==
-X-Gm-Message-State: APjAAAV/VDBGk5CPRrNp28D98yOvUZro0NLIX2iZCq2NG5C7Utmm75cp
- 2wmRYVUSiS9MYumR3UxnObQzlOazNWCe9O7Pgp4Mnw==
-X-Google-Smtp-Source: APXvYqwGwN1Buy7nRoCIKIknJeJSC4VpEKAmCJxqkKVR79/MMLZVyGMQ6KTmylXul487TENWWNYFnqOsKfjCSuXw5OA=
-X-Received: by 2002:a9d:6e8a:: with SMTP id a10mr21951626otr.295.1562000928342; 
- Mon, 01 Jul 2019 10:08:48 -0700 (PDT)
+ (envelope-from <yury-kotov@yandex-team.ru>) id 1hi3QP-0001Jh-Qn
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:01:26 -0400
+Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:36360)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
+ id 1hi3QC-0008CD-Pd
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:01:11 -0400
+Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net
+ [IPv6:2a02:6b8:0:1619::119])
+ by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 78CBF2E1435;
+ Mon,  1 Jul 2019 19:42:34 +0300 (MSK)
+Received: from localhost (localhost [::1])
+ by mxbackcorp2j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
+ 5XFJ2s1Qlk-gYbGiC7f; Mon, 01 Jul 2019 19:42:34 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1561999354; bh=TwFSzjnXJnDvcova6hE0WeovdGZ3iXT6HsyPPJ/eEdo=;
+ h=Date:Message-Id:Cc:Subject:To:From;
+ b=rCCuleW6wAlaJN7ttHYZj2mfbEjAifmu1A2DxE8fFUTn5sF0dRU+GJy4Lv/GOgPPA
+ EkEeSuhVCOxxQeRcwgOIpClCSEpNn8CDPB+Wrk2+DqyLUMFueC2y631iQk3nzME9qI
+ vWUEyMjoGhHpAIGhM7OflK+zXw4eqOOe0mHOU1u8=
+Authentication-Results: mxbackcorp2j.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+X-Yandex-Sender-Uid: 1120000000071945
+X-Yandex-Avir: 1
+Received: from mxbackcorp1g.mail.yandex.net (localhost [::1])
+ by mxbackcorp1g.mail.yandex.net with LMTP id MUMlmgbyWn-ed6mRBF7
+ for <yury-kotov@yandex-team.ru>; Mon, 01 Jul 2019 19:42:23 +0300
+Received: by sas2-ae5b5c0d8595.qloud-c.yandex.net with HTTP;
+ Mon, 01 Jul 2019 19:42:23 +0300
+From: Yury Kotov <yury-kotov@yandex-team.ru>
+To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Juan Quintela <quintela@redhat.com>,
+ Dr. David Alan Gilbert <dgilbert@redhat.com>
 MIME-Version: 1.0
-Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP;
- Mon, 1 Jul 2019 10:08:47 -0700 (PDT)
-Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP;
- Mon, 1 Jul 2019 10:08:47 -0700 (PDT)
-In-Reply-To: <CAL1e-=iogUENT-RESCwCs+tjLD7DBqJ3GamLyythSdcqQ9M==g@mail.gmail.com>
-References: <20190701140143.32706-1-philmd@redhat.com>
- <CAL1e-=iogUENT-RESCwCs+tjLD7DBqJ3GamLyythSdcqQ9M==g@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 1 Jul 2019 19:08:47 +0200
-Message-ID: <CAL1e-=jy+3aXffBchAai=obXOXwCMVddd8tw4hymccXpg3-x2A@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+X-Mailer: Yamail [ http://yandex.ru ] 5.0
+Date: Mon, 01 Jul 2019 19:42:33 +0300
+Message-Id: <1563421561999343@sas2-ae5b5c0d8595.qloud-c.yandex.net>
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.210.67
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH] tests/machine-none: Test recent MIPS cpus
+X-Received-From: 77.88.29.217
+Subject: [Qemu-devel] Question about bdrv_co_invalidate_cache
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,61 +83,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-devel@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: "open list:All patches CC here" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Jul 1, 2019 4:53 PM, "Aleksandar Markovic" <aleksandar.m.mail@gmail.com>
-wrote:
->
->
-> On Jul 1, 2019 4:45 PM, "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
-wrote:
-> >
-> > The MIPS I7200 got added in commit d45942d908e, and the I6500
-> > in commit ca1ffd14ed8.
-> > Extend the coverage on the little-endian machines.
-> > The 4Kc and 20Kc are still covered by the big-endian machines.
-> >
-> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > ---
->
-> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
->
+Hi,
 
-If nobody objects, I am going to select this patch for mips queue scheduled
-tomorrow.
+I just want to clarify the purpose of bdrv_co_invalidate_cache callback.
+IIUC on of the purposes of this callback is to "activate" BDRV (opposite of the
+bdrv_inactivate callback) on migration end, right?
+
+E.g, if we have a custom BDRV which is backed by some network block storage with
+exclusive mount then on migration end bdrv_inactivate callback have to unmount
+this storage and bdrv_co_invalidate_cache have to mount it.
+
+I'm not sure because of the name of bdrv_co_invalidate_cache callback. It looks
+like something that can be called in very different context, not only migration
+(may be not now, but in the future).
+
+If there is another approach for my example, tell me about it, please.
+We have such custom BDRV with exclusive mount and want to realize migration
+support correctly.
 
 Thanks!
 
-Aleksandar
+Regards,
+Yury
 
-> >  tests/machine-none-test.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/tests/machine-none-test.c b/tests/machine-none-test.c
-> > index 4c6d470798..5953d31755 100644
-> > --- a/tests/machine-none-test.c
-> > +++ b/tests/machine-none-test.c
-> > @@ -36,9 +36,9 @@ static struct arch2cpu cpus_map[] =3D {
-> >      /* FIXME: { "microblaze", "any" }, doesn't work with -M none -cpu
-any */
-> >      /* FIXME: { "microblazeel", "any" }, doesn't work with -M none
--cpu any */
-> >      { "mips", "4Kc" },
-> > -    { "mipsel", "4Kc" },
-> > +    { "mipsel", "I7200" },
-> >      { "mips64", "20Kc" },
-> > -    { "mips64el", "20Kc" },
-> > +    { "mips64el", "I6500" },
-> >      { "moxie", "MoxieLite" },
-> >      { "nios2", "FIXME" },
-> >      { "or1k", "or1200" },
-> > --
-> > 2.20.1
-> >
-> >
