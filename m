@@ -7,85 +7,82 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37843C5B578
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 00:22:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83A76C5B578
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 00:28:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01DEB20652
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 00:22:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4AF1F21721
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 00:28:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CuMfXgPL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01DEB20652
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vPUIPgOj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AF1F21721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46412 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi6Yi-0002or-GT
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 20:22:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35337)
+	id 1hi6ez-0003Ks-8B
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 20:28:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51717)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tcminyard@gmail.com>) id 1hi3ds-000560-WB
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:15:21 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hi49X-00055t-Ac
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:48:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tcminyard@gmail.com>) id 1hi3dn-0002Ai-IT
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:15:16 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:32770)
+ (envelope-from <peter.maydell@linaro.org>) id 1hi49V-0007tU-0D
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:47:59 -0400
+Received: from mail-wm1-f53.google.com ([209.85.128.53]:35496)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1hi3dn-0001q6-As
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:15:11 -0400
-Received: by mail-ot1-f66.google.com with SMTP id q20so14962770otl.0
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 14:14:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Mz9dF6CfjXk0LN/K2yMNd+TDsCbwVvqlvyyMEh6FyjY=;
- b=CuMfXgPLIQxe5LbD9NopP9IMfzlWQHNUwWCF8lqXABbVS8OCOB65WxodTmu0DDeuuG
- yRuvQ8trdoOCtwJ36ll67Q/NA8fk17bVmtZPZtb+dpozdD/KZu1Hz14KBq3BatcV8vn4
- wvra4BniHI5lbjSrAMoo4+iGei2vuwePKbqF13eSL9LVLLG/IkVYgvttqEdN7gq8ha1J
- 8rw0rX+nGyPnReTRKv3gARhuS/q2gta0ASJgklx6A1Rc0fQdzHLtpLhb0m4pdMfmrwa0
- 0Y1EnDa8EXcnVbJaqc63ZwUjZgMyxuwBcAahsYY8TNkwQhLrAz7aqF0D1Y/KbyuxNqI6
- dFZw==
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hi49U-0007p1-KF
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:47:56 -0400
+Received: by mail-wm1-f53.google.com with SMTP id c6so1081770wml.0
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 14:47:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=pigEtb5VD7XCWgXu8Dli8Jr+xIcMfHiGbTXOqk3Rhsw=;
+ b=vPUIPgOjkGlkRG6lx/rCNLO7Iw+3S0ripCG9sc1xsogG9PgBE9Rpd+1Xk2cGvaKWyI
+ eWt+CGyTi5aSrZv1FrS5xRN5Eo3f85N7RdRFDjFdYqB/5UcFDbKL7PewScczaRWGf+X1
+ iiRZTWGYd1uf9ypmgyEGcZFibYLTEPCZSvJ2wamf+QSknfFbR0N4LscAjrm62tMFSRNP
+ clMzD2nGAJJlKHh4vRrjyMIeZ4dpjbUgrlEy/944+UPDrHDylj37Vv7XYKqQ6DHtfpw5
+ B4HNSxKrP6J24hUGneYWGTHGYVRbUW7bXm21ROWY41yeCrWnasXryOnrcX1GceypVSl3
+ r+NA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=Mz9dF6CfjXk0LN/K2yMNd+TDsCbwVvqlvyyMEh6FyjY=;
- b=hKHh+3mmQo/35I6wYq57LuYdO+8Biz4xIGQQYOsyOyFyKXHO1S2Mcgw+1edprs1LPl
- yLrE3s4Cvz90p+XwgiK6j2emcP75VaNdzOs2afxp92rdqSURi6aJbqnjwfJRVL9O41B0
- eua4XdM2B0Adm0os6CfgW77kJKsQhJCSEJYjW144xvVVzjs58lcIBUbPgm+m6ZW+x/Ms
- oyXvrg+Lr19PgSW8LSKmE+jrAAy+U0xOYq125njn41XZFNPcRnjy/wP8SdYgKh7sZ/xa
- /uwGD6ctJOISYzmG/GWUgThZ4RV2wu9e38Kj7xnyPeTYQJvyYFtJCMFil9YWJ5o2yNuG
- SXvw==
-X-Gm-Message-State: APjAAAWRrimvQyJOJg8nNIP52gQQLT8gzioBUWXdmNiamm5bSOzRb2/9
- hOQ0qGORb5BXwot+Zan9A1GbqeE=
-X-Google-Smtp-Source: APXvYqzA3YsccTz0nuz686jNu2Y0yWUIswAm7N/FzK5qrTA5YvwU/z3U/fazon0ln4G6iF1B/Jc6mw==
-X-Received: by 2002:a9d:4546:: with SMTP id p6mr21625423oti.34.1562005869827; 
- Mon, 01 Jul 2019 11:31:09 -0700 (PDT)
-Received: from serve.minyard.net (serve.minyard.net. [2001:470:b8f6:1b::1])
- by smtp.gmail.com with ESMTPSA id c125sm4156119oif.17.2019.07.01.11.31.08
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=pigEtb5VD7XCWgXu8Dli8Jr+xIcMfHiGbTXOqk3Rhsw=;
+ b=WIRe65lcFHhTt1VyC05dRptvo+L2jRfdvGukOIV86fZ6JXptC5vssN9UsBUF8zX8Ru
+ nEr3Un6IBckY3PHfU9bfCOsq50koy5uNN9vYSjsFKk1PhvS/aRIwdwnVmCKBoyeKMmj2
+ dLzyP4M0QA8bWLxm96e2k2QBkzFldBCysQTZse475HwRhRpbrB0i/pDAtjL5Bu5QmHoW
+ pd+Prq9QX5k+/pPwzxBdqjKRzbDMJVpRHwzXHsJdhMpqFSuYYcl5vPM5WwzOihUYpNgk
+ WYZQdrrO72M8G5PgziLCIZB0YiEI+GxlrP+dOqqRdM/oRGKzk0FDziCwRDC1muH1R9lR
+ l1rg==
+X-Gm-Message-State: APjAAAUy96ntKiwvvkG36yHedmiVCoLioBopQOTuPoUdMtmSDz8I597d
+ 6wE7+55o68Fa+hVAGmMcfGfpVHuMl7eIGQ==
+X-Google-Smtp-Source: APXvYqwprTbJML91UkqV0ad/rE4aw0+YEOZyt4g6w5IZAm8A2LCqc1pQGgRpuY8E6AMHKjWi4B2V/A==
+X-Received: by 2002:a1c:c109:: with SMTP id r9mr106069wmf.143.1561999207940;
+ Mon, 01 Jul 2019 09:40:07 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id o6sm26573508wra.27.2019.07.01.09.40.06
+ for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 01 Jul 2019 11:31:08 -0700 (PDT)
-Received: from t430.minyard.net (t430m.minyard.net [192.168.27.3])
- by serve.minyard.net (Postfix) with ESMTPA id 95E931805A6;
- Mon,  1 Jul 2019 18:31:07 +0000 (UTC)
-Received: by t430.minyard.net (Postfix, from userid 1000)
- id 3C75D30042A; Mon,  1 Jul 2019 13:31:07 -0500 (CDT)
-From: minyard@acm.org
-To: QEMU Developers <qemu-devel@nongnu.org>
-Date: Mon,  1 Jul 2019 13:31:00 -0500
-Message-Id: <20190701183100.7849-3-minyard@acm.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190701183100.7849-1-minyard@acm.org>
-References: <20190701183100.7849-1-minyard@acm.org>
+ Mon, 01 Jul 2019 09:40:07 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Mon,  1 Jul 2019 17:39:18 +0100
+Message-Id: <20190701163943.22313-22-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190701163943.22313-1-peter.maydell@linaro.org>
+References: <20190701163943.22313-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.210.66
-Subject: [Qemu-devel] [PATCH v2 2/2] ipmi: Add a UUID device property
+X-Received-From: 209.85.128.53
+Subject: [Qemu-devel] [PULL 21/46] aspeed/smc: add a 'sdram_base' property
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,127 +94,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>, "Michael S . Tsirkin" <mst@redhat.com>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Corey Minyard <cminyard@mvista.com>
+From: Cédric Le Goater <clg@kaod.org>
 
-Using the UUID that qemu generates probably isn't the best thing
-to do, allow it to be passed in via properties, and use QemuUUID
-for the type.
+The DRAM address of a DMA transaction depends on the DRAM base address
+of the SoC. Inform the SMC controller model with this value.
 
-If the UUID is not set, return an unsupported command error.  This
-way we are not providing an all-zero (or randomly generated) GUID
-to the IPMI user.  This lets the host fall back to the other
-method of using the get device id command to determind the BMC
-being accessed.
-
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Cc: Cédric Le Goater <clg@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Reviewed-by: Joel Stanley <joel@jms.id.au>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20190618165311.27066-15-clg@kaod.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/ipmi/ipmi_bmc_sim.c | 22 ++++++++++++++--------
- qemu-options.hx        | 10 +++++++---
- 2 files changed, 21 insertions(+), 11 deletions(-)
+ include/hw/ssi/aspeed_smc.h | 3 +++
+ hw/arm/aspeed_soc.c         | 6 ++++++
+ hw/ssi/aspeed_smc.c         | 1 +
+ 3 files changed, 10 insertions(+)
 
-diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
-index 1980536517..007e2c6588 100644
---- a/hw/ipmi/ipmi_bmc_sim.c
-+++ b/hw/ipmi/ipmi_bmc_sim.c
-@@ -221,7 +221,7 @@ struct IPMIBmcSim {
-     uint8_t restart_cause;
+diff --git a/include/hw/ssi/aspeed_smc.h b/include/hw/ssi/aspeed_smc.h
+index 3b1e7fce6c8..591279ba1f4 100644
+--- a/include/hw/ssi/aspeed_smc.h
++++ b/include/hw/ssi/aspeed_smc.h
+@@ -97,6 +97,9 @@ typedef struct AspeedSMCState {
+     uint8_t r_timings;
+     uint8_t conf_enable_w0;
  
-     uint8_t acpi_power_state[2];
--    uint8_t uuid[16];
-+    QemuUUID uuid;
- 
-     IPMISel sel;
-     IPMISdr sdr;
-@@ -937,8 +937,19 @@ static void get_device_guid(IPMIBmcSim *ibs,
- {
-     unsigned int i;
- 
-+    /* An uninitialized uuid is all zeros, use that to know if it is set. */
-     for (i = 0; i < 16; i++) {
--        rsp_buffer_push(rsp, ibs->uuid[i]);
-+        if (ibs->uuid.data[i]) {
-+            goto uuid_set;
-+        }
-+    }
-+    /* No uuid is set, return an error. */
-+    rsp_buffer_set_error(rsp, IPMI_CC_INVALID_CMD);
-+    return;
++    /* for DMA support */
++    uint64_t sdram_base;
 +
-+ uuid_set:
-+    for (i = 0; i < 16; i++) {
-+        rsp_buffer_push(rsp, ibs->uuid.data[i]);
-     }
- }
+     AspeedSMCFlash *flashes;
  
-@@ -1980,12 +1991,6 @@ static void ipmi_sim_realize(DeviceState *dev, Error **errp)
-     ibs->acpi_power_state[0] = 0;
-     ibs->acpi_power_state[1] = 0;
+     uint8_t snoop_index;
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index 736e52366a6..02feb4361ba 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -337,6 +337,12 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+                        aspeed_soc_get_irq(s, ASPEED_I2C));
  
--    if (qemu_uuid_set) {
--        memcpy(&ibs->uuid, &qemu_uuid, 16);
--    } else {
--        memset(&ibs->uuid, 0, 16);
--    }
--
-     ipmi_init_sensors_from_sdrs(ibs);
-     register_cmds(ibs);
+     /* FMC, The number of CS is set at the board level */
++    object_property_set_int(OBJECT(&s->fmc), sc->info->memmap[ASPEED_SDRAM],
++                            "sdram-base", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
+     object_property_set_bool(OBJECT(&s->fmc), true, "realized", &err);
+     if (err) {
+         error_propagate(errp, err);
+diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+index 9eda0d720be..81f2fb7f707 100644
+--- a/hw/ssi/aspeed_smc.c
++++ b/hw/ssi/aspeed_smc.c
+@@ -913,6 +913,7 @@ static const VMStateDescription vmstate_aspeed_smc = {
  
-@@ -2005,6 +2010,7 @@ static Property ipmi_sim_properties[] = {
-     DEFINE_PROP_UINT8("fwrev2", IPMIBmcSim, fwrev2, 0),
-     DEFINE_PROP_UINT32("mfg_id", IPMIBmcSim, mfg_id, 0),
-     DEFINE_PROP_UINT16("product_id", IPMIBmcSim, product_id, 0),
-+    DEFINE_PROP_UUID_NODEFAULT("guid", IPMIBmcSim, uuid),
+ static Property aspeed_smc_properties[] = {
+     DEFINE_PROP_UINT32("num-cs", AspeedSMCState, num_cs, 1),
++    DEFINE_PROP_UINT64("sdram-base", AspeedSMCState, sdram_base, 0),
      DEFINE_PROP_END_OF_LIST(),
  };
  
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 0d8beb4afd..ec56ab8f6f 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -700,7 +700,7 @@ possible drivers and properties, use @code{-device help} and
- @code{-device @var{driver},help}.
- 
- Some drivers are:
--@item -device ipmi-bmc-sim,id=@var{id}[,slave_addr=@var{val}][,sdrfile=@var{file}][,furareasize=@var{val}][,furdatafile=@var{file}]
-+@item -device ipmi-bmc-sim,id=@var{id}[,slave_addr=@var{val}][,sdrfile=@var{file}][,furareasize=@var{val}][,furdatafile=@var{file}][,guid=@var{uuid}]
- 
- Add an IPMI BMC.  This is a simulation of a hardware management
- interface processor that normally sits on a system.  It provides
-@@ -713,8 +713,8 @@ controllers.  If you don't know what this means, it is safe to ignore
- it.
- 
- @table @option
--@item bmc=@var{id}
--The BMC to connect to, one of ipmi-bmc-sim or ipmi-bmc-extern above.
-+@item id=@var{id}
-+The BMC id for interfaces to use this device.
- @item slave_addr=@var{val}
- Define slave address to use for the BMC.  The default is 0x20.
- @item sdrfile=@var{file}
-@@ -723,6 +723,10 @@ file containing raw Sensor Data Records (SDR) data. The default is none.
- size of a Field Replaceable Unit (FRU) area.  The default is 1024.
- @item frudatafile=@var{file}
- file containing raw Field Replaceable Unit (FRU) inventory data. The default is none.
-+@item guid=@var{uuid}
-+value for the GUID for the BMC, in standard UUID format.  If this is set,
-+get "Get GUID" command to the BMC will return it.  Otherwise "Get GUID"
-+will return an error.
- @end table
- 
- @item -device ipmi-bmc-extern,id=@var{id},chardev=@var{id}[,slave_addr=@var{val}]
 -- 
-2.17.1
+2.20.1
 
 
