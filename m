@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8377C0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 14:03:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20E89C0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 14:03:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E38A2173E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 14:03:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E38A2173E
+	by mail.kernel.org (Postfix) with ESMTPS id ECBF12146E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 14:03:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECBF12146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhwta-0001hJ-OD
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 10:03:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43404)
+	id 1hhwtf-0001pH-2L
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 10:03:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43318)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hhwTa-0002Rk-9U
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:36:11 -0400
+ (envelope-from <philmd@redhat.com>) id 1hhwTQ-0002OA-Lc
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:36:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hhwTZ-00009M-6R
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:36:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56756)
+ (envelope-from <philmd@redhat.com>) id 1hhwTO-0008Po-P9
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:36:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41218)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hhwTY-000069-5E
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:36:08 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hhwTM-0008Jz-Tw
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:35:58 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A59EDC1EB210;
- Mon,  1 Jul 2019 13:36:06 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 856883086268;
+ Mon,  1 Jul 2019 13:35:50 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.205.170])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CADFC608BA;
- Mon,  1 Jul 2019 13:35:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 28512608BA;
+ Mon,  1 Jul 2019 13:35:46 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon,  1 Jul 2019 15:35:25 +0200
-Message-Id: <20190701133536.28946-5-philmd@redhat.com>
+Date: Mon,  1 Jul 2019 15:35:22 +0200
+Message-Id: <20190701133536.28946-2-philmd@redhat.com>
 In-Reply-To: <20190701133536.28946-1-philmd@redhat.com>
 References: <20190701133536.28946-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Mon, 01 Jul 2019 13:36:06 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.49]); Mon, 01 Jul 2019 13:35:50 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 04/15] hw/i386/pc: Rename bochs_bios_init as
- more generic fw_cfg_arch_create
+Subject: [Qemu-devel] [PATCH v3 01/15] hw/i386/pc: Use
+ e820_get_num_entries() to access e820_entries
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,55 +79,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The bochs_bios_init() function is not restricted to the Bochs
-BIOS and is useful to other BIOS.
-Since it is not specific to the PC machine, and can be reused
-by other machines of the X86 architecture, rename it as
-fw_cfg_arch_create().
+To be able to extract the e820* code out of this file (in the next
+patch), access e820_entries with its correct helper.
 
-Suggested-by: Samuel Ortiz <sameo@linux.intel.com>
 Reviewed-by: Li Qiang <liq3ea@gmail.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-v2: Rename x86_create_fw_cfg() -> fw_cfg_arch_create() (MST)
----
- hw/i386/pc.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ hw/i386/pc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index ea7422b16c..5fc52f6a0e 100644
+index e96360b47a..691726b85b 100644
 --- a/hw/i386/pc.c
 +++ b/hw/i386/pc.c
-@@ -929,7 +929,7 @@ static void pc_build_smbios(PCMachineState *pcms)
-     }
- }
+@@ -1020,7 +1020,7 @@ static FWCfgState *bochs_bios_init(AddressSpace *as=
+, PCMachineState *pcms)
+     fw_cfg_add_bytes(fw_cfg, FW_CFG_E820_TABLE,
+                      &e820_reserve, sizeof(e820_reserve));
+     fw_cfg_add_file(fw_cfg, "etc/e820", e820_table,
+-                    sizeof(struct e820_entry) * e820_entries);
++                    sizeof(struct e820_entry) * e820_get_num_entries());
 =20
--static FWCfgState *bochs_bios_init(PCMachineState *pcms)
-+static FWCfgState *fw_cfg_arch_create(PCMachineState *pcms)
- {
-     FWCfgState *fw_cfg;
-     uint64_t *numa_fw_cfg;
-@@ -1509,7 +1509,7 @@ void pc_cpus_init(PCMachineState *pcms)
-      * Limit for the APIC ID value, so that all
-      * CPU APIC IDs are < pcms->apic_id_limit.
-      *
--     * This is used for FW_CFG_MAX_CPUS. See comments on bochs_bios_init=
-().
-+     * This is used for FW_CFG_MAX_CPUS. See comments on fw_cfg_arch_cre=
-ate().
-      */
-     pcms->apic_id_limit =3D x86_cpu_apic_id_from_index(max_cpus - 1) + 1=
-;
-     possible_cpus =3D mc->possible_cpu_arch_ids(ms);
-@@ -1763,7 +1763,7 @@ void pc_memory_init(PCMachineState *pcms,
-                                         option_rom_mr,
-                                         1);
-=20
--    fw_cfg =3D bochs_bios_init(pcms);
-+    fw_cfg =3D fw_cfg_arch_create(pcms);
-=20
-     rom_set_fw(fw_cfg);
-=20
+     fw_cfg_add_bytes(fw_cfg, FW_CFG_HPET, &hpet_cfg, sizeof(hpet_cfg));
+     /* allocate memory for the NUMA channel: one (64bit) word for the nu=
+mber
 --=20
 2.20.1
 
