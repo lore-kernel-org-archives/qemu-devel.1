@@ -4,37 +4,37 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83B81C0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 08:46:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1BB7C0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 08:48:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B8DF2089C
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 08:46:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B8DF2089C
+	by mail.kernel.org (Postfix) with ESMTPS id B4FE82089C
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 08:48:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4FE82089C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhrwo-00078R-MI
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 04:46:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39967)
+	id 1hhryq-0008Ho-0p
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 04:48:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40170)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hhrw3-00066x-GL
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:45:16 -0400
+ (envelope-from <laurent@vivier.eu>) id 1hhrxF-0007h9-Mz
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:46:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hhrw2-0004A4-8V
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:45:15 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:54039)
+ (envelope-from <laurent@vivier.eu>) id 1hhrxE-0004vr-II
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:46:29 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:48525)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hhrw1-00049G-VR
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:45:14 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hhrxE-0004v5-6U
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 04:46:28 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MuDPf-1iX58k2TYj-00ua79; Mon, 01 Jul 2019 10:44:55 +0200
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1N5mSj-1iaysa3ubz-017HPa; Mon, 01 Jul 2019 10:46:12 +0200
 To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
 References: <1561718618-20218-1-git-send-email-aleksandar.markovic@rt-rk.com>
  <1561718618-20218-6-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -82,8 +82,8 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <1a200c20-4b5c-a8ea-be3b-c2196dd7cd78@vivier.eu>
-Date: Mon, 1 Jul 2019 10:44:54 +0200
+Message-ID: <a1d26542-4e78-30cf-8e74-ab9fe9466622@vivier.eu>
+Date: Mon, 1 Jul 2019 10:46:10 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
@@ -91,24 +91,24 @@ In-Reply-To: <1561718618-20218-6-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:arUTH1veMEce3R0e75AKJV1YS3cVI0RH2oBL01fGM3Fa+w8Cw+p
- Bb49MoAm9BhKKLdEzXYsd5939VFJG9z22bORfB4kYzsNOPAqXTVzgdHE2UxqRpgA/1JAHWb
- 1r8nd0SF0YdvINPuC1TQWNkd4x0wfzs4t6Ezq12Il9s94HOFXdVjIeRpRRucuGaoX6EI2DO
- WEf8kaKZQ5XGLwEAzY1cg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Q1262WvOrqE=:E2WxBUOU9AmeVAqqS3jeqv
- snoIxyelVqflrpfTdy2eTWngHLBCmXnA6j1iSTsYlxgVVLEkPcpzWsUblOcbLXXARhm8eQ5k+
- tq0M7YWzVg8k+2z6BTBJi4p5mH5Qa2GF9N4vgjyzRkHemYMLE/Wkc9p0lvEMOoB2NCFUWlnJC
- MpBVTCd1JAshrPpuDGLjUpTv8gmujeECYnMFa+JXuMvzYN1R0kqdNyWse2vkwb7gkb1ypA94Q
- xe9xPCm1Qt8ZwhZxuuqvoH6j+E/gwhlfRHoGsoujEmw88IrKEoglxUfe6gEq6N8vILQu9dSFA
- 6wj0ib+YW5YRkNjpIY2oWOlXtQc1BM7z/bKVwIJZFyfhBY3s459OnREUOQx5vaFgbMmDIyI0P
- KAzyV1+1gZhv7huH5+SMKpSoz4RtSnRQfEvE7AsSk/vnkiUN8OoUywhCI84RR9J+LnSOTR//z
- B+2aEKgb11QF6zkjMJhpmdlSRCKghasqMLIXNcml3GYYx66NhlcOrl3lyUmWNWJdP3y6pu5n8
- 3KC9tv4sZtgIOyPpCvoAUW4DP0XvSiBploHY/wN2p0aZnYnTz2gYRCv0cG04ZBARDNsYz3/j7
- zuzyOS/caNd2Lk+FWVkFjwpChVWJM3yB1XN/ByrcetMRFq6ZRHdtHFVT7Ivru6JqMnPKofRA6
- 4+p5g3yQGl7FSENaT9nj89vkQWlJ2/8ABwtXIuDDRZVd+IrbusFlkhEB8i9Mp3pveRTczSIOa
- Qub6NJ+2rz5vAKWaPuymC5eeEFMbuAkd1hag1VAGXLD7ykbKkKkWGzSrGuc=
+X-Provags-ID: V03:K1:Z8ci9peE/BfwBSjxVzl6P286brre4vqk0CXrKTQ6uGMKsmNJCZd
+ 31JckRpycpWLPBluvW7sFIc/4bi+9z1/hg4BpcCIcMQHdY/+7fKg7ycY2Ua53mW2OjAZ5Gu
+ lF/KNWCePJEmbDEaaB5lEGZwUsmyW2RF6jTx9mQ+JxID5PTQmoz1yPKRH7tXt28mdXtNLHS
+ 9Efnx1r0dsIX1hPW+BeQA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:LsaFN/Nu518=:dI9xeVqYDS1QEhtdlADO3x
+ XtDJpM5Ohqt8oWH5VioKJBPeK2pxcB3PikRlebMA31/A+yu/Zv2EZhYziVyUUvfPjMRafDGMG
+ P+WNMr4QfbchO3M/7bFyAf/m/ghQLCdQdfb/14Uxtdv9uKphhfl2HsafF166DMTTSoTX4MSTH
+ l3uJJFvDY/bTRcdtJ1XLjgvgaNFLrI51Q9ZLQkB0W4GiGC93RaDbvK/HmlavFsmrj6rQWdfRU
+ zqY+sAPnnoGc+O/cQ47OSnTk44yO5j/TOZGR6yDUilD0R8xqj81yCkeZMJMCFaMUvwoHAo+6T
+ 6jtMZvuOkAn/zsn3MMVp4b0d7cTyJx1OozLWkZcmbW4uGmYSIUcEFWeghWDPEc70xx71I4lZ3
+ Kf92cQS42sCahRYjgmFAcdme3G1w+2xSV4MV9V5oyVyMZIMZMZzdrFJ+igeCpMnGO+t+i7vVD
+ RGFSCTxrVnk6EmoX8QA8w/ZYyE1s3D0Cpr3UJwmzD9xmYWi9+mFohkwz1rnIH+wuMI82TaWE8
+ aMIULKEe69xBK1uOmxaax6XS7PUHNIPcLx6twzNfNv6mG9kDvlgGPVm9QOsnImX/M3JfNYmax
+ ZbpoIi5VwxnkOLfPcFRxJFFyw4VokJvu+iq3OBKMVQXnWN01EmdtnLruqlQF4Z7l+fmNQ/D8g
+ o7+2RINI7zJSrSFc8Vz6hlLtTn5rr8LHi7nWNL2uYbyGnd3j82KX3fBgcu3qvOG3PslpcSl7P
+ oU8c4YCjEn3Pd3NVE6oHgkjzXhP+pe0iFG4Vn3kWTqzrjM+eFSdEtfzGG24=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.24
+X-Received-From: 212.227.17.13
 Subject: Re: [Qemu-devel] [PATCH v16 5/5] linux-user: Handle EXCP_FPE
  properly for MIPS
 X-BeenThere: qemu-devel@nongnu.org
@@ -180,5 +180,9 @@ Le 28/06/2019 à 12:43, Aleksandar Markovic a écrit :
 >           */
 > 
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Applied to my linux-user branch.
+
+Thanks,
+Laurent
+
 
