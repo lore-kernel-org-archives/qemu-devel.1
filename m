@@ -2,78 +2,62 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1CAAC0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 14:42:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B46BDC0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 14:43:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CEDF2173E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 14:42:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="S19RzFaH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CEDF2173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8A1952064B
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 14:43:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A1952064B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhxVu-0003ne-Ol
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 10:42:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51871)
+	id 1hhxX0-0005Az-Lk
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 10:43:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46787)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hhx6L-0002nF-2L
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:16:14 -0400
+ (envelope-from <dinechin@redhat.com>) id 1hhwiO-0000Q9-KH
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:51:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hhx6J-0005cn-HZ
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:16:12 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:41850)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hhx6J-0005br-5G
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:16:11 -0400
-Received: by mail-ot1-x344.google.com with SMTP id o101so13322659ota.8
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 07:16:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=EY4Adx0OcbtAOPWeOiQ6foI2RYDNLt0gmr6T8P4rYnc=;
- b=S19RzFaHFMPAsC8JggOBvrQ0XCcqqUvZaHS/xgr5bTJgOF1D32KN6NODKaUA6S4rpa
- 5dbFGqRGu6eQVDS3Ju98o7q2T0uyMo6q+xDBGEgR+y6w9MNmDND4Ge4fvP2/JkT9ysku
- voC0Hn/Sr/iR8MPDEn2J08NV5BkYZncBBgb1BlMOZ4RizZ/6eok/jFuppEUgr8jq9BqH
- nnGZ+fOIX0A32Yuq2DI7Ln9jLSCJF8y0mMDsXMR8pg7K9eAsU/gTSFGX1FQFNjTAHQ7W
- fMWXx/0EXMsOSe24u7ngsX1fIJutPF7YKjbpK4VD4sVpjggNdVNDRB1pJoXfuqTwW2FA
- r9Og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=EY4Adx0OcbtAOPWeOiQ6foI2RYDNLt0gmr6T8P4rYnc=;
- b=XUrePyHF4eZl1OVJj8q5UsUbdPxlDAm/68o1g67sSHKx1UQoxt6uBH5woP0qfUY/a6
- zFW/ej/3lPKhw+Qp1gXtmShwGkeeRn4HfglGO5cHT+nWS6mE06uPencP3Y/+VsFJnLqG
- MVdrzTRVL9MVryh4r2eKveghyKUaTE5MH6pt6H/S7EVmmT/oplVMCZsWtNnDKL0pTzvU
- xw1wFPme9D70Y/2CHEkIefriGC/honQf5YqwSw2j+spZwRoZYUAijexLXh4sdEusloG0
- eW16WYqAZIMUHwTM4t6BdYlOp6q4JKaPfsZAg26pPJMBVUW4WSinXRoWZwTbcGZzSb8E
- rdzg==
-X-Gm-Message-State: APjAAAU+8zVtfh9YhePylcFQ+cWw0Jab0h2ZSxpOVlaJVneEetEY6bq+
- zPeTP+/3cM7sP94WFXfP+j/HXoUcIT5v6nYhCbGuKw==
-X-Google-Smtp-Source: APXvYqzdGFS/f8xo5e9jpYynCQWW4r6cciJTzD5y5Zmjpb91hBQPXoaFxIIJJx8iub15B6j7PQCDSyaxMqyPf8rtw/c=
-X-Received: by 2002:a9d:5f1a:: with SMTP id f26mr20494605oti.91.1561990570216; 
- Mon, 01 Jul 2019 07:16:10 -0700 (PDT)
+ (envelope-from <dinechin@redhat.com>) id 1hhwiN-0001vh-Fg
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:51:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33088)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dinechin@redhat.com>) id 1hhwiN-0001n0-6P
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:51:27 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6B8B13003BF1
+ for <qemu-devel@nongnu.org>; Mon,  1 Jul 2019 13:51:14 +0000 (UTC)
+Received: from ptitpuce (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A3A1F6085B;
+ Mon,  1 Jul 2019 13:51:13 +0000 (UTC)
+References: <20190621064615.20099-1-mst@redhat.com>
+ <20190701093232.28575-1-mst@redhat.com>
+User-agent: mu4e 1.3.2; emacs 26.2
+From: Christophe de Dinechin <dinechin@redhat.com>
+To: qemu-devel@nongnu.org
+In-reply-to: <20190701093232.28575-1-mst@redhat.com>
+Date: Mon, 01 Jul 2019 15:51:10 +0200
+Message-ID: <m1h885hnht.fsf@redhat.com>
 MIME-Version: 1.0
-References: <1561890034-15921-1-git-send-email-hongbo.zhang@linaro.org>
-In-Reply-To: <1561890034-15921-1-git-send-email-hongbo.zhang@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 1 Jul 2019 15:15:59 +0100
-Message-ID: <CAFEAcA8cut67vuwsc++H2TWa8Aq0g1ss8Gda3QnoyyP_-6WgwQ@mail.gmail.com>
-To: Hongbo Zhang <hongbo.zhang@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH v9 0/2] Add Arm SBSA Reference Machine
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Mon, 01 Jul 2019 13:51:14 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 4/3] pcie: minor cleanups for slot
+ control/status
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,80 +69,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>,
- Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Leif Lindholm <leif.lindholm@linaro.org>,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 30 Jun 2019 at 11:21, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
+
+Michael S. Tsirkin writes:
+
+> Rename function arguments to make intent clearer.
+> Better documentation for slot control logic.
 >
-> For the Aarch64, there is one machine 'virt', it is primarily meant to
-> run on KVM and execute virtualization workloads, but we need an
-> environment as faithful as possible to physical hardware,  to support
-> firmware and OS development for pysical Aarch64 machines.
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
 >
-> This machine comes with:
->  - Re-designed memory map.
->  - CPU cortex-a57.
->  - EL2 and EL3 enabled.
->  - GIC version 3.
->  - System bus AHCI controller.
->  - System bus XHCI controller.
->  - CDROM and hard disc on AHCI bus.
->  - E1000E ethernet card on PCIE bus.
->  - VGA display adaptor on PCIE bus.
->  - Only minimal device tree nodes.
-> And without:
->  - virtio deivces.
->  - fw_cfg device.
->  - ACPI tables.
 >
-> Arm Trusted Firmware and UEFI porting to this are done accordingly, and
-> it should supply ACPI tables to load OS, the minimal device tree nodes
-> supplied from this platform are only to pass the dynamic info reflecting
-> command line input to firmware, not for loading OS.
+>  include/hw/pci/pcie.h |  3 ++-
+>  hw/pci/pcie.c         | 17 +++++++++++------
+>  2 files changed, 13 insertions(+), 7 deletions(-)
+>
+> diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+> index 8d90c0e193..34f277735c 100644
+> --- a/include/hw/pci/pcie.h
+> +++ b/include/hw/pci/pcie.h
+> @@ -108,7 +108,8 @@ void pcie_cap_lnkctl_reset(PCIDevice *dev);
+>  void pcie_cap_slot_init(PCIDevice *dev, uint16_t slot);
+>  void pcie_cap_slot_reset(PCIDevice *dev);
+>  void pcie_cap_slot_get(PCIDevice *dev, uint16_t *slot_ctl, uint16_t *slt_sta);
+> -void pcie_cap_slot_write_config(PCIDevice *dev, uint16_t slot_ctl, uint16_t slt_sta,
+> +void pcie_cap_slot_write_config(PCIDevice *dev,
+> +                                uint16_t old_slot_ctl, uint16_t old_slt_sta,
+>                                  uint32_t addr, uint32_t val, int len);
+>  int pcie_cap_slot_post_load(void *opaque, int version_id);
+>  void pcie_cap_slot_push_attention_button(PCIDevice *dev);
+> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+> index c605d32dd4..a6beb567bd 100644
+> --- a/hw/pci/pcie.c
+> +++ b/hw/pci/pcie.c
+> @@ -602,7 +602,8 @@ void pcie_cap_slot_get(PCIDevice *dev, uint16_t *slt_ctl, uint16_t *slt_sta)
+>      *slt_sta = pci_get_word(exp_cap + PCI_EXP_SLTSTA);
+>  }
+>
+> -void pcie_cap_slot_write_config(PCIDevice *dev, uint16_t slt_ctl, uint16_t slt_sta,
+> +void pcie_cap_slot_write_config(PCIDevice *dev,
+> +                                uint16_t old_slt_ctl, uint16_t old_slt_sta,
+>                                  uint32_t addr, uint32_t val, int len)
+>  {
+>      uint32_t pos = dev->exp.exp_cap;
+> @@ -625,8 +626,8 @@ void pcie_cap_slot_write_config(PCIDevice *dev, uint16_t slt_ctl, uint16_t slt_s
+>                            PCI_EXP_SLTSTA_MRLSC | PCI_EXP_SLTSTA_PDC | \
+>                            PCI_EXP_SLTSTA_CC)
+>
+> -        if (val & ~slt_sta & PCIE_SLOT_EVENTS) {
+> -            sltsta = (sltsta & ~PCIE_SLOT_EVENTS) | (slt_sta & PCIE_SLOT_EVENTS);
+> +        if (val & ~old_slt_sta & PCIE_SLOT_EVENTS) {
+> +            sltsta = (sltsta & ~PCIE_SLOT_EVENTS) | (old_slt_sta & PCIE_SLOT_EVENTS);
+>              pci_set_word(exp_cap + PCI_EXP_SLTSTA, sltsta);
+>          }
+>          hotplug_event_clear(dev);
+> @@ -646,13 +647,17 @@ void pcie_cap_slot_write_config(PCIDevice *dev, uint16_t slt_ctl, uint16_t slt_s
+>      }
+>
+>      /*
+> -     * If the slot is polulated, power indicator is off and power
+> +     * If the slot is populated, power indicator is off and power
+>       * controller is off, it is safe to detach the devices.
+> +     *
+> +     * Note: don't detach if condition was already true:
+> +     * this is a work around for guests that overwrite
+> +     * control of powered off slots before powering them on.
+>       */
+>      if ((sltsta & PCI_EXP_SLTSTA_PDS) && (val & PCI_EXP_SLTCTL_PCC) &&
+>          (val & PCI_EXP_SLTCTL_PIC_OFF) == PCI_EXP_SLTCTL_PIC_OFF &&
+> -        (!(slt_ctl & PCI_EXP_SLTCTL_PCC) ||
+> -        (slt_ctl & PCI_EXP_SLTCTL_PIC_OFF) != PCI_EXP_SLTCTL_PIC_OFF)) {
+> +        (!(old_slt_ctl & PCI_EXP_SLTCTL_PCC) ||
+> +        (old_slt_ctl & PCI_EXP_SLTCTL_PIC_OFF) != PCI_EXP_SLTCTL_PIC_OFF)) {
+>          PCIBus *sec_bus = pci_bridge_get_sec_bus(PCI_BRIDGE(dev));
+>          pci_for_each_device(sec_bus, pci_bus_num(sec_bus),
+>                              pcie_unplug_device, NULL);
 
-Hi; this fails "make check" for me. Running the relevant bit of the
-test suite standalone:
+Good idea.
+Reviewed-by: Christophe de Dinechin <dinechin@redhat.com>
 
-e104462:bionic:arm-clang$
-QTEST_QEMU_BINARY=arm-softmmu/qemu-system-arm QTEST_QEMU_IMG=qemu-img
-tests/qom-test
-/arm/qom/integratorcp: OK
-/arm/qom/nuri: OK
-/arm/qom/mps2-an511: OK
-/arm/qom/verdex: OK
-/arm/qom/mps2-an505: OK
-/arm/qom/ast2500-evb: OK
-/arm/qom/smdkc210: OK
-/arm/qom/collie: OK
-/arm/qom/imx25-pdk: OK
-/arm/qom/none: OK
-/arm/qom/spitz: OK
-/arm/qom/musca-b1: OK
-/arm/qom/realview-pbx-a9: OK
-/arm/qom/realview-eb: OK
-/arm/qom/realview-pb-a8: OK
-/arm/qom/versatilepb: OK
-/arm/qom/emcraft-sf2: OK
-/arm/qom/musicpal: OK
-/arm/qom/sbsa-ref: **
-ERROR:/home/petmay01/linaro/qemu-from-laptop/qemu/qom/object.c:628:object_new_with_type:
-assertion failed: (type != NULL)
-Broken pipe
-/home/petmay01/linaro/qemu-from-laptop/qemu/tests/libqtest.c:145:
-kill_qemu() detected QEMU death from signal 6 (Aborted) (core dumped)
-Aborted (core dumped)
-
-It looks like the new board model is being added to the
-32-bit qemu-system-arm as well as to qemu-system-aarch64.
-This seems wrong, since the board will only work with a
-64-bit CPU.
-
-thanks
--- PMM
+--
+Cheers,
+Christophe de Dinechin (IRC c3d)
 
