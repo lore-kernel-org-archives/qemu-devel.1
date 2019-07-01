@@ -2,82 +2,79 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 964DCC0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 09:53:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EC60C0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 09:57:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59EE620881
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 09:53:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hcwFyWPe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59EE620881
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 375D020881
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 09:57:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 375D020881
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hht0N-0001yf-0e
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 05:53:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54452)
+	id 1hht3T-0003i7-HA
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 05:56:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55004)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hhszV-0001WR-Ik
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:52:54 -0400
+ (envelope-from <philmd@redhat.com>) id 1hht2c-00039F-1A
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:56:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hhszU-0002N8-Fu
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:52:53 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:41743)
+ (envelope-from <philmd@redhat.com>) id 1hht2a-0005TX-VA
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:56:05 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:36959)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hhszU-0002M6-8S
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:52:52 -0400
-Received: by mail-ot1-x341.google.com with SMTP id o101so12540343ota.8
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 02:52:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=MmNckSm2XAzvctbvhUpKbpJjd94dJV8ANtzR9spR1Aw=;
- b=hcwFyWPesn+zrRPnCPqmEuJFVymt7Gz+ESCL8yoKr7n8TArB3aYupgWapGxRgerYzG
- 4XzefGMLd+tXiZWfYw+IzwSdvYIMqyTNMAakTnNFnu4f1SXuu8sOdsgJlpuneHLpPySd
- Ouywak1EzI3l77zuJRVrSCard+pgjLfLuZPyTUNwft+l7WWo9t++c2CeJLTML4P0zpA2
- ILjFT65RkIpMaQI2RYRD95rmODr4Ej5gd8q6JGHXvaoRmzam/FjsMAzOI7AXN3ZPaLdm
- PNPVhCVzs/ks7crj4R6hNtZ5dD+IQmT7cr8DZWocXlbN5MjVbOmk32Se09IMXN49YjVv
- hAOQ==
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hht2a-0005RZ-Oz
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:56:04 -0400
+Received: by mail-wm1-f68.google.com with SMTP id f17so15170562wme.2
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 02:56:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=MmNckSm2XAzvctbvhUpKbpJjd94dJV8ANtzR9spR1Aw=;
- b=hGtl2rfFIvWrGPcxduiqFqmxWZ4yjozzZJknb9J5SETEKTgPtSUrroqo5bPVQ0gIEo
- 0ajj9B9edXnDWEv/0CZnjrdwFzxCoHHaKhP0GDQyNYDlnRssBlRheSV5g7uCj2ohlKei
- +KF6TAAPpTmcATlNzG31qsN6/T/scuU9XgaYhJ+4yRjYzzBtvx821eYeS0d6OlkIn6UY
- Z15aW69NWw02a4S0Yp+abC9AikRICT+82ymWV//e6mxKaoOTI2PdGJoVcyJIWjxbx4Su
- ddqehpE8eoPNWFZhsEbOt5N/dmyD4eKTPUGHdnqGXWTswkDfy4cTHE1GRXoODRq1iMSY
- db/w==
-X-Gm-Message-State: APjAAAXsv7l9MJfKr9+sG/nE3w9WAVlEWdqpSO8AJxUvhLA0rbmzuLxu
- gWoZkanQ7Zs9yVZnl5tRWD5Qj9gbUw/pdW1DUWFr2g==
-X-Google-Smtp-Source: APXvYqyM7KjHPeoB44GH0tiE6V1Lu3WH298uslu6ifqfrB4ylAiVcLbTR3piTVYTgzGEcZM7iGvP34P9HZNJSh2tqdk=
-X-Received: by 2002:a9d:4d81:: with SMTP id u1mr7924422otk.221.1561974770968; 
- Mon, 01 Jul 2019 02:52:50 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=esYtdvA6iVIBBEVsUukNwSp6DwYedmsNl6Re3bXnZqM=;
+ b=DtlkTqBVP8BTmAqHxG/tDKjUSBMe1XZRssvO0TYDNFdHJb+2doc4bdqisV4PX2VFds
+ /oIT0syQA6jjmHLPSCPJfSSJ6GhT971ZVixTpZyP7wv6kp74fvY8N+/kpR9Sw9RTsGpG
+ ey9wu+Exm2nrQ7d8GjBTiBx1mrO7obpjmwO5d66HejdibcG5JdtHF347FjvIF2ZfmjMf
+ TdoHlaYCSIenXym7/dPbsgIlJsvsptcQzkGYbs/NTp86Hzb6kU6TUohPnCYORHmZSGfs
+ 6GXXQQusQtEtgdP7A1fgM2/0nJSwR6UwehKKyeex7/92rC/npCBNCwSVh0SNgIO7aaJ5
+ OehQ==
+X-Gm-Message-State: APjAAAVFo98gBH9taK47sVuM0ZIvdDUHomRQm4s4wUTbZTNN1j8pVJKz
+ pW1Apx/0AIIK7wmLVRI2ZeH8AQ==
+X-Google-Smtp-Source: APXvYqzv97stbd2CRVzxT9Z8tYIP/gBIUuQgOu16IwPlTd1NOvPuyrH4YsB1kc3ZTHPvq85bcu9nUA==
+X-Received: by 2002:a1c:7217:: with SMTP id n23mr16919880wmc.47.1561974962737; 
+ Mon, 01 Jul 2019 02:56:02 -0700 (PDT)
+Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.183])
+ by smtp.gmail.com with ESMTPSA id o12sm10075331wrx.63.2019.07.01.02.56.01
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Mon, 01 Jul 2019 02:56:02 -0700 (PDT)
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+References: <20190701093232.28575-1-mst@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <2911eb5c-08cb-e0fb-e079-8738476d2f37@redhat.com>
+Date: Mon, 1 Jul 2019 11:56:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <20190624134337.10532-1-alex.bennee@linaro.org>
-In-Reply-To: <20190624134337.10532-1-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 1 Jul 2019 10:52:40 +0100
-Message-ID: <CAFEAcA_VPcqxVjmSkRYoRRYS9TvM9KXU7e7pww9UofApp42O7Q@mail.gmail.com>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-Subject: Re: [Qemu-devel] [PULL 00/19] testing/next (tests/vm,
- Travis and hyperv build fix)
+In-Reply-To: <20190701093232.28575-1-mst@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.68
+Subject: Re: [Qemu-devel] [PATCH 4/3] pcie: minor cleanups for slot
+ control/status
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,63 +86,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 24 Jun 2019 at 14:43, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
->
-> The following changes since commit 474f3938d79ab36b9231c9ad3b5a9314c2aeac=
-de:
->
->   Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-jun-21-=
-2019' into staging (2019-06-21 15:40:50 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/stsquad/qemu.git tags/pull-testing-next-240619-1
->
-> for you to fetch changes up to e0fe22c3528773fcbfd135a0ef7f6b3c5d373bb9:
->
->   target/i386: fix feature check in hyperv-stub.c (2019-06-24 14:36:39 +0=
-100)
->
-> ----------------------------------------------------------------
-> Various testing fixes:
->
->    - tests/vm updates and clean-ups
->    - tests/vm serial autobuild on host
->    - ensure MacOS builds do "brew update"
->    - ensure we test --static user builds
->    - fix hyperv compile failure
->
-> This brings my testing back to green on all CI services.
+On 7/1/19 11:34 AM, Michael S. Tsirkin wrote:
+> Rename function arguments to make intent clearer.
+> Better documentation for slot control logic.
+> 
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+> 
+> 
+>  include/hw/pci/pcie.h |  3 ++-
+>  hw/pci/pcie.c         | 17 +++++++++++------
+>  2 files changed, 13 insertions(+), 7 deletions(-)
+> 
+> diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+> index 8d90c0e193..34f277735c 100644
+> --- a/include/hw/pci/pcie.h
+> +++ b/include/hw/pci/pcie.h
+> @@ -108,7 +108,8 @@ void pcie_cap_lnkctl_reset(PCIDevice *dev);
+>  void pcie_cap_slot_init(PCIDevice *dev, uint16_t slot);
+>  void pcie_cap_slot_reset(PCIDevice *dev);
+>  void pcie_cap_slot_get(PCIDevice *dev, uint16_t *slot_ctl, uint16_t *slt_sta);
+> -void pcie_cap_slot_write_config(PCIDevice *dev, uint16_t slot_ctl, uint16_t slt_sta,
+> +void pcie_cap_slot_write_config(PCIDevice *dev,
+> +                                uint16_t old_slot_ctl, uint16_t old_slt_sta,
+>                                  uint32_t addr, uint32_t val, int len);
+>  int pcie_cap_slot_post_load(void *opaque, int version_id);
+>  void pcie_cap_slot_push_attention_button(PCIDevice *dev);
+> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+> index c605d32dd4..a6beb567bd 100644
+> --- a/hw/pci/pcie.c
+> +++ b/hw/pci/pcie.c
+> @@ -602,7 +602,8 @@ void pcie_cap_slot_get(PCIDevice *dev, uint16_t *slt_ctl, uint16_t *slt_sta)
+>      *slt_sta = pci_get_word(exp_cap + PCI_EXP_SLTSTA);
+>  }
+>  
+> -void pcie_cap_slot_write_config(PCIDevice *dev, uint16_t slt_ctl, uint16_t slt_sta,
+> +void pcie_cap_slot_write_config(PCIDevice *dev,
+> +                                uint16_t old_slt_ctl, uint16_t old_slt_sta,
+>                                  uint32_t addr, uint32_t val, int len)
+>  {
+>      uint32_t pos = dev->exp.exp_cap;
+> @@ -625,8 +626,8 @@ void pcie_cap_slot_write_config(PCIDevice *dev, uint16_t slt_ctl, uint16_t slt_s
+>                            PCI_EXP_SLTSTA_MRLSC | PCI_EXP_SLTSTA_PDC | \
+>                            PCI_EXP_SLTSTA_CC)
+>  
+> -        if (val & ~slt_sta & PCIE_SLOT_EVENTS) {
+> -            sltsta = (sltsta & ~PCIE_SLOT_EVENTS) | (slt_sta & PCIE_SLOT_EVENTS);
+> +        if (val & ~old_slt_sta & PCIE_SLOT_EVENTS) {
+> +            sltsta = (sltsta & ~PCIE_SLOT_EVENTS) | (old_slt_sta & PCIE_SLOT_EVENTS);
+>              pci_set_word(exp_cap + PCI_EXP_SLTSTA, sltsta);
+>          }
+>          hotplug_event_clear(dev);
+> @@ -646,13 +647,17 @@ void pcie_cap_slot_write_config(PCIDevice *dev, uint16_t slt_ctl, uint16_t slt_s
+>      }
+>  
+>      /*
+> -     * If the slot is polulated, power indicator is off and power
+> +     * If the slot is populated, power indicator is off and power
+>       * controller is off, it is safe to detach the devices.
+> +     *
+> +     * Note: don't detach if condition was already true:
+> +     * this is a work around for guests that overwrite
+> +     * control of powered off slots before powering them on.
+>       */
+>      if ((sltsta & PCI_EXP_SLTSTA_PDS) && (val & PCI_EXP_SLTCTL_PCC) &&
+>          (val & PCI_EXP_SLTCTL_PIC_OFF) == PCI_EXP_SLTCTL_PIC_OFF &&
+> -        (!(slt_ctl & PCI_EXP_SLTCTL_PCC) ||
+> -        (slt_ctl & PCI_EXP_SLTCTL_PIC_OFF) != PCI_EXP_SLTCTL_PIC_OFF)) {
+> +        (!(old_slt_ctl & PCI_EXP_SLTCTL_PCC) ||
+> +        (old_slt_ctl & PCI_EXP_SLTCTL_PIC_OFF) != PCI_EXP_SLTCTL_PIC_OFF)) {
+>          PCIBus *sec_bus = pci_bridge_get_sec_bus(PCI_BRIDGE(dev));
+>          pci_for_each_device(sec_bus, pci_bus_num(sec_bus),
+>                              pcie_unplug_device, NULL);
+> 
 
-The FreeBSD tests pass OK but the new output includes
-some stuff that trips my "find error/warning messages grep:
-con recv: /etc/rc: WARNING: $hostname is not set -- see rc.conf(5).
-con recv: /etc/rc: WARNING: hostid: unable to figure out a UUID from
-DMI data, generating a new one
-pkg: Repository FreeBSD load error: access repo
-file(/var/db/pkg/repo-FreeBSD.sqlite) failed: No such file or
-directory
-        p5-Error: 0.17027
-
-There's also a new compile warning:
-/home/qemu/qemu-test.r7G0Wv/src/migration/rdma.c:842:26: warning:
-unused variable 'port_attr' [-Wunused-variable]
-    struct ibv_port_attr port_attr;
-                         ^
-which I guess was not being flagged up by the old compiler/VM image.
-
-OpenBSD also passes but has some output which my 'find warnings'
-grep picks up:
-
-con recv: WARNING: root is targeted by password guessing attacks,
-pubkeys are safer.
-
-thanks
--- PMM
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
