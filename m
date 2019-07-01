@@ -2,87 +2,61 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FA33C5B578
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 01:26:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5270C5B578
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 01:27:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 664B621473
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 01:26:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yvNFfoLs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 664B621473
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A876321473
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 01:27:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A876321473
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi7ZC-0004nT-Fc
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 21:26:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52660)
+	id 1hi7aH-0006gv-W4
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 21:27:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47114)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hi4CN-0006hw-HO
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:50:56 -0400
+ (envelope-from <philmd@redhat.com>) id 1hi3xK-0000gV-EM
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:35:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hi4CM-0004n2-HI
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:50:55 -0400
-Received: from mail-wm1-f53.google.com ([209.85.128.53]:52118)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hi4CM-0004mY-6A
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:50:54 -0400
-Received: by mail-wm1-f53.google.com with SMTP id 207so948891wma.1
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 14:50:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=5CvhAR9JL3XvS1viNpt8Z+O+QAfXPREE5z2qgUjmg2c=;
- b=yvNFfoLsjCGbWdM+B6GYebsDQUlcOtkTMbxyZqRnMYiJV5tJZo+s9JtnP1QVutl1Dn
- YDc66fO6n2+uEEyBr4xYwc+HXUWjJ5s4nfGbBkIoAyy9FNhqf01YncAHUYo0lzUi9qKC
- skhcsPTRRJ+KgHHlE8BRl7UQCkKUUsD4YxgtlGvj9cF/nuuXIQqT4a6fvFKL3SfWIpbv
- nEzoldofboalAYt32QkZMwVj1Ik16euRq7nR3Bwb29aOYMLmv5Dgh4wepp/HU/cmhDYL
- Hglz8OTR8Ip5NBhVtP/YilHaNGFLy3IwvD8Q1ULKtJQ9onORpKkNuxDBkonjHWO7bdRO
- 7bcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=5CvhAR9JL3XvS1viNpt8Z+O+QAfXPREE5z2qgUjmg2c=;
- b=TfYVFnEEBMq0kZRzUv2kstbcc0MTs/bG29G7pL0GiQWRw2NXk0CwPM5EeQIkdvq8YP
- PZuGvHQqs+KAHaOCRaiERCFk4wGd48woGBG8tj10Hy9djMAh6R4UVPqLKfaq0a4URtiW
- VXuUttK9XUySGvinKZtM0lbayIW6G5UcOFAStS6yLumkdM0KqOYM+T5AuCv5EcUJy1cO
- /HsV4eCAxGeUIN72qnHnqPxaH/VRKD9hLW3nPDtgQ3/Exn29iSd7UKqZPFvcgKexQhSD
- ofAF7gQdUhEp1OOidK2Z3zJSJfDUTWEdqY0ATEZ7UKDVoUhd/H7qSOEaQr2D6wy3JHlZ
- J/lw==
-X-Gm-Message-State: APjAAAVhbLAYyU4ZBeYbVb1DWTi/IWHE73xVXVYN6IREYZkcwEowoTs6
- /1F1IYlitHSV//GI+pLB9aMOlJqWVipHsQ==
-X-Google-Smtp-Source: APXvYqxGZJIjcK0maWtnOqNPFfxP51OnvFqKm6vC5UwPt6g31XITmyc0rlVTDP/XB3J3A8i1hy3f7g==
-X-Received: by 2002:a1c:e108:: with SMTP id y8mr112360wmg.65.1561999188397;
- Mon, 01 Jul 2019 09:39:48 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id o6sm26573508wra.27.2019.07.01.09.39.47
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 01 Jul 2019 09:39:47 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
+ (envelope-from <philmd@redhat.com>) id 1hi3xI-0002Hl-4Q
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:35:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46562)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>)
+ id 1hi3xC-00029M-8Y; Mon, 01 Jul 2019 17:35:14 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A7BFE3082E72;
+ Mon,  1 Jul 2019 19:50:17 +0000 (UTC)
+Received: from x1w.redhat.com (unknown [10.40.205.170])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B8E0D379F;
+ Mon,  1 Jul 2019 19:50:14 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon,  1 Jul 2019 17:39:00 +0100
-Message-Id: <20190701163943.22313-4-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190701163943.22313-1-peter.maydell@linaro.org>
-References: <20190701163943.22313-1-peter.maydell@linaro.org>
+Date: Mon,  1 Jul 2019 21:49:39 +0200
+Message-Id: <20190701194942.10092-6-philmd@redhat.com>
+In-Reply-To: <20190701194942.10092-1-philmd@redhat.com>
+References: <20190701194942.10092-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Mon, 01 Jul 2019 19:50:17 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.53
-Subject: [Qemu-devel] [PULL 03/46] hw/arm/virt: Add support for Cortex-A7
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v4 5/8] RFC target/arm: Do not build pre-ARMv7
+ cpus when using KVM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,37 +68,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Yang Zhong <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Andrew Jones <drjones@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>,
+ Rob Bradford <robert.bradford@intel.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jan Kiszka <jan.kiszka@siemens.com>
+A KVM-only build won't be able to run pre-ARMv7 cpus, disable them.
 
-Allow cortex-a7 to be used with the virt board; it supports
-the v7VE features and there is no reason to deny this type.
+If KVM is not enabled, they are enabled by default.
 
-Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: fc5404f7-4d1d-c28f-6e48-d8799c82acc0@web.de
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/arm/virt.c | 1 +
- 1 file changed, 1 insertion(+)
+Sadly this does not work with --enable-tcg --enable-kvm dual config.
+---
+ default-configs/arm-softmmu.mak | 33 ++++++++++++++++-----------------
+ hw/arm/Kconfig                  | 26 ++++++++++++++++++++++++++
+ 2 files changed, 42 insertions(+), 17 deletions(-)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 431e2900fd2..ed009fa447c 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -176,6 +176,7 @@ static const int a15irqmap[] = {
- };
- 
- static const char *valid_cpus[] = {
-+    ARM_CPU_TYPE_NAME("cortex-a7"),
-     ARM_CPU_TYPE_NAME("cortex-a15"),
-     ARM_CPU_TYPE_NAME("cortex-a53"),
-     ARM_CPU_TYPE_NAME("cortex-a57"),
--- 
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
+u.mak
+index 1f2e0e7fde..081d507c87 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -9,34 +9,33 @@ CONFIG_ARM_V7M=3Dy
+ CONFIG_ARM_VIRT=3Dy
+ CONFIG_CUBIEBOARD=3Dy
+ CONFIG_EXYNOS4=3Dy
+-CONFIG_HIGHBANK=3Dy
+-CONFIG_INTEGRATOR=3Dy
+ CONFIG_FSL_IMX31=3Dy
+-CONFIG_MUSICPAL=3Dy
+ CONFIG_MUSCA=3Dy
+-CONFIG_CHEETAH=3Dy
+-CONFIG_SX1=3Dy
+-CONFIG_NSERIES=3Dy
+ CONFIG_STELLARIS=3Dy
+ CONFIG_REALVIEW=3Dy
+-CONFIG_VERSATILE=3Dy
+ CONFIG_VEXPRESS=3Dy
+ CONFIG_ZYNQ=3Dy
+-CONFIG_MAINSTONE=3Dy
+-CONFIG_GUMSTIX=3Dy
+-CONFIG_SPITZ=3Dy
+-CONFIG_TOSA=3Dy
+-CONFIG_Z2=3Dy
+-CONFIG_COLLIE=3Dy
+-CONFIG_ASPEED_SOC=3Dy
+ CONFIG_NETDUINO2=3Dy
+ CONFIG_MPS2=3Dy
+ CONFIG_RASPI=3Dy
+-CONFIG_DIGIC=3Dy
+ CONFIG_SABRELITE=3Dy
+ CONFIG_EMCRAFT_SF2=3Dy
+-CONFIG_MICROBIT=3Dy
+-CONFIG_FSL_IMX25=3Dy
+ CONFIG_FSL_IMX7=3Dy
+ CONFIG_FSL_IMX6UL=3Dy
+ CONFIG_SEMIHOSTING=3Dy
++#CONFIG_CHEETAH=3Dy
++#CONFIG_SX1=3Dy
++#CONFIG_DIGIC=3Dy
++#CONFIG_INTEGRATOR=3Dy
++#CONFIG_MUSICPAL=3Dy
++#CONFIG_MAINSTONE=3Dy
++#CONFIG_GUMSTIX=3Dy
++#CONFIG_SPITZ=3Dy
++#CONFIG_TOSA=3Dy
++#CONFIG_COLLIE=3Dy
++#CONFIG_VERSATILE=3Dy
++#CONFIG_FSL_IMX25=3Dy
++#CONFIG_ASPEED_SOC=3Dy
++#CONFIG_NSERIES=3Dy
++#CONFIG_HIGHBANK=3Dn
++#CONFIG_MICROBIT=3Dn
+diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+index ab65ecd216..b4d31c6026 100644
+--- a/hw/arm/Kconfig
++++ b/hw/arm/Kconfig
+@@ -1,3 +1,18 @@
++config ARM_V4
++    default y
++    depends on !KVM
++    bool
++
++config ARM_V5
++    default y
++    depends on !KVM
++    bool
++
++config ARM_V6
++    default y
++    depends on !KVM
++    bool
++
+ config ARM_VIRT
+     bool
+     imply PCI_DEVICES
+@@ -23,6 +38,7 @@ config ARM_VIRT
+=20
+ config CHEETAH
+     bool
++    select ARM_V4
+     select OMAP
+     select TSC210X
+=20
+@@ -32,6 +48,7 @@ config CUBIEBOARD
+=20
+ config DIGIC
+     bool
++    select ARM_V5
+     select PTIMER
+     select PFLASH_CFI02
+=20
+@@ -61,6 +78,7 @@ config HIGHBANK
+=20
+ config INTEGRATOR
+     bool
++    select ARM_V5
+     select ARM_TIMER
+     select INTEGRATOR_DEBUG
+     select PL011 # UART
+@@ -84,6 +102,7 @@ config MUSCA
+=20
+ config MUSICPAL
+     bool
++    select ARM_V5
+     select BITBANG_I2C
+     select MARVELL_88W8618
+     select PTIMER
+@@ -97,6 +116,7 @@ config NETDUINO2
+=20
+ config NSERIES
+     bool
++    select ARM_V6
+     select OMAP
+     select TMP105   # tempature sensor
+     select BLIZZARD # LCD/TV controller
+@@ -119,6 +139,7 @@ config OMAP
+=20
+ config PXA2XX
+     bool
++    select ARM_V5
+     select FRAMEBUFFER
+     select I2C
+     select SERIAL
+@@ -229,10 +250,12 @@ config COLLIE
+=20
+ config SX1
+     bool
++    select ARM_V4
+     select OMAP
+=20
+ config VERSATILE
+     bool
++    select ARM_V5
+     select ARM_TIMER # sp804
+     select PFLASH_CFI01
+     select LSI_SCSI_PCI
+@@ -321,6 +344,7 @@ config XLNX_VERSAL
+=20
+ config FSL_IMX25
+     bool
++    select ARM_V5
+     select IMX
+     select IMX_FEC
+     select IMX_I2C
+@@ -328,6 +352,7 @@ config FSL_IMX25
+=20
+ config FSL_IMX31
+     bool
++    select ARM_V6
+     select SERIAL
+     select IMX
+     select IMX_I2C
+@@ -343,6 +368,7 @@ config FSL_IMX6
+=20
+ config ASPEED_SOC
+     bool
++    select ARM_V5
+     select DS1338
+     select FTGMAC100
+     select I2C
+--=20
 2.20.1
 
 
