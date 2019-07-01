@@ -2,58 +2,87 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15B8FC5B578
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:46:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9C3FC5B578
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:47:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF14921479
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:46:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF14921479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AEDEE21479
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:47:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BcKv3pdK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEDEE21479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi8oO-0001zd-6P
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 22:46:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33959)
+	id 1hi8Vk-00059u-MQ
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 22:27:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58855)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hi4or-0005L7-D3
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:30:42 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hi4Z1-00058v-8U
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:14:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hi4oo-0000EQ-Tv
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:30:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34924)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>)
- id 1hi4od-00087c-CE; Mon, 01 Jul 2019 18:30:29 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 607EE3E2B9;
- Mon,  1 Jul 2019 22:29:26 +0000 (UTC)
-Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3A54784FA;
- Mon,  1 Jul 2019 22:29:21 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Cleber Rosa <crosa@redhat.com>
-Date: Mon,  1 Jul 2019 19:29:09 -0300
-Message-Id: <20190701222912.4703-2-ehabkost@redhat.com>
-In-Reply-To: <20190701222912.4703-1-ehabkost@redhat.com>
-References: <20190701222912.4703-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Mon, 01 Jul 2019 22:29:26 +0000 (UTC)
+ (envelope-from <peter.maydell@linaro.org>) id 1hi4Z0-0003mR-74
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:14:19 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:41720)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hi4Z0-0003m0-0P
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:14:18 -0400
+Received: by mail-wr1-f66.google.com with SMTP id c2so15466177wrm.8
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 15:14:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=SM8mY+R0SiuBOfCMBxDLwmP2jvWXg+rVriH+MW5T7NQ=;
+ b=BcKv3pdK6VP3YAvICZ3IjFWl8q1SUNfgZVufEMve5wV23Y9aKngp7BhjFG3Lfwflji
+ vXaGU0aO3uJnFcAWRygMdhXJ2ZePDe53efT/3XN0Gyh7T8rx8CrV0auXxalGzoJBw4/A
+ c65cRGaNitO2d9kW75cz8dkPys7TAN6z8VE1OMAqSUs3x/wPrnp/a/q7JVd9T+zJ5PFi
+ jmi86rSre0NHaa2KEhF9dPRNvMwxDsM9WjptMZA2SCkSE0UgeS1xGz/O/vUV2V6dOXPQ
+ j0dpacPdzSyBERnahO2v4ZVbmXGnG0hQzm6s6ZtqwNJY8p7GR3pFkhYoDV4Yn2TnmlUP
+ VXSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=SM8mY+R0SiuBOfCMBxDLwmP2jvWXg+rVriH+MW5T7NQ=;
+ b=C8eP99jhMev0rUeJzXjc2IV2LbLpnKoqer7wdYe7Zy57+PHXaVAEbgSg8tzhiMGPB0
+ 0kldTxoIw3jORbNq52wLdxUvzgsP39BfENolcsqKvznyLUeSdG42EHcT6rkXdoX5rKon
+ FRsSMAyrQrqhfu7oyqmVFEwamjdFlJCmNl4xI8vmOTX4m8l7XyZvjZOKcC7Ar2vXvsUG
+ FAExM3ZzaRDmgBU9ZIvin/4AtpOn4kX8zNzsLHv5khmrpi7C3f5V/tJeNVwPBmNX9fUY
+ 08ddBes0usyUttWZIB8IWZtrbXKErHWVCrwTfvRYoDI5/LmDqPIriToObCsxVCGkjAW2
+ G/Fg==
+X-Gm-Message-State: APjAAAWrxXxKui2m54gR2Q5r+pEgwkLrI9lj1r2sPnXLGBXCRDGt0S+V
+ uimN+HyVhw4aNqhiU9a14yK34PpPDwjBzA==
+X-Google-Smtp-Source: APXvYqxKgF3m5Olw4flHXvWP4Bn+sryjaKJzfiMfXIOtoIT+qhRcBaYZhuPwFrzbfEsEiq/7UC+pzA==
+X-Received: by 2002:adf:dc09:: with SMTP id t9mr1952549wri.69.1561999204945;
+ Mon, 01 Jul 2019 09:40:04 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id o6sm26573508wra.27.2019.07.01.09.40.03
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 01 Jul 2019 09:40:04 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Mon,  1 Jul 2019 17:39:15 +0100
+Message-Id: <20190701163943.22313-19-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190701163943.22313-1-peter.maydell@linaro.org>
+References: <20190701163943.22313-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 1/4] qmp: make qmp-shell work with python3
+ [fuzzy]
+X-Received-From: 209.85.221.66
+Subject: [Qemu-devel] [PULL 18/46] aspeed/timer: Ensure positive muldiv delta
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,57 +94,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- libvir-list@redhat.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Igor Mammedov <imammedo@redhat.com>
+From: Christian Svensson <bluecmd@google.com>
 
-python3 doesn't have raw_input(), so qmp-shell breaks.
-Use input() instead and override it with raw_input()
-if running on python2.
+If the host decrements the counter register that results in a negative
+delta. This is then passed to muldiv64 which only handles unsigned
+numbers resulting in bogus results.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <20190620154035.30989-1-imammedo@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+This fix ensures the delta being operated on is positive.
+
+Test case: kexec a kernel using aspeed_timer and it will freeze on the
+second bootup when the kernel initializes the timer. With this patch
+that no longer happens and the timer appears to run OK.
+
+Signed-off-by: Christian Svensson <bluecmd@google.com>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Reviewed-by: Joel Stanley <joel@jms.id.au>
+Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
+Message-id: 20190618165311.27066-12-clg@kaod.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- scripts/qmp/qmp-shell | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ hw/timer/aspeed_timer.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
-index 7776c7b141..f1cddeafbc 100755
---- a/scripts/qmp/qmp-shell
-+++ b/scripts/qmp/qmp-shell
-@@ -78,6 +78,9 @@ import re
- sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python'))
- from qemu import qmp
+diff --git a/hw/timer/aspeed_timer.c b/hw/timer/aspeed_timer.c
+index 745eb8608b5..29cc5e80708 100644
+--- a/hw/timer/aspeed_timer.c
++++ b/hw/timer/aspeed_timer.c
+@@ -275,7 +275,11 @@ static void aspeed_timer_set_value(AspeedTimerCtrlState *s, int timer, int reg,
+             int64_t delta = (int64_t) value - (int64_t) calculate_ticks(t, now);
+             uint32_t rate = calculate_rate(t);
  
-+if sys.version_info[0] == 2:
-+    input = raw_input
-+
- class QMPCompleter(list):
-     def complete(self, text, state):
-         for cmd in self:
-@@ -308,7 +311,7 @@ class QMPShell(qmp.QEMUMonitorProtocol):
-         @return True if execution was ok, return False if disconnected.
-         """
-         try:
--            cmdline = raw_input(prompt)
-+            cmdline = input(prompt)
-         except EOFError:
-             print()
-             return False
+-            t->start += muldiv64(delta, NANOSECONDS_PER_SECOND, rate);
++            if (delta >= 0) {
++                t->start += muldiv64(delta, NANOSECONDS_PER_SECOND, rate);
++            } else {
++                t->start -= muldiv64(-delta, NANOSECONDS_PER_SECOND, rate);
++            }
+             aspeed_timer_mod(t);
+         }
+         break;
 -- 
-2.18.0.rc1.1.g3f1ff2140
+2.20.1
 
 
