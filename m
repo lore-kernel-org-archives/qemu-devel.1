@@ -4,78 +4,89 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 227F3C0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 14:48:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BDE1C0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 14:51:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E29172064B
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 14:48:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EC412206A2
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 14:51:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BNj/8Y+l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E29172064B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qCS+3YzM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC412206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhxbM-0000Tu-53
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 10:48:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52531)
+	id 1hhxeU-0003rp-3k
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 10:51:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52877)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hhx9S-0004xU-9c
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:19:27 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hhxAC-0005Gz-5i
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:20:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hhx9M-00082G-79
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:19:23 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:45387)
+ (envelope-from <alex.bennee@linaro.org>) id 1hhxAA-0000L8-Nu
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:20:11 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36737)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hhx9K-0007o7-OG
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:19:19 -0400
-Received: by mail-ot1-x343.google.com with SMTP id x21so13624138otq.12
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 07:19:04 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hhxAA-0000JQ-GT
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 10:20:10 -0400
+Received: by mail-wr1-x443.google.com with SMTP id n4so14109020wrs.3
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 07:20:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=M0bHov4AsMs+15g5Y8TaVCAZ0ewX/G2VwigLTPONJMo=;
- b=BNj/8Y+lyNYGiJCjI29HgDCsVw4KziBSXGJ1hYmClENkCGgghV3vXS7vzk63zl5ckQ
- cUoTZQlnzvnHBLzYbaJq8UW7TfGabi3cxVYFy4xc/OIR2+Nn5Clu7sQFDLR0uLUjtZ+P
- IUdpq/ot6/V02mAusbTUcTdWOVdFDadjWNqJRES/Uzp/5n0RovL2j5Cof1ZSzdl+Bs3s
- g0V59s6k74tOUXdxG8MTcBWhwE9eWRE6cWipqDkAeidw8bUUkwMHh1nmdtQ3bvOJpikj
- Qnzr2kNuW1p2483Se+eqNx9mn2R0MaQsbSJntUa0cEe4rvwGPNSGqpFjOsXWu+6qIQ9t
- AaDw==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=e0eSTWXS81cyAjTjY0gOE2I9p8eua4Cc+NKwToq5OhQ=;
+ b=qCS+3YzMH5TytIhyob+MfY5Cq+y6Dv7r+S2QEAu8ym8Ds/ADPPplUpcG4VVtNoeijY
+ v38+vxwy01N8I0BYfy4T6DN17705O/oF0kauRTbHLlHGnOPLYzA+SaM5lxsGU8HkbYkj
+ N7LtFazXze1rJ5dVIF5AtrjQcCQKRB/rRSwzyBKcy9U3lAn63CeRpRnLm+g1GurHeQ9g
+ ZmNZN/IlDqjMWLn8Yc4D1ijXKXd7yRIcMdxYkMwN28YSzuNQpwimT813OCVrHpVW75+I
+ /J4uY+KXNbS1nqbI+jjTtHtNkHlVBG9lpIDuKE18lXTexcfdYYwK857OVo6mmUXQ84Bn
+ tQlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=M0bHov4AsMs+15g5Y8TaVCAZ0ewX/G2VwigLTPONJMo=;
- b=nDXSDFzzkuNEtHnciXJ/Hatdj7DOA523RQOZudXte+f6TsPjHKhvKg2xnlit+1DAO/
- Ce8L39/92JC05KuodQBFXUsGjKZMePH55D7qekPddCNytGdbt9af2UVmczm9eWIMekFs
- 6rrFiUh+9nNgP0NMb9EWtKjDiz3gBgggVMwUT/NNdn0n+0tSiSp8bbCbugHbIhy20ycU
- uLGIaphu5onC3hiOCD6LFuE35F5PvUq5VMis70tcMiPu5fSSiBYftUcDZAwH3lsXEOZM
- Y6zbiE7nQzcA3rAtBAApQ1H9tjh2nVf6XiTy2paCaNJSXXEv998JW9/TCUS+m5XIj+TW
- j9gg==
-X-Gm-Message-State: APjAAAU0CP+6yVzyBWVQjGyy5ZonuLmFxnTQMtNJN841er85c+xBLcJB
- nPkGUUhHX0+w4P/8b7PFyh3x8UFKeyrZsSO71ykR7icpuqM=
-X-Google-Smtp-Source: APXvYqwHuA8HP24RqwJBTdwMTPlFOjtMiwLr9po+7+31BfDmCVmLSk55HmmdRFm0DjbMCyHcAYSAahdCUUusDXIIgU0=
-X-Received: by 2002:a9d:7245:: with SMTP id a5mr20759321otk.232.1561990743623; 
- Mon, 01 Jul 2019 07:19:03 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=e0eSTWXS81cyAjTjY0gOE2I9p8eua4Cc+NKwToq5OhQ=;
+ b=EgDhH9Pajbnh4QhXaA/kprNWrbHdoRt84BMQm7/C0kTYOoh56ENFnuIr56DrS6bYTZ
+ shaa+cXpWsuNRQ6SptFKQck+/WBOqZYkoio5KMy9pvra5ncZXbGkmPjaqAFm1J2G18Jx
+ lcnp1y5vCONklgHK2c+yWu1apwrdMH7NuNL/lEykqv/dkWxPt1ZVSp7A2vNTC1zbL/dR
+ tqx1gY+KmuDCrM4WbmqojtCRfRp/v4ISO5ii6ReneXj6wJDAJGfMMq6PyhmJJyvCnSQK
+ OMyNSmIvf9RL/pWaywLBBxIx7TS2FIQ82iw1e34BeOtSS8eoyAnwI1TOMvVxikgYh3hG
+ xQGA==
+X-Gm-Message-State: APjAAAWz9s90v7m6bLmzQuv5PyRQKzYNhBr5hrdpFnjOuGOiUbaSAmUD
+ 6mz0FrBQ3L4u7GD/z9JQ0ad5UA==
+X-Google-Smtp-Source: APXvYqwJi3i7w+n44L2hFuVkagyXwwFtC9jHezUXyc/+TlFREM6lVxTG75yGtKn6hIi7vH7rv4aDXQ==
+X-Received: by 2002:adf:f812:: with SMTP id s18mr19603583wrp.32.1561990808350; 
+ Mon, 01 Jul 2019 07:20:08 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id j7sm14760231wru.54.2019.07.01.07.20.07
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 01 Jul 2019 07:20:07 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 300551FF87;
+ Mon,  1 Jul 2019 15:20:07 +0100 (BST)
+References: <20190614171200.21078-1-alex.bennee@linaro.org>
+ <20190614171200.21078-23-alex.bennee@linaro.org>
+ <CADYwmhFz6jjhK0_D1WGMqLcV5XvWaT5mRgtfbbhrU8vchuoAZA@mail.gmail.com>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Pranith Kumar <bobby.prani@gmail.com>
+In-reply-to: <CADYwmhFz6jjhK0_D1WGMqLcV5XvWaT5mRgtfbbhrU8vchuoAZA@mail.gmail.com>
+Date: Mon, 01 Jul 2019 15:20:07 +0100
+Message-ID: <878sthsup4.fsf@zen.linaroharston>
 MIME-Version: 1.0
-References: <1561890034-15921-1-git-send-email-hongbo.zhang@linaro.org>
- <1561890034-15921-2-git-send-email-hongbo.zhang@linaro.org>
-In-Reply-To: <1561890034-15921-2-git-send-email-hongbo.zhang@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 1 Jul 2019 15:18:52 +0100
-Message-ID: <CAFEAcA8qi7zRiLwDP38cPax=gAfEK8WQm0i9ZxDLXeESqh79Wg@mail.gmail.com>
-To: Hongbo Zhang <hongbo.zhang@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Subject: Re: [Qemu-devel] [PATCH v9 1/2] hw/arm: Add arm SBSA reference
- machine, skeleton part
+X-Received-From: 2a00:1450:4864:20::443
+Subject: Re: [Qemu-devel] [PATCH v3 22/50] *-user: plugin syscalls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,108 +98,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>,
- Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Leif Lindholm <leif.lindholm@linaro.org>,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Riku Voipio <riku.voipio@iki.fi>, "Emilio G. Cota" <cota@braap.org>,
+ qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 30 Jun 2019 at 11:21, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
->
-> For the Aarch64, there is one machine 'virt', it is primarily meant to
-> run on KVM and execute virtualization workloads, but we need an
-> environment as faithful as possible to physical hardware, for supporting
-> firmware and OS development for pysical Aarch64 machines.
->
-> This patch introduces new machine type 'sbsa-ref' with main features:
->  - Based on 'virt' machine type.
->  - A new memory map.
->  - CPU type cortex-a57.
->  - EL2 and EL3 are enabled.
->  - GIC version 3.
->  - System bus AHCI controller.
->  - System bus EHCI controller.
->  - CDROM and hard disc on AHCI bus.
->  - E1000E ethernet card on PCIE bus.
->  - VGA display adaptor on PCIE bus.
->  - No virtio deivces.
->  - No fw_cfg device.
->  - No ACPI table supplied.
->  - Only minimal device tree nodes.
->
-> Arm Trusted Firmware and UEFI porting to this are done accordingly, and
-> it should supply ACPI tables to load OS, the minimal device tree nodes
-> supplied from this platform are only to pass the dynamic info reflecting
-> command line input to firmware, not for loading OS.
->
-> To make the review easier, this task is split into two patches, the
-> fundamental sceleton part and the peripheral devices part, this patch is
-> the first part.
->
-> Signed-off-by: Hongbo Zhang <hongbo.zhang@linaro.org>
-> ---
->  default-configs/arm-softmmu.mak |   1 +
->  hw/arm/Kconfig                  |  16 +++
->  hw/arm/Makefile.objs            |   1 +
->  hw/arm/sbsa-ref.c               | 281 ++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 299 insertions(+)
->  create mode 100644 hw/arm/sbsa-ref.c
->
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index 1f2e0e7..f9fdb73 100644
-> --- a/default-configs/arm-softmmu.mak
-> +++ b/default-configs/arm-softmmu.mak
-> @@ -19,6 +19,7 @@ CONFIG_SX1=y
->  CONFIG_NSERIES=y
->  CONFIG_STELLARIS=y
->  CONFIG_REALVIEW=y
-> +CONFIG_SBSA_REF=y
->  CONFIG_VERSATILE=y
->  CONFIG_VEXPRESS=y
->  CONFIG_ZYNQ=y
 
-Adding CONFIG_SBSA_REF=y here is what makes the board
-model available for the 32-bit-only qemu-system-arm.
-If you put it in aarch64-softmmu.mak instead it will
-be correctly restricted to the 64-bit binary.
+Pranith Kumar <bobby.prani@gmail.com> writes:
 
-> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index 9aced9d..18e47b2 100644
-> --- a/hw/arm/Kconfig
-> +++ b/hw/arm/Kconfig
-> @@ -184,6 +184,22 @@ config REALVIEW
->      select DS1338 # I2C RTC+NVRAM
->      select USB_OHCI
+> Minor nits.
 >
-> +config SBSA_REF
-> +    bool
-> +    imply PCI_DEVICES
-> +    select A15MPCORE
+> On Fri, Jun 14, 2019 at 11:41 AM Alex Benn=C3=A9e <alex.bennee@linaro.org=
+> wrote:
+>>
+>> From: "Emilio G. Cota" <cota@braap.org>
+>>
+>> Signed-off-by: Emilio G. Cota <cota@braap.org>
+>> ---
+>>  bsd-user/syscall.c   | 9 +++++++++
+>>  linux-user/syscall.c | 3 +++
+>>  2 files changed, 12 insertions(+)
+>>
+>> diff --git a/bsd-user/syscall.c b/bsd-user/syscall.c
+>> index 84a983a9a1..50e47d217c 100644
+>> --- a/bsd-user/syscall.c
+>> +++ b/bsd-user/syscall.c
+>> @@ -323,6 +323,8 @@ abi_long do_freebsd_syscall(void *cpu_env, int num, =
+abi_long arg1,
+>>      gemu_log("freebsd syscall %d\n", num);
+>>  #endif
+>>      trace_guest_user_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, ar=
+g6, arg7, arg8);
+>> +    qemu_plugin_vcpu_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, ar=
+g6, arg7,
+>> +                             arg8);
+>
+> Looking at the previous line, seems like you can avoid splitting this
+> line into 2. Keeps it more consistent that way.
 
-This looks like a leftover from the virt config?
+Technically the trace line is over-long... I can make them both
+consistent with each other but it would be nicer to wrap them both into
+a common function.
 
-> +    select AHCI
-> +    select ARM_SMMUV3
-> +    select GPIO_KEY
-> +    select PCI_EXPRESS
-> +    select PCI_EXPRESS_GENERIC_BRIDGE
-> +    select PFLASH_CFI01
-> +    select PL011 # UART
-> +    select PL031 # RTC
-> +    select PL061 # GPIO
-> +    select PLATFORM_BUS
+Unfortunately this seems a little tricky for *-user as they are kept
+pretty separate.
 
-I don't think you use the platform-bus either, do you?
+>
+>>      if(do_strace)
+>>          print_freebsd_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
+>>
+>> @@ -404,6 +406,7 @@ abi_long do_freebsd_syscall(void *cpu_env, int num, =
+abi_long arg1,
+>>      if (do_strace)
+>>          print_freebsd_syscall_ret(num, ret);
+>>      trace_guest_user_syscall_ret(cpu, num, ret);
+>> +    qemu_plugin_vcpu_syscall_ret(cpu, num, ret);
+>>      return ret;
+>>   efault:
+>>      ret =3D -TARGET_EFAULT;
+>> @@ -422,6 +425,8 @@ abi_long do_netbsd_syscall(void *cpu_env, int num, a=
+bi_long arg1,
+>>      gemu_log("netbsd syscall %d\n", num);
+>>  #endif
+>>      trace_guest_user_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, ar=
+g6, 0, 0);
+>> +    qemu_plugin_vcpu_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, ar=
+g6, 0,
+>> +                             0);
+>
+> ditto.
+>
+>>      if(do_strace)
+>>          print_netbsd_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
+>>
+>> @@ -480,6 +485,7 @@ abi_long do_netbsd_syscall(void *cpu_env, int num, a=
+bi_long arg1,
+>>      if (do_strace)
+>>          print_netbsd_syscall_ret(num, ret);
+>>      trace_guest_user_syscall_ret(cpu, num, ret);
+>> +    qemu_plugin_vcpu_syscall_ret(cpu, num, ret);
+>>      return ret;
+>>   efault:
+>>      ret =3D -TARGET_EFAULT;
+>> @@ -498,6 +504,8 @@ abi_long do_openbsd_syscall(void *cpu_env, int num, =
+abi_long arg1,
+>>      gemu_log("openbsd syscall %d\n", num);
+>>  #endif
+>>      trace_guest_user_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, ar=
+g6, 0, 0);
+>> +    qemu_plugin_vcpu_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, ar=
+g6, 0,
+>> +                             0);
+>
+> ditto.
+>
+>>      if(do_strace)
+>>          print_openbsd_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
+>>
+>> @@ -556,6 +564,7 @@ abi_long do_openbsd_syscall(void *cpu_env, int num, =
+abi_long arg1,
+>>      if (do_strace)
+>>          print_openbsd_syscall_ret(num, ret);
+>>      trace_guest_user_syscall_ret(cpu, num, ret);
+>> +    qemu_plugin_vcpu_syscall_ret(cpu, num, ret);
+>>      return ret;
+>>   efault:
+>>      ret =3D -TARGET_EFAULT;
+>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+>> index b187c1281d..7f3cfdee84 100644
+>> --- a/linux-user/syscall.c
+>> +++ b/linux-user/syscall.c
+>> @@ -11724,6 +11724,8 @@ abi_long do_syscall(void *cpu_env, int num, abi_=
+long arg1,
+>>
+>>      trace_guest_user_syscall(cpu, num, arg1, arg2, arg3, arg4,
+>>                               arg5, arg6, arg7, arg8);
+>> +    qemu_plugin_vcpu_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, ar=
+g6, arg7,
+>> +                             arg8);
+>
+> This I am not sure.
+>
+>
+>>
+>>      if (unlikely(do_strace)) {
+>>          print_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
+>> @@ -11736,5 +11738,6 @@ abi_long do_syscall(void *cpu_env, int num, abi_=
+long arg1,
+>>      }
+>>
+>>      trace_guest_user_syscall_ret(cpu, num, ret);
+>> +    qemu_plugin_vcpu_syscall_ret(cpu, num, ret);
+>>      return ret;
+>>  }
+>> --
+>> 2.20.1
+>>
+>>
 
-> +    select USB_EHCI_SYSBUS
-> +
->  config SABRELITE
->      bool
->      select FSL_IMX6
 
-thanks
--- PMM
+--
+Alex Benn=C3=A9e
 
