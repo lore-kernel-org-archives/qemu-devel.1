@@ -2,125 +2,88 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5749C5B578
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 21:25:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB534C5B578
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 21:26:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D27C206A2
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 21:25:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 68C77206A2
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 21:26:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="WJoEl0qD";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="LNS16dVW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D27C206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lgwylm3h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68C77206A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi30D-0004Yw-Do
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 16:34:17 -0400
-Received: from [2001:470:142:3::10] (port=54213 helo=eggs.gnu.org)
+	id 1hi3p0-0002il-IR
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 17:26:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44556)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <prvs=078c2aed5=Alistair.Francis@wdc.com>)
- id 1hi2y4-00037p-Ly
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:32:10 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hi3DN-000156-Pw
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:47:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=078c2aed5=Alistair.Francis@wdc.com>)
- id 1hi2xw-0002CU-Ax
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:32:02 -0400
-Received: from [68.232.141.245] (port=24951 helo=esa1.hgst.iphmx.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <prvs=078c2aed5=Alistair.Francis@wdc.com>)
- id 1hi2xS-000276-FB; Mon, 01 Jul 2019 16:31:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1562013088; x=1593549088;
- h=from:to:cc:subject:date:message-id:references:
- in-reply-to:content-id:content-transfer-encoding: mime-version;
- bh=t0zilVrsnptR4o/X16EGoLIx2lBppe5iNJ1mY2Dq4Uw=;
- b=WJoEl0qDBZxjnkqRIAlB1+1dnPejZZQnaxiVj2bDBhvs2J4bQ1TzFD2k
- a9vq4vYYsUWGuv5h4ArxWWKQB0mh68+QnWBIQ6yp+by5ivMFsxr0O1IKk
- OSCy3Q6ERJmUk52P4Dq+L15dkU2rUu789PyUCFXADDbN3YSUVgCrYZEMZ
- h0k6jUN7Ui0laAzFOYDJhZOBEuw3XYDMMnxr35QStJeMnF6bBMCxAzOoD
- XhZ/s9EYPcXSQKgeqxNGN61vuePShtIwWX6Y7emnxkYPw7wd5KXmu4T1V
- xfpnSqnWTex7z3FGrCDjfDj3BJM5FLDyBFK/3rsv3Ggn1ZJ5k14/fpphU A==;
-X-IronPort-AV: E=Sophos;i="5.63,440,1557158400"; d="scan'208";a="218363525"
-Received: from mail-by2nam01lp2052.outbound.protection.outlook.com (HELO
- NAM01-BY2-obe.outbound.protection.outlook.com) ([104.47.34.52])
- by ob1.hgst.iphmx.com with ESMTP; 02 Jul 2019 02:19:38 +0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=t0zilVrsnptR4o/X16EGoLIx2lBppe5iNJ1mY2Dq4Uw=;
- b=LNS16dVW1zuY/WP2i3DBEhvkuwas2ahDzSw/8gqXUkU3aMqGndl9rHfcN3KjBodrVHpRtP6kHXJfRlFz0ESSfeAgDASdW3ALBQyW/tNpSxtggP4P5n5vUKIA5jPSGttu5gdO44kdEt6Knon5DFsGymVpw0VZk4t7hNjeyr9FEE0=
-Received: from BYAPR04MB4901.namprd04.prod.outlook.com (52.135.232.206) by
- BYAPR04MB5655.namprd04.prod.outlook.com (20.179.56.213) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2032.18; Mon, 1 Jul 2019 18:19:37 +0000
-Received: from BYAPR04MB4901.namprd04.prod.outlook.com
- ([fe80::40b0:3c4b:b778:664d]) by BYAPR04MB4901.namprd04.prod.outlook.com
- ([fe80::40b0:3c4b:b778:664d%7]) with mapi id 15.20.2032.019; Mon, 1 Jul 2019
- 18:19:37 +0000
-From: Alistair Francis <Alistair.Francis@wdc.com>
-To: "peter.maydell@linaro.org" <peter.maydell@linaro.org>
-Thread-Topic: [PULL 33/34] roms: Add OpenSBI version 0.3
-Thread-Index: AQHVLPx3D6cSVSLMSUSkcnC2JIn/F6a2AV8AgAAO5QCAAAOyAIAAAYuAgAABxYCAAAEbgA==
-Date: Mon, 1 Jul 2019 18:19:37 +0000
-Message-ID: <9363cb8764e800d8c30ff6722c680e4aa8bd9271.camel@wdc.com>
-References: <20190627152011.18686-1-palmer@sifive.com>
- <20190627152011.18686-34-palmer@sifive.com>
- <CAFEAcA8sscJQ2GCwL1gM+EcRtfHQb1v0BwORt6ncH54x51TCVg@mail.gmail.com>
- <5896113812cd914308e5b617377f8e8205224cfe.camel@wdc.com>
- <CAFEAcA_-h6b_f1fuWh7NkGo+FT0xSyCDXgd3b4pwEvNDN8HcJw@mail.gmail.com>
- <efaaaa7aabddfb8481af4c5b2eeec23513f8fcb8.camel@wdc.com>
- <CAFEAcA_cwm_1VhGW7yGL6=ja7TuO3c9perBs_OoWMaXBhJYH9g@mail.gmail.com>
-In-Reply-To: <CAFEAcA_cwm_1VhGW7yGL6=ja7TuO3c9perBs_OoWMaXBhJYH9g@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Alistair.Francis@wdc.com; 
-x-originating-ip: [199.255.44.250]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: b32c80c0-eb54-453d-c94d-08d6fe50acff
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);
- SRVR:BYAPR04MB5655; 
-x-ms-traffictypediagnostic: BYAPR04MB5655:
-wdcipoutbound: EOP-TRUE
-x-microsoft-antispam-prvs: <BYAPR04MB5655322D78DC7D0B042CAEAF90F90@BYAPR04MB5655.namprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 00851CA28B
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(4636009)(136003)(346002)(376002)(366004)(39860400002)(396003)(189003)(199004)(24433001)(73956011)(316002)(54906003)(2906002)(71190400001)(6486002)(71200400001)(229853002)(5640700003)(476003)(66476007)(6436002)(66066001)(118296001)(53936002)(64756008)(66556008)(66946007)(66446008)(25786009)(26005)(5660300002)(6246003)(305945005)(6512007)(478600001)(7736002)(8936002)(186003)(2501003)(11346002)(6916009)(76176011)(486006)(68736007)(72206003)(256004)(446003)(7416002)(4326008)(2351001)(102836004)(6506007)(8676002)(36756003)(86362001)(76116006)(81156014)(3846002)(6116002)(81166006)(99286004)(2616005)(14454004);
- DIR:OUT; SFP:1102; SCL:1; SRVR:BYAPR04MB5655;
- H:BYAPR04MB4901.namprd04.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: Af/fZd+PqOl3YDSyOuYQkCdVAYC5LFj/XQj3/hetKfydElTAd97XeZBasVijo+qPgFI6XsklLu0v67xAjfAU2vSW5U7y9DhpmVVJT2CQ1KuKJRjrTTVAkhKXyqUllVSq19L/b4ie9qnJIWp62mSzOFHVmvhjbvVfQFyyZEji/z0I29GO/y587eyuqPjLFp0t5owY6o1NC4Z1wxa5yIHzg8gKsn6XFkmuzAefqCaQk2HJsny0Nx23ViB4BlKrsqCouyYddbKWwZrxEwVVHjqFtl929k38e/wqtqRkOSj/LLLtCjKaVyIkZYAv8SFDxTcEdiJt9Z9oVDlfsWqFd07h1Aciabc+BSse9PtbmuoBrDBpekiDcP6558b8rJCGaCrzdisy9SdL4k40GQUyL/CFesrXyypYjanc8qMA3wApbYI=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C1F79ACECBAE8E44AB732B3F3E19846F@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <peter.maydell@linaro.org>) id 1hi3DJ-00014K-F2
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:47:51 -0400
+Received: from mail-wm1-f53.google.com ([209.85.128.53]:39562)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hi3DJ-00013b-3T
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:47:49 -0400
+Received: by mail-wm1-f53.google.com with SMTP id z23so915515wma.4
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 13:47:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=Yg5Vx+HL92u3RjZhwa/JrTs4lVp0MXgbzgCuIPXTEJA=;
+ b=lgwylm3h7UNq3fo3wlBmzBiyP+kL1F6Tyqk2qXYEP/4I1HfRMaM2mjpMBLHocjwKeS
+ liTjBfIaCBEtYPMSOhzxGLYDZI8sdMzHtUnNd9xu8oFaOmDJ7kb6ukLm80LBqymLck8I
+ zboXqBPyW2GXCPpQfGKC2kLum3yceaAVoEB2y9aZk+xQ/h8Njk3p3EeZfejvf1VoFERL
+ nEjaQWKIwwekmnyxhARddcuLar48WqPfGex/KPP1cnSTm7slIyaf194lyFxuUFeMRQWP
+ vHvOO7hdP9O/j4vGMzyDtqSLdBapG1g963p/V+uvEnQEeEPN4Q43ATyT4DsGF1Zu/XO4
+ bUlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=Yg5Vx+HL92u3RjZhwa/JrTs4lVp0MXgbzgCuIPXTEJA=;
+ b=ihzk15pORXBgtoBTwM489pEWmy3PgPsGrjXSSFu9MYRcGF4aWmcdoIeh64dvE9wbXa
+ Pt3kpowMPNGX8aBlWJygAsgersLUu7mUie/ksXVTa5kBywPzgfvrRMFWx5f3Kza1lQj8
+ /gEXQY5b2/Lr52uaPPa3ipPN6PjDCa9gU77mzUXNC1+FwIJhdiCRLla2szzK5/wfdOTd
+ bDdfDmiOt/IL8QmQ39taiNEhnJUr+KsRfjcvBRpxIcXe2ITswI5OX3qrL7lavA8zlQHv
+ AdML05JDnTF3k46lH9SvRDT3mdYphDvNBTKnIP7kNfeiDe/iJjDEwKGBkktXF8IaK1af
+ G02w==
+X-Gm-Message-State: APjAAAVUXjX7d9bKs93YDNQqVfYAbaaJeC9yCW/PRqOU8RF/l+h7LYa1
+ slolTjY1pCQ10bDiS/MFgb9+u8zbhTReKA==
+X-Google-Smtp-Source: APXvYqxXvlU4Lml+RgWEsGhLIpp1R5DGGSLLtwebfSiF9z6A7VTieayFOjyjWwq82ep0C1f+qz3SbQ==
+X-Received: by 2002:a1c:1f06:: with SMTP id f6mr147412wmf.60.1561999229372;
+ Mon, 01 Jul 2019 09:40:29 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id o6sm26573508wra.27.2019.07.01.09.40.28
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 01 Jul 2019 09:40:28 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Mon,  1 Jul 2019 17:39:36 +0100
+Message-Id: <20190701163943.22313-40-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190701163943.22313-1-peter.maydell@linaro.org>
+References: <20190701163943.22313-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b32c80c0-eb54-453d-c94d-08d6fe50acff
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Jul 2019 18:19:37.1137 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Alistair.Francis@wdc.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5655
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 68.232.141.245
-Subject: Re: [Qemu-devel] [PULL 33/34] roms: Add OpenSBI version 0.3
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.53
+Subject: [Qemu-devel] [PULL 39/46] target/arm: Move TLB related routines to
+ tlb_helper.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -132,37 +95,498 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
- "codyprime@gmail.com" <codyprime@gmail.com>,
- "palmer@sifive.com" <palmer@sifive.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "alistair23@gmail.com" <alistair23@gmail.com>,
- "bmeng.cn@gmail.com" <bmeng.cn@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-T24gTW9uLCAyMDE5LTA3LTAxIGF0IDE5OjEzICswMTAwLCBQZXRlciBNYXlkZWxsIHdyb3RlOg0K
-PiBPbiBNb24sIDEgSnVsIDIwMTkgYXQgMTk6MDksIEFsaXN0YWlyIEZyYW5jaXMgPA0KPiBBbGlz
-dGFpci5GcmFuY2lzQHdkYy5jb20+IHdyb3RlOg0KPiA+IE9uIE1vbiwgMjAxOS0wNy0wMSBhdCAx
-OTowMSArMDEwMCwgUGV0ZXIgTWF5ZGVsbCB3cm90ZToNCj4gPiA+IE9uIE1vbiwgMSBKdWwgMjAx
-OSBhdCAxODo1MCwgQWxpc3RhaXIgRnJhbmNpcyA8DQo+ID4gPiBBbGlzdGFpci5GcmFuY2lzQHdk
-Yy5jb20+IHdyb3RlOg0KPiA+ID4gPiBQUzogSXQgc2VlbXMgbGlrZSB0aGVyZSBhcmUgc3RpbGwg
-c29tZSBpc3N1ZXMgd2l0aCB0aGlzIHBhdGNoDQo+ID4gPiA+IHNvDQo+ID4gPiA+IG1heWJlDQo+
-ID4gPiA+IGl0J3Mgd29ydGggZHJvcHBpbmcgdGhpcyBwYXRjaCBmcm9tIHRoZSBQUiBzbyB0aGF0
-IHdlIGNhbiBnZXQNCj4gPiA+ID4gZXZlcnl0aGluZyBlbHNlIG1lcmdlZC4NCj4gPiA+IA0KPiA+
-ID4gWWVhaCwgdGhhdCB3b3VsZCBiZSBteSBzdWdnZXN0aW9uLg0KPiA+IA0KPiA+IENhbiB5b3Ug
-ZG8gdGhhdCB3aGVuIHlvdSBtZXJnZSBpdCBvciBkb2VzIFBhbG1lciBoYXZlIHRvIHNlbmQgdGhl
-DQo+ID4gUFINCj4gPiBhZ2Fpbj8NCj4gDQo+IFBhbG1lciBuZWVkcyB0byByZXNwaW4gaXQgLS0g
-cHVsbHMgYXJlIHNpZ25lZCBhbmQgSSBjYW4ndA0KPiBtb2RpZnkgdGhlbSwgb25seSBlaXRoZXIg
-YXBwbHkgdGhlbSBvciBub3QuIChUZWNobmljYWxseSBJDQo+IGNvdWxkIGluIHRoZW9yeSBjaGVy
-cnktcGljayBhbGwgdGhlIG90aGVyIGNvbW1pdHMgb3V0IG9mIHRoZW0NCj4gYnV0IHRoYXQgd291
-bGQgYmUgYSBodWdlIGFtb3VudCBvZiBtYW51YWwgbGFib3VyLikNCg0KTm8gd29ycmllcy4NCg0K
-QFBhbG1lciBjYW4geW91IHBsZWFzZSBkcm9wIHRoZXNlIHR3byBwYXRjaGVzIGZyb20gdGhpcyBQ
-Uj8NCg0KaHcvcmlzY3Y6IExvYWQgT3BlblNCSSBhcyB0aGUgZGVmYXVsdCBmaXJtd2FyZQ0Kcm9t
-czogQWRkIE9wZW5TQkkgdmVyc2lvbiAwLjMNCg0KU29ycnkgZm9yIHRoZSBhbGwgdGhlIGxhc3Qg
-bWludXRlIGNoYW5nZXMuIEknbGwgd2FpdCB1bnRpbCBPcGVuU0JJIDAuNA0KdG8gcmVzcGluIHRo
-b3NlIHR3byBwYXRjaGVzLg0KDQpBbGlzdGFpcg0KDQo+IA0KPiB0aGFua3MNCj4gLS0gUE1NDQo=
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+These routines are TCG specific.
+The arm_deliver_fault() function is only used within the new
+helper. Make it static.
+
+Suggested-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20190701132516.26392-13-philmd@redhat.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/Makefile.objs |   1 +
+ target/arm/internals.h   |   3 -
+ target/arm/cpu.c         |   6 +-
+ target/arm/helper.c      |  53 -----------
+ target/arm/op_helper.c   | 135 --------------------------
+ target/arm/tlb_helper.c  | 200 +++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 205 insertions(+), 193 deletions(-)
+ create mode 100644 target/arm/tlb_helper.c
+
+diff --git a/target/arm/Makefile.objs b/target/arm/Makefile.objs
+index 3fcda66132a..5c154f01c58 100644
+--- a/target/arm/Makefile.objs
++++ b/target/arm/Makefile.objs
+@@ -32,6 +32,7 @@ target/arm/translate-sve.o: target/arm/decode-sve.inc.c
+ target/arm/translate.o: target/arm/decode-vfp.inc.c
+ target/arm/translate.o: target/arm/decode-vfp-uncond.inc.c
+ 
++obj-y += tlb_helper.o
+ obj-y += translate.o op_helper.o
+ obj-y += crypto_helper.o
+ obj-y += iwmmxt_helper.o vec_helper.o neon_helper.o
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index ff5ab0328e8..46a1313d69d 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -765,9 +765,6 @@ bool arm_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+                       MMUAccessType access_type, int mmu_idx,
+                       bool probe, uintptr_t retaddr);
+ 
+-void arm_deliver_fault(ARMCPU *cpu, vaddr addr, MMUAccessType access_type,
+-                       int mmu_idx, ARMMMUFaultInfo *fi) QEMU_NORETURN;
+-
+ /* Return true if the stage 1 translation regime is using LPAE format page
+  * tables */
+ bool arm_s1_regime_using_lpae_format(CPUARMState *env, ARMMMUIdx mmu_idx);
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 1f73631bac0..f21261c8ff8 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -2566,8 +2566,6 @@ static void arm_cpu_class_init(ObjectClass *oc, void *data)
+     cc->gdb_write_register = arm_cpu_gdb_write_register;
+ #ifndef CONFIG_USER_ONLY
+     cc->do_interrupt = arm_cpu_do_interrupt;
+-    cc->do_unaligned_access = arm_cpu_do_unaligned_access;
+-    cc->do_transaction_failed = arm_cpu_do_transaction_failed;
+     cc->get_phys_page_attrs_debug = arm_cpu_get_phys_page_attrs_debug;
+     cc->asidx_from_attrs = arm_asidx_from_attrs;
+     cc->vmsd = &vmstate_arm_cpu;
+@@ -2590,6 +2588,10 @@ static void arm_cpu_class_init(ObjectClass *oc, void *data)
+ #ifdef CONFIG_TCG
+     cc->tcg_initialize = arm_translate_init;
+     cc->tlb_fill = arm_cpu_tlb_fill;
++#if !defined(CONFIG_USER_ONLY)
++    cc->do_unaligned_access = arm_cpu_do_unaligned_access;
++    cc->do_transaction_failed = arm_cpu_do_transaction_failed;
++#endif /* CONFIG_TCG && !CONFIG_USER_ONLY */
+ #endif
+ }
+ 
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 063f4778e0a..4ef908c611e 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -13244,59 +13244,6 @@ uint32_t HELPER(v7m_tt)(CPUARMState *env, uint32_t addr, uint32_t op)
+ 
+ #endif
+ 
+-bool arm_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+-                      MMUAccessType access_type, int mmu_idx,
+-                      bool probe, uintptr_t retaddr)
+-{
+-    ARMCPU *cpu = ARM_CPU(cs);
+-
+-#ifdef CONFIG_USER_ONLY
+-    cpu->env.exception.vaddress = address;
+-    if (access_type == MMU_INST_FETCH) {
+-        cs->exception_index = EXCP_PREFETCH_ABORT;
+-    } else {
+-        cs->exception_index = EXCP_DATA_ABORT;
+-    }
+-    cpu_loop_exit_restore(cs, retaddr);
+-#else
+-    hwaddr phys_addr;
+-    target_ulong page_size;
+-    int prot, ret;
+-    MemTxAttrs attrs = {};
+-    ARMMMUFaultInfo fi = {};
+-
+-    /*
+-     * Walk the page table and (if the mapping exists) add the page
+-     * to the TLB.  On success, return true.  Otherwise, if probing,
+-     * return false.  Otherwise populate fsr with ARM DFSR/IFSR fault
+-     * register format, and signal the fault.
+-     */
+-    ret = get_phys_addr(&cpu->env, address, access_type,
+-                        core_to_arm_mmu_idx(&cpu->env, mmu_idx),
+-                        &phys_addr, &attrs, &prot, &page_size, &fi, NULL);
+-    if (likely(!ret)) {
+-        /*
+-         * Map a single [sub]page. Regions smaller than our declared
+-         * target page size are handled specially, so for those we
+-         * pass in the exact addresses.
+-         */
+-        if (page_size >= TARGET_PAGE_SIZE) {
+-            phys_addr &= TARGET_PAGE_MASK;
+-            address &= TARGET_PAGE_MASK;
+-        }
+-        tlb_set_page_with_attrs(cs, address, phys_addr, attrs,
+-                                prot, mmu_idx, page_size);
+-        return true;
+-    } else if (probe) {
+-        return false;
+-    } else {
+-        /* now we have a real cpu fault */
+-        cpu_restore_state(cs, retaddr, true);
+-        arm_deliver_fault(cpu, address, access_type, mmu_idx, &fi);
+-    }
+-#endif
+-}
+-
+ /* Note that signed overflow is undefined in C.  The following routines are
+    careful to use unsigned types where modulo arithmetic is required.
+    Failure to do so _will_ break on newer gcc.  */
+diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+index 7c835d3ce77..9850993c114 100644
+--- a/target/arm/op_helper.c
++++ b/target/arm/op_helper.c
+@@ -88,141 +88,6 @@ uint32_t HELPER(neon_tbl)(uint32_t ireg, uint32_t def, void *vn,
+     return val;
+ }
+ 
+-#if !defined(CONFIG_USER_ONLY)
+-
+-static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
+-                                            unsigned int target_el,
+-                                            bool same_el, bool ea,
+-                                            bool s1ptw, bool is_write,
+-                                            int fsc)
+-{
+-    uint32_t syn;
+-
+-    /*
+-     * ISV is only set for data aborts routed to EL2 and
+-     * never for stage-1 page table walks faulting on stage 2.
+-     *
+-     * Furthermore, ISV is only set for certain kinds of load/stores.
+-     * If the template syndrome does not have ISV set, we should leave
+-     * it cleared.
+-     *
+-     * See ARMv8 specs, D7-1974:
+-     * ISS encoding for an exception from a Data Abort, the
+-     * ISV field.
+-     */
+-    if (!(template_syn & ARM_EL_ISV) || target_el != 2 || s1ptw) {
+-        syn = syn_data_abort_no_iss(same_el,
+-                                    ea, 0, s1ptw, is_write, fsc);
+-    } else {
+-        /*
+-         * Fields: IL, ISV, SAS, SSE, SRT, SF and AR come from the template
+-         * syndrome created at translation time.
+-         * Now we create the runtime syndrome with the remaining fields.
+-         */
+-        syn = syn_data_abort_with_iss(same_el,
+-                                      0, 0, 0, 0, 0,
+-                                      ea, 0, s1ptw, is_write, fsc,
+-                                      false);
+-        /* Merge the runtime syndrome with the template syndrome.  */
+-        syn |= template_syn;
+-    }
+-    return syn;
+-}
+-
+-void arm_deliver_fault(ARMCPU *cpu, vaddr addr, MMUAccessType access_type,
+-                       int mmu_idx, ARMMMUFaultInfo *fi)
+-{
+-    CPUARMState *env = &cpu->env;
+-    int target_el;
+-    bool same_el;
+-    uint32_t syn, exc, fsr, fsc;
+-    ARMMMUIdx arm_mmu_idx = core_to_arm_mmu_idx(env, mmu_idx);
+-
+-    target_el = exception_target_el(env);
+-    if (fi->stage2) {
+-        target_el = 2;
+-        env->cp15.hpfar_el2 = extract64(fi->s2addr, 12, 47) << 4;
+-    }
+-    same_el = (arm_current_el(env) == target_el);
+-
+-    if (target_el == 2 || arm_el_is_aa64(env, target_el) ||
+-        arm_s1_regime_using_lpae_format(env, arm_mmu_idx)) {
+-        /*
+-         * LPAE format fault status register : bottom 6 bits are
+-         * status code in the same form as needed for syndrome
+-         */
+-        fsr = arm_fi_to_lfsc(fi);
+-        fsc = extract32(fsr, 0, 6);
+-    } else {
+-        fsr = arm_fi_to_sfsc(fi);
+-        /*
+-         * Short format FSR : this fault will never actually be reported
+-         * to an EL that uses a syndrome register. Use a (currently)
+-         * reserved FSR code in case the constructed syndrome does leak
+-         * into the guest somehow.
+-         */
+-        fsc = 0x3f;
+-    }
+-
+-    if (access_type == MMU_INST_FETCH) {
+-        syn = syn_insn_abort(same_el, fi->ea, fi->s1ptw, fsc);
+-        exc = EXCP_PREFETCH_ABORT;
+-    } else {
+-        syn = merge_syn_data_abort(env->exception.syndrome, target_el,
+-                                   same_el, fi->ea, fi->s1ptw,
+-                                   access_type == MMU_DATA_STORE,
+-                                   fsc);
+-        if (access_type == MMU_DATA_STORE
+-            && arm_feature(env, ARM_FEATURE_V6)) {
+-            fsr |= (1 << 11);
+-        }
+-        exc = EXCP_DATA_ABORT;
+-    }
+-
+-    env->exception.vaddress = addr;
+-    env->exception.fsr = fsr;
+-    raise_exception(env, exc, syn, target_el);
+-}
+-
+-/* Raise a data fault alignment exception for the specified virtual address */
+-void arm_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
+-                                 MMUAccessType access_type,
+-                                 int mmu_idx, uintptr_t retaddr)
+-{
+-    ARMCPU *cpu = ARM_CPU(cs);
+-    ARMMMUFaultInfo fi = {};
+-
+-    /* now we have a real cpu fault */
+-    cpu_restore_state(cs, retaddr, true);
+-
+-    fi.type = ARMFault_Alignment;
+-    arm_deliver_fault(cpu, vaddr, access_type, mmu_idx, &fi);
+-}
+-
+-/*
+- * arm_cpu_do_transaction_failed: handle a memory system error response
+- * (eg "no device/memory present at address") by raising an external abort
+- * exception
+- */
+-void arm_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
+-                                   vaddr addr, unsigned size,
+-                                   MMUAccessType access_type,
+-                                   int mmu_idx, MemTxAttrs attrs,
+-                                   MemTxResult response, uintptr_t retaddr)
+-{
+-    ARMCPU *cpu = ARM_CPU(cs);
+-    ARMMMUFaultInfo fi = {};
+-
+-    /* now we have a real cpu fault */
+-    cpu_restore_state(cs, retaddr, true);
+-
+-    fi.ea = arm_extabort_type(response);
+-    fi.type = ARMFault_SyncExternal;
+-    arm_deliver_fault(cpu, addr, access_type, mmu_idx, &fi);
+-}
+-
+-#endif /* !defined(CONFIG_USER_ONLY) */
+-
+ void HELPER(v8m_stackcheck)(CPUARMState *env, uint32_t newvalue)
+ {
+     /*
+diff --git a/target/arm/tlb_helper.c b/target/arm/tlb_helper.c
+new file mode 100644
+index 00000000000..5feb3129417
+--- /dev/null
++++ b/target/arm/tlb_helper.c
+@@ -0,0 +1,200 @@
++/*
++ * ARM TLB (Translation lookaside buffer) helpers.
++ *
++ * This code is licensed under the GNU GPL v2 or later.
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++#include "qemu/osdep.h"
++#include "cpu.h"
++#include "internals.h"
++#include "exec/exec-all.h"
++
++#if !defined(CONFIG_USER_ONLY)
++
++static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
++                                            unsigned int target_el,
++                                            bool same_el, bool ea,
++                                            bool s1ptw, bool is_write,
++                                            int fsc)
++{
++    uint32_t syn;
++
++    /*
++     * ISV is only set for data aborts routed to EL2 and
++     * never for stage-1 page table walks faulting on stage 2.
++     *
++     * Furthermore, ISV is only set for certain kinds of load/stores.
++     * If the template syndrome does not have ISV set, we should leave
++     * it cleared.
++     *
++     * See ARMv8 specs, D7-1974:
++     * ISS encoding for an exception from a Data Abort, the
++     * ISV field.
++     */
++    if (!(template_syn & ARM_EL_ISV) || target_el != 2 || s1ptw) {
++        syn = syn_data_abort_no_iss(same_el,
++                                    ea, 0, s1ptw, is_write, fsc);
++    } else {
++        /*
++         * Fields: IL, ISV, SAS, SSE, SRT, SF and AR come from the template
++         * syndrome created at translation time.
++         * Now we create the runtime syndrome with the remaining fields.
++         */
++        syn = syn_data_abort_with_iss(same_el,
++                                      0, 0, 0, 0, 0,
++                                      ea, 0, s1ptw, is_write, fsc,
++                                      false);
++        /* Merge the runtime syndrome with the template syndrome.  */
++        syn |= template_syn;
++    }
++    return syn;
++}
++
++static void QEMU_NORETURN arm_deliver_fault(ARMCPU *cpu, vaddr addr,
++                                            MMUAccessType access_type,
++                                            int mmu_idx, ARMMMUFaultInfo *fi)
++{
++    CPUARMState *env = &cpu->env;
++    int target_el;
++    bool same_el;
++    uint32_t syn, exc, fsr, fsc;
++    ARMMMUIdx arm_mmu_idx = core_to_arm_mmu_idx(env, mmu_idx);
++
++    target_el = exception_target_el(env);
++    if (fi->stage2) {
++        target_el = 2;
++        env->cp15.hpfar_el2 = extract64(fi->s2addr, 12, 47) << 4;
++    }
++    same_el = (arm_current_el(env) == target_el);
++
++    if (target_el == 2 || arm_el_is_aa64(env, target_el) ||
++        arm_s1_regime_using_lpae_format(env, arm_mmu_idx)) {
++        /*
++         * LPAE format fault status register : bottom 6 bits are
++         * status code in the same form as needed for syndrome
++         */
++        fsr = arm_fi_to_lfsc(fi);
++        fsc = extract32(fsr, 0, 6);
++    } else {
++        fsr = arm_fi_to_sfsc(fi);
++        /*
++         * Short format FSR : this fault will never actually be reported
++         * to an EL that uses a syndrome register. Use a (currently)
++         * reserved FSR code in case the constructed syndrome does leak
++         * into the guest somehow.
++         */
++        fsc = 0x3f;
++    }
++
++    if (access_type == MMU_INST_FETCH) {
++        syn = syn_insn_abort(same_el, fi->ea, fi->s1ptw, fsc);
++        exc = EXCP_PREFETCH_ABORT;
++    } else {
++        syn = merge_syn_data_abort(env->exception.syndrome, target_el,
++                                   same_el, fi->ea, fi->s1ptw,
++                                   access_type == MMU_DATA_STORE,
++                                   fsc);
++        if (access_type == MMU_DATA_STORE
++            && arm_feature(env, ARM_FEATURE_V6)) {
++            fsr |= (1 << 11);
++        }
++        exc = EXCP_DATA_ABORT;
++    }
++
++    env->exception.vaddress = addr;
++    env->exception.fsr = fsr;
++    raise_exception(env, exc, syn, target_el);
++}
++
++/* Raise a data fault alignment exception for the specified virtual address */
++void arm_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
++                                 MMUAccessType access_type,
++                                 int mmu_idx, uintptr_t retaddr)
++{
++    ARMCPU *cpu = ARM_CPU(cs);
++    ARMMMUFaultInfo fi = {};
++
++    /* now we have a real cpu fault */
++    cpu_restore_state(cs, retaddr, true);
++
++    fi.type = ARMFault_Alignment;
++    arm_deliver_fault(cpu, vaddr, access_type, mmu_idx, &fi);
++}
++
++/*
++ * arm_cpu_do_transaction_failed: handle a memory system error response
++ * (eg "no device/memory present at address") by raising an external abort
++ * exception
++ */
++void arm_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
++                                   vaddr addr, unsigned size,
++                                   MMUAccessType access_type,
++                                   int mmu_idx, MemTxAttrs attrs,
++                                   MemTxResult response, uintptr_t retaddr)
++{
++    ARMCPU *cpu = ARM_CPU(cs);
++    ARMMMUFaultInfo fi = {};
++
++    /* now we have a real cpu fault */
++    cpu_restore_state(cs, retaddr, true);
++
++    fi.ea = arm_extabort_type(response);
++    fi.type = ARMFault_SyncExternal;
++    arm_deliver_fault(cpu, addr, access_type, mmu_idx, &fi);
++}
++
++#endif /* !defined(CONFIG_USER_ONLY) */
++
++bool arm_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
++                      MMUAccessType access_type, int mmu_idx,
++                      bool probe, uintptr_t retaddr)
++{
++    ARMCPU *cpu = ARM_CPU(cs);
++
++#ifdef CONFIG_USER_ONLY
++    cpu->env.exception.vaddress = address;
++    if (access_type == MMU_INST_FETCH) {
++        cs->exception_index = EXCP_PREFETCH_ABORT;
++    } else {
++        cs->exception_index = EXCP_DATA_ABORT;
++    }
++    cpu_loop_exit_restore(cs, retaddr);
++#else
++    hwaddr phys_addr;
++    target_ulong page_size;
++    int prot, ret;
++    MemTxAttrs attrs = {};
++    ARMMMUFaultInfo fi = {};
++
++    /*
++     * Walk the page table and (if the mapping exists) add the page
++     * to the TLB.  On success, return true.  Otherwise, if probing,
++     * return false.  Otherwise populate fsr with ARM DFSR/IFSR fault
++     * register format, and signal the fault.
++     */
++    ret = get_phys_addr(&cpu->env, address, access_type,
++                        core_to_arm_mmu_idx(&cpu->env, mmu_idx),
++                        &phys_addr, &attrs, &prot, &page_size, &fi, NULL);
++    if (likely(!ret)) {
++        /*
++         * Map a single [sub]page. Regions smaller than our declared
++         * target page size are handled specially, so for those we
++         * pass in the exact addresses.
++         */
++        if (page_size >= TARGET_PAGE_SIZE) {
++            phys_addr &= TARGET_PAGE_MASK;
++            address &= TARGET_PAGE_MASK;
++        }
++        tlb_set_page_with_attrs(cs, address, phys_addr, attrs,
++                                prot, mmu_idx, page_size);
++        return true;
++    } else if (probe) {
++        return false;
++    } else {
++        /* now we have a real cpu fault */
++        cpu_restore_state(cs, retaddr, true);
++        arm_deliver_fault(cpu, address, access_type, mmu_idx, &fi);
++    }
++#endif
++}
+-- 
+2.20.1
+
 
