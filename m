@@ -2,88 +2,60 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-11.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 242C6C5B578
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:15:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20C70C5B578
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:17:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6B82206A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:15:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dTYZuzRq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6B82206A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id EFA51206A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:17:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFA51206A3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi8Kp-0003FF-0N
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 22:15:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55415)
+	id 1hi8MI-0004bl-9U
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 22:17:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33865)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hi4MF-0004EF-9J
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:01:08 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hi4of-0005Fe-J1
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:30:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hi4MD-00007B-Ir
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:01:07 -0400
-Received: from mail-wm1-f44.google.com ([209.85.128.44]:40145)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hi4MD-00005C-9E
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:01:05 -0400
-Received: by mail-wm1-f44.google.com with SMTP id v19so1068524wmj.5
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 15:01:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=FU2Y0liu1lAY21ffJv7mbpvtLv+zwcB4gkTn/owodzc=;
- b=dTYZuzRqznkL1JWXiXhXsfzH6vrFZSAfYuUAxXz14yzh+XhdihHx+yiIemFyuvKftu
- /uXJx/Bzq2Aa1hr+hFIUDh9KNXSqu7R/0BpJrXB1uVLAR+Xmr3DO2KJ3b9GA3b/s7cjY
- kczeZT2svdsUWUs9wN8b0rmT8u5sJ5N3f0Z4zMXK37F81BT8u/wglyW/9Gjv/AUF8u08
- zhWmISA25oWJ5HLtleVC+Tlr+Eyxy7neAOgzVlSiRRemVuB14zLotZFBL075zLv3Q/hZ
- YQj6fjBu4YUiZbi5Yj7CAWb/HlPQ1Hz3TTFAt1WCzF1SVktUC7ayCcyPBtaVZzE4xj5b
- bYgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=FU2Y0liu1lAY21ffJv7mbpvtLv+zwcB4gkTn/owodzc=;
- b=DQiZhyQo5bZy5V4Tmp8jnKv1Mr8LY18BFr9tYhRVQKFIEZ8iTpHVjsmaav40XfA9ao
- L+/oLoZtg5kFKK+IXA4z2JGh46sgQZyi1qtjyuhHlJNgfYrHRRdnkrZuVvMmiruXEXf1
- JTpCk7hjA7PmlaUJyHZxRc1bGseaJaskF32x6uuXgrFPN936XnZc7oSV6dyPUWQKPCGs
- fbixyLYISpueKKLFn5abeXnerjFz6MkPkaB9EhW8e4b8i+rhwM8fY8/QkrDyoDqRiZSE
- ufAc7mHBGE70CFJZfq7Qn1lj/HKEqAROD6Q7c8fxoyeV8zTUBCmMXutGD6y6yTfC2mx5
- 228w==
-X-Gm-Message-State: APjAAAU8cYJd9dskPsH1P8WcKtnMAc+WZHGQ0GWv8Ff8z6yehKzGPGii
- T5ImJscxw3ocZH+5Fbi0ngksn8fwT/kAoA==
-X-Google-Smtp-Source: APXvYqxqJE48jegwRpLdka4IArNOqs/boilwqQAw4ipEBofAAVhLQw5EesHmbTfm9PPKm/rVSqDkCA==
-X-Received: by 2002:a1c:700b:: with SMTP id l11mr132471wmc.106.1561999189993; 
- Mon, 01 Jul 2019 09:39:49 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id o6sm26573508wra.27.2019.07.01.09.39.49
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 01 Jul 2019 09:39:49 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Mon,  1 Jul 2019 17:39:02 +0100
-Message-Id: <20190701163943.22313-6-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190701163943.22313-1-peter.maydell@linaro.org>
-References: <20190701163943.22313-1-peter.maydell@linaro.org>
+ (envelope-from <ehabkost@redhat.com>) id 1hi4ob-00008t-7P
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:30:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60348)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>)
+ id 1hi4oG-00087m-JZ; Mon, 01 Jul 2019 18:30:06 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A9E287FDF4;
+ Mon,  1 Jul 2019 22:29:19 +0000 (UTC)
+Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8B5E818386;
+ Mon,  1 Jul 2019 22:29:13 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Cleber Rosa <crosa@redhat.com>
+Date: Mon,  1 Jul 2019 19:29:08 -0300
+Message-Id: <20190701222912.4703-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Mon, 01 Jul 2019 22:29:25 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.44
-Subject: [Qemu-devel] [PULL 05/46] i.mx7d: Add no-op/unimplemented PCIE PHY
- IP block
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 0/4] Python queue, 2019-07-01
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,58 +67,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ libvir-list@redhat.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Andrey Smirnov <andrew.smirnov@gmail.com>
+The following changes since commit 7d0e02405fc02a181319b1ab8681d2f72246b7=
+c6:
 
-Add no-op/unimplemented PCIE PHY IP block. Needed by new kernels to
-use PCIE.
+  Merge remote-tracking branch 'remotes/vivier2/tags/trivial-patches-pull=
+-request' into staging (2019-07-01 17:40:32 +0100)
 
-Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- include/hw/arm/fsl-imx7.h | 3 +++
- hw/arm/fsl-imx7.c         | 5 +++++
- 2 files changed, 8 insertions(+)
+are available in the Git repository at:
 
-diff --git a/include/hw/arm/fsl-imx7.h b/include/hw/arm/fsl-imx7.h
-index dcd73603c33..09f4f33f6e5 100644
---- a/include/hw/arm/fsl-imx7.h
-+++ b/include/hw/arm/fsl-imx7.h
-@@ -125,6 +125,9 @@ enum FslIMX7MemoryMap {
-     FSL_IMX7_ADC2_ADDR            = 0x30620000,
-     FSL_IMX7_ADCn_SIZE            = 0x1000,
- 
-+    FSL_IMX7_PCIE_PHY_ADDR        = 0x306D0000,
-+    FSL_IMX7_PCIE_PHY_SIZE        = 0x10000,
-+
-     FSL_IMX7_GPC_ADDR             = 0x303A0000,
- 
-     FSL_IMX7_I2C1_ADDR            = 0x30A20000,
-diff --git a/hw/arm/fsl-imx7.c b/hw/arm/fsl-imx7.c
-index 803fe94c034..2eddf3f25c6 100644
---- a/hw/arm/fsl-imx7.c
-+++ b/hw/arm/fsl-imx7.c
-@@ -532,6 +532,11 @@ static void fsl_imx7_realize(DeviceState *dev, Error **errp)
-      */
-     create_unimplemented_device("dma-apbh", FSL_IMX7_DMA_APBH_ADDR,
-                                 FSL_IMX7_DMA_APBH_SIZE);
-+    /*
-+     * PCIe PHY
-+     */
-+    create_unimplemented_device("pcie-phy", FSL_IMX7_PCIE_PHY_ADDR,
-+                                FSL_IMX7_PCIE_PHY_SIZE);
- }
- 
- static void fsl_imx7_class_init(ObjectClass *oc, void *data)
--- 
-2.20.1
+  git://github.com/ehabkost/qemu.git tags/python-next-pull-request
+
+for you to fetch changes up to e5abf59eae5990296c243202f95f801495c52e76:
+
+  Deprecate Python 2 support (2019-07-01 19:02:10 -0300)
+
+----------------------------------------------------------------
+Python queue, 2019-07-01
+
+* Deprecate Python 2 support (Eduardo Habkost)
+* qemu/__init__.py refactor (John Snow)
+* make qmp-shell work with python3 (Igor Mammedov)
+
+----------------------------------------------------------------
+
+Eduardo Habkost (1):
+  Deprecate Python 2 support
+
+Igor Mammedov (1):
+  qmp: make qmp-shell work with python3
+
+John Snow (2):
+  python/qemu: split QEMUMachine out from underneath __init__.py
+  machine.py: minor delinting
+
+ configure                                 |   8 +
+ scripts/render_block_graph.py             |   2 +-
+ python/qemu/__init__.py                   | 502 +-------------------
+ python/qemu/machine.py                    | 531 ++++++++++++++++++++++
+ python/qemu/qtest.py                      |   2 +-
+ qemu-deprecated.texi                      |   8 +
+ scripts/device-crash-test                 |   2 +-
+ scripts/qmp/qmp-shell                     |   5 +-
+ tests/acceptance/avocado_qemu/__init__.py |   2 +-
+ tests/acceptance/virtio_version.py        |   2 +-
+ tests/migration/guestperf/engine.py       |  24 +-
+ tests/qemu-iotests/235                    |   2 +-
+ tests/vm/basevm.py                        |   3 +-
+ 13 files changed, 572 insertions(+), 521 deletions(-)
+ create mode 100644 python/qemu/machine.py
+
+--=20
+2.18.0.rc1.1.g3f1ff2140
 
 
