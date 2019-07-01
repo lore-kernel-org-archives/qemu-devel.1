@@ -2,61 +2,80 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 470FAC0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 14:07:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9015BC0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 14:08:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2360020665
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 14:07:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2360020665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1C6F720665
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 14:08:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bRiu0vdd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C6F720665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhwy1-0004H7-Ch
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 10:07:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41429)
+	id 1hhwzK-0005PG-8A
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 10:08:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43466)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hhwL4-0002iH-0M
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:27:23 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hhwTi-0002k7-V6
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:36:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hhwL3-0002oX-0Q
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:27:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48986)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hhwKu-0002eW-3V; Mon, 01 Jul 2019 09:27:13 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 156BC316290C;
- Mon,  1 Jul 2019 13:27:10 +0000 (UTC)
-Received: from x1w.redhat.com (unknown [10.40.205.170])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5ABB76085B;
- Mon,  1 Jul 2019 13:27:07 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Mon,  1 Jul 2019 15:25:15 +0200
-Message-Id: <20190701132516.26392-27-philmd@redhat.com>
-In-Reply-To: <20190701132516.26392-1-philmd@redhat.com>
-References: <20190701132516.26392-1-philmd@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1hhwTh-0000FI-UQ
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:36:18 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:38311)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hhwTh-0000Ei-PV
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:36:17 -0400
+Received: by mail-ot1-x343.google.com with SMTP id d17so13516527oth.5
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 06:36:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=PVjMmpPwdek8frF6rNFPjF6DDS9IuYy6pojPPHcGSgk=;
+ b=bRiu0vddosM8bldq04r9MnXHYz7aNQFTu7Us063tbrs0G1OoJCFoRJ7UhlZqNiXcPS
+ XyBTtv42i/ZYbH8lgbWDRxWUe6jWlvS5j1j6JJHlVNqS9URovAB0axAWqSZRYHkXaNVh
+ dtmIC2QM4NA0pzSabKtWrmqZ1P/ZdxrW1HB9+x7EQQSZCyFAMuPpC4KCuZ0af/uZVRhy
+ 8LFp0tgnILW/otCwdZrL2kKoC1xFj7crSQUAtuOa8rb2+gwO14Jd39/Hu7seEJOx2Nmp
+ sRN6u/pbNJ4VFAAJbM6Pm495WpV72pzDHrm+iY1I4kEdqqA2GfkYZwIqiX7Zn2o/B2PR
+ FF9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=PVjMmpPwdek8frF6rNFPjF6DDS9IuYy6pojPPHcGSgk=;
+ b=AWfMXP2hH+yZA280OTuZWZwU8XNL6gEKo0ZGL13TyEe9t2qtq1efE3hV8uV8SH77k2
+ OvzdihVe/OSfIHkkoxIx0sNRSeZCk2fTYfjnA5mA3IST+y0bs7Em5japr9x4STJZO3qv
+ QF1F2fb6MpM88URmQc1tkUlPFXWKzDfablMwRBFLrgaD46TbbmEQfGoEBUHZA2jIXNy1
+ 77KuxwfPTnDdtDE5n19TMXHcOKY+bUg85+57pd+z8MrOOn9R6Yim8TkkGtTK6Lhs2EOs
+ wcOkkfFXU2bpP1zbiLKnW4R9kRtzkm7zfvjcdRM4wC8w8NonSaH8Z2SqMD9jnfpCm6ue
+ buPg==
+X-Gm-Message-State: APjAAAX14ap1YG+WaSrISfDTb+DR6a71yr6sv4Pmybp/RO6WKQ0WVCwn
+ whcomu+7H8V75A6gwirZZgcww4iEp7J4Io3bxS9GTwynDrY=
+X-Google-Smtp-Source: APXvYqzqoVuuToGpqIVVnN1xo1sRZuYwWWRKYL0LEDRP1aEX50UcslOCJtTtDkGh8d2hAIG3PfVkGyBOBkeu6OXCYjU=
+X-Received: by 2002:a9d:7245:: with SMTP id a5mr20589831otk.232.1561988176854; 
+ Mon, 01 Jul 2019 06:36:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Mon, 01 Jul 2019 13:27:10 +0000 (UTC)
+References: <20190621065242.32535-1-joel@jms.id.au>
+In-Reply-To: <20190621065242.32535-1-joel@jms.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 1 Jul 2019 14:36:06 +0100
+Message-ID: <CAFEAcA93PEEsp-6Ko_ELU+0QYPuYQFJLzX1LT+5+LdPjh-jq+A@mail.gmail.com>
+To: Joel Stanley <joel@jms.id.au>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC PATCH v3 26/27] target/arm: Do not build
- A/M-profile cpus when using KVM
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH v2] aspeed: Link SCU to the watchdog
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,113 +87,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yang Zhong <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>,
- Andrew Jones <drjones@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>,
- Rob Bradford <robert.bradford@intel.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A KVM-only build won't be able to run A or M-profile cpus,
-disable them.
+On Fri, 21 Jun 2019 at 07:52, Joel Stanley <joel@jms.id.au> wrote:
+>
+> The ast2500 uses the watchdog to reset the SDRAM controller. This
+> operation is usually performed by u-boot's memory training procedure,
+> and it is enabled by setting a bit in the SCU and then causing the
+> watchdog to expire. Therefore, we need the watchdog to be able to
+> access the SCU's register space.
+>
+> This causes the watchdog to not perform a system reset when the bit is
+> set. In the future it could perform a reset of the SDMC model.
+>
+> Signed-off-by: Joel Stanley <joel@jms.id.au>
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+> v2: rebase on upstream, rework commit message
 
-If KVM is not enabled, they are enabled by default.
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-Sadly this does not work with --enable-tcg --enable-kvm dual config.
----
- default-configs/arm-softmmu.mak | 14 ++++++--------
- hw/arm/Kconfig                  | 16 +++++++++++++---
- 2 files changed, 19 insertions(+), 11 deletions(-)
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
-u.mak
-index 081d507c87..3995c4bb65 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -1,25 +1,18 @@
- # Default configuration for arm-softmmu
-=20
--# TODO: ARM_V7M is currently always required - make this more flexible!
--CONFIG_ARM_V7M=3Dy
--
- # CONFIG_PCI_DEVICES=3Dn
- # CONFIG_TEST_DEVICES=3Dn
-+CONFIG_ARM_V7M=3Dn
-=20
- CONFIG_ARM_VIRT=3Dy
- CONFIG_CUBIEBOARD=3Dy
- CONFIG_EXYNOS4=3Dy
- CONFIG_FSL_IMX31=3Dy
--CONFIG_MUSCA=3Dy
--CONFIG_STELLARIS=3Dy
- CONFIG_REALVIEW=3Dy
- CONFIG_VEXPRESS=3Dy
- CONFIG_ZYNQ=3Dy
--CONFIG_NETDUINO2=3Dy
--CONFIG_MPS2=3Dy
- CONFIG_RASPI=3Dy
- CONFIG_SABRELITE=3Dy
--CONFIG_EMCRAFT_SF2=3Dy
- CONFIG_FSL_IMX7=3Dy
- CONFIG_FSL_IMX6UL=3Dy
- CONFIG_SEMIHOSTING=3Dy
-@@ -38,4 +31,9 @@ CONFIG_SEMIHOSTING=3Dy
- #CONFIG_ASPEED_SOC=3Dy
- #CONFIG_NSERIES=3Dy
- #CONFIG_HIGHBANK=3Dn
-+#CONFIG_MUSCA=3Dn
-+#CONFIG_STELLARIS=3Dn
-+#CONFIG_NETDUINO2=3Dn
-+#CONFIG_MPS2=3Dn
-+#CONFIG_EMCRAFT_SF2=3Dn
- #CONFIG_MICROBIT=3Dn
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 9320509979..1724c21ece 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -13,6 +13,18 @@ config ARM_V6
-     depends on !KVM
-     bool
-=20
-+# ARM Microcontroller profile
-+config ARM_V7M
-+    default y
-+    depends on !KVM
-+    bool
-+
-+# ARM Realtime profile
-+config ARM_V7R
-+    default y
-+    depends on !KVM
-+    bool
-+
- config ARM_VIRT
-     bool
-     imply PCI_DEVICES
-@@ -281,9 +293,6 @@ config ZYNQ
-     select XILINX_SPIPS
-     select ZYNQ_DEVCFG
-=20
--config ARM_V7M
--    bool
--
- config ALLWINNER_A10
-     bool
-     select AHCI
-@@ -309,6 +318,7 @@ config STM32F205_SOC
-=20
- config XLNX_ZYNQMP_ARM
-     bool
-+    select ARM_V7R
-     select AHCI
-     select ARM_GIC
-     select CADENCE
---=20
-2.20.1
+Applied to target-arm.next, thanks.
 
+-- PMM
 
