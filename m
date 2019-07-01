@@ -2,128 +2,81 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74F0CC0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 13:15:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B53DCC0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 13:19:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F6CF2089F
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 13:15:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 825CA208E4
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 13:19:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="wnzyeKU5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F6CF2089F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dCStNmCP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 825CA208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhw9H-0000qS-DA
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 09:15:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37668)
+	id 1hhwDL-0002pI-LE
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 09:19:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36756)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <edgar@xilinx.com>) id 1hhw5Q-000792-NB
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:11:14 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hhw1r-0002j6-Oh
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:07:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <edgar@xilinx.com>) id 1hhw5O-0003dB-S3
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:11:12 -0400
-Received: from mail-dm3nam05on0616.outbound.protection.outlook.com
- ([2a01:111:f400:fe51::616]:6001
- helo=NAM05-DM3-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <edgar@xilinx.com>) id 1hhw5O-0003ZZ-E9
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:11:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector1-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cynKbhuiZ424GnefsCEsJI46z1GBNYXzCXAtygf3xUw=;
- b=wnzyeKU5zOOJ14zA1xWlSMYTbdUQ0VwVZ1+ijTbVmdWVs59bct5d7mPEqqLIXpxquWWnwcjQxyVBKZSc2jI+njcMcrT6XR1mhulbTNbGdndtAjGkCsyyqTQsk1msbjIqyOsgnJcDQcNEdo7qp7ovVrIY2D43sAy67cYXhTFixwA=
-Received: from BYAPR02CA0024.namprd02.prod.outlook.com (2603:10b6:a02:ee::37)
- by BY5PR02MB6321.namprd02.prod.outlook.com (2603:10b6:a03:1f9::24)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2032.17; Mon, 1 Jul
- 2019 13:11:07 +0000
-Received: from CY1NAM02FT057.eop-nam02.prod.protection.outlook.com
- (2a01:111:f400:7e45::206) by BYAPR02CA0024.outlook.office365.com
- (2603:10b6:a02:ee::37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.2032.20 via Frontend
- Transport; Mon, 1 Jul 2019 13:11:06 +0000
-Authentication-Results: spf=pass (sender IP is 149.199.60.100)
- smtp.mailfrom=xilinx.com; greensocs.com; dkim=none (message not signed)
- header.d=none;greensocs.com; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.60.100 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.60.100; helo=xsj-pvapsmtpgw02;
-Received: from xsj-pvapsmtpgw02 (149.199.60.100) by
- CY1NAM02FT057.mail.protection.outlook.com (10.152.75.110) with Microsoft SMTP
- Server (version=TLS1_0, cipher=TLS_RSA_WITH_AES_256_CBC_SHA) id 15.20.2032.15
- via Frontend Transport; Mon, 1 Jul 2019 13:11:05 +0000
-Received: from unknown-38-66.xilinx.com ([149.199.38.66]:48034
- helo=xsj-pvapsmtp01) by xsj-pvapsmtpgw02 with esmtp (Exim 4.63)
- (envelope-from <edgar@xilinx.com>)
- id 1hhw5I-0003H5-KE; Mon, 01 Jul 2019 06:11:04 -0700
-Received: from [127.0.0.1] (helo=localhost)
- by xsj-pvapsmtp01 with smtp (Exim 4.63)
- (envelope-from <edgar@xilinx.com>)
- id 1hhw5D-00021m-Gm; Mon, 01 Jul 2019 06:10:59 -0700
-Received: from xsj-pvapsmtp01 (mailhub.xilinx.com [149.199.38.66])
- by xsj-smtp-dlp1.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id x61DAqhP027357; 
- Mon, 1 Jul 2019 06:10:52 -0700
-Received: from [10.71.119.209] (helo=localhost)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <edgar@xilinx.com>)
- id 1hhw56-00020p-Dz; Mon, 01 Jul 2019 06:10:52 -0700
-Date: Mon, 1 Jul 2019 15:19:33 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <20190701131933.GA2840@toto>
-References: <20190628113917.15869-1-luc.michel@greensocs.com>
- <f9c429e1-4a1d-959a-04c4-e9b7e94637cf@linaro.org>
+ (envelope-from <peter.maydell@linaro.org>) id 1hhw1n-0007xH-UI
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:07:29 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:40415)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hhw1n-0007J8-Oe
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 09:07:27 -0400
+Received: by mail-oi1-x242.google.com with SMTP id w196so9872543oie.7
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 06:06:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=GFpVemuNL7UhbLtjtR7O0P9wazBxTV9UABGaJgXIshY=;
+ b=dCStNmCPt9WreNdovNC0xder7dlBrJLvhhkZWT1qlkbg4dEiQbVJB3ZbzBGNofHaJl
+ FdyLODZlX5wuBaaQjzrsBf5KNT6WqFQN3Ic3lxvAxailNNP4JBrxfpVQE0dqc+jlP5V4
+ y6cLwJ7TG4Z1hLR8v02XTRhZgCp6CpJ47hmnvZLTLioFGv8C0N+OByjGnj71F3UzXNaw
+ 1mtn3Ig4tnqxTIoYmKuvwEnvmMVroXAVbyiaiRyb6CwK8zKAY6PyNE2k5cq5hPmNKIIX
+ fMKNg/r6sksMRIRK+6U9rEoyp8Q4W1Zt1k9mRUKF7lW9W15sjyfYxlCw5VNlDPlILwNk
+ BMWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=GFpVemuNL7UhbLtjtR7O0P9wazBxTV9UABGaJgXIshY=;
+ b=BoO3b4KRIFwhHEwwOFucuyM+onTJMuSTETsOQQNtwIYfX2//bJS0u41ix9YDJstyB2
+ ty6pzWIYLPeUUnI5K1ZLxh2MEM2MI+PiLDw/LIuR3rwHaO0ydXpSuBPfw5/lhNxxzz8Q
+ wMzW7Uc1Ii1pRzIGO3ltCLDGqgcvhhFI0Z4mnrrp65FqJd4wL8mAGvv/wJTPjvdRwnkg
+ piySFZ6GqWCrIWPG87bQ+L4eY0F5dVjMG+NNyqGqceRfA+ul8VL9m4YimYilhrfh/Q7W
+ Nhz8wM4h/YKu3Go0kRb1okHfEQ3evIoY0wEDtlQ0Xj/rKpdSJOvBVZP6ibQN+VUHOBZa
+ l8rA==
+X-Gm-Message-State: APjAAAXdpKkZzmFF4wopGcmo0E345nyrqq0RZYLUdtTKBdLPz+1c/dqY
+ Z/v5lxZ4HVjvciFz2DFwsA6U+UhAw+x8jLlGYFVIrg==
+X-Google-Smtp-Source: APXvYqwvba2MQMyS7jLMKDl454jZLaiXhButHVexL7HSy/SUqsJ6RAdi7pyD/yDQVq2pi+l9JeCmOjzaQB1rxa+Y8lo=
+X-Received: by 2002:aca:ac48:: with SMTP id v69mr6542560oie.48.1561986407265; 
+ Mon, 01 Jul 2019 06:06:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f9c429e1-4a1d-959a-04c4-e9b7e94637cf@linaro.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-RCIS-Action: ALLOW
-X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
-X-TM-AS-User-Approved-Sender: Yes;Yes
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-Forefront-Antispam-Report: CIP:149.199.60.100; IPV:NLI; CTRY:US; EFV:NLI;
- SFV:NSPM;
- SFS:(10009020)(4636009)(7916004)(376002)(346002)(396003)(39850400004)(136003)(2980300002)(199004)(189003)(70586007)(70206006)(33656002)(14444005)(1076003)(53546011)(229853002)(76176011)(446003)(47776003)(305945005)(50466002)(33716001)(9686003)(478600001)(54906003)(2906002)(486006)(476003)(426003)(11346002)(126002)(76506005)(23726003)(336012)(63266004)(57986006)(77096007)(186003)(9786002)(8936002)(36386004)(26005)(81156014)(81166006)(8676002)(16586007)(58126008)(6246003)(4326008)(5660300002)(106002)(6916009)(316002)(356004)(6666004)(5001870100001);
- DIR:OUT; SFP:1101; SCL:1; SRVR:BY5PR02MB6321; H:xsj-pvapsmtpgw02; FPR:;
- SPF:Pass; LANG:en; PTR:xapps1.xilinx.com,unknown-60-100.xilinx.com; A:1; MX:1;
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 8ca6c371-24d5-46b8-5505-08d6fe25937b
-X-Microsoft-Antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(4709080)(1401327)(2017052603328);
- SRVR:BY5PR02MB6321; 
-X-MS-TrafficTypeDiagnostic: BY5PR02MB6321:
-X-LD-Processed: 657af505-d5df-48d0-8300-c31994686c5c,ExtAddr
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-Microsoft-Antispam-PRVS: <BY5PR02MB63218992C3F77C8C803D156DC2F90@BY5PR02MB6321.namprd02.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-Forefront-PRVS: 00851CA28B
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam-Message-Info: wsN/hfUTCNpjBQ1QnGnsbSDsAeY26T3JkcPPJJUfQg0KvcBV95/HQWjOez0ZlIUNsfuHw5hmHdhMK8JtbcvV84xG92e0lN4zcs5Juw+T9dNa+o5ss1yApx2YXUBXqN18bK0dR8ybIT4MdTNZ7YshCHFhTECkYrJsth1UcsNKbRsqC0l55tFgAIIak1k3lIAleRI3GerfY4FiM4Fp6NpqNSueHd/0q8F3fuGoRFMgNYja6koSCYfv80eY4dRUTMJtkC47RHNga+ZAdgfmN4jcXjHWC85YRHAv+pj9d3wy53O0bq9jNfQN3TOiBrTbW7g9yMdjrOgT8VMGiss013WWTr9vHPV6hL0iiiU3yaEA8aqdiGFxodFaYp1UxemimEOdZMLkMNM4HB2KvpQEep4C6e3hDECZtHSssbz91jTIaQk=
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2019 13:11:05.0493 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8ca6c371-24d5-46b8-5505-08d6fe25937b
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.100];
- Helo=[xsj-pvapsmtpgw02]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR02MB6321
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe51::616
-Subject: Re: [Qemu-devel] [RFC PATCH] accel/tcg/translator: add tb_enter TCG
- trace
+References: <20190618165311.27066-1-clg@kaod.org>
+ <20190618165311.27066-16-clg@kaod.org>
+In-Reply-To: <20190618165311.27066-16-clg@kaod.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 1 Jul 2019 14:06:36 +0100
+Message-ID: <CAFEAcA-J+bS2-EtX6pTFYJ1XMaNLx0roYEoQMxV_=-mwMSPDgg@mail.gmail.com>
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
+Subject: Re: [Qemu-devel] [PATCH v2 15/21] aspeed/smc: add support for DMAs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -135,100 +88,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: damien.hedde@greensocs.com, mark.burton@greensocs.com,
- qemu-devel@nongnu.org, sakisp@xilinx.com, edgari@xilinx.com,
- Paolo Bonzini <pbonzini@redhat.com>, Luc Michel <luc.michel@greensocs.com>
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 28, 2019 at 02:16:41PM +0200, Richard Henderson wrote:
-> On 6/28/19 1:39 PM, Luc Michel wrote:
-> > Add a TCG trace at the begining of a translation block recording the
-> > first and last (past-the-end) PC values.
-> > 
-> > Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-> > ---
-> > This can be used to trace the execution of the guest quite efficiently.
-> > It will report each time a TB is entered (using the tb_enter_exec
-> > trace). The traces arguments give the PC start and past-the-end values.
-> > It has very little to no performance impact since the trace is actually
-> > emitted in the generated code only when it is enabled at run time.
-> > 
-> > It works already quite well on its own to trace guest execution. However
-> > it does not handle the case where a TB is exited in the middle of
-> > execution. I'm not sure how to properly trace that. A trace could be
-> > added when `cpu_loop_exit()' is called to report the current PC, but in
-> > most cases the interesting value (the PC of the instruction that
-> > caused the exit) is already lost at this stage.
-> > 
-> > I'm not sure there is a generic (i.e. not target specific) way of
-> > recovering the last PC executed when cpu_loop_exit() is called. Do you
-> > think of a better way?
-> > 
-> > Thanks to the Xilinx's QEMU team who sponsored this work.
-> > ---
-> >  accel/tcg/translator.c | 24 ++++++++++++++++++++++++
-> >  trace-events           |  3 +++
-> >  2 files changed, 27 insertions(+)
-> > 
-> > diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
-> > index 9226a348a3..c55377aa18 100644
-> > --- a/accel/tcg/translator.c
-> > +++ b/accel/tcg/translator.c
-> > @@ -14,10 +14,11 @@
-> >  #include "tcg/tcg-op.h"
-> >  #include "exec/exec-all.h"
-> >  #include "exec/gen-icount.h"
-> >  #include "exec/log.h"
-> >  #include "exec/translator.h"
-> > +#include "trace-tcg.h"
-> >  
-> >  /* Pairs with tcg_clear_temp_count.
-> >     To be called by #TranslatorOps.{translate_insn,tb_stop} if
-> >     (1) the target is sufficiently clean to support reporting,
-> >     (2) as and when all temporaries are known to be consumed.
-> > @@ -28,14 +29,31 @@ void translator_loop_temp_check(DisasContextBase *db)
-> >          qemu_log("warning: TCG temporary leaks before "
-> >                   TARGET_FMT_lx "\n", db->pc_next);
-> >      }
-> >  }
-> >  
-> > +static TCGOp *gen_trace_tb_enter(TranslationBlock *tb)
-> > +{
-> > +    TCGOp *last_pc_op;
-> > +
-> > +    TCGv pc_end = tcg_temp_new();
-> > +
-> > +    /* The last PC value is not known yet */
-> > +    tcg_gen_movi_tl(pc_end, 0xdeadbeef);
-> > +    last_pc_op = tcg_last_op();
-> 
-> TL is a target-specific type that does not necessarily correspond to uint64_t,
-> as you assume in the print message.  More importantly, on a 32-bit host with a
-> 64-bit guest, this movi will generate *two* ops...
-> 
-> > +    /* Fixup the last PC value in the tb_enter trace now that we know it */
-> > +    tcg_set_insn_param(trace_pc_end, 1, db->pc_next);
-> 
-> ... which means that this operation does not do what you think it does.  It
-> will only set one (unknown) half of the _i64 temporary.
-> 
-> Moreover, this isn't quite as zero overhead as I would like, because the pc_end
-> temporary is always created, even if the trace_tb condition is not satisfied
-> and so it (eventually) gets removed as unused.
-> 
-> I'm not quite sure what you're after with pc_end anyway.  As you note within
-> the cover, you can't reliably use it for anything.  If you remove that, then
-> you've also removed all of the other problems with this patch.
+On Tue, 18 Jun 2019 at 17:55, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 >
+> The FMC controller on the Aspeed SoCs support DMA to access the flash
+> modules. It can operate in a normal mode, to copy to or from the flash
+> module mapping window, or in a checksum calculation mode, to evaluate
+> the best clock settings for reads.
+>
+> The model introduces two custom address spaces for DMAs: one for the
+> AHB window of the FMC flash devices and one for the DRAM. The latter
+> is populated using a "dram" link set from the machine with the RAM
+> container region.
+>
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Acked-by: Joel Stanley <joel@jms.id.au>
+> +/*
+> + * Accumulate the result of the reads to provide a checksum that will
+> + * be used to validate the read timing settings.
+> + */
+> +static void aspeed_smc_dma_checksum(AspeedSMCState *s)
+> +{
+> +    MemTxResult result;
+> +    uint32_t data;
+> +
+> +    if (s->regs[R_DMA_CTRL] & DMA_CTRL_WRITE) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "%s: invalid direction for DMA checksum\n",  __fun=
+c__);
+> +        return;
+> +    }
+> +
+> +    while (s->regs[R_DMA_LEN]) {
+> +        result =3D address_space_read(&s->flash_as, s->regs[R_DMA_FLASH_=
+ADDR],
+> +                                    MEMTXATTRS_UNSPECIFIED,
+> +                                    (uint8_t *)&data, 4);
 
-Hi,
+This does a byte-by-byte read into a local uint32_t...
 
-One of the use cases is to be able to collect code-coverage from these traces.
-In that case we're going to need a reliable pc_end. We may need to recover it
-from outside of TCG in some cases though...
+> +        if (result !=3D MEMTX_OK) {
+> +            qemu_log_mask(LOG_GUEST_ERROR, "%s: Flash read failed @%08x\=
+n",
+> +                          __func__, s->regs[R_DMA_FLASH_ADDR]);
+> +            return;
+> +        }
+> +
+> +        /*
+> +         * When the DMA is on-going, the DMA registers are updated
+> +         * with the current working addresses and length.
+> +         */
+> +        s->regs[R_DMA_CHECKSUM] +=3D data;
 
-Cheers,
-Edgar 
+...which we then use as a (host-endian) 32-bit value.
+
+This will behave differently on big endian and little endian hosts.
+If the h/w behaviour is to to load a 32-bit data type you probably
+want address_space_ldl_le() (or _be() if it's doing a big-endian load).
+
+> +        s->regs[R_DMA_FLASH_ADDR] +=3D 4;
+> +        s->regs[R_DMA_LEN] -=3D 4;
+> +    }
+> +}
+> +
+> +static void aspeed_smc_dma_rw(AspeedSMCState *s)
+> +{
+> +    MemTxResult result;
+> +    uint32_t data;
+> +
+> +    while (s->regs[R_DMA_LEN]) {
+> +        if (s->regs[R_DMA_CTRL] & DMA_CTRL_WRITE) {
+> +            result =3D address_space_read(&s->dram_as, s->regs[R_DMA_DRA=
+M_ADDR],
+> +                                        MEMTXATTRS_UNSPECIFIED,
+> +                                        (uint8_t *)&data, 4);
+> +            if (result !=3D MEMTX_OK) {
+> +                qemu_log_mask(LOG_GUEST_ERROR, "%s: DRAM read failed @%0=
+8x\n",
+> +                              __func__, s->regs[R_DMA_DRAM_ADDR]);
+> +                return;
+> +            }
+> +
+> +            result =3D address_space_write(&s->flash_as,
+> +                                         s->regs[R_DMA_FLASH_ADDR],
+> +                                         MEMTXATTRS_UNSPECIFIED,
+> +                                         (uint8_t *)&data, 4);
+> +            if (result !=3D MEMTX_OK) {
+> +                qemu_log_mask(LOG_GUEST_ERROR, "%s: Flash write failed @=
+%08x\n",
+> +                              __func__, s->regs[R_DMA_FLASH_ADDR]);
+> +                return;
+> +            }
+> +        } else {
+> +            result =3D address_space_read(&s->flash_as, s->regs[R_DMA_FL=
+ASH_ADDR],
+> +                                        MEMTXATTRS_UNSPECIFIED,
+> +                                        (uint8_t *)&data, 4);
+> +            if (result !=3D MEMTX_OK) {
+> +                qemu_log_mask(LOG_GUEST_ERROR, "%s: Flash read failed @%=
+08x\n",
+> +                              __func__, s->regs[R_DMA_FLASH_ADDR]);
+> +                return;
+> +            }
+> +
+> +            result =3D address_space_write(&s->dram_as, s->regs[R_DMA_DR=
+AM_ADDR],
+> +                                         MEMTXATTRS_UNSPECIFIED,
+> +                                         (uint8_t *)&data, 4);
+> +            if (result !=3D MEMTX_OK) {
+> +                qemu_log_mask(LOG_GUEST_ERROR, "%s: DRAM write failed @%=
+08x\n",
+> +                              __func__, s->regs[R_DMA_DRAM_ADDR]);
+> +                return;
+> +            }
+> +        }
+
+Since the code here doesn't do anything with the data the
+address_space_read/write here aren't wrong, but you might
+prefer to use the ldl and stl functions to avoid the casts
+to uint8_t* and need to specify the length.
+
+thanks
+-- PMM
 
