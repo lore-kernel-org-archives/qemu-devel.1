@@ -3,60 +3,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9FB7C06511
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 11:28:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53500C0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 11:29:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 964FF206A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 11:28:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 964FF206A3
+	by mail.kernel.org (Postfix) with ESMTPS id 2A9032089C
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 11:29:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A9032089C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhuTw-0008Vi-Rr
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 07:28:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45108)
+	id 1hhuUj-00019P-8e
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 07:29:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43504)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hhuS3-00061g-33
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:26:27 -0400
+ (envelope-from <cohuck@redhat.com>) id 1hhuKA-0006YL-3y
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:18:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hhuS1-0007ec-4A
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:26:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54200)
+ (envelope-from <cohuck@redhat.com>) id 1hhuK3-0000sT-P7
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:18:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53172)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hhuS0-0007ct-UY
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:26:25 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>)
+ id 1hhuK3-0000Gj-EW; Mon, 01 Jul 2019 07:18:11 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E84B33082231;
- Mon,  1 Jul 2019 11:26:21 +0000 (UTC)
-Received: from x1w.redhat.com (unknown [10.40.205.170])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1E2C71B4B0;
- Mon,  1 Jul 2019 11:26:19 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Mon,  1 Jul 2019 13:26:09 +0200
-Message-Id: <20190701112612.14758-2-philmd@redhat.com>
-In-Reply-To: <20190701112612.14758-1-philmd@redhat.com>
-References: <20190701112612.14758-1-philmd@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 6342C30B4B5E;
+ Mon,  1 Jul 2019 11:17:34 +0000 (UTC)
+Received: from localhost (ovpn-117-220.ams2.redhat.com [10.36.117.220])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F15017CD9;
+ Mon,  1 Jul 2019 11:17:30 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon,  1 Jul 2019 13:17:17 +0200
+Message-Id: <20190701111722.32068-2-cohuck@redhat.com>
+In-Reply-To: <20190701111722.32068-1-cohuck@redhat.com>
+References: <20190701111722.32068-1-cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Mon, 01 Jul 2019 11:26:22 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.49]); Mon, 01 Jul 2019 11:17:39 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 1/4] hw/mips: Explicit the semi-hosting
- feature is always required
+Subject: [Qemu-devel] [PULL 1/6] tests/tcg/s390x: Fix alignment of csst
+ parameter list
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,54 +67,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>,
- Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: qemu-s390x@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Disabling the semi-hosting feature leads to build failure:
+From: Richard Henderson <richard.henderson@linaro.org>
 
-    LINK    mips-softmmu/qemu-system-mips
-  /usr/bin/ld: target/mips/mips-semi.o: in function `helper_do_semihostin=
-g':
-  target/mips/mips-semi.c:335: undefined reference to `qemu_semihosting_l=
-og_out'
-  /usr/bin/ld: target/mips/mips-semi.c:338: undefined reference to `qemu_=
-semihosting_log_out'
-  collect2: error: ld returned 1 exit status
+The parameter list given in general register 1 shall be aligned
+on a quadword boundary.  This test currently succeeds or fails
+depending on the compiler version used and the accidential layout
+of the function's stack frame.
 
-Add a comment to avoid this feature to be disabled.
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- default-configs/mips-softmmu-common.mak | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ tests/tcg/s390x/csst.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mi=
-ps-softmmu-common.mak
-index e10ac4b20c..1ea47a9c2a 100644
---- a/default-configs/mips-softmmu-common.mak
-+++ b/default-configs/mips-softmmu-common.mak
-@@ -1,5 +1,8 @@
- # Common mips*-softmmu CONFIG defines
+diff --git a/tests/tcg/s390x/csst.c b/tests/tcg/s390x/csst.c
+index 1dae9071fbd5..084d80af49f3 100644
+--- a/tests/tcg/s390x/csst.c
++++ b/tests/tcg/s390x/csst.c
+@@ -3,7 +3,7 @@
 =20
-+# CONFIG_SEMIHOSTING is always required on this architecture
-+CONFIG_SEMIHOSTING=3Dy
-+
- CONFIG_ISA_BUS=3Dy
- CONFIG_PCI=3Dy
- CONFIG_PCI_DEVICES=3Dy
-@@ -35,7 +38,6 @@ CONFIG_MIPS_CPS=3Dy
- CONFIG_MIPS_ITU=3Dy
- CONFIG_R4K=3Dy
- CONFIG_MALTA=3Dy
--CONFIG_SEMIHOSTING=3Dy
- CONFIG_PCNET_PCI=3Dy
- CONFIG_MIPSSIM=3Dy
- CONFIG_ACPI_SMBUS=3Dy
+ int main(void)
+ {
+-    uint64_t parmlist[] =3D {
++    uint64_t parmlist[] __attribute__((aligned(16))) =3D {
+         0xfedcba9876543210ull,
+         0,
+         0x7777777777777777ull,
 --=20
 2.20.1
 
