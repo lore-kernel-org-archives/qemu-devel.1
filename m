@@ -2,60 +2,61 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 798BFC4646D
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 09:36:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9687CC0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 09:36:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52A002089C
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 09:36:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52A002089C
+	by mail.kernel.org (Postfix) with ESMTPS id 6E8B0206E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 09:36:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E8B0206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhsjY-0004aY-IS
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 05:36:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49635)
+	id 1hhsjt-0005S1-KO
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 05:36:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49731)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1hhseh-0002NA-2X
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:31:24 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1hhsep-0002c3-Le
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:31:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1hhsef-0000Nm-Dt
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:31:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54902)
+ (envelope-from <eric.auger@redhat.com>) id 1hhsek-0000U5-LV
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:31:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41908)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1hhseY-0008NE-5m; Mon, 01 Jul 2019 05:31:15 -0400
+ id 1hhsee-0000LP-6b; Mon, 01 Jul 2019 05:31:20 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8F2A981F1B;
- Mon,  1 Jul 2019 09:30:50 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 50F17308FE9A;
+ Mon,  1 Jul 2019 09:31:09 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-116-89.ams2.redhat.com [10.36.116.89])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 30618BA4D;
- Mon,  1 Jul 2019 09:30:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DBCB4BA4D;
+ Mon,  1 Jul 2019 09:30:59 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org, peter.maydell@linaro.org, peterx@redhat.com,
  pbonzini@redhat.com, alex.williamson@redhat.com
-Date: Mon,  1 Jul 2019 11:30:28 +0200
-Message-Id: <20190701093034.18873-1-eric.auger@redhat.com>
+Date: Mon,  1 Jul 2019 11:30:32 +0200
+Message-Id: <20190701093034.18873-5-eric.auger@redhat.com>
+In-Reply-To: <20190701093034.18873-1-eric.auger@redhat.com>
+References: <20190701093034.18873-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Mon, 01 Jul 2019 09:30:50 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.49]); Mon, 01 Jul 2019 09:31:14 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 0/6] ARM SMMUv3: Fix spurious notification
- errors and stall with vfio-pci
+Subject: [Qemu-devel] [PATCH v2 4/6] hw/arm/smmuv3: Advertise VFIO_NESTED
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,43 +72,48 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series fixes the guest stall observed when attempting to run
-a guest exposed with a SMMUv3 and a VFIO-PCI device. As a reminder
-SMMUv3 is not yet integrated with VFIO (the device will not work
-properly) but this shouldn't prevent the guest from booting.
+Virtual SMMUv3 requires physical nested stages for VFIO integration.
+Advertise this attribute.
 
-It also silences some spurious translation configuration decoding
-errors (STE out of span or invalid STE) that may happen on guest IOVA
-invalidation notifications.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-Best Regards
+---
+---
+ hw/arm/smmuv3.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-Eric
-
-History:
-
-v1 -> v2:
-- Added "memory: Remove unused memory_region_iommu_replay_all()" &
-  "hw/arm/smmuv3: Log a guest error when decoding an invalid STE"
-- do not attempt to implement replay Cb but rather remove the call
-  in case it is not needed
-- explain why we do not remove other log messages on config decoding
-
-Eric Auger (6):
-  memory: Remove unused memory_region_iommu_replay_all()
-  memory: Add IOMMU_ATTR_VFIO_NESTED IOMMU memory region attribute
-  hw/vfio/common: Do not replay IOMMU mappings in nested case
-  hw/arm/smmuv3: Advertise VFIO_NESTED
-  hw/arm/smmuv3: Log a guest error when decoding an invalid STE
-  hw/arm/smmuv3: Remove spurious error messages on IOVA invalidations
-
- hw/arm/smmuv3-internal.h |  1 +
- hw/arm/smmuv3.c          | 26 ++++++++++++++++++++------
- hw/vfio/common.c         |  7 ++++++-
- include/exec/memory.h    | 13 ++-----------
- memory.c                 |  9 ---------
- 5 files changed, 29 insertions(+), 27 deletions(-)
-
+diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+index e96d5beb9a..384c02cb91 100644
+--- a/hw/arm/smmuv3.c
++++ b/hw/arm/smmuv3.c
+@@ -1490,6 +1490,17 @@ static void smmuv3_notify_flag_changed(IOMMUMemory=
+Region *iommu,
+     }
+ }
+=20
++static int smmuv3_get_attr(IOMMUMemoryRegion *iommu,
++                           enum IOMMUMemoryRegionAttr attr,
++                           void *data)
++{
++    if (attr =3D=3D IOMMU_ATTR_VFIO_NESTED) {
++        *(bool *) data =3D true;
++        return 0;
++    }
++    return -EINVAL;
++}
++
+ static void smmuv3_iommu_memory_region_class_init(ObjectClass *klass,
+                                                   void *data)
+ {
+@@ -1497,6 +1508,7 @@ static void smmuv3_iommu_memory_region_class_init(O=
+bjectClass *klass,
+=20
+     imrc->translate =3D smmuv3_translate;
+     imrc->notify_flag_changed =3D smmuv3_notify_flag_changed;
++    imrc->get_attr =3D smmuv3_get_attr;
+ }
+=20
+ static const TypeInfo smmuv3_type_info =3D {
 --=20
 2.20.1
 
