@@ -2,87 +2,64 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-11.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFD98C5B578
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:08:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A76B9C5B578
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:09:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1CFA206A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:08:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VK/Q8/0L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1CFA206A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7D5F5206A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:09:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D5F5206A3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47126 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi8Dn-00088S-Cy
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 22:08:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55291)
+	id 1hi8ES-0008Ug-NZ
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 22:09:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33085)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hi4Lm-000469-3a
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:00:39 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hi4kl-00040j-7K
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:26:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hi4Lj-0008SR-P4
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:00:37 -0400
-Received: from mail-wr1-f50.google.com ([209.85.221.50]:43745)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hi4Lh-0008NC-PN
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:00:35 -0400
-Received: by mail-wr1-f50.google.com with SMTP id p13so15404184wru.10
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 15:00:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=KqpLKfjrgSvCjVcmL96LXqXG75GeUM+DNTc46s318rE=;
- b=VK/Q8/0LfvU8fmYJ/2BejcaK4j0cH1dTfnksW+UfwmBnzBLcfpnb4KEZIy/kWNGt/n
- MEqjRVx2I4L95cHfCzDzzY8kgn08le5J31I8ga31GuzbLIT77K3n/xi1/eezySQQMjEM
- 0cfo9mWV2N8ORsZOmGeA2cn7Z6+IPJeYVYfzCy8+KnHnjKcGq9VGG974WySZuKAq+UF4
- qCeFwVkCRM5FIu5QoQVxBVzprTb8rKP46lMXUMhyi8JyiH+gIp+eru0dEtc276UKncn6
- 5yWNIJN0YvjEOypRiBBEvBK1PrE9rcXANj/GLl4zYmIe8vZuQwzw6lOTyw0MDECAm9w5
- qCEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=KqpLKfjrgSvCjVcmL96LXqXG75GeUM+DNTc46s318rE=;
- b=N3DCs5354X2lamCKazJ8O3xQjJjbQtbqytSh7QVs+oeRkUYFtZAVTWLogayusNU9Ve
- BM2XWnCkM1tbyd1yCKDTGFJT3TMEkmcNvmVRium719Zync+wTyOtVrtbCAG1KFXTiDtY
- ETEj4aNU/MOUfZQcyZZFwoWGUT27CbxyGKdLVbYLgKfTn2eENYFdou6bg71k6gz/nCed
- s0l1t49YG/IK+4T9kuHcUIoVwstO2cUonxTfrP7lGaaeUrWt2KWE6gBkNAPNsnSRvWSx
- iHzKbUy2uw4ZAxhP9nxjyGuTTWpJanB6rb5cg5cG8upCOj5+fy7/527YnuRTqv4FtdoS
- Oqlg==
-X-Gm-Message-State: APjAAAV4w2hbwIYltCNGGT4qdUw3PhxRldHdWho35MlAQY8yEk5JqdDh
- m5D1yK3ssnytKXAj6upArHwE6ti7nn8mUw==
-X-Google-Smtp-Source: APXvYqx/VqneEvFcfzcF966LizdY7zagZ3Aj4lH3Ayvgb+07cEcN9PcqJEjvu8s6G3Z2nMgROySyEg==
-X-Received: by 2002:a5d:42c5:: with SMTP id t5mr18846199wrr.5.1561999217125;
- Mon, 01 Jul 2019 09:40:17 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id o6sm26573508wra.27.2019.07.01.09.40.16
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 01 Jul 2019 09:40:16 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Mon,  1 Jul 2019 17:39:26 +0100
-Message-Id: <20190701163943.22313-30-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190701163943.22313-1-peter.maydell@linaro.org>
-References: <20190701163943.22313-1-peter.maydell@linaro.org>
+ (envelope-from <ehabkost@redhat.com>) id 1hi4kk-00077T-4L
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:26:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37452)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hi4kg-0006tx-KJ
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:26:25 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C81DBC04BD4A;
+ Mon,  1 Jul 2019 22:25:31 +0000 (UTC)
+Received: from localhost (ovpn-116-30.gru2.redhat.com [10.97.116.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2C58119C77;
+ Mon,  1 Jul 2019 22:25:28 +0000 (UTC)
+Date: Mon, 1 Jul 2019 19:25:27 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <20190701222527.GJ5198@habkost.net>
+References: <20190607211544.7964-1-ehabkost@redhat.com>
+ <CAFEAcA-wCqppsi+gcrTqGjR3bSDOHs5btKKE8oHYxbAUDtu7Fw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-wCqppsi+gcrTqGjR3bSDOHs5btKKE8oHYxbAUDtu7Fw@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Mon, 01 Jul 2019 22:25:31 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.50
-Subject: [Qemu-devel] [PULL 29/46] target/arm: Makefile cleanup (ARM)
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] Python 2 in tests/vm (was Re: [PULL 0/8] Python queue,
+ 2019-06-07)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,53 +71,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+On Mon, Jun 10, 2019 at 01:58:50PM +0100, Peter Maydell wrote:
+> On Fri, 7 Jun 2019 at 22:16, Eduardo Habkost <ehabkost@redhat.com> wrot=
+e:
+> >
+> > The following changes since commit 185b7ccc11354cbd69b6d53bf8d831dd96=
+4f6c88:
+> >
+> >   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190607-2'=
+ into staging (2019-06-07 15:24:13 +0100)
+> >
+> > are available in the Git repository at:
+> >
+> >   git://github.com/ehabkost/qemu.git tags/python-next-pull-request
+> >
+> > for you to fetch changes up to 8297719709f1339506d6da93ec69e6118ace86=
+76:
+> >
+> >   travis: Make check-acceptance job more verbose (2019-06-07 18:11:02=
+ -0300)
+> >
+> > ----------------------------------------------------------------
+> > Python queue, 2019-06-07
+> >
+> > * New boot_linux_console test cases (Philippe Mathieu-Daud=E9)
+> > * Deprecate Python 2 support (Eduardo Habkost)
+> > * Require python3 >=3D 3.5 (Eduardo Habkost)
+> > * Make check-acceptance Travis job more verbose (Eduardo Habkost)
+> >
+> > ----------------------------------------------------------------
+>=20
+> Hi. This fails to build on one of my buildtest machines:
+>=20
+> ERROR: Cannot use 'python3', Python 2 >=3D 2.7 or Python 3 >=3D 3.5 is =
+required.
+>        Use --python=3D/path/to/python to specify a supported Python.
+>=20
+> The machine has python 2.7.6 and 3.4.3. (It's an Ubuntu trusty
+> box; it's one of the gcc compile farm machines so upgrades to its
+> OS are not really under my control.)
+>=20
+> The configure check also spits out deprecation warnings for
+> the NetBSD/FreeBSD/OpenBSD tests/vm configurations. It would be nice
+> to get those updated.
 
-Group ARM objects together, TCG related ones at the bottom.
-This will help when restricting TCG-only objects.
+CCing the test/vm maintainers.
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20190701132516.26392-3-philmd@redhat.com
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/Makefile.objs | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Fam, Alex, are you able to fix this and create new BSD VM images
+with Python 3 available?  I thought the VM image configurations
+were stored in the source tree, but they are downloaded from
+download.patchew.org.
 
-diff --git a/target/arm/Makefile.objs b/target/arm/Makefile.objs
-index 7c31fa01c1c..1cbe7cfdb47 100644
---- a/target/arm/Makefile.objs
-+++ b/target/arm/Makefile.objs
-@@ -4,11 +4,9 @@ obj-$(CONFIG_KVM) += kvm.o
- obj-$(call land,$(CONFIG_KVM),$(call lnot,$(TARGET_AARCH64))) += kvm32.o
- obj-$(call land,$(CONFIG_KVM),$(TARGET_AARCH64)) += kvm64.o
- obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
--obj-y += translate.o op_helper.o helper.o cpu.o
--obj-y += neon_helper.o iwmmxt_helper.o vec_helper.o vfp_helper.o
--obj-y += gdbstub.o
-+obj-y += helper.o vfp_helper.o
-+obj-y += cpu.o gdbstub.o
- obj-$(TARGET_AARCH64) += cpu64.o gdbstub64.o
--obj-y += crypto_helper.o
- obj-$(CONFIG_SOFTMMU) += arm-powerctl.o
- 
- DECODETREE = $(SRC_PATH)/scripts/decodetree.py
-@@ -32,6 +30,10 @@ target/arm/translate-sve.o: target/arm/decode-sve.inc.c
- target/arm/translate.o: target/arm/decode-vfp.inc.c
- target/arm/translate.o: target/arm/decode-vfp-uncond.inc.c
- 
-+obj-y += translate.o op_helper.o
-+obj-y += crypto_helper.o
-+obj-y += iwmmxt_helper.o vec_helper.o neon_helper.o
-+
- obj-$(TARGET_AARCH64) += translate-a64.o helper-a64.o
- obj-$(TARGET_AARCH64) += translate-sve.o sve_helper.o
- obj-$(TARGET_AARCH64) += pauth_helper.o
--- 
-2.20.1
-
+--=20
+Eduardo
 
