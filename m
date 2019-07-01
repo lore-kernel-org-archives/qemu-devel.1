@@ -2,68 +2,89 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11FD9C5B578
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 03:54:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23C41C5B578
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 03:58:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3216208CA
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 03:54:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3216208CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E2D5A20881
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 03:58:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="grS2NQte"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2D5A20881
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhnON-0005dF-O4
-	for qemu-devel@archiver.kernel.org; Sun, 30 Jun 2019 23:54:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51829)
+	id 1hhnSU-0006zN-Tb
+	for qemu-devel@archiver.kernel.org; Sun, 30 Jun 2019 23:58:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52095)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pagupta@redhat.com>) id 1hhnNr-000587-Pc
- for qemu-devel@nongnu.org; Sun, 30 Jun 2019 23:53:41 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hhnRH-0006S1-SV
+ for qemu-devel@nongnu.org; Sun, 30 Jun 2019 23:57:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pagupta@redhat.com>) id 1hhnNq-0007JG-D1
- for qemu-devel@nongnu.org; Sun, 30 Jun 2019 23:53:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34868)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hhnNq-000772-44
- for qemu-devel@nongnu.org; Sun, 30 Jun 2019 23:53:38 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F2DFA308339E;
- Mon,  1 Jul 2019 03:53:06 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
- (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0C7157A4A7;
- Mon,  1 Jul 2019 03:53:06 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com
- (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
- by colo-mx.corp.redhat.com (Postfix) with ESMTP id E6771206D1;
- Mon,  1 Jul 2019 03:53:04 +0000 (UTC)
-Date: Sun, 30 Jun 2019 23:53:03 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-To: qemu-devel@nongnu.org
-Message-ID: <678909315.38216446.1561953183580.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20190619094907.10131-1-pagupta@redhat.com>
-References: <20190619094907.10131-1-pagupta@redhat.com>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hhnRF-0000V8-TO
+ for qemu-devel@nongnu.org; Sun, 30 Jun 2019 23:57:11 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:46014)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1hhnRD-0000TD-Uq
+ for qemu-devel@nongnu.org; Sun, 30 Jun 2019 23:57:09 -0400
+Received: by mail-ot1-x344.google.com with SMTP id x21so12014216otq.12
+ for <qemu-devel@nongnu.org>; Sun, 30 Jun 2019 20:57:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=dkfQeiXDLXUYX17x2rDqaUzaQBqjEjkxW7FN8vv7u9g=;
+ b=grS2NQteYtXl3S1f/KFyr35z1O4CFvH76bb4fAMj2uXa3D/cUHqsxiFgzSO9gcJ3If
+ 6EDMPo0mZdcMoosL+Bnc7I0+DZdTzUBnm78tbiN7uXaRk8Cua6ww91aMRW9WIR6dBGrf
+ Ct8Wldxc5vn4++w/rwRLOyyajnpY08Be8DBBEtHtIyidJoxBZO/W+YDTgjPr/qk/uTq7
+ Lw+U7XOTDdY9rMnkjvWBR2MGMyyONLjwZzlqP2qy5qa5Jd/X3Y6qY+WJQmEi5VFg3v5D
+ 6AYHfYozHDseJ76vyn4n0sPcrzGrisUNzN5BxbRmcAWBB39sp5VtB9Pcrmy0t+zbsyYJ
+ U99Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=dkfQeiXDLXUYX17x2rDqaUzaQBqjEjkxW7FN8vv7u9g=;
+ b=qQ4Q8iv8FFLfag1CZ+85BdScZfv5vZHJ6zhOmvoV8BYfpTz7UHvxFy/512kgpkTwPD
+ 4Go0qmx/jsXgOV3X74iKhiNuX9mFExoPSrvnUShLQOux2SMAK7mmpR9Z21BIXLfoVXzn
+ vpMk+XJPnTu0ocyIkAhtSUVuMAvImaZ1zVj/CBeK56en+OmXAXcgisZLqM3c7c2We/Zw
+ 3XzjH2Qcg5aSbIJWBXnAWhXjSXjdWJ2P/Grtag2FJbVY3U+93w2DWkqe0SBl4PSxzu6w
+ 2w5wFlQrCRpFM76BglK4hmi3ki93YcfcTPS2ALCUx5N3+ccoqpTdyKrkUjjKO4X8twPW
+ +RQQ==
+X-Gm-Message-State: APjAAAUiCFq8twchEXsAOtDkwpFnvtnVCpqEK/sodeECdjIKQQbJtS8f
+ DTQFP4eKRQRjGopTvaybzLzwfaTkx4iwWzEezDCKiA==
+X-Google-Smtp-Source: APXvYqzL6r+EzEDFPxxKmhUjWSQWWRO02TlBNaPInGROyXYEcAMJsWF3vyqatbAZwFXW6eKdLw8hQv7/05QsL/pTu5M=
+X-Received: by 2002:a05:6830:c6:: with SMTP id
+ x6mr17643890oto.64.1561953425932; 
+ Sun, 30 Jun 2019 20:57:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.116.128, 10.4.195.19]
-Thread-Topic: Qemu virtio pmem device
-Thread-Index: 2xx2Y+youX9y9dYx9hligXxaIAYzfw==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Mon, 01 Jul 2019 03:53:07 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] Qemu virtio pmem device
+Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP; Sun, 30 Jun 2019 20:57:05
+ -0700 (PDT)
+Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP; Sun, 30 Jun 2019 20:57:05
+ -0700 (PDT)
+In-Reply-To: <b376dc86-6879-2a72-3261-7fdf06172456@linaro.org>
+References: <20190629130017.2973-1-richard.henderson@linaro.org>
+ <20190629130017.2973-16-richard.henderson@linaro.org>
+ <CAL1e-=ghMjUtEyqKX+s15RcyQp6uQO_hJ_u4RTSJ5ZyPvFnymw@mail.gmail.com>
+ <b376dc86-6879-2a72-3261-7fdf06172456@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 1 Jul 2019 05:57:05 +0200
+Message-ID: <CAL1e-=hS_nQQYY39j-mx1QBFw+Xe3V5NgFW7ifrkMZRxFbB=OA@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH v6 15/16] tcg/ppc: Update vector support to
+ v2.07
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,139 +96,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, aarcange@redhat.com,
- xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, riel@surriel.com,
- rth@twiddle.net, cohuck@redhat.com, david@redhat.com, armbru@redhat.com,
- lcapitulino@redhat.com, mst@redhat.com, stefanha@redhat.com,
- imammedo@redhat.com, pbonzini@redhat.com,
- dan j williams <dan.j.williams@intel.com>, nilal@redhat.com,
- dgilbert@redhat.com, ehabkost@redhat.com
+Cc: mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
+ amarkovic@wavecomp.com, hsp.cat7@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Jun 30, 2019 5:12 PM, "Richard Henderson" <richard.henderson@linaro.org>
+wrote:
+>
+> On 6/30/19 3:37 PM, Aleksandar Markovic wrote:
+> >>  bool have_isa_2_06;
+> >>  bool have_isa_2_06_vsx;
+> >> +bool have_isa_2_07_vsx;
+> >
+> > Does this flag indicate support for PowerISA 2.07 or VSX?
+>
+> VSX & 2.07,
+>
+> >> +    if (hwcap2 & PPC_FEATURE2_ARCH_2_07) {
+> >> +        if (hwcap & PPC_FEATURE_HAS_VSX) {
+> >> +            have_isa_2_07_vsx = true;
+> >> +        }
+> >> +    }
+>
+> Like so.
+>
+> While it would have been possible to have one single have_isa_vsx, we
+would
+> then also have to check a second flag to see which revision.  Therefore I
+> created these composite flags so that we only have to check one.
+>
 
+Yes, but, in this patch, for example, among other things, the support for
+doubleword integer max/min vector operation is implemented. Why is the
+existence of that support dependant on VSX (PPC_FEATURE_HAS_VSX)?
 
-Ping.
-
-> 
-> This patch series has implementation for "virtio pmem"
->  device. "virtio pmem" is persistent memory(nvdimm) device in
->  guest which allows to bypass the guest page cache. This
->  also implements a VIRTIO based asynchronous flush mechanism.
->  Details of project idea for 'virtio pmem' flushing interface
->  is shared [2] & [3].
-> 
->  Sharing Qemu device emulation in this patchset. Tested with
->  guest kernel driver [1]. This series is based on David's
->  memory device refactoring [5] work with modified version of
->  my initial virtio pmem [4] series.
-> 
->  Usage:
->  ./qemu -name test -machine pc -m 8G,slots=240,maxmem=20G
->  -object memory-backend-file,id=mem1,share,mem-path=test.img,
->   size=4G,share
->  -device virtio-pmem-pci,memdev=mem1,id=nv1
-> 
->  (qemu) info memory-devices
->   Memory device [virtio-pmem]: "nv1"
->   memaddr: 0x240000000
->   size: 4294967296
->   memdev: /objects/mem1
-> 
->  Implementation is divided into two parts:
->  New virtio pmem guest driver and qemu code changes for new
->  virtio pmem paravirtualized device. In this series we are
->  sharing Qemu device emulation.
-> 
-> 1. Guest virtio-pmem kernel driver
-> ---------------------------------
->    - Reads persistent memory range from paravirt device and
->      registers with 'nvdimm_bus'.
->    - 'nvdimm/pmem' driver uses this information to allocate
->      persistent memory region and setup filesystem operations
->      to the allocated memory.
->    - virtio pmem driver implements asynchronous flushing
->      interface to flush from guest to host.
-> 
-> 2. Qemu virtio-pmem device
-> ---------------------------------
->    - Creates virtio pmem device and exposes a memory range to
->      KVM guest.
->    - At host side this is file backed memory which acts as
->      persistent memory.
->    - Qemu side flush uses aio thread pool API's and virtio
->      for asynchronous guest multi request handling.
-> 
->  Virtio-pmem security implications and suggested countermeasures:
->  ---------------------------------------------------------------
-> 
->  In previous posting of kernel driver, there was discussion [7]
->  on possible implications of page cache side channel attacks with
->  virtio pmem. After thorough analysis of details of known side
->  channel attacks, below are the suggestions:
-> 
->  - Depends entirely on how host backing image file is mapped
->    into guest address space.
-> 
->  - virtio-pmem device emulation, by default shared mapping is used
->    to map host backing file. It is recommended to use separate
->    backing file at host side for every guest. This will prevent
->    any possibility of executing common code from multiple guests
->    and any chance of inferring guest local data based based on
->    execution time.
-> 
->  - If backing file is required to be shared among multiple guests
->    it is recommended to don't support host page cache eviction
->    commands from the guest driver. This will avoid any possibility
->    of inferring guest local data or host data from another guest.
-> 
->  - Proposed device specification [6] for virtio-pmem device with
->    details of possible security implications and suggested
->    countermeasures for device emulation.
-> 
-> Changes from PATCH v1:
->  - Change proposed version from qemu 4.0 to 4.1 - Eric
->  - Remove virtio queue_add from unrealize function - Cornelia
-> 
-> [1] https://lkml.org/lkml/2019/6/12/624
-> [2] https://www.spinics.net/lists/kvm/msg149761.html
-> [3] https://www.spinics.net/lists/kvm/msg153095.html
-> [4] https://marc.info/?l=linux-kernel&m=153572228719237&w=2
-> [5] https://marc.info/?l=qemu-devel&m=153555721901824&w=2
-> [6] https://lists.oasis-open.org/archives/virtio-dev/201903/msg00083.html
-> [7] https://lkml.org/lkml/2019/1/9/1191
-> 
->  Pankaj Gupta (3):
->   virtio-pmem: add virtio device
->   virtio-pmem: sync linux headers
->   virtio-pci: proxy for virtio-pmem
-> 
->  David Hildenbrand (4):
->   virtio-pci: Allow to specify additional interfaces for the base type
->   hmp: Handle virtio-pmem when printing memory device infos
->   numa: Handle virtio-pmem in NUMA stats
->   pc: Support for virtio-pmem-pci
-> 
->  hmp.c                                        |   27 ++-
->  hw/i386/Kconfig                              |    1
->  hw/i386/pc.c                                 |   72 ++++++++++
->  hw/virtio/Kconfig                            |   10 +
->  hw/virtio/Makefile.objs                      |    2
->  hw/virtio/virtio-pci.c                       |    1
->  hw/virtio/virtio-pci.h                       |    1
->  hw/virtio/virtio-pmem-pci.c                  |  131 ++++++++++++++++++
->  hw/virtio/virtio-pmem-pci.h                  |   34 ++++
->  hw/virtio/virtio-pmem.c                      |  189
->  +++++++++++++++++++++++++++
->  include/hw/pci/pci.h                         |    1
->  include/hw/virtio/virtio-pmem.h              |   49 +++++++
->  include/standard-headers/linux/virtio_ids.h  |    1
->  include/standard-headers/linux/virtio_pmem.h |   35 +++++
->  numa.c                                       |   24 +--
->  qapi/misc.json                               |   28 +++-
->  16 files changed, 580 insertions(+), 26 deletions(-)
-> ----
-> 
-> 
-
+>
+> r~
