@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 725AFC0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 11:11:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13F77C0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 11:12:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 199B4206A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 11:11:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 199B4206A3
+	by mail.kernel.org (Postfix) with ESMTPS id A9C05206A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 11:12:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9C05206A3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhuDX-0001kQ-CH
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 07:11:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41216)
+	id 1hhuEW-0002ek-PY
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 07:12:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41223)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hhu8L-00054Q-Uf
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:06:15 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hhu8N-000551-QA
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:06:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hhu8D-00076s-7N
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:06:05 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:48946 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hhu8D-00076t-7I
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:06:07 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:48942 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hhu8C-00067W-DN
+ id 1hhu8C-00067O-DN
  for qemu-devel@nongnu.org; Mon, 01 Jul 2019 07:05:57 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 96F5A1A1FFE;
+ by mail.rt-rk.com (Postfix) with ESMTP id 6D0CC1A1FF7;
  Mon,  1 Jul 2019 13:04:51 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 428FF1A1E44;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 28A1F1A1E8D;
  Mon,  1 Jul 2019 13:04:51 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org,
 	arikalo@wavecomp.com
-Date: Mon,  1 Jul 2019 13:04:35 +0200
-Message-Id: <1561979080-26195-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon,  1 Jul 2019 13:04:34 +0200
+Message-Id: <1561979080-26195-2-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1561979080-26195-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1561979080-26195-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH 2/7] tcg/tests: target/mips: Amend MSA integer
- multiply tests
+Subject: [Qemu-devel] [PATCH 1/7] tcg/tests: target/mips: Amend MSA fixed
+ point multiply tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,1554 +72,1023 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Amend MSA fixed point multiply tests: correct output values for
-MADDV.B, MADDV.H, MADDV.W, MADDV.D, MSUBV.B, MSUBV.H, MSUBV.W and
-MSUBD.D.
+Amend MSA fixed point multiply tests: add tests for MADD_Q.H, MADD_Q.W,
+MADDR_Q.H, MADDR_Q.W, MSUB_Q.H, MSUB_Q.W, MSUBR_Q.H and MSUBR_Q.W.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- .../user/ase/msa/int-multiply/test_msa_maddv_b.c   | 224 ++++++++++-----------
- .../user/ase/msa/int-multiply/test_msa_maddv_d.c   | 214 ++++++++++----------
- .../user/ase/msa/int-multiply/test_msa_maddv_h.c   | 224 ++++++++++-----------
- .../user/ase/msa/int-multiply/test_msa_maddv_w.c   | 224 ++++++++++-----------
- .../user/ase/msa/int-multiply/test_msa_msubv_b.c   | 224 ++++++++++-----------
- .../user/ase/msa/int-multiply/test_msa_msubv_d.c   | 224 ++++++++++-----------
- .../user/ase/msa/int-multiply/test_msa_msubv_h.c   | 224 ++++++++++-----------
- .../user/ase/msa/int-multiply/test_msa_msubv_w.c   | 224 ++++++++++-----------
- 8 files changed, 891 insertions(+), 891 deletions(-)
+ tests/tcg/mips/include/wrappers_msa.h              |  16 ++
+ .../ase/msa/fixed-multiply/test_msa_madd_q_h.c     | 216 +++++++++++++++++++++
+ .../ase/msa/fixed-multiply/test_msa_madd_q_w.c     | 216 +++++++++++++++++++++
+ .../ase/msa/fixed-multiply/test_msa_maddr_q_h.c    | 216 +++++++++++++++++++++
+ .../ase/msa/fixed-multiply/test_msa_maddr_q_w.c    | 216 +++++++++++++++++++++
+ .../ase/msa/fixed-multiply/test_msa_msub_q_h.c     | 216 +++++++++++++++++++++
+ .../ase/msa/fixed-multiply/test_msa_msub_q_w.c     | 216 +++++++++++++++++++++
+ .../ase/msa/fixed-multiply/test_msa_msubr_q_h.c    | 216 +++++++++++++++++++++
+ .../ase/msa/fixed-multiply/test_msa_msubr_q_w.c    | 216 +++++++++++++++++++++
+ .../mips/user/ase/msa/test_msa_compile_32r6eb.sh   |  16 ++
+ .../mips/user/ase/msa/test_msa_compile_32r6el.sh   |  16 ++
+ .../mips/user/ase/msa/test_msa_compile_64r6eb.sh   |  16 ++
+ .../mips/user/ase/msa/test_msa_compile_64r6el.sh   |  16 ++
+ tests/tcg/mips/user/ase/msa/test_msa_run_32r6eb.sh |   8 +
+ tests/tcg/mips/user/ase/msa/test_msa_run_32r6el.sh |   8 +
+ tests/tcg/mips/user/ase/msa/test_msa_run_64r6eb.sh |   8 +
+ tests/tcg/mips/user/ase/msa/test_msa_run_64r6el.sh |   8 +
+ 17 files changed, 1840 insertions(+)
+ create mode 100644 tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_madd_q_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_madd_q_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_maddr_q_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_maddr_q_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_msub_q_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_msub_q_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_msubr_q_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_msubr_q_w.c
 
-diff --git a/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_b.c b/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_b.c
-index 5678677..d543e1a 100644
---- a/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_b.c
-+++ b/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_b.c
-@@ -43,118 +43,118 @@ int32_t main(void)
+diff --git a/tests/tcg/mips/include/wrappers_msa.h b/tests/tcg/mips/include/wrappers_msa.h
+index b512b1d..4be7821 100644
+--- a/tests/tcg/mips/include/wrappers_msa.h
++++ b/tests/tcg/mips/include/wrappers_msa.h
+@@ -252,16 +252,32 @@ DO_MSA__WD__WS_WT(BNEG_D, bneg.d)
+  */
  
-     uint64_t b128_result[TEST_COUNT_TOTAL][2];
-     uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
--        { 0x0000000000000002ULL, 0x0000000000000002ULL, },    /*   0  */
--        { 0x0000000000000002ULL, 0x0000000000000002ULL, },
--        { 0x00000000aaaaaaaeULL, 0x00000000aaaaaaaeULL, },
--        { 0x0000000000000004ULL, 0x0000000000000004ULL, },
--        { 0x000000006666666cULL, 0x000000006666666cULL, },
--        { 0x0000000000000006ULL, 0x0000000000000006ULL, },
--        { 0x000000008e38e395ULL, 0xffffffffe38e38ebULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },    /*   8  */
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x00000000aaaaaab4ULL, 0x00000000aaaaaab4ULL, },    /*  16  */
--        { 0x00000000aaaaaab4ULL, 0x00000000aaaaaab4ULL, },
--        { 0x38e38e3a71c71c7cULL, 0x38e38e3a71c71c7cULL, },
--        { 0x0000000155555560ULL, 0x0000000155555560ULL, },
--        { 0x2222222444444450ULL, 0x2222222444444450ULL, },
--        { 0x000000020000000cULL, 0x000000020000000cULL, },
--        { 0x2f684bdcb425ed16ULL, 0xf684bda397b425faULL, },
--        { 0x00000002aaaaaab8ULL, 0x00000002aaaaaab8ULL, },
--        { 0x000000020000000eULL, 0x000000020000000eULL, },    /*  24  */
--        { 0x000000020000000eULL, 0x000000020000000eULL, },
--        { 0xc71c71c8e38e38f2ULL, 0xc71c71c8e38e38f2ULL, },
--        { 0x0000000155555564ULL, 0x0000000155555564ULL, },
--        { 0xdddddddeccccccdcULL, 0xdddddddeccccccdcULL, },
--        { 0x00000000aaaaaabaULL, 0x00000000aaaaaabaULL, },
--        { 0xd097b42684bda13fULL, 0x097b425ef684bdb1ULL, },
--        { 0x0000000000000010ULL, 0x0000000000000010ULL, },
--        { 0x0000000066666678ULL, 0x0000000066666678ULL, },    /*  32  */
--        { 0x0000000066666678ULL, 0x0000000066666678ULL, },
--        { 0x2222222355555568ULL, 0x2222222355555568ULL, },
--        { 0x00000000cccccce0ULL, 0x00000000cccccce0ULL, },
--        { 0x147ae1491eb85200ULL, 0x147ae1491eb85200ULL, },
--        { 0x0000000133333348ULL, 0x0000000133333348ULL, },
--        { 0x1c71c71e3e93e954ULL, 0xfa4fa4fbb60b60ccULL, },
--        { 0x00000001999999b0ULL, 0x00000001999999b0ULL, },
--        { 0x000000013333334aULL, 0x000000013333334aULL, },    /*  40  */
--        { 0x000000013333334aULL, 0x000000013333334aULL, },
--        { 0xdddddddeeeeeef06ULL, 0xdddddddeeeeeef06ULL, },
--        { 0x00000000cccccce4ULL, 0x00000000cccccce4ULL, },
--        { 0xeb851eb8e147ae2cULL, 0xeb851eb8e147ae2cULL, },
--        { 0x000000006666667eULL, 0x000000006666667eULL, },
--        { 0xe38e38e3e93e9401ULL, 0x05b05b05c71c71dfULL, },
--        { 0x0000000000000018ULL, 0x0000000000000018ULL, },
--        { 0x000000008e38e3a7ULL, 0xffffffffe38e38fdULL, },    /*  48  */
--        { 0x000000008e38e3a7ULL, 0xffffffffe38e38fdULL, },
--        { 0x2f684bdb425ed0b1ULL, 0xf684bda17b425eebULL, },
--        { 0x000000011c71c736ULL, 0xffffffffc71c71e2ULL, },
--        { 0x1c71c71e27d27d42ULL, 0xfa4fa4fa49f49f66ULL, },
--        { 0x00000001aaaaaac5ULL, 0xffffffffaaaaaac7ULL, },
--        { 0x35ba781b4587e6d2ULL, 0x0fcd6e9d6b74f050ULL, },
--        { 0x0000000238e38e54ULL, 0xffffffff8e38e3acULL, },
--        { 0x00000001aaaaaac7ULL, 0xffffffffaaaaaac9ULL, },    /*  56  */
--        { 0x00000001aaaaaac7ULL, 0xffffffffaaaaaac9ULL, },
--        { 0xd097b427a12f6869ULL, 0x097b425ebda12f87ULL, },
--        { 0x000000011c71c73aULL, 0xffffffffc71c71e6ULL, },
--        { 0xe38e38e477777796ULL, 0x05b05b05aaaaaacaULL, },
--        { 0x000000008e38e3adULL, 0xffffffffe38e3903ULL, },
--        { 0xca4587e781948b2fULL, 0xf032916206522c5fULL, },
--        { 0x0000000000000020ULL, 0x0000000000000020ULL, },
--        { 0x3e3ad4ae1266c2b0ULL, 0x1637d725aebdb734ULL, },    /*  64  */
--        { 0x4c74e0d60a3d6d94ULL, 0x1badd2dd9f4dac90ULL, },
--        { 0x6874e8f94205b90cULL, 0x27eb0c41af2c3022ULL, },
--        { 0x42dab657e16f25e8ULL, 0x06d6782e137656f2ULL, },
--        { 0x5114c27fd945d0ccULL, 0x0c4c73e604064c4eULL, },
--        { 0x68a91e898c276755ULL, 0x0f77ad378bdfb302ULL, },
--        { 0x54c82cde41d1cf13ULL, 0x0b6108a5f38e1598ULL, },
--        { 0x6f755d3eddd1234aULL, 0xfbbaace2f5421908ULL, },
--        { 0x8b75656215996ec2ULL, 0x07f7e64705209c9aULL, },    /*  72  */
--        { 0x779473b6cb43d680ULL, 0x03e141b56cceff30ULL, },
--        { 0xa6279a1866fb9f64ULL, 0x2631668db9e53ac1ULL, },
--        { 0x67a1f71bd99e4586ULL, 0x312ec9f6206e6e69ULL, },
--        { 0x4207c47a7907b262ULL, 0x101a35e284b89539ULL, },
--        { 0x5cb4f4db15070699ULL, 0x0073da1f866c98a9ULL, },
--        { 0x1e2f51de87a9acbbULL, 0x0b713d87ecf5cc51ULL, },
--        { 0x721d49ba5f0acfa8ULL, 0x5ba5bbe9afeae691ULL, },
--        { 0x4bcd68690d995de0ULL, 0x771da6b4b6c967ebULL, },    /*  80  */
--        { 0x4ea9a2cfbb5acd7bULL, 0x79dd6a73439e6387ULL, },
--        { 0x47c800b999dd2371ULL, 0x766d25914ef7a7a0ULL, },
--        { 0x41b0fa10eb77cf84ULL, 0x26e85189458965f8ULL, },
--        { 0x1fc448ce062c2944ULL, 0x31f490a9422a80e6ULL, },
--        { 0x211bdfadfd79770eULL, 0x3b25f4cac5763378ULL, },
--        { 0x16fbb87edd87b6f0ULL, 0x57c0b65fabdda20eULL, },
--        { 0x14621091eac4a5f6ULL, 0x4d29a25d32fa9ef6ULL, },
--        { 0x07832ded1c464b02ULL, 0x6396905709e3cfa4ULL, },    /*  88  */
--        { 0x0ff4a84eab8df3b9ULL, 0x6bc9a7d8c6adf2eaULL, },
--        { 0x21e53326bfbd0b05ULL, 0x8f8f3b9c679dff5aULL, },
--        { 0x191ed6a24e1576f9ULL, 0x9e8c2e402760373aULL, },
--        { 0x19b438400fc27751ULL, 0x819c4bbfd3ee6972ULL, },
--        { 0x1e0d5dc1094ae999ULL, 0x7496a289f5eff010ULL, },
--        { 0x11af620b7bc03943ULL, 0x8a11f229836addc7ULL, },
--        { 0x46fa45d0e84440fcULL, 0xe8d2c0211fb042bfULL, },
--        { 0x22142516b5a8adbcULL, 0xe1cf1923e186aad1ULL, },    /*  96  */
--        { 0x066ebbbb4ff6da44ULL, 0xd918d7e6a7e61877ULL, },
--        { 0x100acc9d22839a48ULL, 0xce291932929e367fULL, },
--        { 0x0dfe419d62a62f64ULL, 0xc020fe45a8cf7acfULL, },
--        { 0x2ba79b6ffbf3c63bULL, 0xb428f52c49fce695ULL, },
--        { 0x29b3b85200bdf100ULL, 0xb4ae7ea2f52aa5b9ULL, },
--        { 0x293bb84d6360c0b6ULL, 0xae33b26e4c493c49ULL, },
--        { 0x46a99fdf54f4862dULL, 0xae790dc5055f6f51ULL, },
--        { 0x18480e0fd728c7c3ULL, 0xa000ad7b15f8ebe0ULL, },    /* 104  */
--        { 0x1b8b97aa205e1239ULL, 0x89c78b8909c4a8e5ULL, },
--        { 0x09abb26b05ef649dULL, 0x74242fa1bd49e740ULL, },
--        { 0x04e233bc861d272bULL, 0x9c5343ab30f62f9fULL, },
--        { 0xda2da0d0884dc3d1ULL, 0xb824f201640b4147ULL, },
--        { 0x9d8b22ee1b9a2e0fULL, 0xb642ddf1edb0747fULL, },
--        { 0x7c81956533686a37ULL, 0xdd5181781dc3ad37ULL, },
--        { 0xc60b1905717ff25aULL, 0xe2af726e71ad7ad7ULL, },
-+        { 0x0101010101010101ULL, 0x0101010101010101ULL, },    /*   0  */
-+        { 0x0101010101010101ULL, 0x0101010101010101ULL, },
-+        { 0x5757575757575757ULL, 0x5757575757575757ULL, },
-+        { 0x0202020202020202ULL, 0x0202020202020202ULL, },
-+        { 0x3636363636363636ULL, 0x3636363636363636ULL, },
-+        { 0x0303030303030303ULL, 0x0303030303030303ULL, },
-+        { 0x2075cb2075cb2075ULL, 0xcb2075cb2075cb20ULL, },
-+        { 0x0404040404040404ULL, 0x0404040404040404ULL, },
-+        { 0x0404040404040404ULL, 0x0404040404040404ULL, },    /*   8  */
-+        { 0x0404040404040404ULL, 0x0404040404040404ULL, },
-+        { 0x0404040404040404ULL, 0x0404040404040404ULL, },
-+        { 0x0404040404040404ULL, 0x0404040404040404ULL, },
-+        { 0x0404040404040404ULL, 0x0404040404040404ULL, },
-+        { 0x0404040404040404ULL, 0x0404040404040404ULL, },
-+        { 0x0404040404040404ULL, 0x0404040404040404ULL, },
-+        { 0x0404040404040404ULL, 0x0404040404040404ULL, },
-+        { 0x5a5a5a5a5a5a5a5aULL, 0x5a5a5a5a5a5a5a5aULL, },    /*  16  */
-+        { 0x5a5a5a5a5a5a5a5aULL, 0x5a5a5a5a5a5a5a5aULL, },
-+        { 0x3e3e3e3e3e3e3e3eULL, 0x3e3e3e3e3e3e3e3eULL, },
-+        { 0xb0b0b0b0b0b0b0b0ULL, 0xb0b0b0b0b0b0b0b0ULL, },
-+        { 0x2828282828282828ULL, 0x2828282828282828ULL, },
-+        { 0x0606060606060606ULL, 0x0606060606060606ULL, },
-+        { 0xc45236c45236c452ULL, 0x36c45236c45236c4ULL, },
-+        { 0x5c5c5c5c5c5c5c5cULL, 0x5c5c5c5c5c5c5c5cULL, },
-+        { 0x0707070707070707ULL, 0x0707070707070707ULL, },    /*  24  */
-+        { 0x0707070707070707ULL, 0x0707070707070707ULL, },
-+        { 0x7979797979797979ULL, 0x7979797979797979ULL, },
-+        { 0xb2b2b2b2b2b2b2b2ULL, 0xb2b2b2b2b2b2b2b2ULL, },
-+        { 0x6e6e6e6e6e6e6e6eULL, 0x6e6e6e6e6e6e6e6eULL, },
-+        { 0x5d5d5d5d5d5d5d5dULL, 0x5d5d5d5d5d5d5d5dULL, },
-+        { 0xbc83f5bc83f5bc83ULL, 0xf5bc83f5bc83f5bcULL, },
-+        { 0x0808080808080808ULL, 0x0808080808080808ULL, },
-+        { 0x3c3c3c3c3c3c3c3cULL, 0x3c3c3c3c3c3c3c3cULL, },    /*  32  */
-+        { 0x3c3c3c3c3c3c3c3cULL, 0x3c3c3c3c3c3c3c3cULL, },
-+        { 0xb4b4b4b4b4b4b4b4ULL, 0xb4b4b4b4b4b4b4b4ULL, },
-+        { 0x7070707070707070ULL, 0x7070707070707070ULL, },
+ DO_MSA__WD__WS_WT(MADD_Q_H, madd_q.h)
++DO_MSA__WD__WD_WT(MADD_Q_H__DDT, madd_q.h)
++DO_MSA__WD__WS_WD(MADD_Q_H__DSD, madd_q.h)
+ DO_MSA__WD__WS_WT(MADD_Q_W, madd_q.w)
++DO_MSA__WD__WD_WT(MADD_Q_W__DDT, madd_q.w)
++DO_MSA__WD__WS_WD(MADD_Q_W__DSD, madd_q.w)
+ 
+ DO_MSA__WD__WS_WT(MADDR_Q_H, maddr_q.h)
++DO_MSA__WD__WD_WT(MADDR_Q_H__DDT, maddr_q.h)
++DO_MSA__WD__WS_WD(MADDR_Q_H__DSD, maddr_q.h)
+ DO_MSA__WD__WS_WT(MADDR_Q_W, maddr_q.w)
++DO_MSA__WD__WD_WT(MADDR_Q_W__DDT, maddr_q.w)
++DO_MSA__WD__WS_WD(MADDR_Q_W__DSD, maddr_q.w)
+ 
+ DO_MSA__WD__WS_WT(MSUB_Q_H, msub_q.h)
++DO_MSA__WD__WD_WT(MSUB_Q_H__DDT, msub_q.h)
++DO_MSA__WD__WS_WD(MSUB_Q_H__DSD, msub_q.h)
+ DO_MSA__WD__WS_WT(MSUB_Q_W, msub_q.w)
++DO_MSA__WD__WD_WT(MSUB_Q_W__DDT, msub_q.w)
++DO_MSA__WD__WS_WD(MSUB_Q_W__DSD, msub_q.w)
+ 
+ DO_MSA__WD__WS_WT(MSUBR_Q_H, msubr_q.h)
++DO_MSA__WD__WD_WT(MSUBR_Q_H__DDT, msubr_q.h)
++DO_MSA__WD__WS_WD(MSUBR_Q_H__DSD, msubr_q.h)
+ DO_MSA__WD__WS_WT(MSUBR_Q_W, msubr_q.w)
++DO_MSA__WD__WD_WT(MSUBR_Q_W__DDT, msubr_q.w)
++DO_MSA__WD__WS_WD(MSUBR_Q_W__DSD, msubr_q.w)
+ 
+ DO_MSA__WD__WS_WT(MUL_Q_H, mul_q.h)
+ DO_MSA__WD__WS_WT(MUL_Q_W, mul_q.w)
+diff --git a/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_madd_q_h.c b/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_madd_q_h.c
+new file mode 100644
+index 0000000..29a2990
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_madd_q_h.c
+@@ -0,0 +1,216 @@
++/*
++ *  Test program for MSA instruction MADD_Q.H
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *  Copyright (C) 2019  RT-RK Computer Based Systems LLC
++ *  Copyright (C) 2019  Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs_128.h"
++#include "../../../../include/test_utils_128.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *isa_ase_name = "MSA";
++    char *group_name = "Fixed Multiply";
++    char *instruction_name =  "MADD_Q.H";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   0  */
 +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0xa4a4a4a4a4a4a4a4ULL, 0xa4a4a4a4a4a4a4a4ULL, },
-+        { 0x88cc4488cc4488ccULL, 0x4488cc4488cc4488ULL, },
-+        { 0xd8d8d8d8d8d8d8d8ULL, 0xd8d8d8d8d8d8d8d8ULL, },
-+        { 0xa5a5a5a5a5a5a5a5ULL, 0xa5a5a5a5a5a5a5a5ULL, },    /*  40  */
-+        { 0xa5a5a5a5a5a5a5a5ULL, 0xa5a5a5a5a5a5a5a5ULL, },
-+        { 0x8383838383838383ULL, 0x8383838383838383ULL, },
-+        { 0x7272727272727272ULL, 0x7272727272727272ULL, },
-+        { 0x1616161616161616ULL, 0x1616161616161616ULL, },
-+        { 0x3f3f3f3f3f3f3f3fULL, 0x3f3f3f3f3f3f3f3fULL, },
-+        { 0x7889677889677889ULL, 0x6778896778896778ULL, },
-+        { 0x0c0c0c0c0c0c0c0cULL, 0x0c0c0c0c0c0c0c0cULL, },
-+        { 0x297ed4297ed4297eULL, 0xd4297ed4297ed429ULL, },    /*  48  */
-+        { 0x297ed4297ed4297eULL, 0xd4297ed4297ed429ULL, },
-+        { 0xe7ca04e7ca04e7caULL, 0x04e7ca04e7ca04e7ULL, },
-+        { 0x46f09c46f09c46f0ULL, 0x9c46f09c46f09c46ULL, },
-+        { 0x2a183c2a183c2a18ULL, 0x3c2a183c2a183c2aULL, },
-+        { 0x6362646362646362ULL, 0x6463626463626463ULL, },
-+        { 0xac26a4ac26a4ac26ULL, 0xa4ac26a4ac26a4acULL, },
-+        { 0x80d42c80d42c80d4ULL, 0x2c80d42c80d42c80ULL, },
-+        { 0x6463656463656463ULL, 0x6564636564636564ULL, },    /*  56  */
-+        { 0x6463656463656463ULL, 0x6564636564636564ULL, },
-+        { 0xfc6d8bfc6d8bfc6dULL, 0x8bfc6d8bfc6d8bfcULL, },
-+        { 0x48f29e48f29e48f2ULL, 0x9e48f29e48f29e48ULL, },
-+        { 0x98fe3298fe3298feULL, 0x3298fe3298fe3298ULL, },
-+        { 0x2c81d72c81d72c81ULL, 0xd72c81d72c81d72cULL, },
-+        { 0x002f5f002f5f002fULL, 0x5f002f5f002f5f00ULL, },
-+        { 0x1010101010101010ULL, 0x1010101010101010ULL, },
-+        { 0x50f4b4a050944910ULL, 0x09818994142910a0ULL, },    /*  64  */
-+        { 0xa8a0b48458da5c10ULL, 0x4fe29220ea6e7070ULL, },
-+        { 0x08e408fc40188310ULL, 0xbcca14c29417e060ULL, },
-+        { 0x889acc58f0da8d90ULL, 0x0bc1ec1242cd40e0ULL, },
-+        { 0xe046cc3cf820a090ULL, 0x5122f59e1812a0b0ULL, },
-+        { 0xf94acc85218951d0ULL, 0x95738e42d193e4c0ULL, },
-+        { 0x9d16cc43c6665ed0ULL, 0x53db3028d828be70ULL, },
-+        { 0x6db8cc0a0c890c40ULL, 0x3d628818b56622f0ULL, },
-+        { 0xcdfc2082f4c73340ULL, 0xaa4a0aba5f0f92e0ULL, },    /*  72  */
-+        { 0x71c8204099a44040ULL, 0x68b2aca066a46c90ULL, },
-+        { 0x016c64244a05b940ULL, 0x59f2d0a19fddc520ULL, },
-+        { 0x4132584638a46f40ULL, 0xd44a00c982f36fa0ULL, },
-+        { 0xc1e81ca2e86679c0ULL, 0x2341d81930a9cf20ULL, },
-+        { 0x918a1c692e892730ULL, 0x0dc830090de733a0ULL, },
-+        { 0xd150108b1c28dd30ULL, 0x88206031f0fddd20ULL, },
-+        { 0xd1b1f4b4a08961f4ULL, 0x3101a07181016120ULL, },
-+        { 0xd9fb2c24a0fb96f4ULL, 0x8c6880ef7f7c11a0ULL, },    /*  80  */
-+        { 0x9c452c10c01c3094ULL, 0x64c00035ea008320ULL, },
-+        { 0x6c8714b080c04094ULL, 0xa0c00000380072a0ULL, },
-+        { 0xac30cca08080c0acULL, 0xc0800000300016a0ULL, },
-+        { 0x0c101420808080acULL, 0x00000000d0003620ULL, },
-+        { 0xd0f014800000000cULL, 0x00000000e00082a0ULL, },
-+        { 0x9050ac800000000cULL, 0x0000000080004c20ULL, },
-+        { 0x90007400000000b4ULL, 0x0000000000006420ULL, },
-+        { 0x1000ac00000000b4ULL, 0x00000000000024a0ULL, },    /*  88  */
-+        { 0xc000ac0000000054ULL, 0x000000000000ac20ULL, },
-+        { 0xc000940000000054ULL, 0x00000000000088a0ULL, },
-+        { 0xc0004c00000000ecULL, 0x00000000000098a0ULL, },
-+        { 0xc0009400000000ecULL, 0x0000000000001820ULL, },
-+        { 0x000094000000004cULL, 0x000000000000c8a0ULL, },
-+        { 0x00002c000000004cULL, 0x000000000000b020ULL, },
-+        { 0x0000f40000000074ULL, 0x0000000000001020ULL, },
-+        { 0x00002c0000000074ULL, 0x00000000000010a0ULL, },    /*  96  */
-+        { 0x0000b40000000074ULL, 0x0000000000001020ULL, },
-+        { 0x00006c0000000074ULL, 0x00000000000010a0ULL, },
-+        { 0x0000740000000074ULL, 0x0000000000001020ULL, },
-+        { 0x0000740000000014ULL, 0x00000000000030a0ULL, },
-+        { 0x00007400000000b4ULL, 0x0000000000009020ULL, },
-+        { 0x0000740000000054ULL, 0x000000000000b0a0ULL, },
-+        { 0x00007400000000f4ULL, 0x0000000000001020ULL, },
-+        { 0x00004c00000000f4ULL, 0x00000000000060a0ULL, },    /* 104  */
-+        { 0x0000f400000000f4ULL, 0x0000000000004020ULL, },
-+        { 0x0000cc00000000f4ULL, 0x00000000000080a0ULL, },
-+        { 0x00007400000000f4ULL, 0x0000000000000020ULL, },
-+        { 0x00006c000000004cULL, 0x0000000000000020ULL, },
-+        { 0x0000b40000000074ULL, 0x0000000000000020ULL, },
-+        { 0x00002c00000000ccULL, 0x0000000000000020ULL, },
-+        { 0x0000f400000000f4ULL, 0x0000000000000020ULL, },
-     };
- 
-     reset_msa_registers();
-diff --git a/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_d.c b/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_d.c
-index 965703c..fda35f7 100644
---- a/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_d.c
-+++ b/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_d.c
-@@ -43,118 +43,118 @@ int32_t main(void)
- 
-     uint64_t b128_result[TEST_COUNT_TOTAL][2];
-     uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
--        { 0x0000000000000002ULL, 0x0000000000000002ULL, },    /*   0  */
-+        { 0x0000000000000001ULL, 0x0000000000000001ULL, },    /*   0  */
-+        { 0x0000000000000001ULL, 0x0000000000000001ULL, },
-+        { 0x5555555555555557ULL, 0x5555555555555557ULL, },
-         { 0x0000000000000002ULL, 0x0000000000000002ULL, },
--        { 0x00000000aaaaaaaeULL, 0x00000000aaaaaaaeULL, },
-+        { 0x3333333333333336ULL, 0x3333333333333336ULL, },
-+        { 0x0000000000000003ULL, 0x0000000000000003ULL, },
-+        { 0x1c71c71c71c71c75ULL, 0xc71c71c71c71c720ULL, },
-         { 0x0000000000000004ULL, 0x0000000000000004ULL, },
--        { 0x000000006666666cULL, 0x000000006666666cULL, },
-+        { 0x0000000000000004ULL, 0x0000000000000004ULL, },    /*   8  */
-+        { 0x0000000000000004ULL, 0x0000000000000004ULL, },
-+        { 0x0000000000000004ULL, 0x0000000000000004ULL, },
-+        { 0x0000000000000004ULL, 0x0000000000000004ULL, },
-+        { 0x0000000000000004ULL, 0x0000000000000004ULL, },
-+        { 0x0000000000000004ULL, 0x0000000000000004ULL, },
-+        { 0x0000000000000004ULL, 0x0000000000000004ULL, },
-+        { 0x0000000000000004ULL, 0x0000000000000004ULL, },
-+        { 0x555555555555555aULL, 0x555555555555555aULL, },    /*  16  */
-+        { 0x555555555555555aULL, 0x555555555555555aULL, },
-+        { 0x8e38e38e38e38e3eULL, 0x8e38e38e38e38e3eULL, },
-+        { 0xaaaaaaaaaaaaaab0ULL, 0xaaaaaaaaaaaaaab0ULL, },
-+        { 0x2222222222222228ULL, 0x2222222222222228ULL, },
-         { 0x0000000000000006ULL, 0x0000000000000006ULL, },
--        { 0x000000008e38e395ULL, 0xffffffffe38e38ebULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },    /*   8  */
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
-+        { 0x12f684bda12f6852ULL, 0x2f684bda12f684c4ULL, },
-+        { 0x555555555555555cULL, 0x555555555555555cULL, },
-+        { 0x0000000000000007ULL, 0x0000000000000007ULL, },    /*  24  */
-+        { 0x0000000000000007ULL, 0x0000000000000007ULL, },
-+        { 0x1c71c71c71c71c79ULL, 0x1c71c71c71c71c79ULL, },
-+        { 0xaaaaaaaaaaaaaab2ULL, 0xaaaaaaaaaaaaaab2ULL, },
-+        { 0x666666666666666eULL, 0x666666666666666eULL, },
-+        { 0x555555555555555dULL, 0x555555555555555dULL, },
-+        { 0x5ed097b425ed0983ULL, 0xed097b425ed097bcULL, },
-         { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x00000000aaaaaab4ULL, 0x00000000aaaaaab4ULL, },    /*  16  */
--        { 0x00000000aaaaaab4ULL, 0x00000000aaaaaab4ULL, },
--        { 0x38e38e3a71c71c7cULL, 0x38e38e3a71c71c7cULL, },
--        { 0x0000000155555560ULL, 0x0000000155555560ULL, },
--        { 0x2222222444444450ULL, 0x2222222444444450ULL, },
--        { 0x000000020000000cULL, 0x000000020000000cULL, },
--        { 0x2f684bdcb425ed16ULL, 0xf684bda397b425faULL, },
--        { 0x00000002aaaaaab8ULL, 0x00000002aaaaaab8ULL, },
--        { 0x000000020000000eULL, 0x000000020000000eULL, },    /*  24  */
--        { 0x000000020000000eULL, 0x000000020000000eULL, },
--        { 0xc71c71c8e38e38f2ULL, 0xc71c71c8e38e38f2ULL, },
--        { 0x0000000155555564ULL, 0x0000000155555564ULL, },
--        { 0xdddddddeccccccdcULL, 0xdddddddeccccccdcULL, },
--        { 0x00000000aaaaaabaULL, 0x00000000aaaaaabaULL, },
--        { 0xd097b42684bda13fULL, 0x097b425ef684bdb1ULL, },
-+        { 0x333333333333333cULL, 0x333333333333333cULL, },    /*  32  */
-+        { 0x333333333333333cULL, 0x333333333333333cULL, },
-+        { 0xaaaaaaaaaaaaaab4ULL, 0xaaaaaaaaaaaaaab4ULL, },
-+        { 0x6666666666666670ULL, 0x6666666666666670ULL, },
-+        { 0x5c28f5c28f5c2900ULL, 0x5c28f5c28f5c2900ULL, },
-+        { 0x99999999999999a4ULL, 0x99999999999999a4ULL, },
-+        { 0x16c16c16c16c16ccULL, 0xd27d27d27d27d288ULL, },
-+        { 0xccccccccccccccd8ULL, 0xccccccccccccccd8ULL, },
-+        { 0x99999999999999a5ULL, 0x99999999999999a5ULL, },    /*  40  */
-+        { 0x99999999999999a5ULL, 0x99999999999999a5ULL, },
-+        { 0x7777777777777783ULL, 0x7777777777777783ULL, },
-+        { 0x6666666666666672ULL, 0x6666666666666672ULL, },
-+        { 0xa3d70a3d70a3d716ULL, 0xa3d70a3d70a3d716ULL, },
-+        { 0x333333333333333fULL, 0x333333333333333fULL, },
-+        { 0xd27d27d27d27d289ULL, 0xc16c16c16c16c178ULL, },
-+        { 0x000000000000000cULL, 0x000000000000000cULL, },
-+        { 0x1c71c71c71c71c7eULL, 0xc71c71c71c71c729ULL, },    /*  48  */
-+        { 0x1c71c71c71c71c7eULL, 0xc71c71c71c71c729ULL, },
-+        { 0x2f684bda12f684caULL, 0xf684bda12f684be7ULL, },
-+        { 0x38e38e38e38e38f0ULL, 0x8e38e38e38e38e46ULL, },
-+        { 0xb60b60b60b60b618ULL, 0xc71c71c71c71c72aULL, },
-+        { 0x5555555555555562ULL, 0x5555555555555563ULL, },
-+        { 0x06522c3f35ba7826ULL, 0xa781948b0fcd6eacULL, },
-+        { 0x71c71c71c71c71d4ULL, 0x1c71c71c71c71c80ULL, },
-+        { 0x5555555555555563ULL, 0x5555555555555564ULL, },    /*  56  */
-+        { 0x5555555555555563ULL, 0x5555555555555564ULL, },
-+        { 0x97b425ed097b426dULL, 0x7b425ed097b425fcULL, },
-+        { 0x38e38e38e38e38f2ULL, 0x8e38e38e38e38e48ULL, },
-+        { 0xeeeeeeeeeeeeeefeULL, 0x8888888888888898ULL, },
-+        { 0x1c71c71c71c71c81ULL, 0xc71c71c71c71c72cULL, },
-+        { 0x87e6b74f0329162fULL, 0x3c0ca4587e6b7500ULL, },
-         { 0x0000000000000010ULL, 0x0000000000000010ULL, },
--        { 0x0000000066666678ULL, 0x0000000066666678ULL, },    /*  32  */
--        { 0x0000000066666678ULL, 0x0000000066666678ULL, },
--        { 0x2222222355555568ULL, 0x2222222355555568ULL, },
--        { 0x00000000cccccce0ULL, 0x00000000cccccce0ULL, },
--        { 0x147ae1491eb85200ULL, 0x147ae1491eb85200ULL, },
--        { 0x0000000133333348ULL, 0x0000000133333348ULL, },
--        { 0x1c71c71e3e93e954ULL, 0xfa4fa4fbb60b60ccULL, },
--        { 0x00000001999999b0ULL, 0x00000001999999b0ULL, },
--        { 0x000000013333334aULL, 0x000000013333334aULL, },    /*  40  */
--        { 0x000000013333334aULL, 0x000000013333334aULL, },
--        { 0xdddddddeeeeeef06ULL, 0xdddddddeeeeeef06ULL, },
--        { 0x00000000cccccce4ULL, 0x00000000cccccce4ULL, },
--        { 0xeb851eb8e147ae2cULL, 0xeb851eb8e147ae2cULL, },
--        { 0x000000006666667eULL, 0x000000006666667eULL, },
--        { 0xe38e38e3e93e9401ULL, 0x05b05b05c71c71dfULL, },
--        { 0x0000000000000018ULL, 0x0000000000000018ULL, },
--        { 0x000000008e38e3a7ULL, 0xffffffffe38e38fdULL, },    /*  48  */
--        { 0x000000008e38e3a7ULL, 0xffffffffe38e38fdULL, },
--        { 0x2f684bdb425ed0b1ULL, 0xf684bda17b425eebULL, },
--        { 0x000000011c71c736ULL, 0xffffffffc71c71e2ULL, },
--        { 0x1c71c71e27d27d42ULL, 0xfa4fa4fa49f49f66ULL, },
--        { 0x00000001aaaaaac5ULL, 0xffffffffaaaaaac7ULL, },
--        { 0x35ba781b4587e6d2ULL, 0x0fcd6e9d6b74f050ULL, },
--        { 0x0000000238e38e54ULL, 0xffffffff8e38e3acULL, },
--        { 0x00000001aaaaaac7ULL, 0xffffffffaaaaaac9ULL, },    /*  56  */
--        { 0x00000001aaaaaac7ULL, 0xffffffffaaaaaac9ULL, },
--        { 0xd097b427a12f6869ULL, 0x097b425ebda12f87ULL, },
--        { 0x000000011c71c73aULL, 0xffffffffc71c71e6ULL, },
--        { 0xe38e38e477777796ULL, 0x05b05b05aaaaaacaULL, },
--        { 0x000000008e38e3adULL, 0xffffffffe38e3903ULL, },
--        { 0xca4587e781948b2fULL, 0xf032916206522c5fULL, },
--        { 0x0000000000000020ULL, 0x0000000000000020ULL, },
--        { 0x3e3ad4ae1266c2b0ULL, 0x1637d725aebdb734ULL, },    /*  64  */
--        { 0x4c74e0d60a3d6d94ULL, 0x1badd2dd9f4dac90ULL, },
--        { 0x6874e8f94205b90cULL, 0x27eb0c41af2c3022ULL, },
--        { 0x42dab657e16f25e8ULL, 0x06d6782e137656f2ULL, },
--        { 0x5114c27fd945d0ccULL, 0x0c4c73e604064c4eULL, },
--        { 0x68a91e898c276755ULL, 0x0f77ad378bdfb302ULL, },
--        { 0x54c82cde41d1cf13ULL, 0x0b6108a5f38e1598ULL, },
--        { 0x6f755d3eddd1234aULL, 0xfbbaace2f5421908ULL, },
--        { 0x8b75656215996ec2ULL, 0x07f7e64705209c9aULL, },    /*  72  */
--        { 0x779473b6cb43d680ULL, 0x03e141b56cceff30ULL, },
--        { 0xa6279a1866fb9f64ULL, 0x2631668db9e53ac1ULL, },
--        { 0x67a1f71bd99e4586ULL, 0x312ec9f6206e6e69ULL, },
--        { 0x4207c47a7907b262ULL, 0x101a35e284b89539ULL, },
--        { 0x5cb4f4db15070699ULL, 0x0073da1f866c98a9ULL, },
--        { 0x1e2f51de87a9acbbULL, 0x0b713d87ecf5cc51ULL, },
--        { 0x721d49ba5f0acfa8ULL, 0x5ba5bbe9afeae691ULL, },
--        { 0x4bcd68690d995de0ULL, 0x771da6b4b6c967ebULL, },    /*  80  */
--        { 0x4ea9a2cfbb5acd7bULL, 0x79dd6a73439e6387ULL, },
--        { 0x47c800b999dd2371ULL, 0x766d25914ef7a7a0ULL, },
--        { 0x41b0fa10eb77cf84ULL, 0x26e85189458965f8ULL, },
--        { 0x1fc448ce062c2944ULL, 0x31f490a9422a80e6ULL, },
--        { 0x211bdfadfd79770eULL, 0x3b25f4cac5763378ULL, },
--        { 0x16fbb87edd87b6f0ULL, 0x57c0b65fabdda20eULL, },
--        { 0x14621091eac4a5f6ULL, 0x4d29a25d32fa9ef6ULL, },
--        { 0x07832ded1c464b02ULL, 0x6396905709e3cfa4ULL, },    /*  88  */
--        { 0x0ff4a84eab8df3b9ULL, 0x6bc9a7d8c6adf2eaULL, },
--        { 0x21e53326bfbd0b05ULL, 0x8f8f3b9c679dff5aULL, },
--        { 0x191ed6a24e1576f9ULL, 0x9e8c2e402760373aULL, },
--        { 0x19b438400fc27751ULL, 0x819c4bbfd3ee6972ULL, },
--        { 0x1e0d5dc1094ae999ULL, 0x7496a289f5eff010ULL, },
--        { 0x11af620b7bc03943ULL, 0x8a11f229836addc7ULL, },
--        { 0x46fa45d0e84440fcULL, 0xe8d2c0211fb042bfULL, },
--        { 0x22142516b5a8adbcULL, 0xe1cf1923e186aad1ULL, },    /*  96  */
--        { 0x066ebbbb4ff6da44ULL, 0xd918d7e6a7e61877ULL, },
--        { 0x100acc9d22839a48ULL, 0xce291932929e367fULL, },
--        { 0x0dfe419d62a62f64ULL, 0xc020fe45a8cf7acfULL, },
--        { 0x2ba79b6ffbf3c63bULL, 0xb428f52c49fce695ULL, },
--        { 0x29b3b85200bdf100ULL, 0xb4ae7ea2f52aa5b9ULL, },
--        { 0x293bb84d6360c0b6ULL, 0xae33b26e4c493c49ULL, },
--        { 0x46a99fdf54f4862dULL, 0xae790dc5055f6f51ULL, },
--        { 0x18480e0fd728c7c3ULL, 0xa000ad7b15f8ebe0ULL, },    /* 104  */
--        { 0x1b8b97aa205e1239ULL, 0x89c78b8909c4a8e5ULL, },
--        { 0x09abb26b05ef649dULL, 0x74242fa1bd49e740ULL, },
--        { 0x04e233bc861d272bULL, 0x9c5343ab30f62f9fULL, },
--        { 0xda2da0d0884dc3d1ULL, 0xb824f201640b4147ULL, },
--        { 0x9d8b22ee1b9a2e0fULL, 0xb642ddf1edb0747fULL, },
--        { 0x7c81956533686a37ULL, 0xdd5181781dc3ad37ULL, },
--        { 0xc60b1905717ff25aULL, 0xe2af726e71ad7ad7ULL, },
-+        { 0xad45be6961639010ULL, 0x3297fdea749880a0ULL, },    /*  64  */
-+        { 0x9ced640a487afa10ULL, 0xeaa90809e3b1a470ULL, },
-+        { 0xa5b377aa0caf5a10ULL, 0x95c9a7903bd12160ULL, },
-+        { 0xa194ffe4fb27d390ULL, 0x17e6ccd3c9a1c0e0ULL, },
-+        { 0x913ca585e23f3d90ULL, 0xcff7d6f338bae4b0ULL, },
-+        { 0xc8ead0bee02cadd0ULL, 0x381c4d6a83a94cc0ULL, },
-+        { 0x33b60e279e9989d0ULL, 0xe7f71f9b97ee3470ULL, },
-+        { 0x217580abbfdd3e40ULL, 0x6779436687bc89f0ULL, },
-+        { 0x2a3b944b84119e40ULL, 0x1299e2ecdfdc06e0ULL, },    /*  72  */
-+        { 0x9506d1b4427e7a40ULL, 0xc274b51df420ee90ULL, },
-+        { 0x1b2bb7962782ba40ULL, 0x9bf62dc42637b820ULL, },
-+        { 0x91d16316b1663b40ULL, 0x3cf7c824fb128ca0ULL, },
-+        { 0x8db2eb519fdeb4c0ULL, 0xbf14ed6888e32c20ULL, },
-+        { 0x7b725dd5c1226930ULL, 0x3e97113378b181a0ULL, },
-+        { 0xf21809564b05ea30ULL, 0xdf98ab944d8c5620ULL, },
-+        { 0x3dcc402bfcefb9f4ULL, 0xf26a7a4530ab3a20ULL, },
-+        { 0x81a8956a21043af4ULL, 0xe63ec4a9de07f3a0ULL, },    /*  80  */
-+        { 0x14acc7eab115be94ULL, 0xa72fae300e450520ULL, },
-+        { 0x4c5c3900181b6494ULL, 0xc26796e561c70ba0ULL, },
-+        { 0x513451003792b1acULL, 0x5acad191d5b18fa0ULL, },
-+        { 0x0daff27cb51538acULL, 0x31375ce2aea24b20ULL, },
-+        { 0xbb9ebee52390b20cULL, 0xd8cfb350af547ea0ULL, },
-+        { 0x4df25269204a3c0cULL, 0x07b9241bbd1b8320ULL, },
-+        { 0x39b3c4d066371fb4ULL, 0x2a4dc00c264fb720ULL, },
-+        { 0xf9aee458846dd0b4ULL, 0x79d838b37c524ca0ULL, },    /*  88  */
-+        { 0x115f9e7f00744254ULL, 0x46ec87fe3540fa20ULL, },
-+        { 0xb01458f6b0850854ULL, 0xde82246a25db24a0ULL, },
-+        { 0xc18097bf5a7bb9ecULL, 0x4155f0da566748a0ULL, },
-+        { 0x70c7391b1a7d90ecULL, 0x0400deec0a0cb020ULL, },
-+        { 0xf7a41980bd958c4cULL, 0xedfeb14ff6d44fa0ULL, },
-+        { 0x7906f19718fcf64cULL, 0x29e471752ecca820ULL, },
-+        { 0xb6393967140b1974ULL, 0xbd0ed4c39361fc20ULL, },
-+        { 0x74ecb57da4acfa74ULL, 0x36ea3f3dbcafcda0ULL, },    /*  96  */
-+        { 0x5b14aa5e3f7c1b74ULL, 0xeb031f17fe2b7120ULL, },
-+        { 0x0468573ef6087c74ULL, 0xe8ef35d2e05abea0ULL, },
-+        { 0xd69cf5cf0de21d74ULL, 0x39f569701e89ae20ULL, },
-+        { 0xf233f7a10f743514ULL, 0xf574fc00c1b755a0ULL, },
-+        { 0x873c421a5ed469b4ULL, 0x96f393305dfcdf20ULL, },
-+        { 0x17e80b0449fea354ULL, 0x2f05ddb06b40c2a0ULL, },
-+        { 0x0741f67f982609f4ULL, 0x9c23f2dbc2b79820ULL, },
-+        { 0x530275e3b2de7ff4ULL, 0xc6904e7f6f6c1aa0ULL, },    /* 104  */
-+        { 0xf8214644bbe3f5f4ULL, 0xe44a0de01c974f20ULL, },
-+        { 0xb59c90c0a8b66bf4ULL, 0x9abcf7a8e1391da0ULL, },
-+        { 0xb67d543caed5e1f4ULL, 0x4ce8f72994d78e20ULL, },
-+        { 0xcee67f5e9d2e224cULL, 0xba31bdf2ab48a220ULL, },
-+        { 0x87acb43db40fad74ULL, 0x8a259794c40e3620ULL, },
-+        { 0x45c27495332aeeccULL, 0xe81c4208ecf84a20ULL, },
-+        { 0x50a99b794e1bc8f4ULL, 0x17cdf4c275d6de20ULL, },
-     };
- 
-     reset_msa_registers();
-diff --git a/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_h.c b/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_h.c
-index ad20f01..a9ee9b3 100644
---- a/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_h.c
-+++ b/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_h.c
-@@ -43,118 +43,118 @@ int32_t main(void)
- 
-     uint64_t b128_result[TEST_COUNT_TOTAL][2];
-     uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
--        { 0x0000000000000002ULL, 0x0000000000000002ULL, },    /*   0  */
--        { 0x0000000000000002ULL, 0x0000000000000002ULL, },
--        { 0x00000000aaaaaaaeULL, 0x00000000aaaaaaaeULL, },
--        { 0x0000000000000004ULL, 0x0000000000000004ULL, },
--        { 0x000000006666666cULL, 0x000000006666666cULL, },
--        { 0x0000000000000006ULL, 0x0000000000000006ULL, },
--        { 0x000000008e38e395ULL, 0xffffffffe38e38ebULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },    /*   8  */
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x00000000aaaaaab4ULL, 0x00000000aaaaaab4ULL, },    /*  16  */
--        { 0x00000000aaaaaab4ULL, 0x00000000aaaaaab4ULL, },
--        { 0x38e38e3a71c71c7cULL, 0x38e38e3a71c71c7cULL, },
--        { 0x0000000155555560ULL, 0x0000000155555560ULL, },
--        { 0x2222222444444450ULL, 0x2222222444444450ULL, },
--        { 0x000000020000000cULL, 0x000000020000000cULL, },
--        { 0x2f684bdcb425ed16ULL, 0xf684bda397b425faULL, },
--        { 0x00000002aaaaaab8ULL, 0x00000002aaaaaab8ULL, },
--        { 0x000000020000000eULL, 0x000000020000000eULL, },    /*  24  */
--        { 0x000000020000000eULL, 0x000000020000000eULL, },
--        { 0xc71c71c8e38e38f2ULL, 0xc71c71c8e38e38f2ULL, },
--        { 0x0000000155555564ULL, 0x0000000155555564ULL, },
--        { 0xdddddddeccccccdcULL, 0xdddddddeccccccdcULL, },
--        { 0x00000000aaaaaabaULL, 0x00000000aaaaaabaULL, },
--        { 0xd097b42684bda13fULL, 0x097b425ef684bdb1ULL, },
--        { 0x0000000000000010ULL, 0x0000000000000010ULL, },
--        { 0x0000000066666678ULL, 0x0000000066666678ULL, },    /*  32  */
--        { 0x0000000066666678ULL, 0x0000000066666678ULL, },
--        { 0x2222222355555568ULL, 0x2222222355555568ULL, },
--        { 0x00000000cccccce0ULL, 0x00000000cccccce0ULL, },
--        { 0x147ae1491eb85200ULL, 0x147ae1491eb85200ULL, },
--        { 0x0000000133333348ULL, 0x0000000133333348ULL, },
--        { 0x1c71c71e3e93e954ULL, 0xfa4fa4fbb60b60ccULL, },
--        { 0x00000001999999b0ULL, 0x00000001999999b0ULL, },
--        { 0x000000013333334aULL, 0x000000013333334aULL, },    /*  40  */
--        { 0x000000013333334aULL, 0x000000013333334aULL, },
--        { 0xdddddddeeeeeef06ULL, 0xdddddddeeeeeef06ULL, },
--        { 0x00000000cccccce4ULL, 0x00000000cccccce4ULL, },
--        { 0xeb851eb8e147ae2cULL, 0xeb851eb8e147ae2cULL, },
--        { 0x000000006666667eULL, 0x000000006666667eULL, },
--        { 0xe38e38e3e93e9401ULL, 0x05b05b05c71c71dfULL, },
--        { 0x0000000000000018ULL, 0x0000000000000018ULL, },
--        { 0x000000008e38e3a7ULL, 0xffffffffe38e38fdULL, },    /*  48  */
--        { 0x000000008e38e3a7ULL, 0xffffffffe38e38fdULL, },
--        { 0x2f684bdb425ed0b1ULL, 0xf684bda17b425eebULL, },
--        { 0x000000011c71c736ULL, 0xffffffffc71c71e2ULL, },
--        { 0x1c71c71e27d27d42ULL, 0xfa4fa4fa49f49f66ULL, },
--        { 0x00000001aaaaaac5ULL, 0xffffffffaaaaaac7ULL, },
--        { 0x35ba781b4587e6d2ULL, 0x0fcd6e9d6b74f050ULL, },
--        { 0x0000000238e38e54ULL, 0xffffffff8e38e3acULL, },
--        { 0x00000001aaaaaac7ULL, 0xffffffffaaaaaac9ULL, },    /*  56  */
--        { 0x00000001aaaaaac7ULL, 0xffffffffaaaaaac9ULL, },
--        { 0xd097b427a12f6869ULL, 0x097b425ebda12f87ULL, },
--        { 0x000000011c71c73aULL, 0xffffffffc71c71e6ULL, },
--        { 0xe38e38e477777796ULL, 0x05b05b05aaaaaacaULL, },
--        { 0x000000008e38e3adULL, 0xffffffffe38e3903ULL, },
--        { 0xca4587e781948b2fULL, 0xf032916206522c5fULL, },
--        { 0x0000000000000020ULL, 0x0000000000000020ULL, },
--        { 0x3e3ad4ae1266c2b0ULL, 0x1637d725aebdb734ULL, },    /*  64  */
--        { 0x4c74e0d60a3d6d94ULL, 0x1badd2dd9f4dac90ULL, },
--        { 0x6874e8f94205b90cULL, 0x27eb0c41af2c3022ULL, },
--        { 0x42dab657e16f25e8ULL, 0x06d6782e137656f2ULL, },
--        { 0x5114c27fd945d0ccULL, 0x0c4c73e604064c4eULL, },
--        { 0x68a91e898c276755ULL, 0x0f77ad378bdfb302ULL, },
--        { 0x54c82cde41d1cf13ULL, 0x0b6108a5f38e1598ULL, },
--        { 0x6f755d3eddd1234aULL, 0xfbbaace2f5421908ULL, },
--        { 0x8b75656215996ec2ULL, 0x07f7e64705209c9aULL, },    /*  72  */
--        { 0x779473b6cb43d680ULL, 0x03e141b56cceff30ULL, },
--        { 0xa6279a1866fb9f64ULL, 0x2631668db9e53ac1ULL, },
--        { 0x67a1f71bd99e4586ULL, 0x312ec9f6206e6e69ULL, },
--        { 0x4207c47a7907b262ULL, 0x101a35e284b89539ULL, },
--        { 0x5cb4f4db15070699ULL, 0x0073da1f866c98a9ULL, },
--        { 0x1e2f51de87a9acbbULL, 0x0b713d87ecf5cc51ULL, },
--        { 0x721d49ba5f0acfa8ULL, 0x5ba5bbe9afeae691ULL, },
--        { 0x4bcd68690d995de0ULL, 0x771da6b4b6c967ebULL, },    /*  80  */
--        { 0x4ea9a2cfbb5acd7bULL, 0x79dd6a73439e6387ULL, },
--        { 0x47c800b999dd2371ULL, 0x766d25914ef7a7a0ULL, },
--        { 0x41b0fa10eb77cf84ULL, 0x26e85189458965f8ULL, },
--        { 0x1fc448ce062c2944ULL, 0x31f490a9422a80e6ULL, },
--        { 0x211bdfadfd79770eULL, 0x3b25f4cac5763378ULL, },
--        { 0x16fbb87edd87b6f0ULL, 0x57c0b65fabdda20eULL, },
--        { 0x14621091eac4a5f6ULL, 0x4d29a25d32fa9ef6ULL, },
--        { 0x07832ded1c464b02ULL, 0x6396905709e3cfa4ULL, },    /*  88  */
--        { 0x0ff4a84eab8df3b9ULL, 0x6bc9a7d8c6adf2eaULL, },
--        { 0x21e53326bfbd0b05ULL, 0x8f8f3b9c679dff5aULL, },
--        { 0x191ed6a24e1576f9ULL, 0x9e8c2e402760373aULL, },
--        { 0x19b438400fc27751ULL, 0x819c4bbfd3ee6972ULL, },
--        { 0x1e0d5dc1094ae999ULL, 0x7496a289f5eff010ULL, },
--        { 0x11af620b7bc03943ULL, 0x8a11f229836addc7ULL, },
--        { 0x46fa45d0e84440fcULL, 0xe8d2c0211fb042bfULL, },
--        { 0x22142516b5a8adbcULL, 0xe1cf1923e186aad1ULL, },    /*  96  */
--        { 0x066ebbbb4ff6da44ULL, 0xd918d7e6a7e61877ULL, },
--        { 0x100acc9d22839a48ULL, 0xce291932929e367fULL, },
--        { 0x0dfe419d62a62f64ULL, 0xc020fe45a8cf7acfULL, },
--        { 0x2ba79b6ffbf3c63bULL, 0xb428f52c49fce695ULL, },
--        { 0x29b3b85200bdf100ULL, 0xb4ae7ea2f52aa5b9ULL, },
--        { 0x293bb84d6360c0b6ULL, 0xae33b26e4c493c49ULL, },
--        { 0x46a99fdf54f4862dULL, 0xae790dc5055f6f51ULL, },
--        { 0x18480e0fd728c7c3ULL, 0xa000ad7b15f8ebe0ULL, },    /* 104  */
--        { 0x1b8b97aa205e1239ULL, 0x89c78b8909c4a8e5ULL, },
--        { 0x09abb26b05ef649dULL, 0x74242fa1bd49e740ULL, },
--        { 0x04e233bc861d272bULL, 0x9c5343ab30f62f9fULL, },
--        { 0xda2da0d0884dc3d1ULL, 0xb824f201640b4147ULL, },
--        { 0x9d8b22ee1b9a2e0fULL, 0xb642ddf1edb0747fULL, },
--        { 0x7c81956533686a37ULL, 0xdd5181781dc3ad37ULL, },
--        { 0xc60b1905717ff25aULL, 0xe2af726e71ad7ad7ULL, },
-+        { 0x0001000100010001ULL, 0x0001000100010001ULL, },    /*   0  */
-+        { 0x0001000100010001ULL, 0x0001000100010001ULL, },
-+        { 0x5557555755575557ULL, 0x5557555755575557ULL, },
-+        { 0x0002000200020002ULL, 0x0002000200020002ULL, },
-+        { 0x3336333633363336ULL, 0x3336333633363336ULL, },
-+        { 0x0003000300030003ULL, 0x0003000300030003ULL, },
-+        { 0x1c75c72071cb1c75ULL, 0xc72071cb1c75c720ULL, },
-+        { 0x0004000400040004ULL, 0x0004000400040004ULL, },
-+        { 0x0004000400040004ULL, 0x0004000400040004ULL, },    /*   8  */
-+        { 0x0004000400040004ULL, 0x0004000400040004ULL, },
-+        { 0x0004000400040004ULL, 0x0004000400040004ULL, },
-+        { 0x0004000400040004ULL, 0x0004000400040004ULL, },
-+        { 0x0004000400040004ULL, 0x0004000400040004ULL, },
-+        { 0x0004000400040004ULL, 0x0004000400040004ULL, },
-+        { 0x0004000400040004ULL, 0x0004000400040004ULL, },
-+        { 0x0004000400040004ULL, 0x0004000400040004ULL, },
-+        { 0x555a555a555a555aULL, 0x555a555a555a555aULL, },    /*  16  */
-+        { 0x555a555a555a555aULL, 0x555a555a555a555aULL, },
-+        { 0x8e3e8e3e8e3e8e3eULL, 0x8e3e8e3e8e3e8e3eULL, },
-+        { 0xaab0aab0aab0aab0ULL, 0xaab0aab0aab0aab0ULL, },
-+        { 0x2228222822282228ULL, 0x2228222822282228ULL, },
-+        { 0x0006000600060006ULL, 0x0006000600060006ULL, },
-+        { 0x685284c4a1366852ULL, 0x84c4a136685284c4ULL, },
-+        { 0x555c555c555c555cULL, 0x555c555c555c555cULL, },
-+        { 0x0007000700070007ULL, 0x0007000700070007ULL, },    /*  24  */
-+        { 0x0007000700070007ULL, 0x0007000700070007ULL, },
-+        { 0x1c791c791c791c79ULL, 0x1c791c791c791c79ULL, },
-+        { 0xaab2aab2aab2aab2ULL, 0xaab2aab2aab2aab2ULL, },
-+        { 0x666e666e666e666eULL, 0x666e666e666e666eULL, },
-+        { 0x555d555d555d555dULL, 0x555d555d555d555dULL, },
-+        { 0x098397bc25f50983ULL, 0x97bc25f5098397bcULL, },
-+        { 0x0008000800080008ULL, 0x0008000800080008ULL, },
-+        { 0x333c333c333c333cULL, 0x333c333c333c333cULL, },    /*  32  */
-+        { 0x333c333c333c333cULL, 0x333c333c333c333cULL, },
-+        { 0xaab4aab4aab4aab4ULL, 0xaab4aab4aab4aab4ULL, },
-+        { 0x6670667066706670ULL, 0x6670667066706670ULL, },
-+        { 0x2900290029002900ULL, 0x2900290029002900ULL, },
-+        { 0x99a499a499a499a4ULL, 0x99a499a499a499a4ULL, },
-+        { 0x16ccd2888e4416ccULL, 0xd2888e4416ccd288ULL, },
-+        { 0xccd8ccd8ccd8ccd8ULL, 0xccd8ccd8ccd8ccd8ULL, },
-+        { 0x99a599a599a599a5ULL, 0x99a599a599a599a5ULL, },    /*  40  */
-+        { 0x99a599a599a599a5ULL, 0x99a599a599a599a5ULL, },
-+        { 0x7783778377837783ULL, 0x7783778377837783ULL, },
-+        { 0x6672667266726672ULL, 0x6672667266726672ULL, },
-+        { 0xd716d716d716d716ULL, 0xd716d716d716d716ULL, },
-+        { 0x333f333f333f333fULL, 0x333f333f333f333fULL, },
-+        { 0xd289c178b067d289ULL, 0xc178b067d289c178ULL, },
-+        { 0x000c000c000c000cULL, 0x000c000c000c000cULL, },
-+        { 0x1c7ec72971d41c7eULL, 0xc72971d41c7ec729ULL, },    /*  48  */
-+        { 0x1c7ec72971d41c7eULL, 0xc72971d41c7ec729ULL, },
-+        { 0x84ca4be7130484caULL, 0x4be7130484ca4be7ULL, },
-+        { 0x38f08e46e39c38f0ULL, 0x8e46e39c38f08e46ULL, },
-+        { 0xb618c72ad83cb618ULL, 0xc72ad83cb618c72aULL, },
-+        { 0x5562556355645562ULL, 0x5563556455625563ULL, },
-+        { 0x78266eac81a47826ULL, 0x6eac81a478266eacULL, },
-+        { 0x71d41c80c72c71d4ULL, 0x1c80c72c71d41c80ULL, },
-+        { 0x5563556455655563ULL, 0x5564556555635564ULL, },    /*  56  */
-+        { 0x5563556455655563ULL, 0x5564556555635564ULL, },
-+        { 0x426d25fc098b426dULL, 0x25fc098b426d25fcULL, },
-+        { 0x38f28e48e39e38f2ULL, 0x8e48e39e38f28e48ULL, },
-+        { 0xeefe88982232eefeULL, 0x88982232eefe8898ULL, },
-+        { 0x1c81c72c71d71c81ULL, 0xc72c71d71c81c72cULL, },
-+        { 0x162f7500b75f162fULL, 0x7500b75f162f7500ULL, },
-+        { 0x0010001000100010ULL, 0x0010001000100010ULL, },
-+        { 0xcbf432a0c5949010ULL, 0x838136944f2980a0ULL, },    /*  64  */
-+        { 0xf8a073846fdafa10ULL, 0x81e20820066ea470ULL, },
-+        { 0x25e45efce9185a10ULL, 0xd1ca0ec2ee172160ULL, },
-+        { 0x9e9a52589fdad390ULL, 0x88c19612bccdc0e0ULL, },
-+        { 0xcb46933c4a203d90ULL, 0x8722679e7412e4b0ULL, },
-+        { 0xec4ab9850c89add0ULL, 0x31736642d9934cc0ULL, },
-+        { 0x15164543016689d0ULL, 0xd2dbe12880283470ULL, },
-+        { 0xe4b8e50ad4893e40ULL, 0xb8628f18916689f0ULL, },
-+        { 0x11fcd0824dc79e40ULL, 0x084a95ba790f06e0ULL, },    /*  72  */
-+        { 0x3ac85c4042a47a40ULL, 0xa9b210a01fa4ee90ULL, },
-+        { 0x4a6ce5241805ba40ULL, 0x2ff282a198ddb820ULL, },
-+        { 0xda320a46aaa43b40ULL, 0xaa4ae1c91cf38ca0ULL, },
-+        { 0x52e8fda26166b4c0ULL, 0x61416919eba92c20ULL, },
-+        { 0x228a9d6934896930ULL, 0x46c81709fce781a0ULL, },
-+        { 0xb250c28bc728ea30ULL, 0xc120763180fd5620ULL, },
-+        { 0xeab115b4cc89b9f4ULL, 0x1e01ac71b6013a20ULL, },
-+        { 0x1ffb192480fb3af4ULL, 0x7b68d8ef267cf3a0ULL, },    /*  80  */
-+        { 0xf545d210101cbe94ULL, 0xdcc07635cb000520ULL, },
-+        { 0x8b8730b052c06494ULL, 0x5ec03300e4000ba0ULL, },
-+        { 0xaa30f5a0a980b1acULL, 0x51803b00ac008fa0ULL, },
-+        { 0xa21071208c8038acULL, 0x9c00e50050004b20ULL, },
-+        { 0x99f03080ba00b20cULL, 0x2000270000007ea0ULL, },
-+        { 0xf850658020003c0cULL, 0x2000000000008320ULL, },
-+        { 0x9900ed0040001fb4ULL, 0x400000000000b720ULL, },
-+        { 0xf300c900c000d0b4ULL, 0x0000000000004ca0ULL, },    /*  88  */
-+        { 0x4d00840000004254ULL, 0x000000000000fa20ULL, },
-+        { 0x5f002c0000000854ULL, 0x00000000000024a0ULL, },
-+        { 0xb00068000000b9ecULL, 0x00000000000048a0ULL, },
-+        { 0x90004800000090ecULL, 0x000000000000b020ULL, },
-+        { 0x7000200000008c4cULL, 0x0000000000004fa0ULL, },
-+        { 0xd00060000000f64cULL, 0x000000000000a820ULL, },
-+        { 0x0000400000001974ULL, 0x000000000000fc20ULL, },
-+        { 0x000040000000fa74ULL, 0x000000000000cda0ULL, },    /*  96  */
-+        { 0x0000400000001b74ULL, 0x0000000000007120ULL, },
-+        { 0x0000400000007c74ULL, 0x000000000000bea0ULL, },
-+        { 0x0000400000001d74ULL, 0x000000000000ae20ULL, },
-+        { 0x0000000000003514ULL, 0x00000000000055a0ULL, },
-+        { 0x00000000000069b4ULL, 0x000000000000df20ULL, },
-+        { 0x000000000000a354ULL, 0x000000000000c2a0ULL, },
-+        { 0x00000000000009f4ULL, 0x0000000000009820ULL, },
-+        { 0x0000000000007ff4ULL, 0x0000000000001aa0ULL, },    /* 104  */
-+        { 0x000000000000f5f4ULL, 0x0000000000004f20ULL, },
-+        { 0x0000000000006bf4ULL, 0x0000000000001da0ULL, },
-+        { 0x000000000000e1f4ULL, 0x0000000000008e20ULL, },
-+        { 0x000000000000224cULL, 0x000000000000a220ULL, },
-+        { 0x000000000000ad74ULL, 0x0000000000003620ULL, },
-+        { 0x000000000000eeccULL, 0x0000000000004a20ULL, },
-+        { 0x000000000000c8f4ULL, 0x000000000000de20ULL, },
-     };
- 
-     reset_msa_registers();
-diff --git a/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_w.c b/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_w.c
-index 09f01d3..bc3f5d2 100644
---- a/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_w.c
-+++ b/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_maddv_w.c
-@@ -43,118 +43,118 @@ int32_t main(void)
- 
-     uint64_t b128_result[TEST_COUNT_TOTAL][2];
-     uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
--        { 0x0000000000000002ULL, 0x0000000000000002ULL, },    /*   0  */
--        { 0x0000000000000002ULL, 0x0000000000000002ULL, },
--        { 0x00000000aaaaaaaeULL, 0x00000000aaaaaaaeULL, },
--        { 0x0000000000000004ULL, 0x0000000000000004ULL, },
--        { 0x000000006666666cULL, 0x000000006666666cULL, },
--        { 0x0000000000000006ULL, 0x0000000000000006ULL, },
--        { 0x000000008e38e395ULL, 0xffffffffe38e38ebULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },    /*   8  */
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x00000000aaaaaab4ULL, 0x00000000aaaaaab4ULL, },    /*  16  */
--        { 0x00000000aaaaaab4ULL, 0x00000000aaaaaab4ULL, },
--        { 0x38e38e3a71c71c7cULL, 0x38e38e3a71c71c7cULL, },
--        { 0x0000000155555560ULL, 0x0000000155555560ULL, },
--        { 0x2222222444444450ULL, 0x2222222444444450ULL, },
--        { 0x000000020000000cULL, 0x000000020000000cULL, },
--        { 0x2f684bdcb425ed16ULL, 0xf684bda397b425faULL, },
--        { 0x00000002aaaaaab8ULL, 0x00000002aaaaaab8ULL, },
--        { 0x000000020000000eULL, 0x000000020000000eULL, },    /*  24  */
--        { 0x000000020000000eULL, 0x000000020000000eULL, },
--        { 0xc71c71c8e38e38f2ULL, 0xc71c71c8e38e38f2ULL, },
--        { 0x0000000155555564ULL, 0x0000000155555564ULL, },
--        { 0xdddddddeccccccdcULL, 0xdddddddeccccccdcULL, },
--        { 0x00000000aaaaaabaULL, 0x00000000aaaaaabaULL, },
--        { 0xd097b42684bda13fULL, 0x097b425ef684bdb1ULL, },
--        { 0x0000000000000010ULL, 0x0000000000000010ULL, },
--        { 0x0000000066666678ULL, 0x0000000066666678ULL, },    /*  32  */
--        { 0x0000000066666678ULL, 0x0000000066666678ULL, },
--        { 0x2222222355555568ULL, 0x2222222355555568ULL, },
--        { 0x00000000cccccce0ULL, 0x00000000cccccce0ULL, },
--        { 0x147ae1491eb85200ULL, 0x147ae1491eb85200ULL, },
--        { 0x0000000133333348ULL, 0x0000000133333348ULL, },
--        { 0x1c71c71e3e93e954ULL, 0xfa4fa4fbb60b60ccULL, },
--        { 0x00000001999999b0ULL, 0x00000001999999b0ULL, },
--        { 0x000000013333334aULL, 0x000000013333334aULL, },    /*  40  */
--        { 0x000000013333334aULL, 0x000000013333334aULL, },
--        { 0xdddddddeeeeeef06ULL, 0xdddddddeeeeeef06ULL, },
--        { 0x00000000cccccce4ULL, 0x00000000cccccce4ULL, },
--        { 0xeb851eb8e147ae2cULL, 0xeb851eb8e147ae2cULL, },
--        { 0x000000006666667eULL, 0x000000006666667eULL, },
--        { 0xe38e38e3e93e9401ULL, 0x05b05b05c71c71dfULL, },
--        { 0x0000000000000018ULL, 0x0000000000000018ULL, },
--        { 0x000000008e38e3a7ULL, 0xffffffffe38e38fdULL, },    /*  48  */
--        { 0x000000008e38e3a7ULL, 0xffffffffe38e38fdULL, },
--        { 0x2f684bdb425ed0b1ULL, 0xf684bda17b425eebULL, },
--        { 0x000000011c71c736ULL, 0xffffffffc71c71e2ULL, },
--        { 0x1c71c71e27d27d42ULL, 0xfa4fa4fa49f49f66ULL, },
--        { 0x00000001aaaaaac5ULL, 0xffffffffaaaaaac7ULL, },
--        { 0x35ba781b4587e6d2ULL, 0x0fcd6e9d6b74f050ULL, },
--        { 0x0000000238e38e54ULL, 0xffffffff8e38e3acULL, },
--        { 0x00000001aaaaaac7ULL, 0xffffffffaaaaaac9ULL, },    /*  56  */
--        { 0x00000001aaaaaac7ULL, 0xffffffffaaaaaac9ULL, },
--        { 0xd097b427a12f6869ULL, 0x097b425ebda12f87ULL, },
--        { 0x000000011c71c73aULL, 0xffffffffc71c71e6ULL, },
--        { 0xe38e38e477777796ULL, 0x05b05b05aaaaaacaULL, },
--        { 0x000000008e38e3adULL, 0xffffffffe38e3903ULL, },
--        { 0xca4587e781948b2fULL, 0xf032916206522c5fULL, },
--        { 0x0000000000000020ULL, 0x0000000000000020ULL, },
--        { 0x3e3ad4ae1266c2b0ULL, 0x1637d725aebdb734ULL, },    /*  64  */
--        { 0x4c74e0d60a3d6d94ULL, 0x1badd2dd9f4dac90ULL, },
--        { 0x6874e8f94205b90cULL, 0x27eb0c41af2c3022ULL, },
--        { 0x42dab657e16f25e8ULL, 0x06d6782e137656f2ULL, },
--        { 0x5114c27fd945d0ccULL, 0x0c4c73e604064c4eULL, },
--        { 0x68a91e898c276755ULL, 0x0f77ad378bdfb302ULL, },
--        { 0x54c82cde41d1cf13ULL, 0x0b6108a5f38e1598ULL, },
--        { 0x6f755d3eddd1234aULL, 0xfbbaace2f5421908ULL, },
--        { 0x8b75656215996ec2ULL, 0x07f7e64705209c9aULL, },    /*  72  */
--        { 0x779473b6cb43d680ULL, 0x03e141b56cceff30ULL, },
--        { 0xa6279a1866fb9f64ULL, 0x2631668db9e53ac1ULL, },
--        { 0x67a1f71bd99e4586ULL, 0x312ec9f6206e6e69ULL, },
--        { 0x4207c47a7907b262ULL, 0x101a35e284b89539ULL, },
--        { 0x5cb4f4db15070699ULL, 0x0073da1f866c98a9ULL, },
--        { 0x1e2f51de87a9acbbULL, 0x0b713d87ecf5cc51ULL, },
--        { 0x721d49ba5f0acfa8ULL, 0x5ba5bbe9afeae691ULL, },
--        { 0x4bcd68690d995de0ULL, 0x771da6b4b6c967ebULL, },    /*  80  */
--        { 0x4ea9a2cfbb5acd7bULL, 0x79dd6a73439e6387ULL, },
--        { 0x47c800b999dd2371ULL, 0x766d25914ef7a7a0ULL, },
--        { 0x41b0fa10eb77cf84ULL, 0x26e85189458965f8ULL, },
--        { 0x1fc448ce062c2944ULL, 0x31f490a9422a80e6ULL, },
--        { 0x211bdfadfd79770eULL, 0x3b25f4cac5763378ULL, },
--        { 0x16fbb87edd87b6f0ULL, 0x57c0b65fabdda20eULL, },
--        { 0x14621091eac4a5f6ULL, 0x4d29a25d32fa9ef6ULL, },
--        { 0x07832ded1c464b02ULL, 0x6396905709e3cfa4ULL, },    /*  88  */
--        { 0x0ff4a84eab8df3b9ULL, 0x6bc9a7d8c6adf2eaULL, },
--        { 0x21e53326bfbd0b05ULL, 0x8f8f3b9c679dff5aULL, },
--        { 0x191ed6a24e1576f9ULL, 0x9e8c2e402760373aULL, },
--        { 0x19b438400fc27751ULL, 0x819c4bbfd3ee6972ULL, },
--        { 0x1e0d5dc1094ae999ULL, 0x7496a289f5eff010ULL, },
--        { 0x11af620b7bc03943ULL, 0x8a11f229836addc7ULL, },
--        { 0x46fa45d0e84440fcULL, 0xe8d2c0211fb042bfULL, },
--        { 0x22142516b5a8adbcULL, 0xe1cf1923e186aad1ULL, },    /*  96  */
--        { 0x066ebbbb4ff6da44ULL, 0xd918d7e6a7e61877ULL, },
--        { 0x100acc9d22839a48ULL, 0xce291932929e367fULL, },
--        { 0x0dfe419d62a62f64ULL, 0xc020fe45a8cf7acfULL, },
--        { 0x2ba79b6ffbf3c63bULL, 0xb428f52c49fce695ULL, },
--        { 0x29b3b85200bdf100ULL, 0xb4ae7ea2f52aa5b9ULL, },
--        { 0x293bb84d6360c0b6ULL, 0xae33b26e4c493c49ULL, },
--        { 0x46a99fdf54f4862dULL, 0xae790dc5055f6f51ULL, },
--        { 0x18480e0fd728c7c3ULL, 0xa000ad7b15f8ebe0ULL, },    /* 104  */
--        { 0x1b8b97aa205e1239ULL, 0x89c78b8909c4a8e5ULL, },
--        { 0x09abb26b05ef649dULL, 0x74242fa1bd49e740ULL, },
--        { 0x04e233bc861d272bULL, 0x9c5343ab30f62f9fULL, },
--        { 0xda2da0d0884dc3d1ULL, 0xb824f201640b4147ULL, },
--        { 0x9d8b22ee1b9a2e0fULL, 0xb642ddf1edb0747fULL, },
--        { 0x7c81956533686a37ULL, 0xdd5181781dc3ad37ULL, },
--        { 0xc60b1905717ff25aULL, 0xe2af726e71ad7ad7ULL, },
-+        { 0x0000000100000001ULL, 0x0000000100000001ULL, },    /*   0  */
-+        { 0x0000000100000001ULL, 0x0000000100000001ULL, },
-+        { 0x5555555755555557ULL, 0x5555555755555557ULL, },
-+        { 0x0000000200000002ULL, 0x0000000200000002ULL, },
-+        { 0x3333333633333336ULL, 0x3333333633333336ULL, },
-+        { 0x0000000300000003ULL, 0x0000000300000003ULL, },
-+        { 0x1c71c72071c71c75ULL, 0xc71c71cb1c71c720ULL, },
-+        { 0x0000000400000004ULL, 0x0000000400000004ULL, },
-+        { 0x0000000400000004ULL, 0x0000000400000004ULL, },    /*   8  */
-+        { 0x0000000400000004ULL, 0x0000000400000004ULL, },
-+        { 0x0000000400000004ULL, 0x0000000400000004ULL, },
-+        { 0x0000000400000004ULL, 0x0000000400000004ULL, },
-+        { 0x0000000400000004ULL, 0x0000000400000004ULL, },
-+        { 0x0000000400000004ULL, 0x0000000400000004ULL, },
-+        { 0x0000000400000004ULL, 0x0000000400000004ULL, },
-+        { 0x0000000400000004ULL, 0x0000000400000004ULL, },
-+        { 0x5555555a5555555aULL, 0x5555555a5555555aULL, },    /*  16  */
-+        { 0x5555555a5555555aULL, 0x5555555a5555555aULL, },
-+        { 0x38e38e3e38e38e3eULL, 0x38e38e3e38e38e3eULL, },
-+        { 0xaaaaaab0aaaaaab0ULL, 0xaaaaaab0aaaaaab0ULL, },
-+        { 0x2222222822222228ULL, 0x2222222822222228ULL, },
-+        { 0x0000000600000006ULL, 0x0000000600000006ULL, },
-+        { 0x12f684c4a12f6852ULL, 0x84bda13612f684c4ULL, },
-+        { 0x5555555c5555555cULL, 0x5555555c5555555cULL, },
-+        { 0x0000000700000007ULL, 0x0000000700000007ULL, },    /*  24  */
-+        { 0x0000000700000007ULL, 0x0000000700000007ULL, },
-+        { 0x71c71c7971c71c79ULL, 0x71c71c7971c71c79ULL, },
-+        { 0xaaaaaab2aaaaaab2ULL, 0xaaaaaab2aaaaaab2ULL, },
-+        { 0x6666666e6666666eULL, 0x6666666e6666666eULL, },
-+        { 0x5555555d5555555dULL, 0x5555555d5555555dULL, },
-+        { 0x5ed097bc25ed0983ULL, 0x97b425f55ed097bcULL, },
-+        { 0x0000000800000008ULL, 0x0000000800000008ULL, },
-+        { 0x3333333c3333333cULL, 0x3333333c3333333cULL, },    /*  32  */
-+        { 0x3333333c3333333cULL, 0x3333333c3333333cULL, },
-+        { 0xaaaaaab4aaaaaab4ULL, 0xaaaaaab4aaaaaab4ULL, },
-+        { 0x6666667066666670ULL, 0x6666667066666670ULL, },
-+        { 0x8f5c29008f5c2900ULL, 0x8f5c29008f5c2900ULL, },
-+        { 0x999999a4999999a4ULL, 0x999999a4999999a4ULL, },
-+        { 0x7d27d288c16c16ccULL, 0x38e38e447d27d288ULL, },
-+        { 0xccccccd8ccccccd8ULL, 0xccccccd8ccccccd8ULL, },
-+        { 0x999999a5999999a5ULL, 0x999999a5999999a5ULL, },    /*  40  */
-+        { 0x999999a5999999a5ULL, 0x999999a5999999a5ULL, },
-+        { 0x7777778377777783ULL, 0x7777778377777783ULL, },
-+        { 0x6666667266666672ULL, 0x6666667266666672ULL, },
-+        { 0x70a3d71670a3d716ULL, 0x70a3d71670a3d716ULL, },
-+        { 0x3333333f3333333fULL, 0x3333333f3333333fULL, },
-+        { 0x6c16c1787d27d289ULL, 0x5b05b0676c16c178ULL, },
-+        { 0x0000000c0000000cULL, 0x0000000c0000000cULL, },
-+        { 0x1c71c72971c71c7eULL, 0xc71c71d41c71c729ULL, },    /*  48  */
-+        { 0x1c71c72971c71c7eULL, 0xc71c71d41c71c729ULL, },
-+        { 0x2f684be712f684caULL, 0x4bda13042f684be7ULL, },
-+        { 0x38e38e46e38e38f0ULL, 0x8e38e39c38e38e46ULL, },
-+        { 0x1c71c72a0b60b618ULL, 0x2d82d83c1c71c72aULL, },
-+        { 0x5555556355555562ULL, 0x5555556455555563ULL, },
-+        { 0x0fcd6eac35ba7826ULL, 0x5ba781a40fcd6eacULL, },
-+        { 0x71c71c80c71c71d4ULL, 0x1c71c72c71c71c80ULL, },
-+        { 0x5555556455555563ULL, 0x5555556555555564ULL, },    /*  56  */
-+        { 0x5555556455555563ULL, 0x5555556555555564ULL, },
-+        { 0x97b425fc097b426dULL, 0x25ed098b97b425fcULL, },
-+        { 0x38e38e48e38e38f2ULL, 0x8e38e39e38e38e48ULL, },
-+        { 0x88888898eeeeeefeULL, 0x2222223288888898ULL, },
-+        { 0x1c71c72c71c71c81ULL, 0xc71c71d71c71c72cULL, },
-+        { 0x7e6b75000329162fULL, 0x87e6b75f7e6b7500ULL, },
-+        { 0x0000001000000010ULL, 0x0000001000000010ULL, },
-+        { 0xb10332a061639010ULL, 0x3a253694749880a0ULL, },    /*  64  */
-+        { 0xc1c27384487afa10ULL, 0xbb9c0820e3b1a470ULL, },
-+        { 0x35565efc0caf5a10ULL, 0x735b0ec23bd12160ULL, },
-+        { 0xe6475258fb27d390ULL, 0x49d49612c9a1c0e0ULL, },
-+        { 0xf706933ce23f3d90ULL, 0xcb4b679e38bae4b0ULL, },
-+        { 0xabfab985e02cadd0ULL, 0x0836664283a94cc0ULL, },
-+        { 0xa33845439e9989d0ULL, 0x5b9fe12897ee3470ULL, },
-+        { 0x1df3e50abfdd3e40ULL, 0x6d858f1887bc89f0ULL, },
-+        { 0x9187d08284119e40ULL, 0x254495badfdc06e0ULL, },    /*  72  */
-+        { 0x88c55c40427e7a40ULL, 0x78ae10a0f420ee90ULL, },
-+        { 0x3f78e5242782ba40ULL, 0x93ad82a12637b820ULL, },
-+        { 0x28380a46b1663b40ULL, 0x255be1c9fb128ca0ULL, },
-+        { 0xd928fda29fdeb4c0ULL, 0xfbd5691988e32c20ULL, },
-+        { 0x53e49d69c1226930ULL, 0x0dbb170978b181a0ULL, },
-+        { 0x3ca3c28b4b05ea30ULL, 0x9f6976314d8c5620ULL, },
-+        { 0x621b15b4fcefb9f4ULL, 0x7f3fac7130ab3a20ULL, },
-+        { 0x81b8192421043af4ULL, 0x7180d8efde07f3a0ULL, },    /*  80  */
-+        { 0xa0a1d210b115be94ULL, 0x33a676350e450520ULL, },
-+        { 0xe27e30b0181b6494ULL, 0x359b330061c70ba0ULL, },
-+        { 0xe0f1f5a03792b1acULL, 0xe6a63b00d5b18fa0ULL, },
-+        { 0x38af7120b51538acULL, 0x7938e500aea24b20ULL, },
-+        { 0x7a4830802390b20cULL, 0x4b472700af547ea0ULL, },
-+        { 0xcc2f6580204a3c0cULL, 0x37510000bd1b8320ULL, },
-+        { 0x9ba9ed0066371fb4ULL, 0xeba90000264fb720ULL, },
-+        { 0x7400c900846dd0b4ULL, 0xb6b700007c524ca0ULL, },    /*  88  */
-+        { 0x7e4e840000744254ULL, 0xf24d00003540fa20ULL, },
-+        { 0x242a2c00b0850854ULL, 0xdb00000025db24a0ULL, },
-+        { 0x38a168005a7bb9ecULL, 0xa3000000566748a0ULL, },
-+        { 0x6cb048001a7d90ecULL, 0x7d0000000a0cb020ULL, },
-+        { 0xe4dc2000bd958c4cULL, 0x2f000000f6d44fa0ULL, },
-+        { 0xbcc9600018fcf64cULL, 0x000000002ecca820ULL, },
-+        { 0x739b4000140b1974ULL, 0x000000009361fc20ULL, },
-+        { 0x8ed24000a4acfa74ULL, 0x00000000bcafcda0ULL, },    /*  96  */
-+        { 0xc3dd40003f7c1b74ULL, 0x00000000fe2b7120ULL, },
-+        { 0x1fac4000f6087c74ULL, 0x00000000e05abea0ULL, },
-+        { 0x9e6f40000de21d74ULL, 0x000000001e89ae20ULL, },
-+        { 0x637500000f743514ULL, 0x00000000c1b755a0ULL, },
-+        { 0xd9b400005ed469b4ULL, 0x000000005dfcdf20ULL, },
-+        { 0x0a50000049fea354ULL, 0x000000006b40c2a0ULL, },
-+        { 0x07400000982609f4ULL, 0x00000000c2b79820ULL, },
-+        { 0x57c00000b2de7ff4ULL, 0x000000006f6c1aa0ULL, },    /* 104  */
-+        { 0x1d400000bbe3f5f4ULL, 0x000000001c974f20ULL, },
-+        { 0x09c00000a8b66bf4ULL, 0x00000000e1391da0ULL, },
-+        { 0x03400000aed5e1f4ULL, 0x0000000094d78e20ULL, },
-+        { 0x7d8000009d2e224cULL, 0x00000000ab48a220ULL, },
-+        { 0x3d000000b40fad74ULL, 0x00000000c40e3620ULL, },
-+        { 0x96000000332aeeccULL, 0x00000000ecf84a20ULL, },
-+        { 0xb40000004e1bc8f4ULL, 0x0000000075d6de20ULL, },
-     };
- 
-     reset_msa_registers();
-diff --git a/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_msubv_b.c b/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_msubv_b.c
-index b68b57f..808c49d 100644
---- a/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_msubv_b.c
-+++ b/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_msubv_b.c
-@@ -43,118 +43,118 @@ int32_t main(void)
- 
-     uint64_t b128_result[TEST_COUNT_TOTAL][2];
-     uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
--        { 0x0000000000000002ULL, 0x0000000000000002ULL, },    /*   0  */
--        { 0x0000000000000002ULL, 0x0000000000000002ULL, },
--        { 0x00000000aaaaaaaeULL, 0x00000000aaaaaaaeULL, },
--        { 0x0000000000000004ULL, 0x0000000000000004ULL, },
--        { 0x000000006666666cULL, 0x000000006666666cULL, },
--        { 0x0000000000000006ULL, 0x0000000000000006ULL, },
--        { 0x000000008e38e395ULL, 0xffffffffe38e38ebULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },    /*   8  */
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x00000000aaaaaab4ULL, 0x00000000aaaaaab4ULL, },    /*  16  */
--        { 0x00000000aaaaaab4ULL, 0x00000000aaaaaab4ULL, },
--        { 0x38e38e3a71c71c7cULL, 0x38e38e3a71c71c7cULL, },
--        { 0x0000000155555560ULL, 0x0000000155555560ULL, },
--        { 0x2222222444444450ULL, 0x2222222444444450ULL, },
--        { 0x000000020000000cULL, 0x000000020000000cULL, },
--        { 0x2f684bdcb425ed16ULL, 0xf684bda397b425faULL, },
--        { 0x00000002aaaaaab8ULL, 0x00000002aaaaaab8ULL, },
--        { 0x000000020000000eULL, 0x000000020000000eULL, },    /*  24  */
--        { 0x000000020000000eULL, 0x000000020000000eULL, },
--        { 0xc71c71c8e38e38f2ULL, 0xc71c71c8e38e38f2ULL, },
--        { 0x0000000155555564ULL, 0x0000000155555564ULL, },
--        { 0xdddddddeccccccdcULL, 0xdddddddeccccccdcULL, },
--        { 0x00000000aaaaaabaULL, 0x00000000aaaaaabaULL, },
--        { 0xd097b42684bda13fULL, 0x097b425ef684bdb1ULL, },
--        { 0x0000000000000010ULL, 0x0000000000000010ULL, },
--        { 0x0000000066666678ULL, 0x0000000066666678ULL, },    /*  32  */
--        { 0x0000000066666678ULL, 0x0000000066666678ULL, },
--        { 0x2222222355555568ULL, 0x2222222355555568ULL, },
--        { 0x00000000cccccce0ULL, 0x00000000cccccce0ULL, },
--        { 0x147ae1491eb85200ULL, 0x147ae1491eb85200ULL, },
--        { 0x0000000133333348ULL, 0x0000000133333348ULL, },
--        { 0x1c71c71e3e93e954ULL, 0xfa4fa4fbb60b60ccULL, },
--        { 0x00000001999999b0ULL, 0x00000001999999b0ULL, },
--        { 0x000000013333334aULL, 0x000000013333334aULL, },    /*  40  */
--        { 0x000000013333334aULL, 0x000000013333334aULL, },
--        { 0xdddddddeeeeeef06ULL, 0xdddddddeeeeeef06ULL, },
--        { 0x00000000cccccce4ULL, 0x00000000cccccce4ULL, },
--        { 0xeb851eb8e147ae2cULL, 0xeb851eb8e147ae2cULL, },
--        { 0x000000006666667eULL, 0x000000006666667eULL, },
--        { 0xe38e38e3e93e9401ULL, 0x05b05b05c71c71dfULL, },
--        { 0x0000000000000018ULL, 0x0000000000000018ULL, },
--        { 0x000000008e38e3a7ULL, 0xffffffffe38e38fdULL, },    /*  48  */
--        { 0x000000008e38e3a7ULL, 0xffffffffe38e38fdULL, },
--        { 0x2f684bdb425ed0b1ULL, 0xf684bda17b425eebULL, },
--        { 0x000000011c71c736ULL, 0xffffffffc71c71e2ULL, },
--        { 0x1c71c71e27d27d42ULL, 0xfa4fa4fa49f49f66ULL, },
--        { 0x00000001aaaaaac5ULL, 0xffffffffaaaaaac7ULL, },
--        { 0x35ba781b4587e6d2ULL, 0x0fcd6e9d6b74f050ULL, },
--        { 0x0000000238e38e54ULL, 0xffffffff8e38e3acULL, },
--        { 0x00000001aaaaaac7ULL, 0xffffffffaaaaaac9ULL, },    /*  56  */
--        { 0x00000001aaaaaac7ULL, 0xffffffffaaaaaac9ULL, },
--        { 0xd097b427a12f6869ULL, 0x097b425ebda12f87ULL, },
--        { 0x000000011c71c73aULL, 0xffffffffc71c71e6ULL, },
--        { 0xe38e38e477777796ULL, 0x05b05b05aaaaaacaULL, },
--        { 0x000000008e38e3adULL, 0xffffffffe38e3903ULL, },
--        { 0xca4587e781948b2fULL, 0xf032916206522c5fULL, },
--        { 0x0000000000000020ULL, 0x0000000000000020ULL, },
--        { 0x3e3ad4ae1266c2b0ULL, 0x1637d725aebdb734ULL, },    /*  64  */
--        { 0x4c74e0d60a3d6d94ULL, 0x1badd2dd9f4dac90ULL, },
--        { 0x6874e8f94205b90cULL, 0x27eb0c41af2c3022ULL, },
--        { 0x42dab657e16f25e8ULL, 0x06d6782e137656f2ULL, },
--        { 0x5114c27fd945d0ccULL, 0x0c4c73e604064c4eULL, },
--        { 0x68a91e898c276755ULL, 0x0f77ad378bdfb302ULL, },
--        { 0x54c82cde41d1cf13ULL, 0x0b6108a5f38e1598ULL, },
--        { 0x6f755d3eddd1234aULL, 0xfbbaace2f5421908ULL, },
--        { 0x8b75656215996ec2ULL, 0x07f7e64705209c9aULL, },    /*  72  */
--        { 0x779473b6cb43d680ULL, 0x03e141b56cceff30ULL, },
--        { 0xa6279a1866fb9f64ULL, 0x2631668db9e53ac1ULL, },
--        { 0x67a1f71bd99e4586ULL, 0x312ec9f6206e6e69ULL, },
--        { 0x4207c47a7907b262ULL, 0x101a35e284b89539ULL, },
--        { 0x5cb4f4db15070699ULL, 0x0073da1f866c98a9ULL, },
--        { 0x1e2f51de87a9acbbULL, 0x0b713d87ecf5cc51ULL, },
--        { 0x721d49ba5f0acfa8ULL, 0x5ba5bbe9afeae691ULL, },
--        { 0x4bcd68690d995de0ULL, 0x771da6b4b6c967ebULL, },    /*  80  */
--        { 0x4ea9a2cfbb5acd7bULL, 0x79dd6a73439e6387ULL, },
--        { 0x47c800b999dd2371ULL, 0x766d25914ef7a7a0ULL, },
--        { 0x41b0fa10eb77cf84ULL, 0x26e85189458965f8ULL, },
--        { 0x1fc448ce062c2944ULL, 0x31f490a9422a80e6ULL, },
--        { 0x211bdfadfd79770eULL, 0x3b25f4cac5763378ULL, },
--        { 0x16fbb87edd87b6f0ULL, 0x57c0b65fabdda20eULL, },
--        { 0x14621091eac4a5f6ULL, 0x4d29a25d32fa9ef6ULL, },
--        { 0x07832ded1c464b02ULL, 0x6396905709e3cfa4ULL, },    /*  88  */
--        { 0x0ff4a84eab8df3b9ULL, 0x6bc9a7d8c6adf2eaULL, },
--        { 0x21e53326bfbd0b05ULL, 0x8f8f3b9c679dff5aULL, },
--        { 0x191ed6a24e1576f9ULL, 0x9e8c2e402760373aULL, },
--        { 0x19b438400fc27751ULL, 0x819c4bbfd3ee6972ULL, },
--        { 0x1e0d5dc1094ae999ULL, 0x7496a289f5eff010ULL, },
--        { 0x11af620b7bc03943ULL, 0x8a11f229836addc7ULL, },
--        { 0x46fa45d0e84440fcULL, 0xe8d2c0211fb042bfULL, },
--        { 0x22142516b5a8adbcULL, 0xe1cf1923e186aad1ULL, },    /*  96  */
--        { 0x066ebbbb4ff6da44ULL, 0xd918d7e6a7e61877ULL, },
--        { 0x100acc9d22839a48ULL, 0xce291932929e367fULL, },
--        { 0x0dfe419d62a62f64ULL, 0xc020fe45a8cf7acfULL, },
--        { 0x2ba79b6ffbf3c63bULL, 0xb428f52c49fce695ULL, },
--        { 0x29b3b85200bdf100ULL, 0xb4ae7ea2f52aa5b9ULL, },
--        { 0x293bb84d6360c0b6ULL, 0xae33b26e4c493c49ULL, },
--        { 0x46a99fdf54f4862dULL, 0xae790dc5055f6f51ULL, },
--        { 0x18480e0fd728c7c3ULL, 0xa000ad7b15f8ebe0ULL, },    /* 104  */
--        { 0x1b8b97aa205e1239ULL, 0x89c78b8909c4a8e5ULL, },
--        { 0x09abb26b05ef649dULL, 0x74242fa1bd49e740ULL, },
--        { 0x04e233bc861d272bULL, 0x9c5343ab30f62f9fULL, },
--        { 0xda2da0d0884dc3d1ULL, 0xb824f201640b4147ULL, },
--        { 0x9d8b22ee1b9a2e0fULL, 0xb642ddf1edb0747fULL, },
--        { 0x7c81956533686a37ULL, 0xdd5181781dc3ad37ULL, },
--        { 0xc60b1905717ff25aULL, 0xe2af726e71ad7ad7ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },
-+        { 0xa9a9a9a9a9a9a9a9ULL, 0xa9a9a9a9a9a9a9a9ULL, },
-+        { 0xfefefefefefefefeULL, 0xfefefefefefefefeULL, },
-+        { 0xcacacacacacacacaULL, 0xcacacacacacacacaULL, },
-+        { 0xfdfdfdfdfdfdfdfdULL, 0xfdfdfdfdfdfdfdfdULL, },
-+        { 0xe08b35e08b35e08bULL, 0x35e08b35e08b35e0ULL, },
-+        { 0xfcfcfcfcfcfcfcfcULL, 0xfcfcfcfcfcfcfcfcULL, },
-+        { 0xfcfcfcfcfcfcfcfcULL, 0xfcfcfcfcfcfcfcfcULL, },    /*   8  */
-+        { 0xfcfcfcfcfcfcfcfcULL, 0xfcfcfcfcfcfcfcfcULL, },
-+        { 0xfcfcfcfcfcfcfcfcULL, 0xfcfcfcfcfcfcfcfcULL, },
-+        { 0xfcfcfcfcfcfcfcfcULL, 0xfcfcfcfcfcfcfcfcULL, },
-+        { 0xfcfcfcfcfcfcfcfcULL, 0xfcfcfcfcfcfcfcfcULL, },
-+        { 0xfcfcfcfcfcfcfcfcULL, 0xfcfcfcfcfcfcfcfcULL, },
-+        { 0xfcfcfcfcfcfcfcfcULL, 0xfcfcfcfcfcfcfcfcULL, },
-+        { 0xfcfcfcfcfcfcfcfcULL, 0xfcfcfcfcfcfcfcfcULL, },
-+        { 0xa6a6a6a6a6a6a6a6ULL, 0xa6a6a6a6a6a6a6a6ULL, },    /*  16  */
-+        { 0xa6a6a6a6a6a6a6a6ULL, 0xa6a6a6a6a6a6a6a6ULL, },
-+        { 0xc2c2c2c2c2c2c2c2ULL, 0xc2c2c2c2c2c2c2c2ULL, },
-+        { 0x5050505050505050ULL, 0x5050505050505050ULL, },
-+        { 0xd8d8d8d8d8d8d8d8ULL, 0xd8d8d8d8d8d8d8d8ULL, },
-+        { 0xfafafafafafafafaULL, 0xfafafafafafafafaULL, },
-+        { 0x3caeca3caeca3caeULL, 0xca3caeca3caeca3cULL, },
-+        { 0xa4a4a4a4a4a4a4a4ULL, 0xa4a4a4a4a4a4a4a4ULL, },
-+        { 0xf9f9f9f9f9f9f9f9ULL, 0xf9f9f9f9f9f9f9f9ULL, },    /*  24  */
-+        { 0xf9f9f9f9f9f9f9f9ULL, 0xf9f9f9f9f9f9f9f9ULL, },
-+        { 0x8787878787878787ULL, 0x8787878787878787ULL, },
-+        { 0x4e4e4e4e4e4e4e4eULL, 0x4e4e4e4e4e4e4e4eULL, },
-+        { 0x9292929292929292ULL, 0x9292929292929292ULL, },
-+        { 0xa3a3a3a3a3a3a3a3ULL, 0xa3a3a3a3a3a3a3a3ULL, },
-+        { 0x447d0b447d0b447dULL, 0x0b447d0b447d0b44ULL, },
-+        { 0xf8f8f8f8f8f8f8f8ULL, 0xf8f8f8f8f8f8f8f8ULL, },
-+        { 0xc4c4c4c4c4c4c4c4ULL, 0xc4c4c4c4c4c4c4c4ULL, },    /*  32  */
-+        { 0xc4c4c4c4c4c4c4c4ULL, 0xc4c4c4c4c4c4c4c4ULL, },
-+        { 0x4c4c4c4c4c4c4c4cULL, 0x4c4c4c4c4c4c4c4cULL, },
-+        { 0x9090909090909090ULL, 0x9090909090909090ULL, },
 +        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
-+        { 0x5c5c5c5c5c5c5c5cULL, 0x5c5c5c5c5c5c5c5cULL, },
-+        { 0x7834bc7834bc7834ULL, 0xbc7834bc7834bc78ULL, },
-+        { 0x2828282828282828ULL, 0x2828282828282828ULL, },
-+        { 0x5b5b5b5b5b5b5b5bULL, 0x5b5b5b5b5b5b5b5bULL, },    /*  40  */
-+        { 0x5b5b5b5b5b5b5b5bULL, 0x5b5b5b5b5b5b5b5bULL, },
-+        { 0x7d7d7d7d7d7d7d7dULL, 0x7d7d7d7d7d7d7d7dULL, },
-+        { 0x8e8e8e8e8e8e8e8eULL, 0x8e8e8e8e8e8e8e8eULL, },
-+        { 0xeaeaeaeaeaeaeaeaULL, 0xeaeaeaeaeaeaeaeaULL, },
-+        { 0xc1c1c1c1c1c1c1c1ULL, 0xc1c1c1c1c1c1c1c1ULL, },
-+        { 0x8877998877998877ULL, 0x9988779988779988ULL, },
-+        { 0xf4f4f4f4f4f4f4f4ULL, 0xf4f4f4f4f4f4f4f4ULL, },
-+        { 0xd7822cd7822cd782ULL, 0x2cd7822cd7822cd7ULL, },    /*  48  */
-+        { 0xd7822cd7822cd782ULL, 0x2cd7822cd7822cd7ULL, },
-+        { 0x1936fc1936fc1936ULL, 0xfc1936fc1936fc19ULL, },
-+        { 0xba1064ba1064ba10ULL, 0x64ba1064ba1064baULL, },
-+        { 0xd6e8c4d6e8c4d6e8ULL, 0xc4d6e8c4d6e8c4d6ULL, },
-+        { 0x9d9e9c9d9e9c9d9eULL, 0x9c9d9e9c9d9e9c9dULL, },
-+        { 0x54da5c54da5c54daULL, 0x5c54da5c54da5c54ULL, },
-+        { 0x802cd4802cd4802cULL, 0xd4802cd4802cd480ULL, },
-+        { 0x9c9d9b9c9d9b9c9dULL, 0x9b9c9d9b9c9d9b9cULL, },    /*  56  */
-+        { 0x9c9d9b9c9d9b9c9dULL, 0x9b9c9d9b9c9d9b9cULL, },
-+        { 0x0493750493750493ULL, 0x7504937504937504ULL, },
-+        { 0xb80e62b80e62b80eULL, 0x62b80e62b80e62b8ULL, },
-+        { 0x6802ce6802ce6802ULL, 0xce6802ce6802ce68ULL, },
-+        { 0xd47f29d47f29d47fULL, 0x29d47f29d47f29d4ULL, },
-+        { 0x00d1a100d1a100d1ULL, 0xa100d1a100d1a100ULL, },
-+        { 0xf0f0f0f0f0f0f0f0ULL, 0xf0f0f0f0f0f0f0f0ULL, },
-+        { 0xb00c4c60b06cb7f0ULL, 0xf77f776cecd7f060ULL, },    /*  64  */
-+        { 0x58604c7ca826a4f0ULL, 0xb11e6ee016929090ULL, },
-+        { 0xf81cf804c0e87df0ULL, 0x4436ec3e6ce920a0ULL, },
-+        { 0x786634a810267370ULL, 0xf53f14eebe33c020ULL, },
-+        { 0x20ba34c408e06070ULL, 0xafde0b62e8ee6050ULL, },
-+        { 0x07b6347bdf77af30ULL, 0x6b8d72be2f6d1c40ULL, },
-+        { 0x63ea34bd3a9aa230ULL, 0xad25d0d828d84290ULL, },
-+        { 0x934834f6f477f4c0ULL, 0xc39e78e84b9ade10ULL, },
-+        { 0x3304e07e0c39cdc0ULL, 0x56b6f646a1f16e20ULL, },    /*  72  */
-+        { 0x8f38e0c0675cc0c0ULL, 0x984e54609a5c9470ULL, },
-+        { 0xff949cdcb6fb47c0ULL, 0xa70e305f61233be0ULL, },
-+        { 0xbfcea8bac85c91c0ULL, 0x2cb600377e0d9160ULL, },
-+        { 0x3f18e45e189a8740ULL, 0xddbf28e7d05731e0ULL, },
-+        { 0x6f76e497d277d9d0ULL, 0xf338d0f7f319cd60ULL, },
-+        { 0x2fb0f075e4d823d0ULL, 0x78e0a0cf100323e0ULL, },
-+        { 0x2f4f0c4c60779f0cULL, 0xcfff608f7fff9fe0ULL, },
-+        { 0x379944bc60e9d40cULL, 0x2a66400d7d7a4f60ULL, },    /*  80  */
-+        { 0x4a0b4408801e08acULL, 0x36fc80bb3c7401e0ULL, },
-+        { 0x922d0cb800dcb0acULL, 0xfc5c807628f8dc60ULL, },
-+        { 0xb24a046000c05044ULL, 0x30c080e6c008a460ULL, },
-+        { 0x22a66ce00040c044ULL, 0x208000724030e4e0ULL, },
-+        { 0xcc726c4000808024ULL, 0xe00000de0060dc60ULL, },
-+        { 0xbc5e04c000000024ULL, 0xc00000bc004010e0ULL, },
-+        { 0x7c5cac000000002cULL, 0x0000001c00c0f0e0ULL, },
-+        { 0x9c4424000000002cULL, 0x000000d40080f060ULL, },    /*  88  */
-+        { 0xa8cc2400000000ccULL, 0x0000004c000010e0ULL, },
-+        { 0xc814ac00000000ccULL, 0x000000980000c060ULL, },
-+        { 0x48e8e400000000a4ULL, 0x0000005800004060ULL, },
-+        { 0x08d80c00000000a4ULL, 0x00000008000040e0ULL, },
-+        { 0x30880c0000000084ULL, 0x000000380000c060ULL, },
-+        { 0xf0b8e40000000084ULL, 0x00000070000000e0ULL, },
-+        { 0xf0f04c000000004cULL, 0x000000f0000000e0ULL, },
-+        { 0x709004000000004cULL, 0x000000d000000060ULL, },    /*  96  */
-+        { 0xf0f06c000000004cULL, 0x00000070000000e0ULL, },
-+        { 0x709064000000004cULL, 0x0000005000000060ULL, },
-+        { 0xf0f08c000000004cULL, 0x000000f0000000e0ULL, },
-+        { 0xa0d08c00000000ecULL, 0x0000009000000060ULL, },
-+        { 0xc0708c000000008cULL, 0x000000f0000000e0ULL, },
-+        { 0x80508c000000002cULL, 0x0000009000000060ULL, },
-+        { 0x00f08c00000000ccULL, 0x000000f0000000e0ULL, },
-+        { 0x00906400000000ccULL, 0x000000e000000060ULL, },    /* 104  */
-+        { 0x00f06c00000000ccULL, 0x000000c0000000e0ULL, },
-+        { 0x00900400000000ccULL, 0x0000008000000060ULL, },
-+        { 0x00f04c00000000ccULL, 0x00000000000000e0ULL, },
-+        { 0x00e0c400000000a4ULL, 0x00000000000000e0ULL, },
-+        { 0x00c0ec00000000acULL, 0x00000000000000e0ULL, },
-+        { 0x0080a40000000044ULL, 0x00000000000000e0ULL, },
-+        { 0x00008c000000008cULL, 0x00000000000000e0ULL, },
-     };
- 
-     reset_msa_registers();
-diff --git a/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_msubv_d.c b/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_msubv_d.c
-index 5a0549a..9722dbd 100644
---- a/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_msubv_d.c
-+++ b/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_msubv_d.c
-@@ -43,118 +43,118 @@ int32_t main(void)
- 
-     uint64_t b128_result[TEST_COUNT_TOTAL][2];
-     uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
--        { 0x0000000000000002ULL, 0x0000000000000002ULL, },    /*   0  */
--        { 0x0000000000000002ULL, 0x0000000000000002ULL, },
--        { 0x00000000aaaaaaaeULL, 0x00000000aaaaaaaeULL, },
--        { 0x0000000000000004ULL, 0x0000000000000004ULL, },
--        { 0x000000006666666cULL, 0x000000006666666cULL, },
--        { 0x0000000000000006ULL, 0x0000000000000006ULL, },
--        { 0x000000008e38e395ULL, 0xffffffffe38e38ebULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },    /*   8  */
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x00000000aaaaaab4ULL, 0x00000000aaaaaab4ULL, },    /*  16  */
--        { 0x00000000aaaaaab4ULL, 0x00000000aaaaaab4ULL, },
--        { 0x38e38e3a71c71c7cULL, 0x38e38e3a71c71c7cULL, },
--        { 0x0000000155555560ULL, 0x0000000155555560ULL, },
--        { 0x2222222444444450ULL, 0x2222222444444450ULL, },
--        { 0x000000020000000cULL, 0x000000020000000cULL, },
--        { 0x2f684bdcb425ed16ULL, 0xf684bda397b425faULL, },
--        { 0x00000002aaaaaab8ULL, 0x00000002aaaaaab8ULL, },
--        { 0x000000020000000eULL, 0x000000020000000eULL, },    /*  24  */
--        { 0x000000020000000eULL, 0x000000020000000eULL, },
--        { 0xc71c71c8e38e38f2ULL, 0xc71c71c8e38e38f2ULL, },
--        { 0x0000000155555564ULL, 0x0000000155555564ULL, },
--        { 0xdddddddeccccccdcULL, 0xdddddddeccccccdcULL, },
--        { 0x00000000aaaaaabaULL, 0x00000000aaaaaabaULL, },
--        { 0xd097b42684bda13fULL, 0x097b425ef684bdb1ULL, },
--        { 0x0000000000000010ULL, 0x0000000000000010ULL, },
--        { 0x0000000066666678ULL, 0x0000000066666678ULL, },    /*  32  */
--        { 0x0000000066666678ULL, 0x0000000066666678ULL, },
--        { 0x2222222355555568ULL, 0x2222222355555568ULL, },
--        { 0x00000000cccccce0ULL, 0x00000000cccccce0ULL, },
--        { 0x147ae1491eb85200ULL, 0x147ae1491eb85200ULL, },
--        { 0x0000000133333348ULL, 0x0000000133333348ULL, },
--        { 0x1c71c71e3e93e954ULL, 0xfa4fa4fbb60b60ccULL, },
--        { 0x00000001999999b0ULL, 0x00000001999999b0ULL, },
--        { 0x000000013333334aULL, 0x000000013333334aULL, },    /*  40  */
--        { 0x000000013333334aULL, 0x000000013333334aULL, },
--        { 0xdddddddeeeeeef06ULL, 0xdddddddeeeeeef06ULL, },
--        { 0x00000000cccccce4ULL, 0x00000000cccccce4ULL, },
--        { 0xeb851eb8e147ae2cULL, 0xeb851eb8e147ae2cULL, },
--        { 0x000000006666667eULL, 0x000000006666667eULL, },
--        { 0xe38e38e3e93e9401ULL, 0x05b05b05c71c71dfULL, },
--        { 0x0000000000000018ULL, 0x0000000000000018ULL, },
--        { 0x000000008e38e3a7ULL, 0xffffffffe38e38fdULL, },    /*  48  */
--        { 0x000000008e38e3a7ULL, 0xffffffffe38e38fdULL, },
--        { 0x2f684bdb425ed0b1ULL, 0xf684bda17b425eebULL, },
--        { 0x000000011c71c736ULL, 0xffffffffc71c71e2ULL, },
--        { 0x1c71c71e27d27d42ULL, 0xfa4fa4fa49f49f66ULL, },
--        { 0x00000001aaaaaac5ULL, 0xffffffffaaaaaac7ULL, },
--        { 0x35ba781b4587e6d2ULL, 0x0fcd6e9d6b74f050ULL, },
--        { 0x0000000238e38e54ULL, 0xffffffff8e38e3acULL, },
--        { 0x00000001aaaaaac7ULL, 0xffffffffaaaaaac9ULL, },    /*  56  */
--        { 0x00000001aaaaaac7ULL, 0xffffffffaaaaaac9ULL, },
--        { 0xd097b427a12f6869ULL, 0x097b425ebda12f87ULL, },
--        { 0x000000011c71c73aULL, 0xffffffffc71c71e6ULL, },
--        { 0xe38e38e477777796ULL, 0x05b05b05aaaaaacaULL, },
--        { 0x000000008e38e3adULL, 0xffffffffe38e3903ULL, },
--        { 0xca4587e781948b2fULL, 0xf032916206522c5fULL, },
--        { 0x0000000000000020ULL, 0x0000000000000020ULL, },
--        { 0x3e3ad4ae1266c2b0ULL, 0x1637d725aebdb734ULL, },    /*  64  */
--        { 0x4c74e0d60a3d6d94ULL, 0x1badd2dd9f4dac90ULL, },
--        { 0x6874e8f94205b90cULL, 0x27eb0c41af2c3022ULL, },
--        { 0x42dab657e16f25e8ULL, 0x06d6782e137656f2ULL, },
--        { 0x5114c27fd945d0ccULL, 0x0c4c73e604064c4eULL, },
--        { 0x68a91e898c276755ULL, 0x0f77ad378bdfb302ULL, },
--        { 0x54c82cde41d1cf13ULL, 0x0b6108a5f38e1598ULL, },
--        { 0x6f755d3eddd1234aULL, 0xfbbaace2f5421908ULL, },
--        { 0x8b75656215996ec2ULL, 0x07f7e64705209c9aULL, },    /*  72  */
--        { 0x779473b6cb43d680ULL, 0x03e141b56cceff30ULL, },
--        { 0xa6279a1866fb9f64ULL, 0x2631668db9e53ac1ULL, },
--        { 0x67a1f71bd99e4586ULL, 0x312ec9f6206e6e69ULL, },
--        { 0x4207c47a7907b262ULL, 0x101a35e284b89539ULL, },
--        { 0x5cb4f4db15070699ULL, 0x0073da1f866c98a9ULL, },
--        { 0x1e2f51de87a9acbbULL, 0x0b713d87ecf5cc51ULL, },
--        { 0x721d49ba5f0acfa8ULL, 0x5ba5bbe9afeae691ULL, },
--        { 0x4bcd68690d995de0ULL, 0x771da6b4b6c967ebULL, },    /*  80  */
--        { 0x4ea9a2cfbb5acd7bULL, 0x79dd6a73439e6387ULL, },
--        { 0x47c800b999dd2371ULL, 0x766d25914ef7a7a0ULL, },
--        { 0x41b0fa10eb77cf84ULL, 0x26e85189458965f8ULL, },
--        { 0x1fc448ce062c2944ULL, 0x31f490a9422a80e6ULL, },
--        { 0x211bdfadfd79770eULL, 0x3b25f4cac5763378ULL, },
--        { 0x16fbb87edd87b6f0ULL, 0x57c0b65fabdda20eULL, },
--        { 0x14621091eac4a5f6ULL, 0x4d29a25d32fa9ef6ULL, },
--        { 0x07832ded1c464b02ULL, 0x6396905709e3cfa4ULL, },    /*  88  */
--        { 0x0ff4a84eab8df3b9ULL, 0x6bc9a7d8c6adf2eaULL, },
--        { 0x21e53326bfbd0b05ULL, 0x8f8f3b9c679dff5aULL, },
--        { 0x191ed6a24e1576f9ULL, 0x9e8c2e402760373aULL, },
--        { 0x19b438400fc27751ULL, 0x819c4bbfd3ee6972ULL, },
--        { 0x1e0d5dc1094ae999ULL, 0x7496a289f5eff010ULL, },
--        { 0x11af620b7bc03943ULL, 0x8a11f229836addc7ULL, },
--        { 0x46fa45d0e84440fcULL, 0xe8d2c0211fb042bfULL, },
--        { 0x22142516b5a8adbcULL, 0xe1cf1923e186aad1ULL, },    /*  96  */
--        { 0x066ebbbb4ff6da44ULL, 0xd918d7e6a7e61877ULL, },
--        { 0x100acc9d22839a48ULL, 0xce291932929e367fULL, },
--        { 0x0dfe419d62a62f64ULL, 0xc020fe45a8cf7acfULL, },
--        { 0x2ba79b6ffbf3c63bULL, 0xb428f52c49fce695ULL, },
--        { 0x29b3b85200bdf100ULL, 0xb4ae7ea2f52aa5b9ULL, },
--        { 0x293bb84d6360c0b6ULL, 0xae33b26e4c493c49ULL, },
--        { 0x46a99fdf54f4862dULL, 0xae790dc5055f6f51ULL, },
--        { 0x18480e0fd728c7c3ULL, 0xa000ad7b15f8ebe0ULL, },    /* 104  */
--        { 0x1b8b97aa205e1239ULL, 0x89c78b8909c4a8e5ULL, },
--        { 0x09abb26b05ef649dULL, 0x74242fa1bd49e740ULL, },
--        { 0x04e233bc861d272bULL, 0x9c5343ab30f62f9fULL, },
--        { 0xda2da0d0884dc3d1ULL, 0xb824f201640b4147ULL, },
--        { 0x9d8b22ee1b9a2e0fULL, 0xb642ddf1edb0747fULL, },
--        { 0x7c81956533686a37ULL, 0xdd5181781dc3ad37ULL, },
--        { 0xc60b1905717ff25aULL, 0xe2af726e71ad7ad7ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
 +        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },
-+        { 0xaaaaaaaaaaaaaaa9ULL, 0xaaaaaaaaaaaaaaa9ULL, },
-+        { 0xfffffffffffffffeULL, 0xfffffffffffffffeULL, },
-+        { 0xcccccccccccccccaULL, 0xcccccccccccccccaULL, },
-+        { 0xfffffffffffffffdULL, 0xfffffffffffffffdULL, },
-+        { 0xe38e38e38e38e38bULL, 0x38e38e38e38e38e0ULL, },
-+        { 0xfffffffffffffffcULL, 0xfffffffffffffffcULL, },
-+        { 0xfffffffffffffffcULL, 0xfffffffffffffffcULL, },    /*   8  */
-+        { 0xfffffffffffffffcULL, 0xfffffffffffffffcULL, },
-+        { 0xfffffffffffffffcULL, 0xfffffffffffffffcULL, },
-+        { 0xfffffffffffffffcULL, 0xfffffffffffffffcULL, },
-+        { 0xfffffffffffffffcULL, 0xfffffffffffffffcULL, },
-+        { 0xfffffffffffffffcULL, 0xfffffffffffffffcULL, },
-+        { 0xfffffffffffffffcULL, 0xfffffffffffffffcULL, },
-+        { 0xfffffffffffffffcULL, 0xfffffffffffffffcULL, },
-+        { 0xaaaaaaaaaaaaaaa6ULL, 0xaaaaaaaaaaaaaaa6ULL, },    /*  16  */
-+        { 0xaaaaaaaaaaaaaaa6ULL, 0xaaaaaaaaaaaaaaa6ULL, },
-+        { 0x71c71c71c71c71c2ULL, 0x71c71c71c71c71c2ULL, },
-+        { 0x5555555555555550ULL, 0x5555555555555550ULL, },
-+        { 0xddddddddddddddd8ULL, 0xddddddddddddddd8ULL, },
-+        { 0xfffffffffffffffaULL, 0xfffffffffffffffaULL, },
-+        { 0xed097b425ed097aeULL, 0xd097b425ed097b3cULL, },
-+        { 0xaaaaaaaaaaaaaaa4ULL, 0xaaaaaaaaaaaaaaa4ULL, },
-+        { 0xfffffffffffffff9ULL, 0xfffffffffffffff9ULL, },    /*  24  */
-+        { 0xfffffffffffffff9ULL, 0xfffffffffffffff9ULL, },
-+        { 0xe38e38e38e38e387ULL, 0xe38e38e38e38e387ULL, },
-+        { 0x555555555555554eULL, 0x555555555555554eULL, },
-+        { 0x9999999999999992ULL, 0x9999999999999992ULL, },
-+        { 0xaaaaaaaaaaaaaaa3ULL, 0xaaaaaaaaaaaaaaa3ULL, },
-+        { 0xa12f684bda12f67dULL, 0x12f684bda12f6844ULL, },
-+        { 0xfffffffffffffff8ULL, 0xfffffffffffffff8ULL, },
-+        { 0xccccccccccccccc4ULL, 0xccccccccccccccc4ULL, },    /*  32  */
-+        { 0xccccccccccccccc4ULL, 0xccccccccccccccc4ULL, },
-+        { 0x555555555555554cULL, 0x555555555555554cULL, },
-+        { 0x9999999999999990ULL, 0x9999999999999990ULL, },
-+        { 0xa3d70a3d70a3d700ULL, 0xa3d70a3d70a3d700ULL, },
-+        { 0x666666666666665cULL, 0x666666666666665cULL, },
-+        { 0xe93e93e93e93e934ULL, 0x2d82d82d82d82d78ULL, },
-+        { 0x3333333333333328ULL, 0x3333333333333328ULL, },
-+        { 0x666666666666665bULL, 0x666666666666665bULL, },    /*  40  */
-+        { 0x666666666666665bULL, 0x666666666666665bULL, },
-+        { 0x888888888888887dULL, 0x888888888888887dULL, },
-+        { 0x999999999999998eULL, 0x999999999999998eULL, },
-+        { 0x5c28f5c28f5c28eaULL, 0x5c28f5c28f5c28eaULL, },
-+        { 0xccccccccccccccc1ULL, 0xccccccccccccccc1ULL, },
-+        { 0x2d82d82d82d82d77ULL, 0x3e93e93e93e93e88ULL, },
-+        { 0xfffffffffffffff4ULL, 0xfffffffffffffff4ULL, },
-+        { 0xe38e38e38e38e382ULL, 0x38e38e38e38e38d7ULL, },    /*  48  */
-+        { 0xe38e38e38e38e382ULL, 0x38e38e38e38e38d7ULL, },
-+        { 0xd097b425ed097b36ULL, 0x097b425ed097b419ULL, },
-+        { 0xc71c71c71c71c710ULL, 0x71c71c71c71c71baULL, },
-+        { 0x49f49f49f49f49e8ULL, 0x38e38e38e38e38d6ULL, },
-+        { 0xaaaaaaaaaaaaaa9eULL, 0xaaaaaaaaaaaaaa9dULL, },
-+        { 0xf9add3c0ca4587daULL, 0x587e6b74f0329154ULL, },
-+        { 0x8e38e38e38e38e2cULL, 0xe38e38e38e38e380ULL, },
-+        { 0xaaaaaaaaaaaaaa9dULL, 0xaaaaaaaaaaaaaa9cULL, },    /*  56  */
-+        { 0xaaaaaaaaaaaaaa9dULL, 0xaaaaaaaaaaaaaa9cULL, },
-+        { 0x684bda12f684bd93ULL, 0x84bda12f684bda04ULL, },
-+        { 0xc71c71c71c71c70eULL, 0x71c71c71c71c71b8ULL, },
-+        { 0x1111111111111102ULL, 0x7777777777777768ULL, },
-+        { 0xe38e38e38e38e37fULL, 0x38e38e38e38e38d4ULL, },
-+        { 0x781948b0fcd6e9d1ULL, 0xc3f35ba781948b00ULL, },
-+        { 0xfffffffffffffff0ULL, 0xfffffffffffffff0ULL, },
-+        { 0x52ba41969e9c6ff0ULL, 0xcd6802158b677f60ULL, },    /*  64  */
-+        { 0x63129bf5b78505f0ULL, 0x1556f7f61c4e5b90ULL, },
-+        { 0x5a4c8855f350a5f0ULL, 0x6a36586fc42edea0ULL, },
-+        { 0x5e6b001b04d82c70ULL, 0xe819332c365e3f20ULL, },
-+        { 0x6ec35a7a1dc0c270ULL, 0x3008290cc7451b50ULL, },
-+        { 0x37152f411fd35230ULL, 0xc7e3b2957c56b340ULL, },
-+        { 0xcc49f1d861667630ULL, 0x1808e0646811cb90ULL, },
-+        { 0xde8a7f544022c1c0ULL, 0x9886bc9978437610ULL, },
-+        { 0xd5c46bb47bee61c0ULL, 0xed661d132023f920ULL, },    /*  72  */
-+        { 0x6af92e4bbd8185c0ULL, 0x3d8b4ae20bdf1170ULL, },
-+        { 0xe4d44869d87d45c0ULL, 0x6409d23bd9c847e0ULL, },
-+        { 0x6e2e9ce94e99c4c0ULL, 0xc30837db04ed7360ULL, },
-+        { 0x724d14ae60214b40ULL, 0x40eb1297771cd3e0ULL, },
-+        { 0x848da22a3edd96d0ULL, 0xc168eecc874e7e60ULL, },
-+        { 0x0de7f6a9b4fa15d0ULL, 0x2067546bb273a9e0ULL, },
-+        { 0xc233bfd40310460cULL, 0x0d9585bacf54c5e0ULL, },
-+        { 0x061015122724c70cULL, 0x0169d01f7cb17f60ULL, },    /*  80  */
-+        { 0x23dacc726f603aacULL, 0xf3ea8c4eaa8b5ce0ULL, },
-+        { 0xd82df953c25380acULL, 0xba87b7f0f99bbb60ULL, },
-+        { 0x546cb94a0c5e7444ULL, 0x3818c320ce1bdf60ULL, },
-+        { 0xa38f9428761ecf44ULL, 0x63113b9e681b66e0ULL, },
-+        { 0x7dc23fbe59fe7924ULL, 0x156ddd68750e6260ULL, },
-+        { 0x8a17717d36df5b24ULL, 0x36b1f5939596d2e0ULL, },
-+        { 0x7e854cd9a677ce2cULL, 0xf2b6202eb36946e0ULL, },
-+        { 0x246d8d067437a72cULL, 0x04c6347e9c1ff460ULL, },    /*  88  */
-+        { 0xc48a013a554339ccULL, 0xcb81fd31acc4a5e0ULL, },
-+        { 0xb971282c0b508fccULL, 0x20d62d6344ce5060ULL, },
-+        { 0x835f812f0bc6a7a4ULL, 0x17bd6b5a08275460ULL, },
-+        { 0xc0ee1b9557ab4aa4ULL, 0x170471a9d22d5fe0ULL, },
-+        { 0xc6f66d89431f7984ULL, 0x5c6f5a646cad3f60ULL, },
-+        { 0x5ae0b289f6ac0b84ULL, 0x6f9f6bc81fdb6be0ULL, },
-+        { 0x2f584ee03fd2014cULL, 0xa7e34ccbd1bc3fe0ULL, },
-+        { 0x5947927731cb724cULL, 0xf76af1f9a05f4160ULL, },    /*  96  */
-+        { 0x68112ad490e3a34cULL, 0x7f944a22f5d630e0ULL, },
-+        { 0x1cf6705c5faa944cULL, 0x801292d47291e660ULL, },
-+        { 0x5519f2782cb0454cULL, 0x3d691c2dd53919e0ULL, },
-+        { 0xe5c979861aac06ecULL, 0x585247d6e899e160ULL, },
-+        { 0x2450b27896665b8cULL, 0x8276d8ad504f46e0ULL, },
-+        { 0x2716d456a4a5ab2cULL, 0x46e1f3460c71c260ULL, },
-+        { 0x5751460331251dccULL, 0xdc1dc7a4a693abe0ULL, },
-+        { 0x3bf387b7f37473ccULL, 0x8efb4ff7cc92de60ULL, },    /* 104  */
-+        { 0xc3103a3df066c9ccULL, 0x7d3b07351cd59ee0ULL, },
-+        { 0x0d612554557c1fccULL, 0x5dbabfc2ac8ed560ULL, },
-+        { 0x1cd018ef103475ccULL, 0xca277277956f49e0ULL, },
-+        { 0x15d520225c2e79a4ULL, 0x08f2025804e95de0ULL, },
-+        { 0x820f9c65be3ea1acULL, 0x37094edbda6ef1e0ULL, },
-+        { 0x0f18515c62838744ULL, 0xcfbd4b5627d005e0ULL, },
-+        { 0x11d549f26502488cULL, 0x8de999d53cdc99e0ULL, },
-     };
- 
-     reset_msa_registers();
-diff --git a/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_msubv_h.c b/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_msubv_h.c
-index 17bccc8..6c059c7 100644
---- a/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_msubv_h.c
-+++ b/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_msubv_h.c
-@@ -43,118 +43,118 @@ int32_t main(void)
- 
-     uint64_t b128_result[TEST_COUNT_TOTAL][2];
-     uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
--        { 0x0000000000000002ULL, 0x0000000000000002ULL, },    /*   0  */
--        { 0x0000000000000002ULL, 0x0000000000000002ULL, },
--        { 0x00000000aaaaaaaeULL, 0x00000000aaaaaaaeULL, },
--        { 0x0000000000000004ULL, 0x0000000000000004ULL, },
--        { 0x000000006666666cULL, 0x000000006666666cULL, },
--        { 0x0000000000000006ULL, 0x0000000000000006ULL, },
--        { 0x000000008e38e395ULL, 0xffffffffe38e38ebULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },    /*   8  */
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x00000000aaaaaab4ULL, 0x00000000aaaaaab4ULL, },    /*  16  */
--        { 0x00000000aaaaaab4ULL, 0x00000000aaaaaab4ULL, },
--        { 0x38e38e3a71c71c7cULL, 0x38e38e3a71c71c7cULL, },
--        { 0x0000000155555560ULL, 0x0000000155555560ULL, },
--        { 0x2222222444444450ULL, 0x2222222444444450ULL, },
--        { 0x000000020000000cULL, 0x000000020000000cULL, },
--        { 0x2f684bdcb425ed16ULL, 0xf684bda397b425faULL, },
--        { 0x00000002aaaaaab8ULL, 0x00000002aaaaaab8ULL, },
--        { 0x000000020000000eULL, 0x000000020000000eULL, },    /*  24  */
--        { 0x000000020000000eULL, 0x000000020000000eULL, },
--        { 0xc71c71c8e38e38f2ULL, 0xc71c71c8e38e38f2ULL, },
--        { 0x0000000155555564ULL, 0x0000000155555564ULL, },
--        { 0xdddddddeccccccdcULL, 0xdddddddeccccccdcULL, },
--        { 0x00000000aaaaaabaULL, 0x00000000aaaaaabaULL, },
--        { 0xd097b42684bda13fULL, 0x097b425ef684bdb1ULL, },
--        { 0x0000000000000010ULL, 0x0000000000000010ULL, },
--        { 0x0000000066666678ULL, 0x0000000066666678ULL, },    /*  32  */
--        { 0x0000000066666678ULL, 0x0000000066666678ULL, },
--        { 0x2222222355555568ULL, 0x2222222355555568ULL, },
--        { 0x00000000cccccce0ULL, 0x00000000cccccce0ULL, },
--        { 0x147ae1491eb85200ULL, 0x147ae1491eb85200ULL, },
--        { 0x0000000133333348ULL, 0x0000000133333348ULL, },
--        { 0x1c71c71e3e93e954ULL, 0xfa4fa4fbb60b60ccULL, },
--        { 0x00000001999999b0ULL, 0x00000001999999b0ULL, },
--        { 0x000000013333334aULL, 0x000000013333334aULL, },    /*  40  */
--        { 0x000000013333334aULL, 0x000000013333334aULL, },
--        { 0xdddddddeeeeeef06ULL, 0xdddddddeeeeeef06ULL, },
--        { 0x00000000cccccce4ULL, 0x00000000cccccce4ULL, },
--        { 0xeb851eb8e147ae2cULL, 0xeb851eb8e147ae2cULL, },
--        { 0x000000006666667eULL, 0x000000006666667eULL, },
--        { 0xe38e38e3e93e9401ULL, 0x05b05b05c71c71dfULL, },
--        { 0x0000000000000018ULL, 0x0000000000000018ULL, },
--        { 0x000000008e38e3a7ULL, 0xffffffffe38e38fdULL, },    /*  48  */
--        { 0x000000008e38e3a7ULL, 0xffffffffe38e38fdULL, },
--        { 0x2f684bdb425ed0b1ULL, 0xf684bda17b425eebULL, },
--        { 0x000000011c71c736ULL, 0xffffffffc71c71e2ULL, },
--        { 0x1c71c71e27d27d42ULL, 0xfa4fa4fa49f49f66ULL, },
--        { 0x00000001aaaaaac5ULL, 0xffffffffaaaaaac7ULL, },
--        { 0x35ba781b4587e6d2ULL, 0x0fcd6e9d6b74f050ULL, },
--        { 0x0000000238e38e54ULL, 0xffffffff8e38e3acULL, },
--        { 0x00000001aaaaaac7ULL, 0xffffffffaaaaaac9ULL, },    /*  56  */
--        { 0x00000001aaaaaac7ULL, 0xffffffffaaaaaac9ULL, },
--        { 0xd097b427a12f6869ULL, 0x097b425ebda12f87ULL, },
--        { 0x000000011c71c73aULL, 0xffffffffc71c71e6ULL, },
--        { 0xe38e38e477777796ULL, 0x05b05b05aaaaaacaULL, },
--        { 0x000000008e38e3adULL, 0xffffffffe38e3903ULL, },
--        { 0xca4587e781948b2fULL, 0xf032916206522c5fULL, },
--        { 0x0000000000000020ULL, 0x0000000000000020ULL, },
--        { 0x3e3ad4ae1266c2b0ULL, 0x1637d725aebdb734ULL, },    /*  64  */
--        { 0x4c74e0d60a3d6d94ULL, 0x1badd2dd9f4dac90ULL, },
--        { 0x6874e8f94205b90cULL, 0x27eb0c41af2c3022ULL, },
--        { 0x42dab657e16f25e8ULL, 0x06d6782e137656f2ULL, },
--        { 0x5114c27fd945d0ccULL, 0x0c4c73e604064c4eULL, },
--        { 0x68a91e898c276755ULL, 0x0f77ad378bdfb302ULL, },
--        { 0x54c82cde41d1cf13ULL, 0x0b6108a5f38e1598ULL, },
--        { 0x6f755d3eddd1234aULL, 0xfbbaace2f5421908ULL, },
--        { 0x8b75656215996ec2ULL, 0x07f7e64705209c9aULL, },    /*  72  */
--        { 0x779473b6cb43d680ULL, 0x03e141b56cceff30ULL, },
--        { 0xa6279a1866fb9f64ULL, 0x2631668db9e53ac1ULL, },
--        { 0x67a1f71bd99e4586ULL, 0x312ec9f6206e6e69ULL, },
--        { 0x4207c47a7907b262ULL, 0x101a35e284b89539ULL, },
--        { 0x5cb4f4db15070699ULL, 0x0073da1f866c98a9ULL, },
--        { 0x1e2f51de87a9acbbULL, 0x0b713d87ecf5cc51ULL, },
--        { 0x721d49ba5f0acfa8ULL, 0x5ba5bbe9afeae691ULL, },
--        { 0x4bcd68690d995de0ULL, 0x771da6b4b6c967ebULL, },    /*  80  */
--        { 0x4ea9a2cfbb5acd7bULL, 0x79dd6a73439e6387ULL, },
--        { 0x47c800b999dd2371ULL, 0x766d25914ef7a7a0ULL, },
--        { 0x41b0fa10eb77cf84ULL, 0x26e85189458965f8ULL, },
--        { 0x1fc448ce062c2944ULL, 0x31f490a9422a80e6ULL, },
--        { 0x211bdfadfd79770eULL, 0x3b25f4cac5763378ULL, },
--        { 0x16fbb87edd87b6f0ULL, 0x57c0b65fabdda20eULL, },
--        { 0x14621091eac4a5f6ULL, 0x4d29a25d32fa9ef6ULL, },
--        { 0x07832ded1c464b02ULL, 0x6396905709e3cfa4ULL, },    /*  88  */
--        { 0x0ff4a84eab8df3b9ULL, 0x6bc9a7d8c6adf2eaULL, },
--        { 0x21e53326bfbd0b05ULL, 0x8f8f3b9c679dff5aULL, },
--        { 0x191ed6a24e1576f9ULL, 0x9e8c2e402760373aULL, },
--        { 0x19b438400fc27751ULL, 0x819c4bbfd3ee6972ULL, },
--        { 0x1e0d5dc1094ae999ULL, 0x7496a289f5eff010ULL, },
--        { 0x11af620b7bc03943ULL, 0x8a11f229836addc7ULL, },
--        { 0x46fa45d0e84440fcULL, 0xe8d2c0211fb042bfULL, },
--        { 0x22142516b5a8adbcULL, 0xe1cf1923e186aad1ULL, },    /*  96  */
--        { 0x066ebbbb4ff6da44ULL, 0xd918d7e6a7e61877ULL, },
--        { 0x100acc9d22839a48ULL, 0xce291932929e367fULL, },
--        { 0x0dfe419d62a62f64ULL, 0xc020fe45a8cf7acfULL, },
--        { 0x2ba79b6ffbf3c63bULL, 0xb428f52c49fce695ULL, },
--        { 0x29b3b85200bdf100ULL, 0xb4ae7ea2f52aa5b9ULL, },
--        { 0x293bb84d6360c0b6ULL, 0xae33b26e4c493c49ULL, },
--        { 0x46a99fdf54f4862dULL, 0xae790dc5055f6f51ULL, },
--        { 0x18480e0fd728c7c3ULL, 0xa000ad7b15f8ebe0ULL, },    /* 104  */
--        { 0x1b8b97aa205e1239ULL, 0x89c78b8909c4a8e5ULL, },
--        { 0x09abb26b05ef649dULL, 0x74242fa1bd49e740ULL, },
--        { 0x04e233bc861d272bULL, 0x9c5343ab30f62f9fULL, },
--        { 0xda2da0d0884dc3d1ULL, 0xb824f201640b4147ULL, },
--        { 0x9d8b22ee1b9a2e0fULL, 0xb642ddf1edb0747fULL, },
--        { 0x7c81956533686a37ULL, 0xdd5181781dc3ad37ULL, },
--        { 0xc60b1905717ff25aULL, 0xe2af726e71ad7ad7ULL, },
-+        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
 +        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },
-+        { 0xaaa9aaa9aaa9aaa9ULL, 0xaaa9aaa9aaa9aaa9ULL, },
 +        { 0xfffefffefffefffeULL, 0xfffefffefffefffeULL, },
-+        { 0xcccacccacccacccaULL, 0xcccacccacccacccaULL, },
++        { 0xfffefffdfffefffeULL, 0xfffdfffefffefffdULL, },
 +        { 0xfffdfffdfffdfffdULL, 0xfffdfffdfffdfffdULL, },
-+        { 0xe38b38e08e35e38bULL, 0x38e08e35e38b38e0ULL, },
++        { 0xfffdfffdfffdfffdULL, 0xfffdfffdfffdfffdULL, },    /*   8  */
++        { 0xfffdfffdfffdfffdULL, 0xfffdfffdfffdfffdULL, },
++        { 0xfffdfffdfffdfffdULL, 0xfffdfffdfffdfffdULL, },
++        { 0xfffdfffdfffdfffdULL, 0xfffdfffdfffdfffdULL, },
++        { 0xfffdfffdfffdfffdULL, 0xfffdfffdfffdfffdULL, },
++        { 0xfffdfffdfffdfffdULL, 0xfffdfffdfffdfffdULL, },
++        { 0xfffdfffdfffdfffdULL, 0xfffdfffdfffdfffdULL, },
++        { 0xfffdfffdfffdfffdULL, 0xfffdfffdfffdfffdULL, },
++        { 0xfffdfffdfffdfffdULL, 0xfffdfffdfffdfffdULL, },    /*  16  */
++        { 0xfffdfffdfffdfffdULL, 0xfffdfffdfffdfffdULL, },
++        { 0x38e138e138e138e1ULL, 0x38e138e138e138e1ULL, },
++        { 0xfffdfffdfffdfffdULL, 0xfffdfffdfffdfffdULL, },
++        { 0x221f221f221f221fULL, 0x221f221f221f221fULL, },
++        { 0xfffcfffcfffcfffcULL, 0xfffcfffcfffcfffcULL, },
++        { 0x12f2da0f4bd712f2ULL, 0xda0f4bd712f2da0fULL, },
++        { 0xfffbfffcfffcfffbULL, 0xfffcfffcfffbfffcULL, },
++        { 0xfffafffbfffbfffaULL, 0xfffbfffbfffafffbULL, },    /*  24  */
++        { 0xfffafffbfffbfffaULL, 0xfffbfffbfffafffbULL, },
++        { 0xc716c717c717c716ULL, 0xc717c717c716c717ULL, },
++        { 0xfff9fffafffafff9ULL, 0xfffafffafff9fffaULL, },
++        { 0xddd6ddd7ddd7ddd6ULL, 0xddd7ddd7ddd6ddd7ULL, },
++        { 0xfff7fff8fff8fff7ULL, 0xfff8fff8fff7fff8ULL, },
++        { 0xed0025e4b41ded00ULL, 0x25e4b41ded0025e4ULL, },
++        { 0xfff5fff6fff6fff5ULL, 0xfff6fff6fff5fff6ULL, },
++        { 0xfff5fff6fff6fff5ULL, 0xfff6fff6fff5fff6ULL, },    /*  32  */
++        { 0xfff5fff6fff6fff5ULL, 0xfff6fff6fff5fff6ULL, },
++        { 0x2217221822182217ULL, 0x2218221822172218ULL, },
++        { 0xfff4fff5fff5fff4ULL, 0xfff5fff5fff4fff5ULL, },
++        { 0x146f14701470146fULL, 0x14701470146f1470ULL, },
++        { 0xfff3fff4fff4fff3ULL, 0xfff4fff4fff3fff4ULL, },
++        { 0x0b53e9322d770b53ULL, 0xe9322d770b53e932ULL, },
++        { 0xfff2fff3fff3fff2ULL, 0xfff3fff3fff2fff3ULL, },
++        { 0xfff1fff2fff2fff1ULL, 0xfff2fff2fff1fff2ULL, },    /*  40  */
++        { 0xfff1fff2fff2fff1ULL, 0xfff2fff2fff1fff2ULL, },
++        { 0xddceddcfddcfddceULL, 0xddcfddcfddceddcfULL, },
++        { 0xffeffff0fff0ffefULL, 0xfff0fff0ffeffff0ULL, },
++        { 0xeb73eb74eb74eb73ULL, 0xeb74eb74eb73eb74ULL, },
++        { 0xffedffeeffeeffedULL, 0xffeeffeeffedffeeULL, },
++        { 0xf48c16afd26af48cULL, 0x16afd26af48c16afULL, },
++        { 0xffecffedffecffecULL, 0xffedffecffecffedULL, },
++        { 0xffecffecffecffecULL, 0xffecffecffecffecULL, },    /*  48  */
++        { 0xffecffecffecffecULL, 0xffecffecffecffecULL, },
++        { 0x12e2d9ff4bc712e2ULL, 0xd9ff4bc712e2d9ffULL, },
++        { 0xffebffebffecffebULL, 0xffebffecffebffebULL, },
++        { 0x0b4be9292d6f0b4bULL, 0xe9292d6f0b4be929ULL, },
++        { 0xffeaffeaffebffeaULL, 0xffeaffebffeaffeaULL, },
++        { 0x063c1932650f063cULL, 0x1932650f063c1932ULL, },
++        { 0xffe9ffe9ffebffe9ULL, 0xffe9ffebffe9ffe9ULL, },
++        { 0xffe8ffe9ffeaffe8ULL, 0xffe9ffeaffe8ffe9ULL, },    /*  56  */
++        { 0xffe8ffe9ffeaffe8ULL, 0xffe9ffeaffe8ffe9ULL, },
++        { 0xecf125d6b40fecf1ULL, 0x25d6b40fecf125d6ULL, },
++        { 0xffe6ffe8ffe8ffe6ULL, 0xffe8ffe8ffe6ffe8ULL, },
++        { 0xf48516a9d264f485ULL, 0x16a9d264f48516a9ULL, },
++        { 0xffe5ffe7ffe6ffe5ULL, 0xffe7ffe6ffe5ffe7ULL, },
++        { 0xf992e69e9ac2f992ULL, 0xe69e9ac2f992e69eULL, },
++        { 0xffe3ffe7ffe4ffe3ULL, 0xffe7ffe4ffe3ffe7ULL, },
++        { 0x6f9c04dd0ca138aaULL, 0x2c5200e6ffe731d8ULL, },    /*  64  */
++        { 0x739604c9251a12b8ULL, 0x377dfac7ffa6fe02ULL, },
++        { 0x7fff14cc0ef4c520ULL, 0x4ef5f5b700a7e6d8ULL, },
++        { 0x171110672cabb158ULL, 0x0bc4eb2201aef931ULL, },
++        { 0x1b0b105345248b66ULL, 0x16efe503016dc55bULL, },
++        { 0x1b2f10537427a4c0ULL, 0x19be0a1804f3fb27ULL, },
++        { 0x1df71014499cd899ULL, 0x1fa528c6f6de1330ULL, },
++        { 0x1a3a10257fffe5d0ULL, 0x0ebe68e9e8780024ULL, },
++        { 0x6860202869d99838ULL, 0x263663d9e979e8faULL, },    /*  72  */
++        { 0x6b281fe93f4ecc11ULL, 0x2c1d7fffdb640103ULL, },
++        { 0x7fff539865cb3619ULL, 0x38847fff139c0bc0ULL, },
++        { 0x369a456c32245120ULL, 0x15027fff4d19033dULL, },
++        { 0xcdac41074fdb3d58ULL, 0xd1d1756a4e201596ULL, },
++        { 0xc9ef41187fff4a8fULL, 0xc0ea7fff3fba028aULL, },
++        { 0x808a32ec4c586596ULL, 0x9d687fff7937fa07ULL, },
++        { 0xe31436ce7fff6c79ULL, 0x030a7fff7fff00c4ULL, },
++        { 0xfe192c037fff7fffULL, 0x04d47fff7e7a0049ULL, },    /*  80  */
++        { 0xfe292c257fff4707ULL, 0x058b3b197fff0078ULL, },
++        { 0xff5c101739ce0661ULL, 0x074420c72b2a009aULL, },
++        { 0xfecc12e4645704e6ULL, 0x00ca02430de90076ULL, },
++        { 0xffeb0f2b7fff0829ULL, 0x014002760dbe002cULL, },
++        { 0xffeb0f367fff0487ULL, 0x016f012210050048ULL, },
++        { 0xfff8058b39ce0068ULL, 0x01e100a00567005cULL, },
++        { 0xfff006826457004fULL, 0x0034000b01bd0046ULL, },
++        { 0xfffe05397fff0083ULL, 0x0052000b01b7001aULL, },    /*  88  */
++        { 0xfffe053d7fff0048ULL, 0x005e000501ff002aULL, },
++        { 0xffff01e839ce0006ULL, 0x007b000200ac0036ULL, },
++        { 0xfffe023d64570004ULL, 0x000d000000370029ULL, },
++        { 0xffff01cc7fff0006ULL, 0x001400000036000fULL, },
++        { 0xffff01cd7fff0003ULL, 0x00160000003e0018ULL, },
++        { 0xffff00a839ce0000ULL, 0x001c00000014001eULL, },
++        { 0xfffe00c564570000ULL, 0x0003000000060017ULL, },
++        { 0xffff009e7fff0000ULL, 0x0004000000050008ULL, },    /*  96  */
++        { 0xffff007e7fff0000ULL, 0x0006000000040003ULL, },
++        { 0xffff00657fff0000ULL, 0x0009000000030001ULL, },
++        { 0xffff00517fff0000ULL, 0x000e000000020000ULL, },
++        { 0xffff00517fff0000ULL, 0x0010000000020000ULL, },
++        { 0xffff00517fff0000ULL, 0x0012000000020000ULL, },
++        { 0xffff00517fff0000ULL, 0x0014000000020000ULL, },
++        { 0xffff00517fff0000ULL, 0x0016000000020000ULL, },
++        { 0xffff001d39ce0000ULL, 0x001c000000000000ULL, },    /* 104  */
++        { 0xffff000a1a1b0000ULL, 0x0024000000000000ULL, },
++        { 0xffff00030bca0000ULL, 0x002f000000000000ULL, },
++        { 0xffff000105530000ULL, 0x003d000000000000ULL, },
++        { 0xfffe0001093d0000ULL, 0x0006000000000000ULL, },
++        { 0xfffc000110090000ULL, 0x0000000000000000ULL, },
++        { 0xfff800011bd50000ULL, 0x0000000000000000ULL, },
++        { 0xfff0000130500000ULL, 0x0000000000000000ULL, },
++};
++
++    reset_msa_registers();
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADD_Q_H(b128_pattern[i], b128_pattern[j],
++                            b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADD_Q_H(b128_random[i], b128_random[j],
++                            b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                         (PATTERN_INPUTS_SHORT_COUNT)) +
++                                        RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADD_Q_H__DDT(b128_random[i], b128_random[j],
++                                 b128_result[
++                                     ((PATTERN_INPUTS_SHORT_COUNT) *
++                                      (PATTERN_INPUTS_SHORT_COUNT)) +
++                                     ((RANDOM_INPUTS_SHORT_COUNT) *
++                                      (RANDOM_INPUTS_SHORT_COUNT)) +
++                                     RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADD_Q_H__DSD(b128_random[i], b128_random[j],
++                                 b128_result[
++                                     ((PATTERN_INPUTS_SHORT_COUNT) *
++                                      (PATTERN_INPUTS_SHORT_COUNT)) +
++                                     (2 * (RANDOM_INPUTS_SHORT_COUNT) *
++                                      (RANDOM_INPUTS_SHORT_COUNT)) +
++                                     RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results_128(isa_ase_name, group_name, instruction_name,
++                            TEST_COUNT_TOTAL, elapsed_time,
++                            &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_madd_q_w.c b/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_madd_q_w.c
+new file mode 100644
+index 0000000..529d60d
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_madd_q_w.c
+@@ -0,0 +1,216 @@
++/*
++ *  Test program for MSA instruction MADD_Q.W
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *  Copyright (C) 2019  RT-RK Computer Based Systems LLC
++ *  Copyright (C) 2019  Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs_128.h"
++#include "../../../../include/test_utils_128.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *isa_ase_name = "MSA";
++    char *group_name = "Fixed Multiply";
++    char *instruction_name =  "MADD_Q.W";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },
++        { 0xfffffffefffffffeULL, 0xfffffffefffffffeULL, },
++        { 0xfffffffefffffffeULL, 0xfffffffdfffffffeULL, },
++        { 0xfffffffdfffffffdULL, 0xfffffffdfffffffdULL, },
++        { 0xfffffffdfffffffdULL, 0xfffffffdfffffffdULL, },    /*   8  */
++        { 0xfffffffdfffffffdULL, 0xfffffffdfffffffdULL, },
++        { 0xfffffffdfffffffdULL, 0xfffffffdfffffffdULL, },
++        { 0xfffffffdfffffffdULL, 0xfffffffdfffffffdULL, },
++        { 0xfffffffdfffffffdULL, 0xfffffffdfffffffdULL, },
++        { 0xfffffffdfffffffdULL, 0xfffffffdfffffffdULL, },
++        { 0xfffffffdfffffffdULL, 0xfffffffdfffffffdULL, },
++        { 0xfffffffdfffffffdULL, 0xfffffffdfffffffdULL, },
++        { 0xfffffffdfffffffdULL, 0xfffffffdfffffffdULL, },    /*  16  */
++        { 0xfffffffdfffffffdULL, 0xfffffffdfffffffdULL, },
++        { 0x38e38e3638e38e36ULL, 0x38e38e3638e38e36ULL, },
++        { 0xfffffffcfffffffcULL, 0xfffffffcfffffffcULL, },
++        { 0x2222221e2222221eULL, 0x2222221e2222221eULL, },
++        { 0xfffffffbfffffffbULL, 0xfffffffbfffffffbULL, },
++        { 0x12f684b94bda12f2ULL, 0xda12f68012f684b9ULL, },
++        { 0xfffffffbfffffffbULL, 0xfffffffbfffffffbULL, },
++        { 0xfffffffafffffffaULL, 0xfffffffafffffffaULL, },    /*  24  */
++        { 0xfffffffafffffffaULL, 0xfffffffafffffffaULL, },
++        { 0xc71c71c0c71c71c0ULL, 0xc71c71c0c71c71c0ULL, },
++        { 0xfffffff8fffffff8ULL, 0xfffffff8fffffff8ULL, },
++        { 0xddddddd5ddddddd5ULL, 0xddddddd5ddddddd5ULL, },
++        { 0xfffffff6fffffff6ULL, 0xfffffff6fffffff6ULL, },
++        { 0xed097b38b425ecffULL, 0x25ed0970ed097b38ULL, },
++        { 0xfffffff5fffffff4ULL, 0xfffffff4fffffff5ULL, },
++        { 0xfffffff5fffffff4ULL, 0xfffffff4fffffff5ULL, },    /*  32  */
++        { 0xfffffff5fffffff4ULL, 0xfffffff4fffffff5ULL, },
++        { 0x2222221722222216ULL, 0x2222221622222217ULL, },
++        { 0xfffffff4fffffff3ULL, 0xfffffff3fffffff4ULL, },
++        { 0x147ae13c147ae13bULL, 0x147ae13b147ae13cULL, },
++        { 0xfffffff4fffffff3ULL, 0xfffffff3fffffff4ULL, },
++        { 0x0b60b5ff2d82d821ULL, 0xe93e93dc0b60b5ffULL, },
++        { 0xfffffff3fffffff3ULL, 0xfffffff3fffffff3ULL, },
++        { 0xfffffff2fffffff2ULL, 0xfffffff2fffffff2ULL, },    /*  40  */
++        { 0xfffffff2fffffff2ULL, 0xfffffff2fffffff2ULL, },
++        { 0xddddddcfddddddcfULL, 0xddddddcfddddddcfULL, },
++        { 0xfffffff0fffffff0ULL, 0xfffffff0fffffff0ULL, },
++        { 0xeb851ea8eb851ea8ULL, 0xeb851ea8eb851ea8ULL, },
++        { 0xffffffefffffffefULL, 0xffffffefffffffefULL, },
++        { 0xf49f49e3d27d27c1ULL, 0x16c16c05f49f49e3ULL, },
++        { 0xffffffeeffffffeeULL, 0xffffffeeffffffeeULL, },
++        { 0xffffffeeffffffeeULL, 0xffffffedffffffeeULL, },    /*  48  */
++        { 0xffffffeeffffffeeULL, 0xffffffedffffffeeULL, },
++        { 0x12f684ac4bda12e5ULL, 0xda12f67212f684acULL, },
++        { 0xffffffeeffffffeeULL, 0xffffffecffffffeeULL, },
++        { 0x0b60b5f92d82d81cULL, 0xe93e93d50b60b5f9ULL, },
++        { 0xffffffedffffffeeULL, 0xffffffebffffffedULL, },
++        { 0x06522c2c6522c3e1ULL, 0x1948b0e706522c2cULL, },
++        { 0xffffffecffffffeeULL, 0xffffffeaffffffecULL, },
++        { 0xffffffebffffffedULL, 0xffffffeaffffffebULL, },    /*  56  */
++        { 0xffffffebffffffedULL, 0xffffffeaffffffebULL, },
++        { 0xed097b2db425ecf6ULL, 0x25ed0965ed097b2dULL, },
++        { 0xffffffeaffffffebULL, 0xffffffe9ffffffeaULL, },
++        { 0xf49f49ded27d27bdULL, 0x16c16c00f49f49deULL, },
++        { 0xffffffe9ffffffeaULL, 0xffffffe9ffffffe9ULL, },
++        { 0xf9add3a99add3bf7ULL, 0xe6b74eecf9add3a9ULL, },
++        { 0xffffffe8ffffffe8ULL, 0xffffffe8ffffffe8ULL, },
++        { 0x6fb7e8710cbdc0baULL, 0x2c6b142e000499ecULL, },    /*  64  */
++        { 0x73b239bf253787bbULL, 0x379780d7ffc424b2ULL, },
++        { 0x7fffffff0f12777aULL, 0x4f10996a00c57ee6ULL, },
++        { 0x1713a7162cca6b1fULL, 0x0be04dd301cca255ULL, },
++        { 0x1b0df86445443220ULL, 0x170cba7c018c2d1bULL, },
++        { 0x1b323a657448a831ULL, 0x19dc4690051313a9ULL, },
++        { 0x1dfa85ec49be7952ULL, 0x1fc3e11af6fe2ffbULL, },
++        { 0x1a3e24c87fffffffULL, 0x0edd19b6e8983fd8ULL, },
++        { 0x6863454e69daefbeULL, 0x26563249e9999a0cULL, },    /*  72  */
++        { 0x6b2b90d53f50c0dfULL, 0x2c3dccd3db84b65eULL, },
++        { 0x7fffffff65cdd2a2ULL, 0x38a5553713bd77aaULL, },
++        { 0x369baa383226e26fULL, 0x1523c32e4d39d083ULL, },
++        { 0xcdaf514f4fded614ULL, 0xd1f377974e40f3f2ULL, },
++        { 0xc9f2f02b7fffffffULL, 0xc10cb0333fdb03cfULL, },
++        { 0x808e9a644c590fccULL, 0x9d8b1e2a79575ca8ULL, },
++        { 0xe31932487fffffffULL, 0x032ce40b7fffffffULL, },
++        { 0xfe196fe57fffffffULL, 0x050bc0117e7bb00bULL, },    /*  80  */
++        { 0xfe299f467fffffffULL, 0x05cb2b207fffffffULL, },
++        { 0xff5d018239cf8b7fULL, 0x0798e21e2b2b2513ULL, },
++        { 0xfecdfe1e645a7d99ULL, 0x00d3dcf00dea608dULL, },
++        { 0xffebe0507fffffffULL, 0x0150aaf30dc02967ULL, },
++        { 0xffec8bad7fffffffULL, 0x01828e9310087db0ULL, },
++        { 0xfff9423b39cf8b7fULL, 0x01fae4ad056841b8ULL, },
++        { 0xfff35804645a7d99ULL, 0x003737ba01be3861ULL, },
++        { 0xffff2aee7fffffffULL, 0x0057bed401b8eeafULL, },    /*  88  */
++        { 0xffff32047fffffffULL, 0x0064bf7c02021ffbULL, },
++        { 0xffffb89f39cf8b7fULL, 0x00841c7300ad6409ULL, },
++        { 0xffff79fe645a7d99ULL, 0x000e642e0037e4a5ULL, },
++        { 0xfffff72f7fffffffULL, 0x0016de7600373b15ULL, },
++        { 0xfffff77a7fffffffULL, 0x001a420100406619ULL, },
++        { 0xfffffd0b39cf8b7fULL, 0x00226e950015b801ULL, },
++        { 0xfffffa72645a7d99ULL, 0x0003c03400070049ULL, },
++        { 0xffffffa27fffffffULL, 0x0005f5d70006eb0bULL, },    /*  96  */
++        { 0xfffffff97fffffffULL, 0x000978af0006d60eULL, },
++        { 0xffffffff7fffffffULL, 0x000f0d050006c150ULL, },
++        { 0xffffffff7fffffffULL, 0x0017eac30006acd1ULL, },
++        { 0xffffffff7fffffffULL, 0x001b76100007c878ULL, },
++        { 0xffffffff7fffffffULL, 0x001f87d000091335ULL, },
++        { 0xffffffff7fffffffULL, 0x002433ef000a94d9ULL, },
++        { 0xffffffff7fffffffULL, 0x0029914d000c5680ULL, },
++        { 0xffffffff39cf8b7fULL, 0x003681f800042937ULL, },    /* 104  */
++        { 0xffffffff1a1c28c3ULL, 0x004779e10001673fULL, },
++        { 0xffffffff0bcae025ULL, 0x005dba1000007928ULL, },
++        { 0xffffffff055376c1ULL, 0x007ae77c000028dcULL, },
++        { 0xfffffffe093ed554ULL, 0x000d636d00000d2bULL, },
++        { 0xfffffffc100c9463ULL, 0x0001755c0000043eULL, },
++        { 0xfffffff81bdc128cULL, 0x000028ab0000015eULL, },
++        { 0xfffffff0305c8babULL, 0x0000046e00000070ULL, },
++};
++
++    reset_msa_registers();
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADD_Q_W(b128_pattern[i], b128_pattern[j],
++                            b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADD_Q_W(b128_random[i], b128_random[j],
++                            b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                         (PATTERN_INPUTS_SHORT_COUNT)) +
++                                        RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADD_Q_W__DDT(b128_random[i], b128_random[j],
++                                 b128_result[
++                                     ((PATTERN_INPUTS_SHORT_COUNT) *
++                                      (PATTERN_INPUTS_SHORT_COUNT)) +
++                                     ((RANDOM_INPUTS_SHORT_COUNT) *
++                                      (RANDOM_INPUTS_SHORT_COUNT)) +
++                                     RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADD_Q_W__DSD(b128_random[i], b128_random[j],
++                                 b128_result[
++                                     ((PATTERN_INPUTS_SHORT_COUNT) *
++                                      (PATTERN_INPUTS_SHORT_COUNT)) +
++                                     (2 * (RANDOM_INPUTS_SHORT_COUNT) *
++                                      (RANDOM_INPUTS_SHORT_COUNT)) +
++                                     RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results_128(isa_ase_name, group_name, instruction_name,
++                            TEST_COUNT_TOTAL, elapsed_time,
++                            &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_maddr_q_h.c b/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_maddr_q_h.c
+new file mode 100644
+index 0000000..a4713f2
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_maddr_q_h.c
+@@ -0,0 +1,216 @@
++/*
++ *  Test program for MSA instruction MADDR_Q.H
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *  Copyright (C) 2019  RT-RK Computer Based Systems LLC
++ *  Copyright (C) 2019  Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs_128.h"
++#include "../../../../include/test_utils_128.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *isa_ase_name = "MSA";
++    char *group_name = "Fixed Multiply";
++    char *instruction_name =  "MADDR_Q.H";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0001000100010001ULL, 0x0001000100010001ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000010000ULL, 0x0000000100000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0001000100010001ULL, 0x0001000100010001ULL, },    /*  16  */
++        { 0x0001000100010001ULL, 0x0001000100010001ULL, },
++        { 0x38e538e538e538e5ULL, 0x38e538e538e538e5ULL, },
++        { 0x0001000100010001ULL, 0x0001000100010001ULL, },
++        { 0x2224222422242224ULL, 0x2224222422242224ULL, },
++        { 0x0002000200020002ULL, 0x0002000200020002ULL, },
++        { 0x12f9da154bdd12f9ULL, 0xda154bdd12f9da15ULL, },
++        { 0x0003000300020003ULL, 0x0003000200030003ULL, },
++        { 0x0002000200010002ULL, 0x0002000100020002ULL, },    /*  24  */
++        { 0x0002000200010002ULL, 0x0002000100020002ULL, },
++        { 0xc71ec71ec71dc71eULL, 0xc71ec71dc71ec71eULL, },
++        { 0x0001000100000001ULL, 0x0001000000010001ULL, },
++        { 0xdddedddedddddddeULL, 0xdddedddddddedddeULL, },
++        { 0x00000000ffff0000ULL, 0x0000ffff00000000ULL, },
++        { 0xed0925edb425ed09ULL, 0x25edb425ed0925edULL, },
++        { 0xffff0000ffffffffULL, 0x0000ffffffff0000ULL, },
++        { 0xffff0000ffffffffULL, 0x0000ffffffff0000ULL, },    /*  32  */
++        { 0xffff0000ffffffffULL, 0x0000ffffffff0000ULL, },
++        { 0x2222222322222222ULL, 0x2223222222222223ULL, },
++        { 0xffff0000ffffffffULL, 0x0000ffffffff0000ULL, },
++        { 0x147b147c147b147bULL, 0x147c147b147b147cULL, },
++        { 0x0000000100000000ULL, 0x0001000000000001ULL, },
++        { 0x0b61e93f2d840b61ULL, 0xe93f2d840b61e93fULL, },
++        { 0x0000000100000000ULL, 0x0001000000000001ULL, },
++        { 0x0000000100000000ULL, 0x0001000000000001ULL, },    /*  40  */
++        { 0x0000000100000000ULL, 0x0001000000000001ULL, },
++        { 0xdddedddfdddedddeULL, 0xdddfdddedddedddfULL, },
++        { 0x0000000100000000ULL, 0x0001000000000001ULL, },
++        { 0xeb85eb86eb85eb85ULL, 0xeb86eb85eb85eb86ULL, },
++        { 0x0000000100000000ULL, 0x0001000000000001ULL, },
++        { 0xf49f16c2d27df49fULL, 0x16c2d27df49f16c2ULL, },
++        { 0xffff00000000ffffULL, 0x00000000ffff0000ULL, },
++        { 0xffff00000001ffffULL, 0x00000001ffff0000ULL, },    /*  48  */
++        { 0xffff00000001ffffULL, 0x00000001ffff0000ULL, },
++        { 0x12f6da134bdc12f6ULL, 0xda134bdc12f6da13ULL, },
++        { 0xffff00000002ffffULL, 0x00000002ffff0000ULL, },
++        { 0x0b60e93e2d860b60ULL, 0xe93e2d860b60e93eULL, },
++        { 0xffffffff0003ffffULL, 0xffff0003ffffffffULL, },
++        { 0x0651194765270651ULL, 0x1947652706511947ULL, },
++        { 0xfffffffe0004ffffULL, 0xfffe0004fffffffeULL, },
++        { 0xfffffffe0003ffffULL, 0xfffe0003fffffffeULL, },    /*  56  */
++        { 0xfffffffe0003ffffULL, 0xfffe0003fffffffeULL, },
++        { 0xed0925ecb428ed09ULL, 0x25ecb428ed0925ecULL, },
++        { 0xffffffff0002ffffULL, 0xffff0002ffffffffULL, },
++        { 0xf49e16c1d27ef49eULL, 0x16c1d27ef49e16c1ULL, },
++        { 0xfffeffff0001fffeULL, 0xffff0001fffeffffULL, },
++        { 0xf9ace6b69adef9acULL, 0xe6b69adef9ace6b6ULL, },
++        { 0xfffeffff0001fffeULL, 0xffff0001fffeffffULL, },
++        { 0x6fb804f50cbf38c5ULL, 0x2c6a0103000331f0ULL, },    /*  64  */
++        { 0x73b204e2253812d4ULL, 0x3796fae5ffc2fe1aULL, },
++        { 0x7fff14e60f13c53dULL, 0x4f0ff5d500c4e6f1ULL, },
++        { 0x171210822ccab176ULL, 0x0bdeeb4001ccf94aULL, },
++        { 0x1b0c106f45438b85ULL, 0x170ae522018bc574ULL, },
++        { 0x1b30106f7447a4e0ULL, 0x19d90a380512fb41ULL, },
++        { 0x1df8103049bdd8baULL, 0x1fc028e7f6fd134bULL, },
++        { 0x1a3c10417fffe5f1ULL, 0x0eda690ae8970040ULL, },
++        { 0x6862204569da985aULL, 0x265363fae999e917ULL, },    /*  72  */
++        { 0x6b2a20063f50cc34ULL, 0x2c3a7fffdb840121ULL, },
++        { 0x7fff53b565ce363dULL, 0x38a17fff13bd0bdfULL, },
++        { 0x369a458932275144ULL, 0x15207fff4d3a035dULL, },
++        { 0xcdad41254fde3d7dULL, 0xd1ef756a4e4215b6ULL, },
++        { 0xc9f141367fff4ab4ULL, 0xc1097fff3fdc02abULL, },
++        { 0x808c330a4c5865bbULL, 0x9d887fff7959fa29ULL, },
++        { 0xe31636ed7fff6c9fULL, 0x032b7fff7fff00e7ULL, },
++        { 0xfe192c1c7fff7fffULL, 0x05097fff7e7a0057ULL, },    /*  80  */
++        { 0xfe292c3e7fff4707ULL, 0x05c83b1a7fff008fULL, },
++        { 0xff5d102139cf0662ULL, 0x079520c82b2b00b8ULL, },
++        { 0xfece12f0645904e7ULL, 0x00d302440dea008eULL, },
++        { 0xffec0f357fff082bULL, 0x014f02780dc00035ULL, },
++        { 0xffed0f417fff0488ULL, 0x0181012410080057ULL, },
++        { 0xfff9059039cf0068ULL, 0x01f900a205680070ULL, },
++        { 0xfff3068864590050ULL, 0x0037000b01be0056ULL, },
++        { 0xffff053f7fff0085ULL, 0x0057000c01b90020ULL, },    /*  88  */
++        { 0xffff05437fff004aULL, 0x0064000602020035ULL, },
++        { 0x000001eb39cf0007ULL, 0x0083000300ad0044ULL, },
++        { 0x0000024164590005ULL, 0x000e000000380034ULL, },
++        { 0x000001cf7fff0008ULL, 0x0016000000370014ULL, },
++        { 0x000001d07fff0004ULL, 0x0019000000400021ULL, },
++        { 0x000000a939cf0000ULL, 0x002100000016002bULL, },
++        { 0x000000c664590000ULL, 0x0004000000070021ULL, },
++        { 0x0000009f7fff0000ULL, 0x000600000007000cULL, },    /*  96  */
++        { 0x000000807fff0000ULL, 0x000a000000070005ULL, },
++        { 0x000000677fff0000ULL, 0x0010000000070002ULL, },
++        { 0x000000537fff0000ULL, 0x0019000000070001ULL, },
++        { 0x000000537fff0000ULL, 0x001d000000080002ULL, },
++        { 0x000000537fff0000ULL, 0x0021000000090003ULL, },
++        { 0x000000537fff0000ULL, 0x00260000000a0005ULL, },
++        { 0x000000537fff0000ULL, 0x002c0000000c0008ULL, },
++        { 0x0000001e39cf0000ULL, 0x003a00000004000aULL, },    /* 104  */
++        { 0x0000000b1a1c0000ULL, 0x004c00000001000dULL, },
++        { 0x000000040bcb0000ULL, 0x0064000000000011ULL, },
++        { 0x0000000105530000ULL, 0x0083000000000016ULL, },
++        { 0x00000001093e0000ULL, 0x000e000000000011ULL, },
++        { 0x00000001100b0000ULL, 0x000200000000000dULL, },
++        { 0x000000011bd90000ULL, 0x000000000000000aULL, },
++        { 0x0000000130570000ULL, 0x0000000000000008ULL, },
++};
++
++    reset_msa_registers();
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADDR_Q_H(b128_pattern[i], b128_pattern[j],
++                             b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADDR_Q_H(b128_random[i], b128_random[j],
++                             b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                          (PATTERN_INPUTS_SHORT_COUNT)) +
++                                         RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADDR_Q_H__DDT(b128_random[i], b128_random[j],
++                                  b128_result[
++                                      ((PATTERN_INPUTS_SHORT_COUNT) *
++                                       (PATTERN_INPUTS_SHORT_COUNT)) +
++                                      ((RANDOM_INPUTS_SHORT_COUNT) *
++                                       (RANDOM_INPUTS_SHORT_COUNT)) +
++                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADDR_Q_H__DSD(b128_random[i], b128_random[j],
++                                  b128_result[
++                                      ((PATTERN_INPUTS_SHORT_COUNT) *
++                                       (PATTERN_INPUTS_SHORT_COUNT)) +
++                                      (2 * (RANDOM_INPUTS_SHORT_COUNT) *
++                                       (RANDOM_INPUTS_SHORT_COUNT)) +
++                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results_128(isa_ase_name, group_name, instruction_name,
++                            TEST_COUNT_TOTAL, elapsed_time,
++                            &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_maddr_q_w.c b/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_maddr_q_w.c
+new file mode 100644
+index 0000000..19eccbf
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_maddr_q_w.c
+@@ -0,0 +1,216 @@
++/*
++ *  Test program for MSA instruction MADDR_Q.W
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *  Copyright (C) 2019  RT-RK Computer Based Systems LLC
++ *  Copyright (C) 2019  Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs_128.h"
++#include "../../../../include/test_utils_128.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *isa_ase_name = "MSA";
++    char *group_name = "Fixed Multiply";
++    char *instruction_name =  "MADDR_Q.W";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000100000001ULL, 0x0000000100000001ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000001ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000100000001ULL, 0x0000000100000001ULL, },    /*  16  */
++        { 0x0000000100000001ULL, 0x0000000100000001ULL, },
++        { 0x38e38e3b38e38e3bULL, 0x38e38e3b38e38e3bULL, },
++        { 0x0000000200000002ULL, 0x0000000200000002ULL, },
++        { 0x2222222522222225ULL, 0x2222222522222225ULL, },
++        { 0x0000000300000003ULL, 0x0000000300000003ULL, },
++        { 0x12f684c14bda12faULL, 0xda12f68812f684c1ULL, },
++        { 0x0000000400000003ULL, 0x0000000400000004ULL, },
++        { 0x0000000300000002ULL, 0x0000000300000003ULL, },    /*  24  */
++        { 0x0000000300000002ULL, 0x0000000300000003ULL, },
++        { 0xc71c71cac71c71c9ULL, 0xc71c71cac71c71caULL, },
++        { 0x0000000200000001ULL, 0x0000000200000002ULL, },
++        { 0xdddddddfdddddddeULL, 0xdddddddfdddddddfULL, },
++        { 0x0000000100000000ULL, 0x0000000100000001ULL, },
++        { 0xed097b43b425ed0aULL, 0x25ed097ced097b43ULL, },
++        { 0x0000000000000000ULL, 0x0000000100000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000100000000ULL, },    /*  32  */
++        { 0x0000000000000000ULL, 0x0000000100000000ULL, },
++        { 0x2222222322222223ULL, 0x2222222422222223ULL, },
++        { 0x0000000000000000ULL, 0x0000000100000000ULL, },
++        { 0x147ae148147ae148ULL, 0x147ae149147ae148ULL, },
++        { 0x0000000000000000ULL, 0x0000000100000000ULL, },
++        { 0x0b60b60c2d82d82eULL, 0xe93e93ea0b60b60cULL, },
++        { 0x0000000100000000ULL, 0x0000000100000001ULL, },
++        { 0x0000000100000000ULL, 0x0000000100000001ULL, },    /*  40  */
++        { 0x0000000100000000ULL, 0x0000000100000001ULL, },
++        { 0xdddddddfdddddddeULL, 0xdddddddfdddddddfULL, },
++        { 0x0000000100000000ULL, 0x0000000100000001ULL, },
++        { 0xeb851eb9eb851eb8ULL, 0xeb851eb9eb851eb9ULL, },
++        { 0x0000000100000000ULL, 0x0000000100000001ULL, },
++        { 0xf49f49f5d27d27d3ULL, 0x16c16c17f49f49f5ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000001ULL, 0x0000000000000000ULL, },    /*  48  */
++        { 0x0000000000000001ULL, 0x0000000000000000ULL, },
++        { 0x12f684be4bda12f8ULL, 0xda12f68512f684beULL, },
++        { 0x0000000000000002ULL, 0x0000000000000000ULL, },
++        { 0x0b60b60c2d82d830ULL, 0xe93e93e90b60b60cULL, },
++        { 0x0000000000000003ULL, 0xffffffff00000000ULL, },
++        { 0x06522c3f6522c3f7ULL, 0x1948b0fb06522c3fULL, },
++        { 0x0000000000000004ULL, 0xffffffff00000000ULL, },
++        { 0x0000000000000003ULL, 0xffffffff00000000ULL, },    /*  56  */
++        { 0x0000000000000003ULL, 0xffffffff00000000ULL, },
++        { 0xed097b43b425ed0cULL, 0x25ed097bed097b43ULL, },
++        { 0x0000000000000002ULL, 0x0000000000000000ULL, },
++        { 0xf49f49f5d27d27d4ULL, 0x16c16c17f49f49f5ULL, },
++        { 0x0000000000000001ULL, 0x0000000000000000ULL, },
++        { 0xf9add3c19add3c0eULL, 0xe6b74f04f9add3c1ULL, },
++        { 0x0000000000000000ULL, 0x0000000100000000ULL, },
++        { 0x6fb7e8890cbdc0d3ULL, 0x2c6b144700049a05ULL, },    /*  64  */
++        { 0x73b239d7253787d5ULL, 0x379780f0ffc424ccULL, },
++        { 0x7fffffff0f127795ULL, 0x4f10998300c57f01ULL, },
++        { 0x1713a7162cca6b3bULL, 0x0be04ded01cca270ULL, },
++        { 0x1b0df8644544323dULL, 0x170cba96018c2d37ULL, },
++        { 0x1b323a657448a84fULL, 0x19dc46aa051313c6ULL, },
++        { 0x1dfa85ed49be7970ULL, 0x1fc3e135f6fe3018ULL, },
++        { 0x1a3e24ca7fffffffULL, 0x0edd19d1e8983ff6ULL, },
++        { 0x6863455169daefbfULL, 0x26563264e9999a2bULL, },    /*  72  */
++        { 0x6b2b90d93f50c0e0ULL, 0x2c3dccefdb84b67dULL, },
++        { 0x7fffffff65cdd2a4ULL, 0x38a5555313bd77c9ULL, },
++        { 0x369baa393226e271ULL, 0x1523c34a4d39d0a3ULL, },
++        { 0xcdaf51504fded617ULL, 0xd1f377b44e40f412ULL, },
++        { 0xc9f2f02d7fffffffULL, 0xc10cb0503fdb03f0ULL, },
++        { 0x808e9a674c590fccULL, 0x9d8b1e4779575ccaULL, },
++        { 0xe319324b7fffffffULL, 0x032ce4297fffffffULL, },
++        { 0xfe196fe67fffffffULL, 0x050bc0417e7bb00bULL, },    /*  80  */
++        { 0xfe299f487fffffffULL, 0x05cb2b577fffffffULL, },
++        { 0xff5d018339cf8b80ULL, 0x0798e2662b2b2514ULL, },
++        { 0xfecdfe20645a7d9bULL, 0x00d3dcf80dea608eULL, },
++        { 0xffebe0517fffffffULL, 0x0150ab000dc02968ULL, },
++        { 0xffec8baf7fffffffULL, 0x01828ea210087db2ULL, },
++        { 0xfff9423c39cf8b80ULL, 0x01fae4c1056841b9ULL, },
++        { 0xfff35806645a7d9bULL, 0x003737bc01be3862ULL, },
++        { 0xffff2aee7fffffffULL, 0x0057bed801b8eeb0ULL, },    /*  88  */
++        { 0xffff32047fffffffULL, 0x0064bf8102021ffcULL, },
++        { 0xffffb89f39cf8b80ULL, 0x00841c7a00ad640aULL, },
++        { 0xffff79fe645a7d9bULL, 0x000e642f0037e4a6ULL, },
++        { 0xfffff7307fffffffULL, 0x0016de7800373b16ULL, },
++        { 0xfffff77b7fffffffULL, 0x001a42040040661aULL, },
++        { 0xfffffd0c39cf8b80ULL, 0x00226e990015b802ULL, },
++        { 0xfffffa75645a7d9bULL, 0x0003c0350007004aULL, },
++        { 0xffffffa37fffffffULL, 0x0005f5d90006eb0dULL, },    /*  96  */
++        { 0xfffffffa7fffffffULL, 0x000978b30006d610ULL, },
++        { 0x000000007fffffffULL, 0x000f0d0c0006c153ULL, },
++        { 0x000000007fffffffULL, 0x0017eacf0006acd5ULL, },
++        { 0x000000007fffffffULL, 0x001b761e0007c87dULL, },
++        { 0x000000007fffffffULL, 0x001f87e00009133bULL, },
++        { 0x000000007fffffffULL, 0x00243402000a94e0ULL, },
++        { 0x000000007fffffffULL, 0x00299164000c5689ULL, },
++        { 0x0000000039cf8b80ULL, 0x003682160004293bULL, },    /* 104  */
++        { 0x000000001a1c28c4ULL, 0x00477a0900016741ULL, },
++        { 0x000000000bcae026ULL, 0x005dba4500007929ULL, },
++        { 0x00000000055376c2ULL, 0x007ae7c2000028ddULL, },
++        { 0x00000000093ed557ULL, 0x000d637500000d2cULL, },
++        { 0x00000000100c9469ULL, 0x0001755d0000043fULL, },
++        { 0x000000001bdc1297ULL, 0x000028ac0000015eULL, },
++        { 0x00000000305c8bbfULL, 0x0000046e00000071ULL, },
++};
++
++    reset_msa_registers();
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADDR_Q_W(b128_pattern[i], b128_pattern[j],
++                             b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADDR_Q_W(b128_random[i], b128_random[j],
++                             b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                          (PATTERN_INPUTS_SHORT_COUNT)) +
++                                         RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADDR_Q_W__DDT(b128_random[i], b128_random[j],
++                                  b128_result[
++                                      ((PATTERN_INPUTS_SHORT_COUNT) *
++                                       (PATTERN_INPUTS_SHORT_COUNT)) +
++                                      ((RANDOM_INPUTS_SHORT_COUNT) *
++                                       (RANDOM_INPUTS_SHORT_COUNT)) +
++                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADDR_Q_W__DSD(b128_random[i], b128_random[j],
++                                  b128_result[
++                                      ((PATTERN_INPUTS_SHORT_COUNT) *
++                                       (PATTERN_INPUTS_SHORT_COUNT)) +
++                                      (2 * (RANDOM_INPUTS_SHORT_COUNT) *
++                                       (RANDOM_INPUTS_SHORT_COUNT)) +
++                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results_128(isa_ase_name, group_name, instruction_name,
++                            TEST_COUNT_TOTAL, elapsed_time,
++                            &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_msub_q_h.c b/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_msub_q_h.c
+new file mode 100644
+index 0000000..b584736
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_msub_q_h.c
+@@ -0,0 +1,216 @@
++/*
++ *  Test program for MSA instruction MSUB_Q.H
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *  Copyright (C) 2019  RT-RK Computer Based Systems LLC
++ *  Copyright (C) 2019  Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs_128.h"
++#include "../../../../include/test_utils_128.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *isa_ase_name = "MSA";
++    char *group_name = "Fixed Multiply";
++    char *instruction_name =  "MSUB_Q.H";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },
++        { 0xfffefffefffefffeULL, 0xfffefffefffefffeULL, },
++        { 0xfffefffefffefffeULL, 0xfffefffefffefffeULL, },
++        { 0xfffdfffdfffdfffdULL, 0xfffdfffdfffdfffdULL, },
++        { 0xfffdfffdfffdfffdULL, 0xfffdfffdfffdfffdULL, },
++        { 0xfffcfffdfffcfffcULL, 0xfffdfffcfffcfffdULL, },
 +        { 0xfffcfffcfffcfffcULL, 0xfffcfffcfffcfffcULL, },
 +        { 0xfffcfffcfffcfffcULL, 0xfffcfffcfffcfffcULL, },    /*   8  */
 +        { 0xfffcfffcfffcfffcULL, 0xfffcfffcfffcfffcULL, },
@@ -1629,232 +1098,219 @@ index 17bccc8..6c059c7 100644
 +        { 0xfffcfffcfffcfffcULL, 0xfffcfffcfffcfffcULL, },
 +        { 0xfffcfffcfffcfffcULL, 0xfffcfffcfffcfffcULL, },
 +        { 0xfffcfffcfffcfffcULL, 0xfffcfffcfffcfffcULL, },
-+        { 0xaaa6aaa6aaa6aaa6ULL, 0xaaa6aaa6aaa6aaa6ULL, },    /*  16  */
-+        { 0xaaa6aaa6aaa6aaa6ULL, 0xaaa6aaa6aaa6aaa6ULL, },
-+        { 0x71c271c271c271c2ULL, 0x71c271c271c271c2ULL, },
-+        { 0x5550555055505550ULL, 0x5550555055505550ULL, },
-+        { 0xddd8ddd8ddd8ddd8ULL, 0xddd8ddd8ddd8ddd8ULL, },
-+        { 0xfffafffafffafffaULL, 0xfffafffafffafffaULL, },
-+        { 0x97ae7b3c5eca97aeULL, 0x7b3c5eca97ae7b3cULL, },
-+        { 0xaaa4aaa4aaa4aaa4ULL, 0xaaa4aaa4aaa4aaa4ULL, },
-+        { 0xfff9fff9fff9fff9ULL, 0xfff9fff9fff9fff9ULL, },    /*  24  */
++        { 0xfffbfffbfffbfffbULL, 0xfffbfffbfffbfffbULL, },    /*  16  */
++        { 0xfffbfffbfffbfffbULL, 0xfffbfffbfffbfffbULL, },
++        { 0xc716c716c716c716ULL, 0xc716c716c716c716ULL, },
 +        { 0xfff9fff9fff9fff9ULL, 0xfff9fff9fff9fff9ULL, },
-+        { 0xe387e387e387e387ULL, 0xe387e387e387e387ULL, },
-+        { 0x554e554e554e554eULL, 0x554e554e554e554eULL, },
-+        { 0x9992999299929992ULL, 0x9992999299929992ULL, },
-+        { 0xaaa3aaa3aaa3aaa3ULL, 0xaaa3aaa3aaa3aaa3ULL, },
-+        { 0xf67d6844da0bf67dULL, 0x6844da0bf67d6844ULL, },
++        { 0xddd6ddd6ddd6ddd6ULL, 0xddd6ddd6ddd6ddd6ULL, },
 +        { 0xfff8fff8fff8fff8ULL, 0xfff8fff8fff8fff8ULL, },
-+        { 0xccc4ccc4ccc4ccc4ULL, 0xccc4ccc4ccc4ccc4ULL, },    /*  32  */
-+        { 0xccc4ccc4ccc4ccc4ULL, 0xccc4ccc4ccc4ccc4ULL, },
-+        { 0x554c554c554c554cULL, 0x554c554c554c554cULL, },
-+        { 0x9990999099909990ULL, 0x9990999099909990ULL, },
-+        { 0xd700d700d700d700ULL, 0xd700d700d700d700ULL, },
-+        { 0x665c665c665c665cULL, 0x665c665c665c665cULL, },
-+        { 0xe9342d7871bce934ULL, 0x2d7871bce9342d78ULL, },
-+        { 0x3328332833283328ULL, 0x3328332833283328ULL, },
-+        { 0x665b665b665b665bULL, 0x665b665b665b665bULL, },    /*  40  */
-+        { 0x665b665b665b665bULL, 0x665b665b665b665bULL, },
-+        { 0x887d887d887d887dULL, 0x887d887d887d887dULL, },
-+        { 0x998e998e998e998eULL, 0x998e998e998e998eULL, },
-+        { 0x28ea28ea28ea28eaULL, 0x28ea28ea28ea28eaULL, },
-+        { 0xccc1ccc1ccc1ccc1ULL, 0xccc1ccc1ccc1ccc1ULL, },
-+        { 0x2d773e884f992d77ULL, 0x3e884f992d773e88ULL, },
-+        { 0xfff4fff4fff4fff4ULL, 0xfff4fff4fff4fff4ULL, },
-+        { 0xe38238d78e2ce382ULL, 0x38d78e2ce38238d7ULL, },    /*  48  */
-+        { 0xe38238d78e2ce382ULL, 0x38d78e2ce38238d7ULL, },
-+        { 0x7b36b419ecfc7b36ULL, 0xb419ecfc7b36b419ULL, },
-+        { 0xc71071ba1c64c710ULL, 0x71ba1c64c71071baULL, },
-+        { 0x49e838d627c449e8ULL, 0x38d627c449e838d6ULL, },
-+        { 0xaa9eaa9daa9caa9eULL, 0xaa9daa9caa9eaa9dULL, },
-+        { 0x87da91547e5c87daULL, 0x91547e5c87da9154ULL, },
-+        { 0x8e2ce38038d48e2cULL, 0xe38038d48e2ce380ULL, },
-+        { 0xaa9daa9caa9baa9dULL, 0xaa9caa9baa9daa9cULL, },    /*  56  */
-+        { 0xaa9daa9caa9baa9dULL, 0xaa9caa9baa9daa9cULL, },
-+        { 0xbd93da04f675bd93ULL, 0xda04f675bd93da04ULL, },
-+        { 0xc70e71b81c62c70eULL, 0x71b81c62c70e71b8ULL, },
-+        { 0x11027768ddce1102ULL, 0x7768ddce11027768ULL, },
-+        { 0xe37f38d48e29e37fULL, 0x38d48e29e37f38d4ULL, },
-+        { 0xe9d18b0048a1e9d1ULL, 0x8b0048a1e9d18b00ULL, },
++        { 0xed0125e4b41ced01ULL, 0x25e4b41ced0125e4ULL, },
++        { 0xfff7fff6fff6fff7ULL, 0xfff6fff6fff7fff6ULL, },
++        { 0xfff7fff6fff6fff7ULL, 0xfff6fff6fff7fff6ULL, },    /*  24  */
++        { 0xfff7fff6fff6fff7ULL, 0xfff6fff6fff7fff6ULL, },
++        { 0x38da38d938d938daULL, 0x38d938d938da38d9ULL, },
++        { 0xfff6fff5fff5fff6ULL, 0xfff5fff5fff6fff5ULL, },
++        { 0x2218221722172218ULL, 0x2217221722182217ULL, },
++        { 0xfff6fff5fff5fff6ULL, 0xfff5fff5fff6fff5ULL, },
++        { 0x12ecda084bcf12ecULL, 0xda084bcf12ecda08ULL, },
++        { 0xfff6fff5fff5fff6ULL, 0xfff5fff5fff6fff5ULL, },
++        { 0xfff5fff4fff4fff5ULL, 0xfff4fff4fff5fff4ULL, },    /*  32  */
++        { 0xfff5fff4fff4fff5ULL, 0xfff4fff4fff5fff4ULL, },
++        { 0xddd2ddd1ddd1ddd2ULL, 0xddd1ddd1ddd2ddd1ULL, },
++        { 0xfff4fff3fff3fff4ULL, 0xfff3fff3fff4fff3ULL, },
++        { 0xeb78eb77eb77eb78ULL, 0xeb77eb77eb78eb77ULL, },
++        { 0xfff3fff2fff2fff3ULL, 0xfff2fff2fff3fff2ULL, },
++        { 0xf49216b3d26ef492ULL, 0x16b3d26ef49216b3ULL, },
++        { 0xfff2fff1fff1fff2ULL, 0xfff1fff1fff2fff1ULL, },
++        { 0xfff2fff1fff1fff2ULL, 0xfff1fff1fff2fff1ULL, },    /*  40  */
++        { 0xfff2fff1fff1fff2ULL, 0xfff1fff1fff2fff1ULL, },
++        { 0x2214221322132214ULL, 0x2213221322142213ULL, },
++        { 0xfff2fff1fff1fff2ULL, 0xfff1fff1fff2fff1ULL, },
++        { 0x146d146c146c146dULL, 0x146c146c146d146cULL, },
++        { 0xfff2fff1fff1fff2ULL, 0xfff1fff1fff2fff1ULL, },
++        { 0x0b52e92f2d740b52ULL, 0xe92f2d740b52e92fULL, },
++        { 0xfff1fff0fff1fff1ULL, 0xfff0fff1fff1fff0ULL, },
++        { 0xfff0fff0fff0fff0ULL, 0xfff0fff0fff0fff0ULL, },    /*  48  */
 +        { 0xfff0fff0fff0fff0ULL, 0xfff0fff0fff0fff0ULL, },
-+        { 0x340ccd603a6c6ff0ULL, 0x7c7fc96cb0d77f60ULL, },    /*  64  */
-+        { 0x07608c7c902605f0ULL, 0x7e1ef7e0f9925b90ULL, },
-+        { 0xda1ca10416e8a5f0ULL, 0x2e36f13e11e9dea0ULL, },
-+        { 0x6166ada860262c70ULL, 0x773f69ee43333f20ULL, },
-+        { 0x34ba6cc4b5e0c270ULL, 0x78de98628bee1b50ULL, },
-+        { 0x13b6467bf3775230ULL, 0xce8d99be266db340ULL, },
-+        { 0xeaeababdfe9a7630ULL, 0x2d251ed87fd8cb90ULL, },
-+        { 0x1b481af62b77c1c0ULL, 0x479e70e86e9a7610ULL, },
-+        { 0xee042f7eb23961c0ULL, 0xf7b66a4686f1f920ULL, },    /*  72  */
-+        { 0xc538a3c0bd5c85c0ULL, 0x564eef60e05c1170ULL, },
-+        { 0xb5941adce7fb45c0ULL, 0xd00e7d5f672347e0ULL, },
-+        { 0x25cef5ba555cc4c0ULL, 0x55b61e37e30d7360ULL, },
-+        { 0xad18025e9e9a4b40ULL, 0x9ebf96e71457d3e0ULL, },
-+        { 0xdd766297cb7796d0ULL, 0xb938e8f703197e60ULL, },
-+        { 0x4db03d7538d815d0ULL, 0x3ee089cf7f03a9e0ULL, },
-+        { 0x154fea4c3377460cULL, 0xe1ff538f49ffc5e0ULL, },
-+        { 0x4a99edbce7e9c70cULL, 0x3f66800dba7a7f60ULL, },    /*  80  */
-+        { 0xea0bfe08a81e3aacULL, 0xe7fcffbbd4745ce0ULL, },
-+        { 0x3e2ddcb809dc80acULL, 0xc75ca276a8f8bb60ULL, },
-+        { 0x5e4aa9605ec07444ULL, 0x6dc0dee66108df60ULL, },
-+        { 0x03a670e01940cf44ULL, 0x05802472d23066e0ULL, },
-+        { 0x8c72ca4059807924ULL, 0xb7002ade28606260ULL, },
-+        { 0x945efbc07b005b24ULL, 0x4f00c3bc4040d2e0ULL, },
-+        { 0xab5cc300f000ce2cULL, 0xf000bd1c6fc046e0ULL, },
-+        { 0xd7445f001000a72cULL, 0x600018d43e80f460ULL, },    /*  88  */
-+        { 0x66cca200e00039ccULL, 0xc000b74c5d00a5e0ULL, },
-+        { 0x33140e00c0008fccULL, 0xc0005a98be005060ULL, },
-+        { 0xafe8d8000000a7a4ULL, 0x00002a58c2005460ULL, },
-+        { 0x99d8b80000004aa4ULL, 0x0000d6088c005fe0ULL, },
-+        { 0xa388900000007984ULL, 0x0000413818003f60ULL, },
-+        { 0xc5b8f00000000b84ULL, 0x0000fa7010006be0ULL, },
-+        { 0x41f0c0000000014cULL, 0x00002bf0f0003fe0ULL, },
-+        { 0x7490c0000000724cULL, 0x0000b9d0a0004160ULL, },    /*  96  */
-+        { 0xb0f0c0000000a34cULL, 0x00008f70c00030e0ULL, },
-+        { 0xed90c0000000944cULL, 0x000014508000e660ULL, },
-+        { 0x0ff0c0000000454cULL, 0x00002ef0000019e0ULL, },
-+        { 0xebd08000000006ecULL, 0x00001a900000e160ULL, },
-+        { 0xf770000000005b8cULL, 0x000037f0000046e0ULL, },
-+        { 0x825000000000ab2cULL, 0x000039900000c260ULL, },
-+        { 0x5af0000000001dccULL, 0x000030f00000abe0ULL, },
-+        { 0x22900000000073ccULL, 0x0000d1e00000de60ULL, },    /* 104  */
-+        { 0x3bf000000000c9ccULL, 0x000083c000009ee0ULL, },
-+        { 0xe990000000001fccULL, 0x0000c7800000d560ULL, },
-+        { 0x0cf00000000075ccULL, 0x00000f00000049e0ULL, },
-+        { 0x0ee00000000079a4ULL, 0x0000670000005de0ULL, },
-+        { 0x77c000000000a1acULL, 0x00007f000000f1e0ULL, },
-+        { 0x8380000000008744ULL, 0x00005700000005e0ULL, },
-+        { 0xef0000000000488cULL, 0x0000ef00000099e0ULL, },
-     };
- 
-     reset_msa_registers();
-diff --git a/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_msubv_w.c b/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_msubv_w.c
-index 171b717..0a83db4 100644
---- a/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_msubv_w.c
-+++ b/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_msubv_w.c
-@@ -43,118 +43,118 @@ int32_t main(void)
- 
-     uint64_t b128_result[TEST_COUNT_TOTAL][2];
-     uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
--        { 0x0000000000000002ULL, 0x0000000000000002ULL, },    /*   0  */
--        { 0x0000000000000002ULL, 0x0000000000000002ULL, },
--        { 0x00000000aaaaaaaeULL, 0x00000000aaaaaaaeULL, },
--        { 0x0000000000000004ULL, 0x0000000000000004ULL, },
--        { 0x000000006666666cULL, 0x000000006666666cULL, },
--        { 0x0000000000000006ULL, 0x0000000000000006ULL, },
--        { 0x000000008e38e395ULL, 0xffffffffe38e38ebULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },    /*   8  */
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x0000000000000008ULL, 0x0000000000000008ULL, },
--        { 0x00000000aaaaaab4ULL, 0x00000000aaaaaab4ULL, },    /*  16  */
--        { 0x00000000aaaaaab4ULL, 0x00000000aaaaaab4ULL, },
--        { 0x38e38e3a71c71c7cULL, 0x38e38e3a71c71c7cULL, },
--        { 0x0000000155555560ULL, 0x0000000155555560ULL, },
--        { 0x2222222444444450ULL, 0x2222222444444450ULL, },
--        { 0x000000020000000cULL, 0x000000020000000cULL, },
--        { 0x2f684bdcb425ed16ULL, 0xf684bda397b425faULL, },
--        { 0x00000002aaaaaab8ULL, 0x00000002aaaaaab8ULL, },
--        { 0x000000020000000eULL, 0x000000020000000eULL, },    /*  24  */
--        { 0x000000020000000eULL, 0x000000020000000eULL, },
--        { 0xc71c71c8e38e38f2ULL, 0xc71c71c8e38e38f2ULL, },
--        { 0x0000000155555564ULL, 0x0000000155555564ULL, },
--        { 0xdddddddeccccccdcULL, 0xdddddddeccccccdcULL, },
--        { 0x00000000aaaaaabaULL, 0x00000000aaaaaabaULL, },
--        { 0xd097b42684bda13fULL, 0x097b425ef684bdb1ULL, },
--        { 0x0000000000000010ULL, 0x0000000000000010ULL, },
--        { 0x0000000066666678ULL, 0x0000000066666678ULL, },    /*  32  */
--        { 0x0000000066666678ULL, 0x0000000066666678ULL, },
--        { 0x2222222355555568ULL, 0x2222222355555568ULL, },
--        { 0x00000000cccccce0ULL, 0x00000000cccccce0ULL, },
--        { 0x147ae1491eb85200ULL, 0x147ae1491eb85200ULL, },
--        { 0x0000000133333348ULL, 0x0000000133333348ULL, },
--        { 0x1c71c71e3e93e954ULL, 0xfa4fa4fbb60b60ccULL, },
--        { 0x00000001999999b0ULL, 0x00000001999999b0ULL, },
--        { 0x000000013333334aULL, 0x000000013333334aULL, },    /*  40  */
--        { 0x000000013333334aULL, 0x000000013333334aULL, },
--        { 0xdddddddeeeeeef06ULL, 0xdddddddeeeeeef06ULL, },
--        { 0x00000000cccccce4ULL, 0x00000000cccccce4ULL, },
--        { 0xeb851eb8e147ae2cULL, 0xeb851eb8e147ae2cULL, },
--        { 0x000000006666667eULL, 0x000000006666667eULL, },
--        { 0xe38e38e3e93e9401ULL, 0x05b05b05c71c71dfULL, },
--        { 0x0000000000000018ULL, 0x0000000000000018ULL, },
--        { 0x000000008e38e3a7ULL, 0xffffffffe38e38fdULL, },    /*  48  */
--        { 0x000000008e38e3a7ULL, 0xffffffffe38e38fdULL, },
--        { 0x2f684bdb425ed0b1ULL, 0xf684bda17b425eebULL, },
--        { 0x000000011c71c736ULL, 0xffffffffc71c71e2ULL, },
--        { 0x1c71c71e27d27d42ULL, 0xfa4fa4fa49f49f66ULL, },
--        { 0x00000001aaaaaac5ULL, 0xffffffffaaaaaac7ULL, },
--        { 0x35ba781b4587e6d2ULL, 0x0fcd6e9d6b74f050ULL, },
--        { 0x0000000238e38e54ULL, 0xffffffff8e38e3acULL, },
--        { 0x00000001aaaaaac7ULL, 0xffffffffaaaaaac9ULL, },    /*  56  */
--        { 0x00000001aaaaaac7ULL, 0xffffffffaaaaaac9ULL, },
--        { 0xd097b427a12f6869ULL, 0x097b425ebda12f87ULL, },
--        { 0x000000011c71c73aULL, 0xffffffffc71c71e6ULL, },
--        { 0xe38e38e477777796ULL, 0x05b05b05aaaaaacaULL, },
--        { 0x000000008e38e3adULL, 0xffffffffe38e3903ULL, },
--        { 0xca4587e781948b2fULL, 0xf032916206522c5fULL, },
--        { 0x0000000000000020ULL, 0x0000000000000020ULL, },
--        { 0x3e3ad4ae1266c2b0ULL, 0x1637d725aebdb734ULL, },    /*  64  */
--        { 0x4c74e0d60a3d6d94ULL, 0x1badd2dd9f4dac90ULL, },
--        { 0x6874e8f94205b90cULL, 0x27eb0c41af2c3022ULL, },
--        { 0x42dab657e16f25e8ULL, 0x06d6782e137656f2ULL, },
--        { 0x5114c27fd945d0ccULL, 0x0c4c73e604064c4eULL, },
--        { 0x68a91e898c276755ULL, 0x0f77ad378bdfb302ULL, },
--        { 0x54c82cde41d1cf13ULL, 0x0b6108a5f38e1598ULL, },
--        { 0x6f755d3eddd1234aULL, 0xfbbaace2f5421908ULL, },
--        { 0x8b75656215996ec2ULL, 0x07f7e64705209c9aULL, },    /*  72  */
--        { 0x779473b6cb43d680ULL, 0x03e141b56cceff30ULL, },
--        { 0xa6279a1866fb9f64ULL, 0x2631668db9e53ac1ULL, },
--        { 0x67a1f71bd99e4586ULL, 0x312ec9f6206e6e69ULL, },
--        { 0x4207c47a7907b262ULL, 0x101a35e284b89539ULL, },
--        { 0x5cb4f4db15070699ULL, 0x0073da1f866c98a9ULL, },
--        { 0x1e2f51de87a9acbbULL, 0x0b713d87ecf5cc51ULL, },
--        { 0x721d49ba5f0acfa8ULL, 0x5ba5bbe9afeae691ULL, },
--        { 0x4bcd68690d995de0ULL, 0x771da6b4b6c967ebULL, },    /*  80  */
--        { 0x4ea9a2cfbb5acd7bULL, 0x79dd6a73439e6387ULL, },
--        { 0x47c800b999dd2371ULL, 0x766d25914ef7a7a0ULL, },
--        { 0x41b0fa10eb77cf84ULL, 0x26e85189458965f8ULL, },
--        { 0x1fc448ce062c2944ULL, 0x31f490a9422a80e6ULL, },
--        { 0x211bdfadfd79770eULL, 0x3b25f4cac5763378ULL, },
--        { 0x16fbb87edd87b6f0ULL, 0x57c0b65fabdda20eULL, },
--        { 0x14621091eac4a5f6ULL, 0x4d29a25d32fa9ef6ULL, },
--        { 0x07832ded1c464b02ULL, 0x6396905709e3cfa4ULL, },    /*  88  */
--        { 0x0ff4a84eab8df3b9ULL, 0x6bc9a7d8c6adf2eaULL, },
--        { 0x21e53326bfbd0b05ULL, 0x8f8f3b9c679dff5aULL, },
--        { 0x191ed6a24e1576f9ULL, 0x9e8c2e402760373aULL, },
--        { 0x19b438400fc27751ULL, 0x819c4bbfd3ee6972ULL, },
--        { 0x1e0d5dc1094ae999ULL, 0x7496a289f5eff010ULL, },
--        { 0x11af620b7bc03943ULL, 0x8a11f229836addc7ULL, },
--        { 0x46fa45d0e84440fcULL, 0xe8d2c0211fb042bfULL, },
--        { 0x22142516b5a8adbcULL, 0xe1cf1923e186aad1ULL, },    /*  96  */
--        { 0x066ebbbb4ff6da44ULL, 0xd918d7e6a7e61877ULL, },
--        { 0x100acc9d22839a48ULL, 0xce291932929e367fULL, },
--        { 0x0dfe419d62a62f64ULL, 0xc020fe45a8cf7acfULL, },
--        { 0x2ba79b6ffbf3c63bULL, 0xb428f52c49fce695ULL, },
--        { 0x29b3b85200bdf100ULL, 0xb4ae7ea2f52aa5b9ULL, },
--        { 0x293bb84d6360c0b6ULL, 0xae33b26e4c493c49ULL, },
--        { 0x46a99fdf54f4862dULL, 0xae790dc5055f6f51ULL, },
--        { 0x18480e0fd728c7c3ULL, 0xa000ad7b15f8ebe0ULL, },    /* 104  */
--        { 0x1b8b97aa205e1239ULL, 0x89c78b8909c4a8e5ULL, },
--        { 0x09abb26b05ef649dULL, 0x74242fa1bd49e740ULL, },
--        { 0x04e233bc861d272bULL, 0x9c5343ab30f62f9fULL, },
--        { 0xda2da0d0884dc3d1ULL, 0xb824f201640b4147ULL, },
--        { 0x9d8b22ee1b9a2e0fULL, 0xb642ddf1edb0747fULL, },
--        { 0x7c81956533686a37ULL, 0xdd5181781dc3ad37ULL, },
--        { 0xc60b1905717ff25aULL, 0xe2af726e71ad7ad7ULL, },
++        { 0xecf925dcb414ecf9ULL, 0x25dcb414ecf925dcULL, },
++        { 0xffefffefffeeffefULL, 0xffefffeeffefffefULL, },
++        { 0xf48e16b0d26af48eULL, 0x16b0d26af48e16b0ULL, },
++        { 0xffeeffeeffedffeeULL, 0xffeeffedffeeffeeULL, },
++        { 0xf99be6a59ac8f99bULL, 0xe6a59ac8f99be6a5ULL, },
++        { 0xffedffedffebffedULL, 0xffedffebffedffedULL, },
++        { 0xffedffecffebffedULL, 0xffecffebffedffecULL, },    /*  56  */
++        { 0xffedffecffebffedULL, 0xffecffebffedffecULL, },
++        { 0x12e3d9fe4bc512e3ULL, 0xd9fe4bc512e3d9feULL, },
++        { 0xffedffebffebffedULL, 0xffebffebffedffebULL, },
++        { 0x0b4de9292d6e0b4dULL, 0xe9292d6e0b4de929ULL, },
++        { 0xffecffeaffebffecULL, 0xffeaffebffecffeaULL, },
++        { 0x063e1932650e063eULL, 0x1932650e063e1932ULL, },
++        { 0xffecffe8ffebffecULL, 0xffe8ffebffecffe8ULL, },
++        { 0x9032faf1f32dc724ULL, 0xd37cfee8ffe7cdf6ULL, },    /*  64  */
++        { 0x8c37fb04dab3ed15ULL, 0xc8500506002701cbULL, },
++        { 0x8000eb00f0d83aacULL, 0xb0d70a15ff2518f4ULL, },
++        { 0xe8edef64d3204e73ULL, 0xf40714a9fe1d069aULL, },
++        { 0xe4f2ef77baa67464ULL, 0xe8db1ac7fe5d3a6fULL, },
++        { 0xe4cdef768ba25b09ULL, 0xe60bf5b1fad604a2ULL, },
++        { 0xe204efb4b62c272fULL, 0xe023d70208eaec98ULL, },
++        { 0xe5c0efa2800019f7ULL, 0xf10996de174fffa3ULL, },
++        { 0x9799df9e9625678eULL, 0xd9909bed164d16ccULL, },    /*  72  */
++        { 0x94d0dfdcc0af33b4ULL, 0xd3a880002461fec2ULL, },
++        { 0x8000ac2c9a31c9abULL, 0xc7408000ec28f404ULL, },
++        { 0xc964ba57cdd7aea3ULL, 0xeac18000b2aafc86ULL, },
++        { 0x3251bebbb01fc26aULL, 0x2df18a94b1a2ea2cULL, },
++        { 0x360dbea98000b532ULL, 0x3ed78000c007fd37ULL, },
++        { 0x7f71ccd4b3a69a2aULL, 0x62588000868905b9ULL, },
++        { 0x1ce6c8f180009346ULL, 0xfcb580008000fefbULL, },
++        { 0x37e5be19a862dbafULL, 0xfea58b5e8000fe57ULL, },    /*  80  */
++        { 0x39c0be4bdd7bcb85ULL, 0xfed88000953fff6aULL, },
++        { 0x5f7d948aca8d9bc1ULL, 0xff3480008000ff95ULL, },
++        { 0x0bb4a742f1e1847fULL, 0xfe7e80008000ff7cULL, },
++        { 0x16a395c8f655d6c0ULL, 0xff618b5e8000ff29ULL, },
++        { 0x1763961afc30c464ULL, 0xff788000953fffb4ULL, },
++        { 0x26ab8000fa188e23ULL, 0xffa280008000ffcaULL, },
++        { 0x04bd964dfe708000ULL, 0xff4e80008000ffbdULL, },
++        { 0x092a817dfeeed540ULL, 0xffb68b5e8000ff93ULL, },    /*  88  */
++        { 0x097881deff94c239ULL, 0xffc08000953fffd9ULL, },
++        { 0x0fa88000ff5889feULL, 0xffd380008000ffe4ULL, },
++        { 0x01eb964dffd38000ULL, 0xffaa80008000ffddULL, },
++        { 0x03b5817dffe1d540ULL, 0xffdc8b5e8000ffc7ULL, },
++        { 0x03d481defff3c239ULL, 0xffe18000953fffebULL, },
++        { 0x06548000ffeb89feULL, 0xffea80008000fff1ULL, },
++        { 0x00c6964dfffa8000ULL, 0xffd680008000ffedULL, },
++        { 0x017e817dfffbd540ULL, 0xffee8b5e8000ffe1ULL, },    /*  96  */
++        { 0x02e28000fffcf1b8ULL, 0xfff895b98000ffcdULL, },
++        { 0x05938000fffdfb3aULL, 0xfffc9f298000ffadULL, },
++        { 0x0ac88000fffdfe67ULL, 0xfffea7c28000ff79ULL, },
++        { 0x0b238063fffefdb0ULL, 0xfffe8000953fffd0ULL, },
++        { 0x0b8180c5fffffca8ULL, 0xfffe8000a6f7ffefULL, },
++        { 0x0be28127fffffb2bULL, 0xfffe8000b5befffaULL, },
++        { 0x0c478189fffff904ULL, 0xfffe8000c211fffdULL, },
++        { 0x144c8000fffef2a8ULL, 0xfffe80009905fffdULL, },    /* 104  */
++        { 0x218f8000fffce682ULL, 0xfffe80008000fffdULL, },
++        { 0x377d8000fff9cf4eULL, 0xfffe80008000fffdULL, },
++        { 0x5bc08000fff5a2fbULL, 0xfffe80008000fffdULL, },
++        { 0x0b3f964dfffd8d66ULL, 0xfffc80008000fffcULL, },
++        { 0x0160a8b7ffff8000ULL, 0xfff880008000fffbULL, },
++        { 0x002bb7ecffff8000ULL, 0xfff080008000fff9ULL, },
++        { 0x0005c47affff8000ULL, 0xffe180008000fff7ULL, },
++};
++
++    reset_msa_registers();
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MSUB_Q_H(b128_pattern[i], b128_pattern[j],
++                            b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MSUB_Q_H(b128_random[i], b128_random[j],
++                            b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                         (PATTERN_INPUTS_SHORT_COUNT)) +
++                                        RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MSUB_Q_H__DDT(b128_random[i], b128_random[j],
++                                 b128_result[
++                                     ((PATTERN_INPUTS_SHORT_COUNT) *
++                                      (PATTERN_INPUTS_SHORT_COUNT)) +
++                                     ((RANDOM_INPUTS_SHORT_COUNT) *
++                                      (RANDOM_INPUTS_SHORT_COUNT)) +
++                                     RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MSUB_Q_H__DSD(b128_random[i], b128_random[j],
++                                 b128_result[
++                                     ((PATTERN_INPUTS_SHORT_COUNT) *
++                                      (PATTERN_INPUTS_SHORT_COUNT)) +
++                                     (2 * (RANDOM_INPUTS_SHORT_COUNT) *
++                                      (RANDOM_INPUTS_SHORT_COUNT)) +
++                                     RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results_128(isa_ase_name, group_name, instruction_name,
++                            TEST_COUNT_TOTAL, elapsed_time,
++                            &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_msub_q_w.c b/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_msub_q_w.c
+new file mode 100644
+index 0000000..5619192
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_msub_q_w.c
+@@ -0,0 +1,216 @@
++/*
++ *  Test program for MSA instruction MSUB_Q.W
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *  Copyright (C) 2019  RT-RK Computer Based Systems LLC
++ *  Copyright (C) 2019  Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs_128.h"
++#include "../../../../include/test_utils_128.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *isa_ase_name = "MSA";
++    char *group_name = "Fixed Multiply";
++    char *instruction_name =  "MSUB_Q.W";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
 +        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
 +        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },
-+        { 0xaaaaaaa9aaaaaaa9ULL, 0xaaaaaaa9aaaaaaa9ULL, },
 +        { 0xfffffffefffffffeULL, 0xfffffffefffffffeULL, },
-+        { 0xcccccccacccccccaULL, 0xcccccccacccccccaULL, },
++        { 0xfffffffefffffffeULL, 0xfffffffefffffffeULL, },
 +        { 0xfffffffdfffffffdULL, 0xfffffffdfffffffdULL, },
-+        { 0xe38e38e08e38e38bULL, 0x38e38e35e38e38e0ULL, },
++        { 0xfffffffdfffffffdULL, 0xfffffffdfffffffdULL, },
++        { 0xfffffffcfffffffcULL, 0xfffffffdfffffffcULL, },
 +        { 0xfffffffcfffffffcULL, 0xfffffffcfffffffcULL, },
 +        { 0xfffffffcfffffffcULL, 0xfffffffcfffffffcULL, },    /*   8  */
 +        { 0xfffffffcfffffffcULL, 0xfffffffcfffffffcULL, },
@@ -1864,105 +1320,787 @@ index 171b717..0a83db4 100644
 +        { 0xfffffffcfffffffcULL, 0xfffffffcfffffffcULL, },
 +        { 0xfffffffcfffffffcULL, 0xfffffffcfffffffcULL, },
 +        { 0xfffffffcfffffffcULL, 0xfffffffcfffffffcULL, },
-+        { 0xaaaaaaa6aaaaaaa6ULL, 0xaaaaaaa6aaaaaaa6ULL, },    /*  16  */
-+        { 0xaaaaaaa6aaaaaaa6ULL, 0xaaaaaaa6aaaaaaa6ULL, },
-+        { 0xc71c71c2c71c71c2ULL, 0xc71c71c2c71c71c2ULL, },
-+        { 0x5555555055555550ULL, 0x5555555055555550ULL, },
-+        { 0xddddddd8ddddddd8ULL, 0xddddddd8ddddddd8ULL, },
++        { 0xfffffffbfffffffbULL, 0xfffffffbfffffffbULL, },    /*  16  */
++        { 0xfffffffbfffffffbULL, 0xfffffffbfffffffbULL, },
++        { 0xc71c71c1c71c71c1ULL, 0xc71c71c1c71c71c1ULL, },
 +        { 0xfffffffafffffffaULL, 0xfffffffafffffffaULL, },
-+        { 0xed097b3c5ed097aeULL, 0x7b425ecaed097b3cULL, },
-+        { 0xaaaaaaa4aaaaaaa4ULL, 0xaaaaaaa4aaaaaaa4ULL, },
-+        { 0xfffffff9fffffff9ULL, 0xfffffff9fffffff9ULL, },    /*  24  */
++        { 0xddddddd7ddddddd7ULL, 0xddddddd7ddddddd7ULL, },
 +        { 0xfffffff9fffffff9ULL, 0xfffffff9fffffff9ULL, },
-+        { 0x8e38e3878e38e387ULL, 0x8e38e3878e38e387ULL, },
-+        { 0x5555554e5555554eULL, 0x5555554e5555554eULL, },
-+        { 0x9999999299999992ULL, 0x9999999299999992ULL, },
-+        { 0xaaaaaaa3aaaaaaa3ULL, 0xaaaaaaa3aaaaaaa3ULL, },
-+        { 0xa12f6844da12f67dULL, 0x684bda0ba12f6844ULL, },
-+        { 0xfffffff8fffffff8ULL, 0xfffffff8fffffff8ULL, },
-+        { 0xccccccc4ccccccc4ULL, 0xccccccc4ccccccc4ULL, },    /*  32  */
-+        { 0xccccccc4ccccccc4ULL, 0xccccccc4ccccccc4ULL, },
-+        { 0x5555554c5555554cULL, 0x5555554c5555554cULL, },
-+        { 0x9999999099999990ULL, 0x9999999099999990ULL, },
-+        { 0x70a3d70070a3d700ULL, 0x70a3d70070a3d700ULL, },
-+        { 0x6666665c6666665cULL, 0x6666665c6666665cULL, },
-+        { 0x82d82d783e93e934ULL, 0xc71c71bc82d82d78ULL, },
-+        { 0x3333332833333328ULL, 0x3333332833333328ULL, },
-+        { 0x6666665b6666665bULL, 0x6666665b6666665bULL, },    /*  40  */
-+        { 0x6666665b6666665bULL, 0x6666665b6666665bULL, },
-+        { 0x8888887d8888887dULL, 0x8888887d8888887dULL, },
-+        { 0x9999998e9999998eULL, 0x9999998e9999998eULL, },
-+        { 0x8f5c28ea8f5c28eaULL, 0x8f5c28ea8f5c28eaULL, },
-+        { 0xccccccc1ccccccc1ULL, 0xccccccc1ccccccc1ULL, },
-+        { 0x93e93e8882d82d77ULL, 0xa4fa4f9993e93e88ULL, },
-+        { 0xfffffff4fffffff4ULL, 0xfffffff4fffffff4ULL, },
-+        { 0xe38e38d78e38e382ULL, 0x38e38e2ce38e38d7ULL, },    /*  48  */
-+        { 0xe38e38d78e38e382ULL, 0x38e38e2ce38e38d7ULL, },
-+        { 0xd097b419ed097b36ULL, 0xb425ecfcd097b419ULL, },
-+        { 0xc71c71ba1c71c710ULL, 0x71c71c64c71c71baULL, },
-+        { 0xe38e38d6f49f49e8ULL, 0xd27d27c4e38e38d6ULL, },
-+        { 0xaaaaaa9daaaaaa9eULL, 0xaaaaaa9caaaaaa9dULL, },
-+        { 0xf0329154ca4587daULL, 0xa4587e5cf0329154ULL, },
-+        { 0x8e38e38038e38e2cULL, 0xe38e38d48e38e380ULL, },
-+        { 0xaaaaaa9caaaaaa9dULL, 0xaaaaaa9baaaaaa9cULL, },    /*  56  */
-+        { 0xaaaaaa9caaaaaa9dULL, 0xaaaaaa9baaaaaa9cULL, },
-+        { 0x684bda04f684bd93ULL, 0xda12f675684bda04ULL, },
-+        { 0xc71c71b81c71c70eULL, 0x71c71c62c71c71b8ULL, },
-+        { 0x7777776811111102ULL, 0xddddddce77777768ULL, },
-+        { 0xe38e38d48e38e37fULL, 0x38e38e29e38e38d4ULL, },
-+        { 0x81948b00fcd6e9d1ULL, 0x781948a181948b00ULL, },
++        { 0xed097b3ab425ed01ULL, 0x25ed0973ed097b3aULL, },
++        { 0xfffffff7fffffff7ULL, 0xfffffff7fffffff7ULL, },
++        { 0xfffffff7fffffff7ULL, 0xfffffff7fffffff7ULL, },    /*  24  */
++        { 0xfffffff7fffffff7ULL, 0xfffffff7fffffff7ULL, },
++        { 0x38e38e3038e38e30ULL, 0x38e38e3038e38e30ULL, },
++        { 0xfffffff7fffffff7ULL, 0xfffffff7fffffff7ULL, },
++        { 0x2222221922222219ULL, 0x2222221922222219ULL, },
++        { 0xfffffff7fffffff7ULL, 0xfffffff7fffffff7ULL, },
++        { 0x12f684b44bda12edULL, 0xda12f67c12f684b4ULL, },
++        { 0xfffffff6fffffff7ULL, 0xfffffff7fffffff6ULL, },
++        { 0xfffffff5fffffff6ULL, 0xfffffff6fffffff5ULL, },    /*  32  */
++        { 0xfffffff5fffffff6ULL, 0xfffffff6fffffff5ULL, },
++        { 0xddddddd2ddddddd3ULL, 0xddddddd3ddddddd2ULL, },
++        { 0xfffffff4fffffff5ULL, 0xfffffff5fffffff4ULL, },
++        { 0xeb851eabeb851eacULL, 0xeb851eaceb851eabULL, },
++        { 0xfffffff2fffffff3ULL, 0xfffffff3fffffff2ULL, },
++        { 0xf49f49e6d27d27c4ULL, 0x16c16c09f49f49e6ULL, },
++        { 0xfffffff1fffffff1ULL, 0xfffffff1fffffff1ULL, },
++        { 0xfffffff1fffffff1ULL, 0xfffffff1fffffff1ULL, },    /*  40  */
++        { 0xfffffff1fffffff1ULL, 0xfffffff1fffffff1ULL, },
++        { 0x2222221322222213ULL, 0x2222221322222213ULL, },
++        { 0xfffffff1fffffff1ULL, 0xfffffff1fffffff1ULL, },
++        { 0x147ae138147ae138ULL, 0x147ae138147ae138ULL, },
 +        { 0xfffffff0fffffff0ULL, 0xfffffff0fffffff0ULL, },
-+        { 0x4efccd609e9c6ff0ULL, 0xc5dac96c8b677f60ULL, },    /*  64  */
-+        { 0x3e3d8c7cb78505f0ULL, 0x4463f7e01c4e5b90ULL, },
-+        { 0xcaa9a104f350a5f0ULL, 0x8ca4f13ec42edea0ULL, },
-+        { 0x19b8ada804d82c70ULL, 0xb62b69ee365e3f20ULL, },
-+        { 0x08f96cc41dc0c270ULL, 0x34b49862c7451b50ULL, },
-+        { 0x5405467b1fd35230ULL, 0xf7c999be7c56b340ULL, },
-+        { 0x5cc7babd61667630ULL, 0xa4601ed86811cb90ULL, },
-+        { 0xe20c1af64022c1c0ULL, 0x927a70e878437610ULL, },
-+        { 0x6e782f7e7bee61c0ULL, 0xdabb6a462023f920ULL, },    /*  72  */
-+        { 0x773aa3c0bd8185c0ULL, 0x8751ef600bdf1170ULL, },
-+        { 0xc0871adcd87d45c0ULL, 0x6c527d5fd9c847e0ULL, },
-+        { 0xd7c7f5ba4e99c4c0ULL, 0xdaa41e3704ed7360ULL, },
-+        { 0x26d7025e60214b40ULL, 0x042a96e7771cd3e0ULL, },
-+        { 0xac1b62973edd96d0ULL, 0xf244e8f7874e7e60ULL, },
-+        { 0xc35c3d75b4fa15d0ULL, 0x609689cfb273a9e0ULL, },
-+        { 0x9de4ea4c0310460cULL, 0x80c0538fcf54c5e0ULL, },
-+        { 0xbd81edbc2724c70cULL, 0x7301800d7cb17f60ULL, },    /*  80  */
-+        { 0xaebafe086f603aacULL, 0x35c5ffbbaa8b5ce0ULL, },
-+        { 0xdf14dcb8c25380acULL, 0x3ef9a276f99bbb60ULL, },
-+        { 0x5e0ea9600c5e7444ULL, 0x8ef3dee6ce1bdf60ULL, },
-+        { 0x1c7370e0761ecf44ULL, 0x864a2472681b66e0ULL, },
-+        { 0xb58eca4059fe7924ULL, 0x8c252ade750e6260ULL, },
-+        { 0xfcc4fbc036df5b24ULL, 0x36a7c3bc9596d2e0ULL, },
-+        { 0x57a2c300a677ce2cULL, 0x2922bd1cb36946e0ULL, },
-+        { 0x88bd5f007437a72cULL, 0x45fd18d49c1ff460ULL, },    /*  88  */
-+        { 0x2581a200554339ccULL, 0x6c99b74cacc4a5e0ULL, },
-+        { 0x2d500e000b508fccULL, 0x1f975a9844ce5060ULL, },
-+        { 0x5907d8000bc6a7a4ULL, 0x0eaa2a5808275460ULL, },
-+        { 0xeab7b80057ab4aa4ULL, 0x8af4d608d22d5fe0ULL, },
-+        { 0x95ab9000431f7984ULL, 0x840741386cad3f60ULL, },
-+        { 0xf5ddf000f6ac0b84ULL, 0xd51bfa701fdb6be0ULL, },
-+        { 0xdf7cc0003fd2014cULL, 0xb5052bf0d1bc3fe0ULL, },
-+        { 0x3393c00031cb724cULL, 0x06abb9d0a05f4160ULL, },    /*  96  */
-+        { 0xdb56c00090e3a34cULL, 0x7ff18f70f5d630e0ULL, },
-+        { 0xa1b5c0005faa944cULL, 0x9e0514507291e660ULL, },
-+        { 0xfa60c0002cb0454cULL, 0xc4182ef0d53919e0ULL, },
-+        { 0xa6f680001aac06ecULL, 0x05ca1a90e899e160ULL, },
-+        { 0x15a3000096665b8cULL, 0x0cec37f0504f46e0ULL, },
-+        { 0xb79a0000a4a5ab2cULL, 0x578239900c71c260ULL, },
-+        { 0xb70c000031251dccULL, 0xaa4c30f0a693abe0ULL, },
-+        { 0x01140000f37473ccULL, 0x400dd1e0cc92de60ULL, },    /* 104  */
-+        { 0xb1cc0000f066c9ccULL, 0x8cf683c01cd59ee0ULL, },
-+        { 0xf8540000557c1fccULL, 0x0f82c780ac8ed560ULL, },
-+        { 0xf88c0000103475ccULL, 0xa1f10f00956f49e0ULL, },
-+        { 0x2e7000005c2e79a4ULL, 0xcf94670004e95de0ULL, },
-+        { 0x96c00000be3ea1acULL, 0xdca57f00da6ef1e0ULL, },
-+        { 0xbf00000062838744ULL, 0x368a570027d005e0ULL, },
-+        { 0x4c0000006502488cULL, 0xcc98ef003cdc99e0ULL, },
-     };
- 
-     reset_msa_registers();
++        { 0x0b60b5fb2d82d81dULL, 0xe93e93d90b60b5fbULL, },
++        { 0xffffffefffffffefULL, 0xffffffefffffffefULL, },
++        { 0xffffffeeffffffeeULL, 0xffffffefffffffeeULL, },    /*  48  */
++        { 0xffffffeeffffffeeULL, 0xffffffefffffffeeULL, },
++        { 0xed097b2fb425ecf6ULL, 0x25ed0969ed097b2fULL, },
++        { 0xffffffecffffffecULL, 0xffffffeeffffffecULL, },
++        { 0xf49f49e0d27d27bdULL, 0x16c16c04f49f49e0ULL, },
++        { 0xffffffebffffffeaULL, 0xffffffedffffffebULL, },
++        { 0xf9add3ab9add3bf6ULL, 0xe6b74ef0f9add3abULL, },
++        { 0xffffffeaffffffe8ULL, 0xffffffecffffffeaULL, },
++        { 0xffffffeaffffffe8ULL, 0xffffffebffffffeaULL, },    /*  56  */
++        { 0xffffffeaffffffe8ULL, 0xffffffebffffffeaULL, },
++        { 0x12f684a74bda12deULL, 0xda12f66f12f684a7ULL, },
++        { 0xffffffe9ffffffe8ULL, 0xffffffeaffffffe9ULL, },
++        { 0x0b60b5f42d82d815ULL, 0xe93e93d20b60b5f4ULL, },
++        { 0xffffffe8ffffffe7ULL, 0xffffffe8ffffffe8ULL, },
++        { 0x06522c276522c3d9ULL, 0x1948b0e406522c27ULL, },
++        { 0xffffffe7ffffffe7ULL, 0xffffffe7ffffffe7ULL, },
++        { 0x9048175df3423f14ULL, 0xd394eba0fffb65e2ULL, },    /*  64  */
++        { 0x8c4dc60edac87812ULL, 0xc8687ef6003bdb1bULL, },
++        { 0x80000000f0ed8852ULL, 0xb0ef6662ff3a80e6ULL, },
++        { 0xe8ec58e8d33594acULL, 0xf41fb1f8fe335d76ULL, },
++        { 0xe4f20799babbcdaaULL, 0xe8f3454efe73d2afULL, },
++        { 0xe4cdc5978bb75798ULL, 0xe623b939faecec20ULL, },
++        { 0xe2057a0fb6418676ULL, 0xe03c1eae0901cfcdULL, },
++        { 0xe5c1db3280000000ULL, 0xf122e6111767bfefULL, },
++        { 0x979cbaab96251040ULL, 0xd9a9cd7d166665baULL, },    /*  72  */
++        { 0x94d46f23c0af3f1eULL, 0xd3c232f2247b4967ULL, },
++        { 0x800000009a322d5aULL, 0xc75aaa8dec42881aULL, },
++        { 0xc96455c6cdd91d8cULL, 0xeadc3c95b2c62f40ULL, },
++        { 0x3250aeaeb02129e6ULL, 0x2e0c882bb1bf0bd0ULL, },
++        { 0x360d0fd180000000ULL, 0x3ef34f8ec024fbf2ULL, },
++        { 0x7f716597b3a6f032ULL, 0x6274e19686a8a318ULL, },
++        { 0x1ce6cdb280000000ULL, 0xfcd31bb480000000ULL, },
++        { 0x37e70b49a8625540ULL, 0xfeb1f7e080000000ULL, },    /*  80  */
++        { 0x39c31699dd7c5546ULL, 0xfee37780953f52fcULL, },
++        { 0x5f82316fca8f431eULL, 0xff3c0af780000000ULL, },
++        { 0x0bb5432ff1e2e177ULL, 0xfe8d6e9580000000ULL, },
++        { 0x16a56af3f656d2b3ULL, 0xff67ba1b80000000ULL, },
++        { 0x17664384fc31bf42ULL, 0xff7e4aa4953f52fcULL, },
++        { 0x26b0cbfdfa1b830bULL, 0xffa6ab9180000000ULL, },
++        { 0x04be31a4fe719ab1ULL, 0xff57124580000000ULL, },
++        { 0x092c8a1ffeef4c68ULL, 0xffba958e80000000ULL, },    /*  88  */
++        { 0x097aa960ff949347ULL, 0xffc4dede953f52fcULL, },
++        { 0x0fac7158ff59ab27ULL, 0xffd7471a80000000ULL, },
++        { 0x01ebdf01ffd41248ULL, 0xffb2fdd380000000ULL, },
++        { 0x03b76546ffe1ee50ULL, 0xffe05b1780000000ULL, },
++        { 0x03d70afdfff427aaULL, 0xffe50b86953f52fcULL, },
++        { 0x065971c1ffeda8dfULL, 0xffed6fa980000000ULL, },
++        { 0x00c741e8fffb2801ULL, 0xffdce50280000000ULL, },
++        { 0x01816947fffcaf39ULL, 0xfff1931580000000ULL, },    /*  96  */
++        { 0x02e97a17fffdbb03ULL, 0xfffa128380000000ULL, },
++        { 0x05a1edf3fffe7250ULL, 0xfffd906f80000000ULL, },
++        { 0x0ae508c5fffeefc8ULL, 0xfffeffc380000000ULL, },
++        { 0x0b41cf1bffff94c3ULL, 0xffff25bb953f52fcULL, },
++        { 0x0ba1ab79ffffd5c1ULL, 0xffff4613a6f7bf69ULL, },
++        { 0x0c04b828ffffef5bULL, 0xffff61a0b5bf25caULL, },
++        { 0x0c6b104efffff971ULL, 0xffff7918c21285a5ULL, },
++        { 0x148886c7fffff5d8ULL, 0xffffa3179907b21bULL, },    /* 104  */
++        { 0x21f39335fffff046ULL, 0xffffc00380000000ULL, },
++        { 0x38235e38ffffe7a6ULL, 0xffffd3ee80000000ULL, },
++        { 0x5cd2ce93ffffda4bULL, 0xffffe1a680000000ULL, },
++        { 0x0b60ff8afffff60aULL, 0xffffc69a80000000ULL, },
++        { 0x01651818fffffd5eULL, 0xffff937480000000ULL, },
++        { 0x002bc65fffffff4dULL, 0xffff32bb80000000ULL, },
++        { 0x00055dbfffffffd0ULL, 0xfffe7bd280000000ULL, },
++};
++
++    reset_msa_registers();
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MSUB_Q_W(b128_pattern[i], b128_pattern[j],
++                            b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MSUB_Q_W(b128_random[i], b128_random[j],
++                            b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                         (PATTERN_INPUTS_SHORT_COUNT)) +
++                                        RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MSUB_Q_W__DDT(b128_random[i], b128_random[j],
++                                 b128_result[
++                                     ((PATTERN_INPUTS_SHORT_COUNT) *
++                                      (PATTERN_INPUTS_SHORT_COUNT)) +
++                                     ((RANDOM_INPUTS_SHORT_COUNT) *
++                                      (RANDOM_INPUTS_SHORT_COUNT)) +
++                                     RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MSUB_Q_W__DSD(b128_random[i], b128_random[j],
++                                 b128_result[
++                                     ((PATTERN_INPUTS_SHORT_COUNT) *
++                                      (PATTERN_INPUTS_SHORT_COUNT)) +
++                                     (2 * (RANDOM_INPUTS_SHORT_COUNT) *
++                                      (RANDOM_INPUTS_SHORT_COUNT)) +
++                                     RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results_128(isa_ase_name, group_name, instruction_name,
++                            TEST_COUNT_TOTAL, elapsed_time,
++                            &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_msubr_q_h.c b/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_msubr_q_h.c
+new file mode 100644
+index 0000000..0be6d51
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_msubr_q_h.c
+@@ -0,0 +1,216 @@
++/*
++ *  Test program for MSA instruction MSUBR_Q.H
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *  Copyright (C) 2019  RT-RK Computer Based Systems LLC
++ *  Copyright (C) 2019  Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs_128.h"
++#include "../../../../include/test_utils_128.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *isa_ase_name = "MSA";
++    char *group_name = "Fixed Multiply";
++    char *instruction_name =  "MSUBR_Q.H";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x00000000ffff0000ULL, 0x0000ffff00000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*  16  */
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },
++        { 0xc71bc71bc71bc71bULL, 0xc71bc71bc71bc71bULL, },
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },
++        { 0xdddcdddcdddcdddcULL, 0xdddcdddcdddcdddcULL, },
++        { 0xfffefffefffefffeULL, 0xfffefffefffefffeULL, },
++        { 0xed0725ebb423ed07ULL, 0x25ebb423ed0725ebULL, },
++        { 0xfffdfffdfffefffdULL, 0xfffdfffefffdfffdULL, },
++        { 0xfffefffefffffffeULL, 0xfffefffffffefffeULL, },    /*  24  */
++        { 0xfffefffefffffffeULL, 0xfffefffffffefffeULL, },
++        { 0x38e238e238e338e2ULL, 0x38e238e338e238e2ULL, },
++        { 0xffffffff0000ffffULL, 0xffff0000ffffffffULL, },
++        { 0x2222222222232222ULL, 0x2222222322222222ULL, },
++        { 0x0000000000010000ULL, 0x0000000100000000ULL, },
++        { 0x12f7da134bdb12f7ULL, 0xda134bdb12f7da13ULL, },
++        { 0x0001000000010001ULL, 0x0000000100010000ULL, },
++        { 0x0001000000010001ULL, 0x0000000100010000ULL, },    /*  32  */
++        { 0x0001000000010001ULL, 0x0000000100010000ULL, },
++        { 0xdddedddddddedddeULL, 0xdddddddedddeddddULL, },
++        { 0x0001000000010001ULL, 0x0000000100010000ULL, },
++        { 0xeb85eb84eb85eb85ULL, 0xeb84eb85eb85eb84ULL, },
++        { 0x0000ffff00000000ULL, 0xffff00000000ffffULL, },
++        { 0xf49f16c1d27cf49fULL, 0x16c1d27cf49f16c1ULL, },
++        { 0x0000ffff00000000ULL, 0xffff00000000ffffULL, },
++        { 0x0000ffff00000000ULL, 0xffff00000000ffffULL, },    /*  40  */
++        { 0x0000ffff00000000ULL, 0xffff00000000ffffULL, },
++        { 0x2222222122222222ULL, 0x2221222222222221ULL, },
++        { 0x0000ffff00000000ULL, 0xffff00000000ffffULL, },
++        { 0x147b147a147b147bULL, 0x147a147b147b147aULL, },
++        { 0x0000ffff00000000ULL, 0xffff00000000ffffULL, },
++        { 0x0b61e93e2d830b61ULL, 0xe93e2d830b61e93eULL, },
++        { 0x0001000000000001ULL, 0x0000000000010000ULL, },
++        { 0x00010000ffff0001ULL, 0x0000ffff00010000ULL, },    /*  48  */
++        { 0x00010000ffff0001ULL, 0x0000ffff00010000ULL, },
++        { 0xed0a25edb424ed0aULL, 0x25edb424ed0a25edULL, },
++        { 0x00010000fffe0001ULL, 0x0000fffe00010000ULL, },
++        { 0xf4a016c2d27af4a0ULL, 0x16c2d27af4a016c2ULL, },
++        { 0x00010001fffd0001ULL, 0x0001fffd00010001ULL, },
++        { 0xf9afe6b99ad9f9afULL, 0xe6b99ad9f9afe6b9ULL, },
++        { 0x00010002fffc0001ULL, 0x0002fffc00010002ULL, },
++        { 0x00010002fffd0001ULL, 0x0002fffd00010002ULL, },    /*  56  */
++        { 0x00010002fffd0001ULL, 0x0002fffd00010002ULL, },
++        { 0x12f7da144bd812f7ULL, 0xda144bd812f7da14ULL, },
++        { 0x00010001fffe0001ULL, 0x0001fffe00010001ULL, },
++        { 0x0b62e93f2d820b62ULL, 0xe93f2d820b62e93fULL, },
++        { 0x00020001ffff0002ULL, 0x0001ffff00020001ULL, },
++        { 0x0654194a65220654ULL, 0x194a65220654194aULL, },
++        { 0x00020001ffff0002ULL, 0x0001ffff00020001ULL, },
++        { 0x9048fb0bf341c73bULL, 0xd396fefdfffdce10ULL, },    /*  64  */
++        { 0x8c4efb1edac8ed2cULL, 0xc86a051b003e01e6ULL, },
++        { 0x8000eb1af0ed3ac3ULL, 0xb0f10a2bff3c190fULL, },
++        { 0xe8edef7ed3364e8aULL, 0xf42214c0fe3406b6ULL, },
++        { 0xe4f3ef91babd747bULL, 0xe8f61adefe753a8cULL, },
++        { 0xe4cfef918bb95b20ULL, 0xe627f5c8faee04bfULL, },
++        { 0xe207efd0b6432746ULL, 0xe040d7190903ecb5ULL, },
++        { 0xe5c3efbf80001a0fULL, 0xf12696f61769ffc0ULL, },
++        { 0x979ddfbb962567a6ULL, 0xd9ad9c06166716e9ULL, },    /*  72  */
++        { 0x94d5dffac0af33ccULL, 0xd3c68000247cfedfULL, },
++        { 0x8000ac4b9a31c9c4ULL, 0xc75f8000ec43f421ULL, },
++        { 0xc965ba77cdd8aebdULL, 0xeae08000b2c6fca3ULL, },
++        { 0x3252bedbb021c284ULL, 0x2e118a95b1beea4aULL, },
++        { 0x360ebeca8000b54dULL, 0x3ef78000c024fd55ULL, },
++        { 0x7f73ccf6b3a79a46ULL, 0x6278800086a705d7ULL, },
++        { 0x1ce9c91380009362ULL, 0xfcd580008000ff19ULL, },
++        { 0x37ebbe42a862dbb9ULL, 0xfeb38b5e8000fe89ULL, },    /*  80  */
++        { 0x39c7be75dd7ccb94ULL, 0xfee48000953fff7cULL, },
++        { 0x5f8994cfca8f9bdeULL, 0xff3c80008000ffa2ULL, },
++        { 0x0bb6a77cf1e284a3ULL, 0xfe8d80008000ff8cULL, },
++        { 0x16a7960ef656d6ccULL, 0xff688b5e8000ff44ULL, },
++        { 0x17689660fc31c475ULL, 0xff7f8000953fffbeULL, },
++        { 0x26b48000fa1a8e43ULL, 0xffa780008000ffd1ULL, },
++        { 0x04bf964dfe718000ULL, 0xff5880008000ffc6ULL, },
++        { 0x092e817dfeefd540ULL, 0xffbb8b5e8000ffa2ULL, },    /*  88  */
++        { 0x097c81dfff94c239ULL, 0xffc58000953fffdfULL, },
++        { 0x0faf8000ff5989ffULL, 0xffd780008000ffe9ULL, },
++        { 0x01ec964dffd48000ULL, 0xffb280008000ffe4ULL, },
++        { 0x03b8817dffe2d540ULL, 0xffe08b5e8000ffd3ULL, },
++        { 0x03d881dffff4c239ULL, 0xffe58000953ffff0ULL, },
++        { 0x065b8000ffed89ffULL, 0xffed80008000fff5ULL, },
++        { 0x00c7964dfffb8000ULL, 0xffdc80008000fff2ULL, },
++        { 0x0181817dfffdd540ULL, 0xfff18b5e8000ffe9ULL, },    /*  96  */
++        { 0x02e98000fffef1b9ULL, 0xfffa95ba8000ffdbULL, },
++        { 0x05a18000fffffb3bULL, 0xfffe9f2a8000ffc4ULL, },
++        { 0x0ae38000fffffe68ULL, 0xffffa7c48000ff9fULL, },
++        { 0x0b4080630000fdb2ULL, 0xffff8000953fffdeULL, },
++        { 0x0ba080c60000fcabULL, 0xffff8000a6f7fff4ULL, },
++        { 0x0c0381280000fb2fULL, 0xffff8000b5befffcULL, },
++        { 0x0c69818a0000f90aULL, 0xffff8000c211ffffULL, },
++        { 0x148580000000f2b4ULL, 0xffff80009905ffffULL, },    /* 104  */
++        { 0x21ee80000000e69aULL, 0xffff80008000ffffULL, },
++        { 0x381a80000000cf7cULL, 0xffff80008000ffffULL, },
++        { 0x5cc480000000a354ULL, 0xffff80008000ffffULL, },
++        { 0x0b5f964d00008dd4ULL, 0xfffe80008000ffffULL, },
++        { 0x0165a8b700008000ULL, 0xfffc80008000ffffULL, },
++        { 0x002cb7ec00008000ULL, 0xfff880008000ffffULL, },
++        { 0x0005c47b00008000ULL, 0xfff180008000ffffULL, },
++};
++
++    reset_msa_registers();
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MSUBR_Q_H(b128_pattern[i], b128_pattern[j],
++                             b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MSUBR_Q_H(b128_random[i], b128_random[j],
++                             b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                          (PATTERN_INPUTS_SHORT_COUNT)) +
++                                         RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MSUBR_Q_H__DDT(b128_random[i], b128_random[j],
++                                  b128_result[
++                                      ((PATTERN_INPUTS_SHORT_COUNT) *
++                                       (PATTERN_INPUTS_SHORT_COUNT)) +
++                                      ((RANDOM_INPUTS_SHORT_COUNT) *
++                                       (RANDOM_INPUTS_SHORT_COUNT)) +
++                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MSUBR_Q_H__DSD(b128_random[i], b128_random[j],
++                                  b128_result[
++                                      ((PATTERN_INPUTS_SHORT_COUNT) *
++                                       (PATTERN_INPUTS_SHORT_COUNT)) +
++                                      (2 * (RANDOM_INPUTS_SHORT_COUNT) *
++                                       (RANDOM_INPUTS_SHORT_COUNT)) +
++                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results_128(isa_ase_name, group_name, instruction_name,
++                            TEST_COUNT_TOTAL, elapsed_time,
++                            &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_msubr_q_w.c b/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_msubr_q_w.c
+new file mode 100644
+index 0000000..7d57cb5
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_msubr_q_w.c
+@@ -0,0 +1,216 @@
++/*
++ *  Test program for MSA instruction MSUBR_Q.W
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *  Copyright (C) 2019  RT-RK Computer Based Systems LLC
++ *  Copyright (C) 2019  Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs_128.h"
++#include "../../../../include/test_utils_128.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            3 * (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *isa_ase_name = "MSA";
++    char *group_name = "Fixed Multiply";
++    char *instruction_name =  "MSUBR_Q.W";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000100000001ULL, 0x0000000100000001ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000001ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000100000001ULL, 0x0000000100000001ULL, },    /*  16  */
++        { 0x0000000100000001ULL, 0x0000000100000001ULL, },
++        { 0x38e38e3b38e38e3bULL, 0x38e38e3b38e38e3bULL, },
++        { 0x0000000200000002ULL, 0x0000000200000002ULL, },
++        { 0x2222222522222225ULL, 0x2222222522222225ULL, },
++        { 0x0000000300000003ULL, 0x0000000300000003ULL, },
++        { 0x12f684c14bda12faULL, 0xda12f68812f684c1ULL, },
++        { 0x0000000400000003ULL, 0x0000000400000004ULL, },
++        { 0x0000000300000002ULL, 0x0000000300000003ULL, },    /*  24  */
++        { 0x0000000300000002ULL, 0x0000000300000003ULL, },
++        { 0xc71c71cac71c71c9ULL, 0xc71c71cac71c71caULL, },
++        { 0x0000000200000001ULL, 0x0000000200000002ULL, },
++        { 0xdddddddfdddddddeULL, 0xdddddddfdddddddfULL, },
++        { 0x0000000100000000ULL, 0x0000000100000001ULL, },
++        { 0xed097b43b425ed0aULL, 0x25ed097ced097b43ULL, },
++        { 0x0000000000000000ULL, 0x0000000100000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000100000000ULL, },    /*  32  */
++        { 0x0000000000000000ULL, 0x0000000100000000ULL, },
++        { 0x2222222322222223ULL, 0x2222222422222223ULL, },
++        { 0x0000000000000000ULL, 0x0000000100000000ULL, },
++        { 0x147ae148147ae148ULL, 0x147ae149147ae148ULL, },
++        { 0x0000000000000000ULL, 0x0000000100000000ULL, },
++        { 0x0b60b60c2d82d82eULL, 0xe93e93ea0b60b60cULL, },
++        { 0x0000000100000000ULL, 0x0000000100000001ULL, },
++        { 0x0000000100000000ULL, 0x0000000100000001ULL, },    /*  40  */
++        { 0x0000000100000000ULL, 0x0000000100000001ULL, },
++        { 0xdddddddfdddddddeULL, 0xdddddddfdddddddfULL, },
++        { 0x0000000100000000ULL, 0x0000000100000001ULL, },
++        { 0xeb851eb9eb851eb8ULL, 0xeb851eb9eb851eb9ULL, },
++        { 0x0000000100000000ULL, 0x0000000100000001ULL, },
++        { 0xf49f49f5d27d27d3ULL, 0x16c16c17f49f49f5ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000001ULL, 0x0000000000000000ULL, },    /*  48  */
++        { 0x0000000000000001ULL, 0x0000000000000000ULL, },
++        { 0x12f684be4bda12f8ULL, 0xda12f68512f684beULL, },
++        { 0x0000000000000002ULL, 0x0000000000000000ULL, },
++        { 0x0b60b60c2d82d830ULL, 0xe93e93e90b60b60cULL, },
++        { 0x0000000000000003ULL, 0xffffffff00000000ULL, },
++        { 0x06522c3f6522c3f7ULL, 0x1948b0fb06522c3fULL, },
++        { 0x0000000000000004ULL, 0xffffffff00000000ULL, },
++        { 0x0000000000000003ULL, 0xffffffff00000000ULL, },    /*  56  */
++        { 0x0000000000000003ULL, 0xffffffff00000000ULL, },
++        { 0xed097b43b425ed0cULL, 0x25ed097bed097b43ULL, },
++        { 0x0000000000000002ULL, 0x0000000000000000ULL, },
++        { 0xf49f49f5d27d27d4ULL, 0x16c16c17f49f49f5ULL, },
++        { 0x0000000000000001ULL, 0x0000000000000000ULL, },
++        { 0xf9add3c19add3c0eULL, 0xe6b74f04f9add3c1ULL, },
++        { 0x0000000000000000ULL, 0x0000000100000000ULL, },
++        { 0x6fb7e8890cbdc0d3ULL, 0x2c6b144700049a05ULL, },    /*  64  */
++        { 0x73b239d7253787d5ULL, 0x379780f0ffc424ccULL, },
++        { 0x7fffffff0f127795ULL, 0x4f10998300c57f01ULL, },
++        { 0x1713a7162cca6b3bULL, 0x0be04ded01cca270ULL, },
++        { 0x1b0df8644544323dULL, 0x170cba96018c2d37ULL, },
++        { 0x1b323a657448a84fULL, 0x19dc46aa051313c6ULL, },
++        { 0x1dfa85ed49be7970ULL, 0x1fc3e135f6fe3018ULL, },
++        { 0x1a3e24ca7fffffffULL, 0x0edd19d1e8983ff6ULL, },
++        { 0x6863455169daefbfULL, 0x26563264e9999a2bULL, },    /*  72  */
++        { 0x6b2b90d93f50c0e0ULL, 0x2c3dccefdb84b67dULL, },
++        { 0x7fffffff65cdd2a4ULL, 0x38a5555313bd77c9ULL, },
++        { 0x369baa393226e271ULL, 0x1523c34a4d39d0a3ULL, },
++        { 0xcdaf51504fded617ULL, 0xd1f377b44e40f412ULL, },
++        { 0xc9f2f02d7fffffffULL, 0xc10cb0503fdb03f0ULL, },
++        { 0x808e9a674c590fccULL, 0x9d8b1e4779575ccaULL, },
++        { 0xe319324b7fffffffULL, 0x032ce4297fffffffULL, },
++        { 0xfe196fe67fffffffULL, 0x050bc0417e7bb00bULL, },    /*  80  */
++        { 0xfe299f487fffffffULL, 0x05cb2b577fffffffULL, },
++        { 0xff5d018339cf8b80ULL, 0x0798e2662b2b2514ULL, },
++        { 0xfecdfe20645a7d9bULL, 0x00d3dcf80dea608eULL, },
++        { 0xffebe0517fffffffULL, 0x0150ab000dc02968ULL, },
++        { 0xffec8baf7fffffffULL, 0x01828ea210087db2ULL, },
++        { 0xfff9423c39cf8b80ULL, 0x01fae4c1056841b9ULL, },
++        { 0xfff35806645a7d9bULL, 0x003737bc01be3862ULL, },
++        { 0xffff2aee7fffffffULL, 0x0057bed801b8eeb0ULL, },    /*  88  */
++        { 0xffff32047fffffffULL, 0x0064bf8102021ffcULL, },
++        { 0xffffb89f39cf8b80ULL, 0x00841c7a00ad640aULL, },
++        { 0xffff79fe645a7d9bULL, 0x000e642f0037e4a6ULL, },
++        { 0xfffff7307fffffffULL, 0x0016de7800373b16ULL, },
++        { 0xfffff77b7fffffffULL, 0x001a42040040661aULL, },
++        { 0xfffffd0c39cf8b80ULL, 0x00226e990015b802ULL, },
++        { 0xfffffa75645a7d9bULL, 0x0003c0350007004aULL, },
++        { 0xffffffa37fffffffULL, 0x0005f5d90006eb0dULL, },    /*  96  */
++        { 0xfffffffa7fffffffULL, 0x000978b30006d610ULL, },
++        { 0x000000007fffffffULL, 0x000f0d0c0006c153ULL, },
++        { 0x000000007fffffffULL, 0x0017eacf0006acd5ULL, },
++        { 0x000000007fffffffULL, 0x001b761e0007c87dULL, },
++        { 0x000000007fffffffULL, 0x001f87e00009133bULL, },
++        { 0x000000007fffffffULL, 0x00243402000a94e0ULL, },
++        { 0x000000007fffffffULL, 0x00299164000c5689ULL, },
++        { 0x0000000039cf8b80ULL, 0x003682160004293bULL, },    /* 104  */
++        { 0x000000001a1c28c4ULL, 0x00477a0900016741ULL, },
++        { 0x000000000bcae026ULL, 0x005dba4500007929ULL, },
++        { 0x00000000055376c2ULL, 0x007ae7c2000028ddULL, },
++        { 0x00000000093ed557ULL, 0x000d637500000d2cULL, },
++        { 0x00000000100c9469ULL, 0x0001755d0000043fULL, },
++        { 0x000000001bdc1297ULL, 0x000028ac0000015eULL, },
++        { 0x00000000305c8bbfULL, 0x0000046e00000071ULL, },
++};
++
++    reset_msa_registers();
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADDR_Q_W(b128_pattern[i], b128_pattern[j],
++                             b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADDR_Q_W(b128_random[i], b128_random[j],
++                             b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                          (PATTERN_INPUTS_SHORT_COUNT)) +
++                                         RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADDR_Q_W__DDT(b128_random[i], b128_random[j],
++                                  b128_result[
++                                      ((PATTERN_INPUTS_SHORT_COUNT) *
++                                       (PATTERN_INPUTS_SHORT_COUNT)) +
++                                      ((RANDOM_INPUTS_SHORT_COUNT) *
++                                       (RANDOM_INPUTS_SHORT_COUNT)) +
++                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_MADDR_Q_W__DSD(b128_random[i], b128_random[j],
++                                  b128_result[
++                                      ((PATTERN_INPUTS_SHORT_COUNT) *
++                                       (PATTERN_INPUTS_SHORT_COUNT)) +
++                                      (2 * (RANDOM_INPUTS_SHORT_COUNT) *
++                                       (RANDOM_INPUTS_SHORT_COUNT)) +
++                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results_128(isa_ase_name, group_name, instruction_name,
++                            TEST_COUNT_TOTAL, elapsed_time,
++                            &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/test_msa_compile_32r6eb.sh b/tests/tcg/mips/user/ase/msa/test_msa_compile_32r6eb.sh
+index 7a88ca2..537267c 100755
+--- a/tests/tcg/mips/user/ase/msa/test_msa_compile_32r6eb.sh
++++ b/tests/tcg/mips/user/ase/msa/test_msa_compile_32r6eb.sh
+@@ -88,6 +88,22 @@
+ # Fixed Multiply
+ # --------------
+ #
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_madd_q_h.c        \
++-EB -static -mabi=32 -march=mips32r6 -mmsa -o  /tmp/test_msa_madd_q_h_32r6eb
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_madd_q_w.c        \
++-EB -static -mabi=32 -march=mips32r6 -mmsa -o  /tmp/test_msa_madd_q_w_32r6eb
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_maddr_q_h.c       \
++-EB -static -mabi=32 -march=mips32r6 -mmsa -o  /tmp/test_msa_maddr_q_h_32r6eb
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_maddr_q_w.c       \
++-EB -static -mabi=32 -march=mips32r6 -mmsa -o  /tmp/test_msa_maddr_q_w_32r6eb
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_msub_q_h.c        \
++-EB -static -mabi=32 -march=mips32r6 -mmsa -o  /tmp/test_msa_msub_q_h_32r6eb
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_msub_q_w.c        \
++-EB -static -mabi=32 -march=mips32r6 -mmsa -o  /tmp/test_msa_msub_q_w_32r6eb
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_msubr_q_h.c       \
++-EB -static -mabi=32 -march=mips32r6 -mmsa -o  /tmp/test_msa_msubr_q_h_32r6eb
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_msubr_q_w.c       \
++-EB -static -mabi=32 -march=mips32r6 -mmsa -o  /tmp/test_msa_msubr_q_w_32r6eb
+ /opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_mul_q_h.c         \
+ -EB -static -mabi=32 -march=mips32r6 -mmsa -o  /tmp/test_msa_mul_q_h_32r6eb
+ /opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_mul_q_w.c         \
+diff --git a/tests/tcg/mips/user/ase/msa/test_msa_compile_32r6el.sh b/tests/tcg/mips/user/ase/msa/test_msa_compile_32r6el.sh
+index dbe04dc..49f8aa0 100755
+--- a/tests/tcg/mips/user/ase/msa/test_msa_compile_32r6el.sh
++++ b/tests/tcg/mips/user/ase/msa/test_msa_compile_32r6el.sh
+@@ -88,6 +88,22 @@
+ # Fixed Multiply
+ # --------------
+ #
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_madd_q_h.c        \
++-EL -static -mabi=32 -march=mips32r6 -mmsa -o  /tmp/test_msa_madd_q_h_32r6el
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_madd_q_w.c        \
++-EL -static -mabi=32 -march=mips32r6 -mmsa -o  /tmp/test_msa_madd_q_w_32r6el
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_maddr_q_h.c       \
++-EL -static -mabi=32 -march=mips32r6 -mmsa -o  /tmp/test_msa_maddr_q_h_32r6el
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_maddr_q_w.c       \
++-EL -static -mabi=32 -march=mips32r6 -mmsa -o  /tmp/test_msa_maddr_q_w_32r6el
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_msub_q_h.c        \
++-EL -static -mabi=32 -march=mips32r6 -mmsa -o  /tmp/test_msa_msub_q_h_32r6el
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_msub_q_w.c        \
++-EL -static -mabi=32 -march=mips32r6 -mmsa -o  /tmp/test_msa_msub_q_w_32r6el
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_msubr_q_h.c       \
++-EL -static -mabi=32 -march=mips32r6 -mmsa -o  /tmp/test_msa_msubr_q_h_32r6el
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_msubr_q_w.c       \
++-EL -static -mabi=32 -march=mips32r6 -mmsa -o  /tmp/test_msa_msubr_q_w_32r6el
+ /opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_mul_q_h.c         \
+ -EL -static -mabi=32 -march=mips32r6 -mmsa -o  /tmp/test_msa_mul_q_h_32r6el
+ /opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_mul_q_w.c         \
+diff --git a/tests/tcg/mips/user/ase/msa/test_msa_compile_64r6eb.sh b/tests/tcg/mips/user/ase/msa/test_msa_compile_64r6eb.sh
+index 73adabb..f4346d6 100755
+--- a/tests/tcg/mips/user/ase/msa/test_msa_compile_64r6eb.sh
++++ b/tests/tcg/mips/user/ase/msa/test_msa_compile_64r6eb.sh
+@@ -88,6 +88,22 @@
+ # Fixed Multiply
+ # --------------
+ #
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_madd_q_h.c        \
++-EB -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_madd_q_h_64r6eb
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_madd_q_w.c        \
++-EB -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_madd_q_w_64r6eb
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_maddr_q_h.c       \
++-EB -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_maddr_q_h_64r6eb
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_maddr_q_w.c       \
++-EB -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_maddr_q_w_64r6eb
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_msub_q_h.c        \
++-EB -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_msub_q_h_64r6eb
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_msub_q_w.c        \
++-EB -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_msub_q_w_64r6eb
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_msubr_q_h.c       \
++-EB -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_msubr_q_h_64r6eb
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_msubr_q_w.c       \
++-EB -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_msubr_q_w_64r6eb
+ /opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_mul_q_h.c         \
+ -EB -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_mul_q_h_64r6eb
+ /opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_mul_q_w.c         \
+diff --git a/tests/tcg/mips/user/ase/msa/test_msa_compile_64r6el.sh b/tests/tcg/mips/user/ase/msa/test_msa_compile_64r6el.sh
+index afe4311..2912b17 100755
+--- a/tests/tcg/mips/user/ase/msa/test_msa_compile_64r6el.sh
++++ b/tests/tcg/mips/user/ase/msa/test_msa_compile_64r6el.sh
+@@ -88,6 +88,22 @@
+ # Fixed Multiply
+ # --------------
+ #
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_madd_q_h.c        \
++-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_madd_q_h_64r6el
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_madd_q_w.c        \
++-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_madd_q_w_64r6el
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_maddr_q_h.c       \
++-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_maddr_q_h_64r6el
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_maddr_q_w.c       \
++-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_maddr_q_w_64r6el
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_msub_q_h.c        \
++-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_msub_q_h_64r6el
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_msub_q_w.c        \
++-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_msub_q_w_64r6el
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_msubr_q_h.c       \
++-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_msubr_q_h_64r6el
++/opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_msubr_q_w.c       \
++-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_msubr_q_w_64r6el
+ /opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_mul_q_h.c         \
+ -EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_mul_q_h_64r6el
+ /opt/img/bin/mips-img-linux-gnu-gcc  fixed-multiply/test_msa_mul_q_w.c         \
+diff --git a/tests/tcg/mips/user/ase/msa/test_msa_run_32r6eb.sh b/tests/tcg/mips/user/ase/msa/test_msa_run_32r6eb.sh
+index 70b2549..e979762 100644
+--- a/tests/tcg/mips/user/ase/msa/test_msa_run_32r6eb.sh
++++ b/tests/tcg/mips/user/ase/msa/test_msa_run_32r6eb.sh
+@@ -55,6 +55,14 @@ $PATH_TO_QEMU -cpu I6400  /tmp/test_msa_bset_d_32r6eb
+ # Fixed Multiply
+ # --------------
+ #
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_madd_q_h_32r6eb
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_madd_q_w_32r6eb
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_maddr_q_h_32r6eb
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_maddr_q_w_32r6eb
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_msub_q_h_32r6eb
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_msub_q_w_32r6eb
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_msubr_q_h_32r6eb
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_msubr_q_w_32r6eb
+ $PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mul_q_h_32r6eb
+ $PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mul_q_w_32r6eb
+ $PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mulr_q_h_32r6eb
+diff --git a/tests/tcg/mips/user/ase/msa/test_msa_run_32r6el.sh b/tests/tcg/mips/user/ase/msa/test_msa_run_32r6el.sh
+index 4e07930..0e3e0e2 100755
+--- a/tests/tcg/mips/user/ase/msa/test_msa_run_32r6el.sh
++++ b/tests/tcg/mips/user/ase/msa/test_msa_run_32r6el.sh
+@@ -55,6 +55,14 @@ $PATH_TO_QEMU -cpu I6400  /tmp/test_msa_bset_d_32r6el
+ # Fixed Multiply
+ # --------------
+ #
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_madd_q_h_32r6el
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_madd_q_w_32r6el
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_maddr_q_h_32r6el
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_maddr_q_w_32r6el
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_msub_q_h_32r6el
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_msub_q_w_32r6el
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_msubr_q_h_32r6el
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_msubr_q_w_32r6el
+ $PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mul_q_h_32r6el
+ $PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mul_q_w_32r6el
+ $PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mulr_q_h_32r6el
+diff --git a/tests/tcg/mips/user/ase/msa/test_msa_run_64r6eb.sh b/tests/tcg/mips/user/ase/msa/test_msa_run_64r6eb.sh
+index c127c1a..e58f177 100755
+--- a/tests/tcg/mips/user/ase/msa/test_msa_run_64r6eb.sh
++++ b/tests/tcg/mips/user/ase/msa/test_msa_run_64r6eb.sh
+@@ -55,6 +55,14 @@ $PATH_TO_QEMU -cpu I6400  /tmp/test_msa_bset_d_64r6eb
+ # Fixed Multiply
+ # --------------
+ #
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_madd_q_h_64r6eb
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_madd_q_w_64r6eb
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_maddr_q_h_64r6eb
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_maddr_q_w_64r6eb
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_msub_q_h_64r6eb
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_msub_q_w_64r6eb
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_msubr_q_h_64r6eb
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_msubr_q_w_64r6eb
+ $PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mul_q_h_64r6eb
+ $PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mul_q_w_64r6eb
+ $PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mulr_q_h_64r6eb
+diff --git a/tests/tcg/mips/user/ase/msa/test_msa_run_64r6el.sh b/tests/tcg/mips/user/ase/msa/test_msa_run_64r6el.sh
+index 380d876..7a89bd6 100755
+--- a/tests/tcg/mips/user/ase/msa/test_msa_run_64r6el.sh
++++ b/tests/tcg/mips/user/ase/msa/test_msa_run_64r6el.sh
+@@ -55,6 +55,14 @@ $PATH_TO_QEMU -cpu I6400  /tmp/test_msa_bset_d_64r6el
+ # Fixed Multiply
+ # --------------
+ #
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_madd_q_h_64r6el
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_madd_q_w_64r6el
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_maddr_q_h_64r6el
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_maddr_q_w_64r6el
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_msub_q_h_64r6el
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_msub_q_w_64r6el
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_msubr_q_h_64r6el
++$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_msubr_q_w_64r6el
+ $PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mul_q_h_64r6el
+ $PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mul_q_w_64r6el
+ $PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mulr_q_h_64r6el
 -- 
 2.7.4
 
