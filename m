@@ -2,82 +2,86 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46091C5B578
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 21:24:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10BFFC5B578
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 21:24:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DC90206A2
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 21:24:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0EC7206A2
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 21:24:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="csguGd7k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DC90206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mj73yvcp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0EC7206A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi3mU-0008O4-8K
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 17:24:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44702)
+	id 1hi3mm-0008Sy-4j
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 17:24:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47769)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hi3DZ-0001Sn-0l
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:48:06 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hi3JT-00069o-8M
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:54:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hi3DU-0001Ae-H5
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:48:02 -0400
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:45074)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hi3JN-0003t1-4Q
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:54:09 -0400
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:38912)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hi3DU-0001A4-BH
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:48:00 -0400
-Received: by mail-ot1-f67.google.com with SMTP id x21so14875820otq.12
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 13:48:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=QJs+wnP7c3BpRJI+8igklFziS6QGCIHoT3iDWYUKOyA=;
- b=csguGd7kk8DWw7OoY2fZ/gwKDwN5XOwl1Ib7+RiLqkWgxzNfy8e/so15aWFOEWlFw4
- 2pvf2tn/5f2gZX0R0rg1ODSKVQ3Vwf6bb58dQiEtVPD17/jKG1oY/2IU77R6WoA0shUJ
- QMJsF/Virm46bRxopQZGXe5KBJzqlsTUvoEbVE20BlrtTN5iJzPTLR+7sBjKc0aVR8P6
- Bkv6yLUGTFviGw7wp41JWET224Pbj5Nwzo7Gf6JSAvUlwP/WKwb0sNYwxIMaEgA5vhpL
- FAk9+BjXM4WgWNHYeYyU0tR/aW4QkWN6xZ3VCvKp5g35FYfXmexVygzJP61H0tzymSp2
- S0Vw==
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1hi3JM-0003sH-R9
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 16:54:05 -0400
+Received: by mail-oi1-f193.google.com with SMTP id m202so11133389oig.6
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 13:54:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=F1CAFMJ2ugwhLJyIZk8aVSxYO+A7/m98waF1eglWTiQ=;
+ b=Mj73yvcpkbDKkzosWfTPPcJXZUIEHwXoxlBB/Ch0L/D2jSscqpYYQBfPJ8AKWDuoaV
+ +kBs73I5eG0/mPdh8/Ic9CanD/ym6vN5/uvCpdqLFTVmFfztI1G3kwf1qxtdtBmhg7RZ
+ Wcbu+VkehSKsAuENaAl+cKZM6uApKvxiyxak870mNMdVYyxIf0QFPYXlr04Mbwx3w5No
+ Tg82JwPEJZ9mphp88IbnBVguv6GgQR8cU3p2SCxXBHkllfcUHBGznVy5O3kMRR55CJ9D
+ gJ1ldxdOTduxIsXPkpr8RtC4TpS7Cg4pZLua1X99La+2+CFWI8y/DGusYHL9Vnx/n76O
+ Z03Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
  :message-id:subject:to:cc;
- bh=QJs+wnP7c3BpRJI+8igklFziS6QGCIHoT3iDWYUKOyA=;
- b=gZygXaVj6WVYfIxjgkbvFiz5YUHwNxWZYDMCl48Hr1zRlt5fIi8EOXhcBqw4Ku2uHj
- kO8yBAAycsfBus38YaavptELPzwtYtFm+L17hFr8RTWKK+x2k4FYrPPRAd9dZxnn7AAX
- hVFr4fwOI9uFRwZ1cyT5huwkzgVXXoP9/WqSgzKjXW+mRAzYyx60Q+mr0LVjNK6V4bNO
- 3UO3LdDxBhBcPn+MLy27ZgvOQPja7bxlgTPqOUNJrHHh3sZGXPmRkJkaSLf1jV+Dz1Tk
- dRCU55XanNyaV8fDXjk+yX7GNDUoJUOSq60BkpqMr2s0YGqFzYxEgU2a8c0g59IF/diu
- Qg4g==
-X-Gm-Message-State: APjAAAVTQTxaEERs17BlIZtZyt4g+04K6ja8UY/cd36fKVQiu3jCesaF
- YujLwpV5ZWQSHK+/T4cRxRW1IscPkW329dwgHmrO2mdMYxY=
-X-Google-Smtp-Source: APXvYqzBWH0IDKpEyD8cyyebd2LnOM4k88OtEINRLqENYiaC4zRic/a7SPUS89ipGLWka9p4qgy05CkyR41qaQokOMc=
-X-Received: by 2002:a9d:7245:: with SMTP id a5mr21588198otk.232.1562004083150; 
- Mon, 01 Jul 2019 11:01:23 -0700 (PDT)
+ bh=F1CAFMJ2ugwhLJyIZk8aVSxYO+A7/m98waF1eglWTiQ=;
+ b=DU9ZchKP8lU1VG3iXhXs260V09qvz2C2WN62zJq68fcmbJdkS0wxfzhVqpf30xP7iu
+ zkqbmkV2PTNAChnZwDIa0jQxEAPLuONmNkEBREP8fYwxlOGyE1H7xIebraS892K9qLCh
+ tml7exPpacvWiN90ePPKweqHL0aXHvhLDOu3wfm67t8Xfg++lZAi4q6+Z4cY5BZG7lvI
+ CmBUr5A+HG35p4a2ccA2i8xmzoVuTFQWHpyfyxGZkIO41jK/+Hu3abbq+hDKKZim/Osy
+ OyqNoQ1dCJnvXpL6iUk9h3J8WtYUvkySnTUq2TYSUgJLmfnOcezhz1ISoTtSkPdwQBmm
+ xwOg==
+X-Gm-Message-State: APjAAAXRiJ62KzN9xHwpW8VNOSIueJH4TtL+oeDuiWveO8zIPso2KKWM
+ 1UyoGVSsNqsVofSxCigWhS2lEdxNL2AE02GQsPHiHA==
+X-Google-Smtp-Source: APXvYqx4fV7FfSrMltTULwuUTbtm7wFMOVmkBDN/rEU7qUOmegzLvOTYOpx0aLfgfViwmqntT39H5xaLEz6pjrJyRAU=
+X-Received: by 2002:aca:4083:: with SMTP id n125mr211010oia.106.1562001089638; 
+ Mon, 01 Jul 2019 10:11:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190627152011.18686-1-palmer@sifive.com>
- <20190627152011.18686-34-palmer@sifive.com>
- <CAFEAcA8sscJQ2GCwL1gM+EcRtfHQb1v0BwORt6ncH54x51TCVg@mail.gmail.com>
- <5896113812cd914308e5b617377f8e8205224cfe.camel@wdc.com>
-In-Reply-To: <5896113812cd914308e5b617377f8e8205224cfe.camel@wdc.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 1 Jul 2019 19:01:12 +0100
-Message-ID: <CAFEAcA_-h6b_f1fuWh7NkGo+FT0xSyCDXgd3b4pwEvNDN8HcJw@mail.gmail.com>
-To: Alistair Francis <Alistair.Francis@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
+Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP;
+ Mon, 1 Jul 2019 10:11:29 -0700 (PDT)
+Received: by 2002:a9d:4798:0:0:0:0:0 with HTTP;
+ Mon, 1 Jul 2019 10:11:29 -0700 (PDT)
+In-Reply-To: <20190701112612.14758-1-philmd@redhat.com>
+References: <20190701112612.14758-1-philmd@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 1 Jul 2019 19:11:29 +0200
+Message-ID: <CAL1e-=hyQ-SArX7fOavpYoSuZSVg2yV1DDW-j6D1rV6UWEnNTw@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.210.67
-Subject: Re: [Qemu-devel] [PULL 33/34] roms: Add OpenSBI version 0.3
+X-Received-From: 209.85.167.193
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH v4 0/4] Kconfig dependencies for some MIPS
+ machines
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,106 +93,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
- Jeff Cody <codyprime@gmail.com>, "palmer@sifive.com" <palmer@sifive.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- "bmeng.cn@gmail.com" <bmeng.cn@gmail.com>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Thomas Huth <thuth@redhat.com>,
+ qemu-devel@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 1 Jul 2019 at 18:50, Alistair Francis <Alistair.Francis@wdc.com> wrote:
+On Jul 1, 2019 1:26 PM, "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com> w=
+rote:
 >
-> On Mon, 2019-07-01 at 17:54 +0100, Peter Maydell wrote:
-> > On Thu, 27 Jun 2019 at 16:24, Palmer Dabbelt <palmer@sifive.com>
-> > wrote:
-> > > From: Alistair Francis <alistair.francis@wdc.com>
-> > >
-> > > Add OpenSBI version 0.3 as a git submodule and as a prebult binary.
-> > >
-> > > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> > > Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
-> > > Tested-by: Bin Meng <bmeng.cn@gmail.com>
-> > > Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
-> > > ---
-> > >  .gitmodules                                  |   3 ++
-> > >  Makefile                                     |   5 +-
-> > >  pc-bios/opensbi-riscv32-virt-fw_jump.bin     | Bin 0 -> 28848
-> > > bytes
-> > >  pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin | Bin 0 -> 28904
-> > > bytes
-> > >  pc-bios/opensbi-riscv64-virt-fw_jump.bin     | Bin 0 -> 28904
-> > > bytes
-> > >  roms/Makefile                                |  48 ++++++++++++++-
-> > > ----
-> > >  roms/opensbi                                 |   1 +
-> > >  7 files changed, 44 insertions(+), 13 deletions(-)
-> > >  create mode 100644 pc-bios/opensbi-riscv32-virt-fw_jump.bin
-> > >  create mode 100644 pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin
-> > >  create mode 100644 pc-bios/opensbi-riscv64-virt-fw_jump.bin
-> > >  create mode 160000 roms/opensbi
-> > >
-> > > diff --git a/.gitmodules b/.gitmodules
-> > > index 2857eec76377..7a10e72e09cd 100644
-> > > --- a/.gitmodules
-> > > +++ b/.gitmodules
-> > > @@ -55,3 +55,6 @@
-> > >  [submodule "slirp"]
-> > >         path = slirp
-> > >         url = https://git.qemu.org/git/libslirp.git
-> > > +[submodule "roms/opensbi"]
-> > > +       path = roms/opensbi
-> > > +       url = https://github.com/riscv/opensbi.git
-> >
-> > It would be nice to state the license for new blobs we're
-> > adding to the source tree... In particular, I find the
-> > readme at https://github.com/riscv/opensbi a bit confusing
-> > because it says it's 2-BSD but also that some parts are Apache-2.0;
-> > the latter is *not* GPL-2.0 compatible. That makes it not completely
-> > obvious to me that we can ship this with QEMU.
+> Express the MIPS machine dependencies with Kconfig.
 >
-> Ah, I didn't realise there is Apache-2.0 code in there.
+> Various issues prevent to use Kconfig with the Boston and Malta
+> boards. They will be switched later.
 >
-> In this case all of the code we are using (we aren't using the Kendryte
-> code with QEMU) is BSD-2-Clause. Even then though does it matter if it
-> is GPL compatible? This isn't being linked with QEMU it is just being
-> included with QEMU.
 
-Yeah, if we're not building the apache-2.0 parts then I think
-we're OK, and as you say there's the question of whether QEMU's
-GPL affects what we ship as mere bios blobs to run as guest
-code anyway. But it's sufficiently not a "really obviously ok"
-that I'd like a second opinion; cc'd some people who might have
-second opinions.
+I am going to select the whole series for mips queue scheduled tomorrow.
 
-> I can add details of the license in the source tree, where should it be
-> added?
+Yours,
+Aleksandar
 
-I was thinking in the commit message. We also seem to
-have human-readable information in pc-bios/README for
-the various blobs, which seems to be a good place for a brief
-one-para summary of what OpenSBI is, a URL for its upstream,
-and a brief note of the license.
-
-> >
-> > Also, new git modules in .gitmodules should be qemu.org
-> > URLs, not random external ones. (ie, we should set up
-> > mirroring of any new external repo we start shipping
-> > code and binaries for). We can set this up and fix up the
-> > gitmodules file after the fact, but the ideal is to do
-> > it in advance rather than afterwards.
+> v4:
+> - dropped Boston (Aleksandar required the ITU to be selectable)
+> - comment why use 'imply' in Jazz (Thomas)
 >
-> Ok, who can setup a git mirror for the QEMU repo?
-
-That would be Jeff or Stefan (cc'd).
-
-> PS: It seems like there are still some issues with this patch so maybe
-> it's worth dropping this patch from the PR so that we can get
-> everything else merged.
-
-Yeah, that would be my suggestion.
-
-thanks
--- PMM
-
+> v3:
+> - addressed review comments from Thomas and Aleksandar
+>   (noted in each patch)
+>
+> v2: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg00887.html
+> - Do not remove machines from the default config (Thomas)
+> - Corrected comment about CONFIG_PCI_BONITO (Thomas)
+>
+> v1: https://www.mail-archive.com/qemu-devel@nongnu.org/msg593013.html
+>
+> $ git backport-diff -u kconfig_mips-v3
+> Key:
+> [----] : patches are identical
+> [####] : number of functional differences between upstream/downstream
+patch
+> The flags [FC] indicate (F)unctional and (C)ontextual differences,
+respectively
+>
+> 001/4:[down] 'hw/mips: Explicit the semi-hosting feature is always
+required'
+> 002/4:[----] [--] 'hw/mips: Express dependencies of the MIPSsim machine
+with Kconfig'
+> 003/4:[----] [-C] 'hw/mips: Express dependencies of the Jazz machine with
+Kconfig'
+> 004/4:[0005] [FC] 'hw/mips: Express dependencies of the r4k platform with
+Kconfig'
+>
+> Regards,
+>
+> Phil.
+>
+> Philippe Mathieu-Daud=C3=A9 (4):
+>   hw/mips: Explicit the semi-hosting feature is always required
+>   hw/mips: Express dependencies of the MIPSsim machine with Kconfig
+>   hw/mips: Express dependencies of the Jazz machine with Kconfig
+>   hw/mips: Express dependencies of the r4k platform with Kconfig
+>
+>  default-configs/mips-softmmu-common.mak |  7 +++---
+>  default-configs/mips64-softmmu.mak      |  5 -----
+>  default-configs/mips64el-softmmu.mak    |  5 -----
+>  hw/mips/Kconfig                         | 30 +++++++++++++++++++++++++
+>  4 files changed, 33 insertions(+), 14 deletions(-)
+>
+> --
+> 2.20.1
+>
+>
