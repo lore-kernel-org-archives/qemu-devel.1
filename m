@@ -2,61 +2,83 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=DATE_IN_PAST_03_06,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 008BEC5B578
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 22:24:57 +0000 (UTC)
-Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C789EC5B578
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 22:33:56 +0000 (UTC)
+Received: from lists.gnu.org (unknown [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C220C20B7C
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 22:24:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C220C20B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4E31820B7C
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 22:33:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eOqifwzF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E31820B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi4jH-0002MQ-W5
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 18:24:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56425)
+	id 1hi4rs-0004b3-VS
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 18:33:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35116)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hi3XZ-00083Q-6I
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:08:46 -0400
+ (envelope-from <radoslaw.biernacki@linaro.org>) id 1hi3dm-0004sw-W1
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:15:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hi3XY-0006UB-4W
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:08:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:11475)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hi3XT-0006RA-OL; Mon, 01 Jul 2019 17:08:39 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B80E6223884;
- Mon,  1 Jul 2019 19:50:26 +0000 (UTC)
-Received: from x1w.redhat.com (unknown [10.40.205.170])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 99A719089;
- Mon,  1 Jul 2019 19:50:21 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Mon,  1 Jul 2019 21:49:41 +0200
-Message-Id: <20190701194942.10092-8-philmd@redhat.com>
-In-Reply-To: <20190701194942.10092-1-philmd@redhat.com>
-References: <20190701194942.10092-1-philmd@redhat.com>
+ (envelope-from <radoslaw.biernacki@linaro.org>) id 1hi3di-000232-Sc
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:15:10 -0400
+Received: from mail-yb1-f194.google.com ([209.85.219.194]:33789)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <radoslaw.biernacki@linaro.org>)
+ id 1hi3df-0001E0-PV
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:15:06 -0400
+Received: by mail-yb1-f194.google.com with SMTP id x4so566954ybk.0
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 14:13:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=zUdJ2ra0quRmBJw7uvelcVmfVROIlFC4VcERGTjbcMc=;
+ b=eOqifwzF+s5nDPQtVR1dlA7jZKNj9uWM381ERJcKTxr+jUKVnYCkuROs11yGm7zRnl
+ Cw8AG8uVoAl4hs/v2/bfDMGsGmloHlihtZYCnJd8ceOvxnKRMMwhaDSjhDAu+HDdPpcV
+ KHouR0Ihxkdr6jmK52GNAAUyHkI63siJ67lrqBasKLRqEIKZyOnAqoM/t2e0dZkyTNzU
+ 6iH8vBaNtODTGlOtM/UqolpWqM8SZlHoM9wKQyKqjL+YNGU6ptXYBYwNgL4zt3NAyONv
+ Z1PLUiDbkmrSDfaatJNW/2qF9RUTwvl1zw1zWSyQk2zDg7Ihty0cUTHwFuu/8BfZ8Sa+
+ b1Rw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=zUdJ2ra0quRmBJw7uvelcVmfVROIlFC4VcERGTjbcMc=;
+ b=MZ7yPc8nvuMi0HdMMMPuh9Qaq3wGgUG6equx241zbGXWOLa4JOucrbGXwoZ4SS9s71
+ AMzVAfsvGefJecbj6mfhUvNKofF+wSG2x5TnICfM+Z0J8xsrX3TJCOyeG9jykoJDQQTW
+ tJscDrNPGItnuC6m6kZEVy985cgO/lTPud5vcukJO1Ll/lG0+M4vfHy9XZvFaXs8X8Yt
+ /7QPGmvHzZLdxC6OmGyoqQYvTZImU8/2upIb+jm1sEbbisCjm5LLVJIEJbaDXQR5HIN5
+ LibtJ0IVSQWqXMgbNPHZr8hl3YimeOkWYrlSosArLRmHHDPqBry0GeKSIwmeuTTLUDiG
+ X/vQ==
+X-Gm-Message-State: APjAAAUPOInZqMnTi/2mtsMfSoFx8dyGJsGP5xQabo24yXc96q+44zg/
+ GJqt5OZAQvaqofoLElzDdTUuZgevz+8gm2cS4gQDTQ==
+X-Google-Smtp-Source: APXvYqxlX2N0jR1dINvFRvx8d0NyP7+eHLPQOuGX4Ju3Y1DIBZnmPodvR87jYkJTKBKgEkg4OMOZ2tBKJseniYHGvuw=
+X-Received: by 2002:a25:db8d:: with SMTP id
+ g135mr10947046ybf.336.1561998231160; 
+ Mon, 01 Jul 2019 09:23:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Mon, 01 Jul 2019 19:50:26 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+References: <1561890034-15921-1-git-send-email-hongbo.zhang@linaro.org>
+ <CAFEAcA8P-=mbQ4__9OXB078GnrGfm9afH1YBDLkv88mUXmm=PQ@mail.gmail.com>
+ <20190701160846.fwjeco3zuobn3pgv@bivouac.eciton.net>
+In-Reply-To: <20190701160846.fwjeco3zuobn3pgv@bivouac.eciton.net>
+From: Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
+Date: Mon, 1 Jul 2019 18:23:40 +0200
+Message-ID: <CAEK-wK=gV7t8sTnN9dLmJO4ECgAudO-THhtJzHWxMpxf12mPtg@mail.gmail.com>
+To: Leif Lindholm <leif.lindholm@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 7/8] RFC target/arm: Do not build
- A/M-profile cpus when using KVM
+ [fuzzy]
+X-Received-From: 209.85.219.194
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH v9 0/2] Add Arm SBSA Reference Machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,114 +90,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yang Zhong <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>,
- Andrew Jones <drjones@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>,
- Rob Bradford <robert.bradford@intel.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Hongbo Zhang <hongbo.zhang@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A KVM-only build won't be able to run A or M-profile cpus,
-disable them.
+Hi Leif and Peter,
 
-If KVM is not enabled, they are enabled by default.
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-Sadly this does not work with --enable-tcg --enable-kvm dual config.
----
- default-configs/arm-softmmu.mak | 14 ++++++--------
- hw/arm/Kconfig                  | 16 +++++++++++++---
- 2 files changed, 19 insertions(+), 11 deletions(-)
-
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
-u.mak
-index 081d507c87..3995c4bb65 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -1,25 +1,18 @@
- # Default configuration for arm-softmmu
-=20
--# TODO: ARM_V7M is currently always required - make this more flexible!
--CONFIG_ARM_V7M=3Dy
--
- # CONFIG_PCI_DEVICES=3Dn
- # CONFIG_TEST_DEVICES=3Dn
-+CONFIG_ARM_V7M=3Dn
-=20
- CONFIG_ARM_VIRT=3Dy
- CONFIG_CUBIEBOARD=3Dy
- CONFIG_EXYNOS4=3Dy
- CONFIG_FSL_IMX31=3Dy
--CONFIG_MUSCA=3Dy
--CONFIG_STELLARIS=3Dy
- CONFIG_REALVIEW=3Dy
- CONFIG_VEXPRESS=3Dy
- CONFIG_ZYNQ=3Dy
--CONFIG_NETDUINO2=3Dy
--CONFIG_MPS2=3Dy
- CONFIG_RASPI=3Dy
- CONFIG_SABRELITE=3Dy
--CONFIG_EMCRAFT_SF2=3Dy
- CONFIG_FSL_IMX7=3Dy
- CONFIG_FSL_IMX6UL=3Dy
- CONFIG_SEMIHOSTING=3Dy
-@@ -38,4 +31,9 @@ CONFIG_SEMIHOSTING=3Dy
- #CONFIG_ASPEED_SOC=3Dy
- #CONFIG_NSERIES=3Dy
- #CONFIG_HIGHBANK=3Dn
-+#CONFIG_MUSCA=3Dn
-+#CONFIG_STELLARIS=3Dn
-+#CONFIG_NETDUINO2=3Dn
-+#CONFIG_MPS2=3Dn
-+#CONFIG_EMCRAFT_SF2=3Dn
- #CONFIG_MICROBIT=3Dn
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index b4d31c6026..f8242068ad 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -13,6 +13,18 @@ config ARM_V6
-     depends on !KVM
-     bool
-=20
-+# ARM Microcontroller profile
-+config ARM_V7M
-+    default y
-+    depends on !KVM
-+    bool
-+
-+# ARM Realtime profile
-+config ARM_V7R
-+    default y
-+    depends on !KVM
-+    bool
-+
- config ARM_VIRT
-     bool
-     imply PCI_DEVICES
-@@ -295,9 +307,6 @@ config ZYNQ
-     select XILINX_SPIPS
-     select ZYNQ_DEVCFG
-=20
--config ARM_V7M
--    bool
--
- config ALLWINNER_A10
-     bool
-     select AHCI
-@@ -323,6 +332,7 @@ config STM32F205_SOC
-=20
- config XLNX_ZYNQMP_ARM
-     bool
-+    select ARM_V7R
-     select AHCI
-     select ARM_GIC
-     select CADENCE
---=20
-2.20.1
+We talked with Hongbo about the takeover, so please add me as maintainer.
 
 
+On Mon, 1 Jul 2019 at 18:08, Leif Lindholm <leif.lindholm@linaro.org> wrote:
+
+> Hi Peter,
+>
+> On Mon, Jul 01, 2019 at 03:54:24PM +0100, Peter Maydell wrote:
+> > I've pointed out a number of issues with these patches, but they
+> > all turn out to be very minor (mostly fixable by moving code between
+> > patch 1 and 2). The other thing we need is a MAINTAINERS section for
+> > the new board:
+> >
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index cad58b94879..0bf3739f06a 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -728,6 +728,13 @@ F: include/hw/arm/fsl-imx6.h
+> >  F: include/hw/misc/imx6_*.h
+> >  F: include/hw/ssi/imx_spi.h
+> >
+> > +SBSA-REF
+> > +M: Hongbo Zhang <hongbo.zhang@linaro.org>
+> > +M: Peter Maydell <peter.maydell@linaro.org>
+> > +L: qemu-arm@nongnu.org
+> > +S: Maintained
+> > +F: hw/arm/sbsa-ref.c
+> > +
+>
+> Sadly, Hongbo is no longer in Linaro (but has generously helped keep
+> working on this platform being upstreamed since he left). It is my
+> understanding that in his new role, Hongbo does not have the bandwidth
+> to keep maintaining this platform once it's in.
+>
+> Unless I have misunderstood this (Hongbo, please confirm - we would
+> certainly love to have your help if you feel that you do have the
+> banwidth), could we please add Radek as a maintainer instead?:
+>
+> M: Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
+>
+> If you think it could be useful, feel free to add me as a designated
+> reviewer:
+>
+> R: Leif Lindholm <leif.lindholm@linaro.org>
+>
+> (I would not be offended if you don't, I have plenty to keep me busy :)
+>
+> >  Sharp SL-5500 (Collie) PDA
+> >  M: Peter Maydell <peter.maydell@linaro.org>
+> >  L: qemu-arm@nongnu.org
+> >
+> >
+> > So rather than making you do another respin, I'm planning to
+> > make the fixes in my target-arm.next tree as I apply the patches.
+> > That way we can get this in before softfreeze (which is tomorrow).
+>
+> Many thanks!
+>
+> Best Regards,
+>
+> Leif
+>
