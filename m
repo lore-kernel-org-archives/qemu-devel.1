@@ -2,66 +2,91 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCB55C0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 15:38:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC5DCC0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 15:38:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF167206E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 15:38:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF167206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9AF1620B7C
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 15:38:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qDA1jQSu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AF1620B7C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=fail smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhyNn-0001Jq-J5
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 11:38:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38752)
+	id 1hhyO9-0001av-UL
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 11:38:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41186)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <crosa@redhat.com>) id 1hhy9e-0000xo-HE
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 11:23:43 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1hhyKS-0000Qy-LI
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 11:34:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1hhy9d-0005VG-B7
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 11:23:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38182)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>)
- id 1hhy9d-0005TG-37; Mon, 01 Jul 2019 11:23:41 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D2748C057F88;
- Mon,  1 Jul 2019 15:23:37 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-124-195.rdu2.redhat.com
- [10.10.124.195])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8D4A2BA4D;
- Mon,  1 Jul 2019 15:23:34 +0000 (UTC)
-Date: Mon, 1 Jul 2019 11:23:32 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>, ehabkost@redhat.com
-Message-ID: <20190701152332.GA30640@localhost.localdomain>
-References: <20190607174953.22342-1-philmd@redhat.com>
- <a09936fe-4fdc-1623-6300-43f4891ff389@redhat.com>
- <CAL1e-=hoWQpmttzUGGbW7x8gGme7VMfEKhw=cFpL5Pg9A9sHDQ@mail.gmail.com>
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1hhyKL-0003YX-Me
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 11:34:47 -0400
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:33413)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1hhyKJ-0003Wk-Rh
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 11:34:43 -0400
+Received: by mail-wm1-x32c.google.com with SMTP id h19so314047wme.0
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 08:34:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=cxCjEB5zKdWfSZxX3+j2v2ItnSTW3coA+RW/5hRm9LQ=;
+ b=qDA1jQSuCgcMlqiAvOoPnUFwvoKCAD4oPTXzpCqT63Rhkix/iEuHCP/Fpy4DgHPDPs
+ DNzXKO8LXbUoBoMFz/psKzLQUANRqW8k8w+zFMThPxavUmwiqNqPOGdp7IpCza2WDnN7
+ bgYjxCSUtQd50ev2brEo+QQ1FGclh63MNYTlVhChhAP4qmMUMWNGu+WLMvvRVJrfFIYL
+ H7VBRx6N+c+8q9UqE4NBH2vz0shJxeZLNXK6nBHaCSO/lq9bIbUGw3LMlEFhqwvKQF0W
+ l/JRvHoknpTX7ssXltPFTCw1VMnNotTO5bdddU/WRTV8BcQkXTsRWki0g4+TLyOggVDC
+ djCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=cxCjEB5zKdWfSZxX3+j2v2ItnSTW3coA+RW/5hRm9LQ=;
+ b=KCQUOiNWB0YuJswPEOAlUQ48igika9Y1KU5L/s1NOU4HaXF11q3f69MYV3HWBPD/Xm
+ f8tCs2RpDT3m+Ia5jJ2lnsTDnlPrIXUya6P25rm4on/74BgbmjIv2FnkQ+3gnO1TwoJs
+ oHaIMV02/XQRA/sjb/dvhWjG4dqm4zmLPXKGuIQRtub2jwsISx0xvECoxOgg0fbhf9Ck
+ dQWlhJWD2HDMPOK8tlyxG6s1/R3K1bTmtLo1aGQFwUOgF+6zPl3LH+vBAPOL+eEg88pc
+ WD/YgWknYbedt4OzdfSFQWu/UEw4XqOocGsikB22Gguo+eKARkPA8wBQaDoiO69RMfyX
+ fMGg==
+X-Gm-Message-State: APjAAAUlGixKsM1VpkizkXnJMNu0zgCJeETkvK/ZM+JJcgN25Vdm+yht
+ RZJ9H5uSrIGRby5KAUnlMccgV/dr
+X-Google-Smtp-Source: APXvYqyAQY3CiwKUCIfgWGScUWWHOJzMjSok2hbZPbgBb8+kayPRtsdNrekXQUm7vq/cLT+r3aZ7jg==
+X-Received: by 2002:a1c:448b:: with SMTP id
+ r133mr18259488wma.114.1561995282370; 
+ Mon, 01 Jul 2019 08:34:42 -0700 (PDT)
+Received: from x1.local (183.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.183])
+ by smtp.gmail.com with ESMTPSA id w24sm8922341wmc.30.2019.07.01.08.34.40
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 01 Jul 2019 08:34:41 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Date: Mon,  1 Jul 2019 17:34:36 +0200
+Message-Id: <20190701153436.16579-3-f4bug@amsat.org>
+X-Mailer: git-send-email 2.19.1
+In-Reply-To: <20190701153436.16579-1-f4bug@amsat.org>
+References: <20190701153436.16579-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAL1e-=hoWQpmttzUGGbW7x8gGme7VMfEKhw=cFpL5Pg9A9sHDQ@mail.gmail.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Mon, 01 Jul 2019 15:23:38 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] BootLinuxSshTest: Only use 'test' for
- unittest.TestCase method names
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32c
+Subject: [Qemu-devel] [PATCH v2 2/2] .travis.yml: Let the avocado job run
+ the NeXTcube tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,96 +98,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org,
- qemu-devel@nongnu.org, Aleksandar Rikalo <arikalo@wavecomp.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ Thomas Huth <huth@tuxfamily.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 01, 2019 at 05:03:33PM +0200, Aleksandar Markovic wrote:
-> On Jul 1, 2019 4:22 PM, "Philippe Mathieu-Daud=E9" <philmd@redhat.com> =
-wrote:
-> >
-> > ping?
-> >
-> > On 6/7/19 7:49 PM, Philippe Mathieu-Daud=E9 wrote:
-> > > In commit f6e501a28ef9, Eduardo started to use "check_" as a
-> > > prefix for methods of similar purpose. Follow this prior art,
-> > > since it might become the conventions when writting Avocado
-> > > tests.
-> > >
-> > > Suggested-by: Cleber Rosa <crosa@redhat.com>
-> > > Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> > > ---
->=20
-> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+v2:
+- install tesseract English package (Thomas)
+- install PIL
+---
+ .travis.yml | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
+diff --git a/.travis.yml b/.travis.yml
+index aeb9b211cd..0980f65ec5 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -231,15 +231,20 @@ matrix:
+ 
+     # Acceptance (Functional) tests
+     - env:
+-        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu"
++        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu,m68k-softmmu"
+         - TEST_CMD="make check-acceptance"
+       after_failure:
+         - cat tests/results/latest/job.log
+       addons:
+         apt:
+           packages:
++            - python3-pil
+             - python3-pip
+             - python3.5-venv
++            - tesseract-ocr
++            - tesseract-ocr-eng
++
++
+     # Using newer GCC with sanitizers
+     - addons:
+         apt:
+-- 
+2.19.1
 
-And queued on my python-next branch.
-
->=20
-> > >  tests/acceptance/linux_ssh_mips_malta.py | 10 +++++-----
-> > >  1 file changed, 5 insertions(+), 5 deletions(-)
-> > >
-> > > diff --git a/tests/acceptance/linux_ssh_mips_malta.py
-> b/tests/acceptance/linux_ssh_mips_malta.py
-> > > index aafb0c39f6..134f10cac3 100644
-> > > --- a/tests/acceptance/linux_ssh_mips_malta.py
-> > > +++ b/tests/acceptance/linux_ssh_mips_malta.py
-> > > @@ -162,7 +162,7 @@ class LinuxSSH(Test):
-> > >          self.assertIn(True, ["0dfbe8aa4c20b52e1b8bf3cb6cbdf193" in=
- line
-> > >                               for line in stdout])
-> > >
-> > > -    def do_test_mips_malta(self, endianess, kernel_path, uname_m):
-> > > +    def check_mips_malta(self, endianess, kernel_path, uname_m):
-> > >          self.boot_debian_wheezy_image_and_ssh_login(endianess,
-> kernel_path)
-> > >
-> > >          stdout, stderr =3D self.ssh_command('uname -a')
-> > > @@ -184,7 +184,7 @@ class LinuxSSH(Test):
-> > >          kernel_hash =3D '592e384a4edc16dade52a6cd5c785c637bcbc9ad'
-> > >          kernel_path =3D self.fetch_asset(kernel_url,
-> asset_hash=3Dkernel_hash)
-> > >
-> > > -        self.do_test_mips_malta('be', kernel_path, 'mips')
-> > > +        self.check_mips_malta('be', kernel_path, 'mips')
-> > >
-> > >      @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on
-> Travis-CI')
-> > >      def test_mips_malta32el_kernel3_2_0(self):
-> > > @@ -199,7 +199,7 @@ class LinuxSSH(Test):
-> > >          kernel_hash =3D 'a66bea5a8adaa2cb3d36a1d4e0ccdb01be8f6c2a'
-> > >          kernel_path =3D self.fetch_asset(kernel_url,
-> asset_hash=3Dkernel_hash)
-> > >
-> > > -        self.do_test_mips_malta('le', kernel_path, 'mips')
-> > > +        self.check_mips_malta('le', kernel_path, 'mips')
-> > >
-> > >      @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on
-> Travis-CI')
-> > >      def test_mips_malta64eb_kernel3_2_0(self):
-> > > @@ -213,7 +213,7 @@ class LinuxSSH(Test):
-> > >                        'vmlinux-3.2.0-4-5kc-malta')
-> > >          kernel_hash =3D 'db6eea7de35d36c77d8c165b6bcb222e16eb91db'
-> > >          kernel_path =3D self.fetch_asset(kernel_url,
-> asset_hash=3Dkernel_hash)
-> > > -        self.do_test_mips_malta('be', kernel_path, 'mips64')
-> > > +        self.check_mips_malta('be', kernel_path, 'mips64')
-> > >
-> > >      @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on
-> Travis-CI')
-> > >      def test_mips_malta64el_kernel3_2_0(self):
-> > > @@ -227,4 +227,4 @@ class LinuxSSH(Test):
-> > >                        'vmlinux-3.2.0-4-5kc-malta')
-> > >          kernel_hash =3D '6a7f77245acf231415a0e8b725d91ed2f3487794'
-> > >          kernel_path =3D self.fetch_asset(kernel_url,
-> asset_hash=3Dkernel_hash)
-> > > -        self.do_test_mips_malta('le', kernel_path, 'mips64')
-> > > +        self.check_mips_malta('le', kernel_path, 'mips64')
-> > >
-> >
 
