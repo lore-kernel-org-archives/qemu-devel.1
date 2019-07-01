@@ -2,82 +2,65 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EEA4C0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 10:03:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 018FEC0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 10:05:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFBE820881
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 10:03:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFBE820881
+	by mail.kernel.org (Postfix) with ESMTPS id CDCD620881
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 10:05:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDCD620881
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhtAD-0000oc-AZ
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 06:03:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55456)
+	id 1hhtBY-0001ip-4L
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 06:05:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55512)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hht5A-0006Nd-M8
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:58:47 -0400
+ (envelope-from <ppandit@redhat.com>) id 1hht5P-0006TN-8Y
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:59:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hht59-0007sg-Kp
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:58:44 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:46762)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hht59-0007rh-CF
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:58:43 -0400
-Received: by mail-wr1-f67.google.com with SMTP id n4so13049938wrw.13
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 02:58:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=YtzbtwJeSmY2r9CQ/aodjkBS7oniY9D5Gqhkb0tm5cE=;
- b=giDkt4r/gOU7aYZJpWyHOg0+IdBBvo06cSdhJREcBLUEm74LI3jIOa7TCsuwLqRLK6
- 0x+3AbOrwwHT9/9Y2XWG1uEnqlfwJqGJdl11J3ypNVyRng2KTMs7jq0p3SyapPmyleES
- fTP841uD6bM9JLbPpFlQ9aXcOOngR/ltyBUR+5OGANXI9noYo+FGLa8abBPFTPyGZmAU
- eNJ53gR8foz42mHNnSxXWanWRCnFwzxhM2zHAXrHPEPAKzphzhQgUMzrbmY2THSziQOq
- 9NlPFhSti84ExvES26jC3b5iyTfgmSi/roXLG/NL6XknI7SlXUsYINMMWUja9S/pRm+8
- 8YHw==
-X-Gm-Message-State: APjAAAVKM9D3vSFq+LHHvfK5AitkIiZ8U9BYKZu1vEM5DKzCQPfWoPmx
- v6Che63xuXNYoI5Jtx8dWPTWag==
-X-Google-Smtp-Source: APXvYqwKPq4o6BdbfcPYV5Grns1CLYdlDMyGRTX17BjMbMCVWatU52xF/A9sDYxcxCgq4zKrofktEg==
-X-Received: by 2002:adf:82a8:: with SMTP id 37mr8172535wrc.332.1561975122450; 
- Mon, 01 Jul 2019 02:58:42 -0700 (PDT)
-Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.183])
- by smtp.gmail.com with ESMTPSA id t15sm8826375wrx.84.2019.07.01.02.58.41
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Mon, 01 Jul 2019 02:58:41 -0700 (PDT)
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org,
- peterx@redhat.com, pbonzini@redhat.com, alex.williamson@redhat.com
-References: <20190701093034.18873-1-eric.auger@redhat.com>
- <20190701093034.18873-2-eric.auger@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <ca989a2a-05db-4222-7068-9d294f0434f7@redhat.com>
-Date: Mon, 1 Jul 2019 11:58:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <ppandit@redhat.com>) id 1hht5N-000875-1l
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:58:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38424)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1hht5I-00080p-PD
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 05:58:53 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id EF20A7FDC9;
+ Mon,  1 Jul 2019 09:58:36 +0000 (UTC)
+Received: from kaapi (unknown [10.33.36.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9315D7DF6A;
+ Mon,  1 Jul 2019 09:58:32 +0000 (UTC)
+Date: Mon, 1 Jul 2019 15:28:30 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+X-X-Sender: pjp@kaapi
+To: =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>
+In-Reply-To: <20190701094353.GF3573@redhat.com>
+Message-ID: <nycvar.YSQ.7.76.1907011527460.31268@xnncv>
+References: <20190701090904.31312-1-ppandit@redhat.com>
+ <20190701090904.31312-2-ppandit@redhat.com>
+ <20190701094353.GF3573@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190701093034.18873-2-eric.auger@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Mon, 01 Jul 2019 09:58:37 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] memory: Remove unused
- memory_region_iommu_replay_all()
+X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] qemu-bridge-helper: restrict
+ interface name to IFNAMSIZ
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,62 +72,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Riccardo Schirone <rschiron@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Li Qiang <liq3ea@gmail.com>, Qemu Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/1/19 11:30 AM, Eric Auger wrote:
-> memory_region_iommu_replay_all is not used. Remove it.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  include/exec/memory.h | 10 ----------
->  memory.c              |  9 ---------
->  2 files changed, 19 deletions(-)
-> 
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index e6140e8a04..bdd76653a8 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -1076,16 +1076,6 @@ void memory_region_register_iommu_notifier(MemoryRegion *mr,
->   */
->  void memory_region_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n);
->  
-> -/**
-> - * memory_region_iommu_replay_all: replay existing IOMMU translations
-> - * to all the notifiers registered.
-> - *
-> - * Note: this is not related to record-and-replay functionality.
-> - *
-> - * @iommu_mr: the memory region to observe
-> - */
-> -void memory_region_iommu_replay_all(IOMMUMemoryRegion *iommu_mr);
-> -
->  /**
->   * memory_region_unregister_iommu_notifier: unregister a notifier for
->   * changes to IOMMU translation entries.
-> diff --git a/memory.c b/memory.c
-> index 0a089a73ae..290a1493ef 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -1910,15 +1910,6 @@ void memory_region_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
->      }
->  }
->  
-> -void memory_region_iommu_replay_all(IOMMUMemoryRegion *iommu_mr)
-> -{
-> -    IOMMUNotifier *notifier;
-> -
-> -    IOMMU_NOTIFIER_FOREACH(notifier, iommu_mr) {
-> -        memory_region_iommu_replay(iommu_mr, notifier);
-> -    }
-> -}
-> -
->  void memory_region_unregister_iommu_notifier(MemoryRegion *mr,
->                                               IOMMUNotifier *n)
->  {
-> 
++-- On Mon, 1 Jul 2019, Daniel P. Berrang=C3=A9 wrote --+
+| > +        if (strcmp(cmd, "include") && strlen(arg) >=3D IFNAMSIZ) {
+| > +            fprintf(stderr, "name `%s' too long: %lu\n", arg, strlen=
+(arg));
+|=20
+| strlen returns size_t, which does not match %lu - it needs %zu - we can
+| ignore the non-portability of %zu to windows, since this code is UNIX
+| only.
+|=20
+| I'd prefer also !g_str_equal(cmd, "include")  as to me it reads more
+| easily.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
+Okay. Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
