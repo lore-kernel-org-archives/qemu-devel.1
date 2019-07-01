@@ -2,61 +2,87 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5270C5B578
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 01:27:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E81EC5B578
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 01:28:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A876321473
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 01:27:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A876321473
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5822021473
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 01:28:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fKNZZew5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5822021473
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi7aH-0006gv-W4
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 21:27:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47114)
+	id 1hi7aR-00072Q-LM
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 21:27:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52485)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hi3xK-0000gV-EM
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:35:23 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hi4Bs-0006Nu-O8
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:50:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hi3xI-0002Hl-4Q
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:35:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46562)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hi3xC-00029M-8Y; Mon, 01 Jul 2019 17:35:14 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A7BFE3082E72;
- Mon,  1 Jul 2019 19:50:17 +0000 (UTC)
-Received: from x1w.redhat.com (unknown [10.40.205.170])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B8E0D379F;
- Mon,  1 Jul 2019 19:50:14 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1hi4Bq-0004UC-Bj
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:50:23 -0400
+Received: from mail-wr1-f44.google.com ([209.85.221.44]:34934)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hi4Bl-0004BH-9x
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:50:21 -0400
+Received: by mail-wr1-f44.google.com with SMTP id c27so7714626wrb.2
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 14:50:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=wbaK2lk4yZHP52j/5+PW5BzsdFPHnkuejkFeyT9B6iY=;
+ b=fKNZZew5Oh02CcxlKp2lEV04XxxkatzL6oCiuE3zqI6/RoSINksSra+/JteNGuKeE2
+ Fv5edWUc/wL7d6Asf1HM/ldpFU2nGJB9r37hnOPyw1nB8aipJJb5zAqkzGK1LdCdFoEI
+ tlTdH7dAQLRI3Ouz47bjXeTZ2j03anFT/OVT8gURDvaT24WJimi57OuqakybGLElo34i
+ +kMBNXcC5bPsBwLiVBe6nps42etI2oY9mwF2kaTXj/KegjoUSNPqOJNu/Y5JpYYg3lLC
+ E6SYxx0Q3BwOjdyxznW2c9IZSLqMwzDUWifR1IUZ+58+MeuItkjd3j6SMXoFmlEUG7B1
+ JfYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=wbaK2lk4yZHP52j/5+PW5BzsdFPHnkuejkFeyT9B6iY=;
+ b=fQoC7Ccwc1rt1nGLuhd1Ix14bzQxffcDNe2ClqwGkWTV0+bU/2WXJ6jk/n9mTCc1Kj
+ oXrJCCkXgbhqTt33G475qy21EQCc0fTO5VmmS6UHeH7H7o7cmKBXxYw8m6H5jsg7JcDt
+ +GdcKvRYD9YiHLQyebVeEuLhgsHLES0W1vN1mIQP9TrFXNuy5xj3CUp9tX++Ft402p9C
+ No5qVUgHnqrZXgH9utFMDUE5Om9WJhiPnRipFBC2MVIeg7TqN9I5q7a8INHfpe/Aru+U
+ NvA7OjbuysEYFDnXhPi1njUvFrl7XZQPJOrI8etvZDP62OEkvHpVlxYNZaEojTAZmJTr
+ xaSg==
+X-Gm-Message-State: APjAAAXqDmO5b/JSOAmbCXbvrVCXhbbqwBI7S7QYumI0cq/gdrCA8iir
+ CZX6w9bxh6LUrwk/tgDmaKvI23xr2VbWlg==
+X-Google-Smtp-Source: APXvYqyntrThvsXnDgmb3Jvc2F4qwOVxFWJlUiUGcjNnuo+nYw6R91DADJ8zyoqesNcI/ywnEdy9hQ==
+X-Received: by 2002:a5d:5386:: with SMTP id d6mr11726003wrv.207.1561999201868; 
+ Mon, 01 Jul 2019 09:40:01 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id o6sm26573508wra.27.2019.07.01.09.40.00
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 01 Jul 2019 09:40:00 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon,  1 Jul 2019 21:49:39 +0200
-Message-Id: <20190701194942.10092-6-philmd@redhat.com>
-In-Reply-To: <20190701194942.10092-1-philmd@redhat.com>
-References: <20190701194942.10092-1-philmd@redhat.com>
+Date: Mon,  1 Jul 2019 17:39:12 +0100
+Message-Id: <20190701163943.22313-16-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190701163943.22313-1-peter.maydell@linaro.org>
+References: <20190701163943.22313-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Mon, 01 Jul 2019 19:50:17 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 5/8] RFC target/arm: Do not build pre-ARMv7
- cpus when using KVM
+ [fuzzy]
+X-Received-From: 209.85.221.44
+Subject: [Qemu-devel] [PULL 15/46] aspeed/timer: Fix behaviour running Linux
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,194 +94,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yang Zhong <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>,
- Andrew Jones <drjones@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>,
- Rob Bradford <robert.bradford@intel.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A KVM-only build won't be able to run pre-ARMv7 cpus, disable them.
+From: Joel Stanley <joel@jms.id.au>
 
-If KVM is not enabled, they are enabled by default.
+The Linux kernel driver was updated in commit 4451d3f59f2a
+("clocksource/drivers/fttmr010: Fix set_next_event handler) to fix an
+issue observed on hardware:
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+ > RELOAD register is loaded into COUNT register when the aspeed timer
+ > is enabled, which means the next event may be delayed because timer
+ > interrupt won't be generated until <0xFFFFFFFF - current_count +
+ > cycles>.
+
+When running under Qemu, the system appeared "laggy". The guest is now
+scheduling timer events too regularly, starving the host of CPU time.
+
+This patch modifies the timer model to attempt to schedule the timer
+expiry as the guest requests, but if we have missed the deadline we
+re interrupt and try again, which allows the guest to catch up.
+
+Provides expected behaviour with old and new guest code.
+
+Fixes: c04bd47db6b9 ("hw/timer: Add ASPEED timer device model")
+Signed-off-by: Joel Stanley <joel@jms.id.au>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Message-id: 20190618165311.27066-8-clg@kaod.org
+[clg: - merged a fix from Andrew Jeffery <andrew@aj.id.au>
+        "Fire interrupt on failure to meet deadline"
+        https://lists.ozlabs.org/pipermail/openbmc/2019-January/014641.html
+      - adapted commit log
+      - checkpatch fixes ]
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
-Sadly this does not work with --enable-tcg --enable-kvm dual config.
----
- default-configs/arm-softmmu.mak | 33 ++++++++++++++++-----------------
- hw/arm/Kconfig                  | 26 ++++++++++++++++++++++++++
- 2 files changed, 42 insertions(+), 17 deletions(-)
+ hw/timer/aspeed_timer.c | 57 ++++++++++++++++++++++-------------------
+ 1 file changed, 30 insertions(+), 27 deletions(-)
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
-u.mak
-index 1f2e0e7fde..081d507c87 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -9,34 +9,33 @@ CONFIG_ARM_V7M=3Dy
- CONFIG_ARM_VIRT=3Dy
- CONFIG_CUBIEBOARD=3Dy
- CONFIG_EXYNOS4=3Dy
--CONFIG_HIGHBANK=3Dy
--CONFIG_INTEGRATOR=3Dy
- CONFIG_FSL_IMX31=3Dy
--CONFIG_MUSICPAL=3Dy
- CONFIG_MUSCA=3Dy
--CONFIG_CHEETAH=3Dy
--CONFIG_SX1=3Dy
--CONFIG_NSERIES=3Dy
- CONFIG_STELLARIS=3Dy
- CONFIG_REALVIEW=3Dy
--CONFIG_VERSATILE=3Dy
- CONFIG_VEXPRESS=3Dy
- CONFIG_ZYNQ=3Dy
--CONFIG_MAINSTONE=3Dy
--CONFIG_GUMSTIX=3Dy
--CONFIG_SPITZ=3Dy
--CONFIG_TOSA=3Dy
--CONFIG_Z2=3Dy
--CONFIG_COLLIE=3Dy
--CONFIG_ASPEED_SOC=3Dy
- CONFIG_NETDUINO2=3Dy
- CONFIG_MPS2=3Dy
- CONFIG_RASPI=3Dy
--CONFIG_DIGIC=3Dy
- CONFIG_SABRELITE=3Dy
- CONFIG_EMCRAFT_SF2=3Dy
--CONFIG_MICROBIT=3Dy
--CONFIG_FSL_IMX25=3Dy
- CONFIG_FSL_IMX7=3Dy
- CONFIG_FSL_IMX6UL=3Dy
- CONFIG_SEMIHOSTING=3Dy
-+#CONFIG_CHEETAH=3Dy
-+#CONFIG_SX1=3Dy
-+#CONFIG_DIGIC=3Dy
-+#CONFIG_INTEGRATOR=3Dy
-+#CONFIG_MUSICPAL=3Dy
-+#CONFIG_MAINSTONE=3Dy
-+#CONFIG_GUMSTIX=3Dy
-+#CONFIG_SPITZ=3Dy
-+#CONFIG_TOSA=3Dy
-+#CONFIG_COLLIE=3Dy
-+#CONFIG_VERSATILE=3Dy
-+#CONFIG_FSL_IMX25=3Dy
-+#CONFIG_ASPEED_SOC=3Dy
-+#CONFIG_NSERIES=3Dy
-+#CONFIG_HIGHBANK=3Dn
-+#CONFIG_MICROBIT=3Dn
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index ab65ecd216..b4d31c6026 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -1,3 +1,18 @@
-+config ARM_V4
-+    default y
-+    depends on !KVM
-+    bool
+diff --git a/hw/timer/aspeed_timer.c b/hw/timer/aspeed_timer.c
+index 2c3a4d0fe77..537f072cf87 100644
+--- a/hw/timer/aspeed_timer.c
++++ b/hw/timer/aspeed_timer.c
+@@ -109,37 +109,40 @@ static inline uint64_t calculate_time(struct AspeedTimer *t, uint32_t ticks)
+ 
+ static uint64_t calculate_next(struct AspeedTimer *t)
+ {
+-    uint64_t next = 0;
+-    uint32_t rate = calculate_rate(t);
++    uint64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    uint64_t next;
+ 
+-    while (!next) {
+-        /* We don't know the relationship between the values in the match
+-         * registers, so sort using MAX/MIN/zero. We sort in that order as the
+-         * timer counts down to zero. */
+-        uint64_t seq[] = {
+-            calculate_time(t, MAX(t->match[0], t->match[1])),
+-            calculate_time(t, MIN(t->match[0], t->match[1])),
+-            calculate_time(t, 0),
+-        };
+-        uint64_t reload_ns;
+-        uint64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    /*
++     * We don't know the relationship between the values in the match
++     * registers, so sort using MAX/MIN/zero. We sort in that order as
++     * the timer counts down to zero.
++     */
+ 
+-        if (now < seq[0]) {
+-            next = seq[0];
+-        } else if (now < seq[1]) {
+-            next = seq[1];
+-        } else if (now < seq[2]) {
+-            next = seq[2];
+-        } else if (t->reload) {
+-            reload_ns = muldiv64(t->reload, NANOSECONDS_PER_SECOND, rate);
+-            t->start = now - ((now - t->start) % reload_ns);
+-        } else {
+-            /* no reload value, return 0 */
+-            break;
+-        }
++    next = calculate_time(t, MAX(t->match[0], t->match[1]));
++    if (now < next) {
++        return next;
+     }
+ 
+-    return next;
++    next = calculate_time(t, MIN(t->match[0], t->match[1]));
++    if (now < next) {
++        return next;
++    }
 +
-+config ARM_V5
-+    default y
-+    depends on !KVM
-+    bool
++    next = calculate_time(t, 0);
++    if (now < next) {
++        return next;
++    }
 +
-+config ARM_V6
-+    default y
-+    depends on !KVM
-+    bool
++    /* We've missed all deadlines, fire interrupt and try again */
++    timer_del(&t->timer);
 +
- config ARM_VIRT
-     bool
-     imply PCI_DEVICES
-@@ -23,6 +38,7 @@ config ARM_VIRT
-=20
- config CHEETAH
-     bool
-+    select ARM_V4
-     select OMAP
-     select TSC210X
-=20
-@@ -32,6 +48,7 @@ config CUBIEBOARD
-=20
- config DIGIC
-     bool
-+    select ARM_V5
-     select PTIMER
-     select PFLASH_CFI02
-=20
-@@ -61,6 +78,7 @@ config HIGHBANK
-=20
- config INTEGRATOR
-     bool
-+    select ARM_V5
-     select ARM_TIMER
-     select INTEGRATOR_DEBUG
-     select PL011 # UART
-@@ -84,6 +102,7 @@ config MUSCA
-=20
- config MUSICPAL
-     bool
-+    select ARM_V5
-     select BITBANG_I2C
-     select MARVELL_88W8618
-     select PTIMER
-@@ -97,6 +116,7 @@ config NETDUINO2
-=20
- config NSERIES
-     bool
-+    select ARM_V6
-     select OMAP
-     select TMP105   # tempature sensor
-     select BLIZZARD # LCD/TV controller
-@@ -119,6 +139,7 @@ config OMAP
-=20
- config PXA2XX
-     bool
-+    select ARM_V5
-     select FRAMEBUFFER
-     select I2C
-     select SERIAL
-@@ -229,10 +250,12 @@ config COLLIE
-=20
- config SX1
-     bool
-+    select ARM_V4
-     select OMAP
-=20
- config VERSATILE
-     bool
-+    select ARM_V5
-     select ARM_TIMER # sp804
-     select PFLASH_CFI01
-     select LSI_SCSI_PCI
-@@ -321,6 +344,7 @@ config XLNX_VERSAL
-=20
- config FSL_IMX25
-     bool
-+    select ARM_V5
-     select IMX
-     select IMX_FEC
-     select IMX_I2C
-@@ -328,6 +352,7 @@ config FSL_IMX25
-=20
- config FSL_IMX31
-     bool
-+    select ARM_V6
-     select SERIAL
-     select IMX
-     select IMX_I2C
-@@ -343,6 +368,7 @@ config FSL_IMX6
-=20
- config ASPEED_SOC
-     bool
-+    select ARM_V5
-     select DS1338
-     select FTGMAC100
-     select I2C
---=20
++    if (timer_overflow_interrupt(t)) {
++        t->level = !t->level;
++        qemu_set_irq(t->irq, t->level);
++    }
++
++    t->start = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    return calculate_time(t, MAX(MAX(t->match[0], t->match[1]), 0));
+ }
+ 
+ static void aspeed_timer_mod(AspeedTimer *t)
+-- 
 2.20.1
 
 
