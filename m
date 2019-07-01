@@ -2,61 +2,87 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78BF6C5B578
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 01:28:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D55DC5B578
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 01:30:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52C5821473
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 01:28:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52C5821473
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CE40D21479
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 01:30:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eSUm5Pht"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE40D21479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi7aZ-0007LN-KT
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 21:28:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44739)
+	id 1hi7cm-0001CL-2p
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 21:30:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55938)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hi3rd-0005Iv-DI
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:29:30 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hi4Na-0005Ft-Ll
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:02:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hi3rc-0008Rg-Ct
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:29:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36895)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hi3rZ-0008No-DL; Mon, 01 Jul 2019 17:29:25 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1F18630BBE98;
- Mon,  1 Jul 2019 19:50:21 +0000 (UTC)
-Received: from x1w.redhat.com (unknown [10.40.205.170])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B6CF379F;
- Mon,  1 Jul 2019 19:50:17 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1hi4NY-0000a6-L6
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:02:30 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:41572)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hi4NV-0000Ts-GO
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:02:26 -0400
+Received: by mail-wr1-f67.google.com with SMTP id c2so15441571wrm.8
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 15:02:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=KkUQSWRyDo7N3gMjPFgWAFIufs62qiUnuMkPV6Fsbp4=;
+ b=eSUm5Pht6gJL8SzhSmxiPQULQJzBY0cI1Q3x7OssvcCHel0w6maC1/oSV00SeY+mNE
+ 8VZRlirc9S5A9t3kbYe9DONj7hwVro5koBmKvSSkP2QtNRvsldq5aSaXanaqrpcS+dJA
+ i9hKFixCEVTX4S2f300g2A7FLiRhDTkUMy4EnejnUcQmm0DVL3eDc7U8u0Mvsje2MXOx
+ G32NAhHC2CrJVEHh6GJUjf7qPe33hzxWgul1PhERAM2+eCl0O6XczVSZeTmgeeYVf9Zz
+ 094Zd3+uerm+ugLO6uDhjVFtduCY+cg24fBIkB8MXtpKRfanMN+rurh9PaK0cQ/ANYYf
+ Zi7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=KkUQSWRyDo7N3gMjPFgWAFIufs62qiUnuMkPV6Fsbp4=;
+ b=fIc0vcLs3AbzMjutZ8Ucaba+Wb0aw39XC1+6YLxALJH6nzuoFJE2155sgGqZPuZYJi
+ EgAxE1fet11qBA/p+ylJ+0160DaGljugGpaQRqnWIa9MVq/IqrRvetKWfAqD/3VwELX6
+ HU90BWqfKgrIpH5NAG/3NWdDN1Y0n6oG/nIVA2sbwH/5R7lBT/3oCFdhZQWYKFDTGMal
+ OgYemvitR7+T7/xKwbCBbU4tD0Pb7qRa3Oy4skrqAqf/j0beOGyjxDNQhza8yI+KUkCv
+ n9RNz+cTAnWsRJIBiI9kDKxAGxUfQ3BTBkRl7ZgBLb2+F90NHQs28ecyW1KMa41wY97f
+ kvYg==
+X-Gm-Message-State: APjAAAVnqDN3QiNvYffC7IOfVpgvxycBBpKKJK5d0bjdEb8Ed1y0CR/9
+ sJLWvdRpwjufPGgE6X7b+7qgZt9LcNz/ag==
+X-Google-Smtp-Source: APXvYqyEeY51OM8LgNBMbG1hjRPU4+p7Z1PjSrZ9DifrGkNIeT8Yswg4PjQNbADUNvXPK1zDZWGJEQ==
+X-Received: by 2002:adf:e947:: with SMTP id m7mr8960339wrn.123.1561999192071; 
+ Mon, 01 Jul 2019 09:39:52 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id o6sm26573508wra.27.2019.07.01.09.39.50
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 01 Jul 2019 09:39:51 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon,  1 Jul 2019 21:49:40 +0200
-Message-Id: <20190701194942.10092-7-philmd@redhat.com>
-In-Reply-To: <20190701194942.10092-1-philmd@redhat.com>
-References: <20190701194942.10092-1-philmd@redhat.com>
+Date: Mon,  1 Jul 2019 17:39:04 +0100
+Message-Id: <20190701163943.22313-8-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190701163943.22313-1-peter.maydell@linaro.org>
+References: <20190701163943.22313-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Mon, 01 Jul 2019 19:50:21 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 6/8] RFC target/arm: Restrict R and M
- profiles to TCG
+ [fuzzy]
+X-Received-From: 209.85.221.67
+Subject: [Qemu-devel] [PULL 07/46] pci: designware: Update MSI mapping when
+ MSI address changes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,77 +94,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yang Zhong <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>,
- Andrew Jones <drjones@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>,
- Rob Bradford <robert.bradford@intel.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-KVM is only able to run A profile cpus.
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+MSI mapping needs to be update when MSI address changes, so add the
+code to do so.
+
+Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ hw/pci-host/designware.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 290ef16e52..a0934a47ee 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -453,7 +453,9 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interru=
-pt_request)
-     return ret;
- }
-=20
--#if !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64)
-+/* CPU models. These are not needed for the AArch64 linux-user build. */
-+#if (!defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64)) \
-+    && defined(CONFIG_TCG)
- static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_reque=
-st)
- {
-     CPUClass *cc =3D CPU_GET_CLASS(cs);
-@@ -1855,8 +1857,6 @@ static void cortex_m0_initfn(Object *obj)
-     cpu->midr =3D 0x410cc200;
- }
-=20
--#endif
--
- static void cortex_m3_initfn(Object *obj)
- {
-     ARMCPU *cpu =3D ARM_CPU(obj);
-@@ -2010,6 +2010,8 @@ static void cortex_r5f_initfn(Object *obj)
-     cpu->isar.mvfr1 =3D 0x00000011;
- }
-=20
-+#endif
-+
- static const ARMCPRegInfo cortexa8_cp_reginfo[] =3D {
-     { .name =3D "L2LOCKDOWN", .cp =3D 15, .crn =3D 9, .crm =3D 0, .opc1 =
-=3D 1, .opc2 =3D 0,
-       .access =3D PL1_RW, .type =3D ARM_CP_CONST, .resetvalue =3D 0 },
-@@ -2491,7 +2493,6 @@ static const ARMCPUInfo arm_cpus[] =3D {
-     { .name =3D "arm1176",     .initfn =3D arm1176_initfn },
-     { .name =3D "arm11mpcore", .initfn =3D arm11mpcore_initfn },
-     { .name =3D "cortex-m0",   .initfn =3D cortex_m0_initfn,
--#endif
-                              .class_init =3D arm_v7m_class_init },
-     { .name =3D "cortex-m3",   .initfn =3D cortex_m3_initfn,
-                              .class_init =3D arm_v7m_class_init },
-@@ -2501,6 +2502,7 @@ static const ARMCPUInfo arm_cpus[] =3D {
-                              .class_init =3D arm_v7m_class_init },
-     { .name =3D "cortex-r5",   .initfn =3D cortex_r5_initfn },
-     { .name =3D "cortex-r5f",  .initfn =3D cortex_r5f_initfn },
-+#endif
-     { .name =3D "cortex-a7",   .initfn =3D cortex_a7_initfn },
-     { .name =3D "cortex-a8",   .initfn =3D cortex_a8_initfn },
-     { .name =3D "cortex-a9",   .initfn =3D cortex_a9_initfn },
---=20
+diff --git a/hw/pci-host/designware.c b/hw/pci-host/designware.c
+index ec697c8f9df..931cd954e87 100644
+--- a/hw/pci-host/designware.c
++++ b/hw/pci-host/designware.c
+@@ -290,11 +290,13 @@ static void designware_pcie_root_config_write(PCIDevice *d, uint32_t address,
+     case DESIGNWARE_PCIE_MSI_ADDR_LO:
+         root->msi.base &= 0xFFFFFFFF00000000ULL;
+         root->msi.base |= val;
++        designware_pcie_root_update_msi_mapping(root);
+         break;
+ 
+     case DESIGNWARE_PCIE_MSI_ADDR_HI:
+         root->msi.base &= 0x00000000FFFFFFFFULL;
+         root->msi.base |= (uint64_t)val << 32;
++        designware_pcie_root_update_msi_mapping(root);
+         break;
+ 
+     case DESIGNWARE_PCIE_MSI_INTR0_ENABLE:
+-- 
 2.20.1
 
 
