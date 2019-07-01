@@ -7,58 +7,59 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8392C5B578
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 05:52:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C368C5B578
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 05:54:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B60972089F
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 05:52:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D76082089F
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 05:54:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="UaR01ucf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B60972089F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Qm3d7aSe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D76082089F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhpEy-0005pf-2e
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 01:52:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37350)
+	id 1hhpGx-0008Au-6S
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 01:54:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37425)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hhpAg-0000dt-5V
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 01:48:11 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hhpAi-0000eQ-KA
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 01:48:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hhpAe-0005pp-T8
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 01:48:10 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:49375 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1hhpAg-0005rR-GJ
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 01:48:12 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:59343 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hhpAe-0005o0-8w; Mon, 01 Jul 2019 01:48:08 -0400
+ id 1hhpAf-0005p6-P9; Mon, 01 Jul 2019 01:48:10 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 45cbxs1Ttgz9sPB; Mon,  1 Jul 2019 15:48:01 +1000 (AEST)
+ id 45cbxs6Xh4z9sPM; Mon,  1 Jul 2019 15:48:01 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1561960081;
- bh=wArsJ2g+QXz7I+S+0+7xd3m0DxewLLWkl54pYpy0zyA=;
+ bh=La5wpYeVWWyWA1k4a/X+TG3/LKFrYVWAJfzBvUudCpI=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=UaR01ucf2LXsrb7vOHYqOAhM8As6gmx14dAa2I4d/I+FVwzVzctq36Jqjso0soczy
- ddnc7Kj0xfcYXA/N/4U6tPe1pnb9otuQS13Am/osYAe+OZ8X4hZ+xgIDwQukGzbkrJ
- FPHnk3NMoaNPyGWiBpKvdyvhNVs6+nbI10Mib7no=
-Date: Mon, 1 Jul 2019 15:11:11 +1000
+ b=Qm3d7aSe69fg8gPDzySRNMPla341qMaeVrbkEuU3Kb8zknWa07ytEA/41G/c18rpv
+ mWoOo73Y1lKwoHYEywcz1k/XiONJvD5L5tMv2C7ejN/HQ4xG7g+vIpcuUnhU0/bTTZ
+ cC9kbxdSePQCtL9sxsR1rM/p/mu0Z85/kAcJER9s=
+Date: Mon, 1 Jul 2019 15:32:04 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Message-ID: <20190701051111.GK2138@umbus.fritz.box>
-References: <156110925375.92514.11649846071216864570.stgit@bahia.lan>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Message-ID: <20190701053204.GO2138@umbus.fritz.box>
+References: <20190630204601.30574-1-clg@kaod.org>
+ <20190630204601.30574-4-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Xsn3knLL3qrmRbVI"
+ protocol="application/pgp-signature"; boundary="Sr6hGnsCY8KeifOY"
 Content-Disposition: inline
-In-Reply-To: <156110925375.92514.11649846071216864570.stgit@bahia.lan>
+In-Reply-To: <20190630204601.30574-4-clg@kaod.org>
 User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [PATCH] spapr_pci: Unregister listeners before
- destroying the IOMMU address space
+Subject: Re: [Qemu-devel] [PATCH 03/10] ppc/pnv: Rework cache watch model of
+ PnvXIVE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,122 +71,303 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>,
+ Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---Xsn3knLL3qrmRbVI
-Content-Type: text/plain; charset=us-ascii
+--Sr6hGnsCY8KeifOY
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 21, 2019 at 11:27:33AM +0200, Greg Kurz wrote:
-> Hot-unplugging a PHB with a VFIO device connected to it crashes QEMU:
+On Sun, Jun 30, 2019 at 10:45:54PM +0200, C=E9dric Le Goater wrote:
+> When the software modifies the XIVE internal structures, ESB, EAS,
+> END, NVT, it also must update the caches of the different XIVE
+> sub-engines. HW offers a set of common interface for such purpose.
 >=20
-> -device spapr-pci-host-bridge,index=3D1,id=3Dphb1 \
-> -device vfio-pci,host=3D0034:01:00.3,id=3Dvfio0
+> The CWATCH_SPEC register defines the block/index of the target and a
+> set of flags to perform a full update and to watch for update
+> conflicts.
 >=20
-> (qemu) device_del phb1
-> [  357.207183] iommu: Removing device 0001:00:00.0 from group 1
-> [  360.375523] rpadlpar_io: slot PHB 1 removed
-> qemu-system-ppc64: memory.c:2742:
->  do_address_space_destroy: Assertion `QTAILQ_EMPTY(&as->listeners)' faile=
-d.
+> The cache watch CWATCH_DATAX registers are then loaded with the target
+> data with a first read on CWATCH_DATA0. Writing back is done in the
+> opposit order, CWATCH_DATA0 triggering the update.
 >=20
-> 'as' is the IOMMU address space, which indeed has a listener registered
-> to by vfio_connect_container() when the VFIO device is realized. This
-> listener is supposed to be unregistered by vfio_disconnect_container()
-> when the VFIO device is finalized. Unfortunately, the VFIO device hasn't
-> reached finalize yet at the time the PHB unrealize function is called,
-> and address_space_destroy() gets called with the VFIO listener still
-> being registered.
+> The SCRUB_TRIG registers are used to flush the cache in RAM, and to
+> possibly invalidate it. Cache disablement is also an option but as we
+> do not model the cache, these registers are no-ops
 >=20
-> All regions have just been unmapped from the address space. Listeners
-> aren't needed anymore at this point. Remove them before destroying the
-> address space.
+> Today, the modeling of these registers is incorrect but it did not
+> impact the set up of a baremetal system. However, running KVM requires
+> a rework.
 >=20
-> The VFIO code will try to remove them _again_ at device finalize,
-> but it is okay since memory_listener_unregister() is idempotent.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Fixes: 2dfa91a2aa5a ("ppc/pnv: add a XIVE interrupt controller model for =
+POWER9")
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-LGTM, applied.
+Pushing it for what counts as a bugfix this close to freeze, but I'll
+take it.  Applied to ppc-for-4.1.
 
 > ---
->  hw/ppc/spapr_pci.c    |    6 ++++++
->  include/exec/memory.h |   10 ++++++++++
->  memory.c              |    7 +++++++
->  3 files changed, 23 insertions(+)
+>  hw/intc/pnv_xive.c | 142 +++++++++++++++++++++++++++++++++------------
+>  1 file changed, 106 insertions(+), 36 deletions(-)
 >=20
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index 2dca1e57f36c..eee92b102d5c 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -1788,6 +1788,12 @@ static void spapr_phb_unrealize(DeviceState *dev, =
-Error **errp)
+> diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+> index 9ab77feee9d8..4dc92ef1e372 100644
+> --- a/hw/intc/pnv_xive.c
+> +++ b/hw/intc/pnv_xive.c
+> @@ -169,7 +169,7 @@ static uint64_t pnv_xive_vst_addr_indirect(PnvXive *x=
+ive, uint32_t type,
+>      vsd =3D ldq_be_dma(&address_space_memory, vsd_addr);
 > =20
->      memory_region_del_subregion(&sphb->iommu_root, &sphb->msiwindow);
+>      if (!(vsd & VSD_ADDRESS_MASK)) {
+> -        xive_error(xive, "VST: invalid %s entry %x !?", info->name, 0);
+> +        xive_error(xive, "VST: invalid %s entry %x !?", info->name, idx);
+>          return 0;
+>      }
 > =20
-> +    /*
-> +     * An attached PCI device may have memory listeners, eg. VFIO PCI. W=
-e have
-> +     * unmapped all sections. Remove the listeners now, before destroyin=
-g the
-> +     * address space.
-> +     */
-> +    address_space_remove_listeners(&sphb->iommu_as);
->      address_space_destroy(&sphb->iommu_as);
+> @@ -190,7 +190,7 @@ static uint64_t pnv_xive_vst_addr_indirect(PnvXive *x=
+ive, uint32_t type,
+>          vsd =3D ldq_be_dma(&address_space_memory, vsd_addr);
 > =20
->      qbus_set_hotplug_handler(BUS(phb->bus), NULL, &error_abort);
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index e6140e8a0489..1ba2e89aa8ce 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -1757,6 +1757,16 @@ void address_space_init(AddressSpace *as, MemoryRe=
-gion *root, const char *name);
->   */
->  void address_space_destroy(AddressSpace *as);
+>          if (!(vsd & VSD_ADDRESS_MASK)) {
+> -            xive_error(xive, "VST: invalid %s entry %x !?", info->name, =
+0);
+> +            xive_error(xive, "VST: invalid %s entry %x !?", info->name, =
+idx);
+>              return 0;
+>          }
 > =20
-> +/**
-> + * address_space_remove_listeners: unregister all listerners of an addre=
-ss space
-> + *
-> + * Removes all callbacks previously registered with memory_listener_regi=
-ster()
-> + * for @as.
-> + *
-> + * @as: an initialized #AddressSpace
-> + */
-> +void address_space_remove_listeners(AddressSpace *as);
-> +
->  /**
->   * address_space_rw: read from or write to an address space.
->   *
-> diff --git a/memory.c b/memory.c
-> index 0a089a73ae1a..480f3d989b4f 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -2723,6 +2723,13 @@ void memory_listener_unregister(MemoryListener *li=
-stener)
->      listener->address_space =3D NULL;
+> @@ -294,8 +294,12 @@ static int pnv_xive_write_end(XiveRouter *xrtr, uint=
+8_t blk, uint32_t idx,
+>                                word_number);
 >  }
 > =20
-> +void address_space_remove_listeners(AddressSpace *as)
+> -static int pnv_xive_end_update(PnvXive *xive, uint8_t blk, uint32_t idx)
+> +static int pnv_xive_end_update(PnvXive *xive)
+>  {
+> +    uint8_t  blk =3D GETFIELD(VC_EQC_CWATCH_BLOCKID,
+> +                           xive->regs[(VC_EQC_CWATCH_SPEC >> 3)]);
+> +    uint32_t idx =3D GETFIELD(VC_EQC_CWATCH_OFFSET,
+> +                           xive->regs[(VC_EQC_CWATCH_SPEC >> 3)]);
+>      int i;
+>      uint64_t eqc_watch[4];
+> =20
+> @@ -307,6 +311,24 @@ static int pnv_xive_end_update(PnvXive *xive, uint8_=
+t blk, uint32_t idx)
+>                                XIVE_VST_WORD_ALL);
+>  }
+> =20
+> +static void pnv_xive_end_cache_load(PnvXive *xive)
 > +{
-> +    while (!QTAILQ_EMPTY(&as->listeners)) {
-> +        memory_listener_unregister(QTAILQ_FIRST(&as->listeners));
+> +    uint8_t  blk =3D GETFIELD(VC_EQC_CWATCH_BLOCKID,
+> +                           xive->regs[(VC_EQC_CWATCH_SPEC >> 3)]);
+> +    uint32_t idx =3D GETFIELD(VC_EQC_CWATCH_OFFSET,
+> +                           xive->regs[(VC_EQC_CWATCH_SPEC >> 3)]);
+> +    uint64_t eqc_watch[4] =3D { 0 };
+> +    int i;
+> +
+> +    if (pnv_xive_vst_read(xive, VST_TSEL_EQDT, blk, idx, eqc_watch)) {
+> +        xive_error(xive, "VST: no END entry %x/%x !?", blk, idx);
+> +    }
+> +
+> +    for (i =3D 0; i < ARRAY_SIZE(eqc_watch); i++) {
+> +        xive->regs[(VC_EQC_CWATCH_DAT0 >> 3) + i] =3D be64_to_cpu(eqc_wa=
+tch[i]);
 > +    }
 > +}
 > +
->  void address_space_init(AddressSpace *as, MemoryRegion *root, const char=
- *name)
+>  static int pnv_xive_get_nvt(XiveRouter *xrtr, uint8_t blk, uint32_t idx,
+>                              XiveNVT *nvt)
 >  {
->      memory_region_ref(root);
->=20
+> @@ -320,8 +342,12 @@ static int pnv_xive_write_nvt(XiveRouter *xrtr, uint=
+8_t blk, uint32_t idx,
+>                                word_number);
+>  }
+> =20
+> -static int pnv_xive_nvt_update(PnvXive *xive, uint8_t blk, uint32_t idx)
+> +static int pnv_xive_nvt_update(PnvXive *xive)
+>  {
+> +    uint8_t  blk =3D GETFIELD(PC_VPC_CWATCH_BLOCKID,
+> +                           xive->regs[(PC_VPC_CWATCH_SPEC >> 3)]);
+> +    uint32_t idx =3D GETFIELD(PC_VPC_CWATCH_OFFSET,
+> +                           xive->regs[(PC_VPC_CWATCH_SPEC >> 3)]);
+>      int i;
+>      uint64_t vpc_watch[8];
+> =20
+> @@ -333,6 +359,24 @@ static int pnv_xive_nvt_update(PnvXive *xive, uint8_=
+t blk, uint32_t idx)
+>                                XIVE_VST_WORD_ALL);
+>  }
+> =20
+> +static void pnv_xive_nvt_cache_load(PnvXive *xive)
+> +{
+> +    uint8_t  blk =3D GETFIELD(PC_VPC_CWATCH_BLOCKID,
+> +                           xive->regs[(PC_VPC_CWATCH_SPEC >> 3)]);
+> +    uint32_t idx =3D GETFIELD(PC_VPC_CWATCH_OFFSET,
+> +                           xive->regs[(PC_VPC_CWATCH_SPEC >> 3)]);
+> +    uint64_t vpc_watch[8] =3D { 0 };
+> +    int i;
+> +
+> +    if (pnv_xive_vst_read(xive, VST_TSEL_VPDT, blk, idx, vpc_watch)) {
+> +        xive_error(xive, "VST: no NVT entry %x/%x !?", blk, idx);
+> +    }
+> +
+> +    for (i =3D 0; i < ARRAY_SIZE(vpc_watch); i++) {
+> +        xive->regs[(PC_VPC_CWATCH_DAT0 >> 3) + i] =3D be64_to_cpu(vpc_wa=
+tch[i]);
+> +    }
+> +}
+> +
+>  static int pnv_xive_get_eas(XiveRouter *xrtr, uint8_t blk, uint32_t idx,
+>                              XiveEAS *eas)
+>  {
+> @@ -346,12 +390,6 @@ static int pnv_xive_get_eas(XiveRouter *xrtr, uint8_=
+t blk, uint32_t idx,
+>      return pnv_xive_vst_read(xive, VST_TSEL_IVT, blk, idx, eas);
+>  }
+> =20
+> -static int pnv_xive_eas_update(PnvXive *xive, uint8_t blk, uint32_t idx)
+> -{
+> -    /* All done. */
+> -    return 0;
+> -}
+> -
+>  static XiveTCTX *pnv_xive_get_tctx(XiveRouter *xrtr, CPUState *cs)
+>  {
+>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> @@ -950,28 +988,43 @@ static void pnv_xive_ic_reg_write(void *opaque, hwa=
+ddr offset,
+>       * XIVE PC & VC cache updates for EAS, NVT and END
+>       */
+>      case VC_IVC_SCRUB_MASK:
+> -        break;
+>      case VC_IVC_SCRUB_TRIG:
+> -        pnv_xive_eas_update(xive, GETFIELD(PC_SCRUB_BLOCK_ID, val),
+> -                            GETFIELD(VC_SCRUB_OFFSET, val));
+>          break;
+> =20
+> -    case VC_EQC_SCRUB_MASK:
+>      case VC_EQC_CWATCH_SPEC:
+> -    case VC_EQC_CWATCH_DAT0 ... VC_EQC_CWATCH_DAT3:
+> +        val &=3D ~VC_EQC_CWATCH_CONFLICT; /* HW resets this bit */
+> +        break;
+> +    case VC_EQC_CWATCH_DAT1 ... VC_EQC_CWATCH_DAT3:
+>          break;
+> +    case VC_EQC_CWATCH_DAT0:
+> +        /* writing to DATA0 triggers the cache write */
+> +        xive->regs[reg] =3D val;
+> +        pnv_xive_end_update(xive);
+> +        break;
+> +    case VC_EQC_SCRUB_MASK:
+>      case VC_EQC_SCRUB_TRIG:
+> -        pnv_xive_end_update(xive, GETFIELD(VC_SCRUB_BLOCK_ID, val),
+> -                            GETFIELD(VC_SCRUB_OFFSET, val));
+> +        /*
+> +         * The scrubbing registers flush the cache in RAM and can also
+> +         * invalidate.
+> +         */
+>          break;
+> =20
+> -    case PC_VPC_SCRUB_MASK:
+>      case PC_VPC_CWATCH_SPEC:
+> -    case PC_VPC_CWATCH_DAT0 ... PC_VPC_CWATCH_DAT7:
+> +        val &=3D ~PC_VPC_CWATCH_CONFLICT; /* HW resets this bit */
+> +        break;
+> +    case PC_VPC_CWATCH_DAT1 ... PC_VPC_CWATCH_DAT7:
+>          break;
+> +    case PC_VPC_CWATCH_DAT0:
+> +        /* writing to DATA0 triggers the cache write */
+> +        xive->regs[reg] =3D val;
+> +        pnv_xive_nvt_update(xive);
+> +        break;
+> +    case PC_VPC_SCRUB_MASK:
+>      case PC_VPC_SCRUB_TRIG:
+> -        pnv_xive_nvt_update(xive, GETFIELD(PC_SCRUB_BLOCK_ID, val),
+> -                           GETFIELD(PC_SCRUB_OFFSET, val));
+> +        /*
+> +         * The scrubbing registers flush the cache in RAM and can also
+> +         * invalidate.
+> +         */
+>          break;
+> =20
+> =20
+> @@ -1022,15 +1075,6 @@ static uint64_t pnv_xive_ic_reg_read(void *opaque,=
+ hwaddr offset, unsigned size)
+>      case PC_GLOBAL_CONFIG:
+> =20
+>      case PC_VPC_SCRUB_MASK:
+> -    case PC_VPC_CWATCH_SPEC:
+> -    case PC_VPC_CWATCH_DAT0:
+> -    case PC_VPC_CWATCH_DAT1:
+> -    case PC_VPC_CWATCH_DAT2:
+> -    case PC_VPC_CWATCH_DAT3:
+> -    case PC_VPC_CWATCH_DAT4:
+> -    case PC_VPC_CWATCH_DAT5:
+> -    case PC_VPC_CWATCH_DAT6:
+> -    case PC_VPC_CWATCH_DAT7:
+> =20
+>      case VC_GLOBAL_CONFIG:
+>      case VC_AIB_TX_ORDER_TAG2:
+> @@ -1043,12 +1087,6 @@ static uint64_t pnv_xive_ic_reg_read(void *opaque,=
+ hwaddr offset, unsigned size)
+>      case VC_IRQ_CONFIG_IPI_CASC:
+> =20
+>      case VC_EQC_SCRUB_MASK:
+> -    case VC_EQC_CWATCH_DAT0:
+> -    case VC_EQC_CWATCH_DAT1:
+> -    case VC_EQC_CWATCH_DAT2:
+> -    case VC_EQC_CWATCH_DAT3:
+> -
+> -    case VC_EQC_CWATCH_SPEC:
+>      case VC_IVC_SCRUB_MASK:
+>      case VC_SBC_CONFIG:
+>      case VC_AT_MACRO_KILL_MASK:
+> @@ -1080,6 +1118,38 @@ static uint64_t pnv_xive_ic_reg_read(void *opaque,=
+ hwaddr offset, unsigned size)
+>      /*
+>       * XIVE PC & VC cache updates for EAS, NVT and END
+>       */
+> +    case VC_EQC_CWATCH_SPEC:
+> +        xive->regs[reg] =3D ~(VC_EQC_CWATCH_FULL | VC_EQC_CWATCH_CONFLIC=
+T);
+> +        val =3D xive->regs[reg];
+> +        break;
+> +    case VC_EQC_CWATCH_DAT0:
+> +        /*
+> +         * Load DATA registers from cache with data requested by the
+> +         * SPEC register
+> +         */
+> +        pnv_xive_end_cache_load(xive);
+> +        val =3D xive->regs[reg];
+> +        break;
+> +    case VC_EQC_CWATCH_DAT1 ... VC_EQC_CWATCH_DAT3:
+> +        val =3D xive->regs[reg];
+> +        break;
+> +
+> +    case PC_VPC_CWATCH_SPEC:
+> +        xive->regs[reg] =3D ~(PC_VPC_CWATCH_FULL | PC_VPC_CWATCH_CONFLIC=
+T);
+> +        val =3D xive->regs[reg];
+> +        break;
+> +    case PC_VPC_CWATCH_DAT0:
+> +        /*
+> +         * Load DATA registers from cache with data requested by the
+> +         * SPEC register
+> +         */
+> +        pnv_xive_nvt_cache_load(xive);
+> +        val =3D xive->regs[reg];
+> +        break;
+> +    case PC_VPC_CWATCH_DAT1 ... PC_VPC_CWATCH_DAT7:
+> +        val =3D xive->regs[reg];
+> +        break;
+> +
+>      case PC_VPC_SCRUB_TRIG:
+>      case VC_IVC_SCRUB_TRIG:
+>      case VC_EQC_SCRUB_TRIG:
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -193,25 +375,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---Xsn3knLL3qrmRbVI
+--Sr6hGnsCY8KeifOY
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0Zle8ACgkQbDjKyiDZ
-s5LJfRAA1VZQS3o1TpvNFoC1VJjrCyxnVuarxhcGzCL+yja20rVq0oJFhJQI2wkT
-JSIzwerw0nxuhTtkmF3P06haZQ0AA5ouIN6vuo1qzm7OOiwlKx/pnqQ+1qvK2Bei
-YIfm1kwYDRiXrgmy8gakuB5UtiBYC14qNvwZtdUSeBQvBxv5iNflpCnIm/CBy/qp
-tZncOxJlrknxkMNLpTD1iJM7mUftv0TgUN2ALWKQntHSua1C97xyb9HCTKBW27tF
-4x+ii/SK6D/ed/NaVM6v+koJvITCHrRZ43sKuhEnIHuAu/XIxV09ysN58J2MwzzI
-77AjiK6YcZBwHkbmEcq3tWUGIvhwk6ffEgDhrm10zxmbW+/fTUsxne8lMp/Ww+IU
-vVC/CnaOTzz7gCRJOz7ktMKOHvnl99mv8dChUMO6pqQsZdNf0HWC7gLJ4QtK4GUw
-iSb0m6ZEXOYL5xYHouH1qm4GG6aJifBdlaqDSzTw4NFIqo+oWYjOWVV2+RCoWf4I
-jq5HtatVMs4lqP5YbTs7hNq94LgxyvuBZHmr9Iqmx5/5yksr0euKRWd2UpFLCvxt
-55i954GGo/sCuA/FKxmvbDRf3un30Uz90+I3jWWrg9JulSyf16H/5Idl94LgJSg2
-YPVazvuRRsRW0ogTlXI5nDsArj0+IPbCDaSltzFdW3WV/BdP+hc=
-=XaEc
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0ZmtQACgkQbDjKyiDZ
+s5JeBg//bINgwMCJ8lT8p5pJD/6aRGC8/FCXie/765SXo0h/KCvdMd6wntBVvDv6
+Xcg/JI00THfHyXEqx7el6eDT+EYcaBwqV4D7z4C5r1/J9u8AByliRqUe3/RBr3L8
+8IWlua/rAWi6bj4fMX5Ww48QnpBg96DU28AlxfF2lZIZ2xcrEZMCscdji3qfk0yq
+Hx0Dy2M+Z5UEZffkVb38WKUsj2jp1u3+q+tqA4tuh3+zG5a97dUjLZDLXEyuoDCO
+P2V6uRxPoFRWbV0bL3e9HwbPHEGyHQCbrpPXLZBtkAUSk83dWvcANH/BYKIAqTMs
+H5Y8crVqOw7M2vabfy1uI3diJnrdggyymJkLONTB3qg4H5BHOmBizhOPYl3BlK+X
+HBhG/IgXrc1P0kKvq9Th0Th+EEt+lFHlG5eI3/4nTfyAYClRZBTpCqXbNZaXtK8m
+I8ZXjYHRZFZdBU5MaRov+HIM5M06x5tA7BG1y5cvI/ilFLk7YnHzpAKGLg5Wuz0e
+cWyY77Mz+uCj6arU51NdNpNnfieOn2WwbHTK4t0VGNCNfJGvR3H+M5pcwZxNucNB
+GRwF6O/fr2gzlkzK49qE5KJPJczHWHYeF4RnGoIEh6hbq45OfS+f7sijXqrBcmhV
+NsB1/J0cXL+t23w1N1lqZuVmAVn6h9G+9vX3yERqNCX3qo38R3c=
+=yBzN
 -----END PGP SIGNATURE-----
 
---Xsn3knLL3qrmRbVI--
+--Sr6hGnsCY8KeifOY--
 
