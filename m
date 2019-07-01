@@ -2,79 +2,80 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E862CC0650E
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 12:05:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FB4AC0650E
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 12:06:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5251214AE
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 12:05:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1A0CB214AE
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 12:06:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nNQI/Gjc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5251214AE
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kAtQLg79"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A0CB214AE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hhv3n-0001tV-05
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 08:05:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52079)
+	id 1hhv4Z-0002u6-Ac
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 08:06:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51768)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hhv2F-0000qo-Q0
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 08:03:56 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hhv0Y-0000Xd-Du
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 08:02:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hhv2E-0000x5-Kt
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 08:03:51 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:40920)
+ (envelope-from <peter.maydell@linaro.org>) id 1hhv0S-0007yA-V2
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 08:02:02 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:38507)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hhv2C-0000t2-Jr
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 08:03:50 -0400
-Received: by mail-oi1-x241.google.com with SMTP id w196so9719050oie.7
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 05:03:46 -0700 (PDT)
+ id 1hhv0S-0007wm-OH
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 08:02:00 -0400
+Received: by mail-ot1-x343.google.com with SMTP id d17so13223035oth.5
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 05:02:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=2AAfKKzmLdAIFaTaBf7HuSbxroPMPlPB7lCbk6zDrPg=;
- b=nNQI/GjcjI+U6Vg1U/THZ5l5OVd460GzMwahYvitk0ZFCi6RTGPFAZf5FsX8OciEfr
- U287GHhKd4h+xkJ8Y1DXQzCGmxbvjmCLInUxN/IucB3z4bX54eWphFUn1TQ9W7povplY
- Gk+RimbVFtgrGMKU9C8sWaOYTh/5fOxHD+A70hIkYl755Cybyrv5Rg222RLVYP6FeqAi
- itpzlkzXFys66U4k+EZdfglgAZQB4VBB16WCllHdGr0CaAQG1ccpxEawPQ+Epc2ZDo+h
- 6E/AiH/9anur/bpIU6H8oyxMGjUO4HqBybEMZvJJRN4qLGwC9/ClfeRpCnKB+Q1UXBed
- 25aA==
+ :cc; bh=mjliL6SGD7W1mzlrS/SGIU2L53Tm1xC2mwquCwVdnAg=;
+ b=kAtQLg79yqP8rfCNjn58girppAbLKYpuAHzC81rJfGt9etH000zegyjDgkfkd0rCj0
+ hcMy26SDIcE3cDPnAueIRHDfIkqCQZq94euymcu954wfKun9sh3GicYBR5kLCULAFGyd
+ 7bBIhJs6Uqm1XIWtj9CcEfnUJ2l4asIPvD4105uC+GSOcwXa5jzAGrAMWziBFlUN0Usq
+ HmgtMVDa0LK9n9CIjBIDKtbSkaDLBuqeWAtzfeoNBtmsbMCK5mDlexa0CeB2J5MMmU9v
+ ZY4ZHspxtPtqb44tNCAvZNC5RpuwvSpUpzLZZq8zjvubZW4p4t69m7eYT3d68vkPvFFd
+ cOoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=2AAfKKzmLdAIFaTaBf7HuSbxroPMPlPB7lCbk6zDrPg=;
- b=EGz52qvbOOYD0Y5Uba9ReW/1ufM1ux60Cr25kR1EykCTdoIU0X82lp6ikN+HqNq82v
- 9p+3SUTl6N0XM1wGW9WEECUBJ4y1RcNC7NjB3n7/68tqG2eDq+KNi5JA6CW30MwgnnyN
- SpOfeUtCTZVTyiEavBpCaWySxfolEpbOrcwrlTOK8iMpmjO6WTOC5ISKgJff4svifwt8
- zqchZ47GlqpwgHg39kPEY7AKYwrAX3VIuF8USbnlD4nQpPaXnKndP6K1xSki/c6aVQMi
- g4aT03LKdbBnuIudnDJzaVGYHY7y87ndN/iphR+oof0gkwtNllXYBST0pnGR4rhVFAzs
- Lv9w==
-X-Gm-Message-State: APjAAAXSjStPL0muRZ/x6bm1ydJF+SBaRj4RLa0pQYEP3zViu4QKJMLY
- jm+6lrKPJUHFy6VTmA1YW0yNHTRyH8x7bbcZVXjylQ==
-X-Google-Smtp-Source: APXvYqw2wIXEpMxE0mIOoQ1msiyxXHhiw3j2/8D9VI6VkomGgjZsDHqQReqknT0IHIipDZgkuytwycbPTCQZV3z1KJA=
-X-Received: by 2002:aca:6185:: with SMTP id v127mr6744757oib.163.1561982626028; 
- Mon, 01 Jul 2019 05:03:46 -0700 (PDT)
+ bh=mjliL6SGD7W1mzlrS/SGIU2L53Tm1xC2mwquCwVdnAg=;
+ b=I2R6xi+xbBo/Nw1QO1Jvko+GVQtsv2lGClpJ0uoW3P1dFZ9aYT9666A9NLC2b0Kk3q
+ lpW06F8WGystjlZoZpwDo4E5qRUk7XB5ZFBlLmqOpIxhpLIWzRPMDIySFv5uuyEhBufj
+ vjFwVJhq2suI87A4nVOpJfN1qFRa0dLTV0IUpOAu3MEomJR4J35gacPi7V1urYyXiy4W
+ 1PHB9dSOLxrTlor3a+kE+5zPqQOM90XGUxBHVXcI6QYV108Vlj6VjCowfhTXSGNOKba+
+ OqQVECeX7+tGY8UPjVeru6+MM4d5IjGHE4vcqKwuqGRRnXU6F5iuSdxmIdXsvNtmftgB
+ NYyg==
+X-Gm-Message-State: APjAAAUDrXsd0E6yutzx4LabyBcIrQZqKdmc7My6QD5NTQxtDjLi8jgF
+ PogaaOpirDr492AWa1ucEdJUPRMvjXK4H3WE/YawPg==
+X-Google-Smtp-Source: APXvYqxLXfzD7ULcJbz9fYHUZvUCTG+XVZ1dGgs8TUGqz1DVsQyyw5Vi0crch06wbaCWdJ5T1GPYVGWO5rJVq5sZO3M=
+X-Received: by 2002:a9d:5f1a:: with SMTP id f26mr19993893oti.91.1561982519462; 
+ Mon, 01 Jul 2019 05:01:59 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190624144740.5338-1-mreitz@redhat.com>
-In-Reply-To: <20190624144740.5338-1-mreitz@redhat.com>
+References: <20190416013902.4941-1-andrew.smirnov@gmail.com>
+ <20190416013902.4941-6-andrew.smirnov@gmail.com>
+In-Reply-To: <20190416013902.4941-6-andrew.smirnov@gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 1 Jul 2019 13:03:35 +0100
-Message-ID: <CAFEAcA9suWjDxBuB1OeJd97=Fx6YvhD0omJ3z69uOK_X9Ywd1Q@mail.gmail.com>
-To: Max Reitz <mreitz@redhat.com>
+Date: Mon, 1 Jul 2019 13:01:48 +0100
+Message-ID: <CAFEAcA9hGvpafJkVS3o+n=4S_=UyZ=iz352L5DtCkit5bvysCQ@mail.gmail.com>
+To: Andrey Smirnov <andrew.smirnov@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::241
-Subject: Re: [Qemu-devel] [PULL v2 0/8] Block patches
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH 5/5] i.mx7d: pci: Update PCI IRQ mapping to
+ match HW
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,44 +87,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 24 Jun 2019 at 15:47, Max Reitz <mreitz@redhat.com> wrote:
+On Tue, 16 Apr 2019 at 02:39, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
 >
-> The following changes since commit 474f3938d79ab36b9231c9ad3b5a9314c2aeacde:
+> Datasheet for i.MX7 is incorrect and i.MX7's PCI IRQ mapping matches
+> that of i.MX6:
 >
->   Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-jun-21-2019' into staging (2019-06-21 15:40:50 +0100)
+>     * INTD/MSI    122
+>     * INTC        123
+>     * INTB        124
+>     * INTA        125
 >
-> are available in the Git repository at:
+> Fix all of the relevant code to reflect that fact. Needed by latest
+> Linux kernels.
 >
->   https://github.com/XanClic/qemu.git tags/pull-block-2019-06-24
->
-> for you to fetch changes up to ab5d4a30f7f3803ca5106b370969c1b7b54136f8:
->
->   iotests: Fix 205 for concurrent runs (2019-06-24 16:01:40 +0200)
->
-> ----------------------------------------------------------------
-> Block patches:
-> - The SSH block driver now uses libssh instead of libssh2
-> - The VMDK block driver gets read-only support for the seSparse
->   subformat
-> - Various fixes
->
+> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: qemu-devel@nongnu.org
+> Cc: qemu-arm@nongnu.org
 > ---
->
-> v2:
-> - Squashed Pino's fix for pre-0.8 libssh into the libssh patch
->
+>  include/hw/arm/fsl-imx7.h | 8 ++++----
+>  hw/pci-host/designware.c  | 6 ++++--
+>  2 files changed, 8 insertions(+), 6 deletions(-)
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Applied, thanks.
+Compare Linux kernel commit 538d6e9d597584e805146 from an
+NXP employee confirming that the datasheet is incorrect
+and with a report of a test against real h/w.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
-
+thanks
 -- PMM
 
