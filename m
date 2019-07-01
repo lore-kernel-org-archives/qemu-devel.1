@@ -5,74 +5,74 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C50E5C5B578
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 04:37:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A512C5B578
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 04:41:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81EAB208C4
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 04:37:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8AC84208C4
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 04:41:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eC1toOYD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81EAB208C4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AW8Krlrm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AC84208C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hho4d-0006nR-Ny
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 00:37:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56661)
+	id 1hho7x-0001ei-Fk
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 00:41:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56611)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jan.bobek@gmail.com>) id 1hho2r-0004wu-Sy
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 00:36:04 -0400
+ (envelope-from <jan.bobek@gmail.com>) id 1hho2n-0004tE-MU
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 00:35:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.bobek@gmail.com>) id 1hho2p-0004Vb-En
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 00:36:01 -0400
-Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:42838)
+ (envelope-from <jan.bobek@gmail.com>) id 1hho2m-0004Tu-H2
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 00:35:57 -0400
+Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:37617)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hho2p-0004VC-8p
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 00:35:59 -0400
-Received: by mail-yb1-xb43.google.com with SMTP id f195so4906228ybg.9
- for <qemu-devel@nongnu.org>; Sun, 30 Jun 2019 21:35:59 -0700 (PDT)
+ (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hho2m-0004TY-C6
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 00:35:56 -0400
+Received: by mail-yb1-xb42.google.com with SMTP id l22so3629246ybf.4
+ for <qemu-devel@nongnu.org>; Sun, 30 Jun 2019 21:35:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=aIRZzvzwuNFXzVPMQmBgSBWetLSDRb08aZcJZQ381l4=;
- b=eC1toOYDlYKuB0R/MqylOfb1fRXHMPi6EUboGVOjpoWaqiu/hyluh8zKK4x0c5NKa9
- dsmLhe96pDEfxqmEP5F1En1nr6FIIRZ0ZS+RYO0OONapWN6fWEk0LMmQJY45VvXFYHIJ
- focXaeIT9L7MuN7TY3f30/StcCRWdZ0l70yqghrtI5gjju4A8hBid6HQkuX1T/0EaoeX
- cFKqVHYIb07FsoXRWBe/1rphgt2TgoDTKV8XB5Z8A0b0BBFz4xE1kzbynaUaeo2Vn+0w
- VR45RlAWkhO/0OLH+uWP7BJ4LfSWPc4cg9OZpLemFwSVtv1Fq38auuvYlVFu2ogfdSks
- 6upA==
+ bh=liyGMfmhycaZ3/V3dGPSjjHCU+qnWveeLZ45quM65dU=;
+ b=AW8Krlrm9cwM40wtC/fhxqMgCOxlAIAJV7GOu3ZOkLkJyaRgxOdygv+yLyplgnzjJk
+ sm1AFgR+DKzamouOn6edeQjnMGWVF4DQmZrvYoWbiKXtyWrA3T85Hy4M2rWRD2fQeAXX
+ e2t+JSQMii/j1TN0m6gXCV+hmXH5vSXom3kLpWuq7rZu6AWcd/yapqDgdzBfxc3UQbbu
+ 0gttVwyC5ydVGedX3TsH0wYcovwE0IQKXD3MM/sGWmMR+4zOmerhAhXyi0j0cFMR9v9/
+ 1ktxcICC8oeCUa8q7Cqm3hPLBuZJA2Rsi0wjaqStEGAFRNmr1Pf/TkDttOOxM5x3G5VW
+ 6BZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=aIRZzvzwuNFXzVPMQmBgSBWetLSDRb08aZcJZQ381l4=;
- b=Y9yrxMgMY5NjcWHX77r5hoWaUGNMyrE+OviUtZlCTbnPG16qbCnrBY61D7jwM1mwF3
- pD/2kJjHitDiZSfGWVfCsueJnTcj0lucs1sI9wEWN3Xs98aPSwRtZnkHa90JZH2MZ7/T
- 9s9iiE4y68itCJa/HbwHeyVNQ4I18e1qx4Cu0LomCwZZ+dS9VdKKjZp8RN3tX6UNbqPX
- k6Dh2Knwp6cUCyyMOJaJOoftTcYob+F0NT6ZCAlYOwsQ7YOnxFFMBgdmtyoTAW68U6Le
- ZnUiNeURBgFyvl5JZznHdFhYgvgqpFUKOyHQK/aYFelzt64xLpwzWxhGUIbzQdyIB9oh
- ZCew==
-X-Gm-Message-State: APjAAAU+fQLCU84r3KaItMBW7D3V+tAjJvb9rEQ7uTN7YaqSZlAuBjYx
- 7b2YiOO46hlyvkvE9JgFGTeNfmiu
-X-Google-Smtp-Source: APXvYqz3bnQIYOQEnYcgv0+jXzKeTwhLov5whq2RpBtIqf7+fqWoZyfN1DnCqBLxxfmcvK+F43+BPw==
-X-Received: by 2002:a25:2003:: with SMTP id g3mr14322906ybg.447.1561955758355; 
- Sun, 30 Jun 2019 21:35:58 -0700 (PDT)
+ bh=liyGMfmhycaZ3/V3dGPSjjHCU+qnWveeLZ45quM65dU=;
+ b=H8Anx4QpZ5663oYw29PFKiJgLkniYIkhgNx/dwukycq00Dc7FwSntXlU3QrIyXP6r7
+ eD1K1inbLdJ9AG7XNY/kL9gDByUxVvLwmsbfVdO6v74fMLsBs3s83B6A8Hw3ou3qXLUP
+ JSGXiKk2ktqt9vNXhRgizkm1vULA3A6GLdADOF0U/PnQnYMDZjNzn0Cyp1AGwuAl2NQG
+ mvDNA2chuEhpk68nSxz3z8pPZDlTAl/st4aVBKUmN5pQNyPtDSkBEDOPoPFQ21EshXp5
+ Mk6+R9FLKrnTLEXUOhg8Y+3l0ofgfLGEJU+dEMnrlFChOXdwSEKeWbGZIoNzGIFyxamD
+ e/MQ==
+X-Gm-Message-State: APjAAAV4ZtmqCo6Am9v9plXnoHLFPipHsLudDKMINNr/01CAa1sKk8yx
+ 21Tbzn0cPsbGVjzFcoaRxNll853Z
+X-Google-Smtp-Source: APXvYqzDIUYPTSC0Jt3PQFx7dqDr/C/2oCHyL42kGXdGB9tQzioCj/guBZp9a5BDlO5cadi0/j4DmA==
+X-Received: by 2002:a25:aab0:: with SMTP id t45mr14038514ybi.201.1561955755659; 
+ Sun, 30 Jun 2019 21:35:55 -0700 (PDT)
 Received: from dionysus.attlocal.net
  (69-222-133-165.lightspeed.tukrga.sbcglobal.net. [69.222.133.165])
- by smtp.gmail.com with ESMTPSA id k126sm1108564ywf.36.2019.06.30.21.35.57
+ by smtp.gmail.com with ESMTPSA id k126sm1108564ywf.36.2019.06.30.21.35.55
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sun, 30 Jun 2019 21:35:58 -0700 (PDT)
+ Sun, 30 Jun 2019 21:35:55 -0700 (PDT)
 From: Jan Bobek <jan.bobek@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Mon,  1 Jul 2019 00:35:26 -0400
-Message-Id: <20190701043536.26019-5-jan.bobek@gmail.com>
+Date: Mon,  1 Jul 2019 00:35:23 -0400
+Message-Id: <20190701043536.26019-2-jan.bobek@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190701043536.26019-1-jan.bobek@gmail.com>
 References: <20190701043536.26019-1-jan.bobek@gmail.com>
@@ -80,8 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::b43
-Subject: [Qemu-devel] [RISU RFC PATCH v2 04/14] risugen_x86: add module
+X-Received-From: 2607:f8b0:4864:20::b42
+Subject: [Qemu-devel] [RISU RFC PATCH v2 01/14] risugen_common: add insnv,
+ randint_constr, rand_fill
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,559 +101,163 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The risugen_x86.pm module contains most of the code specific to Intel
-i386 and x86_64 architectures. This commit also adds --x86_64 option,
-which enables emission of 64-bit (rather than 32-bit) assembly.
+Add three common utility functions:
+
+- insnv allows emitting variable-length instructions in little-endian
+  or big-endian byte order; it subsumes functionality of former
+  insn16() and insn32() functions.
+
+- randint_constr allows generating random integers according to
+  several constraints passed as arguments.
+
+- rand_fill uses randint_constr to fill a given hash with
+  (optionally constrained) random values.
 
 Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
 ---
- risugen        |   6 +-
- risugen_x86.pm | 498 +++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 503 insertions(+), 1 deletion(-)
- create mode 100644 risugen_x86.pm
+ risugen_common.pm | 107 +++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 101 insertions(+), 6 deletions(-)
 
-diff --git a/risugen b/risugen
-index fe3d00e..09a702a 100755
---- a/risugen
-+++ b/risugen
-@@ -310,6 +310,7 @@ Valid options:
-                    Useful to test before support for FP is available.
-     --sve        : enable sve floating point
-     --be         : generate instructions in Big-Endian byte order (ppc64 only).
-+    --x86_64     : generate 64-bit (rather than 32-bit) x86 code.
-     --help       : print this message
- EOT
+diff --git a/risugen_common.pm b/risugen_common.pm
+index 71ee996..c5d861e 100644
+--- a/risugen_common.pm
++++ b/risugen_common.pm
+@@ -23,7 +23,8 @@ BEGIN {
+     require Exporter;
+ 
+     our @ISA = qw(Exporter);
+-    our @EXPORT = qw(open_bin close_bin set_endian insn32 insn16 $bytecount
++    our @EXPORT = qw(open_bin close_bin set_endian insn32 insn16
++                   $bytecount insnv randint_constr rand_fill
+                    progress_start progress_update progress_end
+                    eval_with_fields is_pow_of_2 sextract ctz
+                    dump_insn_details);
+@@ -37,7 +38,7 @@ my $bigendian = 0;
+ # (default is little endian, 0).
+ sub set_endian
+ {
+-    $bigendian = @_;
++    ($bigendian) = @_;
  }
-@@ -322,6 +323,7 @@ sub main()
-     my $fp_enabled = 1;
-     my $sve_enabled = 0;
-     my $big_endian = 0;
-+    my $is_x86_64 = 0;
-     my ($infile, $outfile);
  
-     GetOptions( "help" => sub { usage(); exit(0); },
-@@ -338,6 +340,7 @@ sub main()
-                 },
-                 "be" => sub { $big_endian = 1; },
-                 "no-fp" => sub { $fp_enabled = 0; },
-+                "x86_64" => sub { $is_x86_64 = 1; },
-                 "sve" => sub { $sve_enabled = 1; },
-         ) or return 1;
-     # allow "--pattern re,re" and "--pattern re --pattern re"
-@@ -372,7 +375,8 @@ sub main()
-         'keys' => \@insn_keys,
-         'arch' => $full_arch[0],
-         'subarch' => $full_arch[1] || '',
--        'bigendian' => $big_endian
-+        'bigendian' => $big_endian,
-+        'x86_64' => $is_x86_64
-     );
+ sub open_bin
+@@ -52,18 +53,112 @@ sub close_bin
+     close(BIN) or die "can't close output file: $!";
+ }
  
-     write_test_code(\%params);
-diff --git a/risugen_x86.pm b/risugen_x86.pm
-new file mode 100644
-index 0000000..fd16c45
---- /dev/null
-+++ b/risugen_x86.pm
-@@ -0,0 +1,498 @@
-+#!/usr/bin/perl -w
-+###############################################################################
-+# Copyright (c) 2019 Linaro Limited
-+# All rights reserved. This program and the accompanying materials
-+# are made available under the terms of the Eclipse Public License v1.0
-+# which accompanies this distribution, and is available at
-+# http://www.eclipse.org/legal/epl-v10.html
-+#
-+# Contributors:
-+#     Jan Bobek - initial implementation
-+###############################################################################
-+
-+# risugen_x86 -- risugen module for Intel i386/x86_64 architectures
-+package risugen_x86;
-+
-+use strict;
-+use warnings;
-+
-+use risugen_common;
-+use risugen_x86_asm;
-+use risugen_x86_emit;
-+
-+require Exporter;
-+
-+our @ISA    = qw(Exporter);
-+our @EXPORT = qw(write_test_code);
-+
-+use constant {
-+    RISUOP_COMPARE     => 0,        # compare registers
-+    RISUOP_TESTEND     => 1,        # end of test, stop
-+    RISUOP_SETMEMBLOCK => 2,        # eax is address of memory block (8192 bytes)
-+    RISUOP_GETMEMBLOCK => 3,        # add the address of memory block to eax
-+    RISUOP_COMPAREMEM  => 4,        # compare memory block
-+
-+    # Maximum alignment restriction permitted for a memory op.
-+    MAXALIGN => 64,
-+    MEMBLOCK_LEN => 8192,
-+};
-+
-+my $periodic_reg_random = 1;
-+my $is_x86_64 = 0;
-+
-+sub write_risuop($)
-+{
-+    my ($op) = @_;
-+
-+    write_insn(opcode => X86OP_UD1,
-+               modrm => {mod => MOD_DIRECT,
-+                         reg => REG_EAX,
-+                         rm => $op});
-+}
-+
-+sub write_mov_rr($$)
-+{
-+    my ($r1, $r2) = @_;
-+
-+    my %insn = (opcode => X86OP_MOV,
-+                modrm => {mod => MOD_DIRECT,
-+                          reg => ($r1 & 0x7),
-+                          rm => ($r2 & 0x7)});
-+
-+    $insn{rex}{w} = 1 if $is_x86_64;
-+    $insn{rex}{r} = 1 if $r1 >= 8;
-+    $insn{rex}{b} = 1 if $r2 >= 8;
-+
-+    write_insn(%insn);
-+}
-+
-+sub write_mov_reg_imm($$)
-+{
-+    my ($reg, $imm) = @_;
-+    my %insn;
-+
-+    if (0 <= $imm && $imm <= 0xffffffff) {
-+        %insn = (opcode => {value => 0xB8 | ($reg & 0x7), len => 1},
-+                 imm => {value => $imm, len => 4});
-+    } elsif (-0x80000000 <= $imm && $imm <= 0x7fffffff) {
-+        %insn = (opcode => {value => 0xC7, len => 1},
-+                 modrm => {mod => MOD_DIRECT,
-+                           reg => 0, rm => ($reg & 0x7)},
-+                 imm => {value => $imm, len => 4});
-+
-+        $insn{rex}{w} = 1 if $is_x86_64;
-+    } else {
-+        %insn = (rex => {w => 1},
-+                 opcode => {value => 0xB8 | ($reg & 0x7), len => 1},
-+                 imm => {value => $imm, len => 8});
-+    }
-+
-+    $insn{rex}{b} = 1 if $reg >= 8;
-+    write_insn(%insn);
-+}
-+
-+sub write_random_regdata()
-+{
-+    my $reg_cnt = $is_x86_64 ? 16 : 8;
-+    my $bitlen = $is_x86_64 ? 64 : 32;
-+
-+    # initialize flags register
-+    write_insn(opcode => X86OP_XOR,
-+               modrm => {mod => MOD_DIRECT,
-+                         reg => REG_EAX,
-+                         rm => REG_EAX});
-+    write_insn(opcode => X86OP_SAHF);
-+
-+    # general purpose registers
-+    for (my $reg = 0; $reg < $reg_cnt; $reg++) {
-+        if ($reg != REG_ESP) {
-+            my $imm = randint_constr(bitlen => $bitlen, signed => 1);
-+            write_mov_reg_imm($reg, $imm);
-+        }
-+    }
-+}
-+
-+sub write_random_datablock($)
-+{
-+    my ($datalen) = @_;
-+
-+    # Write a block of random data, $datalen bytes long, aligned
-+    # according to MAXALIGN, and load its address into EAX/RAX.
-+
-+    $datalen += MAXALIGN - 1;
-+
-+    # First, load current EIP/RIP into EAX/RAX. Easy to do on x86_64
-+    # thanks to RIP-relative addressing, but on i386 we need to play
-+    # some well-known tricks with CALL instruction.
-+    if ($is_x86_64) {
-+        # 4-byte AND + 5-byte JMP
-+        my $disp32 = 4 + 5 + (MAXALIGN - 1);
-+        my $reg = REG_EAX;
-+
-+        write_insn(rex => {w => 1},
-+                   opcode => X86OP_LEA,
-+                   modrm => {mod => MOD_INDIRECT,
-+                             reg => $reg, rm => REG_EBP},
-+                   disp => {value => $disp32, len => 4});
-+
-+        write_insn(rex => {w => 1},
-+                   opcode => X86OP_ALU_imm8,
-+                   modrm => {mod => MOD_DIRECT,
-+                             reg => 4, rm => $reg},
-+                   imm => {value => ~(MAXALIGN - 1),
-+                           len => 1});
-+
-+    } else {
-+        # 1-byte POP + 3-byte ADD + 3-byte AND + 5-byte JMP
-+        my $imm8 = 1 + 3 + 3 + 5 + (MAXALIGN - 1);
-+        my $reg = REG_EAX;
-+
-+        # displacement = next instruction
-+        write_insn(opcode => X86OP_CALL,
-+                   imm => {value => 0x00000000, len => 4});
-+
-+        write_insn(opcode => {value => 0x58 | ($reg & 0x7),
-+                              len => 1});
-+
-+        write_insn(opcode => X86OP_ALU_imm8,
-+                   modrm => {mod => MOD_DIRECT,
-+                             reg => 0, rm => $reg},
-+                   imm => {value => $imm8, len => 1});
-+
-+        write_insn(opcode => X86OP_ALU_imm8,
-+                   modrm => {mod => MOD_DIRECT,
-+                             reg => 4, rm => $reg},
-+                   imm => {value => ~(MAXALIGN - 1),
-+                           len => 1});
-+    }
-+
-+    # JMP over the data blob.
-+    write_insn(opcode => X86OP_JMP,
-+               imm => {value => $datalen, len => 4});
-+
-+    # Generate the random data
-+    for (my $w = 8; 0 < $w; $w /= 2) {
-+        for (; $w <= $datalen; $datalen -= $w) {
-+            insnv(%{rand_insn_imm(size => $w)});
-+        }
-+    }
-+}
-+
-+sub write_random_ymmdata()
-+{
-+    my $ymm_cnt = $is_x86_64 ? 16 : 8;
-+    my $ymm_len = 32;
-+    my $datalen = $ymm_cnt * $ymm_len;
-+
-+    # Generate random data blob
-+    write_random_datablock($datalen);
-+
-+    # Load the random data into YMM regs.
-+    for (my $ymm_reg = 0; $ymm_reg < $ymm_cnt; $ymm_reg++) {
-+        write_insn(vex => {l => VEX_L_256, p => VEX_P_DATA16,
-+                           r => !($ymm_reg >= 8)},
-+                   opcode => X86OP_VMOVAPS,
-+                   modrm => {mod => MOD_INDIRECT_DISP32,
-+                             reg => ($ymm_reg & 0x7),
-+                             rm => REG_EAX},
-+                   disp => {value => $ymm_reg * $ymm_len,
-+                            len => 4});
-+    }
-+}
-+
-+sub write_memblock_setup()
-+{
-+    # Generate random data blob
-+    write_random_datablock(MEMBLOCK_LEN);
-+    # Pointer is in EAX/RAX; set the memblock
-+    write_risuop(RISUOP_SETMEMBLOCK);
-+}
-+
-+sub write_random_register_data()
-+{
-+    write_random_ymmdata();
-+    write_random_regdata();
-+    write_risuop(RISUOP_COMPARE);
-+}
-+
-+sub rand_insn_imm(%)
++sub insnv(%)
 +{
 +    my (%args) = @_;
 +
-+    return {
-+        value => randint_constr(bitlen => ($args{size} * 8), signed => 1),
-+        len => $args{size}
-+    };
-+}
++    # Default to big-endian order, so that the instruction bytes are
++    # emitted in the same order as they are written in the
++    # configuration file.
++    $args{bigendian} = 1 unless defined $args{bigendian};
 +
-+sub rand_insn_opcode($)
-+{
-+    # Given an instruction-details array, generate an instruction
-+    my ($rec) = @_;
-+    my $insnname = $rec->{name};
-+    my $insnwidth = $rec->{width};
++    my $bitcur = 0;
++    my $bitend = 8 * $args{len};
++    while ($bitcur < $bitend) {
++        my $format;
++        my $bitlen;
 +
-+    my $constraintfailures = 0;
-+
-+    INSN: while(1) {
-+        my $opcode = randint_constr(bitlen => 32,
-+                                    fixedbits => $rec->{fixedbits},
-+                                    fixedbitmask => $rec->{fixedbitmask});
-+
-+        my $constraint = $rec->{blocks}{"constraints"};
-+        if (defined $constraint) {
-+            # user-specified constraint: evaluate in an environment
-+            # with variables set corresponding to the variable fields.
-+            my $v = eval_with_fields($insnname, $opcode, $rec, "constraints", $constraint);
-+            if (!$v) {
-+                $constraintfailures++;
-+                if ($constraintfailures > 10000) {
-+                    print "10000 consecutive constraint failures for $insnname constraints string:\n$constraint\n";
-+                    exit (1);
-+                }
-+                next INSN;
-+            }
++        if ($bitcur + 64 <= $bitend) {
++            $format = "Q";
++            $bitlen = 64;
++        } elsif ($bitcur + 32 <= $bitend) {
++            $format = "L";
++            $bitlen = 32;
++        } elsif ($bitcur + 16 <= $bitend) {
++            $format = "S";
++            $bitlen = 16;
++        } else {
++            $format = "C";
++            $bitlen = 8;
 +        }
 +
-+        # OK, we got a good one
-+        $constraintfailures = 0;
++        $format .= ($args{bigendian} ? ">" : "<") if $bitlen > 8;
 +
-+        return {
-+            value => $opcode >> (32 - $insnwidth),
-+            len => $insnwidth / 8
-+        };
++        my $bitmask = (1 << $bitlen) - 1;
++        my $value = $args{value} >> ($args{bigendian}
++                                     ? $bitend - $bitcur - $bitlen
++                                     : $bitcur);
++
++        print BIN pack($format, $value & $bitmask);
++        $bytecount += $bitlen / 8;
++
++        $bitcur += $bitlen;
 +    }
 +}
 +
-+sub rand_insn_modrm($$)
+ sub insn32($)
+ {
+     my ($insn) = @_;
+-    print BIN pack($bigendian ? "N" : "V", $insn);
+-    $bytecount += 4;
++    insnv(value => $insn, len => 4, bigendian => $bigendian);
+ }
+ 
+ sub insn16($)
+ {
+     my ($insn) = @_;
+-    print BIN pack($bigendian ? "n" : "v", $insn);
+-    $bytecount += 2;
++    insnv(value => $insn, len => 2, bigendian => $bigendian);
++}
++
++sub randint_constr(%)
 +{
-+    my ($opts, $insn) = @_;
-+    my $modrm;
++    my (%args) = @_;
++    my $bitlen = $args{bitlen};
++    my $halfrange = 1 << ($bitlen - 1);
 +
 +    while (1) {
-+        $modrm = rand_fill({mod => {bitlen => 2},
-+                            reg => {bitlen => 3},
-+                            rm => {bitlen => 3}},
-+                           $opts);
++        my $value = int(rand(2 * $halfrange));
++        $value -= $halfrange if defined $args{signed} && $args{signed};
++        $value &= ~$args{fixedbitmask} if defined $args{fixedbitmask};
++        $value |= $args{fixedbits} if defined $args{fixedbits};
 +
-+        if ($modrm->{mod} != MOD_DIRECT) {
-+            # Displacement only; we cannot use this since we
-+            # don't know absolute address of the memblock.
-+            next if $modrm->{mod} == MOD_INDIRECT && $modrm->{rm} == REG_EBP;
++        if (defined $args{constraint}) {
++            # The idea is: if the most significant bit of
++            # $args{constraint} is zero, $args{constraint} is the
++            # value we want to return; if the most significant bit is
++            # one, ~$args{constraint} (its bit inversion) is the value
++            # we want to *avoid*, so we try again.
 +
-+            if ($modrm->{rm} == REG_ESP) {
-+                # SIB byte present
-+                my $sib = rand_fill({ss => {bitlen => 2},
-+                                     index => {bitlen => 3},
-+                                     base => {bitlen => 3}}, {});
-+
-+                # We cannot modify ESP/RSP during the tests
-+                next if $sib->{base} == REG_ESP;
-+
-+                # When base and index register are the same,
-+                # computing the correct memblock addresses and
-+                # offsets gets way too complicated...
-+                next if $sib->{base} == $sib->{index};
-+
-+                # No base register
-+                next if $modrm->{mod} == MOD_INDIRECT && $sib->{base} == REG_EBP;
-+
-+                $insn->{sib} = $sib;
++            if (!($args{constraint} >> 63)) {
++                $value = $args{constraint};
++            } elsif ($value == ~$args{constraint}) {
++                next;
 +            }
-+
-+            $insn->{disp} = rand_insn_imm(size => 1)
-+                if $modrm->{mod} == MOD_INDIRECT_DISP8;
-+
-+            $insn->{disp} = rand_insn_imm(size => 4)
-+                if $modrm->{mod} == MOD_INDIRECT_DISP32;
 +        }
 +
-+        $insn->{modrm} = $modrm;
-+        last;
++        return $value;
 +    }
 +}
 +
-+sub rand_insn_rex($$)
++sub rand_fill($$)
 +{
-+    my ($opts, $insn) = @_;
++    my ($target, $constraints) = @_;
 +
-+    $opts->{w} = 0 unless defined $opts->{w};
-+    $opts->{x} = 0 unless defined $opts->{x} || defined $insn->{sib};
++    for (keys %{$target}) {
++        my %args = (bitlen => $target->{$_}{bitlen});
 +
-+    my $rex = rand_fill({w => {bitlen => 1},
-+                         r => {bitlen => 1},
-+                         b => {bitlen => 1},
-+                         x => {bitlen => 1}},
-+                        $opts);
++        $args{fixedbits} = $target->{$_}{fixedbits}
++            if defined $target->{$_}{fixedbits};
++        $args{fixedbitmask} = $target->{$_}{fixedbitmask}
++            if defined $target->{$_}{fixedbitmask};
++        $args{signed} = $target->{$_}{signed}
++            if defined $target->{$_}{signed};
 +
-+    $insn->{rex} = $rex
-+        if $rex->{w} || $rex->{r} || $rex->{b} || $rex->{x};
-+}
++        $args{constraint} = $constraints->{$_}
++            if defined $constraints->{$_};
 +
-+sub rand_insn_vex($$)
-+{
-+    my ($opts, $insn) = @_;
-+    my $vex;
-+
-+    $opts->{r} = 1 unless $is_x86_64;
-+    $opts->{x} = 1 unless $is_x86_64 && (defined $opts->{x} || defined $insn->{sib});
-+    $opts->{b} = 1 unless $is_x86_64;
-+    $opts->{p} = 0 unless defined $opts->{p};
-+
-+    $vex->{r} = {bitlen => 1};
-+    $vex->{v} = {bitlen => 4};
-+    $vex->{l} = {bitlen => 1};
-+    $vex->{p} = {bitlen => 2};
-+
-+    # Note that VEX.X, VEX.B, VEX.M and VEX.W are only present in the
-+    # 3-byte VEX prefix. Since VEX.M is an extension of opcode, it
-+    # makes no sense to randomize it; therefore, we can only include
-+    # VEX.X, VEX.B and VEX.W if we are given a meaningful value for
-+    # VEX.M.
-+    if (defined $opts->{m}) {
-+        $vex->{x} = {bitlen => 1};
-+        $vex->{b} = {bitlen => 1};
-+        $vex->{m} = {bitlen => 5};
-+        $vex->{w} = {bitlen => 1};
++        $target->{$_} = randint_constr(%args);
 +    }
 +
-+    $insn->{vex} = rand_fill($vex, $opts);
-+}
-+
-+sub write_mem_getoffset($$)
-+{
-+    my ($opts, $insn) = @_;
-+    my $offset, my $index;
-+
-+    $opts->{size}  = 0 unless defined $opts->{size};
-+    $opts->{align} = 1 unless defined $opts->{align};
-+
-+    if (!defined $opts->{base}
-+        && defined $insn->{modrm}
-+        && $insn->{modrm}{mod} != MOD_DIRECT) {
-+
-+        $opts->{base} = (defined $insn->{sib}
-+                         ? $insn->{sib}{base}
-+                         : $insn->{modrm}{rm});
-+
-+        if ($insn->{modrm}{mod} == MOD_INDIRECT && $opts->{base} == REG_EBP) {
-+            delete $opts->{base}; # No base register
-+        } else {
-+            $opts->{base} |= $insn->{rex}{b} << 3 if defined $insn->{rex};
-+            $opts->{base} |= (!$insn->{vex}{b}) << 3 if defined $insn->{vex};
-+        }
-+    }
-+
-+    if (!defined $opts->{index} && defined $insn->{sib}) {
-+        $opts->{index} = $insn->{sib}{index};
-+        $opts->{index} |= $insn->{rex}{x} << 3 if defined $insn->{rex};
-+        $opts->{index} |= (!$insn->{vex}{x}) << 3 if defined $insn->{vex};
-+        delete $opts->{index} if $opts->{index} == REG_ESP; # ESP means "none"
-+    }
-+
-+    $opts->{ss} = $insn->{sib}{ss} if !defined $opts->{ss} && defined $insn->{sib};
-+    $opts->{disp} = $insn->{disp} if !defined $opts->{disp} && defined $insn->{disp};
-+
-+    $offset = int(rand(MEMBLOCK_LEN - $opts->{size}));
-+    $offset &= ~($opts->{align} - 1);
-+
-+    $offset -= $opts->{disp}{value} if defined $opts->{disp};
-+
-+    if (defined $opts->{index}) {
-+        $index = randint_constr(bitlen => 32, signed => 1);
-+        $offset -= $index * (1 << $opts->{ss});
-+    }
-+
-+    if (defined $opts->{base} && defined $offset) {
-+        write_mov_reg_imm(REG_EAX, $offset);
-+        write_risuop(RISUOP_GETMEMBLOCK);
-+        write_mov_rr($opts->{base}, REG_EAX);
-+    }
-+    if (defined $opts->{index} && defined $index) {
-+        write_mov_reg_imm($opts->{index}, $index);
-+    }
-+}
-+
-+sub gen_one_insn($)
-+{
-+    my ($rec) = @_;
-+    my $insn;
-+
-+    $insn->{opcode} = rand_insn_opcode($rec);
-+    my $opts = parse_emitblock($rec, $insn);
-+
-+    # Operation with a ModR/M byte can potentially use a memory
-+    # operand
-+    $opts->{mem} = {}
-+        unless (defined $opts->{mem}
-+                || !defined $opts->{modrm});
-+
-+    # If none of REX/VEX/EVEX are specified, default to REX
-+    $opts->{rex} = {}
-+        unless (defined $opts->{rex}
-+                || defined $opts->{vex}
-+                || defined $opts->{evex}
-+                || !defined $opts->{modrm});
-+
-+    # REX requires x86_64
-+    delete $opts->{rex}
-+        unless $is_x86_64;
-+
-+    $insn->{rep}    = $opts->{rep}    if defined $opts->{rep};
-+    $insn->{repne}  = $opts->{repne}  if defined $opts->{repne};
-+    $insn->{data16} = $opts->{data16} if defined $opts->{data16};
-+
-+    rand_insn_modrm($opts->{modrm}, $insn) if defined $opts->{modrm};
-+
-+    rand_insn_vex($opts->{vex}, $insn) if defined $opts->{vex};
-+    # TODO rand_insn_evex($opts->{evex}, $insn) if defined $opts->{evex};
-+    rand_insn_rex($opts->{rex}, $insn) if defined $opts->{rex};
-+
-+    $insn->{imm} = rand_insn_imm(%{$opts->{imm}}) if defined $opts->{imm};
-+
-+    write_mem_getoffset($opts->{mem}, $insn);
-+    write_insn(%{$insn});
-+}
-+
-+sub write_test_code($)
-+{
-+    my ($params) = @_;
-+
-+    my $numinsns = $params->{ 'numinsns' };
-+    my $outfile = $params->{ 'outfile' };
-+
-+    my %insn_details = %{ $params->{ 'details' } };
-+    my @keys = @{ $params->{ 'keys' } };
-+
-+    $is_x86_64 = $params->{ 'x86_64' };
-+
-+    open_bin($outfile);
-+
-+    # TODO better random number generator?
-+    srand(0);
-+
-+    print "Generating code using patterns: @keys...\n";
-+    progress_start(78, $numinsns);
-+
-+    write_memblock_setup();
-+
-+    # memblock setup doesn't clean its registers, so this must come afterwards.
-+    write_random_register_data();
-+
-+    for my $i (1..$numinsns) {
-+        my $insn_enc = $keys[int rand (@keys)];
-+        gen_one_insn($insn_details{$insn_enc});
-+        write_risuop(RISUOP_COMPARE);
-+        # Rewrite the registers periodically. This avoids the tendency
-+        # for the VFP registers to decay to NaNs and zeroes.
-+        if ($periodic_reg_random && ($i % 100) == 0) {
-+            write_random_register_data();
-+        }
-+        progress_update($i);
-+    }
-+    write_risuop(RISUOP_TESTEND);
-+    progress_end();
-+    close_bin();
-+}
-+
-+1;
++    return $target;
+ }
+ 
+ # Progress bar implementation
 -- 
 2.20.1
 
