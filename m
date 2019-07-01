@@ -2,59 +2,82 @@ Return-Path: <SRS0=9yXi=U7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=DATE_IN_PAST_03_06,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E733C5B578
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:48:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35188C5B578
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:50:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 543A321479
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:48:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 543A321479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EF16221479
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:50:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YrPtT5ki"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF16221479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi8qZ-0002ux-Fj
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 22:48:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52696)
+	id 1hi8co-00077e-Dp
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 22:34:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32789)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hi6RW-0000ly-A5
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 20:14:43 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hi4jX-0003j4-En
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:25:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hi6RR-0006jq-Hm
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 20:14:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35674)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1hi6R2-0006E6-SX; Mon, 01 Jul 2019 20:14:13 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D9F6FC07014A;
- Tue,  2 Jul 2019 00:13:26 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-21.brq.redhat.com [10.40.204.21])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AE45F10018F9;
- Tue,  2 Jul 2019 00:13:04 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Tue,  2 Jul 2019 02:12:52 +0200
-Message-Id: <20190702001301.4768-1-philmd@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1hi4jU-0006l9-U2
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:25:10 -0400
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:38705)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hi4jR-0006kB-PO
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:25:06 -0400
+Received: by mail-ot1-f65.google.com with SMTP id d17so1213326oth.5
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 15:25:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=AtNCVajgsZwa/StomNud26kciS92ZyHegidqhZS10w8=;
+ b=YrPtT5kim9QxRnpSBr5p0suPohzsL/fdc8PJVBhD+AVAHVR0LGUwDUxRenh2bawYwT
+ x8CjDKqJuaSCSxQa0JjA2P3cC3HY2bP/tAxTkGxKArLfG5kJbJ+goNG+8r7zJ315C/pp
+ U32CMnVUJH4EBeEDymgLPQ47mSBxKwqcBlviIJmHxLZf33WLT3Ej16aXAAN3h7EhVb9H
+ gtlC46vdGBiJdfFEMZ++L52F5XlTWXoT8ecciC7VBQ41eAV/qJpRw/GMX59YbG8faxxb
+ Pigbp1Ur8J/SK1/p7sgcRMfCqnKpiX/GLvHbLyoSitb+oESfAsK4D4XUF/2Z8uLaQy/a
+ rQ1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=AtNCVajgsZwa/StomNud26kciS92ZyHegidqhZS10w8=;
+ b=mLO+WuvXVSPS45Gkj7BlXOQM4W8uPhmsZhFd7F+6soT6hsdSmhplLsgX2PN4wgsPZi
+ 7/GjG5jlrntii704XyYB/fsUnnFTe1ODCUVFS9JYHuxpKmQS1e1shiuufcNsTMVaqdkz
+ hZ/1RNK5m2R+jcu79C8evyO2hIEypriBDaGPWtmDlJhVnodNo4mOBV2W5Y+2g/yZxpxV
+ by3SHiZ1Oz/iLjwudSUnVqJ5ovt0Jp12d1hfF8Kyb1BYdW+GNL9ZEFpkzxjlFbQJFubN
+ maIkI5QYh+bCNJaRCdM7UjCItb6O8VFN+Ag7YEyTn30DiW+kzbCK+VjRQapVuQ3aK/Vb
+ azhA==
+X-Gm-Message-State: APjAAAXYNrsUixHiofoXIlO1Pku7hL60IKk1K3GxtiZsSOZ+1EjjigqP
+ qyAT8BvaCaybvLxw2h5ASC4nWFuP5N0Of3l26rjqbHVVpyA=
+X-Google-Smtp-Source: APXvYqwP7qXeR69xJD5LJF0Zqwnyf0wNAUkpD8db9S2Lsh3kl1f+fdfxgG7DR7mWo57rkrCfCn0qMXZlbArUg8F3lIw=
+X-Received: by 2002:a9d:7245:: with SMTP id a5mr21358824otk.232.1562000237264; 
+ Mon, 01 Jul 2019 09:57:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Tue, 02 Jul 2019 00:13:27 +0000 (UTC)
+References: <20190701164732.30518-1-alex.bennee@linaro.org>
+In-Reply-To: <20190701164732.30518-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 1 Jul 2019 17:57:06 +0100
+Message-ID: <CAFEAcA9fRnH74+jOqxMPyZo-7pS45hHjnA5NdnpdSpNs30G--g@mail.gmail.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 0/9] hw/block/pflash_cfi01: Add
- DeviceReset() handler
+ [fuzzy]
+X-Received-From: 209.85.210.65
+Subject: Re: [Qemu-devel] [PATCH] migration: move port_attr inside
+ CONFIG_LINUX
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,62 +89,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-block@nongnu.org,
- Aleksandar Rikalo <arikalo@wavecomp.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-arm@nongnu.org,
- Alistair Francis <alistair23@gmail.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Michael Walle <michael@walle.cc>,
- qemu-ppc@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The pflash device lacks a reset() function.
-When a machine is resetted, the flash might be in an
-inconsistent state, leading to unexpected behavior:
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1678713
-Resolve this issue by adding a DeviceReset() handler.
+On Mon, 1 Jul 2019 at 17:47, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
+e:
+>
+> Otherwise the FreeBSD compiler complains about an unused variable.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  migration/rdma.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/migration/rdma.c b/migration/rdma.c
+> index 74cb2aa9f9..3036221ee8 100644
+> --- a/migration/rdma.c
+> +++ b/migration/rdma.c
+> @@ -839,10 +839,9 @@ static void qemu_rdma_dump_gid(const char *who, stru=
+ct rdma_cm_id *id)
+>   */
+>  static int qemu_rdma_broken_ipv6_kernel(struct ibv_context *verbs, Error=
+ **errp)
+>  {
+> -    struct ibv_port_attr port_attr;
+> -
+>      /* This bug only exists in linux, to our knowledge. */
+>  #ifdef CONFIG_LINUX
+> +    struct ibv_port_attr port_attr;
+>
+>      /*
+>       * Verbs are only NULL if management has bound to '[::]'.
+> --
+> 2.20.1
 
-Fix also two minor issues, and clean a bit the codebase.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Since v1: https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg00962.=
-html
-- addressed Laszlo review comments
-
-Maintainers spam list from:
-./scripts/get_maintainer.pl -f $(git grep -El '(pflash_cfi01_register|TYP=
-E_PFLASH_CFI01)')
-
-Regards,
-
-Phil.
-
-Philippe Mathieu-Daud=C3=A9 (9):
-  hw/block/pflash_cfi01: Removed an unused timer
-  hw/block/pflash_cfi01: Use the correct READ_ARRAY value
-  hw/block/pflash_cfi01: Extract pflash_mode_read_array()
-  hw/block/pflash_cfi01: Start state machine as READY to accept commands
-  hw/block/pflash_cfi01: Add the DeviceReset() handler
-  hw/block/pflash_cfi01: Simplify CFI_QUERY processing
-  hw/block/pflash_cfi01: Improve command comments
-  hw/block/pflash_cfi01: Replace DPRINTF by qemu_log_mask(GUEST_ERROR)
-  hw/block/pflash_cfi01: Hold the PRI table offset in a variable
-
- hw/block/pflash_cfi01.c | 140 +++++++++++++++++++++-------------------
- hw/block/trace-events   |   1 +
- 2 files changed, 74 insertions(+), 67 deletions(-)
-
---=20
-2.20.1
-
+thanks
+-- PMM
 
