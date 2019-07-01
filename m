@@ -2,87 +2,61 @@ Return-Path: <SRS0=a9ZG=U6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E30EC5B578
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 22:22:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 008BEC5B578
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 22:24:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CDD021479
-	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 22:22:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KMINlJEr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CDD021479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id C220C20B7C
+	for <qemu-devel@archiver.kernel.org>; Mon,  1 Jul 2019 22:24:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C220C20B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi4hF-0001ke-HL
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 18:22:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56639)
+	id 1hi4jH-0002MQ-W5
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 18:24:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56425)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hi3Xp-0008KS-SE
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:09:05 -0400
+ (envelope-from <philmd@redhat.com>) id 1hi3XZ-00083Q-6I
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:08:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hi3Xm-0006aA-Bg
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:09:01 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:32804)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hi3Xm-0006XT-39
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:08:58 -0400
-Received: by mail-wr1-f65.google.com with SMTP id n9so15367038wru.0
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 14:08:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=ehjkWhdt19qHAzsl/X1nqYdNDUK2w3SB8ITjOfQ+4TI=;
- b=KMINlJErVZ7iKNRZ2mGI6agJBxPZ5UynPiAegrlvS+4aFfDW8o0FtGInDe6SF0CBki
- ZQPVCCikM5C2JGisHOb48SJO1HAoam0gnTjtq6yrgmli6Pso7Ur7mHNJKFo9zzWseSSh
- UMXS1xxDohNFbhxWdlq8RgLz+1/EqhdngSUQk7wwEtrt/NkvLphuqrEsxj5Inky6Ijc4
- lC4HyzdbdBHaVxh6Moc1oNO0IKJ7H/IIWuOS6SSUOJbCHD+rrjmyuYpJLQbUwecLQJ0m
- uO+5ZOzBnESU8QnMlHp8gZ5pBxf9R9enZ56nKr7zF/4hgppj3kQy4gBBVtc5wlHUfOi0
- sw/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=ehjkWhdt19qHAzsl/X1nqYdNDUK2w3SB8ITjOfQ+4TI=;
- b=VMV3T2W4oWZJU92cq1to5fbvE8MMSeSpOg303d4fNZ4+mRKBknKwgRPcTKXWaRnQNH
- EsGYZok2KBCP8Fm4PnKY4fPzk2Xfg/BrN1XnEwBEcVKWrZQV5hl4egR3tZ6JtZTrs2wm
- 0hX95nIilyB3gOatIZwLyEMJSW/K1Hi3IeYjwuf5EfV3ZWbJ8RpYlpbfLJsChA1WBPIy
- sWYbe/Yf4+1+7Zm2lKyNkfWEJi/BYyqPHLgzhIBx5CTELepWiiYxfyE+/R4N7w1++FxD
- yqIY5MYJ5qNw3+1PVIcnVwWibujqJi42I4DxotPK537T02NszNd+5+HQDUcxPa4fdzqY
- wDWQ==
-X-Gm-Message-State: APjAAAXNG7A/iCQ7FtWLok3EOkkFdW96ky3rVoaNXmVfPCVF3hfMzYmL
- j+r7kjxY8VEI7WL9XcSNyYFE5INNI84hxg==
-X-Google-Smtp-Source: APXvYqwgw42ETSsGk1LeD/uFWz5EaZ8D1CEOUaAm881AhiceVCqQ6nn9XTr7OlnlhxQ6tX9GCaQhcA==
-X-Received: by 2002:adf:e84d:: with SMTP id d13mr15985309wrn.88.1561999206838; 
- Mon, 01 Jul 2019 09:40:06 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id o6sm26573508wra.27.2019.07.01.09.40.05
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 01 Jul 2019 09:40:06 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
+ (envelope-from <philmd@redhat.com>) id 1hi3XY-0006UB-4W
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 17:08:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:11475)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>)
+ id 1hi3XT-0006RA-OL; Mon, 01 Jul 2019 17:08:39 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B80E6223884;
+ Mon,  1 Jul 2019 19:50:26 +0000 (UTC)
+Received: from x1w.redhat.com (unknown [10.40.205.170])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 99A719089;
+ Mon,  1 Jul 2019 19:50:21 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon,  1 Jul 2019 17:39:17 +0100
-Message-Id: <20190701163943.22313-21-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190701163943.22313-1-peter.maydell@linaro.org>
-References: <20190701163943.22313-1-peter.maydell@linaro.org>
+Date: Mon,  1 Jul 2019 21:49:41 +0200
+Message-Id: <20190701194942.10092-8-philmd@redhat.com>
+In-Reply-To: <20190701194942.10092-1-philmd@redhat.com>
+References: <20190701194942.10092-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.39]); Mon, 01 Jul 2019 19:50:26 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.65
-Subject: [Qemu-devel] [PULL 20/46] aspeed: add a RAM memory region container
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v4 7/8] RFC target/arm: Do not build
+ A/M-profile cpus when using KVM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,74 +68,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Yang Zhong <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Andrew Jones <drjones@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>,
+ Rob Bradford <robert.bradford@intel.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cédric Le Goater <clg@kaod.org>
+A KVM-only build won't be able to run A or M-profile cpus,
+disable them.
 
-The RAM memory region is defined after the SoC is realized when the
-SDMC controller has checked that the defined RAM size for the machine
-is correct. This is problematic for controller models requiring a link
-on the RAM region, for DMA support in the SMC controller for instance.
+If KVM is not enabled, they are enabled by default.
 
-Introduce a container memory region for the RAM that we can link into
-the controllers early, before the SoC is realized. It will be
-populated with the RAM region after the checks have be done.
-
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Reviewed-by: Joel Stanley <joel@jms.id.au>
-Message-id: 20190618165311.27066-14-clg@kaod.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/arm/aspeed.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+Sadly this does not work with --enable-tcg --enable-kvm dual config.
+---
+ default-configs/arm-softmmu.mak | 14 ++++++--------
+ hw/arm/Kconfig                  | 16 +++++++++++++---
+ 2 files changed, 19 insertions(+), 11 deletions(-)
 
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 5d73267da16..7f01df1b61d 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -33,6 +33,7 @@ static struct arm_boot_info aspeed_board_binfo = {
- 
- struct AspeedBoardState {
-     AspeedSoCState soc;
-+    MemoryRegion ram_container;
-     MemoryRegion ram;
-     MemoryRegion max_ram;
- };
-@@ -159,6 +160,10 @@ static void aspeed_board_init(MachineState *machine,
-     ram_addr_t max_ram_size;
- 
-     bmc = g_new0(AspeedBoardState, 1);
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
+u.mak
+index 081d507c87..3995c4bb65 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -1,25 +1,18 @@
+ # Default configuration for arm-softmmu
+=20
+-# TODO: ARM_V7M is currently always required - make this more flexible!
+-CONFIG_ARM_V7M=3Dy
+-
+ # CONFIG_PCI_DEVICES=3Dn
+ # CONFIG_TEST_DEVICES=3Dn
++CONFIG_ARM_V7M=3Dn
+=20
+ CONFIG_ARM_VIRT=3Dy
+ CONFIG_CUBIEBOARD=3Dy
+ CONFIG_EXYNOS4=3Dy
+ CONFIG_FSL_IMX31=3Dy
+-CONFIG_MUSCA=3Dy
+-CONFIG_STELLARIS=3Dy
+ CONFIG_REALVIEW=3Dy
+ CONFIG_VEXPRESS=3Dy
+ CONFIG_ZYNQ=3Dy
+-CONFIG_NETDUINO2=3Dy
+-CONFIG_MPS2=3Dy
+ CONFIG_RASPI=3Dy
+ CONFIG_SABRELITE=3Dy
+-CONFIG_EMCRAFT_SF2=3Dy
+ CONFIG_FSL_IMX7=3Dy
+ CONFIG_FSL_IMX6UL=3Dy
+ CONFIG_SEMIHOSTING=3Dy
+@@ -38,4 +31,9 @@ CONFIG_SEMIHOSTING=3Dy
+ #CONFIG_ASPEED_SOC=3Dy
+ #CONFIG_NSERIES=3Dy
+ #CONFIG_HIGHBANK=3Dn
++#CONFIG_MUSCA=3Dn
++#CONFIG_STELLARIS=3Dn
++#CONFIG_NETDUINO2=3Dn
++#CONFIG_MPS2=3Dn
++#CONFIG_EMCRAFT_SF2=3Dn
+ #CONFIG_MICROBIT=3Dn
+diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+index b4d31c6026..f8242068ad 100644
+--- a/hw/arm/Kconfig
++++ b/hw/arm/Kconfig
+@@ -13,6 +13,18 @@ config ARM_V6
+     depends on !KVM
+     bool
+=20
++# ARM Microcontroller profile
++config ARM_V7M
++    default y
++    depends on !KVM
++    bool
 +
-+    memory_region_init(&bmc->ram_container, NULL, "aspeed-ram-container",
-+                       UINT32_MAX);
++# ARM Realtime profile
++config ARM_V7R
++    default y
++    depends on !KVM
++    bool
 +
-     object_initialize_child(OBJECT(machine), "soc", &bmc->soc,
-                             (sizeof(bmc->soc)), cfg->soc_name, &error_abort,
-                             NULL);
-@@ -193,16 +198,16 @@ static void aspeed_board_init(MachineState *machine,
-                                         &error_abort);
- 
-     memory_region_allocate_system_memory(&bmc->ram, NULL, "ram", ram_size);
-+    memory_region_add_subregion(&bmc->ram_container, 0, &bmc->ram);
-     memory_region_add_subregion(get_system_memory(),
--                                sc->info->memmap[ASPEED_SDRAM], &bmc->ram);
-+                                sc->info->memmap[ASPEED_SDRAM],
-+                                &bmc->ram_container);
- 
-     max_ram_size = object_property_get_uint(OBJECT(&bmc->soc), "max-ram-size",
-                                             &error_abort);
-     memory_region_init_io(&bmc->max_ram, NULL, &max_ram_ops, NULL,
-                           "max_ram", max_ram_size  - ram_size);
--    memory_region_add_subregion(get_system_memory(),
--                                sc->info->memmap[ASPEED_SDRAM] + ram_size,
--                                &bmc->max_ram);
-+    memory_region_add_subregion(&bmc->ram_container, ram_size, &bmc->max_ram);
- 
-     aspeed_board_init_flashes(&bmc->soc.fmc, cfg->fmc_model, &error_abort);
-     aspeed_board_init_flashes(&bmc->soc.spi[0], cfg->spi_model, &error_abort);
--- 
+ config ARM_VIRT
+     bool
+     imply PCI_DEVICES
+@@ -295,9 +307,6 @@ config ZYNQ
+     select XILINX_SPIPS
+     select ZYNQ_DEVCFG
+=20
+-config ARM_V7M
+-    bool
+-
+ config ALLWINNER_A10
+     bool
+     select AHCI
+@@ -323,6 +332,7 @@ config STM32F205_SOC
+=20
+ config XLNX_ZYNQMP_ARM
+     bool
++    select ARM_V7R
+     select AHCI
+     select ARM_GIC
+     select CADENCE
+--=20
 2.20.1
 
 
