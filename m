@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A001C5B578
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:17:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2358DC5B578
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:20:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB6EC206A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:17:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DBCFA216C8
+	for <qemu-devel@archiver.kernel.org>; Tue,  2 Jul 2019 02:20:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RgyXmKF1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB6EC206A3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="psNUuIla"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBCFA216C8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47167 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hi8MP-0004pK-4m
-	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 22:17:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57246)
+	id 1hi8PL-0006eG-U4
+	for qemu-devel@archiver.kernel.org; Mon, 01 Jul 2019 22:20:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60212)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hi4Sn-00015d-KQ
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:07:55 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hi4fA-0001jQ-KX
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:20:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hi4Se-000270-7V
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:07:47 -0400
-Received: from mail-wr1-f54.google.com ([209.85.221.54]:41336)
+ (envelope-from <peter.maydell@linaro.org>) id 1hi4f6-0005ah-RF
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:20:38 -0400
+Received: from mail-wm1-f41.google.com ([209.85.128.41]:36713)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hi4Sc-000264-7e
- for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:07:44 -0400
-Received: by mail-wr1-f54.google.com with SMTP id c2so15453590wrm.8
- for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 15:07:41 -0700 (PDT)
+ id 1hi4f5-0005Oj-9C
+ for qemu-devel@nongnu.org; Mon, 01 Jul 2019 18:20:36 -0400
+Received: by mail-wm1-f41.google.com with SMTP id u8so1136707wmm.1
+ for <qemu-devel@nongnu.org>; Mon, 01 Jul 2019 15:20:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=kvmRawPGPmElWaZn3Ee6CrEYDJliNT9WQgA2cgByzq0=;
- b=RgyXmKF1Azn3zawAGqyGiQQVgYJ2nV1x8DwVmPZGcQU/NtEQcKVATbRFkMVWbjQ4Ke
- asSYAnGDisiZoaGDhI7K75WNJiXTWcghdKTUapfB3AnzJxxWjyNNnfbo841iTn3rbNDk
- JOjtuFCj3BN0g++slmnAsemuYS4oQVW7hztq98cQNZV9/P5Uj1+N5fxfA8C+bnon5zHk
- kf+aifEaF7XR4bxQiuhvX2QWKJJnJDtOcJFjiInI63rkZv4vcOf9PumaoZTX8iNuywn7
- 4oOd7LqeJHeTvFD9q0UsJ3Yk4Z6HK1VIoxSzb6NGr4UwfwDA3kHeZTDE8BJ/92iac876
- 1F2g==
+ bh=ZMrqkHkBcxi0ttxgCOY8UHzzFSmivWvG6v3OYeb/MfM=;
+ b=psNUuIlaJiNnRjrcJvR6FYbx9Q+lXkqw9w60Qr2zvsK/kpaaljXSX2uKaW+lWHai/v
+ 1LlyBTmYCH53gjVituGG204mtGiSiG05QEGWHULVZcLOY5hYQTOzhU/StnY1z1OAg1/K
+ lKOpMSB7xOhr02TZp/2FDNmU8kE8YVgCbjvAQm894KqoobgpoGed53qS8OpxSP74jEmU
+ PT/Cot+jUY8I7oyKBF/b3L0Dzn4L3ILFHFiAzaZpBSVn4arHjPz59HUaOuDnyoLj1CzT
+ DO+8tMh4G2L1mpTnLvbiHKMbzU+/FQMrewBN5yA8Dh7U1xq5Eq5M8U8G6srkOIsHl7az
+ osSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=kvmRawPGPmElWaZn3Ee6CrEYDJliNT9WQgA2cgByzq0=;
- b=dCHAGdesC3hmFbozMuTpDGuI6/Xv6Iqgi2CbMBlu8Y6SZ+Q8ekuTPzOFGJ0pwroo4Q
- a3A86ly1Lkz8KBqHuHDnOE4p+QOzqrnTg8PzJi1ZUC7XptmkllvKzJR24dBjmmQ3/d9v
- 88UEp00PPtCgNapKhce/WIT5wYpYrXGrpJWgRhw+O5SrzBPYqptRUm5fe5sHbHWFXbvQ
- 4TjutSj/I1ZaXOgFuXRorWi/Q8XcRBiqR393hvHGISJ6DSWbeb+lnCVACoARq898dVjB
- I3RailzIIV2RY43zpVefMlLnVpGQDth4KKU/edm1MfO89bPcloAjTYQ/JxX7SVcEqMDa
- fZNQ==
-X-Gm-Message-State: APjAAAVB9Da2RvbGRoh37nwWLGJWxt4s+3y+ChHuIGZ8TW8I4JpEaISQ
- U4cFJJp7lVJHYQ5ZyT0M2chf8CY9TczDrA==
-X-Google-Smtp-Source: APXvYqwr/B6FgjDNoshZoyySt8Den7g3/hNz1yPFuglMZP3rA7hb9o/KwMze3Acuka/zSRy9laPZnA==
-X-Received: by 2002:a5d:5752:: with SMTP id q18mr14428598wrw.337.1561999224904; 
- Mon, 01 Jul 2019 09:40:24 -0700 (PDT)
+ bh=ZMrqkHkBcxi0ttxgCOY8UHzzFSmivWvG6v3OYeb/MfM=;
+ b=cwF2dAMW/UCOM0/601k0HrC27hQ05rbD01WEu9gf5giZcEZWeKgd+lqYgWmtF3bsE9
+ nfc62o9rudQ9UXx2Da0scAGPHz5NxjwqFyN8+4dSVPNfmRXba1orCgmd+Y8Dhb8cgPkK
+ xylsKSBBaA+h3SLszgASXQe35TqLpoDR5fU2KOkEnatW2xIdS4hk/ENsz+4JWSYZP03v
+ huE7NRg0AXwS3KzgEqKJcYaFnOPav9Zy6MCr2fjvbEf/oxLmbSWmjuQb+L3C5GzU34Di
+ nyJI2VroiB/G46GetrJIAg5K+vTGC4hPGe5buB4FNzF51z/ErVRwfmUlqsrqXiPPz3Jl
+ 8mpg==
+X-Gm-Message-State: APjAAAVTUVbZG6/NuqCJAjSyzvIhmUJoZKJ0AJdpPPsPLv1tJHqu//xq
+ CBVZgT9cT4TUGLx6GArweCX3Y7b24wk8Ag==
+X-Google-Smtp-Source: APXvYqx23JurnM+ro/0QqE+Fix2mx14PhNMapJnEhNTEbXDFEkfIcz8Fq93eyUBKtDByF9QRP/xAeA==
+X-Received: by 2002:a1c:e108:: with SMTP id y8mr114068wmg.65.1561999231515;
+ Mon, 01 Jul 2019 09:40:31 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id o6sm26573508wra.27.2019.07.01.09.40.23
+ by smtp.gmail.com with ESMTPSA id o6sm26573508wra.27.2019.07.01.09.40.30
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 01 Jul 2019 09:40:23 -0700 (PDT)
+ Mon, 01 Jul 2019 09:40:30 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon,  1 Jul 2019 17:39:32 +0100
-Message-Id: <20190701163943.22313-36-peter.maydell@linaro.org>
+Date: Mon,  1 Jul 2019 17:39:38 +0100
+Message-Id: <20190701163943.22313-42-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190701163943.22313-1-peter.maydell@linaro.org>
 References: <20190701163943.22313-1-peter.maydell@linaro.org>
@@ -81,8 +81,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.54
-Subject: [Qemu-devel] [PULL 35/46] target/arm: Fix coding style issues
+X-Received-From: 209.85.128.41
+Subject: [Qemu-devel] [PULL 41/46] target/arm/vfp_helper: Extract
+ vfp_set_fpscr_to_host()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,122 +101,167 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Since we'll move this code around, fix its style first.
+The vfp_set_fpscr() helper contains code specific to the host
+floating point implementation (here the SoftFloat library).
+Extract this code to vfp_set_fpscr_to_host().
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20190701132516.26392-9-philmd@redhat.com
+Message-id: 20190701132516.26392-16-philmd@redhat.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate.c  | 11 ++++++-----
- target/arm/vfp_helper.c | 36 ++++++++++++++++++++++++------------
- 2 files changed, 30 insertions(+), 17 deletions(-)
+ target/arm/vfp_helper.c | 127 +++++++++++++++++++++-------------------
+ 1 file changed, 66 insertions(+), 61 deletions(-)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 4750b9fa1bb..c6bdf026b45 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -9109,7 +9109,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                 loaded_base = 0;
-                 loaded_var = NULL;
-                 n = 0;
--                for(i=0;i<16;i++) {
-+                for (i = 0; i < 16; i++) {
-                     if (insn & (1 << i))
-                         n++;
-                 }
-@@ -9132,7 +9132,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                     }
-                 }
-                 j = 0;
--                for(i=0;i<16;i++) {
-+                for (i = 0; i < 16; i++) {
-                     if (insn & (1 << i)) {
-                         if (is_load) {
-                             /* load */
-@@ -12353,12 +12353,13 @@ void arm_cpu_dump_state(CPUState *cs, FILE *f, int flags)
-         return;
-     }
- 
--    for(i=0;i<16;i++) {
-+    for (i = 0; i < 16; i++) {
-         qemu_fprintf(f, "R%02d=%08x", i, env->regs[i]);
--        if ((i % 4) == 3)
-+        if ((i % 4) == 3) {
-             qemu_fprintf(f, "\n");
--        else
-+        } else {
-             qemu_fprintf(f, " ");
-+        }
-     }
- 
-     if (arm_feature(env, ARM_FEATURE_M)) {
 diff --git a/target/arm/vfp_helper.c b/target/arm/vfp_helper.c
-index 7ece78e987b..121bdbd3aff 100644
+index d54e3253240..b19a395b67d 100644
 --- a/target/arm/vfp_helper.c
 +++ b/target/arm/vfp_helper.c
-@@ -34,18 +34,24 @@ static inline int vfp_exceptbits_from_host(int host_bits)
- {
-     int target_bits = 0;
- 
--    if (host_bits & float_flag_invalid)
-+    if (host_bits & float_flag_invalid) {
-         target_bits |= 1;
--    if (host_bits & float_flag_divbyzero)
-+    }
-+    if (host_bits & float_flag_divbyzero) {
-         target_bits |= 2;
--    if (host_bits & float_flag_overflow)
-+    }
-+    if (host_bits & float_flag_overflow) {
-         target_bits |= 4;
--    if (host_bits & (float_flag_underflow | float_flag_output_denormal))
-+    }
-+    if (host_bits & (float_flag_underflow | float_flag_output_denormal)) {
-         target_bits |= 8;
--    if (host_bits & float_flag_inexact)
-+    }
-+    if (host_bits & float_flag_inexact) {
-         target_bits |= 0x10;
--    if (host_bits & float_flag_input_denormal)
-+    }
-+    if (host_bits & float_flag_input_denormal) {
-         target_bits |= 0x80;
-+    }
-     return target_bits;
- }
- 
-@@ -80,18 +86,24 @@ static inline int vfp_exceptbits_to_host(int target_bits)
- {
-     int host_bits = 0;
- 
--    if (target_bits & 1)
-+    if (target_bits & 1) {
-         host_bits |= float_flag_invalid;
--    if (target_bits & 2)
-+    }
-+    if (target_bits & 2) {
-         host_bits |= float_flag_divbyzero;
--    if (target_bits & 4)
-+    }
-+    if (target_bits & 4) {
-         host_bits |= float_flag_overflow;
--    if (target_bits & 8)
-+    }
-+    if (target_bits & 8) {
-         host_bits |= float_flag_underflow;
--    if (target_bits & 0x10)
-+    }
-+    if (target_bits & 0x10) {
-         host_bits |= float_flag_inexact;
--    if (target_bits & 0x80)
-+    }
-+    if (target_bits & 0x80) {
-         host_bits |= float_flag_input_denormal;
-+    }
+@@ -81,71 +81,11 @@ static inline int vfp_exceptbits_to_host(int target_bits)
      return host_bits;
  }
  
+-uint32_t HELPER(vfp_get_fpscr)(CPUARMState *env)
+-{
+-    uint32_t i, fpscr;
+-
+-    fpscr = env->vfp.xregs[ARM_VFP_FPSCR]
+-            | (env->vfp.vec_len << 16)
+-            | (env->vfp.vec_stride << 20);
+-
+-    i = get_float_exception_flags(&env->vfp.fp_status);
+-    i |= get_float_exception_flags(&env->vfp.standard_fp_status);
+-    /* FZ16 does not generate an input denormal exception.  */
+-    i |= (get_float_exception_flags(&env->vfp.fp_status_f16)
+-          & ~float_flag_input_denormal);
+-    fpscr |= vfp_exceptbits_from_host(i);
+-
+-    i = env->vfp.qc[0] | env->vfp.qc[1] | env->vfp.qc[2] | env->vfp.qc[3];
+-    fpscr |= i ? FPCR_QC : 0;
+-
+-    return fpscr;
+-}
+-
+-uint32_t vfp_get_fpscr(CPUARMState *env)
+-{
+-    return HELPER(vfp_get_fpscr)(env);
+-}
+-
+-void HELPER(vfp_set_fpscr)(CPUARMState *env, uint32_t val)
++static void vfp_set_fpscr_to_host(CPUARMState *env, uint32_t val)
+ {
+     int i;
+     uint32_t changed = env->vfp.xregs[ARM_VFP_FPSCR];
+ 
+-    /* When ARMv8.2-FP16 is not supported, FZ16 is RES0.  */
+-    if (!cpu_isar_feature(aa64_fp16, env_archcpu(env))) {
+-        val &= ~FPCR_FZ16;
+-    }
+-
+-    if (arm_feature(env, ARM_FEATURE_M)) {
+-        /*
+-         * M profile FPSCR is RES0 for the QC, STRIDE, FZ16, LEN bits
+-         * and also for the trapped-exception-handling bits IxE.
+-         */
+-        val &= 0xf7c0009f;
+-    }
+-
+-    /*
+-     * We don't implement trapped exception handling, so the
+-     * trap enable bits, IDE|IXE|UFE|OFE|DZE|IOE are all RAZ/WI (not RES0!)
+-     *
+-     * If we exclude the exception flags, IOC|DZC|OFC|UFC|IXC|IDC
+-     * (which are stored in fp_status), and the other RES0 bits
+-     * in between, then we clear all of the low 16 bits.
+-     */
+-    env->vfp.xregs[ARM_VFP_FPSCR] = val & 0xf7c80000;
+-    env->vfp.vec_len = (val >> 16) & 7;
+-    env->vfp.vec_stride = (val >> 20) & 3;
+-
+-    /*
+-     * The bit we set within fpscr_q is arbitrary; the register as a
+-     * whole being zero/non-zero is what counts.
+-     */
+-    env->vfp.qc[0] = val & FPCR_QC;
+-    env->vfp.qc[1] = 0;
+-    env->vfp.qc[2] = 0;
+-    env->vfp.qc[3] = 0;
+-
+     changed ^= val;
+     if (changed & (3 << 22)) {
+         i = (val >> 22) & 3;
+@@ -193,6 +133,71 @@ void HELPER(vfp_set_fpscr)(CPUARMState *env, uint32_t val)
+     set_float_exception_flags(0, &env->vfp.standard_fp_status);
+ }
+ 
++uint32_t HELPER(vfp_get_fpscr)(CPUARMState *env)
++{
++    uint32_t i, fpscr;
++
++    fpscr = env->vfp.xregs[ARM_VFP_FPSCR]
++            | (env->vfp.vec_len << 16)
++            | (env->vfp.vec_stride << 20);
++
++    i = get_float_exception_flags(&env->vfp.fp_status);
++    i |= get_float_exception_flags(&env->vfp.standard_fp_status);
++    /* FZ16 does not generate an input denormal exception.  */
++    i |= (get_float_exception_flags(&env->vfp.fp_status_f16)
++          & ~float_flag_input_denormal);
++    fpscr |= vfp_exceptbits_from_host(i);
++
++    i = env->vfp.qc[0] | env->vfp.qc[1] | env->vfp.qc[2] | env->vfp.qc[3];
++    fpscr |= i ? FPCR_QC : 0;
++
++    return fpscr;
++}
++
++uint32_t vfp_get_fpscr(CPUARMState *env)
++{
++    return HELPER(vfp_get_fpscr)(env);
++}
++
++void HELPER(vfp_set_fpscr)(CPUARMState *env, uint32_t val)
++{
++    /* When ARMv8.2-FP16 is not supported, FZ16 is RES0.  */
++    if (!cpu_isar_feature(aa64_fp16, env_archcpu(env))) {
++        val &= ~FPCR_FZ16;
++    }
++
++    if (arm_feature(env, ARM_FEATURE_M)) {
++        /*
++         * M profile FPSCR is RES0 for the QC, STRIDE, FZ16, LEN bits
++         * and also for the trapped-exception-handling bits IxE.
++         */
++        val &= 0xf7c0009f;
++    }
++
++    /*
++     * We don't implement trapped exception handling, so the
++     * trap enable bits, IDE|IXE|UFE|OFE|DZE|IOE are all RAZ/WI (not RES0!)
++     *
++     * If we exclude the exception flags, IOC|DZC|OFC|UFC|IXC|IDC
++     * (which are stored in fp_status), and the other RES0 bits
++     * in between, then we clear all of the low 16 bits.
++     */
++    env->vfp.xregs[ARM_VFP_FPSCR] = val & 0xf7c80000;
++    env->vfp.vec_len = (val >> 16) & 7;
++    env->vfp.vec_stride = (val >> 20) & 3;
++
++    /*
++     * The bit we set within fpscr_q is arbitrary; the register as a
++     * whole being zero/non-zero is what counts.
++     */
++    env->vfp.qc[0] = val & FPCR_QC;
++    env->vfp.qc[1] = 0;
++    env->vfp.qc[2] = 0;
++    env->vfp.qc[3] = 0;
++
++    vfp_set_fpscr_to_host(env, val);
++}
++
+ void vfp_set_fpscr(CPUARMState *env, uint32_t val)
+ {
+     HELPER(vfp_set_fpscr)(env, val);
 -- 
 2.20.1
 
